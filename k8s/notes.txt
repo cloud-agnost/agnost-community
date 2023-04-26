@@ -1,0 +1,9 @@
+Install rabbitmq kubernetes operator
+https://www.rabbitmq.com/kubernetes/operator/install-operator.html
+
+MongoDB community edition kubernetes operator
+https://github.com/mongodb/mongodb-kubernetes-operator
+
+
+Create the mongodb initialization config map
+kubectl create configmap engine-mongodb-configmap --from-file=./scripts/mongoinit.js

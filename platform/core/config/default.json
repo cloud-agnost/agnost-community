@@ -1,0 +1,40 @@
+{
+    "server": {
+        "host": "localhost",
+        "port": 4000,
+        "timeout": 3600000,
+        "maxBodySize": "50mb"
+     },
+     "rateLimiters": [{      
+        "rateLimitWindowSec": 30,
+        "rateLimitMaxHits": 300}],
+    "general": {  
+        "minPwdLength": 8,
+        "maxTextLength": 64,
+        "maxDetailTxtLength": 1024,
+        "maxImageSizeMB": 3,
+        "maxDbNameLength": 58,
+        "maxModelNameLength": 58,
+        "maxFieldNameLength": 58,
+        "profileImgSizePx": 512,
+        "minPageSize": 1,
+        "maxPageSize": 100,
+        "maxTextFieldLength": 10240,
+        "maxRichTextFieldLength": 524288,
+        "maxEncryptedTextFieldLength": 50,
+        "maxDecimalDigits": 10,
+        "maxOptionsCount": 1000,
+        "masterToken": "mt_hYZqahaQ20P5kSvpEJ3ky0opT8zJX5Y1VFIZ"
+    },
+    "session": {
+        "validationCodeExpiry": 600,
+        "accessTokenExpiry": 31536000,
+        "refreshTokenExpiry": 31536000
+    },
+    "storage": {
+        "profileImagesBucket": "agnost-profile-pictures",
+        "orgImagesBucket": "agnost-organization-pictures",
+        "appImagesBucket": "agnost-app-pictures"
+
+    }
+}

@@ -1,0 +1,17 @@
+{
+     "queue": {
+        "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
+        "port": 5672,
+        "reconnectInterval": 1000,
+        "retryCount": 30
+     },
+     "database": {
+        "minPoolSize": 3
+     },
+     "emailServer": {
+      "host": "smtp.mandrillapp.com",
+      "port": 587,
+      "secure": false,
+      "pool": true
+   }
+}

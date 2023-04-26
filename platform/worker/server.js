@@ -1,0 +1,136 @@
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import nocache from "nocache";
+import cluster from "cluster";
+import process from "process";
+import config from "config";
+import path from "path";
+import os from "os";
+import { I18n } from "i18n";
+import { fileURLToPath } from "url";
+import logger from "./init/logger.js";
+import { connectToDatabase, disconnectFromDatabase } from "./init/db.js";
+import { connectToQueue, disconnectFromQueue } from "./init/queue.js";
+import { handleUndefinedPaths } from "./middlewares/undefinedPaths.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Get number of CPUS of the node
+const numCPUs = os.cpus().length;
+
+// If this is the primary process fork as many child processes as possible to max utilize the system resources
+if (
+	cluster.isPrimary &&
+	numCPUs > 1 &&
+	["production", "clouddev"].includes(process.env.NODE_ENV)
+) {
+	logger.info(`Primary process ${process.pid} is running`);
+
+	for (let i = 0; i < numCPUs; i++) {
+		cluster.fork();
+	}
+
+	cluster.on("exit", function (worker, code, signal) {
+		logger.warn(`Platform worker process ${worker.process.pid} died`);
+		cluster.fork();
+	});
+} else if (cluster.isWorker || ["development"].includes(process.env.NODE_ENV)) {
+	logger.info(`Platform worker process ${process.pid} is running`);
+	// Init globally accessible variables
+	initGlobals();
+	// Set up locatlization
+	const i18n = initLocalization();
+	// Connect to the database
+	connectToDatabase();
+	// Connect to message queue
+	connectToQueue();
+	// Spin up http server
+	const server = initExpress(i18n);
+
+	// Gracefull handle process exist
+	handleProcessExit(server);
+}
+
+function initGlobals() {
+	// Add logger to the global object
+	global.logger = logger;
+
+	// To correctly identify errors thrown by the platform vs. system thrown errors
+	global.AgnostError = class extends Error {
+		constructor(message) {
+			super(message);
+		}
+	};
+	// Add config to the global object
+	global.config = config;
+}
+
+function initLocalization() {
+	// Multi-language support configuration
+	const i18n = new I18n({
+		locales: ["en", "tr"],
+		directory: path.join(__dirname, "locales"),
+		defaultLocale: "en",
+		// watch for changes in JSON files to reload locale on updates
+		autoReload: true,
+		// whether to write new locale information to disk
+		updateFiles: false,
+		// sync locale information across all files
+		syncFiles: false,
+		register: global,
+		api: {
+			__: "t", //now req.__ becomes req.t
+			__n: "tn", //and req.__n can be called as req.tn
+		},
+		preserveLegacyCase: false,
+	});
+
+	return i18n;
+}
+
+async function initExpress(i18n) {
+	// Create express application
+	var app = express();
+	//Secure express app by setting various HTTP headers
+	app.use(helmet());
+	//Enable cross-origin resource sharing
+	app.use(cors());
+	//Disable client side caching
+	app.use(nocache());
+	app.set("etag", false);
+	// Add middleware to identify user locale using 'accept-language' header to guess language settings
+	app.use(i18n.init);
+
+	app.use("/", (await import("./routes/system.js")).default);
+
+	// Middleware to handle undefined paths or posts
+	app.use(handleUndefinedPaths);
+
+	// Spin up the http server
+	const HOST = config.get("server.host");
+	const PORT = config.get("server.port");
+	var server = app.listen(PORT, () => {
+		logger.info(`Http server started @ ${HOST}:${PORT}`);
+	});
+
+	/* 	Particularly needed in case of bulk insert/update/delete operations, we should not generate 502 Bad Gateway errors at nginex ingress controller, the value specified in default config file is in milliseconds */
+	server.timeout = config.get("server.timeout");
+
+	return server;
+}
+
+function handleProcessExit(server) {
+	//Gracefully exit if we force quit through cntr+C
+	process.on("SIGINT", () => {
+		// Close connection to the database
+		disconnectFromDatabase();
+		// Close connection to message queue
+		disconnectFromQueue();
+		//Close Http server
+		server.close(() => {
+			logger.info("Http server closed");
+		});
+	});
+}

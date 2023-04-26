@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: platform-worker-deployment
+   labels:
+      app: platform-worker
+spec:
+   replicas: 1
+   selector:
+      matchLabels:
+         app: platform-worker
+   template:
+      metadata:
+         labels:
+            app: platform-worker
+      spec:
+         containers:
+            - name: platform-worker
+              image: agnost/platform-worker
+              # We will be using the minikube docker daemon, since the actual docker daemon on local machine are different
+              # Prevent minikube docker daemon to pull images from central docker hub set imagePullPolicy to Never, so that
+              # it uses the image put in minikube's docker environment, see dev.sh script how we change the docker context to minikube
+              imagePullPolicy: Never
+              env:
+                 - name: QUEUE_URL
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: queueURL
+                 - name: EMAIL_SERVER_USER
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: emailServerUser
+                 - name: EMAIL_SERVER_PWD
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: emailServerPwd
+                 - name: PLATFORM_DB_URI
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: clusterDBURI
+                 - name: PLATFORM_DB_USER
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: clusterDBUser
+                 - name: PLATFORM_DB_PWD
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: clusterDBPwd

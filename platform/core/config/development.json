@@ -1,0 +1,46 @@
+{
+    "cache": {
+        "hostname": "platform-redis-clusterip-service",
+        "port": 6379,
+        "readReplica": {
+            "hostname": "platform-redis-clusterip-service",
+            "port": 6379
+        }
+     },
+     "queue": {
+        "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
+        "port": 5672,
+        "reconnectInterval": 1000,
+        "retryCount": 30
+     },
+     "database": {
+        "minPoolSize": 3
+     },
+     "sync": {
+      "serverURL": "http://platform-sync-clusterip-service:4000",
+      "namespace": "sync",
+      "reconnection": true,
+      "reconnectionDelay": 500
+   },
+     "oauth": {
+         "redirectUrl": "http://api.development.test/auth-redirect",
+         "github": {
+            "clientId": "4cf945c9d196d1652f61",
+            "clientSecret": "1b72c763411e979082d45cb521b50ba2f4ed2993",
+            "callbackUrl": "http://api.development.test/v1/auth/continue/github/callback"
+         },
+         "gitlab": {
+            "clientId": "62fc034e053b62ed63a0fdbda262c2e7653f6515c6501989d08d4f998f4b724c",
+            "clientSecret": "1bd01cf356714ea1307e8608f9b74855a3dc3caec05ddb887e184d0ce912f1c8",
+            "callbackUrl": "http://api.development.test/v1/auth/continue/gitlab/callback"
+         }
+     },
+     "general": {
+         "uiBaseUrl": "http://api.development.test",
+         "platformBaseUrl": "http://platform-core-clusterip-service:4000"
+     },
+     "defaultEngineClusterAccess": {
+         "workerUrl": "http://engine-worker-clusterip-service:4000",
+         "accessToken": "at_2F5FOIkOXEOmPfywWJ6JRZXCnzFgtqVIHAJ7"
+     }
+}

@@ -1,0 +1,15 @@
+{
+     "database": {
+        "minPoolSize": 3
+     },
+     "sync": {
+      "pingTimeout": 30000,
+      "pingInterval": 10000,
+      "upgradeTimeout": 10000,
+      "serveClient": false
+   },
+   "cache": {
+      "hostname": "sync-redis-clusterip-service",
+      "port": 6379
+   }
+}

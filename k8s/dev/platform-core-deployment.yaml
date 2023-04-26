@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: platform-core-deployment
+   labels:
+      app: platform-core
+spec:
+   replicas: 1
+   selector:
+      matchLabels:
+         app: platform-core
+   template:
+      metadata:
+         labels:
+            app: platform-core
+      spec:
+         containers:
+            - name: platform-core
+              image: agnost/platform-core
+              # We will be using the minikube docker daemon, since the actual docker daemon on local machine are different
+              # Prevent minikube docker daemon to pull images from central docker hub set imagePullPolicy to Never, so that
+              # it uses the image put in minikube's docker environment, see dev.sh script how we change the docker context to minikube
+              imagePullPolicy: Never
+              ports:
+                 - containerPort: 4000
+              env:
+                 - name: CACHE_PWD
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: cachePwd
+                 - name: CACHE_READ_REPLICA_PWD
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: cacheReadReplicaPwd
+                 - name: QUEUE_URL
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: queueURL
+                 - name: PLATFORM_DB_URI
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: clusterDBURI
+                 - name: PLATFORM_DB_USER
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: clusterDBUser
+                 - name: PLATFORM_DB_PWD
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: clusterDBPwd
+                 - name: PASSPHRASE
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: passPhrase

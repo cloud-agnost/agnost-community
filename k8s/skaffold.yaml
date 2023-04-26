@@ -1,0 +1,57 @@
+# On command line use the below command, if --trigger=polling is not added then file sync does not work
+# skaffold dev --trigger='polling' --no-prune=false --cache-artifacts=false
+apiVersion: skaffold/v2alpha3
+kind: Config
+build:
+   artifacts:
+      - image:  agnost/platform-core
+        context: ../platform/core
+        sync:
+           infer:
+              - '**/*.js'
+              - '**/*.json'
+        docker:
+           dockerfile: Dockerfile.dev
+      - image: agnost/platform-worker
+        context: ../platform/worker
+        sync:
+           infer:
+              - '**/*.js'
+              - '**/*.json'
+              - '**/*.pug'
+        docker:
+           dockerfile: Dockerfile.dev
+      - image: agnost/platform-sync
+        context: ../platform/sync
+        sync:
+           infer:
+              - '**/*.js'
+              - '**/*.json'
+              - '**/*.pug'
+        docker:
+           dockerfile: Dockerfile.dev
+      - image: agnost/engine-core
+        context: ../engine/core
+        sync:
+          infer:
+              - '**/*.js'
+              - '**/*.json'
+        docker:
+          dockerfile: Dockerfile.dev
+      - image: agnost/engine-worker
+        context: ../engine/worker
+        sync:
+          infer:
+              - '**/*.js'
+              - '**/*.json'
+        docker:
+          dockerfile: Dockerfile.dev
+deploy:
+   statusCheckDeadlineSeconds: 300
+   kubectl:
+      manifests:
+         - dev/platform-core-deployment.yaml
+         - dev/platform-worker-deployment.yaml
+         - dev/platform-sync-deployment.yaml
+         - dev/engine-core-deployment.yaml
+         - dev/engine-worker-deployment.yaml
