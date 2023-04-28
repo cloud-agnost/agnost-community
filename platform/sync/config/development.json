@@ -9,7 +9,7 @@
       "serveClient": false
    },
    "cache": {
-      "hostname": "sync-redis-clusterip-service",
+      "hostname": "cluster-redis-clusterip-service",
       "port": 6379
    }
 }

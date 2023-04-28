@@ -5,16 +5,17 @@ var client;
 
 export const connectToDatabase = async () => {
 	try {
-		client = new mongo.MongoClient(
-			`mongodb://${process.env.ENGINE_DB_USER}:${process.env.ENGINE_DB_PWD}@engine-mongodb-clusterip-service`,
-			{
-				minPoolSize: config.get("database.minPoolSize"),
-				useNewUrlParser: true,
-			}
-		);
+		client = new mongo.MongoClient(process.env.ENGINE_DB_URI, {
+			minPoolSize: config.get("database.minPoolSize"),
+			useNewUrlParser: true,
+			auth: {
+				username: process.env.ENGINE_DB_USER,
+				password: process.env.ENGINE_DB_PWD,
+			},
+		});
 		//Connect to the database of the application
 		await client.connect();
-		logger.info(`Connected to the database @${config.get("database.uri")}`);
+		logger.info(`Connected to the database ${process.env.ENGINE_DB_URI}`);
 	} catch (err) {
 		logger.error(`Cannot connect to the database`, { details: err });
 		process.exit(1);
@@ -26,6 +27,6 @@ export const disconnectFromDatabase = async () => {
 	logger.info("Disconnected from the database");
 };
 
-export const getMongoDBClient = () => {
+export const getDBClient = () => {
 	return client;
 };

@@ -16,7 +16,7 @@ spec:
       spec:
          containers:
             - name: platform-core
-              image: agnost/platform-core
+              image: agnost-enterprise/platform-core
               # We will be using the minikube docker daemon, since the actual docker daemon on local machine are different
               # Prevent minikube docker daemon to pull images from central docker hub set imagePullPolicy to Never, so that
               # it uses the image put in minikube's docker environment, see dev.sh script how we change the docker context to minikube

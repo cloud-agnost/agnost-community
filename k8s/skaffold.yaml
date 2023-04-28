@@ -4,7 +4,7 @@ apiVersion: skaffold/v2alpha3
 kind: Config
 build:
    artifacts:
-      - image:  agnost/platform-core
+      - image:  agnost-enterprise/platform-core
         context: ../platform/core
         sync:
            infer:
@@ -12,7 +12,7 @@ build:
               - '**/*.json'
         docker:
            dockerfile: Dockerfile.dev
-      - image: agnost/platform-worker
+      - image: agnost-enterprise/platform-worker
         context: ../platform/worker
         sync:
            infer:
@@ -21,7 +21,7 @@ build:
               - '**/*.pug'
         docker:
            dockerfile: Dockerfile.dev
-      - image: agnost/platform-sync
+      - image: agnost-enterprise/platform-sync
         context: ../platform/sync
         sync:
            infer:
@@ -30,7 +30,7 @@ build:
               - '**/*.pug'
         docker:
            dockerfile: Dockerfile.dev
-      - image: agnost/engine-core
+      - image: agnost-enterprise/engine-core
         context: ../engine/core
         sync:
           infer:
@@ -38,7 +38,7 @@ build:
               - '**/*.json'
         docker:
           dockerfile: Dockerfile.dev
-      - image: agnost/engine-worker
+      - image: agnost-enterprise/engine-worker
         context: ../engine/worker
         sync:
           infer:

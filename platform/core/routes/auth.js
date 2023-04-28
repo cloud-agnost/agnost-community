@@ -10,7 +10,6 @@ import { validate } from "../middlewares/validate.js";
 import { authSession } from "../middlewares/authSession.js";
 import { authRefreshToken } from "../middlewares/authRefreshToken.js";
 import { checkOAuthProvider } from "../middlewares/checkOAuthProvider.js";
-import { continueWithProvider } from "../middlewares/continueWithProvider.js";
 import { sendMessage } from "../init/queue.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
@@ -334,60 +333,6 @@ router.post("/renew", authRefreshToken, async (req, res) => {
 		handleError(req, res, error);
 	}
 });
-
-/*
-@route      /v1/auth/continue/:provider
-@method     GET
-@desc       Signs up or signs in the user using the provider credentials.
-@access     private
-*/
-router.get("/continue/:provider", checkOAuthProvider, continueWithProvider);
-
-/*
-@route      /v1/auth/continue/:provider/callback
-@method     GET
-@desc       This is the callback url called by the oAuth provider in case of successful authentication. 
-@access     private
-*/
-router.get(
-	"/continue/:provider/callback",
-	checkOAuthProvider,
-	continueWithProvider,
-	async (req, res) => {
-		try {
-			if (req.authResult.tokens) {
-				res.redirect(
-					helper.appendQueryParams(config.get("oauth.redirectUrl"), {
-						provider: req.provider.name,
-						action: req.authResult.action,
-						status: 200,
-						at: req.authResult.tokens.at,
-						rt: req.authResult.tokens.rt,
-					})
-				);
-
-				// Log action
-				auditCtrl.log(
-					req.authResult.user,
-					"user",
-					"login",
-					t("Logged in using '%s' credentials", req.provider.name)
-				);
-			} else {
-				res.redirect(
-					helper.appendQueryParams(config.get("oauth.redirectUrl"), {
-						provider: req.provider.name,
-						action: req.authResult.action,
-						status: 200,
-						...req.authResult.profile,
-					})
-				);
-			}
-		} catch (error) {
-			handleError(req, res, error);
-		}
-	}
-);
 
 /*
 @route      /v1/auth/profile

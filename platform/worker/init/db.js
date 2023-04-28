@@ -16,9 +16,7 @@ export const connectToDatabase = async () => {
 		//Connect to the platform database
 		await dbConnection.connect();
 
-		logger.info(
-			`Connected to the main database @${process.env.PLATFORM_DB_URI}`
-		);
+		logger.info(`Connected to the database @${process.env.PLATFORM_DB_URI}`);
 	} catch (err) {
 		logger.error(`Cannot connect to the database`, {
 			details: err,

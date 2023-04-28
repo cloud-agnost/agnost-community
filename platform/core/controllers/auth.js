@@ -88,24 +88,6 @@ const deleteSession = async (session) => {
 };
 
 /**
- * Keeps the list of supported oAuth provider configurations
- */
-const providers = [
-	{
-		name: "github",
-		clientId: config.get("oauth.github.clientId"),
-		clientSecret: config.get("oauth.github.clientSecret"),
-		callbackUrl: config.get("oauth.github.callbackUrl"),
-	},
-	{
-		name: "gitlab",
-		clientId: config.get("oauth.gitlab.clientId"),
-		clientSecret: config.get("oauth.gitlab.clientSecret"),
-		callbackUrl: config.get("oauth.gitlab.callbackUrl"),
-	},
-];
-
-/**
  * Returns the list of supported oAuth providers
  */
 const getSupportedProviders = () => {

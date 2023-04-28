@@ -4,10 +4,10 @@
       "minPoolSize": 3
    },
    "cache": {
-      "hostname": "engine-redis-clusterip-service",
+      "hostname": "cluster-redis-clusterip-service",
       "port": 6379,
       "readReplica": {
-         "hostname": "engine-redis-clusterip-service",
+         "hostname": "cluster-redis-clusterip-service",
          "port": 6379
       }
    },

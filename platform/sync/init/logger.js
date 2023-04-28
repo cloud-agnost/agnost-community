@@ -26,7 +26,7 @@ class MongoDBTransport extends Transport {
 			// Save the error to the errors collection, do not wait for the save operation to complete and write it fast
 			let dbClient = getDBClient();
 			dbClient
-				.db("agnost")
+				.db("agnost_enterprise")
 				.collection("platform_errors")
 				.insertOne(entry, { writeConcern: { w: 0 } });
 		} catch (err) {}

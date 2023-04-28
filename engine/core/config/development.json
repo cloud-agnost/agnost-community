@@ -4,21 +4,20 @@
       "minPoolSize": 3
    },
     "cache": {
-        "hostname": "engine-redis-clusterip-service",
+        "hostname": "cluster-redis-clusterip-service",
         "port": 6379,
         "readReplica": {
-            "hostname": "engine-redis-clusterip-service",
+            "hostname": "cluster-redis-clusterip-service",
             "port": 6379
         }
      },
      "queue": {
-        "hostname": "engine-rabbitmq",
-        "port": 5672,
-        "reconnectInterval": 1000,
-        "retryCount": 30,
-        "frameMax": 0,
-        "heartbeat": 60
-     },
+      "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
+      "port": 5672,
+      "reconnectInterval": 1000,
+      "retryCount": 30,
+      "developmentSuffix": "mito"
+   },
      "sync": {
         "serverURL": "http://platform-sync-clusterip-service:4000",
         "namespace": "sync",

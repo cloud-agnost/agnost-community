@@ -1,5 +1,6 @@
 import winston from "winston";
 import Transport from "winston-transport";
+import { getDBClient } from "./db.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const { combine, timestamp, printf } = winston.format;
@@ -20,6 +21,15 @@ class MongoDBTransport extends Transport {
 			payload: log.payload,
 			code: ERROR_CODES.internalServerError,
 		};
+
+		try {
+			// Save the error to the errors collection, do not wait for the save operation to complete and write it fast
+			let dbClient = getDBClient();
+			dbClient
+				.db("agnost_enterprise")
+				.collection("platform_errors")
+				.insertOne(entry, { writeConcern: { w: 0 } });
+		} catch (err) {}
 
 		callback();
 	}
