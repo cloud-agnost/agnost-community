@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 import { body, param, query } from "express-validator";
+import {
+	providerTypes,
+	notificationTypes,
+	userStatus,
+} from "../config/constants.js";
+import userCtrl from "../controllers/user.js";
 
 /**
  * Models the user information. Users will be associated with organizations and apps. App users will be part of the organization
@@ -47,7 +53,11 @@ export const UserModel = mongoose.model(
 			},
 			canCreateOrg: {
 				type: Boolean,
-				default: true,
+				default: false,
+			},
+			isClusterOwner: {
+				type: Boolean,
+				default: false,
 			},
 			loginProfiles: [
 				{
@@ -56,6 +66,7 @@ export const UserModel = mongoose.model(
 						type: String,
 						required: true,
 						index: true,
+						enum: providerTypes,
 					},
 					id: {
 						// The unique identifier of the user associated with this login profile.
@@ -68,7 +79,6 @@ export const UserModel = mongoose.model(
 					password: {
 						// This field will only be populated if a user has an email login connection
 						type: String,
-						select: false,
 					},
 					email: {
 						// Independent of the provider we store the email address of the user
@@ -83,17 +93,15 @@ export const UserModel = mongoose.model(
 					},
 				},
 			],
+			notifications: {
+				type: [String],
+				enum: notificationTypes,
+			},
 			status: {
 				type: String,
 				required: true,
 				default: "Pending",
-				enum: ["Pending", "Active", "Suspended"],
-			},
-			suspensionReason: {
-				type: String,
-			},
-			suspensionDtm: {
-				type: Date,
+				enum: userStatus,
 			},
 			__v: {
 				type: Number,
@@ -106,49 +114,40 @@ export const UserModel = mongoose.model(
 
 export const applyRules = (type) => {
 	switch (type) {
-		case "signup":
-		case "add-profile":
+		case "view":
 			return [
-				body("provider")
+				query("page")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isIn(["agnost", "github", "bitbucket", "gitlab"])
-					.withMessage(t("Unsupported sign-up provider"))
-					.bail()
-					.if(() => type === "add-profile")
-					.isIn(["github", "bitbucket", "gitlab"])
+					.isInt({
+						min: 0,
+					})
 					.withMessage(
-						t("Only oAuth providers can be added as a login profile")
-					),
-				body("id")
-					.if(body("provider").isIn(["github", "bitbucket", "gitlab"]))
+						t("Page number needs to be a positive integer or 0 (zero)")
+					)
+					.toInt(),
+				query("size")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.custom(async (value, { req }) => {
-						// Check whether email is unique or not
-						let user = await UserModel.findOne({
-							"loginProfiles.provider": {
-								$in: ["github", "bitbucket", "gitlab"],
-							},
-							"loginProfiles.id": value,
-						}).lean();
-
-						if (user) {
-							throw new AgnostError(
-								type === "sign-up"
-									? t("User has already signed up with the selected provider")
-									: t(
-											"The login provider '%s' has already been added to a user account",
-											req.body.provider
-									  )
-							);
-						}
-						return true;
-					}),
+					.isInt({
+						min: config.get("general.minPageSize"),
+						max: config.get("general.maxPageSize"),
+					})
+					.withMessage(
+						t(
+							"Page size needs to be an integer, between %s and %s",
+							config.get("general.minPageSize"),
+							config.get("general.maxPageSize")
+						)
+					)
+					.toInt(),
+			];
+		case "initiate-cluster-setup":
+			return [
 				body("email")
 					.trim()
 					.notEmpty()
@@ -158,7 +157,6 @@ export const applyRules = (type) => {
 					.withMessage(t("Not a valid email address"))
 					.bail()
 					.normalizeEmail({ gmail_remove_dots: false })
-					.if(body("provider").isIn(["agnost"]))
 					.custom(async (value) => {
 						// Check whether email is unique or not
 						let user = await UserModel.findOne({
@@ -174,7 +172,6 @@ export const applyRules = (type) => {
 						return true;
 					}),
 				body("password")
-					.if(body("provider").isIn(["agnost"]))
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
@@ -185,9 +182,62 @@ export const applyRules = (type) => {
 							config.get("general.minPwdLength")
 						)
 					),
-				body("name")
-					.optional()
+				body("username")
 					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isLength({ max: config.get("general.maxTextLength") })
+					.withMessage(
+						t(
+							"Username must be at most %s characters long",
+							config.get("general.maxTextLength")
+						)
+					)
+					.bail()
+					.custom((value) => {
+						let regex = /^[A-Za-z0-9_]+$/;
+						if (!regex.test(value)) {
+							throw new AgnostError(
+								t(
+									"Username can include only numbers, letters and underscore (_) characters"
+								)
+							);
+						}
+
+						let regex2 = /^[0-9].*$/;
+						if (regex2.test(value)) {
+							throw new AgnostError(t("Usernames cannot start with a number"));
+						}
+
+						if (value.startsWith("_")) {
+							throw new AgnostError(
+								t("Usernames cannot start with underscore (_) character")
+							);
+						}
+
+						//Indicates the success of this synchronous custom validator
+						return true;
+					})
+					.bail()
+					.custom(async (value) => {
+						// Check whether email is unique or not
+						let user = await UserModel.findOne({
+							username: value,
+						}).lean();
+
+						if (user) {
+							throw new AgnostError(
+								t("User account with the provided username already exists")
+							);
+						}
+						return true;
+					}),
+				body("name")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
 					.isLength({ max: config.get("general.maxTextLength") })
 					.withMessage(
 						t(
@@ -195,26 +245,6 @@ export const applyRules = (type) => {
 							config.get("general.maxTextLength")
 						)
 					),
-				body("pictureUrl")
-					.optional()
-					.trim()
-					.isURL()
-					.withMessage(t("Profile picture is not a valid URL")),
-				body("accountRole")
-					.optional()
-					.trim()
-					.isIn(["Admin", "App Admin", "Billing Admin", "Read-only", "Member"])
-					.withMessage(t("Unsupported account role")),
-			];
-		case "delete-profile":
-			return [
-				param("provider")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isIn(["agnost", "github", "bitbucket", "gitlab"])
-					.withMessage(t("Unsupported login profile")),
 			];
 		case "resend-code":
 		case "validate-email":
@@ -244,6 +274,7 @@ export const applyRules = (type) => {
 						let loginConnection = user.loginProfiles.find(
 							(entry) => entry.provider === "agnost"
 						);
+
 						if (loginConnection.emailVerified)
 							throw new AgnostError(t("This email has already been verified"));
 
@@ -296,6 +327,16 @@ export const applyRules = (type) => {
 							config.get("general.minPwdLength")
 						)
 					),
+			];
+		case "update-notifications":
+			return [
+				body("notifications.*")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required value, cannot be left empty"))
+					.bail()
+					.isIn(notificationTypes)
+					.withMessage(t("Unsupported notification type")),
 			];
 		case "reset-password-finalize":
 			return [
@@ -370,6 +411,48 @@ export const applyRules = (type) => {
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required parameter, cannot be left empty")),
+			];
+		case "transfer":
+			return [
+				param("userId")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom(async (value, { req }) => {
+						if (!helper.isValidId(value))
+							throw new AgnostError(t("Not a valid user identifier"));
+
+						return true;
+					})
+					.bail()
+					.custom(async (value, { req }) => {
+						let userObj = await userCtrl.getOneByQuery(
+							{
+								_id: value,
+							},
+							{ cacheKey: `${value}` }
+						);
+
+						if (!userObj) {
+							throw new AgnostError(
+								t(
+									"The user identified with id '%s' is not a member the Agnost Cluster. Cluster ownership can only be transferred to an existing cluster member in 'Active' status.",
+									value
+								)
+							);
+						}
+
+						if (userObj.status !== "Active") {
+							throw new AgnostError(
+								t(
+									"Cluster ownership can only be transferred to an existing cluster member in 'Active' status."
+								)
+							);
+						}
+
+						return true;
+					}),
 			];
 		default:
 			return [];

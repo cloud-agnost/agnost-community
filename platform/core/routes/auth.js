@@ -7,43 +7,40 @@ import { applyRules } from "../schemas/user.js";
 import { handleError } from "../schemas/platformError.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validate } from "../middlewares/validate.js";
+import { authClusterToken } from "../middlewares/authClusterToken.js";
 import { authSession } from "../middlewares/authSession.js";
 import { authRefreshToken } from "../middlewares/authRefreshToken.js";
-import { checkOAuthProvider } from "../middlewares/checkOAuthProvider.js";
+import { checkClusterSetupStatus } from "../middlewares/checkClusterSetupStatus.js";
 import { sendMessage } from "../init/queue.js";
 import ERROR_CODES from "../config/errorCodes.js";
+import { notificationTypes } from "../config/constants.js";
 
 const router = express.Router({ mergeParams: true });
 
 /*
-@route      /v1/auth/signup
+@route      /v1/auth/initialize
 @method     POST
-@desc       Signs up a new user using email/password verification. Sends a verification code to the email address.
+@desc       Initializes the cluster set-up. Signs up the cluster owner using email/password verification. Sends a verification code to the email address.
 			By default also creates a top level new account for the user and assigns the contact email to the login profile email
 @access     public
 */
 router.post(
-	"/signup",
+	"/initialize",
 	checkContentType,
-	applyRules("signup"),
+	authClusterToken,
+	checkClusterSetupStatus,
+	applyRules("initiate-cluster-setup"),
 	validate,
 	async (req, res) => {
 		// Start new database transaction session
 		const session = await userCtrl.startSession();
 		try {
 			let userId = helper.generateId();
-			let { password, provider, email, name, pictureUrl, id, accountRole } =
-				req.body;
-			// Assign id
-			req.body.id = id;
+			let { email, password, name } = req.body;
 
-			if (provider === "agnost") {
-				// If email/password based sign up then encrypt the password
-				// Encrypt user password
-				const salt = await bcrypt.genSalt(10);
-				password = await bcrypt.hash(password, salt);
-				req.body.password = password;
-			}
+			// Encrypt user password
+			const salt = await bcrypt.genSalt(10);
+			password = await bcrypt.hash(password, salt);
 
 			// Save user to the database
 			const userObj = await userCtrl.create(
@@ -51,34 +48,32 @@ router.post(
 					_id: userId,
 					iid: helper.generateSlug("usr"),
 					name: name,
-					pictureUrl: pictureUrl,
 					color: helper.generateColor("dark"),
 					contactEmail: email,
-					lastLoginAt: provider !== "agnost" ? Date.now() : undefined,
-					lastLoginProvider: provider !== "agnost" ? provider : undefined,
-					status: provider !== "agnost" ? "Active" : "Pending",
+					status: "Pending",
+					canCreateOrg: true,
+					isClusterOwner: true,
 					loginProfiles: [
 						{
-							provider,
-							id: provider !== "agnost" ? id : userId,
+							provider: "agnost",
+							id: userId,
 							password,
 							email,
-							emailVerified: provider !== "agnost" ? true : false,
+							emailVerified: false,
 						},
 					],
+					notifications: notificationTypes,
 				},
 				{ session }
 			);
 
-			if (provider === "agnost") {
-				// Create the 6-digit email validation code
-				let code = await authCtrl.createValidationCode(email);
-				sendMessage("send-validation-code", {
-					to: email,
-					code1: code.substring(0, 3),
-					code2: code.substring(3, 6),
-				});
-			}
+			// Create the 6-digit email validation code
+			let code = await authCtrl.createValidationCode(email);
+			sendMessage("send-validation-code", {
+				to: email,
+				code1: code.substring(0, 3),
+				code2: code.substring(3, 6),
+			});
 			// Commit transaction
 			await userCtrl.commit(session);
 
@@ -87,7 +82,12 @@ router.post(
 			res.json(userObj);
 
 			// Log action
-			auditCtrl.log(userObj, "user", "signup", t("Created a new account"));
+			auditCtrl.log(
+				userObj,
+				"user",
+				"initiate-cluster-setup",
+				t("Initiated cluster setup")
+			);
 		} catch (error) {
 			await userCtrl.rollback(session);
 			handleError(req, res, error);
@@ -151,7 +151,8 @@ router.post(
 						lastLoginAt: Date.now(),
 						lastLoginProvider: "agnost",
 						"loginProfiles.$.emailVerified": true,
-					}
+					},
+					{}
 				);
 
 				// Delete email validation code
@@ -165,6 +166,8 @@ router.post(
 					"agnost"
 				);
 
+				// Remove password field value from returned object
+				delete user.loginProfiles[0].password;
 				res.json({ ...user, ...tokens });
 
 				// Log action
@@ -235,19 +238,6 @@ router.post(
 				});
 			}
 
-			// Check account status
-			if (user.status === "Suspended") {
-				return res.status(403).json({
-					error: t("Account suspended"),
-					code: ERROR_CODES.suspendedAccount,
-					details: t(
-						"Your account has been suspended on '%s' due to '%s'.",
-						helper.getDateStr(user.suspensionDtm),
-						user.suspensionReason
-					),
-				});
-			}
-
 			// It seems this is a valid user, we can check the password match
 			const isMatch = await bcrypt.compare(
 				password.toString(),
@@ -259,7 +249,7 @@ router.post(
 					error: t("Invalid Credentials"),
 					code: ERROR_CODES.invalidCredentials,
 					details: t(
-						"Invalid credentials. Email/username or password provided is invalid."
+						"Invalid credentials. Email or password provided is invalid."
 					),
 				});
 			}
@@ -271,7 +261,8 @@ router.post(
 			});
 
 			// Success, create the session token and return user information and do not return the password field value
-			delete profile.password;
+			// Remove password field value from returned object
+			delete user.loginProfiles[0].password;
 			let tokens = await authCtrl.createSession(
 				user._id,
 				helper.getIP(req),
@@ -333,99 +324,5 @@ router.post("/renew", authRefreshToken, async (req, res) => {
 		handleError(req, res, error);
 	}
 });
-
-/*
-@route      /v1/auth/profile
-@method     POST
-@desc       Adds a new login profile to a user
-@access     private
-*/
-router.post(
-	"/profile",
-	checkContentType,
-	authSession,
-	applyRules("add-profile"),
-	validate,
-	async (req, res) => {
-		try {
-			const { userId } = req.session;
-			let userObj = await userCtrl.pushObjectById(
-				userId,
-				"loginProfiles",
-				req.body,
-				{},
-				{ cacheKey: userId }
-			);
-			res.json(userObj);
-
-			// Log action
-			auditCtrl.log(
-				userObj,
-				"user.loginProfile",
-				"create",
-				t("Added '%s' login profile", req.body.provider)
-			);
-		} catch (error) {
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /v1/auth/profile/:provider
-@method     DELETE
-@desc       Deletes a login profile of a user
-@access     private
-*/
-router.delete(
-	"/profile/:provider",
-	checkContentType,
-	authSession,
-	applyRules("delete-profile"),
-	validate,
-	async (req, res) => {
-		try {
-			const { provider } = req.params;
-			const { user } = req;
-
-			// Check if this login profile can be deleted or not
-			if (
-				user.loginProfiles.legth === 1 &&
-				user.loginProfiles[0].provider === provider
-			) {
-				return res.status(403).json({
-					error: t("Forbidden"),
-					code: ERROR_CODES.notAllowed,
-					details: t(
-						"User has only one login profile which cannot be deleted."
-					),
-				});
-			}
-
-			// Delete the login profile
-			let updatedUser = await userCtrl.pullObjectByQuery(
-				user._id,
-				"loginProfiles",
-				{
-					provider,
-				},
-				{},
-				{ cacheKey: user._id }
-			);
-
-			res.json(updatedUser);
-
-			// Log action
-			auditCtrl.log(
-				updatedUser,
-				"user.loginProfile",
-				"delete",
-				t("Deleted '%s' login profile", provider)
-			);
-		} catch (error) {
-			handleError(req, res, error);
-		}
-	}
-);
 
 export default router;

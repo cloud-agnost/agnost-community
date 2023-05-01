@@ -40,7 +40,7 @@ export const validateOrg = async (req, res, next) => {
 					code: ERROR_CODES.unauthorized,
 				});
 			}
-			// Assign oorganization membership data
+			// Assign organization membership data
 			req.orgMembrer = orgMember;
 		}
 

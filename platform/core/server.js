@@ -141,12 +141,12 @@ async function initExpress(i18n) {
 		(await import("./routes/appTeam.js")).default
 	);
 	app.use(
-		"/v1/org/:orgId/app/:appId/version/:versionId/env",
-		(await import("./routes/environment.js")).default
-	);
-	app.use(
 		"/v1/org/:orgId/app/:appId/version",
 		(await import("./routes/version.js")).default
+	);
+	app.use(
+		"/v1/org/:orgId/app/:appId/version/:versionId/env",
+		(await import("./routes/environment.js")).default
 	);
 	app.use(
 		"/v1/org/:orgId/app/:appId/version/:versionId/db",

@@ -26,8 +26,46 @@
          "uiBaseUrl": "http://api.development.test",
          "platformBaseUrl": "http://platform-core-clusterip-service:4000"
     },
-    "defaultEngineClusterAccess": {
-         "workerUrl": "http://engine-worker-clusterip-service:4000",
-         "accessToken": "at_2F5FOIkOXEOmPfywWJ6JRZXCnzFgtqVIHAJ7"
+    "defaultEngineWorkerAccess": {
+        "workerUrl": "http://engine-worker-clusterip-service:4000",
+        "accessToken": "at_2F5FOIkOXEOmPfywWJ6JRZXCnzFgtqVIHAJ7"
+   },
+    "defaultStorage": {
+        "config": {
+            "size": "5Gi"
+        },
+        "access": {
+            "mountPath": "/storage"
+        }
+   },
+   "defaultQueue": {
+        "config": {
+            "size": "5Gi",
+            "CPU": {
+                "request": "250m",
+                "limit": "500m"
+            },
+            "memory": {
+                "request": "250Mi",
+                "limit": "500Mi"
+            }
+        },
+        "access": {
+            "url": "amqps://kvnulbdf:b6RSlkX-CKEDfeIO2EmJXomFAMcURdrr@hilarious-lime-fox.rmq4.cloudamqp.com/kvnulbdf?frameMax=0&heartbeat=60"
+        }
+    },
+    "defaultScheduler": {
+        "config": {
+            "CPU": {
+                "request": "100m",
+                "limit": "150m"
+            },
+            "memory": {
+                "request": "250Mi",
+                "limit": "300Mi"
+            }
+        },
+        "access": {
+        }
     }
 }

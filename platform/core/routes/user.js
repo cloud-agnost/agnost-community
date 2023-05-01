@@ -39,6 +39,54 @@ router.get("/me", authSession, async (req, res) => {
 });
 
 /*
+@route      /v1/user/list
+@method     GET
+@desc       Gets (searches) all users in a cluster
+@access     private
+*/
+router.get(
+	"/list",
+	checkContentType,
+	authSession,
+	applyRules("view"),
+	validate,
+	async (req, res) => {
+		try {
+			const { user } = req;
+			const { page, size, search, sortBy, sortDir, start, end } = req.query;
+
+			let query = { _id: { $ne: user._id }, status: "Active" };
+			if (search && search !== "null") {
+				query.$or = [
+					{ name: { $regex: search, $options: "i" } },
+					{ contactEmail: { $regex: search, $options: "i" } },
+					{ "loginProfiles.email": { $regex: search, $options: "i" } },
+				];
+			}
+
+			if (start && !end) query.createdAt = { $gte: start };
+			else if (!start && end) query.createdAt = { $lte: end };
+			else if (start && end) query.createdAt = { $gte: start, $lt: end };
+
+			let sort = {};
+			if (sortBy && sortDir) {
+				sort[sortBy] = sortDir;
+			} else sort = { name: "asc" };
+
+			let users = await userCtrl.getManyByQuery(query, {
+				sort,
+				skip: size * page,
+				limit: size,
+			});
+
+			res.json(users);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
 @route      /v1/user/name
 @method     PUT
 @desc       Updates the name of the user
@@ -60,6 +108,9 @@ router.put(
 				{},
 				{ cacheKey: req.user._id }
 			);
+
+			// Remove password field value from returned object
+			delete userObj.loginProfiles[0].password;
 			res.json(userObj);
 
 			// Log action
@@ -136,7 +187,7 @@ router.put(
 
 			// Log action
 			auditCtrl.log(req.user, "user", "update", t("Updated login password"));
-		} catch (ererror) {
+		} catch (error) {
 			handleError(req, res, error);
 		}
 	}
@@ -145,7 +196,7 @@ router.put(
 /*
 @route      /v1/user/picture?width=128&height=128
 @method     PUT
-@desc       Updates the profile image of the user. A picture with the name 'picture' needs to be uploaded in body of the request.
+@desc       Updates the profile image of the user. A picture with the name 'picture' needs to be uploaded in the body of the request.
 @access     private
 */
 router.put(
@@ -156,7 +207,7 @@ router.put(
 	validate,
 	async (req, res) => {
 		try {
-			let buffer = req.file.buffer;
+			let buffer = req.file?.buffer;
 			let { width, height } = req.query;
 			if (!width) width = config.get("general.profileImgSizePx");
 			if (!height) height = config.get("general.profileImgSizePx");
@@ -228,6 +279,8 @@ router.put(
 							{ cacheKey: req.user._id }
 						);
 
+						// Remove password field value from returned object
+						delete userObj.loginProfiles[0].password;
 						res.json(userObj);
 
 						// Log action
@@ -290,6 +343,46 @@ router.delete("/picture", authSession, async (req, res) => {
 });
 
 /*
+@route      /v1/user/notifications
+@method     PUT
+@desc       Updates the notification settings of the user. The full notifications list is needed, it directly sets the new value
+@access     private
+*/
+router.put(
+	"/notifications",
+	checkContentType,
+	authSession,
+	applyRules("update-notifications"),
+	validate,
+	async (req, res) => {
+		try {
+			let userObj = await userCtrl.updateOneById(
+				req.user._id,
+				{
+					notifications: req.body.notifications,
+				},
+				{},
+				{ cacheKey: req.user._id }
+			);
+
+			// Remove password field value from returned object
+			delete userObj.loginProfiles[0].password;
+			res.json(userObj);
+
+			// Log action
+			auditCtrl.log(
+				userObj,
+				"user",
+				"update",
+				t("Updated notification settings")
+			);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
 @route      /v1/user/contact-email
 @method     POST
 @desc       Initiates the update for contact email change. A confirmation email is sent to the new email address.
@@ -316,9 +409,7 @@ router.post(
 			// Send the contact email verification link to the new email address
 			sendMessage("send-contact-email-token", {
 				to: email,
-				url: `${config.get(
-					"general.uiBaseUrl"
-				)}/v1/user/contact-email/${token}`,
+				url: `${process.env.UI_BASE_URL}/v1/user/contact-email/${token}`,
 			});
 
 			res.json();
@@ -425,17 +516,17 @@ router.post(
 				});
 			}
 
-			// Craate the contact email validation token
+			// Create the login email validation token
 			let token = await userCtrl.createChangeEmailToken(
 				req.user._id,
 				email,
-				helper.constants["1day"]
+				helper.constants["2hours"]
 			);
 
 			// Send the login email verification link to the new email address
 			sendMessage("send-login-email-token", {
 				to: email,
-				url: `${config.get("general.uiBaseUrl")}/v1/user/login-email/${token}`,
+				url: `${process.env.UI_BASE_URL}/v1/user/login-email/${token}`,
 			});
 
 			res.json();
@@ -543,7 +634,7 @@ router.post(
 		try {
 			let { email } = req.body;
 
-			let userObj = userCtrl.getOneByQuery({
+			let userObj = await userCtrl.getOneByQuery({
 				"loginProfiles.provider": "agnost",
 				"loginProfiles.email": email,
 			});
@@ -556,17 +647,17 @@ router.post(
 				});
 			}
 
-			// Craate the contact email validation token
+			// Craate and send the reset password validation token
 			let token = await userCtrl.createResetPwdToken(
 				userObj._id,
 				email,
-				helper.constants["1hour"]
+				helper.constants["2hours"]
 			);
 
 			// Send the forgot password change link link to the email address
 			sendMessage("send-reset-pwd-token", {
 				to: email,
-				url: `${config.get("general.uiBaseUrl")}/v1/user/reset-pwd/${token}`,
+				url: `${process.env.UI_BASE_URL}/v1/user/reset-pwd/${token}`,
 			});
 
 			res.json();
@@ -789,7 +880,7 @@ router.post(
 			auditCtrl.logAndNotify(
 				invite.orgId._id,
 				user,
-				"org.invite",
+				"org",
 				"accept",
 				t("Accepted the invitation to join to the organization"),
 				{ ...invite.orgId, role: invite.role },
@@ -911,7 +1002,7 @@ router.post(
 			auditCtrl.logAndNotify(
 				invite.appId._id,
 				user,
-				"org.app.invite",
+				"app",
 				"accept",
 				t("Accepted the invitation to join to the app"),
 				updatedApp,
@@ -973,7 +1064,7 @@ router.post(
 			auditCtrl.logAndNotify(
 				invite.orgId._id,
 				user,
-				"org.invite",
+				"org",
 				"reject",
 				t("Rejected the invitation to join to the organization"),
 				{ ...invite.orgId, role: invite.role },
@@ -1034,13 +1125,96 @@ router.post(
 			auditCtrl.logAndNotify(
 				invite.appId._id,
 				user,
-				"org.app.invite",
+				"app",
 				"reject",
 				t("Rejected the invitation to join to the app"),
 				{ ...invite.appId },
 				{ orgId: invite.orgId, appId: invite.appId._id }
 			);
 		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/user/transfer/:userId
+@method     POST
+@desc       Transfers the ownership of cluster to another cluster member
+@access     private
+*/
+router.post(
+	"/transfer/:userId",
+	checkContentType,
+	authSession,
+	applyRules("transfer"),
+	validate,
+	async (req, res) => {
+		// Start new database transaction session
+		const session = await userCtrl.startSession();
+		try {
+			// Get transferred user information
+			let transferredUser = await userCtrl.getOneById(req.params.userId);
+
+			// If the current owner and the trasferred users are the same then do nothing
+			if (transferredUser._id.toString() === req.user._id.toString()) {
+				await userCtrl.endSession(session);
+				return res.json();
+			}
+
+			// Take ownership of cluster from existing user
+			await userCtrl.updateOneById(
+				req.user._id,
+				{ isClusterOwner: false },
+				{},
+				{ session, cacheKey: req.user._id }
+			);
+
+			// Transfer cluster ownership to the new user
+			await userCtrl.updateOneById(
+				transferredUser._id,
+				{ isClusterOwner: true },
+				{},
+				{ session, cacheKey: transferredUser._id }
+			);
+
+			// Update all existing organization memberships of the transferred user to Admin
+			let orgMemberships = await orgMemberCtrl.getManyByQuery(
+				{ userId: transferredUser._id },
+				{ session }
+			);
+
+			for (let i = 0; i < orgMemberships.length; i++) {
+				const orgMembership = orgMemberships[i];
+				await orgMemberCtrl.updateOneById(
+					orgMembership._id,
+					{ role: "Admin" },
+					{},
+					{ session, cacheKey: `${orgMembership.orgId}.${transferredUser._id}` }
+				);
+			}
+
+			// Update all existing app memberships of the transferred user to Admin
+			let apps = await appCtrl.getManyByQuery(
+				{ "team.userId": transferredUser._id },
+				{ session }
+			);
+
+			for (let i = 0; i < apps.length; i++) {
+				const app = apps[i];
+				await appCtrl.updateOneByQuery(
+					{ _id: app._id, "team.userId": transferredUser._id },
+					{ "team.$.role": "Admin" },
+					{},
+					{ session, cacheKey: `${app._id}` }
+				);
+			}
+
+			// Commit transaction
+			await userCtrl.commit(session);
+			res.json();
+		} catch (error) {
+			await userCtrl.rollback(session);
 			handleError(req, res, error);
 		}
 	}

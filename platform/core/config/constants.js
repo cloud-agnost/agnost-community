@@ -1,5 +1,37 @@
+// Types of login providers supported. Initially we support agnost (email/username and password based authentication),
+// later on we can support , "github", "bitbucket", "gitlab" etc.
+export const providerTypes = ["agnost"];
+
+// Notification types
+export const notificationTypes = [
+	"org",
+	"app",
+	"version",
+	"database",
+	"model",
+	"field",
+	"endpoint",
+	"queue",
+	"cronjob",
+	"cache",
+	"storage",
+	"resource",
+	"environment",
+];
+
+// User statuses. The Pending status is only used during the sign up of the cluster owner, e.g., initialization of the cluster
+export const userStatus = ["Active", "Pending"];
+
+export const orgRoles = [
+	"Org Admin",
+	"App Admin",
+	"Developer",
+	"Resource Manager",
+	"Viewer",
+];
+
 // Application team member roles
-export const appRoles = ["Admin", "Member", "Read-only"];
+export const appRoles = ["Admin", "Developer", "Viewer"];
 
 export const engineErrorType = ["endpoint", "queue", "cronjob", "worker"];
 
@@ -236,6 +268,7 @@ export const mongoDBConnFormat = ["mongodb", "mongodb+srv"];
 export const resourceActions = ["create", "update", "delete"];
 
 export const resourceStatuses = [
+	"Binding", // Valid for default cluster resources
 	"Creating",
 	"OK",
 	"Error",
@@ -263,13 +296,15 @@ export const designElementTypes = [
 ];
 
 export const instanceTypes = {
-	engine: ["Agnost K8s Cluster"],
+	engine: ["Agnost Engine"],
 	database: ["PostgreSQL", "MySQL", "SQL Server", "MongoDB", "Oracle"],
 	cache: ["Redis"],
 	storage: [
 		"AWS S3",
 		"GCP Cloud Storage",
 		"Azure Blob Storage",
-		"Local Storage",
+		"Default Storage",
 	],
+	queue: ["Default Queue", "RabbitMQ", "Kafka"],
+	scheduler: ["Default Scheduler"],
 };

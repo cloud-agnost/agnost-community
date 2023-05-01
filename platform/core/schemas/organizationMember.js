@@ -1,17 +1,15 @@
 import mongoose from "mongoose";
 import { body, query, param } from "express-validator";
-
+import { orgRoles } from "../config/constants.js";
 /**
  * An organization is the top level entitiy used to hold all apps and its associated design elements.
  * Each organization will have team members with different roled. There are two types of roles in Agnost one at the organization level
  * and the other at the application level. The organization level roles specifiy the authorizations an org member have.
- * Admin: Full access to the organization, can change organization name and add members to the organization
+ * Org Admin: Full access to the organization, can change organization name and add members to the organization
  * App Admin: Can only manage applications associated with an organization
- * Billing Admin: The billing related information is kept separately for each organization. Billing admins have read-only access to organization apps
- * and they can view and manage organization billing informaton
- * Resource Manager: Resource managers can manage organization level resources such as databases, message queuest etc. They can also manage the environments
- * of organization applications
  * Developer: Developers have read-only access to an organization. They cannot create a new app but can take part as a member to the development of specific apps.
+ * Resource Manager: Resource managers can manage organization level resources such as databases, message queuest etc.
+ * Viewer: Read-only access to organization information
  */
 export const OrganizationMemberModel = mongoose.model(
 	"organization_member",
@@ -32,14 +30,7 @@ export const OrganizationMemberModel = mongoose.model(
 			type: String,
 			required: true,
 			index: true,
-			enum: [
-				"Admin",
-				"App Admin",
-				"Billing Admin",
-				"Read-only",
-				"Resource Manager",
-				"Developer",
-			],
+			enum: orgRoles,
 		},
 		joinDate: {
 			type: Date,
@@ -106,14 +97,7 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isIn([
-						"Admin",
-						"App Admin",
-						"Billing Admin",
-						"Read-only",
-						"Resource Manager",
-						"Developer",
-					])
+					.isIn(orgRoles)
 					.withMessage(t("Unsupported member role")),
 			];
 		case "remove-member":

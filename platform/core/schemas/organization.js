@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import { body, query, param } from "express-validator";
 import orgMemberCtrl from "../controllers/organizationMember.js";
-
 /**
  * Each account can have multiple organizations and an organization is the top level entitiy used to hold all apps and its associated design elements.
  */
@@ -32,18 +31,6 @@ export const OrganizationModel = mongoose.model(
 			color: {
 				// If no picture provided then this will be the avatar background color of the organization
 				type: String,
-			},
-			status: {
-				type: String,
-				required: true,
-				default: "Active",
-				enum: ["Active", "Suspended"],
-			},
-			suspensionReason: {
-				type: String,
-			},
-			suspensionDtm: {
-				type: Date,
 			},
 			createdBy: {
 				type: mongoose.Schema.Types.ObjectId,

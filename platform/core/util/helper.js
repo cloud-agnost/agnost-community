@@ -5,6 +5,7 @@ import cyripto from "crypto-js";
 
 const constants = {
 	"1hour": 3600, // in seconds
+	"2hours": 7200, // in seconds
 	"1day": 86400, // in seconds
 	"1week": 604800, // in seconds
 	"1month": 2592000, // in seconds (30 days)

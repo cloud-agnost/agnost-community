@@ -84,6 +84,8 @@ export const disconnectFromRedisCache = () => {
  * @param  {string} ttl time-to-live in seconds
  */
 export const setKey = async (key, value, ttl) => {
+	if (!key || !value) return;
+
 	if (value && typeof value === "object") value = JSON.stringify(value);
 
 	if (ttl) await client.set(key.toString(), value, "EX", ttl);
@@ -95,6 +97,8 @@ export const setKey = async (key, value, ttl) => {
  * @param  {string} key
  */
 export const getKey = async (key) => {
+	if (!key) return undefined;
+
 	// Use read replica if available
 	let conn = clientReadReplica || client;
 
@@ -115,6 +119,7 @@ export const getKey = async (key) => {
  * @param  {string} key
  */
 export const deleteKey = async (key) => {
+	if (!key) return;
 	return await client.del(key.toString());
 };
 

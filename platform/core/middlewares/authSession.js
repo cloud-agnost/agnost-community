@@ -16,8 +16,9 @@ export const authSession = async (req, res, next) => {
 	}
 
 	// Check if token is still valid or not
+	// Check if this is a valid session token, session tokens have refresh tokens
 	let session = await getKey(token);
-	if (!session) {
+	if (!session || !session.rt) {
 		return res.status(401).json({
 			error: t("Unauthorized"),
 			details: t("The access token was not authorized or has expired."),
@@ -34,9 +35,7 @@ export const authSession = async (req, res, next) => {
 	if (!user || user.status !== "Active") {
 		return res.status(401).json({
 			error: t("Unauthorized"),
-			details: t(
-				"No such user exists or user account is not active with the provided access token."
-			),
+			details: t("No such user exists or the user account is not active."),
 			code: ERROR_CODES.invalidUser,
 		});
 	}

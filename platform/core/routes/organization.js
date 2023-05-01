@@ -50,22 +50,40 @@ router.get("/roles", checkContentType, authSession, async (req, res) => {
 router.get("/", checkContentType, authSession, async (req, res) => {
 	try {
 		const { user } = req;
-		let orgs = await orgMemberCtrl.getManyByQuery(
-			{ userId: user._id },
-			{ lookup: "orgId" }
-		);
+		let orgs = [];
 
-		res.json(
-			orgs
-				.map((entry) => {
-					return { ...entry.orgId, role: entry.role };
-				})
-				.sort((a, b) => {
-					if (a.name < b.name) return -1;
-					if (a.name > b.name) return 1;
-					return 0;
-				})
-		);
+		// Cluster owner is by default Admin member of all organizations
+		if (user.isClusterOwner) {
+			orgs = await orgCtrl.getManyByQuery({});
+			res.json(
+				orgs
+					.map((entry) => {
+						return { ...entry, role: "Admin" };
+					})
+					.sort((a, b) => {
+						if (a.name < b.name) return -1;
+						if (a.name > b.name) return 1;
+						return 0;
+					})
+			);
+		} else {
+			orgs = await orgMemberCtrl.getManyByQuery(
+				{ userId: user._id },
+				{ lookup: "orgId" }
+			);
+
+			res.json(
+				orgs
+					.map((entry) => {
+						return { ...entry.orgId, role: entry.role };
+					})
+					.sort((a, b) => {
+						if (a.name < b.name) return -1;
+						if (a.name > b.name) return 1;
+						return 0;
+					})
+			);
+		}
 	} catch (error) {
 		handleError(req, res, error);
 	}
@@ -88,8 +106,8 @@ router.post(
 		const session = await orgCtrl.startSession();
 		try {
 			let orgId = helper.generateId();
-			let orgIid = helper.generateSlug("org");
 			const { name } = req.body;
+			const { user } = req;
 			// Check if the user can create an organization or not
 			if (!req.user.canCreateOrg) {
 				return res.status(401).json({
@@ -105,11 +123,11 @@ router.post(
 			let orgObj = await orgCtrl.create(
 				{
 					_id: orgId,
-					ownerUserId: req.user._id,
-					iid: orgIid,
+					ownerUserId: user._id,
+					iid: helper.generateSlug("org"),
 					name: name,
 					color: helper.generateColor("light"),
-					createdBy: req.user._id,
+					createdBy: user._id,
 				},
 				{ session, cacheKey: orgId }
 			);
@@ -121,29 +139,11 @@ router.post(
 					userId: req.user._id,
 					role: "Admin",
 				},
-				{ session, cacheKey: `${orgId}.${req.user._id}` }
+				{ session, cacheKey: `${orgId}.${user._id}` }
 			);
 
-			// If it is a development environment add the default engine cluster as a resource
-			if (["development"].includes(process.env.NODE_ENV)) {
-				let resourceId = helper.generateId();
-				await resourceCtrl.create(
-					{
-						_id: resourceId,
-						orgId: orgId,
-						iid: helper.generateSlug("res"),
-						name: t("Default Engine Cluster"),
-						type: "engine",
-						instance: "Agnost K8s Cluster",
-						managed: true,
-						allowedRoles: ["Admin", "Member"],
-						access: config.get("defaultEngineClusterAccess"),
-						deletable: false,
-						createdBy: req.user._id,
-					},
-					{ session, cacheKey: resourceId }
-				);
-			}
+			// Add the default Agnost cluster resources to the organization
+			await resourceCtrl.addDefaultOrganizationResources(session, user, orgObj);
 
 			// Commit transaction
 			await orgCtrl.commit(session);
@@ -244,7 +244,7 @@ router.put(
 	validate,
 	async (req, res) => {
 		try {
-			let buffer = req.file.buffer;
+			let buffer = req.file?.buffer;
 			let { width, height } = req.query;
 			if (!width) width = config.get("general.profileImgSizePx");
 			if (!height) height = config.get("general.profileImgSizePx");
@@ -901,7 +901,7 @@ router.get(
 /*
 @route      /v1/org/:orgId/me
 @method     GET
-@desc       Get currnet user's organization membership info
+@desc       Get current user's organization membership info
 @access     private
 */
 router.get(

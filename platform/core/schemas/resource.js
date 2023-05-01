@@ -83,22 +83,13 @@ export const ResourceModel = mongoose.model(
 			deletable: {
 				type: Boolean,
 				required: true,
-				default: true,
+				default: false,
 			},
 			// Resource status
-			telemetry: {
-				status: {
-					type: String,
-					index: true,
-					enum: resourceStatuses,
-				},
-				logs: {
-					type: String,
-				},
-				// Last telemetry update for this resource
-				updatedAt: {
-					type: Date,
-				},
+			status: {
+				type: String,
+				index: true,
+				enum: resourceStatuses,
 			},
 			createdBy: {
 				type: mongoose.Schema.Types.ObjectId,
