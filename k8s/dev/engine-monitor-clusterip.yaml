@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+   name: engine-monitor-clusterip-service
+spec:
+   type: ClusterIP
+   selector:
+      app: engine-monitor
+   ports:
+      - port: 4000
+        targetPort: 4000

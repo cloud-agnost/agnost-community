@@ -101,30 +101,13 @@ router.post(
 							code: ERROR_CODES.notAllowed,
 						});
 					}
-				} else if (type === "engine") {
-					try {
-						// Test engine connection
-						await connCtrl.testEngineConnection(access);
-					} catch (err) {
-						await resourceCtrl.endSession(session);
-
-						return res.status(422).json({
-							error: t("Connection Error"),
-							details: err.message,
-							code: ERROR_CODES.notAllowed,
-						});
-					}
 				}
 			}
 
 			// Encrypt sensitive access data
-			access = connCtrl.encyrptSensitiveData(type, instance, access);
+			access = connCtrl.encyrptSensitiveData(access);
 			if (accessReadOnly)
-				accessReadOnly = connCtrl.encyrptSensitiveData(
-					type,
-					instance,
-					accessReadOnly
-				);
+				accessReadOnly = connCtrl.encyrptSensitiveData(accessReadOnly);
 
 			// Create the new organization resource
 			let resourceId = helper.generateId();
@@ -389,7 +372,6 @@ router.put(
 					config: req.body,
 					telemetry: {
 						status: "Updating",
-						logs: "",
 						updatedAt: Date.now(),
 					},
 					updatedBy: user._id,
@@ -498,34 +480,13 @@ router.put(
 						code: ERROR_CODES.notAllowed,
 					});
 				}
-			} else if (type === "engine") {
-				try {
-					// Test engine connection
-					await connCtrl.testEngineConnection(access);
-				} catch (err) {
-					await resourceCtrl.endSession(session);
-
-					return res.status(422).json({
-						error: t("Connection Error"),
-						details: err.message,
-						code: ERROR_CODES.notAllowed,
-					});
-				}
 			}
 
 			// Encrypt sensitive access data
-			access = connCtrl.encyrptSensitiveData(
-				resource.type,
-				resource.instance,
-				access
-			);
+			access = connCtrl.encyrptSensitiveData(access);
 
 			if (accessReadonly)
-				accessReadonly = connCtrl.encyrptSensitiveData(
-					resource.type,
-					resource.instance,
-					accessReadonly
-				);
+				accessReadonly = connCtrl.encyrptSensitiveData(accessReadonly);
 
 			let updatedResource = await resourceCtrl.updateOneById(
 				resource._id,
@@ -593,7 +554,7 @@ router.delete(
 
 				return res.status(422).json({
 					error: t("Not Allowed"),
-					details: t("Default Engine Cluster resource cannot be deleted."),
+					details: t("Default cluster resources cannot be deleted."),
 					code: ERROR_CODES.notAllowed,
 				});
 			}
@@ -625,7 +586,6 @@ router.delete(
 					resource._id,
 					{
 						"telemetry.status": "Deleting",
-						"telemetry.logs": "",
 						"telemetry.updatedAt": Date.now(),
 						updatedBy: user._id,
 					},
@@ -739,11 +699,11 @@ router.get(
 
 /*
 @route      /v1/org/:orgId/resource/:resourceId/log:/logId
-@method     PUT
+@method     POST
 @desc       Update resource telemetry (e.g., status and status message) and resource log entry
 @access     private
 */
-router.put(
+router.post(
 	"/:resourceId/log/:logId",
 	checkContentType,
 	authMasterToken,
@@ -758,6 +718,7 @@ router.put(
 			const { org, resource, log } = req;
 			const { status, logs } = req.body;
 			let timestamp = Date.now();
+			let updatedResource;
 
 			// Get user information
 			let user = await userCtrl.getOneById(log.createdBy, {
@@ -781,16 +742,11 @@ router.put(
 				await resourceCtrl.commit(session);
 				res.json();
 			} else {
-				/* If we have the resource access information then we should also update the access settings of the resource object
-				 *
-				 *
-				 */
-				let updatedResource = await resourceCtrl.updateOneById(
+				updatedResource = await resourceCtrl.updateOneById(
 					resource._id,
 					{
-						"telemetry.status": status,
-						"telemetry.logs": logs,
-						"telemetry.updatedAt": timestamp,
+						status: status,
+						updatedAt: timestamp,
 						updatedBy: user._id,
 					},
 					{},
@@ -820,7 +776,7 @@ router.put(
 			auditCtrl.logAndNotify(
 				org._id,
 				user,
-				"org.resource",
+				"org",
 				log.action,
 				t(
 					status === "OK"

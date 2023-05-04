@@ -41,7 +41,7 @@ router.get("/me", authSession, async (req, res) => {
 /*
 @route      /v1/user/list
 @method     GET
-@desc       Gets (searches) all users in a cluster
+@desc       Gets (searches) all users in a cluster, excludes the user that is making the request. By default returns users sorted by name ascending order.
 @access     private
 */
 router.get(
@@ -114,12 +114,15 @@ router.put(
 			res.json(userObj);
 
 			// Log action
-			auditCtrl.log(
+			auditCtrl.logAndNotify(
+				userObj._id,
 				userObj,
 				"user",
 				"update",
-				t("Updated name to '%s'", req.body.name)
+				t("Updated name to '%s'", req.body.name),
+				userObj
 			);
+
 			auditCtrl.updateActorName(userObj._id, req.body.name);
 		} catch (error) {
 			handleError(req, res, error);
@@ -284,12 +287,15 @@ router.put(
 						res.json(userObj);
 
 						// Log action
-						auditCtrl.log(
+						auditCtrl.logAndNotify(
+							userObj._id,
 							userObj,
 							"user",
 							"update",
-							t("Updated profile picture")
+							t("Updated profile picture"),
+							userObj
 						);
+
 						auditCtrl.updateActorPicture(userObj._id, pictureUrl);
 					});
 				});
@@ -332,10 +338,19 @@ router.delete("/picture", authSession, async (req, res) => {
 			{ cacheKey: req.user._id }
 		);
 
+		// Remove password field value from returned object
+		delete userObj.loginProfiles[0].password;
 		res.json(userObj);
 
 		// Log action
-		auditCtrl.log(userObj, "user", "update", t("Removed profile picture"));
+		auditCtrl.logAndNotify(
+			userObj._id,
+			userObj,
+			"user",
+			"update",
+			t("Removed profile picture"),
+			userObj
+		);
 		auditCtrl.removeActorPicture(userObj._id);
 	} catch (error) {
 		handleError(req, res, error);
@@ -370,11 +385,13 @@ router.put(
 			res.json(userObj);
 
 			// Log action
-			auditCtrl.log(
+			auditCtrl.logAndNotify(
+				userObj._id,
 				userObj,
 				"user",
 				"update",
-				t("Updated notification settings")
+				t("Updated notification settings"),
+				userObj
 			);
 		} catch (error) {
 			handleError(req, res, error);
@@ -460,13 +477,15 @@ router.post(
 			res.json();
 
 			// Log action
-			auditCtrl.log(
+			auditCtrl.logAndNotify(
+				userObj._id,
 				userObj,
 				"user",
 				"update",
-				t("Updated contact email to '%s'", info.email)
+				t("Updated contact email to '%s'", info.email),
+				userObj
 			);
-			auditCtrl.updateActorEmail(userObj._id, info.email);
+			auditCtrl.updateActorContactEmail(userObj._id, info.email);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -606,12 +625,15 @@ router.post(
 			res.json();
 
 			// Log action
-			auditCtrl.log(
+			auditCtrl.logAndNotify(
+				userObj._id,
 				userObj,
 				"user",
 				"update",
-				t("Updated login email to '%s'", info.email)
+				t("Updated login email to '%s'", info.email),
+				userObj
 			);
+			auditCtrl.updateActorLoginEmail(userObj._id, info.email);
 		} catch (error) {
 			handleError(req, res, error);
 		}

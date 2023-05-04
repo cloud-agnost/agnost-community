@@ -7,12 +7,17 @@ import process from "process";
 import config from "config";
 import path from "path";
 import os from "os";
+import responseTime from "response-time";
 import { I18n } from "i18n";
 import { fileURLToPath } from "url";
 import logger from "./init/logger.js";
+import helper from "./util/helper.js";
 import { connectToDatabase, disconnectFromDatabase } from "./init/db.js";
+import { connectToRedisCache, disconnectFromRedisCache } from "./init/cache.js";
 import { connectToQueue, disconnectFromQueue } from "./init/queue.js";
+import { createRateLimiter } from "./middlewares/rateLimiter.js";
 import { handleUndefinedPaths } from "./middlewares/undefinedPaths.js";
+import { logRequest } from "./middlewares/logRequest.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,17 +38,19 @@ if (
 	}
 
 	cluster.on("exit", function (worker, code, signal) {
-		logger.warn(`Platform worker process ${worker.process.pid} died`);
+		logger.warn(`Child process ${worker.process.pid} died`);
 		cluster.fork();
 	});
 } else if (cluster.isWorker || ["development"].includes(process.env.NODE_ENV)) {
-	logger.info(`Platform worker process ${process.pid} is running`);
+	logger.info(`Child process ${process.pid} is running`);
 	// Init globally accessible variables
 	initGlobals();
 	// Set up locatlization
 	const i18n = initLocalization();
 	// Connect to the database
 	connectToDatabase();
+	// Connect to cache server(s)
+	connectToRedisCache();
 	// Connect to message queue
 	connectToQueue();
 	// Spin up http server
@@ -65,6 +72,8 @@ function initGlobals() {
 	};
 	// Add config to the global object
 	global.config = config;
+	// Add utility methods to the global object
+	global.helper = helper;
 }
 
 function initLocalization() {
@@ -93,6 +102,9 @@ function initLocalization() {
 async function initExpress(i18n) {
 	// Create express application
 	var app = express();
+	// Add rate limiter middlewares
+	let rateLimiters = config.get("rateLimiters");
+	rateLimiters.forEach((entry) => app.use(createRateLimiter(entry)));
 	//Secure express app by setting various HTTP headers
 	app.use(helmet());
 	//Enable cross-origin resource sharing
@@ -102,6 +114,7 @@ async function initExpress(i18n) {
 	app.set("etag", false);
 	// Add middleware to identify user locale using 'accept-language' header to guess language settings
 	app.use(i18n.init);
+	app.use(responseTime(logRequest));
 
 	app.use("/", (await import("./routes/system.js")).default);
 
@@ -126,6 +139,8 @@ function handleProcessExit(server) {
 	process.on("SIGINT", () => {
 		// Close connection to the database
 		disconnectFromDatabase();
+		// Close connection to cache server(s)
+		disconnectFromRedisCache();
 		// Close connection to message queue
 		disconnectFromQueue();
 		//Close Http server

@@ -5,7 +5,7 @@ import ERROR_CODES from "../config/errorCodes.js";
 /**
  * Keeps track of the internal platform errors
  */
-export const ErrorModel = mongoose.model(
+export const PlatformErrorModel = mongoose.model(
 	"platform_error",
 	new mongoose.Schema({
 		// e.g., platform-core, platform-worker
@@ -87,7 +87,7 @@ export const handleError = (req, res, error) => {
 	logger.info(JSON.stringify(entry, null, 2));
 
 	// Save the error to the errors collection, do not wait for the save operation to complete and write it fast
-	new ErrorModel({
+	new PlatformErrorModel({
 		...entry,
 		source: "platform-core",
 		payload: { body: req.body, query: req.query, params: req.params },
@@ -112,5 +112,5 @@ export const handleException = (error, details, name, message, stack) => {
 	logger.info(JSON.stringify(entry, null, 2));
 
 	// Save the error to the errors collection, do not wait for the save operation to complete and write it fast
-	new ErrorModel(entry).save({ w: 0 });
+	new PlatformErrorModel(entry).save({ w: 0 });
 };

@@ -29,17 +29,17 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: cachePwd
-                 - name: PLATFORM_DB_URI
+                 - name: CLUSTER_DB_URI
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets
                          key: clusterDBURI
-                 - name: PLATFORM_DB_USER
+                 - name: CLUSTER_DB_USER
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets
                          key: clusterDBUser
-                 - name: PLATFORM_DB_PWD
+                 - name: CLUSTER_DB_PWD
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets

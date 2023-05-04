@@ -8,9 +8,10 @@
         "rateLimitWindowSec": 30,
         "rateLimitMaxHits": 300}],
     "general": {  
-        "masterToken": "mt_hYZqahaQ20P5kSvpEJ3ky0opT8zJX5Y1VFIZ",
+        "masterToken": "mt-hYZqahaQ20P5kSvpEJ3ky0opT8zJX5Y1VFIZ",
         "generalQueueCount": 1,
         "maxMessageWaitMinues": 5,
-        "maxMongoDBIndexNumberPerCollection": 64
+        "maxMongoDBIndexNumberPerCollection": 64,
+        "k8sNamespace": "default"
     }
 }

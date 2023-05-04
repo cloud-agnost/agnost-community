@@ -4,5 +4,11 @@
         "port": 4000,
         "timeout": 3600000,
         "maxBodySize": "50mb"
-     }
+     },
+     "rateLimiters": [{      
+        "rateLimitWindowSec": 30,
+        "rateLimitMaxHits": 300}],
+    "general": {  
+        "masterToken": "mt-hYZqahaQ20P5kSvpEJ3ky0opT8zJX5Y1VFIZ"
+    }
 }

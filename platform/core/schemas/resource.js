@@ -38,6 +38,12 @@ export const ResourceModel = mongoose.model(
 				ref: "app",
 				index: true,
 			},
+			// If the resource is an engine (API server) then we also keep the version information
+			versionId: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "version",
+				index: true,
+			},
 			name: {
 				type: String,
 				required: true,
@@ -79,7 +85,7 @@ export const ResourceModel = mongoose.model(
 			accessReadOnly: {
 				type: mongoose.Schema.Types.Mixed,
 			},
-			// Whether the resource can be deleted or not. Default engine cluster in community edition cannot be deleted.
+			// Whether the resource can be deleted or not.
 			deletable: {
 				type: Boolean,
 				required: true,

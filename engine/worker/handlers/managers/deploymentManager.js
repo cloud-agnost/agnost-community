@@ -1,6 +1,6 @@
 import axios from "axios";
 import util from "util";
-import { getMongoDBClient } from "../../init/db.js";
+import { getDBClient } from "../../init/db.js";
 import {
 	createPipeline,
 	getKey,
@@ -33,7 +33,7 @@ export class DeploymentManager {
 	getEnvDB() {
 		if (!this.envDB) {
 			if (!this.conn) {
-				this.conn = getMongoDBClient();
+				this.conn = getDBClient();
 			}
 			this.envDB = this.conn.db(this.getEnvId());
 		}

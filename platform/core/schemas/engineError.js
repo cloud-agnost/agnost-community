@@ -33,6 +33,21 @@ export const EngineErrorModel = mongoose.model(
 			ref: "environment",
 			index: true,
 		},
+		endpointId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "endpoint",
+			index: true,
+		},
+		queueId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "queue",
+			index: true,
+		},
+		cronjobId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "cronjob",
+			index: true,
+		},
 		type: {
 			type: String,
 			index: true,

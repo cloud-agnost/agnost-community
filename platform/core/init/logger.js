@@ -1,7 +1,7 @@
 import winston from "winston";
 import mongoose from "mongoose";
 import Transport from "winston-transport";
-import { ErrorModel } from "../schemas/platformError.js";
+import { PlatformErrorModel } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const { combine, timestamp, printf } = winston.format;
@@ -26,7 +26,7 @@ class MongoDBTransport extends Transport {
 		// If we have a database connection
 		if (mongoose.connection?.readyState === 1) {
 			// Save the error to the errors collection, do not wait for the save operation to complete and write it fast
-			new ErrorModel(entry).save({ w: 0 });
+			new PlatformErrorModel(entry).save({ w: 0 });
 		}
 
 		callback();

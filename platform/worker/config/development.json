@@ -1,4 +1,12 @@
 {
+   "cache": {
+      "hostname": "cluster-redis-clusterip-service",
+      "port": 6379,
+      "readReplica": {
+          "hostname": "cluster-redis-clusterip-service",
+          "port": 6379
+      }
+   },
      "queue": {
         "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
         "port": 5672,
@@ -13,5 +21,8 @@
       "port": 587,
       "secure": false,
       "pool": true
+   },
+   "general": {  
+      "platformBaseUrl": "http://platform-core-clusterip-service:4000"
    }
 }

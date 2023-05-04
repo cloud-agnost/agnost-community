@@ -1,4 +1,4 @@
-// Types of login providers supported. Initially we support agnost (email/username and password based authentication),
+// Types of login providers supported. Initially we support agnost (email and password based authentication),
 // later on we can support , "github", "bitbucket", "gitlab" etc.
 export const providerTypes = ["agnost"];
 
@@ -22,18 +22,25 @@ export const notificationTypes = [
 // User statuses. The Pending status is only used during the sign up of the cluster owner, e.g., initialization of the cluster
 export const userStatus = ["Active", "Pending"];
 
-export const orgRoles = [
-	"Org Admin",
-	"App Admin",
-	"Developer",
-	"Resource Manager",
-	"Viewer",
-];
+// Admin - Can access all organization data including all apps of the organization. Can manage organization resources, organization members and organization settings.
+// Member - Can access organization data and view apps that they are a member of. Cannot manage organization resources organization members and organization settings.
+// Member - Can access organization data and view apps that they are a member of.  Can manage organization resources but cannot manage organization members or organization settings.
+// Viewer - Can access organization data and view apps that they are a member of.  Cannot manage organization resources, organization members and organization settings.
+export const orgRoles = ["Admin", "Member", "Resource Manager", "Viewer"];
 
 // Application team member roles
 export const appRoles = ["Admin", "Developer", "Viewer"];
 
-export const engineErrorType = ["endpoint", "queue", "cronjob", "worker"];
+export const engineErrorType = [
+	"endpoint",
+	"queue",
+	"cronjob",
+	"worker",
+	"engine",
+	"monitor",
+	"scheduler",
+	"realtime",
+];
 
 export const envActions = [
 	"deploy",
@@ -265,7 +272,7 @@ export const databaseTypes = [
 
 export const mongoDBConnFormat = ["mongodb", "mongodb+srv"];
 
-export const resourceActions = ["create", "update", "delete"];
+export const resourceActions = ["create", "update", "delete", "bind", "check"];
 
 export const resourceStatuses = [
 	"Binding", // Valid for default cluster resources
@@ -296,14 +303,14 @@ export const designElementTypes = [
 ];
 
 export const instanceTypes = {
-	engine: ["Agnost Engine"],
+	engine: ["API Server"],
 	database: ["PostgreSQL", "MySQL", "SQL Server", "MongoDB", "Oracle"],
 	cache: ["Redis"],
 	storage: [
 		"AWS S3",
 		"GCP Cloud Storage",
 		"Azure Blob Storage",
-		"Default Storage",
+		"Cluster Storage",
 	],
 	queue: ["Default Queue", "RabbitMQ", "Kafka"],
 	scheduler: ["Default Scheduler"],

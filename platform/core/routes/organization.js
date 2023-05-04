@@ -143,12 +143,23 @@ router.post(
 			);
 
 			// Add the default Agnost cluster resources to the organization
-			await resourceCtrl.addDefaultOrganizationResources(session, user, orgObj);
+			const resources = await resourceCtrl.addDefaultOrganizationResources(
+				session,
+				user,
+				orgObj
+			);
 
 			// Commit transaction
 			await orgCtrl.commit(session);
 			// Return the newly created organization object
 			res.json(orgObj);
+
+			// We just need to create the storage resource, default queue and scheduler are bound to the existing resources
+			await resourceCtrl.manageClusterResources([
+				resources.storage,
+				resources.queue,
+				resources.scheduler,
+			]);
 
 			// Log action
 			auditCtrl.log(

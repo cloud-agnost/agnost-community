@@ -22,6 +22,16 @@ spec:
               # it uses the image put in minikube's docker environment, see dev.sh script how we change the docker context to minikube
               imagePullPolicy: Never
               env:
+                 - name: CACHE_PWD
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: cachePwd
+                 - name: CACHE_READ_REPLICA_PWD
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: cacheReadReplicaPwd
                  - name: QUEUE_URL
                    valueFrom:
                       secretKeyRef:
@@ -37,17 +47,17 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: emailServerPwd
-                 - name: PLATFORM_DB_URI
+                 - name: CLUSTER_DB_URI
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets
                          key: clusterDBURI
-                 - name: PLATFORM_DB_USER
+                 - name: CLUSTER_DB_USER
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets
                          key: clusterDBUser
-                 - name: PLATFORM_DB_PWD
+                 - name: CLUSTER_DB_PWD
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets

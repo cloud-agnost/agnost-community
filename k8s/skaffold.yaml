@@ -46,6 +46,14 @@ build:
               - '**/*.json'
         docker:
           dockerfile: Dockerfile.dev
+      - image: agnost-enterprise/engine-monitor
+        context: ../engine/monitor
+        sync:
+          infer:
+              - '**/*.js'
+              - '**/*.json'
+        docker:
+          dockerfile: Dockerfile.dev
 deploy:
    statusCheckDeadlineSeconds: 300
    kubectl:
@@ -55,3 +63,4 @@ deploy:
          - dev/platform-sync-deployment.yaml
          - dev/engine-core-deployment.yaml
          - dev/engine-worker-deployment.yaml
+         - dev/engine-monitor-deployment.yaml

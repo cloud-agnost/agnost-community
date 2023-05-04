@@ -25,16 +25,10 @@ class DeploymentController {
 		resources.forEach((element) => {
 			delete element.config;
 			delete element.telemetry;
-			element.access = connCtrl.decrptSensitiveData(
-				element.type,
-				element.instance,
-				element.access
-			);
+			element.access = connCtrl.decryptSensitiveData(element.access);
 
 			if (element.accessReadOnly)
-				element.accessReadOnly = connCtrl.decrptSensitiveData(
-					element.type,
-					element.instance,
+				element.accessReadOnly = connCtrl.decryptSensitiveData(
 					element.accessReadOnly
 				);
 		});

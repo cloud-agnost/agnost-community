@@ -24,7 +24,7 @@
         "maxEncryptedTextFieldLength": 50,
         "maxDecimalDigits": 10,
         "maxOptionsCount": 1000,
-        "masterToken": "mt_hYZqahaQ20P5kSvpEJ3ky0opT8zJX5Y1VFIZ"
+        "masterToken": "mt-hYZqahaQ20P5kSvpEJ3ky0opT8zJX5Y1VFIZ"
     },
     "session": {
         "validationCodeExpiry": 600,

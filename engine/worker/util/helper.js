@@ -50,6 +50,8 @@ function getIP(req) {
  */
 function handleError(req, res, error) {
 	let entry = {
+		source: "engine-worker",
+		type: "worker",
 		code: ERROR_CODES.internalServerError,
 		name: error.name,
 		message: error.message,

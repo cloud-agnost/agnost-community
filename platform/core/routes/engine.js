@@ -15,7 +15,9 @@ const router = express.Router({ mergeParams: true });
 router.post("/error", checkContentType, authMasterToken, async (req, res) => {
 	try {
 		handleEngineError(req.body);
-		res.status(200).send(new Date().toISOString() + " - Logged error message");
+		res
+			.status(200)
+			.send(new Date().toISOString() + " - Logged engine error message");
 	} catch (error) {
 		handleError(req, res, error);
 	}

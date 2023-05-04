@@ -29,6 +29,7 @@ class AuditController extends BaseController {
 					name: user.name,
 					pictureUrl: user.pictureUrl,
 					color: user.color,
+					loginEmail: user.loginProfiles[0].email,
 					contactEmail: user.contactEmail,
 				},
 			},
@@ -62,6 +63,7 @@ class AuditController extends BaseController {
 				name: user.name,
 				pictureUrl: user.pictureUrl,
 				color: user.color,
+				loginEmail: user.loginProfiles[0].email,
 				contactEmail: user.contactEmail,
 			},
 			action,
@@ -88,14 +90,28 @@ class AuditController extends BaseController {
 	}
 
 	/**
-	 * Updates the matching actor email in all audit logs
+	 * Updates the matching actor contact email in all audit logs
 	 * @param  {string} userId The user identifier
-	 * @param  {string} email The email of the user
+	 * @param  {string} email The contact email of the user
 	 */
-	async updateActorEmail(userId, email) {
+	async updateActorContactEmail(userId, email) {
 		await this.updateMultiByQuery(
 			{ "actor.userId": userId },
 			{ "actor.contactEmail": email },
+			{},
+			{ writeConcern: { w: 0 } }
+		);
+	}
+
+	/**
+	 * Updates the matching actor login email in all audit logs
+	 * @param  {string} userId The user identifier
+	 * @param  {string} email The login email of the user
+	 */
+	async updateActorLoginEmail(userId, email) {
+		await this.updateMultiByQuery(
+			{ "actor.userId": userId },
+			{ "actor.loginEmail": email },
 			{},
 			{ writeConcern: { w: 0 } }
 		);

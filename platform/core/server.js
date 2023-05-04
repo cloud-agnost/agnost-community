@@ -39,11 +39,11 @@ if (
 	}
 
 	cluster.on("exit", function (worker, code, signal) {
-		logger.warn(`Platform core process ${worker.process.pid} died`);
+		logger.warn(`Child process ${worker.process.pid} died`);
 		cluster.fork();
 	});
 } else if (cluster.isWorker || ["development"].includes(process.env.NODE_ENV)) {
-	logger.info(`Worker process ${process.pid} is running`);
+	logger.info(`Child process ${process.pid} is running`);
 	// Init globally accessible variables
 	initGlobals();
 	// Set up locatlization
@@ -122,6 +122,8 @@ async function initExpress(i18n) {
 
 	app.use("/", (await import("./routes/system.js")).default);
 	app.use("/v1/engine", (await import("./routes/engine.js")).default);
+	app.use("/v1/platform", (await import("./routes/platform.js")).default);
+	app.use("/v1/telemetry", (await import("./routes/telemetry.js")).default);
 	app.use("/v1/types", (await import("./routes/types.js")).default);
 	app.use("/v1/auth", (await import("./routes/auth.js")).default);
 	app.use("/v1/user", (await import("./routes/user.js")).default);

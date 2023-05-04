@@ -3,6 +3,7 @@ import { deployVersionHandler } from "../consumers/deployVersion.js";
 import { redeployVersionHandler } from "../consumers/redeployVersion.js";
 import { undeployVersionHandler } from "../consumers/undeployVersion.js";
 import { deleteEnvironmentHandler } from "../consumers/deleteEnvironment.js";
+import { manageResourceHandler } from "../consumers/manageResource.js";
 
 var amqpConnection = null;
 var isConnecting = false;
@@ -84,6 +85,10 @@ export const connectToQueue = () => {
 			deleteEnvironmentHandler(
 				connection,
 				`delete-environment-${i}${config.get("queue.developmentSuffix")}`
+			);
+			manageResourceHandler(
+				connection,
+				`manage-resource-${i}${config.get("queue.developmentSuffix")}`
 			);
 		}
 	});
@@ -231,6 +236,41 @@ export const deleteEnvironment = (payload) => {
 			`delete-environment-${randNumber}${config.get(
 				"queue.developmentSuffix"
 			)}`,
+			Buffer.from(JSON.stringify(payload)),
+			{
+				persistent: true,
+				timestamp: Date.now(),
+			}
+		);
+
+		channel.close();
+	});
+};
+
+export const manageResource = (payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		let randNumber = helper.randomInt(
+			1,
+			config.get("general.generalQueueCount")
+		);
+
+		channel.assertQueue(
+			`manage-resource-${randNumber}${config.get("queue.developmentSuffix")}`,
+			{
+				durable: true,
+			}
+		);
+
+		channel.sendToQueue(
+			`manage-resource-${randNumber}${config.get("queue.developmentSuffix")}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,

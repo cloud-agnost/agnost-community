@@ -2,79 +2,56 @@ import pg from "pg";
 import mysql from "mysql2/promise";
 import mssql from "mssql";
 import mongo from "mongodb";
-import axios from "axios";
 
 class ConnectionController {
 	constructor() {}
 
 	/**
 	 * Encrtypes sensitive connection data
-	 * @param  {string} type The type of the resource
-	 * @param  {string} instance The instance of the resource
 	 * @param  {Object} access The connection settings needed to connect to the resource
 	 */
-	encyrptSensitiveData(type, instance, access) {
-		switch (type) {
-			case "database":
-				switch (instance) {
-					case "PostgreSQL":
-					case "MySQL":
-					case "SQL Server":
-					case "MongoDB":
-						return {
-							...access,
-							host: helper.encryptText(access.host),
-							username: helper.encryptText(access.username),
-							password: helper.encryptText(access.password),
-						};
-					default:
-						return access;
-				}
-			case "engine":
-				return {
-					...access,
-					workerUrl: helper.encryptText(access.workerUrl),
-					accessToken: helper.encryptText(access.accessToken),
-				};
-
-			default:
-				return access;
+	encyrptSensitiveData(access) {
+		let encrypted = {};
+		for (const key in access) {
+			const value = access[key];
+			if (typeof value === "object" && value !== null) {
+				encrypted[key] = encyrptSensitiveData(value);
+			} else if (Array.isArray(value)) {
+				encrypted[key] = value.map((entry) => {
+					if (entry && typeof entry === "string")
+						return helper.encryptText(entry);
+					else return entry;
+				});
+			} else if (value && typeof value === "string")
+				encrypted[key] = helper.encryptText(value);
+			else encrypted[key] = value;
 		}
+
+		return encrypted;
 	}
 
 	/**
 	 * Decrypt connection data
-	 * @param  {string} type The type of the resource
-	 * @param  {string} instance The instance of the resource
 	 * @param  {Object} access The encrypted connection settings needed to connect to the resource
 	 */
-	decrptSensitiveData(type, instance, access) {
-		switch (type) {
-			case "database":
-				switch (instance) {
-					case "PostgreSQL":
-					case "MySQL":
-					case "SQL Server":
-					case "MongoDB":
-						return {
-							...access,
-							host: helper.decryptText(access.host),
-							username: helper.decryptText(access.username),
-							password: helper.decryptText(access.password),
-						};
-					default:
-						return access;
-				}
-			case "engine":
-				return {
-					...access,
-					workerUrl: helper.decryptText(access.workerUrl),
-					accessToken: helper.decryptText(access.accessToken),
-				};
-
-			default:
-				return access;
+	decryptSensitiveData(access) {
+		let decrypted = {};
+		for (const key in access) {
+			const value = access[key];
+			if (typeof value === "object" && value !== null) {
+				decrypted[key] = decryptSensitiveData(value);
+			} else if (Array.isArray(value)) {
+				decrypted[key] = value.map((entry) => {
+					if (entry && typeof entry === "string")
+						return helper.decryptText(entry);
+					else return entry;
+				});
+			} else if (value && typeof value === "string")
+				decrypted[key] = helper.decryptText(value);
+			else decrypted[key] = value;
 		}
+
+		return decrypted;
 	}
 
 	/**
@@ -185,29 +162,6 @@ class ConnectionController {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Returns true if successfully connects to the execution engine otherwise throws an exception
-	 * @param  {string} connSettings The connection settings needed to connect to the execution engine
-	 */
-	async testEngineConnection(connSettings) {
-		try {
-			//Make api call to environment's execution engine to validate connection and access token
-			await axios.get(`${connSettings.workerUrl}/agnost/validate`, {
-				headers: {
-					Authorization: connSettings.accessToken,
-					"Content-Type": "application/json",
-				},
-			});
-		} catch (err) {
-			throw new AgnostError(
-				t(
-					"Cannot connect to the execution engine. %s",
-					err.response?.data?.details || err.message
-				)
-			);
-		}
 	}
 }
 

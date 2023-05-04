@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import { body } from "express-validator";
-import { resourceActions, resourceStatuses } from "../config/constants.js";
+import {
+	resourceActions,
+	resourceStatuses,
+	logStatuses,
+} from "../config/constants.js";
 
 /**
  * Keeps the list of deployment
@@ -31,7 +35,13 @@ export const ResourceLogModel = mongoose.model(
 			required: true,
 		},
 		// Resouce operation logs
-		logs: { type: String },
+		logs: [
+			{
+				startedAt: { type: Date },
+				status: { type: String, enum: logStatuses },
+				message: { type: String },
+			},
+		],
 		createdAt: {
 			type: Date,
 			default: Date.now,
@@ -65,6 +75,26 @@ export const applyRules = (type) => {
 					.isIn(resourceStatuses)
 					.withMessage(t("Unsupported environment status")),
 				body("logs")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.isArray()
+					.withMessage(t("Logs need to be an array of log entries")),
+				body("logs.*.startedAt")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isISO8601()
+					.withMessage(t("Not a valid date & time format")),
+				body("logs.*.status")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(logStatuses)
+					.withMessage(t("Unsupported log status")),
+				body("logs.*.message")
+					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty")),
 			];

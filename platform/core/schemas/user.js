@@ -182,57 +182,6 @@ export const applyRules = (type) => {
 							config.get("general.minPwdLength")
 						)
 					),
-				body("username")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
-					.withMessage(
-						t(
-							"Username must be at most %s characters long",
-							config.get("general.maxTextLength")
-						)
-					)
-					.bail()
-					.custom((value) => {
-						let regex = /^[A-Za-z0-9_]+$/;
-						if (!regex.test(value)) {
-							throw new AgnostError(
-								t(
-									"Username can include only numbers, letters and underscore (_) characters"
-								)
-							);
-						}
-
-						let regex2 = /^[0-9].*$/;
-						if (regex2.test(value)) {
-							throw new AgnostError(t("Usernames cannot start with a number"));
-						}
-
-						if (value.startsWith("_")) {
-							throw new AgnostError(
-								t("Usernames cannot start with underscore (_) character")
-							);
-						}
-
-						//Indicates the success of this synchronous custom validator
-						return true;
-					})
-					.bail()
-					.custom(async (value) => {
-						// Check whether email is unique or not
-						let user = await UserModel.findOne({
-							username: value,
-						}).lean();
-
-						if (user) {
-							throw new AgnostError(
-								t("User account with the provided username already exists")
-							);
-						}
-						return true;
-					}),
 				body("name")
 					.trim()
 					.notEmpty()

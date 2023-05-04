@@ -23,8 +23,8 @@ export function setUpSyncServer(expressServer) {
 			host: cacheConfig.hostname,
 			port: cacheConfig.port,
 			password:
-				process.env.SYNC_CACHE_PWD && process.env.SYNC_CACHE_PWD !== "null"
-					? process.env.SYNC_CACHE_PWD
+				process.env.CACHE_PWD && process.env.CACHE_PWD !== "null"
+					? process.env.CACHE_PWD
 					: undefined,
 		});
 

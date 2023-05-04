@@ -56,10 +56,10 @@ function generateColor(luminosity = "dark") {
  * @param  {string} prefix The length of the slug excluding the prefix
  */
 function generateSlug(prefix, length = 12) {
-	const alphabet =
-		"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	// Kubernetes resource names need to be alphanumeric and in lowercase letters
+	const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
 	const nanoid = customAlphabet(alphabet, length);
-	return `${prefix}_${nanoid()}`;
+	return `${prefix}-${nanoid()}`;
 }
 
 /**
