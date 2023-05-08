@@ -2,7 +2,6 @@ import axios from "axios";
 import BaseController from "./base.js";
 import { ResourceModel } from "../schemas/resource.js";
 import resLogCtrl from "./resourceLog.js";
-import connCtrl from "./connection.js";
 
 class ResourceController extends BaseController {
 	constructor() {
@@ -31,23 +30,23 @@ class ResourceController extends BaseController {
 	 */
 	async createClusterStorage(session, user, org) {
 		const resourceId = helper.generateId();
-		const resourceIid = helper.generateSlug("res");
+		const resourceIid = helper.generateSlug("str");
 		const resource = await this.create(
 			{
 				_id: resourceId,
 				orgId: org._id,
 				iid: resourceIid,
-				name: t("Cluster Storage"),
+				name: t("Organization Storage"),
 				type: "storage",
 				instance: "Cluster Storage",
-				managed: true,
+				managed: true, // The size of the storage can be updated
 				allowedRoles: ["Admin", "Developer", "Viewer"],
-				config: config.get("defaultStorage.config"),
-				access: connCtrl.encyrptSensitiveData({
+				config: { size: config.get("general.defaulPVCSize") },
+				access: helper.encyrptSensitiveData({
 					name: resourceIid,
 					mountPath: resourceIid,
 				}),
-				deletable: false,
+				deletable: true,
 				status: "Creating",
 				createdBy: user._id,
 			},
@@ -80,18 +79,18 @@ class ResourceController extends BaseController {
 			{
 				_id: resourceId,
 				orgId: org._id,
-				iid: helper.generateSlug("res"),
+				iid: helper.generateSlug("que"),
 				name: t("Default Queue"),
 				type: "queue",
 				instance: "Default Queue",
-				managed: true,
+				managed: false, // Default queue is a cluster resource and only cluster owner can update its configuration
 				allowedRoles: ["Admin", "Developer", "Viewer"],
-				config: config.get("defaultQueue.config"),
-				access: connCtrl.encyrptSensitiveData({
+				config: {},
+				access: helper.encyrptSensitiveData({
 					url: process.env.QUEUE_URL,
 				}),
-				deletable: false,
 				status: "Binding",
+				deletable: false,
 				createdBy: user._id,
 			},
 			{ session, cacheKey: resourceId }
@@ -123,18 +122,18 @@ class ResourceController extends BaseController {
 			{
 				_id: resourceId,
 				orgId: org._id,
-				iid: helper.generateSlug("res"),
+				iid: helper.generateSlug("sch"),
 				name: t("Default Scheduler"),
 				type: "scheduler",
 				instance: "Default Scheduler",
-				managed: true,
+				managed: false, // Default scheduler is a cluster resource and only cluster owner can update its configuration
 				allowedRoles: ["Admin", "Developer", "Viewer"],
-				config: config.get("defaultScheduler.config"),
-				access: connCtrl.encyrptSensitiveData(
-					config.get("defaultScheduler.access")
-				),
-				deletable: false,
+				config: {},
+				access: helper.encyrptSensitiveData({
+					name: config.get("general.defaultSchedulerDeploymentName"),
+				}),
 				status: "Binding",
+				deletable: false,
 				createdBy: user._id,
 			},
 			{ session, cacheKey: resourceId }
@@ -155,27 +154,87 @@ class ResourceController extends BaseController {
 	}
 
 	/**
+	 * Adds the engine deployment object as a resource to the organization app
+	 * @param  {Object} session The database session object
+	 * @param  {Object} user The user whose creating the engine deployment
+	 * @param  {Object} org The organization object where the engine deployment will be added
+	 * @param  {Object} app The app object where the engine deployment will be added
+	 * @param  {Object} version The version object where the engine deployment will be added
+	 * @param  {string} envIid The version environment internal identifier
+	 */
+	async createEngineDeployment(session, user, org, app, version, envIid) {
+		const resourceId = helper.generateId();
+		const resourceIid = helper.generateSlug("eng");
+
+		const resource = await this.create(
+			{
+				_id: resourceId,
+				orgId: org._id,
+				appId: app._id,
+				versionId: version._id,
+				iid: resourceIid,
+				name: t("API Server"),
+				type: "engine",
+				instance: "API Server",
+				managed: true, // The configuration of engine deployment can be updated
+				allowedRoles: ["Admin", "Developer", "Viewer"],
+				config: config.get("general.defaultEngineConfig"),
+				access: helper.encyrptSensitiveData({
+					name: resourceIid,
+					versionId: version.iid,
+					envId: envIid,
+				}),
+				status: "Creating",
+				createdBy: user._id,
+			},
+			{ session, cacheKey: resourceId }
+		);
+
+		const log = await resLogCtrl.create(
+			{
+				orgId: org._id,
+				resourceId: resourceId,
+				action: "create",
+				status: "Creating",
+				createdBy: user._id,
+			},
+			{ session }
+		);
+
+		return { resource, log };
+	}
+
+	/**
 	 * Initiates the actual creating/binding of cluster resources
-	 * @param  {Object | Array} resources The resource objects that will be created/bound
+	 * @param  {Array} resources The resource objects that will be created/bound/updated/deleted and their associated logs
 	 */
 	async manageClusterResources(resources) {
 		resources = resources.map((entry) => {
-			return {
-				...entry.resource,
-				access: connCtrl.decryptSensitiveData(entry.resource.access),
-				action: entry.log.action,
-				callback: `${config.get("general.platformBaseUrl")}/v1/org/${
-					entry.resource.orgId
-				}/resource/${entry.resource._id}/log/${entry.log._id}`,
-			};
+			// If there is no log entry, then it is a delete operation
+			if (entry.log?.action) {
+				return {
+					...entry.resource,
+					access: helper.decryptSensitiveData(entry.resource.access),
+					action: entry.log.action,
+					callback: `${config.get("general.platformBaseUrl")}/v1/org/${
+						entry.resource.orgId
+					}/resource/${entry.resource._id}/log/${entry.log._id}`,
+				};
+			} else {
+				return {
+					...entry.resource,
+					access: helper.decryptSensitiveData(entry.resource.access),
+					action: "delete",
+				};
+			}
 		});
 		// Make api call to engine worker to create resources
 		await axios.post(
-			config.get("defaultEngineWorkerAccess.workerUrl") + "/v1/resource/manage",
+			config.get("general.workerUrl") + "/v1/resource/manage",
 			resources,
 			{
 				headers: {
-					Authorization: config.get("defaultEngineWorkerAccess.accessToken"),
+					Authorization: config.get("general.workerAccessToken"),
 					"Content-Type": "application/json",
 				},
 			}

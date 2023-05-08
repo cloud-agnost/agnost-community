@@ -20,16 +20,19 @@ export const notificationTypes = [
 ];
 
 // User statuses. The Pending status is only used during the sign up of the cluster owner, e.g., initialization of the cluster
-export const userStatus = ["Active", "Pending"];
+export const userStatus = ["Active", "Pending", "Deleted"];
 
 // Admin - Can access all organization data including all apps of the organization. Can manage organization resources, organization members and organization settings.
 // Member - Can access organization data and view apps that they are a member of. Cannot manage organization resources organization members and organization settings.
-// Member - Can access organization data and view apps that they are a member of.  Can manage organization resources but cannot manage organization members or organization settings.
+// Resource Manager - Can access organization data and view apps that they are a member of.  Can manage organization resources but cannot manage organization members or organization settings.
 // Viewer - Can access organization data and view apps that they are a member of.  Cannot manage organization resources, organization members and organization settings.
 export const orgRoles = ["Admin", "Member", "Resource Manager", "Viewer"];
 
 // Application team member roles
 export const appRoles = ["Admin", "Developer", "Viewer"];
+
+// Invitation statuses
+export const invitationStatus = ["Pending", "Accepted", "Rejected"];
 
 export const engineErrorType = [
 	"endpoint",

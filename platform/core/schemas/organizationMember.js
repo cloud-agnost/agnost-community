@@ -47,7 +47,6 @@ export const OrganizationMemberModel = mongoose.model(
 export const applyRules = (type) => {
 	switch (type) {
 		case "get-members":
-		case "list-eligible":
 			return [
 				query("page")
 					.trim()
@@ -103,6 +102,25 @@ export const applyRules = (type) => {
 		case "remove-member":
 			return [
 				param("userId")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom(async (value, { req }) => {
+						if (!helper.isValidId(value))
+							throw new AgnostError(t("Not a valid user identifier"));
+
+						return true;
+					}),
+			];
+		case "remove-members":
+			return [
+				body("userIds")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.isArray()
+					.withMessage(t("User identifiers need to be an array of strings")),
+				body("userIds.*")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))

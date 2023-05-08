@@ -55,7 +55,7 @@ export const validateResourceLog = async (req, res, next) => {
 				error: t("Not Found"),
 				details: t(
 					"No such resource log with the provided id '%s' exists.",
-					envId
+					logId
 				),
 				code: ERROR_CODES.notFound,
 			});

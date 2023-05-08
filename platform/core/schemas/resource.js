@@ -85,12 +85,6 @@ export const ResourceModel = mongoose.model(
 			accessReadOnly: {
 				type: mongoose.Schema.Types.Mixed,
 			},
-			// Whether the resource can be deleted or not.
-			deletable: {
-				type: Boolean,
-				required: true,
-				default: false,
-			},
 			// Resource status
 			status: {
 				type: String,

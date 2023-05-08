@@ -1,7 +1,9 @@
 import mongoose from "mongoose";
 import { body, query } from "express-validator";
 import helper from "../util/helper.js";
-
+import userCtrl from "../controllers/user.js";
+import orgMemberCtrl from "../controllers/organizationMember.js";
+import { orgRoles, invitationStatus } from "../config/constants.js";
 /**
  * Organization invitions. Each member is first needs to be added to the organization.
  * Later on these members will be aded to specific apps.
@@ -32,14 +34,7 @@ export const OrgInvitationModel = mongoose.model(
 			type: String,
 			required: true,
 			index: true,
-			enum: [
-				"Admin",
-				"App Admin",
-				"Billing Admin",
-				"Read-only",
-				"Resource Manager",
-				"Developer",
-			],
+			enum: orgRoles,
 			required: true,
 		},
 		status: {
@@ -47,7 +42,31 @@ export const OrgInvitationModel = mongoose.model(
 			required: true,
 			index: true,
 			default: "Pending",
-			enum: ["Pending", "Accepted", "Rejected"],
+			enum: invitationStatus,
+		},
+		// Info about the person who invites the user
+		host: {
+			userId: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "user",
+				index: true,
+			},
+			name: {
+				type: String,
+				index: true,
+			},
+			pictureUrl: {
+				type: String,
+			},
+			color: {
+				// If no picture provided then this will be the avatar background color of the user
+				type: String,
+			},
+			contactEmail: {
+				// Independent of the provider we store the email address of the user
+				type: String,
+				index: true,
+			},
 		},
 		createdAt: {
 			type: Date,
@@ -76,20 +95,32 @@ export const applyRules = (type) => {
 					.isEmail()
 					.withMessage(t("Not a valid email address"))
 					.bail()
-					.normalizeEmail({ gmail_remove_dots: false }),
+					.normalizeEmail({ gmail_remove_dots: false })
+					.custom(async (value, { req }) => {
+						// Check whether a user with the provided email is already a member of the organization
+						let user = await userCtrl.getOneByQuery({
+							"loginProfiles.provider": "agnost",
+							"loginProfiles.email": value,
+						});
+
+						if (user) {
+							let member = await orgMemberCtrl.getOneByQuery(
+								{ orgId: req.org._id, userId: user._id }
+								//{ cacheKey: `${req.org._id}.${user._id}` }
+							);
+							if (member)
+								throw new AgnostError(
+									t("User is already a member of the organization")
+								);
+						}
+						return true;
+					}),
 				body("*.role")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isIn([
-						"Admin",
-						"App Admin",
-						"Billing Admin",
-						"Read-only",
-						"Resource Manager",
-						"Developer",
-					])
+					.isIn(orgRoles)
 					.withMessage(t("Unsupported member role")),
 			];
 		case "update-invite":
@@ -103,20 +134,26 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isIn([
-						"Admin",
-						"App Admin",
-						"Billing Admin",
-						"Read-only",
-						"Resource Manager",
-						"Developer",
-					])
+					.isIn(orgRoles)
 					.withMessage(t("Unsupported member role")),
 			];
 		case "resend-invite":
-		case "revoke-invite":
+		case "delete-invite":
 			return [
 				query("token")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required parameter, cannot be left empty")),
+			];
+		case "delete-invite-multi":
+			return [
+				body("tokens")
+					.notEmpty()
+					.withMessage(t("Required parameter, cannot be left empty"))
+					.bail()
+					.isArray()
+					.withMessage(t("Invitation tokens needs to be an array of strings")),
+				body("tokens.*")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required parameter, cannot be left empty")),

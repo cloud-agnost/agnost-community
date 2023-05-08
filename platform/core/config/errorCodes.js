@@ -9,6 +9,7 @@ const ERROR_CODES = {
 	invalidValidationCode: "invalid_validation_code",
 	invalidCredentials: "invalid_credentials",
 	pendingAccount: "pending_account",
+	pendingEmailConfirmation: "pending_email_confirmation",
 	missingAccessToken: "missing_access_token",
 	missingRefreshToken: "missing_refresh_token",
 	invalidSession: "invalid_session",
@@ -25,6 +26,7 @@ const ERROR_CODES = {
 	fileUploadError: "file_upload_error",
 	unauthorized: "unauthorized",
 	notFound: "not_found",
+	setupCompleted: "setup_completed",
 
 	// Remaining
 	session_expired: "session_expired",

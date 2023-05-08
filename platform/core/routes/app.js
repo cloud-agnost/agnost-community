@@ -8,6 +8,7 @@ import envLogCtrl from "../controllers/environmentLog.js";
 import deployCtrl from "../controllers/deployment.js";
 import auditCtrl from "../controllers/audit.js";
 import userCtrl from "../controllers/user.js";
+import resourceCtrl from "../controllers/resource.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
@@ -42,6 +43,7 @@ router.get("/roles", checkContentType, authSession, async (req, res) => {
 @route      /v1/org/:orgId/app
 @method     POST
 @desc       Creates a new app. When creating the app a new master version is also created and the app creator is added as 'Manager' to app team.
+			While creating the new version we also create the engine deployment for it.
 @access     private
 */
 router.post(
@@ -59,39 +61,19 @@ router.post(
 			const { org, user } = req;
 			const { name } = req.body;
 
-			// Create the app
-			let appId = helper.generateId();
-			let app = await appCtrl.create(
-				{
-					_id: appId,
-					orgId: org._id,
-					iid: helper.generateSlug("app"),
-					name,
-					team: [{ userId: user._id, role: "Admin" }],
-					createdBy: user._id,
-				},
-				{ session, cacheKey: appId }
+			// Create the new app and associated master version, environment and engine API server
+			const { app, version, resource, log, env } = await appCtrl.createApp(
+				session,
+				user,
+				org,
+				name
 			);
 
-			// Create the master app version
-			let versionId = helper.generateId();
-			let version = await versionCtrl.create(
-				{
-					_id: versionId,
-					orgId: org._id,
-					appId,
-					iid: helper.generateSlug("ver"),
-					name: "master",
-					private: false,
-					readOnly: true,
-					master: true,
-					createdBy: user._id,
-				},
-				{ session, cacheKey: versionId }
-			);
+			//await appCtrl.commit(session);
+			res.json({ app, version, resource, log, env });
 
-			await appCtrl.commit(session);
-			res.json({ app, version });
+			// We just need to create the storage resource, default queue and scheduler are bound to the existing resources
+			await resourceCtrl.manageClusterResources([{ resource, log }]);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -100,10 +82,11 @@ router.post(
 				"org.app",
 				"create",
 				t("Created new app '%s'", name),
-				{ app, version },
-				{ orgId: org._id, appId }
+				{ app, version, resource, env },
+				{ orgId: org._id, appId: app._id }
 			);
 		} catch (err) {
+			console.log("***err", err);
 			await appCtrl.rollback(session);
 			handleError(req, res, err);
 		}

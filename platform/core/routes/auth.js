@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import authCtrl from "../controllers/auth.js";
 import userCtrl from "../controllers/user.js";
 import auditCtrl from "../controllers/audit.js";
+import orgInvitationCtrl from "../controllers/orgInvitation.js";
+import appInvitationCtrl from "../controllers/appInvitation.js";
 import { applyRules } from "../schemas/user.js";
 import { handleError } from "../schemas/platformError.js";
 import { checkContentType } from "../middlewares/contentType.js";
@@ -10,7 +12,10 @@ import { validate } from "../middlewares/validate.js";
 import { authClusterToken } from "../middlewares/authClusterToken.js";
 import { authSession } from "../middlewares/authSession.js";
 import { authRefreshToken } from "../middlewares/authRefreshToken.js";
-import { checkClusterSetupStatus } from "../middlewares/checkClusterSetupStatus.js";
+import {
+	checkClusterSetupStatus,
+	hasClusterSetUpCompleted,
+} from "../middlewares/checkClusterSetupStatus.js";
 import { sendMessage } from "../init/queue.js";
 import ERROR_CODES from "../config/errorCodes.js";
 import { notificationTypes } from "../config/constants.js";
@@ -140,7 +145,7 @@ router.post(
 			let storedCode = await authCtrl.getValidationCode(email);
 
 			//Codes match validate user email and create session
-			if (code?.toString() === storedCode?.toString()) {
+			if (code && code.toString() === storedCode?.toString()) {
 				let user = await userCtrl.updateOneByQuery(
 					{
 						"loginProfiles.provider": "agnost",
@@ -206,13 +211,10 @@ router.post(
 			const { email, password } = req.body;
 
 			// Get user record
-			let user = await userCtrl.getOneByQuery(
-				{
-					"loginProfiles.provider": "agnost",
-					"loginProfiles.email": email,
-				},
-				{ projection: "+loginProfiles.password" }
-			);
+			let user = await userCtrl.getOneByQuery({
+				"loginProfiles.provider": "agnost",
+				"loginProfiles.email": email,
+			});
 
 			if (!user) {
 				return res.status(401).json({
@@ -230,11 +232,22 @@ router.post(
 			);
 
 			// Check account status and email verification
-			if (!profile || !profile.emailVerified || user.status === "Pending") {
+			if (!profile || !profile.emailVerified) {
+				return res.status(403).json({
+					error: t("Pending account"),
+					code: ERROR_CODES.pendingEmailConfirmation,
+					details: t("Your email address has not been confirmed yet."),
+				});
+			}
+
+			// Check account status and email verification
+			if (user.status === "Pending") {
 				return res.status(403).json({
 					error: t("Pending account"),
 					code: ERROR_CODES.pendingAccount,
-					details: t("Your email address has not been confirmed yet."),
+					details: t(
+						"You have not completed yet account setup. You need to set your name and password."
+					),
 				});
 			}
 
@@ -324,5 +337,244 @@ router.post("/renew", authRefreshToken, async (req, res) => {
 		handleError(req, res, error);
 	}
 });
+
+/*
+@route      /v1/auth/initiate-setup
+@method     POST
+@desc       Checks the account status of the user, if the user has already completed the account set up returns an error. 
+			If the account set up has not ben completed returns success and sends a verification code to user's email address.
+@access     public
+*/
+router.post(
+	"/initiate-setup",
+	checkContentType,
+	hasClusterSetUpCompleted,
+	applyRules("initiate-setup"),
+	validate,
+	async (req, res) => {
+		try {
+			const { email } = req.body;
+			// Get user record
+			let user = await userCtrl.getOneByQuery({
+				"loginProfiles.provider": "agnost",
+				"loginProfiles.email": email,
+			});
+
+			if (!user) {
+				return res.status(404).json({
+					error: t("Not Found"),
+					code: ERROR_CODES.notFound,
+					details: t("No user account with provided email exists."),
+				});
+			}
+
+			if (user.status === "Active") {
+				return res.status(400).json({
+					error: t("Setup Completed"),
+					code: ERROR_CODES.setupCompleted,
+					details: t(
+						"User account setup has already been completed. Try signing in."
+					),
+				});
+			}
+
+			// Create the 6-digit email validation code
+			let code = await authCtrl.createValidationCode(email);
+			sendMessage("send-validation-code", {
+				to: email,
+				code1: code.substring(0, 3),
+				code2: code.substring(3, 6),
+			});
+
+			res.json();
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/auth/complete-setup
+@method     POST
+@desc       Completes the account set-up
+@access     public
+*/
+router.post(
+	"/complete-setup",
+	checkContentType,
+	hasClusterSetUpCompleted,
+	applyRules("complete-setup"),
+	validate,
+	async (req, res) => {
+		try {
+			const { email, password, name, verificationCode } = req.body;
+			// Get user record
+			let user = await userCtrl.getOneByQuery({
+				"loginProfiles.provider": "agnost",
+				"loginProfiles.email": email,
+			});
+
+			if (!user) {
+				return res.status(404).json({
+					error: t("Not Found"),
+					code: ERROR_CODES.notFound,
+					details: t("No user account with provided email exists."),
+				});
+			}
+
+			if (user.status === "Active") {
+				return res.status(400).json({
+					error: t("Setup Completed"),
+					code: ERROR_CODES.setupCompleted,
+					details: t(
+						"User account setup has already been completed. Try signing in."
+					),
+				});
+			}
+
+			// Get the stored validateion code
+			let storedCode = await authCtrl.getValidationCode(email);
+			if (
+				verificationCode &&
+				verificationCode.toString() === storedCode?.toString()
+			) {
+				// Encrypt user password
+				const salt = await bcrypt.genSalt(10);
+				let encryptedPassword = await bcrypt.hash(password, salt);
+				let updatedUser = await userCtrl.updateOneByQuery(
+					{ _id: user._id, "loginProfiles.email": email },
+					{
+						name: name,
+						status: "Active",
+						lastLoginAt: Date.now(),
+						lastLoginProvider: "agnost",
+						"loginProfiles.$.password": encryptedPassword,
+					}
+				);
+
+				// Create new session
+				let tokens = await authCtrl.createSession(
+					updatedUser._id,
+					helper.getIP(req),
+					req.headers["user-agent"],
+					"agnost"
+				);
+
+				// Remove password field value from returned object
+				delete updatedUser.loginProfiles[0].password;
+				res.json({ ...updatedUser, ...tokens });
+			} else {
+				return res.status(401).json({
+					error: t("Invalid Credentials"),
+					details: t("The validation code provided is invalid or has expired."),
+					code: ERROR_CODES.invalidValidationCode,
+				});
+			}
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/auth/setup
+@method     POST
+@desc       Completes the account set-up. This endpoint needs to be called immediately after the user accepts and organization or app invitation and has not completed his account set up yet.
+@access     public
+*/
+router.post(
+	"/setup",
+	checkContentType,
+	hasClusterSetUpCompleted,
+	applyRules("setup"),
+	validate,
+	async (req, res) => {
+		try {
+			const { email, password, name, token, inviteType } = req.body;
+			// Get user record
+			let user = await userCtrl.getOneByQuery({
+				"loginProfiles.provider": "agnost",
+				"loginProfiles.email": email,
+			});
+
+			if (!user) {
+				return res.status(404).json({
+					error: t("Not Found"),
+					code: ERROR_CODES.notFound,
+					details: t("No user account with provided email exists."),
+				});
+			}
+
+			if (user.status === "Active") {
+				return res.status(400).json({
+					error: t("Setup Completed"),
+					code: ERROR_CODES.setupCompleted,
+					details: t(
+						"User account setup has already been completed. Try signing in."
+					),
+				});
+			}
+
+			let invite = null;
+			if (inviteType === "org") {
+				invite = await orgInvitationCtrl.getOneByQuery({
+					token,
+					email,
+					status: "Accepted",
+				});
+
+				if (!invite) {
+					return res.status(404).json({
+						error: t("Not Found"),
+						details: t("No such invitation exists for the organization."),
+						code: ERROR_CODES.notFound,
+					});
+				}
+			} else {
+				invite = await appInvitationCtrl.getOneByQuery({
+					token,
+					email,
+					status: "Accepted",
+				});
+
+				if (!invite) {
+					return res.status(404).json({
+						error: t("Not Found"),
+						details: t("No such invitation exists for the app."),
+						code: ERROR_CODES.notFound,
+					});
+				}
+			}
+
+			// Encrypt user password
+			const salt = await bcrypt.genSalt(10);
+			let encryptedPassword = await bcrypt.hash(password, salt);
+			let updatedUser = await userCtrl.updateOneByQuery(
+				{ _id: user._id, "loginProfiles.email": email },
+				{
+					name: name,
+					status: "Active",
+					lastLoginAt: Date.now(),
+					lastLoginProvider: "agnost",
+					"loginProfiles.$.password": encryptedPassword,
+				}
+			);
+
+			// Create new session
+			let tokens = await authCtrl.createSession(
+				updatedUser._id,
+				helper.getIP(req),
+				req.headers["user-agent"],
+				"agnost"
+			);
+
+			// Remove password field value from returned object
+			delete updatedUser.loginProfiles[0].password;
+			res.json({ ...updatedUser, ...tokens });
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
 
 export default router;

@@ -12,6 +12,7 @@
         "generalQueueCount": 1,
         "maxMessageWaitMinues": 5,
         "maxMongoDBIndexNumberPerCollection": 64,
-        "k8sNamespace": "default"
+        "k8sNamespace": "default",
+        "ingressServiceName": "ingress-service"
     }
 }

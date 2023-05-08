@@ -7,54 +7,6 @@ class ConnectionController {
 	constructor() {}
 
 	/**
-	 * Encrtypes sensitive connection data
-	 * @param  {Object} access The connection settings needed to connect to the resource
-	 */
-	encyrptSensitiveData(access) {
-		let encrypted = {};
-		for (const key in access) {
-			const value = access[key];
-			if (typeof value === "object" && value !== null) {
-				encrypted[key] = encyrptSensitiveData(value);
-			} else if (Array.isArray(value)) {
-				encrypted[key] = value.map((entry) => {
-					if (entry && typeof entry === "string")
-						return helper.encryptText(entry);
-					else return entry;
-				});
-			} else if (value && typeof value === "string")
-				encrypted[key] = helper.encryptText(value);
-			else encrypted[key] = value;
-		}
-
-		return encrypted;
-	}
-
-	/**
-	 * Decrypt connection data
-	 * @param  {Object} access The encrypted connection settings needed to connect to the resource
-	 */
-	decryptSensitiveData(access) {
-		let decrypted = {};
-		for (const key in access) {
-			const value = access[key];
-			if (typeof value === "object" && value !== null) {
-				decrypted[key] = decryptSensitiveData(value);
-			} else if (Array.isArray(value)) {
-				decrypted[key] = value.map((entry) => {
-					if (entry && typeof entry === "string")
-						return helper.decryptText(entry);
-					else return entry;
-				});
-			} else if (value && typeof value === "string")
-				decrypted[key] = helper.decryptText(value);
-			else decrypted[key] = value;
-		}
-
-		return decrypted;
-	}
-
-	/**
 	 * Returns true if successfully connects to the database otherwise throws an exception
 	 * @param  {string} dbType The type of the datbase e.g., PostgreSQL, MySQL
 	 * @param  {string} connSettings The connection settings needed to connect to the database

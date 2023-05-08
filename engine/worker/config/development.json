@@ -27,6 +27,17 @@
    "general": {  
       "accessToken": "at-2F5FOIkOXEOmPfywWJ6JRZXCnzFgtqVIHAJ7",
       "platformBaseUrl": "http://platform-core-clusterip-service:4000",
-      "maxPoolSize": 3
+      "maxPoolSize": 3,
+      "defaultClusterIPPort": 4000,
+      "livenessProbe": {
+         "initialDelaySeconds": 10,
+         "periodSeconds": 20,
+         "timeoutSeconds": 5
+      },
+      "readinessProbe": {
+         "initialDelaySeconds": 10,
+         "periodSeconds": 20,
+         "timeoutSeconds": 5
+      }
    }
 }

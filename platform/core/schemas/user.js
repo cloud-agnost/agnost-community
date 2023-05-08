@@ -114,7 +114,7 @@ export const UserModel = mongoose.model(
 
 export const applyRules = (type) => {
 	switch (type) {
-		case "view":
+		case "search":
 			return [
 				query("page")
 					.trim()
@@ -171,6 +171,41 @@ export const applyRules = (type) => {
 						}
 						return true;
 					}),
+				body("password")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isLength({ min: config.get("general.minPwdLength") })
+					.withMessage(
+						t(
+							"Password must be at least %s characters",
+							config.get("general.minPwdLength")
+						)
+					),
+				body("name")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isLength({ max: config.get("general.maxTextLength") })
+					.withMessage(
+						t(
+							"Name must be at most %s characters long",
+							config.get("general.maxTextLength")
+						)
+					),
+			];
+		case "complete-setup":
+			return [
+				body("email")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isEmail()
+					.withMessage(t("Not a valid email address"))
+					.bail()
+					.normalizeEmail({ gmail_remove_dots: false }),
 				body("password")
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
@@ -303,6 +338,7 @@ export const applyRules = (type) => {
 			];
 		case "change-contact-email":
 		case "reset-password-init":
+		case "initiate-setup":
 			return [
 				body("email")
 					.trim()
@@ -402,6 +438,52 @@ export const applyRules = (type) => {
 
 						return true;
 					}),
+			];
+		case "setup":
+			return [
+				body("email")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isEmail()
+					.withMessage(t("Not a valid email address"))
+					.bail()
+					.normalizeEmail({ gmail_remove_dots: false }),
+				body("password")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isLength({ min: config.get("general.minPwdLength") })
+					.withMessage(
+						t(
+							"Password must be at least %s characters",
+							config.get("general.minPwdLength")
+						)
+					),
+				body("name")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isLength({ max: config.get("general.maxTextLength") })
+					.withMessage(
+						t(
+							"Name must be at most %s characters long",
+							config.get("general.maxTextLength")
+						)
+					),
+				body("token")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("inviteType")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(["org", "app"])
+					.withMessage(t("Unsupported invitation type")),
 			];
 		default:
 			return [];

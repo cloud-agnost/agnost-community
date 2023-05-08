@@ -27,6 +27,13 @@ export const AppModel = mongoose.model(
 				required: true,
 				index: true,
 			},
+			pictureUrl: {
+				type: String,
+			},
+			color: {
+				// If no picture provided then this will be the avatar background color of the app
+				type: String,
+			},
 			team: [
 				{
 					userId: {

@@ -28,7 +28,6 @@ export const authSession = async (req, res, next) => {
 
 	// Get the user information associated with the session
 	let user = await userCtrl.getOneById(session.userId, {
-		projection: "+loginProfiles.password",
 		cacheKey: session.userId,
 	});
 

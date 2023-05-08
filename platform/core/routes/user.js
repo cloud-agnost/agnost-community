@@ -16,6 +16,7 @@ import { sendMessage } from "../init/queue.js";
 import { storage } from "../init/storage.js";
 import { handleError } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
+import { notificationTypes } from "../config/constants.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -39,21 +40,57 @@ router.get("/me", authSession, async (req, res) => {
 });
 
 /*
-@route      /v1/user/list
+@route      /v1/user
+@method     DELETE
+@desc       Deletes (anonymizes) the user account
+@access     private
+*/
+router.delete("/", authSession, async (req, res) => {
+	try {
+		if (req.user.isClusterOwner) {
+			return res.status(400).json({
+				error: t("Not Allowed"),
+				code: ERROR_CODES.notAllowed,
+				details: t(
+					"You are the owner of the cluster. If you would like to delete your account, you first need to transfer cluster ownership to another user of the cluster."
+				),
+			});
+		}
+
+		await userCtrl.updateOneById(
+			req.user._id,
+			{
+				name: "Anonymous",
+				contactEmail: "Anonymous",
+				status: "Deleted",
+				color: helper.generateColor("dark"),
+				"loginProfiles.$[].email": "Anonymous",
+			},
+			{ pictureUrl: 1, "loginProfiles.$[].password": 1, notifications: 1 },
+			{ cacheKey: req.user._id }
+		);
+		res.json();
+	} catch (error) {
+		handleError(req, res, error);
+	}
+});
+
+/*
+@route      /v1/user/list?page=0&size=10&search&sortBy=name&sortDir=asc
 @method     GET
-@desc       Gets (searches) all users in a cluster, excludes the user that is making the request. By default returns users sorted by name ascending order.
+@desc       Gets (searches) all active users in a cluster, excludes the user that is making the request. By default returns users sorted by name ascending order.
 @access     private
 */
 router.get(
 	"/list",
 	checkContentType,
 	authSession,
-	applyRules("view"),
+	applyRules("search"),
 	validate,
 	async (req, res) => {
 		try {
 			const { user } = req;
-			const { page, size, search, sortBy, sortDir, start, end } = req.query;
+			const { page, size, search, sortBy, sortDir } = req.query;
 
 			let query = { _id: { $ne: user._id }, status: "Active" };
 			if (search && search !== "null") {
@@ -63,10 +100,6 @@ router.get(
 					{ "loginProfiles.email": { $regex: search, $options: "i" } },
 				];
 			}
-
-			if (start && !end) query.createdAt = { $gte: start };
-			else if (!start && end) query.createdAt = { $lte: end };
-			else if (start && end) query.createdAt = { $gte: start, $lt: end };
 
 			let sort = {};
 			if (sortBy && sortDir) {
@@ -124,6 +157,8 @@ router.put(
 			);
 
 			auditCtrl.updateActorName(userObj._id, req.body.name);
+			orgInvitationCtrl.updateHostName(userObj._id, req.body.name);
+			appInvitationCtrl.updateHostName(userObj._id, req.body.name);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -223,7 +258,7 @@ router.put(
 				});
 			}
 
-			// Resize image if width and height specifiec
+			// Resize image if width and height specified
 			buffer = await sharp(req.file.buffer).resize(width, height).toBuffer();
 
 			// A bucket is a container for objects (files)
@@ -297,6 +332,8 @@ router.put(
 						);
 
 						auditCtrl.updateActorPicture(userObj._id, pictureUrl);
+						orgInvitationCtrl.updateHostPicture(userObj._id, pictureUrl);
+						appInvitationCtrl.updateHostPicture(userObj._id, pictureUrl);
 					});
 				});
 
@@ -352,6 +389,8 @@ router.delete("/picture", authSession, async (req, res) => {
 			userObj
 		);
 		auditCtrl.removeActorPicture(userObj._id);
+		orgInvitationCtrl.removeHostPicture(userObj._id);
+		appInvitationCtrl.removeHostPicture(userObj._id);
 	} catch (error) {
 		handleError(req, res, error);
 	}
@@ -486,6 +525,8 @@ router.post(
 				userObj
 			);
 			auditCtrl.updateActorContactEmail(userObj._id, info.email);
+			orgInvitationCtrl.updateHostContactEmail(userObj._id, info.email);
+			appInvitationCtrl.updateHostContactEmail(userObj._id, info.email);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -634,6 +675,8 @@ router.post(
 				userObj
 			);
 			auditCtrl.updateActorLoginEmail(userObj._id, info.email);
+			orgInvitationCtrl.updateHostLoginEmail(userObj._id, info.email);
+			appInvitationCtrl.updateHostLoginEmail(userObj._id, info.email);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -771,11 +814,7 @@ router.get("/org-invite", checkContentType, authSession, async (req, res) => {
 			{ lookup: "orgId" }
 		);
 
-		res.json(
-			invites.map((entry) => {
-				return { ...entry, orgName: entry.orgId?.name, orgId: undefined };
-			})
-		);
+		res.json(invites);
 	} catch (error) {
 		handleError(req, res, error);
 	}
@@ -799,15 +838,7 @@ router.get("/app-invite", checkContentType, authSession, async (req, res) => {
 			{ lookup: "appId" }
 		);
 
-		res.json(
-			invites.map((entry) => {
-				return {
-					...entry,
-					appName: entry.appId?.name,
-					appId: entry.appId?._id,
-				};
-			})
-		);
+		res.json(invites);
 	} catch (error) {
 		handleError(req, res, error);
 	}
@@ -822,7 +853,6 @@ router.get("/app-invite", checkContentType, authSession, async (req, res) => {
 router.post(
 	"/org-invite-accept",
 	checkContentType,
-	authSession,
 	applyRules("accept-org-invite"),
 	validate,
 	async (req, res) => {
@@ -830,24 +860,23 @@ router.post(
 		const session = await userCtrl.startSession();
 		try {
 			const { token } = req.query;
-			const { user } = req;
 
-			// Make sure that the invitation token is associated with the email of the user
-			let emails = user.loginProfiles.map((entry) => entry.email);
 			let invite = await orgInvitationCtrl.getOneByQuery(
-				{ token, email: { $in: emails } },
+				{ token },
 				{ lookup: "orgId" }
 			);
 
 			if (!invite || !invite.orgId) {
+				await userCtrl.endSession(session);
 				return res.status(404).json({
 					error: t("Not Found"),
-					details: t("No such invitation exists."),
+					details: t("No such invitation exists for the organization."),
 					code: ERROR_CODES.notFound,
 				});
 			}
 
 			if (invite.status !== "Pending") {
+				await userCtrl.endSession(session);
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t("Invitations only in 'pending' status can be accepted."),
@@ -855,24 +884,56 @@ router.post(
 				});
 			}
 
-			// Check whether the user is already a member of the organization or not
-			let member = await orgMemberCtrl.getOneByQuery(
-				{
-					orgId: invite.orgId._id,
-					userId: user._id,
-				},
-				{ cacheKey: `${invite.orgId._id}.${user._id}` }
-			);
+			// Check if the user is already a cluster user
+			let user = await userCtrl.getOneByQuery({
+				"loginProfiles.email": invite.email,
+			});
 
-			if (member) {
-				return res.status(422).json({
-					error: t("Already Member"),
-					details: t(
-						"You are already a member of the organization '%s'.",
-						invite.orgId.name
-					),
-					code: ERROR_CODES.notAllowed,
-				});
+			if (user) {
+				// Check whether the user is already a member of the organization or not
+				let member = await orgMemberCtrl.getOneByQuery(
+					{
+						orgId: invite.orgId._id,
+						userId: user._id,
+					},
+					{ cacheKey: `${invite.orgId._id}.${user._id}` }
+				);
+
+				if (member) {
+					await userCtrl.endSession(session);
+					return res.status(422).json({
+						error: t("Already Member"),
+						details: t(
+							"You are already a member of the organization '%s'.",
+							invite.orgId.name
+						),
+						code: ERROR_CODES.notAllowed,
+					});
+				}
+			} else {
+				// Create a new cluster user
+				let userId = helper.generateId();
+				user = await userCtrl.create(
+					{
+						_id: userId,
+						iid: helper.generateSlug("usr"),
+						color: helper.generateColor("dark"),
+						contactEmail: invite.email,
+						status: "Pending",
+						canCreateOrg: invite.role === "Admin" ? true : false,
+						isClusterOwner: false,
+						loginProfiles: [
+							{
+								provider: "agnost",
+								id: userId,
+								email: invite.email,
+								emailVerified: true,
+							},
+						],
+						notifications: notificationTypes,
+					},
+					{ session }
+				);
 			}
 
 			// Accept invitation
@@ -882,6 +943,7 @@ router.post(
 				{},
 				{ session }
 			);
+
 			// Add user to the organization as a member
 			await orgMemberCtrl.create(
 				{
@@ -896,7 +958,7 @@ router.post(
 			await userCtrl.commit(session);
 
 			// Return the organization object the user is added as a mamber
-			res.json({ ...invite.orgId, role: invite.role });
+			res.json({ ...invite.orgId, role: invite.role, user });
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -905,7 +967,7 @@ router.post(
 				"org",
 				"accept",
 				t("Accepted the invitation to join to the organization"),
-				{ ...invite.orgId, role: invite.role },
+				{ ...invite.orgId, role: invite.role, user },
 				{ orgId: invite.orgId._id }
 			);
 		} catch (error) {
@@ -924,7 +986,6 @@ router.post(
 router.post(
 	"/app-invite-accept",
 	checkContentType,
-	authSession,
 	applyRules("accept-app-invite"),
 	validate,
 	async (req, res) => {
@@ -932,24 +993,23 @@ router.post(
 		const session = await userCtrl.startSession();
 		try {
 			const { token } = req.query;
-			const { user } = req;
 
-			// Make sure that the invitation token is associated with the email of the user
-			let emails = user.loginProfiles.map((entry) => entry.email);
 			let invite = await appInvitationCtrl.getOneByQuery(
-				{ token, email: { $in: emails } },
+				{ token },
 				{ lookup: "appId" }
 			);
 
 			if (!invite || !invite.appId) {
+				await userCtrl.endSession(session);
 				return res.status(404).json({
 					error: t("Not Found"),
-					details: t("No such app invitation exists."),
+					details: t("No such invitation exists for the app."),
 					code: ERROR_CODES.notFound,
 				});
 			}
 
 			if (invite.status !== "Pending") {
+				await userCtrl.endSession(session);
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t("Invitations only in 'pending' status can be accepted."),
@@ -957,32 +1017,74 @@ router.post(
 				});
 			}
 
-			// Check whether the user is already a member of the app team or not
-			let appMember = invite.appId.team.find(
-				(entry) => entry.userId.toString() === user._id.toString()
-			);
+			// Check if the user is already a cluster user
+			let user = await userCtrl.getOneByQuery({
+				"loginProfiles.email": invite.email,
+			});
 
-			if (appMember) {
-				return res.status(422).json({
-					error: t("Already Member"),
-					details: t(
-						"You are already a member of the app '%s'.",
-						invite.appId.name
-					),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
+			if (user) {
+				// Check whether the user is already a member of the app team or not
+				let appMember = invite.appId.team.find(
+					(entry) => entry.userId.toString() === user._id.toString()
+				);
 
-			// Check whether the user is already a member of the organization or not
-			let orgMember = await orgMemberCtrl.getOneByQuery(
-				{
-					orgId: invite.orgId,
-					userId: user._id,
-				},
-				{ cacheKey: `${invite.orgId}.${user._id}` }
-			);
+				if (appMember) {
+					await userCtrl.endSession(session);
+					return res.status(422).json({
+						error: t("Already Member"),
+						details: t(
+							"You are already a member of the app '%s'.",
+							invite.appId.name
+						),
+						code: ERROR_CODES.notAllowed,
+					});
+				}
 
-			if (!orgMember) {
+				// Check whether the user is already a member of the organization or not
+				let orgMember = await orgMemberCtrl.getOneByQuery(
+					{
+						orgId: invite.orgId,
+						userId: user._id,
+					},
+					{ cacheKey: `${invite.orgId}.${user._id}` }
+				);
+
+				if (!orgMember) {
+					// Add user to the organization as a member
+					await orgMemberCtrl.create(
+						{
+							orgId: invite.orgId,
+							userId: user._id,
+							role: invite.orgRole,
+						},
+						{ session, cacheKey: `${invite.orgId}.${user._id}` }
+					);
+				}
+			} else {
+				// Create a new cluster user
+				let userId = helper.generateId();
+				user = await userCtrl.create(
+					{
+						_id: userId,
+						iid: helper.generateSlug("usr"),
+						color: helper.generateColor("dark"),
+						contactEmail: invite.email,
+						status: "Pending",
+						canCreateOrg: invite.orgRole === "Admin" ? true : false,
+						isClusterOwner: false,
+						loginProfiles: [
+							{
+								provider: "agnost",
+								id: userId,
+								email: invite.email,
+								emailVerified: true,
+							},
+						],
+						notifications: notificationTypes,
+					},
+					{ session }
+				);
+
 				// Add user to the organization as a member
 				await orgMemberCtrl.create(
 					{
@@ -1024,7 +1126,7 @@ router.post(
 			auditCtrl.logAndNotify(
 				invite.appId._id,
 				user,
-				"app",
+				"org.app",
 				"accept",
 				t("Accepted the invitation to join to the app"),
 				updatedApp,
@@ -1046,25 +1148,22 @@ router.post(
 router.post(
 	"/org-invite-reject",
 	checkContentType,
-	authSession,
 	applyRules("reject-org-invite"),
 	validate,
 	async (req, res) => {
 		try {
 			const { token } = req.query;
-			const { user } = req;
 
 			// Make sure that the invitation token is associated with the email of the user
-			let emails = user.loginProfiles.map((entry) => entry.email);
 			let invite = await orgInvitationCtrl.getOneByQuery(
-				{ token, email: { $in: emails } },
+				{ token },
 				{ lookup: "orgId" }
 			);
 
 			if (!invite || !invite.orgId) {
 				return res.status(404).json({
 					error: t("Not Found"),
-					details: t("No such invitation exists."),
+					details: t("No such invitation exists for the organization."),
 					code: ERROR_CODES.notFound,
 				});
 			}
@@ -1081,17 +1180,6 @@ router.post(
 			await orgInvitationCtrl.updateOneById(invite._id, { status: "Rejected" });
 
 			res.json();
-
-			// Log action
-			auditCtrl.logAndNotify(
-				invite.orgId._id,
-				user,
-				"org",
-				"reject",
-				t("Rejected the invitation to join to the organization"),
-				{ ...invite.orgId, role: invite.role },
-				{ orgId: invite.orgId._id }
-			);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -1107,25 +1195,19 @@ router.post(
 router.post(
 	"/app-invite-reject",
 	checkContentType,
-	authSession,
 	applyRules("reject-app-invite"),
 	validate,
 	async (req, res) => {
 		try {
 			const { token } = req.query;
-			const { user } = req;
 
 			// Make sure that the invitation token is associated with the email of the user
-			let emails = user.loginProfiles.map((entry) => entry.email);
-			let invite = await appInvitationCtrl.getOneByQuery(
-				{ token, email: { $in: emails } },
-				{ lookup: "appId" }
-			);
+			let invite = await appInvitationCtrl.getOneByQuery({ token });
 
 			if (!invite || !invite.appId) {
 				return res.status(404).json({
 					error: t("Not Found"),
-					details: t("No such app invitation exists."),
+					details: t("No such invitation exists for the app."),
 					code: ERROR_CODES.notFound,
 				});
 			}
@@ -1142,17 +1224,6 @@ router.post(
 			await appInvitationCtrl.updateOneById(invite._id, { status: "Rejected" });
 
 			res.json();
-
-			// Log action
-			auditCtrl.logAndNotify(
-				invite.appId._id,
-				user,
-				"app",
-				"reject",
-				t("Rejected the invitation to join to the app"),
-				{ ...invite.appId },
-				{ orgId: invite.orgId, appId: invite.appId._id }
-			);
 		} catch (error) {
 			handleError(req, res, error);
 		}

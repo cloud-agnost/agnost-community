@@ -86,8 +86,11 @@ export const AuditModel = mongoose.model(
 				// If no picture provided then this will be the avatar background color of the user
 				type: String,
 			},
+			loginEmail: {
+				type: String,
+				index: true,
+			},
 			contactEmail: {
-				// Independent of the provider we store the email address of the user
 				type: String,
 				index: true,
 			},

@@ -24,47 +24,27 @@
    },
     "general": {
          "uiBaseUrl": "http://api.development.test",
-         "platformBaseUrl": "http://platform-core-clusterip-service:4000"
-    },
-    "defaultEngineWorkerAccess": {
-        "workerUrl": "http://engine-worker-clusterip-service:4000",
-        "accessToken": "at-2F5FOIkOXEOmPfywWJ6JRZXCnzFgtqVIHAJ7"
-   },
-    "defaultStorage": {
-        "config": {
-            "size": "1Gi"
-        },
-        "access": {
-        }
-   },
-   "defaultQueue": {
-        "config": {
-            "size": "5Gi",
-            "CPU": {
+         "platformBaseUrl": "http://platform-core-clusterip-service:4000",
+         "workerUrl": "http://engine-worker-clusterip-service:4000",
+         "workerAccessToken": "at-2F5FOIkOXEOmPfywWJ6JRZXCnzFgtqVIHAJ7",
+         "defaulPVCSize": "1Gi",
+         "defaultSchedulerDeploymentName": "engine-scheduler-deployment",
+         "defaultEngineConfig": {
+            "replicas": 1,
+            "hpa": {
+                "avgCPU": 80,
+                "avgMemory": 80,
+                "minReplicas": 1,
+                "maxReplicas": 10
+            },
+            "cpu": {
                 "request": "100m",
-                "limit": "150m"
+                "limit": "200m"
             },
             "memory": {
-                "request": "250Mi",
-                "limit": "500Mi"
+                "request": "256Mi",
+                "limit": "512Mi"
             }
-        },
-        "access": {
-        }
-    },
-    "defaultScheduler": {
-        "config": {
-            "CPU": {
-                "request": "100m",
-                "limit": "150m"
-            },
-            "memory": {
-                "request": "250Mi",
-                "limit": "300Mi"
-            }
-        },
-        "access": {
-            "name": "engine-scheduler-deployment"
-        }
+         }
     }
 }

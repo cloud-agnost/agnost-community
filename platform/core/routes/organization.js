@@ -110,6 +110,7 @@ router.post(
 			const { user } = req;
 			// Check if the user can create an organization or not
 			if (!req.user.canCreateOrg) {
+				await orgCtrl.endSession(session);
 				return res.status(401).json({
 					error: t("Unauthorized"),
 					details: t(
@@ -167,7 +168,7 @@ router.post(
 				"org",
 				"create",
 				t("Created a new organization named '%s'", name),
-				req.body,
+				orgObj,
 				{ orgId }
 			);
 		} catch (error) {
@@ -232,7 +233,7 @@ router.get(
 	validateOrg,
 	async (req, res) => {
 		try {
-			res.json({ ...req.org, role: req.orgMembrer.role });
+			res.json({ ...req.org, role: req.orgMember.role });
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -442,9 +443,7 @@ router.post(
 					to: entry.email,
 					role: entry.role,
 					organization: org.name,
-					url: `${config.get("general.uiBaseUrl")}/v1/user/invitation/${
-						entry.token
-					}`,
+					url: `${process.env.UI_BASE_URL}/v1/user/invitation/${entry.token}`,
 				});
 			});
 
@@ -457,7 +456,7 @@ router.post(
 			// Send realtime notifications to invited users with accounts
 			matchingUsers.forEach((entry) => {
 				let userEmails = entry.loginProfiles.map((entry) => entry.email);
-				// Find the invidation entry matching the user's emails
+				// Find the invitation entry matching the user's emails
 				let invite = invitations.find((entry) =>
 					userEmails.includes(entry.email)
 				);
@@ -469,6 +468,7 @@ router.post(
 						pictureUrl: user.pictureUrl,
 						color: user.color,
 						contactEmail: user.contactEmail,
+						loginEmail: user.loginProfiles[0].email,
 					},
 					action: "invite",
 					object: "org.invite",
@@ -547,7 +547,7 @@ router.put(
 				{ role }
 			);
 
-			// If there are alreay a user account with provided email then send them realtime notifications
+			// If there is alreay a user account with provided email then send them realtime notifications
 			let matchingUser = await userCtrl.getOneByQuery({
 				"loginProfiles.email": invite.email,
 				status: "Active",
@@ -561,6 +561,7 @@ router.put(
 						pictureUrl: user.pictureUrl,
 						color: user.color,
 						contactEmail: user.contactEmail,
+						loginEmail: user.loginProfiles[0].email,
 					},
 					action: "invite",
 					object: "org.invite",
@@ -640,9 +641,7 @@ router.post(
 				to: invite.email,
 				role: invite.role,
 				organization: org.name,
-				url: `${config.get("general.uiBaseUrl")}/v1/user/invitation/${
-					invite.token
-				}`,
+				url: `${process.env.UI_BASE_URL}/v1/user/invitation/${invite.token}`,
 			});
 
 			// If there are alreay user accounts with provided email then send them realtime notifications
@@ -732,6 +731,45 @@ router.delete(
 				"delete",
 				t("Deleted organization invitation to '%s'", invite.email),
 				invite,
+				{ orgId: org._id }
+			);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/invite/multi
+@method     DELETE
+@desc       Deletes multiple organization invitations
+@access     private
+*/
+router.delete(
+	"/:orgId/invite/multi",
+	checkContentType,
+	authSession,
+	validateOrg,
+	authorizeOrgAction("org.invite.delete"),
+	invitationApplyRules("delete-invite-multi"),
+	validate,
+	async (req, res) => {
+		try {
+			const { tokens } = req.body;
+			const { user, org } = req;
+
+			// Delete the organization invitations
+			await orgInvitationCtrl.deleteManyByQuery({ token: { $in: tokens } });
+
+			res.json();
+
+			// Log action
+			auditCtrl.log(
+				user,
+				"org.invite",
+				"delete",
+				t("Deleted multiple organization invitation"),
+				{},
 				{ orgId: org._id }
 			);
 		} catch (error) {
@@ -841,6 +879,9 @@ router.get(
 							{
 								"user.name": { $regex: search, $options: "i" },
 							},
+							{
+								"user.contactEmail": { $regex: search, $options: "i" },
+							},
 						],
 					},
 				});
@@ -899,67 +940,11 @@ router.get(
 							contactEmail: entry.user[0].contactEmail,
 							name: entry.user[0].name,
 							pictureUrl: entry.user[0].pictureUrl,
+							loginEmail: entry.user[0].loginProfiles[0].email,
 						},
 					};
 				})
 			);
-		} catch (error) {
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/me
-@method     GET
-@desc       Get current user's organization membership info
-@access     private
-*/
-router.get(
-	"/:orgId/me",
-	checkContentType,
-	authSession,
-	validateOrg,
-	authorizeOrgAction("org.member.view"),
-	async (req, res) => {
-		try {
-			const { org, user } = req;
-
-			let pipeline = [
-				{
-					$match: {
-						orgId: helper.objectId(org._id),
-						userId: helper.objectId(user._id),
-					},
-				},
-				{
-					$lookup: {
-						from: "users",
-						localField: "userId",
-						foreignField: "_id",
-						as: "user",
-					},
-				},
-			];
-
-			let result = await orgMemberCtrl.aggregate(pipeline);
-			let processedList = result.map((entry) => {
-				return {
-					_id: entry._id,
-					orgId: entry.orgId,
-					role: entry.role,
-					joinDate: entry.joinDate,
-					member: {
-						_id: entry.user[0]._id,
-						iid: entry.user[0].iid,
-						color: entry.user[0].color,
-						contactEmail: entry.user[0].contactEmail,
-						name: entry.user[0].name,
-						pictureUrl: entry.user[0].pictureUrl,
-					},
-				};
-			});
-			res.json(processedList.length > 0 ? processedList[0] : undefined);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -1013,6 +998,9 @@ router.get(
 							{
 								"user.name": { $regex: search, $options: "i" },
 							},
+							{
+								"user.contactEmail": { $regex: search, $options: "i" },
+							},
 						],
 					},
 				});
@@ -1071,6 +1059,7 @@ router.get(
 							contactEmail: entry.user[0].contactEmail,
 							name: entry.user[0].name,
 							pictureUrl: entry.user[0].pictureUrl,
+							loginEmail: entry.user[0].loginProfiles[0].email,
 						},
 					};
 				})
@@ -1111,10 +1100,13 @@ router.put(
 			}
 
 			// Check if the user is a member of the organization or not
-			let member = await orgMemberCtrl.getOneByQuery({
-				orgId: req.org._id,
-				userId: userId,
-			});
+			let member = await orgMemberCtrl.getOneByQuery(
+				{
+					orgId: req.org._id,
+					userId: userId,
+				},
+				{ cacheKey: `${req.org._id}.${userId}` }
+			);
 
 			if (!member) {
 				return res.status(404).json({
@@ -1136,8 +1128,8 @@ router.put(
 				});
 			}
 
-			// Check if the target user is the organization creator. The role of organization owner cannot be changed.
-			if (user._id.toString() === req.org.createdBy.toString()) {
+			// Check if the target user is the organization owner. The role of organization owner cannot be changed.
+			if (user._id.toString() === req.org.ownerUserId.toString()) {
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t("You cannot change the role of the organization owner."),
@@ -1162,6 +1154,7 @@ router.put(
 					contactEmail: user.contactEmail,
 					name: user.name,
 					pictureUrl: user.pictureUrl,
+					loginEmail: user.loginProfiles[0].email,
 				},
 			};
 
@@ -1174,7 +1167,8 @@ router.put(
 				"org.member",
 				"update",
 				t(
-					"Updated organization member role of user '%s' from '%s' to '%s'",
+					"Updated organization member role of user '%s' (%s) from '%s' to '%s'",
+					user.name,
 					user.contactEmail,
 					member.role,
 					role
@@ -1203,12 +1197,14 @@ router.delete(
 	memberApplyRules("remove-member"),
 	validate,
 	async (req, res) => {
+		const session = await orgMemberCtrl.startSession();
 		try {
 			const { userId } = req.params;
 
 			// Check if there is such a user
 			let user = await userCtrl.getOneById(userId);
 			if (!user) {
+				await orgMemberCtrl.endSession(session);
 				return res.status(404).json({
 					error: t("Not Found"),
 					details: t("No such user exists"),
@@ -1228,6 +1224,7 @@ router.delete(
 			);
 
 			if (!member) {
+				await orgMemberCtrl.endSession(session);
 				return res.status(404).json({
 					error: t("Not a Member"),
 					details: t(
@@ -1238,38 +1235,56 @@ router.delete(
 				});
 			}
 
-			// Check if the user is the creator of the organization or not
-			if (req.org.createdBy.toString() === userId) {
+			// Check if the target user is the current user or not. Users cannot delete themselves from the org team, they need to leave from org team.
+			if (req.user._id.toString() === user._id.toString()) {
+				await orgMemberCtrl.endSession(session);
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"You are the owner of the organization. The organization owner cannot be removed from the organization team."
+						"You cannot delete yourself from the organization. Try to leave the organization team."
 					),
 					code: ERROR_CODES.notAllowed,
 				});
 			}
 
-			// Check to see if the user has app team memberships. If the use is member of an app then first the user needs to be removed from app teams.
+			// Check if the user is the owner of the organization or not
+			if (req.org.ownerUserId.toString() === user._id.toString()) {
+				await orgMemberCtrl.endSession(session);
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"The organization owner cannot be removed from the organization team. If you would like to remove the current organization owner from the organization then the organization ownership needs to be transferred to another organization 'Admin' member."
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// Check to see if the user has app team memberships. If the user is member of an app then first the user needs to be removed from app teams.
 			let apps = await appCtrl.getManyByQuery({
 				orgId: req.org._id,
 				"team.userId": userId,
 			});
 
-			if (apps.length > 0) {
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"User is a team member in at least one of the apps of the organization. You first need to remove the user from these app teams and then remove it from the organization team."
-					),
-					code: ERROR_CODES.notFound,
-				});
+			// Remove user from app teams
+			for (let i = 0; i < apps.length; i++) {
+				const app = apps[i];
+				await appCtrl.pullObjectByQuery(
+					app._id,
+					"team",
+					{ userId: user._id },
+					{ updatedBy: req.user._id },
+					{ cacheKey: app._id, session }
+				);
 			}
 
 			// Remove user from the organization
 			await orgMemberCtrl.deleteOneById(member._id, {
+				session,
 				cacheKey: `${req.org._id}.${userId}`,
 			});
 
+			// Commit changes
+			await orgMemberCtrl.commit(session);
 			res.json();
 
 			// Log action
@@ -1278,7 +1293,11 @@ router.delete(
 				req.user,
 				"org.member",
 				"delete",
-				t("Removed user '%s' from organization team", user.contactEmail),
+				t(
+					"Removed user '%s' (%s) from organization team",
+					user.name,
+					user.contactEmail
+				),
 				{
 					_id: user._id,
 					iid: user.iid,
@@ -1286,10 +1305,105 @@ router.delete(
 					contactEmail: user.contactEmail,
 					name: user.name,
 					pictureUrl: user.pictureUrl,
+					loginEmail: user.loginProfiles[0].email,
 				},
 				{ orgId: req.org._id }
 			);
 		} catch (error) {
+			await orgMemberCtrl.rollback(session);
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/member/delete-multi
+@method     POST
+@desc       Remove multiple members from organization
+@access     private
+*/
+router.post(
+	"/:orgId/member/delete-multi",
+	checkContentType,
+	authSession,
+	validateOrg,
+	authorizeOrgAction("org.member.delete"),
+	memberApplyRules("remove-members"),
+	validate,
+	async (req, res) => {
+		const session = await orgMemberCtrl.startSession();
+		try {
+			const { userIds } = req.body;
+
+			// Users cannot delete themselves from the org team, they need to leave from org team.
+			if (userIds.includes(req.user._id.toString())) {
+				await orgMemberCtrl.endSession(session);
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"You cannot delete yourself from the organization. Try to leave the organization team."
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// Check if one of the deleted user is the owner of the organization or not
+			if (userIds.includes(req.org.ownerUserId.toString())) {
+				await orgMemberCtrl.endSession(session);
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"The organization owner cannot be removed from the organization team. If you would like to remove the current organization owner from the organization, then the organization ownership needs to be transferred to another organization 'Admin' member."
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// Check to see if the deleted users have app team memberships. If they have then we first need to remove them from the app teams.
+			let apps = await appCtrl.getManyByQuery({
+				orgId: req.org._id,
+				"team.userId": { $in: userIds },
+			});
+
+			// Remove users from app teams
+			for (let i = 0; i < apps.length; i++) {
+				const app = apps[i];
+				await appCtrl.pullObjectByQuery(
+					app._id,
+					"team",
+					{ userId: { $in: userIds } },
+					{ updatedBy: req.user._id },
+					{ cacheKey: app._id, session }
+				);
+			}
+
+			// Remove users from the organization
+			await orgMemberCtrl.deleteManyByQuery(
+				{ orgId: req.org._id, userId: { $in: userIds } },
+				{
+					session,
+					cacheKey: userIds.map((entry) => `${req.org._id}.${entry}`),
+				}
+			);
+
+			// Commit changes
+			await orgMemberCtrl.commit(session);
+			res.json();
+
+			// Log action
+			auditCtrl.logAndNotify(
+				req.org._id,
+				req.user,
+				"org.member",
+				"delete",
+				t("Removed users from organization team"),
+				{
+					userIds,
+				},
+				{ orgId: req.org._id }
+			);
+		} catch (error) {
+			await orgMemberCtrl.rollback(session);
 			handleError(req, res, error);
 		}
 	}
@@ -1307,6 +1421,7 @@ router.delete(
 	authSession,
 	validateOrg,
 	async (req, res) => {
+		const session = await orgMemberCtrl.startSession();
 		try {
 			const { user } = req;
 			// Check if the user is a member of the organization or not
@@ -1321,6 +1436,7 @@ router.delete(
 			);
 
 			if (!member) {
+				await orgMemberCtrl.endSession(session);
 				return res.status(404).json({
 					error: t("Not a Member"),
 					details: t(
@@ -1331,38 +1447,47 @@ router.delete(
 				});
 			}
 
-			// Check if the user is the creator of the organization or not
-			if (req.org.createdBy.toString() === user._id) {
+			// Check if the user is the owner of the organization or not
+			if (req.org.ownerUserId.toString() === user._id) {
+				await orgMemberCtrl.endSession(session);
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"You are the owner of the organization. The organization owner cannot leave the organization team."
+						"You are the owner of the organization. The organization owner cannot leave the organization team. You first need to transfer organization ownership to another organization 'Admin' member."
 					),
 					code: ERROR_CODES.notAllowed,
 				});
 			}
 
-			// Check to see if the user has app team memberships. If the use is member of an app then first the user needs to be removed from app teams.
+			// Check to see if the user has app team memberships. If the user is member of an app then first the user needs to be removed from app teams.
 			let apps = await appCtrl.getManyByQuery({
 				orgId: req.org._id,
 				"team.userId": user._id,
 			});
 
-			if (apps.length > 0) {
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"You are a team member in at least one of the apps of the organization. You first need to leave from these app teams and then leave from the organization team."
-					),
-					code: ERROR_CODES.notFound,
-				});
+			// Remove user from app teams
+			for (let i = 0; i < apps.length; i++) {
+				const app = apps[i];
+				await appCtrl.pullObjectByQuery(
+					app._id,
+					"team",
+					{ userId: user._id },
+					{ updatedBy: user._id },
+					{ cacheKey: app._id, session }
+				);
 			}
 
 			// Leave the organization team
-			await orgMemberCtrl.deleteOneById(user._id, {
-				cacheKey: `${req.org._id}.${user._id}`,
-			});
+			await orgMemberCtrl.deleteOneByQuery(
+				{ orgId: req.org._id, userId: user._id },
+				{
+					cacheKey: `${req.org._id}.${user._id}`,
+					session,
+				}
+			);
 
+			// Commit changes
+			await orgMemberCtrl.commit(session);
 			res.json();
 
 			// Log action
@@ -1371,7 +1496,11 @@ router.delete(
 				req.user,
 				"org.member",
 				"delete",
-				t("User '%s' has left the organization team", user.contactEmail),
+				t(
+					"User '%s' (%s) has left the organization team",
+					user.name,
+					user.contactEmail
+				),
 				{
 					_id: user._id,
 					iid: user.iid,
@@ -1379,10 +1508,12 @@ router.delete(
 					contactEmail: user.contactEmail,
 					name: user.name,
 					pictureUrl: user.pictureUrl,
+					loginEmail: user.loginProfiles[0].email,
 				},
 				{ orgId: req.org._id }
 			);
 		} catch (error) {
+			await orgMemberCtrl.rollback(session);
 			handleError(req, res, error);
 		}
 	}
@@ -1410,7 +1541,7 @@ router.post(
 			// Transfer organization ownership
 			let orgObj = await orgCtrl.updateOneById(
 				req.org._id,
-				{ createdBy: transferredUser._id, updatedBy: req.user._id },
+				{ ownerUserId: transferredUser._id, updatedBy: req.user._id },
 				{},
 				{ cacheKey: req.org._id }
 			);
@@ -1424,7 +1555,8 @@ router.post(
 				"org",
 				"transfer",
 				t(
-					"Transferred organization ownership to '%s'",
+					"Transferred organization ownership to user '%s' (%s)",
+					transferredUser.name,
 					transferredUser.contactEmail
 				),
 				orgObj,

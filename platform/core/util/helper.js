@@ -148,6 +148,52 @@ function decryptText(cipherText) {
 	return bytes.toString(cyripto.enc.Utf8);
 }
 
+/**
+ * Encrtypes sensitive connection data
+ * @param  {Object} access The connection settings needed to connect to the resource
+ */
+function encyrptSensitiveData(access) {
+	let encrypted = {};
+	for (const key in access) {
+		const value = access[key];
+		if (typeof value === "object" && value !== null) {
+			encrypted[key] = encyrptSensitiveData(value);
+		} else if (Array.isArray(value)) {
+			encrypted[key] = value.map((entry) => {
+				if (entry && typeof entry === "string") return encryptText(entry);
+				else return entry;
+			});
+		} else if (value && typeof value === "string")
+			encrypted[key] = encryptText(value);
+		else encrypted[key] = value;
+	}
+
+	return encrypted;
+}
+
+/**
+ * Decrypt connection data
+ * @param  {Object} access The encrypted connection settings needed to connect to the resource
+ */
+function decryptSensitiveData(access) {
+	let decrypted = {};
+	for (const key in access) {
+		const value = access[key];
+		if (typeof value === "object" && value !== null) {
+			decrypted[key] = decryptSensitiveData(value);
+		} else if (Array.isArray(value)) {
+			decrypted[key] = value.map((entry) => {
+				if (entry && typeof entry === "string") return decryptText(entry);
+				else return entry;
+			});
+		} else if (value && typeof value === "string")
+			decrypted[key] = decryptText(value);
+		else decrypted[key] = value;
+	}
+
+	return decrypted;
+}
+
 export default {
 	constants,
 	isEmptyJson,
@@ -161,4 +207,6 @@ export default {
 	appendQueryParams,
 	encryptText,
 	decryptText,
+	encyrptSensitiveData,
+	decryptSensitiveData,
 };

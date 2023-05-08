@@ -2,7 +2,6 @@ import axios from "axios";
 import dbCtrl from "../controllers/database.js";
 import modelCtrl from "../controllers/model.js";
 import resourceCtrl from "../controllers/resource.js";
-import connCtrl from "../controllers/connection.js";
 
 class DeploymentController {
 	constructor() {}
@@ -25,10 +24,10 @@ class DeploymentController {
 		resources.forEach((element) => {
 			delete element.config;
 			delete element.telemetry;
-			element.access = connCtrl.decryptSensitiveData(element.access);
+			element.access = helper.decryptSensitiveData(element.access);
 
 			if (element.accessReadOnly)
-				element.accessReadOnly = connCtrl.decryptSensitiveData(
+				element.accessReadOnly = helper.decryptSensitiveData(
 					element.accessReadOnly
 				);
 		});

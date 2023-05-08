@@ -601,7 +601,7 @@ async function checkRedisConnection(connSettings) {
 
 			redisClient.on("connect", function () {
 				// Disconnect from redis cache
-				client.quit();
+				redisClient.quit();
 				resolve(true);
 			});
 		} catch (err) {
@@ -624,7 +624,7 @@ async function checkClusterStorage(connSettings) {
 
 	try {
 		await coreApi.readNamespacedPersistentVolumeClaim(
-			connSettings.name,
+			`${connSettings.name}-pvc`,
 			config.get("general.k8sNamespace")
 		);
 
@@ -646,7 +646,7 @@ async function checkAPIServer(connSettings) {
 
 	try {
 		let result = await coreApi.readNamespacedDeployment(
-			connSettings.name,
+			`${connSettings.name}-deployment`,
 			config.get("general.k8sNamespace")
 		);
 

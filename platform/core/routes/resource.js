@@ -105,9 +105,9 @@ router.post(
 			}
 
 			// Encrypt sensitive access data
-			access = connCtrl.encyrptSensitiveData(access);
+			access = helper.encyrptSensitiveData(access);
 			if (accessReadOnly)
-				accessReadOnly = connCtrl.encyrptSensitiveData(accessReadOnly);
+				accessReadOnly = helper.encyrptSensitiveData(accessReadOnly);
 
 			// Create the new organization resource
 			let resourceId = helper.generateId();
@@ -483,10 +483,10 @@ router.put(
 			}
 
 			// Encrypt sensitive access data
-			access = connCtrl.encyrptSensitiveData(access);
+			access = helper.encyrptSensitiveData(access);
 
 			if (accessReadonly)
-				accessReadonly = connCtrl.encyrptSensitiveData(accessReadonly);
+				accessReadonly = helper.encyrptSensitiveData(accessReadonly);
 
 			let updatedResource = await resourceCtrl.updateOneById(
 				resource._id,
@@ -534,7 +534,7 @@ router.put(
 /*
 @route      /v1/org/:orgId/resource/:resourceId
 @method     DELETE
-@desc       Delete organization resource. Organization resouces can only be deleted if they are not used by any environment and are marked as deletable.
+@desc       Delete organization resource. Organization resouces can only be deleted if they are not used by any version environment.
 @access     private
 */
 router.delete(
@@ -548,16 +548,6 @@ router.delete(
 		const session = await resourceCtrl.startSession();
 		try {
 			const { org, user, resource } = req;
-
-			if (resource.deletable === false) {
-				await resourceCtrl.endSession(session);
-
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t("Default cluster resources cannot be deleted."),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
 
 			// Check if this resource has been used by any environment
 			let environments = await envCtrl.getManyByQuery({

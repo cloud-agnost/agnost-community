@@ -85,7 +85,7 @@ function initLocalization() {
 		directory: path.join(__dirname, "locales"),
 		defaultLocale: "en",
 		// watch for changes in JSON files to reload locale on updates
-		autoReload: true,
+		autoReload: false,
 		// whether to write new locale information to disk
 		updateFiles: false,
 		// sync locale information across all files

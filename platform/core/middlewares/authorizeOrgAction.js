@@ -33,13 +33,106 @@ export const orgAuthorization = {
 			},
 		},
 	},
+	Member: {
+		org: {
+			update: false,
+			transfer: false,
+			viewLogs: true,
+			invite: {
+				view: true,
+				create: false,
+				update: false,
+				resend: false,
+				delete: false,
+			},
+			member: {
+				view: true,
+				update: false,
+				delete: false,
+			},
+			app: {
+				view: true,
+				viewAll: true,
+				create: false,
+				update: false,
+			},
+			resource: {
+				view: true,
+				create: false,
+				update: false,
+				delete: false,
+			},
+		},
+	},
+	"Resource Manager": {
+		org: {
+			update: false,
+			transfer: false,
+			viewLogs: true,
+			invite: {
+				view: true,
+				create: false,
+				update: false,
+				resend: false,
+				delete: false,
+			},
+			member: {
+				view: true,
+				update: false,
+				delete: false,
+			},
+			app: {
+				view: true,
+				viewAll: true,
+				create: false,
+				update: false,
+			},
+			resource: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
+		},
+	},
+	Viewer: {
+		org: {
+			update: false,
+			transfer: false,
+			viewLogs: true,
+			invite: {
+				view: true,
+				create: false,
+				update: false,
+				resend: false,
+				delete: false,
+			},
+			member: {
+				view: true,
+				update: false,
+				delete: false,
+			},
+			app: {
+				view: true,
+				viewAll: true,
+				create: false,
+				update: false,
+			},
+			resource: {
+				view: true,
+				create: false,
+				update: false,
+				delete: false,
+			},
+		},
+	},
 };
 
 // Middleare to create the error message for failed request input validations
 export const authorizeOrgAction = (action = null) => {
 	return async (req, res, next) => {
 		try {
-			let entity = orgAuthorization[req.orgMembrer.role];
+			let entity = orgAuthorization[req.orgMember.role];
 			if (action && entity) {
 				let items = action.split(".");
 				for (let i = 0; i < items.length - 1; i++) {

@@ -33,21 +33,34 @@ export const validateApp = async (req, res, next) => {
 
 		// If we have the user information, in case of endpoints called by the master token we do not have user info
 		if (req.user) {
-			// Check if the user is a member of the app or not
-			let appMember = app.team.find(
-				(entry) => entry.userId.toString() === req.user._id.toString()
-			);
+			// If the user is cluster owner then by default he has 'Admin' privileges to the app
+			if (req.user.isClusterOwner) {
+				// Assign app membership data
+				req.appMember = {
+					userId: req.user._id,
+					role: "Admin",
+					joinDate: req.user.createdAt,
+				};
+			} else {
+				// Check if the user is a member of the app or not
+				let appMember = app.team.find(
+					(entry) => entry.userId.toString() === req.user._id.toString()
+				);
 
-			if (!appMember) {
-				return res.status(401).json({
-					error: t("Not Authorized"),
-					details: t("You are not a member of the application '%s'", app.name),
-					code: ERROR_CODES.unauthorized,
-				});
+				if (!appMember) {
+					return res.status(401).json({
+						error: t("Not Authorized"),
+						details: t(
+							"You are not a member of the application '%s'",
+							app.name
+						),
+						code: ERROR_CODES.unauthorized,
+					});
+				}
+
+				// Assign app membership data
+				req.appMember = appMember;
 			}
-
-			// Assign app membership data
-			req.appMember = appMember;
 		}
 
 		// Assign app data

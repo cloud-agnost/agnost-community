@@ -8,6 +8,7 @@ import config from "config";
 import path from "path";
 import os from "os";
 import responseTime from "response-time";
+
 import { I18n } from "i18n";
 import { fileURLToPath } from "url";
 import logger from "./init/logger.js";
@@ -18,7 +19,6 @@ import { connectToQueue, disconnectFromQueue } from "./init/queue.js";
 import { createRateLimiter } from "./middlewares/rateLimiter.js";
 import { handleUndefinedPaths } from "./middlewares/undefinedPaths.js";
 import { logRequest } from "./middlewares/logRequest.js";
-import { touchVersion } from "./middlewares/touchVersion.js";
 import { initializeSyncClient, disconnectSyncClient } from "./init/sync.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -86,7 +86,7 @@ function initLocalization() {
 		directory: path.join(__dirname, "locales"),
 		defaultLocale: "en",
 		// watch for changes in JSON files to reload locale on updates
-		autoReload: true,
+		autoReload: false,
 		// whether to write new locale information to disk
 		updateFiles: false,
 		// sync locale information across all files
@@ -118,8 +118,7 @@ async function initExpress(i18n) {
 	// Add middleware to identify user locale using 'accept-language' header to guess language settings
 	app.use(i18n.init);
 	app.use(responseTime(logRequest));
-	app.use(touchVersion);
-
+	app.use((await import("./middlewares/touchVersion.js")).default);
 	app.use("/", (await import("./routes/system.js")).default);
 	app.use("/v1/engine", (await import("./routes/engine.js")).default);
 	app.use("/v1/platform", (await import("./routes/platform.js")).default);

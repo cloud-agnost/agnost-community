@@ -63,6 +63,30 @@ export const AppInvitationModel = mongoose.model(
 			default: "Pending",
 			enum: ["Pending", "Accepted", "Rejected"],
 		},
+		// Info about the person who invites the user
+		host: {
+			userId: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "user",
+				index: true,
+			},
+			name: {
+				type: String,
+				index: true,
+			},
+			pictureUrl: {
+				type: String,
+			},
+			color: {
+				// If no picture provided then this will be the avatar background color of the user
+				type: String,
+			},
+			contactEmail: {
+				// Independent of the provider we store the email address of the user
+				type: String,
+				index: true,
+			},
+		},
 		createdAt: {
 			type: Date,
 			default: Date.now,
