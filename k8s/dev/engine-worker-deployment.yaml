@@ -54,3 +54,13 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: clusterDBPwd
+                 - name: MASTER_TOKEN
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: masterToken
+                 - name: ACCESS_TOKEN
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: accessToken

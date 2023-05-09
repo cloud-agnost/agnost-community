@@ -47,8 +47,37 @@ export const VersionModel = mongoose.model(
 				type: Boolean,
 				default: false,
 			},
+			realtime: {
+				enabled: {
+					type: Boolean,
+					required: true,
+					default: true,
+				},
+				apiKeyRequired: {
+					type: Boolean,
+					required: true,
+					default: true,
+				},
+				sessionRequired: {
+					type: Boolean,
+					required: true,
+					default: true,
+				},
+				rateLimits: {
+					// The iid of rate limits are stored
+					type: [String],
+					index: true,
+					default: [],
+				},
+			},
 			params: [
 				{
+					iid: {
+						// Internal identifier
+						type: String,
+						index: true,
+						immutable: true,
+					},
 					name: {
 						type: String,
 					},
@@ -63,6 +92,12 @@ export const VersionModel = mongoose.model(
 			],
 			limits: [
 				{
+					iid: {
+						// Internal identifier
+						type: String,
+						index: true,
+						immutable: true,
+					},
 					name: {
 						type: String,
 						required: true,
@@ -83,6 +118,73 @@ export const VersionModel = mongoose.model(
 					updatedAt: { type: Date },
 					createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 					updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+				},
+			],
+			defaultEndpointLimits: {
+				type: [mongoose.Schema.Types.ObjectId],
+				default: [],
+			},
+			apiKeys: [
+				{
+					name: {
+						type: String,
+						required: true,
+						index: true,
+					},
+					key: {
+						type: String,
+						index: true,
+					},
+					allowRealtime: {
+						type: Boolean,
+						default: true,
+					},
+					type: {
+						type: String,
+						enum: [
+							"no-access",
+							"full-access",
+							"custom-allowed",
+							"custom-excluded",
+						],
+					},
+					allowedEndpoints: [
+						{
+							//list of endpoint inames, custom type is only applicable if there is a deployed snapshot
+							type: mongoose.Schema.Types.ObjectId,
+							index: true,
+						},
+					],
+					excludedEndpoints: [
+						{
+							//list of endpoint inames, custom type is only applicable if there is a deployed snapshot
+							type: mongoose.Schema.Types.ObjectId,
+							index: true,
+						},
+					],
+					domainAuthorization: {
+						type: String,
+						default: "all",
+						enum: ["all", "specified"],
+					},
+					authorizedDomains: [{ type: String }],
+					IPAuthorization: {
+						type: String,
+						default: "all",
+						enum: ["all", "specified"],
+					},
+					authorizedIPs: [{ type: String }],
+					createdBy: {
+						type: mongoose.Schema.Types.ObjectId,
+						ref: "user",
+						index: true,
+					},
+					updatedBy: {
+						type: mongoose.Schema.Types.ObjectId,
+						ref: "user",
+					},
+					createdAt: { type: Date, default: Date.now, immutable: true },
+					updatedAt: { type: Date },
 				},
 			],
 			createdBy: {

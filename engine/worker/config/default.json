@@ -8,7 +8,6 @@
         "rateLimitWindowSec": 30,
         "rateLimitMaxHits": 300}],
     "general": {  
-        "masterToken": "mt-hYZqahaQ20P5kSvpEJ3ky0opT8zJX5Y1VFIZ",
         "generalQueueCount": 1,
         "maxMessageWaitMinues": 5,
         "maxMongoDBIndexNumberPerCollection": 64,

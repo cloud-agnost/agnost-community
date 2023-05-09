@@ -59,9 +59,7 @@ router.post(
 					role: entry.role,
 					organization: org.name,
 					app: app.name,
-					url: `${config.get("general.uiBaseUrl")}/v1/user/invitation/app/${
-						entry.token
-					}`,
+					url: `${process.env.UI_BASE_URL}/v1/user/invitation/app/${entry.token}`,
 				});
 			});
 
@@ -262,9 +260,7 @@ router.post(
 				role: invite.role,
 				organization: org.name,
 				app: app.name,
-				url: `${config.get("general.uiBaseUrl")}/v1/user/invitation/app/${
-					invite.token
-				}`,
+				url: `${process.env.UI_BASE_URL}/v1/user/invitation/app/${invite.token}`,
 			});
 
 			// If there are alreay user accounts with provided email then send them realtime notifications

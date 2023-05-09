@@ -15,17 +15,21 @@ export const checkContentType = (req, res, next) => {
 	}
 
 	// Parse content and build the req.body object
-	express.json()(req, res, (error) => {
-		if (error) {
-			return res.status(400).json({
-				error: t("Invalid Request Body"),
-				details: t(
-					"The server could not understand the request due to either invalid syntax of JSON document in request body or the request body payload is larger than the allowed limit."
-				),
-				code: ERROR_CODES.invalidRequestBody,
-			});
-		}
+	express.json({ limit: config.get("server.maxBodySize") })(
+		req,
+		res,
+		(error) => {
+			if (error) {
+				return res.status(400).json({
+					error: t("Invalid Request Body"),
+					details: t(
+						"The server could not understand the request due to either invalid syntax of JSON document in request body or the request body payload is larger than the allowed limit."
+					),
+					code: ERROR_CODES.invalidRequestBody,
+				});
+			}
 
-		next();
-	});
+			next();
+		}
+	);
 };

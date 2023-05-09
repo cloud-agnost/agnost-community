@@ -17,7 +17,7 @@ export const authAccessToken = async (req, res, next) => {
 	// Check if token is valid or not for development environments
 	if (
 		process.env.NODE_ENV === "development" &&
-		token !== config.get("general.accessToken")
+		token !== process.env.ACCESS_TOKEN
 	) {
 		return res.status(401).json({
 			error: t("Unauthorized"),

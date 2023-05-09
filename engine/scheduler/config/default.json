@@ -1,0 +1,25 @@
+{
+    "server": {
+        "host": "localhost",
+        "port": 4000,
+        "timeout": 3600000
+     },
+     "rateLimiters": [{      
+        "rateLimitWindowSec": 30,
+        "rateLimitMaxHits": 300}],
+    "general": {  
+        "generalQueueCount": 1,
+        "taskProcessQueueCount": 1
+    },
+    "agenda": {
+        "loadBatchSize": 100,
+        "DBName": "scheduler",
+        "collectionName": "cronjobs",
+        "processEvery": "one minute",
+        "maxConcurrency": 20,
+        "defaultConcurrency": 5,
+        "lockLimit": 0,
+        "defaultLockLimit": 0,
+        "defaultLockLifetime": 600000
+    }
+}

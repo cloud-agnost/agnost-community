@@ -15,8 +15,6 @@ import helper from "./util/helper.js";
 import monitorResources from "./handler/monitorResources.js";
 import { connectToDatabase, disconnectFromDatabase } from "./init/db.js";
 import { connectToRedisCache, disconnectFromRedisCache } from "./init/cache.js";
-import { connectToQueue, disconnectFromQueue } from "./init/queue.js";
-import { initializeSyncClient, disconnectSyncClient } from "./init/sync.js";
 import { createRateLimiter } from "./middlewares/rateLimiter.js";
 import { handleUndefinedPaths } from "./middlewares/undefinedPaths.js";
 import { logRequest } from "./middlewares/logRequest.js";
@@ -50,12 +48,8 @@ if (
 	connectToDatabase();
 	// Connect to cache server(s)
 	connectToRedisCache();
-	// Connect to message queue
-	connectToQueue();
 	// Spin up http server
 	const server = initExpress(i18n);
-	// Connect to synchronization server
-	initializeSyncClient();
 	//Launch scheduler
 	initResourceMonitorScheduler();
 	// Gracefull handle process exist
@@ -151,14 +145,10 @@ function initResourceMonitorScheduler() {
 function handleProcessExit(server) {
 	//Gracefully exit if we force quit through cntr+C
 	process.on("SIGINT", () => {
-		// Close synchronization server connection
-		disconnectSyncClient();
 		// Close connection to the database
 		disconnectFromDatabase();
 		// Close connection to cache server(s)
 		disconnectFromRedisCache();
-		// Close connection to message queue
-		disconnectFromQueue();
 		//Close Http server
 		server.close(() => {
 			logger.info("Http server closed");

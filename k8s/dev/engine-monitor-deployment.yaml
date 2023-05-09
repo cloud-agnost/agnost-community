@@ -59,3 +59,13 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: passPhrase
+                 - name: MASTER_TOKEN
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: masterToken
+                 - name: ACCESS_TOKEN
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: accessToken

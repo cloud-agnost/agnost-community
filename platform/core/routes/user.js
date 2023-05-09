@@ -1246,6 +1246,16 @@ router.post(
 		// Start new database transaction session
 		const session = await userCtrl.startSession();
 		try {
+			if (!req.user.isClusterOwner) {
+				return res.status(400).json({
+					error: t("Not Allowed"),
+					details: t(
+						"Only a cluster owner can transfer the ownership to another 'Active' cluster user."
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
 			// Get transferred user information
 			let transferredUser = await userCtrl.getOneById(req.params.userId);
 
@@ -1256,7 +1266,7 @@ router.post(
 			}
 
 			// Take ownership of cluster from existing user
-			await userCtrl.updateOneById(
+			let originalUser = await userCtrl.updateOneById(
 				req.user._id,
 				{ isClusterOwner: false },
 				{},
@@ -1264,7 +1274,7 @@ router.post(
 			);
 
 			// Transfer cluster ownership to the new user
-			await userCtrl.updateOneById(
+			transferredUser = await userCtrl.updateOneById(
 				transferredUser._id,
 				{ isClusterOwner: true },
 				{},
@@ -1306,6 +1316,30 @@ router.post(
 			// Commit transaction
 			await userCtrl.commit(session);
 			res.json();
+
+			// Log action
+			auditCtrl.logAndNotify(
+				originalUser._id,
+				originalUser,
+				"user",
+				"transfer",
+				t(
+					"Transferred cluster ownership to user '%s' (%s)",
+					transferredUser.name,
+					transferredUser.contactEmail
+				),
+				originalUser
+			);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				transferredUser._id,
+				transferredUser,
+				"user",
+				"transfer",
+				t("Became the new cluster owner"),
+				transferredUser
+			);
 		} catch (error) {
 			await userCtrl.rollback(session);
 			handleError(req, res, error);

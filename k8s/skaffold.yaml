@@ -54,6 +54,22 @@ build:
               - '**/*.json'
         docker:
           dockerfile: Dockerfile.dev
+      - image: agnost-enterprise/engine-realtime
+        context: ../engine/realtime
+        sync:
+          infer:
+              - '**/*.js'
+              - '**/*.json'
+        docker:
+          dockerfile: Dockerfile.dev
+      - image: agnost-enterprise/engine-scheduler
+        context: ../engine/scheduler
+        sync:
+          infer:
+              - '**/*.js'
+              - '**/*.json'
+        docker:
+          dockerfile: Dockerfile.dev
 deploy:
    statusCheckDeadlineSeconds: 300
    kubectl:
@@ -64,3 +80,5 @@ deploy:
          - dev/engine-core-deployment.yaml
          - dev/engine-worker-deployment.yaml
          - dev/engine-monitor-deployment.yaml
+         - dev/engine-realtime-deployment.yaml
+         - dev/engine-scheduler-deployment.yaml

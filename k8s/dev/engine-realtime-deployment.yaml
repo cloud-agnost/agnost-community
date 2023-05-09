@@ -1,0 +1,39 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: engine-realtime-deployment
+   labels:
+      app: engine-realtime
+spec:
+   replicas: 1
+   selector:
+      matchLabels:
+         app: engine-realtime
+   template:
+      metadata:
+         labels:
+            app: engine-realtime
+      spec:
+         containers:
+            - name: engine-realtime
+              image: agnost-enterprise/engine-realtime
+              imagePullPolicy: Never
+              ports:
+                 - containerPort: 4000
+              env:
+                 - name: REALTIME_CACHE_PWD
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: realtimeCachePwd
+                 - name: MASTER_TOKEN
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: masterToken
+                 - name: ACCESS_TOKEN
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: accessToken

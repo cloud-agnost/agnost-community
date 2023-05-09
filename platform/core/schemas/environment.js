@@ -1,11 +1,7 @@
 import mongoose from "mongoose";
 import mappingCtrl from "../controllers/mapping.js";
 import { body, query } from "express-validator";
-import {
-	resourceTypes,
-	envStatuses,
-	logStatuses,
-} from "../config/constants.js";
+import { resourceTypes, envStatuses } from "../config/constants.js";
 
 /**
  * Each version will have multiple execution environments. An environment will be tagged as development, test, staging, production etc.
@@ -115,45 +111,11 @@ export const EnvironmentModel = mongoose.model(
 					updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 				},
 			],
-			// Application parameter overrides
-			params: [
-				{
-					paramId: {
-						type: mongoose.Schema.Types.ObjectId,
-						required: true,
-						index: true,
-					},
-					value: {
-						type: mongoose.Schema.Types.Mixed,
-					},
-					updatedBy: {
-						type: mongoose.Schema.Types.ObjectId,
-						ref: "user",
-					},
-					updatedAt: { type: Date, default: Date.now },
-				},
-			],
-			// Environment status, keeps also the latest log information
-			telemetry: {
-				status: {
-					type: String,
-					index: true,
-					enum: envStatuses,
-					default: "Idle",
-				},
-				// Deployment log status
-				logs: [
-					{
-						startedAt: { type: Date },
-						duration: { type: Number },
-						status: { type: String, enum: logStatuses },
-						message: { type: String },
-					},
-				],
-				// Last telemetry update for this environment
-				updatedAt: {
-					type: Date,
-				},
+			// Resource status
+			status: {
+				type: String,
+				index: true,
+				enum: envStatuses,
 			},
 			createdBy: {
 				type: mongoose.Schema.Types.ObjectId,

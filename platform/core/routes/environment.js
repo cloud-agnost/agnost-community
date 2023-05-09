@@ -597,13 +597,13 @@ router.post(
 				{ session }
 			);
 
+			await envCtrl.commit(session);
+			res.json({ env: updatedEnv, log });
+
 			// Deploy application version to the environment
 			await deployCtrl.deploy(log, app, version, env, user);
 			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
 			await setKey(env._id, updatedEnv, helper.constants["1month"]);
-
-			await envCtrl.commit(session);
-			res.json({ env: updatedEnv, log });
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -905,9 +905,7 @@ router.post(
 			} else {
 				let timestamp = Date.now();
 				let dataSet = {
-					"telemetry.status": status,
-					"telemetry.logs": logs,
-					"telemetry.updatedAt": timestamp,
+					status: status,
 					updatedBy: user._id,
 				};
 
@@ -921,7 +919,7 @@ router.post(
 				// If undeployment is successful then unset versionId and deploymentDtm
 				let dataUnset = {};
 				if (log.action === "undeploy" && status === "OK") {
-					dataSet["telemetry.status"] = "Idle";
+					dataSet["status"] = "Idle";
 					dataUnset.deploymentDtm = 1;
 				}
 
@@ -964,217 +962,6 @@ router.post(
 					env.name
 				),
 				{},
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					envId: env._id,
-				}
-			);
-		} catch (error) {
-			await envCtrl.rollback(session);
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/param
-@method     POST
-@desc       Add app param override
-@access     private
-*/
-router.post(
-	"/:envId/param",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateEnv,
-	authorizeAppAction("app.env.update"),
-	applyRules("add-param"),
-	validate,
-	async (req, res) => {
-		const session = await envCtrl.startSession();
-		try {
-			const { user, org, app, version, env, appParam } = req;
-			const { value } = req.body;
-
-			let existingOverride = env.params.find(
-				(entry) => entry.paramId.toString() === appParam._id.toString()
-			);
-
-			if (existingOverride) {
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"There is already value override for app param '%s' set for this environment. You can only update or delete an existing app param override.",
-						appParam.name
-					),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			let updatedEnv = await envCtrl.pushObjectById(
-				env._id,
-				"params",
-				{
-					paramId: appParam._id,
-					value,
-					updatedBy: user._id,
-					updatedAt: Date.now(),
-				},
-				{ updatedBy: user._id },
-				{ cacheKey: env._id, session }
-			);
-
-			await envCtrl.commit(session);
-			// Update environemnt data in engine cluster
-			await deployCtrl.update(app, version, updatedEnv, user);
-			res.json(updatedEnv);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.environment",
-				"update",
-				t(
-					"Added app param override '%s' to environment '%s'",
-					appParam.name,
-					env.name
-				),
-				updatedEnv,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					envId: env._id,
-				}
-			);
-		} catch (error) {
-			await envCtrl.rollback(session);
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/param/:paramOverrideId
-@method     PUT
-@desc       Update app param override value
-@access     private
-*/
-router.put(
-	"/:envId/param/:paramOverrideId",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateEnv,
-	validateParam,
-	authorizeAppAction("app.env.update"),
-	applyRules("update-param"),
-	validate,
-	async (req, res) => {
-		const session = await envCtrl.startSession();
-		try {
-			const { user, org, app, version, env, appParam, paramOverride } = req;
-			const { value } = req.body;
-
-			let updatedEnv = await envCtrl.updateOneByQuery(
-				{ _id: env._id, "params._id": paramOverride._id },
-				{
-					"params.$.value": value,
-					"params.$.updatedBy": user._id,
-					"params.$.updatedAt": Date.now(),
-					updatedBy: user._id,
-				},
-				{},
-				{ cacheKey: env._id, session }
-			);
-
-			await envCtrl.commit(session);
-			// Update environment data in engine cluster
-			await deployCtrl.update(app, version, updatedEnv, user);
-			res.json(updatedEnv);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.environment",
-				"update",
-				t(
-					"Updated app param override '%s' value in environment '%s'",
-					appParam.name,
-					env.name
-				),
-				updatedEnv,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					envId: env._id,
-				}
-			);
-		} catch (error) {
-			await envCtrl.rollback(session);
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/param/:paramOverrideId
-@method     DELETE
-@desc       Delete app param override entry
-@access     private
-*/
-router.delete(
-	"/:envId/param/:paramOverrideId",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateEnv,
-	validateParam,
-	authorizeAppAction("app.env.update"),
-	async (req, res) => {
-		const session = await envCtrl.startSession();
-		try {
-			const { user, org, app, version, env, appParam, paramOverride } = req;
-
-			let updatedEnv = await envCtrl.pullObjectById(
-				env._id,
-				"params",
-				paramOverride._id,
-				{
-					updatedBy: user._id,
-				},
-				{ cacheKey: env._id, session }
-			);
-
-			await envCtrl.commit(session);
-			// Update environment data in engine cluster
-			await deployCtrl.update(app, version, updatedEnv, user);
-			res.json(updatedEnv);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.environment",
-				"update",
-				t(
-					"Deleted app param override '%s' entry in environment '%s'",
-					appParam.name,
-					env.name
-				),
-				updatedEnv,
 				{
 					orgId: org._id,
 					appId: app._id,

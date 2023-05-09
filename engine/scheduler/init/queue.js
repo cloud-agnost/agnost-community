@@ -72,3 +72,42 @@ export const disconnectFromQueue = () => {
 export const getMQClient = () => {
 	return amqpConnection;
 };
+
+export const submitTask = (payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		let randNumber = helper.randomInt(
+			1,
+			config.get("general.taskProcessQueueCount")
+		);
+
+		channel.assertQueue(
+			`process-task-${payload.envId}-${randNumber}${config.get(
+				"queue.developmentSuffix"
+			)}`,
+			{
+				durable: true,
+			}
+		);
+
+		channel.sendToQueue(
+			`process-task-${payload.envId}-${randNumber}${config.get(
+				"queue.developmentSuffix"
+			)}`,
+			Buffer.from(JSON.stringify(payload)),
+			{
+				persistent: true,
+				timestamp: Date.now(),
+			}
+		);
+
+		channel.close();
+	});
+};

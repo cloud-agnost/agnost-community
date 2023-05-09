@@ -23,8 +23,7 @@
         "maxRichTextFieldLength": 524288,
         "maxEncryptedTextFieldLength": 50,
         "maxDecimalDigits": 10,
-        "maxOptionsCount": 1000,
-        "masterToken": "mt-hYZqahaQ20P5kSvpEJ3ky0opT8zJX5Y1VFIZ"
+        "maxOptionsCount": 1000
     },
     "session": {
         "validationCodeExpiry": 600,
@@ -35,6 +34,5 @@
         "profileImagesBucket": "agnost-profile-pictures",
         "orgImagesBucket": "agnost-organization-pictures",
         "appImagesBucket": "agnost-app-pictures"
-
     }
 }

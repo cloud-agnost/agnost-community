@@ -164,7 +164,8 @@ class ResourceController extends BaseController {
 	 */
 	async createEngineDeployment(session, user, org, app, version, envIid) {
 		const resourceId = helper.generateId();
-		const resourceIid = helper.generateSlug("eng");
+		// The engine deployment has the same iid of the environment
+		const resourceIid = envIid;
 
 		const resource = await this.create(
 			{
@@ -234,7 +235,7 @@ class ResourceController extends BaseController {
 			resources,
 			{
 				headers: {
-					Authorization: config.get("general.workerAccessToken"),
+					Authorization: process.env.ACCESS_TOKEN,
 					"Content-Type": "application/json",
 				},
 			}

@@ -36,16 +36,13 @@ export default async function monitorResources() {
 						resource.access = decryptSensitiveData(resource.access);
 						result = await checkResourceStatus(resource);
 					}
-
 					if (result) {
 						// Add status to the cache if it has not been added already
 						setCachedStatus(statusCache, resource, result);
 						// If the resource is being created, updated or deleted and if we face an error it might be possible that it is undergoing an operation and we need to give time to it to complete its opeation
 						if (
 							result.status === "Error" &&
-							["Binding", "Creating", "Updating", "Deleting"].includes(
-								resource.status
-							)
+							["Creating", "Updating", "Deleting"].includes(resource.status)
 						) {
 							// Check duration of the operation
 							const now = Date.now();
@@ -98,7 +95,7 @@ async function updateLatestResourceLog(resource, status) {
 			{ resource, status },
 			{
 				headers: {
-					Authorization: config.get("general.masterToken"),
+					Authorization: process.env.MASTER_TOKEN,
 					"Content-Type": "application/json",
 				},
 			}
@@ -119,7 +116,7 @@ async function upadateResourceStatus(resource, status) {
 			{ resource, status },
 			{
 				headers: {
-					Authorization: config.get("general.masterToken"),
+					Authorization: process.env.MASTER_TOKEN,
 					"Content-Type": "application/json",
 				},
 			}
@@ -644,21 +641,25 @@ async function checkAPIServer(connSettings) {
 	kubeconfig.loadFromDefault();
 	const coreApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
 
+	let result = null;
 	try {
-		let result = await coreApi.readNamespacedDeployment(
+		result = await coreApi.readNamespacedDeployment(
 			`${connSettings.name}-deployment`,
 			config.get("general.k8sNamespace")
 		);
-
-		if (result.body?.status?.availableReplicas === 0)
-			throw new AgnostError(
-				t("API server does not have any available replicas.")
-			);
-
-		return { availableReplicas: result.body?.status?.availableReplicas };
 	} catch (err) {
 		return null;
 	}
+
+	if (
+		result.body?.status?.availableReplicas === 0 ||
+		!result.body?.status?.availableReplicas
+	)
+		throw new AgnostError(
+			t("API server does not have any available replicas.")
+		);
+
+	return { availableReplicas: result.body?.status?.availableReplicas };
 }
 
 /**
@@ -671,21 +672,26 @@ async function checkDefaultScheduler(connSettings) {
 	kubeconfig.loadFromDefault();
 	const coreApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
 
+	let result = null;
+
 	try {
-		let result = await coreApi.readNamespacedDeployment(
+		result = await coreApi.readNamespacedDeployment(
 			connSettings.name,
 			config.get("general.k8sNamespace")
 		);
-
-		if (result.body?.status?.availableReplicas === 0)
-			throw new AgnostError(
-				t("Default scheduler does not have any available replicas.")
-			);
-
-		return { availableReplicas: result.body?.status?.availableReplicas };
 	} catch (err) {
 		return null;
 	}
+
+	if (
+		result.body?.status?.availableReplicas === 0 ||
+		!result.body?.status?.availableReplicas
+	)
+		throw new AgnostError(
+			t("Default scheduler does not have any available replicas.")
+		);
+
+	return { availableReplicas: result.body?.status?.availableReplicas };
 }
 
 /**

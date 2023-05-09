@@ -31,20 +31,15 @@ class AppController extends BaseController {
 		);
 
 		// Create the master version of the app
-		const { version, resource, log, env } = await versionCtrl.createVersion(
-			session,
-			user,
-			org,
-			app,
-			{
+		const { version, resource, resLog, env, envLog } =
+			await versionCtrl.createVersion(session, user, org, app, {
 				name: "master",
 				isPrivate: false,
 				readOnly: true,
 				master: true,
-			}
-		);
+			});
 
-		return { app, version, resource, log, env };
+		return { app, version, resource, resLog, env, envLog };
 	}
 }
 

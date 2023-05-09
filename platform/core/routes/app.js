@@ -21,6 +21,7 @@ import {
 import { applyRules } from "../schemas/app.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
+import { setKey } from "../init/cache.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
@@ -43,7 +44,7 @@ router.get("/roles", checkContentType, authSession, async (req, res) => {
 @route      /v1/org/:orgId/app
 @method     POST
 @desc       Creates a new app. When creating the app a new master version is also created and the app creator is added as 'Manager' to app team.
-			While creating the new version we also create the engine deployment for it.
+			While creating the new version we also create the engine deployment for it and trigger the initial deployment.
 @access     private
 */
 router.post(
@@ -62,18 +63,20 @@ router.post(
 			const { name } = req.body;
 
 			// Create the new app and associated master version, environment and engine API server
-			const { app, version, resource, log, env } = await appCtrl.createApp(
-				session,
-				user,
-				org,
-				name
-			);
+			const { app, version, resource, resLog, env, envLog } =
+				await appCtrl.createApp(session, user, org, name);
 
-			//await appCtrl.commit(session);
-			res.json({ app, version, resource, log, env });
+			await appCtrl.commit(session);
+			res.json({ app, version, resource, resLog, env, envLog });
 
-			// We just need to create the storage resource, default queue and scheduler are bound to the existing resources
-			await resourceCtrl.manageClusterResources([{ resource, log }]);
+			// Create the engine deployment (API server), associated HPA, service and ingress rule
+			await resourceCtrl.manageClusterResources([{ resource, log: resLog }]);
+
+			// Deploy application version to the environment
+			await deployCtrl.deploy(envLog, app, version, env, user);
+
+			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
+			await setKey(env._id, env, helper.constants["1month"]);
 
 			// Log action
 			auditCtrl.logAndNotify(

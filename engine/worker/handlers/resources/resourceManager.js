@@ -77,7 +77,7 @@ export class ResourceManager {
 				},
 				{
 					headers: {
-						Authorization: config.get("general.masterToken"),
+						Authorization: process.env.MASTER_TOKEN,
 						"Content-Type": "application/json",
 					},
 				}
@@ -587,8 +587,8 @@ export class ResourceManager {
 						resource: {
 							name: "memory",
 							target: {
-								type: "AverageValue",
-								averageValue: hpaConfig.avgMemory,
+								type: "Utilization",
+								averageUtilization: hpaConfig.avgMemory,
 							},
 						},
 					},
@@ -629,7 +629,8 @@ export class ResourceManager {
 			hpa.spec.minReplicas = hpaConfig.minReplicas;
 			hpa.spec.maxReplicas = hpaConfig.maxReplicas;
 			hpa.spec.metrics[0].resource.target.averageUtilization = hpaConfig.avgCPU;
-			hpa.spec.metrics[1].resource.target.averageValue = hpaConfig.avgMemory;
+			hpa.spec.metrics[1].resource.target.averageUtilization =
+				hpaConfig.avgMemory;
 
 			await autoscalingApi.replaceNamespacedHorizontalPodAutoscaler(
 				`${hpaName}-autoscaler`,

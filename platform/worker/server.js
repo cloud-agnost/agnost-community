@@ -12,7 +12,6 @@ import { I18n } from "i18n";
 import { fileURLToPath } from "url";
 import logger from "./init/logger.js";
 import helper from "./util/helper.js";
-import { connectToDatabase, disconnectFromDatabase } from "./init/db.js";
 import { connectToRedisCache, disconnectFromRedisCache } from "./init/cache.js";
 import { connectToQueue, disconnectFromQueue } from "./init/queue.js";
 import { createRateLimiter } from "./middlewares/rateLimiter.js";
@@ -47,8 +46,6 @@ if (
 	initGlobals();
 	// Set up locatlization
 	const i18n = initLocalization();
-	// Connect to the database
-	connectToDatabase();
 	// Connect to cache server(s)
 	connectToRedisCache();
 	// Connect to message queue
@@ -137,8 +134,6 @@ async function initExpress(i18n) {
 function handleProcessExit(server) {
 	//Gracefully exit if we force quit through cntr+C
 	process.on("SIGINT", () => {
-		// Close connection to the database
-		disconnectFromDatabase();
 		// Close connection to cache server(s)
 		disconnectFromRedisCache();
 		// Close connection to message queue

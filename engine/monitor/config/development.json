@@ -1,6 +1,5 @@
 {
    "database": {
-      "uri": "engine-mongodb-clusterip-service",
       "minPoolSize": 3
    },
    "cache": {
@@ -18,15 +17,7 @@
       "retryCount": 30,
       "developmentSuffix": "mito"
    },
-   "sync": {
-      "serverURL": "http://platform-sync-clusterip-service:4000",
-      "namespace": "sync",
-      "reconnection": true,
-      "reconnectionDelay": 500
-   },
    "general": {  
-      "accessToken": "at-2F5FOIkOXEOmPfywWJ6JRZXCnzFgtqVIHAJ7",
-      "platformBaseUrl": "http://platform-core-clusterip-service:4000",
-      "maxPoolSize": 3
+      "platformBaseUrl": "http://platform-core-clusterip-service:4000"
    }
 }

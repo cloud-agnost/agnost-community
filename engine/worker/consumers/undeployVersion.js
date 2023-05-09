@@ -89,7 +89,7 @@ export const undeployVersionHandler = (connection, queue) => {
 								},
 								{
 									headers: {
-										Authorization: config.get("general.masterToken"),
+										Authorization: process.env.MASTER_TOKEN,
 										"Content-Type": "application/json",
 									},
 								}

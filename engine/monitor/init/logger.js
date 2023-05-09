@@ -31,7 +31,7 @@ class EngineErrorTransport extends Transport {
 		axios
 			.post(config.get("general.platformBaseUrl") + "/v1/engine/error", entry, {
 				headers: {
-					Authorization: config.get("general.masterToken"),
+					Authorization: process.env.MASTER_TOKEN,
 					"Content-Type": "application/json",
 				},
 			})

@@ -159,20 +159,22 @@ export class DeploymentManager {
 		// If there is no callback just return
 		if (!this.msgObj.callback) return;
 
-		// Update the environment log object
-		await axios.post(
-			this.msgObj.callback,
-			{
-				status,
-				logs: this.logs,
-			},
-			{
-				headers: {
-					Authorization: config.get("general.masterToken"),
-					"Content-Type": "application/json",
+		try {
+			// Update the environment log object
+			await axios.post(
+				this.msgObj.callback,
+				{
+					status,
+					logs: this.logs,
 				},
-			}
-		);
+				{
+					headers: {
+						Authorization: process.env.MASTER_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+		} catch (err) {}
 	}
 
 	/**
@@ -540,10 +542,10 @@ export class DeploymentManager {
 			//C reate all required indices
 			await collection.createIndexes([
 				{
-					key: { jobId: 1 },
+					key: { trackingId: 1 },
 				},
 				{
-					key: { cronId: 1 },
+					key: { taskId: 1 },
 				},
 				{
 					key: { status: 1 },

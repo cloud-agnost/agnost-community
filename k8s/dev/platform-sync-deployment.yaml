@@ -29,18 +29,8 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: cachePwd
-                 - name: CLUSTER_DB_URI
+                 - name: MASTER_TOKEN
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets
-                         key: clusterDBURI
-                 - name: CLUSTER_DB_USER
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: clusterDBUser
-                 - name: CLUSTER_DB_PWD
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: clusterDBPwd
+                         key: masterToken

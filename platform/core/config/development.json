@@ -23,10 +23,8 @@
       "reconnectionDelay": 500
    },
     "general": {
-         "uiBaseUrl": "http://api.development.test",
          "platformBaseUrl": "http://platform-core-clusterip-service:4000",
          "workerUrl": "http://engine-worker-clusterip-service:4000",
-         "workerAccessToken": "at-2F5FOIkOXEOmPfywWJ6JRZXCnzFgtqVIHAJ7",
          "defaulPVCSize": "1Gi",
          "defaultSchedulerDeploymentName": "engine-scheduler-deployment",
          "defaultEngineConfig": {

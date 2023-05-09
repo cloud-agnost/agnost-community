@@ -1,6 +1,5 @@
 {
    "database": {
-      "uri": "engine-mongodb-clusterip-service",
       "minPoolSize": 3
    },
     "cache": {

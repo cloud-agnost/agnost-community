@@ -66,7 +66,7 @@ class DeploymentController {
 		if (!engine) {
 			throw new AgnostError(
 				t(
-					"Environment '%s' does not have an assigned engine cluster. To deploy an app version to an environment, an engine cluster mapping needs to be made.",
+					"Environment '%s' does not have an assigned engine (API server). To deploy an app version to an environment, an engine needs to be created for the environment.",
 					env.name
 				)
 			);
@@ -122,12 +122,16 @@ class DeploymentController {
 		}
 
 		//Make api call to environment worker engine to deploy app version
-		await axios.post(engine.access.workerUrl + "/v1/env/deploy", payload, {
-			headers: {
-				Authorization: engine.access.accessToken,
-				"Content-Type": "application/json",
-			},
-		});
+		await axios.post(
+			config.get("general.workerUrl") + "/v1/env/deploy",
+			payload,
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
 	}
 
 	/**
@@ -203,12 +207,16 @@ class DeploymentController {
 		}
 
 		//Make api call to environment worker engine to redeploy app version
-		await axios.post(engine.access.workerUrl + "/v1/env/redeploy", payload, {
-			headers: {
-				Authorization: engine.access.accessToken,
-				"Content-Type": "application/json",
-			},
-		});
+		await axios.post(
+			config.get("general.workerUrl") + "/v1/env/redeploy",
+			payload,
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
 	}
 
 	/**
@@ -257,12 +265,16 @@ class DeploymentController {
 		};
 
 		//Make api call to environment worker engine to undeploy app version
-		await axios.post(engine.access.workerUrl + "/v1/env/undeploy", payload, {
-			headers: {
-				Authorization: engine.access.accessToken,
-				"Content-Type": "application/json",
-			},
-		});
+		await axios.post(
+			config.get("general.workerUrl") + "/v1/env/undeploy",
+			payload,
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
 	}
 
 	/**
@@ -303,12 +315,16 @@ class DeploymentController {
 		};
 
 		//Make api call to environment worker engine to delete the environment
-		await axios.post(engine.access.workerUrl + "/v1/env/delete", payload, {
-			headers: {
-				Authorization: engine.access.accessToken,
-				"Content-Type": "application/json",
-			},
-		});
+		await axios.post(
+			config.get("general.workerUrl") + "/v1/env/delete",
+			payload,
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
 	}
 
 	/**
@@ -345,12 +361,16 @@ class DeploymentController {
 		};
 
 		//Make api call to environment worker engine to update environment data
-		await axios.post(engine.access.workerUrl + "/v1/env/update", payload, {
-			headers: {
-				Authorization: engine.access.accessToken,
-				"Content-Type": "application/json",
-			},
-		});
+		await axios.post(
+			config.get("general.workerUrl") + "/v1/env/update",
+			payload,
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
 	}
 }
 

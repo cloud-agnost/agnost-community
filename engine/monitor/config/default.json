@@ -8,7 +8,6 @@
         "rateLimitWindowSec": 30,
         "rateLimitMaxHits": 300}],
     "general": {  
-        "masterToken": "mt-hYZqahaQ20P5kSvpEJ3ky0opT8zJX5Y1VFIZ",
         "monitoringInterval": 3000,
         "resourcePaginationSize": 100,
         "k8sNamespace": "default",
