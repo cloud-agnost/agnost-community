@@ -3,14 +3,14 @@ name: Build and Push
 on:
   push:
     branches:
-      - 'pipeline'
+      - 'master'
     paths:
       - 'engine/**'
       - 'platform/**'
 
 env:
   DOCKER_REGISTRY: 'gcr.io'
-  GCP_PROJECT: 'agnost-enterprise'
+  GCR_PROJECT: 'agnost-enterprise'
 
 jobs:
   get_apps:
@@ -79,5 +79,5 @@ jobs:
           context: ./${{ matrix.application }}
           file: ./${{ matrix.application }}/Dockerfile
           tags: |
-            ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT }}/${{ matrix.application }}:${{ needs.generate_short_sha.outputs.sha }}
-            ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT }}/${{ matrix.application }}:latest
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:${{ needs.generate_short_sha.outputs.sha }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:latest
