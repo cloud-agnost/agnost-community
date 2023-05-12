@@ -5,14 +5,8 @@ on:
     branches:
       - 'pipeline'
     paths:
-      - 'engine/core/**'
-      - 'engine/monitor/**'
-      - 'engine/realtime/**'
-      - 'engine/scheduler/**'
-      - 'engine/worker/**'
-      - 'platform/core/**'
-      - 'platform/sync/**'
-      - 'platform/worker/**'
+      - 'engine/**'
+      - 'platform/**'
 
 env:
   DOCKER_REGISTRY: 'gcr.io'
