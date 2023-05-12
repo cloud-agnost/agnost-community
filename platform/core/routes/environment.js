@@ -14,7 +14,6 @@ import { validateVersion } from "../middlewares/validateVersion.js";
 import {
 	validateEnv,
 	validateEnvLog,
-	validateParam,
 	validateMapping,
 } from "../middlewares/validateEnv.js";
 import { authorizeAppAction } from "../middlewares/authorizeAppAction.js";
@@ -26,196 +25,6 @@ import { setKey } from "../init/cache.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env?page=0&size=10&name=&sortBy=email&sortDir=asc
-@method     GET
-@desc       Get all app version environments that are visible to the user
-@access     private
-*/
-router.get(
-	"/",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	authorizeAppAction("app.env.view"),
-	applyRules("view"),
-	validate,
-	async (req, res) => {
-		try {
-			const { app, appMember, version } = req;
-			const { page, size, name, sortBy, sortDir, tag } = req.query;
-
-			let query = { appId: app._id, versionId: version._id };
-			if (appMember.role !== "Admin") query.createdBy = req.user._id;
-			if (name && name !== "null") query.name = { $regex: name, $options: "i" };
-
-			let sort = {};
-			if (sortBy && sortDir) {
-				sort[sortBy] = sortDir;
-			} else sort = { createdAt: "desc" };
-
-			let envs = await envCtrl.getManyByQuery(query, {
-				sort,
-				skip: size * page,
-				limit: size,
-			});
-
-			res.json(envs);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env/mine?page=0&size=10&name=&sortBy=email&sortDir=asc
-@method     GET
-@desc       Get the app version environments created by the user
-@access     private
-*/
-router.get(
-	"/mine",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	authorizeAppAction("app.env.view"),
-	applyRules("view"),
-	validate,
-	async (req, res) => {
-		try {
-			const { app, version } = req;
-			const { page, size, name, sortBy, sortDir, tag } = req.query;
-
-			let query = {
-				appId: app._id,
-				versionId: version._id,
-				createdBy: req.user._id,
-			};
-			if (name && name !== "null") query.name = { $regex: name, $options: "i" };
-
-			let sort = {};
-			if (sortBy && sortDir) {
-				sort[sortBy] = sortDir;
-			} else sort = { createdAt: "desc" };
-
-			let envs = await envCtrl.getManyByQuery(query, {
-				sort,
-				skip: size * page,
-				limit: size,
-			});
-
-			res.json(envs);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env/all?page=0&size=10&name=&sortBy=email&sortDir=asc
-@method     GET
-@desc       Get the all app version environments
-@access     private
-*/
-router.get(
-	"/mine",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	authorizeAppAction("app.env.view"),
-	applyRules("view"),
-	validate,
-	async (req, res) => {
-		try {
-			const { app, version } = req;
-			const { page, size, name, sortBy, sortDir, tag } = req.query;
-
-			let query = {
-				appId: app._id,
-				versionId: version._id,
-			};
-
-			if (name && name !== "null") query.name = { $regex: name, $options: "i" };
-
-			let sort = {};
-			if (sortBy && sortDir) {
-				sort[sortBy] = sortDir;
-			} else sort = { createdAt: "desc" };
-
-			let envs = await envCtrl.getManyByQuery(query, {
-				sort,
-				skip: size * page,
-				limit: size,
-			});
-
-			res.json(envs);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env
-@method     POST
-@desc       Create a new environment
-@access     private
-*/
-router.post(
-	"/",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	authorizeAppAction("app.env.create"),
-	applyRules("create"),
-	validate,
-	async (req, res) => {
-		try {
-			const { org, user, app, version } = req;
-			let { name, autoDeploy } = req.body;
-
-			// Create the new environment object
-			let envId = helper.generateId();
-			let envObj = await envCtrl.create(
-				{
-					_id: envId,
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					iid: helper.generateSlug("env"),
-					name,
-					autoDeploy,
-					createdBy: req.user._id,
-				},
-				{ cacheKey: envId }
-			);
-
-			res.json(envObj);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.environment",
-				"create",
-				t("Created a new environment named '%s'", name),
-				envObj,
-				{ orgId: org._id, appId: app._id, versionId: version._id, envId }
-			);
-		} catch (error) {
-			handleError(req, res, error);
-		}
-	}
-);
 
 /*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId
@@ -271,139 +80,6 @@ router.put(
 				}
 			);
 		} catch (error) {
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId
-@method     DELETE
-@desc       Delete environment
-@access     private
-*/
-router.delete(
-	"/:envId",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateEnv,
-	authorizeAppAction("app.env.delete"),
-	async (req, res) => {
-		const session = await envCtrl.startSession();
-		try {
-			const { org, user, app, version, env } = req;
-
-			if (
-				[
-					"Deploying",
-					"Redeploying",
-					"Undeploying",
-					"Auto-deploying",
-					"Deleting",
-				].includes(env.telemetry.status)
-			) {
-				await envCtrl.endSession(session);
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"There is already a deployment operation running on this environment. You need to wait the completion of this operation."
-					),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			// If there is no version deployment to the environment then directly delete the environment and associcated logs
-			if (!env.deploymentDtm) {
-				// Delete environment
-				await envCtrl.deleteOneById(env._id, {
-					cacheKey: env._id,
-					session,
-				});
-
-				// Delete environment logs
-				await envLogCtrl.deleteManyByQuery({
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					envId: env._id,
-				});
-
-				await envCtrl.commit(session);
-				res.json();
-
-				// Log action
-				auditCtrl.logAndNotify(
-					version._id,
-					user,
-					"org.app.version.environment",
-					"delete",
-					t("Deleted environment '%s'", env.name),
-					{},
-					{
-						orgId: org._id,
-						appId: app._id,
-						versionId: version._id,
-						envId: env._id,
-					}
-				);
-			} else {
-				// Update environment data
-				let updatedEnv = await envCtrl.updateOneById(
-					env._id,
-					{
-						"telemetry.status": "Deleting",
-						"telemetry.logs": [],
-						"telemetry.updatedAt": Date.now(),
-						updatedBy: req.user._id,
-					},
-					{},
-					{ cacheKey: env._id, session }
-				);
-
-				// Create environment logs entry, which will be updated when the operation is completed
-				let log = await envLogCtrl.create(
-					{
-						orgId: org._id,
-						appId: app._id,
-						versionId: version._id,
-						envId: env._id,
-						action: "delete",
-						status: "Deleting",
-						logs: [],
-						createdBy: user._id,
-					},
-					{ session }
-				);
-
-				// Redeploy application version to the environment
-				await deployCtrl.delete(log, app, version, env, user);
-				// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
-				await setKey(env._id, updatedEnv, helper.constants["1month"]);
-
-				await envCtrl.commit(session);
-				res.json({ env: updatedEnv, log });
-
-				// Log action
-				auditCtrl.logAndNotify(
-					version._id,
-					user,
-					"org.app.version.environment",
-					"delete",
-					t("Started deleting environment '%s'", env.name),
-					updatedEnv,
-					{
-						orgId: org._id,
-						appId: app._id,
-						versionId: version._id,
-						envId: env._id,
-					}
-				);
-			}
-		} catch (error) {
-			await envCtrl.rollback(session);
 			handleError(req, res, error);
 		}
 	}
@@ -520,118 +196,6 @@ router.post(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/deploy
-@method     POST
-@desc       Start deploying app version to environment
-@access     private
-*/
-router.post(
-	"/:envId/deploy",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateEnv,
-	authorizeAppAction("app.env.deploy"),
-	async (req, res) => {
-		const session = await envCtrl.startSession();
-		try {
-			const { org, user, app, version, env } = req;
-
-			if (
-				[
-					"Deploying",
-					"Redeploying",
-					"Undeploying",
-					"Auto-deploying",
-					"Deleting",
-				].includes(env.telemetry.status)
-			) {
-				await envCtrl.endSession(session);
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"There is already a deployment operation running on this environment. You need to wait the completion of this operation."
-					),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			if (env.deploymentDtm) {
-				await envCtrl.endSession(session);
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"The app version is already deployed to this envivonment. If you want to deploy this version again either re-deploy it or undeploy this version first and then deploy it again."
-					),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			// Create environment logs entry, which will be updated when the deployment is completed
-			let log = await envLogCtrl.create(
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					envId: env._id,
-					action: "deploy",
-					status: "Deploying",
-					logs: [],
-					createdBy: user._id,
-				},
-				{ session }
-			);
-
-			// Update environment data, we do not update the cache value yet, we update it after the deployment
-			let updatedEnv = await envCtrl.updateOneById(
-				env._id,
-				{
-					"telemetry.status": "Deploying",
-					"telemetry.logs": [],
-					"telemetry.updatedAt": Date.now(),
-					updatedBy: req.user._id,
-				},
-				{},
-				{ session }
-			);
-
-			await envCtrl.commit(session);
-			res.json({ env: updatedEnv, log });
-
-			// Deploy application version to the environment
-			await deployCtrl.deploy(log, app, version, env, user);
-			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
-			await setKey(env._id, updatedEnv, helper.constants["1month"]);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.environment",
-				"deploy",
-				t(
-					"Started deploying app version '%s' to environment '%s'",
-					version.name,
-					env.name
-				),
-				updatedEnv,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					envId: env._id,
-				}
-			);
-		} catch (error) {
-			await envCtrl.rollback(session);
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/redeploy
 @method     POST
 @desc       Start re-deploying app version to environment
@@ -651,14 +215,21 @@ router.post(
 		try {
 			const { org, user, app, version, env } = req;
 
+			/* 			console.log("***here", env);
 			if (
 				[
-					"Deploying",
-					"Redeploying",
-					"Undeploying",
-					"Auto-deploying",
-					"Deleting",
-				].includes(env.telemetry.status)
+					env.dbDeploymentStatus,
+					env.engineDeploymentStatus,
+					env.schedulerDeploymentStatus,
+				].some((entry) =>
+					[
+						"Deploying",
+						"Redeploying",
+						"Undeploying",
+						"Auto-deploying",
+						"Deleting",
+					].includes(entry)
+				)
 			) {
 				return res.status(422).json({
 					error: t("Not Allowed"),
@@ -667,7 +238,7 @@ router.post(
 					),
 					code: ERROR_CODES.notAllowed,
 				});
-			}
+			} */
 
 			if (!env.deploymentDtm) {
 				return res.status(422).json({
@@ -683,9 +254,9 @@ router.post(
 			let updatedEnv = await envCtrl.updateOneById(
 				env._id,
 				{
-					"telemetry.status": "Redeploying",
-					"telemetry.logs": [],
-					"telemetry.updatedAt": Date.now(),
+					dbDeploymentStatus: "Redeploying",
+					engineDeploymentStatus: "Redeploying",
+					schedulerDeploymentStatus: "Redeploying",
 					updatedBy: req.user._id,
 				},
 				{},
@@ -693,14 +264,47 @@ router.post(
 			);
 
 			// Create environment logs entry, which will be updated when the deployment is completed
-			let log = await envLogCtrl.create(
+			let dbLog = await envLogCtrl.create(
 				{
 					orgId: org._id,
 					appId: app._id,
 					versionId: version._id,
 					envId: env._id,
-					action: "redeploy",
-					status: "Redeploying",
+					action: "deploy",
+					status: "Deploying",
+					type: "db",
+					logs: [],
+					createdBy: user._id,
+				},
+				{ session }
+			);
+
+			// Create environment logs entry, which will be updated when the deployment is completed
+			let engineLog = await envLogCtrl.create(
+				{
+					orgId: org._id,
+					appId: app._id,
+					versionId: version._id,
+					envId: env._id,
+					action: "deploy",
+					status: "Deploying",
+					type: "engine",
+					logs: [],
+					createdBy: user._id,
+				},
+				{ session }
+			);
+
+			// Create environment logs entry, which will be updated when the deployment is completed
+			let schedulerLog = await envLogCtrl.create(
+				{
+					orgId: org._id,
+					appId: app._id,
+					versionId: version._id,
+					envId: env._id,
+					action: "deploy",
+					status: "Deploying",
+					type: "scheduler",
 					logs: [],
 					createdBy: user._id,
 				},
@@ -708,12 +312,19 @@ router.post(
 			);
 
 			// Redeploy application version to the environment
-			await deployCtrl.redeploy(log, app, version, env, user);
-			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
+			await deployCtrl.redeploy(
+				{ dbLog, engineLog, schedulerLog },
+				app,
+				version,
+				env,
+				user
+			);
+
+			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine worker
 			await setKey(env._id, updatedEnv, helper.constants["1month"]);
 
 			await envCtrl.commit(session);
-			res.json({ env: updatedEnv, log });
+			res.json({ env: updatedEnv, dbLog, engineLog, schedulerLog });
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -780,10 +391,7 @@ router.post(
 			else dataSet.schedulerDeploymentStatus = status;
 
 			// If deployment successfully completed then update deploymentDtm
-			if (
-				["deploy", "redeploy", "auto-deploy"].includes(log.action) &&
-				status === "OK"
-			)
+			if (["deploy", "redeploy", "auto-deploy"].includes(log.action))
 				dataSet.deploymentDtm = timestamp;
 
 			// Update environment data
@@ -794,17 +402,31 @@ router.post(
 				{ cacheKey: env._id, session }
 			);
 
-			// Update environment log data
-			await envLogCtrl.updateOneById(
-				log._id,
-				{
-					status: status,
-					logs: logs,
-					updatedAt: timestamp,
-				},
-				{},
-				{ session }
-			);
+			if (type === "engine") {
+				// Update environment log data, we can have multiple engine pods so each of them will add their own logs
+				await envLogCtrl.pushObjectById(
+					log._id,
+					"logs",
+					logs,
+					{
+						status: status,
+						updatedAt: timestamp,
+					},
+					{ session }
+				);
+			} else {
+				// Update environment log data
+				await envLogCtrl.updateOneById(
+					log._id,
+					{
+						status: status,
+						logs: logs,
+						updatedAt: timestamp,
+					},
+					{},
+					{ session }
+				);
+			}
 
 			await envCtrl.commit(session);
 			res.json(updatedEnv);

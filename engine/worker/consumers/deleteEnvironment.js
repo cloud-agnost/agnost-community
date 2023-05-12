@@ -1,6 +1,5 @@
 import axios from "axios";
-import { getKey, setKey } from "../init/cache.js";
-import { sendMessage } from "../init/sync.js";
+import { getKey } from "../init/cache.js";
 import { DeploymentManager } from "../handlers/managers/deploymentManager.js";
 
 export const deleteEnvironmentHandler = (connection, queue) => {

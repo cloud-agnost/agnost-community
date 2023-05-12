@@ -205,7 +205,6 @@ export function setUpRealtimeServer(expressServer) {
 				// If the user is not a member of the channel do nothing
 				const rooms = socket.rooms;
 				if (rooms && !rooms.has(`${socket.data.envId}.${payload.channel}`)) {
-					//console.log('***not a member');
 					return;
 				}
 

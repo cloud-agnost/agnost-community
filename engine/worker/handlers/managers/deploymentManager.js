@@ -15,6 +15,7 @@ import { MySQLDBManager } from "./MySQLDBManager.js";
 import { MsSQLDBManager } from "./MsSQLDBManager.js";
 import { OracleDBManager } from "./OracleDBManager.js";
 import { DATABASE } from "../../config/constants.js";
+import { manageAPIServers } from "../../init/queue.js";
 
 export class DeploymentManager {
 	constructor(msgObj) {
@@ -90,6 +91,13 @@ export class DeploymentManager {
 		keys.forEach((key) => {
 			removeFromCache(this.getPipeline(), key);
 		});
+	}
+
+	/**
+	 * Returns the environment object
+	 */
+	getMsgObj() {
+		return this.msgObj;
 	}
 
 	/**
@@ -944,6 +952,8 @@ export class DeploymentManager {
 			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
 			// Load all data models and do deployment initializations
 			await this.loadDatabases();
+			// After we load all configuration data to the cache we can notify engine API servers to update themselves
+			this.notifyAPIServers();
 			// Create application specific configuration and log collections
 			await this.createInternalCollections();
 			// Create database structure for databases and models (e.g.,tables, collections, indices)
@@ -1062,5 +1072,12 @@ export class DeploymentManager {
 			await this.sendEnvironmentLogs("Error");
 			return { success: false, error };
 		}
+	}
+
+	/**
+	 * Sends the message to the engine API servers so that they can update their state
+	 */
+	notifyAPIServers() {
+		manageAPIServers(this.getEnvId(), this.getMsgObj());
 	}
 }

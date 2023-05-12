@@ -307,7 +307,7 @@ export default class BaseController {
 			.findByIdAndUpdate(
 				parentId,
 				{
-					$push: { [field]: data },
+					$push: { [field]: Array.isArray(data) ? { $each: data } : data },
 					$set: dataSet,
 				},
 				{
@@ -338,7 +338,7 @@ export default class BaseController {
 			.findOneAndUpdate(
 				query,
 				{
-					$push: { [field]: data },
+					$push: { [field]: Array.isArray(data) ? { $each: data } : data },
 					$set: dataSet,
 				},
 				{

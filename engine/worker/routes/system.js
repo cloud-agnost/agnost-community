@@ -1,5 +1,6 @@
 import express from "express";
 import { authAccessToken } from "../middlewares/authAccessToken.js";
+import { manageAPIServers } from "../init/queue.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -33,6 +34,11 @@ router.get("/ping", (req, res) => {
 */
 router.get("/validate", authAccessToken, (req, res) => {
 	res.status(200).send(new Date().toISOString() + " - Access token validated");
+});
+
+router.get("/redeploy", (req, res) => {
+	manageAPIServers("env-7eqm41n7nsul", {});
+	res.status(200).send("Sent message");
 });
 
 export default router;

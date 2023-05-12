@@ -1,24 +1,14 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import nocache from "nocache";
 import cluster from "cluster";
 import process from "process";
 import config from "config";
 import path from "path";
 import os from "os";
-import responseTime from "response-time";
-import { I18n } from "i18n";
-import { fileURLToPath } from "url";
 import logger from "./init/logger.js";
 import helper from "./util/helper.js";
-import { connectToDatabase, disconnectFromDatabase } from "./init/db.js";
+import { I18n } from "i18n";
+import { fileURLToPath } from "url";
 import { connectToRedisCache, disconnectFromRedisCache } from "./init/cache.js";
 import { connectToQueue, disconnectFromQueue } from "./init/queue.js";
-import { initializeSyncClient, disconnectSyncClient } from "./init/sync.js";
-import { createRateLimiter } from "./middlewares/rateLimiter.js";
-import { handleUndefinedPaths } from "./middlewares/undefinedPaths.js";
-import { logRequest } from "./middlewares/logRequest.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,42 +17,33 @@ const __dirname = path.dirname(__filename);
 const numCPUs = os.cpus().length;
 
 // If this is the primary process fork as many child processes as possible to max utilize the system resources
-if (
-	cluster.isPrimary &&
-	numCPUs > 1 &&
-	["production", "clouddev"].includes(process.env.NODE_ENV)
-) {
+if (cluster.isPrimary) {
 	logger.info(`Primary process ${process.pid} is running`);
+
+	// Init globally accessible variables
+	initGlobalsForPrimaryProcess();
+	// Set up locatlization
+	initLocalization();
+	// Connect to cache server(s)
+	connectToRedisCache();
+	// Connect to message queue
+	connectToQueue();
+	// Gracefull handle process exist
+	handlePrimaryProcessExit();
+
 	for (let i = 0; i < numCPUs; i++) {
 		cluster.fork();
 	}
 
 	cluster.on("exit", function (worker, code, signal) {
-		logger.warn(`Engine core process ${worker.process.pid} died`);
+		logger.warn(`Child process ${worker.process.pid} died`);
 		cluster.fork();
 	});
-} else if (cluster.isWorker || ["development"].includes(process.env.NODE_ENV)) {
-	logger.info(`Worker process ${process.pid} is running`);
-	// Init globally accessible variables
-	initGlobals();
-	// Set up locatlization
-	const i18n = initLocalization();
-	// Connect to the database
-	connectToDatabase();
-	// Connect to cache server(s)
-	connectToRedisCache();
-	// Connect to message queue
-	connectToQueue();
-	// Spin up http server
-	const server = initExpress(i18n);
-	// Connect to synchronization server
-	initializeSyncClient();
-
-	// Gracefull handle process exist
-	handleProcessExit(server);
+} else if (cluster.isWorker) {
+	logger.info(`Child process ${process.pid} is running`);
 }
 
-function initGlobals() {
+function initGlobalsForPrimaryProcess() {
 	// Add logger to the global object
 	global.logger = logger;
 
@@ -101,61 +82,12 @@ function initLocalization() {
 	return i18n;
 }
 
-async function initExpress(i18n) {
-	// Create express application
-	var app = express();
-	// Set up rate limiter middlewares
-	let rateLimitersConfig = config.get("rateLimiters");
-	let rateLimiters = rateLimitersConfig.map((entry) =>
-		createRateLimiter(entry)
-	);
-	//Secure express app by setting various HTTP headers
-	app.use(helmet());
-	//Enable cross-origin resource sharing
-	app.use(cors());
-	//Disable client side caching
-	app.use(nocache());
-	app.set("etag", false);
-	// Add middleware to identify user locale using 'accept-language' header to guess language settings
-	app.use(i18n.init);
-	app.use(responseTime(logRequest));
-
-	app.use(
-		"/agnost",
-		...rateLimiters,
-		(await import("./routes/system.js")).default
-	);
-
-	// Middleware to handle undefined paths or posts
-	app.use(handleUndefinedPaths);
-
-	// Spin up the http server
-	const HOST = config.get("server.host");
-	const PORT = config.get("server.port");
-	var server = app.listen(PORT, () => {
-		logger.info(`Http server started @ ${HOST}:${PORT}`);
-	});
-
-	/* 	Particularly needed in case of bulk insert/update/delete operations, we should not generate 502 Bad Gateway errors at nginex ingress controller, the value specified in default config file is in milliseconds */
-	server.timeout = config.get("server.timeout");
-
-	return server;
-}
-
-function handleProcessExit(server) {
+function handlePrimaryProcessExit() {
 	//Gracefully exit if we force quit through cntr+C
 	process.on("SIGINT", () => {
-		// Close synchronization server connection
-		disconnectSyncClient();
-		// Close connection to the database
-		disconnectFromDatabase();
 		// Close connection to cache server(s)
 		disconnectFromRedisCache();
 		// Close connection to message queue
 		disconnectFromQueue();
-		//Close Http server
-		server.close(() => {
-			logger.info("Http server closed");
-		});
 	});
 }

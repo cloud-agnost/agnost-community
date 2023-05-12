@@ -112,7 +112,6 @@ router.post(
 				{ orgId: org._id, appId: app._id }
 			);
 		} catch (err) {
-			console.log("***err", err);
 			await appCtrl.rollback(session);
 			handleError(req, res, err);
 		}

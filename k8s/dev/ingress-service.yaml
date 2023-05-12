@@ -46,3 +46,13 @@ spec:
                       name: platform-sync-clusterip-service
                       port:
                          number: 4000
+      - host: 
+        http:
+           paths:
+              - path: /worker/(.*)
+                pathType: Prefix
+                backend:
+                   service:
+                      name: engine-worker-clusterip-service
+                      port:
+                         number: 4000

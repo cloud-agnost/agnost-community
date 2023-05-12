@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-   name: env-8ivryl87mcms-deployment
+   name: env-7eqm41n7nsul-deployment
    labels:
       app: engine-core
 spec:
@@ -39,23 +39,13 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: queueURL
-                 - name: CLUSTER_DB_URI
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: clusterDBURI
-                 - name: CLUSTER_DB_USER
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: clusterDBUser
-                 - name: CLUSTER_DB_PWD
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: clusterDBPwd
                  - name: MASTER_TOKEN
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets
                          key: masterToken
+                 - name: AGNOST_ENVIRONMENT_ID
+                   value: env-7eqm41n7nsul
+                 - name: AGNOST_ENGINE_ID
+                   value: env-7eqm41n7nsul
+                            

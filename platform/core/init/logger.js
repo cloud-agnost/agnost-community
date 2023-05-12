@@ -35,7 +35,6 @@ class MongoDBTransport extends Transport {
 
 const logFormat = printf((log) => {
 	let { level, message, label, timestamp } = log;
-	//console.log("****log", JSON.stringify(log, null, 3));
 	return `${timestamp} ${level}: ${message}`;
 });
 

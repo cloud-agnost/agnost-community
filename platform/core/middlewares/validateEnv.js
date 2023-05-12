@@ -99,51 +99,6 @@ export const validateEnvLog = async (req, res, next) => {
 	}
 };
 
-export const validateParam = async (req, res, next) => {
-	try {
-		const { paramOverrideId } = req.params;
-
-		// Get the param override object
-		let param = req.env.params.find(
-			(entry) => entry._id.toString() === paramOverrideId.toString()
-		);
-
-		if (!param) {
-			return res.status(404).json({
-				error: t("Not Found"),
-				details: t(
-					"No such app param override with the provided id '%s' exists.",
-					paramOverrideId
-				),
-				code: ERROR_CODES.notFound,
-			});
-		}
-
-		let appParam = req.version.params.find(
-			(entry) => entry._id.toString() === param.paramId.toString()
-		);
-
-		if (!appParam) {
-			return res.status(404).json({
-				error: t("Not Found"),
-				details: t(
-					"No such app param with the provided id '%s' exists.",
-					param.paramId
-				),
-				code: ERROR_CODES.notFound,
-			});
-		}
-
-		// Assign app param and param override data
-		req.appParam = appParam;
-		req.paramOverride = param;
-
-		next();
-	} catch (err) {
-		return handleError(req, res, err);
-	}
-};
-
 export const validateMapping = async (req, res, next) => {
 	try {
 		const { mappingId } = req.params;

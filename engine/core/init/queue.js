@@ -1,4 +1,5 @@
 import amqp from "amqplib/callback_api.js";
+import { manageAPIServerHandler } from "../consumers/manageAPIServer.js";
 
 var amqpConnection = null;
 var isConnecting = false;
@@ -6,7 +7,6 @@ var retryCount = 0;
 
 // There is no default connection retry mechanism in the RabbitMQ client library for this reason we implement it
 export const connectToQueue = () => {
-	let queueConfig = config.get("queue");
 	if (isConnecting) return;
 	isConnecting = true;
 	retryCount++;
@@ -62,6 +62,8 @@ export const connectToQueue = () => {
 				"queue.hostname"
 			)}:${config.get("queue.port")}`
 		);
+
+		manageAPIServerHandler(connection, process.env.AGNOST_ENVIRONMENT_ID);
 	});
 };
 
@@ -72,26 +74,4 @@ export const disconnectFromQueue = () => {
 
 export const getMQClient = () => {
 	return amqpConnection;
-};
-
-export const sendMessage = (queue, message) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
-
-			return;
-		}
-
-		channel.assertQueue(queue, {
-			durable: true,
-		});
-
-		channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)), {
-			persistent: true,
-		});
-
-		channel.close();
-	});
 };

@@ -390,3 +390,24 @@ export const manageResource = (payload) => {
 		channel.close();
 	});
 };
+
+export const manageAPIServers = (envId, payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		channel.assertExchange(envId, "fanout", {
+			durable: true,
+			autoDelete: true,
+		});
+
+		channel.publish(envId, "", Buffer.from(JSON.stringify(payload)));
+
+		channel.close();
+	});
+};

@@ -20,7 +20,6 @@ export const validateApp = async (req, res, next) => {
 			});
 		}
 
-		console.log("***here", app);
 		if (app.orgId.toString() !== req.org._id.toString()) {
 			return res.status(401).json({
 				error: t("Not Authorized"),

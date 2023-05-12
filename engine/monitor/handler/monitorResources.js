@@ -714,8 +714,6 @@ async function checkDefaultScheduler(connSettings) {
 			config.get("general.k8sNamespace")
 		);
 	} catch (err) {
-		console.log(err);
-
 		return null;
 	}
 
@@ -748,8 +746,6 @@ async function checkDefaultRealtime(connSettings) {
 			config.get("general.k8sNamespace")
 		);
 	} catch (err) {
-		console.log(err);
-
 		return null;
 	}
 

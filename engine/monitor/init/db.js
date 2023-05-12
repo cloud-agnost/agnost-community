@@ -17,7 +17,6 @@ export const connectToDatabase = async () => {
 		await client.connect();
 		logger.info(`Connected to the database ${process.env.CLUSTER_DB_URI}`);
 	} catch (err) {
-		console.log("***", err);
 		logger.error(`Cannot connect to the database`, { details: err });
 		process.exit(1);
 	}

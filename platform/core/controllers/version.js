@@ -53,6 +53,79 @@ class VersionController extends BaseController {
 			envIid
 		);
 
+		// Get the default cluster resources
+		let defaultResources = await resourceCtrl.getManyByQuery({
+			orgId: org._id,
+			$or: [
+				{ instance: "Default Queue" },
+				{ instance: "Default Scheduler" },
+				{ instance: "Default Realtime" },
+			],
+		});
+
+		const mappings = [
+			{
+				design: {
+					iid: envIid,
+					type: "engine",
+					name: t("Engine"),
+				},
+				resource: {
+					id: resource._id,
+					name: resource.name,
+					type: resource.type,
+					instance: resource.instance,
+				},
+			},
+		];
+
+		for (let i = 0; i < defaultResources.length; i++) {
+			let res = defaultResources[i];
+			if (res.instance === "Default Queue") {
+				mappings.push({
+					design: {
+						iid: envIid,
+						type: "queue",
+						name: t("Message broker"),
+					},
+					resource: {
+						id: res._id,
+						name: res.name,
+						type: res.type,
+						instance: res.instance,
+					},
+				});
+			} else if (res.instance === "Default Scheduler") {
+				mappings.push({
+					design: {
+						iid: envIid,
+						type: "scheduler",
+						name: t("Cronjob scheduler"),
+					},
+					resource: {
+						id: res._id,
+						name: res.name,
+						type: res.type,
+						instance: res.instance,
+					},
+				});
+			} else if (res.instance === "Default Realtime") {
+				mappings.push({
+					design: {
+						iid: envIid,
+						type: "realtime",
+						name: t("Realtime server"),
+					},
+					resource: {
+						id: res._id,
+						name: res.name,
+						type: res.type,
+						instance: res.instance,
+					},
+				});
+			}
+		}
+
 		// Create environment data, we do not update the cache value yet, we update it after the deployment
 		const env = await envCtrl.create(
 			{
@@ -63,21 +136,8 @@ class VersionController extends BaseController {
 				iid: envIid,
 				name: t("Default Environment"),
 				autoDeploy: true,
-				mappings: [
-					{
-						design: {
-							iid: envIid,
-							type: "engine",
-							name: t("Engine"),
-						},
-						resource: {
-							id: resource._id,
-							name: resource.name,
-							type: resource.type,
-							instance: resource.instance,
-						},
-					},
-				],
+				// We have the mapping for engine, default queue, default scheduler and realtime by default
+				mappings: mappings,
 				dbDeploymentStatus: "Deploying",
 				engineDeploymentStatus: "Deploying",
 				schedulerDeploymentStatus: "Deploying",

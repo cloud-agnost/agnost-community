@@ -4,7 +4,7 @@ import ERROR_CODES from "../config/errorCodes.js";
 export const handleUndefinedPaths = (req, res, next) => {
 	return res.status(404).json({
 		error: t("Not Found"),
-		details: t("The server can not find the requested resource."),
+		details: t("The API server can not find the requested resource."),
 		code: ERROR_CODES.resourceNotFound,
 	});
 };

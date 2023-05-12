@@ -1,12 +1,12 @@
 import winston from "winston";
+import axios from "axios";
 import Transport from "winston-transport";
-import { getDBClient } from "./db.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const { combine, timestamp, printf } = winston.format;
 
 // Custom transport to save error logs in MongoDB
-class MongoDBTransport extends Transport {
+class EngineErrorTransport extends Transport {
 	constructor(opts) {
 		super(opts);
 	}
@@ -14,22 +14,28 @@ class MongoDBTransport extends Transport {
 	log(log, callback) {
 		let entry = {
 			source: "engine-core",
+			orgId: log.details?.orgId,
+			appId: log.details?.appId,
+			versionId: log.details?.versionId,
+			envId: log.details?.envId,
+			type: "engine",
 			name: log.details?.name,
 			message: log.details?.message,
 			details: log.message,
 			stack: log.details?.stack,
-			payload: log.payload,
+			payload: log.details.payload,
 			code: ERROR_CODES.internalServerError,
 		};
 
-		try {
-			// Save the error to the errors collection, do not wait for the save operation to complete and write it fast
-			let dbClient = getDBClient();
-			dbClient
-				.db("agnost_enterprise")
-				.collection("platform_errors")
-				.insertOne(entry, { writeConcern: { w: 0 } });
-		} catch (err) {}
+		//Make api call to the platform to log the error message
+		axios
+			.post(config.get("general.platformBaseUrl") + "/v1/engine/error", entry, {
+				headers: {
+					Authorization: process.env.MASTER_TOKEN,
+					"Content-Type": "application/json",
+				},
+			})
+			.catch((error) => {});
 
 		callback();
 	}
@@ -50,7 +56,7 @@ const logger = winston.createLogger({
 					? true
 					: false, */
 		}),
-		new MongoDBTransport({ level: "error" }),
+		new EngineErrorTransport({ level: "error" }),
 	],
 });
 

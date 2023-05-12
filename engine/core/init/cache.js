@@ -22,6 +22,7 @@ export const connectToRedisCache = async () => {
 			client.get = util.promisify(client.get);
 			client.set = util.promisify(client.set);
 			client.del = util.promisify(client.del);
+			client.scan = util.promisify(client.scan);
 
 			logger.info(
 				`Connected to the cache server @${cacheConfig.hostname}:${cacheConfig.port}`
@@ -53,6 +54,7 @@ export const connectToRedisCache = async () => {
 			clientReadReplica.on("connect", async function () {
 				// Promisify the get method
 				clientReadReplica.get = util.promisify(clientReadReplica.get);
+				clientReadReplica.scan = util.promisify(clientReadReplica.scan);
 
 				logger.info(
 					`Connected to the read replica cache server @${readReplicaConfig.hostnameRead}:${readReplicaConfig.port}`
@@ -77,8 +79,12 @@ export const disconnectFromRedisCache = () => {
 	}
 };
 
+export const getRedisClient = () => {
+	return client;
+};
+
 /**
- * Stores a value in cache using the key, if ttl (time-to-live)
+ * Stores a value in cache using the key
  * @param  {string} key Stored value key
  * @param  {any} value Stored value, if object/array passed then stringifies the value
  * @param  {string} ttl time-to-live in seconds
@@ -118,6 +124,51 @@ export const deleteKey = async (key) => {
 	return await client.del(key.toString());
 };
 
-export const getRedisClient = () => {
-	return client;
+/**
+ * Creates a Redis command pipeline to execute multiple commands at once
+ */
+export const createPipeline = () => {
+	return client.multi();
+};
+
+/**
+ * Stores a value in cache using the key
+ * @param  {object} pipeline Redis command pipeline
+ * @param  {string} key Stored value key
+ * @param  {any} value Stored value, if object/array passed then stringifies the value
+ * @param  {string} ttl time-to-live in seconds
+ */
+export const addToCache = (pipeline, key, value, ttl) => {
+	if (value && typeof value === "object") value = JSON.stringify(value);
+
+	if (ttl) pipeline.set(key.toString(), value, "EX", ttl);
+	else pipeline.set(key.toString(), value);
+};
+
+/**
+ * Removes a cache key
+ * @param  {string} key Stored value key
+ */
+export const removeFromCache = (pipeline, key) => {
+	pipeline.del(key);
+};
+
+/**
+ * Returns the list of Redis cache keys matching the pattern
+ * @param  {string} pattern Key search/scan pattern
+ */
+export const scanKeys = async (pattern) => {
+	// Use read replica if available
+	let conn = clientReadReplica || client;
+
+	const found = [];
+	let cursor = "0";
+
+	do {
+		const reply = await conn.scan(cursor, "MATCH", pattern);
+		cursor = reply[0];
+		found.push(...reply[1]);
+	} while (cursor !== "0");
+
+	return found;
 };

@@ -1,9 +1,10 @@
 import express from "express";
+import { authAccessToken } from "../middlewares/authAccessToken.js";
 
 const router = express.Router({ mergeParams: true });
 
 /*
-@route      /agnost
+@route      /health
 @method     GET
 @desc       Checks liveliness of engine core
 @access     public
@@ -11,11 +12,11 @@ const router = express.Router({ mergeParams: true });
 router.get("/health", (req, res) => {
 	res
 		.status(200)
-		.send(new Date().toISOString() + " - Healthy engine core server");
+		.send(new Date().toISOString() + " - Healthy engine worker server");
 });
 
 /*
-@route      /agnost/ping
+@route      /ping
 @method     GET
 @desc       Checks liveliness of engine core
 @access     public

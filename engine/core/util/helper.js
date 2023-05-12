@@ -1,22 +1,15 @@
-/**
- * Get the IP number of requesting client
- * @param  {object} req HTTP request object
- */
-function getIP(req) {
-	try {
-		var ip;
-		if (req.headers["x-forwarded-for"]) {
-			ip = req.headers["x-forwarded-for"].split(",")[0];
-		} else if (req.connection && req.connection.remoteAddress) {
-			ip = req.connection.remoteAddress;
-		} else {
-			ip = req.ip;
-		}
+import { customAlphabet } from "nanoid";
 
-		return ip;
-	} catch (err) {
-		return req.ip ?? null;
-	}
+/**
+ * Generates a hihg probability unique slugs
+ * @param  {string} prefix The prefix prepended to the slug
+ * @param  {string} prefix The length of the slug excluding the prefix
+ */
+function generateSlug(length = 5) {
+	// Kubernetes resource names need to be alphanumeric and in lowercase letters
+	const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
+	const nanoid = customAlphabet(alphabet, length);
+	return nanoid();
 }
 
-export default { getIP };
+export default { generateSlug };

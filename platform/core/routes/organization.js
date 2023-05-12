@@ -176,7 +176,6 @@ router.post(
 				{ orgId }
 			);
 		} catch (error) {
-			console.log("***here", error);
 			await orgCtrl.rollback(session);
 			handleError(req, res, error);
 		}
