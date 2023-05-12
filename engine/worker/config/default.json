@@ -2,7 +2,8 @@
     "server": {
         "host": "localhost",
         "port": 4000,
-        "timeout": 3600000
+        "timeout": 3600000,
+        "maxBodySize": "50mb"
      },
      "rateLimiters": [{      
         "rateLimitWindowSec": 30,

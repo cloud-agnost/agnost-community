@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import { body, query } from "express-validator";
 
 /**
- * An app is your workspace that packages all required design and configuration elements to run your backend app services.
  * All application design elements are specified in versions, and all execution configurations are specified in environments.
  */
 export const VersionModel = mongoose.model(
@@ -121,7 +120,7 @@ export const VersionModel = mongoose.model(
 				},
 			],
 			defaultEndpointLimits: {
-				type: [mongoose.Schema.Types.ObjectId],
+				type: [String], // Array of rate limit iids
 				default: [],
 			},
 			apiKeys: [

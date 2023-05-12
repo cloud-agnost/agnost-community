@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 import { appRoles } from "../config/constants.js";
 
 /**
@@ -21,6 +21,11 @@ export const AppModel = mongoose.model(
 				required: true,
 				index: true,
 				immutable: true,
+			},
+			ownerUserId: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "user",
+				index: true,
 			},
 			name: {
 				type: String,
@@ -292,6 +297,25 @@ export const applyRules = (type) => {
 						return true;
 					}),
 			];
+		case "remove-members":
+			return [
+				body("userIds")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.isArray()
+					.withMessage(t("User identifiers need to be an array of strings")),
+				body("userIds.*")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom(async (value, { req }) => {
+						if (!helper.isValidId(value))
+							throw new AgnostError(t("Not a valid user identifier"));
+
+						return true;
+					}),
+			];
 		case "transfer":
 			return [
 				param("userId")
@@ -333,6 +357,21 @@ export const applyRules = (type) => {
 
 						return true;
 					}),
+			];
+		case "upload-picture":
+			return [
+				query("width")
+					.trim()
+					.optional({ nullable: true })
+					.isInt({ min: 1 })
+					.withMessage(t("Width needs to be a positive integer"))
+					.toInt(),
+				query("height")
+					.trim()
+					.optional({ nullable: true })
+					.isInt({ min: 1 })
+					.withMessage(t("Height needs to be a positive integer"))
+					.toInt(),
 			];
 		default:
 			return [];

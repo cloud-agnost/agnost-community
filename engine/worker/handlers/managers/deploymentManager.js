@@ -157,12 +157,12 @@ export class DeploymentManager {
 	 */
 	async sendEnvironmentLogs(status = "OK") {
 		// If there is no callback just return
-		if (!this.msgObj.callback) return;
+		if (!this.msgObj.dbCallback) return;
 
 		try {
 			// Update the environment log object
 			await axios.post(
-				this.msgObj.callback,
+				this.msgObj.dbCallback,
 				{
 					status,
 					logs: this.logs,
@@ -745,6 +745,7 @@ export class DeploymentManager {
 					db.name
 				)
 			);
+
 			// Load the previous database configuration if there is any
 			let prevConfig = await this.getPrevDBDefinition(db);
 			let dbManager = this.createDBManager(db, prevConfig);
@@ -761,6 +762,23 @@ export class DeploymentManager {
 					db.name
 				)
 			);
+		}
+
+		// Iterate over the previous db configurations and drop deleted databases
+		let prevConfig = await this.getPrevDBDefinitions();
+		for (let i = 0; i < prevConfig.length; i++) {
+			const prevdbConfig = prevConfig[i];
+			// Check if this database exists in the new configuration or not
+			const newdbConfig = databases.find(
+				(entry) => entry.iid === prevdbConfig.iid
+			);
+			if (newdbConfig) continue;
+			else {
+				let dbManager = this.createDBManager(prevdb, prevdb);
+				await dbManager.beginSession();
+				await dbManager.dropDatabase();
+				await dbManager.endSession();
+			}
 		}
 	}
 
@@ -855,9 +873,12 @@ export class DeploymentManager {
 	async saveDeploymentConfig() {
 		const engineDb = this.getEnvDB();
 		// Delete old configuration
+		await engineDb.collection("environment").deleteMany({});
 		await engineDb.collection("databases").deleteMany({});
 
-		// We should have records to insert into database if not mongodb it raises an error
+		// Save environment and version information
+		await engineDb.collection("environment").insertOne(this.getEnvObj());
+		// We should have records to insert into database if not mongodb raises an error
 		if (this.getDatabases().length > 0)
 			await engineDb.collection("databases").insertMany(this.getDatabases());
 
@@ -955,53 +976,6 @@ export class DeploymentManager {
 	}
 
 	/**
-	 * Undeploys the application version from the engine cluster
-	 */
-	async undeployVersion() {
-		try {
-			this.addLog(t("Started undeployment"));
-			// Set current status of environment in engine cluster
-			await this.setStatus("Undeploying");
-
-			// Clear the initially cached environment data
-			await this.clearCachedData(`${this.getEnvId()}.*`);
-
-			// Drop application specific data (e.g., cache, database, storage)
-			if (this.isDataDropped()) {
-				await this.clearCachedData(`sessions.${this.getEnvId()}.*`);
-				await this.clearCachedData(`cache.${this.getEnvId()}.*`);
-				await this.clearCachedData(`tokens.${this.getEnvId()}.*`);
-				await this.dropDatabases();
-			}
-
-			// Delete environment configuration database
-			await this.dropEnvDB();
-			// Execute all redis commands altogether
-			await this.commitPipeline();
-
-			// Update status of environment in engine cluster
-			this.addLog(t("Completed undeployment successfully"));
-			// Send the deployment telemetry information to the platform
-			await this.sendEnvironmentLogs("OK");
-			// Update status of environment in engine cluster
-			await this.setStatus("OK");
-			return { success: true };
-		} catch (error) {
-			// Update status of environment in engine cluster
-			await this.setStatus("Error");
-			// Send the deployment telemetry information to the platform
-			this.addLog(
-				[t("Undeployment failed"), error.name, error.message, error.stack].join(
-					"\n"
-				),
-				"Error"
-			);
-			await this.sendEnvironmentLogs("Error");
-			return { success: false, error };
-		}
-	}
-
-	/**
 	 * Deploys the application version to the engine cluster
 	 */
 	async deleteEnvironment() {
@@ -1038,6 +1012,47 @@ export class DeploymentManager {
 			this.addLog(
 				[
 					t("Environment deletion failed"),
+					error.name,
+					error.message,
+					error.stack,
+				].join("\n"),
+				"Error"
+			);
+			await this.sendEnvironmentLogs("Error");
+			return { success: false, error };
+		}
+	}
+
+	/**
+	 * Updates the environemnt and version metadata
+	 */
+	async updateEnvironmentMetadata() {
+		try {
+			this.addLog(t("Started metadata update"));
+			// Set current status of environment in engine cluster
+			await this.setStatus("Deploying");
+			// First add environment object data to cache
+			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
+
+			// Save updated deployment to database
+			await this.saveDeploymentConfig();
+			// Execute all redis commands altogether
+			await this.commitPipeline();
+
+			// Update status of environment in engine cluster
+			this.addLog(t("Completed update successfully"));
+			// Send the deployment telemetry information to the platform
+			await this.sendEnvironmentLogs("OK");
+			// Update status of environment in engine cluster
+			await this.setStatus("OK");
+			return { success: true };
+		} catch (error) {
+			// Update status of environment in engine cluster
+			await this.setStatus("Error");
+			// Send the deployment telemetry information to the platform
+			this.addLog(
+				[
+					t("Metadata update failed"),
 					error.name,
 					error.message,
 					error.stack,

@@ -349,9 +349,7 @@ router.put(
 
 			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
 			// unless the previous one is completed
-			if (
-				["Creating", "Updating", "Deleting"].includes(resource.telemetry.status)
-			) {
+			if (["Creating", "Updating", "Deleting"].includes(resource.status)) {
 				await resourceCtrl.endSession(session);
 
 				return res.status(422).json({
@@ -360,7 +358,7 @@ router.put(
 						"The %s resource '%s' named '%s' is in '%s' status. You need to wait for the completion of the existing operation.",
 						resource.instance,
 						resource.name,
-						resource.telemetry.status
+						resource.status
 					),
 					code: ERROR_CODES.notAllowed,
 				});
@@ -370,10 +368,7 @@ router.put(
 				resource._id,
 				{
 					config: req.body,
-					telemetry: {
-						status: "Updating",
-						updatedAt: Date.now(),
-					},
+					status: "Updating",
 					updatedBy: user._id,
 				},
 				{},
@@ -447,9 +442,7 @@ router.put(
 
 			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
 			// unless the previous one is completed
-			if (
-				["Creating", "Updating", "Deleting"].includes(resource.telemetry.status)
-			) {
+			if (["Creating", "Updating", "Deleting"].includes(resource.status)) {
 				await resourceCtrl.endSession(session);
 
 				return res.status(422).json({
@@ -458,7 +451,7 @@ router.put(
 						"The %s resource named '%s' is in '%s' status. You need to wait for the completion of the existing operation.",
 						resource.instance,
 						resource.name,
-						resource.telemetry.status
+						resource.status
 					),
 					code: ERROR_CODES.notAllowed,
 				});

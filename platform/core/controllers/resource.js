@@ -19,6 +19,7 @@ class ResourceController extends BaseController {
 			storage: await this.createClusterStorage(session, user, org),
 			queue: await this.bindDefaultQueue(session, user, org),
 			scheduler: await this.bindDefaultScheduler(session, user, org),
+			realtime: await this.bindDefaultRealtime(session, user, org),
 		};
 	}
 
@@ -154,6 +155,49 @@ class ResourceController extends BaseController {
 	}
 
 	/**
+	 * Adds the default realtime server
+	 * @param  {Object} session The database session object
+	 * @param  {Object} user The user whose creating the default cron job scheduler resource
+	 * @param  {Object} org The organization object where the default cron job scheduler will be added
+	 */
+	async bindDefaultRealtime(session, user, org) {
+		const resourceId = helper.generateId();
+		const resource = await this.create(
+			{
+				_id: resourceId,
+				orgId: org._id,
+				iid: helper.generateSlug("sch"),
+				name: t("Default Realtime Server"),
+				type: "realtime",
+				instance: "Default Realtime",
+				managed: false, // Default realtime is a cluster resource and only cluster owner can update its configuration
+				allowedRoles: ["Admin", "Developer", "Viewer"],
+				config: {},
+				access: helper.encyrptSensitiveData({
+					name: config.get("general.defaultRealtimeDeploymentName"),
+				}),
+				status: "Binding",
+				deletable: false,
+				createdBy: user._id,
+			},
+			{ session, cacheKey: resourceId }
+		);
+
+		const log = await resLogCtrl.create(
+			{
+				orgId: org._id,
+				resourceId: resourceId,
+				action: "bind",
+				status: "Binding",
+				createdBy: user._id,
+			},
+			{ session }
+		);
+
+		return { resource, log };
+	}
+
+	/**
 	 * Adds the engine deployment object as a resource to the organization app
 	 * @param  {Object} session The database session object
 	 * @param  {Object} user The user whose creating the engine deployment
@@ -186,6 +230,7 @@ class ResourceController extends BaseController {
 					envId: envIid,
 				}),
 				status: "Creating",
+				deletable: false, // Engine deployment can be deleted only if the version is deleted
 				createdBy: user._id,
 			},
 			{ session, cacheKey: resourceId }
@@ -207,29 +252,51 @@ class ResourceController extends BaseController {
 
 	/**
 	 * Initiates the actual creating/binding of cluster resources
-	 * @param  {Array} resources The resource objects that will be created/bound/updated/deleted and their associated logs
+	 * @param  {Array} resources The resource objects that will be created/bound/updated and their associated logs
 	 */
 	async manageClusterResources(resources) {
+		if (!resources && resources.length === 0) return;
+
 		resources = resources.map((entry) => {
-			// If there is no log entry, then it is a delete operation
-			if (entry.log?.action) {
-				return {
-					...entry.resource,
-					access: helper.decryptSensitiveData(entry.resource.access),
-					action: entry.log.action,
-					callback: `${config.get("general.platformBaseUrl")}/v1/org/${
-						entry.resource.orgId
-					}/resource/${entry.resource._id}/log/${entry.log._id}`,
-				};
-			} else {
-				return {
-					...entry.resource,
-					access: helper.decryptSensitiveData(entry.resource.access),
-					action: "delete",
-				};
-			}
+			return {
+				...entry.resource,
+				access: helper.decryptSensitiveData(entry.resource.access),
+				action: entry.log.action,
+				callback: `${config.get("general.platformBaseUrl")}/v1/org/${
+					entry.resource.orgId
+				}/resource/${entry.resource._id}/log/${entry.log._id}`,
+			};
 		});
-		// Make api call to engine worker to create resources
+
+		// Make api call to engine worker to manage resources
+		await axios.post(
+			config.get("general.workerUrl") + "/v1/resource/manage",
+			resources,
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
+	}
+
+	/**
+	 * Initiates the actual creating/binding of cluster resources
+	 * @param  {Array} resources The resource objects that will be deleted
+	 */
+	async deleteClusterResources(resources) {
+		if (!resources && resources.length === 0) return;
+
+		resources = resources.map((entry) => {
+			return {
+				...entry,
+				access: helper.decryptSensitiveData(entry.access),
+				action: "delete",
+			};
+		});
+
+		// Make api call to engine worker to manage resources
 		await axios.post(
 			config.get("general.workerUrl") + "/v1/resource/manage",
 			resources,

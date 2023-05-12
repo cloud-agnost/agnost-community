@@ -1,9 +1,9 @@
-import axios from "axios";
-import { getKey, setKey } from "../init/cache.js";
-import { sendMessage } from "../init/sync.js";
-import { DeploymentManager } from "../handlers/managers/deploymentManager.js";
+import { TaskManager } from "../handlers/taskManager.js";
 
-export const deleteEnvironmentHandler = (connection, queue) => {
+/**
+ * Deploys the list of tasks in message payload. The message payload includes environment, version and tasks (array of taks ojbects) information.
+ */
+export const deployTasksHandler = (connection, queue) => {
 	connection.createChannel(function (error, channel) {
 		if (error) {
 			logger.error("Cannot create channel to message queue", {
@@ -28,51 +28,23 @@ export const deleteEnvironmentHandler = (connection, queue) => {
 			queue,
 			async function (msg) {
 				let msgObj = JSON.parse(msg.content.toString());
-
-				// Check the environment status if it is in a deployment state
-				let envStatus = await getKey(`${msgObj.env.iid}.status`);
-				console.log("status", envStatus);
-				if (
-					[
-						"Deploying",
-						"Redeploying",
-						"Undeploying",
-						"Auto-deploying",
-					].includes(envStatus)
-				) {
-					// Check timestamp of the message
-					const now = Date.now();
-					const date = new Date(Date.parse(msgObj.timestamp));
-					const millisecondsFromEpoch = date.getTime();
-
-					// If processing has not timed out do not acknowledge message and return
-					if (
-						now - millisecondsFromEpoch <
-						config.get("general.maxMessageWaitMinues") * 60 * 1000
-					) {
-						// Message has not timed out yet, it might be still being processed
-						channel.nack(msg);
-						return;
-					}
-				}
-
 				logger.info(
 					t(
-						"Started deleting app '%s' version '%s' environment '%s'",
+						"Started scheduling the cron jobs of app '%s' version '%s' environment '%s'",
 						msgObj.app.name,
 						msgObj.env.version.name,
 						msgObj.env.name
 					)
 				);
 				// Create the deployment manager and deploy the version
-				let manager = new DeploymentManager(msgObj);
-				let result = await manager.deleteEnvironment();
-				console.log("***result", result);
+				let manager = new TaskManager(msgObj);
+				let result = await manager.deployTasks();
+
 				if (result.success) {
 					channel.ack(msg);
 					logger.info(
 						t(
-							"Completed deleting app '%s' version '%s' environment '%s' successfully",
+							"Completed scheduling the cron jobs of app '%s' version '%s' environment '%s'",
 							msgObj.app.name,
 							msgObj.env.version.name,
 							msgObj.env.name
@@ -83,7 +55,7 @@ export const deleteEnvironmentHandler = (connection, queue) => {
 					channel.ack(msg);
 					logger.error(
 						t(
-							"Cannot delete app '%s' version '%s' environment '%s'",
+							"Cannot complete scheduling the cron jobs of app '%s' version '%s' environment '%s'",
 							msgObj.app.name,
 							msgObj.env.version.name,
 							msgObj.env.name

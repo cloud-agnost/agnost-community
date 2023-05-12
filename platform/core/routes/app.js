@@ -1,10 +1,8 @@
 import express from "express";
+import sharp from "sharp";
 import appCtrl from "../controllers/app.js";
 import versionCtrl from "../controllers/version.js";
-import dbCtrl from "../controllers/database.js";
-import modelCtrl from "../controllers/model.js";
 import envCtrl from "../controllers/environment.js";
-import envLogCtrl from "../controllers/environmentLog.js";
 import deployCtrl from "../controllers/deployment.js";
 import auditCtrl from "../controllers/audit.js";
 import userCtrl from "../controllers/user.js";
@@ -22,6 +20,8 @@ import { applyRules } from "../schemas/app.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
 import { setKey } from "../init/cache.js";
+import { handleFile } from "../middlewares/handleFile.js";
+import { storage } from "../init/storage.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
@@ -63,17 +63,40 @@ router.post(
 			const { name } = req.body;
 
 			// Create the new app and associated master version, environment and engine API server
-			const { app, version, resource, resLog, env, envLog } =
-				await appCtrl.createApp(session, user, org, name);
+			const {
+				app,
+				version,
+				resource,
+				resLog,
+				env,
+				dbLog,
+				engineLog,
+				schedulerLog,
+			} = await appCtrl.createApp(session, user, org, name);
 
 			await appCtrl.commit(session);
-			res.json({ app, version, resource, resLog, env, envLog });
+			res.json({
+				app,
+				version,
+				resource,
+				resLog,
+				env,
+				dbLog,
+				engineLog,
+				schedulerLog,
+			});
 
 			// Create the engine deployment (API server), associated HPA, service and ingress rule
 			await resourceCtrl.manageClusterResources([{ resource, log: resLog }]);
 
 			// Deploy application version to the environment
-			await deployCtrl.deploy(envLog, app, version, env, user);
+			await deployCtrl.deploy(
+				{ dbLog, engineLog, schedulerLog },
+				app,
+				version,
+				env,
+				user
+			);
 
 			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
 			await setKey(env._id, env, helper.constants["1month"]);
@@ -111,11 +134,17 @@ router.get(
 	async (req, res) => {
 		try {
 			const { org, user } = req;
+			let apps = [];
 
-			let apps = await appCtrl.getManyByQuery({
-				orgId: org._id,
-				"team.userId": user._id,
-			});
+			// Cluster owner is by default Admin member of all apps
+			if (user.isClusterOwner) {
+				apps = await appCtrl.getManyByQuery({ orgId: org._id });
+			} else {
+				apps = await appCtrl.getManyByQuery({
+					orgId: org._id,
+					"team.userId": user._id,
+				});
+			}
 
 			res.json(apps);
 		} catch (err) {
@@ -187,12 +216,180 @@ router.put(
 				user,
 				"org.app",
 				"update",
-				t("Update the name of app from '%s' to '%s' ", app.name, name),
+				t("Updated the name of app from '%s' to '%s' ", app.name, name),
 				updatedApp,
 				{ orgId: org._id, appId: app._id }
 			);
 		} catch (err) {
 			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/picture?width=128&height=128
+@method     PUT
+@desc       Updates the profile image of the app. A picture with the name 'picture' needs to be uploaded in body of the request.
+@access     private
+*/
+router.put(
+	"/:appId/picture",
+	handleFile.single("picture"),
+	authSession,
+	validateOrg,
+	validateApp,
+	authorizeAppAction("app.update"),
+	applyRules("upload-picture"),
+	validate,
+	async (req, res) => {
+		try {
+			let buffer = req.file?.buffer;
+			let { width, height } = req.query;
+			if (!width) width = config.get("general.profileImgSizePx");
+			if (!height) height = config.get("general.profileImgSizePx");
+
+			if (!req.file) {
+				return res.status(422).json({
+					error: t("Missing Upload File"),
+					details: t("Missing file, no file uploaded."),
+					code: ERROR_CODES.fileUploadError,
+				});
+			}
+
+			// Resize image if width and height specifiec
+			buffer = await sharp(req.file.buffer).resize(width, height).toBuffer();
+
+			// A bucket is a container for objects (files)
+			const bucket = storage.bucket(config.get("storage.appImagesBucket"));
+			// Create a new blob in the bucket and upload the file data
+			let blob = bucket.file(
+				`${helper.generateSlug("img", 6)}-${req.file.originalname}`
+			);
+
+			// Delete the porfile picture if exists from storages
+			if (req.app.pictureUrl) {
+				try {
+					// Get the file name
+					let filename = req.app.pictureUrl.substring(
+						req.user.pictureUrl.lastIndexOf("/") + 1
+					);
+					let oldFile = bucket.file(filename);
+					let exists = await oldFile.exists();
+					if (exists[0]) await oldFile.delete();
+				} catch (err) {}
+			}
+
+			// Make sure to set the contentType metadata for the browser to be able to render the image instead of downloading the file (default behavior)
+			const blobStream = blob
+				.createWriteStream({
+					metadata: {
+						contentType: req.file.mimetype,
+						metadata: {
+							uploadDtm: Date.now(),
+						},
+					},
+				})
+				.on("error", (err) => {
+					return res.status(400).json({
+						error: t("Upload Failed"),
+						details: t(
+							"An error occured while uploading the app image. %s",
+							err.message
+						),
+						code: ERROR_CODES.fileUploadError,
+					});
+				})
+				.on("finish", () => {
+					// The public URL can be used to directly access the file via HTTP.
+					const pictureUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+
+					// Make the image public to the web
+					blob.makePublic().then(async () => {
+						// Update user with the new profile image url
+						let appObj = await appCtrl.updateOneById(
+							req.app._id,
+							{
+								pictureUrl,
+								updatedBy: req.user._id,
+							},
+							{},
+							{ cacheKey: req.app._id }
+						);
+
+						res.json(appObj);
+
+						// Log action
+						auditCtrl.logAndNotify(
+							req.app._id,
+							req.user,
+							"org.app",
+							"update",
+							t("Updated application picture"),
+							appObj,
+							{ orgId: req.org._id, appId: req.app._id }
+						);
+					});
+				});
+
+			blobStream.end(buffer);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/picture
+@method     DELETE
+@desc       Removes the profile picture of the organization.
+@access     private
+*/
+router.delete(
+	"/:appId/picture",
+	authSession,
+	validateOrg,
+	validateApp,
+	authorizeAppAction("app.update"),
+	validate,
+	async (req, res) => {
+		try {
+			// A bucket is a container for objects (files)
+			const bucket = storage.bucket(config.get("storage.appImagesBucket"));
+			// Delete the porfile picture if exists from storages
+			if (req.app.pictureUrl) {
+				try {
+					// Get the file name
+					let filename = req.app.pictureUrl.substring(
+						req.user.pictureUrl.lastIndexOf("/") + 1
+					);
+					let oldFile = bucket.file(filename);
+					let exists = await oldFile.exists();
+					if (exists[0]) await oldFile.delete();
+				} catch (err) {}
+			}
+
+			// Update user with the new profile image url
+			let appObj = await appCtrl.updateOneById(
+				req.app._id,
+				{ updatedBy: req.user._id },
+				{ pictureUrl: 1 },
+				{ cacheKey: req.app._id }
+			);
+
+			res.json(appObj);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				req.app._id,
+				req.user,
+				"org.app",
+				"update",
+				t("Removed application picture"),
+				appObj,
+				{ orgId: req.org._id, appId: req.app._id }
+			);
+		} catch (error) {
+			handleError(req, res, error);
 		}
 	}
 );
@@ -223,7 +420,7 @@ router.get(
 /*
 @route      /v1/org/:orgId/app/:appId
 @method     DELETE
-@desc       Delete specific application of a user whom is a member of. Only app creators can delete the app.
+@desc       Delete specific application of a user whom is a member of. Only app creators or cluster owner can delete the app.
 @access     private
 */
 router.delete(
@@ -238,54 +435,60 @@ router.delete(
 
 		try {
 			const { org, app, user } = req;
-			if (app.createdBy.toString() !== req.user._id.toString()) {
+			if (
+				app.ownerUserId.toString() !== req.user._id.toString() &&
+				!req.user.isClusterOwner
+			) {
 				return res.status(401).json({
 					error: t("Not Authorized"),
 					details: t(
-						"You are not authorized to delete app '%s'. Only the creator of the app can delete it.",
+						"You are not authorized to delete app '%s'. Only the creator of the app or cluster owner can delete it.",
 						app.name
 					),
 					code: ERROR_CODES.unauthorized,
 				});
 			}
 
-			// Delete the databases, we do no clear cache since it will eventually expire
-			await dbCtrl.deleteManyByQuery({ appId: app._id }, { session });
-			// Delete the models, we do no clear cache since it will eventually expire
-			await modelCtrl.deleteManyByQuery({ appId: app._id }, { session });
-
-			// Get the list of environments of the version that have active deloyments, active deployment means that the environment has a deploymtnDtm
-			let environments = await envCtrl.getManyByQuery({
+			// First get all app resources, environments and versions
+			const resources = await resourceCtrl.getManyByQuery({
+				orgId: org._id,
 				appId: app._id,
-				deploymentDtm: { $exists: true },
+			});
+			const envs = await envCtrl.getManyByQuery({
+				orgId: org._id,
+				appId: app._id,
+			});
+			const versions = await versionCtrl.getManyByQuery({
+				orgId: org._id,
+				appId: app._id,
 			});
 
-			// If there are active environments then delete those environments at engine cluster
-			if (environments.length > 0) {
-				for (let i = 0; i < environments.length; i++) {
-					const env = environments[i];
-					await deployCtrl.delete(null, app, null, env, user);
-				}
+			// Delete all app related data
+			await appCtrl.deleteApp(session, org, app);
+			// Commit transaction
+			await appCtrl.commit(session);
+
+			// Iterate through all environments and delete them
+			for (let i = 0; i < envs.length; i++) {
+				const env = envs[i];
+				deployCtrl.delete(
+					app,
+					versions.find(
+						(entry) => env.versionId.toString() === entry._id.toString()
+					),
+					env,
+					user
+				);
 			}
 
-			// Delete the environments, we do not clear cache since it will eventually expire
-			await envCtrl.deleteManyByQuery({ appId: app._id }, { session });
-			// Delete the environment logs
-			await envLogCtrl.deleteManyByQuery({ appId: app._id }, { session });
-
-			// Delete the app version
-			await versionCtrl.deleteManyByQuery(
-				{ appId: app._id },
-				{
-					session,
-				}
+			// Iterate through all resources and delete them if they are managed
+			const managedResources = resources.filter(
+				(entry) => entry.managed === true
 			);
 
-			// Delete the application
-			await appCtrl.deleteOneById(app._id, { cacheKey: app._id });
+			// Delete managed organization resources
+			resourceCtrl.deleteClusterResources(managedResources);
 
-			// Commit the database transaction
-			await appCtrl.commit(session);
 			res.json();
 
 			// Log action
@@ -330,7 +533,7 @@ router.post(
 			// Update app name
 			let updatedApp = await appCtrl.updateOneById(
 				app._id,
-				{ createdBy: req.params.userId, updatedBy: user._id },
+				{ ownerUserId: req.params.userId, updatedBy: user._id },
 				{},
 				{ cacheKey: app._id }
 			);
@@ -343,7 +546,11 @@ router.post(
 				user,
 				"org.app",
 				"transfer",
-				t("Transferred app ownership to '%s'", transferredUser.contactEmail),
+				t(
+					"Transferred app ownership to '%s' (%s)",
+					transferredUser.name,
+					transferredUser.contactEmail
+				),
 				updatedApp,
 				{ orgId: org._id, appId: app._id }
 			);

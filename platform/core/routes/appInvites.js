@@ -2,14 +2,12 @@ import express from "express";
 import userCtrl from "../controllers/user.js";
 import auditCtrl from "../controllers/audit.js";
 import appInvitationCtrl from "../controllers/appInvitation.js";
-import orgMemberCtrl from "../controllers/organizationMember.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateApp } from "../middlewares/validateApp.js";
 import { authorizeAppAction } from "../middlewares/authorizeAppAction.js";
 import { applyRules as invitationApplyRules } from "../schemas/appInvitation.js";
-import { applyRules as memberApplyRules } from "../schemas/organizationMember.js";
 import { validate } from "../middlewares/validate.js";
 import { sendMessage } from "../init/queue.js";
 import { sendMessage as sendNotification } from "../init/sync.js";
@@ -45,7 +43,7 @@ router.post(
 					email: entry.email,
 					token: helper.generateSlug("tkn", 36),
 					role: entry.role,
-					orgRole: "Developer",
+					orgRole: "Member",
 				});
 			});
 
@@ -158,7 +156,7 @@ router.put(
 				});
 			}
 
-			//All good, update the invitation
+			// All good, update the invitation
 			let updatedInvite = await appInvitationCtrl.updateOneByQuery(
 				{ token },
 				{ role }
@@ -314,7 +312,7 @@ router.post(
 /*
 @route      /v1/org/:orgId/app/:appId/invite?token=tkn_...
 @method     DELETE
-@desc       Deletes the organization invitation to the user
+@desc       Deletes the app invitation to the user
 @access     private
 */
 router.delete(
@@ -352,6 +350,46 @@ router.delete(
 				"delete",
 				t("Deleted app invitation to '%s'", invite.email),
 				invite,
+				{ orgId: org._id, appId: app._id }
+			);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/invite/multi
+@method     DELETE
+@desc       Deletes multiple app invitations
+@access     private
+*/
+router.delete(
+	"/multi",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	authorizeAppAction("app.invite.delete"),
+	invitationApplyRules("delete-invite-multi"),
+	validate,
+	async (req, res) => {
+		try {
+			const { tokens } = req.body;
+			const { user, org, app } = req;
+
+			// Delete the app invitations
+			await appInvitationCtrl.deleteManyByQuery({ token: { $in: tokens } });
+
+			res.json();
+
+			// Log action
+			auditCtrl.log(
+				user,
+				"org.app.invite",
+				"delete",
+				t("Deleted multiple app invitations"),
+				{ tokens },
 				{ orgId: org._id, appId: app._id }
 			);
 		} catch (error) {
@@ -420,7 +458,7 @@ router.get(
 /*
 @route      /v1/org/:orgId/app/:appId/invite/list-eligible?page=0&size=10&email=&sortBy=email&sortDir=asc
 @method     GET
-@desc       Get eligible organization members to invite to app
+@desc       Get eligible cluster members to invite to the app
 @access     private
 */
 router.get(
@@ -430,83 +468,40 @@ router.get(
 	validateOrg,
 	validateApp,
 	authorizeAppAction("app.team.view"),
-	memberApplyRules("list-eligible"),
+	invitationApplyRules("list-eligible"),
 	validate,
 	async (req, res) => {
 		try {
-			const { org, app } = req;
-			const { page, size, email, sortBy, sortDir } = req.query;
+			const { user, app } = req;
+			const { page, size, search, sortBy, sortDir } = req.query;
 
-			// We just need to get the organization members that are not already a team member of the app
+			// We just need to get the cluster members that are not already a team member of the app
 			let appTeam = app.team.map((entry) => helper.objectId(entry.userId));
+			// The current user is also not eligible for invitation
+			appTeam.push(helper.objectId(user._id));
 
-			let pipeline = [
-				{
-					$match: {
-						orgId: helper.objectId(org._id),
-						userId: { $nin: appTeam },
-					},
-				},
-				{
-					$lookup: {
-						from: "users",
-						localField: "userId",
-						foreignField: "_id",
-						as: "user",
-					},
-				},
-			];
-
-			// Email search
-			if (email && email !== "null") {
-				pipeline.push({
-					$match: {
-						"user.loginProfiles.email": { $regex: email, $options: "i" },
-					},
-				});
+			let query = { _id: { $nin: appTeam }, status: "Active" };
+			if (search && search !== "null") {
+				query.$or = [
+					{ name: { $regex: search, $options: "i" } },
+					{ contactEmail: { $regex: search, $options: "i" } },
+					{ "loginProfiles.email": { $regex: search, $options: "i" } },
+				];
 			}
 
-			// Sort rules (currently support role and createdAt fields)
+			let sort = {};
 			if (sortBy && sortDir) {
-				pipeline.push({
-					$sort: {
-						[sortBy]: sortDir.toString().toLowerCase() === "desc" ? -1 : 1,
-					},
-				});
-			} else
-				pipeline.push({
-					$sort: {
-						createdAt: -1,
-					},
-				});
+				sort[sortBy] = sortDir;
+			} else sort = { name: "asc" };
 
-			// Pagination
-			pipeline.push({
-				$skip: size * page,
-			});
-			pipeline.push({
-				$limit: size,
+			let users = await userCtrl.getManyByQuery(query, {
+				sort,
+				skip: size * page,
+				limit: size,
+				projection: "-loginProfiles.password -notifications",
 			});
 
-			let result = await orgMemberCtrl.aggregate(pipeline);
-			res.json(
-				result.map((entry) => {
-					return {
-						_id: entry._id,
-						orgId: entry.orgId,
-						role: entry.role,
-						joinDate: entry.joinDate,
-						member: {
-							_id: entry.user[0]._id,
-							iid: entry.user[0].iid,
-							color: entry.user[0].color,
-							contactEmail: entry.user[0].contactEmail,
-							name: entry.user[0].name,
-							pictureUrl: entry.user[0].pictureUrl,
-						},
-					};
-				})
-			);
+			res.json(users);
 		} catch (error) {
 			handleError(req, res, error);
 		}

@@ -92,10 +92,9 @@ const taskProcessor = async (job) => {
 		};
 
 		if (env && task) {
-			// user the environment database
+			// Use the environment database
 			let db = dbClient.db(envId);
 			let taskInfo = {
-				_id: trackingId,
 				trackingId: trackingId,
 				taskId: helper.generateId(taskId),
 				taskName: task.name,
@@ -133,3 +132,41 @@ const taskProcessor = async (job) => {
 		);
 	}
 };
+
+export async function deployTask(env, task) {
+	if (!agendaInstance) return;
+
+	// Cancel any existing task with the same key
+	await agendaInstance.cancel({ name: `${env.iid}.${task.iid}` });
+
+	// Define the task and its handler function
+	agendaInstance.define(`${env.iid}.${task.iid}`, taskProcessor);
+	// Schedule the task
+	agendaInstance.every(
+		task.schedule.cronExpression,
+		`${env.iid}.${task.iid}`,
+		{
+			envId: env.iid,
+			taskId: task.iid,
+		},
+		{
+			// Setting this true will skip the immediate run. The first run will occur only in configured interval.
+			skipImmediate: true,
+			timezone: task.schedule.timezone,
+		}
+	);
+}
+
+export async function undeployTask(envId, taskId) {
+	if (!agendaInstance) return;
+
+	// Cancel any existing task with the same key
+	await agendaInstance.cancel({ name: `${envId}.${taskId}` });
+}
+
+export async function undeployTasks(envId) {
+	if (!agendaInstance) return;
+
+	// Cancel any existing task of the environment
+	await agendaInstance.cancel({ name: { $regex: envId } });
+}

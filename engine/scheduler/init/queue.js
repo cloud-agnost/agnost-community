@@ -1,4 +1,7 @@
 import amqp from "amqplib/callback_api.js";
+import { deleteTasksHandler } from "../consumers/deleteTasks.js";
+import { deployTasksHandler } from "../consumers/deployTasks.js";
+import { redeployTasksHandler } from "../consumers/redeployTasks.js";
 
 var amqpConnection = null;
 var isConnecting = false;
@@ -61,6 +64,23 @@ export const connectToQueue = () => {
 				"queue.hostname"
 			)}:${config.get("queue.port")}`
 		);
+
+		// Register queue message handlers
+		let queueCount = config.get("general.generalQueueCount");
+		for (let i = 1; i <= queueCount; i++) {
+			deployTasksHandler(
+				connection,
+				`deploy-tasks-${i}${config.get("queue.developmentSuffix")}`
+			);
+			redeployTasksHandler(
+				connection,
+				`redeploy-tasks-${i}${config.get("queue.developmentSuffix")}`
+			);
+			deleteTasksHandler(
+				connection,
+				`delete-tasks-${i}${config.get("queue.developmentSuffix")}`
+			);
+		}
 	});
 };
 

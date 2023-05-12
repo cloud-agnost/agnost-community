@@ -4,8 +4,11 @@ import { checkContentType } from "../middlewares/contentType.js";
 import {
 	deployVersion,
 	redeployVersion,
-	undeployVersion,
 	deleteEnvironment,
+	updateEnvironment,
+	deployTasks,
+	redeployTasks,
+	deleteTasks,
 } from "../init/queue.js";
 
 const router = express.Router({ mergeParams: true });
@@ -18,7 +21,20 @@ const router = express.Router({ mergeParams: true });
 */
 router.post("/deploy", checkContentType, authAccessToken, async (req, res) => {
 	try {
+		const { timestamp, action, schedulerCallback, actor, app, env, tasks } =
+			req.body;
+		// Cache items and manage databases
 		deployVersion(req.body);
+		// Deploy tasks
+		deployTasks({
+			timestamp,
+			action,
+			schedulerCallback,
+			actor,
+			app,
+			env,
+			tasks,
+		});
 		res.json();
 	} catch (error) {
 		helper.handleError(req, res, error);
@@ -37,27 +53,20 @@ router.post(
 	authAccessToken,
 	async (req, res) => {
 		try {
+			const { timestamp, action, schedulerCallback, actor, app, env, tasks } =
+				req.body;
+			// Cache items and manage databases
 			redeployVersion(req.body);
-			res.json();
-		} catch (error) {
-			helper.handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /env/undeploy
-@method     POST
-@desc       Undeploy version from the environment
-@access     public
-*/
-router.post(
-	"/undeploy",
-	checkContentType,
-	authAccessToken,
-	async (req, res) => {
-		try {
-			undeployVersion(req.body);
+			// Redeploy tasks
+			redeployTasks({
+				timestamp,
+				action,
+				schedulerCallback,
+				actor,
+				app,
+				env,
+				tasks,
+			});
 			res.json();
 		} catch (error) {
 			helper.handleError(req, res, error);
@@ -73,7 +82,20 @@ router.post(
 */
 router.post("/delete", checkContentType, authAccessToken, async (req, res) => {
 	try {
+		const { timestamp, action, schedulerCallback, actor, app, env, tasks } =
+			req.body;
+		// Clear cache items and manage databases
 		deleteEnvironment(req.body);
+		// Delete all task schedules
+		deleteTasks({
+			timestamp,
+			action,
+			schedulerCallback,
+			actor,
+			app,
+			env,
+			tasks,
+		});
 		res.json();
 	} catch (error) {
 		helper.handleError(req, res, error);
@@ -83,12 +105,12 @@ router.post("/delete", checkContentType, authAccessToken, async (req, res) => {
 /*
 @route      /env/update
 @method     POST
-@desc       Updates the environment data
+@desc       Updates the environment data including version data
 @access     public
 */
 router.post("/update", checkContentType, authAccessToken, async (req, res) => {
 	try {
-		//deleteEnvironment(req.body);
+		updateEnvironment(req.body);
 		res.json();
 	} catch (error) {
 		helper.handleError(req, res, error);

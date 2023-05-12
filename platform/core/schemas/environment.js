@@ -111,8 +111,20 @@ export const EnvironmentModel = mongoose.model(
 					updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 				},
 			],
-			// Resource status
-			status: {
+			// Environment status
+			dbDeploymentStatus: {
+				type: String,
+				index: true,
+				enum: envStatuses,
+			},
+			// Environment status
+			engineDeploymentStatus: {
+				type: String,
+				index: true,
+				enum: envStatuses,
+			},
+			// Environment status
+			schedulerDeploymentStatus: {
 				type: String,
 				index: true,
 				enum: envStatuses,
@@ -191,17 +203,6 @@ export const applyRules = (type) => {
 						)
 					)
 					.toInt(),
-			];
-		case "undeploy":
-			return [
-				body("dropData")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isBoolean()
-					.withMessage(t("Not a valid boolean value"))
-					.toBoolean(),
 			];
 		case "add-param":
 			return [

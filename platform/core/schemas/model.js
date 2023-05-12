@@ -79,35 +79,6 @@ export const ModelModel = mongoose.model(
 					default: "updatedAt",
 				},
 			},
-			// Object (row) level security rules
-			ols: [
-				{
-					action: {
-						type: String,
-						required: true,
-						enum: crudType,
-					},
-					type: {
-						type: String,
-						default: "sql",
-						required: true,
-						enum: ruleType,
-					},
-					session: {
-						type: Boolean,
-						default: false,
-					},
-					rule: {
-						type: String,
-					},
-					createdAt: { type: Date, default: Date.now, immutable: true },
-					updatedAt: { type: Date, default: Date.now },
-					createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-					updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-				},
-			],
-			// Table trigger definitions
-			triggers: [],
 			fields: [
 				{
 					name: {
@@ -157,33 +128,10 @@ export const ModelModel = mongoose.model(
 						type: Boolean,
 						default: false,
 					},
-					// Default value expression of the field
-					dvExp: {
-						type: String,
+					// Default value of the field
+					defaultValue: {
+						type: mongoose.Schema.Types.Mixed,
 					},
-					validationRules: [
-						{
-							name: {
-								type: String,
-								required: true,
-							},
-							ruleExp: {
-								type: String,
-								required: true,
-							},
-							errorExp: {
-								type: String,
-								required: true,
-							},
-							order: {
-								type: Number,
-							},
-							// Whether to continue executing other validation rules or not or just stop after this
-							bail: {
-								type: Boolean,
-							},
-						},
-					],
 					text: {
 						//If searchable is true then a text index is created in MongoDB
 						searchable: {

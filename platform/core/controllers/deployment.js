@@ -23,7 +23,6 @@ class DeploymentController {
 		// Decrypt access data of the resources and delete managed resource config settings
 		resources.forEach((element) => {
 			delete element.config;
-			delete element.telemetry;
 			element.access = helper.decryptSensitiveData(element.access);
 
 			if (element.accessReadOnly)
@@ -51,36 +50,35 @@ class DeploymentController {
 
 	/**
 	 * Deploys the version to the environment
-	 * @param  {object} log The environment log object
+	 * @param  {object} log The environment logs object includes the log entries for db, engine and scheduler
 	 * @param  {object} app The application object
 	 * @param  {object} version The version object
 	 * @param  {object} env The environment object
 	 * @param  {object} user The user who initiated the deployment
 	 */
-	async deploy(log, app, version, env, user) {
+	async deploy({ dbLog, engineLog, schedulerLog }, app, version, env, user) {
 		// First get the list of environment resources
 		let resources = await this.getEnvironmentResources(env);
-		// Get environment engine
-		let engine = resources.find((entry) => entry.type === "engine");
-
-		if (!engine) {
-			throw new AgnostError(
-				t(
-					"Environment '%s' does not have an assigned engine (API server). To deploy an app version to an environment, an engine needs to be created for the environment.",
-					env.name
-				)
-			);
-		}
 
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			timestamp: new Date(),
 			action: "deploy",
-			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
+			dbCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
 				env.orgId
 			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				log._id
-			}`,
+				dbLog._id
+			}?type=db`,
+			engineCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
+				env.orgId
+			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+				engineLog._id
+			}?type=engine`,
+			schedulerCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
+				env.orgId
+			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+				schedulerLog._id
+			}?type=scheduler`,
 			actor: {
 				userId: user._id,
 				name: user.name,
@@ -91,6 +89,10 @@ class DeploymentController {
 			app,
 			env: { ...env, version },
 			databases: [],
+			endpoints: [],
+			middlewares: [],
+			queues: [],
+			tasks: [],
 		};
 
 		// For each design element build entries in the payload
@@ -136,36 +138,35 @@ class DeploymentController {
 
 	/**
 	 * Redeploys the version to the environment
-	 * @param  {object} log The environment log object
+	 * @param  {object} log The environment logs object includes the log entries for db, engine and scheduler
 	 * @param  {object} app The application object
 	 * @param  {object} version The version object
 	 * @param  {object} env The environment object
 	 * @param  {object} user The user who initiated the deployment
 	 */
-	async redeploy(log, app, version, env, user) {
+	async redeploy({ dbLog, engineLog, schedulerLog }, app, version, env, user) {
 		// First get the list of environment resources
 		let resources = await this.getEnvironmentResources(env);
-		// Get environment engine
-		let engine = resources.find((entry) => entry.type === "engine");
-
-		if (!engine) {
-			throw new AgnostError(
-				t(
-					"Environment '%s' does not have an assigned engine cluster. To redeploy an app version to an environment, an engine cluster mapping needs to be made.",
-					env.name
-				)
-			);
-		}
 
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			timestamp: new Date(),
 			action: "redeploy",
-			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
+			dbCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
 				env.orgId
 			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				log._id
-			}`,
+				dbLog._id
+			}?type=db`,
+			engineCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
+				env.orgId
+			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+				engineLog._id
+			}?type=engine`,
+			schedulerCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
+				env.orgId
+			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+				schedulerLog._id
+			}?type=scheduler`,
 			actor: {
 				userId: user._id,
 				name: user.name,
@@ -176,6 +177,10 @@ class DeploymentController {
 			app,
 			env: { ...env, version },
 			databases: [],
+			endpoints: [],
+			middlewares: [],
+			queues: [],
+			tasks: [],
 		};
 
 		// For each design element build entries in the payload
@@ -220,89 +225,20 @@ class DeploymentController {
 	}
 
 	/**
-	 * Undeploys the version from the environment
-	 * @param  {object} log The environment log object
-	 * @param  {object} app The application object
-	 * @param  {object} version The version object
-	 * @param  {object} env The environment object
-	 * @param  {object} user The user who initiated the deployment
-	 * @param  {boolean} dropData Whether to delete environment data (e.g., app databases, storage, cache)
-	 */
-	async undeploy(log, app, version, env, user, dropData = true) {
-		// First get the list of environment resources
-		let resources = await this.getEnvironmentResources(env);
-		// Get environment engine
-		let engine = resources.find((entry) => entry.type === "engine");
-
-		if (!engine) {
-			throw new AgnostError(
-				t(
-					"Environment '%s' does not have an assigned engine cluster. To undeploy an app version from an environment, an engine cluster mapping needs to be made.",
-					env.name
-				)
-			);
-		}
-
-		// Start building the deployment instructions that will be sent to the engine cluster worker
-		let payload = {
-			timestamp: new Date(),
-			action: "undeploy",
-			dropData: dropData,
-			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
-				env.orgId
-			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				log._id
-			}`,
-			actor: {
-				userId: user._id,
-				name: user.name,
-				pictureUrl: user.pictureUrl,
-				color: user.color,
-				contactEmail: user.contactEmail,
-			},
-			app,
-			env: { ...env, version },
-		};
-
-		//Make api call to environment worker engine to undeploy app version
-		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/undeploy",
-			payload,
-			{
-				headers: {
-					Authorization: process.env.ACCESS_TOKEN,
-					"Content-Type": "application/json",
-				},
-			}
-		);
-	}
-
-	/**
-	 * Deletes the environment
-	 * @param  {object} log The environment log object
+	 * Deletes the environment. Please note that when we delete an organization we pass the app and version parameters null.
 	 * @param  {object} app The application object
 	 * @param  {object} version The version object
 	 * @param  {object} env The environment object
 	 * @param  {object} user The user who initiated the deployment
 	 */
-	async delete(log, app, version, env, user) {
-		// First get the list of environment resources
-		let resources = await this.getEnvironmentResources(env);
-		// Get environment engine
-		let engine = resources.find((entry) => entry.type === "engine");
-
-		// If the environment does not have an engine then do nothing
-		if (!engine) return;
-
+	async delete(app, version, env, user) {
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			timestamp: new Date(),
 			action: "delete",
-			callback: log
-				? `${config.get("general.platformBaseUrl")}/v1/org/${env.orgId}/app/${
-						env.appId
-				  }/version/${env.versionId}/env/${env._id}/log/${log._id}`
-				: undefined,
+			dbCallback: null,
+			engineCallback: null,
+			schedulerCallback: null,
 			actor: {
 				userId: user._id,
 				name: user.name,
@@ -328,27 +264,31 @@ class DeploymentController {
 	}
 
 	/**
-	 * Updates the environment data in engine cluster if autoDeploy is turned on and the version is deployed to the environemnt
+	 * Updates the environment metadata in engine cluster if autoDeploy is turned on and the version is deployed to the environemnt
+	 * @param  {object} log The environment logs object includes the log entries for db and engine
 	 * @param  {object} app The application object
 	 * @param  {object} version The version object
 	 * @param  {object} env The environment object
 	 * @param  {object} user The user who initiated the deployment
 	 */
-	async update(app, version, env, user) {
+	async update({ dbLog, engineLog }, app, version, env, user) {
 		// If auto deploy is turned off or version has not been deployed to the environment then we do not send the environment updates to the engine cluster
 		if (!env.autoDeploy || !env.deploymentDtm) return;
-		// First get the list of environment resources
-		let resources = await this.getEnvironmentResources(env);
-		// Get environment engine
-		let engine = resources.find((entry) => entry.type === "engine");
-
-		// If the environment does not have an engine then do nothing
-		if (!engine) return;
 
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			timestamp: new Date(),
-			action: "update",
+			action: "auto-deploy",
+			dbCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
+				env.orgId
+			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+				dbLog._id
+			}?type=db`,
+			engineCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
+				env.orgId
+			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+				engineLog._id
+			}?type=engine`,
 			actor: {
 				userId: user._id,
 				name: user.name,
@@ -360,7 +300,7 @@ class DeploymentController {
 			env: { ...env, version },
 		};
 
-		//Make api call to environment worker engine to update environment data
+		// Make api call to environment worker engine to update environment data
 		await axios.post(
 			config.get("general.workerUrl") + "/v1/env/update",
 			payload,

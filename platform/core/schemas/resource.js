@@ -67,6 +67,12 @@ export const ResourceModel = mongoose.model(
 				required: true,
 				default: false,
 			},
+			// Whether this resource can be deleted or not from the resource views list
+			deletable: {
+				type: Boolean,
+				required: true,
+				default: false,
+			},
 			// The list of app roles that can access to this resource and use in environment resource mappings besides the "Admin" role
 			// App "Admin" role will always be added to the allowedRoles list
 			allowedRoles: {

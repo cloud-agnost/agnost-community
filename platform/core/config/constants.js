@@ -48,7 +48,6 @@ export const engineErrorType = [
 export const envActions = [
 	"deploy",
 	"redeploy",
-	"undeploy",
 	"switch",
 	"auto-deploy",
 	"delete",
@@ -60,12 +59,13 @@ export const envStatuses = [
 	"Error",
 	"Deploying",
 	"Redeploying",
-	"Undeploying",
 	"Auto-deploying",
 	"Deleting",
 ];
 
 export const logStatuses = ["OK", "Error"];
+
+export const envLogTypes = ["db", "engine", "scheduler"];
 
 // sub-model-object: for single child or reference objects
 // sub-model-list: for a collection of child objects within a parent document
@@ -293,6 +293,7 @@ export const resourceTypes = [
 	"storage",
 	"queue",
 	"scheduler",
+	"realtime",
 ];
 
 export const designElementTypes = [
@@ -317,4 +318,11 @@ export const instanceTypes = {
 	],
 	queue: ["Default Queue", "RabbitMQ", "Kafka"],
 	scheduler: ["Default Scheduler"],
+	realtime: ["Default Realtime"],
 };
+
+export const methodTypes = ["GET", "POST", "PUT", "DELETE"];
+
+export const schedulTypes = ["every", "day", "week", "month", "plain"];
+
+export const intervalTypes = ["minute", "hour"];

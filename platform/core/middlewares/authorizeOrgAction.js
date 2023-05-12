@@ -5,6 +5,7 @@ export const orgAuthorization = {
 	Admin: {
 		org: {
 			update: true,
+			delete: true,
 			transfer: true,
 			viewLogs: true,
 			invite: {
@@ -36,6 +37,7 @@ export const orgAuthorization = {
 	Member: {
 		org: {
 			update: false,
+			delete: false,
 			transfer: false,
 			viewLogs: true,
 			invite: {
@@ -67,6 +69,7 @@ export const orgAuthorization = {
 	"Resource Manager": {
 		org: {
 			update: false,
+			delete: false,
 			transfer: false,
 			viewLogs: true,
 			invite: {
@@ -98,6 +101,7 @@ export const orgAuthorization = {
 	Viewer: {
 		org: {
 			update: false,
+			delete: false,
 			transfer: false,
 			viewLogs: true,
 			invite: {

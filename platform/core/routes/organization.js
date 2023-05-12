@@ -2,11 +2,14 @@ import express from "express";
 import sharp from "sharp";
 import orgCtrl from "../controllers/organization.js";
 import appCtrl from "../controllers/app.js";
+import versionCtrl from "../controllers/version.js";
 import orgMemberCtrl from "../controllers/organizationMember.js";
 import userCtrl from "../controllers/user.js";
 import orgInvitationCtrl from "../controllers/orgInvitation.js";
 import resourceCtrl from "../controllers/resource.js";
+import envCtrl from "../controllers/environment.js";
 import auditCtrl from "../controllers/audit.js";
+import deployCtrl from "../controllers/deployment.js";
 import { applyRules } from "../schemas/organization.js";
 import { applyRules as invitationApplyRules } from "../schemas/orgInvitation.js";
 import { applyRules as memberApplyRules } from "../schemas/organizationMember.js";
@@ -155,11 +158,12 @@ router.post(
 			// Return the newly created organization object
 			res.json(orgObj);
 
-			// We just need to create the storage resource, default queue and scheduler are bound to the existing resources
+			// We just need to create the storage resource. Default queue, scheduler and realtime are bound to the existing resources
 			await resourceCtrl.manageClusterResources([
 				resources.storage,
 				resources.queue,
 				resources.scheduler,
+				resources.realtime,
 			]);
 
 			// Log action
@@ -172,6 +176,7 @@ router.post(
 				{ orgId }
 			);
 		} catch (error) {
+			console.log("***here", error);
 			await orgCtrl.rollback(session);
 			handleError(req, res, error);
 		}
@@ -215,6 +220,89 @@ router.put(
 				{ orgId: req.org._id }
 			);
 		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId
+@method     DELETE
+@desc       Deletes the organization
+@access     private
+*/
+router.delete(
+	"/:orgId",
+	checkContentType,
+	authSession,
+	validateOrg,
+	authorizeOrgAction("org.delete"),
+	async (req, res) => {
+		// Start new database transaction session
+		const session = await orgCtrl.startSession();
+		try {
+			const { org, user } = req;
+
+			if (
+				org.ownerUserId.toString() !== req.user._id.toString() &&
+				!req.user.isClusterOwner
+			) {
+				return res.status(401).json({
+					error: t("Not Authorized"),
+					details: t(
+						"You are not authorized to delete organization '%s'. Only the owner of the organization or cluster owner can delete it.",
+						app.name
+					),
+					code: ERROR_CODES.unauthorized,
+				});
+			}
+
+			// First get all organization resources, environments, apps and versions
+			const resources = await resourceCtrl.getManyByQuery({ orgId: org._id });
+			const envs = await envCtrl.getManyByQuery({ orgId: org._id });
+			const apps = await appCtrl.getManyByQuery({ orgId: org._id });
+			const versions = await versionCtrl.getManyByQuery({ orgId: org._id });
+
+			// Delete all organization related data
+			await orgCtrl.deleteOrganization(session, org);
+			// Commit transaction
+			await orgCtrl.commit(session);
+
+			// Iterate through all environments and delete them
+			for (let i = 0; i < envs.length; i++) {
+				const env = envs[i];
+				deployCtrl.delete(
+					apps.find((entry) => env.appId.toString() === entry._id.toString()),
+					versions.find(
+						(entry) => env.versionId.toString() === entry._id.toString()
+					),
+					env,
+					user
+				);
+			}
+
+			// Iterate through all resources and delete them if they are managed
+			const managedResources = resources.filter(
+				(entry) => entry.managed === true
+			);
+
+			// Delete managed organization resources
+			resourceCtrl.deleteClusterResources(managedResources);
+
+			res.json();
+
+			// Log action
+			auditCtrl.logAndNotify(
+				org._id,
+				user,
+				"org",
+				"delete",
+				t("Deleted organization '%s'", org.name),
+				org,
+				{ orgId: org._id }
+			);
+		} catch (error) {
+			await orgCtrl.rollback(session);
 			handleError(req, res, error);
 		}
 	}
@@ -279,11 +367,11 @@ router.put(
 				`${helper.generateSlug("img", 6)}-${req.file.originalname}`
 			);
 
-			// Delete old porfile picture if exists
-			if (req.user.pictureUrl) {
+			// Delete the porfile picture if exists from storages
+			if (req.org.pictureUrl) {
 				try {
 					// Get the file name
-					let filename = req.user.pictureUrl.substring(
+					let filename = req.org.pictureUrl.substring(
 						req.user.pictureUrl.lastIndexOf("/") + 1
 					);
 					let oldFile = bucket.file(filename);
@@ -306,7 +394,7 @@ router.put(
 					return res.status(400).json({
 						error: t("Upload Failed"),
 						details: t(
-							"An error occured while uploading the profile image. %s",
+							"An error occured while uploading the organization image. %s",
 							err.message
 						),
 						code: ERROR_CODES.fileUploadError,
@@ -768,8 +856,8 @@ router.delete(
 				user,
 				"org.invite",
 				"delete",
-				t("Deleted multiple organization invitation"),
-				{},
+				t("Deleted multiple organization invitations"),
+				{ tokens },
 				{ orgId: org._id }
 			);
 		} catch (error) {
@@ -781,7 +869,7 @@ router.delete(
 /*
 @route      /v1/org/:orgId/invite?page=0&size=10&status=&email=&role=&start=&end&sortBy=email&sortDir=asc
 @method     GET
-@desc       Get user invitations
+@desc       Get organization invitations
 @access     private
 */
 router.get(
@@ -827,6 +915,60 @@ router.get(
 			});
 
 			res.json(invites);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/invite/list-eligible?page=0&size=10&email=&sortBy=email&sortDir=asc
+@method     GET
+@desc       Get eligible cluster members to invite to the organization
+@access     private
+*/
+router.get(
+	"/:orgId/invite/list-eligible",
+	checkContentType,
+	authSession,
+	validateOrg,
+	authorizeOrgAction("org.invite.view"),
+	invitationApplyRules("get-invites"),
+	validate,
+	async (req, res) => {
+		try {
+			const { user, org } = req;
+			const { page, size, search, sortBy, sortDir } = req.query;
+
+			// Get current organization team
+			let orgTeam = await orgMemberCtrl.getManyByQuery({ orgId: org._id });
+			// We just need to get the cluster members that are not already a team member of the organization
+			orgTeam = orgTeam.map((entry) => helper.objectId(entry.userId));
+			// The current user is also not eligible for invitation
+			orgTeam.push(helper.objectId(user._id));
+
+			let query = { _id: { $nin: orgTeam }, status: "Active" };
+			if (search && search !== "null") {
+				query.$or = [
+					{ name: { $regex: search, $options: "i" } },
+					{ contactEmail: { $regex: search, $options: "i" } },
+					{ "loginProfiles.email": { $regex: search, $options: "i" } },
+				];
+			}
+
+			let sort = {};
+			if (sortBy && sortDir) {
+				sort[sortBy] = sortDir;
+			} else sort = { name: "asc" };
+
+			let users = await userCtrl.getManyByQuery(query, {
+				sort,
+				skip: size * page,
+				limit: size,
+				projection: "-loginProfiles.password -notifications",
+			});
+
+			res.json(users);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -941,6 +1083,8 @@ router.get(
 							name: entry.user[0].name,
 							pictureUrl: entry.user[0].pictureUrl,
 							loginEmail: entry.user[0].loginProfiles[0].email,
+							isOrgOwner:
+								org.ownerUserId.toString() === entry.user[0]._id.toString(),
 						},
 					};
 				})
@@ -1060,6 +1204,8 @@ router.get(
 							name: entry.user[0].name,
 							pictureUrl: entry.user[0].pictureUrl,
 							loginEmail: entry.user[0].loginProfiles[0].email,
+							isOrgOwner:
+								org.ownerUserId.toString() === entry.user[0]._id.toString(),
 						},
 					};
 				})
@@ -1155,6 +1301,7 @@ router.put(
 					name: user.name,
 					pictureUrl: user.pictureUrl,
 					loginEmail: user.loginProfiles[0].email,
+					isOrgOwner: req.org.ownerUserId.toString() === user._id.toString(),
 				},
 			};
 
@@ -1241,7 +1388,7 @@ router.delete(
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"You cannot delete yourself from the organization. Try to leave the organization team."
+						"You cannot remove yourself from the organization. Try to leave the organization team."
 					),
 					code: ERROR_CODES.notAllowed,
 				});
@@ -1264,6 +1411,22 @@ router.delete(
 				orgId: req.org._id,
 				"team.userId": userId,
 			});
+
+			// Check if the removed user is an app owner or not
+			for (let i = 0; i < apps.length; i++) {
+				const app = apps[i];
+				if (app.ownerUserId.toString() === user._id.toString()) {
+					await orgMemberCtrl.endSession(session);
+					return res.status(422).json({
+						error: t("Not Allowed"),
+						details: t(
+							"You cannot remove a user who owns an app from the organization. The user first needs to transfer the app '%s' ownership to another app 'Admin' member.",
+							app.name
+						),
+						code: ERROR_CODES.notAllowed,
+					});
+				}
+			}
 
 			// Remove user from app teams
 			for (let i = 0; i < apps.length; i++) {
@@ -1341,7 +1504,7 @@ router.post(
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"You cannot delete yourself from the organization. Try to leave the organization team."
+						"You cannot remove yourself from the organization. Try to leave the organization team."
 					),
 					code: ERROR_CODES.notAllowed,
 				});
@@ -1364,6 +1527,21 @@ router.post(
 				orgId: req.org._id,
 				"team.userId": { $in: userIds },
 			});
+
+			// Check if any of the removed users is an app owner or not
+			for (let i = 0; i < apps.length; i++) {
+				const app = apps[i];
+				if (userIds.includes(app.ownerUserId.toString())) {
+					await orgMemberCtrl.endSession(session);
+					return res.status(422).json({
+						error: t("Not Allowed"),
+						details: t(
+							"You cannot remove a user who owns an app from the organization. The user first needs to transfer the app ownership to another app 'Admin' member."
+						),
+						code: ERROR_CODES.notAllowed,
+					});
+				}
+			}
 
 			// Remove users from app teams
 			for (let i = 0; i < apps.length; i++) {
@@ -1464,6 +1642,22 @@ router.delete(
 				orgId: req.org._id,
 				"team.userId": user._id,
 			});
+
+			// Check if the removed user is an app owner or not
+			for (let i = 0; i < apps.length; i++) {
+				const app = apps[i];
+				if (app.ownerUserId.toString() === user._id.toString()) {
+					await orgMemberCtrl.endSession(session);
+					return res.status(422).json({
+						error: t("Not Allowed"),
+						details: t(
+							"You cannot leave the organization team, because you are owner of at least one app of the organization. You first need to transfer  app '%s' ownership to another app 'Admin' member.",
+							app.name
+						),
+						code: ERROR_CODES.notAllowed,
+					});
+				}
+			}
 
 			// Remove user from app teams
 			for (let i = 0; i < apps.length; i++) {

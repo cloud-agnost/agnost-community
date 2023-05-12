@@ -131,7 +131,11 @@ async function upadateResourceStatus(resource, status) {
  * @param  {Object} result The resource status object
  */
 function getCachedStatus(cache, resource) {
-	if (["Default Queue", "Default Scheduler"].includes(resource.instance)) {
+	if (
+		["Default Queue", "Default Scheduler", "Default Realtime"].includes(
+			resource.instance
+		)
+	) {
 		return cache.get(resource.instance);
 	} else return cache.get(resource.iid);
 }
@@ -143,7 +147,11 @@ function getCachedStatus(cache, resource) {
  * @param  {Object} result The resource status object
  */
 function setCachedStatus(cache, resource, result) {
-	if (["Default Queue", "Default Scheduler"].includes(resource.instance)) {
+	if (
+		["Default Queue", "Default Scheduler", "Default Realtime"].includes(
+			resource.instance
+		)
+	) {
 		// If not already cached, add it to the cache
 		if (!cache.get(resource.instance)) cache.set(resource.instance, result);
 	} else {
@@ -461,6 +469,32 @@ async function checkResourceStatus(resource) {
 					},
 				};
 			}
+		case "Default Realtime":
+			try {
+				let result = await checkDefaultRealtime(resource.access);
+				if (result === null) return null;
+				return {
+					status: "OK",
+					availableReplicas: result.availableReplicas,
+					logs: [
+						{
+							startedAt: new Date(),
+							status: "OK",
+							message: t("Default realtime server is up and running"),
+						},
+					],
+				};
+			} catch (error) {
+				return {
+					status: "Error",
+					availableReplicas: 0,
+					logs: {
+						startedAt: new Date(),
+						status: "Error",
+						message: error.message,
+					},
+				};
+			}
 		default:
 			return null;
 	}
@@ -680,6 +714,8 @@ async function checkDefaultScheduler(connSettings) {
 			config.get("general.k8sNamespace")
 		);
 	} catch (err) {
+		console.log(err);
+
 		return null;
 	}
 
@@ -689,6 +725,40 @@ async function checkDefaultScheduler(connSettings) {
 	)
 		throw new AgnostError(
 			t("Default scheduler does not have any available replicas.")
+		);
+
+	return { availableReplicas: result.body?.status?.availableReplicas };
+}
+
+/**
+ * Returns availableReplica count if the default realtime server deployment is up and running. We have always a default realtime pod in the cluster.
+ * @param  {object} connSettings The connection settings needed to connect to the default realtime server pod
+ */
+async function checkDefaultRealtime(connSettings) {
+	// Create a Kubernetes core API client
+	const kubeconfig = new k8s.KubeConfig();
+	kubeconfig.loadFromDefault();
+	const coreApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
+
+	let result = null;
+
+	try {
+		result = await coreApi.readNamespacedDeployment(
+			connSettings.name,
+			config.get("general.k8sNamespace")
+		);
+	} catch (err) {
+		console.log(err);
+
+		return null;
+	}
+
+	if (
+		result.body?.status?.availableReplicas === 0 ||
+		!result.body?.status?.availableReplicas
+	)
+		throw new AgnostError(
+			t("Default realtime server does not have any available replicas.")
 		);
 
 	return { availableReplicas: result.body?.status?.availableReplicas };

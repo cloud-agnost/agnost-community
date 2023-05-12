@@ -49,6 +49,9 @@ router.get(
 							contactEmail: entry.userId.contactEmail,
 							name: entry.userId.name,
 							pictureUrl: entry.userId.pictureUrl,
+							loginEmail: entry.userId.loginProfiles[0].email,
+							isAppOwner:
+								app.ownerUserId.toString() === entry.userId._id.toString(),
 						},
 					};
 				})
@@ -95,6 +98,8 @@ router.get(
 							contactEmail: entry.userId.contactEmail,
 							name: entry.userId.name,
 							pictureUrl: entry.userId.pictureUrl,
+							isAppOwner:
+								app.ownerUserId.toString() === entry.userId._id.toString(),
 						},
 					};
 				});
@@ -156,8 +161,8 @@ router.put(
 				});
 			}
 
-			// Check if the target user is the app created. The role of app owner cannot be changed.
-			if (targetUser._id.toString() === app.createdBy.toString()) {
+			// Check if the target user is the app owner. The role of app owner cannot be changed.
+			if (targetUser._id.toString() === app.ownerUserId.toString()) {
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t("You cannot change the app role of the app owner."),
@@ -188,6 +193,8 @@ router.put(
 					contactEmail: targetUser.contactEmail,
 					name: targetUser.name,
 					pictureUrl: targetUser.pictureUrl,
+					loginEmail: targetUser.loginProfiles[0].email,
+					isAppOwner: app.ownerUserId.toString() === targetUser._id.toString(),
 				},
 			};
 
@@ -200,7 +207,8 @@ router.put(
 				"org.app.team",
 				"update",
 				t(
-					"Updated app member role of user '%s' from '%s' to '%s'",
+					"Updated app member role of user '%s' (%s) from '%s' to '%s'",
+					targetUser.name,
 					targetUser.contactEmail,
 					member.role,
 					role
@@ -254,12 +262,23 @@ router.delete(
 				});
 			}
 
-			// Check if the user is the creator of the app or not
-			if (app.createdBy.toString() === userId) {
+			// Check if the target user is the current user or not. Users cannot delete themselves from the org team, they need to leave from org team.
+			if (req.user._id.toString() === user._id.toString()) {
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"You are the owner of the app. The app owner cannot be removed from the app team."
+						"You cannot remove yourself from the app team. Try to leave the app team."
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// Check if the user is the creator of the app or not
+			if (app.ownerUserId.toString() === userId) {
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"The app owner cannot be removed from the app team. If you would like to remove the current app owner from the app team then the app ownership needs to be transferred to another app team 'Admin' member."
 					),
 					code: ERROR_CODES.notAllowed,
 				});
@@ -282,7 +301,7 @@ router.delete(
 				req.user,
 				"org.app.team",
 				"delete",
-				t("Removed user '%s' from app team", user.contactEmail),
+				t("Removed user '%s' (%s) from app team", user.name, user.contactEmail),
 				{
 					_id: user._id,
 					iid: user.iid,
@@ -290,6 +309,78 @@ router.delete(
 					contactEmail: user.contactEmail,
 					name: user.name,
 					pictureUrl: user.pictureUrl,
+					loginEmail: user.loginProfiles[0].email,
+				},
+				{ orgId: org._id, appId: app._id }
+			);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/team/delete-multi
+@method     POST
+@desc       Remove multiple members from app team
+@access     private
+*/
+router.post(
+	"/delete-multi",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	authorizeAppAction("app.team.delete"),
+	applyRules("remove-members"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app } = req;
+			const { userIds } = req.body;
+
+			// Users cannot remove themselves from the app team, they need to leave from org team.
+			if (userIds.includes(req.user._id.toString())) {
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"You cannot remove yourself from the app team. Try to leave the app team."
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// Check if one of the deleted user is the owner of the app or not
+			if (userIds.includes(app.ownerUserId.toString())) {
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"The app owner cannot be removed from the app team. If you would like to remove the current app owner from the app team, then the app ownership needs to be transferred to another app 'Admin' member."
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// Remove users from the app team
+			await appCtrl.pullObjectByQuery(
+				app._id,
+				"team",
+				{ userId: { $in: userIds } },
+				{ updatedBy: req.user._id },
+				{ cacheKey: app._id }
+			);
+
+			res.json();
+
+			// Log action
+			auditCtrl.logAndNotify(
+				app._id,
+				req.user,
+				"org.app.team",
+				"delete",
+				t("Removed users from app team"),
+				{
+					userIds,
 				},
 				{ orgId: org._id, appId: app._id }
 			);
@@ -329,11 +420,11 @@ router.delete(
 			}
 
 			// Check if the user is the creator of the app or not
-			if (app.createdBy.toString() === user._id) {
+			if (app.ownerUserId.toString() === user._id) {
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"You are the owner of the app. The app owner cannot be removed from the app team."
+						"You are the owner of the app. The app owner cannot leave the app team. You first need to transfer app ownership to another app 'Admin' member."
 					),
 					code: ERROR_CODES.notAllowed,
 				});
@@ -356,7 +447,7 @@ router.delete(
 				user,
 				"org.app.team",
 				"delete",
-				t("User '%s' has left the app team", user.contactEmail),
+				t("User '%s' (%s) has left the app team", user.name, user.contactEmail),
 				{
 					_id: user._id,
 					iid: user.iid,
@@ -364,6 +455,7 @@ router.delete(
 					contactEmail: user.contactEmail,
 					name: user.name,
 					pictureUrl: user.pictureUrl,
+					loginEmail: user.loginProfiles[0].email,
 				},
 				{ orgId: org._id, appId: app._id }
 			);

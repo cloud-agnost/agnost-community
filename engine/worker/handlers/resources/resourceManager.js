@@ -404,7 +404,9 @@ export class ResourceManager {
 							{
 								name: deploymentName,
 								image: "agnost-enterprise/engine-core",
-								imagePullPolicy: "Always",
+								imagePullPolicy: ["development"].includes(process.env.NODE_ENV)
+									? "Never"
+									: "Always",
 								env: [
 									{
 										name: "AGNOST_VERSION_ID",

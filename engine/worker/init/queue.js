@@ -1,7 +1,7 @@
 import amqp from "amqplib/callback_api.js";
 import { deployVersionHandler } from "../consumers/deployVersion.js";
 import { redeployVersionHandler } from "../consumers/redeployVersion.js";
-import { undeployVersionHandler } from "../consumers/undeployVersion.js";
+import { updateEnvironmentHandler } from "../consumers/updateEnvironment.js";
 import { deleteEnvironmentHandler } from "../consumers/deleteEnvironment.js";
 import { manageResourceHandler } from "../consumers/manageResource.js";
 
@@ -78,13 +78,13 @@ export const connectToQueue = () => {
 				connection,
 				`redeploy-version-${i}${config.get("queue.developmentSuffix")}`
 			);
-			undeployVersionHandler(
-				connection,
-				`undeploy-version-${i}${config.get("queue.developmentSuffix")}`
-			);
 			deleteEnvironmentHandler(
 				connection,
 				`delete-environment-${i}${config.get("queue.developmentSuffix")}`
+			);
+			updateEnvironmentHandler(
+				connection,
+				`update-environment-${i}${config.get("queue.developmentSuffix")}`
 			);
 			manageResourceHandler(
 				connection,
@@ -173,41 +173,6 @@ export const redeployVersion = (payload) => {
 	});
 };
 
-export const undeployVersion = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
-
-			return;
-		}
-
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
-
-		channel.assertQueue(
-			`undeploy-version-${randNumber}${config.get("queue.developmentSuffix")}`,
-			{
-				durable: true,
-			}
-		);
-
-		channel.sendToQueue(
-			`undeploy-version-${randNumber}${config.get("queue.developmentSuffix")}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
-
-		channel.close();
-	});
-};
-
 export const deleteEnvironment = (payload) => {
 	amqpConnection.createChannel(function (error, channel) {
 		if (error) {
@@ -236,6 +201,150 @@ export const deleteEnvironment = (payload) => {
 			`delete-environment-${randNumber}${config.get(
 				"queue.developmentSuffix"
 			)}`,
+			Buffer.from(JSON.stringify(payload)),
+			{
+				persistent: true,
+				timestamp: Date.now(),
+			}
+		);
+
+		channel.close();
+	});
+};
+
+export const updateEnvironment = (payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		let randNumber = helper.randomInt(
+			1,
+			config.get("general.generalQueueCount")
+		);
+
+		channel.assertQueue(
+			`update-environment-${randNumber}${config.get(
+				"queue.developmentSuffix"
+			)}`,
+			{
+				durable: true,
+			}
+		);
+
+		channel.sendToQueue(
+			`update-environment-${randNumber}${config.get(
+				"queue.developmentSuffix"
+			)}`,
+			Buffer.from(JSON.stringify(payload)),
+			{
+				persistent: true,
+				timestamp: Date.now(),
+			}
+		);
+
+		channel.close();
+	});
+};
+
+export const deployTasks = (payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		let randNumber = helper.randomInt(
+			1,
+			config.get("general.generalQueueCount")
+		);
+
+		channel.assertQueue(
+			`deploy-tasks-${randNumber}${config.get("queue.developmentSuffix")}`,
+			{
+				durable: true,
+			}
+		);
+
+		channel.sendToQueue(
+			`deploy-tasks-${randNumber}${config.get("queue.developmentSuffix")}`,
+			Buffer.from(JSON.stringify(payload)),
+			{
+				persistent: true,
+				timestamp: Date.now(),
+			}
+		);
+
+		channel.close();
+	});
+};
+
+export const redeployTasks = (payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		let randNumber = helper.randomInt(
+			1,
+			config.get("general.generalQueueCount")
+		);
+
+		channel.assertQueue(
+			`redeploy-tasks-${randNumber}${config.get("queue.developmentSuffix")}`,
+			{
+				durable: true,
+			}
+		);
+
+		channel.sendToQueue(
+			`redeploy-tasks-${randNumber}${config.get("queue.developmentSuffix")}`,
+			Buffer.from(JSON.stringify(payload)),
+			{
+				persistent: true,
+				timestamp: Date.now(),
+			}
+		);
+
+		channel.close();
+	});
+};
+
+export const deleteTasks = (payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		let randNumber = helper.randomInt(
+			1,
+			config.get("general.generalQueueCount")
+		);
+
+		channel.assertQueue(
+			`delete-tasks-${randNumber}${config.get("queue.developmentSuffix")}`,
+			{
+				durable: true,
+			}
+		);
+
+		channel.sendToQueue(
+			`delete-tasks-${randNumber}${config.get("queue.developmentSuffix")}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,

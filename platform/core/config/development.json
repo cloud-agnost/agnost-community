@@ -27,6 +27,7 @@
          "workerUrl": "http://engine-worker-clusterip-service:4000",
          "defaulPVCSize": "1Gi",
          "defaultSchedulerDeploymentName": "engine-scheduler-deployment",
+         "defaultRealtimeDeploymentName": "engine-realtime-deployment",
          "defaultEngineConfig": {
             "replicas": 1,
             "hpa": {
@@ -42,7 +43,8 @@
             "memory": {
                 "request": "256Mi",
                 "limit": "512Mi"
-            }
+            },
+            "forkChildProcesses": true
          }
     }
 }

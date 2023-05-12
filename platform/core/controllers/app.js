@@ -1,6 +1,18 @@
 import BaseController from "./base.js";
-import { AppModel } from "../schemas/app.js";
 import versionCtrl from "./version.js";
+import appInvitationCtrl from "../controllers/appInvitation.js";
+import dbCtrl from "../controllers/database.js";
+import modelCtrl from "../controllers/model.js";
+import envCtrl from "../controllers/environment.js";
+import envLogCtrl from "../controllers/environmentLog.js";
+import auditCtrl from "../controllers/audit.js";
+import resourceCtrl from "../controllers/resource.js";
+import resLogCtrl from "../controllers/resourceLog.js";
+import epCtrl from "../controllers/endpoint.js";
+import mwCtrl from "../controllers/middleware.js";
+import queueCtrl from "../controllers/queue.js";
+import taskCtrl from "../controllers/task.js";
+import { AppModel } from "../schemas/app.js";
 
 class AppController extends BaseController {
 	constructor() {
@@ -22,6 +34,7 @@ class AppController extends BaseController {
 				_id: appId,
 				orgId: org._id,
 				iid: helper.generateSlug("app"),
+				ownerUserId: user._id,
 				name,
 				color: helper.generateColor("light"),
 				team: [{ userId: user._id, role: "Admin" }],
@@ -31,15 +44,75 @@ class AppController extends BaseController {
 		);
 
 		// Create the master version of the app
-		const { version, resource, resLog, env, envLog } =
-			await versionCtrl.createVersion(session, user, org, app, {
-				name: "master",
-				isPrivate: false,
-				readOnly: true,
-				master: true,
-			});
+		const result = await versionCtrl.createVersion(session, user, org, app, {
+			name: "master",
+			isPrivate: false,
+			readOnly: true,
+			master: true,
+		});
 
-		return { app, version, resource, resLog, env, envLog };
+		return { app, ...result };
+	}
+
+	/**
+	 * Delete all application related data
+	 * @param  {Object} session The database session object
+	 * @param  {Object} org The organization object that will be deleted
+	 */
+	async deleteApp(session, org, app) {
+		await this.deleteOneById(app._id, { session, cacheKey: app._id });
+		await appInvitationCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await versionCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await dbCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await modelCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await envCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await envLogCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await auditCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await resourceCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await resLogCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await epCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await mwCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await queueCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await taskCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
 	}
 }
 

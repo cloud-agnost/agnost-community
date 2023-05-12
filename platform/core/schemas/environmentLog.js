@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
-import { body } from "express-validator";
-import { envActions, envStatuses, logStatuses } from "../config/constants.js";
+import { body, query } from "express-validator";
+import {
+	envActions,
+	envStatuses,
+	logStatuses,
+	envLogTypes,
+} from "../config/constants.js";
 
 /**
  * Keeps the list of deployment
@@ -28,6 +33,12 @@ export const EnvironmentLogModel = mongoose.model(
 			ref: "environment",
 			index: true,
 		},
+		type: {
+			type: String,
+			index: true,
+			enum: envLogTypes,
+			required: true,
+		},
 		action: {
 			type: String,
 			index: true,
@@ -44,7 +55,6 @@ export const EnvironmentLogModel = mongoose.model(
 		logs: [
 			{
 				startedAt: { type: Date },
-				duration: { type: Number },
 				status: { type: String, enum: logStatuses },
 				message: { type: String },
 			},
@@ -74,6 +84,13 @@ export const applyRules = (type) => {
 	switch (type) {
 		case "update":
 			return [
+				query("type")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(envLogTypes)
+					.withMessage(t("Unsupported environment log type")),
 				body("status")
 					.trim()
 					.notEmpty()
@@ -93,13 +110,6 @@ export const applyRules = (type) => {
 					.bail()
 					.isISO8601()
 					.withMessage(t("Not a valid date & time format")),
-				body("logs.*.duration")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isFloat({ min: 0 })
-					.withMessage(t("Duration needs to be positive number")),
 				body("logs.*.status")
 					.trim()
 					.notEmpty()

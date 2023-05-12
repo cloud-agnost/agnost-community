@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { body, query } from "express-validator";
 import helper from "../util/helper.js";
+import { appRoles, orgRoles, invitationStatus } from "../config/constants.js";
 
 /**
  * Organization invitions. Each member is first needs to be added to the organization.
@@ -38,21 +39,14 @@ export const AppInvitationModel = mongoose.model(
 			type: String,
 			required: true,
 			index: true,
-			enum: ["Admin", "Member", "Read-only"],
+			enum: appRoles,
 			required: true,
 		},
 		orgRole: {
 			type: String,
 			required: true,
 			index: true,
-			enum: [
-				"Admin",
-				"App Admin",
-				"Billing Admin",
-				"Read-only",
-				"Resource Manager",
-				"Developer",
-			],
+			enum: orgRoles,
 			default: "Developer",
 			required: true,
 		},
@@ -61,7 +55,7 @@ export const AppInvitationModel = mongoose.model(
 			required: true,
 			index: true,
 			default: "Pending",
-			enum: ["Pending", "Accepted", "Rejected"],
+			enum: invitationStatus,
 		},
 		// Info about the person who invites the user
 		host: {
@@ -120,7 +114,7 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isIn(["Admin", "Member", "Read-only"])
+					.isIn(appRoles)
 					.withMessage(t("Unsupported app member role")),
 			];
 		case "update-invite":
@@ -134,11 +128,11 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isIn(["Admin", "Member", "Read-only"])
+					.isIn(appRoles)
 					.withMessage(t("Unsupported app member role")),
 			];
 		case "resend-invite":
-		case "revoke-invite":
+		case "delete-invite":
 			return [
 				query("token")
 					.trim()
@@ -146,6 +140,7 @@ export const applyRules = (type) => {
 					.withMessage(t("Required parameter, cannot be left empty")),
 			];
 		case "get-invites":
+		case "list-eligible":
 			return [
 				query("page")
 					.trim()
@@ -176,6 +171,19 @@ export const applyRules = (type) => {
 						)
 					)
 					.toInt(),
+			];
+		case "delete-invite-multi":
+			return [
+				body("tokens")
+					.notEmpty()
+					.withMessage(t("Required parameter, cannot be left empty"))
+					.bail()
+					.isArray()
+					.withMessage(t("Invitation tokens needs to be an array of strings")),
+				body("tokens.*")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required parameter, cannot be left empty")),
 			];
 		default:
 			return [];

@@ -742,122 +742,7 @@ router.post(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/undeploy
-@method     POST
-@desc       Start undeploying app version from environment
-@access     private
-*/
-router.post(
-	"/:envId/undeploy",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateEnv,
-	authorizeAppAction("app.env.deploy"),
-	applyRules("undeploy"),
-	validate,
-	async (req, res) => {
-		const session = await envCtrl.startSession();
-		try {
-			const { org, user, app, version, env } = req;
-			const { dropData } = req.body;
-
-			if (
-				[
-					"Deploying",
-					"Redeploying",
-					"Undeploying",
-					"Auto-deploying",
-					"Deleting",
-				].includes(env.telemetry.status)
-			) {
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"There is already a deployment operation running on this environment. You need to wait the completion of this operation."
-					),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			if (!env.deploymentDtm) {
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"There is no app version deployed to this environment. You first need to deploy an app version to undeploy it later."
-					),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			// Update environment data
-			let updatedEnv = await envCtrl.updateOneById(
-				env._id,
-				{
-					"telemetry.status": "Undeploying",
-					"telemetry.logs": [],
-					"telemetry.updatedAt": Date.now(),
-					updatedBy: req.user._id,
-				},
-				{
-					deploymentDtm: 1,
-				},
-				{ cacheKey: env._id, session }
-			);
-
-			// Create environment logs entry, which will be updated when the deployment is completed
-			let log = await envLogCtrl.create(
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					envId: env._id,
-					action: "undeploy",
-					status: "Undeploying",
-					logs: [],
-					createdBy: user._id,
-				},
-				{ session }
-			);
-
-			// Redeploy application version to the environment
-			await deployCtrl.undeploy(log, app, version, env, user, dropData);
-			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
-			await setKey(env._id, updatedEnv, helper.constants["1month"]);
-
-			await envCtrl.commit(session);
-			res.json({ env: updatedEnv, log });
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.environment",
-				"undeploy",
-				t(
-					"Started undeploying app version '%s' from environment '%s'",
-					version.name,
-					env.name
-				),
-				updatedEnv,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					envId: env._id,
-				}
-			);
-		} catch (error) {
-			await envCtrl.rollback(session);
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/log/:logId
+@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/log/:logId?type=
 @method     POST
 @desc       Update deployment operation log and environment status
 @access     private
@@ -878,74 +763,51 @@ router.post(
 		try {
 			const { org, app, version, env, log } = req;
 			const { status, logs } = req.body;
+			const { type } = req.query;
 
 			// Get user information
 			let user = await userCtrl.getOneById(log.createdBy, {
 				cacheKey: log.createdBy,
 			});
 
-			// If the environemnt is successfully deleted then delete it and its logs from the database
-			if (log.action === "delete" && status === "OK") {
-				// Delete environment
-				await envCtrl.deleteOneById(env._id, {
-					cacheKey: env._id,
-					session,
-				});
+			let timestamp = Date.now();
+			let dataSet = {
+				updatedBy: user._id,
+			};
 
-				// Delete environment logs
-				await envLogCtrl.deleteManyByQuery({
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					envId: env._id,
-				});
+			if (type === "db") dataSet.dbDeploymentStatus = status;
+			else if (type === "engine") dataSet.engineDeploymentStatus = status;
+			else dataSet.schedulerDeploymentStatus = status;
 
-				await envCtrl.commit(session);
-				res.json();
-			} else {
-				let timestamp = Date.now();
-				let dataSet = {
+			// If deployment successfully completed then update deploymentDtm
+			if (
+				["deploy", "redeploy", "auto-deploy"].includes(log.action) &&
+				status === "OK"
+			)
+				dataSet.deploymentDtm = timestamp;
+
+			// Update environment data
+			let updatedEnv = await envCtrl.updateOneById(
+				env._id,
+				dataSet,
+				{},
+				{ cacheKey: env._id, session }
+			);
+
+			// Update environment log data
+			await envLogCtrl.updateOneById(
+				log._id,
+				{
 					status: status,
-					updatedBy: user._id,
-				};
+					logs: logs,
+					updatedAt: timestamp,
+				},
+				{},
+				{ session }
+			);
 
-				// If deployment successfully completed then update deploymentDtm
-				if (
-					["deploy", "redeploy", "auto-deploy"].includes(log.action) &&
-					status === "OK"
-				)
-					dataSet.deploymentDtm = timestamp;
-
-				// If undeployment is successful then unset versionId and deploymentDtm
-				let dataUnset = {};
-				if (log.action === "undeploy" && status === "OK") {
-					dataSet["status"] = "Idle";
-					dataUnset.deploymentDtm = 1;
-				}
-
-				// Update environment data
-				let updatedEnv = await envCtrl.updateOneById(
-					env._id,
-					dataSet,
-					dataUnset,
-					{ cacheKey: env._id, session }
-				);
-
-				// Update environment log data
-				await envLogCtrl.updateOneById(
-					log._id,
-					{
-						status: status,
-						logs: logs,
-						updatedAt: timestamp,
-					},
-					{},
-					{ session }
-				);
-
-				await envCtrl.commit(session);
-				res.json(updatedEnv);
-			}
+			await envCtrl.commit(session);
+			res.json(updatedEnv);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -955,10 +817,11 @@ router.post(
 				log.action,
 				t(
 					status === "OK"
-						? "Completed '%s' operation on environment '%s' successfully"
-						: "Completed '%s' operation on environment '%s' with erors",
+						? "Completed '%s' '%s' operation on environment '%s' successfully"
+						: "Completed '%s' '%s' operation on environment '%s' with erorrs",
 
 					log.action,
+					type,
 					env.name
 				),
 				{},

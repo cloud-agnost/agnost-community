@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-   name: engine-core-deployment
+   name: env-8ivryl87mcms-deployment
    labels:
       app: engine-core
 spec:

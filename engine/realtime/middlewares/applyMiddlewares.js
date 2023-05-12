@@ -1,6 +1,7 @@
 import { authEnvironment, authEnvironment2 } from "./authEnvironment.js";
 import { checkApiKey, checkApiKey2 } from "./checkApiKey.js";
 import { checkSession, checkSession2 } from "./checkSession.js";
+import { applyRateLimiters2 } from "./applyRateLimiters.js";
 
 export const applyRealtimeMiddlewares = () => async (socket, next) => {
 	let error = await authEnvironment(socket);
