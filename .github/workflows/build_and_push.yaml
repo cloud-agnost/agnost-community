@@ -1,12 +1,18 @@
-name: Build and Pusg
+name: Build and Push
 
 on:
   push:
     branches:
       - 'pipeline'
     paths:
-      - 'engine/**'
-      - 'platform/**'
+      - 'engine/core/**'
+      - 'engine/monitor/**'
+      - 'engine/realtime/**'
+      - 'engine/scheduler/**'
+      - 'engine/worker/**'
+      - 'platform/core/**'
+      - 'platform/sync/**'
+      - 'platform/worker/**'
 
 env:
   DOCKER_REGISTRY: 'gcr.io'
