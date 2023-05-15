@@ -57,7 +57,7 @@ export const connectToRedisCache = async () => {
 				clientReadReplica.scan = util.promisify(clientReadReplica.scan);
 
 				logger.info(
-					`Connected to the read replica cache server @${readReplicaConfig.hostnameRead}:${readReplicaConfig.port}`
+					`Connected to the read replica cache server @${readReplicaConfig.hostname}:${readReplicaConfig.port}`
 				);
 			});
 		} catch (err) {

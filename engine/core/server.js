@@ -25,7 +25,7 @@ if (cluster.isPrimary) {
 	// Set up locatlization
 	initLocalization();
 	// Connect to cache server(s)
-	connectToRedisCache();
+	await connectToRedisCache();
 	// Connect to message queue
 	connectToQueue();
 	// Gracefull handle process exist

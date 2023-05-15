@@ -35,6 +35,7 @@ export const manageAPIServerHandler = (connection, envId) => {
 				let msgObj = JSON.parse(msg.content.toString());
 
 				console.log("halding message", process.pid);
+				channel.ack(msg);
 				return;
 
 				// Create the deployment manager and manage the API server configuration
@@ -79,7 +80,7 @@ export const manageAPIServerHandler = (connection, envId) => {
 			{
 				// The broker will not expect an acknowledgement of messages delivered to this consumer
 				// It will dequeue messages as soon as they’ve been sent down the wire
-				noAck: true,
+				noAck: false,
 			}
 		);
 	});
