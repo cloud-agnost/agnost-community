@@ -1,5 +1,5 @@
 # Get the base node image from docker hub, we are not using alpine since shart library requires some modules that are not included in alpine version
-FROM node:18
+FROM node:18-alpine
 # Set the working directory in our docker image, anything that is copied from now on
 # from local machine to the image will be moved under '/app' directory in docker image
 WORKDIR '/app'

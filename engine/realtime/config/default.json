@@ -21,11 +21,9 @@
         "gcSeconds": 30
     },
     "cache": {
-        "hostname": "cluster-redis-clusterip-service",
         "port": 6379
     },
     "realtimeCache": {
-        "hostname": "cluster-redis-clusterip-service",
         "port": 6379
     },
     "general": {  

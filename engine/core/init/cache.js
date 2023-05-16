@@ -9,7 +9,7 @@ export const connectToRedisCache = async () => {
 	try {
 		let cacheConfig = config.get("cache");
 		client = redis.createClient({
-			host: cacheConfig.hostname,
+			host: process.env.CACHE_HOSTNAME,
 			port: cacheConfig.port,
 			password:
 				process.env.CACHE_PWD && process.env.CACHE_PWD !== "null"
@@ -25,7 +25,7 @@ export const connectToRedisCache = async () => {
 			client.scan = util.promisify(client.scan);
 
 			logger.info(
-				`Connected to the cache server @${cacheConfig.hostname}:${cacheConfig.port}`
+				`Connected to the cache server @${process.env.CACHE_HOSTNAME}:${cacheConfig.port}`
 			);
 		});
 	} catch (err) {
@@ -42,7 +42,7 @@ export const connectToRedisCache = async () => {
 	if (readReplicaConfig) {
 		try {
 			clientReadReplica = redis.createClient({
-				host: readReplicaConfig.hostname,
+				host: process.env.CACHE_READ_REPLICA_HOSTNAME,
 				port: readReplicaConfig.port,
 				password:
 					process.env.CACHE_READ_REPLICA_PWD &&
@@ -57,7 +57,7 @@ export const connectToRedisCache = async () => {
 				clientReadReplica.scan = util.promisify(clientReadReplica.scan);
 
 				logger.info(
-					`Connected to the read replica cache server @${readReplicaConfig.hostname}:${readReplicaConfig.port}`
+					`Connected to the read replica cache server @${process.env.CACHE_READ_REPLICA_HOSTNAME}:${readReplicaConfig.port}`
 				);
 			});
 		} catch (err) {

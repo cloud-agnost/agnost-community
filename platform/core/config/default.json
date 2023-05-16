@@ -19,10 +19,8 @@
         "appImagesBucket": "agnost-app-pictures"
     },
     "cache": {
-        "hostname": "cluster-redis-clusterip-service",
         "port": 6379,
         "readReplica": {
-            "hostname": "cluster-redis-clusterip-service",
             "port": 6379
         }
     },

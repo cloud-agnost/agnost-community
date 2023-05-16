@@ -22,11 +22,16 @@ export function setUpRealtimeServer(expressServer) {
 		},
 	});
 
+	console.log(
+		"***here",
+		process.env.REALTIME_CACHE_HOSTNAME,
+		process.env.REALTIME_CACHE_PWD
+	);
 	try {
 		// Create the redis client for pub
 		let cacheConfig = config.get("realtimeCache");
 		const pubClient = createClient({
-			host: cacheConfig.hostname,
+			host: process.env.REALTIME_CACHE_HOSTNAME,
 			port: cacheConfig.port,
 			password:
 				process.env.REALTIME_CACHE_PWD &&

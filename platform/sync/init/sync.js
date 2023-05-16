@@ -20,7 +20,7 @@ export function setUpSyncServer(expressServer) {
 		// Create the redis client for pub
 		let cacheConfig = config.get("cache");
 		const pubClient = createClient({
-			host: cacheConfig.hostname,
+			host: process.env.CACHE_HOSTNAME,
 			port: cacheConfig.port,
 			password:
 				process.env.CACHE_PWD && process.env.CACHE_PWD !== "null"
@@ -33,7 +33,7 @@ export function setUpSyncServer(expressServer) {
 
 		pubClient.on("connect", function () {
 			logger.info(
-				`Connected to the cache server @${cacheConfig.hostname}:${cacheConfig.port}`
+				`Connected to the cache server @${process.env.CACHE_HOSTNAME}:${cacheConfig.port}`
 			);
 
 			// Crate socket.io redis adapter

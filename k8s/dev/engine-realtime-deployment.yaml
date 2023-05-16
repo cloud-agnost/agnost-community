@@ -22,6 +22,31 @@ spec:
               ports:
                  - containerPort: 4000
               env:
+                 - name: CACHE_HOSTNAME
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: cacheHostname          
+                 - name: CACHE_READ_REPLICA_HOSTNAME
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: cacheReadReplicaHostname         
+                 - name: CACHE_PWD
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: cachePwd
+                 - name: CACHE_READ_REPLICA_PWD
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: cacheReadReplicaPwd
+                 - name: REALTIME_CACHE_HOSTNAME
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: realtimeCacheHostname           
                  - name: REALTIME_CACHE_PWD
                    valueFrom:
                       secretKeyRef:
