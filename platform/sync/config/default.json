@@ -6,5 +6,21 @@
      },
      "rateLimiters": [{      
         "rateLimitWindowSec": 30,
-        "rateLimitMaxHits": 300}]
+        "rateLimitMaxHits": 300}],
+     "database": {
+        "minPoolSize": 3
+     },
+     "sync": {
+      "pingTimeout": 30000,
+      "pingInterval": 10000,
+      "upgradeTimeout": 10000,
+      "serveClient": false
+   },
+   "cache": {
+      "hostname": "cluster-redis-clusterip-service",
+      "port": 6379
+   },
+   "general": {  
+      "platformBaseUrl": "http://platform-core-clusterip-service:4000"
+   }
 }

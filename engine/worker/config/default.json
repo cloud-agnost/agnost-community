@@ -8,11 +8,48 @@
      "rateLimiters": [{      
         "rateLimitWindowSec": 30,
         "rateLimitMaxHits": 300}],
-    "general": {  
+    "database": {
+        "minPoolSize": 3
+     },
+     "cache": {
+        "hostname": "cluster-redis-clusterip-service",
+        "port": 6379,
+        "readReplica": {
+           "hostname": "cluster-redis-clusterip-service",
+           "port": 6379
+        }
+     },
+     "queue": {
+        "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
+        "port": 5672,
+        "reconnectInterval": 1000,
+        "retryCount": 30,
+        "developmentSuffix": "mito"
+     },
+     "sync": {
+        "serverURL": "http://platform-sync-clusterip-service:4000",
+        "namespace": "sync",
+        "reconnection": true,
+        "reconnectionDelay": 500
+     },
+     "general": { 
         "generalQueueCount": 1,
         "maxMessageWaitMinues": 5,
         "maxMongoDBIndexNumberPerCollection": 64,
         "k8sNamespace": "default",
-        "ingressServiceName": "ingress-service"
-    }
+        "ingressServiceName": "ingress-service", 
+        "platformBaseUrl": "http://platform-core-clusterip-service:4000",
+        "maxPoolSize": 3,
+        "defaultClusterIPPort": 4000,
+        "livenessProbe": {
+           "initialDelaySeconds": 10,
+           "periodSeconds": 20,
+           "timeoutSeconds": 5
+        },
+        "readinessProbe": {
+           "initialDelaySeconds": 10,
+           "periodSeconds": 20,
+           "timeoutSeconds": 5
+        }
+     }
 }

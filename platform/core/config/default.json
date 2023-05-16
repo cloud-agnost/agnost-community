@@ -8,7 +8,40 @@
      "rateLimiters": [{      
         "rateLimitWindowSec": 30,
         "rateLimitMaxHits": 300}],
-    "general": {  
+    "session": {
+        "validationCodeExpiry": 600,
+        "accessTokenExpiry": 31536000,
+        "refreshTokenExpiry": 31536000
+    },
+    "storage": {
+        "profileImagesBucket": "agnost-profile-pictures",
+        "orgImagesBucket": "agnost-organization-pictures",
+        "appImagesBucket": "agnost-app-pictures"
+    },
+    "cache": {
+        "hostname": "cluster-redis-clusterip-service",
+        "port": 6379,
+        "readReplica": {
+            "hostname": "cluster-redis-clusterip-service",
+            "port": 6379
+        }
+    },
+    "queue": {
+        "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
+        "port": 5672,
+        "reconnectInterval": 1000,
+        "retryCount": 30
+    },
+    "database": {
+        "minPoolSize": 3
+    },
+    "sync": {
+      "serverURL": "http://platform-sync-clusterip-service:4000",
+      "namespace": "sync",
+      "reconnection": true,
+      "reconnectionDelay": 500
+   },
+    "general": {
         "minPwdLength": 8,
         "maxTextLength": 64,
         "maxDetailTxtLength": 1024,
@@ -23,16 +56,29 @@
         "maxRichTextFieldLength": 524288,
         "maxEncryptedTextFieldLength": 50,
         "maxDecimalDigits": 10,
-        "maxOptionsCount": 1000
-    },
-    "session": {
-        "validationCodeExpiry": 600,
-        "accessTokenExpiry": 31536000,
-        "refreshTokenExpiry": 31536000
-    },
-    "storage": {
-        "profileImagesBucket": "agnost-profile-pictures",
-        "orgImagesBucket": "agnost-organization-pictures",
-        "appImagesBucket": "agnost-app-pictures"
+        "maxOptionsCount": 1000,
+         "platformBaseUrl": "http://platform-core-clusterip-service:4000",
+         "workerUrl": "http://engine-worker-clusterip-service:4000",
+         "defaulPVCSize": "1Gi",
+         "defaultSchedulerDeploymentName": "engine-scheduler-deployment",
+         "defaultRealtimeDeploymentName": "engine-realtime-deployment",
+         "defaultEngineConfig": {
+            "replicas": 1,
+            "hpa": {
+                "avgCPU": 80,
+                "avgMemory": 80,
+                "minReplicas": 1,
+                "maxReplicas": 10
+            },
+            "cpu": {
+                "request": "100m",
+                "limit": "200m"
+            },
+            "memory": {
+                "request": "256Mi",
+                "limit": "512Mi"
+            },
+            "forkChildProcesses": true
+         }
     }
 }

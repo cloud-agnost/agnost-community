@@ -11,6 +11,25 @@
         "monitoringInterval": 3000,
         "resourcePaginationSize": 100,
         "k8sNamespace": "default",
-        "maxResourceOpWaitMinues": 5
-    }
+        "maxResourceOpWaitMinues": 5,
+        "platformBaseUrl": "http://platform-core-clusterip-service:4000"
+    },
+    "database": {
+        "minPoolSize": 3
+     },
+     "cache": {
+        "hostname": "cluster-redis-clusterip-service",
+        "port": 6379,
+        "readReplica": {
+           "hostname": "cluster-redis-clusterip-service",
+           "port": 6379
+        }
+     },
+     "queue": {
+        "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
+        "port": 5672,
+        "reconnectInterval": 1000,
+        "retryCount": 30,
+        "developmentSuffix": "mito"
+     }
 }

@@ -7,5 +7,31 @@
      },
      "rateLimiters": [{      
         "rateLimitWindowSec": 30,
-        "rateLimitMaxHits": 300}]
+        "rateLimitMaxHits": 300}],
+   "cache": {
+      "hostname": "cluster-redis-clusterip-service",
+      "port": 6379,
+      "readReplica": {
+          "hostname": "cluster-redis-clusterip-service",
+          "port": 6379
+      }
+   },
+     "queue": {
+        "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
+        "port": 5672,
+        "reconnectInterval": 1000,
+        "retryCount": 30
+     },
+     "database": {
+        "minPoolSize": 3
+     },
+     "emailServer": {
+      "host": "smtp.mandrillapp.com",
+      "port": 587,
+      "secure": false,
+      "pool": true
+   },
+   "general": {  
+      "platformBaseUrl": "http://platform-core-clusterip-service:4000"
+   }
 }
