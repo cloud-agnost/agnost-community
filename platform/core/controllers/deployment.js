@@ -62,7 +62,6 @@ class DeploymentController {
 
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
-			timestamp: new Date(),
 			action: "deploy",
 			dbCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
 				env.orgId
@@ -87,7 +86,7 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			env: { ...env, version },
+			env: { ...env, version, timestamp: new Date() },
 			databases: [],
 			endpoints: [],
 			middlewares: [],
@@ -150,7 +149,6 @@ class DeploymentController {
 
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
-			timestamp: new Date(),
 			action: "redeploy",
 			dbCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
 				env.orgId
@@ -175,7 +173,7 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			env: { ...env, version },
+			env: { ...env, version, timestamp: new Date() },
 			databases: [],
 			endpoints: [],
 			middlewares: [],
@@ -234,7 +232,6 @@ class DeploymentController {
 	async delete(app, version, env, user) {
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
-			timestamp: new Date(),
 			action: "delete",
 			dbCallback: null,
 			engineCallback: null,
@@ -247,7 +244,7 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			env: { ...env, version },
+			env: { ...env, version, timestamp: new Date() },
 		};
 
 		//Make api call to environment worker engine to delete the environment
@@ -264,7 +261,7 @@ class DeploymentController {
 	}
 
 	/**
-	 * Updates the environment metadata in engine cluster if autoDeploy is turned on and the version is deployed to the environemnt
+	 * Updates the environment (environment and version) metadata in engine cluster if autoDeploy is turned on and the version is deployed to the environemnt
 	 * @param  {object} log The environment logs object includes the log entries for db and engine
 	 * @param  {object} app The application object
 	 * @param  {object} version The version object
@@ -277,7 +274,6 @@ class DeploymentController {
 
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
-			timestamp: new Date(),
 			action: "auto-deploy",
 			dbCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
 				env.orgId
@@ -297,7 +293,7 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			env: { ...env, version },
+			env: { ...env, version, timestamp: new Date() },
 		};
 
 		// Make api call to environment worker engine to update environment data

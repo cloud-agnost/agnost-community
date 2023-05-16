@@ -94,10 +94,17 @@ export class DeploymentManager {
 	}
 
 	/**
-	 * Returns the environment object
+	 * Returns the message object
 	 */
 	getMsgObj() {
 		return this.msgObj;
+	}
+
+	/**
+	 * Returns the message timestamp
+	 */
+	getTimestamp() {
+		return this.msgObj.env.timestamp;
 	}
 
 	/**
@@ -134,6 +141,34 @@ export class DeploymentManager {
 	 */
 	isDataDropped() {
 		return this.msgObj.dropData ?? true;
+	}
+
+	/**
+	 * Returns the endpoints of the input message
+	 */
+	getEndpoints() {
+		return this.msgObj.endpoints ? this.msgObj.endpoints : [];
+	}
+
+	/**
+	 * Returns the endpoints of the input message
+	 */
+	getMiddlewares() {
+		return this.msgObj.middlewares ? this.msgObj.middlewares : [];
+	}
+
+	/**
+	 * Returns the endpoints of the input message
+	 */
+	getQueues() {
+		return this.msgObj.queues ? this.msgObj.queues : [];
+	}
+
+	/**
+	 * Returns the endpoints of the input message
+	 */
+	getTasks() {
+		return this.msgObj.tasks ? this.msgObj.tasks : [];
 	}
 
 	/**
@@ -894,6 +929,78 @@ export class DeploymentManager {
 	}
 
 	/**
+	 * Caches the application version design data
+	 */
+	async cacheMetadata() {
+		this.cacheEndpoints(this.getEndpoints(), "set");
+		this.cacheMiddlewares(this.getMiddlewares(), "set");
+		this.cacheQueues(this.getQueues(), "set");
+		this.cacheTasks(this.getTasks(), "set");
+
+		this.addLog(t("Cached application metadata"));
+	}
+
+	/**
+	 * Caches the endpoint metadata of the app version
+	 * @param  {Array} endpoints The list of endpoints data to cache
+	 * @param  {String} actionType The action type can be either set, udpate or delete
+	 */
+	async cacheEndpoints(endpoints, actionType) {
+		switch (actionType) {
+			case "set":
+				this.addToCache(`${this.getEnvId()}.endpoints`, endpoints);
+				break;
+			default:
+				break;
+		}
+	}
+
+	/**
+	 * Caches the middleware metadata of the app version
+	 * @param  {Array} middlewares The list of middlewares data to cache
+	 * @param  {String} actionType The action type can be either set, udpate or delete
+	 */
+	async cacheMiddlewares(middlewares, actionType) {
+		switch (actionType) {
+			case "set":
+				this.addToCache(`${this.getEnvId()}.middlewares`, middlewares);
+				break;
+			default:
+				break;
+		}
+	}
+
+	/**
+	 * Caches the queue metadata of the app version
+	 * @param  {Array} queues The list of queues data to cache
+	 * @param  {String} actionType The action type can be either set, udpate or delete
+	 */
+	async cacheQueues(queues, actionType) {
+		switch (actionType) {
+			case "set":
+				this.addToCache(`${this.getEnvId()}.queues`, queues);
+				break;
+			default:
+				break;
+		}
+	}
+
+	/**
+	 * Caches the task metadata of the app version
+	 * @param  {Array} tasks The list of tasks data to cache
+	 * @param  {String} actionType The action type can be either set, udpate or delete
+	 */
+	async cacheTasks(tasks, actionType) {
+		switch (actionType) {
+			case "set":
+				this.addToCache(`${this.getEnvId()}.tasks`, tasks);
+				break;
+			default:
+				break;
+		}
+	}
+
+	/**
 	 * Deploys the application version to the engine cluster
 	 */
 	async deployVersion() {
@@ -903,7 +1010,10 @@ export class DeploymentManager {
 			await this.setStatus("Deploying");
 			// First add environment object data to cache
 			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
+			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
+			// Cache application configuration data
+			await this.cacheMetadata();
 			// Load all data models and do deployment initializations
 			await this.loadDatabases();
 			// Create application specific configuration and log collections
@@ -950,6 +1060,10 @@ export class DeploymentManager {
 			await this.clearCachedData(`${this.getEnvId()}.*`);
 			// Add environment object data to cache
 			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
+			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
+
+			// Cache application configuration data
+			await this.cacheMetadata();
 			// Load all data models and do deployment initializations
 			await this.loadDatabases();
 			// After we load all configuration data to the cache we can notify engine API servers to update themselves
@@ -1043,6 +1157,7 @@ export class DeploymentManager {
 			await this.setStatus("Deploying");
 			// First add environment object data to cache
 			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
+			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
 			// Save updated deployment to database
 			await this.saveDeploymentConfig();

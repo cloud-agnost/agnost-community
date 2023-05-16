@@ -83,6 +83,17 @@ export const getRedisClient = () => {
 	return client;
 };
 
+export const getRedisClientForInit = () => {
+	//If we have the read replica cache then connect to it
+	let readReplicaConfig = null;
+	try {
+		readReplicaConfig = config.get("cache.readReplica");
+	} catch (err) {}
+
+	if (readReplicaConfig) return clientReadReplica;
+	else return client;
+};
+
 /**
  * Stores a value in cache using the key
  * @param  {string} key Stored value key

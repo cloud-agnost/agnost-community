@@ -173,17 +173,24 @@ export const VersionModel = mongoose.model(
 						enum: ["all", "specified"],
 					},
 					authorizedIPs: [{ type: String }],
-					createdBy: {
-						type: mongoose.Schema.Types.ObjectId,
-						ref: "user",
-						index: true,
+					createdAt: { type: Date, default: Date.now, immutable: true },
+					updatedAt: { type: Date },
+					createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+					updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+				},
+			],
+			npmPackages: [
+				{
+					name: {
+						type: String,
 					},
-					updatedBy: {
-						type: mongoose.Schema.Types.ObjectId,
-						ref: "user",
+					version: {
+						type: String,
 					},
 					createdAt: { type: Date, default: Date.now, immutable: true },
 					updatedAt: { type: Date },
+					createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+					updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 				},
 			],
 			createdBy: {

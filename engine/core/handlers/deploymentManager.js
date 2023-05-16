@@ -2,8 +2,10 @@ import axios from "axios";
 
 export class DeploymentManager {
 	constructor(msgObj) {
+		// Set the message object
 		this.msgObj = msgObj;
-
+		// Set the environment object
+		this.envObj = null;
 		// Deployment operation logs
 		this.logs = [];
 	}
@@ -11,8 +13,15 @@ export class DeploymentManager {
 	/**
 	 * Returns the environment object
 	 */
+	setEnvObj(envObj) {
+		this.envObj = envObj;
+	}
+
+	/**
+	 * Returns the environment object
+	 */
 	getEnvObj() {
-		return this.msgObj.env;
+		return this.envObj ?? this.msgObj.env;
 	}
 
 	/**
@@ -20,6 +29,20 @@ export class DeploymentManager {
 	 */
 	getEnvId() {
 		return this.getEnvObj().iid;
+	}
+
+	/**
+	 * Returns the version of the app
+	 */
+	getVersion() {
+		return this.getEnvObj().version;
+	}
+
+	/**
+	 * Returns the NPM packages of the version
+	 */
+	getPackages() {
+		return this.getVersion().npmPackages;
 	}
 
 	/**
@@ -51,7 +74,7 @@ export class DeploymentManager {
 	 */
 	async sendEnvironmentLogs(status = "OK") {
 		// If there is no callback just return
-		if (!this.msgObj.engineCallback) return;
+		if (!this.msgObj?.engineCallback) return;
 
 		try {
 			// Update the environment log object
@@ -69,34 +92,5 @@ export class DeploymentManager {
 				}
 			);
 		} catch (err) {}
-	}
-
-	/**
-	 * Updates the API server (engine) of the environment
-	 */
-	async manageAPIServer() {
-		try {
-			this.addLog(t("Started updating API server"));
-
-			// Update status of environment in engine cluster
-			this.addLog(t("Completed API server updates successfully"));
-			// Send the deployment telemetry information to the platform
-			//await this.sendEnvironmentLogs("OK");
-
-			return { success: true };
-		} catch (error) {
-			// Send the deployment telemetry information to the platform
-			this.addLog(
-				[
-					t("Cron job scheduling failed"),
-					error.name,
-					error.message,
-					error.stack,
-				].join("\n"),
-				"Error"
-			);
-			await this.sendEnvironmentLogs("Error");
-			return { success: false, error };
-		}
 	}
 }

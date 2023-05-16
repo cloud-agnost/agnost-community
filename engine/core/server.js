@@ -7,11 +7,17 @@ import logger from "./init/logger.js";
 import helper from "./util/helper.js";
 import { I18n } from "i18n";
 import { fileURLToPath } from "url";
-import { connectToRedisCache, disconnectFromRedisCache } from "./init/cache.js";
+import {
+	connectToRedisCache,
+	disconnectFromRedisCache,
+	getRedisClientForInit,
+	getKey,
+} from "./init/cache.js";
 import { connectToQueue, disconnectFromQueue } from "./init/queue.js";
+import { PrimaryProcessDeploymentManager } from "./handlers/primaryProcessManager.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
 // Get number of CPUS of the node
 const numCPUs = os.cpus().length;
@@ -25,19 +31,27 @@ if (cluster.isPrimary) {
 	// Set up locatlization
 	initLocalization();
 	// Connect to cache server(s)
-	await connectToRedisCache();
+	connectToRedisCache();
 	// Connect to message queue
 	connectToQueue();
 	// Gracefull handle process exist
 	handlePrimaryProcessExit();
+	getRedisClientForInit().on("connect", async function () {
+		// Get the environment information
+		let envObj = await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.object`);
+		// Create the primary process deployment manager and set up the engine core (API Sever)
+		const manager = new PrimaryProcessDeploymentManager(null);
+		manager.setEnvObj(envObj);
+		await manager.initializeCore();
 
-	for (let i = 0; i < numCPUs; i++) {
-		cluster.fork();
-	}
+		for (let i = 0; i < numCPUs; i++) {
+			cluster.fork();
+		}
 
-	cluster.on("exit", function (worker, code, signal) {
-		logger.warn(`Child process ${worker.process.pid} died`);
-		cluster.fork();
+		cluster.on("exit", function (worker, code, signal) {
+			logger.warn(`Child process ${worker.process.pid} died`);
+			cluster.fork();
+		});
 	});
 } else if (cluster.isWorker) {
 	logger.info(`Child process ${process.pid} is running`);
@@ -46,6 +60,7 @@ if (cluster.isPrimary) {
 function initGlobalsForPrimaryProcess() {
 	// Add logger to the global object
 	global.logger = logger;
+	global.__dirname = dirname;
 
 	// To correctly identify errors thrown by the engine vs. system thrown errors
 	global.AgnostError = class extends Error {
