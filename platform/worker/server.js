@@ -6,7 +6,6 @@ import cluster from "cluster";
 import process from "process";
 import config from "config";
 import path from "path";
-import os from "os";
 import responseTime from "response-time";
 import { I18n } from "i18n";
 import { fileURLToPath } from "url";
@@ -21,20 +20,10 @@ import { logRequest } from "./middlewares/logRequest.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Get number of CPUS of the node
-const numCPUs = os.cpus().length;
-
-// If this is the primary process fork as many child processes as possible to max utilize the system resources
-if (
-	cluster.isPrimary &&
-	numCPUs > 1 &&
-	["production", "clouddev"].includes(process.env.NODE_ENV)
-) {
+// If this is the primary process a child process
+if (cluster.isPrimary) {
 	logger.info(`Primary process ${process.pid} is running`);
-
-	for (let i = 0; i < numCPUs; i++) {
-		cluster.fork();
-	}
+	cluster.fork();
 
 	cluster.on("exit", function (worker, code, signal) {
 		logger.warn(`Child process ${worker.process.pid} died`);

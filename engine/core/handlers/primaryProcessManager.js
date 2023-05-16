@@ -277,14 +277,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	 */
 	async manageNPMPackages() {
 		const installedPackages = await this.getInstalledNPMPackages();
-		// const packages = this.getPackages() ?? [];
-		console.log("***installedPackages", installedPackages);
-
-		const packages = [
-			{ name: "altogic", version: "2.3.9" },
-			{ name: "moment", version: "2.29.4" },
-		];
-
+		const packages = this.getPackages() ?? [];
 		if (packages.length === 0) return;
 
 		const packagesToInstall = [];

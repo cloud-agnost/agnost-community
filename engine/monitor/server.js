@@ -6,7 +6,6 @@ import cluster from "cluster";
 import process from "process";
 import config from "config";
 import path from "path";
-import os from "os";
 import responseTime from "response-time";
 import { I18n } from "i18n";
 import { fileURLToPath } from "url";
@@ -22,15 +21,9 @@ import { logRequest } from "./middlewares/logRequest.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 var processing = false;
-// Get number of CPUS of the node
-const numCPUs = os.cpus().length;
 
-// If this is the primary process fork 1 child process
-if (
-	cluster.isPrimary &&
-	numCPUs > 1 &&
-	["production", "clouddev"].includes(process.env.NODE_ENV)
-) {
+// If this is the primary process a child process
+if (cluster.isPrimary) {
 	logger.info(`Primary process ${process.pid} is running`);
 	cluster.fork();
 
@@ -38,7 +31,7 @@ if (
 		logger.warn(`Child process ${worker.process.pid} died`);
 		cluster.fork();
 	});
-} else if (cluster.isWorker || ["development"].includes(process.env.NODE_ENV)) {
+} else if (cluster.isWorker) {
 	logger.info(`Child process ${process.pid} is running`);
 	// Init globally accessible variables
 	initGlobals();

@@ -22,11 +22,6 @@ export function setUpRealtimeServer(expressServer) {
 		},
 	});
 
-	console.log(
-		"***here",
-		process.env.REALTIME_CACHE_HOSTNAME,
-		process.env.REALTIME_CACHE_PWD
-	);
 	try {
 		// Create the redis client for pub
 		let cacheConfig = config.get("realtimeCache");

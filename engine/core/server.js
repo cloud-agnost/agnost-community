@@ -22,7 +22,7 @@ const dirname = path.dirname(filename);
 // Get number of CPUS of the node
 const numCPUs = os.cpus().length;
 
-// If this is the primary process fork as many child processes as possible to max utilize the system resources
+// If this is the primary process a child process
 if (cluster.isPrimary) {
 	logger.info(`Primary process ${process.pid} is running`);
 
