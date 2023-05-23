@@ -12,7 +12,14 @@ export const connectToQueue = () => {
 	if (isConnecting) return;
 	isConnecting = true;
 	retryCount++;
-	amqp.connect(process.env.QUEUE_URL, (error, connection) => {
+	// Get the RabbitMQ connection credentials from environment variables
+	const amqpUsername = process.env.QUEUE_USERNAME;
+	const amqpPassword = process.env.QUEUE_PASSWORD;
+	const amqpHost = process.env.QUEUE_HOST;
+	// Construct the connection URL with the credentials
+	const amqpServerUrl = `amqp://${amqpUsername}:${amqpPassword}@${amqpHost}`;
+
+	amqp.connect(amqpServerUrl, (error, connection) => {
 		isConnecting = false;
 		if (error) {
 			if (retryCount < config.get("queue.retryCount")) {
