@@ -342,7 +342,7 @@ router.post("/renew", authRefreshToken, async (req, res) => {
 @route      /v1/auth/initiate-setup
 @method     POST
 @desc       Checks the account status of the user, if the user has already completed the account set up returns an error. 
-			If the account set up has not ben completed returns success and sends a verification code to user's email address.
+			If the account set up has not been completed returns success and sends a verification code to user's email address.
 @access     public
 */
 router.post(
@@ -479,7 +479,7 @@ router.post(
 /*
 @route      /v1/auth/setup
 @method     POST
-@desc       Completes the account set-up. This endpoint needs to be called immediately after the user accepts and organization or app invitation and has not completed his account set up yet.
+@desc       Completes the account set-up. This endpoint needs to be called immediately after the user accepts an organization or app invitation and has not completed his account set up yet.
 @access     public
 */
 router.post(

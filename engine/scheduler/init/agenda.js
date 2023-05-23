@@ -96,9 +96,9 @@ const taskProcessor = async (job) => {
 			let db = dbClient.db(envId);
 			let taskInfo = {
 				trackingId: trackingId,
-				taskId: helper.generateId(taskId),
+				taskId: taskId,
 				taskName: task.name,
-				startedAt: new Date(),
+				triggeredAt: new Date(),
 				status: "pending",
 			};
 
@@ -110,6 +110,7 @@ const taskProcessor = async (job) => {
 			// Submit task to the message queue
 			submitTask(message);
 		}
+		x;
 	} catch (error) {
 		logger.error(
 			t(

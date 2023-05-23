@@ -49,6 +49,21 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: queueURL
+                 - name: CLUSTER_DB_URI
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: clusterDBURI
+                 - name: CLUSTER_DB_USER
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: clusterDBUser
+                 - name: CLUSTER_DB_PWD
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: clusterDBPwd
                  - name: MASTER_TOKEN
                    valueFrom:
                       secretKeyRef:

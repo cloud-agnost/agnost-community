@@ -1,4 +1,6 @@
-import { DeploymentManager } from "../handlers/deploymentManager.js";
+import cluster from "cluster";
+import { getKey } from "../init/cache.js";
+import { PrimaryProcessDeploymentManager } from "../handlers/primaryProcessManager.js";
 
 export const manageAPIServerHandler = (connection, envId) => {
 	connection.createChannel(function (error, channel) {
@@ -32,54 +34,32 @@ export const manageAPIServerHandler = (connection, envId) => {
 		channel.consume(
 			queue,
 			async function (msg) {
+				// Acknowledge the message
+				channel.ack(msg);
 				let msgObj = JSON.parse(msg.content.toString());
 
-				console.log("halding message", process.pid);
-				channel.ack(msg);
-				return;
-
-				// Create the deployment manager and manage the API server configuration
-				let manager = new DeploymentManager(msgObj);
-				let result = await manager.manageAPIServer();
-				console.log("***result", result);
-				if (result.success) {
-					channel.ack(msg);
-					logger.info(
-						t(
-							"Completed updating app '%s' version '%s' environment '%s' API server successfully",
-							msgObj.app.name,
-							msgObj.env.version.name,
-							msgObj.env.name
-						)
-					);
-				} else {
-					// Error occurrred
-					channel.ack(msg);
-					logger.error(
-						t(
-							"Cannot update app '%s' version '%s' to environment '%s' API server",
-							msgObj.app.name,
-							msgObj.env.version.name,
-							msgObj.env.name
-						),
-						{
-							details: {
-								orgId: msgObj.env.orgId,
-								appId: msgObj.env.appId,
-								versionId: msgObj.env.versionId,
-								envId: msgObj.env._id,
-								name: result.error?.name,
-								message: result.error?.message,
-								stack: result.error?.stack,
-								payload: msgObj,
-							},
+				switch (msgObj.action) {
+					case "deploy":
+						// Do nothing, we have already initialized the engine when it start up
+						break;
+					default:
+						// Get the environment information
+						let envObj = await getKey(
+							`${process.env.AGNOST_ENVIRONMENT_ID}.object`
+						);
+						// Create the primary process deployment manager and set up the engine core (API Sever)
+						const manager = new PrimaryProcessDeploymentManager(envObj);
+						await manager.initializeCore();
+						// Restart worker(s)
+						for (const worker of Object.values(cluster.workers)) {
+							worker.kill("SIGINT");
 						}
-					);
+						break;
 				}
+
+				return;
 			},
 			{
-				// The broker will not expect an acknowledgement of messages delivered to this consumer
-				// It will dequeue messages as soon as they’ve been sent down the wire
 				noAck: false,
 			}
 		);

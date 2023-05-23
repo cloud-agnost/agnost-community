@@ -1,6 +1,4 @@
 import express from "express";
-import { authAccessToken } from "../middlewares/authAccessToken.js";
-
 const router = express.Router({ mergeParams: true });
 
 /*

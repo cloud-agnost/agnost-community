@@ -92,6 +92,10 @@ export const EnvironmentModel = mongoose.model(
 							ref: "resource",
 							index: true,
 						},
+						iid: {
+							type: String,
+							index: true,
+						},
 						name: {
 							type: String,
 						},

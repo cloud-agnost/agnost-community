@@ -316,7 +316,7 @@ export const instanceTypes = {
 		"Azure Blob Storage",
 		"Cluster Storage",
 	],
-	queue: ["Default Queue", "RabbitMQ", "Kafka"],
+	queue: ["RabbitMQ", "Kafka"],
 	scheduler: ["Default Scheduler"],
 	realtime: ["Default Realtime"],
 };

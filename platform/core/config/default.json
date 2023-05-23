@@ -60,6 +60,7 @@
          "defaulPVCSize": "1Gi",
          "defaultSchedulerDeploymentName": "engine-scheduler-deployment",
          "defaultRealtimeDeploymentName": "engine-realtime-deployment",
+         "defaultRealtimeServerURL": "http://engine-realtime-clusterip-service:4000",
          "defaultEngineConfig": {
             "replicas": 1,
             "hpa": {

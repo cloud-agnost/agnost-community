@@ -131,11 +131,7 @@ async function upadateResourceStatus(resource, status) {
  * @param  {Object} result The resource status object
  */
 function getCachedStatus(cache, resource) {
-	if (
-		["Default Queue", "Default Scheduler", "Default Realtime"].includes(
-			resource.instance
-		)
-	) {
+	if (["Default Scheduler", "Default Realtime"].includes(resource.instance)) {
 		return cache.get(resource.instance);
 	} else return cache.get(resource.iid);
 }
@@ -147,11 +143,7 @@ function getCachedStatus(cache, resource) {
  * @param  {Object} result The resource status object
  */
 function setCachedStatus(cache, resource, result) {
-	if (
-		["Default Queue", "Default Scheduler", "Default Realtime"].includes(
-			resource.instance
-		)
-	) {
+	if (["Default Scheduler", "Default Realtime"].includes(resource.instance)) {
 		// If not already cached, add it to the cache
 		if (!cache.get(resource.instance)) cache.set(resource.instance, result);
 	} else {
@@ -361,29 +353,6 @@ async function checkResourceStatus(resource) {
 							startedAt: new Date(),
 							status: "OK",
 							message: t("Cluster storage is bound and ready"),
-						},
-					],
-				};
-			} catch (error) {
-				return {
-					status: "Error",
-					logs: {
-						startedAt: new Date(),
-						status: "Error",
-						message: error.message,
-					},
-				};
-			}
-		case "Default Queue":
-			try {
-				await checkDefaultQueue(resource.access);
-				return {
-					status: "OK",
-					logs: [
-						{
-							startedAt: new Date(),
-							status: "OK",
-							message: t("Default queue is up and running"),
 						},
 					],
 				};
@@ -761,29 +730,6 @@ async function checkDefaultRealtime(connSettings) {
 }
 
 /**
- * Returns true if the default queue pod is up and running. We have always on default queue pod in the cluster.
- * @param  {object} connSettings The connection settings needed to connect to the default queue pod
- */
-async function checkDefaultQueue(connSettings) {
-	// If the connection format is object then username and password etc. needed. If connection format is url then just the url parameter is neede
-	if (connSettings.format === "object") {
-		const { username, password, host, port } = connSettings;
-		connSettings.url = `amqp://${username}:${password}@${host}:${port}`;
-	}
-
-	try {
-		const connection = await amqp.connect(connSettings.url);
-		await connection.close();
-
-		return true;
-	} catch (err) {
-		throw new AgnostError(
-			t("Cannot connect to the Default Queue. %s", err.message)
-		);
-	}
-}
-
-/**
  * Returns true if AWS S3 bucket exits
  * @param  {object} connSettings The connection settings needed to connect to the AWS S3 storage
  */
@@ -846,7 +792,7 @@ async function checkAzureStorage(connSettings) {
 		return true;
 	} catch (err) {
 		if (err.statusCode === 404) {
-			return true;
+			return false;
 		} else {
 			throw new AgnostError(
 				t("Cannot connect to the Azure Blog Storage. %s", err.message)

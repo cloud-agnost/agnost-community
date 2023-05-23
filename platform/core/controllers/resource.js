@@ -37,7 +37,7 @@ class ResourceController extends BaseController {
 				_id: resourceId,
 				orgId: org._id,
 				iid: resourceIid,
-				name: t("Organization Storage"),
+				name: t("Default Storage"),
 				type: "storage",
 				instance: "Cluster Storage",
 				managed: true, // The size of the storage can be updated
@@ -80,10 +80,10 @@ class ResourceController extends BaseController {
 			{
 				_id: resourceId,
 				orgId: org._id,
-				iid: helper.generateSlug("que"),
-				name: t("Default Queue"),
+				iid: helper.generateSlug("mbr"),
+				name: t("Default Message Broker"),
 				type: "queue",
-				instance: "Default Queue",
+				instance: "RabbitMQ",
 				managed: false, // Default queue is a cluster resource and only cluster owner can update its configuration
 				allowedRoles: ["Admin", "Developer", "Viewer"],
 				config: {},
@@ -166,7 +166,7 @@ class ResourceController extends BaseController {
 			{
 				_id: resourceId,
 				orgId: org._id,
-				iid: helper.generateSlug("sch"),
+				iid: helper.generateSlug("rlt"),
 				name: t("Default Realtime Server"),
 				type: "realtime",
 				instance: "Default Realtime",
@@ -175,6 +175,7 @@ class ResourceController extends BaseController {
 				config: {},
 				access: helper.encyrptSensitiveData({
 					name: config.get("general.defaultRealtimeDeploymentName"),
+					serverURL: config.get("general.defaultRealtimeServerURL"),
 				}),
 				status: "Binding",
 				deletable: false,

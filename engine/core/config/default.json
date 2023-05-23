@@ -20,17 +20,27 @@
         "retryCount": 30,
         "developmentSuffix": "mito"
      },
+     "sync": {
+      "serverURL": "http://platform-sync-clusterip-service:4000",
+      "namespace": "sync",
+      "reconnection": true,
+      "reconnectionDelay": 500
+   },
      "realtime": {
-        "serverURL": "http://engine-realtime-clusterip-service:4000",
-        "namespace": "",
         "reconnection": true,
         "reconnectionDelay": 500
      },
      "general": {
         "generalQueueCount": 1,
         "taskProcessQueueCount": 1,
-        "messageProcessQueueCount": 1,  
+        "messageProcessQueueCount": 1,
+        "delayedMessageExchangeCount": 1,
         "platformBaseUrl": "http://platform-core-clusterip-service:4000",
-        "maxPoolSize": 3
+        "maxPoolSize": 3,
+        "maxLogPayloadSizeKB": 100,
+        "fileStorageFolder": "/tmp/uploads",
+        "expressRequestMaxBodySize": "100mb",
+        "endpointPrefix": "/api",
+        "gcSeconds": 30
      }
 }

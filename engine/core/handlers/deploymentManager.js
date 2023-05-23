@@ -1,17 +1,18 @@
 import axios from "axios";
+import path from "path";
+import fs from "fs/promises";
 
 export class DeploymentManager {
-	constructor(msgObj) {
-		// Set the message object
-		this.msgObj = msgObj;
+	constructor(envObj) {
 		// Set the environment object
-		this.envObj = null;
+		this.envObj = envObj;
 		// Deployment operation logs
 		this.logs = [];
 	}
 
 	/**
-	 * Returns the environment object
+	 * Set the environment object of the deployment manager
+	 * @param  {Object} envObj Environment object json
 	 */
 	setEnvObj(envObj) {
 		this.envObj = envObj;
@@ -21,7 +22,7 @@ export class DeploymentManager {
 	 * Returns the environment object
 	 */
 	getEnvObj() {
-		return this.envObj ?? this.msgObj.env;
+		return this.envObj;
 	}
 
 	/**
@@ -42,7 +43,49 @@ export class DeploymentManager {
 	 * Returns the NPM packages of the version
 	 */
 	getPackages() {
-		return this.getVersion().npmPackages;
+		return this.getVersion().npmPackages ?? [];
+	}
+
+	/**
+	 * Returns the params of the version
+	 */
+	getEnvironmentVariables() {
+		return this.getVersion().params ?? [];
+	}
+
+	/**
+	 * Returns the API keys of the version
+	 */
+	getAPIKeys() {
+		return this.getVersion().apiKeys ?? [];
+	}
+
+	/**
+	 * Returns the rate limits of the version
+	 */
+	getLimits() {
+		return this.getVersion().limits ?? [];
+	}
+
+	/**
+	 * Returns the default rate limits of the application
+	 */
+	getEndpointDefaultRateLimits() {
+		return this.getVersion().defaultEndpointLimits ?? [];
+	}
+
+	/**
+	 * Returns the environment resource mappings
+	 */
+	getResourceMappings() {
+		return this.getEnvObj().mappings ?? [];
+	}
+
+	/**
+	 * Returns the environment resource mappings
+	 */
+	getResources() {
+		return this.getEnvObj().resources ?? [];
 	}
 
 	/**
@@ -69,28 +112,35 @@ export class DeploymentManager {
 	}
 
 	/**
-	 * Updates the environment status and logs in platform
-	 * @param  {string} status Final environment status
+	 * Loads the environment config file
 	 */
-	async sendEnvironmentLogs(status = "OK") {
-		// If there is no callback just return
-		if (!this.msgObj?.engineCallback) return;
-
+	async loadEnvConfigFile() {
 		try {
-			// Update the environment log object
-			await axios.post(
-				this.msgObj.engineCallback,
-				{
-					status,
-					logs: this.logs,
-				},
-				{
-					headers: {
-						Authorization: process.env.MASTER_TOKEN,
-						"Content-Type": "application/json",
-					},
-				}
+			const appPath = path.resolve(__dirname);
+			const fileContents = await fs.readFile(
+				`${appPath}/meta/config/environment.json`,
+				"utf8"
 			);
-		} catch (err) {}
+			return JSON.parse(fileContents);
+		} catch (error) {
+			return null;
+		}
+	}
+
+	/**
+	 * Loads the specific entity configuration file, if not config file exists it returns an empty array object
+	 * @param  {string} contentType The content type such as endpoints, queues, tasks, middlewares
+	 */
+	async loadEntityConfigFile(contentType) {
+		try {
+			const appPath = path.resolve(__dirname);
+			const fileContents = await fs.readFile(
+				`${appPath}/meta/config/${contentType}.json`,
+				"utf8"
+			);
+			return JSON.parse(fileContents);
+		} catch (error) {
+			return [];
+		}
 	}
 }

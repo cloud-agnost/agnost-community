@@ -134,6 +134,9 @@ export const VersionModel = mongoose.model(
 						type: String,
 						index: true,
 					},
+					expiryDate: {
+						type: Date,
+					},
 					allowRealtime: {
 						type: Boolean,
 						default: true,
@@ -149,15 +152,15 @@ export const VersionModel = mongoose.model(
 					},
 					allowedEndpoints: [
 						{
-							//list of endpoint inames, custom type is only applicable if there is a deployed snapshot
-							type: mongoose.Schema.Types.ObjectId,
+							//list of endpoint iids
+							type: String,
 							index: true,
 						},
 					],
 					excludedEndpoints: [
 						{
-							//list of endpoint inames, custom type is only applicable if there is a deployed snapshot
-							type: mongoose.Schema.Types.ObjectId,
+							//list of endpoint iids
+							type: String,
 							index: true,
 						},
 					],

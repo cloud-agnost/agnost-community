@@ -63,6 +63,7 @@ export const connectToQueue = () => {
 			)}:${config.get("queue.port")}`
 		);
 
+		// Listen for deployment messages, the primary process listens these messages, not the child one
 		manageAPIServerHandler(connection, process.env.AGNOST_ENVIRONMENT_ID);
 	});
 };

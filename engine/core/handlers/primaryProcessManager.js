@@ -1,21 +1,21 @@
 import path from "path";
 import fs from "fs/promises";
-import { execSync, spawn } from "child_process";
+import { execSync } from "child_process";
 
 import { DeploymentManager } from "./deploymentManager.js";
 import { getKey } from "../init/cache.js";
 import { corePackages } from "../config/constants.js";
 
 export class PrimaryProcessDeploymentManager extends DeploymentManager {
-	constructor(msgObj) {
-		super(msgObj);
+	constructor(envObj) {
+		super(envObj);
 	}
 
 	/**
-	 * Initializes the API server
+	 * Manages the metadata of the api server
 	 */
 	async initializeCore() {
-		this.addLog(t("Started initializing API server"));
+		this.addLog(t("Started configuring the API server"));
 		// Check whether app is already deployed to this api server or not
 		const envConfig = await this.loadEnvConfigFile();
 
@@ -30,7 +30,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 				this.addLog(
 					t("API server has the latest configuration, no changes applied")
 				);
-				//return;
+				return;
 			}
 		}
 
@@ -57,22 +57,6 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	}
 
 	/**
-	 * Loads the environment config file
-	 */
-	async loadEnvConfigFile() {
-		try {
-			const appPath = path.resolve(__dirname);
-			const fileContents = await fs.readFile(
-				`${appPath}/meta/config/environment.json`,
-				"utf8"
-			);
-			return JSON.parse(fileContents);
-		} catch (error) {
-			return null;
-		}
-	}
-
-	/**
 	 * Save the environment config file
 	 */
 	async saveEnvConfigFile() {
@@ -80,23 +64,6 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 		const filePath = path.join(`${appPath}/meta/config/environment.json`);
 		// Write environemnt config data
 		await fs.writeFile(filePath, JSON.stringify(this.getEnvObj(), null, 2));
-	}
-
-	/**
-	 * Loads the specific entity configuration file, if not config file exists it returns an empty array object
-	 * @param  {string} contentType The content type such as endpoints, queues, tasks, middlewares
-	 */
-	async loadEntityConfigFile(contentType) {
-		try {
-			const appPath = path.resolve(__dirname);
-			const fileContents = await fs.readFile(
-				`${appPath}/meta/config/${contentType}.json`,
-				"utf8"
-			);
-			return JSON.parse(fileContents);
-		} catch (error) {
-			return [];
-		}
 	}
 
 	/**
@@ -154,18 +121,22 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 
 		// Save environment and version info
 		await this.saveEnvConfigFile();
+		// Save databases info
+		const databases = await getKey(
+			`${process.env.AGNOST_ENVIRONMENT_ID}.databases`
+		);
+		await this.saveEntityConfigFile("databases", databases);
 
 		this.addLog(t("Saved new app configuration files and metadata"));
 	}
 
 	/**
 	 * Saves configuration files to the specified meta folder and overall config folder
-	 * @param  {string} folderName The metadata foler name such as endpoints, queues, tasks, middlewares
-	 * @param  {string} contentType The content type such as endpoints, queues, tasks, middlewares
+	 * @param  {string} contentType The content type such as endpoints, queues, tasks, middlewares. This will also be used as the folder name.
 	 * @param  {Array} contents The array of JSON objects for the app configuration e.g., array of endpoints, tasks
 	 * @param  {string} actionType The action type such as set, update, delete and add
 	 */
-	async manageConfigFiles(folderName, contentType, contents, actionType) {
+	async manageConfigFiles(contentType, contents, actionType) {
 		if (contents.length === 0) return;
 
 		// We save the files both to their respective meta folder but also udpate the entries in their respective data in config folder
@@ -178,7 +149,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 			case "add":
 				for (const entry of contents) {
 					const filePath = path.join(
-						`${appPath}/meta/${folderName}/${entry.iid}.js`
+						`${appPath}/meta/${contentType}/${entry.iid}.js`
 					);
 
 					// Write file code
@@ -192,7 +163,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 			case "delete":
 				for (const entry of contents) {
 					const filePath = path.join(
-						`${appPath}/meta/${folderName}/${entry.iid}.js`
+						`${appPath}/meta/${contentType}/${entry.iid}.js`
 					);
 
 					// Delete the file if it exists
@@ -209,6 +180,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 				break;
 		}
 
+		// Save the summary info about all design elements under the /meta/config folder
 		await this.updateConfigEntries(contentType, configItems, actionType);
 	}
 
@@ -219,43 +191,35 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	 * @param  {string} actionType The action type such as set, update, delete and add
 	 */
 	async updateConfigEntries(contentType, configEntries, actionType) {
+		const config = await this.loadEntityConfigFile(contentType);
 		switch (actionType) {
 			case "set":
-				await this.saveEntityConfigFile(contentType, configEntries);
+				config = configEntries;
 				break;
 			case "add":
-				{
-					const config = await this.loadEntityConfigFile(contentType);
-					config.push(...configEntries);
-					await this.saveEntityConfigFile(contentType, config);
-				}
+				config.push(...configEntries);
+				await this.saveEntityConfigFile(contentType, config);
 				break;
 			case "update":
-				{
-					const config = await this.loadEntityConfigFile(contentType);
-					config = config.map((entry) => {
-						let newEntry = configEntries.find(
-							(newEntry) => newEntry.iid === entry.iid
-						);
+				config = config.map((entry) => {
+					let newEntry = configEntries.find(
+						(newEntry) => newEntry.iid === entry.iid
+					);
 
-						if (newEntry) return newEntry;
-						else return entry;
-					});
-					await this.saveEntityConfigFile(contentType, config);
-				}
+					if (newEntry) return newEntry;
+					else return entry;
+				});
 				break;
 			case "delete":
-				{
-					const config = await this.loadEntityConfigFile(contentType);
-					config = config.filter(
-						(entry) => !secondArray.find((item) => item.iid === entry.iid)
-					);
-					await this.saveEntityConfigFile(contentType, config);
-				}
+				config = config.filter(
+					(entry) => !secondArray.find((item) => item.iid === entry.iid)
+				);
 				break;
 			default:
 				break;
 		}
+
+		await this.saveEntityConfigFile(contentType, configEntries);
 	}
 
 	/**

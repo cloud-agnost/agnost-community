@@ -147,28 +147,28 @@ export class DeploymentManager {
 	 * Returns the endpoints of the input message
 	 */
 	getEndpoints() {
-		return this.msgObj.endpoints ? this.msgObj.endpoints : [];
+		return this.msgObj.endpoints || [];
 	}
 
 	/**
 	 * Returns the endpoints of the input message
 	 */
 	getMiddlewares() {
-		return this.msgObj.middlewares ? this.msgObj.middlewares : [];
+		return this.msgObj.middlewares || [];
 	}
 
 	/**
 	 * Returns the endpoints of the input message
 	 */
 	getQueues() {
-		return this.msgObj.queues ? this.msgObj.queues : [];
+		return this.msgObj.queues || [];
 	}
 
 	/**
 	 * Returns the endpoints of the input message
 	 */
 	getTasks() {
-		return this.msgObj.tasks ? this.msgObj.tasks : [];
+		return this.msgObj.tasks || [];
 	}
 
 	/**
@@ -534,10 +534,10 @@ export class DeploymentManager {
 		// Collection has not created yet let's create it
 		if (!collection) {
 			collection = await db.createCollection("messages");
-			// Create all required indices
+			// Create all required indices (we also keep queueName, delay and errors fields but they are not indexed)
 			await collection.createIndexes([
 				{
-					key: { messageId: 1 },
+					key: { trackingId: 1 },
 				},
 				{
 					key: { queueId: 1 },
@@ -582,7 +582,7 @@ export class DeploymentManager {
 		// Collection has not created yet let's create it
 		if (!collection) {
 			collection = await db.createCollection("cronjobs");
-			//C reate all required indices
+			//C reate all required indices (we also keep taskName and errors fields but they are not indexed)
 			await collection.createIndexes([
 				{
 					key: { trackingId: 1 },
@@ -614,7 +614,7 @@ export class DeploymentManager {
 	/**
 	 * Creates the environment specific endpoint logs collection. Endpoint logs will include the following fields
 	 * timestamp, endpointPath, method, status, duration, envId, orgId, appId, versionId, endpointId, params, query,
-	 * body, headers, cookies, response
+	 * body, headers, cookies, files, response
 	 * @param  {array} collections The list of mongodb collections of the environment database
 	 */
 	async createEndopintLogsCollection(collections) {
@@ -632,7 +632,7 @@ export class DeploymentManager {
 			//C reate all required indices
 			await collection.createIndexes([
 				{
-					key: { endpointPath: 1 },
+					key: { path: 1 },
 				},
 				{
 					key: { method: 1 },
@@ -642,6 +642,9 @@ export class DeploymentManager {
 				},
 				{
 					key: { duration: 1 },
+				},
+				{
+					key: { orgId: 1 },
 				},
 				{
 					key: { appId: 1 },
@@ -687,13 +690,16 @@ export class DeploymentManager {
 			//C reate all required indices
 			await collection.createIndexes([
 				{
-					key: { queue: 1 },
+					key: { name: 1 },
 				},
 				{
 					key: { status: 1 },
 				},
 				{
 					key: { duration: 1 },
+				},
+				{
+					key: { orgId: 1 },
 				},
 				{
 					key: { appId: 1 },
@@ -721,7 +727,7 @@ export class DeploymentManager {
 
 	/**
 	 * Creates the environment specific cron job logs collection. Cron job logs will include the following fields
-	 * timestamp, task (name), status, duration, envId, orgId, appId, versionId, queueId, result
+	 * timestamp, task (name), status, duration, envId, orgId, appId, versionId, taskId, result
 	 * @param  {array} collections The list of mongodb collections of the environment database
 	 */
 	async createCronJobLogsCollection(collections) {
@@ -918,12 +924,44 @@ export class DeploymentManager {
 		// Delete old configuration
 		await engineDb.collection("environment").deleteMany({});
 		await engineDb.collection("databases").deleteMany({});
+		await engineDb.collection("endpoints").deleteMany({});
+		await engineDb.collection("middlewares").deleteMany({});
+		await engineDb.collection("queues").deleteMany({});
+		await engineDb.collection("tasks").deleteMany({});
 
 		// Save environment and version information
 		await engineDb.collection("environment").insertOne(this.getEnvObj());
 		// We should have records to insert into database if not mongodb raises an error
 		if (this.getDatabases().length > 0)
 			await engineDb.collection("databases").insertMany(this.getDatabases());
+
+		if (this.getEndpoints().length > 0)
+			await engineDb.collection("endpoints").insertMany(this.getEndpoints());
+
+		if (this.getMiddlewares().length > 0)
+			await engineDb
+				.collection("middlewares")
+				.insertMany(this.getMiddlewares());
+
+		if (this.getQueues().length > 0)
+			await engineDb.collection("queues").insertMany(this.getQueues());
+
+		if (this.getTasks().length > 0)
+			await engineDb.collection("tasks").insertMany(this.getTasks());
+
+		this.addLog("Saved deployment configuration to database");
+	}
+
+	/**
+	 * Save new deployment configuration to the engine cluster database
+	 */
+	async saveEnvironmentDeploymentConfig() {
+		const engineDb = this.getEnvDB();
+		// Delete old configuration
+		await engineDb.collection("environment").deleteMany({});
+
+		// Save environment and version information
+		await engineDb.collection("environment").insertOne(this.getEnvObj());
 
 		this.addLog("Saved deployment configuration to database");
 	}
@@ -932,12 +970,28 @@ export class DeploymentManager {
 	 * Caches the application version design data
 	 */
 	async cacheMetadata() {
+		this.cacheDatabases(this.getDatabases(), "set");
 		this.cacheEndpoints(this.getEndpoints(), "set");
 		this.cacheMiddlewares(this.getMiddlewares(), "set");
 		this.cacheQueues(this.getQueues(), "set");
 		this.cacheTasks(this.getTasks(), "set");
 
 		this.addLog(t("Cached application metadata"));
+	}
+
+	/**
+	 * Caches the database metadata of the app version
+	 * @param  {Array} databases The list of databases data to cache
+	 * @param  {String} actionType The action type can be either set, udpate or delete
+	 */
+	async cacheDatabases(databases, actionType) {
+		switch (actionType) {
+			case "set":
+				this.addToCache(`${this.getEnvId()}.databases`, databases);
+				break;
+			default:
+				break;
+		}
 	}
 
 	/**
@@ -1160,7 +1214,7 @@ export class DeploymentManager {
 			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
 			// Save updated deployment to database
-			await this.saveDeploymentConfig();
+			await this.saveEnvironmentDeploymentConfig();
 			// Execute all redis commands altogether
 			await this.commitPipeline();
 

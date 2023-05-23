@@ -47,7 +47,7 @@ export function setUpRealtimeServer(expressServer) {
 		// Register middlewares that get executed for every incoming connection apply the middlewares and join to the default channels
 		realtimeServer.use(applyRealtimeMiddlewares());
 
-		//Get to the root namespace
+		// Get to the root namespace
 		realtimeServer.on("connection", (socket) => {
 			logger.info(`Client ${socket.id} connected`);
 

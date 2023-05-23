@@ -57,7 +57,6 @@ class VersionController extends BaseController {
 		let defaultResources = await resourceCtrl.getManyByQuery({
 			orgId: org._id,
 			$or: [
-				{ instance: "Default Queue" },
 				{ instance: "Default Scheduler" },
 				{ instance: "Default Realtime" },
 			],
@@ -68,10 +67,11 @@ class VersionController extends BaseController {
 				design: {
 					iid: envIid,
 					type: "engine",
-					name: t("Engine"),
+					name: t("apiServer"),
 				},
 				resource: {
 					id: resource._id,
+					iid: resource.iid,
 					name: resource.name,
 					type: resource.type,
 					instance: resource.instance,
@@ -81,29 +81,16 @@ class VersionController extends BaseController {
 
 		for (let i = 0; i < defaultResources.length; i++) {
 			let res = defaultResources[i];
-			if (res.instance === "Default Queue") {
-				mappings.push({
-					design: {
-						iid: envIid,
-						type: "queue",
-						name: t("Message broker"),
-					},
-					resource: {
-						id: res._id,
-						name: res.name,
-						type: res.type,
-						instance: res.instance,
-					},
-				});
-			} else if (res.instance === "Default Scheduler") {
+			if (res.instance === "Default Scheduler") {
 				mappings.push({
 					design: {
 						iid: envIid,
 						type: "scheduler",
-						name: t("Cronjob scheduler"),
+						name: t("cronScheduler"),
 					},
 					resource: {
 						id: res._id,
+						iid: res.iid,
 						name: res.name,
 						type: res.type,
 						instance: res.instance,
@@ -114,10 +101,11 @@ class VersionController extends BaseController {
 					design: {
 						iid: envIid,
 						type: "realtime",
-						name: t("Realtime server"),
+						name: t("realtimeServer"),
 					},
 					resource: {
 						id: res._id,
+						iid: res.iid,
 						name: res.name,
 						type: res.type,
 						instance: res.instance,

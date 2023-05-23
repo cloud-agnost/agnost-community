@@ -1,4 +1,3 @@
-import axios from "axios";
 import ERROR_CODES from "../config/errorCodes.js";
 
 /**

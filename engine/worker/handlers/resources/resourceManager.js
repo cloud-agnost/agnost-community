@@ -367,7 +367,7 @@ export class ResourceManager {
 	/**
 	 * Creates an engine deployment (API server)
 	 * @param  {string} deploymentName The deployment name prefix (resource iid)
-	 * @param  {object} accessConfig The access configuration fo the deployment
+	 * @param  {object} accessConfig The access configuration of the deployment
 	 * @param  {object} deploymentConfig The deployment configuration
 	 */
 	async createDeployment(deploymentName, accessConfig, deploymentConfig) {
@@ -417,8 +417,40 @@ export class ResourceManager {
 										value: accessConfig.envId,
 									},
 									{
-										name: "AGNOST_ENGINE_ID",
-										value: accessConfig.name,
+										name: "CACHE_HOSTNAME",
+										value: process.env.CACHE_HOSTNAME,
+									},
+									{
+										name: "CACHE_READ_REPLICA_HOSTNAME",
+										value: process.env.CACHE_READ_REPLICA_HOSTNAME,
+									},
+									{
+										name: "CACHE_PWD",
+										value: process.env.CACHE_PWD,
+									},
+									{
+										name: "CACHE_READ_REPLICA_PWD",
+										value: process.env.CACHE_READ_REPLICA_PWD,
+									},
+									{
+										name: "QUEUE_URL",
+										value: process.env.QUEUE_URL,
+									},
+									{
+										name: "CLUSTER_DB_URI",
+										value: process.env.CLUSTER_DB_URI,
+									},
+									{
+										name: "CLUSTER_DB_USER",
+										value: process.env.CLUSTER_DB_USER,
+									},
+									{
+										name: "CLUSTER_DB_PWD",
+										value: process.env.CLUSTER_DB_PWD,
+									},
+									{
+										name: "MASTER_TOKEN",
+										value: process.env.MASTER_TOKEN,
 									},
 								],
 								resources: {

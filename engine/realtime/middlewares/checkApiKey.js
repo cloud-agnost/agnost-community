@@ -28,7 +28,7 @@ export const checkApiKey = async function (socket) {
 
 	// Get the list of the API keys of the app version
 	const apiKeys = socket.temp.apiKeys;
-	// If no API keys specified for the version then return erro message
+	// If no API keys specified for the version then return error message
 	if (!apiKeys || apiKeys.length === 0) {
 		socket.disconnect(true);
 		return helper.errorMessage(
@@ -82,17 +82,68 @@ export const checkApiKey = async function (socket) {
 		);
 	}
 
-	// Check if the api key requires authorized domains and if yes the request origin is from a valid domain
-	if (apiKeyObj.domainAuthorization === "specified") {
-		let origin = socket.handshake.headers?.origin;
-		if (origin && apiKeyObj.authorizedDomains.includes(origin) === false) {
+	// Check if key has expiry date and if it is expired or not
+	if (apiKeyObj.expiryDate) {
+		let expiryDate = new Date(apiKeyObj.expiryDate);
+
+		if (Date.now() > expiryDate) {
 			socket.disconnect(true);
 			return helper.errorMessage(
 				{
-					error: t("Realtime Connection Error - Origin Domain Not Authorized"),
-					details: t("Origin domain '%s' is not an authorized domain", origin),
+					error: t("Realtime Connection Error - Expired API Key"),
+					details: t(
+						"API key is expired, no request can be processed with this API key until its expiry date is extended"
+					),
 				},
-				ERROR_CODES.domainNotAuthorized
+				ERROR_CODES.expiredAPIKey
+			);
+		}
+	}
+
+	// Check if the api key requires authorized domains and if yes the request origin is from a valid domain
+	if (apiKeyObj.domainAuthorization === "specified") {
+		let origin = socket.handshake.headers?.origin;
+		if (origin) {
+			// Check if the origin is in the allowed domains list
+			const isAllowedDomain = apiKeyObj.authorizedDomains.some((domain) => {
+				if (domain.startsWith("*.")) {
+					// Wildcard subdomain match
+					const regex = new RegExp(
+						`^[^.]+\\.${allowedDomain.substr(2).replace(".", "\\.")}$`,
+						"i"
+					);
+					return regex.test(origin);
+				} else {
+					// Exact domain match
+					return origin === domain;
+				}
+			});
+
+			if (!isAllowedDomain) {
+				socket.disconnect(true);
+				return helper.errorMessage(
+					{
+						error: t(
+							"Realtime Connection Error - Origin Domain Not Authorized"
+						),
+						details: t(
+							"Origin domain '%s' is not an authorized domain",
+							origin
+						),
+					},
+					ERROR_CODES.domainNotAuthorized
+				);
+			}
+		} else {
+			socket.disconnect(true);
+			return helper.errorMessage(
+				{
+					error: t("Realtime Connection Error - Origin Domain Not Found"),
+					details: t(
+						"The provided API key requires authorized domain control but request does not have a origin header to check against whitelisted domains"
+					),
+				},
+				ERROR_CODES.missingRequestOrigin
 			);
 		}
 	}
@@ -107,14 +158,24 @@ export const checkApiKey = async function (socket) {
 				: clientIP
 			: null;
 
-		if (
-			clientIP &&
-			helper.isAuthorizedIP(clientIP, apiKeyObj.authorizedIPs) === false
-		) {
+		if (!clientIP) {
 			socket.disconnect(true);
 			return helper.errorMessage(
 				{
-					error: t("Realtime Connection Error - IP Address Authorized"),
+					error: t("Realtime Connection Error - IP Address Not Found"),
+					details: t(
+						"The proviced API key requires authorized IP address control but request does not have an IP address to check against whitelisted IP addresses"
+					),
+				},
+				ERROR_CODES.missingClientIP
+			);
+		}
+
+		if (helper.isAuthorizedIP(clientIP, apiKeyObj.authorizedIPs) === false) {
+			socket.disconnect(true);
+			return helper.errorMessage(
+				{
+					error: t("Realtime Connection Error - IP Address Not Authorized"),
 					details: t("IP address '%s' is not whitelisted", clientIP),
 				},
 				ERROR_CODES.IPNotAuthorized

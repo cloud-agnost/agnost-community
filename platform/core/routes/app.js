@@ -86,9 +86,6 @@ router.post(
 				schedulerLog,
 			});
 
-			// Create the engine deployment (API server), associated HPA, service and ingress rule
-			await resourceCtrl.manageClusterResources([{ resource, log: resLog }]);
-
 			// Deploy application version to the environment
 			await deployCtrl.deploy(
 				{ dbLog, engineLog, schedulerLog },
@@ -100,6 +97,10 @@ router.post(
 
 			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
 			await setKey(env._id, env, helper.constants["1month"]);
+
+			// We first deploy the app then create the resources. The environment data needs to be cached before the api-server pod starts up.
+			// Create the engine deployment (API server), associated HPA, service and ingress rule
+			await resourceCtrl.manageClusterResources([{ resource, log: resLog }]);
 
 			// Log action
 			auditCtrl.logAndNotify(

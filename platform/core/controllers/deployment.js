@@ -86,12 +86,15 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			env: { ...env, version, timestamp: new Date() },
+			// We pass the list of resources in env object
+			env: { ...env, version, resources, timestamp: new Date() },
 			databases: [],
 			endpoints: [],
 			middlewares: [],
 			queues: [],
 			tasks: [],
+			storage: [],
+			cache: [],
 		};
 
 		// For each design element build entries in the payload
@@ -102,7 +105,7 @@ class DeploymentController {
 				(entry) => entry._id.toString() === mapping.resource.id.toString()
 			);
 
-			// If there is no resource availble we skip the design element
+			// If there is no resource available we skip the design element
 			if (!resource) continue;
 			// We have the design element
 			switch (mapping.design.type) {
@@ -112,7 +115,7 @@ class DeploymentController {
 						mapping.design.iid
 					);
 					if (db) {
-						// Assign the resource info of the database, also add the default database name to the access settings
+						// Assign the resource info of the database
 						db.resource = resource;
 						payload.databases.push(db);
 					}
@@ -173,12 +176,15 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			env: { ...env, version, timestamp: new Date() },
+			// We pass the list of resources in env object
+			env: { ...env, version, resources, timestamp: new Date() },
 			databases: [],
 			endpoints: [],
 			middlewares: [],
 			queues: [],
 			tasks: [],
+			storage: [],
+			cache: [],
 		};
 
 		// For each design element build entries in the payload

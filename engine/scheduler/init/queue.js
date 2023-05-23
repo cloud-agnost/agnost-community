@@ -109,18 +109,19 @@ export const submitTask = (payload) => {
 		);
 
 		channel.assertQueue(
-			`process-task-${payload.envId}-${randNumber}${config.get(
-				"queue.developmentSuffix"
-			)}`,
+			`process-task-${payload.envId}-${
+				payload.taskId
+			}-${randNumber}${config.get("queue.developmentSuffix")}`,
 			{
 				durable: true,
+				autoDelete: true,
 			}
 		);
 
 		channel.sendToQueue(
-			`process-task-${payload.envId}-${randNumber}${config.get(
-				"queue.developmentSuffix"
-			)}`,
+			`process-task-${payload.envId}-${
+				payload.taskId
+			}-${randNumber}${config.get("queue.developmentSuffix")}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,
