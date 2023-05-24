@@ -44,11 +44,21 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: cacheReadReplicaPwd
-                 - name: QUEUE_URL
+                 - name: QUEUE_USERNAME
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets
-                         key: queueURL
+                         key: queueUsername
+                 - name: QUEUE_PASSWORD
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: queuePassword
+                 - name: QUEUE_HOST
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: queueHost
                  - name: CLUSTER_DB_URI
                    valueFrom:
                       secretKeyRef:
@@ -69,6 +79,10 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: masterToken
+                 - name: POD_NAME
+                   valueFrom:
+                      fieldRef:
+                         fieldPath: metadata.name
                  - name: AGNOST_ENVIRONMENT_ID
                    value: env-7eqm41n7nsul
                  - name: AGNOST_ENGINE_ID

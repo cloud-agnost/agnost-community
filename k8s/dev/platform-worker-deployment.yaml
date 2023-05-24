@@ -42,11 +42,21 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: cacheReadReplicaPwd
-                 - name: QUEUE_URL
+                 - name: QUEUE_USERNAME
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets
-                         key: queueURL
+                         key: queueUsername
+                 - name: QUEUE_PASSWORD
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: queuePassword
+                 - name: QUEUE_HOST
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: queueHost
                  - name: EMAIL_SERVER_USER
                    valueFrom:
                       secretKeyRef:
