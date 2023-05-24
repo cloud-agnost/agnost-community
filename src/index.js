@@ -51,7 +51,7 @@ async function createDeployment(deploymentName, imageName, replicaCount, contain
             env: [
               {
                 name: "MONGODB_NODES",
-                value: "mongo-srv://mimongodb-0.mongodb-headless.default.svc.cluster.local,mongodb-1.mongodb-headless.default.svc.cluster.local,mongodb-2.mongodb-headless.default.svc.cluster.local",
+                value: "mongodb://mongodb-svc.default.svc/agnost_enterprise?retryWrites=true&w=majority",
               },
               {
                 name: "MONGODB_PASSWORD",
@@ -63,30 +63,12 @@ async function createDeployment(deploymentName, imageName, replicaCount, contain
                 }
               },
               {
-                name: "RABBITMQ_NODES",
-                value: "rabbitmq-server-0.rabbitmq-nodes.default.svc.cluster.local,rabbitmq-server-1.rabbitmq-nodes.default.svc.cluster.local,rabbitmq-server-2.rabbitmq-nodes.default.svc.cluster.local"
-              },
-              {
-                name: "RABBITMQ_USERNAME",
-                valueFrom: {
-                  secretKeyRef: {
-                    name: "rabbitmq-default-user",
-                    key: "username"
-                  }
-                }
-              },
-              {
-                name: "RABBITMQ_PASSWORD",
-                valueFrom: {
-                  secretKeyRef: {
-                    name: "rabbitmq-default-user",
-                    key: "password"
-                  }
-                }
+                name: "QUEUE_URL",
+                value: "amqp://rabbitmq.default.svc"
               },
               {
                 name: "REDIS_HOST",
-                value: "redis-master.default.svc.cluster.local",
+                value: "redis-master.default.svc",
               },
               {
                 name: "REDIS_PASSWORD",
@@ -293,7 +275,7 @@ async function createMongoDBResource(mongoName, mongoVersion, memoryRequest, mem
             },
             {
               db: "admin",
-              name: "userAdminAnyDatabase"
+              name: "readWriteAnyDatabase"
             }
           ],
           scramCredentialsSecretName: "my-user"
@@ -349,12 +331,153 @@ async function createMongoDBResource(mongoName, mongoVersion, memoryRequest, mem
     }
   };
 
-  const response = await k8sCustomApi.createNamespacedCustomObject('mongodbcommunity.mongodb.com', 'v1', 'default', 'mongodbcommunity', mongodbResource);
-  return response.body;
+  const dbResult = await k8sCustomApi.createNamespacedCustomObject('mongodbcommunity.mongodb.com', 'v1', 'default', 'mongodbcommunity', mongodbResource);
+  return dbResult.body;
 }
 
-//createMongoDBResource().catch(console.error);
+async function createRabbitmqCluster(clusterName) {
+  const rabbitmqCluster = {
+    apiVersion: "rabbitmq.com/v1beta1",
+    kind: "RabbitmqCluster",
+    metadata: {
+      name: clusterName,
+    },
+    spec: {
+      override: {
+        statefulSet: {
+          spec: {
+            template: {
+              spec: {
+                containers: [
+                  {
+                    name: "rabbitmq",
+                    volumeMounts: [
+                      {
+                        mountPath: "/opt/rabbitmq/community-plugins",
+                        name: "community-plugins"
+                      }
+                    ]
+                  }
+                ],
+                initContainers: [
+                  {
+                    command: [
+                      "sh",
+                      "-c",
+                      "curl -L -v https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/3.11.1/rabbitmq_delayed_message_exchange-3.11.1.ez --output /community-plugins/rabbitmq_delayed_message_exchange-3.11.1.ez"
+                    ],
+                    image: "curlimages/curl",
+                    imagePullPolicy: "IfNotPresent",
+                    name: "copy-community-plugins",
+                    resources: {
+                      limits: {
+                        cpu: "100m",
+                        memory: "500Mi"
+                      },
+                      requests: {
+                        cpu: "100m",
+                        memory: "500Mi"
+                      }
+                    },
+                    terminationMessagePolicy: "FallbackToLogsOnError",
+                    volumeMounts: [
+                      {
+                        mountPath: "/community-plugins/",
+                        name: "community-plugins"
+                      }
+                    ]
+                  }
+                ],
+                volumes: [
+                  {
+                    emptyDir: {},
+                    name: "community-plugins"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      persistence: {
+        storage: "3Gi",
+        storageClassName: "standard"
+      },
+      rabbitmq: {
+        additionalConfig: "default_user_tags.administrator = true\n",
+        additionalPlugins: [
+          "rabbitmq_delayed_message_exchange"
+        ],
+        envConfig: "RABBITMQ_PLUGINS_DIR=/opt/rabbitmq/plugins:/opt/rabbitmq/community-plugins:/opt/bitnami/rabbitmq/plugins\n"
+      },
+      replicas: 3,
+      resources: {
+        limits: {
+          cpu: "200m",
+          memory: "500Mi"
+        },
+        requests: {
+          cpu: "200m",
+          memory: "500Mi"
+        }
+      }
+    }
+  };
 
+  const clusterResult = await k8sCustomApi.createNamespacedCustomObject('rabbitmq.com', 'v1beta1', 'default', 'rabbitmqclusters', rabbitmqCluster);
+  return clusterResult.body;
+}
+
+async function createRabbitmqUser(clusterName, userName) {
+  const rabbitmqUser = {
+    apiVersion: "rabbitmq.com/v1beta1",
+    kind: "User",
+    metadata: {
+      name: userName
+    },
+    spec: {
+      importCredentialsSecret: {
+        name: "rabbitmq-credentials"
+      },
+      rabbitmqClusterReference: {
+        name: clusterName
+      },
+      tags: [
+        "administrator"
+      ]
+    }
+  };
+
+  const userResult = await k8sCustomApi.createNamespacedCustomObject('rabbitmq.com', 'v1beta1', 'default', 'users', rabbitmqUser);
+  return userResult.body;
+}
+
+async function createRabbitmqPermission(clusterName, userName) {
+  const rabbitmqPermission = {
+    apiVersion: "rabbitmq.com/v1beta1",
+    kind: "Permission",
+    metadata: {
+      name: userName + '-permission'
+    },
+    spec: {
+      permissions: {
+        configure: ".*",
+        read: ".*",
+        write: ".*"
+      },
+      rabbitmqClusterReference: {
+        name: clusterName
+      },
+      userReference: {
+        name: userName
+      },
+      vhost: "/"
+    }
+  };
+
+  const permResult = await k8sCustomApi.createNamespacedCustomObject('rabbitmq.com', 'v1beta1', 'default', 'permissions', rabbitmqPermission);
+  return permResult.body;
+}
 
 // Create a Kubernetes deployment, service, ingress, and HPA
 app.post('/deployments', async (req, res) => {
@@ -384,6 +507,25 @@ app.post('/mongodb', async (req, res) => {
   try {
     const mongoResult = await createMongoDBResource(mongoName, mongoVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit);
     res.json({ mongodb: mongoResult.body });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Create a RabbitMQ Cluster
+app.post('/rabbitmq', async (req, res) => {
+  const { clusterName, userName } = req.body;
+
+  try {
+    const clusterResult = await createRabbitmqCluster(clusterName);
+    const userResult = await createRabbitmqUser(clusterName, userName);
+    const permResult = await createRabbitmqPermission(clusterName, userName);
+    res.json({
+      rabbitmq: clusterResult.body,
+      user: userResult.body,
+      permission: permResult.body
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
