@@ -63,16 +63,8 @@ router.post(
 			const { name } = req.body;
 
 			// Create the new app and associated master version, environment and engine API server
-			const {
-				app,
-				version,
-				resource,
-				resLog,
-				env,
-				dbLog,
-				engineLog,
-				schedulerLog,
-			} = await appCtrl.createApp(session, user, org, name);
+			const { app, version, resource, resLog, env, envLog } =
+				await appCtrl.createApp(session, user, org, name);
 
 			await appCtrl.commit(session);
 			res.json({
@@ -81,19 +73,11 @@ router.post(
 				resource,
 				resLog,
 				env,
-				dbLog,
-				engineLog,
-				schedulerLog,
+				envLog,
 			});
 
 			// Deploy application version to the environment
-			await deployCtrl.deploy(
-				{ dbLog, engineLog, schedulerLog },
-				app,
-				version,
-				env,
-				user
-			);
+			await deployCtrl.deploy(envLog, app, version, env, user);
 
 			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
 			await setKey(env._id, env, helper.constants["1month"]);

@@ -42,8 +42,9 @@ if (cluster.isPrimary) {
 	getRedisClientForInit().on("connect", async function () {
 		// Get the environment information
 		let envObj = await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.object`);
+		if (!envObj) return;
 		// Create the primary process deployment manager and set up the engine core (API Sever)
-		const manager = new PrimaryProcessDeploymentManager(envObj);
+		const manager = new PrimaryProcessDeploymentManager(null, envObj);
 		await manager.initializeCore();
 
 		// Fork child process
@@ -66,7 +67,7 @@ if (cluster.isPrimary) {
 	connectToRedisCache();
 	getRedisClient().on("connect", async function () {
 		// Create the child process manager which will set up the API server
-		const manager = new ChildProcessDeploymentManager(null, i18n);
+		const manager = new ChildProcessDeploymentManager(null, null, i18n);
 		await manager.initializeCore();
 	});
 	// Connect to synchronization server

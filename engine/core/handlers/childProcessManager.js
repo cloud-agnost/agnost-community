@@ -20,8 +20,8 @@ import { adapterManager } from "./adapterManager.js";
 import { MetaManager } from "./metaManager.js";
 
 export class ChildProcessDeploymentManager extends DeploymentManager {
-	constructor(envObj, i18n) {
-		super(envObj);
+	constructor(msgObj, envObj, i18n) {
+		super(msgObj, envObj);
 		this.expressApp = null;
 		this.i18n = i18n;
 	}
@@ -61,6 +61,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		await this.initExpressServer();
 		// Manage endpoints
 		await this.manageEndpoints();
+		// Spin up the express server
+		await this.startExpressServer();
+
 		// Initialize the connection manager
 		await this.setupResourceConnections();
 		// Create initial buckets if needed, don't call it with await it can run in parallel
@@ -70,8 +73,6 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Set up the task listeners
 		await this.manageTasks();
 
-		// Spin up the express server
-		await this.startExpressServer();
 		logger.info(`Completed initializing the API server`);
 	}
 
@@ -300,6 +301,11 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		const resources = this.getResources();
 		for (const resource of resources) {
 			await adapterManager.setupConnection(resource);
+			logger.info(
+				`Initialized the adapter of '%s' resource '%s'`,
+				resource.type,
+				resource.name
+			);
 		}
 	}
 
@@ -337,7 +343,10 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		for (const queue of queueus) {
 			const adapterObj = adapterManager.getQueueAdapter(queue.name);
-			if (adapterObj) adapterObj.listenMessages(queue.iid);
+			if (adapterObj) {
+				adapterObj.listenMessages(queue.iid);
+				logger.info(`Initialized handler of queue '%s'`, queue.name);
+			}
 		}
 	}
 
@@ -353,7 +362,10 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		for (const task of tasks) {
 			const adapterObj = adapterManager.getTaskAdapter(queue.name);
-			if (adapterObj) adapterObj.listenMessages(task.iid);
+			if (adapterObj) {
+				adapterObj.listenMessages(task.iid);
+				logger.info(`Initialized handler of task '%s'`, task.name);
+			}
 		}
 	}
 }

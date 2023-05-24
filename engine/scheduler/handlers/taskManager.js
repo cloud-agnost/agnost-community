@@ -54,6 +54,33 @@ export class TaskManager {
 	}
 
 	/**
+	 * Updates the environment status and logs in platform
+	 * @param  {string} status Final environment status
+	 */
+	async sendEnvironmentLogs(status = "OK") {
+		// If there is no callback just return
+		if (!this.msgObj.callback) return;
+
+		try {
+			// Update the environment log object
+			await axios.post(
+				this.msgObj.callback,
+				{
+					status,
+					logs: this.logs,
+					type: "scheduler",
+				},
+				{
+					headers: {
+						Authorization: process.env.MASTER_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+		} catch (err) {}
+	}
+
+	/**
 	 * Schedules the application version tasks (cron jobs)
 	 */
 	async deployTasks() {
@@ -69,6 +96,8 @@ export class TaskManager {
 
 			// Update status of environment in engine cluster
 			this.addLog(t("Completed cron job scheduling successfully"));
+			// Send the deployment telemetry information to the platform
+			await this.sendEnvironmentLogs("OK");
 
 			return { success: true };
 		} catch (error) {
@@ -82,6 +111,7 @@ export class TaskManager {
 				].join("\n"),
 				"Error"
 			);
+			await this.sendEnvironmentLogs("Error");
 			return { success: false, error };
 		}
 	}
@@ -104,6 +134,9 @@ export class TaskManager {
 
 			// Update status of environment in engine cluster
 			this.addLog(t("Completed cron job rescheduling successfully"));
+			// Send the deployment telemetry information to the platform
+			await this.sendEnvironmentLogs("OK");
+
 			return { success: true };
 		} catch (error) {
 			// Send the deployment telemetry information to the platform
@@ -116,6 +149,7 @@ export class TaskManager {
 				].join("\n"),
 				"Error"
 			);
+			await this.sendEnvironmentLogs("Error");
 			return { success: false, error };
 		}
 	}
@@ -136,6 +170,9 @@ export class TaskManager {
 
 			// Update status of environment in engine cluster
 			this.addLog(t("Completed cron job cancellation successfully"));
+			// Send the deployment telemetry information to the platform
+			await this.sendEnvironmentLogs("OK");
+
 			return { success: true };
 		} catch (error) {
 			// Send the deployment telemetry information to the platform
@@ -148,6 +185,7 @@ export class TaskManager {
 				].join("\n"),
 				"Error"
 			);
+			await this.sendEnvironmentLogs("Error");
 			return { success: false, error };
 		}
 	}
@@ -176,6 +214,7 @@ export class TaskManager {
 				].join("\n"),
 				"Error"
 			);
+			await this.sendEnvironmentLogs("Error");
 			return { success: false, error };
 		}
 	}

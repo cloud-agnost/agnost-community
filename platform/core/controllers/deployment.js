@@ -50,34 +50,24 @@ class DeploymentController {
 
 	/**
 	 * Deploys the version to the environment
-	 * @param  {object} log The environment logs object includes the log entries for db, engine and scheduler
+	 * @param  {object} envLog The environment log object
 	 * @param  {object} app The application object
 	 * @param  {object} version The version object
 	 * @param  {object} env The environment object
 	 * @param  {object} user The user who initiated the deployment
 	 */
-	async deploy({ dbLog, engineLog, schedulerLog }, app, version, env, user) {
+	async deploy(envLog, app, version, env, user) {
 		// First get the list of environment resources
 		let resources = await this.getEnvironmentResources(env);
 
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "deploy",
-			dbCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
+			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
 				env.orgId
 			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				dbLog._id
-			}?type=db`,
-			engineCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
-				env.orgId
-			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				engineLog._id
-			}?type=engine`,
-			schedulerCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
-				env.orgId
-			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				schedulerLog._id
-			}?type=scheduler`,
+				envLog._id
+			}`,
 			actor: {
 				userId: user._id,
 				name: user.name,
@@ -140,34 +130,24 @@ class DeploymentController {
 
 	/**
 	 * Redeploys the version to the environment
-	 * @param  {object} log The environment logs object includes the log entries for db, engine and scheduler
+	 * @param  {object} envLog The environment log object
 	 * @param  {object} app The application object
 	 * @param  {object} version The version object
 	 * @param  {object} env The environment object
 	 * @param  {object} user The user who initiated the deployment
 	 */
-	async redeploy({ dbLog, engineLog, schedulerLog }, app, version, env, user) {
+	async redeploy(envLog, app, version, env, user) {
 		// First get the list of environment resources
 		let resources = await this.getEnvironmentResources(env);
 
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "redeploy",
-			dbCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
+			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
 				env.orgId
 			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				dbLog._id
-			}?type=db`,
-			engineCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
-				env.orgId
-			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				engineLog._id
-			}?type=engine`,
-			schedulerCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
-				env.orgId
-			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				schedulerLog._id
-			}?type=scheduler`,
+				envLog._id
+			}`,
 			actor: {
 				userId: user._id,
 				name: user.name,
@@ -239,9 +219,7 @@ class DeploymentController {
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "delete",
-			dbCallback: null,
-			engineCallback: null,
-			schedulerCallback: null,
+			callback: null,
 			actor: {
 				userId: user._id,
 				name: user.name,
@@ -268,29 +246,24 @@ class DeploymentController {
 
 	/**
 	 * Updates the environment (environment and version) metadata in engine cluster if autoDeploy is turned on and the version is deployed to the environemnt
-	 * @param  {object} log The environment logs object includes the log entries for db and engine
+	 * @param  {object} envLog The environment log object
 	 * @param  {object} app The application object
 	 * @param  {object} version The version object
 	 * @param  {object} env The environment object
 	 * @param  {object} user The user who initiated the deployment
 	 */
-	async update({ dbLog, engineLog }, app, version, env, user) {
+	async update(envLog, app, version, env, user) {
 		// If auto deploy is turned off or version has not been deployed to the environment then we do not send the environment updates to the engine cluster
 		if (!env.autoDeploy || !env.deploymentDtm) return;
 
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "auto-deploy",
-			dbCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
+			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
 				env.orgId
 			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				dbLog._id
-			}?type=db`,
-			engineCallback: `${config.get("general.platformBaseUrl")}/v1/org/${
-				env.orgId
-			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				engineLog._id
-			}?type=engine`,
+				envLog._id
+			}`,
 			actor: {
 				userId: user._id,
 				name: user.name,

@@ -45,14 +45,40 @@ export const EnvironmentLogModel = mongoose.model(
 			enum: envActions,
 			required: true,
 		},
-		status: {
+		dbStatus: {
+			type: String,
+			index: true,
+			enum: envStatuses,
+			required: true,
+		},
+		serverStatus: {
+			type: String,
+			index: true,
+			enum: envStatuses,
+			required: true,
+		},
+		schedulerStatus: {
 			type: String,
 			index: true,
 			enum: envStatuses,
 			required: true,
 		},
 		// Deployment log status
-		logs: [
+		dbLogs: [
+			{
+				startedAt: { type: Date },
+				status: { type: String, enum: logStatuses },
+				message: { type: String },
+			},
+		],
+		serverLogs: [
+			{
+				startedAt: { type: Date },
+				status: { type: String, enum: logStatuses },
+				message: { type: String },
+			},
+		],
+		schedulerLogs: [
 			{
 				startedAt: { type: Date },
 				status: { type: String, enum: logStatuses },

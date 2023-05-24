@@ -433,8 +433,16 @@ export class ResourceManager {
 										value: process.env.CACHE_READ_REPLICA_PWD,
 									},
 									{
-										name: "QUEUE_URL",
-										value: process.env.QUEUE_URL,
+										name: "QUEUE_USERNAME",
+										value: process.env.QUEUE_USERNAME,
+									},
+									{
+										name: "QUEUE_PASSWORD",
+										value: process.env.QUEUE_PASSWORD,
+									},
+									{
+										name: "QUEUE_HOST",
+										value: process.env.QUEUE_HOST,
 									},
 									{
 										name: "CLUSTER_DB_URI",

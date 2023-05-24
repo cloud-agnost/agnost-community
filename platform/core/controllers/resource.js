@@ -88,7 +88,10 @@ class ResourceController extends BaseController {
 				allowedRoles: ["Admin", "Developer", "Viewer"],
 				config: {},
 				access: helper.encyrptSensitiveData({
-					url: process.env.QUEUE_URL,
+					format: "object", // can be either object or url
+					username: process.env.QUEUE_USERNAME,
+					password: process.env.QUEUE_PASSWORD,
+					host: process.env.QUEUE_HOST,
 				}),
 				status: "Binding",
 				deletable: false,

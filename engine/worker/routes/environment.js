@@ -21,15 +21,14 @@ const router = express.Router({ mergeParams: true });
 */
 router.post("/deploy", checkContentType, authAccessToken, async (req, res) => {
 	try {
-		const { timestamp, action, schedulerCallback, actor, app, env, tasks } =
-			req.body;
+		const { timestamp, action, callback, actor, app, env, tasks } = req.body;
 		// Cache items and manage databases
 		deployVersion(req.body);
 		// Deploy tasks
 		deployTasks({
 			timestamp,
 			action,
-			schedulerCallback,
+			callback,
 			actor,
 			app,
 			env,
@@ -53,15 +52,14 @@ router.post(
 	authAccessToken,
 	async (req, res) => {
 		try {
-			const { timestamp, action, schedulerCallback, actor, app, env, tasks } =
-				req.body;
+			const { timestamp, action, callback, actor, app, env, tasks } = req.body;
 			// Cache items and manage databases
 			redeployVersion(req.body);
 			// Redeploy tasks
 			redeployTasks({
 				timestamp,
 				action,
-				schedulerCallback,
+				callback,
 				actor,
 				app,
 				env,
@@ -82,15 +80,14 @@ router.post(
 */
 router.post("/delete", checkContentType, authAccessToken, async (req, res) => {
 	try {
-		const { timestamp, action, schedulerCallback, actor, app, env, tasks } =
-			req.body;
+		const { timestamp, action, callback, actor, app, env, tasks } = req.body;
 		// Clear cache items and manage databases
 		deleteEnvironment(req.body);
 		// Delete all task schedules
 		deleteTasks({
 			timestamp,
 			action,
-			schedulerCallback,
+			callback,
 			actor,
 			app,
 			env,

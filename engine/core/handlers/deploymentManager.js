@@ -3,7 +3,8 @@ import path from "path";
 import fs from "fs/promises";
 
 export class DeploymentManager {
-	constructor(envObj) {
+	constructor(msgObj, envObj) {
+		this.msbObj = msgObj;
 		// Set the environment object
 		this.envObj = envObj;
 		// Deployment operation logs
@@ -105,10 +106,38 @@ export class DeploymentManager {
 			duration: duration,
 			status,
 			message,
+			pod: process.env.POD_NAME,
 		});
 
 		logger.info(`${message} (${duration}ms)`);
 		this.prevDtm = dtm;
+	}
+
+	/**
+	 * Updates the environment status and logs in platform
+	 * @param  {string} status Final environment status
+	 */
+	async sendEnvironmentLogs(status = "OK") {
+		// If there is no callback just return
+		if (!this.msgObj?.callback) return;
+
+		try {
+			// Update the environment log object
+			await axios.post(
+				this.msgObj.callback,
+				{
+					status,
+					logs: this.logs,
+					type: "server",
+				},
+				{
+					headers: {
+						Authorization: process.env.MASTER_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+		} catch (err) {}
 	}
 
 	/**

@@ -136,48 +136,19 @@ class VersionController extends BaseController {
 		);
 
 		// Create environment logs entry, which will be updated when the deployment is completed
-		let dbLog = await envLogCtrl.create(
+		let envLog = await envLogCtrl.create(
 			{
 				orgId: org._id,
 				appId: app._id,
 				versionId: version._id,
 				envId: env._id,
 				action: "deploy",
-				status: "Deploying",
-				type: "db",
-				logs: [],
-				createdBy: user._id,
-			},
-			{ session }
-		);
-
-		// Create environment logs entry, which will be updated when the deployment is completed
-		let engineLog = await envLogCtrl.create(
-			{
-				orgId: org._id,
-				appId: app._id,
-				versionId: version._id,
-				envId: env._id,
-				action: "deploy",
-				status: "Deploying",
-				type: "engine",
-				logs: [],
-				createdBy: user._id,
-			},
-			{ session }
-		);
-
-		// Create environment logs entry, which will be updated when the deployment is completed
-		let schedulerLog = await envLogCtrl.create(
-			{
-				orgId: org._id,
-				appId: app._id,
-				versionId: version._id,
-				envId: env._id,
-				action: "deploy",
-				status: "Deploying",
-				type: "scheduler",
-				logs: [],
+				dbStatus: "Deploying",
+				serverStatus: "Deploying",
+				schedulerStatus: "Deploying",
+				dbLogs: [],
+				serverLogs: [],
+				schedulerLogs: [],
 				createdBy: user._id,
 			},
 			{ session }
@@ -188,9 +159,7 @@ class VersionController extends BaseController {
 			resource,
 			resLog,
 			env,
-			dbLog,
-			engineLog,
-			schedulerLog,
+			envLog,
 		};
 	}
 }

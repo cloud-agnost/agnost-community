@@ -30,6 +30,8 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 				this.addLog(
 					t("API server has the latest configuration, no changes applied")
 				);
+				// Send the deployment telemetry information to the platform
+				await this.sendEnvironmentLogs("OK");
 				return;
 			}
 		}
@@ -41,6 +43,9 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 		// Manage NPM packages
 		await this.manageNPMPackages();
 		this.addLog(t("Completed initializing API server"));
+		this.addLog(t("Starting child process and HTTP server"));
+		// Send the deployment telemetry information to the platform
+		await this.sendEnvironmentLogs("OK");
 	}
 
 	/**

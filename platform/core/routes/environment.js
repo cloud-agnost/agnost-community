@@ -264,67 +264,32 @@ router.post(
 			);
 
 			// Create environment logs entry, which will be updated when the deployment is completed
-			let dbLog = await envLogCtrl.create(
+			let envLog = await envLogCtrl.create(
 				{
 					orgId: org._id,
 					appId: app._id,
 					versionId: version._id,
 					envId: env._id,
 					action: "deploy",
-					status: "Deploying",
-					type: "db",
-					logs: [],
-					createdBy: user._id,
-				},
-				{ session }
-			);
-
-			// Create environment logs entry, which will be updated when the deployment is completed
-			let engineLog = await envLogCtrl.create(
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					envId: env._id,
-					action: "deploy",
-					status: "Deploying",
-					type: "engine",
-					logs: [],
-					createdBy: user._id,
-				},
-				{ session }
-			);
-
-			// Create environment logs entry, which will be updated when the deployment is completed
-			let schedulerLog = await envLogCtrl.create(
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					envId: env._id,
-					action: "deploy",
-					status: "Deploying",
-					type: "scheduler",
-					logs: [],
+					dbStatus: "Deploying",
+					serverStatus: "Deploying",
+					schedulerStatus: "Deploying",
+					dbLogs: [],
+					serverLogs: [],
+					schedulerLogs: [],
 					createdBy: user._id,
 				},
 				{ session }
 			);
 
 			// Redeploy application version to the environment
-			await deployCtrl.redeploy(
-				{ dbLog, engineLog, schedulerLog },
-				app,
-				version,
-				env,
-				user
-			);
+			await deployCtrl.redeploy(envLog, app, version, env, user);
 
 			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine worker
 			await setKey(env._id, updatedEnv, helper.constants["1month"]);
 
 			await envCtrl.commit(session);
-			res.json({ env: updatedEnv, dbLog, engineLog, schedulerLog });
+			res.json({ env: updatedEnv, envLog });
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -353,7 +318,7 @@ router.post(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/log/:logId?type=
+@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/log/:logId
 @method     POST
 @desc       Update deployment operation log and environment status
 @access     private
@@ -373,8 +338,7 @@ router.post(
 		const session = await envCtrl.startSession();
 		try {
 			const { org, app, version, env, log } = req;
-			const { status, logs } = req.body;
-			const { type } = req.query;
+			const { status, logs, type } = req.body;
 
 			// Get user information
 			let user = await userCtrl.getOneById(log.createdBy, {
@@ -386,10 +350,13 @@ router.post(
 				updatedBy: user._id,
 			};
 
-			if (type === "db") dataSet.dbDeploymentStatus = status;
-			else if (type === "engine") dataSet.engineDeploymentStatus = status;
-			else dataSet.schedulerDeploymentStatus = status;
-
+			if (type === "db") {
+				dataSet.dbStatus = status;
+			} else if (type === "server") {
+				dataSet.serverStatus = status;
+			} else {
+				dataSet.schedulerStatus = status;
+			}
 			// If deployment successfully completed then update deploymentDtm
 			if (["deploy", "redeploy", "auto-deploy"].includes(log.action))
 				dataSet.deploymentDtm = timestamp;
@@ -402,14 +369,26 @@ router.post(
 				{ cacheKey: env._id, session }
 			);
 
-			if (type === "engine") {
+			if (type === "db") {
+				// Update environment log data
+				await envLogCtrl.updateOneById(
+					log._id,
+					{
+						dbStatus: status,
+						dbLogs: logs,
+						updatedAt: timestamp,
+					},
+					{},
+					{ session }
+				);
+			} else if (type === "server") {
 				// Update environment log data, we can have multiple engine pods so each of them will add their own logs
 				await envLogCtrl.pushObjectById(
 					log._id,
-					"logs",
+					"serverLogs",
 					logs,
 					{
-						status: status,
+						serverStatus: status,
 						updatedAt: timestamp,
 					},
 					{ session }
@@ -419,8 +398,8 @@ router.post(
 				await envLogCtrl.updateOneById(
 					log._id,
 					{
-						status: status,
-						logs: logs,
+						schedulerStatus: status,
+						schedulerLogs: logs,
 						updatedAt: timestamp,
 					},
 					{},
@@ -446,7 +425,7 @@ router.post(
 					type,
 					env.name
 				),
-				{},
+				{ updatedEnv },
 				{
 					orgId: org._id,
 					appId: app._id,

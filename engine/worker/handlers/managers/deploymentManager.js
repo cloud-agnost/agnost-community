@@ -200,15 +200,16 @@ export class DeploymentManager {
 	 */
 	async sendEnvironmentLogs(status = "OK") {
 		// If there is no callback just return
-		if (!this.msgObj.dbCallback) return;
+		if (!this.msgObj.callback) return;
 
 		try {
 			// Update the environment log object
 			await axios.post(
-				this.msgObj.dbCallback,
+				this.msgObj.callback,
 				{
 					status,
 					logs: this.logs,
+					type: "db",
 				},
 				{
 					headers: {
