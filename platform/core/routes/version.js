@@ -1,11 +1,11 @@
+import axios from "axios";
 import express from "express";
 import versionCtrl from "../controllers/version.js";
-import dbCtrl from "../controllers/database.js";
-import modelCtrl from "../controllers/model.js";
 import envCtrl from "../controllers/environment.js";
-import envLogCtrl from "../controllers/environmentLog.js";
 import deployCtrl from "../controllers/deployment.js";
+import resourceCtrl from "../controllers/resource.js";
 import auditCtrl from "../controllers/audit.js";
+import epCtrl from "../controllers/endpoint.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
@@ -14,11 +14,15 @@ import {
 	validateVersion,
 	validateVersionParam,
 	validateVersionLimit,
+	validateVersionKey,
+	validateVersionPackage,
+	validateVersionOSRedirect,
 } from "../middlewares/validateVersion.js";
 import { authorizeAppAction } from "../middlewares/authorizeAppAction.js";
 import { applyRules } from "../schemas/version.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
+import { setKey } from "../init/cache.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
@@ -121,7 +125,7 @@ router.get(
 /*
 @route      /v1/org/:orgId/app/:appId/version
 @method     POST
-@desc       Creates a new version. By default when we create a new version we also create an associated environment.
+@desc       Creates a new blank version. By default when we create a new version we also create an associated environment.
 @access     private
 */
 router.post(
@@ -140,59 +144,34 @@ router.post(
 			const { org, user, app } = req;
 			const { name, readOnly } = req.body;
 
-			// Create the new version
-			let versionId = helper.generateId();
-			let version = await versionCtrl.create(
-				{
-					_id: versionId,
-					orgId: org._id,
-					appId: app._id,
-					iid: helper.generateSlug("ver"),
+			// Create the new version and associated environment and api server resource
+			const { version, resource, resLog, env, envLog } =
+				await versionCtrl.createVersion(session, user, org, app, {
 					name,
-					private: req.body.private,
+					isPrivate: req.body.private,
 					readOnly,
 					master: false,
-					createdBy: user._id,
-				},
-				{ cacheKey: versionId }
-			);
-
-			// Create the environment of the version
-			let mappings = [];
-			let envId = helper.generateId();
-			// If it is a development environment then add the default engince cluster mapping
-			if (["development"].includes(process.env.NODE_ENV)) {
-				mappings.push({
-					design: {
-						iid: "asdasd",
-						type: "sfsdfsf",
-						name: "weqwe",
-					},
-					resource: {
-						id: "dasda",
-						name: "sdasd",
-						type: "sdssdasd",
-						instance: "asasdasd",
-					},
 				});
-			}
-			await envCtrl.create(
-				{
-					_id: envId,
-					orgId: org._id,
-					appId: app._id,
-					versionId: versionId,
-					iid: helper.generateSlug("env"),
-					name: t("Default Environment"),
-					autoDeploy: true,
-					createdBy: user._id,
-				},
-				{ session, cacheKey: envId }
-			);
 
 			// Commit transaction
 			await versionCtrl.commit(session);
-			res.json(version);
+			res.json({
+				version,
+				resource,
+				resLog,
+				env,
+				envLog,
+			});
+
+			// Deploy application version to the environment
+			await deployCtrl.deploy(envLog, app, version, env, user);
+
+			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
+			await setKey(env._id, env, helper.constants["1month"]);
+
+			// We first deploy the app then create the resources. The environment data needs to be cached before the api-server pod starts up.
+			// Create the engine deployment (API server), associated HPA, service and ingress rule
+			await resourceCtrl.manageClusterResources([{ resource, log: resLog }]);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -200,11 +179,84 @@ router.post(
 				user,
 				"org.app.version",
 				"create",
-				t("Created a new app version '%s'", name),
-				version,
-				{ orgId: org._id, appId: app._id, versionId: versionId }
+				t("Created a new blank app version '%s'", name),
+				{ version, resource, env },
+				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
-		} catch (err) {
+		} catch (error) {
+			await versionCtrl.rollback(session);
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/copy
+@method     POST
+@desc       Creates a copy of an existing version.
+@access     private
+*/
+router.post(
+	"/copy",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	authorizeAppAction("app.version.create"),
+	applyRules("create-copy"),
+	validate,
+	async (req, res) => {
+		// Start new database transaction session
+		const session = await versionCtrl.startSession();
+		try {
+			const { org, user, app } = req;
+			const { name, readOnly } = req.body;
+
+			// Create the new version and associated environment and api server resource
+			const { version, resource, resLog, env, envLog } =
+				await versionCtrl.createVersionCopy(session, user, org, app, {
+					name,
+					isPrivate: req.body.private,
+					readOnly,
+					master: false,
+					parentVersion: req.parentVersion,
+				});
+
+			// Commit transaction
+			await versionCtrl.commit(session);
+			res.json({
+				version,
+				resource,
+				resLog,
+				env,
+				envLog,
+			});
+
+			// Deploy application version to the environment
+			await deployCtrl.deploy(envLog, app, version, env, user);
+
+			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
+			await setKey(env._id, env, helper.constants["1month"]);
+
+			// We first deploy the app then create the resources. The environment data needs to be cached before the api-server pod starts up.
+			// Create the engine deployment (API server), associated HPA, service and ingress rule
+			await resourceCtrl.manageClusterResources([{ resource, log: resLog }]);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				app._id,
+				user,
+				"org.app.version",
+				"create",
+				t(
+					"Created a new app version '%s' copied from version '%s'",
+					name,
+					req.parentVersion.name
+				),
+				{ version, resource, env },
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (error) {
 			await versionCtrl.rollback(session);
 			handleError(req, res, error);
 		}
@@ -214,7 +266,7 @@ router.post(
 /*
 @route      /v1/org/:orgId/app/:appId/version/:versionId
 @method     PUT
-@desc       Update the version information name, private, readOnly
+@desc       Update the version information name, private, readOnly and default endpoint limits
 @access     private
 */
 router.put(
@@ -230,7 +282,8 @@ router.put(
 	async (req, res) => {
 		try {
 			const { org, user, app, version } = req;
-			const { name, readOnly } = req.body;
+			const { name, readOnly, defaultEndpointLimits } = req.body;
+			const defaultLimits = defaultEndpointLimits || [];
 
 			if (version.master && req.body.private) {
 				return res.status(422).json({
@@ -245,12 +298,21 @@ router.put(
 
 			let updatedVersion = await versionCtrl.updateOneById(
 				version._id,
-				{ name, private: req.body.private, readOnly },
+				{
+					name,
+					private: req.body.private,
+					readOnly,
+					defaultEndpointLimits: defaultLimits,
+					updatedBy: user._id,
+				},
 				{},
 				{ cacheKey: version._id }
 			);
 
 			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -285,7 +347,7 @@ router.delete(
 	async (req, res) => {
 		const session = await versionCtrl.startSession();
 		try {
-			const { org, user, app, version } = req;
+			const { org, user, app, version, appMember } = req;
 
 			if (version.master) {
 				return res.status(422).json({
@@ -298,44 +360,52 @@ router.delete(
 				});
 			}
 
-			// Delete the databases, we do no clear cache since it will eventually expire
-			await dbCtrl.deleteManyByQuery({ versionId: version._id }, { session });
-			// Delete the models, we do no clear cache since it will eventually expire
-			await modelCtrl.deleteManyByQuery(
-				{ versionId: version._id },
-				{ session }
-			);
-
-			// Get the list of environments of the version that have active deloyments, active deployment means that the environment has a deploymtnDtm
-			let environments = await envCtrl.getManyByQuery({
-				versionId: version._id,
-				deploymentDtm: { $exists: true },
-			});
-
-			// If there are active environments then delete those environments at engine cluster
-			if (environments.length > 0) {
-				for (let i = 0; i < environments.length; i++) {
-					const env = environments[i];
-					await deployCtrl.delete(null, app, version, env, user);
-				}
+			if (
+				version.createdBy.toString() !== req.user._id.toString() &&
+				appMember.role !== "Admin"
+			) {
+				return res.status(401).json({
+					error: t("Not Authorized"),
+					details: t(
+						"You are not authorized to delete version '%s'. Only the creator of the version or app team members with 'Admin' role can delete it.",
+						version.name
+					),
+					code: ERROR_CODES.unauthorized,
+				});
 			}
 
-			// Delete the environments, we do not clear cache since it will eventually expire
-			await envCtrl.deleteManyByQuery({ versionId: version._id }, { session });
-			// Delete the environment logs
-			await envLogCtrl.deleteManyByQuery(
-				{ versionId: version._id },
-				{ session }
-			);
-
-			// Delete the app version
-			await versionCtrl.deleteOneById(version._id, {
-				cacheKey: version._id,
-				session,
+			// First get all app resources, environments and versions
+			const resources = await resourceCtrl.getManyByQuery({
+				orgId: org._id,
+				appId: app._id,
+				versionId: version._id,
 			});
 
+			const envs = await envCtrl.getManyByQuery({
+				orgId: org._id,
+				appId: app._id,
+				versionId: version._id,
+			});
+
+			// Delete all version related data
+			await versionCtrl.deleteVersion(session, org, app, version);
 			// Commit the database transaction
 			await versionCtrl.commit(session);
+
+			// Iterate through all environments and delete them
+			for (let i = 0; i < envs.length; i++) {
+				const env = envs[i];
+				deployCtrl.delete(app, version, env, user);
+			}
+
+			// Iterate through all resources and delete them if they are managed
+			const managedResources = resources.filter(
+				(entry) => entry.managed === true
+			);
+
+			// Delete managed organization resources
+			resourceCtrl.deleteClusterResources(managedResources);
+
 			res.json();
 
 			// Log action
@@ -358,7 +428,7 @@ router.delete(
 /*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/params
 @method     POST
-@desc       Create a new paramerter.
+@desc       Creates a new paramerter
 @access     private
 */
 router.post(
@@ -389,6 +459,9 @@ router.post(
 			);
 
 			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -443,6 +516,9 @@ router.put(
 
 			res.json(updatedVersion);
 
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
@@ -488,6 +564,9 @@ router.delete(
 
 			res.json(updatedVersion);
 
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
@@ -495,6 +574,56 @@ router.delete(
 				"org.app.version.params",
 				"delete",
 				t("Deleted parameter '%s'", param.name),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/params
+@method     DELETE
+@desc       Delete multiple parameters
+@access     private
+*/
+router.delete(
+	"/:versionId/params",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.param.delete"),
+	applyRules("delete-multi-params"),
+	validate,
+	async (req, res) => {
+		try {
+			const { paramIds } = req.body;
+			const { org, app, user, version } = req;
+
+			let updatedVersion = await versionCtrl.pullObjectByQuery(
+				version._id,
+				"params",
+				{ _id: { $in: paramIds } },
+				{ updatedBy: user._id },
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.params",
+				"delete",
+				t("Deleted '%s' app parameter(s)", paramIds.length),
 				updatedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
@@ -529,6 +658,7 @@ router.post(
 				version._id,
 				"limits",
 				{
+					iid: helper.generateSlug("lmt"),
 					name,
 					rate,
 					duration,
@@ -540,6 +670,9 @@ router.post(
 			);
 
 			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -601,6 +734,9 @@ router.put(
 
 			res.json(updatedVersion);
 
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
@@ -633,18 +769,39 @@ router.delete(
 	validateVersionLimit,
 	authorizeAppAction("app.version.limit.delete"),
 	async (req, res) => {
+		const session = await versionCtrl.startSession();
 		try {
 			const { org, app, user, limit, version } = req;
+
+			// If the deleted rate limiter is used in default endpoint limits or realtime limiters then we also need to udpate them in any case
+			const defaultEndpointLimits = version.defaultEndpointLimits.filter(
+				(entry) => entry !== limit.iid
+			);
+			const realtimeLimits = version.realtime.rateLimits.filter(
+				(entry) => entry !== limit.iid
+			);
 
 			let updatedVersion = await versionCtrl.pullObjectById(
 				version._id,
 				"limits",
 				limit._id,
-				{ updatedBy: user._id },
+				{
+					updatedBy: user._id,
+					defaultEndpointLimits,
+					"realtime.rateLimits": realtimeLimits,
+				},
 				{ cacheKey: version._id }
 			);
 
+			// Update also all the endpoints that use the deleted rate limiter object
+			await epCtrl.removeRateLimiters(session, version, [limit], user);
+
+			// Commit updates
+			await versionCtrl.commit(session);
 			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -653,6 +810,951 @@ router.delete(
 				"org.app.version.limits",
 				"delete",
 				t("Deleted rate limiter '%s'", limit.name),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			versionCtrl.rollback(session);
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/limits
+@method     DELETE
+@desc       Delete multiple rate limiters
+@access     private
+*/
+router.delete(
+	"/:versionId/limits",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.limit.delete"),
+	applyRules("delete-multi-limits"),
+	validate,
+	async (req, res) => {
+		const session = await versionCtrl.startSession();
+		try {
+			const { limitIds } = req.body;
+			const { org, app, user, version } = req;
+
+			// If the deleted rate limiters are used in default endpoint limits or realtime limiters then we also need to udpate them in any case
+			const limits = version.limits.filter((entry) =>
+				limitIds.includes(entry._id.toString())
+			);
+
+			const defaultEndpointLimits = version.defaultEndpointLimits.filter(
+				(entry) => {
+					let limitObj = limits.find((item) => item.iid === entry);
+					return limitObj ? false : true;
+				}
+			);
+			const realtimeLimits = version.realtime.rateLimits.filter((entry) => {
+				let limitObj = limits.find((item) => item.iid === entry);
+				return limitObj ? false : true;
+			});
+
+			// Update also all the endpoints that use the deleted rate limiter objects
+			await epCtrl.removeRateLimiters(session, version, limits, user);
+
+			let updatedVersion = await versionCtrl.pullObjectByQuery(
+				version._id,
+				"limits",
+				{ _id: { $in: limitIds } },
+				{
+					updatedBy: user._id,
+					defaultEndpointLimits,
+					"realtime.rateLimits": realtimeLimits,
+				},
+				{ cacheKey: version._id, session }
+			);
+
+			// Commit updates
+			await versionCtrl.commit(session);
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.limits",
+				"delete",
+				t("Deleted '%s' rate limiter(s)", limitIds.length),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			versionCtrl.rollback(session);
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/realtime
+@method     PUT
+@desc       Update the realtime settings of the version
+@access     private
+*/
+router.put(
+	"/:versionId/realtime",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.update"),
+	applyRules("update-realtime"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, user, app, version } = req;
+			const { enabled, apiKeyRequired, sessionRequired, rateLimits } = req.body;
+			const realtimeLimits = rateLimits || [];
+
+			let updatedVersion = await versionCtrl.updateOneById(
+				version._id,
+				{
+					"realtime.enabled": enabled,
+					"realtime.apiKeyRequired": apiKeyRequired,
+					"realtime.sessionRequired": sessionRequired,
+					"realtime.rateLimits": realtimeLimits,
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				app._id,
+				user,
+				"org.app.version",
+				"update",
+				t("Updated app version '%s' realtime properties", version.name),
+				version,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/keys
+@method     POST
+@desc       Create a new API key
+@access     private
+*/
+router.post(
+	"/:versionId/keys",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.key.create"),
+	applyRules("create-key"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app, user, version } = req;
+			const {
+				name,
+				expiryDate,
+				allowRealtime,
+				type,
+				allowedEndpoints,
+				excludedEndpoints,
+				domainAuthorization,
+				authorizedDomains,
+				IPAuthorization,
+				authorizedIPs,
+			} = req.body;
+
+			let updatedVersion = await versionCtrl.pushObjectById(
+				version._id,
+				"apiKeys",
+				{
+					name,
+					key: helper.generateSlug("ak", 36),
+					expiryDate,
+					allowRealtime,
+					type,
+					allowedEndpoints,
+					excludedEndpoints,
+					domainAuthorization,
+					authorizedDomains,
+					IPAuthorization,
+					authorizedIPs,
+					createdBy: user._id,
+				},
+				{ updatedBy: user._id },
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.keys",
+				"create",
+				t("Added a new API key '%s'", name),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/keys/:keyId
+@method     PUT
+@desc       Update an API key
+@access     private
+*/
+router.put(
+	"/:versionId/keys/:keyId",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateVersionKey,
+	authorizeAppAction("app.version.key.update"),
+	applyRules("update-key"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app, user, key, version } = req;
+			const {
+				name,
+				expiryDate,
+				allowRealtime,
+				type,
+				allowedEndpoints,
+				excludedEndpoints,
+				domainAuthorization,
+				authorizedDomains,
+				IPAuthorization,
+				authorizedIPs,
+			} = req.body;
+
+			let updatedVersion = await versionCtrl.updateOneByQuery(
+				{ _id: version._id, "apiKeys._id": key._id },
+				{
+					"apiKeys.$.name": name,
+					"apiKeys.$.expiryDate": expiryDate,
+					"apiKeys.$.allowRealtime": allowRealtime,
+					"apiKeys.$.type": type,
+					"apiKeys.$.allowedEndpoints": allowedEndpoints,
+					"apiKeys.$.excludedEndpoints": excludedEndpoints,
+					"apiKeys.$.domainAuthorization": domainAuthorization,
+					"apiKeys.$.authorizedDomains": authorizedDomains,
+					"apiKeys.$.IPAuthorization": IPAuthorization,
+					"apiKeys.$.authorizedIPs": authorizedIPs,
+					"apiKeys.$.updatedAt": Date.now(),
+					"apiKeys.$.updatedBy": user._id,
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.keys",
+				"update",
+				t("Updated API key '%s'", name),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/keys/:keyId
+@method     DELETE
+@desc       Delete API key
+@access     private
+*/
+router.delete(
+	"/:versionId/keys/:keyId",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateVersionKey,
+	authorizeAppAction("app.version.key.delete"),
+	async (req, res) => {
+		try {
+			const { org, app, user, key, version } = req;
+
+			let updatedVersion = await versionCtrl.pullObjectById(
+				version._id,
+				"apiKeys",
+				key._id,
+				{ updatedBy: user._id },
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.keys",
+				"delete",
+				t("Deleted API key '%s'", key.name),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/keys
+@method     DELETE
+@desc       Delete multiple API keys
+@access     private
+*/
+router.delete(
+	"/:versionId/keys",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.key.delete"),
+	applyRules("delete-multi-keys"),
+	validate,
+	async (req, res) => {
+		try {
+			const { keyIds } = req.body;
+			const { org, app, user, version } = req;
+
+			let updatedVersion = await versionCtrl.pullObjectByQuery(
+				version._id,
+				"apiKeys",
+				{ _id: { $in: keyIds } },
+				{ updatedBy: user._id },
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.keys",
+				"delete",
+				t("Deleted '%s' API key(s)", keyIds.length),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/npm-search?package=&page=&size=
+@method     GET
+@desc       Searches the NPM packages
+@access     private
+*/
+router.get(
+	"/:versionId/npm-search",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.update"),
+	applyRules("npm-search"),
+	validate,
+	async (req, res) => {
+		try {
+			const { page, size, sortBy } = req.query;
+			const url = `https://registry.npmjs.org/-/v1/search?text=${
+				req.query.package
+			}&size=${size}&from=${page * size}&sort=${sortBy}`;
+
+			const response = await axios.get(url);
+			res.json(
+				response.data.objects.map((entry) => {
+					return {
+						package: entry.package.name,
+						version: entry.package.version,
+						description: entry.package.description,
+					};
+				})
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/packages
+@method     POST
+@desc       Add a new NPM package
+@access     private
+*/
+router.post(
+	"/:versionId/packages",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.package.create"),
+	applyRules("add-npm-package"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app, user, version } = req;
+			const { name, description } = req.body;
+
+			let updatedVersion = await versionCtrl.pushObjectById(
+				version._id,
+				"npmPackages",
+				{
+					name,
+					version: req.body.version,
+					description,
+					createdBy: user._id,
+				},
+				{ updatedBy: user._id },
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.packages",
+				"create",
+				t("Added a new NPM package '%s@%s'", name, req.body.version),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/packages/:packageId
+@method     PUT
+@desc       Update NPM package version
+@access     private
+*/
+router.put(
+	"/:versionId/packages/:packageId",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateVersionPackage,
+	authorizeAppAction("app.version.package.update"),
+	applyRules("update-npm-package"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app, user, key, version, npmPackage } = req;
+
+			let updatedVersion = await versionCtrl.updateOneByQuery(
+				{ _id: version._id, "npmPackages._id": key._id },
+				{
+					"npmPackages.$.version": req.body.version,
+					"npmPackages.$.updatedAt": Date.now(),
+					"npmPackages.$.updatedBy": user._id,
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.packages",
+				"update",
+				t(
+					"Updated version of NPM package '%s' from '%s' to '%s'",
+					npmPackage.name,
+					npmPackage.version,
+					req.body.version
+				),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/packages/:packageId
+@method     DELETE
+@desc       Remove NPM package
+@access     private
+*/
+router.delete(
+	"/:versionId/packages/:packageId",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateVersionPackage,
+	authorizeAppAction("app.version.package.delete"),
+	async (req, res) => {
+		try {
+			const { org, app, user, npmPackage, version } = req;
+
+			let updatedVersion = await versionCtrl.pullObjectById(
+				version._id,
+				"npmPackages",
+				npmPackage._id,
+				{ updatedBy: user._id },
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.packages",
+				"delete",
+				t("Removed NPM package '%s'", npmPackage.name),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/packages
+@method     DELETE
+@desc       Remove multiple NPM packages
+@access     private
+*/
+router.delete(
+	"/:versionId/packages",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.package.delete"),
+	applyRules("remove-multi-packages"),
+	validate,
+	async (req, res) => {
+		try {
+			const { packageIds } = req.body;
+			const { org, app, user, version } = req;
+
+			let updatedVersion = await versionCtrl.pullObjectByQuery(
+				version._id,
+				"npmPackages",
+				{ _id: { $in: packageIds } },
+				{ updatedBy: user._id },
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.keys",
+				"delete",
+				t("Removed '%s' NPM package(s)", packageIds.length),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/auth/save-model
+@method     POST
+@desc       Saves the user data model database and model info
+@access     private
+*/
+router.post(
+	"/:versionId/auth/save-model",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.auth.update"),
+	applyRules("save-model"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app, user, version, database, model } = req;
+
+			let updatedVersion = await versionCtrl.updateOneById(
+				version._id,
+				{
+					"authentication.userDataModel.database": database.iid,
+					"authentication.userDataModel.model": model.iid,
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.keys",
+				"delete",
+				t(
+					"Set authentication user data model to '%s.%s'",
+					database.name,
+					model.name
+				),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/auth/add-fields
+@method     POST
+@desc       Adds the missing user data model fields required for authentication
+@access     private
+*/
+router.post(
+	"/:versionId/auth/add-fields",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.auth.update"),
+	applyRules("add-fields"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app, user, version, model } = req;
+			const { fields } = req.body;
+
+			// TO BE COMPLETED
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, version, user);
+
+			// Log action
+			/* 			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.keys",
+				"delete",
+				t(
+					"Set authentication user data model to '%s.%s'",
+					database.name,
+					model.name
+				),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			); */
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/auth/save-redirect
+@method     POST
+@desc       Sets the default redirect URL
+@access     private
+*/
+router.post(
+	"/:versionId/auth/save-redirect",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.auth.update"),
+	applyRules("save-redirect"),
+	validate,
+	async (req, res) => {
+		try {
+			const { defaultRedirect } = req.body;
+			const { org, app, user, version } = req;
+
+			let updatedVersion = await versionCtrl.updateOneById(
+				version._id,
+				{
+					"authentication.defaultRedirect": defaultRedirect,
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.keys",
+				"delete",
+				t("Set default redirect URL to '%s'", defaultRedirect),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/osredirects
+@method     POST
+@desc       Create a new OS specific redirect configuration.
+@access     private
+*/
+router.post(
+	"/:versionId/osredirects",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.auth.update"),
+	applyRules("create-osredirect"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app, user, version } = req;
+			const { os, primary, secondary } = req.body;
+
+			let updatedVersion = await versionCtrl.pushObjectById(
+				version._id,
+				"authentication.osRedirects",
+				{
+					os,
+					primary,
+					secondary,
+					createdBy: user._id,
+				},
+				{ updatedBy: user._id },
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.limits",
+				"create",
+				t("Added ' %s' redirect URL configuration", os),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/osredirects/:redirectId
+@method     PUT
+@desc       Update redirect URLs of a specific OS
+@access     private
+*/
+router.put(
+	"/:versionId/osredirects/:redirectId",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateVersionOSRedirect,
+	authorizeAppAction("app.version.auth.update"),
+	applyRules("update-osredirect"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app, user, osRedirect, version } = req;
+			const { primary, secondary } = req.body;
+
+			let updatedVersion = await versionCtrl.updateOneByQuery(
+				{ _id: version._id, "authentication.osRedirects._id": osRedirect._id },
+				{
+					"authentication.osRedirects.$.primary": primary,
+					"authentication.osRedirects.$.secondary": secondary,
+					"authentication.osRedirects.$.updatedAt": Date.now(),
+					"authentication.osRedirects.$.updatedBy": user._id,
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.limits",
+				"update",
+				t("Updated '%s' redirect URL configuration", osRedirect.os),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/osredirects/:redirectId
+@method     DELETE
+@desc       Delete a specific OS redirect configuration
+@access     private
+*/
+router.delete(
+	"/:versionId/osredirects/:redirectId",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateVersionOSRedirect,
+	authorizeAppAction("app.version.auth.update"),
+	async (req, res) => {
+		try {
+			const { org, app, user, osRedirect, version } = req;
+
+			let updatedVersion = await versionCtrl.pullObjectById(
+				version._id,
+				"authentication.osRedirects",
+				osRedirect._id,
+				{ updatedBy: user._id },
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.limits",
+				"delete",
+				t("Deleted '%s' redirect URL configuration", osRedirect.os),
 				updatedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);

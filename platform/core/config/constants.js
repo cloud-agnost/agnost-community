@@ -65,7 +65,7 @@ export const envStatuses = [
 
 export const logStatuses = ["OK", "Error"];
 
-export const envLogTypes = ["db", "engine", "scheduler"];
+export const envLogTypes = ["db", "server", "scheduler"];
 
 // sub-model-object: for single child or reference objects
 // sub-model-list: for a collection of child objects within a parent document
@@ -326,3 +326,23 @@ export const methodTypes = ["GET", "POST", "PUT", "DELETE"];
 export const schedulTypes = ["every", "day", "week", "month", "plain"];
 
 export const intervalTypes = ["minute", "hour"];
+
+export const apiKeyTypes = [
+	"no-access",
+	"full-access",
+	"custom-allowed",
+	"custom-excluded",
+];
+
+export const osTypes = ["ios", "android", "macos", "windows", "linux", "other"];
+
+export const smsProviders = ["Twilio", "MessageBird", "Vonage"];
+
+export const oAuthProviderTypes = [
+	"google",
+	"facebook",
+	"twitter",
+	"apple",
+	"discord",
+	"github",
+];

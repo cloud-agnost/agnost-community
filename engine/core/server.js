@@ -23,6 +23,7 @@ import { adapterManager } from "./handlers/adapterManager.js";
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
+var childProcess = null;
 // If this is the primary process a child process
 if (cluster.isPrimary) {
 	logger.info(`Primary process ${process.pid} is running`);
@@ -48,15 +49,54 @@ if (cluster.isPrimary) {
 		await manager.initializeCore();
 
 		// Fork child process
-		cluster.fork();
+		childProcess = cluster.fork();
 
 		cluster.on("exit", function (worker, code, signal) {
 			logger.warn(`Child process ${worker.process.pid} died`);
 			cluster.fork();
 		});
+
+		// Set up heartbeat interval
+		const heartbeatInterval = setInterval(() => {
+			// Send heartbeat message to the child process
+			childProcess.send("heartbeat");
+
+			// Set a timeout to check if child process responded
+			const heartbeatTimeout = setTimeout(() => {
+				// Child process did not respond within timeout, handle accordingly
+				console.log("Child process is unresponsive!");
+
+				// Disconnect the child process
+				// childProcess.disconnect();
+
+				// You can choose to restart the child process here using `cluster.fork()` if desired
+				// cluster.fork();
+
+				// Clear the heartbeat interval
+				clearInterval(heartbeatInterval);
+			}, config.get("general.heartbeatTimeoutSeconds") * 1000); // Timeout duration in milliseconds
+
+			// Listen for heartbeat response from the child process
+			childProcess.once("message", (message) => {
+				if (message === "heartbeat") {
+					logger.info(`Child process is up and running`);
+					// Child process responded, clear the heartbeat timeout
+					clearTimeout(heartbeatTimeout);
+				}
+			});
+		}, config.get("general.heartbeatIntervalSeconds") * 1000); // Heartbeat interval duration in milliseconds
 	});
 } else if (cluster.isWorker) {
 	logger.info(`Child process ${process.pid} is running`);
+
+	// Listen for heartbeat messages from the parent process
+	process.on("message", (message) => {
+		if (message === "heartbeat") {
+			// Respond back to the parent process to indicate responsiveness
+			process.send("heartbeat");
+		}
+	});
+
 	// Init globally accessible variables
 	initGlobalsForChildProcess();
 	// Set up locatlization
@@ -78,7 +118,7 @@ if (cluster.isPrimary) {
 	// Handle gracelfull process exit
 	process.on("SIGINT", async () => {
 		// Disconnect all connections/adapters
-		await adapterManager.disconnect();
+		await adapterManager.disconnectAll();
 		// Close connection to cache server(s)
 		disconnectFromRedisCache();
 		// Close connection to the database

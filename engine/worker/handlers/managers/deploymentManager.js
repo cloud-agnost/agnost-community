@@ -1218,7 +1218,8 @@ export class DeploymentManager {
 			await this.saveEnvironmentDeploymentConfig();
 			// Execute all redis commands altogether
 			await this.commitPipeline();
-
+			// After we load all configuration data to the cache we can notify engine API servers to update themselves
+			this.notifyAPIServers();
 			// Update status of environment in engine cluster
 			this.addLog(t("Completed update successfully"));
 			// Send the deployment telemetry information to the platform
@@ -1248,6 +1249,16 @@ export class DeploymentManager {
 	 * Sends the message to the engine API servers so that they can update their state
 	 */
 	notifyAPIServers() {
+		// Clear unnecessary data
+		const msgObj = this.getMsgObj();
+		delete msgObj.databases;
+		delete msgObj.endpoints;
+		delete msgObj.middlewares;
+		delete msgObj.queues;
+		delete msgObj.tasks;
+		delete msgObj.storage;
+		delete msgObj.cache;
+
 		manageAPIServers(this.getEnvId(), this.getMsgObj());
 	}
 }

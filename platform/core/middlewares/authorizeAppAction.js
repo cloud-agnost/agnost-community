@@ -36,6 +36,19 @@ export const appAuthorization = {
 					update: true,
 					delete: true,
 				},
+				key: {
+					create: true,
+					update: true,
+					delete: true,
+				},
+				package: {
+					create: true,
+					update: true,
+					delete: true,
+				},
+				auth: {
+					update: true,
+				},
 			},
 			db: {
 				view: true,

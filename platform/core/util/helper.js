@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import randomColor from "randomcolor";
 import { customAlphabet } from "nanoid";
 import cyripto from "crypto-js";
+import CIDR from "ip-cidr";
 
 const constants = {
 	"1hour": 3600, // in seconds
@@ -194,6 +195,42 @@ function decryptSensitiveData(access) {
 	return decrypted;
 }
 
+/**
+ * Checks whether the domain provided is in correct format or not. Supports also wildcard domains. The domain name needs to start with http:// or https://.
+ * The first item after the protocal can be wildcard *. Supported domain examples:
+ * "http://example.com"
+ * "https://www.example.com"
+ * "https://*.mydomain.com"
+ * "https://sub1.sub2.sub3.main.com"
+ * "https://*.sub1.sub2.sub3.main.com:4000"
+ * "http://localhost"
+ * "http://localhost:3000"
+ *
+ * @param  {string} domain The domain name
+ */
+function isValidDomain(domain) {
+	// Regular expression to match the URL structure
+	const domainPattern =
+		/^(https?:\/\/)?(\*\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]+(:\d{2,5})?(\/[a-zA-Z0-9-_.\/?%&=]*)?$/;
+
+	// Additional check for http://localhost
+	const localhostPattern = /^https?:\/\/localhost(:\d{2,5})?$/;
+
+	// Check if the domain matches the pattern
+	return domainPattern.test(domain) || localhostPattern.test(domain);
+}
+
+/**
+ * Checks whether the address provided is a valid IP address or IP address range in CIDR notation. Examples below:
+ * "50.165.190.0/23"
+ * "192.168.0.1"
+ *
+ * @param  {string} address The IPv4 address or address range in CIDR notation
+ */
+function isValidIPAddress(address) {
+	return CIDR.isValidAddress(address);
+}
+
 export default {
 	constants,
 	isEmptyJson,
@@ -209,4 +246,6 @@ export default {
 	decryptText,
 	encyrptSensitiveData,
 	decryptSensitiveData,
+	isValidDomain,
+	isValidIPAddress,
 };

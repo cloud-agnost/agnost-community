@@ -39,16 +39,13 @@ export const manageAPIServerHandler = (connection, envId) => {
 				let msgObj = JSON.parse(msg.content.toString());
 
 				switch (msgObj.action) {
-					case "deploy":
-						// Do nothing, we have already initialized the engine when it start up
-						break;
 					default:
 						// Get the environment information
 						let envObj = await getKey(
 							`${process.env.AGNOST_ENVIRONMENT_ID}.object`
 						);
-						// Create the primary process deployment manager and set up the engine core (API Sever)
-						const manager = new PrimaryProcessDeploymentManager(envObj);
+						// Create the primary process deployment manager and set up the engine core (API Server)
+						const manager = new PrimaryProcessDeploymentManager(msgObj, envObj);
 						await manager.initializeCore();
 						// Restart worker(s)
 						for (const worker of Object.values(cluster.workers)) {

@@ -57,7 +57,8 @@ class AppController extends BaseController {
 	/**
 	 * Delete all application related data
 	 * @param  {Object} session The database session object
-	 * @param  {Object} org The organization object that will be deleted
+	 * @param  {Object} org The organization object
+	 * @param  {Object} app The app object that will be deleted
 	 */
 	async deleteApp(session, org, app) {
 		await this.deleteOneById(app._id, { session, cacheKey: app._id });

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-   name: env-7eqm41n7nsul-deployment
+   name: env-oktlbdfli89k-deployment
    labels:
       app: engine-core
 spec:
@@ -84,7 +84,7 @@ spec:
                       fieldRef:
                          fieldPath: metadata.name
                  - name: AGNOST_ENVIRONMENT_ID
-                   value: env-7eqm41n7nsul
+                   value: env-oktlbdfli89k
                  - name: AGNOST_ENGINE_ID
-                   value: env-7eqm41n7nsul
+                   value: env-oktlbdfli89k
                             

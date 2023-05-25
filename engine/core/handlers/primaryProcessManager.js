@@ -7,8 +7,8 @@ import { getKey } from "../init/cache.js";
 import { corePackages } from "../config/constants.js";
 
 export class PrimaryProcessDeploymentManager extends DeploymentManager {
-	constructor(envObj) {
-		super(envObj);
+	constructor(msgObj, envObj) {
+		super(msgObj, envObj);
 	}
 
 	/**
@@ -247,7 +247,6 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	async manageNPMPackages() {
 		const installedPackages = await this.getInstalledNPMPackages();
 		const packages = this.getPackages() ?? [];
-		if (packages.length === 0) return;
 
 		const packagesToInstall = [];
 		for (const pkg of packages) {
@@ -261,12 +260,37 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 			packagesToInstall.push(`${pkg.name}@${pkg.version}`);
 		}
 
+		const packagesToUnInstall = [];
+		for (const [key, value] of Object.entries(installedPackages)) {
+			// Check if the package is a core package
+			if (corePackages.includes(key)) continue;
+			// Check if the package is in the version packages list
+			if (packages.find((entry) => entry.name === key)) continue;
+			// Add package to uninstall list
+			packagesToUnInstall.push(`${key}`);
+		}
+
+		if (packagesToUnInstall.length > 0) {
+			this.addLog(t("Uninstalling %s package(s)", packagesToUnInstall.length));
+		}
+		// If there are packages to uninstall then uninstall them
+		for (let i = 0; i < packagesToUnInstall.length; i++) {
+			const entry = packagesToUnInstall[i];
+			try {
+				execSync(`npm uninstall ${entry}`, {
+					stdio: "ignore",
+				});
+				this.addLog(t("Uninstalled package %s", entry));
+			} catch (err) {
+				this.addLog(t("Failed to uninstall package %s", entry));
+			}
+		}
+
 		if (packagesToInstall.length > 0) {
 			this.addLog(
 				t("Installing/updating %s package(s)", packagesToInstall.length)
 			);
 		}
-
 		// If there are packages to install then install them
 		for (let i = 0; i < packagesToInstall.length; i++) {
 			const entry = packagesToInstall[i];

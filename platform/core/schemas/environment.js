@@ -116,19 +116,27 @@ export const EnvironmentModel = mongoose.model(
 				},
 			],
 			// Environment status
-			dbDeploymentStatus: {
+			dbStatus: {
 				type: String,
 				index: true,
 				enum: envStatuses,
 			},
 			// Environment status
-			engineDeploymentStatus: {
-				type: String,
-				index: true,
-				enum: envStatuses,
-			},
+			serverStatus: [
+				{
+					pod: {
+						type: String,
+						index: true,
+					},
+					status: {
+						type: String,
+						index: true,
+						enum: envStatuses,
+					},
+				},
+			],
 			// Environment status
-			schedulerDeploymentStatus: {
+			schedulerStatus: {
 				type: String,
 				index: true,
 				enum: envStatuses,

@@ -4,7 +4,7 @@ import fs from "fs/promises";
 
 export class DeploymentManager {
 	constructor(msgObj, envObj) {
-		this.msbObj = msgObj;
+		this.msgObj = msgObj;
 		// Set the environment object
 		this.envObj = envObj;
 		// Deployment operation logs
@@ -23,7 +23,7 @@ export class DeploymentManager {
 	 * Returns the environment object
 	 */
 	getEnvObj() {
-		return this.envObj;
+		return this.envObj || this.msgObj?.env;
 	}
 
 	/**
@@ -126,9 +126,10 @@ export class DeploymentManager {
 			await axios.post(
 				this.msgObj.callback,
 				{
-					status,
+					status: status,
 					logs: this.logs,
 					type: "server",
+					pod: process.env.POD_NAME,
 				},
 				{
 					headers: {

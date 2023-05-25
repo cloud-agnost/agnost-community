@@ -109,7 +109,7 @@ export const validateVersionLimit = async (req, res, next) => {
 	try {
 		const { limitId } = req.params;
 
-		// Get the param object
+		// Get the rate limit
 		let limit = req.version.limits.find(
 			(entry) => entry._id.toString() === limitId.toString()
 		);
@@ -127,6 +127,87 @@ export const validateVersionLimit = async (req, res, next) => {
 
 		// Assign the rate limiter data
 		req.limit = limit;
+		next();
+	} catch (err) {
+		return handleError(req, res, err);
+	}
+};
+
+export const validateVersionKey = async (req, res, next) => {
+	try {
+		const { keyId } = req.params;
+
+		// Get the API key object
+		let key = req.version.apiKeys.find(
+			(entry) => entry._id.toString() === keyId.toString()
+		);
+
+		if (!key) {
+			return res.status(404).json({
+				error: t("Not Found"),
+				details: t("No such API key with the provided id '%s' exists.", keyId),
+				code: ERROR_CODES.notFound,
+			});
+		}
+
+		// Assign the API key data
+		req.key = key;
+		next();
+	} catch (err) {
+		return handleError(req, res, err);
+	}
+};
+
+export const validateVersionPackage = async (req, res, next) => {
+	try {
+		const { packageId } = req.params;
+
+		// Get the NPM package object
+		let npmPackage = req.version.npmPackages.find(
+			(entry) => entry._id.toString() === packageId.toString()
+		);
+
+		if (!npmPackage) {
+			return res.status(404).json({
+				error: t("Not Found"),
+				details: t(
+					"No such NPM package with the provided id '%s' exists.",
+					packageId
+				),
+				code: ERROR_CODES.notFound,
+			});
+		}
+
+		// Assign the NPM package data
+		req.npmPackage = npmPackage;
+		next();
+	} catch (err) {
+		return handleError(req, res, err);
+	}
+};
+
+export const validateVersionOSRedirect = async (req, res, next) => {
+	try {
+		const { redirectId } = req.params;
+
+		// Get the NPM package object
+		let osRedirect = req.version.authentication?.osRedirects?.find(
+			(entry) => entry._id.toString() === redirectId.toString()
+		);
+
+		if (!osRedirect) {
+			return res.status(404).json({
+				error: t("Not Found"),
+				details: t(
+					"No such OS specific redirect configuration with the provided id '%s' exists.",
+					redirectId
+				),
+				code: ERROR_CODES.notFound,
+			});
+		}
+
+		// Assign the os specific redirect configuration
+		req.osRedirect = osRedirect;
 		next();
 	} catch (err) {
 		return handleError(req, res, err);

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { body, query } from "express-validator";
+import { body } from "express-validator";
 import {
 	envActions,
 	envStatuses,
@@ -33,12 +33,6 @@ export const EnvironmentLogModel = mongoose.model(
 			ref: "environment",
 			index: true,
 		},
-		type: {
-			type: String,
-			index: true,
-			enum: envLogTypes,
-			required: true,
-		},
 		action: {
 			type: String,
 			index: true,
@@ -49,19 +43,24 @@ export const EnvironmentLogModel = mongoose.model(
 			type: String,
 			index: true,
 			enum: envStatuses,
-			required: true,
 		},
-		serverStatus: {
-			type: String,
-			index: true,
-			enum: envStatuses,
-			required: true,
-		},
+		serverStatus: [
+			{
+				pod: {
+					type: String,
+					index: true,
+				},
+				status: {
+					type: String,
+					index: true,
+					enum: envStatuses,
+				},
+			},
+		],
 		schedulerStatus: {
 			type: String,
 			index: true,
 			enum: envStatuses,
-			required: true,
 		},
 		// Deployment log status
 		dbLogs: [
@@ -74,6 +73,7 @@ export const EnvironmentLogModel = mongoose.model(
 		serverLogs: [
 			{
 				startedAt: { type: Date },
+				pod: { type: String },
 				status: { type: String, enum: logStatuses },
 				message: { type: String },
 			},
@@ -110,7 +110,7 @@ export const applyRules = (type) => {
 	switch (type) {
 		case "update":
 			return [
-				query("type")
+				body("type")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))

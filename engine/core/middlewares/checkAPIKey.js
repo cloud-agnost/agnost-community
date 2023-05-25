@@ -132,10 +132,10 @@ export const checkAPIKey = (endpoint) => (req, res, next) => {
 				);
 		}
 
-		const { authorizedDomains } = META.getVersion();
+		const { authorizedDomains } = apiKeyObj;
 		// Check if the origin is in the allowed domains list
 		const isAllowedDomain = authorizedDomains.some((domain) => {
-			if (domain.startsWith("*.")) {
+			if (domain.startsWith("http://*.") || domain.startsWith("https://*.")) {
 				// Wildcard subdomain match
 				const regex = new RegExp(
 					`^[^.]+\\.${allowedDomain.substr(2).replace(".", "\\.")}$`,

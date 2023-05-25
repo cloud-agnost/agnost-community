@@ -61,6 +61,9 @@
          "defaultSchedulerDeploymentName": "engine-scheduler-deployment",
          "defaultRealtimeDeploymentName": "engine-realtime-deployment",
          "defaultRealtimeServerURL": "http://engine-realtime-clusterip-service:4000",
+         "defaultAuthRedirect": "http://localhost:3000/auth-redirect",
+         "emailTokenExpiresInSeconds": 3600,
+         "SMSCodeExpiresInSeconds": 3600,
          "defaultEngineConfig": {
             "replicas": 1,
             "hpa": {

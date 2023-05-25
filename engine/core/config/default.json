@@ -41,6 +41,8 @@
         "fileStorageFolder": "/tmp/uploads",
         "expressRequestMaxBodySize": "100mb",
         "endpointPrefix": "/api",
-        "gcSeconds": 30
+        "gcSeconds": 30,
+        "heartbeatIntervalSeconds": 10,
+        "heartbeatTimeoutSeconds": 5
      }
 }

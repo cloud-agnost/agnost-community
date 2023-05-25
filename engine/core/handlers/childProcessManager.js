@@ -55,8 +55,6 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// We are initializing the server, do not process any incoming requests
 		global.SERVER_STATUS = "initializing";
 
-		// Set the environment variables of the API server
-		this.manageEnvironmentVariables(this.getEnvironmentVariables());
 		// Initialize express server
 		await this.initExpressServer();
 		// Manage endpoints
@@ -64,6 +62,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Spin up the express server
 		await this.startExpressServer();
 
+		// Set the environment variables of the API server
+		this.manageEnvironmentVariables(this.getEnvironmentVariables());
 		// Initialize the connection manager
 		await this.setupResourceConnections();
 		// Create initial buckets if needed, don't call it with await it can run in parallel
@@ -79,14 +79,13 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	/**
 	 * Manages the environment variables of the API server
 	 * @param  {Array} variables The list of environment variables in name-value pairs
-	 * @param  {string} actionType The action type such as set, add, update and delete
 	 */
-	manageEnvironmentVariables(variables, actionType) {
+	manageEnvironmentVariables(variables) {
 		if (variables.length === 0) return;
-		logger.info(`Updating environment variables`);
 
 		for (const variable of variables) {
 			process.env[variable.name] = variable.value;
+			logger.info(`Added environment variable '${variable.name}'`);
 		}
 	}
 
@@ -194,10 +193,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			this.getExpressApp().use(touter);
 
 			logger.info(
-				`Added endpoint (%s) %s: %s`,
-				endpoint.name,
-				endpoint.method,
-				endpoint.path
+				`Added endpoint '${endpoint.name}' ${endpoint.method}: ${endpoint.path}`
 			);
 		}
 	}
@@ -302,9 +298,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		for (const resource of resources) {
 			await adapterManager.setupConnection(resource);
 			logger.info(
-				`Initialized the adapter of '%s' resource '%s'`,
-				resource.type,
-				resource.name
+				`Initialized the adapter of '${resource.type}' resource '${resource.name}'`
 			);
 		}
 	}
@@ -325,8 +319,10 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			const connection = adapterManager.getStorageAdapter(mapping.design.name);
 
 			if (connection) {
-				await connection.ensureStorage(entry.design.iid);
-				logger.info(`Initialized storage '%s'`, mapping.design.name);
+				await connection.ensureStorage(
+					`${META.getEnvId()}-${entry.design.iid}`
+				);
+				logger.info(`Initialized storage '${mapping.design.name}'`);
 			}
 		}
 	}
@@ -345,7 +341,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			const adapterObj = adapterManager.getQueueAdapter(queue.name);
 			if (adapterObj) {
 				adapterObj.listenMessages(queue.iid);
-				logger.info(`Initialized handler of queue '%s'`, queue.name);
+				logger.info(`Initialized handler of queue '${queue.name}'`);
 			}
 		}
 	}
@@ -364,7 +360,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			const adapterObj = adapterManager.getTaskAdapter(queue.name);
 			if (adapterObj) {
 				adapterObj.listenMessages(task.iid);
-				logger.info(`Initialized handler of task '%s'`, task.name);
+				logger.info(`Initialized handler of task '${task.name}'`);
 			}
 		}
 	}

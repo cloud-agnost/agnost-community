@@ -40,15 +40,7 @@ export const AuditModel = mongoose.model(
 			ref: "model",
 			index: true,
 		},
-		olsId: {
-			type: mongoose.Schema.Types.ObjectId,
-			index: true,
-		},
 		fieldId: {
-			type: mongoose.Schema.Types.ObjectId,
-			index: true,
-		},
-		validationRuleId: {
 			type: mongoose.Schema.Types.ObjectId,
 			index: true,
 		},
@@ -60,6 +52,26 @@ export const AuditModel = mongoose.model(
 		envId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "environment",
+			index: true,
+		},
+		endpointId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "endpoint",
+			index: true,
+		},
+		middlewareId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "middleware",
+			index: true,
+		},
+		queueId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "queue",
+			index: true,
+		},
+		taskId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "task",
 			index: true,
 		},
 		// Action type e.g., create, update, delete, deploy, merge
