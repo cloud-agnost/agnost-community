@@ -286,6 +286,66 @@ class ModelController extends BaseController {
 
 		return order + 10000;
 	}
+
+	/**
+	 * Prepares the missing fields information
+	 * @param  {Object} modelObj The model object
+	 * @param  {Array} newFields The new fields information, provides the name and type of the field to add
+	 */
+	prepareAuthUserDataModelMissingFields(modelObj, newFields, user) {
+		const fieldsToAdd = [];
+		let startingOrderNumber = this.getNewFieldOrderNumber(modelObj);
+		for (const newField of newFields) {
+			// Assign the field values
+			let fieldData = {
+				_id: helper.generateId(),
+				name: newField.name,
+				iid: helper.generateSlug("fld"),
+				creator: "user",
+				type: newField.type,
+				order: (startingOrderNumber += 10000),
+				required: ["provider", "signUpAt"].includes(newField.name)
+					? true
+					: false,
+				unique: ["email", "phone"].includes(newField.name) ? true : false,
+				immutable: ["provider", "providerUserId", "2faSecret"].includes(
+					newField.name
+				)
+					? true
+					: false,
+				indexed: [
+					"provider",
+					"providerUserId",
+					"email",
+					"phone",
+					"name",
+					"signUpAt",
+					"lastLoginAt",
+				].includes(newField.name)
+					? true
+					: false,
+				createdBy: user._id,
+			};
+
+			if (newField.type === "text") {
+				fieldData.text = {
+					searchable: false,
+					maxLength: 1024,
+					trim: "none",
+					caseStyle: "none",
+					acceptType: "all",
+				};
+			} else if (newField.type === "encrypted-text") {
+				fieldData.encryptedText = {
+					maxLength: config.get("general.maxEncryptedTextFieldLength"),
+				};
+			}
+
+			fieldsToAdd.push(fieldData);
+		}
+
+		return fieldsToAdd;
+	}
 }
 
 export default new ModelController();

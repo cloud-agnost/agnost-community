@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import mappingCtrl from "../controllers/mapping.js";
 import { body, query } from "express-validator";
 import { resourceTypes, envStatuses } from "../config/constants.js";
 
@@ -87,11 +86,6 @@ export const EnvironmentModel = mongoose.model(
 						},
 					},
 					resource: {
-						id: {
-							type: mongoose.Schema.Types.ObjectId,
-							ref: "resource",
-							index: true,
-						},
 						iid: {
 							type: String,
 							index: true,
@@ -160,21 +154,8 @@ export const EnvironmentModel = mongoose.model(
 
 export const applyRules = (type) => {
 	switch (type) {
-		case "create":
 		case "update":
 			return [
-				body("name")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
-					.withMessage(
-						t(
-							"Name must be at most %s characters long",
-							config.get("general.maxTextLength")
-						)
-					),
 				body("autoDeploy")
 					.trim()
 					.notEmpty()
@@ -183,138 +164,6 @@ export const applyRules = (type) => {
 					.isBoolean()
 					.withMessage(t("Not a valid boolean value"))
 					.toBoolean(),
-			];
-		case "view":
-			return [
-				query("page")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isInt({
-						min: 0,
-					})
-					.withMessage(
-						t("Page number needs to be a positive integer or 0 (zero)")
-					)
-					.toInt(),
-				query("size")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isInt({
-						min: config.get("general.minPageSize"),
-						max: config.get("general.maxPageSize"),
-					})
-					.withMessage(
-						t(
-							"Page size needs to be an integer, between %s and %s",
-							config.get("general.minPageSize"),
-							config.get("general.maxPageSize")
-						)
-					)
-					.toInt(),
-			];
-		case "add-param":
-			return [
-				body("value")
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty")),
-				body("paramId")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom((value, { req }) => {
-						if (!helper.isValidId(value))
-							throw new AgnostError(t("Not a valid app param identifier"));
-
-						let param = req.version.params.find(
-							(entry) => entry._id.toString() === value
-						);
-
-						if (!param)
-							throw new AgnostError(
-								t("No such app param with the provided id '%s' exists.", value)
-							);
-
-						// Assign param information
-						req.appParam = param;
-						return true;
-					}),
-			];
-		case "update-param":
-			return [
-				body("value")
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty")),
-			];
-		case "add-mapping":
-			return [
-				body("type")
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isIn(resourceTypes)
-					.withMessage(t("Unsupported resource type")),
-				body("designiid")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom(async (value, { req }) => {
-						// Get the design element
-						let designElement = await mappingCtrl.getDesignElement(
-							req.body.type,
-							req.org._id,
-							req.app._id,
-							req.version._id,
-							value
-						);
-
-						if (!designElement)
-							throw new AgnostError(
-								t(
-									"No such app '%s' design element with the provided id '%s' exists.",
-									req.body.type,
-									value
-								)
-							);
-
-						// Assign design element information
-						req.designElement = designElement;
-						return true;
-					}),
-				body("resourceId")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom(async (value, { req }) => {
-						if (!helper.isValidId(value))
-							throw new AgnostError(t("Not a valid resource identifier"));
-
-						// Get the resource
-						let resource = await mappingCtrl.getResource(
-							req.body.type,
-							req.org._id,
-							value
-						);
-
-						if (!resource)
-							throw new AgnostError(
-								t(
-									"No such organization '%s' resource with the provided id '%s' exists.",
-									req.body.type,
-									value
-								)
-							);
-
-						// Assign resource information
-						req.resource = resource;
-						return true;
-					}),
 			];
 		default:
 			return [];

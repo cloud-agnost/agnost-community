@@ -7,6 +7,8 @@ import {
 	databaseTypes,
 	resourceTypes,
 	instanceTypes,
+	phoneAuthSMSProviders,
+	oAuthProviderTypes,
 } from "../config/constants.js";
 
 const router = express.Router({ mergeParams: true });
@@ -24,6 +26,8 @@ router.get("/all", checkContentType, authSession, (req, res) => {
 		databaseTypes,
 		resourceTypes,
 		instanceTypes,
+		phoneAuthSMSProviders,
+		oAuthProviderTypes,
 	});
 });
 
@@ -75,6 +79,26 @@ router.get("/resource", checkContentType, authSession, (req, res) => {
 */
 router.get("/instance", checkContentType, authSession, (req, res) => {
 	res.json(instanceTypes);
+});
+
+/*
+@route      /instance
+@method     GET
+@desc       Returns the list of phone based authentication SMS providers
+@access     public
+*/
+router.get("/sms-provider", checkContentType, authSession, (req, res) => {
+	res.json(phoneAuthSMSProviders);
+});
+
+/*
+@route      /instance
+@method     GET
+@desc       Returns the list of phone based authentication SMS providers
+@access     public
+*/
+router.get("/oauth-provider", checkContentType, authSession, (req, res) => {
+	res.json(oAuthProviderTypes);
 });
 
 export default router;

@@ -70,9 +70,7 @@ export const appAuthorization = {
 			},
 			env: {
 				view: true,
-				create: true,
 				update: true,
-				delete: true,
 				deploy: true,
 			},
 		},

@@ -78,7 +78,6 @@ class VersionController extends BaseController {
 					name: t("apiServer"),
 				},
 				resource: {
-					id: resource._id,
 					iid: resource.iid,
 					name: resource.name,
 					type: resource.type,
@@ -97,7 +96,6 @@ class VersionController extends BaseController {
 						name: t("cronScheduler"),
 					},
 					resource: {
-						id: res._id,
 						iid: res.iid,
 						name: res.name,
 						type: res.type,
@@ -112,7 +110,6 @@ class VersionController extends BaseController {
 						name: t("realtimeServer"),
 					},
 					resource: {
-						id: res._id,
 						iid: res.iid,
 						name: res.name,
 						type: res.type,
@@ -244,7 +241,6 @@ class VersionController extends BaseController {
 					name: t("apiServer"),
 				},
 				resource: {
-					id: resource._id,
 					iid: resource.iid,
 					name: resource.name,
 					type: resource.type,
@@ -263,7 +259,6 @@ class VersionController extends BaseController {
 						name: t("cronScheduler"),
 					},
 					resource: {
-						id: res._id,
 						iid: res.iid,
 						name: res.name,
 						type: res.type,
@@ -278,7 +273,6 @@ class VersionController extends BaseController {
 						name: t("realtimeServer"),
 					},
 					resource: {
-						id: res._id,
 						iid: res.iid,
 						name: res.name,
 						type: res.type,

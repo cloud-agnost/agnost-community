@@ -2,7 +2,6 @@ import express from "express";
 import envCtrl from "../controllers/environment.js";
 import envLogCtrl from "../controllers/environmentLog.js";
 import userCtrl from "../controllers/user.js";
-import mappingCtrl from "../controllers/mapping.js";
 import deployCtrl from "../controllers/deployment.js";
 import auditCtrl from "../controllers/audit.js";
 import { authSession } from "../middlewares/authSession.js";
@@ -11,25 +10,48 @@ import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateApp } from "../middlewares/validateApp.js";
 import { validateVersion } from "../middlewares/validateVersion.js";
-import {
-	validateEnv,
-	validateEnvLog,
-	validateMapping,
-} from "../middlewares/validateEnv.js";
+import { validateEnv, validateEnvLog } from "../middlewares/validateEnv.js";
 import { authorizeAppAction } from "../middlewares/authorizeAppAction.js";
 import { applyRules } from "../schemas/environment.js";
 import { applyRules as applyLogRules } from "../schemas/environmentLog.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
-import { setKey } from "../init/cache.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
 
 /*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/env
+@method     GET
+@desc       Returns app version environment
+@access     private
+*/
+router.get(
+	"/",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.env.view"),
+	async (req, res) => {
+		try {
+			const { version } = req;
+
+			// Get the environemnt of the version
+			let envObj = await envCtrl.getOneByQuery({ versionId: version._id });
+
+			res.json(envObj);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId
 @method     PUT
-@desc       Update environment information
+@desc       Turn on/off environment autodeploy
 @access     private
 */
 router.put(
@@ -46,23 +68,51 @@ router.put(
 	async (req, res) => {
 		try {
 			const { org, user, app, version, env } = req;
-			let { name, autoDeploy } = req.body;
+			let { autoDeploy } = req.body;
 
-			// Update environment data
-			let updatedEnv = await envCtrl.updateOneById(
-				env._id,
-				{
-					name,
-					autoDeploy,
-					updatedBy: req.user._id,
-				},
-				{},
-				{ cacheKey: env._id }
-			);
+			// If auto deploy turned on then we need to do a redeployment
+			if (env.autoDeploy === false && autoDeploy) {
+				// Update environment data
+				let updatedEnv = await envCtrl.updateOneById(
+					env._id,
+					{
+						autoDeploy,
+						dbStatus: "Deploying",
+						serverStatus: [{ pod: "all", status: "Deploying" }],
+						schedulerStatus: "Deploying",
+						updatedBy: req.user._id,
+					},
+					{},
+					{ cacheKey: env._id }
+				);
 
-			// Update environemnt data in engine cluster
-			await deployCtrl.update(app, version, updatedEnv, user);
-			res.json(updatedEnv);
+				res.json(updatedEnv);
+
+				// Create the environment log entry
+				const envLog = await deployCtrl.createEnvLog(
+					version,
+					updatedEnv,
+					user,
+					"Deploying",
+					[{ pod: "all", status: "Deploying" }],
+					"Deploying"
+				);
+				// Update environemnt data in engine cluster
+				await deployCtrl.redeploy(envLog, app, version, updatedEnv, user);
+			} else {
+				// Update environment data
+				let updatedEnv = await envCtrl.updateOneById(
+					env._id,
+					{
+						autoDeploy,
+						updatedBy: req.user._id,
+					},
+					{},
+					{ cacheKey: env._id }
+				);
+
+				res.json(updatedEnv);
+			}
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -70,7 +120,7 @@ router.put(
 				user,
 				"org.app.version.environment",
 				"update",
-				t("Updated environment '%s' properties", name),
+				autoDeploy ? t("Turned on auto-deploy") : t("Turned off auto-deploy"),
 				updatedEnv,
 				{
 					orgId: org._id,
@@ -80,6 +130,7 @@ router.put(
 				}
 			);
 		} catch (error) {
+			console.log(error);
 			handleError(req, res, error);
 		}
 	}
@@ -115,9 +166,15 @@ router.post(
 				{ cacheKey: env._id }
 			);
 
-			// Update environemnt data in engine cluster
-			await deployCtrl.update(app, version, updatedEnv, user);
 			res.json(updatedEnv);
+
+			// Update environemnt data in engine cluster
+			await deployCtrl.updateVersionInfo(
+				app,
+				version,
+				user,
+				"suspend-environment"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -170,9 +227,14 @@ router.post(
 				{ cacheKey: env._id }
 			);
 
-			// Update environemnt data in engine cluster
-			await deployCtrl.update(app, version, updatedEnv, user);
 			res.json(updatedEnv);
+			// Update environemnt data in engine cluster
+			await deployCtrl.updateVersionInfo(
+				app,
+				version,
+				user,
+				"suspend-environment"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -215,20 +277,12 @@ router.post(
 		try {
 			const { org, user, app, version, env } = req;
 
-			/* 			console.log("***here", env);
 			if (
-				[
-					env.dbStatus,
-					env.serverStatus,
-					env.schedulerStatus,
-				].some((entry) =>
-					[
-						"Deploying",
-						"Redeploying",
-						"Undeploying",
-						"Auto-deploying",
-						"Deleting",
-					].includes(entry)
+				[env.dbStatus, env.schedulerStatus].some((entry) =>
+					["Deploying", "Redeploying", "Deleting"].includes(entry)
+				) ||
+				env.serverStatus.some((entry) =>
+					["Deploying", "Redeploying", "Deleting"].includes(entry.status)
 				)
 			) {
 				return res.status(422).json({
@@ -238,14 +292,12 @@ router.post(
 					),
 					code: ERROR_CODES.notAllowed,
 				});
-			} */
+			}
 
 			if (!env.deploymentDtm) {
 				return res.status(422).json({
 					error: t("Not Allowed"),
-					details: t(
-						"There is no app version deployed to this environment. You first need to deploy an app version to redeploy it again."
-					),
+					details: t("There is no app version deployed to this environment."),
 					code: ERROR_CODES.notAllowed,
 				});
 			}
@@ -285,11 +337,8 @@ router.post(
 			// Redeploy application version to the environment
 			await deployCtrl.redeploy(envLog, app, version, env, user);
 
-			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine worker
-			await setKey(env._id, updatedEnv, helper.constants["1month"]);
-
 			await envCtrl.commit(session);
-			res.json({ env: updatedEnv, envLog });
+			res.json(updatedEnv);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -362,7 +411,7 @@ router.post(
 			}
 
 			// If deployment successfully completed then update deploymentDtm
-			if (["deploy", "redeploy", "auto-deploy"].includes(log.action))
+			if (["deploy", "redeploy"].includes(log.action))
 				dataSet.deploymentDtm = timestamp;
 
 			// Update environment data
@@ -431,124 +480,6 @@ router.post(
 					type,
 					env.name
 				),
-				{ updatedEnv },
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					envId: env._id,
-				}
-			);
-		} catch (error) {
-			await envCtrl.rollback(session);
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/mapping
-@method     POST
-@desc       Add resource mapping
-@access     private
-*/
-router.post(
-	"/:envId/mapping",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateEnv,
-	authorizeAppAction("app.env.update"),
-	applyRules("add-mapping"),
-	validate,
-	async (req, res) => {
-		const session = await envCtrl.startSession();
-		try {
-			const { user, org, app, version, env, designElement, resource } = req;
-			const { type } = req.body;
-
-			// Check if there is already a mapping for this design element
-			let exists = env.mappings.find(
-				(entry) =>
-					entry.design.iid.toString() === designElement.iid.toString() &&
-					entry.resource.id.toString() === resource._id.toString()
-			);
-
-			if (exists) {
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"There is already a design element to resouce mapping for '%s' design element '%s' and resource '%s'.",
-						type,
-						designElement.name,
-						resource.name
-					),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			// Check if the design element and the resource types are the same
-			let validMapping = mappingCtrl.isValidMapping(
-				type,
-				designElement,
-				resource
-			);
-
-			if (validMapping.result === "error") {
-				return res.status(422).json({
-					error: t("Invalid Mapping"),
-					details: validMapping.message,
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			// Add mapping to the environment
-			let updatedEnv = await envCtrl.pushObjectById(
-				env._id,
-				"mappings",
-				{
-					design: {
-						iid: designElement.iid,
-						type: type,
-						name: designElement.name,
-					},
-					resource: {
-						id: resource._id,
-						name: resource.name,
-						type: type,
-						instance: resource.instance,
-					},
-					createdBy: user._id,
-				},
-				{ updatedBy: user._id },
-				{ cacheKey: env._id, session }
-			);
-
-			await envCtrl.commit(session);
-			// Update environment data in engine cluster
-			await deployCtrl.update(app, version, updatedEnv, user);
-			res.json(updatedEnv);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.environment",
-				"update",
-				type === "engine"
-					? t(
-							"Mapped  engine cluster of environment '%s' to '%s'",
-							designElement.name,
-							resource.name
-					  )
-					: t(
-							"Mapped app %s design element '%s' to resource '%s'",
-							type,
-							designElement.name,
-							resource.name
-					  ),
 				updatedEnv,
 				{
 					orgId: org._id,
@@ -565,67 +496,65 @@ router.post(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/mapping/:mappingId
-@method     POST
-@desc       Delete resource mapping
+@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/logs
+@method     GET
+@desc       Returns environment logs
 @access     private
 */
-router.delete(
-	"/:envId/mapping/:mappingId",
+router.get(
+	"/:envId/logs",
 	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
 	validateVersion,
 	validateEnv,
-	validateMapping,
-	authorizeAppAction("app.env.update"),
+	authorizeAppAction("app.env.view"),
 	async (req, res) => {
-		const session = await envCtrl.startSession();
 		try {
-			const { user, org, app, version, env, mapping } = req;
+			const { org, app, version, env } = req;
+			const { page, size, status, actor, sortBy, sortDir, start, end } =
+				req.query;
 
-			// Add mapping to the environment
-			let updatedEnv = await envCtrl.pullObjectById(
-				env._id,
-				"mappings",
-				mapping._id,
-				{ updatedBy: user._id },
-				{ cacheKey: env._id, session }
-			);
+			let query = {
+				orgId: org._id,
+				appId: app._id,
+				versionId: version._id,
+				envId: env._id,
+			};
 
-			await envCtrl.commit(session);
-			// Update environment data in engine cluster
-			await deployCtrl.update(app, version, updatedEnv, user);
-			res.json(updatedEnv);
+			// Status filter
+			if (status) {
+				query.$or = [
+					{ dbStatus: status },
+					{ schedulerStatus: status },
+					{ "serverStatus.status": status },
+				];
+			}
 
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.environment",
-				"update",
-				mapping.design.type === "engine"
-					? t(
-							"Deleted the engine cluster mapping of environment '%s' to resource '%s'",
-							mapping.design.name,
-							mapping.resource.name
-					  )
-					: t(
-							"Deleted design element '%s' to resource '%s' mapping",
-							mapping.design.name,
-							mapping.resource.name
-					  ),
-				updatedEnv,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					envId: env._id,
-				}
-			);
+			// Actor filter
+			if (actor) {
+				if (Array.isArray(action)) query["createdBy"] = { $in: actor };
+				else query["createdBy"] = actor;
+			}
+
+			if (start && !end) query.createdAt = { $gte: start };
+			else if (!start && end) query.createdAt = { $lte: end };
+			else if (start && end) query.createdAt = { $gte: start, $lt: end };
+
+			let sort = {};
+			if (sortBy && sortDir) {
+				sort[sortBy] = sortDir;
+			} else sort = { createdAt: "desc" };
+
+			let logs = await envLogCtrl.getManyByQuery(query, {
+				sort,
+				skip: size * page,
+				limit: size,
+			});
+
+			res.json(logs);
 		} catch (error) {
-			await envCtrl.rollback(session);
 			handleError(req, res, error);
 		}
 	}

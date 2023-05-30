@@ -6,6 +6,7 @@ import deployCtrl from "../controllers/deployment.js";
 import resourceCtrl from "../controllers/resource.js";
 import auditCtrl from "../controllers/audit.js";
 import epCtrl from "../controllers/endpoint.js";
+import modelCtrl from "../controllers/model.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
@@ -16,13 +17,14 @@ import {
 	validateVersionLimit,
 	validateVersionKey,
 	validateVersionPackage,
-	validateVersionOSRedirect,
+	validateVersionOauthProvider,
 } from "../middlewares/validateVersion.js";
 import { authorizeAppAction } from "../middlewares/authorizeAppAction.js";
 import { applyRules } from "../schemas/version.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
 import { setKey } from "../init/cache.js";
+import { authUserDataModel } from "../config/constants.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
@@ -312,7 +314,12 @@ router.put(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"update-version"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -461,7 +468,12 @@ router.post(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"add-parameter"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -517,7 +529,12 @@ router.put(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"update-parameter"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -565,7 +582,12 @@ router.delete(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"delete-parameter"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -615,7 +637,12 @@ router.delete(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"delete-parameter"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -672,7 +699,12 @@ router.post(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"add-limit"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -735,7 +767,12 @@ router.put(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"update-limit"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -801,7 +838,12 @@ router.delete(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"delete-limit"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -878,7 +920,12 @@ router.delete(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"delete-limit"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -935,7 +982,12 @@ router.put(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"update-realtime"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1009,7 +1061,7 @@ router.post(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(app, updatedVersion, user, "add-key");
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1084,7 +1136,12 @@ router.put(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"update-key"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1132,7 +1189,12 @@ router.delete(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"delete-key"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1182,7 +1244,12 @@ router.delete(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"delete-key"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1276,7 +1343,12 @@ router.post(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"add-package"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1330,7 +1402,12 @@ router.put(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"update-package"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1383,7 +1460,12 @@ router.delete(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"remove-package"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1433,7 +1515,12 @@ router.delete(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"remove-package"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1471,6 +1558,43 @@ router.post(
 		try {
 			const { org, app, user, version, database, model } = req;
 
+			// Check if the required fields are present in the user data model
+			const missingFields = [];
+			const conflictingFields = [];
+			for (const entry of authUserDataModel) {
+				// Check if entry exists in user data model
+				const fields = req.model.fields;
+				let fieldExists = false;
+				for (const field of fields) {
+					if (field.name === entry.name) {
+						if (field.type === entry.type) {
+							fieldExists = true;
+							break;
+						} else {
+							fieldExists = true;
+							conflictingFields.push({ ...entry, existingType: field.type });
+							break;
+						}
+					}
+				}
+
+				if (!fieldExists) missingFields.push(entry);
+			}
+
+			if (missingFields.length > 0 || conflictingFields.length > 0) {
+				return res.status(422).json({
+					error: t("Invalid User Data Model"),
+					details: t(
+						"User data model '%s' in database '%s' is not a valid model to store authentication user data. There are either missing or conflicing fields that need to be fixed.",
+						database.name,
+						model.name
+					),
+					code: ERROR_CODES.invalidUserDataModel,
+					missingFields,
+					conflictingFields,
+				});
+			}
+
 			let updatedVersion = await versionCtrl.updateOneById(
 				version._id,
 				{
@@ -1485,7 +1609,12 @@ router.post(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"save-userdata-model"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1525,28 +1654,90 @@ router.post(
 	validate,
 	async (req, res) => {
 		try {
-			const { org, app, user, version, model } = req;
-			const { fields } = req.body;
+			const { org, app, user, version, database, model } = req;
 
-			// TO BE COMPLETED
+			// Check if the required fields are present in the user data model
+			const missingFields = [];
+			const conflictingFields = [];
+			for (const entry of authUserDataModel) {
+				// Check if entry exists in user data model
+				const fields = req.model.fields;
+				let fieldExists = false;
+				for (const field of fields) {
+					if (field.name === entry.name) {
+						if (field.type === entry.type) {
+							fieldExists = true;
+							break;
+						} else {
+							fieldExists = true;
+							conflictingFields.push({ ...entry, existingType: field.type });
+							break;
+						}
+					}
+				}
 
-			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, version, user);
+				if (!fieldExists) missingFields.push(entry);
+			}
+
+			if (conflictingFields.length > 0) {
+				return res.status(422).json({
+					error: t("Invalid User Data Model"),
+					details: t(
+						"User data model '%s' in database '%s' is not a valid model to store authentication user data. There are conflicing fields that need to be fixed.",
+						database.name,
+						model.name
+					),
+					code: ERROR_CODES.invalidUserDataModel,
+					conflictingFields,
+				});
+			}
+
+			// Prepare the data for the fields to add
+			const fieldsToAdd = modelCtrl.prepareAuthUserDataModelMissingFields(
+				model,
+				missingFields,
+				user
+			);
+
+			const updatedModel = await modelCtrl.pushObjectById(
+				model._id,
+				"fields",
+				fieldsToAdd,
+				{ updatedBy: user._id },
+				{ cacheKey: model._id }
+			);
+
+			res.json(updatedModel);
+
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(
+				app,
+				version,
+				user,
+				database,
+				"add-missing-userdata-fields"
+			);
 
 			// Log action
-			/* 			auditCtrl.logAndNotify(
+			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.keys",
-				"delete",
+				"org.app.version.db.model.fields",
+				"create",
 				t(
-					"Set authentication user data model to '%s.%s'",
+					"Added missing fields to authentication user data model '%s.%s'",
 					database.name,
 					model.name
 				),
-				updatedVersion,
-				{ orgId: org._id, appId: app._id, versionId: version._id }
-			); */
+				updatedModel,
+				{
+					orgId: org._id,
+					appId: app._id,
+					versionId: version._id,
+					dbId: database._id,
+					modelId: model._id,
+				}
+			);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -1556,7 +1747,7 @@ router.post(
 /*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/auth/save-redirect
 @method     POST
-@desc       Sets the default redirect URL
+@desc       Sets the default redirect URLs
 @access     private
 */
 router.post(
@@ -1567,17 +1758,17 @@ router.post(
 	validateApp,
 	validateVersion,
 	authorizeAppAction("app.version.auth.update"),
-	applyRules("save-redirect"),
+	applyRules("save-redirect-urls"),
 	validate,
 	async (req, res) => {
 		try {
-			const { defaultRedirect } = req.body;
+			const { redirectURLs } = req.body;
 			const { org, app, user, version } = req;
 
 			let updatedVersion = await versionCtrl.updateOneById(
 				version._id,
 				{
-					"authentication.defaultRedirect": defaultRedirect,
+					"authentication.redirectURLs": redirectURLs,
 					updatedBy: user._id,
 				},
 				{},
@@ -1587,7 +1778,12 @@ router.post(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"set-redirect-urls"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1595,7 +1791,7 @@ router.post(
 				user,
 				"org.app.version.keys",
 				"delete",
-				t("Set default redirect URL to '%s'", defaultRedirect),
+				t("Set default redirect URLs to '%s'", redirectURLs.join(", ")),
 				updatedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
@@ -1606,33 +1802,156 @@ router.post(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/osredirects
+@route      /v1/org/:orgId/app/:appId/version/:versionId/auth/save-email
 @method     POST
-@desc       Create a new OS specific redirect configuration.
+@desc       Saves the email authentication settings
 @access     private
 */
 router.post(
-	"/:versionId/osredirects",
+	"/:versionId/auth/save-email",
 	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
 	validateVersion,
 	authorizeAppAction("app.version.auth.update"),
-	applyRules("create-osredirect"),
+	applyRules("save-email-config"),
 	validate,
 	async (req, res) => {
 		try {
 			const { org, app, user, version } = req;
-			const { os, primary, secondary } = req.body;
+
+			// If we have the password then encrypt it
+			if (req.body.customSMTP?.password)
+				req.body.customSMTP.password = helper.encryptText(
+					req.body.customSMTP.password
+				);
+
+			let updatedVersion = await versionCtrl.updateOneById(
+				version._id,
+				{
+					"authentication.email": req.body,
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"save-email-auth"
+			);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.keys",
+				"delete",
+				t("Saved email based authentication settings"),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/auth/save-phone
+@method     POST
+@desc       Saves the phone authentication settings
+@access     private
+*/
+router.post(
+	"/:versionId/auth/save-phone",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.auth.update"),
+	applyRules("save-phone-config"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app, user, version } = req;
+
+			// If we have the SMS provider configuration
+			if (req.body.providerConfig)
+				req.body.providerConfig = helper.encyrptSensitiveData(
+					req.body.providerConfig
+				);
+
+			let updatedVersion = await versionCtrl.updateOneById(
+				version._id,
+				{
+					"authentication.phone": req.body,
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"save-phone-auth"
+			);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.keys",
+				"delete",
+				t("Saved phone based authentication settings"),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/auth/providers
+@method     POST
+@desc       Create a new oAuth provider entry.
+@access     private
+*/
+router.post(
+	"/:versionId/auth/providers",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.auth.update"),
+	applyRules("create-oauth-provider"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app, user, version } = req;
+
+			req.body.config = helper.encyrptSensitiveData(req.body.config);
 
 			let updatedVersion = await versionCtrl.pushObjectById(
 				version._id,
-				"authentication.osRedirects",
+				"authentication.providers",
 				{
-					os,
-					primary,
-					secondary,
+					...req.body,
 					createdBy: user._id,
 				},
 				{ updatedBy: user._id },
@@ -1642,7 +1961,12 @@ router.post(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"add-oauth-provider"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1650,7 +1974,7 @@ router.post(
 				user,
 				"org.app.version.limits",
 				"create",
-				t("Added ' %s' redirect URL configuration", os),
+				t("Configured '%s' oAuth settings", req.body.provider),
 				updatedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
@@ -1661,34 +1985,41 @@ router.post(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/osredirects/:redirectId
+@route      /v1/org/:orgId/app/:appId/version/:versionId/auth/providers/:providerId
 @method     PUT
-@desc       Update redirect URLs of a specific OS
+@desc       Updates an existing oAuth provider setting.
 @access     private
 */
 router.put(
-	"/:versionId/osredirects/:redirectId",
+	"/:versionId/auth/providers/:providerId",
 	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
 	validateVersion,
-	validateVersionOSRedirect,
+	validateVersionOauthProvider,
 	authorizeAppAction("app.version.auth.update"),
-	applyRules("update-osredirect"),
+	applyRules("update-oauth-provider"),
 	validate,
 	async (req, res) => {
 		try {
-			const { org, app, user, osRedirect, version } = req;
-			const { primary, secondary } = req.body;
+			const { org, app, user, oauthProvider, version } = req;
+
+			req.body = helper.encyrptSensitiveData(req.body);
+
+			const updateObj = {};
+			for (let key in req.body) {
+				updateObj[`authentication.providers.$.config.${key}`] = req.body[key];
+			}
+
+			console.log("***here", updateObj);
 
 			let updatedVersion = await versionCtrl.updateOneByQuery(
-				{ _id: version._id, "authentication.osRedirects._id": osRedirect._id },
+				{ _id: version._id, "authentication.providers._id": oauthProvider._id },
 				{
-					"authentication.osRedirects.$.primary": primary,
-					"authentication.osRedirects.$.secondary": secondary,
-					"authentication.osRedirects.$.updatedAt": Date.now(),
-					"authentication.osRedirects.$.updatedBy": user._id,
+					...updateObj,
+					"authentication.providers.$.updatedAt": Date.now(),
+					"authentication.providers.$.updatedBy": user._id,
 					updatedBy: user._id,
 				},
 				{},
@@ -1698,7 +2029,12 @@ router.put(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"update-oauth-provider"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1706,7 +2042,7 @@ router.put(
 				user,
 				"org.app.version.limits",
 				"update",
-				t("Updated '%s' redirect URL configuration", osRedirect.os),
+				t("Updated '%s' oAuth settings", oauthProvider.provider),
 				updatedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
@@ -1717,28 +2053,28 @@ router.put(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/osredirects/:redirectId
+@route      /v1/org/:orgId/app/:appId/version/:versionId/auth/providers/:providerId
 @method     DELETE
-@desc       Delete a specific OS redirect configuration
+@desc       Delete a specific oAuth provider configuration
 @access     private
 */
 router.delete(
-	"/:versionId/osredirects/:redirectId",
+	"/:versionId/auth/providers/:providerId",
 	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
 	validateVersion,
-	validateVersionOSRedirect,
+	validateVersionOauthProvider,
 	authorizeAppAction("app.version.auth.update"),
 	async (req, res) => {
 		try {
-			const { org, app, user, osRedirect, version } = req;
+			const { org, app, user, oauthProvider, version } = req;
 
 			let updatedVersion = await versionCtrl.pullObjectById(
 				version._id,
-				"authentication.osRedirects",
-				osRedirect._id,
+				"authentication.providers",
+				oauthProvider._id,
 				{ updatedBy: user._id },
 				{ cacheKey: version._id }
 			);
@@ -1746,7 +2082,12 @@ router.delete(
 			res.json(updatedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
-			await deployCtrl.updateVersionInfo(app, updatedVersion, user);
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"delete-oauth-provider"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1754,7 +2095,91 @@ router.delete(
 				user,
 				"org.app.version.limits",
 				"delete",
-				t("Deleted '%s' redirect URL configuration", osRedirect.os),
+				t("Deleted '%s' oAuth settings", oauthProvider.provider),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/auth/messages
+@method     POST
+@desc       Sets the authentication message template
+@access     private
+*/
+router.post(
+	"/:versionId/auth/messages",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.auth.update"),
+	applyRules("set-message-template"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app, user, version } = req;
+			const { type } = req.body;
+
+			// If SMS code message template remove uncessary input
+			if (type === "verify_sms_code") {
+				delete req.body.fromEmail;
+				delete req.body.fromName;
+				delete req.body.subject;
+			}
+
+			let templates = version.authentication.messages ?? [];
+			const templateEntry = templates.find((entry) => entry.type === type);
+			if (templateEntry) {
+				templates = templates.map((entry) => {
+					if (entry.type === type)
+						return {
+							...entry,
+							...req.body,
+							updatedBy: user._id,
+							updatedAt: Date.now(),
+						};
+					else return entry;
+				});
+			} else {
+				templates.push({
+					...req.body,
+					createdBy: user._id,
+				});
+			}
+
+			let updatedVersion = await versionCtrl.updateOneById(
+				version._id,
+				{
+					"authentication.messages": templates,
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: version._id }
+			);
+
+			res.json(updatedVersion);
+
+			// Deploy version updates to environments if auto-deployment is enabled
+			await deployCtrl.updateVersionInfo(
+				app,
+				updatedVersion,
+				user,
+				"set-auth-message"
+			);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.limits",
+				"create",
+				t("Updated the authentication message template '%s'", type),
 				updatedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);

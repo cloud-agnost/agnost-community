@@ -53,13 +53,14 @@ if (cluster.isPrimary) {
 
 		cluster.on("exit", function (worker, code, signal) {
 			logger.warn(`Child process ${worker.process.pid} died`);
-			cluster.fork();
+			childProcess = cluster.fork();
 		});
 
 		// Set up heartbeat interval
-		const heartbeatInterval = setInterval(() => {
+		setInterval(() => {
 			// Send heartbeat message to the child process
-			childProcess.send("heartbeat");
+			if (childProcess.isConnected()) childProcess.send("heartbeat");
+			else return;
 
 			// Set a timeout to check if child process responded
 			const heartbeatTimeout = setTimeout(() => {
@@ -71,15 +72,12 @@ if (cluster.isPrimary) {
 
 				// You can choose to restart the child process here using `cluster.fork()` if desired
 				// cluster.fork();
-
-				// Clear the heartbeat interval
-				clearInterval(heartbeatInterval);
 			}, config.get("general.heartbeatTimeoutSeconds") * 1000); // Timeout duration in milliseconds
 
 			// Listen for heartbeat response from the child process
 			childProcess.once("message", (message) => {
 				if (message === "heartbeat") {
-					logger.info(`Child process is up and running`);
+					// logger.info(`Child process is up and running`);
 					// Child process responded, clear the heartbeat timeout
 					clearTimeout(heartbeatTimeout);
 				}
@@ -204,4 +202,8 @@ function setUpGC() {
 			global.gc();
 		}
 	}, config.get("general.gcSeconds") * 1000);
+}
+
+export function setChildProcess(newChild) {
+	childProcess = newChild;
 }

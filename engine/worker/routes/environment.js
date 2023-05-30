@@ -6,6 +6,7 @@ import {
 	redeployVersion,
 	deleteEnvironment,
 	updateEnvironment,
+	updateDatabase,
 	deployTasks,
 	redeployTasks,
 	deleteTasks,
@@ -113,5 +114,25 @@ router.post("/update", checkContentType, authAccessToken, async (req, res) => {
 		helper.handleError(req, res, error);
 	}
 });
+
+/*
+@route      /env/update-database
+@method     POST
+@desc       Updates the database and environment data
+@access     public
+*/
+router.post(
+	"/update-database",
+	checkContentType,
+	authAccessToken,
+	async (req, res) => {
+		try {
+			updateDatabase(req.body);
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
+);
 
 export default router;

@@ -27,5 +27,7 @@ const ERROR_CODES = {
 	unauthorized: "unauthorized",
 	notFound: "not_found",
 	setupCompleted: "setup_completed",
+	connectionError: "connection_error",
+	invalidUserDataModel: "invalid_user_data_model",
 };
 export default ERROR_CODES;

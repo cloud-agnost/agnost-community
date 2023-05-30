@@ -63,7 +63,9 @@
          "defaultRealtimeServerURL": "http://engine-realtime-clusterip-service:4000",
          "defaultAuthRedirect": "http://localhost:3000/auth-redirect",
          "emailTokenExpiresInSeconds": 3600,
+         "minEmailTokenExpirySeconds": 60,
          "SMSCodeExpiresInSeconds": 3600,
+         "minSMSCodeExpirySeconds": 60,
          "defaultEngineConfig": {
             "replicas": 1,
             "hpa": {

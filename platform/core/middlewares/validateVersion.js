@@ -186,28 +186,28 @@ export const validateVersionPackage = async (req, res, next) => {
 	}
 };
 
-export const validateVersionOSRedirect = async (req, res, next) => {
+export const validateVersionOauthProvider = async (req, res, next) => {
 	try {
-		const { redirectId } = req.params;
+		const { providerId } = req.params;
 
 		// Get the NPM package object
-		let osRedirect = req.version.authentication?.osRedirects?.find(
-			(entry) => entry._id.toString() === redirectId.toString()
+		let oauthProvider = req.version.authentication?.providers?.find(
+			(entry) => entry._id.toString() === providerId.toString()
 		);
 
-		if (!osRedirect) {
+		if (!oauthProvider) {
 			return res.status(404).json({
 				error: t("Not Found"),
 				details: t(
-					"No such OS specific redirect configuration with the provided id '%s' exists.",
-					redirectId
+					"No such oAuth provider configuration with the provided id '%s' exists.",
+					providerId
 				),
 				code: ERROR_CODES.notFound,
 			});
 		}
 
 		// Assign the os specific redirect configuration
-		req.osRedirect = osRedirect;
+		req.oauthProvider = oauthProvider;
 		next();
 	} catch (err) {
 		return handleError(req, res, err);

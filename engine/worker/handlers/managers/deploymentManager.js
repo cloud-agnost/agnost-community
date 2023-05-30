@@ -3,7 +3,6 @@ import util from "util";
 import { getDBClient } from "../../init/db.js";
 import {
 	createPipeline,
-	getKey,
 	setKey,
 	scanKeys,
 	addToCache,
@@ -115,6 +114,20 @@ export class DeploymentManager {
 	}
 
 	/**
+	 * Returns the list of app resources
+	 */
+	getResources() {
+		return this.msgObj.env.resources || [];
+	}
+
+	/**
+	 * Returns the resource mappings
+	 */
+	getResourceMappings() {
+		return this.msgObj.env.mappings || [];
+	}
+
+	/**
 	 * Returns the environment iid (internal identifier)
 	 */
 	getEnvId() {
@@ -169,6 +182,24 @@ export class DeploymentManager {
 	 */
 	getTasks() {
 		return this.msgObj.tasks || [];
+	}
+
+	/**
+	 * Returns the database resource object mapped to the database design
+	 */
+	getDatabaseResource(dbConfig) {
+		const mappings = this.getResourceMappings();
+		const mapping = mappings.find((entry) => entry.design.iid === dbConfig.iid);
+		// We have the mapping return the corresponding resource
+		if (mapping) {
+			const resource = this.getResources().find(
+				(entry) => entry.iid === mapping.resource.iid
+			);
+
+			return resource;
+		}
+
+		return null;
 	}
 
 	/**
@@ -269,10 +300,6 @@ export class DeploymentManager {
 
 			for (let j = 0; j < model.fields.length; j++) {
 				const field = model.fields[j];
-				// Sort the validation rules
-				field.validationRules.sort(function (a, b) {
-					return a.order - b.order;
-				});
 				// Create query path of the field starting from the topmost model
 				field.queryPath = this.getFieldPath(models, model, field.name);
 				// Unwinded query path is used to delete or rename fields deep in a document hierarchy with multiple levels of sub-object arrays
@@ -824,7 +851,7 @@ export class DeploymentManager {
 			);
 			if (newdbConfig) continue;
 			else {
-				let dbManager = this.createDBManager(prevdb, prevdb);
+				let dbManager = this.createDBManager(prevdbConfig, prevdbConfig);
 				await dbManager.beginSession();
 				await dbManager.dropDatabase();
 				await dbManager.endSession();
@@ -859,6 +886,11 @@ export class DeploymentManager {
 	 * @param  {object} prevConfig The database json object for the previous configuration
 	 */
 	createDBManager(dbConfig, prevConfig) {
+		// Assign the database server resource
+		const resource = this.getDatabaseResource(dbConfig);
+		dbConfig.resource = resource;
+		prevConfig.resource = resource;
+
 		switch (dbConfig.type) {
 			case DATABASE.MongoDB:
 				return new MongoDBManager(dbConfig, prevConfig, (message, status) =>
@@ -888,24 +920,24 @@ export class DeploymentManager {
 	}
 
 	/**
-	 * Gets the existing (previous) database information first from the cache if not exists loads it from the engine cluster database
+	 * Gets the existing (previous) database information from environment database
+	 * We do not use cache since cache is already updated with new configuration info.
 	 * @param  {object} db The database json object
 	 */
 	async getPrevDBDefinition(dbJson) {
-		// If there is already a database configuration load it from the cache first
-		let db = await getKey(`${this.getEnvId()}.db.${this.getDbId(dbJson)}`);
-		if (db) return db;
-
 		// Database configuration is not in the cache, load it from the database
 		const engineDb = this.getEnvDB();
-		db = await engineDb.collection("databases").findOne({ iid: dbJson.iid });
+		const db = await engineDb
+			.collection("databases")
+			.findOne({ iid: dbJson.iid });
 		if (db) return db;
 
 		return null;
 	}
 
 	/**
-	 * Gets all existing database configurations from engine cluster database
+	 * Gets all existing database configurations from environment database.
+	 * We do not use cache since cache is already updated with new configuration info.
 	 */
 	async getPrevDBDefinitions() {
 		// Database configuration is not in the cache, load it from the database
@@ -954,6 +986,21 @@ export class DeploymentManager {
 	}
 
 	/**
+	 * Save new database configurations to the engine cluster database
+	 */
+	async saveDatabaseDeploymentConfigs(databases) {
+		const engineDb = this.getEnvDB();
+		for (const db of databases) {
+			// Save updated configuration
+			await engineDb
+				.collection("databases")
+				.updateOne({ iid: db.iid }, { $set: db }, { upsert: true });
+		}
+
+		this.addLog("Saved database configurations to environment database");
+	}
+
+	/**
 	 * Save new deployment configuration to the engine cluster database
 	 */
 	async saveEnvironmentDeploymentConfig() {
@@ -989,6 +1036,22 @@ export class DeploymentManager {
 		switch (actionType) {
 			case "set":
 				this.addToCache(`${this.getEnvId()}.databases`, databases);
+				break;
+			case "update":
+				const prevDbDefinitions = await this.getPrevDBDefinitions();
+				if (prevDbDefinitions.length === 0) {
+					//this.addToCache(`${this.getEnvId()}.databases`, databases);
+				} else {
+					const updatedDbDefinitions = prevDbDefinitions.map((entry) => {
+						const updatedDb = databases.find(
+							(entry2) => entry2.iid === entry.iid
+						);
+
+						if (updatedDb) return updatedDb;
+						else entry;
+					});
+					this.addToCache(`${this.getEnvId()}.databases`, updatedDbDefinitions);
+				}
 				break;
 			default:
 				break;
@@ -1067,18 +1130,20 @@ export class DeploymentManager {
 			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
 			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
-			// Cache application configuration data
-			await this.cacheMetadata();
 			// Load all data models and do deployment initializations
 			await this.loadDatabases();
+			// Cache application configuration data
+			await this.cacheMetadata();
+			// Execute all redis commands altogether
+			await this.commitPipeline();
+			// After we load all configuration data to the cache we can notify engine API servers to update themselves
+			this.notifyAPIServers();
 			// Create application specific configuration and log collections
 			await this.createInternalCollections();
 			// Create database structure for databases and models (e.g.,tables, collections, indices)
 			await this.prepareDatabases();
 			// Save updated deployment to database
 			await this.saveDeploymentConfig();
-			// Execute all redis commands altogether
-			await this.commitPipeline();
 
 			// Update status of environment in engine cluster
 			this.addLog(t("Completed deployment successfully"));
@@ -1117,10 +1182,12 @@ export class DeploymentManager {
 			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
 			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
-			// Cache application configuration data
-			await this.cacheMetadata();
 			// Load all data models and do deployment initializations
 			await this.loadDatabases();
+			// Cache application configuration data
+			await this.cacheMetadata();
+			// Execute all redis commands altogether
+			await this.commitPipeline();
 			// After we load all configuration data to the cache we can notify engine API servers to update themselves
 			this.notifyAPIServers();
 			// Create application specific configuration and log collections
@@ -1129,8 +1196,6 @@ export class DeploymentManager {
 			await this.prepareDatabases();
 			// Save updated deployment to database
 			await this.saveDeploymentConfig();
-			// Execute all redis commands altogether
-			await this.commitPipeline();
 
 			// Update status of environment in engine cluster
 			this.addLog(t("Completed redeployment successfully"));
@@ -1246,19 +1311,72 @@ export class DeploymentManager {
 	}
 
 	/**
+	 * Updates the databases
+	 */
+	async updateDatabases() {
+		try {
+			this.addLog(t("Started updating databases"));
+			// Set current status of environment in engine cluster
+			await this.setStatus("Deploying");
+
+			// Clear the initially cached environment data
+			await this.clearCachedData(`${this.getEnvId()}.*`);
+			// Add environment object data to cache
+			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
+			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
+
+			// Load updated data models and do deployments
+			await this.loadDatabases();
+			// Cache updated database configurations
+			await this.cacheDatabases(this.getDatabases(), "update");
+			// Execute all redis commands altogether
+			await this.commitPipeline();
+			// We first cache all data and then notify api servers
+			// After we load all configuration data to the cache we can notify engine API servers to update themselves
+			this.notifyAPIServers();
+
+			// Update database structure for databases and models (e.g.,tables, collections, indices)
+			await this.prepareDatabases();
+			// Save updated deployment to database
+			await this.saveDatabaseDeploymentConfigs(this.getDatabases());
+
+			// Update status of environment in engine cluster
+			this.addLog(t("Completed database updates successfully"));
+			// Send the deployment telemetry information to the platform
+			await this.sendEnvironmentLogs("OK");
+			// Update status of environment in engine cluster
+			await this.setStatus("OK");
+			return { success: true };
+		} catch (error) {
+			// Update status of environment in engine cluster
+			await this.setStatus("Error");
+			// Send the deployment telemetry information to the platform
+			this.addLog(
+				[
+					t("Database updates failed"),
+					error.name,
+					error.message,
+					error.stack,
+				].join("\n"),
+				"Error"
+			);
+			await this.sendEnvironmentLogs("Error");
+			return { success: false, error };
+		}
+	}
+
+	/**
 	 * Sends the message to the engine API servers so that they can update their state
 	 */
 	notifyAPIServers() {
-		// Clear unnecessary data
 		const msgObj = this.getMsgObj();
-		delete msgObj.databases;
-		delete msgObj.endpoints;
-		delete msgObj.middlewares;
-		delete msgObj.queues;
-		delete msgObj.tasks;
-		delete msgObj.storage;
-		delete msgObj.cache;
-
-		manageAPIServers(this.getEnvId(), this.getMsgObj());
+		manageAPIServers(this.getEnvId(), {
+			action: msgObj.action,
+			subAction: msgObj.subAction,
+			callback: msgObj.callback,
+			actor: msgObj.actor,
+			app: msgObj.app,
+			env: msgObj.env,
+		});
 	}
 }

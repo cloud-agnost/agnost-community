@@ -4,6 +4,7 @@ import modelCtrl from "../controllers/model.js";
 import resourceCtrl from "../controllers/resource.js";
 import envCtrl from "../controllers/environment.js";
 import envLogCtrl from "../controllers/environmentLog.js";
+import { sendMessage } from "../init/sync.js";
 
 class DeploymentController {
 	constructor() {}
@@ -33,6 +34,42 @@ class DeploymentController {
 		serverStatus,
 		schedulerStatus
 	) {
+		// Update the environment object status
+		const updatedEnv = await envCtrl.updateOneById(
+			env._id,
+			{
+				dbStatus,
+				serverStatus,
+				schedulerStatus,
+				updatedBy: user._id,
+			},
+			{},
+			{ cacheKey: env._id }
+		);
+
+		// Send realtime message
+		sendMessage(version._id, {
+			actor: {
+				userId: user._id,
+				name: user.name,
+				pictureUrl: user.pictureUrl,
+				color: user.color,
+				loginEmail: user.loginProfiles[0].email,
+				contactEmail: user.contactEmail,
+			},
+			action: "update",
+			object: "org.app.version.environment",
+			description: t("Updating environment"),
+			timestamp: Date.now(),
+			data: updatedEnv,
+			identifiers: {
+				orgId: version.orgId,
+				appId: version.appId,
+				versionId: version._id,
+				envId: env._id,
+			},
+		});
+
 		// Create environment logs entry, which will be updated when the deployment is completed
 		let envLog = await envLogCtrl.create({
 			orgId: version.orgId,
@@ -59,11 +96,11 @@ class DeploymentController {
 	 */
 	async getEnvironmentResources(env) {
 		// Get all resource ids
-		let resourceIds = env.mappings.map((entry) => entry.resource.id);
+		let resourceIds = env.mappings.map((entry) => entry.resource.iid);
 
 		// Get the resources used by the environment
 		let resources = await resourceCtrl.getManyByQuery({
-			_id: { $in: resourceIds },
+			iid: { $in: resourceIds },
 		});
 
 		// Decrypt access data of the resources and delete managed resource config settings
@@ -81,17 +118,17 @@ class DeploymentController {
 	}
 
 	/**
-	 * Returns the database and associated models information
+	 * Returns the databases and their associated models
 	 * @param  {string} versionId The version id
 	 * @param  {string} dbId The database id
 	 */
-	async getDatabaseDesign(versionId, dbiid) {
-		let db = await dbCtrl.getOneByQuery({ iid: dbiid, versionId: versionId });
+	async getDatabases(versionId) {
+		let databases = await dbCtrl.getManyByQuery({ versionId });
+		for (const db of databases) {
+			db.models = await modelCtrl.getManyByQuery({ dbId: db._id, versionId });
+		}
 
-		if (!db) return null;
-		db.models = await modelCtrl.getManyByQuery({ dbId: db._id, versionId });
-
-		return db;
+		return databases;
 	}
 
 	/**
@@ -109,6 +146,7 @@ class DeploymentController {
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "deploy",
+			subAction: "deploy",
 			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
 				env.orgId
 			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
@@ -124,7 +162,7 @@ class DeploymentController {
 			app,
 			// We pass the list of resources in env object
 			env: { ...env, version, resources, timestamp: new Date() },
-			databases: [],
+			databases: await this.getDatabases(version._id),
 			endpoints: [],
 			middlewares: [],
 			queues: [],
@@ -132,34 +170,6 @@ class DeploymentController {
 			storage: [],
 			cache: [],
 		};
-
-		// For each design element build entries in the payload
-		for (let i = 0; i < env.mappings.length; i++) {
-			const mapping = env.mappings[i];
-			// Check if this mapping has a corresponding resource
-			const resource = resources.find(
-				(entry) => entry._id.toString() === mapping.resource.id.toString()
-			);
-
-			// If there is no resource available we skip the design element
-			if (!resource) continue;
-			// We have the design element
-			switch (mapping.design.type) {
-				case "database": {
-					let db = await this.getDatabaseDesign(
-						version._id,
-						mapping.design.iid
-					);
-					if (db) {
-						// Assign the resource info of the database
-						db.resource = resource;
-						payload.databases.push(db);
-					}
-				}
-				default:
-					break;
-			}
-		}
 
 		//Make api call to environment worker engine to deploy app version
 		await axios.post(
@@ -189,6 +199,7 @@ class DeploymentController {
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "redeploy",
+			subAction: "redeploy",
 			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
 				env.orgId
 			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
@@ -204,7 +215,7 @@ class DeploymentController {
 			app,
 			// We pass the list of resources in env object
 			env: { ...env, version, resources, timestamp: new Date() },
-			databases: [],
+			databases: await this.getDatabases(version._id),
 			endpoints: [],
 			middlewares: [],
 			queues: [],
@@ -212,34 +223,6 @@ class DeploymentController {
 			storage: [],
 			cache: [],
 		};
-
-		// For each design element build entries in the payload
-		for (let i = 0; i < env.mappings.length; i++) {
-			const mapping = env.mappings[i];
-			// Check if this mapping has a corresponding resource
-			const resource = resources.find(
-				(entry) => entry._id.toString() === mapping.resource.id.toString()
-			);
-
-			// If there is no resource availble we skip the design element
-			if (!resource) continue;
-			// We have the design element
-			switch (mapping.design.type) {
-				case "database": {
-					let db = await this.getDatabaseDesign(
-						version._id,
-						mapping.design.iid
-					);
-					if (db) {
-						// Assign the resource info of the database, also add the default database name to the access settings
-						db.resource = resource;
-						payload.databases.push(db);
-					}
-				}
-				default:
-					break;
-			}
-		}
 
 		//Make api call to environment worker engine to redeploy app version
 		await axios.post(
@@ -262,6 +245,9 @@ class DeploymentController {
 	 * @param  {object} user The user who initiated the delete operation
 	 */
 	async delete(app, version, env, user) {
+		// First get the list of environment resources
+		let resources = await this.getEnvironmentResources(env);
+
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "delete",
@@ -274,7 +260,7 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			env: { ...env, version, timestamp: new Date() },
+			env: { ...env, version, resources, timestamp: new Date() },
 		};
 
 		//Make api call to environment worker engine to delete the environment
@@ -291,12 +277,12 @@ class DeploymentController {
 	}
 
 	/**
-	 * Updates the version metadata in engine cluster if autoDeploy is turned on
+	 * Updates the version and also environment metadata in engine cluster if autoDeploy is turned on
 	 * @param  {object} app The application object
 	 * @param  {object} version The version object
 	 * @param  {object} user The user who initiated the update
 	 */
-	async updateVersionInfo(app, version, user) {
+	async updateVersionInfo(app, version, user, subAction) {
 		const env = await this.getEnvironment(version);
 		// If auto deploy is turned off or version has not been deployed to the environment then we do not send the environment updates to the engine cluster
 		if (!env.autoDeploy || !env.deploymentDtm) return;
@@ -316,6 +302,7 @@ class DeploymentController {
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "update-version",
+			subAction: subAction,
 			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
 				env.orgId
 			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
@@ -347,20 +334,39 @@ class DeploymentController {
 	}
 
 	/**
-	 * Updates the environment (environment and version) metadata in engine cluster if autoDeploy is turned on and the version is deployed to the environemnt
-	 * @param  {object} envLog The environment log object
+	 * Updates the database configuration if autoDeploy is turned on
 	 * @param  {object} app The application object
 	 * @param  {object} version The version object
-	 * @param  {object} env The environment object
-	 * @param  {object} user The user who initiated the deployment
+	 * @param  {object} user The user who initiated the update
 	 */
-	async update(envLog, app, version, env, user) {
+	async updateDatabase(app, version, user, database, subAction) {
+		const env = await this.getEnvironment(version);
 		// If auto deploy is turned off or version has not been deployed to the environment then we do not send the environment updates to the engine cluster
 		if (!env.autoDeploy || !env.deploymentDtm) return;
 
+		// Create the environment log entry
+		const envLog = await this.createEnvLog(
+			version,
+			env,
+			user,
+			"Deploying",
+			[{ pod: "all", status: "Deploying" }],
+			env.schedulerStatus
+		);
+
+		// First get the list of environment resources
+		const resources = await this.getEnvironmentResources(env);
+
+		// Add models information to the database object
+		database.models = await modelCtrl.getManyByQuery({
+			dbId: database._id,
+			versionId: version._id,
+		});
+
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
-			action: "auto-deploy",
+			action: "deploy",
+			subAction: subAction,
 			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
 				env.orgId
 			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
@@ -374,12 +380,14 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			env: { ...env, version, timestamp: new Date() },
+			// We pass the list of resources in env object
+			env: { ...env, version, resources, timestamp: new Date() },
+			databases: [database],
 		};
 
-		// Make api call to environment worker engine to update environment data
+		// Make api call to environment worker engine to update database
 		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/update",
+			config.get("general.workerUrl") + "/v1/env/update-database",
 			payload,
 			{
 				headers: {

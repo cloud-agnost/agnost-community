@@ -105,31 +105,30 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	 */
 	async saveConfig() {
 		// Save endpoints
-		const endpoints = await getKey(
-			`${process.env.AGNOST_ENVIRONMENT_ID}.endpoints`
-		);
+		const endpoints =
+			(await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.endpoints`)) ?? [];
 		await this.manageConfigFiles("endpoints", endpoints, "set");
 
 		// Save middlewares
-		const middlewares = await getKey(
-			`${process.env.AGNOST_ENVIRONMENT_ID}.middlewares`
-		);
+		const middlewares =
+			(await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.middlewares`)) ?? [];
 		await this.manageConfigFiles("middlewares", middlewares, "set");
 
 		// Save queues
-		const queues = await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.queues`);
+		const queues =
+			(await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.queues`)) ?? [];
 		await this.manageConfigFiles("queues", queues, "set");
 
 		// Save tasks
-		const tasks = await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.tasks`);
+		const tasks =
+			(await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.tasks`)) ?? [];
 		await this.manageConfigFiles("tasks", tasks, "set");
 
 		// Save environment and version info
 		await this.saveEnvConfigFile();
 		// Save databases info
-		const databases = await getKey(
-			`${process.env.AGNOST_ENVIRONMENT_ID}.databases`
-		);
+		const databases =
+			(await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.databases`)) ?? [];
 		await this.saveEntityConfigFile("databases", databases);
 
 		this.addLog(t("Saved new app configuration files and metadata"));

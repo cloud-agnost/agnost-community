@@ -32,14 +32,7 @@ export const redeployVersionHandler = (connection, queue) => {
 				// Check the environment status if it is in a deployment state then do not acknowledge the message unless it is timed out
 				let envStatus = await getKey(`${msgObj.env.iid}.status`);
 				console.log("status", envStatus);
-				if (
-					[
-						"Deploying",
-						"Redeploying",
-						"Undeploying",
-						"Auto-deploying",
-					].includes(envStatus)
-				) {
+				if (["Deploying", "Redeploying"].includes(envStatus)) {
 					// Check timestamp of the message
 					const now = Date.now();
 					const date = new Date(Date.parse(msgObj.timestamp));

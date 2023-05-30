@@ -98,32 +98,3 @@ export const validateEnvLog = async (req, res, next) => {
 		return handleError(req, res, err);
 	}
 };
-
-export const validateMapping = async (req, res, next) => {
-	try {
-		const { mappingId } = req.params;
-
-		// Get the mapping object
-		let mapping = req.env.mappings.find(
-			(entry) => entry._id.toString() === mappingId.toString()
-		);
-
-		if (!mapping) {
-			return res.status(404).json({
-				error: t("Not Found"),
-				details: t(
-					"No such design to resource mapping with the provided id '%s' exists.",
-					mappingId
-				),
-				code: ERROR_CODES.notFound,
-			});
-		}
-
-		// Assign mapping data
-		req.mapping = mapping;
-
-		next();
-	} catch (err) {
-		return handleError(req, res, err);
-	}
-};

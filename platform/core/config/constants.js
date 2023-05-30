@@ -45,21 +45,13 @@ export const engineErrorType = [
 	"realtime",
 ];
 
-export const envActions = [
-	"deploy",
-	"redeploy",
-	"switch",
-	"auto-deploy",
-	"delete",
-];
+export const envActions = ["deploy", "redeploy", "auto-deploy", "delete"];
 
 export const envStatuses = [
-	"Idle",
 	"OK",
 	"Error",
 	"Deploying",
 	"Redeploying",
-	"Auto-deploying",
 	"Deleting",
 ];
 
@@ -334,15 +326,271 @@ export const apiKeyTypes = [
 	"custom-excluded",
 ];
 
-export const osTypes = ["ios", "android", "macos", "windows", "linux", "other"];
+export const messageTemplatesTypes = [
+	"verify_sms_code",
+	"confirm_email",
+	"reset_password",
+	"magic_link",
+	"confirm_email_change",
+];
 
-export const smsProviders = ["Twilio", "MessageBird", "Vonage"];
+export const phoneAuthSMSProviders = [
+	{
+		provider: "Twilio",
+		params: [
+			{
+				name: "accountSID",
+				title: t("Account SID"),
+				type: "string",
+				description: t(
+					"The SID (String Identifier) of your Twilio account that you will be using to send the SMS messages."
+				),
+				multiline: false,
+			},
+			{
+				name: "authToken",
+				title: t("Authentication Token"),
+				type: "string",
+				description: t("Token to use to authenticate your account."),
+				multiline: false,
+			},
+			{
+				name: "fromNumberOrSID",
+				title: t("Phone Number or Messsage Service SID"),
+				type: "string",
+				description: t(
+					"The phone number (in E.164 format i.e., [+] [country code] [subscriber number including area code]) or alphanumeric sender ID that initiated the message."
+				),
+				multiline: false,
+			},
+		],
+	},
+	{
+		provider: "MessageBird",
+		params: [
+			{
+				name: "accessKey",
+				title: t("Access Key"),
+				type: "string",
+				description: t(
+					"The access key of your MessageBird account that you will be using to send the SMS messages."
+				),
+				multiline: false,
+			},
+			{
+				name: "originator",
+				title: t("Message Sender"),
+				type: "string",
+				description: t(
+					"The phone number (in E.164 format i.e., [+] [country code] [subscriber number including area code]) or alphanumeric string."
+				),
+				multiline: false,
+			},
+		],
+	},
+	{
+		provider: "Vonage",
+		params: [
+			{
+				name: "apiKey",
+				title: t("API Key"),
+				type: "string",
+				description: t(
+					"The API key of your Vonage account that you will be using to send the SMS messages."
+				),
+				multiline: false,
+			},
+			{
+				name: "apiSecret",
+				title: t("API Secret"),
+				type: "string",
+				description: t(
+					"Used in combination with your API key to authenticate your API requests."
+				),
+				multiline: false,
+			},
+			{
+				name: "from",
+				title: t("Message Sender"),
+				type: "string",
+				description: t(
+					"The phone number (in E.164 format i.e., [+] [country code] [subscriber number including area code]) or alphanumeric senderID."
+				),
+				multiline: false,
+			},
+		],
+	},
+];
 
 export const oAuthProviderTypes = [
-	"google",
-	"facebook",
-	"twitter",
-	"apple",
-	"discord",
-	"github",
+	{
+		provider: "google",
+		params: [
+			{
+				name: "key",
+				title: t("Client Id"),
+				type: "string",
+				multiline: false,
+			},
+			{
+				name: "secret",
+				title: t("Client Secret"),
+				type: "string",
+				multiline: false,
+			},
+		],
+	},
+	{
+		provider: "facebook",
+		params: [
+			{
+				name: "key",
+				title: t("Client Id"),
+				type: "string",
+				multiline: false,
+			},
+			{
+				name: "secret",
+				title: t("Client Secret"),
+				type: "string",
+				multiline: false,
+			},
+		],
+	},
+	{
+		provider: "twitter",
+		params: [
+			{
+				name: "key",
+				title: t("Client Key"),
+				type: "string",
+				multiline: false,
+			},
+			{
+				name: "secret",
+				title: t("Client Secret"),
+				type: "string",
+				multiline: false,
+			},
+		],
+	},
+	{
+		provider: "apple",
+		params: [
+			{
+				name: "teamId",
+				title: t("Team Id"),
+				type: "string",
+				multiline: false,
+			},
+			{
+				name: "serviceId",
+				title: t("Service (Client) Id"),
+				type: "string",
+				multiline: false,
+			},
+			{
+				name: "keyId",
+				title: t("Key Id"),
+				type: "string",
+				multiline: false,
+			},
+			{
+				name: "privateKey",
+				title: t("Private Key"),
+				type: "string",
+				multiline: true,
+			},
+		],
+	},
+	{
+		provider: "discord",
+		params: [
+			{
+				name: "key",
+				title: t("Client Id"),
+				type: "string",
+				multiline: false,
+			},
+			{
+				name: "secret",
+				title: t("Client Secret"),
+				type: "string",
+				multiline: false,
+			},
+		],
+	},
+	{
+		provider: "github",
+		params: [
+			{
+				name: "key",
+				title: t("Client Id"),
+				type: "string",
+				multiline: false,
+			},
+			{
+				name: "secret",
+				title: t("Client Secret"),
+				type: "string",
+				multiline: false,
+			},
+		],
+	},
+];
+
+// List of fields that are required to use Agnost's built-in authentication methods
+export const authUserDataModel = [
+	{
+		name: "provider",
+		type: "text",
+	},
+	{
+		name: "providerUserId",
+		type: "text",
+	},
+	{
+		name: "email",
+		type: "email",
+	},
+	{
+		name: "phone",
+		type: "phone",
+	},
+	{
+		name: "password",
+		type: "encrypted-text",
+	},
+	{
+		name: "name",
+		type: "text",
+	},
+	{
+		name: "profilePicture",
+		type: "link",
+	},
+	{
+		name: "signUpAt",
+		type: "datetime",
+	},
+	{
+		name: "lastLoginAt",
+		type: "datetime",
+	},
+	{
+		name: "emailVerified",
+		type: "boolean",
+	},
+	{
+		name: "phoneVerified",
+		type: "boolean",
+	},
+	{
+		name: "2fa",
+		type: "boolean",
+	},
+	{
+		name: "2faSecret",
+		type: "text",
+	},
 ];

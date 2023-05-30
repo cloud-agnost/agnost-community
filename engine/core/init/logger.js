@@ -41,8 +41,8 @@ class EngineErrorTransport extends Transport {
 	}
 }
 
-const logFormat = printf(({ level, message, label, timestamp }) => {
-	return `${timestamp} ${level}: ${message}`;
+const logFormat = printf((log) => {
+	return `${log.timestamp} ${log.level}: ${log.message}`;
 });
 
 const logger = winston.createLogger({

@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 import { body, query } from "express-validator";
 import {
 	apiKeyTypes,
-	osTypes,
-	smsProviders,
 	oAuthProviderTypes,
+	messageTemplatesTypes,
+	phoneAuthSMSProviders,
 } from "../config/constants.js";
 import dbCtrl from "../controllers/database.js";
 import modelCtrl from "../controllers/model.js";
@@ -212,28 +212,10 @@ export const VersionModel = mongoose.model(
 						type: String, // The model iid
 					},
 				},
-				defaultRedirect: {
-					type: String,
-					required: true,
-					default: config.get("general.defaultAuthRedirect"),
+				redirectURLs: {
+					type: [String], // Array of rate limit iids
+					default: [config.get("general.defaultAuthRedirect")],
 				},
-				osRedirects: [
-					{
-						os: {
-							type: String,
-							required: true,
-							enum: osTypes,
-						},
-						primary: {
-							type: String,
-							required: true,
-						},
-						secondary: {
-							type: String,
-							required: false,
-						},
-					},
-				],
 				email: {
 					enabled: {
 						type: Boolean,
@@ -241,7 +223,7 @@ export const VersionModel = mongoose.model(
 					},
 					confirmEmail: {
 						type: Boolean,
-						default: true,
+						default: false,
 					},
 					expiresIn: {
 						type: Number,
@@ -250,19 +232,20 @@ export const VersionModel = mongoose.model(
 					customSMTP: {
 						host: {
 							type: String,
-							required: true,
 						},
 						port: {
 							type: Number,
-							required: true,
+						},
+						useTLS: {
+							type: Boolean,
+							default: false,
 						},
 						user: {
 							type: String,
-							required: true,
 						},
+						// Password is encrypted when stored in database
 						password: {
 							type: String,
-							required: true,
 						},
 					},
 				},
@@ -282,7 +265,7 @@ export const VersionModel = mongoose.model(
 					smsProvider: {
 						type: String,
 						default: "Twilio",
-						enum: smsProviders,
+						enum: phoneAuthSMSProviders.map((entry) => entry.provider),
 					},
 					expiresIn: {
 						type: Number,
@@ -297,11 +280,40 @@ export const VersionModel = mongoose.model(
 						provider: {
 							type: String,
 							required: true,
-							enum: oAuthProviderTypes,
+							enum: oAuthProviderTypes.map((entry) => entry.provider),
 						},
 						config: {
 							type: mongoose.Schema.Types.Mixed,
 						},
+						createdAt: { type: Date, default: Date.now, immutable: true },
+						updatedAt: { type: Date, default: Date.now },
+						createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+						updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+					},
+				],
+				messages: [
+					{
+						type: {
+							type: String,
+							required: true,
+							enum: messageTemplatesTypes,
+						},
+						fromEmail: {
+							type: String,
+						},
+						fromName: {
+							type: String,
+						},
+						subject: {
+							type: String,
+						},
+						body: {
+							type: String,
+						},
+						createdAt: { type: Date, default: Date.now, immutable: true },
+						updatedAt: { type: Date, default: Date.now },
+						createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+						updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 					},
 				],
 			},
@@ -1030,6 +1042,7 @@ export const applyRules = (type) => {
 					}),
 			];
 		case "save-model":
+		case "add-fields":
 			return [
 				body("databaseId")
 					.trim()
@@ -1062,13 +1075,20 @@ export const applyRules = (type) => {
 							throw new AgnostError(t("Not a valida model identifier"));
 						}
 
-						let model = await modelCtrl.getOneById(value, {
-							cacheKey: value,
-						});
+						let model = await modelCtrl.getOneByQuery(
+							{ dbId: req.body.databaseId, _id: value },
+							{
+								cacheKey: value,
+							}
+						);
 
 						if (!model) {
 							throw new AgnostError(
-								t("No such model with the provided id '%s' exists", value)
+								t(
+									"No such model with the provided id '%s' exists in database '%s'",
+									value,
+									req.database.name
+								)
 							);
 						}
 
@@ -1089,47 +1109,361 @@ export const applyRules = (type) => {
 						return true;
 					}),
 			];
-		case "save-redirect":
+		case "save-redirect-urls":
 			return [
-				body("defaultRedirect")
+				body("redirectURLs")
+					.optional()
+					.isArray()
+					.withMessage(t("Redirect URLs need to be an array of strings")),
+				body("redirectURLs.*")
 					.trim()
 					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty")),
+					.withMessage(t("Redirect URL cannot be left empty")),
 			];
-		case "create-osredirect":
+		case "save-email-config":
 			return [
-				body("os")
+				body("enabled")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isIn(osTypes)
-					.withMessage(t("Unsupported Operting System (OS) type"))
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
+				body("confirmEmail")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
+				body("expiresIn")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isInt({
+						min: config.get("general.minEmailTokenExpirySeconds"),
+					})
+					.withMessage(
+						t(
+							"Email validation token expiry can be minimum '%s' seconds",
+							config.get("general.minEmailTokenExpirySeconds")
+						)
+					)
+					.toInt(),
+				body("customSMTP.host")
+					.if((value, { req }) => req.body.confirmEmail && req.body.enabled)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("customSMTP.port")
+					.if((value, { req }) => req.body.confirmEmail)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isInt({
+						min: 0,
+						max: 65535,
+					})
+					.withMessage(t("Port number needs to be an integer between 0-65535"))
+					.toInt(),
+				body("customSMTP.useTLS")
+					.if((value, { req }) => req.body.confirmEmail && req.body.enabled)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
+				body("customSMTP.user")
+					.if((value, { req }) => req.body.confirmEmail && req.body.enabled)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("customSMTP.password")
+					.if((value, { req }) => req.body.confirmEmail && req.body.enabled)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+			];
+		case "save-phone-config":
+			return [
+				body("enabled")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
+				body("confirmPhone")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
+				body("allowCodeSignIn")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
+				body("expiresIn")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isInt({
+						min: config.get("general.minEmailTokenExpirySeconds"),
+					})
+					.withMessage(
+						t(
+							"SMS code expiry can be minimum '%s' seconds",
+							config.get("general.minSMSCodeExpirySeconds")
+						)
+					)
+					.toInt(),
+				body("smsProvider")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(phoneAuthSMSProviders.map((entry) => entry.provider))
+					.withMessage(t("Unsupported resource type")),
+				body("providerConfig.accountSID")
+					.if(
+						(value, { req }) =>
+							req.body.enabled &&
+							req.body.confirmPhone &&
+							req.body.smsProvider === "Twilio"
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("providerConfig.authToken")
+					.if(
+						(value, { req }) =>
+							req.body.enabled &&
+							req.body.confirmPhone &&
+							req.body.smsProvider === "Twilio"
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("providerConfig.fromNumberOrSID")
+					.if(
+						(value, { req }) =>
+							req.body.enabled &&
+							req.body.confirmPhone &&
+							req.body.smsProvider === "Twilio"
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("providerConfig.accessKey")
+					.if(
+						(value, { req }) =>
+							req.body.enabled &&
+							req.body.confirmPhone &&
+							req.body.smsProvider === "MessageBird"
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("providerConfig.originator")
+					.if(
+						(value, { req }) =>
+							req.body.enabled &&
+							req.body.confirmPhone &&
+							req.body.smsProvider === "MessageBird"
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("providerConfig.apiKey")
+					.if(
+						(value, { req }) =>
+							req.body.enabled &&
+							req.body.confirmPhone &&
+							req.body.smsProvider === "Vonage"
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("providerConfig.apiSecret")
+					.if(
+						(value, { req }) =>
+							req.body.enabled &&
+							req.body.confirmPhone &&
+							req.body.smsProvider === "Vonage"
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("providerConfig.from")
+					.if(
+						(value, { req }) =>
+							req.body.enabled &&
+							req.body.confirmPhone &&
+							req.body.smsProvider === "Vonage"
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+			];
+		case "create-oauth-provider":
+			return [
+				body("provider")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(oAuthProviderTypes.map((entry) => entry.provider))
+					.withMessage(t("Unsupported oAuth provider type"))
 					.bail()
 					.custom((value, { req }) => {
-						const { osRedirects } = req.version.authentication;
-						const osRedirect = osRedirects?.find((entry) => entry.os === value);
-						if (osRedirect) {
+						const { providers } = req.version.authentication;
+						const oauthProvider = providers?.find(
+							(entry) => entry.provider === value
+						);
+						if (oauthProvider) {
 							throw new AgnostError(
-								t("Redirect URLs are already configured for '%s'", value)
+								t("Oauth configuration is already configured for '%s'", value)
 							);
 						}
 
 						return true;
 					}),
-				body("primary")
+				body("config.key")
+					.if((value, { req }) =>
+						["google", "twitter", "facebook", "discord", "github"].includes(
+							req.body.provider
+						)
+					)
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty")),
-				body("secondary").trim().optional(),
+				body("config.secret")
+					.if((value, { req }) =>
+						["google", "twitter", "facebook", "discord", "github"].includes(
+							req.body.provider
+						)
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("config.teamId")
+					.if((value, { req }) => req.body.provider === "apple")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("config.serviceId")
+					.if((value, { req }) => req.body.provider === "apple")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("config.keyId")
+					.if((value, { req }) => req.body.provider === "apple")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("config.privateKey")
+					.if((value, { req }) => req.body.provider === "apple")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
 			];
-		case "update-osredirect":
+		case "update-oauth-provider":
 			return [
-				body("primary")
+				body("key")
+					.if((value, { req }) =>
+						["google", "twitter", "facebook", "discord", "github"].includes(
+							req.oauthProvider.provider
+						)
+					)
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty")),
-				body("secondary").trim().optional(),
+				body("secret")
+					.if((value, { req }) =>
+						["google", "twitter", "facebook", "discord", "github"].includes(
+							req.oauthProvider.provider
+						)
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("teamId")
+					.if((value, { req }) => req.oauthProvider.provider === "apple")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("serviceId")
+					.if((value, { req }) => req.oauthProvider.provider === "apple")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("keyId")
+					.if((value, { req }) => req.oauthProvider.provider === "apple")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("privateKey")
+					.if((value, { req }) => req.oauthProvider.provider === "apple")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+			];
+		case "set-message-template":
+			return [
+				body("type")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(messageTemplatesTypes)
+					.withMessage(t("Unsupported message template type")),
+				body("fromEmail")
+					.if((value, { req }) =>
+						[
+							"confirm_email",
+							"reset_password",
+							"magic_link",
+							"confirm_email_change",
+						].includes(req.body.type)
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isEmail()
+					.withMessage(t("Not a valid email address"))
+					.bail()
+					.normalizeEmail({ gmail_remove_dots: false }),
+				body("fromName").trim().optional(),
+				body("subject")
+					.if((value, { req }) =>
+						[
+							"confirm_email",
+							"reset_password",
+							"magic_link",
+							"confirm_email_change",
+						].includes(req.body.type)
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("body")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
 			];
 		default:
 			return [];

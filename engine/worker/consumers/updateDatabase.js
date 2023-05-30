@@ -1,8 +1,7 @@
-import axios from "axios";
 import { getKey } from "../init/cache.js";
 import { DeploymentManager } from "../handlers/managers/deploymentManager.js";
 
-export const deleteEnvironmentHandler = (connection, queue) => {
+export const updateDatabaseHandler = (connection, queue) => {
 	connection.createChannel(function (error, channel) {
 		if (error) {
 			logger.error("Cannot create channel to message queue", {
@@ -28,46 +27,39 @@ export const deleteEnvironmentHandler = (connection, queue) => {
 			async function (msg) {
 				let msgObj = JSON.parse(msg.content.toString());
 
-				// Check the environment status if it is in a deployment state
+				// Check the environment status if it is in a deployment state then do not acknowledge the message unless it is timed out
 				let envStatus = await getKey(`${msgObj.env.iid}.status`);
 				console.log("status", envStatus);
-				if (["Deploying", "Redeploying"].includes(envStatus)) {
-					// Check timestamp of the message
-					const now = Date.now();
-					const date = new Date(Date.parse(msgObj.timestamp));
-					const millisecondsFromEpoch = date.getTime();
-
-					// If processing has not timed out do not acknowledge message and return
-					if (
-						now - millisecondsFromEpoch <
-						config.get("general.maxMessageWaitMinues") * 60 * 1000
-					) {
-						// Message has not timed out yet, it might be still being processed
-						channel.nack(msg);
-						return;
-					}
+				if (envStatus === "Deleting") {
+					// If the environment is being deleted then do not process deployment messages
+					channel.ack(msg);
+					return;
 				}
 
 				logger.info(
 					t(
-						"Started deleting app '%s' version '%s' environment '%s'",
+						"Started updating app '%s' version '%s' database(s) '%s'",
 						msgObj.app.name,
 						msgObj.env.version.name,
-						msgObj.env.name
+						msgObj.databases.map((entry) => entry.name).join(", ")
 					)
 				);
+				console.log("***result1", msgObj.databases);
+
 				// Create the deployment manager and deploy the version
 				let manager = new DeploymentManager(msgObj);
-				let result = await manager.deleteEnvironment();
-				console.log("***result", result);
+				let result = await manager.updateDatabases();
+
+				console.log("***result2", msgObj.databases);
+
 				if (result.success) {
 					channel.ack(msg);
 					logger.info(
 						t(
-							"Completed deleting app '%s' version '%s' environment '%s' successfully",
+							"Completed updating app '%s' version '%s' databases '%s' successfully",
 							msgObj.app.name,
 							msgObj.env.version.name,
-							msgObj.env.name
+							msgObj.databases.map((entry) => entry.name).join(", ")
 						)
 					);
 				} else {
@@ -75,10 +67,10 @@ export const deleteEnvironmentHandler = (connection, queue) => {
 					channel.ack(msg);
 					logger.error(
 						t(
-							"Cannot delete app '%s' version '%s' environment '%s'",
+							"Cannot update app '%s' version '%s' database(s) '%s'",
 							msgObj.app.name,
 							msgObj.env.version.name,
-							msgObj.env.name
+							msgObj.databases.map((entry) => entry.name).join(", ")
 						),
 						{
 							details: {

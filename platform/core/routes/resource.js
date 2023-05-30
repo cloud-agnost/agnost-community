@@ -545,7 +545,7 @@ router.delete(
 			// Check if this resource has been used by any environment
 			let environments = await envCtrl.getManyByQuery({
 				orgId: org._id,
-				"mappings.resource.id": resource._id,
+				"mappings.resource.iid": resource.iid,
 			});
 
 			if (environments.length > 0) {
@@ -665,7 +665,7 @@ router.get(
 			let environments = await envCtrl.getManyByQuery(
 				{
 					orgId: org._id,
-					"mappings.resource.id": resource.id,
+					"mappings.resource.iid": resource.iid,
 				},
 				{
 					lookup: "appId",

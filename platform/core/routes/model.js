@@ -922,7 +922,7 @@ router.post(
 				"fields",
 				fieldData,
 				{
-					updatedBy: req.user.id,
+					updatedBy: req.user._id,
 				},
 				{ cacheKey: model._id, session }
 			);

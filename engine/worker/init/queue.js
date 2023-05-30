@@ -2,6 +2,7 @@ import amqp from "amqplib/callback_api.js";
 import { deployVersionHandler } from "../consumers/deployVersion.js";
 import { redeployVersionHandler } from "../consumers/redeployVersion.js";
 import { updateEnvironmentHandler } from "../consumers/updateEnvironment.js";
+import { updateDatabaseHandler } from "../consumers/updateDatabase.js";
 import { deleteEnvironmentHandler } from "../consumers/deleteEnvironment.js";
 import { manageResourceHandler } from "../consumers/manageResource.js";
 
@@ -92,6 +93,10 @@ export const connectToQueue = () => {
 			updateEnvironmentHandler(
 				connection,
 				`update-environment-${i}${config.get("queue.developmentSuffix")}`
+			);
+			updateDatabaseHandler(
+				connection,
+				`update-db-${i}${config.get("queue.developmentSuffix")}`
 			);
 			manageResourceHandler(
 				connection,
@@ -247,6 +252,41 @@ export const updateEnvironment = (payload) => {
 			`update-environment-${randNumber}${config.get(
 				"queue.developmentSuffix"
 			)}`,
+			Buffer.from(JSON.stringify(payload)),
+			{
+				persistent: true,
+				timestamp: Date.now(),
+			}
+		);
+
+		channel.close();
+	});
+};
+
+export const updateDatabase = (payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		let randNumber = helper.randomInt(
+			1,
+			config.get("general.generalQueueCount")
+		);
+
+		channel.assertQueue(
+			`update-db-${randNumber}${config.get("queue.developmentSuffix")}`,
+			{
+				durable: true,
+			}
+		);
+
+		channel.sendToQueue(
+			`update-db-${randNumber}${config.get("queue.developmentSuffix")}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,
