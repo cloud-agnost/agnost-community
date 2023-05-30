@@ -24,62 +24,34 @@ import ERROR_CODES from "../config/errorCodes.js";
 const router = express.Router({ mergeParams: true });
 
 /*
-@route      /v1/org/:orgId/resource
+@route      /v1/org/:orgId/resource/add
 @method     POST
-@desc       Create a new organization resource
+@desc       Add an existing resource
 @access     private
 */
 router.post(
-	"/",
+	"/add",
 	checkContentType,
 	authSession,
 	validateOrg,
-	authorizeOrgAction("org.resource.create"),
-	applyRules("create"),
+	authorizeOrgAction("org.resource.add"),
+	applyRules("add"),
 	validate,
 	async (req, res) => {
 		const session = await resourceCtrl.startSession();
 		try {
 			const { org, user } = req;
-			let {
+			const {
 				appId,
 				name,
 				type,
 				instance,
-				managed,
 				allowedRoles,
-				config,
 				access,
 				accessReadOnly,
 			} = req.body;
 
-			// Check validity of the application
-			if (appId) {
-				let app = await appCtrl.getOneById(appId, { cacheKey: appId });
-
-				if (!app) {
-					await resourceCtrl.endSession(session);
-					return res.status(404).json({
-						error: t("Not Found"),
-						details: t(
-							"No such application with the provided id '%s' exists.",
-							appId
-						),
-						code: ERROR_CODES.notFound,
-					});
-				}
-
-				if (app.orgId.toString() !== org._id.toString()) {
-					return res.status(401).json({
-						error: t("Not Authorized"),
-						details: t(
-							"Organization does not have an app with the provided id '%s'",
-							appId
-						),
-						code: ERROR_CODES.unauthorized,
-					});
-				}
-			}
+			return res.json();
 
 			// Admin should always be included in allowedRoles list
 			if (!allowedRoles.includes("Admin")) allowedRoles.push("Admin");
@@ -279,6 +251,30 @@ router.put(
 				{},
 				{ cacheKey: resource._id, session }
 			);
+
+			// If we are updating the name of the resource, we should also update the resouce mapping name info in environments if there is any
+			if (resource.name !== name) {
+				let environments = await envCtrl.getManyByQuery(
+					{
+						orgId: org._id,
+						"mappings.resource.iid": resource.iid,
+					},
+					{ session }
+				);
+
+				for (let i = 0; i < environments.length; i++) {
+					const env = environments[i];
+					await envCtrl.updateOneByQuery(
+						{
+							_id: env._id,
+							"mappings.resource.iid": resource.iid,
+						},
+						{ "mappings.$.resource.name": name },
+						{},
+						{ cacheKey: env._id, session }
+					);
+				}
+			}
 
 			await resourceCtrl.commit(session);
 			// Delete the sensitive data
@@ -542,6 +538,20 @@ router.delete(
 		try {
 			const { org, user, resource } = req;
 
+			if (!resource.deletable) {
+				await resourceCtrl.endSession(session);
+
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"The %s resource named '%s' is either a cluster resource that is created when the cluster is set up or an API server resource of an app version. Cluster resources cannot be deleted unless you delete the cluster. API server resources can only be deleted when their associated version is deleted.",
+						resource.instance,
+						resource.name
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
 			// Check if this resource has been used by any environment
 			let environments = await envCtrl.getManyByQuery({
 				orgId: org._id,
@@ -563,80 +573,38 @@ router.delete(
 				});
 			}
 
-			if (resource.managed) {
-				// Update resource data
-				let updatedResource = await resourceCtrl.updateOneById(
-					resource._id,
-					{
-						"telemetry.status": "Deleting",
-						"telemetry.updatedAt": Date.now(),
-						updatedBy: user._id,
-					},
-					{},
-					{ cacheKey: resource._id, session }
-				);
+			// Delete organization resource
+			await resourceCtrl.deleteOneById(resource._id, {
+				cacheKey: resource._id,
+				session,
+			});
 
-				// Create resource logs entry, which will be updated when the operation is completed
-				let log = await resLogCtrl.create(
-					{
-						orgId: org._id,
-						resourceId: resource._id,
-						action: "delete",
-						status: "Deleting",
-						createdBy: user._id,
-					},
-					{ session }
-				);
+			// Delete resource logs
+			await resLogCtrl.deleteManyByQuery(
+				{
+					orgId: org._id,
+					resourceId: resource._id,
+				},
+				{ session }
+			);
 
-				await resourceCtrl.commit(session);
-				// Delete the sensitive data
-				delete updatedResource.config;
-				delete updatedResource.access;
-				delete updatedResource.accessReadOnly;
-				res.json(updatedResource);
+			await resourceCtrl.commit(session);
+			res.json();
 
-				// Log action
-				auditCtrl.logAndNotify(
-					org._id,
-					user,
-					"org.resource",
-					"delete",
-					t(
-						"Started deleting '%s' resource named '%s'",
-						resource.instance,
-						resource.name
-					),
-					updatedResource,
-					{
-						orgId: org._id,
-						appId: updatedResource.appId,
-						resourceId: resource._id,
-					}
-				);
-			} else {
-				await resourceCtrl.deleteOneById(resource._id, {
-					cacheKey: resource._id,
-					session,
-				});
+			// If this is a managed a deleteable resource then delete it
+			if (resource.deletable && resource.managed)
+				resourceCtrl.deleteClusterResources([resource]);
 
-				await resourceCtrl.commit(session);
-				res.json();
-
-				// Log action
-				auditCtrl.logAndNotify(
-					org._id,
-					user,
-					"org.resource",
-					"delete",
-					t(
-						"Deleted '%s' resource named '%s'",
-						resource.instance,
-						resource.name
-					),
-					{},
-					{ orgId: org._id, appId: resource.appId, resourceId: resource._id }
-				);
-			}
+			// Log action
+			auditCtrl.logAndNotify(
+				org._id,
+				user,
+				"org.resource",
+				"delete",
+				t("Deleted '%s' resource named '%s'", resource.instance, resource.name),
+				{},
+				{ orgId: org._id, appId: resource.appId, resourceId: resource._id }
+			);
 		} catch (error) {
 			await resourceCtrl.rollback(session);
 			handleError(req, res, error);
@@ -669,7 +637,7 @@ router.get(
 				},
 				{
 					lookup: "appId",
-					projection: "+name",
+					lookup2: "versionId",
 				}
 			);
 
@@ -701,59 +669,40 @@ router.post(
 			const { org, resource, log } = req;
 			const { status, logs } = req.body;
 			let timestamp = Date.now();
-			let updatedResource;
 
 			// Get user information
 			let user = await userCtrl.getOneById(log.createdBy, {
 				cacheKey: log.createdBy,
 			});
 
-			// If the resource is successfully deleted then delete it and its logs from the database
-			if (log.action === "delete" && status === "OK") {
-				// Delete resource
-				await resourceCtrl.deleteOneById(resource._id, {
-					cacheKey: resource._id,
-					session,
-				});
+			const updatedResource = await resourceCtrl.updateOneById(
+				resource._id,
+				{
+					status: status,
+					updatedAt: timestamp,
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: resource._id, session }
+			);
 
-				// Delete resource logs
-				await resLogCtrl.deleteManyByQuery({
-					orgId: org._id,
-					resourceId: resource._id,
-				});
+			await resLogCtrl.updateOneById(
+				log._id,
+				{
+					status: status,
+					logs: logs,
+					updatedAt: timestamp,
+				},
+				{},
+				{ session }
+			);
 
-				await resourceCtrl.commit(session);
-				res.json();
-			} else {
-				updatedResource = await resourceCtrl.updateOneById(
-					resource._id,
-					{
-						status: status,
-						updatedAt: timestamp,
-						updatedBy: user._id,
-					},
-					{},
-					{ cacheKey: resource._id, session }
-				);
-
-				await resLogCtrl.updateOneById(
-					log._id,
-					{
-						status: status,
-						logs: logs,
-						updatedAt: timestamp,
-					},
-					{},
-					{ session }
-				);
-
-				await resourceCtrl.commit(session);
-				// Delete the sensitive data
-				delete updatedResource.config;
-				delete updatedResource.access;
-				delete updatedResource.accessReadOnly;
-				res.json(updatedResource);
-			}
+			await resourceCtrl.commit(session);
+			// Delete the sensitive data
+			delete updatedResource.config;
+			delete updatedResource.access;
+			delete updatedResource.accessReadOnly;
+			res.json(updatedResource);
 
 			// Log action
 			auditCtrl.logAndNotify(

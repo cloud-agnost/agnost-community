@@ -1,13 +1,15 @@
 import mongoose from "mongoose";
 import { body, query } from "express-validator";
+import appCtrl from "../controllers/app.js";
 import {
 	resourceTypes,
+	addResourceTypes,
 	instanceTypes,
+	addInstanceTypes,
 	appRoles,
 	resourceStatuses,
 } from "../config/constants.js";
 
-import accessEngineRules from "./access/engine.js";
 import accessDatabaseRules from "./access/database.js";
 
 /**
@@ -116,6 +118,111 @@ export const ResourceModel = mongoose.model(
 
 export const applyRules = (type) => {
 	switch (type) {
+		case "add":
+			return [
+				body("appId")
+					.trim()
+					.optional()
+					.custom(async (value, { req }) => {
+						if (!helper.isValidId(value))
+							throw new AgnostError(t("Not a valid app identifier"));
+
+						const app = await appCtrl.getOneById(value, { cacheKey: value });
+						if (!app)
+							throw new AgnostError(
+								t(
+									"No such application with the provided id '%s' exists.",
+									value
+								)
+							);
+
+						if (app.orgId.toString() !== req.org._id.toString())
+							throw new AgnostError(
+								t(
+									"Organization does not have an app with the provided id '%s'",
+									value
+								)
+							);
+
+						req.app = app;
+						return true;
+					}),
+				body("name")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isLength({ max: config.get("general.maxTextLength") })
+					.withMessage(
+						t(
+							"Name must be at most %s characters long",
+							config.get("general.maxTextLength")
+						)
+					),
+				body("type")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(addResourceTypes)
+					.withMessage(t("Unsupported resource type")),
+				body("instance")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom((value, { req }) => {
+						let instanceList = addInstanceTypes[req.body.type];
+						if (!instanceList)
+							throw new AgnostError(
+								t(
+									"Cannot identify the instance types for the provided resource type"
+								)
+							);
+
+						if (!instanceList.includes(value))
+							throw new AgnostError(
+								t(
+									"Not a valid instance type for respource type '%s'",
+									req.body.type
+								)
+							);
+
+						return true;
+					}),
+				body("allowedRoles")
+					.isArray()
+					.withMessage(t("Allowed roles needs to be an array of strings")),
+				body("allowedRoles.*")
+					.notEmpty()
+					.withMessage(
+						t("Allowed role needs to be provided, cannot be left empty")
+					)
+					.bail()
+					.isIn(appRoles)
+					.withMessage(t("Unsupported app role")),
+				body("access")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom((value, { req }) => {
+						if (typeof value !== "object" || Array.isArray(value))
+							throw new AgnostError(t("Not a valid resource access setting"));
+
+						return true;
+					}),
+				body("accessReadOnly")
+					.optional()
+					.custom((value, { req }) => {
+						if (typeof value !== "object" || Array.isArray(value))
+							throw new AgnostError(
+								t("Not a valid resource read-only access setting")
+							);
+
+						return true;
+					}),
+				...accessDatabaseRules,
+			];
 		case "create":
 			return [
 				body("appId")
@@ -222,7 +329,6 @@ export const applyRules = (type) => {
 					.custom((value, { req }) => {
 						return true;
 					}),
-				...accessEngineRules,
 				...accessDatabaseRules,
 			];
 		case "get-resources":
@@ -275,10 +381,7 @@ export const applyRules = (type) => {
 					.isArray()
 					.withMessage(t("Allowed roles needs to be an array of strings")),
 				body("allowedRoles.*")
-					.if((value, { req }) => {
-						if (Array.isArray(req.body.allowedRoles)) return true;
-						else return false;
-					})
+					.trim()
 					.notEmpty()
 					.withMessage(
 						t("Allowed role needs to be provided, cannot be left empty")
@@ -302,7 +405,7 @@ export const applyRules = (type) => {
 		case "update-config":
 			return [];
 		case "update-access":
-			return [...accessEngineRules, ...accessDatabaseRules];
+			return [...accessDatabaseRules];
 		default:
 			return [];
 	}

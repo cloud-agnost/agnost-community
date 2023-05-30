@@ -243,6 +243,8 @@ class ResourceController extends BaseController {
 		const log = await resLogCtrl.create(
 			{
 				orgId: org._id,
+				appId: app._id,
+				versionId: version._id,
 				resourceId: resourceId,
 				action: "create",
 				status: "Creating",

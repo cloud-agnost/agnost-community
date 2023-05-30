@@ -17,6 +17,19 @@ export const ResourceLogModel = mongoose.model(
 			ref: "organization",
 			index: true,
 		},
+		// The resources are primarily kept at the organization level, if a resource is added under an app
+		// this field helps to filter out the resources that belong to a specific app
+		appId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "app",
+			index: true,
+		},
+		// If the resource is an engine (API server) then we also keep the version information
+		versionId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "version",
+			index: true,
+		},
 		resourceId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "resource",

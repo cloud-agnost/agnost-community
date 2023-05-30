@@ -467,7 +467,7 @@ router.delete(
 
 			// Iterate through all resources and delete them if they are managed
 			const managedResources = resources.filter(
-				(entry) => entry.managed === true
+				(entry) => entry.managed === true && entry.deletable === true
 			);
 
 			// Delete managed organization resources

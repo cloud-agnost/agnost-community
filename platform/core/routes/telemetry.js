@@ -69,6 +69,8 @@ router.post(
 			await resLogCtrl.create(
 				{
 					orgId: resource.orgId,
+					appId: resource.appId,
+					versionId: resource.versionId,
 					resourceId: resource._id,
 					action: "check",
 					status: status.status,

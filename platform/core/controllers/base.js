@@ -67,7 +67,7 @@ export default class BaseController {
 	 */
 	async getOneByQuery(
 		query,
-		{ session = null, projection = null, cacheKey, lookup } = {}
+		{ session = null, projection = null, cacheKey, lookup, lookup2 } = {}
 	) {
 		// See if we have a value for the key in redis
 		if (cacheKey) {
@@ -82,6 +82,13 @@ export default class BaseController {
 					? typeof lookup === "object"
 						? lookup
 						: { path: lookup }
+					: undefined
+			)
+			.populate(
+				lookup2
+					? typeof lookup2 === "object"
+						? lookup2
+						: { path: lookup2 }
 					: undefined
 			)
 			.lean();
@@ -103,7 +110,7 @@ export default class BaseController {
 	 */
 	async getOneById(
 		id,
-		{ session = null, projection = null, cacheKey, lookup } = {}
+		{ session = null, projection = null, cacheKey, lookup, lookup2 } = {}
 	) {
 		// See if we have a value for the key in redis
 		if (cacheKey) {
@@ -118,6 +125,13 @@ export default class BaseController {
 					? typeof lookup === "object"
 						? lookup
 						: { path: lookup }
+					: undefined
+			)
+			.populate(
+				lookup2
+					? typeof lookup2 === "object"
+						? lookup2
+						: { path: lookup2 }
 					: undefined
 			)
 			.lean();
@@ -148,6 +162,7 @@ export default class BaseController {
 			projection = null,
 			cacheKey,
 			lookup,
+			lookup2,
 			sort,
 			skip,
 			limit,
@@ -166,6 +181,13 @@ export default class BaseController {
 					? typeof lookup === "object"
 						? lookup
 						: { path: lookup }
+					: undefined
+			)
+			.populate(
+				lookup2
+					? typeof lookup2 === "object"
+						? lookup2
+						: { path: lookup2 }
 					: undefined
 			)
 			.sort(sort)

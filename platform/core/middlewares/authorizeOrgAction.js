@@ -28,6 +28,7 @@ export const orgAuthorization = {
 			},
 			resource: {
 				view: true,
+				add: true,
 				create: true,
 				update: true,
 				delete: true,
@@ -60,6 +61,7 @@ export const orgAuthorization = {
 			},
 			resource: {
 				view: true,
+				add: false,
 				create: false,
 				update: false,
 				delete: false,
@@ -92,6 +94,7 @@ export const orgAuthorization = {
 			},
 			resource: {
 				view: true,
+				add: true,
 				create: true,
 				update: true,
 				delete: true,
@@ -124,6 +127,7 @@ export const orgAuthorization = {
 			},
 			resource: {
 				view: true,
+				add: false,
 				create: false,
 				update: false,
 				delete: false,

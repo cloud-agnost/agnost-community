@@ -288,6 +288,8 @@ export const resourceTypes = [
 	"realtime",
 ];
 
+export const addResourceTypes = ["database", "cache", "storage", "queue"];
+
 export const designElementTypes = [
 	"engine",
 	"endpoint",
@@ -311,6 +313,13 @@ export const instanceTypes = {
 	queue: ["RabbitMQ", "Kafka"],
 	scheduler: ["Default Scheduler"],
 	realtime: ["Default Realtime"],
+};
+
+export const addInstanceTypes = {
+	database: ["PostgreSQL", "MySQL", "SQL Server", "MongoDB", "Oracle"],
+	cache: ["Redis"],
+	storage: ["AWS S3", "GCP Cloud Storage", "Azure Blob Storage"],
+	queue: ["RabbitMQ", "Kafka"],
 };
 
 export const methodTypes = ["GET", "POST", "PUT", "DELETE"];
