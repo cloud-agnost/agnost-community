@@ -24,7 +24,7 @@ const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
 var childProcess = null;
-// If this is the primary process a child process
+// If this is the primary process then fork a child process
 if (cluster.isPrimary) {
 	logger.info(`Primary process ${process.pid} is running`);
 
