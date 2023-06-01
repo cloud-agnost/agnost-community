@@ -193,6 +193,7 @@ export class AdapterManager {
 			if (!connSettings) return;
 
 			const client = new pg.Client({
+				...helper.getAsObject(connSettings.options),
 				host: connSettings.host,
 				port: connSettings.port,
 				user: connSettings.username,
@@ -230,6 +231,7 @@ export class AdapterManager {
 			if (!connSettings) return;
 
 			const client = await mysql.createConnection({
+				...helper.getAsObject(connSettings.options),
 				host: connSettings.host,
 				port: connSettings.port,
 				user: connSettings.username,
@@ -265,11 +267,12 @@ export class AdapterManager {
 			if (!connSettings) return;
 
 			const client = await mssql.connect({
+				...helper.getAsObject(connSettings.options),
 				server: connSettings.host,
 				port: connSettings.port,
 				user: connSettings.username,
 				password: connSettings.password,
-				encrypt: false,
+				encrypt: connSettings.encrypt ?? false,
 			});
 
 			this.adapters.set(`${resource.idd}-${readOnly ? "ro" : "rw"}`, {
@@ -309,10 +312,12 @@ export class AdapterManager {
 					}
 					 */
 			let client = null;
+			// Build query string part of the MongoDB connection string
+			connSettings.connOptions = helper.getQueryString(connSettings.options);
 			if (connSettings.connFormat === "mongodb") {
 				client = new mongo.MongoClient(
 					connSettings.connOptions
-						? `mongodb://${connSettings.host}:${connSettings.port}/?${connSettings.connOptions}`
+						? `mongodb://${connSettings.host}:${connSettings.port}?${connSettings.connOptions}`
 						: `mongodb://${connSettings.host}:${connSettings.port}`,
 					{
 						auth: {
@@ -324,7 +329,7 @@ export class AdapterManager {
 			} else {
 				client = new mongo.MongoClient(
 					connSettings.connOptions
-						? `mongodb+srv://${connSettings.host}/?${connSettings.connOptions}`
+						? `mongodb+srv://${connSettings.host}?${connSettings.connOptions}`
 						: `mongodb+srv://${connSettings.host}`,
 					{
 						auth: {
@@ -373,15 +378,20 @@ export class AdapterManager {
 					connSettings.password && connSettings.password !== "null"
 						? connSettings.password
 						: undefined,
+				database: connSettings.databaseNumber ?? 0,
 			});
 
-			this.adapters.set(`${resource.idd}-${readOnly ? "ro" : "rw"}`, {
-				type,
-				instance,
-				iid,
-				readOnly,
-				adapter: new Redis(client),
+			client.on("connect", () => {
+				this.adapters.set(`${resource.idd}-${readOnly ? "ro" : "rw"}`, {
+					type,
+					instance,
+					iid,
+					readOnly,
+					adapter: new Redis(client),
+				});
 			});
+
+			client.on("error", (err) => {});
 		} catch (err) {}
 	}
 
@@ -401,8 +411,11 @@ export class AdapterManager {
 
 			// If the connection format is object then username and password etc. needed. If connection format is url then just the url parameter is neede
 			if (connSettings.format === "object") {
-				const { username, password, host, port } = connSettings;
-				connSettings.url = `amqp://${username}:${password}@${host}:${port}`;
+				const { username, password, host, port, scheme, vhost, options } =
+					connSettings;
+				connSettings.url = `${scheme}://${username}:${password}@${host}:${port}/${vhost}?${helper.getQueryString(
+					options
+				)}`;
 			}
 
 			const client = await amqp.connect(connSettings.url);
@@ -442,10 +455,10 @@ export class AdapterManager {
 					clientId: connSettings.clientId,
 					brokers: connSettings.brokers,
 					ssl: {
-						rejectUnauthorized: false,
-						ca: connSettings.ca,
-						key: connSettings.key,
-						cert: connSettings.cert,
+						rejectUnauthorized: connSettings.ssl.rejectUnauthorized,
+						ca: connSettings.ssl.ca,
+						key: connSettings.ssl.key,
+						cert: connSettings.ssl.cert,
 					},
 				});
 			} else if (connSettings.format === "sasl") {
@@ -454,9 +467,9 @@ export class AdapterManager {
 					brokers: connSettings.brokers,
 					ssl: true,
 					sasl: {
-						mechanism: connSettings.mechanism, // plain, scram-sha-256 or scram-sha-512
-						username: connSettings.username,
-						password: connSettings.password,
+						mechanism: connSettings.sasl.mechanism, // plain, scram-sha-256 or scram-sha-512
+						username: connSettings.sasl.username,
+						password: connSettings.sasl.password,
 					},
 				});
 			}
@@ -489,8 +502,10 @@ export class AdapterManager {
 			if (!connSettings) return;
 
 			const s3 = new S3Client({
-				accessKeyId: connSettings.accessKeyId,
-				secretAccessKey: connSettings.secretAccessKey,
+				credentials: {
+					accessKeyId: connSettings.accessKeyId,
+					secretAccessKey: connSettings.secretAccessKey,
+				},
 				region: connSettings.region,
 			});
 
@@ -575,7 +590,7 @@ export class AdapterManager {
 			let connSettings = access;
 			if (!connSettings) return;
 
-			const pvcStorage = new PVCStorage(access.mountPath);
+			const pvcStorage = new PVCStorage(connSettings.mountPath);
 
 			this.adapters.set(`${resource.idd}-rw`, {
 				type,
@@ -601,7 +616,7 @@ export class AdapterManager {
 			let connSettings = access;
 			if (!connSettings) return;
 
-			const socket = io(`${access.serverURL}`, {
+			const socket = io(`${connSettings.serverURL}`, {
 				reconnection: config.get("realtime.reconnection"),
 				reconnectionDelay: config.get("realtime.reconnectionDelay"),
 				transports: ["websocket", "polling"],

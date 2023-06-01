@@ -63,11 +63,7 @@ export const connectToQueue = () => {
 		retryCount = 0;
 		amqpConnection = connection;
 
-		logger.info(
-			`Connected to the message queue @${config.get(
-				"queue.hostname"
-			)}:${config.get("queue.port")}`
-		);
+		logger.info(`Connected to the message queue @${amqpHost}`);
 	});
 };
 

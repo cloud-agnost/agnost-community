@@ -44,13 +44,10 @@ export const updateDatabaseHandler = (connection, queue) => {
 						msgObj.databases.map((entry) => entry.name).join(", ")
 					)
 				);
-				console.log("***result1", msgObj.databases);
 
 				// Create the deployment manager and deploy the version
 				let manager = new DeploymentManager(msgObj);
 				let result = await manager.updateDatabases();
-
-				console.log("***result2", msgObj.databases);
 
 				if (result.success) {
 					channel.ack(msg);

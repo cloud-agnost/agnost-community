@@ -265,7 +265,19 @@ export const databaseTypes = [
 	"Oracle",
 ];
 
+export const cacheTypes = ["Redis"];
+
+export const messageBrokerTypes = ["RabbitMQ", "Kafka"];
+
 export const mongoDBConnFormat = ["mongodb", "mongodb+srv"];
+
+export const rabbitMQConnFormat = ["object", "url"];
+
+export const rabbitMQConnScheme = ["amqp", "amqps"];
+
+export const kafkaConnFormat = ["simple", "ssl", "sasl"];
+
+export const kafkaSaslMechanism = ["plain", "scram-sha-256", "scram-sha-512"];
 
 export const resourceActions = ["create", "update", "delete", "bind", "check"];
 

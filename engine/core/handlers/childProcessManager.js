@@ -319,9 +319,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			const connection = adapterManager.getStorageAdapter(mapping.design.name);
 
 			if (connection) {
-				await connection.ensureStorage(
-					`${META.getEnvId()}-${entry.design.iid}`
-				);
+				await connection.ensureStorage(`${mapping.design.iid}`);
 				logger.info(`Initialized storage '${mapping.design.name}'`);
 			}
 		}

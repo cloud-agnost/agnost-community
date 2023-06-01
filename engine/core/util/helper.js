@@ -1,5 +1,6 @@
 import { customAlphabet } from "nanoid";
 import mongo from "mongodb";
+import querystring from "querystring";
 import { sendMessage } from "../init/sync.js";
 
 /**
@@ -205,6 +206,38 @@ function randomInt(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+/**
+ * Converts array of key-value objets to query string format e.g. key1=value1&key2=value2
+ * @param  {Array} keyValuePairs Array of key-value pair objects
+ */
+function getQueryString(keyValuePairs) {
+	if (!keyValuePairs || keyValuePairs.length === 0) return "";
+
+	// Convert the array to an object
+	const obj = {};
+	keyValuePairs.forEach((item) => {
+		obj[item.key] = item.value;
+	});
+
+	return querystring.stringify(obj);
+}
+
+/**
+ * Converts array of key-value objets to an object {key1:value1, key2:value2}
+ * @param  {Array} keyValuePairs Array of key-value pair objects
+ */
+function getAsObject(keyValuePairs) {
+	if (!keyValuePairs || keyValuePairs.length === 0) return {};
+
+	// Convert the array to an object
+	const obj = {};
+	keyValuePairs.forEach((item) => {
+		obj[item.key] = item.value;
+	});
+
+	return obj;
+}
+
 export default {
 	generateSlug,
 	generateFileName,
@@ -217,4 +250,6 @@ export default {
 	turnOnLogging,
 	turnOffLogging,
 	randomInt,
+	getQueryString,
+	getAsObject,
 };

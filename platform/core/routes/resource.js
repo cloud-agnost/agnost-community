@@ -3,9 +3,9 @@ import resourceCtrl from "../controllers/resource.js";
 import envCtrl from "../controllers/environment.js";
 import resLogCtrl from "../controllers/resourceLog.js";
 import userCtrl from "../controllers/user.js";
-import appCtrl from "../controllers/app.js";
 import auditCtrl from "../controllers/audit.js";
 import connCtrl from "../controllers/connection.js";
+import deployCtrl from "../controllers/deployment.js";
 import { authSession } from "../middlewares/authSession.js";
 import { authMasterToken } from "../middlewares/authMasterToken.js";
 import { checkContentType } from "../middlewares/contentType.js";
@@ -19,14 +19,52 @@ import { applyRules } from "../schemas/resource.js";
 import { applyRules as applyLogRules } from "../schemas/resourceLog.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
+import { deleteKey } from "../init/cache.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
 
 /*
+@route      /v1/org/:orgId/resource/test
+@method     POST
+@desc       Tests the resource connection
+@access     private
+*/
+router.post(
+	"/test",
+	checkContentType,
+	authSession,
+	validateOrg,
+	authorizeOrgAction("org.resource.add"),
+	applyRules("test"),
+	validate,
+	async (req, res) => {
+		try {
+			let { instance, access } = req.body;
+
+			// Try to connect to the database
+			try {
+				// Test database connection
+				await connCtrl.testConnection(instance, access);
+			} catch (err) {
+				return res.status(422).json({
+					error: t("Connection Error"),
+					details: err.message,
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			res.json();
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
 @route      /v1/org/:orgId/resource/add
 @method     POST
-@desc       Add an existing resource
+@desc       Add an existing resource. These resources are not managed by the cluster but we just get access to them and use them. 
 @access     private
 */
 router.post(
@@ -41,7 +79,7 @@ router.post(
 		const session = await resourceCtrl.startSession();
 		try {
 			const { org, user } = req;
-			const {
+			let {
 				appId,
 				name,
 				type,
@@ -51,28 +89,34 @@ router.post(
 				accessReadOnly,
 			} = req.body;
 
-			return res.json();
-
 			// Admin should always be included in allowedRoles list
 			if (!allowedRoles.includes("Admin")) allowedRoles.push("Admin");
 
-			// If this is not a managed resource and we try to add a database connection then try to connect to the database
-			if (!managed) {
-				if (type === "database") {
-					try {
-						// Test database connection
-						await connCtrl.testDBConnection(instance, access);
-						if (accessReadOnly)
-							await connCtrl.testDBConnection(instance, accessReadOnly);
-					} catch (err) {
-						await resourceCtrl.endSession(session);
+			// Try to connect to the resource
+			try {
+				// Test connection
+				await connCtrl.testConnection(instance, access);
+			} catch (err) {
+				await resourceCtrl.endSession(session);
 
-						return res.status(422).json({
-							error: t("Connection Error"),
-							details: err.message,
-							code: ERROR_CODES.notAllowed,
-						});
-					}
+				return res.status(422).json({
+					error: t("Connection Error - Primary"),
+					details: err.message,
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+			if (accessReadOnly) {
+				try {
+					// Test connection
+					await connCtrl.testConnection(instance, accessReadOnly);
+				} catch (err) {
+					await resourceCtrl.endSession(session);
+
+					return res.status(422).json({
+						error: t("Connection Error - Read-only"),
+						details: err.message,
+						code: ERROR_CODES.notAllowed,
+					});
 				}
 			}
 
@@ -92,32 +136,16 @@ router.post(
 					name,
 					type,
 					instance,
-					managed,
+					managed: false,
+					deletable: true,
 					allowedRoles,
-					config,
 					access,
 					accessReadOnly,
-					telemetry: {
-						status: managed ? "Creating" : "OK",
-					},
+					status: "OK",
 					createdBy: user._id,
 				},
 				{ cacheKey: resourceId, session }
 			);
-
-			// If this is a managed resource then we need to create a new log entry
-			if (managed) {
-				let log = await resLogCtrl.create(
-					{
-						orgId: org._id,
-						resourceId: resourceId,
-						action: "create",
-						status: "Creating",
-						createdBy: user._id,
-					},
-					{ session }
-				);
-			}
 
 			await resourceCtrl.commit(session);
 			// Delete the sensitive data
@@ -132,14 +160,7 @@ router.post(
 				user,
 				"org.resource",
 				"create",
-				t(
-					managed
-						? "Started creating new '%s' resource '%s' named '%s'"
-						: "Added new '%s' resource '%s' named '%s'",
-					type,
-					instance,
-					name
-				),
+				t("Added new '%s' resource '%s' named '%s'", type, instance, name),
 				resourceObj,
 				{ orgId: org._id, appId, resourceId }
 			);
@@ -167,8 +188,17 @@ router.get(
 	async (req, res) => {
 		try {
 			const { org } = req;
-			const { page, size, search, type, instance, sortBy, sortDir, appId } =
-				req.query;
+			const {
+				page,
+				size,
+				search,
+				type,
+				instance,
+				sortBy,
+				sortDir,
+				appId,
+				status,
+			} = req.query;
 
 			let query = { orgId: org._id };
 
@@ -189,6 +219,12 @@ router.get(
 			if (instance) {
 				if (Array.isArray(instance)) query.instance = { $in: instance };
 				else query.instance = instance;
+			}
+
+			// Status filter
+			if (status) {
+				if (Array.isArray(status)) query.status = { $in: status };
+				else query.status = status;
 			}
 
 			let sort = {};
@@ -262,17 +298,21 @@ router.put(
 					{ session }
 				);
 
-				for (let i = 0; i < environments.length; i++) {
-					const env = environments[i];
-					await envCtrl.updateOneByQuery(
+				if (environments.length > 0) {
+					await envCtrl.updateMultiByQuery(
 						{
-							_id: env._id,
+							orgId: org._id,
 							"mappings.resource.iid": resource.iid,
 						},
 						{ "mappings.$.resource.name": name },
 						{},
-						{ cacheKey: env._id, session }
+						{ session }
 					);
+
+					// Clear cache for environments
+					environments.forEach((element) => {
+						deleteKey(element._id.toString());
+					});
 				}
 			}
 
@@ -335,7 +375,7 @@ router.put(
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"You can update the configuration parameters of a managed resource. The resource '%s' named '%s' is not a managed resource. You can only update access settings of an unmanaged resource.",
+						"You can update the configuration parameters of a managed resource. The resource '%s' named '%s' is not a managed resource.",
 						resource.instance,
 						resource.name
 					),
@@ -345,7 +385,11 @@ router.put(
 
 			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
 			// unless the previous one is completed
-			if (["Creating", "Updating", "Deleting"].includes(resource.status)) {
+			if (
+				["Creating", "Updating", "Deleting", "Binding"].includes(
+					resource.status
+				)
+			) {
 				await resourceCtrl.endSession(session);
 
 				return res.status(422).json({
@@ -371,8 +415,7 @@ router.put(
 				{ cacheKey: resource._id, session }
 			);
 
-			// We also need to check here if the configuration parameters of the managed resource has changed or not
-			let log = await resLogCtrl.create(
+			let resLog = await resLogCtrl.create(
 				{
 					orgId: org._id,
 					resourceId: resource._id,
@@ -389,6 +432,11 @@ router.put(
 			delete updatedResource.access;
 			delete updatedResource.accessReadOnly;
 			res.json(updatedResource);
+
+			// Apply the changes to the managed resource
+			await resourceCtrl.manageClusterResources([
+				{ resource: updatedResource, log: resLog },
+			]);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -438,7 +486,11 @@ router.put(
 
 			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
 			// unless the previous one is completed
-			if (["Creating", "Updating", "Deleting"].includes(resource.status)) {
+			if (
+				["Creating", "Updating", "Deleting", "Binding"].includes(
+					resource.status
+				)
+			) {
 				await resourceCtrl.endSession(session);
 
 				return res.status(422).json({
@@ -453,18 +505,28 @@ router.put(
 				});
 			}
 
-			// If we try to configure access settings of a database connection then try to connect to the database
-			if (type === "database") {
+			// Try to connect to the resource
+			try {
+				// Test connection
+				await connCtrl.testConnection(resource.instance, access);
+			} catch (err) {
+				await resourceCtrl.endSession(session);
+
+				return res.status(422).json({
+					error: t("Connection Error - Primary"),
+					details: err.message,
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+			if (accessReadOnly) {
 				try {
-					// Test database connection
-					await connCtrl.testDBConnection(instance, access);
-					if (accessReadonly)
-						await connCtrl.testDBConnection(instance, accessReadonly);
+					// Test connection
+					await connCtrl.testConnection(resource.instance, accessReadOnly);
 				} catch (err) {
 					await resourceCtrl.endSession(session);
 
 					return res.status(422).json({
-						error: t("Connection Error"),
+						error: t("Connection Error - Read-only"),
 						details: err.message,
 						code: ERROR_CODES.notAllowed,
 					});
@@ -477,16 +539,29 @@ router.put(
 			if (accessReadonly)
 				accessReadonly = helper.encyrptSensitiveData(accessReadonly);
 
-			let updatedResource = await resourceCtrl.updateOneById(
-				resource._id,
-				{
-					access,
-					accessReadonly,
-					updatedBy: user._id,
-				},
-				{},
-				{ cacheKey: resource._id, session }
-			);
+			let updatedResource = null;
+			if (accessReadonly) {
+				updatedResource = await resourceCtrl.updateOneById(
+					resource._id,
+					{
+						access,
+						accessReadonly,
+						updatedBy: user._id,
+					},
+					{},
+					{ cacheKey: resource._id, session }
+				);
+			} else {
+				updatedResource = await resourceCtrl.updateOneById(
+					resource._id,
+					{
+						access,
+						updatedBy: user._id,
+					},
+					{ accessReadonly: "" },
+					{ cacheKey: resource._id, session }
+				);
+			}
 
 			await resourceCtrl.commit(session);
 			// Delete the sensitive data
@@ -494,6 +569,22 @@ router.put(
 			delete updatedResource.access;
 			delete updatedResource.accessReadOnly;
 			res.json(updatedResource);
+
+			// Get all the impacted environments and associated versions so that we can refresh their deployments and API servers
+			const environments = await envCtrl.getManyByQuery({
+				orgId: org._id,
+				"mappings.resource.iid": resource.iid,
+			});
+
+			// Refresh the deployment data and respective API servers
+			environments.forEach(async (element) => {
+				deployCtrl.updateResourceAccessSettings(
+					element.appId,
+					element.versionId,
+					updatedResource,
+					user
+				);
+			});
 
 			// Log action
 			auditCtrl.logAndNotify(

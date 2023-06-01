@@ -405,9 +405,12 @@ router.delete(
 				deployCtrl.delete(app, version, env, user);
 			}
 
-			// Iterate through all resources and delete them if they are managed
+			// Iterate through all resources and delete them if they are managed or if the resource is the API server of the version
 			const managedResources = resources.filter(
-				(entry) => entry.managed === true && entry.deletable === true
+				(entry) =>
+					entry.managed === true &&
+					(entry.deletable === true ||
+						(entry.deletable === false && entry.type === "engine"))
 			);
 
 			// Delete managed organization resources
@@ -2011,8 +2014,6 @@ router.put(
 			for (let key in req.body) {
 				updateObj[`authentication.providers.$.config.${key}`] = req.body[key];
 			}
-
-			console.log("***here", updateObj);
 
 			let updatedVersion = await versionCtrl.updateOneByQuery(
 				{ _id: version._id, "authentication.providers._id": oauthProvider._id },

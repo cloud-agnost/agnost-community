@@ -261,83 +261,45 @@ router.put(
 			// Resize image if width and height specified
 			buffer = await sharp(req.file.buffer).resize(width, height).toBuffer();
 
-			// A bucket is a container for objects (files)
-			const bucket = storage.bucket(config.get("storage.profileImagesBucket"));
-			// Create a new blob in the bucket and upload the file data
-			let blob = bucket.file(
-				`${helper.generateSlug("img", 6)}-${req.file.originalname}`
+			// Specify the directory where you want to store the image
+			const uploadDirectory = config.get("general.storageDirectory");
+			// Ensure file storage folder exists
+			storage.ensureFolder(uploadDirectory);
+			// Delete existing file if it exists
+			storage.deleteFile(req.user.pictureUrl);
+			// Save the new file
+			const filePath = `${uploadDirectory}${helper.generateSlug("img", 6)}-${
+				req.file.originalname
+			}`;
+			storage.saveFile(filePath, buffer);
+
+			// Update user with the new profile image url
+			let userObj = await userCtrl.updateOneById(
+				req.user._id,
+				{
+					pictureUrl: filePath,
+				},
+				{},
+				{ cacheKey: req.user._id }
 			);
 
-			// Delete old porfile picture if exists
-			if (req.user.pictureUrl) {
-				try {
-					// Get the file name
-					let filename = req.user.pictureUrl.substring(
-						req.user.pictureUrl.lastIndexOf("/") + 1
-					);
-					let oldFile = bucket.file(filename);
-					let exists = await oldFile.exists();
-					if (exists[0]) await oldFile.delete();
-				} catch (err) {}
-			}
+			// Remove password field value from returned object
+			delete userObj.loginProfiles[0].password;
+			res.json(userObj);
 
-			// Make sure to set the contentType metadata for the browser to be able to render the image instead of downloading the file (default behavior)
-			const blobStream = blob
-				.createWriteStream({
-					metadata: {
-						contentType: req.file.mimetype,
-						metadata: {
-							uploadDtm: Date.now(),
-						},
-					},
-				})
-				.on("error", (err) => {
-					return res.status(400).json({
-						error: t("Upload Failed"),
-						details: t(
-							"An error occured while uploading the profile image. %s",
-							err.message
-						),
-						code: ERROR_CODES.fileUploadError,
-					});
-				})
-				.on("finish", () => {
-					// The public URL can be used to directly access the file via HTTP.
-					const pictureUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+			// Log action
+			auditCtrl.logAndNotify(
+				userObj._id,
+				userObj,
+				"user",
+				"update",
+				t("Updated profile picture"),
+				userObj
+			);
 
-					// Make the image public to the web
-					blob.makePublic().then(async () => {
-						// Update user with the new profile image url
-						let userObj = await userCtrl.updateOneById(
-							req.user._id,
-							{
-								pictureUrl,
-							},
-							{},
-							{ cacheKey: req.user._id }
-						);
-
-						// Remove password field value from returned object
-						delete userObj.loginProfiles[0].password;
-						res.json(userObj);
-
-						// Log action
-						auditCtrl.logAndNotify(
-							userObj._id,
-							userObj,
-							"user",
-							"update",
-							t("Updated profile picture"),
-							userObj
-						);
-
-						auditCtrl.updateActorPicture(userObj._id, pictureUrl);
-						orgInvitationCtrl.updateHostPicture(userObj._id, pictureUrl);
-						appInvitationCtrl.updateHostPicture(userObj._id, pictureUrl);
-					});
-				});
-
-			blobStream.end(buffer);
+			auditCtrl.updateActorPicture(userObj._id, pictureUrl);
+			orgInvitationCtrl.updateHostPicture(userObj._id, pictureUrl);
+			appInvitationCtrl.updateHostPicture(userObj._id, pictureUrl);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -352,20 +314,8 @@ router.put(
 */
 router.delete("/picture", authSession, async (req, res) => {
 	try {
-		// A bucket is a container for objects (files)
-		const bucket = storage.bucket(config.get("storage.profileImagesBucket"));
-		// Delete the porfile picture if exists from storages
-		if (req.user.pictureUrl) {
-			try {
-				// Get the file name
-				let filename = req.user.pictureUrl.substring(
-					req.user.pictureUrl.lastIndexOf("/") + 1
-				);
-				let oldFile = bucket.file(filename);
-				let exists = await oldFile.exists();
-				if (exists[0]) await oldFile.delete();
-			} catch (err) {}
-		}
+		// Delete existing file if it exists
+		storage.deleteFile(req.user.pictureUrl);
 
 		// Update user with the new profile image url
 		let userObj = await userCtrl.updateOneById(

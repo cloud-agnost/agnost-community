@@ -2,6 +2,8 @@ import axios from "axios";
 import dbCtrl from "../controllers/database.js";
 import modelCtrl from "../controllers/model.js";
 import resourceCtrl from "../controllers/resource.js";
+import versionCtrl from "../controllers/version.js";
+import appCtrl from "../controllers/app.js";
 import envCtrl from "../controllers/environment.js";
 import envLogCtrl from "../controllers/environmentLog.js";
 import { sendMessage } from "../init/sync.js";
@@ -318,6 +320,68 @@ class DeploymentController {
 			app,
 			// We pass the list of resources in env object
 			env: { ...env, version, resources, timestamp: new Date() },
+		};
+
+		// Make api call to environment worker engine to update environment data
+		await axios.post(
+			config.get("general.workerUrl") + "/v1/env/update",
+			payload,
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
+	}
+
+	/**
+	 * Updates the version and also environment metadata in engine cluster if autoDeploy is turned on
+	 * @param  {string} app The application id
+	 * @param  {string} version The version id
+	 * @param  {object} version The resource whose access setting has been updated
+	 * @param  {object} user The user who initiated the update
+	 */
+	async updateResourceAccessSettings(appId, versionId, resource, user) {
+		const version = versionCtrl.getOneById(versionId, { cacheKey: versionId });
+		const env = await this.getEnvironment(version);
+		// If auto deploy is turned off or version has not been deployed to the environment then we do not send the environment updates to the engine cluster
+		if (!env.autoDeploy || !env.deploymentDtm) return;
+
+		const app = appCtrl.getOneById(appId, { cacheKey: appId });
+
+		// Create the environment log entry
+		const envLog = await this.createEnvLog(
+			version,
+			env,
+			user,
+			"Deploying",
+			[{ pod: "all", status: "Deploying" }],
+			env.schedulerStatus
+		);
+		// First get the list of environment resources
+		const resources = await this.getEnvironmentResources(env);
+
+		// Start building the deployment instructions that will be sent to the engine cluster worker
+		let payload = {
+			action: "update-version",
+			subAction: "update-resource-access",
+			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
+				env.orgId
+			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+				envLog._id
+			}`,
+			actor: {
+				userId: user._id,
+				name: user.name,
+				pictureUrl: user.pictureUrl,
+				color: user.color,
+				contactEmail: user.contactEmail,
+			},
+			app,
+			// We pass the list of resources in env object
+			env: { ...env, version, resources, timestamp: new Date() },
+			updatedResource: resource,
 		};
 
 		// Make api call to environment worker engine to update environment data

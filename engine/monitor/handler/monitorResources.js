@@ -7,7 +7,7 @@ import k8s from "@kubernetes/client-node";
 import amqp from "amqplib";
 import { Kafka } from "kafkajs";
 import axios from "axios";
-import { S3Client } from "@aws-sdk/client-s3";
+import { S3Client, HeadBucketCommand } from "@aws-sdk/client-s3";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { Storage } from "@google-cloud/storage";
 
@@ -479,6 +479,7 @@ async function checkDBConnection(dbType, connSettings) {
 		case "PostgreSQL":
 			try {
 				const client = new pg.Client({
+					...helper.getAsObject(connSettings.options),
 					host: connSettings.host,
 					port: connSettings.port,
 					user: connSettings.username,
@@ -497,6 +498,7 @@ async function checkDBConnection(dbType, connSettings) {
 		case "MySQL":
 			try {
 				const connection = await mysql.createConnection({
+					...helper.getAsObject(connSettings.options),
 					host: connSettings.host,
 					port: connSettings.port,
 					user: connSettings.username,
@@ -514,11 +516,12 @@ async function checkDBConnection(dbType, connSettings) {
 		case "SQL Server":
 			try {
 				const connection = await mssql.connect({
+					...helper.getAsObject(connSettings.options),
 					server: connSettings.host,
 					port: connSettings.port,
 					user: connSettings.username,
 					password: connSettings.password,
-					encrypt: false,
+					encrypt: connSettings.encrypt ?? false,
 				});
 
 				await connection.close();
@@ -540,10 +543,12 @@ async function checkDBConnection(dbType, connSettings) {
 					}
 					 */
 				let client = null;
+				// Build query string part of the MongoDB connection string
+				connSettings.connOptions = helper.getQueryString(connSettings.options);
 				if (connSettings.connFormat === "mongodb") {
 					client = new mongo.MongoClient(
 						connSettings.connOptions
-							? `mongodb://${connSettings.host}:${connSettings.port}/?${connSettings.connOptions}`
+							? `mongodb://${connSettings.host}:${connSettings.port}?${connSettings.connOptions}`
 							: `mongodb://${connSettings.host}:${connSettings.port}`,
 						{
 							auth: {
@@ -555,7 +560,7 @@ async function checkDBConnection(dbType, connSettings) {
 				} else {
 					client = new mongo.MongoClient(
 						connSettings.connOptions
-							? `mongodb+srv://${connSettings.host}/?${connSettings.connOptions}`
+							? `mongodb+srv://${connSettings.host}?${connSettings.connOptions}`
 							: `mongodb+srv://${connSettings.host}`,
 						{
 							auth: {
@@ -597,6 +602,7 @@ async function checkRedisConnection(connSettings) {
 					connSettings.password && connSettings.password !== "null"
 						? connSettings.password
 						: undefined,
+				database: connSettings.databaseNumber ?? 0,
 			});
 
 			redisClient.on("connect", function () {
@@ -604,10 +610,12 @@ async function checkRedisConnection(connSettings) {
 				redisClient.quit();
 				resolve(true);
 			});
-		} catch (err) {
-			throw new AgnostError(
-				t("Cannot connect to the Redis cache. %s", err.message)
+
+			redisClient.on("error", (err) =>
+				reject(t("Cannot connect to the Redis cache. %s", err.message))
 			);
+		} catch (err) {
+			reject(t("Cannot connect to the Redis cache. %s", err.message));
 		}
 	});
 }
@@ -736,12 +744,19 @@ async function checkDefaultRealtime(connSettings) {
 async function checkAWSStorage(connSettings) {
 	try {
 		const s3 = new S3Client({
-			accessKeyId: connSettings.accessKeyId,
-			secretAccessKey: connSettings.secretAccessKey,
+			credentials: {
+				accessKeyId: connSettings.accessKeyId,
+				secretAccessKey: connSettings.secretAccessKey,
+			},
 			region: connSettings.region,
 		});
 
-		await s3.headBucket({ Bucket: "test_aws_bucket" }).promise();
+		try {
+			const command = new HeadBucketCommand({
+				Bucket: "agnoststorage",
+			});
+			await s3.send(command);
+		} catch (err) {}
 
 		return true;
 	} catch (err) {
@@ -766,7 +781,7 @@ async function checkGCPStorage(connSettings) {
 			credentials: JSON.parse(connSettings.keyFileContents),
 		});
 
-		const bucket = storage.bucket("test_gcp_bucket");
+		const bucket = storage.bucket("agnoststorage");
 		await bucket.exists();
 		return true;
 	} catch (err) {
@@ -785,10 +800,12 @@ async function checkAzureStorage(connSettings) {
 		const blobServiceClient = BlobServiceClient.fromConnectionString(
 			connSettings.connectionString
 		);
-		const containerClient = blobServiceClient.getContainerClient(
-			"test_azure_container"
-		);
-		await containerClient.getProperties();
+		const containerClient =
+			blobServiceClient.getContainerClient("agnoststorage");
+		try {
+			await containerClient.getProperties();
+		} catch (err) {}
+
 		return true;
 	} catch (err) {
 		if (err.statusCode === 404) {
@@ -808,8 +825,11 @@ async function checkAzureStorage(connSettings) {
 async function checkRabbitMQConnection(connSettings) {
 	// If the connection format is object then username and password etc. needed. If connection format is url then just the url parameter is neede
 	if (connSettings.format === "object") {
-		const { username, password, host, port } = connSettings;
-		connSettings.url = `amqp://${username}:${password}@${host}:${port}`;
+		const { username, password, host, port, scheme, vhost, options } =
+			connSettings;
+		connSettings.url = `${scheme}://${username}:${password}@${host}:${port}/${vhost}?${helper.getQueryString(
+			options
+		)}`;
 	}
 
 	try {
@@ -841,10 +861,10 @@ async function checkKafkaConnection(connSettings) {
 				clientId: connSettings.clientId,
 				brokers: connSettings.brokers,
 				ssl: {
-					rejectUnauthorized: false,
-					ca: connSettings.ca,
-					key: connSettings.key,
-					cert: connSettings.cert,
+					rejectUnauthorized: connSettings.ssl.rejectUnauthorized,
+					ca: connSettings.ssl.ca,
+					key: connSettings.ssl.key,
+					cert: connSettings.ssl.cert,
 				},
 			});
 		} else if (connSettings.format === "sasl") {
@@ -853,9 +873,9 @@ async function checkKafkaConnection(connSettings) {
 				brokers: connSettings.brokers,
 				ssl: true,
 				sasl: {
-					mechanism: connSettings.mechanism, // plain, scram-sha-256 or scram-sha-512
-					username: connSettings.username,
-					password: connSettings.password,
+					mechanism: connSettings.sasl.mechanism, // plain, scram-sha-256 or scram-sha-512
+					username: connSettings.sasl.username,
+					password: connSettings.sasl.password,
 				},
 			});
 		}

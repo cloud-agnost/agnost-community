@@ -17,16 +17,17 @@ export default [
 		.optional()
 		.if(
 			(value, { req }) =>
-				req.body.type === "database" && ["MongoDB"].includes(req.body.instance)
+				req.body.type === "database" &&
+				databaseTypes.includes(req.body.instance)
 		)
 		.isArray()
-		.withMessage(t("Access needs to be an array of key-value pairs")),
+		.withMessage(t("Access options need to be an array of key-value pairs")),
 	body("access.options.*.key")
 		.if(
 			(value, { req }) =>
 				Array.isArray(req.body.access.options) &&
 				req.body.type === "database" &&
-				["MongoDB"].includes(req.body.instance)
+				databaseTypes.includes(req.body.instance)
 		)
 		.trim()
 		.notEmpty()
@@ -36,7 +37,7 @@ export default [
 			(value, { req }) =>
 				Array.isArray(req.body.access.options) &&
 				req.body.type === "database" &&
-				["MongoDB"].includes(req.body.instance)
+				databaseTypes.includes(req.body.instance)
 		)
 		.trim()
 		.notEmpty()
@@ -84,9 +85,21 @@ export default [
 				req.body.type === "database" &&
 				databaseTypes.includes(req.body.instance)
 		)
-		.trim()
 		.notEmpty()
 		.withMessage(t("Required field, cannot be left empty")),
+	body("access.encrypt")
+		.if(
+			(value, { req }) =>
+				req.body.type === "database" &&
+				["SQL Server"].includes(req.body.instance)
+		)
+		.trim()
+		.notEmpty()
+		.withMessage(t("Required field, cannot be left empty"))
+		.bail()
+		.isBoolean()
+		.withMessage(t("Not a valid boolean value"))
+		.toBoolean(),
 	body("accessReadOnly.connFormat")
 		.if(
 			(value, { req }) =>
@@ -109,7 +122,7 @@ export default [
 				["MongoDB"].includes(req.body.instance)
 		)
 		.isArray()
-		.withMessage(t("Access needs to be an array of key-value pairs")),
+		.withMessage(t("Access options need to be an array of key-value pairs")),
 	body("accessReadOnly.options.*.key")
 		.if(
 			(value, { req }) =>
@@ -167,8 +180,7 @@ export default [
 			(value, { req }) =>
 				req.body.accessReadOnly &&
 				req.body.type === "database" &&
-				databaseTypes.includes(req.body.instance) &&
-				!req.body.managed
+				databaseTypes.includes(req.body.instance)
 		)
 		.trim()
 		.notEmpty()
@@ -178,10 +190,22 @@ export default [
 			(value, { req }) =>
 				req.body.accessReadOnly &&
 				req.body.type === "database" &&
-				databaseTypes.includes(req.body.instance) &&
-				!req.body.managed
+				databaseTypes.includes(req.body.instance)
+		)
+		.notEmpty()
+		.withMessage(t("Required field, cannot be left empty")),
+	body("accessReadOnly.encrypt")
+		.if(
+			(value, { req }) =>
+				req.body.accessReadOnly &&
+				req.body.type === "database" &&
+				["SQL Server"].includes(req.body.instance)
 		)
 		.trim()
 		.notEmpty()
-		.withMessage(t("Required field, cannot be left empty")),
+		.withMessage(t("Required field, cannot be left empty"))
+		.bail()
+		.isBoolean()
+		.withMessage(t("Not a valid boolean value"))
+		.toBoolean(),
 ];

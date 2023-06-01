@@ -10,7 +10,7 @@ export class Kafka extends QueueBase {
 
 	async disconnect() {
 		try {
-			await this.driver.close();
+			await this.driver.disconnect();
 		} catch (err) {}
 	}
 }

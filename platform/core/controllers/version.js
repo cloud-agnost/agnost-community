@@ -292,6 +292,16 @@ class VersionController extends BaseController {
 			)
 		);
 
+		// If there are Cluster Storage object mappings then they should also be mapped in the API server deployment
+		// During the deployment creation we need to mount the PVCs
+		const pvcs = mappings.filter(
+			(entry) =>
+				entry.resource.type === "storage" &&
+				entry.resource.instance === "Cluster Storage"
+		);
+		// Assign these pvcs to the API server deployment config
+		resource.config.pvcs = pvcs;
+
 		// Create environment data, we do not update the cache value yet, we update it after the deployment
 		const env = await envCtrl.create(
 			{

@@ -243,79 +243,41 @@ router.put(
 			// Resize image if width and height specifiec
 			buffer = await sharp(req.file.buffer).resize(width, height).toBuffer();
 
-			// A bucket is a container for objects (files)
-			const bucket = storage.bucket(config.get("storage.appImagesBucket"));
-			// Create a new blob in the bucket and upload the file data
-			let blob = bucket.file(
-				`${helper.generateSlug("img", 6)}-${req.file.originalname}`
+			// Specify the directory where you want to store the image
+			const uploadDirectory = config.get("general.storageDirectory");
+			// Ensure file storage folder exists
+			storage.ensureFolder(uploadDirectory);
+			// Delete existing file if it exists
+			storage.deleteFile(req.app.pictureUrl);
+			// Save the new file
+			const filePath = `${uploadDirectory}${helper.generateSlug("img", 6)}-${
+				req.file.originalname
+			}`;
+			storage.saveFile(filePath, buffer);
+
+			// Update app with the new profile image url
+			let appObj = await appCtrl.updateOneById(
+				req.app._id,
+				{
+					pictureUrl: filePath,
+					updatedBy: req.user._id,
+				},
+				{},
+				{ cacheKey: req.app._id }
 			);
 
-			// Delete the porfile picture if exists from storages
-			if (req.app.pictureUrl) {
-				try {
-					// Get the file name
-					let filename = req.app.pictureUrl.substring(
-						req.user.pictureUrl.lastIndexOf("/") + 1
-					);
-					let oldFile = bucket.file(filename);
-					let exists = await oldFile.exists();
-					if (exists[0]) await oldFile.delete();
-				} catch (err) {}
-			}
+			res.json(appObj);
 
-			// Make sure to set the contentType metadata for the browser to be able to render the image instead of downloading the file (default behavior)
-			const blobStream = blob
-				.createWriteStream({
-					metadata: {
-						contentType: req.file.mimetype,
-						metadata: {
-							uploadDtm: Date.now(),
-						},
-					},
-				})
-				.on("error", (err) => {
-					return res.status(400).json({
-						error: t("Upload Failed"),
-						details: t(
-							"An error occured while uploading the app image. %s",
-							err.message
-						),
-						code: ERROR_CODES.fileUploadError,
-					});
-				})
-				.on("finish", () => {
-					// The public URL can be used to directly access the file via HTTP.
-					const pictureUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-
-					// Make the image public to the web
-					blob.makePublic().then(async () => {
-						// Update user with the new profile image url
-						let appObj = await appCtrl.updateOneById(
-							req.app._id,
-							{
-								pictureUrl,
-								updatedBy: req.user._id,
-							},
-							{},
-							{ cacheKey: req.app._id }
-						);
-
-						res.json(appObj);
-
-						// Log action
-						auditCtrl.logAndNotify(
-							req.app._id,
-							req.user,
-							"org.app",
-							"update",
-							t("Updated application picture"),
-							appObj,
-							{ orgId: req.org._id, appId: req.app._id }
-						);
-					});
-				});
-
-			blobStream.end(buffer);
+			// Log action
+			auditCtrl.logAndNotify(
+				req.app._id,
+				req.user,
+				"org.app",
+				"update",
+				t("Updated application picture"),
+				appObj,
+				{ orgId: req.org._id, appId: req.app._id }
+			);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -337,20 +299,8 @@ router.delete(
 	validate,
 	async (req, res) => {
 		try {
-			// A bucket is a container for objects (files)
-			const bucket = storage.bucket(config.get("storage.appImagesBucket"));
-			// Delete the porfile picture if exists from storages
-			if (req.app.pictureUrl) {
-				try {
-					// Get the file name
-					let filename = req.app.pictureUrl.substring(
-						req.user.pictureUrl.lastIndexOf("/") + 1
-					);
-					let oldFile = bucket.file(filename);
-					let exists = await oldFile.exists();
-					if (exists[0]) await oldFile.delete();
-				} catch (err) {}
-			}
+			// Delete existing file if it exists
+			storage.deleteFile(req.app.pictureUrl);
 
 			// Update user with the new profile image url
 			let appObj = await appCtrl.updateOneById(

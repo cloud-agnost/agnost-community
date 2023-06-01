@@ -42,6 +42,7 @@ class ConnectionManager {
 			case DATABASE.PostgreSQL:
 				try {
 					const client = new pg.Pool({
+						...helper.getAsObject(connSettings.options),
 						host: connSettings.host,
 						port: connSettings.port,
 						user: connSettings.username,
@@ -62,6 +63,7 @@ class ConnectionManager {
 			case DATABASE.MySQL:
 				try {
 					const connection = await mysql.createPool({
+						...helper.getAsObject(connSettings.options),
 						host: connSettings.host,
 						port: connSettings.port,
 						user: connSettings.username,
@@ -82,12 +84,13 @@ class ConnectionManager {
 			case DATABASE.SQLServer:
 				try {
 					const connection = await mssql.connect({
+						...helper.getAsObject(connSettings.options),
 						server: connSettings.host,
 						port: connSettings.port,
 						user: connSettings.username,
 						password: connSettings.password,
 						database: connSettings.database,
-						encrypt: false,
+						encrypt: connSettings.encrypt ?? false,
 						pool: {
 							max: config.get("general.maxPoolSize"),
 						},
@@ -111,10 +114,14 @@ class ConnectionManager {
 					}
 					 */
 					let client = null;
+					// Build query string part of the MongoDB connection string
+					connSettings.connOptions = helper.getQueryString(
+						connSettings.options
+					);
 					if (connSettings.connFormat === "mongodb") {
 						client = new mongo.MongoClient(
 							connSettings.connOptions
-								? `mongodb://${connSettings.host}:${connSettings.port}/?${connSettings.connOptions}`
+								? `mongodb://${connSettings.host}:${connSettings.port}?${connSettings.connOptions}`
 								: `mongodb://${connSettings.host}:${connSettings.port}`,
 							{
 								auth: {
@@ -127,7 +134,7 @@ class ConnectionManager {
 					} else {
 						client = new mongo.MongoClient(
 							connSettings.connOptions
-								? `mongodb+srv://${connSettings.host}/?${connSettings.connOptions}`
+								? `mongodb+srv://${connSettings.host}?${connSettings.connOptions}`
 								: `mongodb+srv://${connSettings.host}`,
 							{
 								auth: {

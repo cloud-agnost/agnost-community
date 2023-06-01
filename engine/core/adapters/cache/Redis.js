@@ -10,7 +10,7 @@ export class Redis extends CacheBase {
 
 	async disconnect() {
 		try {
-			await this.driver.quit();
+			this.driver.quit();
 		} catch (err) {}
 	}
 }

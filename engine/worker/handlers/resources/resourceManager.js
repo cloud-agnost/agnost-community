@@ -323,8 +323,9 @@ export class ResourceManager {
 			config.get("general.defaultClusterIPPort")
 		);
 
-		// Add the Ingress rule for the engine service
-		await this.addIngressRule(
+		// Add the Ingress for the engine service
+		await this.createIngress(
+			resource.iid,
 			resource.iid,
 			resource.iid,
 			config.get("general.defaultClusterIPPort")
@@ -360,8 +361,8 @@ export class ResourceManager {
 		// Delete the ClusterIP service of engine
 		await this.deleteClusterIPService(resource.iid);
 
-		// Remove the Ingress rule of the engine service
-		await this.removeIngressRule(resource.iid);
+		// Delete the Ingress of the engine service
+		await this.deleteIngress(resource.iid);
 	}
 
 	/**
@@ -375,6 +376,8 @@ export class ResourceManager {
 		const kubeconfig = new k8s.KubeConfig();
 		kubeconfig.loadFromDefault();
 		const appsApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
+		// pvcs is an array of unique (since multiple different storages can use the same PVC) Cluster Storage resources coming from the environment configuration. It is the resouce part of the design-resource mapping but only the unique Cluster Storage resources.
+		const pvcs = deploymentConfig.pvcs ?? [];
 
 		// Define the Deployment specification
 		const deploymentSpec = {
@@ -407,6 +410,12 @@ export class ResourceManager {
 								imagePullPolicy: ["development"].includes(process.env.NODE_ENV)
 									? "Never"
 									: "Always",
+								volumeMounts: pvcs.map((entry) => {
+									return {
+										mountPath: `/${entry.iid}`, // iid of PVC resource
+										name: entry.iid, //iid of PVC resource
+									};
+								}),
 								env: [
 									{
 										name: "AGNOST_VERSION_ID",
@@ -509,6 +518,14 @@ export class ResourceManager {
 								},
 							},
 						],
+						volumes: pvcs.map((entry) => {
+							return {
+								name: entry.iid,
+								persistentVolumeClaim: {
+									claimName: `${entry.iid}-pvc`,
+								},
+							};
+						}),
 					},
 				},
 			},
@@ -535,6 +552,8 @@ export class ResourceManager {
 		const kubeconfig = new k8s.KubeConfig();
 		kubeconfig.loadFromDefault();
 		const appsApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
+		// pvcs is an array of unique (since multiple different storages can use the same PVC) Cluster Storage resources coming from the environment configuration. It is the resouce part of the design-resource mapping but only the unique Cluster Storage resources.
+		const pvcs = deploymentConfig.pvcs ?? [];
 
 		try {
 			// Get the existing Deployment
@@ -553,6 +572,24 @@ export class ResourceManager {
 				deploymentConfig.cpu.limit;
 			deployment.spec.template.spec.containers[0].resources.limits.memory =
 				deploymentConfig.memory.limit;
+
+			// Update the PVC mounts
+			deployment.spec.template.spec.containers[0].volumeMounts = pvcs.map(
+				(entry) => {
+					return {
+						mountPath: `/${entry.iid}`, // iid of PVC resource
+						name: entry.iid, //iid of PVC resource
+					};
+				}
+			);
+			deployment.spec.template.spec.volumes = pvcs.map((entry) => {
+				return {
+					name: entry.iid,
+					persistentVolumeClaim: {
+						claimName: `${entry.iid}-pvc`,
+					},
+				};
+			});
 
 			// Update the deployment
 			await appsApi.replaceNamespacedDeployment(
@@ -772,49 +809,60 @@ export class ResourceManager {
 	}
 
 	/**
-	 * Adds ingress rule for the deployment service
+	 * Creates the ingress rule for the deployment service
+	 * @param  {string} ingressName The ingress name
 	 * @param  {string} pathName The ingress path to route external traffic to the resource (resource iid)
 	 * @param  {string} serviceName The service name prefix (resource iid)
 	 * @param  {number} port The service port
 	 */
-	async addIngressRule(pathName, serviceName, port) {
+	async createIngress(ingressName, pathName, serviceName, port) {
 		// Create a Kubernetes core API client
 		const kubeconfig = new k8s.KubeConfig();
 		kubeconfig.loadFromDefault();
 		const networkingApi = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
 
 		try {
-			// Get the current ingress specification
-			const response = await networkingApi.readNamespacedIngress(
-				config.get("general.ingressServiceName"),
-				config.get("general.k8sNamespace")
-			);
-
-			const ingressSpec = response.body.spec;
-
-			// Add the new rule
-			ingressSpec.rules.push({
-				http: {
-					paths: [
+			const ingress = {
+				apiVersion: "networking.k8s.io/v1",
+				kind: "Ingress",
+				metadata: {
+					name: ingressName,
+					annotations: {
+						"kubernetes.io/ingress.class": "nginx",
+						"nginx.ingress.kubernetes.io/proxy-body-size": "500m",
+						"nginx.ingress.kubernetes.io/proxy-connect-timeout": "6000",
+						"nginx.ingress.kubernetes.io/proxy-send-timeout": "6000",
+						"nginx.ingress.kubernetes.io/proxy-read-timeout": "6000",
+						"nginx.ingress.kubernetes.io/proxy-next-upstream-timeout": "6000",
+						"nginx.ingress.kubernetes.io/rewrite-target": "/$1",
+					},
+				},
+				spec: {
+					rules: [
 						{
-							path: `/${pathName}`,
-							pathType: "Prefix",
-							backend: {
-								service: {
-									name: `${serviceName}-service`,
-									port: { number: port },
-								},
+							http: {
+								paths: [
+									{
+										path: `/${pathName}/(.*)`,
+										pathType: "Prefix",
+										backend: {
+											service: {
+												name: `${serviceName}-service`,
+												port: { number: port },
+											},
+										},
+									},
+								],
 							},
 						},
 					],
 				},
-			});
+			};
 
-			// Update the Ingress with the modified spec
-			await networkingApi.replaceNamespacedIngress(
-				config.get("general.ingressServiceName"),
+			// Create the ingress with the provided spec
+			await networkingApi.createNamespacedIngress(
 				config.get("general.k8sNamespace"),
-				response.body
+				ingress
 			);
 		} catch (err) {
 			throw new AgnostError(err.body?.message);
@@ -822,33 +870,20 @@ export class ResourceManager {
 	}
 
 	/**
-	 * Remove ingress rule of the deployment service
-	 * @param  {string} pathName The ingress path to route external traffic to the resource (resource iid)
+	 * Deletes the ingress of the deployment service
+	 * @param  {string} ingressName The ingress name
 	 */
-	async removeIngressRule(pathName) {
+	async deleteIngress(ingressName) {
 		// Create a Kubernetes core API client
 		const kubeconfig = new k8s.KubeConfig();
 		kubeconfig.loadFromDefault();
 		const networkingApi = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
 
 		try {
-			// Get the current ingress specification
-			const response = await networkingApi.readNamespacedIngress(
-				config.get("general.ingressServiceName"),
+			// Delete the ingress resource
+			await networkingApi.deleteNamespacedIngress(
+				ingressName,
 				config.get("general.k8sNamespace")
-			);
-
-			const ingressSpec = response.body.spec;
-			// Revove the existing rule
-			ingressSpec.rules = ingressSpec.rules.filter(
-				(entry) => entry.http.paths[0].path !== `/${pathName}`
-			);
-
-			// Update the Ingress with the modified spec
-			await networkingApi.replaceNamespacedIngress(
-				config.get("general.ingressServiceName"),
-				config.get("general.k8sNamespace"),
-				response.body
 			);
 		} catch (err) {
 			throw new AgnostError(err.body?.message);

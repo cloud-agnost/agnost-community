@@ -11,6 +11,9 @@ import {
 } from "../config/constants.js";
 
 import accessDatabaseRules from "./access/database.js";
+import accessCacheRules from "./access/cache.js";
+import accessQueueRules from "./access/queue.js";
+import accessStorageRules from "./access/storage.js";
 
 /**
  * Resources are the actual instances of IaaS or PaaS from specific providers. There resources can be managed by the platform or
@@ -118,6 +121,54 @@ export const ResourceModel = mongoose.model(
 
 export const applyRules = (type) => {
 	switch (type) {
+		case "test":
+			return [
+				body("type")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(addResourceTypes)
+					.withMessage(t("Unsupported resource type")),
+				body("instance")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom((value, { req }) => {
+						let instanceList = addInstanceTypes[req.body.type];
+						if (!instanceList)
+							throw new AgnostError(
+								t(
+									"Cannot identify the instance types for the provided resource type"
+								)
+							);
+
+						if (!instanceList.includes(value))
+							throw new AgnostError(
+								t(
+									"Not a valid instance type for respource type '%s'",
+									req.body.type
+								)
+							);
+
+						return true;
+					}),
+				body("access")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom((value, { req }) => {
+						if (typeof value !== "object" || Array.isArray(value))
+							throw new AgnostError(t("Not a valid resource access setting"));
+
+						return true;
+					}),
+				...accessDatabaseRules,
+				...accessCacheRules,
+				...accessQueueRules,
+				...accessStorageRules,
+			];
 		case "add":
 			return [
 				body("appId")
@@ -222,6 +273,9 @@ export const applyRules = (type) => {
 						return true;
 					}),
 				...accessDatabaseRules,
+				...accessCacheRules,
+				...accessQueueRules,
+				...accessStorageRules,
 			];
 		case "create":
 			return [
@@ -390,22 +444,6 @@ export const applyRules = (type) => {
 					.isIn(appRoles)
 					.withMessage(t("Unsupported app role")),
 			];
-		case "update-telemetry":
-			return [
-				body("status")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isIn(resourceStatuses)
-					.withMessage(t("Unsupported status type")),
-				body("message").trim().optional(),
-				body("logs").trim().optional(),
-			];
-		case "update-config":
-			return [];
-		case "update-access":
-			return [...accessDatabaseRules];
 		default:
 			return [];
 	}

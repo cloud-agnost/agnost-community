@@ -44,8 +44,7 @@ class ResourceController extends BaseController {
 				allowedRoles: ["Admin", "Developer", "Viewer"],
 				config: { size: config.get("general.defaulPVCSize") },
 				access: helper.encyrptSensitiveData({
-					name: resourceIid,
-					mountPath: resourceIid,
+					mountPath: `/${resourceIid}`,
 				}),
 				deletable: true,
 				status: "Creating",
@@ -89,9 +88,11 @@ class ResourceController extends BaseController {
 				config: {},
 				access: helper.encyrptSensitiveData({
 					format: "object", // can be either object or url
+					scheme: "amqps",
 					username: process.env.QUEUE_USERNAME,
 					password: process.env.QUEUE_PASSWORD,
 					host: process.env.QUEUE_HOST,
+					port: 5671, // 5671 for TLS for normal 5672
 				}),
 				status: "Binding",
 				deletable: false,

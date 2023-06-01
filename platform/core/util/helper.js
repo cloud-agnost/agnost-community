@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import randomColor from "randomcolor";
 import { customAlphabet } from "nanoid";
 import cyripto from "crypto-js";
+import querystring from "querystring";
 import CIDR from "ip-cidr";
 
 const constants = {
@@ -231,6 +232,38 @@ function isValidIPAddress(address) {
 	return CIDR.isValidAddress(address);
 }
 
+/**
+ * Converts array of key-value objets to query string format e.g. key1=value1&key2=value2
+ * @param  {Array} keyValuePairs Array of key-value pair objects
+ */
+function getQueryString(keyValuePairs) {
+	if (!keyValuePairs || keyValuePairs.length === 0) return "";
+
+	// Convert the array to an object
+	const obj = {};
+	keyValuePairs.forEach((item) => {
+		obj[item.key] = item.value;
+	});
+
+	return querystring.stringify(obj);
+}
+
+/**
+ * Converts array of key-value objets to an object {key1:value1, key2:value2}
+ * @param  {Array} keyValuePairs Array of key-value pair objects
+ */
+function getAsObject(keyValuePairs) {
+	if (!keyValuePairs || keyValuePairs.length === 0) return {};
+
+	// Convert the array to an object
+	const obj = {};
+	keyValuePairs.forEach((item) => {
+		obj[item.key] = item.value;
+	});
+
+	return obj;
+}
+
 export default {
 	constants,
 	isEmptyJson,
@@ -248,4 +281,6 @@ export default {
 	decryptSensitiveData,
 	isValidDomain,
 	isValidIPAddress,
+	getQueryString,
+	getAsObject,
 };

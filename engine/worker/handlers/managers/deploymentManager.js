@@ -889,7 +889,7 @@ export class DeploymentManager {
 		// Assign the database server resource
 		const resource = this.getDatabaseResource(dbConfig);
 		dbConfig.resource = resource;
-		prevConfig.resource = resource;
+		if (prevConfig) prevConfig.resource = resource;
 
 		switch (dbConfig.type) {
 			case DATABASE.MongoDB:

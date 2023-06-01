@@ -108,8 +108,11 @@ async function initExpress(i18n) {
 	// Add middleware to identify user locale using 'accept-language' header to guess language settings
 	app.use(i18n.init);
 	app.use(responseTime(logRequest));
+	// Serve static files from the specified directory
 	app.use((await import("./middlewares/touchVersion.js")).default);
 	app.use("/", (await import("./routes/system.js")).default);
+	// Serve static files from the storage directory
+	app.use("/storage", express.static(config.get("general.storageDirectory")));
 	app.use("/v1/engine", (await import("./routes/engine.js")).default);
 	app.use("/v1/platform", (await import("./routes/platform.js")).default);
 	app.use("/v1/telemetry", (await import("./routes/telemetry.js")).default);
