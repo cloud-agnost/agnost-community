@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { body } from "express-validator";
+import resourceCtrl from "../controllers/resource.js";
 import { databaseTypes } from "../config/constants.js";
 
 /**
@@ -131,10 +132,21 @@ export const applyRules = (type) => {
 							);
 						}
 
+						// Special case for oracle databases (schemas)
+						if (
+							req.type === "Oracle" &&
+							value.length > config.get("general.maxOracleDbNameLength")
+						)
+							throw AgnostError(
+								t(
+									"Name must be at most %s characters long",
+									config.get("general.maxOracleDbNameLength")
+								)
+							);
+
 						return true;
 					}),
 				body("type")
-					.if(() => type === "create")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
@@ -142,7 +154,6 @@ export const applyRules = (type) => {
 					.isIn(databaseTypes)
 					.withMessage(t("Unsupported database type")),
 				body("managed")
-					.if(() => type === "create")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
@@ -150,6 +161,49 @@ export const applyRules = (type) => {
 					.isBoolean()
 					.withMessage(t("Not a valid boolean value"))
 					.toBoolean(),
+				body("resourceId")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom(async (value, { req }) => {
+						if (!helper.isValidId(value))
+							throw new AgnostError(t("Not a valid resource identifier"));
+
+						let resource = await resourceCtrl.getOneById(value, {
+							cacheKey: value,
+						});
+
+						if (!resource)
+							throw new AgnostError(
+								t("No such resource with the provided id '%s' exists.", value)
+							);
+
+						// Check if the selected resource type and input database type matches or not
+						if (req.body.type !== resource.instance)
+							throw new AgnostError(
+								t(
+									"The specified database type '%s' and the selected resource type '%s' do not match",
+									req.body.type,
+									resource.instance
+								)
+							);
+
+						// Check the status of the resource whether it is in OK status or not
+						if (resource.status !== "OK")
+							throw new AgnostError(
+								t(
+									"Only resorces in ready (OK) status can be mapped to a database. The selected '%s' resoure '%s' is in '%s' status",
+									resource.instance,
+									resource.name,
+									resource.status
+								)
+							);
+
+						// Assign the resource object
+						req.resource = resource;
+						return true;
+					}),
 			];
 		case "update":
 			return [

@@ -268,6 +268,9 @@ class ResourceController extends BaseController {
 			return {
 				...entry.resource,
 				access: helper.decryptSensitiveData(entry.resource.access),
+				accessReadOnly: helper.decryptSensitiveData(
+					entry.resource.accessReadOnly
+				),
 				action: entry.log.action,
 				callback: `${config.get("general.platformBaseUrl")}/v1/org/${
 					entry.resource.orgId
@@ -299,6 +302,7 @@ class ResourceController extends BaseController {
 			return {
 				...entry,
 				access: helper.decryptSensitiveData(entry.access),
+				accessReadOnly: helper.decryptSensitiveData(entry.accessReadOnly),
 				action: "delete",
 			};
 		});

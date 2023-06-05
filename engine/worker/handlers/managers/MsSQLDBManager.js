@@ -2,8 +2,8 @@ import MsSQLDriver from "../sql-database/drivers/MsSQLDriver.js";
 import { SQLBaseManager } from "./SQLBaseManager.js";
 
 export class MsSQLDBManager extends SQLBaseManager {
-	constructor(dbConfig, prevDbConfig, addLogFn) {
-		super(dbConfig, prevDbConfig, addLogFn, MsSQLDriver);
+	constructor(env, dbConfig, prevDbConfig, addLogFn) {
+		super(env, dbConfig, prevDbConfig, addLogFn, MsSQLDriver);
 	}
 
 	async useDatabase(databaseName) {

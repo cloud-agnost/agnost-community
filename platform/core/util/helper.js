@@ -155,16 +155,27 @@ function decryptText(cipherText) {
  * @param  {Object} access The connection settings needed to connect to the resource
  */
 function encyrptSensitiveData(access) {
+	if (Array.isArray(access)) {
+		let list = [];
+		access.forEach((entry) => {
+			list.push(encyrptSensitiveData(entry));
+		});
+
+		return list;
+	}
+
 	let encrypted = {};
 	for (const key in access) {
 		const value = access[key];
-		if (typeof value === "object" && value !== null) {
-			encrypted[key] = encyrptSensitiveData(value);
-		} else if (Array.isArray(value)) {
+		if (Array.isArray(value)) {
 			encrypted[key] = value.map((entry) => {
+				if (entry && typeof entry === "object")
+					return encyrptSensitiveData(entry);
 				if (entry && typeof entry === "string") return encryptText(entry);
 				else return entry;
 			});
+		} else if (typeof value === "object" && value !== null) {
+			encrypted[key] = encyrptSensitiveData(value);
 		} else if (value && typeof value === "string")
 			encrypted[key] = encryptText(value);
 		else encrypted[key] = value;
@@ -178,16 +189,27 @@ function encyrptSensitiveData(access) {
  * @param  {Object} access The encrypted connection settings needed to connect to the resource
  */
 function decryptSensitiveData(access) {
+	if (Array.isArray(access)) {
+		let list = [];
+		access.forEach((entry) => {
+			list.push(decryptSensitiveData(entry));
+		});
+
+		return list;
+	}
+
 	let decrypted = {};
 	for (const key in access) {
 		const value = access[key];
-		if (typeof value === "object" && value !== null) {
-			decrypted[key] = decryptSensitiveData(value);
-		} else if (Array.isArray(value)) {
+		if (Array.isArray(value)) {
 			decrypted[key] = value.map((entry) => {
+				if (entry && typeof entry === "object")
+					return decryptSensitiveData(entry);
 				if (entry && typeof entry === "string") return decryptText(entry);
 				else return entry;
 			});
+		} else if (typeof value === "object" && value !== null) {
+			decrypted[key] = decryptSensitiveData(value);
 		} else if (value && typeof value === "string")
 			decrypted[key] = decryptText(value);
 		else decrypted[key] = value;

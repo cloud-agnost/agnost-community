@@ -893,24 +893,39 @@ export class DeploymentManager {
 
 		switch (dbConfig.type) {
 			case DATABASE.MongoDB:
-				return new MongoDBManager(dbConfig, prevConfig, (message, status) =>
-					this.addLog(message, status)
+				return new MongoDBManager(
+					this.getEnvObj(),
+					dbConfig,
+					prevConfig,
+					(message, status) => this.addLog(message, status)
 				);
 			case DATABASE.PostgreSQL:
-				return new PostgresDBManager(dbConfig, prevConfig, (message, status) =>
-					this.addLog(message, status)
+				return new PostgresDBManager(
+					this.getEnvObj(),
+					dbConfig,
+					prevConfig,
+					(message, status) => this.addLog(message, status)
 				);
 			case DATABASE.MySQL:
-				return new MySQLDBManager(dbConfig, prevConfig, (message, status) =>
-					this.addLog(message, status)
+				return new MySQLDBManager(
+					this.getEnvObj(),
+					dbConfig,
+					prevConfig,
+					(message, status) => this.addLog(message, status)
 				);
 			case DATABASE.SQLServer:
-				return new MsSQLDBManager(dbConfig, prevConfig, (message, status) =>
-					this.addLog(message, status)
+				return new MsSQLDBManager(
+					this.getEnvObj(),
+					dbConfig,
+					prevConfig,
+					(message, status) => this.addLog(message, status)
 				);
 			case DATABASE.Oracle:
-				return new OracleDBManager(dbConfig, prevConfig, (message, status) =>
-					this.addLog(message, status)
+				return new OracleDBManager(
+					this.getEnvObj(),
+					dbConfig,
+					prevConfig,
+					(message, status) => this.addLog(message, status)
 				);
 			default:
 				throw new AgnostError(
@@ -1040,7 +1055,7 @@ export class DeploymentManager {
 			case "update":
 				const prevDbDefinitions = await this.getPrevDBDefinitions();
 				if (prevDbDefinitions.length === 0) {
-					//this.addToCache(`${this.getEnvId()}.databases`, databases);
+					this.addToCache(`${this.getEnvId()}.databases`, databases);
 				} else {
 					const updatedDbDefinitions = prevDbDefinitions.map((entry) => {
 						const updatedDb = databases.find(

@@ -100,10 +100,11 @@ export default [
 		.isBoolean()
 		.withMessage(t("Not a valid boolean value"))
 		.toBoolean(),
-	body("accessReadOnly.connFormat")
+	body("accessReadOnly.*.connFormat")
 		.if(
 			(value, { req }) =>
 				req.body.accessReadOnly &&
+				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "database" &&
 				["MongoDB"].includes(req.body.instance)
 		)
@@ -113,57 +114,62 @@ export default [
 		.bail()
 		.isIn(mongoDBConnFormat)
 		.withMessage(t("Unsupported connection format")),
-	body("accessReadOnly.options")
+	body("accessReadOnly.*.options")
 		.optional()
 		.if(
 			(value, { req }) =>
 				req.body.accessReadOnly &&
+				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "database" &&
 				["MongoDB"].includes(req.body.instance)
 		)
 		.isArray()
 		.withMessage(t("Access options need to be an array of key-value pairs")),
-	body("accessReadOnly.options.*.key")
+	body("accessReadOnly.*.options.*.key")
 		.if(
 			(value, { req }) =>
 				req.body.accessReadOnly &&
-				Array.isArray(req.body.accessReadOnly.options) &&
+				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "database" &&
 				["MongoDB"].includes(req.body.instance)
 		)
 		.trim()
 		.notEmpty()
 		.withMessage(t("Required field, cannot be left empty")),
-	body("accessReadOnly.options.*.value")
+	body("accessReadOnly.*.options.*.value")
 		.if(
 			(value, { req }) =>
 				req.body.accessReadOnly &&
-				Array.isArray(req.body.accessReadOnly.options) &&
+				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "database" &&
 				["MongoDB"].includes(req.body.instance)
 		)
 		.trim()
 		.notEmpty()
 		.withMessage(t("Required field, cannot be left empty")),
-	body("accessReadOnly.host")
+	body("accessReadOnly.*.host")
 		.if(
 			(value, { req }) =>
 				req.body.accessReadOnly &&
+				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "database" &&
 				databaseTypes.includes(req.body.instance)
 		)
 		.trim()
 		.notEmpty()
 		.withMessage(t("Required field, cannot be left empty")),
-	body("accessReadOnly.port")
+	body("accessReadOnly.*.port")
 		.if(
 			(value, { req }) =>
 				eq.body.accessReadOnly &&
+				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "database" &&
 				((databaseTypes.includes(req.body.instance) &&
 					req.body.instance !== "MongoDB") ||
 					(req.body.instance === "MongoDB" &&
-						req.body.accessReadOnly?.connFormat === "mongodb"))
+						req.body.accessReadOnly?.some(
+							(entry) => entry.connFormat === "mongodb"
+						)))
 		)
 		.trim()
 		.notEmpty()
@@ -175,29 +181,32 @@ export default [
 		})
 		.withMessage(t("Port number needs to be an integer between 0-65535"))
 		.toInt(),
-	body("accessReadOnly.username")
+	body("accessReadOnly.*.username")
 		.if(
 			(value, { req }) =>
 				req.body.accessReadOnly &&
+				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "database" &&
 				databaseTypes.includes(req.body.instance)
 		)
 		.trim()
 		.notEmpty()
 		.withMessage(t("Required field, cannot be left empty")),
-	body("accessReadOnly.password")
+	body("accessReadOnly.*.password")
 		.if(
 			(value, { req }) =>
 				req.body.accessReadOnly &&
+				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "database" &&
 				databaseTypes.includes(req.body.instance)
 		)
 		.notEmpty()
 		.withMessage(t("Required field, cannot be left empty")),
-	body("accessReadOnly.encrypt")
+	body("accessReadOnly.*.encrypt")
 		.if(
 			(value, { req }) =>
 				req.body.accessReadOnly &&
+				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "database" &&
 				["SQL Server"].includes(req.body.instance)
 		)

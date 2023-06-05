@@ -37,7 +37,8 @@ export const ResourceModel = mongoose.model(
 				immutable: true,
 			},
 			// The resources are primarily kept at the organization level, if a resource is added under an app
-			// this field helps to filter out the resources that belong to a specific app
+			// this field helps to filter out the resources that belong to a specific app. If appId assigned then
+			// the resource can be only used within that app and cannot be shared across other apps of the organization
 			appId: {
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "app",
@@ -93,8 +94,9 @@ export const ResourceModel = mongoose.model(
 				type: mongoose.Schema.Types.Mixed,
 			},
 			// Typically for redis or some databases we might have a read only replica, this holds the read only replica acces settings
+			// There can be multiple read only replicas for this reason it is an array of configuration items
 			accessReadOnly: {
-				type: mongoose.Schema.Types.Mixed,
+				type: [mongoose.Schema.Types.Mixed],
 			},
 			// Resource status
 			status: {
@@ -122,6 +124,7 @@ export const ResourceModel = mongoose.model(
 export const applyRules = (type) => {
 	switch (type) {
 		case "test":
+		case "update-access":
 			return [
 				body("type")
 					.trim()
@@ -265,7 +268,7 @@ export const applyRules = (type) => {
 				body("accessReadOnly")
 					.optional()
 					.custom((value, { req }) => {
-						if (typeof value !== "object" || Array.isArray(value))
+						if (!Array.isArray(value))
 							throw new AgnostError(
 								t("Not a valid resource read-only access setting")
 							);
@@ -387,6 +390,62 @@ export const applyRules = (type) => {
 			];
 		case "get-resources":
 			return [
+				query("appId")
+					.trim()
+					.optional()
+					.custom(async (value, { req }) => {
+						if (!helper.isValidId(value))
+							throw new AgnostError(t("Not a valid app identifier"));
+
+						const app = await appCtrl.getOneById(value, { cacheKey: value });
+						if (!app)
+							throw new AgnostError(
+								t(
+									"No such application with the provided id '%s' exists.",
+									value
+								)
+							);
+
+						if (app.orgId.toString() !== req.org._id.toString())
+							throw new AgnostError(
+								t(
+									"Organization does not have an app with the provided id '%s'",
+									value
+								)
+							);
+
+						req.app = app;
+
+						// If the user is cluster owner then by default he has 'Admin' privileges to the app
+						if (req.user.isClusterOwner) {
+							// Assign app membership data
+							req.appMember = {
+								userId: req.user._id,
+								role: "Admin",
+								joinDate: req.user.createdAt,
+							};
+						} else {
+							// Check if the user is a member of the app or not
+							let appMember = app.team.find(
+								(entry) => entry.userId.toString() === req.user._id.toString()
+							);
+
+							if (!appMember) {
+								return res.status(401).json({
+									error: t("Not Authorized"),
+									details: t(
+										"You are not a member of the application '%s'",
+										app.name
+									),
+									code: ERROR_CODES.unauthorized,
+								});
+							}
+
+							// Assign app membership data
+							req.appMember = appMember;
+						}
+						return true;
+					}),
 				query("page")
 					.trim()
 					.notEmpty()

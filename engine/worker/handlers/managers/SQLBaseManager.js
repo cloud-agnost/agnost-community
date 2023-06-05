@@ -9,8 +9,8 @@ export class SQLBaseManager extends DBManager {
 	 */
 	sql = "";
 
-	constructor(dbConfig, prevDbConfig, addLogFn, Driver) {
-		super(dbConfig, prevDbConfig, addLogFn);
+	constructor(env, dbConfig, prevDbConfig, addLogFn, Driver) {
+		super(env, dbConfig, prevDbConfig, addLogFn);
 		this.driver = new Driver(this);
 	}
 

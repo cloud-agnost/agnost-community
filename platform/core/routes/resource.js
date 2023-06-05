@@ -105,18 +105,22 @@ router.post(
 					code: ERROR_CODES.notAllowed,
 				});
 			}
-			if (accessReadOnly) {
-				try {
-					// Test connection
-					await connCtrl.testConnection(instance, accessReadOnly);
-				} catch (err) {
-					await resourceCtrl.endSession(session);
 
-					return res.status(422).json({
-						error: t("Connection Error - Read-only"),
-						details: err.message,
-						code: ERROR_CODES.notAllowed,
-					});
+			if (accessReadOnly) {
+				for (let i = 0; i < accessReadOnly.length; i++) {
+					const connSettings = accessReadOnly[i];
+					try {
+						// Test connection
+						await connCtrl.testConnection(instance, connSettings);
+					} catch (err) {
+						await resourceCtrl.endSession(session);
+
+						return res.status(422).json({
+							error: t("Connection Error - Read-only server %s", i + 1),
+							details: `Read-only server #${i + 1}: ${err.message}`,
+							code: ERROR_CODES.notAllowed,
+						});
+					}
 				}
 			}
 
@@ -141,10 +145,21 @@ router.post(
 					allowedRoles,
 					access,
 					accessReadOnly,
-					status: "OK",
+					status: "Binding",
 					createdBy: user._id,
 				},
 				{ cacheKey: resourceId, session }
+			);
+
+			const logObj = await resLogCtrl.create(
+				{
+					orgId: org._id,
+					resourceId: resourceId,
+					action: "bind",
+					status: "Binding",
+					createdBy: user._id,
+				},
+				{ session }
 			);
 
 			await resourceCtrl.commit(session);
@@ -153,6 +168,11 @@ router.post(
 			delete resourceObj.access;
 			delete resourceObj.accessReadOnly;
 			res.json(resourceObj);
+
+			// Bind the managed resource
+			await resourceCtrl.manageClusterResources([
+				{ resource: resourceObj, log: logObj },
+			]);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -202,8 +222,16 @@ router.get(
 
 			let query = { orgId: org._id };
 
-			// App filter
-			if (appId) query.appId = appId;
+			// App filter and app member filter
+			if (appId) {
+				query.$or = [
+					{ $and: [{ appId: appId }, { allowedRoles: req.appMember.role }] },
+					{ createdBy: req.user._id },
+				];
+			} else {
+				// If we are looking for organization level resources then appId should not be assigned. When appId assigned, the resouce can only be used within that app only.
+				query.appId = { $exists: false };
+			}
 
 			// Search resource
 			if (search && search !== "null")
@@ -482,7 +510,7 @@ router.put(
 		const session = await resourceCtrl.startSession();
 		try {
 			const { org, user, resource } = req;
-			let { access, accessReadonly } = req.body;
+			let { access, accessReadOnly } = req.body;
 
 			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
 			// unless the previous one is completed
@@ -518,50 +546,41 @@ router.put(
 					code: ERROR_CODES.notAllowed,
 				});
 			}
-			if (accessReadOnly) {
-				try {
-					// Test connection
-					await connCtrl.testConnection(resource.instance, accessReadOnly);
-				} catch (err) {
-					await resourceCtrl.endSession(session);
 
-					return res.status(422).json({
-						error: t("Connection Error - Read-only"),
-						details: err.message,
-						code: ERROR_CODES.notAllowed,
-					});
+			if (accessReadOnly) {
+				for (let i = 0; i < accessReadOnly.length; i++) {
+					const connSettings = accessReadOnly[i];
+					try {
+						// Test connection
+						await connCtrl.testConnection(instance, connSettings);
+					} catch (err) {
+						await resourceCtrl.endSession(session);
+
+						return res.status(422).json({
+							error: t("Connection Error - Read-only server %s", i + 1),
+							details: `Read-only server #${i + 1}: ${err.message}`,
+							code: ERROR_CODES.notAllowed,
+						});
+					}
 				}
 			}
 
 			// Encrypt sensitive access data
 			access = helper.encyrptSensitiveData(access);
-
-			if (accessReadonly)
-				accessReadonly = helper.encyrptSensitiveData(accessReadonly);
+			if (accessReadOnly)
+				accessReadOnly = helper.encyrptSensitiveData(accessReadOnly);
 
 			let updatedResource = null;
-			if (accessReadonly) {
-				updatedResource = await resourceCtrl.updateOneById(
-					resource._id,
-					{
-						access,
-						accessReadonly,
-						updatedBy: user._id,
-					},
-					{},
-					{ cacheKey: resource._id, session }
-				);
-			} else {
-				updatedResource = await resourceCtrl.updateOneById(
-					resource._id,
-					{
-						access,
-						updatedBy: user._id,
-					},
-					{ accessReadonly: "" },
-					{ cacheKey: resource._id, session }
-				);
-			}
+			updatedResource = await resourceCtrl.updateOneById(
+				resource._id,
+				{
+					access,
+					accessReadOnly,
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: resource._id, session }
+			);
 
 			await resourceCtrl.commit(session);
 			// Delete the sensitive data
@@ -733,6 +752,70 @@ router.get(
 			);
 
 			res.json(environments);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/resource/:resourceId/logs
+@method     GET
+@desc       Returns resource logs
+@access     private
+*/
+router.get(
+	"/:resourceId/logs",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateResource,
+	authorizeOrgAction("org.resource.view"),
+	async (req, res) => {
+		try {
+			const { org, resource } = req;
+			const { page, size, status, action, actor, sortBy, sortDir, start, end } =
+				req.query;
+
+			let query = {
+				orgId: org._id,
+				resourceId: resource._id,
+			};
+
+			// Status filter
+			if (status) {
+				if (Array.isArray(status)) query["status"] = { $in: status };
+				else query["status"] = status;
+			}
+
+			// Action filter
+			if (action) {
+				if (Array.isArray(action)) query["action"] = { $in: action };
+				else query["action"] = action;
+			}
+
+			// Actor filter
+			if (actor) {
+				if (Array.isArray(action)) query["createdBy"] = { $in: actor };
+				else query["createdBy"] = actor;
+			}
+
+			if (start && !end) query.createdAt = { $gte: start };
+			else if (!start && end) query.createdAt = { $lte: end };
+			else if (start && end) query.createdAt = { $gte: start, $lt: end };
+
+			let sort = {};
+			if (sortBy && sortDir) {
+				sort[sortBy] = sortDir;
+			} else sort = { createdAt: "desc" };
+
+			let logs = await resLogCtrl.getManyByQuery(query, {
+				sort,
+				skip: size * page,
+				limit: size,
+			});
+
+			res.json(logs);
 		} catch (error) {
 			handleError(req, res, error);
 		}

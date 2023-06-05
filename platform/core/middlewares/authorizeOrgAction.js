@@ -1,3 +1,4 @@
+import appCtrl from "../controllers/app.js";
 import { handleError } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
@@ -149,6 +150,48 @@ export const authorizeOrgAction = (action = null) => {
 				}
 
 				if (entity && entity[items[items.length - 1]]) return next();
+			}
+
+			// Chece if it is an app level resource action or not
+			if (
+				[
+					"org.resource.add",
+					"org.resource.create",
+					"org.resource.update",
+					"org.resource.delete",
+				].includes(action)
+			) {
+				// If this is the person who created the resource then allow the action
+				if (req.resource?.createdBy.toString() === req.user._id.toString())
+					return next();
+
+				// Check if this is app level resource
+				const appId = req.body.appId || req.resource?.appId?.toString();
+				if (appId && helper.isValidId(appId)) {
+					const app = await appCtrl.getOneById(appId, { cacheKey: appId });
+					if (app && app.orgId.toString() !== req.org._id.toString()) {
+						req.app = app;
+						// If the user is cluster owner then by default he has 'Admin' privileges to the app
+						if (req.user.isClusterOwner) {
+							// Assign app membership data
+							req.appMember = {
+								userId: req.user._id,
+								role: "Admin",
+								joinDate: req.user.createdAt,
+							};
+						} else {
+							// Check if the user is a member of the app or not
+							let appMember = app.team.find(
+								(entry) => entry.userId.toString() === req.user._id.toString()
+							);
+
+							// Assign app membership data
+							req.appMember = appMember;
+						}
+
+						if (req.appMember?.role === "Admin") return next();
+					}
+				}
 			}
 
 			return res.status(401).json({

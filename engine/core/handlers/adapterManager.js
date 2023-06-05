@@ -34,10 +34,8 @@ export class AdapterManager {
 	 * Returns the connection object matching the resource iid
 	 * @param  {string} resourceiid The resource identifier
 	 */
-	getAdapterObject2(resourceiid, readOnly) {
-		let adapterObj = this.adapters.get(
-			`${resourceiid}-${readOnly ? "ro" : "rw"}`
-		);
+	getAdapterObject2(resourceiid) {
+		let adapterObj = this.adapters.get(resourceiid);
 		if (adapterObj) return adapterObj;
 		else return null;
 	}
@@ -56,15 +54,15 @@ export class AdapterManager {
 		);
 
 		if (mapping) {
-			let adapterObj = null;
+			let adapterObj = this.adapters.get(resource.iid);
 			if (readOnly) {
-				adapterObj = this.adapters.get(`${mapping.resource.iid}-ro`);
-				// If the readonly connection is not there then check for the read-write connection
-				if (!adapterObj)
-					adapterObj = this.adapters.get(`${mapping.resource.iid}-rw`);
-			} else adapterObj = this.adapters.get(`${mapping.resource.iid}-rw`);
-
-			return adapterObj;
+				// If the readonly connection is not there then return the read-write connection
+				if (adapterObj?.slaves && adapterObj.slaves.length > 0) {
+					return adapterObj.slaves[
+						helper.randomInt(1, adapterObj.slaves.length) - 1
+					];
+				} else return adapterObj;
+			} else return adapterObj;
 		} else return null;
 	}
 
@@ -124,26 +122,21 @@ export class AdapterManager {
 	async setupConnection(resource) {
 		switch (resource.instance) {
 			case "PostgreSQL":
-				this.connectToPostgresSQL(resource, false);
-				this.connectToPostgresSQL(resource, true);
+				this.connectToPostgresSQL(resource);
 				break;
 			case "MySQL":
-				this.connectToMySQL(resource, false);
-				this.connectToMySQL(resource, true);
+				this.connectToMySQL(resource);
 				break;
 			case "SQL Server":
-				this.connectToSQLServer(resource, false);
-				this.connectToSQLServer(resource, true);
+				this.connectToSQLServer(resource);
 				break;
 			case "MongoDB":
-				this.connectToMongoDB(resource, false);
-				this.connectToMongoDB(resource, true);
+				this.connectToMongoDB(resource);
 				break;
 			case "Oracle":
 				break;
 			case "Redis":
-				this.connectToRedis(resource, false);
-				this.connectToRedis(resource, true);
+				this.connectToRedis(resource);
 				break;
 			case "AWS S3":
 				this.connectToAWSStorage(resource);
@@ -179,17 +172,14 @@ export class AdapterManager {
 	 * @param  {Object} resource The resource object
 	 * @param  {boolean} readOnly Whether this is a readonly connection or not
 	 */
-	async connectToPostgresSQL(resource, readOnly = false) {
+	async connectToPostgresSQL(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid, readOnly);
+		const adapterObj = this.getAdapterObject2(resource.iid);
 		if (adapterObj) return;
 
 		try {
 			const { access, accessReadOnly, iid, instance, type } = resource;
 			let connSettings = access;
-
-			if (readOnly) connSettings = accessReadOnly;
-
 			if (!connSettings) return;
 
 			const client = new pg.Client({
@@ -202,13 +192,42 @@ export class AdapterManager {
 
 			await client.connect();
 
-			this.adapters.set(`${resource.idd}-${readOnly ? "ro" : "rw"}`, {
+			const adapterObj = {
 				type,
 				instance,
 				iid,
-				readOnly,
+				readOnly: false,
 				adapter: new PostgreSQL(client),
-			});
+				slaves: [],
+			};
+
+			this.adapters.set(resource.idd, adapterObj);
+
+			// Add readonly connections as slave
+			if (accessReadOnly) {
+				for (let i = 0; i < accessReadOnly.length; i++) {
+					let config = accessReadOnly[i];
+
+					try {
+						const slaveClient = new pg.Client({
+							...helper.getAsObject(config.options),
+							host: config.host,
+							port: config.port,
+							user: config.username,
+							password: config.password,
+						});
+
+						await slaveClient.connect();
+						adapterObj.slaves.push({
+							type,
+							instance,
+							iid,
+							readOnly: true,
+							adapter: new PostgreSQL(slaveClient),
+						});
+					} catch (err) {}
+				}
+			}
 		} catch (err) {}
 	}
 
@@ -217,17 +236,14 @@ export class AdapterManager {
 	 * @param  {Object} resource The resource object
 	 * @param  {boolean} readOnly Whether this is a readonly connection or not
 	 */
-	async connectToMySQL(resource, readOnly = false) {
+	async connectToMySQL(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid, readOnly);
+		const adapterObj = this.getAdapterObject2(resource.iid);
 		if (adapterObj) return;
 
 		try {
 			const { access, accessReadOnly, iid, instance, type } = resource;
 			let connSettings = access;
-
-			if (readOnly) connSettings = accessReadOnly;
-
 			if (!connSettings) return;
 
 			const client = await mysql.createConnection({
@@ -238,13 +254,41 @@ export class AdapterManager {
 				password: connSettings.password,
 			});
 
-			this.adapters.set(`${resource.idd}-${readOnly ? "ro" : "rw"}`, {
+			const adapterObj = {
 				type,
 				instance,
 				iid,
-				readOnly,
+				readOnly: false,
 				adapter: new MySQL(client),
-			});
+				slaves: [],
+			};
+
+			this.adapters.set(resource.idd, adapterObj);
+
+			// Add readonly connections as slave
+			if (accessReadOnly) {
+				for (let i = 0; i < accessReadOnly.length; i++) {
+					let config = accessReadOnly[i];
+
+					try {
+						const slaveClient = await mysql.createConnection({
+							...helper.getAsObject(config.options),
+							host: config.host,
+							port: config.port,
+							user: config.username,
+							password: config.password,
+						});
+
+						adapterObj.slaves.push({
+							type,
+							instance,
+							iid,
+							readOnly: true,
+							adapter: new MySQL(slaveClient),
+						});
+					} catch (err) {}
+				}
+			}
 		} catch (err) {}
 	}
 
@@ -253,17 +297,14 @@ export class AdapterManager {
 	 * @param  {Object} resource The resource object
 	 * @param  {boolean} readOnly Whether this is a readonly connection or not
 	 */
-	async connectToSQLServer(resource, readOnly = false) {
+	async connectToSQLServer(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid, readOnly);
+		const adapterObj = this.getAdapterObject2(resource.iid);
 		if (adapterObj) return;
 
 		try {
 			const { access, accessReadOnly, iid, instance, type } = resource;
 			let connSettings = access;
-
-			if (readOnly) connSettings = accessReadOnly;
-
 			if (!connSettings) return;
 
 			const client = await mssql.connect({
@@ -275,13 +316,41 @@ export class AdapterManager {
 				encrypt: connSettings.encrypt ?? false,
 			});
 
-			this.adapters.set(`${resource.idd}-${readOnly ? "ro" : "rw"}`, {
+			const adapterObj = {
 				type,
 				instance,
 				iid,
-				readOnly,
+				readOnly: false,
 				adapter: new SQLServer(client),
-			});
+				slaves: [],
+			};
+
+			this.adapters.set(resource.idd, adapterObj);
+
+			// Add readonly connections as slave
+			if (accessReadOnly) {
+				for (let i = 0; i < accessReadOnly.length; i++) {
+					let config = accessReadOnly[i];
+
+					try {
+						const slaveClient = await mssql.connect({
+							...helper.getAsObject(config.options),
+							host: config.host,
+							port: config.port,
+							user: config.username,
+							password: config.password,
+						});
+
+						adapterObj.slaves.push({
+							type,
+							instance,
+							iid,
+							readOnly: true,
+							adapter: new SQLServer(slaveClient),
+						});
+					} catch (err) {}
+				}
+			}
 		} catch (err) {}
 	}
 
@@ -290,17 +359,14 @@ export class AdapterManager {
 	 * @param  {Object} resource The resource object
 	 * @param  {boolean} readOnly Whether this is a readonly connection or not
 	 */
-	async connectToMongoDB(resource, readOnly = false) {
+	async connectToMongoDB(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid, readOnly);
+		const adapterObj = this.getAdapterObject2(resource.iid);
 		if (adapterObj) return;
 
 		try {
 			const { access, accessReadOnly, iid, instance, type } = resource;
 			let connSettings = access;
-
-			if (readOnly) connSettings = accessReadOnly;
-
 			if (!connSettings) return;
 
 			/* Example: 			
@@ -343,13 +409,65 @@ export class AdapterManager {
 			// Connect to the database of the application
 			await client.connect();
 
-			this.adapters.set(`${resource.idd}-${readOnly ? "ro" : "rw"}`, {
+			const adapterObj = {
 				type,
 				instance,
 				iid,
-				readOnly,
+				readOnly: false,
 				adapter: new MongoDB(client),
-			});
+				slaves: [],
+			};
+
+			this.adapters.set(resource.idd, adapterObj);
+
+			// Add readonly connections as slave
+			if (accessReadOnly) {
+				for (let i = 0; i < accessReadOnly.length; i++) {
+					let config = accessReadOnly[i];
+
+					try {
+						let slaveClient = null;
+						// Build query string part of the MongoDB connection string
+						config.connOptions = helper.getQueryString(config.options);
+						if (config.connFormat === "mongodb") {
+							slaveClient = new mongo.MongoClient(
+								config.connOptions
+									? `mongodb://${config.host}:${config.port}?${config.connOptions}`
+									: `mongodb://${config.host}:${config.port}`,
+								{
+									auth: {
+										username: config.username,
+										password: config.password,
+									},
+								}
+							);
+						} else {
+							slaveClient = new mongo.MongoClient(
+								config.connOptions
+									? `mongodb+srv://${config.host}?${config.connOptions}`
+									: `mongodb+srv://${config.host}`,
+								{
+									auth: {
+										username: config.username,
+										password: config.password,
+									},
+								}
+							);
+						}
+
+						// Connect to the database of the application
+						await slaveClient.connect();
+
+						adapterObj.slaves.push({
+							type,
+							instance,
+							iid,
+							readOnly: true,
+							adapter: new MongoDB(slaveClient),
+						});
+					} catch (err) {}
+				}
+			}
 		} catch (err) {}
 	}
 
@@ -358,18 +476,14 @@ export class AdapterManager {
 	 * @param  {Object} resource The resource object
 	 * @param  {boolean} readOnly Whether this is a readonly connection or not
 	 */
-	async connectToRedis(resource, readOnly = false) {
+	async connectToRedis(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid, readOnly);
+		const adapterObj = this.getAdapterObject2(resource.iid);
 		if (adapterObj) return;
 
 		try {
 			const { access, accessReadOnly, iid, instance, type } = resource;
 			let connSettings = access;
-
-			if (readOnly) connSettings = accessReadOnly;
-
-			if (!connSettings) return;
 
 			let client = redis.createClient({
 				host: connSettings.host,
@@ -382,13 +496,43 @@ export class AdapterManager {
 			});
 
 			client.on("connect", () => {
-				this.adapters.set(`${resource.idd}-${readOnly ? "ro" : "rw"}`, {
+				const adapterObj = {
 					type,
 					instance,
 					iid,
-					readOnly,
+					readOnly: false,
 					adapter: new Redis(client),
-				});
+					slaves: [],
+				};
+
+				this.adapters.set(resource.idd, adapterObj);
+
+				// Add readonly connections as slave
+				if (accessReadOnly) {
+					for (let i = 0; i < accessReadOnly.length; i++) {
+						let config = accessReadOnly[i];
+
+						try {
+							const slaveClient = redis.createClient({
+								host: config.host,
+								port: config.port,
+								password:
+									config.password && config.password !== "null"
+										? config.password
+										: undefined,
+								database: config.databaseNumber ?? 0,
+							});
+
+							adapterObj.slaves.push({
+								type,
+								instance,
+								iid,
+								readOnly: true,
+								adapter: new SQLServer(slaveClient),
+							});
+						} catch (err) {}
+					}
+				}
 			});
 
 			client.on("error", (err) => {});
@@ -401,7 +545,7 @@ export class AdapterManager {
 	 */
 	async connectToRabbitMQ(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid, false);
+		const adapterObj = this.getAdapterObject2(resource.iid);
 		if (adapterObj) return;
 
 		try {
@@ -420,7 +564,7 @@ export class AdapterManager {
 
 			const client = await amqp.connect(connSettings.url);
 
-			this.adapters.set(`${resource.idd}-rw`, {
+			this.adapters.set(resource.idd, {
 				type,
 				instance,
 				iid,
@@ -436,7 +580,7 @@ export class AdapterManager {
 	 */
 	async connectToKafka(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid, false);
+		const adapterObj = this.getAdapterObject2(resource.iid);
 		if (adapterObj) return;
 
 		try {
@@ -477,7 +621,7 @@ export class AdapterManager {
 			const admin = kafka.admin();
 			await admin.connect();
 
-			this.adapters.set(`${resource.idd}-rw`, {
+			this.adapters.set(resource.idd, {
 				type,
 				instance,
 				iid,
@@ -493,7 +637,7 @@ export class AdapterManager {
 	 */
 	async connectToAWSStorage(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid, false);
+		const adapterObj = this.getAdapterObject2(resource.iid);
 		if (adapterObj) return;
 
 		try {
@@ -509,7 +653,7 @@ export class AdapterManager {
 				region: connSettings.region,
 			});
 
-			this.adapters.set(`${resource.idd}-rw`, {
+			this.adapters.set(resource.idd, {
 				type,
 				instance,
 				iid,
@@ -525,7 +669,7 @@ export class AdapterManager {
 	 */
 	async connectToGCPStorage(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid, false);
+		const adapterObj = this.getAdapterObject2(resource.iid);
 		if (adapterObj) return;
 
 		try {
@@ -538,7 +682,7 @@ export class AdapterManager {
 				credentials: JSON.parse(connSettings.keyFileContents),
 			});
 
-			this.adapters.set(`${resource.idd}-rw`, {
+			this.adapters.set(resource.idd, {
 				type,
 				instance,
 				iid,
@@ -566,7 +710,7 @@ export class AdapterManager {
 				connSettings.connectionString
 			);
 
-			this.adapters.set(`${resource.idd}-rw`, {
+			this.adapters.set(resource.idd, {
 				type,
 				instance,
 				iid,
@@ -582,7 +726,7 @@ export class AdapterManager {
 	 */
 	async connectToClusterStorage(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid, false);
+		const adapterObj = this.getAdapterObject2(resource.iid);
 		if (adapterObj) return;
 
 		try {
@@ -592,7 +736,7 @@ export class AdapterManager {
 
 			const pvcStorage = new PVCStorage(connSettings.mountPath);
 
-			this.adapters.set(`${resource.idd}-rw`, {
+			this.adapters.set(resource.idd, {
 				type,
 				instance,
 				iid,
@@ -608,7 +752,7 @@ export class AdapterManager {
 	 */
 	async connectToRealtimeServer(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid, false);
+		const adapterObj = this.getAdapterObject2(resource.iid);
 		if (adapterObj) return;
 
 		try {
@@ -622,7 +766,7 @@ export class AdapterManager {
 				transports: ["websocket", "polling"],
 			});
 
-			this.adapters.set(`${resource.idd}-rw`, {
+			this.adapters.set(resource.idd, {
 				type,
 				instance,
 				iid,
@@ -638,13 +782,13 @@ export class AdapterManager {
 	 */
 	async connectToScheduler(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid, false);
+		const adapterObj = this.getAdapterObject2(resource.iid);
 		if (adapterObj) return;
 
 		try {
 			const { iid, instance, type } = resource;
 
-			this.adapters.set(`${resource.idd}-rw`, {
+			this.adapters.set(resource.idd, {
 				type,
 				instance,
 				iid,

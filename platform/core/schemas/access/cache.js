@@ -44,20 +44,22 @@ export default [
 		})
 		.withMessage(t("Database number needs to be an integer between 0-15"))
 		.toInt(),
-	body("accessReadOnly.host")
+	body("accessReadOnly.*.host")
 		.if(
 			(value, { req }) =>
 				req.body.accessReadOnly &&
+				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "cache" &&
 				cacheTypes.includes(req.body.instance)
 		)
 		.trim()
 		.notEmpty()
 		.withMessage(t("Required field, cannot be left empty")),
-	body("accessReadOnly.port")
+	body("accessReadOnly.*.port")
 		.if(
 			(value, { req }) =>
 				req.body.accessReadOnly &&
+				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "cache" &&
 				cacheTypes.includes(req.body.instance)
 		)
@@ -71,18 +73,20 @@ export default [
 		})
 		.withMessage(t("Port number needs to be an integer between 0-65535"))
 		.toInt(),
-	body("accessReadOnly.password")
+	body("accessReadOnly.*.password")
 		.if(
 			(value, { req }) =>
 				req.body.accessReadOnly &&
+				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "cache" &&
 				cacheTypes.includes(req.body.instance)
 		)
 		.optional(),
-	body("accessReadOnly.databaseNumber")
+	body("accessReadOnly.*.databaseNumber")
 		.if(
 			(value, { req }) =>
 				req.body.accessReadOnly &&
+				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "cache" &&
 				cacheTypes.includes(req.body.instance)
 		)

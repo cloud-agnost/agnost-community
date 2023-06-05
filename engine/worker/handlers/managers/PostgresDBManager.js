@@ -2,8 +2,8 @@ import PostgresSQLDriver from "../sql-database/drivers/PostgresSQLDriver.js";
 import { SQLBaseManager } from "./SQLBaseManager.js";
 
 export class PostgresDBManager extends SQLBaseManager {
-	constructor(dbConfig, prevDbConfig, addLogFn) {
-		super(dbConfig, prevDbConfig, addLogFn, PostgresSQLDriver);
+	constructor(env, dbConfig, prevDbConfig, addLogFn) {
+		super(env, dbConfig, prevDbConfig, addLogFn, PostgresSQLDriver);
 	}
 
 	beginSession() {

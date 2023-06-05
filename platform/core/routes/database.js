@@ -3,6 +3,7 @@ import dbCtrl from "../controllers/database.js";
 import modelCtrl from "../controllers/model.js";
 import envCtrl from "../controllers/environment.js";
 import auditCtrl from "../controllers/audit.js";
+import deployCtrl from "../controllers/deployment.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
@@ -60,28 +61,61 @@ router.post(
 	applyRules("create"),
 	validate,
 	async (req, res) => {
+		const session = await dbCtrl.startSession();
 		try {
-			const { org, user, app, version } = req;
+			const { org, user, app, version, resource } = req;
 			const { name, type, managed } = req.body;
 
 			// Create the database
 			let dbId = helper.generateId();
+			let dbiid = helper.generateSlug("db");
 			let db = await dbCtrl.create(
 				{
 					_id: dbId,
 					orgId: org._id,
 					appId: app._id,
 					versionId: version._id,
-					iid: helper.generateSlug("db"),
+					iid: dbiid,
 					name,
 					type,
 					managed,
 					createdBy: user._id,
 				},
-				{ cacheKey: dbId }
+				{ cacheKey: dbId, session }
 			);
 
+			// Add mapping to the environment
+			const env = await envCtrl.getOneByQuery({
+				orgId: org._id,
+				appId: app._id,
+				versionId: version._id,
+			});
+
+			await envCtrl.pushObjectById(
+				env._id,
+				"mappings",
+				{
+					design: {
+						iid: dbiid,
+						type: "database",
+						name: name,
+					},
+					resource: {
+						iid: resource.iid,
+						name: resource.name,
+						type: resource.type,
+						instance: resource.instance,
+					},
+				},
+				{ updatedBy: user._id },
+				{ cacheKey: env._id, session }
+			);
+
+			await dbCtrl.commit(session);
 			res.json(db);
+
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(app, version, user, db, "create-db");
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -94,6 +128,7 @@ router.post(
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
+			await dbCtrl.rollback(session);
 			handleError(req, res, err);
 		}
 	}

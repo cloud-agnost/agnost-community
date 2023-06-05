@@ -2,8 +2,8 @@ import { SQLBaseManager } from "./SQLBaseManager.js";
 import MySQLDriver from "../sql-database/drivers/MySQLDriver.js";
 
 export class MySQLDBManager extends SQLBaseManager {
-	constructor(dbConfig, prevDbConfig, addLogFn) {
-		super(dbConfig, prevDbConfig, addLogFn, MySQLDriver);
+	constructor(env, dbConfig, prevDbConfig, addLogFn) {
+		super(env, dbConfig, prevDbConfig, addLogFn, MySQLDriver);
 	}
 
 	beginSession() {

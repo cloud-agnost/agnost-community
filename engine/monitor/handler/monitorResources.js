@@ -172,17 +172,28 @@ async function getResources(pageNumber, pageSize) {
  * @param  {Object} access The encrypted access settings needed to connect to the resource
  */
 function decryptSensitiveData(access) {
+	if (Array.isArray(access)) {
+		let list = [];
+		access.forEach((entry) => {
+			list.push(decryptSensitiveData(entry));
+		});
+
+		return list;
+	}
+
 	let decrypted = {};
 	for (const key in access) {
 		const value = access[key];
-		if (typeof value === "object" && value !== null) {
-			decrypted[key] = decryptSensitiveData(value);
-		} else if (Array.isArray(value)) {
+		if (Array.isArray(value)) {
 			decrypted[key] = value.map((entry) => {
+				if (entry && typeof entry === "object")
+					return decryptSensitiveData(entry);
 				if (entry && typeof entry === "string")
 					return helper.decryptText(entry);
 				else return entry;
 			});
+		} else if (typeof value === "object" && value !== null) {
+			decrypted[key] = decryptSensitiveData(value);
 		} else if (value && typeof value === "string")
 			decrypted[key] = helper.decryptText(value);
 		else decrypted[key] = value;
