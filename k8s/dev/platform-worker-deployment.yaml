@@ -57,31 +57,6 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: queueHost
-                 - name: EMAIL_SERVER_HOST
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: emailServerHost
-                 - name: EMAIL_SERVER_PORT
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: emailServerPort
-                 - name: EMAIL_SERVER_SECURE
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: emailServerSecure
-                 - name: EMAIL_SERVER_USER
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: emailServerUser
-                 - name: EMAIL_SERVER_PWD
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: emailServerPwd
                  - name: CLUSTER_DB_URI
                    valueFrom:
                       secretKeyRef:

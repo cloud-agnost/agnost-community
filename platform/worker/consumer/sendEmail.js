@@ -1,7 +1,7 @@
 import Email from "email-templates";
 import path from "path";
 import { fileURLToPath } from "url";
-import { transporter } from "../util/transporter.js";
+import { getTransport } from "../util/transporter.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,8 +29,18 @@ export const sendEmail = (connection, queue, template) => {
 
 		channel.consume(
 			queue,
-			function (msg) {
+			async function (msg) {
 				let msgObj = JSON.parse(msg.content.toString());
+				const transporter = await getTransport();
+				if (!transporter) {
+					channel.ack(msg);
+					logger.error(
+						`Send email failed: ${queue}. SMTP server configuration has not beeen specifiec.`
+					);
+
+					return;
+				}
+
 				const email = new Email({
 					send: true,
 					preview: false,

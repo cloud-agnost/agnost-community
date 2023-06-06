@@ -16,6 +16,17 @@ const constants = {
 };
 
 /**
+ * Check whether the input value is a JS objet or not
+ * @param  {object} input
+ */
+function isObject(value) {
+	if (typeof value === "object" && !Array.isArray(value) && value !== null)
+		return true;
+
+	return false;
+}
+
+/**
  * Check whether the input json object is empty or not. If a json object is {} this function returns true
  * @param  {object} input
  */
@@ -288,6 +299,7 @@ function getAsObject(keyValuePairs) {
 
 export default {
 	constants,
+	isObject,
 	isEmptyJson,
 	getIP,
 	generateColor,

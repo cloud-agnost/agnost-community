@@ -4,6 +4,7 @@ import {
 	providerTypes,
 	notificationTypes,
 	userStatus,
+	appRoles,
 } from "../config/constants.js";
 import userCtrl from "../controllers/user.js";
 
@@ -195,7 +196,131 @@ export const applyRules = (type) => {
 						)
 					),
 			];
-		case "complete-setup":
+		case "finalize-cluster-setup":
+			return [
+				body("orgName")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isLength({ max: config.get("general.maxTextLength") })
+					.withMessage(
+						t(
+							"Name must be at most %s characters long",
+							config.get("general.maxTextLength")
+						)
+					),
+				body("appName")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isLength({ max: config.get("general.maxTextLength") })
+					.withMessage(
+						t(
+							"Name must be at most %s characters long",
+							config.get("general.maxTextLength")
+						)
+					),
+				body("smtp")
+					.optional()
+					.custom(async (value) => {
+						if (!helper.isObject(value)) {
+							throw new AgnostError(
+								t("SMTP server configuration needs to be provides as an object")
+							);
+						}
+
+						return true;
+					}),
+				body("smtp.host")
+					.if(
+						(value, { req }) => req.body.smtp && helper.isObject(req.body.smtp)
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("smtp.port")
+					.if(
+						(value, { req }) => req.body.smtp && helper.isObject(req.body.smtp)
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isInt({
+						min: 0,
+						max: 65535,
+					})
+					.withMessage(t("Port number needs to be an integer between 0-65535"))
+					.toInt(),
+				body("smtp.useTLS")
+					.if(
+						(value, { req }) => req.body.smtp && helper.isObject(req.body.smtp)
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
+				body("smtp.user")
+					.if(
+						(value, { req }) => req.body.smtp && helper.isObject(req.body.smtp)
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("smtp.password")
+					.if(
+						(value, { req }) => req.body.smtp && helper.isObject(req.body.smtp)
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("appMembers")
+					.optional()
+					.if(
+						(value, { req }) => req.body.smtp && helper.isObject(req.body.smtp)
+					)
+					.isArray()
+					.withMessage(t("App members list need to be an array of objects")),
+				body("appMembers.*")
+					.optional()
+					.custom(async (value) => {
+						if (!helper.isObject(value)) {
+							throw new AgnostError(
+								t("App member invitaion needs to be provides as an object")
+							);
+						}
+
+						return true;
+					}),
+				body("appMembers.*.email")
+					.if(
+						(value, { req }) => req.body.smtp && helper.isObject(req.body.smtp)
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isEmail()
+					.withMessage(t("Not a valid email address"))
+					.bail()
+					.normalizeEmail({ gmail_remove_dots: false }),
+				body("appMembers.*.role")
+					.if(
+						(value, { req }) => req.body.smtp && helper.isObject(req.body.smtp)
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(appRoles)
+					.withMessage(t("Unsupported app member role")),
+			];
+		case "finalize-account-setup":
 			return [
 				body("email")
 					.trim()
@@ -338,7 +463,7 @@ export const applyRules = (type) => {
 			];
 		case "change-contact-email":
 		case "reset-password-init":
-		case "initiate-setup":
+		case "init-account-setup":
 			return [
 				body("email")
 					.trim()
@@ -439,7 +564,7 @@ export const applyRules = (type) => {
 						return true;
 					}),
 			];
-		case "setup":
+		case "complete-setup":
 			return [
 				body("email")
 					.trim()

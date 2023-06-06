@@ -62,13 +62,16 @@ class VersionController extends BaseController {
 		);
 
 		// Get the default cluster resources
-		let defaultResources = await resourceCtrl.getManyByQuery({
-			orgId: org._id,
-			$or: [
-				{ instance: "Default Scheduler" },
-				{ instance: "Default Realtime" },
-			],
-		});
+		let defaultResources = await resourceCtrl.getManyByQuery(
+			{
+				orgId: org._id,
+				$or: [
+					{ instance: "Default Scheduler" },
+					{ instance: "Default Realtime" },
+				],
+			},
+			{ session }
+		);
 
 		const mappings = [
 			{

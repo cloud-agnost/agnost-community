@@ -1,14 +1,35 @@
+import axios from "axios";
 import nodemailer from "nodemailer";
 import config from "config";
 
-// Create email connection to SMTP server
-export const transporter = nodemailer.createTransport({
-	host: process.env.EMAIL_SERVER_HOST,
-	port: process.env.EMAIL_SERVER_PORT,
-	secure: process.env.EMAIL_SERVER_SECURE === "false" ? false : true,
-	auth: {
-		user: process.env.EMAIL_SERVER_USER,
-		pass: process.env.EMAIL_SERVER_PWD,
-	},
-	pool: config.get("emailServer.pool"),
-});
+var transporter = null;
+
+export async function getTransport() {
+	if (transporter) return transporter;
+
+	// Get the SMTP server configuration. Make api call to the platform to log the error message
+	try {
+		const smtpConfig = axios.post(
+			config.get("general.platformBaseUrl") + "/v1/cluster/smtp",
+			{
+				headers: {
+					Authorization: process.env.MASTER_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
+
+		transporter = nodemailer.createTransport({
+			host: smtpConfig.host,
+			port: smtpConfig.port,
+			secure: smtpConfig.useTLS,
+			auth: {
+				user: smtpConfig.user,
+				pass: smtpConfig.password,
+			},
+			pool: config.get("emailServer.pool"),
+		});
+
+		return transporter;
+	} catch (err) {}
+}

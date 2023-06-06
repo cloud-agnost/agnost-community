@@ -384,7 +384,6 @@ router.post(
 	applyLogRules("update"),
 	validate,
 	async (req, res) => {
-		const session = await envCtrl.startSession();
 		try {
 			const { org, app, version, env, log } = req;
 			const { status, logs, type, pod } = req.body;
@@ -419,7 +418,7 @@ router.post(
 				env._id,
 				dataSet,
 				{},
-				{ cacheKey: env._id, session }
+				{ cacheKey: env._id }
 			);
 
 			if (type === "db") {
@@ -431,8 +430,7 @@ router.post(
 						dbLogs: logs,
 						updatedAt: timestamp,
 					},
-					{},
-					{ session }
+					{}
 				);
 			} else if (type === "server") {
 				const newLogs = log.serverLogs || [];
@@ -445,8 +443,7 @@ router.post(
 						serverLogs: newLogs,
 						updatedAt: timestamp,
 					},
-					{},
-					{ session }
+					{}
 				);
 			} else {
 				// Update environment log data
@@ -457,12 +454,10 @@ router.post(
 						schedulerLogs: logs,
 						updatedAt: timestamp,
 					},
-					{},
-					{ session }
+					{}
 				);
 			}
 
-			await envCtrl.commit(session);
 			res.json(updatedEnv);
 
 			// Log action
@@ -489,7 +484,6 @@ router.post(
 				}
 			);
 		} catch (error) {
-			await envCtrl.rollback(session);
 			handleError(req, res, error);
 		}
 	}

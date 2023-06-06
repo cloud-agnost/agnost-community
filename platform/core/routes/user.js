@@ -908,7 +908,7 @@ router.post(
 			await userCtrl.commit(session);
 
 			// Return the organization object the user is added as a mamber
-			res.json({ ...invite.orgId, role: invite.role, user });
+			res.json({ org: invite.orgId, role: invite.role, user });
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1070,7 +1070,7 @@ router.post(
 			await userCtrl.commit(session);
 
 			// Return the app object the user is added as a mamber
-			res.json({ ...updatedApp, role: invite.role, user });
+			res.json({ app: updatedApp, role: invite.role, user });
 
 			// Log action
 			auditCtrl.logAndNotify(
