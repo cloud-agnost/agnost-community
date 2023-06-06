@@ -1,9 +1,9 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter } from 'react-router-dom';
 
 const router = createBrowserRouter([
 	{
-		path: "/",
-		element: <div>Hello Agnost</div>,
+		path: '/',
+		element: <div className=' font-bold text-element-strong-blue text-3xl'>Hello Agnost</div>,
 	},
 ]);
 
