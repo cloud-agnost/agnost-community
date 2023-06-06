@@ -1,23 +1,26 @@
-import * as React from 'react';
+import { cn } from '@/utils';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
-
-import { cn } from '../../utils';
+import * as React from 'react';
+import './Button.scss';
 
 const buttonVariants = cva('btn', {
 	variants: {
 		variant: {
-			default: 'bg-blue-500 text-white hover:bg-blue-400',
+			primary: 'btn-primary',
+			secondary: 'btn-secondary',
+			destructive: 'btn-destructive',
+			text: 'btn-text',
+			link: 'btn-link',
 		},
 		size: {
-			default: 'h-10 py-2 px-4',
-			sm: 'h-9 px-3 rounded-md',
-			lg: 'h-11 px-8 rounded-md',
+			md: 'btn-md',
+			sm: 'btn-sm',
 		},
 	},
 	defaultVariants: {
-		variant: 'default',
-		size: 'default',
+		variant: 'primary',
+		size: 'md',
 	},
 });
 
