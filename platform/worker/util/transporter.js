@@ -3,9 +3,9 @@ import config from "config";
 
 // Create email connection to SMTP server
 export const transporter = nodemailer.createTransport({
-	host: config.get("emailServer.host"),
-	port: config.get("emailServer.port"),
-	secure: config.get("emailServer.secure"),
+	host: process.env.EMAIL_SERVER_HOST,
+	port: process.env.EMAIL_SERVER_PORT,
+	secure: process.env.EMAIL_SERVER_SECURE === "false" ? false : true,
 	auth: {
 		user: process.env.EMAIL_SERVER_USER,
 		pass: process.env.EMAIL_SERVER_PWD,

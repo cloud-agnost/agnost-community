@@ -1070,7 +1070,7 @@ router.post(
 			await userCtrl.commit(session);
 
 			// Return the app object the user is added as a mamber
-			res.json(updatedApp);
+			res.json({ ...updatedApp, role: invite.role, user });
 
 			// Log action
 			auditCtrl.logAndNotify(

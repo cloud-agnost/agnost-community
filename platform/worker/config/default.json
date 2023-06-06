@@ -24,9 +24,6 @@
         "minPoolSize": 3
      },
      "emailServer": {
-      "host": "smtp.mandrillapp.com",
-      "port": 587,
-      "secure": false,
       "pool": true
    },
    "general": {  

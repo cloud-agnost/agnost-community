@@ -113,6 +113,7 @@ async function initExpress(i18n) {
 	app.use("/", (await import("./routes/system.js")).default);
 	// Serve static files from the storage directory
 	app.use("/storage", express.static(config.get("general.storageDirectory")));
+	app.use("/v1/cluster", (await import("./routes/cluster.js")).default);
 	app.use("/v1/engine", (await import("./routes/engine.js")).default);
 	app.use("/v1/platform", (await import("./routes/platform.js")).default);
 	app.use("/v1/telemetry", (await import("./routes/telemetry.js")).default);
