@@ -41,7 +41,7 @@
 		--error-hover: rgba(241, 99, 133, 1);
 		--error-focus: rgba(119, 34, 55, 1);
 
-		--theme-base-background: rgb(1, 1, 1);
+		--theme-base-background: rgb(255, 255, 255);
 		--theme-subtle-background: rgba(249, 249, 251, 1);
 		--theme-lighter-background: rgba(237, 238, 243, 1);
 		--theme-border: rgba(237, 238, 243, 1);
@@ -65,9 +65,11 @@
 		--button-background-hover-primary: rgba(104, 132, 253, 1);
 		--button-background-base-secondary: rgba(237, 238, 243, 1);
 		--button-background-hover-secondary: rgba(219, 221, 230, 1);
-		--button-background-border-secondary: rgba(219, 221, 230, 1);
-		--button-background-border-hover-secondary: rgba(146, 154, 181, 1);
 		--button-background-disabled: rgba(249, 249, 251, 1);
+
+		--button-border-hover: rgba(146, 154, 181, 1);
+		--button-border-disabled: rgba(249, 249, 251, 1);
+		--button-border-base: rgba(219, 221, 230, 1);
 
 		--surface-blue: rgba(219, 226, 255, 1);
 		--surface-green: rgba(207, 241, 225, 1);
@@ -182,13 +184,15 @@
 		--icon-base: rgba(146, 154, 181, 1);
 		--icon-disable: rgba(99, 111, 146, 1);
 
-		--button-background-base-primary: rgba(74, 108, 253, 1);
-		--button-background-hover-primary: rgba(104, 132, 253, 1);
 		--button-background-base-secondary: rgba(50, 56, 73, 1);
 		--button-background-hover-secondary: rgba(66, 74, 97, 1);
 		--button-background-border-secondary: rgba(70, 71, 78, 1);
 		--button-background-border-hover-secondary: rgba(99, 111, 146, 1);
 		--button-background-disabled: rgba(33, 37, 48, 1);
+
+		--button-border-hover: rgba(66, 74, 97, 1);
+		--button-border-disabled: rgba(33, 37, 48, 1);
+		--button-border-base: rgba(70, 71, 78, 1);
 
 		--wrapper-background-base: rgba(33, 37, 48, 1);
 		--wrapper-background-hover: rgba(50, 56, 73, 1);

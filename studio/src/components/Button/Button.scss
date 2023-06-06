@@ -9,14 +9,21 @@
 	@apply bg-button-primary hover:bg-button-primary-hover text-white focus-visible:ring-button-primary;
 }
 .btn-secondary {
-	@apply bg-button-secondary hover:bg-button-secondary-hover text-white focus-visible:ring-button-secondary;
+	@apply bg-button-secondary hover:bg-button-secondary-hover text-base focus-visible:ring-button-secondary;
+	@apply border border-button-border hover:border-button-border-hover;
 }
-
+.btn:disabled.btn-secondary {
+	@apply bg-button-disabled;
+}
 .btn-text {
-	@apply text-white hover:bg-button-secondary-hover focus-visible:ring-button-secondary;
+	@apply text-base hover:bg-button-secondary-hover focus-visible:ring-button-secondary;
 }
 .btn-link {
 	@apply text-button-primary hover:underline hover:text-button-primary-hover focus-visible:ring-button-secondary;
+}
+.btn:disabled.btn-link,
+.btn:disabled.btn-text {
+	@apply bg-transparent;
 }
 .btn-md {
 	@apply h-9 py-2 px-4;
@@ -26,4 +33,7 @@
 }
 .btn-full {
 	@apply w-full;
+}
+.btn:disabled {
+	@apply bg-button-disabled text-disabled;
 }
