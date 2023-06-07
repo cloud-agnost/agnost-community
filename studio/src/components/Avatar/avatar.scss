@@ -1,0 +1,25 @@
+.avatar {
+	@apply relative flex shrink-0 overflow-hidden rounded-full;
+	&-image {
+		@apply aspect-square h-full w-full;
+	}
+	&-fallback {
+		@apply flex h-full w-full items-center justify-center rounded-full;
+		@apply bg-text-disabled text-default;
+	}
+	&-xs {
+		@apply w-4 h-4 text-xs;
+	}
+	&-sm {
+		@apply w-8 h-8 text-sm;
+	}
+	&-md {
+		@apply w-10 h-10 text-base;
+	}
+	&-lg {
+		@apply w-16 h-16 text-2xl;
+	}
+	&-xl {
+		@apply w-32 h-32 text-6xl;
+	}
+}
