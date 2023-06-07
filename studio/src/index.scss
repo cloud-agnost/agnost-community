@@ -215,4 +215,7 @@
 		// @apply bg-base text-foreground;
 		font-feature-settings: 'rlig' 1, 'calt' 1;
 	}
+	.loading {
+		@apply animate-spin mr-2;
+	}
 }
