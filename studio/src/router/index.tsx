@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { Slider } from '@/components/Slider';
-import { AuthLayout } from '@/components/AuthLayout';
-import { OnboardingLayout } from '@/components/OnboardingLayout';
+import { AuthLayout } from '@/layouts/AuthLayout';
+import { OnboardingLayout } from '@/layouts/OnboardingLayout';
 
 const items = [
 	{
