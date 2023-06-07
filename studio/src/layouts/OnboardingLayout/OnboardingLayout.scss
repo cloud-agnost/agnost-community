@@ -1,0 +1,20 @@
+.onboarding-layout {
+	@apply grid grid-cols-[346px_auto] h-screen;
+	@apply bg-subtle;
+
+	.onboarding-layout-left {
+		@apply dark:bg-base p-16 flex flex-col items-center gap-y-16;
+	}
+
+	.onboarding-layout-right {
+		@apply p-16;
+	}
+
+	.onboarding-layout-app-logo {
+		@apply w-36 self-start;
+	}
+
+	.onboarding-stepper {
+		@apply w-full;
+	}
+}

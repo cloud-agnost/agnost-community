@@ -1,0 +1,16 @@
+.auth-layout {
+	@apply grid grid-cols-2 h-screen;
+	@apply bg-subtle;
+
+	.auth-layout-left {
+		@apply p-16;
+	}
+
+	.auth-layout-right {
+		@apply dark:bg-base py-28 px-[74px];
+	}
+
+	.auth-layout-app-logo {
+		@apply mb-24;
+	}
+}

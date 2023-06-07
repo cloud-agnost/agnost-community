@@ -26,6 +26,7 @@
 		"react-hook-form": "^7.44.3",
 		"react-i18next": "^12.3.1",
 		"react-router-dom": "^6.11.2",
+		"swiper": "^9.3.2",
 		"tailwind-merge": "^1.13.0",
 		"zod": "^3.21.4"
 	},
