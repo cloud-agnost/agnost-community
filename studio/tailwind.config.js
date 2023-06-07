@@ -1,7 +1,7 @@
 import { fontFamily } from 'tailwindcss/defaultTheme';
 /** @type {import('tailwindcss').Config} */
 export default {
-	darkMode: ['class'],
+	darkMode: ['class', '[data-mode="dark"]'],
 	content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
 	theme: {
 		container: {
@@ -74,12 +74,11 @@ export default {
 				button: {
 					primary: 'var(--button-background-base-primary)',
 					'primary-hover': 'var(--button-background-hover-primary)',
-
 					secondary: 'var(--button-background-base-secondary)',
 					'secondary-hover': 'var(--button-background-hover-secondary)',
-					'border-secondary': 'var(--button-background-border-secondary)',
-
-					'border-hover': 'var(--button-background-border-hover-secondary)',
+					border: 'var(--button-border-base)',
+					'border-hover': 'var(--button-border-hover)',
+					'border-disabled': 'var(--button-border-disabled)',
 					disabled: 'var(--button-background-disabled)',
 				},
 				surface: {
