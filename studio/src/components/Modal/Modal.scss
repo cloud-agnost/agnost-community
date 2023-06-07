@@ -1,0 +1,12 @@
+.modal {
+	@apply fixed inset-0 z-50 flex items-center justify-center bg-base/80;
+
+	.modal-body {
+		width: min(100% - 2rem, 570px);
+		@apply relative bg-subtle rounded-lg p-6;
+
+		.modal-close {
+			@apply absolute top-4 right-4;
+		}
+	}
+}
