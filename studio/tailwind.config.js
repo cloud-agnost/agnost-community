@@ -92,6 +92,7 @@ export default {
 				wrapper: {
 					'background-base': 'var(--wrapper-background-base)',
 					'background-hover': 'var(--wrapper-background-hover)',
+					'background-base-light': 'var(--wrapper-background-base-light)',
 				},
 
 				red: {
