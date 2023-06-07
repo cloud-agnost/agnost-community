@@ -10,7 +10,7 @@
 		@apply border-error-default;
 	}
 	&-wrapper {
-		@apply relative flex flex-col w-full max-w-sm;
+		@apply relative flex flex-col w-full max-w-sm relative;
 	}
 	&-description {
 		@apply text-xs text-subtle;
