@@ -1,4 +1,5 @@
 import './Stepper.scss';
+import { cn } from '@/utils';
 
 const steps = [
 	{
@@ -28,9 +29,9 @@ const steps = [
 	},
 ];
 
-export default function Stepper() {
+export default function Stepper({ classname }: { classname?: string }) {
 	return (
-		<ol className='auth-stepper'>
+		<ol className={cn('auth-stepper', classname)}>
 			{steps.map(({ text, isDone, isActive }, index) => (
 				<>
 					<li className='auth-stepper-item' data-is-active={isActive} data-is-done={isDone}>
