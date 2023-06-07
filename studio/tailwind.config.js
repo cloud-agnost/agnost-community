@@ -93,6 +93,11 @@ export default {
 					'background-base': 'var(--wrapper-background-base)',
 					'background-hover': 'var(--wrapper-background-hover)',
 				},
+				text: {
+					default: 'var(--text-base)',
+					subtle: 'var(--text-subtle)',
+					disabled: 'var(--text-disabled)',
+				},
 
 				red: {
 					DEFAULT: 'var(--red-500)',
@@ -184,6 +189,9 @@ export default {
 				default: 'var(--text-base)',
 				subtle: 'var(--text-subtle)',
 				disabled: 'var(--text-disabled)',
+			},
+			fontSize: {
+				xs: 'var(--font-size-xs)',
 			},
 			borderRadius: {
 				lg: `var(--radius)`,
