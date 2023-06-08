@@ -1,0 +1,8 @@
+.description {
+	&-title {
+		@apply text-default text-xl	leading-8 font-semibold mb-2;
+	}
+	&-content {
+		@apply text-sm dark:text-subtle font-normal leading-6;
+	}
+}
