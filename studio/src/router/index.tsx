@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { Slider } from '@/components/Slider';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import { OnboardingLayout } from '@/layouts/OnboardingLayout';
+import { Description } from '@/components/Description';
 
 const items = [
 	{
@@ -29,7 +30,13 @@ const router = createBrowserRouter([
 	},
 	{
 		path: '/login',
-		element: <AuthLayout>Özgür ÖZALP</AuthLayout>,
+		element: (
+			<AuthLayout>
+				<Description title='Login to your account'>
+					Welcome back! Please enter your details.
+				</Description>
+			</AuthLayout>
+		),
 	},
 	{
 		path: '/onboarding',
