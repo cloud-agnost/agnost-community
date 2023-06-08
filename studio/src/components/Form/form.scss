@@ -1,0 +1,9 @@
+.form {
+	&-message {
+		@apply text-error-default;
+	}
+
+	&-description {
+		@apply text-sm text-subtle;
+	}
+}
