@@ -95,19 +95,13 @@ export default {
 					'background-base-light': 'var(--wrapper-background-base-light)',
 				},
 				text: {
-					default: 'var(--text-base)',
-					subtle: 'var(--text-subtle)',
-					disabled: 'var(--text-disabled)',
+					default: 'rgba(var(--text-base), <alpha-value>)',
+					subtle: 'rgba(var(--text-subtle), <alpha-value>)',
+					disabled: 'rgba(var(--text-disabled), <alpha-value>)',
 					'background-base': 'rgba(var(--wrapper-background-base), <alpha-value>)',
 					'background-hover': 'rgba(var(--wrapper-background-hover), <alpha-value>)',
 					'background-base-light': 'rgba(var(--wrapper-background-base-light), <alpha-value>)',
 				},
-				text: {
-					default: 'rgba(var(--text-base), <alpha-value>)',
-					subtle: 'rgba(var(--text-subtle), <alpha-value>)',
-					disabled: 'rgba(var(--text-disabled), <alpha-value>)',
-				},
-
 				red: {
 					DEFAULT: 'rgba(var(--red-500), <alpha-value>)',
 					50: 'rgba(var(--red-50), <alpha-value>)',

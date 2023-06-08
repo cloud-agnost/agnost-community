@@ -7,4 +7,4 @@ export {
 	SelectLabel,
 	SelectItem,
 	SelectSeparator,
-} from './select';
+} from './Select';

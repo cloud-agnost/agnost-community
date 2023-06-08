@@ -1,52 +1,74 @@
 import { createBrowserRouter } from 'react-router-dom';
-import { Slider } from '@/components/Slider';
 import { AuthLayout } from '@/layouts/AuthLayout';
-import { OnboardingLayout } from '@/layouts/OnboardingLayout';
 import { Description } from '@/components/Description';
-import { Modal } from '@/components/Modal';
-
-
-const items = [
-	{
-		text: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. A architecto assumenda explicabo ipsa modi nesciunt nisi, nobis, provident quaerat qui quis, saepe sed sint soluta sunt voluptatem voluptatibus! Animi, officiis?',
-		element: <img src='https://shaders-slider.uiinitiative.com/images/01.jpg' alt='' />,
-	},
-	{
-		text: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. A architecto assumenda explicabo ipsa modi nesciunt nisi, nobis, provident quaerat qui quis, saepe sed sint soluta sunt voluptatem voluptatibus! Animi, officiis?',
-		element: <img src='https://shaders-slider.uiinitiative.com/images/02.jpg' alt='' />,
-	},
-];
+import { Root } from '@/pages/root';
+import {
+	AccountInformation,
+	CreateApp,
+	CreateOrganization,
+	InviteTeamMembers,
+	Onboarding,
+	SMTPConfiguration,
+} from '@/pages/onboarding';
+import { Organization, SelectOrganization } from '@/pages/organization';
 
 const router = createBrowserRouter([
 	{
 		path: '/',
-		element: <div className=' font-bold text-element-strong-blue text-3xl'>Hello Agnost</div>,
+		loader: Root.loader,
+		element: <Root />,
+		children: [
+			{
+				path: '/login',
+				element: (
+					<AuthLayout>
+						<Description title='Login to your account'>
+							Welcome back! Please enter your details.
+						</Description>
+					</AuthLayout>
+				),
+			},
+			{
+				path: '/organization',
+				element: <Organization />,
+				children: [
+					{
+						path: '',
+						element: <SelectOrganization />,
+					},
+				],
+			},
+			{
+				path: '/organization/:id',
+			},
+		],
 	},
 	{
-		path: '/slider',
-		element: (
-			<div className='flex p-10 items-center justify-center'>
-				<Slider items={items} />
-			</div>
-		),
-	},
-	{
-		path: '/login',
-		element: (
-			<AuthLayout>
-				<Description title='Login to your account'>
-					Welcome back! Please enter your details.
-				</Description>
-			</AuthLayout>
-		),
-	},
-	{
+		loader: Onboarding.loader,
 		path: '/onboarding',
-		element: (
-			<OnboardingLayout>
-				<Modal.Demo />
-			</OnboardingLayout>
-		),
+		element: <Onboarding />,
+		children: [
+			{
+				path: '',
+				element: <AccountInformation />,
+			},
+			{
+				path: 'create-organization',
+				element: <CreateOrganization />,
+			},
+			{
+				path: 'create-app',
+				element: <CreateApp />,
+			},
+			{
+				path: 'smtp-configuration',
+				element: <SMTPConfiguration />,
+			},
+			{
+				path: 'invite-team-members',
+				element: <InviteTeamMembers />,
+			},
+		],
 	},
 ]);
 
