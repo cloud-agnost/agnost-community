@@ -17,41 +17,32 @@ spec:
       spec:
          containers:
             - name: engine-realtime
-              image: agnost-enterprise/engine-realtime
+              image: agnost-community/engine/realtime
               imagePullPolicy: Never
               ports:
                  - containerPort: 4000
               env:
                  - name: CACHE_HOSTNAME
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: cacheHostname          
+                   value: redis-master       
                  - name: CACHE_READ_REPLICA_HOSTNAME
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: cacheReadReplicaHostname         
+                   value: redis-replicas         
                  - name: CACHE_PWD
                    valueFrom:
                       secretKeyRef:
-                         name: cluster-secrets
-                         key: cachePwd
+                         name: redis-password
+                         key: password
                  - name: CACHE_READ_REPLICA_PWD
                    valueFrom:
                       secretKeyRef:
-                         name: cluster-secrets
-                         key: cacheReadReplicaPwd
+                         name: redis-password
+                         key: password
                  - name: REALTIME_CACHE_HOSTNAME
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: realtimeCacheHostname           
+                   value: redis-master           
                  - name: REALTIME_CACHE_PWD
                    valueFrom:
                       secretKeyRef:
-                         name: cluster-secrets
-                         key: realtimeCachePwd
+                         name: redis-password
+                         key: password
                  - name: MASTER_TOKEN
                    valueFrom:
                       secretKeyRef:

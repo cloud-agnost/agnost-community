@@ -4,7 +4,7 @@ apiVersion: skaffold/v2alpha3
 kind: Config
 build:
    artifacts:
-      - image:  agnost-enterprise/platform-core
+      - image:  agnost-community/platform/core
         context: ../platform/core
         sync:
            infer:
@@ -12,7 +12,7 @@ build:
               - '**/*.json'
         docker:
            dockerfile: Dockerfile.dev
-      - image: agnost-enterprise/platform-worker
+      - image: agnost-community/platform/worker
         context: ../platform/worker
         sync:
            infer:
@@ -21,7 +21,7 @@ build:
               - '**/*.pug'
         docker:
            dockerfile: Dockerfile.dev
-      - image: agnost-enterprise/platform-sync
+      - image: agnost-community/platform/sync
         context: ../platform/sync
         sync:
            infer:
@@ -30,7 +30,7 @@ build:
               - '**/*.pug'
         docker:
            dockerfile: Dockerfile.dev
-      - image: agnost-enterprise/engine-core
+      - image: agnost-community/engine/core
         context: ../engine/core
         sync:
           infer:
@@ -38,7 +38,7 @@ build:
               - '**/*.json'
         docker:
           dockerfile: Dockerfile.dev
-      - image: agnost-enterprise/engine-worker
+      - image: agnost-community/engine/worker
         context: ../engine/worker
         sync:
           infer:
@@ -46,7 +46,7 @@ build:
               - '**/*.json'
         docker:
           dockerfile: Dockerfile.dev
-      - image: agnost-enterprise/engine-monitor
+      - image: agnost-community/engine/monitor
         context: ../engine/monitor
         sync:
           infer:
@@ -54,7 +54,7 @@ build:
               - '**/*.json'
         docker:
           dockerfile: Dockerfile.dev
-      - image: agnost-enterprise/engine-realtime
+      - image: agnost-community/engine/realtime
         context: ../engine/realtime
         sync:
           infer:
@@ -62,7 +62,7 @@ build:
               - '**/*.json'
         docker:
           dockerfile: Dockerfile.dev
-      - image: agnost-enterprise/engine-scheduler
+      - image: agnost-community/engine/scheduler
         context: ../engine/scheduler
         sync:
           infer:
@@ -70,7 +70,7 @@ build:
               - '**/*.json'
         docker:
           dockerfile: Dockerfile.dev
-      - image: agnost-enterprise/studio
+      - image: agnost-community/studio
         context: ../studio
         sync:
           infer:

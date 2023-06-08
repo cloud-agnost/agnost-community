@@ -464,8 +464,6 @@ export const applyRules = (type) => {
 						)
 					),
 			];
-		case "change-contact-email":
-		case "reset-password-init":
 		case "init-account-setup":
 			return [
 				body("email")
@@ -478,6 +476,23 @@ export const applyRules = (type) => {
 					.bail()
 					.normalizeEmail({ gmail_remove_dots: false }),
 			];
+		case "reset-password-init":
+		case "change-contact-email":
+			return [
+				body("email")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isEmail()
+					.withMessage(t("Not a valid email address"))
+					.bail()
+					.normalizeEmail({ gmail_remove_dots: false }),
+				body("uiBaseURL")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+			];
+
 		case "verify-token":
 			return [
 				param("token")
@@ -497,6 +512,9 @@ export const applyRules = (type) => {
 					.bail()
 					.normalizeEmail({ gmail_remove_dots: false }),
 				body("password")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("uiBaseURL")
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty")),
 			];

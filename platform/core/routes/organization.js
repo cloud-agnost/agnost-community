@@ -443,7 +443,7 @@ router.delete(
 );
 
 /*
-@route      /v1/org/:orgId/invite
+@route      /v1/org/:orgId/invite?&uiBaseURL=http://...
 @method     POST
 @desc       Invites user(s) to the organization
 @access     private
@@ -459,6 +459,7 @@ router.post(
 	async (req, res) => {
 		try {
 			const { user, org } = req;
+			const { uiBaseURL } = req.query;
 			// Prepare the invitations array to store in the database
 			let invitations = [];
 			req.body.forEach((entry) => {
@@ -479,7 +480,7 @@ router.post(
 					to: entry.email,
 					role: entry.role,
 					organization: org.name,
-					url: `${process.env.UI_BASE_URL}/v1/user/invitation/${entry.token}`,
+					url: `${uiBaseURL}/redirect-handle?token=${entry.token}&type=org-invite`,
 				});
 			});
 
@@ -637,7 +638,7 @@ router.put(
 );
 
 /*
-@route      /v1/org/:orgId/invite-resend?token=tkn_...
+@route      /v1/org/:orgId/invite-resend?token=tkn_...&uiBaseURL=http://...
 @method     POST
 @desc       Resends the organization invitation to the user email
 @access     private
@@ -652,7 +653,7 @@ router.post(
 	validate,
 	async (req, res) => {
 		try {
-			const { token } = req.query;
+			const { token, uiBaseURL } = req.query;
 			const { user, org } = req;
 
 			let invite = await orgInvitationCtrl.getOneByQuery({ token });
@@ -677,7 +678,7 @@ router.post(
 				to: invite.email,
 				role: invite.role,
 				organization: org.name,
-				url: `${process.env.UI_BASE_URL}/v1/user/invitation/${invite.token}`,
+				url: `${uiBaseURL}/redirect-handle?token=${invite.token}&type=org-invite`,
 			});
 
 			// If there are alreay user accounts with provided email then send them realtime notifications

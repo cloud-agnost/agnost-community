@@ -16,7 +16,7 @@ spec:
       spec:
          containers:
             - name: platform-sync
-              image: agnost-enterprise/platform-sync
+              image: agnost-community/platform/sync
               # We will be using the minikube docker daemon, since the actual docker daemon on local machine are different
               # Prevent minikube docker daemon to pull images from central docker hub set imagePullPolicy to Never, so that
               # it uses the image put in minikube's docker environment, see dev.sh script how we change the docker context to minikube
@@ -25,20 +25,14 @@ spec:
                  - containerPort: 4000
               env:
                  - name: CACHE_HOSTNAME
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: cacheHostname          
+                   value: redis-master      
                  - name: CACHE_READ_REPLICA_HOSTNAME
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: cacheReadReplicaHostname   
+                   value: redis-replicas  
                  - name: CACHE_PWD
                    valueFrom:
                       secretKeyRef:
-                         name: cluster-secrets
-                         key: cachePwd
+                         name: redis-password
+                         key: password
                  - name: MASTER_TOKEN
                    valueFrom:
                       secretKeyRef:

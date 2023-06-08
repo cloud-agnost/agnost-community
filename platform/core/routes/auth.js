@@ -270,7 +270,7 @@ router.post(
 					role: entry.role,
 					organization: orgObj.name,
 					app: app.name,
-					url: `${uiBaseURL}/v1/user/invitation/app/${entry.token}`,
+					url: `${uiBaseURL}/redirect-handle?token=${entry.token}&type=app-invite`,
 				});
 			});
 
