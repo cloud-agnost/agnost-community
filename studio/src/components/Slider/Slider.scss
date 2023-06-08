@@ -1,14 +1,14 @@
 .slider {
-	--swiper-pagination-bullet-inactive-color: var(--neutral-700);
+	--swiper-pagination-bullet-inactive-color: rgba(var(--neutral-700));
 	--swiper-pagination-bullet-inactive-opacity: 1;
-	--swiper-pagination-color: var(--neutral-50);
+	--swiper-pagination-color: rgba(var(--neutral-50));
 
 	max-width: 800px;
 	width: 100%;
 
 	.swiper-pagination-bullet-active {
 		--swiper-pagination-bullet-width: 2rem;
-	 	--swiper-pagination-bullet-border-radius: .5rem;
+		--swiper-pagination-bullet-border-radius: 0.5rem;
 	}
 
 	.slider-item {
