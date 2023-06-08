@@ -6,18 +6,7 @@
 	@apply disabled:cursor-not-allowed disabled:opacity-50;
 	@apply focus:border-input-focus focus:outline-none focus:ring-0;
 	@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border;
-	&.error {
+	&-error {
 		@apply border-error-default;
-	}
-	&-wrapper {
-		@apply relative flex flex-col w-full max-w-sm relative;
-	}
-	&-description {
-		@apply text-xs text-subtle;
-		@apply mt-1;
-
-		&.error {
-			@apply text-error-default;
-		}
 	}
 }

@@ -1,7 +1,7 @@
-import * as React from 'react';
 import { cn } from '@/utils';
-import { Label } from '../Label';
+import * as React from 'react';
 import './input.scss';
+
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 	type?: 'text' | 'password' | 'email' | 'number' | 'search' | 'tel' | 'url' | 'file';
 	className?: string;
@@ -21,7 +21,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 		return (
 			<input
 				type={type}
-				className={cn('input', props.error && 'error', className)}
+				className={cn('input', props.error && 'input-error', className)}
 				ref={ref}
 				{...props}
 			/>
@@ -31,18 +31,3 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = 'Input';
 
 export { Input };
-
-const InputWrapper = React.forwardRef<HTMLDivElement, InputWrapperProps>(
-	({ className, children, ...props }, ref) => (
-		<div ref={ref} className={cn('input-wrapper', className)} {...props}>
-			{props.label && <Label htmlFor={props.id}>{props.label}</Label>}
-			{children}
-			{props.description && (
-				<p className={cn('input-description', props.error && 'error')}>{props.description}</p>
-			)}
-		</div>
-	),
-);
-InputWrapper.displayName = 'InputWrapper';
-
-export { InputWrapper };
