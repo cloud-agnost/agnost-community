@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -209,10 +211,11 @@
 
 @layer base {
 	* {
+		font-family: 'Rubik', sans-serif;
 		@apply border-border;
 	}
 	body {
-		// @apply bg-base text-foreground;
+		@apply bg-base;
 		font-feature-settings: 'rlig' 1, 'calt' 1;
 	}
 	.loading {
