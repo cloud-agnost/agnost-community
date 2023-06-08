@@ -2,6 +2,8 @@ import express from "express";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import {
+	orgRoles,
+	appRoles,
 	bvlTypes,
 	fieldTypes,
 	databaseTypes,
@@ -9,6 +11,7 @@ import {
 	instanceTypes,
 	phoneAuthSMSProviders,
 	oAuthProviderTypes,
+	authUserDataModel,
 } from "../config/constants.js";
 
 const router = express.Router({ mergeParams: true });
@@ -21,6 +24,8 @@ const router = express.Router({ mergeParams: true });
 */
 router.get("/all", checkContentType, authSession, (req, res) => {
 	res.json({
+		orgRoles,
+		appRoles,
 		bvlTypes,
 		fieldTypes,
 		databaseTypes,
@@ -28,6 +33,7 @@ router.get("/all", checkContentType, authSession, (req, res) => {
 		instanceTypes,
 		phoneAuthSMSProviders,
 		oAuthProviderTypes,
+		authUserDataModel,
 	});
 });
 

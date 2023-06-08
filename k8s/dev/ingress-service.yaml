@@ -58,6 +58,16 @@ spec:
                          number: 4000
       - host:
         http:
+           paths:
+              - path: /mongo
+                pathType: Prefix
+                backend:
+                   service:
+                      name: cluster-mongodb-service
+                      port:
+                         number: 27017
+      - host:
+        http:
           paths:
             - path: /(.*)
               pathType: Prefix

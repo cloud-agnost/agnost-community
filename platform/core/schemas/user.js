@@ -222,6 +222,9 @@ export const applyRules = (type) => {
 							config.get("general.maxTextLength")
 						)
 					),
+				body("uiBaseURL")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
 				body("smtp")
 					.optional()
 					.custom(async (value) => {

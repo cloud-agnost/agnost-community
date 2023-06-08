@@ -24,6 +24,26 @@ router.get("/setup-status", checkContentType, async (req, res) => {
 });
 
 /*
+@route      /v1/cluster/smtp-status
+@method     GET
+@desc       Checks whether the cluster can send emails or not
+@access     public
+*/
+router.get("/smtp-status", checkContentType, async (req, res) => {
+	try {
+		// Get cluster configuration
+		let cluster = await clsCtrl.getOneByQuery({
+			clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+		});
+		if (cluster?.smtp) {
+			res.json({ status: true });
+		} else res.json({ status: false });
+	} catch (error) {
+		handleError(req, res, error);
+	}
+});
+
+/*
 @route      /v1/cluster/smtp
 @method     GET
 @desc       Returns the smtp configuration of the cluster object
