@@ -3,6 +3,8 @@ import { Slider } from '@/components/Slider';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import { OnboardingLayout } from '@/layouts/OnboardingLayout';
 import { Description } from '@/components/Description';
+import { Modal } from '@/components/Modal';
+
 
 const items = [
 	{
@@ -40,7 +42,11 @@ const router = createBrowserRouter([
 	},
 	{
 		path: '/onboarding',
-		element: <OnboardingLayout>Özgür ÖZALP</OnboardingLayout>,
+		element: (
+			<OnboardingLayout>
+				<Modal.Demo />
+			</OnboardingLayout>
+		),
 	},
 ]);
 
