@@ -100,6 +100,12 @@ export default {
 					disabled: 'var(--text-disabled)',
 					'background-base': 'rgba(var(--wrapper-background-base), <alpha-value>)',
 					'background-hover': 'rgba(var(--wrapper-background-hover), <alpha-value>)',
+					'background-base-light': 'rgba(var(--wrapper-background-base-light), <alpha-value>)',
+				},
+				text: {
+					default: 'rgba(var(--text-base), <alpha-value>)',
+					subtle: 'rgba(var(--text-subtle), <alpha-value>)',
+					disabled: 'rgba(var(--text-disabled), <alpha-value>)',
 				},
 
 				red: {
@@ -211,7 +217,7 @@ export default {
 					to: { height: 'var(--radix-accordion-content-height)' },
 				},
 				'accordion-up': {
-					from: { height: 'var(--radix-accordion-content-height' },
+					from: { height: 'var(--radix-accordion-content-height)' },
 					to: { height: 0 },
 				},
 			},
