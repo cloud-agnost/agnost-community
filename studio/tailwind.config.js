@@ -64,8 +64,8 @@ export default {
 				},
 
 				input: {
-					'base-background': 'rgba(var(--form-input-base-background), <alpha-value>)',
-					'base-border': 'rgba(var(--form-input-base-border), <alpha-value>)',
+					background: 'rgba(var(--form-input-base-background), <alpha-value>)',
+					border: 'rgba(var(--form-input-base-border), <alpha-value>)',
 					hover: 'rgba(var(--form-input-hover), <alpha-value>)',
 					focus: 'rgba(var(--form-input-focus), <alpha-value>)',
 					'disabled-background': 'rgba(var(--form-input-disabled-background), <alpha-value>)',
@@ -210,6 +210,10 @@ export default {
 			},
 			fontFamily: {
 				sans: ['var(--font-sans)', ...fontFamily.sans],
+			},
+			fontSize: {
+				xs: ['var(--font-size-xs)', 'var(--font-size-xs-line-height)'],
+				sm: ['var(--font-size-sm)', 'var(--font-size-sm-line-height)'],
 			},
 			keyframes: {
 				'accordion-down': {
