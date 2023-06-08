@@ -1,0 +1,26 @@
+.alert {
+	@apply relative w-full rounded-xs border border-transparent p-4 flex items-center justify-center gap-4 max-w-sm;
+
+	&-icon {
+		@apply rounded-full p-3 flex items-center justify-center bg-base;
+	}
+	&-success {
+		@apply bg-surface-green text-elements-strong-green dark:text-elements-subtle-green;
+	}
+
+	&-error {
+		@apply bg-surface-red text-elements-strong-red dark:text-elements-subtle-red;
+	}
+
+	&-warning {
+		@apply bg-surface-orange text-elements-strong-orange dark:text-elements-subtle-orange;
+	}
+
+	&-body {
+		@apply flex-1;
+	}
+
+	&-description {
+		@apply text-sm [&_p]:leading-relaxed;
+	}
+}
