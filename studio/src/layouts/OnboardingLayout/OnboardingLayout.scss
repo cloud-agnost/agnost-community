@@ -1,5 +1,5 @@
 .onboarding-layout {
-	@apply grid grid-cols-[346px_auto] h-screen;
+	@apply grid grid-cols-[350px_auto] min-h-screen;
 	@apply bg-subtle;
 
 	.onboarding-layout-left {
@@ -12,9 +12,5 @@
 
 	.onboarding-layout-app-logo {
 		@apply w-36 self-start;
-	}
-
-	.onboarding-stepper {
-		@apply w-full;
 	}
 }

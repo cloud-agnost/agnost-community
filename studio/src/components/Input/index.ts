@@ -1,2 +1,2 @@
 export { Input } from './Input';
-export { InputWrapper } from './Input';
+export type { InputWrapperProps } from './Input';

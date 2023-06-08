@@ -193,9 +193,6 @@ export default {
 				subtle: 'rgba(var(--text-subtle), <alpha-value>)',
 				disabled: 'rgba(var(--text-disabled), <alpha-value>)',
 			},
-			fontSize: {
-				xs: 'var(--font-size-xs)',
-			},
 			borderRadius: {
 				lg: `var(--radius)`,
 				md: `calc(var(--radius) - 2px)`,

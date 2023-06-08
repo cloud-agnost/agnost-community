@@ -6,6 +6,7 @@ export const instance = axios.create({
 	headers: {
 		'Content-Type': 'application/json',
 	},
+	validateStatus: (status) => status < 500,
 });
 
 instance.interceptors.request.use((config) => {

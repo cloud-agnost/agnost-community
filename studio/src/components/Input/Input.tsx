@@ -17,12 +17,18 @@ export interface InputWrapperProps extends React.ComponentPropsWithoutRef<'div'>
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-	({ className, type, ...props }, ref) => {
+	({ className, type, value, error, ...props }, ref) => {
+		const [inputValue, setInputValue] = React.useState(value);
+
 		return (
 			<input
 				type={type}
-				className={cn('input', props.error && 'input-error', className)}
+				className={cn('input', error && 'input-error', className)}
 				ref={ref}
+				value={inputValue}
+				onChange={(e) => {
+					setInputValue(type === 'number' ? e.target.valueAsNumber : e.target.value);
+				}}
 				{...props}
 			/>
 		);

@@ -28,3 +28,26 @@ export interface User {
 	at: string;
 	rt: string;
 }
+
+export interface UserDataToRegister {
+	name: string;
+	email: string;
+	password: string;
+}
+
+export interface OnboardingData {
+	orgName: string;
+	appName: string;
+	uiBaseURL: string;
+	smtp: {
+		host: string;
+		port: number;
+		useTLS: boolean;
+		user: string;
+		password: string;
+	};
+	appMembers: {
+		email: string;
+		role: string;
+	}[];
+}
