@@ -30,6 +30,8 @@ export const sendEmail = (connection, queue, template) => {
 		channel.consume(
 			queue,
 			async function (msg) {
+				channel.ack(msg);
+
 				let msgObj = JSON.parse(msg.content.toString());
 				const transporter = await getTransport();
 				if (!transporter) {
@@ -85,11 +87,9 @@ export const sendEmail = (connection, queue, template) => {
 						locals: msgObj,
 					})
 					.then(() => {
-						channel.ack(msg);
 						logger.info(`Sent email: ${queue}`);
 					})
 					.catch((error) => {
-						channel.nack(msg);
 						logger.error(`Send email failed: ${queue}`, {
 							details: error,
 						});
