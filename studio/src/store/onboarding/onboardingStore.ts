@@ -3,16 +3,19 @@ import { devtools, persist } from 'zustand/middleware';
 import { OnboardingData } from '@/types/type.ts';
 import { removeLastSlash } from '@/utils/utils.ts';
 
+export interface Step {
+	text: string;
+	path: string;
+	isDone: boolean;
+	isActive: boolean;
+	prevPath?: string;
+	nextPath?: string;
+}
+
 interface OnboardingStore {
-	steps: {
-		text: string;
-		path: string;
-		isDone: boolean;
-		isActive: boolean;
-		prevPath?: string;
-	}[];
+	steps: Step[];
 	data: OnboardingData;
-	setStepByPath: (path: string, step: Partial<OnboardingStore['steps'][number]>) => void;
+	setStepByPath: (path: string, step: Partial<Step>) => void;
 	setDataPartially: (data: Partial<OnboardingStore['data']>) => void;
 	getPrevPath: () => string | undefined;
 }
@@ -25,15 +28,17 @@ const useOnboardingStore = create<OnboardingStore>()(
 					{
 						text: 'Account Information',
 						path: '/onboarding',
-						isDone: false,
+						isDone: true,
 						isActive: false,
+						nextPath: '/onboarding/create-organization',
 					},
 					{
 						text: 'Create Your Organization',
 						path: '/onboarding/create-organization',
-						isDone: false,
+						isDone: true,
 						isActive: false,
 						prevPath: '/onboarding',
+						nextPath: '/onboarding/create-app',
 					},
 					{
 						text: 'Create Your First App',
@@ -41,6 +46,7 @@ const useOnboardingStore = create<OnboardingStore>()(
 						isDone: false,
 						isActive: false,
 						prevPath: '/onboarding/create-organization',
+						nextPath: '/onboarding/smtp-configuration',
 					},
 					{
 						text: 'Configure SMTP Server',
@@ -48,6 +54,7 @@ const useOnboardingStore = create<OnboardingStore>()(
 						isDone: false,
 						isActive: false,
 						prevPath: '/onboarding/create-app',
+						nextPath: '/onboarding/invite-team-members',
 					},
 					{
 						text: 'Invite Team Members',

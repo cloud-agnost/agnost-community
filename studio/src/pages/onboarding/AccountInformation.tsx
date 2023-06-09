@@ -18,6 +18,8 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
+import { PasswordInput } from '@/components/PasswordInput';
+import { Alert } from '@/components/Alert';
 
 async function loader() {
 	return null;
@@ -37,6 +39,7 @@ const FormSchema = z.object({
 
 export default function AccountInformation() {
 	const [initiating, setInitiating] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	const { initializeClusterSetup } = useClusterStore();
 	const { setUser } = useAuthStore();
@@ -50,10 +53,11 @@ export default function AccountInformation() {
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		setInitiating(true);
+		setError(null);
 		const res = await initializeClusterSetup(data);
 
 		if ('error' in res) {
-			alert(res.details);
+			setError(res.details);
 		} else {
 			setUser(res);
 			navigate('/onboarding/create-organization');
@@ -76,6 +80,12 @@ export default function AccountInformation() {
 				organization and first app. Please follow the succeeding steps to complete your cluster set
 				up and start building your apps.
 			</Description>
+
+			{error && (
+				<Alert className='!max-w-full' variant='error'>
+					{error}
+				</Alert>
+			)}
 
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
@@ -104,7 +114,7 @@ export default function AccountInformation() {
 							<FormItem>
 								<FormLabel>Password</FormLabel>
 								<FormControl>
-									<Input
+									<PasswordInput
 										error={Boolean(form.formState.errors.password)}
 										type='password'
 										placeholder='Enter Password'

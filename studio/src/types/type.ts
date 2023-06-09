@@ -39,15 +39,17 @@ export interface OnboardingData {
 	orgName: string;
 	appName: string;
 	uiBaseURL: string;
-	smtp: {
-		host: string;
-		port: number;
-		useTLS: boolean;
-		user: string;
-		password: string;
-	};
+	smtp: SMTPSettings;
 	appMembers: {
 		email: string;
 		role: string;
 	}[];
+}
+
+export interface SMTPSettings {
+	host: string;
+	port: number;
+	useTLS: boolean;
+	user: string;
+	password: string;
 }
