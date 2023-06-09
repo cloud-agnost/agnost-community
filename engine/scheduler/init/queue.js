@@ -71,18 +71,9 @@ export const connectToQueue = () => {
 		// Register queue message handlers
 		let queueCount = config.get("general.generalQueueCount");
 		for (let i = 1; i <= queueCount; i++) {
-			deployTasksHandler(
-				connection,
-				`deploy-tasks-${i}${config.get("queue.developmentSuffix")}`
-			);
-			redeployTasksHandler(
-				connection,
-				`redeploy-tasks-${i}${config.get("queue.developmentSuffix")}`
-			);
-			deleteTasksHandler(
-				connection,
-				`delete-tasks-${i}${config.get("queue.developmentSuffix")}`
-			);
+			deployTasksHandler(connection, `deploy-tasks-${i}`);
+			redeployTasksHandler(connection, `redeploy-tasks-${i}`);
+			deleteTasksHandler(connection, `delete-tasks-${i}`);
 		}
 	});
 };
@@ -112,9 +103,7 @@ export const submitTask = (payload) => {
 		);
 
 		channel.assertQueue(
-			`process-task-${payload.envId}-${
-				payload.taskId
-			}-${randNumber}${config.get("queue.developmentSuffix")}`,
+			`process-task-${payload.envId}-${payload.taskId}-${randNumber}`,
 			{
 				durable: true,
 				autoDelete: true,
@@ -122,9 +111,7 @@ export const submitTask = (payload) => {
 		);
 
 		channel.sendToQueue(
-			`process-task-${payload.envId}-${
-				payload.taskId
-			}-${randNumber}${config.get("queue.developmentSuffix")}`,
+			`process-task-${payload.envId}-${payload.taskId}-${randNumber}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,

@@ -406,10 +406,8 @@ export class ResourceManager {
 						containers: [
 							{
 								name: deploymentName,
-								image: "agnost-community/engine/core",
-								imagePullPolicy: ["development"].includes(process.env.NODE_ENV)
-									? "Never"
-									: "Always",
+								image: "gcr.io/agnost-community/engine/core",
+								imagePullPolicy: "Always",
 								volumeMounts: pvcs.map((entry) => {
 									return {
 										mountPath: `/${entry.iid}`, // iid of PVC resource

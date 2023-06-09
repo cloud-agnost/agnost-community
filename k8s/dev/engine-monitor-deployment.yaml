@@ -14,6 +14,7 @@ spec:
          labels:
             app: engine-monitor
       spec:
+         serviceAccountName: provisioner-sa
          containers:
             - name: engine-monitor
               image: agnost-community/engine/monitor

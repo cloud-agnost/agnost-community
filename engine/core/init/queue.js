@@ -37,6 +37,7 @@ export const connectToQueue = () => {
 		}
 
 		connection.on("error", (error) => {
+			console.log("***here", error);
 			if (error.message !== "Connection closing") {
 				logger.error(`Cannot connect to the message queue`, {
 					details: error,

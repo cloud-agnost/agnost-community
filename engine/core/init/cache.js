@@ -5,7 +5,7 @@ import util from "util";
 var client;
 var clientReadReplica;
 
-export const connectToRedisCache = async () => {
+export const connectToRedisCache = async (callback) => {
 	try {
 		let cacheConfig = config.get("cache");
 		client = redis.createClient({
@@ -27,6 +27,8 @@ export const connectToRedisCache = async () => {
 			logger.info(
 				`Connected to the cache server @${process.env.CACHE_HOSTNAME}:${cacheConfig.port}`
 			);
+
+			if (callback) callback();
 		});
 
 		client.on("error", function (err) {

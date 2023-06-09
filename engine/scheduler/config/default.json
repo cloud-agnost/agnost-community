@@ -31,8 +31,7 @@
         "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
         "port": 5672,
         "reconnectInterval": 1000,
-        "retryCount": 30,
-        "developmentSuffix": "mito"
+        "retryCount": 30
      },
      "sync": {
         "serverURL": "http://platform-sync-clusterip-service:4000",

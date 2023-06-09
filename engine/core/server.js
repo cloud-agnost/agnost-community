@@ -9,7 +9,6 @@ import { fileURLToPath } from "url";
 import {
 	connectToRedisCache,
 	disconnectFromRedisCache,
-	getRedisClientForInit,
 	getRedisClient,
 	getKey,
 } from "./init/cache.js";
@@ -33,57 +32,13 @@ if (cluster.isPrimary) {
 	// Set up locatlization
 	initLocalization();
 	// Connect to cache server(s)
-	connectToRedisCache();
+	connectToRedisCache(finalizePrimaryProcessStarup);
 	// Connect to message queue
 	connectToQueue();
 	// Gracefull handle process exist
 	handlePrimaryProcessExit();
 	// Set up garbage collector
 	setUpGC();
-	getRedisClientForInit().on("connect", async function () {
-		// Get the environment information
-		let envObj = await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.object`);
-		if (!envObj) return;
-		// Create the primary process deployment manager and set up the engine core (API Sever)
-		const manager = new PrimaryProcessDeploymentManager(null, envObj);
-		await manager.initializeCore();
-
-		// Fork child process
-		childProcess = cluster.fork();
-
-		cluster.on("exit", function (worker, code, signal) {
-			logger.warn(`Child process ${worker.process.pid} died`);
-			childProcess = cluster.fork();
-		});
-
-		// Set up heartbeat interval
-		setInterval(() => {
-			// Send heartbeat message to the child process
-			if (childProcess.isConnected()) childProcess.send("heartbeat");
-			else return;
-
-			// Set a timeout to check if child process responded
-			const heartbeatTimeout = setTimeout(() => {
-				// Child process did not respond within timeout, handle accordingly
-				console.log("Child process is unresponsive!");
-
-				// Disconnect the child process
-				// childProcess.disconnect();
-
-				// You can choose to restart the child process here using `cluster.fork()` if desired
-				// cluster.fork();
-			}, config.get("general.heartbeatTimeoutSeconds") * 1000); // Timeout duration in milliseconds
-
-			// Listen for heartbeat response from the child process
-			childProcess.once("message", (message) => {
-				if (message === "heartbeat") {
-					// logger.info(`Child process is up and running`);
-					// Child process responded, clear the heartbeat timeout
-					clearTimeout(heartbeatTimeout);
-				}
-			});
-		}, config.get("general.heartbeatIntervalSeconds") * 1000); // Heartbeat interval duration in milliseconds
-	});
 } else if (cluster.isWorker) {
 	logger.info(`Child process ${process.pid} is running`);
 
@@ -126,6 +81,48 @@ if (cluster.isPrimary) {
 		// We call process exit so that primary process can fork a new child process
 		process.exit();
 	});
+}
+
+async function finalizePrimaryProcessStarup() {
+	// Get the environment information
+	let envObj = await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.object`);
+	if (!envObj) return;
+	// Create the primary process deployment manager and set up the engine core (API Sever)
+	const manager = new PrimaryProcessDeploymentManager(null, envObj);
+	await manager.initializeCore();
+
+	// Fork child process
+	childProcess = cluster.fork();
+
+	cluster.on("exit", function (worker, code, signal) {
+		logger.warn(`Child process ${worker.process.pid} died`);
+		childProcess = cluster.fork();
+	});
+
+	// Set up heartbeat interval
+	setInterval(() => {
+		// Send heartbeat message to the child process
+		if (childProcess.isConnected()) childProcess.send("heartbeat");
+		else return;
+
+		// Set a timeout to check if child process responded
+		const heartbeatTimeout = setTimeout(() => {
+			// Child process did not respond within timeout, handle accordingly
+			console.log("Child process is unresponsive!");
+
+			// Kill the child process so that it restarts
+			childProcess.kill("SIGINT");
+		}, config.get("general.heartbeatTimeoutSeconds") * 1000); // Timeout duration in milliseconds
+
+		// Listen for heartbeat response from the child process
+		childProcess.once("message", (message) => {
+			if (message === "heartbeat") {
+				// logger.info(`Child process is up and running`);
+				// Child process responded, clear the heartbeat timeout
+				clearTimeout(heartbeatTimeout);
+			}
+		});
+	}, config.get("general.heartbeatIntervalSeconds") * 1000); // Heartbeat interval duration in milliseconds
 }
 
 function initGlobalsForPrimaryProcess() {
