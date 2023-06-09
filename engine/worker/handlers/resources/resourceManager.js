@@ -406,7 +406,7 @@ export class ResourceManager {
 						containers: [
 							{
 								name: deploymentName,
-								image: "agnost-enterprise/engine-core",
+								image: "agnost-community/engine/core",
 								imagePullPolicy: ["development"].includes(process.env.NODE_ENV)
 									? "Never"
 									: "Always",

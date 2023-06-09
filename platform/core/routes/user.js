@@ -403,7 +403,7 @@ router.post(
 	validate,
 	async (req, res) => {
 		try {
-			let { email } = req.body;
+			let { email, uiBaseURL } = req.body;
 
 			// Craate the contact email validation token
 			let token = await userCtrl.createChangeEmailToken(
@@ -415,7 +415,7 @@ router.post(
 			// Send the contact email verification link to the new email address
 			sendMessage("send-contact-email-token", {
 				to: email,
-				url: `${process.env.UI_BASE_URL}/v1/user/contact-email/${token}`,
+				url: `${uiBaseURL}/v1/user/contact-email/${token}`,
 			});
 
 			res.json();
@@ -499,7 +499,7 @@ router.post(
 	async (req, res) => {
 		try {
 			const { loginProfiles } = req.user;
-			let { email, password } = req.body;
+			let { email, password, uiBaseURL } = req.body;
 
 			// Get email/password login profile
 			let profile = loginProfiles.find((entry) => entry.provider === "agnost");
@@ -536,7 +536,7 @@ router.post(
 			// Send the login email verification link to the new email address
 			sendMessage("send-login-email-token", {
 				to: email,
-				url: `${process.env.UI_BASE_URL}/v1/user/login-email/${token}`,
+				url: `${uiBaseURL}/redirect-handle?token=${token}&type=change-email`,
 			});
 
 			res.json();
@@ -647,7 +647,7 @@ router.post(
 	validate,
 	async (req, res) => {
 		try {
-			let { email } = req.body;
+			let { email, uiBaseURL } = req.body;
 
 			let userObj = await userCtrl.getOneByQuery({
 				"loginProfiles.provider": "agnost",
@@ -672,7 +672,7 @@ router.post(
 			// Send the forgot password change link link to the email address
 			sendMessage("send-reset-pwd-token", {
 				to: email,
-				url: `${process.env.UI_BASE_URL}/v1/user/reset-pwd/${token}`,
+				url: `${uiBaseURL}/redirect-handle?token=${token}&type=reset-pwd`,
 			});
 
 			res.json();

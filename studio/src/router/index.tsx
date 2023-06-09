@@ -1,7 +1,7 @@
-import { createBrowserRouter } from 'react-router-dom';
-import { AuthLayout } from '@/layouts/AuthLayout';
-import { Description } from '@/components/Description';
-import { Root } from '@/pages/root';
+import { createBrowserRouter } from "react-router-dom";
+import { AuthLayout } from "@/layouts/AuthLayout";
+import { Description } from "@/components/Description";
+import { Root } from "@/pages/root";
 import {
 	AccountInformation,
 	CreateApp,
@@ -9,63 +9,63 @@ import {
 	InviteTeamMembers,
 	Onboarding,
 	SMTPConfiguration,
-} from '@/pages/onboarding';
-import { Organization, SelectOrganization } from '@/pages/organization';
+} from "@/pages/onboarding";
+import { Organization, SelectOrganization } from "@/pages/organization";
 
 const router = createBrowserRouter([
 	{
-		path: '/',
+		path: "/",
 		loader: Root.loader,
 		element: <Root />,
 		children: [
 			{
-				path: '/login',
+				path: "/login",
 				element: (
 					<AuthLayout>
-						<Description title='Login to your account'>
+						<Description title="Login to your account">
 							Welcome back! Please enter your details.
 						</Description>
 					</AuthLayout>
 				),
 			},
 			{
-				path: '/organization',
+				path: "/organization",
 				element: <Organization />,
 				children: [
 					{
-						path: '',
+						path: "",
 						element: <SelectOrganization />,
 					},
 				],
 			},
 			{
-				path: '/organization/:id',
+				path: "/organization/:id",
 			},
 		],
 	},
 	{
 		loader: Onboarding.loader,
-		path: '/onboarding',
+		path: "/onboarding",
 		element: <Onboarding />,
 		children: [
 			{
-				path: '',
+				path: "",
 				element: <AccountInformation />,
 			},
 			{
-				path: 'create-organization',
+				path: "create-organization",
 				element: <CreateOrganization />,
 			},
 			{
-				path: 'create-app',
+				path: "create-app",
 				element: <CreateApp />,
 			},
 			{
-				path: 'smtp-configuration',
+				path: "smtp-configuration",
 				element: <SMTPConfiguration />,
 			},
 			{
-				path: 'invite-team-members',
+				path: "invite-team-members",
 				element: <InviteTeamMembers />,
 			},
 		],

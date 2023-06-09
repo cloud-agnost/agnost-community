@@ -17,7 +17,7 @@ import ERROR_CODES from "../config/errorCodes.js";
 const router = express.Router({ mergeParams: true });
 
 /*
-@route      /v1/org/:orgId/app/:appId/invite
+@route      /v1/org/:orgId/app/:appId/invite?uiBaseURL=http://...
 @method     POST
 @desc       Invites user(s) to the app
 @access     private
@@ -34,6 +34,7 @@ router.post(
 	async (req, res) => {
 		try {
 			const { user, org, app } = req;
+			const { uiBaseURL } = req.query;
 			// Prepare the invitations array to store in the database
 			let invitations = [];
 			req.body.forEach((entry) => {
@@ -57,7 +58,7 @@ router.post(
 					role: entry.role,
 					organization: org.name,
 					app: app.name,
-					url: `${process.env.UI_BASE_URL}/v1/user/invitation/app/${entry.token}`,
+					url: `${uiBaseURL}/redirect-handle?token=${entry.token}&type=app-invite`,
 				});
 			});
 
@@ -216,7 +217,7 @@ router.put(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/invite/resend?token=tkn_...
+@route      /v1/org/:orgId/app/:appId/invite/resend?token=tkn_...&uiBaseURL=http://...
 @method     POST
 @desc       Resends the app invitation to the user email
 @access     private
@@ -232,7 +233,7 @@ router.post(
 	validate,
 	async (req, res) => {
 		try {
-			const { token } = req.query;
+			const { token, uiBaseURL } = req.query;
 			const { user, org, app } = req;
 
 			let invite = await appInvitationCtrl.getOneByQuery({ token });
@@ -258,7 +259,7 @@ router.post(
 				role: invite.role,
 				organization: org.name,
 				app: app.name,
-				url: `${process.env.UI_BASE_URL}/v1/user/invitation/app/${invite.token}`,
+				url: `${uiBaseURL}/redirect-handle?token=${invite.token}&type=app-invite`,
 			});
 
 			// If there are alreay user accounts with provided email then send them realtime notifications

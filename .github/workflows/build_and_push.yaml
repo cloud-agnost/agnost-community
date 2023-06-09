@@ -7,10 +7,11 @@ on:
     paths:
       - 'engine/**'
       - 'platform/**'
+      - 'studio/**'
 
 env:
   DOCKER_REGISTRY: 'gcr.io'
-  GCR_PROJECT: 'agnost-enterprise'
+  GCR_PROJECT: 'agnost-community'
 
 jobs:
   get_apps:
@@ -34,7 +35,7 @@ jobs:
             platform/core: 'platform/core/**'
             platform/sync: 'platform/sync/**'
             platform/worker: 'platform/worker/**'
-
+            studio: 'studio/**'
 
   generate_short_sha:
     runs-on: ubuntu-latest

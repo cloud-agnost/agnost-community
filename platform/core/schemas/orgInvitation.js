@@ -87,6 +87,9 @@ export const applyRules = (type) => {
 	switch (type) {
 		case "invite":
 			return [
+				query("uiBaseURL")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
 				body("*.email")
 					.trim()
 					.notEmpty()
@@ -137,9 +140,18 @@ export const applyRules = (type) => {
 					.isIn(orgRoles)
 					.withMessage(t("Unsupported member role")),
 			];
-		case "resend-invite":
 		case "delete-invite":
 			return [
+				query("token")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required parameter, cannot be left empty")),
+			];
+		case "resend-invite":
+			return [
+				query("uiBaseURL")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
 				query("token")
 					.trim()
 					.notEmpty()

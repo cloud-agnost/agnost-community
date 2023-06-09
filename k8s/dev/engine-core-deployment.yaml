@@ -16,7 +16,7 @@ spec:
       spec:
          containers:
             - name: engine-core
-              image: agnost-enterprise/engine-core
+              image: agnost-community/engine/core
               # We will be using the minikube docker daemon, since the actual docker daemon on local machine are different
               # Prevent minikube docker daemon to pull images from central docker hub set imagePullPolicy to Never, so that
               # it uses the image put in minikube's docker environment, see dev.sh script how we change the docker context to minikube
@@ -25,55 +25,46 @@ spec:
                  - containerPort: 4000
               env:
                  - name: CACHE_HOSTNAME
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: cacheHostname          
+                   value: redis-master          
                  - name: CACHE_READ_REPLICA_HOSTNAME
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: cacheReadReplicaHostname         
+                   value: redis-replicas         
                  - name: CACHE_PWD
                    valueFrom:
                       secretKeyRef:
-                         name: cluster-secrets
-                         key: cachePwd
+                         name: redis-password
+                         key: password
                  - name: CACHE_READ_REPLICA_PWD
                    valueFrom:
                       secretKeyRef:
-                         name: cluster-secrets
-                         key: cacheReadReplicaPwd
+                         name: redis-password
+                         key: password
                  - name: QUEUE_USERNAME
                    valueFrom:
                       secretKeyRef:
-                         name: cluster-secrets
-                         key: queueUsername
+                         name: rabbitmq-credentials
+                         key: username
                  - name: QUEUE_PASSWORD
                    valueFrom:
                       secretKeyRef:
-                         name: cluster-secrets
-                         key: queuePassword
+                         name: rabbitmq-credentials
+                         key: password
                  - name: QUEUE_HOST
                    valueFrom:
                       secretKeyRef:
-                         name: cluster-secrets
-                         key: queueHost
+                         name: rabbitmq-credentials
+                         key: host
                  - name: CLUSTER_DB_URI
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets
                          key: clusterDBURI
                  - name: CLUSTER_DB_USER
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: clusterDBUser
+                   value: "mongo-user"
                  - name: CLUSTER_DB_PWD
                    valueFrom:
                       secretKeyRef:
-                         name: cluster-secrets
-                         key: clusterDBPwd
+                         name: mongodb-admin-password
+                         key: password
                  - name: MASTER_TOKEN
                    valueFrom:
                       secretKeyRef:

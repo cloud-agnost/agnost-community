@@ -9,7 +9,7 @@ export async function getTransport() {
 
 	// Get the SMTP server configuration. Make api call to the platform to log the error message
 	try {
-		const smtpConfig = axios.post(
+		const smtpConfig = await axios.get(
 			config.get("general.platformBaseUrl") + "/v1/cluster/smtp",
 			{
 				headers: {
@@ -20,12 +20,12 @@ export async function getTransport() {
 		);
 
 		transporter = nodemailer.createTransport({
-			host: smtpConfig.host,
-			port: smtpConfig.port,
-			secure: smtpConfig.useTLS,
+			host: smtpConfig.data.host,
+			port: smtpConfig.data.port,
+			secure: smtpConfig.data.useTLS,
 			auth: {
-				user: smtpConfig.user,
-				pass: smtpConfig.password,
+				user: smtpConfig.data.user,
+				pass: smtpConfig.data.password,
 			},
 			pool: config.get("emailServer.pool"),
 		});

@@ -100,6 +100,9 @@ export const applyRules = (type) => {
 	switch (type) {
 		case "invite":
 			return [
+				query("uiBaseURL")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
 				body("*.email")
 					.trim()
 					.notEmpty()
@@ -116,6 +119,9 @@ export const applyRules = (type) => {
 					.bail()
 					.isIn(appRoles)
 					.withMessage(t("Unsupported app member role")),
+				body("*.uiBaseURL")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
 			];
 		case "update-invite":
 			return [
@@ -131,13 +137,22 @@ export const applyRules = (type) => {
 					.isIn(appRoles)
 					.withMessage(t("Unsupported app member role")),
 			];
-		case "resend-invite":
 		case "delete-invite":
 			return [
 				query("token")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required parameter, cannot be left empty")),
+			];
+		case "resend-invite":
+			return [
+				query("token")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required parameter, cannot be left empty")),
+				query("uiBaseURL")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
 			];
 		case "get-invites":
 		case "list-eligible":

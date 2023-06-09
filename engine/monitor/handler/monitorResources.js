@@ -161,7 +161,7 @@ async function getResources(pageNumber, pageSize) {
 	let dbClient = getDBClient();
 
 	return await dbClient
-		.db("agnost_enterprise")
+		.db("agnost")
 		.collection("resources")
 		.find({}, { limit: pageSize, skip: pageNumber * pageSize })
 		.toArray();

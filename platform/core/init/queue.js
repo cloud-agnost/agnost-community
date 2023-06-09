@@ -36,6 +36,7 @@ export const connectToQueue = () => {
 		}
 
 		connection.on("error", (error) => {
+			console.log("***queue connection error:", error);
 			if (error.message !== "Connection closing") {
 				logger.error(`Cannot connect to the message queue`, {
 					details: error,
@@ -51,6 +52,7 @@ export const connectToQueue = () => {
 		});
 
 		connection.on("close", function (error) {
+			console.log("***queue connection closed:", error);
 			// If this is not a user initiated close then reconnect to the message queue
 			if (error && retryCount < config.get("queue.retryCount")) {
 				return setTimeout(

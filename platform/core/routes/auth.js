@@ -138,7 +138,7 @@ router.post(
 		const session = await userCtrl.startSession();
 		try {
 			const { user } = req;
-			const { orgName, appName, smtp, appMembers } = req.body;
+			const { orgName, appName, smtp, appMembers, uiBaseURL } = req.body;
 
 			// Check if the user is cluster owner or not
 			if (!user.isClusterOwner) {
@@ -270,7 +270,7 @@ router.post(
 					role: entry.role,
 					organization: orgObj.name,
 					app: app.name,
-					url: `${process.env.UI_BASE_URL}/v1/user/invitation/app/${entry.token}`,
+					url: `${uiBaseURL}/redirect-handle?token=${entry.token}&type=app-invite`,
 				});
 			});
 
