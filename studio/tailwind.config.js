@@ -59,6 +59,7 @@ export default {
 
 				icon: {
 					darker: 'rgba(var(--icon-darker), <alpha-value>)',
+					lighter: 'rgba(var(--icon-lighter), <alpha-value>)',
 					base: 'rgba(var(--icon-base), <alpha-value>)',
 					disabled: 'rgba(var(--icon-disabled), <alpha-value>)',
 				},
