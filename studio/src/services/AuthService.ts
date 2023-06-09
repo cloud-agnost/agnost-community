@@ -1,14 +1,14 @@
 import { axios } from '@/helpers';
-import { User } from '@/types/type.ts';
+import { APIError, User, UserDataToRegister } from '@/types/type.ts';
 
 export default class AuthService {
 	static url = '/v1/auth';
 
-	static async initializeClusterSetup(): Promise<User> {
-		return (await axios.get(`${this.url}/init-cluster-setup`)).data;
+	static async initializeClusterSetup(data: UserDataToRegister): Promise<User | APIError> {
+		return (await axios.post(`${this.url}/init-cluster-setup`, data)).data;
 	}
 	static async finalizeClusterSetup() {
-		return (await axios.get(`${this.url}/finalize-cluster-setup`)).data;
+		return (await axios.post(`${this.url}/finalize-cluster-setup`)).data;
 	}
 	static async initializeAccountSetup() {
 		return (await axios.get(`${this.url}/init-account-setup`)).data;

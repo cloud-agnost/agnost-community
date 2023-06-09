@@ -1,15 +1,15 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { ClusterService } from '@/services';
+import { AuthService, ClusterService } from '@/services';
 import { APIError } from '@/types';
-import { User } from '@/types/type.ts';
+import { User, UserDataToRegister } from '@/types/type.ts';
 
 interface ClusterStore {
 	loading: boolean;
 	error: APIError | null;
 	isCompleted: boolean;
 	checkClusterSetup: () => Promise<boolean>;
-	initializeClusterSetup: () => Promise<User | undefined> | void;
+	initializeClusterSetup: (data: UserDataToRegister) => Promise<User | APIError>;
 	finalizeClusterSetup: () => void;
 	initializeAccountSetup: () => void;
 	finalizeAccountSetup: () => void;
@@ -32,8 +32,8 @@ const useClusterStore = create<ClusterStore>()(
 						throw error;
 					}
 				},
-				initializeClusterSetup: () => {
-					// TODO: Implement
+				initializeClusterSetup: async (data: UserDataToRegister) => {
+					return AuthService.initializeClusterSetup(data);
 				},
 				finalizeClusterSetup: () => {
 					// TODO: Implement

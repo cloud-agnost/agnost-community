@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 
-async function loader() {
+async function loader(params: any) {
+	console.log(params);
 	return null;
 }
 

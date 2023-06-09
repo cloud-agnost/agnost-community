@@ -1,5 +1,5 @@
 .auth-layout {
-	@apply grid grid-cols-2 h-screen;
+	@apply grid grid-cols-2 min-h-screen;
 	@apply bg-subtle;
 
 	.auth-layout-left {

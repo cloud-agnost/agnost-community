@@ -1,39 +1,42 @@
 .btn {
 	@apply inline-flex items-center justify-center;
-	@apply rounded-md text-sm font-medium transition-colors;
+	@apply rounded-md text-sm transition-colors font-semibold leading-[normal];
 	@apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary-hover focus-visible:ring-offset-2;
 	@apply disabled:opacity-50 disabled:pointer-events-none focus-visible:ring-button-primary-hover;
 	@apply px-4 py-2;
+
+	&-primary {
+		@apply hover:bg-button-primary-hover text-white focus-visible:ring-button-primary;
+		@apply bg-button-primary;
+	}
+	&-secondary {
+		@apply bg-button-secondary hover:bg-button-secondary-hover text-default focus-visible:ring-button-secondary;
+		@apply border border-button-border hover:border-button-border-hover;
+	}
+	&-text {
+		@apply text-default hover:bg-button-secondary-hover focus-visible:ring-button-secondary;
+	}
+	&-link {
+		@apply text-button-primary hover:underline hover:text-button-primary-hover focus-visible:ring-button-secondary;
+	}
+	&-md {
+		@apply h-9 py-2 px-4;
+	}
+	&-sm {
+		@apply h-7 py-[6px] px-2;
+	}
+	&-full {
+		@apply w-full;
+	}
 }
-.btn-primary {
-	@apply bg-button-primary hover:bg-button-primary-hover text-white focus-visible:ring-button-primary;
-}
-.btn-secondary {
-	@apply bg-button-secondary hover:bg-button-secondary-hover text-base focus-visible:ring-button-secondary;
-	@apply border border-button-border hover:border-button-border-hover;
-}
-.btn:disabled.btn-secondary {
-	@apply bg-button-disabled;
-}
-.btn-text {
-	@apply text-base hover:bg-button-secondary-hover focus-visible:ring-button-secondary;
-}
-.btn-link {
-	@apply text-button-primary hover:underline hover:text-button-primary-hover focus-visible:ring-button-secondary;
-}
+
 .btn:disabled.btn-link,
 .btn:disabled.btn-text {
 	@apply bg-transparent;
 }
-.btn-md {
-	@apply h-9 py-2 px-4;
-}
-.btn-sm {
-	@apply h-7 py-[6px] px-2;
-}
-.btn-full {
-	@apply w-full;
-}
 .btn:disabled {
 	@apply bg-button-disabled text-disabled;
+}
+.btn:disabled.btn-secondary {
+	@apply bg-button-disabled;
 }

@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { AuthService } from '@/services';
 import type { APIError, User } from '@/types/type.ts';
 
 interface AuthStore {
@@ -10,12 +9,9 @@ interface AuthStore {
 	setUser: (user: User) => void;
 	login: () => void;
 	logout: () => void;
-	token: string;
 	setToken: (token: string) => void;
-	refreshToken: string;
 	setRefreshToken: (refreshToken: string) => void;
 	isAuthenticated: boolean;
-	initializeClusterSetup: () => void;
 	finalizeClusterSetup: () => void;
 	initializeAccountSetup: () => void;
 	finalizeAccountSetup: () => void;
@@ -26,27 +22,28 @@ interface AuthStore {
 const useAuthStore = create<AuthStore>()(
 	devtools(
 		persist(
-			(set) => ({
+			(set, get) => ({
 				loading: false,
 				error: null,
 				user: null,
 				setUser: (user) => set({ user }),
-				login: () => set({ isAuthenticated: true }),
-				logout: () => set({ isAuthenticated: false }),
-				token: '',
-				setToken: (token) => set({ token }),
-				refreshToken: '',
-				setRefreshToken: (refreshToken) => set({ refreshToken }),
-				isAuthenticated: false,
-				initializeClusterSetup: async () => {
-					set({ loading: true, error: null });
-					try {
-						const user = await AuthService.initializeClusterSetup();
-						set({ loading: false, user });
-					} catch (error) {
-						set({ error: error as APIError });
-					}
+				login: () => {
+					// TODO Implement
 				},
+				logout: () => {
+					// TODO Implement
+				},
+				setToken: (token) =>
+					set((prev) => {
+						if (prev.user) prev.user.at = token;
+						return prev;
+					}),
+				setRefreshToken: (refreshToken) =>
+					set((prev) => {
+						if (prev.user) prev.user.rt = refreshToken;
+						return prev;
+					}),
+				isAuthenticated: get()?.user !== null,
 				finalizeClusterSetup: () => {
 					// TODO
 				},

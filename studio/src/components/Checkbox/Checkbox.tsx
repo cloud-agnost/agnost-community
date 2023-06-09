@@ -1,5 +1,3 @@
-'use client';
-
 import { Label } from '@/components/Label';
 import { cn } from '@/utils';
 import { Check } from '@phosphor-icons/react';

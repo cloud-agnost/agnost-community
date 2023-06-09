@@ -59,6 +59,7 @@ export default {
 
 				icon: {
 					darker: 'rgba(var(--icon-darker), <alpha-value>)',
+					lighter: 'rgba(var(--icon-lighter), <alpha-value>)',
 					base: 'rgba(var(--icon-base), <alpha-value>)',
 					disabled: 'rgba(var(--icon-disabled), <alpha-value>)',
 				},
@@ -192,9 +193,6 @@ export default {
 				default: 'rgba(var(--text-base), <alpha-value>)',
 				subtle: 'rgba(var(--text-subtle), <alpha-value>)',
 				disabled: 'rgba(var(--text-disabled), <alpha-value>)',
-			},
-			fontSize: {
-				xs: 'var(--font-size-xs)',
 			},
 			borderRadius: {
 				lg: `var(--radius)`,
