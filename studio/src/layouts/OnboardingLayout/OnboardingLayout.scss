@@ -3,7 +3,7 @@
 	@apply bg-subtle;
 
 	.onboarding-layout-left {
-		@apply dark:bg-base p-16 flex flex-col items-center gap-y-16 max-h-screen sticky top-0;
+		@apply bg-base p-16 flex flex-col items-center gap-y-16 max-h-screen sticky top-0;
 	}
 
 	.onboarding-layout-right {
