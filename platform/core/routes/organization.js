@@ -36,7 +36,7 @@ const router = express.Router({ mergeParams: true });
 @desc       Get organization role definitions
 @access     private
 */
-router.get("/roles", checkContentType, authSession, async (req, res) => {
+router.get("/roles", authSession, async (req, res) => {
 	try {
 		res.json(orgAuthorization);
 	} catch (error) {
@@ -50,7 +50,7 @@ router.get("/roles", checkContentType, authSession, async (req, res) => {
 @desc       Get all organizations where a user is a member of (sorted by organization name ascending)
 @access     private
 */
-router.get("/", checkContentType, authSession, async (req, res) => {
+router.get("/", authSession, async (req, res) => {
 	try {
 		const { user } = req;
 		let orgs = [];
@@ -313,19 +313,13 @@ router.delete(
 @desc       Returns organization information of the user
 @access     private
 */
-router.get(
-	"/:orgId",
-	checkContentType,
-	authSession,
-	validateOrg,
-	async (req, res) => {
-		try {
-			res.json({ ...req.org, role: req.orgMember.role });
-		} catch (error) {
-			handleError(req, res, error);
-		}
+router.get("/:orgId", authSession, validateOrg, async (req, res) => {
+	try {
+		res.json({ ...req.org, role: req.orgMember.role });
+	} catch (error) {
+		handleError(req, res, error);
 	}
-);
+});
 
 /*
 @route      /v1/org/:orgId/picture?width=128&height=128
@@ -823,7 +817,6 @@ router.delete(
 */
 router.get(
 	"/:orgId/invite",
-	checkContentType,
 	authSession,
 	validateOrg,
 	authorizeOrgAction("org.invite.view"),
@@ -878,7 +871,6 @@ router.get(
 */
 router.get(
 	"/:orgId/invite/list-eligible",
-	checkContentType,
 	authSession,
 	validateOrg,
 	authorizeOrgAction("org.invite.view"),
@@ -932,7 +924,6 @@ router.get(
 */
 router.get(
 	"/:orgId/member",
-	checkContentType,
 	authSession,
 	validateOrg,
 	authorizeOrgAction("org.member.view"),
@@ -1052,7 +1043,6 @@ router.get(
 */
 router.get(
 	"/:orgId/member/exclude-current",
-	checkContentType,
 	authSession,
 	validateOrg,
 	authorizeOrgAction("org.member.view"),

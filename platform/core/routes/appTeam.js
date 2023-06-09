@@ -22,7 +22,6 @@ const router = express.Router({ mergeParams: true });
 */
 router.get(
 	"/",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
@@ -70,7 +69,6 @@ router.get(
 */
 router.get(
 	"/me",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,

@@ -15,7 +15,7 @@ import { applyRules } from "../schemas/user.js";
 import { handleError } from "../schemas/platformError.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validate } from "../middlewares/validate.js";
-import { authClusterToken } from "../middlewares/authClusterToken.js";
+//import { authClusterToken } from "../middlewares/authClusterToken.js";
 import { authSession } from "../middlewares/authSession.js";
 import { authRefreshToken } from "../middlewares/authRefreshToken.js";
 import {
@@ -40,7 +40,7 @@ const router = express.Router({ mergeParams: true });
 router.post(
 	"/init-cluster-setup",
 	checkContentType,
-	authClusterToken,
+	//authClusterToken,
 	checkClusterSetupStatus,
 	applyRules("initiate-cluster-setup"),
 	validate,
@@ -282,7 +282,6 @@ router.post(
 				t("Completed cluster setup")
 			);
 		} catch (error) {
-			console.log("***here", error);
 			await userCtrl.rollback(session);
 			handleError(req, res, error);
 		}

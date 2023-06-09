@@ -32,7 +32,7 @@ const router = express.Router({ mergeParams: true });
 @desc       Get organization role definitions
 @access     private
 */
-router.get("/roles", checkContentType, authSession, async (req, res) => {
+router.get("/roles", authSession, async (req, res) => {
 	try {
 		res.json(appAuthorization);
 	} catch (error) {
@@ -111,7 +111,6 @@ router.post(
 */
 router.get(
 	"/",
-	checkContentType,
 	authSession,
 	validateOrg,
 	authorizeOrgAction("org.app.view"),
@@ -145,7 +144,6 @@ router.get(
 */
 router.get(
 	"/all",
-	checkContentType,
 	authSession,
 	validateOrg,
 	authorizeOrgAction("org.app.viewAll"),
@@ -336,7 +334,6 @@ router.delete(
 */
 router.get(
 	"/:appId",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,

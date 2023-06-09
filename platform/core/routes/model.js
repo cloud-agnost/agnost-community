@@ -30,7 +30,6 @@ const router = express.Router({ mergeParams: true });
 */
 router.get(
 	"/",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
@@ -123,7 +122,6 @@ router.post(
 */
 router.get(
 	"/:modelId",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,

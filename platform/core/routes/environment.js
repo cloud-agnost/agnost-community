@@ -28,7 +28,6 @@ const router = express.Router({ mergeParams: true });
 */
 router.get(
 	"/",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
@@ -497,7 +496,6 @@ router.post(
 */
 router.get(
 	"/:envId/logs",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,

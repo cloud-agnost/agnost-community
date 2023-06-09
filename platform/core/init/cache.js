@@ -27,6 +27,11 @@ export const connectToRedisCache = async () => {
 				`Connected to the cache server @${process.env.CACHE_HOSTNAME}:${cacheConfig.port}`
 			);
 		});
+
+		client.on("error", function (err) {
+			logger.error(`Cannot connect to the cache server`, { details: err });
+			process.exit(1);
+		});
 	} catch (err) {
 		logger.error(`Cannot connect to the cache server`, { details: err });
 		process.exit(1);
@@ -57,6 +62,13 @@ export const connectToRedisCache = async () => {
 				logger.info(
 					`Connected to the read replica cache server @${process.env.CACHE_READ_REPLICA_HOSTNAME}:${readReplicaConfig.port}`
 				);
+			});
+
+			clientReadReplica.on("error", function (err) {
+				logger.error(`Cannot connect to the replica cache server`, {
+					details: err,
+				});
+				process.exit(1);
 			});
 		} catch (err) {
 			logger.error(`Cannot connect to the cache read replica server`, {
