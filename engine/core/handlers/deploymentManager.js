@@ -23,6 +23,8 @@ export class DeploymentManager {
 	 * Returns the environment object
 	 */
 	getEnvObj() {
+		console.log("***getEnvObj", this.msgObj, this.envObj);
+
 		return this.envObj || this.msgObj?.env;
 	}
 

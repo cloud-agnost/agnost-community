@@ -95,8 +95,7 @@ async function finalizePrimaryProcessStartup() {
 	);
 
 	// Create the primary process deployment manager and set up the engine core (API Sever)
-	//const manager = new PrimaryProcessDeploymentManager(null, envObj);
-	const manager = new PrimaryProcessDeploymentManager(null, null);
+	const manager = new PrimaryProcessDeploymentManager(null, envObj);
 	await manager.initializeCore();
 
 	// Fork child process
@@ -116,7 +115,7 @@ async function finalizePrimaryProcessStartup() {
 		// Set a timeout to check if child process responded
 		const heartbeatTimeout = setTimeout(() => {
 			// Child process did not respond within timeout, handle accordingly
-			console.log("Child process is unresponsive!");
+			logger.warn("Child process is unresponsive!");
 
 			// Kill the child process so that it restarts
 			childProcess.kill("SIGINT");

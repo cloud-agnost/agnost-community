@@ -41,7 +41,7 @@
         "expressRequestMaxBodySize": "100mb",
         "endpointPrefix": "/api",
         "gcSeconds": 30,
-        "heartbeatIntervalSeconds": 10,
-        "heartbeatTimeoutSeconds": 5
+        "heartbeatIntervalSeconds": 15,
+        "heartbeatTimeoutSeconds": 10
      }
 }

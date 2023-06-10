@@ -9,6 +9,7 @@ import { corePackages } from "../config/constants.js";
 export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	constructor(msgObj, envObj) {
 		super(msgObj, envObj);
+		console.log("***constructor", msgObj, envObj);
 	}
 
 	/**
