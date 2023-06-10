@@ -92,7 +92,6 @@ async function finalizePrimaryProcessStartup() {
 		envObj
 	);
 
-	if (!envObj) return;
 	// Create the primary process deployment manager and set up the engine core (API Sever)
 	const manager = new PrimaryProcessDeploymentManager(null, envObj);
 	await manager.initializeCore();

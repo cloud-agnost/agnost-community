@@ -48,6 +48,15 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		logger.info(`Started initializing the API server`);
 		// First load the environment and vesion configuration file
 		const envObj = await this.loadEnvConfigFile();
+		// If we do  not have the envObj yet then just spin up the express server to serve system default endpoints
+		if (!envObj) {
+			// Initialize express server
+			await this.initExpressServer();
+			// Spin up the express server
+			await this.startExpressServer();
+			return;
+		}
+
 		// Set the environment object of the deployment manager
 		this.setEnvObj(envObj);
 		// Save also the environment object to globals for faster access
