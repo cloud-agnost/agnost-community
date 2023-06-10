@@ -78,11 +78,11 @@
             },
             "cpu": {
                 "request": "100m",
-                "limit": "200m"
+                "limit": "1000m"
             },
             "memory": {
                 "request": "256Mi",
-                "limit": "512Mi"
+                "limit": "2Gi"
             }
          }
     }

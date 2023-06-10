@@ -31,6 +31,8 @@ if (cluster.isPrimary) {
 	initGlobalsForPrimaryProcess();
 	// Set up locatlization
 	initLocalization();
+	// Connect to the database
+	connectToDatabase();
 	// Connect to cache server(s)
 	connectToRedisCache(finalizePrimaryProcessStartup);
 	// Connect to message queue
@@ -93,7 +95,8 @@ async function finalizePrimaryProcessStartup() {
 	);
 
 	// Create the primary process deployment manager and set up the engine core (API Sever)
-	const manager = new PrimaryProcessDeploymentManager(null, envObj);
+	//const manager = new PrimaryProcessDeploymentManager(null, envObj);
+	const manager = new PrimaryProcessDeploymentManager(null, null);
 	await manager.initializeCore();
 
 	// Fork child process
