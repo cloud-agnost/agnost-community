@@ -36,6 +36,8 @@ export const manageAPIServerHandler = (connection, envId) => {
 				channel.ack(msg);
 				let msgObj = JSON.parse(msg.content.toString());
 
+				console.log("***manageAPIServerHandler", msgObj.action);
+
 				switch (msgObj.action) {
 					default:
 						// Get the environment information

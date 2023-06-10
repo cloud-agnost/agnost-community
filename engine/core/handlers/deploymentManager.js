@@ -118,6 +118,7 @@ export class DeploymentManager {
 	 * @param  {string} status Final environment status
 	 */
 	async sendEnvironmentLogs(status = "OK") {
+		console.log("***sendEnvironmentLogs", this.msgObj?.callback);
 		// If there is no callback just return
 		if (!this.msgObj?.callback) return;
 

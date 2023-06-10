@@ -1,8 +1,3 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import nocache from "nocache";
-import responseTime from "response-time";
 import cluster from "cluster";
 import process from "process";
 import config from "config";
@@ -23,8 +18,6 @@ import { initializeSyncClient, disconnectSyncClient } from "./init/sync.js";
 import { PrimaryProcessDeploymentManager } from "./handlers/primaryProcessManager.js";
 import { ChildProcessDeploymentManager } from "./handlers/childProcessManager.js";
 import { adapterManager } from "./handlers/adapterManager.js";
-import { handleUndefinedPaths } from "./middlewares/undefinedPaths.js";
-import { logRequest } from "./middlewares/logRequest.js";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -37,13 +30,11 @@ if (cluster.isPrimary) {
 	// Init globally accessible variables
 	initGlobalsForPrimaryProcess();
 	// Set up locatlization
-	const i18n = initLocalization();
+	initLocalization();
 	// Connect to cache server(s)
-	connectToRedisCache(finalizePrimaryProcessStarup);
+	connectToRedisCache(finalizePrimaryProcessStartup);
 	// Connect to message queue
 	connectToQueue();
-	// Spin up http server
-	const server = initExpress(i18n);
 	// Gracefull handle process exist
 	handlePrimaryProcessExit();
 	// Set up garbage collector
@@ -92,11 +83,14 @@ if (cluster.isPrimary) {
 	});
 }
 
-async function finalizePrimaryProcessStarup() {
-	console.log("****here - final steps", process.env.AGNOST_ENVIRONMENT_ID);
+async function finalizePrimaryProcessStartup() {
 	// Get the environment information
 	let envObj = await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.object`);
-	console.log("****here - final steps envObj", envObj);
+	console.log(
+		"****here - final steps envObj",
+		`${process.env.AGNOST_ENVIRONMENT_ID}.object`,
+		envObj
+	);
 
 	if (!envObj) return;
 	// Create the primary process deployment manager and set up the engine core (API Sever)
@@ -192,38 +186,6 @@ function initLocalization() {
 	});
 
 	return i18n;
-}
-
-async function initExpress(i18n) {
-	// Create express application
-	var app = express();
-	//Secure express app by setting various HTTP headers
-	app.use(helmet());
-	//Enable cross-origin resource sharing
-	app.use(cors());
-	//Disable client side caching
-	app.use(nocache());
-	app.set("etag", false);
-	// Add middleware to identify user locale using 'accept-language' header to guess language settings
-	app.use(i18n.init);
-	app.use(responseTime(logRequest));
-
-	app.use("/", (await import("./routes/system.js")).default);
-
-	// Middleware to handle undefined paths or posts
-	app.use(handleUndefinedPaths);
-
-	// Spin up the http server
-	const HOST = config.get("server.host");
-	const PORT = config.get("server.port");
-	var server = app.listen(PORT, () => {
-		logger.info(`Http server started @ ${HOST}:${PORT}`);
-	});
-
-	/* 	Particularly needed in case of bulk insert/update/delete operations, we should not generate 502 Bad Gateway errors at nginex ingress controller, the value specified in default config file is in milliseconds */
-	server.timeout = config.get("server.timeout");
-
-	return server;
 }
 
 function handlePrimaryProcessExit() {

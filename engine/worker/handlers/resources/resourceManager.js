@@ -396,6 +396,10 @@ export class ResourceManager {
 						app: deploymentName,
 					},
 				},
+				strategy: {
+					type: "RollingUpdate",
+					rollingUpdate: { maxSurge: "30%", maxUnavailable: 0 },
+				},
 				template: {
 					metadata: {
 						labels: {
@@ -489,29 +493,23 @@ export class ResourceManager {
 										path: "/health",
 										port: config.get("general.defaultClusterIPPort"),
 									},
-									initialDelaySeconds: config.get(
-										"general.livenessProbe.initialDelaySeconds"
+									failureThreshold: config.get(
+										"general.livenessProbe.failureThreshold"
 									),
 									periodSeconds: config.get(
 										"general.livenessProbe.periodSeconds"
 									),
-									timeoutSeconds: config.get(
-										"general.livenessProbe.timeoutSeconds"
-									),
 								},
-								readinessProbe: {
+								startupProbe: {
 									httpGet: {
 										path: "/health",
 										port: config.get("general.defaultClusterIPPort"),
 									},
-									initialDelaySeconds: config.get(
-										"general.readinessProbe.initialDelaySeconds"
+									failureThreshold: config.get(
+										"general.startupProbe.failureThreshold"
 									),
 									periodSeconds: config.get(
-										"general.readinessProbe.periodSeconds"
-									),
-									timeoutSeconds: config.get(
-										"general.readinessProbe.timeoutSeconds"
+										"general.startupProbe.periodSeconds"
 									),
 								},
 							},

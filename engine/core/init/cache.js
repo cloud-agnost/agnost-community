@@ -6,6 +6,12 @@ var client;
 var clientReadReplica;
 
 export const connectToRedisCache = async (callback) => {
+	//If we have the read replica cache then connect to it
+	let readReplicaConfig = null;
+	try {
+		readReplicaConfig = config.get("cache.readReplica");
+	} catch (err) {}
+
 	try {
 		let cacheConfig = config.get("cache");
 		client = redis.createClient({
@@ -28,7 +34,8 @@ export const connectToRedisCache = async (callback) => {
 				`Connected to the cache server @${process.env.CACHE_HOSTNAME}:${cacheConfig.port}`
 			);
 
-			if (callback) callback();
+			// If we have a callback function and do not have a read replica cache then execute the callback function
+			if (callback && !readReplicaConfig) callback();
 		});
 
 		client.on("error", function (err) {
@@ -39,12 +46,6 @@ export const connectToRedisCache = async (callback) => {
 		logger.error(`Cannot connect to the cache server`, { details: err });
 		process.exit(1);
 	}
-
-	//If we have the read replica cache then connect to it
-	let readReplicaConfig = null;
-	try {
-		readReplicaConfig = config.get("cache.readReplica");
-	} catch (err) {}
 
 	if (readReplicaConfig) {
 		try {
@@ -66,6 +67,9 @@ export const connectToRedisCache = async (callback) => {
 				logger.info(
 					`Connected to the read replica cache server @${process.env.CACHE_READ_REPLICA_HOSTNAME}:${readReplicaConfig.port}`
 				);
+
+				// If we have a callback function then execute it
+				if (callback) callback();
 			});
 
 			clientReadReplica.on("error", function (err) {

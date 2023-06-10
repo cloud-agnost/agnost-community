@@ -39,14 +39,12 @@
         "maxPoolSize": 3,
         "defaultClusterIPPort": 4000,
         "livenessProbe": {
-           "initialDelaySeconds": 10,
-           "periodSeconds": 20,
-           "timeoutSeconds": 5
+           "failureThreshold": 3,
+           "periodSeconds": 20
         },
-        "readinessProbe": {
-           "initialDelaySeconds": 10,
-           "periodSeconds": 20,
-           "timeoutSeconds": 5
+        "startupProbe": {
+           "failureThreshold": 30,
+           "periodSeconds": 30
         }
      }
 }

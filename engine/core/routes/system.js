@@ -12,7 +12,7 @@ router.get("/health", (req, res) => {
 		.status(200)
 		.send(
 			`${new Date().toISOString()} - Healthy API server ${
-				process.env.AGNOST_ENGINE_ID
+				process.env.AGNOST_ENVIRONMENT_ID
 			}`
 		);
 });
