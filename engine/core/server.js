@@ -88,11 +88,6 @@ if (cluster.isPrimary) {
 async function finalizePrimaryProcessStartup() {
 	// Get the environment information
 	let envObj = await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.object`);
-	console.log(
-		"****here - final steps envObj",
-		`${process.env.AGNOST_ENVIRONMENT_ID}.object`,
-		envObj
-	);
 
 	// Create the primary process deployment manager and set up the engine core (API Sever)
 	const manager = new PrimaryProcessDeploymentManager(null, envObj);

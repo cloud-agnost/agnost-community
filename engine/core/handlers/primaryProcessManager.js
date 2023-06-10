@@ -198,7 +198,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	 * @param  {string} actionType The action type such as set, update, delete and add
 	 */
 	async updateConfigEntries(contentType, configEntries, actionType) {
-		const config = await this.loadEntityConfigFile(contentType);
+		let config = await this.loadEntityConfigFile(contentType);
 		switch (actionType) {
 			case "set":
 				config = configEntries;
