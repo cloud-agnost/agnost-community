@@ -285,10 +285,6 @@ router.delete(
 				(entry) => entry.managed === true
 			);
 
-			console.log(
-				"***managed resources",
-				JSON.stringify(managedResources, null, 2)
-			);
 			// Delete managed organization resources
 			resourceCtrl.deleteClusterResources(managedResources);
 

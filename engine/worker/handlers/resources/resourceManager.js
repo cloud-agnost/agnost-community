@@ -471,6 +471,14 @@ export class ResourceManager {
 										name: "MASTER_TOKEN",
 										value: process.env.MASTER_TOKEN,
 									},
+									{
+										name: "POD_NAME",
+										valueFrom: {
+											fieldRef: {
+												fieldPath: "metadata.name",
+											},
+										},
+									},
 								],
 								resources: {
 									requests: {
@@ -532,8 +540,6 @@ export class ResourceManager {
 				},
 			},
 		};
-
-		console.log("***deploymentSpec", JSON.stringify(deploymentSpec, null, 2));
 
 		try {
 			// Create the deployment
@@ -847,7 +853,7 @@ export class ResourceManager {
 							http: {
 								paths: [
 									{
-										path: `/${pathName}/(.*)`,
+										path: `/${pathName}(/|$)(.*)`,
 										pathType: "Prefix",
 										backend: {
 											service: {

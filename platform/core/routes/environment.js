@@ -129,7 +129,6 @@ router.put(
 				}
 			);
 		} catch (error) {
-			console.log(error);
 			handleError(req, res, error);
 		}
 	}

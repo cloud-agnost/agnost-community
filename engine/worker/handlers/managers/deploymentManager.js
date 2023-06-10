@@ -1145,8 +1145,6 @@ export class DeploymentManager {
 			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
 			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
-			console.log("****here", `${this.getEnvId()}.object`, this.getEnvObj());
-
 			// Load all data models and do deployment initializations
 			await this.loadDatabases();
 			// Cache application configuration data

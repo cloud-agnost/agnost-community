@@ -9,7 +9,6 @@ import { corePackages } from "../config/constants.js";
 export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	constructor(msgObj, envObj) {
 		super(msgObj, envObj);
-		console.log("***constructor", msgObj, envObj);
 	}
 
 	/**
@@ -147,8 +146,6 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	 * @param  {string} actionType The action type such as set, update, delete and add
 	 */
 	async manageConfigFiles(contentType, contents, actionType) {
-		if (contents.length === 0) return;
-
 		// We save the files both to their respective meta folder but also udpate the entries in their respective data in config folder
 		// As an example when we save each endpoint to meta/endpoints folder individually, we also save their configuration (without the code part) to meta/config/endpoints.json file also
 		const configItems = [];

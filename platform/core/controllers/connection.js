@@ -128,9 +128,9 @@ class ConnectionController {
 					if (connSettings.format === "object") {
 						const { username, password, host, port, scheme, vhost, options } =
 							connSettings;
-						connSettings.url = `${scheme}://${username}:${password}@${host}:${port}/${vhost}?${helper.getQueryString(
-							options
-						)}`;
+						connSettings.url = `${scheme}://${username}:${password}@${host}:${port}/${
+							vhost ?? ""
+						}?${helper.getQueryString(options)}`;
 					}
 
 					const client = await amqp.connect(connSettings.url);

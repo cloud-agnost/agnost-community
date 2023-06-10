@@ -23,8 +23,6 @@ export class DeploymentManager {
 	 * Returns the environment object
 	 */
 	getEnvObj() {
-		console.log("***getEnvObj", this.msgObj, this.envObj);
-
 		return this.envObj || this.msgObj?.env;
 	}
 
@@ -120,14 +118,13 @@ export class DeploymentManager {
 	 * @param  {string} status Final environment status
 	 */
 	async sendEnvironmentLogs(status = "OK") {
-		console.log("***sendEnvironmentLogs", this.msgObj?.callback);
 		// If there is no callback just return
-		if (!this.msgObj?.callback) return;
+		if (!this.msgObj?.callback && !this.envObj.callback) return;
 
 		try {
 			// Update the environment log object
 			await axios.post(
-				this.msgObj.callback,
+				this.msgObj?.callback || this.envObj.callback,
 				{
 					status: status,
 					logs: this.logs,
