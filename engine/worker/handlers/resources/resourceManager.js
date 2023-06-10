@@ -518,6 +518,21 @@ export class ResourceManager {
 										"general.readinessProbe.initialDelaySeconds"
 									),
 								},
+								startupProbe: {
+									httpGet: {
+										path: "/health",
+										port: config.get("general.defaultClusterIPPort"),
+									},
+									timeoutSeconds: config.get(
+										"general.startupProbe.timeoutSeconds"
+									),
+									periodSeconds: config.get(
+										"general.startupProbe.periodSeconds"
+									),
+									failureThreshold: config.get(
+										"general.startupProbe.failureThreshold"
+									),
+								},
 							},
 						],
 						volumes: pvcs.map((entry) => {
