@@ -27,7 +27,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 		<div className='auth-layout'>
 			<div className='auth-layout-left'>
 				<Logo className='auth-layout-app-logo' />
-				<Slider items={items} />
+				<Slider className='!m-0' items={items} />
 			</div>
 			<div className='auth-layout-right'>{children}</div>
 		</div>

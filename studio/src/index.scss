@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700;900&family=Rubik:wght@300;400;500;600;700;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,6 +6,9 @@
 
 @layer base {
 	:root {
+		--font-sans: 'Rubik', sans-serif;
+		--font-albert: 'Albert Sans', sans-serif;
+
 		/* Color styles */
 		--brand-color-primary--darker: 37, 54, 127;
 		--brand-color-primary: 104, 132, 253;
@@ -220,9 +223,9 @@
 
 @layer base {
 	* {
-		font-family: 'Rubik', sans-serif;
 		@apply border-border;
 	}
+
 	body {
 		@apply bg-base;
 		font-feature-settings: 'rlig' 1, 'calt' 1;
