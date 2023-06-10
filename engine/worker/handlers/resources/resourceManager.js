@@ -493,23 +493,29 @@ export class ResourceManager {
 										path: "/health",
 										port: config.get("general.defaultClusterIPPort"),
 									},
-									failureThreshold: config.get(
-										"general.livenessProbe.failureThreshold"
+									timeoutSeconds: config.get(
+										"general.livenessProbe.timeoutSeconds"
 									),
 									periodSeconds: config.get(
 										"general.livenessProbe.periodSeconds"
 									),
+									initialDelaySeconds: config.get(
+										"general.livenessProbe.initialDelaySeconds"
+									),
 								},
-								startupProbe: {
+								readinessProbe: {
 									httpGet: {
 										path: "/health",
 										port: config.get("general.defaultClusterIPPort"),
 									},
-									failureThreshold: config.get(
-										"general.startupProbe.failureThreshold"
+									timeoutSeconds: config.get(
+										"general.readinessProbe.timeoutSeconds"
 									),
 									periodSeconds: config.get(
-										"general.startupProbe.periodSeconds"
+										"general.readinessProbe.periodSeconds"
+									),
+									initialDelaySeconds: config.get(
+										"general.readinessProbe.initialDelaySeconds"
 									),
 								},
 							},
