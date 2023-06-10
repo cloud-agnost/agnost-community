@@ -6,7 +6,16 @@ import { Stepper } from '@/components/Stepper';
 import useOnboardingStore, { Step } from '@/store/onboarding/onboardingStore.ts';
 import { removeLastSlash } from '@/utils/utils.ts';
 
+import './onboarding.scss';
+import { data } from 'autoprefixer';
+
 async function loader(params: LoaderFunctionArgs) {
+	const status = await useClusterStore.getState().checkClusterSetup();
+
+	if (status) {
+		// return redirect('/organization');
+	}
+
 	const url = new URL(params.request.url);
 	const steps = useOnboardingStore.getState().steps;
 
@@ -22,12 +31,7 @@ async function loader(params: LoaderFunctionArgs) {
 		}
 	}
 
-	const status = await useClusterStore.getState().checkClusterSetup();
-	if (status) {
-		console.log(status);
-		// TODO: Check if user is logged in
-	}
-	return null;
+	return data;
 }
 
 export default function Onboarding() {
@@ -57,7 +61,7 @@ export default function Onboarding() {
 
 	return (
 		<OnboardingLayout stepper={stepper}>
-			<div className='space-y-8 w-3/4 max-w-2xl mx-auto'>
+			<div className='onboarding-page'>
 				<Outlet context={{ goBack }} />
 			</div>
 		</OnboardingLayout>

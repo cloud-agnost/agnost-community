@@ -1,16 +1,15 @@
 .onboarding-layout {
-	@apply grid grid-cols-[350px_auto] h-screen overflow-auto;
-	@apply bg-subtle;
+	@apply grid md:grid-cols-[350px_auto] h-full min-h-screen;
 
 	.onboarding-layout-left {
-		@apply bg-base p-16 flex flex-col items-center gap-y-16 max-h-screen sticky top-0;
+		@apply hidden md:flex bg-base p-8 md:p-16 flex-col items-center gap-y-16 sticky top-0 max-h-full;
 	}
 
 	.onboarding-layout-right {
-		@apply p-16;
+		@apply p-8 md:p-16 bg-subtle;
 	}
 
 	.onboarding-layout-app-logo {
-		@apply w-36 self-start;
+		@apply w-36 self-start shrink-0;
 	}
 }
