@@ -17,10 +17,17 @@ const buttonVariants = cva('btn', {
 			text: 'btn-text',
 			link: 'btn-link',
 		},
+		icon: {
+			true: 'btn-icon',
+		},
 		size: {
 			md: 'btn-md',
 			sm: 'btn-sm',
+			lg: 'btn-lg',
 			full: 'btn-full',
+		},
+		loading: {
+			true: 'btn-loading',
 		},
 	},
 	defaultVariants: {
