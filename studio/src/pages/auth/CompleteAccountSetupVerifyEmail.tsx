@@ -18,6 +18,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PasswordInput } from '@/components/PasswordInput';
+import { VerificationCodeInput } from '@/components/VerificationCodeInput';
 
 async function loader(params: any) {
 	console.log(params);
@@ -58,9 +59,16 @@ export default function CompleteAccountSetupVerifyEmail() {
 
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-						<div className='text-default'>
-							{/* TODO :: Code input buraya gelecek hazır değil */}
-							Code input buraya gelecek hazır değil
+						<div className='space-y-8'>
+							<span className='text-default'>Verification Code</span>
+							<VerificationCodeInput
+								onChange={(code) => {
+									console.log(code);
+								}}
+								onComplete={(code) => {
+									console.log(code);
+								}}
+							/>
 						</div>
 
 						<FormField
