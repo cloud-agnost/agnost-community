@@ -11,7 +11,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import './auth.scss';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import useAuthStore from '@/store/auth/authStore.ts';
+import { APIError } from '@/types';
 
 async function loader(params: any) {
 	console.log(params);
@@ -26,15 +28,26 @@ const FormSchema = z.object({
 });
 
 export default function Login() {
-	const [error, setError] = useState<string | null>(null);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<APIError | null>(null);
+	const { login } = useAuthStore();
+	const navigate = useNavigate();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
 
-	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		setError(null);
-		console.log(data);
+	async function onSubmit({ email, password }: z.infer<typeof FormSchema>) {
+		try {
+			setError(null);
+			setLoading(true);
+			await login(email, password);
+			navigate('/organization');
+		} catch (error) {
+			setError(error as APIError);
+		} finally {
+			setLoading(false);
+		}
 	}
 
 	return (
@@ -46,7 +59,7 @@ export default function Login() {
 
 				{error && (
 					<Alert className='!max-w-full' variant='error'>
-						{error}
+						{error.details}
 					</Alert>
 				)}
 
@@ -90,7 +103,9 @@ export default function Login() {
 						/>
 
 						<div className='flex justify-end space-y-8'>
-							<Button size='full'>Login</Button>
+							<Button loading={loading} size='full'>
+								Login
+							</Button>
 						</div>
 					</form>
 				</Form>

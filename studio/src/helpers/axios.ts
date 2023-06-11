@@ -7,7 +7,6 @@ export const instance = axios.create({
 	headers: {
 		'Content-Type': 'application/json',
 	},
-	validateStatus: (status) => status < 500,
 });
 
 instance.interceptors.request.use((config) => {
@@ -18,3 +17,10 @@ instance.interceptors.request.use((config) => {
 	}
 	return config;
 });
+
+instance.interceptors.response.use(
+	(response) => {
+		return response;
+	},
+	(error) => Promise.reject(error.response.data),
+);
