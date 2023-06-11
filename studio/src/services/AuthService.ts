@@ -7,8 +7,8 @@ export default class AuthService {
 	static async initializeClusterSetup(data: UserDataToRegister): Promise<User> {
 		return (await axios.post(`${this.url}/init-cluster-setup`, data)).data;
 	}
-	static async finalizeClusterSetup(data: OnboardingData) {
-		return (await axios.post(`${this.url}/finalize-cluster-setup`, data)).data;
+	static async finalizeClusterSetup(req: OnboardingData) {
+		return (await axios.post(`${this.url}/finalize-cluster-setup`, req)).data;
 	}
 	static async initiateAccountSetup(email: string) {
 		return (await axios.post(`${this.url}/init-account-setup`, { email })).data;
