@@ -46,7 +46,14 @@ export default function SMTPConfiguration() {
 	const [isTesting, setIsTesting] = useState(false);
 	const [finalizing, setFinalizing] = useState(false);
 
-	const { setDataPartially, getCurrentStep, goToNextStep } = useOnboardingStore();
+	const {
+		setDataPartially,
+		getCurrentStep,
+		goToNextStep,
+		setStepByPath,
+		data: onboardingData,
+	} = useOnboardingStore();
+
 	const { finalizeClusterSetup } = useClusterStore();
 	const { goBack } = useOutletContext() as { goBack: () => void };
 
@@ -54,7 +61,9 @@ export default function SMTPConfiguration() {
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
-
+	async function onSubmit(data: z.infer<typeof FormSchema>) {
+		await checkSMTPConnection(data);
+	}
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		try {
 			setIsTesting(true);
@@ -74,11 +83,36 @@ export default function SMTPConfiguration() {
 			setIsTesting(false);
 		}
 	}
+	async function checkSMTPConnection(data: z.infer<typeof FormSchema>): Promise<boolean> {
+		setIsTesting(true);
+		setError(null);
+
+		const res = await PlatformService.testSMTPSettings(data);
+		setIsTesting(false);
+		if (typeof res === 'object' && 'error' in res) {
+			setError(res);
+			return false;
+		} else {
+			setDataPartially({
+				smtp: data,
+			});
+			navigate('/onboarding/invite-team-members');
+
+			setStepByPath('/onboarding/smtp-configuration', {
+				isDone: true,
+			});
+			return true;
+		}
+	}
 
 	async function finishSetup() {
-		// TODO: finalizeClusterSetup should implemented;
+		try {
+			await PlatformService.testSMTPSettings(form.getValues());
+		} catch (error) {
+			setError(error as APIError);
+		}
 		setFinalizing(true);
-		await finalizeClusterSetup();
+		await finalizeClusterSetup(onboardingData);
 		setFinalizing(false);
 	}
 
