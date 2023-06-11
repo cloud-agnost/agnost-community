@@ -10,7 +10,7 @@
 		"preview": "vite preview",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
-		"icon": "svgr icons -d src/components/icons --ext tsx --typescript --icon --ignore-existing --replace-attr-values \"#fff=currentColor\""
+		"icon": "svgr src/assets/icons -d src/components/icons --ext tsx --typescript --icon --ignore-existing --replace-attr-values \"#fff=currentColor\""
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^3.1.0",
