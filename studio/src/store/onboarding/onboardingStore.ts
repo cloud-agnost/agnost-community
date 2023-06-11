@@ -28,14 +28,14 @@ const useOnboardingStore = create<OnboardingStore>()(
 					{
 						text: 'Account Information',
 						path: '/onboarding',
-						isDone: true,
+						isDone: false,
 						isActive: false,
 						nextPath: '/onboarding/create-organization',
 					},
 					{
 						text: 'Create Your Organization',
 						path: '/onboarding/create-organization',
-						isDone: true,
+						isDone: false,
 						isActive: false,
 						prevPath: '/onboarding',
 						nextPath: '/onboarding/create-app',

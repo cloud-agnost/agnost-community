@@ -1,23 +1,26 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { Pagination, Autoplay } from 'swiper';
 import { ReactElement } from 'react';
 import './Slider.scss';
+import { cn } from '@/utils';
 
 interface SliderProps {
+	className?: string;
 	items: {
 		text: string;
 		element: ReactElement;
 	}[];
 }
 
-export default function Slider({ items }: SliderProps) {
+export default function Slider({ items, className }: SliderProps) {
 	return (
 		<Swiper
 			spaceBetween={10}
 			pagination
 			loop
-			className='slider'
+			className={cn('slider', className)}
 			autoplay
 			modules={[Pagination, Autoplay]}
 		>

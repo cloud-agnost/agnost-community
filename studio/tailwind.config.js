@@ -202,6 +202,7 @@ export default {
 			},
 			fontFamily: {
 				sans: ['var(--font-sans)', ...fontFamily.sans],
+				albert: ['var(--font-albert)'],
 			},
 			fontSize: {
 				xs: ['var(--font-size-xs)', 'var(--font-size-xs-line-height)'],
