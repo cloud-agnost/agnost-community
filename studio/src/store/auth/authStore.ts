@@ -7,12 +7,16 @@ interface AuthStore {
 	loading: boolean;
 	error: APIError | null;
 	user: User | null;
-	setUser: (user: User | null) => void;
-	login: (email: string, password: string) => Promise<User>;
-	logout: () => any;
+	isAuthenticated: boolean;
+	setUser: (user: User) => void;
+	login: () => void;
+	logout: () => void;
 	setToken: (token: string) => void;
 	setRefreshToken: (refreshToken: string) => void;
-	isAuthenticated: () => boolean;
+	finalizeClusterSetup: () => void;
+	initializeAccountSetup: () => void;
+	finalizeAccountSetup: () => void;
+	completeAccountSetupFollowingInviteAccept: () => void;
 	renewAccessToken: () => void;
 }
 
