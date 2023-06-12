@@ -12,7 +12,7 @@ interface AuthStore {
 	logout: () => any;
 	setToken: (token: string) => void;
 	setRefreshToken: (refreshToken: string) => void;
-	isAuthenticated: boolean;
+	isAuthenticated: () => boolean;
 	renewAccessToken: () => void;
 }
 
@@ -44,7 +44,7 @@ const useAuthStore = create<AuthStore>()(
 						if (prev.user) prev.user.rt = refreshToken;
 						return prev;
 					}),
-				isAuthenticated: get()?.user !== null,
+				isAuthenticated: () => get()?.user !== null,
 				renewAccessToken: () => {
 					// TODO renew access token
 				},
