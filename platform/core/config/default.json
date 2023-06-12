@@ -81,7 +81,7 @@
                 "limit": "1000m"
             },
             "memory": {
-                "request": "256Mi",
+                "request": "512Mi",
                 "limit": "2Gi"
             }
          }

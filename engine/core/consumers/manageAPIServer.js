@@ -1,3 +1,7 @@
+import cluster from "cluster";
+import { getKey } from "../init/cache.js";
+import { PrimaryProcessDeploymentManager } from "../handlers/primaryProcessManager.js";
+
 export const manageAPIServerHandler = (connection, envId) => {
 	connection.createChannel(function (error, channel) {
 		if (error) {
@@ -30,8 +34,25 @@ export const manageAPIServerHandler = (connection, envId) => {
 			async function (msg) {
 				// Acknowledge the message
 				channel.ack(msg);
-				// Restart the process throught pm2
-				process.exit(0);
+				let msgObj = JSON.parse(msg.content.toString());
+
+				switch (msgObj.action) {
+					default:
+						// Get the environment information
+						let envObj = await getKey(
+							`${process.env.AGNOST_ENVIRONMENT_ID}.object`
+						);
+						// Create the primary process deployment manager and set up the engine core (API Server)
+						const manager = new PrimaryProcessDeploymentManager(msgObj, envObj);
+						await manager.initializeCore();
+						// Restart worker(s)
+						for (const worker of Object.values(cluster.workers)) {
+							worker.kill("SIGINT");
+						}
+						break;
+				}
+
+				return;
 			},
 			{
 				noAck: false,
