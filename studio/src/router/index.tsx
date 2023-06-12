@@ -18,6 +18,7 @@ import {
 } from '@/pages/auth';
 import useAuthStore from '@/store/auth/authStore.ts';
 import type { ReactNode } from 'react';
+import { RedirectHandle } from '@/pages/redirect-handle';
 
 const router = createBrowserRouter([
 	{
@@ -126,6 +127,11 @@ const router = createBrowserRouter([
 				),
 			},
 		],
+	},
+	{
+		path: '/redirect-handle',
+		loader: RedirectHandle.loader,
+		element: <RedirectHandle />,
 	},
 ]);
 
