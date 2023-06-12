@@ -3,6 +3,8 @@ import useClusterStore from '@/store/cluster/clusterStore.ts';
 
 async function loader() {
 	const status = await useClusterStore.getState().checkClusterSetup();
+	await useClusterStore.getState().checkClusterSmtpStatus();
+
 	// TODO: Check if user is logged in
 	if (!status) {
 		return redirect('/onboarding');

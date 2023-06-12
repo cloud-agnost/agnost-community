@@ -81,27 +81,6 @@ export default function SMTPConfiguration() {
 			setIsTesting(false);
 		}
 	}
-	async function checkSMTPConnection(data: z.infer<typeof FormSchema>): Promise<boolean> {
-		setIsTesting(true);
-		setError(null);
-
-		const res = await PlatformService.testSMTPSettings(data);
-		setIsTesting(false);
-		if (typeof res === 'object' && 'error' in res) {
-			setError(res);
-			return false;
-		} else {
-			setDataPartially({
-				smtp: data,
-			});
-			navigate('/onboarding/invite-team-members');
-
-			setStepByPath('/onboarding/smtp-configuration', {
-				isDone: true,
-			});
-			return true;
-		}
-	}
 
 	async function finishSetup() {
 		try {
