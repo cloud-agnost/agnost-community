@@ -9,7 +9,7 @@ interface AuthStore {
 	user: User | null;
 	isAuthenticated: boolean;
 	setUser: (user: User) => void;
-	login: () => void;
+	login: (email: string, password: string) => Promise<User>;
 	logout: () => void;
 	setToken: (token: string) => void;
 	setRefreshToken: (refreshToken: string) => void;
