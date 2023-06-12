@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import type { APIError, User } from '@/types/type.ts';
-import { AuthService } from '@/services';
+import { AuthService, UserService } from '@/services';
 
 interface AuthStore {
 	loading: boolean;
@@ -14,6 +14,9 @@ interface AuthStore {
 	setRefreshToken: (refreshToken: string) => void;
 	isAuthenticated: () => boolean;
 	renewAccessToken: () => void;
+	completeAccountSetupFollowingInviteAccept: () => void;
+	resetPassword: (email: string) => Promise<void>;
+	verifyEmail: (email: string, code: number) => Promise<void>;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -47,6 +50,18 @@ const useAuthStore = create<AuthStore>()(
 				isAuthenticated: () => get()?.user !== null,
 				renewAccessToken: () => {
 					// TODO renew access token
+				},
+				completeAccountSetupFollowingInviteAccept() {
+					// TODO complete account setup following invite accept
+				},
+				async resetPassword(email) {
+					return UserService.resetPassword({
+						email,
+						uiBaseURL: window.location.origin,
+					});
+				},
+				async verifyEmail(email: string, code: number) {
+					await AuthService.validateEmail(email, code);
 				},
 			}),
 			{

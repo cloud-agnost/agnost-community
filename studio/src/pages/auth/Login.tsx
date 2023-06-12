@@ -14,11 +14,7 @@ import './auth.scss';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { APIError } from '@/types';
-
-async function loader(params: any) {
-	console.log(params);
-	return null;
-}
+import { AuthService } from '@/services';
 
 const FormSchema = z.object({
 	email: z
@@ -30,7 +26,7 @@ const FormSchema = z.object({
 export default function Login() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
-	const { login } = useAuthStore();
+	const { login, setUser } = useAuthStore();
 	const navigate = useNavigate();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
@@ -41,7 +37,10 @@ export default function Login() {
 		try {
 			setError(null);
 			setLoading(true);
-			await login(email, password);
+			const user = await login(email, password);
+			console.log(user);
+			console.log(user);
+			setUser(user);
 			navigate('/organization');
 		} catch (error) {
 			setError(error as APIError);
@@ -50,19 +49,21 @@ export default function Login() {
 		}
 	}
 
+	if (error?.code === 'pending_email_confirmation') {
+		return <NotVerified clearError={() => setError(null)} email={form.getValues().email} />;
+	}
+
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
 				<Description title='Login to your account'>
 					Welcome back! Please enter your details.
 				</Description>
-
 				{error && (
 					<Alert className='!max-w-full' variant='error'>
 						{error.details}
 					</Alert>
 				)}
-
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='auth-form'>
 						<FormField
@@ -109,7 +110,6 @@ export default function Login() {
 						</div>
 					</form>
 				</Form>
-
 				<div className='flex justify-between text-sm underline text-default leading-6 font-albert'>
 					<Link to='/forgot-password'>Forgot Password</Link>
 					<Link to='/complete-account-setup'>Complete Account Setup</Link>
@@ -119,4 +119,59 @@ export default function Login() {
 	);
 }
 
-Login.loader = loader;
+function NotVerified({ email, clearError }: { email: string; clearError: () => void }) {
+	const [loading, setLoading] = useState(false);
+	const [success, setSuccess] = useState(false);
+	const [error, setError] = useState<APIError | null>(null);
+
+	async function reSendVerificationCode() {
+		try {
+			setError(null);
+			setLoading(true);
+			setSuccess(false);
+			await AuthService.resendEmailVerificationCode(email);
+			setSuccess(true);
+		} catch (error) {
+			setError(error as APIError);
+		} finally {
+			setLoading(false);
+		}
+	}
+
+	return (
+		<AuthLayout>
+			<div className='auth-page'>
+				<Description title='Email Verification'>
+					Your email address has not been verified yet. You need to first verify your email to
+					activate your Agnost account.
+				</Description>
+
+				<Description className='!mt-2'>
+					Click button below to send the email verification code to{' '}
+					<span className='text-default'>{email}</span>
+				</Description>
+
+				{error && (
+					<Alert className='!max-w-full' variant='error'>
+						{error.details}
+					</Alert>
+				)}
+
+				{success && (
+					<Alert className='!max-w-full' variant='success'>
+						Email verification code has been sent to your email address.
+					</Alert>
+				)}
+
+				<div className='flex justify-end gap-1'>
+					<Button onClick={clearError} variant='text' type='button' className='w-[165px]'>
+						Back to Login
+					</Button>
+					<Button loading={loading} onClick={reSendVerificationCode}>
+						Send Verify Code
+					</Button>
+				</div>
+			</div>
+		</AuthLayout>
+	);
+}

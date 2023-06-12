@@ -56,10 +56,11 @@ export default function AccountInformation() {
 		try {
 			setInitiating(true);
 			setError(null);
-			const res = await initializeClusterSetup(data);
+			const user = await initializeClusterSetup(data);
+			setUser(user);
 			const { nextPath } = getCurrentStep();
-			setUser(res);
 			if (nextPath) {
+				console.log(nextPath);
 				navigate(nextPath);
 				goToNextStep(true);
 			}
