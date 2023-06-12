@@ -1,21 +1,18 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import type { APIError, User } from '@/types/type.ts';
+import { AuthService } from '@/services';
 
 interface AuthStore {
 	loading: boolean;
 	error: APIError | null;
 	user: User | null;
-	setUser: (user: User) => void;
-	login: () => void;
-	logout: () => void;
+	setUser: (user: User | null) => void;
+	login: (email: string, password: string) => Promise<User>;
+	logout: () => any;
 	setToken: (token: string) => void;
 	setRefreshToken: (refreshToken: string) => void;
-	isAuthenticated: boolean;
-	finalizeClusterSetup: () => void;
-	initializeAccountSetup: () => void;
-	finalizeAccountSetup: () => void;
-	completeAccountSetupFollowingInviteAccept: () => void;
+	isAuthenticated: () => boolean;
 	renewAccessToken: () => void;
 }
 
@@ -27,11 +24,15 @@ const useAuthStore = create<AuthStore>()(
 				error: null,
 				user: null,
 				setUser: (user) => set({ user }),
-				login: () => {
-					// TODO Implement
+				login: async (email, password) => {
+					const res = await AuthService.login(email, password);
+					set({ user: res });
+					return res;
 				},
-				logout: () => {
-					// TODO Implement
+				logout: async () => {
+					const res = await AuthService.logout();
+					set({ user: null });
+					return res;
 				},
 				setToken: (token) =>
 					set((prev) => {
@@ -43,21 +44,9 @@ const useAuthStore = create<AuthStore>()(
 						if (prev.user) prev.user.rt = refreshToken;
 						return prev;
 					}),
-				isAuthenticated: get()?.user !== null,
-				finalizeClusterSetup: () => {
-					// TODO
-				},
-				initializeAccountSetup: () => {
-					// TODO
-				},
-				finalizeAccountSetup: () => {
-					// TODO
-				},
-				completeAccountSetupFollowingInviteAccept: () => {
-					// TODO
-				},
+				isAuthenticated: () => get()?.user !== null,
 				renewAccessToken: () => {
-					// TODO
+					// TODO renew access token
 				},
 			}),
 			{

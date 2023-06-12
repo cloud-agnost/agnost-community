@@ -46,7 +46,7 @@ export default function SMTPConfiguration() {
 	const [isTesting, setIsTesting] = useState(false);
 	const [finalizing, setFinalizing] = useState(false);
 
-	const { setDataPartially, setStepByPath } = useOnboardingStore();
+	const { setDataPartially, getCurrentStep, goToNextStep } = useOnboardingStore();
 	const { finalizeClusterSetup } = useClusterStore();
 	const { goBack } = useOutletContext() as { goBack: () => void };
 
@@ -56,22 +56,22 @@ export default function SMTPConfiguration() {
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		setIsTesting(true);
-		setError(null);
-
-		const res = await PlatformService.testSMTPSettings(data);
-		setIsTesting(false);
-
-		if (typeof res === 'object' && 'error' in res) setError(res);
-		else {
+		try {
+			setIsTesting(true);
+			setError(null);
+			await PlatformService.testSMTPSettings(data);
+			const { nextPath } = getCurrentStep();
 			setDataPartially({
 				smtp: data,
 			});
-			navigate('/onboarding/invite-team-members');
-
-			setStepByPath('/onboarding/smtp-configuration', {
-				isDone: true,
-			});
+			if (nextPath) {
+				navigate(nextPath);
+				goToNextStep(true);
+			}
+		} catch (error) {
+			setError(error as APIError);
+		} finally {
+			setIsTesting(false);
 		}
 	}
 
@@ -92,7 +92,7 @@ export default function SMTPConfiguration() {
 
 			{error && (
 				<Alert className='!max-w-full' variant='error'>
-					{error.error}
+					{error.details}
 				</Alert>
 			)}
 

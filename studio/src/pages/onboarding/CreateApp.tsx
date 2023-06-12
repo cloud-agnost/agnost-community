@@ -30,7 +30,7 @@ const FormSchema = z.object({
 export default function CreateApp() {
 	const navigate = useNavigate();
 	const { goBack } = useOutletContext() as { goBack: () => void };
-	const { setStepByPath, setDataPartially } = useOnboardingStore();
+	const { setDataPartially, getCurrentStep, goToNextStep } = useOnboardingStore();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -38,10 +38,11 @@ export default function CreateApp() {
 
 	function onSubmit(data: z.infer<typeof FormSchema>) {
 		setDataPartially({ appName: data.appName });
-		navigate('/onboarding/smtp-configuration');
-		setStepByPath('/onboarding/create-app', {
-			isDone: true,
-		});
+		const { nextPath } = getCurrentStep();
+		if (nextPath) {
+			navigate(nextPath);
+			goToNextStep(true);
+		}
 	}
 
 	return (

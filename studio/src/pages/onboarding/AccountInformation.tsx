@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 import { PasswordInput } from '@/components/PasswordInput';
 import { Alert } from '@/components/Alert';
+import { APIError } from '@/types';
 
 async function loader() {
 	return null;
@@ -39,35 +40,34 @@ const FormSchema = z.object({
 
 export default function AccountInformation() {
 	const [initiating, setInitiating] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-
+	const [error, setError] = useState<APIError | null>(null);
+	const { goToNextStep } = useOnboardingStore();
 	const { initializeClusterSetup } = useClusterStore();
 	const { setUser } = useAuthStore();
 	const navigate = useNavigate();
 
-	const { setStepByPath } = useOnboardingStore();
+	const { getCurrentStep } = useOnboardingStore();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		setInitiating(true);
-		setError(null);
-		const res = await initializeClusterSetup(data);
-
-		if ('error' in res) {
-			setError(res.details);
-		} else {
+		try {
+			setInitiating(true);
+			setError(null);
+			const res = await initializeClusterSetup(data);
+			const { nextPath } = getCurrentStep();
 			setUser(res);
-			navigate('/onboarding/create-organization');
-
-			setStepByPath('/onboarding', {
-				isDone: true,
-			});
+			if (nextPath) {
+				navigate(nextPath);
+				goToNextStep(true);
+			}
+		} catch (e) {
+			setError(e as APIError);
+		} finally {
+			setInitiating(false);
 		}
-
-		setInitiating(false);
 	}
 
 	return (
@@ -83,7 +83,7 @@ export default function AccountInformation() {
 
 			{error && (
 				<Alert className='!max-w-full' variant='error'>
-					{error}
+					{error.details}
 				</Alert>
 			)}
 

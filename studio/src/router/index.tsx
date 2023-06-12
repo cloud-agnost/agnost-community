@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom';
 import { Root } from '@/pages/root';
 import {
 	AccountInformation,
@@ -17,6 +17,8 @@ import {
 	Login,
 	VerifyEmail,
 } from '@/pages/auth';
+import useAuthStore from '@/store/auth/authStore.ts';
+import type { ReactNode } from 'react';
 
 const router = createBrowserRouter([
 	{
@@ -26,7 +28,11 @@ const router = createBrowserRouter([
 		children: [
 			{
 				path: '/login',
-				element: <Login />,
+				element: (
+					<GuestOnly>
+						<Login />
+					</GuestOnly>
+				),
 			},
 			{
 				path: '/forgot-password',
@@ -50,7 +56,11 @@ const router = createBrowserRouter([
 			},
 			{
 				path: '/organization',
-				element: <Organization />,
+				element: (
+					<RequireAuth>
+						<Organization />
+					</RequireAuth>
+				),
 				children: [
 					{
 						path: '',
@@ -66,7 +76,11 @@ const router = createBrowserRouter([
 	{
 		loader: Onboarding.loader,
 		path: '/onboarding',
-		element: <Onboarding />,
+		element: (
+			<GuestOnly>
+				<Onboarding />
+			</GuestOnly>
+		),
 		children: [
 			{
 				path: '',
@@ -91,5 +105,25 @@ const router = createBrowserRouter([
 		],
 	},
 ]);
+
+export function RequireAuth({ children }: { children: ReactNode }) {
+	const { isAuthenticated } = useAuthStore();
+	const location = useLocation();
+
+	if (!isAuthenticated()) {
+		return <Navigate to='/login' state={{ from: location }} replace />;
+	}
+
+	return children;
+}
+export function GuestOnly({ children }: { children: ReactNode }) {
+	const { isAuthenticated } = useAuthStore();
+
+	if (isAuthenticated()) {
+		return <Navigate to='/' />;
+	}
+
+	return children;
+}
 
 export default router;

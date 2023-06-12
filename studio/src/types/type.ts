@@ -1,33 +1,39 @@
-export interface APIError {
-	error: string;
-	details: string;
-	code: string;
-}
+import { z } from 'zod';
 
-export interface User {
-	iid: string;
-	name: string;
-	color: string;
-	contactEmail: string;
-	'2fa': boolean;
-	canCreateOrg: boolean;
-	isClusterOwner: boolean;
-	loginProfiles: {
-		provider: string;
-		id: string;
-		email: string;
-		emailVerified: boolean;
-		_id: string;
-	}[];
-	notifications: string[];
-	status: string;
-	_id: string;
-	createdAt: string;
-	updatedAt: string;
-	__v: number;
-	at: string;
-	rt: string;
-}
+export const APIErrorSchema = z.object({
+	error: z.string(),
+	details: z.string(),
+	code: z.string(),
+});
+export const UserSchema = z.object({
+	iid: z.string(),
+	name: z.string(),
+	color: z.string(),
+	contactEmail: z.string(),
+	'2fa': z.boolean(),
+	canCreateOrg: z.boolean(),
+	isClusterOwner: z.boolean(),
+	loginProfiles: z.array(
+		z.object({
+			provider: z.string(),
+			id: z.string(),
+			email: z.string(),
+			emailVerified: z.boolean(),
+			_id: z.string(),
+		}),
+	),
+	notifications: z.array(z.string()),
+	status: z.string(),
+	_id: z.string(),
+	createdAt: z.string(),
+	updatedAt: z.string(),
+	__v: z.number(),
+	at: z.string(),
+	rt: z.string(),
+});
+
+export type APIError = z.infer<typeof APIErrorSchema>;
+export type User = z.infer<typeof UserSchema>;
 
 export interface UserDataToRegister {
 	name: string;
