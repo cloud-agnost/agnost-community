@@ -41,12 +41,12 @@ const FormSchema = z.object({
 export default function AccountInformation() {
 	const [initiating, setInitiating] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
-
+	const { goToNextStep } = useOnboardingStore();
 	const { initializeClusterSetup } = useClusterStore();
 	const { setUser } = useAuthStore();
 	const navigate = useNavigate();
 
-	const { setStepByPath } = useOnboardingStore();
+	const { getCurrentStep } = useOnboardingStore();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -57,11 +57,12 @@ export default function AccountInformation() {
 			setInitiating(true);
 			setError(null);
 			const res = await initializeClusterSetup(data);
+			const { nextPath } = getCurrentStep();
 			setUser(res);
-			navigate('/onboarding/create-organization');
-			setStepByPath('/onboarding', {
-				isDone: true,
-			});
+			if (nextPath) {
+				navigate(nextPath);
+				goToNextStep(true);
+			}
 		} catch (e) {
 			setError(e as APIError);
 		} finally {

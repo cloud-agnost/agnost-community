@@ -29,7 +29,7 @@ const FormSchema = z.object({
 
 export default function CreateOrganization() {
 	const navigate = useNavigate();
-	const { setStepByPath, setDataPartially } = useOnboardingStore();
+	const { setDataPartially, getCurrentStep, goToNextStep } = useOnboardingStore();
 	const { goBack } = useOutletContext() as { goBack: () => void };
 
 	const form = useForm<z.infer<typeof FormSchema>>({
@@ -40,10 +40,11 @@ export default function CreateOrganization() {
 		setDataPartially({
 			orgName: data.orgName,
 		});
-		navigate('/onboarding/create-app');
-		setStepByPath('/onboarding/create-organization', {
-			isDone: true,
-		});
+		const { nextPath } = getCurrentStep();
+		if (nextPath) {
+			navigate(nextPath);
+			goToNextStep(true);
+		}
 	}
 
 	return (

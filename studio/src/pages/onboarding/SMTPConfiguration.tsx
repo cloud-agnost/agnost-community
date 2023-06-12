@@ -46,7 +46,7 @@ export default function SMTPConfiguration() {
 	const [isTesting, setIsTesting] = useState(false);
 	const [finalizing, setFinalizing] = useState(false);
 
-	const { setDataPartially, setStepByPath } = useOnboardingStore();
+	const { setDataPartially, getCurrentStep, goToNextStep } = useOnboardingStore();
 	const { finalizeClusterSetup } = useClusterStore();
 	const { goBack } = useOutletContext() as { goBack: () => void };
 
@@ -60,14 +60,14 @@ export default function SMTPConfiguration() {
 			setIsTesting(true);
 			setError(null);
 			await PlatformService.testSMTPSettings(data);
+			const { nextPath } = getCurrentStep();
 			setDataPartially({
 				smtp: data,
 			});
-			navigate('/onboarding/invite-team-members');
-
-			setStepByPath('/onboarding/smtp-configuration', {
-				isDone: true,
-			});
+			if (nextPath) {
+				navigate(nextPath);
+				goToNextStep(true);
+			}
 		} catch (error) {
 			setError(error as APIError);
 		} finally {
