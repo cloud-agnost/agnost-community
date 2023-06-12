@@ -22,24 +22,26 @@ import { initializeSyncClient, disconnectSyncClient } from "./init/sync.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-logger.info(`Process ${process.pid} is running`);
-// Init globally accessible variables
-initGlobals();
-// Set up locatlization
-const i18n = initLocalization();
-// Connect to the database
-connectToDatabase();
-// Connect to cache server(s)
-connectToRedisCache();
-// Connect to message queue
-connectToQueue();
-// Spin up http server
-const server = initExpress(i18n);
-// Connect to synchronization server
-initializeSyncClient();
+(function () {
+	logger.info(`Process ${process.pid} is running`);
+	// Init globally accessible variables
+	initGlobals();
+	// Set up locatlization
+	const i18n = initLocalization();
+	// Connect to the database
+	connectToDatabase();
+	// Connect to cache server(s)
+	connectToRedisCache();
+	// Connect to message queue
+	connectToQueue();
+	// Spin up http server
+	const server = initExpress(i18n);
+	// Connect to synchronization server
+	initializeSyncClient();
 
-// Gracefull handle process exist
-handleProcessExit(server);
+	// Gracefull handle process exist
+	handleProcessExit(server);
+})();
 
 function initGlobals() {
 	// Add logger to the global object
