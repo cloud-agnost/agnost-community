@@ -104,7 +104,6 @@ export default function InviteTeamMembers() {
 		}
 		setError(member?.message || '');
 	}, [form.formState.errors]);
-	console.log(form.formState.errors.member?.[0]?.email);
 
 	return (
 		<div className='max-w-xl space-y-12'>
