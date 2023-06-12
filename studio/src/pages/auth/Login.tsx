@@ -1,20 +1,20 @@
-import { Description } from '@/components/Description';
-import { AuthLayout } from '@/layouts/AuthLayout';
 import { Alert } from '@/components/Alert';
+import { Button } from '@/components/Button';
+import { Description } from '@/components/Description';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { PasswordInput } from '@/components/PasswordInput';
-import { Button } from '@/components/Button';
-import * as z from 'zod';
+import { AuthLayout } from '@/layouts/AuthLayout';
+import { AuthService } from '@/services';
+import useAuthStore from '@/store/auth/authStore.ts';
+import useClusterStore from '@/store/cluster/clusterStore';
+import { APIError } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-
-import './auth.scss';
 import { Link, useNavigate } from 'react-router-dom';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { APIError } from '@/types';
-import { AuthService } from '@/services';
+import * as z from 'zod';
+import './auth.scss';
 
 const FormSchema = z.object({
 	email: z
@@ -27,6 +27,7 @@ export default function Login() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
 	const { login, setUser } = useAuthStore();
+	const { canClusterSendEmail } = useClusterStore();
 	const navigate = useNavigate();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
@@ -108,10 +109,12 @@ export default function Login() {
 						</div>
 					</form>
 				</Form>
-				<div className='flex justify-between text-sm underline text-default leading-6 font-albert'>
-					<Link to='/forgot-password'>Forgot Password</Link>
-					<Link to='/complete-account-setup'>Complete Account Setup</Link>
-				</div>
+				{canClusterSendEmail && (
+					<div className='flex justify-between text-sm underline text-default leading-6 font-albert'>
+						<Link to='/forgot-password'>Forgot Password</Link>
+						<Link to='/complete-account-setup'>Complete Account Setup</Link>
+					</div>
+				)}
 			</div>
 		</AuthLayout>
 	);
