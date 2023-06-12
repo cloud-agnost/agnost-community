@@ -10,7 +10,6 @@ export const corePackages = [
 	"@google-cloud/storage",
 	"helmet",
 	"i18n",
-	"@kubernetes/client-node",
 	"kafkajs",
 	"mongodb",
 	"mssql",

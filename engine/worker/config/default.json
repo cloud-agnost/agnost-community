@@ -21,8 +21,7 @@
         "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
         "port": 5672,
         "reconnectInterval": 1000,
-        "retryCount": 30,
-        "developmentSuffix": "mito"
+        "retryCount": 30
      },
      "sync": {
         "serverURL": "http://platform-sync-clusterip-service:4000",
@@ -40,14 +39,19 @@
         "maxPoolSize": 3,
         "defaultClusterIPPort": 4000,
         "livenessProbe": {
-           "initialDelaySeconds": 10,
+           "timeoutSeconds": 5,
            "periodSeconds": 20,
-           "timeoutSeconds": 5
+           "initialDelaySeconds": 30
         },
         "readinessProbe": {
-           "initialDelaySeconds": 10,
+           "timeoutSeconds": 5,
            "periodSeconds": 20,
-           "timeoutSeconds": 5
-        }
+           "initialDelaySeconds": 30
+        },
+        "startupProbe": {
+         "timeoutSeconds": 5,
+         "periodSeconds": 20,
+         "failureThreshold": 30
+      }
      }
 }

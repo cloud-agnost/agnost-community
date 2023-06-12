@@ -119,12 +119,12 @@ export class DeploymentManager {
 	 */
 	async sendEnvironmentLogs(status = "OK") {
 		// If there is no callback just return
-		if (!this.msgObj?.callback) return;
+		if (!this.msgObj?.callback && !this.envObj.callback) return;
 
 		try {
 			// Update the environment log object
 			await axios.post(
-				this.msgObj.callback,
+				this.msgObj?.callback || this.envObj.callback,
 				{
 					status: status,
 					logs: this.logs,

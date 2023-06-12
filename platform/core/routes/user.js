@@ -83,7 +83,6 @@ router.delete("/", authSession, async (req, res) => {
 */
 router.get(
 	"/list",
-	checkContentType,
 	authSession,
 	applyRules("search"),
 	validate,
@@ -752,7 +751,7 @@ router.post(
 @desc       Get pending organization invitations of user
 @access     private
 */
-router.get("/org-invite", checkContentType, authSession, async (req, res) => {
+router.get("/org-invite", authSession, async (req, res) => {
 	try {
 		const { user } = req;
 		let emails = user.loginProfiles.map((entry) => entry.email);
@@ -776,7 +775,7 @@ router.get("/org-invite", checkContentType, authSession, async (req, res) => {
 @desc       Get pending app invitations of user
 @access     private
 */
-router.get("/app-invite", checkContentType, authSession, async (req, res) => {
+router.get("/app-invite", authSession, async (req, res) => {
 	try {
 		const { user } = req;
 		let emails = user.loginProfiles.map((entry) => entry.email);

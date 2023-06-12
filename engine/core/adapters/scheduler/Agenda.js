@@ -22,12 +22,7 @@ export class Agenda extends SchedulerBase {
 
 		// Listen for messages
 		for (let i = 1; i <= queueCount; i++) {
-			this.processTask(
-				taskId,
-				`process-task-${envId}-${taskId}-${i}${config.get(
-					"queue.developmentSuffix"
-				)}`
-			);
+			this.processTask(taskId, `process-task-${envId}-${taskId}-${i}`);
 		}
 	}
 

@@ -199,7 +199,6 @@ router.post(
 */
 router.get(
 	"/",
-	checkContentType,
 	authSession,
 	validateOrg,
 	authorizeOrgAction("org.resource.view"),
@@ -730,7 +729,6 @@ router.delete(
 */
 router.get(
 	"/:resourceId/dependents",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateResource,
@@ -766,7 +764,6 @@ router.get(
 */
 router.get(
 	"/:resourceId/logs",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateResource,

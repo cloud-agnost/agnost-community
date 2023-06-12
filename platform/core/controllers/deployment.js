@@ -145,15 +145,16 @@ class DeploymentController {
 		// First get the list of environment resources
 		let resources = await this.getEnvironmentResources(env);
 
+		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
+			env.orgId
+		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+			envLog._id
+		}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "deploy",
 			subAction: "deploy",
-			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
-				env.orgId
-			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				envLog._id
-			}`,
+			callback: callback,
 			actor: {
 				userId: user._id,
 				name: user.name,
@@ -163,7 +164,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object
-			env: { ...env, version, resources, timestamp: new Date() },
+			env: { ...env, callback, version, resources, timestamp: new Date() },
 			databases: await this.getDatabases(version._id),
 			endpoints: [],
 			middlewares: [],
@@ -198,15 +199,16 @@ class DeploymentController {
 		// First get the list of environment resources
 		let resources = await this.getEnvironmentResources(env);
 
+		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
+			env.orgId
+		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+			envLog._id
+		}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "redeploy",
 			subAction: "redeploy",
-			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
-				env.orgId
-			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				envLog._id
-			}`,
+			callback: callback,
 			actor: {
 				userId: user._id,
 				name: user.name,
@@ -216,7 +218,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object
-			env: { ...env, version, resources, timestamp: new Date() },
+			env: { ...env, callback, version, resources, timestamp: new Date() },
 			databases: await this.getDatabases(version._id),
 			endpoints: [],
 			middlewares: [],
@@ -301,15 +303,16 @@ class DeploymentController {
 		// First get the list of environment resources
 		const resources = await this.getEnvironmentResources(env);
 
+		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
+			env.orgId
+		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+			envLog._id
+		}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "update-version",
 			subAction: subAction,
-			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
-				env.orgId
-			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				envLog._id
-			}`,
+			callback: callback,
 			actor: {
 				userId: user._id,
 				name: user.name,
@@ -319,7 +322,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object
-			env: { ...env, version, resources, timestamp: new Date() },
+			env: { ...env, callback, version, resources, timestamp: new Date() },
 		};
 
 		// Make api call to environment worker engine to update environment data
@@ -362,15 +365,16 @@ class DeploymentController {
 		// First get the list of environment resources
 		const resources = await this.getEnvironmentResources(env);
 
+		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
+			env.orgId
+		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+			envLog._id
+		}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "update-version",
 			subAction: "update-resource-access",
-			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
-				env.orgId
-			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				envLog._id
-			}`,
+			callback: callback,
 			actor: {
 				userId: user._id,
 				name: user.name,
@@ -380,7 +384,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object
-			env: { ...env, version, resources, timestamp: new Date() },
+			env: { ...env, callback, version, resources, timestamp: new Date() },
 			updatedResource: resource,
 		};
 
@@ -427,15 +431,16 @@ class DeploymentController {
 			versionId: version._id,
 		});
 
+		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
+			env.orgId
+		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+			envLog._id
+		}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "deploy",
 			subAction: subAction,
-			callback: `${config.get("general.platformBaseUrl")}/v1/org/${
-				env.orgId
-			}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-				envLog._id
-			}`,
+			callback: callback,
 			actor: {
 				userId: user._id,
 				name: user.name,
@@ -445,7 +450,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object
-			env: { ...env, version, resources, timestamp: new Date() },
+			env: { ...env, callback, version, resources, timestamp: new Date() },
 			databases: [database],
 		};
 

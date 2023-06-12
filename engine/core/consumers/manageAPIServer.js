@@ -13,9 +13,7 @@ export const manageAPIServerHandler = (connection, envId) => {
 		}
 
 		const exchange = envId;
-		const queue = `manage-apiserver-${envId}-${helper.generateSlug()}.${config.get(
-			"queue.developmentSuffix"
-		)}`;
+		const queue = `manage-apiserver-${envId}-${helper.generateSlug()}`;
 
 		channel.assertExchange(exchange, "fanout", {
 			durable: true,

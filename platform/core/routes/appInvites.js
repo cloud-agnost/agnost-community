@@ -407,7 +407,6 @@ router.delete(
 */
 router.get(
 	"/",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
@@ -464,7 +463,6 @@ router.get(
 */
 router.get(
 	"/list-eligible",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,

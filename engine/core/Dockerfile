@@ -7,7 +7,7 @@ WORKDIR '/app'
 COPY ./package.json ./
 # Run npm install to install dependent modules
 RUN npm install
-# Copy everhting to the image under '/app' directory
+# Copy everything to the image under '/app' directory
 COPY ./ ./
 # This will be the start up command of the docker container, run the development react server
 CMD [ "npm", "run", "prod" ]

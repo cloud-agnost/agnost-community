@@ -396,6 +396,10 @@ export class ResourceManager {
 						app: deploymentName,
 					},
 				},
+				strategy: {
+					type: "RollingUpdate",
+					rollingUpdate: { maxSurge: "30%", maxUnavailable: 0 },
+				},
 				template: {
 					metadata: {
 						labels: {
@@ -406,10 +410,8 @@ export class ResourceManager {
 						containers: [
 							{
 								name: deploymentName,
-								image: "agnost-community/engine/core",
-								imagePullPolicy: ["development"].includes(process.env.NODE_ENV)
-									? "Never"
-									: "Always",
+								image: "gcr.io/agnost-community/engine/core",
+								imagePullPolicy: "Always",
 								volumeMounts: pvcs.map((entry) => {
 									return {
 										mountPath: `/${entry.iid}`, // iid of PVC resource
@@ -469,6 +471,14 @@ export class ResourceManager {
 										name: "MASTER_TOKEN",
 										value: process.env.MASTER_TOKEN,
 									},
+									{
+										name: "POD_NAME",
+										valueFrom: {
+											fieldRef: {
+												fieldPath: "metadata.name",
+											},
+										},
+									},
 								],
 								resources: {
 									requests: {
@@ -491,14 +501,14 @@ export class ResourceManager {
 										path: "/health",
 										port: config.get("general.defaultClusterIPPort"),
 									},
-									initialDelaySeconds: config.get(
-										"general.livenessProbe.initialDelaySeconds"
+									timeoutSeconds: config.get(
+										"general.livenessProbe.timeoutSeconds"
 									),
 									periodSeconds: config.get(
 										"general.livenessProbe.periodSeconds"
 									),
-									timeoutSeconds: config.get(
-										"general.livenessProbe.timeoutSeconds"
+									initialDelaySeconds: config.get(
+										"general.livenessProbe.initialDelaySeconds"
 									),
 								},
 								readinessProbe: {
@@ -506,14 +516,14 @@ export class ResourceManager {
 										path: "/health",
 										port: config.get("general.defaultClusterIPPort"),
 									},
-									initialDelaySeconds: config.get(
-										"general.readinessProbe.initialDelaySeconds"
+									timeoutSeconds: config.get(
+										"general.readinessProbe.timeoutSeconds"
 									),
 									periodSeconds: config.get(
 										"general.readinessProbe.periodSeconds"
 									),
-									timeoutSeconds: config.get(
-										"general.readinessProbe.timeoutSeconds"
+									initialDelaySeconds: config.get(
+										"general.readinessProbe.initialDelaySeconds"
 									),
 								},
 							},
@@ -843,7 +853,7 @@ export class ResourceManager {
 							http: {
 								paths: [
 									{
-										path: `/${pathName}/(.*)`,
+										path: `/${pathName}(/|$)(.*)`,
 										pathType: "Prefix",
 										backend: {
 											service: {

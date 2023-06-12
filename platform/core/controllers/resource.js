@@ -88,11 +88,11 @@ class ResourceController extends BaseController {
 				config: {},
 				access: helper.encyrptSensitiveData({
 					format: "object", // can be either object or url
-					scheme: "amqps",
+					scheme: "amqp",
 					username: process.env.QUEUE_USERNAME,
 					password: process.env.QUEUE_PASSWORD,
 					host: process.env.QUEUE_HOST,
-					port: 5671, // 5671 for TLS for normal 5672
+					port: 5672, // 5671 for TLS for normal 5672
 				}),
 				status: "Binding",
 				deletable: false,
