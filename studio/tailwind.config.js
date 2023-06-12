@@ -91,9 +91,9 @@ export default {
 					orange: 'rgba(var(--surface-orange), <alpha-value>)',
 				},
 				wrapper: {
-					'background-base': 'var(--wrapper-background-base)',
-					'background-hover': 'var(--wrapper-background-hover)',
-					'background-base-light': 'var(--wrapper-background-base-light)',
+					'background-base': 'rgba(var(--wrapper-background-base), <alpha-value>)',
+					'background-hover': 'rgba(var(--wrapper-background-hover), <alpha-value>)',
+					'background-light': 'rgba(var(--wrapper-background-light), <alpha-value>)',
 				},
 				text: {
 					default: 'rgba(var(--text-base), <alpha-value>)',

@@ -46,7 +46,14 @@ export default function SMTPConfiguration() {
 	const [isTesting, setIsTesting] = useState(false);
 	const [finalizing, setFinalizing] = useState(false);
 
-	const { setDataPartially, getCurrentStep, goToNextStep } = useOnboardingStore();
+	const {
+		setDataPartially,
+		getCurrentStep,
+		goToNextStep,
+		setStepByPath,
+		data: onboardingData,
+	} = useOnboardingStore();
+
 	const { finalizeClusterSetup } = useClusterStore();
 	const { goBack } = useOutletContext() as { goBack: () => void };
 
@@ -74,12 +81,37 @@ export default function SMTPConfiguration() {
 			setIsTesting(false);
 		}
 	}
+	async function checkSMTPConnection(data: z.infer<typeof FormSchema>): Promise<boolean> {
+		setIsTesting(true);
+		setError(null);
+
+		const res = await PlatformService.testSMTPSettings(data);
+		setIsTesting(false);
+		if (typeof res === 'object' && 'error' in res) {
+			setError(res);
+			return false;
+		} else {
+			setDataPartially({
+				smtp: data,
+			});
+			navigate('/onboarding/invite-team-members');
+
+			setStepByPath('/onboarding/smtp-configuration', {
+				isDone: true,
+			});
+			return true;
+		}
+	}
 
 	async function finishSetup() {
-		// TODO: finalizeClusterSetup should implemented;
-		setFinalizing(true);
-		await finalizeClusterSetup();
-		setFinalizing(false);
+		try {
+			setFinalizing(true);
+			await finalizeClusterSetup(onboardingData);
+			setFinalizing(false);
+			navigate('/organization');
+		} catch (error) {
+			setError(error as APIError);
+		}
 	}
 
 	return (

@@ -46,10 +46,7 @@ export interface OnboardingData {
 	appName: string;
 	uiBaseURL: string;
 	smtp: SMTPSettings;
-	appMembers: {
-		email: string;
-		role: string;
-	}[];
+	appMembers: AppMembers[];
 }
 
 export interface SMTPSettings {
@@ -58,4 +55,9 @@ export interface SMTPSettings {
 	useTLS: boolean;
 	user: string;
 	password: string;
+}
+
+export interface AppMembers {
+	email?: string;
+	role?: 'Admin' | 'Developer' | 'Viewer' | '';
 }

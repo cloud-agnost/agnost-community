@@ -14,6 +14,7 @@ interface AuthStore {
 	setRefreshToken: (refreshToken: string) => void;
 	isAuthenticated: () => boolean;
 	renewAccessToken: () => void;
+	completeAccountSetupFollowingInviteAccept: () => void;
 }
 
 const useAuthStore = create<AuthStore>()(

@@ -60,10 +60,11 @@ const AvatarFallback = React.forwardRef<
 	React.ElementRef<typeof AvatarPrimitive.Fallback>,
 	AvatarFallbackProps
 >(({ className, ...props }, ref) => {
-	const { name = '' } = props;
+	const name = props.name?.split(' ');
 	return (
 		<AvatarPrimitive.Fallback ref={ref} className={cn('avatar-fallback', className)} {...props}>
-			{name.slice(0, 2).toUpperCase()}
+			{name?.[0]?.charAt(0).toUpperCase()}
+			{name?.[1]?.charAt(0).toUpperCase()}
 		</AvatarPrimitive.Fallback>
 	);
 });

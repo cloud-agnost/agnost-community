@@ -101,7 +101,6 @@ const FormControl = React.forwardRef<
 	React.ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
 	const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
-
 	return (
 		<Slot
 			ref={ref}

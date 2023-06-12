@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/utils';
-import { Check, Warning, WarningCircle } from '@phosphor-icons/react';
+
 import './alert.scss';
+import { SuccessCheck, Warning, Error } from '@/components/icons';
 
 const alertVariants = cva('alert', {
 	variants: {
@@ -23,21 +24,30 @@ const Alert = React.forwardRef<
 >(({ className, variant, ...props }, ref) => (
 	<div ref={ref} role='alert' className={cn(alertVariants({ variant }), className)} {...props}>
 		<div className='alert-icon'>
-			{variant === 'success' && <Check size={24} />}
-			{variant === 'warning' && <Warning size={24} />}
-			{variant === 'error' && <WarningCircle size={24} />}
+			{variant === 'success' && <SuccessCheck />}
+			{variant === 'warning' && <Warning />}
+			{variant === 'error' && <Error />}
 		</div>
 		<div className='alert-body'>{props.children}</div>
 	</div>
 ));
 Alert.displayName = 'Alert';
 
+const AlertTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
+	({ className, ...props }, ref) => (
+		<h4 ref={ref} className={cn('alert-title', className)} {...props}>
+			{props.children}
+		</h4>
+	),
+);
+AlertTitle.displayName = 'AlertTitle';
+
 const AlertDescription = React.forwardRef<
 	HTMLParagraphElement,
 	React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-	<div ref={ref} className={cn('alert-description', className)} {...props} />
+	<p ref={ref} className={cn('alert-description', className)} {...props} />
 ));
 AlertDescription.displayName = 'AlertDescription';
 
-export { Alert, AlertDescription };
+export { Alert, AlertDescription, AlertTitle };
