@@ -2,7 +2,7 @@ import { Description } from '@/components/Description';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import './auth.scss';
 import { Button } from '@/components/Button';
-import { Alert } from '@/components/Alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import {
 	Form,
 	FormControl,
@@ -19,13 +19,26 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PasswordInput } from '@/components/PasswordInput';
 import { VerificationCodeInput } from '@/components/VerificationCodeInput';
+import useAuthStore from '@/store/auth/authStore.ts';
+import { LoaderFunctionArgs, redirect, useSearchParams } from 'react-router-dom';
+import { APIError } from '@/types';
 
-async function loader(params: any) {
-	console.log(params);
+async function loader(params: LoaderFunctionArgs) {
+	const url = new URL(params.request.url);
+
+	if (!url.searchParams.has('email')) {
+		return redirect('/complete-account-setup');
+	}
+
 	return null;
 }
 
 const FormSchema = z.object({
+	verificationCode: z
+		.string({ required_error: 'Verification code is required' })
+		.max(6, 'Verification code must be 6 digits')
+		.min(6, 'Verification code must be 6 digits')
+		.transform((val) => Number(val)),
 	password: z
 		.string({ required_error: 'Password is required' })
 		.min(8, 'Password must be at least 8 characters long'),
@@ -35,15 +48,31 @@ const FormSchema = z.object({
 });
 
 export default function CompleteAccountSetupVerifyEmail() {
-	const [error, setError] = useState<string | null>(null);
-
+	const [error, setError] = useState<APIError | null>(null);
+	const [loading, setLoading] = useState(false);
+	const [success, setSuccess] = useState(false);
+	const [params] = useSearchParams();
+	const { finalizeAccountSetup } = useAuthStore();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
 
+	console.log(params.get('email'));
+
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		setError(null);
-		console.log(data);
+		const email = params.get('email');
+		if (!email) return;
+		try {
+			setError(null);
+			setLoading(true);
+			setSuccess(false);
+			await finalizeAccountSetup({ ...data, email });
+			setSuccess(true);
+		} catch (e) {
+			setError(e as APIError);
+		} finally {
+			setLoading(false);
+		}
 	}
 
 	return (
@@ -53,24 +82,37 @@ export default function CompleteAccountSetupVerifyEmail() {
 
 				{error && (
 					<Alert className='!max-w-full' variant='error'>
-						{error}
+						<AlertDescription>{error.details}</AlertDescription>
+					</Alert>
+				)}
+
+				{success && (
+					<Alert className='!max-w-full' variant='success'>
+						<AlertTitle>You have been successfully added to the Atlassian team</AlertTitle>
+						<AlertDescription>
+							Complete your personal account setup to access the Agnost platform. Logging in
+							requires a completed account setup.
+						</AlertDescription>
 					</Alert>
 				)}
 
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-						<div className='space-y-8'>
-							<span className='text-default'>Verification Code</span>
-							<VerificationCodeInput
-								onChange={(code) => {
-									console.log(code);
-								}}
-								onComplete={(code) => {
-									console.log(code);
-								}}
-							/>
-						</div>
-
+						<FormField
+							control={form.control}
+							name='verificationCode'
+							render={({ field }) => (
+								<FormItem className='space-y-1'>
+									<FormControl>
+										<VerificationCodeInput
+											error={!!form.formState.errors.verificationCode}
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 						<FormField
 							control={form.control}
 							name='password'
@@ -115,7 +157,9 @@ export default function CompleteAccountSetupVerifyEmail() {
 							)}
 						/>
 						<div className='flex justify-end'>
-							<Button className='w-[165px]'>Complete Setup</Button>
+							<Button loading={loading} className='w-[165px]'>
+								Complete Setup
+							</Button>
 						</div>
 					</form>
 				</Form>

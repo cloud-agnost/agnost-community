@@ -1,5 +1,10 @@
 import { axios } from '@/helpers';
-import { OnboardingData, User, UserDataToRegister } from '@/types/type.ts';
+import {
+	FinalizeAccountSetupData,
+	OnboardingData,
+	User,
+	UserDataToRegister,
+} from '@/types/type.ts';
 
 export default class AuthService {
 	static url = '/v1/auth';
@@ -18,12 +23,7 @@ export default class AuthService {
 		return (await axios.post(`${this.url}/resend-code`, { email })).data;
 	}
 
-	static async finalizeAccountSetup(data: {
-		email: string;
-		verificationCode: number;
-		password: string;
-		name: string;
-	}) {
+	static async finalizeAccountSetup(data: FinalizeAccountSetupData) {
 		return (await axios.post(`${this.url}/finalize-account-setup`, data)).data;
 	}
 

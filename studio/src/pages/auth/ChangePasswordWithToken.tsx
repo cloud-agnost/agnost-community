@@ -1,45 +1,46 @@
 import { Description } from '@/components/Description';
 import { AuthLayout } from '@/layouts/AuthLayout';
-import './auth.scss';
-import { Button } from '@/components/Button';
-import { Alert, AlertDescription } from '@/components/Alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
-import { Input } from '@/components/Input';
+import { Button } from '@/components/Button';
+import * as z from 'zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { APIError } from '@/types';
-import { useNavigate } from 'react-router-dom';
 
-async function loader(params: any) {
-	console.log(params);
-	return null;
-}
+import './auth.scss';
+import { APIError } from '@/types';
+import useAuthStore from '@/store/auth/authStore.ts';
+import { PasswordInput } from '@/components/PasswordInput';
+import { useParams } from 'react-router-dom';
 
 const FormSchema = z.object({
-	email: z
-		.string({ required_error: 'Email address is required' })
-		.email('Please enter a valid email address'),
+	password: z
+		.string({ required_error: 'Password is required' })
+		.min(8, 'Password must be at least 8 characters long'),
 });
 
-export default function CompleteAccountSetup() {
-	const [error, setError] = useState<APIError | null>(null);
+export default function ForgotPassword() {
+	const { changePasswordWithToken } = useAuthStore();
+	const { token } = useParams<{ token: string }>();
 	const [loading, setLoading] = useState(false);
-	const navigate = useNavigate();
+	const [error, setError] = useState<APIError | null>(null);
+	const [success, setSuccess] = useState(false);
 
-	const { completeAccountSetup } = useAuthStore();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
+		if (!token) return;
+
 		try {
 			setError(null);
 			setLoading(true);
-			await completeAccountSetup(data.email);
-			navigate(`/complete-account-setup/verify-email?email=${data.email}`);
+			setSuccess(false);
+			await changePasswordWithToken(token, data.password);
+			setSuccess(true);
+			form.reset();
 		} catch (e) {
 			setError(e as APIError);
 		} finally {
@@ -50,10 +51,8 @@ export default function CompleteAccountSetup() {
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
-				<Description title='Complete Account Setup'>
-					If you have been invited to an organization or an app and accepted the invitation, then
-					you might have an account with an incomplete setup (e.g., mission password, name). Please
-					enter your email to start completing your account set up.
+				<Description title='Change Your Password'>
+					Enter your new password below to change your password.
 				</Description>
 
 				{error && (
@@ -62,19 +61,25 @@ export default function CompleteAccountSetup() {
 					</Alert>
 				)}
 
+				{success && (
+					<Alert className='!max-w-full' variant='success'>
+						<AlertTitle>Your password has been changed successfully.</AlertTitle>
+						<AlertDescription>You can now login with your new password.</AlertDescription>
+					</Alert>
+				)}
+
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='auth-form'>
 						<FormField
 							control={form.control}
-							name='email'
+							name='password'
 							render={({ field }) => (
 								<FormItem className='space-y-1'>
-									<FormLabel>Email</FormLabel>
+									<FormLabel>Password</FormLabel>
 									<FormControl>
-										<Input
-											error={Boolean(form.formState.errors.email)}
-											type='email'
-											placeholder='Enter email address'
+										<PasswordInput
+											error={Boolean(form.formState.errors.password)}
+											placeholder='Enter your new password'
 											{...field}
 										/>
 									</FormControl>
@@ -88,7 +93,7 @@ export default function CompleteAccountSetup() {
 								Back to Login
 							</Button>
 							<Button loading={loading} className='w-[165px]'>
-								Continue
+								Change Password
 							</Button>
 						</div>
 					</form>
@@ -97,5 +102,3 @@ export default function CompleteAccountSetup() {
 		</AuthLayout>
 	);
 }
-
-CompleteAccountSetup.loader = loader;

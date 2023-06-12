@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import type { APIError, User } from '@/types/type.ts';
 import { AuthService, UserService } from '@/services';
+import { FinalizeAccountSetupData } from '@/types/type.ts';
 
 interface AuthStore {
 	loading: boolean;
@@ -9,7 +10,7 @@ interface AuthStore {
 	user: User | null;
 	setUser: (user: User | null) => void;
 	login: (email: string, password: string) => Promise<User>;
-	logout: () => any;
+	logout: () => Promise<any>;
 	setToken: (token: string) => void;
 	setRefreshToken: (refreshToken: string) => void;
 	isAuthenticated: () => boolean;
@@ -17,6 +18,9 @@ interface AuthStore {
 	completeAccountSetupFollowingInviteAccept: () => void;
 	resetPassword: (email: string) => Promise<void>;
 	verifyEmail: (email: string, code: number) => Promise<void>;
+	changePasswordWithToken: (token: string, newPassword: string) => Promise<void>;
+	completeAccountSetup: (email: string) => Promise<void>;
+	finalizeAccountSetup: (data: FinalizeAccountSetupData) => Promise<void>;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -54,14 +58,26 @@ const useAuthStore = create<AuthStore>()(
 				completeAccountSetupFollowingInviteAccept() {
 					// TODO complete account setup following invite accept
 				},
-				async resetPassword(email) {
+				resetPassword(email) {
 					return UserService.resetPassword({
 						email,
 						uiBaseURL: window.location.origin,
 					});
 				},
-				async verifyEmail(email: string, code: number) {
-					await AuthService.validateEmail(email, code);
+				verifyEmail(email: string, code: number) {
+					return AuthService.validateEmail(email, code);
+				},
+				changePasswordWithToken(token: string, newPassword: string) {
+					return UserService.changePasswordWithToken({
+						token,
+						newPassword,
+					});
+				},
+				completeAccountSetup(email: string) {
+					return AuthService.initiateAccountSetup(email);
+				},
+				finalizeAccountSetup(data) {
+					return AuthService.finalizeAccountSetup(data);
 				},
 			}),
 			{

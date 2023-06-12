@@ -61,3 +61,10 @@ export interface AppMembers {
 	email?: string;
 	role?: 'Admin' | 'Developer' | 'Viewer' | '';
 }
+
+export interface FinalizeAccountSetupData {
+	email: string;
+	verificationCode: number;
+	password: string;
+	name: string;
+}

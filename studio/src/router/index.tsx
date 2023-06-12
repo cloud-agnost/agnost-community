@@ -10,6 +10,7 @@ import {
 } from '@/pages/onboarding';
 import { Organization, SelectOrganization } from '@/pages/organization';
 import {
+	ChangePasswordWithToken,
 	CompleteAccountSetup,
 	CompleteAccountSetupVerifyEmail,
 	ForgotPassword,
@@ -43,6 +44,14 @@ const router = createBrowserRouter([
 				),
 			},
 			{
+				path: '/forgot-password/:token',
+				element: (
+					<GuestOnly>
+						<ChangePasswordWithToken />
+					</GuestOnly>
+				),
+			},
+			{
 				path: '/verify-email',
 				element: (
 					<GuestOnly>
@@ -60,6 +69,7 @@ const router = createBrowserRouter([
 			},
 			{
 				path: '/complete-account-setup/verify-email',
+				loader: CompleteAccountSetupVerifyEmail.loader,
 				element: (
 					<GuestOnly>
 						<CompleteAccountSetupVerifyEmail />,
