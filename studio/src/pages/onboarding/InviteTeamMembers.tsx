@@ -58,7 +58,6 @@ export default function InviteTeamMembers() {
 		resolver: zodResolver(FormSchema),
 	});
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		console.log(data);
 		const appMembers = data.member.filter((item) => item.email !== '' && item.role !== '');
 		setDataPartially({
 			appMembers,
