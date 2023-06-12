@@ -822,7 +822,8 @@ router.get(
 /*
 @route      /v1/org/:orgId/resource/:resourceId/log:/logId
 @method     POST
-@desc       Update resource telemetry (e.g., status and status message) and resource log entry
+@desc       Update resource log entry. We do not update resource status through this endpoint, this just udpates the resource log status. 
+			The actual resource status is done through the engine-monitor process.
 @access     private
 */
 router.post(
@@ -835,7 +836,6 @@ router.post(
 	applyLogRules("update"),
 	validate,
 	async (req, res) => {
-		const session = await resourceCtrl.startSession();
 		try {
 			const { org, resource, log } = req;
 			const { status, logs } = req.body;
@@ -846,40 +846,19 @@ router.post(
 				cacheKey: log.createdBy,
 			});
 
-			const updatedResource = await resourceCtrl.updateOneById(
-				resource._id,
-				{
-					status: status,
-					updatedAt: timestamp,
-					updatedBy: user._id,
-				},
-				{},
-				{ cacheKey: resource._id, session }
-			);
+			const updatedLog = await resLogCtrl.updateOneById(log._id, {
+				status: status,
+				logs: logs,
+				updatedAt: timestamp,
+			});
 
-			await resLogCtrl.updateOneById(
-				log._id,
-				{
-					status: status,
-					logs: logs,
-					updatedAt: timestamp,
-				},
-				{},
-				{ session }
-			);
-
-			await resourceCtrl.commit(session);
-			// Delete the sensitive data
-			delete updatedResource.config;
-			delete updatedResource.access;
-			delete updatedResource.accessReadOnly;
-			res.json(updatedResource);
+			res.json();
 
 			// Log action
 			auditCtrl.logAndNotify(
 				org._id,
 				user,
-				"org",
+				"org.resource.log",
 				log.action,
 				t(
 					status === "OK"
@@ -889,11 +868,10 @@ router.post(
 					resource.instance,
 					resource.name
 				),
-				updatedResource,
+				updatedLog,
 				{ orgId: org._id, appId: resource.appId, resourceId: resource._id }
 			);
 		} catch (error) {
-			await resourceCtrl.rollback(session);
 			handleError(req, res, error);
 		}
 	}

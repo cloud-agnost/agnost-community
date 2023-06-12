@@ -6,7 +6,7 @@
    "type": "module",
    "scripts": {
       "prod": "NODE_ENV=production node --expose-gc server",
-      "dev": "NODE_ENV=development nodemon --expose-gc server"
+      "dev": "NODE_ENV=development node --expose-gc server"
    },
    "author": "Ümit Çakmak",
    "license": "ISC",

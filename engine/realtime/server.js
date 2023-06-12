@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import nocache from "nocache";
-import cluster from "cluster";
 import process from "process";
 import config from "config";
 import path from "path";
@@ -29,28 +28,17 @@ import rateLimitManager from "./init/rateLimitManager.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// If this is the primary process a child process
-if (cluster.isPrimary) {
-	logger.info(`Primary process ${process.pid} is running`);
-	cluster.fork();
-
-	cluster.on("exit", function (worker, code, signal) {
-		logger.warn(`Child process ${worker.process.pid} died`);
-		cluster.fork();
-	});
-} else if (cluster.isWorker) {
-	logger.info(`Child process ${process.pid} is running`);
-	// Init globally accessible variables
-	initGlobals();
-	// Set up locatlization
-	const i18n = initLocalization();
-	// Connect to cache server(s)
-	connectToRedisCache();
-	// Spin up http server
-	let { expressServer, realtimeServer } = initExpress(i18n);
-	// Gracefull handle process exist
-	handleProcessExit(expressServer, realtimeServer);
-}
+logger.info(`Process ${process.pid} is running`);
+// Init globally accessible variables
+initGlobals();
+// Set up locatlization
+const i18n = initLocalization();
+// Connect to cache server(s)
+connectToRedisCache();
+// Spin up http server
+let { expressServer, realtimeServer } = initExpress(i18n);
+// Gracefull handle process exist
+handleProcessExit(expressServer, realtimeServer);
 
 function initGlobals() {
 	// Add logger to the global object
