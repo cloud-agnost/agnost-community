@@ -21,23 +21,25 @@ import { logRequest } from "./middlewares/logRequest.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-logger.info(`Process ${process.pid} is running`);
-// Init globally accessible variables
-initGlobals();
-// Set up locatlization
-const i18n = initLocalization();
-// Connect to the database
-connectToDatabase();
-// Connect to cache server(s)
-connectToRedisCache();
-// Connect to message queue
-connectToQueue();
-// Spin up http server
-const server = initExpress(i18n);
-// Start cron job scheduler service
-startAgenda();
-// Gracefull handle process exist
-handleProcessExit(server);
+(function () {
+	logger.info(`Process ${process.pid} is running`);
+	// Init globally accessible variables
+	initGlobals();
+	// Set up locatlization
+	const i18n = initLocalization();
+	// Connect to the database
+	connectToDatabase();
+	// Connect to cache server(s)
+	connectToRedisCache();
+	// Connect to message queue
+	connectToQueue();
+	// Spin up http server
+	const server = initExpress(i18n);
+	// Start cron job scheduler service
+	startAgenda();
+	// Gracefull handle process exist
+	handleProcessExit(server);
+})();
 
 function initGlobals() {
 	// Add logger to the global object
@@ -128,7 +130,5 @@ function handleProcessExit(server) {
 		server.close(() => {
 			logger.info("Http server closed");
 		});
-		// We call process exit so that primary process can fork a new child process
-		process.exit();
 	});
 }

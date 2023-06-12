@@ -8,43 +8,61 @@ import { fileURLToPath } from "url";
 import {
 	connectToRedisCache,
 	disconnectFromRedisCache,
-	getKey,
+	getRedisClient,
 } from "./init/cache.js";
-import { connectToQueue, disconnectFromQueue } from "./init/queue.js";
-import { PrimaryProcessDeploymentManager } from "./handlers/primaryProcessManager.js";
-import { processManager } from "./childProcessManager.js";
+import { connectToDatabase, disconnectFromDatabase } from "./init/db.js";
+import { initializeSyncClient, disconnectSyncClient } from "./init/sync.js";
+import { ChildProcessDeploymentManager } from "./handlers/childProcessManager.js";
+import { adapterManager } from "./handlers/adapterManager.js";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
+var childManager = null;
 
 (function () {
-	// If this is the primary process then fork a child process
-	logger.info(`Primary process ${process.pid} is running`);
-
+	logger.info(`Child process ${process.pid} is running`);
 	// Init globally accessible variables
 	initGlobals();
 	// Set up locatlization
-	initLocalization();
+	const i18n = initLocalization();
+	// Connect to the database
+	connectToDatabase();
 	// Connect to cache server(s)
-	connectToRedisCache(finalizePrimaryProcessStartup);
-	// Connect to message queue
-	connectToQueue();
-	// Gracefull handle process exist
-	handlePrimaryProcessExit();
+	connectToRedisCache();
+	getRedisClient().on("connect", async function () {
+		// Create the child process manager which will set up the API server
+		const manager = new ChildProcessDeploymentManager(null, null, i18n);
+		await manager.initializeCore();
+		childManager = manager;
+	});
+	// Connect to synchronization server
+	initializeSyncClient();
 	// Set up garbage collector
 	setUpGC();
+
+	// Handle gracelfull process exit
+	process.on("SIGINT", async () => {
+		await cleanUp();
+		// We call process exit so that primary process can spawn a new child process
+		process.exit();
+	});
+
+	// Handle gracelfull process exit, this code is sent when the main processes is also exiting, no need to spawn a new shild process
+	process.on("SIGHUP", async () => {
+		await cleanUp();
+	});
 })();
 
-async function finalizePrimaryProcessStartup() {
-	// Get the environment information
-	let envObj = await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.object`);
-
-	// Create the primary process deployment manager and set up the engine core (API Sever)
-	const manager = new PrimaryProcessDeploymentManager(null, envObj);
-	await manager.initializeCore();
-
-	// Create the child process
-	processManager.spawnChildProcess();
+async function cleanUp() {
+	// Disconnect all connections/adapters
+	await adapterManager.disconnectAll();
+	// Close connection to cache server(s)
+	disconnectFromRedisCache();
+	// Close connection to the database
+	await disconnectFromDatabase();
+	// Close synchronization server connection
+	disconnectSyncClient();
+	if (childManager) await childManager.closeHttpServer();
 }
 
 function initGlobals() {
@@ -85,16 +103,6 @@ function initLocalization() {
 	});
 
 	return i18n;
-}
-
-function handlePrimaryProcessExit() {
-	process.on("SIGINT", async () => {
-		console.log("SIGINT");
-		// Close connection to cache server(s)
-		disconnectFromRedisCache();
-		// Close connection to message queue
-		disconnectFromQueue();
-	});
 }
 
 function setUpGC() {

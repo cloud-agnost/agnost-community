@@ -1,6 +1,6 @@
-import cluster from "cluster";
 import { getKey } from "../init/cache.js";
 import { PrimaryProcessDeploymentManager } from "../handlers/primaryProcessManager.js";
+import { processManager } from "../childProcessManager.js";
 
 export const manageAPIServerHandler = (connection, envId) => {
 	connection.createChannel(function (error, channel) {
@@ -45,10 +45,8 @@ export const manageAPIServerHandler = (connection, envId) => {
 						// Create the primary process deployment manager and set up the engine core (API Server)
 						const manager = new PrimaryProcessDeploymentManager(msgObj, envObj);
 						await manager.initializeCore();
-						// Restart worker(s)
-						for (const worker of Object.values(cluster.workers)) {
-							worker.kill("SIGINT");
-						}
+
+						processManager.restartChildProcess();
 						break;
 				}
 
