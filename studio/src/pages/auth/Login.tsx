@@ -38,8 +38,6 @@ export default function Login() {
 			setError(null);
 			setLoading(true);
 			const user = await login(email, password);
-			console.log(user);
-			console.log(user);
 			setUser(user);
 			navigate('/organization');
 		} catch (error) {
