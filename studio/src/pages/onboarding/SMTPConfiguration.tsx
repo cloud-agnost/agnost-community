@@ -61,9 +61,7 @@ export default function SMTPConfiguration() {
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
-	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		await checkSMTPConnection(data);
-	}
+
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		try {
 			setIsTesting(true);
@@ -107,13 +105,13 @@ export default function SMTPConfiguration() {
 
 	async function finishSetup() {
 		try {
-			await PlatformService.testSMTPSettings(form.getValues());
+			setFinalizing(true);
+			await finalizeClusterSetup(onboardingData);
+			setFinalizing(false);
+			navigate('/organization');
 		} catch (error) {
 			setError(error as APIError);
 		}
-		setFinalizing(true);
-		await finalizeClusterSetup(onboardingData);
-		setFinalizing(false);
 	}
 
 	return (
