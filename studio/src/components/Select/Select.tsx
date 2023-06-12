@@ -15,10 +15,13 @@ const SelectValue = SelectPrimitive.Value;
 const SelectTrigger = React.forwardRef<
 	React.ElementRef<typeof SelectPrimitive.Trigger>,
 	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, icon, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
 	<SelectPrimitive.Trigger ref={ref} className={cn('select', className)} {...props}>
 		{children}
-		<SelectPrimitive.Icon asChild>{icon || <CaretDown className='h-4 w-4' />}</SelectPrimitive.Icon>
+		<SelectPrimitive.Icon asChild>
+			{' '}
+			<CaretDown className='h-4 w-4' />
+		</SelectPrimitive.Icon>
 	</SelectPrimitive.Trigger>
 ));
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;

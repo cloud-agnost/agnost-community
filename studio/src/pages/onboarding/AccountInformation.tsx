@@ -21,6 +21,7 @@ import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 import { PasswordInput } from '@/components/PasswordInput';
 import { Alert } from '@/components/Alert';
 import { APIError } from '@/types';
+import { User } from '@/types/type';
 
 async function loader() {
 	return null;
@@ -57,7 +58,7 @@ export default function AccountInformation() {
 			setInitiating(true);
 			setError(null);
 			const user = await initializeClusterSetup(data);
-			setUser(user);
+			setUser(user as User);
 			const { nextPath } = getCurrentStep();
 			if (nextPath) {
 				console.log(nextPath);
