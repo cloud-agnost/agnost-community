@@ -49,6 +49,9 @@ const useAuthStore = create<AuthStore>()(
 				renewAccessToken: () => {
 					// TODO renew access token
 				},
+				completeAccountSetupFollowingInviteAccept: () => {
+					// TODO: Implement
+				},
 			}),
 			{
 				name: 'auth-storage',
