@@ -7,17 +7,14 @@ interface AuthStore {
 	loading: boolean;
 	error: APIError | null;
 	user: User | null;
-	isAuthenticated: boolean;
-	setUser: (user: User) => void;
+	setUser: (user: User | null) => void;
 	login: (email: string, password: string) => Promise<User>;
-	logout: () => void;
+	logout: () => any;
 	setToken: (token: string) => void;
 	setRefreshToken: (refreshToken: string) => void;
-	finalizeClusterSetup: () => void;
-	initializeAccountSetup: () => void;
-	finalizeAccountSetup: () => void;
-	completeAccountSetupFollowingInviteAccept: () => void;
+	isAuthenticated: () => boolean;
 	renewAccessToken: () => void;
+	completeAccountSetupFollowingInviteAccept: () => void;
 }
 
 const useAuthStore = create<AuthStore>()(
