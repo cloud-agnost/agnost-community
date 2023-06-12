@@ -23,6 +23,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	constructor(msgObj, envObj, i18n) {
 		super(msgObj, envObj);
 		this.expressApp = null;
+		this.httpServer = null;
 		this.i18n = i18n;
 	}
 
@@ -39,6 +40,37 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 */
 	getExpressApp() {
 		return this.expressApp;
+	}
+
+	/**
+	 * Sets the http server
+	 * @param  {Object} server The http server
+	 */
+	setHttpServer(server) {
+		this.httpServer = server;
+	}
+
+	/**
+	 * Returns the http server
+	 */
+	getHttpServer() {
+		return this.httpServer;
+	}
+
+	/**
+	 * Shuts down the http server
+	 */
+	async closeHttpServer() {
+		return new Promise((resolve, reject) => {
+			const server = this.getHttpServer();
+			if (server) {
+				//Close Http server
+				server.close(() => {
+					logger.info("Http server closed");
+					resolve();
+				});
+			} else resolve();
+		});
 	}
 
 	/**
@@ -141,6 +173,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		/* 	Particularly needed in case of bulk insert/update/delete operations, we should not generate 502 Bad Gateway errors at nginex ingress controller, the value specified in default config file is in milliseconds */
 		server.timeout = config.get("server.timeout");
+		this.setHttpServer(server);
 	}
 
 	/**

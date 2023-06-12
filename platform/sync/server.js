@@ -19,17 +19,19 @@ import { logRequest } from "./middlewares/logRequest.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-logger.info(`Process ${process.pid} is running`);
-// Init globally accessible variables
-initGlobals();
-// Set up locatlization
-const i18n = initLocalization();
-// Connect to cache server(s)
-connectToRedisCache();
-// Spin up http server
-const { expressServer, syncServer } = initExpress(i18n);
-// Gracefull handle process exist
-handleProcessExit(expressServer, syncServer);
+(function () {
+	logger.info(`Process ${process.pid} is running`);
+	// Init globally accessible variables
+	initGlobals();
+	// Set up locatlization
+	const i18n = initLocalization();
+	// Connect to cache server(s)
+	connectToRedisCache();
+	// Spin up http server
+	const { expressServer, syncServer } = initExpress(i18n);
+	// Gracefull handle process exist
+	handleProcessExit(expressServer, syncServer);
+})();
 
 function initGlobals() {
 	// Add logger to the global object

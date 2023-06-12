@@ -571,7 +571,7 @@ export const applyRules = (type) => {
 					})
 					.bail()
 					.custom((value, { req }) => {
-						let params = req.app.params ?? [];
+						let params = req.version.params ?? [];
 						params.forEach((param) => {
 							if (param.name.toLowerCase() === value.toLowerCase())
 								throw new AgnostError(
@@ -636,7 +636,7 @@ export const applyRules = (type) => {
 					})
 					.bail()
 					.custom((value, { req }) => {
-						let params = req.app.params ?? [];
+						let params = req.version.params ?? [];
 						params.forEach((param) => {
 							if (
 								param.name.toLowerCase() === value.toLowerCase() &&
