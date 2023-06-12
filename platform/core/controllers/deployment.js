@@ -163,7 +163,7 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			// We pass the list of resources in env object
+			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
 			env: { ...env, callback, version, resources, timestamp: new Date() },
 			databases: await this.getDatabases(version._id),
 			endpoints: [],
@@ -217,7 +217,7 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			// We pass the list of resources in env object
+			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
 			env: { ...env, callback, version, resources, timestamp: new Date() },
 			databases: await this.getDatabases(version._id),
 			endpoints: [],
@@ -321,7 +321,7 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			// We pass the list of resources in env object
+			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
 			env: { ...env, callback, version, resources, timestamp: new Date() },
 		};
 
@@ -383,7 +383,7 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			// We pass the list of resources in env object
+			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
 			env: { ...env, callback, version, resources, timestamp: new Date() },
 			updatedResource: resource,
 		};
@@ -449,7 +449,7 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			// We pass the list of resources in env object
+			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
 			env: { ...env, callback, version, resources, timestamp: new Date() },
 			databases: [database],
 		};

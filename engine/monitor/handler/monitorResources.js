@@ -36,38 +36,55 @@ export default async function monitorResources() {
 						resource.access = decryptSensitiveData(resource.access);
 						result = await checkResourceStatus(resource);
 					}
+
 					if (result) {
 						// Add status to the cache if it has not been added already
 						setCachedStatus(statusCache, resource, result);
 						// If the resource is being created, updated or deleted and if we face an error it might be possible that it is undergoing an operation and we need to give time to it to complete its opeation
 						if (
-							result.status === "Error" &&
 							["Creating", "Updating", "Deleting"].includes(resource.status)
 						) {
 							// Check duration of the operation
 							const now = Date.now();
-							const date = new Date(Date.parse(resource.updatedAt));
+							const date = new Date(
+								Date.parse(
+									resource.status === "Creating"
+										? resource.createdAt
+										: resource.updatedAt
+								)
+							);
 							const millisecondsFromEpoch = date.getTime();
+
+							// For create and update operations wait for at least the initial delay seconds
+							if (
+								now - millisecondsFromEpoch <
+								config.get("general.initialDelaySeconds") * 1000
+							) {
+								continue;
+							}
 
 							// If the operation has not timed out yet then continue
 							if (
+								result.status === "Error" &&
 								now - millisecondsFromEpoch <
-								config.get("general.maxResourceOpWaitMinues") * 60 * 1000
-							)
+									config.get("general.maxResourceOpWaitMinues") * 60 * 1000
+							) {
 								continue;
+							}
 						}
 
-						// If the status of he resource is ok and last telemetry is also OK no need to update resource status or resource logs
+						// If the status of the resource is ok and last telemetry is also OK no need to update resource status or resource logs
 						if (result.status === "OK" && resource.status === "OK") continue;
-
-						// If the resource is in error state then update the latest error resource log
-						if (result.status === "Error" && resource.status === "Error") {
-							await updateLatestResourceLog(resource, result);
-						}
 
 						// If the resource status has changed both update the resource status and add a new resource log
 						if (result.status !== resource.status) {
 							await upadateResourceStatus(resource, result);
+							continue;
+						}
+
+						// If the resource is in error state then update the latest error resource log
+						if (result.status === "Error" && resource.status === "Error") {
+							await updateLatestResourceLog(resource, result);
 						}
 					}
 				} catch (err) {}

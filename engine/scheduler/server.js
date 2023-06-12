@@ -1,4 +1,3 @@
-import cluster from "cluster";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -22,34 +21,23 @@ import { logRequest } from "./middlewares/logRequest.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// If this is the primary process then fork a child process
-if (cluster.isPrimary) {
-	logger.info(`Primary process ${process.pid} is running`);
-	cluster.fork();
-
-	cluster.on("exit", function (worker, code, signal) {
-		logger.warn(`Child process ${worker.process.pid} died`);
-		cluster.fork();
-	});
-} else if (cluster.isWorker) {
-	logger.info(`Child process ${process.pid} is running`);
-	// Init globally accessible variables
-	initGlobals();
-	// Set up locatlization
-	const i18n = initLocalization();
-	// Connect to the database
-	connectToDatabase();
-	// Connect to cache server(s)
-	connectToRedisCache();
-	// Connect to message queue
-	connectToQueue();
-	// Spin up http server
-	const server = initExpress(i18n);
-	// Start cron job scheduler service
-	startAgenda();
-	// Gracefull handle process exist
-	handleProcessExit(server);
-}
+logger.info(`Process ${process.pid} is running`);
+// Init globally accessible variables
+initGlobals();
+// Set up locatlization
+const i18n = initLocalization();
+// Connect to the database
+connectToDatabase();
+// Connect to cache server(s)
+connectToRedisCache();
+// Connect to message queue
+connectToQueue();
+// Spin up http server
+const server = initExpress(i18n);
+// Start cron job scheduler service
+startAgenda();
+// Gracefull handle process exist
+handleProcessExit(server);
 
 function initGlobals() {
 	// Add logger to the global object

@@ -1,4 +1,7 @@
 import express from "express";
+import responseTime from "response-time";
+import { logRequestToConsole } from "../middlewares/logRequest.js";
+
 const router = express.Router({ mergeParams: true });
 
 /*
@@ -7,7 +10,7 @@ const router = express.Router({ mergeParams: true });
 @desc       Checks liveliness of engine core
 @access     public
 */
-router.get("/health", (req, res) => {
+router.get("/health", responseTime(logRequestToConsole), (req, res) => {
 	res
 		.status(200)
 		.send(
@@ -23,7 +26,7 @@ router.get("/health", (req, res) => {
 @desc       Checks liveliness of engine core
 @access     public
 */
-router.get("/ping", (req, res) => {
+router.get("/ping", responseTime(logRequestToConsole), (req, res) => {
 	res.status(200).send(new Date().toISOString() + " - Pong!");
 });
 

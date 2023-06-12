@@ -853,7 +853,7 @@ export class ResourceManager {
 							http: {
 								paths: [
 									{
-										path: `/${pathName}(/|$)(.*)`,
+										path: `/${pathName}/(.*)`,
 										pathType: "Prefix",
 										backend: {
 											service: {

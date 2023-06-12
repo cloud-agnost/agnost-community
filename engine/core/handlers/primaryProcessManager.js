@@ -15,12 +15,12 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	 * Manages the metadata of the api server
 	 */
 	async initializeCore() {
+		this.addLog(t("Started configuring the API server"));
+
 		if (!this.getEnvObj()) {
 			this.addLog(t("Cannot get the environment object data"));
 			return;
 		}
-
-		this.addLog(t("Started configuring the API server"));
 		// Check whether app is already deployed to this api server or not
 		const envConfig = await this.loadEnvConfigFile();
 
