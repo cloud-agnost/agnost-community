@@ -1,0 +1,29 @@
+.alert {
+	@apply relative rounded-xs border border-transparent p-4 flex items-center justify-center gap-6 w-full;
+
+	&-icon {
+		@apply rounded-full flex items-center justify-center text-6xl;
+	}
+	&-success {
+		@apply bg-surface-green;
+	}
+
+	&-error {
+		@apply bg-surface-red;
+	}
+
+	&-warning {
+		@apply bg-surface-orange;
+	}
+
+	&-body {
+		@apply flex-1;
+	}
+	&-title {
+		@apply text-default text-sm font-semibold [&_p]:leading-tight;
+	}
+
+	&-description {
+		@apply text-sm text-subtle [&_p]:leading-relaxed;
+	}
+}

@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700;900&family=Rubik:wght@300;400;500;600;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	:root {
+		--font-sans: 'Rubik', sans-serif;
+		--font-albert: 'Albert Sans', sans-serif;
+
+		/* Color styles */
+		--brand-color-primary--darker: 37, 54, 127;
+		--brand-color-primary: 104, 132, 253;
+		--brand-color-subtle--primary: 46, 106, 246;
+
+		--elements-strong--blue: 49, 72, 169;
+		--elements-blue: 104, 132, 253;
+		--elements-subtle-blue: 195, 206, 254;
+
+		--elements-strong-green: 11, 125, 70;
+		--elements-green: 57, 198, 130;
+		--elements-subtle-green: 176, 232, 205;
+
+		--elements-strong-yellow: 155, 123, 8;
+		--elements-yellow: 237, 197, 53;
+		--elements-subtle-yellow: 248, 232, 174;
+
+		--elements-strong-purple: 131, 49, 169;
+		--elements-purple: 206, 104, 253;
+		--elements-subtle-purple: 235, 195, 254;
+
+		--elements-strong-red: 159, 45, 73;
+		--elements-red: 241, 99, 133;
+		--elements-subtle-red: 249, 193, 206;
+
+		--elements-strong-orange: 155, 70, 8;
+		--elements-orange: 237, 130, 53;
+		--elements-subtle-orange: 248, 205, 174;
+
+		--success-default: 14, 156, 88;
+		--success-hover: 57, 198, 130;
+		--success-focus: 9, 94, 53;
+
+		--error-default: 198, 57, 91;
+		--error-hover: 241, 99, 133;
+		--error-focus: 119, 34, 55;
+
+		--theme-base-background: 255, 255, 255;
+		--theme-subtle-background: 249, 249, 251;
+		--theme-lighter-background: 237, 238, 243;
+		--theme-border: 237, 238, 243;
+
+		--text-base: 25, 28, 41;
+		--text-subtle: 146, 154, 181;
+		--text-disabled: 219, 221, 230;
+
+		--icon-darker: 33, 37, 48;
+		--icon-lighter: 255, 255, 255;
+		--icon-base: 146, 154, 181;
+		--icon-disabled: 219, 221, 230;
+
+		--form-input-base-background: 255, 255, 255;
+		--form-input-base-border: 219, 221, 230;
+		--form-input-hover: 146, 154, 181;
+		--form-input-focus: 134, 157, 254;
+		--form-input-disabled-background: 249, 249, 251;
+		--form-input-disabled-border: 237, 238, 243;
+
+		--button-background-base-primary: 74, 108, 253;
+		--button-background-hover-primary: 104, 132, 253;
+		--button-background-base-secondary: 237, 238, 243;
+		--button-background-hover-secondary: 219, 221, 230;
+		--button-background-disabled: 249, 249, 251;
+
+		--button-border-hover: 146, 154, 181;
+		--button-border-disabled: 249, 249, 251;
+		--button-border-base: 219, 221, 230;
+
+		--surface-blue: 219, 226, 255;
+		--surface-green: 207, 241, 225;
+		--surface-yellow: 251, 241, 206;
+		--surface-purple: 243, 219, 255;
+		--surface-red: 252, 218, 226;
+		--surface-orange: 251, 225, 206;
+
+		--orange-50: 251, 225, 206;
+		--orange-100: 248, 205, 174;
+		--orange-200: 244, 180, 133;
+		--orange-300: 240, 155, 93;
+		--orange-400: 237, 130, 53;
+		--orange-500: 233, 105, 12;
+		--orange-600: 194, 88, 10;
+		--orange-700: 155, 70, 8;
+		--orange-800: 117, 53, 6;
+		--orange-900: 78, 35, 4;
+
+		--neutral-50: 255, 255, 255;
+		--neutral-100: 249, 249, 251;
+		--neutral-200: 237, 238, 243;
+		--neutral-300: 219, 221, 230;
+		--neutral-400: 146, 154, 181;
+		--neutral-500: 99, 111, 146;
+		--neutral-600: 70, 71, 78;
+		--neutral-650: 66, 74, 97;
+		--neutral-700: 50, 56, 73;
+		--neutral-750: 42, 47, 60;
+		--neutral-800: 33, 37, 48;
+		--neutral-900: 25, 28, 41;
+
+		--blue-50: 219, 226, 255;
+		--blue-100: 195, 206, 254;
+		--blue-200: 164, 181, 254;
+		--blue-300: 134, 157, 254;
+		--blue-400: 104, 132, 253;
+		--blue-500: 74, 108, 253;
+		--blue-600: 62, 90, 211;
+		--blue-700: 49, 72, 169;
+		--blue-800: 37, 54, 127;
+		--blue-900: 25, 36, 84;
+
+		--yellow-50: 251, 241, 206;
+		--yellow-100: 248, 232, 174;
+		--yellow-200: 244, 220, 133;
+		--yellow-300: 240, 208, 93;
+		--yellow-400: 237, 197, 53;
+		--yellow-500: 233, 185, 12;
+		--yellow-600: 194, 154, 10;
+		--yellow-700: 155, 123, 8;
+		--yellow-800: 117, 93, 6;
+		--yellow-900: 78, 62, 4;
+
+		--purple-50: 243, 219, 255;
+		--purple-100: 235, 195, 254;
+		--purple-200: 225, 164, 254;
+		--purple-300: 216, 134, 254;
+		--purple-400: 206, 104, 253;
+		--purple-500: 196, 74, 253;
+		--purple-600: 163, 62, 211;
+		--purple-700: 131, 49, 169;
+		--purple-800: 98, 37, 127;
+		--purple-900: 65, 25, 84;
+
+		--red--50: 252, 218, 226;
+		--red--100: 249, 193, 206;
+		--red--200: 246, 161, 182;
+		--red--300: 244, 130, 158;
+		--red--400: 241, 99, 133;
+		--red--500: 238, 68, 109;
+		--red--600: 198, 57, 91;
+		--red--700: 159, 45, 73;
+		--red--800: 119, 34, 55;
+		--red--900: 79, 23, 36;
+
+		--green-50: 207, 241, 225;
+		--green-100: 176, 232, 205;
+		--green-200: 136, 221, 180;
+		--green-300: 96, 210, 155;
+		--green-400: 57, 198, 130;
+		--green-500: 17, 187, 105;
+		--green-600: 14, 156, 88;
+		--green-700: 11, 125, 70;
+		--green-800: 9, 94, 53;
+		--green-900: 6, 62, 35;
+
+		--wrapper-background-base: 255, 255, 255;
+		--wrapper-background-hover: 237, 238, 243;
+
+		--radius: 0.5rem;
+
+		--font-size-xs: 0.5rem;
+	}
+
+	.dark {
+		--theme-base-background: 25, 28, 41;
+		--theme-subtle-background: 33, 37, 48;
+		--theme-lighter-background: 50, 56, 73;
+		--theme-border: 50, 56, 73;
+
+		--surface-blue: 25, 36, 84;
+		--surface-green: 6, 62, 35;
+		--surface-yellow: 78, 62, 4;
+		--surface-purple: 65, 25, 84;
+		--surface-red: 79, 23, 36;
+		--surface-orange: 78, 35, 4;
+
+		--text-base: 255, 255, 255;
+		--text-subtle: 146, 154, 181;
+		--text-disabled: 99, 111, 146;
+
+		--icon-lighter: 255, 255, 255;
+		--icon-base: 146, 154, 181;
+		--icon-disabled: 99, 111, 146;
+
+		--button-background-base-secondary: 50, 56, 73;
+		--button-background-hover-secondary: 66, 74, 97;
+		--button-background-border-secondary: 70, 71, 78;
+		--button-background-border-hover-secondary: 99, 111, 146;
+		--button-background-disabled: 33, 37, 48;
+
+		--button-border-hover: 66, 74, 97;
+		--button-border-disabled: 33, 37, 48;
+		--button-border-base: 70, 71, 78;
+
+		--wrapper-background-base: 33, 37, 48;
+		--wrapper-background-hover: 50, 56, 73;
+		--wrapper-background-light: 42, 47, 60;
+
+		--form-input-base-background: 25, 28, 41;
+		--form-input-base-border: 70, 71, 78;
+		--form-input-hover: 99, 111, 146;
+		--form-input-focus: 134, 157, 254;
+		--form-input-disabled-background: 33, 37, 48;
+		--form-input-disabled-border: 50, 56, 73;
+
+		--font-size-xs: 12px;
+		--font-size-xs-line-height: 18px;
+
+		--font-size-sm: 14px;
+		--font-size-sm-line-height: 24px;
+	}
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+
+	body {
+		@apply bg-base;
+		font-feature-settings: 'rlig' 1, 'calt' 1;
+	}
+	.loading {
+		@apply animate-spin mr-2;
+	}
+}
