@@ -9,7 +9,7 @@ interface ClusterStore {
 	error: APIError | null;
 	isCompleted: boolean;
 	checkClusterSetup: () => Promise<boolean>;
-	initializeClusterSetup: (data: UserDataToRegister) => Promise<User | APIError>;
+	initializeClusterSetup: (data: UserDataToRegister) => Promise<User>;
 	finalizeClusterSetup: () => void;
 	initializeAccountSetup: () => void;
 	finalizeAccountSetup: () => void;

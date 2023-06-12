@@ -56,14 +56,10 @@ export default function SMTPConfiguration() {
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		setIsTesting(true);
-		setError(null);
-
-		const res = await PlatformService.testSMTPSettings(data);
-		setIsTesting(false);
-
-		if (typeof res === 'object' && 'error' in res) setError(res);
-		else {
+		try {
+			setIsTesting(true);
+			setError(null);
+			await PlatformService.testSMTPSettings(data);
 			setDataPartially({
 				smtp: data,
 			});
@@ -72,6 +68,10 @@ export default function SMTPConfiguration() {
 			setStepByPath('/onboarding/smtp-configuration', {
 				isDone: true,
 			});
+		} catch (error) {
+			setError(error as APIError);
+		} finally {
+			setIsTesting(false);
 		}
 	}
 
@@ -92,7 +92,7 @@ export default function SMTPConfiguration() {
 
 			{error && (
 				<Alert className='!max-w-full' variant='error'>
-					{error.error}
+					{error.details}
 				</Alert>
 			)}
 

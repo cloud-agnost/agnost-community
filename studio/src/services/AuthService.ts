@@ -1,10 +1,10 @@
 import { axios } from '@/helpers';
-import { APIError, OnboardingData, User, UserDataToRegister } from '@/types/type.ts';
+import { OnboardingData, User, UserDataToRegister } from '@/types/type.ts';
 
 export default class AuthService {
 	static url = '/v1/auth';
 
-	static async initializeClusterSetup(data: UserDataToRegister): Promise<User | APIError> {
+	static async initializeClusterSetup(data: UserDataToRegister): Promise<User> {
 		return (await axios.post(`${this.url}/init-cluster-setup`, data)).data;
 	}
 	static async finalizeClusterSetup(data: OnboardingData) {
