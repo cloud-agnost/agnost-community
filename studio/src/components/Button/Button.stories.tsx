@@ -1,9 +1,8 @@
 // Button.stories.ts|tsx
 
-import type { Meta, StoryObj } from '@storybook/react';
-import * as React from 'react';
-import { Button } from './Button';
 import { CheckCircle } from '@phosphor-icons/react';
+import type { Meta, StoryObj } from '@storybook/react';
+import { Button } from './Button';
 
 const meta: Meta<typeof Button> = {
 	/* 👇 The title prop is optional.

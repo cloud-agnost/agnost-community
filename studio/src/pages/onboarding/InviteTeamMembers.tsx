@@ -6,14 +6,13 @@ import { Input } from '@/components/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import useClusterStore from '@/store/cluster/clusterStore';
 import useOnboardingStore from '@/store/onboarding/onboardingStore';
-import { APIError } from '@/types';
 import { cn } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash } from '@phosphor-icons/react';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import * as z from 'zod';
 async function loader() {
 	return null;

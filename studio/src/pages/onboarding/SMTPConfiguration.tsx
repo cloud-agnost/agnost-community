@@ -1,3 +1,5 @@
+import { Alert } from '@/components/Alert';
+import { Button } from '@/components/Button';
 import { Description } from '@/components/Description';
 import {
 	Form,
@@ -8,20 +10,18 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/Form';
-import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
-import { useNavigate, useOutletContext } from 'react-router-dom';
-import useClusterStore from '@/store/cluster/clusterStore.ts';
 import { PasswordInput } from '@/components/PasswordInput';
 import { Switch } from '@/components/Switch';
-import { useState } from 'react';
 import { PlatformService } from '@/services';
-import { Alert } from '@/components/Alert';
+import useClusterStore from '@/store/cluster/clusterStore.ts';
+import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 import { APIError } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import * as z from 'zod';
 
 async function loader() {
 	return null;
@@ -108,6 +108,10 @@ export default function SMTPConfiguration() {
 			setFinalizing(true);
 			await finalizeClusterSetup(onboardingData);
 			setFinalizing(false);
+			setStepByPath;
+			setStepByPath('/onboarding/smtp-configuration', {
+				isDone: true,
+			});
 			navigate('/organization');
 		} catch (error) {
 			setError(error as APIError);
