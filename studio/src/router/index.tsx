@@ -12,7 +12,6 @@ import { Organization, SelectOrganization } from '@/pages/organization';
 import {
 	CompleteAccountSetup,
 	CompleteAccountSetupVerifyEmail,
-	EmailVerification,
 	ForgotPassword,
 	Login,
 	VerifyEmail,
@@ -36,23 +35,35 @@ const router = createBrowserRouter([
 			},
 			{
 				path: '/forgot-password',
-				element: <ForgotPassword />,
-			},
-			{
-				path: '/email-verification',
-				element: <EmailVerification />,
+				element: (
+					<GuestOnly>
+						<ForgotPassword />
+					</GuestOnly>
+				),
 			},
 			{
 				path: '/verify-email',
-				element: <VerifyEmail />,
+				element: (
+					<GuestOnly>
+						<VerifyEmail />
+					</GuestOnly>
+				),
 			},
 			{
 				path: '/complete-account-setup',
-				element: <CompleteAccountSetup />,
+				element: (
+					<GuestOnly>
+						<CompleteAccountSetup />
+					</GuestOnly>
+				),
 			},
 			{
 				path: '/complete-account-setup/verify-email',
-				element: <CompleteAccountSetupVerifyEmail />,
+				element: (
+					<GuestOnly>
+						<CompleteAccountSetupVerifyEmail />,
+					</GuestOnly>
+				),
 			},
 			{
 				path: '/organization',
@@ -76,11 +87,7 @@ const router = createBrowserRouter([
 	{
 		loader: Onboarding.loader,
 		path: '/onboarding',
-		element: (
-			<GuestOnly>
-				<Onboarding />
-			</GuestOnly>
-		),
+		element: <Onboarding />,
 		children: [
 			{
 				path: '',
@@ -88,25 +95,42 @@ const router = createBrowserRouter([
 			},
 			{
 				path: 'create-organization',
-				element: <CreateOrganization />,
+				element: (
+					<RequireAuth>
+						<CreateOrganization />
+					</RequireAuth>
+				),
 			},
 			{
 				path: 'create-app',
-				element: <CreateApp />,
+				element: (
+					<RequireAuth>
+						<CreateApp />
+					</RequireAuth>
+				),
 			},
 			{
 				path: 'smtp-configuration',
-				element: <SMTPConfiguration />,
+				element: (
+					<RequireAuth>
+						<SMTPConfiguration />
+					</RequireAuth>
+				),
 			},
 			{
 				path: 'invite-team-members',
-				element: <InviteTeamMembers />,
+				element: (
+					<RequireAuth>
+						<InviteTeamMembers />
+					</RequireAuth>
+				),
 			},
 		],
 	},
 ]);
 
-export function RequireAuth({ children }: { children: ReactNode }) {
+// eslint-disable-next-line react-refresh/only-export-components
+function RequireAuth({ children }: { children: ReactNode }) {
 	const { isAuthenticated } = useAuthStore();
 	const location = useLocation();
 
@@ -116,11 +140,12 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 
 	return children;
 }
-export function GuestOnly({ children }: { children: ReactNode }) {
+// eslint-disable-next-line react-refresh/only-export-components
+function GuestOnly({ children }: { children: ReactNode }) {
 	const { isAuthenticated } = useAuthStore();
 
 	if (isAuthenticated()) {
-		return <Navigate to='/' />;
+		return <Navigate to='/organization' />;
 	}
 
 	return children;

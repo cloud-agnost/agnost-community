@@ -10,6 +10,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import './auth.scss';
+import { APIError } from '@/types';
+import { Link } from 'react-router-dom';
+import useAuthStore from '@/store/auth/authStore.ts';
 
 async function loader(params: any) {
 	console.log(params);
@@ -23,15 +26,54 @@ const FormSchema = z.object({
 });
 
 export default function ForgotPassword() {
-	const [error, setError] = useState<string | null>(null);
+	const { resetPassword } = useAuthStore();
+	const [loading, setLoading] = useState(false);
+	const [success, setSuccess] = useState(false);
+	const [error, setError] = useState<APIError | null>(null);
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		setError(null);
-		console.log(data);
+		try {
+			setError(null);
+			setLoading(true);
+			setSuccess(false);
+			await resetPassword(data.email);
+			setSuccess(true);
+		} catch (e) {
+			setError(e as APIError);
+		} finally {
+			setLoading(false);
+		}
+	}
+
+	if (success) {
+		return (
+			<div className='flex justify-center items-center flex-col min-h-screen text-center text-subtle px-4'>
+				<div className='w-[172px] h-[172px] rounded-2xl bg-text-subtle mb-12'></div>
+				<h1 className='text-default font-semibold leading-[44px] text-[26px] mb-2'>
+					Password reset message sent
+				</h1>
+				<div className='flex flex-col gap-6 leading-6 font-normal'>
+					<p>
+						Link and instructions for resetting your password have been sent to{' '}
+						<span className='block text-default'>{form.getValues().email}</span>
+					</p>
+					<p>If you don’t receive it right away, please check your spam folder</p>
+					<p className='font-albert'>
+						Contact our support team if you have an issue when resetting your password.{' '}
+						<Link className='text-default underline' to='/contact'>
+							Contact Us
+						</Link>
+					</p>
+				</div>
+				<Link className='text-default text-xs mt-14' to='/login'>
+					Back To Login
+				</Link>
+			</div>
+		);
 	}
 
 	return (
@@ -42,9 +84,15 @@ export default function ForgotPassword() {
 					link to reset your password.
 				</Description>
 
-				{error && (
+				{error && error.code !== 'invalid_credentials' && (
 					<Alert className='!max-w-full' variant='error'>
-						{error}
+						{error.details}
+					</Alert>
+				)}
+
+				{success && (
+					<Alert className='!max-w-full' variant='success'>
+						Password reset link sent to your email address
 					</Alert>
 				)}
 
@@ -58,13 +106,18 @@ export default function ForgotPassword() {
 									<FormLabel>Email</FormLabel>
 									<FormControl>
 										<Input
-											error={Boolean(form.formState.errors.email)}
+											error={
+												Boolean(form.formState.errors.email) ||
+												error?.code === 'invalid_credentials'
+											}
 											type='email'
 											placeholder='Enter email address'
 											{...field}
 										/>
 									</FormControl>
-									<FormMessage />
+									<FormMessage>
+										{form.formState.errors.email?.message || error?.details}
+									</FormMessage>
 								</FormItem>
 							)}
 						/>
@@ -73,7 +126,9 @@ export default function ForgotPassword() {
 							<Button to='/login' variant='text' type='button' className='w-[165px]'>
 								Back to Login
 							</Button>
-							<Button className='w-[165px]'>Get Reset Link</Button>
+							<Button loading={loading} className='w-[165px]'>
+								Get Reset Link
+							</Button>
 						</div>
 					</form>
 				</Form>
