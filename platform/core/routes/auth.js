@@ -15,7 +15,7 @@ import { applyRules } from "../schemas/user.js";
 import { handleError } from "../schemas/platformError.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validate } from "../middlewares/validate.js";
-import { authClusterToken } from "../middlewares/authClusterToken.js";
+//import { authClusterToken } from "../middlewares/authClusterToken.js";
 import { authSession } from "../middlewares/authSession.js";
 import { authRefreshToken } from "../middlewares/authRefreshToken.js";
 import {
@@ -38,86 +38,86 @@ const router = express.Router({ mergeParams: true });
 @access     public
 */
 router.post(
-  "/init-cluster-setup",
-  checkContentType,
-  // authClusterToken,
-  checkClusterSetupStatus,
-  applyRules("initiate-cluster-setup"),
-  validate,
-  async (req, res) => {
-    // Start new database transaction session
-    const session = await userCtrl.startSession();
-    try {
-      let userId = helper.generateId();
-      let { email, password, name } = req.body;
+	"/init-cluster-setup",
+	checkContentType,
+	//authClusterToken,
+	checkClusterSetupStatus,
+	applyRules("initiate-cluster-setup"),
+	validate,
+	async (req, res) => {
+		// Start new database transaction session
+		const session = await userCtrl.startSession();
+		try {
+			let userId = helper.generateId();
+			let { email, password, name } = req.body;
 
-      // Encrypt user password
-      const salt = await bcrypt.genSalt(10);
-      password = await bcrypt.hash(password, salt);
+			// Encrypt user password
+			const salt = await bcrypt.genSalt(10);
+			password = await bcrypt.hash(password, salt);
 
-      // Save user to the database
-      const userObj = await userCtrl.create(
-        {
-          _id: userId,
-          iid: helper.generateSlug("usr"),
-          name: name,
-          color: helper.generateColor("dark"),
-          contactEmail: email,
-          status: "Active",
-          canCreateOrg: true,
-          isClusterOwner: true,
-          loginProfiles: [
-            {
-              provider: "agnost",
-              id: userId,
-              password,
-              email,
-              emailVerified: true, //During cluster set-up we assume the email of the cluster owner is verified
-            },
-          ],
-          notifications: notificationTypes,
-        },
-        { session }
-      );
+			// Save user to the database
+			const userObj = await userCtrl.create(
+				{
+					_id: userId,
+					iid: helper.generateSlug("usr"),
+					name: name,
+					color: helper.generateColor("dark"),
+					contactEmail: email,
+					status: "Active",
+					canCreateOrg: true,
+					isClusterOwner: true,
+					loginProfiles: [
+						{
+							provider: "agnost",
+							id: userId,
+							password,
+							email,
+							emailVerified: true, //During cluster set-up we assume the email of the cluster owner is verified
+						},
+					],
+					notifications: notificationTypes,
+				},
+				{ session }
+			);
 
-      // Save initial cluster config to the database
-      await clsCtrl.create(
-        {
-          clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
-          masterToken: process.env.MASTER_TOKEN,
-          accessToken: process.env.ACCESS_TOKEN,
-          createdBy: userId,
-        },
-        { session }
-      );
+			// Save initial cluster config to the database
+			await clsCtrl.create(
+				{
+					clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+					masterToken: process.env.MASTER_TOKEN,
+					accessToken: process.env.ACCESS_TOKEN,
+					createdBy: userId,
+				},
+				{ session }
+			);
 
-      // Create new session
-      let tokens = await authCtrl.createSession(
-        userId,
-        helper.getIP(req),
-        req.headers["user-agent"],
-        "agnost"
-      );
+			// Create new session
+			let tokens = await authCtrl.createSession(
+				userId,
+				helper.getIP(req),
+				req.headers["user-agent"],
+				"agnost"
+			);
 
-      // Commit transaction
-      await userCtrl.commit(session);
+			// Commit transaction
+			await userCtrl.commit(session);
 
-      // Remove password field value from returned object
-      delete userObj.loginProfiles[0].password;
-      res.json({ ...userObj, ...tokens });
+			// Remove password field value from returned object
+			delete userObj.loginProfiles[0].password;
+			res.json({ ...userObj, ...tokens });
 
-      // Log action
-      auditCtrl.log(
-        userObj,
-        "user",
-        "initiate-cluster-setup",
-        t("Initiated cluster setup")
-      );
-    } catch (error) {
-      await userCtrl.rollback(session);
-      handleError(req, res, error);
-    }
-  }
+			// Log action
+			auditCtrl.log(
+				userObj,
+				"user",
+				"initiate-cluster-setup",
+				t("Initiated cluster setup")
+			);
+		} catch (error) {
+			await userCtrl.rollback(session);
+			handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -127,166 +127,165 @@ router.post(
 @access     public
 */
 router.post(
-  "/finalize-cluster-setup",
-  checkContentType,
-  hasClusterSetUpCompleted,
-  authSession,
-  applyRules("finalize-cluster-setup"),
-  validate,
-  async (req, res) => {
-    // Start new database transaction session
-    const session = await userCtrl.startSession();
-    try {
-      const { user } = req;
-      const { orgName, appName, smtp, appMembers, uiBaseURL } = req.body;
+	"/finalize-cluster-setup",
+	checkContentType,
+	hasClusterSetUpCompleted,
+	authSession,
+	applyRules("finalize-cluster-setup"),
+	validate,
+	async (req, res) => {
+		// Start new database transaction session
+		const session = await userCtrl.startSession();
+		try {
+			const { user } = req;
+			const { orgName, appName, smtp, appMembers, uiBaseURL } = req.body;
 
-      // Check if the user is cluster owner or not
-      if (!user.isClusterOwner) {
-        await userCtrl.endSession(session);
+			// Check if the user is cluster owner or not
+			if (!user.isClusterOwner) {
+				await userCtrl.endSession(session);
 
-        return res.status(422).json({
-          error: t("Not Allowed"),
-          details: t("Only cluster owners can finalize cluster set-up."),
-          code: ERROR_CODES.notAllowed,
-        });
-      }
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t("Only cluster owners can finalize cluster set-up."),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
 
-      // Check whether cluster set up has been finalized or not. If we have an organization then it means that cluster set-up has been finalized
-      const org = await orgCtrl.getOneByQuery({});
-      if (org) {
-        await userCtrl.endSession(session);
+			// Check whether cluster set up has been finalized or not. If we have an organization then it means that cluster set-up has been finalized
+			const org = await orgCtrl.getOneByQuery({});
+			if (org) {
+				await userCtrl.endSession(session);
 
-        return res.status(422).json({
-          error: t("Not Allowed"),
-          details: t("Cluster set-up has already been finalized."),
-          code: ERROR_CODES.notAllowed,
-        });
-      }
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t("Cluster set-up has already been finalized."),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
 
-      // We are good to finalize the cluster set-up. One last check whether we have members list and whether the SMTP configuration has been provided
-      if (!smtp && appMembers && appMembers.length > 0) {
-        await userCtrl.endSession(session);
+			// We are good to finalize the cluster set-up. One last check whether we have members list and whether the SMTP configuration has been provided
+			if (!smtp && appMembers && appMembers.length > 0) {
+				await userCtrl.endSession(session);
 
-        return res.status(422).json({
-          error: t("Not Allowed"),
-          details: t(
-            "In order to invite members to your app, you need to specify the SMTP server configuration."
-          ),
-          code: ERROR_CODES.notAllowed,
-        });
-      }
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"In order to invite members to your app, you need to specify the SMTP server configuration."
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
 
-      // Create the new organization object
-      let orgId = helper.generateId();
-      let orgObj = await orgCtrl.create(
-        {
-          _id: orgId,
-          ownerUserId: user._id,
-          iid: helper.generateSlug("org"),
-          name: orgName,
-          color: helper.generateColor("light"),
-          createdBy: user._id,
-        },
-        { session, cacheKey: orgId }
-      );
+			// Create the new organization object
+			let orgId = helper.generateId();
+			let orgObj = await orgCtrl.create(
+				{
+					_id: orgId,
+					ownerUserId: user._id,
+					iid: helper.generateSlug("org"),
+					name: orgName,
+					color: helper.generateColor("light"),
+					createdBy: user._id,
+				},
+				{ session, cacheKey: orgId }
+			);
 
-      // Add the creator of the organization as an 'Admin' member
-      await orgMemberCtrl.create(
-        {
-          orgId: orgId,
-          userId: user._id,
-          role: "Admin",
-        },
-        { session, cacheKey: `${orgId}.${user._id}` }
-      );
+			// Add the creator of the organization as an 'Admin' member
+			await orgMemberCtrl.create(
+				{
+					orgId: orgId,
+					userId: user._id,
+					role: "Admin",
+				},
+				{ session, cacheKey: `${orgId}.${user._id}` }
+			);
 
-      // Add the default Agnost cluster resources to the organization
-      const resources = await resourceCtrl.addDefaultOrganizationResources(
-        session,
-        user,
-        orgObj
-      );
+			// Add the default Agnost cluster resources to the organization
+			const resources = await resourceCtrl.addDefaultOrganizationResources(
+				session,
+				user,
+				orgObj
+			);
 
-      // Create the new app and associated master version, environment and engine API server
-      const { app, version, resource, resLog, env, envLog } =
-        await appCtrl.createApp(session, user, orgObj, appName);
+			// Create the new app and associated master version, environment and engine API server
+			const { app, version, resource, resLog, env, envLog } =
+				await appCtrl.createApp(session, user, orgObj, appName);
 
-      if (smtp) {
-        // Save SMTP server configuration
-        await clsCtrl.updateOneByQuery(
-          {
-            clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
-          },
-          { smtp: helper.encyrptSensitiveData(smtp) },
-          {},
-          { session }
-        );
-      }
+			if (smtp) {
+				// Save SMTP server configuration
+				await clsCtrl.updateOneByQuery(
+					{
+						clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+					},
+					{ smtp: helper.encyrptSensitiveData(smtp) },
+					{},
+					{ session }
+				);
+			}
 
-      // Prepare the invitations array to store in the database
-      let invitations = [];
-      if (appMembers) {
-        appMembers.forEach((entry) => {
-          invitations.push({
-            orgId: orgObj._id,
-            appId: app._id,
-            email: entry.email,
-            token: helper.generateSlug("tkn", 36),
-            role: entry.role,
-            orgRole: "Member",
-          });
-        });
+			// Prepare the invitations array to store in the database
+			let invitations = [];
+			if (appMembers) {
+				appMembers.forEach((entry) => {
+					invitations.push({
+						orgId: orgObj._id,
+						appId: app._id,
+						email: entry.email,
+						token: helper.generateSlug("tkn", 36),
+						role: entry.role,
+						orgRole: "Member",
+					});
+				});
 
-        // Create invitations
-        await appInvitationCtrl.createMany(invitations, {
-          session,
-        });
-      }
+				// Create invitations
+				await appInvitationCtrl.createMany(invitations, {
+					session,
+				});
+			}
 
-      // Commit changes to the database
-      await userCtrl.commit(session);
-      res.json({ org: orgObj, app, version, env });
+			// Commit changes to the database
+			await userCtrl.commit(session);
+			res.json({ org: orgObj, app, version, env });
 
-      // Deploy application version to the environment
-      await deployCtrl.deploy(envLog, app, version, env, user);
+			// Deploy application version to the environment
+			await deployCtrl.deploy(envLog, app, version, env, user);
 
-      // We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
-      await setKey(env._id, env, helper.constants["1month"]);
+			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
+			await setKey(env._id, env, helper.constants["1month"]);
 
-      // We first deploy the app then create the resources. The environment data needs to be cached before the api-server pod starts up.
-      // Create the engine deployment (API server), associated HPA, service and ingress rule
-      await resourceCtrl.manageClusterResources([
-        resources.storage,
-        resources.queue,
-        resources.scheduler,
-        resources.realtime,
-        { resource, log: resLog },
-      ]);
+			// We first deploy the app then create the resources. The environment data needs to be cached before the api-server pod starts up.
+			// Create the engine deployment (API server), associated HPA, service and ingress rule
+			await resourceCtrl.manageClusterResources([
+				resources.storage,
+				resources.queue,
+				resources.scheduler,
+				resources.realtime,
+				{ resource, log: resLog },
+			]);
 
-      // Send invitation emails
-      invitations.forEach((entry) => {
-        sendMessage("send-app-inivation", {
-          to: entry.email,
-          role: entry.role,
-          organization: orgObj.name,
-          app: app.name,
-          url: `${uiBaseURL}/redirect-handle?token=${entry.token}&type=app-invite`,
-        });
-      });
+			// Send invitation emails
+			invitations.forEach((entry) => {
+				sendMessage("send-app-inivation", {
+					to: entry.email,
+					role: entry.role,
+					organization: orgObj.name,
+					app: app.name,
+					url: `${uiBaseURL}/redirect-handle?token=${entry.token}&type=app-invite`,
+				});
+			});
 
-      // Log action
-      auditCtrl.log(
-        user,
-        "user",
-        "finalize-cluster-setup",
-        t("Completed cluster setup")
-      );
-    } catch (error) {
-      console.log("***here", error);
-      await userCtrl.rollback(session);
-      handleError(req, res, error);
-    }
-  }
+			// Log action
+			auditCtrl.log(
+				user,
+				"user",
+				"finalize-cluster-setup",
+				t("Completed cluster setup")
+			);
+		} catch (error) {
+			await userCtrl.rollback(session);
+			handleError(req, res, error);
+		}
+	}
 );
 
 /*

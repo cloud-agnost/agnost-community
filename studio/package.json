@@ -9,7 +9,8 @@
 		"lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
 		"preview": "vite preview",
 		"storybook": "storybook dev -p 6006",
-		"build-storybook": "storybook build"
+		"build-storybook": "storybook build",
+		"icon": "svgr src/assets/icons -d src/components/icons --ext tsx --typescript --icon --ignore-existing --replace-attr-values \"#fff=currentColor\""
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^3.1.0",
@@ -26,6 +27,7 @@
 		"clsx": "^1.2.1",
 		"framer-motion": "^10.12.16",
 		"i18next": "^22.5.0",
+		"lodash": "^4.17.21",
 		"path": "^0.12.7",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
@@ -36,7 +38,9 @@
 		"swiper": "^9.3.2",
 		"tailwind-merge": "^1.13.0",
 		"zod": "^3.21.4",
-		"zustand": "^4.3.8"
+		"zustand": "^4.3.8",
+		"@svgr/cli": "^6.3.1",
+		"@svgr/plugin-jsx": "^6.5.1"
 	},
 	"devDependencies": {
 		"@storybook/addon-essentials": "^7.0.18",

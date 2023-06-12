@@ -74,30 +74,12 @@ export const connectToQueue = () => {
 		// Register queue message handlers
 		let queueCount = config.get("general.generalQueueCount");
 		for (let i = 1; i <= queueCount; i++) {
-			deployVersionHandler(
-				connection,
-				`deploy-version-${i}${config.get("queue.developmentSuffix")}`
-			);
-			redeployVersionHandler(
-				connection,
-				`redeploy-version-${i}${config.get("queue.developmentSuffix")}`
-			);
-			deleteEnvironmentHandler(
-				connection,
-				`delete-environment-${i}${config.get("queue.developmentSuffix")}`
-			);
-			updateEnvironmentHandler(
-				connection,
-				`update-environment-${i}${config.get("queue.developmentSuffix")}`
-			);
-			updateDatabaseHandler(
-				connection,
-				`update-db-${i}${config.get("queue.developmentSuffix")}`
-			);
-			manageResourceHandler(
-				connection,
-				`manage-resource-${i}${config.get("queue.developmentSuffix")}`
-			);
+			deployVersionHandler(connection, `deploy-version-${i}`);
+			redeployVersionHandler(connection, `redeploy-version-${i}`);
+			deleteEnvironmentHandler(connection, `delete-environment-${i}`);
+			updateEnvironmentHandler(connection, `update-environment-${i}`);
+			updateDatabaseHandler(connection, `update-db-${i}`);
+			manageResourceHandler(connection, `manage-resource-${i}`);
 		}
 	});
 };
@@ -126,15 +108,12 @@ export const deployVersion = (payload) => {
 			config.get("general.generalQueueCount")
 		);
 
-		channel.assertQueue(
-			`deploy-version-${randNumber}${config.get("queue.developmentSuffix")}`,
-			{
-				durable: true,
-			}
-		);
+		channel.assertQueue(`deploy-version-${randNumber}`, {
+			durable: true,
+		});
 
 		channel.sendToQueue(
-			`deploy-version-${randNumber}${config.get("queue.developmentSuffix")}`,
+			`deploy-version-${randNumber}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,
@@ -161,15 +140,12 @@ export const redeployVersion = (payload) => {
 			config.get("general.generalQueueCount")
 		);
 
-		channel.assertQueue(
-			`redeploy-version-${randNumber}${config.get("queue.developmentSuffix")}`,
-			{
-				durable: true,
-			}
-		);
+		channel.assertQueue(`redeploy-version-${randNumber}`, {
+			durable: true,
+		});
 
 		channel.sendToQueue(
-			`redeploy-version-${randNumber}${config.get("queue.developmentSuffix")}`,
+			`redeploy-version-${randNumber}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,
@@ -196,19 +172,12 @@ export const deleteEnvironment = (payload) => {
 			config.get("general.generalQueueCount")
 		);
 
-		channel.assertQueue(
-			`delete-environment-${randNumber}${config.get(
-				"queue.developmentSuffix"
-			)}`,
-			{
-				durable: true,
-			}
-		);
+		channel.assertQueue(`delete-environment-${randNumber}`, {
+			durable: true,
+		});
 
 		channel.sendToQueue(
-			`delete-environment-${randNumber}${config.get(
-				"queue.developmentSuffix"
-			)}`,
+			`delete-environment-${randNumber}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,
@@ -235,19 +204,12 @@ export const updateEnvironment = (payload) => {
 			config.get("general.generalQueueCount")
 		);
 
-		channel.assertQueue(
-			`update-environment-${randNumber}${config.get(
-				"queue.developmentSuffix"
-			)}`,
-			{
-				durable: true,
-			}
-		);
+		channel.assertQueue(`update-environment-${randNumber}`, {
+			durable: true,
+		});
 
 		channel.sendToQueue(
-			`update-environment-${randNumber}${config.get(
-				"queue.developmentSuffix"
-			)}`,
+			`update-environment-${randNumber}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,
@@ -274,15 +236,12 @@ export const updateDatabase = (payload) => {
 			config.get("general.generalQueueCount")
 		);
 
-		channel.assertQueue(
-			`update-db-${randNumber}${config.get("queue.developmentSuffix")}`,
-			{
-				durable: true,
-			}
-		);
+		channel.assertQueue(`update-db-${randNumber}`, {
+			durable: true,
+		});
 
 		channel.sendToQueue(
-			`update-db-${randNumber}${config.get("queue.developmentSuffix")}`,
+			`update-db-${randNumber}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,
@@ -309,15 +268,12 @@ export const deployTasks = (payload) => {
 			config.get("general.generalQueueCount")
 		);
 
-		channel.assertQueue(
-			`deploy-tasks-${randNumber}${config.get("queue.developmentSuffix")}`,
-			{
-				durable: true,
-			}
-		);
+		channel.assertQueue(`deploy-tasks-${randNumber}`, {
+			durable: true,
+		});
 
 		channel.sendToQueue(
-			`deploy-tasks-${randNumber}${config.get("queue.developmentSuffix")}`,
+			`deploy-tasks-${randNumber}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,
@@ -344,15 +300,12 @@ export const redeployTasks = (payload) => {
 			config.get("general.generalQueueCount")
 		);
 
-		channel.assertQueue(
-			`redeploy-tasks-${randNumber}${config.get("queue.developmentSuffix")}`,
-			{
-				durable: true,
-			}
-		);
+		channel.assertQueue(`redeploy-tasks-${randNumber}`, {
+			durable: true,
+		});
 
 		channel.sendToQueue(
-			`redeploy-tasks-${randNumber}${config.get("queue.developmentSuffix")}`,
+			`redeploy-tasks-${randNumber}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,
@@ -379,15 +332,12 @@ export const deleteTasks = (payload) => {
 			config.get("general.generalQueueCount")
 		);
 
-		channel.assertQueue(
-			`delete-tasks-${randNumber}${config.get("queue.developmentSuffix")}`,
-			{
-				durable: true,
-			}
-		);
+		channel.assertQueue(`delete-tasks-${randNumber}`, {
+			durable: true,
+		});
 
 		channel.sendToQueue(
-			`delete-tasks-${randNumber}${config.get("queue.developmentSuffix")}`,
+			`delete-tasks-${randNumber}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,
@@ -414,15 +364,12 @@ export const manageResource = (payload) => {
 			config.get("general.generalQueueCount")
 		);
 
-		channel.assertQueue(
-			`manage-resource-${randNumber}${config.get("queue.developmentSuffix")}`,
-			{
-				durable: true,
-			}
-		);
+		channel.assertQueue(`manage-resource-${randNumber}`, {
+			durable: true,
+		});
 
 		channel.sendToQueue(
-			`manage-resource-${randNumber}${config.get("queue.developmentSuffix")}`,
+			`manage-resource-${randNumber}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,

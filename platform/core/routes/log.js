@@ -20,7 +20,6 @@ const router = express.Router({ mergeParams: true });
 */
 router.get(
 	"/org/:orgId/app/:appId/version/:versionId",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,

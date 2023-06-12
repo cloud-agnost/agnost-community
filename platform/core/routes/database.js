@@ -25,7 +25,6 @@ const router = express.Router({ mergeParams: true });
 */
 router.get(
 	"/",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
@@ -142,7 +141,6 @@ router.post(
 */
 router.get(
 	"/:dbId",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,

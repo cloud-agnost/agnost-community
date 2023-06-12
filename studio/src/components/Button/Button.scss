@@ -2,7 +2,7 @@
 	@apply inline-flex items-center justify-center;
 	@apply rounded-md text-sm transition-colors font-semibold leading-[normal];
 	@apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary-hover focus-visible:ring-offset-2;
-	@apply disabled:opacity-50 disabled:pointer-events-none focus-visible:ring-button-primary-hover;
+	@apply disabled:pointer-events-none focus-visible:ring-button-primary-hover;
 	@apply px-4 py-2;
 
 	&-primary {
@@ -27,6 +27,9 @@
 	}
 	&-full {
 		@apply w-full;
+	}
+	&-loading {
+		@apply cursor-wait pointer-events-none;
 	}
 }
 

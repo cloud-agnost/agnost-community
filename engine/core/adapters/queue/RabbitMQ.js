@@ -27,24 +27,15 @@ export class RabbitMQ extends QueueBase {
 
 		// Listen for messages
 		for (let i = 1; i <= queueCount; i++) {
-			this.processMessage(
-				queueId,
-				`process-message-${envId}-${queueId}-${i}${config.get(
-					"queue.developmentSuffix"
-				)}`
-			);
+			this.processMessage(queueId, `process-message-${envId}-${queueId}-${i}`);
 		}
 
 		// Listen for delayed messages
 		for (let i = 1; i <= exchangeCount; i++) {
 			this.processMessage(
 				queueId,
-				`process-delayed-message-exchange-${envId}-${queueId}-${i}${config.get(
-					"queue.developmentSuffix"
-				)}`,
-				`process-delayed-message-${envId}-${queueId}-${i}${config.get(
-					"queue.developmentSuffix"
-				)}`
+				`process-delayed-message-exchange-${envId}-${queueId}-${i}`,
+				`process-delayed-message-${envId}-${queueId}-${i}`
 			);
 		}
 	}
@@ -92,9 +83,7 @@ export class RabbitMQ extends QueueBase {
 					1,
 					config.get("general.delayedMessageExchangeCount")
 				);
-				const exchangeName = `process-delayed-message-exchange-${envId}-${queueId}-${exchangeNumber}${config.get(
-					"queue.developmentSuffix"
-				)}`;
+				const exchangeName = `process-delayed-message-exchange-${envId}-${queueId}-${exchangeNumber}`;
 
 				channel.assertExchange(exchangeName, "x-delayed-message", {
 					durable: true,
@@ -122,9 +111,7 @@ export class RabbitMQ extends QueueBase {
 					1,
 					config.get("general.messageProcessQueueCount")
 				);
-				const queueName = `process-message-${envId}-${queueId}-${queueNumber}${config.get(
-					"queue.developmentSuffix"
-				)}`;
+				const queueName = `process-message-${envId}-${queueId}-${queueNumber}`;
 
 				channel.assertQueue(queueName, {
 					durable: true,

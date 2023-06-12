@@ -37,7 +37,6 @@ const router = express.Router({ mergeParams: true });
 */
 router.get(
 	"/",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
@@ -87,7 +86,6 @@ router.get(
 */
 router.get(
 	"/mine",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
@@ -1278,7 +1276,6 @@ router.delete(
 */
 router.get(
 	"/:versionId/npm-search",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,

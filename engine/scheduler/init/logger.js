@@ -23,7 +23,7 @@ class EngineErrorTransport extends Transport {
 			message: log.details?.message,
 			details: log.message,
 			stack: log.details?.stack,
-			payload: log.details.payload,
+			payload: log.details?.payload,
 			code: ERROR_CODES.internalServerError,
 		};
 
