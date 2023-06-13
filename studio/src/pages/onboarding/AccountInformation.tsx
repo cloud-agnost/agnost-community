@@ -37,7 +37,9 @@ const FormSchema = z.object({
 	name: z
 		.string({ required_error: 'Name is required' })
 		.min(2, 'Name must be at least 2 characters long')
-		.max(64, 'Name must be at most 64 characters long'),
+		.max(64, 'Name must be at most 64 characters long')
+		.trim()
+		.refine((value) => value.trim().length > 0, 'Name is required'),
 });
 
 export default function AccountInformation() {

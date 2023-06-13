@@ -28,12 +28,20 @@ async function loader() {
 }
 
 const FormSchema = z.object({
-	host: z.string({ required_error: 'Host is required' }),
+	host: z
+		.string({ required_error: 'Host is required' })
+		.trim()
+		.refine((value) => value.trim().length > 0, 'Host is required'),
 	port: z
 		.string({ required_error: 'Port is required' })
 		.regex(/^[0-9]+$/, 'Port must be a number')
-		.min(3, 'Port must be at least 3 characters long'),
-	user: z.string({ required_error: 'Username is required' }),
+		.min(3, 'Port must be at least 3 characters long')
+		.trim()
+		.refine((value) => value.trim().length > 0, 'Port is required'),
+	user: z
+		.string({ required_error: 'Username is required' })
+		.trim()
+		.refine((value) => value.trim().length > 0, 'Username is required'),
 	password: z.string({ required_error: 'Password is required' }),
 	useTLS: z.boolean(),
 });

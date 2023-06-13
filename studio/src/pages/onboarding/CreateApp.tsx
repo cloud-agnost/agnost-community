@@ -24,7 +24,9 @@ const FormSchema = z.object({
 	appName: z
 		.string({ required_error: 'App name is required' })
 		.min(2, 'App name must be at least 2 characters long')
-		.max(64, 'App name must be at most 64 characters long'),
+		.max(64, 'App name must be at most 64 characters long')
+		.trim()
+		.refine((value) => value.trim().length > 0, 'App name is required'),
 });
 
 export default function CreateApp() {
