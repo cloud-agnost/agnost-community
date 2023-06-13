@@ -11,7 +11,7 @@ interface ClusterStore {
 	canClusterSendEmail: boolean;
 	checkClusterSetup: () => Promise<boolean>;
 	checkClusterSmtpStatus: () => Promise<boolean>;
-	initializeClusterSetup: (data: UserDataToRegister) => Promise<User | APIError>;
+	initializeClusterSetup: (data: UserDataToRegister) => Promise<User>;
 	finalizeClusterSetup: (req: OnboardingData) => Promise<User | APIError>;
 	initializeAccountSetup: () => void;
 	finalizeAccountSetup: () => void;
