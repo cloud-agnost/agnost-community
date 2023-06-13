@@ -74,7 +74,7 @@ jobs:
           password: '${{ steps.auth.outputs.access_token }}'
       -
         name: Build and Push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           push: true
           context: ./${{ matrix.application }}
