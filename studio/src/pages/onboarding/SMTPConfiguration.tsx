@@ -210,7 +210,7 @@ export default function SMTPConfiguration() {
 						}}
 					/>
 
-					<div className='flex gap-1 justify-end'>
+					<div className='flex gap-4 justify-end'>
 						<Button onClick={goBack} type='button' variant='text' size='lg'>
 							Previous
 						</Button>

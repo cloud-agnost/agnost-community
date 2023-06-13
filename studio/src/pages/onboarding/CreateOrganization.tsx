@@ -77,7 +77,7 @@ export default function CreateOrganization() {
 						)}
 					/>
 
-					<div className='flex gap-1 justify-end'>
+					<div className='flex gap-4 justify-end'>
 						<Button size='lg'>Next</Button>
 					</div>
 				</form>
