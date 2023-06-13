@@ -66,8 +66,11 @@ const useAuthStore = create<AuthStore>()(
 						return prev;
 					}),
 				isAuthenticated: () => get()?.user !== null,
-				renewAccessToken: () => {
-					// TODO renew access token
+				renewAccessToken: async () => {
+					if (!get().isAuthenticated()) return;
+					const res = await AuthService.renewAccessToken();
+					get().setRefreshToken(res.rt);
+					get().setToken(res.at);
 				},
 				completeAccountSetup: async (data) => {
 					try {
