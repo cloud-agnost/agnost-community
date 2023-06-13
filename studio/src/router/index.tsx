@@ -75,8 +75,13 @@ const router = createBrowserRouter([
 				),
 				children: [
 					{
+						loader: SelectOrganization.loader,
 						path: '',
-						element: <SelectOrganization />,
+						element: (
+							<RequireAuth>
+								<SelectOrganization />
+							</RequireAuth>
+						),
 					},
 				],
 			},
