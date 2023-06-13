@@ -71,9 +71,11 @@ const useAuthStore = create<AuthStore>()(
 				},
 				completeAccountSetup: async (data) => {
 					try {
-						return AuthService.completeAccountSetup(data);
+						const user = await AuthService.completeAccountSetup(data);
+						set({ user });
+						return user;
 					} catch (error) {
-						return error as APIError;
+						throw error as APIError;
 					}
 				},
 				resetPassword(email) {
@@ -82,8 +84,14 @@ const useAuthStore = create<AuthStore>()(
 						uiBaseURL: window.location.origin,
 					});
 				},
-				verifyEmail(email: string, code: number) {
-					return AuthService.validateEmail(email, code);
+				async verifyEmail(email: string, code: number) {
+					try {
+						const user = await AuthService.validateEmail(email, code);
+						set({ user });
+						return user;
+					} catch (error) {
+						throw error as APIError;
+					}
 				},
 				changePasswordWithToken(token: string, newPassword: string) {
 					return UserService.changePasswordWithToken({
@@ -113,7 +121,7 @@ const useAuthStore = create<AuthStore>()(
 						set({ user: res });
 						return res;
 					} catch (error) {
-						return error as APIError;
+						throw error as APIError;
 					}
 				},
 				async acceptInvite(token: string) {

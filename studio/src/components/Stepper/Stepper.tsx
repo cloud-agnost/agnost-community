@@ -1,23 +1,24 @@
 import './Stepper.scss';
 import { cn } from '@/utils';
+import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 
 interface StepperProps {
 	classname?: string;
 	steps: {
 		text: string;
 		isDone: boolean;
-		isActive: boolean;
 	}[];
 }
 
 export default function Stepper({ classname, steps }: StepperProps) {
+	const { currentStepIndex } = useOnboardingStore();
 	return (
 		<ol className={cn('auth-stepper', classname)}>
-			{steps.map(({ text, isDone, isActive }, index) => (
+			{steps.map(({ text, isDone }, index) => (
 				<li
 					key={index}
 					className='auth-stepper-item'
-					data-is-active={isActive}
+					data-is-active={currentStepIndex === index}
 					data-is-done={isDone}
 				>
 					<div className='auth-stepper-item-wrapper'>

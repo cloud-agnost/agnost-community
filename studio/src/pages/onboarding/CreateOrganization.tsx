@@ -13,7 +13,7 @@ import { Input } from '@/components/Input';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 
 async function loader() {
@@ -29,11 +29,13 @@ const FormSchema = z.object({
 
 export default function CreateOrganization() {
 	const navigate = useNavigate();
-	const { setDataPartially, getCurrentStep, goToNextStep } = useOnboardingStore();
-	const { goBack } = useOutletContext() as { goBack: () => void };
+	const { setDataPartially, getCurrentStep, goToNextStep, data } = useOnboardingStore();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
+		defaultValues: {
+			orgName: data.orgName,
+		},
 	});
 
 	function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -76,9 +78,6 @@ export default function CreateOrganization() {
 					/>
 
 					<div className='flex gap-1 justify-end'>
-						<Button type='button' onClick={goBack} variant='text' size='lg'>
-							Previous
-						</Button>
 						<Button size='lg'>Next</Button>
 					</div>
 				</form>

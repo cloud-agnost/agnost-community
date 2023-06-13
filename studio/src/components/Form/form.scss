@@ -1,5 +1,9 @@
 .form {
 	&-message {
+		@apply text-error-default text-xs;
+	}
+
+	&-label-error {
 		@apply text-error-default;
 	}
 

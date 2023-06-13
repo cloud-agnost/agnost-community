@@ -1,44 +1,40 @@
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import { OnboardingLayout } from '@/layouts/OnboardingLayout';
-import { LoaderFunctionArgs, Outlet, redirect, useLocation, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { LoaderFunctionArgs, Outlet, redirect, useNavigate } from 'react-router-dom';
 import { Stepper } from '@/components/Stepper';
-import useOnboardingStore, { Step } from '@/store/onboarding/onboardingStore.ts';
-import { removeLastSlash } from '@/utils/utils.ts';
+import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 
 import './onboarding.scss';
 import { data } from 'autoprefixer';
 
 async function loader(params: LoaderFunctionArgs) {
 	const status = await useClusterStore.getState().checkClusterSetup();
+	const { currentStepIndex, steps } = useOnboardingStore.getState();
 
+	// TODO: check later
 	if (status) {
 		// return redirect('/organization');
 	}
 
 	const url = new URL(params.request.url);
-	const steps = useOnboardingStore.getState().steps;
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
-	const lastDoneStep = steps.findLastIndex((step: Step) => step.isDone);
+	const lastDoneStep = steps[currentStepIndex];
 
-	if (lastDoneStep > -1 && steps[lastDoneStep + 1]) {
-		const nextStep = steps[lastDoneStep + 1];
-
-		if (nextStep.path !== url.pathname) {
-			return redirect(nextStep.path);
-		}
+	if (lastDoneStep && lastDoneStep.path !== url.pathname) {
+		return redirect(lastDoneStep.path);
 	}
 
 	return data;
 }
 
 export default function Onboarding() {
-	const { steps, getPrevPath } = useOnboardingStore();
-	const location = useLocation();
+	const { steps, getPrevPath, goToPrevStep } = useOnboardingStore();
+	// const location = useLocation();
 	const navigate = useNavigate();
 
+	/*
 	useEffect(() => {
 		useOnboardingStore.setState((prev) => {
 			const steps = prev.steps.map((step) => {
@@ -52,9 +48,14 @@ export default function Onboarding() {
 		});
 	}, [location]);
 
+	 */
+
 	function goBack() {
 		const prev = getPrevPath();
-		if (prev) navigate(prev);
+		if (prev) {
+			goToPrevStep();
+			navigate(prev);
+		}
 	}
 
 	const stepper = <Stepper steps={steps} classname='w-full' />;

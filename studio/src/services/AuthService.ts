@@ -1,6 +1,5 @@
 import { axios } from '@/helpers';
 import {
-	APIError,
 	CompleteAccountSetupRequest,
 	FinalizeAccountSetupRequest,
 	OnboardingData,
@@ -66,7 +65,7 @@ export default class AuthService {
 		return (await axios.post(`${this.url}/renew`)).data;
 	}
 
-	static async completeAccountSetup(data: CompleteAccountSetupRequest): Promise<User | APIError> {
+	static async completeAccountSetup(data: CompleteAccountSetupRequest): Promise<User> {
 		return (await axios.post(`${this.url}/complete-setup`, data)).data;
 	}
 }

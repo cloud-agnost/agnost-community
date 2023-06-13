@@ -1,4 +1,4 @@
-import { Alert } from '@/components/Alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { Description } from '@/components/Description';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
@@ -60,7 +60,8 @@ export default function Login() {
 				</Description>
 				{error && (
 					<Alert className='!max-w-full' variant='error'>
-						{error.details}
+						<AlertTitle>{error.error}</AlertTitle>
+						<AlertDescription>{error.details}</AlertDescription>
 					</Alert>
 				)}
 				<Form {...form}>
@@ -122,16 +123,14 @@ export default function Login() {
 
 function NotVerified({ email, clearError }: { email: string; clearError: () => void }) {
 	const [loading, setLoading] = useState(false);
-	const [success, setSuccess] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
-
+	const navigate = useNavigate();
 	async function reSendVerificationCode() {
 		try {
 			setError(null);
 			setLoading(true);
-			setSuccess(false);
 			await AuthService.resendEmailVerificationCode(email);
-			setSuccess(true);
+			navigate(`/verify-email?email=${email}`);
 		} catch (error) {
 			setError(error as APIError);
 		} finally {
@@ -154,13 +153,8 @@ function NotVerified({ email, clearError }: { email: string; clearError: () => v
 
 				{error && (
 					<Alert className='!max-w-full' variant='error'>
-						{error.details}
-					</Alert>
-				)}
-
-				{success && (
-					<Alert className='!max-w-full' variant='success'>
-						Email verification code has been sent to your email address.
+						<AlertTitle>{error.error}</AlertTitle>
+						<AlertDescription>{error.details}</AlertDescription>
 					</Alert>
 				)}
 

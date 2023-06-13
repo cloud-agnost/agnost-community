@@ -30,10 +30,13 @@ const FormSchema = z.object({
 export default function CreateApp() {
 	const navigate = useNavigate();
 	const { goBack } = useOutletContext() as { goBack: () => void };
-	const { setDataPartially, getCurrentStep, goToNextStep } = useOnboardingStore();
+	const { setDataPartially, getCurrentStep, goToNextStep, data } = useOnboardingStore();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
+		defaultValues: {
+			appName: data.appName,
+		},
 	});
 
 	function onSubmit(data: z.infer<typeof FormSchema>) {

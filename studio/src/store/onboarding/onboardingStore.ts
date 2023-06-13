@@ -7,7 +7,6 @@ export interface Step {
 	text: string;
 	path: string;
 	isDone: boolean;
-	isActive: boolean;
 	prevPath?: string;
 	nextPath?: string;
 }
@@ -37,14 +36,14 @@ const useOnboardingStore = create<OnboardingStore>()(
 						text: 'Account Information',
 						path: '/onboarding',
 						isDone: false,
-						isActive: false,
+
 						nextPath: '/onboarding/create-organization',
 					},
 					{
 						text: 'Create Your Organization',
 						path: '/onboarding/create-organization',
 						isDone: false,
-						isActive: false,
+
 						prevPath: '/onboarding',
 						nextPath: '/onboarding/create-app',
 					},
@@ -52,7 +51,7 @@ const useOnboardingStore = create<OnboardingStore>()(
 						text: 'Create Your First App',
 						path: '/onboarding/create-app',
 						isDone: false,
-						isActive: false,
+
 						prevPath: '/onboarding/create-organization',
 						nextPath: '/onboarding/smtp-configuration',
 					},
@@ -60,7 +59,7 @@ const useOnboardingStore = create<OnboardingStore>()(
 						text: 'Configure SMTP Server',
 						path: '/onboarding/smtp-configuration',
 						isDone: false,
-						isActive: false,
+
 						prevPath: '/onboarding/create-app',
 						nextPath: '/onboarding/invite-team-members',
 					},
@@ -68,7 +67,7 @@ const useOnboardingStore = create<OnboardingStore>()(
 						text: 'Invite Team Members',
 						path: '/onboarding/invite-team-members',
 						isDone: false,
-						isActive: false,
+
 						prevPath: '/onboarding/smtp-configuration',
 					},
 				],
@@ -77,11 +76,11 @@ const useOnboardingStore = create<OnboardingStore>()(
 					appName: '',
 					uiBaseURL: window.location.origin,
 					smtp: {
-						host: '',
-						port: 587,
+						host: 'smtp.mandrillapp.com',
+						port: '587',
 						useTLS: false,
-						user: '',
-						password: '',
+						user: 'Altogic',
+						password: 'iS-pNHmBJIXIpjOUXgYmZQ',
 					},
 					appMembers: [],
 				},
@@ -103,7 +102,7 @@ const useOnboardingStore = create<OnboardingStore>()(
 					}));
 				},
 				getPrevPath() {
-					const currentStepIndex = get().steps.findIndex((step) => step.isActive);
+					const currentStepIndex = get().currentStepIndex;
 					const prevStep = get().steps[currentStepIndex - 1];
 					return prevStep?.path;
 				},
@@ -116,16 +115,18 @@ const useOnboardingStore = create<OnboardingStore>()(
 					}));
 				},
 				goToNextStep(isDone = true) {
+					if (get().currentStepIndex >= get().steps.length - 1) return;
 					set((state) => {
-						get().setStepByIndex(state.currentStepIndex, { isActive: false, isDone });
+						get().setStepByIndex(state.currentStepIndex, { isDone });
 						return {
 							currentStepIndex: state.currentStepIndex + 1,
 						};
 					});
 				},
 				goToPrevStep() {
+					if (get().currentStepIndex <= 0) return;
 					set((state) => {
-						get().setStepByIndex(state.currentStepIndex, { isActive: false });
+						get().setStepByIndex(state.currentStepIndex - 1, { isDone: false });
 						return {
 							currentStepIndex: state.currentStepIndex - 1,
 						};
@@ -140,6 +141,9 @@ const useOnboardingStore = create<OnboardingStore>()(
 				name: 'onboarding-storage',
 			},
 		),
+		{
+			name: 'onboarding',
+		},
 	),
 );
 

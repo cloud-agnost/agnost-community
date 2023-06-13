@@ -44,14 +44,15 @@ async function loader(params: LoaderFunctionArgs) {
 
 const FormSchema = z.object({
 	verificationCode: z
-		.string({ required_error: 'Verification code is required' })
+		.string()
 		.max(6, 'Verification code must be 6 digits')
 		.min(6, 'Verification code must be 6 digits')
+		.optional()
+		.or(z.literal(''))
 		.transform((val) => Number(val))
 		.superRefine((val, ctx) => {
 			const url = new URL(window.location.href);
 			const token = url.searchParams.has('token');
-			console.log('token', token);
 			if (!token && !val) {
 				return ctx.addIssue({
 					code: z.ZodIssueCode.custom,
@@ -106,6 +107,9 @@ export default function CompleteAccountSetupVerifyEmail() {
 				});
 			}
 		} catch (e) {
+			console.log({
+				catch: e,
+			});
 			setError(e as APIError);
 		} finally {
 			setLoading(false);
@@ -113,6 +117,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 	}
 
 	useEffect(() => {
+		console.log({ error });
 		if (error && error.code === 'invalid_validation_code') {
 			form.setError('verificationCode', {
 				message: '',

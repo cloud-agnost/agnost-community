@@ -19,7 +19,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 import { PasswordInput } from '@/components/PasswordInput';
-import { Alert } from '@/components/Alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { APIError } from '@/types';
 import { User } from '@/types/type';
 
@@ -60,6 +60,7 @@ export default function AccountInformation() {
 			const user = await initializeClusterSetup(data);
 			setUser(user as User);
 			const { nextPath } = getCurrentStep();
+			console.log(nextPath);
 			if (nextPath) {
 				console.log(nextPath);
 				navigate(nextPath);
@@ -85,7 +86,8 @@ export default function AccountInformation() {
 
 			{error && (
 				<Alert className='!max-w-full' variant='error'>
-					{error.details}
+					<AlertTitle>{error.error}</AlertTitle>
+					<AlertDescription>{error.details}</AlertDescription>
 				</Alert>
 			)}
 

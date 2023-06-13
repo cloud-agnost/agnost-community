@@ -51,7 +51,7 @@ export interface OnboardingData {
 
 export interface SMTPSettings {
 	host: string;
-	port: number;
+	port: string;
 	useTLS: boolean;
 	user: string;
 	password: string;
