@@ -75,6 +75,7 @@ const router = createBrowserRouter([
 				),
 				children: [
 					{
+						loader: SelectOrganization.loader,
 						path: '',
 						element: <SelectOrganization />,
 					},
