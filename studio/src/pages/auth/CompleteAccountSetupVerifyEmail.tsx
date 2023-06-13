@@ -1,8 +1,6 @@
-import { Description } from '@/components/Description';
-import { AuthLayout } from '@/layouts/AuthLayout';
-import './auth.scss';
-import { Button } from '@/components/Button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
+import { Button } from '@/components/Button';
+import { Description } from '@/components/Description';
 import {
 	Form,
 	FormControl,
@@ -13,24 +11,35 @@ import {
 	FormMessage,
 } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { PasswordInput } from '@/components/PasswordInput';
 import { VerificationCodeInput } from '@/components/VerificationCodeInput';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { LoaderFunctionArgs, redirect, useSearchParams } from 'react-router-dom';
-import { APIError } from '@/types';
-
+import { AuthLayout } from '@/layouts/AuthLayout';
+import useAuthStore from '@/store/auth/authStore';
+import { APIError, User } from '@/types/type.ts';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { LoaderFunctionArgs, redirect, useLoaderData } from 'react-router-dom';
+import * as z from 'zod';
+import './auth.scss';
+interface CompleteAccountSetupVerifyEmailLoaderData {
+	token?: string;
+	isVerified?: boolean;
+	user?: User;
+	error: APIError | null;
+}
 async function loader(params: LoaderFunctionArgs) {
-	const url = new URL(params.request.url);
-
-	if (!url.searchParams.has('email')) {
-		return redirect('/complete-account-setup');
+	try {
+		const url = new URL(params.request.url);
+		const token = url.searchParams.get('token');
+		const isVerified = JSON.parse(url.searchParams.get('isVerified') || 'false');
+		let res;
+		if (token) res = await useAuthStore.getState().acceptInvite(token as string);
+		return { token, isVerified, user: res?.user };
+	} catch (error) {
+		if ((error as APIError).code === 'not_allowed') return redirect('/login');
+		else return error;
 	}
-
-	return null;
 }
 
 const FormSchema = z.object({
@@ -38,7 +47,19 @@ const FormSchema = z.object({
 		.string({ required_error: 'Verification code is required' })
 		.max(6, 'Verification code must be 6 digits')
 		.min(6, 'Verification code must be 6 digits')
-		.transform((val) => Number(val)),
+		.transform((val) => Number(val))
+		.superRefine((val, ctx) => {
+			const url = new URL(window.location.href);
+			const token = url.searchParams.has('token');
+			console.log('token', token);
+			if (!token && !val) {
+				return ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: 'Verification code is required',
+					path: ['verificationCode'],
+				});
+			}
+		}),
 	password: z
 		.string({ required_error: 'Password is required' })
 		.min(8, 'Password must be at least 8 characters long'),
@@ -48,26 +69,42 @@ const FormSchema = z.object({
 });
 
 export default function CompleteAccountSetupVerifyEmail() {
-	const [error, setError] = useState<APIError | null>(null);
+	const {
+		token,
+		isVerified,
+		user,
+		error: loaderError,
+	} = useLoaderData() as CompleteAccountSetupVerifyEmailLoaderData;
+
+	const [error, setError] = useState<APIError | null>(loaderError);
 	const [loading, setLoading] = useState(false);
-	const [success, setSuccess] = useState(false);
-	const [params] = useSearchParams();
-	const { finalizeAccountSetup } = useAuthStore();
+
+	const { completeAccountSetup, finalizeAccountSetup, email } = useAuthStore();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
 
-	console.log(params.get('email'));
-
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		const email = params.get('email');
-		if (!email) return;
 		try {
 			setError(null);
 			setLoading(true);
-			setSuccess(false);
-			await finalizeAccountSetup({ ...data, email });
-			setSuccess(true);
+
+			if (!token) {
+				await finalizeAccountSetup({
+					email: email as string,
+					verificationCode: data.verificationCode,
+					name: data.name,
+					password: data.password,
+				});
+			} else {
+				await completeAccountSetup({
+					email: user?.loginProfiles[0].email,
+					token,
+					name: data.name,
+					password: data.password,
+					inviteType: 'app',
+				});
+			}
 		} catch (e) {
 			setError(e as APIError);
 		} finally {
@@ -75,44 +112,54 @@ export default function CompleteAccountSetupVerifyEmail() {
 		}
 	}
 
+	useEffect(() => {
+		if (error && error.code === 'invalid_validation_code') {
+			form.setError('verificationCode', {
+				message: '',
+			});
+		}
+	}, [error]);
+
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
 				<Description title='Complete Account Setup' />
 
-				{error && (
-					<Alert className='!max-w-full' variant='error'>
-						<AlertDescription>{error.details}</AlertDescription>
-					</Alert>
-				)}
-
-				{success && (
-					<Alert className='!max-w-full' variant='success'>
-						<AlertTitle>You have been successfully added to the Atlassian team</AlertTitle>
+				{(error || isVerified) && (
+					<Alert className='!max-w-full' variant={isVerified && !error ? 'success' : 'error'}>
+						<AlertTitle>
+							{isVerified && !error ? 'You have been successfully added.' : error?.error}
+						</AlertTitle>
 						<AlertDescription>
-							Complete your personal account setup to access the Agnost platform. Logging in
-							requires a completed account setup.
+							{isVerified && !error
+								? 'Complete your personal account setup to access the Agnost platform. Logging in requires a completed account setup.'
+								: error?.details}
 						</AlertDescription>
 					</Alert>
 				)}
 
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-						<FormField
-							control={form.control}
-							name='verificationCode'
-							render={({ field }) => (
-								<FormItem className='space-y-1'>
-									<FormControl>
-										<VerificationCodeInput
-											error={!!form.formState.errors.verificationCode}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+						{!isVerified && (
+							<FormField
+								control={form.control}
+								name='verificationCode'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Verification Code</FormLabel>
+										<FormControl>
+											<VerificationCodeInput
+												error={Boolean(form.formState.errors.verificationCode)}
+												{...field}
+											/>
+										</FormControl>
+
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						)}
+
 						<FormField
 							control={form.control}
 							name='password'
@@ -157,7 +204,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 							)}
 						/>
 						<div className='flex justify-end'>
-							<Button loading={loading} className='w-[165px]'>
+							<Button loading={loading} size='lg'>
 								Complete Setup
 							</Button>
 						</div>

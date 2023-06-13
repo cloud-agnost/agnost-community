@@ -174,7 +174,6 @@ export default function InviteTeamMembers() {
 										!index &&
 										'self-end',
 								)}
-								icon={true}
 								onClick={() => {
 									remove(index);
 								}}

@@ -62,8 +62,16 @@ export interface AppMembers {
 	role?: 'Admin' | 'Developer' | 'Viewer' | '';
 }
 
-export interface FinalizeAccountSetupData {
-	email: string;
+export interface CompleteAccountSetupRequest {
+	email: string | undefined;
+	token: string;
+	inviteType: 'org' | 'app';
+	name: string;
+	password: string;
+}
+
+export interface FinalizeAccountSetupRequest {
+	email: string | undefined;
 	verificationCode: number;
 	password: string;
 	name: string;

@@ -1,6 +1,8 @@
 import { axios } from '@/helpers';
 import {
-	FinalizeAccountSetupData,
+	APIError,
+	CompleteAccountSetupRequest,
+	FinalizeAccountSetupRequest,
 	OnboardingData,
 	User,
 	UserDataToRegister,
@@ -15,15 +17,16 @@ export default class AuthService {
 	static async finalizeClusterSetup(req: OnboardingData) {
 		return (await axios.post(`${this.url}/finalize-cluster-setup`, req)).data;
 	}
-	static async initiateAccountSetup(email: string) {
-		return (await axios.post(`${this.url}/init-account-setup`, { email })).data;
-	}
 
 	static async resendEmailVerificationCode(email: string) {
 		return (await axios.post(`${this.url}/resend-code`, { email })).data;
 	}
 
-	static async finalizeAccountSetup(data: FinalizeAccountSetupData) {
+	static async initiateAccountSetup(email: string) {
+		return (await axios.post(`${this.url}/init-account-setup`, { email })).data;
+	}
+
+	static async finalizeAccountSetup(data: FinalizeAccountSetupRequest) {
 		return (await axios.post(`${this.url}/finalize-account-setup`, data)).data;
 	}
 
@@ -61,5 +64,9 @@ export default class AuthService {
 
 	static async renewAccessToken() {
 		return (await axios.post(`${this.url}/renew`)).data;
+	}
+
+	static async completeAccountSetup(data: CompleteAccountSetupRequest): Promise<User | APIError> {
+		return (await axios.post(`${this.url}/complete-setup`, data)).data;
 	}
 }

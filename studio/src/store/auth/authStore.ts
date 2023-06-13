@@ -1,13 +1,18 @@
+import { AuthService, UserService } from '@/services';
+import type {
+	APIError,
+	CompleteAccountSetupRequest,
+	FinalizeAccountSetupRequest,
+	User,
+} from '@/types/type.ts';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import type { APIError, User } from '@/types/type.ts';
-import { AuthService, UserService } from '@/services';
-import { FinalizeAccountSetupData } from '@/types/type.ts';
 
 interface AuthStore {
 	loading: boolean;
 	error: APIError | null;
 	user: User | null;
+	email: string | null;
 	setUser: (user: User | null) => void;
 	login: (email: string, password: string) => Promise<User>;
 	logout: () => Promise<any>;
@@ -15,12 +20,20 @@ interface AuthStore {
 	setRefreshToken: (refreshToken: string) => void;
 	isAuthenticated: () => boolean;
 	renewAccessToken: () => void;
-	completeAccountSetupFollowingInviteAccept: () => void;
+	completeAccountSetup: (data: CompleteAccountSetupRequest) => Promise<User | APIError>;
 	resetPassword: (email: string) => Promise<void>;
 	verifyEmail: (email: string, code: number) => Promise<void>;
 	changePasswordWithToken: (token: string, newPassword: string) => Promise<void>;
-	completeAccountSetup: (email: string) => Promise<void>;
-	finalizeAccountSetup: (data: FinalizeAccountSetupData) => Promise<void>;
+	resendEmailVerificationCode: (email: string) => Promise<void>;
+	initiateAccountSetup: (
+		email: string,
+		onSuccess: () => void,
+		onError: (err: APIError) => void,
+	) => Promise<void>;
+	finalizeAccountSetup: (data: FinalizeAccountSetupRequest) => Promise<User | APIError>;
+	acceptInvite: (token: string) => Promise<{
+		user: User;
+	}>;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -30,6 +43,7 @@ const useAuthStore = create<AuthStore>()(
 				loading: false,
 				error: null,
 				user: null,
+				email: null,
 				setUser: (user) => set({ user }),
 				login: async (email, password) => {
 					const res = await AuthService.login(email, password);
@@ -55,8 +69,12 @@ const useAuthStore = create<AuthStore>()(
 				renewAccessToken: () => {
 					// TODO renew access token
 				},
-				completeAccountSetupFollowingInviteAccept() {
-					// TODO complete account setup following invite accept
+				completeAccountSetup: async (data) => {
+					try {
+						return AuthService.completeAccountSetup(data);
+					} catch (error) {
+						return error as APIError;
+					}
 				},
 				resetPassword(email) {
 					return UserService.resetPassword({
@@ -73,11 +91,37 @@ const useAuthStore = create<AuthStore>()(
 						newPassword,
 					});
 				},
-				completeAccountSetup(email: string) {
-					return AuthService.initiateAccountSetup(email);
+				async resendEmailVerificationCode(email: string) {
+					await AuthService.resendEmailVerificationCode(email);
 				},
-				finalizeAccountSetup(data) {
-					return AuthService.finalizeAccountSetup(data);
+				async initiateAccountSetup(
+					email: string,
+					onSuccess: () => void,
+					onError: (err: APIError) => void,
+				) {
+					try {
+						await AuthService.initiateAccountSetup(email);
+						set({ email });
+						onSuccess();
+					} catch (error) {
+						onError(error as APIError);
+					}
+				},
+				async finalizeAccountSetup(data: FinalizeAccountSetupRequest) {
+					try {
+						const res = await AuthService.finalizeAccountSetup(data);
+						set({ user: res });
+						return res;
+					} catch (error) {
+						return error as APIError;
+					}
+				},
+				async acceptInvite(token: string) {
+					try {
+						return UserService.acceptInvite(token);
+					} catch (err) {
+						set({ error: err as APIError });
+					}
 				},
 			}),
 			{

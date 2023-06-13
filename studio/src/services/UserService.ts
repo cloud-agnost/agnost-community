@@ -16,4 +16,8 @@ export default class UserService {
 	}) {
 		return (await axios.post(`${this.url}/reset-pwd/${token}`, { newPassword })).data;
 	}
+
+	static async acceptInvite(token: string) {
+		return (await axios.post(`${this.url}/app-invite-accept?token=${token}`, { token })).data;
+	}
 }
