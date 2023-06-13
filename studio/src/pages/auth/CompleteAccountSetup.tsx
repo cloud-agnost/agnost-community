@@ -84,7 +84,7 @@ export default function CompleteAccountSetup() {
 							)}
 						/>
 
-						<div className='flex justify-end gap-1'>
+						<div className='flex justify-end gap-4'>
 							<Button to='/login' variant='text' type='button' size='lg'>
 								Back to Login
 							</Button>

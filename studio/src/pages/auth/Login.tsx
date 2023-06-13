@@ -158,7 +158,7 @@ function NotVerified({ email, clearError }: { email: string; clearError: () => v
 					</Alert>
 				)}
 
-				<div className='flex justify-end gap-1'>
+				<div className='flex justify-end gap-4'>
 					<Button onClick={clearError} variant='text' type='button' size='lg'>
 						Back to Login
 					</Button>

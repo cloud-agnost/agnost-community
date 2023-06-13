@@ -87,7 +87,7 @@ export default function VerifyEmail() {
 							email, please check your spam folder.
 						</Description>
 
-						<div className='flex justify-end gap-1'>
+						<div className='flex justify-end gap-4'>
 							<Button loading={loading} size='lg'>
 								Verify
 							</Button>
