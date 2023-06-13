@@ -188,6 +188,7 @@ export class AdapterManager {
 				port: connSettings.port,
 				user: connSettings.username,
 				password: connSettings.password,
+				database: connSettings.dbName,
 			});
 
 			await client.connect();
@@ -215,6 +216,7 @@ export class AdapterManager {
 							port: config.port,
 							user: config.username,
 							password: config.password,
+							database: config.dbName,
 						});
 
 						await slaveClient.connect();
@@ -252,6 +254,7 @@ export class AdapterManager {
 				port: connSettings.port,
 				user: connSettings.username,
 				password: connSettings.password,
+				database: connSettings.dbName,
 			});
 
 			const adapterObj = {
@@ -277,6 +280,7 @@ export class AdapterManager {
 							port: config.port,
 							user: config.username,
 							password: config.password,
+							database: config.dbName,
 						});
 
 						adapterObj.slaves.push({
@@ -313,6 +317,7 @@ export class AdapterManager {
 				port: connSettings.port,
 				user: connSettings.username,
 				password: connSettings.password,
+				database: connSettings.dbName,
 				encrypt: connSettings.encrypt ?? false,
 			});
 
@@ -339,6 +344,7 @@ export class AdapterManager {
 							port: config.port,
 							user: config.username,
 							password: config.password,
+							database: config.dbName,
 						});
 
 						adapterObj.slaves.push({
@@ -381,29 +387,29 @@ export class AdapterManager {
 			// Build query string part of the MongoDB connection string
 			connSettings.connOptions = helper.getQueryString(connSettings.options);
 			if (connSettings.connFormat === "mongodb") {
-				client = new mongo.MongoClient(
-					connSettings.connOptions
-						? `mongodb://${connSettings.host}:${connSettings.port}?${connSettings.connOptions}`
-						: `mongodb://${connSettings.host}:${connSettings.port}`,
-					{
-						auth: {
-							username: connSettings.username,
-							password: connSettings.password,
-						},
-					}
-				);
+				let uri = `mongodb://${connSettings.host}:${connSettings.port}`;
+				if (connSettings.dbName) uri = `${uri}/${connSettings.dbName}`;
+				if (connSettings.connOptions)
+					uri = `${uri}?${connSettings.connOptions}`;
+
+				client = new mongo.MongoClient(uri, {
+					auth: {
+						username: connSettings.username,
+						password: connSettings.password,
+					},
+				});
 			} else {
-				client = new mongo.MongoClient(
-					connSettings.connOptions
-						? `mongodb+srv://${connSettings.host}?${connSettings.connOptions}`
-						: `mongodb+srv://${connSettings.host}`,
-					{
-						auth: {
-							username: connSettings.username,
-							password: connSettings.password,
-						},
-					}
-				);
+				let uri = `mongodb+srv://${connSettings.host}`;
+				if (connSettings.dbName) uri = `${uri}/${connSettings.dbName}`;
+				if (connSettings.connOptions)
+					uri = `${uri}?${connSettings.connOptions}`;
+
+				client = new mongo.MongoClient(uri, {
+					auth: {
+						username: connSettings.username,
+						password: connSettings.password,
+					},
+				});
 			}
 
 			// Connect to the database of the application

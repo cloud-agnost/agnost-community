@@ -412,12 +412,12 @@ export class ResourceManager {
 								name: deploymentName,
 								image: "gcr.io/agnost-community/engine/core",
 								imagePullPolicy: "Always",
-								volumeMounts: pvcs.map((entry) => {
+								/* 								volumeMounts: pvcs.map((entry) => {
 									return {
 										mountPath: `/${entry.iid}`, // iid of PVC resource
 										name: entry.iid, //iid of PVC resource
 									};
-								}),
+								}), */
 								env: [
 									{
 										name: "AGNOST_VERSION_ID",
@@ -472,6 +472,10 @@ export class ResourceManager {
 										value: process.env.MASTER_TOKEN,
 									},
 									{
+										name: "PASSPHRASE",
+										value: process.env.PASSPHRASE,
+									},
+									{
 										name: "POD_NAME",
 										valueFrom: {
 											fieldRef: {
@@ -496,7 +500,7 @@ export class ResourceManager {
 										name: "http",
 									},
 								],
-								livenessProbe: {
+								/* 								livenessProbe: {
 									httpGet: {
 										path: "/health",
 										port: config.get("general.defaultClusterIPPort"),
@@ -525,17 +529,17 @@ export class ResourceManager {
 									initialDelaySeconds: config.get(
 										"general.readinessProbe.initialDelaySeconds"
 									),
-								},
+								}, */
 							},
 						],
-						volumes: pvcs.map((entry) => {
+						/* 						volumes: pvcs.map((entry) => {
 							return {
 								name: entry.iid,
 								persistentVolumeClaim: {
 									claimName: `${entry.iid}-pvc`,
 								},
 							};
-						}),
+						}), */
 					},
 				},
 			},

@@ -41,7 +41,6 @@ router.post(
 	async (req, res) => {
 		try {
 			let { instance, access } = req.body;
-
 			// Try to connect to the database
 			try {
 				// Test database connection
