@@ -76,10 +76,10 @@ export default function CreateOrganization() {
 					/>
 
 					<div className='flex gap-1 justify-end'>
-						<Button type='button' onClick={goBack} variant='text' className='w-[165px]'>
+						<Button type='button' onClick={goBack} variant='text' size='lg'>
 							Previous
 						</Button>
-						<Button className='w-[165px]'>Next</Button>
+						<Button size='lg'>Next</Button>
 					</div>
 				</form>
 			</Form>

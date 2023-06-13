@@ -147,7 +147,7 @@ export default function AccountInformation() {
 						)}
 					/>
 					<div className='flex justify-end'>
-						<Button loading={initiating} className='w-[165px]'>
+						<Button loading={initiating} size='lg'>
 							Next
 						</Button>
 					</div>

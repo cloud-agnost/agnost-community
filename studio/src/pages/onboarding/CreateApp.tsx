@@ -74,10 +74,10 @@ export default function CreateApp() {
 					/>
 
 					<div className='flex gap-1 justify-end'>
-						<Button onClick={goBack} type={'button'} variant='text' className='w-[165px]'>
+						<Button onClick={goBack} type={'button'} variant='text' size='lg'>
 							Previous
 						</Button>
-						<Button className='w-[165px]'>Next</Button>
+						<Button size='lg'>Next</Button>
 					</div>
 				</form>
 			</Form>

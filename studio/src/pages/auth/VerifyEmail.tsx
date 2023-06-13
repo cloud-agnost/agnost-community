@@ -98,7 +98,7 @@ export default function VerifyEmail() {
 						</Description>
 
 						<div className='flex justify-end gap-1'>
-							<Button loading={loading} className='w-[165px]'>
+							<Button loading={loading} size='lg'>
 								Verify
 							</Button>
 						</div>
