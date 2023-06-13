@@ -162,10 +162,6 @@ router.post(
 			);
 
 			await resourceCtrl.commit(session);
-			// Delete the sensitive data
-			delete resourceObj.config;
-			delete resourceObj.access;
-			delete resourceObj.accessReadOnly;
 			res.json(resourceObj);
 
 			// Bind the managed resource
@@ -264,15 +260,7 @@ router.get(
 				limit: size,
 			});
 
-			res.json(
-				resources.map((entry) => {
-					// Delete the sensitive data
-					delete entry.config;
-					delete entry.access;
-					delete entry.accessReadOnly;
-					return entry;
-				})
-			);
+			res.json(resources);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -343,10 +331,6 @@ router.put(
 			}
 
 			await resourceCtrl.commit(session);
-			// Delete the sensitive data
-			delete updatedResource.config;
-			delete updatedResource.access;
-			delete updatedResource.accessReadOnly;
 			res.json(updatedResource);
 
 			// Log action
@@ -453,10 +437,6 @@ router.put(
 			);
 
 			await resourceCtrl.commit(session);
-			// Delete the sensitive data
-			delete updatedResource.config;
-			delete updatedResource.access;
-			delete updatedResource.accessReadOnly;
 			res.json(updatedResource);
 
 			// Apply the changes to the managed resource
@@ -492,7 +472,7 @@ router.put(
 /*
 @route      /v1/org/:orgId/resource/:resourceId/access
 @method     PUT
-@desc       Update resource access settings (for managed resources access settings needs to be configured at respective cloud service provider)
+@desc       Update resource access settings
 @access     private
 */
 router.put(
@@ -550,7 +530,7 @@ router.put(
 					const connSettings = accessReadOnly[i];
 					try {
 						// Test connection
-						await connCtrl.testConnection(instance, connSettings);
+						await connCtrl.testConnection(resource.instance, connSettings);
 					} catch (err) {
 						await resourceCtrl.endSession(session);
 
@@ -581,10 +561,6 @@ router.put(
 			);
 
 			await resourceCtrl.commit(session);
-			// Delete the sensitive data
-			delete updatedResource.config;
-			delete updatedResource.access;
-			delete updatedResource.accessReadOnly;
 			res.json(updatedResource);
 
 			// Get all the impacted environments and associated versions so that we can refresh their deployments and API servers

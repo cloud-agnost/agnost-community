@@ -124,6 +124,53 @@ export const ResourceModel = mongoose.model(
 export const applyRules = (type) => {
 	switch (type) {
 		case "test":
+			return [
+				body("type")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(addResourceTypes)
+					.withMessage(t("Unsupported resource type")),
+				body("instance")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom((value, { req }) => {
+						let instanceList = addInstanceTypes[req.body.type];
+						if (!instanceList)
+							throw new AgnostError(
+								t(
+									"Cannot identify the instance types for the provided resource type"
+								)
+							);
+
+						if (!instanceList.includes(value))
+							throw new AgnostError(
+								t(
+									"Not a valid instance type for respource type '%s'",
+									req.body.type
+								)
+							);
+
+						return true;
+					}),
+				body("access")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom((value, { req }) => {
+						if (typeof value !== "object" || Array.isArray(value))
+							throw new AgnostError(t("Not a valid resource access setting"));
+
+						return true;
+					}),
+				...accessDatabaseRules,
+				...accessCacheRules,
+				...accessQueueRules,
+				...accessStorageRules,
+			];
 		case "update-access":
 			return [
 				body("type")
@@ -164,6 +211,16 @@ export const applyRules = (type) => {
 					.custom((value, { req }) => {
 						if (typeof value !== "object" || Array.isArray(value))
 							throw new AgnostError(t("Not a valid resource access setting"));
+
+						return true;
+					}),
+				body("accessReadOnly")
+					.optional()
+					.custom((value, { req }) => {
+						if (!Array.isArray(value))
+							throw new AgnostError(
+								t("Not a valid resource read-only access setting")
+							);
 
 						return true;
 					}),

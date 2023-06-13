@@ -93,7 +93,6 @@ class DeploymentController {
 
 	/**
 	 * Returns the list of environment resources mapped to this environment.
-	 * When returning the resource information, it also decrypts the resources access settings
 	 * @param  {object} env The environment object
 	 */
 	async getEnvironmentResources(env) {
@@ -103,17 +102,6 @@ class DeploymentController {
 		// Get the resources used by the environment
 		let resources = await resourceCtrl.getManyByQuery({
 			iid: { $in: resourceIds },
-		});
-
-		// Decrypt access data of the resources and delete managed resource config settings
-		resources.forEach((element) => {
-			delete element.config;
-			element.access = helper.decryptSensitiveData(element.access);
-
-			if (element.accessReadOnly)
-				element.accessReadOnly = helper.decryptSensitiveData(
-					element.accessReadOnly
-				);
 		});
 
 		return resources;
@@ -346,7 +334,9 @@ class DeploymentController {
 	 * @param  {object} user The user who initiated the update
 	 */
 	async updateResourceAccessSettings(appId, versionId, resource, user) {
-		const version = versionCtrl.getOneById(versionId, { cacheKey: versionId });
+		const version = await versionCtrl.getOneById(versionId, {
+			cacheKey: versionId,
+		});
 		const env = await this.getEnvironment(version);
 		// If auto deploy is turned off or version has not been deployed to the environment then we do not send the environment updates to the engine cluster
 		if (!env.autoDeploy || !env.deploymentDtm) return;
@@ -372,7 +362,7 @@ class DeploymentController {
 		}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
-			action: "update-version",
+			action: "update-resource",
 			subAction: "update-resource-access",
 			callback: callback,
 			actor: {
@@ -388,9 +378,9 @@ class DeploymentController {
 			updatedResource: resource,
 		};
 
-		// Make api call to environment worker engine to update environment data
+		// Make api call to environment worker engine to update resource-access settings
 		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/update",
+			config.get("general.workerUrl") + "/v1/env/update-resource-access",
 			payload,
 			{
 				headers: {

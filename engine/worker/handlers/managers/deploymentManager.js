@@ -203,6 +203,13 @@ export class DeploymentManager {
 	}
 
 	/**
+	 * Returns the udpated resource object (only valid when handling resource access setting updates)
+	 */
+	getUpdatedResource() {
+		return this.msgObj.updatedResource;
+	}
+
+	/**
 	 * Returns the database resource object mapped to the database design
 	 */
 	getDatabaseResource(dbConfig) {
@@ -1447,6 +1454,78 @@ export class DeploymentManager {
 			this.addLog(
 				[
 					t("Database updates failed"),
+					error.name,
+					error.message,
+					error.stack,
+				].join("\n"),
+				"Error"
+			);
+			await this.sendEnvironmentLogs("Error");
+			return { success: false, error };
+		}
+	}
+
+	/**
+	 * Updates the databases
+	 */
+	async updateResourceAccessSettings() {
+		try {
+			this.addLog(t("Started updating resource access settings"));
+			// Set current status of environment in engine cluster
+			await this.setStatus("Deploying");
+			const updatedResource = this.getUpdatedResource();
+
+			// Update environment object data in cache
+			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
+			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
+
+			// If the access setting of a database resource has changed then we need to update respective database objects
+			let updatedDbList = null;
+			if (updatedResource.type === "database") {
+				const databases = await this.getPrevDBDefinitions();
+				const impactedDB = databases.find(
+					(db) => db.resource.iid === updatedResource.iid
+				);
+
+				if (impactedDB) {
+					impactedDB.resource = updatedResource;
+					// Update individual DB cache
+					this.addToCache(
+						`${this.getEnvId()}.db.${this.getDbId(impactedDB)}`,
+						impactedDB
+					);
+
+					// Update the overall databases list
+					updatedDbList = await this.cacheDatabases([impactedDB], "update");
+				}
+			}
+
+			// Execute all redis commands altogether
+			await this.commitPipeline();
+			// We first cache all data and then notify api servers
+			// After we load all configuration data to the cache we can notify engine API servers to update themselves
+			this.notifyAPIServers();
+
+			// Save updated deployment to database
+			if (updatedDbList)
+				await this.saveDatabaseDeploymentConfigs(updatedDbList);
+			// Save updated deployment to database
+			await this.saveEnvironmentDeploymentConfig();
+
+			// Update status of environment in engine cluster
+			this.addLog(t("Completed resource access settings update successfully"));
+			// Send the deployment telemetry information to the platform
+			await this.sendEnvironmentLogs("OK");
+			// Update status of environment in engine cluster
+			await this.setStatus("OK");
+			return { success: true };
+		} catch (error) {
+			// Update status of environment in engine cluster
+			await this.setStatus("Error");
+			// Send the deployment telemetry information to the platform
+			this.addLog(
+				[
+					t("Resource access settings update failed"),
 					error.name,
 					error.message,
 					error.stack,
