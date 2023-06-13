@@ -163,7 +163,7 @@ function NotVerified({ email, clearError }: { email: string; clearError: () => v
 						Back to Login
 					</Button>
 					<Button loading={loading} onClick={reSendVerificationCode}>
-						Send Verify Code
+						Send Verification Code
 					</Button>
 				</div>
 			</div>

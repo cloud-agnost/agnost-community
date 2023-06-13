@@ -57,6 +57,7 @@ export default function ForgotPassword() {
 
 				{error && (
 					<Alert className='!max-w-full' variant='error'>
+						<AlertTitle>{error.error}</AlertTitle>
 						<AlertDescription>{error.details}</AlertDescription>
 					</Alert>
 				)}

@@ -36,7 +36,8 @@ const FormSchema = z.object({
 		.min(8, 'Password must be at least 8 characters long'),
 	name: z
 		.string({ required_error: 'Name is required' })
-		.min(2, 'Name must be at least 2 characters long'),
+		.min(2, 'Name must be at least 2 characters long')
+		.max(64, 'Name must be at most 64 characters long'),
 });
 
 export default function AccountInformation() {
@@ -143,7 +144,7 @@ export default function AccountInformation() {
 										{...field}
 									/>
 								</FormControl>
-								<FormDescription>Minimum 2 characters</FormDescription>
+								<FormDescription>Maximum 64 characters</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
