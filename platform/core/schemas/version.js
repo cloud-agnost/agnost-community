@@ -344,10 +344,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					)
@@ -432,10 +436,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					)
@@ -536,10 +544,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					)
@@ -601,10 +613,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					)
@@ -696,10 +712,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					),
@@ -817,10 +837,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					),

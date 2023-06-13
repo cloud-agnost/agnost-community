@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-   name: env-oktlbdfli89k-deployment
+   name: env-ycdptagssz9v-deployment
    labels:
-      app: engine-core
+      app: env-ycdptagssz9v
 spec:
    replicas: 1
    selector:
       matchLabels:
-         app: engine-core
+         app: env-ycdptagssz9v
    template:
       metadata:
          labels:
-            app: engine-core
+            app: env-ycdptagssz9v
       spec:
          containers:
-            - name: engine-core
+            - name: env-ycdptagssz9v
               image: agnost-community/engine/core
               # We will be using the minikube docker daemon, since the actual docker daemon on local machine are different
               # Prevent minikube docker daemon to pull images from central docker hub set imagePullPolicy to Never, so that
@@ -75,7 +75,7 @@ spec:
                       fieldRef:
                          fieldPath: metadata.name
                  - name: AGNOST_ENVIRONMENT_ID
-                   value: env-oktlbdfli89k
+                   value: env-ycdptagssz9v
                  - name: AGNOST_ENGINE_ID
-                   value: env-oktlbdfli89k
+                   value: env-ycdptagssz9v
                             

@@ -37,7 +37,7 @@ router.get("/validate", authAccessToken, (req, res) => {
 });
 
 router.get("/redeploy", (req, res) => {
-	manageAPIServers("env-oktlbdfli89k", {});
+	manageAPIServers("env-ycdptagssz9v", {});
 	res.status(200).send("Sent message");
 });
 

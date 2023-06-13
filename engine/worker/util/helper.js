@@ -1,3 +1,4 @@
+import cyripto from "crypto-js";
 import axios from "axios";
 import mongo from "mongodb";
 import querystring from "querystring";
@@ -132,6 +133,49 @@ function getAsObject(keyValuePairs) {
 	return obj;
 }
 
+/**
+ * Decrypts the encrypted text and returns the decrypted string value
+ * @param  {string} ciphertext The encrypted input text
+ */
+function decryptText(cipherText) {
+	const bytes = cyripto.AES.decrypt(cipherText, process.env.PASSPHRASE);
+	return bytes.toString(cyripto.enc.Utf8);
+}
+
+/**
+ * Decrypt resource access settings
+ * @param  {Object} access The encrypted access settings needed to connect to the resource
+ */
+function decryptSensitiveData(access) {
+	if (Array.isArray(access)) {
+		let list = [];
+		access.forEach((entry) => {
+			list.push(decryptSensitiveData(entry));
+		});
+
+		return list;
+	}
+
+	let decrypted = {};
+	for (const key in access) {
+		const value = access[key];
+		if (Array.isArray(value)) {
+			decrypted[key] = value.map((entry) => {
+				if (entry && typeof entry === "object")
+					return decryptSensitiveData(entry);
+				if (entry && typeof entry === "string") return decryptText(entry);
+				else return entry;
+			});
+		} else if (typeof value === "object" && value !== null) {
+			decrypted[key] = decryptSensitiveData(value);
+		} else if (value && typeof value === "string")
+			decrypted[key] = decryptText(value);
+		else decrypted[key] = value;
+	}
+
+	return decrypted;
+}
+
 export default {
 	constants,
 	randomInt,
@@ -141,4 +185,5 @@ export default {
 	objectId,
 	getQueryString,
 	getAsObject,
+	decryptSensitiveData,
 };

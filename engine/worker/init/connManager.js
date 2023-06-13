@@ -118,33 +118,33 @@ class ConnectionManager {
 					connSettings.connOptions = helper.getQueryString(
 						connSettings.options
 					);
+
 					if (connSettings.connFormat === "mongodb") {
-						client = new mongo.MongoClient(
-							connSettings.connOptions
-								? `mongodb://${connSettings.host}:${connSettings.port}?${connSettings.connOptions}`
-								: `mongodb://${connSettings.host}:${connSettings.port}`,
-							{
-								auth: {
-									username: connSettings.username,
-									password: connSettings.password,
-								},
-								maxPoolSize: config.get("general.maxPoolSize"),
-							}
-						);
+						let uri = `mongodb://${connSettings.host}:${connSettings.port}`;
+						if (connSettings.dbName) uri = `${uri}/${connSettings.dbName}`;
+						if (connSettings.connOptions)
+							uri = `${uri}?${connSettings.connOptions}`;
+
+						client = new mongo.MongoClient(uri, {
+							auth: {
+								username: connSettings.username,
+								password: connSettings.password,
+							},
+						});
 					} else {
-						client = new mongo.MongoClient(
-							connSettings.connOptions
-								? `mongodb+srv://${connSettings.host}?${connSettings.connOptions}`
-								: `mongodb+srv://${connSettings.host}`,
-							{
-								auth: {
-									username: connSettings.username,
-									password: connSettings.password,
-								},
-								maxPoolSize: config.get("general.maxPoolSize"),
-							}
-						);
+						let uri = `mongodb+srv://${connSettings.host}`;
+						if (connSettings.dbName) uri = `${uri}/${connSettings.dbName}`;
+						if (connSettings.connOptions)
+							uri = `${uri}?${connSettings.connOptions}`;
+
+						client = new mongo.MongoClient(uri, {
+							auth: {
+								username: connSettings.username,
+								password: connSettings.password,
+							},
+						});
 					}
+
 					//Connect to the database of the application
 					await client.connect();
 					this.addConnection(id, client, readOnly);
