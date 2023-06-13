@@ -1,9 +1,9 @@
 .form {
 	&-message {
-		@apply text-xs text-error-default;
+		@apply text-error-default;
 	}
 
 	&-description {
-		@apply text-xs text-subtle;
+		@apply text-subtle;
 	}
 }
