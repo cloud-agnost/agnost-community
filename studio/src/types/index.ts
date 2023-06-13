@@ -1,1 +1,1 @@
-export type { APIError } from './type.ts';
+export type { APIError, CompleteAccountSetupRequest, FinalizeAccountSetupRequest } from './type.ts';

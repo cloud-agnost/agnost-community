@@ -1,5 +1,11 @@
-import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom';
-import { Root } from '@/pages/root';
+import {
+	ChangePasswordWithToken,
+	CompleteAccountSetup,
+	CompleteAccountSetupVerifyEmail,
+	ForgotPassword,
+	Login,
+	VerifyEmail,
+} from '@/pages/auth';
 import {
 	AccountInformation,
 	CreateApp,
@@ -9,17 +15,11 @@ import {
 	SMTPConfiguration,
 } from '@/pages/onboarding';
 import { Organization, SelectOrganization } from '@/pages/organization';
-import {
-	ChangePasswordWithToken,
-	CompleteAccountSetup,
-	CompleteAccountSetupVerifyEmail,
-	ForgotPassword,
-	Login,
-	VerifyEmail,
-} from '@/pages/auth';
+import { RedirectHandle } from '@/pages/redirect-handle';
+import { Root } from '@/pages/root';
 import useAuthStore from '@/store/auth/authStore.ts';
 import type { ReactNode } from 'react';
-import { RedirectHandle } from '@/pages/redirect-handle';
+import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom';
 
 const router = createBrowserRouter([
 	{
@@ -68,7 +68,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: '/complete-account-setup/verify-email',
+				path: '/complete-account-setup/verify-email/',
 				loader: CompleteAccountSetupVerifyEmail.loader,
 				element: (
 					<GuestOnly>
@@ -151,7 +151,7 @@ const router = createBrowserRouter([
 ]);
 
 // eslint-disable-next-line react-refresh/only-export-components
-function RequireAuth({ children }: { children: ReactNode }) {
+function RequireAuth({ children }: { children: JSX.Element }): JSX.Element {
 	const { isAuthenticated } = useAuthStore();
 	const location = useLocation();
 
@@ -162,14 +162,14 @@ function RequireAuth({ children }: { children: ReactNode }) {
 	return children;
 }
 // eslint-disable-next-line react-refresh/only-export-components
-function GuestOnly({ children }: { children: ReactNode }) {
+function GuestOnly({ children }: { children: ReactNode }): JSX.Element {
 	const { isAuthenticated } = useAuthStore();
 
 	if (isAuthenticated()) {
 		return <Navigate to='/organization' />;
 	}
 
-	return children;
+	return children as JSX.Element;
 }
 
 export default router;
