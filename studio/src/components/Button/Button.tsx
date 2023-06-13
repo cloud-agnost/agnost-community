@@ -16,10 +16,9 @@ const buttonVariants = cva('btn', {
 			destructive: 'btn-destructive',
 			text: 'btn-text',
 			link: 'btn-link',
+			icon: 'btn-icon',
 		},
-		icon: {
-			true: 'btn-icon',
-		},
+
 		size: {
 			md: 'btn-md',
 			sm: 'btn-sm',
@@ -67,7 +66,11 @@ const Button = React.forwardRef<
 		);
 	}
 	return (
-		<Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props}>
+		<Comp
+			className={cn(buttonVariants({ variant, size, loading, className }))}
+			ref={ref}
+			{...props}
+		>
 			{loading && <CircleNotch size={20} className='loading' />}
 			{children}
 		</Comp>

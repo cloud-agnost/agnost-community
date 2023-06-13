@@ -1,8 +1,8 @@
 .btn {
-	@apply inline-flex items-center justify-center;
+	@apply inline-flex items-center justify-center h-9;
 	@apply rounded-md text-sm transition-colors font-semibold leading-[normal];
 	@apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary-hover focus-visible:ring-offset-2;
-	@apply disabled:pointer-events-none focus-visible:ring-button-primary-hover;
+	@apply disabled:opacity-50 disabled:pointer-events-none focus-visible:ring-button-primary-hover;
 	@apply px-4 py-2;
 
 	&-primary {
@@ -19,11 +19,17 @@
 	&-link {
 		@apply text-button-primary hover:underline hover:text-button-primary-hover focus-visible:ring-button-secondary;
 	}
+	&-icon {
+		@apply text-default;
+	}
 	&-md {
-		@apply h-9 py-2 px-4;
+		@apply py-2 px-4;
 	}
 	&-sm {
-		@apply h-7 py-[6px] px-2;
+		@apply py-[6px] px-2;
+	}
+	&-lg {
+		@apply w-[165px];
 	}
 	&-full {
 		@apply w-full;
