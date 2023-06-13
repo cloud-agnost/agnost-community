@@ -24,7 +24,9 @@ const FormSchema = z.object({
 	orgName: z
 		.string({ required_error: 'Organization name is required' })
 		.min(2, 'Organization name must be at least 2 characters long')
-		.max(64, 'Organization name must be at most 64 characters long'),
+		.max(64, 'Organization name must be at most 64 characters long')
+		.trim()
+		.refine((value) => value.trim().length > 0, 'Organization name is required'),
 });
 
 export default function CreateOrganization() {
