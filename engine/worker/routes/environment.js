@@ -10,6 +10,8 @@ import {
 	deployTasks,
 	redeployTasks,
 	deleteTasks,
+	updateResourceAccess,
+	manageEngineWorkers,
 } from "../init/queue.js";
 
 const router = express.Router({ mergeParams: true });
@@ -128,6 +130,30 @@ router.post(
 	async (req, res) => {
 		try {
 			updateDatabase(req.body);
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /env/update-database
+@method     POST
+@desc       Updates the resource access settings
+@access     public
+*/
+router.post(
+	"/update-resource-access",
+	checkContentType,
+	authAccessToken,
+	async (req, res) => {
+		try {
+			// Remove the database connection from
+			const { updatedResource } = req.body;
+			// If database access settings has change then we need to update connection pools in each engine worker
+			if (updatedResource.type === "database") manageEngineWorkers(req.body);
+			updateResourceAccess(req.body);
 			res.json();
 		} catch (error) {
 			helper.handleError(req, res, error);

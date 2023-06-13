@@ -338,6 +338,12 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	async setupResourceConnections() {
 		const resources = this.getResources();
 		for (const resource of resources) {
+			resource.access = helper.decryptSensitiveData(resource.access);
+			if (resource.accessReadOnly)
+				resource.accessReadOnly = helper.decryptSensitiveData(
+					resource.accessReadOnly
+				);
+
 			await adapterManager.setupConnection(resource);
 			logger.info(
 				`Initialized the adapter of '${resource.type}' resource '${resource.name}'`

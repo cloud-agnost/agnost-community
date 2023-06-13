@@ -74,6 +74,11 @@ spec:
                    valueFrom:
                       fieldRef:
                          fieldPath: metadata.name
+                 - name: PASSPHRASE
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: passPhrase
                  - name: AGNOST_ENVIRONMENT_ID
                    value: env-ycdptagssz9v
                  - name: AGNOST_ENGINE_ID
