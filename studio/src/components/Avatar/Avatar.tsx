@@ -35,6 +35,7 @@ export interface AvatarFallbackProps
 	extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback> {
 	className?: string;
 	name?: string;
+	color?: string;
 }
 
 const Avatar = React.forwardRef<React.ElementRef<typeof AvatarPrimitive.Root>, AvatarProps>(
@@ -59,10 +60,17 @@ AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 const AvatarFallback = React.forwardRef<
 	React.ElementRef<typeof AvatarPrimitive.Fallback>,
 	AvatarFallbackProps
->(({ className, ...props }, ref) => {
+>(({ className, color, ...props }, ref) => {
 	const name = props.name?.split(' ');
 	return (
-		<AvatarPrimitive.Fallback ref={ref} className={cn('avatar-fallback', className)} {...props}>
+		<AvatarPrimitive.Fallback
+			ref={ref}
+			className={cn('avatar-fallback', className)}
+			{...props}
+			style={{
+				backgroundColor: color,
+			}}
+		>
 			{name?.[0]?.charAt(0).toUpperCase()}
 			{name?.[1]?.charAt(0).toUpperCase()}
 		</AvatarPrimitive.Fallback>
