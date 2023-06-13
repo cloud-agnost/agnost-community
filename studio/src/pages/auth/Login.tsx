@@ -12,7 +12,7 @@ import { APIError } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
 
@@ -29,6 +29,9 @@ export default function Login() {
 	const { login, setUser } = useAuthStore();
 	const { canClusterSendEmail } = useClusterStore();
 	const navigate = useNavigate();
+	const { state } = useLocation();
+
+	const REDIRECT_URL = state?.from ? state.from.pathname + state.from.search : '/organization';
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -40,7 +43,7 @@ export default function Login() {
 			setLoading(true);
 			const user = await login(email, password);
 			setUser(user);
-			navigate('/organization');
+			navigate(REDIRECT_URL);
 		} catch (error) {
 			setError(error as APIError);
 		} finally {
