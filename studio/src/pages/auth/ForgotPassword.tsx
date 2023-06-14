@@ -80,7 +80,6 @@ export default function ForgotPassword() {
 
 				{error && error.code !== 'invalid_credentials' && (
 					<>
-						<AlertTitle>{error.error}</AlertTitle>
 						<Alert className='!max-w-full' variant='error'>
 							<AlertTitle>{error.error}</AlertTitle>
 							<AlertDescription>{error.details}</AlertDescription>
