@@ -61,7 +61,7 @@ export default class AuthService {
 		return (await axios.post(`${this.url}/logout`)).data;
 	}
 
-	static async renewAccessToken() {
+	static async renewAccessToken(): Promise<{ at: string; rt: string }> {
 		return (await axios.post(`${this.url}/renew`)).data;
 	}
 
