@@ -1,11 +1,11 @@
-import { ReactNode } from 'react';
-import './UserSettingsLayout.scss';
+import { Button } from '@/components/Button';
+import { Description } from '@/components/Description';
 import { Navbar } from '@/components/Navbar';
 import { MENU_ITEMS_FOR_PROFILE_SETTINGS } from '@/constants';
-import { Description } from '@/components/Description';
-import { Button } from '@/components/Button';
 import { ArrowLeft } from '@phosphor-icons/react';
+import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import './UserSettingsLayout.scss';
 
 type UserSettingsLayoutProps = {
 	children: ReactNode;
