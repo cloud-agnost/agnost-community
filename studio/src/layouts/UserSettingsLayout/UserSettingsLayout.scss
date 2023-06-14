@@ -2,10 +2,14 @@
 	@apply grid md:grid-cols-[285px_auto] h-full min-h-screen;
 
 	.user-settings-layout-left {
-		@apply hidden md:flex bg-base px-6 py-8 flex-col items-center gap-y-16 sticky top-0 max-h-full border-r border-border;
+		@apply hidden md:flex bg-base px-6 py-8 flex-col items-center gap-y-8 sticky top-0 max-h-full border-r border-border;
 	}
 
 	.user-settings-layout-right {
-		@apply p-[40px] bg-subtle;
+		@apply p-4 md:p-[40px] bg-subtle;
+
+		&-divider {
+			@apply border-b border-border pb-4 md:pb-8 mb-4 md:mb-8;
+		}
 	}
 }

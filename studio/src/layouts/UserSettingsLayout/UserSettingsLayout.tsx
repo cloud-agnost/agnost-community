@@ -1,38 +1,42 @@
 import { ReactNode } from 'react';
 import './UserSettingsLayout.scss';
-import { GearSix } from '@phosphor-icons/react';
-import { BellRing, LineSegments } from '@/components/icons';
 import { Navbar } from '@/components/Navbar';
+import { MENU_ITEMS_FOR_PROFILE_SETTINGS } from '@/constants';
+import { Description } from '@/components/Description';
+import { Button } from '@/components/Button';
+import { ArrowLeft } from '@phosphor-icons/react';
+import { useTranslation } from 'react-i18next';
 
 type UserSettingsLayoutProps = {
 	children: ReactNode;
+	title?: string | null;
+	description?: ReactNode;
 };
 
-const MENU_ITEMS_FOR_PROFILE_SETTINGS = [
-	{
-		title: 'General',
-		href: '/profile/settings',
-		icon: <GearSix />,
-	},
-	{
-		title: 'Notifications',
-		href: '/profile/settings/notifications',
-		icon: <BellRing />,
-	},
-	{
-		title: 'Cluster Management',
-		href: '/profile/settings/cluster-management',
-		icon: <LineSegments />,
-	},
-];
-
-export default function UserSettingsLayout({ children }: UserSettingsLayoutProps) {
+export default function UserSettingsLayout({
+	children,
+	title,
+	description,
+}: UserSettingsLayoutProps) {
+	const { t } = useTranslation();
 	return (
 		<div className='user-settings-layout'>
 			<div className='user-settings-layout-left'>
+				<div className='self-start'>
+					<Button to='/profile' variant='text' className='px-2 gap-4'>
+						<ArrowLeft className='text-xl' />
+						<span>{t('profileSettings.user_settings')}</span>
+					</Button>
+					<div className='font-semibold text-base leading-[26px] text-default'></div>
+				</div>
 				<Navbar items={MENU_ITEMS_FOR_PROFILE_SETTINGS} />
 			</div>
-			<div className='user-settings-layout-right'>{children}</div>
+			<div className='user-settings-layout-right'>
+				<div className='user-settings-layout-right-divider'>
+					<Description title={title}>{description}</Description>
+				</div>
+				{children}
+			</div>
 		</div>
 	);
 }

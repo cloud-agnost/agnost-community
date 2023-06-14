@@ -1,3 +1,11 @@
+import { useTranslation } from 'react-i18next';
+import { UserSettingsLayout } from '@/layouts/UserSettingsLayout';
+
 export default function ProfileSettingsClusterManagement() {
-	return <h1>ProfileSettingsClusterManagement</h1>;
+	const { t } = useTranslation();
+	return (
+		<UserSettingsLayout title={t('profileSettings.clusters_title')}>
+			page content
+		</UserSettingsLayout>
+	);
 }
