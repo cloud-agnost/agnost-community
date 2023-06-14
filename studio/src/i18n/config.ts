@@ -1,11 +1,14 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import enLogin from './en/login.json';
+import { login, forms, general, organization } from './en';
 
 export const resources = {
 	en: {
 		translation: {
-			login: enLogin,
+			login,
+			forms,
+			general,
+			organization,
 		},
 	},
 };
