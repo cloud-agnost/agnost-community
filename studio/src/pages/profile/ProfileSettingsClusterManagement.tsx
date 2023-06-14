@@ -1,5 +1,5 @@
-import { useTranslation } from 'react-i18next';
 import { UserSettingsLayout } from '@/layouts/UserSettingsLayout';
+import { useTranslation } from 'react-i18next';
 
 export default function ProfileSettingsClusterManagement() {
 	const { t } = useTranslation();

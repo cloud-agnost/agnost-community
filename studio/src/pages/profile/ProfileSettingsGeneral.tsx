@@ -1,6 +1,6 @@
-import { useTranslation } from 'react-i18next';
-import { UserSettingsLayout } from '@/layouts/UserSettingsLayout';
 import { ProfileSettingsForm } from '@/features/auth/components/ProfileSettingsForm';
+import { UserSettingsLayout } from '@/layouts/UserSettingsLayout';
+import { useTranslation } from 'react-i18next';
 
 export default function ProfileSettingsGeneral() {
 	const { t } = useTranslation();
