@@ -1,0 +1,63 @@
+.header-menu {
+	--height: 72px;
+	@apply bg-base flex justify-between items-center h-[var(--height)] py-3 px-6 border-b border-border;
+
+	&-divider {
+		@apply w-[1px] h-[40px] bg-border;
+	}
+
+	&-left {
+		@apply flex gap-4 items-center;
+		&-logo {
+			@apply flex items-center;
+		}
+		&-organization-select {
+			@apply text-icon-base;
+		}
+	}
+
+	&-right {
+		@apply flex gap-3 items-center text-icon-base;
+		&-nav {
+			@apply hidden md:flex gap-1 items-center;
+			&-item {
+				@apply flex items-center gap-1 p-2 transition rounded;
+				&:hover {
+					@apply bg-border text-default;
+				}
+				&-icon {
+					@apply w-[20px] h-[20px] flex items-center justify-center;
+				}
+				&-title {
+					@apply leading-6 font-normal text-sm;
+				}
+			}
+		}
+		&-actions {
+			@apply flex gap-4 items-center;
+			&-versions,
+			&-notification {
+				svg {
+					@apply text-[17px];
+				}
+				.btn-icon {
+					@apply w-[36px] h-[36px] p-0 hover:bg-border;
+				}
+			}
+
+			&-user {
+				@apply flex items-center gap-2;
+				&-avatar {
+					@apply rounded-full overflow-hidden;
+				}
+				&-name {
+					@apply leading-6 font-normal text-sm;
+				}
+			}
+		}
+
+		.header-menu-divider {
+			@apply hidden md:block;
+		}
+	}
+}
