@@ -12,10 +12,10 @@ import { APIError } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
-
 const FormSchema = z.object({
 	email: z
 		.string({ required_error: 'Email address is required' })
@@ -24,6 +24,7 @@ const FormSchema = z.object({
 });
 
 export default function Login() {
+	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
 	const { login, setUser } = useAuthStore();
@@ -58,9 +59,8 @@ export default function Login() {
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
-				<Description title='Login to your account'>
-					Welcome back! Please enter your details.
-				</Description>
+				<Description title={t('login.title')}>{t('login.description')}</Description>
+
 				{error && (
 					<Alert className='!max-w-full' variant='error'>
 						<AlertTitle>{error.error}</AlertTitle>

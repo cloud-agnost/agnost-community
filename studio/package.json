@@ -22,11 +22,13 @@
 		"@radix-ui/react-slot": "^1.0.2",
 		"@radix-ui/react-switch": "^1.0.3",
 		"@storybook/addons": "^7.0.18",
+		"@svgr/cli": "^6.3.1",
+		"@svgr/plugin-jsx": "^6.5.1",
 		"axios": "^1.4.0",
 		"class-variance-authority": "^0.6.0",
 		"clsx": "^1.2.1",
 		"framer-motion": "^10.12.16",
-		"i18next": "^22.5.0",
+		"i18next": "^22.5.1",
 		"lodash": "^4.17.21",
 		"path": "^0.12.7",
 		"react": "^18.2.0",
@@ -38,9 +40,7 @@
 		"swiper": "^9.3.2",
 		"tailwind-merge": "^1.13.0",
 		"zod": "^3.21.4",
-		"zustand": "^4.3.8",
-		"@svgr/cli": "^6.3.1",
-		"@svgr/plugin-jsx": "^6.5.1"
+		"zustand": "^4.3.8"
 	},
 	"devDependencies": {
 		"@storybook/addon-essentials": "^7.0.18",
