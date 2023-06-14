@@ -8,14 +8,6 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 	error?: boolean;
 }
 
-export interface InputWrapperProps extends React.ComponentPropsWithoutRef<'div'> {
-	className?: string;
-	label?: string;
-	id: string;
-	error?: string;
-	description?: string;
-}
-
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
 	({ className, type, error, ...props }, ref) => {
 		return (
