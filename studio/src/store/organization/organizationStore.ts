@@ -1,27 +1,50 @@
 import OrganizationService from '@/services/OrganizationService';
-import { APIError } from '@/types';
+import { APIError, CreateOrganizationRequest, Organization } from '@/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 interface OrganizationStore {
-	organization: object;
-	organizations: object[];
-	getAllOrganizationByUser: () => Promise<object[] | APIError>;
+	loading: boolean;
+	organization: Organization | null;
+	organizations: Organization[];
+	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
+	createOrganization: (req: CreateOrganizationRequest) => Promise<Organization | APIError>;
 }
 
 const useOrganizationStore = create<OrganizationStore>()(
 	devtools(
 		persist(
-			(set) => ({
-				organization: {},
+			(set, get) => ({
+				loading: false,
+				organization: null,
 				organizations: [],
 				getAllOrganizationByUser: async () => {
 					try {
+						set({ loading: true });
 						const res = await OrganizationService.getAllOrganizationsByUser();
-						set({ organizations: res });
+						set({ organizations: res, loading: false });
 						return res;
 					} catch (error) {
-						return error;
+						throw error as APIError;
+					}
+				},
+				createOrganization: async ({ name, onSuccess, onError }: CreateOrganizationRequest) => {
+					try {
+						const res = await OrganizationService.createOrganization(name);
+						set({
+							organizations: [
+								{
+									...res,
+									role: 'Admin',
+								},
+								...get().organizations,
+							],
+						});
+						onSuccess();
+						return res;
+					} catch (error) {
+						onError(error as APIError);
+						throw error as APIError;
 					}
 				},
 			}),
