@@ -99,10 +99,10 @@ export default function ForgotPassword() {
 							/>
 
 							<div className='flex justify-end gap-4'>
-								<Button to='/login' variant='text' type='button' className='w-[165px]'>
+								<Button to='/login' variant='text' type='button' size='lg'>
 									Back to Login
 								</Button>
-								<Button loading={loading} className='w-[165px]'>
+								<Button loading={loading} size='lg'>
 									Change Password
 								</Button>
 							</div>
