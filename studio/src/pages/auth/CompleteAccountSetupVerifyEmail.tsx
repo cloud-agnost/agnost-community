@@ -29,16 +29,16 @@ interface CompleteAccountSetupVerifyEmailLoaderData {
 	error: APIError | null;
 }
 async function loader(params: LoaderFunctionArgs) {
+	const url = new URL(params.request.url);
+	const token = url.searchParams.get('token');
+	const isVerified = url.searchParams.has('isVerified');
 	try {
-		const url = new URL(params.request.url);
-		const token = url.searchParams.get('token');
-		const isVerified = JSON.parse(url.searchParams.get('isVerified') || 'false');
 		let res;
 		if (token) res = await useAuthStore.getState().acceptInvite(token as string);
 		return { token, isVerified, user: res?.user };
 	} catch (error) {
 		if ((error as APIError).code === 'not_allowed') return redirect('/login');
-		else return error;
+		else return { error, token, isVerified };
 	}
 }
 
@@ -79,10 +79,8 @@ export default function CompleteAccountSetupVerifyEmail() {
 		user,
 		error: loaderError,
 	} = useLoaderData() as CompleteAccountSetupVerifyEmailLoaderData;
-
 	const [error, setError] = useState<APIError | null>(loaderError);
 	const [loading, setLoading] = useState(false);
-
 	const { completeAccountSetup, finalizeAccountSetup, email } = useAuthStore();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -110,9 +108,6 @@ export default function CompleteAccountSetupVerifyEmail() {
 				});
 			}
 		} catch (e) {
-			console.log({
-				catch: e,
-			});
 			setError(e as APIError);
 		} finally {
 			setLoading(false);
@@ -120,7 +115,6 @@ export default function CompleteAccountSetupVerifyEmail() {
 	}
 
 	useEffect(() => {
-		console.log({ error });
 		if (error && error.code === 'invalid_validation_code') {
 			form.setError('verificationCode', {
 				message: '',
@@ -212,7 +206,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 							)}
 						/>
 						<div className='flex justify-end'>
-							<Button loading={loading} size='lg'>
+							<Button loading={loading} size='lg' disabled={!!error}>
 								Complete Setup
 							</Button>
 						</div>
