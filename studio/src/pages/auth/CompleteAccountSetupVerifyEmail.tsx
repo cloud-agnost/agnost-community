@@ -31,7 +31,7 @@ interface CompleteAccountSetupVerifyEmailLoaderData {
 async function loader(params: LoaderFunctionArgs) {
 	const url = new URL(params.request.url);
 	const token = url.searchParams.get('token');
-	const isVerified = JSON.parse(url.searchParams.get('isVerified') || 'false');
+	const isVerified = url.searchParams.has('isVerified');
 	try {
 		let res;
 		if (token) res = await useAuthStore.getState().acceptInvite(token as string);
