@@ -206,7 +206,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 							)}
 						/>
 						<div className='flex justify-end'>
-							<Button loading={loading} size='lg'>
+							<Button loading={loading} size='lg' disabled={!!error}>
 								Complete Setup
 							</Button>
 						</div>
