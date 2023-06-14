@@ -12,7 +12,8 @@ import './auth.scss';
 import { APIError } from '@/types';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { PasswordInput } from '@/components/PasswordInput';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { CaretLeft } from '@phosphor-icons/react';
 
 const FormSchema = z.object({
 	password: z
@@ -62,43 +63,52 @@ export default function ForgotPassword() {
 					</Alert>
 				)}
 
-				{success && (
-					<Alert className='!max-w-full' variant='success'>
-						<AlertTitle>Your password has been changed successfully.</AlertTitle>
-						<AlertDescription>You can now login with your new password.</AlertDescription>
-					</Alert>
+				{success ? (
+					<div className='space-y-8'>
+						<Alert className='!max-w-full mb-8' variant='success'>
+							<AlertTitle>Your password has been changed successfully.</AlertTitle>
+							<AlertDescription>You can now login with your new password.</AlertDescription>
+						</Alert>
+						<Link
+							to='/login'
+							className='text-default hover:underline mt-4 flex items-center justify-center'
+						>
+							<CaretLeft className='mr-1 inline-block' />
+							Back to Login
+						</Link>
+					</div>
+				) : (
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onSubmit)} className='auth-form'>
+							<FormField
+								control={form.control}
+								name='password'
+								render={({ field }) => (
+									<FormItem className='space-y-1'>
+										<FormLabel>Password</FormLabel>
+										<FormControl>
+											<PasswordInput
+												error={Boolean(form.formState.errors.password)}
+												placeholder='Enter your new password'
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<div className='flex justify-end gap-4'>
+								<Button to='/login' variant='text' type='button' className='w-[165px]'>
+									Back to Login
+								</Button>
+								<Button loading={loading} className='w-[165px]'>
+									Change Password
+								</Button>
+							</div>
+						</form>
+					</Form>
 				)}
-
-				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='auth-form'>
-						<FormField
-							control={form.control}
-							name='password'
-							render={({ field }) => (
-								<FormItem className='space-y-1'>
-									<FormLabel>Password</FormLabel>
-									<FormControl>
-										<PasswordInput
-											error={Boolean(form.formState.errors.password)}
-											placeholder='Enter your new password'
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<div className='flex justify-end gap-4'>
-							<Button to='/login' variant='text' type='button' className='w-[165px]'>
-								Back to Login
-							</Button>
-							<Button loading={loading} className='w-[165px]'>
-								Change Password
-							</Button>
-						</div>
-					</form>
-				</Form>
 			</div>
 		</AuthLayout>
 	);
