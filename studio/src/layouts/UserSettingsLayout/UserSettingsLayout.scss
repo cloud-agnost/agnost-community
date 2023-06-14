@@ -15,6 +15,10 @@
 	}
 
 	.user-settings-layout-right {
-		@apply p-[40px] bg-subtle;
+		@apply p-4 md:p-[40px] bg-subtle;
+
+		&-divider {
+			@apply border-b border-border pb-4 md:pb-8 mb-4 md:mb-8;
+		}
 	}
 }
