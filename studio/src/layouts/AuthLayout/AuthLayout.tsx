@@ -13,7 +13,19 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 		<div className='auth-layout'>
 			<div className='auth-layout-left'>
 				<Logo className='auth-layout-app-logo' />
-				<Slider className='!m-0' items={SLIDER_IMAGES} />
+				<Slider
+					className='!m-0'
+					pagination
+					autoplay
+					loop
+					spaceBetween={10}
+					items={SLIDER_IMAGES.map(({ image, text }) => {
+						return {
+							element: <img src={image} alt={text} key={image} />,
+							text,
+						};
+					})}
+				/>
 			</div>
 			<div className='auth-layout-right'>{children}</div>
 		</div>

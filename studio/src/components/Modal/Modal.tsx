@@ -5,14 +5,16 @@ import { cn } from '@/utils';
 import { X } from '@phosphor-icons/react';
 import './Modal.scss';
 
-interface ModalProps {
-	children: ReactNode;
+export interface ModalProps {
+	title?: string | null;
+	children?: ReactNode;
 	className?: string;
 	isOpen: boolean;
 	closeModal: () => void;
 	closeOnOverlayClick?: boolean;
 }
 export default function Modal({
+	title,
 	children,
 	className,
 	isOpen = false,
@@ -46,25 +48,16 @@ export default function Modal({
 						className={cn('modal-body', className)}
 					>
 						<Button size='sm' onClick={closeModal} className='modal-close' variant='link'>
-							<X className='h-4 w-4 text-icon-base' />
+							<X size={24} className='text-icon-base' />
 						</Button>
-						<div>{children}</div>
+
+						<div className='space-y-6'>
+							<h5 className='text-xl text-default'>{title}</h5>
+							{children}
+						</div>
 					</motion.div>
 				</div>
 			)}
 		</AnimatePresence>
 	);
 }
-
-Modal.Demo = function () {
-	const [isOpen, setIsOpen] = useState(false);
-
-	return (
-		<div>
-			<Button onClick={() => setIsOpen(true)}>Open Modal</Button>
-			<Modal isOpen={isOpen} closeModal={() => setIsOpen(false)}>
-				<p className='text-default'>Özgür ÖZALP</p>
-			</Modal>
-		</div>
-	);
-};

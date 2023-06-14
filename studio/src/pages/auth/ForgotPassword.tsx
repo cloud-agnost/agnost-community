@@ -1,19 +1,17 @@
-import { Description } from '@/components/Description';
-import { AuthLayout } from '@/layouts/AuthLayout';
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
+import { Button } from '@/components/Button';
+import { Description } from '@/components/Description';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { Button } from '@/components/Button';
-import * as z from 'zod';
+import { AuthLayout } from '@/layouts/AuthLayout';
+import useAuthStore from '@/store/auth/authStore.ts';
+import { APIError } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-
-import './auth.scss';
-import { APIError } from '@/types';
 import { Link } from 'react-router-dom';
-import useAuthStore from '@/store/auth/authStore.ts';
-
+import * as z from 'zod';
+import './auth.scss';
 async function loader(params: any) {
 	console.log(params);
 	return null;
