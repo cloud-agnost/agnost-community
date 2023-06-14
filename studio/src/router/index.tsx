@@ -20,6 +20,13 @@ import { Root } from '@/pages/root';
 import useAuthStore from '@/store/auth/authStore.ts';
 import type { ReactNode } from 'react';
 import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom';
+import {
+	Profile,
+	ProfileSettings,
+	ProfileSettingsGeneral,
+	ProfileSettingsClusterManagement,
+	ProfileSettingsNotifications,
+} from '@/pages/profile';
 
 const router = createBrowserRouter([
 	{
@@ -97,6 +104,36 @@ const router = createBrowserRouter([
 			},
 			{
 				path: '/organization/:id',
+			},
+			{
+				path: '/profile',
+				element: (
+					<RequireAuth>
+						<Profile />
+					</RequireAuth>
+				),
+			},
+			{
+				path: '/profile/settings',
+				element: (
+					<RequireAuth>
+						<ProfileSettings />
+					</RequireAuth>
+				),
+				children: [
+					{
+						index: true,
+						element: <ProfileSettingsGeneral />,
+					},
+					{
+						path: 'notifications',
+						element: <ProfileSettingsNotifications />,
+					},
+					{
+						path: 'cluster-management',
+						element: <ProfileSettingsClusterManagement />,
+					},
+				],
 			},
 		],
 	},
