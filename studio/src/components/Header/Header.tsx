@@ -1,29 +1,11 @@
-import './header.scss';
-import { Link } from 'react-router-dom';
-import { LightBulb, ChangeLog, AgnostOnlyLogo } from '@/components/icons';
-import { FileText, Cloud, Bell } from '@phosphor-icons/react';
-import { Button } from '@/components/Button';
-import useAuthStore from '@/store/auth/authStore.ts';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
-
-const menuItems = [
-	{
-		title: 'Feedback',
-		url: '/feedback',
-		icon: <LightBulb />,
-	},
-	{
-		title: 'Change Log',
-		url: '/change-log',
-		icon: <ChangeLog />,
-	},
-	{
-		title: 'Docs',
-		url: '/docs',
-		icon: <FileText />,
-	},
-];
-
+import { Button } from '@/components/Button';
+import { AgnostOnlyLogo } from '@/components/icons';
+import useAuthStore from '@/store/auth/authStore.ts';
+import { Bell, Cloud } from '@phosphor-icons/react';
+import { Link } from 'react-router-dom';
+import './header.scss';
+import { MENU_ITEMS } from '@/constants';
 export function Header() {
 	const { user } = useAuthStore();
 	return (
@@ -37,9 +19,11 @@ export function Header() {
 			</div>
 			<div className='header-menu-right'>
 				<nav className='header-menu-right-nav'>
-					{menuItems.map((item, index) => (
+					{MENU_ITEMS.map((item, index) => (
 						<Link className='header-menu-right-nav-item' key={index} to={item.url}>
-							<span className='header-menu-right-nav-item-icon'>{item.icon}</span>
+							<span className='header-menu-right-nav-item-icon'>
+								<item.icon />
+							</span>
 							<span className='header-menu-right-nav-item-title'>{item.title}</span>
 						</Link>
 					))}
