@@ -5,6 +5,7 @@ import type {
 	FinalizeAccountSetupRequest,
 	User,
 } from '@/types/type.ts';
+import { joinChannel, leaveChannel } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -44,15 +45,20 @@ const useAuthStore = create<AuthStore>()(
 				error: null,
 				user: null,
 				email: null,
-				setUser: (user) => set({ user }),
+				setUser: (user) => {
+					set({ user });
+					if (user) joinChannel(user._id);
+				},
 				login: async (email, password) => {
 					const res = await AuthService.login(email, password);
-					set({ user: res });
+					get().setUser(res);
 					return res;
 				},
 				logout: async () => {
+					const user = get().user;
+					if (user) leaveChannel(user?._id);
 					const res = await AuthService.logout();
-					set({ user: null });
+					get().setUser(null);
 					return res;
 				},
 				setToken: (token) =>
@@ -75,7 +81,7 @@ const useAuthStore = create<AuthStore>()(
 				completeAccountSetup: async (data) => {
 					try {
 						const user = await AuthService.completeAccountSetup(data);
-						set({ user });
+						get().setUser(user);
 						return user;
 					} catch (error) {
 						throw error as APIError;
@@ -90,7 +96,7 @@ const useAuthStore = create<AuthStore>()(
 				async verifyEmail(email: string, code: number) {
 					try {
 						const user = await AuthService.validateEmail(email, code);
-						set({ user });
+						get().setUser(user);
 						return user;
 					} catch (error) {
 						throw error as APIError;
@@ -121,7 +127,7 @@ const useAuthStore = create<AuthStore>()(
 				async finalizeAccountSetup(data: FinalizeAccountSetupRequest) {
 					try {
 						const res = await AuthService.finalizeAccountSetup(data);
-						set({ user: res });
+						get().setUser(res);
 						return res;
 					} catch (error) {
 						throw error as APIError;

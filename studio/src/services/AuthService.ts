@@ -25,7 +25,7 @@ export default class AuthService {
 		return (await axios.post(`${this.url}/init-account-setup`, { email })).data;
 	}
 
-	static async finalizeAccountSetup(data: FinalizeAccountSetupRequest) {
+	static async finalizeAccountSetup(data: FinalizeAccountSetupRequest): Promise<User> {
 		return (await axios.post(`${this.url}/finalize-account-setup`, data)).data;
 	}
 
