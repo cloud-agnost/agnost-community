@@ -10,4 +10,4 @@ RUN npm install
 # Copy everything to the image under '/app' directory
 COPY ./ ./
 # This will be the start up command of the docker container, run the development react server
-CMD [ "npm", "run", "prod" ]
+CMD [ "npm", "run", "dev" ]

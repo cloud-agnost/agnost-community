@@ -64,11 +64,13 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		return new Promise((resolve, reject) => {
 			const server = this.getHttpServer();
 			if (server) {
-				//Close Http server
-				server.close(() => {
-					logger.info("Http server closed");
-					resolve();
-				});
+				try {
+					//Close Http server
+					server.close(() => {
+						logger.info("Http server closed");
+						resolve();
+					});
+				} catch (err) {}
 			} else resolve();
 		});
 	}
