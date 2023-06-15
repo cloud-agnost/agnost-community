@@ -35,6 +35,9 @@ interface AuthStore {
 	acceptInvite: (token: string) => Promise<{
 		user: User;
 	}>;
+	changeName: (name: string) => Promise<string>;
+	changeEmail: (email: string, password: string) => Promise<string>;
+	changeAvatar: (avatar: File) => Promise<string>;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -140,11 +143,39 @@ const useAuthStore = create<AuthStore>()(
 						set({ error: err as APIError });
 					}
 				},
+				async changeName(name: string) {
+					const newName = await UserService.changeName(name);
+					set((prev) => {
+						if (prev.user) prev.user.name = newName;
+						return prev;
+					});
+					return newName;
+				},
+				async changeEmail(email: string, password) {
+					const newEmail = await UserService.changeEmail({
+						email,
+						password,
+						uiBaseURL: window.location.origin,
+					});
+					console.log(newEmail);
+					return newEmail;
+				},
+				async changeAvatar(avatar: File) {
+					const pictureUrl = await UserService.changeAvatar(avatar);
+					set((prev) => {
+						if (prev.user) prev.user.pictureUrl = pictureUrl;
+						return prev;
+					});
+					return pictureUrl;
+				},
 			}),
 			{
 				name: 'auth-storage',
 			},
 		),
+		{
+			name: 'auth',
+		},
 	),
 );
 

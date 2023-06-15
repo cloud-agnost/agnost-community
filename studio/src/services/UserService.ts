@@ -20,4 +20,29 @@ export default class UserService {
 	static async acceptInvite(token: string) {
 		return (await axios.post(`${this.url}/app-invite-accept?token=${token}`, { token })).data;
 	}
+
+	static async changeName(name: string): Promise<string> {
+		return (await axios.put(`${this.url}/name`, { name })).data.name;
+	}
+
+	static async changeEmail(data: {
+		email: string;
+		password: string;
+		uiBaseURL: string;
+	}): Promise<string> {
+		return (await axios.post(`${this.url}/login-email`, data)).data.email;
+	}
+
+	static async changeAvatar(avatar: File): Promise<string> {
+		const formData = new FormData();
+		formData.append('picture', avatar, avatar.name);
+		return (
+			await axios.put(`${this.url}/picture`, formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+					selam: 's',
+				},
+			})
+		).data?.pictureUrl;
+	}
 }

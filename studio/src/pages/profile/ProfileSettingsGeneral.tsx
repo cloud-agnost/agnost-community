@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { UserSettingsLayout } from '@/layouts/UserSettingsLayout';
+import { ProfileSettingsForm } from '@/features/auth/components/ProfileSettingsForm';
 
 export default function ProfileSettingsGeneral() {
 	const { t } = useTranslation();
@@ -8,7 +9,7 @@ export default function ProfileSettingsGeneral() {
 			title={t('profileSettings.general_title')}
 			description={t('profileSettings.general_description')}
 		>
-			<h1>Gelecek devamı</h1>
+			<ProfileSettingsForm />
 		</UserSettingsLayout>
 	);
 }

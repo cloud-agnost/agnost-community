@@ -4,5 +4,6 @@ export { default as ChangeLog } from './ChangeLog';
 export { default as Error } from './Error';
 export { default as LightBulb } from './LightBulb';
 export { default as LineSegments } from './LineSegments';
+export { default as Pencil } from './Pencil';
 export { default as SuccessCheck } from './SuccessCheck';
 export { default as Warning } from './Warning';
