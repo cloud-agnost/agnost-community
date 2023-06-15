@@ -1,4 +1,5 @@
 import { axios } from '@/helpers';
+import { User } from '@/types/type.ts';
 
 export default class UserService {
 	static url = '/v1/user';
@@ -44,5 +45,9 @@ export default class UserService {
 				},
 			})
 		).data?.pictureUrl;
+	}
+
+	static async removeAvatar(): Promise<User> {
+		return (await axios.delete(`${this.url}/picture`)).data;
 	}
 }

@@ -10,9 +10,10 @@ import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
 
 export default function ChangeAvatar() {
 	const [loading, setLoading] = useState(false);
+	const [deleting, setDeleting] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
 	const filePickerId = useId();
-	const { user, changeAvatar } = useAuthStore();
+	const { user, changeAvatar, removeAvatar } = useAuthStore();
 
 	async function onChangeHandler(e: ChangeEvent<HTMLInputElement>) {
 		if (!e.target.files?.length) return;
@@ -25,6 +26,18 @@ export default function ChangeAvatar() {
 			setError(error as APIError);
 		} finally {
 			setLoading(false);
+		}
+	}
+
+	async function onClickHandler() {
+		try {
+			setError(null);
+			setDeleting(true);
+			await removeAvatar();
+		} catch (error) {
+			setError(error as APIError);
+		} finally {
+			setDeleting(false);
 		}
 	}
 
@@ -43,7 +56,7 @@ export default function ChangeAvatar() {
 				</Avatar>
 				<div className='avatar-actions'>
 					<input onChange={onChangeHandler} id={filePickerId} type='file' className='hidden' />
-					<Button variant='icon' size='sm'>
+					<Button loading={deleting} onClick={onClickHandler} variant='icon' size='sm'>
 						<Trash />
 					</Button>
 					<Button variant='icon' size='sm' disabled={loading}>

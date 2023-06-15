@@ -38,6 +38,7 @@ interface AuthStore {
 	changeName: (name: string) => Promise<string>;
 	changeEmail: (email: string, password: string) => Promise<string>;
 	changeAvatar: (avatar: File) => Promise<string>;
+	removeAvatar: () => Promise<void>;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -167,6 +168,18 @@ const useAuthStore = create<AuthStore>()(
 						return prev;
 					});
 					return pictureUrl;
+				},
+				async removeAvatar() {
+					try {
+						await UserService.removeAvatar();
+						set((prev) => {
+							delete prev.user?.pictureUrl;
+							return prev;
+						});
+					} catch (err) {
+						set({ error: err as APIError });
+						throw err;
+					}
 				},
 			}),
 			{
