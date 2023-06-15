@@ -37,6 +37,7 @@
 		"react-i18next": "^12.3.1",
 		"react-router-dom": "^6.11.2",
 		"react-verification-input": "^3.3.0",
+		"socket.io-client": "^4.6.2",
 		"swiper": "^9.3.2",
 		"tailwind-merge": "^1.13.0",
 		"zod": "^3.21.4",
