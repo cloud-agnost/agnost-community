@@ -26,6 +26,8 @@
 	"cant_remember_password": "Can't remember your current password?",
 	"delete": "Delete",
 	"cancel": "Cancel",
+	"name": "Name",
+	"email": "Email",
 	"new_email": "New Email Address",
 	"name_placeholder": "Enter Your Name",
 	"new_email_placeholder": "Enter Your Email Address",
