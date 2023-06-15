@@ -1,1 +1,8 @@
-export { cn, translate, removeLastSlash } from './utils';
+export {
+	cn,
+	translate,
+	removeLastSlash,
+	joinChannel,
+	leaveChannel,
+	sendMessageToChannel,
+} from './utils';

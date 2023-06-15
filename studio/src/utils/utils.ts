@@ -20,6 +20,6 @@ export function joinChannel(channel: string) {
 export function leaveChannel(channel: string) {
 	socket.emit('channel:leave', channel);
 }
-export function sendChannelMessage(channel: string, message: string) {
+export function sendMessageToChannel(channel: string, message: string) {
 	socket.emit('channel:message', { channel, message });
 }
