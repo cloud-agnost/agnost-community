@@ -1,1 +1,1 @@
-export { cn, translate } from './utils';
+export { cn, translate, removeLastSlash } from './utils';
