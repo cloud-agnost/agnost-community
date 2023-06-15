@@ -160,92 +160,9 @@ const defaultRules = (type) => {
 					.isBoolean()
 					.withMessage(t("Not a valid boolean value"))
 					.toBoolean(),
-				body("rule").trim().optional(),
 			];
-		// Name, type and uniqueness values of a field once set cannot be changed
+		// Type and uniqueness values of a field once set cannot be changed
 		case "update-field":
-			return [
-				body("description")
-					.trim()
-					.optional()
-					.isLength({ max: config.get("general.maxDetailTxtLength") })
-					.withMessage(
-						t(
-							"Description can be max %s characters long",
-							config.get("general.maxDetailTxtLength")
-						)
-					),
-				body("required")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isBoolean()
-					.withMessage(t("Not a valid boolean value"))
-					.toBoolean(),
-				body("immutable")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isBoolean()
-					.withMessage(t("Not a valid boolean value"))
-					.toBoolean(),
-				body("indexed")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isBoolean()
-					.withMessage(t("Not a valid boolean value"))
-					.toBoolean(),
-				body("rule").trim().optional(),
-			];
-		case "delete-multi":
-			return [
-				body("fieldIds.*")
-					.trim()
-					.optional()
-					.custom((value) => {
-						if (!helper.isValidId(value)) {
-							throw new AgnostError(t("Not a valid object identifier"));
-						}
-						return true;
-					}),
-			];
-		case "order-multi":
-			return [
-				body("orders")
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom((value) => {
-						if (!Array.isArray(value)) {
-							throw new AgnostError(t("Not a valid field order list"));
-						}
-						return true;
-					}),
-				body("orders.*.id")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom((value) => {
-						if (!helper.isValidId(value)) {
-							throw new AgnostError(t("Not a valid object identifier"));
-						}
-						return true;
-					}),
-				body("orders.*.order")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isInt({ min: 1 })
-					.withMessage(t("Order needs to be a positive integer"))
-					.toInt(),
-			];
-		case "rename-field":
 			return [
 				body("name")
 					.trim()
@@ -312,6 +229,52 @@ const defaultRules = (type) => {
 						}
 
 						//Indicates the success of this synchronous custom validator
+						return true;
+					}),
+				body("description")
+					.trim()
+					.optional()
+					.isLength({ max: config.get("general.maxDetailTxtLength") })
+					.withMessage(
+						t(
+							"Description can be max %s characters long",
+							config.get("general.maxDetailTxtLength")
+						)
+					),
+				body("required")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
+				body("immutable")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
+				body("indexed")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
+			];
+		case "delete-multi":
+			return [
+				body("fieldIds.*")
+					.trim()
+					.optional()
+					.custom((value) => {
+						if (!helper.isValidId(value)) {
+							throw new AgnostError(t("Not a valid object identifier"));
+						}
 						return true;
 					}),
 			];

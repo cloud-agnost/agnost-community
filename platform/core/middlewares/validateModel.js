@@ -37,34 +37,6 @@ export const validateModel = async (req, res, next) => {
 	}
 };
 
-export const validateOls = async (req, res, next) => {
-	try {
-		const { olsId } = req.params;
-
-		// Get the param object
-		let ols = req.model.ols.find(
-			(entry) => entry._id.toString() === olsId.toString()
-		);
-
-		if (!ols) {
-			return res.status(404).json({
-				error: t("Not Found"),
-				details: t(
-					"No such row (object) level security rule with the provided id '%s' exists.",
-					olsId
-				),
-				code: ERROR_CODES.notFound,
-			});
-		}
-
-		// Assign ols data
-		req.ols = ols;
-		next();
-	} catch (err) {
-		return handleError(req, res, err);
-	}
-};
-
 export const validateField = async (req, res, next) => {
 	try {
 		const { fieldId } = req.params;
@@ -85,36 +57,6 @@ export const validateField = async (req, res, next) => {
 
 		// Assign field data
 		req.field = field;
-
-		next();
-	} catch (err) {
-		return handleError(req, res, err);
-	}
-};
-
-export const validateValidationRule = async (req, res, next) => {
-	try {
-		const { ruleId } = req.params;
-		const { field } = req;
-
-		// Get the validation rule object
-		let rule = await field.validationRules.find(
-			(entry) => entry._id.toString() === ruleId
-		);
-
-		if (!rule) {
-			return res.status(404).json({
-				error: t("Not Found"),
-				details: t(
-					"No such validation rule with the provided id '%s' exists.",
-					ruleId
-				),
-				code: ERROR_CODES.notFound,
-			});
-		}
-
-		// Assign validation rule data
-		req.rule = rule;
 
 		next();
 	} catch (err) {

@@ -48,7 +48,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 		// Manage NPM packages
 		await this.manageNPMPackages();
 		this.addLog(t("Completed initializing API server"));
-		this.addLog(t("Starting child process and HTTP server"));
+		this.addLog(t("Initializing child process and HTTP server"));
 		// Send the deployment telemetry information to the platform
 		await this.sendEnvironmentLogs("OK");
 	}

@@ -1108,6 +1108,7 @@ export class DeploymentManager {
 			}
 			case "update": {
 				const prevDbDefinitions = await this.getPrevDBDefinitions();
+
 				if (prevDbDefinitions.length === 0) {
 					this.addToCache(`${this.getEnvId()}.databases`, databases);
 					return databases;
@@ -1118,7 +1119,7 @@ export class DeploymentManager {
 						);
 
 						if (updatedDb) return updatedDb;
-						else entry;
+						else return entry;
 					});
 
 					this.addToCache(`${this.getEnvId()}.databases`, updatedDbDefinitions);
@@ -1421,6 +1422,7 @@ export class DeploymentManager {
 				this.getDatabases(),
 				subAction
 			);
+
 			// Execute all redis commands altogether
 			await this.commitPipeline();
 			// We first cache all data and then notify api servers

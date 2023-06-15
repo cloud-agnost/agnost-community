@@ -73,6 +73,12 @@ export const appAuthorization = {
 				update: true,
 				deploy: true,
 			},
+			middleware: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
 		},
 	},
 };

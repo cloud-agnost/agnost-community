@@ -13,13 +13,13 @@ class ModelController extends BaseController {
 	 * @param  {string} parentiid For no-sql databases the parent object internal identifier
 	 * @param  {string} userId The it the of the user who is creating the new model
 	 */
-	getDefaultFields(dbType, timestamps, parentiid, userId) {
+	getDefaultFields(timestamps, parentiid, userId) {
 		let fields = [];
 		let orderNumber = 10000;
 
 		//First set-up the ID field
 		let id = {};
-		id.name = dbType === "MongoDB" ? "_id" : "id";
+		id.name = "id";
 		id.creator = "system";
 		id.order = orderNumber;
 		id.type = "id";
@@ -37,7 +37,7 @@ class ModelController extends BaseController {
 			//Set-up the parent field
 			let parent = {};
 			parent.reference = {};
-			parent.name = "_parent";
+			parent.name = "parent";
 			parent.creator = "system";
 			parent.order = orderNumber;
 			parent.type = "parent";

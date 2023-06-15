@@ -272,7 +272,7 @@ router.delete(
 				{ cacheKey: env._id, session }
 			);
 
-			// Delete the models associated with the database, we do no clear cache since it will eventually expire
+			// Delete the models associated with the database, we do not clear cache since it will eventually expire
 			await modelCtrl.deleteManyByQuery({ dbId: db._id }, { session });
 
 			// Delete the database

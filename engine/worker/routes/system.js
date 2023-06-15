@@ -36,9 +36,4 @@ router.get("/validate", authAccessToken, (req, res) => {
 	res.status(200).send(new Date().toISOString() + " - Access token validated");
 });
 
-router.get("/redeploy", (req, res) => {
-	manageAPIServers("env-ycdptagssz9v", {});
-	res.status(200).send("Sent message");
-});
-
 export default router;

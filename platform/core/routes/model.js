@@ -1,18 +1,14 @@
 import express from "express";
 import modelCtrl from "../controllers/model.js";
 import auditCtrl from "../controllers/audit.js";
+import deployCtrl from "../controllers/deployment.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateApp } from "../middlewares/validateApp.js";
 import { validateVersion } from "../middlewares/validateVersion.js";
 import { validateDb } from "../middlewares/validateDb.js";
-import {
-	validateModel,
-	validateOls,
-	validateField,
-	validateValidationRule,
-} from "../middlewares/validateModel.js";
+import { validateModel, validateField } from "../middlewares/validateModel.js";
 import { authorizeAppAction } from "../middlewares/authorizeAppAction.js";
 import { applyRules } from "../schemas/model.js";
 import { applyRules as fieldRules } from "../schemas/rules/field.js";
@@ -85,18 +81,16 @@ router.post(
 					type: "model",
 					description,
 					timestamps,
-					fields: modelCtrl.getDefaultFields(
-						db.type,
-						timestamps,
-						null,
-						user._id
-					),
+					fields: modelCtrl.getDefaultFields(timestamps, null, user._id),
 					createdBy: user._id,
 				},
 				{ cacheKey: modelId }
 			);
 
 			res.json(model);
+
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(app, version, user, db, "update");
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -165,10 +159,42 @@ router.delete(
 			let models = await modelCtrl.getManyByQuery({
 				_id: { $in: modelIds },
 				versionId: version._id,
-				type: "model",
 			});
 
 			if (models.length === 0) return res.json();
+
+			for (let i = 0; i < models.length; i++) {
+				const model = models[i];
+
+				// Check whether the model is a top level model or not
+				if (model.type !== "model") {
+					await modelCtrl.endSession(session);
+					return res.status(422).json({
+						error: t("Not Allowed"),
+						details: t(
+							"'%s' is not a top level model. Only top level models can be deleted.",
+							model.name
+						),
+						code: ERROR_CODES.notAllowed,
+					});
+				}
+
+				// If the model to be deleted is used as the model to store authenticated user data then return error
+				if (
+					version.authentication?.userDataModel?.database === db.iid &&
+					version.authentication?.userDataModel?.model === model.iid
+				) {
+					await modelCtrl.endSession(session);
+					return res.status(422).json({
+						error: t("Not Allowed"),
+						details: t(
+							"Model '%s' is used as the authentication model to store user data in version user authentication settings. You cannot delete the user authentication data model.",
+							model.name
+						),
+						code: ERROR_CODES.notAllowed,
+					});
+				}
+			}
 
 			// Get the list of dependent models to the deleted models
 			let dependentModels = [];
@@ -182,7 +208,7 @@ router.delete(
 			// Get the list of dependent reference fields to the deleted models including dependent ones
 			let dependents = await modelCtrl.getDependentReferenceFieldsToModels(
 				version._id,
-				dependentModels
+				[...dependentModels, ...models]
 			);
 
 			// First delete the dependent reference fields
@@ -213,6 +239,9 @@ router.delete(
 			await modelCtrl.commit(session);
 			res.json();
 
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(app, version, user, db, "update");
+
 			models.forEach((model) => {
 				// Log action
 				auditCtrl.logAndNotify(
@@ -241,7 +270,7 @@ router.delete(
 /*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId
 @method     DELETE
-@desc       Delete a top level model
+@desc       Deletes a top level model. Note: Sub-models are deleted as a field of their parent model.
 @access     private
 */
 router.delete(
@@ -258,14 +287,42 @@ router.delete(
 		const session = await modelCtrl.startSession();
 		try {
 			const { org, user, app, version, db, model } = req;
+			// Check whether the model is a top level model or not
+			if (model.type !== "model") {
+				await modelCtrl.endSession(session);
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"'%s' is not a top level model. Only top level models can be deleted.",
+						model.name
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// If the model to be deleted is used as the model to store authenticated user data then return error
+			if (
+				version.authentication?.userDataModel?.database === db.iid &&
+				version.authentication?.userDataModel?.model === model.iid
+			) {
+				await modelCtrl.endSession(session);
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"Model '%s' is used as the authentication model to store user data in version user authentication settings. You cannot delete the user authentication data model.",
+						model.name
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
 
 			// Get the list of dependent models to the deleted model
 			let dependentModels = await modelCtrl.getDependentModelsToModel(model);
 
-			// Get the list of dependent reference fields to the deleted model
+			// Get the list of dependent reference fields to the deleted model and its dependents
 			let dependents = await modelCtrl.getDependentReferenceFieldsToModels(
 				version._id,
-				[model]
+				[model, ...dependentModels]
 			);
 
 			// First delete the dependent reference fields
@@ -293,6 +350,9 @@ router.delete(
 			await modelCtrl.commit(session);
 			res.json();
 
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(app, version, user, db, "update");
+
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
@@ -317,13 +377,13 @@ router.delete(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId/desc
+@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId
 @method     PUT
-@desc       Upadate model description
+@desc       Upadate model description and name
 @access     private
 */
 router.put(
-	"/:modelId/desc",
+	"/:modelId",
 	checkContentType,
 	authSession,
 	validateOrg,
@@ -332,22 +392,25 @@ router.put(
 	validateDb,
 	validateModel,
 	authorizeAppAction("app.model.update"),
-	applyRules("update-description"),
+	applyRules("update"),
 	validate,
 	async (req, res) => {
 		try {
 			const { org, user, app, version, db, model } = req;
-			const { description } = req.body;
+			const { name, description } = req.body;
 
 			// Update app name
 			let updatedModel = await modelCtrl.updateOneById(
 				model._id,
-				{ description, updatedBy: user._id },
+				{ name, description, updatedBy: user._id },
 				{},
 				{ cacheKey: model._id }
 			);
 
 			res.json(updatedModel);
+
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(app, version, user, db, "update");
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -355,67 +418,13 @@ router.put(
 				user,
 				"org.app.version.db.model",
 				"update",
-				t(
-					"Update the description of the model '%s' from '%s' to '%s'",
-					model.name,
-					model.description,
-					description
-				),
-				updatedModel,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					dbId: db._id,
-					modelId: model._id,
-				}
-			);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId/name
-@method     PUT
-@desc       Upadate model name
-@access     private
-*/
-router.put(
-	"/:modelId/name",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateDb,
-	validateModel,
-	authorizeAppAction("app.model.update"),
-	applyRules("rename"),
-	validate,
-	async (req, res) => {
-		try {
-			const { org, user, app, version, db, model } = req;
-			const { name } = req.body;
-
-			// Update app name
-			let updatedModel = await modelCtrl.updateOneById(
-				model._id,
-				{ name, updatedBy: user._id },
-				{},
-				{ cacheKey: model._id }
-			);
-
-			res.json(updatedModel);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.db.model",
-				"update",
-				t("Update the name of the model '%s' to '%s'", model.name, name),
+				model.name !== name
+					? t(
+							"Updated the name of the model from '%s' to '%s'",
+							model.name,
+							name
+					  )
+					: t("Updated model '%s' description", model.name),
 				updatedModel,
 				{
 					orgId: org._id,
@@ -506,6 +515,9 @@ router.put(
 
 			res.json(updatedModel);
 
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(app, version, user, db, "update");
+
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
@@ -580,6 +592,9 @@ router.put(
 
 			res.json(updatedModel);
 
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(app, version, user, db, "update");
+
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
@@ -594,218 +609,6 @@ router.put(
 					versionId: version._id,
 					dbId: db._id,
 					modelId: model._id,
-				}
-			);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId/ols
-@method     POST
-@desc       Add object level security rule
-@access     private
-*/
-router.post(
-	"/:modelId/ols",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateDb,
-	validateModel,
-	authorizeAppAction("app.model.update"),
-	applyRules("add-ols"),
-	validate,
-	async (req, res) => {
-		try {
-			const { org, user, app, version, db, model } = req;
-			const { action, type, session, rule } = req.body;
-
-			let existingRule = model.ols.find((entry) => entry.action === action);
-			if (existingRule) {
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"There is already a row (object) level security rule defined for '%s' operation. You can only modify or delete an existing rule.",
-						action
-					),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			// Add new OLS rule to the model
-			let olsId = helper.generateId();
-			let updatedModel = await modelCtrl.pushObjectById(
-				model._id,
-				"ols",
-				{
-					_id: olsId,
-					action,
-					type,
-					session,
-					rule,
-					createdBy: user._id,
-				},
-				{
-					updatedBy: user._id,
-				},
-				{ cacheKey: model._id }
-			);
-
-			res.json(updatedModel);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.db.model.ols",
-				"create",
-				t(
-					"Added row (object) level security rule to model '%s' for '%s' operation",
-					model.name,
-					action
-				),
-				updatedModel,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					dbId: db._id,
-					modelId: model._id,
-					olsId: olsId,
-				}
-			);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId/ols/:olsId
-@method     PUT
-@desc       Update object level security rule
-@access     private
-*/
-router.put(
-	"/:modelId/ols/:olsId",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateDb,
-	validateModel,
-	validateOls,
-	authorizeAppAction("app.model.update"),
-	applyRules("update-ols"),
-	validate,
-	async (req, res) => {
-		try {
-			const { org, user, app, version, db, model, ols } = req;
-			const { type, session, rule } = req.body;
-
-			// Update existing OLS rule
-			let updatedModel = await modelCtrl.updateOneByQuery(
-				{ _id: model._id, "ols._id": ols._id },
-				{
-					"ols.$.type": type,
-					"ols.$.session": session,
-					"ols.$.rule": rule,
-					"ols.$.updatedBy": user._id,
-					"ols.$.updatedAt": Date.now(),
-					updatedBy: user._id,
-				},
-				{},
-				{ cacheKey: model._id }
-			);
-
-			res.json(updatedModel);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.db.model.ols",
-				"update",
-				t(
-					"Updated row (object) level security rule of model '%s' for '%s' operation",
-					model.name,
-					ols.action
-				),
-				updatedModel,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					dbId: db._id,
-					modelId: model._id,
-					olsId: ols._id,
-				}
-			);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId/ols/:olsId
-@method     DELETE
-@desc       Delete object level security rule
-@access     private
-*/
-router.delete(
-	"/:modelId/ols/:olsId",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateDb,
-	validateModel,
-	validateOls,
-	authorizeAppAction("app.model.update"),
-	async (req, res) => {
-		try {
-			const { org, user, app, version, db, model, ols } = req;
-
-			// Delete existing OLS rule
-			let updatedModel = await modelCtrl.pullObjectById(
-				model._id,
-				"ols",
-				ols._id,
-				{
-					updatedBy: user._id,
-				},
-				{ cacheKey: model._id }
-			);
-
-			res.json(updatedModel);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.db.model.ols",
-				"delete",
-				t(
-					"Deleted row (object) level security rule from model '%s' for '%s' operation",
-					model.name,
-					ols.action
-				),
-				updatedModel,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					dbId: db._id,
-					modelId: model._id,
-					olsId: ols._id,
 				}
 			);
 		} catch (err) {
@@ -845,7 +648,7 @@ router.post(
 				unique,
 				immutable,
 				indexed,
-				dvExp,
+				defaultValue,
 			} = req.body;
 
 			// Assign the field values
@@ -870,7 +673,7 @@ router.post(
 					type,
 					indexed
 				),
-				dvExp,
+				defaultValue,
 				createdBy: user._id,
 			};
 
@@ -897,7 +700,6 @@ router.post(
 					parentiid: model.iid,
 					timestamps: pointer.timestamps,
 					fields: modelCtrl.getDefaultFields(
-						db.type,
 						pointer.timestamps,
 						model.iid,
 						user._id
@@ -929,6 +731,9 @@ router.post(
 			await modelCtrl.commit(session);
 
 			res.json(updatedModel);
+
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(app, version, user, db, "update");
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1050,6 +855,9 @@ router.delete(
 
 			res.json(updatedModel);
 
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(app, version, user, db, "update");
+
 			fields.forEach(async (field) => {
 				// Log action
 				auditCtrl.logAndNotify(
@@ -1059,97 +867,6 @@ router.delete(
 					"delete",
 					t(
 						"Deleted the '%s' field '%s' from model '%s'",
-						field.type,
-						field.name,
-						model.name
-					),
-					updatedModel,
-					{
-						orgId: org._id,
-						appId: app._id,
-						versionId: version._id,
-						dbId: db._id,
-						modelId: model._id,
-						fieldId: field._id,
-					}
-				);
-			});
-		} catch (error) {
-			await modelCtrl.rollback(session);
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId/fields/order-multi
-@method     PUT
-@desc       Update order of multiple fields at once
-@access     private
-*/
-router.put(
-	"/:modelId/fields/order-multi",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateDb,
-	validateModel,
-	authorizeAppAction("app.model.update"),
-	fieldRules("order-multi"),
-	validate,
-	async (req, res) => {
-		// Start new database transaction session
-		const session = await modelCtrl.startSession();
-		try {
-			const { org, user, app, version, db, model } = req;
-			const { orders } = req.body;
-
-			//First filter out the system generated fields from the delete list
-			let fields = [];
-			for (let i = 0; i < orders.length; i++) {
-				let field = model.fields.find(
-					(entry) => entry._id.toString() === orders[i].id.toString()
-				);
-
-				// Set the new order of the field
-				field.order = orders[i].order;
-				fields.push(field);
-			}
-
-			// Update the order of the fields
-			let updatedModel = {};
-			let updatedAt = Date.now();
-			for (let i = 0; i < fields.length; i++) {
-				const field = fields[i];
-				updatedModel = await modelCtrl.updateOneByQuery(
-					{ _id: model._id, "fields._id": field._id },
-					{
-						"fields.$.order": field.order,
-						"fields.$.updatedAt": updatedAt,
-						"fields.$.updatedBy": user._id,
-						updatedBy: user._id,
-					},
-					{},
-					{ session, cacheKey: model._id }
-				);
-			}
-
-			// Commit transaction
-			await modelCtrl.commit(session);
-
-			res.json(updatedModel);
-
-			fields.forEach(async (field) => {
-				// Log action
-				auditCtrl.logAndNotify(
-					version._id,
-					user,
-					"org.app.version.db.model.fields",
-					"delete",
-					t(
-						"Updated the order of '%s' field '%s' in model '%s'",
 						field.type,
 						field.name,
 						model.name
@@ -1257,6 +974,9 @@ router.delete(
 
 			res.json(updatedModel);
 
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(app, version, user, db, "update");
+
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
@@ -1289,7 +1009,7 @@ router.delete(
 /*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId/fields/:fieldId
 @method     PUT
-@desc       Update properties of a field
+@desc       Update properties of a field (excluding name)
 @access     private
 */
 router.put(
@@ -1306,9 +1026,12 @@ router.put(
 	fieldRules("update-field"),
 	validate,
 	async (req, res) => {
+		// Start new database transaction session
+		const session = await modelCtrl.startSession();
 		try {
 			const { org, user, app, version, db, model, field } = req;
-			const { description, required, immutable, indexed, dvExp } = req.body;
+			const { name, description, required, immutable, indexed, defaultValue } =
+				req.body;
 
 			// Assign the field update values
 			let fieldUpdateData = null;
@@ -1323,6 +1046,7 @@ router.put(
 				};
 			} else {
 				fieldUpdateData = {
+					"fields.$.name": name,
 					"fields.$.description": description,
 					"fields.$.required": required,
 					"fields.$.immutable": modelCtrl.getNormalizedFieldPropValue(
@@ -1335,7 +1059,7 @@ router.put(
 						field.type,
 						indexed
 					),
-					"fields.$.dvExp": dvExp,
+					"fields.$.defaultValue": defaultValue,
 					"fields.$.updatedBy": user._id,
 					"fields.$.updatedAt": updatedAt,
 					updatedBy: user._id,
@@ -1357,86 +1081,7 @@ router.put(
 				{ _id: model._id, "fields._id": field._id },
 				fieldUpdateData,
 				{},
-				{ cacheKey: model._id }
-			);
-
-			res.json(updatedModel);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.db.model.fields",
-				"update",
-				t(
-					"Updated the properties of '%s' field '%s' in model '%s'",
-					field.type,
-					field.name,
-					model.name
-				),
-				updatedModel,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					dbId: db._id,
-					modelId: model._id,
-					fieldId: field._id,
-				}
-			);
-		} catch (error) {
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId/fields/:fieldId/name
-@method     PUT
-@desc       Update name of a field
-@access     private
-*/
-router.put(
-	"/:modelId/fields/:fieldId/name",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateDb,
-	validateModel,
-	validateField,
-	authorizeAppAction("app.model.update"),
-	fieldRules("rename-field"),
-	validate,
-	async (req, res) => {
-		// Start new database transaction session
-		const session = await modelCtrl.startSession();
-		try {
-			const { org, user, app, version, db, model, field } = req;
-			const { name } = req.body;
-
-			//System generated fields cannot be deleted
-			if (field.creator !== "user") {
-				modelCtrl.endSession(session);
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t("Platform generated and managed fields cannot be renamed"),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			// Update the name of the field
-			let updatedModel = await modelCtrl.updateOneByQuery(
-				{ _id: model._id, "fields._id": field._id },
-				{
-					"fields.$.name": name,
-					"fields.$.updatedBy": user._id,
-					"fields.$.updatedAt": Date.now(),
-					updatedBy: user._id,
-				},
-				{},
-				{ session, cacheKey: model._id }
+				{ cacheKey: model._id, session }
 			);
 
 			// If we are renaming a sub-model field then we should also rename the sub-model
@@ -1469,6 +1114,9 @@ router.put(
 
 			res.json(updatedModel);
 
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(app, version, user, db, "update");
+
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
@@ -1476,9 +1124,8 @@ router.put(
 				"org.app.version.db.model.fields",
 				"update",
 				t(
-					"Changed the name of '%s' field from '%s' to '%s' in model '%s'",
+					"Updated the properties of '%s' field '%s' in model '%s'",
 					field.type,
-					field.name,
 					name,
 					model.name
 				),
@@ -1494,458 +1141,6 @@ router.put(
 			);
 		} catch (error) {
 			await modelCtrl.rollback(session);
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId/fields/:fieldId/rules
-@method     POST
-@desc       Add validation rule to a field
-@access     private
-*/
-router.post(
-	"/:modelId/fields/:fieldId/rules",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateDb,
-	validateModel,
-	validateField,
-	authorizeAppAction("app.model.update"),
-	fieldRules("add-validation-rule"),
-	validate,
-	async (req, res) => {
-		try {
-			const { org, user, app, version, db, model, field } = req;
-			const { name, ruleExp, errorExp, bail } = req.body;
-
-			// System generated fields cannot be modified
-			if (field.creator !== "user") {
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"Validation rules cannot be added to platform generated and managed fields."
-					),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			// Validation rules cannot be added to sub-object fields
-			if (["object", "object-list"].includes(field.type)) {
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t("Validation rules cannot be added to sub-model fields."),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			// Add new validation rule to field
-			let order = modelCtrl.getNewValidationRuleOrderNumber(field);
-			let ruleId = helper.generateId();
-			let updatedModel = await modelCtrl.pushObjectByQuery(
-				{
-					_id: model._id,
-					"fields._id": field._id,
-				},
-				"fields.$.validationRules",
-				{
-					_id: ruleId,
-					name,
-					ruleExp,
-					errorExp,
-					bail,
-					order,
-				},
-				{
-					updatedBy: user._id,
-					"fields.$.updatedBy": user._id,
-					"fields.$.updatedAt": Date.now(),
-				},
-				{ cacheKey: model._id }
-			);
-
-			res.json(updatedModel);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.db.model.fields.validationRules",
-				"create",
-				t(
-					"Added a new validation rule to model '%s' field '%s'",
-					model.name,
-					field.name
-				),
-				updatedModel,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					dbId: db._id,
-					modelId: model._id,
-					fieldId: field._id,
-					validationRuleId: ruleId,
-				}
-			);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId/fields/:fieldId/rules/delete-multi
-@method     DELETE
-@desc       Delete multiple fields from a model
-@access     private
-*/
-router.delete(
-	"/:modelId/fields/:fieldId/rules/delete-multi",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateDb,
-	validateModel,
-	validateField,
-	authorizeAppAction("app.model.update"),
-	fieldRules("delete-multi-validation-rules"),
-	validate,
-	async (req, res) => {
-		try {
-			const { org, user, app, version, db, model, field } = req;
-			const { ruleIds } = req.body;
-
-			let rules = field.validationRules.filter((entry) =>
-				ruleIds.includes(entry._id.toString())
-			);
-
-			// Delete the rules from the field validation rules list
-			let updatedModel = await modelCtrl.pullObjectByQuery2(
-				{
-					_id: model._id,
-					"fields._id": field._id,
-				},
-				"fields.$.validationRules",
-				{ _id: { $in: ruleIds } },
-				{
-					updatedBy: user._id,
-					"fields.$.updatedBy": user._id,
-					"fields.$.updatedAt": Date.now(),
-				},
-				{ cacheKey: model._id }
-			);
-
-			res.json(updatedModel);
-
-			rules.forEach(async (rule) => {
-				// Log action
-				auditCtrl.logAndNotify(
-					version._id,
-					user,
-					"org.app.version.db.model.fields.validationRules",
-					"delete",
-					t(
-						"Deleted the validation rule '%s' of field '%s' in model '%s'",
-						rule.name,
-						field.name,
-						model.name
-					),
-					updatedModel,
-					{
-						orgId: org._id,
-						appId: app._id,
-						versionId: version._id,
-						dbId: db._id,
-						modelId: model._id,
-						fieldId: field._id,
-						validationRuleId: rule._id,
-					}
-				);
-			});
-		} catch (error) {
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId/fields/:fieldId/rules/order-multi
-@method     PUT
-@desc       Changes the order of multiple valdation rules at once
-@access     private
-*/
-router.put(
-	"/:modelId/fields/:fieldId/rules/order-multi",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateDb,
-	validateModel,
-	validateField,
-	authorizeAppAction("app.model.update"),
-	fieldRules("order-multi-validation-rules"),
-	validate,
-	async (req, res) => {
-		// Start new database transaction session
-		const session = await modelCtrl.startSession();
-		try {
-			const { org, user, app, version, db, model, field } = req;
-			const { orders } = req.body;
-
-			// Get the index number of the field
-			let fieldIndex = 0;
-			for (let i = 0; i < model.fields.length; i++) {
-				if (model.fields[i]._id.toString() == field._id.toString()) {
-					fieldIndex = i;
-					break;
-				}
-			}
-
-			// Update the order of the fields
-			let updatedModel = {};
-			let updatedAt = Date.now();
-			let updatedRules = [];
-			for (let i = 0; i < orders.length; i++) {
-				const order = orders[i];
-
-				// Get the index number of the rule
-				let ruleIndex = -1;
-				for (let i = 0; i < field.validationRules.length; i++) {
-					if (field.validationRules[i]._id.toString() == order.id.toString()) {
-						ruleIndex = i;
-						updatedRules.push(field.validationRules[i]);
-						break;
-					}
-				}
-
-				// If we have the rule index then update it
-				if (ruleIndex >= 0) {
-					// Update validation rule properties of field
-					updatedModel = await modelCtrl.updateOneByQuery(
-						{
-							_id: model._id,
-							"fields._id": field._id,
-							"fields.validationRules._id":
-								field.validationRules[ruleIndex]._id,
-						},
-						{
-							[`fields.${fieldIndex}.validationRules.${ruleIndex}.order`]:
-								order.order,
-							[`fields.${fieldIndex}.updatedBy`]: user._id,
-							[`fields.${fieldIndex}.updatedAt`]: updatedAt,
-							updatedBy: user._id,
-						},
-						{},
-						{ session, cacheKey: model._id }
-					);
-				}
-			}
-
-			// Commit transaction
-			await modelCtrl.commit(session);
-			res.json(updatedModel);
-
-			updatedRules.forEach(async (rule) => {
-				// Log action
-				auditCtrl.logAndNotify(
-					version._id,
-					user,
-					"org.app.version.db.model.fields.validationRules",
-					"update",
-					t(
-						"Updated the validation rule order '%s' of field '%s' in model '%s'",
-						rule.name,
-						field.name,
-						model.name
-					),
-					updatedModel,
-					{
-						orgId: org._id,
-						appId: app._id,
-						versionId: version._id,
-						dbId: db._id,
-						modelId: model._id,
-						fieldId: field._id,
-						validationRuleId: rule._id,
-					}
-				);
-			});
-		} catch (err) {
-			await modelCtrl.rollback(session);
-			handleError(req, res, err);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId/fields/:fieldId/rules/:ruleId
-@method     PUT
-@desc       Update validation rule of a field
-@access     private
-*/
-router.put(
-	"/:modelId/fields/:fieldId/rules/:ruleId",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateDb,
-	validateModel,
-	validateField,
-	validateValidationRule,
-	authorizeAppAction("app.model.update"),
-	fieldRules("update-validation-rule"),
-	validate,
-	async (req, res) => {
-		try {
-			const { org, user, app, version, db, model, field, rule } = req;
-			const { name, ruleExp, errorExp, bail } = req.body;
-
-			// Get the index number of the field
-			let fieldIndex = 0;
-			for (let i = 0; i < model.fields.length; i++) {
-				if (model.fields[i]._id.toString() == field._id.toString()) {
-					fieldIndex = i;
-					break;
-				}
-			}
-
-			// Get the index number of the rule
-			let ruleIndex = 0;
-			for (let i = 0; i < field.validationRules.length; i++) {
-				if (field.validationRules[i]._id.toString() == rule._id.toString()) {
-					ruleIndex = i;
-					break;
-				}
-			}
-
-			// Update validation rule properties of field
-			let updatedModel = await modelCtrl.updateOneByQuery(
-				{
-					_id: model._id,
-					"fields._id": field._id,
-					"fields.validationRules._id": rule._id,
-				},
-				{
-					[`fields.${fieldIndex}.validationRules.${ruleIndex}.name`]: name,
-					[`fields.${fieldIndex}.validationRules.${ruleIndex}.ruleExp`]:
-						ruleExp,
-					[`fields.${fieldIndex}.validationRules.${ruleIndex}.errorExp`]:
-						errorExp,
-					[`fields.${fieldIndex}.validationRules.${ruleIndex}.bail`]: bail,
-					[`fields.${fieldIndex}.updatedBy`]: user._id,
-					[`fields.${fieldIndex}.updatedAt`]: Date.now(),
-					updatedBy: user._id,
-				},
-				{},
-				{ cacheKey: model._id }
-			);
-
-			res.json(updatedModel);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.db.model.fields.validationRules",
-				"update",
-				t(
-					"Updated the validation rule '%s' of field '%s' in model '%s'",
-					rule.name,
-					field.name,
-					model.name
-				),
-				updatedModel,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					dbId: db._id,
-					modelId: model._id,
-					fieldId: field._id,
-					validationRuleId: rule._id,
-				}
-			);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId/fields/:fieldId/rules/:ruleId
-@method     DELETE
-@desc       Delete a specific validation rule of a field
-@access     private
-*/
-router.delete(
-	"/:modelId/fields/:fieldId/rules/:ruleId",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateDb,
-	validateModel,
-	validateField,
-	validateValidationRule,
-	authorizeAppAction("app.model.update"),
-	async (req, res) => {
-		try {
-			const { org, user, app, version, db, model, field, rule } = req;
-
-			// Delete the rules from the field validation rules list
-			let updatedModel = await modelCtrl.pullObjectByQuery2(
-				{
-					_id: model._id,
-					"fields._id": field._id,
-				},
-				"fields.$.validationRules",
-				{ _id: rule._id },
-				{
-					updatedBy: user._id,
-					"fields.$.updatedBy": user._id,
-					"fields.$.updatedAt": Date.now(),
-				},
-				{ cacheKey: model._id }
-			);
-
-			res.json(updatedModel);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.db.model.fields.validationRules",
-				"delete",
-				t(
-					"Deleted the validation rule '%s' of field '%s' in model '%s'",
-					rule.name,
-					field.name,
-					model.name
-				),
-				updatedModel,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					dbId: db._id,
-					modelId: model._id,
-					fieldId: field._id,
-					validationRuleId: rule._id,
-				}
-			);
-		} catch (error) {
 			handleError(req, res, error);
 		}
 	}

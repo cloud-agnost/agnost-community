@@ -1100,7 +1100,7 @@ export const applyRules = (type) => {
 						}
 
 						let model = await modelCtrl.getOneByQuery(
-							{ dbId: req.body.databaseId, _id: value },
+							{ dbId: req.body.databaseId, _id: value, type: "model" },
 							{
 								cacheKey: value,
 							}
@@ -1109,7 +1109,7 @@ export const applyRules = (type) => {
 						if (!model) {
 							throw new AgnostError(
 								t(
-									"No such model with the provided id '%s' exists in database '%s'",
+									"No such top level model with the provided id '%s' exists in database '%s'",
 									value,
 									req.database.name
 								)

@@ -109,7 +109,6 @@ export const textRules = (type) => {
 						"uppercase",
 						"lowercase",
 						"sentencecase",
-						"tittlecase",
 						"capitilizewords",
 					])
 					.withMessage((value) => {

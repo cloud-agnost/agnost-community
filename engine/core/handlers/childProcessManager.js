@@ -77,7 +77,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * Initializes the API server of the app version
 	 */
 	async initializeCore() {
-		logger.info(`Started initializing the API server`);
+		this.addLog(`Started initializing the API server`);
 		// First load the environment and vesion configuration file
 		const envObj = await this.loadEnvConfigFile();
 		// If we do  not have the envObj yet then just spin up the express server to serve system default endpoints
@@ -114,7 +114,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Set up the task listeners
 		await this.manageTasks();
 
-		logger.info(`Completed initializing the API server`);
+		this.addLog(`Completed initializing the API server`);
+		// Send the deployment telemetry information to the platform
+		await this.sendEnvironmentLogs("OK");
 	}
 
 	/**
@@ -126,7 +128,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		for (const variable of variables) {
 			process.env[variable.name] = variable.value;
-			logger.info(`Added environment variable '${variable.name}'`);
+			this.addLog(`Added environment variable '${variable.name}'`);
 		}
 	}
 
@@ -134,7 +136,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * Initializes the express server
 	 */
 	async initExpressServer() {
-		logger.info(`Initializing express server`);
+		this.addLog(`Initializing express server`);
 		// Create and set the express application
 		var app = express();
 		this.setExpressApp(app);
@@ -166,7 +168,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		const HOST = config.get("server.host");
 		const PORT = config.get("server.port");
 		var server = app.listen(PORT, () => {
-			logger.info(`Http server started @ ${HOST}:${PORT}`);
+			this.addLog(`Http server started @ ${HOST}:${PORT}`);
 			// We completed server initialization and can accept incoming requests
 			global.SERVER_STATUS = "running";
 		});
@@ -234,7 +236,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 			this.getExpressApp().use(touter);
 
-			logger.info(
+			this.addLog(
 				`Added endpoint '${endpoint.name}' ${endpoint.method}: ${endpoint.path}`
 			);
 		}
@@ -345,7 +347,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 				);
 
 			await adapterManager.setupConnection(resource);
-			logger.info(
+			this.addLog(
 				`Initialized the adapter of '${resource.type}' resource '${resource.name}'`
 			);
 		}
@@ -368,7 +370,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 			if (connection) {
 				await connection.ensureStorage(`${mapping.design.iid}`);
-				logger.info(`Initialized storage '${mapping.design.name}'`);
+				this.addLog(`Initialized storage '${mapping.design.name}'`);
 			}
 		}
 	}
@@ -387,7 +389,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			const adapterObj = adapterManager.getQueueAdapter(queue.name);
 			if (adapterObj) {
 				adapterObj.listenMessages(queue.iid);
-				logger.info(`Initialized handler of queue '${queue.name}'`);
+				this.addLog(`Initialized handler of queue '${queue.name}'`);
 			}
 		}
 	}
@@ -406,7 +408,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			const adapterObj = adapterManager.getTaskAdapter(queue.name);
 			if (adapterObj) {
 				adapterObj.listenMessages(task.iid);
-				logger.info(`Initialized handler of task '${task.name}'`);
+				this.addLog(`Initialized handler of task '${task.name}'`);
 			}
 		}
 	}

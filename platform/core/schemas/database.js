@@ -79,13 +79,13 @@ export const applyRules = (type) => {
 					.bail()
 					.isLength({
 						min: config.get("general.minNameLength"),
-						max: config.get("general.maxTextLength"),
+						max: config.get("general.maxDbNameLength"),
 					})
 					.withMessage(
 						t(
 							"Name must be minimum %s and maximum %s characters long",
 							config.get("general.minNameLength"),
-							config.get("general.maxTextLength")
+							config.get("general.maxDbNameLength")
 						)
 					)
 					.bail()
@@ -218,13 +218,13 @@ export const applyRules = (type) => {
 					.bail()
 					.isLength({
 						min: config.get("general.minNameLength"),
-						max: config.get("general.maxTextLength"),
+						max: config.get("general.maxDbNameLength"),
 					})
 					.withMessage(
 						t(
 							"Name must be minimum %s and maximum %s characters long",
 							config.get("general.minNameLength"),
-							config.get("general.maxTextLength")
+							config.get("general.maxDbNameLength")
 						)
 					)
 					.bail()
