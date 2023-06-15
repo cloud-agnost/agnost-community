@@ -23,3 +23,10 @@ export function leaveChannel(channel: string) {
 export function sendMessageToChannel(channel: string, message: string) {
 	socket.emit('channel:message', { channel, message });
 }
+
+export function onChannelMessage<T>(channel: string, callback: (data: T) => void) {
+	socket.on(channel, callback);
+	return () => {
+		socket.off(channel);
+	};
+}
