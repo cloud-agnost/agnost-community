@@ -79,7 +79,8 @@ class ConnectionController {
 						"connFormat": "mongodb+srv",
 						"host": "cluster0-qxaly.mongodb.net",
 						"username": "umit_cakmak",
-						"password": "G3oUiFhcKczQI6lJ"
+						"password": "G3oUiFhcKczQI6lJ",
+						"dbName": "deneme"
 					}
 					 */
 					let client = null;
@@ -87,30 +88,31 @@ class ConnectionController {
 					connSettings.connOptions = helper.getQueryString(
 						connSettings.options
 					);
+
 					if (connSettings.connFormat === "mongodb") {
-						client = new mongo.MongoClient(
-							connSettings.connOptions
-								? `mongodb://${connSettings.host}:${connSettings.port}?${connSettings.connOptions}`
-								: `mongodb://${connSettings.host}:${connSettings.port}`,
-							{
-								auth: {
-									username: connSettings.username,
-									password: connSettings.password,
-								},
-							}
-						);
+						let uri = `mongodb://${connSettings.host}:${connSettings.port}`;
+						if (connSettings.dbName) uri = `${uri}/${connSettings.dbName}`;
+						if (connSettings.connOptions)
+							uri = `${uri}?${connSettings.connOptions}`;
+
+						client = new mongo.MongoClient(uri, {
+							auth: {
+								username: connSettings.username,
+								password: connSettings.password,
+							},
+						});
 					} else {
-						client = new mongo.MongoClient(
-							connSettings.connOptions
-								? `mongodb+srv://${connSettings.host}?${connSettings.connOptions}`
-								: `mongodb+srv://${connSettings.host}`,
-							{
-								auth: {
-									username: connSettings.username,
-									password: connSettings.password,
-								},
-							}
-						);
+						let uri = `mongodb+srv://${connSettings.host}`;
+						if (connSettings.dbName) uri = `${uri}/${connSettings.dbName}`;
+						if (connSettings.connOptions)
+							uri = `${uri}?${connSettings.connOptions}`;
+
+						client = new mongo.MongoClient(uri, {
+							auth: {
+								username: connSettings.username,
+								password: connSettings.password,
+							},
+						});
 					}
 					//Connect to the database of the application
 					await client.connect();

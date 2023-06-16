@@ -62,8 +62,6 @@ export const envLogTypes = ["db", "server", "scheduler"];
 // sub-model-object: for single child or reference objects
 // sub-model-list: for a collection of child objects within a parent document
 export const modelTypes = ["model", "sub-model-object", "sub-model-list"];
-export const crudType = ["create", "read", "update", "delete"];
-export const ruleType = ["sql", "exp"];
 export const bvlTypes = [
 	"text",
 	"boolean",
@@ -86,6 +84,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "text",
@@ -93,6 +96,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "rich-text",
@@ -100,6 +108,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: false,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "encrypted-text",
@@ -107,6 +120,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: false,
+			indexed: false,
+			immutable: true,
+		},
 	},
 	{
 		name: "email",
@@ -114,6 +132,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "link",
@@ -121,6 +144,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "phone",
@@ -128,6 +156,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "boolean",
@@ -135,6 +168,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "integer",
@@ -142,6 +180,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "decimal",
@@ -149,6 +192,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "monetary",
@@ -156,6 +204,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "createdat",
@@ -163,6 +216,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "updatedat",
@@ -170,6 +228,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "datetime",
@@ -177,6 +240,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "date",
@@ -184,6 +252,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: false,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "time",
@@ -191,6 +264,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: false,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "enum",
@@ -198,6 +276,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "geo-point",
@@ -205,6 +288,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: false,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "binary",
@@ -212,6 +300,11 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: false,
+			indexed: false,
+			immutable: true,
+		},
 	},
 	{
 		name: "json",
@@ -219,20 +312,35 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": false,
 		MongoDB: true,
+		view: {
+			unique: false,
+			indexed: false,
+			immutable: true,
+		},
 	},
 	{
 		name: "parent",
-		PostgreSQL: false,
-		MySQL: false,
-		"SQL Server": false,
+		PostgreSQL: true,
+		MySQL: true,
+		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "object",
-		PostgreSQL: false,
-		MySQL: false,
-		"SQL Server": false,
+		PostgreSQL: true,
+		MySQL: true,
+		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: false,
+			indexed: false,
+			immutable: false,
+		},
 	},
 	{
 		name: "reference",
@@ -240,20 +348,35 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+		},
 	},
 	{
 		name: "object-list",
-		PostgreSQL: false,
-		MySQL: false,
-		"SQL Server": false,
+		PostgreSQL: true,
+		MySQL: true,
+		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: false,
+			indexed: false,
+			immutable: false,
+		},
 	},
 	{
 		name: "basic-values-list",
-		PostgreSQL: false,
-		MySQL: false,
-		"SQL Server": false,
+		PostgreSQL: true,
+		MySQL: true,
+		"SQL Server": true,
 		MongoDB: true,
+		view: {
+			unique: false,
+			indexed: true,
+			immutable: true,
+		},
 	},
 ];
 

@@ -3,6 +3,7 @@ import util from "util";
 import { getDBClient } from "../../init/db.js";
 import {
 	createPipeline,
+	getKey,
 	setKey,
 	scanKeys,
 	addToCache,
@@ -15,6 +16,7 @@ import { MsSQLDBManager } from "./MsSQLDBManager.js";
 import { OracleDBManager } from "./OracleDBManager.js";
 import { DATABASE } from "../../config/constants.js";
 import { manageAPIServers } from "../../init/queue.js";
+import { resolveSrv } from "dns";
 
 export class DeploymentManager {
 	constructor(msgObj) {
@@ -71,6 +73,15 @@ export class DeploymentManager {
 	addToCache(key, value) {
 		const pipeline = this.getPipeline();
 		addToCache(pipeline, key, value);
+	}
+
+	/**
+	 * Removes the value in cache using the key and redis command pipeline
+	 * @param  {string} key Removed value key
+	 */
+	removeFromCache(key) {
+		const pipeline = this.getPipeline();
+		removeFromCache(pipeline, key);
 	}
 
 	/**
@@ -182,6 +193,20 @@ export class DeploymentManager {
 	 */
 	getTasks() {
 		return this.msgObj.tasks || [];
+	}
+
+	/**
+	 * Returns the sub-action of the message
+	 */
+	getSubAction() {
+		return this.msgObj.subAction;
+	}
+
+	/**
+	 * Returns the udpated resource object (only valid when handling resource access setting updates)
+	 */
+	getUpdatedResource() {
+		return this.msgObj.updatedResource;
 	}
 
 	/**
@@ -860,6 +885,29 @@ export class DeploymentManager {
 	}
 
 	/**
+	 * Deletes the managed databases and data stored in these databases. Since the database is being deleted we do not have the resource associated with the database for this reason we need to get the resource from the previous db configuration
+	 */
+	async deleteManagedDatabases(dbsToDelete) {
+		let prevConfig = await this.getPrevDBDefinitions();
+		for (let i = 0; i < dbsToDelete.length; i++) {
+			const db = dbsToDelete[i];
+			// We only process databases managed by the platform
+			if (!db.managed) continue;
+
+			const prevDb = prevConfig.find((entry) => entry.iid === db.iid);
+
+			this.addLog(t("Started deleting %s database %s", db.type, db.name));
+			let dbManager = this.createDBManager(db, prevDb);
+
+			await dbManager.beginSession();
+			await dbManager.dropDatabase();
+			await dbManager.endSession();
+
+			this.addLog(t("Completed deleting '%s' database '%s'", db.type, db.name));
+		}
+	}
+
+	/**
 	 * Deletes all managed databases and data stored in these databases
 	 */
 	async dropDatabases() {
@@ -889,7 +937,9 @@ export class DeploymentManager {
 		// Assign the database server resource
 		const resource = this.getDatabaseResource(dbConfig);
 		dbConfig.resource = resource;
-		if (prevConfig) prevConfig.resource = resource;
+		// During delete database operation we do not send the database resource mapping since it is deleted for this reason
+		// in such cases we need to use the previous config resource information
+		if (!dbConfig.resource) dbConfig.resource = prevConfig.resource;
 
 		switch (dbConfig.type) {
 			case DATABASE.MongoDB:
@@ -936,7 +986,7 @@ export class DeploymentManager {
 
 	/**
 	 * Gets the existing (previous) database information from environment database
-	 * We do not use cache since cache is already updated with new configuration info.
+	 * We do not use cache since cache is already updated with new configuration info and we specifially would like to get the previous config from the database which also includes the resource data of the database
 	 * @param  {object} db The database json object
 	 */
 	async getPrevDBDefinition(dbJson) {
@@ -952,7 +1002,7 @@ export class DeploymentManager {
 
 	/**
 	 * Gets all existing database configurations from environment database.
-	 * We do not use cache since cache is already updated with new configuration info.
+	 * We do not use cache since cache is already updated with new configuration info and we specifially would like to get the previous config from the database which also includes the resource data for each database
 	 */
 	async getPrevDBDefinitions() {
 		// Database configuration is not in the cache, load it from the database
@@ -1001,16 +1051,14 @@ export class DeploymentManager {
 	}
 
 	/**
-	 * Save new database configurations to the engine cluster database
+	 * Save the database configurations to the engine cluster database
 	 */
 	async saveDatabaseDeploymentConfigs(databases) {
 		const engineDb = this.getEnvDB();
-		for (const db of databases) {
-			// Save updated configuration
-			await engineDb
-				.collection("databases")
-				.updateOne({ iid: db.iid }, { $set: db }, { upsert: true });
-		}
+		// First clear any existing configuration
+		await engineDb.collection("databases").deleteMany({});
+		if (databases.length > 0)
+			await engineDb.collection("databases").insertMany(databases);
 
 		this.addLog("Saved database configurations to environment database");
 	}
@@ -1043,7 +1091,7 @@ export class DeploymentManager {
 	}
 
 	/**
-	 * Caches the database metadata of the app version
+	 * Caches the database metadata of the app version and returns the latest databases cache data
 	 * @param  {Array} databases The list of databases data to cache
 	 * @param  {String} actionType The action type can be either set, udpate or delete
 	 */
@@ -1051,11 +1099,19 @@ export class DeploymentManager {
 		switch (actionType) {
 			case "set":
 				this.addToCache(`${this.getEnvId()}.databases`, databases);
-				break;
-			case "update":
+				return databases;
+			case "add": {
 				const prevDbDefinitions = await this.getPrevDBDefinitions();
+				prevDbDefinitions.push(...databases);
+				this.addToCache(`${this.getEnvId()}.databases`, prevDbDefinitions);
+				return prevDbDefinitions;
+			}
+			case "update": {
+				const prevDbDefinitions = await this.getPrevDBDefinitions();
+
 				if (prevDbDefinitions.length === 0) {
 					this.addToCache(`${this.getEnvId()}.databases`, databases);
+					return databases;
 				} else {
 					const updatedDbDefinitions = prevDbDefinitions.map((entry) => {
 						const updatedDb = databases.find(
@@ -1063,11 +1119,23 @@ export class DeploymentManager {
 						);
 
 						if (updatedDb) return updatedDb;
-						else entry;
+						else return entry;
 					});
+
 					this.addToCache(`${this.getEnvId()}.databases`, updatedDbDefinitions);
+
+					return updatedDbDefinitions;
 				}
-				break;
+			}
+			case "delete": {
+				const prevDbDefinitions = await this.getPrevDBDefinitions();
+				const updatedDbDefinitions = prevDbDefinitions.filter(
+					(entry) => !databases.find((entry2) => entry.iid === entry2.iid)
+				);
+				this.addToCache(`${this.getEnvId()}.databases`, updatedDbDefinitions);
+
+				return updatedDbDefinitions;
+			}
 			default:
 				break;
 		}
@@ -1294,12 +1362,12 @@ export class DeploymentManager {
 			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
 			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
-			// Save updated deployment to database
-			await this.saveEnvironmentDeploymentConfig();
 			// Execute all redis commands altogether
 			await this.commitPipeline();
 			// After we load all configuration data to the cache we can notify engine API servers to update themselves
 			this.notifyAPIServers();
+			// Save updated deployment to database
+			await this.saveEnvironmentDeploymentConfig();
 			// Update status of environment in engine cluster
 			this.addLog(t("Completed update successfully"));
 			// Send the deployment telemetry information to the platform
@@ -1333,27 +1401,46 @@ export class DeploymentManager {
 			this.addLog(t("Started updating databases"));
 			// Set current status of environment in engine cluster
 			await this.setStatus("Deploying");
+			const subAction = this.getSubAction();
 
-			// Clear the initially cached environment data
-			await this.clearCachedData(`${this.getEnvId()}.*`);
-			// Add environment object data to cache
+			// Update environment object data in cache
 			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
 			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
-			// Load updated data models and do deployments
-			await this.loadDatabases();
-			// Cache updated database configurations
-			await this.cacheDatabases(this.getDatabases(), "update");
+			if (subAction === "delete") {
+				// Clear cache of databases
+				this.getDatabases().forEach((db) =>
+					this.removeFromCache(`${this.getEnvId()}.db.${this.getDbId(db)}`)
+				);
+			} else {
+				// Load updated data models and do deployments
+				await this.loadDatabases();
+			}
+
+			// Cache updated database configurations (subaction can be add, delete or update)
+			const databases = await this.cacheDatabases(
+				this.getDatabases(),
+				subAction
+			);
+
 			// Execute all redis commands altogether
 			await this.commitPipeline();
 			// We first cache all data and then notify api servers
 			// After we load all configuration data to the cache we can notify engine API servers to update themselves
 			this.notifyAPIServers();
 
-			// Update database structure for databases and models (e.g.,tables, collections, indices)
-			await this.prepareDatabases();
+			if (subAction === "delete") {
+				// Delete the databases
+				await this.deleteManagedDatabases(this.getDatabases());
+			} else {
+				// Update database structure for databases and models (e.g.,tables, collections, indices)
+				await this.prepareDatabases();
+			}
+
 			// Save updated deployment to database
-			await this.saveDatabaseDeploymentConfigs(this.getDatabases());
+			await this.saveDatabaseDeploymentConfigs(databases);
+			// Save updated deployment to database
+			await this.saveEnvironmentDeploymentConfig();
 
 			// Update status of environment in engine cluster
 			this.addLog(t("Completed database updates successfully"));
@@ -1369,6 +1456,78 @@ export class DeploymentManager {
 			this.addLog(
 				[
 					t("Database updates failed"),
+					error.name,
+					error.message,
+					error.stack,
+				].join("\n"),
+				"Error"
+			);
+			await this.sendEnvironmentLogs("Error");
+			return { success: false, error };
+		}
+	}
+
+	/**
+	 * Updates the databases
+	 */
+	async updateResourceAccessSettings() {
+		try {
+			this.addLog(t("Started updating resource access settings"));
+			// Set current status of environment in engine cluster
+			await this.setStatus("Deploying");
+			const updatedResource = this.getUpdatedResource();
+
+			// Update environment object data in cache
+			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
+			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
+
+			// If the access setting of a database resource has changed then we need to update respective database objects
+			let updatedDbList = null;
+			if (updatedResource.type === "database") {
+				const databases = await this.getPrevDBDefinitions();
+				const impactedDB = databases.find(
+					(db) => db.resource.iid === updatedResource.iid
+				);
+
+				if (impactedDB) {
+					impactedDB.resource = updatedResource;
+					// Update individual DB cache
+					this.addToCache(
+						`${this.getEnvId()}.db.${this.getDbId(impactedDB)}`,
+						impactedDB
+					);
+
+					// Update the overall databases list
+					updatedDbList = await this.cacheDatabases([impactedDB], "update");
+				}
+			}
+
+			// Execute all redis commands altogether
+			await this.commitPipeline();
+			// We first cache all data and then notify api servers
+			// After we load all configuration data to the cache we can notify engine API servers to update themselves
+			this.notifyAPIServers();
+
+			// Save updated deployment to database
+			if (updatedDbList)
+				await this.saveDatabaseDeploymentConfigs(updatedDbList);
+			// Save updated deployment to database
+			await this.saveEnvironmentDeploymentConfig();
+
+			// Update status of environment in engine cluster
+			this.addLog(t("Completed resource access settings update successfully"));
+			// Send the deployment telemetry information to the platform
+			await this.sendEnvironmentLogs("OK");
+			// Update status of environment in engine cluster
+			await this.setStatus("OK");
+			return { success: true };
+		} catch (error) {
+			// Update status of environment in engine cluster
+			await this.setStatus("Error");
+			// Send the deployment telemetry information to the platform
+			this.addLog(
+				[
+					t("Resource access settings update failed"),
 					error.name,
 					error.message,
 					error.stack,

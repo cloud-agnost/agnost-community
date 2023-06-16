@@ -1,12 +1,6 @@
 import mongoose from "mongoose";
 import { body } from "express-validator";
-import {
-	modelTypes,
-	crudType,
-	ruleType,
-	bvlTypes,
-	fieldTypes,
-} from "../config/constants.js";
+import { modelTypes, bvlTypes, fieldTypes } from "../config/constants.js";
 
 /**
  * Each database holds models which are tables/collections with fields
@@ -154,7 +148,6 @@ export const ModelModel = mongoose.model(
 								"uppercase",
 								"lowercase",
 								"sentencecase",
-								"tittlecase",
 								"capitilizewords",
 							],
 						},
@@ -281,10 +274,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxModelNameLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxModelNameLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxModelNameLength")
 						)
 					)
@@ -479,30 +476,21 @@ export const applyRules = (type) => {
 						)
 					),
 			];
-		case "update-description":
-			return [
-				body("description")
-					.trim()
-					.optional()
-					.isLength({ max: config.get("general.maxDetailTxtLength") })
-					.withMessage(
-						t(
-							"Description can be max %s characters long",
-							config.get("general.maxDetailTxtLength")
-						)
-					),
-			];
-		case "rename":
+		case "update":
 			return [
 				body("name")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxModelNameLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxModelNameLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxModelNameLength")
 						)
 					)
@@ -582,77 +570,16 @@ export const applyRules = (type) => {
 						//Indicates the success of this synchronous custom validator
 						return true;
 					}),
-			];
-		case "add-ols":
-			return [
-				body("action")
+				body("description")
 					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isIn(crudType)
-					.withMessage(t("Unsupported CRUD operation type")),
-				body("type")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isIn(ruleType)
-					.withMessage(t("Unsupported rule type"))
-					.bail()
-					.custom((value, { req }) => {
-						if (value === "sql" && req.db.type === "MongoDB")
-							throw new AgnostError(
-								t("SQL rule type cannot be specified for a no-sql database.")
-							);
-
-						//Indicates the success of this synchronous custom validator
-						return true;
-					}),
-				body("session")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isBoolean()
-					.withMessage(t("Not a valid boolean value"))
-					.toBoolean(),
-				body("rule")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty")),
-			];
-		case "update-ols":
-			return [
-				body("type")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isIn(ruleType)
-					.withMessage(t("Unsupported rule type"))
-					.bail()
-					.custom((value, { req }) => {
-						if (value === "sql" && req.db.type === "MongoDB")
-							throw new AgnostError(
-								t("SQL rule type cannot be specified for a no-sql database.")
-							);
-
-						//Indicates the success of this synchronous custom validator
-						return true;
-					}),
-				body("session")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isBoolean()
-					.withMessage(t("Not a valid boolean value"))
-					.toBoolean(),
-				body("rule")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty")),
+					.optional()
+					.isLength({ max: config.get("general.maxDetailTxtLength") })
+					.withMessage(
+						t(
+							"Description can be max %s characters long",
+							config.get("general.maxDetailTxtLength")
+						)
+					),
 			];
 		case "delete-multi":
 			return [

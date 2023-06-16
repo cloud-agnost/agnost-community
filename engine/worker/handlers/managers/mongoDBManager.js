@@ -190,7 +190,7 @@ export class MongoDBManager extends DBManager {
 		}
 
 		// Apply field name changes in the databae
-		let appDB = this.getAppDB();
+		let appDB = await this.getAppDB();
 		for (let key in fieldChanges) {
 			let renameFields = fieldChanges[key];
 			for (let i = 0; i < renameFields.length; i++) {
@@ -248,7 +248,7 @@ export class MongoDBManager extends DBManager {
 		}
 
 		// Drop deleted fiels
-		let appDB = this.getAppDB();
+		let appDB = await this.getAppDB();
 		for (let key in fieldDeletes) {
 			let deleteFields = fieldDeletes[key];
 			for (let i = 0; i < deleteFields.length; i++) {
@@ -287,6 +287,8 @@ export class MongoDBManager extends DBManager {
 			// Drop any unused or changed index
 			for (let j = 0; j < indices.length; j++) {
 				const index = indices[j];
+				// If this is _id field index then skip
+				if (index.key._id || index.name === "_id_") continue;
 				const requiredIndex = this.getRequiredIndex(
 					index,
 					requiredIndices,
@@ -337,7 +339,7 @@ export class MongoDBManager extends DBManager {
 				else indexDef.key[keyName] = 1;
 
 				// Add unique flag to index
-				if (field.unique && field.name != "_id" && field.name != "_parent") {
+				if (field.unique && field.name != "_id") {
 					indexDef.unique = true;
 					indexDef.sparse = true;
 				}
@@ -460,7 +462,7 @@ export class MongoDBManager extends DBManager {
 		if (field.creator == "system") return true;
 		if (!["object", "object-list"].includes(field.type)) {
 			if (field.unique) return true;
-			// By default we index geo-point and auto-number fields
+			// By default we index geo-point and datetime fields
 			if (field.type == "geo-point") return true;
 			if (field.type == "datetime") return true;
 			if (field.indexed) return true;

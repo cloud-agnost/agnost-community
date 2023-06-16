@@ -114,7 +114,7 @@ router.post(
 			res.json(db);
 
 			// Deploy database updates to environments if auto-deployment is enabled
-			await deployCtrl.updateDatabase(app, version, user, db, "create-db");
+			await deployCtrl.updateDatabase(app, version, user, db, "add");
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -159,7 +159,7 @@ router.get(
 /*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId
 @method     PUT
-@desc       Upadate database properties
+@desc       Upadate database name
 @access     private
 */
 router.put(
@@ -188,32 +188,31 @@ router.put(
 			);
 
 			// Update the resouce mapping name info in environments if there is any
-			let environments = await envCtrl.getManyByQuery(
+			let env = await envCtrl.getOneByQuery(
 				{
 					orgId: org._id,
 					appId: app._id,
-					"mappings.design.iid": db.iid,
+					versionId: version._id,
 				},
 				{ session }
 			);
 
-			for (let i = 0; i < environments.length; i++) {
-				const env = environments[i];
-				await envCtrl.updateOneByQuery(
-					{
-						_id: env._id,
-						"mappings.design.iid": db.iid,
-					},
-					{ "mappings.$.design.name": name },
-					{},
-					{ cacheKey: env._id, session }
-				);
-			}
+			await envCtrl.updateOneByQuery(
+				{
+					_id: env._id,
+					"mappings.design.iid": db.iid,
+				},
+				{ "mappings.$.design.name": name },
+				{},
+				{ cacheKey: env._id, session }
+			);
 
 			// Commit the database transaction
 			await dbCtrl.commit(session);
-
 			res.json(updatedDb);
+
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(app, version, user, updatedDb, "update");
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -257,27 +256,23 @@ router.delete(
 		try {
 			const { org, user, app, version, db } = req;
 
-			// Get the list of environments that are using this database
-			let environments = await envCtrl.getManyByQuery({
+			// Get the environment
+			let env = await envCtrl.getOneByQuery({
 				orgId: org._id,
 				appId: app._id,
 				versionId: version._id,
-				"mappings.design.iid": db.iid,
 			});
 
-			// Delete the resource mapping from impacted environments
-			for (let i = 0; i < environments.length; i++) {
-				const env = environments[i];
-				await envCtrl.pullObjectByQuery(
-					env._id,
-					"mappings",
-					{ "design.iid": db.iid },
-					{ updatedBy: user._id },
-					{ cacheKey: env._id, session }
-				);
-			}
+			// Remove the resource mapping from the environment
+			await envCtrl.pullObjectByQuery(
+				env._id,
+				"mappings",
+				{ "design.iid": db.iid },
+				{ updatedBy: user._id },
+				{ cacheKey: env._id, session }
+			);
 
-			// Delete the models associated with the database, we do no clear cache since it will eventually expire
+			// Delete the models associated with the database, we do not clear cache since it will eventually expire
 			await modelCtrl.deleteManyByQuery({ dbId: db._id }, { session });
 
 			// Delete the database
@@ -286,6 +281,9 @@ router.delete(
 			// Commit the database transaction
 			await dbCtrl.commit(session);
 			res.json();
+
+			// Deploy database updates to environments if auto-deployment is enabled
+			await deployCtrl.updateDatabase(app, version, user, db, "delete");
 
 			// Log action
 			auditCtrl.logAndNotify(

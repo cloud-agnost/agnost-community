@@ -11,7 +11,7 @@ class AppInvitationController extends BaseController {
 	 * @param  {string} userId The user identifier
 	 * @param  {string} name The name of the user
 	 */
-	async updateHOstName(userId, name) {
+	async updateHostName(userId, name) {
 		await this.updateMultiByQuery(
 			{ "host.userId": userId },
 			{ "host.name": name },

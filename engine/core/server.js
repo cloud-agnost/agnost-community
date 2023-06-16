@@ -22,6 +22,7 @@ import { adapterManager } from "./handlers/adapterManager.js";
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
+var childManager = null;
 var childProcess = null;
 // If this is the primary process then fork a child process
 if (cluster.isPrimary) {
@@ -64,6 +65,7 @@ if (cluster.isPrimary) {
 		// Create the child process manager which will set up the API server
 		const manager = new ChildProcessDeploymentManager(null, null, i18n);
 		await manager.initializeCore();
+		childManager = manager;
 	});
 	// Connect to synchronization server
 	initializeSyncClient();
@@ -80,6 +82,8 @@ if (cluster.isPrimary) {
 		await disconnectFromDatabase();
 		// Close synchronization server connection
 		disconnectSyncClient();
+		// Close the http server
+		if (childManager) await childManager.closeHttpServer();
 		// We call process exit so that primary process can fork a new child process
 		process.exit();
 	});

@@ -14,8 +14,7 @@ export const richTextRules = (type) => {
 							return true;
 						else return false;
 					})
-					.not()
-					.isEmpty()
+					.notEmpty()
 					.withMessage(
 						t("Rich text properties need to be provided, cannot be left empty")
 					),

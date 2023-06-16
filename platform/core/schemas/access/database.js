@@ -70,6 +70,14 @@ export default [
 		})
 		.withMessage(t("Port number needs to be an integer between 0-65535"))
 		.toInt(),
+	body("access.dbName")
+		.if(
+			(value, { req }) =>
+				req.body.type === "database" &&
+				databaseTypes.includes(req.body.instance)
+		)
+		.trim()
+		.optional(),
 	body("access.username")
 		.if(
 			(value, { req }) =>
@@ -161,7 +169,7 @@ export default [
 	body("accessReadOnly.*.port")
 		.if(
 			(value, { req }) =>
-				eq.body.accessReadOnly &&
+				req.body.accessReadOnly &&
 				Array.isArray(req.body.accessReadOnly) &&
 				req.body.type === "database" &&
 				((databaseTypes.includes(req.body.instance) &&
@@ -181,6 +189,16 @@ export default [
 		})
 		.withMessage(t("Port number needs to be an integer between 0-65535"))
 		.toInt(),
+	body("accessReadOnly.*.dbName")
+		.if(
+			(value, { req }) =>
+				req.body.accessReadOnly &&
+				Array.isArray(req.body.accessReadOnly) &&
+				req.body.type === "database" &&
+				databaseTypes.includes(req.body.instance)
+		)
+		.trim()
+		.optional(),
 	body("accessReadOnly.*.username")
 		.if(
 			(value, { req }) =>

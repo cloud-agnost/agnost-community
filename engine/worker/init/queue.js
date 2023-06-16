@@ -5,6 +5,8 @@ import { updateEnvironmentHandler } from "../consumers/updateEnvironment.js";
 import { updateDatabaseHandler } from "../consumers/updateDatabase.js";
 import { deleteEnvironmentHandler } from "../consumers/deleteEnvironment.js";
 import { manageResourceHandler } from "../consumers/manageResource.js";
+import { updateResourceAccessHandler } from "../consumers/updateResourceAccess.js";
+import { manageEngineWorkersHandler } from "../consumers/manageEngineWorkers.js";
 
 var amqpConnection = null;
 var isConnecting = false;
@@ -80,6 +82,8 @@ export const connectToQueue = () => {
 			updateEnvironmentHandler(connection, `update-environment-${i}`);
 			updateDatabaseHandler(connection, `update-db-${i}`);
 			manageResourceHandler(connection, `manage-resource-${i}`);
+			updateResourceAccessHandler(connection, `update-resource-access-${i}`);
+			manageEngineWorkersHandler(connection, "manage-engine-workers");
 		}
 	});
 };
@@ -397,6 +401,63 @@ export const manageAPIServers = (envId, payload) => {
 		});
 
 		channel.publish(envId, "", Buffer.from(JSON.stringify(payload)));
+
+		channel.close();
+	});
+};
+
+export const updateResourceAccess = (payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		let randNumber = helper.randomInt(
+			1,
+			config.get("general.generalQueueCount")
+		);
+
+		channel.assertQueue(`update-resource-access-${randNumber}`, {
+			durable: true,
+		});
+
+		channel.sendToQueue(
+			`update-resource-access-${randNumber}`,
+			Buffer.from(JSON.stringify(payload)),
+			{
+				persistent: true,
+				timestamp: Date.now(),
+			}
+		);
+
+		channel.close();
+	});
+};
+
+export const manageEngineWorkers = (payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		channel.assertExchange("manage-engine-workers", "fanout", {
+			durable: true,
+			autoDelete: true,
+		});
+
+		channel.publish(
+			"manage-engine-workers",
+			"",
+			Buffer.from(JSON.stringify(payload))
+		);
 
 		channel.close();
 	});

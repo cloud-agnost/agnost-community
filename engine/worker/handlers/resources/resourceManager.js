@@ -472,6 +472,10 @@ export class ResourceManager {
 										value: process.env.MASTER_TOKEN,
 									},
 									{
+										name: "PASSPHRASE",
+										value: process.env.PASSPHRASE,
+									},
+									{
 										name: "POD_NAME",
 										valueFrom: {
 											fieldRef: {
@@ -480,7 +484,7 @@ export class ResourceManager {
 										},
 									},
 								],
-								resources: {
+								/* 								resources: {
 									requests: {
 										cpu: deploymentConfig.cpu.request,
 										memory: deploymentConfig.memory.request,
@@ -489,7 +493,7 @@ export class ResourceManager {
 										cpu: deploymentConfig.cpu.limit,
 										memory: deploymentConfig.memory.limit,
 									},
-								},
+								}, */
 								ports: [
 									{
 										containerPort: config.get("general.defaultClusterIPPort"),

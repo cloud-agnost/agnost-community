@@ -19,8 +19,8 @@ import { validate } from "../middlewares/validate.js";
 import { authSession } from "../middlewares/authSession.js";
 import { authRefreshToken } from "../middlewares/authRefreshToken.js";
 import {
-  checkClusterSetupStatus,
-  hasClusterSetUpCompleted,
+	checkClusterSetupStatus,
+	hasClusterSetUpCompleted,
 } from "../middlewares/checkClusterSetupStatus.js";
 import { sendMessage } from "../init/queue.js";
 import { setKey } from "../init/cache.js";
@@ -80,16 +80,37 @@ router.post(
 				{ session }
 			);
 
-			// Save initial cluster config to the database
-			await clsCtrl.create(
-				{
-					clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
-					masterToken: process.env.MASTER_TOKEN,
-					accessToken: process.env.ACCESS_TOKEN,
-					createdBy: userId,
-				},
-				{ session }
-			);
+			// Get cluster configuration
+			const cluster = await clsCtrl.getOneByQuery({
+				clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+			});
+
+			// If there is no cluster configuration then create a new one
+			if (!cluster) {
+				// Save initial cluster config to the database
+				await clsCtrl.create(
+					{
+						clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+						masterToken: process.env.MASTER_TOKEN,
+						accessToken: process.env.ACCESS_TOKEN,
+						createdBy: userId,
+					},
+					{ session }
+				);
+			} else {
+				// Update existing configuration
+				await clsCtrl.updateOneById(
+					cluster._id,
+					{
+						clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+						masterToken: process.env.MASTER_TOKEN,
+						accessToken: process.env.ACCESS_TOKEN,
+						createdBy: userId,
+					},
+					{},
+					{ session }
+				);
+			}
 
 			// Create new session
 			let tokens = await authCtrl.createSession(
@@ -295,25 +316,25 @@ router.post(
 @access     public
 */
 router.post(
-  "/resend-code",
-  checkContentType,
-  applyRules("resend-code"),
-  validate,
-  async (req, res) => {
-    try {
-      const { email } = req.body;
-      // Create the 6-digit email validation code
-      let code = await authCtrl.createValidationCode(email);
-      sendMessage("send-validation-code", {
-        to: email,
-        code1: code.substring(0, 3),
-        code2: code.substring(3, 6),
-      });
-      res.json();
-    } catch (error) {
-      handleError(req, res, error);
-    }
-  }
+	"/resend-code",
+	checkContentType,
+	applyRules("resend-code"),
+	validate,
+	async (req, res) => {
+		try {
+			const { email } = req.body;
+			// Create the 6-digit email validation code
+			let code = await authCtrl.createValidationCode(email);
+			sendMessage("send-validation-code", {
+				to: email,
+				code1: code.substring(0, 3),
+				code2: code.substring(3, 6),
+			});
+			res.json();
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -323,54 +344,54 @@ router.post(
 @access     public
 */
 router.post(
-  "/validate-email",
-  checkContentType,
-  applyRules("validate-email"),
-  validate,
-  async (req, res) => {
-    try {
-      const { email, code } = req.body;
-      let storedCode = await authCtrl.getValidationCode(email);
+	"/validate-email",
+	checkContentType,
+	applyRules("validate-email"),
+	validate,
+	async (req, res) => {
+		try {
+			const { email, code } = req.body;
+			let storedCode = await authCtrl.getValidationCode(email);
 
-      //Codes match validate user email and create session
-      if (code && code.toString() === storedCode?.toString()) {
-        let user = await userCtrl.updateOneByQuery(
-          {
-            "loginProfiles.provider": "agnost",
-            "loginProfiles.email": email,
-          },
-          {
-            lastLoginAt: Date.now(),
-            lastLoginProvider: "agnost",
-            "loginProfiles.$.emailVerified": true,
-          },
-          {}
-        );
+			//Codes match validate user email and create session
+			if (code && code.toString() === storedCode?.toString()) {
+				let user = await userCtrl.updateOneByQuery(
+					{
+						"loginProfiles.provider": "agnost",
+						"loginProfiles.email": email,
+					},
+					{
+						lastLoginAt: Date.now(),
+						lastLoginProvider: "agnost",
+						"loginProfiles.$.emailVerified": true,
+					},
+					{}
+				);
 
-        // Delete email validation code
-        authCtrl.deleteValidationCode(email);
-        // Remove password field value from returned object
-        delete user.loginProfiles[0].password;
-        res.json(user);
+				// Delete email validation code
+				authCtrl.deleteValidationCode(email);
+				// Remove password field value from returned object
+				delete user.loginProfiles[0].password;
+				res.json(user);
 
-        // Log action
-        auditCtrl.log(
-          user,
-          "user",
-          "validate-email",
-          t("Validated account email")
-        );
-      } else {
-        return res.status(401).json({
-          error: t("Invalid Credentials"),
-          details: t("The validation code provided is invalid or has expired."),
-          code: ERROR_CODES.invalidValidationCode,
-        });
-      }
-    } catch (error) {
-      handleError(req, res, error);
-    }
-  }
+				// Log action
+				auditCtrl.log(
+					user,
+					"user",
+					"validate-email",
+					t("Validated account email")
+				);
+			} else {
+				return res.status(401).json({
+					error: t("Invalid Credentials"),
+					details: t("The validation code provided is invalid or has expired."),
+					code: ERROR_CODES.invalidValidationCode,
+				});
+			}
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -380,100 +401,100 @@ router.post(
 @access     public
 */
 router.post(
-  "/login",
-  checkContentType,
-  applyRules("login"),
-  validate,
-  async (req, res) => {
-    try {
-      const { email, password } = req.body;
+	"/login",
+	checkContentType,
+	applyRules("login"),
+	validate,
+	async (req, res) => {
+		try {
+			const { email, password } = req.body;
 
-      // Get user record
-      let user = await userCtrl.getOneByQuery({
-        "loginProfiles.provider": "agnost",
-        "loginProfiles.email": email,
-      });
+			// Get user record
+			let user = await userCtrl.getOneByQuery({
+				"loginProfiles.provider": "agnost",
+				"loginProfiles.email": email,
+			});
 
-      if (!user) {
-        return res.status(401).json({
-          error: t("Invalid Credentials"),
-          code: ERROR_CODES.invalidCredentials,
-          details: t(
-            "Invalid credentials. Email or password provided is invalid."
-          ),
-        });
-      }
+			if (!user) {
+				return res.status(401).json({
+					error: t("Invalid Credentials"),
+					code: ERROR_CODES.invalidCredentials,
+					details: t(
+						"Invalid credentials. Email or password provided is invalid."
+					),
+				});
+			}
 
-      // Get email based login profile
-      let profile = user.loginProfiles.find(
-        (entry) => entry.provider === "agnost"
-      );
+			// Get email based login profile
+			let profile = user.loginProfiles.find(
+				(entry) => entry.provider === "agnost"
+			);
 
-      // Check account status and email verification
-      if (!profile || !profile.emailVerified) {
-        return res.status(403).json({
-          error: t("Pending account"),
-          code: ERROR_CODES.pendingEmailConfirmation,
-          details: t("Your email address has not been confirmed yet."),
-        });
-      }
+			// Check account status and email verification
+			if (!profile || !profile.emailVerified) {
+				return res.status(403).json({
+					error: t("Pending account"),
+					code: ERROR_CODES.pendingEmailConfirmation,
+					details: t("Your email address has not been confirmed yet."),
+				});
+			}
 
-      // Check account status and email verification
-      if (user.status === "Pending") {
-        return res.status(403).json({
-          error: t("Pending account"),
-          code: ERROR_CODES.pendingAccount,
-          details: t(
-            "You have not completed yet account setup. You need to set your name and password."
-          ),
-        });
-      }
+			// Check account status and email verification
+			if (user.status === "Pending") {
+				return res.status(403).json({
+					error: t("Pending account"),
+					code: ERROR_CODES.pendingAccount,
+					details: t(
+						"You have not completed your account setup yet. Please complete your account set up to set your name and password."
+					),
+				});
+			}
 
-      // It seems this is a valid user, we can check the password match
-      const isMatch = await bcrypt.compare(
-        password.toString(),
-        profile.password
-      );
+			// It seems this is a valid user, we can check the password match
+			const isMatch = await bcrypt.compare(
+				password.toString(),
+				profile.password
+			);
 
-      if (!isMatch) {
-        return res.status(401).json({
-          error: t("Invalid Credentials"),
-          code: ERROR_CODES.invalidCredentials,
-          details: t(
-            "Invalid credentials. Email or password provided is invalid."
-          ),
-        });
-      }
+			if (!isMatch) {
+				return res.status(401).json({
+					error: t("Invalid Credentials"),
+					code: ERROR_CODES.invalidCredentials,
+					details: t(
+						"Invalid credentials. Email or password provided is invalid."
+					),
+				});
+			}
 
-      // Update user's last login information
-      user = await userCtrl.updateOneById(user._id, {
-        lastLoginAt: Date.now(),
-        lastLoginProvider: "agnost",
-      });
+			// Update user's last login information
+			user = await userCtrl.updateOneById(user._id, {
+				lastLoginAt: Date.now(),
+				lastLoginProvider: "agnost",
+			});
 
-      // Success, create the session token and return user information and do not return the password field value
-      // Remove password field value from returned object
-      delete user.loginProfiles[0].password;
-      let tokens = await authCtrl.createSession(
-        user._id,
-        helper.getIP(req),
-        req.headers["user-agent"],
-        "agnost"
-      );
+			// Success, create the session token and return user information and do not return the password field value
+			// Remove password field value from returned object
+			delete user.loginProfiles[0].password;
+			let tokens = await authCtrl.createSession(
+				user._id,
+				helper.getIP(req),
+				req.headers["user-agent"],
+				"agnost"
+			);
 
-      res.json({ ...user, ...tokens });
+			res.json({ ...user, ...tokens });
 
-      // Log action
-      auditCtrl.log(
-        user,
-        "user",
-        "login",
-        t("Logged in using email & password credentials")
-      );
-    } catch (error) {
-      handleError(req, res, error);
-    }
-  }
+			// Log action
+			auditCtrl.log(
+				user,
+				"user",
+				"login",
+				t("Logged in using email & password credentials")
+			);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -483,13 +504,13 @@ router.post(
 @access     private
 */
 router.post("/logout", authSession, async (req, res) => {
-  try {
-    // Delete the session token and also the associated refresh token
-    await authCtrl.deleteSession(req.session);
-    res.json();
-  } catch (error) {
-    handleError(req, res, error);
-  }
+	try {
+		// Delete the session token and also the associated refresh token
+		await authCtrl.deleteSession(req.session);
+		res.json();
+	} catch (error) {
+		handleError(req, res, error);
+	}
 });
 
 /*
@@ -499,21 +520,21 @@ router.post("/logout", authSession, async (req, res) => {
 @access     private
 */
 router.post("/renew", authRefreshToken, async (req, res) => {
-  try {
-    // First delete existing access and refresh tokens
-    await authCtrl.deleteSession(req.tokens);
+	try {
+		// First delete existing access and refresh tokens
+		await authCtrl.deleteSession(req.tokens);
 
-    // Create new session
-    let tokens = await authCtrl.createSession(
-      req.tokens.userId,
-      helper.getIP(req),
-      req.headers["user-agent"]
-    );
+		// Create new session
+		let tokens = await authCtrl.createSession(
+			req.tokens.userId,
+			helper.getIP(req),
+			req.headers["user-agent"]
+		);
 
-    res.json(tokens);
-  } catch (error) {
-    handleError(req, res, error);
-  }
+		res.json(tokens);
+	} catch (error) {
+		handleError(req, res, error);
+	}
 });
 
 /*
@@ -524,51 +545,51 @@ router.post("/renew", authRefreshToken, async (req, res) => {
 @access     public
 */
 router.post(
-  "/init-account-setup",
-  checkContentType,
-  hasClusterSetUpCompleted,
-  applyRules("init-account-setup"),
-  validate,
-  async (req, res) => {
-    try {
-      const { email } = req.body;
-      // Get user record
-      let user = await userCtrl.getOneByQuery({
-        "loginProfiles.provider": "agnost",
-        "loginProfiles.email": email,
-      });
+	"/init-account-setup",
+	checkContentType,
+	hasClusterSetUpCompleted,
+	applyRules("init-account-setup"),
+	validate,
+	async (req, res) => {
+		try {
+			const { email } = req.body;
+			// Get user record
+			let user = await userCtrl.getOneByQuery({
+				"loginProfiles.provider": "agnost",
+				"loginProfiles.email": email,
+			});
 
-      if (!user) {
-        return res.status(404).json({
-          error: t("Not Found"),
-          code: ERROR_CODES.notFound,
-          details: t("No user account with provided email exists."),
-        });
-      }
+			if (!user) {
+				return res.status(404).json({
+					error: t("Not Found"),
+					code: ERROR_CODES.notFound,
+					details: t("No user account with provided email exists."),
+				});
+			}
 
-      if (user.status === "Active") {
-        return res.status(400).json({
-          error: t("Setup Completed"),
-          code: ERROR_CODES.setupCompleted,
-          details: t(
-            "User account setup has already been completed. Try signing in."
-          ),
-        });
-      }
+			if (user.status === "Active") {
+				return res.status(400).json({
+					error: t("Setup Completed"),
+					code: ERROR_CODES.setupCompleted,
+					details: t(
+						"User account setup has already been completed. Try signing in."
+					),
+				});
+			}
 
-      // Create the 6-digit email validation code
-      let code = await authCtrl.createValidationCode(email);
-      sendMessage("send-validation-code", {
-        to: email,
-        code1: code.substring(0, 3),
-        code2: code.substring(3, 6),
-      });
+			// Create the 6-digit email validation code
+			let code = await authCtrl.createValidationCode(email);
+			sendMessage("send-validation-code", {
+				to: email,
+				code1: code.substring(0, 3),
+				code2: code.substring(3, 6),
+			});
 
-      res.json();
-    } catch (error) {
-      handleError(req, res, error);
-    }
-  }
+			res.json();
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -578,81 +599,81 @@ router.post(
 @access     public
 */
 router.post(
-  "/finalize-account-setup",
-  checkContentType,
-  hasClusterSetUpCompleted,
-  applyRules("finalize-account-setup"),
-  validate,
-  async (req, res) => {
-    try {
-      const { email, password, name, verificationCode } = req.body;
-      // Get user record
-      let user = await userCtrl.getOneByQuery({
-        "loginProfiles.provider": "agnost",
-        "loginProfiles.email": email,
-      });
+	"/finalize-account-setup",
+	checkContentType,
+	hasClusterSetUpCompleted,
+	applyRules("finalize-account-setup"),
+	validate,
+	async (req, res) => {
+		try {
+			const { email, password, name, verificationCode } = req.body;
+			// Get user record
+			let user = await userCtrl.getOneByQuery({
+				"loginProfiles.provider": "agnost",
+				"loginProfiles.email": email,
+			});
 
-      if (!user) {
-        return res.status(404).json({
-          error: t("Not Found"),
-          code: ERROR_CODES.notFound,
-          details: t("No user account with provided email exists."),
-        });
-      }
+			if (!user) {
+				return res.status(404).json({
+					error: t("Not Found"),
+					code: ERROR_CODES.notFound,
+					details: t("No user account with provided email exists."),
+				});
+			}
 
-      if (user.status === "Active") {
-        return res.status(400).json({
-          error: t("Setup Completed"),
-          code: ERROR_CODES.setupCompleted,
-          details: t(
-            "User account setup has already been completed. Try signing in."
-          ),
-        });
-      }
+			if (user.status === "Active") {
+				return res.status(400).json({
+					error: t("Setup Completed"),
+					code: ERROR_CODES.setupCompleted,
+					details: t(
+						"User account setup has already been completed. Try signing in."
+					),
+				});
+			}
 
-      // Get the stored validateion code
-      let storedCode = await authCtrl.getValidationCode(email);
-      if (
-        verificationCode &&
-        verificationCode.toString() === storedCode?.toString()
-      ) {
-        // Encrypt user password
-        const salt = await bcrypt.genSalt(10);
-        let encryptedPassword = await bcrypt.hash(password, salt);
-        let updatedUser = await userCtrl.updateOneByQuery(
-          { _id: user._id, "loginProfiles.email": email },
-          {
-            name: name,
-            status: "Active",
-            lastLoginAt: Date.now(),
-            lastLoginProvider: "agnost",
-            "loginProfiles.$.password": encryptedPassword,
-            "loginProfiles.$.emailVerified": true,
-          }
-        );
+			// Get the stored validateion code
+			let storedCode = await authCtrl.getValidationCode(email);
+			if (
+				verificationCode &&
+				verificationCode.toString() === storedCode?.toString()
+			) {
+				// Encrypt user password
+				const salt = await bcrypt.genSalt(10);
+				let encryptedPassword = await bcrypt.hash(password, salt);
+				let updatedUser = await userCtrl.updateOneByQuery(
+					{ _id: user._id, "loginProfiles.email": email },
+					{
+						name: name,
+						status: "Active",
+						lastLoginAt: Date.now(),
+						lastLoginProvider: "agnost",
+						"loginProfiles.$.password": encryptedPassword,
+						"loginProfiles.$.emailVerified": true,
+					}
+				);
 
-        // Create new session
-        let tokens = await authCtrl.createSession(
-          updatedUser._id,
-          helper.getIP(req),
-          req.headers["user-agent"],
-          "agnost"
-        );
+				// Create new session
+				let tokens = await authCtrl.createSession(
+					updatedUser._id,
+					helper.getIP(req),
+					req.headers["user-agent"],
+					"agnost"
+				);
 
-        // Remove password field value from returned object
-        delete updatedUser.loginProfiles[0].password;
-        res.json({ ...updatedUser, ...tokens });
-      } else {
-        return res.status(401).json({
-          error: t("Invalid Credentials"),
-          details: t("The validation code provided is invalid or has expired."),
-          code: ERROR_CODES.invalidValidationCode,
-        });
-      }
-    } catch (error) {
-      handleError(req, res, error);
-    }
-  }
+				// Remove password field value from returned object
+				delete updatedUser.loginProfiles[0].password;
+				res.json({ ...updatedUser, ...tokens });
+			} else {
+				return res.status(401).json({
+					error: t("Invalid Credentials"),
+					details: t("The validation code provided is invalid or has expired."),
+					code: ERROR_CODES.invalidValidationCode,
+				});
+			}
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -662,99 +683,99 @@ router.post(
 @access     public
 */
 router.post(
-  "/complete-setup",
-  checkContentType,
-  hasClusterSetUpCompleted,
-  applyRules("complete-setup"),
-  validate,
-  async (req, res) => {
-    try {
-      const { email, password, name, token, inviteType } = req.body;
-      // Get user record
-      let user = await userCtrl.getOneByQuery({
-        "loginProfiles.provider": "agnost",
-        "loginProfiles.email": email,
-      });
+	"/complete-setup",
+	checkContentType,
+	hasClusterSetUpCompleted,
+	applyRules("complete-setup"),
+	validate,
+	async (req, res) => {
+		try {
+			const { email, password, name, token, inviteType } = req.body;
+			// Get user record
+			let user = await userCtrl.getOneByQuery({
+				"loginProfiles.provider": "agnost",
+				"loginProfiles.email": email,
+			});
 
-      if (!user) {
-        return res.status(404).json({
-          error: t("Not Found"),
-          code: ERROR_CODES.notFound,
-          details: t("No user account with provided email exists."),
-        });
-      }
+			if (!user) {
+				return res.status(404).json({
+					error: t("Not Found"),
+					code: ERROR_CODES.notFound,
+					details: t("No user account with provided email exists."),
+				});
+			}
 
-      if (user.status === "Active") {
-        return res.status(400).json({
-          error: t("Setup Completed"),
-          code: ERROR_CODES.setupCompleted,
-          details: t(
-            "User account setup has already been completed. Try signing in."
-          ),
-        });
-      }
+			if (user.status === "Active") {
+				return res.status(400).json({
+					error: t("Setup Completed"),
+					code: ERROR_CODES.setupCompleted,
+					details: t(
+						"User account setup has already been completed. Try signing in."
+					),
+				});
+			}
 
-      let invite = null;
-      if (inviteType === "org") {
-        invite = await orgInvitationCtrl.getOneByQuery({
-          token,
-          email,
-          status: "Accepted",
-        });
+			let invite = null;
+			if (inviteType === "org") {
+				invite = await orgInvitationCtrl.getOneByQuery({
+					token,
+					email,
+					status: "Accepted",
+				});
 
-        if (!invite) {
-          return res.status(404).json({
-            error: t("Not Found"),
-            details: t("No such invitation exists for the organization."),
-            code: ERROR_CODES.notFound,
-          });
-        }
-      } else {
-        invite = await appInvitationCtrl.getOneByQuery({
-          token,
-          email,
-          status: "Accepted",
-        });
+				if (!invite) {
+					return res.status(404).json({
+						error: t("Not Found"),
+						details: t("No such invitation exists for the organization."),
+						code: ERROR_CODES.notFound,
+					});
+				}
+			} else {
+				invite = await appInvitationCtrl.getOneByQuery({
+					token,
+					email,
+					status: "Accepted",
+				});
 
-        if (!invite) {
-          return res.status(404).json({
-            error: t("Not Found"),
-            details: t("No such invitation exists for the app."),
-            code: ERROR_CODES.notFound,
-          });
-        }
-      }
+				if (!invite) {
+					return res.status(404).json({
+						error: t("Not Found"),
+						details: t("No such invitation exists for the app."),
+						code: ERROR_CODES.notFound,
+					});
+				}
+			}
 
-      // Encrypt user password
-      const salt = await bcrypt.genSalt(10);
-      let encryptedPassword = await bcrypt.hash(password, salt);
-      let updatedUser = await userCtrl.updateOneByQuery(
-        { _id: user._id, "loginProfiles.email": email },
-        {
-          name: name,
-          status: "Active",
-          lastLoginAt: Date.now(),
-          lastLoginProvider: "agnost",
-          "loginProfiles.$.password": encryptedPassword,
-          "loginProfiles.$.emailVerified": true,
-        }
-      );
+			// Encrypt user password
+			const salt = await bcrypt.genSalt(10);
+			let encryptedPassword = await bcrypt.hash(password, salt);
+			let updatedUser = await userCtrl.updateOneByQuery(
+				{ _id: user._id, "loginProfiles.email": email },
+				{
+					name: name,
+					status: "Active",
+					lastLoginAt: Date.now(),
+					lastLoginProvider: "agnost",
+					"loginProfiles.$.password": encryptedPassword,
+					"loginProfiles.$.emailVerified": true,
+				}
+			);
 
-      // Create new session
-      let tokens = await authCtrl.createSession(
-        updatedUser._id,
-        helper.getIP(req),
-        req.headers["user-agent"],
-        "agnost"
-      );
+			// Create new session
+			let tokens = await authCtrl.createSession(
+				updatedUser._id,
+				helper.getIP(req),
+				req.headers["user-agent"],
+				"agnost"
+			);
 
-      // Remove password field value from returned object
-      delete updatedUser.loginProfiles[0].password;
-      res.json({ ...updatedUser, ...tokens });
-    } catch (error) {
-      handleError(req, res, error);
-    }
-  }
+			// Remove password field value from returned object
+			delete updatedUser.loginProfiles[0].password;
+			res.json({ ...updatedUser, ...tokens });
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
 );
 
 export default router;

@@ -344,10 +344,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					)
@@ -432,10 +436,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					)
@@ -536,10 +544,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					)
@@ -571,7 +583,7 @@ export const applyRules = (type) => {
 					})
 					.bail()
 					.custom((value, { req }) => {
-						let params = req.app.params ?? [];
+						let params = req.version.params ?? [];
 						params.forEach((param) => {
 							if (param.name.toLowerCase() === value.toLowerCase())
 								throw new AgnostError(
@@ -601,10 +613,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					)
@@ -636,7 +652,7 @@ export const applyRules = (type) => {
 					})
 					.bail()
 					.custom((value, { req }) => {
-						let params = req.app.params ?? [];
+						let params = req.version.params ?? [];
 						params.forEach((param) => {
 							if (
 								param.name.toLowerCase() === value.toLowerCase() &&
@@ -696,10 +712,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					),
@@ -817,10 +837,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					),
@@ -1076,7 +1100,7 @@ export const applyRules = (type) => {
 						}
 
 						let model = await modelCtrl.getOneByQuery(
-							{ dbId: req.body.databaseId, _id: value },
+							{ dbId: req.body.databaseId, _id: value, type: "model" },
 							{
 								cacheKey: value,
 							}
@@ -1085,7 +1109,7 @@ export const applyRules = (type) => {
 						if (!model) {
 							throw new AgnostError(
 								t(
-									"No such model with the provided id '%s' exists in database '%s'",
+									"No such top level model with the provided id '%s' exists in database '%s'",
 									value,
 									req.database.name
 								)

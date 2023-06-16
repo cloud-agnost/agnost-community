@@ -6,6 +6,7 @@ export const corePackages = [
 	"cookie-parser",
 	"config",
 	"cors",
+	"crypto-js",
 	"express",
 	"@google-cloud/storage",
 	"helmet",

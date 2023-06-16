@@ -23,6 +23,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	constructor(msgObj, envObj, i18n) {
 		super(msgObj, envObj);
 		this.expressApp = null;
+		this.httpServer = null;
 		this.i18n = i18n;
 	}
 
@@ -42,10 +43,43 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	}
 
 	/**
+	 * Sets the http server
+	 * @param  {Object} server The http server
+	 */
+	setHttpServer(server) {
+		this.httpServer = server;
+	}
+
+	/**
+	 * Returns the http server
+	 */
+	getHttpServer() {
+		return this.httpServer;
+	}
+
+	/**
+	 * Shuts down the http server
+	 */
+	async closeHttpServer() {
+		return new Promise((resolve, reject) => {
+			const server = this.getHttpServer();
+			if (server) {
+				try {
+					//Close Http server
+					server.close(() => {
+						logger.info("Http server closed");
+						resolve();
+					});
+				} catch (err) {}
+			} else resolve();
+		});
+	}
+
+	/**
 	 * Initializes the API server of the app version
 	 */
 	async initializeCore() {
-		logger.info(`Started initializing the API server`);
+		this.addLog(`Started initializing the API server`);
 		// First load the environment and vesion configuration file
 		const envObj = await this.loadEnvConfigFile();
 		// If we do  not have the envObj yet then just spin up the express server to serve system default endpoints
@@ -82,7 +116,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Set up the task listeners
 		await this.manageTasks();
 
-		logger.info(`Completed initializing the API server`);
+		this.addLog(`Completed initializing the API server`);
+		// Send the deployment telemetry information to the platform
+		await this.sendEnvironmentLogs("OK");
 	}
 
 	/**
@@ -94,7 +130,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		for (const variable of variables) {
 			process.env[variable.name] = variable.value;
-			logger.info(`Added environment variable '${variable.name}'`);
+			this.addLog(`Added environment variable '${variable.name}'`);
 		}
 	}
 
@@ -102,7 +138,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * Initializes the express server
 	 */
 	async initExpressServer() {
-		logger.info(`Initializing express server`);
+		this.addLog(`Initializing express server`);
 		// Create and set the express application
 		var app = express();
 		this.setExpressApp(app);
@@ -134,13 +170,14 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		const HOST = config.get("server.host");
 		const PORT = config.get("server.port");
 		var server = app.listen(PORT, () => {
-			logger.info(`Http server started @ ${HOST}:${PORT}`);
+			this.addLog(`Http server started @ ${HOST}:${PORT}`);
 			// We completed server initialization and can accept incoming requests
 			global.SERVER_STATUS = "running";
 		});
 
 		/* 	Particularly needed in case of bulk insert/update/delete operations, we should not generate 502 Bad Gateway errors at nginex ingress controller, the value specified in default config file is in milliseconds */
 		server.timeout = config.get("server.timeout");
+		this.setHttpServer(server);
 	}
 
 	/**
@@ -201,7 +238,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 			this.getExpressApp().use(touter);
 
-			logger.info(
+			this.addLog(
 				`Added endpoint '${endpoint.name}' ${endpoint.method}: ${endpoint.path}`
 			);
 		}
@@ -305,8 +342,14 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	async setupResourceConnections() {
 		const resources = this.getResources();
 		for (const resource of resources) {
+			resource.access = helper.decryptSensitiveData(resource.access);
+			if (resource.accessReadOnly)
+				resource.accessReadOnly = helper.decryptSensitiveData(
+					resource.accessReadOnly
+				);
+
 			await adapterManager.setupConnection(resource);
-			logger.info(
+			this.addLog(
 				`Initialized the adapter of '${resource.type}' resource '${resource.name}'`
 			);
 		}
@@ -329,7 +372,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 			if (connection) {
 				await connection.ensureStorage(`${mapping.design.iid}`);
-				logger.info(`Initialized storage '${mapping.design.name}'`);
+				this.addLog(`Initialized storage '${mapping.design.name}'`);
 			}
 		}
 	}
@@ -348,7 +391,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			const adapterObj = adapterManager.getQueueAdapter(queue.name);
 			if (adapterObj) {
 				adapterObj.listenMessages(queue.iid);
-				logger.info(`Initialized handler of queue '${queue.name}'`);
+				this.addLog(`Initialized handler of queue '${queue.name}'`);
 			}
 		}
 	}
@@ -367,7 +410,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			const adapterObj = adapterManager.getTaskAdapter(queue.name);
 			if (adapterObj) {
 				adapterObj.listenMessages(task.iid);
-				logger.info(`Initialized handler of task '${task.name}'`);
+				this.addLog(`Initialized handler of task '${task.name}'`);
 			}
 		}
 	}

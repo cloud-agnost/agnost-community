@@ -124,7 +124,6 @@ export const ResourceModel = mongoose.model(
 export const applyRules = (type) => {
 	switch (type) {
 		case "test":
-		case "update-access":
 			return [
 				body("type")
 					.trim()
@@ -172,6 +171,64 @@ export const applyRules = (type) => {
 				...accessQueueRules,
 				...accessStorageRules,
 			];
+		case "update-access":
+			return [
+				body("type")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(addResourceTypes)
+					.withMessage(t("Unsupported resource type")),
+				body("instance")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom((value, { req }) => {
+						let instanceList = addInstanceTypes[req.body.type];
+						if (!instanceList)
+							throw new AgnostError(
+								t(
+									"Cannot identify the instance types for the provided resource type"
+								)
+							);
+
+						if (!instanceList.includes(value))
+							throw new AgnostError(
+								t(
+									"Not a valid instance type for respource type '%s'",
+									req.body.type
+								)
+							);
+
+						return true;
+					}),
+				body("access")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom((value, { req }) => {
+						if (typeof value !== "object" || Array.isArray(value))
+							throw new AgnostError(t("Not a valid resource access setting"));
+
+						return true;
+					}),
+				body("accessReadOnly")
+					.optional()
+					.custom((value, { req }) => {
+						if (!Array.isArray(value))
+							throw new AgnostError(
+								t("Not a valid resource read-only access setting")
+							);
+
+						return true;
+					}),
+				...accessDatabaseRules,
+				...accessCacheRules,
+				...accessQueueRules,
+				...accessStorageRules,
+			];
 		case "add":
 			return [
 				body("appId")
@@ -206,10 +263,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					),
@@ -296,10 +357,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					),
@@ -483,10 +548,14 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isLength({ max: config.get("general.maxTextLength") })
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
 					.withMessage(
 						t(
-							"Name must be at most %s characters long",
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
 					),

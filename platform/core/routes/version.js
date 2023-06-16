@@ -1710,13 +1710,7 @@ router.post(
 			res.json(updatedModel);
 
 			// Deploy database updates to environments if auto-deployment is enabled
-			await deployCtrl.updateDatabase(
-				app,
-				version,
-				user,
-				database,
-				"add-missing-userdata-fields"
-			);
+			await deployCtrl.updateDatabase(app, version, user, database, "update");
 
 			// Log action
 			auditCtrl.logAndNotify(

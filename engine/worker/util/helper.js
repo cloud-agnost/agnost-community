@@ -1,3 +1,5 @@
+import cyripto from "crypto-js";
+import { customAlphabet } from "nanoid";
 import axios from "axios";
 import mongo from "mongodb";
 import querystring from "querystring";
@@ -11,6 +13,18 @@ const constants = {
 	"6months": 15552000, // in seconds (180 days)
 	"1year": 31536000, // in seconds (365 days)
 };
+
+/**
+ * Generates a hihg probability unique slugs
+ * @param  {string} prefix The prefix prepended to the slug
+ * @param  {string} prefix The length of the slug excluding the prefix
+ */
+function generateSlug(length = 5) {
+	// Kubernetes resource names need to be alphanumeric and in lowercase letters
+	const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
+	const nanoid = customAlphabet(alphabet, length);
+	return nanoid();
+}
 
 /**
  * Returns a random integer between min and max
@@ -132,8 +146,52 @@ function getAsObject(keyValuePairs) {
 	return obj;
 }
 
+/**
+ * Decrypts the encrypted text and returns the decrypted string value
+ * @param  {string} ciphertext The encrypted input text
+ */
+function decryptText(cipherText) {
+	const bytes = cyripto.AES.decrypt(cipherText, process.env.PASSPHRASE);
+	return bytes.toString(cyripto.enc.Utf8);
+}
+
+/**
+ * Decrypt resource access settings
+ * @param  {Object} access The encrypted access settings needed to connect to the resource
+ */
+function decryptSensitiveData(access) {
+	if (Array.isArray(access)) {
+		let list = [];
+		access.forEach((entry) => {
+			list.push(decryptSensitiveData(entry));
+		});
+
+		return list;
+	}
+
+	let decrypted = {};
+	for (const key in access) {
+		const value = access[key];
+		if (Array.isArray(value)) {
+			decrypted[key] = value.map((entry) => {
+				if (entry && typeof entry === "object")
+					return decryptSensitiveData(entry);
+				if (entry && typeof entry === "string") return decryptText(entry);
+				else return entry;
+			});
+		} else if (typeof value === "object" && value !== null) {
+			decrypted[key] = decryptSensitiveData(value);
+		} else if (value && typeof value === "string")
+			decrypted[key] = decryptText(value);
+		else decrypted[key] = value;
+	}
+
+	return decrypted;
+}
+
 export default {
 	constants,
+	generateSlug,
 	randomInt,
 	getIP,
 	handleError,
@@ -141,4 +199,5 @@ export default {
 	objectId,
 	getQueryString,
 	getAsObject,
+	decryptSensitiveData,
 };

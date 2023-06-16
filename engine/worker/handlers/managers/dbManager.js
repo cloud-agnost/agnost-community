@@ -50,7 +50,7 @@ export class DBManager {
 	 * Returns the database resource access settings
 	 */
 	getResourceAccessSettings() {
-		return this.dbConfig.resource.access;
+		return helper.decryptSensitiveData(this.dbConfig.resource.access);
 	}
 
 	/**

@@ -20,24 +20,41 @@ class ConnectionManager {
 		} else return await this.setUpConnection(id, type, connSettings, false);
 	}
 
-	async getReadOnlyConn(id, type, connSettings) {
-		let conn = this.getConnection(`${id}.ro`);
-
-		if (conn) {
-			return conn;
-		} else return await this.setUpConnection(id, type, connSettings, true);
-	}
-
 	getConnection(id) {
 		return this.connections.get(id);
 	}
 
-	addConnection(id, conn, readOnly = false) {
-		if (readOnly) this.connections.set(`${id}.ro`, conn);
-		else this.connections.set(id, conn);
+	addConnection(id, conn) {
+		this.connections.set(id, conn);
 	}
 
-	async setUpConnection(id, type, connSettings, readOnly = false) {
+	async removeConnection(id, type) {
+		let conn = this.getConnection(id);
+		if (conn) {
+			try {
+				switch (type) {
+					case DATABASE.PostgreSQL:
+						await conn.end();
+						break;
+					case DATABASE.MySQL:
+						await conn.end();
+						break;
+					case DATABASE.SQLServer:
+						await conn.close();
+						break;
+					case DATABASE.MongoDB:
+						await conn.close();
+						break;
+					default:
+						break;
+				}
+			} catch (err) {}
+		}
+
+		this.connections.delete(id);
+	}
+
+	async setUpConnection(id, type, connSettings) {
 		switch (type) {
 			case DATABASE.PostgreSQL:
 				try {
@@ -52,7 +69,7 @@ class ConnectionManager {
 					});
 
 					await client.connect();
-					this.addConnection(id, client, readOnly);
+					this.addConnection(id, client);
 
 					return client;
 				} catch (err) {
@@ -73,7 +90,7 @@ class ConnectionManager {
 						multipleStatements: true,
 					});
 
-					this.addConnection(id, connection, readOnly);
+					this.addConnection(id, connection);
 
 					return connection;
 				} catch (err) {
@@ -95,7 +112,7 @@ class ConnectionManager {
 							max: config.get("general.maxPoolSize"),
 						},
 					});
-					this.addConnection(id, connection, readOnly);
+					this.addConnection(id, connection);
 
 					return connection;
 				} catch (err) {
@@ -118,36 +135,36 @@ class ConnectionManager {
 					connSettings.connOptions = helper.getQueryString(
 						connSettings.options
 					);
+
 					if (connSettings.connFormat === "mongodb") {
-						client = new mongo.MongoClient(
-							connSettings.connOptions
-								? `mongodb://${connSettings.host}:${connSettings.port}?${connSettings.connOptions}`
-								: `mongodb://${connSettings.host}:${connSettings.port}`,
-							{
-								auth: {
-									username: connSettings.username,
-									password: connSettings.password,
-								},
-								maxPoolSize: config.get("general.maxPoolSize"),
-							}
-						);
+						let uri = `mongodb://${connSettings.host}:${connSettings.port}`;
+						if (connSettings.dbName) uri = `${uri}/${connSettings.dbName}`;
+						if (connSettings.connOptions)
+							uri = `${uri}?${connSettings.connOptions}`;
+
+						client = new mongo.MongoClient(uri, {
+							auth: {
+								username: connSettings.username,
+								password: connSettings.password,
+							},
+						});
 					} else {
-						client = new mongo.MongoClient(
-							connSettings.connOptions
-								? `mongodb+srv://${connSettings.host}?${connSettings.connOptions}`
-								: `mongodb+srv://${connSettings.host}`,
-							{
-								auth: {
-									username: connSettings.username,
-									password: connSettings.password,
-								},
-								maxPoolSize: config.get("general.maxPoolSize"),
-							}
-						);
+						let uri = `mongodb+srv://${connSettings.host}`;
+						if (connSettings.dbName) uri = `${uri}/${connSettings.dbName}`;
+						if (connSettings.connOptions)
+							uri = `${uri}?${connSettings.connOptions}`;
+
+						client = new mongo.MongoClient(uri, {
+							auth: {
+								username: connSettings.username,
+								password: connSettings.password,
+							},
+						});
 					}
+
 					//Connect to the database of the application
 					await client.connect();
-					this.addConnection(id, client, readOnly);
+					this.addConnection(id, client);
 
 					return client;
 				} catch (err) {

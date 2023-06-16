@@ -400,7 +400,7 @@ router.post(
 				dataSet.dbStatus = status;
 			} else if (type === "server") {
 				dataSet.serverStatus = env.serverStatus.filter(
-					(entry) => entry.pod !== "all"
+					(entry) => entry.pod !== "all" && entry.pod !== pod
 				);
 				dataSet.serverStatus.push({ pod, status });
 			} else {

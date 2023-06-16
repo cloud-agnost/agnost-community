@@ -21,21 +21,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 var processing = false;
 
-logger.info(`Process ${process.pid} is running`);
-// Init globally accessible variables
-initGlobals();
-// Set up locatlization
-const i18n = initLocalization();
-// Connect to the database
-connectToDatabase();
-// Connect to cache server(s)
-connectToRedisCache();
-// Spin up http server
-const server = initExpress(i18n);
-//Launch scheduler
-initResourceMonitorScheduler();
-// Gracefull handle process exist
-handleProcessExit(server);
+(function () {
+	logger.info(`Process ${process.pid} is running`);
+	// Init globally accessible variables
+	initGlobals();
+	// Set up locatlization
+	const i18n = initLocalization();
+	// Connect to the database
+	connectToDatabase();
+	// Connect to cache server(s)
+	connectToRedisCache();
+	// Spin up http server
+	const server = initExpress(i18n);
+	//Launch scheduler
+	initResourceMonitorScheduler();
+	// Gracefull handle process exist
+	handleProcessExit(server);
+})();
 
 function initGlobals() {
 	// Add logger to the global object

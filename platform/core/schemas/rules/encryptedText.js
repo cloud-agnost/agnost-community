@@ -14,8 +14,7 @@ export const encryptedTextRules = (type) => {
 							return true;
 						else return false;
 					})
-					.not()
-					.isEmpty()
+					.notEmpty()
 					.withMessage(
 						t(
 							"Encrypted text properties need to be provided, cannot be left empty"
