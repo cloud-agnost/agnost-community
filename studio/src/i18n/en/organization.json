@@ -5,7 +5,7 @@
 	"select": "Select Your Organization",
 	"empty": "No organizations found.",
 	"leave": "Leave Organization",
-	"leave.desc": "You are about the leave the app team. After leaving the team you will not be able to access it again. Are you sure you would like to leave the {{name}} team",
+	"leaveDesc": "You are about the leave the app team. After leaving the team you will not be able to access it again. Are you sure you would like to leave the {{name}} team",
 	"leave.success": "You have successfully left the {{name}} team.",
-	"leave.success.desc": "You will no longer have access to the {{name}} team."
+	"leave.successDesc": "You will no longer have access to the {{name}} team."
 }
