@@ -13,6 +13,7 @@ const avatarVariants = cva('avatar', {
 			md: 'avatar-md',
 			lg: 'avatar-lg',
 			xl: 'avatar-xl',
+			'2xl': 'avatar-2xl',
 		},
 		defaultVariants: {
 			size: 'md',
@@ -23,7 +24,7 @@ const avatarVariants = cva('avatar', {
 export interface AvatarProps
 	extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>,
 		VariantProps<typeof avatarVariants> {
-	size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+	size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 }
 
 export interface AvatarImageProps

@@ -7,7 +7,7 @@ import { Button } from '../Button';
 import './copyInput.scss';
 
 const CopyInput = React.forwardRef<HTMLInputElement, React.ComponentPropsWithoutRef<'input'>>(
-	({ className, value, placeholder, ...props }, ref) => {
+	({ className, value, readOnly, placeholder, ...props }, ref) => {
 		const [inputValue, setInputValue] = useState<string>(value as string);
 
 		return (
@@ -15,6 +15,7 @@ const CopyInput = React.forwardRef<HTMLInputElement, React.ComponentPropsWithout
 				<Input
 					ref={ref}
 					value={inputValue}
+					readOnly={readOnly}
 					onChange={(e) => setInputValue(e.target.value)}
 					placeholder={placeholder}
 					className='copy-input'

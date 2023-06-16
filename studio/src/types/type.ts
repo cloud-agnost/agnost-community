@@ -11,6 +11,7 @@ export const UserSchema = z.object({
 	color: z.string(),
 	contactEmail: z.string(),
 	'2fa': z.boolean(),
+	pictureUrl: z.string().nullish(),
 	canCreateOrg: z.boolean(),
 	isClusterOwner: z.boolean(),
 	loginProfiles: z.array(

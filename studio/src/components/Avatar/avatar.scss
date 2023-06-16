@@ -25,6 +25,9 @@
 		@apply w-16 h-16 text-2xl;
 	}
 	&-xl {
+		@apply w-20 h-20 text-3xl;
+	}
+	&-2xl {
 		@apply w-32 h-32 text-6xl;
 	}
 }

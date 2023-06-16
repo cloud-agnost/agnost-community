@@ -4,9 +4,16 @@
 		"error": "{{label}} must be at least 2 characters long",
 		"description": "Minimum 2 characters"
 	},
+	"min8": {
+		"error": "{{label}} must be at least 8 characters long",
+		"description": "Minimum 8 characters"
+	},
 	"max64": {
 		"error": "{{label}} must be at most 64 characters long",
 		"description": "Maximum 64 characters"
+	},
+	"email": {
+		"error": "Please enter a valid email address"
 	},
 	"placeholder": "Enter {{label}}",
 	"alphanumeric": "{{label}} must only contain alphanumeric characters"
