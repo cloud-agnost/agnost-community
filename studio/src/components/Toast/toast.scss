@@ -1,0 +1,24 @@
+.toast {
+	@apply bg-base-reverse h-full w-full;
+	@apply flex justify-center items-center gap-3;
+	&-content {
+		@apply flex-1 font-sfCompact;
+	}
+	&-icon {
+		@apply h-8 w-8 rounded-full flex justify-center items-center;
+		@apply text-icon-secondary;
+	}
+	&-success {
+		@apply bg-elements-strong-green;
+	}
+	&-error {
+		@apply bg-elements-red;
+	}
+	&-title {
+		@apply text-default-reverse text-sm;
+	}
+
+	&-description {
+		@apply text-subtle-reverse text-xs;
+	}
+}
