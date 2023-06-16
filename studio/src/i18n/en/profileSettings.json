@@ -43,8 +43,16 @@
 	"password_dont_match": "Passwords don't match",
 	"success": "Success",
 	"name_updated_description": "Your name has been updated successfully",
-	"email_updated_description": "Your email has been updated successfully",
+	"email_updated_description": "We have sent you an email to confirm your new email address",
 	"password_updated": "Password updated successfully",
 	"avatar_updated": "Avatar updated successfully",
-	"delete_account_success": "Account deleted successfully"
+	"delete_account_success": "Account deleted successfully",
+	"password_reset_email_sent": "Password reset email sent successfully, please check your inbox",
+	"email_sent": "Email Sent",
+	"email_sent_description": "An email has been sent to {{email}} with instructions to reset your password",
+	"OK": "OK",
+	"delete_my_account": "Delete My Account",
+	"delete_confirm_description": "Confirm account delete by typing <confirmCode>{{confirmCode}}</confirmCode> below.",
+	"delete_account_alert_title": "Are you sure to delete your account?",
+	"delete_account_alert_description": "All owned organizations, their apps, managed resources and associated data will be deleted. This action is not reversible - please continue with caution."
 }

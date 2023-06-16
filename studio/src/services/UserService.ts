@@ -50,4 +50,13 @@ export default class UserService {
 	static async removeAvatar(): Promise<User> {
 		return (await axios.delete(`${this.url}/picture`)).data;
 	}
+
+	static async changePassword(currentPassword: string, newPassword: string) {
+		return (await axios.put(`${this.url}/password`, { password: currentPassword, newPassword }))
+			.data;
+	}
+
+	static async deleteAccount() {
+		return (await axios.delete(`${this.url}`)).data;
+	}
 }

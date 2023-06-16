@@ -39,6 +39,8 @@ interface AuthStore {
 	changeEmail: (email: string, password: string) => Promise<string>;
 	changeAvatar: (avatar: File) => Promise<string>;
 	removeAvatar: () => Promise<void>;
+	changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+	deleteAccount: () => Promise<void>;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -180,6 +182,12 @@ const useAuthStore = create<AuthStore>()(
 						set({ error: err as APIError });
 						throw err;
 					}
+				},
+				async changePassword(currentPassword: string, newPassword: string) {
+					return UserService.changePassword(currentPassword, newPassword);
+				},
+				async deleteAccount() {
+					return UserService.deleteAccount();
 				},
 			}),
 			{

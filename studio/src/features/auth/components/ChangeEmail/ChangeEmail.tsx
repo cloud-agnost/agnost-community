@@ -60,7 +60,7 @@ export default function ChangeEmail() {
 			setSuccess(false);
 			await changeEmail(data.email, data.password);
 			setSuccess(true);
-			// setIsChangeMode(false);
+			close();
 			setTimeout(() => setSuccess(false), 5000);
 		} catch (e) {
 			setError(e as APIError);
@@ -69,11 +69,11 @@ export default function ChangeEmail() {
 		}
 	}
 
-	function openModal() {
+	function open() {
 		setIsChangeMode(true);
 	}
 
-	function closeModal() {
+	function close() {
 		setIsChangeMode(false);
 	}
 
@@ -130,7 +130,7 @@ export default function ChangeEmail() {
 							)}
 						/>
 						<div className='mt-4 flex gap-4 justify-end'>
-							<Button onClick={closeModal} variant='text' size='lg'>
+							<Button onClick={close} variant='text' size='lg'>
 								{t('profileSettings.cancel')}
 							</Button>
 							<Button loading={loading} size='lg'>
@@ -142,7 +142,7 @@ export default function ChangeEmail() {
 			) : (
 				<div className='space-y-4'>
 					<Input readOnly value={user?.contactEmail} />
-					<Button onClick={openModal} size='lg'>
+					<Button onClick={open} size='lg'>
 						{t('profileSettings.change_email')}
 					</Button>
 				</div>

@@ -1,4 +1,6 @@
 {
 	"cancel": "Cancel",
-	"ok": "OK"
+	"ok": "OK",
+	"delete": "Delete",
+	"enter_confirmation_code_here": "Enter confirmation code here"
 }

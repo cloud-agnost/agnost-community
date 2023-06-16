@@ -51,8 +51,8 @@ export default function Modal({
 							<X size={24} className='text-icon-base' />
 						</Button>
 
-						<div className='space-y-6'>
-							<h5 className='text-xl text-default'>{title}</h5>
+						<div className='space-y-4'>
+							{title && <h5 className='modal-title'>{title}</h5>}
 							{children}
 						</div>
 					</motion.div>
