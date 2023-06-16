@@ -19,8 +19,12 @@
 	&-link {
 		@apply text-button-primary hover:underline hover:text-button-primary-hover focus-visible:ring-button-secondary;
 	}
-	&-icon {
+	&-blank {
 		@apply text-default;
+	}
+	&-outline {
+		@apply border border-button-border hover:border-button-border-hover;
+		@apply text-default focus-visible:ring-button-secondary;
 	}
 	&-md {
 		@apply py-2 px-4;
@@ -36,6 +40,9 @@
 	}
 	&-loading {
 		@apply cursor-wait pointer-events-none;
+	}
+	&-rounded {
+		@apply rounded-full;
 	}
 }
 
