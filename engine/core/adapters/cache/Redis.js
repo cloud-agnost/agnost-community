@@ -5,6 +5,7 @@ import { CacheBase } from "./CacheBase.js";
  */
 export class Redis extends CacheBase {
 	constructor(driver) {
+		super();
 		this.driver = driver;
 	}
 

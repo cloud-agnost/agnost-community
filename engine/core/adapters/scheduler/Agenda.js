@@ -5,6 +5,7 @@ import { SchedulerBase } from "./SchedulerBase.js";
  */
 export class Agenda extends SchedulerBase {
 	constructor(driver) {
+		super();
 		this.driver = driver;
 	}
 

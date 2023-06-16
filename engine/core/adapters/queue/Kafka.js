@@ -5,6 +5,7 @@ import { QueueBase } from "./QueueBase.js";
  */
 export class Kafka extends QueueBase {
 	constructor(driver) {
+		super();
 		this.driver = driver;
 	}
 

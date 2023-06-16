@@ -1,16 +1,15 @@
 # Get the base node image from docker hub
-FROM node:18-alpine
+FROM node:18.16.0-alpine3.18
 # Set the working directory in our docker image, anything that is copied from now on
 # from local machine to the image will be moved under '/app' directory in docker image
 WORKDIR '/app'
 # Copy package.json file from local machine to the image under '/app' directory
 COPY ./package.json ./
+# Set the node environment variable
+ENV NODE_ENV production
 # Run npm install to install dependent modules
-RUN npm install -g pm2
-# Run npm install to install dependent modules
-RUN npm install
+RUN npm install --omit=dev
 # Copy everhting to the image under '/app' directory
 COPY ./ ./
-ENV NODE_ENV=production
-# This will be the start up command of the docker container
-CMD ["pm2-runtime", "start", "npm", "--", "run", "prod", "--watch"]
+# This will be the start up command of the docker container, run the development react server
+CMD ["node", "server"]

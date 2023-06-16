@@ -31,7 +31,7 @@ class ResourceController extends BaseController {
 	 */
 	async createClusterStorage(session, user, org) {
 		const resourceId = helper.generateId();
-		const resourceIid = helper.generateSlug("str");
+		const resourceIid = helper.generateSlug("res");
 		const resource = await this.create(
 			{
 				_id: resourceId,
@@ -79,7 +79,7 @@ class ResourceController extends BaseController {
 			{
 				_id: resourceId,
 				orgId: org._id,
-				iid: helper.generateSlug("mbr"),
+				iid: helper.generateSlug("res"),
 				name: t("Default Message Broker"),
 				type: "queue",
 				instance: "RabbitMQ",
@@ -127,7 +127,7 @@ class ResourceController extends BaseController {
 			{
 				_id: resourceId,
 				orgId: org._id,
-				iid: helper.generateSlug("sch"),
+				iid: helper.generateSlug("res"),
 				name: t("Default Scheduler"),
 				type: "scheduler",
 				instance: "Default Scheduler",
@@ -170,7 +170,7 @@ class ResourceController extends BaseController {
 			{
 				_id: resourceId,
 				orgId: org._id,
-				iid: helper.generateSlug("rlt"),
+				iid: helper.generateSlug("res"),
 				name: t("Default Realtime Server"),
 				type: "realtime",
 				instance: "Default Realtime",

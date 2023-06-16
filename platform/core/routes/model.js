@@ -229,7 +229,7 @@ router.delete(
 				.concat(dependentModels.map((entry) => entry._id));
 
 			await modelCtrl.deleteManyByQuery(
-				{ _id: { $in: ids } },
+				{ _id: { $in: ids }, versionId: version._id },
 				{
 					cacheKey: ids,
 					session,
@@ -340,7 +340,7 @@ router.delete(
 			// Delete the top level model and its dependent models
 			let ids = dependentModels.map((entry) => entry._id).concat([model._id]);
 			await modelCtrl.deleteManyByQuery(
-				{ _id: { $in: ids } },
+				{ _id: { $in: ids }, versionId: version._id },
 				{
 					cacheKey: ids,
 					session,
@@ -952,7 +952,7 @@ router.delete(
 
 				let impactedModelIds = impactedModels.map((entry) => entry._id);
 				await modelCtrl.deleteManyByQuery(
-					{ _id: { $in: impactedModelIds } },
+					{ _id: { $in: impactedModelIds }, versionId: version._id },
 					{
 						session,
 						cacheKey: impactedModelIds,

@@ -5,6 +5,7 @@ import { RealtimeBase } from "./RealtimeBase.js";
  */
 export class Socketio extends RealtimeBase {
 	constructor(driver) {
+		super();
 		this.driver = driver;
 	}
 
