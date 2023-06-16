@@ -1,4 +1,5 @@
 import { APIError } from '@/types';
+import { BaseRequest } from './type';
 
 export interface Organization {
 	_id: string;
@@ -14,8 +15,9 @@ export interface Organization {
 	__v: number;
 	role: 'Admin' | 'Member' | 'Resource Manager' | 'Viewer';
 }
-export interface CreateOrganizationRequest {
+export interface CreateOrganizationRequest extends BaseRequest {
 	name: string;
-	onSuccess: () => void;
-	onError: (err: APIError) => void;
+}
+export interface LeaveOrganizationRequest extends BaseRequest {
+	organizationId: string;
 }
