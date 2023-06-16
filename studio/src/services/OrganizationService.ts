@@ -11,4 +11,14 @@ export default class OrganizationService {
 	static async createOrganization(name: string): Promise<Organization> {
 		return (await axios.post(`${this.url}`, { name })).data;
 	}
+
+	static async leaveOrganization(organizationId: string): Promise<void> {
+		return (
+			await axios.delete(`${this.url}/${organizationId}/member`, {
+				data: {
+					organizationId,
+				},
+			})
+		).data;
+	}
 }

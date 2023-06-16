@@ -20,4 +20,7 @@
 	&-role {
 		@apply text-default text-sm  font-semibold;
 	}
+	&-button {
+		@apply h-[13rem];
+	}
 }

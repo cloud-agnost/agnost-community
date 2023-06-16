@@ -10,13 +10,50 @@
 		@apply text-default text-xl font-semibold;
 	}
 }
-
-.organization-form {
-	@apply py-4;
-	&-item {
-		@apply space-y-1;
+.organization {
+	&-form {
+		@apply py-4;
+		&-item {
+			@apply space-y-1;
+		}
+		&-buttons {
+			@apply flex justify-end gap-4 mt-2;
+		}
 	}
-	&-buttons {
-		@apply flex justify-end gap-4 mt-2;
+	&-label {
+		@apply flex items-center;
+	}
+	&-dropdown {
+		@apply w-[200px] h-12 p-1 flex justify-between items-center border border-border rounded-sm;
+		&-icon {
+			@apply rounded-full bg-lighter p-1.5 hover:bg-wrapper-background-light;
+		}
+		&-container {
+			@apply max-h-[300px] overflow-y-auto;
+		}
+		&-options {
+			@apply space-y-2;
+		}
+		&-option {
+			@apply cursor-pointer hover:bg-wrapper-background-hover;
+		}
+		&-footer {
+			@apply m-auto;
+		}
+		&-leave {
+			@apply justify-center;
+		}
+		&-label {
+			@apply text-left flex-1 font-sfCompact;
+		}
+		&-name {
+			@apply text-sm text-default whitespace-nowrap truncate max-w-[15ch];
+		}
+		&-desc {
+			@apply text-xs text-subtle;
+		}
+		&-content {
+			@apply w-[200px] p-0;
+		}
 	}
 }

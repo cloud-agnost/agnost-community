@@ -2,5 +2,14 @@
 	"create": "Create Organization",
 	"create-new": "Create New Organization",
 	"name": "Organization Name",
-	"select": "Select Your Organization"
+	"select": "Select Your Organization",
+	"empty": "No organizations found.",
+	"leave": {
+		"description": "You are about the leave the organization. After leaving the organization you will not be able to access it again. Are you sure you would like to leave the {{name}} organization",
+		"main": "Leave Organization",
+		"success": {
+			"title": "You have successfully left the {{name}} organization.",
+			"description": "You will no longer have access to the {{name}} organization."
+		}
+	}
 }
