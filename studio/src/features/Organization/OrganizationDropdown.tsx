@@ -9,7 +9,6 @@ import {
 	CommandSeparator,
 } from '@/components/Command';
 import { InfoModal } from '@/components/InfoModal';
-import { Modal } from '@/components/Modal';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
 import { useToast } from '@/hooks';
 import useOrganizationStore from '@/store/organization/organizationStore';
@@ -19,6 +18,7 @@ import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
+Ø;
 export function OrganizationDropdown() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
@@ -36,10 +36,10 @@ export function OrganizationDropdown() {
 			organizationId: organization?._id as string,
 			onSuccess: () => {
 				notify({
-					title: t('organization.leave.success', {
+					title: t('organization.leave.success.title', {
 						name: organization?.name,
 					}),
-					description: t('organization.leave.successDesc', {
+					description: t('organization.leave.success.description', {
 						name: organization?.name,
 					}),
 					type: 'success',
@@ -114,7 +114,7 @@ export function OrganizationDropdown() {
 										setOpen(false);
 									}}
 								>
-									{t('organization.leave')}
+									{t('organization.leave.main')}
 								</Button>
 							</CommandItem>
 							<CommandItem>
@@ -151,8 +151,8 @@ export function OrganizationDropdown() {
 						</Button>
 					</div>
 				}
-				title={t('organization.leave')}
-				description={t('organization.leaveDesc', {
+				title={t('organization.leave.main')}
+				description={t('organization.leave.description', {
 					name: organization?.name,
 				})}
 			/>
