@@ -1,22 +1,31 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
+import { Button } from '@/components/Button';
 import { Slider } from '@/components/Slider';
 import { OrganizationCreateButton, OrganizationCreateModal } from '@/features/Organization';
-import useOrganizationStore from '@/store/organization/organizationStore';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import useAuthStore from '@/store/auth/authStore';
-import './organization.scss';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { Organization } from '@/types';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import './organization.scss';
 
 async function loader() {
 	return useOrganizationStore.getState().getAllOrganizationByUser();
 }
 
-export default function SelectOrganization() {
-	const { organizations } = useOrganizationStore();
+export default function OrganizationSelect() {
+	const { organizations, selectOrganization } = useOrganizationStore();
 	const [isOpen, setIsOpen] = useState(false);
 	const { user } = useAuthStore();
+	const navigate = useNavigate();
 	const { t } = useTranslation();
+
+	function handleClickOrganization(org: Organization) {
+		selectOrganization(org);
+		navigate(`/organization/${org?._id}`);
+	}
+
 	return (
 		<div>
 			{organizations.length > 0 && (
@@ -32,7 +41,12 @@ export default function SelectOrganization() {
 								items={organizations.map((organization) => {
 									return {
 										element: (
-											<Link to={`/organization/${organization?._id}`} key={organization?._id}>
+											<Button
+												variant='blank'
+												onClick={() => handleClickOrganization(organization)}
+												key={organization?._id}
+												className='select-organization-button'
+											>
 												<div className='select-organization-item'>
 													<Avatar size='xl'>
 														<AvatarImage src={organization.pictureUrl} alt={organization.name} />
@@ -43,7 +57,7 @@ export default function SelectOrganization() {
 														<p className='select-organization-role'>{organization?.role}</p>
 													</div>
 												</div>
-											</Link>
+											</Button>
 										),
 									};
 								})}
@@ -60,4 +74,4 @@ export default function SelectOrganization() {
 	);
 }
 
-SelectOrganization.loader = loader;
+OrganizationSelect.loader = loader;
