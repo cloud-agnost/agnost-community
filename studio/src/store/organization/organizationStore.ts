@@ -1,5 +1,11 @@
+import { organization } from '@/i18n/en';
 import OrganizationService from '@/services/OrganizationService';
-import { APIError, CreateOrganizationRequest, Organization } from '@/types';
+import {
+	APIError,
+	CreateOrganizationRequest,
+	Organization,
+	LeaveOrganizationRequest,
+} from '@/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -9,6 +15,8 @@ interface OrganizationStore {
 	organizations: Organization[];
 	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
 	createOrganization: (req: CreateOrganizationRequest) => Promise<Organization | APIError>;
+	selectOrganization: (organization: Organization) => void;
+	leaveOrganization: (req: LeaveOrganizationRequest) => Promise<void>;
 }
 
 const useOrganizationStore = create<OrganizationStore>()(
@@ -42,6 +50,27 @@ const useOrganizationStore = create<OrganizationStore>()(
 						});
 						onSuccess();
 						return res;
+					} catch (error) {
+						onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				selectOrganization: (organization: Organization) => {
+					set({ organization });
+				},
+				leaveOrganization: async ({
+					organizationId,
+					onSuccess,
+					onError,
+				}: LeaveOrganizationRequest) => {
+					try {
+						await OrganizationService.leaveOrganization(organizationId);
+						set({
+							organizations: get().organizations.filter(
+								(organization) => organization._id !== organizationId,
+							),
+						});
+						onSuccess();
 					} catch (error) {
 						onError(error as APIError);
 						throw error as APIError;
