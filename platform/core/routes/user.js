@@ -296,9 +296,9 @@ router.put(
 				userObj
 			);
 
-			auditCtrl.updateActorPicture(userObj._id, pictureUrl);
-			orgInvitationCtrl.updateHostPicture(userObj._id, pictureUrl);
-			appInvitationCtrl.updateHostPicture(userObj._id, pictureUrl);
+			auditCtrl.updateActorPicture(userObj._id, filePath);
+			orgInvitationCtrl.updateHostPicture(userObj._id, filePath);
+			appInvitationCtrl.updateHostPicture(userObj._id, filePath);
 		} catch (error) {
 			handleError(req, res, error);
 		}

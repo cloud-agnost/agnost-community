@@ -80,16 +80,37 @@ router.post(
 				{ session }
 			);
 
-			// Save initial cluster config to the database
-			await clsCtrl.create(
-				{
-					clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
-					masterToken: process.env.MASTER_TOKEN,
-					accessToken: process.env.ACCESS_TOKEN,
-					createdBy: userId,
-				},
-				{ session }
-			);
+			// Get cluster configuration
+			const cluster = await clsCtrl.getOneByQuery({
+				clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+			});
+
+			// If there is no cluster configuration then create a new one
+			if (!cluster) {
+				// Save initial cluster config to the database
+				await clsCtrl.create(
+					{
+						clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+						masterToken: process.env.MASTER_TOKEN,
+						accessToken: process.env.ACCESS_TOKEN,
+						createdBy: userId,
+					},
+					{ session }
+				);
+			} else {
+				// Update existing configuration
+				await clsCtrl.updateOneById(
+					cluster._id,
+					{
+						clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+						masterToken: process.env.MASTER_TOKEN,
+						accessToken: process.env.ACCESS_TOKEN,
+						createdBy: userId,
+					},
+					{},
+					{ session }
+				);
+			}
 
 			// Create new session
 			let tokens = await authCtrl.createSession(
