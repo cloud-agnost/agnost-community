@@ -6,6 +6,7 @@ import { Bell, Cloud } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
 import './header.scss';
 import { MENU_ITEMS } from '@/constants';
+import { OrganizationDropdown } from '@/features/Organization/OrganizationDropdown';
 export function Header() {
 	const { user } = useAuthStore();
 	return (
@@ -15,7 +16,7 @@ export function Header() {
 					<AgnostOnlyLogo width='40' height='40' />
 				</Link>
 				<div className='header-menu-divider' />
-				<div className='header-menu-left-organization-select'>Organization Select Dropdown</div>
+				<OrganizationDropdown />
 			</div>
 			<div className='header-menu-right'>
 				<nav className='header-menu-right-nav'>
@@ -31,12 +32,12 @@ export function Header() {
 				<div className='header-menu-divider' />
 				<div className='header-menu-right-actions'>
 					<div className='header-menu-right-actions-versions'>
-						<Button variant='icon'>
+						<Button variant='blank'>
 							<Cloud />
 						</Button>
 					</div>
 					<div className='header-menu-right-actions-notification'>
-						<Button variant='icon'>
+						<Button variant='blank'>
 							<Bell />
 						</Button>
 					</div>
