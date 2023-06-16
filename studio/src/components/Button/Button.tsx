@@ -6,7 +6,6 @@ import { CircleNotch } from '@phosphor-icons/react';
 import { Link, LinkProps } from 'react-router-dom';
 import { RefAttributes } from 'react';
 import * as React from 'react';
-import IntrinsicAttributes = React.JSX.IntrinsicAttributes;
 
 const buttonVariants = cva('btn', {
 	variants: {
@@ -45,7 +44,7 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<
-	HTMLButtonElement & (IntrinsicAttributes & LinkProps & RefAttributes<HTMLAnchorElement>),
+	HTMLButtonElement & (LinkProps & RefAttributes<HTMLAnchorElement>),
 	ButtonProps
 >(({ className, variant, children, to, size, loading, asChild = false, ...props }, ref) => {
 	const Comp = asChild ? Slot : 'button';

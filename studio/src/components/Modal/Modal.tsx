@@ -1,8 +1,8 @@
-import { useEffect, useRef, ReactNode, MouseEvent, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/Button';
 import { cn } from '@/utils';
 import { X } from '@phosphor-icons/react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import './Modal.scss';
 
 export interface ModalProps {
