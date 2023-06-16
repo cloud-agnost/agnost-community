@@ -1,13 +1,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { Slider } from '@/components/Slider';
-import { OrganizationCreateButton, OrganizationCreateModal } from '@/features/Organization';
+import { OrganizationCreateButton } from '@/features/Organization';
 import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization } from '@/types';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import './organization.scss';
 
 async function loader() {
@@ -16,7 +16,9 @@ async function loader() {
 
 export default function OrganizationSelect() {
 	const { organizations, selectOrganization } = useOrganizationStore();
-	const [isOpen, setIsOpen] = useState(false);
+	const { openCreateModal } = useOutletContext<{
+		openCreateModal: () => void;
+	}>();
 	const { user } = useAuthStore();
 	const navigate = useNavigate();
 	const { t } = useTranslation();
@@ -62,14 +64,11 @@ export default function OrganizationSelect() {
 									};
 								})}
 							/>
-							{user?.canCreateOrg && (
-								<OrganizationCreateButton onClick={() => setIsOpen(!isOpen)} />
-							)}
+							{user?.canCreateOrg && <OrganizationCreateButton onClick={openCreateModal} />}
 						</div>
 					</div>
 				</>
 			)}
-			<OrganizationCreateModal isOpen={isOpen} closeModal={() => setIsOpen(!isOpen)} />
 		</div>
 	);
 }
