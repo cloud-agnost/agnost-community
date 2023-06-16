@@ -3,7 +3,7 @@ import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
 import { BellRing, ChangeLog, LightBulb, LineSegments } from '@/components/icons';
 import { FileText, GearSix } from '@phosphor-icons/react';
-import { t } from '@/i18n/config.ts';
+import { translate } from '@/utils';
 
 export const SLIDER_IMAGES = [
 	{
@@ -39,17 +39,17 @@ export const MENU_ITEMS = [
 
 export const MENU_ITEMS_FOR_PROFILE_SETTINGS = [
 	{
-		title: t('profileSettings.general_title'),
+		title: translate('profileSettings.general_title'),
 		href: '/profile/settings',
 		icon: <GearSix />,
 	},
 	{
-		title: t('profileSettings.notifications_title'),
+		title: translate('profileSettings.notifications_title'),
 		href: '/profile/settings/notifications',
 		icon: <BellRing />,
 	},
 	{
-		title: t('profileSettings.clusters_title'),
+		title: translate('profileSettings.clusters_title'),
 		href: '/profile/settings/cluster-management',
 		icon: <LineSegments />,
 	},
