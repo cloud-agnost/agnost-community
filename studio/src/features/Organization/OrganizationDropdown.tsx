@@ -18,7 +18,7 @@ import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
-Ø;
+
 export function OrganizationDropdown() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
