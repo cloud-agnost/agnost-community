@@ -1,3 +1,4 @@
+import { Header } from '@/components/Header';
 import {
 	ChangePasswordWithToken,
 	CompleteAccountSetup,
@@ -14,7 +15,7 @@ import {
 	Onboarding,
 	SMTPConfiguration,
 } from '@/pages/onboarding';
-import { Organization, SelectOrganization } from '@/pages/organization';
+import { Organization, OrganizationSelect } from '@/pages/organization';
 import { RedirectHandle } from '@/pages/redirect-handle';
 import { Root } from '@/pages/root';
 import useAuthStore from '@/store/auth/authStore.ts';
@@ -92,13 +93,17 @@ const router = createBrowserRouter([
 				),
 				children: [
 					{
-						loader: SelectOrganization.loader,
+						loader: OrganizationSelect.loader,
 						path: '',
 						element: (
 							<RequireAuth>
-								<SelectOrganization />
+								<OrganizationSelect />
 							</RequireAuth>
 						),
+					},
+					{
+						path: ':id',
+						element: <Header></Header>,
 					},
 				],
 			},
