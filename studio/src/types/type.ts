@@ -77,3 +77,13 @@ export interface FinalizeAccountSetupRequest {
 	password: string;
 	name: string;
 }
+export interface BaseRequest {
+	onSuccess: () => void;
+	onError: (err: APIError) => void;
+}
+
+export interface ToastType {
+	title: string;
+	description: string;
+	type: 'success' | 'error';
+}
