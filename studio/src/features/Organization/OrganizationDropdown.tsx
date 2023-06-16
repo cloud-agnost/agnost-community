@@ -16,8 +16,10 @@ import { Organization } from '@/types';
 import { cn } from '@/utils';
 import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 export function OrganizationDropdown() {
+	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
 	const { organizations, organization, selectOrganization, leaveOrganization } =
@@ -42,10 +44,12 @@ export function OrganizationDropdown() {
 						</Button>
 					</div>
 				</PopoverTrigger>
-				<PopoverContent className='w-[200px] p-0'>
+				<PopoverContent className='organization-dropdown-content'>
 					<Command>
-						{organizations.length > 5 && <CommandInput placeholder='Select Organization' />}
-						<CommandEmpty>No organizations found.</CommandEmpty>
+						{organizations.length > 5 && (
+							<CommandInput placeholder={t('organization.select') as string} />
+						)}
+						<CommandEmpty>{t('organization.empty')}</CommandEmpty>
 						<CommandGroup className='organization-dropdown-container'>
 							<div className='organization-dropdown-options'>
 								{organizations.map((org) => (
@@ -83,7 +87,7 @@ export function OrganizationDropdown() {
 										setOpen(false);
 									}}
 								>
-									Leave Organization
+									{t('organization.leave')}
 								</Button>
 							</CommandItem>
 							<CommandItem>
@@ -95,7 +99,7 @@ export function OrganizationDropdown() {
 									}}
 								>
 									<Plus size={16} className='mr-2' />
-									Create Organization
+									{t('organization.create')}
 								</Button>
 							</CommandItem>
 						</CommandGroup>
@@ -106,16 +110,16 @@ export function OrganizationDropdown() {
 				<div className='flex flex-col justify-center items-center gap-6'>
 					<div className='w-24 h-24 rounded-full bg-yellow-500' />
 					<div className='space-y-2'>
-						<h2 className='text-default text-center text-xl'>Leave Organization</h2>
+						<h2 className='text-default text-center text-xl'>{t('organization.leave')}</h2>
 						<p className='text-subtle text-center text-sm font-albert'>
-							You are about the leave the app team. After leaving the team you will not be able to
-							access it again. Are you sure you would like to leave the{' '}
-							<b className='text-default'>{organization?.name}</b> team?
+							{t('organization.leave.desc', {
+								name: organization?.name,
+							})}
 						</p>
 					</div>
 					<div className='flex  items-center justify-center gap-4'>
 						<Button variant='text' size='lg' onClick={() => setOpenModal(false)}>
-							Cancel
+							{t('general.cancel')}
 						</Button>
 						<Button
 							size='lg'
@@ -125,8 +129,12 @@ export function OrganizationDropdown() {
 									organizationId: organization?._id as string,
 									onSuccess: () => {
 										notify({
-											title: 'Organization lef successfully',
-											description: 'You have left the organization.',
+											title: t('organization.leave.success', {
+												name: organization?.name,
+											}),
+											description: t('organization.leave.success.desc', {
+												name: organization?.name,
+											}),
 											type: 'success',
 										});
 										navigate('/organization');
@@ -142,7 +150,7 @@ export function OrganizationDropdown() {
 								setOpenModal(false);
 							}}
 						>
-							Ok
+							{t('general.ok')}
 						</Button>
 					</div>
 				</div>
@@ -152,7 +160,7 @@ export function OrganizationDropdown() {
 }
 
 const OrganizationLabel = ({ organization }: { organization: Organization | null }) => (
-	<div className='flex items-center'>
+	<div className='organization-label'>
 		<Avatar className='mr-2' size='sm'>
 			<AvatarImage src={organization?.pictureUrl} alt={organization?.name} />
 			<AvatarFallback name={organization?.name} color={organization?.color as string} />
