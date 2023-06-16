@@ -8,6 +8,7 @@ import {
 	CommandItem,
 	CommandSeparator,
 } from '@/components/Command';
+import { InfoModal } from '@/components/InfoModal';
 import { Modal } from '@/components/Modal';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
 import { useToast } from '@/hooks';
@@ -29,6 +30,32 @@ export function OrganizationDropdown() {
 		openCreateModal: () => void;
 	}>();
 	const { notify } = useToast();
+
+	function handleLeave() {
+		leaveOrganization({
+			organizationId: organization?._id as string,
+			onSuccess: () => {
+				notify({
+					title: t('organization.leave.success', {
+						name: organization?.name,
+					}),
+					description: t('organization.leave.successDesc', {
+						name: organization?.name,
+					}),
+					type: 'success',
+				});
+				navigate('/organization');
+			},
+			onError: ({ error, details }) => {
+				notify({
+					title: error,
+					description: details,
+					type: 'error',
+				});
+			},
+		});
+		setOpenModal(false);
+	}
 	return (
 		<>
 			<Popover open={open} onOpenChange={setOpen}>
@@ -106,55 +133,29 @@ export function OrganizationDropdown() {
 					</Command>
 				</PopoverContent>
 			</Popover>
-			<Modal isOpen={openModal} closeModal={() => setOpenModal(false)}>
-				<div className='flex flex-col justify-center items-center gap-6'>
-					<div className='w-24 h-24 rounded-full bg-yellow-500' />
-					<div className='space-y-2'>
-						<h2 className='text-default text-center text-xl'>{t('organization.leave')}</h2>
-						<p className='text-subtle text-center text-sm font-albert'>
-							{t('organization.leave.desc', {
-								name: organization?.name,
-							})}
-						</p>
-					</div>
+			<InfoModal
+				isOpen={openModal}
+				closeModal={() => setOpenModal(false)}
+				icon={
+					<Avatar size='2xl'>
+						<AvatarFallback color='#9B7B0866' />
+					</Avatar>
+				}
+				action={
 					<div className='flex  items-center justify-center gap-4'>
 						<Button variant='text' size='lg' onClick={() => setOpenModal(false)}>
 							{t('general.cancel')}
 						</Button>
-						<Button
-							size='lg'
-							variant='primary'
-							onClick={() => {
-								leaveOrganization({
-									organizationId: organization?._id as string,
-									onSuccess: () => {
-										notify({
-											title: t('organization.leave.success', {
-												name: organization?.name,
-											}),
-											description: t('organization.leave.success.desc', {
-												name: organization?.name,
-											}),
-											type: 'success',
-										});
-										navigate('/organization');
-									},
-									onError: ({ error, details }) => {
-										notify({
-											title: error,
-											description: details,
-											type: 'error',
-										});
-									},
-								});
-								setOpenModal(false);
-							}}
-						>
+						<Button size='lg' variant='primary' onClick={handleLeave}>
 							{t('general.ok')}
 						</Button>
 					</div>
-				</div>
-			</Modal>
+				}
+				title={t('organization.leave')}
+				description={t('organization.leaveDesc', {
+					name: organization?.name,
+				})}
+			/>
 		</>
 	);
 }
