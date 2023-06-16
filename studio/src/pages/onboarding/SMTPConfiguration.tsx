@@ -1,4 +1,4 @@
-import { Alert } from '@/components/Alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { Description } from '@/components/Description';
 import {
@@ -27,18 +27,23 @@ async function loader() {
 	return null;
 }
 
-// TODO: remove default values from schema after testing
 const FormSchema = z.object({
-	host: z.string({ required_error: 'Host is required' }).default('smtp.mandrillapp.com'),
+	host: z
+		.string({ required_error: 'Host is required' })
+		.trim()
+		.refine((value) => value.trim().length > 0, 'Host is required'),
 	port: z
 		.string({ required_error: 'Port is required' })
 		.regex(/^[0-9]+$/, 'Port must be a number')
 		.min(3, 'Port must be at least 3 characters long')
-		.transform((val) => Number(val))
-		.default('587'),
-	user: z.string({ required_error: 'Username is required' }).default('Altogic'),
-	password: z.string({ required_error: 'Password is required' }).default('iS-pNHmBJIXIpjOUXgYmZQ'),
-	useTLS: z.boolean().default(false),
+		.trim()
+		.refine((value) => value.trim().length > 0, 'Port is required'),
+	user: z
+		.string({ required_error: 'Username is required' })
+		.trim()
+		.refine((value) => value.trim().length > 0, 'Username is required'),
+	password: z.string({ required_error: 'Password is required' }),
+	useTLS: z.boolean(),
 });
 
 export default function SMTPConfiguration() {
@@ -60,6 +65,10 @@ export default function SMTPConfiguration() {
 	const navigate = useNavigate();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
+		defaultValues: {
+			...onboardingData.smtp,
+			port: onboardingData.smtp.port,
+		},
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -81,34 +90,12 @@ export default function SMTPConfiguration() {
 			setIsTesting(false);
 		}
 	}
-	async function checkSMTPConnection(data: z.infer<typeof FormSchema>): Promise<boolean> {
-		setIsTesting(true);
-		setError(null);
-
-		const res = await PlatformService.testSMTPSettings(data);
-		setIsTesting(false);
-		if (typeof res === 'object' && 'error' in res) {
-			setError(res);
-			return false;
-		} else {
-			setDataPartially({
-				smtp: data,
-			});
-			navigate('/onboarding/invite-team-members');
-
-			setStepByPath('/onboarding/smtp-configuration', {
-				isDone: true,
-			});
-			return true;
-		}
-	}
 
 	async function finishSetup() {
 		try {
 			setFinalizing(true);
 			await finalizeClusterSetup(onboardingData);
 			setFinalizing(false);
-			setStepByPath;
 			setStepByPath('/onboarding/smtp-configuration', {
 				isDone: true,
 			});
@@ -128,7 +115,8 @@ export default function SMTPConfiguration() {
 
 			{error && (
 				<Alert className='!max-w-full' variant='error'>
-					{error.details}
+					<AlertTitle>{error.error}</AlertTitle>
+					<AlertDescription>{error.details}</AlertDescription>
 				</Alert>
 			)}
 
@@ -161,10 +149,8 @@ export default function SMTPConfiguration() {
 									<FormLabel>Port</FormLabel>
 									<FormControl>
 										<Input
-											type='number'
 											error={!!form.formState.errors.port}
 											placeholder='Enter port'
-											{...form.register('port', { valueAsNumber: true })}
 											{...field}
 										/>
 									</FormControl>
@@ -216,21 +202,24 @@ export default function SMTPConfiguration() {
 					<FormField
 						control={form.control}
 						name='useTLS'
-						render={({ field }) => (
-							<FormItem className='flex items-center gap-2'>
-								<FormLabel>Use TLS</FormLabel>
-								<FormControl>
-									{/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-									{/* @ts-ignore */}
-									<Switch className='flex !m-0' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+						render={({ field }) => {
+							console.log(field);
+							return (
+								<FormItem className='flex items-center gap-2'>
+									<FormLabel>Use TLS</FormLabel>
+									<FormControl>
+										{/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+										{/* @ts-ignore */}
+										<Switch className='flex !m-0' {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							);
+						}}
 					/>
 
-					<div className='flex gap-1 justify-end'>
-						<Button onClick={goBack} type='button' variant='text' className='w-[165px]'>
+					<div className='flex gap-4 justify-end'>
+						<Button onClick={goBack} type='button' variant='text' size='lg'>
 							Previous
 						</Button>
 						<Button
@@ -238,11 +227,11 @@ export default function SMTPConfiguration() {
 							onClick={finishSetup}
 							type='button'
 							variant='secondary'
-							className='w-[165px]'
+							size='lg'
 						>
 							Skip & Finish
 						</Button>
-						<Button loading={isTesting} className='w-[165px]'>
+						<Button loading={isTesting} size='lg'>
 							Next
 						</Button>
 					</div>

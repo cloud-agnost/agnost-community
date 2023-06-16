@@ -24,16 +24,21 @@ const FormSchema = z.object({
 	appName: z
 		.string({ required_error: 'App name is required' })
 		.min(2, 'App name must be at least 2 characters long')
-		.max(64, 'App name must be at most 64 characters long'),
+		.max(64, 'App name must be at most 64 characters long')
+		.trim()
+		.refine((value) => value.trim().length > 0, 'App name is required'),
 });
 
 export default function CreateApp() {
 	const navigate = useNavigate();
 	const { goBack } = useOutletContext() as { goBack: () => void };
-	const { setDataPartially, getCurrentStep, goToNextStep } = useOnboardingStore();
+	const { setDataPartially, getCurrentStep, goToNextStep, data } = useOnboardingStore();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
+		defaultValues: {
+			appName: data.appName,
+		},
 	});
 
 	function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -73,11 +78,11 @@ export default function CreateApp() {
 						)}
 					/>
 
-					<div className='flex gap-1 justify-end'>
-						<Button onClick={goBack} type={'button'} variant='text' className='w-[165px]'>
+					<div className='flex gap-4 justify-end'>
+						<Button onClick={goBack} type={'button'} variant='text' size='lg'>
 							Previous
 						</Button>
-						<Button className='w-[165px]'>Next</Button>
+						<Button size='lg'>Next</Button>
 					</div>
 				</form>
 			</Form>

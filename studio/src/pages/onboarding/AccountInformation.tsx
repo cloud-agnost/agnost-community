@@ -19,7 +19,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 import { PasswordInput } from '@/components/PasswordInput';
-import { Alert } from '@/components/Alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { APIError } from '@/types';
 import { User } from '@/types/type';
 
@@ -36,7 +36,10 @@ const FormSchema = z.object({
 		.min(8, 'Password must be at least 8 characters long'),
 	name: z
 		.string({ required_error: 'Name is required' })
-		.min(2, 'Name must be at least 2 characters long'),
+		.min(2, 'Name must be at least 2 characters long')
+		.max(64, 'Name must be at most 64 characters long')
+		.trim()
+		.refine((value) => value.trim().length > 0, 'Name is required'),
 });
 
 export default function AccountInformation() {
@@ -60,6 +63,7 @@ export default function AccountInformation() {
 			const user = await initializeClusterSetup(data);
 			setUser(user as User);
 			const { nextPath } = getCurrentStep();
+			console.log(nextPath);
 			if (nextPath) {
 				console.log(nextPath);
 				navigate(nextPath);
@@ -85,7 +89,8 @@ export default function AccountInformation() {
 
 			{error && (
 				<Alert className='!max-w-full' variant='error'>
-					{error.details}
+					<AlertTitle>{error.error}</AlertTitle>
+					<AlertDescription>{error.details}</AlertDescription>
 				</Alert>
 			)}
 
@@ -141,13 +146,13 @@ export default function AccountInformation() {
 										{...field}
 									/>
 								</FormControl>
-								<FormDescription>Minimum 2 characters</FormDescription>
+								<FormDescription>Maximum 64 characters</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
 					<div className='flex justify-end'>
-						<Button loading={initiating} className='w-[165px]'>
+						<Button loading={initiating} size='lg'>
 							Next
 						</Button>
 					</div>

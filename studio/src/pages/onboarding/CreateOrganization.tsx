@@ -13,7 +13,7 @@ import { Input } from '@/components/Input';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 
 async function loader() {
@@ -24,16 +24,20 @@ const FormSchema = z.object({
 	orgName: z
 		.string({ required_error: 'Organization name is required' })
 		.min(2, 'Organization name must be at least 2 characters long')
-		.max(64, 'Organization name must be at most 64 characters long'),
+		.max(64, 'Organization name must be at most 64 characters long')
+		.trim()
+		.refine((value) => value.trim().length > 0, 'Organization name is required'),
 });
 
 export default function CreateOrganization() {
 	const navigate = useNavigate();
-	const { setDataPartially, getCurrentStep, goToNextStep } = useOnboardingStore();
-	const { goBack } = useOutletContext() as { goBack: () => void };
+	const { setDataPartially, getCurrentStep, goToNextStep, data } = useOnboardingStore();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
+		defaultValues: {
+			orgName: data.orgName,
+		},
 	});
 
 	function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -75,11 +79,8 @@ export default function CreateOrganization() {
 						)}
 					/>
 
-					<div className='flex gap-1 justify-end'>
-						<Button type='button' onClick={goBack} variant='text' className='w-[165px]'>
-							Previous
-						</Button>
-						<Button className='w-[165px]'>Next</Button>
+					<div className='flex gap-4 justify-end'>
+						<Button size='lg'>Next</Button>
 					</div>
 				</form>
 			</Form>

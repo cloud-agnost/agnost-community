@@ -1,5 +1,5 @@
 .alert {
-	@apply relative rounded-xs border border-transparent p-4 flex items-center justify-center gap-6 w-full;
+	@apply relative rounded-lg border border-transparent p-4 flex items-center justify-center gap-6 w-full;
 
 	&-icon {
 		@apply rounded-full flex items-center justify-center text-6xl;

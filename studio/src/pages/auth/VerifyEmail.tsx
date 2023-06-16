@@ -7,7 +7,7 @@ import { useSearchParams } from 'react-router-dom';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { APIError } from '@/types';
 import { useState } from 'react';
-import { Alert } from '@/components/Alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -38,19 +38,12 @@ export default function VerifyEmail() {
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		verify(data.code);
-	}
-	function onComplete(code: string) {
-		verify(Number(code) ?? form.getValues().code);
-	}
-
-	async function verify(code: number) {
 		const email = searchParams.get('email');
 		if (!email) return;
 		try {
 			setError(null);
 			setLoading(true);
-			await verifyEmail(email, code);
+			await verifyEmail(email, data.code);
 		} catch (e) {
 			setError(e as APIError);
 		} finally {
@@ -69,7 +62,8 @@ export default function VerifyEmail() {
 
 				{error && (
 					<Alert className='!max-w-full' variant='error'>
-						{error.details}
+						<AlertTitle>{error.error}</AlertTitle>
+						<AlertDescription>{error.details}</AlertDescription>
 					</Alert>
 				)}
 
@@ -81,11 +75,7 @@ export default function VerifyEmail() {
 							render={({ field }) => (
 								<FormItem className='space-y-1'>
 									<FormControl>
-										<VerificationCodeInput
-											error={!!form.formState.errors.code}
-											onComplete={onComplete}
-											{...field}
-										/>
+										<VerificationCodeInput error={!!form.formState.errors.code} {...field} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -97,8 +87,8 @@ export default function VerifyEmail() {
 							email, please check your spam folder.
 						</Description>
 
-						<div className='flex justify-end gap-1'>
-							<Button loading={loading} className='w-[165px]'>
+						<div className='flex justify-end gap-4'>
+							<Button loading={loading} size='lg'>
 								Verify
 							</Button>
 						</div>

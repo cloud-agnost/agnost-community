@@ -5,7 +5,12 @@
 	}
 	&-fallback {
 		@apply flex h-full w-full items-center justify-center rounded-full;
-		@apply bg-text-disabled text-default;
+		&-user {
+			@apply text-default;
+		}
+		&-org {
+			@apply text-disabled;
+		}
 	}
 	&-xs {
 		@apply w-4 h-4 text-xs;

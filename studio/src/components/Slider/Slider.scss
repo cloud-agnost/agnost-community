@@ -6,27 +6,25 @@
 	max-width: 800px;
 	width: 100%;
 
-	.swiper-pagination-bullet-active {
-		--swiper-pagination-bullet-width: 2rem;
-		--swiper-pagination-bullet-border-radius: 0.5rem;
-	}
-
-	.slider-item {
+	&-item {
 		@apply grid grid-rows-[auto_auto];
 
-		.slider-item-cover {
-			@apply overflow-hidden max-h-[400px];
+		&-cover {
+			@apply overflow-hidden h-[400px];
 			img {
-				@apply w-full;
+				@apply w-full h-full object-contain;
 			}
 		}
-
-		.slider-item-text {
+		&-text {
 			@apply text-xl text-default pt-16 pb-14 text-center flex items-center justify-center w-3/4 mx-auto;
 		}
 	}
 
 	.swiper-pagination {
 		position: static;
+		&-bullet-active {
+			--swiper-pagination-bullet-width: 2rem;
+			--swiper-pagination-bullet-border-radius: 0.5rem;
+		}
 	}
 }

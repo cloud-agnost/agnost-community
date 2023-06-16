@@ -1,19 +1,17 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
+import { Button } from '@/components/Button';
 import { Description } from '@/components/Description';
-import { AuthLayout } from '@/layouts/AuthLayout';
-import { Alert } from '@/components/Alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { Button } from '@/components/Button';
-import * as z from 'zod';
+import { AuthLayout } from '@/layouts/AuthLayout';
+import useAuthStore from '@/store/auth/authStore.ts';
+import { APIError } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-
-import './auth.scss';
-import { APIError } from '@/types';
 import { Link } from 'react-router-dom';
-import useAuthStore from '@/store/auth/authStore.ts';
-
+import * as z from 'zod';
+import './auth.scss';
 async function loader(params: any) {
 	console.log(params);
 	return null;
@@ -62,14 +60,8 @@ export default function ForgotPassword() {
 						<span className='block text-default'>{form.getValues().email}</span>
 					</p>
 					<p>If you don’t receive it right away, please check your spam folder</p>
-					<p className='font-albert'>
-						Contact our support team if you have an issue when resetting your password.{' '}
-						<Link className='text-default underline' to='/contact'>
-							Contact Us
-						</Link>
-					</p>
 				</div>
-				<Link className='text-default text-xs mt-14' to='/login'>
+				<Link className='text-default text-xs mt-14 hover:underline' to='/login'>
 					Back To Login
 				</Link>
 			</div>
@@ -85,15 +77,12 @@ export default function ForgotPassword() {
 				</Description>
 
 				{error && error.code !== 'invalid_credentials' && (
-					<Alert className='!max-w-full' variant='error'>
-						{error.details}
-					</Alert>
-				)}
-
-				{success && (
-					<Alert className='!max-w-full' variant='success'>
-						Password reset link sent to your email address
-					</Alert>
+					<>
+						<Alert className='!max-w-full' variant='error'>
+							<AlertTitle>{error.error}</AlertTitle>
+							<AlertDescription>{error.details}</AlertDescription>
+						</Alert>
+					</>
 				)}
 
 				<Form {...form}>
@@ -122,11 +111,11 @@ export default function ForgotPassword() {
 							)}
 						/>
 
-						<div className='flex justify-end gap-1'>
-							<Button to='/login' variant='text' type='button' className='w-[165px]'>
+						<div className='flex justify-end gap-4'>
+							<Button to='/login' variant='text' type='button' size='lg'>
 								Back to Login
 							</Button>
-							<Button loading={loading} className='w-[165px]'>
+							<Button loading={loading} size='lg'>
 								Get Reset Link
 							</Button>
 						</div>

@@ -1,22 +1,40 @@
+import { AuthService, UserService } from '@/services';
+import type {
+	APIError,
+	CompleteAccountSetupRequest,
+	FinalizeAccountSetupRequest,
+	User,
+} from '@/types/type.ts';
+import { joinChannel, leaveChannel } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import type { APIError, User } from '@/types/type.ts';
-import { AuthService, UserService } from '@/services';
 
 interface AuthStore {
 	loading: boolean;
 	error: APIError | null;
 	user: User | null;
+	email: string | null;
 	setUser: (user: User | null) => void;
 	login: (email: string, password: string) => Promise<User>;
-	logout: () => any;
+	logout: () => Promise<any>;
 	setToken: (token: string) => void;
 	setRefreshToken: (refreshToken: string) => void;
 	isAuthenticated: () => boolean;
 	renewAccessToken: () => void;
-	completeAccountSetupFollowingInviteAccept: () => void;
+	completeAccountSetup: (data: CompleteAccountSetupRequest) => Promise<User | APIError>;
 	resetPassword: (email: string) => Promise<void>;
 	verifyEmail: (email: string, code: number) => Promise<void>;
+	changePasswordWithToken: (token: string, newPassword: string) => Promise<void>;
+	resendEmailVerificationCode: (email: string) => Promise<void>;
+	initiateAccountSetup: (
+		email: string,
+		onSuccess: () => void,
+		onError: (err: APIError) => void,
+	) => Promise<void>;
+	finalizeAccountSetup: (data: FinalizeAccountSetupRequest) => Promise<User | APIError>;
+	acceptInvite: (token: string) => Promise<{
+		user: User;
+	}>;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -26,15 +44,21 @@ const useAuthStore = create<AuthStore>()(
 				loading: false,
 				error: null,
 				user: null,
-				setUser: (user) => set({ user }),
+				email: null,
+				setUser: (user) => {
+					set({ user });
+					if (user) joinChannel(user._id);
+				},
 				login: async (email, password) => {
 					const res = await AuthService.login(email, password);
-					set({ user: res });
+					get().setUser(res);
 					return res;
 				},
 				logout: async () => {
+					const user = get().user;
+					if (user) leaveChannel(user?._id);
 					const res = await AuthService.logout();
-					set({ user: null });
+					get().setUser(null);
 					return res;
 				},
 				setToken: (token) =>
@@ -48,20 +72,73 @@ const useAuthStore = create<AuthStore>()(
 						return prev;
 					}),
 				isAuthenticated: () => get()?.user !== null,
-				renewAccessToken: () => {
-					// TODO renew access token
+				renewAccessToken: async () => {
+					if (!get().isAuthenticated()) return;
+					const res = await AuthService.renewAccessToken();
+					get().setRefreshToken(res.rt);
+					get().setToken(res.at);
 				},
-				completeAccountSetupFollowingInviteAccept() {
-					// TODO complete account setup following invite accept
+				completeAccountSetup: async (data) => {
+					try {
+						const user = await AuthService.completeAccountSetup(data);
+						get().setUser(user);
+						return user;
+					} catch (error) {
+						throw error as APIError;
+					}
 				},
-				async resetPassword(email) {
+				resetPassword(email) {
 					return UserService.resetPassword({
 						email,
 						uiBaseURL: window.location.origin,
 					});
 				},
 				async verifyEmail(email: string, code: number) {
-					await AuthService.validateEmail(email, code);
+					try {
+						const user = await AuthService.validateEmail(email, code);
+						get().setUser(user);
+						return user;
+					} catch (error) {
+						throw error as APIError;
+					}
+				},
+				changePasswordWithToken(token: string, newPassword: string) {
+					return UserService.changePasswordWithToken({
+						token,
+						newPassword,
+					});
+				},
+				async resendEmailVerificationCode(email: string) {
+					await AuthService.resendEmailVerificationCode(email);
+				},
+				async initiateAccountSetup(
+					email: string,
+					onSuccess: () => void,
+					onError: (err: APIError) => void,
+				) {
+					try {
+						await AuthService.initiateAccountSetup(email);
+						set({ email });
+						onSuccess();
+					} catch (error) {
+						onError(error as APIError);
+					}
+				},
+				async finalizeAccountSetup(data: FinalizeAccountSetupRequest) {
+					try {
+						const res = await AuthService.finalizeAccountSetup(data);
+						get().setUser(res);
+						return res;
+					} catch (error) {
+						throw error as APIError;
+					}
+				},
+				async acceptInvite(token: string) {
+					try {
+						return UserService.acceptInvite(token);
+					} catch (err) {
+						set({ error: err as APIError });
+					}
 				},
 			}),
 			{

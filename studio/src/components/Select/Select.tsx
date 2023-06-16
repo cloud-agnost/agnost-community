@@ -19,7 +19,6 @@ const SelectTrigger = React.forwardRef<
 	<SelectPrimitive.Trigger ref={ref} className={cn('select', className)} {...props}>
 		{children}
 		<SelectPrimitive.Icon asChild>
-			{' '}
 			<CaretDown className='h-4 w-4' />
 		</SelectPrimitive.Icon>
 	</SelectPrimitive.Trigger>

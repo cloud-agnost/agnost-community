@@ -3,6 +3,7 @@ import { Button } from '@/components/Button';
 import { Description } from '@/components/Description';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
+import { Label } from '@/components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import useClusterStore from '@/store/cluster/clusterStore';
 import useOnboardingStore from '@/store/onboarding/onboardingStore';
@@ -104,7 +105,6 @@ export default function InviteTeamMembers() {
 		}
 		setError(member?.message || '');
 	}, [form.formState.errors]);
-	console.log(form.formState.errors.member?.[0]?.email);
 
 	return (
 		<div className='max-w-xl space-y-12'>
@@ -144,7 +144,7 @@ export default function InviteTeamMembers() {
 								name={`member.${index}.role`}
 								render={({ field }) => (
 									<FormItem className='w-[180px]'>
-										{index === 0 && <FormLabel>Role</FormLabel>}
+										{index === 0 && <Label>Role</Label>}
 										<Select onValueChange={field.onChange}>
 											<FormControl>
 												<SelectTrigger>
@@ -175,7 +175,6 @@ export default function InviteTeamMembers() {
 										!index &&
 										'self-end',
 								)}
-								icon={true}
 								onClick={() => {
 									remove(index);
 								}}

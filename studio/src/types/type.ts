@@ -51,7 +51,7 @@ export interface OnboardingData {
 
 export interface SMTPSettings {
 	host: string;
-	port: number;
+	port: string;
 	useTLS: boolean;
 	user: string;
 	password: string;
@@ -60,4 +60,19 @@ export interface SMTPSettings {
 export interface AppMembers {
 	email?: string;
 	role?: 'Admin' | 'Developer' | 'Viewer' | '';
+}
+
+export interface CompleteAccountSetupRequest {
+	email: string | undefined;
+	token: string;
+	inviteType: 'org' | 'app';
+	name: string;
+	password: string;
+}
+
+export interface FinalizeAccountSetupRequest {
+	email: string | undefined;
+	verificationCode: number;
+	password: string;
+	name: string;
 }

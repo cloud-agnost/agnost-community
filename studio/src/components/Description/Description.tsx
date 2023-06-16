@@ -6,7 +6,7 @@ import './Description.scss';
 type Props = {
 	className?: string;
 	children?: ReactNode;
-	title?: string;
+	title?: string | null;
 };
 
 export default function Description({ children, title, className }: Props) {

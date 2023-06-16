@@ -1,14 +1,17 @@
-import { Description } from '@/components/Description';
-import { AuthLayout } from '@/layouts/AuthLayout';
-import './auth.scss';
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
-import { Alert } from '@/components/Alert';
+import { Description } from '@/components/Description';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
+import { AuthLayout } from '@/layouts/AuthLayout';
+import useAuthStore from '@/store/auth/authStore';
+import { APIError } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import './auth.scss';
 
 async function loader(params: any) {
 	console.log(params);
@@ -22,15 +25,27 @@ const FormSchema = z.object({
 });
 
 export default function CompleteAccountSetup() {
-	const [error, setError] = useState<string | null>(null);
-
+	const navigate = useNavigate();
+	const [error, setError] = useState<APIError | null>(null);
+	const [loading, setLoading] = useState(false);
+	const { initiateAccountSetup } = useAuthStore();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		setError(null);
-		console.log(data);
+		setLoading(true);
+		await initiateAccountSetup(
+			data.email,
+			() => {
+				navigate('verify-email');
+				setLoading(false);
+			},
+			(e) => {
+				setError(e as APIError);
+				setLoading(false);
+			},
+		);
 	}
 
 	return (
@@ -44,7 +59,8 @@ export default function CompleteAccountSetup() {
 
 				{error && (
 					<Alert className='!max-w-full' variant='error'>
-						{error}
+						<AlertTitle>{error.error}</AlertTitle>
+						<AlertDescription>{error.details}</AlertDescription>
 					</Alert>
 				)}
 
@@ -59,7 +75,6 @@ export default function CompleteAccountSetup() {
 									<FormControl>
 										<Input
 											error={Boolean(form.formState.errors.email)}
-											type='email'
 											placeholder='Enter email address'
 											{...field}
 										/>
@@ -69,11 +84,13 @@ export default function CompleteAccountSetup() {
 							)}
 						/>
 
-						<div className='flex justify-end gap-1'>
-							<Button to='/login' variant='text' type='button' className='w-[165px]'>
+						<div className='flex justify-end gap-4'>
+							<Button to='/login' variant='text' type='button' size='lg'>
 								Back to Login
 							</Button>
-							<Button className='w-[165px]'>Continue</Button>
+							<Button size='lg' loading={loading}>
+								Continue
+							</Button>
 						</div>
 					</form>
 				</Form>

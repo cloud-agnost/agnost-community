@@ -7,13 +7,8 @@ import { Lock } from '@phosphor-icons/react';
 const Switch = React.forwardRef<
 	React.ElementRef<typeof SwitchPrimitives.Root>,
 	React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
->(({ className, value, ...props }, ref) => (
-	<SwitchPrimitives.Root
-		value={value}
-		className={cn('switch-root', className)}
-		{...props}
-		ref={ref}
-	>
+>(({ className, ...props }, ref) => (
+	<SwitchPrimitives.Root className={cn('switch-root', className)} ref={ref} {...props}>
 		<SwitchPrimitives.Thumb className={cn('switch-thumb')} />
 		<Lock className='switch-lock' />
 	</SwitchPrimitives.Root>

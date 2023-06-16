@@ -1,21 +1,21 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
+import { Button } from '@/components/Button';
 import { Description } from '@/components/Description';
-import { AuthLayout } from '@/layouts/AuthLayout';
-import { Alert } from '@/components/Alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { PasswordInput } from '@/components/PasswordInput';
-import { Button } from '@/components/Button';
-import * as z from 'zod';
+import { AuthLayout } from '@/layouts/AuthLayout';
+import { AuthService } from '@/services';
+import useAuthStore from '@/store/auth/authStore.ts';
+import useClusterStore from '@/store/cluster/clusterStore';
+import { APIError } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-
+import { useTranslation } from 'react-i18next';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import * as z from 'zod';
 import './auth.scss';
-import { Link, useNavigate } from 'react-router-dom';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { APIError } from '@/types';
-import { AuthService } from '@/services';
-
 const FormSchema = z.object({
 	email: z
 		.string({ required_error: 'Email address is required' })
@@ -24,10 +24,15 @@ const FormSchema = z.object({
 });
 
 export default function Login() {
+	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
 	const { login, setUser } = useAuthStore();
+	const { canClusterSendEmail } = useClusterStore();
 	const navigate = useNavigate();
+	const { state } = useLocation();
+
+	const REDIRECT_URL = state?.from ? state.from.pathname + state.from.search : '/organization';
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -39,7 +44,7 @@ export default function Login() {
 			setLoading(true);
 			const user = await login(email, password);
 			setUser(user);
-			navigate('/organization');
+			navigate(REDIRECT_URL);
 		} catch (error) {
 			setError(error as APIError);
 		} finally {
@@ -54,12 +59,12 @@ export default function Login() {
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
-				<Description title='Login to your account'>
-					Welcome back! Please enter your details.
-				</Description>
+				<Description title={t('login.title')}>{t('login.description')}</Description>
+
 				{error && (
 					<Alert className='!max-w-full' variant='error'>
-						{error.details}
+						<AlertTitle>{error.error}</AlertTitle>
+						<AlertDescription>{error.details}</AlertDescription>
 					</Alert>
 				)}
 				<Form {...form}>
@@ -108,10 +113,12 @@ export default function Login() {
 						</div>
 					</form>
 				</Form>
-				<div className='flex justify-between text-sm underline text-default leading-6 font-albert'>
-					<Link to='/forgot-password'>Forgot Password</Link>
-					<Link to='/complete-account-setup'>Complete Account Setup</Link>
-				</div>
+				{canClusterSendEmail && (
+					<div className='flex justify-between text-sm underline text-default leading-6 font-albert'>
+						<Link to='/forgot-password'>Forgot Password</Link>
+						<Link to='/complete-account-setup'>Complete Account Setup</Link>
+					</div>
+				)}
 			</div>
 		</AuthLayout>
 	);
@@ -119,16 +126,14 @@ export default function Login() {
 
 function NotVerified({ email, clearError }: { email: string; clearError: () => void }) {
 	const [loading, setLoading] = useState(false);
-	const [success, setSuccess] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
-
+	const navigate = useNavigate();
 	async function reSendVerificationCode() {
 		try {
 			setError(null);
 			setLoading(true);
-			setSuccess(false);
 			await AuthService.resendEmailVerificationCode(email);
-			setSuccess(true);
+			navigate(`/verify-email?email=${email}`);
 		} catch (error) {
 			setError(error as APIError);
 		} finally {
@@ -151,22 +156,17 @@ function NotVerified({ email, clearError }: { email: string; clearError: () => v
 
 				{error && (
 					<Alert className='!max-w-full' variant='error'>
-						{error.details}
+						<AlertTitle>{error.error}</AlertTitle>
+						<AlertDescription>{error.details}</AlertDescription>
 					</Alert>
 				)}
 
-				{success && (
-					<Alert className='!max-w-full' variant='success'>
-						Email verification code has been sent to your email address.
-					</Alert>
-				)}
-
-				<div className='flex justify-end gap-1'>
-					<Button onClick={clearError} variant='text' type='button' className='w-[165px]'>
+				<div className='flex justify-end gap-4'>
+					<Button onClick={clearError} variant='text' type='button' size='lg'>
 						Back to Login
 					</Button>
 					<Button loading={loading} onClick={reSendVerificationCode}>
-						Send Verify Code
+						Send Verification Code
 					</Button>
 				</div>
 			</div>

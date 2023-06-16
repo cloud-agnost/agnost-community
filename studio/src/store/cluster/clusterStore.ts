@@ -8,8 +8,10 @@ interface ClusterStore {
 	loading: boolean;
 	error: APIError | null;
 	isCompleted: boolean;
+	canClusterSendEmail: boolean;
 	checkClusterSetup: () => Promise<boolean>;
-	initializeClusterSetup: (data: UserDataToRegister) => Promise<User | APIError>;
+	checkClusterSmtpStatus: () => Promise<boolean>;
+	initializeClusterSetup: (data: UserDataToRegister) => Promise<User>;
 	finalizeClusterSetup: (req: OnboardingData) => Promise<User | APIError>;
 	initializeAccountSetup: () => void;
 	finalizeAccountSetup: () => void;
@@ -21,11 +23,22 @@ const useClusterStore = create<ClusterStore>()(
 			(set) => ({
 				loading: false,
 				isCompleted: false,
+				canClusterSendEmail: false,
 				error: null,
 				checkClusterSetup: async () => {
 					try {
 						const { status } = await ClusterService.checkCompleted();
 						set({ isCompleted: status });
+						return status;
+					} catch (error) {
+						set({ error: error as APIError });
+						throw error;
+					}
+				},
+				checkClusterSmtpStatus: async () => {
+					try {
+						const { status } = await ClusterService.canClusterSendEmail();
+						set({ canClusterSendEmail: status });
 						return status;
 					} catch (error) {
 						set({ error: error as APIError });

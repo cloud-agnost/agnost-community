@@ -1,5 +1,11 @@
 import { axios } from '@/helpers';
-import { OnboardingData, User, UserDataToRegister } from '@/types/type.ts';
+import {
+	CompleteAccountSetupRequest,
+	FinalizeAccountSetupRequest,
+	OnboardingData,
+	User,
+	UserDataToRegister,
+} from '@/types/type.ts';
 
 export default class AuthService {
 	static url = '/v1/auth';
@@ -10,20 +16,16 @@ export default class AuthService {
 	static async finalizeClusterSetup(req: OnboardingData) {
 		return (await axios.post(`${this.url}/finalize-cluster-setup`, req)).data;
 	}
-	static async initiateAccountSetup(email: string) {
-		return (await axios.post(`${this.url}/init-account-setup`, { email })).data;
-	}
 
 	static async resendEmailVerificationCode(email: string) {
 		return (await axios.post(`${this.url}/resend-code`, { email })).data;
 	}
 
-	static async finalizeAccountSetup(data: {
-		email: string;
-		verificationCode: number;
-		password: string;
-		name: string;
-	}) {
+	static async initiateAccountSetup(email: string) {
+		return (await axios.post(`${this.url}/init-account-setup`, { email })).data;
+	}
+
+	static async finalizeAccountSetup(data: FinalizeAccountSetupRequest): Promise<User> {
 		return (await axios.post(`${this.url}/finalize-account-setup`, data)).data;
 	}
 
@@ -59,7 +61,11 @@ export default class AuthService {
 		return (await axios.post(`${this.url}/logout`)).data;
 	}
 
-	static async renewAccessToken() {
+	static async renewAccessToken(): Promise<{ at: string; rt: string }> {
 		return (await axios.post(`${this.url}/renew`)).data;
+	}
+
+	static async completeAccountSetup(data: CompleteAccountSetupRequest): Promise<User> {
+		return (await axios.post(`${this.url}/complete-setup`, data)).data;
 	}
 }
