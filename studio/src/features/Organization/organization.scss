@@ -20,6 +20,9 @@
 			@apply flex justify-end gap-4 mt-2;
 		}
 	}
+	&-label {
+		@apply flex items-center;
+	}
 	&-dropdown {
 		@apply w-[200px] h-12 p-1 flex justify-between items-center border border-border rounded-sm;
 		&-icon {
@@ -48,6 +51,9 @@
 		}
 		&-desc {
 			@apply text-xs text-subtle;
+		}
+		&-content {
+			@apply w-[200px] p-0;
 		}
 	}
 }
