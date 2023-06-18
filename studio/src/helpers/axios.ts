@@ -10,9 +10,9 @@ export const instance = axios.create({
 });
 
 instance.interceptors.request.use((config) => {
-	const accessToken = useAuthStore.getState().user?.at;
+	const accessToken = useAuthStore.getState().accessToken;
 	if (accessToken) {
-		config.headers['Authorization'] = accessToken ?? 'at-51249e5321534d838cbc79d6cf60d598';
+		config.headers['Authorization'] = accessToken;
 	}
 	return config;
 });
