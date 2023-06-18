@@ -54,3 +54,19 @@ export const MENU_ITEMS_FOR_PROFILE_SETTINGS = [
 		icon: <LineSegments />,
 	},
 ];
+
+export const ALL_NOTIFICATIONS = [
+	'org',
+	'app',
+	'version',
+	'database',
+	'model',
+	'field',
+	'endpoint',
+	'queue',
+	'cronjob',
+	'cache',
+	'storage',
+	'resource',
+	'environment',
+];

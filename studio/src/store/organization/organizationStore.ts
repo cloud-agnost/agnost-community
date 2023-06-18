@@ -1,4 +1,3 @@
-import { organization } from '@/i18n/en';
 import OrganizationService from '@/services/OrganizationService';
 import {
 	APIError,

@@ -52,5 +52,19 @@
 	"delete_my_account": "Delete My Account",
 	"delete_confirm_description": "Confirm account delete by typing <confirmCode>{{confirmCode}}</confirmCode> below.",
 	"delete_account_alert_title": "Are you sure to delete your account?",
-	"delete_account_alert_description": "All owned organizations, their apps, managed resources and associated data will be deleted. This action is not reversible - please continue with caution."
+	"delete_account_alert_description": "All owned organizations, their apps, managed resources and associated data will be deleted. This action is not reversible - please continue with caution.",
+	"org_notification": "Organization events",
+	"app_notification": "App Events",
+	"version_notification": "Version Events",
+	"database_notification": "Database Events",
+	"model_notification": "Database Model Events",
+	"field_notification": "Model field events",
+	"endpoint_notification": "Endpoint events",
+	"queue_notification": "Message queue events",
+	"cronjob_notification": "Message queue events",
+	"cache_notification": "Cache events",
+	"storage_notification": "Storage events",
+	"resource_notification": "Organization resource events",
+	"environment_notification": "Environment Events",
+	"all_notification": "All Notifications"
 }

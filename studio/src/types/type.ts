@@ -87,3 +87,7 @@ export interface ToastType {
 	description: string;
 	type: 'success' | 'error';
 }
+
+export interface UpdateNotificationsData {
+	notifications: string[];
+}
