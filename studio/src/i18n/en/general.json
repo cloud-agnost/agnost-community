@@ -7,5 +7,6 @@
 	"copied_error": "Failed to copy try again",
 	"success": "Success",
 	"error": "Error",
-	"addMembers": "Add Members"
+	"addMembers": "Add Members",
+	"created": "Created"
 }
