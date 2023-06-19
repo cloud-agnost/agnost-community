@@ -263,7 +263,7 @@
 	.loading {
 		@apply animate-spin mr-2;
 	}
-	.main{
+	.main {
 		height: calc(100vh - 72px);
 	}
 }
@@ -275,7 +275,7 @@
 	color: var(--text-base);
 }
 .Toastify__toast-theme--light {
-	background-color: rgb(var(--theme-base-reverse-background));
+	background-color: rgb(var(--theme-base-background));
 }
 .Toastify__toast-container--top-right {
 	top: 5rem;
@@ -284,7 +284,7 @@
 	align-self: center;
 }
 .Toastify__close-button--light {
-	color: rgb(var(--icon-base-reverse));
+	color: rgb(var(--icon-base));
 	opacity: 1;
 }
 .Toastify__close-button > svg {
