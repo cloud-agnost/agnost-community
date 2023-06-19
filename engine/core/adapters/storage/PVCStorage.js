@@ -11,6 +11,7 @@ export class PVCStorage extends StorageBase {
 	 * For PVC storage under the mounth path we will create folders for each environment of the app identified by the environment iid
 	 */
 	constructor(mountPath) {
+		super();
 		this.mountPath = mountPath;
 	}
 

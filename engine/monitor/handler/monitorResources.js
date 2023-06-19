@@ -13,6 +13,10 @@ import { Storage } from "@google-cloud/storage";
 
 import { getDBClient } from "../init/db.js";
 
+// Create a Kubernetes core API client
+const kubeconfig = new k8s.KubeConfig();
+kubeconfig.loadFromDefault();
+
 /**
  * Iterates over all cluster resources and monitors their status
  */
@@ -653,9 +657,6 @@ async function checkRedisConnection(connSettings) {
  * @param  {object} connSettings The connection settings needed to connect to the cluster storage
  */
 async function checkClusterStorage(connSettings) {
-	// Create a Kubernetes core API client
-	const kubeconfig = new k8s.KubeConfig();
-	kubeconfig.loadFromDefault();
 	const coreApi = kubeconfig.makeApiClient(k8s.CoreV1Api);
 
 	try {
@@ -675,9 +676,6 @@ async function checkClusterStorage(connSettings) {
  * @param  {object} connSettings The connection settings needed to connect to the API server
  */
 async function checkAPIServer(connSettings) {
-	// Create a Kubernetes core API client
-	const kubeconfig = new k8s.KubeConfig();
-	kubeconfig.loadFromDefault();
 	const coreApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
 
 	let result = null;
@@ -706,9 +704,6 @@ async function checkAPIServer(connSettings) {
  * @param  {object} connSettings The connection settings needed to connect to the default scheduler pod
  */
 async function checkDefaultScheduler(connSettings) {
-	// Create a Kubernetes core API client
-	const kubeconfig = new k8s.KubeConfig();
-	kubeconfig.loadFromDefault();
 	const coreApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
 
 	let result = null;
@@ -738,9 +733,6 @@ async function checkDefaultScheduler(connSettings) {
  * @param  {object} connSettings The connection settings needed to connect to the default realtime server pod
  */
 async function checkDefaultRealtime(connSettings) {
-	// Create a Kubernetes core API client
-	const kubeconfig = new k8s.KubeConfig();
-	kubeconfig.loadFromDefault();
 	const coreApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
 
 	let result = null;

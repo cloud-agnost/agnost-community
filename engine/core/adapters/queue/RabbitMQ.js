@@ -7,6 +7,7 @@ import ERROR_CODES from "../../config/errorCodes.js";
  */
 export class RabbitMQ extends QueueBase {
 	constructor(driver) {
+		super();
 		this.driver = driver;
 	}
 

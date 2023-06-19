@@ -5,6 +5,7 @@ import { DatabaseBase } from "./DatabaseBase.js";
  */
 export class MySQL extends DatabaseBase {
 	constructor(driver) {
+		super();
 		this.driver = driver;
 	}
 

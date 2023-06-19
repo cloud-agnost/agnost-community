@@ -5,6 +5,7 @@ import { DatabaseBase } from "./DatabaseBase.js";
  */
 export class SQLServer extends DatabaseBase {
 	constructor(driver) {
+		super();
 		this.driver = driver;
 	}
 

@@ -110,6 +110,9 @@ async function initExpress(i18n) {
 	/* 	Particularly needed in case of bulk insert/update/delete operations, we should not generate 502 Bad Gateway errors at nginex ingress controller, the value specified in default config file is in milliseconds */
 	server.timeout = config.get("server.timeout");
 
+	// Set up garbage collector to manage memory consumption of the realtime server
+	setUpGC();
+
 	return server;
 }
 
@@ -123,6 +126,15 @@ function initResourceMonitorScheduler() {
 			processing = false;
 		}
 	}, config.get("general.monitoringInterval"));
+}
+
+function setUpGC() {
+	setInterval(() => {
+		if (global.gc) {
+			// Manually hangle gc to boost performance of our realtime server, gc is an expensive operation
+			global.gc();
+		}
+	}, config.get("general.gcSeconds") * 1000);
 }
 
 function handleProcessExit(server) {

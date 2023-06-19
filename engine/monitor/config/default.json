@@ -13,6 +13,7 @@
         "k8sNamespace": "default",
         "initialDelaySeconds": 20,
         "maxResourceOpWaitMinues": 5,
+        "gcSeconds": 30,
         "platformBaseUrl": "http://platform-core-clusterip-service:4000"
     },
     "database": {

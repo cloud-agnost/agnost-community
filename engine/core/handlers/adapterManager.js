@@ -54,7 +54,7 @@ export class AdapterManager {
 		);
 
 		if (mapping) {
-			let adapterObj = this.adapters.get(resource.iid);
+			let adapterObj = this.adapters.get(mapping.resource.iid);
 			if (readOnly) {
 				// If the readonly connection is not there then return the read-write connection
 				if (adapterObj?.slaves && adapterObj.slaves.length > 0) {
@@ -178,7 +178,7 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, accessReadOnly, iid, instance, type } = resource;
+			const { access, accessReadOnly, iid, instance, type, name } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -194,6 +194,7 @@ export class AdapterManager {
 			await client.connect();
 
 			const adapterObj = {
+				name,
 				type,
 				instance,
 				iid,
@@ -202,7 +203,7 @@ export class AdapterManager {
 				slaves: [],
 			};
 
-			this.adapters.set(resource.idd, adapterObj);
+			this.adapters.set(resource.iid, adapterObj);
 
 			// Add readonly connections as slave
 			if (accessReadOnly) {
@@ -221,6 +222,7 @@ export class AdapterManager {
 
 						await slaveClient.connect();
 						adapterObj.slaves.push({
+							name,
 							type,
 							instance,
 							iid,
@@ -244,7 +246,7 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, accessReadOnly, iid, instance, type } = resource;
+			const { access, accessReadOnly, iid, instance, type, name } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -258,6 +260,7 @@ export class AdapterManager {
 			});
 
 			const adapterObj = {
+				name,
 				type,
 				instance,
 				iid,
@@ -266,7 +269,7 @@ export class AdapterManager {
 				slaves: [],
 			};
 
-			this.adapters.set(resource.idd, adapterObj);
+			this.adapters.set(resource.iid, adapterObj);
 
 			// Add readonly connections as slave
 			if (accessReadOnly) {
@@ -284,6 +287,7 @@ export class AdapterManager {
 						});
 
 						adapterObj.slaves.push({
+							name,
 							type,
 							instance,
 							iid,
@@ -307,7 +311,7 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, accessReadOnly, iid, instance, type } = resource;
+			const { access, accessReadOnly, iid, instance, type, name } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -322,6 +326,7 @@ export class AdapterManager {
 			});
 
 			const adapterObj = {
+				name,
 				type,
 				instance,
 				iid,
@@ -330,7 +335,7 @@ export class AdapterManager {
 				slaves: [],
 			};
 
-			this.adapters.set(resource.idd, adapterObj);
+			this.adapters.set(resource.iid, adapterObj);
 
 			// Add readonly connections as slave
 			if (accessReadOnly) {
@@ -348,6 +353,7 @@ export class AdapterManager {
 						});
 
 						adapterObj.slaves.push({
+							name,
 							type,
 							instance,
 							iid,
@@ -371,7 +377,7 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, accessReadOnly, iid, instance, type } = resource;
+			const { access, accessReadOnly, iid, instance, type, name } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -416,6 +422,7 @@ export class AdapterManager {
 			await client.connect();
 
 			const adapterObj = {
+				name,
 				type,
 				instance,
 				iid,
@@ -424,7 +431,7 @@ export class AdapterManager {
 				slaves: [],
 			};
 
-			this.adapters.set(resource.idd, adapterObj);
+			this.adapters.set(resource.iid, adapterObj);
 
 			// Add readonly connections as slave
 			if (accessReadOnly) {
@@ -465,6 +472,7 @@ export class AdapterManager {
 						await slaveClient.connect();
 
 						adapterObj.slaves.push({
+							name,
 							type,
 							instance,
 							iid,
@@ -488,7 +496,7 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, accessReadOnly, iid, instance, type } = resource;
+			const { access, accessReadOnly, iid, instance, type, name } = resource;
 			let connSettings = access;
 
 			let client = redis.createClient({
@@ -503,6 +511,7 @@ export class AdapterManager {
 
 			client.on("connect", () => {
 				const adapterObj = {
+					name,
 					type,
 					instance,
 					iid,
@@ -511,7 +520,7 @@ export class AdapterManager {
 					slaves: [],
 				};
 
-				this.adapters.set(resource.idd, adapterObj);
+				this.adapters.set(resource.iid, adapterObj);
 
 				// Add readonly connections as slave
 				if (accessReadOnly) {
@@ -530,6 +539,7 @@ export class AdapterManager {
 							});
 
 							adapterObj.slaves.push({
+								name,
 								type,
 								instance,
 								iid,
@@ -555,7 +565,7 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, iid, instance, type } = resource;
+			const { access, iid, instance, type, name } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -570,7 +580,8 @@ export class AdapterManager {
 
 			const client = await amqp.connect(connSettings.url);
 
-			this.adapters.set(resource.idd, {
+			this.adapters.set(resource.iid, {
+				name,
 				type,
 				instance,
 				iid,
@@ -590,7 +601,7 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, iid, instance, type } = resource;
+			const { access, iid, instance, type, name } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -627,7 +638,8 @@ export class AdapterManager {
 			const admin = kafka.admin();
 			await admin.connect();
 
-			this.adapters.set(resource.idd, {
+			this.adapters.set(resource.iid, {
+				name,
 				type,
 				instance,
 				iid,
@@ -647,7 +659,7 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, iid, instance, type } = resource;
+			const { access, iid, instance, type, name } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -659,7 +671,8 @@ export class AdapterManager {
 				region: connSettings.region,
 			});
 
-			this.adapters.set(resource.idd, {
+			this.adapters.set(resource.iid, {
+				name,
 				type,
 				instance,
 				iid,
@@ -679,7 +692,7 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, iid, instance, type } = resource;
+			const { access, iid, instance, type, name } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -688,7 +701,8 @@ export class AdapterManager {
 				credentials: JSON.parse(connSettings.keyFileContents),
 			});
 
-			this.adapters.set(resource.idd, {
+			this.adapters.set(resource.iid, {
+				name,
 				type,
 				instance,
 				iid,
@@ -708,7 +722,7 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, iid, instance, type } = resource;
+			const { access, iid, instance, type, name } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -716,7 +730,8 @@ export class AdapterManager {
 				connSettings.connectionString
 			);
 
-			this.adapters.set(resource.idd, {
+			this.adapters.set(resource.iid, {
+				name,
 				type,
 				instance,
 				iid,
@@ -736,13 +751,14 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, iid, instance, type } = resource;
+			const { access, iid, instance, type, name } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
 			const pvcStorage = new PVCStorage(connSettings.mountPath);
 
-			this.adapters.set(resource.idd, {
+			this.adapters.set(resource.iid, {
+				name,
 				type,
 				instance,
 				iid,
@@ -762,7 +778,7 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, iid, instance, type } = resource;
+			const { access, iid, instance, type, name } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -772,7 +788,8 @@ export class AdapterManager {
 				transports: ["websocket", "polling"],
 			});
 
-			this.adapters.set(resource.idd, {
+			this.adapters.set(resource.iid, {
+				name,
 				type,
 				instance,
 				iid,
@@ -792,9 +809,10 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { iid, instance, type } = resource;
+			const { iid, instance, type, name } = resource;
 
-			this.adapters.set(resource.idd, {
+			this.adapters.set(resource.iid, {
+				name,
 				type,
 				instance,
 				iid,
@@ -843,6 +861,7 @@ export class AdapterManager {
 		const iterator = this.adapters.values();
 		for (const adapterObj of iterator) {
 			await this.disconnect(adapterObj);
+			console.log(`Closed connection to resource ${adapterObj.name}`);
 		}
 		this.adapters.clear();
 	}

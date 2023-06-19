@@ -5,6 +5,7 @@ import { StorageBase } from "./StorageBase.js";
  */
 export class AzureStorage extends StorageBase {
 	constructor(driver) {
+		super();
 		this.driver = driver;
 	}
 
