@@ -1,4 +1,3 @@
-import { APIError } from '@/types';
 import { BaseRequest } from './type';
 
 export interface Organization {

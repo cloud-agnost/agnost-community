@@ -1,5 +1,5 @@
 import { axios } from '@/helpers';
-import { User } from '@/types/type.ts';
+import { UpdateNotificationsData, User } from '@/types/type.ts';
 
 export default class UserService {
 	static url = '/v1/user';
@@ -22,8 +22,8 @@ export default class UserService {
 		return (await axios.post(`${this.url}/app-invite-accept?token=${token}`, { token })).data;
 	}
 
-	static async changeName(name: string): Promise<string> {
-		return (await axios.put(`${this.url}/name`, { name })).data.name;
+	static async changeName(name: string): Promise<User> {
+		return (await axios.put(`${this.url}/name`, { name })).data;
 	}
 
 	static async changeEmail(data: {
@@ -31,10 +31,10 @@ export default class UserService {
 		password: string;
 		uiBaseURL: string;
 	}): Promise<string> {
-		return (await axios.post(`${this.url}/login-email`, data)).data.email;
+		return (await axios.post(`${this.url}/login-email`, data)).data;
 	}
 
-	static async changeAvatar(avatar: File): Promise<string> {
+	static async changeAvatar(avatar: File): Promise<User> {
 		const formData = new FormData();
 		formData.append('picture', avatar, avatar.name);
 		return (
@@ -44,7 +44,7 @@ export default class UserService {
 					selam: 's',
 				},
 			})
-		).data?.pictureUrl;
+		).data;
 	}
 
 	static async removeAvatar(): Promise<User> {
@@ -58,5 +58,9 @@ export default class UserService {
 
 	static async deleteAccount() {
 		return (await axios.delete(`${this.url}`)).data;
+	}
+
+	static async updateNotifications(data: UpdateNotificationsData): Promise<User> {
+		return (await axios.put(`${this.url}/notifications`, data)).data;
 	}
 }

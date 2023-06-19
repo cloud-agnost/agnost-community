@@ -64,10 +64,10 @@ export default function ChangeAvatar() {
 						type='file'
 						className='hidden'
 					/>
-					<Button loading={deleting} onClick={onClickHandler} variant='icon' size='sm'>
+					<Button loading={deleting} onClick={onClickHandler} variant='blank' size='sm'>
 						<Trash />
 					</Button>
-					<Button variant='icon' size='sm' disabled={loading}>
+					<Button variant='blank' size='sm' disabled={loading}>
 						{loading ? (
 							<CircleNotch size={15} className='loading m-0' />
 						) : (

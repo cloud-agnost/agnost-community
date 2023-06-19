@@ -10,6 +10,8 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 interface AuthStore {
+	accessToken: string | null | undefined;
+	refreshToken: string | null | undefined;
 	loading: boolean;
 	error: APIError | null;
 	user: User | null;
@@ -17,8 +19,8 @@ interface AuthStore {
 	setUser: (user: User | null) => void;
 	login: (email: string, password: string) => Promise<User>;
 	logout: () => Promise<any>;
-	setToken: (token: string) => void;
-	setRefreshToken: (refreshToken: string) => void;
+	setToken: (accessToken: string | null | undefined) => void;
+	setRefreshToken: (refreshToken: string | null | undefined) => void;
 	isAuthenticated: () => boolean;
 	renewAccessToken: () => void;
 	completeAccountSetup: (data: CompleteAccountSetupRequest) => Promise<User | APIError>;
@@ -35,18 +37,21 @@ interface AuthStore {
 	acceptInvite: (token: string) => Promise<{
 		user: User;
 	}>;
-	changeName: (name: string) => Promise<string>;
+	changeName: (name: string) => Promise<User>;
 	changeEmail: (email: string, password: string) => Promise<string>;
-	changeAvatar: (avatar: File) => Promise<string>;
+	changeAvatar: (avatar: File) => Promise<User>;
 	removeAvatar: () => Promise<void>;
 	changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 	deleteAccount: () => Promise<void>;
+	updateNotifications: (notifications: string[]) => Promise<User>;
 }
 
 const useAuthStore = create<AuthStore>()(
 	devtools(
 		persist(
 			(set, get) => ({
+				accessToken: null,
+				refreshToken: null,
 				loading: false,
 				error: null,
 				user: null,
@@ -54,6 +59,8 @@ const useAuthStore = create<AuthStore>()(
 				setUser: (user) => {
 					set({ user });
 					if (user) joinChannel(user._id);
+					if (user?.at) get().setToken(user.at);
+					if (user?.rt) get().setRefreshToken(user.rt);
 				},
 				login: async (email, password) => {
 					const res = await AuthService.login(email, password);
@@ -67,16 +74,8 @@ const useAuthStore = create<AuthStore>()(
 					get().setUser(null);
 					return res;
 				},
-				setToken: (token) =>
-					set((prev) => {
-						if (prev.user) prev.user.at = token;
-						return prev;
-					}),
-				setRefreshToken: (refreshToken) =>
-					set((prev) => {
-						if (prev.user) prev.user.rt = refreshToken;
-						return prev;
-					}),
+				setToken: (accessToken) => set({ accessToken }),
+				setRefreshToken: (refreshToken) => set({ refreshToken }),
 				isAuthenticated: () => get()?.user !== null,
 				renewAccessToken: async () => {
 					if (!get().isAuthenticated()) return;
@@ -147,12 +146,9 @@ const useAuthStore = create<AuthStore>()(
 					}
 				},
 				async changeName(name: string) {
-					const newName = await UserService.changeName(name);
-					set((prev) => {
-						if (prev.user) prev.user.name = newName;
-						return prev;
-					});
-					return newName;
+					const user = await UserService.changeName(name);
+					set({ user });
+					return user;
 				},
 				async changeEmail(email: string, password) {
 					const newEmail = await UserService.changeEmail({
@@ -164,12 +160,9 @@ const useAuthStore = create<AuthStore>()(
 					return newEmail;
 				},
 				async changeAvatar(avatar: File) {
-					const pictureUrl = await UserService.changeAvatar(avatar);
-					set((prev) => {
-						if (prev.user) prev.user.pictureUrl = pictureUrl;
-						return prev;
-					});
-					return pictureUrl;
+					const user = await UserService.changeAvatar(avatar);
+					set({ user });
+					return user;
 				},
 				async removeAvatar() {
 					try {
@@ -188,6 +181,11 @@ const useAuthStore = create<AuthStore>()(
 				},
 				async deleteAccount() {
 					return UserService.deleteAccount();
+				},
+				async updateNotifications(notifications: string[]) {
+					const res = await UserService.updateNotifications({ notifications });
+					set({ user: res });
+					return res;
 				},
 			}),
 			{
