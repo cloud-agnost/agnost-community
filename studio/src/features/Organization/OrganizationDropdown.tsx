@@ -18,17 +18,16 @@ import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
-
+import { OrganizationCreateModal } from '@/features/Organization';
 export function OrganizationDropdown() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
+	const [openCreateModal, setOpenCreateModal] = useState(false);
 	const { organizations, organization, selectOrganization, leaveOrganization } =
 		useOrganizationStore();
 	const navigate = useNavigate();
-	const { openCreateModal } = useOutletContext<{
-		openCreateModal: () => void;
-	}>();
+
 	const { notify } = useToast();
 
 	function handleLeave() {
@@ -121,7 +120,7 @@ export function OrganizationDropdown() {
 								<Button
 									variant='secondary'
 									onClick={() => {
-										openCreateModal();
+										setOpenCreateModal(true);
 										setOpen(false);
 									}}
 								>
@@ -155,6 +154,10 @@ export function OrganizationDropdown() {
 				description={t('organization.leave.description', {
 					name: organization?.name,
 				})}
+			/>
+			<OrganizationCreateModal
+				isOpen={openCreateModal}
+				closeModal={() => setOpenCreateModal(false)}
 			/>
 		</>
 	);
