@@ -121,12 +121,28 @@ router.get(
 
 			// Cluster owner is by default Admin member of all apps
 			if (user.isClusterOwner) {
-				apps = await appCtrl.getManyByQuery({ orgId: org._id });
+				apps = await appCtrl.getManyByQuery(
+					{ orgId: org._id },
+					{
+						lookup: {
+							path: "team.userId",
+							select: "-loginProfiles -notifications",
+						},
+					}
+				);
 			} else {
-				apps = await appCtrl.getManyByQuery({
-					orgId: org._id,
-					"team.userId": user._id,
-				});
+				apps = await appCtrl.getManyByQuery(
+					{
+						orgId: org._id,
+						"team.userId": user._id,
+					},
+					{
+						lookup: {
+							path: "team.userId",
+							select: "-loginProfiles -notifications",
+						},
+					}
+				);
 			}
 
 			res.json(apps);
@@ -151,9 +167,17 @@ router.get(
 		try {
 			const { org } = req;
 
-			let apps = await appCtrl.getManyByQuery({
-				orgId: org._id,
-			});
+			let apps = await appCtrl.getManyByQuery(
+				{
+					orgId: org._id,
+				},
+				{
+					lookup: {
+						path: "team.userId",
+						select: "-loginProfiles -notifications",
+					},
+				}
+			);
 
 			res.json(apps);
 		} catch (err) {
