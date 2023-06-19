@@ -1,6 +1,7 @@
 .application {
 	&-card {
-		@apply p-4 border border-border bg-subtle;
+		@apply px-4 pt-6  pb-3 border border-border bg-subtle;
+		@apply flex flex-col justify-between;
 		width: 326px;
 		height: 164px;
 	}
