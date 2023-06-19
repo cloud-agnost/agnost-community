@@ -11,4 +11,7 @@
 			@apply space-y-1;
 		}
 	}
+	&-team {
+		@apply flex items-center justify-center -space-x-2 overflow-hidden;
+	}
 }
