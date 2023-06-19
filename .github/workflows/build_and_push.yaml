@@ -79,6 +79,7 @@ jobs:
           push: true
           context: ./${{ matrix.application }}
           file: ./${{ matrix.application }}/Dockerfile
+          platforms: linux/amd64,linux/arm64
           tags: |
             ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:${{ needs.generate_short_sha.outputs.sha }}
             ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:latest
