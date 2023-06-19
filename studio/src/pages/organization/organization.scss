@@ -7,6 +7,9 @@
 	}
 	&-slider {
 		@apply flex items-center justify-center gap-16;
+		.swiper-slide {
+			width: 176px !important;
+		}
 	}
 	&-item {
 		@apply flex flex-col items-center justify-center gap-4;

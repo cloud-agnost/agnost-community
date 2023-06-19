@@ -180,9 +180,8 @@
 		--green-900: 6, 62, 35;
 
 		--wrapper-background-base: 255, 255, 255;
-		--wrapper-background-hover: 237, 238, 243
+		--wrapper-background-hover: 237, 238, 243;
 		--wrapper-background-light: 42, 47, 60;
-
 
 		--radius: 0.5rem;
 
@@ -195,11 +194,10 @@
 		--theme-lighter-background: 50, 56, 73;
 		--theme-border: 50, 56, 73;
 
-		
 		--text-base: 255, 255, 255;
 		--text-subtle: 146, 154, 181;
 		--text-disabled: 99, 111, 146;
-		
+
 		--icon-secondary: 255, 255, 255;
 		--icon-base: 146, 154, 181;
 		--icon-disabled: 99, 111, 146;
@@ -223,7 +221,7 @@
 		--surface-purple: 65, 25, 84;
 		--surface-red: 79, 23, 36;
 		--surface-orange: 78, 35, 4;
-		
+
 		--button-background-base-secondary: 50, 56, 73;
 		--button-background-hover-secondary: 66, 74, 97;
 		--button-background-border-secondary: 70, 71, 78;
@@ -250,7 +248,6 @@
 
 		--font-size-sm: 14px;
 		--font-size-sm-line-height: 24px;
-		
 	}
 }
 
@@ -275,8 +272,7 @@
 	color: var(--text-base);
 }
 .Toastify__toast-theme--light {
-	background-color: rgb(var(--theme-base-reverse-background))
-	
+	background-color: rgb(var(--theme-base-reverse-background));
 }
 .Toastify__toast-container--top-right {
 	top: 5rem;
@@ -284,15 +280,11 @@
 .Toastify__close-button {
 	align-self: center;
 }
-.Toastify__close-button--light{
+.Toastify__close-button--light {
 	color: rgb(var(--icon-base-reverse));
 	opacity: 1;
 }
 .Toastify__close-button > svg {
 	width: 1.25rem;
 	height: 1.25rem;
-	
-}
-.swiper-slide, swiper-slide{
-	width: 176px !important;
 }
