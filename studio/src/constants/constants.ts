@@ -82,12 +82,6 @@ export const APPLICATION_SETTINGS = [
 	{
 		name: translate('general.addMembers'),
 	},
-	{
-		name: translate('application.settings.leaveTeam'),
-	},
-	{
-		name: translate('general.delete'),
-	},
 ];
 
 export const ALL_NOTIFICATIONS = [
