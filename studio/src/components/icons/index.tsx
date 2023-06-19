@@ -6,6 +6,7 @@ export { default as LightBulb } from './LightBulb';
 export { default as LineSegments } from './LineSegments';
 export { default as List } from './List';
 export { default as Pencil } from './Pencil';
+export { default as Refresh } from './Refresh';
 export { default as SquaresFour } from './SquaresFour';
 export { default as SuccessCheck } from './SuccessCheck';
 export { default as Warning } from './Warning';
