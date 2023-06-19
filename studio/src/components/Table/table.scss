@@ -1,0 +1,27 @@
+.table {
+	@apply w-full caption-bottom text-sm border border-border bg-subtle;
+	.container {
+		@apply w-full overflow-auto rounded;
+	}
+	&-header {
+		@apply [&_tr]:border-b;
+	}
+	&-body {
+		@apply [&_tr:last-child]:border-0;
+	}
+	&-footer {
+		@apply bg-subtle font-medium text-subtle;
+	}
+	&-row {
+		@apply border-b transition-colors hover:bg-subtle/50 data-[state=selected]:bg-subtle;
+	}
+	&-head {
+		@apply h-12 px-4 text-left align-middle font-medium text-subtle [&:has([role=checkbox])]:pr-0;
+	}
+	&-cell {
+		@apply p-4 align-middle [&:has([role=checkbox])]:pr-0 text-default;
+	}
+	&-caption {
+		@apply mt-4 text-sm text-subtle;
+	}
+}
