@@ -52,7 +52,7 @@ export default function ChangeAvatar() {
 				</Alert>
 			)}
 			<div className='avatar-container'>
-				<Avatar size='xl'>
+				<Avatar size='3xl'>
 					<AvatarImage src={location.origin + '/api' + user?.pictureUrl ?? ''} />
 					{user && <AvatarFallback isUserAvatar color={user?.color} name={user?.name} />}
 				</Avatar>

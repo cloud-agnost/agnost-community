@@ -263,6 +263,9 @@
 	.loading {
 		@apply animate-spin mr-2;
 	}
+	.main{
+		height: calc(100vh - 72px);
+	}
 }
 .Toastify__toast-container {
 	min-width: 400px;

@@ -19,6 +19,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import { OrganizationCreateModal } from '@/features/Organization';
+import './organization.scss';
+
 export function OrganizationDropdown() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
@@ -27,7 +29,6 @@ export function OrganizationDropdown() {
 	const { organizations, organization, selectOrganization, leaveOrganization } =
 		useOrganizationStore();
 	const navigate = useNavigate();
-
 	const { notify } = useToast();
 
 	function handleLeave() {

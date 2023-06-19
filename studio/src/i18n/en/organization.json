@@ -1,4 +1,10 @@
 {
+	"menu": {
+		"apps": "Apps",
+		"resources": "Resources",
+		"settings": "Settings"
+	},
+
 	"create": "Create Organization",
 	"create-new": "Create New Organization",
 	"name": "Organization Name",

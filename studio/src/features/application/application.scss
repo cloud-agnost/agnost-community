@@ -1,0 +1,13 @@
+.application {
+	&-card {
+		@apply p-4 border border-border bg-subtle;
+		width: 326px;
+		height: 164px;
+	}
+	&-form {
+		@apply py-4;
+		&-item {
+			@apply space-y-1;
+		}
+	}
+}

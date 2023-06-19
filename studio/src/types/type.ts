@@ -78,8 +78,8 @@ export interface FinalizeAccountSetupRequest {
 	name: string;
 }
 export interface BaseRequest {
-	onSuccess: () => void;
-	onError: (err: APIError) => void;
+	onSuccess?: () => void;
+	onError?: (err: APIError) => void;
 }
 
 export interface ToastType {

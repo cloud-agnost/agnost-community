@@ -1,21 +1,26 @@
 import OrganizationService from '@/services/OrganizationService';
 import {
 	APIError,
+	Application,
 	CreateOrganizationRequest,
-	Organization,
 	LeaveOrganizationRequest,
+	Organization,
+	CreateApplicationRequest,
+	CreateApplicationResponse,
 } from '@/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-
 interface OrganizationStore {
 	loading: boolean;
 	organization: Organization | null;
 	organizations: Organization[];
+	applications: Application[];
 	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
 	createOrganization: (req: CreateOrganizationRequest) => Promise<Organization | APIError>;
 	selectOrganization: (organization: Organization) => void;
 	leaveOrganization: (req: LeaveOrganizationRequest) => Promise<void>;
+	getOrganizationApps: (organizationId: string) => Promise<Application[] | APIError>;
+	createApplication: (req: CreateApplicationRequest) => Promise<Application | APIError>;
 }
 
 const useOrganizationStore = create<OrganizationStore>()(
@@ -25,6 +30,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 				loading: false,
 				organization: null,
 				organizations: [],
+				applications: [],
 				getAllOrganizationByUser: async () => {
 					try {
 						set({ loading: true });
@@ -37,6 +43,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 				},
 				createOrganization: async ({ name, onSuccess, onError }: CreateOrganizationRequest) => {
 					try {
+						set({ loading: true });
 						const res = await OrganizationService.createOrganization(name);
 						set({
 							organizations: [
@@ -47,11 +54,13 @@ const useOrganizationStore = create<OrganizationStore>()(
 								...get().organizations,
 							],
 						});
-						onSuccess();
+						if (onSuccess) onSuccess();
 						return res;
 					} catch (error) {
-						onError(error as APIError);
+						if (onError) onError(error as APIError);
 						throw error as APIError;
+					} finally {
+						set({ loading: false });
 					}
 				},
 				selectOrganization: (organization: Organization) => {
@@ -69,13 +78,45 @@ const useOrganizationStore = create<OrganizationStore>()(
 								(organization) => organization._id !== organizationId,
 							),
 						});
-						onSuccess();
+						if (onSuccess) onSuccess();
 					} catch (error) {
-						onError(error as APIError);
+						if (onError) onError(error as APIError);
 						throw error as APIError;
 					}
 				},
+				getOrganizationApps: async (organizationId: string) => {
+					try {
+						set({ loading: true });
+						const res = await OrganizationService.getOrganizationApps(organizationId);
+						set({ applications: res });
+						return res;
+					} catch (error) {
+						throw error as APIError;
+					} finally {
+						set({ loading: false });
+					}
+				},
+				createApplication: async ({
+					orgId,
+					name,
+					onSuccess,
+					onError,
+				}: CreateApplicationRequest) => {
+					try {
+						set({ loading: true });
+						const res = await OrganizationService.createApplication({ orgId, name });
+						if (onSuccess) onSuccess();
+						set({ applications: [...get().applications, res.app] });
+						return res.app;
+					} catch (error) {
+						if (onError) onError(error as APIError);
+						throw error as APIError;
+					} finally {
+						set({ loading: false });
+					}
+				},
 			}),
+
 			{
 				name: 'organization-storage',
 			},

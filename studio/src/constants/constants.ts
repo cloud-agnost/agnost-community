@@ -2,7 +2,8 @@ import Database from '@/assets/images/database.png';
 import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
 import { BellRing, ChangeLog, LightBulb, LineSegments } from '@/components/icons';
-import { FileText, GearSix } from '@phosphor-icons/react';
+import { FileText, GearSix, DeviceTablet, Database as DatabaseIcon } from '@phosphor-icons/react';
+import { translate } from '@/utils';
 
 export const SLIDER_IMAGES = [
 	{
@@ -40,17 +41,52 @@ export const MENU_ITEMS_FOR_PROFILE_SETTINGS = (translate: (key: string) => stri
 	{
 		title: translate('profileSettings.general_title'),
 		href: '/profile/settings',
-		icon: <GearSix />,
+		icon: GearSix,
 	},
 	{
 		title: translate('profileSettings.notifications_title'),
 		href: '/profile/settings/notifications',
-		icon: <BellRing />,
+		icon: BellRing,
 	},
 	{
 		title: translate('profileSettings.clusters_title'),
 		href: '/profile/settings/cluster-management',
-		icon: <LineSegments />,
+		icon: LineSegments,
+	},
+];
+export const ORGANIZATION_MENU_ITEMS = [
+	{
+		name: translate('organization.menu.apps'),
+		href: 'apps',
+		icon: DeviceTablet,
+	},
+	{
+		name: translate('organization.menu.resources'),
+		href: 'resources',
+		icon: DatabaseIcon,
+	},
+	{
+		name: translate('organization.menu.settings'),
+		href: 'settings',
+		icon: GearSix,
+	},
+];
+
+export const APPLICATION_SETTINGS = [
+	{
+		name: translate('application.settings.openVersion'),
+	},
+	{
+		name: translate('application.settings.editApp'),
+	},
+	{
+		name: translate('general.addMembers'),
+	},
+	{
+		name: translate('application.settings.leaveTeam'),
+	},
+	{
+		name: translate('general.delete'),
 	},
 ];
 

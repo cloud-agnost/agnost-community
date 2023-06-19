@@ -1,20 +1,26 @@
 import { OrganizationCreateModal } from '@/features/Organization';
-import { Outlet } from 'react-router-dom';
 import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
+
 async function loader(params: any) {
 	console.log(params);
 	return null;
 }
 
 export default function Organization() {
-	const [open, setOpen] = useState(false);
+	const [openOrgCreateModal, setOpenOrgCreateModal] = useState(false);
+
 	return (
 		<>
-			<OrganizationCreateModal isOpen={open} closeModal={() => setOpen(false)} />
+			<OrganizationCreateModal
+				isOpen={openOrgCreateModal}
+				closeModal={() => setOpenOrgCreateModal(false)}
+			/>
+
 			<Outlet
 				context={{
-					openCreateModal: () => setOpen(true),
-					closeCreateModal: () => setOpen(false),
+					openOrgCreateModal: () => setOpenOrgCreateModal(true),
+					closeOrgCreateModal: () => setOpenOrgCreateModal(false),
 				}}
 			/>
 		</>

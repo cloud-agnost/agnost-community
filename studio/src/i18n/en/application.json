@@ -1,0 +1,12 @@
+{
+	"apps": "Apps",
+	"create": "Create Application",
+	"create-new": "Create New Application",
+	"name": "Application Name",
+	"empty": "You have not created any apps yet!",
+	"settings": {
+		"openVersion": "Open Version",
+		"editApp": "Edit App",
+		"leaveTeam": "Leave Team"
+	}
+}

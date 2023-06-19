@@ -61,7 +61,7 @@ const CommandGroup = React.forwardRef<
 	React.ElementRef<typeof CommandPrimitive.Group>,
 	React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
 >(({ className, ...props }, ref) => (
-	<CommandPrimitive.Group ref={ref} className={cn('command-group', className)} {...props} />
+	<CommandPrimitive.Group ref={ref} className={cn(className, 'command-group')} {...props} />
 ));
 
 CommandGroup.displayName = CommandPrimitive.Group.displayName;

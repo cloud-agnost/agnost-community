@@ -6,5 +6,6 @@
 	"copied": "Copied",
 	"copied_error": "Failed to copy try again",
 	"success": "Success",
-	"error": "Error"
+	"error": "Error",
+	"addMembers": "Add Members"
 }

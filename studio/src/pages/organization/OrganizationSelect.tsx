@@ -16,8 +16,8 @@ async function loader() {
 
 export default function OrganizationSelect() {
 	const { organizations, selectOrganization } = useOrganizationStore();
-	const { openCreateModal } = useOutletContext<{
-		openCreateModal: () => void;
+	const { openOrgCreateModal } = useOutletContext<{
+		openOrgCreateModal: () => void;
 	}>();
 	const { user } = useAuthStore();
 	const navigate = useNavigate();
@@ -64,7 +64,7 @@ export default function OrganizationSelect() {
 									};
 								})}
 							/>
-							{user?.canCreateOrg && <OrganizationCreateButton onClick={openCreateModal} />}
+							{user?.canCreateOrg && <OrganizationCreateButton onClick={openOrgCreateModal} />}
 						</div>
 					</div>
 				</>

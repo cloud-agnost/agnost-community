@@ -18,12 +18,15 @@
 		@apply space-y-2 text-center;
 	}
 	&-name {
-		@apply text-default text-xl  font-semibold truncate max-w-[16ch];
+		@apply text-default text-xl truncate max-w-[16ch];
 	}
 	&-role {
-		@apply text-default text-sm  font-semibold;
+		@apply text-default text-sm;
 	}
 	&-button {
 		@apply h-[13rem];
 	}
+}
+.org-menu-container {
+	@apply h-[72px] border-b border-border;
 }
