@@ -24,7 +24,7 @@ export default class OrganizationService {
 	}
 
 	static async getOrganizationApps(organizationId: string): Promise<Application[]> {
-		return (await axios.get(`${this.url}/${organizationId}/app/all`)).data;
+		return (await axios.get(`${this.url}/${organizationId}/app`)).data;
 	}
 
 	static async createApplication({
