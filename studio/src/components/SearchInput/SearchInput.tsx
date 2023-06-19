@@ -20,14 +20,16 @@ const SearchInput = React.forwardRef<HTMLInputElement, React.ComponentPropsWitho
 					placeholder={placeholder}
 					className='search-input'
 				/>
-				<Button
-					className='search-input-button'
-					onClick={() => setInputValue('')}
-					variant='blank'
-					type='button'
-				>
-					<X size={20} />
-				</Button>
+				{inputValue && (
+					<Button
+						className='search-input-button'
+						onClick={() => setInputValue('')}
+						variant='blank'
+						type='button'
+					>
+						<X size={20} />
+					</Button>
+				)}
 			</div>
 		);
 	},
