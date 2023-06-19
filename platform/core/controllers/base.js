@@ -14,6 +14,14 @@ export default class BaseController {
 	 * Starts a new databse transaction session and returns the session object
 	 */
 	async startSession() {
+		// Check to see if transactions are supported by MongoDB deployment
+		const db = mongoose.connection.db;
+		const adminDb = db.admin();
+		const serverStatus = await adminDb.serverStatus();
+
+		// If transactions not supported then return
+		if (!serverStatus.transactions) return;
+
 		const session = await mongoose.startSession();
 		session.startTransaction();
 
@@ -47,7 +55,7 @@ export default class BaseController {
 	 * @param  {Object} session The database session object creates calling the startSession method
 	 */
 	async endSession(session) {
-		session.endSession();
+		if (session) session.endSession();
 	}
 
 	/**

@@ -19,10 +19,7 @@
         "appImagesBucket": "agnost-app-pictures"
     },
     "cache": {
-        "port": 6379,
-        "readReplica": {
-            "port": 6379
-        }
+        "port": 6379
     },
     "queue": {
         "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
