@@ -20,7 +20,12 @@ export interface Application {
 }
 
 export interface Team {
-	userId: string;
+	userId: {
+		_id: string;
+		name: string;
+		color: string;
+		pictureUrl: string;
+	};
 	role: string;
 	_id: string;
 	joinDate: string;
