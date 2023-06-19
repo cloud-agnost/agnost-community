@@ -31,6 +31,7 @@
 		@apply relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5;
 		@apply text-sm outline-none;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
+		@apply cursor-pointer hover:bg-wrapper-background-hover;
 	}
 	&-shortcut {
 		@apply ml-auto text-xs tracking-widest text-subtle;
