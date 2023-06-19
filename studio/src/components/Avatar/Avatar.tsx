@@ -4,6 +4,7 @@ import * as React from 'react';
 import * as AvatarPrimitive from '@radix-ui/react-avatar';
 import { cn } from '@/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { getNameForAvatar } from '@/utils';
 import './avatar.scss';
 const avatarVariants = cva('avatar', {
 	variants: {
@@ -69,7 +70,7 @@ const AvatarFallback = React.forwardRef<
 	React.ElementRef<typeof AvatarPrimitive.Fallback>,
 	AvatarFallbackProps
 >(({ className, color, isUserAvatar, ...props }, ref) => {
-	const name = props.name?.split(' ');
+	const name = getNameForAvatar(props.name as string);
 	return (
 		<AvatarPrimitive.Fallback
 			ref={ref}
@@ -83,8 +84,7 @@ const AvatarFallback = React.forwardRef<
 			}}
 			{...props}
 		>
-			{name?.[0]?.charAt(0).toUpperCase()}
-			{name?.[1]?.charAt(0).toUpperCase()}
+			{name}
 		</AvatarPrimitive.Fallback>
 	);
 });
