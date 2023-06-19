@@ -6,5 +6,6 @@ export {
 	leaveChannel,
 	sendMessageToChannel,
 	onChannelMessage,
-	zodKeys,	
+	getNameForAvatar,
+	getApplicationRoleVariant,
 } from './utils';
