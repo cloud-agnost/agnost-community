@@ -11,7 +11,7 @@ export default function ApplicationSettings() {
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<Button variant='blank' iconOnly className='p-0'>
+				<Button variant='text' rounded className='p-2'>
 					<DotsThreeVertical className='w-5 h-5 text-icon-secondary' />
 					<span className='sr-only'>Open popover</span>
 				</Button>
