@@ -3,6 +3,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { SearchInput } from '@/components/SearchInput';
 import { List, SquaresFour } from '@/components/icons';
 import { ApplicationCard } from '@/features/application';
+import ApplicationTable from '@/features/application/ApplicationTable/ApplicationTable';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { cn } from '@/utils';
 import { Plus } from '@phosphor-icons/react';
@@ -34,7 +35,7 @@ export default function OrganizationApps() {
 								<Button
 									variant='outline'
 									iconOnly
-									className={cn(isCard && 'bg-lighter transition-all')}
+									className={cn(isCard && 'bg-lighter transition-all', 'hover:bg-base')}
 									onClick={() => setIsCard(false)}
 								>
 									<List className='w-5 h-5 text-icon-secondary ' />
@@ -42,7 +43,7 @@ export default function OrganizationApps() {
 								<Button
 									variant='outline'
 									iconOnly
-									className={cn(!isCard && 'bg-lighter transition-all')}
+									className={cn(!isCard && 'bg-lighter transition-all', 'hover:bg-base')}
 									onClick={() => setIsCard(true)}
 								>
 									<SquaresFour className='w-5 h-5 text-icon-secondary' />
@@ -51,11 +52,15 @@ export default function OrganizationApps() {
 							<CreateApplicationButton />
 						</div>
 					</div>
-					<div className='mt-8 flex flex-wrap gap-6 items-center'>
-						{applications.map((application) => (
-							<ApplicationCard key={application._id} application={application} />
-						))}
-					</div>
+					{isCard ? (
+						<div className='mt-8 flex flex-wrap gap-6 items-center'>
+							{applications.map((application) => (
+								<ApplicationCard key={application._id} application={application} />
+							))}
+						</div>
+					) : (
+						<ApplicationTable apps={applications} />
+					)}
 				</div>
 			) : (
 				<EmptyState title={t('application.empty')}>
