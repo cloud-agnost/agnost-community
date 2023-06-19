@@ -2,5 +2,9 @@
 	"cancel": "Cancel",
 	"ok": "OK",
 	"delete": "Delete",
-	"enter_confirmation_code_here": "Enter confirmation code here"
+	"enter_confirmation_code_here": "Enter confirmation code here",
+	"copied": "Copied",
+	"copied_error": "Failed to copy try again",
+	"success": "Success",
+	"error": "Error"
 }
