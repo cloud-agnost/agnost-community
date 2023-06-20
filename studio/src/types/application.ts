@@ -59,3 +59,7 @@ export interface CreateApplicationResponse {
 	version: Version;
 	resource: Resource;
 }
+export interface DeleteApplicationRequest extends BaseRequest {
+	appId: string;
+	orgId: string;
+}

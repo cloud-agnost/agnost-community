@@ -15,6 +15,7 @@ export type {
 	Team,
 	CreateApplicationRequest,
 	CreateApplicationResponse,
+	DeleteApplicationRequest,
 } from './application.ts';
 
 export { CreateOrganizationSchema } from './organization.ts';
