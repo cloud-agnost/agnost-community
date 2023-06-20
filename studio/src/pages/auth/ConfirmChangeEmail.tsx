@@ -20,4 +20,5 @@ ConfirmChangeEmail.loader = async function ({ request }: LoaderFunctionArgs) {
 	} catch (error) {
 		return json({ error });
 	}
+	// TODO  - implement error page
 };
