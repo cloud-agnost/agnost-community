@@ -1,5 +1,5 @@
-import { useRenewToken } from '@/hooks';
 import '@/i18n/config';
+import { useRenewToken } from '@/hooks';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
