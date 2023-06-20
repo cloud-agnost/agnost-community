@@ -1,0 +1,69 @@
+.tab-container {
+	@apply flex items-stretch justify-between border-b border-border;
+
+	.tab-control {
+		@apply flex items-stretch bg-subtle divide-x border-l;
+
+		.tab-control-item {
+			@apply flex items-center justify-center w-14 h-14;
+			button {
+				@apply w-full h-full rounded-none;
+				&:hover {
+					@apply bg-base;
+				}
+			}
+			&.navigation {
+				@apply w-20;
+			}
+		}
+	}
+}
+.tab {
+	@apply flex overflow-auto max-w-full select-none no-scrollbar scroll-smooth;
+	.tab-item {
+		@apply relative flex items-center justify-between bg-subtle border-border min-w-[8.5rem] pr-1;
+		@apply border-x shrink-0 transition;
+
+		&:hover {
+			@apply bg-base;
+		}
+
+		.tab-item-link {
+			@apply flex items-center gap-2 py-4 px-3 font-sfCompact;
+			@apply text-subtle text-sm leading-6 font-normal w-full;
+		}
+
+		&:first-child {
+			@apply sticky left-0 z-10;
+		}
+
+		&.icon {
+			.tab-item-link {
+				@apply pl-[27px];
+			}
+		}
+
+		&.closeable {
+			.tab-item-link {
+				@apply pr-1;
+			}
+		}
+
+		&.active {
+			@apply border-b-2 border-b-button-primary;
+		}
+
+		.tab-item-close {
+			@apply opacity-0 text-subtle p-2 w-7 h-7;
+			&:hover {
+				@apply bg-subtle;
+			}
+		}
+
+		&:hover {
+			.tab-item-close {
+				@apply opacity-100;
+			}
+		}
+	}
+}

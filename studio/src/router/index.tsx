@@ -35,6 +35,7 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import type { ReactNode } from 'react';
 import { Navigate, createBrowserRouter, useLocation } from 'react-router-dom';
+import { Version, VersionDashboard } from '@/pages/version';
 
 const router = createBrowserRouter([
 	{
@@ -153,7 +154,17 @@ const router = createBrowserRouter([
 					},
 				],
 			},
-
+			{
+				path: '/organization/:orgId/apps/:appId/version',
+				element: <Version />,
+				loader: Version.loader,
+				children: [
+					{
+						path: '',
+						element: <VersionDashboard />,
+					},
+				],
+			},
 			{
 				path: '/profile/settings',
 				element: (
@@ -186,7 +197,11 @@ const router = createBrowserRouter([
 		children: [
 			{
 				path: '',
-				element: <AccountInformation />,
+				element: (
+					<GuestOnly>
+						<AccountInformation />
+					</GuestOnly>
+				),
 			},
 			{
 				path: 'create-organization',
@@ -235,10 +250,10 @@ function RequireAuth({ children }: { children: JSX.Element }): JSX.Element {
 	const { isCompleted } = useClusterStore();
 	const location = useLocation();
 
-	if (!isAuthenticated()) {
-		return <Navigate to='/login' state={{ from: location }} replace />;
-	} else if (location.pathname === '/') {
+	if (location.pathname === '/') {
 		return <Navigate to={isCompleted ? '/organization' : '/onboarding'} />;
+	} else if (!isAuthenticated()) {
+		return <Navigate to='/login' state={{ from: location }} replace />;
 	}
 
 	return children;

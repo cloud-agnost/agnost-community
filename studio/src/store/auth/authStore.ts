@@ -18,7 +18,7 @@ interface AuthStore {
 	email: string | null;
 	setUser: (user: User | null) => void;
 	login: (email: string, password: string) => Promise<User>;
-	logout: () => Promise<any>;
+	logout: () => Promise<void>;
 	setToken: (accessToken: string | null | undefined) => void;
 	setRefreshToken: (refreshToken: string | null | undefined) => void;
 	isAuthenticated: () => boolean;
@@ -74,6 +74,7 @@ const useAuthStore = create<AuthStore>()(
 					if (user) leaveChannel(user?._id);
 					const res = await AuthService.logout();
 					get().setUser(null);
+					localStorage.clear();
 					return res;
 				},
 				setToken: (accessToken) => set({ accessToken }),

@@ -1,4 +1,1 @@
-import { axios } from '@/helpers';
-
-export default class ApplicationService {
-    
+export default class ApplicationService {}

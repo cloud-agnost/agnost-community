@@ -267,6 +267,18 @@
 		height: calc(100vh - 72px);
 	}
 }
+
+@layer utilities {
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+
+	.no-scrollbar {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+}
+
 .Toastify__toast-container {
 	min-width: 400px;
 }
