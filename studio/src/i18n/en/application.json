@@ -8,5 +8,13 @@
 		"openVersion": "Open Version",
 		"editApp": "Edit App",
 		"leaveTeam": "Leave Team"
+	},
+	"leave": {
+		"title": "Leave App Team",
+		"description": "You are about the leave the app team. After leaving the team you will not be able to access it again. Are you sure you would like to leave the {{name}} team?"
+	},
+	"delete": {
+		"title": "Delete App",
+		"description": "You are about to delete the app. After deleting the app you will not be able to access it again. Are you sure you would like to delete the {{name}} app?"
 	}
 }
