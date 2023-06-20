@@ -12,7 +12,7 @@ async function loader(params: LoaderFunctionArgs) {
 
 	if (isAuthenticated) {
 		await useAuthStore.getState().getUser();
-		if (status && currentPath !== '/organization') return redirect('/organization');
+		if (status && currentPath === '/') return redirect('/organization');
 	} else if (!status && currentPath !== '/onboarding') {
 		return redirect('/onboarding');
 	}
