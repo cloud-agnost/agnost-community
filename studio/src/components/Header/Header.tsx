@@ -42,7 +42,7 @@ export function Header() {
 						</Button>
 					</div>
 					<div className='header-menu-right-actions-user'>
-						<Link to='/profile' className='header-menu-right-actions-user-avatar'>
+						<Link to='/profile/settings' className='header-menu-right-actions-user-avatar'>
 							<Avatar size='sm'>
 								<AvatarImage src='https://avatars.githubusercontent.com/u/1500684?s=400&u=3a3d2f8d7d1b5c2b5f5d9f3e3b9e5f6f8b0c9b8a&v=4' />
 								{user && <AvatarFallback color={user?.color} name={user?.name} />}

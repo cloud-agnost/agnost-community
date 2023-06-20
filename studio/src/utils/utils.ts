@@ -8,6 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function removeLastSlash(str: string) {
+	if (str === '/') return str;
 	return str.replace(/\/$/, '');
 }
 export function translate(key: string, options?: any) {

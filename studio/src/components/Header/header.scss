@@ -34,14 +34,17 @@
 			}
 		}
 		&-actions {
-			@apply flex gap-4 items-center;
+			@apply flex gap-2 items-center;
 			&-versions,
 			&-notification {
 				svg {
 					@apply text-[17px];
 				}
-				.btn-icon {
-					@apply w-[36px] h-[36px] p-0 hover:bg-border;
+				.btn {
+					@apply w-[36px] h-[36px] p-0;
+					&:hover {
+						@apply bg-border text-default;
+					}
 				}
 			}
 
