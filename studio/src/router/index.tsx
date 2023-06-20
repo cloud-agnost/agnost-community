@@ -67,11 +67,7 @@ const router = createBrowserRouter([
 			},
 			{
 				path: '/forgot-password/:token',
-				element: (
-					<GuestOnly>
-						<ChangePasswordWithToken />
-					</GuestOnly>
-				),
+				element: <ChangePasswordWithToken />,
 			},
 			{
 				path: '/verify-email',
