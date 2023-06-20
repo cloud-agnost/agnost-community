@@ -10,7 +10,7 @@ async function loader(params: LoaderFunctionArgs) {
 
 	if (isAuthenticated) {
 		await useAuthStore.getState().getUser();
-	} else if (currentPath === '/login') {
+	} else if (currentPath !== '/login') {
 		return redirect('/login');
 	}
 
