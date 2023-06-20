@@ -15,12 +15,14 @@ interface OrganizationStore {
 	organization: Organization | null;
 	organizations: Organization[];
 	applications: Application[];
+	temp: Application[];
 	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
 	createOrganization: (req: CreateOrganizationRequest) => Promise<Organization | APIError>;
 	selectOrganization: (organization: Organization) => void;
 	leaveOrganization: (req: LeaveOrganizationRequest) => Promise<void>;
 	getOrganizationApps: (organizationId: string) => Promise<Application[] | APIError>;
 	createApplication: (req: CreateApplicationRequest) => Promise<Application | APIError>;
+	searchApplications: (query: string) => Promise<Application[] | APIError>;
 }
 
 const useOrganizationStore = create<OrganizationStore>()(
@@ -31,6 +33,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 				organization: null,
 				organizations: [],
 				applications: [],
+				temp: [],
 				getAllOrganizationByUser: async () => {
 					try {
 						set({ loading: true });
@@ -88,7 +91,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 					try {
 						set({ loading: true });
 						const res = await OrganizationService.getOrganizationApps(organizationId);
-						set({ applications: res });
+						set({ applications: res, temp: res });
 						return res;
 					} catch (error) {
 						throw error as APIError;
@@ -110,6 +113,24 @@ const useOrganizationStore = create<OrganizationStore>()(
 						return res.app;
 					} catch (error) {
 						if (onError) onError(error as APIError);
+						throw error as APIError;
+					} finally {
+						set({ loading: false });
+					}
+				},
+				searchApplications: async (query: string) => {
+					try {
+						if (query === '') {
+							set({ applications: get().temp });
+							return get().temp;
+						}
+						set({ loading: true });
+						const res = get().temp.filter((app) =>
+							app.name.toLowerCase().includes(query.toLowerCase()),
+						);
+						set({ applications: res });
+						return res;
+					} catch (error) {
 						throw error as APIError;
 					} finally {
 						set({ loading: false });
