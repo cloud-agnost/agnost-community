@@ -57,6 +57,9 @@ export const ApplicationColumns: ColumnDef<Application>[] = [
 	},
 	{
 		id: 'actions',
-		cell: () => <ApplicationSettings />,
+		cell: ({ row }) => {
+			const { _id, name } = row.original;
+			return <ApplicationSettings appId={_id} appName={name} />;
+		},
 	},
 ];
