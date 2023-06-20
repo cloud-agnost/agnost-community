@@ -29,6 +29,7 @@ import {
 	ProfileSettingsNotifications,
 } from '@/pages/profile';
 import ErrorBoundary from '@/pages/errors/ErrorBoundary.tsx';
+import { Home } from '@/pages/home';
 
 const router = createBrowserRouter([
 	{
@@ -36,6 +37,14 @@ const router = createBrowserRouter([
 		loader: Root.loader,
 		element: <Root />,
 		children: [
+			{
+				index: true,
+				element: (
+					<RequireAuth>
+						<Home />
+					</RequireAuth>
+				),
+			},
 			{
 				path: '/login',
 				element: (

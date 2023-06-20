@@ -7,25 +7,17 @@ async function loader(params: LoaderFunctionArgs) {
 	const isAuthenticated = useAuthStore.getState().isAuthenticated();
 	const requestURL = new URL(params.request.url);
 	const currentPath = removeLastSlash(requestURL.pathname);
-
-	if (isAuthenticated) {
-		await useAuthStore.getState().getUser();
-	} else if (currentPath !== '/login') {
-		return redirect('/login');
-	}
-
 	const status = await useClusterStore.getState().checkClusterSetup();
 	await useClusterStore.getState().checkClusterSmtpStatus();
 
-	if (currentPath !== '/') {
-		return null;
-	}
-
-	if (status) {
-		return redirect('/organization');
-	} else {
+	if (isAuthenticated) {
+		await useAuthStore.getState().getUser();
+		if (status && currentPath !== '/organization') return redirect('/organization');
+	} else if (!status && currentPath !== '/onboarding') {
 		return redirect('/onboarding');
 	}
+
+	return null;
 }
 
 export default function Root() {
