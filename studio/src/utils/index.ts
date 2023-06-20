@@ -6,4 +6,6 @@ export {
 	leaveChannel,
 	sendMessageToChannel,
 	onChannelMessage,
+	getNameForAvatar,
+	getApplicationRoleVariant,
 } from './utils';

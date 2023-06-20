@@ -1,5 +1,6 @@
 import { axios } from '@/helpers';
-import { Organization } from '@/types';
+import { Application, CreateApplicationResponse, Organization } from '@/types';
+import { CreateApplicationRequest } from '@/types';
 
 export default class OrganizationService {
 	static url = '/v1/org';
@@ -18,6 +19,32 @@ export default class OrganizationService {
 				data: {
 					organizationId,
 				},
+			})
+		).data;
+	}
+
+	static async getOrganizationApps(organizationId: string): Promise<Application[]> {
+		return (await axios.get(`${this.url}/${organizationId}/app`)).data;
+	}
+
+	static async createApplication({
+		orgId,
+		name,
+	}: CreateApplicationRequest): Promise<CreateApplicationResponse> {
+		return (await axios.post(`${this.url}/${orgId}/app`, { name })).data;
+	}
+
+	static async deleteApplication(appId: string, orgId: string): Promise<void> {
+		return (
+			await axios.delete(`${this.url}/${orgId}/app/${appId}`, {
+				data: {},
+			})
+		).data;
+	}
+	static async leaveAppTeam(appId: string, orgId: string): Promise<void> {
+		return (
+			await axios.delete(`${this.url}/${orgId}/app/${appId}/team`, {
+				data: {},
 			})
 		).data;
 	}

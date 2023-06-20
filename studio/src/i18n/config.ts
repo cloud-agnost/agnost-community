@@ -1,6 +1,6 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { forms, general, login, organization, profileSettings } from './en';
+import { forms, general, login, organization, profileSettings, application } from './en';
 
 export const resources = {
 	en: {
@@ -10,6 +10,7 @@ export const resources = {
 			general,
 			organization,
 			profileSettings,
+			application,
 		},
 	},
 };

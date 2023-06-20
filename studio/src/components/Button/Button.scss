@@ -44,6 +44,18 @@
 	&-rounded {
 		@apply rounded-full;
 	}
+	&-group {
+		@apply inline-flex items-center justify-center;
+		@apply border border-border;
+		border-radius: calc(var(--radius) - 3px);
+
+		.btn {
+			@apply border-none rounded-sm;
+		}
+	}
+	&-icon-only {
+		@apply p-2;
+	}
 }
 
 .btn:disabled.btn-link,

@@ -206,6 +206,9 @@ module.exports = {
 				'subtle-reverse': 'rgba(var(--text-subtle-reverse), <alpha-value>)',
 				'disabled-reverse': 'rgba(var(--text-disabled-reverse), <alpha-value>)',
 			},
+			borderWidth: {
+				3: '3px',
+			},
 			borderRadius: {
 				lg: `var(--radius)`,
 				md: `calc(var(--radius) - 2px)`,

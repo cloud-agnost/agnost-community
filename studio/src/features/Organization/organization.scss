@@ -21,10 +21,10 @@
 		}
 	}
 	&-label {
-		@apply flex items-center;
+		@apply flex items-center px-1 hover:bg-wrapper-background-hover hover:rounded;
 	}
 	&-dropdown {
-		@apply w-[200px] h-12 p-1 flex justify-between items-center border border-border rounded-sm;
+		@apply w-[210px] h-12 p-1 flex justify-between items-center border border-border rounded-sm;
 		&-icon {
 			@apply rounded-full bg-lighter p-1.5 hover:bg-wrapper-background-light;
 		}
@@ -33,9 +33,6 @@
 		}
 		&-options {
 			@apply space-y-2;
-		}
-		&-option {
-			@apply cursor-pointer hover:bg-wrapper-background-hover;
 		}
 		&-footer {
 			@apply m-auto;

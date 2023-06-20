@@ -1,7 +1,8 @@
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import i18next from 'i18next';
 import { socket } from '@/helpers';
+import { clsx, type ClassValue } from 'clsx';
+import i18next from 'i18next';
+import { DateTime } from 'luxon';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -30,4 +31,27 @@ export function onChannelMessage<T>(channel: string, callback: (data: T) => void
 	return () => {
 		socket.off(channel);
 	};
+}
+export function getNameForAvatar(name: string) {
+	if (name?.length > 2) {
+		const names = name.split(' ');
+		return names[0].charAt(0).toUpperCase() + names[names.length - 1].charAt(0).toUpperCase();
+	} else {
+		return name;
+	}
+}
+export function getRelativeTime(date: string) {
+	return DateTime.fromISO(date).toRelative();
+}
+export function getApplicationRoleVariant(role: string) {
+	switch (role) {
+		case 'Admin':
+			return 'green';
+		case 'Developer':
+			return 'blue';
+		case 'Viewer':
+			return 'yellow';
+		default:
+			return 'green';
+	}
 }

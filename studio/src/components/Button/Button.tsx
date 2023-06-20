@@ -18,7 +18,9 @@ const buttonVariants = cva('btn', {
 			blank: 'btn-blank',
 			outline: 'btn-outline',
 		},
-
+		iconOnly: {
+			true: 'btn-icon-only',
+		},
 		size: {
 			md: 'btn-md',
 			sm: 'btn-sm',
@@ -54,7 +56,18 @@ const Button = React.forwardRef<
 	ButtonProps
 >(
 	(
-		{ className, variant, children, to, size, loading, rounded, asChild = false, ...props },
+		{
+			className,
+			variant,
+			children,
+			to,
+			size,
+			loading,
+			rounded,
+			iconOnly,
+			asChild = false,
+			...props
+		},
 		ref,
 	) => {
 		const Comp = asChild ? Slot : 'button';
@@ -76,7 +89,7 @@ const Button = React.forwardRef<
 		}
 		return (
 			<Comp
-				className={cn(buttonVariants({ variant, size, loading, rounded, className }))}
+				className={cn(buttonVariants({ variant, size, loading, rounded, iconOnly, className }))}
 				ref={ref}
 				{...props}
 			>
@@ -88,4 +101,8 @@ const Button = React.forwardRef<
 );
 Button.displayName = 'Button';
 
-export { Button, buttonVariants };
+const ButtonGroup = ({ children }: { children: React.ReactNode }) => {
+	return <div className='btn-group'>{children}</div>;
+};
+
+export { Button, buttonVariants, ButtonGroup };

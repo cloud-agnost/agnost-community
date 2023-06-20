@@ -4,7 +4,7 @@
 		@apply aspect-square h-full w-full;
 	}
 	&-fallback {
-		@apply flex h-full w-full items-center justify-center rounded-full;
+		@apply flex h-full w-full items-center justify-center font-albert;
 		&-user {
 			@apply text-default;
 		}
@@ -13,7 +13,7 @@
 		}
 	}
 	&-xs {
-		@apply w-4 h-4 text-xs;
+		@apply w-6 h-6 text-xs;
 	}
 	&-sm {
 		@apply w-8 h-8 text-sm;
@@ -22,12 +22,18 @@
 		@apply w-10 h-10 text-base;
 	}
 	&-lg {
-		@apply w-16 h-16 text-2xl;
+		@apply w-12 h-12 text-lg;
 	}
 	&-xl {
-		@apply w-20 h-20 text-3xl;
+		@apply w-16 h-16 text-2xl;
 	}
 	&-2xl {
+		@apply w-20 h-20 text-3xl;
+	}
+	&-3xl {
 		@apply w-32 h-32 text-6xl;
+	}
+	&-square {
+		@apply rounded-sm;
 	}
 }

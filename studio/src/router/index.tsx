@@ -1,4 +1,3 @@
-import { Header } from '@/components/Header';
 import {
 	ChangePasswordWithToken,
 	CompleteAccountSetup,
@@ -8,6 +7,8 @@ import {
 	Login,
 	VerifyEmail,
 } from '@/pages/auth';
+import ErrorBoundary from '@/pages/errors/ErrorBoundary.tsx';
+import { Home } from '@/pages/home';
 import {
 	AccountInformation,
 	CreateApp,
@@ -16,21 +17,24 @@ import {
 	Onboarding,
 	SMTPConfiguration,
 } from '@/pages/onboarding';
-import { Organization, OrganizationSelect } from '@/pages/organization';
+import {
+	Organization,
+	OrganizationApps,
+	OrganizationDetails,
+	OrganizationSelect,
+} from '@/pages/organization';
+import {
+	ProfileSettings,
+	ProfileSettingsClusterManagement,
+	ProfileSettingsGeneral,
+	ProfileSettingsNotifications,
+} from '@/pages/profile';
 import { RedirectHandle } from '@/pages/redirect-handle';
 import { Root } from '@/pages/root';
 import useAuthStore from '@/store/auth/authStore.ts';
-import type { ReactNode } from 'react';
-import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom';
-import {
-	ProfileSettings,
-	ProfileSettingsGeneral,
-	ProfileSettingsClusterManagement,
-	ProfileSettingsNotifications,
-} from '@/pages/profile';
-import ErrorBoundary from '@/pages/errors/ErrorBoundary.tsx';
-import { Home } from '@/pages/home';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
+import type { ReactNode } from 'react';
+import { Navigate, createBrowserRouter, useLocation } from 'react-router-dom';
 
 const router = createBrowserRouter([
 	{
@@ -114,13 +118,42 @@ const router = createBrowserRouter([
 					},
 					{
 						path: ':id',
-						element: <Header></Header>,
+						element: (
+							<RequireAuth>
+								<OrganizationDetails />
+							</RequireAuth>
+						),
+						children: [
+							{
+								loader: OrganizationApps.loader,
+								path: 'apps',
+								element: (
+									<RequireAuth>
+										<OrganizationApps />
+									</RequireAuth>
+								),
+							},
+							{
+								path: 'resources',
+								element: (
+									<RequireAuth>
+										<p>Resource</p>
+									</RequireAuth>
+								),
+							},
+							{
+								path: 'settings',
+								element: (
+									<RequireAuth>
+										<p>Settings</p>
+									</RequireAuth>
+								),
+							},
+						],
 					},
 				],
 			},
-			{
-				path: '/organization/:id',
-			},
+
 			{
 				path: '/profile/settings',
 				element: (
