@@ -1,15 +1,22 @@
 import { Input } from '@/components/Input';
+import { useDebounce, useUpdateEffect } from '@/hooks';
 import { cn } from '@/utils';
 import { MagnifyingGlass, X } from '@phosphor-icons/react';
 import * as React from 'react';
 import { useState } from 'react';
 import { Button } from '../Button';
 import './searchInput.scss';
+interface SearchInputProps extends React.ComponentPropsWithoutRef<'input'> {
+	onSearch?: (value: string) => void;
+}
+const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
+	({ className, placeholder, onSearch, ...props }, ref) => {
+		const [inputValue, setInputValue] = useState<string>('');
+		const searchTerm = useDebounce(inputValue, 500);
 
-const SearchInput = React.forwardRef<HTMLInputElement, React.ComponentPropsWithoutRef<'input'>>(
-	({ className, value, placeholder, ...props }, ref) => {
-		const [inputValue, setInputValue] = useState(value);
-
+		useUpdateEffect(() => {
+			onSearch?.(searchTerm);
+		}, [searchTerm]);
 		return (
 			<div className={cn('search-input-wrapper', className)} {...props}>
 				<MagnifyingGlass size={20} className='search-input-icon' />
