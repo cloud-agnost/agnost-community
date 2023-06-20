@@ -3,7 +3,6 @@ import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
 import { BellRing, ChangeLog, LightBulb, LineSegments } from '@/components/icons';
 import { FileText, GearSix } from '@phosphor-icons/react';
-import { translate } from '@/utils';
 
 export const SLIDER_IMAGES = [
 	{
@@ -37,7 +36,7 @@ export const MENU_ITEMS = [
 	},
 ];
 
-export const MENU_ITEMS_FOR_PROFILE_SETTINGS = [
+export const MENU_ITEMS_FOR_PROFILE_SETTINGS = (translate: (key: string) => string) => [
 	{
 		title: translate('profileSettings.general_title'),
 		href: '/profile/settings',
@@ -69,4 +68,12 @@ export const ALL_NOTIFICATIONS = [
 	'storage',
 	'resource',
 	'environment',
+];
+
+export const ERROR_CODES_TO_REDIRECT_LOGIN_PAGE = [
+	'invalid_session',
+	'missing_access_token',
+	'invalid_access_token',
+	'missing_refresh_token',
+	'invalid_refresh_token',
 ];

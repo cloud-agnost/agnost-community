@@ -19,6 +19,7 @@ import { translate } from '@/utils';
 import { useState } from 'react';
 import { APIError } from '@/types';
 import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
+import { useToast } from '@/hooks';
 
 const FormSchema = z.object({
 	name: z
@@ -41,8 +42,7 @@ const FormSchema = z.object({
 export default function ChangeName() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
-	const [success, setSuccess] = useState(false);
-
+	const { notify } = useToast();
 	const { user, changeName } = useAuthStore();
 	const { t } = useTranslation();
 
@@ -58,10 +58,12 @@ export default function ChangeName() {
 		try {
 			setLoading(true);
 			setError(null);
-			setSuccess(false);
 			await changeName(data.name);
-			setSuccess(true);
-			setTimeout(() => setSuccess(false), 5000);
+			notify({
+				type: 'success',
+				title: t('profileSettings.success'),
+				description: t('profileSettings.name_updated_description'),
+			});
 		} catch (e) {
 			setError(e as APIError);
 		} finally {
@@ -75,13 +77,6 @@ export default function ChangeName() {
 				<Alert variant='error'>
 					<AlertTitle>{error.error}</AlertTitle>
 					<AlertDescription>{error.details}</AlertDescription>
-				</Alert>
-			)}
-
-			{success && (
-				<Alert variant='success'>
-					<AlertTitle>{t('profileSettings.success')}</AlertTitle>
-					<AlertDescription>{t('profileSettings.name_updated_description')}</AlertDescription>
 				</Alert>
 			)}
 

@@ -54,7 +54,7 @@ export default function ChangeAvatar() {
 			<div className='avatar-container'>
 				<Avatar size='xl'>
 					<AvatarImage src={location.origin + '/api' + user?.pictureUrl ?? ''} />
-					{user && <AvatarFallback color={user?.color} name={user?.name} />}
+					{user && <AvatarFallback isUserAvatar color={user?.color} name={user?.name} />}
 				</Avatar>
 				<div className='avatar-actions'>
 					<input
@@ -64,9 +64,11 @@ export default function ChangeAvatar() {
 						type='file'
 						className='hidden'
 					/>
-					<Button loading={deleting} onClick={onClickHandler} variant='blank' size='sm'>
-						<Trash />
-					</Button>
+					{user?.pictureUrl && (
+						<Button loading={deleting} onClick={onClickHandler} variant='blank' size='sm'>
+							<Trash />
+						</Button>
+					)}
 					<Button variant='blank' size='sm' disabled={loading}>
 						{loading ? (
 							<CircleNotch size={15} className='loading m-0' />

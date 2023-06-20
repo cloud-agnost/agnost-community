@@ -3,6 +3,7 @@ import {
 	ChangePasswordWithToken,
 	CompleteAccountSetup,
 	CompleteAccountSetupVerifyEmail,
+	ConfirmChangeEmail,
 	ForgotPassword,
 	Login,
 	VerifyEmail,
@@ -22,12 +23,14 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import type { ReactNode } from 'react';
 import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom';
 import {
-	Profile,
 	ProfileSettings,
 	ProfileSettingsGeneral,
 	ProfileSettingsClusterManagement,
 	ProfileSettingsNotifications,
 } from '@/pages/profile';
+import ErrorBoundary from '@/pages/errors/ErrorBoundary.tsx';
+import { Home } from '@/pages/home';
+import useClusterStore from '@/store/cluster/clusterStore.ts';
 
 const router = createBrowserRouter([
 	{
@@ -35,6 +38,14 @@ const router = createBrowserRouter([
 		loader: Root.loader,
 		element: <Root />,
 		children: [
+			{
+				index: true,
+				element: (
+					<RequireAuth>
+						<Home />
+					</RequireAuth>
+				),
+			},
 			{
 				path: '/login',
 				element: (
@@ -52,12 +63,12 @@ const router = createBrowserRouter([
 				),
 			},
 			{
+				path: '/confirm-change-email',
+				loader: ConfirmChangeEmail.loader,
+			},
+			{
 				path: '/forgot-password/:token',
-				element: (
-					<GuestOnly>
-						<ChangePasswordWithToken />
-					</GuestOnly>
-				),
+				element: <ChangePasswordWithToken />,
 			},
 			{
 				path: '/verify-email',
@@ -111,14 +122,6 @@ const router = createBrowserRouter([
 				path: '/organization/:id',
 			},
 			{
-				path: '/profile',
-				element: (
-					<RequireAuth>
-						<Profile />
-					</RequireAuth>
-				),
-			},
-			{
 				path: '/profile/settings',
 				element: (
 					<RequireAuth>
@@ -141,6 +144,7 @@ const router = createBrowserRouter([
 				],
 			},
 		],
+		errorElement: <ErrorBoundary />,
 	},
 	{
 		loader: Onboarding.loader,
@@ -195,10 +199,13 @@ const router = createBrowserRouter([
 // eslint-disable-next-line react-refresh/only-export-components
 function RequireAuth({ children }: { children: JSX.Element }): JSX.Element {
 	const { isAuthenticated } = useAuthStore();
+	const { isCompleted } = useClusterStore();
 	const location = useLocation();
 
 	if (!isAuthenticated()) {
 		return <Navigate to='/login' state={{ from: location }} replace />;
+	} else if (location.pathname === '/') {
+		return <Navigate to={isCompleted ? '/organization' : '/onboarding'} />;
 	}
 
 	return children;

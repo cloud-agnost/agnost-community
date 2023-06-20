@@ -21,6 +21,7 @@ import { useState } from 'react';
 import { PasswordInput } from 'components/PasswordInput';
 import { APIError } from '@/types';
 import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
+import { useToast } from '@/hooks';
 
 const FormSchema = z.object({
 	password: z
@@ -44,7 +45,7 @@ const FormSchema = z.object({
 export default function ChangeEmail() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
-	const [success, setSuccess] = useState(false);
+	const { notify } = useToast();
 
 	const [isChangeMode, setIsChangeMode] = useState(false);
 	const { user, changeEmail } = useAuthStore();
@@ -57,11 +58,13 @@ export default function ChangeEmail() {
 		try {
 			setError(null);
 			setLoading(true);
-			setSuccess(false);
 			await changeEmail(data.email, data.password);
-			setSuccess(true);
+			notify({
+				type: 'success',
+				title: t('profileSettings.success'),
+				description: t('profileSettings.email_updated_description'),
+			});
 			close();
-			setTimeout(() => setSuccess(false), 5000);
 		} catch (e) {
 			setError(e as APIError);
 		} finally {
@@ -79,12 +82,6 @@ export default function ChangeEmail() {
 
 	return (
 		<div className='space-y-4'>
-			{success && (
-				<Alert variant='success'>
-					<AlertTitle>{t('profileSettings.success')}</AlertTitle>
-					<AlertDescription>{t('profileSettings.email_updated_description')}</AlertDescription>
-				</Alert>
-			)}
 			{isChangeMode ? (
 				<Form {...form}>
 					<form className='change-email-form' onSubmit={form.handleSubmit(onSubmit)}>
@@ -141,7 +138,7 @@ export default function ChangeEmail() {
 				</Form>
 			) : (
 				<div className='space-y-4'>
-					<Input readOnly value={user?.contactEmail} />
+					<Input readOnly value={user?.loginProfiles[0].email} />
 					<Button onClick={open} size='lg'>
 						{t('profileSettings.change_email')}
 					</Button>

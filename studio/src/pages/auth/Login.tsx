@@ -114,9 +114,19 @@ export default function Login() {
 					</form>
 				</Form>
 				{canClusterSendEmail && (
-					<div className='flex justify-between text-sm underline text-default leading-6 font-albert'>
-						<Link to='/forgot-password'>Forgot Password</Link>
-						<Link to='/complete-account-setup'>Complete Account Setup</Link>
+					<div className='flex justify-between text-sm text-default leading-6 font-albert'>
+						<Link
+							className='hover:underline no-underline underline-offset-2 hover:text-disabled-reverse'
+							to='/forgot-password'
+						>
+							Forgot Password
+						</Link>
+						<Link
+							className='hover:underline no-underline underline-offset-2 hover:text-disabled-reverse'
+							to='/complete-account-setup'
+						>
+							Complete Account Setup
+						</Link>
 					</div>
 				)}
 			</div>

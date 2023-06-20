@@ -20,8 +20,7 @@ import { PasswordInput } from 'components/PasswordInput';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { APIError } from '@/types';
 import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
-import { Avatar, AvatarFallback } from 'components/Avatar';
-import { InfoModal } from 'components/InfoModal';
+import { useToast } from '@/hooks';
 
 const FormSchema = z.object({
 	currentPassword: z
@@ -69,13 +68,10 @@ const FormSchema = z.object({
 export default function ChangePassword() {
 	const [loading, setLoading] = useState(false);
 	const [sending, setSending] = useState(false);
-	const [success, setSuccess] = useState<{ message: string; title?: string | null } | null>(null);
 	const [error, setError] = useState<APIError | null>(null);
-	const [infoModalIsOpen, setInfoModalIsOpen] = useState(false);
 	const [isChangeMode, setIsChangeMode] = useState(false);
-
+	const { notify } = useToast();
 	const { changePassword, user, resetPassword } = useAuthStore();
-	const loginEmail = user?.loginProfiles.find((profile) => profile.provider === 'agnost')?.email;
 
 	const { t } = useTranslation();
 	const form = useForm<z.infer<typeof FormSchema>>({
@@ -86,13 +82,12 @@ export default function ChangePassword() {
 		try {
 			setError(null);
 			setLoading(true);
-			setSuccess(null);
 			await changePassword(data.currentPassword, data.newPassword.password);
-			setSuccess({
+			notify({
+				type: 'success',
 				title: t('profileSettings.success'),
-				message: t('profileSettings.password_updated'),
+				description: t('profileSettings.password_updated'),
 			});
-			setTimeout(() => setSuccess(null), 5000);
 			close();
 		} catch (error) {
 			setError(error as APIError);
@@ -108,7 +103,13 @@ export default function ChangePassword() {
 			setError(null);
 			setSending(true);
 			await resetPassword(loginEmail);
-			setInfoModalIsOpen(true);
+			notify({
+				type: 'success',
+				title: t('profileSettings.email_sent'),
+				description: t('profileSettings.email_sent_description', {
+					email: loginEmail,
+				}),
+			});
 		} catch (e) {
 			setError(e as APIError);
 		} finally {
@@ -126,29 +127,7 @@ export default function ChangePassword() {
 
 	return (
 		<>
-			<InfoModal
-				icon={
-					<Avatar size='2xl'>
-						<AvatarFallback color='#9B7B0866' />
-					</Avatar>
-				}
-				action={
-					<Button size='lg' onClick={() => setInfoModalIsOpen(false)}>
-						{t('general.ok')}
-					</Button>
-				}
-				title={t('profileSettings.email_sent')}
-				description={t('profileSettings.email_sent_description', { email: loginEmail })}
-				isOpen={infoModalIsOpen}
-				closeModal={() => setInfoModalIsOpen(false)}
-			/>
 			<div className='space-y-4'>
-				{success && (
-					<Alert variant='success'>
-						<AlertTitle>{success.title}</AlertTitle>
-						<AlertDescription>{success.message}</AlertDescription>
-					</Alert>
-				)}
 				{error && (
 					<Alert variant='error'>
 						<AlertTitle>{error.error}</AlertTitle>

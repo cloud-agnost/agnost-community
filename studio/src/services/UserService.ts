@@ -4,6 +4,10 @@ import { UpdateNotificationsData, User } from '@/types/type.ts';
 export default class UserService {
 	static url = '/v1/user';
 
+	static async getUser(): Promise<User> {
+		return (await axios.get(`${this.url}/me`)).data;
+	}
+
 	static async resetPassword({ email, uiBaseURL }: { email: string; uiBaseURL: string }) {
 		return (await axios.post(`${this.url}/reset-pwd`, { email, uiBaseURL })).data;
 	}
@@ -32,6 +36,10 @@ export default class UserService {
 		uiBaseURL: string;
 	}): Promise<string> {
 		return (await axios.post(`${this.url}/login-email`, data)).data;
+	}
+
+	static async confirmChangeLoginEmail(token: string): Promise<void> {
+		return (await axios.post(`${this.url}/login-email/${token}`, {})).data;
 	}
 
 	static async changeAvatar(avatar: File): Promise<User> {

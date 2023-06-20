@@ -44,6 +44,8 @@ interface AuthStore {
 	changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 	deleteAccount: () => Promise<void>;
 	updateNotifications: (notifications: string[]) => Promise<User>;
+	confirmChangeLoginEmail: (token: string) => Promise<void>;
+	getUser: () => Promise<User>;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -76,7 +78,7 @@ const useAuthStore = create<AuthStore>()(
 				},
 				setToken: (accessToken) => set({ accessToken }),
 				setRefreshToken: (refreshToken) => set({ refreshToken }),
-				isAuthenticated: () => get()?.user !== null,
+				isAuthenticated: () => Boolean(get().accessToken),
 				renewAccessToken: async () => {
 					if (!get().isAuthenticated()) return;
 					const res = await AuthService.renewAccessToken();
@@ -186,6 +188,14 @@ const useAuthStore = create<AuthStore>()(
 					const res = await UserService.updateNotifications({ notifications });
 					set({ user: res });
 					return res;
+				},
+				confirmChangeLoginEmail(token: string) {
+					return UserService.confirmChangeLoginEmail(token);
+				},
+				async getUser() {
+					const user = await UserService.getUser();
+					set({ user });
+					return user;
 				},
 			}),
 			{
