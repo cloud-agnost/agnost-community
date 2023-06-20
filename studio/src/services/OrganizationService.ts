@@ -33,4 +33,19 @@ export default class OrganizationService {
 	}: CreateApplicationRequest): Promise<CreateApplicationResponse> {
 		return (await axios.post(`${this.url}/${orgId}/app`, { name })).data;
 	}
+
+	static async deleteApplication(appId: string, orgId: string): Promise<void> {
+		return (
+			await axios.delete(`${this.url}/${orgId}/app/${appId}`, {
+				data: {},
+			})
+		).data;
+	}
+	static async leaveAppTeam(appId: string, orgId: string): Promise<void> {
+		return (
+			await axios.delete(`${this.url}/${orgId}/app/${appId}/team`, {
+				data: {},
+			})
+		).data;
+	}
 }
