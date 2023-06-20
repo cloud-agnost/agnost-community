@@ -30,6 +30,7 @@ import {
 } from '@/pages/profile';
 import ErrorBoundary from '@/pages/errors/ErrorBoundary.tsx';
 import { Home } from '@/pages/home';
+import useClusterStore from '@/store/cluster/clusterStore.ts';
 
 const router = createBrowserRouter([
 	{
@@ -198,10 +199,13 @@ const router = createBrowserRouter([
 // eslint-disable-next-line react-refresh/only-export-components
 function RequireAuth({ children }: { children: JSX.Element }): JSX.Element {
 	const { isAuthenticated } = useAuthStore();
+	const { isCompleted } = useClusterStore();
 	const location = useLocation();
 
 	if (!isAuthenticated()) {
 		return <Navigate to='/login' state={{ from: location }} replace />;
+	} else if (location.pathname === '/') {
+		return <Navigate to={isCompleted ? '/organization' : '/onboarding'} />;
 	}
 
 	return children;
