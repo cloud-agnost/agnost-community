@@ -8,9 +8,15 @@ import './application.scss';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/Badge';
 import { getApplicationRoleVariant } from '@/utils';
-export default function ApplicationCard({ application }: { application: Application }) {
+
+interface ApplicationCardProps {
+	application: Application;
+}
+
+export default function ApplicationCard({ application }: ApplicationCardProps) {
 	const { user } = useAuthStore();
 	const { t } = useTranslation();
+
 	const role = application.team.find((member) => member._id !== user?._id)?.role;
 	return (
 		<div className='application-card'>
@@ -35,7 +41,7 @@ export default function ApplicationCard({ application }: { application: Applicat
 				<span className='text-subtle font-sfCompact text-xs'>
 					{t('general.created')} {getRelativeTime(application.createdAt)}
 				</span>
-				<ApplicationSettings />
+				<ApplicationSettings appId={application._id} appName={application.name} />
 			</div>
 		</div>
 	);
