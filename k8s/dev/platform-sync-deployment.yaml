@@ -26,8 +26,6 @@ spec:
               env:
                  - name: CACHE_HOSTNAME
                    value: redis-master      
-                 - name: CACHE_READ_REPLICA_HOSTNAME
-                   value: redis-replicas  
                  - name: CACHE_PWD
                    valueFrom:
                       secretKeyRef:
