@@ -17,6 +17,7 @@ interface OrganizationStore {
 	organizations: Organization[];
 	applications: Application[];
 	temp: Application[];
+	isVersionOpen: boolean;
 	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
 	createOrganization: (req: CreateOrganizationRequest) => Promise<Organization | APIError>;
 	selectOrganization: (organization: Organization) => void;
@@ -39,6 +40,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 				organizations: [],
 				applications: [],
 				temp: [],
+				isVersionOpen: false,
 				getAllOrganizationByUser: async () => {
 					try {
 						set({ loading: true });
