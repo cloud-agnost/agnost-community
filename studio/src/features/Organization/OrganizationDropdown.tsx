@@ -107,7 +107,7 @@ export function OrganizationDropdown() {
 						<CommandGroup className='organization-dropdown-footer'>
 							<CommandItem className='organization-dropdown-leave'>
 								<Button
-									variant='text'
+									variant='blank'
 									className='text-subtle'
 									onClick={() => {
 										setOpenModal(true);
