@@ -16,5 +16,15 @@
 	"delete": {
 		"title": "Delete App",
 		"description": "You are about to delete the app. After deleting the app you will not be able to access it again. Are you sure you would like to delete the {{name}} app?"
+	},
+	"version": {
+		"title": "Open Version",
+		"search": "Search Versions"
+	},
+	"table": {
+		"name": "Name",
+		"role": "Role",
+		"createdAt": "Created",
+		"team": "Team"
 	}
 }
