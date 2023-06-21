@@ -13,7 +13,7 @@
 		@apply bg-subtle font-medium text-subtle;
 	}
 	&-row {
-		@apply border-b transition-colors hover:bg-subtle/50 data-[state=selected]:bg-subtle;
+		@apply border-b transition-colors hover:bg-base/80 data-[state=selected]:bg-subtle;
 	}
 	&-head {
 		@apply h-12 px-4 text-left align-middle font-medium text-subtle [&:has([role=checkbox])]:pr-0;

@@ -1,7 +1,7 @@
 .application {
 	&-card {
 		@apply px-4 pt-6  pb-3 border border-border bg-subtle;
-		@apply flex flex-col justify-between;
+		@apply flex flex-col justify-between hover:bg-base/50;
 		width: 326px;
 		height: 164px;
 	}
