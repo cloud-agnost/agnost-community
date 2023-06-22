@@ -3,7 +3,6 @@
 	@apply rounded-md text-sm transition-colors font-semibold leading-[normal];
 	@apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary-hover focus-visible:ring-offset-2;
 	@apply disabled:opacity-50 disabled:pointer-events-none focus-visible:ring-button-primary-hover;
-	@apply px-4 py-2;
 
 	&-primary {
 		@apply hover:bg-button-primary-hover text-white focus-visible:ring-button-primary;
@@ -19,9 +18,7 @@
 	&-link {
 		@apply text-button-primary hover:underline hover:text-button-primary-hover focus-visible:ring-button-secondary;
 	}
-	&-blank {
-		@apply text-default;
-	}
+
 	&-outline {
 		@apply border border-button-border hover:border-button-border-hover;
 		@apply text-default focus-visible:ring-button-secondary;
@@ -55,6 +52,9 @@
 	}
 	&-icon-only {
 		@apply p-2;
+	}
+	&-blank {
+		@apply text-default p-0;
 	}
 }
 
