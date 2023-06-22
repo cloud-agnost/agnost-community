@@ -17,7 +17,7 @@ import { cn } from '@/utils';
 import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useOutletContext } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { OrganizationCreateModal } from '@/features/Organization';
 import './organization.scss';
 

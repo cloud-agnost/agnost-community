@@ -1,6 +1,6 @@
 import './notifications.scss';
 import { ALL_NOTIFICATIONS } from '@/constants';
-import { NotificationItem } from '@/features/auth/components/Notifications';
+import { NotificationItem } from '@/features/auth/components/Notifications/index.ts';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { useState } from 'react';
 import { APIError } from '@/types';

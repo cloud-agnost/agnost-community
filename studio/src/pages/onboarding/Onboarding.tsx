@@ -5,13 +5,15 @@ import { Stepper } from '@/components/Stepper';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 
 import './onboarding.scss';
+import useAuthStore from '@/store/auth/authStore.ts';
 
 async function loader(params: LoaderFunctionArgs) {
 	const status = await useClusterStore.getState().checkClusterSetup();
 	const { currentStepIndex, steps } = useOnboardingStore.getState();
+	const isAuthenticated = useAuthStore.getState().isAuthenticated();
 
 	if (status) {
-		return redirect('/organization');
+		return redirect(isAuthenticated ? '/organization' : '/login');
 	}
 
 	const url = new URL(params.request.url);
