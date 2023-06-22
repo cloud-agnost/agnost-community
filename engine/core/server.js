@@ -116,8 +116,9 @@ async function finalizePrimaryProcessStartup() {
 			// Child process did not respond within timeout, handle accordingly
 			logger.warn("Child process is unresponsive!");
 
-			// Kill the child process so that it restarts
-			childProcess.kill("SIGINT");
+			// Kill the child process so that it restarts.
+			// SIGINT does not work if child process is stuck in an ifinite loop, we need to use SIGTERM
+			childProcess.kill("SIGTERM");
 		}, config.get("general.heartbeatTimeoutSeconds") * 1000); // Timeout duration in milliseconds
 
 		// Listen for heartbeat response from the child process

@@ -29,6 +29,7 @@ const ERROR_CODES = {
 	queueExecutionError: "queue_execution_error",
 	endpointImportError: "endpoint_import_error",
 	queueImportError: "queue_import_error",
+	requestTimedOut: "request_timed_out",
 };
 
 export default ERROR_CODES;

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { logicTypes } from "../config/constants.js";
 
 /**
  * Message queue and its handler definition
@@ -38,10 +39,15 @@ export const QueueModel = mongoose.model(
 				type: Boolean,
 				default: true,
 			},
-			code: {
+			type: {
 				type: String,
-				index: true,
-				default: "",
+				required: true,
+				enum: logicTypes,
+				default: "code",
+			},
+			logic: {
+				type: String,
+				text: true, // Declares a full-text index
 			},
 			createdBy: {
 				type: mongoose.Schema.Types.ObjectId,

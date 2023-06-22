@@ -459,6 +459,8 @@ export const addInstanceTypes = {
 
 export const methodTypes = ["GET", "POST", "PUT", "DELETE"];
 
+export const logicTypes = ["code", "flow"];
+
 export const schedulTypes = ["every", "day", "week", "month", "plain"];
 
 export const intervalTypes = ["minute", "hour"];
@@ -738,3 +740,15 @@ export const authUserDataModel = [
 		type: "text",
 	},
 ];
+
+export const defaultEndpointCode = `const endpointHandler = (req, res) => {
+	res.json();
+};
+
+export default endpointHandler;`;
+
+export const defaultMiddlewareCode = `const middlewareHandler = (req, res, next) => {
+	next();
+};
+
+export default middlewareHandler;`;

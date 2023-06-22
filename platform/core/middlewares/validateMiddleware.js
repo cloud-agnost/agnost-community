@@ -14,7 +14,7 @@ export const validateMiddleware = async (req, res, next) => {
 				error: t("Not Found"),
 				details: t(
 					"No such middleware with the provided id '%s' exists.",
-					dbId
+					mwId
 				),
 				code: ERROR_CODES.notFound,
 			});
@@ -25,7 +25,7 @@ export const validateMiddleware = async (req, res, next) => {
 				error: t("Not Authorized"),
 				details: t(
 					"App version does not have a middleware with the provided id '%s'",
-					dbId
+					mwId
 				),
 				code: ERROR_CODES.unauthorized,
 			});

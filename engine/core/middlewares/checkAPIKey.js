@@ -18,7 +18,7 @@ export const checkAPIKey = (endpoint) => (req, res, next) => {
 					ERROR_CODES.clientError,
 					ERROR_CODES.missingAPIKey,
 					t(
-						'No API Key was found in "Authorization" header or "apikey" query parameter.'
+						"No API Key was found in 'Authorization' header or 'apikey' query parameter."
 					)
 				)
 			);
@@ -170,8 +170,8 @@ export const checkAPIKey = (endpoint) => (req, res, next) => {
 		// If the IP address is in IPv6 format, convert it to IPv4 format
 		clientIP = clientIP
 			? net.isIPv4(clientIP)
-				? clientIP.substring(7)
-				: clientIP
+				? clientIP
+				: clientIP.substring(7)
 			: null;
 
 		// Request doesn't have an origin header

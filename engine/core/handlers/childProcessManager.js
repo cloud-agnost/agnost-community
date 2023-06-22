@@ -10,11 +10,17 @@ import { getResponseBody } from "../middlewares/getResponseBody.js";
 import { checkServerStatus } from "../middlewares/checkServerStatus.js";
 import { applyRateLimit } from "../middlewares/applyRateLimit.js";
 import { logRequest } from "../middlewares/logRequest.js";
+import { applyTimeout } from "../middlewares/applyTimeout.js";
+import { clearTimeout } from "../middlewares/clearTimeout.js";
 import { checkAPIKey } from "../middlewares/checkAPIKey.js";
 import { checkSession } from "../middlewares/checkSession.js";
 import { handleFileUploads } from "../middlewares/handleFileUploads.js";
 import { checkContentType } from "../middlewares/checkContentType.js";
 import { applyCustomMiddleware } from "../middlewares/applyCustomMiddleware.js";
+import {
+	turnOnLogging,
+	turnOffLogging,
+} from "../middlewares/manageDebugChannels.js";
 import { runHandler } from "../middlewares/runHandler.js";
 import { adapterManager } from "./adapterManager.js";
 import { MetaManager } from "./metaManager.js";
@@ -193,27 +199,36 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			// Create a new router for the endpoint
 			const router = express.Router();
 
+			// Add rate limiter middlewares if any
+			this.addRateLimiters(endpoint, handlers);
+			// If the endpoint is marked as log enabled then add logging middleware
+			this.addTimeoutMiddleware(endpoint, handlers);
+			// If the endpoint is marked as log enabled then add logging middleware
+			this.addClearTimeoutMiddleware(endpoint, handlers);
 			// Add the server status checker middleware
 			handlers.push(getResponseBody);
 			// Add the server status checker middleware
 			handlers.push(checkServerStatus);
-			// Add rate limiter middlewares if any
-			this.addRateLimiters(endpoint, handlers);
 			// If the endpoint is marked as log enabled then add logging middleware
 			this.addLogMiddleware(endpoint, handlers);
+			// Add content-type check middleware
+			handlers.push(checkContentType);
 			// If the endpoint is marked as API key required then add API key check middleware
 			this.addAPIKeyMiddleware(endpoint, handlers);
 			// If the endpoint is marked as session required then add session token check middleware
 			this.addSessionMiddleware(endpoint, handlers);
 			// Add file handler middleware
 			handlers.push(handleFileUploads);
-			// Add content-type check middleware
-			handlers.push(checkContentType);
+			// Add debug channel handlers
+			handlers.push(turnOnLogging);
+			// When headers are sent, automatically turn off logging
+			handlers.push(turnOffLogging);
 			// If the endpoint has custom defined middlewares then add those middlewares
 			await this.addCustomMiddlewares(endpoint, handlers);
 			// Add the route handler
 			this.addEndpointHandler(endpoint, handlers);
 
+			console.log("****here", handlers);
 			// Register the endpoint to the router
 			if (endpoint.method === "GET")
 				router.get(
@@ -236,12 +251,32 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 					...handlers
 				);
 
-			this.getExpressApp().use(touter);
+			this.getExpressApp().use(router);
 
 			this.addLog(
 				`Added endpoint '${endpoint.name}' ${endpoint.method}: ${endpoint.path}`
 			);
 		}
+	}
+
+	/**
+	 * Adds the timeout control middleware
+	 * @param  {Object} endpoint The endpoint JSON object
+	 * @param  {Array} handlers The array where the timeout middleware will be added
+	 */
+	addTimeoutMiddleware(endpoint, handlers) {
+		// If timeout specified then add the timeout middleware
+		if (endpoint.timeout > 0) handlers.push(applyTimeout(endpoint));
+	}
+
+	/**
+	 * Adds the timeout control middleware
+	 * @param  {Object} endpoint The endpoint JSON object
+	 * @param  {Array} handlers The array where the timeout middleware will be added
+	 */
+	addClearTimeoutMiddleware(endpoint, handlers) {
+		// If timeout specified then add the timeout middleware
+		if (endpoint.timeout > 0) handlers.push(clearTimeout);
 	}
 
 	/**
@@ -253,12 +288,12 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Get the rate limiters of the endpoint
 		let rateLimiters = endpoint.rateLimits || [];
 		// If no endpoint rate limiters specified then check the default rate limites specified in version
-		if (rateLimiters.lendth === 0) {
+		if (rateLimiters.length === 0) {
 			rateLimiters = this.getEndpointDefaultRateLimits();
 		}
 
 		// If there are no rate limites then do nothing
-		if (rateLimiters.lendth === 0) return;
+		if (rateLimiters.length === 0) return;
 
 		// OK we have rate limits then add the middlewares
 		for (let i = 0; i < rateLimiters.length; i++) {
