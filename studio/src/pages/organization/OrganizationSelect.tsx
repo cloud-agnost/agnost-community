@@ -11,6 +11,7 @@ import { useOutletContext } from 'react-router-dom';
 import './organization.scss';
 
 async function loader() {
+	if (!useAuthStore.getState().isAuthenticated()) return null;
 	return useOrganizationStore.getState().getAllOrganizationByUser();
 }
 
