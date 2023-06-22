@@ -7,9 +7,18 @@ import { getRelativeTime } from '@/utils/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { Refresh } from '@/components/icons';
 import { getApplicationRoleVariant } from '@/utils';
+import { translate } from '@/utils';
+import { Button } from '@/components/Button';
+import { CaretUpDown } from '@phosphor-icons/react';
+import { SortButton } from '@/components/DataTable';
 export const ApplicationColumns: ColumnDef<Application>[] = [
 	{
 		id: 'name',
+		header: ({ column }) => (
+			<SortButton text={translate('application.table.name')} column={column} />
+		),
+		size: 1234,
+		accessorKey: 'name',
 		cell: ({ row }) => {
 			const { pictureUrl, name, color } = row.original;
 			return (
@@ -25,23 +34,27 @@ export const ApplicationColumns: ColumnDef<Application>[] = [
 	},
 	{
 		id: 'role',
+		header: ({ column }) => (
+			<SortButton text={translate('application.table.role')} column={column} />
+		),
+		accessorKey: 'role',
 		cell: ({ row }) => {
 			const { team } = row.original;
 			const role = team.find((member) => member._id !== useAuthStore.getState().user?._id)?.role;
-			return (
-				<div className='text-center'>
-					<Badge variant={getApplicationRoleVariant(role as string)}>{role}</Badge>
-				</div>
-			);
+			return <Badge variant={getApplicationRoleVariant(role as string)}>{role}</Badge>;
 		},
 	},
 
 	{
 		id: 'date',
+		header: ({ column }) => (
+			<SortButton text={translate('application.table.createdAt')} column={column} />
+		),
+		accessorKey: 'createdAt',
 		cell: ({ row }) => {
 			const { createdAt } = row.original;
 			return (
-				<div className='flex items-center justify-center gap-1'>
+				<div className='flex gap-1'>
 					<Refresh className='w-4 h-4 text-subtle mr-2' />
 					{getRelativeTime(createdAt)}
 				</div>
@@ -50,6 +63,7 @@ export const ApplicationColumns: ColumnDef<Application>[] = [
 	},
 	{
 		id: 'team',
+		header: translate('application.table.team'),
 		cell: ({ row }) => {
 			const { team } = row.original;
 			return <ApplicationTeam team={team} />;
@@ -59,7 +73,11 @@ export const ApplicationColumns: ColumnDef<Application>[] = [
 		id: 'actions',
 		cell: ({ row }) => {
 			const { _id, name } = row.original;
-			return <ApplicationSettings appId={_id} appName={name} />;
+			return (
+				<div className='text-center'>
+					<ApplicationSettings appId={_id} appName={name} />
+				</div>
+			);
 		},
 	},
 ];

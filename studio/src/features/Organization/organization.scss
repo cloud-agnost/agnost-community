@@ -21,7 +21,7 @@
 		}
 	}
 	&-label {
-		@apply flex items-center px-1 hover:bg-wrapper-background-hover hover:rounded;
+		@apply flex items-center px-1 hover:bg-wrapper-background-hover hover:rounded flex-1;
 	}
 	&-dropdown {
 		@apply w-[210px] h-12 p-1 flex justify-between items-center border border-border rounded-sm;
@@ -50,7 +50,8 @@
 			@apply text-xs text-subtle;
 		}
 		&-content {
-			@apply w-[200px] p-0;
+			@apply p-0;
+			transform: translateX(1.25rem);
 		}
 	}
 }

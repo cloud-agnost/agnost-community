@@ -2,7 +2,7 @@ import { Button, ButtonGroup } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { SearchInput } from '@/components/SearchInput';
 import { List, SquaresFour } from '@/components/icons';
-import { ApplicationCard } from '@/features/application';
+import { ApplicationCard, ApplicationVersions } from '@/features/application';
 import ApplicationTable from '@/features/application/ApplicationTable/ApplicationTable';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Application } from '@/types';
@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { ApplicationCardSkeleton } from '@/components/Skeletons';
+
 function loader() {
 	return null;
 }
@@ -25,7 +26,7 @@ export default function OrganizationApps() {
 
 	useEffect(() => {
 		const query = searchParams.get('q');
-		if (query) searchApplications(query as string);
+		if (query) searchApplications(query);
 		else searchApplications('');
 	}, [searchParams.get('q')]);
 
@@ -91,6 +92,7 @@ export default function OrganizationApps() {
 					<CreateApplicationButton />
 				</EmptyState>
 			)}
+			<ApplicationVersions />
 		</div>
 	);
 }

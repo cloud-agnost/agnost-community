@@ -4,7 +4,8 @@ import Realtime from '@/assets/images/realtime.png';
 import { BellRing, ChangeLog, LightBulb, LineSegments } from '@/components/icons';
 import { FileText, GearSix, DeviceTablet, Database as DatabaseIcon } from '@phosphor-icons/react';
 import { translate } from '@/utils';
-
+import { ApplicationVersions } from '@/features/application';
+import useOrganizationStore from '@/store/organization/organizationStore';
 export const SLIDER_IMAGES = [
 	{
 		text: 'Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.',
@@ -75,6 +76,9 @@ export const ORGANIZATION_MENU_ITEMS = [
 export const APPLICATION_SETTINGS = [
 	{
 		name: translate('application.settings.openVersion'),
+		onClick: () => {
+			useOrganizationStore.setState({ isVersionOpen: true });
+		},
 	},
 	{
 		name: translate('application.settings.editApp'),

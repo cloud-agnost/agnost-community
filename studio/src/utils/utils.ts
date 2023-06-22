@@ -46,11 +46,11 @@ export function getRelativeTime(date: string) {
 export function getApplicationRoleVariant(role: string) {
 	switch (role) {
 		case 'Admin':
-			return 'green';
+			return 'orange';
 		case 'Developer':
-			return 'blue';
+			return 'purple';
 		case 'Viewer':
-			return 'yellow';
+			return 'blue';
 		default:
 			return 'green';
 	}

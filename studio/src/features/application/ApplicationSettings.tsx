@@ -35,7 +35,14 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 		<>
 			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger asChild>
-					<Button variant='text' rounded className='p-2'>
+					<Button
+						variant='text'
+						rounded
+						className='p-2'
+						onClick={(e) => {
+							e.stopPropagation();
+						}}
+					>
 						<DotsThreeVertical className='w-5 h-5 text-icon-secondary' />
 						<span className='sr-only'>Open popover</span>
 					</Button>
@@ -48,6 +55,7 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 									key={setting.name}
 									onSelect={() => {
 										setOpen(false);
+										if (setting.onClick) setting.onClick();
 									}}
 									className='font-sfCompact px-3'
 								>
