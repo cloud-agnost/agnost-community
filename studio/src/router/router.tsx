@@ -297,9 +297,13 @@ function RequireAuth({ children }: { children: JSX.Element }): JSX.Element {
 // eslint-disable-next-line react-refresh/only-export-components
 function GuestOnly({ children }: { children: ReactNode }): JSX.Element {
 	const { isAuthenticated } = useAuthStore();
+	const { isCompleted } = useClusterStore();
+	const { pathname } = useLocation();
 
 	if (isAuthenticated()) {
 		return <Navigate to='/organization' />;
+	} else if (!isCompleted && pathname !== '/onboarding') {
+		return <Navigate to='/onboarding' />;
 	}
 
 	return children as JSX.Element;
