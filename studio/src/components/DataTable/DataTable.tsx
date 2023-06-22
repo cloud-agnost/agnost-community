@@ -40,10 +40,13 @@ export function DataTable<TData, TValue>({
 			{columns.map((column) => column.header).filter(Boolean).length > 0 && (
 				<TableHeader>
 					{table.getHeaderGroups().map((headerGroup) => (
-						<TableRow key={headerGroup.id}>
+						<TableRow key={headerGroup.id} className='head'>
 							{headerGroup.headers.map((header) => {
 								return (
-									<TableHead key={header.id}>
+									<TableHead
+										key={header.id}
+										className={cn(typeof header.column.columnDef.header !== 'string' && 'sortable')}
+									>
 										{header.isPlaceholder
 											? null
 											: flexRender(header.column.columnDef.header, header.getContext())}
@@ -61,7 +64,7 @@ export function DataTable<TData, TValue>({
 							key={row.id}
 							data-state={row.getIsSelected() && 'selected'}
 							onClick={() => onRowClick?.(row.original)}
-							className={cn(onRowClick && 'cursor-pointer')}
+							className={cn(onRowClick && 'cursor-pointer', 'content')}
 						>
 							{row.getVisibleCells().map((cell) => (
 								<TableCell
