@@ -5,12 +5,18 @@
 		&-name {
 			@apply text-default text-sm font-sfCompact;
 		}
+		&.active {
+			.org-menu-link {
+				@apply border-b-brand-primary;
+			}
+			.org-menu-icon {
+				@apply text-brand-primary;
+			}
+		}
 	}
 	&-link {
 		@apply flex items-center justify-center gap-2 p-4;
-		&-active {
-			@apply border-b-3 border-brand-primary;
-		}
+		@apply border-b-3 border-transparent;
 	}
 	&-icon {
 		@apply text-icon-base;
