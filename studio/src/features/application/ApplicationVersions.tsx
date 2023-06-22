@@ -25,7 +25,7 @@ export default function ApplicationVersions() {
 					<DrawerTitle>{t('application.version.title')}</DrawerTitle>
 				</DrawerHeader>
 				<div className='p-6'>
-					<SearchInput placeholder={t('application.version.search')} />
+					<SearchInput placeholder={t('application.version.search') as string} />
 				</div>
 				<DrawerFooter>
 					<DrawerClose asChild>

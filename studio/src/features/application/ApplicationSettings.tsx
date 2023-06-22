@@ -136,7 +136,7 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 				title={modalInfo.title}
 				description={modalInfo.description}
 				icon={
-					<Avatar size='2xl'>
+					<Avatar size='3xl'>
 						<AvatarFallback color='#9B7B0866' />
 					</Avatar>
 				}
