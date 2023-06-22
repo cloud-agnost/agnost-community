@@ -9,7 +9,7 @@ export default function ApplicationTeam({ team, table = false }: ApplicationTeam
 	return (
 		<div className=''>
 			{team.slice(0, 4).map((member) => (
-				<Avatar key={member._id} size={table ? 'xs' : 'xxs'}>
+				<Avatar key={member._id} size={table ? 'xs' : 'sm'}>
 					<AvatarImage src={member.userId.pictureUrl} />
 					<AvatarFallback name={member.userId.name} color={member.userId.color} isUserAvatar />
 				</Avatar>
