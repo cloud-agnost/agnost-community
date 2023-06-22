@@ -1015,6 +1015,22 @@ export class DeploymentManager {
 	}
 
 	/**
+	 * Gets all existing endpoint configurations from the cache.
+	 */
+	async getPrevEndpointDefinitions() {
+		let endpoints = await getKey(`${this.getEnvId()}.endpoints`);
+		return endpoints;
+	}
+
+	/**
+	 * Gets all existing endpoint configurations from the cache.
+	 */
+	async getPrevMiddlewareDefinitions() {
+		let middlewares = await getKey(`${this.getEnvId()}.middlewares`);
+		return middlewares;
+	}
+
+	/**
 	 * Save new deployment configuration to the engine cluster database
 	 */
 	async saveDeploymentConfig() {
@@ -1061,6 +1077,19 @@ export class DeploymentManager {
 			await engineDb.collection("databases").insertMany(databases);
 
 		this.addLog("Saved database configurations to environment database");
+	}
+
+	/**
+	 * Save the database configurations to the engine cluster database
+	 */
+	async saveEndpointDeploymentConfigs(endpoints) {
+		const engineDb = this.getEnvDB();
+		// First clear any existing configuration
+		await engineDb.collection("endpoints").deleteMany({});
+		if (endpoints.length > 0)
+			await engineDb.collection("endpoints").insertMany(endpoints);
+
+		this.addLog("Saved endpoint configurations to environment database");
 	}
 
 	/**
@@ -1150,7 +1179,43 @@ export class DeploymentManager {
 		switch (actionType) {
 			case "set":
 				this.addToCache(`${this.getEnvId()}.endpoints`, endpoints);
-				break;
+				return endpoints;
+			case "add": {
+				const prevEpDefinitions = await this.getPrevEndpointDefinitions();
+				prevEpDefinitions.push(...endpoints);
+				this.addToCache(`${this.getEnvId()}.endpoints`, prevEpDefinitions);
+				return prevEpDefinitions;
+			}
+			case "update": {
+				const prevEpDefinitions = await this.getPrevEndpointDefinitions();
+
+				if (prevEpDefinitions.length === 0) {
+					this.addToCache(`${this.getEnvId()}.endpoints`, endpoints);
+					return endpoints;
+				} else {
+					const updatedEpDefinitions = prevEpDefinitions.map((entry) => {
+						const updatedEp = endpoints.find(
+							(entry2) => entry2.iid === entry.iid
+						);
+
+						if (updatedEp) return updatedEp;
+						else return entry;
+					});
+
+					this.addToCache(`${this.getEnvId()}.endpoints`, updatedEpDefinitions);
+
+					return updatedEpDefinitions;
+				}
+			}
+			case "delete": {
+				const prevEpDefinitions = await this.getPrevEndpointDefinitions();
+				const updatedEpDefinitions = prevEpDefinitions.filter(
+					(entry) => !endpoints.find((entry2) => entry.iid === entry2.iid)
+				);
+				this.addToCache(`${this.getEnvId()}.endpoints`, updatedEpDefinitions);
+
+				return updatedEpDefinitions;
+			}
 			default:
 				break;
 		}
@@ -1165,7 +1230,46 @@ export class DeploymentManager {
 		switch (actionType) {
 			case "set":
 				this.addToCache(`${this.getEnvId()}.middlewares`, middlewares);
-				break;
+				return middlewares;
+			case "add": {
+				const prevMwDefinitions = await this.getPrevMiddlewareDefinitions();
+				prevMwDefinitions.push(...middlewares);
+				this.addToCache(`${this.getEnvId()}.middlewares`, prevMwDefinitions);
+				return prevMwDefinitions;
+			}
+			case "update": {
+				const prevMwDefinitions = await this.getPrevMiddlewareDefinitions();
+
+				if (prevMwDefinitions.length === 0) {
+					this.addToCache(`${this.getEnvId()}.middlewares`, middlewares);
+					return middlewares;
+				} else {
+					const updatedMwDefinitions = prevMwDefinitions.map((entry) => {
+						const updatedMw = middlewares.find(
+							(entry2) => entry2.iid === entry.iid
+						);
+
+						if (updatedMw) return updatedMw;
+						else return entry;
+					});
+
+					this.addToCache(
+						`${this.getEnvId()}.middlewares`,
+						updatedMwDefinitions
+					);
+
+					return updatedMwDefinitions;
+				}
+			}
+			case "delete": {
+				const prevMwDefinitions = await this.getPrevMiddlewareDefinitions();
+				const updatedMwDefinitions = prevMwDefinitions.filter(
+					(entry) => !middlewares.find((entry2) => entry.iid === entry2.iid)
+				);
+				this.addToCache(`${this.getEnvId()}.middlewares`, updatedMwDefinitions);
+
+				return updatedMwDefinitions;
+			}
 			default:
 				break;
 		}
@@ -1456,6 +1560,118 @@ export class DeploymentManager {
 			this.addLog(
 				[
 					t("Database updates failed"),
+					error.name,
+					error.message,
+					error.stack,
+				].join("\n"),
+				"Error"
+			);
+			await this.sendEnvironmentLogs("Error");
+			return { success: false, error };
+		}
+	}
+
+	/**
+	 * Updates the endpoints
+	 */
+	async updateEndpoints() {
+		try {
+			this.addLog(t("Started updating endpoints"));
+			// Set current status of environment in engine cluster
+			await this.setStatus("Deploying");
+			const subAction = this.getSubAction();
+
+			// Update environment object data in cache
+			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
+			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
+
+			// Cache updated database configurations (subaction can be add, delete or update)
+			const endpoints = await this.cacheEndpoints(
+				this.getEndpoints(),
+				subAction
+			);
+
+			// Execute all redis commands altogether
+			await this.commitPipeline();
+			// We first cache all data and then notify api servers
+			// After we load all configuration data to the cache we can notify engine API servers to update themselves
+			this.notifyAPIServers();
+
+			// Save updated deployment to database
+			await this.saveEndpointDeploymentConfigs(endpoints);
+			// Save updated deployment to database
+			await this.saveEnvironmentDeploymentConfig();
+
+			// Update status of environment in engine cluster
+			this.addLog(t("Completed endpoint updates successfully"));
+			// Send the deployment telemetry information to the platform
+			await this.sendEnvironmentLogs("OK");
+			// Update status of environment in engine cluster
+			await this.setStatus("OK");
+			return { success: true };
+		} catch (error) {
+			// Update status of environment in engine cluster
+			await this.setStatus("Error");
+			// Send the deployment telemetry information to the platform
+			this.addLog(
+				[
+					t("Endpoint updates failed"),
+					error.name,
+					error.message,
+					error.stack,
+				].join("\n"),
+				"Error"
+			);
+			await this.sendEnvironmentLogs("Error");
+			return { success: false, error };
+		}
+	}
+
+	/**
+	 * Updates the middlewares
+	 */
+	async updateMiddlewares() {
+		try {
+			this.addLog(t("Started updating middlewares"));
+			// Set current status of environment in engine cluster
+			await this.setStatus("Deploying");
+			const subAction = this.getSubAction();
+
+			// Update environment object data in cache
+			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
+			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
+
+			// Cache updated database configurations (subaction can be add, delete or update)
+			const middlewares = await this.cacheMiddlewares(
+				this.getMiddlewares(),
+				subAction
+			);
+
+			// Execute all redis commands altogether
+			await this.commitPipeline();
+			// We first cache all data and then notify api servers
+			// After we load all configuration data to the cache we can notify engine API servers to update themselves
+			this.notifyAPIServers();
+
+			// Save updated deployment to database
+			await this.saveMiddlewareDeploymentConfigs(middlewares);
+			// Save updated deployment to database
+			await this.saveEnvironmentDeploymentConfig();
+
+			// Update status of environment in engine cluster
+			this.addLog(t("Completed middleware updates successfully"));
+			// Send the deployment telemetry information to the platform
+			await this.sendEnvironmentLogs("OK");
+			// Update status of environment in engine cluster
+			await this.setStatus("OK");
+			return { success: true };
+		} catch (error) {
+			// Update status of environment in engine cluster
+			await this.setStatus("Error");
+			// Send the deployment telemetry information to the platform
+			this.addLog(
+				[
+					t("Middleware updates failed"),
 					error.name,
 					error.message,
 					error.stack,

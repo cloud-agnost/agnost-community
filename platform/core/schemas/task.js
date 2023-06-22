@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { schedulTypes, intervalTypes } from "../config/constants.js";
+import { logicTypes } from "../config/constants.js";
 
 /**
  * Message cron job and its handler definition
@@ -39,10 +40,15 @@ export const TaskModel = mongoose.model(
 				type: Boolean,
 				default: true,
 			},
-			code: {
+			type: {
 				type: String,
-				index: true,
-				default: "",
+				required: true,
+				enum: logicTypes,
+				default: "code",
+			},
+			logic: {
+				type: String,
+				text: true, // Declares a full-text index
 			},
 			schedule: {
 				type: {

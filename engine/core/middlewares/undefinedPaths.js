@@ -10,7 +10,7 @@ export const handleUndefinedPaths = (req, res) => {
 			{
 				method: req.method,
 				path: req.path,
-				url: req.url,
+				url: req.protocol + "://" + req.get("host") + req.originalUrl,
 			}
 		)
 	);

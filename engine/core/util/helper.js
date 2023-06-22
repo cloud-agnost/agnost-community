@@ -37,7 +37,7 @@ function generateFileName(length = 8) {
  */
 function createErrorMessage(origin, code, message, details) {
 	return {
-		errors: [origin, code, message, details],
+		errors: [{ origin, code, message, details }],
 	};
 }
 

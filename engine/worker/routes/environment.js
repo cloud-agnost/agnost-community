@@ -7,6 +7,8 @@ import {
 	deleteEnvironment,
 	updateEnvironment,
 	updateDatabase,
+	updateEndpoints,
+	updateMiddlewares,
 	deployTasks,
 	redeployTasks,
 	deleteTasks,
@@ -154,6 +156,46 @@ router.post(
 			// If database access settings has change then we need to update connection pools in each engine worker
 			if (updatedResource.type === "database") manageEngineWorkers(req.body);
 			updateResourceAccess(req.body);
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /env/update-endpoints
+@method     POST
+@desc       Updates the endpoints and environment data
+@access     public
+*/
+router.post(
+	"/update-endpoints",
+	checkContentType,
+	authAccessToken,
+	async (req, res) => {
+		try {
+			updateEndpoints(req.body);
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /env/update-middlewares
+@method     POST
+@desc       Updates the middlewares and environment data
+@access     public
+*/
+router.post(
+	"/update-middlewares",
+	checkContentType,
+	authAccessToken,
+	async (req, res) => {
+		try {
+			updateMiddlewares(req.body);
 			res.json();
 		} catch (error) {
 			helper.handleError(req, res, error);
