@@ -46,6 +46,7 @@ interface AuthStore {
 	updateNotifications: (notifications: string[]) => Promise<User>;
 	confirmChangeLoginEmail: (token: string) => Promise<void>;
 	getUser: () => Promise<User>;
+	getUserPicture: () => string;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -197,6 +198,9 @@ const useAuthStore = create<AuthStore>()(
 					const user = await UserService.getUser();
 					set({ user });
 					return user;
+				},
+				getUserPicture() {
+					return location.origin + '/api' + get().user?.pictureUrl;
 				},
 			}),
 			{

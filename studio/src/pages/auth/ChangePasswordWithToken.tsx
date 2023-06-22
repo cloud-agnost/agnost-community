@@ -12,7 +12,7 @@ import './auth.scss';
 import { APIError } from '@/types';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { PasswordInput } from '@/components/PasswordInput';
-import { Link, useParams } from 'react-router-dom';
+import { Link, LoaderFunctionArgs, redirect, useLoaderData } from 'react-router-dom';
 import { CaretLeft } from '@phosphor-icons/react';
 
 const FormSchema = z.object({
@@ -21,9 +21,9 @@ const FormSchema = z.object({
 		.min(8, 'Password must be at least 8 characters long'),
 });
 
-export default function ForgotPassword() {
+export default function ChangePasswordWithToken() {
 	const { changePasswordWithToken } = useAuthStore();
-	const { token } = useParams<{ token: string }>();
+	const token = useLoaderData() as string;
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
 	const [success, setSuccess] = useState(false);
@@ -33,8 +33,6 @@ export default function ForgotPassword() {
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		if (!token) return;
-
 		try {
 			setError(null);
 			setLoading(true);
@@ -113,3 +111,12 @@ export default function ForgotPassword() {
 		</AuthLayout>
 	);
 }
+
+ChangePasswordWithToken.loader = ({ request }: LoaderFunctionArgs) => {
+	const token = new URL(request.url).searchParams.get('token');
+	if (!token) {
+		return redirect('/login');
+	}
+
+	return token;
+};

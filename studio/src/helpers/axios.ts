@@ -26,8 +26,8 @@ instance.interceptors.response.use(
 	(error) => {
 		const apiError = error.response.data as APIError;
 		if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
-			useAuthStore.getState().logout();
-			location.href = '/login';
+			localStorage.clear();
+			// location.href = '/login';
 			return;
 		}
 		return Promise.reject(apiError);

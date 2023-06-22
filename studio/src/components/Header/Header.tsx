@@ -7,6 +7,8 @@ import { Link } from 'react-router-dom';
 import './header.scss';
 import { MENU_ITEMS } from '@/constants';
 import { OrganizationDropdown } from '@/features/Organization/OrganizationDropdown';
+import { DeploymentStatusCard } from '@/features/version/components/DeploymentStatusCard';
+
 export function Header() {
 	const { user } = useAuthStore();
 	return (
@@ -32,9 +34,7 @@ export function Header() {
 				<div className='header-menu-divider' />
 				<div className='header-menu-right-actions'>
 					<div className='header-menu-right-actions-versions'>
-						<Button variant='blank'>
-							<Cloud />
-						</Button>
+						<DeploymentStatusCard triggerIcon={<Cloud />} />
 					</div>
 					<div className='header-menu-right-actions-notification'>
 						<Button variant='blank'>

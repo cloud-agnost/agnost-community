@@ -4,5 +4,6 @@ import login from './login.json';
 import organization from './organization.json';
 import profileSettings from './profileSettings.json';
 import application from './application.json';
+import version from './version.json';
 
-export { forms, general, login, organization, profileSettings, application };
+export { forms, general, login, organization, profileSettings, application, version };

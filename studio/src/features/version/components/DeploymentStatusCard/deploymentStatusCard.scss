@@ -1,0 +1,15 @@
+.deployment-status {
+	@apply z-50 min-w-[8rem] overflow-hidden rounded-md border shadow-md animate-in;
+	@apply data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
+	@apply bg-wrapper-background-light w-[23.75rem] rounded mr-6;
+}
+
+.deployment-status-title {
+	@apply font-bold text-sm leading-6 text-default p-4 border-b border-b-border;
+}
+.deployment-status-content {
+	@apply p-4 flex flex-col items-center justify-center gap-4;
+}
+.deployment-item {
+	@apply relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
+}

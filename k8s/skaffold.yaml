@@ -72,20 +72,6 @@ build:
           dockerfile: Dockerfile.dev
       - image: agnost-community/studio
         context: ../studio
-        sync:
-          infer:
-            - '**/*.js'
-            - '**/*.jsx'
-            - '**/*.ts'
-            - '**/*.tsx'
-            - '**/*.json'
-            - '**/*.html'
-            - '**/*.htm'
-            - '**/*.css'
-            - '**/*.scss'
-            - '**/*.png'
-            - '**/*.jpg'
-            - '**/*.svg'
         docker:
           dockerfile: Dockerfile.dev
 deploy:

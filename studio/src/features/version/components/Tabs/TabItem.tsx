@@ -18,16 +18,16 @@ export default function TabItem({ to, children, icon, closeable, onClose }: TabI
 	}
 
 	return (
-		<div className={cn('tab-item', icon && 'icon', closeable && 'closeable')}>
-			<NavLink className='tab-item-link' to={to}>
+		<NavLink className={cn('tab-item', icon && 'icon', closeable && 'closeable')} to={to} end>
+			<span className='tab-item-link'>
 				{icon}
-				{children}
-			</NavLink>
+				<span className='tab-item-link-text'>{children}</span>
+			</span>
 			{closeable && (
 				<Button iconOnly className='tab-item-close' variant='blank' onClick={close}>
 					<X />
 				</Button>
 			)}
-		</div>
+		</NavLink>
 	);
 }

@@ -30,7 +30,15 @@
 
 		.tab-item-link {
 			@apply flex items-center gap-2 py-4 px-3 font-sfCompact;
-			@apply text-subtle text-sm leading-6 font-normal w-full;
+			@apply text-subtle text-sm leading-6 font-normal;
+
+			svg {
+				@apply shrink-0;
+			}
+
+			.tab-item-link-text {
+				@apply max-w-[100px] truncate flex-1;
+			}
 		}
 
 		&:first-child {
@@ -39,7 +47,7 @@
 
 		&.icon {
 			.tab-item-link {
-				@apply pl-[27px];
+				@apply pl-[27px] pr-[25px];
 			}
 		}
 
@@ -49,8 +57,15 @@
 			}
 		}
 
+		&::before {
+			content: '';
+			@apply absolute bottom-0 left-0 right-0 h-0.5 bg-button-primary opacity-0 transition;
+		}
 		&.active {
-			@apply border-b-2 border-b-button-primary;
+			@apply bg-base;
+			&::before {
+				@apply opacity-100;
+			}
 		}
 
 		.tab-item-close {
@@ -64,6 +79,16 @@
 			.tab-item-close {
 				@apply opacity-100;
 			}
+		}
+	}
+}
+
+.tab-dropdown-content {
+	@apply w-[272px];
+
+	.tab-search-input {
+		input {
+			@apply border-input-border bg-wrapper-background-light font-sfCompact font-normal;
 		}
 	}
 }
