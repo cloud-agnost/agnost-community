@@ -1,12 +1,26 @@
-import { Outlet } from 'react-router-dom';
+import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useAuthStore from '@/store/auth/authStore.ts';
+import { removeLastSlash } from '@/utils';
 
-async function loader() {
+const authPaths = [
+	'/login',
+	'/forgot-password',
+	'/confirm-change-email',
+	'/forgot-password',
+	'/verify-email',
+	'/complete-account-setup',
+	'/complete-account-setup/verify-email',
+];
+
+async function loader({ request }: LoaderFunctionArgs) {
 	const isAuthenticated = useAuthStore.getState().isAuthenticated();
 	await useClusterStore.getState().checkClusterSmtpStatus();
+	await useClusterStore.getState().checkClusterSetup();
+	const currentPathname = removeLastSlash(new URL(request.url).pathname);
+	const isAuthPath = authPaths.includes(currentPathname);
 
-	if (isAuthenticated) {
+	if (!isAuthPath && isAuthenticated) {
 		await useAuthStore.getState().getUser();
 	}
 

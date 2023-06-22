@@ -4,7 +4,7 @@ import { CopyInput } from 'components/CopyInput';
 import { ChangeName } from '@/features/auth/components/ChangeName';
 import { ChangeEmail } from '@/features/auth/components/ChangeEmail';
 import { ChangePassword } from '@/features/auth/components/ChangePassword';
-import { ProfileSettingsFormItem } from '@/features/auth/components/ProfileSettingsForm';
+import { ProfileSettingsFormItem } from '@/features/auth/components/ProfileSettingsForm/index.ts';
 import { DeleteAccount } from '@/features/auth/components/DeleteAccount';
 import { ChangeAvatar } from '@/features/auth/components/ChangeAvatar';
 
