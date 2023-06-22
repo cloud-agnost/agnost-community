@@ -25,8 +25,8 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 			tabIndex={0}
 			aria-hidden='true'
 		>
-			<div className='flex items-center gap-4 flex-1'>
-				<Avatar size='xl' square>
+			<div className='flex items-center gap-4'>
+				<Avatar size='2xl' square>
 					<AvatarImage src={application.pictureUrl} />
 					<AvatarFallback name={application.name} color={application.color} />
 				</Avatar>
@@ -42,7 +42,7 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 					</div>
 				</div>
 			</div>
-			<div className=' flex items-center justify-between'>
+			<div className=' flex items-center justify-between self-end'>
 				<span className='text-subtle font-sfCompact text-xs'>
 					{t('general.created')} {getRelativeTime(application.createdAt)}
 				</span>
