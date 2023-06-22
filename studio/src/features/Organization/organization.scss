@@ -21,12 +21,20 @@
 		}
 	}
 	&-label {
-		@apply flex items-center px-1 hover:bg-wrapper-background-hover hover:rounded flex-1;
+		@apply flex items-center px-1 hover:rounded flex-1;
 	}
 	&-dropdown {
-		@apply w-[210px] h-12 p-1 flex justify-between items-center border border-border rounded-sm;
+		@apply w-[210px] h-12 relative border border-border rounded-sm;
+		& a {
+			@apply w-full h-full hover:bg-wrapper-background-hover block;
+		}
+		&-button {
+			@apply absolute z-50 top-0 right-0  p-1.5;
+			@apply text-icon-base hover:text-icon-secondary;
+		}
 		&-icon {
-			@apply rounded-full bg-lighter p-1.5 hover:bg-wrapper-background-light;
+			@apply rounded-full hover:bg-wrapper-background-light w-8 h-8;
+			@apply flex items-center justify-center;
 		}
 		&-container {
 			@apply max-h-[300px] overflow-y-auto;
@@ -44,7 +52,7 @@
 			@apply text-left flex-1 font-sfCompact;
 		}
 		&-name {
-			@apply text-sm text-default whitespace-nowrap truncate max-w-[15ch];
+			@apply text-sm text-default whitespace-nowrap truncate max-w-[12ch];
 		}
 		&-desc {
 			@apply text-xs text-subtle;
