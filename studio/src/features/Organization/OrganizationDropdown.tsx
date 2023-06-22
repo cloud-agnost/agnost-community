@@ -172,7 +172,7 @@ export function OrganizationDropdown() {
 
 const OrganizationLabel = ({ organization }: { organization: Organization | null }) => (
 	<div className='organization-label'>
-		<Avatar className='mr-2' size='sm'>
+		<Avatar className='mr-2' size='sm' square>
 			<AvatarImage src={organization?.pictureUrl} alt={organization?.name} />
 			<AvatarFallback name={organization?.name} color={organization?.color as string} />
 		</Avatar>

@@ -27,8 +27,9 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
 					className='password-input'
 				/>
 				<Button
-					className='password-input-button'
+					className='password-input-button p-2'
 					onClick={() => setShowPassword(!showPassword)}
+					iconOnly
 					variant='blank'
 					type='button'
 				>
