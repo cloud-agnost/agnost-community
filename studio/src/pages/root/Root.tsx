@@ -16,7 +16,7 @@ const authPaths = [
 async function loader({ request }: LoaderFunctionArgs) {
 	const isAuthenticated = useAuthStore.getState().isAuthenticated();
 	await useClusterStore.getState().checkClusterSmtpStatus();
-
+	await useClusterStore.getState().checkClusterSetup();
 	const currentPathname = removeLastSlash(new URL(request.url).pathname);
 	const isAuthPath = authPaths.includes(currentPathname);
 
