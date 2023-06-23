@@ -43,3 +43,9 @@ export interface Version {
 	updatedAt: string;
 	__v: number;
 }
+
+export interface Tab {
+	id: string;
+	title: string;
+	path: string;
+}
