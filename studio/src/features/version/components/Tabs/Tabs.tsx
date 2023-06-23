@@ -1,16 +1,16 @@
-import './tabs.scss';
 import {
 	NewTabDropdown,
 	TabItem,
 	TabOptionsDropdown,
 } from '@/features/version/components/Tabs/index.ts';
-import { Dashboard } from 'components/icons';
-import { CaretRight, CaretLeft } from '@phosphor-icons/react';
+import useVersionStore from '@/store/version/versionStore.ts';
+import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
+import { Dashboard } from 'components/icons';
+import { NEW_TAB_ITEMS } from 'constants/constants.ts';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useMatches, useNavigate } from 'react-router-dom';
-import useVersionStore from '@/store/version/versionStore.ts';
-import { NEW_TAB_ITEMS } from 'constants/constants.ts';
+import './tabs.scss';
 
 const SCROLL_AMOUNT = 200;
 

@@ -1,8 +1,5 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { Button } from 'components/Button';
 import { ArrowLeft } from '@phosphor-icons/react';
-import { useTranslation } from 'react-i18next';
-import { Switch } from 'components/Switch';
+import { Button } from 'components/Button';
 import {
 	Drawer,
 	DrawerClose,
@@ -11,7 +8,10 @@ import {
 	DrawerHeader,
 	DrawerTitle,
 } from 'components/Drawer';
+import { Switch } from 'components/Switch';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface DeploymentSettingsProps {
 	isOpen: boolean;
