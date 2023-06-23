@@ -29,7 +29,7 @@
 			@apply w-full h-full hover:bg-wrapper-background-hover block;
 		}
 		&-button {
-			@apply absolute z-50 top-0 right-0  p-1.5;
+			@apply absolute z-50 top-1 right-0  p-1.5;
 			@apply text-icon-base hover:text-icon-secondary;
 		}
 		&-icon {
