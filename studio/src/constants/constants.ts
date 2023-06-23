@@ -9,6 +9,7 @@ import { Database as DatabaseIcon, DeviceTablet, FileText, GearSix } from '@phos
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { Tab } from '@/types';
 
+import { Tab } from '@/types';
 export const ORGANIZATION_MEMBERS_PAGE_SIZE = 10;
 
 export const SLIDER_IMAGES = [

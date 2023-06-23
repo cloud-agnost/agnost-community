@@ -1,8 +1,8 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { Button } from 'components/Button';
 import { ArrowLeft } from '@phosphor-icons/react';
-import { useTranslation } from 'react-i18next';
+import { Button } from 'components/Button';
 import { Switch } from 'components/Switch';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface DeploymentSettingsProps {
 	isOpen: boolean;
