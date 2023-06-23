@@ -10,24 +10,34 @@ interface TabItemProps {
 	icon?: ReactNode;
 	closeable?: boolean;
 	onClose?: () => void;
+	onClick?: () => void;
 }
 
-export default function TabItem({ to, children, icon, closeable, onClose }: TabItemProps) {
+export default function TabItem({ onClick, to, children, icon, closeable, onClose }: TabItemProps) {
 	function close() {
 		onClose?.();
 	}
 
 	return (
-		<NavLink className={cn('tab-item', icon && 'icon', closeable && 'closeable')} to={to} end>
-			<span className='tab-item-link'>
+		<span className={cn('tab-item', icon && 'icon', closeable && 'closeable')}>
+			<NavLink
+				title={children?.toString()}
+				className='tab-item-link'
+				onClick={onClick}
+				to={to}
+				replace
+				end
+			>
 				{icon}
 				<span className='tab-item-link-text'>{children}</span>
-			</span>
+			</NavLink>
 			{closeable && (
-				<Button iconOnly className='tab-item-close' variant='blank' onClick={close}>
-					<X />
-				</Button>
+				<div className='tab-item-close'>
+					<Button iconOnly variant='blank' onClick={close}>
+						<X />
+					</Button>
+				</div>
 			)}
-		</NavLink>
+		</span>
 	);
 }

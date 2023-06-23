@@ -9,6 +9,7 @@ import { Database as DatabaseIcon, DeviceTablet, FileText, GearSix } from '@phos
 
 export const ORGANIZATION_MEMBERS_PAGE_SIZE = 10;
 
+import { Tab } from '@/types';
 export const SLIDER_IMAGES = [
 	{
 		text: 'Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.',
@@ -162,5 +163,32 @@ export const ORG_INVITATIONS_SORT_OPTIONS: SortOption[] = [
 		name: translate('organization.settings.members.sortOptions.email'),
 		value: 'email',
 		sortDir: 'asc',
+	},
+];
+
+export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
+	{
+		title: 'Databases',
+		path: 'database',
+	},
+	{
+		title: 'Storage',
+		path: 'storage',
+	},
+	{
+		title: 'Cache',
+		path: 'cache',
+	},
+	{
+		title: 'Endpoints',
+		path: 'endpoint',
+	},
+	{
+		title: 'Message Queues',
+		path: 'message-queue',
+	},
+	{
+		title: 'Cron Jobs',
+		path: 'cron-job',
 	},
 ];
