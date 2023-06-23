@@ -17,14 +17,11 @@ export function SortButton({ text, column }: SortButtonProps) {
 			{text}
 			<div className='ml-2'>
 				<CaretUp
-					size={8}
-					className={cn('text-icon-base', column.getIsSorted() === 'asc' && 'text-icon-secondary')}
-					weight='fill'
-				/>
-				<CaretDown
-					size={8}
-					className={cn('text-icon-base', column.getIsSorted() === 'desc' && 'text-icon-secondary')}
-					weight='fill'
+					size={14}
+					className={cn(
+						'text-icon-base',
+						column.getIsSorted() === 'asc' && 'rotate-180 text-icon-secondary',
+					)}
 				/>
 			</div>
 		</Button>
