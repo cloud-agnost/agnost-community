@@ -1,9 +1,7 @@
-import { TaskManager } from "../handlers/taskManager.js";
+import { getKey } from "../init/cache.js";
+import { DeploymentManager } from "../handlers/managers/deploymentManager.js";
 
-/**
- * Deletes all tasks of the app version. The message object only includes the environment and vesion information.
- */
-export const deleteTasksHandler = (connection, queue) => {
+export const updateQueuesHandler = (connection, queue) => {
 	connection.createChannel(function (error, channel) {
 		if (error) {
 			logger.error("Cannot create channel to message queue", {
@@ -28,29 +26,37 @@ export const deleteTasksHandler = (connection, queue) => {
 			queue,
 			async function (msg) {
 				let msgObj = JSON.parse(msg.content.toString());
+
+				// Check the environment status if it is in a deployment state then do not acknowledge the message unless it is timed out
+				let envStatus = await getKey(`${msgObj.env.iid}.status`);
+				console.log("status", envStatus);
+				if (envStatus === "Deleting") {
+					// If the environment is being deleted then do not process deployment messages
+					channel.ack(msg);
+					return;
+				}
+
 				logger.info(
 					t(
-						"Started cancelling the cron jobs of app '%s' version '%s' environment '%s'",
+						"Started updating app '%s' version '%s' queues '%s'",
 						msgObj.app.name,
 						msgObj.env.version.name,
-						msgObj.env.name
+						msgObj.queues.map((entry) => entry.name).join(", ")
 					)
 				);
+
 				// Create the deployment manager and deploy the version
-				let manager = new TaskManager(msgObj);
-				let result = null;
-				// If tasks is undefined or null this means that the environment has been deleted, we need to delete all tasks
-				if (!manager.getTasks()) result = await manager.deleteTasks();
-				else result = await manager.undeployTasks();
+				let manager = new DeploymentManager(msgObj);
+				let result = await manager.updateQueues();
 
 				if (result.success) {
 					channel.ack(msg);
 					logger.info(
 						t(
-							"Completed cancelling the cron jobs of app '%s' version '%s' environment '%s'",
+							"Completed updating app '%s' version '%s' queues '%s' successfully",
 							msgObj.app.name,
 							msgObj.env.version.name,
-							msgObj.env.name
+							msgObj.queues.map((entry) => entry.name).join(", ")
 						)
 					);
 				} else {
@@ -58,10 +64,10 @@ export const deleteTasksHandler = (connection, queue) => {
 					channel.ack(msg);
 					logger.error(
 						t(
-							"Cannot complete cancelling the cron jobs of app '%s' version '%s' environment '%s'",
+							"Cannot update app '%s' version '%s' queues '%s'",
 							msgObj.app.name,
 							msgObj.env.version.name,
-							msgObj.env.name
+							msgObj.queues.map((entry) => entry.name).join(", ")
 						),
 						{
 							details: {

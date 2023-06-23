@@ -228,7 +228,6 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			// Add the route handler
 			this.addEndpointHandler(endpoint, handlers);
 
-			console.log("****here", handlers);
 			// Register the endpoint to the router
 			if (endpoint.method === "GET")
 				router.get(
@@ -425,7 +424,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		for (const queue of queueus) {
 			const adapterObj = adapterManager.getQueueAdapter(queue.name);
 			if (adapterObj) {
-				adapterObj.listenMessages(queue.iid);
+				adapterObj.listenMessages(queue);
 				this.addLog(`Initialized handler of queue '${queue.name}'`);
 			}
 		}

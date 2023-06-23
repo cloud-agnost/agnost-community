@@ -752,3 +752,9 @@ export const defaultMiddlewareCode = `const middlewareHandler = (req, res, next)
 };
 
 export default middlewareHandler;`;
+
+export const defaultQueueCode = `const queueHandler = (message) => {
+
+};
+
+export default queueHandler;`;

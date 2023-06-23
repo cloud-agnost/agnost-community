@@ -3,7 +3,6 @@ import deployCtrl from "../controllers/deployment.js";
 import auditCtrl from "../controllers/audit.js";
 import mwCtrl from "../controllers/middleware.js";
 import epCtrl from "../controllers/endpoint.js";
-import versionCtrl from "../controllers/version.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
@@ -221,7 +220,7 @@ router.put(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/mw/:mwId
+@route      /v1/org/:orgId/app/:appId/version/:versionId/mw/:mwId/logic
 @method     PUT
 @desc       Saves the logic (e.g., code) of the middleware
 @access     private

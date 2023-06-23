@@ -625,6 +625,68 @@ class DeploymentController {
 			}
 		);
 	}
+
+	/**
+	 * Updates the queues if autoDeploy is turned on
+	 * @param  {object} app The application object
+	 * @param  {object} version The version object
+	 * @param  {object} user The user who initiated the update
+	 * @param  {object} queues The queues that are created/updated/deleted
+	 * @param  {string} subAction Can be either add, update, delete
+	 */
+	async updateQueues(app, version, user, queues, subAction) {
+		const env = await this.getEnvironment(version);
+		// If auto deploy is turned off or version has not been deployed to the environment then we do not send the environment updates to the engine cluster
+		if (!env.autoDeploy || !env.deploymentDtm) return;
+
+		// Create the environment log entry
+		const envLog = await this.createEnvLog(
+			version,
+			env,
+			user,
+			"Deploying",
+			[{ pod: "all", status: "Deploying" }],
+			env.schedulerStatus
+		);
+
+		// First get the list of environment resources
+		const resources = await this.getEnvironmentResources(env);
+
+		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
+			env.orgId
+		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+			envLog._id
+		}`;
+		// Start building the deployment instructions that will be sent to the engine cluster worker
+		let payload = {
+			action: "deploy",
+			subAction: subAction,
+			callback: callback,
+			actor: {
+				userId: user._id,
+				name: user.name,
+				pictureUrl: user.pictureUrl,
+				color: user.color,
+				contactEmail: user.contactEmail,
+			},
+			app,
+			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
+			env: { ...env, callback, version, resources, timestamp: new Date() },
+			queues: queues,
+		};
+
+		// Make api call to environment worker engine to update database
+		await axios.post(
+			config.get("general.workerUrl") + "/v1/env/update-queues",
+			payload,
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
+	}
 }
 
 export default new DeploymentController();
