@@ -51,7 +51,7 @@ export default function OrganizationSelect() {
 												className='select-organization-button'
 											>
 												<div className='select-organization-item'>
-													<Avatar size='2xl'>
+													<Avatar size='3xl'>
 														<AvatarImage src={organization.pictureUrl} alt={organization.name} />
 														<AvatarFallback name={organization?.name} color={organization?.color} />
 													</Avatar>

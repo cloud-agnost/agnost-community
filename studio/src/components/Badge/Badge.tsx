@@ -11,13 +11,14 @@ const badgeVariants = cva('badge', {
 			purple: 'badge-purple',
 			red: 'badge-red',
 			orange: 'badge-orange',
+			default: 'badge',
 		},
 		rounded: {
 			true: 'badge-rounded',
 		},
 	},
 	defaultVariants: {
-		variant: 'green',
+		variant: 'default',
 		rounded: false,
 	},
 });
@@ -26,16 +27,13 @@ interface BadgeProps {
 	variant?: 'green' | 'blue' | 'yellow' | 'purple' | 'red' | 'orange';
 	rounded?: boolean;
 	clearable?: boolean;
-	children?: React.ReactNode;
+	text: string;
 }
-export default function Badge({ children, variant, rounded, clearable }: BadgeProps) {
+export default function Badge({ text, variant, rounded, clearable }: BadgeProps) {
 	return (
 		<div className={cn(badgeVariants({ variant, rounded }), 'badge')}>
 			{rounded && <div className='badge-dot' />}
-			<span className='badge-text'>
-				{/* {application.team.find((member) => member._id !== user?._id)?.role} */}
-				{children}
-			</span>
+			<span className='badge-text'>{text}</span>
 			{clearable && <X className='badge-clear' size={12} />}
 		</div>
 	);

@@ -1,10 +1,10 @@
 .table {
-	@apply w-full caption-bottom text-sm border border-border bg-subtle;
-	.container {
-		@apply w-full overflow-auto rounded;
+	@apply w-full caption-bottom text-sm bg-base;
+	&-container {
+		@apply w-full overflow-auto rounded-lg border border-border;
 	}
 	&-header {
-		@apply [&_tr]:border-b;
+		@apply [&_tr]:border-b bg-subtle;
 	}
 	&-body {
 		@apply [&_tr:last-child]:border-0;
@@ -13,10 +13,20 @@
 		@apply bg-subtle font-medium text-subtle;
 	}
 	&-row {
-		@apply border-b transition-colors hover:bg-base/80 data-[state=selected]:bg-subtle;
+		@apply border-b transition-colors data-[state=selected]:bg-subtle;
+		&.head {
+			@apply border-none;
+		}
+		&.content {
+			@apply hover:bg-subtle;
+		}
 	}
 	&-head {
-		@apply h-12 px-4 text-left align-middle font-medium text-subtle [&:has([role=checkbox])]:pr-0;
+		@apply h-12 px-4 text-left align-middle font-medium;
+		@apply text-subtle [&:has([role=checkbox])]:pr-0 font-sfCompact text-sm;
+		&.sortable {
+			@apply hover:bg-lighter;
+		}
 	}
 	&-cell {
 		@apply p-4 align-middle [&:has([role=checkbox])]:pr-0 text-default;

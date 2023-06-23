@@ -3,12 +3,13 @@ import { Team } from '@/types';
 import './application.scss';
 interface ApplicationTeamProps {
 	team: Team[];
+	table?: boolean;
 }
-export default function ApplicationTeam({ team }: ApplicationTeamProps) {
+export default function ApplicationTeam({ team, table = false }: ApplicationTeamProps) {
 	return (
 		<div className=''>
 			{team.slice(0, 4).map((member) => (
-				<Avatar key={member._id} size='xs'>
+				<Avatar key={member._id} size={table ? 'xs' : 'sm'}>
 					<AvatarImage src={member.userId.pictureUrl} />
 					<AvatarFallback name={member.userId.name} color={member.userId.color} isUserAvatar />
 				</Avatar>

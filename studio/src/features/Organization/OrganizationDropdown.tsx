@@ -10,6 +10,7 @@ import {
 } from '@/components/Command';
 import { InfoModal } from '@/components/InfoModal';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
+import { OrganizationCreateModal } from '@/features/Organization';
 import { useToast } from '@/hooks';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization } from '@/types';
@@ -18,7 +19,6 @@ import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { OrganizationCreateModal } from '@/features/Organization';
 import './organization.scss';
 
 export function OrganizationDropdown() {
@@ -64,9 +64,15 @@ export function OrganizationDropdown() {
 						<Link to={`/organization/${organization?._id}`}>
 							<OrganizationLabel organization={organization} />
 						</Link>
-						<Button variant='blank' role='combobox' aria-expanded={open} rounded>
+						<Button
+							variant='blank'
+							role='combobox'
+							aria-expanded={open}
+							className='organization-dropdown-button'
+							rounded
+						>
 							<div className='organization-dropdown-icon'>
-								<CaretUpDown size={20} className='text-icon-subtle' />
+								<CaretUpDown size={20} />
 							</div>
 						</Button>
 					</div>
@@ -137,7 +143,7 @@ export function OrganizationDropdown() {
 				isOpen={openModal}
 				closeModal={() => setOpenModal(false)}
 				icon={
-					<Avatar size='2xl'>
+					<Avatar size='3xl'>
 						<AvatarFallback color='#9B7B0866' />
 					</Avatar>
 				}
@@ -166,7 +172,7 @@ export function OrganizationDropdown() {
 
 const OrganizationLabel = ({ organization }: { organization: Organization | null }) => (
 	<div className='organization-label'>
-		<Avatar className='mr-2' size='sm'>
+		<Avatar className='mr-2' size='sm' square>
 			<AvatarImage src={organization?.pictureUrl} alt={organization?.name} />
 			<AvatarFallback name={organization?.name} color={organization?.color as string} />
 		</Avatar>

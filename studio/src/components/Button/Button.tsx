@@ -89,7 +89,7 @@ const Button = React.forwardRef<
 		}
 		return (
 			<Comp
-				className={cn(buttonVariants({ variant, size, loading, rounded, iconOnly, className }))}
+				className={cn(buttonVariants({ size, variant, loading, rounded, iconOnly, className }))}
 				ref={ref}
 				{...props}
 			>

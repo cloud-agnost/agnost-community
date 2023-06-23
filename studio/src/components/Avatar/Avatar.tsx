@@ -9,6 +9,7 @@ import './avatar.scss';
 const avatarVariants = cva('avatar', {
 	variants: {
 		size: {
+			xxs: 'avatar-xxs',
 			xs: 'avatar-xs',
 			sm: 'avatar-sm',
 			md: 'avatar-md',
@@ -16,6 +17,7 @@ const avatarVariants = cva('avatar', {
 			xl: 'avatar-xl',
 			'2xl': 'avatar-2xl',
 			'3xl': 'avatar-3xl',
+			'4xl': 'avatar-4xl',
 		},
 		square: {
 			true: 'avatar-square',
@@ -30,7 +32,7 @@ const avatarVariants = cva('avatar', {
 export interface AvatarProps
 	extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>,
 		VariantProps<typeof avatarVariants> {
-	size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+	size?: 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
 	square?: boolean;
 }
 

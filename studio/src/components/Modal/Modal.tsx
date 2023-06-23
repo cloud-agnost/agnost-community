@@ -18,7 +18,9 @@ export default function Modal({
 	children,
 	className,
 	isOpen = false,
-	closeModal = () => {},
+	closeModal = () => {
+		return;
+	},
 	closeOnOverlayClick = false,
 }: ModalProps) {
 	const modalOverlay = useRef(null);
@@ -39,7 +41,14 @@ export default function Modal({
 	return (
 		<AnimatePresence>
 			{isOpen && (
-				<div ref={modalOverlay} className='modal open' onClick={clickOutside}>
+				<div
+					ref={modalOverlay}
+					className='modal open'
+					onClick={clickOutside}
+					role='button'
+					tabIndex={0}
+					aria-hidden={true}
+				>
 					<motion.div
 						initial={{ scale: '0', opacity: 0 }}
 						animate={{ scale: 1, opacity: 1 }}
@@ -47,8 +56,8 @@ export default function Modal({
 						transition={{ type: 'tween' }}
 						className={cn('modal-body', className)}
 					>
-						<Button size='sm' onClick={closeModal} className='modal-close' variant='link'>
-							<X size={24} className='text-icon-base' />
+						<Button size='sm' onClick={closeModal} className='modal-close' variant='text' rounded>
+							<X size={24} className='text-icon-base hover:text-icon-secondary' />
 						</Button>
 
 						<div className='space-y-4'>
