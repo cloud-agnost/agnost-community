@@ -7,8 +7,8 @@ import { Application, SortOption } from '@/types';
 import { translate } from '@/utils';
 import { Database as DatabaseIcon, DeviceTablet, FileText, GearSix } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
-
 import { Tab } from '@/types';
+
 export const ORGANIZATION_MEMBERS_PAGE_SIZE = 10;
 
 export const SLIDER_IMAGES = [
