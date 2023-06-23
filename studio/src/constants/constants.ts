@@ -4,8 +4,9 @@ import Realtime from '@/assets/images/realtime.png';
 import { BellRing, ChangeLog, LightBulb, LineSegments } from '@/components/icons';
 import { FileText, GearSix, DeviceTablet, Database as DatabaseIcon } from '@phosphor-icons/react';
 import { translate } from '@/utils';
-import { ApplicationVersions } from '@/features/application';
+
 import useOrganizationStore from '@/store/organization/organizationStore';
+import { Tab } from '@/types';
 export const SLIDER_IMAGES = [
 	{
 		text: 'Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.',
@@ -110,4 +111,31 @@ export const ERROR_CODES_TO_REDIRECT_LOGIN_PAGE = [
 	'invalid_access_token',
 	'missing_refresh_token',
 	'invalid_refresh_token',
+];
+
+export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
+	{
+		title: 'Databases',
+		path: 'database',
+	},
+	{
+		title: 'Storage',
+		path: 'storage',
+	},
+	{
+		title: 'Cache',
+		path: 'cache',
+	},
+	{
+		title: 'Endpoints',
+		path: 'endpoint',
+	},
+	{
+		title: 'Message Queues',
+		path: 'message-queue',
+	},
+	{
+		title: 'Cron Jobs',
+		path: 'cron-job',
+	},
 ];
