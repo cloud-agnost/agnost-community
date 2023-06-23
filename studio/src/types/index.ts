@@ -34,5 +34,5 @@ export type {
 export { CreateApplicationSchema } from './application.ts';
 export type { EnvLog, Environment } from './environment.ts';
 export { CreateOrganizationSchema } from './organization.ts';
-export type { ResLog, Resource } from './resource.ts';
-export type { Tab, Version } from './version.ts';
+export type * from './resource.ts';
+export type * from './version.ts';
