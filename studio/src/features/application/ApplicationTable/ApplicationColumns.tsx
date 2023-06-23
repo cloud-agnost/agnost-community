@@ -14,7 +14,7 @@ export const ApplicationColumns: ColumnDef<Application>[] = [
 		header: ({ column }) => (
 			<SortButton text={translate('application.table.name')} column={column} />
 		),
-		size: 1234,
+		size: 900,
 		accessorKey: 'name',
 
 		cell: ({ row }) => {
@@ -52,7 +52,7 @@ export const ApplicationColumns: ColumnDef<Application>[] = [
 		cell: ({ row }) => {
 			const { createdAt } = row.original;
 			return (
-				<div className='flex gap-1'>
+				<div className='flex gap-1 items-center'>
 					<Refresh className='w-4 h-4 text-subtle mr-2' />
 					{getRelativeTime(createdAt)}
 				</div>
