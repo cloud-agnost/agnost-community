@@ -9,6 +9,8 @@ import {
 	updateDatabase,
 	updateEndpoints,
 	updateMiddlewares,
+	updateQueues,
+	updateTasks,
 	deployTasks,
 	redeployTasks,
 	deleteTasks,
@@ -140,7 +142,7 @@ router.post(
 );
 
 /*
-@route      /env/update-database
+@route      /env/update-resource-access
 @method     POST
 @desc       Updates the resource access settings
 @access     public
@@ -153,7 +155,7 @@ router.post(
 		try {
 			// Remove the database connection from
 			const { updatedResource } = req.body;
-			// If database access settings has change then we need to update connection pools in each engine worker
+			// If database access settings has changed then we need to update connection pools in each engine worker
 			if (updatedResource.type === "database") manageEngineWorkers(req.body);
 			updateResourceAccess(req.body);
 			res.json();
@@ -196,6 +198,82 @@ router.post(
 	async (req, res) => {
 		try {
 			updateMiddlewares(req.body);
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /env/update-queues
+@method     POST
+@desc       Updates the queues and environment data
+@access     public
+*/
+router.post(
+	"/update-queues",
+	checkContentType,
+	authAccessToken,
+	async (req, res) => {
+		try {
+			updateQueues(req.body);
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /env/update-tasks
+@method     POST
+@desc       Updates the tasks and environment data
+@access     public
+*/
+router.post(
+	"/update-tasks",
+	checkContentType,
+	authAccessToken,
+	async (req, res) => {
+		try {
+			const { timestamp, action, subAction, callback, actor, app, env, tasks } =
+				req.body;
+			updateTasks(req.body);
+			if (subAction === "add") {
+				// Deploy tasks
+				deployTasks({
+					timestamp,
+					action,
+					callback,
+					actor,
+					app,
+					env,
+					tasks,
+				});
+			} else if (subAction === "update") {
+				// Redeploy tasks
+				redeployTasks({
+					timestamp,
+					action,
+					callback,
+					actor,
+					app,
+					env,
+					tasks,
+				});
+			} else if (subAction === "delete") {
+				// Delete tasks
+				deleteTasks({
+					timestamp,
+					action,
+					callback,
+					actor,
+					app,
+					env,
+					tasks,
+				});
+			}
 			res.json();
 		} catch (error) {
 			helper.handleError(req, res, error);

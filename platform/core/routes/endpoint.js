@@ -277,7 +277,7 @@ router.put(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/ep/:epId
+@route      /v1/org/:orgId/app/:appId/version/:versionId/ep/:epId/logic
 @method     PUT
 @desc       Saves the logic (e.g., code) of the endpoint
 @access     private

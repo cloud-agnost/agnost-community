@@ -30,6 +30,8 @@ const ERROR_CODES = {
 	endpointImportError: "endpoint_import_error",
 	queueImportError: "queue_import_error",
 	requestTimedOut: "request_timed_out",
+	missingAccessToken: "missing_access_token",
+	invalidCredentials: "invalid_credentials",
 };
 
 export default ERROR_CODES;
