@@ -41,7 +41,7 @@ export function getNameForAvatar(name: string) {
 	}
 }
 export function getRelativeTime(date: string) {
-	return DateTime.fromISO(date).toRelative();
+	return DateTime.fromISO(date).setLocale('en').toRelative();
 }
 export function getApplicationRoleVariant(role: string) {
 	switch (role) {
