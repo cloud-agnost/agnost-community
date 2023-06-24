@@ -20,7 +20,12 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 	return (
 		<div
 			className='application-card'
-			onClick={() => useOrganizationStore.setState({ isVersionOpen: true })}
+			onClick={(e) => {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				//@ts-ignore
+				if (e.target.id === 'delete-app' || e.target.id === 'leave-app') return;
+				useOrganizationStore.setState({ isVersionOpen: true });
+			}}
 			role='button'
 			tabIndex={0}
 			aria-hidden='true'
@@ -32,7 +37,7 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 				</Avatar>
 				<div className='flex flex-col justify-center gap-1 flex-1'>
 					<div className='flex items-center justify-between'>
-						<span className='text-xl text-default font-semibold block truncate max-w-[12ch]'>
+						<span className='text-xl text-default font-semibold block truncate max-w-[15ch]'>
 							{application.name}
 						</span>
 						<Badge text={role as string} />
