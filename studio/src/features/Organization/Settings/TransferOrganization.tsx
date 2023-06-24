@@ -1,0 +1,121 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
+import { AutoComplete } from '@/components/AutoComplete';
+import { Button } from '@/components/Button';
+import { useToast } from '@/hooks';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { OrganizationMember } from '@/types';
+import { APIError } from '@/types/type';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+interface FormatOptionLabelProps {
+	label: string;
+	value: any;
+}
+interface GroupedOption {
+	readonly label: string;
+	readonly options: readonly OrganizationMember[];
+}
+
+const loadOptions = async (inputValue: string) => {
+	const res = await useOrganizationStore.getState().getOrganizationMembers({
+		search: inputValue,
+		excludeSelf: false,
+		organizationId: '64944d75d869e16dffb47e19',
+		page: 0,
+		size: 50,
+	});
+	return res.map((res) => ({
+		label: res.member.name,
+		value: res,
+	}));
+};
+const formatOptionLabel = ({ label, value }: FormatOptionLabelProps) => {
+	const name = label?.split(' ');
+	return (
+		<div className='flex items-center gap-2'>
+			{value.member.pictureUrl ? (
+				<img
+					src={value.member.pictureUrl}
+					alt={label}
+					className='rounded-full object-contain w-8 h-8 '
+				/>
+			) : (
+				name && (
+					<div
+						className='relative inline-flex items-center justify-center cursor-pointer overflow-hidden w-8 h-8 rounded-full'
+						style={{
+							backgroundColor: value.member.color,
+						}}
+					>
+						<span className='text-default text-xs'>
+							{name[0]?.charAt(0).toUpperCase()}
+							{name[1]?.charAt(0).toUpperCase()}
+						</span>
+					</div>
+				)
+			)}
+			<div className='flex flex-col'>
+				<span className='ml-2 text-default text-sm'>{label}</span>
+				<span className='ml-2 text-xs text-subtle'>{value.member.contactEmail}</span>
+			</div>
+		</div>
+	);
+};
+const formatGroupLabel = (data: GroupedOption) => {
+	console.log('data', { data });
+	return (
+		<div className='flex items-center gap-2'>
+			<span className='text-default text-sm'>{data.label}</span>
+		</div>
+	);
+};
+export default function TransferOrganization() {
+	const [user, setUser] = useState<any>();
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<APIError>();
+	const { organization, transferOrganization } = useOrganizationStore();
+	const { notify } = useToast();
+	const navigate = useNavigate();
+	function transferOrganizationHandle() {
+		setLoading(true);
+		transferOrganization({
+			organizationId: organization?._id as string,
+			userId: user?.member._id,
+			onSuccess: () => {
+				setLoading(false);
+				notify({
+					title: 'Organization transfered successfully',
+					description: 'You will be redirected to the new organization',
+					type: 'success',
+				});
+				setTimeout(() => {
+					navigate(`/organization`);
+				}, 2000);
+			},
+			onError: (err) => {
+				setError(err);
+				setLoading(false);
+			},
+		});
+	}
+	return (
+		<div className='space-y-8'>
+			{error && (
+				<Alert variant='error'>
+					<AlertTitle>{error?.error}</AlertTitle>
+					<AlertDescription>{error?.details}</AlertDescription>
+				</Alert>
+			)}
+			<AutoComplete
+				loadOptions={loadOptions}
+				onChange={(res) => setUser(res.value)}
+				formatOptionLabel={formatOptionLabel}
+				formatGroupLabel={formatGroupLabel}
+			/>
+			<Button size='lg' className='text-end' onClick={transferOrganizationHandle} loading={loading}>
+				Transfer
+			</Button>
+		</div>
+	);
+}
