@@ -37,3 +37,43 @@ export const CreateOrganizationSchema = z.object({
 			message: translate('forms.alphanumeric', { label: translate('organization.name') }),
 		}),
 });
+export interface ChangeOrganizationNameRequest extends BaseRequest {
+	name: string;
+	organizationId: string;
+}
+
+export interface ChangeOrganizationAvatarRequest extends BaseRequest {
+	organizationId: string;
+	picture: File;
+}
+
+export interface GetOrganizationMembersRequest extends BaseRequest {
+	page?: number;
+	size?: number;
+	role?: string;
+	sortBy?: string;
+	sortDir?: 'asc' | 'desc';
+	search?: string;
+	organizationId: string;
+	excludeSelf?: boolean;
+}
+export interface TransferOrganizationRequest extends BaseRequest {
+	organizationId: string;
+	userId: string;
+}
+export interface OrganizationMember {
+	_id: string;
+	orgId: string;
+	role: string;
+	joinDate: string;
+	member: {
+		_id: string;
+		iid: string;
+		color: string;
+		contactEmail: string;
+		name: string;
+		pictureUrl: string;
+		loginEmail: string;
+		isOrgOwner: boolean;
+	};
+}
