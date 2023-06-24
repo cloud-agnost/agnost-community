@@ -17,5 +17,35 @@
 			"title": "You have successfully left the {{name}} organization.",
 			"description": "You will no longer have access to the {{name}} organization."
 		}
+	},
+	"settings": {
+		"general": "General",
+		"members": "Members",
+		"id": {
+			"title": "Organization ID",
+			"desc": "This is your organization's id within your Agnost Enterprise Cluster."
+		},
+		"name": {
+			"title": "Organization Name",
+			"desc": "This is your organization's visible name within the platform. For example, the name of your company or department."
+		},
+
+		"avatar": {
+			"title": "Organization Avatar",
+			"desc": "This is the avatar that will be displayed for your organization."
+		},
+		"transfer": {
+			"title": "Transfer Cluster Ownership",
+			"desc": "The organization owner is the person who has created the organization or the person to whom the organization ownership has been transferred. The Owner has full control over the organization and only organization owners can delete the organization or transfer its ownership to someone else."
+		},
+		"delete": {
+			"title": "Delete Organization",
+			"desc": "Permanently remove your Organization and all of its apps and associated app data from deployed environments. This action is not reversible — please continue with caution.",
+			"confirm": {
+				"title": "Are you sure to delete your organization?",
+				"desc": "All organization apps and managed resource and associated data will be deleted. This action is not reversible — please continue with caution.",
+				"code": "Confirm organization delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
+			}
+		}
 	}
 }
