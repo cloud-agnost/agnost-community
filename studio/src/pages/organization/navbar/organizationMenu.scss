@@ -1,5 +1,6 @@
 .org-menu {
 	@apply flex items-end justify-center h-full mx-auto;
+
 	&-item {
 		@apply list-none;
 		&-name {
