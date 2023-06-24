@@ -10,4 +10,5 @@ export { default as Pencil } from './Pencil';
 export { default as Refresh } from './Refresh';
 export { default as SquaresFour } from './SquaresFour';
 export { default as SuccessCheck } from './SuccessCheck';
+export { default as Team } from './Team';
 export { default as Warning } from './Warning';
