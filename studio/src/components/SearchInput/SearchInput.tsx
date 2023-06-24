@@ -33,6 +33,7 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
 						onClick={() => setInputValue('')}
 						variant='blank'
 						type='button'
+						iconOnly
 					>
 						<X size={20} />
 					</Button>
