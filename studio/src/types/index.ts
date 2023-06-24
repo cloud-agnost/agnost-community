@@ -8,6 +8,11 @@ export type {
 	Organization,
 	CreateOrganizationRequest,
 	LeaveOrganizationRequest,
+	ChangeOrganizationNameRequest,
+	GetOrganizationMembersRequest,
+	ChangeOrganizationAvatarRequest,
+	OrganizationMember,
+	TransferOrganizationRequest,
 } from './organization.ts';
 
 export type {
