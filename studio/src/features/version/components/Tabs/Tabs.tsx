@@ -75,9 +75,6 @@ export default function Tabs() {
 		const condition = currentTab?.id === id;
 		const redirectPath = removeTab(id);
 
-		console.log({
-			redirectPath,
-		});
 		const path = redirectPath ?? getDashboardPath();
 
 		if (condition) {
