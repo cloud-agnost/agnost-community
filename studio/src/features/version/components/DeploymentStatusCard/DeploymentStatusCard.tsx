@@ -2,12 +2,13 @@ import * as React from 'react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { cn } from '@/utils';
 import { Button } from 'components/Button';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import './deploymentStatusCard.scss';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { useTranslation } from 'react-i18next';
 import { GearSix } from '@phosphor-icons/react';
 import { DeploymentSettings } from '@/features/version/components/DeploymentStatusCard/';
+import { useAnimate } from 'framer-motion';
 
 interface DeploymentStatusCardProps {
 	triggerIcon: ReactNode;
@@ -16,12 +17,19 @@ interface DeploymentStatusCardProps {
 export default function DeploymentStatusCard({ triggerIcon }: DeploymentStatusCardProps) {
 	const { t } = useTranslation();
 	const [settingsIsOpen, setSettingsIsOpen] = useState(false);
+	const [scope, animate] = useAnimate();
+
+	useEffect(() => {
+		if (!scope.current) return;
+		animate(scope.current, { height: settingsIsOpen ? '510px' : 'auto' });
+	}, [settingsIsOpen]);
+
 	return (
-		<DropdownMenu>
+		<DropdownMenu onOpenChange={(open) => !open && setSettingsIsOpen(false)}>
 			<DropdownMenuPrimitive.Trigger asChild>
 				<Button variant='blank'>{triggerIcon}</Button>
 			</DropdownMenuPrimitive.Trigger>
-			<DropdownMenuContent className='overflow-hiddenr relative'>
+			<DropdownMenuContent ref={scope} className={cn('overflow-hidden relative')}>
 				<DropdownMenuLabel className='relative flex justify-between items-center'>
 					<span className='pr-10 truncate'>{t('version.deployment_status')}</span>
 					<Button
@@ -29,7 +37,7 @@ export default function DeploymentStatusCard({ triggerIcon }: DeploymentStatusCa
 						variant='blank'
 						iconOnly
 						rounded
-						className='absolute hover:bg-subtle right-4 p-0 w-8 h-8'
+						className='absolute hover:bg-subtle right-4 p-0 aspect-square'
 					>
 						<GearSix size={20} />
 					</Button>

@@ -25,10 +25,13 @@
 	}
 
 	.deployment-settings-items {
-		@apply flex flex-col gap-4 p-4 divide-y;
+		@apply flex flex-col gap-4 p-4 divide-y max-h-[500px] overflow-auto;
 
 		> * {
-			@apply flex gap-4 font-sfCompact text-sm leading-6 text-default pt-4;
+			@apply flex gap-3 font-sfCompact text-sm leading-6 text-default;
+			&:not(:first-child) {
+				@apply pt-4;
+			}
 			h5 {
 				@apply text-sm leading-6 text-default font-normal;
 			}
