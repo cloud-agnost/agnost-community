@@ -1,21 +1,21 @@
-import { Description } from '@/components/Description';
-import { AuthLayout } from '@/layouts/AuthLayout';
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Button } from '@/components/Button';
-import * as z from 'zod';
+import { Description } from '@/components/Description';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
+import { AuthLayout } from '@/layouts/AuthLayout';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 
-import './auth.scss';
-import { APIError } from '@/types';
-import useAuthStore from '@/store/auth/authStore.ts';
 import { PasswordInput } from '@/components/PasswordInput';
-import { Link, LoaderFunctionArgs, redirect, useLoaderData } from 'react-router-dom';
-import { CaretLeft } from '@phosphor-icons/react';
+import useAuthStore from '@/store/auth/authStore.ts';
+import { APIError } from '@/types';
 import { translate } from '@/utils';
+import { CaretLeft } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
+import { Link, LoaderFunctionArgs, redirect, useLoaderData } from 'react-router-dom';
+import './auth.scss';
 
 const FormSchema = z.object({
 	password: z

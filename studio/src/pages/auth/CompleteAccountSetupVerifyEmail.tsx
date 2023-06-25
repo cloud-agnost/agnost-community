@@ -16,14 +16,14 @@ import { VerificationCodeInput } from '@/components/VerificationCodeInput';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import useAuthStore from '@/store/auth/authStore';
 import { APIError, User } from '@/types/type.ts';
+import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, redirect, useLoaderData } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
-import { translate } from '@/utils';
-import { useTranslation } from 'react-i18next';
 interface CompleteAccountSetupVerifyEmailLoaderData {
 	token?: string;
 	isVerified?: boolean;
