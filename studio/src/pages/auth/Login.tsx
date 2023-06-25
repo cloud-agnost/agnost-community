@@ -9,6 +9,7 @@ import { AuthService } from '@/services';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore';
 import { APIError } from '@/types';
+import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -16,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
-import { translate } from '@/utils';
 
 const FormSchema = z.object({
 	email: z

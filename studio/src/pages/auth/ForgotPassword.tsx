@@ -6,14 +6,14 @@ import { Input } from '@/components/Input';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { APIError } from '@/types';
+import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { Trans, useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
-import { Trans, useTranslation } from 'react-i18next';
-import { translate } from '@/utils';
 
 async function loader(params: any) {
 	console.log(params);
