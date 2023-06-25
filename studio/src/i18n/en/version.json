@@ -15,5 +15,6 @@
 	"redeploy_desc": "Redeploy latest changes to the environment",
 	"auto_redeploy": "Auto redeploy",
 	"auto_redeploy_desc": "When version changes then deploy changes automatically",
-	"view_logs": "View Deployment Logs"
+	"view_logs": "View Deployment Logs",
+	"logs": "Deployment Logs"
 }

@@ -12,6 +12,11 @@
 		"error": "{{label}} must be at most 64 characters long",
 		"description": "Maximum 64 characters"
 	},
+	"verificationCode": {
+		"length": {
+			"error": "Verification code must be 6 digits long"
+		}
+	},
 	"email": {
 		"error": "Please enter a valid email address"
 	},
