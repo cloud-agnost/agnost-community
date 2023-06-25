@@ -16,11 +16,21 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
+import { translate } from '@/utils';
+
 const FormSchema = z.object({
 	email: z
-		.string({ required_error: 'Email address is required' })
-		.email('Please enter a valid email address'),
-	password: z.string({ required_error: 'Password is required' }),
+		.string({
+			required_error: translate('forms.required', {
+				label: 'Email address',
+			}),
+		})
+		.email(translate('forms.email.error')),
+	password: z.string({
+		required_error: translate('forms.required', {
+			label: 'Password',
+		}),
+	}),
 });
 
 export default function Login() {
@@ -74,12 +84,12 @@ export default function Login() {
 							name='email'
 							render={({ field }) => (
 								<FormItem className='space-y-1'>
-									<FormLabel>Email</FormLabel>
+									<FormLabel>{t('login.email')}</FormLabel>
 									<FormControl>
 										<Input
 											error={Boolean(form.formState.errors.email)}
 											type='email'
-											placeholder='Enter email address'
+											placeholder={t('login.enter_email') as string}
 											{...field}
 										/>
 									</FormControl>
@@ -92,12 +102,12 @@ export default function Login() {
 							name='password'
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Password</FormLabel>
+									<FormLabel>{t('login.password')}</FormLabel>
 									<FormControl>
 										<PasswordInput
 											error={Boolean(form.formState.errors.password)}
 											type='password'
-											placeholder='Enter Password'
+											placeholder={t('login.enter_password') as string}
 											{...field}
 										/>
 									</FormControl>
@@ -108,7 +118,7 @@ export default function Login() {
 
 						<div className='flex justify-end space-y-8'>
 							<Button loading={loading} size='full'>
-								Login
+								{t('login.login')}
 							</Button>
 						</div>
 					</form>
@@ -119,13 +129,13 @@ export default function Login() {
 							className='hover:underline no-underline underline-offset-2 hover:text-disabled-reverse'
 							to='/forgot-password'
 						>
-							Forgot Password
+							{t('login.forgot_password')}
 						</Link>
 						<Link
 							className='hover:underline no-underline underline-offset-2 hover:text-disabled-reverse'
 							to='/complete-account-setup'
 						>
-							Complete Account Setup
+							{t('login.complete_account_setup')}
 						</Link>
 					</div>
 				)}
@@ -138,6 +148,7 @@ function NotVerified({ email, clearError }: { email: string; clearError: () => v
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
 	const navigate = useNavigate();
+	const { t } = useTranslation();
 	async function reSendVerificationCode() {
 		try {
 			setError(null);
@@ -154,14 +165,12 @@ function NotVerified({ email, clearError }: { email: string; clearError: () => v
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
-				<Description title='Email Verification'>
-					Your email address has not been verified yet. You need to first verify your email to
-					activate your Agnost account.
+				<Description title={t('login.email_verification')}>
+					{t('login.email_verification_pending')}
 				</Description>
 
 				<Description className='!mt-2'>
-					Click button below to send the email verification code to{' '}
-					<span className='text-default'>{email}</span>
+					{t('login.email_verification_pending_desc')} <span className='text-default'>{email}</span>
 				</Description>
 
 				{error && (
@@ -173,10 +182,10 @@ function NotVerified({ email, clearError }: { email: string; clearError: () => v
 
 				<div className='flex justify-end gap-4'>
 					<Button onClick={clearError} variant='text' type='button' size='lg'>
-						Back to Login
+						{t('login.back_to_login')}
 					</Button>
 					<Button loading={loading} onClick={reSendVerificationCode}>
-						Send Verification Code
+						{t('login.send_verification_code')}
 					</Button>
 				</div>
 			</div>
