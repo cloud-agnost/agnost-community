@@ -22,6 +22,8 @@ import { useForm } from 'react-hook-form';
 import { LoaderFunctionArgs, redirect, useLoaderData } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
+import { translate } from '@/utils';
+import { useTranslation } from 'react-i18next';
 interface CompleteAccountSetupVerifyEmailLoaderData {
 	token?: string;
 	isVerified?: boolean;
@@ -45,8 +47,8 @@ async function loader(params: LoaderFunctionArgs) {
 const FormSchema = z.object({
 	verificationCode: z
 		.string()
-		.max(6, 'Verification code must be 6 digits')
-		.min(6, 'Verification code must be 6 digits')
+		.max(6, translate('forms.verificationCode.length.error'))
+		.min(6, translate('forms.verificationCode.length.error'))
 		.optional()
 		.or(z.literal(''))
 		.transform((val) => Number(val))
@@ -56,20 +58,50 @@ const FormSchema = z.object({
 			if (!token && !val) {
 				return ctx.addIssue({
 					code: z.ZodIssueCode.custom,
-					message: 'Verification code is required',
+					message: translate('forms.required', {
+						label: 'Verification Code',
+					}),
 					path: ['verificationCode'],
 				});
 			}
 		}),
 	password: z
-		.string({ required_error: 'Password is required' })
-		.min(8, 'Password must be at least 8 characters long'),
+		.string({
+			required_error: translate('forms.required', {
+				label: 'Password',
+			}),
+		})
+		.min(
+			8,
+			translate('forms.min8.error', {
+				label: 'Password',
+			}),
+		),
 	name: z
-		.string({ required_error: 'Name is required' })
-		.min(2, 'Name must be at least 2 characters long')
-		.max(64, 'Name must be at most 64 characters long')
+		.string({
+			required_error: translate('forms.required', {
+				label: 'Name',
+			}),
+		})
+		.min(
+			2,
+			translate('forms.min2.error', {
+				label: 'Name',
+			}),
+		)
+		.max(
+			64,
+			translate('forms.max64.error', {
+				label: 'Name',
+			}),
+		)
 		.trim()
-		.refine((value) => value.trim().length > 0, 'Name is required'),
+		.refine(
+			(value) => value.trim().length > 0,
+			translate('forms.required', {
+				label: 'Name',
+			}),
+		),
 });
 
 export default function CompleteAccountSetupVerifyEmail() {
@@ -85,6 +117,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
+	const { t } = useTranslation();
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		try {
@@ -125,17 +158,15 @@ export default function CompleteAccountSetupVerifyEmail() {
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
-				<Description title='Complete Account Setup' />
+				<Description title={t('login.complete_account_setup')} />
 
 				{(error || isVerified) && (
 					<Alert className='!max-w-full' variant={isVerified && !error ? 'success' : 'error'}>
 						<AlertTitle>
-							{isVerified && !error ? 'You have been successfully added.' : error?.error}
+							{isVerified && !error ? t('login.you_have_been_added') : error?.error}
 						</AlertTitle>
 						<AlertDescription>
-							{isVerified && !error
-								? 'Complete your personal account setup to access the Agnost platform. Logging in requires a completed account setup.'
-								: error?.details}
+							{isVerified && !error ? t('login.complete_account_setup_desc') : error?.details}
 						</AlertDescription>
 					</Alert>
 				)}
@@ -148,7 +179,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 								name='verificationCode'
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Verification Code</FormLabel>
+										<FormLabel>{t('login.verification_code')}</FormLabel>
 										<FormControl>
 											<VerificationCodeInput
 												error={Boolean(form.formState.errors.verificationCode)}
@@ -167,19 +198,17 @@ export default function CompleteAccountSetupVerifyEmail() {
 							name='password'
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Password</FormLabel>
-									<FormDescription>
-										When signing in your account you can use either your email and your password
-									</FormDescription>
+									<FormLabel>{t('login.password')}</FormLabel>
+									<FormDescription>{t('forms.password_desc')}</FormDescription>
 									<FormControl>
 										<PasswordInput
 											error={Boolean(form.formState.errors.password)}
 											type='password'
-											placeholder='Enter Password'
+											placeholder={t('forms.password') as string}
 											{...field}
 										/>
 									</FormControl>
-									<FormDescription>Minimum 8 characters</FormDescription>
+									<FormDescription>{t('forms.min8.description')}</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}
@@ -189,25 +218,23 @@ export default function CompleteAccountSetupVerifyEmail() {
 							name='name'
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Name</FormLabel>
-									<FormDescription>
-										Please enter your full name, or a display name you are comfortable with.
-									</FormDescription>
+									<FormLabel>{t('login.name')}</FormLabel>
+									<FormDescription>{t('login.name_desc')}</FormDescription>
 									<FormControl>
 										<Input
 											error={Boolean(form.formState.errors.name)}
-											placeholder='Enter your name'
+											placeholder={t('login.enter_name') as string}
 											{...field}
 										/>
 									</FormControl>
-									<FormDescription>Maximum 64 characters</FormDescription>
+									<FormDescription>{t('forms.max64.description')}</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}
 						/>
 						<div className='flex justify-end'>
 							<Button loading={loading} size='lg' disabled={!!error}>
-								Complete Setup
+								{t('login.complete_setup')}
 							</Button>
 						</div>
 					</form>

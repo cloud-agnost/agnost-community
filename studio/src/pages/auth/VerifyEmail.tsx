@@ -12,6 +12,8 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { translate } from '@/utils';
+import { Trans, useTranslation } from 'react-i18next';
 
 async function loader(params: any) {
 	console.log(params);
@@ -20,9 +22,13 @@ async function loader(params: any) {
 
 const FormSchema = z.object({
 	code: z
-		.string({ required_error: 'Verification code is required' })
-		.max(6, 'Verification code must be 6 digits')
-		.min(6, 'Verification code must be 6 digits')
+		.string({
+			required_error: translate('forms.required', {
+				label: 'Verification code',
+			}),
+		})
+		.max(6, translate('forms.verificationCode.length.error'))
+		.min(6, translate('forms.verificationCode.length.error'))
 		.transform((val) => Number(val)),
 });
 
@@ -30,7 +36,7 @@ export default function VerifyEmail() {
 	const [searchParams] = useSearchParams();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
-
+	const { t } = useTranslation();
 	const { verifyEmail } = useAuthStore();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
@@ -54,10 +60,14 @@ export default function VerifyEmail() {
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
-				<Description title='Verify Your Email'>
-					We&apos;ve sent a six-digit confirmation code to{' '}
-					<span className='text-default'>{searchParams.get('email')}</span>. Please enter your code
-					below to activate your account.
+				<Description title={t('login.verify_your_email')}>
+					<Trans
+						i18nKey='login.sent_verification_code'
+						values={{ email: searchParams.get('email') }}
+						components={{
+							email: <span className='text-default' />,
+						}}
+					/>
 				</Description>
 
 				{error && (
@@ -82,14 +92,11 @@ export default function VerifyEmail() {
 							)}
 						/>
 
-						<Description>
-							Keep this window open while checking for your code. If you haven&apos;t received our
-							email, please check your spam folder.
-						</Description>
+						<Description>{t('login.verification_page_info')}</Description>
 
 						<div className='flex justify-end gap-4'>
 							<Button loading={loading} size='lg'>
-								Verify
+								{t('login.verify')}
 							</Button>
 						</div>
 					</form>

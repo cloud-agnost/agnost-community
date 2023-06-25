@@ -14,11 +14,17 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import { PasswordInput } from '@/components/PasswordInput';
 import { Link, LoaderFunctionArgs, redirect, useLoaderData } from 'react-router-dom';
 import { CaretLeft } from '@phosphor-icons/react';
+import { translate } from '@/utils';
+import { useTranslation } from 'react-i18next';
 
 const FormSchema = z.object({
 	password: z
-		.string({ required_error: 'Password is required' })
-		.min(8, 'Password must be at least 8 characters long'),
+		.string({
+			required_error: translate('forms.required', {
+				label: 'Password',
+			}),
+		})
+		.min(8, translate('forms.min8.error', { label: 'Password' })),
 });
 
 export default function ChangePasswordWithToken() {
@@ -27,7 +33,7 @@ export default function ChangePasswordWithToken() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
 	const [success, setSuccess] = useState(false);
-
+	const { t } = useTranslation();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
@@ -50,8 +56,8 @@ export default function ChangePasswordWithToken() {
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
-				<Description title='Change Your Password'>
-					Enter your new password below to change your password.
+				<Description title={t('login.change_your_password')}>
+					{t('login.enter_new_password_desc')}
 				</Description>
 
 				{error && (
@@ -64,15 +70,15 @@ export default function ChangePasswordWithToken() {
 				{success ? (
 					<div className='space-y-8'>
 						<Alert className='!max-w-full mb-8' variant='success'>
-							<AlertTitle>Your password has been changed successfully.</AlertTitle>
-							<AlertDescription>You can now login with your new password.</AlertDescription>
+							<AlertTitle>{t('login.changed_successfully')}</AlertTitle>
+							<AlertDescription>{t('login.changed_successfully_desc')}</AlertDescription>
 						</Alert>
 						<Link
 							to='/login'
 							className='text-default hover:underline mt-4 flex items-center justify-center'
 						>
 							<CaretLeft className='mr-1 inline-block' />
-							Back to Login
+							{t('login.back_to_login')}
 						</Link>
 					</div>
 				) : (
@@ -83,11 +89,11 @@ export default function ChangePasswordWithToken() {
 								name='password'
 								render={({ field }) => (
 									<FormItem className='space-y-1'>
-										<FormLabel>Password</FormLabel>
+										<FormLabel>{t('login.password')}</FormLabel>
 										<FormControl>
 											<PasswordInput
 												error={Boolean(form.formState.errors.password)}
-												placeholder='Enter your new password'
+												placeholder={t('login.enter_new_password') as string}
 												{...field}
 											/>
 										</FormControl>
@@ -98,10 +104,10 @@ export default function ChangePasswordWithToken() {
 
 							<div className='flex justify-end gap-4'>
 								<Button to='/login' variant='text' type='button' size='lg'>
-									Back to Login
+									{t('login.back_to_login')}
 								</Button>
 								<Button loading={loading} size='lg'>
-									Change Password
+									{t('login.change_password')}
 								</Button>
 							</div>
 						</form>
