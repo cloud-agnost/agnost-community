@@ -4,6 +4,10 @@
 		"error": "{{label}} must be at least 2 characters long",
 		"description": "Minimum 2 characters"
 	},
+	"min3": {
+		"error": "{{label}} must be at least 3 characters long",
+		"description": "Minimum 3 characters"
+	},
 	"min8": {
 		"error": "{{label}} must be at least 8 characters long",
 		"description": "Minimum 8 characters"

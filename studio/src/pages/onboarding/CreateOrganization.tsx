@@ -15,6 +15,8 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
+import { translate } from '@/utils';
+import { useTranslation } from 'react-i18next';
 
 async function loader() {
 	return null;
@@ -22,17 +24,30 @@ async function loader() {
 
 const FormSchema = z.object({
 	orgName: z
-		.string({ required_error: 'Organization name is required' })
-		.min(2, 'Organization name must be at least 2 characters long')
-		.max(64, 'Organization name must be at most 64 characters long')
+		.string({
+			required_error: translate('forms.required', {
+				label: translate('organization.name'),
+			}),
+		})
+		.min(2, {
+			message: translate('forms.min2.error', { label: translate('organization.name') }),
+		})
+		.max(64, {
+			message: translate('forms.max64.error', { label: translate('organization.name') }),
+		})
 		.trim()
-		.refine((value) => value.trim().length > 0, 'Organization name is required'),
+		.refine(
+			(value) => value.trim().length > 0,
+			translate('forms.required', {
+				label: translate('organization.name'),
+			}),
+		),
 });
 
 export default function CreateOrganization() {
 	const navigate = useNavigate();
 	const { setDataPartially, getCurrentStep, goToNextStep, data } = useOnboardingStore();
-
+	const { t } = useTranslation();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
@@ -53,10 +68,7 @@ export default function CreateOrganization() {
 
 	return (
 		<>
-			<Description title='Create Your Organization'>
-				Organizations are the top level entities that are used to group your applications and manage
-				organization specific resource (e.g., databases, cache, message brokers)
-			</Description>
+			<Description title={t('onboarding.org.title')}>{t('onboarding.org.desc')}</Description>
 
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
@@ -65,22 +77,22 @@ export default function CreateOrganization() {
 						name='orgName'
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Organization Name</FormLabel>
+								<FormLabel>{t('organization.name')}</FormLabel>
 								<FormControl>
 									<Input
 										error={!!form.formState.errors.orgName}
-										placeholder='Enter organization name'
+										placeholder={t('organization.enter_organization_name') as string}
 										{...field}
 									/>
 								</FormControl>
-								<FormDescription>Maximum 64 characters</FormDescription>
+								<FormDescription>{t('forms.max64.description')}</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
 
 					<div className='flex gap-4 justify-end'>
-						<Button size='lg'>Next</Button>
+						<Button size='lg'>{t('onboarding.next')}</Button>
 					</div>
 				</form>
 			</Form>

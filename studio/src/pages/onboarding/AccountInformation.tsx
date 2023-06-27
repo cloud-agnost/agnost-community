@@ -22,6 +22,8 @@ import { PasswordInput } from '@/components/PasswordInput';
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { APIError } from '@/types';
 import { User } from '@/types/type';
+import { translate } from '@/utils';
+import { useTranslation } from 'react-i18next';
 
 async function loader() {
 	return null;
@@ -29,17 +31,36 @@ async function loader() {
 
 const FormSchema = z.object({
 	email: z
-		.string({ required_error: 'Email address is required' })
-		.email('Please enter a valid email address'),
+		.string({
+			required_error: translate('forms.required', {
+				label: translate('login.email'),
+			}),
+		})
+		.email(translate('forms.email.error')),
 	password: z
-		.string({ required_error: 'Password is required' })
-		.min(8, 'Password must be at least 8 characters long'),
+		.string({
+			required_error: translate('forms.required', {
+				label: translate('logins.password'),
+			}),
+		})
+		.min(8, {
+			message: translate('forms.min8.error', { label: translate('logins.password') }),
+		}),
 	name: z
-		.string({ required_error: 'Name is required' })
-		.min(2, 'Name must be at least 2 characters long')
-		.max(64, 'Name must be at most 64 characters long')
+		.string({
+			required_error: translate('forms.required', { label: translate('login.name') }),
+		})
+		.min(2, {
+			message: translate('forms.min2.error', { label: translate('login.name') }),
+		})
+		.max(64, {
+			message: translate('forms.max64.error', { label: translate('login.name') }),
+		})
 		.trim()
-		.refine((value) => value.trim().length > 0, 'Name is required'),
+		.refine(
+			(value) => value.trim().length > 0,
+			translate('forms.required', { label: translate('login.name') }),
+		),
 });
 
 export default function AccountInformation() {
@@ -48,6 +69,7 @@ export default function AccountInformation() {
 	const { goToNextStep } = useOnboardingStore();
 	const { initializeClusterSetup } = useClusterStore();
 	const { setUser } = useAuthStore();
+	const { t } = useTranslation();
 	const navigate = useNavigate();
 
 	const { getCurrentStep } = useOnboardingStore();
@@ -79,13 +101,9 @@ export default function AccountInformation() {
 	return (
 		<>
 			<h1 className='text-default font-semibold text-[1.625rem] leading-[2.75rem] text-center'>
-				Welcome to Agnost Enterprise Cluster
+				{t('onboarding.welcome')}
 			</h1>
-			<Description title='Account Information'>
-				Through this onboarding flow, we will help you set up your cluster and create your
-				organization and first app. Please follow the succeeding steps to complete your cluster set
-				up and start building your apps.
-			</Description>
+			<Description title={t('onboarding.account_info')}>{t('onboarding.welcome_desc')}</Description>
 
 			{error && (
 				<Alert className='!max-w-full' variant='error'>
@@ -101,12 +119,12 @@ export default function AccountInformation() {
 						name='email'
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Email</FormLabel>
+								<FormLabel>{t('login.email')}</FormLabel>
 								<FormControl>
 									<Input
 										error={Boolean(form.formState.errors.email)}
 										type='email'
-										placeholder='Enter email address'
+										placeholder={t('login.enter_email') as string}
 										{...field}
 									/>
 								</FormControl>
@@ -119,16 +137,16 @@ export default function AccountInformation() {
 						name='password'
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Password</FormLabel>
+								<FormLabel>{t('login.password')}</FormLabel>
 								<FormControl>
 									<PasswordInput
 										error={Boolean(form.formState.errors.password)}
 										type='password'
-										placeholder='Enter Password'
+										placeholder={t('login.enter_password') as string}
 										{...field}
 									/>
 								</FormControl>
-								<FormDescription>Minimum 8 characters</FormDescription>
+								<FormDescription>{t('forms.min8.description')}</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -138,22 +156,22 @@ export default function AccountInformation() {
 						name='name'
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Name</FormLabel>
+								<FormLabel>{t('login.name')}</FormLabel>
 								<FormControl>
 									<Input
 										error={Boolean(form.formState.errors.name)}
-										placeholder='Enter your name'
+										placeholder={t('login.enter_name') as string}
 										{...field}
 									/>
 								</FormControl>
-								<FormDescription>Maximum 64 characters</FormDescription>
+								<FormDescription>{t('forms.max64.description')}</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
 					<div className='flex justify-end'>
 						<Button loading={initiating} size='lg'>
-							Next
+							{t('onboarding.next')}
 						</Button>
 					</div>
 				</form>

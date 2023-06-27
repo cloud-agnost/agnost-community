@@ -21,7 +21,7 @@ export default function DeploymentStatusCard({ triggerIcon }: DeploymentStatusCa
 
 	useEffect(() => {
 		if (!scope.current) return;
-		animate(scope.current, { height: settingsIsOpen ? '510px' : 'auto' });
+		animate(scope.current, { height: settingsIsOpen ? '490px' : 'auto' });
 	}, [settingsIsOpen]);
 
 	return (
