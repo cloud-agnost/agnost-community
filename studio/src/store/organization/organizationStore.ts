@@ -234,7 +234,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 				},
 				removeMemberFromOrganization: async (req: RemoveMemberFromOrganizationRequest) => {
 					try {
-						await OrganizationService.removeMemberFromOrganization(req.userId);
+						await OrganizationService.removeMemberFromOrganization(req.userId as string);
 						set({
 							members: get().members.filter(({ member }) => member._id !== req.userId),
 						});
@@ -297,7 +297,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 						});
 						if (req.onSuccess) req.onSuccess();
 					} catch (error) {
-						if (req.onError) req.onError(error);
+						if (req.onError) req.onError(error as APIError);
 						throw error as APIError;
 					} finally {
 						set({
@@ -343,11 +343,11 @@ const useOrganizationStore = create<OrganizationStore>()(
 					try {
 						const res = await OrganizationService.changeMemberRole(req?.userId as string, req.role);
 						set({
-							members: get().members.map(({ member }) => {
-								if (member._id === req.userId) {
+							members: get().members.map((m) => {
+								if (m.member._id === req.userId) {
 									return res;
 								}
-								return member;
+								return m;
 							}),
 						});
 						if (req.onSuccess) req.onSuccess();
