@@ -1,0 +1,15 @@
+.tab {
+	&-container {
+		@apply inline-flex items-center justify-center;
+		@apply border border-border rounded-full bg-subtle;
+		@apply w-72;
+	}
+	&-button {
+		@apply inline-flex items-center justify-center bg-subtle w-full;
+		@apply rounded-full transition-colors duration-200 hover:bg-button-primary;
+		@apply font-sfCompact font-normal text-sm py-4;
+		&.active {
+			@apply bg-button-primary hover:bg-button-primary/75;
+		}
+	}
+}
