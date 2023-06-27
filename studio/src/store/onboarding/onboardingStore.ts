@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { OnboardingData } from '@/types/type.ts';
-import { removeLastSlash } from '@/utils/utils.ts';
+import { removeLastSlash, translate } from '@/utils/utils.ts';
 
 export interface Step {
 	text: string;
@@ -33,41 +33,36 @@ const useOnboardingStore = create<OnboardingStore>()(
 				currentStepIndex: 0,
 				steps: [
 					{
-						text: 'Account Information',
+						text: translate('onboarding.account_info'),
 						path: '/onboarding',
 						isDone: false,
-
 						nextPath: '/onboarding/create-organization',
 					},
 					{
-						text: 'Create Your Organization',
+						text: translate('onboarding.org.title'),
 						path: '/onboarding/create-organization',
 						isDone: false,
-
 						prevPath: '/onboarding',
 						nextPath: '/onboarding/create-app',
 					},
 					{
-						text: 'Create Your First App',
+						text: translate('onboarding.app.title'),
 						path: '/onboarding/create-app',
 						isDone: false,
-
 						prevPath: '/onboarding/create-organization',
 						nextPath: '/onboarding/smtp-configuration',
 					},
 					{
-						text: 'Configure SMTP Server',
+						text: translate('onboarding.smtp.title'),
 						path: '/onboarding/smtp-configuration',
 						isDone: false,
-
 						prevPath: '/onboarding/create-app',
 						nextPath: '/onboarding/invite-team-members',
 					},
 					{
-						text: 'Invite Team Members',
+						text: translate('onboarding.invite.stepper_title'),
 						path: '/onboarding/invite-team-members',
 						isDone: false,
-
 						prevPath: '/onboarding/smtp-configuration',
 					},
 				],

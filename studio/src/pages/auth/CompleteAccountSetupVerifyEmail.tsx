@@ -59,7 +59,7 @@ const FormSchema = z.object({
 				return ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					message: translate('forms.required', {
-						label: 'Verification Code',
+						label: translate('login.verification_code'),
 					}),
 					path: ['verificationCode'],
 				});
@@ -68,38 +68,38 @@ const FormSchema = z.object({
 	password: z
 		.string({
 			required_error: translate('forms.required', {
-				label: 'Password',
+				label: translate('login.password'),
 			}),
 		})
 		.min(
 			8,
 			translate('forms.min8.error', {
-				label: 'Password',
+				label: translate('login.name'),
 			}),
 		),
 	name: z
 		.string({
 			required_error: translate('forms.required', {
-				label: 'Name',
+				label: translate('login.name'),
 			}),
 		})
 		.min(
 			2,
 			translate('forms.min2.error', {
-				label: 'Name',
+				label: translate('login.name'),
 			}),
 		)
 		.max(
 			64,
 			translate('forms.max64.error', {
-				label: 'Name',
+				label: translate('login.name'),
 			}),
 		)
 		.trim()
 		.refine(
 			(value) => value.trim().length > 0,
 			translate('forms.required', {
-				label: 'Name',
+				label: translate('login.name'),
 			}),
 		),
 });
@@ -186,7 +186,6 @@ export default function CompleteAccountSetupVerifyEmail() {
 												{...field}
 											/>
 										</FormControl>
-
 										<FormMessage />
 									</FormItem>
 								)}

@@ -2,6 +2,7 @@
 	"title": "Login to your account",
 	"description": "Welcome back! Please enter your details.",
 	"email": "Email",
+	"email_address": "Email Address",
 	"name": "Name",
 	"login": "Login",
 	"password": "Password",

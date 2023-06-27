@@ -24,7 +24,7 @@ const FormSchema = z.object({
 	code: z
 		.string({
 			required_error: translate('forms.required', {
-				label: 'Verification code',
+				label: translate('login.verification_code'),
 			}),
 		})
 		.max(6, translate('forms.verificationCode.length.error'))
