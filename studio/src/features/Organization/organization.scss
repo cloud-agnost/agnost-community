@@ -63,3 +63,16 @@
 		}
 	}
 }
+.members {
+	&-header {
+	}
+	&-filter {
+		@apply font-sfCompact font-normal;
+		&-icon {
+			@apply text-icon-base mr-2;
+		}
+		&-resend {
+			@apply text-icon-base mr-2 w-4 h-4;
+		}
+	}
+}

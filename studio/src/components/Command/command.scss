@@ -28,7 +28,7 @@
 		@apply -mx-1 h-px bg-border;
 	}
 	&-item {
-		@apply relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5;
+		@apply relative flex justify-between cursor-default select-none items-center rounded-sm px-2 py-1.5;
 		@apply text-sm outline-none;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
 		@apply cursor-pointer hover:bg-wrapper-background-hover;
