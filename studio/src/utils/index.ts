@@ -9,3 +9,5 @@ export {
 	getNameForAvatar,
 	getApplicationRoleVariant,
 } from './utils';
+
+export { formatDate } from './time';
