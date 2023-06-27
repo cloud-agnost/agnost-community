@@ -79,6 +79,7 @@ export default function OrganizationMembersTableHeader() {
 				<SearchInput
 					placeholder='Search'
 					className='w-80'
+					value={searchParams.get('q') ?? ''}
 					onSearch={(searchTerm) => {
 						if (searchTerm) {
 							searchParams.set('q', searchTerm);

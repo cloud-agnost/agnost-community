@@ -10,10 +10,10 @@ interface SearchInputProps extends React.ComponentPropsWithoutRef<'input'> {
 	onSearch?: (value: string) => void;
 }
 const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
-	({ className, placeholder, onSearch, ...props }, ref) => {
-		const [inputValue, setInputValue] = useState<string>('');
+	({ className, placeholder, onSearch, value, ...props }, ref) => {
+		const [inputValue, setInputValue] = useState<string>((value as string) ?? '');
 		const searchTerm = useDebounce(inputValue, 500);
-
+		console.log('searchTerm', value);
 		useUpdateEffect(() => {
 			onSearch?.(searchTerm);
 		}, [searchTerm]);
