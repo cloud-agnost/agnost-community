@@ -1,39 +1,50 @@
 'use client';
 
-import {
-	ColumnDef,
-	flexRender,
-	getCoreRowModel,
-	useReactTable,
-	SortingState,
-	getSortedRowModel,
-} from '@tanstack/react-table';
-import { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table';
 import { cn } from '@/utils';
+import {
+	ColumnDef,
+	SortingState,
+	flexRender,
+	getCoreRowModel,
+	getSortedRowModel,
+	useReactTable,
+	Row,
+} from '@tanstack/react-table';
+import { useEffect, useState } from 'react';
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
 	onRowClick?: (row: TData) => void;
+	setSelectedRows?: (table: Row<TData>[]) => void;
 }
 
 export function DataTable<TData, TValue>({
 	columns,
 	data,
+	setSelectedRows,
 	onRowClick,
 }: DataTableProps<TData, TValue>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
-
+	const [rowSelection, setRowSelection] = useState({});
 	const table = useReactTable({
 		data,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		onSortingChange: setSorting,
 		getSortedRowModel: getSortedRowModel(),
+		onRowSelectionChange: setRowSelection,
 		state: {
 			sorting,
+			rowSelection,
 		},
 	});
+
+	useEffect(() => {
+		if (table.getSelectedRowModel().rows.length > 0) {
+			setSelectedRows?.(table.getSelectedRowModel().rows);
+		}
+	}, [table.getSelectedRowModel().rows]);
 
 	return (
 		<Table>
