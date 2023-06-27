@@ -21,7 +21,7 @@ const loadOptions = async (inputValue: string) => {
 	const res = await useOrganizationStore.getState().getOrganizationMembers({
 		search: inputValue,
 		excludeSelf: false,
-		organizationId: '64944d75d869e16dffb47e19',
+		organizationId: useOrganizationStore.getState().organization?._id as string,
 		page: 0,
 		size: 50,
 	});
