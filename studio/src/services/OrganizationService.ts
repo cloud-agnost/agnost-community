@@ -7,8 +7,11 @@ import {
 	GetOrganizationMembersRequest,
 	ChangeOrganizationAvatarRequest,
 	OrganizationMember,
+	InviteOrgRequest,
+	OrganizationInvitations,
+	GetOrganizationInvitationRequest,
 } from '@/types';
-
+import useOrganizationStore from '@/store/organization/organizationStore';
 export default class OrganizationService {
 	static url = '/v1/org';
 
@@ -82,6 +85,121 @@ export default class OrganizationService {
 	static async deleteOrganization(organizationId: string) {
 		return (await axios.delete(`${this.url}/${organizationId}`, { data: {} })).data;
 	}
+	static async inviteUsersToOrganization(req: InviteOrgRequest) {
+		return (
+			await axios.post(
+				`${this.url}/${req.organizationId}/invite?uiBaseURL=${req.uiBaseURL}`,
+				req.members,
+			)
+		).data;
+	}
+
+	static async getOrganizationInvitations(
+		req: GetOrganizationInvitationRequest,
+	): Promise<OrganizationInvitations[]> {
+		const { page, size, status, email, role, start, end, sortBy, sortDir, organizationId } = req;
+		return (
+			await axios.get(`${this.url}/${organizationId}/invite`, {
+				params: {
+					page,
+					size,
+					sortBy,
+					sortDir,
+					status,
+					email,
+					role,
+					start,
+					end,
+				},
+			})
+		).data;
+	}
+
+	static async deleteInvitation(token: string) {
+		return (
+			await axios.delete(
+				`${this.url}/${useOrganizationStore.getState().organization?._id}/invite?token=${token}`,
+				{
+					data: {},
+				},
+			)
+		).data;
+	}
+
+	static async deleteMultipleInvitations(tokens: string[]) {
+		return (
+			await axios.delete(
+				`${this.url}/${useOrganizationStore.getState().organization?._id}/invite?token=${
+					tokens[0]
+				}`,
+				{
+					data: {
+						tokens,
+					},
+				},
+			)
+		).data;
+	}
+
+	static async resendInvitation(token: string) {
+		return (
+			await axios.post(
+				`${this.url}/${
+					useOrganizationStore.getState().organization?._id
+				}/invite-resend?token=${token}&uiBaseURL=${window.location.origin}`,
+				{
+					token,
+				},
+			)
+		).data;
+	}
+
+	static async removeMemberFromOrganization(userId: string) {
+		return (
+			await axios.delete(
+				`${this.url}/${useOrganizationStore.getState().organization?._id}/member/${userId}`,
+				{
+					data: {},
+				},
+			)
+		).data;
+	}
+	static async removeMultipleMembersFromOrganization(userIds: string[]) {
+		return (
+			await axios.post(
+				`${this.url}/${useOrganizationStore.getState().organization?._id}/delete-multi`,
+				{
+					userIds,
+				},
+			)
+		).data;
+	}
+
+	static async updateInvitationUserRole(
+		token: string,
+		role: string,
+	): Promise<OrganizationInvitations> {
+		return (
+			await axios.put(
+				`${this.url}/${useOrganizationStore.getState().organization?._id}/invite?token=${token}`,
+				{
+					role,
+				},
+			)
+		).data;
+	}
+
+	static async changeMemberRole(userId: string, role: string): Promise<OrganizationMember> {
+		return (
+			await axios.put(
+				`${this.url}/${useOrganizationStore.getState().organization?._id}/member/${userId}`,
+				{
+					role,
+				},
+			)
+		).data;
+	}
+
 	static async getOrganizationApps(organizationId: string): Promise<Application[]> {
 		return (await axios.get(`${this.url}/${organizationId}/app`)).data;
 	}
