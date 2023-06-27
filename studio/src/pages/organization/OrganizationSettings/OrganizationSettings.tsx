@@ -1,5 +1,22 @@
-import { Outlet, redirect } from 'react-router-dom';
-
+import { Outlet } from 'react-router-dom';
+import { useState } from 'react';
+import { Row } from '@tanstack/react-table';
+import { OrganizationInvitations, OrganizationMember } from '@/types';
 export default function OrganizationSettings() {
-	return <Outlet />;
+	const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+	const [isMember, setIsMember] = useState<boolean>(true);
+	const [selectedRows, setSelectedRows] =
+		useState<Row<OrganizationInvitations | OrganizationMember>[]>();
+	return (
+		<Outlet
+			context={{
+				selectedRoles,
+				isMember,
+				selectedRows,
+				setSelectedRows,
+				setSelectedRoles,
+				setIsMember,
+			}}
+		/>
+	);
 }

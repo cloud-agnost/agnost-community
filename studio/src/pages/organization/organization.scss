@@ -31,3 +31,16 @@
 	@apply h-[72px] border-b border-border;
 	@apply sticky top-[72px] z-50 bg-base;
 }
+
+.members {
+	@apply mt-8;
+	&-header {
+		@apply flex justify-between;
+	}
+	&-filter {
+		@apply flex justify-end gap-4 flex-1;
+	}
+	&-table {
+		@apply mt-8;
+	}
+}
