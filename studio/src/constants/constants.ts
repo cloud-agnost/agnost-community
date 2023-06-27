@@ -3,7 +3,7 @@ import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
 import { BellRing, ChangeLog, LightBulb, LineSegments, Team } from '@/components/icons';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { SortOption } from '@/types';
+import { Application, SortOption } from '@/types';
 import { translate } from '@/utils';
 import { Database as DatabaseIcon, DeviceTablet, FileText, GearSix } from '@phosphor-icons/react';
 
@@ -79,8 +79,8 @@ export const ORGANIZATION_MENU_ITEMS = [
 export const APPLICATION_SETTINGS = [
 	{
 		name: translate('application.settings.openVersion'),
-		onClick: () => {
-			useOrganizationStore.setState({ isVersionOpen: true });
+		onClick: (application: Application) => {
+			useOrganizationStore.getState().openVersionDrawer(application);
 		},
 	},
 	{

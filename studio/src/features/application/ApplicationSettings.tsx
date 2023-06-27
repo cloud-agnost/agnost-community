@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks';
 import { InfoModal } from '@/components/InfoModal';
 import { Avatar, AvatarFallback } from '@/components/Avatar';
+import { Application } from '@/types';
 interface ApplicationSettingsProps {
 	appId: string;
 	appName: string;
@@ -55,7 +56,12 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 									key={setting.name}
 									onSelect={() => {
 										setOpen(false);
-										if (setting.onClick) setting.onClick();
+										if (setting.onClick)
+											setting.onClick(
+												useOrganizationStore
+													.getState()
+													.applications.find((app) => app._id === appId) as Application,
+											);
 									}}
 									className='font-sfCompact px-3'
 								>
