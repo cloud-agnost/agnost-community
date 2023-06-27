@@ -3,16 +3,22 @@ import { Navbar } from '@/components/Navbar';
 import { ORGANIZATION_SETTINGS } from '@/constants';
 import React from 'react';
 import './organizationSettingsLayout.scss';
+import useOrganizationStore from '@/store/organization/organizationStore';
 interface Props {
 	children: React.ReactNode;
 	title?: string | null;
 	description?: React.ReactNode;
 }
 export default function OrganizationSettingsLayout({ title, description, children }: Props) {
+	const { organization } = useOrganizationStore();
+	const settings = ORGANIZATION_SETTINGS.map((setting) => ({
+		...setting,
+		href: setting.href.replace(':id', organization?._id as string),
+	}));
 	return (
 		<div className='organization-settings-layout'>
 			<div className='organization-settings-layout-left'>
-				<Navbar items={ORGANIZATION_SETTINGS} />
+				<Navbar items={settings} />
 			</div>
 			<div className='organization-settings-layout-right'>
 				<div className='organization-settings-layout-right-divider'>

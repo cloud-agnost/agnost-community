@@ -166,9 +166,18 @@ const router = createBrowserRouter([
 								children: [
 									{
 										index: true,
+										path: '',
 										element: (
 											<RequireAuth>
 												<OrganizationSettingsGeneral />
+											</RequireAuth>
+										),
+									},
+									{
+										path: 'members',
+										element: (
+											<RequireAuth>
+												<OrganizationSettingsMembers />
 											</RequireAuth>
 										),
 									},
