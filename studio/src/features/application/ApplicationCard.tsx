@@ -37,7 +37,7 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 				</Avatar>
 				<div className='flex flex-col justify-center gap-1 flex-1'>
 					<div className='flex items-center justify-between'>
-						<span className='text-xl text-default font-semibold block truncate max-w-[15ch]'>
+						<span className='text-xl text-default font-semibold block truncate max-w-[11ch]'>
 							{application.name}
 						</span>
 						<Badge text={role as string} />
