@@ -1,20 +1,14 @@
-import { APIError } from '@/types';
+import { APIError, GetVersionRequest, Version, Tab } from '@/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { VersionService } from '@/services';
 
-export interface Tab {
-	id: string;
-	title: string;
-	path: string;
-}
-
 interface VersionStore {
 	loading: boolean;
 	error: APIError | null;
-	versions: any[];
+	versions: Version[];
 	tabs: Tab[];
-	getAllVersionsVisibleToUser: (orgId: string, appId: string) => Promise<void>;
+	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<void>;
 	removeTab: (id: string) => string | undefined;
 	addTab: (tab: Omit<Tab, 'id'>) => void;
 	getTabByPath: (path: string) => Tab | undefined;
@@ -30,10 +24,10 @@ const useVersionStore = create<VersionStore>()(
 				error: null,
 				versions: [],
 				tabs: [],
-				getAllVersionsVisibleToUser: async (orgId: string, appId: string) => {
+				getAllVersionsVisibleToUser: async (req: GetVersionRequest) => {
 					set({ loading: true });
 					try {
-						const versions = await VersionService.getAllVersionsVisibleToUser(orgId, appId);
+						const versions = await VersionService.getAllVersionsVisibleToUser(req);
 						set({ versions });
 					} catch (error) {
 						set({ error: error as APIError });
