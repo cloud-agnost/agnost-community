@@ -4,6 +4,7 @@ import { ORGANIZATION_SETTINGS } from '@/constants';
 import React from 'react';
 import './organizationSettingsLayout.scss';
 import useOrganizationStore from '@/store/organization/organizationStore';
+import { ScrollArea, ScrollBar } from '@/components/ScrollArea';
 interface Props {
 	children: React.ReactNode;
 	title?: string | null;
@@ -20,12 +21,15 @@ export default function OrganizationSettingsLayout({ title, description, childre
 			<div className='organization-settings-layout-left'>
 				<Navbar items={settings} />
 			</div>
-			<div className='organization-settings-layout-right'>
-				<div className='organization-settings-layout-right-divider'>
-					<Description title={title}>{description}</Description>
+			<ScrollArea className='organization-settings-layout-scrollable'>
+				<ScrollBar orientation='horizontal' />
+				<div className='organization-settings-layout-right'>
+					<div className='organization-settings-layout-right-divider'>
+						<Description title={title}>{description}</Description>
+					</div>
+					{children}
 				</div>
-				{children}
-			</div>
+			</ScrollArea>
 		</div>
 	);
 }

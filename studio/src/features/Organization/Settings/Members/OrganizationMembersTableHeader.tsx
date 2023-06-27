@@ -19,15 +19,16 @@ import { Row } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
 import '../../organization.scss';
+import { SetStateAction, Dispatch } from 'react';
 
 interface RowTypes extends Omit<OrganizationInvitations, 'role'>, OrganizationMember {}
 
 interface OutletContextTypes {
 	selectedRoles: string[];
-	setSelectedRoles: (roles: string[]) => void;
-	setIsMember: (isMember: boolean) => void;
 	isMember: boolean;
 	selectedRows: Row<RowTypes>[];
+	setSelectedRoles: Dispatch<SetStateAction<string[]>>;
+	setIsMember: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function OrganizationMembersTableHeader() {

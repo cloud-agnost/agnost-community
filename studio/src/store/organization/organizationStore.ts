@@ -262,7 +262,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 					try {
 						const res = await OrganizationService.getOrganizationMembers(req);
 						set({
-							members: res,
+							members: [...get().members, ...res],
 						});
 						if (req.onSuccess) req.onSuccess();
 						return res;
@@ -309,7 +309,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 					try {
 						const res = await OrganizationService.getOrganizationInvitations(req);
 						set({
-							invitations: res,
+							invitations: [...get().invitations, ...res],
 						});
 						if (req.onSuccess) req.onSuccess();
 						return res;

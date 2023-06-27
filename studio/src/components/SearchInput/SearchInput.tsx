@@ -13,10 +13,11 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
 	({ className, placeholder, onSearch, value, ...props }, ref) => {
 		const [inputValue, setInputValue] = useState<string>((value as string) ?? '');
 		const searchTerm = useDebounce(inputValue, 500);
-		console.log('searchTerm', value);
+
 		useUpdateEffect(() => {
 			onSearch?.(searchTerm);
 		}, [searchTerm]);
+
 		return (
 			<div className={cn('search-input-wrapper', className)} {...props}>
 				<MagnifyingGlass size={20} className='search-input-icon' />

@@ -10,17 +10,19 @@ import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTypeStore from '@/store/types/typeStore';
 import { APIError, OrgMemberRequest } from '@/types';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
 import { Separator } from '@/components/Separator';
+import { ORGANIZATION_MEMBERS_PAGE_SIZE } from '@/constants';
+import { useMemo } from 'react';
 interface OutletContextTypes {
 	isMember: boolean;
+	page: number;
 }
 
 export default function OrganizationSettingsMembers() {
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const {
 		inviteUsersToOrganization,
@@ -49,41 +51,30 @@ export default function OrganizationSettingsMembers() {
 
 	const { orgRoles } = useTypeStore();
 
-	const { isMember } = useOutletContext() as OutletContextTypes;
+	const { isMember, page } = useOutletContext() as OutletContextTypes;
 
-	useEffect(() => {
-		if (searchParams.get('t') === 'member' || !searchParams.get('t')) {
-			getOrganizationMembers({
-				page: 0,
-				size: 10,
-				organizationId: organization?._id as string,
-				search: searchParams.get('q') as string,
-				sortBy: searchParams.get('s') as string,
-				sortDir: searchParams.get('d') as string,
-				role: searchParams.get('r') as string,
-				excludeSelf: false,
-			});
-		} else {
-			getOrganizationInvitations({
-				page: 0,
-				size: 10,
-				organizationId: organization?._id as string,
-				email: searchParams.get('q') as string,
-				sortBy: searchParams.get('s') as string,
-				sortDir: searchParams.get('d') as string,
-				role: searchParams.get('r') as string,
-			});
-		}
-	}, [searchParams]);
+	const getMemberRequest = useMemo(
+		() => ({
+			page,
+			size: ORGANIZATION_MEMBERS_PAGE_SIZE,
+			organizationId: organization?._id as string,
+			...(isMember
+				? { search: searchParams.get('q') as string }
+				: { email: searchParams.get('q') as string }),
+			sortBy: searchParams.get('s') as string,
+			sortDir: searchParams.get('d') as string,
+			role: searchParams.get('r') as string,
+		}),
+		[searchParams, isMember, page],
+	);
 
 	useEffect(() => {
 		if (isMember) {
-			searchParams.set('t', 'member');
+			getOrganizationMembers(getMemberRequest);
 		} else {
-			searchParams.set('t', 'invite');
+			getOrganizationInvitations(getMemberRequest);
 		}
-		setSearchParams(searchParams);
-	}, [isMember]);
+	}, [getMemberRequest]);
 
 	return (
 		<OrganizationSettingsLayout

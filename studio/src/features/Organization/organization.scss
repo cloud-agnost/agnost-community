@@ -49,7 +49,7 @@
 			@apply justify-center;
 		}
 		&-label {
-			@apply text-left flex-1 font-sfCompact;
+			@apply text-left flex-1 font-sfCompact h-full;
 		}
 		&-name {
 			@apply text-sm text-default whitespace-nowrap truncate max-w-[12ch];
@@ -64,8 +64,6 @@
 	}
 }
 .members {
-	&-header {
-	}
 	&-filter {
 		@apply font-sfCompact font-normal;
 		&-icon {
