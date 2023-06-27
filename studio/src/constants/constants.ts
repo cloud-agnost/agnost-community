@@ -3,6 +3,7 @@ import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
 import { BellRing, ChangeLog, LightBulb, LineSegments, Team } from '@/components/icons';
 import useOrganizationStore from '@/store/organization/organizationStore';
+import { SortOption } from '@/types';
 import { translate } from '@/utils';
 import { Database as DatabaseIcon, DeviceTablet, FileText, GearSix } from '@phosphor-icons/react';
 
@@ -91,12 +92,12 @@ export const APPLICATION_SETTINGS = [
 export const ORGANIZATION_SETTINGS = [
 	{
 		title: translate('organization.settings.general'),
-		href: '',
+		href: '/organization/:id/settings',
 		icon: GearSix,
 	},
 	{
-		title: translate('organization.settings.members'),
-		href: 'members',
+		title: translate('organization.settings.members.title'),
+		href: '/organization/:id/settings/members',
 		icon: Team,
 	},
 ];
@@ -123,4 +124,41 @@ export const ERROR_CODES_TO_REDIRECT_LOGIN_PAGE = [
 	'invalid_access_token',
 	'missing_refresh_token',
 	'invalid_refresh_token',
+];
+
+export const ORG_MEMBERS_SORT_OPTIONS: SortOption[] = [
+	{
+		name: translate('organization.settings.members.sortOptions.default'),
+		value: 'default',
+	},
+	{
+		name: translate('organization.settings.members.sortOptions.joinDate'),
+		value: 'joinDate',
+		sortDir: 'desc',
+	},
+	{
+		name: translate('organization.settings.members.sortOptions.nameAsc'),
+		value: 'name',
+		sortDir: 'asc',
+	},
+	{
+		name: translate('organization.settings.members.sortOptions.nameDesc'),
+		value: 'name',
+		sortDir: 'desc',
+	},
+];
+export const ORG_INVITATIONS_SORT_OPTIONS: SortOption[] = [
+	{
+		name: translate('organization.settings.members.sortOptions.default'),
+	},
+	{
+		name: translate('organization.settings.members.sortOptions.inviteDate'),
+		value: 'createdAt',
+		sortDir: 'desc',
+	},
+	{
+		name: translate('organization.settings.members.sortOptions.email'),
+		value: 'email',
+		sortDir: 'asc',
+	},
 ];
