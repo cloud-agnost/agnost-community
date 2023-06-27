@@ -1,3 +1,5 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
+import { Button } from '@/components/Button';
 import { Description } from '@/components/Description';
 import {
 	Form,
@@ -8,22 +10,20 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/Form';
-import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import useClusterStore from '@/store/cluster/clusterStore.ts';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 import { PasswordInput } from '@/components/PasswordInput';
-import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
+import useAuthStore from '@/store/auth/authStore.ts';
+import useClusterStore from '@/store/cluster/clusterStore.ts';
+import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 import { APIError } from '@/types';
 import { User } from '@/types/type';
 import { translate } from '@/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import * as z from 'zod';
 
 async function loader() {
 	return null;

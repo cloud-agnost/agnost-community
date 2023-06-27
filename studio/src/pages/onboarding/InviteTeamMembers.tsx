@@ -40,7 +40,6 @@ export default function InviteTeamMembers() {
 			setError(res);
 			return;
 		}
-		navigate('/organization');
 	}
 
 	return (
