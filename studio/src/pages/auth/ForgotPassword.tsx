@@ -24,7 +24,7 @@ const FormSchema = z.object({
 	email: z
 		.string({
 			required_error: translate('forms.required', {
-				label: 'Email address',
+				label: translate('login.email_address'),
 			}),
 		})
 		.email(translate('forms.email.error')),

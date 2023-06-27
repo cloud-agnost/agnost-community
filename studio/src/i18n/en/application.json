@@ -3,6 +3,8 @@
 	"create": "Create Application",
 	"create-new": "Create New Application",
 	"name": "Application Name",
+	"short_name": "App Name",
+	"enter_name": "Enter app name",
 	"empty": "You have not created any apps yet!",
 	"settings": {
 		"openVersion": "Open Version",
