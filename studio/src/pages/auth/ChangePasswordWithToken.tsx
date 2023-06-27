@@ -21,10 +21,10 @@ const FormSchema = z.object({
 	password: z
 		.string({
 			required_error: translate('forms.required', {
-				label: 'Password',
+				label: translate('login.password'),
 			}),
 		})
-		.min(8, translate('forms.min8.error', { label: 'Password' })),
+		.min(8, translate('forms.min8.error', { label: translate('login.password') })),
 });
 
 export default function ChangePasswordWithToken() {

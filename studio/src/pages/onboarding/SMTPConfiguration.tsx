@@ -22,6 +22,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import * as z from 'zod';
+import { useTranslation } from 'react-i18next';
 
 async function loader() {
 	return null;
@@ -50,6 +51,7 @@ export default function SMTPConfiguration() {
 	const [error, setError] = useState<APIError | null>(null);
 	const [isTesting, setIsTesting] = useState(false);
 	const [finalizing, setFinalizing] = useState(false);
+	const { t } = useTranslation('onboarding');
 
 	const {
 		setDataPartially,
@@ -107,11 +109,7 @@ export default function SMTPConfiguration() {
 
 	return (
 		<>
-			<Description title='SMTP Configuration'>
-				In order to send invitation emails, you need to configure your SMTP server (email server)
-				connection parameters. This email server configuration will be used to send organization and
-				application invitations and also other platform-related notification messages.
-			</Description>
+			<Description title={t('onboarding.smtp.title')}>{t('onboarding.smtp.desc')}</Description>
 
 			{error && (
 				<Alert className='!max-w-full' variant='error'>
@@ -127,15 +125,15 @@ export default function SMTPConfiguration() {
 						name='host'
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Host</FormLabel>
+								<FormLabel>{t('onboarding.smtp.host')}</FormLabel>
 								<FormControl>
 									<Input
 										error={!!form.formState.errors.host}
-										placeholder='Enter hostname'
+										placeholder={t('onboarding.smtp.enter_host').toString()}
 										{...field}
 									/>
 								</FormControl>
-								<FormDescription>The hostname or IP address to connect to</FormDescription>
+								<FormDescription>{t('onboarding.smtp.host_desc')}</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -146,15 +144,15 @@ export default function SMTPConfiguration() {
 						render={({ field }) => {
 							return (
 								<FormItem>
-									<FormLabel>Port</FormLabel>
+									<FormLabel>{t('onboarding.smtp.port')}</FormLabel>
 									<FormControl>
 										<Input
 											error={!!form.formState.errors.port}
-											placeholder='Enter port'
+											placeholder={t('onboarding.smtp.enter_port').toString()}
 											{...field}
 										/>
 									</FormControl>
-									<FormDescription>The port to connect to</FormDescription>
+									<FormDescription>{t('onboarding.smtp.port_desc')}</FormDescription>
 									<FormMessage />
 								</FormItem>
 							);
@@ -166,15 +164,15 @@ export default function SMTPConfiguration() {
 						name='user'
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>User</FormLabel>
+								<FormLabel>{t('onboarding.smtp.username')}</FormLabel>
 								<FormControl>
 									<Input
 										error={!!form.formState.errors.user}
-										placeholder='Enter username'
+										placeholder={t('onboarding.smtp.enter_username').toString()}
 										{...field}
 									/>
 								</FormControl>
-								<FormDescription>Username for authentication</FormDescription>
+								<FormDescription>{t('onboarding.smtp.username_desc')}</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -185,16 +183,17 @@ export default function SMTPConfiguration() {
 						name='password'
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Password</FormLabel>
+								<FormLabel>{t('onboarding.smtp.password')}</FormLabel>
 								<FormControl>
 									<PasswordInput
 										error={Boolean(form.formState.errors.password)}
 										type='password'
-										placeholder='Enter Password'
+										placeholder={t('onboarding.smtp.enter_password').toString()}
 										{...field}
 									/>
 								</FormControl>
-								<FormDescription>The password for the user</FormDescription>
+								<FormDescription>{t('onboarding.smtp.password_desc')}</FormDescription>
+
 								<FormMessage />
 							</FormItem>
 						)}
@@ -206,7 +205,7 @@ export default function SMTPConfiguration() {
 							console.log(field);
 							return (
 								<FormItem className='flex items-center gap-2'>
-									<FormLabel>Use TLS</FormLabel>
+									<FormLabel>{t('onboarding.smtp.useTLS')}</FormLabel>
 									<FormControl>
 										{/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
 										{/* @ts-ignore */}
@@ -220,7 +219,7 @@ export default function SMTPConfiguration() {
 
 					<div className='flex gap-4 justify-end'>
 						<Button onClick={goBack} type='button' variant='text' size='lg'>
-							Previous
+							{t('onboarding.previous')}
 						</Button>
 						<Button
 							loading={finalizing}
@@ -229,10 +228,10 @@ export default function SMTPConfiguration() {
 							variant='secondary'
 							size='lg'
 						>
-							Skip & Finish
+							{t('onboarding.skip_and_finish')}
 						</Button>
 						<Button loading={isTesting} size='lg'>
-							Next
+							{t('onboarding.next')}
 						</Button>
 					</div>
 				</form>

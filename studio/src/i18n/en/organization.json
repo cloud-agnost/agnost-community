@@ -8,6 +8,7 @@
 	"create": "Create Organization",
 	"create-new": "Create New Organization",
 	"name": "Organization Name",
+	"enter_organization_name": "Enter organization name",
 	"select": "Select Your Organization",
 	"empty": "No organizations found.",
 	"leave": {

@@ -1,4 +1,4 @@
-import { Alert, AlertDescription } from '@/components/Alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { Description } from '@/components/Description';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
@@ -15,15 +15,18 @@ import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import * as z from 'zod';
+import { useTranslation } from 'react-i18next';
+import { APIError } from '@/types';
 async function loader() {
 	return null;
 }
 const appRoles = ['Admin', 'Developer', 'Viewer'];
 export default function InviteTeamMembers() {
-	const [error, setError] = useState('');
+	const [error, setError] = useState<APIError | null>(null);
 	const { goBack } = useOutletContext() as { goBack: () => void };
 	const { setStepByPath, setDataPartially, data: onboardingReq } = useOnboardingStore();
 	const { finalizeClusterSetup } = useClusterStore();
+	const { t } = useTranslation();
 	const navigate = useNavigate();
 
 	const FormSchema = z.object({
@@ -39,7 +42,9 @@ export default function InviteTeamMembers() {
 						if (email && !role) {
 							return ctx.addIssue({
 								code: z.ZodIssueCode.custom,
-								message: 'Role is required',
+								message: t('forms.required', {
+									label: t('onboarding.role'),
+								}).toString(),
 							});
 						}
 					}),
@@ -49,7 +54,7 @@ export default function InviteTeamMembers() {
 				if (_.uniq(emails).length !== emails.length) {
 					return ctx.addIssue({
 						code: z.ZodIssueCode.custom,
-						message: 'Emails must be unique',
+						message: t('onboarding.invite.emails_unique').toString(),
 					});
 				}
 			}),
@@ -58,23 +63,23 @@ export default function InviteTeamMembers() {
 		resolver: zodResolver(FormSchema),
 	});
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		const appMembers = data.member.filter((item) => item.email !== '' && item.role !== '');
-		setDataPartially({
-			appMembers,
-		});
-		setStepByPath('/onboarding/invite-team-members', {
-			isDone: true,
-		});
-		const res = await finalizeClusterSetup({
-			...onboardingReq,
-			appMembers,
-		});
-
-		if ('error' in res) {
-			setError(res.details);
-			return;
+		try {
+			setError(null);
+			const appMembers = data.member.filter((item) => item.email !== '' && item.role !== '');
+			setDataPartially({
+				appMembers,
+			});
+			setStepByPath('/onboarding/invite-team-members', {
+				isDone: true,
+			});
+			await finalizeClusterSetup({
+				...onboardingReq,
+				appMembers,
+			});
+			navigate('/organization');
+		} catch (e) {
+			setError(error as APIError);
 		}
-		navigate('/organization');
 	}
 	const { fields, append, remove } = useFieldArray({
 		control: form.control,
@@ -94,28 +99,34 @@ export default function InviteTeamMembers() {
 		if (!_.isEmpty(member) && _.isArray(member)) {
 			member.forEach((e, index) => {
 				if (e?.type === 'custom') {
-					if (e?.message === 'Role is required') {
+					if (
+						e?.message ===
+						t('forms.required', {
+							label: t('onboarding.role'),
+						}).toString()
+					) {
 						form.setError(`member.${index}.role`, {
 							type: 'required',
-							message: 'Role is required',
+							message: t('forms.required', {
+								label: t('onboarding.role'),
+							}).toString(),
 						});
 					}
 				}
 			});
 		}
-		setError(member?.message || '');
+		setError({
+			details: member?.message || '',
+		} as APIError);
 	}, [form.formState.errors]);
 
 	return (
 		<div className='max-w-xl space-y-12'>
-			<Description title='Invite Members To App Team'>
-				You can invite team members to your application with different role profiles. These team
-				members will also become organization members and can be easily added as member to other
-				organization apps.
-			</Description>
+			<Description title={t('onboarding.invite.title')}>{t('onboarding.invite.desc')}</Description>
 			{error && (
 				<Alert variant='error'>
-					<AlertDescription>{error}</AlertDescription>
+					{error.error && <AlertTitle>{error.error}</AlertTitle>}
+					<AlertDescription>{error.details}</AlertDescription>
 				</Alert>
 			)}
 			<Form {...form}>
@@ -127,10 +138,10 @@ export default function InviteTeamMembers() {
 								name={`member.${index}.email`}
 								render={({ field }) => (
 									<FormItem className='flex-1'>
-										{index === 0 && <FormLabel>Email</FormLabel>}
+										{index === 0 && <FormLabel>{t('login.email')}</FormLabel>}
 										<FormControl>
 											<Input
-												placeholder='Email'
+												placeholder={t('login.email') as string}
 												error={!!form.formState.errors.member?.[index]?.email}
 												{...field}
 											/>
@@ -144,11 +155,11 @@ export default function InviteTeamMembers() {
 								name={`member.${index}.role`}
 								render={({ field }) => (
 									<FormItem className='w-[180px]'>
-										{index === 0 && <Label>Role</Label>}
+										{index === 0 && <Label>{t('onboarding.role')}</Label>}
 										<Select onValueChange={field.onChange}>
 											<FormControl>
 												<SelectTrigger>
-													<SelectValue placeholder='Select a role' />
+													<SelectValue placeholder={t('onboarding.select_a_role')} />
 												</SelectTrigger>
 											</FormControl>
 											<SelectContent>
@@ -193,16 +204,14 @@ export default function InviteTeamMembers() {
 							}}
 						>
 							<Plus size={16} />
-							<span className='ml-2'>Add Another One</span>
+							<span className='ml-2'>{t('onboarding.add_another_one')}</span>
 						</Button>
 					)}
 					<div className='flex items-center justify-end gap-4'>
 						<Button variant='text' size='lg' onClick={goBack}>
-							Previous
+							{t('onboarding.previous')}
 						</Button>
-						<Button variant='primary' size='lg'>
-							Finish
-						</Button>
+						<Button size='lg'>{t('onboarding.next')}</Button>
 					</div>
 				</form>
 			</Form>
