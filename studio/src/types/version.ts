@@ -1,3 +1,5 @@
+import { BaseGetRequest } from './type';
+
 export interface Version {
 	orgId: string;
 	appId: string;
@@ -42,4 +44,14 @@ export interface Version {
 	createdAt: string;
 	updatedAt: string;
 	__v: number;
+}
+
+export interface GetVersionRequest extends BaseGetRequest {
+	name?: string;
+	appId: string;
+}
+export interface Tab {
+	id: string;
+	title: string;
+	path: string;
 }
