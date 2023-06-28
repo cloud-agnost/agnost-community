@@ -6,9 +6,9 @@ export class QueueBase {
 
 	/**
 	 * Adds the listerer to listen messages for the provided queueId
-	 * @param  {string} queueId The iid of the queue
+	 * @param  {Object} queue The queue object
 	 */
-	async listenMessages(queueId) {}
+	async listenMessages(queue) {}
 
 	/**
 	 * Sends a message to the specified queue
@@ -120,36 +120,39 @@ export class QueueBase {
 			`QUEUE: ${queue.name} (${status}) ${Math.round(duration * 10) / 10}ms`
 		);
 
-		// Calculate size of the request and response body, if they are larger than certain size we do not log their content
-		const conn = getDBClient();
-		const messageSize = Buffer.byteLength(JSON.stringify(payload));
-
-		const timestamp = new Date();
-		const log = {
-			timestamp: timestamp,
-			name: queue.name,
-			status: status === 400 ? "error" : "success", // 200 or 400
-			duration: time,
-			orgId: queue.orgId,
-			appId: queue.appId,
-			versionId: queue.versionId,
-			envId: META.getEnvObj()._id,
-			queueId: queue._id,
-			message:
-				messageSize > config.get("general.maxLogPayloadSizeKB") * 1024
-					? t("Message too large to store")
-					: payload,
-			errors: errors,
-		};
-
-		// Save log to the database
-		conn
-			.db(META.getEnvId())
-			.collection("queue_logs")
-			.insertOne(log, { writeConcern: { w: 0 } });
-
-		// Also update the message info record
+		// Update the message info record
 		this.endProcessingMessage(trackingId, timestamp, errors);
+
+		// If queue logs enabled then add the log entry to the database
+		if (queue.logExecution) {
+			// Calculate size of the request and response body, if they are larger than certain size we do not log their content
+			const conn = getDBClient();
+			const messageSize = Buffer.byteLength(JSON.stringify(payload));
+
+			const timestamp = new Date();
+			const log = {
+				timestamp: timestamp,
+				name: queue.name,
+				status: status === 400 ? "error" : "success", // 200 or 400
+				duration: time,
+				orgId: queue.orgId,
+				appId: queue.appId,
+				versionId: queue.versionId,
+				envId: META.getEnvObj()._id,
+				queueId: queue._id,
+				message:
+					messageSize > config.get("general.maxLogPayloadSizeKB") * 1024
+						? t("Message too large to store")
+						: payload,
+				errors: errors,
+			};
+
+			// Save log to the database
+			conn
+				.db(META.getEnvId())
+				.collection("queue_logs")
+				.insertOne(log, { writeConcern: { w: 0 } });
+		}
 	}
 }
 

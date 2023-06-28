@@ -1,5 +1,9 @@
 import axios from "axios";
 import dbCtrl from "../controllers/database.js";
+import epCtrl from "../controllers/endpoint.js";
+import mwCtrl from "../controllers/middleware.js";
+import queueCtrl from "../controllers/queue.js";
+import taskCtrl from "../controllers/task.js";
 import modelCtrl from "../controllers/model.js";
 import resourceCtrl from "../controllers/resource.js";
 import versionCtrl from "../controllers/version.js";
@@ -110,7 +114,6 @@ class DeploymentController {
 	/**
 	 * Returns the databases and their associated models
 	 * @param  {string} versionId The version id
-	 * @param  {string} dbId The database id
 	 */
 	async getDatabases(versionId) {
 		let databases = await dbCtrl.getManyByQuery({ versionId });
@@ -119,6 +122,46 @@ class DeploymentController {
 		}
 
 		return databases;
+	}
+
+	/**
+	 * Returns the endpoints
+	 * @param  {string} versionId The version id
+	 */
+	async getEndpoints(versionId) {
+		let endpoints = await epCtrl.getManyByQuery({ versionId });
+
+		return endpoints;
+	}
+
+	/**
+	 * Returns the middlewares
+	 * @param  {string} versionId The version id
+	 */
+	async getMiddlewares(versionId) {
+		let middlewares = await mwCtrl.getManyByQuery({ versionId });
+
+		return middlewares;
+	}
+
+	/**
+	 * Returns the message queues
+	 * @param  {string} versionId The version id
+	 */
+	async getQueues(versionId) {
+		let queues = await queueCtrl.getManyByQuery({ versionId });
+
+		return queues;
+	}
+
+	/**
+	 * Returns the tasks
+	 * @param  {string} versionId The version id
+	 */
+	async getTasks(versionId) {
+		let tasks = await taskCtrl.getManyByQuery({ versionId });
+
+		return tasks;
 	}
 
 	/**
@@ -154,10 +197,10 @@ class DeploymentController {
 			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
 			env: { ...env, callback, version, resources, timestamp: new Date() },
 			databases: await this.getDatabases(version._id),
-			endpoints: [],
-			middlewares: [],
-			queues: [],
-			tasks: [],
+			endpoints: await this.getEndpoints(version._id),
+			middlewares: await this.getMiddlewares(version._id),
+			queues: await this.getQueues(version._id),
+			tasks: await this.getTasks(version._id),
 			storage: [],
 			cache: [],
 		};
@@ -208,10 +251,10 @@ class DeploymentController {
 			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
 			env: { ...env, callback, version, resources, timestamp: new Date() },
 			databases: await this.getDatabases(version._id),
-			endpoints: [],
-			middlewares: [],
-			queues: [],
-			tasks: [],
+			endpoints: await this.getEndpoints(version._id),
+			middlewares: await this.getMiddlewares(version._id),
+			queues: await this.getQueues(version._id),
+			tasks: await this.getTasks(version._id),
 			storage: [],
 			cache: [],
 		};
@@ -328,9 +371,9 @@ class DeploymentController {
 
 	/**
 	 * Updates the version and also environment metadata in engine cluster if autoDeploy is turned on
-	 * @param  {string} app The application id
-	 * @param  {string} version The version id
-	 * @param  {object} version The resource whose access setting has been updated
+	 * @param  {string} appId The application id
+	 * @param  {string} versionId The version id
+	 * @param  {object} resource The resource whose access setting has been updated
 	 * @param  {object} user The user who initiated the update
 	 */
 	async updateResourceAccessSettings(appId, versionId, resource, user) {
@@ -396,6 +439,8 @@ class DeploymentController {
 	 * @param  {object} app The application object
 	 * @param  {object} version The version object
 	 * @param  {object} user The user who initiated the update
+	 * @param  {object} database The database object that is created/updted/deleted
+	 * @param  {string} subAction Can be either add, update, delete
 	 */
 	async updateDatabase(app, version, user, database, subAction) {
 		const env = await this.getEnvironment(version);
@@ -447,6 +492,192 @@ class DeploymentController {
 		// Make api call to environment worker engine to update database
 		await axios.post(
 			config.get("general.workerUrl") + "/v1/env/update-database",
+			payload,
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
+	}
+
+	/**
+	 * Updates the endpoints if autoDeploy is turned on
+	 * @param  {object} app The application object
+	 * @param  {object} version The version object
+	 * @param  {object} user The user who initiated the update
+	 * @param  {object} endpoints The endpoints that are created/updated/deleted
+	 * @param  {string} subAction Can be either add, update, delete
+	 */
+	async updateEndpoints(app, version, user, endpoints, subAction) {
+		const env = await this.getEnvironment(version);
+		// If auto deploy is turned off or version has not been deployed to the environment then we do not send the environment updates to the engine cluster
+		if (!env.autoDeploy || !env.deploymentDtm) return;
+
+		// Create the environment log entry
+		const envLog = await this.createEnvLog(
+			version,
+			env,
+			user,
+			"Deploying",
+			[{ pod: "all", status: "Deploying" }],
+			env.schedulerStatus
+		);
+
+		// First get the list of environment resources
+		const resources = await this.getEnvironmentResources(env);
+
+		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
+			env.orgId
+		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+			envLog._id
+		}`;
+		// Start building the deployment instructions that will be sent to the engine cluster worker
+		let payload = {
+			action: "deploy",
+			subAction: subAction,
+			callback: callback,
+			actor: {
+				userId: user._id,
+				name: user.name,
+				pictureUrl: user.pictureUrl,
+				color: user.color,
+				contactEmail: user.contactEmail,
+			},
+			app,
+			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
+			env: { ...env, callback, version, resources, timestamp: new Date() },
+			endpoints: endpoints,
+		};
+
+		// Make api call to environment worker engine to update database
+		await axios.post(
+			config.get("general.workerUrl") + "/v1/env/update-endpoints",
+			payload,
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
+	}
+
+	/**
+	 * Updates the middlewares if autoDeploy is turned on
+	 * @param  {object} app The application object
+	 * @param  {object} version The version object
+	 * @param  {object} user The user who initiated the update
+	 * @param  {object} middlewares The middlewares that are created/updated/deleted
+	 * @param  {string} subAction Can be either add, update, delete
+	 */
+	async updateMiddlewares(app, version, user, middlewares, subAction) {
+		const env = await this.getEnvironment(version);
+		// If auto deploy is turned off or version has not been deployed to the environment then we do not send the environment updates to the engine cluster
+		if (!env.autoDeploy || !env.deploymentDtm) return;
+
+		// Create the environment log entry
+		const envLog = await this.createEnvLog(
+			version,
+			env,
+			user,
+			"Deploying",
+			[{ pod: "all", status: "Deploying" }],
+			env.schedulerStatus
+		);
+
+		// First get the list of environment resources
+		const resources = await this.getEnvironmentResources(env);
+
+		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
+			env.orgId
+		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+			envLog._id
+		}`;
+		// Start building the deployment instructions that will be sent to the engine cluster worker
+		let payload = {
+			action: "deploy",
+			subAction: subAction,
+			callback: callback,
+			actor: {
+				userId: user._id,
+				name: user.name,
+				pictureUrl: user.pictureUrl,
+				color: user.color,
+				contactEmail: user.contactEmail,
+			},
+			app,
+			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
+			env: { ...env, callback, version, resources, timestamp: new Date() },
+			middlewares: middlewares,
+		};
+
+		// Make api call to environment worker engine to update database
+		await axios.post(
+			config.get("general.workerUrl") + "/v1/env/update-middlewares",
+			payload,
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
+	}
+
+	/**
+	 * Updates the queues if autoDeploy is turned on
+	 * @param  {object} app The application object
+	 * @param  {object} version The version object
+	 * @param  {object} user The user who initiated the update
+	 * @param  {object} queues The queues that are created/updated/deleted
+	 * @param  {string} subAction Can be either add, update, delete
+	 */
+	async updateQueues(app, version, user, queues, subAction) {
+		const env = await this.getEnvironment(version);
+		// If auto deploy is turned off or version has not been deployed to the environment then we do not send the environment updates to the engine cluster
+		if (!env.autoDeploy || !env.deploymentDtm) return;
+
+		// Create the environment log entry
+		const envLog = await this.createEnvLog(
+			version,
+			env,
+			user,
+			"Deploying",
+			[{ pod: "all", status: "Deploying" }],
+			env.schedulerStatus
+		);
+
+		// First get the list of environment resources
+		const resources = await this.getEnvironmentResources(env);
+
+		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
+			env.orgId
+		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+			envLog._id
+		}`;
+		// Start building the deployment instructions that will be sent to the engine cluster worker
+		let payload = {
+			action: "deploy",
+			subAction: subAction,
+			callback: callback,
+			actor: {
+				userId: user._id,
+				name: user.name,
+				pictureUrl: user.pictureUrl,
+				color: user.color,
+				contactEmail: user.contactEmail,
+			},
+			app,
+			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
+			env: { ...env, callback, version, resources, timestamp: new Date() },
+			queues: queues,
+		};
+
+		// Make api call to environment worker engine to update database
+		await axios.post(
+			config.get("general.workerUrl") + "/v1/env/update-queues",
 			payload,
 			{
 				headers: {

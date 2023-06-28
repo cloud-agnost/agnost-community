@@ -55,6 +55,7 @@ export class AdapterManager {
 
 		if (mapping) {
 			let adapterObj = this.adapters.get(mapping.resource.iid);
+
 			if (readOnly) {
 				// If the readonly connection is not there then return the read-write connection
 				if (adapterObj?.slaves && adapterObj.slaves.length > 0) {
@@ -122,45 +123,45 @@ export class AdapterManager {
 	async setupConnection(resource) {
 		switch (resource.instance) {
 			case "PostgreSQL":
-				this.connectToPostgresSQL(resource);
+				await this.connectToPostgresSQL(resource);
 				break;
 			case "MySQL":
-				this.connectToMySQL(resource);
+				await this.connectToMySQL(resource);
 				break;
 			case "SQL Server":
-				this.connectToSQLServer(resource);
+				await this.connectToSQLServer(resource);
 				break;
 			case "MongoDB":
-				this.connectToMongoDB(resource);
+				await this.connectToMongoDB(resource);
 				break;
 			case "Oracle":
 				break;
 			case "Redis":
-				this.connectToRedis(resource);
+				await this.connectToRedis(resource);
 				break;
 			case "AWS S3":
-				this.connectToAWSStorage(resource);
+				await this.connectToAWSStorage(resource);
 				break;
 			case "GCP Cloud Storage":
-				this.connectToGCPStorage(resource);
+				await this.connectToGCPStorage(resource);
 				break;
 			case "Azure Blob Storage":
-				this.connectToAzureStorage(resource);
+				await this.connectToAzureStorage(resource);
 				break;
 			case "Cluster Storage":
-				this.connectToClusterStorage(resource);
+				await this.connectToClusterStorage(resource);
 				break;
 			case "RabbitMQ":
-				this.connectToRabbitMQ(resource);
+				await this.connectToRabbitMQ(resource);
 				break;
 			case "Kafka":
-				this.connectToKafka(resource);
+				await this.connectToKafka(resource);
 				break;
 			case "Default Realtime":
-				this.connectToRealtimeServer(resource);
+				await this.connectToRealtimeServer(resource);
 				break;
 			case "Default Scheduler":
-				this.connectToScheduler(resource);
+				await this.connectToScheduler(resource);
 				break;
 			default:
 				return null;

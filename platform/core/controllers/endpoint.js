@@ -1,6 +1,6 @@
 import BaseController from "./base.js";
+import auditCtrl from "./audit.js";
 import { EndpointModel } from "../schemas/endpoint.js";
-import { deleteKey } from "../init/cache.js";
 
 class EndpointController extends BaseController {
 	constructor() {
@@ -23,30 +23,47 @@ class EndpointController extends BaseController {
 				versionId: version._id,
 				rateLimits: { $in: limits.map((entry) => entry.iid) },
 			},
-			{ projection: "-code" }
+			{ projection: "-logic" }
 		);
 
 		// If no matching endpoints then return
 		if (endpoints.length === 0) return;
 
-		await EndpointModel.updateMany(
-			{
-				versionId: version._id,
-				rateLimits: { $in: limits.map((entry) => entry.iid) },
-			},
-			{
-				$pull: { rateLimits: { $in: limits.map((entry) => entry.iid) } },
-				$set: {
+		for (let i = 0; i < endpoints.length; i++) {
+			const ep = endpoints[i];
+			const updatedEp = await this.updateOneById(
+				ep._id,
+				{
+					rateLimits: ep.rateLimits.filter(
+						(entry) => !limits.find((entry2) => entry2.iid === entry)
+					),
 					updatedBy: user._id,
 				},
-			},
-			{ session }
-		);
+				{},
+				{ session, cacheKey: ep._id }
+			);
 
-		// Clear cache for endpoints
-		endpoints.forEach((element) => {
-			deleteKey(element._id.toString());
-		});
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.endpoint",
+				"update",
+				t(
+					"Removed rate limit(s) from endpoint '%s' '%s:%s'",
+					ep.name,
+					ep.method,
+					ep.path
+				),
+				updatedEp,
+				{
+					orgId: ep.orgId,
+					appId: ep.appId,
+					versionId: ep.versionId,
+					endpointId: ep._id,
+				}
+			);
+		}
 	}
 
 	/**
@@ -65,30 +82,47 @@ class EndpointController extends BaseController {
 				versionId: version._id,
 				middlewares: { $in: middlewares.map((entry) => entry.iid) },
 			},
-			{ projection: "-code" }
+			{ projection: "-logic" }
 		);
 
 		// If no matching endpoints then return
 		if (endpoints.length === 0) return;
 
-		await EndpointModel.updateMany(
-			{
-				versionId: version._id,
-				middlewares: { $in: middlewares.map((entry) => entry.iid) },
-			},
-			{
-				$pull: { middlewares: { $in: middlewares.map((entry) => entry.iid) } },
-				$set: {
+		for (let i = 0; i < endpoints.length; i++) {
+			const ep = endpoints[i];
+			const updatedEp = await this.updateOneById(
+				ep._id,
+				{
+					middlewares: ep.middlewares.filter(
+						(entry) => !middlewares.find((entry2) => entry2.iid === entry)
+					),
 					updatedBy: user._id,
 				},
-			},
-			{ session }
-		);
+				{},
+				{ session, cacheKey: ep._id }
+			);
 
-		// Clear cache for endpoints
-		endpoints.forEach((element) => {
-			deleteKey(element._id.toString());
-		});
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.endpoint",
+				"update",
+				t(
+					"Removed middleware(s) from endpoint '%s' '%s:%s'",
+					ep.name,
+					ep.method,
+					ep.path
+				),
+				updatedEp,
+				{
+					orgId: ep.orgId,
+					appId: ep.appId,
+					versionId: ep.versionId,
+					endpointId: ep._id,
+				}
+			);
+		}
 	}
 }
 

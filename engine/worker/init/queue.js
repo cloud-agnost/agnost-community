@@ -3,6 +3,10 @@ import { deployVersionHandler } from "../consumers/deployVersion.js";
 import { redeployVersionHandler } from "../consumers/redeployVersion.js";
 import { updateEnvironmentHandler } from "../consumers/updateEnvironment.js";
 import { updateDatabaseHandler } from "../consumers/updateDatabase.js";
+import { updateEndpointsHandler } from "../consumers/updateEndpoints.js";
+import { updateMiddlewaresHandler } from "../consumers/updateMiddlewares.js";
+import { updateQueuesHandler } from "../consumers/updateQueues.js";
+import { updateTasksHandler } from "../consumers/updateTasks.js";
 import { deleteEnvironmentHandler } from "../consumers/deleteEnvironment.js";
 import { manageResourceHandler } from "../consumers/manageResource.js";
 import { updateResourceAccessHandler } from "../consumers/updateResourceAccess.js";
@@ -84,6 +88,10 @@ export const connectToQueue = () => {
 			manageResourceHandler(connection, `manage-resource-${i}`);
 			updateResourceAccessHandler(connection, `update-resource-access-${i}`);
 			manageEngineWorkersHandler(connection, "manage-engine-workers");
+			updateEndpointsHandler(connection, `update-endpoints-${i}`);
+			updateMiddlewaresHandler(connection, `update-middlewares-${i}`);
+			updateQueuesHandler(connection, `update-queues-${i}`);
+			updateTasksHandler(connection, `update-tasks-${i}`);
 		}
 	});
 };
@@ -246,6 +254,134 @@ export const updateDatabase = (payload) => {
 
 		channel.sendToQueue(
 			`update-db-${randNumber}`,
+			Buffer.from(JSON.stringify(payload)),
+			{
+				persistent: true,
+				timestamp: Date.now(),
+			}
+		);
+
+		channel.close();
+	});
+};
+
+export const updateEndpoints = (payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		let randNumber = helper.randomInt(
+			1,
+			config.get("general.generalQueueCount")
+		);
+
+		channel.assertQueue(`update-endpoints-${randNumber}`, {
+			durable: true,
+		});
+
+		channel.sendToQueue(
+			`update-endpoints-${randNumber}`,
+			Buffer.from(JSON.stringify(payload)),
+			{
+				persistent: true,
+				timestamp: Date.now(),
+			}
+		);
+
+		channel.close();
+	});
+};
+
+export const updateMiddlewares = (payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		let randNumber = helper.randomInt(
+			1,
+			config.get("general.generalQueueCount")
+		);
+
+		channel.assertQueue(`update-middlewares-${randNumber}`, {
+			durable: true,
+		});
+
+		channel.sendToQueue(
+			`update-middlewares-${randNumber}`,
+			Buffer.from(JSON.stringify(payload)),
+			{
+				persistent: true,
+				timestamp: Date.now(),
+			}
+		);
+
+		channel.close();
+	});
+};
+
+export const updateQueues = (payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		let randNumber = helper.randomInt(
+			1,
+			config.get("general.generalQueueCount")
+		);
+
+		channel.assertQueue(`update-queues-${randNumber}`, {
+			durable: true,
+		});
+
+		channel.sendToQueue(
+			`update-queues-${randNumber}`,
+			Buffer.from(JSON.stringify(payload)),
+			{
+				persistent: true,
+				timestamp: Date.now(),
+			}
+		);
+
+		channel.close();
+	});
+};
+
+export const updateTasks = (payload) => {
+	amqpConnection.createChannel(function (error, channel) {
+		if (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+
+			return;
+		}
+
+		let randNumber = helper.randomInt(
+			1,
+			config.get("general.generalQueueCount")
+		);
+
+		channel.assertQueue(`update-tasks-${randNumber}`, {
+			durable: true,
+		});
+
+		channel.sendToQueue(
+			`update-tasks-${randNumber}`,
 			Buffer.from(JSON.stringify(payload)),
 			{
 				persistent: true,

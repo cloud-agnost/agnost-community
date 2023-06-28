@@ -12,7 +12,7 @@ export const applyRateLimit = (limitObj) => {
 
 	return (req, res, next) => {
 		rateLimiter
-			.consume(helper.getIP(req))
+			.consume(`${helper.getIP(req)}-${limitObj.iid}`)
 			.then(() => {
 				next();
 			})
