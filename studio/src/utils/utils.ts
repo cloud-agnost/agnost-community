@@ -61,7 +61,7 @@ export function isEmpty(value: unknown): boolean {
 }
 export function isArray(value: unknown): value is any[] {
 	return Array.isArray(value);
-
+}
 export function getNameForAvatar(name: string) {
 	if (name?.length > 2) {
 		const names = name.split(' ');
