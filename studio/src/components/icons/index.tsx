@@ -12,4 +12,5 @@ export { default as Resend } from './Resend';
 export { default as SquaresFour } from './SquaresFour';
 export { default as SuccessCheck } from './SuccessCheck';
 export { default as Team } from './Team';
+export { default as Version } from './Version';
 export { default as Warning } from './Warning';
