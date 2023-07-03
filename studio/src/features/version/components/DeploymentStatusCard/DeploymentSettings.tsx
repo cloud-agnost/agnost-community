@@ -3,15 +3,6 @@ import { Button } from 'components/Button';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
 import { Switch } from 'components/Switch';
-import {
-	Drawer,
-	DrawerClose,
-	DrawerContent,
-	DrawerFooter,
-	DrawerHeader,
-	DrawerTitle,
-} from 'components/Drawer';
-import { useState } from 'react';
 
 interface DeploymentSettingsProps {
 	isOpen: boolean;
@@ -20,7 +11,38 @@ interface DeploymentSettingsProps {
 
 export default function DeploymentSettings({ isOpen, close }: DeploymentSettingsProps) {
 	const { t } = useTranslation();
-	const [isLogsOpen, setIsLogsOpen] = useState(false);
+
+	function reDeploy() {
+		// TODO: will implemented
+	}
+
+	function suspendServices() {
+		// TODO: will implemented
+	}
+
+	function autoRedeployChange(checked: boolean) {
+		// TODO: will implemented
+		console.log(checked);
+	}
+
+	const settings = [
+		{
+			title: t('version.suspend_services'),
+			description: t('version.suspend_services_desc'),
+			element: <Button onClick={suspendServices}>{t('version.reactivate')}</Button>,
+		},
+		{
+			title: t('version.redeploy'),
+			description: t('version.redeploy_desc'),
+			element: <Button onClick={reDeploy}>{t('version.redeploy')}</Button>,
+		},
+		{
+			title: t('version.auto_redeploy'),
+			description: t('version.auto_redeploy_desc'),
+			element: <Switch onCheckedChange={autoRedeployChange} />,
+		},
+	];
+
 	return (
 		<>
 			<AnimatePresence>
@@ -45,52 +67,19 @@ export default function DeploymentSettings({ isOpen, close }: DeploymentSettings
 							<h4>Deployment Settings</h4>
 						</header>
 						<div className='deployment-settings-items'>
-							<div>
-								<div>
-									<h5>{t('version.suspend_services')}</h5>
-									<p>{t('version.suspend_services_desc')}</p>
+							{settings.map(({ title, description, element }, index) => (
+								<div key={index}>
+									<div>
+										<h5>{title}</h5>
+										<p>{description}</p>
+									</div>
+									<div className='flex items-center'>{element}</div>
 								</div>
-								<div className='flex items-center'>
-									<Button>{t('version.reactivate')}</Button>
-								</div>
-							</div>
-							<div>
-								<div>
-									<h5>{t('version.redeploy')}</h5>
-									<p>{t('version.redeploy_desc')}</p>
-								</div>
-								<div className='flex items-center'>
-									<Button>{t('version.redeploy')}</Button>
-								</div>
-							</div>
-							<div>
-								<div>
-									<h5>{t('version.auto_redeploy')}</h5>
-									<p>{t('version.auto_redeploy_desc')}</p>
-								</div>
-								<div className='flex items-center'>
-									<Switch />
-								</div>
-							</div>
+							))}
 						</div>
-						<footer className='deployment-settings-footer'>
-							<Button onClick={() => setIsLogsOpen(true)} variant='link'>
-								{t('version.view_logs')}
-							</Button>
-						</footer>
 					</motion.div>
 				)}
 			</AnimatePresence>
-			<Drawer open={isLogsOpen} onOpenChange={() => setIsLogsOpen(false)}>
-				<DrawerContent position='right' size='md'>
-					<DrawerHeader>
-						<DrawerTitle>{t('version.logs')}</DrawerTitle>
-					</DrawerHeader>
-					<DrawerFooter>
-						<DrawerClose asChild></DrawerClose>
-					</DrawerFooter>
-				</DrawerContent>
-			</Drawer>
 		</>
 	);
 }
