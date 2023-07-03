@@ -1,4 +1,4 @@
-import { BaseGetRequest } from './type';
+import { BaseGetRequest, User } from './type';
 
 export interface Version {
 	orgId: string;
@@ -35,7 +35,7 @@ export interface Version {
 		providers: [];
 		messages: [];
 	};
-	createdBy: string;
+	createdBy: User;
 	_id: string;
 	params: [];
 	limits: [];
