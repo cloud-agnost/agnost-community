@@ -1,5 +1,7 @@
 import axios from 'axios';
 import useAuthStore from '@/store/auth/authStore.ts';
+import { APIError } from '@/types';
+import { ERROR_CODES_TO_REDIRECT_LOGIN_PAGE } from '@/constants';
 const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost/api';
 
 export const instance = axios.create({
@@ -10,10 +12,9 @@ export const instance = axios.create({
 });
 
 instance.interceptors.request.use((config) => {
-	config.headers['Content-Type'] = 'application/json';
-	const accessToken = useAuthStore.getState().user?.at;
+	const accessToken = useAuthStore.getState().accessToken;
 	if (accessToken) {
-		config.headers['Authorization'] = accessToken ?? 'at-51249e5321534d838cbc79d6cf60d598';
+		config.headers['Authorization'] = accessToken;
 	}
 	return config;
 });
@@ -22,5 +23,13 @@ instance.interceptors.response.use(
 	(response) => {
 		return response;
 	},
-	(error) => Promise.reject(error.response.data),
+	(error) => {
+		const apiError = error.response.data as APIError;
+		if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
+			localStorage.clear();
+			// location.href = '/login';
+			return;
+		}
+		return Promise.reject(apiError);
+	},
 );

@@ -1,4 +1,15 @@
 {
 	"cancel": "Cancel",
-	"ok": "OK"
+	"ok": "OK",
+	"delete": "Delete",
+	"enter_confirmation_code_here": "Enter confirmation code here",
+	"copied": "Copied",
+	"copied_error": "Failed to copy try again",
+	"success": "Success",
+	"error": "Error",
+	"addMembers": "Add Members",
+	"created": "Created",
+	"open": "Open",
+	"name": "Name",
+	"save": "Save"
 }

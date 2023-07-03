@@ -9,4 +9,8 @@ export {
 	uniq,
 	isEmpty,
 	isArray,
+	getNameForAvatar,
+	getApplicationRoleVariant,
 } from './utils';
+
+export { formatDate } from './time';

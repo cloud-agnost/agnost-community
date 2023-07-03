@@ -13,8 +13,6 @@ interface ClusterStore {
 	checkClusterSmtpStatus: () => Promise<boolean>;
 	initializeClusterSetup: (data: UserDataToRegister) => Promise<User>;
 	finalizeClusterSetup: (req: OnboardingData) => Promise<User | APIError>;
-	initializeAccountSetup: () => void;
-	finalizeAccountSetup: () => void;
 }
 
 const useClusterStore = create<ClusterStore>()(
@@ -50,15 +48,6 @@ const useClusterStore = create<ClusterStore>()(
 				},
 				finalizeClusterSetup: async (data: OnboardingData) => {
 					return AuthService.finalizeClusterSetup(data);
-				},
-				initializeAccountSetup: () => {
-					// TODO: Implement
-				},
-				finalizeAccountSetup: () => {
-					// TODO: Implement
-				},
-				completeAccountSetupFollowingInviteAccept: () => {
-					// TODO: Implement
 				},
 			}),
 			{

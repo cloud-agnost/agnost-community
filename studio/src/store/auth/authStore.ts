@@ -10,15 +10,17 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 interface AuthStore {
+	accessToken: string | null | undefined;
+	refreshToken: string | null | undefined;
 	loading: boolean;
 	error: APIError | null;
 	user: User | null;
 	email: string | null;
 	setUser: (user: User | null) => void;
 	login: (email: string, password: string) => Promise<User>;
-	logout: () => Promise<any>;
-	setToken: (token: string) => void;
-	setRefreshToken: (refreshToken: string) => void;
+	logout: () => Promise<void>;
+	setToken: (accessToken: string | null | undefined) => void;
+	setRefreshToken: (refreshToken: string | null | undefined) => void;
 	isAuthenticated: () => boolean;
 	renewAccessToken: () => void;
 	completeAccountSetup: (data: CompleteAccountSetupRequest) => Promise<User | APIError>;
@@ -35,12 +37,24 @@ interface AuthStore {
 	acceptInvite: (token: string) => Promise<{
 		user: User;
 	}>;
+	changeName: (name: string) => Promise<User>;
+	changeEmail: (email: string, password: string) => Promise<string>;
+	changeAvatar: (avatar: File) => Promise<User>;
+	removeAvatar: () => Promise<void>;
+	changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+	deleteAccount: () => Promise<void>;
+	updateNotifications: (notifications: string[]) => Promise<User>;
+	confirmChangeLoginEmail: (token: string) => Promise<void>;
+	getUser: () => Promise<User>;
+	getUserPicture: () => string;
 }
 
 const useAuthStore = create<AuthStore>()(
 	devtools(
 		persist(
 			(set, get) => ({
+				accessToken: null,
+				refreshToken: null,
 				loading: false,
 				error: null,
 				user: null,
@@ -48,6 +62,8 @@ const useAuthStore = create<AuthStore>()(
 				setUser: (user) => {
 					set({ user });
 					if (user) joinChannel(user._id);
+					if (user?.at) get().setToken(user.at);
+					if (user?.rt) get().setRefreshToken(user.rt);
 				},
 				login: async (email, password) => {
 					const res = await AuthService.login(email, password);
@@ -59,19 +75,12 @@ const useAuthStore = create<AuthStore>()(
 					if (user) leaveChannel(user?._id);
 					const res = await AuthService.logout();
 					get().setUser(null);
+					localStorage.clear();
 					return res;
 				},
-				setToken: (token) =>
-					set((prev) => {
-						if (prev.user) prev.user.at = token;
-						return prev;
-					}),
-				setRefreshToken: (refreshToken) =>
-					set((prev) => {
-						if (prev.user) prev.user.rt = refreshToken;
-						return prev;
-					}),
-				isAuthenticated: () => get()?.user !== null,
+				setToken: (accessToken) => set({ accessToken }),
+				setRefreshToken: (refreshToken) => set({ refreshToken }),
+				isAuthenticated: () => Boolean(get().accessToken),
 				renewAccessToken: async () => {
 					if (!get().isAuthenticated()) return;
 					const res = await AuthService.renewAccessToken();
@@ -140,11 +149,67 @@ const useAuthStore = create<AuthStore>()(
 						set({ error: err as APIError });
 					}
 				},
+				async changeName(name: string) {
+					const user = await UserService.changeName(name);
+					set({ user });
+					return user;
+				},
+				async changeEmail(email: string, password) {
+					const newEmail = await UserService.changeEmail({
+						email,
+						password,
+						uiBaseURL: window.location.origin,
+					});
+					console.log(newEmail);
+					return newEmail;
+				},
+				async changeAvatar(avatar: File) {
+					const user = await UserService.changeAvatar(avatar);
+					set({ user });
+					return user;
+				},
+				async removeAvatar() {
+					try {
+						await UserService.removeAvatar();
+						set((prev) => {
+							delete prev.user?.pictureUrl;
+							return prev;
+						});
+					} catch (err) {
+						set({ error: err as APIError });
+						throw err;
+					}
+				},
+				async changePassword(currentPassword: string, newPassword: string) {
+					return UserService.changePassword(currentPassword, newPassword);
+				},
+				async deleteAccount() {
+					return UserService.deleteAccount();
+				},
+				async updateNotifications(notifications: string[]) {
+					const res = await UserService.updateNotifications({ notifications });
+					set({ user: res });
+					return res;
+				},
+				confirmChangeLoginEmail(token: string) {
+					return UserService.confirmChangeLoginEmail(token);
+				},
+				async getUser() {
+					const user = await UserService.getUser();
+					set({ user });
+					return user;
+				},
+				getUserPicture() {
+					return location.origin + '/api' + get().user?.pictureUrl;
+				},
 			}),
 			{
 				name: 'auth-storage',
 			},
 		),
+		{
+			name: 'auth',
+		},
 	),
 );
 

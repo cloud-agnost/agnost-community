@@ -1,0 +1,25 @@
+.org-menu {
+	@apply flex items-end justify-center h-full mx-auto;
+
+	&-item {
+		@apply list-none;
+		&-name {
+			@apply text-default text-sm font-sfCompact;
+		}
+		&.active {
+			.org-menu-link {
+				@apply border-b-brand-primary;
+			}
+			.org-menu-icon {
+				@apply text-brand-primary;
+			}
+		}
+	}
+	&-link {
+		@apply flex items-center justify-center gap-2 p-4;
+		@apply border-b-3 border-transparent;
+	}
+	&-icon {
+		@apply text-icon-base;
+	}
+}

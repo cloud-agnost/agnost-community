@@ -5,15 +5,15 @@ import { Stepper } from '@/components/Stepper';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 
 import './onboarding.scss';
-import { data } from 'autoprefixer';
+import useAuthStore from '@/store/auth/authStore.ts';
 
 async function loader(params: LoaderFunctionArgs) {
 	const status = await useClusterStore.getState().checkClusterSetup();
 	const { currentStepIndex, steps } = useOnboardingStore.getState();
+	const isAuthenticated = useAuthStore.getState().isAuthenticated();
 
-	// TODO: check later
 	if (status) {
-		// return redirect('/organization');
+		return redirect(isAuthenticated ? '/organization' : '/login');
 	}
 
 	const url = new URL(params.request.url);
@@ -26,29 +26,12 @@ async function loader(params: LoaderFunctionArgs) {
 		return redirect(lastDoneStep.path);
 	}
 
-	return data;
+	return null;
 }
 
 export default function Onboarding() {
 	const { steps, getPrevPath, goToPrevStep } = useOnboardingStore();
-	// const location = useLocation();
 	const navigate = useNavigate();
-
-	/*
-	useEffect(() => {
-		useOnboardingStore.setState((prev) => {
-			const steps = prev.steps.map((step) => {
-				step.isActive = removeLastSlash(step.path) === removeLastSlash(location.pathname);
-				return step;
-			});
-
-			return {
-				steps,
-			};
-		});
-	}, [location]);
-
-	 */
 
 	function goBack() {
 		const prev = getPrevPath();

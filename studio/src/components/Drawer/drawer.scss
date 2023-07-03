@@ -1,0 +1,42 @@
+.drawer {
+	@apply fixed z-50 scale-100 gap-4 bg-wrapper-background-base opacity-100 shadow-lg border;
+	&-left {
+		@apply animate-in slide-in-from-left h-full duration-300;
+	}
+	&-right {
+		@apply animate-in slide-in-from-right h-full duration-300;
+	}
+
+	&-portal {
+		@apply fixed inset-0 z-50 flex;
+
+		&-left {
+			@apply justify-start;
+		}
+		&-right {
+			@apply justify-end;
+		}
+	}
+	&-overlay {
+		@apply fixed inset-0 z-50 bg-base/80 backdrop-blur-sm transition-all duration-100 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in;
+	}
+	&-md {
+		width: 600px;
+	}
+	&-lg {
+		width: 700px;
+	}
+	&-close {
+		@apply rounded-full w-8 h-8 flex justify-center items-center hover:bg-button-secondary-hover;
+		@apply text-icon-base hover:text-icon-secondary;
+	}
+	&-header {
+		@apply flex items-center justify-between text-center sm:text-left border-b border-border p-6;
+	}
+	&-title {
+		@apply text-xl font-semibold text-default;
+	}
+	&-footer {
+		@apply flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2;
+	}
+}

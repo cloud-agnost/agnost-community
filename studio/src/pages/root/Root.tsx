@@ -1,25 +1,42 @@
-import { LoaderFunctionArgs, Outlet, redirect } from 'react-router-dom';
-import useClusterStore from '@/store/cluster/clusterStore.ts';
+import { useUpdateEffect } from '@/hooks';
 import useAuthStore from '@/store/auth/authStore.ts';
-import { removeLastSlash } from 'utils/utils.ts';
+import useClusterStore from '@/store/cluster/clusterStore.ts';
+import useTypeStore from '@/store/types/typeStore';
+import { removeLastSlash } from '@/utils';
+import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
+const authPaths = [
+	'/login',
+	'/forgot-password',
+	'/confirm-change-email',
+	'/forgot-password',
+	'/verify-email',
+	'/complete-account-setup',
+	'/complete-account-setup/verify-email',
+];
 
-async function loader(params: LoaderFunctionArgs) {
-	const status = await useClusterStore.getState().checkClusterSetup();
-	await useClusterStore.getState().checkClusterSmtpStatus();
+async function loader({ request }: LoaderFunctionArgs) {
 	const isAuthenticated = useAuthStore.getState().isAuthenticated();
+	await useClusterStore.getState().checkClusterSmtpStatus();
+	await useClusterStore.getState().checkClusterSetup();
+	const currentPathname = removeLastSlash(new URL(request.url).pathname);
 
-	const requestURL = new URL(params.request.url);
+	const isAuthPath = authPaths.includes(currentPathname);
 
-	if (!status) {
-		return redirect('/onboarding');
-	} else if (status && !isAuthenticated && removeLastSlash(requestURL.pathname) !== '/login') {
-		return redirect('/login');
+	if (!isAuthPath && isAuthenticated) {
+		await useAuthStore.getState().getUser();
 	}
 
 	return null;
 }
 
 export default function Root() {
+	const accessToken = useAuthStore((s) => s.accessToken);
+	useUpdateEffect(() => {
+		const { isTypesOk, getAllTypes } = useTypeStore.getState();
+		if (!isTypesOk && accessToken) {
+			getAllTypes();
+		}
+	}, [accessToken]);
 	return <Outlet />;
 }
 

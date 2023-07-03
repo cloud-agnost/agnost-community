@@ -1,6 +1,7 @@
 import { fontFamily } from 'tailwindcss/defaultTheme';
 /** @type {import('tailwindcss').Config} */
-export default {
+// @filename tailwind.config.js
+module.exports = {
 	darkMode: ['class', '[data-mode="dark"]'],
 	content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
 	theme: {
@@ -58,10 +59,12 @@ export default {
 				border: 'rgba(var(--theme-border), <alpha-value>)',
 
 				icon: {
-					darker: 'rgba(var(--icon-darker), <alpha-value>)',
-					lighter: 'rgba(var(--icon-lighter), <alpha-value>)',
+					secondary: 'rgba(var(--icon-secondary), <alpha-value>)',
 					base: 'rgba(var(--icon-base), <alpha-value>)',
 					disabled: 'rgba(var(--icon-disabled), <alpha-value>)',
+					'secondary-reverse': 'rgba(var(--icon-secondary-reverse), <alpha-value>)',
+					'base-reverse': 'rgba(var(--icon-base-reverse), <alpha-value>)',
+					'disabled-reverse': 'rgba(var(--icon-disabled-reverse), <alpha-value>)',
 				},
 
 				input: {
@@ -99,6 +102,9 @@ export default {
 					default: 'rgba(var(--text-base), <alpha-value>)',
 					subtle: 'rgba(var(--text-subtle), <alpha-value>)',
 					disabled: 'rgba(var(--text-disabled), <alpha-value>)',
+					'default-reverse': 'rgba(var(--text-base-reverse), <alpha-value>)',
+					'subtle-reverse': 'rgba(var(--text-subtle-reverse), <alpha-value>)',
+					'disabled-reverse': 'rgba(var(--text-disabled-reverse), <alpha-value>)',
 					'background-base': 'rgba(var(--wrapper-background-base), <alpha-value>)',
 					'background-hover': 'rgba(var(--wrapper-background-hover), <alpha-value>)',
 					'background-base-light': 'rgba(var(--wrapper-background-base-light), <alpha-value>)',
@@ -188,11 +194,20 @@ export default {
 				base: 'rgba(var(--theme-base-background), <alpha-value>)',
 				subtle: 'rgba(var(--theme-subtle-background), <alpha-value>)',
 				lighter: 'rgba(var(--theme-lighter-background), <alpha-value>)',
+				'base-reverse': 'rgba(var(--theme-base-reverse-background), <alpha-value>)',
+				'subtle-reverse': 'rgba(var(--theme-subtle-reverse-background), <alpha-value>)',
+				'lighter-reverse': 'rgba(var(--theme-lighter-reverse-background), <alpha-value>)',
 			},
 			textColor: {
 				default: 'rgba(var(--text-base), <alpha-value>)',
 				subtle: 'rgba(var(--text-subtle), <alpha-value>)',
 				disabled: 'rgba(var(--text-disabled), <alpha-value>)',
+				'default-reverse': 'rgba(var(--text-base-reverse), <alpha-value>)',
+				'subtle-reverse': 'rgba(var(--text-subtle-reverse), <alpha-value>)',
+				'disabled-reverse': 'rgba(var(--text-disabled-reverse), <alpha-value>)',
+			},
+			borderWidth: {
+				3: '3px',
 			},
 			borderRadius: {
 				lg: `var(--radius)`,
@@ -203,6 +218,7 @@ export default {
 			fontFamily: {
 				sans: ['var(--font-sans)', ...fontFamily.sans],
 				albert: ['var(--font-albert)'],
+				sfCompact: ['SF Compact', ...fontFamily.sans],
 			},
 			fontSize: {
 				xs: ['var(--font-size-xs)', 'var(--font-size-xs-line-height)'],
@@ -224,5 +240,5 @@ export default {
 			},
 		},
 	},
-	plugins: [],
+	plugins: [require('tailwindcss-animate')],
 };

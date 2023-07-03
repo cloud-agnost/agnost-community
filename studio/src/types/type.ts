@@ -11,6 +11,7 @@ export const UserSchema = z.object({
 	color: z.string(),
 	contactEmail: z.string(),
 	'2fa': z.boolean(),
+	pictureUrl: z.string().nullish(),
 	canCreateOrg: z.boolean(),
 	isClusterOwner: z.boolean(),
 	loginProfiles: z.array(
@@ -75,4 +76,88 @@ export interface FinalizeAccountSetupRequest {
 	verificationCode: number;
 	password: string;
 	name: string;
+}
+export interface BaseRequest {
+	onSuccess?: () => void;
+	onError?: (err: APIError) => void;
+}
+
+export interface ToastType {
+	title: string;
+	description: string;
+	type: 'success' | 'error';
+}
+
+export interface UpdateNotificationsData {
+	notifications: string[];
+}
+
+export interface Types {
+	orgRoles: string[];
+	appRoles: string[];
+	bvlTypes: string[];
+	fieldTypes: {
+		name: string;
+		PostgreSQL: boolean;
+		MySQL: boolean;
+		'SQL Server': boolean;
+		MongoDB: boolean;
+		view: {
+			unique: boolean;
+			indexed: boolean;
+			immutable: boolean;
+		};
+	}[];
+	databaseTypes: string[];
+	instanceTypes: {
+		engine: string[];
+		database: string[];
+		cache: string[];
+		storage: string[];
+		queue: string[];
+		scheduler: string[];
+		realtime: string[];
+	};
+	phoneAuthSMSProviders: [
+		{
+			provider: string;
+			params: {
+				name: string;
+				title: string;
+				type: string;
+				description: string;
+				multiline: boolean;
+			}[];
+		}[],
+	];
+	oAuthProviderTypes: [
+		{
+			provider: string;
+			params: {
+				name: string;
+				title: string;
+				type: string;
+				multiline: boolean;
+			}[];
+		}[],
+	];
+	authUserDataModel: {
+		name: string;
+		type: string;
+	}[];
+}
+export interface BaseGetRequest extends BaseRequest {
+	page: number;
+	size: number;
+	sortBy?: string;
+	sortDir?: string;
+	start?: string;
+	end?: string;
+	search?: string;
+}
+
+export interface SortOption {
+	name: string;
+	value?: string;
+	sortDir?: 'asc' | 'desc';
 }

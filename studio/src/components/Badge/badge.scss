@@ -1,0 +1,58 @@
+.badge {
+	@apply py-1 px-1.5 bg-elements-strong-purple inline-flex justify-center items-center gap-2 rounded;
+	@apply bg-lighter;
+	&-text {
+		@apply text-xs text-default font-sfCompact;
+	}
+	&-green {
+		@apply bg-elements-subtle-green dark:bg-elements-strong-green;
+		.badge-dot {
+			@apply bg-elements-green;
+		}
+	}
+	&-blue {
+		@apply bg-elements-subtle-blue dark:bg-elements-strong-blue;
+		.badge-dot {
+			@apply bg-elements-blue;
+		}
+	}
+	&-yellow {
+		@apply bg-elements-subtle-yellow dark:bg-elements-strong-yellow;
+		.badge-dot {
+			@apply bg-elements-yellow;
+		}
+	}
+	&-purple {
+		@apply bg-elements-subtle-purple dark:bg-elements-strong-purple;
+		.badge-dot {
+			@apply bg-elements-purple;
+		}
+	}
+	&-red {
+		@apply bg-elements-subtle-red dark:bg-elements-strong-red;
+		.badge-dot {
+			@apply bg-elements-red;
+		}
+	}
+	&-orange {
+		@apply bg-elements-subtle-orange dark:bg-elements-strong-orange;
+		.badge-dot {
+			@apply bg-elements-orange;
+		}
+	}
+	// &-gray {
+	// 	@apply bg-elements-subtle-gray dark:bg-elements-strong-gray;
+	// 	.badge-dot {
+	// 		@apply bg-elements-gray;
+	// 	}
+	// }
+	&-rounded {
+		@apply rounded-full;
+	}
+	&-dot {
+		@apply w-2 h-2 rounded-full;
+	}
+	&-clear {
+		@apply text-icon-secondary;
+	}
+}

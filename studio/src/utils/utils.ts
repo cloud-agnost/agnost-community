@@ -1,7 +1,8 @@
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import i18next from 'i18next';
 import { socket } from '@/helpers';
+import { clsx, type ClassValue } from 'clsx';
+import i18next from 'i18next';
+import { DateTime } from 'luxon';
+import { twMerge } from 'tailwind-merge';
 
 type EmptyableArray = readonly [] | [];
 type EmptyableString = '' | string;
@@ -12,6 +13,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function removeLastSlash(str: string) {
+	if (str === '/') return str;
 	return str.replace(/\/$/, '');
 }
 export function translate(key: string, options?: any) {
@@ -34,6 +36,7 @@ export function onChannelMessage<T>(channel: string, callback: (data: T) => void
 		socket.off(channel);
 	};
 }
+
 export function uniq<T>(array: T[]): T[] {
 	return [...new Set(array)];
 }
@@ -58,4 +61,27 @@ export function isEmpty(value: unknown): boolean {
 }
 export function isArray(value: unknown): value is any[] {
 	return Array.isArray(value);
+
+export function getNameForAvatar(name: string) {
+	if (name?.length > 2) {
+		const names = name.split(' ');
+		return names[0].charAt(0).toUpperCase() + names[names.length - 1].charAt(0).toUpperCase();
+	} else {
+		return name;
+	}
+}
+export function getRelativeTime(date: string) {
+	return DateTime.fromISO(date).setLocale('en').toRelative();
+}
+export function getApplicationRoleVariant(role: string) {
+	switch (role) {
+		case 'Admin':
+			return 'orange';
+		case 'Developer':
+			return 'purple';
+		case 'Viewer':
+			return 'blue';
+		default:
+			return 'green';
+	}
 }

@@ -7,7 +7,7 @@
 	}
 
 	.switch-thumb {
-		@apply pointer-events-none dark:bg-icon-lighter block h-4 w-4 rounded-full shadow-lg transition-transform;
+		@apply pointer-events-none dark:bg-icon-secondary block h-4 w-4 rounded-full shadow-lg transition-transform;
 	}
 
 	&[data-state='checked'] {
