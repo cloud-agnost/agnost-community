@@ -8,9 +8,9 @@ import './scrollArea.scss';
 const ScrollArea = React.forwardRef<
 	React.ElementRef<typeof ScrollAreaPrimitive.Root>,
 	React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, id, ...props }, ref) => (
 	<ScrollAreaPrimitive.Root ref={ref} className={cn('scroll-area', className)} {...props}>
-		<ScrollAreaPrimitive.Viewport className='scroll-area-viewport'>
+		<ScrollAreaPrimitive.Viewport className='scroll-area-viewport' id={id}>
 			{children}
 		</ScrollAreaPrimitive.Viewport>
 		<ScrollBar />
