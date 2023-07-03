@@ -40,11 +40,11 @@ const FormSchema = z.object({
 	password: z
 		.string({
 			required_error: translate('forms.required', {
-				label: translate('logins.password'),
+				label: translate('login.password'),
 			}),
 		})
 		.min(8, {
-			message: translate('forms.min8.error', { label: translate('logins.password') }),
+			message: translate('forms.min8.error', { label: translate('login.password') }),
 		}),
 	name: z
 		.string({
