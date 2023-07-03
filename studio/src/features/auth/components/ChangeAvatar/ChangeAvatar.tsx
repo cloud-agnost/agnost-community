@@ -1,4 +1,4 @@
-import '˜/styles/changeAvatar.scss';
+import './changeAvatar.scss';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/Avatar';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { Button } from 'components/Button';
