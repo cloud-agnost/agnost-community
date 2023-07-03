@@ -49,7 +49,6 @@ export default class UserService {
 			await axios.put(`${this.url}/picture`, formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
-					selam: 's',
 				},
 			})
 		).data;

@@ -1,27 +1,25 @@
 .btn {
 	@apply inline-flex items-center justify-center h-9;
 	@apply rounded-md text-sm transition-colors font-semibold leading-[normal];
-	@apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary-hover focus-visible:ring-offset-2;
-	@apply disabled:opacity-50 disabled:pointer-events-none focus-visible:ring-button-primary-hover;
+	@apply disabled:opacity-50 disabled:pointer-events-none;
 
 	&-primary {
-		@apply hover:bg-button-primary-hover text-white focus-visible:ring-button-primary;
-		@apply bg-button-primary;
+		@apply hover:bg-button-primary-hover text-white bg-button-primary;
 	}
 	&-secondary {
-		@apply bg-button-secondary hover:bg-button-secondary-hover text-default focus-visible:ring-button-secondary;
+		@apply bg-button-secondary hover:bg-button-secondary-hover text-default;
 		@apply border border-button-border hover:border-button-border-hover;
 	}
 	&-text {
-		@apply text-default hover:bg-button-secondary-hover focus-visible:ring-button-secondary;
+		@apply text-default hover:bg-button-secondary-hover;
 	}
 	&-link {
-		@apply text-button-primary hover:underline hover:text-button-primary-hover focus-visible:ring-button-secondary;
+		@apply text-button-primary hover:underline hover:text-button-primary-hover;
 	}
 
 	&-outline {
 		@apply border border-button-border hover:border-button-border-hover;
-		@apply text-default focus-visible:ring-button-secondary;
+		@apply text-default;
 	}
 	&-md {
 		@apply py-2 px-4;
@@ -50,11 +48,11 @@
 			@apply border-none rounded-sm;
 		}
 	}
-	&-icon-only {
-		@apply p-2;
-	}
 	&-blank {
 		@apply text-default p-0;
+	}
+	&-icon-only {
+		@apply p-2;
 	}
 }
 

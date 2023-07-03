@@ -1,7 +1,7 @@
 .header-menu {
 	--height: 72px;
 	@apply bg-base flex justify-between items-center h-[var(--height)] py-3 px-6 border-b border-border;
-
+	@apply sticky top-0 z-50;
 	&-divider {
 		@apply w-[1px] h-[40px] bg-border;
 	}

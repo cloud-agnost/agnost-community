@@ -31,12 +31,12 @@ export default function OrganizationSelect() {
 
 	return (
 		<div>
-			{organizations.length > 0 && (
-				<>
-					<div className='select-organization-container'>
-						<h1 className='select-organization-title'>{t('organization.select')}</h1>
+			<>
+				<div className='select-organization-container'>
+					<h1 className='select-organization-title'>{t('organization.select')}</h1>
 
-						<div className='select-organization-slider'>
+					<div className='select-organization-slider'>
+						{organizations.length > 0 && (
 							<Slider
 								slidesPerView={4}
 								spaceBetween={32}
@@ -51,7 +51,7 @@ export default function OrganizationSelect() {
 												className='select-organization-button'
 											>
 												<div className='select-organization-item'>
-													<Avatar size='3xl'>
+													<Avatar size='4xl' square>
 														<AvatarImage src={organization.pictureUrl} alt={organization.name} />
 														<AvatarFallback name={organization?.name} color={organization?.color} />
 													</Avatar>
@@ -65,11 +65,11 @@ export default function OrganizationSelect() {
 									};
 								})}
 							/>
-							{user?.canCreateOrg && <OrganizationCreateButton onClick={openOrgCreateModal} />}
-						</div>
+						)}
+						{user?.canCreateOrg && <OrganizationCreateButton onClick={openOrgCreateModal} />}
 					</div>
-				</>
-			)}
+				</div>
+			</>
 		</div>
 	);
 }

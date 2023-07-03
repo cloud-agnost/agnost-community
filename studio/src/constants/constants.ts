@@ -1,11 +1,14 @@
 import Database from '@/assets/images/database.png';
 import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
-import { BellRing, ChangeLog, LightBulb, LineSegments } from '@/components/icons';
-import { FileText, GearSix, DeviceTablet, Database as DatabaseIcon } from '@phosphor-icons/react';
-import { translate } from '@/utils';
-import { ApplicationVersions } from '@/features/application';
+import { BellRing, ChangeLog, LightBulb, LineSegments, Team } from '@/components/icons';
 import useOrganizationStore from '@/store/organization/organizationStore';
+import { SortOption } from '@/types';
+import { translate } from '@/utils';
+import { Database as DatabaseIcon, DeviceTablet, FileText, GearSix } from '@phosphor-icons/react';
+
+export const ORGANIZATION_MEMBERS_PAGE_SIZE = 10;
+
 export const SLIDER_IMAGES = [
 	{
 		text: 'Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.',
@@ -88,6 +91,19 @@ export const APPLICATION_SETTINGS = [
 	},
 ];
 
+export const ORGANIZATION_SETTINGS = [
+	{
+		title: translate('organization.settings.general'),
+		href: '/organization/:id/settings',
+		icon: GearSix,
+	},
+	{
+		title: translate('organization.settings.members.title'),
+		href: '/organization/:id/settings/members',
+		icon: Team,
+	},
+];
+
 export const ALL_NOTIFICATIONS = [
 	'org',
 	'app',
@@ -110,4 +126,41 @@ export const ERROR_CODES_TO_REDIRECT_LOGIN_PAGE = [
 	'invalid_access_token',
 	'missing_refresh_token',
 	'invalid_refresh_token',
+];
+
+export const ORG_MEMBERS_SORT_OPTIONS: SortOption[] = [
+	{
+		name: translate('organization.settings.members.sortOptions.default'),
+		value: 'default',
+	},
+	{
+		name: translate('organization.settings.members.sortOptions.joinDate'),
+		value: 'joinDate',
+		sortDir: 'desc',
+	},
+	{
+		name: translate('organization.settings.members.sortOptions.nameAsc'),
+		value: 'name',
+		sortDir: 'asc',
+	},
+	{
+		name: translate('organization.settings.members.sortOptions.nameDesc'),
+		value: 'name',
+		sortDir: 'desc',
+	},
+];
+export const ORG_INVITATIONS_SORT_OPTIONS: SortOption[] = [
+	{
+		name: translate('organization.settings.members.sortOptions.default'),
+	},
+	{
+		name: translate('organization.settings.members.sortOptions.inviteDate'),
+		value: 'createdAt',
+		sortDir: 'desc',
+	},
+	{
+		name: translate('organization.settings.members.sortOptions.email'),
+		value: 'email',
+		sortDir: 'asc',
+	},
 ];

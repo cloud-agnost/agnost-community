@@ -1,6 +1,6 @@
-import { z } from 'zod';
-import { BaseRequest } from './type';
 import { translate } from '@/utils';
+import { z } from 'zod';
+import { BaseGetRequest, BaseRequest } from './type';
 export interface Organization {
 	_id: string;
 	ownerUserId: string;
@@ -37,3 +37,77 @@ export const CreateOrganizationSchema = z.object({
 			message: translate('forms.alphanumeric', { label: translate('organization.name') }),
 		}),
 });
+export interface ChangeOrganizationNameRequest extends BaseRequest {
+	name: string;
+	organizationId: string;
+}
+
+export interface ChangeOrganizationAvatarRequest extends BaseRequest {
+	organizationId: string;
+	picture: File;
+}
+
+export interface GetOrganizationMembersRequest extends BaseGetRequest {
+	role?: string;
+	organizationId: string;
+	excludeSelf?: boolean;
+}
+export interface GetOrganizationInvitationRequest extends BaseGetRequest {
+	organizationId: string;
+	email?: string;
+	role?: string;
+	status?: string;
+}
+export interface TransferOrganizationRequest extends BaseRequest {
+	organizationId: string;
+	userId: string;
+}
+export interface OrganizationMember {
+	_id: string;
+	orgId: string;
+	role: string;
+	joinDate: string;
+	member: {
+		_id: string;
+		iid: string;
+		color: string;
+		contactEmail: string;
+		name: string;
+		pictureUrl: string;
+		loginEmail: string;
+		isOrgOwner: boolean;
+	};
+}
+export interface OrgMemberRequest {
+	email: string;
+	role: 'Admin' | 'Member' | 'Resource Manager' | 'Viewer' | '';
+}
+export interface InviteOrgRequest extends BaseRequest {
+	members: OrgMemberRequest[];
+	organizationId: string;
+	uiBaseURL: string;
+}
+
+export interface OrganizationInvitations {
+	_id: string;
+	orgId: string;
+	email: string;
+	token: string;
+	role: 'Admin' | 'Member' | 'Resource Manager' | 'Viewer' | '';
+	status: 'Pending' | 'Active';
+	createdAt: string;
+}
+
+export interface OrgInvitationRequest extends BaseRequest {
+	token?: string;
+	tokens?: string[];
+}
+export interface RemoveMemberFromOrganizationRequest extends BaseRequest {
+	userId?: string;
+	userIds?: string[];
+}
+export interface UpdateRoleRequest extends BaseRequest {
+	token?: string;
+	userId?: string;
+	role: string;
+}

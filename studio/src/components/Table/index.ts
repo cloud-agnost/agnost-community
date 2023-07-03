@@ -8,3 +8,5 @@ export {
 	TableCell,
 	TableCaption,
 } from './Table';
+
+export { TableConfirmation } from './TableConfirmation';

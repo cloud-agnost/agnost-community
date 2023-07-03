@@ -91,3 +91,73 @@ export interface ToastType {
 export interface UpdateNotificationsData {
 	notifications: string[];
 }
+
+export interface Types {
+	orgRoles: string[];
+	appRoles: string[];
+	bvlTypes: string[];
+	fieldTypes: {
+		name: string;
+		PostgreSQL: boolean;
+		MySQL: boolean;
+		'SQL Server': boolean;
+		MongoDB: boolean;
+		view: {
+			unique: boolean;
+			indexed: boolean;
+			immutable: boolean;
+		};
+	}[];
+	databaseTypes: string[];
+	instanceTypes: {
+		engine: string[];
+		database: string[];
+		cache: string[];
+		storage: string[];
+		queue: string[];
+		scheduler: string[];
+		realtime: string[];
+	};
+	phoneAuthSMSProviders: [
+		{
+			provider: string;
+			params: {
+				name: string;
+				title: string;
+				type: string;
+				description: string;
+				multiline: boolean;
+			}[];
+		}[],
+	];
+	oAuthProviderTypes: [
+		{
+			provider: string;
+			params: {
+				name: string;
+				title: string;
+				type: string;
+				multiline: boolean;
+			}[];
+		}[],
+	];
+	authUserDataModel: {
+		name: string;
+		type: string;
+	}[];
+}
+export interface BaseGetRequest extends BaseRequest {
+	page: number;
+	size: number;
+	sortBy?: string;
+	sortDir?: string;
+	start?: string;
+	end?: string;
+	search?: string;
+}
+
+export interface SortOption {
+	name: string;
+	value?: string;
+	sortDir?: 'asc' | 'desc';
+}

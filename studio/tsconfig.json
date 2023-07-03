@@ -28,7 +28,8 @@
 			"services/*": ["./src/services/*"],
 			"utils/*": ["./src/utils/*"],
 			"components/*": ["./src/components/*"],
-			"constants/*": ["./src/constants/*"]
+			"constants/*": ["./src/constants/*"],
+			"˜/*": ["./src/assets/*"]
 		}
 	},
 	"include": ["src"],

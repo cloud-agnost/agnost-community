@@ -9,5 +9,7 @@
 	"error": "Error",
 	"addMembers": "Add Members",
 	"created": "Created",
-	"open": "Open"
+	"open": "Open",
+	"name": "Name",
+	"save": "Save"
 }

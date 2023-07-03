@@ -9,15 +9,15 @@ export interface Item {
 }
 
 interface Props {
-	classname?: string;
+	className?: string;
 	items: Item[];
 }
 
-export function Navbar({ items, classname }: Props): JSX.Element {
+export function Navbar({ items, className }: Props): JSX.Element {
 	return (
-		<nav className={cn('navbar', classname)}>
-			{items.map((item, index) => (
-				<NavLink className='navbar-item' to={item.href} key={index} end>
+		<nav className={cn('navbar', className)}>
+			{items.map((item) => (
+				<NavLink className='navbar-item' to={item.href} key={item.title} end>
 					<span className='navbar-item-icon'>
 						<item.icon />
 					</span>

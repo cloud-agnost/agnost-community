@@ -66,7 +66,9 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 						<CommandSeparator />
 						<CommandGroup>
 							<CommandItem
-								onSelect={() => {
+								id='delete-app'
+								onSelect={(e) => {
+									console.log(e);
 									setOpen(false);
 									setOpenInfoModal(true);
 									setModalInfo({
@@ -98,6 +100,7 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 						<CommandSeparator />
 						<CommandGroup>
 							<CommandItem
+								id='leave-app'
 								onSelect={() => {
 									setOpen(false);
 									setOpenInfoModal(true);
@@ -142,10 +145,24 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 				}
 				action={
 					<div className='flex  items-center justify-center gap-4'>
-						<Button variant='text' size='lg' onClick={() => setOpenInfoModal(false)}>
+						<Button
+							variant='text'
+							size='lg'
+							onClick={(e) => {
+								e.stopPropagation();
+								setOpenInfoModal(false);
+							}}
+						>
 							{t('general.cancel')}
 						</Button>
-						<Button size='lg' variant='primary' onClick={modalInfo.onConfirm}>
+						<Button
+							size='lg'
+							variant='primary'
+							onClick={(e) => {
+								e.stopPropagation();
+								modalInfo.onConfirm?.();
+							}}
+						>
 							{t('general.ok')}
 						</Button>
 					</div>

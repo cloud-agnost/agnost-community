@@ -20,7 +20,7 @@ function loader() {
 export default function OrganizationApps() {
 	const [isCard, setIsCard] = useState(true);
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { applications, searchApplications, organization, getOrganizationApps, loading } =
+	const { applications, searchApplications, organization, getOrganizationApps, loading, temp } =
 		useOrganizationStore();
 	const { t } = useTranslation();
 
@@ -37,42 +37,47 @@ export default function OrganizationApps() {
 	}, [organization]);
 
 	return (
-		<div className='h-[calc(100%-72px)] p-8'>
-			<div className='flex  items-center justify-between'>
-				<h1 className='text-default text-2xl font-semibold text-center'>
-					{applications.length} {t('application.apps')}
-				</h1>
-				<div className='flex items-center justify-center gap-6'>
-					<SearchInput
-						placeholder='Search apps'
-						onSearch={(searchTerm) => {
-							if (searchTerm) setSearchParams({ q: searchTerm });
-							else setSearchParams({});
-						}}
-					/>
-					<ButtonGroup>
-						<Button
-							variant='outline'
-							iconOnly
-							className={cn(isCard && 'bg-lighter transition-all', 'hover:bg-base')}
-							onClick={() => setIsCard(false)}
-						>
-							<List className='w-5 h-5 text-icon-secondary ' />
-						</Button>
-						<Button
-							variant='outline'
-							iconOnly
-							className={cn(!isCard && 'bg-lighter transition-all', 'hover:bg-base')}
-							onClick={() => setIsCard(true)}
-						>
-							<SquaresFour className='w-5 h-5 text-icon-secondary' />
-						</Button>
-					</ButtonGroup>
-					<CreateApplicationButton />
-				</div>
-			</div>
-			{applications.length > 0 ? (
+		<div
+			className={cn(
+				'h-[calc(100%-72px)] p-8',
+				temp.length === 0 && 'flex items-center justify-center',
+			)}
+		>
+			{temp.length > 0 ? (
 				<div className=''>
+					<div className='flex  items-center justify-between'>
+						<h1 className='text-default text-2xl font-semibold text-center'>
+							{applications.length} {t('application.apps')}
+						</h1>
+						<div className='flex items-center justify-center gap-6'>
+							<SearchInput
+								placeholder='Search apps'
+								onSearch={(searchTerm) => {
+									if (searchTerm) setSearchParams({ q: searchTerm });
+									else setSearchParams({});
+								}}
+							/>
+							<ButtonGroup>
+								<Button
+									variant='outline'
+									iconOnly
+									className={cn(isCard && 'bg-lighter transition-all', 'hover:bg-base')}
+									onClick={() => setIsCard(false)}
+								>
+									<List className='w-5 h-5 text-icon-secondary ' />
+								</Button>
+								<Button
+									variant='outline'
+									iconOnly
+									className={cn(!isCard && 'bg-lighter transition-all', 'hover:bg-base')}
+									onClick={() => setIsCard(true)}
+								>
+									<SquaresFour className='w-5 h-5 text-icon-secondary' />
+								</Button>
+							</ButtonGroup>
+							<CreateApplicationButton />
+						</div>
+					</div>
 					{isCard ? (
 						<div className='mt-8 flex flex-wrap gap-6 items-center'>
 							{loading ? (

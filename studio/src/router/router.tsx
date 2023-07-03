@@ -45,7 +45,11 @@ import {
 	VersionMessageQueue,
 	VersionStorage,
 } from '@/pages/version';
-
+import {
+	OrganizationSettings,
+	OrganizationSettingsGeneral,
+	OrganizationSettingsMembers,
+} from '@/pages/organization/';
 const router = createBrowserRouter([
 	{
 		path: '/',
@@ -156,9 +160,28 @@ const router = createBrowserRouter([
 								path: 'settings',
 								element: (
 									<RequireAuth>
-										<p>Settings</p>
+										<OrganizationSettings />
 									</RequireAuth>
 								),
+								children: [
+									{
+										index: true,
+										path: '',
+										element: (
+											<RequireAuth>
+												<OrganizationSettingsGeneral />
+											</RequireAuth>
+										),
+									},
+									{
+										path: 'members',
+										element: (
+											<RequireAuth>
+												<OrganizationSettingsMembers />
+											</RequireAuth>
+										),
+									},
+								],
 							},
 						],
 					},

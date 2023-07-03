@@ -1,8 +1,9 @@
-import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
-import useClusterStore from '@/store/cluster/clusterStore.ts';
+import { useUpdateEffect } from '@/hooks';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useClusterStore from '@/store/cluster/clusterStore.ts';
+import useTypeStore from '@/store/types/typeStore';
 import { removeLastSlash } from '@/utils';
-
+import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
 const authPaths = [
 	'/login',
 	'/forgot-password',
@@ -18,6 +19,7 @@ async function loader({ request }: LoaderFunctionArgs) {
 	await useClusterStore.getState().checkClusterSmtpStatus();
 	await useClusterStore.getState().checkClusterSetup();
 	const currentPathname = removeLastSlash(new URL(request.url).pathname);
+
 	const isAuthPath = authPaths.includes(currentPathname);
 
 	if (!isAuthPath && isAuthenticated) {
@@ -28,6 +30,13 @@ async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Root() {
+	const accessToken = useAuthStore((s) => s.accessToken);
+	useUpdateEffect(() => {
+		const { isTypesOk, getAllTypes } = useTypeStore.getState();
+		if (!isTypesOk && accessToken) {
+			getAllTypes();
+		}
+	}, [accessToken]);
 	return <Outlet />;
 }
 

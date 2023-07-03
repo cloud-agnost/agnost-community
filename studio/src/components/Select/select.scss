@@ -1,11 +1,12 @@
 .select {
-	@apply flex h-9 w-full items-center justify-between text-default;
+	@apply flex h-9 items-center justify-between text-default;
 	@apply rounded-md border border-border bg-transparent;
 	@apply px-3 py-2 text-sm ring-offset-button-primary;
 	@apply placeholder:text-subtle focus:outline-none;
 	@apply focus:border-button-primary;
-	@apply disabled:cursor-not-allowed disabled:bg-input-disabled-background;
 	@apply truncate max-w-[calc(100%)];
+	@apply disabled:cursor-not-allowed disabled:bg-input-disabled-background;
+	@apply space-x-4;
 	&-content {
 		@apply relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-wrapper-background-light;
 		@apply text-subtle shadow-md;
