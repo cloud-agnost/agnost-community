@@ -6,6 +6,10 @@ import useTypeStore from '@/store/types/typeStore';
 import { APIError, AppMembers } from '@/types/type';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 async function loader() {
+	const { isTypesOk, getAllTypes } = useTypeStore.getState();
+	if (!isTypesOk) {
+		getAllTypes();
+	}
 	return null;
 }
 

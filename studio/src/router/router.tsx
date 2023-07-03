@@ -287,6 +287,7 @@ const router = createBrowserRouter([
 			},
 			{
 				path: 'invite-team-members',
+				loader: InviteTeamMembers.loader,
 				element: (
 					<RequireAuth>
 						<InviteTeamMembers />
