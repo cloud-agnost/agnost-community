@@ -6,4 +6,7 @@ export {
 	leaveChannel,
 	sendMessageToChannel,
 	onChannelMessage,
+	uniq,
+	isEmpty,
+	isArray,
 } from './utils';
