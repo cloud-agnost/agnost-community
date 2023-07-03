@@ -5,10 +5,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/Input';
 import { Label } from '@/components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
-import { cn } from '@/utils';
+import { cn, isArray, isEmpty, uniq } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash } from '@phosphor-icons/react';
-import _ from 'lodash';
+
 import React, { useEffect } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -56,7 +56,7 @@ export default function InviteMemberForm({
 			)
 			.superRefine((val, ctx) => {
 				const emails = val.map((v) => v.email).filter(Boolean);
-				if (_.uniq(emails).length !== emails.length) {
+				if (uniq(emails).length !== emails.length) {
 					return ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: 'Emails must be unique',
@@ -81,12 +81,12 @@ export default function InviteMemberForm({
 	}, []);
 
 	useEffect(() => {
-		if (_.isEmpty(form.formState.errors)) {
+		if (isEmpty(form.formState.errors)) {
 			return;
 		}
 		const { member } = form.formState.errors;
 
-		if (!_.isEmpty(member) && _.isArray(member)) {
+		if (!isEmpty(member) && isArray(member)) {
 			member.forEach((e, index) => {
 				if (e?.type === 'custom') {
 					if (e?.message === 'Role is required') {
@@ -164,9 +164,9 @@ export default function InviteMemberForm({
 								variant='secondary'
 								className={cn(
 									!index && 'self-end',
-									!_.isEmpty(form.formState.errors) && !index && 'self-center mt-2',
-									!_.isEmpty(form.formState.errors) &&
-										_.isEmpty(form.formState.errors.member?.[0]) &&
+									!isEmpty(form.formState.errors) && !index && 'self-center mt-2',
+									!isEmpty(form.formState.errors) &&
+										isEmpty(form.formState.errors.member?.[0]) &&
 										!index &&
 										'self-end',
 								)}
