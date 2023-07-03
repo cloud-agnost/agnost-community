@@ -83,7 +83,7 @@ const DrawerContent = React.forwardRef<
 		<DrawerOverlay />
 		<SheetPrimitive.Content
 			ref={ref}
-			className={cn(drawerVariants({ position, size }), className)}
+			className={cn(drawerVariants({ position, size }), className, 'drawer-content')}
 			{...props}
 		>
 			{children}
