@@ -23,8 +23,10 @@ const badgeVariants = cva('badge', {
 	},
 });
 
+export type BadgeColors = 'green' | 'blue' | 'yellow' | 'purple' | 'red' | 'orange';
+
 interface BadgeProps {
-	variant?: 'green' | 'blue' | 'yellow' | 'purple' | 'red' | 'orange';
+	variant?: BadgeColors;
 	rounded?: boolean;
 	clearable?: boolean;
 	text: string;

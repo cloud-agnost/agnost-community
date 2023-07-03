@@ -200,7 +200,7 @@ const useAuthStore = create<AuthStore>()(
 					return user;
 				},
 				getUserPicture() {
-					return location.origin + '/api' + get().user?.pictureUrl;
+					return location.origin.replace(':4000', '') + '/api' + get().user?.pictureUrl;
 				},
 			}),
 			{

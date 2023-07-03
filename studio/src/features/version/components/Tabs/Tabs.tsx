@@ -9,6 +9,7 @@ import { Button } from 'components/Button';
 import { Dashboard } from 'components/icons';
 import { NEW_TAB_ITEMS } from 'constants/constants.ts';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useMatches, useNavigate } from 'react-router-dom';
 import './tabs.scss';
 
@@ -20,6 +21,7 @@ export default function Tabs() {
 	const [startOfScroll, setStartOfScroll] = useState(false);
 	const [isScrollable, setIsScrollable] = useState(false);
 	const { tabs, removeTab, currentTab, setCurrentTab, addTab } = useVersionStore();
+	const { t } = useTranslation();
 	const matches = useMatches();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
@@ -98,10 +100,10 @@ export default function Tabs() {
 	}
 
 	return (
-		<div className='tab-container'>
+		<div className='navigation-tab-container'>
 			<div ref={scrollContainer} className='tab'>
 				<TabItem onClick={() => setCurrentTab(null)} icon={<Dashboard />} to={getDashboardPath()}>
-					Dashboard
+					{t('version.dashboard')}
 				</TabItem>
 				{tabs.map((tab) => (
 					<TabItem
