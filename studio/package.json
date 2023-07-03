@@ -10,7 +10,7 @@
 		"preview": "vite preview",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
-		"icon": "svgr src/assets/icons -d src/components/icons --ext tsx --typescript --icon --ignore-existing --replace-attr-values \"#fff=currentColor\""
+		"icon": "svgr src/assets/icons -d src/components/icons --ext tsx --typescript --icon --ignore-existing --replace-attr-values \"#929AB5=currentColor\" "
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^3.1.0",
@@ -44,6 +44,7 @@
 		"react-dom": "^18.2.0",
 		"react-hook-form": "^7.44.3",
 		"react-i18next": "^12.3.1",
+		"react-infinite-scroll-component": "^6.1.0",
 		"react-intersection-observer": "^9.5.1",
 		"react-router-dom": "^6.11.2",
 		"react-select": "^5.7.3",
