@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import './header.scss';
 import { MENU_ITEMS } from '@/constants';
 import { OrganizationDropdown } from '@/features/Organization/OrganizationDropdown';
-import { DeploymentStatusCard } from '@/features/version/components/DeploymentStatusCard';
+import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 
 export function Header() {

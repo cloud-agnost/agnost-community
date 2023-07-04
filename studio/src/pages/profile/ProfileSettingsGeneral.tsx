@@ -1,4 +1,4 @@
-import { ProfileSettingsForm } from '@/features/auth/components/ProfileSettingsForm';
+import { ProfileSettingsForm } from '@/features/auth/ProfileSettingsForm';
 import { UserSettingsLayout } from '@/layouts/UserSettingsLayout';
 import { useTranslation } from 'react-i18next';
 

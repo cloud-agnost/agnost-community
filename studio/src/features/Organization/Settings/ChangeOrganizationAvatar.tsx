@@ -1,6 +1,5 @@
-import '@/features/auth/components/ChangeAvatar/changeAvatar.scss';
+import '@/features/auth/ChangeAvatar/changeAvatar.scss';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/Avatar';
-import useAuthStore from '@/store/auth/authStore.ts';
 import { Button } from 'components/Button';
 import { Pencil } from 'components/icons';
 import { CircleNotch, Trash } from '@phosphor-icons/react';

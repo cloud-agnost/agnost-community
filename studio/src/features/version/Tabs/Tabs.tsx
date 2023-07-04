@@ -1,9 +1,4 @@
-import {
-	NewTabDropdown,
-	TabItem,
-	TabOptionsDropdown,
-} from '@/features/version/components/Tabs/index.ts';
-import useVersionStore from '@/store/version/versionStore.ts';
+import { NewTabDropdown, TabItem, TabOptionsDropdown } from '@/features/version/Tabs/index.ts';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 import { Dashboard } from 'components/icons';
@@ -12,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useMatches, useNavigate } from 'react-router-dom';
 import './tabs.scss';
+import useTabStore from '@/store/version/tabStore.ts';
 
 const SCROLL_AMOUNT = 200;
 
@@ -20,7 +16,7 @@ export default function Tabs() {
 	const [endOfScroll, setEndOfScroll] = useState(false);
 	const [startOfScroll, setStartOfScroll] = useState(false);
 	const [isScrollable, setIsScrollable] = useState(false);
-	const { tabs, removeTab, currentTab, setCurrentTab, addTab } = useVersionStore();
+	const { tabs, removeTab, currentTab, setCurrentTab, addTab } = useTabStore();
 	const { t } = useTranslation();
 	const matches = useMatches();
 	const navigate = useNavigate();
