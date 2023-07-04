@@ -36,9 +36,9 @@ function randomInt(min, max) {
  * @param  {string} id The string representation of a MongoDB id
  */
 const generateId = (id = null) => {
-	if (id && typeof id === "string") return new mongo.ObjectID(id);
-	else if (id instanceof mongo.ObjectID) return id;
-	else return new mongo.ObjectID();
+	if (id && typeof id === "string") return new mongo.ObjectId(id);
+	else if (id instanceof mongo.ObjectId) return id;
+	else return new mongo.ObjectId();
 };
 
 export default { randomInt, generateId, getIP };

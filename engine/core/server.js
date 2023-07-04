@@ -29,7 +29,7 @@ if (cluster.isPrimary) {
 	logger.info(`Primary process ${process.pid} is running`);
 
 	// Init globally accessible variables
-	initGlobalsForPrimaryProcess();
+	initGlobals();
 	// Set up locatlization
 	initLocalization();
 	// Connect to the database
@@ -54,11 +54,13 @@ if (cluster.isPrimary) {
 	});
 
 	// Init globally accessible variables
-	initGlobalsForChildProcess();
+	initGlobals();
 	// Set up locatlization
 	const i18n = initLocalization();
 	// Connect to the database
 	connectToDatabase();
+	// Connect to message queue
+	connectToQueue();
 	// Connect to cache server(s)
 	connectToRedisCache();
 	getRedisClient().on("connect", async function () {
@@ -82,6 +84,8 @@ if (cluster.isPrimary) {
 		await disconnectFromDatabase();
 		// Close synchronization server connection
 		disconnectSyncClient();
+		// Close connection to message queue
+		disconnectFromQueue();
 		// Close the http server
 		if (childManager) await childManager.closeHttpServer();
 		// We call process exit so that primary process can fork a new child process
@@ -132,24 +136,7 @@ async function finalizePrimaryProcessStartup() {
 	}, config.get("general.heartbeatIntervalSeconds") * 1000); // Heartbeat interval duration in milliseconds
 }
 
-function initGlobalsForPrimaryProcess() {
-	// Add logger to the global object
-	global.logger = logger;
-	global.__dirname = dirname;
-
-	// To correctly identify errors thrown by the engine vs. system thrown errors
-	global.AgnostError = class extends Error {
-		constructor(message) {
-			super(message);
-		}
-	};
-	// Add config to the global object
-	global.config = config;
-	// Add utility methods to the global object
-	global.helper = helper;
-}
-
-function initGlobalsForChildProcess() {
+function initGlobals() {
 	// Add logger to the global object
 	global.logger = logger;
 	global.__dirname = dirname;

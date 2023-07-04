@@ -41,6 +41,10 @@ export const QueueModel = mongoose.model(
 				type: Boolean,
 				default: true,
 			},
+			// The delay duration of the queue, in milliseconds
+			delay: {
+				type: Number,
+			},
 			type: {
 				type: String,
 				required: true,
@@ -173,7 +177,7 @@ export const applyRules = (type) => {
 						if (value.toLowerCase() === "this") {
 							throw new AgnostError(
 								t(
-									"'%s' is a reserved keyword and cannot be used as Queue name",
+									"'%s' is a reserved keyword and cannot be used as queue name",
 									value
 								)
 							);
@@ -190,6 +194,14 @@ export const applyRules = (type) => {
 					.isBoolean()
 					.withMessage(t("Not a valid boolean value"))
 					.toBoolean(),
+				body("delay")
+					.trim()
+					.optional()
+					.isInt({
+						min: 0,
+					})
+					.withMessage(t("Delay duration can be zero or a positive integer"))
+					.toInt(),
 				body("resourceId")
 					.if(() => type === "create")
 					.trim()

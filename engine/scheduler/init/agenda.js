@@ -1,4 +1,4 @@
-import agenda from "agenda";
+import { Agenda } from "agenda";
 import { getDBClient } from "./db.js";
 import { getKey } from "./cache.js";
 import { submitTask } from "./queue.js";
@@ -7,12 +7,19 @@ import { submitTask } from "./queue.js";
 var agendaInstance = null;
 
 export const startAgenda = async () => {
+	// Please note we are using mongodb version 4.16.0 since the version of Agenda does not support mongodb driver 5.1.0
 	const dbClient = getDBClient();
 	const agendaConfig = config.get("agenda");
 
-	agendaInstance = new agenda.Agenda({
+	agendaInstance = new Agenda({
 		mongo: dbClient.db(agendaConfig.DBName),
 	});
+
+	// Clear the lockedAt and lastFinishedAt fields since if they are present sometimes Agenda doest no start the cron scheduler
+	await dbClient
+		.db(agendaConfig.DBName)
+		.collection("agendaJobs")
+		.updateMany({}, { $unset: { lockedAt: "", lastFinishedAt: "" } });
 
 	// Set agenda instance properties
 	agendaInstance
@@ -23,8 +30,7 @@ export const startAgenda = async () => {
 		.defaultLockLimit(agendaConfig.defaultLockLimit)
 		.defaultLockLifetime(agendaConfig.defaultLockLifetime);
 
-	// Start agenda instance
-	agendaInstance.start();
+	await agendaInstance.start();
 
 	// Load all agenda jobs and restart them
 	let skipCount = 0;
@@ -42,16 +48,15 @@ export const startAgenda = async () => {
 		for (let i = 0; i < jobs.length; i++) {
 			const job = jobs[i];
 			// Define the task and its handler function
-			agendaInstance.define(job.attrs.name, taskProcessor);
+			await agendaInstance.define(job.attrs.name, taskProcessor);
 			// Schedule the task
-			agendaInstance.every(
+			await agendaInstance.every(
 				job.attrs.repeatInterval,
 				job.attrs.name,
 				job.attrs.data,
 				{
 					// Setting this true will skip the immediate run. The first run will occur only in configured interval.
 					skipImmediate: true,
-					timezone: job.attrs.repeatTimezone,
 				}
 			);
 		}
@@ -77,40 +82,31 @@ export const stopAgenda = async () => {
 const taskProcessor = async (job) => {
 	const dbClient = getDBClient();
 	// Data holds information about the
-	const { envId, taskId } = job.attrs.data;
-	// Get the environment object
-	const env = await getKey(`${envId}.object`);
-	// Get the task object
-	const task = await getKey(`${envId}.tasks.${taskId}`);
+	const { envId, taskId, taskName } = job.attrs.data;
 
 	try {
 		let trackingId = helper.generateId();
 		let message = {
 			taskId,
 			envId,
+			taskName,
 			trackingId,
 		};
 
-		if (env && task) {
-			// Use the environment database
-			let db = dbClient.db(envId);
-			let taskInfo = {
-				trackingId: trackingId,
-				taskId: taskId,
-				taskName: task.name,
-				triggeredAt: new Date(),
-				status: "pending",
-			};
+		// Use the environment database
+		let db = dbClient.db(envId);
+		let taskInfo = {
+			trackingId: trackingId,
+			taskId: taskId,
+			taskName: taskName,
+			triggeredAt: new Date(),
+			status: "pending",
+		};
 
-			// Create tracking entry in cluster environment database
-			await db
-				.collection(config.get("agenda.collectionName"))
-				.insertOne(taskInfo);
-
-			// Submit task to the message queue
-			submitTask(message);
-		}
-		x;
+		// Create tracking entry in cluster environment database
+		await db.collection("cronjobs").insertOne(taskInfo);
+		// Submit task to the message queue
+		submitTask(message);
 	} catch (error) {
 		logger.error(
 			t(
@@ -144,16 +140,16 @@ export async function deployTask(env, task) {
 	agendaInstance.define(`${env.iid}.${task.iid}`, taskProcessor);
 	// Schedule the task
 	agendaInstance.every(
-		task.schedule.cronExpression,
+		task.cronExpression,
 		`${env.iid}.${task.iid}`,
 		{
 			envId: env.iid,
 			taskId: task.iid,
+			taskName: task.name,
 		},
 		{
 			// Setting this true will skip the immediate run. The first run will occur only in configured interval.
 			skipImmediate: true,
-			timezone: task.schedule.timezone,
 		}
 	);
 }

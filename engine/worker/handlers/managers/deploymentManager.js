@@ -1877,7 +1877,7 @@ export class DeploymentManager {
 			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
 			// Cache updated database configurations (subaction can be add, delete or update)
-			const queues = await this.cacheTasks(this.getQueues(), subAction);
+			const tasks = await this.cacheTasks(this.getTasks(), subAction);
 
 			// Execute all redis commands altogether
 			await this.commitPipeline();
@@ -1886,7 +1886,7 @@ export class DeploymentManager {
 			this.notifyAPIServers();
 
 			// Save updated deployment to database
-			await this.saveTaskDeploymentConfigs(queues);
+			await this.saveTaskDeploymentConfigs(tasks);
 			// Save updated deployment to database
 			await this.saveEnvironmentDeploymentConfig();
 

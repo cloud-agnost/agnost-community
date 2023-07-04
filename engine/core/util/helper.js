@@ -134,9 +134,9 @@ const getJSONErrorMessage = (error) => {
  * @param  {string} id The string representation of a MongoDB id
  */
 const generateId = (id = null) => {
-	if (id && typeof id === "string") return new mongo.ObjectID(id);
-	else if (id instanceof mongo.ObjectID) return id;
-	else return new mongo.ObjectID();
+	if (id && typeof id === "string") return new mongo.ObjectId(id);
+	else if (id instanceof mongo.ObjectId) return id;
+	else return new mongo.ObjectId();
 };
 
 /**
@@ -144,7 +144,7 @@ const generateId = (id = null) => {
  * @param  {string} idString The string representation of the id
  */
 function objectId(idString) {
-	return new mongo.ObjectID(idString);
+	return new mongo.ObjectId(idString);
 }
 
 /**

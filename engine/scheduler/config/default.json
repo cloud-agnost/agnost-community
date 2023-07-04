@@ -11,7 +11,7 @@
         "loadBatchSize": 100,
         "DBName": "scheduler",
         "collectionName": "cronjobs",
-        "processEvery": "one minute",
+        "processEvery": "30 seconds",
         "maxConcurrency": 20,
         "defaultConcurrency": 5,
         "lockLimit": 0,

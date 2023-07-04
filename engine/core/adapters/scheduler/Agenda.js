@@ -1,4 +1,5 @@
 import { SchedulerBase } from "./SchedulerBase.js";
+import ERROR_CODES from "../../config/errorCodes.js";
 
 /**
  * Manages listening and processing the cron job triggered tasks
@@ -14,33 +15,27 @@ export class Agenda extends SchedulerBase {
 	}
 
 	/**
-	 * Adds the listerer to listen messages for the provided taskId
-	 * @param  {string} taskId The iid of the task
+	 * Adds the listerer to listen messages for the provided task
+	 * @param  {string} task The task object
 	 */
-	async listenMessages(taskId) {
+	async listenMessages(task) {
 		const envId = META.getEnvId();
 		const queueCount = config.get("general.taskProcessQueueCount");
 
 		// Listen for messages
 		for (let i = 1; i <= queueCount; i++) {
-			this.processTask(taskId, `process-task-${envId}-${taskId}-${i}`);
+			this.processTask(task, `process-task-${envId}-${task.name}-${i}`);
 		}
 	}
 
 	/**
 	 * Listens and processes tasks from the provided queue
-	 * @param  {string} taskId The unique task iid
+	 * @param  {string} taskObj The task object
 	 * @param  {string} queue The unique queue name
 	 */
-	processTask(taskId, queue) {
-		this.driver.createChannel(function (error, channel) {
-			if (error) {
-				logger.error("Cannot create channel to message queue", {
-					details: error,
-				});
-
-				return;
-			}
+	async processTask(taskObj, queue) {
+		try {
+			const channel = await this.driver.createChannel();
 
 			channel.assertQueue(queue, {
 				durable: true,
@@ -56,8 +51,7 @@ export class Agenda extends SchedulerBase {
 
 			channel.consume(
 				queue,
-				async function (messsage) {
-					const taskObj = await META.getTask(taskId);
+				async (messsage) => {
 					//Start timer
 					const start = Date.now();
 					const messageObj = JSON.parse(messsage.content.toString());
@@ -72,7 +66,7 @@ export class Agenda extends SchedulerBase {
 					// Check whether the environment is suspended or not
 					if (META.isSuspended()) {
 						// Log processing of the message
-						await this.logTaskProcessing(
+						this.logTaskProcessing(
 							debugChannel,
 							trackingId,
 							taskObj,
@@ -89,17 +83,18 @@ export class Agenda extends SchedulerBase {
 						return;
 					}
 
-					// We can run the queue code
-					const handlerModule = null;
+					// We can run the task cron job handler code
 					try {
 						// Dynamicly import the
-						handlerModule = await import(`../../meta/queues/${taskId}.js`);
+						const handlerModule = await import(
+							`../../meta/tasks/${taskObj.name}.js`
+						);
 
 						const handlerFunction = handlerModule.default;
 						// Check the endpoint module has a default exprot or not
 						if (!handlerFunction) {
 							// Log processing of the message
-							await this.logTaskProcessing(
+							this.logTaskProcessing(
 								debugChannel,
 								trackingId,
 								taskObj,
@@ -109,7 +104,7 @@ export class Agenda extends SchedulerBase {
 									ERROR_CODES.clientError,
 									ERROR_CODES.missingDefaultExport,
 									t(
-										"The taskk '%s' code does not have a default exported function.",
+										"The cron job '%s' code does not have a default exported function.",
 										taskObj.name
 									)
 								)
@@ -128,7 +123,7 @@ export class Agenda extends SchedulerBase {
 							)
 						) {
 							// Log processing of the message
-							await this.logTaskProcessing(
+							this.logTaskProcessing(
 								debugChannel,
 								trackingId,
 								taskObj,
@@ -138,7 +133,7 @@ export class Agenda extends SchedulerBase {
 									ERROR_CODES.clientError,
 									ERROR_CODES.invalidFunction,
 									t(
-										"Function specified in task '%s' is not valid. A callable function is required.",
+										"Function specified in cron job '%s' is not valid. A callable function is required.",
 										endpoint.name
 									)
 								)
@@ -150,7 +145,7 @@ export class Agenda extends SchedulerBase {
 							// Run the function
 							await handlerFunction();
 							// Log processing of the message
-							await this.logTaskProcessing(
+							this.logTaskProcessing(
 								debugChannel,
 								trackingId,
 								taskObj,
@@ -159,7 +154,7 @@ export class Agenda extends SchedulerBase {
 							);
 						} catch (error) {
 							// Log processing of the message
-							await this.logTaskProcessing(
+							this.logTaskProcessing(
 								debugChannel,
 								trackingId,
 								taskObj,
@@ -167,9 +162,9 @@ export class Agenda extends SchedulerBase {
 								Date.now() - start,
 								helper.createErrorMessage(
 									ERROR_CODES.clientError,
-									ERROR_CODES.queueExecutionError,
+									ERROR_CODES.taskExecutionError,
 									t(
-										"An error occurred while executing the '%s' task handler function. %s",
+										"An error occurred while executing the '%s' cron job handler function. %s",
 										taskObj.name,
 										error.message
 									),
@@ -184,7 +179,7 @@ export class Agenda extends SchedulerBase {
 						}
 					} catch (error) {
 						// Log processing of the message
-						await this.logTaskProcessing(
+						this.logTaskProcessing(
 							debugChannel,
 							trackingId,
 							taskObj,
@@ -192,9 +187,9 @@ export class Agenda extends SchedulerBase {
 							Date.now() - start,
 							helper.createErrorMessage(
 								ERROR_CODES.clientError,
-								ERROR_CODES.queueImportError,
+								ERROR_CODES.taskImportError,
 								t(
-									"An error occurred while importing the '%s' task module. %s",
+									"An error occurred while importing the '%s' cron job module. %s",
 									taskObj.name,
 									error.message
 								),
@@ -214,6 +209,12 @@ export class Agenda extends SchedulerBase {
 					noAck: true,
 				}
 			);
-		});
+		} catch (error) {
+			logger.error("Cannot run cron job", {
+				details: error,
+			});
+
+			return;
+		}
 	}
 }
