@@ -55,3 +55,9 @@ export interface Tab {
 	title: string;
 	path: string;
 }
+export interface VersionParams {
+	orgId: string;
+	appId: string;
+	versionId: string;
+	envId: string;
+}
