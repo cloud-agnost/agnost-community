@@ -21,7 +21,7 @@
 		}
 	}
 	&-label {
-		@apply flex items-center px-1 hover:rounded flex-1;
+		@apply flex items-center px-1 hover:rounded h-full;
 	}
 	&-dropdown {
 		@apply w-[210px] h-12 relative border border-border rounded-sm;

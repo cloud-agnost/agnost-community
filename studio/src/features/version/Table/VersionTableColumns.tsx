@@ -1,0 +1,84 @@
+import { ColumnDef } from '@tanstack/react-table';
+import { Version } from '@/types';
+import { Button } from '@/components/Button';
+import { Version as VersionIcon } from '@/components/icons';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/Avatar';
+import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
+import { Link } from 'react-router-dom';
+import useOrganizationStore from '@/store/organization/organizationStore';
+
+export const VersionTableColumns: ColumnDef<Version>[] = [
+	{
+		id: 'name',
+		header: 'Name',
+		accessorKey: 'name',
+		size: 75,
+		cell: ({ row }) => {
+			const { name } = row.original;
+			return (
+				<div className='flex items-center gap-1'>
+					<VersionIcon className='w-5 h-5 text-subtle mr-2' />
+					<span>{name}</span>
+				</div>
+			);
+		},
+	},
+	{
+		id: 'createdBy',
+		header: 'Created By',
+		accessorKey: 'createdBy',
+		size: 200,
+		cell: ({ row }) => {
+			const { createdBy } = row.original;
+			return (
+				<div className='flex items-center gap-3'>
+					<Avatar size='sm'>
+						<AvatarImage src={createdBy?.pictureUrl as string} />
+						<AvatarFallback name={createdBy?.name} color={createdBy?.color} />
+					</Avatar>
+					<div className='flex flex-col'>
+						<span className='font-sfCompact text-sm'>{createdBy?.name}</span>
+						<span className='font-sfCompact text-xs text-subtle'>{createdBy?.contactEmail}</span>
+					</div>
+				</div>
+			);
+		},
+	},
+	{
+		id: 'permissions',
+		header: 'Read/Write',
+		accessorKey: 'readOnly',
+		size: 100,
+		cell: ({ row }) => {
+			const { readOnly } = row.original;
+			return (
+				<div className='flex items-center gap-3'>
+					{readOnly ? (
+						<LockSimple size={20} className='text-elements-red' />
+					) : (
+						<LockSimpleOpen size={20} className='text-elements-green' />
+					)}
+					<span className='font-sfCompact text-sm'>{readOnly ? 'Read Only' : 'Read/Write'}</span>
+				</div>
+			);
+		},
+	},
+	{
+		id: 'actions',
+		header: 'Actions',
+		size: 75,
+		cell: ({ row }) => {
+			const { _id } = row.original;
+			const app = useOrganizationStore.getState().application;
+			return (
+				<div className='flex items-center gap-3'>
+					<Link to={`${app?._id}/version/${_id}`}>
+						<Button size='sm' variant='secondary'>
+							Open
+						</Button>
+					</Link>
+				</div>
+			);
+		},
+	},
+];

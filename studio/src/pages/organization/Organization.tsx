@@ -1,4 +1,4 @@
-import { OrganizationCreateModal } from '@/features/Organization';
+import { OrganizationCreateModal } from '@/features/organization';
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 

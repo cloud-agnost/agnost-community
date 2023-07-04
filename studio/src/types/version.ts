@@ -1,3 +1,5 @@
+import { BaseGetRequest, User } from './type';
+
 export interface Version {
 	orgId: string;
 	appId: string;
@@ -33,7 +35,7 @@ export interface Version {
 		providers: [];
 		messages: [];
 	};
-	createdBy: string;
+	createdBy: User;
 	_id: string;
 	params: [];
 	limits: [];
@@ -44,11 +46,18 @@ export interface Version {
 	__v: number;
 }
 
+
+export interface GetVersionRequest extends BaseGetRequest {
+	name?: string;
+	appId: string;
+}
+
 export interface Tab {
 	id: string;
 	title: string;
 	path: string;
 }
+
 export interface VersionParams {
 	orgId: string;
 	appId: string;

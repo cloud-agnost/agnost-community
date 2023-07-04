@@ -13,8 +13,8 @@ export default function ApplicationTable({ apps }: ApplicationTableType) {
 			<DataTable
 				columns={ApplicationColumns}
 				data={apps}
-				onRowClick={() => {
-					useOrganizationStore.setState({ isVersionOpen: true });
+				onRowClick={(app) => {
+					useOrganizationStore.getState().openVersionDrawer(app);
 				}}
 			/>
 		</div>
