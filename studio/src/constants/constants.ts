@@ -200,4 +200,6 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	Error: 'red',
 	Ok: 'green',
 	Good: 'green',
+	Yes: 'green',
+	No: 'red',
 };
