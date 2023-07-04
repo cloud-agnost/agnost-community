@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { CopyInput } from 'components/CopyInput';
-import { ChangeName } from '@/features/auth/components/ChangeName';
-import { ChangeEmail } from '@/features/auth/components/ChangeEmail';
-import { ChangePassword } from '@/features/auth/components/ChangePassword';
-import { ProfileSettingsFormItem } from '@/features/auth/components/ProfileSettingsForm/index.ts';
-import { DeleteAccount } from '@/features/auth/components/DeleteAccount';
-import { ChangeAvatar } from '@/features/auth/components/ChangeAvatar';
+import { ChangeName } from '@/features/auth/ChangeName';
+import { ChangeEmail } from '@/features/auth/ChangeEmail';
+import { ChangePassword } from '@/features/auth/ChangePassword';
+import { ProfileSettingsFormItem } from '@/features/auth/ProfileSettingsForm/index.ts';
+import { DeleteAccount } from '@/features/auth/DeleteAccount';
+import { ChangeAvatar } from '@/features/auth/ChangeAvatar';
 
 export default function ProfileSettingsForm() {
 	const { t } = useTranslation();

@@ -9,16 +9,16 @@ import {
 import { Button } from 'components/Button';
 import { DotsThreeVertical } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
-import useVersionStore from '@/store/version/versionStore.ts';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Fragment } from 'react';
+import useTabStore from '@/store/version/tabStore.ts';
 
 interface TabOptionsDropdownProps {
 	getDashboardPath: () => string;
 }
 export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropdownProps) {
 	const { t } = useTranslation();
-	const { removeAllTabs, currentTab, tabs, removeTab, removeAllTabsExcept } = useVersionStore();
+	const { removeAllTabs, currentTab, tabs, removeTab, removeAllTabsExcept } = useTabStore();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
 

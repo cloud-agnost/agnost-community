@@ -10,12 +10,12 @@ import { Button } from 'components/Button';
 import { Plus } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
 import { SearchInput } from 'components/SearchInput';
-import useVersionStore from '@/store/version/versionStore.ts';
 import { Tab } from '@/types';
 import { NEW_TAB_ITEMS } from 'constants/constants.ts';
+import useTabStore from '@/store/version/tabStore.ts';
 
 export default function NewTabDropdown() {
-	const { addTab } = useVersionStore();
+	const { addTab } = useTabStore();
 	function newTab(item: Omit<Tab, 'id'>) {
 		addTab(item);
 	}

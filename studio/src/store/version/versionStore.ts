@@ -1,14 +1,13 @@
-import { VersionService } from '@/services';
-import { APIError, GetVersionRequest, Tab, Version } from '@/types';
-import { create } from 'zustand';
+import { APIError, GetVersionRequest, Version } from '@/types';
 import { devtools } from 'zustand/middleware';
+import { create } from 'zustand';
+import { VersionService } from '@/services';
 
 interface VersionStore {
 	loading: boolean;
 	error: APIError | null;
 	versions: Version[];
 	versionPage: number;
-	tabs: Tab[];
 	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<void>;
 	setVersionPage: (page: number) => void;
 }
@@ -20,7 +19,6 @@ const useVersionStore = create<VersionStore>()(
 			error: null,
 			versions: [],
 			versionPage: 0,
-			tabs: [],
 			getAllVersionsVisibleToUser: async (req: GetVersionRequest) => {
 				set({ loading: true });
 				try {
