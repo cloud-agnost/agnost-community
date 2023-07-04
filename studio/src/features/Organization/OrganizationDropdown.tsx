@@ -77,7 +77,7 @@ export function OrganizationDropdown() {
 						</Button>
 					</div>
 				</PopoverTrigger>
-				<PopoverContent className='organization-dropdown-content'>
+				<PopoverContent align='start' className='organization-dropdown-content'>
 					<Command>
 						{organizations.length > 5 && (
 							<CommandInput placeholder={t('organization.select') as string} />
@@ -125,6 +125,7 @@ export function OrganizationDropdown() {
 							</CommandItem>
 							<CommandItem>
 								<Button
+									size='full'
 									variant='secondary'
 									onClick={() => {
 										setOpenCreateModal(true);

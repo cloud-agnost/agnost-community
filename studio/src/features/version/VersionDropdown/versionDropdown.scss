@@ -1,0 +1,32 @@
+.version {
+	&-form {
+		@apply py-4;
+		&-item {
+			@apply space-y-1;
+		}
+		&-buttons {
+			@apply flex justify-end gap-4 mt-2;
+		}
+	}
+	&-label {
+		@apply flex items-center px-1 hover:rounded h-full;
+	}
+	&-dropdown {
+		@apply w-[210px] h-12 relative border border-border rounded-sm;
+		&-button {
+			@apply absolute z-50 top-1 right-0  p-1.5;
+			@apply text-icon-base hover:text-icon-secondary;
+		}
+		&-icon {
+			@apply rounded-full hover:bg-wrapper-background-light w-8 h-8;
+			@apply flex items-center justify-center;
+		}
+		&-label {
+			@apply text-left flex-1 font-sfCompact h-full;
+		}
+	}
+}
+
+.version-dropdown-content {
+	min-width: 210px;
+}

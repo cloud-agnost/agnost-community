@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import {
+	Environment,
 	getAppVersionEnvironmentParams,
 	GetEnvironmentLogsParams,
 	ToggleAutoDeployParams,
@@ -10,7 +11,9 @@ import {
 import EnvironmentService from 'services/EnvironmentService.ts';
 
 interface EnvironmentStore {
-	getAppVersionEnvironment: (params: getAppVersionEnvironmentParams) => Promise<any>;
+	environments: Environment[];
+	environment: Environment | null;
+	getAppVersionEnvironment: (params: getAppVersionEnvironmentParams) => Promise<Environment>;
 	getEnvironmentLogs: (params: GetEnvironmentLogsParams) => Promise<any>;
 	toggleAutoDeploy: (params: ToggleAutoDeployParams) => Promise<any>;
 	suspendEnvironment: (params: VersionParams) => Promise<any>;
@@ -22,9 +25,13 @@ interface EnvironmentStore {
 const useEnvironmentStore = create<EnvironmentStore>()(
 	devtools(
 		persist(
-			(_) => ({
-				getAppVersionEnvironment: (params: getAppVersionEnvironmentParams) => {
-					return EnvironmentService.getAppVersionEnvironment(params);
+			(set) => ({
+				environments: [],
+				environment: null,
+				getAppVersionEnvironment: async (params: getAppVersionEnvironmentParams) => {
+					const environment = await EnvironmentService.getAppVersionEnvironment(params);
+					set({ environment });
+					return environment;
 				},
 				getEnvironmentLogs: (params: GetEnvironmentLogsParams) => {
 					return EnvironmentService.getEnvironmentLogs(params);

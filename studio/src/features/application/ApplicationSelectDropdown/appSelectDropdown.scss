@@ -10,7 +10,7 @@
 		@apply text-default text-xl font-semibold;
 	}
 }
-.organization {
+.application {
 	&-form {
 		@apply py-4;
 		&-item {
@@ -48,8 +48,7 @@
 			}
 		}
 		&-leave {
-			@apply flex;
-			justify-content: center !important;
+			@apply justify-center;
 		}
 		&-label {
 			@apply text-left flex-1 font-sfCompact h-full;
