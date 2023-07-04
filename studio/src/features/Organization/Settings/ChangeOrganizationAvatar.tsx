@@ -3,7 +3,6 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError } from '@/types';
 import { CircleNotch, Trash } from '@phosphor-icons/react';
 import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
-import '@/features/auth/components/ChangeAvatar/changeAvatar.scss';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/Avatar';
 import { Button } from 'components/Button';
 import { Pencil } from 'components/icons';

@@ -1,5 +1,4 @@
 import { NewTabDropdown, TabItem, TabOptionsDropdown } from '@/features/version/Tabs/index.ts';
-import useTabStore from '@/store/version/tabStore.ts';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 import { Dashboard } from 'components/icons';
@@ -8,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useMatches, useNavigate } from 'react-router-dom';
 import './tabs.scss';
+import useTabStore from '@/store/version/tabStore.ts';
 
 const SCROLL_AMOUNT = 200;
 
