@@ -59,7 +59,7 @@ export function isEmpty(value: unknown): boolean {
 
 	return false;
 }
-export function isArray(value: unknown): value is any[] {
+export function isArray<T>(value: unknown): value is T[] {
 	return Array.isArray(value);
 }
 export function getNameForAvatar(name: string) {
