@@ -117,21 +117,24 @@ export default function DeploymentLogsDrawer({
 				</DrawerContent>
 			</Drawer>
 			<Modal title='Deployment Log Details' isOpen={logModalIsOpen} closeModal={closeLogDetails}>
-				<div>
-					{/* TODO: handle it */}
-					{selectedLog && null}
-					<ScrollArea className='w-full p-4 bg-wrapper-background-light rounded'>
-						<ScrollBar orientation='horizontal' />
-						<div className='whitespace-pre text-default leading-6 text-sm font-mono'>
-							<>{`2023-03-01T09:28:45 Started deployment process
+				{/* TODO: handle it */}
+				{selectedLog && null}
+				<ScrollArea className='w-full p-4 bg-wrapper-background-light rounded'>
+					<ScrollBar orientation='horizontal' />
+					<div className='whitespace-pre text-default leading-6 text-sm font-mono'>
+						<>{`2023-03-01T09:28:45 Started deployment process
 2023-03-01T09:28:45 Started processing HR portal database (2ms)
 2023-03-01T09:28:45 Completed processing database (2ms)
 2023-03-01T09:28:45 Started processing Accounting database (2ms)
 2023-03-01T09:28:45 Completed processing Accounting database (2ms)
 2023-03-01T09:28:45 Created default collections (2ms)
 2023-03-01T09:28:45 Deployed endpoints (2ms)`}</>
-						</div>
-					</ScrollArea>
+					</div>
+				</ScrollArea>
+				<div className='flex justify-end'>
+					<Button onClick={closeLogDetails} size='lg'>
+						{t('general.close')}
+					</Button>
 				</div>
 			</Modal>
 		</>
