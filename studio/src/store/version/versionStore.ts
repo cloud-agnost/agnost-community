@@ -1,18 +1,13 @@
-import { APIError } from '@/types';
+import { APIError, Tab } from '@/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { VersionService } from '@/services';
-
-export interface Tab {
-	id: string;
-	title: string;
-	path: string;
-}
 
 interface VersionStore {
 	loading: boolean;
 	error: APIError | null;
 	versions: any[];
+	currentTab: Tab | null;
 	tabs: Tab[];
 	getAllVersionsVisibleToUser: (orgId: string, appId: string) => Promise<void>;
 	removeTab: (id: string) => string | undefined;
@@ -20,6 +15,9 @@ interface VersionStore {
 	getTabByPath: (path: string) => Tab | undefined;
 	getTabById: (id: string) => Tab | undefined;
 	getPreviousTab: (currentTabId: string) => Tab | undefined;
+	removeAllTabs: () => void;
+	removeAllTabsExcept: (id: string) => void;
+	setCurrentTab: (tab: Tab | null) => void;
 }
 
 const useVersionStore = create<VersionStore>()(
@@ -30,6 +28,7 @@ const useVersionStore = create<VersionStore>()(
 				error: null,
 				versions: [],
 				tabs: [],
+				currentTab: null,
 				getAllVersionsVisibleToUser: async (orgId: string, appId: string) => {
 					set({ loading: true });
 					try {
@@ -59,6 +58,7 @@ const useVersionStore = create<VersionStore>()(
 					set((state) => {
 						return {
 							tabs: [...state.tabs, newTab],
+							currentTab: newTab,
 						};
 					});
 				},
@@ -72,7 +72,21 @@ const useVersionStore = create<VersionStore>()(
 					const currentTabIndex = get().tabs.findIndex((tab) => tab.id === currentTabId);
 					if (currentTabIndex === -1) return;
 
-					return get().tabs[currentTabIndex - 1];
+					let index = currentTabIndex - 1;
+					if (index === -1) index = currentTabIndex + 1;
+
+					return get().tabs[index];
+				},
+				removeAllTabs: () => {
+					set({ tabs: [] });
+				},
+				removeAllTabsExcept: (id: string) => {
+					set((state) => ({
+						tabs: state.tabs.filter((tab) => tab.id === id),
+					}));
+				},
+				setCurrentTab: (tab) => {
+					set({ currentTab: tab });
 				},
 			}),
 

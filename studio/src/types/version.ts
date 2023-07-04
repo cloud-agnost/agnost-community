@@ -43,3 +43,15 @@ export interface Version {
 	updatedAt: string;
 	__v: number;
 }
+
+export interface Tab {
+	id: string;
+	title: string;
+	path: string;
+}
+export interface VersionParams {
+	orgId: string;
+	appId: string;
+	versionId: string;
+	envId: string;
+}
