@@ -477,6 +477,10 @@ export class ResourceManager {
 										value: process.env.MASTER_TOKEN,
 									},
 									{
+										name: "ACCESS_TOKEN",
+										value: process.env.ACCESS_TOKEN,
+									},
+									{
 										name: "PASSPHRASE",
 										value: process.env.PASSPHRASE,
 									},

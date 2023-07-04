@@ -73,7 +73,25 @@ export const appAuthorization = {
 				update: true,
 				deploy: true,
 			},
+			endpoint: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
 			middleware: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
+			queue: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
+			task: {
 				view: true,
 				create: true,
 				update: true,

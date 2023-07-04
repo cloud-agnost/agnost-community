@@ -38,7 +38,10 @@ export const deleteTasksHandler = (connection, queue) => {
 				);
 				// Create the deployment manager and deploy the version
 				let manager = new TaskManager(msgObj);
-				let result = await manager.deleteTasks();
+				let result = null;
+				// If tasks is undefined or null this means that the environment has been deleted, we need to delete all tasks
+				if (!manager.getTasks()) result = await manager.deleteTasks();
+				else result = await manager.undeployTasks();
 
 				if (result.success) {
 					channel.ack(msg);

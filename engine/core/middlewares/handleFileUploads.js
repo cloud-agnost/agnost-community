@@ -7,7 +7,7 @@ export const handleFileUploads = (req, res, next) => {
 		storage: multer.diskStorage({
 			destination: config.get("general.fileStorageFolder"),
 			filename: function (req, file, cb) {
-				cb(null, helper.generateFileName());
+				cb(null, `${helper.generateFileName()}-${file.originalname}`);
 			},
 		}),
 	}).any();

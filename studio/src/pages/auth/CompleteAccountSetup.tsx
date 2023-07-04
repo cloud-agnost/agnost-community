@@ -6,9 +6,11 @@ import { Input } from '@/components/Input';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import useAuthStore from '@/store/auth/authStore';
 import { APIError } from '@/types';
+import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
@@ -20,8 +22,12 @@ async function loader(params: any) {
 
 const FormSchema = z.object({
 	email: z
-		.string({ required_error: 'Email address is required' })
-		.email('Please enter a valid email address'),
+		.string({
+			required_error: translate('forms.required', {
+				label: translate('login.email_address'),
+			}),
+		})
+		.email(translate('forms.email.error')),
 });
 
 export default function CompleteAccountSetup() {
@@ -32,6 +38,7 @@ export default function CompleteAccountSetup() {
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
+	const { t } = useTranslation();
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		setLoading(true);
@@ -51,10 +58,8 @@ export default function CompleteAccountSetup() {
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
-				<Description title='Complete Account Setup'>
-					If you have been invited to an organization or an app and accepted the invitation, then
-					you might have an account with an incomplete setup (e.g., mission password, name). Please
-					enter your email to start completing your account set up.
+				<Description title={t('login.complete_account_setup')}>
+					{t('login.complete_account_setup_info')}
 				</Description>
 
 				{error && (
@@ -71,11 +76,11 @@ export default function CompleteAccountSetup() {
 							name='email'
 							render={({ field }) => (
 								<FormItem className='space-y-1'>
-									<FormLabel>Email</FormLabel>
+									<FormLabel>{t('login.email')}</FormLabel>
 									<FormControl>
 										<Input
 											error={Boolean(form.formState.errors.email)}
-											placeholder='Enter email address'
+											placeholder={t('login.enter_email') as string}
 											{...field}
 										/>
 									</FormControl>
@@ -86,10 +91,10 @@ export default function CompleteAccountSetup() {
 
 						<div className='flex justify-end gap-4'>
 							<Button to='/login' variant='text' type='button' size='lg'>
-								Back to Login
+								{t('login.back_to_login')}
 							</Button>
 							<Button size='lg' loading={loading}>
-								Continue
+								{t('login.continue')}
 							</Button>
 						</div>
 					</form>

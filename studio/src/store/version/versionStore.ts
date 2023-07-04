@@ -1,13 +1,17 @@
-import { VersionService } from '@/services';
 import { APIError, GetVersionRequest, Tab, Version } from '@/types';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { APIError, Tab } from '@/types';
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+import { VersionService } from '@/services';
 
 interface VersionStore {
 	loading: boolean;
 	error: APIError | null;
 	versions: Version[];
 	versionPage: number;
+	currentTab: Tab | null;
 	tabs: Tab[];
 	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<void>;
 	removeTab: (id: string) => string | undefined;
@@ -16,6 +20,9 @@ interface VersionStore {
 	getTabById: (id: string) => Tab | undefined;
 	getPreviousTab: (currentTabId: string) => Tab | undefined;
 	setVersionPage: (page: number) => void;
+	removeAllTabs: () => void;
+	removeAllTabsExcept: (id: string) => void;
+	setCurrentTab: (tab: Tab | null) => void;
 }
 
 const useVersionStore = create<VersionStore>()(
@@ -68,8 +75,18 @@ const useVersionStore = create<VersionStore>()(
 			getPreviousTab: (currentTabId: string) => {
 				const currentTabIndex = get().tabs.findIndex((tab) => tab.id === currentTabId);
 				if (currentTabIndex === -1) return;
-
 				return get().tabs[currentTabIndex - 1];
+			},
+			removeAllTabs: () => {
+				set({ tabs: [] });
+			},
+			removeAllTabsExcept: (id: string) => {
+				set((state) => ({
+					tabs: state.tabs.filter((tab) => tab.id === id),
+				}));
+			},
+			setCurrentTab: (tab) => {
+				set({ currentTab: tab });
 			},
 			setVersionPage: (page: number) => {
 				set({ versionPage: page });

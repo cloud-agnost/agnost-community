@@ -4,7 +4,9 @@ import useClusterStore from '@/store/cluster/clusterStore';
 import useOnboardingStore from '@/store/onboarding/onboardingStore';
 import useTypeStore from '@/store/types/typeStore';
 import { APIError, AppMembers } from '@/types/type';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+
 async function loader() {
 	const { isTypesOk, getAllTypes } = useTypeStore.getState();
 	if (!isTypesOk) {
@@ -19,6 +21,7 @@ export default function InviteTeamMembers() {
 	const { finalizeClusterSetup } = useClusterStore();
 	const { appRoles } = useTypeStore();
 	const navigate = useNavigate();
+	const { t } = useTranslation();
 
 	async function onSubmit(data: { member: AppMembers[] }, setError: (error: APIError) => void) {
 		const appMembers = data.member.filter((item) => item.email !== '' && item.role !== '');
@@ -37,22 +40,21 @@ export default function InviteTeamMembers() {
 			setError(res);
 			return;
 		}
-		navigate('/organization');
 	}
 
 	return (
 		<InviteMemberForm
-			title='Invite Members To App Team'
-			description='You can invite team members to your application with different role profiles. These team members will also become organization members and can be easily added as member to other organization apps.'
+			title={t('onboarding.invite.title')}
+			description={t('onboarding.invite.desc')}
 			submitForm={onSubmit}
 			roles={appRoles}
 			actions={
 				<div className='flex items-center justify-end gap-4'>
 					<Button variant='text' size='lg' onClick={goBack}>
-						Previous
+						{t('onboarding.previous')}
 					</Button>
 					<Button variant='primary' size='lg'>
-						Finish
+						{t('onboarding.finish')}
 					</Button>
 				</div>
 			}

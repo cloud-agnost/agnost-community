@@ -21,7 +21,7 @@ export const checkServerStatus = (req, res, next) => {
 	}
 
 	// Check whether environment is suspeneded or not
-	if (META.isSuspended) {
+	if (META.isSuspended()) {
 		return res
 			.status(403)
 			.json(

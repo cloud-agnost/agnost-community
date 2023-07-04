@@ -6,7 +6,9 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { Application, SortOption } from '@/types';
 import { translate } from '@/utils';
 import { Database as DatabaseIcon, DeviceTablet, FileText, GearSix } from '@phosphor-icons/react';
+import { BadgeColors } from 'components/Badge/Badge.tsx';
 
+import { Tab } from '@/types';
 export const ORGANIZATION_MEMBERS_PAGE_SIZE = 10;
 
 export const SLIDER_IMAGES = [
@@ -41,7 +43,7 @@ export const MENU_ITEMS = [
 	},
 ];
 
-export const MENU_ITEMS_FOR_PROFILE_SETTINGS = (translate: (key: string) => string) => [
+export const MENU_ITEMS_FOR_PROFILE_SETTINGS = [
 	{
 		title: translate('profileSettings.general_title'),
 		href: '/profile/settings',
@@ -164,3 +166,40 @@ export const ORG_INVITATIONS_SORT_OPTIONS: SortOption[] = [
 		sortDir: 'asc',
 	},
 ];
+
+export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
+	{
+		title: translate('version.databases'),
+		path: 'database',
+	},
+	{
+		title: translate('version.storage'),
+		path: 'storage',
+	},
+	{
+		title: translate('version.cache'),
+		path: 'cache',
+	},
+	{
+		title: translate('version.endpoints'),
+		path: 'endpoint',
+	},
+	{
+		title: translate('version.message_queues'),
+		path: 'message-queue',
+	},
+	{
+		title: translate('version.cron_jobs'),
+		path: 'cron-job',
+	},
+];
+
+export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
+	Suspended: 'yellow',
+	Deploying: 'blue',
+	Error: 'red',
+	Ok: 'green',
+	Good: 'green',
+	Yes: 'green',
+	No: 'red',
+};

@@ -70,10 +70,6 @@ build:
               - '**/*.json'
         docker:
           dockerfile: Dockerfile.dev
-      - image: agnost-community/studio
-        context: ../studio
-        docker:
-          dockerfile: Dockerfile.dev
 deploy:
    statusCheckDeadlineSeconds: 300
    kubectl:
@@ -86,4 +82,3 @@ deploy:
          - dev/engine-monitor-deployment.yaml
          - dev/engine-realtime-deployment.yaml
          - dev/engine-scheduler-deployment.yaml
-         - dev/studio-deployment.yaml

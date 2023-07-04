@@ -8,6 +8,7 @@ import './UserSettingsLayout.scss';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
 import { MENU_ITEMS_FOR_PROFILE_SETTINGS } from '@/constants';
 import { Layout } from '@/layouts/Layout';
+import { ScrollArea, ScrollBar } from 'components/ScrollArea';
 
 type UserSettingsLayoutProps = {
 	children: ReactNode;
@@ -37,14 +38,22 @@ export default function UserSettingsLayout({
 						</Button>
 						<div className='font-semibold text-base leading-[26px] text-default'></div>
 					</div>
-					<Navbar items={MENU_ITEMS_FOR_PROFILE_SETTINGS(t)} />
+					<Navbar items={MENU_ITEMS_FOR_PROFILE_SETTINGS} />
 				</div>
-				<div className='user-settings-layout-right'>
-					<div className='user-settings-layout-right-divider'>
-						<Description title={title}>{description}</Description>
+				<ScrollArea
+					style={{
+						height: 'calc(100vh - 72px)',
+					}}
+				>
+					<ScrollBar orientation='vertical' />
+					<div className='user-settings-layout-right'>
+						<div className='user-settings-layout-right-divider'>
+							<Description title={title}>{description}</Description>
+						</div>
+
+						{children}
 					</div>
-					{children}
-				</div>
+				</ScrollArea>
 			</div>
 		</Layout>
 	);

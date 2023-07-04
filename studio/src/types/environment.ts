@@ -1,3 +1,6 @@
+import { VersionParams } from '@/types/version.ts';
+import { PaginationOptions } from '@/types/database.ts';
+
 export interface Environment {
 	orgId: string;
 	appId: string;
@@ -68,3 +71,18 @@ export interface EnvLog {
 	updatedAt: string;
 	__v: number;
 }
+
+export type UpdateEnvironmentTelemetryLogsParams = VersionParams & {
+	logId: string;
+};
+
+export type ToggleAutoDeployParams = VersionParams & {
+	autoDeploy: boolean;
+};
+
+export type GetEnvironmentLogsParams = VersionParams & {
+	actor?: string;
+	status?: string;
+} & PaginationOptions;
+
+export type getAppVersionEnvironmentParams = Omit<VersionParams, 'envId'>;

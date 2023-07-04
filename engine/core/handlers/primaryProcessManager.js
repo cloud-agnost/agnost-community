@@ -36,7 +36,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 					t("API server has the latest configuration, no changes applied")
 				);
 				// Send the deployment telemetry information to the platform
-				await this.sendEnvironmentLogs("OK");
+				// await this.sendEnvironmentLogs("OK");
 				return;
 			}
 		}
@@ -50,7 +50,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 		this.addLog(t("Completed initializing API server"));
 		this.addLog(t("Initializing child process and HTTP server"));
 		// Send the deployment telemetry information to the platform
-		await this.sendEnvironmentLogs("OK");
+		// await this.sendEnvironmentLogs("OK");
 	}
 
 	/**
@@ -156,21 +156,21 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 			case "add":
 				for (const entry of contents) {
 					const filePath = path.join(
-						`${appPath}/meta/${contentType}/${entry.iid}.js`
+						`${appPath}/meta/${contentType}/${entry.name}.js`
 					);
 
 					// Write file code
-					await fs.writeFile(filePath, entry.code);
+					await fs.writeFile(filePath, entry.logic);
 
 					// Add the config item without the code to the overall config file
-					delete entry.code;
+					delete entry.logic;
 					configItems.push(entry);
 				}
 				break;
 			case "delete":
 				for (const entry of contents) {
 					const filePath = path.join(
-						`${appPath}/meta/${contentType}/${entry.iid}.js`
+						`${appPath}/meta/${contentType}/${entry.name}.js`
 					);
 
 					// Delete the file if it exists
@@ -179,7 +179,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 					} catch (err) {}
 
 					// Add the config item withoud the code to the overall config file
-					delete entry.code;
+					delete entry.logic;
 					configItems.push(entry);
 				}
 				break;

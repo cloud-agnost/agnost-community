@@ -10,7 +10,7 @@
 		@apply relative bg-subtle rounded-lg p-6;
 
 		.modal-close {
-			@apply absolute top-4 right-4;
+			@apply absolute top-4 right-4 aspect-square w-10 h-10 text-icon-base hover:text-icon-secondary;
 		}
 	}
 }

@@ -1,4 +1,3 @@
-import { getDBClient } from "../../init/db.js";
 import { QueueBase } from "./QueueBase.js";
 import ERROR_CODES from "../../config/errorCodes.js";
 
@@ -18,25 +17,25 @@ export class RabbitMQ extends QueueBase {
 	}
 
 	/**
-	 * Adds the listerer to listen messages for the provided queueId
-	 * @param  {string} queueId The iid of the queue
+	 * Adds the listerer to listen messages for the provided queue
+	 * @param  {Object} queue The queue object
 	 */
-	async listenMessages(queueId) {
+	async listenMessages(queue) {
 		const envId = META.getEnvId();
 		const queueCount = config.get("general.messageProcessQueueCount");
 		const exchangeCount = config.get("general.delayedMessageExchangeCount");
 
 		// Listen for messages
 		for (let i = 1; i <= queueCount; i++) {
-			this.processMessage(queueId, `process-message-${envId}-${queueId}-${i}`);
+			this.processMessage(queue, `process-message-${envId}-${queue.name}-${i}`);
 		}
 
 		// Listen for delayed messages
 		for (let i = 1; i <= exchangeCount; i++) {
 			this.processMessage(
-				queueId,
-				`process-delayed-message-exchange-${envId}-${queueId}-${i}`,
-				`process-delayed-message-${envId}-${queueId}-${i}`
+				queue,
+				`process-delayed-message-${envId}-${queue.name}-${i}`,
+				`process-delayed-message-exchange-${envId}-${queue.name}-${i}`
 			);
 		}
 	}
@@ -84,7 +83,7 @@ export class RabbitMQ extends QueueBase {
 					1,
 					config.get("general.delayedMessageExchangeCount")
 				);
-				const exchangeName = `process-delayed-message-exchange-${envId}-${queueId}-${exchangeNumber}`;
+				const exchangeName = `process-delayed-message-exchange-${envId}-${queue.name}-${exchangeNumber}`;
 
 				channel.assertExchange(exchangeName, "x-delayed-message", {
 					durable: true,
@@ -112,7 +111,7 @@ export class RabbitMQ extends QueueBase {
 					1,
 					config.get("general.messageProcessQueueCount")
 				);
-				const queueName = `process-message-${envId}-${queueId}-${queueNumber}`;
+				const queueName = `process-message-${envId}-${queue.name}-${queueNumber}`;
 
 				channel.assertQueue(queueName, {
 					durable: true,
@@ -130,19 +129,13 @@ export class RabbitMQ extends QueueBase {
 
 	/**
 	 * Listens and processes messages from the provided queue
-	 * @param  {string} queueId The unique queue iid
+	 * @param  {Object} queue The queue object
 	 * @param  {string} queue The unique queue name
 	 * @param  {string} exchange The unique exchange name (this is used to process delayed messages)
 	 */
-	processMessage(queueId, queue, exchange) {
-		this.driver.createChannel(function (error, channel) {
-			if (error) {
-				logger.error("Cannot create channel to message queue", {
-					details: error,
-				});
-
-				return;
-			}
+	async processMessage(queueObj, queue, exchange) {
+		try {
+			const channel = await this.driver.createChannel();
 
 			// If this is a delayed message then we need to bind the queue to the exchange
 			if (exchange) {
@@ -185,7 +178,6 @@ export class RabbitMQ extends QueueBase {
 			channel.consume(
 				queue,
 				async function (messsage) {
-					const queueObj = await META.getQueue(queueId);
 					//Start timer
 					const start = Date.now();
 					const messageObj = JSON.parse(messsage.content.toString());
@@ -222,7 +214,9 @@ export class RabbitMQ extends QueueBase {
 					const handlerModule = null;
 					try {
 						// Dynamicly import the
-						handlerModule = await import(`../../meta/queues/${queueId}.js`);
+						handlerModule = await import(
+							`../../meta/queues/${queueObj.name}.js`
+						);
 
 						const handlerFunction = handlerModule.default;
 						// Check the endpoint module has a default exprot or not
@@ -348,6 +342,12 @@ export class RabbitMQ extends QueueBase {
 					noAck: true,
 				}
 			);
-		});
+		} catch (error) {
+			logger.error("Cannot process queue message", {
+				details: error,
+			});
+
+			return;
+		}
 	}
 }
