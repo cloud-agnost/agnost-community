@@ -4,6 +4,9 @@ import { Button } from '@/components/Button';
 import { Version as VersionIcon } from '@/components/icons';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/Avatar';
 import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
+import { Link } from 'react-router-dom';
+import useOrganizationStore from '@/store/organization/organizationStore';
+
 export const VersionTableColumns: ColumnDef<Version>[] = [
 	{
 		id: 'name',
@@ -66,7 +69,16 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 		size: 75,
 		cell: ({ row }) => {
 			const { _id } = row.original;
-			return <Button variant='secondary'>Open</Button>;
+			const app = useOrganizationStore.getState().application;
+			return (
+				<div className='flex items-center gap-3'>
+					<Link to={`${app?._id}/version/${_id}`}>
+						<Button size='sm' variant='secondary'>
+							Open
+						</Button>
+					</Link>
+				</div>
+			);
 		},
 	},
 ];
