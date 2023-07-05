@@ -4,18 +4,10 @@ import { AutoComplete } from '@/components/AutoComplete';
 import { Button } from '@/components/Button';
 import { useToast } from '@/hooks';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { OrganizationMember } from '@/types';
+import { FormatOptionLabelProps, GroupedOption, OrganizationMember } from '@/types';
 import { APIError } from '@/types/type';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-interface FormatOptionLabelProps {
-	label: string;
-	value: any;
-}
-interface GroupedOption {
-	readonly label: string;
-	readonly options: readonly OrganizationMember[];
-}
 
 const loadOptions = async (inputValue: string) => {
 	const res = await useOrganizationStore.getState().getOrganizationMembers({
@@ -62,7 +54,7 @@ const formatOptionLabel = ({ label, value }: FormatOptionLabelProps) => {
 		</div>
 	);
 };
-const formatGroupLabel = (data: GroupedOption) => {
+const formatGroupLabel = (data: GroupedOption<OrganizationMember>) => {
 	console.log('data', { data });
 	return (
 		<div className='flex items-center gap-2'>
@@ -109,7 +101,7 @@ export default function TransferOrganization() {
 			)}
 			<AutoComplete
 				loadOptions={loadOptions}
-				onChange={(res) => setUser(res.member)}
+				onChange={(res) => setUser(res)}
 				formatOptionLabel={formatOptionLabel}
 				formatGroupLabel={formatGroupLabel}
 			/>
