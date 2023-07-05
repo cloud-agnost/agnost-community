@@ -78,7 +78,16 @@ export interface ApplicationMember {
 	appId: string;
 	role: string;
 	joinDate: string;
-	member: User;
+	member: {
+		color: string;
+		contactEmail: string;
+		iid: string;
+		isAppOwner: boolean;
+		loginEmail: string;
+		name: string;
+		_id: string;
+		pictureUrl: string;
+	};
 }
 export interface TeamOption {
 	readonly value: ApplicationMember;
