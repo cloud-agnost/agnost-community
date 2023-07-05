@@ -16,7 +16,7 @@
 		}
 	}
 	&-link {
-		@apply flex items-center justify-center gap-2 p-4;
+		@apply flex items-center justify-center gap-2 pb-4 px-8;
 		@apply border-b-3 border-transparent;
 	}
 	&-icon {
