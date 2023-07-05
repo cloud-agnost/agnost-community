@@ -1,5 +1,6 @@
 import { axios } from '@/helpers';
 import {
+	Environment,
 	getAppVersionEnvironmentParams,
 	GetEnvironmentLogsParams,
 	ToggleAutoDeployParams,
@@ -14,7 +15,7 @@ export default class EnvironmentService {
 		orgId,
 		appId,
 		versionId,
-	}: getAppVersionEnvironmentParams) {
+	}: getAppVersionEnvironmentParams): Promise<Environment> {
 		return (await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/env`)).data;
 	}
 

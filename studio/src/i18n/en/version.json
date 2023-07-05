@@ -27,5 +27,13 @@
 	"auto_redeploy": "Auto redeploy",
 	"auto_redeploy_desc": "When version changes then deploy changes automatically",
 	"view_logs": "View Deployment Logs",
-	"logs": "Deployment Logs"
+	"logs": "Deployment Logs",
+	"open_version": "Open Version",
+	"create_a_copy": "Create a Copy",
+	"merge": "Merge",
+	"export": "Export",
+	"import": "Import",
+	"mark_read_only": "Mark Read Only",
+	"set_private": "Set Private",
+	"delete": "Delete"
 }

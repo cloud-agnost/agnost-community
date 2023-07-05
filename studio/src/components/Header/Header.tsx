@@ -1,14 +1,20 @@
 import { Button } from '@/components/Button';
 import { AgnostOnlyLogo } from '@/components/icons';
-import { Bell, Cloud } from '@phosphor-icons/react';
-import { Link } from 'react-router-dom';
-import './header.scss';
+import { Bell, CaretRight, Cloud } from '@phosphor-icons/react';
+import { Link, useParams } from 'react-router-dom';
 import { MENU_ITEMS } from '@/constants';
 import { OrganizationDropdown } from '@/features/Organization/OrganizationDropdown';
 import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
+import { ApplicationSelectDropdown } from '@/features/application';
+import useOrganizationStore from '@/store/organization/organizationStore.ts';
+import { VersionDropdown } from '@/features/version/VersionDropdown';
+import './header.scss';
 
 export function Header() {
+	const { application } = useOrganizationStore();
+	const { versionId } = useParams();
+
 	return (
 		<header className='header-menu'>
 			<div className='header-menu-left'>
@@ -16,7 +22,21 @@ export function Header() {
 					<AgnostOnlyLogo width='40' height='40' />
 				</Link>
 				<div className='header-menu-divider' />
-				<OrganizationDropdown />
+				<div className='flex items-center gap-2'>
+					<OrganizationDropdown />
+					{application && (
+						<>
+							<CaretRight size={20} className='text-icon-disabled' />
+							<ApplicationSelectDropdown />
+						</>
+					)}
+					{versionId && (
+						<>
+							<CaretRight size={20} className='text-icon-disabled' />
+							<VersionDropdown />
+						</>
+					)}
+				</div>
 			</div>
 			<div className='header-menu-right'>
 				<nav className='header-menu-right-nav'>

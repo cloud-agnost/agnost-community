@@ -36,6 +36,7 @@ interface OrganizationStore {
 	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
 	createOrganization: (req: CreateOrganizationRequest) => Promise<Organization | APIError>;
 	selectOrganization: (organization: Organization) => void;
+	selectApplication: (application: Application) => void;
 	leaveOrganization: (req: LeaveOrganizationRequest) => Promise<void>;
 	changeOrganizationName: (req: ChangeOrganizationNameRequest) => Promise<Organization>;
 	changeOrganizationAvatar: (req: ChangeOrganizationAvatarRequest) => Promise<Organization>;
@@ -455,6 +456,9 @@ const useOrganizationStore = create<OrganizationStore>()(
 						isVersionOpen: false,
 						application: null,
 					});
+				},
+				selectApplication: (application: Application) => {
+					set({ application });
 				},
 			}),
 
