@@ -15,15 +15,17 @@ export function SortButton({ text, column }: SortButtonProps) {
 			className='sort-button'
 		>
 			{text}
-			<div className='ml-2'>
-				<CaretUp
-					size={14}
-					className={cn(
-						'text-icon-base',
-						column.getIsSorted() === 'asc' && 'rotate-180 text-icon-secondary',
-					)}
-				/>
-			</div>
+			{column.getIsSorted() && (
+				<div className='ml-2'>
+					<CaretUp
+						size={14}
+						className={cn(
+							'text-icon-base',
+							column.getIsSorted() === 'asc' && 'rotate-180 text-icon-secondary',
+						)}
+					/>
+				</div>
+			)}
 		</Button>
 	);
 }
