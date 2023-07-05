@@ -1,20 +1,19 @@
-import { OrganizationMember } from '@/types';
 import AsyncSelect from 'react-select/async';
 import './autocomplete.scss';
 
-interface Props {
-	onChange: (value: OrganizationMember) => void;
+interface Props<T> {
+	onChange: (value: T) => void;
 	loadOptions: (inputValue: string) => void;
 	formatOptionLabel?: (props: any) => JSX.Element;
 	formatGroupLabel?: (props: any) => JSX.Element;
 }
 
-export default function AutoComplete({ onChange, loadOptions, ...props }: Props) {
+export default function AutoComplete<T>({ onChange, loadOptions, ...props }: Props<T>) {
 	return (
 		<AsyncSelect
 			cacheOptions
 			loadOptions={loadOptions}
-			onChange={(value) => onChange(value as OrganizationMember)}
+			onChange={({ value }) => onChange(value)}
 			defaultOptions
 			className='select-container'
 			classNamePrefix='select'
