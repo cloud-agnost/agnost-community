@@ -7,20 +7,19 @@ import {
 	DrawerHeader,
 	DrawerTitle,
 } from '@/components/Drawer';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { ScrollArea } from '@/components/ScrollArea';
 import { SearchInput } from '@/components/SearchInput';
 import { useUpdateEffect } from '@/hooks';
-import useOrganizationStore from '@/store/organization/organizationStore';
+import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { VersionTable } from '../version/Table';
-import { useRef } from 'react';
 
 export default function ApplicationVersions() {
 	const { t } = useTranslation();
-	const { isVersionOpen, application, closeVersionDrawer } = useOrganizationStore();
+	const { isVersionOpen, application, closeVersionDrawer } = useApplicationStore();
 	const { getAllVersionsVisibleToUser, versions, versionPage, setVersionPage } = useVersionStore();
 
 	const [name, setName] = useState('');
@@ -28,12 +27,6 @@ export default function ApplicationVersions() {
 	const prevPageRef = useRef(versionPage);
 
 	const getVersions = useCallback(() => {
-		console.log(
-			'getVersions',
-			!!application?._id,
-			prevQueryRef.current !== name,
-			prevPageRef.current !== versionPage,
-		);
 		if (application?._id || (name && prevPageRef.current !== versionPage)) {
 			getAllVersionsVisibleToUser({
 				appId: application?._id as string,
