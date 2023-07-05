@@ -63,7 +63,7 @@ const formatGroupLabel = (data: GroupedOption<OrganizationMember>) => {
 	);
 };
 export default function TransferOrganization() {
-	const [user, setUser] = useState<any>();
+	const [userId, setUserId] = useState<string>();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
 	const { organization, transferOrganization } = useOrganizationStore();
@@ -73,11 +73,11 @@ export default function TransferOrganization() {
 		setLoading(true);
 		transferOrganization({
 			organizationId: organization?._id as string,
-			userId: user?._id,
+			userId: userId as string,
 			onSuccess: () => {
 				setLoading(false);
 				notify({
-					title: 'Organization transfered successfully',
+					title: 'Organization transferred successfully',
 					description: 'You will be redirected to the new organization',
 					type: 'success',
 				});
@@ -99,9 +99,9 @@ export default function TransferOrganization() {
 					<AlertDescription>{error?.details}</AlertDescription>
 				</Alert>
 			)}
-			<AutoComplete
+			<AutoComplete<OrganizationMember>
 				loadOptions={loadOptions}
-				onChange={(res) => setUser(res)}
+				onChange={(res) => setUserId(res.member._id)}
 				formatOptionLabel={formatOptionLabel}
 				formatGroupLabel={formatGroupLabel}
 			/>
