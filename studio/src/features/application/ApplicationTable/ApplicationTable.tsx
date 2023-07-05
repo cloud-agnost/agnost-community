@@ -1,7 +1,7 @@
 import { DataTable } from '@/components/DataTable/DataTable';
-import { ApplicationColumns } from './ApplicationColumns';
+import useApplicationStore from '@/store/app/applicationStore';
 import { Application } from '@/types';
-import useOrganizationStore from '@/store/organization/organizationStore';
+import { ApplicationColumns } from './ApplicationColumns';
 
 interface ApplicationTableType {
 	apps: Application[];
@@ -14,7 +14,7 @@ export default function ApplicationTable({ apps }: ApplicationTableType) {
 				columns={ApplicationColumns}
 				data={apps}
 				onRowClick={(app) => {
-					useOrganizationStore.getState().openVersionDrawer(app);
+					useApplicationStore.getState().openVersionDrawer(app);
 				}}
 			/>
 		</div>
