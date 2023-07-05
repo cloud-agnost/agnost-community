@@ -28,9 +28,7 @@ interface OrganizationStore {
 	organization: Organization | null;
 	organizations: Organization[];
 	applications: Application[];
-	application: Application | null;
 	temp: Application[];
-	isVersionOpen: boolean;
 	members: OrganizationMember[];
 	invitations: OrganizationInvitations[];
 	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
@@ -63,8 +61,6 @@ interface OrganizationStore {
 	getOrganizationInvitations: (
 		req: GetOrganizationInvitationRequest,
 	) => Promise<OrganizationInvitations[] | APIError>;
-	openVersionDrawer: (application: Application) => void;
-	closeVersionDrawer: () => void;
 }
 
 const useOrganizationStore = create<OrganizationStore>()(
@@ -75,9 +71,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 				organization: null,
 				organizations: [],
 				applications: [],
-				application: null,
 				temp: [],
-				isVersionOpen: false,
 				members: [],
 				invitations: [],
 				getAllOrganizationByUser: async () => {
@@ -443,18 +437,6 @@ const useOrganizationStore = create<OrganizationStore>()(
 						if (onError) onError(error as APIError);
 						throw error as APIError;
 					}
-				},
-				openVersionDrawer: (application: Application) => {
-					set({
-						isVersionOpen: true,
-						application,
-					});
-				},
-				closeVersionDrawer: () => {
-					set({
-						isVersionOpen: false,
-						application: null,
-					});
 				},
 			}),
 
