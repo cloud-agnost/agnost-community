@@ -14,10 +14,6 @@ spec:
          labels:
             app: platform-core
       spec:
-         volumes:
-            - name: cluster-storage
-              persistentVolumeClaim:
-                 claimName: cluster-storage-pvc
          containers:
             - name: platform-core
               image: agnost-community/platform/core
@@ -27,9 +23,6 @@ spec:
               imagePullPolicy: Never
               ports:
                  - containerPort: 4000
-              volumeMounts:
-                 - name: cluster-storage
-                   mountPath: /storage
               env:
                  - name: CACHE_HOSTNAME
                    value: redis-master        
@@ -85,3 +78,15 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: accessToken
+                 - name: MINIO_ENDPOINT
+                   value: "minio"
+                 - name: MINIO_PORT
+                   value: "9000"
+                 - name: MINIO_ACCESS_KEY
+                   value: appUser
+                 - name: MINIO_SECRET_KEY
+                   valueFrom:
+                      secretKeyRef:
+                         name: minio-credentials
+                         key: userPassword
+

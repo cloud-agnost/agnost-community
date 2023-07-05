@@ -261,13 +261,14 @@ router.put(
 			buffer = await sharp(req.file.buffer).resize(width, height).toBuffer();
 
 			// Specify the directory where you want to store the image
-			const uploadDirectory = config.get("general.storageDirectory");
+			const uploadBucket = config.get("general.storageBucket");
 			// Ensure file storage folder exists
-			storage.ensureFolder(uploadDirectory);
+			await storage.ensureBucket(uploadBucket);
+			return res.json();
 			// Delete existing file if it exists
 			storage.deleteFile(req.user.pictureUrl);
 			// Save the new file
-			const filePath = `${uploadDirectory}${helper.generateSlug("img", 6)}-${
+			const filePath = `${uploadBucket}${helper.generateSlug("img", 6)}-${
 				req.file.originalname
 			}`;
 			storage.saveFile(filePath, buffer);
