@@ -34,10 +34,17 @@
 		"members": "Members",
 		"invitations": "Pending Invitations",
 		"invite": "Invite",
-		"name": "App Name",
+		"name": {
+			"title": "App Name",
+			"success": "App name has been updated successfully",
+			"successDesc": "The app name has been updated successfully."
+		},
+
 		"avatar": {
 			"title": "App Avatar",
-			"description": "Click on the avatar to upload a custom one from your files. An avatar is optional but strongly recommended."
+			"description": "Click on the avatar to upload a custom one from your files. An avatar is optional but strongly recommended.",
+			"success": "App avatar has been updated successfully",
+			"successDesc": "The app avatar has been updated successfully."
 		},
 		"transfer": {
 			"title": "Transfer Ownership",
