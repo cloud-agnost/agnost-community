@@ -1,4 +1,4 @@
-import '@/features/auth/components/ChangeAvatar/changeAvatar.scss';
+import '@/features/auth/ChangeAvatar/changeAvatar.scss';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError } from '@/types';
 import { CircleNotch, Trash } from '@phosphor-icons/react';
