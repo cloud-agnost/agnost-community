@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { ApplicationCardSkeleton } from '@/components/Skeletons';
+import EditApplication from '@/features/application/EditApplication';
 
 function loader() {
 	return null;
@@ -98,6 +99,7 @@ export default function OrganizationApps() {
 				</EmptyState>
 			)}
 			<ApplicationVersions />
+			<EditApplication />
 		</div>
 	);
 }
