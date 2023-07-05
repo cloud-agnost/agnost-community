@@ -1,7 +1,7 @@
 import { cn } from '@/utils';
+import { CaretUp } from '@phosphor-icons/react';
 import { Column } from '@tanstack/react-table';
 import { Button } from '../Button';
-import { CaretUp, CaretDown } from '@phosphor-icons/react';
 import './sortButton.scss';
 interface SortButtonProps {
 	text: string;

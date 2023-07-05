@@ -5,6 +5,8 @@ import './autocomplete.scss';
 interface Props {
 	onChange: (value: OrganizationMember) => void;
 	loadOptions: (inputValue: string) => void;
+	formatOptionLabel?: (props: any) => JSX.Element;
+	formatGroupLabel?: (props: any) => JSX.Element;
 }
 
 export default function AutoComplete({ onChange, loadOptions, ...props }: Props) {

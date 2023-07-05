@@ -81,7 +81,7 @@ export default function TransferOrganization() {
 		setLoading(true);
 		transferOrganization({
 			organizationId: organization?._id as string,
-			userId: user?.member._id,
+			userId: user?._id,
 			onSuccess: () => {
 				setLoading(false);
 				notify({
@@ -109,7 +109,7 @@ export default function TransferOrganization() {
 			)}
 			<AutoComplete
 				loadOptions={loadOptions}
-				onChange={(res) => setUser(res.value)}
+				onChange={(res) => setUser(res.member)}
 				formatOptionLabel={formatOptionLabel}
 				formatGroupLabel={formatGroupLabel}
 			/>

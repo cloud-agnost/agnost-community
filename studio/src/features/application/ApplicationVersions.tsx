@@ -75,7 +75,7 @@ export default function ApplicationVersions() {
 							hasMore={true}
 							loader={<></>}
 						>
-							<VersionTable setPage={setVersionPage} />
+							<VersionTable />
 						</InfiniteScroll>
 						<DrawerFooter>
 							<DrawerClose asChild>

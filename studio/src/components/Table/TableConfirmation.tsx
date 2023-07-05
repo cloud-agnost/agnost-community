@@ -1,9 +1,9 @@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
+import { X } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../Button';
-import { X, WarningCircle } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback } from '../Avatar';
+import { Button } from '../Button';
 interface TableConfirmationProps {
 	children: React.ReactNode;
 	onConfirm: () => void;

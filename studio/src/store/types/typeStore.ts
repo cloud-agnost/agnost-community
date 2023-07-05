@@ -67,18 +67,20 @@ const useTypeStore = create<TypesStore>()(
 				orgRoles: [],
 				appRoles: [],
 				bvlTypes: [],
-				fieldTypes: {
-					name: '',
-					PostgreSQL: true,
-					MySQL: true,
-					'SQL Server': true,
-					MongoDB: true,
-					view: {
-						unique: true,
-						indexed: true,
-						immutable: true,
+				fieldTypes: [
+					{
+						name: '',
+						PostgreSQL: true,
+						MySQL: true,
+						'SQL Server': true,
+						MongoDB: true,
+						view: {
+							unique: true,
+							indexed: true,
+							immutable: true,
+						},
 					},
-				},
+				],
 				databaseTypes: [],
 				instanceTypes: {
 					engine: [],
@@ -90,27 +92,35 @@ const useTypeStore = create<TypesStore>()(
 					realtime: [],
 				},
 				phoneAuthSMSProviders: [
-					{
-						provider: '',
-						params: {
-							name: '',
-							title: '',
-							type: '',
-							description: '',
-							multiline: true,
+					[
+						{
+							provider: '',
+							params: [
+								{
+									name: '',
+									title: '',
+									type: '',
+									description: '',
+									multiline: true,
+								},
+							],
 						},
-					},
+					],
 				],
 				oAuthProviderTypes: [
-					{
-						provider: '',
-						params: {
-							name: '',
-							title: '',
-							type: '',
-							multiline: true,
+					[
+						{
+							provider: '',
+							params: [
+								{
+									name: '',
+									title: '',
+									type: '',
+									multiline: true,
+								},
+							],
 						},
-					},
+					],
 				],
 				authUserDataModel: [
 					{
@@ -118,6 +128,7 @@ const useTypeStore = create<TypesStore>()(
 						type: '',
 					},
 				],
+				isTypesOk: false,
 				getAllTypes: async () => {
 					try {
 						const res = await TypesService.getAllTypes();
