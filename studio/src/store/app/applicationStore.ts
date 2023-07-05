@@ -19,8 +19,8 @@ interface ApplicationStore {
 	error: APIError | null;
 	isVersionOpen: boolean;
 	isEditAppOpen: boolean;
-	applicationTeam: ApplicationMember[] | null;
-	tempTeam: ApplicationMember[] | null;
+	applicationTeam: ApplicationMember[];
+	tempTeam: ApplicationMember[];
 	teamOptions: TeamOption[];
 	changeAppName: (req: ChangeAppNameRequest) => Promise<Application>;
 	setAppAvatar: (req: SetAppAvatarRequest) => Promise<Application>;
