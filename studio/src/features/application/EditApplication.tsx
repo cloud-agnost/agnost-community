@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import AppGeneralSettings from './Settings/AppGeneralSettings';
+import AppMembers from './Settings/Members/AppMembers';
 const EDIT_APPLICATION_MENU_ITEMS = [
 	{
 		name: translate('application.edit.general'),
@@ -55,7 +56,10 @@ export default function EditApplication() {
 						);
 					})}
 				</nav>
-				<div className='p-6'>{searchParams.get('t') === 'general' && <AppGeneralSettings />}</div>
+				<div className='p-6'>
+					{searchParams.get('t') === 'general' && <AppGeneralSettings />}
+					{searchParams.get('t') === 'members' && <AppMembers />}
+				</div>
 			</DrawerContent>
 		</Drawer>
 	);
