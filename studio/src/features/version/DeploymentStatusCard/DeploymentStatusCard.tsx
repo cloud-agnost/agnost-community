@@ -4,7 +4,7 @@ import {
 	EmptyStatus,
 	LastDeployment,
 	Resources,
-} from '@/features/version/components/DeploymentStatusCard/';
+} from '@/features/version/DeploymentStatusCard/index.ts';
 import { cn } from '@/utils';
 import { GearSix } from '@phosphor-icons/react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';

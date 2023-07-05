@@ -1,6 +1,6 @@
 import { UserSettingsLayout } from '@/layouts/UserSettingsLayout';
 import { useTranslation } from 'react-i18next';
-import { Notifications } from '@/features/auth/components/Notifications';
+import { Notifications } from '@/features/auth/Notifications';
 
 export default function ProfileSettingsNotifications() {
 	const { t } = useTranslation();
