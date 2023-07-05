@@ -161,3 +161,11 @@ export interface SortOption {
 	value?: string;
 	sortDir?: 'asc' | 'desc';
 }
+export interface FormatOptionLabelProps {
+	label: string;
+	value: any;
+}
+export interface GroupedOption<T> {
+	readonly label: string;
+	readonly options: readonly T[];
+}
