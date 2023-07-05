@@ -28,5 +28,24 @@
 		"role": "Role",
 		"createdAt": "Created",
 		"team": "Team"
+	},
+	"edit": {
+		"general": "General",
+		"members": "Members",
+		"invitations": "Pending Invitations",
+		"invite": "Invite",
+		"name": "App Name",
+		"avatar": {
+			"title": "App Avatar",
+			"description": "Click on the avatar to upload a custom one from your files. An avatar is optional but strongly recommended."
+		},
+		"transfer": {
+			"title": "Transfer Ownership",
+			"description": "The organization owner is the person who has created the organization or the person to whom the organization ownership has been transferred. The Owner has full control over the organization and only organization owners can delete the organization or transfer its ownership to someone else.",
+			"subDesc": "Select the organization member with Admin role to transfer ownership",
+			"placeholder": "Select a member",
+			"success": "Ownership has been transferred successfully",
+			"successDesc": "You are no longer the owner of this organization. You can still access it as an admin."
+		}
 	}
 }
