@@ -265,6 +265,31 @@ router.post(
 
 /*
 @route      /v1/org/:orgId/app/:appId/version/:versionId
+@method     GET
+@desc       Returns a specific version
+@access     private
+*/
+router.get(
+	"/:versionId",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.view"),
+	async (req, res) => {
+		try {
+			const { version } = req;
+
+			res.json(version);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId
 @method     PUT
 @desc       Update the version information name, private, readOnly and default endpoint limits
 @access     private

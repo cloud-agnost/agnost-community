@@ -18,6 +18,7 @@ export const corePackages = [
 	"mysql2",
 	"nanoid",
 	"nocache",
+	"on-headers",
 	"pg",
 	"rate-limiter-flexible",
 	"redis",

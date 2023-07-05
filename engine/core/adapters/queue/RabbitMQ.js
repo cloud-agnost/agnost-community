@@ -56,20 +56,12 @@ export class RabbitMQ extends QueueBase {
 			queueName: queue.name,
 			submittedAt: new Date(),
 			status: "pending",
-			dealay: delayMs,
+			delay: delayMs,
 		});
 
-		this.driver.createChannel(function (error, channel) {
-			if (error) {
-				logger.error("Cannot create channel to message queue", {
-					details: error,
-				});
-
-				return;
-			}
-
+		try {
+			const channel = await this.driver.createChannel();
 			const envId = META.getEnvId();
-			const queueId = queue.iid;
 			const message = {
 				timestamp: new Date(),
 				trackingId: trackingId,
@@ -85,7 +77,7 @@ export class RabbitMQ extends QueueBase {
 				);
 				const exchangeName = `process-delayed-message-exchange-${envId}-${queue.name}-${exchangeNumber}`;
 
-				channel.assertExchange(exchangeName, "x-delayed-message", {
+				await channel.assertExchange(exchangeName, "x-delayed-message", {
 					durable: true,
 					autoDelete: true,
 					arguments: {
@@ -94,7 +86,7 @@ export class RabbitMQ extends QueueBase {
 				});
 
 				//Since payload is string we do not stringify it
-				channel.publish(
+				await channel.publish(
 					exchangeName,
 					"",
 					Buffer.from(JSON.stringify(message)),
@@ -113,18 +105,27 @@ export class RabbitMQ extends QueueBase {
 				);
 				const queueName = `process-message-${envId}-${queue.name}-${queueNumber}`;
 
-				channel.assertQueue(queueName, {
+				await channel.assertQueue(queueName, {
 					durable: true,
 					autoDelete: true,
 				});
 
-				channel.sendToQueue(queueName, Buffer.from(JSON.stringify(message)), {
-					persistent: true,
-					timestamp: Date.now(),
-				});
+				await channel.sendToQueue(
+					queueName,
+					Buffer.from(JSON.stringify(message)),
+					{
+						persistent: true,
+						timestamp: Date.now(),
+					}
+				);
 			}
-			channel.close();
-		});
+
+			await channel.close();
+		} catch (error) {
+			logger.error("Cannot create channel to message queue", {
+				details: error,
+			});
+		}
 	}
 
 	/**
@@ -177,7 +178,7 @@ export class RabbitMQ extends QueueBase {
 
 			channel.consume(
 				queue,
-				async function (messsage) {
+				async (messsage) => {
 					//Start timer
 					const start = Date.now();
 					const messageObj = JSON.parse(messsage.content.toString());
@@ -192,7 +193,7 @@ export class RabbitMQ extends QueueBase {
 					// Check whether the environment is suspended or not
 					if (META.isSuspended()) {
 						// Log processing of the message
-						await this.logMessageProcessing(
+						this.logMessageProcessing(
 							debugChannel,
 							trackingId,
 							queueObj,
@@ -210,11 +211,9 @@ export class RabbitMQ extends QueueBase {
 						return;
 					}
 
-					// We can run the queue code
-					const handlerModule = null;
 					try {
 						// Dynamicly import the
-						handlerModule = await import(
+						const handlerModule = await import(
 							`../../meta/queues/${queueObj.name}.js`
 						);
 
@@ -222,7 +221,7 @@ export class RabbitMQ extends QueueBase {
 						// Check the endpoint module has a default exprot or not
 						if (!handlerFunction) {
 							// Log processing of the message
-							await this.logMessageProcessing(
+							this.logMessageProcessing(
 								debugChannel,
 								trackingId,
 								queueObj,
@@ -252,7 +251,7 @@ export class RabbitMQ extends QueueBase {
 							)
 						) {
 							// Log processing of the message
-							await this.logMessageProcessing(
+							this.logMessageProcessing(
 								debugChannel,
 								trackingId,
 								queueObj,
@@ -275,7 +274,7 @@ export class RabbitMQ extends QueueBase {
 							// Run the function
 							await handlerFunction(payload);
 							// Log processing of the message
-							await this.logMessageProcessing(
+							this.logMessageProcessing(
 								debugChannel,
 								trackingId,
 								queueObj,
@@ -285,7 +284,7 @@ export class RabbitMQ extends QueueBase {
 							);
 						} catch (error) {
 							// Log processing of the message
-							await this.logMessageProcessing(
+							this.logMessageProcessing(
 								debugChannel,
 								trackingId,
 								queueObj,
@@ -311,12 +310,12 @@ export class RabbitMQ extends QueueBase {
 						}
 					} catch (error) {
 						// Log processing of the message
-						await this.logMessageProcessing(
+						this.logMessageProcessing(
 							debugChannel,
 							trackingId,
 							queueObj,
 							payload,
-							400, // Error code
+							500, // Error code
 							Date.now() - start,
 							helper.createErrorMessage(
 								ERROR_CODES.clientError,

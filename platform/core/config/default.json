@@ -54,7 +54,7 @@
         "maxEncryptedTextFieldLength": 50,
         "maxDecimalDigits": 10,
         "maxOptionsCount": 1000,
-        "storageDirectory": "/storage/",
+        "storageBucket": "cluster-storage",
          "platformBaseUrl": "http://platform-core-clusterip-service:4000",
          "workerUrl": "http://engine-worker-clusterip-service:4000",
          "defaulPVCSize": "1Gi",

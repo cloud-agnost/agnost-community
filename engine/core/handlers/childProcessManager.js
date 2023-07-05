@@ -441,9 +441,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		if (tasks.length === 0) return;
 
 		for (const task of tasks) {
-			const adapterObj = adapterManager.getTaskAdapter(queue.name);
+			const adapterObj = adapterManager.getTaskAdapter(task.name);
 			if (adapterObj) {
-				adapterObj.listenMessages(task.iid);
+				adapterObj.listenMessages(task);
 				this.addLog(`Initialized handler of task '${task.name}'`);
 			}
 		}

@@ -1,3 +1,5 @@
+import { getDBClient } from "../../init/db.js";
+
 export class SchedulerBase {
 	constructor() {}
 	async disconnect() {}
@@ -63,6 +65,7 @@ export class SchedulerBase {
 	 * @param  {Object} errors The errors object if any
 	 */
 	logTaskProcessing(debugChannel, trackingId, task, status, time, errors) {
+		const timestamp = new Date();
 		// If we have a debug channel then send the final message and turn off debug logging
 		if (debugChannel) {
 			if (status === 200)
@@ -71,7 +74,7 @@ export class SchedulerBase {
 						`'${
 							task.name
 						}' has completed processing the cron job successfully in ${
-							Math.round(duration * 10) / 10
+							Math.round(time * 10) / 10
 						}ms`
 					)
 				);
@@ -87,33 +90,35 @@ export class SchedulerBase {
 		}
 
 		logger.info(
-			`TASK: ${task.name} (${status}) ${Math.round(duration * 10) / 10}ms`
+			`TASK: ${task.name} (${status}) ${Math.round(time * 10) / 10}ms`
 		);
 
-		// Calculate size of the request and response body, if they are larger than certain size we do not log their content
-		const conn = getDBClient();
-		const timestamp = new Date();
-		const log = {
-			timestamp: timestamp,
-			name: task.name,
-			status: status === 400 ? "error" : "success", // 200 or 400
-			duration: time,
-			orgId: task.orgId,
-			appId: task.appId,
-			versionId: task.versionId,
-			envId: META.getEnvObj()._id,
-			taskId: task._id,
-			errors: errors,
-		};
-
-		// Save log to the database
-		conn
-			.db(META.getEnvId())
-			.collection("cronjob_logs")
-			.insertOne(log, { writeConcern: { w: 0 } });
-
-		// Also update the message info record
+		// Also update the cronjob info record
 		this.endProcessingTask(trackingId, timestamp, errors);
+
+		// If queue logs enabled then add the log entry to the database
+		if (task.logExecution) {
+			// Calculate size of the request and response body, if they are larger than certain size we do not log their content
+			const conn = getDBClient();
+			const log = {
+				timestamp: timestamp,
+				name: task.name,
+				status: status === 400 ? "error" : "success", // 200 or 400
+				duration: time,
+				orgId: task.orgId,
+				appId: task.appId,
+				versionId: task.versionId,
+				envId: META.getEnvObj()._id,
+				taskId: task._id,
+				errors: errors,
+			};
+
+			// Save log to the database
+			conn
+				.db(META.getEnvId())
+				.collection("cronjob_logs")
+				.insertOne(log, { writeConcern: { w: 0 } });
+		}
 	}
 }
 

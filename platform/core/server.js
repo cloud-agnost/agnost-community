@@ -102,7 +102,7 @@ async function initExpress(i18n) {
 	app.use((await import("./middlewares/touchVersion.js")).default);
 	app.use("/", (await import("./routes/system.js")).default);
 	// Serve static files from the storage directory
-	app.use("/storage", express.static(config.get("general.storageDirectory")));
+	app.use("/storage", express.static(config.get("general.storageBucket")));
 	app.use("/v1/cluster", (await import("./routes/cluster.js")).default);
 	app.use("/v1/engine", (await import("./routes/engine.js")).default);
 	app.use("/v1/platform", (await import("./routes/platform.js")).default);
@@ -152,6 +152,10 @@ async function initExpress(i18n) {
 	app.use(
 		"/v1/org/:orgId/app/:appId/version/:versionId/queue",
 		(await import("./routes/queue.js")).default
+	);
+	app.use(
+		"/v1/org/:orgId/app/:appId/version/:versionId/task",
+		(await import("./routes/task.js")).default
 	);
 
 	// Middleware to handle undefined paths or posts

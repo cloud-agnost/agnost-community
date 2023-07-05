@@ -2,25 +2,25 @@ import express from "express";
 import deployCtrl from "../controllers/deployment.js";
 import envCtrl from "../controllers/environment.js";
 import auditCtrl from "../controllers/audit.js";
-import queueCtrl from "../controllers/queue.js";
+import taskCtrl from "../controllers/task.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateApp } from "../middlewares/validateApp.js";
 import { validateVersion } from "../middlewares/validateVersion.js";
-import { validateQueue } from "../middlewares/validateQueue.js";
+import { validateTask } from "../middlewares/validateTask.js";
 import { authorizeAppAction } from "../middlewares/authorizeAppAction.js";
-import { applyRules } from "../schemas/queue.js";
+import { applyRules } from "../schemas/task.js";
 import { validate } from "../middlewares/validate.js";
-import { defaultQueueCode } from "../config/constants.js";
+import { defaultTaskCode } from "../config/constants.js";
 import { handleError } from "../schemas/platformError.js";
 
 const router = express.Router({ mergeParams: true });
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/queue?page=0&size=10&search=&sortBy=email&sortDir=asc&start&end
+@route      /v1/org/:orgId/app/:appId/version/:versionId/task?page=0&size=10&search=&sortBy=email&sortDir=asc&start&end
 @method     GET
-@desc       Get queues of the app version. This does not return the logic (e.g., code or flow) of the queues
+@desc       Get tasks of the app version. This does not return the logic (e.g., code or flow) of the tasks
 @access     private
 */
 router.get(
@@ -29,7 +29,7 @@ router.get(
 	validateOrg,
 	validateApp,
 	validateVersion,
-	authorizeAppAction("app.queue.view"),
+	authorizeAppAction("app.task.view"),
 	applyRules("view"),
 	validate,
 	async (req, res) => {
@@ -50,7 +50,7 @@ router.get(
 				sort[sortBy] = sortDir;
 			} else sort = { createdAt: "desc" };
 
-			let eps = await queueCtrl.getManyByQuery(query, {
+			let eps = await taskCtrl.getManyByQuery(query, {
 				sort,
 				skip: size * page,
 				limit: size,
@@ -65,23 +65,23 @@ router.get(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/queue/:queueId
+@route      /v1/org/:orgId/app/:appId/version/:versionId/task/:taskId
 @method     GET
-@desc       Get a specific queue, which also returns the logic (e.g., code or flow)
+@desc       Get a specific task, which also returns the logic (e.g., code or flow)
 @access     private
 */
 router.get(
-	"/:queueId",
+	"/:taskId",
 	authSession,
 	validateOrg,
 	validateApp,
 	validateVersion,
-	validateQueue,
-	authorizeAppAction("app.queue.view"),
+	validateTask,
+	authorizeAppAction("app.task.view"),
 	async (req, res) => {
 		try {
-			const { queue } = req;
-			res.json(queue);
+			const { task } = req;
+			res.json(task);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -89,9 +89,9 @@ router.get(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/queue
+@route      /v1/org/:orgId/app/:appId/version/:versionId/task
 @method     POST
-@desc       Creates a new queue
+@desc       Creates a new task
 @access     private
 */
 router.post(
@@ -101,34 +101,34 @@ router.post(
 	validateOrg,
 	validateApp,
 	validateVersion,
-	authorizeAppAction("app.queue.create"),
+	authorizeAppAction("app.task.create"),
 	applyRules("create"),
 	validate,
 	async (req, res) => {
-		const session = await queueCtrl.startSession();
+		const session = await taskCtrl.startSession();
 		try {
 			const { org, user, app, version, resource } = req;
-			const { name, delay, logExecution } = req.body;
+			const { name, cronExpression, logExecution } = req.body;
 
-			// Create the queue
-			let queueId = helper.generateId();
-			let queueiid = helper.generateSlug("que");
+			// Create the task
+			let taskId = helper.generateId();
+			let taskiid = helper.generateSlug("que");
 
-			let queue = await queueCtrl.create(
+			let task = await taskCtrl.create(
 				{
-					_id: queueId,
+					_id: taskId,
 					orgId: org._id,
 					appId: app._id,
 					versionId: version._id,
-					iid: queueiid,
+					iid: taskiid,
 					name,
-					delay: delay === 0 ? undefined : delay,
+					cronExpression,
 					logExecution,
 					type: "code",
-					logic: defaultQueueCode,
+					logic: defaultTaskCode,
 					createdBy: user._id,
 				},
-				{ cacheKey: queueId, session }
+				{ cacheKey: taskId, session }
 			);
 
 			// Add mapping to the environment
@@ -143,8 +143,8 @@ router.post(
 				"mappings",
 				{
 					design: {
-						iid: queueiid,
-						type: "queue",
+						iid: taskiid,
+						type: "scheduler",
 						name: name,
 					},
 					resource: {
@@ -158,76 +158,74 @@ router.post(
 				{ cacheKey: env._id, session }
 			);
 
-			await queueCtrl.commit(session);
-			res.json(queue);
+			await taskCtrl.commit(session);
+			res.json(task);
 
-			// Deploy queue updates to environments if auto-deployment is enabled
-			await deployCtrl.updateQueues(app, version, user, [queue], "add");
+			// Deploy task updates to environments if auto-deployment is enabled
+			await deployCtrl.updateTasks(app, version, user, [task], "add");
 
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.queue",
+				"org.app.version.task",
 				"create",
-				t("Created a new queue '%s'", name),
-				queue,
+				t("Created a new cron job '%s'", name),
+				task,
 				{
 					orgId: org._id,
 					appId: app._id,
 					versionId: version._id,
-					queueId: queue._id,
+					taskId: task._id,
 				}
 			);
 		} catch (err) {
-			await queueCtrl.rollback(session);
+			console.log("***here", err);
+			await taskCtrl.rollback(session);
 			handleError(req, res, err);
 		}
 	}
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/queue/:queueId
+@route      /v1/org/:orgId/app/:appId/version/:versionId/task/:taskId
 @method     PUT
-@desc      	Updates queue properties
+@desc      	Updates task properties
 @access     private
 */
 router.put(
-	"/:queueId",
+	"/:taskId",
 	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
 	validateVersion,
-	validateQueue,
-	authorizeAppAction("app.queue.update"),
+	validateTask,
+	authorizeAppAction("app.task.update"),
 	applyRules("update"),
 	validate,
 	async (req, res) => {
-		const session = await queueCtrl.startSession();
+		const session = await taskCtrl.startSession();
 		try {
-			const { org, user, app, version, queue } = req;
-			const { name, delay, logExecution } = req.body;
+			const { org, user, app, version, task } = req;
+			const { name, cronExpression, logExecution } = req.body;
 
-			let set = {
-				name,
-				delay,
-				logExecution,
-				updatedBy: user._id,
-			};
+			let updatedTask = await taskCtrl.updateOneById(
+				task._id,
+				{
+					name,
+					cronExpression,
+					logExecution,
+					updatedBy: user._id,
+				},
+				{},
+				{
+					cacheKey: task._id,
+					session,
+				}
+			);
 
-			let unset = {};
-			if (delay === undefined || delay === 0) {
-				delete set.delay;
-				unset.delay = "";
-			}
-
-			let updatedQueue = await queueCtrl.updateOneById(queue._id, set, unset, {
-				cacheKey: queue._id,
-				session,
-			});
-
-			if (queue.name !== name) {
+			if (task.name !== name) {
 				// Update the resouce mapping name info in environments if there is any
 				let env = await envCtrl.getOneByQuery(
 					{
@@ -241,7 +239,7 @@ router.put(
 				await envCtrl.updateOneByQuery(
 					{
 						_id: env._id,
-						"mappings.design.iid": queue.iid,
+						"mappings.design.iid": task.iid,
 					},
 					{ "mappings.$.design.name": name },
 					{},
@@ -249,94 +247,82 @@ router.put(
 				);
 			}
 
-			await queueCtrl.commit(session);
-			res.json(updatedQueue);
+			await taskCtrl.commit(session);
+			res.json(updatedTask);
 
-			// Deploy queue updates to environments if auto-deployment is enabled
-			await deployCtrl.updateQueues(
-				app,
-				version,
-				user,
-				[updatedQueue],
-				"update"
-			);
+			// Deploy task updates to environments if auto-deployment is enabled
+			await deployCtrl.updateTasks(app, version, user, [updatedTask], "update");
 
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.queue",
+				"org.app.version.task",
 				"update",
-				t("Updated the properties of queue '%s'", updatedQueue.name),
-				updatedQueue,
+				t("Updated the properties of cron job '%s'", updatedTask.name),
+				updatedTask,
 				{
 					orgId: org._id,
 					appId: app._id,
 					versionId: version._id,
-					queueId: queue._id,
+					taskId: task._id,
 				}
 			);
 		} catch (err) {
-			await queueCtrl.rollback(session);
+			await taskCtrl.rollback(session);
 			handleError(req, res, err);
 		}
 	}
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/queue/:queueId/logic
+@route      /v1/org/:orgId/app/:appId/version/:versionId/task/:taskId/logic
 @method     PUT
-@desc       Saves the logic (e.g., code) of the queue
+@desc       Saves the logic (e.g., code) of the task
 @access     private
 */
 router.put(
-	"/:queueId/logic",
+	"/:taskId/logic",
 	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
 	validateVersion,
-	validateQueue,
-	authorizeAppAction("app.queue.update"),
+	validateTask,
+	authorizeAppAction("app.task.update"),
 	applyRules("save-logic"),
 	validate,
 	async (req, res) => {
 		try {
-			const { org, user, app, version, queue } = req;
+			const { org, user, app, version, task } = req;
 			const { logic } = req.body;
 
 			// Update the endpoing logic/code
-			const updatedQueue = await queueCtrl.updateOneById(
-				queue._id,
+			const updatedTask = await taskCtrl.updateOneById(
+				task._id,
 				{ logic, updatedBy: user._id },
 				{},
-				{ cacheKey: queue._id }
+				{ cacheKey: task._id }
 			);
 
-			res.json(updatedQueue);
+			res.json(updatedTask);
 
-			// Deploy queue updates to environments if auto-deployment is enabled
-			await deployCtrl.updateQueues(
-				app,
-				version,
-				user,
-				[updatedQueue],
-				"update"
-			);
+			// Deploy task updates to environments if auto-deployment is enabled
+			await deployCtrl.updateTasks(app, version, user, [updatedTask], "update");
 
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.queue",
+				"org.app.version.task",
 				"update",
-				t("Updated the handler of queue '%s'", updatedQueue.name),
-				updatedQueue,
+				t("Updated the handler of cron job '%s'", updatedTask.name),
+				updatedTask,
 				{
 					orgId: org._id,
 					appId: app._id,
 					versionId: version._id,
-					queueId: queue._id,
+					taskId: task._id,
 				}
 			);
 		} catch (err) {
@@ -346,9 +332,9 @@ router.put(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/queue/delete-multi
+@route      /v1/org/:orgId/app/:appId/version/:versionId/task/delete-multi
 @method     DELETE
-@desc       Deletes multiple queues
+@desc       Deletes multiple tasks
 @access     private
 */
 router.delete(
@@ -358,27 +344,27 @@ router.delete(
 	validateOrg,
 	validateApp,
 	validateVersion,
-	authorizeAppAction("app.queue.delete"),
+	authorizeAppAction("app.task.delete"),
 	applyRules("delete-multi"),
 	validate,
 	async (req, res) => {
-		const session = await queueCtrl.startSession();
+		const session = await taskCtrl.startSession();
 		try {
 			const { org, user, app, version } = req;
-			const { queueIds } = req.body;
+			const { taskIds } = req.body;
 
-			// Get the list of queues that will be deleted
-			let queues = await queueCtrl.getManyByQuery({
-				_id: { $in: queueIds },
+			// Get the list of tasks that will be deleted
+			let tasks = await taskCtrl.getManyByQuery({
+				_id: { $in: taskIds },
 				versionId: version._id,
 			});
 
-			if (queues.length === 0) return res.json();
+			if (tasks.length === 0) return res.json();
 
-			// Delete the queues
-			let ids = queues.map((entry) => entry._id);
-			let iids = queues.map((entry) => entry.iid);
-			await queueCtrl.deleteManyByQuery(
+			// Delete the tasks
+			let ids = tasks.map((entry) => entry._id);
+			let iids = tasks.map((entry) => entry.iid);
+			await taskCtrl.deleteManyByQuery(
 				{ _id: { $in: ids } },
 				{ cacheKey: ids, session }
 			);
@@ -399,58 +385,58 @@ router.delete(
 				{ cacheKey: env._id, session }
 			);
 
-			await queueCtrl.commit(session);
+			await taskCtrl.commit(session);
 			res.json();
 
-			// Deploy queue updates to environments if auto-deployment is enabled
-			await deployCtrl.updateQueues(app, version, user, queues, "delete");
+			// Deploy task updates to environments if auto-deployment is enabled
+			await deployCtrl.updateTasks(app, version, user, tasks, "delete");
 
-			queues.forEach((queue) => {
+			tasks.forEach((task) => {
 				// Log action
 				auditCtrl.logAndNotify(
 					version._id,
 					user,
-					"org.app.version.queue",
+					"org.app.version.task",
 					"delete",
-					t("Deleted queue '%s'", queue.name),
+					t("Deleted cron job '%s'", task.name),
 					{},
 					{
 						orgId: org._id,
 						appId: app._id,
 						versionId: version._id,
-						queueId: queue._id,
+						taskId: task._id,
 					}
 				);
 			});
 		} catch (err) {
-			await queueCtrl.rollback(session);
+			await taskCtrl.rollback(session);
 			handleError(req, res, err);
 		}
 	}
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/queue/:queueId
+@route      /v1/org/:orgId/app/:appId/version/:versionId/task/:taskId
 @method     DELETE
-@desc       Delete a specific queue
+@desc       Delete a specific task
 @access     private
 */
 router.delete(
-	"/:queueId",
+	"/:taskId",
 	authSession,
 	validateOrg,
 	validateApp,
 	validateVersion,
-	validateQueue,
-	authorizeAppAction("app.queue.delete"),
+	validateTask,
+	authorizeAppAction("app.task.delete"),
 	async (req, res) => {
-		const session = await queueCtrl.startSession();
+		const session = await taskCtrl.startSession();
 		try {
-			const { org, user, app, version, queue } = req;
+			const { org, user, app, version, task } = req;
 
-			// Delete the queue
-			await queueCtrl.deleteOneById(queue._id, {
-				cacheKey: queue._id,
+			// Delete the task
+			await taskCtrl.deleteOneById(task._id, {
+				cacheKey: task._id,
 				session,
 			});
 
@@ -465,34 +451,34 @@ router.delete(
 			await envCtrl.pullObjectByQuery(
 				env._id,
 				"mappings",
-				{ "design.iid": queue.iid },
+				{ "design.iid": task.iid },
 				{ updatedBy: user._id },
 				{ cacheKey: env._id, session }
 			);
 
-			await queueCtrl.commit(session);
+			await taskCtrl.commit(session);
 			res.json();
 
-			// Deploy queue updates to environments if auto-deployment is enabled
-			await deployCtrl.updateQueues(app, version, user, [queue], "delete");
+			// Deploy task updates to environments if auto-deployment is enabled
+			await deployCtrl.updateTasks(app, version, user, [task], "delete");
 
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.queue",
+				"org.app.version.task",
 				"delete",
-				t("Deleted queue '%s'", queue.name),
+				t("Deleted cron job '%s'", task.name),
 				{},
 				{
 					orgId: org._id,
 					appId: app._id,
 					versionId: version._id,
-					queueId: queue._id,
+					taskId: task._id,
 				}
 			);
 		} catch (err) {
-			await queueCtrl.rollback(session);
+			await taskCtrl.rollback(session);
 			handleError(req, res, err);
 		}
 	}

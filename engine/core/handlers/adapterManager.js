@@ -106,6 +106,15 @@ export class AdapterManager {
 	}
 
 	/**
+	 * Returns the message queue connection object matching the name
+	 * @param  {string} name The design name of the resource
+	 */
+	getTaskAdapter(name) {
+		const adapterObj = this.getAdapterObject(name, "scheduler", false);
+		return adapterObj?.adapter || null;
+	}
+
+	/**
 	 * Returns the realtime connection object matching the name
 	 * @param  {string} name The design name of the resource
 	 */

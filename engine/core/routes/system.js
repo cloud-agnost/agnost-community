@@ -1,7 +1,8 @@
 import express from "express";
 import responseTime from "response-time";
 import { logRequestToConsole } from "../middlewares/logRequest.js";
-import { authAccessToken } from "../middlewares/authAccessToken.js";
+import { checkContentType } from "../middlewares/checkContentType.js";
+import { adapterManager } from "../handlers/adapterManager.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -39,9 +40,15 @@ router.get("/ping", responseTime(logRequestToConsole), (req, res) => {
 */
 router.post(
 	"/test/queue",
-	authAccessToken,
+	checkContentType,
+	//authAccessToken,
 	responseTime(logRequestToConsole),
-	(req, res) => {
+	async (req, res) => {
+		const { queueiid, delay, payload } = req.body;
+		const queue = await META.getQueue(queueiid);
+		const adapterObj = adapterManager.getQueueAdapter(queue.name);
+		await adapterObj.sendMessage(queue, payload, delay);
+
 		res.status(200).send("Hello queue tester");
 	}
 );

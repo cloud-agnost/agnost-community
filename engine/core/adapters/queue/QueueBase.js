@@ -93,6 +93,7 @@ export class QueueBase {
 		time,
 		errors
 	) {
+		const timestamp = new Date();
 		// If we have a debug channel then send the final message and turn off debug logging
 		if (debugChannel) {
 			if (status === 200)
@@ -101,7 +102,7 @@ export class QueueBase {
 						`'${
 							queue.name
 						}' has completed processing the input message successfully in ${
-							Math.round(duration * 10) / 10
+							Math.round(time * 10) / 10
 						}ms`
 					)
 				);
@@ -117,7 +118,7 @@ export class QueueBase {
 		}
 
 		logger.info(
-			`QUEUE: ${queue.name} (${status}) ${Math.round(duration * 10) / 10}ms`
+			`QUEUE: ${queue.name} (${status}) ${Math.round(time * 10) / 10}ms`
 		);
 
 		// Update the message info record
@@ -129,7 +130,6 @@ export class QueueBase {
 			const conn = getDBClient();
 			const messageSize = Buffer.byteLength(JSON.stringify(payload));
 
-			const timestamp = new Date();
 			const log = {
 				timestamp: timestamp,
 				name: queue.name,

@@ -21,14 +21,14 @@ import { logRequest } from "./middlewares/logRequest.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-(function () {
+(async function () {
 	logger.info(`Process ${process.pid} is running`);
 	// Init globally accessible variables
 	initGlobals();
 	// Set up locatlization
 	const i18n = initLocalization();
 	// Connect to the database
-	connectToDatabase();
+	await connectToDatabase();
 	// Connect to cache server(s)
 	connectToRedisCache();
 	// Connect to message queue
@@ -36,7 +36,7 @@ const __dirname = path.dirname(__filename);
 	// Spin up http server
 	const server = initExpress(i18n);
 	// Start cron job scheduler service
-	startAgenda();
+	await startAgenda();
 	// Gracefull handle process exist
 	handleProcessExit(server);
 })();

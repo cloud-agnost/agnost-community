@@ -35,7 +35,7 @@ export const validateVersion = async (req, res, next) => {
 		}
 
 		// If this is a private version then only authorized people can view and update it
-		if (version.private) {
+		if (version.private && req.user) {
 			if (
 				version.createdBy.toString() !== req.user._id.toString() &&
 				req.appMember.role !== "Admin"

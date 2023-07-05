@@ -354,16 +354,16 @@ router.put(
 			buffer = await sharp(req.file.buffer).resize(width, height).toBuffer();
 
 			// Specify the directory where you want to store the image
-			const uploadDirectory = config.get("general.storageDirectory");
+			const uploadBucket = config.get("general.storageBucket");
 			// Ensure file storage folder exists
-			storage.ensureFolder(uploadDirectory);
+			await storage.ensureBucket(uploadBucket);
 			// Delete existing file if it exists
-			storage.deleteFile(req.org.pictureUrl);
+			await storage.deleteFile(uploadBucket, req.org.pictureUrl);
 			// Save the new file
-			const filePath = `${uploadDirectory}${helper.generateSlug("img", 6)}-${
+			const filePath = `avatars/${helper.generateSlug("img", 6)}-${
 				req.file.originalname
 			}`;
-			storage.saveFile(filePath, buffer);
+			await storage.saveFile(uploadBucket, filePath, buffer);
 
 			// Update organization with the new profile image url
 			let orgObj = await orgCtrl.updateOneById(

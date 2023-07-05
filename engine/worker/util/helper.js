@@ -103,7 +103,7 @@ function handleError(req, res, error) {
  * Generate a new unique MongoDB identifier
  */
 function generateId() {
-	return new mongo.ObjectID();
+	return new mongo.ObjectId();
 }
 
 /**
@@ -111,7 +111,7 @@ function generateId() {
  * @param  {string} idString The string representation of the id
  */
 function objectId(idString) {
-	return new mongo.ObjectID(idString);
+	return new mongo.ObjectId(idString);
 }
 
 /**

@@ -758,3 +758,9 @@ export const defaultQueueCode = `const queueHandler = (message) => {
 };
 
 export default queueHandler;`;
+
+export const defaultTaskCode = `const cronJobHandler = () => {
+
+};
+
+export default cronJobHandler;`;

@@ -187,25 +187,27 @@ router.put(
 				{ cacheKey: db._id }
 			);
 
-			// Update the resouce mapping name info in environments if there is any
-			let env = await envCtrl.getOneByQuery(
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-				},
-				{ session }
-			);
+			if (db.name !== name) {
+				// Update the resouce mapping name info in environments if there is any
+				let env = await envCtrl.getOneByQuery(
+					{
+						orgId: org._id,
+						appId: app._id,
+						versionId: version._id,
+					},
+					{ session }
+				);
 
-			await envCtrl.updateOneByQuery(
-				{
-					_id: env._id,
-					"mappings.design.iid": db.iid,
-				},
-				{ "mappings.$.design.name": name },
-				{},
-				{ cacheKey: env._id, session }
-			);
+				await envCtrl.updateOneByQuery(
+					{
+						_id: env._id,
+						"mappings.design.iid": db.iid,
+					},
+					{ "mappings.$.design.name": name },
+					{},
+					{ cacheKey: env._id, session }
+				);
+			}
 
 			// Commit the database transaction
 			await dbCtrl.commit(session);
