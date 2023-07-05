@@ -21,6 +21,8 @@ export type {
 	FinalizeAccountSetupRequest,
 	SortOption,
 	ToastType,
+	FormatOptionLabelProps,
+	GroupedOption,
 } from './type.ts';
 
 export type {
@@ -29,12 +31,17 @@ export type {
 	CreateApplicationResponse,
 	DeleteApplicationRequest,
 	Team,
+	ChangeAppNameRequest,
+	TransferAppOwnershipRequest,
+	SetAppAvatarRequest,
+	ApplicationMember,
+	TeamOption,
 } from './application.ts';
 
 export { CreateApplicationSchema } from './application.ts';
 export type * from './database.ts';
 export type * from './environment.ts';
 export { CreateOrganizationSchema } from './organization.ts';
-export type * from './resource.ts';
 export type { ResLog, Resource } from './resource.ts';
+export type * from './resource.ts';
 export type * from './version.ts';

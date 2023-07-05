@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BaseRequest } from './type';
+import { BaseRequest, User } from './type';
 import { translate } from '@/utils';
 import { Environment, EnvLog } from './environment';
 import { Version } from './version';
@@ -62,4 +62,25 @@ export interface CreateApplicationResponse {
 export interface DeleteApplicationRequest extends BaseRequest {
 	appId: string;
 	orgId: string;
+}
+export interface ChangeAppNameRequest extends BaseRequest {
+	name: string;
+}
+export interface SetAppAvatarRequest extends BaseRequest {
+	picture: File;
+	appId: string;
+}
+export interface TransferAppOwnershipRequest extends BaseRequest {
+	userId: string;
+}
+export interface ApplicationMember {
+	_id: string;
+	appId: string;
+	role: string;
+	joinDate: string;
+	member: User;
+}
+export interface TeamOption {
+	readonly value: ApplicationMember;
+	readonly label: string;
 }
