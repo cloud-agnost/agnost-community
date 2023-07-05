@@ -13,5 +13,9 @@
 	"open": "Open",
 	"name": "Name",
 	"save": "Save",
-	"transfer": "Transfer"
+	"transfer": "Transfer",
+	"delete_all": "Delete All",
+	"actions": "Actions",
+	"selected": "{{count}} selected",
+	"search": "Search"
 }
