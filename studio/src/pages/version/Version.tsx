@@ -12,7 +12,7 @@ export default function Version() {
 
 Version.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { appId, orgId } = params;
-	console.log(appId, orgId);
+
 	if (!appId || !orgId) return null;
 	await useVersionStore.getState().getAllVersionsVisibleToUser(orgId, appId);
 	return null;
