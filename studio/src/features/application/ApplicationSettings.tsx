@@ -53,6 +53,7 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 						<CommandGroup>
 							{APPLICATION_SETTINGS.map((setting) => (
 								<CommandItem
+									id={setting.id}
 									key={setting.name}
 									onSelect={() => {
 										setOpen(false);
