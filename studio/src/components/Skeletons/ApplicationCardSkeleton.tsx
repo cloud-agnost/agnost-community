@@ -1,4 +1,3 @@
-import React from 'react';
 import './skeleton.scss';
 export default function ApplicationCardSkeleton() {
 	return (

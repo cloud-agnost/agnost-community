@@ -7,7 +7,6 @@ import { getRelativeTime } from '@/utils/utils';
 import { useTranslation } from 'react-i18next';
 import { ApplicationTeam } from '.';
 import ApplicationSettings from './ApplicationSettings';
-import useVersionStore from '@/store/version/versionStore';
 import './application.scss';
 interface ApplicationCardProps {
 	application: Application;

@@ -1,4 +1,8 @@
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { APIError } from '@/types';
+import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
 import { Button } from 'components/Button';
 import {
 	Form,
@@ -9,15 +13,10 @@ import {
 	FormMessage,
 } from 'components/Form';
 import { Input } from 'components/Input';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { useToast } from '@/hooks';
-import useOrganizationStore from '@/store/organization/organizationStore';
-import { APIError } from '@/types';
-import { translate } from '@/utils';
-import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import * as z from 'zod';
 
 const FormSchema = z.object({
 	name: z
@@ -40,7 +39,6 @@ const FormSchema = z.object({
 export default function ChangeOrganizationName() {
 	const [error, setError] = useState<APIError | null>(null);
 	const [loading, setLoading] = useState(false);
-	const { notify } = useToast();
 	const { organization, changeOrganizationName } = useOrganizationStore();
 	const { t } = useTranslation();
 

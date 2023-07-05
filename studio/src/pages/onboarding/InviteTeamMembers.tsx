@@ -5,7 +5,7 @@ import useOnboardingStore from '@/store/onboarding/onboardingStore';
 import useTypeStore from '@/store/types/typeStore';
 import { APIError, AppMembers } from '@/types/type';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 
 async function loader() {
 	const { isTypesOk, getAllTypes } = useTypeStore.getState();
@@ -20,7 +20,6 @@ export default function InviteTeamMembers() {
 	const { setStepByPath, setDataPartially, data: onboardingReq } = useOnboardingStore();
 	const { finalizeClusterSetup } = useClusterStore();
 	const { appRoles } = useTypeStore();
-	const navigate = useNavigate();
 	const { t } = useTranslation();
 
 	async function onSubmit(data: { member: AppMembers[] }, setError: (error: APIError) => void) {
