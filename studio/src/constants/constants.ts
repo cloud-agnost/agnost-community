@@ -2,7 +2,7 @@ import Database from '@/assets/images/database.png';
 import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
 import { BellRing, ChangeLog, LightBulb, LineSegments, Team } from '@/components/icons';
-import useOrganizationStore from '@/store/organization/organizationStore';
+import useApplicationStore from '@/store/app/applicationStore';
 import { Application, SortOption } from '@/types';
 import { translate } from '@/utils';
 import { Database as DatabaseIcon, DeviceTablet, FileText, GearSix } from '@phosphor-icons/react';
@@ -80,15 +80,30 @@ export const ORGANIZATION_MENU_ITEMS = [
 
 export const APPLICATION_SETTINGS = [
 	{
+		id: 'open-version',
 		name: translate('application.settings.openVersion'),
 		onClick: (application: Application) => {
-			useOrganizationStore.getState().openVersionDrawer(application);
+			useApplicationStore.getState().openVersionDrawer(application);
 		},
 	},
 	{
+		id: 'edit-app',
 		name: translate('application.settings.editApp'),
+		onClick: (application: Application) => {
+			useApplicationStore.getState().openEditAppDrawer(application);
+			const searchParams = new URLSearchParams(window.location.search);
+			if (!searchParams.get('t')) {
+				searchParams.set('t', 'general');
+				window.history.replaceState(
+					null,
+					'',
+					`${window.location.pathname}?${searchParams.toString()}`,
+				);
+			}
+		},
 	},
 	{
+		id: 'add-members',
 		name: translate('general.addMembers'),
 	},
 ];
