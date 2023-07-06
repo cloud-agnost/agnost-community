@@ -34,17 +34,17 @@ spec:
                  - name: QUEUE_USERNAME
                    valueFrom:
                       secretKeyRef:
-                         name: rabbitmq-credentials
+                         name: rabbitmq-default-user
                          key: username
                  - name: QUEUE_PASSWORD
                    valueFrom:
                       secretKeyRef:
-                         name: rabbitmq-credentials
+                         name: rabbitmq-default-user
                          key: password
                  - name: QUEUE_HOST
                    valueFrom:
                       secretKeyRef:
-                         name: rabbitmq-credentials
+                         name: rabbitmq-default-user
                          key: host
                  - name: CLUSTER_DB_URI
                    valueFrom:
