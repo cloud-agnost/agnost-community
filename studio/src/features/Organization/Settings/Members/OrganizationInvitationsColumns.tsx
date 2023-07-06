@@ -1,18 +1,15 @@
-import { ColumnDef } from '@tanstack/react-table';
-import { Invitation } from '@/types';
 import { Button } from '@/components/Button';
-import { EnvelopeSimple, Trash } from '@phosphor-icons/react';
 import { Checkbox } from '@/components/Checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
-import useTypeStore from '@/store/types/typeStore';
-import { formatDate } from '@/utils';
-import useOrganizationStore from '@/store/organization/organizationStore';
-import { useToast } from '@/hooks';
 import { TableConfirmation } from '@/components/Table';
-import { translate } from '@/utils';
-const roles = useTypeStore.getState().orgRoles;
+import useOrganizationStore from '@/store/organization/organizationStore';
+import useTypeStore from '@/store/types/typeStore';
+import { Invitation } from '@/types';
+import { notify, formatDate, translate } from '@/utils';
+import { EnvelopeSimple, Trash } from '@phosphor-icons/react';
+import { ColumnDef } from '@tanstack/react-table';
 
-const { notify } = useToast();
+const roles = useTypeStore.getState?.().orgRoles;
 
 export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 	{
