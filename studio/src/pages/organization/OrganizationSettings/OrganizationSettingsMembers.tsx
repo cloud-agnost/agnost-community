@@ -41,7 +41,7 @@ export default function OrganizationSettingsMembers() {
 			onSuccess: () => {
 				notify({
 					title: t('general.success'),
-					description: t('general.invitation_success'),
+					description: t('general.invitation.success'),
 					type: 'success',
 				});
 			},
