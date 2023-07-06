@@ -16,7 +16,8 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 	const { user } = useAuthStore();
 	const { t } = useTranslation();
 	const { openVersionDrawer } = useApplicationStore();
-	const role = application.team.find((member) => member._id !== user?._id)?.role;
+
+	const role = application.team.find(({ userId }) => userId._id === user?._id)?.role;
 	return (
 		<div
 			className='application-card'
