@@ -18,8 +18,8 @@ interface InviteMemberFormProps {
 	submitForm: (data: any, setError: (error: APIError | null) => void) => void;
 	roles: string[];
 	actions: React.ReactNode;
-	title: string;
-	description: string;
+	title?: string;
+	description?: string;
 }
 
 export default function InviteMemberForm({
@@ -68,7 +68,10 @@ export default function InviteMemberForm({
 		resolver: zodResolver(FormSchema),
 	});
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		submitForm(data, setError);
+		submitForm(
+			data.member.filter((item) => item.email !== '' && item.role !== ''),
+			setError,
+		);
 		form.reset();
 	}
 	const { fields, append, remove } = useFieldArray({
@@ -106,7 +109,7 @@ export default function InviteMemberForm({
 	}, [form.formState.errors]);
 	return (
 		<div className='max-w-2xl space-y-12'>
-			<Description title={title}>{description}</Description>
+			{title && <Description title={title}>{description}</Description>}
 			{error && (
 				<Alert variant='error'>
 					<AlertTitle>{error.error}</AlertTitle>
