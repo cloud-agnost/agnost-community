@@ -6,14 +6,16 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Button } from '../Button';
 import './searchInput.scss';
+import { useTranslation } from 'react-i18next';
 interface SearchInputProps extends React.ComponentPropsWithoutRef<'input'> {
 	onSearch?: (value: string) => void;
+	placeholder?: string | null;
 }
 const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
 	({ className, placeholder, onSearch, value, ...props }, ref) => {
 		const [inputValue, setInputValue] = useState<string>((value as string) ?? '');
 		const searchTerm = useDebounce(inputValue, 500);
-
+		const { t } = useTranslation();
 		useUpdateEffect(() => {
 			onSearch?.(searchTerm);
 		}, [searchTerm]);
@@ -25,7 +27,7 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
 					ref={ref}
 					value={inputValue}
 					onChange={(e) => setInputValue(e.target.value)}
-					placeholder={placeholder}
+					placeholder={placeholder ?? t('general.search').toString()}
 					className='search-input'
 				/>
 				{inputValue && (
