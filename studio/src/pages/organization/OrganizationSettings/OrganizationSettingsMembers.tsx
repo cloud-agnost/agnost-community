@@ -33,15 +33,15 @@ export default function OrganizationSettingsMembers() {
 
 	const { notify } = useToast();
 
-	function onSubmit(data: { member: OrgMemberRequest[] }, setError: (error: APIError) => void) {
+	function onSubmit(data: OrgMemberRequest[], setError: (error: APIError) => void) {
 		inviteUsersToOrganization({
 			organizationId: organization?._id as string,
-			members: data.member.filter((item) => item.email !== '' && item.role !== ''),
+			members: data,
 			uiBaseURL: window.location.origin,
 			onSuccess: () => {
 				notify({
-					title: 'Success',
-					description: 'success',
+					title: t('general.success'),
+					description: t('general.invitation_success'),
 					type: 'success',
 				});
 			},
@@ -84,8 +84,8 @@ export default function OrganizationSettingsMembers() {
 			<InviteMemberForm
 				submitForm={onSubmit}
 				roles={orgRoles}
-				title={t('organization.settings.members.invite.title')}
-				description={t('organization.settings.members.invite.desc')}
+				title={t('organization.settings.members.invite.title') as string}
+				description={t('organization.settings.members.invite.desc') as string}
 				actions={
 					<Button variant='primary' size='lg'>
 						Invite
