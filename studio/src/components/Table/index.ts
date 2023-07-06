@@ -10,3 +10,4 @@ export {
 } from './Table';
 
 export { TableConfirmation } from './TableConfirmation';
+export { default as SelectedRowDropdown } from './SelectedRowDropdown';
