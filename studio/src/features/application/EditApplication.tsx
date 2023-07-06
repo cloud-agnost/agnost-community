@@ -1,26 +1,13 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
+import { EDIT_APPLICATION_MENU_ITEMS } from '@/constants';
 import OrganizationMenuItem from '@/features/organization/navbar/OrganizationMenuItem';
 import useApplicationStore from '@/store/app/applicationStore';
-import { translate } from '@/utils';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import AppGeneralSettings from './Settings/AppGeneralSettings';
 import AppMembers from './Settings/Members/AppMembers';
-const EDIT_APPLICATION_MENU_ITEMS = [
-	{
-		name: translate('application.edit.general'),
-		href: '?t=general',
-	},
-	{
-		name: translate('application.edit.members'),
-		href: '?t=members',
-	},
-	{
-		name: translate('application.edit.invitations'),
-		href: '?t=invitations',
-	},
-];
+
 export default function EditApplication() {
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
