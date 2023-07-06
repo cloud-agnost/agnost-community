@@ -1,5 +1,5 @@
 .header-menu {
-	--height: 72px;
+	--height: var(--header-menu-height);
 	@apply bg-base flex justify-between items-center h-[var(--height)] py-3 px-6 border-b border-border;
 	@apply sticky top-0 z-50;
 	&-divider {
@@ -19,7 +19,7 @@
 	&-right {
 		@apply flex gap-3 items-center text-icon-base;
 		&-nav {
-			@apply hidden md:flex gap-1 items-center;
+			@apply hidden 2xl:flex gap-1 items-center;
 			&-item {
 				@apply flex items-center gap-1 p-2 transition rounded;
 				&:hover {
@@ -60,7 +60,7 @@
 		}
 
 		.header-menu-divider {
-			@apply hidden md:block;
+			@apply hidden 2xl:block;
 		}
 	}
 }

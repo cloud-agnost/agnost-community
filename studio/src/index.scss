@@ -10,6 +10,9 @@
 
 @layer base {
 	:root {
+		--header-menu-height: 72px;
+		--navigation-tab-menu-height: 41px;
+
 		--font-sans: 'Rubik', sans-serif;
 		--font-albert: 'Albert Sans', sans-serif;
 
@@ -157,16 +160,16 @@
 		--purple-800: 98, 37, 127;
 		--purple-900: 65, 25, 84;
 
-		--red--50: 252, 218, 226;
-		--red--100: 249, 193, 206;
-		--red--200: 246, 161, 182;
-		--red--300: 244, 130, 158;
-		--red--400: 241, 99, 133;
-		--red--500: 238, 68, 109;
-		--red--600: 198, 57, 91;
-		--red--700: 159, 45, 73;
-		--red--800: 119, 34, 55;
-		--red--900: 79, 23, 36;
+		--red-50: 252, 218, 226;
+		--red-100: 249, 193, 206;
+		--red-200: 246, 161, 182;
+		--red-300: 244, 130, 158;
+		--red-400: 241, 99, 133;
+		--red-500: 238, 68, 109;
+		--red-600: 198, 57, 91;
+		--red-700: 159, 45, 73;
+		--red-800: 119, 34, 55;
+		--red-900: 79, 23, 36;
 
 		--green-50: 207, 241, 225;
 		--green-100: 176, 232, 205;
@@ -271,6 +274,16 @@
 @layer utilities {
 	.no-scrollbar::-webkit-scrollbar {
 		display: none;
+	}
+
+	.full-height-without-header {
+		--height: calc(100vh - (var(--header-menu-height) + var(--navigation-tab-menu-height)));
+		height: var(--height);
+	}
+
+	.full-max-height-without-header {
+		--height: calc(100vh - (var(--header-menu-height) + var(--navigation-tab-menu-height)));
+		max-height: var(--height);
 	}
 
 	.no-scrollbar {

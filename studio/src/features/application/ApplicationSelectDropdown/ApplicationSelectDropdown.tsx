@@ -16,8 +16,9 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import { Application } from '@/types';
 import { cn } from '@/utils';
 import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
-import { useState } from 'react';
+import { MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
 import './appSelectDropdown.scss';
 
 export default function ApplicationSelectDropdown() {
@@ -26,6 +27,16 @@ export default function ApplicationSelectDropdown() {
 	const [openModal, setOpenModal] = useState(false);
 	const [openCreateModal, setOpenCreateModal] = useState(false);
 	const { applications, application, selectApplication } = useApplicationStore();
+	const navigate = useNavigate();
+	const { orgId } = useParams();
+
+	function onSelect(app: Application) {
+		selectApplication(app);
+		setOpen(false);
+		if (app._id === application?._id) return;
+		console.log('app', app);
+		navigate(`/organization/${orgId}`);
+	}
 
 	return (
 		<>
@@ -58,10 +69,7 @@ export default function ApplicationSelectDropdown() {
 									<CommandItem
 										key={app._id}
 										value={app._id}
-										onSelect={() => {
-											selectApplication(app);
-											setOpen(false);
-										}}
+										onSelect={() => onSelect(app)}
 										className='application-dropdown-option'
 									>
 										<ApplicationLabel application={app} />
@@ -130,8 +138,14 @@ export default function ApplicationSelectDropdown() {
 const ApplicationLabel = ({ application }: { application: Application | null }) => {
 	const { user } = useAuthStore();
 
+	function openAppSettings(e: MouseEvent<HTMLButtonElement>) {
+		e.stopPropagation();
+		// TODO: Open App Settings
+		console.log('Open App Settings');
+	}
+
 	return (
-		<div className='application-label'>
+		<Button onClick={openAppSettings} variant='blank' className='application-label'>
 			<Avatar className='mr-2' size='sm' square>
 				<AvatarImage src={application?.pictureUrl} alt={application?.name} />
 				<AvatarFallback name={application?.name} color={application?.color as string} />
@@ -142,6 +156,6 @@ const ApplicationLabel = ({ application }: { application: Application | null }) 
 					{application?.team.find((team) => team.userId._id === user?._id)?.role}
 				</div>
 			</div>
-		</div>
+		</Button>
 	);
 };

@@ -1,4 +1,5 @@
 {
+	"name": "Version name",
 	"status": "Status",
 	"resources": "Resources",
 	"last_deployment": "Last Deployment",
@@ -16,7 +17,6 @@
 	"close_all_tabs": "Close all tabs",
 	"close_all_tabs_except_current": "Close all tabs except current",
 	"duplicate_tab": "Duplicate selected tab",
-	"settings": "Settings",
 	"suspend_services": "Suspend services",
 	"suspend_services_desc": "Suspend access to the execution environment of this version. Version will be kept deployed but no requests will be handled",
 	"reactivate": "Reactivate",
@@ -34,6 +34,70 @@
 	"export": "Export",
 	"import": "Import",
 	"mark_read_only": "Mark Read Only",
+	"mark_read_write": "Mark Read/Write",
 	"set_private": "Set Private",
-	"delete": "Delete"
+	"set_public": "Set Public",
+	"delete": "Delete",
+	"read_only": "Read Only",
+	"private": "Private",
+	"rate_limiters": "Rate Limiters",
+	"add_rate_limiter": "Add Rate Limiter",
+	"add_new_limiter": "Add New Limiter",
+	"rate_limiter": "Rate Limiter {{count}}",
+	"settings": {
+		"default": "Settings",
+		"general": "General",
+		"environment": "Environment",
+		"middlewares": "Middlewares",
+		"npm_packages": "NPM Packages",
+		"environment_variables": "Environment Variables",
+		"rate_limits": "Rate Limits",
+		"authentications": "Authentications",
+		"api_keys": "API Keys",
+		"real_time": "Real Time",
+		"other": "Other Settings",
+		"version_id": "Version ID",
+		"version_id_desc": "This is your version's id within your Agnost Cluster.",
+		"version_name": "Version Name",
+		"version_name_desc": "This is your version's name within your Agnost Cluster.",
+		"read_only_desc": "Set this version as read only. Other team members will be able to view this version but they will not be able to update it, except team members with Admin rights.",
+		"private_desc": "Set this version as private. Other team members will not be able to view this version, except team members with Admin rights.",
+		"endpoint_rate_limit": "Endpoint Default Rate Limiters",
+		"endpoint_rate_limit_desc": "Rate limiting puts a cap on how often someone can call an endpoint of your app within a certain timeframe. By rate limiting, you can help stop certain kinds of malicious activity. You can define multiple rate limits which are applied sequentially."
+	},
+	"updated": {
+		"name": "Version name updated"
+	},
+	"master_version_cant_private": "Master version can't be private",
+	"limiter_detail": "Max {{rate}} request(s) every {{duration}} second(s)",
+	"add": {
+		"rate_limiter": {
+			"name": {
+				"label": "Rate Limit Name",
+				"label_lower": "Rate limit name",
+				"placeholder": "Enter rate limit name"
+			},
+			"rate": {
+				"label": "Max Request Count",
+				"label_lower": "Max request count",
+				"placeholder": "Enter max request count",
+				"desc": "Maximum number of requests/calls allowed"
+			},
+			"duration": {
+				"label": "Duration/Timeframe per Second",
+				"label_lower": "Duration per second",
+				"placeholder": "Enter duration",
+				"desc": "Duration of measurement in seconds"
+			},
+			"error_message": {
+				"label": "Error Message",
+				"label_lower": "Error message",
+				"placeholder": "Enter error message",
+				"desc": "Error message that will be returned to the calling party when the rate limit is exceeded",
+				"default": "Too many requests, please try again later."
+			},
+			"success": "Rate limiter added successfully",
+			"deleted": "Rate limiter deleted successfully"
+		}
+	}
 }

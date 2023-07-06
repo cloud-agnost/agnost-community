@@ -1,0 +1,11 @@
+.setting-container {
+	@apply rounded-lg bg-subtle flex-col flex flex-1 max-h-full overflow-hidden sticky top-6;
+
+	&-title {
+		@apply rounded-t-lg p-6 text-default z-10 bg-inherit font-semibold text-[26px] leading-[44px];
+	}
+
+	&-content {
+		@apply bg-base flex-1 mt-0 m-[3px] rounded-b overflow-auto;
+	}
+}

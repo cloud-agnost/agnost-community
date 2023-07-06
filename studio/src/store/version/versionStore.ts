@@ -1,4 +1,14 @@
-import { APIError, GetVersionRequest, Version } from '@/types';
+import {
+	APIError,
+	CreateRateLimitParams,
+	DeleteRateLimitParams,
+	GetVersionByIdParams,
+	GetVersionRequest,
+	RateLimit,
+	Version,
+	VersionParamsWithoutEnvId,
+	VersionProperties,
+} from '@/types';
 import { devtools } from 'zustand/middleware';
 import { create } from 'zustand';
 import { VersionService } from '@/services';
@@ -6,10 +16,16 @@ import { VersionService } from '@/services';
 interface VersionStore {
 	loading: boolean;
 	error: APIError | null;
+	version: Version | null;
 	versions: Version[];
 	versionPage: number;
+	getVersionById: (req: GetVersionByIdParams) => Promise<Version>;
 	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<void>;
 	setVersionPage: (page: number) => void;
+	updateVersionProperties: (params: VersionParamsWithoutEnvId) => Promise<Version>;
+	createRateLimit: (params: CreateRateLimitParams) => Promise<Version>;
+	deleteRateLimit: (params: DeleteRateLimitParams) => Promise<Version>;
+	orderLimits: (limits: RateLimit[]) => void;
 }
 
 const useVersionStore = create<VersionStore>()(
@@ -17,8 +33,14 @@ const useVersionStore = create<VersionStore>()(
 		(set, get) => ({
 			loading: false,
 			error: null,
+			version: null,
 			versions: [],
 			versionPage: 0,
+			getVersionById: async (params: GetVersionByIdParams) => {
+				const version = await VersionService.getVersionById(params);
+				set({ version });
+				return version;
+			},
 			getAllVersionsVisibleToUser: async (req: GetVersionRequest) => {
 				set({ loading: true });
 				try {
@@ -33,6 +55,44 @@ const useVersionStore = create<VersionStore>()(
 			},
 			setVersionPage: (page: number) => {
 				set({ versionPage: page });
+			},
+			updateVersionProperties: async ({
+				orgId,
+				versionId,
+				appId,
+				...data
+			}: VersionParamsWithoutEnvId & Partial<VersionProperties>) => {
+				const version = await VersionService.updateVersionProperties({
+					orgId,
+					versionId,
+					appId,
+					private: get().version?.private ?? false,
+					defaultEndpointLimits: get().version?.defaultEndpointLimits ?? [],
+					readOnly: get().version?.readOnly ?? false,
+					name: get().version?.name ?? '',
+					...data,
+				});
+				set({ version });
+				return version;
+			},
+			createRateLimit: async (params: CreateRateLimitParams) => {
+				const version = await VersionService.createRateLimit(params);
+				set({ version });
+				return version;
+			},
+			deleteRateLimit: async (params: DeleteRateLimitParams) => {
+				const version = await VersionService.deleteRateLimit(params);
+				set({ version });
+				return version;
+			},
+			orderLimits: (limits: RateLimit[]) => {
+				set((prev) => {
+					if (!prev.version) return prev;
+					prev.version.limits = limits;
+					return {
+						version: prev.version,
+					};
+				});
 			},
 		}),
 		{
