@@ -1,9 +1,9 @@
-import { z } from 'zod';
-import { BaseRequest, User } from './type';
 import { translate } from '@/utils';
-import { Environment, EnvLog } from './environment';
+import { z } from 'zod';
+import { EnvLog, Environment } from './environment';
+import { ResLog, Resource } from './resource';
+import { BaseRequest } from './type';
 import { Version } from './version';
-import { Resource, ResLog } from './resource';
 
 export interface Application {
 	_id: string;
@@ -92,4 +92,12 @@ export interface ApplicationMember {
 export interface TeamOption {
 	readonly value: ApplicationMember;
 	readonly label: string;
+}
+interface AppMemberRequest {
+	email: string;
+	role: 'Admin' | 'Developer' | 'Viewer' | '';
+}
+export interface AppInviteRequest extends BaseRequest {
+	members: AppMemberRequest[];
+	uiBaseUrl: string;
 }
