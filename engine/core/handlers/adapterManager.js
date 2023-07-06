@@ -4,13 +4,14 @@ import mssql from "mssql";
 import mongo from "mongodb";
 import redis from "redis";
 import amqp from "amqplib";
+import * as Minio from "minio";
 import { Kafka } from "kafkajs";
 import { S3Client } from "@aws-sdk/client-s3";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { Storage } from "@google-cloud/storage";
 import { io } from "socket.io-client";
 import { getMQClient } from "../init/queue.js";
-import { PVCStorage } from "../adapters/storage/PVCStorage.js";
+import { MinIOStorage } from "../adapters/storage/MinIOStorage.js";
 import { AWSStorage } from "../adapters/storage/AWSStorage.js";
 import { GCPStorage } from "../adapters/storage/GCPStorage.js";
 import { AzureStorage } from "../adapters/storage/AzureStorage.js";
@@ -157,7 +158,7 @@ export class AdapterManager {
 			case "Azure Blob Storage":
 				await this.connectToAzureStorage(resource);
 				break;
-			case "Cluster Storage":
+			case "MinIO":
 				await this.connectToClusterStorage(resource);
 				break;
 			case "RabbitMQ":
@@ -166,10 +167,10 @@ export class AdapterManager {
 			case "Kafka":
 				await this.connectToKafka(resource);
 				break;
-			case "Default Realtime":
+			case "Socket.io":
 				await this.connectToRealtimeServer(resource);
 				break;
-			case "Default Scheduler":
+			case "Agenda":
 				await this.connectToScheduler(resource);
 				break;
 			default:
@@ -752,7 +753,7 @@ export class AdapterManager {
 	}
 
 	/**
-	 * Creates a custom PVC storage manager
+	 * Creates a MinIO cluster storage client
 	 * @param  {Object} resource The resource object
 	 */
 	async connectToClusterStorage(resource) {
@@ -765,7 +766,13 @@ export class AdapterManager {
 			let connSettings = access;
 			if (!connSettings) return;
 
-			const pvcStorage = new PVCStorage(connSettings.mountPath);
+			const minioClient = new Minio.Client({
+				endPoint: connSettings.endPoint, // Kubernetes service name for MinIO
+				port: connSettings.port, // MinIO service port (default: 9000)
+				useSSL: connSettings.useSSL, // Whether to use SSL (default: false)
+				accessKey: connSettings.accessKey, // MinIO access key
+				secretKey: connSettings.secretKey, // MinIO secret key
+			});
 
 			this.adapters.set(resource.iid, {
 				name,
@@ -773,7 +780,7 @@ export class AdapterManager {
 				instance,
 				iid,
 				readOnly: false,
-				adapter: pvcStorage,
+				adapter: new MinIOStorage(minioClient),
 			});
 		} catch (err) {}
 	}

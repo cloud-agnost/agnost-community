@@ -51,6 +51,26 @@ export const referenceRules = (type) => {
 
 						return true;
 					}),
+				body("reference.action")
+					.if((value, { req }) => {
+						if (
+							(req.body.type === "reference" ||
+								req.field?.type === "reference") &&
+							req.db.type !== "MongoDB"
+						)
+							return true;
+						else return false;
+					})
+					.trim()
+					.notEmpty()
+					.withMessage(
+						t(
+							"On-delete action type needs to be provided, cannot be left empty"
+						)
+					)
+					.bail()
+					.isIn(["CASCADE", "NO ACTION", "SET NULL", "SET DEFAULT"])
+					.withMessage(t("Unsupported on-delete action type")),
 			];
 		default:
 			return [];

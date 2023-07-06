@@ -360,10 +360,14 @@ router.put(
 			// Delete existing file if it exists
 			await storage.deleteFile(uploadBucket, req.org.pictureUrl);
 			// Save the new file
-			const filePath = `avatars/${helper.generateSlug("img", 6)}-${
+			const filePath = `storage/avatars/${helper.generateSlug("img", 6)}-${
 				req.file.originalname
 			}`;
-			await storage.saveFile(uploadBucket, filePath, buffer);
+
+			const metaData = {
+				"Content-Type": req.file.mimetype,
+			};
+			await storage.saveFile(uploadBucket, filePath, buffer, metaData);
 
 			// Update organization with the new profile image url
 			let orgObj = await orgCtrl.updateOneById(

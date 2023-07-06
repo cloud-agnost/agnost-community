@@ -439,15 +439,10 @@ export const instanceTypes = {
 	engine: ["API Server"],
 	database: ["PostgreSQL", "MySQL", "SQL Server", "MongoDB", "Oracle"],
 	cache: ["Redis"],
-	storage: [
-		"AWS S3",
-		"GCP Cloud Storage",
-		"Azure Blob Storage",
-		"Cluster Storage",
-	],
+	storage: ["AWS S3", "GCP Cloud Storage", "Azure Blob Storage", "MinIO"],
 	queue: ["RabbitMQ", "Kafka"],
-	scheduler: ["Default Scheduler"],
-	realtime: ["Default Realtime"],
+	scheduler: ["Agenda"],
+	realtime: ["Socket.io"],
 };
 
 export const addInstanceTypes = {

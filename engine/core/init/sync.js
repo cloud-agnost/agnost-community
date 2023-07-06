@@ -8,6 +8,7 @@ export function initializeSyncClient() {
 		reconnection: syncConfig.reconnection,
 		reconnectionDelay: syncConfig.reconnectionDelay,
 		transports: ["websocket", "polling"],
+		path: syncConfig.path,
 	});
 
 	socket.on("connect", () => {

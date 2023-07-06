@@ -5,6 +5,7 @@ import mongo from "mongodb";
 import redis from "redis";
 import k8s from "@kubernetes/client-node";
 import amqp from "amqplib";
+import * as Minio from "minio";
 import { Kafka } from "kafkajs";
 import axios from "axios";
 import { S3Client, HeadBucketCommand } from "@aws-sdk/client-s3";
@@ -152,7 +153,7 @@ async function upadateResourceStatus(resource, status) {
  * @param  {Object} result The resource status object
  */
 function getCachedStatus(cache, resource) {
-	if (["Default Scheduler", "Default Realtime"].includes(resource.instance)) {
+	if (["Agenda", "Socket.io"].includes(resource.instance)) {
 		return cache.get(resource.instance);
 	} else return cache.get(resource.iid);
 }
@@ -164,7 +165,7 @@ function getCachedStatus(cache, resource) {
  * @param  {Object} result The resource status object
  */
 function setCachedStatus(cache, resource, result) {
-	if (["Default Scheduler", "Default Realtime"].includes(resource.instance)) {
+	if (["Agenda", "Socket.io"].includes(resource.instance)) {
 		// If not already cached, add it to the cache
 		if (!cache.get(resource.instance)) cache.set(resource.instance, result);
 	} else {
@@ -374,7 +375,7 @@ async function checkResourceStatus(resource) {
 					},
 				};
 			}
-		case "Cluster Storage":
+		case "MinIO":
 			try {
 				let result = await checkClusterStorage(resource.access);
 				if (result === null) return null;
@@ -444,7 +445,7 @@ async function checkResourceStatus(resource) {
 					},
 				};
 			}
-		case "Default Scheduler":
+		case "Agenda":
 			try {
 				let result = await checkDefaultScheduler(resource.access);
 				if (result === null) return null;
@@ -470,7 +471,7 @@ async function checkResourceStatus(resource) {
 					},
 				};
 			}
-		case "Default Realtime":
+		case "Socket.io":
 			try {
 				let result = await checkDefaultRealtime(resource.access);
 				if (result === null) return null;
@@ -657,17 +658,19 @@ async function checkRedisConnection(connSettings) {
  * @param  {object} connSettings The connection settings needed to connect to the cluster storage
  */
 async function checkClusterStorage(connSettings) {
-	const coreApi = kubeconfig.makeApiClient(k8s.CoreV1Api);
+	const minioClient = new Minio.Client({
+		endPoint: connSettings.endPoint, // Kubernetes service name for MinIO
+		port: connSettings.port, // MinIO service port (default: 9000)
+		useSSL: connSettings.useSSL, // Whether to use SSL (default: false)
+		accessKey: connSettings.accessKey, // MinIO access key
+		secretKey: connSettings.secretKey, // MinIO secret key
+	});
 
 	try {
-		await coreApi.readNamespacedPersistentVolumeClaim(
-			`${connSettings.name}-pvc`,
-			config.get("general.k8sNamespace")
-		);
-
+		let buckets = await minioClient.listBuckets();
 		return true;
 	} catch (err) {
-		return null;
+		reject(t("Cannot connect to MinIO. %s", err.message));
 	}
 }
 

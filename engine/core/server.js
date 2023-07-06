@@ -37,7 +37,7 @@ if (cluster.isPrimary) {
 	// Connect to cache server(s)
 	connectToRedisCache(finalizePrimaryProcessStartup);
 	// Connect to message queue
-	connectToQueue();
+	connectToQueue(true);
 	// Gracefull handle process exist
 	handlePrimaryProcessExit();
 	// Set up garbage collector
@@ -60,7 +60,7 @@ if (cluster.isPrimary) {
 	// Connect to the database
 	connectToDatabase();
 	// Connect to message queue
-	connectToQueue();
+	connectToQueue(false);
 	// Connect to cache server(s)
 	connectToRedisCache();
 	getRedisClient().on("connect", async function () {
