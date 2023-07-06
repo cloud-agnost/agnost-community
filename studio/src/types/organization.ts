@@ -83,16 +83,7 @@ export interface InviteOrgRequest extends BaseRequest {
 	uiBaseURL: string;
 }
 
-export interface OrgInvitationRequest extends BaseRequest {
-	token?: string;
-	tokens?: string[];
-}
 export interface RemoveMemberFromOrganizationRequest extends BaseRequest {
 	userId?: string;
 	userIds?: string[];
-}
-export interface UpdateRoleRequest extends BaseRequest {
-	token?: string;
-	userId?: string;
-	role: string;
 }

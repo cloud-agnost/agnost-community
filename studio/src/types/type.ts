@@ -159,7 +159,7 @@ export interface BaseGetRequest extends BaseRequest {
 export interface SortOption {
 	name: string;
 	value?: string;
-	sortDir?: 'asc' | 'desc';
+	sortDir?: 'asc' | 'desc' | '';
 }
 export interface FormatOptionLabelProps {
 	label: string;
@@ -184,4 +184,13 @@ export interface GetInvitationRequest extends BaseGetRequest {
 	email?: string;
 	role?: string;
 	status?: string;
+}
+export interface InvitationRequest extends BaseRequest {
+	token?: string;
+	tokens?: string[];
+}
+export interface UpdateRoleRequest extends BaseRequest {
+	token?: string;
+	userId?: string;
+	role: string;
 }
