@@ -1,8 +1,10 @@
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { axios } from '@/helpers';
-import { Application } from '@/types';
+import { Application, GetInvitationRequest, Invitation } from '@/types';
 import useApplicationStore from '@/store/app/applicationStore';
 import { ApplicationMember } from '@/types';
+import { AppInviteRequest } from '@/types/application';
+import { UI_BASE_URL } from '@/constants';
 export default class ApplicationService {
 	static url = '/v1/org/:orgId/app/:appId';
 
@@ -39,5 +41,85 @@ export default class ApplicationService {
 
 	static async getAppMembers(): Promise<ApplicationMember[]> {
 		return (await axios.get(`${this.getUrl()}/team`)).data;
+	}
+
+	static async changeMemberRole(userId: string, role: string): Promise<ApplicationMember> {
+		return (
+			await axios.put(`${this.getUrl()}/team/${userId}`, {
+				role,
+			})
+		).data;
+	}
+
+	static async removeAppMember(userId: string) {
+		return (
+			await axios.delete(`${this.getUrl()}/team/${userId}`, {
+				data: {},
+			})
+		).data;
+	}
+	static async removeMultipleAppMembers(userIds: string[]) {
+		return (
+			await axios.delete(`${this.getUrl()}/team/delete-multi`, {
+				data: {
+					userIds,
+				},
+			})
+		).data;
+	}
+	static async inviteUsersToApp(req: AppInviteRequest): Promise<Invitation[]> {
+		return (await axios.post(`${this.getUrl()}/invite?uiBaseURL=${req.uiBaseUrl}`, req.members))
+			.data;
+	}
+	static async getAppInvitations(req: GetInvitationRequest): Promise<Invitation[]> {
+		const { page, size, status, email, role, start, end, sortBy, sortDir } = req;
+		return (
+			await axios.get(`${this.getUrl()}/invite`, {
+				params: {
+					page,
+					size,
+					sortBy,
+					sortDir,
+					status,
+					email,
+					role,
+					start,
+					end,
+				},
+			})
+		).data;
+	}
+
+	static async resendInvitation(token: string): Promise<Invitation> {
+		return (
+			await axios.post(`${this.getUrl()}/invite/resend?token=${token}&uiBaseURL=${UI_BASE_URL}`, {
+				token,
+			})
+		).data;
+	}
+
+	static async updateInvitationUserRole(token: string, role: string): Promise<Invitation> {
+		return (
+			await axios.put(`${this.getUrl()}/invite?token=${token}`, {
+				role,
+			})
+		).data;
+	}
+	static async deleteInvitation(token: string): Promise<Invitation> {
+		return (
+			await axios.delete(`${this.getUrl()}/invite?token=${token}`, {
+				data: {},
+			})
+		).data;
+	}
+
+	static async deleteMultipleInvitations(tokens: string[] | undefined): Promise<Invitation[]> {
+		return (
+			await axios.delete(`${this.getUrl()}/invite/multi`, {
+				data: {
+					tokens,
+				},
+			})
+		).data;
 	}
 }

@@ -32,14 +32,6 @@
 				"deleteAll": "Delete All",
 				"resend": "Resend All",
 				"deleteDesc": "Are you sure you want to delete this invitation? This action cannot be undone. The user will not be able to join the organization."
-			},
-			"sortOptions": {
-				"default": "Default",
-				"joinDate": "Join Date",
-				"nameAsc": "Name A-Z",
-				"nameDesc": "Name Z-A",
-				"inviteDate": "Invite Date",
-				"email": "Email"
 			}
 		},
 		"id": {

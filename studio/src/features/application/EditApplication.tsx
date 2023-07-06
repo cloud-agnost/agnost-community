@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import AppGeneralSettings from './Settings/AppGeneralSettings';
 import AppMembers from './Settings/Members/AppMembers';
+import AppInvitations from '@/features/application/Settings/Invitations/AppInvitations';
 
 export default function EditApplication() {
 	const { t } = useTranslation();
@@ -46,6 +47,7 @@ export default function EditApplication() {
 				<div className='p-6'>
 					{searchParams.get('t') === 'general' && <AppGeneralSettings />}
 					{searchParams.get('t') === 'members' && <AppMembers />}
+					{searchParams.get('t') === 'invitations' && <AppInvitations />}
 				</div>
 			</DrawerContent>
 		</Drawer>
