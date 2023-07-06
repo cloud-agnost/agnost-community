@@ -1,15 +1,15 @@
-import { ColumnDef } from '@tanstack/react-table';
-import { Checkbox } from '@/components/Checkbox';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
+import { Button } from '@/components/Button';
+import { Checkbox } from '@/components/Checkbox';
+import { SortButton } from '@/components/DataTable';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
-import useApplicationStore from '@/store/app/applicationStore';
 import useTypeStore from '@/store/types/typeStore';
 import { ApplicationMember } from '@/types';
-import { Trash } from '@phosphor-icons/react';
-import { Button } from '@/components/Button';
-import { SortButton } from '@/components/DataTable';
 import { translate } from '@/utils';
-const roles = useTypeStore.getState().appRoles;
+import { Trash } from '@phosphor-icons/react';
+import { ColumnDef } from '@tanstack/react-table';
+
+const roles = useTypeStore.getState?.().appRoles;
 export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 	{
 		id: 'select',
