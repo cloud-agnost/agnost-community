@@ -15,21 +15,21 @@ import {
 	Table as TableType,
 } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
-interface DataTableProps<TData, TValue> {
-	columns: ColumnDef<TData, TValue>[];
+interface DataTableProps<TData> {
+	columns: ColumnDef<TData>[];
 	data: TData[];
 	onRowClick?: (row: TData) => void;
 	setSelectedRows?: (table: Row<TData>[]) => void;
 	setTable?: (table: TableType<TData>) => void;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData>({
 	columns,
 	data,
 	setSelectedRows,
 	setTable,
 	onRowClick,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [rowSelection, setRowSelection] = useState({});
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
