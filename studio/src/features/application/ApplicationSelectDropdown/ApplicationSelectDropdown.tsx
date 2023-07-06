@@ -11,13 +11,13 @@ import {
 import { InfoModal } from '@/components/InfoModal';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
 import { OrganizationCreateModal } from '@/features/organization';
-import useOrganizationStore from '@/store/organization/organizationStore';
+import useApplicationStore from '@/store/app/applicationStore';
+import useAuthStore from '@/store/auth/authStore.ts';
 import { Application } from '@/types';
 import { cn } from '@/utils';
 import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useAuthStore from '@/store/auth/authStore.ts';
 import './appSelectDropdown.scss';
 
 export default function ApplicationSelectDropdown() {
@@ -25,7 +25,7 @@ export default function ApplicationSelectDropdown() {
 	const [open, setOpen] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
 	const [openCreateModal, setOpenCreateModal] = useState(false);
-	const { applications, application, selectApplication } = useOrganizationStore();
+	const { applications, application, selectApplication } = useApplicationStore();
 
 	return (
 		<>

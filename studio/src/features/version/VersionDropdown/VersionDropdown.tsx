@@ -17,13 +17,14 @@ import {
 } from 'components/Dropdown';
 import { Version } from '@/types';
 import { useNavigate, useParams } from 'react-router-dom';
+import useApplicationStore from '@/store/app/applicationStore';
 
 export default function VersionDropdown() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
 	const [openCreateModal, setOpenCreateModal] = useState(false);
-	const { application } = useOrganizationStore();
+	const { application } = useApplicationStore();
 	const navigate = useNavigate();
 	const { appId, orgId, versionId } = useParams();
 
