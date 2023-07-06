@@ -14,8 +14,8 @@ import {
 	OrganizationMember,
 	TransferOrganizationRequest,
 	InviteOrgRequest,
-	OrganizationInvitations,
-	GetOrganizationInvitationRequest,
+	Invitation,
+	GetInvitationRequest,
 	OrgInvitationRequest,
 	RemoveMemberFromOrganizationRequest,
 	UpdateRoleRequest,
@@ -30,11 +30,10 @@ interface OrganizationStore {
 	applications: Application[];
 	temp: Application[];
 	members: OrganizationMember[];
-	invitations: OrganizationInvitations[];
+	invitations: Invitation[];
 	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
 	createOrganization: (req: CreateOrganizationRequest) => Promise<Organization | APIError>;
 	selectOrganization: (organization: Organization) => void;
-	selectApplication: (application: Application) => void;
 	leaveOrganization: (req: LeaveOrganizationRequest) => Promise<void>;
 	changeOrganizationName: (req: ChangeOrganizationNameRequest) => Promise<Organization>;
 	changeOrganizationAvatar: (req: ChangeOrganizationAvatarRequest) => Promise<Organization>;
@@ -49,7 +48,7 @@ interface OrganizationStore {
 	removeMultipleMembersFromOrganization: (
 		req: RemoveMemberFromOrganizationRequest,
 	) => Promise<void>;
-	updateInvitationUserRole: (req: UpdateRoleRequest) => Promise<OrganizationInvitations>;
+	updateInvitationUserRole: (req: UpdateRoleRequest) => Promise<Invitation>;
 	changeMemberRole: (req: UpdateRoleRequest) => Promise<OrganizationMember>;
 	getOrganizationApps: (organizationId: string) => Promise<Application[] | APIError>;
 	createApplication: (
@@ -59,9 +58,7 @@ interface OrganizationStore {
 	deleteApplication: (req: DeleteApplicationRequest) => Promise<void>;
 	leaveAppTeam: (req: DeleteApplicationRequest) => Promise<void>;
 	getOrganizationMembers: (req: GetOrganizationMembersRequest) => Promise<OrganizationMember[]>;
-	getOrganizationInvitations: (
-		req: GetOrganizationInvitationRequest,
-	) => Promise<OrganizationInvitations[] | APIError>;
+	getOrganizationInvitations: (req: GetInvitationRequest) => Promise<Invitation[] | APIError>;
 }
 
 const useOrganizationStore = create<OrganizationStore>()(
@@ -304,7 +301,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 						});
 					}
 				},
-				getOrganizationInvitations: async (req: GetOrganizationInvitationRequest) => {
+				getOrganizationInvitations: async (req: GetInvitationRequest) => {
 					try {
 						const res = await OrganizationService.getOrganizationInvitations(req);
 						set({

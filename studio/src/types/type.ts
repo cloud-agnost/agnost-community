@@ -169,3 +169,19 @@ export interface GroupedOption<T> {
 	readonly label: string;
 	readonly options: readonly T[];
 }
+
+export interface Invitation {
+	_id: string;
+	orgId: string;
+	email: string;
+	token: string;
+	role: string;
+	status: 'Pending' | 'Active';
+	createdAt: string;
+}
+
+export interface GetInvitationRequest extends BaseGetRequest {
+	email?: string;
+	role?: string;
+	status?: string;
+}

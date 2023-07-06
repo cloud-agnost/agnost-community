@@ -52,12 +52,7 @@ export interface GetOrganizationMembersRequest extends BaseGetRequest {
 	organizationId: string;
 	excludeSelf?: boolean;
 }
-export interface GetOrganizationInvitationRequest extends BaseGetRequest {
-	organizationId: string;
-	email?: string;
-	role?: string;
-	status?: string;
-}
+
 export interface TransferOrganizationRequest extends BaseRequest {
 	organizationId: string;
 	userId: string;
@@ -86,16 +81,6 @@ export interface InviteOrgRequest extends BaseRequest {
 	members: OrgMemberRequest[];
 	organizationId: string;
 	uiBaseURL: string;
-}
-
-export interface OrganizationInvitations {
-	_id: string;
-	orgId: string;
-	email: string;
-	token: string;
-	role: 'Admin' | 'Member' | 'Resource Manager' | 'Viewer' | '';
-	status: 'Pending' | 'Active';
-	createdAt: string;
 }
 
 export interface OrgInvitationRequest extends BaseRequest {

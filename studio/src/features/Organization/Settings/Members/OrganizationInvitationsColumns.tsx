@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { OrganizationInvitations } from '@/types';
+import { Invitation } from '@/types';
 import { Button } from '@/components/Button';
 import { EnvelopeSimple, Trash } from '@phosphor-icons/react';
 import { Checkbox } from '@/components/Checkbox';
@@ -14,7 +14,7 @@ const roles = useTypeStore.getState().orgRoles;
 
 const { notify } = useToast();
 
-export const OrganizationInvitationsColumns: ColumnDef<OrganizationInvitations>[] = [
+export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 	{
 		id: 'select',
 		header: ({ table }) => (

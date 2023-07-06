@@ -13,7 +13,7 @@ import { ORG_INVITATIONS_SORT_OPTIONS, ORG_MEMBERS_SORT_OPTIONS } from '@/consta
 import { useToast } from '@/hooks';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTypeStore from '@/store/types/typeStore';
-import { OrganizationInvitations, OrganizationMember, SortOption } from '@/types';
+import { Invitation, OrganizationMember, SortOption } from '@/types';
 import { Funnel, FunnelSimple, Trash } from '@phosphor-icons/react';
 import { Row } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
@@ -21,7 +21,7 @@ import { useOutletContext, useSearchParams } from 'react-router-dom';
 import '../../organization.scss';
 import { SetStateAction, Dispatch } from 'react';
 
-interface RowTypes extends Omit<OrganizationInvitations, 'role'>, OrganizationMember {}
+interface RowTypes extends Omit<Invitation, 'role'>, OrganizationMember {}
 
 interface OutletContextTypes {
 	selectedRoles: string[];
