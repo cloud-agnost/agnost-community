@@ -25,6 +25,7 @@ export const SLIDER_IMAGES = [
 		image: Realtime,
 	},
 ];
+
 export const MENU_ITEMS = [
 	{
 		title: 'Feedback',
@@ -60,6 +61,7 @@ export const MENU_ITEMS_FOR_PROFILE_SETTINGS = [
 		icon: LineSegments,
 	},
 ];
+
 export const ORGANIZATION_MENU_ITEMS = [
 	{
 		name: translate('organization.menu.apps'),
@@ -105,6 +107,9 @@ export const APPLICATION_SETTINGS = [
 	{
 		id: 'add-members',
 		name: translate('general.addMembers'),
+		onClick: (application: Application) => {
+			useApplicationStore.getState().openInviteMemberDrawer(application);
+		},
 	},
 ];
 
@@ -166,6 +171,7 @@ export const ORG_MEMBERS_SORT_OPTIONS: SortOption[] = [
 		sortDir: 'desc',
 	},
 ];
+
 export const ORG_INVITATIONS_SORT_OPTIONS: SortOption[] = [
 	{
 		name: translate('organization.settings.members.sortOptions.default'),
@@ -218,3 +224,17 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	Yes: 'green',
 	No: 'red',
 };
+export const EDIT_APPLICATION_MENU_ITEMS = [
+	{
+		name: translate('application.edit.general'),
+		href: '?t=general',
+	},
+	{
+		name: translate('application.edit.members'),
+		href: '?t=members',
+	},
+	{
+		name: translate('application.edit.invitations'),
+		href: '?t=invitations',
+	},
+];
