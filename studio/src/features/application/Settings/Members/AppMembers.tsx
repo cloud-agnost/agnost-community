@@ -10,7 +10,7 @@ import {
 import { SearchInput } from '@/components/SearchInput';
 import useApplicationStore from '@/store/app/applicationStore';
 import useTypeStore from '@/store/types/typeStore';
-import { ApplicationMember } from '@/types';
+import { Application, ApplicationMember } from '@/types';
 import { Funnel, Trash } from '@phosphor-icons/react';
 import { Table } from '@tanstack/react-table';
 import { useState } from 'react';
@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { AppMembersTableColumns } from './AppMembersTableColumns';
 export default function AppMembers() {
 	const { appRoles } = useTypeStore();
-	const { applicationTeam } = useApplicationStore();
+	const { applicationTeam, application, openInviteMemberDrawer } = useApplicationStore();
 	const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
 	const [table, setTable] = useState<Table<ApplicationMember>>();
 	const { t } = useTranslation();
@@ -101,7 +101,14 @@ export default function AppMembers() {
 							))}
 						</DropdownMenuContent>
 					</DropdownMenu>
-					<Button variant='primary'>{t('application.edit.invite')}</Button>
+					<Button
+						variant='primary'
+						onClick={() => {
+							openInviteMemberDrawer(application as Application);
+						}}
+					>
+						{t('application.edit.invite')}
+					</Button>
 				</div>
 			</div>
 			<DataTable columns={AppMembersTableColumns} data={applicationTeam} setTable={setTable} />
