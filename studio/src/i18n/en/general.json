@@ -17,5 +17,6 @@
 	"delete_all": "Delete All",
 	"actions": "Actions",
 	"selected": "{{count}} selected",
-	"search": "Search"
+	"search": "Search",
+	"invitation_success": "Invitation sent successfully"
 }

@@ -54,5 +54,12 @@
 			"success": "Ownership has been transferred successfully",
 			"successDesc": "You are no longer the owner of this organization. You can still access it as an admin."
 		}
+	},
+	"invite_member": {
+		"title": "Invite Members To App",
+		"subTitle": "Invite Application Members",
+		"description": "Each application member can have different role assigned to authorize certain actions within the organization itself. Organization members can also be added to app teams.",
+		"success": "Invitation has been sent successfully",
+		"successDesc": "The invitation has been sent successfully. The invited member will be able to access the app once they accept the invitation."
 	}
 }
