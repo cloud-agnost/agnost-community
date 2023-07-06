@@ -43,7 +43,18 @@ import {
 	VersionDatabase,
 	VersionEndpoint,
 	VersionMessageQueue,
+	VersionSettings,
+	VersionSettingsGeneral,
 	VersionStorage,
+	VersionSettingsNPMPackages,
+	VersionSettingsEnvironment,
+	VersionSettingsMiddlewares,
+	VersionSettingsEnvironmentVariables,
+	VersionSettingsRateLimits,
+	VersionSettingsAuthentications,
+	VersionSettingsAPIKeys,
+	VersionSettingsRealTime,
+	VersionSettingsOther,
 } from '@/pages/version';
 import {
 	OrganizationSettings,
@@ -219,6 +230,52 @@ const router = createBrowserRouter([
 					{
 						path: 'cron-job',
 						element: <VersionCronJob />,
+					},
+					{
+						path: 'settings',
+						element: <VersionSettings />,
+						children: [
+							{
+								index: true,
+								element: <VersionSettingsGeneral />,
+							},
+							{
+								path: 'environment',
+								element: <VersionSettingsEnvironment />,
+							},
+							{
+								path: 'middlewares',
+								element: <VersionSettingsMiddlewares />,
+							},
+							{
+								path: 'npm-packages',
+								element: <VersionSettingsNPMPackages />,
+							},
+							{
+								path: 'environment-variables',
+								element: <VersionSettingsEnvironmentVariables />,
+							},
+							{
+								path: 'rate-limits',
+								element: <VersionSettingsRateLimits />,
+							},
+							{
+								path: 'authentications',
+								element: <VersionSettingsAuthentications />,
+							},
+							{
+								path: 'api-keys',
+								element: <VersionSettingsAPIKeys />,
+							},
+							{
+								path: 'real-time',
+								element: <VersionSettingsRealTime />,
+							},
+							{
+								path: 'other',
+								element: <VersionSettingsOther />,
+							},
+						],
 					},
 				],
 			},
