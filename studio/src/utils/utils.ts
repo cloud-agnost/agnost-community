@@ -85,28 +85,3 @@ export function getApplicationRoleVariant(role: string) {
 			return 'green';
 	}
 }
-export function uniq<T>(array: T[]): T[] {
-	return [...new Set(array)];
-}
-
-export function isEmpty(value: unknown): boolean {
-	if (value === null || value === undefined) {
-		return true;
-	}
-
-	if (typeof value === 'string' || Array.isArray(value)) {
-		return (value as EmptyableString | EmptyableArray).length === 0;
-	}
-
-	if (
-		typeof value === 'object' &&
-		Object.keys(value as EmptyableObject<Record<string, unknown>>).length === 0
-	) {
-		return true;
-	}
-
-	return false;
-}
-export function isArray<T>(value: unknown): value is T[] {
-	return Array.isArray(value);
-}
