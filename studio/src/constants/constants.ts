@@ -10,7 +10,7 @@ import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { Tab } from '@/types';
 
 export const ORGANIZATION_MEMBERS_PAGE_SIZE = 10;
-
+export const UI_BASE_URL = window.location.origin;
 export const SLIDER_IMAGES = [
 	{
 		text: 'Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.',
@@ -152,39 +152,41 @@ export const ERROR_CODES_TO_REDIRECT_LOGIN_PAGE = [
 
 export const ORG_MEMBERS_SORT_OPTIONS: SortOption[] = [
 	{
-		name: translate('organization.settings.members.sortOptions.default'),
+		name: translate('general.sortOptions.default'),
 		value: 'default',
 	},
 	{
-		name: translate('organization.settings.members.sortOptions.joinDate'),
+		name: translate('general.sortOptions.joinDate'),
 		value: 'joinDate',
 		sortDir: 'desc',
 	},
 	{
-		name: translate('organization.settings.members.sortOptions.nameAsc'),
+		name: translate('general.sortOptions.nameAsc'),
 		value: 'name',
 		sortDir: 'asc',
 	},
 	{
-		name: translate('organization.settings.members.sortOptions.nameDesc'),
+		name: translate('general.sortOptions.nameDesc'),
 		value: 'name',
 		sortDir: 'desc',
 	},
 ];
 
-export const ORG_INVITATIONS_SORT_OPTIONS: SortOption[] = [
+export const INVITATIONS_SORT_OPTIONS: SortOption[] = [
 	{
-		name: translate('organization.settings.members.sortOptions.default'),
-	},
-	{
-		name: translate('organization.settings.members.sortOptions.inviteDate'),
+		name: translate('general.sortOptions.inviteDate'),
 		value: 'createdAt',
 		sortDir: 'desc',
 	},
 	{
-		name: translate('organization.settings.members.sortOptions.email'),
+		name: translate('general.sortOptions.emailAsc'),
 		value: 'email',
 		sortDir: 'asc',
+	},
+	{
+		name: translate('general.sortOptions.emailDesc'),
+		value: 'email',
+		sortDir: 'desc',
 	},
 ];
 
