@@ -51,7 +51,7 @@ export default function SMTPConfiguration() {
 	const [error, setError] = useState<APIError | null>(null);
 	const [isTesting, setIsTesting] = useState(false);
 	const [finalizing, setFinalizing] = useState(false);
-	const { t } = useTranslation('onboarding');
+	const { t } = useTranslation();
 
 	const {
 		setDataPartially,
