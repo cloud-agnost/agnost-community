@@ -16,7 +16,7 @@ export default function OrganizationInvitationTable() {
 
 	return (
 		<InfiniteScroll items={invitations} endOfList={() => setPage((prev) => prev + 1)}>
-			<DataTable
+			<DataTable<Invitation>
 				columns={OrganizationInvitationsColumns}
 				data={invitations}
 				setSelectedRows={setSelectedRows}

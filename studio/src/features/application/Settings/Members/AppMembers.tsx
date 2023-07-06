@@ -111,7 +111,11 @@ export default function AppMembers() {
 					</Button>
 				</div>
 			</div>
-			<DataTable columns={AppMembersTableColumns} data={applicationTeam} setTable={setTable} />
+			<DataTable<ApplicationMember>
+				columns={AppMembersTableColumns}
+				data={applicationTeam}
+				setTable={setTable}
+			/>
 		</div>
 	);
 }
