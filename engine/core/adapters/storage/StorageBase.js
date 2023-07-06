@@ -2,10 +2,10 @@ export class StorageBase {
 	constructor() {}
 	async disconnect() {}
 	/**
-	 * Sets up the storage bucket if it does not exist
-	 * @param  {string} bucketName Name of the bucket, this should be the iid of the storage design element
+	 * Creates the storage bucket if it does not exist
+	 * @param  {string} bucketName Name of the bucket
 	 */
-	async ensureStorage(bucketName) {}
+	async ensureBucket(bucketName) {}
 }
 
 export default new StorageBase();

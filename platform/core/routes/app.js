@@ -268,14 +268,18 @@ router.put(
 			// Specify the directory where you want to store the image
 			const uploadBucket = config.get("general.storageBucket");
 			// Ensure file storage folder exists
-			storage.ensureBucket(uploadBucket);
+			await storage.ensureBucket(uploadBucket);
 			// Delete existing file if it exists
-			storage.deleteFile(req.app.pictureUrl);
+			await storage.deleteFile(uploadBucket, req.org.pictureUrl);
 			// Save the new file
-			const filePath = `${uploadBucket}${helper.generateSlug("img", 6)}-${
+			const filePath = `storage/avatars/${helper.generateSlug("img", 6)}-${
 				req.file.originalname
 			}`;
-			storage.saveFile(filePath, buffer);
+
+			const metaData = {
+				"Content-Type": req.file.mimetype,
+			};
+			await storage.saveFile(uploadBucket, filePath, buffer, metaData);
 
 			// Update app with the new profile image url
 			let appObj = await appCtrl.updateOneById(

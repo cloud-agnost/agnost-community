@@ -65,10 +65,7 @@ class VersionController extends BaseController {
 		let defaultResources = await resourceCtrl.getManyByQuery(
 			{
 				orgId: org._id,
-				$or: [
-					{ instance: "Default Scheduler" },
-					{ instance: "Default Realtime" },
-				],
+				$or: [{ instance: "Agenda" }, { instance: "Socket.io" }],
 			},
 			{ session }
 		);
@@ -91,7 +88,7 @@ class VersionController extends BaseController {
 
 		for (let i = 0; i < defaultResources.length; i++) {
 			let res = defaultResources[i];
-			if (res.instance === "Default Scheduler") {
+			if (res.instance === "Agenda") {
 				mappings.push({
 					design: {
 						iid: envIid,
@@ -105,7 +102,7 @@ class VersionController extends BaseController {
 						instance: res.instance,
 					},
 				});
-			} else if (res.instance === "Default Realtime") {
+			} else if (res.instance === "Socket.io") {
 				mappings.push({
 					design: {
 						iid: envIid,
@@ -231,8 +228,9 @@ class VersionController extends BaseController {
 		let defaultResources = await resourceCtrl.getManyByQuery({
 			orgId: org._id,
 			$or: [
-				{ instance: "Default Scheduler" },
-				{ instance: "Default Realtime" },
+				{ instance: "Agenda" },
+				{ instance: "Socket.io" },
+				{ instance: "MinIO" },
 			],
 		});
 
@@ -254,7 +252,7 @@ class VersionController extends BaseController {
 
 		for (let i = 0; i < defaultResources.length; i++) {
 			let res = defaultResources[i];
-			if (res.instance === "Default Scheduler") {
+			if (res.instance === "Agenda") {
 				mappings.push({
 					design: {
 						iid: envIid,
@@ -268,12 +266,26 @@ class VersionController extends BaseController {
 						instance: res.instance,
 					},
 				});
-			} else if (res.instance === "Default Realtime") {
+			} else if (res.instance === "Socket.io") {
 				mappings.push({
 					design: {
 						iid: envIid,
 						type: "realtime",
 						name: t("realtimeServer"),
+					},
+					resource: {
+						iid: res.iid,
+						name: res.name,
+						type: res.type,
+						instance: res.instance,
+					},
+				});
+			} else if (res.instance === "MinIO") {
+				mappings.push({
+					design: {
+						iid: envIid,
+						type: "storage",
+						name: t("clusterStorage"),
 					},
 					resource: {
 						iid: res.iid,
@@ -289,21 +301,11 @@ class VersionController extends BaseController {
 		mappings.push(
 			...parentEnv.mappings.filter(
 				(entry) =>
-					!["Default Scheduler", "Default Realtime", "API Server"].includes(
+					!["Agenda", "Socket.io", "MinIO", "API Server"].includes(
 						entry.resource.instance
 					)
 			)
 		);
-
-		// If there are Cluster Storage object mappings then they should also be mapped in the API server deployment
-		// During the deployment creation we need to mount the PVCs
-		const pvcs = mappings.filter(
-			(entry) =>
-				entry.resource.type === "storage" &&
-				entry.resource.instance === "Cluster Storage"
-		);
-		// Assign these pvcs to the API server deployment config
-		resource.config.pvcs = pvcs;
 
 		// Create environment data, we do not update the cache value yet, we update it after the deployment
 		const env = await envCtrl.create(

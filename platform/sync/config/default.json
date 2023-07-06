@@ -14,7 +14,8 @@
       "pingTimeout": 30000,
       "pingInterval": 10000,
       "upgradeTimeout": 10000,
-      "serveClient": false
+      "serveClient": false,
+      "path": "/sync/"
    },
    "cache": {
       "port": 6379

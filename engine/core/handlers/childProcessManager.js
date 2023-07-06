@@ -383,9 +383,6 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 				);
 
 			await adapterManager.setupConnection(resource);
-			this.addLog(
-				`Initialized the adapter of '${resource.type}' resource '${resource.name}'`
-			);
 		}
 	}
 
@@ -405,8 +402,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			const connection = adapterManager.getStorageAdapter(mapping.design.name);
 
 			if (connection) {
-				await connection.ensureStorage(`${mapping.design.iid}`);
-				this.addLog(`Initialized storage '${mapping.design.name}'`);
+				this.addLog(`Initialized storage adapter '${mapping.design.name}'`);
 			}
 		}
 	}

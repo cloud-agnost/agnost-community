@@ -30,12 +30,6 @@
         "reconnectInterval": 1000,
         "retryCount": 30
      },
-     "sync": {
-        "serverURL": "http://platform-sync-clusterip-service:4000",
-        "namespace": "sync",
-        "reconnection": true,
-        "reconnectionDelay": 500
-     },
      "general": {  
         "generalQueueCount": 1,
         "taskProcessQueueCount": 1,

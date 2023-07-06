@@ -22,9 +22,10 @@
      },
      "sync": {
         "serverURL": "http://platform-sync-clusterip-service:4000",
-        "namespace": "sync",
+        "namespace": "",
         "reconnection": true,
-        "reconnectionDelay": 500
+        "reconnectionDelay": 500,
+        "path": "/sync/"
      },
      "general": { 
         "generalQueueCount": 1,

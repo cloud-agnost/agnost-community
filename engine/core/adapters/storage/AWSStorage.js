@@ -10,10 +10,10 @@ export class AWSStorage extends StorageBase {
 	}
 
 	/**
-	 * Makes sure that the bucket of the environment exists
-	 * @param  {string} bucketName Name of the bucket, this should be the iid of the storage design element
+	 * Creates the storage bucket if it does not exist
+	 * @param  {string} bucketName Name of the bucket
 	 */
-	async ensureStorage(bucketName) {
+	async ensureBucket(bucketName) {
 		try {
 			await this.driver.headBucket({ Bucket: bucketName }).promise();
 		} catch (err) {

@@ -6,7 +6,7 @@ var isConnecting = false;
 var retryCount = 0;
 
 // There is no default connection retry mechanism in the RabbitMQ client library for this reason we implement it
-export const connectToQueue = () => {
+export const connectToQueue = (listenUpdates = true) => {
 	if (isConnecting) return;
 	isConnecting = true;
 	retryCount++;
@@ -67,7 +67,8 @@ export const connectToQueue = () => {
 		logger.info(`Connected to the message queue @${amqpHost}`);
 
 		// Listen for deployment messages, the primary process listens these messages, not the child one
-		manageAPIServerHandler(connection, process.env.AGNOST_ENVIRONMENT_ID);
+		if (listenUpdates)
+			manageAPIServerHandler(connection, process.env.AGNOST_ENVIRONMENT_ID);
 	});
 };
 

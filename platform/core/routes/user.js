@@ -257,21 +257,24 @@ router.put(
 				});
 			}
 
-			// Resize image if width and height specified
+			// Resize image if width and height specifiec
 			buffer = await sharp(req.file.buffer).resize(width, height).toBuffer();
 
 			// Specify the directory where you want to store the image
 			const uploadBucket = config.get("general.storageBucket");
 			// Ensure file storage folder exists
 			await storage.ensureBucket(uploadBucket);
-			return res.json();
 			// Delete existing file if it exists
-			storage.deleteFile(req.user.pictureUrl);
+			await storage.deleteFile(uploadBucket, req.org.pictureUrl);
 			// Save the new file
-			const filePath = `${uploadBucket}${helper.generateSlug("img", 6)}-${
+			const filePath = `storage/avatars/${helper.generateSlug("img", 6)}-${
 				req.file.originalname
 			}`;
-			storage.saveFile(filePath, buffer);
+
+			const metaData = {
+				"Content-Type": req.file.mimetype,
+			};
+			await storage.saveFile(uploadBucket, filePath, buffer, metaData);
 
 			// Update user with the new profile image url
 			let userObj = await userCtrl.updateOneById(

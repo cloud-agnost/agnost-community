@@ -14,6 +14,7 @@ export function setUpSyncServer(expressServer) {
 		cors: {
 			origin: "*",
 		},
+		path: config.get("sync.path"),
 	});
 
 	try {
@@ -40,8 +41,7 @@ export function setUpSyncServer(expressServer) {
 			syncServer.adapter(createAdapter(pubClient, subClient));
 			logger.info("Synchronization server attached to Http server");
 
-			const io = syncServer.of("sync");
-			io.on("connect", (socket) => {
+			syncServer.on("connect", (socket) => {
 				logger.info(`Client ${socket.id} connected`);
 
 				socket.on("disconnect", () => {
@@ -71,6 +71,7 @@ export function setUpSyncServer(expressServer) {
 				// message.timestamp - The datetime of the message
 				// message.data - The body of the message (json object)
 				socket.on("channel:message", (payload) => {
+					console.log("***new message received!!!!!!!");
 					socket.to(payload.channel).emit("notification", payload.message);
 				});
 			});

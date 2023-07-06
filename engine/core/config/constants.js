@@ -12,6 +12,7 @@ export const corePackages = [
 	"helmet",
 	"i18n",
 	"kafkajs",
+	"minio",
 	"mongodb",
 	"mssql",
 	"multer",

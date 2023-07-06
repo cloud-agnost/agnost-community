@@ -271,7 +271,6 @@ router.post(
 */
 router.get(
 	"/:versionId",
-	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,

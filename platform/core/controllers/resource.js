@@ -16,7 +16,7 @@ class ResourceController extends BaseController {
 	 */
 	async addDefaultOrganizationResources(session, user, org) {
 		return {
-			storage: await this.createClusterStorage(session, user, org),
+			storage: await this.bindClusterStorage(session, user, org),
 			queue: await this.bindDefaultQueue(session, user, org),
 			scheduler: await this.bindDefaultScheduler(session, user, org),
 			realtime: await this.bindDefaultRealtime(session, user, org),
@@ -29,7 +29,7 @@ class ResourceController extends BaseController {
 	 * @param  {Object} user The user whose creating the cluster storage resource
 	 * @param  {Object} org The organization object where the cluster storage will be added
 	 */
-	async createClusterStorage(session, user, org) {
+	async bindClusterStorage(session, user, org) {
 		const resourceId = helper.generateId();
 		const resourceIid = helper.generateSlug("res");
 		const resource = await this.create(
@@ -39,15 +39,19 @@ class ResourceController extends BaseController {
 				iid: resourceIid,
 				name: t("Default Storage"),
 				type: "storage",
-				instance: "Cluster Storage",
-				managed: true, // The size of the storage can be updated
+				instance: "MinIO",
+				managed: false, // The size of the storage can be updated
 				allowedRoles: ["Admin", "Developer", "Viewer"],
-				config: { size: config.get("general.defaulPVCSize") },
+				config: {},
 				access: helper.encyrptSensitiveData({
-					mountPath: `/${resourceIid}`,
+					endPoint: process.env.MINIO_ENDPOINT, // Kubernetes service name for MinIO
+					port: parseInt(process.env.MINIO_PORT, 10), // MinIO service port (default: 9000)
+					useSSL: false, // Whether to use SSL (default: false)
+					accessKey: process.env.MINIO_ACCESS_KEY, // MinIO access key
+					secretKey: process.env.MINIO_SECRET_KEY, // MinIO secret key
 				}),
-				deletable: true,
-				status: "Creating",
+				deletable: false,
+				status: "Binding",
 				createdBy: user._id,
 			},
 			{ session, cacheKey: resourceId }
@@ -57,8 +61,8 @@ class ResourceController extends BaseController {
 			{
 				orgId: org._id,
 				resourceId: resourceId,
-				action: "create",
-				status: "Creating",
+				action: "bind",
+				status: "Binding",
 				createdBy: user._id,
 			},
 			{ session }
@@ -130,7 +134,7 @@ class ResourceController extends BaseController {
 				iid: helper.generateSlug("res"),
 				name: t("Default Scheduler"),
 				type: "scheduler",
-				instance: "Default Scheduler",
+				instance: "Agenda",
 				managed: false, // Default scheduler is a cluster resource and only cluster owner can update its configuration
 				allowedRoles: ["Admin", "Developer", "Viewer"],
 				config: {},
@@ -173,7 +177,7 @@ class ResourceController extends BaseController {
 				iid: helper.generateSlug("res"),
 				name: t("Default Realtime Server"),
 				type: "realtime",
-				instance: "Default Realtime",
+				instance: "Socket.io",
 				managed: false, // Default realtime is a cluster resource and only cluster owner can update its configuration
 				allowedRoles: ["Admin", "Developer", "Viewer"],
 				config: {},

@@ -92,9 +92,6 @@ export class ResourceManager {
 		try {
 			this.addLog(t("Started resource creation"));
 			switch (this.getResourceType()) {
-				case "storage":
-					await this.createStorage();
-					break;
 				case "engine":
 					await this.createDeploymentResources();
 					break;
@@ -154,9 +151,6 @@ export class ResourceManager {
 		try {
 			this.addLog(t("Started resource update"));
 			switch (this.getResourceType()) {
-				case "storage":
-					await this.updateStorage();
-					break;
 				case "engine":
 					await this.updateDeploymentResources();
 					break;
@@ -190,9 +184,6 @@ export class ResourceManager {
 		try {
 			this.addLog(t("Started resource deletion"));
 			switch (this.getResourceType()) {
-				case "storage":
-					await this.deleteStorage();
-					break;
 				case "engine":
 					await this.deleteDeploymentResources();
 					break;
@@ -216,91 +207,6 @@ export class ResourceManager {
 			);
 			await this.sendResourceLogs("Error");
 			return { success: false, error };
-		}
-	}
-
-	/**
-	 * Creates a persistent volume claim (PVC) in Agnost Kubernetes Cluster
-	 */
-	async createStorage() {
-		const resource = this.getResource();
-		// Create a Kubernetes core API client
-		const kubeconfig = new k8s.KubeConfig();
-		kubeconfig.loadFromDefault();
-		const coreApi = kubeconfig.makeApiClient(k8s.CoreV1Api);
-
-		// Define the PVC specification
-		const pvcSpec = {
-			apiVersion: "v1",
-			kind: "PersistentVolumeClaim",
-			metadata: {
-				name: `${resource.iid}-pvc`,
-			},
-			spec: {
-				accessModes: ["ReadWriteMany"],
-				resources: {
-					requests: {
-						storage: resource.config.size,
-					},
-				},
-			},
-		};
-
-		try {
-			await coreApi.createNamespacedPersistentVolumeClaim(
-				config.get("general.k8sNamespace"),
-				pvcSpec
-			);
-		} catch (err) {
-			throw new AgnostError(err.body?.message);
-		}
-	}
-
-	/**
-	 * Updates a persistent volume claim (PVC) size in Agnost Kubernetes Cluster
-	 */
-	async updateStorage() {
-		const resource = this.getResource();
-		// Create a Kubernetes core API client
-		const kubeconfig = new k8s.KubeConfig();
-		kubeconfig.loadFromDefault();
-		const coreApi = kubeconfig.makeApiClient(k8s.CoreV1Api);
-
-		try {
-			const { body: pvc } = await k8sApi.readNamespacedPersistentVolumeClaim(
-				`${resource.iid}-pvc`,
-				config.get("general.k8sNamespace")
-			);
-			// Update the size of the PVC
-			pvc.spec.resources.requests.storage = resource.config.size;
-
-			await coreApi.replaceNamespacedPersistentVolumeClaim(
-				`${resource.iid}-pvc`,
-				config.get("general.k8sNamespace"),
-				pvc
-			);
-		} catch (err) {
-			throw new AgnostError(err.body?.message);
-		}
-	}
-
-	/**
-	 * Deletes a persistent volume claim (PVC) in Agnost Kubernetes Cluster
-	 */
-	async deleteStorage() {
-		const resource = this.getResource();
-		// Create a Kubernetes core API client
-		const kubeconfig = new k8s.KubeConfig();
-		kubeconfig.loadFromDefault();
-		const coreApi = kubeconfig.makeApiClient(k8s.CoreV1Api);
-
-		try {
-			await coreApi.deleteNamespacedPersistentVolumeClaim(
-				`${resource.iid}-pvc`,
-				config.get("general.k8sNamespace")
-			);
-		} catch (err) {
-			throw new AgnostError(err.body?.message);
 		}
 	}
 
@@ -376,8 +282,6 @@ export class ResourceManager {
 		const kubeconfig = new k8s.KubeConfig();
 		kubeconfig.loadFromDefault();
 		const appsApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
-		// pvcs is an array of unique (since multiple different storages can use the same PVC) Cluster Storage resources coming from the environment configuration. It is the resouce part of the design-resource mapping but only the unique Cluster Storage resources.
-		const pvcs = deploymentConfig.pvcs ?? [];
 
 		// Define the Deployment specification
 		const deploymentSpec = {
@@ -417,12 +321,6 @@ export class ResourceManager {
 										containerPort: config.get("general.defaultClusterIPPort"),
 									},
 								],
-								/* 								volumeMounts: pvcs.map((entry) => {
-									return {
-										mountPath: `/${entry.iid}`, // iid of PVC resource
-										name: entry.iid, //iid of PVC resource
-									};
-								}), */
 								env: [
 									{
 										name: "AGNOST_VERSION_ID",
@@ -493,17 +391,17 @@ export class ResourceManager {
 										},
 									},
 								],
-								/* 								resources: {
+								resources: {
 									requests: {
 										cpu: deploymentConfig.cpu.request,
 										memory: deploymentConfig.memory.request,
 									},
-									 limits: {
+									limits: {
 										cpu: deploymentConfig.cpu.limit,
 										memory: deploymentConfig.memory.limit,
-									}, 
-								}, */
-								/* 								livenessProbe: {
+									},
+								},
+								livenessProbe: {
 									httpGet: {
 										path: "/health",
 										port: config.get("general.defaultClusterIPPort"),
@@ -532,17 +430,9 @@ export class ResourceManager {
 									initialDelaySeconds: config.get(
 										"general.readinessProbe.initialDelaySeconds"
 									),
-								}, */
+								},
 							},
 						],
-						/* 						volumes: pvcs.map((entry) => {
-							return {
-								name: entry.iid,
-								persistentVolumeClaim: {
-									claimName: `${entry.iid}-pvc`,
-								},
-							};
-						}), */
 					},
 				},
 			},
@@ -569,8 +459,6 @@ export class ResourceManager {
 		const kubeconfig = new k8s.KubeConfig();
 		kubeconfig.loadFromDefault();
 		const appsApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
-		// pvcs is an array of unique (since multiple different storages can use the same PVC) Cluster Storage resources coming from the environment configuration. It is the resouce part of the design-resource mapping but only the unique Cluster Storage resources.
-		const pvcs = deploymentConfig.pvcs ?? [];
 
 		try {
 			// Get the existing Deployment
@@ -589,24 +477,6 @@ export class ResourceManager {
 				deploymentConfig.cpu.limit;
 			deployment.spec.template.spec.containers[0].resources.limits.memory =
 				deploymentConfig.memory.limit;
-
-			// Update the PVC mounts
-			deployment.spec.template.spec.containers[0].volumeMounts = pvcs.map(
-				(entry) => {
-					return {
-						mountPath: `/${entry.iid}`, // iid of PVC resource
-						name: entry.iid, //iid of PVC resource
-					};
-				}
-			);
-			deployment.spec.template.spec.volumes = pvcs.map((entry) => {
-				return {
-					name: entry.iid,
-					persistentVolumeClaim: {
-						claimName: `${entry.iid}-pvc`,
-					},
-				};
-			});
 
 			// Update the deployment
 			await appsApi.replaceNamespacedDeployment(
