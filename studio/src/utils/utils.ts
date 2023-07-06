@@ -3,7 +3,8 @@ import { clsx, type ClassValue } from 'clsx';
 import i18next from 'i18next';
 import { DateTime } from 'luxon';
 import { twMerge } from 'tailwind-merge';
-
+import { useToast as toast } from '@/hooks';
+import { ToastType } from '@/types';
 type EmptyableArray = readonly [] | [];
 type EmptyableString = '' | string;
 type EmptyableObject<T extends object> = T & Record<keyof T, never>;
@@ -84,4 +85,7 @@ export function getApplicationRoleVariant(role: string) {
 		default:
 			return 'green';
 	}
+}
+export function notify(params: ToastType) {
+	return toast().notify(params);
 }

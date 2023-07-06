@@ -11,6 +11,7 @@ export {
 	isArray,
 	getNameForAvatar,
 	getApplicationRoleVariant,
+	notify,
 } from './utils';
 
 export { formatDate } from './time';
