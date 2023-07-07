@@ -159,7 +159,44 @@ export interface BaseGetRequest extends BaseRequest {
 export interface SortOption {
 	name: string;
 	value?: string;
-	sortDir?: 'asc' | 'desc';
+	sortDir?: 'asc' | 'desc' | '';
+}
+export interface FormatOptionLabelProps {
+	label: string;
+	value: any;
+}
+export interface GroupedOption<T> {
+	readonly label: string;
+	readonly options: readonly T[];
+}
+
+export interface Invitation {
+	_id: string;
+	orgId: string;
+	email: string;
+	token: string;
+	role: string;
+	status: 'Pending' | 'Active';
+	createdAt: string;
+}
+
+export interface GetInvitationRequest extends BaseGetRequest {
+	email?: string;
+	roles: string[];
+	status?: string;
+}
+export interface InvitationRequest extends BaseRequest {
+	token?: string;
+	tokens?: string[];
+}
+export interface UpdateRoleRequest extends BaseRequest {
+	token?: string;
+	userId?: string;
+	role: string;
+}
+export interface RemoveMemberRequest extends BaseRequest {
+	userId?: string;
+	userIds?: string[];
 }
 export type RealtimeActionTypes = 'update' | 'create' | 'delete';
 export type RealtimeObjectTypes = 'user' | 'organization';

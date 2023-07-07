@@ -14,9 +14,9 @@ import {
 	OrganizationMember,
 	TransferOrganizationRequest,
 	InviteOrgRequest,
-	OrganizationInvitations,
-	GetOrganizationInvitationRequest,
-	OrgInvitationRequest,
+	Invitation,
+	GetInvitationRequest,
+	InvitationRequest,
 	RemoveMemberFromOrganizationRequest,
 	UpdateRoleRequest,
 } from '@/types';
@@ -28,15 +28,12 @@ interface OrganizationStore {
 	organization: Organization | null;
 	organizations: Organization[];
 	applications: Application[];
-	application: Application | null;
 	temp: Application[];
-	isVersionOpen: boolean;
 	members: OrganizationMember[];
-	invitations: OrganizationInvitations[];
+	invitations: Invitation[];
 	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
 	createOrganization: (req: CreateOrganizationRequest) => Promise<Organization | APIError>;
 	selectOrganization: (organization: Organization) => void;
-	selectApplication: (application: Application) => void;
 	leaveOrganization: (req: LeaveOrganizationRequest) => Promise<void>;
 	changeOrganizationName: (req: ChangeOrganizationNameRequest) => Promise<Organization>;
 	changeOrganizationAvatar: (req: ChangeOrganizationAvatarRequest) => Promise<Organization>;
@@ -44,14 +41,14 @@ interface OrganizationStore {
 	transferOrganization: (req: TransferOrganizationRequest) => Promise<Organization>;
 	deleteOrganization: (req: BaseRequest) => Promise<void>;
 	inviteUsersToOrganization: (req: InviteOrgRequest) => Promise<void>;
-	deleteInvitation: (req: OrgInvitationRequest) => Promise<void>;
-	deleteMultipleInvitations: (req: OrgInvitationRequest) => Promise<void>;
-	resendInvitation: (req: OrgInvitationRequest) => Promise<void>;
+	deleteInvitation: (req: InvitationRequest) => Promise<void>;
+	deleteMultipleInvitations: (req: InvitationRequest) => Promise<void>;
+	resendInvitation: (req: InvitationRequest) => Promise<void>;
 	removeMemberFromOrganization: (req: RemoveMemberFromOrganizationRequest) => Promise<void>;
 	removeMultipleMembersFromOrganization: (
 		req: RemoveMemberFromOrganizationRequest,
 	) => Promise<void>;
-	updateInvitationUserRole: (req: UpdateRoleRequest) => Promise<OrganizationInvitations>;
+	updateInvitationUserRole: (req: UpdateRoleRequest) => Promise<Invitation>;
 	changeMemberRole: (req: UpdateRoleRequest) => Promise<OrganizationMember>;
 	getOrganizationApps: (organizationId: string) => Promise<Application[] | APIError>;
 	createApplication: (
@@ -61,11 +58,7 @@ interface OrganizationStore {
 	deleteApplication: (req: DeleteApplicationRequest) => Promise<void>;
 	leaveAppTeam: (req: DeleteApplicationRequest) => Promise<void>;
 	getOrganizationMembers: (req: GetOrganizationMembersRequest) => Promise<OrganizationMember[]>;
-	getOrganizationInvitations: (
-		req: GetOrganizationInvitationRequest,
-	) => Promise<OrganizationInvitations[] | APIError>;
-	openVersionDrawer: (application: Application) => void;
-	closeVersionDrawer: () => void;
+	getOrganizationInvitations: (req: GetInvitationRequest) => Promise<Invitation[] | APIError>;
 }
 
 const useOrganizationStore = create<OrganizationStore>()(
@@ -76,9 +69,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 				organization: null,
 				organizations: [],
 				applications: [],
-				application: null,
 				temp: [],
-				isVersionOpen: false,
 				members: [],
 				invitations: [],
 				getAllOrganizationByUser: async () => {
@@ -202,7 +193,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 						throw error as APIError;
 					}
 				},
-				deleteInvitation: async (req: OrgInvitationRequest) => {
+				deleteInvitation: async (req: InvitationRequest) => {
 					try {
 						await OrganizationService.deleteInvitation(req.token as string);
 						set({
@@ -214,7 +205,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 						throw error as APIError;
 					}
 				},
-				deleteMultipleInvitations: async (req: OrgInvitationRequest) => {
+				deleteMultipleInvitations: async (req: InvitationRequest) => {
 					try {
 						await OrganizationService.deleteMultipleInvitations(req.tokens as string[]);
 						set({
@@ -228,7 +219,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 						throw error as APIError;
 					}
 				},
-				resendInvitation: async (req: OrgInvitationRequest) => {
+				resendInvitation: async (req: InvitationRequest) => {
 					try {
 						await OrganizationService.resendInvitation(req.token as string);
 						if (req.onSuccess) req.onSuccess();
@@ -310,7 +301,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 						});
 					}
 				},
-				getOrganizationInvitations: async (req: GetOrganizationInvitationRequest) => {
+				getOrganizationInvitations: async (req: GetInvitationRequest) => {
 					try {
 						const res = await OrganizationService.getOrganizationInvitations(req);
 						set({
@@ -444,21 +435,6 @@ const useOrganizationStore = create<OrganizationStore>()(
 						if (onError) onError(error as APIError);
 						throw error as APIError;
 					}
-				},
-				openVersionDrawer: (application: Application) => {
-					set({
-						isVersionOpen: true,
-						application,
-					});
-				},
-				closeVersionDrawer: () => {
-					set({
-						isVersionOpen: false,
-						application: null,
-					});
-				},
-				selectApplication: (application: Application) => {
-					set({ application });
 				},
 			}),
 

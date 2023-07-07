@@ -8,8 +8,8 @@ import {
 	ChangeOrganizationAvatarRequest,
 	OrganizationMember,
 	InviteOrgRequest,
-	OrganizationInvitations,
-	GetOrganizationInvitationRequest,
+	Invitation,
+	GetInvitationRequest,
 } from '@/types';
 import useOrganizationStore from '@/store/organization/organizationStore';
 export default class OrganizationService {
@@ -94,12 +94,10 @@ export default class OrganizationService {
 		).data;
 	}
 
-	static async getOrganizationInvitations(
-		req: GetOrganizationInvitationRequest,
-	): Promise<OrganizationInvitations[]> {
-		const { page, size, status, email, role, start, end, sortBy, sortDir, organizationId } = req;
+	static async getOrganizationInvitations(req: GetInvitationRequest): Promise<Invitation[]> {
+		const { page, size, status, email, role, start, end, sortBy, sortDir } = req;
 		return (
-			await axios.get(`${this.url}/${organizationId}/invite`, {
+			await axios.get(`${this.url}/${useOrganizationStore.getState().organization?._id}/invite`, {
 				params: {
 					page,
 					size,
@@ -175,10 +173,7 @@ export default class OrganizationService {
 		).data;
 	}
 
-	static async updateInvitationUserRole(
-		token: string,
-		role: string,
-	): Promise<OrganizationInvitations> {
+	static async updateInvitationUserRole(token: string, role: string): Promise<Invitation> {
 		return (
 			await axios.put(
 				`${this.url}/${useOrganizationStore.getState().organization?._id}/invite?token=${token}`,

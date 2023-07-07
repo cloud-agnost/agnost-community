@@ -1,9 +1,12 @@
 import { Button, ButtonGroup } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { SearchInput } from '@/components/SearchInput';
+import { ApplicationCardSkeleton } from '@/components/Skeletons';
 import { List, SquaresFour } from '@/components/icons';
 import { ApplicationCard, ApplicationVersions } from '@/features/application';
+import AppInviteMember from '@/features/application/AppInviteMember';
 import ApplicationTable from '@/features/application/ApplicationTable/ApplicationTable';
+import EditApplication from '@/features/application/EditApplication';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Application } from '@/types';
 import { cn } from '@/utils';
@@ -11,7 +14,6 @@ import { Plus } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
-import { ApplicationCardSkeleton } from '@/components/Skeletons';
 
 function loader() {
 	return null;
@@ -98,6 +100,8 @@ export default function OrganizationApps() {
 				</EmptyState>
 			)}
 			<ApplicationVersions />
+			<EditApplication />
+			<AppInviteMember />
 		</div>
 	);
 }

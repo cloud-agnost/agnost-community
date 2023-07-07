@@ -1,9 +1,9 @@
-import { z } from 'zod';
-import { BaseRequest } from './type';
 import { translate } from '@/utils';
-import { Environment, EnvLog } from './environment';
+import { z } from 'zod';
+import { EnvLog, Environment } from './environment';
+import { ResLog, Resource } from './resource';
+import { BaseRequest } from './type';
 import { Version } from './version';
-import { Resource, ResLog } from './resource';
 
 export interface Application {
 	_id: string;
@@ -62,4 +62,42 @@ export interface CreateApplicationResponse {
 export interface DeleteApplicationRequest extends BaseRequest {
 	appId: string;
 	orgId: string;
+}
+export interface ChangeAppNameRequest extends BaseRequest {
+	name: string;
+}
+export interface SetAppAvatarRequest extends BaseRequest {
+	picture: File;
+	appId: string;
+}
+export interface TransferAppOwnershipRequest extends BaseRequest {
+	userId: string;
+}
+export interface ApplicationMember {
+	_id: string;
+	appId: string;
+	role: string;
+	joinDate: string;
+	member: {
+		color: string;
+		contactEmail: string;
+		iid: string;
+		isAppOwner: boolean;
+		loginEmail: string;
+		name: string;
+		_id: string;
+		pictureUrl: string;
+	};
+}
+export interface TeamOption {
+	readonly value: ApplicationMember;
+	readonly label: string;
+}
+interface AppMemberRequest {
+	email: string;
+	role: 'Admin' | 'Developer' | 'Viewer' | '';
+}
+export interface AppInviteRequest extends BaseRequest {
+	members: AppMemberRequest[];
+	uiBaseUrl: string;
 }

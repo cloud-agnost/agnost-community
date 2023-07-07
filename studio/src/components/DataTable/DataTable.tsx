@@ -10,23 +10,29 @@ import {
 	getSortedRowModel,
 	useReactTable,
 	Row,
+	ColumnFiltersState,
+	getFilteredRowModel,
+	Table as TableType,
 } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
-interface DataTableProps<TData, TValue> {
-	columns: ColumnDef<TData, TValue>[];
+interface DataTableProps<TData> {
+	columns: ColumnDef<TData>[];
 	data: TData[];
 	onRowClick?: (row: TData) => void;
 	setSelectedRows?: (table: Row<TData>[]) => void;
+	setTable?: (table: TableType<TData>) => void;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData>({
 	columns,
 	data,
 	setSelectedRows,
+	setTable,
 	onRowClick,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [rowSelection, setRowSelection] = useState({});
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const table = useReactTable({
 		data,
 		columns,
@@ -34,17 +40,28 @@ export function DataTable<TData, TValue>({
 		onSortingChange: setSorting,
 		getSortedRowModel: getSortedRowModel(),
 		onRowSelectionChange: setRowSelection,
+		onColumnFiltersChange: setColumnFilters,
+		getFilteredRowModel: getFilteredRowModel(),
 		state: {
 			sorting,
 			rowSelection,
+			columnFilters,
 		},
 	});
 
 	useEffect(() => {
 		if (table.getSelectedRowModel().rows.length > 0) {
 			setSelectedRows?.(table.getSelectedRowModel().rows);
+		} else {
+			setSelectedRows?.([]);
 		}
 	}, [table.getSelectedRowModel().rows]);
+
+	useEffect(() => {
+		if (table) {
+			setTable?.(table);
+		}
+	}, [table]);
 
 	return (
 		<Table>

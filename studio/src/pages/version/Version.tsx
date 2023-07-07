@@ -1,6 +1,6 @@
-import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
 import { VersionLayout } from '@/layouts/VersionLayout';
 import useEnvironmentStore from '@/store/environment/environmentStore.ts';
+import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
 
 export default function Version() {
 	return (

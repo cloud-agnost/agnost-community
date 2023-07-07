@@ -9,11 +9,11 @@ import {
 import { PilTab } from '@/components/PilTab';
 import { SearchInput } from '@/components/SearchInput';
 import { Resend } from '@/components/icons';
-import { ORG_INVITATIONS_SORT_OPTIONS, ORG_MEMBERS_SORT_OPTIONS } from '@/constants';
+import { INVITATIONS_SORT_OPTIONS, ORG_MEMBERS_SORT_OPTIONS } from '@/constants';
 import { useToast } from '@/hooks';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTypeStore from '@/store/types/typeStore';
-import { OrganizationInvitations, OrganizationMember, SortOption } from '@/types';
+import { Invitation, OrganizationMember, SortOption } from '@/types';
 import { Funnel, FunnelSimple, Trash } from '@phosphor-icons/react';
 import { Row } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
@@ -21,7 +21,7 @@ import { useOutletContext, useSearchParams } from 'react-router-dom';
 import '../../organization.scss';
 import { SetStateAction, Dispatch } from 'react';
 
-interface RowTypes extends Omit<OrganizationInvitations, 'role'>, OrganizationMember {}
+interface RowTypes extends Omit<Invitation, 'role'>, OrganizationMember {}
 
 interface OutletContextTypes {
 	selectedRoles: string[];
@@ -37,9 +37,7 @@ export default function OrganizationMembersTableHeader() {
 	const selectedRoles = searchParams.get('r')?.split(',') ?? [];
 	const { isMember, setIsMember, selectedRows } = useOutletContext() as OutletContextTypes;
 	const { notify } = useToast();
-	const sortOptions: SortOption[] = isMember
-		? ORG_MEMBERS_SORT_OPTIONS
-		: ORG_INVITATIONS_SORT_OPTIONS;
+	const sortOptions: SortOption[] = isMember ? ORG_MEMBERS_SORT_OPTIONS : INVITATIONS_SORT_OPTIONS;
 	const [selectedSort, setSelectedSort] = useState<SortOption>(sortOptions[0] as SortOption);
 	const { deleteMultipleInvitations, removeMultipleMembersFromOrganization } =
 		useOrganizationStore();

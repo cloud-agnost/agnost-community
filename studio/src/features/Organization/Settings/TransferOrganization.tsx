@@ -4,18 +4,10 @@ import { AutoComplete } from '@/components/AutoComplete';
 import { Button } from '@/components/Button';
 import { useToast } from '@/hooks';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { OrganizationMember } from '@/types';
+import { FormatOptionLabelProps, GroupedOption, OrganizationMember } from '@/types';
 import { APIError } from '@/types/type';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-interface FormatOptionLabelProps {
-	label: string;
-	value: any;
-}
-interface GroupedOption {
-	readonly label: string;
-	readonly options: readonly OrganizationMember[];
-}
 
 const loadOptions = async (inputValue: string) => {
 	const res = await useOrganizationStore.getState().getOrganizationMembers({
@@ -62,7 +54,7 @@ const formatOptionLabel = ({ label, value }: FormatOptionLabelProps) => {
 		</div>
 	);
 };
-const formatGroupLabel = (data: GroupedOption) => {
+const formatGroupLabel = (data: GroupedOption<OrganizationMember>) => {
 	console.log('data', { data });
 	return (
 		<div className='flex items-center gap-2'>
@@ -71,7 +63,7 @@ const formatGroupLabel = (data: GroupedOption) => {
 	);
 };
 export default function TransferOrganization() {
-	const [user, setUser] = useState<any>();
+	const [userId, setUserId] = useState<string>();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
 	const { organization, transferOrganization } = useOrganizationStore();
@@ -81,11 +73,11 @@ export default function TransferOrganization() {
 		setLoading(true);
 		transferOrganization({
 			organizationId: organization?._id as string,
-			userId: user?._id,
+			userId: userId as string,
 			onSuccess: () => {
 				setLoading(false);
 				notify({
-					title: 'Organization transfered successfully',
+					title: 'Organization transferred successfully',
 					description: 'You will be redirected to the new organization',
 					type: 'success',
 				});
@@ -107,9 +99,9 @@ export default function TransferOrganization() {
 					<AlertDescription>{error?.details}</AlertDescription>
 				</Alert>
 			)}
-			<AutoComplete
+			<AutoComplete<OrganizationMember>
 				loadOptions={loadOptions}
-				onChange={(res) => setUser(res.member)}
+				onChange={(res) => setUserId(res.member._id)}
 				formatOptionLabel={formatOptionLabel}
 				formatGroupLabel={formatGroupLabel}
 			/>

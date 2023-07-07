@@ -7,7 +7,7 @@ interface ApplicationTeamProps {
 }
 export default function ApplicationTeam({ team, table = false }: ApplicationTeamProps) {
 	return (
-		<div className=''>
+		<div className='application-team'>
 			{team.slice(0, 4).map((member) => (
 				<Avatar key={member._id} size={table ? 'xs' : 'sm'}>
 					<AvatarImage src={member.userId.pictureUrl} />

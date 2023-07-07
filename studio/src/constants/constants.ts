@@ -2,14 +2,15 @@ import Database from '@/assets/images/database.png';
 import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
 import { BellRing, ChangeLog, LightBulb, LineSegments, Team } from '@/components/icons';
-import useOrganizationStore from '@/store/organization/organizationStore';
+import useApplicationStore from '@/store/app/applicationStore';
 import { Application, SortOption } from '@/types';
 import { translate } from '@/utils';
 import { Database as DatabaseIcon, DeviceTablet, FileText, GearSix } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
-
 import { Tab } from '@/types';
-export const ORGANIZATION_MEMBERS_PAGE_SIZE = 10;
+
+export const PAGE_SIZE = 10;
+export const UI_BASE_URL = window.location.origin;
 
 export const SLIDER_IMAGES = [
 	{
@@ -25,6 +26,7 @@ export const SLIDER_IMAGES = [
 		image: Realtime,
 	},
 ];
+
 export const MENU_ITEMS = [
 	{
 		title: 'Feedback',
@@ -60,6 +62,7 @@ export const MENU_ITEMS_FOR_PROFILE_SETTINGS = [
 		icon: LineSegments,
 	},
 ];
+
 export const ORGANIZATION_MENU_ITEMS = [
 	{
 		name: translate('organization.menu.apps'),
@@ -80,16 +83,34 @@ export const ORGANIZATION_MENU_ITEMS = [
 
 export const APPLICATION_SETTINGS = [
 	{
+		id: 'open-version',
 		name: translate('application.settings.openVersion'),
 		onClick: (application: Application) => {
-			useOrganizationStore.getState().openVersionDrawer(application);
+			useApplicationStore.getState().openVersionDrawer(application);
 		},
 	},
 	{
+		id: 'edit-app',
 		name: translate('application.settings.editApp'),
+		onClick: (application: Application) => {
+			useApplicationStore.getState().openEditAppDrawer(application);
+			const searchParams = new URLSearchParams(window.location.search);
+			if (!searchParams.get('t')) {
+				searchParams.set('t', 'general');
+				window.history.replaceState(
+					null,
+					'',
+					`${window.location.pathname}?${searchParams.toString()}`,
+				);
+			}
+		},
 	},
 	{
+		id: 'add-members',
 		name: translate('general.addMembers'),
+		onClick: (application: Application) => {
+			useApplicationStore.getState().openInviteMemberDrawer(application);
+		},
 	},
 ];
 
@@ -132,38 +153,41 @@ export const ERROR_CODES_TO_REDIRECT_LOGIN_PAGE = [
 
 export const ORG_MEMBERS_SORT_OPTIONS: SortOption[] = [
 	{
-		name: translate('organization.settings.members.sortOptions.default'),
+		name: translate('general.sortOptions.default'),
 		value: 'default',
 	},
 	{
-		name: translate('organization.settings.members.sortOptions.joinDate'),
+		name: translate('general.sortOptions.joinDate'),
 		value: 'joinDate',
 		sortDir: 'desc',
 	},
 	{
-		name: translate('organization.settings.members.sortOptions.nameAsc'),
+		name: translate('general.sortOptions.nameAsc'),
 		value: 'name',
 		sortDir: 'asc',
 	},
 	{
-		name: translate('organization.settings.members.sortOptions.nameDesc'),
+		name: translate('general.sortOptions.nameDesc'),
 		value: 'name',
 		sortDir: 'desc',
 	},
 ];
-export const ORG_INVITATIONS_SORT_OPTIONS: SortOption[] = [
+
+export const INVITATIONS_SORT_OPTIONS: SortOption[] = [
 	{
-		name: translate('organization.settings.members.sortOptions.default'),
-	},
-	{
-		name: translate('organization.settings.members.sortOptions.inviteDate'),
+		name: translate('general.sortOptions.inviteDate'),
 		value: 'createdAt',
 		sortDir: 'desc',
 	},
 	{
-		name: translate('organization.settings.members.sortOptions.email'),
+		name: translate('general.sortOptions.emailAsc'),
 		value: 'email',
 		sortDir: 'asc',
+	},
+	{
+		name: translate('general.sortOptions.emailDesc'),
+		value: 'email',
+		sortDir: 'desc',
 	},
 ];
 
@@ -203,3 +227,17 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	Yes: 'green',
 	No: 'red',
 };
+export const EDIT_APPLICATION_MENU_ITEMS = [
+	{
+		name: translate('application.edit.general'),
+		href: '?t=general',
+	},
+	{
+		name: translate('application.edit.members'),
+		href: '?t=members',
+	},
+	{
+		name: translate('application.edit.invitations'),
+		href: '?t=invitations',
+	},
+];

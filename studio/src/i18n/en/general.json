@@ -12,5 +12,33 @@
 	"created": "Created",
 	"open": "Open",
 	"name": "Name",
-	"save": "Save"
+	"save": "Save",
+	"transfer": "Transfer",
+	"delete_all": "Delete All",
+	"actions": "Actions",
+	"selected": "{{count}} selected",
+	"search": "Search",
+	"invitation": {
+		"success": "Invitation sent successfully",
+		"resent_success": "Invitation resent to {{email}}",
+		"update": "Invitation role changed to {{role}}",
+		"delete": "Invitation deleted successfully"
+	},
+	"member": {
+		"update": "Member role changed to {{role}}",
+		"delete": "Member deleted successfully"
+	},
+	"filter": "Filter",
+	"sortOptions": {
+		"default": "Default",
+		"joinDate": "Join Date",
+		"nameAsc": "Name A-Z",
+		"nameDesc": "Name Z-A",
+		"inviteDate": "Invite Date",
+		"emailAsc": "Email A-Z",
+		"emailDesc": "Email Z-A",
+		"role": "Role",
+		"invitedAt": "Invited At"
+	},
+	"clear": "Clear Filters"
 }

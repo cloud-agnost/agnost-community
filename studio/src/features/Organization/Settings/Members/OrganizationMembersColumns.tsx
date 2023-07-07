@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import useTypeStore from '@/store/types/typeStore';
 import { formatDate } from '@/utils';
 import useOrganizationStore from '@/store/organization/organizationStore';
+import { DateTime } from 'luxon';
 
 const roles = useTypeStore.getState().orgRoles;
 
@@ -58,14 +59,7 @@ export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 		header: 'joinedAt',
 		accessorKey: 'joinDate',
 		size: 200,
-		cell: ({ row }) =>
-			formatDate(row.original.joinDate, {
-				month: 'short',
-				day: 'numeric',
-				year: 'numeric',
-				hour: 'numeric',
-				minute: 'numeric',
-			}),
+		cell: ({ row }) => formatDate(row.original.joinDate, DateTime.DATETIME_MED),
 	},
 	{
 		id: 'role',

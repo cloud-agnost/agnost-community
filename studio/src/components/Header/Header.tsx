@@ -1,18 +1,18 @@
 import { Button } from '@/components/Button';
 import { AgnostOnlyLogo } from '@/components/icons';
-import { Bell, CaretRight, Cloud } from '@phosphor-icons/react';
-import { Link, useParams } from 'react-router-dom';
 import { MENU_ITEMS } from '@/constants';
 import { OrganizationDropdown } from '@/features/Organization/OrganizationDropdown';
-import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { ApplicationSelectDropdown } from '@/features/application';
-import useOrganizationStore from '@/store/organization/organizationStore.ts';
+import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
 import { VersionDropdown } from '@/features/version/VersionDropdown';
+import useApplicationStore from '@/store/app/applicationStore';
+import { Bell, CaretRight, Cloud } from '@phosphor-icons/react';
+import { AuthUserAvatar } from 'components/AuthUserAvatar';
+import { Link, useParams } from 'react-router-dom';
 import './header.scss';
 
 export function Header() {
-	const { application } = useOrganizationStore();
+	const { application } = useApplicationStore();
 	const { versionId } = useParams();
 
 	return (

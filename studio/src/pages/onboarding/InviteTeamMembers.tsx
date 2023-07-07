@@ -6,7 +6,7 @@ import useTypeStore from '@/store/types/typeStore';
 import { APIError, AppMembers } from '@/types/type';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 async function loader() {
 	const { isTypesOk, getAllTypes } = useTypeStore.getState();
 	if (!isTypesOk) {
@@ -21,9 +21,10 @@ export default function InviteTeamMembers() {
 	const { finalizeClusterSetup } = useClusterStore();
 	const { appRoles } = useTypeStore();
 	const { t } = useTranslation();
+	const navigate = useNavigate();
 
-	async function onSubmit(data: { member: AppMembers[] }, setError: (error: APIError) => void) {
-		const appMembers = data.member.filter((item) => item.email !== '' && item.role !== '');
+	async function onSubmit(data: AppMembers[], setError: (error: APIError) => void) {
+		const appMembers = data;
 		setDataPartially({
 			appMembers,
 		});
@@ -39,12 +40,14 @@ export default function InviteTeamMembers() {
 			setError(res);
 			return;
 		}
+
+		navigate('/organization');
 	}
 
 	return (
 		<InviteMemberForm
-			title={t('onboarding.invite.title')}
-			description={t('onboarding.invite.desc')}
+			title={t('onboarding.invite.title') as string}
+			description={t('onboarding.invite.desc') as string}
 			submitForm={onSubmit}
 			roles={appRoles}
 			actions={

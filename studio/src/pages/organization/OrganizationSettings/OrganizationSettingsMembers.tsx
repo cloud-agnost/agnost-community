@@ -14,7 +14,7 @@ import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Separator } from '@/components/Separator';
-import { ORGANIZATION_MEMBERS_PAGE_SIZE } from '@/constants';
+import { PAGE_SIZE } from '@/constants';
 import { useMemo } from 'react';
 interface OutletContextTypes {
 	isMember: boolean;
@@ -33,15 +33,15 @@ export default function OrganizationSettingsMembers() {
 
 	const { notify } = useToast();
 
-	function onSubmit(data: { member: OrgMemberRequest[] }, setError: (error: APIError) => void) {
+	function onSubmit(data: OrgMemberRequest[], setError: (error: APIError) => void) {
 		inviteUsersToOrganization({
 			organizationId: organization?._id as string,
-			members: data.member.filter((item) => item.email !== '' && item.role !== ''),
+			members: data,
 			uiBaseURL: window.location.origin,
 			onSuccess: () => {
 				notify({
-					title: 'Success',
-					description: 'success',
+					title: t('general.success'),
+					description: t('general.invitation.success'),
 					type: 'success',
 				});
 			},
@@ -56,7 +56,7 @@ export default function OrganizationSettingsMembers() {
 	const getMemberRequest = useMemo(
 		() => ({
 			page,
-			size: ORGANIZATION_MEMBERS_PAGE_SIZE,
+			size: PAGE_SIZE,
 			organizationId: organization?._id as string,
 			...(isMember
 				? { search: searchParams.get('q') as string }
@@ -84,8 +84,8 @@ export default function OrganizationSettingsMembers() {
 			<InviteMemberForm
 				submitForm={onSubmit}
 				roles={orgRoles}
-				title={t('organization.settings.members.invite.title')}
-				description={t('organization.settings.members.invite.desc')}
+				title={t('organization.settings.members.invite.title') as string}
+				description={t('organization.settings.members.invite.desc') as string}
 				actions={
 					<Button variant='primary' size='lg'>
 						Invite

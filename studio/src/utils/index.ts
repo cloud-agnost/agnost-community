@@ -1,3 +1,3 @@
-export * from './utils';
 
-export { formatDate } from './time';
+export * from './utils';
+export * from './time';

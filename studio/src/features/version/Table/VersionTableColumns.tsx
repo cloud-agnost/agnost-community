@@ -1,11 +1,11 @@
-import { ColumnDef } from '@tanstack/react-table';
-import { Version } from '@/types';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { Version as VersionIcon } from '@/components/icons';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/Avatar';
+import useApplicationStore from '@/store/app/applicationStore';
+import { Version } from '@/types';
 import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
+import { ColumnDef } from '@tanstack/react-table';
 import { Link } from 'react-router-dom';
-import useOrganizationStore from '@/store/organization/organizationStore';
 
 export const VersionTableColumns: ColumnDef<Version>[] = [
 	{
@@ -69,7 +69,7 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 		size: 75,
 		cell: ({ row }) => {
 			const { _id } = row.original;
-			const app = useOrganizationStore.getState().application;
+			const app = useApplicationStore.getState().application;
 			return (
 				<div className='flex items-center gap-3'>
 					<Link to={`${app?._id}/version/${_id}`}>
