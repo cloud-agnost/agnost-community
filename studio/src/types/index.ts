@@ -24,6 +24,7 @@ export type {
 	BaseRequest,
 	InvitationRequest,
 	UpdateRoleRequest,
+	RemoveMemberRequest,
 } from './type.ts';
 
 export { CreateApplicationSchema } from './application.ts';

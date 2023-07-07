@@ -182,7 +182,7 @@ export interface Invitation {
 
 export interface GetInvitationRequest extends BaseGetRequest {
 	email?: string;
-	role?: string;
+	roles: string[];
 	status?: string;
 }
 export interface InvitationRequest extends BaseRequest {
@@ -193,4 +193,8 @@ export interface UpdateRoleRequest extends BaseRequest {
 	token?: string;
 	userId?: string;
 	role: string;
+}
+export interface RemoveMemberRequest extends BaseRequest {
+	userId?: string;
+	userIds?: string[];
 }
