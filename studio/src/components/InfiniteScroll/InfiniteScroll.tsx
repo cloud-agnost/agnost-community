@@ -23,7 +23,7 @@ export default function InfiniteScroll({
 		}
 	};
 	const setRefs = useCallback(
-		(node) => {
+		(node: any) => {
 			ref.current = node;
 			inViewRef(node);
 		},

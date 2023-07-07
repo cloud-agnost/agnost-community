@@ -40,6 +40,6 @@
 		"role": "Role",
 		"invitedAt": "Invited At"
 	},
-	"clear": "Clear Filters"
+	"clear": "Clear Filters",
 	"create": "Create"
 }

@@ -10,6 +10,7 @@ import { useToast } from '@/hooks';
 import { InfoModal } from '@/components/InfoModal';
 import { Avatar, AvatarFallback } from '@/components/Avatar';
 import { Application } from '@/types';
+import useApplicationStore from '@/store/app/applicationStore.ts';
 interface ApplicationSettingsProps {
 	appId: string;
 	appName: string;
@@ -30,7 +31,9 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 		},
 	});
 	const [openInfoModal, setOpenInfoModal] = useState(false);
-	const { deleteApplication, leaveAppTeam, organization } = useOrganizationStore();
+	const { organization } = useOrganizationStore();
+	const { deleteApplication, leaveAppTeam } = useApplicationStore();
+
 	const { notify } = useToast();
 	return (
 		<>
@@ -59,7 +62,7 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 										setOpen(false);
 										if (setting.onClick)
 											setting.onClick(
-												useOrganizationStore
+												useApplicationStore
 													.getState()
 													.applications.find((app) => app._id === appId) as Application,
 											);

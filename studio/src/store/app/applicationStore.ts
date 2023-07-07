@@ -6,6 +6,9 @@ import {
 	ApplicationMember,
 	BaseRequest,
 	ChangeAppNameRequest,
+	CreateApplicationRequest,
+	CreateApplicationResponse,
+	DeleteApplicationRequest,
 	GetInvitationRequest,
 	Invitation,
 	InvitationRequest,
@@ -20,10 +23,12 @@ import {
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { translate } from '@/utils';
+import OrganizationService from 'services/OrganizationService.ts';
 
 interface ApplicationStore {
 	application: Application | null;
 	applications: Application[];
+	temp: Application[];
 	loading: boolean;
 	error: APIError | null;
 	applicationTeam: ApplicationMember[];
@@ -50,15 +55,22 @@ interface ApplicationStore {
 	inviteUsersToApp: (req: AppInviteRequest) => Promise<Invitation[]>;
 	getAppInvitations: (req: GetInvitationRequest) => Promise<Invitation[]>;
 	openVersionDrawer: (application: Application) => void;
-	closeVersionDrawer: () => void;
+	closeVersionDrawer: (clearApp?: boolean) => void;
 	openEditAppDrawer: (application: Application) => void;
-	closeEditAppDrawer: () => void;
+	closeEditAppDrawer: (clearApp?: boolean) => void;
 	openInviteMemberDrawer: (application: Application) => void;
 	closeInviteMemberDrawer: () => void;
 	resendInvitation: (req: InvitationRequest) => Promise<void>;
 	updateInvitationUserRole: (req: UpdateRoleRequest) => Promise<Invitation>;
 	deleteInvitation: (req: InvitationRequest) => Promise<void>;
 	deleteMultipleInvitations: (req: InvitationRequest) => Promise<void>;
+	getAppsByOrgId: (orgId: string) => Promise<Application[] | APIError>;
+	createApplication: (
+		req: CreateApplicationRequest,
+	) => Promise<CreateApplicationResponse | APIError>;
+	leaveAppTeam: (req: DeleteApplicationRequest) => Promise<void>;
+	deleteApplication: (req: DeleteApplicationRequest) => Promise<void>;
+	searchApplications: (query: string) => Promise<Application[] | APIError>;
 }
 
 const useApplicationStore = create<ApplicationStore>()(
@@ -67,6 +79,7 @@ const useApplicationStore = create<ApplicationStore>()(
 			(set, get) => ({
 				application: null,
 				applications: [],
+				temp: [],
 				applicationTeam: [],
 				tempTeam: [],
 				isVersionOpen: false,
@@ -235,10 +248,10 @@ const useApplicationStore = create<ApplicationStore>()(
 						application,
 					});
 				},
-				closeVersionDrawer: () => {
+				closeVersionDrawer: (clearApp?: boolean) => {
 					set({
 						isVersionOpen: false,
-						application: null,
+						...(clearApp && { application: null }),
 					});
 				},
 				openEditAppDrawer: (application: Application) => {
@@ -247,11 +260,11 @@ const useApplicationStore = create<ApplicationStore>()(
 						application,
 					});
 				},
-				closeEditAppDrawer: () => {
+				closeEditAppDrawer: (clearApp?: boolean) => {
 					set({
 						isEditAppOpen: false,
 						isVersionOpen: false,
-						application: null,
+						...(clearApp && { application: null }),
 					});
 					const searchParams = new URLSearchParams(window.location.search);
 					searchParams.delete('t');
@@ -322,6 +335,89 @@ const useApplicationStore = create<ApplicationStore>()(
 					} catch (error) {
 						if (req.onError) req.onError(error as APIError);
 						throw error as APIError;
+					}
+				},
+				getAppsByOrgId: async (orgId: string) => {
+					try {
+						set({ loading: true });
+						const applications = await OrganizationService.getOrganizationApps(orgId);
+						set({ applications });
+						return applications;
+					} catch (error) {
+						throw error as APIError;
+					} finally {
+						set({ loading: false });
+					}
+				},
+				createApplication: async ({
+					orgId,
+					name,
+					onSuccess,
+					onError,
+				}: CreateApplicationRequest) => {
+					try {
+						set({ loading: true });
+						const res = await OrganizationService.createApplication({ orgId, name });
+						if (onSuccess) onSuccess();
+						set((prev) => ({
+							applications: [...prev.applications, res.app],
+							temp: [...prev.applications, res.app],
+						}));
+						return res;
+					} catch (error) {
+						if (onError) onError(error as APIError);
+						throw error as APIError;
+					} finally {
+						set({ loading: false });
+					}
+				},
+				leaveAppTeam: async ({ appId, orgId, onSuccess, onError }: DeleteApplicationRequest) => {
+					try {
+						await OrganizationService.leaveAppTeam(appId, orgId);
+						set((prev) => ({
+							applications: prev.applications.filter((app) => app._id !== appId),
+							temp: prev.applications.filter((app) => app._id !== appId),
+						}));
+						if (onSuccess) onSuccess();
+					} catch (error) {
+						if (onError) onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				deleteApplication: async ({
+					appId,
+					orgId,
+					onSuccess,
+					onError,
+				}: DeleteApplicationRequest) => {
+					try {
+						await OrganizationService.deleteApplication(appId, orgId);
+						set((prev) => ({
+							applications: prev.applications.filter((app) => app._id !== appId),
+							temp: prev.applications.filter((app) => app._id !== appId),
+						}));
+						if (onSuccess) onSuccess();
+					} catch (error) {
+						if (onError) onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				searchApplications: async (query: string) => {
+					try {
+						if (query === '') {
+							set((prev) => ({ applications: prev.temp }));
+							return get().temp;
+						}
+						set({ loading: true });
+						const res = get().temp.filter((app) =>
+							app.name.toLowerCase().includes(query.toLowerCase()),
+						);
+						set({ applications: res });
+						return res;
+					} catch (error) {
+						throw error as APIError;
+					} finally {
+						set({ loading: false });
 					}
 				},
 			}),

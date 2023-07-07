@@ -24,7 +24,8 @@ export default function ApplicationSelectDropdown() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 	const [openCreateModal, setOpenCreateModal] = useState(false);
-	const { applications, application, selectApplication } = useApplicationStore();
+	const { applications, application, selectApplication, openVersionDrawer, openEditAppDrawer } =
+		useApplicationStore();
 	const navigate = useNavigate();
 	const { orgId } = useParams();
 
@@ -43,8 +44,7 @@ export default function ApplicationSelectDropdown() {
 					<div className='application-dropdown'>
 						<ApplicationLabel
 							onClick={() => {
-								// TODO: Open App Settings
-								console.log('Open App Settings');
+								if (application) openEditAppDrawer(application);
 							}}
 							application={application}
 						/>

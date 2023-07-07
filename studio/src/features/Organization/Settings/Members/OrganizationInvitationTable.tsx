@@ -1,6 +1,6 @@
 import { DataTable } from '@/components/DataTable';
 import { InfiniteScroll } from '@/components/InfiniteScroll';
-import { OrganizationInvitationsColumns } from '@/features/organization';
+import { OrganizationInvitationsColumns } from '@/features/Organization';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Invitation } from '@/types';
 import { Row } from '@tanstack/react-table';

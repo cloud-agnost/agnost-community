@@ -4,6 +4,8 @@ import { removeLastSlash } from '@/utils';
 import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
 import { ApplicationVersions } from '@/features/application';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
+import useApplicationStore from '@/store/app/applicationStore.ts';
+import EditApplication from '@/features/application/EditApplication.tsx';
 
 const authPaths = [
 	'/login',
@@ -32,9 +34,15 @@ async function loader({ request, params }: LoaderFunctionArgs) {
 	useOrganizationStore.setState((prev) => {
 		const organization = prev.organizations.find((org) => org._id === orgId);
 		if (organization) prev.organization = organization;
+		else prev.organization = null;
 
+		return prev;
+	});
+
+	useApplicationStore.setState((prev) => {
 		const application = prev.applications.find((app) => app._id === appId);
 		if (application) prev.application = application;
+		else prev.application = null;
 
 		return prev;
 	});
@@ -47,6 +55,7 @@ export default function Root() {
 		<>
 			<Outlet />
 			<ApplicationVersions />
+			<EditApplication />
 		</>
 	);
 }

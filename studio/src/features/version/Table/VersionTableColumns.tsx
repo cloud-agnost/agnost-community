@@ -5,6 +5,7 @@ import { Version } from '@/types';
 import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Link } from 'react-router-dom';
+import useApplicationStore from '@/store/app/applicationStore.ts';
 
 export const VersionTableColumns: ColumnDef<Version>[] = [
 	{
@@ -64,12 +65,12 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 	},
 	{
 		id: 'actions',
-		header: 'Actions',
+		header: '',
 		size: 75,
 		cell: ({ row }) => {
 			const { _id } = row.original;
-			const app = useOrganizationStore.getState().application;
-			const { closeVersionDrawer, selectApplication } = useOrganizationStore.getState();
+			const app = useApplicationStore.getState().application;
+			const { closeVersionDrawer, selectApplication } = useApplicationStore.getState();
 
 			const onSelect = () => {
 				if (!app) return;
