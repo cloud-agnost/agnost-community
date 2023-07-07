@@ -7,12 +7,12 @@ interface RoleSelectProps {
 	type: 'app' | 'org';
 	onSelect: (role: string) => void;
 }
-function RoleSelect({ role, type, onSelect }: RoleSelectProps) {
+function RoleSelect({ role, type, onSelect, ...props }: RoleSelectProps) {
 	const { appRoles, orgRoles } = useTypeStore();
 	const roles = type === 'app' ? appRoles : orgRoles;
 	return (
-		<Select defaultValue={role} onValueChange={onSelect}>
-			<SelectTrigger className='w-[130px]'>
+		<Select defaultValue={role} onValueChange={onSelect} {...props}>
+			<SelectTrigger className='w-[120px]'>
 				<SelectValue>{role}</SelectValue>
 			</SelectTrigger>
 
