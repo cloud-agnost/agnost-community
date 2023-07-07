@@ -1,4 +1,5 @@
 import { socket } from '@/helpers';
+import { RealtimeData } from '@/types/type';
 import { clsx, type ClassValue } from 'clsx';
 import i18next from 'i18next';
 import { DateTime } from 'luxon';
@@ -30,8 +31,11 @@ export function leaveChannel(channel: string) {
 export function sendMessageToChannel(channel: string, message: string) {
 	socket.emit('channel:message', { channel, message });
 }
+export function offChannelMessage(channel: string) {
+	socket.off(channel);
+}
 
-export function onChannelMessage<T>(channel: string, callback: (data: T) => void) {
+export function onChannelMessage<T>(channel: string, callback: (data: RealtimeData<T>) => void) {
 	socket.on(channel, callback);
 	return () => {
 		socket.off(channel);

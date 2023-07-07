@@ -198,3 +198,26 @@ export interface RemoveMemberRequest extends BaseRequest {
 	userId?: string;
 	userIds?: string[];
 }
+export type RealtimeActionTypes = 'update' | 'create' | 'delete';
+export type RealtimeObjectTypes = 'user' | 'organization';
+export interface RealtimeIdentifiers {
+	orgId?: string;
+	appId?: string;
+	userId?: string;
+	versionId?: string;
+	resourceId?: string;
+	envId?: string;
+}
+export interface RealtimeData<T> {
+	actor: Partial<User>;
+	action: RealtimeActionTypes;
+	object: RealtimeObjectTypes;
+	description: string;
+	timestamp: number;
+	data: T;
+	identifiers: RealtimeIdentifiers;
+}
+export interface RealtimeActionParams<T> {
+	data: T;
+	identifiers: RealtimeIdentifiers;
+}
