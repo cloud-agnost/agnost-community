@@ -89,3 +89,6 @@ export function getApplicationRoleVariant(role: string) {
 export function notify(params: ToastType) {
 	return toast().notify(params);
 }
+export function arrayToQueryString(array: string[], key: string) {
+	return array.map((item) => `${key}=${item}`).join('&');
+}

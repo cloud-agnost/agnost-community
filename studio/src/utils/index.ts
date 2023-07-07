@@ -12,6 +12,7 @@ export {
 	getNameForAvatar,
 	getApplicationRoleVariant,
 	notify,
+	arrayToQueryString,
 } from './utils';
 
 export { formatDate } from './time';
