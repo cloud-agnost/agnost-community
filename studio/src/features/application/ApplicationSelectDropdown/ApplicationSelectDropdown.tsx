@@ -8,31 +8,46 @@ import {
 	CommandItem,
 	CommandSeparator,
 } from '@/components/Command';
-import { InfoModal } from '@/components/InfoModal';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
-import { OrganizationCreateModal } from '@/features/organization';
+import ApplicationCreateModal from '@/features/application/ApplicationCreateModal.tsx';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { Application } from '@/types';
 import { cn } from '@/utils';
 import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
-import { useState } from 'react';
+import { MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
 import './appSelectDropdown.scss';
 
 export default function ApplicationSelectDropdown() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
-	const [openModal, setOpenModal] = useState(false);
 	const [openCreateModal, setOpenCreateModal] = useState(false);
-	const { applications, application, selectApplication } = useApplicationStore();
+	const { applications, application, selectApplication, openVersionDrawer, openEditAppDrawer } =
+		useApplicationStore();
+	const navigate = useNavigate();
+	const { orgId } = useParams();
+
+	function onSelect(app: Application) {
+		selectApplication(app);
+		setOpen(false);
+		if (app._id === application?._id) return;
+		navigate(`/organization/${orgId}`);
+		openVersionDrawer(app);
+	}
 
 	return (
 		<>
 			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger asChild>
 					<div className='application-dropdown'>
-						<ApplicationLabel application={application} />
+						<ApplicationLabel
+							onClick={() => {
+								if (application) openEditAppDrawer(application);
+							}}
+							application={application}
+						/>
 						<Button
 							variant='blank'
 							role='combobox'
@@ -58,10 +73,7 @@ export default function ApplicationSelectDropdown() {
 									<CommandItem
 										key={app._id}
 										value={app._id}
-										onSelect={() => {
-											selectApplication(app);
-											setOpen(false);
-										}}
+										onSelect={() => onSelect(app)}
 										className='application-dropdown-option'
 									>
 										<ApplicationLabel application={app} />
@@ -96,30 +108,8 @@ export default function ApplicationSelectDropdown() {
 					</Command>
 				</PopoverContent>
 			</Popover>
-			<InfoModal
-				isOpen={openModal}
-				closeModal={() => setOpenModal(false)}
-				icon={
-					<Avatar size='3xl'>
-						<AvatarFallback color='#9B7B0866' />
-					</Avatar>
-				}
-				action={
-					<div className='flex  items-center justify-center gap-4'>
-						<Button variant='text' size='lg' onClick={() => setOpenModal(false)}>
-							{t('general.cancel')}
-						</Button>
-						<Button size='lg' variant='primary'>
-							{t('general.ok')}
-						</Button>
-					</div>
-				}
-				title={t('organization.leave.main')}
-				description={t('organization.leave.description', {
-					name: application?.name,
-				})}
-			/>
-			<OrganizationCreateModal
+			<ApplicationCreateModal
+				key={openCreateModal.toString()}
 				isOpen={openCreateModal}
 				closeModal={() => setOpenCreateModal(false)}
 			/>
@@ -127,11 +117,23 @@ export default function ApplicationSelectDropdown() {
 	);
 }
 
-const ApplicationLabel = ({ application }: { application: Application | null }) => {
+interface ApplicationLabelProps {
+	application: Application | null;
+	onClick?: () => void;
+}
+
+const ApplicationLabel = ({ application, onClick }: ApplicationLabelProps) => {
 	const { user } = useAuthStore();
 
+	function openAppSettings(e: MouseEvent<HTMLButtonElement>) {
+		if (onClick) {
+			e.stopPropagation();
+			onClick();
+		}
+	}
+
 	return (
-		<div className='application-label'>
+		<Button onClick={openAppSettings} variant='blank' className='application-label'>
 			<Avatar className='mr-2' size='sm' square>
 				<AvatarImage src={application?.pictureUrl} alt={application?.name} />
 				<AvatarFallback name={application?.name} color={application?.color as string} />
@@ -142,6 +144,6 @@ const ApplicationLabel = ({ application }: { application: Application | null }) 
 					{application?.team.find((team) => team.userId._id === user?._id)?.role}
 				</div>
 			</div>
-		</div>
+		</Button>
 	);
 };

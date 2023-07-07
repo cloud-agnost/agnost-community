@@ -3,10 +3,9 @@ import { EmptyState } from '@/components/EmptyState';
 import { SearchInput } from '@/components/SearchInput';
 import { ApplicationCardSkeleton } from '@/components/Skeletons';
 import { List, SquaresFour } from '@/components/icons';
-import { ApplicationCard, ApplicationVersions } from '@/features/application';
+import { ApplicationCard } from '@/features/application';
 import AppInviteMember from '@/features/application/AppInviteMember';
 import ApplicationTable from '@/features/application/ApplicationTable/ApplicationTable';
-import EditApplication from '@/features/application/EditApplication';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Application } from '@/types';
 import { cn } from '@/utils';
@@ -14,6 +13,7 @@ import { Plus } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
+import useApplicationStore from '@/store/app/applicationStore.ts';
 
 function loader() {
 	return null;
@@ -22,8 +22,8 @@ function loader() {
 export default function OrganizationApps() {
 	const [isCard, setIsCard] = useState(true);
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { applications, searchApplications, organization, getOrganizationApps, loading, temp } =
-		useOrganizationStore();
+	const { organization, loading, temp } = useOrganizationStore();
+	const { applications, searchApplications, getAppsByOrgId } = useApplicationStore();
 	const { t } = useTranslation();
 
 	useEffect(() => {
@@ -33,9 +33,7 @@ export default function OrganizationApps() {
 	}, [searchParams.get('q')]);
 
 	useEffect(() => {
-		if (organization) {
-			getOrganizationApps(organization._id);
-		}
+		if (organization) getAppsByOrgId(organization._id);
 	}, [organization]);
 
 	return (
@@ -99,8 +97,6 @@ export default function OrganizationApps() {
 					<CreateApplicationButton />
 				</EmptyState>
 			)}
-			<ApplicationVersions />
-			<EditApplication />
 			<AppInviteMember />
 		</div>
 	);

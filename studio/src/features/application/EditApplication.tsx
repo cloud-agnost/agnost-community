@@ -1,10 +1,10 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { EDIT_APPLICATION_MENU_ITEMS } from '@/constants';
-import OrganizationMenuItem from '@/features/organization/navbar/OrganizationMenuItem';
+import OrganizationMenuItem from '@/features/Organization/navbar/OrganizationMenuItem';
 import useApplicationStore from '@/store/app/applicationStore';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useMatch, useSearchParams } from 'react-router-dom';
 import AppGeneralSettings from './Settings/AppGeneralSettings';
 import AppMembers from './Settings/Members/AppMembers';
 import AppInvitations from '@/features/application/Settings/Invitations/AppInvitations';
@@ -13,6 +13,8 @@ export default function EditApplication() {
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { isEditAppOpen, closeEditAppDrawer, getAppTeamMembers } = useApplicationStore();
+
+	const match = useMatch('/organization/:orgId/apps');
 
 	useEffect(() => {
 		if (!searchParams.get('t')) {
@@ -28,7 +30,7 @@ export default function EditApplication() {
 	}, [isEditAppOpen]);
 
 	return (
-		<Drawer open={isEditAppOpen} onOpenChange={closeEditAppDrawer}>
+		<Drawer open={isEditAppOpen} onOpenChange={() => closeEditAppDrawer(!!match)}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader className='border-none'>
 					<DrawerTitle>{t('application.settings.editApp')}</DrawerTitle>

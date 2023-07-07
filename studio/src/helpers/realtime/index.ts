@@ -1,6 +1,6 @@
 import { RealtimeObjectTypes } from '@/types';
 import Organization from './Organization';
-import User from './user';
+import User from './User';
 
 export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 	const keys = {

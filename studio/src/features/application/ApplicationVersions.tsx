@@ -16,6 +16,7 @@ import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { VersionTable } from '../version/Table';
+import { useMatch } from 'react-router-dom';
 
 export default function ApplicationVersions() {
 	const { t } = useTranslation();
@@ -25,6 +26,8 @@ export default function ApplicationVersions() {
 	const [name, setName] = useState('');
 	const prevQueryRef = useRef(name);
 	const prevPageRef = useRef(versionPage);
+
+	const match = useMatch('/organization/:orgId/apps');
 
 	const getVersions = useCallback(() => {
 		if (application?._id || (name && prevPageRef.current !== versionPage)) {
@@ -50,7 +53,7 @@ export default function ApplicationVersions() {
 		}
 	}, [getVersions, isVersionOpen]);
 	return (
-		<Drawer open={isVersionOpen} onOpenChange={closeVersionDrawer}>
+		<Drawer open={isVersionOpen} onOpenChange={() => closeVersionDrawer(!!match)}>
 			<DrawerContent position='right' size='lg'>
 				<DrawerHeader>
 					<DrawerTitle>{t('application.version.title')}</DrawerTitle>

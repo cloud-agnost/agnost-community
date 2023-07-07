@@ -40,12 +40,11 @@ export default function VersionDatabase() {
 						<TableHead className='w-[23ch]'>ID</TableHead>
 						<TableHead>TYPE</TableHead>
 						<TableHead>MANAGED</TableHead>
-						<TableHead>MODELS COUNT</TableHead>
 						<TableHead />
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{data.map(({ id, managed, modelsCount, name, type }) => (
+					{data.map(({ id, managed, name, type }) => (
 						<TableRow key={id} className='font-sfCompact font-normal'>
 							<TableCell>{name}</TableCell>
 							<TableCell copyable copyableText={id}>
@@ -55,7 +54,6 @@ export default function VersionDatabase() {
 							<TableCell>
 								<Badge text={managed} variant={BADGE_COLOR_MAP[managed]} rounded />
 							</TableCell>
-							<TableCell>{modelsCount}</TableCell>
 							<TableCell className='text-right text-[24px]'>
 								<div className='flex items-center gap-1 justify-center'>
 									<Button

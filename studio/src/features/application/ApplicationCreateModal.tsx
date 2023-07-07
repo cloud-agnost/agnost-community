@@ -16,6 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
+import useApplicationStore from '@/store/app/applicationStore.ts';
 
 export default function ApplicationCreateModal({ closeModal, ...props }: ModalProps) {
 	const { notify } = useToast();
@@ -23,7 +24,8 @@ export default function ApplicationCreateModal({ closeModal, ...props }: ModalPr
 		resolver: zodResolver(CreateApplicationSchema),
 	});
 	const { t } = useTranslation();
-	const { createApplication, organization } = useOrganizationStore();
+	const { organization } = useOrganizationStore();
+	const { createApplication } = useApplicationStore();
 	const { loading } = useOrganizationStore();
 
 	function handleCloseModal() {

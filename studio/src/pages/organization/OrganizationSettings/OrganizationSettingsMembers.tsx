@@ -4,7 +4,7 @@ import {
 	OrganizationInvitationTable,
 	OrganizationMembersTable,
 	OrganizationMembersTableHeader,
-} from '@/features/organization';
+} from '@/features/Organization';
 import { useToast } from '@/hooks';
 import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout';
 import useOrganizationStore from '@/store/organization/organizationStore';

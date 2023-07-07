@@ -5,15 +5,13 @@ import { OrganizationDropdown } from '@/features/Organization/OrganizationDropdo
 import { ApplicationSelectDropdown } from '@/features/application';
 import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
 import { VersionDropdown } from '@/features/version/VersionDropdown';
-import useApplicationStore from '@/store/app/applicationStore';
 import { Bell, CaretRight, Cloud } from '@phosphor-icons/react';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Link, useParams } from 'react-router-dom';
 import './header.scss';
 
 export function Header() {
-	const { application } = useApplicationStore();
-	const { versionId } = useParams();
+	const { versionId, appId } = useParams();
 
 	return (
 		<header className='header-menu'>
@@ -24,7 +22,7 @@ export function Header() {
 				<div className='header-menu-divider' />
 				<div className='flex items-center gap-2'>
 					<OrganizationDropdown />
-					{application && (
+					{appId && (
 						<>
 							<CaretRight size={20} className='text-icon-disabled' />
 							<ApplicationSelectDropdown />

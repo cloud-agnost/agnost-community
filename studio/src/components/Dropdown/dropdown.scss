@@ -16,7 +16,8 @@
 		@apply relative flex cursor-pointer select-none items-center rounded-sm font-sfCompact;
 		@apply px-3 py-1.5 text-sm text-default outline-none transition-colors;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
-		&:hover {
+		&:hover,
+		&.active {
 			@apply bg-subtle text-default;
 		}
 	}

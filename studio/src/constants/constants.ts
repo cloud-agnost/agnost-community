@@ -1,13 +1,27 @@
 import Database from '@/assets/images/database.png';
 import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
-import { BellRing, ChangeLog, LightBulb, LineSegments, Team } from '@/components/icons';
+import {
+	ApiKeys,
+	Authentication,
+	BellRing,
+	ChangeLog,
+	DoubleGear,
+	Environment,
+	EnvironmentVariable,
+	LightBulb,
+	LineSegments,
+	Middleware,
+	NpmPackage,
+	RateLimit,
+	RealTime,
+	Team,
+} from '@/components/icons';
 import useApplicationStore from '@/store/app/applicationStore';
-import { Application, SortOption } from '@/types';
+import { Application, SortOption, Tab } from '@/types';
 import { translate } from '@/utils';
 import { Database as DatabaseIcon, DeviceTablet, FileText, GearSix } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
-import { Tab } from '@/types';
 
 export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
@@ -227,6 +241,7 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	Yes: 'green',
 	No: 'red',
 };
+
 export const EDIT_APPLICATION_MENU_ITEMS = [
 	{
 		name: translate('application.edit.general'),
@@ -239,5 +254,68 @@ export const EDIT_APPLICATION_MENU_ITEMS = [
 	{
 		name: translate('application.edit.invitations'),
 		href: '?t=invitations',
+	},
+];
+
+export const VERSION_SETTINGS_MENU_ITEMS = [
+	{
+		id: 1,
+		title: translate('version.settings.general'),
+		path: '',
+		icon: GearSix,
+	},
+	{
+		id: 2,
+		title: translate('version.settings.environment'),
+		path: 'environment',
+		icon: Environment,
+	},
+	{
+		id: 3,
+		title: translate('version.settings.middlewares'),
+		path: 'middlewares',
+		icon: Middleware,
+	},
+	{
+		id: 4,
+		title: translate('version.settings.npm_packages'),
+		path: 'npm-packages',
+		icon: NpmPackage,
+	},
+	{
+		id: 5,
+		title: translate('version.settings.environment_variables'),
+		path: 'environment-variables',
+		icon: EnvironmentVariable,
+	},
+	{
+		id: 6,
+		title: translate('version.settings.rate_limits'),
+		path: 'rate-limits',
+		icon: RateLimit,
+	},
+	{
+		id: 7,
+		title: translate('version.settings.authentications'),
+		path: 'authentications',
+		icon: Authentication,
+	},
+	{
+		id: 8,
+		title: translate('version.settings.api_keys'),
+		path: 'api-keys',
+		icon: ApiKeys,
+	},
+	{
+		id: 9,
+		title: translate('version.settings.real_time'),
+		path: 'real-time',
+		icon: RealTime,
+	},
+	{
+		id: 10,
+		title: translate('version.settings.other'),
+		path: 'other',
+		icon: DoubleGear,
 	},
 ];

@@ -25,5 +25,6 @@
 		"error": "Please enter a valid email address"
 	},
 	"placeholder": "Enter {{label}}",
-	"alphanumeric": "{{label}} must only contain alphanumeric characters"
+	"alphanumeric": "{{label}} must only contain alphanumeric characters",
+	"number": "{{label}} must be a number"
 }

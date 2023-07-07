@@ -1,5 +1,6 @@
 .navigation-tab-container {
-	@apply flex items-stretch justify-between border-b border-border;
+	--height: var(--navigation-tab-menu-height);
+	@apply flex items-stretch justify-between border-b border-border max-h-[var(--height)];
 
 	.tab-control {
 		@apply flex items-stretch bg-subtle divide-x border-l;

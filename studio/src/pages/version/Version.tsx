@@ -1,5 +1,6 @@
 import { VersionLayout } from '@/layouts/VersionLayout';
 import useEnvironmentStore from '@/store/environment/environmentStore.ts';
+import useVersionStore from '@/store/version/versionStore.ts';
 import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
 
 export default function Version() {
@@ -18,7 +19,7 @@ Version.loader = async ({ params }: LoaderFunctionArgs) => {
 		.getState()
 		.getAppVersionEnvironment({ orgId, appId, versionId });
 
-	return {
-		environment,
-	};
+	const version = await useVersionStore.getState().getVersionById({ orgId, appId, versionId });
+
+	return { version, environment };
 };

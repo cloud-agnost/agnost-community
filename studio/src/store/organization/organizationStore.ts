@@ -2,22 +2,19 @@ import OrganizationService from '@/services/OrganizationService';
 import {
 	APIError,
 	Application,
-	CreateOrganizationRequest,
-	LeaveOrganizationRequest,
-	Organization,
-	CreateApplicationRequest,
-	CreateApplicationResponse,
-	DeleteApplicationRequest,
 	ChangeOrganizationAvatarRequest,
 	ChangeOrganizationNameRequest,
-	GetOrganizationMembersRequest,
-	OrganizationMember,
-	TransferOrganizationRequest,
-	InviteOrgRequest,
-	Invitation,
+	CreateOrganizationRequest,
 	GetInvitationRequest,
+	GetOrganizationMembersRequest,
+	Invitation,
 	InvitationRequest,
+	InviteOrgRequest,
+	LeaveOrganizationRequest,
+	Organization,
+	OrganizationMember,
 	RemoveMemberFromOrganizationRequest,
+	TransferOrganizationRequest,
 	UpdateRoleRequest,
 } from '@/types';
 import { BaseRequest } from '@/types/type';
@@ -27,7 +24,6 @@ interface OrganizationStore {
 	loading: boolean;
 	organization: Organization | null;
 	organizations: Organization[];
-	applications: Application[];
 	temp: Application[];
 	members: OrganizationMember[];
 	invitations: Invitation[];
@@ -50,13 +46,6 @@ interface OrganizationStore {
 	) => Promise<void>;
 	updateInvitationUserRole: (req: UpdateRoleRequest) => Promise<Invitation>;
 	changeMemberRole: (req: UpdateRoleRequest) => Promise<OrganizationMember>;
-	getOrganizationApps: (organizationId: string) => Promise<Application[] | APIError>;
-	createApplication: (
-		req: CreateApplicationRequest,
-	) => Promise<CreateApplicationResponse | APIError>;
-	searchApplications: (query: string) => Promise<Application[] | APIError>;
-	deleteApplication: (req: DeleteApplicationRequest) => Promise<void>;
-	leaveAppTeam: (req: DeleteApplicationRequest) => Promise<void>;
 	getOrganizationMembers: (req: GetOrganizationMembersRequest) => Promise<OrganizationMember[]>;
 	getOrganizationInvitations: (req: GetInvitationRequest) => Promise<Invitation[] | APIError>;
 }
@@ -353,91 +342,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 						throw error as APIError;
 					}
 				},
-				getOrganizationApps: async (organizationId: string) => {
-					try {
-						set({ loading: true });
-						const res = await OrganizationService.getOrganizationApps(organizationId);
-						set({ applications: res, temp: res });
-						return res;
-					} catch (error) {
-						throw error as APIError;
-					} finally {
-						set({ loading: false });
-					}
-				},
-				createApplication: async ({
-					orgId,
-					name,
-					onSuccess,
-					onError,
-				}: CreateApplicationRequest) => {
-					try {
-						set({ loading: true });
-						const res = await OrganizationService.createApplication({ orgId, name });
-						if (onSuccess) onSuccess();
-						set({
-							applications: [...get().applications, res.app],
-							temp: [...get().applications, res.app],
-						});
-						return res;
-					} catch (error) {
-						if (onError) onError(error as APIError);
-						throw error as APIError;
-					} finally {
-						set({ loading: false });
-					}
-				},
-				searchApplications: async (query: string) => {
-					try {
-						if (query === '') {
-							set({ applications: get().temp });
-							return get().temp;
-						}
-						set({ loading: true });
-						const res = get().temp.filter((app) =>
-							app.name.toLowerCase().includes(query.toLowerCase()),
-						);
-						set({ applications: res });
-						return res;
-					} catch (error) {
-						throw error as APIError;
-					} finally {
-						set({ loading: false });
-					}
-				},
-				deleteApplication: async ({
-					appId,
-					orgId,
-					onSuccess,
-					onError,
-				}: DeleteApplicationRequest) => {
-					try {
-						await OrganizationService.deleteApplication(appId, orgId);
-						set({
-							applications: get().applications.filter((app) => app._id !== appId),
-							temp: [...get().temp.filter((app) => app._id !== appId)],
-						});
-						if (onSuccess) onSuccess();
-					} catch (error) {
-						if (onError) onError(error as APIError);
-						throw error as APIError;
-					}
-				},
-				leaveAppTeam: async ({ appId, orgId, onSuccess, onError }: DeleteApplicationRequest) => {
-					try {
-						await OrganizationService.leaveAppTeam(appId, orgId);
-						set({
-							applications: get().applications.filter((app) => app._id !== appId),
-							temp: [...get().temp.filter((app) => app._id !== appId)],
-						});
-						if (onSuccess) onSuccess();
-					} catch (error) {
-						if (onError) onError(error as APIError);
-						throw error as APIError;
-					}
-				},
 			}),
-
 			{
 				name: 'organization-storage',
 			},

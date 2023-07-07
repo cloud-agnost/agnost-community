@@ -6,7 +6,7 @@ export default function useRenewToken(mins = 2) {
 	const { user, isAuthenticated, renewAccessToken } = useAuthStore();
 
 	useEffect(() => {
-		if (!isAuthenticated()) return;
+		if (import.meta.env.DEV || !isAuthenticated()) return;
 		interval = window.setInterval(() => renewAccessToken(), mins * 60 * 1000);
 		return () => {
 			if (interval) window.clearInterval(interval);

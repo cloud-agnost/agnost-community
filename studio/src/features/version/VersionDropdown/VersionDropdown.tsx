@@ -1,10 +1,10 @@
-import { Avatar, AvatarFallback } from '@/components/Avatar';
 import { Button } from '@/components/Button';
-import { InfoModal } from '@/components/InfoModal';
-import { OrganizationCreateModal } from '@/features/organization';
+import { useToast } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
-import { Version } from '@/types';
-import { CaretUpDown } from '@phosphor-icons/react';
+import useVersionStore from '@/store/version/versionStore.ts';
+import { APIError, VersionProperties } from '@/types';
+import { cn } from '@/utils';
+import { CaretUpDown, LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -15,28 +15,33 @@ import {
 } from 'components/Dropdown';
 import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import './versionDropdown.scss';
 
 export default function VersionDropdown() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
-	const [openModal, setOpenModal] = useState(false);
-	const [openCreateModal, setOpenCreateModal] = useState(false);
-	const { application } = useApplicationStore();
+	const { application, openVersionDrawer } = useApplicationStore();
 	const navigate = useNavigate();
-	const { appId, orgId, versionId } = useParams();
+	const { version, updateVersionProperties } = useVersionStore();
 
-	const versionTabs = [
+	const { appId, orgId, versionId } = useParams();
+	const { pathname } = useLocation();
+	const { notify } = useToast();
+	const versionHomePath = `/organization/${orgId}/apps/${appId}/version/${versionId}`;
+	const VERSION_DROPDOWN_ITEM = [
 		{
 			title: t('version.open_version'),
+			active: false,
 			action: () => {
-				navigate(`/organization/${orgId}/apps/${appId}/version/${versionId}`);
+				if (!application) return;
+				openVersionDrawer(application);
 			},
 			disabled: false,
 		},
 		{
 			title: t('version.create_a_copy'),
+			active: false,
 			action: () => {
 				// TODO: implement
 			},
@@ -44,6 +49,7 @@ export default function VersionDropdown() {
 		},
 		{
 			title: t('version.merge'),
+			active: false,
 			action: () => {
 				// TODO: implement
 			},
@@ -52,6 +58,7 @@ export default function VersionDropdown() {
 		},
 		{
 			title: t('version.export'),
+			active: false,
 			action: () => {
 				// TODO: implement
 			},
@@ -59,6 +66,7 @@ export default function VersionDropdown() {
 		},
 		{
 			title: t('version.import'),
+			active: false,
 			action: () => {
 				// TODO: implement
 			},
@@ -66,29 +74,29 @@ export default function VersionDropdown() {
 			after: <DropdownMenuSeparator />,
 		},
 		{
-			title: t('version.mark_read_only'),
-			action: () => {
-				// TODO: implement
-			},
+			title: version?.readOnly ? t('version.mark_read_write') : t('version.mark_read_only'),
+			active: false,
+			action: () => update({ readOnly: !version?.readOnly }),
 			disabled: false,
 		},
 		{
-			title: t('version.set_private'),
-			action: () => {
-				// TODO: implement
-			},
-			disabled: false,
+			title: version?.private ? t('version.set_public') : t('version.set_private'),
+			active: false,
+			action: () => update({ readOnly: !version?.private }),
+			disabled: version?.master,
 		},
 		{
-			title: t('version.settings'),
+			title: t('version.settings.default'),
+			active: pathname === `${versionHomePath}/settings`,
 			action: () => {
-				// TODO: implement
+				navigate(`${versionHomePath}/settings`);
 			},
 			disabled: false,
 			after: <DropdownMenuSeparator />,
 		},
 		{
 			title: t('version.delete'),
+			active: false,
 			action: () => {
 				// TODO: implement
 			},
@@ -96,70 +104,62 @@ export default function VersionDropdown() {
 		},
 	];
 
+	async function update(data: Partial<VersionProperties>) {
+		if (!orgId || !versionId || !appId) return;
+
+		try {
+			await updateVersionProperties({ orgId, versionId, appId, ...data });
+		} catch (e) {
+			const error = e as APIError;
+			notify({
+				type: 'error',
+				title: error.error,
+				description: error.details,
+			});
+		}
+	}
+
 	return (
-		<>
-			<DropdownMenu open={open} onOpenChange={setOpen}>
+		<DropdownMenu open={open} onOpenChange={setOpen}>
+			<div className='version-dropdown'>
+				<Link to={`${versionHomePath}/settings`} className='version-dropdown-label'>
+					<div className='version-label-icon'>
+						{version?.readOnly ? <LockSimple size={20} /> : <LockSimpleOpen size={20} />}
+					</div>
+					<div className='version-dropdown-label-desc'>
+						<div className='version-dropdown-label-desc-name'>{version?.name}</div>
+						<div className='text-xs text-subtle'>
+							{version?.readOnly ? 'Read Only' : 'Read/Write'}
+						</div>
+					</div>
+				</Link>
 				<DropdownMenuTrigger asChild>
-					<div className='version-dropdown'>
-						<VersionLabel version={null} />
-						<Button
-							variant='blank'
-							role='combobox'
-							aria-expanded={open}
-							className='version-dropdown-button'
-							rounded
-						>
-							<div className='version-dropdown-icon'>
+					<div className='version-dropdown-button'>
+						<Button variant='blank' role='combobox' aria-expanded={open} rounded>
+							<span className='version-dropdown-icon'>
 								<CaretUpDown size={20} />
-							</div>
+							</span>
 						</Button>
 					</div>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent align='center' className='version-dropdown-content'>
-					<DropdownMenuItemContainer>
-						{versionTabs.map((option, index) => (
-							<Fragment key={index}>
-								<DropdownMenuItem disabled={option.disabled} onClick={option.action}>
-									{option.title}
-								</DropdownMenuItem>
-								{option.after}
-							</Fragment>
-						))}
-					</DropdownMenuItemContainer>
-				</DropdownMenuContent>
-			</DropdownMenu>
+			</div>
 
-			<InfoModal
-				isOpen={openModal}
-				closeModal={() => setOpenModal(false)}
-				icon={
-					<Avatar size='3xl'>
-						<AvatarFallback color='#9B7B0866' />
-					</Avatar>
-				}
-				action={
-					<div className='flex  items-center justify-center gap-4'>
-						<Button variant='text' size='lg' onClick={() => setOpenModal(false)}>
-							{t('general.cancel')}
-						</Button>
-						<Button size='lg' variant='primary'>
-							{t('general.ok')}
-						</Button>
-					</div>
-				}
-				title={t('organization.leave.main')}
-				description={t('organization.leave.description', {
-					name: application?.name,
-				})}
-			/>
-			<OrganizationCreateModal
-				isOpen={openCreateModal}
-				closeModal={() => setOpenCreateModal(false)}
-			/>
-		</>
+			<DropdownMenuContent align='end' className='version-dropdown-content'>
+				<DropdownMenuItemContainer>
+					{VERSION_DROPDOWN_ITEM.filter((item) => !item.disabled).map((option, index) => (
+						<Fragment key={index}>
+							<DropdownMenuItem
+								className={cn(option.active && 'active')}
+								disabled={option.disabled}
+								onClick={option.action}
+							>
+								{option.title}
+							</DropdownMenuItem>
+							{option.after}
+						</Fragment>
+					))}
+				</DropdownMenuItemContainer>
+			</DropdownMenuContent>
+		</DropdownMenu>
 	);
 }
-
-const VersionLabel = ({}: { version?: Version | null }) => {
-	return <div className='version-label text-default'>Version</div>;
-};
