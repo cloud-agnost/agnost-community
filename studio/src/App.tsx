@@ -1,17 +1,17 @@
 import '@/i18n/config';
-import { useRenewToken } from '@/hooks';
+import { useRenewToken, useRealtime } from '@/hooks';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { router } from '@/router';
 import { useEffect } from 'react';
 import useTypeStore from './store/types/typeStore';
-import useRealtime from './hooks/useRealtime';
 
 function App() {
 	useRenewToken(2);
 	useRealtime();
-  const { getAllTypes, isTypesOk } = useTypeStore();
+
+	const { getAllTypes, isTypesOk } = useTypeStore();
 
 	useEffect(() => {
 		if (!isTypesOk) {

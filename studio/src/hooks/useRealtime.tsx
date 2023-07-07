@@ -1,6 +1,7 @@
 import { onChannelMessage } from '@/utils';
 import { useEffect } from 'react';
 import { realtimeObjectMapper } from '@/helpers/realtime';
+
 export default function useRealtime() {
 	useEffect(() => {
 		const cb = onChannelMessage('notification', (message) => {
