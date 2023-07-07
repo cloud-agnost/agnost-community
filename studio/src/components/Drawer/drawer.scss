@@ -22,10 +22,10 @@
 		@apply duration-100 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in;
 	}
 	&-md {
-		width: 600px;
+		width: 650px;
 	}
 	&-lg {
-		width: 700px;
+		width: 750px;
 	}
 	&-close {
 		@apply rounded-full w-8 h-8 flex justify-center items-center hover:bg-button-secondary-hover;
