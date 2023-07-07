@@ -143,7 +143,7 @@ const router = createBrowserRouter([
 						),
 					},
 					{
-						path: ':id',
+						path: ':orgId',
 						element: (
 							<RequireAuth>
 								<OrganizationDetails />

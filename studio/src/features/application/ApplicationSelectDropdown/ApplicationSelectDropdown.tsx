@@ -8,9 +8,8 @@ import {
 	CommandItem,
 	CommandSeparator,
 } from '@/components/Command';
-import { InfoModal } from '@/components/InfoModal';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
-import { OrganizationCreateModal } from '@/features/organization';
+import ApplicationCreateModal from '@/features/application/ApplicationCreateModal.tsx';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { Application } from '@/types';
@@ -24,7 +23,6 @@ import './appSelectDropdown.scss';
 export default function ApplicationSelectDropdown() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
-	const [openModal, setOpenModal] = useState(false);
 	const [openCreateModal, setOpenCreateModal] = useState(false);
 	const { applications, application, selectApplication } = useApplicationStore();
 	const navigate = useNavigate();
@@ -34,8 +32,8 @@ export default function ApplicationSelectDropdown() {
 		selectApplication(app);
 		setOpen(false);
 		if (app._id === application?._id) return;
-		console.log('app', app);
 		navigate(`/organization/${orgId}`);
+		openVersionDrawer(app);
 	}
 
 	return (
@@ -43,7 +41,13 @@ export default function ApplicationSelectDropdown() {
 			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger asChild>
 					<div className='application-dropdown'>
-						<ApplicationLabel application={application} />
+						<ApplicationLabel
+							onClick={() => {
+								// TODO: Open App Settings
+								console.log('Open App Settings');
+							}}
+							application={application}
+						/>
 						<Button
 							variant='blank'
 							role='combobox'
@@ -104,30 +108,8 @@ export default function ApplicationSelectDropdown() {
 					</Command>
 				</PopoverContent>
 			</Popover>
-			<InfoModal
-				isOpen={openModal}
-				closeModal={() => setOpenModal(false)}
-				icon={
-					<Avatar size='3xl'>
-						<AvatarFallback color='#9B7B0866' />
-					</Avatar>
-				}
-				action={
-					<div className='flex  items-center justify-center gap-4'>
-						<Button variant='text' size='lg' onClick={() => setOpenModal(false)}>
-							{t('general.cancel')}
-						</Button>
-						<Button size='lg' variant='primary'>
-							{t('general.ok')}
-						</Button>
-					</div>
-				}
-				title={t('organization.leave.main')}
-				description={t('organization.leave.description', {
-					name: application?.name,
-				})}
-			/>
-			<OrganizationCreateModal
+			<ApplicationCreateModal
+				key={openCreateModal.toString()}
 				isOpen={openCreateModal}
 				closeModal={() => setOpenCreateModal(false)}
 			/>
@@ -135,13 +117,19 @@ export default function ApplicationSelectDropdown() {
 	);
 }
 
-const ApplicationLabel = ({ application }: { application: Application | null }) => {
+interface ApplicationLabelProps {
+	application: Application | null;
+	onClick?: () => void;
+}
+
+const ApplicationLabel = ({ application, onClick }: ApplicationLabelProps) => {
 	const { user } = useAuthStore();
 
 	function openAppSettings(e: MouseEvent<HTMLButtonElement>) {
-		e.stopPropagation();
-		// TODO: Open App Settings
-		console.log('Open App Settings');
+		if (onClick) {
+			e.stopPropagation();
+			onClick();
+		}
 	}
 
 	return (
