@@ -10,8 +10,8 @@ import {
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
 import { Button } from 'components/Button';
-import { FunnelSimple } from '@phosphor-icons/react';
-import { INVITATIONS_SORT_OPTIONS } from '@/constants';
+import { Broom, FunnelSimple } from '@phosphor-icons/react';
+import { INVITATIONS_SORT_OPTIONS, PAGE_SIZE } from '@/constants';
 import { Row } from '@tanstack/react-table';
 import { Invitation } from '@/types';
 import { SelectedRowDropdown } from 'components/Table';
@@ -27,10 +27,11 @@ function AppInvitationFilter({ selectedRows }: Props) {
 	const [searchParams] = useSearchParams();
 
 	const {
-		getAppInvitations,
 		invitationRoleFilter,
 		invitationSearch,
 		invitationSort,
+		invitationPage,
+		getAppInvitations,
 		deleteMultipleInvitations,
 	} = useApplicationStore();
 
@@ -55,17 +56,27 @@ function AppInvitationFilter({ selectedRows }: Props) {
 			});
 		}
 	}
-
+	function clearFilters() {
+		useApplicationStore.setState?.({
+			invitationSearch: '',
+			invitationRoleFilter: [],
+			invitationSort: {
+				name: t('general.sortOptions.default'),
+				value: '',
+				sortDir: '',
+			},
+		});
+	}
 	const getInvitations = useCallback(() => {
 		getAppInvitations({
-			size: 10,
-			page: 0,
-			role: invitationRoleFilter,
+			size: PAGE_SIZE,
+			page: invitationPage,
+			roles: invitationRoleFilter || [],
 			sortBy: invitationSort.value,
 			sortDir: invitationSort.sortDir,
 			email: invitationSearch,
 		});
-	}, [invitationRoleFilter, invitationSearch, invitationSort]);
+	}, [invitationRoleFilter, invitationSearch, invitationSort, invitationPage]);
 
 	useEffect(() => {
 		if (searchParams.get('t') === 'invitations') {
@@ -76,13 +87,17 @@ function AppInvitationFilter({ selectedRows }: Props) {
 	return (
 		<div className='flex gap-4'>
 			<SearchInput
+				value={invitationSearch}
 				className='flex-1'
-				onSearch={(val) => useApplicationStore.setState?.({ invitationSearch: val })}
+				onSearch={(val) =>
+					useApplicationStore.setState?.({ invitationSearch: val, invitationPage: 0 })
+				}
 			/>
 			<RoleDropdown
+				value={invitationRoleFilter || []}
 				type='app'
-				onCheck={(role) => useApplicationStore.setState?.({ invitationRoleFilter: role })}
-				onUncheck={() => useApplicationStore.setState?.({ invitationRoleFilter: '' })}
+				onCheck={(roles) => useApplicationStore.setState?.({ invitationRoleFilter: roles })}
+				onUncheck={(roles) => useApplicationStore.setState?.({ invitationRoleFilter: roles })}
 			/>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
@@ -119,6 +134,15 @@ function AppInvitationFilter({ selectedRows }: Props) {
 					selectedRowLength={selectedRows?.length}
 				/>
 			)}
+			{invitationSearch ||
+			!invitationRoleFilter ||
+			invitationRoleFilter.length ||
+			invitationSort.name !== t('general.sortOptions.default') ? (
+				<Button variant='outline' iconOnly onClick={clearFilters}>
+					<Broom size={16} className='members-filter-icon' />
+					{t('general.clear')}
+				</Button>
+			) : null}
 		</div>
 	);
 }
