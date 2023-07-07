@@ -10,7 +10,7 @@ import {
 } from '@/components/Command';
 import { InfoModal } from '@/components/InfoModal';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
-import { OrganizationCreateModal } from '@/features/organization';
+import { OrganizationCreateModal } from '@/features/Organization';
 import { useToast } from '@/hooks';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization } from '@/types';
@@ -164,6 +164,7 @@ export function OrganizationDropdown() {
 				})}
 			/>
 			<OrganizationCreateModal
+				key={openCreateModal.toString()}
 				isOpen={openCreateModal}
 				closeModal={() => setOpenCreateModal(false)}
 			/>
