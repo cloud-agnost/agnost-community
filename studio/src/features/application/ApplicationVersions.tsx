@@ -50,7 +50,7 @@ export default function ApplicationVersions() {
 		}
 	}, [getVersions, isVersionOpen]);
 	return (
-		<Drawer open={isVersionOpen} onOpenChange={closeVersionDrawer}>
+		<Drawer open={isVersionOpen} onOpenChange={() => closeVersionDrawer(true)}>
 			<DrawerContent position='right' size='lg'>
 				<DrawerHeader>
 					<DrawerTitle>{t('application.version.title')}</DrawerTitle>
