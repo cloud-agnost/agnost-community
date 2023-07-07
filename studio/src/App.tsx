@@ -4,9 +4,11 @@ import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { router } from '@/router';
+import useRealtime from './hooks/useRealtime';
 
 function App() {
 	useRenewToken(2);
+	useRealtime();
 	return (
 		<>
 			<RouterProvider router={router} />

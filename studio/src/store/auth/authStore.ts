@@ -53,8 +53,8 @@ const useAuthStore = create<AuthStore>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				accessToken: null,
-				refreshToken: null,
+				accessToken: '',
+				refreshToken: '',
 				loading: false,
 				error: null,
 				user: null,
@@ -196,6 +196,7 @@ const useAuthStore = create<AuthStore>()(
 				},
 				async getUser() {
 					const user = await UserService.getUser();
+					if (user) joinChannel(user._id);
 					set({ user });
 					return user;
 				},

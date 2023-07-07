@@ -15,13 +15,6 @@ export type {
 	TransferOrganizationRequest,
 	UpdateRoleRequest,
 } from './organization.ts';
-export type {
-	APIError,
-	CompleteAccountSetupRequest,
-	FinalizeAccountSetupRequest,
-	SortOption,
-	ToastType,
-} from './type.ts';
 
 export type {
 	Application,
@@ -32,10 +25,10 @@ export type {
 } from './application.ts';
 
 export { CreateApplicationSchema } from './application.ts';
+export { CreateOrganizationSchema } from './organization.ts';
+
 export type * from './database.ts';
 export type * from './environment.ts';
-export { CreateOrganizationSchema } from './organization.ts';
 export type * from './resource.ts';
-export type { ResLog, Resource } from './resource.ts';
 export type * from './version.ts';
-
+export type * from './type.ts';
