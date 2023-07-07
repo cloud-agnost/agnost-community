@@ -14,7 +14,7 @@ import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Separator } from '@/components/Separator';
-import { ORGANIZATION_MEMBERS_PAGE_SIZE } from '@/constants';
+import { PAGE_SIZE } from '@/constants';
 import { useMemo } from 'react';
 interface OutletContextTypes {
 	isMember: boolean;
@@ -56,7 +56,7 @@ export default function OrganizationSettingsMembers() {
 	const getMemberRequest = useMemo(
 		() => ({
 			page,
-			size: ORGANIZATION_MEMBERS_PAGE_SIZE,
+			size: PAGE_SIZE,
 			organizationId: organization?._id as string,
 			...(isMember
 				? { search: searchParams.get('q') as string }
