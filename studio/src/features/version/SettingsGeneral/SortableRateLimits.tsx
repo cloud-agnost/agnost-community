@@ -1,5 +1,5 @@
 import useVersionStore from '@/store/version/versionStore.ts';
-import { DragDropContext, Draggable, DraggableProvided } from 'react-beautiful-dnd';
+import { DragDropContext, Draggable, DraggableProvided, DropResult } from 'react-beautiful-dnd';
 import { StrictModeDroppable as Droppable } from 'components/StrictModeDroppable';
 import { APIError, RateLimit } from '@/types';
 import { useState } from 'react';
@@ -10,10 +10,17 @@ import { DotsSixVertical, Trash } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 
 export default function SortableRateLimits() {
+	const defaultRateLimiters = useVersionStore((state) => state.version?.defaultEndpointLimits);
 	const rateLimits = useVersionStore((state) => state.version?.limits);
+	const updateVersionProperties = useVersionStore((state) => state.updateVersionProperties);
 	const orderLimits = useVersionStore((state) => state.orderLimits);
+	const { orgId, versionId, appId } = useParams<{
+		versionId: string;
+		appId: string;
+		orgId: string;
+	}>();
 
-	const reorder = (list: RateLimit[], startIndex: number, endIndex: number) => {
+	const reorder = (list: string[], startIndex: number, endIndex: number) => {
 		const result = Array.from(list);
 		const [removed] = result.splice(startIndex, 1);
 		result.splice(endIndex, 0, removed);
@@ -21,12 +28,25 @@ export default function SortableRateLimits() {
 		return result;
 	};
 
-	function onDragEnd(result: any) {
-		if (!result.destination || !rateLimits) return;
-		orderLimits(reorder(rateLimits, result.source.index, result.destination.index));
+	async function onDragEnd(result: DropResult) {
+		if (!result.destination || !defaultRateLimiters || !versionId || !appId || !orgId) return;
+		const ordered = reorder(defaultRateLimiters, result.source.index, result.destination.index);
+		orderLimits(ordered);
+		await updateVersionProperties({
+			orgId,
+			versionId,
+			appId,
+			defaultEndpointLimits: ordered,
+		});
 	}
 
-	if (!rateLimits) return <></>;
+	if (
+		!defaultRateLimiters ||
+		!rateLimits ||
+		defaultRateLimiters.length === 0 ||
+		rateLimits.length === 0
+	)
+		return <></>;
 
 	return (
 		<DragDropContext onDragEnd={onDragEnd}>
@@ -34,9 +54,14 @@ export default function SortableRateLimits() {
 				{(provided) => (
 					<div {...provided.droppableProps} ref={provided.innerRef}>
 						<ul className='flex flex-col gap-4'>
-							{rateLimits?.map((limiter, index) => (
+							{defaultRateLimiters?.map((iid, index) => (
 								<Draggable key={index} draggableId={index.toString()} index={index}>
-									{(provided) => <RateLimitItem limiter={limiter} provided={provided} />}
+									{(provided) => (
+										<RateLimitItem
+											limiter={rateLimits?.find((item) => item.iid === iid)}
+											provided={provided}
+										/>
+									)}
 								</Draggable>
 							))}
 						</ul>
@@ -50,11 +75,12 @@ export default function SortableRateLimits() {
 
 interface RateLimitProps {
 	provided: DraggableProvided;
-	limiter: RateLimit;
+	limiter?: RateLimit;
 }
 function RateLimitItem({ provided, limiter }: RateLimitProps) {
 	const [deleting, setDeleting] = useState(false);
-	const deleteLimit = useVersionStore((state) => state.deleteRateLimit);
+	const defaultEndpointLimits = useVersionStore((state) => state.version?.defaultEndpointLimits);
+	const updateVersionProperties = useVersionStore((state) => state.updateVersionProperties);
 	const { t } = useTranslation();
 	const { orgId, versionId, appId } = useParams<{
 		versionId: string;
@@ -64,15 +90,20 @@ function RateLimitItem({ provided, limiter }: RateLimitProps) {
 
 	const { notify } = useToast();
 
-	async function deleteHandler(limitId: string) {
-		if (!versionId || !appId || !orgId || deleting) return;
+	async function deleteHandler(limitId?: string) {
+		if (!versionId || !appId || !orgId || deleting || !limitId) return;
 		try {
 			setDeleting(true);
-			await deleteLimit({ orgId, versionId, appId, limitId });
+			await updateVersionProperties({
+				orgId,
+				versionId,
+				appId,
+				defaultEndpointLimits: defaultEndpointLimits?.filter((item) => item !== limitId),
+			});
 			notify({
 				type: 'success',
 				title: t('general.success'),
-				description: t('version.add.rate_limiter.deleted'),
+				description: t('version.default_limiter_deleted'),
 			});
 		} catch (e) {
 			const error = e as APIError;
@@ -94,14 +125,14 @@ function RateLimitItem({ provided, limiter }: RateLimitProps) {
 			{...provided.dragHandleProps}
 		>
 			<DotsSixVertical className='text-icon-base text-lg cursor-move' />
-			<span>{limiter.name}</span>
+			<span>{limiter?.name}</span>
 			<Button
-				onClick={() => deleteHandler(limiter._id)}
+				onClick={() => deleteHandler(limiter?.iid)}
 				iconOnly
 				loading={deleting}
 				variant='blank'
 				rounded
-				className='ml-auto text-lg text-icon-base hover:bg-base hover:text-default'
+				className='ml-auto text-lg text-icon-base aspect-square hover:bg-base hover:text-default'
 			>
 				<Trash />
 			</Button>

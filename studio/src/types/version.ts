@@ -26,7 +26,7 @@ export interface Version {
 		sessionRequired: boolean;
 		rateLimits: [];
 	};
-	defaultEndpointLimits: RateLimit[];
+	defaultEndpointLimits: string[];
 	authentication: {
 		email: {
 			customSMTP: {
@@ -91,7 +91,7 @@ export type VersionProperties = {
 	name: string;
 	private: boolean;
 	readOnly: boolean;
-	defaultEndpointLimits: RateLimit[];
+	defaultEndpointLimits: string[];
 };
 
 export type UpdateVersionPropertiesParams = VersionParamsWithoutEnvId & VersionProperties;

@@ -22,10 +22,12 @@ interface VersionStore {
 	getVersionById: (req: GetVersionByIdParams) => Promise<Version>;
 	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<void>;
 	setVersionPage: (page: number) => void;
-	updateVersionProperties: (params: VersionParamsWithoutEnvId) => Promise<Version>;
-	createRateLimit: (params: CreateRateLimitParams) => Promise<Version>;
+	updateVersionProperties: (
+		params: VersionParamsWithoutEnvId & Partial<VersionProperties>,
+	) => Promise<Version>;
+	createRateLimit: (params: CreateRateLimitParams) => Promise<RateLimit>;
 	deleteRateLimit: (params: DeleteRateLimitParams) => Promise<Version>;
-	orderLimits: (limits: RateLimit[]) => void;
+	orderLimits: (limits: string[]) => void;
 }
 
 const useVersionStore = create<VersionStore>()(
@@ -78,17 +80,17 @@ const useVersionStore = create<VersionStore>()(
 			createRateLimit: async (params: CreateRateLimitParams) => {
 				const version = await VersionService.createRateLimit(params);
 				set({ version });
-				return version;
+				return version.limits.at(-1);
 			},
 			deleteRateLimit: async (params: DeleteRateLimitParams) => {
 				const version = await VersionService.deleteRateLimit(params);
 				set({ version });
 				return version;
 			},
-			orderLimits: (limits: RateLimit[]) => {
+			orderLimits: (limits: string[]) => {
 				set((prev) => {
 					if (!prev.version) return prev;
-					prev.version.limits = limits;
+					prev.version.defaultEndpointLimits = limits;
 					return {
 						version: prev.version,
 					};

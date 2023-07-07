@@ -96,8 +96,9 @@
 				"desc": "Error message that will be returned to the calling party when the rate limit is exceeded",
 				"default": "Too many requests, please try again later."
 			},
-			"success": "Rate limiter added successfully",
-			"deleted": "Rate limiter deleted successfully"
+			"success": "Rate limiter added successfully"
 		}
-	}
+	},
+	"default_limiter_deleted": "Default rate limiter deleted successfully",
+	"limiter_added_to_default": "Rate limiter added to default rate limiters"
 }

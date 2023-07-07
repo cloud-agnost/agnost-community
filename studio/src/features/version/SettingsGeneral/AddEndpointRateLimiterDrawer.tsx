@@ -94,6 +94,9 @@ export default function AddEndpointRateLimiterDrawer({
 	const { t } = useTranslation();
 	const [error, setError] = useState<APIError | null>(null);
 	const createRateLimit = useVersionStore((state) => state.createRateLimit);
+	const updateVersionProperties = useVersionStore((state) => state.updateVersionProperties);
+	const defaultEndpointLimits = useVersionStore((state) => state.version?.defaultEndpointLimits);
+
 	const { notify } = useToast();
 
 	const { orgId, versionId, appId } = useParams<{
@@ -114,7 +117,7 @@ export default function AddEndpointRateLimiterDrawer({
 		try {
 			setLoading(true);
 			setError(null);
-			await createRateLimit({
+			const rateLimit = await createRateLimit({
 				orgId,
 				versionId,
 				appId,
@@ -122,6 +125,12 @@ export default function AddEndpointRateLimiterDrawer({
 				rate: data.rate,
 				duration: data.duration,
 				errorMessage: data.errorMessage,
+			});
+			await updateVersionProperties({
+				orgId,
+				versionId,
+				appId,
+				defaultEndpointLimits: [...(defaultEndpointLimits ?? []), rateLimit.iid],
 			});
 			onOpenChange(false);
 			notify({
