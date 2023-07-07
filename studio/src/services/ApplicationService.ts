@@ -5,6 +5,7 @@ import useApplicationStore from '@/store/app/applicationStore';
 import { ApplicationMember } from '@/types';
 import { AppInviteRequest } from '@/types/application';
 import { UI_BASE_URL } from '@/constants';
+import { arrayToQueryString } from '@/utils';
 export default class ApplicationService {
 	static url = '/v1/org/:orgId/app/:appId';
 
@@ -72,9 +73,10 @@ export default class ApplicationService {
 			.data;
 	}
 	static async getAppInvitations(req: GetInvitationRequest): Promise<Invitation[]> {
-		const { page, size, status, email, role, start, end, sortBy, sortDir } = req;
+		const { page, size, status, email, roles, start, end, sortBy, sortDir } = req;
+		const role = arrayToQueryString(roles, 'role');
 		return (
-			await axios.get(`${this.getUrl()}/invite`, {
+			await axios.get(`${this.getUrl()}/invite?${role}`, {
 				params: {
 					page,
 					size,
@@ -82,7 +84,6 @@ export default class ApplicationService {
 					sortDir,
 					status,
 					email,
-					role,
 					start,
 					end,
 				},

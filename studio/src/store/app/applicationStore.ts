@@ -9,6 +9,7 @@ import {
 	GetInvitationRequest,
 	Invitation,
 	InvitationRequest,
+	RemoveMemberRequest,
 	SetAppAvatarRequest,
 	SortOption,
 	TeamOption,
@@ -35,7 +36,7 @@ interface ApplicationStore {
 	invitationPage: number;
 	invitationSort: SortOption;
 	invitationSearch: string;
-	invitationRoleFilter: string;
+	invitationRoleFilter: string[] | null;
 	selectApplication: (application: Application) => void;
 	changeAppName: (req: ChangeAppNameRequest) => Promise<Application>;
 	setAppAvatar: (req: SetAppAvatarRequest) => Promise<Application>;
@@ -43,9 +44,9 @@ interface ApplicationStore {
 	transferAppOwnership: (req: TransferAppOwnershipRequest) => Promise<Application>;
 	getAppTeamMembers: () => Promise<ApplicationMember[]>;
 	filterApplicationTeam: (search: string) => ApplicationMember[];
-	changeAppTeamRole: (memberId: string, role: string) => Promise<ApplicationMember>;
-	removeAppMember: (memberId: string) => Promise<ApplicationMember>;
-	removeMultipleAppMembers: (memberIds: string[]) => Promise<ApplicationMember[]>;
+	changeAppTeamRole: (req: UpdateRoleRequest) => Promise<ApplicationMember>;
+	removeAppMember: (req: RemoveMemberRequest) => Promise<ApplicationMember>;
+	removeMultipleAppMembers: (req: RemoveMemberRequest) => Promise<ApplicationMember[]>;
 	inviteUsersToApp: (req: AppInviteRequest) => Promise<Invitation[]>;
 	getAppInvitations: (req: GetInvitationRequest) => Promise<Invitation[]>;
 	openVersionDrawer: (application: Application) => void;
@@ -162,24 +163,46 @@ const useApplicationStore = create<ApplicationStore>()(
 						return filteredTeam as ApplicationMember[];
 					}
 				},
-				changeAppTeamRole: async (memberId: string, role: string) => {
+				changeAppTeamRole: async (req: UpdateRoleRequest) => {
+					const { userId, role, onSuccess, onError } = req;
 					try {
-						const applicationTeam = await ApplicationService.changeAppTeamRole(memberId, role);
-						set({ applicationTeam });
+						await ApplicationService.changeMemberRole(userId?.toString(), role);
+						set({
+							applicationTeam: get().applicationTeam.map((team) => {
+								if (team.member._id === userId) {
+									team.role = role;
+								}
+								return team;
+							}),
+						});
+						if (onSuccess) onSuccess();
 					} catch (error) {
+						if (onError) onError(error as APIError);
 						throw error as APIError;
 					}
 				},
-				removeAppMember: async (memberId: string) => {
+				removeAppMember: async (req: RemoveMemberRequest) => {
 					try {
-						await ApplicationService.removeAppMember(memberId);
+						await ApplicationService.removeAppMember(req.userId?.toString());
+						set({
+							applicationTeam: get().applicationTeam.filter(
+								(team) => team.member._id !== req.userId,
+							),
+						});
+						if (req.onSuccess) req.onSuccess();
 					} catch (error) {
+						if (req.onError) req.onError(error as APIError);
 						throw error as APIError;
 					}
 				},
 				removeMultipleAppMembers: async (memberIds: string[]) => {
 					try {
 						await ApplicationService.removeMultipleAppMembers(memberIds);
+						set({
+							applicationTeam: get().applicationTeam.filter(
+								(team) => !memberIds.includes(team.member._id),
+							),
+						});
 					} catch (error) {
 						throw error as APIError;
 					}

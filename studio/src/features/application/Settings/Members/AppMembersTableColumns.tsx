@@ -2,14 +2,52 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { SortButton } from '@/components/DataTable';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
-import useTypeStore from '@/store/types/typeStore';
 import { ApplicationMember } from '@/types';
-import { translate } from '@/utils';
+import { notify, translate } from '@/utils';
 import { Trash } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
+import { RoleSelect } from 'components/RoleDropdown';
+import useApplicationStore from '@/store/app/applicationStore';
 
-const roles = useTypeStore.getState?.().appRoles;
+function removeMember(userId: string) {
+	useApplicationStore.getState?.().removeAppMember({
+		userId,
+		onSuccess: () => {
+			notify({
+				title: translate('general.success'),
+				description: translate('general.member.delete'),
+				type: 'success',
+			});
+		},
+		onError: ({ error, details }) => {
+			notify({
+				title: error,
+				description: details,
+				type: 'error',
+			});
+		},
+	});
+}
+function updateMemberRole(userId, role) {
+	useApplicationStore.getState?.().changeAppTeamRole({
+		userId,
+		role,
+		onSuccess: () => {
+			notify({
+				title: translate('general.success'),
+				description: translate('general.member.update'),
+				type: 'success',
+			});
+		},
+		onError: ({ error, details }) => {
+			notify({
+				title: error,
+				description: details,
+				type: 'error',
+			});
+		},
+	});
+}
 export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 	{
 		id: 'select',
@@ -63,27 +101,13 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 		filterFn: 'arrIncludesSome',
 		cell: ({ row }) => {
 			const { role, member } = row.original;
-			return member.isAppOwner ? (
-				<span className='text-default text-sm font-sfCompact'>{role}</span>
-			) : (
-				<Select
-					defaultValue={role}
-					onValueChange={(val) => {
-						console.log(val);
-					}}
-				>
-					<SelectTrigger className='w-[150px]'>
-						<SelectValue>{role}</SelectValue>
-					</SelectTrigger>
-
-					<SelectContent>
-						{roles.map((role) => (
-							<SelectItem key={role} value={role}>
-								{role}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
+			return (
+				<RoleSelect
+					role={role}
+					type={'app'}
+					onSelect={(selectedRole) => updateMemberRole(member._id, selectedRole)}
+					disabled={member.isAppOwner}
+				/>
 			);
 		},
 	},
@@ -93,15 +117,10 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 		size: 100,
 		cell: ({ row }) => {
 			const { member } = row.original;
-			// const { removeMember } = useApplicationStore.getState();
 			return (
-				member.isAppOwner && (
+				!member.isAppOwner && (
 					<div className='flex items-center justify-end'>
-						<Button
-							variant='blank'
-							iconOnly
-							// onClick={() => removeMember(member._id)}
-						>
+						<Button variant='blank' iconOnly onClick={() => removeMember(member._id)}>
 							<Trash size={20} />
 						</Button>
 					</div>
