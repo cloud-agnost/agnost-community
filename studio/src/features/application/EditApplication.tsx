@@ -29,7 +29,7 @@ export default function EditApplication() {
 
 	return (
 		<Drawer open={isEditAppOpen} onOpenChange={closeEditAppDrawer}>
-			<DrawerContent position='right' size='lg'>
+			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader className='border-none'>
 					<DrawerTitle>{t('application.settings.editApp')}</DrawerTitle>
 				</DrawerHeader>
@@ -44,7 +44,7 @@ export default function EditApplication() {
 						);
 					})}
 				</nav>
-				<div className='p-6'>
+				<div className='flex flex-col h-full'>
 					{searchParams.get('t') === 'general' && <AppGeneralSettings />}
 					{searchParams.get('t') === 'members' && <AppMembers />}
 					{searchParams.get('t') === 'invitations' && <AppInvitations />}
