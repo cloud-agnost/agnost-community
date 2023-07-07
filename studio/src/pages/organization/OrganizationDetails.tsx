@@ -2,13 +2,14 @@ import ApplicationCreateModal from '@/features/application/ApplicationCreateModa
 import { Layout } from '@/layouts/Layout';
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { OrganizationMenu } from '@/features/organization';
+import { OrganizationMenu } from '@/features/Organization';
 
 export default function OrganizationDetails() {
 	const [openAppCreateModal, setOpenAppCreateModal] = useState(false);
 	return (
 		<Layout>
 			<ApplicationCreateModal
+				key={openAppCreateModal.toString()}
 				isOpen={openAppCreateModal}
 				closeModal={() => setOpenAppCreateModal(false)}
 			/>
