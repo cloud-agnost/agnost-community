@@ -1,6 +1,7 @@
 import { Button } from '@/components/Button';
 import { useToast } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
+import useOrganizationStore from '@/store/organization/organizationStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIError, VersionProperties } from '@/types';
 import { cn } from '@/utils';
@@ -26,6 +27,8 @@ export default function VersionDropdown() {
 	const { application } = useApplicationStore();
 	const navigate = useNavigate();
 	const { version, updateVersionProperties } = useVersionStore();
+	const { openVersionDrawer } = useOrganizationStore();
+
 	const { appId, orgId, versionId } = useParams();
 	const { pathname } = useLocation();
 	const { notify } = useToast();
@@ -33,9 +36,10 @@ export default function VersionDropdown() {
 	const VERSION_DROPDOWN_ITEM = [
 		{
 			title: t('version.open_version'),
-			active: pathname === versionHomePath,
+			active: false,
 			action: () => {
-				navigate(versionHomePath);
+				if (!application) return;
+				openVersionDrawer(application);
 			},
 			disabled: false,
 		},
@@ -120,46 +124,48 @@ export default function VersionDropdown() {
 	}
 
 	return (
-		<DropdownMenu open={open} onOpenChange={setOpen}>
-			<div className='version-dropdown'>
-				<Link to={`${versionHomePath}/settings`} className='version-dropdown-label'>
-					<div className='version-label-icon'>
-						{version?.readOnly ? <LockSimple size={20} /> : <LockSimpleOpen size={20} />}
-					</div>
-					<div className='version-label-desc'>
-						<div className='version-label-desc-name'>{version?.name}</div>
-						<div className='text-xs text-subtle'>
-							{version?.readOnly ? 'Read Only' : 'Read/Write'}
+		<>
+			<DropdownMenu open={open} onOpenChange={setOpen}>
+				<div className='version-dropdown'>
+					<Link to={`${versionHomePath}/settings`} className='version-dropdown-label'>
+						<div className='version-label-icon'>
+							{version?.readOnly ? <LockSimple size={20} /> : <LockSimpleOpen size={20} />}
 						</div>
-					</div>
-				</Link>
-				<DropdownMenuTrigger asChild>
-					<div className='version-dropdown-button'>
-						<Button variant='blank' role='combobox' aria-expanded={open} rounded>
-							<span className='version-dropdown-icon'>
-								<CaretUpDown size={20} />
-							</span>
-						</Button>
-					</div>
-				</DropdownMenuTrigger>
-			</div>
+						<div className='version-label-desc'>
+							<div className='version-label-desc-name'>{version?.name}</div>
+							<div className='text-xs text-subtle'>
+								{version?.readOnly ? 'Read Only' : 'Read/Write'}
+							</div>
+						</div>
+					</Link>
+					<DropdownMenuTrigger asChild>
+						<div className='version-dropdown-button'>
+							<Button variant='blank' role='combobox' aria-expanded={open} rounded>
+								<span className='version-dropdown-icon'>
+									<CaretUpDown size={20} />
+								</span>
+							</Button>
+						</div>
+					</DropdownMenuTrigger>
+				</div>
 
-			<DropdownMenuContent align='end' className='version-dropdown-content'>
-				<DropdownMenuItemContainer>
-					{VERSION_DROPDOWN_ITEM.filter((item) => !item.disabled).map((option, index) => (
-						<Fragment key={index}>
-							<DropdownMenuItem
-								className={cn(option.active && 'active')}
-								disabled={option.disabled}
-								onClick={option.action}
-							>
-								{option.title}
-							</DropdownMenuItem>
-							{option.after}
-						</Fragment>
-					))}
-				</DropdownMenuItemContainer>
-			</DropdownMenuContent>
-		</DropdownMenu>
+				<DropdownMenuContent align='end' className='version-dropdown-content'>
+					<DropdownMenuItemContainer>
+						{VERSION_DROPDOWN_ITEM.filter((item) => !item.disabled).map((option, index) => (
+							<Fragment key={index}>
+								<DropdownMenuItem
+									className={cn(option.active && 'active')}
+									disabled={option.disabled}
+									onClick={option.action}
+								>
+									{option.title}
+								</DropdownMenuItem>
+								{option.after}
+							</Fragment>
+						))}
+					</DropdownMenuItemContainer>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</>
 	);
 }

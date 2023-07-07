@@ -2,22 +2,22 @@ import OrganizationService from '@/services/OrganizationService';
 import {
 	APIError,
 	Application,
-	CreateOrganizationRequest,
-	LeaveOrganizationRequest,
-	Organization,
-	CreateApplicationRequest,
-	CreateApplicationResponse,
-	DeleteApplicationRequest,
 	ChangeOrganizationAvatarRequest,
 	ChangeOrganizationNameRequest,
-	GetOrganizationMembersRequest,
-	OrganizationMember,
-	TransferOrganizationRequest,
-	InviteOrgRequest,
-	Invitation,
+	CreateApplicationRequest,
+	CreateApplicationResponse,
+	CreateOrganizationRequest,
+	DeleteApplicationRequest,
 	GetInvitationRequest,
+	GetOrganizationMembersRequest,
+	Invitation,
 	InvitationRequest,
+	InviteOrgRequest,
+	LeaveOrganizationRequest,
+	Organization,
+	OrganizationMember,
 	RemoveMemberFromOrganizationRequest,
+	TransferOrganizationRequest,
 	UpdateRoleRequest,
 } from '@/types';
 import { BaseRequest } from '@/types/type';
@@ -437,7 +437,6 @@ const useOrganizationStore = create<OrganizationStore>()(
 					}
 				},
 			}),
-
 			{
 				name: 'organization-storage',
 			},

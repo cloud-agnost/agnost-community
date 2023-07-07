@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { Version as VersionIcon } from '@/components/icons';
-import useApplicationStore from '@/store/app/applicationStore';
 import { Version } from '@/types';
 import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
@@ -69,10 +68,21 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 		size: 75,
 		cell: ({ row }) => {
 			const { _id } = row.original;
-			const app = useApplicationStore.getState().application;
+			const app = useOrganizationStore.getState().application;
+			const { closeVersionDrawer, selectApplication } = useOrganizationStore.getState();
+
+			const onSelect = () => {
+				if (!app) return;
+				selectApplication(app);
+				closeVersionDrawer();
+			};
+
 			return (
 				<div className='flex items-center gap-3'>
-					<Link to={`${app?._id}/version/${_id}`}>
+					<Link
+						onClick={onSelect}
+						to={`/organization/${app?.orgId}/apps/${app?._id}/version/${_id}`}
+					>
 						<Button size='sm' variant='secondary'>
 							Open
 						</Button>

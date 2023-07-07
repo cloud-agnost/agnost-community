@@ -2,6 +2,8 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import { removeLastSlash } from '@/utils';
 import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
+import { ApplicationVersions } from '@/features/application';
+
 const authPaths = [
 	'/login',
 	'/forgot-password',
@@ -28,7 +30,12 @@ async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Root() {
-	return <Outlet />;
+	return (
+		<>
+			<Outlet />
+			<ApplicationVersions />
+		</>
+	);
 }
 
 Root.loader = loader;
