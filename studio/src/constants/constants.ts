@@ -9,8 +9,9 @@ import { Database as DatabaseIcon, DeviceTablet, FileText, GearSix } from '@phos
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { Tab } from '@/types';
 
-export const ORGANIZATION_MEMBERS_PAGE_SIZE = 10;
+export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
+
 export const SLIDER_IMAGES = [
 	{
 		text: 'Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.',
