@@ -24,6 +24,10 @@
 		"update": "Invitation role changed to {{role}}",
 		"delete": "Invitation deleted successfully"
 	},
+	"member": {
+		"update": "Member role changed to {{role}}",
+		"delete": "Member deleted successfully"
+	},
 	"filter": "Filter",
 	"sortOptions": {
 		"default": "Default",
@@ -35,5 +39,6 @@
 		"emailDesc": "Email Z-A",
 		"role": "Role",
 		"invitedAt": "Invited At"
-	}
+	},
+	"clear": "Clear Filters"
 }
