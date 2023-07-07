@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
@@ -11,35 +11,47 @@ import { useTranslation } from 'react-i18next';
 import useTypeStore from '@/store/types/typeStore';
 interface RoleDropdownProps {
 	type: 'app' | 'org';
-	onCheck: (role: string) => void;
-	onUncheck: (role: string) => void;
-	defaultRole?: string;
+	onCheck: (roles: string[]) => void;
+	onUncheck: (roles: string[]) => void;
+	value?: string[];
 }
-function RoleDropdown({ type, onCheck, onUncheck, defaultRole }: RoleDropdownProps) {
+function RoleDropdown({ type, onCheck, onUncheck, value }: RoleDropdownProps) {
 	const { t } = useTranslation();
-	const [selectedRole, setSelectedRole] = useState<string>(defaultRole || '');
+	const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
 	const { appRoles, orgRoles } = useTypeStore();
 	const roles = type === 'app' ? appRoles : orgRoles;
+
+	useEffect(() => {
+		if (value) {
+			setSelectedRoles(value);
+		}
+	}, [value]);
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button variant='outline'>
 					<Funnel size={16} weight='fill' className='members-filter-icon' />
-					{selectedRole ? selectedRole : t('general.filter')}
+					{selectedRoles.length > 0
+						? t('general.selected', {
+								count: selectedRoles.length,
+						  })
+						: t('general.filter')}
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent>
 				{roles.map((role) => (
 					<DropdownMenuCheckboxItem
 						key={role}
-						checked={selectedRole === role}
+						checked={selectedRoles.includes(role)}
 						onCheckedChange={(checked) => {
 							if (checked) {
-								setSelectedRole(role);
-								onCheck(role);
+								const newSelectedRoles = [...selectedRoles, role];
+								setSelectedRoles(newSelectedRoles);
+								onCheck(newSelectedRoles);
 							} else {
-								setSelectedRole('');
-								onUncheck(role);
+								const newSelectedRoles = selectedRoles.filter((r) => r !== role);
+								setSelectedRoles(newSelectedRoles);
+								onUncheck(newSelectedRoles);
 							}
 						}}
 					>
