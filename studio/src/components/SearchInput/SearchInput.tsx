@@ -9,7 +9,6 @@ import './searchInput.scss';
 import { useTranslation } from 'react-i18next';
 interface SearchInputProps extends React.ComponentPropsWithoutRef<'input'> {
 	onSearch?: (value: string) => void;
-	placeholder?: string | null;
 }
 const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
 	({ className, placeholder, onSearch, value, ...props }, ref) => {

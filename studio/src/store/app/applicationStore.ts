@@ -45,8 +45,8 @@ interface ApplicationStore {
 	getAppTeamMembers: () => Promise<ApplicationMember[]>;
 	filterApplicationTeam: (search: string) => ApplicationMember[];
 	changeAppTeamRole: (req: UpdateRoleRequest) => Promise<ApplicationMember>;
-	removeAppMember: (req: RemoveMemberRequest) => Promise<ApplicationMember>;
-	removeMultipleAppMembers: (req: RemoveMemberRequest) => Promise<ApplicationMember[]>;
+	removeAppMember: (req: RemoveMemberRequest) => Promise<void>;
+	removeMultipleAppMembers: (req: RemoveMemberRequest) => Promise<void>;
 	inviteUsersToApp: (req: AppInviteRequest) => Promise<Invitation[]>;
 	getAppInvitations: (req: GetInvitationRequest) => Promise<Invitation[]>;
 	openVersionDrawer: (application: Application) => void;
@@ -55,10 +55,10 @@ interface ApplicationStore {
 	closeEditAppDrawer: () => void;
 	openInviteMemberDrawer: (application: Application) => void;
 	closeInviteMemberDrawer: () => void;
-	resendInvitation: (req: InvitationRequest) => Promise<Invitation>;
+	resendInvitation: (req: InvitationRequest) => Promise<void>;
 	updateInvitationUserRole: (req: UpdateRoleRequest) => Promise<Invitation>;
-	deleteInvitation: (req: InvitationRequest) => Promise<Invitation>;
-	deleteMultipleInvitations: (req: InvitationRequest) => Promise<Invitation[]>;
+	deleteInvitation: (req: InvitationRequest) => Promise<void>;
+	deleteMultipleInvitations: (req: InvitationRequest) => Promise<void>;
 }
 
 const useApplicationStore = create<ApplicationStore>()(
@@ -83,7 +83,7 @@ const useApplicationStore = create<ApplicationStore>()(
 					sortDir: '',
 				},
 				invitationSearch: '',
-				invitationRoleFilter: '',
+				invitationRoleFilter: [],
 
 				selectApplication: (application: Application) => {
 					set({ application });
@@ -166,7 +166,7 @@ const useApplicationStore = create<ApplicationStore>()(
 				changeAppTeamRole: async (req: UpdateRoleRequest) => {
 					const { userId, role, onSuccess, onError } = req;
 					try {
-						await ApplicationService.changeMemberRole(userId?.toString(), role);
+						const member = await ApplicationService.changeMemberRole(userId as string, role);
 						set({
 							applicationTeam: get().applicationTeam.map((team) => {
 								if (team.member._id === userId) {
@@ -176,6 +176,7 @@ const useApplicationStore = create<ApplicationStore>()(
 							}),
 						});
 						if (onSuccess) onSuccess();
+						return member;
 					} catch (error) {
 						if (onError) onError(error as APIError);
 						throw error as APIError;
@@ -183,7 +184,7 @@ const useApplicationStore = create<ApplicationStore>()(
 				},
 				removeAppMember: async (req: RemoveMemberRequest) => {
 					try {
-						await ApplicationService.removeAppMember(req.userId?.toString());
+						await ApplicationService.removeAppMember(req.userId as string);
 						set({
 							applicationTeam: get().applicationTeam.filter(
 								(team) => team.member._id !== req.userId,
@@ -195,12 +196,12 @@ const useApplicationStore = create<ApplicationStore>()(
 						throw error as APIError;
 					}
 				},
-				removeMultipleAppMembers: async (memberIds: string[]) => {
+				removeMultipleAppMembers: async (req: RemoveMemberRequest) => {
 					try {
-						await ApplicationService.removeMultipleAppMembers(memberIds);
+						await ApplicationService.removeMultipleAppMembers(req.userIds as string[]);
 						set({
 							applicationTeam: get().applicationTeam.filter(
-								(team) => !memberIds.includes(team.member._id),
+								(team) => !req.userIds?.includes(team.member._id),
 							),
 						});
 					} catch (error) {
@@ -269,7 +270,7 @@ const useApplicationStore = create<ApplicationStore>()(
 				},
 				resendInvitation: async (req: InvitationRequest) => {
 					try {
-						await ApplicationService.resendInvitation(req.token?.toString());
+						await ApplicationService.resendInvitation(req.token as string);
 						if (req.onSuccess) req.onSuccess();
 					} catch (error) {
 						if (req.onError) req.onError(error as APIError);
@@ -278,7 +279,7 @@ const useApplicationStore = create<ApplicationStore>()(
 				},
 				deleteInvitation: async (req: InvitationRequest) => {
 					try {
-						await ApplicationService.deleteInvitation(req.token?.toString());
+						await ApplicationService.deleteInvitation(req.token as string);
 						set({
 							invitations: get().invitations.filter((invitation) => invitation.token !== req.token),
 						});
@@ -304,7 +305,10 @@ const useApplicationStore = create<ApplicationStore>()(
 				},
 				updateInvitationUserRole: async (req: UpdateRoleRequest) => {
 					try {
-						await ApplicationService.updateInvitationUserRole(req.token?.toString(), req.role);
+						const invitation = await ApplicationService.updateInvitationUserRole(
+							req.token as string,
+							req.role,
+						);
 						set({
 							invitations: get().invitations.map((invitation) => {
 								if (invitation.token === req.token) {
@@ -313,8 +317,8 @@ const useApplicationStore = create<ApplicationStore>()(
 								return invitation;
 							}),
 						});
-
 						if (req.onSuccess) req.onSuccess();
+						return invitation;
 					} catch (error) {
 						if (req.onError) req.onError(error as APIError);
 						throw error as APIError;

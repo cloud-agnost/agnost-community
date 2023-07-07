@@ -28,7 +28,7 @@ function removeMember(userId: string) {
 		},
 	});
 }
-function updateMemberRole(userId, role) {
+function updateMemberRole(userId: string, role: string) {
 	useApplicationStore.getState?.().changeAppTeamRole({
 		userId,
 		role,

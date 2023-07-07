@@ -2,11 +2,9 @@ import { Avatar, AvatarFallback } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { InfoModal } from '@/components/InfoModal';
 import { OrganizationCreateModal } from '@/features/organization';
-import useOrganizationStore from '@/store/organization/organizationStore';
+import useApplicationStore from '@/store/app/applicationStore';
+import { Version } from '@/types';
 import { CaretUpDown } from '@phosphor-icons/react';
-import { Fragment, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import './versionDropdown.scss';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -15,9 +13,10 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import { Version } from '@/types';
+import { Fragment, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import useApplicationStore from '@/store/app/applicationStore';
+import './versionDropdown.scss';
 
 export default function VersionDropdown() {
 	const { t } = useTranslation();

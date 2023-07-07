@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { DataTable } from 'components/DataTable';
 import useApplicationStore from '@/store/app/applicationStore';
-import { AppInvitationsColumns } from './AppInvitationsColumns';
 import { Invitation } from '@/types';
-import AppInvitationFilter from './AppInvitationFilter';
 import { Row } from '@tanstack/react-table';
+import { DataTable } from 'components/DataTable';
+import { useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { ScrollArea } from 'components/ScrollArea';
+import AppInvitationFilter from './AppInvitationFilter';
+import { AppInvitationsColumns } from './AppInvitationsColumns';
 
 function AppInvitations() {
 	const { invitations } = useApplicationStore();

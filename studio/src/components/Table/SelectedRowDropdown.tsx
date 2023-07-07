@@ -1,12 +1,11 @@
-import React from 'react';
+import { Trash } from '@phosphor-icons/react';
+import { Button } from 'components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import { Button } from 'components/Button';
-import { Trash } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {

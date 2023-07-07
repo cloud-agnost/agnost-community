@@ -16,7 +16,7 @@ import {
 	InviteOrgRequest,
 	Invitation,
 	GetInvitationRequest,
-	OrgInvitationRequest,
+	InvitationRequest,
 	RemoveMemberFromOrganizationRequest,
 	UpdateRoleRequest,
 } from '@/types';
@@ -41,9 +41,9 @@ interface OrganizationStore {
 	transferOrganization: (req: TransferOrganizationRequest) => Promise<Organization>;
 	deleteOrganization: (req: BaseRequest) => Promise<void>;
 	inviteUsersToOrganization: (req: InviteOrgRequest) => Promise<void>;
-	deleteInvitation: (req: OrgInvitationRequest) => Promise<void>;
-	deleteMultipleInvitations: (req: OrgInvitationRequest) => Promise<void>;
-	resendInvitation: (req: OrgInvitationRequest) => Promise<void>;
+	deleteInvitation: (req: InvitationRequest) => Promise<void>;
+	deleteMultipleInvitations: (req: InvitationRequest) => Promise<void>;
+	resendInvitation: (req: InvitationRequest) => Promise<void>;
 	removeMemberFromOrganization: (req: RemoveMemberFromOrganizationRequest) => Promise<void>;
 	removeMultipleMembersFromOrganization: (
 		req: RemoveMemberFromOrganizationRequest,
@@ -193,7 +193,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 						throw error as APIError;
 					}
 				},
-				deleteInvitation: async (req: OrgInvitationRequest) => {
+				deleteInvitation: async (req: InvitationRequest) => {
 					try {
 						await OrganizationService.deleteInvitation(req.token as string);
 						set({
@@ -205,7 +205,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 						throw error as APIError;
 					}
 				},
-				deleteMultipleInvitations: async (req: OrgInvitationRequest) => {
+				deleteMultipleInvitations: async (req: InvitationRequest) => {
 					try {
 						await OrganizationService.deleteMultipleInvitations(req.tokens as string[]);
 						set({
@@ -219,7 +219,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 						throw error as APIError;
 					}
 				},
-				resendInvitation: async (req: OrgInvitationRequest) => {
+				resendInvitation: async (req: InvitationRequest) => {
 					try {
 						await OrganizationService.resendInvitation(req.token as string);
 						if (req.onSuccess) req.onSuccess();

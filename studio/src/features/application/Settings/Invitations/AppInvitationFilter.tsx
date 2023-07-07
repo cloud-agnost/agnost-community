@@ -1,22 +1,22 @@
-import React, { useCallback, useEffect } from 'react';
-import { SearchInput } from 'components/SearchInput';
-import { useTranslation } from 'react-i18next';
-import { RoleDropdown } from 'components/RoleDropdown';
+import { INVITATIONS_SORT_OPTIONS, PAGE_SIZE } from '@/constants';
+import { useToast } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
+import { Invitation } from '@/types';
+import { Broom, FunnelSimple } from '@phosphor-icons/react';
+import { Row } from '@tanstack/react-table';
+import { Button } from 'components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import { Button } from 'components/Button';
-import { Broom, FunnelSimple } from '@phosphor-icons/react';
-import { INVITATIONS_SORT_OPTIONS, PAGE_SIZE } from '@/constants';
-import { Row } from '@tanstack/react-table';
-import { Invitation } from '@/types';
+import { RoleDropdown } from 'components/RoleDropdown';
+import { SearchInput } from 'components/SearchInput';
 import { SelectedRowDropdown } from 'components/Table';
+import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import { useToast } from '@/hooks';
 
 interface Props {
 	selectedRows: Row<Invitation>[] | undefined;

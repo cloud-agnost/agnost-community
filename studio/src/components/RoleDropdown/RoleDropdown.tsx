@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import useTypeStore from '@/store/types/typeStore';
+import { Funnel } from '@phosphor-icons/react';
+import { Button } from 'components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import { Button } from 'components/Button';
-import { Funnel } from '@phosphor-icons/react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useTypeStore from '@/store/types/typeStore';
 interface RoleDropdownProps {
 	type: 'app' | 'org';
 	onCheck: (roles: string[]) => void;
