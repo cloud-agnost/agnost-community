@@ -11,11 +11,11 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 interface RoleDropdownProps {
 	type: 'app' | 'org';
-	onCheck: (roles: string[]) => void;
-	onUncheck: (roles: string[]) => void;
+
+	onChange: (roles: string[]) => void;
 	value?: string[];
 }
-function RoleDropdown({ type, onCheck, onUncheck, value }: RoleDropdownProps) {
+function RoleDropdown({ type, value, onChange }: RoleDropdownProps) {
 	const { t } = useTranslation();
 	const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
 	const { appRoles, orgRoles } = useTypeStore();
@@ -47,11 +47,11 @@ function RoleDropdown({ type, onCheck, onUncheck, value }: RoleDropdownProps) {
 							if (checked) {
 								const newSelectedRoles = [...selectedRoles, role];
 								setSelectedRoles(newSelectedRoles);
-								onCheck(newSelectedRoles);
+								onChange(newSelectedRoles);
 							} else {
 								const newSelectedRoles = selectedRoles.filter((r) => r !== role);
 								setSelectedRoles(newSelectedRoles);
-								onUncheck(newSelectedRoles);
+								onChange(newSelectedRoles);
 							}
 						}}
 					>
