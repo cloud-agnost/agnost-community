@@ -13,15 +13,14 @@ import {
 	Organization,
 	OrganizationMember,
 	RemoveMemberFromOrganizationRequest,
+	SortOption,
 	TransferOrganizationRequest,
 	UpdateRoleRequest,
-	SortOption,
-	OrgSettingsTabType,
 } from '@/types';
 import { BaseRequest } from '@/types/type';
+import { translate } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { translate } from '@/utils';
 interface OrganizationStore {
 	loading: boolean;
 	organization: Organization | null;

@@ -11,7 +11,7 @@ import { useToast, useUpdateEffect } from '@/hooks';
 import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTypeStore from '@/store/types/typeStore';
-import { APIError, OrgMemberRequest, OrgSettingsTabType } from '@/types';
+import { APIError, OrgMemberRequest } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/Tabs';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
