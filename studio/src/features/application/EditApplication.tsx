@@ -1,6 +1,6 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { EDIT_APPLICATION_MENU_ITEMS } from '@/constants';
-import OrganizationMenuItem from '@/features/Organization/navbar/OrganizationMenuItem';
+import OrganizationMenuItem from '@/features/organization/navbar/OrganizationMenuItem';
 import useApplicationStore from '@/store/app/applicationStore';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';

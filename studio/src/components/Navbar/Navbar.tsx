@@ -1,6 +1,7 @@
 import { cn } from '@/utils';
 import { NavLink } from 'react-router-dom';
 import './navbar.scss';
+import React from 'react';
 
 export interface Item {
 	title: string;

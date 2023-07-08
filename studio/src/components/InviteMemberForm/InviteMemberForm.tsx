@@ -5,15 +5,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/Input';
 import { Label } from '@/components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
+import { APIError } from '@/types';
 import { cn, isArray, isEmpty, uniq } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash } from '@phosphor-icons/react';
-
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { useState } from 'react';
-import { APIError } from '@/types';
+
 interface InviteMemberFormProps {
 	submitForm: (data: any, setError: (error: APIError | null) => void) => void;
 	roles: string[];

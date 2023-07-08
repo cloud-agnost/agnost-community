@@ -2,7 +2,7 @@ import ApplicationCreateModal from '@/features/application/ApplicationCreateModa
 import { Layout } from '@/layouts/Layout';
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { OrganizationMenu } from '@/features/Organization';
+import { OrganizationMenu } from '@/features/organization';
 
 export default function OrganizationDetails() {
 	const [openAppCreateModal, setOpenAppCreateModal] = useState(false);

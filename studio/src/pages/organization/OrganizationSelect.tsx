@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { Slider } from '@/components/Slider';
-import { OrganizationCreateButton } from '@/features/Organization';
+import { OrganizationCreateButton } from '@/features/organization';
 import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization } from '@/types';
