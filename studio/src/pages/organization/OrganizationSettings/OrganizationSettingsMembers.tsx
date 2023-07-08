@@ -1,34 +1,34 @@
 import { Button } from '@/components/Button';
 import { InviteMemberForm } from '@/components/InviteMemberForm';
+import { Separator } from '@/components/Separator';
+import { PAGE_SIZE } from '@/constants';
 import {
 	OrganizationInvitationTable,
 	OrganizationMembersTable,
 	OrganizationMembersTableHeader,
-} from '@/features/Organization';
-import { useToast } from '@/hooks';
+} from '@/features/organization';
+import { useToast, useUpdateEffect } from '@/hooks';
 import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTypeStore from '@/store/types/typeStore';
-import { APIError, OrgMemberRequest } from '@/types';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
-import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Separator } from '@/components/Separator';
-import { PAGE_SIZE } from '@/constants';
+import { APIError, OrgMemberRequest, OrgSettingsTabType } from '@/types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/Tabs';
 import { useMemo } from 'react';
-interface OutletContextTypes {
-	isMember: boolean;
-	page: number;
-}
+import { useTranslation } from 'react-i18next';
 
 export default function OrganizationSettingsMembers() {
-	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const {
 		inviteUsersToOrganization,
 		getOrganizationInvitations,
 		getOrganizationMembers,
+		clearFilter,
 		organization,
+		memberPage,
+		memberSearch,
+		memberRoleFilter,
+		memberSort,
+		selectedTab,
 	} = useOrganizationStore();
 
 	const { notify } = useToast();
@@ -51,30 +51,26 @@ export default function OrganizationSettingsMembers() {
 
 	const { orgRoles } = useTypeStore();
 
-	const { isMember, page } = useOutletContext() as OutletContextTypes;
-
 	const getMemberRequest = useMemo(
 		() => ({
-			page,
+			page: memberPage,
 			size: PAGE_SIZE,
 			organizationId: organization?._id as string,
-			...(isMember
-				? { search: searchParams.get('q') as string }
-				: { email: searchParams.get('q') as string }),
-			sortBy: searchParams.get('s') as string,
-			sortDir: searchParams.get('d') as string,
-			role: searchParams.get('r') as string,
+			...(selectedTab === 'member' ? { search: memberSearch } : { email: memberSearch }),
+			sortBy: memberSort.value,
+			sortDir: memberSort.sortDir,
+			roles: memberRoleFilter,
 		}),
-		[searchParams, isMember, page],
+		[memberPage, memberSearch, memberSort, memberRoleFilter],
 	);
 
-	useEffect(() => {
-		if (isMember) {
+	useUpdateEffect(() => {
+		if (selectedTab === 'member') {
 			getOrganizationMembers(getMemberRequest);
 		} else {
 			getOrganizationInvitations(getMemberRequest);
 		}
-	}, [getMemberRequest]);
+	}, [selectedTab, getMemberRequest]);
 
 	return (
 		<OrganizationSettingsLayout
@@ -88,16 +84,35 @@ export default function OrganizationSettingsMembers() {
 				description={t('organization.settings.members.invite.desc') as string}
 				actions={
 					<Button variant='primary' size='lg'>
-						Invite
+						{t('organization.settings.members.invite.button')}
 					</Button>
 				}
 			/>
 			<Separator className='my-12' />
 			<div className='members'>
-				<OrganizationMembersTableHeader />
-				<div className='members-table'>
-					{isMember ? <OrganizationMembersTable /> : <OrganizationInvitationTable />}
-				</div>
+				<Tabs
+					defaultValue={selectedTab}
+					onValueChange={(value) => {
+						useOrganizationStore.setState?.({ selectedTab: value as 'member' | 'invitation' });
+						clearFilter();
+					}}
+				>
+					<div className='members-header'>
+						<TabsList>
+							<TabsTrigger value='member'>{t('organization.settings.members.title')}</TabsTrigger>
+							<TabsTrigger value='invitation'>
+								{t('organization.settings.pending-invitation')}
+							</TabsTrigger>
+						</TabsList>
+						<OrganizationMembersTableHeader />
+					</div>
+					<TabsContent value='member'>
+						<OrganizationMembersTable />
+					</TabsContent>
+					<TabsContent value='invitation'>
+						<OrganizationInvitationTable />
+					</TabsContent>
+				</Tabs>
 			</div>
 		</OrganizationSettingsLayout>
 	);
