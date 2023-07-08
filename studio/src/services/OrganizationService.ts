@@ -12,6 +12,7 @@ import {
 	GetInvitationRequest,
 } from '@/types';
 import useOrganizationStore from '@/store/organization/organizationStore';
+import { arrayToQueryString } from '@/utils';
 export default class OrganizationService {
 	static url = '/v1/org';
 
@@ -61,10 +62,11 @@ export default class OrganizationService {
 	static async getOrganizationMembers(
 		req: GetOrganizationMembersRequest,
 	): Promise<OrganizationMember[]> {
-		const { page, size, role, sortBy, sortDir, search, organizationId, excludeSelf } = req;
+		const { page, size, roles, sortBy, sortDir, search, organizationId, excludeSelf } = req;
+		const role = arrayToQueryString(roles ?? [], 'role');
 		return (
 			await axios.get(
-				`${this.url}/${organizationId}/member${excludeSelf ? '/exclude-current' : ''}`,
+				`${this.url}/${organizationId}/member${excludeSelf ? '/exclude-current' : ''}?${role}`,
 				{
 					params: {
 						page,
@@ -95,21 +97,24 @@ export default class OrganizationService {
 	}
 
 	static async getOrganizationInvitations(req: GetInvitationRequest): Promise<Invitation[]> {
-		const { page, size, status, email, role, start, end, sortBy, sortDir } = req;
+		const { page, size, status, email, roles, start, end, sortBy, sortDir } = req;
+		const role = arrayToQueryString(roles, 'role');
 		return (
-			await axios.get(`${this.url}/${useOrganizationStore.getState().organization?._id}/invite`, {
-				params: {
-					page,
-					size,
-					sortBy,
-					sortDir,
-					status,
-					email,
-					role,
-					start,
-					end,
+			await axios.get(
+				`${this.url}/${useOrganizationStore.getState().organization?._id}/invite?${role}`,
+				{
+					params: {
+						page,
+						size,
+						sortBy,
+						sortDir,
+						status,
+						email,
+						start,
+						end,
+					},
 				},
-			})
+			)
 		).data;
 	}
 
@@ -127,9 +132,7 @@ export default class OrganizationService {
 	static async deleteMultipleInvitations(tokens: string[]) {
 		return (
 			await axios.delete(
-				`${this.url}/${useOrganizationStore.getState().organization?._id}/invite?token=${
-					tokens[0]
-				}`,
+				`${this.url}/${useOrganizationStore.getState().organization?._id}/invite/multi`,
 				{
 					data: {
 						tokens,

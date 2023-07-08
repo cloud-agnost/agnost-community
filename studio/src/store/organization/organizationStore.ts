@@ -15,16 +15,24 @@ import {
 	RemoveMemberFromOrganizationRequest,
 	TransferOrganizationRequest,
 	UpdateRoleRequest,
+	SortOption,
+	OrgSettingsTabType,
 } from '@/types';
 import { BaseRequest } from '@/types/type';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { translate } from '@/utils';
 interface OrganizationStore {
 	loading: boolean;
 	organization: Organization | null;
 	organizations: Organization[];
 	members: OrganizationMember[];
 	invitations: Invitation[];
+	memberSearch: string;
+	memberRoleFilter: string[];
+	memberSort: SortOption;
+	memberPage: number;
+	selectedTab: 'member' | 'invitation';
 	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
 	createOrganization: (req: CreateOrganizationRequest) => Promise<Organization | APIError>;
 	selectOrganization: (organization: Organization) => void;
@@ -46,6 +54,11 @@ interface OrganizationStore {
 	changeMemberRole: (req: UpdateRoleRequest) => Promise<OrganizationMember>;
 	getOrganizationMembers: (req: GetOrganizationMembersRequest) => Promise<OrganizationMember[]>;
 	getOrganizationInvitations: (req: GetInvitationRequest) => Promise<Invitation[] | APIError>;
+	setMemberSearch: (search: string) => void;
+	setMemberRoleFilter: (roles: string[]) => void;
+	setMemberSort: (sort: SortOption) => void;
+	setMemberPage: (page: number) => void;
+	clearFilter: () => void;
 }
 
 const useOrganizationStore = create<OrganizationStore>()(
@@ -59,6 +72,23 @@ const useOrganizationStore = create<OrganizationStore>()(
 				temp: [],
 				members: [],
 				invitations: [],
+				memberSearch: '',
+				memberRoleFilter: [],
+				memberSort: {
+					name: translate('general.sortOptions.default'),
+					value: '',
+					sortDir: '',
+				},
+				memberPage: 0,
+				invitationsPage: 1,
+				invitationsSearch: '',
+				invitationsSort: {
+					name: translate('general.sortOptions.default'),
+					value: '',
+					sortDir: '',
+				},
+				invitationsFilter: [],
+				selectedTab: 'member',
 				getAllOrganizationByUser: async () => {
 					try {
 						set({ loading: true });
@@ -243,12 +273,11 @@ const useOrganizationStore = create<OrganizationStore>()(
 				},
 				getOrganizationMembers: async (req: GetOrganizationMembersRequest) => {
 					try {
-						const res = await OrganizationService.getOrganizationMembers(req);
-						set({
-							members: [...get().members, ...res],
-						});
+						const members = await OrganizationService.getOrganizationMembers(req);
+						if (get().memberPage === 0) set({ members });
+						else set({ members: [...get().members, ...members] });
 						if (req.onSuccess) req.onSuccess();
-						return res;
+						return members;
 					} catch (error) {
 						if (req.onError) req.onError(error as APIError);
 						throw error as APIError;
@@ -290,12 +319,11 @@ const useOrganizationStore = create<OrganizationStore>()(
 				},
 				getOrganizationInvitations: async (req: GetInvitationRequest) => {
 					try {
-						const res = await OrganizationService.getOrganizationInvitations(req);
-						set({
-							invitations: [...get().invitations, ...res],
-						});
+						const invitations = await OrganizationService.getOrganizationInvitations(req);
+						if (get().memberPage === 0) set({ invitations });
+						else set({ invitations: [...get().invitations, ...invitations] });
 						if (req.onSuccess) req.onSuccess();
-						return res;
+						return invitations;
 					} catch (error) {
 						if (req.onError) req.onError(error as APIError);
 						throw error as APIError;
@@ -339,6 +367,29 @@ const useOrganizationStore = create<OrganizationStore>()(
 						if (req.onError) req.onError(error as APIError);
 						throw error as APIError;
 					}
+				},
+				setMemberPage: (page: number) => {
+					set({ memberPage: page });
+				},
+				setMemberSearch: (search: string) => {
+					set({ memberSearch: search, memberPage: 0 });
+				},
+				setMemberRoleFilter: (roles: string[]) => {
+					set({ memberRoleFilter: roles, memberPage: 0 });
+				},
+				setMemberSort: (sort: SortOption) => {
+					set({ memberSort: sort, memberPage: 0 });
+				},
+				clearFilter: () => {
+					set({
+						memberSearch: '',
+						memberRoleFilter: [],
+						memberSort: {
+							name: translate('general.sortOptions.default'),
+							value: '',
+							sortDir: '',
+						},
+					});
 				},
 			}),
 			{
