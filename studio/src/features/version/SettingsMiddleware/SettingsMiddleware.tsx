@@ -39,13 +39,7 @@ export default function SettingsMiddleware() {
 
 	return (
 		<div className='middlewares-data-table'>
-			<InfiniteScroll
-				items={middlewares}
-				endOfList={() => {
-					console.log('end of list');
-					setPage((prev) => prev + 1);
-				}}
-			>
+			<InfiniteScroll items={middlewares} endOfList={() => setPage((prev) => prev + 1)}>
 				<DataTable<Middleware>
 					columns={MiddlewaresColumns}
 					data={middlewares}
