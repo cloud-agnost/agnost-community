@@ -22,8 +22,8 @@ function loader() {
 export default function OrganizationApps() {
 	const [isCard, setIsCard] = useState(true);
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { organization, loading, temp } = useOrganizationStore();
-	const { applications, searchApplications, getAppsByOrgId } = useApplicationStore();
+	const { organization, loading } = useOrganizationStore();
+	const { applications, searchApplications, getAppsByOrgId, temp } = useApplicationStore();
 	const { t } = useTranslation();
 
 	useEffect(() => {

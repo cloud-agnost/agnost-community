@@ -341,7 +341,7 @@ const useApplicationStore = create<ApplicationStore>()(
 					try {
 						set({ loading: true });
 						const applications = await OrganizationService.getOrganizationApps(orgId);
-						set({ applications });
+						set({ applications, temp: applications });
 						return applications;
 					} catch (error) {
 						throw error as APIError;

@@ -1,7 +1,6 @@
 import OrganizationService from '@/services/OrganizationService';
 import {
 	APIError,
-	Application,
 	ChangeOrganizationAvatarRequest,
 	ChangeOrganizationNameRequest,
 	CreateOrganizationRequest,
@@ -24,7 +23,6 @@ interface OrganizationStore {
 	loading: boolean;
 	organization: Organization | null;
 	organizations: Organization[];
-	temp: Application[];
 	members: OrganizationMember[];
 	invitations: Invitation[];
 	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
