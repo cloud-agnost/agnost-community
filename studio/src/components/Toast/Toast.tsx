@@ -22,7 +22,7 @@ interface ToastProps
 }
 
 const Toast = React.forwardRef<HTMLDivElement, ToastProps>(({ className, type, ...props }, ref) => (
-	<div id={'sa'} ref={ref} className={cn('toast', className)}>
+	<div ref={ref} className={cn('toast', className)}>
 		<div className={cn(toastVariants({ type }))}>
 			{type === 'success' && <Check size={20} weight='bold' />}
 			{type === 'error' && <X size={20} />}

@@ -3,6 +3,10 @@ import { Button } from 'components/Button';
 import { Switch } from 'components/Switch';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import useEnvironmentStore from '@/store/environment/environmentStore.ts';
+import { cn } from '@/utils';
+import { DeployButton } from '@/features/version/DeployButton';
 
 interface DeploymentSettingsProps {
 	isOpen: boolean;
@@ -11,35 +15,74 @@ interface DeploymentSettingsProps {
 
 export default function DeploymentSettings({ isOpen, close }: DeploymentSettingsProps) {
 	const { t } = useTranslation();
+	const environment = useEnvironmentStore((state) => state.environment);
+	const { toggleAutoDeploy, activateEnvironment, suspendEnvironment } = useEnvironmentStore();
+	const { orgId, versionId, appId } = useParams<{
+		versionId: string;
+		appId: string;
+		orgId: string;
+	}>();
 
-	function reDeploy() {
-		// TODO: will implemented
+	async function suspendOrActive() {
+		if (!versionId || !appId || !orgId || !environment?._id) return;
+
+		if (environment?.suspended) {
+			await activateEnvironment({
+				envId: environment._id,
+				orgId,
+				appId,
+				versionId,
+			});
+		} else {
+			await suspendEnvironment({
+				envId: environment._id,
+				orgId,
+				appId,
+				versionId,
+			});
+		}
 	}
 
-	function suspendServices() {
-		// TODO: will implemented
-	}
-
-	function autoRedeployChange(checked: boolean) {
-		// TODO: will implemented
-		console.log(checked);
+	async function onAutoDeployStatusChanged(autoDeploy: boolean) {
+		if (!versionId || !appId || !orgId || !environment?._id) return;
+		await toggleAutoDeploy({
+			envId: environment._id,
+			orgId,
+			appId,
+			versionId,
+			autoDeploy,
+		});
 	}
 
 	const settings = [
 		{
-			title: t('version.suspend_services'),
-			description: t('version.suspend_services_desc'),
-			element: <Button onClick={suspendServices}>{t('version.reactivate')}</Button>,
+			title: environment?.suspended
+				? t('version.reactivate_services')
+				: t('version.suspend_services'),
+			description: environment?.suspended
+				? t('version.reactivate_services_desc')
+				: t('version.suspend_services_desc'),
+			element: (
+				<Button
+					className={cn(!environment?.suspended && '!text-elements-red')}
+					variant={environment?.suspended ? 'primary' : 'outline'}
+					onClick={suspendOrActive}
+				>
+					{environment?.suspended ? t('version.reactivate') : t('version.suspend')}
+				</Button>
+			),
 		},
 		{
 			title: t('version.redeploy'),
 			description: t('version.redeploy_desc'),
-			element: <Button onClick={reDeploy}>{t('version.redeploy')}</Button>,
+			element: <DeployButton />,
 		},
 		{
 			title: t('version.auto_redeploy'),
 			description: t('version.auto_redeploy_desc'),
-			element: <Switch onCheckedChange={autoRedeployChange} />,
+			element: (
+				<Switch checked={!!environment?.autoDeploy} onCheckedChange={onAutoDeployStatusChanged} />
+			),
 		},
 	];
 
@@ -64,7 +107,7 @@ export default function DeploymentSettings({ isOpen, close }: DeploymentSettings
 							<Button onClick={close} rounded variant='blank' iconOnly>
 								<ArrowLeft size={20} />
 							</Button>
-							<h4>Deployment Settings</h4>
+							<h4>{t('version.deployment_settings')}</h4>
 						</header>
 						<div className='deployment-settings-items'>
 							{settings.map(({ title, description, element }, index) => (

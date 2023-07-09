@@ -1,18 +1,25 @@
 import { SettingsContainer } from '@/features/version/SettingsContainer';
-import { Button } from 'components/Button';
 import { useTranslation } from 'react-i18next';
+import { SettingsEnvironment } from '@/features/version/SettingsEnvironment';
+import useEnvironmentStore from '@/store/environment/environmentStore.ts';
+import { formatDate } from '@/utils';
+import { DateTime } from 'luxon';
+import { DeployButton } from '@/features/version/DeployButton';
 
 export default function VersionSettingsEnvironment() {
 	const { t } = useTranslation();
+	const environment = useEnvironmentStore((state) => state.environment);
+
 	return (
 		<SettingsContainer
-			info='Last deployment at: Mar 20th, 2023 04:34:15 pm'
+			info={`Last deployment at: ${formatDate(
+				environment?.deploymentDtm as string,
+				DateTime.DATETIME_MED,
+			)}`}
 			pageTitle={t('version.settings.environment')}
-			action={<Button size='lg'>{t('version.redeploy')}</Button>}
+			action={<DeployButton />}
 		>
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur at atque commodi dicta,
-			explicabo hic incidunt iste perspiciatis possimus provident quas voluptas. Exercitationem
-			fugiat illum mollitia saepe totam. Facere, ut!
+			<SettingsEnvironment />
 		</SettingsContainer>
 	);
 }

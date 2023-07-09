@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import {
+	APIError,
 	Environment,
 	getAppVersionEnvironmentParams,
 	GetEnvironmentLogsParams,
@@ -9,13 +10,14 @@ import {
 	VersionParams,
 } from '@/types';
 import EnvironmentService from 'services/EnvironmentService.ts';
+import { notify, translate } from '@/utils';
 
 interface EnvironmentStore {
 	environments: Environment[];
 	environment: Environment | null;
 	getAppVersionEnvironment: (params: getAppVersionEnvironmentParams) => Promise<Environment>;
 	getEnvironmentLogs: (params: GetEnvironmentLogsParams) => Promise<any>;
-	toggleAutoDeploy: (params: ToggleAutoDeployParams) => Promise<any>;
+	toggleAutoDeploy: (params: ToggleAutoDeployParams) => Promise<Environment>;
 	suspendEnvironment: (params: VersionParams) => Promise<any>;
 	activateEnvironment: (params: VersionParams) => Promise<any>;
 	redeployAppVersionToEnvironment: (params: VersionParams) => Promise<any>;
@@ -36,17 +38,75 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 				getEnvironmentLogs: (params: GetEnvironmentLogsParams) => {
 					return EnvironmentService.getEnvironmentLogs(params);
 				},
-				toggleAutoDeploy: (params: ToggleAutoDeployParams) => {
-					return EnvironmentService.toggleAutoDeploy(params);
+				toggleAutoDeploy: async (params: ToggleAutoDeployParams) => {
+					try {
+						const environment = await EnvironmentService.toggleAutoDeploy(params);
+						set({ environment });
+						return environment;
+					} catch (e) {
+						const error = e as APIError;
+						notify({
+							type: 'error',
+							title: error.error,
+							description: error.details,
+						});
+						throw e;
+					}
 				},
-				suspendEnvironment: (params: VersionParams) => {
-					return EnvironmentService.suspendEnvironment(params);
+				suspendEnvironment: async (params: VersionParams) => {
+					try {
+						const environment = await EnvironmentService.suspendEnvironment(params);
+						set({ environment });
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.suspended_successfully'),
+						});
+						return environment;
+					} catch (e) {
+						const error = e as APIError;
+						notify({
+							type: 'error',
+							title: error.error,
+							description: error.details,
+						});
+						throw e;
+					}
 				},
-				activateEnvironment: (params: VersionParams) => {
-					return EnvironmentService.suspendEnvironment(params);
+				activateEnvironment: async (params: VersionParams) => {
+					try {
+						const environment = await EnvironmentService.activateEnvironment(params);
+						set({ environment });
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.reactivated_successfully'),
+						});
+						return environment;
+					} catch (e) {
+						const error = e as APIError;
+						notify({
+							type: 'error',
+							title: error.error,
+							description: error.details,
+						});
+						throw e;
+					}
 				},
-				redeployAppVersionToEnvironment: (params: VersionParams) => {
-					return EnvironmentService.redeployAppVersionToEnvironment(params);
+				redeployAppVersionToEnvironment: async (params: VersionParams) => {
+					try {
+						const environment = await EnvironmentService.redeployAppVersionToEnvironment(params);
+						set({ environment });
+						return environment;
+					} catch (e) {
+						const error = e as APIError;
+						notify({
+							type: 'error',
+							title: error.error,
+							description: error.details,
+						});
+						throw e;
+					}
 				},
 				updateEnvironmentTelemetryLogs: (params: UpdateEnvironmentTelemetryLogsParams) => {
 					return EnvironmentService.updateEnvironmentTelemetryLogs(params);

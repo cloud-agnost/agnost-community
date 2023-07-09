@@ -10,6 +10,7 @@ export interface Environment {
 	autoDeploy: boolean;
 	suspended: boolean;
 	mappings: Mapping[];
+	deploymentDtm: string;
 	dbStatus: string;
 	serverStatus: ServerStatus[];
 	schedulerStatus: string;

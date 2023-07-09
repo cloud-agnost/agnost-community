@@ -39,30 +39,52 @@ export default class EnvironmentService {
 		versionId,
 		envId,
 		...data
-	}: ToggleAutoDeployParams) {
+	}: ToggleAutoDeployParams): Promise<Environment> {
 		return (
 			await axios.put(`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}`, data)
 		).data;
 	}
 
-	static async suspendEnvironment({ orgId, appId, versionId, envId }: VersionParams) {
+	static async suspendEnvironment({
+		orgId,
+		appId,
+		versionId,
+		envId,
+	}: VersionParams): Promise<Environment> {
 		return (
 			await axios.post(
 				`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/suspend`,
+				{},
 			)
 		).data;
 	}
 
-	static async activateEnvironment({ orgId, appId, versionId, envId }: VersionParams) {
-		return await axios.post(
-			`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/activate`,
-		);
+	static async activateEnvironment({
+		orgId,
+		appId,
+		versionId,
+		envId,
+	}: VersionParams): Promise<Environment> {
+		return (
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/activate`,
+				{},
+			)
+		).data;
 	}
 
-	static async redeployAppVersionToEnvironment({ orgId, appId, versionId, envId }: VersionParams) {
-		return await axios.post(
-			`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/redeploy`,
-		);
+	static async redeployAppVersionToEnvironment({
+		orgId,
+		appId,
+		versionId,
+		envId,
+	}: VersionParams): Promise<Environment> {
+		return (
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/redeploy`,
+				{},
+			)
+		).data;
 	}
 
 	static async updateEnvironmentTelemetryLogs({
@@ -72,8 +94,11 @@ export default class EnvironmentService {
 		envId,
 		logId,
 	}: UpdateEnvironmentTelemetryLogsParams) {
-		return await axios.post(
-			`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/log/${logId}`,
-		);
+		return (
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/log/${logId}`,
+				{},
+			)
+		).data;
 	}
 }
