@@ -11,3 +11,4 @@ export {
 
 export { TableConfirmation } from './TableConfirmation';
 export { default as SelectedRowDropdown } from './SelectedRowDropdown';
+export { default as TableActions } from './TableActions';
