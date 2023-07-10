@@ -221,3 +221,18 @@ export interface RealtimeActionParams<T> {
 	data: T;
 	identifiers: RealtimeIdentifiers;
 }
+
+export interface Middleware {
+	orgId: string;
+	appId: string;
+	versionId: string;
+	iid: string;
+	name: string;
+	type: string;
+	logic: string;
+	createdBy: string;
+	_id: string;
+	createdAt: string;
+	updatedAt: string;
+	__v: number;
+}

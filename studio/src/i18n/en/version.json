@@ -1,4 +1,5 @@
 {
+	"deployment_settings": "Deployment Settings",
 	"name": "Version name",
 	"status": "Status",
 	"resources": "Resources",
@@ -18,6 +19,11 @@
 	"close_all_tabs_except_current": "Close all tabs except current",
 	"duplicate_tab": "Duplicate selected tab",
 	"suspend_services": "Suspend services",
+	"suspend": "Suspend",
+	"suspended_successfully": "Environment suspended successfully",
+	"reactivated_successfully": "Environment activated successfully",
+	"environment_id": "Environment ID",
+	"environment_id_desc": "This is your environment's id within your Agnost Cluster.",
 	"suspend_services_desc": "Suspend access to the execution environment of this version. Version will be kept deployed but no requests will be handled",
 	"reactivate": "Reactivate",
 	"reactivate_services": "Reactivate Services",
@@ -25,6 +31,7 @@
 	"redeploy": "Redeploy",
 	"redeploy_desc": "Redeploy latest changes to the environment",
 	"auto_redeploy": "Auto redeploy",
+	"auto_deploy": "Auto Deploy",
 	"auto_redeploy_desc": "When version changes then deploy changes automatically",
 	"view_logs": "View Deployment Logs",
 	"logs": "Deployment Logs",
@@ -100,5 +107,15 @@
 		}
 	},
 	"default_limiter_deleted": "Default rate limiter deleted successfully",
-	"limiter_added_to_default": "Rate limiter added to default rate limiters"
+	"limiter_added_to_default": "Rate limiter added to default rate limiters",
+	"middleware": {
+		"name": "Middleware Name",
+		"add_middleware": "Add Middleware",
+		"add": {
+			"success": "Middleware added successfully"
+		},
+		"delete": {
+			"success": "Middleware deleted successfully"
+		}
+	}
 }
