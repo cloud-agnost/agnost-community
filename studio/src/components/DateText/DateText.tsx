@@ -3,7 +3,7 @@ import { cn, formatDate } from '@/utils';
 
 interface DateTextProps {
 	date: string | Date;
-	children: ReactNode;
+	children?: ReactNode;
 	className?: string;
 }
 export default function DateText({ date, children, className }: DateTextProps) {
