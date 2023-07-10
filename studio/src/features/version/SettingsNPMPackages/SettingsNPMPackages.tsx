@@ -7,7 +7,6 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { translate } from '@/utils';
 import { Button } from 'components/Button';
-import { Pencil } from 'components/icons';
 import { DateText } from 'components/DateText';
 import { NPMPackage } from '@/types';
 import useVersionStore from '@/store/version/versionStore.ts';
