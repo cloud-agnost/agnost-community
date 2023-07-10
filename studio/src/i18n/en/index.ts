@@ -6,5 +6,15 @@ import profileSettings from './profileSettings.json';
 import application from './application.json';
 import version from './version.json';
 import onboarding from './onboarding.json';
-
-export { forms, general, login, organization, profileSettings, application, version, onboarding };
+import resources from './resources.json';
+export {
+	forms,
+	general,
+	login,
+	organization,
+	profileSettings,
+	application,
+	version,
+	onboarding,
+	resources,
+};

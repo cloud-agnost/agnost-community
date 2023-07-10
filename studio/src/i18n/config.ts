@@ -9,6 +9,7 @@ import {
 	application,
 	version,
 	onboarding,
+	resources as rs,
 } from './en';
 
 export const resources = {
@@ -22,6 +23,7 @@ export const resources = {
 			application,
 			onboarding,
 			version,
+			resources: rs,
 		},
 	},
 };
