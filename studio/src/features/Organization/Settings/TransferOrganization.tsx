@@ -10,14 +10,16 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const loadOptions = async (inputValue: string) => {
-	const res = await useOrganizationStore.getState().getOrganizationMembers({
-		search: inputValue,
-		excludeSelf: false,
-		organizationId: useOrganizationStore.getState().organization?._id as string,
-		page: 0,
-		size: 50,
-	});
-	return res.map((res) => ({
+	const members: OrganizationMember[] = await useOrganizationStore
+		.getState?.()
+		.getOrganizationMembers({
+			search: inputValue,
+			excludeSelf: false,
+			organizationId: useOrganizationStore.getState?.().organization?._id as string,
+			page: 0,
+			size: 50,
+		});
+	return members.map((res) => ({
 		label: res.member.name,
 		value: res,
 	}));
@@ -55,7 +57,6 @@ const formatOptionLabel = ({ label, value }: FormatOptionLabelProps) => {
 	);
 };
 const formatGroupLabel = (data: GroupedOption<OrganizationMember>) => {
-	console.log('data', { data });
 	return (
 		<div className='flex items-center gap-2'>
 			<span className='text-default text-sm'>{data.label}</span>

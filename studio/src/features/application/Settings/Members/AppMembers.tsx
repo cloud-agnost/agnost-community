@@ -53,10 +53,7 @@ export default function AppMembers() {
 					)}
 					<RoleDropdown
 						type={'app'}
-						onCheck={(roles) => {
-							table?.getColumn('role')?.setFilterValue(roles);
-						}}
-						onUncheck={(roles) => {
+						onChange={(roles) => {
 							table?.getColumn('role')?.setFilterValue(roles);
 						}}
 					/>

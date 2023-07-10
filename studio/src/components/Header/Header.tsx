@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button';
 import { AgnostOnlyLogo } from '@/components/icons';
 import { MENU_ITEMS } from '@/constants';
-import { OrganizationDropdown } from '@/features/Organization/OrganizationDropdown';
+import { OrganizationDropdown } from '@/features/organization/OrganizationDropdown';
 import { ApplicationSelectDropdown } from '@/features/application';
 import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
 import { VersionDropdown } from '@/features/version/VersionDropdown';

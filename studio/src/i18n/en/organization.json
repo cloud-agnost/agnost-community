@@ -20,6 +20,7 @@
 		}
 	},
 	"settings": {
+		"pending-invitation": "Pending Invitations",
 		"general": "General",
 		"members": {
 			"title": "Members",

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { OrganizationCreateModal } from '@/features/Organization';
+import { OrganizationCreateModal } from '@/features/organization';
 
 export default function Organization() {
 	const [openOrgCreateModal, setOpenOrgCreateModal] = useState(false);

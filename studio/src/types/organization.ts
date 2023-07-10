@@ -48,7 +48,7 @@ export interface ChangeOrganizationAvatarRequest extends BaseRequest {
 }
 
 export interface GetOrganizationMembersRequest extends BaseGetRequest {
-	role?: string;
+	roles?: string[];
 	organizationId: string;
 	excludeSelf?: boolean;
 }

@@ -1,16 +1,20 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
+import { RoleSelect } from '@/components/RoleDropdown';
+import useOrganizationStore from '@/store/organization/organizationStore';
 import { OrganizationMember } from '@/types';
+import { formatDate } from '@/utils';
 import { Trash } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
-import useTypeStore from '@/store/types/typeStore';
-import { formatDate } from '@/utils';
-import useOrganizationStore from '@/store/organization/organizationStore';
 import { DateTime } from 'luxon';
 
-const roles = useTypeStore.getState().orgRoles;
+function updateRole(userId: string, role: string) {
+	useOrganizationStore.getState().changeMemberRole({
+		userId,
+		role,
+	});
+}
 
 export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 	{
@@ -56,7 +60,7 @@ export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 	},
 	{
 		id: 'joinedAt',
-		header: 'joinedAt',
+		header: 'Joined At',
 		accessorKey: 'joinDate',
 		size: 200,
 		cell: ({ row }) => formatDate(row.original.joinDate, DateTime.DATETIME_MED),
@@ -68,30 +72,13 @@ export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { member, role } = row.original;
-			return member.isOrgOwner ? (
-				role
-			) : (
-				<Select
-					defaultValue={role}
-					onValueChange={(val) => {
-						useOrganizationStore.getState().changeMemberRole({
-							userId: member._id,
-							role: val,
-						});
-					}}
-				>
-					<SelectTrigger className='w-[150px]'>
-						<SelectValue>{role}</SelectValue>
-					</SelectTrigger>
-
-					<SelectContent>
-						{roles.map((role) => (
-							<SelectItem key={role} value={role}>
-								{role}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
+			return (
+				<RoleSelect
+					disabled={member.isOrgOwner}
+					role={role}
+					type={'app'}
+					onSelect={(newRole) => updateRole(member._id, newRole)}
+				/>
 			);
 		},
 	},

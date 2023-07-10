@@ -96,8 +96,7 @@ function AppInvitationFilter({ selectedRows }: Props) {
 			<RoleDropdown
 				value={invitationRoleFilter || []}
 				type='app'
-				onCheck={(roles) => useApplicationStore.setState?.({ invitationRoleFilter: roles })}
-				onUncheck={(roles) => useApplicationStore.setState?.({ invitationRoleFilter: roles })}
+				onChange={(roles) => useApplicationStore.setState?.({ invitationRoleFilter: roles })}
 			/>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>

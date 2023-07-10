@@ -23,7 +23,7 @@ export default function OrganizationApps() {
 	const [isCard, setIsCard] = useState(true);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { organization, loading } = useOrganizationStore();
-	const { applications, searchApplications, getAppsByOrgId, temp } = useApplicationStore();
+	const { applications, temp, searchApplications, getAppsByOrgId } = useApplicationStore();
 	const { t } = useTranslation();
 
 	useEffect(() => {

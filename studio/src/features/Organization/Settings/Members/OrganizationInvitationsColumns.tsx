@@ -1,15 +1,12 @@
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { TableConfirmation } from '@/components/Table';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import useTypeStore from '@/store/types/typeStore';
 import { Invitation } from '@/types';
-import { notify, formatDate, translate } from '@/utils';
+import { formatDate, notify, translate } from '@/utils';
 import { EnvelopeSimple, Trash } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
-
-const roles = useTypeStore.getState?.().orgRoles;
+import { RoleSelect } from 'components/RoleDropdown';
 
 export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 	{
@@ -54,27 +51,18 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 		cell: ({ row }) => {
 			const { token, role } = row.original;
 			return (
-				<Select
-					defaultValue={role}
-					onValueChange={(val) => {
-						useOrganizationStore.getState().updateInvitationUserRole({
-							token,
-							role: val,
-						});
-					}}
-				>
-					<SelectTrigger className='w-[180px]'>
-						<SelectValue>{role}</SelectValue>
-					</SelectTrigger>
-
-					<SelectContent>
-						{roles.map((role) => (
-							<SelectItem key={role} value={role}>
-								{role}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
+				<>
+					<RoleSelect
+						role={role}
+						type={'app'}
+						onSelect={(val) => {
+							useOrganizationStore.getState?.().updateInvitationUserRole({
+								token,
+								role: val,
+							});
+						}}
+					/>
+				</>
 			);
 		},
 	},
@@ -89,7 +77,7 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 						variant='blank'
 						iconOnly
 						onClick={() => {
-							useOrganizationStore.getState().resendInvitation({
+							useOrganizationStore.getState?.().resendInvitation({
 								token,
 								onSuccess: () => {
 									notify({
