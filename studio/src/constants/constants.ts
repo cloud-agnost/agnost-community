@@ -237,13 +237,16 @@ export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 ];
 
 export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
-	Suspended: 'yellow',
-	Deploying: 'blue',
-	Error: 'red',
-	Ok: 'green',
-	Good: 'green',
-	Yes: 'green',
-	No: 'red',
+	SUSPENDED: 'yellow',
+	DEPLOYING: 'blue',
+	ERROR: 'red',
+	OK: 'green',
+	GOOD: 'green',
+	YES: 'green',
+	NO: 'red',
+	ADMIN: 'orange',
+	DEVELOPER: 'purple',
+	VIEWER: 'blue',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
