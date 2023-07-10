@@ -28,7 +28,7 @@ const MiddlewareFormSchema = z.object({
 		})
 		.min(2, translate('forms.min2.error', { label: translate('general.name') }))
 		.max(64, translate('forms.max64.error', { label: translate('general.name') }))
-		.regex(/^[a-zA-Z0-9 ]*$/, {
+		.regex(/^[a-zA-Z0-9]*$/, {
 			message: translate('forms.alphanumeric', { label: translate('general.name') }),
 		})
 		.trim()

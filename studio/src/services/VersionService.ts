@@ -1,10 +1,13 @@
 import { axios } from '@/helpers';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import {
+	AddNPMPackageParams,
 	CreateRateLimitParams,
 	DeleteRateLimitParams,
 	GetVersionByIdParams,
 	GetVersionRequest,
+	SearchNPMPackages,
+	SearchNPMPackagesParams,
 	UpdateVersionPropertiesParams,
 	Version,
 } from '@/types';
@@ -16,7 +19,6 @@ export default class VersionService {
 		return (await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}`)).data;
 	}
 
-	// TODO: Add types for page and size
 	static async getAllVersionsVisibleToUser(req: GetVersionRequest) {
 		const { name, page, size, search, sortBy, sortDir, appId } = req;
 		return (
@@ -53,6 +55,25 @@ export default class VersionService {
 	static async deleteRateLimit({ orgId, versionId, appId, limitId }: DeleteRateLimitParams) {
 		return (
 			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/limits/${limitId}`)
+		).data;
+	}
+
+	static async searchNPMPackages({
+		orgId,
+		appId,
+		versionId,
+		...params
+	}: SearchNPMPackagesParams): Promise<SearchNPMPackages[]> {
+		return (
+			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/npm-search`, {
+				params,
+			})
+		).data;
+	}
+
+	static async addNPMPackage({ orgId, appId, versionId, ...data }: AddNPMPackageParams) {
+		return (
+			await axios.post(`${this.url}/${orgId}/app/${appId}/version/${versionId}/packages`, data)
 		).data;
 	}
 }

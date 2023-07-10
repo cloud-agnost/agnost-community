@@ -52,10 +52,20 @@ export interface Version {
 	params: [];
 	limits: RateLimit[];
 	apiKeys: [];
-	npmPackages: [];
+	npmPackages: NPMPackage[];
 	createdAt: string;
 	updatedAt: string;
 	__v: number;
+}
+
+export interface NPMPackage {
+	name: string;
+	version: string;
+	description: string;
+	createdBy: string;
+	_id: string;
+	createdAt: string;
+	updatedAt: string;
 }
 
 export interface GetVersionRequest extends BaseGetRequest {
@@ -95,3 +105,16 @@ export type VersionProperties = {
 };
 
 export type UpdateVersionPropertiesParams = VersionParamsWithoutEnvId & VersionProperties;
+
+export type SearchNPMPackagesParams = VersionParamsWithoutEnvId & {
+	page: number;
+	size: number;
+	package: string;
+	sortBy?: string;
+};
+
+export type AddNPMPackageParams = VersionParamsWithoutEnvId & {
+	name: string;
+	version: string;
+	description: string;
+};

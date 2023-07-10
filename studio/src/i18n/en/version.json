@@ -122,5 +122,13 @@
 		"delete": {
 			"success": "Middleware(s) deleted successfully"
 		}
+	},
+	"npm": {
+		"install": "Install Packages",
+		"add": "Install",
+		"name": "Package Name",
+		"no_packages": "No packages found",
+		"success": "Package installed successfully",
+		"already_installed": "installed"
 	}
 }

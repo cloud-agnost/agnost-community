@@ -13,6 +13,7 @@ export default function CodeEditor({
 	onChange,
 	onValidate,
 	loading,
+	className,
 }: CodeEditorProps) {
 	const editorRef = useRef(null);
 
@@ -28,7 +29,7 @@ export default function CodeEditor({
 	return (
 		<div className={cn(containerClassName)}>
 			<Editor
-				className={cn('editor')}
+				className={cn('editor', className)}
 				onChange={onChange}
 				onValidate={onValidate}
 				defaultValue={defaultValue}

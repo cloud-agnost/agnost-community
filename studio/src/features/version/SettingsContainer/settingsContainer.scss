@@ -17,4 +17,24 @@
 	&-content {
 		@apply bg-base flex-1 mt-0 m-[3px] rounded-b overflow-auto p-[21px];
 	}
+
+	&.table-view {
+		.setting-container-content {
+			@apply p-0;
+		}
+		.table-head {
+			@apply px-[21px];
+		}
+		.table-head:has([role='checkbox']) {
+			@apply pr-0;
+		}
+		.table-cell {
+			@apply px-[21px];
+		}
+		.data-table-container {
+			.table-container {
+				@apply border-none rounded-none;
+			}
+		}
+	}
 }

@@ -1,10 +1,13 @@
 import {
+	AddNPMPackageParams,
 	APIError,
 	CreateRateLimitParams,
 	DeleteRateLimitParams,
 	GetVersionByIdParams,
 	GetVersionRequest,
 	RateLimit,
+	SearchNPMPackages,
+	SearchNPMPackagesParams,
 	Version,
 	VersionParamsWithoutEnvId,
 	VersionProperties,
@@ -12,6 +15,7 @@ import {
 import { devtools } from 'zustand/middleware';
 import { create } from 'zustand';
 import { VersionService } from '@/services';
+import { notify, translate } from '@/utils';
 
 interface VersionStore {
 	loading: boolean;
@@ -28,6 +32,8 @@ interface VersionStore {
 	createRateLimit: (params: CreateRateLimitParams) => Promise<RateLimit>;
 	deleteRateLimit: (params: DeleteRateLimitParams) => Promise<Version>;
 	orderLimits: (limits: string[]) => void;
+	searchNPMPackages: (params: SearchNPMPackagesParams) => Promise<SearchNPMPackages[]>;
+	addNPMPackage: (params: AddNPMPackageParams) => Promise<Version>;
 }
 
 const useVersionStore = create<VersionStore>()(
@@ -95,6 +101,42 @@ const useVersionStore = create<VersionStore>()(
 						version: prev.version,
 					};
 				});
+			},
+			searchNPMPackages: async (params: SearchNPMPackagesParams) => {
+				try {
+					return VersionService.searchNPMPackages(params);
+				} catch (e) {
+					const error = e as APIError;
+					notify({
+						type: 'error',
+						title: error.error,
+						description: error.details,
+					});
+					throw e;
+				}
+			},
+			addNPMPackage: async (params: AddNPMPackageParams) => {
+				try {
+					const version = await VersionService.addNPMPackage(params);
+					set({ version });
+					notify({
+						type: 'success',
+						title: translate('general.success'),
+						description: translate('version.npm.success'),
+					});
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					const errorArray = error.fields ? error.fields : [{ msg: error.details }];
+					for (const field of errorArray) {
+						notify({
+							type: 'error',
+							title: error.error,
+							description: field.msg,
+						});
+					}
+					throw e;
+				}
 			},
 		}),
 		{

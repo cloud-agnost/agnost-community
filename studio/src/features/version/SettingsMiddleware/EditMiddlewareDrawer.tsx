@@ -28,7 +28,7 @@ const MiddlewareFormSchema = z.object({
 		})
 		.min(2, translate('forms.min2.error', { label: translate('general.name') }))
 		.max(64, translate('forms.max64.error', { label: translate('general.name') }))
-		.regex(/^[a-zA-Z0-9 ]*$/, {
+		.regex(/^[a-zA-Z0-9]*$/, {
 			message: translate('forms.alphanumeric', { label: translate('general.name') }),
 		})
 		.trim()
@@ -131,7 +131,7 @@ export default function EditMiddlewareDrawer() {
 					<DrawerTitle>{t('version.middleware.edit.default')}</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
-					<form className='p-6 flex flex-col gap-6 flex-1' onSubmit={form.handleSubmit(onSubmit)}>
+					<form className='p-6 flex flex-col gap-3 flex-1' onSubmit={form.handleSubmit(onSubmit)}>
 						<FormField
 							control={form.control}
 							name='name'

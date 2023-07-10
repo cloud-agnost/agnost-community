@@ -246,7 +246,6 @@ const router = createBrowserRouter([
 							},
 							{
 								path: 'middlewares',
-								loader: VersionSettingsMiddlewares.loader,
 								element: <VersionSettingsMiddlewares />,
 							},
 							{

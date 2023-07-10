@@ -43,7 +43,7 @@ export default function SettingsMiddleware({ setSelectedRows }: SettingsMiddlewa
 	}
 
 	return (
-		<div className='middlewares-data-table'>
+		<div className='data-table-container'>
 			<InfiniteScroll
 				next={next}
 				hasMore={true}
@@ -89,7 +89,6 @@ export const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 		),
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
-		size: 400,
 	},
 	{
 		id: 'createdAt',
