@@ -2,17 +2,18 @@ import './SettingsMiddleware.scss';
 import { Dispatch, SetStateAction } from 'react';
 import { DataTable, SortButton } from 'components/DataTable';
 import { Middleware } from '@/types';
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
 import { ColumnDef, Row } from '@tanstack/react-table';
 import { useParams } from 'react-router-dom';
 import { Checkbox } from 'components/Checkbox';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
-import { formatDate, translate } from '@/utils';
+import { translate } from '@/utils';
 import { Button } from 'components/Button';
 import { Pencil } from 'components/icons';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { DateText } from 'components/DateText';
 
 interface SettingsMiddlewareProps {
 	selectedRows: Row<Middleware>[] | undefined;
@@ -107,7 +108,7 @@ export const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 			const isMe = useAuthStore.getState().user?._id === createdBy;
 			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
 
-			return <At date={createdAt}>{avatar}</At>;
+			return <DateText date={createdAt}>{avatar}</DateText>;
 		},
 	},
 	{
@@ -126,7 +127,7 @@ export const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 		}) => {
 			const isMe = useAuthStore.getState().user?._id === updatedBy;
 			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
-			return <At date={updatedAt}>{avatar}</At>;
+			return <DateText date={updatedAt}>{avatar}</DateText>;
 		},
 	},
 	{
@@ -143,26 +144,3 @@ export const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 		},
 	},
 ];
-
-function At({ date, children }: { date: string; children: ReactNode }) {
-	return (
-		<div className='flex items-center gap-2'>
-			{children}
-			<div>
-				<span className='block text-default text-sm leading-6'>
-					{formatDate(date, {
-						month: 'short',
-						day: 'numeric',
-						year: 'numeric',
-					})}
-				</span>
-				<time className='text-[11px] text-subtle leading-[21px]'>
-					{formatDate(date, {
-						hour: 'numeric',
-						minute: 'numeric',
-					})}
-				</time>
-			</div>
-		</div>
-	);
-}
