@@ -3,6 +3,7 @@ import envCtrl from "../controllers/environment.js";
 import envLogCtrl from "../controllers/environmentLog.js";
 import userCtrl from "../controllers/user.js";
 import deployCtrl from "../controllers/deployment.js";
+import resourceCtrl from "../controllers/resource.js";
 import auditCtrl from "../controllers/audit.js";
 import { authSession } from "../middlewares/authSession.js";
 import { authMasterToken } from "../middlewares/authMasterToken.js";
@@ -17,6 +18,7 @@ import { applyRules as applyLogRules } from "../schemas/environmentLog.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
+import resource from "../controllers/resource.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -77,7 +79,7 @@ router.put(
 					{
 						autoDeploy,
 						dbStatus: "Deploying",
-						serverStatus: [{ pod: "all", status: "Deploying" }],
+						serverStatus: "Deploying",
 						schedulerStatus: "Deploying",
 						updatedBy: req.user._id,
 					},
@@ -93,7 +95,7 @@ router.put(
 					updatedEnv,
 					user,
 					"Deploying",
-					[{ pod: "all", status: "Deploying" }],
+					"Deploying",
 					"Deploying"
 				);
 				// Update environemnt data in engine cluster
@@ -305,7 +307,7 @@ router.post(
 				env._id,
 				{
 					dbStatus: "Redeploying",
-					serverStatus: [{ pod: "all", status: "Redeploying" }],
+					serverStatus: "Deploying",
 					schedulerStatus: "Redeploying",
 					updatedBy: req.user._id,
 				},
@@ -322,7 +324,7 @@ router.post(
 					envId: env._id,
 					action: "deploy",
 					dbStatus: "Deploying",
-					serverStatus: [{ pod: "all", status: "Redeploying" }],
+					serverStatus: "Deploying",
 					schedulerStatus: "Deploying",
 					dbLogs: [],
 					serverLogs: [],
@@ -384,7 +386,7 @@ router.post(
 	async (req, res) => {
 		try {
 			const { org, app, version, env, log } = req;
-			const { status, logs, type, pod } = req.body;
+			const { status, logs, type } = req.body;
 
 			// Get user information
 			let user = await userCtrl.getOneById(log.createdBy, {
@@ -399,17 +401,12 @@ router.post(
 			if (type === "db") {
 				dataSet.dbStatus = status;
 			} else if (type === "server") {
-				dataSet.serverStatus = env.serverStatus.filter(
-					(entry) => entry.pod !== "all" && entry.pod !== pod
-				);
-				dataSet.serverStatus.push({ pod, status });
+				dataSet.serverStatus = status;
 			} else {
 				dataSet.schedulerStatus = status;
 			}
 
-			// If deployment successfully completed then update deploymentDtm
-			if (["deploy", "redeploy"].includes(log.action))
-				dataSet.deploymentDtm = timestamp;
+			dataSet.deploymentDtm = timestamp;
 
 			// Update environment data
 			let updatedEnv = await envCtrl.updateOneById(
@@ -431,14 +428,12 @@ router.post(
 					{}
 				);
 			} else if (type === "server") {
-				const newLogs = log.serverLogs || [];
-				newLogs.push(...logs);
 				// Update environment log data
 				await envLogCtrl.updateOneById(
 					log._id,
 					{
 						serverStatus: dataSet.serverStatus,
-						serverLogs: newLogs,
+						serverLogs: logs,
 						updatedAt: timestamp,
 					},
 					{}
@@ -545,6 +540,45 @@ router.get(
 			});
 
 			res.json(logs);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/resources
+@method     GET
+@desc       Returns environment resources
+@access     private
+*/
+router.get(
+	"/:envId/resources",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateEnv,
+	authorizeAppAction("app.env.view"),
+	async (req, res) => {
+		try {
+			const { env } = req;
+
+			// Filter out the duplicate resource entries
+			const resourceiids = env.mappings
+				.map((entry) => entry.resource.iid)
+				.filter((value, index, self) => {
+					return self.indexOf(value) === index;
+				});
+
+			const resources = await resourceCtrl.getManyByQuery(
+				{
+					iid: { $in: resourceiids },
+				},
+				{ projection: "-access -accessReadOnly" }
+			);
+
+			res.json(resources);
 		} catch (error) {
 			handleError(req, res, error);
 		}

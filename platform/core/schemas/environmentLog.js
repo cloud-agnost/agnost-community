@@ -44,19 +44,11 @@ export const EnvironmentLogModel = mongoose.model(
 			index: true,
 			enum: envStatuses,
 		},
-		serverStatus: [
-			{
-				pod: {
-					type: String,
-					index: true,
-				},
-				status: {
-					type: String,
-					index: true,
-					enum: envStatuses,
-				},
-			},
-		],
+		serverStatus: {
+			type: String,
+			index: true,
+			enum: envStatuses,
+		},
 		schedulerStatus: {
 			type: String,
 			index: true,
@@ -73,7 +65,6 @@ export const EnvironmentLogModel = mongoose.model(
 		serverLogs: [
 			{
 				startedAt: { type: Date },
-				pod: { type: String },
 				status: { type: String, enum: logStatuses },
 				message: { type: String },
 			},

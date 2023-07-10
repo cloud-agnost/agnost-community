@@ -82,7 +82,7 @@ class DeploymentController {
 			appId: version.appId,
 			versionId: version._id,
 			envId: env._id,
-			action: "auto-deploy",
+			action: "deploy",
 			dbStatus: dbStatus,
 			serverStatus: serverStatus,
 			schedulerStatus: schedulerStatus,
@@ -328,7 +328,7 @@ class DeploymentController {
 			env,
 			user,
 			"Deploying",
-			[{ pod: "all", status: "Deploying" }],
+			"Deploying",
 			env.schedulerStatus
 		);
 		// First get the list of environment resources
@@ -392,7 +392,7 @@ class DeploymentController {
 			env,
 			user,
 			"Deploying",
-			[{ pod: "all", status: "Deploying" }],
+			"Deploying",
 			env.schedulerStatus
 		);
 		// First get the list of environment resources
@@ -453,7 +453,7 @@ class DeploymentController {
 			env,
 			user,
 			"Deploying",
-			[{ pod: "all", status: "Deploying" }],
+			"Deploying",
 			env.schedulerStatus
 		);
 
@@ -521,7 +521,7 @@ class DeploymentController {
 			env,
 			user,
 			"Deploying",
-			[{ pod: "all", status: "Deploying" }],
+			"Deploying",
 			env.schedulerStatus
 		);
 
@@ -583,7 +583,7 @@ class DeploymentController {
 			env,
 			user,
 			"Deploying",
-			[{ pod: "all", status: "Deploying" }],
+			"Deploying",
 			env.schedulerStatus
 		);
 
@@ -645,7 +645,7 @@ class DeploymentController {
 			env,
 			user,
 			"Deploying",
-			[{ pod: "all", status: "Deploying" }],
+			"Deploying",
 			env.schedulerStatus
 		);
 
@@ -707,7 +707,7 @@ class DeploymentController {
 			env,
 			user,
 			"Deploying",
-			[{ pod: "all", status: "Deploying" }],
+			"Deploying",
 			"Deploying"
 		);
 

@@ -61,15 +61,6 @@ class VersionController extends BaseController {
 			envIid
 		);
 
-		// Get the default cluster resources
-		let defaultResources = await resourceCtrl.getManyByQuery(
-			{
-				orgId: org._id,
-				$or: [{ instance: "Agenda" }, { instance: "Socket.io" }],
-			},
-			{ session }
-		);
-
 		const mappings = [
 			{
 				design: {
@@ -86,39 +77,6 @@ class VersionController extends BaseController {
 			},
 		];
 
-		for (let i = 0; i < defaultResources.length; i++) {
-			let res = defaultResources[i];
-			if (res.instance === "Agenda") {
-				mappings.push({
-					design: {
-						iid: envIid,
-						type: "scheduler",
-						name: t("cronScheduler"),
-					},
-					resource: {
-						iid: res.iid,
-						name: res.name,
-						type: res.type,
-						instance: res.instance,
-					},
-				});
-			} else if (res.instance === "Socket.io") {
-				mappings.push({
-					design: {
-						iid: envIid,
-						type: "realtime",
-						name: t("realtimeServer"),
-					},
-					resource: {
-						iid: res.iid,
-						name: res.name,
-						type: res.type,
-						instance: res.instance,
-					},
-				});
-			}
-		}
-
 		// Create environment data, we do not update the cache value yet, we update it after the deployment
 		const env = await envCtrl.create(
 			{
@@ -132,7 +90,7 @@ class VersionController extends BaseController {
 				// We have the mapping for engine, default queue, default scheduler and realtime by default
 				mappings: mappings,
 				dbStatus: "Deploying",
-				serverStatus: [{ pod: "all", status: "Deploying" }],
+				serverStatus: "Deploying",
 				schedulerStatus: "Deploying",
 				createdBy: user._id,
 				updatedBy: user._id,
@@ -149,7 +107,7 @@ class VersionController extends BaseController {
 				envId: env._id,
 				action: "deploy",
 				dbStatus: "Deploying",
-				serverStatus: [{ pod: "all", status: "Deploying" }],
+				serverStatus: "Deploying",
 				schedulerStatus: "Deploying",
 				dbLogs: [],
 				serverLogs: [],
@@ -224,16 +182,6 @@ class VersionController extends BaseController {
 			envIid
 		);
 
-		// Get the default cluster resources
-		let defaultResources = await resourceCtrl.getManyByQuery({
-			orgId: org._id,
-			$or: [
-				{ instance: "Agenda" },
-				{ instance: "Socket.io" },
-				{ instance: "MinIO" },
-			],
-		});
-
 		const mappings = [
 			{
 				design: {
@@ -250,60 +198,10 @@ class VersionController extends BaseController {
 			},
 		];
 
-		for (let i = 0; i < defaultResources.length; i++) {
-			let res = defaultResources[i];
-			if (res.instance === "Agenda") {
-				mappings.push({
-					design: {
-						iid: envIid,
-						type: "scheduler",
-						name: t("cronScheduler"),
-					},
-					resource: {
-						iid: res.iid,
-						name: res.name,
-						type: res.type,
-						instance: res.instance,
-					},
-				});
-			} else if (res.instance === "Socket.io") {
-				mappings.push({
-					design: {
-						iid: envIid,
-						type: "realtime",
-						name: t("realtimeServer"),
-					},
-					resource: {
-						iid: res.iid,
-						name: res.name,
-						type: res.type,
-						instance: res.instance,
-					},
-				});
-			} else if (res.instance === "MinIO") {
-				mappings.push({
-					design: {
-						iid: envIid,
-						type: "storage",
-						name: t("clusterStorage"),
-					},
-					resource: {
-						iid: res.iid,
-						name: res.name,
-						type: res.type,
-						instance: res.instance,
-					},
-				});
-			}
-		}
-
 		// We should also add the relevant mappings from the parent environment
 		mappings.push(
 			...parentEnv.mappings.filter(
-				(entry) =>
-					!["Agenda", "Socket.io", "MinIO", "API Server"].includes(
-						entry.resource.instance
-					)
+				(entry) => entry.resource.instance !== "API Server"
 			)
 		);
 
@@ -320,7 +218,7 @@ class VersionController extends BaseController {
 				// We have the mapping for engine, default queue, default scheduler and realtime by default
 				mappings: mappings,
 				dbStatus: "Deploying",
-				serverStatus: [{ pod: "all", status: "Deploying" }],
+				serverStatus: "Deploying",
 				schedulerStatus: "Deploying",
 				createdBy: user._id,
 				updatedBy: user._id,
@@ -337,7 +235,7 @@ class VersionController extends BaseController {
 				envId: env._id,
 				action: "deploy",
 				dbStatus: "Deploying",
-				serverStatus: [{ pod: "all", status: "Deploying" }],
+				serverStatus: "Deploying",
 				schedulerStatus: "Deploying",
 				dbLogs: [],
 				serverLogs: [],

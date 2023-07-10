@@ -109,27 +109,19 @@ export const EnvironmentModel = mongoose.model(
 					updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 				},
 			],
-			// Environment status
+			// Database deployment status
 			dbStatus: {
 				type: String,
 				index: true,
 				enum: envStatuses,
 			},
-			// Environment status
-			serverStatus: [
-				{
-					pod: {
-						type: String,
-						index: true,
-					},
-					status: {
-						type: String,
-						index: true,
-						enum: envStatuses,
-					},
-				},
-			],
-			// Environment status
+			// API server status
+			serverStatus: {
+				type: String,
+				index: true,
+				enum: envStatuses,
+			},
+			// Cronjobs deployment status
 			schedulerStatus: {
 				type: String,
 				index: true,

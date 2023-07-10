@@ -235,13 +235,16 @@ async function checkResourceStatus(resource) {
 				let result = await checkAPIServer(resource.access);
 				if (result === null) return null;
 				return {
-					status: "OK",
+					status: result.availableReplicas > 0 ? "OK" : "Idle",
 					availableReplicas: result.availableReplicas,
 					logs: [
 						{
 							startedAt: new Date(),
 							status: "OK",
-							message: t("API server is up and running"),
+							message:
+								result.availableReplicas > 0
+									? t("API server is up and running")
+									: t("API server is idle and in a scaled-down state"),
 						},
 					],
 				};
@@ -377,8 +380,7 @@ async function checkResourceStatus(resource) {
 			}
 		case "MinIO":
 			try {
-				let result = await checkClusterStorage(resource.access);
-				if (result === null) return null;
+				await checkClusterStorage(resource.access);
 				return {
 					status: "OK",
 					logs: [
@@ -667,7 +669,7 @@ async function checkClusterStorage(connSettings) {
 	});
 
 	try {
-		let buckets = await minioClient.listBuckets();
+		await minioClient.listBuckets();
 		return true;
 	} catch (err) {
 		reject(t("Cannot connect to MinIO. %s", err.message));
@@ -679,27 +681,50 @@ async function checkClusterStorage(connSettings) {
  * @param  {object} connSettings The connection settings needed to connect to the API server
  */
 async function checkAPIServer(connSettings) {
+	const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
+
+	let result = null;
+	try {
+		result = await k8sApi.getNamespacedCustomObjectStatus(
+			"serving.knative.dev",
+			"v1",
+			config.get("general.k8sNamespace"),
+			"services",
+			connSettings.name
+		);
+
+		// Get the last created revision name, we will use this to check the status of the deployment
+		const latestCreatedRevisionName =
+			result.body?.status?.latestCreatedRevisionName;
+
+		if (latestCreatedRevisionName) {
+			return await checkDeployment(latestCreatedRevisionName);
+		}
+	} catch (err) {
+		return await checkDeployment(connSettings.name);
+	}
+}
+
+/**
+ * Returns availableReplica count if the API server is up and running. Please note that for each version we have a dedicated API server.
+ * @param  {object} connSettings The connection settings needed to connect to the API server
+ */
+async function checkDeployment(deploymentName) {
 	const coreApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
 
 	let result = null;
 	try {
 		result = await coreApi.readNamespacedDeployment(
-			`${connSettings.name}-deployment`,
+			`${deploymentName}-deployment`,
 			config.get("general.k8sNamespace")
 		);
 	} catch (err) {
-		return null;
-	}
-
-	if (
-		result.body?.status?.availableReplicas === 0 ||
-		!result.body?.status?.availableReplicas
-	)
 		throw new AgnostError(
 			t("API server does not have any available replicas.")
 		);
+	}
 
-	return { availableReplicas: result.body?.status?.availableReplicas };
+	return { availableReplicas: result.body?.status?.availableReplicas ?? 0 };
 }
 
 /**

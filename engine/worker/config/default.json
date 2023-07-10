@@ -36,6 +36,7 @@
         "platformBaseUrl": "http://platform-core-clusterip-service:4000",
         "maxPoolSize": 3,
         "defaultClusterIPPort": 4000,
+        "defaultKnativeIngressPort": 80,
         "livenessProbe": {
            "timeoutSeconds": 10,
            "periodSeconds": 30,

@@ -622,7 +622,7 @@ router.delete(
 		try {
 			const { org, user, resource } = req;
 
-			if (!resource.deletable) {
+			if (!resource.deletable || resource.instance === "API Server") {
 				await resourceCtrl.endSession(session);
 
 				return res.status(422).json({

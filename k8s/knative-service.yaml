@@ -1,32 +1,35 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: serving.knative.dev/v1
+kind: Service
 metadata:
-   name: env-l05et1xpq7lw-deployment
-   labels:
-      app: env-l05et1xpq7lw
+  name: env-kc2p9wa3qta4
 spec:
-   replicas: 1
-   selector:
-      matchLabels:
-         app: env-l05et1xpq7lw
-   template:
-      metadata:
-         labels:
-            app: env-l05et1xpq7lw
-      spec:
-         containers:
-            - name: env-l05et1xpq7lw
-              image: agnost-community/engine/core
-              # We will be using the minikube docker daemon, since the actual docker daemon on local machine are different
-              # Prevent minikube docker daemon to pull images from central docker hub set imagePullPolicy to Never, so that
-              # it uses the image put in minikube's docker environment, see dev.sh script how we change the docker context to minikube
-              imagePullPolicy: Never
-              ports:
-                 - containerPort: 4000
-              env:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/initial-scale: "1"
+        autoscaling.knative.dev/target: "10"
+        autoscaling.knative.dev/metric: "concurrency"
+        autoscaling.knative.dev/max-scale: "10"
+        autoscaling.knative.dev/target-utilization-percentage: "80"
+        autoscaling.knative.dev/scale-down-delay: "5m00s"
+        autoscaling.knative.dev/scale-to-zero-pod-retention-period: "10m00s"
+    spec:
+      containerConcurrency: 40
+      containers:
+        - image: agnost-community/engine/core
+          ports:
+          - containerPort: 4000
+          env:
                  - name: CACHE_HOSTNAME
-                   value: redis-master          
+                   value: redis-master
+                 - name: CACHE_READ_REPLICA_HOSTNAME
+                   value: redis-replicas
                  - name: CACHE_PWD
+                   valueFrom:
+                      secretKeyRef:
+                         name: redis-password
+                         key: password
+                 - name: CACHE_READ_REPLICA_PWD
                    valueFrom:
                       secretKeyRef:
                          name: redis-password
@@ -63,21 +66,21 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: masterToken
-                 - name: ACCESS_TOKEN
-                   valueFrom:
-                      secretKeyRef:
-                         name: cluster-secrets
-                         key: accessToken
                  - name: POD_NAME
-                   valueFrom:
-                      fieldRef:
-                         fieldPath: metadata.name
+                   value: "api-server"
                  - name: PASSPHRASE
                    valueFrom:
                       secretKeyRef:
                          name: cluster-secrets
                          key: passPhrase
                  - name: AGNOST_ENVIRONMENT_ID
-                   value: env-l05et1xpq7lw
+                   value: env-kc2p9wa3qta4
                  - name: AGNOST_ENGINE_ID
-                   value: env-l05et1xpq7lw
+                   value: env-kc2p9wa3qta4
+          resources:
+            requests:
+              cpu: "125m"
+              memory: "128M"
+            limits:
+              cpu: "250m"
+              memory: "512M"

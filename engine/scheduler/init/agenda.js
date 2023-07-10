@@ -15,7 +15,7 @@ export const startAgenda = async () => {
 		mongo: dbClient.db(agendaConfig.DBName),
 	});
 
-	// Clear the lockedAt and lastFinishedAt fields since if they are present sometimes Agenda doest no start the cron scheduler
+	// Clear the lockedAt and lastFinishedAt fields since if they are present sometimes Agenda does not start the cron scheduler
 	await dbClient
 		.db(agendaConfig.DBName)
 		.collection("agendaJobs")
