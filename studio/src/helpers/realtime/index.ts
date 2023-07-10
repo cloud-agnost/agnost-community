@@ -5,7 +5,7 @@ import User from './User';
 export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 	const keys = {
 		user: User,
-		organization: Organization,
+		org: Organization,
 	};
 	return new keys[type]();
 }
