@@ -429,10 +429,7 @@ router.delete(
 
 			// Iterate through all resources and delete them if they are managed or if the resource is the API server of the version
 			const managedResources = resources.filter(
-				(entry) =>
-					entry.managed === true &&
-					(entry.deletable === true ||
-						(entry.deletable === false && entry.type === "engine"))
+				(entry) => entry.managed === true && entry.deletable === true
 			);
 
 			// Delete managed organization resources

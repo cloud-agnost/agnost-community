@@ -411,6 +411,7 @@ export const resourceStatuses = [
 	"Error",
 	"Updating",
 	"Deleting",
+	"Idle",
 ];
 
 export const resourceTypes = [

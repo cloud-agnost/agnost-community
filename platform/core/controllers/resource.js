@@ -239,7 +239,7 @@ class ResourceController extends BaseController {
 					envId: envIid,
 				}),
 				status: "Creating",
-				deletable: false, // Engine deployment can be deleted only if the version is deleted
+				deletable: true, // Engine deployment can be deleted only if the version is deleted
 				createdBy: user._id,
 			},
 			{ session, cacheKey: resourceId }

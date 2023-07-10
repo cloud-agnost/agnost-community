@@ -68,20 +68,18 @@
          "SMSCodeExpiresInSeconds": 3600,
          "minSMSCodeExpirySeconds": 60,
          "defaultEngineConfig": {
-            "replicas": 1,
-            "hpa": {
-                "avgCPU": 80,
-                "avgMemory": 80,
-                "minReplicas": 1,
-                "maxReplicas": 10
-            },
+            "initialScale": 1,
+            "maxScale": 10,
+            "scaleDownDelay": "5m00s",
+            "scaleToZeroPodRetentionPeriod": "10m00s",
+            "containerConcurrency": 40,
             "cpu": {
-                "request": "100m",
-                "limit": "1000m"
+                "request": "125m",
+                "limit": "250m"
             },
             "memory": {
-                "request": "512Mi",
-                "limit": "2Gi"
+                "request": "128Mi",
+                "limit": "512Mi"
             }
          }
     }

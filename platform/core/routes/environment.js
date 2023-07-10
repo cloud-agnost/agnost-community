@@ -77,7 +77,7 @@ router.put(
 					{
 						autoDeploy,
 						dbStatus: "Deploying",
-						serverStatus: [{ pod: "all", status: "Deploying" }],
+						serverStatus: "Deploying",
 						schedulerStatus: "Deploying",
 						updatedBy: req.user._id,
 					},
@@ -93,7 +93,7 @@ router.put(
 					updatedEnv,
 					user,
 					"Deploying",
-					[{ pod: "all", status: "Deploying" }],
+					"Deploying",
 					"Deploying"
 				);
 				// Update environemnt data in engine cluster
@@ -305,7 +305,7 @@ router.post(
 				env._id,
 				{
 					dbStatus: "Redeploying",
-					serverStatus: [{ pod: "all", status: "Redeploying" }],
+					serverStatus: "Deploying",
 					schedulerStatus: "Redeploying",
 					updatedBy: req.user._id,
 				},
@@ -322,7 +322,7 @@ router.post(
 					envId: env._id,
 					action: "deploy",
 					dbStatus: "Deploying",
-					serverStatus: [{ pod: "all", status: "Redeploying" }],
+					serverStatus: "Deploying",
 					schedulerStatus: "Deploying",
 					dbLogs: [],
 					serverLogs: [],
@@ -384,7 +384,7 @@ router.post(
 	async (req, res) => {
 		try {
 			const { org, app, version, env, log } = req;
-			const { status, logs, type, pod } = req.body;
+			const { status, logs, type } = req.body;
 
 			// Get user information
 			let user = await userCtrl.getOneById(log.createdBy, {
@@ -399,17 +399,12 @@ router.post(
 			if (type === "db") {
 				dataSet.dbStatus = status;
 			} else if (type === "server") {
-				dataSet.serverStatus = env.serverStatus.filter(
-					(entry) => entry.pod !== "all" && entry.pod !== pod
-				);
-				dataSet.serverStatus.push({ pod, status });
+				dataSet.serverStatus = status;
 			} else {
 				dataSet.schedulerStatus = status;
 			}
 
-			// If deployment successfully completed then update deploymentDtm
-			if (["deploy", "redeploy"].includes(log.action))
-				dataSet.deploymentDtm = timestamp;
+			dataSet.deploymentDtm = timestamp;
 
 			// Update environment data
 			let updatedEnv = await envCtrl.updateOneById(
@@ -431,14 +426,12 @@ router.post(
 					{}
 				);
 			} else if (type === "server") {
-				const newLogs = log.serverLogs || [];
-				newLogs.push(...logs);
 				// Update environment log data
 				await envLogCtrl.updateOneById(
 					log._id,
 					{
 						serverStatus: dataSet.serverStatus,
-						serverLogs: newLogs,
+						serverLogs: logs,
 						updatedAt: timestamp,
 					},
 					{}

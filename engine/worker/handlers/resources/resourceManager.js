@@ -93,7 +93,7 @@ export class ResourceManager {
 			this.addLog(t("Started resource creation"));
 			switch (this.getResourceType()) {
 				case "engine":
-					await this.createDeploymentResources();
+					await this.createAPIServer();
 					break;
 				default:
 					break;
@@ -152,7 +152,7 @@ export class ResourceManager {
 			this.addLog(t("Started resource update"));
 			switch (this.getResourceType()) {
 				case "engine":
-					await this.updateDeploymentResources();
+					await this.updateAPIServer();
 					break;
 				default:
 					break;
@@ -185,7 +185,7 @@ export class ResourceManager {
 			this.addLog(t("Started resource deletion"));
 			switch (this.getResourceType()) {
 				case "engine":
-					await this.deleteDeploymentResources();
+					await this.deleteAPIServer();
 					break;
 				default:
 					break;
@@ -213,20 +213,14 @@ export class ResourceManager {
 	/**
 	 * Creates an engine deployment (API server) and associated horizontal pod autoscaler and ingress entry
 	 */
-	async createDeploymentResources() {
+	async createAPIServer() {
 		const resource = this.getResource();
 
 		// Create the deployment of engine
-		await this.createDeployment(resource.iid, resource.access, resource.config);
-
-		// Create the HPA of engine
-		await this.createHPA(resource.iid, resource.iid, resource.config.hpa);
-
-		// Create the Service of engine
-		await this.createClusterIPService(
+		await this.createKnativeService(
 			resource.iid,
-			resource.iid,
-			config.get("general.defaultClusterIPPort")
+			resource.access,
+			resource.config
 		);
 
 		// Add the Ingress for the engine service
@@ -234,7 +228,7 @@ export class ResourceManager {
 			resource.iid,
 			resource.iid,
 			resource.iid,
-			config.get("general.defaultClusterIPPort")
+			config.get("general.defaultKnativeIngressPort")
 		);
 	}
 
@@ -242,30 +236,21 @@ export class ResourceManager {
 	 * Updates deployment resources, basically updates deployment resource requests, limits, replica count and HPA configuration.
 	 * No changes are made for the deployment servcie and the ingress rule
 	 */
-	async updateDeploymentResources() {
+	async updateAPIServer() {
 		const resource = this.getResource();
 
 		// Update the deployment of engine
-		await this.updateDeployment(resource.iid, resource.config);
-
-		// Update the HPA of engine
-		await this.updateHPA(resource.iid, resource.config.hpa);
+		await this.updateKnativeService(resource.iid, resource.config);
 	}
 
 	/**
 	 * Deletes deployment resources, deletes the deployment and accosiated HPA and clusterIP service and removes ingress rule
 	 */
-	async deleteDeploymentResources() {
+	async deleteAPIServer() {
 		const resource = this.getResource();
 
 		// Delete the deployment of engine
-		await this.deleteDeployment(resource.iid);
-
-		// Delete the HPA of engine
-		await this.deleteHPA(resource.iid);
-
-		// Delete the ClusterIP service of engine
-		await this.deleteClusterIPService(resource.iid);
+		await this.deleteKnativeService(resource.iid);
 
 		// Delete the Ingress of the engine service
 		await this.deleteIngress(resource.iid);
@@ -277,45 +262,46 @@ export class ResourceManager {
 	 * @param  {object} accessConfig The access configuration of the deployment
 	 * @param  {object} deploymentConfig The deployment configuration
 	 */
-	async createDeployment(deploymentName, accessConfig, deploymentConfig) {
+	async createKnativeService(deploymentName, accessConfig, deploymentConfig) {
 		// Create a Kubernetes core API client
 		const kubeconfig = new k8s.KubeConfig();
 		kubeconfig.loadFromDefault();
-		const appsApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
+		const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
+		console.log("***here123", accessConfig, deploymentConfig);
 		// Define the Deployment specification
-		const deploymentSpec = {
-			apiVersion: "apps/v1",
-			kind: "Deployment",
+		const serviceSpec = {
+			apiVersion: "serving.knative.dev/v1",
+			kind: "Service",
 			metadata: {
-				name: `${deploymentName}-deployment`,
-				labels: {
-					app: deploymentName,
-				},
+				name: deploymentName,
 			},
 			spec: {
-				replicas: deploymentConfig.replicas,
-				selector: {
-					matchLabels: {
-						app: deploymentName,
-					},
-				},
-				strategy: {
-					type: "RollingUpdate",
-					rollingUpdate: { maxSurge: "25%", maxUnavailable: "25%" },
-				},
 				template: {
 					metadata: {
 						labels: {
 							app: deploymentName,
 						},
+						annotations: {
+							"autoscaling.knative.dev/initial-scale":
+								deploymentConfig.initialScale.toString(),
+							"autoscaling.knative.dev/target":
+								deploymentConfig.maxScale.toString(),
+							"autoscaling.knative.dev/metric": "concurrency",
+							"autoscaling.knative.dev/max-scale":
+								deploymentConfig.maxScale.toString(),
+							"autoscaling.knative.dev/target-utilization-percentage": "80",
+							"autoscaling.knative.dev/scale-down-delay":
+								deploymentConfig.scaleDownDelay.toString(),
+							"autoscaling.knative.dev/scale-to-zero-pod-retention-period":
+								deploymentConfig.scaleToZeroPodRetentionPeriod.toString(),
+						},
 					},
 					spec: {
+						containerConcurrency: deploymentConfig.containerConcurrency,
 						containers: [
 							{
-								name: deploymentName,
 								image: "gcr.io/agnost-community/engine/core",
-								imagePullPolicy: "Always",
 								ports: [
 									{
 										containerPort: config.get("general.defaultClusterIPPort"),
@@ -384,21 +370,17 @@ export class ResourceManager {
 									},
 									{
 										name: "POD_NAME",
-										valueFrom: {
-											fieldRef: {
-												fieldPath: "metadata.name",
-											},
-										},
+										value: "api-server",
 									},
 								],
 								resources: {
 									requests: {
-										cpu: deploymentConfig.cpu.request,
-										memory: deploymentConfig.memory.request,
+										cpu: deploymentConfig.cpu.request.toString(),
+										memory: deploymentConfig.memory.request.toString(),
 									},
 									limits: {
-										cpu: deploymentConfig.cpu.limit,
-										memory: deploymentConfig.memory.limit,
+										cpu: deploymentConfig.cpu.limit.toString(),
+										memory: deploymentConfig.memory.limit.toString(),
 									},
 								},
 								livenessProbe: {
@@ -439,12 +421,16 @@ export class ResourceManager {
 		};
 
 		try {
-			// Create the deployment
-			await appsApi.createNamespacedDeployment(
+			// Create the knative service
+			await k8sApi.createNamespacedCustomObject(
+				"serving.knative.dev",
+				"v1",
 				config.get("general.k8sNamespace"),
-				deploymentSpec
+				"services",
+				serviceSpec
 			);
 		} catch (err) {
+			console.log("****here-err", err);
 			throw new AgnostError(err.body?.message);
 		}
 	}
@@ -454,7 +440,7 @@ export class ResourceManager {
 	 * @param  {string} deploymentName The deployment name prefix (resource iid)
 	 * @param  {object} deploymentConfig The deployment configuration
 	 */
-	async updateDeployment(deploymentName, deploymentConfig) {
+	async updateKnativeService(deploymentName, deploymentConfig) {
 		// Create a Kubernetes core API client
 		const kubeconfig = new k8s.KubeConfig();
 		kubeconfig.loadFromDefault();
@@ -490,82 +476,23 @@ export class ResourceManager {
 	}
 
 	/**
-	 * Deletes an engine deployment (API server)
+	 * Deletes an engine Knative service (API server)
 	 * @param  {string} deploymentName The deployment name prefix (resource iid)
 	 */
-	async deleteDeployment(deploymentName) {
+	async deleteKnativeService(deploymentName) {
 		// Create a Kubernetes core API client
 		const kubeconfig = new k8s.KubeConfig();
 		kubeconfig.loadFromDefault();
-		const appsApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
+		const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
 		try {
 			// Delete the deployment
-			await appsApi.deleteNamespacedDeployment(
-				`${deploymentName}-deployment`,
-				config.get("general.k8sNamespace")
-			);
-		} catch (err) {
-			throw new AgnostError(err.body?.message);
-		}
-	}
-
-	/**
-	 * Creates horizontal pod autoscaler (HPA) for the deployment
-	 * @param  {string} hpaName The HPA name prefix (resource iid)
-	 * @param  {string} deploymentName The deployment name prefix (resource iid)
-	 * @param  {object} hpaConfig The HPA configuration
-	 */
-	async createHPA(hpaName, deploymentName, hpaConfig) {
-		// Create a Kubernetes core API client
-		const kubeconfig = new k8s.KubeConfig();
-		kubeconfig.loadFromDefault();
-		const autoscalingApi = kubeconfig.makeApiClient(k8s.AutoscalingV2Api);
-
-		// Define the HPA specification
-		const hpaSpec = {
-			apiVersion: "autoscaling/v2",
-			kind: "HorizontalPodAutoscaler",
-			metadata: {
-				name: `${hpaName}-autoscaler`,
-			},
-			spec: {
-				scaleTargetRef: {
-					apiVersion: "apps/v1",
-					kind: "Deployment",
-					name: `${deploymentName}-deployment`,
-				},
-				minReplicas: hpaConfig.minReplicas,
-				maxReplicas: hpaConfig.maxReplicas,
-				metrics: [
-					{
-						type: "Resource",
-						resource: {
-							name: "cpu",
-							target: {
-								type: "Utilization",
-								averageUtilization: hpaConfig.avgCPU,
-							},
-						},
-					},
-					{
-						type: "Resource",
-						resource: {
-							name: "memory",
-							target: {
-								type: "Utilization",
-								averageUtilization: hpaConfig.avgMemory,
-							},
-						},
-					},
-				],
-			},
-		};
-
-		try {
-			await autoscalingApi.createNamespacedHorizontalPodAutoscaler(
+			await k8sApi.deleteNamespacedCustomObject(
+				"serving.knative.dev",
+				"v1",
 				config.get("general.k8sNamespace"),
-				hpaSpec
+				"services",
+				deploymentName
 			);
 		} catch (err) {
 			throw new AgnostError(err.body?.message);
@@ -573,130 +500,7 @@ export class ResourceManager {
 	}
 
 	/**
-	 * Updates horizontal pod autoscaler (HPA) for the deployment
-	 * @param  {string} hpaName The HPA name prefix (resource iid)
-	 * @param  {object} hpaConfig The HPA configuration
-	 */
-	async updateHPA(hpaName, hpaConfig) {
-		// Create a Kubernetes core API client
-		const kubeconfig = new k8s.KubeConfig();
-		kubeconfig.loadFromDefault();
-		const autoscalingApi = kubeconfig.makeApiClient(k8s.AutoscalingV2Api);
-
-		try {
-			// Get the existing HPA
-			const { body: hpa } =
-				await autoscalingApi.readNamespacedHorizontalPodAutoscaler(
-					`${hpaName}-autoscaler`,
-					config.get("general.k8sNamespace")
-				);
-
-			// Update the memory and CPU metrics and min/max replica counts
-			hpa.spec.minReplicas = hpaConfig.minReplicas;
-			hpa.spec.maxReplicas = hpaConfig.maxReplicas;
-			hpa.spec.metrics[0].resource.target.averageUtilization = hpaConfig.avgCPU;
-			hpa.spec.metrics[1].resource.target.averageUtilization =
-				hpaConfig.avgMemory;
-
-			await autoscalingApi.replaceNamespacedHorizontalPodAutoscaler(
-				`${hpaName}-autoscaler`,
-				config.get("general.k8sNamespace"),
-				hpa
-			);
-		} catch (err) {
-			throw new AgnostError(err.body?.message);
-		}
-	}
-
-	/**
-	 * Deletes horizontal pod autoscaler (HPA) for the deployment
-	 * @param  {string} hpaName The HPA name prefix (resource iid)
-	 * @param  {object} hpaConfig The HPA configuration
-	 */
-	async deleteHPA(hpaName) {
-		// Create a Kubernetes core API client
-		const kubeconfig = new k8s.KubeConfig();
-		kubeconfig.loadFromDefault();
-		const autoscalingApi = kubeconfig.makeApiClient(k8s.AutoscalingV2Api);
-
-		try {
-			// Delete the HPA
-			await autoscalingApi.deleteNamespacedHorizontalPodAutoscaler(
-				`${hpaName}-autoscaler`,
-				config.get("general.k8sNamespace")
-			);
-		} catch (err) {
-			throw new AgnostError(err.body?.message);
-		}
-	}
-
-	/**
-	 * Creates ClusterIP service for the deployment
-	 * @param  {string} serviceName The service name prefix (resource iid)
-	 * @param  {string} deploymentName The deployment name prefix (resource iid)
-	 * @param  {number} port The target port of the service
-	 */
-	async createClusterIPService(serviceName, deploymentName, port) {
-		// Create a Kubernetes core API client
-		const kubeconfig = new k8s.KubeConfig();
-		kubeconfig.loadFromDefault();
-		const coreApi = kubeconfig.makeApiClient(k8s.CoreV1Api);
-
-		// Define the ClusterIP specification
-		const serviceSpec = {
-			apiVersion: "v1",
-			kind: "Service",
-			metadata: {
-				name: `${serviceName}-service`,
-			},
-			spec: {
-				selector: {
-					app: deploymentName,
-				},
-				ports: [
-					{
-						name: "http",
-						port: port,
-						targetPort: port,
-					},
-				],
-				type: "ClusterIP",
-			},
-		};
-
-		try {
-			await coreApi.createNamespacedService(
-				config.get("general.k8sNamespace"),
-				serviceSpec
-			);
-		} catch (err) {
-			throw new AgnostError(err.body?.message);
-		}
-	}
-
-	/**
-	 * Deletes ClusterIP service for the deployment
-	 * @param  {string} serviceName The service name prefix (resource iid)
-	 */
-	async deleteClusterIPService(serviceName) {
-		// Create a Kubernetes core API client
-		const kubeconfig = new k8s.KubeConfig();
-		kubeconfig.loadFromDefault();
-		const coreApi = kubeconfig.makeApiClient(k8s.CoreV1Api);
-
-		try {
-			// Delete the service
-			await coreApi.deleteNamespacedService(
-				`${serviceName}-service`,
-				config.get("general.k8sNamespace")
-			);
-		} catch (err) {
-			throw new AgnostError(err.body?.message);
-		}
-	}
-
-	/**
-	 * Creates the ingress rule for the deployment service
+	 * Creates the ingress rule for the API server
 	 * @param  {string} ingressName The ingress name
 	 * @param  {string} pathName The ingress path to route external traffic to the resource (resource iid)
 	 * @param  {string} serviceName The service name prefix (resource iid)
@@ -713,7 +517,7 @@ export class ResourceManager {
 				apiVersion: "networking.k8s.io/v1",
 				kind: "Ingress",
 				metadata: {
-					name: ingressName,
+					name: `${ingressName}-ingress`,
 					annotations: {
 						"kubernetes.io/ingress.class": "nginx",
 						"nginx.ingress.kubernetes.io/proxy-body-size": "500m",
@@ -722,6 +526,7 @@ export class ResourceManager {
 						"nginx.ingress.kubernetes.io/proxy-read-timeout": "6000",
 						"nginx.ingress.kubernetes.io/proxy-next-upstream-timeout": "6000",
 						"nginx.ingress.kubernetes.io/rewrite-target": "/$1",
+						"nginx.ingress.kubernetes.io/upstream-vhost": `${ingressName}.default.svc.cluster.local`,
 					},
 				},
 				spec: {
@@ -734,7 +539,7 @@ export class ResourceManager {
 										pathType: "Prefix",
 										backend: {
 											service: {
-												name: `${serviceName}-service`,
+												name: `${serviceName}`,
 												port: { number: port },
 											},
 										},
@@ -757,7 +562,7 @@ export class ResourceManager {
 	}
 
 	/**
-	 * Deletes the ingress of the deployment service
+	 * Deletes the ingress of the API server
 	 * @param  {string} ingressName The ingress name
 	 */
 	async deleteIngress(ingressName) {
@@ -769,7 +574,7 @@ export class ResourceManager {
 		try {
 			// Delete the ingress resource
 			await networkingApi.deleteNamespacedIngress(
-				ingressName,
+				`${ingressName}-ingress`,
 				config.get("general.k8sNamespace")
 			);
 		} catch (err) {

@@ -79,11 +79,20 @@ spec:
                          name: cluster-secrets
                          key: accessToken
                  - name: MINIO_ENDPOINT
-                   value: "minio"
+                   valueFrom:
+                      secretKeyRef:
+                         name: minio-credentials
+                         key: endpoint
                  - name: MINIO_PORT
-                   value: "9000"
+                   valueFrom:
+                      secretKeyRef:
+                         name: minio-credentials
+                         key: port
                  - name: MINIO_ACCESS_KEY
-                   value: appUser
+                   valueFrom:
+                      secretKeyRef:
+                         name: minio-credentials
+                         key: userName
                  - name: MINIO_SECRET_KEY
                    valueFrom:
                       secretKeyRef:
