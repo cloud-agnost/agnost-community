@@ -17,6 +17,7 @@ import { notify, translate } from '@/utils';
 interface MiddlewareStore {
 	middlewares: Middleware[];
 	middleware: Middleware | null;
+	editMiddlewareDrawerIsOpen: boolean;
 	getMiddlewaresOfAppVersion: (
 		params: GetMiddlewaresOfAppVersionParams,
 		init?: boolean,
@@ -27,6 +28,8 @@ interface MiddlewareStore {
 	createMiddleware: (params: CreateMiddlewareParams) => Promise<Middleware>;
 	updateMiddleware: (params: UpdateMiddlewareParams) => Promise<Middleware>;
 	saveMiddlewareCode: (params: SaveMiddlewareCodeParams) => Promise<Middleware>;
+	setEditMiddlewareDrawerIsOpen: (open: boolean) => void;
+	setMiddleware: (middleware: Middleware | null) => void;
 }
 
 const useMiddlewareStore = create<MiddlewareStore>()(
@@ -35,6 +38,7 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 			(set) => ({
 				middlewares: [],
 				middleware: null,
+				editMiddlewareDrawerIsOpen: false,
 				createMiddleware: async (params: CreateMiddlewareParams) => {
 					try {
 						const middleware = await MiddlewareService.createMiddleware(params);
@@ -115,11 +119,27 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 					}
 				},
 				updateMiddleware: async (params: UpdateMiddlewareParams) => {
-					const middleware = await MiddlewareService.updateMiddleware(params);
-					set((prev) => ({
-						middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
-					}));
-					return middleware;
+					try {
+						const middleware = await MiddlewareService.updateMiddleware(params);
+						console.log({ middleware });
+						set((prev) => ({
+							middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
+						}));
+						notify({
+							title: translate('general.success'),
+							description: translate('version.middleware.edit.success'),
+							type: 'success',
+						});
+						return middleware;
+					} catch (e) {
+						const error = e as APIError;
+						notify({
+							title: error.error,
+							description: error.details,
+							type: 'error',
+						});
+						throw e;
+					}
 				},
 				saveMiddlewareCode: async (params: SaveMiddlewareCodeParams) => {
 					const middleware = await MiddlewareService.saveMiddlewareCode(params);
@@ -127,6 +147,12 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 						middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
 					}));
 					return middleware;
+				},
+				setEditMiddlewareDrawerIsOpen: (open: boolean) => {
+					set({ editMiddlewareDrawerIsOpen: open });
+				},
+				setMiddleware: (middleware) => {
+					set({ middleware });
 				},
 			}),
 			{

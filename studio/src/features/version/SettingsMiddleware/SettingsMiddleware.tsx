@@ -114,7 +114,7 @@ export const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 	{
 		id: 'updatedAt',
 		header: ({ column }) => (
-			<SortButton text={translate('general.created_at').toUpperCase()} column={column} />
+			<SortButton text={translate('general.updated_at').toUpperCase()} column={column} />
 		),
 		accessorKey: 'updatedAt',
 		enableSorting: true,
@@ -133,10 +133,22 @@ export const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 	{
 		id: 'actions',
 		size: 45,
-		cell: () => {
+		cell: ({ row: { original } }) => {
+			function openEditDrawer() {
+				console.log('openEditDrawer');
+				const { setEditMiddlewareDrawerIsOpen, setMiddleware } = useMiddlewareStore.getState();
+				setEditMiddlewareDrawerIsOpen(true);
+				setMiddleware(original);
+			}
 			return (
 				<div className='flex items-center justify-end'>
-					<Button iconOnly variant='blank' className='text-xl text-icon-base'>
+					<Button
+						onClick={openEditDrawer}
+						iconOnly
+						variant='blank'
+						rounded
+						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
+					>
 						<Pencil />
 					</Button>
 				</div>

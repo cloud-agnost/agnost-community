@@ -270,6 +270,12 @@
 	.main {
 		height: calc(100vh - 72px);
 	}
+	.editor {
+		.overflow-guard,
+		.monaco-editor {
+			border-radius: 8px !important;
+		}
+	}
 }
 
 @layer utilities {

@@ -6,6 +6,7 @@ import { ApplicationVersions } from '@/features/application';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import EditApplication from '@/features/application/EditApplication.tsx';
+import { EditMiddlewareDrawer } from '@/features/version/SettingsMiddleware';
 
 const authPaths = [
 	'/login',
@@ -55,6 +56,7 @@ export default function Root() {
 			<Outlet />
 			<ApplicationVersions />
 			<EditApplication />
+			<EditMiddlewareDrawer />
 		</>
 	);
 }

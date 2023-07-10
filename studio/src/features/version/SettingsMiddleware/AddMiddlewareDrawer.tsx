@@ -19,7 +19,7 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { translate } from '@/utils';
 
-const FormSchema = z.object({
+const MiddlewareFormSchema = z.object({
 	name: z
 		.string({
 			required_error: translate('forms.required', {
@@ -51,10 +51,10 @@ export default function AddMiddlewareDrawer({ open, onOpenChange }: AddMiddlewar
 	const { createMiddleware } = useMiddlewareStore();
 	const { orgId, appId, versionId } = useParams();
 
-	const form = useForm<z.infer<typeof FormSchema>>({
-		resolver: zodResolver(FormSchema),
+	const form = useForm<z.infer<typeof MiddlewareFormSchema>>({
+		resolver: zodResolver(MiddlewareFormSchema),
 	});
-	async function onSubmit(data: z.infer<typeof FormSchema>) {
+	async function onSubmit(data: z.infer<typeof MiddlewareFormSchema>) {
 		if (!orgId || !appId || !versionId) return;
 		setLoading(true);
 		try {

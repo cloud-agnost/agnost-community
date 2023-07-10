@@ -108,11 +108,16 @@
 	},
 	"default_limiter_deleted": "Default rate limiter deleted successfully",
 	"limiter_added_to_default": "Rate limiter added to default rate limiters",
+	"handler_code": "Handler Code",
 	"middleware": {
 		"name": "Middleware Name",
 		"add_middleware": "Add Middleware",
 		"add": {
 			"success": "Middleware added successfully"
+		},
+		"edit": {
+			"default": "Edit Middleware",
+			"success": "Middleware updated successfully"
 		},
 		"delete": {
 			"success": "Middleware(s) deleted successfully"

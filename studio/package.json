@@ -43,6 +43,7 @@
 		"framer-motion": "^10.12.16",
 		"i18next": "^22.5.1",
 		"luxon": "^3.3.0",
+		"monaco-themes": "^0.4.4",
 		"path": "^0.12.7",
 		"react": "^18.2.0",
 		"react-beautiful-dnd": "^13.1.1",
