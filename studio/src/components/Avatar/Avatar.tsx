@@ -53,7 +53,7 @@ const Avatar = React.forwardRef<React.ElementRef<typeof AvatarPrimitive.Root>, A
 	({ size, className, square, ...props }, ref) => (
 		<AvatarPrimitive.Root
 			ref={ref}
-			className={cn(avatarVariants({ size, square, className }))}
+			className={cn(avatarVariants({ size, square }), className)}
 			{...props}
 		/>
 	),
