@@ -180,7 +180,6 @@ router.post(
 				}
 			);
 		} catch (err) {
-			console.log("***here", err);
 			await taskCtrl.rollback(session);
 			handleError(req, res, err);
 		}

@@ -268,7 +268,6 @@ export class ResourceManager {
 		kubeconfig.loadFromDefault();
 		const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
-		console.log("***here123", accessConfig, deploymentConfig);
 		// Define the Deployment specification
 		const serviceSpec = {
 			apiVersion: "serving.knative.dev/v1",
@@ -430,7 +429,6 @@ export class ResourceManager {
 				serviceSpec
 			);
 		} catch (err) {
-			console.log("****here-err", err);
 			throw new AgnostError(err.body?.message);
 		}
 	}
