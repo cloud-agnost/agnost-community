@@ -17,6 +17,7 @@ import {
 	TransferOrganizationRequest,
 	UpdateRoleRequest,
 } from '@/types';
+import { joinChannel, leaveChannel } from '@/utils';
 import { BaseRequest } from '@/types/type';
 import { translate } from '@/utils';
 import { create } from 'zustand';
@@ -118,7 +119,10 @@ const useOrganizationStore = create<OrganizationStore>()(
 					}
 				},
 				selectOrganization: (organization: Organization) => {
+					const oldOrganization = get().organization;
+					if (oldOrganization) leaveChannel(oldOrganization._id);
 					set({ organization });
+					joinChannel(organization._id);
 				},
 				leaveOrganization: async ({
 					organizationId,
