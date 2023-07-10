@@ -1,3 +1,5 @@
+import { BaseGetRequest } from '.';
+
 export interface Resource {
 	orgId: string;
 	iid: string;
@@ -52,4 +54,9 @@ export interface ResLog {
 	createdAt: string;
 	updatedAt: string;
 	__v: number;
+}
+export interface GetResourcesRequest extends BaseGetRequest {
+	appId: string;
+	type?: string;
+	instance?: string;
 }
