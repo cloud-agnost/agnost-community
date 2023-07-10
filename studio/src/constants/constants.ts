@@ -230,6 +230,10 @@ export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 		title: translate('version.cron_jobs'),
 		path: 'cron-job',
 	},
+	{
+		title: translate('version.settings.default'),
+		path: 'settings',
+	},
 ];
 
 export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {

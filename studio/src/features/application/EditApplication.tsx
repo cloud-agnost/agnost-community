@@ -17,15 +17,18 @@ export default function EditApplication() {
 	const match = useMatch('/organization/:orgId/apps');
 
 	useEffect(() => {
-		if (!searchParams.get('t')) {
+		if (isEditAppOpen && !searchParams.get('t')) {
 			searchParams.set('t', 'general');
 			setSearchParams(searchParams);
 		}
-	}, [searchParams]);
+	}, [isEditAppOpen, searchParams]);
 
 	useEffect(() => {
 		if (isEditAppOpen) {
 			getAppTeamMembers();
+		} else {
+			searchParams.delete('t');
+			setSearchParams(searchParams);
 		}
 	}, [isEditAppOpen]);
 

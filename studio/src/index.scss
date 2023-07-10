@@ -291,7 +291,10 @@
 		scrollbar-width: none;
 	}
 }
-
+.Toastify {
+	z-index: 999999999;
+	pointer-events: auto;
+}
 .Toastify__toast-container {
 	min-width: 400px;
 }

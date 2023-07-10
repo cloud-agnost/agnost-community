@@ -1,7 +1,6 @@
 import {
 	DeploymentLogsDrawer,
 	DeploymentSettings,
-	EmptyStatus,
 	LastDeployment,
 	Resources,
 } from '@/features/version/DeploymentStatusCard/index.ts';
@@ -89,7 +88,6 @@ export default function DeploymentStatusCard({ triggerIcon }: DeploymentStatusCa
 					<ScrollArea className='h-[500px]'>
 						<ScrollBar orientation='vertical' />
 						<div className='deployment-status-content'>
-							<EmptyStatus />
 							<LastDeployment />
 							<Resources />
 						</div>

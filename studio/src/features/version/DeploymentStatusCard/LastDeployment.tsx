@@ -3,6 +3,8 @@ import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { BADGE_COLOR_MAP } from 'constants/constants.ts';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'components/Button';
+import useEnvironmentStore from '@/store/environment/environmentStore.ts';
+import { useParams } from 'react-router-dom';
 
 const deployment = {
 	date: 'Jul 22, 2023',
@@ -13,10 +15,23 @@ const deployment = {
 export default function LastDeployment() {
 	const { t } = useTranslation();
 	const isSuspended = deployment.statusText === 'Suspended';
+	const environment = useEnvironmentStore((state) => state.environment);
+	const { activateEnvironment } = useEnvironmentStore();
+	const { orgId, versionId, appId } = useParams<{
+		versionId: string;
+		appId: string;
+		orgId: string;
+	}>();
 
-	function reactivateHandler() {
-		// TODO: implement reactivateHandler
-		console.log('reactivateHandler');
+	async function reactivateHandler() {
+		if (!versionId || !appId || !orgId || !environment?._id) return;
+
+		await activateEnvironment({
+			envId: environment._id,
+			orgId,
+			appId,
+			versionId,
+		});
 	}
 
 	return (
