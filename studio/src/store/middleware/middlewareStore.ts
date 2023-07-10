@@ -17,7 +17,10 @@ import { notify, translate } from '@/utils';
 interface MiddlewareStore {
 	middlewares: Middleware[];
 	middleware: Middleware | null;
-	getMiddlewaresOfAppVersion: (params: GetMiddlewaresOfAppVersionParams) => Promise<Middleware[]>;
+	getMiddlewaresOfAppVersion: (
+		params: GetMiddlewaresOfAppVersionParams,
+		init?: boolean,
+	) => Promise<Middleware[]>;
 	getMiddlewareById: (params: GetMiddlewareByIdParams) => Promise<Middleware>;
 	deleteMiddleware: (params: DeleteMiddlewareParams) => Promise<void>;
 	deleteMultipleMiddlewares: (params: DeleteMultipleMiddlewares) => Promise<void>;
@@ -40,6 +43,7 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 							description: translate('version.middleware.add.success'),
 							type: 'success',
 						});
+						set((prev) => ({ middlewares: [middleware, ...prev.middlewares] }));
 						return middleware;
 					} catch (e) {
 						const error = e as APIError;
@@ -51,9 +55,16 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 						throw e;
 					}
 				},
-				getMiddlewaresOfAppVersion: async (params: GetMiddlewaresOfAppVersionParams) => {
+				getMiddlewaresOfAppVersion: async (
+					params: GetMiddlewaresOfAppVersionParams,
+					init?: boolean,
+				) => {
 					const middlewares = await MiddlewareService.getMiddlewaresOfAppVersion(params);
-					set({ middlewares });
+					if (init) {
+						set({ middlewares });
+					} else {
+						set((prev) => ({ middlewares: [...prev.middlewares, ...middlewares] }));
+					}
 					return middlewares;
 				},
 				getMiddlewareById: async (params: GetMiddlewareByIdParams) => {
@@ -62,14 +73,46 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 					return middleware;
 				},
 				deleteMiddleware: async (params: DeleteMiddlewareParams) => {
-					await MiddlewareService.deleteMiddleware(params);
-					set((prev) => ({ middlewares: prev.middlewares.filter((mw) => mw._id !== params.mwId) }));
+					try {
+						await MiddlewareService.deleteMiddleware(params);
+						set((prev) => ({
+							middlewares: prev.middlewares.filter((mw) => mw._id !== params.mwId),
+						}));
+						notify({
+							title: translate('general.success'),
+							description: translate('version.middleware.delete.success'),
+							type: 'success',
+						});
+					} catch (e) {
+						const error = e as APIError;
+						notify({
+							title: error.error,
+							description: error.details,
+							type: 'error',
+						});
+						throw e;
+					}
 				},
 				deleteMultipleMiddlewares: async (params: DeleteMultipleMiddlewares) => {
-					await MiddlewareService.deleteMultipleMiddlewares(params);
-					set((prev) => ({
-						middlewares: prev.middlewares.filter((mw) => !params.middlewareIds.includes(mw._id)),
-					}));
+					try {
+						await MiddlewareService.deleteMultipleMiddlewares(params);
+						set((prev) => ({
+							middlewares: prev.middlewares.filter((mw) => !params.middlewareIds.includes(mw._id)),
+						}));
+						notify({
+							title: translate('general.success'),
+							description: translate('version.middleware.delete.success'),
+							type: 'success',
+						});
+					} catch (e) {
+						const error = e as APIError;
+						notify({
+							title: error.error,
+							description: error.details,
+							type: 'error',
+						});
+						throw e;
+					}
 				},
 				updateMiddleware: async (params: UpdateMiddlewareParams) => {
 					const middleware = await MiddlewareService.updateMiddleware(params);

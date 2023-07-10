@@ -19,8 +19,8 @@ export default function SettingsContainer({ children, pageTitle, info, action, c
 				</div>
 				{action && <div className='setting-container-header-action'>{action}</div>}
 			</div>
-			<div className='setting-container-content'>
-				<div className='setting-container-content-scroll-area p-[21px]'>{children}</div>
+			<div id='setting-container-content' className='setting-container-content'>
+				{children}
 			</div>
 		</div>
 	);

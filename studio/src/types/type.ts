@@ -231,6 +231,7 @@ export interface Middleware {
 	type: string;
 	logic: string;
 	createdBy: string;
+	updatedBy?: string;
 	_id: string;
 	createdAt: string;
 	updatedAt: string;
