@@ -3,6 +3,7 @@ import envCtrl from "../controllers/environment.js";
 import envLogCtrl from "../controllers/environmentLog.js";
 import userCtrl from "../controllers/user.js";
 import deployCtrl from "../controllers/deployment.js";
+import resourceCtrl from "../controllers/resource.js";
 import auditCtrl from "../controllers/audit.js";
 import { authSession } from "../middlewares/authSession.js";
 import { authMasterToken } from "../middlewares/authMasterToken.js";
@@ -17,6 +18,7 @@ import { applyRules as applyLogRules } from "../schemas/environmentLog.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
+import resource from "../controllers/resource.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -538,6 +540,45 @@ router.get(
 			});
 
 			res.json(logs);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/resources
+@method     GET
+@desc       Returns environment resources
+@access     private
+*/
+router.get(
+	"/:envId/resources",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateEnv,
+	authorizeAppAction("app.env.view"),
+	async (req, res) => {
+		try {
+			const { env } = req;
+
+			// Filter out the duplicate resource entries
+			const resourceiids = env.mappings
+				.map((entry) => entry.resource.iid)
+				.filter((value, index, self) => {
+					return self.indexOf(value) === index;
+				});
+
+			const resources = await resourceCtrl.getManyByQuery(
+				{
+					iid: { $in: resourceiids },
+				},
+				{ projection: "-access -accessReadOnly" }
+			);
+
+			res.json(resources);
 		} catch (error) {
 			handleError(req, res, error);
 		}
