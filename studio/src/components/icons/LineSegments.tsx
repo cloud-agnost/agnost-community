@@ -1,5 +1,5 @@
 import { SVGProps } from 'react';
-const SvgLineSegments = (props: SVGProps<SVGSVGElement>): JSX.Element => (
+const SvgLineSegments = (props: SVGProps<SVGSVGElement>) => (
 	<svg
 		width='1em'
 		height='1em'
