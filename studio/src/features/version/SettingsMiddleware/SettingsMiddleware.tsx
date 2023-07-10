@@ -1,45 +1,56 @@
 import './SettingsMiddleware.scss';
-import { ColumnDef, Row } from '@tanstack/react-table';
+import { Dispatch, SetStateAction } from 'react';
+import { DataTable, SortButton } from 'components/DataTable';
 import { Middleware } from '@/types';
-import { Checkbox } from 'components/Checkbox';
-import { formatDate } from '@/utils';
-import { DataTable } from 'components/DataTable';
-import { InfiniteScroll } from 'components/InfiniteScroll';
 import { useState } from 'react';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
+import { ColumnDef, Row } from '@tanstack/react-table';
 import { useParams } from 'react-router-dom';
-import { useUpdateEffect } from '@/hooks';
-import { Pencil } from 'components/icons';
+import { Checkbox } from 'components/Checkbox';
+import useAuthStore from '@/store/auth/authStore.ts';
+import { AuthUserAvatar } from 'components/AuthUserAvatar';
+import { translate } from '@/utils';
 import { Button } from 'components/Button';
+import { Pencil } from 'components/icons';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { DateText } from 'components/DateText';
 
-export default function SettingsMiddleware() {
+interface SettingsMiddlewareProps {
+	selectedRows: Row<Middleware>[] | undefined;
+	setSelectedRows: Dispatch<SetStateAction<Row<Middleware>[] | undefined>>;
+}
+
+export default function SettingsMiddleware({ setSelectedRows }: SettingsMiddlewareProps) {
 	const [page, setPage] = useState(0);
-	const { getMiddlewaresOfAppVersion } = useMiddlewareStore();
-	const [middlewares, setMiddlewares] = useState<Middleware[]>([]);
-	const [_, setSelectedRows] = useState<Row<Middleware>[]>();
+	const { getMiddlewaresOfAppVersion, middlewares } = useMiddlewareStore();
 	const { orgId, appId, versionId } = useParams();
 
-	useUpdateEffect(() => {
-		getMiddlewares(page);
-	}, [page]);
-
-	async function getMiddlewares(page: number) {
+	async function getMiddlewares() {
 		if (!orgId || !appId || !versionId) return;
 
-		const middlewares = await getMiddlewaresOfAppVersion({
+		await getMiddlewaresOfAppVersion({
 			orgId,
 			appId,
 			versionId,
 			page,
-			size: 20,
+			size: 15,
 		});
+	}
 
-		setMiddlewares((prevState) => [...prevState, ...middlewares]);
+	function next() {
+		setPage((prevState) => prevState + 1);
+		getMiddlewares();
 	}
 
 	return (
 		<div className='middlewares-data-table'>
-			<InfiniteScroll items={middlewares} endOfList={() => setPage((prev) => prev + 1)}>
+			<InfiniteScroll
+				next={next}
+				hasMore={true}
+				scrollableTarget='setting-container-content'
+				loader={<></>}
+				dataLength={middlewares.length}
+			>
 				<DataTable<Middleware>
 					columns={MiddlewaresColumns}
 					data={middlewares}
@@ -69,70 +80,54 @@ export const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 		),
 		enableSorting: false,
 		enableHiding: false,
-		size: 25,
+		size: 40,
 	},
 	{
 		id: 'name',
-		header: 'NAME',
+		header: ({ column }) => (
+			<SortButton text={translate('general.name').toUpperCase()} column={column} />
+		),
 		accessorKey: 'name',
-		size: 100,
+		sortingFn: 'textCaseSensitive',
+		size: 400,
 	},
 	{
 		id: 'createdAt',
-		header: 'CREATED AT',
+		header: ({ column }) => (
+			<SortButton text={translate('general.created_at').toUpperCase()} column={column} />
+		),
 		accessorKey: 'createdAt',
-		size: 100,
-		cell: ({
-			row: {
-				original: { createdAt },
-			},
-		}) => {
-			return (
-				<div>
-					<span className='block text-default text-sm leading-6'>
-						{formatDate(createdAt, {
-							month: 'short',
-							day: 'numeric',
-							year: 'numeric',
-						})}
-					</span>
-					<time className='text-[11px] text-subtle leading-[21px]'>
-						{formatDate(createdAt, {
-							hour: 'numeric',
-							minute: 'numeric',
-						})}
-					</time>
-				</div>
-			);
-		},
-	},
-	{
-		id: 'uploadAt',
-		header: 'UPLOAD AT',
-		accessorKey: 'uploadAt',
+		sortingFn: 'datetime',
+		enableSorting: true,
 		size: 200,
 		cell: ({
 			row: {
-				original: { updatedAt },
+				original: { createdAt, createdBy },
 			},
 		}) => {
-			return (
-				<div>
-					<span className='block text-default text-sm leading-6'>
-						{formatDate(updatedAt, {
-							month: 'short',
-							day: 'numeric',
-							year: 'numeric',
-						})}
-					</span>
-					<time className='text-[11px] text-subtle leading-[21px]'>
-						{formatDate(updatedAt, {
-							hour: 'numeric',
-							minute: 'numeric',
-						})}
-					</time>
-				</div>
-			);
+			const isMe = useAuthStore.getState().user?._id === createdBy;
+			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
+
+			return <DateText date={createdAt}>{avatar}</DateText>;
+		},
+	},
+	{
+		id: 'updatedAt',
+		header: ({ column }) => (
+			<SortButton text={translate('general.created_at').toUpperCase()} column={column} />
+		),
+		accessorKey: 'updatedAt',
+		enableSorting: true,
+		sortingFn: 'datetime',
+		size: 200,
+		cell: ({
+			row: {
+				original: { updatedAt, updatedBy },
+			},
+		}) => {
+			const isMe = useAuthStore.getState().user?._id === updatedBy;
+			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
+			return <DateText date={updatedAt}>{avatar}</DateText>;
 		},
 	},
 	{

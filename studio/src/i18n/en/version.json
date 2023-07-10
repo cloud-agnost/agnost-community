@@ -115,7 +115,7 @@
 			"success": "Middleware added successfully"
 		},
 		"delete": {
-			"success": "Middleware deleted successfully"
+			"success": "Middleware(s) deleted successfully"
 		}
 	}
 }

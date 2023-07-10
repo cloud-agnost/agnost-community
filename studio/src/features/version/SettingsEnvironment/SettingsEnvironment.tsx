@@ -44,7 +44,7 @@ export default function SettingsEnvironment() {
 	return (
 		<div className='divide-y'>
 			<SettingsFormItem
-				className='space-y-0 py-6 max-w-lg'
+				className='space-y-0 pb-6 pt-0 max-w-lg'
 				contentClassName='pt-6'
 				title={t('version.auto_deploy')}
 				description={t('version.auto_redeploy_desc')}
