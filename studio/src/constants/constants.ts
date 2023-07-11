@@ -5,22 +5,32 @@ import {
 	ApiKeys,
 	Authentication,
 	BellRing,
+	Cache,
 	ChangeLog,
+	Connect,
+	Database as DatabaseIcon,
 	DoubleGear,
 	Environment,
 	EnvironmentVariable,
 	LightBulb,
 	LineSegments,
+	MessageQueue,
 	Middleware,
+	MongoDb,
+	MySql,
 	NpmPackage,
+	PostgreSql,
 	RateLimit,
 	RealTime,
+	Resource,
+	Storage,
 	Team,
 } from '@/components/icons';
+import { CreateDatabase, SelectResourceType } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
-import { Application, SortOption, Tab } from '@/types';
+import { Application, Instance, SortOption, Tab } from '@/types';
 import { translate } from '@/utils';
-import { Database as DatabaseIcon, DeviceTablet, FileText, GearSix } from '@phosphor-icons/react';
+import { DeviceTablet, FileText, GearSix, Plus } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 
 export const PAGE_SIZE = 10;
@@ -86,7 +96,7 @@ export const ORGANIZATION_MENU_ITEMS = [
 	{
 		name: translate('organization.menu.resources'),
 		href: 'resources',
-		icon: DatabaseIcon,
+		icon: Resource,
 	},
 	{
 		name: translate('organization.menu.settings'),
@@ -324,5 +334,96 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 		title: translate('version.settings.other'),
 		path: 'other',
 		icon: DoubleGear,
+	},
+];
+
+export const RESOURCE_TYPES = [
+	{
+		id: 'database',
+		name: translate('version.databases'),
+		icon: DatabaseIcon,
+	},
+	{
+		id: 'storage',
+		name: translate('version.storage'),
+		icon: Storage,
+	},
+	{
+		id: 'cache',
+		name: translate('version.cache'),
+		icon: Cache,
+	},
+	{
+		id: 'message-queue',
+		name: translate('version.message_queues'),
+		icon: MessageQueue,
+	},
+];
+
+export const DEFAULT_RESOURCE_INSTANCES: Instance[] = [
+	{
+		id: 'create_new',
+		name: translate('resources.create_new'),
+		icon: Plus,
+	},
+	{
+		id: 'connect_existing',
+		name: translate('resources.connect_existing'),
+		icon: Connect,
+	},
+];
+
+export const STORAGE_TYPES: Instance[] = [
+	{
+		id: 'AWS S3',
+		name: 'AWS S3',
+		icon: MongoDb,
+	},
+	{
+		id: 'Azure Blob Storage',
+		name: 'Azure Blob Storage',
+		icon: MySql,
+	},
+	{
+		id: 'GCP Cloud Storage',
+		name: 'GCP Cloud Storage',
+		icon: MySql,
+	},
+	{
+		id: 'Cluster Storage - MinIO',
+		name: 'MinIO',
+		icon: PostgreSql,
+	},
+];
+
+export const DATABASE_TYPES: Instance[] = [
+	{
+		id: 'MongoDB',
+		name: 'MongoDB',
+		icon: MongoDb,
+	},
+	{
+		id: 'MySQL',
+		name: 'MySQL',
+		icon: MySql,
+	},
+	{
+		id: 'PostgreSQL',
+		name: 'PostgreSQL',
+		icon: PostgreSql,
+	},
+];
+
+export const CREATE_RESOURCES_ELEMENTS = [
+	{
+		step: 1,
+		title: translate('resources.select'),
+		CurrentResourceElement: SelectResourceType,
+	},
+	{
+		step: 2,
+		name: translate('version.databases'),
+		type: translate('resources.create_new'),
+		CurrentResourceElement: CreateDatabase,
 	},
 ];
