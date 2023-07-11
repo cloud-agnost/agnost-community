@@ -187,7 +187,7 @@ router.put(
 				{ cacheKey: mw._id }
 			);
 
-			res.json(mw);
+			res.json(updatedMw);
 
 			// Deploy middleware updates to environments if auto-deployment is enabled
 			await deployCtrl.updateMiddlewares(

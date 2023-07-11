@@ -34,22 +34,6 @@ export const decimalRules = (type) => {
 							config.get("general.maxDecimalDigits")
 						)
 					),
-				body("decimal.roundingStyle")
-					.if((value, { req }) => {
-						if (req.body.type === "decimal" || req.field?.type === "decimal")
-							return true;
-						else return false;
-					})
-					.trim()
-					.notEmpty()
-					.withMessage(
-						t("Rounding Style need to be provided, cannot be left empty")
-					)
-					.bail()
-					.isInt({ min: 0, max: 8 })
-					.withMessage(
-						t("Rounding Style needs to be be an integer between 0-8")
-					),
 			];
 		default:
 			return [];
