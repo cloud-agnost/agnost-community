@@ -35,7 +35,8 @@ import { BadgeColors } from 'components/Badge/Badge.tsx';
 
 export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
-
+export const MIN_DB_SIZE = 1;
+export const MAX_DB_SIZE = 50;
 export const SLIDER_IMAGES = [
 	{
 		text: 'Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.',

@@ -1,14 +1,14 @@
-import { DATABASE_TYPES } from '@/constants';
-import { useTranslation } from 'react-i18next';
-import CreateResourceLayout from '../CreateResourceLayout';
 import { Button } from '@/components/Button';
-import useResourceStore from '@/store/resources/resourceStore';
+import { Input } from '@/components/Input';
 import { Separator } from '@/components/Separator';
 import { Slider } from '@/components/Slider';
+import { DATABASE_TYPES, MIN_DB_SIZE, MAX_DB_SIZE } from '@/constants';
+import useResourceStore from '@/store/resources/resourceStore';
 import { useState } from 'react';
-import { Input } from '@/components/Input';
-import { cn } from '@/utils';
+import { useTranslation } from 'react-i18next';
 import ResourceInstance from '../../ResourceType/ResourceInstance';
+import CreateResourceLayout from '../CreateResourceLayout';
+
 export default function CreateDatabase() {
 	const { returnToPreviousStep } = useResourceStore();
 	const [storageSize, setStorageSize] = useState(25);
@@ -49,12 +49,17 @@ export default function CreateDatabase() {
 					})}
 				</p>
 				<div className='flex items-center justify-between'>
-					<p className=' font-sfCompact text-sm text-default'>1 GB</p>
-					<p className=' font-sfCompact text-sm text-default'>50 GB</p>
+					<p className=' font-sfCompact text-sm text-default'>
+						{MIN_DB_SIZE} {t('general.gb')}
+					</p>
+					<p className=' font-sfCompact text-sm text-default'>
+						{MAX_DB_SIZE} {t('general.gb')}
+					</p>
 				</div>
 				<Slider
 					defaultValue={[storageSize]}
-					max={50}
+					max={MAX_DB_SIZE}
+					min={MIN_DB_SIZE}
 					step={1}
 					onValueChange={(val) => setStorageSize(val[0])}
 				/>
