@@ -87,6 +87,7 @@ module.exports = {
 				},
 				surface: {
 					blue: 'rgba(var(--surface-blue), <alpha-value>)',
+					'dark-blue': 'rgba(var(--surface-dark-blue), <alpha-value>)',
 					green: 'rgba(var(--surface-green), <alpha-value>)',
 					yellow: 'rgba(var(--surface-yellow), <alpha-value>)',
 					purple: 'rgba(var(--surface-purple), <alpha-value>)',
