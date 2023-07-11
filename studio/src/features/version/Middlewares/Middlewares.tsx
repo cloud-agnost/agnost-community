@@ -1,4 +1,4 @@
-import './SettingsMiddleware.scss';
+import './Middlewares.scss';
 import { Dispatch, SetStateAction } from 'react';
 import { DataTable } from 'components/DataTable';
 import { Middleware } from '@/types';
@@ -9,16 +9,16 @@ import { useParams } from 'react-router-dom';
 import { translate } from '@/utils';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { TableLoading } from 'components/Table/Table.tsx';
-import MiddlewaresColumns from '@/features/version/SettingsMiddleware/MiddlewaresColumns.tsx';
+import MiddlewaresColumns from '@/features/version/Middlewares/MiddlewaresColumns.tsx';
 
-interface SettingsMiddlewareProps {
+interface MiddlewaresProps {
 	selectedRows: Row<Middleware>[] | undefined;
 	setSelectedRows: Dispatch<SetStateAction<Row<Middleware>[] | undefined>>;
 }
 
 const SIZE = 15;
 
-export default function SettingsMiddleware({ setSelectedRows }: SettingsMiddlewareProps) {
+export default function Middlewares({ setSelectedRows }: MiddlewaresProps) {
 	const [page, setPage] = useState(0);
 	const { getMiddlewaresOfAppVersion, middlewares, lastFetchedCount } = useMiddlewareStore();
 	const { orgId, appId, versionId } = useParams();

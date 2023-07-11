@@ -117,6 +117,7 @@
 	"edit_rate_limiter": "Edit Rate Limiter",
 	"handler_code": "Handler Code",
 	"middleware": {
+		"default": "Middlewares",
 		"name": "Middleware Name",
 		"add_middleware": "Add Middleware",
 		"add": {

@@ -17,7 +17,7 @@ import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { nameSchema } from '@/features/version/SettingsMiddleware/formSchema.ts';
+import { nameSchema } from '@/features/version/Middlewares/formSchema.ts';
 
 const MiddlewareFormSchema = z.object({
 	name: nameSchema,

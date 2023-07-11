@@ -15,7 +15,6 @@ import {
 	LightBulb,
 	LineSegments,
 	MessageQueue,
-	Middleware,
 	MongoDb,
 	MySql,
 	NpmPackage,
@@ -245,6 +244,10 @@ export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 		path: 'cron-job',
 	},
 	{
+		title: translate('version.middleware.default'),
+		path: 'middleware',
+	},
+	{
 		title: translate('version.settings.default'),
 		path: 'settings',
 	},
@@ -294,12 +297,6 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 		title: translate('version.settings.environment'),
 		path: 'environment',
 		icon: Environment,
-	},
-	{
-		id: 3,
-		title: translate('version.settings.middlewares'),
-		path: 'middlewares',
-		icon: Middleware,
 	},
 	{
 		id: 4,

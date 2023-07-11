@@ -17,7 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
 import { CodeEditor } from 'components/CodeEditor';
-import { logicSchema, nameSchema } from '@/features/version/SettingsMiddleware/formSchema.ts';
+import { logicSchema, nameSchema } from '@/features/version/Middlewares/formSchema.ts';
 
 const MiddlewareFormSchema = z.object({
 	name: nameSchema,

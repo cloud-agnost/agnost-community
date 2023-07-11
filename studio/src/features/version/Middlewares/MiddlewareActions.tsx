@@ -1,5 +1,5 @@
 import { SelectedRowDropdown } from 'components/Table';
-import { AddMiddlewareButton } from '@/features/version/SettingsMiddleware/index.ts';
+import { AddMiddlewareButton } from '@/features/version/Middlewares/index.ts';
 import { Row } from '@tanstack/react-table';
 import { Middleware } from '@/types';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
