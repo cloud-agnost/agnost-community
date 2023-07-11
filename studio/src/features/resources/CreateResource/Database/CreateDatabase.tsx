@@ -50,10 +50,14 @@ export default function CreateDatabase() {
 				</p>
 				<div className='flex items-center justify-between'>
 					<p className=' font-sfCompact text-sm text-default'>
-						{MIN_DB_SIZE} {t('general.gb')}
+						{t('general.gb', {
+							size: MIN_DB_SIZE,
+						})}
 					</p>
 					<p className=' font-sfCompact text-sm text-default'>
-						{MAX_DB_SIZE} {t('general.gb')}
+						{t('general.gb', {
+							size: MAX_DB_SIZE,
+						})}
 					</p>
 				</div>
 				<Slider
