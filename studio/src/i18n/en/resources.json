@@ -14,13 +14,21 @@
 		"message": "Are you sure you want to delete this resource?",
 		"alert": "All organization apps and managed resource and associated data will be deleted. This action is not reversible — please continue with caution."
 	},
+	"step": "Step {{currentStep}} of 2",
 	"select": "Select Resource Type",
+	"create_new": "Create New",
+	"connect_existing": "Connect to Existing",
+	"type": {
+		"database": "Database",
+		"storage": "Storage",
+		"cache": "Cache",
+		"mq": "Message Queue"
+	},
 	"database": {
 		"create": "Create New Database",
-		"choose_type": "Choose Database Type",
-		"storage_size": "Storage Size",
+		"choose_type": "CHOOSE DATABASE TYPE",
+		"storage_size": "STORAGE SIZE : {{size}} GB",
 		"read_replicas": "Read Replicas",
-		"connect_existing": "Connect to Existing",
 		"fill_parameters": "Fill Out Parameters",
 		"host": "Host",
 		"port": "Port",

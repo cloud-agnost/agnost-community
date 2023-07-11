@@ -45,5 +45,8 @@
 	},
 	"clear": "Clear Filters",
 	"create": "Create",
-	"resend_invite": "Resend Invitation"
+	"resend_invite": "Resend Invitation",
+	"next": "Next",
+	"previous": "Previous",
+	"add": "Add"
 }
