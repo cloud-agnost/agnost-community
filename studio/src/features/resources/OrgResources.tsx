@@ -5,11 +5,11 @@ import { Plus } from '@phosphor-icons/react';
 import useResourcesStore from '@/store/resources/resourceStore';
 import useApplicationStore from '@/store/app/applicationStore';
 import { useEffect } from 'react';
-import { ResourceTable } from '@/features/resources';
+import { CreateResource, ResourceTable } from '@/features/resources';
 export default function OrgResources() {
 	const { t } = useTranslation();
 	const { application } = useApplicationStore();
-	const { resources, getResources } = useResourcesStore();
+	const { resources, getResources, toggleCreateResourceModal } = useResourcesStore();
 
 	useEffect(() => {
 		getResources({
@@ -24,7 +24,7 @@ export default function OrgResources() {
 				<h1 className='text-default text-2xl font-semibold text-center'>{t('resources.title')}</h1>
 				<div className='flex items-center justify-center gap-6'>
 					<SearchInput />
-					<Button variant='primary'>
+					<Button variant='primary' onClick={toggleCreateResourceModal}>
 						<Plus size={16} />
 						<span className='ml-2'>{t('resources.add')}</span>
 					</Button>
@@ -34,6 +34,7 @@ export default function OrgResources() {
 			<div className='mt-8'>
 				<ResourceTable resources={resources} />
 			</div>
+			<CreateResource />
 		</div>
 	);
 }
