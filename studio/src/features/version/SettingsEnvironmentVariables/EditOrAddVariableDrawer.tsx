@@ -64,7 +64,7 @@ export default function EditOrAddVariableDrawer({
 
 	useEffect(() => {
 		if (!open) form.reset();
-		else if (param) {
+		else if (param && editMode) {
 			form.setValue('name', param.name);
 			form.setValue('value', param.value);
 		}

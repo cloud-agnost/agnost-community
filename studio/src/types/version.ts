@@ -4,6 +4,7 @@ export interface RateLimit {
 	_id: string;
 	iid: string;
 	createdBy: string | User;
+	updatedBy: string | User;
 	createdAt: string;
 	updatedAt: string;
 	name: string;
@@ -107,6 +108,11 @@ export type CreateRateLimitParams = VersionParamsWithoutEnvId & {
 export type DeleteRateLimitParams = VersionParamsWithoutEnvId & {
 	limitId: string;
 };
+
+export type DeleteMultipleRateLimitsParams = VersionParamsWithoutEnvId & {
+	limitIds: string[];
+};
+
 export type VersionProperties = {
 	name: string;
 	private: boolean;
@@ -152,4 +158,15 @@ export type AddVersionVariableParams = VersionParamsWithoutEnvId & {
 
 export type UpdateVersionVariableParams = AddVersionVariableParams & {
 	paramId: string;
+};
+
+export type CreateCopyOfVersionParams = Omit<VersionParamsWithoutEnvId, 'versionId'> & {
+	name: string;
+	private: boolean;
+	readOnly: boolean;
+	parentVersionId: string;
+};
+
+export type EditRateLimitParams = CreateRateLimitParams & {
+	limitId: string;
 };

@@ -9,5 +9,6 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		org: Organization,
 		'org.app': Application,
 	};
+	// TODO: can you fix this?
 	return new keys[type]();
 }

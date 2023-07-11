@@ -23,7 +23,7 @@ export default function VersionDropdown() {
 	const [open, setOpen] = useState(false);
 	const { application, openVersionDrawer } = useApplicationStore();
 	const navigate = useNavigate();
-	const { version, updateVersionProperties } = useVersionStore();
+	const { version, updateVersionProperties, createCopyOfVersion } = useVersionStore();
 
 	const { appId, orgId, versionId } = useParams();
 	const { pathname } = useLocation();
@@ -42,8 +42,19 @@ export default function VersionDropdown() {
 		{
 			title: t('version.create_a_copy'),
 			active: false,
-			action: () => {
-				// TODO: implement
+			action: async () => {
+				if (!version) return;
+				await createCopyOfVersion(
+					{
+						orgId: version.orgId,
+						appId: version.appId,
+						name: `${version?.name} - Copy`,
+						parentVersionId: version._id,
+						private: version?.private,
+						readOnly: version?.readOnly,
+					},
+					true,
+				);
 			},
 			disabled: false,
 		},

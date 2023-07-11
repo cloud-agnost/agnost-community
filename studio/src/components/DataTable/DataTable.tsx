@@ -107,7 +107,7 @@ export function DataTable<TData>({
 						</TableRow>
 					))
 				) : (
-					<TableRow>
+					<TableRow className='border-none'>
 						<TableCell colSpan={columns.length} className='h-24 text-center'>
 							{noDataMessage}
 						</TableCell>

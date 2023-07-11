@@ -11,7 +11,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
 import { Input } from 'components/Input';
 import { Button } from 'components/Button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { translate } from '@/utils';
@@ -84,17 +84,20 @@ const FormSchema = z.object({
 interface AddEndpointRateLimiterDrawerProps {
 	open?: boolean;
 	onOpenChange: (open: boolean) => void;
+	editMode?: boolean;
+	addToDefault?: boolean;
 }
 
-export default function AddEndpointRateLimiterDrawer({
+export default function EditOrAddEndpointRateLimiterDrawer({
 	open,
 	onOpenChange,
+	editMode = false,
+	addToDefault,
 }: AddEndpointRateLimiterDrawerProps) {
 	const [loading, setLoading] = useState(false);
 	const { t } = useTranslation();
 	const [error, setError] = useState<APIError | null>(null);
-	const createRateLimit = useVersionStore((state) => state.createRateLimit);
-	const updateVersionProperties = useVersionStore((state) => state.updateVersionProperties);
+	const { createRateLimit, updateVersionProperties, rateLimit, editRateLimit } = useVersionStore();
 	const defaultEndpointLimits = useVersionStore((state) => state.version?.defaultEndpointLimits);
 
 	const { notify } = useToast();
@@ -104,6 +107,20 @@ export default function AddEndpointRateLimiterDrawer({
 		appId: string;
 		orgId: string;
 	}>();
+
+	useEffect(() => {
+		if (!open) form.reset();
+		else if (rateLimit && editMode) {
+			form.setValue('name', rateLimit.name);
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			form.setValue('rate', rateLimit.rate.toString());
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			form.setValue('duration', rateLimit.duration.toString());
+			form.setValue('errorMessage', rateLimit.errorMessage);
+		}
+	}, [open, rateLimit]);
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -117,27 +134,12 @@ export default function AddEndpointRateLimiterDrawer({
 		try {
 			setLoading(true);
 			setError(null);
-			const rateLimit = await createRateLimit({
-				orgId,
-				versionId,
-				appId,
-				name: data.name,
-				rate: data.rate,
-				duration: data.duration,
-				errorMessage: data.errorMessage,
-			});
-			await updateVersionProperties({
-				orgId,
-				versionId,
-				appId,
-				defaultEndpointLimits: [...(defaultEndpointLimits ?? []), rateLimit.iid],
-			});
+			if (editMode) {
+				await edit(orgId, appId, versionId, data);
+			} else {
+				await add(orgId, appId, versionId, data);
+			}
 			onOpenChange(false);
-			notify({
-				type: 'success',
-				title: t('general.success'),
-				description: t('version.add.rate_limiter.success'),
-			});
 			form.reset();
 		} catch (e) {
 			setError(e as APIError);
@@ -146,11 +148,62 @@ export default function AddEndpointRateLimiterDrawer({
 		}
 	}
 
+	async function add(
+		orgId: string,
+		appId: string,
+		versionId: string,
+		data: z.infer<typeof FormSchema>,
+	) {
+		const rateLimit = await createRateLimit({
+			orgId,
+			versionId,
+			appId,
+			name: data.name,
+			rate: data.rate,
+			duration: data.duration,
+			errorMessage: data.errorMessage,
+		});
+		if (addToDefault) {
+			await updateVersionProperties({
+				orgId,
+				versionId,
+				appId,
+				defaultEndpointLimits: [...(defaultEndpointLimits ?? []), rateLimit.iid],
+			});
+		}
+		notify({
+			type: 'success',
+			title: t('general.success'),
+			description: t('version.add.rate_limiter.success'),
+		});
+	}
+
+	async function edit(
+		orgId: string,
+		appId: string,
+		versionId: string,
+		data: z.infer<typeof FormSchema>,
+	) {
+		if (!rateLimit) return;
+		await editRateLimit({
+			orgId,
+			versionId,
+			appId,
+			name: data.name,
+			rate: data.rate,
+			duration: data.duration,
+			errorMessage: data.errorMessage,
+			limitId: rateLimit?._id,
+		});
+	}
+
 	return (
 		<Drawer open={open} onOpenChange={onOpenChange}>
 			<DrawerContent position='right'>
 				<DrawerHeader>
-					<DrawerTitle>{t('version.add_rate_limiter')}</DrawerTitle>
+					<DrawerTitle>
+						{editMode ? t('version.edit_rate_limiter') : t('version.add_rate_limiter')}
+					</DrawerTitle>
 				</DrawerHeader>
 				<div className='p-6'>
 					<Form {...form}>
@@ -246,7 +299,7 @@ export default function AddEndpointRateLimiterDrawer({
 							/>
 							<div className='mt-4 flex justify-end'>
 								<Button loading={loading} size='lg'>
-									{t('general.create')}
+									{editMode ? t('general.save') : t('general.create')}
 								</Button>
 							</div>
 						</form>

@@ -2,12 +2,15 @@ import {
 	AddNPMPackageParams,
 	AddVersionVariableParams,
 	APIError,
+	CreateCopyOfVersionParams,
 	CreateRateLimitParams,
 	DeleteMultipleNPMPackagesParams,
+	DeleteMultipleRateLimitsParams,
 	DeleteMultipleVersionVariablesParams,
 	DeleteNPMPackageParams,
 	DeleteRateLimitParams,
 	DeleteVersionVariableParams,
+	EditRateLimitParams,
 	GetVersionByIdParams,
 	GetVersionRequest,
 	Param,
@@ -22,7 +25,7 @@ import {
 import { devtools } from 'zustand/middleware';
 import { create } from 'zustand';
 import { VersionService } from '@/services';
-import { notify, translate } from '@/utils';
+import { history, notify, translate } from '@/utils';
 
 interface VersionStore {
 	loading: boolean;
@@ -30,8 +33,10 @@ interface VersionStore {
 	version: Version | null;
 	versions: Version[];
 	param: Param | null;
+	rateLimit: RateLimit | null;
 	versionPage: number;
 	editParamDrawerIsOpen: boolean;
+	editRateLimitDrawerIsOpen: boolean;
 	getVersionById: (req: GetVersionByIdParams) => Promise<Version>;
 	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<void>;
 	setVersionPage: (page: number) => void;
@@ -51,6 +56,14 @@ interface VersionStore {
 	deleteMultipleParams: (params: DeleteMultipleVersionVariablesParams) => Promise<Version>;
 	updateParam: (params: UpdateVersionVariableParams) => Promise<Version>;
 	setEditParamDrawerIsOpen: (isOpen: boolean) => void;
+	createCopyOfVersion: (
+		params: CreateCopyOfVersionParams,
+		returnRedirect?: boolean,
+	) => Promise<Version | void>;
+	setEditRateLimitDrawerIsOpen: (isOpen: boolean) => void;
+	setRateLimit: (rateLimit: RateLimit | null) => void;
+	editRateLimit: (params: EditRateLimitParams) => Promise<Version>;
+	deleteMultipleRateLimits: (params: DeleteMultipleRateLimitsParams) => Promise<Version>;
 }
 
 const useVersionStore = create<VersionStore>()(
@@ -62,7 +75,9 @@ const useVersionStore = create<VersionStore>()(
 			versions: [],
 			versionPage: 0,
 			param: null,
+			rateLimit: null,
 			editParamDrawerIsOpen: false,
+			editRateLimitDrawerIsOpen: false,
 			getVersionById: async (params: GetVersionByIdParams) => {
 				const version = await VersionService.getVersionById(params);
 				set({ version });
@@ -108,9 +123,24 @@ const useVersionStore = create<VersionStore>()(
 				return version.limits.at(-1);
 			},
 			deleteRateLimit: async (params: DeleteRateLimitParams) => {
-				const version = await VersionService.deleteRateLimit(params);
-				set({ version });
-				return version;
+				try {
+					const version = await VersionService.deleteRateLimit(params);
+					set({ version });
+					notify({
+						type: 'success',
+						title: translate('general.success'),
+						description: translate('version.limiter_deleted'),
+					});
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					notify({
+						type: 'error',
+						title: error.error,
+						description: error.details,
+					});
+					throw e;
+				}
 			},
 			orderLimits: (limits: string[]) => {
 				set((prev) => {
@@ -288,6 +318,79 @@ const useVersionStore = create<VersionStore>()(
 			},
 			setEditParamDrawerIsOpen: (isOpen: boolean) => {
 				set({ editParamDrawerIsOpen: isOpen });
+			},
+			createCopyOfVersion: async (params: CreateCopyOfVersionParams, returnRedirect?: boolean) => {
+				try {
+					const { version } = await VersionService.createCopyOfVersion(params);
+					set((prev) => ({ versions: [...prev.versions, version] }));
+					notify({
+						type: 'success',
+						title: translate('general.success'),
+						description: translate('version.copied'),
+					});
+					if (returnRedirect) {
+						console.log('girdi');
+						history.navigate?.(
+							`/organization/${version.orgId}/apps/${version.appId}/version/${version._id}`,
+						);
+					} else {
+						return version;
+					}
+				} catch (e) {
+					const error = e as APIError;
+					notify({
+						type: 'error',
+						title: error.error,
+						description: error.details,
+					});
+					throw e;
+				}
+			},
+			setEditRateLimitDrawerIsOpen: (isOpen: boolean) => {
+				set({ editRateLimitDrawerIsOpen: isOpen });
+			},
+			setRateLimit: (rateLimit) => {
+				set({ rateLimit });
+			},
+			editRateLimit: async (params: EditRateLimitParams) => {
+				try {
+					const version = await VersionService.editRateLimit(params);
+					set({ version });
+					notify({
+						type: 'success',
+						title: translate('general.success'),
+						description: translate('version.rate_limiter_updated'),
+					});
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					notify({
+						type: 'error',
+						title: error.error,
+						description: error.details,
+					});
+					throw e;
+				}
+			},
+			deleteMultipleRateLimits: async (params: DeleteMultipleRateLimitsParams) => {
+				try {
+					const version = await VersionService.deleteMultipleRateLimits(params);
+					set({ version });
+					notify({
+						type: 'success',
+						title: translate('general.success'),
+						description: translate('version.limiter_deleted'),
+					});
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					notify({
+						type: 'error',
+						title: error.error,
+						description: error.details,
+					});
+					throw e;
+				}
 			},
 		}),
 		{

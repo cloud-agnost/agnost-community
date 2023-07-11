@@ -3,14 +3,21 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import {
 	AddNPMPackageParams,
 	AddVersionVariableParams,
+	CreateCopyOfVersionParams,
 	CreateRateLimitParams,
 	DeleteMultipleNPMPackagesParams,
+	DeleteMultipleRateLimitsParams,
 	DeleteMultipleVersionVariablesParams,
 	DeleteNPMPackageParams,
 	DeleteRateLimitParams,
 	DeleteVersionVariableParams,
+	EditRateLimitParams,
+	Environment,
+	EnvLog,
 	GetVersionByIdParams,
 	GetVersionRequest,
+	ResLog,
+	Resource,
 	SearchNPMPackages,
 	SearchNPMPackagesParams,
 	UpdateVersionPropertiesParams,
@@ -60,7 +67,25 @@ export default class VersionService {
 
 	static async deleteRateLimit({ orgId, versionId, appId, limitId }: DeleteRateLimitParams) {
 		return (
-			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/limits/${limitId}`)
+			await axios.delete(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/limits/${limitId}`,
+				{
+					data: {},
+				},
+			)
+		).data;
+	}
+
+	static async deleteMultipleRateLimits({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: DeleteMultipleRateLimitsParams) {
+		return (
+			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/limits`, {
+				data,
+			})
 		).data;
 	}
 
@@ -77,13 +102,23 @@ export default class VersionService {
 		).data;
 	}
 
-	static async addNPMPackage({ orgId, appId, versionId, ...data }: AddNPMPackageParams) {
+	static async addNPMPackage({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: AddNPMPackageParams): Promise<Version> {
 		return (
 			await axios.post(`${this.url}/${orgId}/app/${appId}/version/${versionId}/packages`, data)
 		).data;
 	}
 
-	static async deleteNPMPackage({ orgId, appId, versionId, packageId }: DeleteNPMPackageParams) {
+	static async deleteNPMPackage({
+		orgId,
+		appId,
+		versionId,
+		packageId,
+	}: DeleteNPMPackageParams): Promise<Version> {
 		return (
 			await axios.delete(
 				`${this.url}/${orgId}/app/${appId}/version/${versionId}/packages/${packageId}`,
@@ -98,7 +133,7 @@ export default class VersionService {
 		appId,
 		versionId,
 		...data
-	}: DeleteMultipleNPMPackagesParams) {
+	}: DeleteMultipleNPMPackagesParams): Promise<Version> {
 		return (
 			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/packages`, {
 				data,
@@ -106,7 +141,12 @@ export default class VersionService {
 		).data;
 	}
 
-	static async addVersionVariable({ orgId, appId, versionId, ...data }: AddVersionVariableParams) {
+	static async addVersionVariable({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: AddVersionVariableParams): Promise<Version> {
 		return (await axios.post(`${this.url}/${orgId}/app/${appId}/version/${versionId}/params`, data))
 			.data;
 	}
@@ -116,7 +156,7 @@ export default class VersionService {
 		appId,
 		versionId,
 		paramId,
-	}: DeleteVersionVariableParams) {
+	}: DeleteVersionVariableParams): Promise<Version> {
 		return (
 			await axios.delete(
 				`${this.url}/${orgId}/app/${appId}/version/${versionId}/params/${paramId}`,
@@ -129,7 +169,7 @@ export default class VersionService {
 		appId,
 		versionId,
 		...data
-	}: DeleteMultipleVersionVariablesParams) {
+	}: DeleteMultipleVersionVariablesParams): Promise<Version> {
 		return (
 			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/params/`, { data })
 		).data;
@@ -141,10 +181,29 @@ export default class VersionService {
 		versionId,
 		paramId,
 		...data
-	}: UpdateVersionVariableParams) {
+	}: UpdateVersionVariableParams): Promise<Version> {
 		return (
 			await axios.put(
 				`${this.url}/${orgId}/app/${appId}/version/${versionId}/params/${paramId}`,
+				data,
+			)
+		).data;
+	}
+
+	static async createCopyOfVersion({ orgId, appId, ...data }: CreateCopyOfVersionParams): Promise<{
+		version: Version;
+		resource: Resource;
+		env: Environment;
+		envLog: EnvLog;
+		resLog: ResLog;
+	}> {
+		return (await axios.post(`${this.url}/${orgId}/app/${appId}/version/copy`, data)).data;
+	}
+
+	static async editRateLimit({ orgId, appId, versionId, limitId, ...data }: EditRateLimitParams) {
+		return (
+			await axios.put(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/limits/${limitId}`,
 				data,
 			)
 		).data;

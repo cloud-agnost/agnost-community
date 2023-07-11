@@ -37,6 +37,7 @@
 	"logs": "Deployment Logs",
 	"open_version": "Open Version",
 	"create_a_copy": "Create a Copy",
+	"copied": "Version copied successfully",
 	"merge": "Merge",
 	"export": "Export",
 	"import": "Import",
@@ -51,6 +52,10 @@
 	"add_rate_limiter": "Add Rate Limiter",
 	"add_new_limiter": "Add New Limiter",
 	"rate_limiter": "Rate Limiter {{count}}",
+	"no_rate_limiters": "No rate limiters",
+	"delete_rate_limiter_title": "Delete Rate Limiter",
+	"rate_limiter_updated": "Rate limiter updated successfully",
+	"delete_rate_limiter_message": "Are you sure you want to delete this rate limiter?, This action cannot be undo.",
 	"settings": {
 		"default": "Settings",
 		"general": "General",
@@ -107,7 +112,9 @@
 		}
 	},
 	"default_limiter_deleted": "Default rate limiter deleted successfully",
+	"limiter_deleted": "Rate limiter(s) deleted successfully",
 	"limiter_added_to_default": "Rate limiter added to default rate limiters",
+	"edit_rate_limiter": "Edit Rate Limiter",
 	"handler_code": "Handler Code",
 	"middleware": {
 		"name": "Middleware Name",

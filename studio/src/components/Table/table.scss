@@ -13,7 +13,7 @@
 		@apply bg-subtle font-medium text-subtle;
 	}
 	&-row {
-		@apply border-b transition-colors data-[state=selected]:bg-subtle;
+		@apply border-b transition-colors data-[state=selected]:bg-surface-blue #{!important};
 		&.head {
 			@apply border-none;
 		}

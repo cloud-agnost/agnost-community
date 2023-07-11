@@ -13,6 +13,7 @@
 	"open": "Open",
 	"name": "Name",
 	"save": "Save",
+	"limit": "Limit",
 	"created_at": "Created At",
 	"updated_at": "Updated At",
 	"upload_at": "Upload At",

@@ -17,7 +17,7 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 			const { name } = row.original;
 			return (
 				<div className='flex items-center gap-1'>
-					<VersionIcon className='w-5 h-5 text-subtle mr-2' />
+					<VersionIcon className='w-5 h-5 text-subtle mr-2 shrink-0' />
 					<span>{name}</span>
 				</div>
 			);

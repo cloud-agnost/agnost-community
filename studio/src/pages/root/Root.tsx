@@ -1,7 +1,7 @@
 import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
-import { removeLastSlash } from '@/utils';
-import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
+import { history, removeLastSlash } from '@/utils';
+import { LoaderFunctionArgs, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ApplicationVersions } from '@/features/application';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
 import useApplicationStore from '@/store/app/applicationStore.ts';
@@ -51,6 +51,9 @@ async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function Root() {
+	history.navigate = useNavigate();
+	history.location = useLocation();
+
 	return (
 		<>
 			<Outlet />
