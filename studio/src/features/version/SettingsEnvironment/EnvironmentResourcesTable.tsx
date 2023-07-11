@@ -32,7 +32,7 @@ export default function EnvironmentResourcesTable() {
 							/>
 						</TableCell>
 						<TableCell className='text-right text-[24px]'>
-							<div className='flex items-center gap-1 justify-center'>
+							<div className='flex items-center gap-1 justify-end'>
 								<Button variant='blank' className='hover:bg-subtle aspect-square' rounded iconOnly>
 									<Pencil />
 								</Button>

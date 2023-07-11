@@ -6,13 +6,14 @@ import './sortButton.scss';
 interface SortButtonProps {
 	text: string;
 	column: Column<any>;
+	className?: string;
 }
-export function SortButton({ text, column }: SortButtonProps) {
+export function SortButton({ text, column, className }: SortButtonProps) {
 	return (
 		<Button
 			variant='blank'
 			onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-			className='sort-button'
+			className={cn('sort-button', className)}
 		>
 			{text}
 			{column.getIsSorted() && (

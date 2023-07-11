@@ -22,11 +22,11 @@ Version.loader = async ({ params }: LoaderFunctionArgs) => {
 
 	const version = await useVersionStore.getState().getVersionById({ orgId, appId, versionId });
 
-	useEnvironmentStore
+	await useEnvironmentStore
 		.getState()
 		.getEnvironmentResources({ orgId, appId, versionId, envId: environment._id });
 
-	useMiddlewareStore.getState().getMiddlewaresOfAppVersion(
+	await useMiddlewareStore.getState().getMiddlewaresOfAppVersion(
 		{
 			orgId,
 			appId,

@@ -18,6 +18,7 @@ interface MiddlewareStore {
 	middlewares: Middleware[];
 	middleware: Middleware | null;
 	editMiddlewareDrawerIsOpen: boolean;
+	lastFetchedCount: number;
 	getMiddlewaresOfAppVersion: (
 		params: GetMiddlewaresOfAppVersionParams,
 		init?: boolean,
@@ -38,6 +39,7 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 			(set) => ({
 				middlewares: [],
 				middleware: null,
+				lastFetchedCount: 0,
 				editMiddlewareDrawerIsOpen: false,
 				createMiddleware: async (params: CreateMiddlewareParams) => {
 					try {
@@ -51,11 +53,14 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 						return middleware;
 					} catch (e) {
 						const error = e as APIError;
-						notify({
-							title: error.error,
-							description: error.details,
-							type: 'error',
-						});
+						const errorArray = error.fields ? error.fields : [{ msg: error.details }];
+						for (const field of errorArray) {
+							notify({
+								type: 'error',
+								title: error.error,
+								description: field.msg,
+							});
+						}
 						throw e;
 					}
 				},
@@ -69,6 +74,7 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 					} else {
 						set((prev) => ({ middlewares: [...prev.middlewares, ...middlewares] }));
 					}
+					set({ lastFetchedCount: middlewares.length });
 					return middlewares;
 				},
 				getMiddlewareById: async (params: GetMiddlewareByIdParams) => {

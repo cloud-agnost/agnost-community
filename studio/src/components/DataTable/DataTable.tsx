@@ -1,7 +1,5 @@
-'use client';
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table';
-import { cn } from '@/utils';
+import { cn, translate } from '@/utils';
 import {
 	ColumnDef,
 	SortingState,
@@ -14,13 +12,14 @@ import {
 	getFilteredRowModel,
 	Table as TableType,
 } from '@tanstack/react-table';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 interface DataTableProps<TData> {
 	columns: ColumnDef<TData>[];
 	data: TData[];
 	onRowClick?: (row: TData) => void;
 	setSelectedRows?: (table: Row<TData>[]) => void;
 	setTable?: (table: TableType<TData>) => void;
+	noDataMessage?: string | ReactNode;
 }
 
 export function DataTable<TData>({
@@ -29,6 +28,7 @@ export function DataTable<TData>({
 	setSelectedRows,
 	setTable,
 	onRowClick,
+	noDataMessage = translate('general.no_results'),
 }: DataTableProps<TData>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [rowSelection, setRowSelection] = useState({});
@@ -109,7 +109,7 @@ export function DataTable<TData>({
 				) : (
 					<TableRow>
 						<TableCell colSpan={columns.length} className='h-24 text-center'>
-							No results.
+							{noDataMessage}
 						</TableCell>
 					</TableRow>
 				)}

@@ -49,13 +49,23 @@ export interface Version {
 	};
 	createdBy: User;
 	_id: string;
-	params: [];
+	params: Param[];
 	limits: RateLimit[];
 	apiKeys: [];
 	npmPackages: NPMPackage[];
 	createdAt: string;
 	updatedAt: string;
 	__v: number;
+}
+
+export interface Param {
+	name: string;
+	value: string;
+	createdBy: string;
+	updatedBy?: string;
+	_id: string;
+	createdAt: string;
+	updatedAt: string;
 }
 
 export interface NPMPackage {
@@ -117,4 +127,29 @@ export type AddNPMPackageParams = VersionParamsWithoutEnvId & {
 	name: string;
 	version: string;
 	description: string;
+};
+
+export type DeleteNPMPackageParams = VersionParamsWithoutEnvId & {
+	packageId: string;
+};
+
+export type DeleteMultipleNPMPackagesParams = VersionParamsWithoutEnvId & {
+	packageIds: string[];
+};
+
+export type DeleteVersionVariableParams = VersionParamsWithoutEnvId & {
+	paramId: string;
+};
+
+export type DeleteMultipleVersionVariablesParams = VersionParamsWithoutEnvId & {
+	paramIds: string[];
+};
+
+export type AddVersionVariableParams = VersionParamsWithoutEnvId & {
+	name: string;
+	value: string;
+};
+
+export type UpdateVersionVariableParams = AddVersionVariableParams & {
+	paramId: string;
 };

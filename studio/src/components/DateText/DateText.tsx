@@ -8,7 +8,7 @@ interface DateTextProps {
 }
 export default function DateText({ date, children, className }: DateTextProps) {
 	return (
-		<div className={cn('flex items-center gap-2', className)}>
+		<div className={cn('flex items-center gap-2 whitespace-nowrap', className)}>
 			{children}
 			<div>
 				<span className='block text-default text-sm leading-6'>

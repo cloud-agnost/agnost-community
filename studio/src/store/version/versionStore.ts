@@ -1,13 +1,20 @@
 import {
 	AddNPMPackageParams,
+	AddVersionVariableParams,
 	APIError,
 	CreateRateLimitParams,
+	DeleteMultipleNPMPackagesParams,
+	DeleteMultipleVersionVariablesParams,
+	DeleteNPMPackageParams,
 	DeleteRateLimitParams,
+	DeleteVersionVariableParams,
 	GetVersionByIdParams,
 	GetVersionRequest,
+	Param,
 	RateLimit,
 	SearchNPMPackages,
 	SearchNPMPackagesParams,
+	UpdateVersionVariableParams,
 	Version,
 	VersionParamsWithoutEnvId,
 	VersionProperties,
@@ -22,7 +29,9 @@ interface VersionStore {
 	error: APIError | null;
 	version: Version | null;
 	versions: Version[];
+	param: Param | null;
 	versionPage: number;
+	editParamDrawerIsOpen: boolean;
 	getVersionById: (req: GetVersionByIdParams) => Promise<Version>;
 	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<void>;
 	setVersionPage: (page: number) => void;
@@ -34,6 +43,14 @@ interface VersionStore {
 	orderLimits: (limits: string[]) => void;
 	searchNPMPackages: (params: SearchNPMPackagesParams) => Promise<SearchNPMPackages[]>;
 	addNPMPackage: (params: AddNPMPackageParams) => Promise<Version>;
+	deleteNPMPackage: (params: DeleteNPMPackageParams) => Promise<Version>;
+	deleteMultipleNPMPackages: (params: DeleteMultipleNPMPackagesParams) => Promise<Version>;
+	setParam: (param: Param | null) => void;
+	addParam: (params: AddVersionVariableParams) => Promise<Version>;
+	deleteParam: (params: DeleteVersionVariableParams) => Promise<Version>;
+	deleteMultipleParams: (params: DeleteMultipleVersionVariablesParams) => Promise<Version>;
+	updateParam: (params: UpdateVersionVariableParams) => Promise<Version>;
+	setEditParamDrawerIsOpen: (isOpen: boolean) => void;
 }
 
 const useVersionStore = create<VersionStore>()(
@@ -44,6 +61,8 @@ const useVersionStore = create<VersionStore>()(
 			version: null,
 			versions: [],
 			versionPage: 0,
+			param: null,
+			editParamDrawerIsOpen: false,
 			getVersionById: async (params: GetVersionByIdParams) => {
 				const version = await VersionService.getVersionById(params);
 				set({ version });
@@ -137,6 +156,138 @@ const useVersionStore = create<VersionStore>()(
 					}
 					throw e;
 				}
+			},
+			deleteNPMPackage: async (params: DeleteNPMPackageParams) => {
+				try {
+					const version = await VersionService.deleteNPMPackage(params);
+					set({ version });
+					notify({
+						type: 'success',
+						title: translate('general.success'),
+						description: translate('version.npm.deleted'),
+					});
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					notify({
+						type: 'error',
+						title: error.error,
+						description: error.details,
+					});
+					throw e;
+				}
+			},
+			deleteMultipleNPMPackages: async (params: DeleteMultipleNPMPackagesParams) => {
+				try {
+					const version = await VersionService.deleteMultipleNPMPackages(params);
+					set({ version });
+					notify({
+						type: 'success',
+						title: translate('general.success'),
+						description: translate('version.npm.deleted'),
+					});
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					notify({
+						type: 'error',
+						title: error.error,
+						description: error.details,
+					});
+					throw e;
+				}
+			},
+			setParam: (param: Param | null) => {
+				set({ param });
+			},
+			addParam: async (params: AddVersionVariableParams) => {
+				try {
+					const version = await VersionService.addVersionVariable(params);
+					set({ version });
+					notify({
+						type: 'success',
+						title: translate('general.success'),
+						description: translate('version.variable.success'),
+					});
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					const errorArray = error.fields ? error.fields : [{ msg: error.details }];
+					for (const field of errorArray) {
+						notify({
+							type: 'error',
+							title: error.error,
+							description: field.msg,
+						});
+					}
+					throw e;
+				}
+			},
+			deleteParam: async (params: DeleteVersionVariableParams) => {
+				try {
+					const version = await VersionService.deleteVersionVariable(params);
+					set({ version });
+					notify({
+						type: 'success',
+						title: translate('general.success'),
+						description: translate('version.variable.deleted'),
+					});
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					notify({
+						type: 'error',
+						title: error.error,
+						description: error.details,
+					});
+					throw e;
+				}
+			},
+			deleteMultipleParams: async (params: DeleteMultipleVersionVariablesParams) => {
+				try {
+					const version = await VersionService.deleteMultipleVersionVariables(params);
+					set({ version });
+					notify({
+						type: 'success',
+						title: translate('general.success'),
+						description: translate('version.variable.deleted'),
+					});
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					notify({
+						type: 'error',
+						title: error.error,
+						description: error.details,
+					});
+					throw e;
+				}
+			},
+			updateParam: async (params: UpdateVersionVariableParams) => {
+				try {
+					const version = await VersionService.updateVersionVariable(params);
+					set({ version });
+					notify({
+						type: 'success',
+						title: translate('general.success'),
+						description: translate('version.variable.update_success'),
+					});
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					const errorArray = error.fields ? error.fields : [{ msg: error.details }];
+					for (const field of errorArray) {
+						notify({
+							type: 'error',
+							title: error.error,
+							description: field.msg,
+						});
+					}
+					throw e;
+				}
+			},
+			setEditParamDrawerIsOpen: (isOpen: boolean) => {
+				set({ editParamDrawerIsOpen: isOpen });
 			},
 		}),
 		{

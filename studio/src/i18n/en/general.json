@@ -58,5 +58,9 @@
 	"previous": "Previous",
 	"add": "Add",
 	"gb": "{{size}} GB",
-	"add_another_one": "Add Another One"
+	"add_another_one": "Add Another One",
+	"are_you_sure": "Are you sure?",
+	"no_results": "No results",
+	"key": "Key",
+	"value": "Value"
 }

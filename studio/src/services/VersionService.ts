@@ -2,13 +2,19 @@ import { axios } from '@/helpers';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import {
 	AddNPMPackageParams,
+	AddVersionVariableParams,
 	CreateRateLimitParams,
+	DeleteMultipleNPMPackagesParams,
+	DeleteMultipleVersionVariablesParams,
+	DeleteNPMPackageParams,
 	DeleteRateLimitParams,
+	DeleteVersionVariableParams,
 	GetVersionByIdParams,
 	GetVersionRequest,
 	SearchNPMPackages,
 	SearchNPMPackagesParams,
 	UpdateVersionPropertiesParams,
+	UpdateVersionVariableParams,
 	Version,
 } from '@/types';
 
@@ -74,6 +80,73 @@ export default class VersionService {
 	static async addNPMPackage({ orgId, appId, versionId, ...data }: AddNPMPackageParams) {
 		return (
 			await axios.post(`${this.url}/${orgId}/app/${appId}/version/${versionId}/packages`, data)
+		).data;
+	}
+
+	static async deleteNPMPackage({ orgId, appId, versionId, packageId }: DeleteNPMPackageParams) {
+		return (
+			await axios.delete(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/packages/${packageId}`,
+				{
+					data: {},
+				},
+			)
+		).data;
+	}
+	static async deleteMultipleNPMPackages({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: DeleteMultipleNPMPackagesParams) {
+		return (
+			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/packages`, {
+				data,
+			})
+		).data;
+	}
+
+	static async addVersionVariable({ orgId, appId, versionId, ...data }: AddVersionVariableParams) {
+		return (await axios.post(`${this.url}/${orgId}/app/${appId}/version/${versionId}/params`, data))
+			.data;
+	}
+
+	static async deleteVersionVariable({
+		orgId,
+		appId,
+		versionId,
+		paramId,
+	}: DeleteVersionVariableParams) {
+		return (
+			await axios.delete(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/params/${paramId}`,
+				{ data: {} },
+			)
+		).data;
+	}
+	static async deleteMultipleVersionVariables({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: DeleteMultipleVersionVariablesParams) {
+		return (
+			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/params/`, { data })
+		).data;
+	}
+
+	static async updateVersionVariable({
+		orgId,
+		appId,
+		versionId,
+		paramId,
+		...data
+	}: UpdateVersionVariableParams) {
+		return (
+			await axios.put(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/params/${paramId}`,
+				data,
+			)
 		).data;
 	}
 }
