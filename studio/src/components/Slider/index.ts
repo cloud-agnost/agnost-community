@@ -1,1 +1,1 @@
-export { default as Slider } from "./Slider.tsx";
+export { Slider } from './Slider';

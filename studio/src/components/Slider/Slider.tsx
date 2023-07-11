@@ -1,65 +1,25 @@
+'use client';
+
+import * as React from 'react';
+import * as SliderPrimitive from '@radix-ui/react-slider';
+
 import { cn } from '@/utils';
-import { ReactElement } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { Autoplay, FreeMode, Grid, Pagination } from 'swiper';
-import { GridOptions } from 'swiper/types';
-import './Slider.scss';
 
-interface SliderProps {
-	className?: string;
-	loop?: boolean;
-	autoplay?: boolean;
-	spaceBetween?: number;
-	pagination?: boolean;
-	slidesPerView?: number;
-	grid?: GridOptions;
-	freeMode?: boolean;
+const Slider = React.forwardRef<
+	React.ElementRef<typeof SliderPrimitive.Root>,
+	React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
+>(({ className, ...props }, ref) => (
+	<SliderPrimitive.Root
+		ref={ref}
+		className={cn('relative flex w-full touch-none select-none items-center', className)}
+		{...props}
+	>
+		<SliderPrimitive.Track className='relative h-2 w-full grow overflow-hidden rounded-full bg-brand-primary-darker'>
+			<SliderPrimitive.Range className='absolute h-full bg-brand-primary' />
+		</SliderPrimitive.Track>
+		<SliderPrimitive.Thumb className='block h-6 w-6 rounded-full border-2 border-brand-primary bg-brand-primary-darker shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50' />
+	</SliderPrimitive.Root>
+));
+Slider.displayName = SliderPrimitive.Root.displayName;
 
-	items: {
-		text?: string;
-		element: ReactElement;
-	}[];
-}
-
-export default function Slider({
-	items,
-	className,
-	loop,
-	autoplay,
-	slidesPerView = 1,
-	spaceBetween = 10,
-	pagination,
-	grid,
-	freeMode,
-
-	...props
-}: SliderProps) {
-	return (
-		<Swiper
-			spaceBetween={spaceBetween}
-			pagination={pagination}
-			freeMode={freeMode}
-			loop={loop}
-			autoplay={autoplay}
-			className={cn('slider', className)}
-			slidesPerView={slidesPerView}
-			grid={grid}
-			modules={[
-				pagination && Pagination,
-				autoplay && Autoplay,
-				!!grid && Grid,
-				freeMode && FreeMode,
-			].filter(Boolean)}
-			{...props}
-		>
-			{items.map(({ element, text }, index) => (
-				<SwiperSlide className='slider-item' key={index}>
-					<div className='slider-item-cover'>{element}</div>
-					{text && <div className='slider-item-text'>{text}</div>}
-				</SwiperSlide>
-			))}
-		</Swiper>
-	);
-}
+export { Slider };
