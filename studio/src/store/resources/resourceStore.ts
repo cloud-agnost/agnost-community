@@ -1,18 +1,33 @@
 import { ResourceService } from '@/services';
-import { APIError, Resource } from '@/types';
+import { APIError, GetResourcesRequest, Resource } from '@/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { GetResourcesRequest } from '@/types';
 export interface ResourceStore {
 	resources: Resource[];
+	isCreateResourceModalOpen: boolean;
+	resourceType: {
+		name: string;
+		type: string;
+		step: number;
+	};
 	getResources: (req: GetResourcesRequest) => Promise<Resource[]>;
+	toggleCreateResourceModal: () => void;
+	selectResourceType: (name: string, type: string) => void;
+	goToNextStep: () => void;
+	returnToPreviousStep: () => void;
 }
 
 const useResourceStore = create<ResourceStore>()(
 	devtools(
 		persist(
-			(set) => ({
+			(set, get) => ({
 				resources: [],
+				isCreateResourceModalOpen: false,
+				resourceType: {
+					type: '',
+					name: '',
+					step: 1,
+				},
 				getResources: async (req: GetResourcesRequest) => {
 					try {
 						const resources = await ResourceService.getResources(req);
@@ -22,6 +37,33 @@ const useResourceStore = create<ResourceStore>()(
 						throw error as APIError;
 					}
 				},
+				toggleCreateResourceModal: () =>
+					set((state) => ({
+						isCreateResourceModalOpen: !state.isCreateResourceModalOpen,
+					})),
+				selectResourceType: (name: string, type: string) =>
+					set({
+						resourceType: {
+							type,
+							name,
+							step: get().resourceType.step,
+						},
+					}),
+				goToNextStep: () =>
+					set((state) => ({
+						resourceType: {
+							...state.resourceType,
+							step: state.resourceType.step < 2 ? state.resourceType.step + 1 : 2,
+						},
+					})),
+				returnToPreviousStep: () =>
+					set((state) => ({
+						resourceType: {
+							type: '',
+							name: '',
+							step: state.resourceType.step > 1 ? state.resourceType.step - 1 : 1,
+						},
+					})),
 			}),
 			{
 				name: 'resources-store',

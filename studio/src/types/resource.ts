@@ -60,3 +60,8 @@ export interface GetResourcesRequest extends BaseGetRequest {
 	type?: string;
 	instance?: string;
 }
+export interface Instance {
+	id: string;
+	name: string;
+	icon: React.ElementType;
+}
