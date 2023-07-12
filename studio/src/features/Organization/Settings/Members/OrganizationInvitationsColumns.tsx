@@ -1,5 +1,6 @@
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
+import { ResendButton } from '@/components/ResendButton';
 import { TableConfirmation } from '@/components/Table';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Invitation } from '@/types';
@@ -73,10 +74,8 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 			const { token } = row.original;
 			return (
 				<div className='flex items-center justify-end'>
-					<Button
-						variant='blank'
-						iconOnly
-						onClick={() => {
+					<ResendButton
+						onResend={() => {
 							useOrganizationStore.getState?.().resendInvitation({
 								token,
 								onSuccess: () => {
@@ -95,9 +94,7 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 								},
 							});
 						}}
-					>
-						<EnvelopeSimple size={24} className='text-icon-base' />
-					</Button>
+					/>
 					<TableConfirmation
 						title={translate('organization.settings.members.invite.delete')}
 						description={translate('organization.settings.members.invite.deleteDesc')}

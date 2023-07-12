@@ -1,14 +1,15 @@
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
+import { DateText } from '@/components/DateText';
 import { TableConfirmation } from '@/components/Table';
+import useApplicationStore from '@/store/app/applicationStore';
 import { Invitation } from '@/types';
-import { formatDate, notify, translate } from '@/utils';
+import { notify, translate } from '@/utils';
 import { EnvelopeSimple, Trash } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
-import useApplicationStore from '@/store/app/applicationStore';
 import { RoleSelect } from 'components/RoleDropdown';
-import { DateTime } from 'luxon';
-
+import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '@/components/Tooltip';
+import { ResendButton } from '@/components/ResendButton';
 function updateInvitationUserRole(token: string, role: string) {
 	useApplicationStore.getState?.().updateInvitationUserRole({
 		token,
@@ -100,7 +101,7 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 		header: 'Invited At',
 		accessorKey: 'createdAt',
 		size: 200,
-		cell: ({ row }) => formatDate(row.original.createdAt, DateTime.DATE_MED),
+		cell: ({ row }) => <DateText date={row.original.createdAt} />,
 	},
 	{
 		id: 'role',
@@ -125,9 +126,7 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 			const { token, email } = row.original;
 			return (
 				<div className='flex items-center justify-end'>
-					<Button variant='blank' iconOnly onClick={() => resendInvitation(token, email)}>
-						<EnvelopeSimple size={24} className='text-icon-base' />
-					</Button>
+					<ResendButton onResend={() => resendInvitation(token, email)} />
 					<TableConfirmation
 						title={translate('organization.settings.members.invite.delete')}
 						description={translate('organization.settings.members.invite.deleteDesc')}
