@@ -61,18 +61,22 @@ export default function OrganizationApps() {
 								<Button
 									variant='outline'
 									iconOnly
-									className={cn(isCard && 'bg-lighter transition-all', 'hover:bg-base')}
-									onClick={() => setIsCard(false)}
+									className={cn(isCard ? 'bg-lighter' : 'bg-base', 'transition-all')}
+									onClick={() => setIsCard(true)}
 								>
-									<List className='w-5 h-5 text-icon-secondary ' />
+									<SquaresFour
+										className={cn('w-5 h-5', isCard ? 'text-icon-secondary' : 'text-icon-base')}
+									/>
 								</Button>
 								<Button
 									variant='outline'
 									iconOnly
-									className={cn(!isCard && 'bg-lighter transition-all', 'hover:bg-base')}
-									onClick={() => setIsCard(true)}
+									className={cn(!isCard ? 'bg-lighter' : 'bg-base', 'transition-all')}
+									onClick={() => setIsCard(false)}
 								>
-									<SquaresFour className='w-5 h-5 text-icon-secondary' />
+									<List
+										className={cn('w-5 h-5', !isCard ? 'text-icon-secondary' : 'text-icon-base')}
+									/>
 								</Button>
 							</ButtonGroup>
 							<CreateApplicationButton />

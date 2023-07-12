@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
+import { DateText } from '@/components/DateText';
 import { RoleSelect } from '@/components/RoleDropdown';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { OrganizationMember } from '@/types';
@@ -63,7 +64,7 @@ export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 		header: 'Joined At',
 		accessorKey: 'joinDate',
 		size: 200,
-		cell: ({ row }) => formatDate(row.original.joinDate, DateTime.DATETIME_MED),
+		cell: ({ row }) => <DateText date={row.original.joinDate} />,
 	},
 	{
 		id: 'role',

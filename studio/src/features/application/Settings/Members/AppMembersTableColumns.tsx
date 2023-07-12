@@ -32,13 +32,6 @@ function updateMemberRole(userId: string, role: string) {
 	useApplicationStore.getState?.().changeAppTeamRole({
 		userId,
 		role,
-		onSuccess: () => {
-			notify({
-				title: translate('general.success'),
-				description: translate('general.member.update'),
-				type: 'success',
-			});
-		},
 		onError: ({ error, details }) => {
 			notify({
 				title: error,

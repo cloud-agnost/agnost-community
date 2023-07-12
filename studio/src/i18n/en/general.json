@@ -44,5 +44,6 @@
 		"invitedAt": "Invited At"
 	},
 	"clear": "Clear Filters",
-	"create": "Create"
+	"create": "Create",
+	"resend_invite": "Resend Invitation"
 }

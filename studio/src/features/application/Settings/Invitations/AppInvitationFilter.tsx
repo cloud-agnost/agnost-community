@@ -75,6 +75,7 @@ function AppInvitationFilter({ selectedRows }: Props) {
 			sortBy: invitationSort.value,
 			sortDir: invitationSort.sortDir,
 			email: invitationSearch,
+			status: 'Pending',
 		});
 	}, [invitationRoleFilter, invitationSearch, invitationSort, invitationPage]);
 
@@ -133,15 +134,6 @@ function AppInvitationFilter({ selectedRows }: Props) {
 					selectedRowLength={selectedRows?.length}
 				/>
 			)}
-			{invitationSearch ||
-			!invitationRoleFilter ||
-			invitationRoleFilter.length ||
-			invitationSort.name !== t('general.sortOptions.default') ? (
-				<Button variant='outline' iconOnly onClick={clearFilters}>
-					<Broom size={16} className='members-filter-icon' />
-					{t('general.clear')}
-				</Button>
-			) : null}
 		</div>
 	);
 }

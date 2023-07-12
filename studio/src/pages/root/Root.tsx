@@ -42,7 +42,6 @@ async function loader({ request, params }: LoaderFunctionArgs) {
 	useApplicationStore.setState((prev) => {
 		const application = prev.applications.find((app) => app._id === appId);
 		if (application) prev.application = application;
-		else prev.application = null;
 
 		return prev;
 	});

@@ -20,10 +20,11 @@ import {
 	UpdateRoleRequest,
 } from '@/types';
 
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
 import { translate } from '@/utils';
 import OrganizationService from 'services/OrganizationService.ts';
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+import useAuthStore from '../auth/authStore';
 
 interface ApplicationStore {
 	application: Application | null;
@@ -99,6 +100,7 @@ const useApplicationStore = create<ApplicationStore>()(
 				invitationRoleFilter: [],
 
 				selectApplication: (application: Application) => {
+					console.log('selectApplication', application);
 					set({ application });
 				},
 				changeAppName: async (req: ChangeAppNameRequest) => {
@@ -148,11 +150,12 @@ const useApplicationStore = create<ApplicationStore>()(
 				getAppTeamMembers: async () => {
 					try {
 						const applicationTeam = await ApplicationService.getAppMembers();
+						const userId = useAuthStore.getState().user?._id;
 						set({
 							applicationTeam,
 							tempTeam: applicationTeam,
 							teamOptions: applicationTeam
-								.filter((team) => team.role === 'Admin')
+								.filter((team) => team.role === 'Admin' && userId !== team.member._id)
 								.map((team) => ({
 									label: team.member.name,
 									value: team,
