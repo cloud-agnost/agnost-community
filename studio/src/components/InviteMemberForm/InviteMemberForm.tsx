@@ -164,6 +164,7 @@ export default function InviteMemberForm({
 							<Button
 								type='button'
 								variant='secondary'
+								disabled={fields.length === 1}
 								className={cn(
 									!index && 'self-end',
 									!isEmpty(form.formState.errors) && !index && 'self-center mt-2',
