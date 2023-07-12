@@ -30,12 +30,13 @@ interface BadgeProps {
 	rounded?: boolean;
 	clearable?: boolean;
 	text: string;
+	className?: string;
 }
-export default function Badge({ text, variant, rounded, clearable }: BadgeProps) {
+export default function Badge({ text, variant, rounded, clearable, className }: BadgeProps) {
 	return (
-		<div className={cn(badgeVariants({ variant, rounded }), 'badge')}>
+		<div className={cn(badgeVariants({ variant, rounded }), 'badge', className)}>
 			{rounded && <div className='badge-dot' />}
-			<span className='badge-text'>{text}</span>
+			<span className={cn('badge-text')}>{text}</span>
 			{clearable && <X className='badge-clear' size={12} />}
 		</div>
 	);

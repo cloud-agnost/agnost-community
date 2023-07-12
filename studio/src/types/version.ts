@@ -1,5 +1,26 @@
 import { BaseGetRequest, User } from './type';
 
+export interface APIKey {
+	expiryDate?: string;
+	updatedBy?: string;
+	name: string;
+	key: string;
+	allowRealtime: true;
+	type: APIKeyTypes;
+	allowedEndpoints: string[];
+	excludedEndpoints: string[];
+	domainAuthorization: AllAndSpecified;
+	authorizedDomains: string[];
+	IPAuthorization: AllAndSpecified;
+	authorizedIPs: string[];
+	createdBy: string;
+	_id: string;
+	createdAt: string;
+	updatedAt: string;
+}
+export type APIKeyTypes = 'no-access' | 'full-access' | 'custom-allowed' | 'custom-excluded';
+export type AllAndSpecified = 'all' | 'specified';
+
 export interface RateLimit {
 	_id: string;
 	iid: string;
@@ -52,7 +73,7 @@ export interface Version {
 	_id: string;
 	params: Param[];
 	limits: RateLimit[];
-	apiKeys: [];
+	apiKeys: APIKey[];
 	npmPackages: NPMPackage[];
 	createdAt: string;
 	updatedAt: string;
@@ -169,4 +190,28 @@ export type CreateCopyOfVersionParams = Omit<VersionParamsWithoutEnvId, 'version
 
 export type EditRateLimitParams = CreateRateLimitParams & {
 	limitId: string;
+};
+
+export type CreateAPIKeyParams = VersionParamsWithoutEnvId & {
+	name: string;
+	allowRealtime: boolean;
+	type: APIKeyTypes;
+	domainAuthorization: AllAndSpecified;
+	IPAuthorization: AllAndSpecified;
+	expiryDate?: Date;
+	excludedEndpoints?: string[];
+	allowedEndpoints?: string[];
+	authorizedDomains?: string[];
+	authorizedIPs?: string[];
+};
+
+export type UpdateAPIKeyParams = VersionParamsWithoutEnvId &
+	CreateAPIKeyParams & {
+		keyId: string;
+	};
+export type DeleteAPIKeyParams = VersionParamsWithoutEnvId & {
+	keyId: string;
+};
+export type DeleteMultipleAPIKeys = VersionParamsWithoutEnvId & {
+	keyIds: string[];
 };

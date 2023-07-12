@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ColumnDef } from '@tanstack/react-table';
 
 export const UserSchema = z.object({
 	iid: z.string(),
@@ -248,3 +249,7 @@ export interface SearchNPMPackages {
 	version: string;
 	description: string;
 }
+
+export type ColumnDefWithClassName<TData> = ColumnDef<TData> & {
+	className?: string;
+};

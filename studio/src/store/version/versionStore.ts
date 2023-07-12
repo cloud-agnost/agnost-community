@@ -2,8 +2,11 @@ import {
 	AddNPMPackageParams,
 	AddVersionVariableParams,
 	APIError,
+	CreateAPIKeyParams,
 	CreateCopyOfVersionParams,
 	CreateRateLimitParams,
+	DeleteAPIKeyParams,
+	DeleteMultipleAPIKeys,
 	DeleteMultipleNPMPackagesParams,
 	DeleteMultipleRateLimitsParams,
 	DeleteMultipleVersionVariablesParams,
@@ -17,6 +20,7 @@ import {
 	RateLimit,
 	SearchNPMPackages,
 	SearchNPMPackagesParams,
+	UpdateAPIKeyParams,
 	UpdateVersionVariableParams,
 	Version,
 	VersionParamsWithoutEnvId,
@@ -37,6 +41,7 @@ interface VersionStore {
 	versionPage: number;
 	editParamDrawerIsOpen: boolean;
 	editRateLimitDrawerIsOpen: boolean;
+	createCopyVersionDrawerIsOpen: boolean;
 	getVersionById: (req: GetVersionByIdParams) => Promise<Version>;
 	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<void>;
 	setVersionPage: (page: number) => void;
@@ -64,6 +69,12 @@ interface VersionStore {
 	setRateLimit: (rateLimit: RateLimit | null) => void;
 	editRateLimit: (params: EditRateLimitParams) => Promise<Version>;
 	deleteMultipleRateLimits: (params: DeleteMultipleRateLimitsParams) => Promise<Version>;
+	getVersionDashboardPath: (appendPath?: string, version?: Version) => string;
+	setCreateCopyVersionDrawerIsOpen: (isOpen: boolean) => void;
+	createAPIKey: (params: CreateAPIKeyParams) => Promise<Version>;
+	editAPIKey: (params: UpdateAPIKeyParams) => Promise<Version>;
+	deleteAPIKey: (params: DeleteAPIKeyParams) => Promise<Version>;
+	deleteMultipleAPIKeys: (params: DeleteMultipleAPIKeys) => Promise<Version>;
 }
 
 const useVersionStore = create<VersionStore>()(
@@ -78,6 +89,10 @@ const useVersionStore = create<VersionStore>()(
 			rateLimit: null,
 			editParamDrawerIsOpen: false,
 			editRateLimitDrawerIsOpen: false,
+			createCopyVersionDrawerIsOpen: false,
+			setCreateCopyVersionDrawerIsOpen: (isOpen: boolean) => {
+				set({ createCopyVersionDrawerIsOpen: isOpen });
+			},
 			getVersionById: async (params: GetVersionByIdParams) => {
 				const version = await VersionService.getVersionById(params);
 				set({ version });
@@ -104,18 +119,28 @@ const useVersionStore = create<VersionStore>()(
 				appId,
 				...data
 			}: VersionParamsWithoutEnvId & Partial<VersionProperties>) => {
-				const version = await VersionService.updateVersionProperties({
-					orgId,
-					versionId,
-					appId,
-					private: get().version?.private ?? false,
-					defaultEndpointLimits: get().version?.defaultEndpointLimits ?? [],
-					readOnly: get().version?.readOnly ?? false,
-					name: get().version?.name ?? '',
-					...data,
-				});
-				set({ version });
-				return version;
+				try {
+					const version = await VersionService.updateVersionProperties({
+						orgId,
+						versionId,
+						appId,
+						private: get().version?.private ?? false,
+						defaultEndpointLimits: get().version?.defaultEndpointLimits ?? [],
+						readOnly: get().version?.readOnly ?? false,
+						name: get().version?.name ?? '',
+						...data,
+					});
+					set({ version });
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					notify({
+						type: 'error',
+						title: error.error,
+						description: error.details,
+					});
+					throw e;
+				}
 			},
 			createRateLimit: async (params: CreateRateLimitParams) => {
 				const version = await VersionService.createRateLimit(params);
@@ -329,7 +354,6 @@ const useVersionStore = create<VersionStore>()(
 						description: translate('version.copied'),
 					});
 					if (returnRedirect) {
-						console.log('girdi');
 						history.navigate?.(
 							`/organization/${version.orgId}/apps/${version.appId}/version/${version._id}`,
 						);
@@ -381,6 +405,79 @@ const useVersionStore = create<VersionStore>()(
 						title: translate('general.success'),
 						description: translate('version.limiter_deleted'),
 					});
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					notify({
+						type: 'error',
+						title: error.error,
+						description: error.details,
+					});
+					throw e;
+				}
+			},
+			getVersionDashboardPath: (path?: string, version?: Version) => {
+				const _version = version ?? get().version;
+				if (!_version) return '/organization';
+				const { orgId, appId, _id } = _version;
+				path = path ? `/${path.replace(/^\//, '')}` : '';
+				return `/organization/${orgId}/apps/${appId}/version/${_id}` + path;
+			},
+			createAPIKey: async (params) => {
+				try {
+					const version = await VersionService.createAPIKey(params);
+					set({ version });
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					const errorArray = error.fields ? error.fields : [{ msg: error.details }];
+					for (const field of errorArray) {
+						notify({
+							type: 'error',
+							title: error.error,
+							description: field.msg,
+						});
+					}
+					throw e;
+				}
+			},
+			deleteAPIKey: async (params) => {
+				try {
+					const version = await VersionService.deleteAPIKey(params);
+					set({ version });
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					notify({
+						type: 'error',
+						title: error.error,
+						description: error.details,
+					});
+					throw e;
+				}
+			},
+			editAPIKey: async (params) => {
+				try {
+					const version = await VersionService.editAPIKey(params);
+					set({ version });
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					const errorArray = error.fields ? error.fields : [{ msg: error.details }];
+					for (const field of errorArray) {
+						notify({
+							type: 'error',
+							title: error.error,
+							description: field.msg,
+						});
+					}
+					throw e;
+				}
+			},
+			deleteMultipleAPIKeys: async (params) => {
+				try {
+					const version = await VersionService.deleteMultipleAPIKeys(params);
+					set({ version });
 					return version;
 				} catch (e) {
 					const error = e as APIError;

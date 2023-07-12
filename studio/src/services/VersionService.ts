@@ -3,8 +3,11 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import {
 	AddNPMPackageParams,
 	AddVersionVariableParams,
+	CreateAPIKeyParams,
 	CreateCopyOfVersionParams,
 	CreateRateLimitParams,
+	DeleteAPIKeyParams,
+	DeleteMultipleAPIKeys,
 	DeleteMultipleNPMPackagesParams,
 	DeleteMultipleRateLimitsParams,
 	DeleteMultipleVersionVariablesParams,
@@ -20,6 +23,7 @@ import {
 	Resource,
 	SearchNPMPackages,
 	SearchNPMPackagesParams,
+	UpdateAPIKeyParams,
 	UpdateVersionPropertiesParams,
 	UpdateVersionVariableParams,
 	Version,
@@ -206,6 +210,49 @@ export default class VersionService {
 				`${this.url}/${orgId}/app/${appId}/version/${versionId}/limits/${limitId}`,
 				data,
 			)
+		).data;
+	}
+
+	static async createAPIKey({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: CreateAPIKeyParams): Promise<Version> {
+		return (await axios.post(`${this.url}/${orgId}/app/${appId}/version/${versionId}/keys`, data))
+			.data;
+	}
+	static async editAPIKey({
+		orgId,
+		appId,
+		versionId,
+		keyId,
+		...data
+	}: UpdateAPIKeyParams): Promise<Version> {
+		return (
+			await axios.put(`${this.url}/${orgId}/app/${appId}/version/${versionId}/keys/${keyId}`, data)
+		).data;
+	}
+	static async deleteAPIKey({
+		orgId,
+		appId,
+		versionId,
+		keyId,
+	}: DeleteAPIKeyParams): Promise<Version> {
+		return (
+			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/keys/${keyId}`)
+		).data;
+	}
+	static async deleteMultipleAPIKeys({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: DeleteMultipleAPIKeys): Promise<Version> {
+		return (
+			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/keys/`, {
+				data,
+			})
 		).data;
 	}
 }

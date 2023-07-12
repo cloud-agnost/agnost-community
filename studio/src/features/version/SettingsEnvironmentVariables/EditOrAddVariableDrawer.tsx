@@ -60,7 +60,6 @@ export default function EditOrAddVariableDrawer({
 	const [loading, setLoading] = useState(false);
 	const { orgId, appId, versionId } = useParams();
 	const { param, addParam, updateParam } = useVersionStore();
-	console.log(editMode);
 
 	useEffect(() => {
 		if (!open) form.reset();

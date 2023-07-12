@@ -1,7 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table';
 import { cn, translate } from '@/utils';
 import {
-	ColumnDef,
 	SortingState,
 	flexRender,
 	getCoreRowModel,
@@ -13,8 +12,10 @@ import {
 	Table as TableType,
 } from '@tanstack/react-table';
 import { ReactNode, useEffect, useState } from 'react';
+import { ColumnDefWithClassName } from '@/types';
+
 interface DataTableProps<TData> {
-	columns: ColumnDef<TData>[];
+	columns: ColumnDefWithClassName<TData>[];
 	data: TData[];
 	onRowClick?: (row: TData) => void;
 	setSelectedRows?: (table: Row<TData>[]) => void;
@@ -73,7 +74,7 @@ export function DataTable<TData>({
 								return (
 									<TableHead
 										key={header.id}
-										className={cn(typeof header.column.columnDef.header !== 'string' && 'sortable')}
+										className={cn(header.column.columnDef.enableSorting && 'sortable')}
 									>
 										{header.isPlaceholder
 											? null
@@ -94,9 +95,10 @@ export function DataTable<TData>({
 							onClick={() => onRowClick?.(row.original)}
 							className={cn(onRowClick && 'cursor-pointer', 'content')}
 						>
-							{row.getVisibleCells().map((cell) => (
+							{row.getVisibleCells().map((cell, index) => (
 								<TableCell
 									key={cell.id}
+									className={cn('font-sfCompact', columns[index].className)}
 									style={{
 										width: cell.column.columnDef.size,
 									}}

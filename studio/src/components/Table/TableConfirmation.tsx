@@ -35,7 +35,7 @@ export function TableConfirmation({
 	}
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger>{children}</PopoverTrigger>
+			<PopoverTrigger asChild>{children}</PopoverTrigger>
 			<PopoverContent align={align} className={cn('mr-2', contentClassName)}>
 				<div id='popup-modal' tabIndex={-1}>
 					<div className='relative w-full max-w-sm max-h-full'>
