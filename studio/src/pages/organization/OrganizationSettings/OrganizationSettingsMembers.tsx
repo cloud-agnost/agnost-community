@@ -7,17 +7,18 @@ import {
 	OrganizationMembersTable,
 	OrganizationMembersTableHeader,
 } from '@/features/organization';
-import { useToast, useUpdateEffect } from '@/hooks';
+import { useUpdateEffect } from '@/hooks';
 import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout';
+import useClusterStore from '@/store/cluster/clusterStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTypeStore from '@/store/types/typeStore';
 import { APIError, OrgMemberRequest } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/Tabs';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-
 export default function OrganizationSettingsMembers() {
 	const { t } = useTranslation();
+	const { canClusterSendEmail } = useClusterStore();
 	const {
 		inviteUsersToOrganization,
 		getOrganizationInvitations,
@@ -31,22 +32,15 @@ export default function OrganizationSettingsMembers() {
 		selectedTab,
 	} = useOrganizationStore();
 
-	const { notify } = useToast();
-
 	function onSubmit(data: OrgMemberRequest[], setError: (error: APIError) => void) {
-		inviteUsersToOrganization({
-			organizationId: organization?._id as string,
-			members: data,
-			uiBaseURL: window.location.origin,
-			onSuccess: () => {
-				notify({
-					title: t('general.success'),
-					description: t('general.invitation.success'),
-					type: 'success',
-				});
-			},
-			onError: (error) => setError(error),
-		});
+		if (data.length) {
+			inviteUsersToOrganization({
+				organizationId: organization?._id as string,
+				members: data,
+				uiBaseURL: window.location.origin,
+				onError: (error) => setError(error),
+			});
+		}
 	}
 
 	const { orgRoles } = useTypeStore();
@@ -68,7 +62,10 @@ export default function OrganizationSettingsMembers() {
 		if (selectedTab === 'member') {
 			getOrganizationMembers(getMemberRequest);
 		} else {
-			getOrganizationInvitations(getMemberRequest);
+			getOrganizationInvitations({
+				...getMemberRequest,
+				status: 'Pending',
+			});
 		}
 	}, [selectedTab, getMemberRequest]);
 
@@ -77,17 +74,19 @@ export default function OrganizationSettingsMembers() {
 			title={t('organization.settings.members.title')}
 			description={t('organization.settings.members.description')}
 		>
-			<InviteMemberForm
-				submitForm={onSubmit}
-				roles={orgRoles}
-				title={t('organization.settings.members.invite.title') as string}
-				description={t('organization.settings.members.invite.desc') as string}
-				actions={
-					<Button variant='primary' size='lg'>
-						{t('organization.settings.members.invite.button')}
-					</Button>
-				}
-			/>
+			{canClusterSendEmail && (
+				<InviteMemberForm
+					submitForm={onSubmit}
+					roles={orgRoles}
+					title={t('organization.settings.members.invite.title') as string}
+					description={t('organization.settings.members.invite.desc') as string}
+					actions={
+						<Button variant='primary' size='lg'>
+							{t('organization.settings.members.invite.button')}
+						</Button>
+					}
+				/>
+			)}
 			<Separator className='my-12' />
 			<div className='members'>
 				<Tabs

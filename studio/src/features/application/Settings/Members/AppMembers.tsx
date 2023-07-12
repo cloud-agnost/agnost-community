@@ -10,11 +10,11 @@ import { AppMembersTableColumns } from './AppMembersTableColumns';
 import { SelectedRowDropdown } from 'components/Table';
 import { notify } from '@/utils';
 import { RoleDropdown } from 'components/RoleDropdown';
-
+import useClusterStore from '@/store/cluster/clusterStore';
 export default function AppMembers() {
 	const { applicationTeam, application, openInviteMemberDrawer, removeMultipleAppMembers } =
 		useApplicationStore();
-
+	const { canClusterSendEmail } = useClusterStore();
 	const [table, setTable] = useState<Table<ApplicationMember>>();
 	const [selectedRows, setSelectedRows] = useState<Row<ApplicationMember>[]>();
 	const { t } = useTranslation();
@@ -57,14 +57,16 @@ export default function AppMembers() {
 							table?.getColumn('role')?.setFilterValue(roles);
 						}}
 					/>
-					<Button
-						variant='primary'
-						onClick={() => {
-							openInviteMemberDrawer(application as Application);
-						}}
-					>
-						{t('application.edit.invite')}
-					</Button>
+					{canClusterSendEmail && (
+						<Button
+							variant='primary'
+							onClick={() => {
+								openInviteMemberDrawer(application as Application);
+							}}
+						>
+							{t('application.edit.invite')}
+						</Button>
+					)}
 				</div>
 			</div>
 			<DataTable<ApplicationMember>

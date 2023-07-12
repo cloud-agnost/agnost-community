@@ -40,26 +40,28 @@ export default function AppInviteMember() {
 					<InviteMemberForm
 						roles={appRoles}
 						submitForm={(val) => {
-							inviteUsersToApp({
-								members: val.map((m: { email: string; role: string }[]) => ({
-									...m,
-									uiBaseURL: window.location.origin,
-								})),
-								uiBaseUrl: window.location.origin,
-								onSuccess: () => {
-									setLoading(false);
-									closeInviteMemberDrawer();
-									notify({
-										title: t('general.success'),
-										description: t('general.invitation.success'),
-										type: 'success',
-									});
-								},
-								onError: (err) => {
-									setLoading(false);
-									setError(err);
-								},
-							});
+							if (val.length) {
+								inviteUsersToApp({
+									members: val.map((m: { email: string; role: string }[]) => ({
+										...m,
+										uiBaseURL: window.location.origin,
+									})),
+									uiBaseUrl: window.location.origin,
+									onSuccess: () => {
+										setLoading(false);
+										closeInviteMemberDrawer();
+										notify({
+											title: t('general.success'),
+											description: t('general.invitation.success'),
+											type: 'success',
+										});
+									},
+									onError: (err) => {
+										setLoading(false);
+										setError(err);
+									},
+								});
+							}
 						}}
 						actions={
 							<Button variant='primary' loading={loading}>
