@@ -55,6 +55,11 @@ const useResourceStore = create<ResourceStore>()(
 						const resource = await ResourceService.addExistingResource(req);
 						set((state) => ({
 							resources: [...state.resources, resource],
+							resourceType: {
+								type: '',
+								name: '',
+								step: 1,
+							},
 						}));
 						if (req.onSuccess) req.onSuccess();
 						return resource;
@@ -79,17 +84,17 @@ const useResourceStore = create<ResourceStore>()(
 					set((state) => ({
 						resourceType: {
 							...state.resourceType,
-							step: state.resourceType.step < 2 ? state.resourceType.step + 1 : 2,
+							step: 2,
 						},
 					})),
 				returnToPreviousStep: () =>
-					set((state) => ({
+					set({
 						resourceType: {
 							type: '',
 							name: '',
-							step: state.resourceType.step > 1 ? state.resourceType.step - 1 : 1,
+							step: 1,
 						},
-					})),
+					}),
 			}),
 			{
 				name: 'resources-store',
