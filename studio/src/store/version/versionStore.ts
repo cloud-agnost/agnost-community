@@ -56,7 +56,7 @@ interface VersionStore {
 	deleteNPMPackage: (params: DeleteNPMPackageParams) => Promise<Version>;
 	deleteMultipleNPMPackages: (params: DeleteMultipleNPMPackagesParams) => Promise<Version>;
 	setParam: (param: Param | null) => void;
-	addParam: (params: AddVersionVariableParams) => Promise<Version>;
+	addParam: (params: AddVersionVariableParams, showAlert?: boolean) => Promise<Version>;
 	deleteParam: (params: DeleteVersionVariableParams) => Promise<Version>;
 	deleteMultipleParams: (params: DeleteMultipleVersionVariablesParams) => Promise<Version>;
 	updateParam: (params: UpdateVersionVariableParams) => Promise<Version>;
@@ -255,25 +255,27 @@ const useVersionStore = create<VersionStore>()(
 			setParam: (param: Param | null) => {
 				set({ param });
 			},
-			addParam: async (params: AddVersionVariableParams) => {
+			addParam: async (params: AddVersionVariableParams, showAlert) => {
 				try {
 					const version = await VersionService.addVersionVariable(params);
 					set({ version });
-					notify({
-						type: 'success',
-						title: translate('general.success'),
-						description: translate('version.variable.success'),
-					});
+					showAlert &&
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.variable.success'),
+						});
 					return version;
 				} catch (e) {
 					const error = e as APIError;
 					const errorArray = error.fields ? error.fields : [{ msg: error.details }];
 					for (const field of errorArray) {
-						notify({
-							type: 'error',
-							title: error.error,
-							description: field.msg,
-						});
+						showAlert &&
+							notify({
+								type: 'error',
+								title: error.error,
+								description: field.msg,
+							});
 					}
 					throw e;
 				}

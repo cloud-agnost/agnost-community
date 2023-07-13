@@ -4,3 +4,6 @@ export { default as AddAPIKeyButton } from './AddAPIKeyButton.tsx';
 export { default as AddAPIKeyDrawer } from './AddAPIKeyDrawer.tsx';
 export { default as APIKeysActions } from './APIKeysActions.tsx';
 export { default as AddAPIKeyGeneral } from './AddAPIKeyGeneral.tsx';
+export { default as AddAPIKeyAllowedIPs } from './AddAPIKeyAllowedIPs.tsx';
+export { default as AddAPIKeyAllowedDomains } from './AddAPIKeyAllowedDomains.tsx';
+export { default as Schema } from './Schema.ts';

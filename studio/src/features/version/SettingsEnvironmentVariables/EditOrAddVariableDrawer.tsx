@@ -10,6 +10,8 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { translate } from '@/utils';
 import useVersionStore from '@/store/version/versionStore.ts';
+import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
+import { APIError } from '@/types';
 
 const MiddlewareFormSchema = z.object({
 	name: z
@@ -60,6 +62,7 @@ export default function EditOrAddVariableDrawer({
 	const [loading, setLoading] = useState(false);
 	const { orgId, appId, versionId } = useParams();
 	const { param, addParam, updateParam } = useVersionStore();
+	const [error, setError] = useState<APIError | null>(null);
 
 	useEffect(() => {
 		if (!open) form.reset();
@@ -77,8 +80,8 @@ export default function EditOrAddVariableDrawer({
 		console.log(data);
 		if (!orgId || !appId || !versionId) return;
 		setLoading(true);
+		setError(null);
 		try {
-			onOpenChange(false);
 			editMode
 				? await edit(orgId, appId, versionId, data)
 				: await add(orgId, appId, versionId, data);
@@ -93,12 +96,26 @@ export default function EditOrAddVariableDrawer({
 		versionId: string,
 		data: z.infer<typeof MiddlewareFormSchema>,
 	) {
-		await addParam({
-			appId,
-			orgId,
-			versionId,
-			...data,
-		});
+		try {
+			await addParam({
+				appId,
+				orgId,
+				versionId,
+				...data,
+			});
+			onOpenChange(false);
+		} catch (e) {
+			const error = e as APIError;
+			if (error.fields) {
+				error.fields.forEach((field) => {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					form.setError(field.param, {
+						message: field.msg,
+					});
+				});
+			} else setError(error);
+		}
 	}
 
 	async function edit(
@@ -127,6 +144,12 @@ export default function EditOrAddVariableDrawer({
 				</DrawerHeader>
 				<Form {...form}>
 					<form className='p-6 flex flex-col gap-6' onSubmit={form.handleSubmit(onSubmit)}>
+						{error && (
+							<Alert className='!max-w-full' variant='error'>
+								<AlertTitle>{error.error}</AlertTitle>
+								<AlertDescription>{error.details}</AlertDescription>
+							</Alert>
+						)}
 						<FormField
 							control={form.control}
 							name='name'
