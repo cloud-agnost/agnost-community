@@ -19,7 +19,7 @@ export default function OrgResources() {
 		});
 	}, []);
 	return (
-		<div className='p-8'>
+		<div className='p-8 scroll'>
 			<div className='flex items-center justify-between'>
 				<h1 className='text-default text-2xl font-semibold text-center'>{t('resources.title')}</h1>
 				<div className='flex items-center justify-center gap-6'>
