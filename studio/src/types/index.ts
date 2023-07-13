@@ -19,7 +19,7 @@ export type * from './environment.ts';
 export type * from './middleware.ts';
 export { CreateOrganizationSchema } from './organization.ts';
 export type * from './resource.ts';
-export { ConnectDatabaseSchema, AccessDbSchema } from './resource.ts';
+export { AccessDbSchema, ConnectDatabaseSchema, ConnectResourceSchema } from './resource.ts';
 export type * from './type.ts';
 export type * from './version.ts';
 export type * from './endpoint.ts';

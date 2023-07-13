@@ -68,6 +68,30 @@ export interface Instance {
 	icon: React.ElementType;
 	isConnectOnly?: boolean;
 }
+export const ConnectResourceSchema = z.object({
+	name: z.string({
+		required_error: translate('forms.required', {
+			label: translate('general.name'),
+		}),
+	}),
+	instance: z
+		.string({
+			required_error: translate('forms.required', {
+				label: translate('resources.database.instance'),
+			}),
+		})
+		.refine(
+			(value) =>
+				useTypeStore.getState().instanceTypes.database.includes(value) ||
+				useTypeStore.getState().instanceTypes.storage.includes(value),
+			{
+				message: translate('forms.invalid', {
+					label: translate('resources.database.instance'),
+				}),
+			},
+		),
+	allowedRoles: z.array(z.string()),
+});
 export const AccessDbSchema = z.object({
 	host: z
 		.string()
@@ -139,24 +163,8 @@ export const AccessDbSchema = z.object({
 		.optional(),
 });
 export const ConnectDatabaseSchema = z.object({
-	name: z.string({
-		required_error: translate('forms.required', {
-			label: translate('general.name'),
-		}),
-	}),
-	instance: z
-		.string({
-			required_error: translate('forms.required', {
-				label: translate('resources.database.instance'),
-			}),
-		})
-		.refine((value) => useTypeStore.getState().instanceTypes.database.includes(value), {
-			message: translate('forms.invalid', {
-				label: translate('resources.database.instance'),
-			}),
-		}),
+	...ConnectResourceSchema.shape,
 	access: AccessDbSchema,
-	allowedRoles: z.array(z.string()),
 	accessReadOnly: z.array(AccessDbSchema).optional(),
 	secureConnection: z.boolean().default(false),
 });
@@ -167,13 +175,16 @@ export interface AddExistingResourceRequest extends BaseRequest {
 	instance: string;
 	allowedRoles: string[];
 	access: {
-		host: string;
-		port: string;
-		username: string;
-		password: string;
-		options: {
+		host?: string;
+		port?: string;
+		username?: string;
+		password?: string;
+		options?: {
 			key: string;
 			value: string;
 		}[];
+		accessIdKey?: string;
+		secretAccessKey?: string;
+		region?: string;
 	};
 }
