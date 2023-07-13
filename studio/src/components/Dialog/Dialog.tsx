@@ -4,11 +4,11 @@ import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from '@phosphor-icons/react';
 import { cn } from '@/utils';
-
+import './dialog.scss';
 const Dialog = DialogPrimitive.Root;
 
 const DialogTrigger = DialogPrimitive.Trigger;
-
+const DialogClose = DialogPrimitive.Close;
 const DialogPortal = ({ className, children, ...props }: DialogPrimitive.DialogPortalProps) => (
 	<DialogPrimitive.Portal className={cn(className)} {...props}>
 		<div className='dialog-portal'>{children}</div>
@@ -33,7 +33,7 @@ const DialogContent = React.forwardRef<
 		<DialogPrimitive.Content ref={ref} className={cn('dialog-content', className)} {...props}>
 			{children}
 			<DialogPrimitive.Close className='dialog-close'>
-				<X size={16} />
+				<X size={24} />
 				<span className='sr-only'>Close</span>
 			</DialogPrimitive.Close>
 		</DialogPrimitive.Content>
@@ -79,4 +79,5 @@ export {
 	DialogFooter,
 	DialogTitle,
 	DialogDescription,
+	DialogClose,
 };
