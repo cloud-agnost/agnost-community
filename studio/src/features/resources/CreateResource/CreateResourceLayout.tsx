@@ -115,29 +115,31 @@ export default function CreateResourceLayout({
 							)}
 						/>
 					</CreateResourceItem>
-					<CreateResourceItem title={t('resources.database.choose_type')}>
-						<Controller
-							control={control}
-							name='instance'
-							render={({ field: { onChange, value }, formState: { errors } }) => (
-								<div className='grid grid-cols-4 gap-4'>
-									{instances?.map((type) => (
-										<ResourceInstance
-											key={type.id}
-											instance={type}
-											onSelect={() => {
-												onChange(type.name);
-											}}
-											active={value === type.name}
-										/>
-									))}
-									<p className='col-span-4 text-error-default text-sm font-sfCompact'>
-										{errors.instance?.message?.toString()}
-									</p>
-								</div>
-							)}
-						/>
-					</CreateResourceItem>
+					{instances?.length && (
+						<CreateResourceItem title={t('resources.database.choose_type')}>
+							<Controller
+								control={control}
+								name='instance'
+								render={({ field: { onChange, value }, formState: { errors } }) => (
+									<div className='grid grid-cols-4 gap-4'>
+										{instances?.map((type) => (
+											<ResourceInstance
+												key={type.id}
+												instance={type}
+												onSelect={() => {
+													onChange(type.name);
+												}}
+												active={value === type.name}
+											/>
+										))}
+										<p className='col-span-4 text-error-default text-sm font-sfCompact'>
+											{errors.instance?.message?.toString()}
+										</p>
+									</div>
+								)}
+							/>
+						</CreateResourceItem>
+					)}
 				</>
 			)}
 			{children}

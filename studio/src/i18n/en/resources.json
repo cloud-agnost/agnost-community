@@ -46,5 +46,13 @@
 		"select_connection_format": "Select Connection Format",
 		"username": "Username",
 		"password": "Password"
+	},
+	"storage": {
+		"aws": {
+			"title": "Add AWS S3 Credentials",
+			"accessKeyId": "Access Key ID",
+			"secret": "Secret Access Key",
+			"region": "Region"
+		}
 	}
 }

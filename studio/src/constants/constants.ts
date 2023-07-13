@@ -26,7 +26,12 @@ import {
 	Storage,
 	Team,
 } from '@/components/icons';
-import { ConnectDatabase, CreateDatabase, SelectResourceType } from '@/features/resources';
+import {
+	ConnectAWS,
+	ConnectDatabase,
+	CreateDatabase,
+	SelectResourceType,
+} from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Application, Instance, Method, SortOption, Tab } from '@/types';
@@ -454,6 +459,12 @@ export const CREATE_RESOURCES_ELEMENTS = [
 		name: translate('version.databases'),
 		type: translate('resources.connect_existing'),
 		CurrentResourceElement: ConnectDatabase,
+	},
+	{
+		step: 2,
+		name: translate('version.storage'),
+		type: 'AWS S3',
+		CurrentResourceElement: ConnectAWS,
 	},
 ];
 
