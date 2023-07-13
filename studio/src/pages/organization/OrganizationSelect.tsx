@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Button } from '@/components/Button';
-import { Slider } from '@/components/Slider';
+import { Carousel } from '@/components/Carousel';
 import { OrganizationCreateButton } from '@/features/organization';
 import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
@@ -44,7 +44,7 @@ export default function OrganizationSelect() {
 
 					<div className='select-organization-slider'>
 						{organizations.length > 0 && (
-							<Slider
+							<Carousel
 								slidesPerView={4}
 								spaceBetween={32}
 								freeMode

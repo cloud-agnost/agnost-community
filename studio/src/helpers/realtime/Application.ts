@@ -11,7 +11,7 @@ class Application extends RealtimeActions<ApplicationType> {
 	}
 
 	update({ data }: RealtimeActionParams<ApplicationType>) {
-		useApplicationStore.setState?.({
+	useApplicationStore.setState?.({
 			application: data,
 			applications: useApplicationStore.getState?.().applications.map((app) => {
 				if (app._id === data._id) {

@@ -57,7 +57,7 @@ export default function LastDeployment() {
 						<div className='flex items-center'>
 							<Badge
 								rounded
-								variant={BADGE_COLOR_MAP[deployment.statusText]}
+								variant={BADGE_COLOR_MAP[deployment.statusText.toUpperCase()]}
 								text={deployment.statusText}
 							/>
 						</div>

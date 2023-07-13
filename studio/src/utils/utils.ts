@@ -75,21 +75,17 @@ export function getNameForAvatar(name: string) {
 		return name;
 	}
 }
+export function capitalize(str: string) {
+	if (typeof str !== 'string') {
+		return '';
+	}
+	return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export function getRelativeTime(date: string) {
 	return DateTime.fromISO(date).setLocale('en').toRelative();
 }
-export function getApplicationRoleVariant(role: string) {
-	switch (role) {
-		case 'Admin':
-			return 'orange';
-		case 'Developer':
-			return 'purple';
-		case 'Viewer':
-			return 'blue';
-		default:
-			return 'green';
-	}
-}
+
 export function notify(params: ToastType) {
 	return toast().notify(params);
 }

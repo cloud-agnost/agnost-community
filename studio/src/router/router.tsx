@@ -61,6 +61,7 @@ import {
 	OrganizationSettingsGeneral,
 	OrganizationSettingsMembers,
 } from '@/pages/organization/';
+import { OrgResources } from '@/features/resources';
 const router = createBrowserRouter([
 	{
 		path: '/',
@@ -163,7 +164,7 @@ const router = createBrowserRouter([
 								path: 'resources',
 								element: (
 									<RequireAuth>
-										<p>Resource</p>
+										<OrgResources />
 									</RequireAuth>
 								),
 							},

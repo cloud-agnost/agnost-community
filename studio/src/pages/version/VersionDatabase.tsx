@@ -52,7 +52,7 @@ export default function VersionDatabase() {
 							</TableCell>
 							<TableCell>{type}</TableCell>
 							<TableCell>
-								<Badge text={managed} variant={BADGE_COLOR_MAP[managed]} rounded />
+								<Badge text={managed} variant={BADGE_COLOR_MAP[managed.toUpperCase()]} rounded />
 							</TableCell>
 							<TableCell className='text-right text-[24px]'>
 								<div className='flex items-center gap-1 justify-center'>

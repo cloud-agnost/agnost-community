@@ -19,7 +19,7 @@ const SvgEnvironment = (props: SVGProps<SVGSVGElement>) => (
 			width={21}
 			height={21}
 		>
-			<path d='M.2 0h20v20H.2V0Z' fill='#fff' />
+			<path d='M.2 0h20v20H.2V0Z' fill='currentColor' />
 		</mask>
 		<g mask='url(#Environment_svg__a)'>
 			<path

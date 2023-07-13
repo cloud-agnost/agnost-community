@@ -56,13 +56,32 @@ export default function Modal({
 						transition={{ type: 'tween' }}
 						className={cn('modal-body', className)}
 					>
-						<Button size='sm' onClick={closeModal} className='modal-close' variant='text' rounded>
-							<X size={24} />
-						</Button>
-
-						<div className='space-y-4'>
-							{title && <h5 className='modal-title'>{title}</h5>}
-							{children}
+						<div className=''>
+							{title ? (
+								<div className='modal-header'>
+									<h5 className='modal-title'>{title}</h5>
+									<Button
+										size='sm'
+										onClick={closeModal}
+										className='modal-close'
+										variant='text'
+										rounded
+									>
+										<X size={24} />
+									</Button>
+								</div>
+							) : (
+								<Button
+									size='sm'
+									onClick={closeModal}
+									className='modal-close'
+									variant='text'
+									rounded
+								>
+									<X size={24} />
+								</Button>
+							)}
+							<div className='modal-content'>{children}</div>
 						</div>
 					</motion.div>
 				</div>

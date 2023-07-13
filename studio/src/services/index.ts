@@ -6,3 +6,4 @@ export { default as VersionService } from './VersionService.ts';
 export { default as ApplicationService } from './ApplicationService.ts';
 export { default as DatabaseService } from './DatabaseService.ts';
 export { default as MiddlewareService } from './MiddlewareService.ts';
+export { default as ResourceService } from './ResourceService.ts';

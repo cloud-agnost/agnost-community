@@ -78,7 +78,11 @@ export default function DeploymentLogsDrawer({
 											</div>
 										</TableCell>
 										<TableCell>
-											<Badge text={log.status} variant={BADGE_COLOR_MAP[log.status]} rounded />
+											<Badge
+												text={log.status}
+												variant={BADGE_COLOR_MAP[log.status.toUpperCase()]}
+												rounded
+											/>
 										</TableCell>
 										<TableCell className='whitespace-nowrap'>
 											<span className='block text-default text-sm leading-6'>
