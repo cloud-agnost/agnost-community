@@ -19,6 +19,7 @@ import {
 	MongoDb,
 	MySql,
 	NpmPackage,
+	Oracle,
 	PostgreSql,
 	RateLimit,
 	RealTime,
@@ -26,7 +27,7 @@ import {
 	Storage,
 	Team,
 } from '@/components/icons';
-import { CreateDatabase, SelectResourceType } from '@/features/resources';
+import { ConnectDatabase, CreateDatabase, SelectResourceType } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
 import { Application, Instance, SortOption, Tab } from '@/types';
 import { translate } from '@/utils';
@@ -37,6 +38,8 @@ export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
 export const MIN_DB_SIZE = 1;
 export const MAX_DB_SIZE = 50;
+export const IP_REGEX = /^([0-9]{1,3}\.){3}[0-9]{1,3}$/;
+export const URL_REGEX = /^(http|https):\/\/[^ "]+$/;
 export const SLIDER_IMAGES = [
 	{
 		text: 'Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.',
@@ -258,6 +261,10 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	ADMIN: 'orange',
 	DEVELOPER: 'purple',
 	VIEWER: 'blue',
+	CREATING: 'green',
+	UPDATING: 'yellow',
+	DELETING: 'red',
+	BINDING: 'blue',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
@@ -413,6 +420,18 @@ export const DATABASE_TYPES: Instance[] = [
 		name: 'PostgreSQL',
 		icon: PostgreSql,
 	},
+	{
+		id: 'Oracle',
+		name: 'Oracle',
+		icon: Oracle,
+		isConnectOnly: true,
+	},
+	{
+		id: 'SQL Server',
+		name: 'SQL Server',
+		icon: Oracle,
+		isConnectOnly: true,
+	},
 ];
 
 export const CREATE_RESOURCES_ELEMENTS = [
@@ -426,5 +445,11 @@ export const CREATE_RESOURCES_ELEMENTS = [
 		name: translate('version.databases'),
 		type: translate('resources.create_new'),
 		CurrentResourceElement: CreateDatabase,
+	},
+	{
+		step: 2,
+		name: translate('version.databases'),
+		type: translate('resources.connect_existing'),
+		CurrentResourceElement: ConnectDatabase,
 	},
 ];
