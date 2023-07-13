@@ -76,7 +76,6 @@ export const ConnectResourceSchema = z.object({
 			label: translate('general.name'),
 		}),
 	}),
-
 	instance: z
 		.string({
 			required_error: translate('forms.required', {
