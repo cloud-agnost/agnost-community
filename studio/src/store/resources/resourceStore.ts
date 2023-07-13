@@ -1,5 +1,5 @@
 import { ResourceService } from '@/services';
-import { APIError, GetResourcesRequest, Resource } from '@/types';
+import { APIError, AddExistingResourceRequest, GetResourcesRequest, Resource } from '@/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 export interface ResourceStore {
@@ -10,7 +10,10 @@ export interface ResourceStore {
 		type: string;
 		step: number;
 	};
+	openCreateReplicaModal: boolean;
 	getResources: (req: GetResourcesRequest) => Promise<Resource[]>;
+	testExistingResourceConnection: (req: AddExistingResourceRequest) => Promise<void>;
+	addExistingResource: (req: AddExistingResourceRequest) => Promise<Resource>;
 	toggleCreateResourceModal: () => void;
 	selectResourceType: (name: string, type: string) => void;
 	goToNextStep: () => void;
@@ -28,12 +31,35 @@ const useResourceStore = create<ResourceStore>()(
 					name: '',
 					step: 1,
 				},
+				openCreateReplicaModal: false,
 				getResources: async (req: GetResourcesRequest) => {
 					try {
 						const resources = await ResourceService.getResources(req);
 						set({ resources });
 						return resources;
 					} catch (error) {
+						throw error as APIError;
+					}
+				},
+				testExistingResourceConnection: async (req: AddExistingResourceRequest) => {
+					try {
+						await ResourceService.testExistingResourceConnection(req);
+						if (req.onSuccess) req.onSuccess();
+					} catch (error) {
+						if (req.onError) req.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				addExistingResource: async (req: AddExistingResourceRequest) => {
+					try {
+						const resource = await ResourceService.addExistingResource(req);
+						set((state) => ({
+							resources: [...state.resources, resource],
+						}));
+						if (req.onSuccess) req.onSuccess();
+						return resource;
+					} catch (error) {
+						if (req.onError) req.onError(error as APIError);
 						throw error as APIError;
 					}
 				},

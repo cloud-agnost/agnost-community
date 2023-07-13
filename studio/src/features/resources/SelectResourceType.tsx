@@ -31,6 +31,7 @@ export default function SelectResourceType() {
 						{t('general.next')}
 					</Button>
 				}
+				typeSelection
 			>
 				<div className='space-y-4'>
 					{RESOURCE_TYPES.map((type) => (

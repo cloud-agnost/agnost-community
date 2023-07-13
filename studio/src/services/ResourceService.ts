@@ -1,6 +1,6 @@
-import useOrganizationStore from '@/store/organization/organizationStore';
 import { axios } from '@/helpers';
-import { Resource, GetResourcesRequest } from '@/types';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { AddExistingResourceRequest, GetResourcesRequest, Resource } from '@/types';
 export default class ResourceService {
 	static url = 'v1/org/:orgId/resource';
 
@@ -27,5 +27,12 @@ export default class ResourceService {
 				},
 			})
 		).data;
+	}
+
+	static async testExistingResourceConnection(req: AddExistingResourceRequest) {
+		return (await axios.post(`${this.getUrl()}/test`, req)).data;
+	}
+	static async addExistingResource(req: AddExistingResourceRequest) {
+		return (await axios.post(`${this.getUrl()}/add`, req)).data;
 	}
 }

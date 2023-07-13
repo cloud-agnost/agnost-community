@@ -1,11 +1,11 @@
 import { Button } from '@/components/Button';
 import { SearchInput } from '@/components/SearchInput';
-import { useTranslation } from 'react-i18next';
-import { Plus } from '@phosphor-icons/react';
-import useResourcesStore from '@/store/resources/resourceStore';
-import useApplicationStore from '@/store/app/applicationStore';
-import { useEffect } from 'react';
 import { CreateResource, ResourceTable } from '@/features/resources';
+import useApplicationStore from '@/store/app/applicationStore';
+import useResourcesStore from '@/store/resources/resourceStore';
+import { Plus } from '@phosphor-icons/react';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 export default function OrgResources() {
 	const { t } = useTranslation();
 	const { application } = useApplicationStore();

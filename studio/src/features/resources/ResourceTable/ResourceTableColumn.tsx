@@ -21,11 +21,8 @@ export const ResourceTableColumn: ColumnDef<Resource>[] = [
 		header: ({ column }) => {
 			return <SortButton text={translate('resources.table.type')} column={column} />;
 		},
-		accessorKey: 'type',
+		accessorKey: 'instance',
 		size: 200,
-		cell: ({ row }) => {
-			return capitalize(row.original.type);
-		},
 	},
 	{
 		id: 'status',

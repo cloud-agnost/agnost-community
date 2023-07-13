@@ -1,5 +1,6 @@
 {
 	"required": "{{label}} is required",
+	"invalid": "{{label}} is invalid",
 	"min2": {
 		"error": "{{label}} must be at least 2 characters long",
 		"description": "Minimum 2 characters"

@@ -49,5 +49,6 @@
 	"next": "Next",
 	"previous": "Previous",
 	"add": "Add",
-	"gb": "{{size}} GB"
+	"gb": "{{size}} GB",
+	"add_another_one": "Add Another One"
 }
