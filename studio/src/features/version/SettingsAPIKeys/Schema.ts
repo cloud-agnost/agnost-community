@@ -3,6 +3,7 @@ import { isEmpty, translate } from '@/utils';
 import { AUTHORIZATION_OPTIONS, ENDPOINT_ACCESS_PROPERTIES } from '@/constants';
 
 const Schema = z.object({
+	expiryDate: z.date().optional(),
 	name: z
 		.string({
 			required_error: translate('forms.required', {
@@ -68,26 +69,21 @@ const Schema = z.object({
 			}
 		}),
 	endpoint: z
-		.object(
-			{
-				type: z
-					.enum(ENDPOINT_ACCESS_PROPERTIES, {
-						required_error: 'You must select one of the options',
-					})
-					.default(ENDPOINT_ACCESS_PROPERTIES[0]),
-				allowedEndpoints: z.array(
-					z.object({
-						url: z.string().optional().or(z.literal('')),
-					}),
-				),
-				excludedEndpoints: z.array(
-					z.object({
-						url: z.string().optional().or(z.literal('')),
-					}),
-				),
-			},
-			{ required_error: 'You must select one of the options' },
-		)
+		.object({
+			type: z.enum(ENDPOINT_ACCESS_PROPERTIES, {
+				required_error: 'You must select one of the options',
+			}),
+			allowedEndpoints: z.array(
+				z.object({
+					url: z.string().optional().or(z.literal('')),
+				}),
+			),
+			excludedEndpoints: z.array(
+				z.object({
+					url: z.string().optional().or(z.literal('')),
+				}),
+			),
+		})
 		.superRefine(({ type, allowedEndpoints, excludedEndpoints }, ctx) => {
 			if (type === 'custom-allowed') {
 				const domains = allowedEndpoints.map((value) => value.url).filter(Boolean);
@@ -111,7 +107,6 @@ const Schema = z.object({
 				}
 			}
 		}),
-	expiryDate: z.string().optional().or(z.date()),
 });
 
 export default Schema;

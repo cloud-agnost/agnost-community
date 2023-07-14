@@ -6,6 +6,7 @@ import { SettingsAPIKeysColumns } from '@/features/version/SettingsAPIKeys/';
 import { Row } from '@tanstack/react-table';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { reverseArray } from '@/utils';
 
 interface SettingsAPIKeysProps {
 	selectedRows: Row<APIKey>[] | undefined;
@@ -19,9 +20,9 @@ export default function SettingsAPIKeys({ setSelectedRows }: SettingsAPIKeysProp
 		<div className='data-table-container'>
 			<DataTable<APIKey>
 				columns={SettingsAPIKeysColumns}
-				data={apiKeys}
+				data={reverseArray(apiKeys)}
 				setSelectedRows={setSelectedRows}
-				noDataMessage={<p className='text-xl'>{t('version.variable.no_variable_found')}</p>}
+				noDataMessage={<p className='text-xl'>{t('version.api_key.no_api_key_found')}</p>}
 			/>
 		</div>
 	);

@@ -12,6 +12,7 @@ import { Button } from 'components/Button';
 import { Pencil } from 'components/icons';
 import { TableConfirmation } from 'components/Table';
 import { Trash } from '@phosphor-icons/react';
+import useVersionStore from '@/store/version/versionStore.ts';
 
 const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	{
@@ -213,8 +214,21 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	{
 		id: 'actions',
 		size: 45,
-		cell: () => {
-			async function clickHandler() {}
+		cell: ({
+			row: {
+				original: { _id },
+			},
+		}) => {
+			async function clickHandler() {
+				const { deleteAPIKey, version } = useVersionStore.getState();
+				if (!version) return;
+				await deleteAPIKey({
+					appId: version.appId,
+					orgId: version.orgId,
+					keyId: _id,
+					versionId: version._id,
+				});
+			}
 
 			function editHandler() {}
 			return (
@@ -232,8 +246,8 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 						align='end'
 						closeOnConfirm
 						showAvatar={false}
-						title={translate('version.variable.delete_modal_title')}
-						description={translate('version.variable.delete_modal_desc')}
+						title={translate('version.api_key.delete_modal_title')}
+						description={translate('version.api_key.delete_modal_desc')}
 						onConfirm={clickHandler}
 						contentClassName='m-0'
 					>

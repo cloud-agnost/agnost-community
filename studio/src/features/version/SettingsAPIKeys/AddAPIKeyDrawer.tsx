@@ -14,7 +14,7 @@ import { AnimatePresence } from 'framer-motion';
 import { FormProvider, useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from 'components/Button';
+import useVersionStore from '@/store/version/versionStore.ts';
 
 interface AddAPIKeyDrawerProps {
 	open: boolean;
@@ -24,6 +24,7 @@ interface AddAPIKeyDrawerProps {
 export default function AddAPIKeyDrawer({ open, onOpenChange }: AddAPIKeyDrawerProps) {
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { createAPIKey, version } = useVersionStore();
 
 	const form = useForm<z.infer<typeof Schema>>({
 		resolver: zodResolver(Schema),
@@ -41,8 +42,12 @@ export default function AddAPIKeyDrawer({ open, onOpenChange }: AddAPIKeyDrawerP
 			expiryDate: undefined,
 			endpoint: {
 				type: 'no-access',
-				allowedEndpoints: undefined,
-				excludedEndpoints: undefined,
+				allowedEndpoints: [],
+				excludedEndpoints: [
+					{
+						url: '/api/v1/realtime',
+					},
+				],
 			},
 		},
 	});
@@ -54,10 +59,11 @@ export default function AddAPIKeyDrawer({ open, onOpenChange }: AddAPIKeyDrawerP
 		} else if (!searchParams.has('t')) {
 			searchParams.set('t', 'general');
 			setSearchParams(searchParams);
-			console.log(form.getValues());
-			console.log(form.formState.errors);
 		}
 	}, [open]);
+	useEffect(() => {
+		console.log('error', form.formState.errors);
+	}, [form.formState.errors]);
 
 	const activeTab = searchParams.get('t') || 'general';
 
@@ -69,12 +75,47 @@ export default function AddAPIKeyDrawer({ open, onOpenChange }: AddAPIKeyDrawerP
 
 	async function onSubmit(data: z.infer<typeof Schema>) {
 		console.log(data);
+		if (!version) return;
+
+		await createAPIKey({
+			orgId: version.orgId,
+			appId: version.appId,
+			versionId: version._id,
+			name: data.name,
+			type: data.endpoint.type,
+			IPAuthorization: data.ip.type,
+			domainAuthorization: data.domain.type,
+			expiryDate: data.expiryDate,
+			allowedEndpoints:
+				data.domain.type === 'specified'
+					? (data.endpoint.allowedEndpoints
+							.map((endpoint) => endpoint.url)
+							.filter(Boolean) as string[])
+					: undefined,
+			allowRealtime: data.realtime,
+			excludedEndpoints:
+				data.domain.type === 'specified'
+					? (data.endpoint.excludedEndpoints
+							.map((endpoint) => endpoint.url)
+							.filter(Boolean) as string[])
+					: undefined,
+			authorizedDomains:
+				data.domain.type === 'specified'
+					? (data.domain.list.map((item) => item.domain).filter(Boolean) as string[])
+					: undefined,
+			authorizedIPs:
+				data.ip.type === 'specified'
+					? (data.ip.list.map((item) => item.ip).filter(Boolean) as string[])
+					: undefined,
+		});
+		onOpenChange(false);
+		form.reset();
 	}
 
 	return (
 		<FormProvider {...form}>
 			<Drawer open={open} onOpenChange={onOpenChange}>
-				<DrawerContent position='right'>
+				<DrawerContent position='right' className='overflow-auto'>
 					<DrawerHeader className='border-none'>
 						<DrawerTitle>{t('version.api_key.add')}</DrawerTitle>
 					</DrawerHeader>
@@ -91,9 +132,6 @@ export default function AddAPIKeyDrawer({ open, onOpenChange }: AddAPIKeyDrawerP
 					</ul>
 					<form onSubmit={form.handleSubmit(onSubmit)}>
 						<AnimatePresence>{tabs[activeTab]}</AnimatePresence>
-						<div className='flex justify-end border-none p-6 !pt-0'>
-							<Button size='lg'>{t('general.save')}</Button>
-						</div>
 					</form>
 				</DrawerContent>
 			</Drawer>

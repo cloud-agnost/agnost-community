@@ -240,7 +240,9 @@ export default class VersionService {
 		keyId,
 	}: DeleteAPIKeyParams): Promise<Version> {
 		return (
-			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/keys/${keyId}`)
+			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/keys/${keyId}`, {
+				data: {},
+			})
 		).data;
 	}
 	static async deleteMultipleAPIKeys({
