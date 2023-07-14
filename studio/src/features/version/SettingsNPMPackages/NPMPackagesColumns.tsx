@@ -1,5 +1,4 @@
-import { ColumnDef } from '@tanstack/react-table';
-import { NPMPackage } from '@/types';
+import { ColumnDefWithClassName, NPMPackage } from '@/types';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { translate } from '@/utils';
@@ -11,7 +10,7 @@ import { TableConfirmation } from 'components/Table';
 import { Button } from 'components/Button';
 import { Trash } from '@phosphor-icons/react';
 
-const NPMPackagesColumns: ColumnDef<NPMPackage>[] = [
+const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	{
 		id: 'select',
 		header: ({ table }) => (
@@ -67,7 +66,7 @@ const NPMPackagesColumns: ColumnDef<NPMPackage>[] = [
 	},
 	{
 		id: 'actions',
-		size: 45,
+		className: 'actions',
 		cell: ({
 			row: {
 				original: { _id },
@@ -84,7 +83,7 @@ const NPMPackagesColumns: ColumnDef<NPMPackage>[] = [
 				});
 			}
 			return (
-				<div className='flex items-center justify-end'>
+				<div className='flex items-center'>
 					<TableConfirmation
 						align='end'
 						closeOnConfirm

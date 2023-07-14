@@ -1,12 +1,18 @@
 import { SettingsContainer } from '@/features/version/SettingsContainer';
-import { APIKeysActions, SettingsAPIKeys } from '@/features/version/SettingsAPIKeys';
+import {
+	AddOrEditAPIKeyDrawer,
+	APIKeysActions,
+	SettingsAPIKeys,
+} from '@/features/version/SettingsAPIKeys';
 import { useState } from 'react';
 import { Row } from '@tanstack/react-table';
 import { APIKey } from '@/types';
 import { useTranslation } from 'react-i18next';
+import useVersionStore from '@/store/version/versionStore.ts';
 
 export default function VersionSettingsAPIKeys() {
 	const { t } = useTranslation();
+	const { editAPIKeyDrawerIsOpen, setEditAPIKeyDrawerIsOpen } = useVersionStore();
 	const [selectedRows, setSelectedRows] = useState<Row<APIKey>[]>();
 
 	return (
@@ -16,6 +22,11 @@ export default function VersionSettingsAPIKeys() {
 			pageTitle={t('version.settings.api_keys')}
 		>
 			<SettingsAPIKeys setSelectedRows={setSelectedRows} selectedRows={selectedRows} />
+			<AddOrEditAPIKeyDrawer
+				open={editAPIKeyDrawerIsOpen}
+				onOpenChange={setEditAPIKeyDrawerIsOpen}
+				editMode
+			/>
 		</SettingsContainer>
 	);
 }

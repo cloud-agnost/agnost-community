@@ -16,37 +16,36 @@ import * as z from 'zod';
 import { Schema } from '@/features/version/SettingsAPIKeys/index.ts';
 import { Fragment, useEffect } from 'react';
 import { RadioGroup, RadioGroupItem } from 'components/RadioGroup';
-import { Button } from 'components/Button';
 import Select from 'react-select';
 import { cn } from '@/utils';
 import { DatePicker } from 'components/DatePicker';
 
-export default function AddAPIKeyGeneral() {
+export default function AddOrEditAPIKeyGeneral() {
 	const { t } = useTranslation();
 	const form = useFormContext<z.infer<typeof Schema>>();
 
 	useEffect(() => {
 		// TODO check later
-		form.setValue('endpoint.allowedEndpoints', []);
-		form.setValue('endpoint.excludedEndpoints', []);
-	}, [form.getValues('endpoint.type')]);
+		form.setValue('general.endpoint.allowedEndpoints', []);
+		form.setValue('general.endpoint.excludedEndpoints', []);
+	}, [form.getValues('general.endpoint.type')]);
 
 	return (
 		<motion.div
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 			exit={{ opacity: 0 }}
-			className='p-6 flex flex-col divide-y [&>:first-child]:pt-0 [&>*]:py-6'
+			className='p-6 flex flex-col divide-y [&>:first-child]:pt-0 [&>*]:py-6 overflow-auto'
 		>
 			<FormField
 				control={form.control}
-				name='name'
+				name='general.name'
 				render={({ field }) => (
 					<FormItem>
 						<FormLabel>{t('version.api_key.name')}</FormLabel>
 						<FormControl>
 							<Input
-								error={Boolean(form.formState.errors.name)}
+								error={Boolean(form.formState.errors.general?.name)}
 								placeholder={
 									t('forms.placeholder', {
 										label: t('version.api_key.name'),
@@ -62,7 +61,7 @@ export default function AddAPIKeyGeneral() {
 			/>
 			<FormField
 				control={form.control}
-				name='realtime'
+				name='general.realtime'
 				render={({ field }) => {
 					return (
 						<FormItem className='grid grid-cols-[2fr_1fr] items-center space-y-0 gap-2'>
@@ -86,9 +85,9 @@ export default function AddAPIKeyGeneral() {
 			/>
 			<FormField
 				control={form.control}
-				name='endpoint.type'
+				name='general.endpoint.type'
 				render={({ field }) => (
-					<FormItem className='space-y-6 selamm'>
+					<FormItem className='space-y-6'>
 						<FormLabel>{t('version.api_key.endpoint_access')}</FormLabel>
 						<FormControl>
 							<div className='flex gap-6 flex-col'>
@@ -113,10 +112,10 @@ export default function AddAPIKeyGeneral() {
 												</FormLabel>
 											</FormItem>
 											{item === 'custom-allowed' &&
-												form.getValues('endpoint.type') === 'custom-allowed' && (
+												form.getValues('general.endpoint.type') === 'custom-allowed' && (
 													<FormField
 														control={form.control}
-														name='endpoint.allowedEndpoints'
+														name='general.endpoint.allowedEndpoints'
 														render={({ field }) => (
 															<FormItem className='space-y-2'>
 																<FormLabel>{t('version.api_key.allowed_endpoints')}</FormLabel>
@@ -124,7 +123,7 @@ export default function AddAPIKeyGeneral() {
 																	<Select
 																		className={cn(
 																			'select-box',
-																			form.formState.errors.endpoint?.message && 'error',
+																			form.formState.errors.general?.endpoint?.message && 'error',
 																		)}
 																		classNamePrefix='select'
 																		isClearable={true}
@@ -137,16 +136,18 @@ export default function AddAPIKeyGeneral() {
 																		{...field}
 																	/>
 																</FormControl>
-																<FormMessage>{form.formState.errors.endpoint?.message}</FormMessage>
+																<FormMessage>
+																	{form.formState.errors.general?.endpoint?.message}
+																</FormMessage>
 															</FormItem>
 														)}
 													/>
 												)}
 											{item === 'custom-excluded' &&
-												form.getValues('endpoint.type') === 'custom-excluded' && (
+												form.getValues('general.endpoint.type') === 'custom-excluded' && (
 													<FormField
 														control={form.control}
-														name='endpoint.excludedEndpoints'
+														name='general.endpoint.excludedEndpoints'
 														render={({ field }) => (
 															<FormItem className='space-y-2'>
 																<FormLabel>{t('version.api_key.exclude_endpoints')}</FormLabel>
@@ -155,7 +156,7 @@ export default function AddAPIKeyGeneral() {
 																		classNamePrefix='select'
 																		className={cn(
 																			'select-box',
-																			form.formState.errors.endpoint?.message && 'error',
+																			form.formState.errors.general?.endpoint?.message && 'error',
 																		)}
 																		isClearable={true}
 																		isMulti={true}
@@ -167,7 +168,9 @@ export default function AddAPIKeyGeneral() {
 																		{...field}
 																	/>
 																</FormControl>
-																<FormMessage>{form.formState.errors.endpoint?.message}</FormMessage>
+																<FormMessage>
+																	{form.formState.errors.general?.endpoint?.message}
+																</FormMessage>
 															</FormItem>
 														)}
 													/>
@@ -182,9 +185,9 @@ export default function AddAPIKeyGeneral() {
 			/>
 			<FormField
 				control={form.control}
-				name='expiryDate'
+				name='general.expiryDate'
 				render={({ field }) => (
-					<FormItem className='flex flex-col'>
+					<FormItem className='flex flex-col !pb-0'>
 						<FormLabel>{t('version.api_key.expire_date')}</FormLabel>
 						<DatePicker
 							mode='single'
@@ -197,9 +200,6 @@ export default function AddAPIKeyGeneral() {
 					</FormItem>
 				)}
 			/>
-			<div className='flex justify-end border-none !pt-0'>
-				<Button size='lg'>{t('general.save')}</Button>
-			</div>
 		</motion.div>
 	);
 }

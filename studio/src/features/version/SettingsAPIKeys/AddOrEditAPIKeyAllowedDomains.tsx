@@ -11,16 +11,17 @@ import { Schema } from '@/features/version/SettingsAPIKeys';
 import { RadioGroup, RadioGroupItem } from 'components/RadioGroup';
 import { AUTHORIZATION_OPTIONS } from '@/constants';
 
-export default function AddAPIKeyAllowedIPs() {
+export default function AddAPIKeyGeneral() {
 	const { t } = useTranslation();
 	const form = useFormContext<z.infer<typeof Schema>>();
+
 	const { fields, append, remove } = useFieldArray({
 		control: form.control,
-		name: 'ip.list',
+		name: 'domain.list',
 	});
 
-	const hasAtLestOneError = !!form.formState.errors.ip?.message;
-	const atLestOneError = form.formState.errors.ip?.message as string;
+	const hasAtLestOneError = !!form.formState.errors.domain?.message;
+	const atLestOneError = form.formState.errors.domain?.message as string;
 
 	return (
 		<motion.div
@@ -31,10 +32,10 @@ export default function AddAPIKeyAllowedIPs() {
 		>
 			<FormField
 				control={form.control}
-				name='ip.type'
+				name='domain.type'
 				render={({ field }) => (
 					<FormItem className='flex-1'>
-						<FormLabel>{t('version.api_key.authorized_ips')}</FormLabel>
+						<FormLabel>{t('version.api_key.authorized_domains')}</FormLabel>
 						<FormControl>
 							<RadioGroup
 								onValueChange={field.onChange}
@@ -47,8 +48,8 @@ export default function AddAPIKeyAllowedIPs() {
 											<RadioGroupItem value={item} />
 										</FormControl>
 										<FormLabel className='select-none cursor-pointer'>
-											<p className='text-default'>{t(`version.api_key.${item}_ips`)}</p>
-											<p className='text-subtle'>{t(`version.api_key.${item}_ips_desc`)}</p>
+											<p className='text-default'>{t(`version.api_key.${item}_domains`)}</p>
+											<p className='text-subtle'>{t(`version.api_key.${item}_domains_desc`)}</p>
 										</FormLabel>
 									</FormItem>
 								))}
@@ -58,28 +59,28 @@ export default function AddAPIKeyAllowedIPs() {
 				)}
 			/>
 			<div className='flex flex-col gap-2'>
-				{form.getValues('ip.type') === 'specified' &&
+				{form.getValues('domain.type') === 'specified' &&
 					fields.map((field, index) => {
 						const last = index === fields.length - 1;
 						return (
 							<div className='flex gap-2' key={field.id}>
 								<FormField
 									control={form.control}
-									name={`ip.list.${index}.ip`}
+									name={`domain.list.${index}.domain`}
 									render={({ field }) => {
 										return (
 											<FormItem className='flex-1'>
-												{index === 0 && <FormLabel>{t('general.IP')}</FormLabel>}
+												{index === 0 && <FormLabel>{t('general.domain')}</FormLabel>}
 												<FormControl>
 													<Input
 														placeholder={
 															t('forms.placeholder', {
-																label: t('general.IP'),
+																label: t('general.domain'),
 															}) ?? ''
 														}
 														error={
 															(last && hasAtLestOneError) ||
-															!!form.formState.errors.ip?.list?.[index]?.ip
+															!!form.formState.errors.domain?.list?.[index]?.domain
 														}
 														{...field}
 													/>
@@ -101,11 +102,11 @@ export default function AddAPIKeyAllowedIPs() {
 									className={cn(
 										fields.length === 1 && !isEmpty(atLestOneError)
 											? 'self-center mt-2'
-											: index === 0 && !isEmpty(form.formState.errors.ip?.list?.[index])
+											: index === 0 && !isEmpty(form.formState.errors?.domain?.list?.[index])
 											? 'self-center mt-2'
 											: index === 0 && 'self-end',
 										index !== 0 &&
-											!isEmpty(form.formState.errors.ip?.list?.[index]) &&
+											!isEmpty(form.formState.errors.domain?.list?.[index]) &&
 											'self-start',
 									)}
 									onClick={() => {
@@ -118,17 +119,20 @@ export default function AddAPIKeyAllowedIPs() {
 						);
 					})}
 			</div>
-			{form.getValues('ip.type') === 'specified' && (
-				<Button
-					type='button'
-					variant='text'
-					onClick={() => {
-						append({ ip: '' });
-					}}
-				>
-					<Plus size={16} />
-					<span className='ml-2'>Add Another One</span>
-				</Button>
+
+			{form.getValues('domain.type') === 'specified' && (
+				<div>
+					<Button
+						type='button'
+						variant='text'
+						onClick={() => {
+							append({ domain: '' });
+						}}
+					>
+						<Plus size={16} />
+						<span className='ml-2'>Add Another One</span>
+					</Button>
+				</div>
 			)}
 		</motion.div>
 	);

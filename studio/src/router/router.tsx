@@ -53,7 +53,6 @@ const paths = {
 			rateLimits: `${versionPath}/settings/VersionSettingsRateLimits.tsx`,
 			realTime: `${versionPath}/settings/VersionSettingsRealTime.tsx`,
 			npmPackages: `${versionPath}/settings/VersionSettingsNPMPackages.tsx`,
-			other: `${versionPath}/settings/VersionSettingsOther.tsx`,
 		},
 	},
 	profileSettings: {
@@ -222,10 +221,6 @@ const router = createBrowserRouter([
 							{
 								path: 'real-time',
 								lazy: () => lazyRouteImport(paths.version.settings.realTime),
-							},
-							{
-								path: 'other',
-								lazy: () => lazyRouteImport(paths.version.settings.other),
 							},
 						],
 					},

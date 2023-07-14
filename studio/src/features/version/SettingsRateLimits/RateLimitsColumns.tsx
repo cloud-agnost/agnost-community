@@ -1,4 +1,3 @@
-import { ColumnDef } from '@tanstack/react-table';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { translate } from '@/utils';
@@ -8,11 +7,11 @@ import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 import { Button } from 'components/Button';
 import { Trash } from '@phosphor-icons/react';
-import { RateLimit } from '@/types';
+import { ColumnDefWithClassName, RateLimit } from '@/types';
 import { Pencil } from 'components/icons';
 import useVersionStore from '@/store/version/versionStore.ts';
 
-const RateLimitsColumns: ColumnDef<RateLimit>[] = [
+const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 	{
 		id: 'select',
 		header: ({ table }) => (
@@ -118,7 +117,7 @@ const RateLimitsColumns: ColumnDef<RateLimit>[] = [
 	},
 	{
 		id: 'actions',
-		size: 45,
+		className: 'actions',
 		cell: ({ row: { original } }) => {
 			const { version, setEditRateLimitDrawerIsOpen, setRateLimit, deleteRateLimit } =
 				useVersionStore.getState();
@@ -137,7 +136,7 @@ const RateLimitsColumns: ColumnDef<RateLimit>[] = [
 			}
 
 			return (
-				<div className='flex items-center justify-end gap-0.5'>
+				<div className='flex items-center gap-0.5'>
 					<Button
 						variant='blank'
 						onClick={editHandler}

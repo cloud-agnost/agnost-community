@@ -9,6 +9,7 @@ import {
 	EditOrAddVariableDrawer,
 	VariableColumns,
 } from '@/features/version/SettingsEnvironmentVariables';
+import { EmptyState } from 'components/EmptyState';
 
 interface SettingsEnvironmentVariablesProps {
 	selectedRows: Row<Param>[] | undefined;
@@ -24,14 +25,20 @@ export default function SettingsEnvironmentVariables({
 
 	return (
 		<>
-			<div className='data-table-container'>
-				<DataTable<Param>
-					columns={VariableColumns}
-					data={variables}
-					setSelectedRows={setSelectedRows}
-					noDataMessage={<p className='text-xl'>{t('version.variable.no_variable_found')}</p>}
-				/>
-			</div>
+			{variables.length === 0 ? (
+				<div className='h-full flex items-center justify-center'>
+					<EmptyState title={t('version.variable.no_variable_found')} />
+				</div>
+			) : (
+				<div className='data-table-container'>
+					<DataTable<Param>
+						columns={VariableColumns}
+						data={variables}
+						setSelectedRows={setSelectedRows}
+						noDataMessage={<p className='text-xl'>{t('version.variable.no_variable_found')}</p>}
+					/>
+				</div>
+			)}
 			<EditOrAddVariableDrawer
 				open={editParamDrawerIsOpen}
 				editMode

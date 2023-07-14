@@ -26,7 +26,9 @@
 		"error": "Please enter a valid email address"
 	},
 	"url": {
-		"error": "Please enter a valid url"
+		"error": "Please enter a valid URL",
+		"without_http_error": "URL must start with http:// or https://",
+		"without_path_error": "Please enter a valid URL without path"
 	},
 	"IP": {
 		"error": "Please enter a valid IP address"

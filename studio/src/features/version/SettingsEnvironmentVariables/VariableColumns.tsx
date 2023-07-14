@@ -1,4 +1,3 @@
-import { ColumnDef } from '@tanstack/react-table';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { translate } from '@/utils';
@@ -9,10 +8,10 @@ import useVersionStore from '@/store/version/versionStore.ts';
 import { TableConfirmation } from 'components/Table';
 import { Button } from 'components/Button';
 import { Trash } from '@phosphor-icons/react';
-import { Param } from '@/types';
+import { ColumnDefWithClassName, Param } from '@/types';
 import { Pencil } from 'components/icons';
 
-const VariableColumns: ColumnDef<Param>[] = [
+const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	{
 		id: 'select',
 		header: ({ table }) => (
@@ -113,7 +112,7 @@ const VariableColumns: ColumnDef<Param>[] = [
 	},
 	{
 		id: 'actions',
-		size: 45,
+		className: 'actions',
 		cell: ({ row: { original } }) => {
 			const { version, deleteParam, setParam, setEditParamDrawerIsOpen } =
 				useVersionStore.getState();
@@ -132,7 +131,7 @@ const VariableColumns: ColumnDef<Param>[] = [
 				setEditParamDrawerIsOpen(true);
 			}
 			return (
-				<div className='flex items-center justify-end gap-0.5'>
+				<div className='flex items-center gap-0.5'>
 					<Button
 						variant='blank'
 						onClick={editHandler}

@@ -10,7 +10,6 @@ import {
 	Connect,
 	Database as DatabaseIcon,
 	DeviceMobile,
-	DoubleGear,
 	Environment,
 	EnvironmentVariable,
 	LightBulb,
@@ -338,12 +337,6 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 		title: translate('version.settings.real_time'),
 		path: 'real-time',
 		icon: RealTime,
-	},
-	{
-		id: 10,
-		title: translate('version.settings.other'),
-		path: 'other',
-		icon: DoubleGear,
 	},
 ];
 
