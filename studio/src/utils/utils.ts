@@ -92,3 +92,30 @@ export function notify(params: ToastType) {
 export function arrayToQueryString(array: string[], key: string) {
 	return array.map((item) => `${key}=${item}`).join('&');
 }
+
+export async function copy(text: string) {
+	try {
+		await navigator.clipboard.writeText(text);
+		notify({
+			title: translate('general.success'),
+			description: translate('general.copied'),
+			type: 'success',
+		});
+	} catch (e) {
+		notify({
+			title: translate('general.error'),
+			description: translate('general.copied_error'),
+			type: 'error',
+		});
+	}
+}
+
+export function reverseArray<T>(arr: T[]) {
+	const reversedArray: T[] = [];
+
+	for (let i = arr.length - 1; i >= 0; i--) {
+		reversedArray.push(arr[i]);
+	}
+
+	return reversedArray;
+}

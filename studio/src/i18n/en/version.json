@@ -20,6 +20,7 @@
 	"duplicate_tab": "Duplicate selected tab",
 	"suspend_services": "Suspend services",
 	"suspend": "Suspend",
+	"create_copy_of_version": "Create a Copy of Version",
 	"suspended_successfully": "Environment suspended successfully",
 	"reactivated_successfully": "Environment activated successfully",
 	"environment_id": "Environment ID",
@@ -37,11 +38,12 @@
 	"logs": "Deployment Logs",
 	"open_version": "Open Version",
 	"create_a_copy": "Create a Copy",
+	"copied": "Version copied successfully",
 	"merge": "Merge",
 	"export": "Export",
 	"import": "Import",
-	"mark_read_only": "Mark Read Only",
-	"mark_read_write": "Mark Read/Write",
+	"mark_read_only": "Mark as Read Only",
+	"mark_read_write": "Mark as Read/Write",
 	"set_private": "Set Private",
 	"set_public": "Set Public",
 	"delete": "Delete",
@@ -51,6 +53,10 @@
 	"add_rate_limiter": "Add Rate Limiter",
 	"add_new_limiter": "Add New Limiter",
 	"rate_limiter": "Rate Limiter {{count}}",
+	"no_rate_limiters": "No rate limiters",
+	"delete_rate_limiter_title": "Delete Rate Limiter",
+	"rate_limiter_updated": "Rate limiter updated successfully",
+	"delete_rate_limiter_message": "Are you sure you want to delete this rate limiter?, This action cannot be undo.",
 	"settings": {
 		"default": "Settings",
 		"general": "General",
@@ -107,15 +113,93 @@
 		}
 	},
 	"default_limiter_deleted": "Default rate limiter deleted successfully",
+	"limiter_deleted": "Rate limiter(s) deleted successfully",
 	"limiter_added_to_default": "Rate limiter added to default rate limiters",
+	"edit_rate_limiter": "Edit Rate Limiter",
+	"handler_code": "Handler Code",
 	"middleware": {
+		"default": "Middlewares",
 		"name": "Middleware Name",
 		"add_middleware": "Add Middleware",
 		"add": {
 			"success": "Middleware added successfully"
 		},
+		"edit": {
+			"default": "Edit Middleware",
+			"success": "Middleware updated successfully"
+		},
 		"delete": {
 			"success": "Middleware(s) deleted successfully"
-		}
+		},
+		"no_middleware_found": "No middleware found"
+	},
+	"npm": {
+		"install": "Install Packages",
+		"add": "Install",
+		"name": "Package Name",
+		"no_packages": "No packages found",
+		"success": "Package installed successfully",
+		"deleted": "Package(s) deleted successfully",
+		"already_installed": "installed",
+		"delete_modal_title": "Delete Package",
+		"delete_modal_desc": "Are you sure you want to delete this package? This action cannot be undo.",
+		"no_package_found": "No package found"
+	},
+	"variable": {
+		"add": "Add Variable",
+		"edit": "Edit Variable",
+		"success": "Variable added successfully",
+		"deleted": "Variable(s) deleted successfully",
+		"update_success": "Variable updated successfully",
+		"no_variable_found": "No variable found",
+		"delete_modal_title": "Delete Variable",
+		"delete_modal_desc": "Are you sure you want to delete this variable? This action cannot be undo."
+	},
+	"api_key": {
+		"expire_date": "Expire Date",
+		"expire_date_desc": "Expiration date of API key. For keys without any expiration leave it empty or clear existing value.",
+		"name": "Key Name",
+		"all_domains": "All Domains",
+		"all_domains_desc": "Can be called from any domain",
+		"all_ips": "All IPs",
+		"all_ips_desc": "Can be called from any IP address",
+		"specified_domains": "Only Authorized Domains",
+		"specified_domains_desc": "Agnost can limit calls to \"Authorized Domains\" for application protection.",
+		"specified_ips": "Only Authorized Ips",
+		"specified_ips_desc": "Agnost can limit calls to \"Authorized IPs\" for application protection.",
+		"allowed_endpoints": "Allowed Endpoints",
+		"exclude_endpoints": "Exclude Endpoints",
+		"allowed": "Allowed",
+		"not_allowed": "Not Allowed",
+		"realtime_allowed": "Realtime Allowed",
+		"allowed_domains": "Allowed Domains",
+		"authorized_ips": "Authorized IPs",
+		"authorized_ips_desc": "IPs that are allowed to use this API key. Leave blank to allow all IPs.",
+		"authorized_domains": "Authorized Domains",
+		"allowed_ips": "Allowed IPs",
+		"add": "Add API Key",
+		"edit": "Edit API Key",
+		"success": "API Key added successfully",
+		"deleted": "API Key(s) deleted successfully",
+		"update_success": "API Key updated successfully",
+		"no_api_key_found": "No API Key found",
+		"delete_modal_title": "Delete API Key",
+		"delete_modal_desc": "Are you sure you want to delete this API Key? This action cannot be undo.",
+		"allow_realtime": "Allow Realtime",
+		"allow_realtime_desc": "This API key can be used the font end clients to access realtime services (e.g., sending and receiving messages to and from channels)",
+		"endpoint_access": "Endpoint Access",
+
+		"endpoint_access_no_access": "No Access",
+		"endpoint_access_no_access_desc": "The API key cannot be used to call application endpoints",
+
+		"endpoint_access_full_access": "Full Access",
+		"endpoint_access_full_access_desc": "API key can be used with all HTTP methods to view, create, update and delete data",
+
+		"endpoint_access_custom_allowed": "Custom allowed endpoints",
+		"endpoint_access_custom_allowed_desc": "API key can only be used with below allowed endpoints only",
+
+		"endpoint_access_custom_excluded": "Custom exclude endpoints",
+		"endpoint_access_custom_excluded_desc": "API key cannot be used with below excluded endpoints but with all others not selected"
+
 	}
 }

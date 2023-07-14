@@ -15,7 +15,6 @@ import {
 	LightBulb,
 	LineSegments,
 	MessageQueue,
-	Middleware,
 	MongoDb,
 	MySql,
 	NpmPackage,
@@ -29,10 +28,13 @@ import {
 } from '@/components/icons';
 import { ConnectDatabase, CreateDatabase, SelectResourceType } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
+import useVersionStore from '@/store/version/versionStore.ts';
 import { Application, Instance, SortOption, Tab } from '@/types';
-import { translate } from '@/utils';
+import { history, translate } from '@/utils';
 import { DeviceTablet, FileText, GearSix, Plus } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
+import { DropdownMenuSeparator } from 'components/Dropdown';
+import { Fragment } from 'react';
 
 export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
@@ -245,6 +247,10 @@ export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 		path: 'cron-job',
 	},
 	{
+		title: translate('version.middleware.default'),
+		path: 'middleware',
+	},
+	{
 		title: translate('version.settings.default'),
 		path: 'settings',
 	},
@@ -294,12 +300,6 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 		title: translate('version.settings.environment'),
 		path: 'environment',
 		icon: Environment,
-	},
-	{
-		id: 3,
-		title: translate('version.settings.middlewares'),
-		path: 'middlewares',
-		icon: Middleware,
 	},
 	{
 		id: 4,
@@ -451,5 +451,144 @@ export const CREATE_RESOURCES_ELEMENTS = [
 		name: translate('version.databases'),
 		type: translate('resources.connect_existing'),
 		CurrentResourceElement: ConnectDatabase,
+	},
+];
+
+export const VERSION_DROPDOWN_ITEM = [
+	{
+		title: () => translate('version.open_version'),
+		active: () => false,
+		action: () => {
+			const { application, openVersionDrawer } = useApplicationStore.getState();
+			if (!application) return;
+			openVersionDrawer(application);
+		},
+		disabled: false,
+		after: Fragment,
+	},
+	{
+		title: () => translate('version.create_a_copy'),
+		active: () => false,
+		action: async () => {
+			useVersionStore.getState().setCreateCopyVersionDrawerIsOpen(true);
+		},
+		after: Fragment,
+		disabled: false,
+	},
+	{
+		title: () => translate('version.merge'),
+		active: () => false,
+		action: () => {
+			// TODO: implement
+		},
+		disabled: true,
+		after: DropdownMenuSeparator,
+	},
+	{
+		title: () => translate('version.export'),
+		active: () => false,
+		action: () => {
+			// TODO: implement
+		},
+		disabled: true,
+		after: Fragment,
+	},
+	{
+		title: () => translate('version.import'),
+		active: () => false,
+		action: () => {
+			// TODO: implement
+		},
+		disabled: true,
+		after: DropdownMenuSeparator,
+	},
+	{
+		title: () =>
+			useVersionStore.getState().version?.readOnly
+				? translate('version.mark_read_write')
+				: translate('version.mark_read_only'),
+		active: () => false,
+		action: () => {
+			const { updateVersionProperties, version } = useVersionStore.getState();
+			if (!version) return;
+			updateVersionProperties({
+				orgId: version.orgId,
+				versionId: version._id,
+				appId: version.appId,
+				readOnly: !version?.readOnly,
+			});
+		},
+		after: Fragment,
+		disabled: false,
+	},
+	{
+		title: () =>
+			useVersionStore.getState().version?.private
+				? translate('version.set_public')
+				: translate('version.set_private'),
+		active: () => false,
+		action: () => {
+			const { updateVersionProperties, version } = useVersionStore.getState();
+			if (!version) return;
+			updateVersionProperties({
+				orgId: version.orgId,
+				versionId: version._id,
+				appId: version.appId,
+				private: !version?.private,
+			});
+		},
+		after: Fragment,
+		disabled: useVersionStore.getState().version?.master,
+	},
+	{
+		title: () => translate('version.settings.default'),
+		active: () =>
+			history.location?.pathname ===
+			`${useVersionStore.getState().getVersionDashboardPath()}/settings`,
+		action: () => {
+			const versionHomePath = useVersionStore.getState().getVersionDashboardPath('/settings');
+			history.navigate?.(versionHomePath);
+		},
+		disabled: false,
+		after: DropdownMenuSeparator,
+	},
+	{
+		title: () => translate('version.delete'),
+		active: () => false,
+		after: Fragment,
+		action: () => {
+			// TODO: implement
+		},
+		disabled: false,
+	},
+];
+
+/**
+ * @type APIKeyTypes
+ */
+export const ENDPOINT_ACCESS_PROPERTIES = [
+	'no-access',
+	'full-access',
+	'custom-allowed',
+	'custom-excluded',
+] as const;
+
+/**
+ * @type AllAndSpecified
+ */
+export const AUTHORIZATION_OPTIONS = ['all', 'specified'] as const;
+
+export const ADD_API_KEYS_MENU_ITEMS = [
+	{
+		name: translate('application.edit.general'),
+		href: '?t=general',
+	},
+	{
+		name: translate('version.api_key.allowed_domains'),
+		href: '?t=allowed-domains',
+	},
+	{
+		name: translate('version.api_key.allowed_ips'),
+		href: '?t=allowed-ips',
 	},
 ];

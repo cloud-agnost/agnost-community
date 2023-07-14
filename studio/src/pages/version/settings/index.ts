@@ -1,7 +1,6 @@
 export { default as VersionSettings } from './VersionSettings.tsx';
 export { default as VersionSettingsGeneral } from './VersionSettingsGeneral.tsx';
 export { default as VersionSettingsEnvironment } from './VersionSettingsEnvironment.tsx';
-export { default as VersionSettingsMiddlewares } from './VersionSettingsMiddlewares.tsx';
 export { default as VersionSettingsNPMPackages } from './VersionSettingsNPMPackages.tsx';
 export { default as VersionSettingsEnvironmentVariables } from './VersionSettingsEnvironmentVariables.tsx';
 export { default as VersionSettingsRateLimits } from './VersionSettingsRateLimits.tsx';

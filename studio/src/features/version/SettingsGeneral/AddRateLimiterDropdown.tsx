@@ -14,7 +14,7 @@ import { APIError, RateLimit } from '@/types';
 import { useParams } from 'react-router-dom';
 import { useToast } from '@/hooks';
 import { useState } from 'react';
-import { AddEndpointRateLimiterDrawer } from '@/features/version/SettingsGeneral/index.ts';
+import { EditOrAddEndpointRateLimiterDrawer } from '@/features/version/SettingsGeneral';
 
 export default function AddRateLimiterDropdown() {
 	const rateLimits = useVersionStore((state) => state.version?.limits);
@@ -104,7 +104,8 @@ export default function AddRateLimiterDropdown() {
 				</DropdownMenuContent>
 			</DropdownMenu>
 			{/* The key for reset the state of the component */}
-			<AddEndpointRateLimiterDrawer
+			<EditOrAddEndpointRateLimiterDrawer
+				addToDefault
 				key={addRateLimitDrawerIsOpen.toString()}
 				open={addRateLimitDrawerIsOpen}
 				onOpenChange={setAddRateLimitDrawerIsOpen}

@@ -270,6 +270,12 @@
 	.main {
 		height: calc(100vh - 72px);
 	}
+	.editor {
+		.overflow-guard,
+		.monaco-editor {
+			border-radius: 8px !important;
+		}
+	}
 }
 
 @layer utilities {
@@ -319,4 +325,28 @@
 .Toastify__close-button > svg {
 	width: 1.25rem;
 	height: 1.25rem;
+}
+
+.select-box {
+	@apply min-h-[34px] h-9;
+
+	.select__placeholder,
+	.select__input-container {
+		padding: 0 !important;
+	}
+	.select__value-container {
+		padding-inline: 12px !important;
+	}
+	.select__control {
+		@apply shadow-none hover:border-input-hover min-h-[34px] h-9 #{!important};
+	}
+	&:focus-within {
+		.select__control {
+			@apply border-input-focus outline-none ring-0 #{!important};
+		}
+	}
+
+	&.error:not(:focus-within) .select__control {
+		@apply border-error-default #{!important};
+	}
 }

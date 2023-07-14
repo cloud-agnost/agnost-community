@@ -1,3 +1,4 @@
+import { OrgResources } from '@/features/resources';
 import {
 	ChangePasswordWithToken,
 	CompleteAccountSetup,
@@ -24,6 +25,11 @@ import {
 	OrganizationSelect,
 } from '@/pages/organization';
 import {
+	OrganizationSettings,
+	OrganizationSettingsGeneral,
+	OrganizationSettingsMembers,
+} from '@/pages/organization/';
+import {
 	ProfileSettings,
 	ProfileSettingsClusterManagement,
 	ProfileSettingsGeneral,
@@ -31,10 +37,6 @@ import {
 } from '@/pages/profile';
 import { RedirectHandle } from '@/pages/redirect-handle';
 import { Root } from '@/pages/root';
-import useAuthStore from '@/store/auth/authStore.ts';
-import useClusterStore from '@/store/cluster/clusterStore.ts';
-import type { ReactNode } from 'react';
-import { Navigate, createBrowserRouter, useLocation } from 'react-router-dom';
 import {
 	Version,
 	VersionCache,
@@ -44,24 +46,22 @@ import {
 	VersionEndpoint,
 	VersionMessageQueue,
 	VersionSettings,
-	VersionSettingsGeneral,
-	VersionStorage,
-	VersionSettingsNPMPackages,
-	VersionSettingsEnvironment,
-	VersionSettingsMiddlewares,
-	VersionSettingsEnvironmentVariables,
-	VersionSettingsRateLimits,
-	VersionSettingsAuthentications,
 	VersionSettingsAPIKeys,
-	VersionSettingsRealTime,
+	VersionSettingsAuthentications,
+	VersionSettingsEnvironment,
+	VersionSettingsEnvironmentVariables,
+	VersionSettingsGeneral,
+	VersionSettingsNPMPackages,
 	VersionSettingsOther,
+	VersionSettingsRateLimits,
+	VersionSettingsRealTime,
+	VersionStorage,
 } from '@/pages/version';
-import {
-	OrganizationSettings,
-	OrganizationSettingsGeneral,
-	OrganizationSettingsMembers,
-} from '@/pages/organization/';
-import { OrgResources } from '@/features/resources';
+import VersionMiddlewares from '@/pages/version/VersionMiddlewares.tsx';
+import useAuthStore from '@/store/auth/authStore.ts';
+import useClusterStore from '@/store/cluster/clusterStore.ts';
+import type { ReactNode } from 'react';
+import { Navigate, createBrowserRouter, useLocation } from 'react-router-dom';
 const router = createBrowserRouter([
 	{
 		path: '/',
@@ -221,6 +221,10 @@ const router = createBrowserRouter([
 						element: <VersionStorage />,
 					},
 					{
+						path: 'middleware',
+						element: <VersionMiddlewares />,
+					},
+					{
 						path: 'cache',
 						element: <VersionCache />,
 					},
@@ -243,11 +247,6 @@ const router = createBrowserRouter([
 							{
 								path: 'environment',
 								element: <VersionSettingsEnvironment />,
-							},
-							{
-								path: 'middlewares',
-								loader: VersionSettingsMiddlewares.loader,
-								element: <VersionSettingsMiddlewares />,
 							},
 							{
 								path: 'npm-packages',

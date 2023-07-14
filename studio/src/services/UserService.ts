@@ -1,5 +1,5 @@
 import { axios } from '@/helpers';
-import { UpdateNotificationsData, User } from '@/types/type.ts';
+import { UpdateNotificationData, User } from '@/types/type.ts';
 
 export default class UserService {
 	static url = '/v1/user';
@@ -67,7 +67,7 @@ export default class UserService {
 		return (await axios.delete(`${this.url}`)).data;
 	}
 
-	static async updateNotifications(data: UpdateNotificationsData): Promise<User> {
+	static async updateNotifications(data: UpdateNotificationData): Promise<User> {
 		return (await axios.put(`${this.url}/notifications`, data)).data;
 	}
 }

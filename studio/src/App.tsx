@@ -5,7 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { router } from '@/router';
 import { useEffect } from 'react';
-import useTypeStore from './store/types/typeStore';
+import useTypeStore from '@/store/types/typeStore.ts';
 
 function App() {
 	useRenewToken(2);

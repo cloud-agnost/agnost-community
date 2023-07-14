@@ -1,9 +1,31 @@
 import { BaseGetRequest, User } from './type';
 
+export interface APIKey {
+	expiryDate?: string;
+	updatedBy?: string;
+	name: string;
+	key: string;
+	allowRealtime: true;
+	type: APIKeyTypes;
+	allowedEndpoints: string[];
+	excludedEndpoints: string[];
+	domainAuthorization: AllAndSpecified;
+	authorizedDomains: string[];
+	IPAuthorization: AllAndSpecified;
+	authorizedIPs: string[];
+	createdBy: string;
+	_id: string;
+	createdAt: string;
+	updatedAt: string;
+}
+export type APIKeyTypes = 'no-access' | 'full-access' | 'custom-allowed' | 'custom-excluded';
+export type AllAndSpecified = 'all' | 'specified';
+
 export interface RateLimit {
 	_id: string;
 	iid: string;
 	createdBy: string | User;
+	updatedBy: string | User;
 	createdAt: string;
 	updatedAt: string;
 	name: string;
@@ -49,13 +71,33 @@ export interface Version {
 	};
 	createdBy: User;
 	_id: string;
-	params: [];
+	params: Param[];
 	limits: RateLimit[];
-	apiKeys: [];
-	npmPackages: [];
+	apiKeys: APIKey[];
+	npmPackages: NPMPackage[];
 	createdAt: string;
 	updatedAt: string;
 	__v: number;
+}
+
+export interface Param {
+	name: string;
+	value: string;
+	createdBy: string;
+	updatedBy?: string;
+	_id: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface NPMPackage {
+	name: string;
+	version: string;
+	description: string;
+	createdBy: string;
+	_id: string;
+	createdAt: string;
+	updatedAt: string;
 }
 
 export interface GetVersionRequest extends BaseGetRequest {
@@ -87,6 +129,11 @@ export type CreateRateLimitParams = VersionParamsWithoutEnvId & {
 export type DeleteRateLimitParams = VersionParamsWithoutEnvId & {
 	limitId: string;
 };
+
+export type DeleteMultipleRateLimitsParams = VersionParamsWithoutEnvId & {
+	limitIds: string[];
+};
+
 export type VersionProperties = {
 	name: string;
 	private: boolean;
@@ -95,3 +142,76 @@ export type VersionProperties = {
 };
 
 export type UpdateVersionPropertiesParams = VersionParamsWithoutEnvId & VersionProperties;
+
+export type SearchNPMPackagesParams = VersionParamsWithoutEnvId & {
+	page: number;
+	size: number;
+	package: string;
+	sortBy?: string;
+};
+
+export type AddNPMPackageParams = VersionParamsWithoutEnvId & {
+	name: string;
+	version: string;
+	description: string;
+};
+
+export type DeleteNPMPackageParams = VersionParamsWithoutEnvId & {
+	packageId: string;
+};
+
+export type DeleteMultipleNPMPackagesParams = VersionParamsWithoutEnvId & {
+	packageIds: string[];
+};
+
+export type DeleteVersionVariableParams = VersionParamsWithoutEnvId & {
+	paramId: string;
+};
+
+export type DeleteMultipleVersionVariablesParams = VersionParamsWithoutEnvId & {
+	paramIds: string[];
+};
+
+export type AddVersionVariableParams = VersionParamsWithoutEnvId & {
+	name: string;
+	value: string;
+};
+
+export type UpdateVersionVariableParams = AddVersionVariableParams & {
+	paramId: string;
+};
+
+export type CreateCopyOfVersionParams = Omit<VersionParamsWithoutEnvId, 'versionId'> & {
+	name: string;
+	private: boolean;
+	readOnly: boolean;
+	parentVersionId: string;
+};
+
+export type EditRateLimitParams = CreateRateLimitParams & {
+	limitId: string;
+};
+
+export type CreateAPIKeyParams = VersionParamsWithoutEnvId & {
+	name: string;
+	allowRealtime: boolean;
+	type: APIKeyTypes;
+	domainAuthorization: AllAndSpecified;
+	IPAuthorization: AllAndSpecified;
+	expiryDate?: Date;
+	excludedEndpoints?: string[];
+	allowedEndpoints?: string[];
+	authorizedDomains?: string[];
+	authorizedIPs?: string[];
+};
+
+export type UpdateAPIKeyParams = VersionParamsWithoutEnvId &
+	CreateAPIKeyParams & {
+		keyId: string;
+	};
+export type DeleteAPIKeyParams = VersionParamsWithoutEnvId & {
+	keyId: string;
+};
+export type DeleteMultipleAPIKeys = VersionParamsWithoutEnvId & {
+	keyIds: string[];
+};

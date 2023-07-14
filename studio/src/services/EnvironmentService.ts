@@ -3,6 +3,8 @@ import {
 	Environment,
 	getAppVersionEnvironmentParams,
 	GetEnvironmentLogsParams,
+	GetEnvironmentResourcesParams,
+	Resource,
 	ToggleAutoDeployParams,
 	UpdateEnvironmentTelemetryLogsParams,
 	VersionParams,
@@ -98,6 +100,19 @@ export default class EnvironmentService {
 			await axios.post(
 				`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/log/${logId}`,
 				{},
+			)
+		).data;
+	}
+
+	static async getEnvironmentResources({
+		orgId,
+		appId,
+		versionId,
+		envId,
+	}: GetEnvironmentResourcesParams): Promise<Resource[]> {
+		return (
+			await axios.get(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/resources`,
 			)
 		).data;
 	}

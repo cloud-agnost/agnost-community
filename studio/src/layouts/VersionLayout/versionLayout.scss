@@ -4,4 +4,8 @@
 
 .version-layout {
 	@apply p-6 full-height-without-header;
+
+	&.middleware {
+		@apply p-0;
+	}
 }

@@ -5,6 +5,8 @@ import {
 	Environment,
 	getAppVersionEnvironmentParams,
 	GetEnvironmentLogsParams,
+	GetEnvironmentResourcesParams,
+	Resource,
 	ToggleAutoDeployParams,
 	UpdateEnvironmentTelemetryLogsParams,
 	VersionParams,
@@ -15,6 +17,7 @@ import { notify, translate } from '@/utils';
 interface EnvironmentStore {
 	environments: Environment[];
 	environment: Environment | null;
+	resources: Resource[];
 	getAppVersionEnvironment: (params: getAppVersionEnvironmentParams) => Promise<Environment>;
 	getEnvironmentLogs: (params: GetEnvironmentLogsParams) => Promise<any>;
 	toggleAutoDeploy: (params: ToggleAutoDeployParams) => Promise<Environment>;
@@ -22,6 +25,7 @@ interface EnvironmentStore {
 	activateEnvironment: (params: VersionParams) => Promise<any>;
 	redeployAppVersionToEnvironment: (params: VersionParams) => Promise<any>;
 	updateEnvironmentTelemetryLogs: (params: UpdateEnvironmentTelemetryLogsParams) => Promise<any>;
+	getEnvironmentResources: (params: GetEnvironmentResourcesParams) => Promise<Resource[]>;
 }
 
 const useEnvironmentStore = create<EnvironmentStore>()(
@@ -30,6 +34,7 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 			(set) => ({
 				environments: [],
 				environment: null,
+				resources: [],
 				getAppVersionEnvironment: async (params: getAppVersionEnvironmentParams) => {
 					const environment = await EnvironmentService.getAppVersionEnvironment(params);
 					set({ environment });
@@ -110,6 +115,11 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 				},
 				updateEnvironmentTelemetryLogs: (params: UpdateEnvironmentTelemetryLogsParams) => {
 					return EnvironmentService.updateEnvironmentTelemetryLogs(params);
+				},
+				getEnvironmentResources: async (params: GetEnvironmentResourcesParams) => {
+					const resources = await EnvironmentService.getEnvironmentResources(params);
+					set({ resources });
+					return resources;
 				},
 			}),
 			{

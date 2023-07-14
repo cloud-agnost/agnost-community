@@ -11,33 +11,16 @@ import {
 import { Input } from 'components/Input';
 import { Button } from 'components/Button';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
 import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { translate } from '@/utils';
+import { nameSchema } from '@/features/version/Middlewares/formSchema.ts';
 
-const FormSchema = z.object({
-	name: z
-		.string({
-			required_error: translate('forms.required', {
-				label: translate('general.name'),
-			}),
-		})
-		.min(2, translate('forms.min2.error', { label: translate('general.name') }))
-		.max(64, translate('forms.max64.error', { label: translate('general.name') }))
-		.regex(/^[a-zA-Z0-9 ]*$/, {
-			message: translate('forms.alphanumeric', { label: translate('general.name') }),
-		})
-		.trim()
-		.refine(
-			(value) => value.trim().length > 0,
-			translate('forms.required', {
-				label: translate('general.name'),
-			}),
-		),
+const MiddlewareFormSchema = z.object({
+	name: nameSchema,
 });
 
 interface AddMiddlewareDrawerProps {
@@ -51,10 +34,18 @@ export default function AddMiddlewareDrawer({ open, onOpenChange }: AddMiddlewar
 	const { createMiddleware } = useMiddlewareStore();
 	const { orgId, appId, versionId } = useParams();
 
-	const form = useForm<z.infer<typeof FormSchema>>({
-		resolver: zodResolver(FormSchema),
+	useEffect(() => {
+		if (!open) form.reset();
+	}, [open]);
+
+	const form = useForm<z.infer<typeof MiddlewareFormSchema>>({
+		resolver: zodResolver(MiddlewareFormSchema),
+		defaultValues: {
+			name: '',
+		},
 	});
-	async function onSubmit(data: z.infer<typeof FormSchema>) {
+
+	async function onSubmit(data: z.infer<typeof MiddlewareFormSchema>) {
 		if (!orgId || !appId || !versionId) return;
 		setLoading(true);
 		try {

@@ -1,10 +1,6 @@
 import { z } from 'zod';
+import { ColumnDef } from '@tanstack/react-table';
 
-export const APIErrorSchema = z.object({
-	error: z.string(),
-	details: z.string(),
-	code: z.string(),
-});
 export const UserSchema = z.object({
 	iid: z.string(),
 	name: z.string(),
@@ -33,7 +29,17 @@ export const UserSchema = z.object({
 	rt: z.string(),
 });
 
-export type APIError = z.infer<typeof APIErrorSchema>;
+export type APIError = {
+	error: string;
+	details: string;
+	code: string;
+	fields?: {
+		value: string;
+		msg: string;
+		param: string;
+		location: string;
+	}[];
+};
 export type User = z.infer<typeof UserSchema>;
 
 export interface UserDataToRegister {
@@ -88,7 +94,7 @@ export interface ToastType {
 	type: 'success' | 'error';
 }
 
-export interface UpdateNotificationsData {
+export interface UpdateNotificationData {
 	notifications: string[];
 }
 
@@ -237,3 +243,13 @@ export interface Middleware {
 	updatedAt: string;
 	__v: number;
 }
+
+export interface SearchNPMPackages {
+	package: string;
+	version: string;
+	description: string;
+}
+
+export type ColumnDefWithClassName<TData> = ColumnDef<TData> & {
+	className?: string;
+};

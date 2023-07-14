@@ -84,7 +84,10 @@ export default class MiddlewareService {
 		...data
 	}: SaveMiddlewareCodeParams) {
 		return (
-			await axios.put(`${this.url}/${orgId}/app/${appId}/version/${versionId}/mw/${mwId}`, data)
+			await axios.put(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/mw/${mwId}/logic`,
+				data,
+			)
 		).data;
 	}
 }

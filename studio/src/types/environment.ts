@@ -87,3 +87,4 @@ export type GetEnvironmentLogsParams = VersionParams & {
 } & PaginationOptions;
 
 export type getAppVersionEnvironmentParams = Omit<VersionParams, 'envId'>;
+export type GetEnvironmentResourcesParams = VersionParams;

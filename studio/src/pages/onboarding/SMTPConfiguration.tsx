@@ -202,14 +202,18 @@ export default function SMTPConfiguration() {
 						control={form.control}
 						name='useTLS'
 						render={({ field }) => {
-							console.log(field);
 							return (
 								<FormItem className='flex items-center gap-2'>
 									<FormLabel>{t('onboarding.smtp.useTLS')}</FormLabel>
 									<FormControl>
-										{/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-										{/* @ts-ignore */}
-										<Switch className='flex !m-0' {...field} />
+										<Switch
+											className='flex !m-0'
+											onBlur={field.onBlur}
+											ref={field.ref}
+											name={field.name}
+											checked={field.value}
+											onCheckedChange={field.onChange}
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>

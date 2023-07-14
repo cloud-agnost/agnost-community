@@ -1,7 +1,7 @@
 import { cn } from '@/utils';
 import * as React from 'react';
 import './table.scss';
-import { Copy } from '@phosphor-icons/react';
+import { CircleNotch, Copy } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 import { useToast } from '@/hooks';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,22 @@ const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableE
 		</div>
 	),
 );
+
 Table.displayName = 'Table';
+
+const TableLoading = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+	({ className, ...props }, ref) => (
+		<div
+			className={cn('p-2 justify-center flex items-center text-default', className)}
+			ref={ref}
+			{...props}
+		>
+			<CircleNotch size={25} className='loading' />
+		</div>
+	),
+);
+
+TableLoading.displayName = 'TableLoading';
 
 const TableHeader = React.forwardRef<
 	HTMLTableSectionElement,
@@ -116,4 +131,14 @@ const TableCaption = React.forwardRef<
 ));
 TableCaption.displayName = 'TableCaption';
 
-export { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow };
+export {
+	Table,
+	TableLoading,
+	TableBody,
+	TableCaption,
+	TableCell,
+	TableFooter,
+	TableHead,
+	TableHeader,
+	TableRow,
+};

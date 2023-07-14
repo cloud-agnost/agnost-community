@@ -1,67 +1,16 @@
-import './SettingsMiddleware.scss';
-import { Dispatch, SetStateAction } from 'react';
-import { DataTable, SortButton } from 'components/DataTable';
+import { ColumnDef } from '@tanstack/react-table';
 import { Middleware } from '@/types';
-import { useState } from 'react';
-import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
-import { ColumnDef, Row } from '@tanstack/react-table';
-import { useParams } from 'react-router-dom';
 import { Checkbox } from 'components/Checkbox';
+import { SortButton } from 'components/DataTable';
+import { translate } from '@/utils';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
-import { translate } from '@/utils';
+import { DateText } from 'components/DateText';
+import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
 import { Button } from 'components/Button';
 import { Pencil } from 'components/icons';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { DateText } from 'components/DateText';
 
-interface SettingsMiddlewareProps {
-	selectedRows: Row<Middleware>[] | undefined;
-	setSelectedRows: Dispatch<SetStateAction<Row<Middleware>[] | undefined>>;
-}
-
-export default function SettingsMiddleware({ setSelectedRows }: SettingsMiddlewareProps) {
-	const [page, setPage] = useState(0);
-	const { getMiddlewaresOfAppVersion, middlewares } = useMiddlewareStore();
-	const { orgId, appId, versionId } = useParams();
-
-	async function getMiddlewares() {
-		if (!orgId || !appId || !versionId) return;
-
-		await getMiddlewaresOfAppVersion({
-			orgId,
-			appId,
-			versionId,
-			page,
-			size: 15,
-		});
-	}
-
-	function next() {
-		setPage((prevState) => prevState + 1);
-		getMiddlewares();
-	}
-
-	return (
-		<div className='middlewares-data-table'>
-			<InfiniteScroll
-				next={next}
-				hasMore={true}
-				scrollableTarget='setting-container-content'
-				loader={<></>}
-				dataLength={middlewares.length}
-			>
-				<DataTable<Middleware>
-					columns={MiddlewaresColumns}
-					data={middlewares}
-					setSelectedRows={setSelectedRows}
-				/>
-			</InfiniteScroll>
-		</div>
-	);
-}
-
-export const MiddlewaresColumns: ColumnDef<Middleware>[] = [
+const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 	{
 		id: 'select',
 		header: ({ table }) => (
@@ -89,7 +38,6 @@ export const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 		),
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
-		size: 400,
 	},
 	{
 		id: 'createdAt',
@@ -114,7 +62,7 @@ export const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 	{
 		id: 'updatedAt',
 		header: ({ column }) => (
-			<SortButton text={translate('general.created_at').toUpperCase()} column={column} />
+			<SortButton text={translate('general.updated_at').toUpperCase()} column={column} />
 		),
 		accessorKey: 'updatedAt',
 		enableSorting: true,
@@ -125,6 +73,7 @@ export const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 				original: { updatedAt, updatedBy },
 			},
 		}) => {
+			if (!updatedBy) return null;
 			const isMe = useAuthStore.getState().user?._id === updatedBy;
 			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
 			return <DateText date={updatedAt}>{avatar}</DateText>;
@@ -133,10 +82,22 @@ export const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 	{
 		id: 'actions',
 		size: 45,
-		cell: () => {
+		cell: ({ row: { original } }) => {
+			function openEditDrawer() {
+				console.log('openEditDrawer');
+				const { setEditMiddlewareDrawerIsOpen, setMiddleware } = useMiddlewareStore.getState();
+				setEditMiddlewareDrawerIsOpen(true);
+				setMiddleware(original);
+			}
 			return (
 				<div className='flex items-center justify-end'>
-					<Button iconOnly variant='blank' className='text-xl text-icon-base'>
+					<Button
+						onClick={openEditDrawer}
+						iconOnly
+						variant='blank'
+						rounded
+						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
+					>
 						<Pencil />
 					</Button>
 				</div>
@@ -144,3 +105,5 @@ export const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 		},
 	},
 ];
+
+export default MiddlewaresColumns;
