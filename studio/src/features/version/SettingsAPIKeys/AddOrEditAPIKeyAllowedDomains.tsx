@@ -10,6 +10,7 @@ import { Plus, Trash } from '@phosphor-icons/react';
 import { Schema } from '@/features/version/SettingsAPIKeys';
 import { RadioGroup, RadioGroupItem } from 'components/RadioGroup';
 import { AUTHORIZATION_OPTIONS } from '@/constants';
+import { useEffect } from 'react';
 
 export default function AddAPIKeyGeneral() {
 	const { t } = useTranslation();
@@ -19,6 +20,12 @@ export default function AddAPIKeyGeneral() {
 		control: form.control,
 		name: 'domain.list',
 	});
+
+	useEffect(() => {
+		if (form.getValues('domain.type') === 'specified' && isEmpty(fields)) {
+			append({ domain: '' });
+		}
+	}, [form.getValues('domain.type')]);
 
 	const hasAtLestOneError = !!form.formState.errors.domain?.message;
 	const atLestOneError = form.formState.errors.domain?.message as string;

@@ -13,8 +13,12 @@ import {
 import { EndpointService } from '@/services';
 
 interface EndpointStore {
+	selectEndpointDialogOpen: boolean;
+	setSelectEndpointDialogOpen: (open: boolean) => void;
 	endpoints: Endpoint[];
 	endpoint: Endpoint | null;
+	selectedEndpointIds: string[];
+	setSelectedEndpointIds: (ids: string[]) => void;
 	setEndpoints: (endpoints: Endpoint[]) => void;
 	createEndpoint: (endpoint: CreateEndpointParams) => Promise<Endpoint>;
 	getEndpointById: (endpoint: GetEndpointByIdParams) => Promise<Endpoint>;
@@ -29,8 +33,12 @@ const useEndpointStore = create<EndpointStore>()(
 	devtools(
 		persist(
 			(set) => ({
+				selectEndpointDialogOpen: false,
 				endpoints: [],
 				endpoint: null,
+				selectedEndpointIds: [],
+				setSelectedEndpointIds: (ids) => set({ selectedEndpointIds: ids }),
+				setSelectEndpointDialogOpen: (open) => set({ selectEndpointDialogOpen: open }),
 				setEndpoints: (endpoints) => set({ endpoints }),
 				createEndpoint: async (params) => {
 					const endpoint = await EndpointService.createEndpoint(params);

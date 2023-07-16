@@ -27,11 +27,12 @@ interface AddAPIKeyDrawerProps {
 export default function AddOrEditAPIKeyDrawer({
 	open,
 	onOpenChange,
-	editMode,
+	editMode = false,
 }: AddAPIKeyDrawerProps) {
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { createAPIKey, editAPIKey, version, selectedAPIKey } = useVersionStore();
+	const { createAPIKey, editAPIKey, version, selectedAPIKey, setSelectedAPIKey } =
+		useVersionStore();
 
 	const form = useForm<z.infer<typeof Schema>>({
 		resolver: zodResolver(Schema),
@@ -61,8 +62,8 @@ export default function AddOrEditAPIKeyDrawer({
 		if (!open) {
 			searchParams.delete('t');
 			setSearchParams(searchParams);
+			form.reset();
 		} else if (!searchParams.has('t')) {
-			console.log(selectedAPIKey);
 			searchParams.set('t', 'general');
 			setSearchParams(searchParams);
 		}
@@ -110,6 +111,12 @@ export default function AddOrEditAPIKeyDrawer({
 		general: 'general',
 	};
 
+	const tabToError: Record<string, string> = {
+		'allowed-ips': 'ip',
+		'allowed-domains': 'domain',
+		general: 'general',
+	};
+
 	async function onSubmit(data: z.infer<typeof Schema>) {
 		if (!version) return;
 		const func = editMode ? editAPIKey : createAPIKey;
@@ -124,14 +131,14 @@ export default function AddOrEditAPIKeyDrawer({
 			domainAuthorization: data.domain.type,
 			expiryDate: data.general.expiryDate,
 			allowedEndpoints:
-				data.domain.type === 'specified'
+				data.general.endpoint.type === 'custom-allowed'
 					? (data.general.endpoint.allowedEndpoints
 							.map((endpoint) => endpoint.url)
 							.filter(Boolean) as string[])
 					: undefined,
 			allowRealtime: data.general.realtime,
 			excludedEndpoints:
-				data.domain.type === 'specified'
+				data.general.endpoint.type === 'custom-excluded'
 					? (data.general.endpoint.excludedEndpoints
 							.map((endpoint) => endpoint.url)
 							.filter(Boolean) as string[])
@@ -145,7 +152,6 @@ export default function AddOrEditAPIKeyDrawer({
 					? (data.ip.list.map((item) => item.ip).filter(Boolean) as string[])
 					: undefined,
 		};
-
 		if (editMode && selectedAPIKey) {
 			dataToAPI.keyId = selectedAPIKey?._id;
 		}
@@ -157,18 +163,27 @@ export default function AddOrEditAPIKeyDrawer({
 	function bindOnSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		form.handleSubmit(onSubmit)(event);
-
+		const error = tabToError[activeTab];
 		const errorKeys = Object.keys(form.formState.errors);
+		const activeTabHasError = errorKeys.includes(error);
 		const lastError = errorKeys[errorKeys.length - 1];
-		if (!errorKeys.includes(activeTab) && lastError) {
+
+		if (!activeTabHasError && lastError) {
 			searchParams.set('t', tabHasError[lastError]);
 			setSearchParams(searchParams);
 		}
 	}
 
+	function handleOnOpenChange(status: boolean) {
+		onOpenChange(status);
+		if (!status) {
+			setSelectedAPIKey(null);
+		}
+	}
+
 	return (
 		<FormProvider {...form}>
-			<Drawer open={open} onOpenChange={onOpenChange}>
+			<Drawer open={open} onOpenChange={handleOnOpenChange}>
 				<DrawerContent position='right' className='overflow-auto'>
 					<DrawerHeader className='border-none'>
 						<DrawerTitle>
@@ -188,7 +203,7 @@ export default function AddOrEditAPIKeyDrawer({
 					</ul>
 					<form onSubmit={bindOnSubmit}>
 						<AnimatePresence>{tabs[activeTab]}</AnimatePresence>
-						<div className='flex justify-end border-none px-6 !pt-0'>
+						<div className='flex justify-end border-none p-6 !pt-0'>
 							<Button size='lg'>{t('general.save')}</Button>
 						</div>
 					</form>

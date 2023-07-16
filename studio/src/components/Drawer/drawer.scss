@@ -6,6 +6,10 @@
 	&-right {
 		@apply animate-in slide-in-from-right h-full duration-300;
 	}
+	&-center {
+		width: min(100% - 2rem, 650px);
+		@apply animate-in slide-in-from-top max-h-full duration-300 rounded;
+	}
 
 	&-portal {
 		@apply fixed inset-0 z-50 flex;
@@ -16,8 +20,21 @@
 		&-right {
 			@apply justify-end;
 		}
+		&-center {
+			max-height: 100vh;
+			max-width: 100vw;
+			@supports (max-height: 100dvh) {
+				max-height: 100dvh;
+			}
+			@apply justify-center items-center;
+		}
 	}
 	&-overlay {
+		max-height: 100vh;
+		max-width: 100vw;
+		@supports (max-height: 100dvh) {
+			max-height: 100dvh;
+		}
 		@apply fixed inset-0 z-50 bg-base/80 backdrop-blur-sm transition-all;
 		@apply duration-100 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in;
 	}

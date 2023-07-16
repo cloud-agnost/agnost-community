@@ -169,6 +169,7 @@
 		"specified_ips_desc": "Agnost can limit calls to \"Authorized IPs\" for application protection.",
 		"allowed_endpoints": "Allowed Endpoints",
 		"exclude_endpoints": "Exclude Endpoints",
+		"excluded_endpoints": "Excluded Endpoints",
 		"allowed": "Allowed",
 		"not_allowed": "Not Allowed",
 		"realtime_allowed": "Realtime Allowed",
@@ -199,7 +200,10 @@
 		"endpoint_access_custom_allowed_desc": "API key can only be used with below allowed endpoints only",
 
 		"endpoint_access_custom_excluded": "Custom exclude endpoints",
-		"endpoint_access_custom_excluded_desc": "API key cannot be used with below excluded endpoints but with all others not selected"
-
+		"endpoint_access_custom_excluded_desc": "API key cannot be used with below excluded endpoints but with all others not selected",
+		"select_allowed_endpoint": "Select Allowed Endpoints",
+		"select_excluded_endpoint": "Select Excluded Endpoints",
+		"select_endpoint_desc": "Click button below to select endpoint",
+		"selected": "Selected"
 	}
 }

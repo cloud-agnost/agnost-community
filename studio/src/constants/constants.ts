@@ -29,7 +29,7 @@ import {
 import { ConnectDatabase, CreateDatabase, SelectResourceType } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { Application, Instance, SortOption, Tab } from '@/types';
+import { Application, Instance, Method, SortOption, Tab } from '@/types';
 import { history, translate } from '@/utils';
 import { FileText, GearSix, Plus } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
@@ -587,3 +587,23 @@ export const ADD_API_KEYS_MENU_ITEMS = [
 		href: '?t=allowed-ips',
 	},
 ];
+
+export const ENDPOINT_OPTIONS: SortOption[] = [
+	{
+		name: translate('general.sortOptions.default'),
+		value: 'createdAt',
+		sortDir: 'desc',
+	},
+	{
+		name: translate('general.sortOptions.emailAsc'),
+		value: 'name',
+		sortDir: 'asc',
+	},
+	{
+		name: translate('general.sortOptions.emailDesc'),
+		value: 'name',
+		sortDir: 'desc',
+	},
+];
+
+export const ALL_HTTP_METHODS: Method[] = ['GET', 'POST', 'PUT', 'DELETE'];

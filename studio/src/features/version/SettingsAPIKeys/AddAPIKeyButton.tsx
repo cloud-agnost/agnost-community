@@ -10,7 +10,7 @@ export default function AddAPIKeyButton() {
 	return (
 		<>
 			<Button onClick={() => setOpen(true)}>{t('version.api_key.add')}</Button>
-			<AddOrEditAPIKeyDrawer open={open} onOpenChange={setOpen} />
+			<AddOrEditAPIKeyDrawer key={open.toString()} open={open} onOpenChange={setOpen} />
 		</>
 	);
 }

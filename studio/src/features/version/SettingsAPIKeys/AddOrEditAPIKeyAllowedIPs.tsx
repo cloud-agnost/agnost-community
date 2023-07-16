@@ -10,6 +10,7 @@ import { Plus, Trash } from '@phosphor-icons/react';
 import { Schema } from '@/features/version/SettingsAPIKeys';
 import { RadioGroup, RadioGroupItem } from 'components/RadioGroup';
 import { AUTHORIZATION_OPTIONS } from '@/constants';
+import { useEffect } from 'react';
 
 export default function AddOrEditAPIKeyAllowedIPs() {
 	const { t } = useTranslation();
@@ -21,6 +22,12 @@ export default function AddOrEditAPIKeyAllowedIPs() {
 
 	const hasAtLestOneError = !!form.formState.errors.ip?.message;
 	const atLestOneError = form.formState.errors.ip?.message as string;
+
+	useEffect(() => {
+		if (form.getValues('ip.type') === 'specified' && isEmpty(fields)) {
+			append({ ip: '' });
+		}
+	}, [form.getValues('ip.type')]);
 
 	return (
 		<motion.div

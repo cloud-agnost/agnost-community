@@ -57,9 +57,12 @@ interface VersionStore {
 	deleteRateLimit: (params: DeleteRateLimitParams) => Promise<Version>;
 	orderLimits: (limits: string[]) => void;
 	searchNPMPackages: (params: SearchNPMPackagesParams) => Promise<SearchNPMPackages[]>;
-	addNPMPackage: (params: AddNPMPackageParams) => Promise<Version>;
-	deleteNPMPackage: (params: DeleteNPMPackageParams) => Promise<Version>;
-	deleteMultipleNPMPackages: (params: DeleteMultipleNPMPackagesParams) => Promise<Version>;
+	addNPMPackage: (params: AddNPMPackageParams, showAlert?: boolean) => Promise<Version>;
+	deleteNPMPackage: (params: DeleteNPMPackageParams, showAlert?: boolean) => Promise<Version>;
+	deleteMultipleNPMPackages: (
+		params: DeleteMultipleNPMPackagesParams,
+		showAlert?: boolean,
+	) => Promise<Version>;
 	setParam: (param: Param | null) => void;
 	addParam: (params: AddVersionVariableParams, showAlert?: boolean) => Promise<Version>;
 	deleteParam: (params: DeleteVersionVariableParams, showAlert?: boolean) => Promise<Version>;
@@ -208,15 +211,17 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			addNPMPackage: async (params: AddNPMPackageParams) => {
+			addNPMPackage: async (params: AddNPMPackageParams, showAlert) => {
 				try {
 					const version = await VersionService.addNPMPackage(params);
 					set({ version });
-					notify({
-						type: 'success',
-						title: translate('general.success'),
-						description: translate('version.npm.success'),
-					});
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.npm.success'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -231,15 +236,17 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			deleteNPMPackage: async (params: DeleteNPMPackageParams) => {
+			deleteNPMPackage: async (params: DeleteNPMPackageParams, showAlert) => {
 				try {
 					const version = await VersionService.deleteNPMPackage(params);
 					set({ version });
-					notify({
-						type: 'success',
-						title: translate('general.success'),
-						description: translate('version.npm.deleted'),
-					});
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.npm.deleted'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -251,15 +258,17 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			deleteMultipleNPMPackages: async (params: DeleteMultipleNPMPackagesParams) => {
+			deleteMultipleNPMPackages: async (params: DeleteMultipleNPMPackagesParams, showAlert) => {
 				try {
 					const version = await VersionService.deleteMultipleNPMPackages(params);
 					set({ version });
-					notify({
-						type: 'success',
-						title: translate('general.success'),
-						description: translate('version.npm.deleted'),
-					});
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.npm.deleted'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;

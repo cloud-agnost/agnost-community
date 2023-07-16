@@ -31,12 +31,12 @@ const Schema = z.object({
 				}),
 				allowedEndpoints: z.array(
 					z.object({
-						url: z.string().optional().or(z.literal('')),
+						url: z.string(),
 					}),
 				),
 				excludedEndpoints: z.array(
 					z.object({
-						url: z.string().optional().or(z.literal('')),
+						url: z.string(),
 					}),
 				),
 			})

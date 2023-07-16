@@ -1,5 +1,5 @@
 .badge {
-	@apply py-1 px-1.5 bg-elements-strong-purple inline-flex justify-center items-center gap-2 rounded;
+	@apply py-1 px-1.5 bg-elements-strong-purple inline-flex justify-center items-center gap-1 rounded;
 	@apply bg-lighter;
 	&-text {
 		@apply text-xs text-default font-sfCompact;
