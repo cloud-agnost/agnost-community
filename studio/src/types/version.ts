@@ -42,12 +42,7 @@ export interface Version {
 	private: boolean;
 	readOnly: boolean;
 	master: boolean;
-	realtime: {
-		enabled: boolean;
-		apiKeyRequired: boolean;
-		sessionRequired: boolean;
-		rateLimits: [];
-	};
+	realtime: VersionRealtimeProperties;
 	defaultEndpointLimits: string[];
 	authentication: {
 		email: {
@@ -141,7 +136,16 @@ export type VersionProperties = {
 	defaultEndpointLimits: string[];
 };
 
+export type VersionRealtimeProperties = {
+	enabled: boolean;
+	apiKeyRequired: boolean;
+	sessionRequired: boolean;
+	rateLimits: string[];
+};
+
 export type UpdateVersionPropertiesParams = VersionParamsWithoutEnvId & VersionProperties;
+export type UpdateVersionRealtimePropertiesParams = VersionParamsWithoutEnvId &
+	VersionRealtimeProperties;
 
 export type SearchNPMPackagesParams = VersionParamsWithoutEnvId & {
 	page: number;

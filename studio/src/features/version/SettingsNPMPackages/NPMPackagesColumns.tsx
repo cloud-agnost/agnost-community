@@ -13,6 +13,9 @@ import { Trash } from '@phosphor-icons/react';
 const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	{
 		id: 'select',
+		size: undefined,
+		className:
+			'!max-w-[20px] !w-[20px] [&_.checkbox-wrapper]:mx-auto [&_.checkbox-wrapper]:w-fit !p-0',
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}
@@ -29,7 +32,6 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 		),
 		enableSorting: false,
 		enableHiding: false,
-		size: 40,
 	},
 	{
 		id: 'name',
@@ -66,7 +68,7 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	},
 	{
 		id: 'actions',
-		className: 'actions',
+		className: 'actions max-w-[20px]',
 		cell: ({
 			row: {
 				original: { _id },

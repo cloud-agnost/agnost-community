@@ -31,9 +31,15 @@ export default function ListEndpoint({ type, children }: ListEndpointProps) {
 							? t('version.api_key.allowed_endpoints')
 							: t('version.api_key.excluded_endpoints')}
 					</span>
-					<div className='flex items-center gap-2'>
+					<div className='flex items-center gap-2 overflow-auto no-scrollbar'>
 						{values.map((item, index) => (
-							<Badge clearable onClear={() => clear(index)} text={item.url} key={index} />
+							<Badge
+								className='whitespace-nowrap'
+								clearable
+								onClear={() => clear(index)}
+								text={item.url}
+								key={index}
+							/>
 						))}
 					</div>
 				</>

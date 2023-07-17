@@ -50,7 +50,7 @@ export default function AddOrEditAPIKeyDrawer({
 				name: '',
 				expiryDate: undefined,
 				endpoint: {
-					type: 'no-access',
+					type: editMode ? selectedAPIKey?.type : 'no-access',
 					allowedEndpoints: [{ url: '' }],
 					excludedEndpoints: [{ url: '' }],
 				},
@@ -62,16 +62,20 @@ export default function AddOrEditAPIKeyDrawer({
 		if (!open) {
 			searchParams.delete('t');
 			setSearchParams(searchParams);
-			form.reset();
+			//form.reset();
 		} else if (!searchParams.has('t')) {
 			searchParams.set('t', 'general');
 			setSearchParams(searchParams);
 		}
-		setDefaultForEdit();
 	}, [open]);
+
+	useEffect(() => {
+		setDefaultForEdit();
+	}, [open, selectedAPIKey]);
 
 	function setDefaultForEdit() {
 		if (open && selectedAPIKey) {
+			console.log(selectedAPIKey);
 			form.setValue('ip.type', selectedAPIKey.IPAuthorization);
 			form.setValue('ip.list', selectedAPIKey?.authorizedIPs.map((ip) => ({ ip })) ?? [{ ip: '' }]);
 			form.setValue('domain.type', selectedAPIKey.domainAuthorization);
@@ -160,9 +164,11 @@ export default function AddOrEditAPIKeyDrawer({
 		onOpenChange(false);
 		form.reset();
 	}
+
 	function bindOnSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		form.handleSubmit(onSubmit)(event);
+
 		const error = tabToError[activeTab];
 		const errorKeys = Object.keys(form.formState.errors);
 		const activeTabHasError = errorKeys.includes(error);

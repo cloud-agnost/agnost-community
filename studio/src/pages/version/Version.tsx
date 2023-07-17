@@ -4,6 +4,7 @@ import useVersionStore from '@/store/version/versionStore.ts';
 import { LoaderFunctionArgs, Outlet, useLocation } from 'react-router-dom';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
 import { cn } from '@/utils';
+import useAuthStore from '@/store/auth/authStore.ts';
 
 export default function Version() {
 	const { pathname } = useLocation();
@@ -15,6 +16,7 @@ export default function Version() {
 }
 
 Version.loader = async ({ params, request }: LoaderFunctionArgs) => {
+	if (!useAuthStore.getState().isAuthenticated()) return null;
 	const { appId, orgId, versionId } = params;
 	if (!appId || !orgId || !versionId) return null;
 
@@ -37,7 +39,7 @@ Version.loader = async ({ params, request }: LoaderFunctionArgs) => {
 			versionId,
 			page: 0,
 			size: 15,
-			search: url.searchParams.get('q') || '',
+			search: url.searchParams.get('q') || undefined,
 		},
 		true,
 	);

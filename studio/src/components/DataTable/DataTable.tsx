@@ -70,11 +70,14 @@ export function DataTable<TData>({
 				<TableHeader>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<TableRow key={headerGroup.id} className='head'>
-							{headerGroup.headers.map((header) => {
+							{headerGroup.headers.map((header, index) => {
 								return (
 									<TableHead
 										key={header.id}
-										className={cn(header.column.columnDef.enableSorting && 'sortable')}
+										className={cn(
+											header.column.columnDef.enableSorting && 'sortable',
+											columns[index].className,
+										)}
 									>
 										{header.isPlaceholder
 											? null

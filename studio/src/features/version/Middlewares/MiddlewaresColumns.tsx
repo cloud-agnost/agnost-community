@@ -1,5 +1,4 @@
-import { ColumnDef } from '@tanstack/react-table';
-import { Middleware } from '@/types';
+import { ColumnDefWithClassName, Middleware } from '@/types';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { translate } from '@/utils';
@@ -10,9 +9,10 @@ import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
 import { Button } from 'components/Button';
 import { Pencil } from 'components/icons';
 
-const MiddlewaresColumns: ColumnDef<Middleware>[] = [
+const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
 		id: 'select',
+		className: '!max-w-[25px] !w-[25px] !pr-0',
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}
@@ -29,7 +29,6 @@ const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 		),
 		enableSorting: false,
 		enableHiding: false,
-		size: 40,
 	},
 	{
 		id: 'name',
@@ -81,6 +80,7 @@ const MiddlewaresColumns: ColumnDef<Middleware>[] = [
 	},
 	{
 		id: 'actions',
+		className: 'actions',
 		size: 45,
 		cell: ({ row: { original } }) => {
 			function openEditDrawer() {

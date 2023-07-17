@@ -68,5 +68,6 @@
 	"are_you_sure": "Are you sure?",
 	"no_results": "No results",
 	"key": "Key",
-	"value": "Value"
+	"value": "Value",
+	"step":  "Step {{currentStep}} of {{totalSteps}}"
 }

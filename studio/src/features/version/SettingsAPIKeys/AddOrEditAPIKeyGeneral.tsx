@@ -148,6 +148,32 @@ export default function AddOrEditAPIKeyGeneral() {
 														</p>
 													</FormLabel>
 												</FormItem>
+												{item === 'custom-allowed' &&
+													form.getValues('general.endpoint.type') === 'custom-allowed' && (
+														<ListEndpoint type='custom-allowed'>
+															<Button
+																className={cn(endpointError && 'ring-2 ring-error-default')}
+																type='button'
+																onClick={openEndpointDialog}
+															>
+																{t('version.api_key.select_allowed_endpoint')}
+															</Button>
+															<FormMessage>{endpointError}</FormMessage>
+														</ListEndpoint>
+													)}
+												{item === 'custom-excluded' &&
+													form.getValues('general.endpoint.type') === 'custom-excluded' && (
+														<ListEndpoint type='custom-excluded'>
+															<Button
+																className={cn(endpointError && 'ring-2 ring-error-default')}
+																type='button'
+																onClick={openEndpointDialog}
+															>
+																{t('version.api_key.select_excluded_endpoint')}
+															</Button>
+															<FormMessage>{endpointError}</FormMessage>
+														</ListEndpoint>
+													)}
 											</Fragment>
 										))}
 									</RadioGroup>
@@ -156,24 +182,6 @@ export default function AddOrEditAPIKeyGeneral() {
 						</FormItem>
 					)}
 				/>
-
-				{['custom-allowed', 'custom-excluded'].includes(
-					form.getValues('general.endpoint.type'),
-				) && (
-					<ListEndpoint type={form.getValues('general.endpoint.type')}>
-						<Button
-							className={cn(endpointError && 'ring-2 ring-error-default')}
-							type='button'
-							onClick={openEndpointDialog}
-						>
-							{form.getValues('general.endpoint.type') === 'custom-allowed'
-								? t('version.api_key.select_allowed_endpoint')
-								: t('version.api_key.select_excluded_endpoint')}
-						</Button>
-						<FormMessage>{endpointError}</FormMessage>
-					</ListEndpoint>
-				)}
-
 				<FormField
 					control={form.control}
 					name='general.expiryDate'

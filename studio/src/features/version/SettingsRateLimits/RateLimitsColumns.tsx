@@ -14,6 +14,8 @@ import useVersionStore from '@/store/version/versionStore.ts';
 const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 	{
 		id: 'select',
+		className:
+			'!max-w-[40px] !w-[40px] [&_.checkbox-wrapper]:mx-auto [&_.checkbox-wrapper]:w-fit !p-0',
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}
@@ -30,7 +32,6 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 		),
 		enableSorting: false,
 		enableHiding: false,
-		size: 40,
 	},
 	{
 		id: 'name',
@@ -117,7 +118,7 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 	},
 	{
 		id: 'actions',
-		className: 'actions',
+		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
 			const { version, setEditRateLimitDrawerIsOpen, setRateLimit, deleteRateLimit } =
 				useVersionStore.getState();

@@ -216,8 +216,16 @@ export default function EndpointSelectModal({
 						{filtered.length > 0 && (
 							<span className='px-4 text-subtle text-sm leading-6'>Endpoints</span>
 						)}
-						<div id='endpoint-list-container' className='h-[250px] overflow-auto'>
-							{!loading && (
+						<div
+							id='endpoint-list-container'
+							className={cn(
+								'h-[250px] overflow-auto',
+								filtered.length === 0 && 'flex items-center justify-center',
+							)}
+						>
+							{!loading && filtered.length === 0 ? (
+								<EmptyState title='No endpoints found' />
+							) : (
 								<InfiniteScroll
 									scrollableTarget='endpoint-list-container'
 									next={next}
@@ -225,33 +233,29 @@ export default function EndpointSelectModal({
 									loader={<TableLoading />}
 									dataLength={filtered.length}
 								>
-									{filtered.length === 0 ? (
-										<EmptyState title='No endpoints found' />
-									) : (
-										filtered.map((endpoint, index) => {
-											const checked = selected.includes(endpoint.iid);
-											const id = `endpoint-${endpoint._id}`;
-											return (
-												<div
-													className={cn(
-														'peer-checked:bg-wrapper-background-light px-4 h-[40px] grid grid-cols-[24px_1fr] gap-2',
-														checked && 'bg-wrapper-background-light',
-													)}
-													key={index}
-												>
-													<Checkbox
-														id={id}
-														checked={checked}
-														onCheckedChange={(checked) => addList(endpoint, checked)}
-													/>
-													<label htmlFor={id} className='flex items-center gap-4 cursor-pointer'>
-														<Badge variant={badgeMapping[endpoint.method]} text={endpoint.method} />
-														<p className='text-sm text-default leading-6'>{endpoint.name}</p>
-													</label>
-												</div>
-											);
-										})
-									)}
+									{filtered.map((endpoint, index) => {
+										const checked = selected.includes(endpoint.iid);
+										const id = `endpoint-${endpoint._id}`;
+										return (
+											<div
+												className={cn(
+													'peer-checked:bg-wrapper-background-light px-4 h-[40px] grid grid-cols-[24px_1fr] gap-2',
+													checked && 'bg-wrapper-background-light',
+												)}
+												key={index}
+											>
+												<Checkbox
+													id={id}
+													checked={checked}
+													onCheckedChange={(checked) => addList(endpoint, checked)}
+												/>
+												<label htmlFor={id} className='flex items-center gap-4 cursor-pointer'>
+													<Badge variant={badgeMapping[endpoint.method]} text={endpoint.method} />
+													<p className='text-sm text-default leading-6'>{endpoint.name}</p>
+												</label>
+											</div>
+										);
+									})}
 								</InfiniteScroll>
 							)}
 						</div>

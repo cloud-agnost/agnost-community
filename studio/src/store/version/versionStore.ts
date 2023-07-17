@@ -26,6 +26,7 @@ import {
 	Version,
 	VersionParamsWithoutEnvId,
 	VersionProperties,
+	VersionRealtimeProperties,
 } from '@/types';
 import { devtools } from 'zustand/middleware';
 import { create } from 'zustand';
@@ -55,7 +56,8 @@ interface VersionStore {
 	) => Promise<Version>;
 	createRateLimit: (params: CreateRateLimitParams) => Promise<RateLimit>;
 	deleteRateLimit: (params: DeleteRateLimitParams) => Promise<Version>;
-	orderLimits: (limits: string[]) => void;
+	orderEndpointRateLimits: (limits: string[]) => void;
+	orderRealtimeRateLimits: (limits: string[]) => void;
 	searchNPMPackages: (params: SearchNPMPackagesParams) => Promise<SearchNPMPackages[]>;
 	addNPMPackage: (params: AddNPMPackageParams, showAlert?: boolean) => Promise<Version>;
 	deleteNPMPackage: (params: DeleteNPMPackageParams, showAlert?: boolean) => Promise<Version>;
@@ -89,6 +91,10 @@ interface VersionStore {
 	editAPIKey: (params: UpdateAPIKeyParams, showAlert?: boolean) => Promise<Version>;
 	deleteAPIKey: (params: DeleteAPIKeyParams, showAlert?: boolean) => Promise<Version>;
 	deleteMultipleAPIKeys: (params: DeleteMultipleAPIKeys, showAlert?: boolean) => Promise<Version>;
+	updateVersionRealtimeProperties: (
+		version: VersionParamsWithoutEnvId & Partial<VersionRealtimeProperties>,
+		showAlert?: boolean,
+	) => Promise<Version>;
 }
 
 const useVersionStore = create<VersionStore>()(
@@ -189,10 +195,19 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			orderLimits: (limits: string[]) => {
+			orderEndpointRateLimits: (limits: string[]) => {
 				set((prev) => {
 					if (!prev.version) return prev;
 					prev.version.defaultEndpointLimits = limits;
+					return {
+						version: prev.version,
+					};
+				});
+			},
+			orderRealtimeRateLimits: (limits: string[]) => {
+				set((prev) => {
+					if (!prev.version) return prev;
+					prev.version.realtime.rateLimits = limits;
 					return {
 						version: prev.version,
 					};
@@ -554,6 +569,40 @@ const useVersionStore = create<VersionStore>()(
 						title: error.error,
 						description: error.details,
 					});
+					throw e;
+				}
+			},
+			updateVersionRealtimeProperties: async ({ orgId, versionId, appId, ...data }, showAlert) => {
+				try {
+					const version = await VersionService.updateVersionRealtimeProperties({
+						orgId,
+						versionId,
+						appId,
+						enabled: get().version?.realtime?.enabled ?? false,
+						rateLimits: get().version?.realtime?.rateLimits ?? [],
+						apiKeyRequired: get().version?.realtime?.apiKeyRequired ?? false,
+						sessionRequired: get().version?.realtime?.sessionRequired ?? false,
+						...data,
+					});
+					set({ version });
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.realtime.update_success'),
+						});
+					}
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					const errorArray = error.fields ? error.fields : [{ msg: error.details }];
+					for (const field of errorArray) {
+						notify({
+							type: 'error',
+							title: error.error,
+							description: field.msg,
+						});
+					}
 					throw e;
 				}
 			},

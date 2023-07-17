@@ -9,16 +9,14 @@ import { useToast } from '@/hooks';
 import { DotsSixVertical, Trash } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 
-export default function SortableRateLimits() {
-	const defaultRateLimiters = useVersionStore((state) => state.version?.defaultEndpointLimits);
+export default function SortableRealtimeRateLimits() {
+	const realtimeRateLimiters = useVersionStore((state) => state.version?.realtime.rateLimits);
 	const rateLimits = useVersionStore((state) => state.version?.limits);
-	const updateVersionProperties = useVersionStore((state) => state.updateVersionProperties);
-	const orderLimits = useVersionStore((state) => state.orderEndpointRateLimits);
-	const { orgId, versionId, appId } = useParams<{
-		versionId: string;
-		appId: string;
-		orgId: string;
-	}>();
+	const updateVersionRealtimeProperties = useVersionStore(
+		(state) => state.updateVersionRealtimeProperties,
+	);
+	const orderLimits = useVersionStore((state) => state.orderRealtimeRateLimits);
+	const version = useVersionStore((state) => state.version);
 
 	const reorder = (list: string[], startIndex: number, endIndex: number) => {
 		const result = Array.from(list);
@@ -29,21 +27,21 @@ export default function SortableRateLimits() {
 	};
 
 	async function onDragEnd(result: DropResult) {
-		if (!result.destination || !defaultRateLimiters || !versionId || !appId || !orgId) return;
-		const ordered = reorder(defaultRateLimiters, result.source.index, result.destination.index);
+		if (!result.destination || !realtimeRateLimiters || !version) return;
+		const ordered = reorder(realtimeRateLimiters, result.source.index, result.destination.index);
 		orderLimits(ordered);
-		await updateVersionProperties({
-			orgId,
-			versionId,
-			appId,
-			defaultEndpointLimits: ordered,
+		await updateVersionRealtimeProperties({
+			orgId: version.orgId,
+			versionId: version._id,
+			appId: version.appId,
+			rateLimits: ordered,
 		});
 	}
 
 	if (
-		!defaultRateLimiters ||
+		!realtimeRateLimiters ||
 		!rateLimits ||
-		defaultRateLimiters.length === 0 ||
+		realtimeRateLimiters.length === 0 ||
 		rateLimits.length === 0
 	)
 		return <></>;
@@ -54,7 +52,7 @@ export default function SortableRateLimits() {
 				{(provided) => (
 					<div {...provided.droppableProps} ref={provided.innerRef}>
 						<ul className='flex flex-col gap-4'>
-							{defaultRateLimiters?.map((iid, index) => (
+							{realtimeRateLimiters?.map((iid, index) => (
 								<Draggable key={index} draggableId={index.toString()} index={index}>
 									{(provided) => (
 										<RateLimitItem
@@ -79,8 +77,12 @@ interface RateLimitProps {
 }
 function RateLimitItem({ provided, limiter }: RateLimitProps) {
 	const [deleting, setDeleting] = useState(false);
-	const defaultEndpointLimits = useVersionStore((state) => state.version?.defaultEndpointLimits);
-	const updateVersionProperties = useVersionStore((state) => state.updateVersionProperties);
+	const realtimeRateLimitsRateLimits = useVersionStore(
+		(state) => state.version?.realtime.rateLimits,
+	);
+	const updateVersionRealtimeProperties = useVersionStore(
+		(state) => state.updateVersionRealtimeProperties,
+	);
 	const { t } = useTranslation();
 	const { orgId, versionId, appId } = useParams<{
 		versionId: string;
@@ -94,11 +96,11 @@ function RateLimitItem({ provided, limiter }: RateLimitProps) {
 		if (!versionId || !appId || !orgId || deleting || !limitId) return;
 		try {
 			setDeleting(true);
-			await updateVersionProperties({
+			await updateVersionRealtimeProperties({
 				orgId,
 				versionId,
 				appId,
-				defaultEndpointLimits: defaultEndpointLimits?.filter((item) => item !== limitId),
+				rateLimits: realtimeRateLimitsRateLimits?.filter((item) => item !== limitId),
 			});
 			notify({
 				type: 'success',

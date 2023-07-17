@@ -1,12 +1,12 @@
+import { useRealtime, useRenewToken } from '@/hooks';
 import '@/i18n/config';
-import { useRenewToken, useRealtime } from '@/hooks';
+import { router } from '@/router';
+import useAuthStore from '@/store/auth/authStore.ts';
+import useTypeStore from '@/store/types/typeStore.ts';
+import { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { router } from '@/router';
-import { useEffect } from 'react';
-import useTypeStore from '@/store/types/typeStore.ts';
-import useAuthStore from '@/store/auth/authStore.ts';
 
 function App() {
 	useRenewToken(2);

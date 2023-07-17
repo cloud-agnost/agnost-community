@@ -1,0 +1,17 @@
+{
+  "add": {
+    "title": "Create Database",
+    "field": "Database Name",
+    "resource" : {
+        "title": "Resource Management"
+    },
+    "type" : {
+        "title": "Database Type",
+        "field": "Database type",
+        "placeholder": "Select Database Type"
+    }
+  },
+  "edit": {
+    "title": "Edit Database"
+  }
+}

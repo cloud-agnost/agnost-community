@@ -9,6 +9,7 @@ import {
 	application,
 	version,
 	onboarding,
+	database,
 	resources as rs,
 } from './en';
 
@@ -16,6 +17,7 @@ export const resources = {
 	en: {
 		translation: {
 			login,
+			database,
 			forms,
 			general,
 			organization,

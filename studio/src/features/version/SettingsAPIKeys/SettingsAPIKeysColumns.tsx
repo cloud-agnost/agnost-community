@@ -33,7 +33,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		),
 		enableSorting: false,
 		enableHiding: false,
-		size: 40,
+		className: '!pr-1',
 	},
 	{
 		id: 'name',

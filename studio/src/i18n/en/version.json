@@ -131,7 +131,7 @@
 		"delete": {
 			"success": "Middleware(s) deleted successfully"
 		},
-		"no_middleware_found": "No middleware found"
+		"no_middleware_found": "You have not defined any databases for this app version"
 	},
 	"npm": {
 		"install": "Install Packages",
@@ -205,5 +205,16 @@
 		"select_excluded_endpoint": "Select Excluded Endpoints",
 		"select_endpoint_desc": "Click button below to select endpoint",
 		"selected": "Selected"
+	},
+	"realtime": {
+		"update_success": "Realtime settings updated successfully",
+		"activate_realtime": "Activate Realtime Server",
+		"activate_realtime_desc": "Allow clients to publish messages to channels and subscribe them to listen incoming messages",
+		"api_key_required": "API Key Required",
+		"api_key_required_desc": "To use the realtime services of the platform, a vaild API key is required or not. If turned on then the API key needs to to have the \"Allow realtime\" option turned on.",
+		"session_required": "Session Required",
+		"session_required_desc": "App users are required to be signed in (e.g., have a session token) to use the realtime services through Agnost client library.",
+		"rate_limiter": "Rate Limiters",
+		"rate_limiter_desc": "Rate limiting puts a cap on how often someone can send realtime messages within a certain timeframe. By rate limiting, you can help stop certain kinds of malicious activity. You can define multiple rate limits which are applied sequentially"
 	}
 }

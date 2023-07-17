@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { AddRateLimiterDropdown, SortableRateLimits } from '@/features/version/SettingsGeneral';
+import { AddRateLimiterDropdown } from '@/features/version/SettingsGeneral';
+import { SortableRealtimeRateLimits } from '@/features/version/SettingsRealtime';
 
-export default function EndpointRateLimiters() {
+export default function RealtimeRateLimits() {
 	const { t } = useTranslation();
 	return (
 		<>
@@ -10,9 +11,9 @@ export default function EndpointRateLimiters() {
 					<span className='uppercase font-sfCompact text-subtle leading-6 text-sm font-normal'>
 						{t('version.rate_limiters')}
 					</span>
-					<AddRateLimiterDropdown type='endpoint' hasToAddAsDefault='endpoint' />
+					<AddRateLimiterDropdown type='realtime' hasToAddAsDefault='realtime' />
 				</div>
-				<SortableRateLimits />
+				<SortableRealtimeRateLimits />
 			</div>
 		</>
 	);
