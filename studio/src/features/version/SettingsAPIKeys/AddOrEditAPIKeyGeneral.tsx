@@ -14,15 +14,24 @@ import { motion } from 'framer-motion';
 import { useFormContext } from 'react-hook-form';
 import * as z from 'zod';
 import { ListEndpoint, Schema } from '@/features/version/SettingsAPIKeys';
-import { Fragment } from 'react';
+import { Dispatch, Fragment, SetStateAction } from 'react';
 import { RadioGroup, RadioGroupItem } from 'components/RadioGroup';
 import { DatePicker } from 'components/DatePicker';
 import { Button } from 'components/Button';
 import { cn } from '@/utils';
 import useEndpointStore from '@/store/endpoint/endpointStore.ts';
 import { EndpointSelectModal } from '@/features/version/EndpointSelectModal';
+import { Endpoint } from '@/types';
 
-export default function AddOrEditAPIKeyGeneral() {
+interface AddOrEditAPIKeyGeneralProps {
+	endpoints?: Endpoint[];
+	setEndpoints?: Dispatch<SetStateAction<Endpoint[] | undefined>>;
+}
+
+export default function AddOrEditAPIKeyGeneral({
+	endpoints,
+	setEndpoints,
+}: AddOrEditAPIKeyGeneralProps) {
 	const { t } = useTranslation();
 	const form = useFormContext<z.infer<typeof Schema>>();
 	const {
@@ -46,7 +55,7 @@ export default function AddOrEditAPIKeyGeneral() {
 		setSelectEndpointDialogOpen(true);
 	}
 
-	function onSelectEndpoint(endpoint: string[]) {
+	function onSelectEndpoint(endpoint: string[], lastSelected?: Endpoint) {
 		const type = form.getValues('general.endpoint.type');
 		const data = endpoint.map((iid) => ({
 			url: iid,
@@ -57,6 +66,10 @@ export default function AddOrEditAPIKeyGeneral() {
 			data,
 		);
 		form.clearErrors('general.endpoint');
+
+		if (lastSelected) {
+			setEndpoints?.((prevState) => [...(prevState ?? []), lastSelected]);
+		}
 	}
 
 	return (
@@ -150,7 +163,7 @@ export default function AddOrEditAPIKeyGeneral() {
 												</FormItem>
 												{item === 'custom-allowed' &&
 													form.getValues('general.endpoint.type') === 'custom-allowed' && (
-														<ListEndpoint type='custom-allowed'>
+														<ListEndpoint endpoints={endpoints} type='custom-allowed'>
 															<Button
 																className={cn(endpointError && 'ring-2 ring-error-default')}
 																type='button'
@@ -163,7 +176,7 @@ export default function AddOrEditAPIKeyGeneral() {
 													)}
 												{item === 'custom-excluded' &&
 													form.getValues('general.endpoint.type') === 'custom-excluded' && (
-														<ListEndpoint type='custom-excluded'>
+														<ListEndpoint endpoints={endpoints} type='custom-excluded'>
 															<Button
 																className={cn(endpointError && 'ring-2 ring-error-default')}
 																type='button'

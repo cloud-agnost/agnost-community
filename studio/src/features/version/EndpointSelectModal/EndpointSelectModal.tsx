@@ -29,7 +29,7 @@ interface EndpointSelectModalProps {
 	open: boolean;
 	onOpenChange?: (open: boolean) => void;
 	defaultSelected?: string[];
-	onSelect?: (selected: string[]) => void;
+	onSelect?: (selected: string[], lastSelected?: Endpoint) => void;
 }
 const LIMIT = 20;
 
@@ -103,7 +103,7 @@ export default function EndpointSelectModal({
 	function addList(endpoint: Endpoint, checked: CheckedState) {
 		setSelected((prev) => {
 			const all = checked ? [...prev, endpoint.iid] : prev.filter((id) => id !== endpoint.iid);
-			if (onSelect) onSelect(all);
+			if (onSelect) onSelect(all, checked ? endpoint : undefined);
 			return all;
 		});
 	}

@@ -4,6 +4,7 @@ import {
 	DeleteMultipleEndpointsParams,
 	Endpoint,
 	GetEndpointByIdParams,
+	GetEndpointsByIidParams,
 	GetEndpointsParams,
 	SaveEndpointLogicParams,
 	UpdateEndpointParams,
@@ -44,6 +45,15 @@ export default class EndpointService {
 				params,
 			})
 		).data;
+	}
+	static async getEndpointsByIid({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: GetEndpointsByIidParams): Promise<Endpoint[]> {
+		return (await axios.post(`${this.url}/${orgId}/app/${appId}/version/${versionId}/ep/iid`, data))
+			.data;
 	}
 
 	static async deleteEndpoint({

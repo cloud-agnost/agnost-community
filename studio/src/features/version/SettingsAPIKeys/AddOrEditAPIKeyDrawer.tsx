@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
-import { FormEvent, ReactNode, useEffect } from 'react';
+import { FormEvent, ReactNode, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ADD_API_KEYS_MENU_ITEMS } from '@/constants';
 import { OrganizationMenuItem } from '@/features/organization';
@@ -16,7 +16,8 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Button } from 'components/Button';
-import { CreateAPIKeyParams, UpdateAPIKeyParams } from '@/types';
+import { CreateAPIKeyParams, Endpoint, UpdateAPIKeyParams } from '@/types';
+import useEndpointStore from '@/store/endpoint/endpointStore.ts';
 
 interface AddAPIKeyDrawerProps {
 	open: boolean;
@@ -33,6 +34,8 @@ export default function AddOrEditAPIKeyDrawer({
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { createAPIKey, editAPIKey, version, selectedAPIKey, setSelectedAPIKey } =
 		useVersionStore();
+	const { getEndpointsByIid } = useEndpointStore();
+	const [endpoints, setEndpoints] = useState<Endpoint[]>();
 
 	const form = useForm<z.infer<typeof Schema>>({
 		resolver: zodResolver(Schema),
@@ -73,9 +76,8 @@ export default function AddOrEditAPIKeyDrawer({
 		setDefaultForEdit();
 	}, [open, selectedAPIKey]);
 
-	function setDefaultForEdit() {
+	async function setDefaultForEdit() {
 		if (open && selectedAPIKey) {
-			console.log(selectedAPIKey);
 			form.setValue('ip.type', selectedAPIKey.IPAuthorization);
 			form.setValue('ip.list', selectedAPIKey?.authorizedIPs.map((ip) => ({ ip })) ?? [{ ip: '' }]);
 			form.setValue('domain.type', selectedAPIKey.domainAuthorization);
@@ -98,13 +100,29 @@ export default function AddOrEditAPIKeyDrawer({
 				'general.endpoint.excludedEndpoints',
 				selectedAPIKey?.excludedEndpoints.map((url) => ({ url })) ?? [{ url: '' }],
 			);
+			if (!version) return;
+
+			const iids = (
+				selectedAPIKey.type === 'custom-excluded'
+					? selectedAPIKey.excludedEndpoints
+					: selectedAPIKey.allowedEndpoints
+			).map((url) => url);
+
+			const endpoints = await getEndpointsByIid({
+				orgId: version.orgId,
+				appId: version.appId,
+				versionId: version._id,
+				iids,
+			});
+
+			setEndpoints(endpoints);
 		}
 	}
 
 	const activeTab = searchParams.get('t') || 'general';
 
 	const tabs: Record<string, ReactNode> = {
-		general: <AddOrEditAPIKeyGeneral />,
+		general: <AddOrEditAPIKeyGeneral setEndpoints={setEndpoints} endpoints={endpoints} />,
 		'allowed-domains': <AddOrEditAPIKeyAllowedDomains />,
 		'allowed-ips': <AddOrEditAPIKeyAllowedIPs />,
 	};

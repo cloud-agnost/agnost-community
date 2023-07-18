@@ -61,6 +61,11 @@ export type DeleteEndpointParams = GetEndpointByIdParams;
 export interface DeleteMultipleEndpointsParams extends EndpointBase {
 	endpointIds: string[];
 }
+
+export interface GetEndpointsByIidParams extends EndpointBase {
+	iids: string[];
+}
+
 export interface GetEndpointsParams extends EndpointBase {
 	page: number;
 	size: number;

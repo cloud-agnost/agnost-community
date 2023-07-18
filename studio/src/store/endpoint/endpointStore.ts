@@ -6,6 +6,7 @@ import {
 	DeleteMultipleEndpointsParams,
 	Endpoint,
 	GetEndpointByIdParams,
+	GetEndpointsByIidParams,
 	GetEndpointsParams,
 	SaveEndpointLogicParams,
 	UpdateEndpointParams,
@@ -27,6 +28,7 @@ interface EndpointStore {
 	deleteMultipleEndpoints: (endpoint: DeleteMultipleEndpointsParams) => Promise<void>;
 	updateEndpoint: (endpoint: UpdateEndpointParams) => Promise<Endpoint>;
 	saveEndpointLogic: (endpoint: SaveEndpointLogicParams) => Promise<Endpoint>;
+	getEndpointsByIid: (endpoint: GetEndpointsByIidParams) => Promise<Endpoint[]>;
 }
 
 const useEndpointStore = create<EndpointStore>()(
@@ -80,6 +82,9 @@ const useEndpointStore = create<EndpointStore>()(
 						endpoints: prev.endpoints.map((e) => (e._id === endpoint._id ? endpoint : e)),
 					}));
 					return endpoint;
+				},
+				getEndpointsByIid: async (params) => {
+					return EndpointService.getEndpointsByIid(params);
 				},
 			}),
 			{
