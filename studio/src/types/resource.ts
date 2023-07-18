@@ -1,4 +1,3 @@
-import { NUMBER_REGEX } from '@/constants';
 import useTypeStore from '@/store/types/typeStore';
 import { translate } from '@/utils';
 import * as z from 'zod';
