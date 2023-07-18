@@ -71,6 +71,11 @@ const useResourceStore = create<ResourceStore>()(
 				toggleCreateResourceModal: () =>
 					set((state) => ({
 						isCreateResourceModalOpen: !state.isCreateResourceModalOpen,
+						resourceType: {
+							type: '',
+							name: '',
+							step: 1,
+						},
 					})),
 				selectResourceType: (name: string, type: string) =>
 					set({
