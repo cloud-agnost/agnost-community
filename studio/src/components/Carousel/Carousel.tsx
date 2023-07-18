@@ -4,6 +4,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { Autoplay, FreeMode, Grid, Pagination } from 'swiper';
+import 'swiper/css';
+import 'swiper/css/pagination';
 import { GridOptions } from 'swiper/types';
 import './Carousel.scss';
 

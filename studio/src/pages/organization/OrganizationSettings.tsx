@@ -1,3 +1,4 @@
+import { RequireAuth } from '@/router';
 import { Invitation, OrganizationMember } from '@/types';
 import { Row } from '@tanstack/react-table';
 import { useState } from 'react';
@@ -7,11 +8,13 @@ export default function OrganizationSettings() {
 	const [selectedRows, setSelectedRows] = useState<Row<Invitation | OrganizationMember>[]>();
 
 	return (
-		<Outlet
-			context={{
-				selectedRows,
-				setSelectedRows,
-			}}
-		/>
+		<RequireAuth>
+			<Outlet
+				context={{
+					selectedRows,
+					setSelectedRows,
+				}}
+			/>
+		</RequireAuth>
 	);
 }

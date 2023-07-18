@@ -12,6 +12,7 @@ import {
 } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { PasswordInput } from '@/components/PasswordInput';
+import { GuestOnly } from '@/router';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
@@ -99,7 +100,7 @@ export default function AccountInformation() {
 	}
 
 	return (
-		<>
+		<GuestOnly>
 			<h1 className='text-default font-semibold text-[1.625rem] leading-[2.75rem] text-center'>
 				{t('onboarding.welcome')}
 			</h1>
@@ -176,7 +177,7 @@ export default function AccountInformation() {
 					</div>
 				</form>
 			</Form>
-		</>
+		</GuestOnly>
 	);
 }
 

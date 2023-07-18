@@ -7,6 +7,7 @@ export { default as ChangeLog } from './ChangeLog';
 export { default as Connect } from './Connect';
 export { default as Dashboard } from './Dashboard';
 export { default as Database } from './Database';
+export { default as DeviceMobile } from './DeviceMobile';
 export { default as Document } from './Document';
 export { default as DoubleGear } from './DoubleGear';
 export { default as Environment } from './Environment';

@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 import { translate } from '@/utils';
 import { useTranslation } from 'react-i18next';
+import { RequireAuth } from '@/router';
 
 async function loader() {
 	return null;
@@ -67,36 +68,38 @@ export default function CreateOrganization() {
 	}
 
 	return (
-		<>
-			<Description title={t('onboarding.org.title')}>{t('onboarding.org.desc')}</Description>
+		<RequireAuth>
+			<>
+				<Description title={t('onboarding.org.title')}>{t('onboarding.org.desc')}</Description>
 
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-					<FormField
-						control={form.control}
-						name='orgName'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>{t('organization.name')}</FormLabel>
-								<FormControl>
-									<Input
-										error={!!form.formState.errors.orgName}
-										placeholder={t('organization.enter_organization_name') as string}
-										{...field}
-									/>
-								</FormControl>
-								<FormDescription>{t('forms.max64.description')}</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+						<FormField
+							control={form.control}
+							name='orgName'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>{t('organization.name')}</FormLabel>
+									<FormControl>
+										<Input
+											error={!!form.formState.errors.orgName}
+											placeholder={t('organization.enter_organization_name') as string}
+											{...field}
+										/>
+									</FormControl>
+									<FormDescription>{t('forms.max64.description')}</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-					<div className='flex gap-4 justify-end'>
-						<Button size='lg'>{t('onboarding.next')}</Button>
-					</div>
-				</form>
-			</Form>
-		</>
+						<div className='flex gap-4 justify-end'>
+							<Button size='lg'>{t('onboarding.next')}</Button>
+						</div>
+					</form>
+				</Form>
+			</>
+		</RequireAuth>
 	);
 }
 

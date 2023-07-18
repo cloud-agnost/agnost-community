@@ -51,7 +51,9 @@ export default function ApplicationVersions() {
 		if (isVersionOpen) {
 			getVersions();
 		}
+		console.log('isVersionOpen', isVersionOpen);
 	}, [getVersions, isVersionOpen]);
+
 	return (
 		<Drawer open={isVersionOpen} onOpenChange={() => closeVersionDrawer(!!match)}>
 			<DrawerContent position='right' size='lg'>

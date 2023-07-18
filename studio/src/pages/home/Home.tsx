@@ -1,3 +1,8 @@
+import { RequireAuth } from '@/router';
 export default function Home() {
-	return <>Home Page</>;
+	return (
+		<RequireAuth>
+			<div>Home</div>
+		</RequireAuth>
+	);
 }
