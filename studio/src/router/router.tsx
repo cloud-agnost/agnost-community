@@ -13,7 +13,7 @@ const profilePath = `${path}/profile`;
 const onboardingPath = `${path}/onboarding`;
 
 const paths = {
-	home: `${path}/Home.tsx`,
+	home: `${path}/home/Home.tsx`,
 	auth: {
 		login: `${authPath}/Login.tsx`,
 		forgetPassword: `${authPath}/ForgotPassword.tsx`,
