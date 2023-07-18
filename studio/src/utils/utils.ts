@@ -3,9 +3,9 @@ import { useToast as toast } from '@/hooks';
 import { ToastType } from '@/types';
 import { RealtimeData } from '@/types/type';
 import { clsx, type ClassValue } from 'clsx';
-import i18next from 'i18next';
 import { DateTime } from 'luxon';
 import { twMerge } from 'tailwind-merge';
+import { t } from '@/i18n/config.ts';
 
 type EmptyableArray = readonly [] | [];
 type EmptyableString = '' | string;
@@ -20,7 +20,7 @@ export function removeLastSlash(str: string) {
 	return str.replace(/\/$/, '');
 }
 export function translate(key: string, options?: any) {
-	return String(i18next.t(key, options));
+	return String(t(key, options));
 }
 
 export function joinChannel(channel: string) {
