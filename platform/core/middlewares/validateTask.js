@@ -1,4 +1,4 @@
-import taskCtrl from "../controllers/middleware.js";
+import taskCtrl from "../controllers/task.js";
 import { handleError } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
 

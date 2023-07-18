@@ -14,6 +14,7 @@ import { applyRules } from "../schemas/model.js";
 import { applyRules as fieldRules } from "../schemas/rules/field.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
+import { dbTypeMappings } from "../config/constants.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
@@ -81,7 +82,12 @@ router.post(
 					type: "model",
 					description,
 					timestamps,
-					fields: modelCtrl.getDefaultFields(timestamps, null, user._id),
+					fields: modelCtrl.getDefaultFields(
+						db.type,
+						timestamps,
+						null,
+						user._id
+					),
 					createdBy: user._id,
 				},
 				{ cacheKey: modelId }
@@ -659,6 +665,7 @@ router.post(
 				iid: helper.generateSlug("fld"),
 				creator: "user",
 				type,
+				dbType: dbTypeMappings[db.type][type],
 				order: modelCtrl.getNewFieldOrderNumber(model),
 				description,
 				required,
@@ -700,6 +707,7 @@ router.post(
 					parentiid: model.iid,
 					timestamps: pointer.timestamps,
 					fields: modelCtrl.getDefaultFields(
+						db.type,
 						pointer.timestamps,
 						model.iid,
 						user._id

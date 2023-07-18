@@ -34,6 +34,9 @@ const ERROR_CODES = {
 	requestTimedOut: "request_timed_out",
 	missingAccessToken: "missing_access_token",
 	invalidCredentials: "invalid_credentials",
+	storageNotFound: "storage_not_found",
+	queueNotFound: "queue_not_found",
+	cronJobNotFound: "cronjob_not_found",
 };
 
 export default ERROR_CODES;

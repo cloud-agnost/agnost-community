@@ -97,6 +97,12 @@ export const appAuthorization = {
 				update: true,
 				delete: true,
 			},
+			storage: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
 		},
 	},
 };

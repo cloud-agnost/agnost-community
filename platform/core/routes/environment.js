@@ -278,11 +278,8 @@ router.post(
 			const { org, user, app, version, env } = req;
 
 			if (
-				[env.dbStatus, env.schedulerStatus].some((entry) =>
+				[env.dbStatus, env.serverStatus, env.schedulerStatus].some((entry) =>
 					["Deploying", "Redeploying", "Deleting"].includes(entry)
-				) ||
-				env.serverStatus.some((entry) =>
-					["Deploying", "Redeploying", "Deleting"].includes(entry.status)
 				)
 			) {
 				return res.status(422).json({
@@ -514,7 +511,7 @@ router.get(
 				query.$or = [
 					{ dbStatus: status },
 					{ schedulerStatus: status },
-					{ "serverStatus.status": status },
+					{ serverStatus: status },
 				];
 			}
 

@@ -10,7 +10,13 @@ export const handleUndefinedPaths = (req, res) => {
 			{
 				method: req.method,
 				path: req.path,
-				url: req.protocol + "://" + req.get("host") + req.originalUrl,
+				url:
+					req.protocol +
+					"://" +
+					req.get("host") +
+					"/" +
+					process.env.AGNOST_ENVIRONMENT_ID +
+					req.originalUrl,
 			}
 		)
 	);

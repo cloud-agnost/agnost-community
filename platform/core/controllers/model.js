@@ -1,5 +1,6 @@
 import BaseController from "./base.js";
 import { ModelModel } from "../schemas/model.js";
+import { dbTypeMappings } from "../config/constants.js";
 
 class ModelController extends BaseController {
 	constructor() {
@@ -13,7 +14,7 @@ class ModelController extends BaseController {
 	 * @param  {string} parentiid For no-sql databases the parent object internal identifier
 	 * @param  {string} userId The it the of the user who is creating the new model
 	 */
-	getDefaultFields(timestamps, parentiid, userId) {
+	getDefaultFields(dbType, timestamps, parentiid, userId) {
 		let fields = [];
 		let orderNumber = 10000;
 
@@ -23,6 +24,7 @@ class ModelController extends BaseController {
 		id.creator = "system";
 		id.order = orderNumber;
 		id.type = "id";
+		id.dbType = dbTypeMappings[dbType]["id"];
 		id.required = true;
 		id.unique = true;
 		id.immutable = true;
@@ -41,6 +43,7 @@ class ModelController extends BaseController {
 			parent.creator = "system";
 			parent.order = orderNumber;
 			parent.type = "parent";
+			parent.dbType = dbTypeMappings[dbType]["parent"];
 			parent.required = true;
 			parent.unique = false;
 			parent.immutable = true;
@@ -62,6 +65,7 @@ class ModelController extends BaseController {
 		createdAt.creator = "system";
 		createdAt.order = orderNumber;
 		createdAt.type = "createdat";
+		createdAt.dbType = dbTypeMappings[dbType]["createdat"];
 		createdAt.required = true;
 		createdAt.unique = false;
 		createdAt.immutable = true;
@@ -79,6 +83,7 @@ class ModelController extends BaseController {
 		updatedAt.creator = "system";
 		updatedAt.order = orderNumber;
 		updatedAt.type = "updatedat";
+		updatedAt.dbType = dbTypeMappings[dbType]["updatedat"];
 		updatedAt.label = timestamps.updatedAt;
 		updatedAt.required = true;
 		updatedAt.unique = false;
@@ -136,7 +141,7 @@ class ModelController extends BaseController {
 				else return propValue ?? false;
 			// Immutable (read-only) value cannot be set for
 			case "immutable":
-				if (["object", "object-list", ,].includes(fieldType)) return false;
+				if (["object", "object-list"].includes(fieldType)) return false;
 				else return propValue ?? false;
 			// Indexed value cannot be set for
 			case "indexed":

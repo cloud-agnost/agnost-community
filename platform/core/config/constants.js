@@ -64,7 +64,6 @@ export const envLogTypes = ["db", "server", "scheduler"];
 export const modelTypes = ["model", "sub-model-object", "sub-model-list"];
 export const bvlTypes = [
 	"text",
-	"boolean",
 	"integer",
 	"decimal",
 	"monetary",
@@ -84,10 +83,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -96,10 +97,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: true,
 		},
 	},
 	{
@@ -108,10 +111,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: false,
 			indexed: true,
 			immutable: true,
+			searchable: true,
 		},
 	},
 	{
@@ -120,10 +125,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: false,
 			indexed: false,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -132,10 +139,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -144,10 +153,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -156,10 +167,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -168,10 +181,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -180,10 +195,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -192,10 +209,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -204,10 +223,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -216,10 +237,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -228,10 +251,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -240,10 +265,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -252,10 +279,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: false,
+		Oracle: false,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -264,10 +293,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: false,
+		Oracle: false,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -276,10 +307,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -288,10 +321,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: false,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -300,22 +335,26 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: false,
 			indexed: false,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
 		name: "json",
 		PostgreSQL: true,
 		MySQL: true,
-		"SQL Server": false,
+		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: false,
 			indexed: false,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -324,10 +363,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
-			unique: true,
+			unique: false,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -336,10 +377,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: false,
 			indexed: false,
 			immutable: false,
+			searchable: false,
 		},
 	},
 	{
@@ -348,10 +391,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: true,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 	{
@@ -360,10 +405,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: false,
 			indexed: false,
 			immutable: false,
+			searchable: false,
 		},
 	},
 	{
@@ -372,10 +419,12 @@ export const fieldTypes = [
 		MySQL: true,
 		"SQL Server": true,
 		MongoDB: true,
+		Oracle: true,
 		view: {
 			unique: false,
 			indexed: true,
 			immutable: true,
+			searchable: false,
 		},
 	},
 ];
@@ -387,6 +436,144 @@ export const databaseTypes = [
 	"MongoDB",
 	"Oracle",
 ];
+
+export const dbTypeMappings = {
+	MongoDB: {
+		id: "id",
+		text: "text",
+		"rich-text": "rich-text",
+		"encrypted-text": "encrypted-text",
+		email: "email",
+		link: "link",
+		phone: "phone",
+		boolean: "boolean",
+		integer: "integer",
+		decimal: "decimal",
+		monetary: "monetary",
+		createdat: "createdat",
+		updatedat: "updatedat",
+		datetime: "datetime",
+		date: "date",
+		time: "time",
+		enum: "enum",
+		"geo-point": "geo-point",
+		binary: "binary",
+		json: "json",
+		reference: "reference",
+		"basic-values-list": "basic-values-list",
+		"object-list": "object-list",
+		object: "object",
+		parent: "parent",
+	},
+	PostgreSQL: {
+		id: "bigserial",
+		text: "varchar",
+		"rich-text": "text",
+		"encrypted-text": "varchar",
+		email: "varchar",
+		link: "varchar",
+		phone: "varchar",
+		boolean: "boolean",
+		integer: "integer",
+		decimal: "decimal",
+		monetary: "decimal",
+		createdat: "timestamp",
+		updatedat: "timestamp",
+		datetime: "timestamp",
+		date: "date",
+		time: "time",
+		enum: "varchar",
+		"geo-point": "point",
+		binary: "bytea",
+		json: "jsonb",
+		reference: "bigint",
+		"basic-values-list": "undefined",
+		"object-list": "undefined",
+		object: "undefined",
+		parent: "bigint",
+	},
+	MySQL: {
+		id: "bigint",
+		text: "varchar",
+		"rich-text": "lnogtext",
+		"encrypted-text": "varchar",
+		email: "varchar",
+		link: "varchar",
+		phone: "varchar",
+		boolean: "boolean",
+		integer: "int",
+		decimal: "decimal",
+		monetary: "decimal",
+		createdat: "datetime",
+		updatedat: "datetime",
+		datetime: "datetime",
+		date: "date",
+		time: "time",
+		enum: "varchar",
+		"geo-point": "point",
+		binary: "blob",
+		json: "json",
+		reference: "bigint",
+		"basic-values-list": "undefined",
+		"object-list": "undefined",
+		object: "undefined",
+		parent: "bigint",
+	},
+	"SQL Server": {
+		id: "bigint",
+		text: "nvarchar",
+		"rich-text": "longtext",
+		"encrypted-text": "nvarchar",
+		email: "nvarchar",
+		link: "nvarchar",
+		phone: "nvarchar",
+		boolean: "bit",
+		integer: "int",
+		decimal: "decimal",
+		monetary: "decimal",
+		createdat: "datetime",
+		updatedat: "datetime",
+		datetime: "datetime",
+		date: "date",
+		time: "time",
+		enum: "nvarchar",
+		"geo-point": "geography::Point",
+		binary: "binary",
+		json: "json",
+		reference: "bigint",
+		"basic-values-list": "undefined",
+		"object-list": "undefined",
+		object: "undefined",
+		parent: "bigint",
+	},
+	Oracle: {
+		id: "number",
+		text: "varchar",
+		"rich-text": "clob",
+		"encrypted-text": "varchar",
+		email: "varchar",
+		link: "varchar",
+		phone: "varchar",
+		boolean: "number",
+		integer: "number",
+		decimal: "number",
+		monetary: "number",
+		createdat: "timestamp",
+		updatedat: "timestamp",
+		datetime: "timestamp",
+		date: "undefined",
+		time: "undefined",
+		enum: "nvarchar",
+		"geo-point": "point",
+		binary: "blob",
+		json: "json",
+		reference: "number",
+		"basic-values-list": "undefined",
+		"object-list": "undefined",
+		object: "undefined",
+		parent: "number",
+	},
+};
 
 export const cacheTypes = ["Redis"];
 
@@ -737,25 +924,25 @@ export const authUserDataModel = [
 	},
 ];
 
-export const defaultEndpointCode = `const endpointHandler = (req, res) => {
+export const defaultEndpointCode = `const endpointHandler = async (req, res) => {
 	res.json();
 };
 
 export default endpointHandler;`;
 
-export const defaultMiddlewareCode = `const middlewareHandler = (req, res, next) => {
+export const defaultMiddlewareCode = `const middlewareHandler = async (req, res, next) => {
 	next();
 };
 
 export default middlewareHandler;`;
 
-export const defaultQueueCode = `const queueHandler = (message) => {
+export const defaultQueueCode = `const queueHandler = async (message) => {
 
 };
 
 export default queueHandler;`;
 
-export const defaultTaskCode = `const cronJobHandler = () => {
+export const defaultTaskCode = `const cronJobHandler = async () => {
 
 };
 

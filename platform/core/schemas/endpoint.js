@@ -136,6 +136,13 @@ export const applyRules = (type) => {
 					)
 					.toInt(),
 			];
+		case "view-iid":
+			return [
+				body("iids.*")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required value, cannot be left empty")),
+			];
 		case "create":
 		case "update":
 			return [

@@ -20,28 +20,6 @@ export const encryptedTextRules = (type) => {
 							"Encrypted text properties need to be provided, cannot be left empty"
 						)
 					),
-				body("encryptedText.minLength")
-					.if((value, { req }) => {
-						if (
-							(req.body.type === "encrypted-text" ||
-								req.field?.type === "encrypted-text") &&
-							!!value
-						)
-							return true;
-						else return false;
-					})
-					.trim()
-					.optional()
-					.isInt({
-						min: 1,
-						max: config.get("general.maxEncryptedTextFieldLength"),
-					})
-					.withMessage(
-						t(
-							"Min length needs to be a positive integer between 1 - %s",
-							config.get("general.maxEncryptedTextFieldLength")
-						)
-					),
 				body("encryptedText.maxLength")
 					.if((value, { req }) => {
 						if (
@@ -63,26 +41,7 @@ export const encryptedTextRules = (type) => {
 							"Max length needs to be a positive integer between 1 - %s",
 							config.get("general.maxEncryptedTextFieldLength")
 						)
-					)
-					.bail()
-					.custom((value, { req }) => {
-						if (req.body.encryptedText.minLength) {
-							let minValue = null;
-							try {
-								minValue = parseInt(req.body.encryptedText.minLength, 10);
-							} catch (err) {}
-
-							if (!!minValue && minValue > value)
-								throw new AgnostError(
-									t(
-										"Minimum length needs to be smaller than or equal to maximum length"
-									)
-								);
-						}
-
-						//Indicates the success of this  custom validator
-						return true;
-					}),
+					),
 			];
 		default:
 			return [];

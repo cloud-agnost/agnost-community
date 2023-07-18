@@ -1,4 +1,4 @@
-import queueCtrl from "../controllers/middleware.js";
+import queueCtrl from "../controllers/queue.js";
 import { handleError } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
 

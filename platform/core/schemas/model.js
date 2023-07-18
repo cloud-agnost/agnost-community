@@ -99,6 +99,9 @@ export const ModelModel = mongoose.model(
 						default: "text",
 						enum: fieldTypes.map((entry) => entry.name),
 					},
+					dbType: {
+						type: String,
+					},
 					order: {
 						type: Number,
 					},
@@ -131,41 +134,8 @@ export const ModelModel = mongoose.model(
 						searchable: {
 							type: Boolean,
 						},
-						minLength: {
-							type: Number,
-						},
 						maxLength: {
 							type: Number,
-						},
-						trim: {
-							type: String,
-							enum: ["none", "leading", "trailing", "l+t", "any"],
-						},
-						caseStyle: {
-							type: String,
-							enum: [
-								"none",
-								"uppercase",
-								"lowercase",
-								"sentencecase",
-								"capitilizewords",
-							],
-						},
-						acceptType: {
-							type: String,
-							enum: ["all", "select", "regex"],
-						},
-						acceptSelect: {
-							letters: { type: Boolean },
-							numbers: { type: Boolean },
-							spaces: { type: Boolean },
-							special: { type: Boolean },
-							specialChars: {
-								type: String,
-							} /* some of the special characters needs to be escaped with \ so that they to not mess up the regular expression */,
-						},
-						regex: {
-							type: String,
 						},
 					},
 					richText: {
@@ -173,37 +143,14 @@ export const ModelModel = mongoose.model(
 						searchable: {
 							type: Boolean,
 						},
-						minLength: {
-							type: Number,
-						},
-						maxLength: {
-							type: Number,
-						},
 					},
 					encryptedText: {
-						minLength: {
-							type: Number,
-						},
 						maxLength: {
 							type: Number,
 						},
 					},
 					decimal: {
 						decimalDigits: {
-							type: Number,
-						},
-						roundingStyle: {
-							/*
-                                ROUND_UP	0	Rounds away from zero
-                                ROUND_DOWN	1	Rounds towards zero
-                                ROUND_CEIL	2	Rounds towards Infinity
-                                ROUND_FLOOR	3	Rounds towards -Infinity
-                                ROUND_HALF_UP	4	Rounds towards nearest neighbour. If equidistant, rounds away from zero
-                                ROUND_HALF_DOWN	5	Rounds towards nearest neighbour. If equidistant, rounds towards zero
-                                ROUND_HALF_EVEN	6	Rounds towards nearest neighbour. If equidistant, rounds towards even neighbour
-                                ROUND_HALF_CEIL	7	Rounds towards nearest neighbour. If equidistant, rounds towards Infinity
-                                ROUND_HALF_FLOOR	8	Rounds towards nearest neighbour. If equidistant, rounds towards -Infinity 
-                            */
 							type: Number,
 						},
 					},

@@ -201,12 +201,10 @@ class ConnectionController {
 						region: connSettings.region,
 					});
 
-					try {
-						const command = new HeadBucketCommand({
-							Bucket: "agnoststorage",
-						});
-						await s3.send(command);
-					} catch (err) {}
+					const command = new HeadBucketCommand({
+						Bucket: "agnoststorage",
+					});
+					await s3.send(command);
 				} catch (err) {
 					throw new AgnostError(
 						t("Cannot connect to the AWS S3 storage. %s", err.message)
@@ -240,7 +238,7 @@ class ConnectionController {
 					} catch (err) {}
 				} catch (err) {
 					throw new AgnostError(
-						t("Cannot connect to the GCP Cloud Storage. %s", err.message)
+						t("Cannot connect to the Azure Blob Storage. %s", err.message)
 					);
 				}
 				break;
