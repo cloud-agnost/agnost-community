@@ -1,8 +1,9 @@
-import { NUMBER_REGEX } from '@/constants';
 import useTypeStore from '@/store/types/typeStore';
 import { translate } from '@/utils';
 import * as z from 'zod';
 import { BaseGetRequest, BaseRequest } from '.';
+
+const NUMBER_REGEX = /^[0-9]+$/;
 export interface Resource {
 	orgId: string;
 	iid: string;

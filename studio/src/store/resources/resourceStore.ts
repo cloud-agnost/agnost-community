@@ -11,6 +11,8 @@ export interface ResourceStore {
 		step: number;
 	};
 	openCreateReplicaModal: boolean;
+	isDeletedResourceModalOpen: boolean;
+	deletedResource: Resource | null;
 	getResources: (req: GetResourcesRequest) => Promise<Resource[]>;
 	testExistingResourceConnection: (req: AddExistingResourceRequest) => Promise<void>;
 	addExistingResource: (req: AddExistingResourceRequest) => Promise<Resource>;
@@ -18,6 +20,9 @@ export interface ResourceStore {
 	selectResourceType: (name: string, type: string) => void;
 	goToNextStep: () => void;
 	returnToPreviousStep: () => void;
+	openDeleteResourceModal: (resource: Resource) => void;
+	closeDeleteResourceModal: () => void;
+	deleteResource: (resourceId: string) => Promise<void>;
 }
 
 const useResourceStore = create<ResourceStore>()(
@@ -32,6 +37,8 @@ const useResourceStore = create<ResourceStore>()(
 					step: 1,
 				},
 				openCreateReplicaModal: false,
+				isDeletedResourceModalOpen: false,
+				deletedResource: null,
 				getResources: async (req: GetResourcesRequest) => {
 					try {
 						const resources = await ResourceService.getResources(req);
@@ -100,6 +107,30 @@ const useResourceStore = create<ResourceStore>()(
 							step: 1,
 						},
 					}),
+				openDeleteResourceModal: (resource: Resource) => {
+					set({
+						isDeletedResourceModalOpen: true,
+						deletedResource: resource,
+					});
+				},
+				closeDeleteResourceModal: () => {
+					set({
+						isDeletedResourceModalOpen: false,
+						deletedResource: null,
+					});
+				},
+				deleteResource: async (resourceId: string) => {
+					try {
+						await ResourceService.deleteResource(resourceId);
+						set((state) => ({
+							resources: state.resources.filter((resource) => resource._id !== resourceId),
+							isDeletedResourceModalOpen: false,
+							deletedResource: null,
+						}));
+					} catch (error) {
+						throw error as APIError;
+					}
+				},
 			}),
 			{
 				name: 'resources-store',

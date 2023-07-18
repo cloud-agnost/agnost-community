@@ -1,15 +1,25 @@
 import { Button } from '@/components/Button';
+import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { SearchInput } from '@/components/SearchInput';
 import { CreateResource, ResourceTable } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
 import useResourcesStore from '@/store/resources/resourceStore';
 import { Plus } from '@phosphor-icons/react';
 import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
+
 export default function OrgResources() {
 	const { t } = useTranslation();
 	const { application } = useApplicationStore();
-	const { resources, getResources, toggleCreateResourceModal } = useResourcesStore();
+	const {
+		resources,
+		isDeletedResourceModalOpen,
+		deletedResource,
+		deleteResource,
+		getResources,
+		toggleCreateResourceModal,
+		closeDeleteResourceModal,
+	} = useResourcesStore();
 
 	useEffect(() => {
 		getResources({
@@ -34,6 +44,26 @@ export default function OrgResources() {
 			<div className='mt-8'>
 				<ResourceTable resources={resources} />
 			</div>
+			<CreateResource />
+			<ConfirmationModal
+				title={t('resources.delete.title')}
+				alertTitle={t('resources.delete.message')}
+				alertDescription={t('resources.delete.description')}
+				description={
+					<Trans
+						i18nKey='profileSettings.delete_confirm_description'
+						values={{ confirmCode: deletedResource?.iid as string }}
+						components={{
+							confirmCode: <span className='font-bold text-default' />,
+						}}
+					/>
+				}
+				confirmCode={deletedResource?.iid as string}
+				onConfirm={() => deleteResource(deletedResource?._id as string)}
+				isOpen={isDeletedResourceModalOpen}
+				closeModal={closeDeleteResourceModal}
+				closable
+			/>
 		</div>
 	);
 }
