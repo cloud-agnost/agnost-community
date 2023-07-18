@@ -1,3 +1,4 @@
+import { NUMBER_REGEX } from '@/constants';
 import useTypeStore from '@/store/types/typeStore';
 import { translate } from '@/utils';
 import * as z from 'zod';
@@ -76,6 +77,7 @@ export const ConnectResourceSchema = z.object({
 			label: translate('general.name'),
 		}),
 	}),
+
 	instance: z
 		.string({
 			required_error: translate('forms.required', {
