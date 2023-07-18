@@ -24,6 +24,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import * as z from 'zod';
 import { useTranslation } from 'react-i18next';
 import { RequireAuth } from '@/router';
+import { NUMBER_REGEX } from '@/constants';
 
 async function loader() {
 	return null;
@@ -36,7 +37,7 @@ const FormSchema = z.object({
 		.refine((value) => value.trim().length > 0, 'Host is required'),
 	port: z
 		.string({ required_error: 'Port is required' })
-		.regex(/^[0-9]+$/, 'Port must be a number')
+		.regex(NUMBER_REGEX, 'Port must be a number')
 		.min(3, 'Port must be at least 3 characters long')
 		.trim()
 		.refine((value) => value.trim().length > 0, 'Port is required'),
