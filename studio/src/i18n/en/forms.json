@@ -38,5 +38,6 @@
 	"alphanumeric": "{{label}} must only contain alphanumeric characters",
 	"number": "{{label}} must be a number",
 	"search_to_add": "Search to add {{label}}",
-	"pick_a_date": "Pick a date"
+	"pick_a_date": "Pick a date",
+	"select": "Select {{label}}"
 }
