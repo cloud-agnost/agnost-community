@@ -1,8 +1,7 @@
-import React from 'react';
-import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '../Tooltip';
-import { Button } from '../Button';
 import { EnvelopeSimple } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '../Button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
 interface Props {
 	onResend: () => void;
 }

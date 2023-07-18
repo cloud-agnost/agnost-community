@@ -2,7 +2,7 @@ import { INVITATIONS_SORT_OPTIONS, PAGE_SIZE } from '@/constants';
 import { useToast } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
 import { Invitation } from '@/types';
-import { Broom, FunnelSimple } from '@phosphor-icons/react';
+import { FunnelSimple } from '@phosphor-icons/react';
 import { Row } from '@tanstack/react-table';
 import { Button } from 'components/Button';
 import {
@@ -56,17 +56,7 @@ function AppInvitationFilter({ selectedRows }: Props) {
 			});
 		}
 	}
-	function clearFilters() {
-		useApplicationStore.setState?.({
-			invitationSearch: '',
-			invitationRoleFilter: [],
-			invitationSort: {
-				name: t('general.sortOptions.default'),
-				value: '',
-				sortDir: '',
-			},
-		});
-	}
+
 	const getInvitations = useCallback(() => {
 		getAppInvitations({
 			size: PAGE_SIZE,

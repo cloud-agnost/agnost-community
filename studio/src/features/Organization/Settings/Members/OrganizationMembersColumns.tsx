@@ -5,10 +5,8 @@ import { DateText } from '@/components/DateText';
 import { RoleSelect } from '@/components/RoleDropdown';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { OrganizationMember } from '@/types';
-import { formatDate } from '@/utils';
 import { Trash } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { DateTime } from 'luxon';
 
 function updateRole(userId: string, role: string) {
 	useOrganizationStore.getState().changeMemberRole({

@@ -4,7 +4,7 @@ import { DateText } from '@/components/DateText';
 import { TableActions } from '@/components/Table';
 import { BADGE_COLOR_MAP } from '@/constants';
 import { Resource } from '@/types';
-import { capitalize, translate } from '@/utils';
+import { translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 
 export const ResourceTableColumn: ColumnDef<Resource>[] = [
@@ -47,7 +47,7 @@ export const ResourceTableColumn: ColumnDef<Resource>[] = [
 			const { allowedRoles } = row.original;
 			return (
 				<div className='flex gap-2'>
-					{allowedRoles.map((role) => {
+					{allowedRoles.sort().map((role) => {
 						return <Badge key={role} text={role} variant={BADGE_COLOR_MAP[role.toUpperCase()]} />;
 					})}
 				</div>
