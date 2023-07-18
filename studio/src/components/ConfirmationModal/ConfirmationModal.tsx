@@ -1,6 +1,6 @@
 import { Modal, ModalProps } from 'components/Modal';
 import { Button } from 'components/Button';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState, KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import './confirmationModal.scss';
 import { Input } from 'components/Input';
@@ -46,6 +46,10 @@ export default function ConfirmationModal({
 		if (!isOpen) setCode('');
 	}, [isOpen]);
 
+	function checkPressEnter(event: KeyboardEvent<HTMLInputElement>) {
+		if (event.key === 'Enter' && code === confirmCode) onConfirm();
+	}
+
 	return (
 		<Modal
 			closeModal={closeModal}
@@ -75,6 +79,7 @@ export default function ConfirmationModal({
 						placeholder={t('general.enter_confirmation_code_here') ?? ''}
 						maxLength={confirmCode.length}
 						onChange={(e) => setCode(e.target.value)}
+						onKeyDown={checkPressEnter}
 					/>
 				)}
 				<div className='confirmation-modal-actions'>

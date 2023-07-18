@@ -135,7 +135,7 @@ export default function EndpointSelectModal({
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button variant='outline'>
-								<Funnel className='mr-2' size={16} weight='fill' />
+								<Funnel className='mr-2 text-default' size={14} weight='fill' />
 								<span>{t('general.filter')}</span>
 								{methods.length > 0 && <span className='ml-1'>({methods.length})</span>}
 							</Button>
@@ -174,8 +174,8 @@ export default function EndpointSelectModal({
 					</DropdownMenu>
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button variant='outline' className='gap-2'>
-								<FunnelSimple size={16} />
+							<Button variant='outline' className='gap-2 text-default'>
+								<FunnelSimple className='text-default' weight='bold' size={16} />
 								{sortOption.name}
 							</Button>
 						</DropdownMenuTrigger>

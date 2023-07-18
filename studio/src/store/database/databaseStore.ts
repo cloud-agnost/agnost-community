@@ -16,8 +16,12 @@ interface DatabaseStore {
 	databases: Database[];
 	databasesForSearch: Database[];
 	database: Database | null;
+	toEditDatabase: Database | null;
 	apps: object[];
 	appLogs: object[];
+	editDatabaseDialogOpen: boolean;
+	setToEditDatabase: (database: Database) => void;
+	setEditDatabaseDialogOpen: (open: boolean) => void;
 	setApps: (apps: object[]) => void;
 	setAppLogs: (appLogs: object[]) => void;
 	getDatabasesOfApp: (params: GetDatabasesOfAppParams) => Promise<Database[]>;
@@ -35,8 +39,17 @@ const useDatabaseStore = create<DatabaseStore>()(
 				databases: [],
 				databasesForSearch: [],
 				database: null,
+				editDatabaseDialogOpen: false,
 				apps: [],
 				appLogs: [],
+				toEditDatabase: null,
+				setToEditDatabase: (database: Database) => set({ toEditDatabase: database }),
+				setEditDatabaseDialogOpen: (open: boolean) => {
+					if (!open) {
+						set({ toEditDatabase: null });
+					}
+					set({ editDatabaseDialogOpen: open });
+				},
 				setApps: (apps: object[]) => set({ apps }),
 				setAppLogs: (appLogs: object[]) => set({ appLogs }),
 				getDatabasesOfApp: async (params: GetDatabasesOfAppParams): Promise<Database[]> => {
@@ -50,12 +63,22 @@ const useDatabaseStore = create<DatabaseStore>()(
 					return database;
 				},
 				createDatabase: async (params: CreateDatabaseParams): Promise<Database> => {
-					const database = await DatabaseService.createDatabase(params);
-					set((prev) => ({
-						databases: [...prev.databases, database],
-						databasesForSearch: [...prev.databases, database],
-					}));
-					return database;
+					try {
+						const database = await DatabaseService.createDatabase(params);
+						set((prev) => ({
+							databases: [...prev.databases, database],
+							databasesForSearch: [...prev.databases, database],
+						}));
+						return database;
+					} catch (e) {
+						const error = e as APIError;
+						notify({
+							type: 'error',
+							title: error.error,
+							description: error.details,
+						});
+						throw e;
+					}
 				},
 				updateDatabaseName: async (params: UpdateDatabaseNameParams): Promise<Database> => {
 					const database = await DatabaseService.updateDatabaseName(params);

@@ -57,7 +57,10 @@ export default class DatabaseService {
 		versionId,
 		dbId,
 	}: DeleteDatabaseParams): Promise<void> {
-		return (await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}`))
-			.data;
+		return (
+			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}`, {
+				data: {},
+			})
+		).data;
 	}
 }

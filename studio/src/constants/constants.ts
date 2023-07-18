@@ -34,7 +34,7 @@ import { history, translate } from '@/utils';
 import { FileText, GearSix, Plus } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { DropdownMenuSeparator } from 'components/Dropdown';
-import { Fragment } from 'react';
+import { ElementType, Fragment } from 'react';
 
 export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
@@ -429,6 +429,14 @@ export const DATABASE_TYPES: Instance[] = [
 	},
 ];
 
+export const DATABASE_ICON_MAP: Record<string, ElementType> = {
+	MongoDB: MongoDb,
+	MySQL: MySql,
+	PostgreSQL: PostgreSql,
+	Oracle: Oracle,
+	'SQL Server': Oracle,
+};
+
 export const CREATE_RESOURCES_ELEMENTS = [
 	{
 		step: 1,
@@ -595,12 +603,12 @@ export const ENDPOINT_OPTIONS: SortOption[] = [
 		sortDir: 'desc',
 	},
 	{
-		name: translate('general.sortOptions.emailAsc'),
+		name: translate('general.sortOptions.nameAsc'),
 		value: 'name',
 		sortDir: 'asc',
 	},
 	{
-		name: translate('general.sortOptions.emailDesc'),
+		name: translate('general.sortOptions.nameDesc'),
 		value: 'name',
 		sortDir: 'desc',
 	},

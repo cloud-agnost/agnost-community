@@ -5,7 +5,9 @@ import { Button } from 'components/Button';
 import { Pencil, Refresh } from 'components/icons';
 import { CopyButton } from 'components/CopyButton';
 import { Badge } from 'components/Badge';
-import { Trash } from '@phosphor-icons/react';
+import useDatabaseStore from '@/store/database/databaseStore.ts';
+import { DATABASE_ICON_MAP } from '@/constants';
+import DeleteDatabaseButton from '../DeleteDatabaseButton/DeleteDatabaseButton.tsx';
 
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
@@ -18,9 +20,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'iid',
-		header: ({ column }) => (
-			<SortButton text={translate('general.id').toUpperCase()} column={column} />
-		),
+		header: translate('general.id').toUpperCase(),
 		accessorKey: 'iid',
 		sortingFn: 'textCaseSensitive',
 		cell: ({
@@ -49,14 +49,18 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 				original: { type },
 			},
 		}) => {
-			return <span className='whitespace-nowrap'>{type}</span>;
+			const Icon = DATABASE_ICON_MAP[type];
+			return (
+				<span className='flex items-center gap-2'>
+					<Icon />
+					{type}
+				</span>
+			);
 		},
 	},
 	{
 		id: 'managed',
-		header: ({ column }) => (
-			<SortButton text={translate('general.managed').toUpperCase()} column={column} />
-		),
+		header: translate('general.managed').toUpperCase(),
 		accessorKey: 'managed',
 		sortingFn: 'textCaseSensitive',
 
@@ -78,10 +82,14 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
 		id: 'actions',
 		className: 'actions !w-[50px]',
-		cell: () => {
+		cell: ({ row: { original } }) => {
+			const { setToEditDatabase, setEditDatabaseDialogOpen } = useDatabaseStore.getState();
+
 			function openEditDrawer() {
-				// TODO: open edit drawer
+				setToEditDatabase(original);
+				setEditDatabaseDialogOpen(true);
 			}
+
 			return (
 				<div className='flex items-center justify-end'>
 					<Button
@@ -93,17 +101,8 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 					>
 						<Pencil />
 					</Button>
+					<DeleteDatabaseButton database={original} />
 					<Button
-						onClick={openEditDrawer}
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-					>
-						<Trash />
-					</Button>
-					<Button
-						onClick={openEditDrawer}
 						iconOnly
 						variant='blank'
 						rounded

@@ -1,1 +1,1 @@
-export { default as CreateDatabaseDrawer } from './CreateDatabaseDrawer.tsx';
+export { default as CreateAndEditDatabaseDrawer } from './CreateAndEditDatabaseDrawer.tsx';
