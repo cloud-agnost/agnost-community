@@ -1,21 +1,26 @@
 import { DrawerFooter } from '@/components/Drawer';
 import { Input } from '@/components/Input';
 import useResourceStore from '@/store/resources/resourceStore';
-import { Instance } from '@/types';
+import { Instance, ConnectDatabaseSchema } from '@/types';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import CreateResourceItem from '../CreateResourceItem';
 import ResourceInstance from '../ResourceType/ResourceInstance';
 import useTypeStore from '@/store/types/typeStore';
 import { Checkbox } from '@/components/Checkbox';
+import { Button } from '@/components/Button';
+import { INSTANCE_PORT_MAP } from '@/constants';
+
+import * as z from 'zod';
 interface Props {
 	title: string;
 	children: React.ReactNode;
-	actions: React.ReactNode;
+	actions?: React.ReactNode;
 	instances?: Instance[];
 	control?: Control<any>;
 	typeSelection?: boolean;
+	loading?: boolean;
 }
 export default function CreateResourceLayout({
 	title,
@@ -24,10 +29,12 @@ export default function CreateResourceLayout({
 	instances,
 	control,
 	typeSelection,
+	loading,
 }: Props) {
 	const { t } = useTranslation();
-	const { resourceType } = useResourceStore();
+	const { resourceType, returnToPreviousStep, goToNextStep } = useResourceStore();
 	const { appRoles } = useTypeStore();
+	const form = useFormContext<z.infer<typeof ConnectDatabaseSchema>>();
 
 	return (
 		<div className='px-6 py-4 space-y-6 max-h-[90%] overflow-auto'>
@@ -75,7 +82,7 @@ export default function CreateResourceLayout({
 						<Controller
 							control={control}
 							name='allowedRoles'
-							render={({ field: { onChange, value }, formState: { errors } }) => (
+							render={({ field: { onChange, value } }) => (
 								<FormItem className='flex items-center space-x-6 space-y-0'>
 									{appRoles.map((role) => (
 										<FormField
@@ -86,7 +93,7 @@ export default function CreateResourceLayout({
 												return (
 													<FormItem
 														key={role}
-														className='flex flex-row items-start space-x-3 space-y-0'
+														className='flex flex-row items-start space-x-1 space-y-0'
 													>
 														<FormControl>
 															<Checkbox
@@ -128,6 +135,7 @@ export default function CreateResourceLayout({
 												instance={type}
 												onSelect={() => {
 													onChange(type.name);
+													form.setValue('access.port', INSTANCE_PORT_MAP[type.name]);
 												}}
 												active={value === type.name}
 											/>
@@ -143,7 +151,28 @@ export default function CreateResourceLayout({
 				</>
 			)}
 			{children}
-			<DrawerFooter>{actions}</DrawerFooter>
+			{typeSelection ? (
+				<DrawerFooter>
+					<Button
+						variant='primary'
+						size='lg'
+						onClick={goToNextStep}
+						disabled={resourceType.type && resourceType.name ? false : true}
+					>
+						{t('general.next')}
+					</Button>
+				</DrawerFooter>
+			) : (
+				<DrawerFooter>
+					{actions}
+					<Button size='lg' type='button' variant='secondary' onClick={returnToPreviousStep}>
+						{t('general.previous')}
+					</Button>
+					<Button size='lg' type='submit' loading={loading}>
+						{t('general.add')}
+					</Button>
+				</DrawerFooter>
+			)}
 		</div>
 	);
 }
