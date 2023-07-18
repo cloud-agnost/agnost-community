@@ -1,13 +1,14 @@
-export { default as AgnostOnlyLogo } from './AgnostOnlyLogo';
 export { default as ApiKeys } from './ApiKeys';
+export { default as AgnostOnlyLogo } from './AgnostOnlyLogo';
 export { default as Authentication } from './Authentication';
 export { default as BellRing } from './BellRing';
+export { default as DatabaseIcon } from './DatabaseIcon';
 export { default as Cache } from './Cache';
 export { default as ChangeLog } from './ChangeLog';
 export { default as Connect } from './Connect';
 export { default as Dashboard } from './Dashboard';
 export { default as Database } from './Database';
-export { default as DatabaseIcon } from './DatabaseIcon';
+export { default as DeviceMobile } from './DeviceMobile';
 export { default as Document } from './Document';
 export { default as DoubleGear } from './DoubleGear';
 export { default as Environment } from './Environment';
