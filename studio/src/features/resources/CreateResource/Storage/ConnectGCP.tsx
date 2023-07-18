@@ -1,4 +1,5 @@
 import { Input } from '@/components/Input';
+import { Textarea } from '@/components/Input/Textarea';
 import { useToast } from '@/hooks';
 import useResourceStore from '@/store/resources/resourceStore';
 import { ConnectResourceSchema } from '@/types';
@@ -9,29 +10,25 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import CreateResourceLayout from '../CreateResourceLayout';
-const ConnectAWSSchema = z.object({
+
+const ConnectGCPSchema = z.object({
 	...ConnectResourceSchema.shape,
 	access: z.object({
-		accessKeyId: z.string().nonempty(),
-		secretAccessKey: z.string().nonempty(),
-		region: z.string().nonempty(),
+		projectId: z.string().nonempty(),
+		keyFileContents: z.string().nonempty(),
 	}),
 });
-export default function ConnectAWS() {
+
+export default function ConnectGCP() {
 	const { notify } = useToast();
 	const [loading, setLoading] = useState(false);
-	const form = useForm<z.infer<typeof ConnectAWSSchema>>({
-		resolver: zodResolver(ConnectAWSSchema),
+	const form = useForm<z.infer<typeof ConnectGCPSchema>>({
+		resolver: zodResolver(ConnectGCPSchema),
 	});
-
 	const { t } = useTranslation();
 	const { addExistingResource, toggleCreateResourceModal } = useResourceStore();
 
-	useEffect(() => {
-		form.setValue('instance', 'AWS S3');
-	}, [form]);
-	console.log(form.formState.errors);
-	function onSubmit(data: z.infer<typeof ConnectAWSSchema>) {
+	function onSubmit(data: z.infer<typeof ConnectGCPSchema>) {
 		setLoading(true);
 		addExistingResource({
 			type: 'storage',
@@ -50,23 +47,28 @@ export default function ConnectAWS() {
 			},
 		});
 	}
+
+	useEffect(() => {
+		form.setValue('instance', 'GCP Cloud Storage');
+	}, [form]);
+	console.log(form.formState.errors);
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)}>
-				<CreateResourceLayout title={t('resources.storage.aws.title')} loading={loading}>
-					<div className='grid grid-cols-2 grid-rows-2 gap-6'>
+				<CreateResourceLayout title={t('resources.storage.gcp.title')} loading={loading}>
+					<div className='space-y-6'>
 						<FormField
 							control={form.control}
-							name='access.accessKeyId'
+							name='access.projectId'
 							render={({ field }) => (
 								<FormItem className='flex-1'>
-									<FormLabel>{t('resources.storage.aws.accessKeyId')}</FormLabel>
+									<FormLabel>{t('resources.storage.gcp.projectId')}</FormLabel>
 									<FormControl>
 										<Input
-											error={Boolean(form.formState.errors.access?.accessKeyId)}
+											error={Boolean(form.formState.errors.access?.projectId)}
 											placeholder={
 												t('forms.placeholder', {
-													label: t('resources.storage.aws.accessKeyId'),
+													label: t('resources.storage.gcp.projectId'),
 												}) ?? ''
 											}
 											{...field}
@@ -79,16 +81,19 @@ export default function ConnectAWS() {
 						/>
 						<FormField
 							control={form.control}
-							name='access.secretAccessKey'
+							name='access.keyFileContents'
 							render={({ field }) => (
 								<FormItem className='flex-1'>
-									<FormLabel>{t('resources.storage.aws.secret')}</FormLabel>
+									<FormLabel>{t('resources.storage.gcp.keyFileContents')}</FormLabel>
 									<FormControl>
-										<Input
-											error={Boolean(form.formState.errors.access?.secretAccessKey)}
+										<Textarea
+											showCount
+											rows={5}
+											maxLength={50}
+											error={Boolean(form.formState.errors.access?.keyFileContents)}
 											placeholder={
 												t('forms.placeholder', {
-													label: t('resources.storage.aws.secret'),
+													label: t('resources.storage.gcp.keyFileContents'),
 												}) ?? ''
 											}
 											{...field}
@@ -96,26 +101,6 @@ export default function ConnectAWS() {
 									</FormControl>
 
 									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='access.region'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{t('resources.storage.aws.region')}</FormLabel>
-									<FormControl>
-										<Input
-											error={Boolean(form.formState.errors.access?.region)}
-											placeholder={
-												t('forms.placeholder', {
-													label: t('resources.storage.aws.region'),
-												}) ?? ''
-											}
-											{...field}
-										/>
-									</FormControl>
 								</FormItem>
 							)}
 						/>
