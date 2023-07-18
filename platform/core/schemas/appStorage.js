@@ -1,14 +1,12 @@
 import mongoose from "mongoose";
-import parser from "cron-parser";
 import { body, query } from "express-validator";
 import resourceCtrl from "../controllers/resource.js";
-import { logicTypes } from "../config/constants.js";
 
 /**
- *  Cron job and its handler definition
+ * Message cron job and its handler definition
  */
-export const TaskModel = mongoose.model(
-	"task",
+export const AppStorageModel = mongoose.model(
+	"storage",
 	new mongoose.Schema(
 		{
 			orgId: {
@@ -37,23 +35,6 @@ export const TaskModel = mongoose.model(
 				type: String,
 				required: true,
 				index: true,
-			},
-			logExecution: {
-				type: Boolean,
-				default: true,
-			},
-			type: {
-				type: String,
-				required: true,
-				enum: logicTypes,
-				default: "code",
-			},
-			logic: {
-				type: String,
-				text: true, // Declares a full-text index
-			},
-			cronExpression: {
-				type: String,
 			},
 			createdBy: {
 				type: mongoose.Schema.Types.ObjectId,
@@ -131,7 +112,7 @@ export const applyRules = (type) => {
 						if (!regex.test(value)) {
 							throw new AgnostError(
 								t(
-									"Cron job names can include only numbers, letters and underscore (_) characters"
+									"Storage names can include only numbers, letters and underscore (_) characters"
 								)
 							);
 						}
@@ -139,13 +120,13 @@ export const applyRules = (type) => {
 						let regex2 = /^[0-9].*$/;
 						if (regex2.test(value)) {
 							throw new AgnostError(
-								t("Cron job names cannot start with a number")
+								t("Storage names cannot start with a number")
 							);
 						}
 
 						if (value.startsWith("_")) {
 							throw new AgnostError(
-								t("Cron job names cannot start with underscore (_) character")
+								t("Storage names cannot start with underscore (_) character")
 							);
 						}
 
@@ -155,29 +136,26 @@ export const applyRules = (type) => {
 					.bail()
 					.custom(async (value, { req }) => {
 						//Check whether model name is unique or not
-						let tasks = await TaskModel.find(
-							{
-								versionId: req.version._id,
-							},
-							"-logic"
-						);
-						tasks.forEach((task) => {
+						let storages = await AppStorageModel.find({
+							versionId: req.version._id,
+						});
+						storages.forEach((storage) => {
 							if (
-								(task.name.toLowerCase() === value.toLowerCase() &&
+								(storage.name.toLowerCase() === value.toLowerCase() &&
 									type === "create") ||
-								(task.name.toLowerCase() === value.toLowerCase() &&
+								(storage.name.toLowerCase() === value.toLowerCase() &&
 									type === "update" &&
-									req.task._id.toString() !== task._id.toString())
+									req.storage._id.toString() !== storage._id.toString())
 							)
 								throw new AgnostError(
-									t("Cron job with the provided name already exists")
+									t("Storage with the provided name already exists")
 								);
 						});
 
 						if (value.toLowerCase() === "this") {
 							throw new AgnostError(
 								t(
-									"'%s' is a reserved keyword and cannot be used as cron job name",
+									"'%s' is a reserved keyword and cannot be used as Storage name",
 									value
 								)
 							);
@@ -185,29 +163,6 @@ export const applyRules = (type) => {
 
 						//Indicates the success of this synchronous custom validator
 						return true;
-					}),
-				body("logExecution")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isBoolean()
-					.withMessage(t("Not a valid boolean value"))
-					.toBoolean(),
-				body("cronExpression")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom((value) => {
-						try {
-							parser.parseExpression(value);
-							return true;
-						} catch (err) {
-							throw new AgnostError(
-								t("Not a valid cron expression. %s", err.message)
-							);
-						}
 					}),
 				body("resourceId")
 					.if(() => type === "create")
@@ -228,11 +183,11 @@ export const applyRules = (type) => {
 								t("No such resource with the provided id '%s' exists.", value)
 							);
 
-						// Check if the selected resource is a scheduler
-						if (resource.type !== "scheduler")
+						// Check if the selected resource is a storage
+						if (resource.type !== "storage")
 							throw new AgnostError(
 								t(
-									"The selected resource '%s' (%s) is not a cron job scheduler",
+									"The selected resource '%s' (%s) is not a storage",
 									resource.name,
 									resource.instance
 								)
@@ -242,7 +197,7 @@ export const applyRules = (type) => {
 						if (resource.status !== "OK")
 							throw new AgnostError(
 								t(
-									"Only resorces in ready (OK) status can be mapped to a cron job. The selected '%s' resoure '%s' is in '%s' status",
+									"Only resorces in ready (OK) status can be mapped to a storage. The selected '%s' resoure '%s' is in '%s' status",
 									resource.instance,
 									resource.name,
 									resource.status
@@ -254,15 +209,9 @@ export const applyRules = (type) => {
 						return true;
 					}),
 			];
-		case "save-logic":
-			return [
-				body("logic")
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty")),
-			];
 		case "delete-multi":
 			return [
-				body("taskIds.*")
+				body("storageIds.*")
 					.trim()
 					.optional()
 					.custom((value) => {

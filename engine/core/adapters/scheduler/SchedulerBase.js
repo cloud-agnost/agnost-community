@@ -10,6 +10,44 @@ export class SchedulerBase {
 	 */
 	async listenMessages(taskId) {}
 
+	async triggerCronJob(task) {}
+
+	/**
+	 * Gets the cron job task tracking record information
+	 * @param  {string} trackingId The tracking id of the task
+	 */
+	async getTaskTrackingRecord(cronJobId, trackingId) {
+		if (!helper.isValidId(trackingId))
+			throw new AgnostError(
+				t("Not a valid tracking identifier '%s'", trackingId ?? "")
+			);
+
+		const conn = getDBClient();
+		let db = conn.db(META.getEnvId());
+		return await db
+			.collection("cronjobs")
+			.findOne(
+				{ cronJobId, trackingId: helper.generateId(trackingId) },
+				{ projection: { _id: 0 } }
+			);
+	}
+
+	/**
+	 * Adds a new cron job tracking record to the database and returns the created tracking record
+	 * @param  {Object} trackingRecord The tracking record to add to the database
+	 */
+	async createCronJobTrackingRecord(trackingRecord) {
+		const conn = getDBClient();
+		let db = conn.db(META.getEnvId());
+		const result = await db.collection("cronjobs").insertOne(trackingRecord);
+		if (result?.insertedId) {
+			return await db
+				.collection("cronjobs")
+				.findOne({ _id: result?.insertedId }, { projection: { _id: 0 } });
+		}
+		return null;
+	}
+
 	/**
 	 * Updates the task info record
 	 * @param  {string} trackingId The tracking id of the task

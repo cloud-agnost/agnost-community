@@ -15,8 +15,67 @@ export class Agenda extends SchedulerBase {
 	}
 
 	/**
+	 * Manually triggers the execution of the task
+	 * @param  {object} task The task object
+	 */
+	async triggerCronJob(task) {
+		// Add a tracking record to track progress of this message
+		const trackingId = helper.generateId();
+		const trackingRecord = await this.createCronJobTrackingRecord({
+			trackingId: trackingId,
+			cronJobId: task.iid,
+			cronJobName: task.name,
+			triggeredAt: new Date(),
+			status: "pending",
+		});
+
+		try {
+			const channel = await this.driver.createChannel();
+			const envId = META.getEnvId();
+			const message = {
+				taskId: task.iid,
+				envId: envId,
+				taskName: task.name,
+				trackingId,
+			};
+
+			const queueNumber = helper.randomInt(
+				1,
+				config.get("general.taskProcessQueueCount")
+			);
+			const queueName = `process-task-${envId}-${task.name}-${queueNumber}`;
+
+			await channel.assertQueue(queueName, {
+				durable: true,
+				autoDelete: true,
+			});
+
+			await channel.sendToQueue(
+				queueName,
+				Buffer.from(JSON.stringify(message)),
+				{
+					persistent: true,
+					timestamp: Date.now(),
+				}
+			);
+
+			await channel.close();
+		} catch (error) {
+			console.log("****err", error);
+			logger.error(
+				"Cannot create channel to cron job processing message queue",
+				{
+					details: error,
+				}
+			);
+		}
+
+		return trackingRecord;
+	}
+
+	/**
 	 * Adds the listerer to listen messages for the provided task
-	 * @param  {string} task The task object
+	 * @param  {object} task The task object
 	 */
 	async listenMessages(task) {
 		const envId = META.getEnvId();

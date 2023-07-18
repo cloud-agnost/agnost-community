@@ -924,25 +924,25 @@ export const authUserDataModel = [
 	},
 ];
 
-export const defaultEndpointCode = `const endpointHandler = (req, res) => {
+export const defaultEndpointCode = `const endpointHandler = async (req, res) => {
 	res.json();
 };
 
 export default endpointHandler;`;
 
-export const defaultMiddlewareCode = `const middlewareHandler = (req, res, next) => {
+export const defaultMiddlewareCode = `const middlewareHandler = async (req, res, next) => {
 	next();
 };
 
 export default middlewareHandler;`;
 
-export const defaultQueueCode = `const queueHandler = (message) => {
+export const defaultQueueCode = `const queueHandler = async (message) => {
 
 };
 
 export default queueHandler;`;
 
-export const defaultTaskCode = `const cronJobHandler = () => {
+export const defaultTaskCode = `const cronJobHandler = async () => {
 
 };
 

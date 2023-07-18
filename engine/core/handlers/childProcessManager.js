@@ -24,6 +24,7 @@ import {
 import { runHandler } from "../middlewares/runHandler.js";
 import { adapterManager } from "./adapterManager.js";
 import { MetaManager } from "./metaManager.js";
+import pkg from "../agnost-server-client.cjs";
 
 export class ChildProcessDeploymentManager extends DeploymentManager {
 	constructor(msgObj, envObj, i18n) {
@@ -99,7 +100,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// Set the environment object of the deployment manager
 		this.setEnvObj(envObj);
-		// Save also the environment object to globals for faster access
+		// Save the metadata manager to globals for faster access
 		global.META = new MetaManager(envObj);
 		// We are initializing the server, do not process any incoming requests
 		global.SERVER_STATUS = "initializing";
@@ -125,6 +126,11 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		this.addLog(`Completed initializing the API server`);
 		// Send the deployment telemetry information to the platform
 		await this.sendEnvironmentLogs("OK");
+
+		// Create the agnost server-side client instance
+		// Save agnost server side client to globals for faster access
+		const { createServerSideClient } = pkg;
+		global.agnost = createServerSideClient(META, adapterManager);
 	}
 
 	/**
@@ -392,17 +398,14 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * @param  {Array} handlers The array where the route handler will be will be added
 	 */
 	async manageStorages() {
-		const storageMappings = this.getResourceMappings().filter(
-			(entry) => entry.design.type === "storage"
-		);
+		// First load the tasks configuration file
+		const storages = await META.getStorages();
+		if (storages.length === 0) return;
 
-		if (storageMappings.length === 0) return;
-
-		for (const mapping of storageMappings) {
-			const connection = adapterManager.getStorageAdapter(mapping.design.name);
-
-			if (connection) {
-				this.addLog(`Initialized storage adapter '${mapping.design.name}'`);
+		for (const storage of storages) {
+			const adapterObj = adapterManager.getStorageAdapter(storage.name);
+			if (adapterObj) {
+				this.addLog(`Initialized storage adapter '${storage.name}'`);
 			}
 		}
 	}

@@ -74,6 +74,11 @@ export const AuditModel = mongoose.model(
 			ref: "task",
 			index: true,
 		},
+		storageId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "storage",
+			index: true,
+		},
 		// Action type e.g., create, update, delete, deploy, merge
 		action: {
 			type: String,

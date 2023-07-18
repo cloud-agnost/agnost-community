@@ -20,13 +20,39 @@ export class QueueBase {
 	async sendMessage(queue, payload, delayMs = 0, debugChannel = null) {}
 
 	/**
-	 * Adds a new message tracking record to the database
+	 * Gets the message tracking record information
+	 * @param  {string} trackingId The tracking id of the message
+	 */
+	async getMessageTrackingRecord(queueId, trackingId) {
+		if (!helper.isValidId(trackingId))
+			throw new AgnostError(
+				t("Not a valid tracking identifier '%s'", trackingId ?? "")
+			);
+
+		const conn = getDBClient();
+		let db = conn.db(META.getEnvId());
+		return await db
+			.collection("messages")
+			.findOne(
+				{ queueId, trackingId: helper.generateId(trackingId) },
+				{ projection: { _id: 0 } }
+			);
+	}
+
+	/**
+	 * Adds a new message tracking record to the database and returns the created tracking record
 	 * @param  {Object} trackingRecord The tracking record to add to the database
 	 */
 	async createMessageTrackingRecord(trackingRecord) {
 		const conn = getDBClient();
 		let db = conn.db(META.getEnvId());
-		await db.collection("messages").insertOne(trackingRecord);
+		const result = await db.collection("messages").insertOne(trackingRecord);
+		if (result?.insertedId) {
+			return await db
+				.collection("messages")
+				.findOne({ _id: result?.insertedId }, { projection: { _id: 0 } });
+		}
+		return null;
 	}
 
 	/**

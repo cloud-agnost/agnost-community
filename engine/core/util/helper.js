@@ -148,6 +148,29 @@ function objectId(idString) {
 }
 
 /**
+ * Checks if the id is a valid MongoDB identifer or not
+ * @param  {string} id The identifer to check
+ */
+function isValidId(id) {
+	if (!id) return false;
+
+	try {
+		const objId = objectId(id);
+		if (mongo.ObjectId.isValid(objId)) {
+			if (objId.toString() === id.toString()) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	} catch (err) {
+		return false;
+	}
+}
+
+/**
  * Bind console ouptput to send realtime messages to the client during debug mode
  * @param  {string} debugChannel The debug channel unique id for realtime messages
  */
@@ -291,6 +314,7 @@ export default {
 	getJSONErrorMessage,
 	generateId,
 	objectId,
+	isValidId,
 	turnOnLogging,
 	turnOffLogging,
 	randomInt,

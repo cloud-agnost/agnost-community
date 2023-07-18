@@ -97,8 +97,8 @@ const taskProcessor = async (job) => {
 		let db = dbClient.db(envId);
 		let taskInfo = {
 			trackingId: trackingId,
-			taskId: taskId,
-			taskName: taskName,
+			cronJobId: taskId,
+			cronJobName: taskName,
 			triggeredAt: new Date(),
 			status: "pending",
 		};

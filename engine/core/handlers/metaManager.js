@@ -1,5 +1,6 @@
 import path from "path";
 import fs from "fs/promises";
+import { readFileSync } from "fs";
 
 export class MetaManager {
 	constructor(envObj) {
@@ -10,6 +11,7 @@ export class MetaManager {
 		this.middlewares = null;
 		this.queues = null;
 		this.tasks = null;
+		this.storages = null;
 	}
 
 	/**
@@ -94,9 +96,28 @@ export class MetaManager {
 	 */
 	async getDatabases() {
 		if (!this.databases)
-			this.databases = await await this.loadEntityConfigFile("databases");
+			this.databases = await this.loadEntityConfigFile("databases");
 
 		return this.databases;
+	}
+
+	/**
+	 * Returns the list of databases
+	 */
+	getDatabasesSync() {
+		if (!this.databases)
+			this.databases = this.loadEntityConfigFileSync("databases");
+
+		return this.databases;
+	}
+
+	/**
+	 * Returns a specific database
+	 */
+	getDatabaseByName(name) {
+		const databases = this.getDatabasesSync();
+
+		return databases.find((entry) => entry.name === name);
 	}
 
 	/**
@@ -104,7 +125,7 @@ export class MetaManager {
 	 */
 	async getEndpoints() {
 		if (!this.endpoints)
-			this.endpoints = await await this.loadEntityConfigFile("endpoints");
+			this.endpoints = await this.loadEntityConfigFile("endpoints");
 
 		return this.endpoints;
 	}
@@ -129,12 +150,76 @@ export class MetaManager {
 	}
 
 	/**
+	 * Returns the list of queues
+	 */
+	getQueuesSync() {
+		if (!this.queues) this.queues = this.loadEntityConfigFileSync("queues");
+
+		return this.queues;
+	}
+
+	/**
+	 * Returns a specific queue
+	 */
+	getQueueByName(name) {
+		const queues = this.getQueuesSync();
+		return queues.find((entry) => entry.name === name);
+	}
+
+	/**
 	 * Returns the list of tasks
 	 */
 	async getTasks() {
 		if (!this.tasks) this.tasks = await this.loadEntityConfigFile("tasks");
 
 		return this.tasks;
+	}
+
+	/**
+	 * Returns the list of tasks
+	 */
+	getTasksSync() {
+		if (!this.tasks) this.tasks = this.loadEntityConfigFileSync("tasks");
+
+		return this.tasks;
+	}
+
+	/**
+	 * Returns a specific task
+	 */
+	getTaskByName(name) {
+		const tasks = this.getTasksSync();
+
+		return tasks.find((entry) => entry.name === name);
+	}
+
+	/**
+	 * Returns the list of storages
+	 */
+	async getStorages() {
+		if (!this.storages)
+			this.storages = await this.loadEntityConfigFile("storages");
+
+		return this.storages;
+	}
+
+	/**
+	 * Returns the list of storages
+	 */
+	getStoragesSync() {
+		if (!this.storages)
+			this.storages = this.loadEntityConfigFileSync("storages");
+
+		return this.storages;
+	}
+
+	/**
+	 * Returns a specific task
+	 */
+	getStorageByName(name) {
+		const storages = this.getStoragesSync();
+
+		return storages.find((entry) => entry.name === name);
 	}
 
 	/**
@@ -181,6 +266,23 @@ export class MetaManager {
 		try {
 			const appPath = path.resolve(__dirname);
 			const fileContents = await fs.readFile(
+				`${appPath}/meta/config/${contentType}.json`,
+				"utf8"
+			);
+			return JSON.parse(fileContents);
+		} catch (error) {
+			return [];
+		}
+	}
+
+	/**
+	 * Loads the specific entity configuration file, if not config file exists it returns an empty array object
+	 * @param  {string} contentType The content type such as endpoints, queues, tasks, middlewares
+	 */
+	loadEntityConfigFileSync(contentType) {
+		try {
+			const appPath = path.resolve(__dirname);
+			const fileContents = fs.readFileSync(
 				`${appPath}/meta/config/${contentType}.json`,
 				"utf8"
 			);

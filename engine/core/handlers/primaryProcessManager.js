@@ -129,6 +129,11 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 			(await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.tasks`)) ?? [];
 		await this.manageConfigFiles("tasks", tasks, "set");
 
+		// Save storages
+		const storages =
+			(await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.storages`)) ?? [];
+		await this.saveEntityConfigFile("storages", storages);
+
 		// Save environment and version info
 		await this.saveEnvConfigFile();
 		// Save databases info

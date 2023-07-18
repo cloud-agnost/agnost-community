@@ -44,7 +44,7 @@ export class AdapterManager {
 	/**
 	 * Returns the connection object matching the type and name
 	 * @param  {string} name The design name of the resource
-	 * @param  {string} type Whether we would like to get the read-only connection or not
+	 * @param  {string} type The resource type
 	 * @param  {boolean} readOnly Whether to return the read-only connection if available, otherwise return read-write connection
 	 */
 	getAdapterObject(name, type, readOnly = false) {

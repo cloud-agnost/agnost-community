@@ -15,6 +15,7 @@ import epCtrl from "../controllers/endpoint.js";
 import mwCtrl from "../controllers/middleware.js";
 import queueCtrl from "../controllers/queue.js";
 import taskCtrl from "../controllers/task.js";
+import storageCtrl from "../controllers/storage.js";
 import { OrganizationModel } from "../schemas/organization.js";
 
 class OrganizationController extends BaseController {
@@ -45,6 +46,7 @@ class OrganizationController extends BaseController {
 		await mwCtrl.deleteManyByQuery({ orgId: org._id }, { session });
 		await queueCtrl.deleteManyByQuery({ orgId: org._id }, { session });
 		await taskCtrl.deleteManyByQuery({ orgId: org._id }, { session });
+		await storageCtrl.deleteManyByQuery({ orgId: org._id }, { session });
 	}
 }
 

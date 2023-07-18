@@ -16,6 +16,7 @@ import {
 	deleteTasks,
 	updateResourceAccess,
 	manageEngineWorkers,
+	updateStorages,
 } from "../init/queue.js";
 
 const router = express.Router({ mergeParams: true });
@@ -274,6 +275,26 @@ router.post(
 					tasks,
 				});
 			}
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /env/update-storages
+@method     POST
+@desc       Updates the storages and environment data
+@access     public
+*/
+router.post(
+	"/update-storages",
+	checkContentType,
+	authAccessToken,
+	async (req, res) => {
+		try {
+			updateStorages(req.body);
 			res.json();
 		} catch (error) {
 			helper.handleError(req, res, error);

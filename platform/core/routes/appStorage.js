@@ -2,25 +2,24 @@ import express from "express";
 import deployCtrl from "../controllers/deployment.js";
 import envCtrl from "../controllers/environment.js";
 import auditCtrl from "../controllers/audit.js";
-import taskCtrl from "../controllers/task.js";
+import storageCtrl from "../controllers/storage.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateApp } from "../middlewares/validateApp.js";
 import { validateVersion } from "../middlewares/validateVersion.js";
-import { validateTask } from "../middlewares/validateTask.js";
+import { validateStorage } from "../middlewares/validateStorage.js";
 import { authorizeAppAction } from "../middlewares/authorizeAppAction.js";
-import { applyRules } from "../schemas/task.js";
+import { applyRules } from "../schemas/appStorage.js";
 import { validate } from "../middlewares/validate.js";
-import { defaultTaskCode } from "../config/constants.js";
 import { handleError } from "../schemas/platformError.js";
 
 const router = express.Router({ mergeParams: true });
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/task?page=0&size=10&search=&sortBy=email&sortDir=asc&start&end
+@route      /v1/org/:orgId/app/:appId/version/:versionId/storage?page=0&size=10&search=&sortBy=email&sortDir=asc&start&end
 @method     GET
-@desc       Get tasks of the app version. This does not return the logic (e.g., code or flow) of the tasks
+@desc       Get storages of the app version.
 @access     private
 */
 router.get(
@@ -29,7 +28,7 @@ router.get(
 	validateOrg,
 	validateApp,
 	validateVersion,
-	authorizeAppAction("app.task.view"),
+	authorizeAppAction("app.storage.view"),
 	applyRules("view"),
 	validate,
 	async (req, res) => {
@@ -50,11 +49,10 @@ router.get(
 				sort[sortBy] = sortDir;
 			} else sort = { createdAt: "desc" };
 
-			let eps = await taskCtrl.getManyByQuery(query, {
+			let eps = await storageCtrl.getManyByQuery(query, {
 				sort,
 				skip: size * page,
 				limit: size,
-				projection: "-logic",
 			});
 
 			res.json(eps);
@@ -65,23 +63,23 @@ router.get(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/task/:taskId
+@route      /v1/org/:orgId/app/:appId/version/:versionId/storage/:storageId
 @method     GET
-@desc       Get a specific task, which also returns the logic (e.g., code or flow)
+@desc       Get a specific storage, which also returns the logic (e.g., code or flow)
 @access     private
 */
 router.get(
-	"/:taskId",
+	"/:storageId",
 	authSession,
 	validateOrg,
 	validateApp,
 	validateVersion,
-	validateTask,
-	authorizeAppAction("app.task.view"),
+	validateStorage,
+	authorizeAppAction("app.storage.view"),
 	async (req, res) => {
 		try {
-			const { task } = req;
-			res.json(task);
+			const { storage } = req;
+			res.json(storage);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -89,9 +87,9 @@ router.get(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/task
+@route      /v1/org/:orgId/app/:appId/version/:versionId/storage
 @method     POST
-@desc       Creates a new task
+@desc       Creates a new storage
 @access     private
 */
 router.post(
@@ -101,34 +99,30 @@ router.post(
 	validateOrg,
 	validateApp,
 	validateVersion,
-	authorizeAppAction("app.task.create"),
+	authorizeAppAction("app.storage.create"),
 	applyRules("create"),
 	validate,
 	async (req, res) => {
-		const session = await taskCtrl.startSession();
+		const session = await storageCtrl.startSession();
 		try {
 			const { org, user, app, version, resource } = req;
-			const { name, cronExpression, logExecution } = req.body;
+			const { name } = req.body;
 
-			// Create the task
-			let taskId = helper.generateId();
-			let taskiid = helper.generateSlug("crj");
+			// Create the storage
+			let storageId = helper.generateId();
+			let storageiid = helper.generateSlug("str");
 
-			let task = await taskCtrl.create(
+			let storage = await storageCtrl.create(
 				{
-					_id: taskId,
+					_id: storageId,
 					orgId: org._id,
 					appId: app._id,
 					versionId: version._id,
-					iid: taskiid,
+					iid: storageiid,
 					name,
-					cronExpression,
-					logExecution,
-					type: "code",
-					logic: defaultTaskCode,
 					createdBy: user._id,
 				},
-				{ cacheKey: taskId, session }
+				{ cacheKey: storageId, session }
 			);
 
 			// Add mapping to the environment
@@ -143,8 +137,8 @@ router.post(
 				"mappings",
 				{
 					design: {
-						iid: taskiid,
-						type: "scheduler",
+						iid: storageiid,
+						type: "storage",
 						name: name,
 					},
 					resource: {
@@ -158,73 +152,69 @@ router.post(
 				{ cacheKey: env._id, session }
 			);
 
-			await taskCtrl.commit(session);
-			res.json(task);
+			await storageCtrl.commit(session);
+			res.json(storage);
 
-			// Deploy task updates to environments if auto-deployment is enabled
-			await deployCtrl.updateTasks(app, version, user, [task], "add");
+			// Deploy storage updates to environments if auto-deployment is enabled
+			await deployCtrl.updateStorages(app, version, user, [storage], "add");
 
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.task",
+				"org.app.version.storage",
 				"create",
-				t("Created a new cron job '%s'", name),
-				task,
+				t("Created a new storage '%s'", name),
+				storage,
 				{
 					orgId: org._id,
 					appId: app._id,
 					versionId: version._id,
-					taskId: task._id,
+					storageId: storage._id,
 				}
 			);
 		} catch (err) {
-			await taskCtrl.rollback(session);
+			await storageCtrl.rollback(session);
 			handleError(req, res, err);
 		}
 	}
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/task/:taskId
+@route      /v1/org/:orgId/app/:appId/version/:versionId/storage/:storageId
 @method     PUT
-@desc      	Updates task properties
+@desc      	Updates storage properties
 @access     private
 */
 router.put(
-	"/:taskId",
+	"/:storageId",
 	checkContentType,
 	authSession,
 	validateOrg,
 	validateApp,
 	validateVersion,
-	validateTask,
-	authorizeAppAction("app.task.update"),
+	validateStorage,
+	authorizeAppAction("app.storage.update"),
 	applyRules("update"),
 	validate,
 	async (req, res) => {
-		const session = await taskCtrl.startSession();
+		const session = await storageCtrl.startSession();
 		try {
-			const { org, user, app, version, task } = req;
-			const { name, cronExpression, logExecution } = req.body;
+			const { org, user, app, version, storage } = req;
+			const { name } = req.body;
 
-			let updatedTask = await taskCtrl.updateOneById(
-				task._id,
+			let updatedStorage = await storageCtrl.updateOneById(
+				storage._id,
 				{
 					name,
-					cronExpression,
-					logExecution,
+
 					updatedBy: user._id,
 				},
 				{},
-				{
-					cacheKey: task._id,
-					session,
-				}
+				{ cacheKey: storage._id, session }
 			);
 
-			if (task.name !== name) {
+			if (storage.name !== name) {
 				// Update the resouce mapping name info in environments if there is any
 				let env = await envCtrl.getOneByQuery(
 					{
@@ -238,7 +228,7 @@ router.put(
 				await envCtrl.updateOneByQuery(
 					{
 						_id: env._id,
-						"mappings.design.iid": task.iid,
+						"mappings.design.iid": storage.iid,
 					},
 					{ "mappings.$.design.name": name },
 					{},
@@ -246,94 +236,44 @@ router.put(
 				);
 			}
 
-			await taskCtrl.commit(session);
-			res.json(updatedTask);
+			await storageCtrl.commit(session);
+			res.json(updatedStorage);
 
-			// Deploy task updates to environments if auto-deployment is enabled
-			await deployCtrl.updateTasks(app, version, user, [updatedTask], "update");
+			// Deploy storage updates to environments if auto-deployment is enabled
+			await deployCtrl.updateStorages(
+				app,
+				version,
+				user,
+				[updatedStorage],
+				"update"
+			);
 
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.task",
+				"org.app.version.storage",
 				"update",
-				t("Updated the properties of cron job '%s'", updatedTask.name),
-				updatedTask,
+				t("Updated the properties of storage '%s'", updatedStorage.name),
+				updatedStorage,
 				{
 					orgId: org._id,
 					appId: app._id,
 					versionId: version._id,
-					taskId: task._id,
+					storageId: storage._id,
 				}
 			);
 		} catch (err) {
-			await taskCtrl.rollback(session);
+			await storageCtrl.rollback(session);
 			handleError(req, res, err);
 		}
 	}
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/task/:taskId/logic
-@method     PUT
-@desc       Saves the logic (e.g., code) of the task
-@access     private
-*/
-router.put(
-	"/:taskId/logic",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateApp,
-	validateVersion,
-	validateTask,
-	authorizeAppAction("app.task.update"),
-	applyRules("save-logic"),
-	validate,
-	async (req, res) => {
-		try {
-			const { org, user, app, version, task } = req;
-			const { logic } = req.body;
-
-			// Update the endpoing logic/code
-			const updatedTask = await taskCtrl.updateOneById(
-				task._id,
-				{ logic, updatedBy: user._id },
-				{},
-				{ cacheKey: task._id }
-			);
-
-			res.json(updatedTask);
-
-			// Deploy task updates to environments if auto-deployment is enabled
-			await deployCtrl.updateTasks(app, version, user, [updatedTask], "update");
-
-			// Log action
-			auditCtrl.logAndNotify(
-				version._id,
-				user,
-				"org.app.version.task",
-				"update",
-				t("Updated the handler of cron job '%s'", updatedTask.name),
-				updatedTask,
-				{
-					orgId: org._id,
-					appId: app._id,
-					versionId: version._id,
-					taskId: task._id,
-				}
-			);
-		} catch (err) {
-			handleError(req, res, err);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/task/delete-multi
+@route      /v1/org/:orgId/app/:appId/version/:versionId/storage/delete-multi
 @method     DELETE
-@desc       Deletes multiple tasks
+@desc       Deletes multiple storages
 @access     private
 */
 router.delete(
@@ -343,27 +283,27 @@ router.delete(
 	validateOrg,
 	validateApp,
 	validateVersion,
-	authorizeAppAction("app.task.delete"),
+	authorizeAppAction("app.storage.delete"),
 	applyRules("delete-multi"),
 	validate,
 	async (req, res) => {
-		const session = await taskCtrl.startSession();
+		const session = await storageCtrl.startSession();
 		try {
 			const { org, user, app, version } = req;
-			const { taskIds } = req.body;
+			const { storageIds } = req.body;
 
-			// Get the list of tasks that will be deleted
-			let tasks = await taskCtrl.getManyByQuery({
-				_id: { $in: taskIds },
+			// Get the list of storages that will be deleted
+			let storages = await storageCtrl.getManyByQuery({
+				_id: { $in: storageIds },
 				versionId: version._id,
 			});
 
-			if (tasks.length === 0) return res.json();
+			if (storages.length === 0) return res.json();
 
-			// Delete the tasks
-			let ids = tasks.map((entry) => entry._id);
-			let iids = tasks.map((entry) => entry.iid);
-			await taskCtrl.deleteManyByQuery(
+			// Delete the storages
+			let ids = storages.map((entry) => entry._id);
+			let iids = storages.map((entry) => entry.iid);
+			await storageCtrl.deleteManyByQuery(
 				{ _id: { $in: ids } },
 				{ cacheKey: ids, session }
 			);
@@ -384,58 +324,58 @@ router.delete(
 				{ cacheKey: env._id, session }
 			);
 
-			await taskCtrl.commit(session);
+			await storageCtrl.commit(session);
 			res.json();
 
-			// Deploy task updates to environments if auto-deployment is enabled
-			await deployCtrl.updateTasks(app, version, user, tasks, "delete");
+			// Deploy storage updates to environments if auto-deployment is enabled
+			await deployCtrl.updateStorages(app, version, user, storages, "delete");
 
-			tasks.forEach((task) => {
+			storages.forEach((storage) => {
 				// Log action
 				auditCtrl.logAndNotify(
 					version._id,
 					user,
-					"org.app.version.task",
+					"org.app.version.storage",
 					"delete",
-					t("Deleted cron job '%s'", task.name),
+					t("Deleted storage '%s'", storage.name),
 					{},
 					{
 						orgId: org._id,
 						appId: app._id,
 						versionId: version._id,
-						taskId: task._id,
+						storageId: storage._id,
 					}
 				);
 			});
 		} catch (err) {
-			await taskCtrl.rollback(session);
+			await storageCtrl.rollback(session);
 			handleError(req, res, err);
 		}
 	}
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/task/:taskId
+@route      /v1/org/:orgId/app/:appId/version/:versionId/storage/:storageId
 @method     DELETE
-@desc       Delete a specific task
+@desc       Delete a specific storage
 @access     private
 */
 router.delete(
-	"/:taskId",
+	"/:storageId",
 	authSession,
 	validateOrg,
 	validateApp,
 	validateVersion,
-	validateTask,
-	authorizeAppAction("app.task.delete"),
+	validateStorage,
+	authorizeAppAction("app.storage.delete"),
 	async (req, res) => {
-		const session = await taskCtrl.startSession();
+		const session = await storageCtrl.startSession();
 		try {
-			const { org, user, app, version, task } = req;
+			const { org, user, app, version, storage } = req;
 
-			// Delete the task
-			await taskCtrl.deleteOneById(task._id, {
-				cacheKey: task._id,
+			// Delete the storage
+			await storageCtrl.deleteOneById(storage._id, {
+				cacheKey: storage._id,
 				session,
 			});
 
@@ -450,34 +390,34 @@ router.delete(
 			await envCtrl.pullObjectByQuery(
 				env._id,
 				"mappings",
-				{ "design.iid": task.iid },
+				{ "design.iid": storage.iid },
 				{ updatedBy: user._id },
 				{ cacheKey: env._id, session }
 			);
 
-			await taskCtrl.commit(session);
+			await storageCtrl.commit(session);
 			res.json();
 
-			// Deploy task updates to environments if auto-deployment is enabled
-			await deployCtrl.updateTasks(app, version, user, [task], "delete");
+			// Deploy storage updates to environments if auto-deployment is enabled
+			await deployCtrl.updateStorages(app, version, user, [storage], "delete");
 
 			// Log action
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.task",
+				"org.app.version.storage",
 				"delete",
-				t("Deleted cron job '%s'", task.name),
+				t("Deleted storage '%s'", storage.name),
 				{},
 				{
 					orgId: org._id,
 					appId: app._id,
 					versionId: version._id,
-					taskId: task._id,
+					storageId: storage._id,
 				}
 			);
 		} catch (err) {
-			await taskCtrl.rollback(session);
+			await storageCtrl.rollback(session);
 			handleError(req, res, err);
 		}
 	}

@@ -9,7 +9,7 @@ COPY ./package.json ./
 ENV NODE_ENV production
 # Run npm install to install dependent modules execluding dev dependencies
 RUN npm install --omit=dev
-# Copy everhting to the image under '/app' directory
+# Copy everything to the image under '/app' directory
 COPY ./ ./
 # This will be the start up command of the docker container, run the development react server
 CMD ["node", "--expose-gc", "server"]

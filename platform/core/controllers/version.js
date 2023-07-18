@@ -11,6 +11,7 @@ import epCtrl from "../controllers/endpoint.js";
 import mwCtrl from "../controllers/middleware.js";
 import queueCtrl from "../controllers/queue.js";
 import taskCtrl from "../controllers/task.js";
+import storageCtrl from "../controllers/storage.js";
 
 class VersionController extends BaseController {
 	constructor() {
@@ -389,6 +390,10 @@ class VersionController extends BaseController {
 			{ session }
 		);
 		await taskCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id, versionId: version._id },
+			{ session }
+		);
+		await storageCtrl.deleteManyByQuery(
 			{ orgId: org._id, appId: app._id, versionId: version._id },
 			{ session }
 		);

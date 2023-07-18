@@ -71,6 +71,39 @@ router.get(
 );
 
 /*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/ep/iid
+@method     POST
+@desc       Get the list of endpoints identified by their iid
+@access     private
+*/
+router.post(
+	"/iid",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.endpoint.view"),
+	applyRules("view-iid"),
+	validate,
+	async (req, res) => {
+		try {
+			const { version } = req;
+			const { iids } = req.body;
+
+			let eps = await epCtrl.getManyByQuery({
+				versionId: version._id,
+				iid: { $in: iids },
+			});
+
+			res.json(eps);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/ep/:epId
 @method     GET
 @desc       Get a specific endpoint, which also returns the logic (e.g., code or flow)

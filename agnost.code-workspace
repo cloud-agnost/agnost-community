@@ -5,6 +5,12 @@
 		},
 		{
 			"path": "../agnost-charts"
+		},
+		{
+			"path": "../agnost-server"
+		},
+		{
+			"path": "../agnost-website"
 		}
 	],
 	"settings": {}

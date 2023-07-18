@@ -45,6 +45,7 @@ class Storage {
 	 * @param  {string} fileName The file name
 	 */
 	async deleteFile(bucketName, fileName) {
+		if (!fileName) return;
 		await this.minioClient.removeObject(bucketName, fileName);
 	}
 

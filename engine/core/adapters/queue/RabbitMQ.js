@@ -50,7 +50,7 @@ export class RabbitMQ extends QueueBase {
 	async sendMessage(queue, payload, delayMs = 0, debugChannel = null) {
 		// Add a tracking record to track progress of this message
 		const trackingId = helper.generateId();
-		await this.createMessageTrackingRecord({
+		const trackingRecord = await this.createMessageTrackingRecord({
 			trackingId: trackingId,
 			queueId: queue.iid,
 			queueName: queue.name,
@@ -126,6 +126,8 @@ export class RabbitMQ extends QueueBase {
 				details: error,
 			});
 		}
+
+		return trackingRecord;
 	}
 
 	/**

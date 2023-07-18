@@ -196,6 +196,13 @@ export class DeploymentManager {
 	}
 
 	/**
+	 * Returns the endpoints of the input message
+	 */
+	getStorages() {
+		return this.msgObj.storages || [];
+	}
+
+	/**
 	 * Returns the sub-action of the message
 	 */
 	getSubAction() {
@@ -502,10 +509,13 @@ export class DeploymentManager {
 			// Create all required indices
 			await collection.createIndexes([
 				{
-					key: { fileName: 1 },
+					key: { path: 1 },
 				},
 				{
 					key: { bucketId: 1 },
+				},
+				{
+					key: { storageId: 1 },
 				},
 				{
 					key: { isPublic: 1 },
@@ -515,9 +525,6 @@ export class DeploymentManager {
 				},
 				{
 					key: { mimeType: 1 },
-				},
-				{
-					key: { publicPath: 1 },
 				},
 				{
 					key: { uploadedAt: 1 },
@@ -547,6 +554,9 @@ export class DeploymentManager {
 			collection2 = await db.createCollection("buckets");
 			//Create all required indices
 			await collection2.createIndexes([
+				{
+					key: { storageId: 1 },
+				},
 				{
 					key: { name: 1 },
 				},
@@ -641,7 +651,7 @@ export class DeploymentManager {
 					key: { trackingId: 1 },
 				},
 				{
-					key: { taskId: 1 },
+					key: { cronJobId: 1 },
 				},
 				{
 					key: { status: 1 },
@@ -798,7 +808,7 @@ export class DeploymentManager {
 			//C reate all required indices
 			await collection.createIndexes([
 				{
-					key: { task: 1 },
+					key: { name: 1 },
 				},
 				{
 					key: { status: 1 },
@@ -1019,7 +1029,7 @@ export class DeploymentManager {
 	 */
 	async getPrevEndpointDefinitions() {
 		let endpoints = await getKey(`${this.getEnvId()}.endpoints`);
-		return endpoints;
+		return endpoints ?? [];
 	}
 
 	/**
@@ -1027,7 +1037,7 @@ export class DeploymentManager {
 	 */
 	async getPrevMiddlewareDefinitions() {
 		let middlewares = await getKey(`${this.getEnvId()}.middlewares`);
-		return middlewares;
+		return middlewares ?? [];
 	}
 
 	/**
@@ -1035,7 +1045,7 @@ export class DeploymentManager {
 	 */
 	async getPrevQueueDefinitions() {
 		let queues = await getKey(`${this.getEnvId()}.queues`);
-		return queues;
+		return queues ?? [];
 	}
 
 	/**
@@ -1043,7 +1053,15 @@ export class DeploymentManager {
 	 */
 	async getPrevTaskDefinitions() {
 		let tasks = await getKey(`${this.getEnvId()}.tasks`);
-		return tasks;
+		return tasks ?? [];
+	}
+
+	/**
+	 * Gets all existing storage configurations from the cache.
+	 */
+	async getPrevStorageDefinitions() {
+		let storages = await getKey(`${this.getEnvId()}.storages`);
+		return storages ?? [];
 	}
 
 	/**
@@ -1147,6 +1165,19 @@ export class DeploymentManager {
 	}
 
 	/**
+	 * Save the storage configurations to the engine cluster database
+	 */
+	async saveStorageDeploymentConfigs(storages) {
+		const engineDb = this.getEnvDB();
+		// First clear any existing configuration
+		await engineDb.collection("storages").deleteMany({});
+		if (storages.length > 0)
+			await engineDb.collection("storages").insertMany(storages);
+
+		this.addLog("Saved storage configurations to environment database");
+	}
+
+	/**
 	 * Save new deployment configuration to the engine cluster database
 	 */
 	async saveEnvironmentDeploymentConfig() {
@@ -1161,6 +1192,51 @@ export class DeploymentManager {
 	}
 
 	/**
+	 * Delete logs and tracking entries
+	 */
+	async deleteLogsAndTrackingEntries(type, objects) {
+		const engineDb = this.getEnvDB();
+
+		if (type === "endpoint") {
+			const ids = objects.map((entry) => entry._id);
+			await engineDb
+				.collection("endpoint_logs")
+				.deleteMany({ endpointId: { $in: ids } }, { writeConcern: { w: 0 } });
+		} else if (type === "queue") {
+			const ids = objects.map((entry) => entry._id);
+			await engineDb
+				.collection("queue_logs")
+				.deleteMany({ queueId: { $in: ids } }, { writeConcern: { w: 0 } });
+
+			const iids = objects.map((entry) => entry.iid);
+			await engineDb
+				.collection("messages")
+				.deleteMany({ queueId: { $in: iids } }, { writeConcern: { w: 0 } });
+		} else if (type === "task") {
+			const ids = objects.map((entry) => entry._id);
+			await engineDb
+				.collection("cronjob_logs")
+				.deleteMany({ taskId: { $in: ids } }, { writeConcern: { w: 0 } });
+
+			const iids = objects.map((entry) => entry.iid);
+			await engineDb
+				.collection("cronjobs")
+				.deleteMany({ taskId: { $in: iids } }, { writeConcern: { w: 0 } });
+		} else if (type === "storage") {
+			const iids = objects.map((entry) => entry.iid);
+			await engineDb
+				.collection("buckets")
+				.deleteMany({ storageId: { $in: iids } }, { writeConcern: { w: 0 } });
+
+			await engineDb
+				.collection("files")
+				.deleteMany({ storageId: { $in: iids } }, { writeConcern: { w: 0 } });
+		}
+
+		this.addLog(`Cleared ${type} logs and tracking entries`);
+	}
+
+	/**
 	 * Caches the application version design data
 	 */
 	async cacheMetadata() {
@@ -1169,6 +1245,7 @@ export class DeploymentManager {
 		this.cacheMiddlewares(this.getMiddlewares(), "set");
 		this.cacheQueues(this.getQueues(), "set");
 		this.cacheTasks(this.getTasks(), "set");
+		this.cacheStorages(this.getStorages(), "set");
 
 		this.addLog(t("Cached application metadata"));
 	}
@@ -1425,6 +1502,65 @@ export class DeploymentManager {
 				this.addToCache(`${this.getEnvId()}.tasks`, updatedTaskDefinitions);
 
 				return updatedTaskDefinitions;
+			}
+			default:
+				break;
+		}
+	}
+
+	/**
+	 * Caches the storage metadata of the app version
+	 * @param  {Array} storages The list of storage data to cache
+	 * @param  {String} actionType The action type can be either set, udpate or delete
+	 */
+	async cacheStorages(storages, actionType) {
+		switch (actionType) {
+			case "set":
+				this.addToCache(`${this.getEnvId()}.storages`, storages);
+				return storages;
+			case "add": {
+				const prevStorageDefinitions = await this.getPrevStorageDefinitions();
+				prevStorageDefinitions.push(...storages);
+				this.addToCache(`${this.getEnvId()}.storages`, prevStorageDefinitions);
+				return prevStorageDefinitions;
+			}
+			case "update": {
+				const prevStorageDefinitions = await this.getPrevStorageDefinitions();
+
+				if (prevStorageDefinitions.length === 0) {
+					this.addToCache(`${this.getEnvId()}.storages`, storages);
+					return storages;
+				} else {
+					const updatedStorageDefinitions = prevStorageDefinitions.map(
+						(entry) => {
+							const updatedStorage = storages.find(
+								(entry2) => entry2.iid === entry.iid
+							);
+
+							if (updatedStorage) return updatedStorage;
+							else return entry;
+						}
+					);
+
+					this.addToCache(
+						`${this.getEnvId()}.storages`,
+						updatedStorageDefinitions
+					);
+
+					return updatedStorageDefinitions;
+				}
+			}
+			case "delete": {
+				const prevStorageDefinitions = await this.getPrevStorageDefinitions();
+				const updatedStorageDefinitions = prevStorageDefinitions.filter(
+					(entry) => !storages.find((entry2) => entry.iid === entry2.iid)
+				);
+				this.addToCache(
+					`${this.getEnvId()}.storages`,
+					updatedStorageDefinitions
+				);
+
+				return updatedStorageDefinitions;
 			}
 			default:
 				break;
@@ -1723,6 +1859,12 @@ export class DeploymentManager {
 			// After we load all configuration data to the cache we can notify engine API servers to update themselves
 			this.notifyAPIServers();
 
+			if (subAction === "delete") {
+				await this.deleteLogsAndTrackingEntries(
+					"endpoint",
+					this.getEndpoints()
+				);
+			}
 			// Save updated deployment to database
 			await this.saveEndpointDeploymentConfigs(endpoints);
 			// Save updated deployment to database
@@ -1832,6 +1974,9 @@ export class DeploymentManager {
 			// After we load all configuration data to the cache we can notify engine API servers to update themselves
 			this.notifyAPIServers();
 
+			if (subAction === "delete") {
+				await this.deleteLogsAndTrackingEntries("queue", this.getQueues());
+			}
 			// Save updated deployment to database
 			await this.saveQueueDeploymentConfigs(queues);
 			// Save updated deployment to database
@@ -1885,6 +2030,9 @@ export class DeploymentManager {
 			// After we load all configuration data to the cache we can notify engine API servers to update themselves
 			this.notifyAPIServers();
 
+			if (subAction === "delete") {
+				await this.deleteLogsAndTrackingEntries("task", this.getTasks());
+			}
 			// Save updated deployment to database
 			await this.saveTaskDeploymentConfigs(tasks);
 			// Save updated deployment to database
@@ -1905,6 +2053,62 @@ export class DeploymentManager {
 				[t("Task updates failed"), error.name, error.message, error.stack].join(
 					"\n"
 				),
+				"Error"
+			);
+			await this.sendEnvironmentLogs("Error");
+			return { success: false, error };
+		}
+	}
+
+	/**
+	 * Updates the storages
+	 */
+	async updateStorages() {
+		try {
+			this.addLog(t("Started updating storages"));
+			// Set current status of environment in engine cluster
+			await this.setStatus("Deploying");
+			const subAction = this.getSubAction();
+
+			// Update environment object data in cache
+			this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
+			this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
+
+			// Cache updated database configurations (subaction can be add, delete or update)
+			const storages = await this.cacheStorages(this.getStorages(), subAction);
+
+			// Execute all redis commands altogether
+			await this.commitPipeline();
+			// We first cache all data and then notify api servers
+			// After we load all configuration data to the cache we can notify engine API servers to update themselves
+			this.notifyAPIServers();
+
+			if (subAction === "delete") {
+				await this.deleteLogsAndTrackingEntries("storage", this.getStorages());
+			}
+			// Save updated deployment to database
+			await this.saveStorageDeploymentConfigs(storages);
+			// Save updated deployment to database
+			await this.saveEnvironmentDeploymentConfig();
+
+			// Update status of environment in engine cluster
+			this.addLog(t("Completed storage updates successfully"));
+			// Send the deployment telemetry information to the platform
+			await this.sendEnvironmentLogs("OK");
+			// Update status of environment in engine cluster
+			await this.setStatus("OK");
+			return { success: true };
+		} catch (error) {
+			// Update status of environment in engine cluster
+			await this.setStatus("Error");
+			// Send the deployment telemetry information to the platform
+			this.addLog(
+				[
+					t("Storage updates failed"),
+					error.name,
+					error.message,
+					error.stack,
+				].join("\n"),
 				"Error"
 			);
 			await this.sendEnvironmentLogs("Error");
