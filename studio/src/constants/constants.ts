@@ -4,6 +4,8 @@ import Realtime from '@/assets/images/realtime.png';
 import {
 	ApiKeys,
 	Authentication,
+	AWSS3,
+	AzureBlobStorage,
 	BellRing,
 	Cache,
 	ChangeLog,
@@ -12,6 +14,8 @@ import {
 	DeviceMobile,
 	Environment,
 	EnvironmentVariable,
+	GCPStorage,
+	Kafka,
 	LightBulb,
 	LineSegments,
 	MessageQueue,
@@ -20,16 +24,24 @@ import {
 	NpmPackage,
 	Oracle,
 	PostgreSql,
+	RabbitMq,
 	RateLimit,
 	RealTime,
 	Resource,
+	SqlServer,
 	Storage,
 	Team,
 } from '@/components/icons';
 import {
 	ConnectAWS,
+	ConnectAzure,
+	ConnectCache,
 	ConnectDatabase,
+	ConnectGCP,
+	ConnectQueue,
+	CreateCache,
 	CreateDatabase,
+	CreateQueue,
 	SelectResourceType,
 } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
@@ -47,6 +59,7 @@ export const MIN_DB_SIZE = 1;
 export const MAX_DB_SIZE = 50;
 export const IP_REGEX = /^([0-9]{1,3}\.){3}[0-9]{1,3}$/;
 export const URL_REGEX = /^(http|https):\/\/[^ "]+$/;
+export const NUMBER_REGEX = /^[0-9]+$/;
 export const SLIDER_IMAGES = [
 	{
 		text: 'Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.',
@@ -385,22 +398,17 @@ export const STORAGE_TYPES: Instance[] = [
 	{
 		id: 'AWS S3',
 		name: 'AWS S3',
-		icon: MongoDb,
+		icon: AWSS3,
 	},
 	{
 		id: 'Azure Blob Storage',
 		name: 'Azure Blob Storage',
-		icon: MySql,
+		icon: AzureBlobStorage,
 	},
 	{
 		id: 'GCP Cloud Storage',
 		name: 'GCP Cloud Storage',
-		icon: MySql,
-	},
-	{
-		id: 'Cluster Storage - MinIO',
-		name: 'MinIO',
-		icon: PostgreSql,
+		icon: GCPStorage,
 	},
 ];
 
@@ -429,7 +437,7 @@ export const DATABASE_TYPES: Instance[] = [
 	{
 		id: 'SQL Server',
 		name: 'SQL Server',
-		icon: Oracle,
+		icon: SqlServer,
 		isConnectOnly: true,
 	},
 ];
@@ -441,6 +449,18 @@ export const DATABASE_ICON_MAP: Record<string, ElementType> = {
 	Oracle: Oracle,
 	'SQL Server': Oracle,
 };
+export const QUEUE_TYPES: Instance[] = [
+	{
+		id: 'RabbitMQ',
+		name: 'RabbitMQ',
+		icon: RabbitMq,
+	},
+	{
+		id: 'Kafka',
+		name: 'Kafka',
+		icon: Kafka,
+	},
+];
 
 export const CREATE_RESOURCES_ELEMENTS = [
 	{
@@ -465,6 +485,43 @@ export const CREATE_RESOURCES_ELEMENTS = [
 		name: translate('version.storage'),
 		type: 'AWS S3',
 		CurrentResourceElement: ConnectAWS,
+	},
+	{
+		step: 2,
+		name: translate('version.storage'),
+		type: 'Azure Blob Storage',
+		CurrentResourceElement: ConnectAzure,
+	},
+	{
+		step: 2,
+		name: translate('version.storage'),
+		type: 'GCP Cloud Storage',
+		CurrentResourceElement: ConnectGCP,
+	},
+
+	{
+		step: 2,
+		name: translate('version.cache'),
+		type: translate('resources.create_new'),
+		CurrentResourceElement: CreateCache,
+	},
+	{
+		step: 2,
+		name: translate('version.cache'),
+		type: translate('resources.connect_existing'),
+		CurrentResourceElement: ConnectCache,
+	},
+	{
+		step: 2,
+		name: translate('version.message_queues'),
+		type: translate('resources.create_new'),
+		CurrentResourceElement: CreateQueue,
+	},
+	{
+		step: 2,
+		name: translate('version.message_queues'),
+		type: translate('resources.connect_existing'),
+		CurrentResourceElement: ConnectQueue,
 	},
 ];
 
@@ -592,6 +649,11 @@ export const ENDPOINT_ACCESS_PROPERTIES = [
  */
 export const AUTHORIZATION_OPTIONS = ['all', 'specified'] as const;
 
+export const RABBITMQ_CONNECTION_TYPES = ['url', 'object'] as const;
+export const RABBITMQ_CONNECTION_SCHEMES = ['amqp', 'amqps'] as const;
+export const KAFKA_CONNECTION_SCHEMES = ['simple', 'ssl', 'sasl'] as const;
+export const KAFKA_SASL_MECHANISM = ['plain', 'scram-sha-256', 'scram-sha-512'] as const;
+export const MONGODB_CONNECTION_FORMATS = ['mongodb', 'mongodb+srv'] as const;
 export const ADD_API_KEYS_MENU_ITEMS = [
 	{
 		name: translate('application.edit.general'),
@@ -632,4 +694,12 @@ export const HTTP_METHOD_BADGE_MAP: Record<string, BadgeColors> = {
 	POST: 'green',
 	PUT: 'yellow',
 	DELETE: 'red',
+};
+export const INSTANCE_PORT_MAP: Record<string, string> = {
+	PostgreSQL: '5432',
+	MySQL: '3306',
+	'SQL Server': '1433',
+	MongoDB: '27017',
+	Oracle: '1521',
+	Redis: '6379',
 };
