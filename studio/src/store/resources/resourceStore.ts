@@ -13,6 +13,7 @@ export interface ResourceStore {
 	openCreateReplicaModal: boolean;
 	isDeletedResourceModalOpen: boolean;
 	deletedResource: Resource | null;
+	lastFetchedCount: number;
 	getResources: (req: GetResourcesRequest) => Promise<Resource[]>;
 	testExistingResourceConnection: (req: AddExistingResourceRequest) => Promise<void>;
 	addExistingResource: (req: AddExistingResourceRequest) => Promise<Resource>;
@@ -39,10 +40,21 @@ const useResourceStore = create<ResourceStore>()(
 				openCreateReplicaModal: false,
 				isDeletedResourceModalOpen: false,
 				deletedResource: null,
+				lastFetchedCount: 0,
 				getResources: async (req: GetResourcesRequest) => {
 					try {
 						const resources = await ResourceService.getResources(req);
-						set({ resources });
+						if (req.initialFetch) {
+							set({
+								resources,
+								lastFetchedCount: resources.length,
+							});
+						} else {
+							set({
+								resources: [...get().resources, ...resources],
+								lastFetchedCount: resources.length,
+							});
+						}
 						return resources;
 					} catch (error) {
 						throw error as APIError;
