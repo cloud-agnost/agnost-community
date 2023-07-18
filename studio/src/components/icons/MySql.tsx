@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { SVGProps } from 'react';
 const SvgMySql = (props: SVGProps<SVGSVGElement>) => (
 	<svg
@@ -10,7 +9,7 @@ const SvgMySql = (props: SVGProps<SVGSVGElement>) => (
 		xmlnsXlink='http://www.w3.org/1999/xlink'
 		{...props}
 	>
-		<rect width={40} height={40} rx={20} fill='url(#MySQL_svg__a)' />
+		<path fill='url(#MySQL_svg__a)' d='M0 0h40v40H0z' />
 		<defs>
 			<pattern id='MySQL_svg__a' patternContentUnits='objectBoundingBox' width={1} height={1}>
 				<use xlinkHref='#MySQL_svg__b' transform='translate(0 .16) scale(.00125)' />
