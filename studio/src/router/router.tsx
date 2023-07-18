@@ -289,12 +289,9 @@ const router = createBrowserRouter([
 // eslint-disable-next-line react-refresh/only-export-components
 export function RequireAuth({ children }: { children: JSX.Element }): JSX.Element {
 	const { isAuthenticated } = useAuthStore();
-	const { isCompleted } = useClusterStore();
 	const location = useLocation();
 
-	if (location.pathname === '/') {
-		return <Navigate to={isCompleted ? '/login' : '/onboarding'} />;
-	} else if (!isAuthenticated()) {
+	if (!isAuthenticated()) {
 		return <Navigate to='/login' state={{ from: location }} replace />;
 	}
 
