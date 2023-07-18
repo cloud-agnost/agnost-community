@@ -9,6 +9,7 @@ import {
 	ChangeLog,
 	Connect,
 	Database as DatabaseIcon,
+	DeviceMobile,
 	DoubleGear,
 	Environment,
 	EnvironmentVariable,
@@ -31,7 +32,7 @@ import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Application, Instance, SortOption, Tab } from '@/types';
 import { history, translate } from '@/utils';
-import { DeviceTablet, FileText, GearSix, Plus } from '@phosphor-icons/react';
+import { FileText, GearSix, Plus } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { DropdownMenuSeparator } from 'components/Dropdown';
 import { Fragment } from 'react';
@@ -97,12 +98,12 @@ export const ORGANIZATION_MENU_ITEMS = [
 	{
 		name: translate('organization.menu.apps'),
 		href: 'apps',
-		icon: DeviceTablet,
+		icon: DeviceMobile,
 	},
 	{
 		name: translate('organization.menu.resources'),
 		href: 'resources',
-		icon: Resource,
+		icon: DatabaseIcon,
 	},
 	{
 		name: translate('organization.menu.settings'),
@@ -116,6 +117,7 @@ export const APPLICATION_SETTINGS = [
 		id: 'open-version',
 		name: translate('application.settings.openVersion'),
 		onClick: (application: Application) => {
+			console.log('application', application);
 			useApplicationStore.getState().openVersionDrawer(application);
 		},
 	},
@@ -349,7 +351,7 @@ export const RESOURCE_TYPES = [
 	{
 		id: 'database',
 		name: translate('version.databases'),
-		icon: DatabaseIcon,
+		icon: Resource,
 	},
 	{
 		id: 'storage',
