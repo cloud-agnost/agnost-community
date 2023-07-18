@@ -1,11 +1,12 @@
 import { socket } from '@/helpers';
+import { useToast as toast } from '@/hooks';
+import { ToastType } from '@/types';
 import { RealtimeData } from '@/types/type';
 import { clsx, type ClassValue } from 'clsx';
 import i18next from 'i18next';
 import { DateTime } from 'luxon';
 import { twMerge } from 'tailwind-merge';
-import { useToast as toast } from '@/hooks';
-import { ToastType } from '@/types';
+
 type EmptyableArray = readonly [] | [];
 type EmptyableString = '' | string;
 type EmptyableObject<T extends object> = T & Record<keyof T, never>;
@@ -118,4 +119,13 @@ export function reverseArray<T>(arr: T[]) {
 	}
 
 	return reversedArray;
+}
+
+export async function lazyRouteImport(path: string) {
+	const { default: Component } = await import(path);
+
+	return {
+		Component,
+		loader: Component.loader,
+	};
 }

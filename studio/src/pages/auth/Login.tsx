@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
+import { GuestOnly } from '@/router';
 
 const FormSchema = z.object({
 	email: z
@@ -68,78 +69,80 @@ export default function Login() {
 
 	return (
 		<AuthLayout>
-			<div className='auth-page'>
-				<Description title={t('login.title')}>{t('login.description')}</Description>
+			<GuestOnly>
+				<div className='auth-page'>
+					<Description title={t('login.title')}>{t('login.description')}</Description>
 
-				{error && (
-					<Alert className='!max-w-full' variant='error'>
-						<AlertTitle>{error.error}</AlertTitle>
-						<AlertDescription>{error.details}</AlertDescription>
-					</Alert>
-				)}
-				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='auth-form'>
-						<FormField
-							control={form.control}
-							name='email'
-							render={({ field }) => (
-								<FormItem className='space-y-1'>
-									<FormLabel>{t('login.email')}</FormLabel>
-									<FormControl>
-										<Input
-											error={Boolean(form.formState.errors.email)}
-											type='email'
-											placeholder={t('login.enter_email') as string}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='password'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{t('login.password')}</FormLabel>
-									<FormControl>
-										<PasswordInput
-											error={Boolean(form.formState.errors.password)}
-											type='password'
-											placeholder={t('login.enter_password') as string}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+					{error && (
+						<Alert className='!max-w-full' variant='error'>
+							<AlertTitle>{error.error}</AlertTitle>
+							<AlertDescription>{error.details}</AlertDescription>
+						</Alert>
+					)}
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onSubmit)} className='auth-form'>
+							<FormField
+								control={form.control}
+								name='email'
+								render={({ field }) => (
+									<FormItem className='space-y-1'>
+										<FormLabel>{t('login.email')}</FormLabel>
+										<FormControl>
+											<Input
+												error={Boolean(form.formState.errors.email)}
+												type='email'
+												placeholder={t('login.enter_email') as string}
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='password'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>{t('login.password')}</FormLabel>
+										<FormControl>
+											<PasswordInput
+												error={Boolean(form.formState.errors.password)}
+												type='password'
+												placeholder={t('login.enter_password') as string}
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
-						<div className='flex justify-end space-y-8'>
-							<Button loading={loading} size='full'>
-								{t('login.login')}
-							</Button>
+							<div className='flex justify-end space-y-8'>
+								<Button loading={loading} size='full'>
+									{t('login.login')}
+								</Button>
+							</div>
+						</form>
+					</Form>
+					{canClusterSendEmail && (
+						<div className='flex justify-between text-sm text-default leading-6 font-albert'>
+							<Link
+								className='hover:underline no-underline underline-offset-2 hover:text-disabled-reverse'
+								to='/forgot-password'
+							>
+								{t('login.forgot_password')}
+							</Link>
+							<Link
+								className='hover:underline no-underline underline-offset-2 hover:text-disabled-reverse'
+								to='/complete-account-setup'
+							>
+								{t('login.complete_account_setup')}
+							</Link>
 						</div>
-					</form>
-				</Form>
-				{canClusterSendEmail && (
-					<div className='flex justify-between text-sm text-default leading-6 font-albert'>
-						<Link
-							className='hover:underline no-underline underline-offset-2 hover:text-disabled-reverse'
-							to='/forgot-password'
-						>
-							{t('login.forgot_password')}
-						</Link>
-						<Link
-							className='hover:underline no-underline underline-offset-2 hover:text-disabled-reverse'
-							to='/complete-account-setup'
-						>
-							{t('login.complete_account_setup')}
-						</Link>
-					</div>
-				)}
-			</div>
+					)}
+				</div>
+			</GuestOnly>
 		</AuthLayout>
 	);
 }

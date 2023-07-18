@@ -39,7 +39,7 @@ export default function OrganizationApps() {
 	return (
 		<div
 			className={cn(
-				'h-[calc(100%-72px)] p-8',
+				'full-height-without-header p-8',
 				temp.length === 0 && 'flex items-center justify-center',
 			)}
 		>

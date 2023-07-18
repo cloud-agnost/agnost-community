@@ -15,11 +15,6 @@ import { useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
 
-async function loader(params: any) {
-	console.log(params);
-	return null;
-}
-
 const FormSchema = z.object({
 	email: z
 		.string({
@@ -103,5 +98,3 @@ export default function CompleteAccountSetup() {
 		</AuthLayout>
 	);
 }
-
-CompleteAccountSetup.loader = loader;

@@ -14,6 +14,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
+import { GuestOnly } from '@/router';
 
 async function loader(params: any) {
 	console.log(params);
@@ -56,27 +57,29 @@ export default function ForgotPassword() {
 
 	if (success) {
 		return (
-			<div className='flex justify-center items-center flex-col min-h-screen text-center text-subtle px-4'>
-				<div className='w-[172px] h-[172px] rounded-2xl bg-text-subtle mb-12'></div>
-				<h1 className='text-default font-semibold leading-[44px] text-[26px] mb-2'>
-					{t('login.password_reset_message_sent')}
-				</h1>
-				<div className='flex flex-col gap-6 leading-6 font-normal'>
-					<p>
-						<Trans
-							i18nKey='login.sent_reset_password_email'
-							values={{ email: form.getValues().email }}
-							components={{
-								email: <span className='block text-default' />,
-							}}
-						/>
-					</p>
-					<p>{t('login.if_you_dont_receive_email')}</p>
+			<GuestOnly>
+				<div className='flex justify-center items-center flex-col min-h-screen text-center text-subtle px-4'>
+					<div className='w-[172px] h-[172px] rounded-2xl bg-text-subtle mb-12'></div>
+					<h1 className='text-default font-semibold leading-[44px] text-[26px] mb-2'>
+						{t('login.password_reset_message_sent')}
+					</h1>
+					<div className='flex flex-col gap-6 leading-6 font-normal'>
+						<p>
+							<Trans
+								i18nKey='login.sent_reset_password_email'
+								values={{ email: form.getValues().email }}
+								components={{
+									email: <span className='block text-default' />,
+								}}
+							/>
+						</p>
+						<p>{t('login.if_you_dont_receive_email')}</p>
+					</div>
+					<Link className='text-default text-xs mt-14 hover:underline' to='/login'>
+						{t('login.back_to_login')}
+					</Link>
 				</div>
-				<Link className='text-default text-xs mt-14 hover:underline' to='/login'>
-					{t('login.back_to_login')}
-				</Link>
-			</div>
+			</GuestOnly>
 		);
 	}
 

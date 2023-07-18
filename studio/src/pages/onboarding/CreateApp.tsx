@@ -17,6 +17,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 import { translate } from '@/utils';
 import { useTranslation } from 'react-i18next';
+import { RequireAuth } from '@/router';
 
 async function loader() {
 	return null;
@@ -67,39 +68,41 @@ export default function CreateApp() {
 	}
 
 	return (
-		<>
-			<Description title={t('onboarding.app.title')}>{t('onboarding.app.desc')}</Description>
+		<RequireAuth>
+			<>
+				<Description title={t('onboarding.app.title')}>{t('onboarding.app.desc')}</Description>
 
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-					<FormField
-						control={form.control}
-						name='appName'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>{t('application.short_name')}</FormLabel>
-								<FormControl>
-									<Input
-										error={!!form.formState.errors.appName}
-										placeholder={t('application.enter_name') as string}
-										{...field}
-									/>
-								</FormControl>
-								<FormDescription>{t('forms.max64.description')}</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+						<FormField
+							control={form.control}
+							name='appName'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>{t('application.short_name')}</FormLabel>
+									<FormControl>
+										<Input
+											error={!!form.formState.errors.appName}
+											placeholder={t('application.enter_name') as string}
+											{...field}
+										/>
+									</FormControl>
+									<FormDescription>{t('forms.max64.description')}</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-					<div className='flex gap-4 justify-end'>
-						<Button onClick={goBack} type={'button'} variant='text' size='lg'>
-							{t('onboarding.previous')}
-						</Button>
-						<Button size='lg'>{t('onboarding.next')}</Button>
-					</div>
-				</form>
-			</Form>
-		</>
+						<div className='flex gap-4 justify-end'>
+							<Button onClick={goBack} type={'button'} variant='text' size='lg'>
+								{t('onboarding.previous')}
+							</Button>
+							<Button size='lg'>{t('onboarding.next')}</Button>
+						</div>
+					</form>
+				</Form>
+			</>
+		</RequireAuth>
 	);
 }
 

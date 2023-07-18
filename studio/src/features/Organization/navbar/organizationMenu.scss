@@ -1,6 +1,9 @@
 .org-menu {
 	@apply flex items-end justify-center h-full mx-auto;
-
+	&-container {
+		@apply h-[72px] border-b border-border;
+		@apply sticky top-0 z-50 bg-base;
+	}
 	&-item {
 		@apply list-none;
 		&-name {
@@ -20,6 +23,6 @@
 		@apply border-b-3 border-transparent;
 	}
 	&-icon {
-		@apply text-icon-base;
+		@apply text-icon-base w-6 h-6;
 	}
 }
