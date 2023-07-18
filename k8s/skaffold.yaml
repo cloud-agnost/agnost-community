@@ -1,6 +1,6 @@
 # On command line use the below command, if --trigger=polling is not added then file sync does not work
 # skaffold dev --trigger='polling' --no-prune=false --cache-artifacts=false
-apiVersion: skaffold/v2alpha3
+apiVersion: skaffold/v2beta14
 kind: Config
 build:
    artifacts:
@@ -16,7 +16,7 @@ build:
         context: ../platform/worker
         sync:
            infer:
-              - '**/*.js'
+              - '../../../agnost-server/dist/**/*.js'
               - '**/*.json'
               - '**/*.pug'
         docker:
@@ -33,11 +33,12 @@ build:
       - image: agnost-community/engine/core
         context: ../engine/core
         sync:
-          infer:
+           infer:
               - '**/*.js'
+              - '**/*.cjs'
               - '**/*.json'
         docker:
-          dockerfile: Dockerfile.dev
+           dockerfile: Dockerfile.dev
       - image: agnost-community/engine/worker
         context: ../engine/worker
         sync:
