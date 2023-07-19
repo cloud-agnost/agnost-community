@@ -1,15 +1,17 @@
+import { ApplicationVersions } from '@/features/application';
+import EditApplication from '@/features/application/EditApplication.tsx';
+import { CreateResource } from '@/features/resources';
+import { CreateCopyVersionDrawer } from '@/features/version/CreateCopyVersionDrawer';
+import { EditMiddlewareDrawer } from '@/features/version/Middlewares';
+import useApplicationStore from '@/store/app/applicationStore.ts';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
-import { CreateResource } from '@/features/resources';
 import { history, removeLastSlash } from '@/utils';
 import { LoaderFunctionArgs, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { ApplicationVersions } from '@/features/application';
-import useApplicationStore from '@/store/app/applicationStore.ts';
-import EditApplication from '@/features/application/EditApplication.tsx';
-import { EditMiddlewareDrawer } from '@/features/version/Middlewares';
-import { CreateCopyVersionDrawer } from '@/features/version/CreateCopyVersionDrawer';
 
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 const authPaths = [
 	'/login',
 	'/forgot-password',
@@ -55,6 +57,24 @@ async function loader({ request, params }: LoaderFunctionArgs) {
 export default function Root() {
 	history.navigate = useNavigate();
 	history.location = useLocation();
+	const { orgId } = useParams();
+	const { getOrganizationMembers, memberPage, setMemberPage } = useOrganizationStore();
+
+	useEffect(() => {
+		if (orgId) {
+			const fetchData = async () => {
+				return await getOrganizationMembers({
+					organizationId: orgId,
+					page: memberPage,
+					size: 100,
+					initialFetch: memberPage === 0,
+				});
+			};
+			fetchData().then((res) => {
+				if (res.length > 0) setMemberPage(memberPage + 1);
+			});
+		}
+	}, [memberPage, orgId]);
 
 	return (
 		<>
