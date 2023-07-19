@@ -29,24 +29,16 @@ export type BadgeColors = 'green' | 'blue' | 'yellow' | 'purple' | 'red' | 'oran
 interface BadgeProps {
 	variant?: BadgeColors;
 	rounded?: boolean;
-	clearable?: boolean;
 	text: string;
 	className?: string;
 	onClear?: () => void;
 }
-export default function Badge({
-	text,
-	variant,
-	rounded,
-	onClear,
-	clearable,
-	className,
-}: BadgeProps) {
+export default function Badge({ text, variant, rounded, onClear, className }: BadgeProps) {
 	return (
 		<div className={cn(badgeVariants({ variant, rounded }), 'badge', className)}>
 			{rounded && <div className='badge-dot' />}
 			<span className={cn('badge-text')}>{text}</span>
-			{clearable && (
+			{onClear && (
 				<Button
 					type='button'
 					variant='blank'

@@ -150,7 +150,6 @@ export default function EndpointSelectModal({
 													className='pl-2 pr-1'
 													onClear={() => onMethodSelect(method)}
 													text={method}
-													clearable
 													variant={badgeMapping[method]}
 													key={index}
 												/>
@@ -204,7 +203,6 @@ export default function EndpointSelectModal({
 										<Badge
 											className='pl-2 pr-1'
 											onClear={() => addList(ep, false)}
-											clearable
 											key={ep._id}
 											text={ep.name}
 										/>

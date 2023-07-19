@@ -42,7 +42,6 @@ export default function ListEndpoint({ type, children, endpoints }: ListEndpoint
 						{values.map((item, index) => (
 							<Badge
 								className='whitespace-nowrap'
-								clearable
 								onClear={() => clear(index)}
 								text={getName(item.url)}
 								key={index}
