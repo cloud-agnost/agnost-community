@@ -7,12 +7,9 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
 import { history, removeLastSlash } from '@/utils';
-import { LoaderFunctionArgs, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { LoaderFunctionArgs, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 const authPaths = [
 	'/login',
 	'/forgot-password',
