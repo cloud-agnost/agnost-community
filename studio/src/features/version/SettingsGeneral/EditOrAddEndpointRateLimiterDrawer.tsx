@@ -180,14 +180,8 @@ export default function EditOrAddEndpointRateLimiterDrawer({
 				appId,
 				defaultEndpointLimits: [...(defaultEndpointLimits ?? []), rateLimit.iid],
 			});
-		}
-		if (addToDefault === 'realtime') {
-			await updateVersionRealtimeProperties({
-				orgId,
-				versionId,
-				appId,
-				rateLimits: [...(realtimeEndpoints ?? []), rateLimit.iid],
-			});
+		} else {
+			onCreate?.(rateLimit);
 		}
 		if (!addToDefault) {
 			onCreate?.(rateLimit);
