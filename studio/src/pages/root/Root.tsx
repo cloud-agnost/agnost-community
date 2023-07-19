@@ -11,6 +11,8 @@ import { LoaderFunctionArgs, Outlet, useLocation, useNavigate } from 'react-rout
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 const authPaths = [
 	'/login',
 	'/forgot-password',
