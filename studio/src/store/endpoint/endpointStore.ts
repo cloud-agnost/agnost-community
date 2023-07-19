@@ -58,6 +58,7 @@ const useEndpointStore = create<EndpointStore>()(
 				isEndpointDeleteDialogOpen: false,
 				setSelectedEndpointIds: (ids) => set({ selectedEndpointIds: ids }),
 				setSelectEndpointDialogOpen: (open) => set({ selectEndpointDialogOpen: open }),
+				lastFetchedCount: 0,
 				setEndpoints: (endpoints) => set({ endpoints }),
 				createEndpoint: async (params) => {
 					try {
