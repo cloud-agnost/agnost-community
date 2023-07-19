@@ -1,0 +1,11 @@
+{
+	"title": "Endpoints",
+	"name": "NAME / ID",
+	"method": "METHOD",
+	"path": "PATH",
+	"apiKey": "API KEY",
+	"session": "SESSION",
+	"createdAt": "CREATED AT",
+	"updatedAt": "UPDATED AT",
+	"add": "Create Endpoint"
+}
