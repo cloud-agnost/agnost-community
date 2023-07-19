@@ -17,7 +17,6 @@ export default function ListDatabase() {
 	const {
 		toDeleteDatabase,
 		searchDatabases,
-		toEditDatabase,
 		isOpenDeleteDatabaseDialog,
 		setIsOpenDeleteDatabaseDialog,
 		databasesForSearch,
