@@ -10,6 +10,8 @@ import { history, removeLastSlash } from '@/utils';
 import { useEffect } from 'react';
 import { LoaderFunctionArgs, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 const authPaths = [
 	'/login',
 	'/forgot-password',
