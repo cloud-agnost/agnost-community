@@ -184,9 +184,7 @@ export default function EditOrAddEndpointRateLimiterDrawer({
 		if (!addToDefault) {
 			onCreate?.(rateLimit);
 		}
-		if (!addToDefault) {
-			onCreate?.(rateLimit);
-		}
+
 		notify({
 			type: 'success',
 			title: t('general.success'),
