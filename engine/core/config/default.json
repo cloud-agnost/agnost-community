@@ -40,6 +40,7 @@
         "endpointPrefix": "/api",
         "gcSeconds": 30,
         "heartbeatIntervalSeconds": 15,
-        "heartbeatTimeoutSeconds": 10
+        "heartbeatTimeoutSeconds": 10,
+        "defaultPageSize": 20
      }
 }

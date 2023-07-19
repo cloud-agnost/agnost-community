@@ -537,6 +537,7 @@ export class DeploymentManager {
 				},
 				{
 					key: { tags: 1 },
+					sparse: true,
 				},
 			]);
 
@@ -574,6 +575,7 @@ export class DeploymentManager {
 				},
 				{
 					key: { tags: 1 },
+					sparse: true,
 				},
 			]);
 

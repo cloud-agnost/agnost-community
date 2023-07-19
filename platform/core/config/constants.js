@@ -359,11 +359,11 @@ export const fieldTypes = [
 	},
 	{
 		name: "parent",
-		PostgreSQL: true,
-		MySQL: true,
-		"SQL Server": true,
+		PostgreSQL: false,
+		MySQL: false,
+		"SQL Server": false,
 		MongoDB: true,
-		Oracle: true,
+		Oracle: false,
 		view: {
 			unique: false,
 			indexed: true,
@@ -373,11 +373,11 @@ export const fieldTypes = [
 	},
 	{
 		name: "object",
-		PostgreSQL: true,
-		MySQL: true,
-		"SQL Server": true,
+		PostgreSQL: false,
+		MySQL: false,
+		"SQL Server": false,
 		MongoDB: true,
-		Oracle: true,
+		Oracle: false,
 		view: {
 			unique: false,
 			indexed: false,
@@ -401,11 +401,11 @@ export const fieldTypes = [
 	},
 	{
 		name: "object-list",
-		PostgreSQL: true,
-		MySQL: true,
-		"SQL Server": true,
+		PostgreSQL: false,
+		MySQL: false,
+		"SQL Server": false,
 		MongoDB: true,
-		Oracle: true,
+		Oracle: false,
 		view: {
 			unique: false,
 			indexed: false,
@@ -415,11 +415,11 @@ export const fieldTypes = [
 	},
 	{
 		name: "basic-values-list",
-		PostgreSQL: true,
-		MySQL: true,
-		"SQL Server": true,
+		PostgreSQL: false,
+		MySQL: false,
+		"SQL Server": false,
 		MongoDB: true,
-		Oracle: true,
+		Oracle: false,
 		view: {
 			unique: false,
 			indexed: true,
