@@ -10,7 +10,7 @@ export default function ProfileSettingsFormItem({
 	children,
 }: SettingsFormItemProps) {
 	return (
-		<div className='grid lg:grid-cols-2 gap-12 py-8'>
+		<div className='py-8 max-w-2xl first:pt-0 space-y-6'>
 			<div>
 				<div className='text-sm leading-6 text-default tracking-tight font-medium'>{title}</div>
 				{description && (
