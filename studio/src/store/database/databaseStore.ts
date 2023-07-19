@@ -17,13 +17,17 @@ interface DatabaseStore {
 	databasesForSearch: Database[];
 	database: Database | null;
 	toEditDatabase: Database | null;
+	toDeleteDatabase: Database | null;
+	isOpenDeleteDatabaseDialog: boolean;
 	apps: object[];
 	appLogs: object[];
 	editDatabaseDialogOpen: boolean;
+	setToDeleteDatabase: (database: Database) => void;
 	setToEditDatabase: (database: Database) => void;
 	setEditDatabaseDialogOpen: (open: boolean) => void;
 	setApps: (apps: object[]) => void;
 	setAppLogs: (appLogs: object[]) => void;
+	setIsOpenDeleteDatabaseDialog: (open: boolean) => void;
 	getDatabasesOfApp: (params: GetDatabasesOfAppParams) => Promise<Database[]>;
 	getDatabaseOfAppById: (params: GetDatabaseOfAppByIdParams) => Promise<Database>;
 	createDatabase: (params: CreateDatabaseParams) => Promise<Database>;
@@ -41,8 +45,12 @@ const useDatabaseStore = create<DatabaseStore>()(
 				database: null,
 				editDatabaseDialogOpen: false,
 				apps: [],
+				isOpenDeleteDatabaseDialog: false,
 				appLogs: [],
 				toEditDatabase: null,
+				toDeleteDatabase: null,
+				setToDeleteDatabase: (database: Database) => set({ toDeleteDatabase: database }),
+				setIsOpenDeleteDatabaseDialog: (open: boolean) => set({ isOpenDeleteDatabaseDialog: open }),
 				setToEditDatabase: (database: Database) => set({ toEditDatabase: database }),
 				setEditDatabaseDialogOpen: (open: boolean) => {
 					if (!open) {

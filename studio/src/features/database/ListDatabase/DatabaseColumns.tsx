@@ -7,7 +7,7 @@ import { CopyButton } from 'components/CopyButton';
 import { Badge } from 'components/Badge';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import { DATABASE_ICON_MAP } from '@/constants';
-import DeleteDatabaseButton from '../DeleteDatabaseButton/DeleteDatabaseButton.tsx';
+import { Trash } from '@phosphor-icons/react';
 
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
@@ -83,11 +83,21 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { setToEditDatabase, setEditDatabaseDialogOpen } = useDatabaseStore.getState();
+			const {
+				setToEditDatabase,
+				setEditDatabaseDialogOpen,
+				setIsOpenDeleteDatabaseDialog,
+				setToDeleteDatabase,
+			} = useDatabaseStore.getState();
 
 			function openEditDrawer() {
 				setToEditDatabase(original);
 				setEditDatabaseDialogOpen(true);
+			}
+
+			function deleteHandler() {
+				setToDeleteDatabase(original);
+				setIsOpenDeleteDatabaseDialog(true);
 			}
 
 			return (
@@ -101,7 +111,15 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 					>
 						<Pencil />
 					</Button>
-					<DeleteDatabaseButton database={original} />
+					<Button
+						onClick={deleteHandler}
+						variant='blank'
+						rounded
+						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
+						iconOnly
+					>
+						<Trash size={20} />
+					</Button>
 					<Button
 						iconOnly
 						variant='blank'

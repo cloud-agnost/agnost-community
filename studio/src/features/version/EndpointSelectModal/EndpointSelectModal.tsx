@@ -8,7 +8,6 @@ import useVersionStore from '@/store/version/versionStore.ts';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { TableLoading } from 'components/Table/Table.tsx';
 import { Checkbox } from 'components/Checkbox';
-import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { cn } from '@/utils';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import { EmptyState } from 'components/EmptyState';
@@ -22,7 +21,7 @@ import {
 } from 'components/Dropdown';
 import { Button } from 'components/Button';
 import { Check, Funnel, FunnelSimple } from '@phosphor-icons/react';
-import { ALL_HTTP_METHODS, ENDPOINT_OPTIONS } from '@/constants';
+import { ALL_HTTP_METHODS, ENDPOINT_OPTIONS, HTTP_METHOD_BADGE_MAP } from '@/constants';
 import { useTranslation } from 'react-i18next';
 
 interface EndpointSelectModalProps {
@@ -33,12 +32,6 @@ interface EndpointSelectModalProps {
 }
 const LIMIT = 20;
 
-const badgeMapping: Record<string, BadgeColors> = {
-	GET: 'orange',
-	POST: 'green',
-	PUT: 'yellow',
-	DELETE: 'red',
-};
 interface FetchEndpoints {
 	defaultPage?: number;
 	init?: boolean;
@@ -150,7 +143,7 @@ export default function EndpointSelectModal({
 													className='pl-2 pr-1'
 													onClear={() => onMethodSelect(method)}
 													text={method}
-													variant={badgeMapping[method]}
+													variant={HTTP_METHOD_BADGE_MAP[method]}
 													key={index}
 												/>
 											))}
@@ -165,7 +158,7 @@ export default function EndpointSelectModal({
 									key={index}
 									className='flex items-center justify-between p-[6px]'
 								>
-									<Badge text={method} variant={badgeMapping[method]} />
+									<Badge text={method} variant={HTTP_METHOD_BADGE_MAP[method]} />
 									{methods.includes(method) && <Check />}
 								</DropdownMenuItem>
 							))}
@@ -248,7 +241,10 @@ export default function EndpointSelectModal({
 													onCheckedChange={(checked) => addList(endpoint, checked)}
 												/>
 												<label htmlFor={id} className='flex items-center gap-4 cursor-pointer'>
-													<Badge variant={badgeMapping[endpoint.method]} text={endpoint.method} />
+													<Badge
+														variant={HTTP_METHOD_BADGE_MAP[endpoint.method]}
+														text={endpoint.method}
+													/>
 													<p className='text-sm text-default leading-6'>{endpoint.name}</p>
 												</label>
 											</div>

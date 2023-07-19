@@ -615,3 +615,10 @@ export const ENDPOINT_OPTIONS: SortOption[] = [
 ];
 
 export const ALL_HTTP_METHODS: Method[] = ['GET', 'POST', 'PUT', 'DELETE'];
+
+export const HTTP_METHOD_BADGE_MAP: Record<string, BadgeColors> = {
+	GET: 'orange',
+	POST: 'green',
+	PUT: 'yellow',
+	DELETE: 'red',
+};

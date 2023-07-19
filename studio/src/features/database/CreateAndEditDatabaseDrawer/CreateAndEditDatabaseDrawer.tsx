@@ -71,10 +71,6 @@ const CreateSchema = z.object({
 	managed: z.boolean(),
 });
 
-const EditSchema = z.object({
-	name: nameSchema,
-});
-
 export default function CreateAndEditDatabaseDrawer({
 	open,
 	onOpenChange,
@@ -87,69 +83,53 @@ export default function CreateAndEditDatabaseDrawer({
 		state.resources.filter((resource) => resource.type === 'database'),
 	);
 	const { toggleCreateResourceModal } = useResourceStore();
-	const createForm = useForm<z.infer<typeof CreateSchema>>({
+	const form = useForm<z.infer<typeof CreateSchema>>({
 		resolver: zodResolver(CreateSchema),
 		defaultValues: {
 			managed: true,
 		},
 	});
-	const editForm = useForm<z.infer<typeof EditSchema>>({
-		resolver: zodResolver(EditSchema),
-		defaultValues: {
-			name: toEditDatabase?.name,
-		},
-	});
 
 	useEffect(() => {
 		if (!open || !editMode || !toEditDatabase) return;
-		editForm.setValue('name', toEditDatabase.name);
+		form.setValue('name', toEditDatabase.name);
+		form.setValue('managed', toEditDatabase.managed);
+		// resource id is not editable, and its value is not changed when editing
+		form.setValue('resourceId', useResourceStore.getState().resources[0]._id);
 	}, [open, editMode, toEditDatabase]);
 
-	async function create(data: z.infer<typeof CreateSchema>) {
+	async function onSubmit(data: z.infer<typeof CreateSchema>) {
 		const resource = resources.find((item) => item._id === data.resourceId);
 		if (!version || !resource) return;
-
 		try {
-			await createDatabase({
-				orgId: version.orgId,
-				versionId: version._id,
-				appId: version.appId,
-				managed: data.managed,
-				type: resource.instance,
-				resourceId: data.resourceId,
-				name: data.name,
-			});
-			openStatusChange(false);
-			createForm.reset();
-		} catch (e) {
-			const error = e as APIError;
-			error.fields?.forEach((field) => {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				createForm.setError(field.param, {
-					message: field.msg,
+			if (editMode) {
+				if (!toEditDatabase) return;
+				await updateDatabaseName({
+					orgId: version.orgId,
+					versionId: version._id,
+					appId: version.appId,
+					name: data.name,
+					dbId: toEditDatabase?._id,
 				});
-			});
-		}
-	}
-	async function edit(data: z.infer<typeof EditSchema>) {
-		if (!version || !toEditDatabase) return;
-		try {
-			await updateDatabaseName({
-				orgId: version.orgId,
-				versionId: version._id,
-				appId: version.appId,
-				name: data.name,
-				dbId: toEditDatabase?._id,
-			});
+			} else {
+				await createDatabase({
+					orgId: version.orgId,
+					versionId: version._id,
+					appId: version.appId,
+					managed: data.managed,
+					type: resource.instance,
+					resourceId: data.resourceId,
+					name: data.name,
+				});
+			}
 			openStatusChange(false);
-			createForm.reset();
+			form.reset();
 		} catch (e) {
 			const error = e as APIError;
 			error.fields?.forEach((field) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				editForm.setError(field.param, {
+				form.setError(field.param, {
 					message: field.msg,
 				});
 			});
@@ -158,13 +138,12 @@ export default function CreateAndEditDatabaseDrawer({
 
 	function formHandler(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		if (editMode) editForm.handleSubmit(edit)(event);
-		else createForm.handleSubmit(create)(event);
+		form.handleSubmit(onSubmit)(event);
 	}
 
 	function openStatusChange(status: boolean) {
 		onOpenChange(status);
-		if (!status) createForm.reset();
+		if (!status) form.reset();
 	}
 
 	return (
@@ -174,127 +153,99 @@ export default function CreateAndEditDatabaseDrawer({
 					<DrawerTitle>{editMode ? t('database.edit.title') : t('database.add.title')}</DrawerTitle>
 				</DrawerHeader>
 				<div className='p-6 space-y-6'>
-					{editMode ? (
-						<Form {...editForm}>
-							<form className='space-y-6' onSubmit={formHandler}>
-								<FormField
-									control={editForm.control}
-									name='name'
-									render={({ field, formState: { errors } }) => (
-										<FormItem className='space-y-1'>
-											<FormLabel>{t('database.add.field')}</FormLabel>
-											<FormControl>
-												<Input
-													error={Boolean(errors.name)}
-													type='text'
-													placeholder={
-														t('forms.placeholder', {
-															label: t('database.add.field').toLowerCase(),
-														}) as string
-													}
-													{...field}
-												/>
-											</FormControl>
-											<FormDescription>{t('forms.max64.description')}</FormDescription>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<div className='flex justify-end'>
-									<Button size='lg'>{t('general.save')}</Button>
-								</div>
-							</form>
-						</Form>
-					) : (
-						<Form {...createForm}>
-							<form className='space-y-6' onSubmit={formHandler}>
-								<FormField
-									control={createForm.control}
-									name='name'
-									render={({ field, formState: { errors } }) => (
-										<FormItem className='space-y-1'>
-											<FormLabel>{t('database.add.field')}</FormLabel>
-											<FormControl>
-												<Input
-													error={Boolean(errors.name)}
-													type='text'
-													placeholder={
-														t('forms.placeholder', {
-															label: t('database.add.field').toLowerCase(),
-														}) as string
-													}
-													{...field}
-												/>
-											</FormControl>
-											<FormDescription>{t('forms.max64.description')}</FormDescription>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<Separator />
-								<FormField
-									control={createForm.control}
-									name='resourceId'
-									render={({ field, formState: { errors } }) => (
-										<FormItem className='space-y-1'>
-											<FormLabel>{t('database.add.resource.field')}</FormLabel>
-											<FormControl>
-												<Select
-													defaultValue={field.value}
-													value={field.value}
-													name={field.name}
-													onValueChange={field.onChange}
-												>
-													<FormControl>
-														<SelectTrigger
-															className={cn('w-full input', errors.resourceId && 'input-error')}
-														>
-															<SelectValue
-																className={cn('text-subtle')}
-																placeholder={t('database.add.resource.placeholder')}
-															/>
-														</SelectTrigger>
-													</FormControl>
-													<SelectContent align='center'>
-														<Button
-															size='full'
-															onClick={toggleCreateResourceModal}
-															variant='blank'
-															className='gap-2 px-3 !no-underline text-button-primary font-normal text-left justify-start hover:bg-subtle'
-														>
-															<Plus weight='bold' size={16} />
-															{t('database.add.resource.add')}
-														</Button>
-														<SelectSeparator />
-														{resources.map((resource) => {
-															const Icon = DATABASE_ICON_MAP[resource.instance];
-															return (
-																<SelectItem
-																	checkClassName='right-2 left-auto top-1/2 -translate-y-1/2'
-																	className='px-3 py-[6px] w-full max-w-full cursor-pointer'
-																	key={resource._id}
-																	value={resource._id}
-																>
-																	<div className='flex items-center gap-2'>
-																		<Icon />
-																		{resource.name}
-																	</div>
-																</SelectItem>
-															);
-														})}
-													</SelectContent>
-												</Select>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<div className='flex justify-end'>
-									<Button size='lg'>{t('general.create')}</Button>
-								</div>
-							</form>
-						</Form>
-					)}
+					<Form {...form}>
+						<form className='space-y-6' onSubmit={formHandler}>
+							<FormField
+								control={form.control}
+								name='name'
+								render={({ field, formState: { errors } }) => (
+									<FormItem className='space-y-1'>
+										<FormLabel>{t('database.add.field')}</FormLabel>
+										<FormControl>
+											<Input
+												error={Boolean(errors.name)}
+												type='text'
+												placeholder={
+													t('forms.placeholder', {
+														label: t('database.add.field').toLowerCase(),
+													}) as string
+												}
+												{...field}
+											/>
+										</FormControl>
+										<FormDescription>{t('forms.max64.description')}</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							{!editMode && (
+								<>
+									<Separator />
+									<FormField
+										control={form.control}
+										name='resourceId'
+										render={({ field, formState: { errors } }) => (
+											<FormItem className='space-y-1'>
+												<FormLabel>{t('database.add.resource.field')}</FormLabel>
+												<FormControl>
+													<Select
+														defaultValue={field.value}
+														value={field.value}
+														name={field.name}
+														onValueChange={field.onChange}
+													>
+														<FormControl>
+															<SelectTrigger
+																className={cn('w-full input', errors.resourceId && 'input-error')}
+															>
+																<SelectValue
+																	className={cn('text-subtle')}
+																	placeholder={t('database.add.resource.placeholder')}
+																/>
+															</SelectTrigger>
+														</FormControl>
+														<SelectContent align='center'>
+															<Button
+																size='full'
+																onClick={toggleCreateResourceModal}
+																variant='blank'
+																className='gap-2 px-3 !no-underline text-button-primary font-normal text-left justify-start hover:bg-subtle'
+															>
+																<Plus weight='bold' size={16} />
+																{t('database.add.resource.add')}
+															</Button>
+															<SelectSeparator />
+															{resources.map((resource) => {
+																const Icon = DATABASE_ICON_MAP[resource.instance];
+																return (
+																	<SelectItem
+																		checkClassName='right-2 left-auto top-1/2 -translate-y-1/2'
+																		className='px-3 py-[6px] w-full max-w-full cursor-pointer'
+																		key={resource._id}
+																		value={resource._id}
+																	>
+																		<div className='flex items-center gap-2'>
+																			<Icon />
+																			{resource.name}
+																		</div>
+																	</SelectItem>
+																);
+															})}
+														</SelectContent>
+													</Select>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</>
+							)}
+
+							<div className='flex justify-end'>
+								<Button size='lg'>{editMode ? t('general.save') : t('general.create')}</Button>
+							</div>
+						</form>
+					</Form>
 				</div>
 			</DrawerContent>
 		</Drawer>
