@@ -1,6 +1,3 @@
-import fs from "fs";
-import fsPromises from "fs/promises";
-
 import { StorageBase } from "./StorageBase.js";
 
 /**
@@ -16,26 +13,41 @@ export class MinIOStorage extends StorageBase {
 	}
 
 	/**
-	 * Checks whether a folder exists or not
-	 * @param  {string} path Folder path
-	 */
-	forderExists(path) {
-		try {
-			fs.accessSync(path, fs.constants.R_OK | fs.constants.W_OK);
-			return true;
-		} catch (err) {
-			return false;
-		}
-	}
+	 * Creates a new bucket in storage and returns the created bucket metadata.
+	 * @param {object} storage The storage object metadata
+	 * @param {string} name The name of the bucket to create (case sensitive).
+	 * @param {boolean} isPublic The default privacy setting that will be applied to the files uploaded to this bucket.
+	 * @param {object} tags JSON object (key-value pairs) that will be added to the bucket metadata.
+	 * @param {string} userId The unique identifier of the user who created the bucket.
 
-	/**
-	 * Creates the storage bucket if it does not exist
-	 * @param  {string} bucketName Name of the bucket
 	 */
-	async ensureBucket(bucketName) {
-		const exists = await this.driver.bucketExists(bucketName);
-		if (!exists) {
-			await this.minioClient.makeBucket(bucketName);
+	async createBucket(storage, name, isPublic = true, tags = {}, userId = null) {
+		// First get whether there is already a bucket with the provided name
+		const bucketInfo = await this.getBucketMetadata(storage.iid, name);
+		if (bucketInfo) {
+			throw new AgnostError(
+				t("A bucket with the provided name '%s' already exists.", name)
+			);
 		}
+
+		const dtm = new Date();
+		const id = helper.generateSlug("bck");
+		const metadata = {
+			id,
+			storageId: storage.iid,
+			name,
+			isPublic,
+			createdAt: dtm,
+			updatedAt: dtm,
+			tags: tags ?? undefined,
+			userId: userId ?? undefined,
+		};
+
+		// Create the bucket in MinIO
+		await await this.driver.makeBucket(name);
+		// Create the bucket metada entry in the database
+		await this.saveBucketMetadata(metadata);
+
+		return metadata;
 	}
 }

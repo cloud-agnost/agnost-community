@@ -22,12 +22,12 @@
 									return null;
 							}
 						}
-						getAdapter(e, t, r) {
+						getAdapter(e, t, n) {
 							switch (e) {
 								case "database":
 									return this.adapterManager.getDatabaseAdapter(
 										t,
-										null != r && r
+										null != n && n
 									);
 								case "queue":
 									return this.adapterManager.getQueueAdapter(t);
@@ -41,14 +41,14 @@
 						}
 					});
 			},
-			779: (e, t, r) => {
+			779: (e, t, n) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.AgnostServerSideClient = void 0);
-				const a = r(602),
-					n = r(120),
-					s = r(760),
-					i = r(634);
-				class o extends a.APIBase {
+				const r = n(602),
+					i = n(120),
+					a = n(760),
+					s = n(634);
+				class o extends r.APIBase {
 					constructor(e, t) {
 						super(e, t), (this.managers = new Map());
 					}
@@ -56,7 +56,7 @@
 						const t = this.managers.get(`storage-${e}`);
 						if (t) return t;
 						{
-							const t = new n.Storage(this.metaManager, this.adapterManager, e);
+							const t = new i.Storage(this.metaManager, this.adapterManager, e);
 							return this.managers.set(`storage-${e}`, t), t;
 						}
 					}
@@ -64,7 +64,7 @@
 						const t = this.managers.get(`queue-${e}`);
 						if (t) return t;
 						{
-							const t = new s.Queue(this.metaManager, this.adapterManager, e);
+							const t = new a.Queue(this.metaManager, this.adapterManager, e);
 							return this.managers.set(`queue-${e}`, t), t;
 						}
 					}
@@ -72,42 +72,42 @@
 						const t = this.managers.get(`task-${e}`);
 						if (t) return t;
 						{
-							const t = new i.Task(this.metaManager, this.adapterManager, e);
+							const t = new s.Task(this.metaManager, this.adapterManager, e);
 							return this.managers.set(`task-${e}`, t), t;
 						}
 					}
 				}
 				t.AgnostServerSideClient = o;
 			},
-			341: function (e, t, r) {
-				var a =
+			341: function (e, t, n) {
+				var r =
 						(this && this.__createBinding) ||
 						(Object.create
-							? function (e, t, r, a) {
-									void 0 === a && (a = r);
-									var n = Object.getOwnPropertyDescriptor(t, r);
-									(n &&
-										!("get" in n
+							? function (e, t, n, r) {
+									void 0 === r && (r = n);
+									var i = Object.getOwnPropertyDescriptor(t, n);
+									(i &&
+										!("get" in i
 											? !t.__esModule
-											: n.writable || n.configurable)) ||
-										(n = {
+											: i.writable || i.configurable)) ||
+										(i = {
 											enumerable: !0,
 											get: function () {
-												return t[r];
+												return t[n];
 											},
 										}),
-										Object.defineProperty(e, a, n);
+										Object.defineProperty(e, r, i);
 							  }
-							: function (e, t, r, a) {
-									void 0 === a && (a = r), (e[a] = t[r]);
+							: function (e, t, n, r) {
+									void 0 === r && (r = n), (e[r] = t[n]);
 							  }),
-					n =
+					i =
 						(this && this.__exportStar) ||
 						function (e, t) {
-							for (var r in e)
-								"default" === r ||
-									Object.prototype.hasOwnProperty.call(t, r) ||
-									a(t, e, r);
+							for (var n in e)
+								"default" === n ||
+									Object.prototype.hasOwnProperty.call(t, n) ||
+									r(t, e, n);
 						};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Task =
@@ -117,35 +117,35 @@
 						t.APIBase =
 						t.createServerSideClient =
 							void 0);
-				const s = r(602);
+				const a = n(602);
 				Object.defineProperty(t, "APIBase", {
 					enumerable: !0,
 					get: function () {
-						return s.APIBase;
+						return a.APIBase;
 					},
 				});
-				const i = r(779);
+				const s = n(779);
 				Object.defineProperty(t, "AgnostServerSideClient", {
 					enumerable: !0,
 					get: function () {
-						return i.AgnostServerSideClient;
+						return s.AgnostServerSideClient;
 					},
 				});
-				const o = r(120);
+				const o = n(120);
 				Object.defineProperty(t, "Storage", {
 					enumerable: !0,
 					get: function () {
 						return o.Storage;
 					},
 				});
-				const u = r(760);
+				const u = n(760);
 				Object.defineProperty(t, "Queue", {
 					enumerable: !0,
 					get: function () {
 						return u.Queue;
 					},
 				});
-				const d = r(634);
+				const d = n(634);
 				Object.defineProperty(t, "Task", {
 					enumerable: !0,
 					get: function () {
@@ -153,69 +153,69 @@
 					},
 				}),
 					(t.createServerSideClient = (e, t) =>
-						new i.AgnostServerSideClient(e, t)),
-					n(r(307), t);
+						new s.AgnostServerSideClient(e, t)),
+					i(n(307), t);
 			},
-			760: function (e, t, r) {
-				var a =
+			760: function (e, t, n) {
+				var r =
 					(this && this.__awaiter) ||
-					function (e, t, r, a) {
-						return new (r || (r = Promise))(function (n, s) {
-							function i(e) {
+					function (e, t, n, r) {
+						return new (n || (n = Promise))(function (i, a) {
+							function s(e) {
 								try {
-									u(a.next(e));
+									u(r.next(e));
 								} catch (e) {
-									s(e);
+									a(e);
 								}
 							}
 							function o(e) {
 								try {
-									u(a.throw(e));
+									u(r.throw(e));
 								} catch (e) {
-									s(e);
+									a(e);
 								}
 							}
 							function u(e) {
 								var t;
 								e.done
-									? n(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof r
+									  t instanceof n
 											? t
-											: new r(function (e) {
+											: new n(function (e) {
 													e(t);
-											  })).then(i, o);
+											  })).then(s, o);
 							}
-							u((a = a.apply(e, t || [])).next());
+							u((r = r.apply(e, t || [])).next());
 						});
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Queue = void 0);
-				const n = r(602),
-					s = r(990);
-				class i extends n.APIBase {
-					constructor(e, t, r) {
+				const i = n(602),
+					a = n(990);
+				class s extends i.APIBase {
+					constructor(e, t, n) {
 						if (
 							(super(e, t),
-							(this.name = r),
-							(this.meta = this.getMetadata("queue", r)),
+							(this.name = n),
+							(this.meta = this.getMetadata("queue", n)),
 							!this.meta)
 						)
-							throw new s.ClientError(
+							throw new a.ClientError(
 								"queue_not_found",
-								`Cannot find the queue object identified by name '${r}'`
+								`Cannot find the queue object identified by name '${n}'`
 							);
 						if (
 							((this.adapter = this.getAdapter("queue", this.name)),
 							!this.adapter)
 						)
-							throw new s.ClientError(
+							throw new a.ClientError(
 								"adapter_not_found",
-								`Cannot find the adapter of the queue named '${r}'`
+								`Cannot find the adapter of the queue named '${n}'`
 							);
 					}
 					submitMessage(e, t) {
-						return a(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.sendMessage(
 								this.meta,
 								e,
@@ -224,7 +224,7 @@
 						});
 					}
 					getMessageStatus(e) {
-						return a(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.getMessageTrackingRecord(
 								this.meta.iid,
 								e
@@ -232,124 +232,296 @@
 						});
 					}
 				}
-				t.Queue = i;
+				t.Queue = s;
 			},
-			120: (e, t, r) => {
-				Object.defineProperty(t, "__esModule", { value: !0 }),
-					(t.Storage = void 0);
-				const a = r(602),
-					n = r(990);
-				class s extends a.APIBase {
-					constructor(e, t, r) {
-						if (
-							(super(e, t),
-							(this.name = r),
-							(this.meta = this.getMetadata("storage", r)),
-							!this.meta)
-						)
-							throw new n.ClientError(
-								"storage_not_found",
-								`Cannot find the storage object identified by name '${r}'`
-							);
-					}
-				}
-				t.Storage = s;
-			},
-			634: function (e, t, r) {
-				var a =
+			120: function (e, t, n) {
+				var r =
 					(this && this.__awaiter) ||
-					function (e, t, r, a) {
-						return new (r || (r = Promise))(function (n, s) {
-							function i(e) {
+					function (e, t, n, r) {
+						return new (n || (n = Promise))(function (i, a) {
+							function s(e) {
 								try {
-									u(a.next(e));
+									u(r.next(e));
 								} catch (e) {
-									s(e);
+									a(e);
 								}
 							}
 							function o(e) {
 								try {
-									u(a.throw(e));
+									u(r.throw(e));
 								} catch (e) {
-									s(e);
+									a(e);
 								}
 							}
 							function u(e) {
 								var t;
 								e.done
-									? n(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof r
+									  t instanceof n
 											? t
-											: new r(function (e) {
+											: new n(function (e) {
 													e(t);
-											  })).then(i, o);
+											  })).then(s, o);
 							}
-							u((a = a.apply(e, t || [])).next());
+							u((r = r.apply(e, t || [])).next());
+						});
+					};
+				Object.defineProperty(t, "__esModule", { value: !0 }),
+					(t.Storage = void 0);
+				const i = n(602),
+					a = n(990),
+					s = n(419);
+				class o extends i.APIBase {
+					constructor(e, t, n) {
+						if (
+							(super(e, t),
+							(this.name = n),
+							(this.meta = this.getMetadata("storage", n)),
+							!this.meta)
+						)
+							throw new a.ClientError(
+								"storage_not_found",
+								`Cannot find the storage object identified by name '${n}'`
+							);
+						if (
+							((this.adapter = this.getAdapter("storage", this.name)),
+							!this.adapter)
+						)
+							throw new a.ClientError(
+								"adapter_not_found",
+								`Cannot find the adapter of the storage named '${n}'`
+							);
+					}
+					createBucket(e, t = !0, n, i) {
+						return r(this, void 0, void 0, function* () {
+							if (!(0, s.isString)(e))
+								throw new a.ClientError(
+									"invalid_value",
+									"Bucket name needs to be a string value"
+								);
+							if (!(0, s.isBoolean)(t))
+								throw new a.ClientError(
+									"invalid_value",
+									"Public flag needs to be a boolean value"
+								);
+							if (n && !(0, s.isObject)(n))
+								throw new a.ClientError(
+									"invalid_value",
+									"Bucket tags need to be a JSON object"
+								);
+							return yield this.adapter.createBucket(this.meta, e, t, n, i);
+						});
+					}
+					listBuckets(e) {
+						return r(this, void 0, void 0, function* () {
+							if (e) {
+								if (!(0, s.isObject)(e))
+									throw new a.ClientError(
+										"invalid_value",
+										"Bucket listing options need to be a JSON object"
+									);
+								if ((0, s.valueExists)(e.search) && !(0, s.isString)(e.search))
+									throw new a.ClientError(
+										"invalid_value",
+										"Search parameter needs to be a string value"
+									);
+								if (
+									(0, s.valueExists)(e.page) &&
+									!(0, s.isPositiveInteger)(e.page)
+								)
+									throw new a.ClientError(
+										"invalid_value",
+										"Page number needs to be a positive integer value"
+									);
+								if (
+									(0, s.valueExists)(e.limit) &&
+									!(0, s.isPositiveInteger)(e.limit)
+								)
+									throw new a.ClientError(
+										"invalid_value",
+										"Page limit (size) needs to be a positive integer value"
+									);
+								if (
+									(0, s.valueExists)(e.returnCountInfo) &&
+									!(0, s.isBoolean)(e.returnCountInfo)
+								)
+									throw new a.ClientError(
+										"invalid_value",
+										"Return count info option needs to be a boolean value"
+									);
+							}
+							return yield this.adapter.listBuckets(this.meta, e);
+						});
+					}
+					listFiles(e) {
+						return r(this, void 0, void 0, function* () {
+							if (e) {
+								if (!(0, s.isObject)(e))
+									throw new a.ClientError(
+										"invalid_value",
+										"File listing options need to be a JSON object"
+									);
+								if ((0, s.valueExists)(e.search) && !(0, s.isString)(e.search))
+									throw new a.ClientError(
+										"invalid_value",
+										"Search parameter needs to be a string value"
+									);
+								if (
+									(0, s.valueExists)(e.page) &&
+									!(0, s.isPositiveInteger)(e.page)
+								)
+									throw new a.ClientError(
+										"invalid_value",
+										"Page number needs to be a positive integer value"
+									);
+								if (
+									(0, s.valueExists)(e.limit) &&
+									!(0, s.isPositiveInteger)(e.limit)
+								)
+									throw new a.ClientError(
+										"invalid_value",
+										"Page limit (size) needs to be a positive integer value"
+									);
+								if (
+									(0, s.valueExists)(e.returnCountInfo) &&
+									!(0, s.isBoolean)(e.returnCountInfo)
+								)
+									throw new a.ClientError(
+										"invalid_value",
+										"Return count info option needs to be a boolean value"
+									);
+							}
+							return yield this.adapter.listFiles(this.meta, e);
+						});
+					}
+					getStats() {
+						return r(this, void 0, void 0, function* () {
+							return yield this.adapter.getStats(this.meta);
+						});
+					}
+				}
+				t.Storage = o;
+			},
+			634: function (e, t, n) {
+				var r =
+					(this && this.__awaiter) ||
+					function (e, t, n, r) {
+						return new (n || (n = Promise))(function (i, a) {
+							function s(e) {
+								try {
+									u(r.next(e));
+								} catch (e) {
+									a(e);
+								}
+							}
+							function o(e) {
+								try {
+									u(r.throw(e));
+								} catch (e) {
+									a(e);
+								}
+							}
+							function u(e) {
+								var t;
+								e.done
+									? i(e.value)
+									: ((t = e.value),
+									  t instanceof n
+											? t
+											: new n(function (e) {
+													e(t);
+											  })).then(s, o);
+							}
+							u((r = r.apply(e, t || [])).next());
 						});
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Task = void 0);
-				const n = r(602),
-					s = r(990);
-				class i extends n.APIBase {
-					constructor(e, t, r) {
+				const i = n(602),
+					a = n(990);
+				class s extends i.APIBase {
+					constructor(e, t, n) {
 						if (
 							(super(e, t),
-							(this.name = r),
-							(this.meta = this.getMetadata("task", r)),
+							(this.name = n),
+							(this.meta = this.getMetadata("task", n)),
 							!this.meta)
 						)
-							throw new s.ClientError(
+							throw new a.ClientError(
 								"cronjob_not_found",
-								`Cannot find the cron job object identified by name '${r}'`
+								`Cannot find the cron job object identified by name '${n}'`
 							);
 						if (
 							((this.adapter = this.getAdapter("task", this.name)),
 							!this.adapter)
 						)
-							throw new s.ClientError(
+							throw new a.ClientError(
 								"adapter_not_found",
-								`Cannot find the adapter of the queue named '${r}'`
+								`Cannot find the adapter of the queue named '${n}'`
 							);
 					}
 					runOnce() {
-						return a(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.triggerCronJob(this.meta);
 						});
 					}
 					getTaskStatus(e) {
-						return a(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.getTaskTrackingRecord(this.meta.iid, e);
 						});
 					}
 				}
-				t.Task = i;
+				t.Task = s;
 			},
 			990: (e, t) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.ClientError = void 0);
-				class r extends Error {
-					constructor(e, t, r) {
+				class n extends Error {
+					constructor(e, t, n) {
 						super(t),
 							(this.origin = "client_error"),
 							(this.code = e),
 							(this.message = t),
-							(this.details = r);
+							(this.details = n);
 					}
 				}
-				t.ClientError = r;
+				t.ClientError = n;
+			},
+			419: (e, t) => {
+				Object.defineProperty(t, "__esModule", { value: !0 }),
+					(t.isPositiveInteger =
+						t.valueExists =
+						t.isString =
+						t.isBoolean =
+						t.isObject =
+							void 0),
+					(t.isObject = function (e) {
+						return "object" == typeof e && !Array.isArray(e) && null !== e;
+					}),
+					(t.isBoolean = function (e) {
+						return "boolean" == typeof e;
+					}),
+					(t.isString = function (e) {
+						return "string" == typeof e && "" !== e && 0 !== e.trim().length;
+					}),
+					(t.valueExists = function (e) {
+						return null != e;
+					}),
+					(t.isPositiveInteger = function (e) {
+						return !("number" != typeof e || !Number.isInteger(e)) && e > 0;
+					});
 			},
 			307: (e, t) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
 			},
 		},
 		t = {},
-		r = (function r(a) {
-			var n = t[a];
-			if (void 0 !== n) return n.exports;
-			var s = (t[a] = { exports: {} });
-			return e[a].call(s.exports, s, s.exports, r), s.exports;
+		n = (function n(r) {
+			var i = t[r];
+			if (void 0 !== i) return i.exports;
+			var a = (t[r] = { exports: {} });
+			return e[r].call(a.exports, a, a.exports, n), a.exports;
 		})(341);
-	module.exports = r;
+	module.exports = n;
 })();

@@ -4,6 +4,7 @@ import epCtrl from "../controllers/endpoint.js";
 import mwCtrl from "../controllers/middleware.js";
 import queueCtrl from "../controllers/queue.js";
 import taskCtrl from "../controllers/task.js";
+import storageCtrl from "../controllers/storage.js";
 import modelCtrl from "../controllers/model.js";
 import resourceCtrl from "../controllers/resource.js";
 import versionCtrl from "../controllers/version.js";
@@ -165,6 +166,16 @@ class DeploymentController {
 	}
 
 	/**
+	 * Returns the tasks
+	 * @param  {string} versionId The version id
+	 */
+	async getStorages(versionId) {
+		let storages = await storageCtrl.getManyByQuery({ versionId });
+
+		return storages;
+	}
+
+	/**
 	 * Deploys the version to the environment
 	 * @param  {object} envLog The environment log object
 	 * @param  {object} app The application object
@@ -201,7 +212,7 @@ class DeploymentController {
 			middlewares: await this.getMiddlewares(version._id),
 			queues: await this.getQueues(version._id),
 			tasks: await this.getTasks(version._id),
-			storage: [],
+			storages: await this.getStorages(version._id),
 			cache: [],
 		};
 
@@ -255,7 +266,7 @@ class DeploymentController {
 			middlewares: await this.getMiddlewares(version._id),
 			queues: await this.getQueues(version._id),
 			tasks: await this.getTasks(version._id),
-			storage: [],
+			storages: await this.getStorages(version._id),
 			cache: [],
 		};
 

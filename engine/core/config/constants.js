@@ -7,6 +7,7 @@ export const corePackages = [
 	"config",
 	"cors",
 	"crypto-js",
+	"decimal.js",
 	"express",
 	"@google-cloud/storage",
 	"helmet",

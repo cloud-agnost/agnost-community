@@ -37,6 +37,7 @@ const ERROR_CODES = {
 	storageNotFound: "storage_not_found",
 	queueNotFound: "queue_not_found",
 	cronJobNotFound: "cronjob_not_found",
+	invalidValue: "invalid_value",
 };
 
 export default ERROR_CODES;
