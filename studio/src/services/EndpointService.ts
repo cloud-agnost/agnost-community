@@ -35,15 +35,15 @@ export default class EndpointService {
 			.data;
 	}
 
-	static async getEndpoints({
-		orgId,
-		appId,
-		versionId,
-		...params
-	}: GetEndpointsParams): Promise<Endpoint[]> {
+	static async getEndpoints(params: GetEndpointsParams): Promise<Endpoint[]> {
+		const { orgId, appId, versionId, search, size, page } = params;
 		return (
 			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/ep`, {
-				params,
+				params: {
+					search,
+					size,
+					page,
+				},
 			})
 		).data;
 	}
