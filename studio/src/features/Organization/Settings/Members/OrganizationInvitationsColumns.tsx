@@ -5,7 +5,7 @@ import { TableConfirmation } from '@/components/Table';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Invitation } from '@/types';
 import { formatDate, notify, translate } from '@/utils';
-import { EnvelopeSimple, Trash } from '@phosphor-icons/react';
+import { Trash } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 

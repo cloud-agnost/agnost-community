@@ -24,7 +24,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from 'components/Select';
-import { DATABASE_ICON_MAP } from '@/constants';
+import { DATABASE_ICON_MAP, NAME_SCHEMA } from '@/constants';
 import { Button } from 'components/Button';
 import useResourceStore from '@/store/resources/resourceStore.ts';
 import { Plus } from '@phosphor-icons/react';
@@ -37,26 +37,9 @@ interface CreateDatabaseDrawerProps {
 	onOpenChange: (open: boolean) => void;
 	editMode?: boolean;
 }
-const nameSchema = z
-	.string({
-		required_error: translate('forms.required', {
-			label: translate('general.name'),
-		}),
-	})
-	.min(2, translate('forms.min2.error', { label: translate('general.name') }))
-	.max(64, translate('forms.max64.error', { label: translate('general.name') }))
-	.regex(/^[a-zA-Z0-9_]*$/, {
-		message: translate('forms.alphanumeric', { label: translate('general.name') }),
-	})
-	.trim()
-	.refine(
-		(value) => value.trim().length > 0,
-		translate('forms.required', {
-			label: translate('general.name'),
-		}),
-	);
+
 const CreateSchema = z.object({
-	name: nameSchema,
+	name: NAME_SCHEMA,
 	resourceId: z
 		.string({
 			required_error: translate('forms.required', {
