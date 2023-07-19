@@ -269,6 +269,10 @@ const router = createBrowserRouter([
 						lazy: () => lazyRouteImport(paths.version.database),
 					},
 					{
+						path: 'database/:dbId/models',
+						lazy: () => lazyRouteImport(paths.version.models),
+					},
+					{
 						path: 'endpoint',
 						lazy: () => lazyRouteImport(paths.version.endpoint),
 						children: [

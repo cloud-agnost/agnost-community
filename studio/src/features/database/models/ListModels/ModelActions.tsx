@@ -1,17 +1,17 @@
-import { removeLastSlash } from '@/utils';
-import { Database, Model } from '@/types';
-import { Trans, useTranslation } from 'react-i18next';
-import { Dispatch, SetStateAction, useMemo, useState } from 'react';
+import { CreateModelButton } from '@/features/database/models/ListModels/index.ts';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
-import { useLocation, useParams } from 'react-router-dom';
-import { SearchInput } from 'components/SearchInput';
-import { Button } from 'components/Button';
+import useModelStore from '@/store/database/modelStore.ts';
+import { Database, Model } from '@/types';
+import { removeLastSlash } from '@/utils';
 import { ArrowLeft, CaretRight } from '@phosphor-icons/react';
 import { Row } from '@tanstack/react-table';
-import { SelectedRowDropdown } from 'components/Table';
-import { CreateModelButton } from '@/features/database/models/ListModels/index.ts';
-import useModelStore from '@/store/database/modelStore.ts';
+import { Button } from 'components/Button';
 import { ConfirmationModal } from 'components/ConfirmationModal';
+import { SearchInput } from 'components/SearchInput';
+import { SelectedRowDropdown } from 'components/Table';
+import { Dispatch, SetStateAction, useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import { Link, useLocation, useParams } from 'react-router-dom';
 
 interface ModelActionsProps {
 	setSelectedRows: Dispatch<SetStateAction<Row<Model>[] | undefined>>;
@@ -84,7 +84,9 @@ export default function ModelActions({
 				<div className='flex items-center gap-2 text-sm leading-6'>
 					<span className='text-default'>{t('database.page_title')}</span>
 					<CaretRight className='text-icon-base' weight='bold' size={20} />
-					<span className='text-subtle'>{database?.name}</span>
+					<Link to={goBackLink} className='!text-subtle hover:underline'>
+						{database?.name}
+					</Link>
 				</div>
 			</div>
 			<div className='flex flex-col gap-2 sm:items-center sm:flex-row justify-between'>
