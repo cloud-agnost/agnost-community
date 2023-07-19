@@ -10,7 +10,7 @@ export default function EndpointRateLimiters() {
 					<span className='uppercase font-sfCompact text-subtle leading-6 text-sm font-normal'>
 						{t('version.rate_limiters')}
 					</span>
-					<AddRateLimiterDropdown />
+					<AddRateLimiterDropdown type='endpoint' hasToAddAsDefault='endpoint' />
 				</div>
 				<SortableRateLimits />
 			</div>

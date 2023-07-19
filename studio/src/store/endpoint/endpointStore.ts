@@ -6,6 +6,7 @@ import {
 	DeleteMultipleEndpointsParams,
 	Endpoint,
 	GetEndpointByIdParams,
+	GetEndpointsByIidParams,
 	GetEndpointsParams,
 	SaveEndpointLogicParams,
 	UpdateEndpointParams,
@@ -13,8 +14,12 @@ import {
 import { EndpointService } from '@/services';
 
 interface EndpointStore {
+	selectEndpointDialogOpen: boolean;
+	setSelectEndpointDialogOpen: (open: boolean) => void;
 	endpoints: Endpoint[];
 	endpoint: Endpoint | null;
+	selectedEndpointIds: string[];
+	setSelectedEndpointIds: (ids: string[]) => void;
 	setEndpoints: (endpoints: Endpoint[]) => void;
 	createEndpoint: (endpoint: CreateEndpointParams) => Promise<Endpoint>;
 	getEndpointById: (endpoint: GetEndpointByIdParams) => Promise<Endpoint>;
@@ -23,14 +28,19 @@ interface EndpointStore {
 	deleteMultipleEndpoints: (endpoint: DeleteMultipleEndpointsParams) => Promise<void>;
 	updateEndpoint: (endpoint: UpdateEndpointParams) => Promise<Endpoint>;
 	saveEndpointLogic: (endpoint: SaveEndpointLogicParams) => Promise<Endpoint>;
+	getEndpointsByIid: (endpoint: GetEndpointsByIidParams) => Promise<Endpoint[]>;
 }
 
 const useEndpointStore = create<EndpointStore>()(
 	devtools(
 		persist(
 			(set) => ({
+				selectEndpointDialogOpen: false,
 				endpoints: [],
 				endpoint: null,
+				selectedEndpointIds: [],
+				setSelectedEndpointIds: (ids) => set({ selectedEndpointIds: ids }),
+				setSelectEndpointDialogOpen: (open) => set({ selectEndpointDialogOpen: open }),
 				setEndpoints: (endpoints) => set({ endpoints }),
 				createEndpoint: async (params) => {
 					const endpoint = await EndpointService.createEndpoint(params);
@@ -72,6 +82,9 @@ const useEndpointStore = create<EndpointStore>()(
 						endpoints: prev.endpoints.map((e) => (e._id === endpoint._id ? endpoint : e)),
 					}));
 					return endpoint;
+				},
+				getEndpointsByIid: async (params) => {
+					return EndpointService.getEndpointsByIid(params);
 				},
 			}),
 			{

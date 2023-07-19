@@ -8,6 +8,7 @@ import useApplicationStore from '@/store/app/applicationStore.ts';
 import EditApplication from '@/features/application/EditApplication.tsx';
 import { EditMiddlewareDrawer } from '@/features/version/Middlewares';
 import { CreateCopyVersionDrawer } from '@/features/version/CreateCopyVersionDrawer';
+import { CreateResource } from '@/features/resources';
 
 const authPaths = [
 	'/login',
@@ -62,6 +63,7 @@ export default function Root() {
 			<EditApplication />
 			<EditMiddlewareDrawer />
 			<CreateCopyVersionDrawer />
+			<CreateResource />
 		</>
 	);
 }

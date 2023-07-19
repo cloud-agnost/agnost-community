@@ -13,7 +13,7 @@ export default function SortableRateLimits() {
 	const defaultRateLimiters = useVersionStore((state) => state.version?.defaultEndpointLimits);
 	const rateLimits = useVersionStore((state) => state.version?.limits);
 	const updateVersionProperties = useVersionStore((state) => state.updateVersionProperties);
-	const orderLimits = useVersionStore((state) => state.orderLimits);
+	const orderLimits = useVersionStore((state) => state.orderEndpointRateLimits);
 	const { orgId, versionId, appId } = useParams<{
 		versionId: string;
 		appId: string;

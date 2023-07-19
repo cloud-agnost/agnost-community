@@ -1,0 +1,27 @@
+{
+  "page_title": "Databases",
+  "add": {
+    "title": "Create Database",
+    "field": "Database Name",
+    "resource" : {
+        "title": "Resource Management",
+        "field": "Database Server",
+        "placeholder": "Select Database Server",
+        "add": "Add Database Server"
+    },
+    "type" : {
+        "title": "Database Type",
+        "field": "Database type",
+        "placeholder": "Select Database Type"
+    }
+  },
+  "edit": {
+    "title": "Edit Database"
+  },
+  "delete": {
+    "title": "Delete Database",
+    "confirm": "Confirm database delete by typing <confirmCode>{{confirmCode}}</confirmCode> below.",
+    "confirm_title": "Are you sure you want to delete this database?",
+    "confirm_description": "Deleting this database will remove all associated data and cannot be undone."
+  }
+}

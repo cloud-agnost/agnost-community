@@ -2,6 +2,7 @@ export { default as ApiKeys } from './ApiKeys';
 export { default as AgnostOnlyLogo } from './AgnostOnlyLogo';
 export { default as Authentication } from './Authentication';
 export { default as BellRing } from './BellRing';
+export { default as DatabaseIcon } from './DatabaseIcon';
 export { default as Cache } from './Cache';
 export { default as ChangeLog } from './ChangeLog';
 export { default as Connect } from './Connect';

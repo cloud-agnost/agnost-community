@@ -2,6 +2,7 @@ import {
 	AddNPMPackageParams,
 	AddVersionVariableParams,
 	APIError,
+	APIKey,
 	CreateAPIKeyParams,
 	CreateCopyOfVersionParams,
 	CreateRateLimitParams,
@@ -25,6 +26,7 @@ import {
 	Version,
 	VersionParamsWithoutEnvId,
 	VersionProperties,
+	VersionRealtimeProperties,
 } from '@/types';
 import { devtools } from 'zustand/middleware';
 import { create } from 'zustand';
@@ -42,6 +44,10 @@ interface VersionStore {
 	editParamDrawerIsOpen: boolean;
 	editRateLimitDrawerIsOpen: boolean;
 	createCopyVersionDrawerIsOpen: boolean;
+	editAPIKeyDrawerIsOpen: boolean;
+	selectedAPIKey: APIKey | null;
+	setSelectedAPIKey: (key: APIKey | null) => void;
+	setEditAPIKeyDrawerIsOpen: (isOpen: boolean) => void;
 	getVersionById: (req: GetVersionByIdParams) => Promise<Version>;
 	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<void>;
 	setVersionPage: (page: number) => void;
@@ -50,16 +56,23 @@ interface VersionStore {
 	) => Promise<Version>;
 	createRateLimit: (params: CreateRateLimitParams) => Promise<RateLimit>;
 	deleteRateLimit: (params: DeleteRateLimitParams) => Promise<Version>;
-	orderLimits: (limits: string[]) => void;
+	orderEndpointRateLimits: (limits: string[]) => void;
+	orderRealtimeRateLimits: (limits: string[]) => void;
 	searchNPMPackages: (params: SearchNPMPackagesParams) => Promise<SearchNPMPackages[]>;
-	addNPMPackage: (params: AddNPMPackageParams) => Promise<Version>;
-	deleteNPMPackage: (params: DeleteNPMPackageParams) => Promise<Version>;
-	deleteMultipleNPMPackages: (params: DeleteMultipleNPMPackagesParams) => Promise<Version>;
+	addNPMPackage: (params: AddNPMPackageParams, showAlert?: boolean) => Promise<Version>;
+	deleteNPMPackage: (params: DeleteNPMPackageParams, showAlert?: boolean) => Promise<Version>;
+	deleteMultipleNPMPackages: (
+		params: DeleteMultipleNPMPackagesParams,
+		showAlert?: boolean,
+	) => Promise<Version>;
 	setParam: (param: Param | null) => void;
 	addParam: (params: AddVersionVariableParams, showAlert?: boolean) => Promise<Version>;
-	deleteParam: (params: DeleteVersionVariableParams) => Promise<Version>;
-	deleteMultipleParams: (params: DeleteMultipleVersionVariablesParams) => Promise<Version>;
-	updateParam: (params: UpdateVersionVariableParams) => Promise<Version>;
+	deleteParam: (params: DeleteVersionVariableParams, showAlert?: boolean) => Promise<Version>;
+	deleteMultipleParams: (
+		params: DeleteMultipleVersionVariablesParams,
+		showAlert?: boolean,
+	) => Promise<Version>;
+	updateParam: (params: UpdateVersionVariableParams, showAlert?: boolean) => Promise<Version>;
 	setEditParamDrawerIsOpen: (isOpen: boolean) => void;
 	createCopyOfVersion: (
 		params: CreateCopyOfVersionParams,
@@ -67,20 +80,29 @@ interface VersionStore {
 	) => Promise<Version | void>;
 	setEditRateLimitDrawerIsOpen: (isOpen: boolean) => void;
 	setRateLimit: (rateLimit: RateLimit | null) => void;
-	editRateLimit: (params: EditRateLimitParams) => Promise<Version>;
-	deleteMultipleRateLimits: (params: DeleteMultipleRateLimitsParams) => Promise<Version>;
+	editRateLimit: (params: EditRateLimitParams, showAlert?: boolean) => Promise<Version>;
+	deleteMultipleRateLimits: (
+		params: DeleteMultipleRateLimitsParams,
+		showAlert?: boolean,
+	) => Promise<Version>;
 	getVersionDashboardPath: (appendPath?: string, version?: Version) => string;
 	setCreateCopyVersionDrawerIsOpen: (isOpen: boolean) => void;
-	createAPIKey: (params: CreateAPIKeyParams) => Promise<Version>;
-	editAPIKey: (params: UpdateAPIKeyParams) => Promise<Version>;
-	deleteAPIKey: (params: DeleteAPIKeyParams) => Promise<Version>;
-	deleteMultipleAPIKeys: (params: DeleteMultipleAPIKeys) => Promise<Version>;
+	createAPIKey: (params: CreateAPIKeyParams, showAlert?: boolean) => Promise<Version>;
+	editAPIKey: (params: UpdateAPIKeyParams, showAlert?: boolean) => Promise<Version>;
+	deleteAPIKey: (params: DeleteAPIKeyParams, showAlert?: boolean) => Promise<Version>;
+	deleteMultipleAPIKeys: (params: DeleteMultipleAPIKeys, showAlert?: boolean) => Promise<Version>;
+	updateVersionRealtimeProperties: (
+		version: VersionParamsWithoutEnvId & Partial<VersionRealtimeProperties>,
+		showAlert?: boolean,
+	) => Promise<Version>;
 }
 
 const useVersionStore = create<VersionStore>()(
 	devtools(
 		(set, get) => ({
 			loading: false,
+			editAPIKeyDrawerIsOpen: false,
+			selectedAPIKey: null,
 			error: null,
 			version: null,
 			versions: [],
@@ -90,6 +112,12 @@ const useVersionStore = create<VersionStore>()(
 			editParamDrawerIsOpen: false,
 			editRateLimitDrawerIsOpen: false,
 			createCopyVersionDrawerIsOpen: false,
+			setSelectedAPIKey: (key: APIKey | null) => {
+				set({ selectedAPIKey: key });
+			},
+			setEditAPIKeyDrawerIsOpen: (isOpen: boolean) => {
+				set({ editAPIKeyDrawerIsOpen: isOpen });
+			},
 			setCreateCopyVersionDrawerIsOpen: (isOpen: boolean) => {
 				set({ createCopyVersionDrawerIsOpen: isOpen });
 			},
@@ -167,10 +195,19 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			orderLimits: (limits: string[]) => {
+			orderEndpointRateLimits: (limits: string[]) => {
 				set((prev) => {
 					if (!prev.version) return prev;
 					prev.version.defaultEndpointLimits = limits;
+					return {
+						version: prev.version,
+					};
+				});
+			},
+			orderRealtimeRateLimits: (limits: string[]) => {
+				set((prev) => {
+					if (!prev.version) return prev;
+					prev.version.realtime.rateLimits = limits;
 					return {
 						version: prev.version,
 					};
@@ -189,15 +226,17 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			addNPMPackage: async (params: AddNPMPackageParams) => {
+			addNPMPackage: async (params: AddNPMPackageParams, showAlert) => {
 				try {
 					const version = await VersionService.addNPMPackage(params);
 					set({ version });
-					notify({
-						type: 'success',
-						title: translate('general.success'),
-						description: translate('version.npm.success'),
-					});
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.npm.success'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -212,15 +251,17 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			deleteNPMPackage: async (params: DeleteNPMPackageParams) => {
+			deleteNPMPackage: async (params: DeleteNPMPackageParams, showAlert) => {
 				try {
 					const version = await VersionService.deleteNPMPackage(params);
 					set({ version });
-					notify({
-						type: 'success',
-						title: translate('general.success'),
-						description: translate('version.npm.deleted'),
-					});
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.npm.deleted'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -232,15 +273,17 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			deleteMultipleNPMPackages: async (params: DeleteMultipleNPMPackagesParams) => {
+			deleteMultipleNPMPackages: async (params: DeleteMultipleNPMPackagesParams, showAlert) => {
 				try {
 					const version = await VersionService.deleteMultipleNPMPackages(params);
 					set({ version });
-					notify({
-						type: 'success',
-						title: translate('general.success'),
-						description: translate('version.npm.deleted'),
-					});
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.npm.deleted'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -280,15 +323,17 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			deleteParam: async (params: DeleteVersionVariableParams) => {
+			deleteParam: async (params: DeleteVersionVariableParams, showAlert) => {
 				try {
 					const version = await VersionService.deleteVersionVariable(params);
 					set({ version });
-					notify({
-						type: 'success',
-						title: translate('general.success'),
-						description: translate('version.variable.deleted'),
-					});
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.variable.deleted'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -300,15 +345,17 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			deleteMultipleParams: async (params: DeleteMultipleVersionVariablesParams) => {
+			deleteMultipleParams: async (params: DeleteMultipleVersionVariablesParams, showAlert) => {
 				try {
 					const version = await VersionService.deleteMultipleVersionVariables(params);
 					set({ version });
-					notify({
-						type: 'success',
-						title: translate('general.success'),
-						description: translate('version.variable.deleted'),
-					});
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.variable.deleted'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -320,15 +367,17 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			updateParam: async (params: UpdateVersionVariableParams) => {
+			updateParam: async (params: UpdateVersionVariableParams, showAlert) => {
 				try {
 					const version = await VersionService.updateVersionVariable(params);
 					set({ version });
-					notify({
-						type: 'success',
-						title: translate('general.success'),
-						description: translate('version.variable.update_success'),
-					});
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.variable.update_success'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -378,15 +427,17 @@ const useVersionStore = create<VersionStore>()(
 			setRateLimit: (rateLimit) => {
 				set({ rateLimit });
 			},
-			editRateLimit: async (params: EditRateLimitParams) => {
+			editRateLimit: async (params: EditRateLimitParams, showAlert) => {
 				try {
 					const version = await VersionService.editRateLimit(params);
 					set({ version });
-					notify({
-						type: 'success',
-						title: translate('general.success'),
-						description: translate('version.rate_limiter_updated'),
-					});
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.rate_limiter_updated'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -398,15 +449,17 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			deleteMultipleRateLimits: async (params: DeleteMultipleRateLimitsParams) => {
+			deleteMultipleRateLimits: async (params: DeleteMultipleRateLimitsParams, showAlert) => {
 				try {
 					const version = await VersionService.deleteMultipleRateLimits(params);
 					set({ version });
-					notify({
-						type: 'success',
-						title: translate('general.success'),
-						description: translate('version.limiter_deleted'),
-					});
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.limiter_deleted'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -425,10 +478,17 @@ const useVersionStore = create<VersionStore>()(
 				path = path ? `/${path.replace(/^\//, '')}` : '';
 				return `/organization/${orgId}/apps/${appId}/version/${_id}` + path;
 			},
-			createAPIKey: async (params) => {
+			createAPIKey: async (params, showAlert) => {
 				try {
 					const version = await VersionService.createAPIKey(params);
 					set({ version });
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.api_key.success'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -443,10 +503,17 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			deleteAPIKey: async (params) => {
+			deleteAPIKey: async (params, showAlert) => {
 				try {
 					const version = await VersionService.deleteAPIKey(params);
 					set({ version });
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.api_key.deleted'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -458,10 +525,17 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			editAPIKey: async (params) => {
+			editAPIKey: async (params, showAlert) => {
 				try {
 					const version = await VersionService.editAPIKey(params);
 					set({ version });
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.api_key.update_success'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -476,10 +550,17 @@ const useVersionStore = create<VersionStore>()(
 					throw e;
 				}
 			},
-			deleteMultipleAPIKeys: async (params) => {
+			deleteMultipleAPIKeys: async (params, showAlert) => {
 				try {
 					const version = await VersionService.deleteMultipleAPIKeys(params);
 					set({ version });
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.api_key.update_success'),
+						});
+					}
 					return version;
 				} catch (e) {
 					const error = e as APIError;
@@ -488,6 +569,40 @@ const useVersionStore = create<VersionStore>()(
 						title: error.error,
 						description: error.details,
 					});
+					throw e;
+				}
+			},
+			updateVersionRealtimeProperties: async ({ orgId, versionId, appId, ...data }, showAlert) => {
+				try {
+					const version = await VersionService.updateVersionRealtimeProperties({
+						orgId,
+						versionId,
+						appId,
+						enabled: get().version?.realtime?.enabled ?? false,
+						rateLimits: get().version?.realtime?.rateLimits ?? [],
+						apiKeyRequired: get().version?.realtime?.apiKeyRequired ?? false,
+						sessionRequired: get().version?.realtime?.sessionRequired ?? false,
+						...data,
+					});
+					set({ version });
+					if (showAlert) {
+						notify({
+							type: 'success',
+							title: translate('general.success'),
+							description: translate('version.realtime.update_success'),
+						});
+					}
+					return version;
+				} catch (e) {
+					const error = e as APIError;
+					const errorArray = error.fields ? error.fields : [{ msg: error.details }];
+					for (const field of errorArray) {
+						notify({
+							type: 'error',
+							title: error.error,
+							description: field.msg,
+						});
+					}
 					throw e;
 				}
 			},

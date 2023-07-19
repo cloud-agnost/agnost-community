@@ -14,6 +14,9 @@ export interface ModalProps {
 	closeModal: () => void;
 	closeOnOverlayClick?: boolean;
 	parentClassNames?: string;
+	contentClassNames?: string;
+	hideHeader?: boolean;
+	closeOnEsc?: boolean;
 }
 export default function Modal({
 	title,
@@ -21,14 +24,16 @@ export default function Modal({
 	className,
 	isOpen = false,
 	parentClassNames,
-	closeModal = () => {
-		return;
-	},
+	closeModal,
+	contentClassNames,
 	closeOnOverlayClick = false,
+	closeOnEsc = false,
+	hideHeader = false,
 }: ModalProps) {
 	const modalOverlay = useRef(null);
 
 	function handleEsc(event: KeyboardEvent | ReactKeyboardEvent<HTMLDivElement>) {
+		if (!closeOnEsc) return;
 		if (event.key === 'Escape') closeModal();
 	}
 
@@ -44,7 +49,7 @@ export default function Modal({
 				<div
 					role='dialog'
 					ref={modalOverlay}
-					className={cn('modal pointer-events-auto', parentClassNames)}
+					className={cn('modal', parentClassNames)}
 					onClick={isOpen ? clickOutside : undefined}
 					onKeyDown={handleEsc}
 					aria-hidden={!isOpen}
@@ -56,10 +61,22 @@ export default function Modal({
 						transition={{ type: 'tween' }}
 						className={cn('modal-body', className)}
 					>
-						<div className=''>
-							{title ? (
-								<div className='modal-header'>
-									<h5 className='modal-title'>{title}</h5>
+						<div>
+							{!hideHeader &&
+								(title ? (
+									<div className='modal-header'>
+										<h5 className='modal-title'>{title}</h5>
+										<Button
+											size='sm'
+											onClick={closeModal}
+											className='modal-close'
+											variant='text'
+											rounded
+										>
+											<X size={24} />
+										</Button>
+									</div>
+								) : (
 									<Button
 										size='sm'
 										onClick={closeModal}
@@ -69,19 +86,10 @@ export default function Modal({
 									>
 										<X size={24} />
 									</Button>
-								</div>
-							) : (
-								<Button
-									size='sm'
-									onClick={closeModal}
-									className='modal-close'
-									variant='text'
-									rounded
-								>
-									<X size={24} />
-								</Button>
-							)}
-							<div className='modal-content'>{children}</div>
+								))}
+							<div className={cn('modal-content', hideHeader && 'no-header', contentClassNames)}>
+								{children}
+							</div>
 						</div>
 					</motion.div>
 				</div>

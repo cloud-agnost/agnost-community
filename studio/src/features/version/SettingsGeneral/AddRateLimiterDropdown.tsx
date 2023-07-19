@@ -16,14 +16,26 @@ import { useToast } from '@/hooks';
 import { useState } from 'react';
 import { EditOrAddEndpointRateLimiterDrawer } from '@/features/version/SettingsGeneral';
 
-export default function AddRateLimiterDropdown() {
+interface AddRateLimiterDropdownProps {
+	hasToAddAsDefault?: 'endpoint' | 'realtime';
+	type: 'endpoint' | 'realtime';
+}
+export default function AddRateLimiterDropdown({
+	hasToAddAsDefault,
+	type,
+}: AddRateLimiterDropdownProps) {
 	const rateLimits = useVersionStore((state) => state.version?.limits);
-	const defaultLimits = useVersionStore((state) => state.version?.defaultEndpointLimits);
+	const defaultLimits = useVersionStore((state) =>
+		type === 'endpoint'
+			? state.version?.defaultEndpointLimits
+			: state.version?.realtime?.rateLimits,
+	);
 	const updateVersionProperties = useVersionStore((state) => state.updateVersionProperties);
-	const rateLimitsNotInDefault = rateLimits?.filter((item) => !defaultLimits?.includes(item.iid));
+	const updateVersionRealtimeProperties = useVersionStore(
+		(state) => state.updateVersionRealtimeProperties,
+	);
 	const [addRateLimiterDropDownIsOpen, setAddRateLimiterDropDownIsOpen] = useState(false);
 	const [addRateLimitDrawerIsOpen, setAddRateLimitDrawerIsOpen] = useState(false);
-
 	const { t } = useTranslation();
 	const { orgId, versionId, appId } = useParams<{
 		versionId: string;
@@ -32,15 +44,27 @@ export default function AddRateLimiterDropdown() {
 	}>();
 	const { notify } = useToast();
 
+	const rateLimitsNotInDefault = rateLimits?.filter((item) => !defaultLimits?.includes(item.iid));
+
 	async function addToDefault(limiter: RateLimit) {
 		if (!defaultLimits || !versionId || !appId || !orgId) return;
 		try {
-			await updateVersionProperties({
-				orgId,
-				versionId,
-				appId,
-				defaultEndpointLimits: [...(defaultLimits ?? []), limiter.iid],
-			});
+			if (hasToAddAsDefault === 'endpoint') {
+				await updateVersionProperties({
+					orgId,
+					versionId,
+					appId,
+					defaultEndpointLimits: [...(defaultLimits ?? []), limiter.iid],
+				});
+			}
+			if (hasToAddAsDefault === 'realtime') {
+				await updateVersionRealtimeProperties({
+					orgId,
+					versionId,
+					appId,
+					rateLimits: [...(defaultLimits ?? []), limiter.iid],
+				});
+			}
 			notify({
 				type: 'success',
 				title: t('general.success'),
@@ -86,7 +110,6 @@ export default function AddRateLimiterDropdown() {
 						{rateLimitsNotInDefault && rateLimitsNotInDefault.length > 1 && (
 							<DropdownMenuSeparator />
 						)}
-
 						{rateLimitsNotInDefault?.map((limiter, index) => (
 							<DropdownMenuItem onClick={() => addToDefault(limiter)} key={index}>
 								<div className='flex flex-col'>
@@ -103,9 +126,8 @@ export default function AddRateLimiterDropdown() {
 					</DropdownMenuItemContainer>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			{/* The key for reset the state of the component */}
 			<EditOrAddEndpointRateLimiterDrawer
-				addToDefault
+				addToDefault={hasToAddAsDefault}
 				key={addRateLimitDrawerIsOpen.toString()}
 				open={addRateLimitDrawerIsOpen}
 				onOpenChange={setAddRateLimitDrawerIsOpen}

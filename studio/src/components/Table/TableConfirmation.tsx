@@ -58,7 +58,7 @@ export function TableConfirmation({
 								<h3 className='text-lg font-semibold text-default'>{title}</h3>
 								<p className='text-sm font-normal text-subtle'>{description}</p>
 							</div>
-							<div className='flex  items-center justify-center gap-4 mt-8'>
+							<div className='flex items-center justify-center gap-4 mt-8'>
 								<Button variant='text' size='lg' onClick={() => setOpen(false)}>
 									{t('general.cancel')}
 								</Button>

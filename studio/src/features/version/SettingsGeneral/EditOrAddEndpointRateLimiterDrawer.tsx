@@ -85,7 +85,7 @@ interface AddEndpointRateLimiterDrawerProps {
 	open?: boolean;
 	onOpenChange: (open: boolean) => void;
 	editMode?: boolean;
-	addToDefault?: boolean;
+	addToDefault?: 'realtime' | 'endpoint';
 }
 
 export default function EditOrAddEndpointRateLimiterDrawer({
@@ -97,8 +97,15 @@ export default function EditOrAddEndpointRateLimiterDrawer({
 	const [loading, setLoading] = useState(false);
 	const { t } = useTranslation();
 	const [error, setError] = useState<APIError | null>(null);
-	const { createRateLimit, updateVersionProperties, rateLimit, editRateLimit } = useVersionStore();
+	const {
+		createRateLimit,
+		updateVersionProperties,
+		updateVersionRealtimeProperties,
+		rateLimit,
+		editRateLimit,
+	} = useVersionStore();
 	const defaultEndpointLimits = useVersionStore((state) => state.version?.defaultEndpointLimits);
+	const realtimeEndpoints = useVersionStore((state) => state.version?.realtime?.rateLimits);
 
 	const { notify } = useToast();
 
@@ -163,12 +170,20 @@ export default function EditOrAddEndpointRateLimiterDrawer({
 			duration: data.duration,
 			errorMessage: data.errorMessage,
 		});
-		if (addToDefault) {
+		if (addToDefault === 'endpoint') {
 			await updateVersionProperties({
 				orgId,
 				versionId,
 				appId,
 				defaultEndpointLimits: [...(defaultEndpointLimits ?? []), rateLimit.iid],
+			});
+		}
+		if (addToDefault === 'realtime') {
+			await updateVersionRealtimeProperties({
+				orgId,
+				versionId,
+				appId,
+				rateLimits: [...(realtimeEndpoints ?? []), rateLimit.iid],
 			});
 		}
 		notify({

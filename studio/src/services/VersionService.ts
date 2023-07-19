@@ -25,6 +25,7 @@ import {
 	SearchNPMPackagesParams,
 	UpdateAPIKeyParams,
 	UpdateVersionPropertiesParams,
+	UpdateVersionRealtimePropertiesParams,
 	UpdateVersionVariableParams,
 	Version,
 } from '@/types';
@@ -255,6 +256,17 @@ export default class VersionService {
 			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/keys/`, {
 				data,
 			})
+		).data;
+	}
+
+	static async updateVersionRealtimeProperties({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: UpdateVersionRealtimePropertiesParams): Promise<Version> {
+		return (
+			await axios.put(`${this.url}/${orgId}/app/${appId}/version/${versionId}/realtime`, data)
 		).data;
 	}
 }

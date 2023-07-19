@@ -6,6 +6,7 @@ import { NPMPackage } from '@/types';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { useTranslation } from 'react-i18next';
 import NPMPackagesColumns from '@/features/version/SettingsNPMPackages/NPMPackagesColumns.tsx';
+import { EmptyState } from 'components/EmptyState';
 
 interface SettingsNPMPackagesProps {
 	selectedRows: Row<NPMPackage>[] | undefined;
@@ -15,6 +16,14 @@ interface SettingsNPMPackagesProps {
 export default function SettingsNPMPackages({ setSelectedRows }: SettingsNPMPackagesProps) {
 	const { t } = useTranslation();
 	const npmPackages = useVersionStore((state) => state.version?.npmPackages ?? []);
+
+	if (npmPackages.length === 0) {
+		return (
+			<div className='h-full flex items-center justify-center'>
+				<EmptyState title={t('version.npm.no_package_found')} />
+			</div>
+		);
+	}
 
 	return (
 		<div className='data-table-container'>

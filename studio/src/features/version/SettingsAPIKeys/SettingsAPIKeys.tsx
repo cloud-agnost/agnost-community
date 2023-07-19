@@ -2,11 +2,12 @@ import './SettingsAPIKeys.scss';
 import { DataTable } from 'components/DataTable';
 import { APIKey } from '@/types';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { SettingsAPIKeysColumns } from '@/features/version/SettingsAPIKeys/';
+import { AddOrEditAPIKeyDrawer, SettingsAPIKeysColumns } from '@/features/version/SettingsAPIKeys/';
 import { Row } from '@tanstack/react-table';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { reverseArray } from '@/utils';
+import { EmptyState } from 'components/EmptyState';
 
 interface SettingsAPIKeysProps {
 	selectedRows: Row<APIKey>[] | undefined;
@@ -15,15 +16,33 @@ interface SettingsAPIKeysProps {
 
 export default function SettingsAPIKeys({ setSelectedRows }: SettingsAPIKeysProps) {
 	const apiKeys = useVersionStore((state) => state.version?.apiKeys ?? []);
+	const { editAPIKeyDrawerIsOpen, setEditAPIKeyDrawerIsOpen } = useVersionStore();
 	const { t } = useTranslation();
+
+	if (apiKeys.length === 0) {
+		return (
+			<div className='h-full flex items-center justify-center'>
+				<EmptyState title={t('version.api_key.no_api_key_found')} />
+			</div>
+		);
+	}
+
 	return (
-		<div className='data-table-container'>
-			<DataTable<APIKey>
-				columns={SettingsAPIKeysColumns}
-				data={reverseArray(apiKeys)}
-				setSelectedRows={setSelectedRows}
-				noDataMessage={<p className='text-xl'>{t('version.api_key.no_api_key_found')}</p>}
+		<>
+			<div className='data-table-container'>
+				<DataTable<APIKey>
+					columns={SettingsAPIKeysColumns}
+					data={reverseArray(apiKeys)}
+					setSelectedRows={setSelectedRows}
+					noDataMessage={<p className='text-xl'>{t('version.api_key.no_api_key_found')}</p>}
+				/>
+			</div>
+			<AddOrEditAPIKeyDrawer
+				key={editAPIKeyDrawerIsOpen.toString()}
+				open={editAPIKeyDrawerIsOpen}
+				onOpenChange={setEditAPIKeyDrawerIsOpen}
+				editMode
 			/>
-		</div>
+		</>
 	);
 }

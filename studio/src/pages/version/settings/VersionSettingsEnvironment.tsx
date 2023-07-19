@@ -9,13 +9,15 @@ import { DeployButton } from '@/features/version/DeployButton';
 export default function VersionSettingsEnvironment() {
 	const { t } = useTranslation();
 	const environment = useEnvironmentStore((state) => state.environment);
-
 	return (
 		<SettingsContainer
-			info={`Last deployment at: ${formatDate(
-				environment?.deploymentDtm as string,
-				DateTime.DATETIME_MED,
-			)}`}
+			info={
+				environment?.deploymentDtm &&
+				`Last deployment at: ${formatDate(
+					environment?.deploymentDtm as string,
+					DateTime.DATETIME_MED,
+				)}`
+			}
 			pageTitle={t('version.settings.environment')}
 			action={<DeployButton />}
 		>

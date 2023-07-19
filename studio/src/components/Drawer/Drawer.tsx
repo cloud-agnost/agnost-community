@@ -18,6 +18,7 @@ const portalVariants = cva('drawer-portal', {
 		position: {
 			left: 'drawer-portal-left',
 			right: 'drawer-portal-right',
+			center: 'drawer-portal-center',
 		},
 	},
 	defaultVariants: { position: 'right' },
@@ -47,6 +48,7 @@ const drawerVariants = cva('drawer', {
 		position: {
 			left: 'drawer-left',
 			right: 'drawer-right',
+			center: 'drawer-center',
 		},
 		size: {
 			md: '',

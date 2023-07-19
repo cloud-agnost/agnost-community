@@ -44,15 +44,16 @@ export default function SettingsEnvironment() {
 	return (
 		<div className='divide-y'>
 			<SettingsFormItem
-				className='space-y-0 pb-6 pt-0 max-w-lg'
-				contentClassName='pt-6'
+				className='space-y-0 pb-6 pt-0'
+				contentClassName='flex items-center justify-end'
+				twoColumns
 				title={t('version.auto_deploy')}
 				description={t('version.auto_redeploy_desc')}
 			>
 				<Switch checked={!!environment?.autoDeploy} onCheckedChange={onAutoDeployStatusChanged} />
 			</SettingsFormItem>
 			<SettingsFormItem
-				className='space-y-0 py-6 max-w-lg'
+				className='space-y-0 py-6'
 				contentClassName='pt-6'
 				title={t('version.environment_id')}
 				description={t('version.environment_id_desc')}
@@ -60,7 +61,7 @@ export default function SettingsEnvironment() {
 				<CopyInput value={environment?.iid} readOnly />
 			</SettingsFormItem>
 			<SettingsFormItem
-				className='space-y-0 py-6 max-w-lg'
+				className='space-y-0 py-6'
 				contentClassName='pt-6'
 				title={
 					environment?.suspended ? t('version.reactivate_services') : t('version.suspend_services')

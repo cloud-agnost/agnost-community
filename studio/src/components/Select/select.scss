@@ -8,6 +8,10 @@
 	@apply disabled:cursor-not-allowed disabled:bg-input-disabled-background;
 	@apply border-input-disabled-border disabled:text-subtle;
 	@apply space-x-4;
+
+	&[data-placeholder] span {
+		@apply text-subtle focus:outline-none;
+	}
 	&-content {
 		@apply relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-wrapper-background-light;
 		@apply text-subtle shadow-md;
@@ -37,5 +41,16 @@
 	}
 	span {
 		@apply truncate max-w-[calc(100%-1rem)] block;
+	}
+
+	&.input {
+		@apply flex h-9 w-full px-3 py-2 text-sm text-default bg-input-background rounded appearance-none;
+		@apply border border-input-border hover:border-input-hover;
+		@apply disabled:cursor-not-allowed disabled:opacity-50;
+		@apply focus:border-input-focus focus:outline-none focus:ring-0;
+		@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border;
+		&-error {
+			@apply border-error-default;
+		}
 	}
 }

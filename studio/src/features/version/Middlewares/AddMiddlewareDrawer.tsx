@@ -77,13 +77,14 @@ export default function AddMiddlewareDrawer({ open, onOpenChange }: AddMiddlewar
 									<FormLabel>{t('version.middleware.name')}</FormLabel>
 									<FormControl>
 										<Input
+											value={field.value}
+											onChange={field.onChange}
 											error={Boolean(form.formState.errors.name)}
 											placeholder={
 												t('forms.placeholder', {
 													label: t('general.name'),
 												}) ?? ''
 											}
-											{...field}
 										/>
 									</FormControl>
 									<FormDescription>{t('forms.max64.description')}</FormDescription>

@@ -34,7 +34,6 @@ export default function OrgResources() {
 			<div className='mt-8'>
 				<ResourceTable resources={resources} />
 			</div>
-			<CreateResource />
 		</div>
 	);
 }

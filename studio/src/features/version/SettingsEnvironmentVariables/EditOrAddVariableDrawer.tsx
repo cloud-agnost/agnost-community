@@ -85,24 +85,6 @@ export default function EditOrAddVariableDrawer({
 			editMode
 				? await edit(orgId, appId, versionId, data)
 				: await add(orgId, appId, versionId, data);
-		} finally {
-			setLoading(false);
-		}
-	}
-
-	async function add(
-		orgId: string,
-		appId: string,
-		versionId: string,
-		data: z.infer<typeof MiddlewareFormSchema>,
-	) {
-		try {
-			await addParam({
-				appId,
-				orgId,
-				versionId,
-				...data,
-			});
 			onOpenChange(false);
 		} catch (e) {
 			const error = e as APIError;
@@ -115,7 +97,23 @@ export default function EditOrAddVariableDrawer({
 					});
 				});
 			} else setError(error);
+		} finally {
+			setLoading(false);
 		}
+	}
+
+	async function add(
+		orgId: string,
+		appId: string,
+		versionId: string,
+		data: z.infer<typeof MiddlewareFormSchema>,
+	) {
+		await addParam({
+			appId,
+			orgId,
+			versionId,
+			...data,
+		});
 	}
 
 	async function edit(

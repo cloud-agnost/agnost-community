@@ -7,8 +7,10 @@ import application from './application.json';
 import version from './version.json';
 import onboarding from './onboarding.json';
 import resources from './resources.json';
+import database from './database.json';
 export {
 	forms,
+	database,
 	general,
 	login,
 	organization,

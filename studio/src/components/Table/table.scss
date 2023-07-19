@@ -20,6 +20,14 @@
 		&.content {
 			@apply hover:bg-subtle;
 		}
+
+		&:hover {
+			.table-cell.actions {
+				* {
+					@apply opacity-100;
+				}
+			}
+		}
 	}
 	&-head {
 		@apply h-12 px-4 text-left align-middle font-medium;
@@ -30,6 +38,12 @@
 	}
 	&-cell {
 		@apply p-4 align-middle [&:has([role=checkbox])]:pr-0 text-default;
+
+		&.actions {
+			* {
+				@apply opacity-0;
+			}
+		}
 	}
 	&-caption {
 		@apply mt-4 text-sm text-subtle;

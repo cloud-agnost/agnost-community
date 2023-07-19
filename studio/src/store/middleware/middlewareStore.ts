@@ -24,11 +24,17 @@ interface MiddlewareStore {
 		init?: boolean,
 	) => Promise<Middleware[]>;
 	getMiddlewareById: (params: GetMiddlewareByIdParams) => Promise<Middleware>;
-	deleteMiddleware: (params: DeleteMiddlewareParams) => Promise<void>;
-	deleteMultipleMiddlewares: (params: DeleteMultipleMiddlewares) => Promise<void>;
-	createMiddleware: (params: CreateMiddlewareParams) => Promise<Middleware>;
-	updateMiddleware: (params: UpdateMiddlewareParams) => Promise<Middleware>;
-	saveMiddlewareCode: (params: SaveMiddlewareCodeParams) => Promise<Middleware>;
+	deleteMiddleware: (params: DeleteMiddlewareParams, showAlert?: boolean) => Promise<void>;
+	deleteMultipleMiddlewares: (
+		params: DeleteMultipleMiddlewares,
+		showAlert?: boolean,
+	) => Promise<void>;
+	createMiddleware: (params: CreateMiddlewareParams, showAlert?: boolean) => Promise<Middleware>;
+	updateMiddleware: (params: UpdateMiddlewareParams, showAlert?: boolean) => Promise<Middleware>;
+	saveMiddlewareCode: (
+		params: SaveMiddlewareCodeParams,
+		showAlert?: boolean,
+	) => Promise<Middleware>;
 	setEditMiddlewareDrawerIsOpen: (open: boolean) => void;
 	setMiddleware: (middleware: Middleware | null) => void;
 }
@@ -41,15 +47,17 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 				middleware: null,
 				lastFetchedCount: 0,
 				editMiddlewareDrawerIsOpen: false,
-				createMiddleware: async (params: CreateMiddlewareParams) => {
+				createMiddleware: async (params: CreateMiddlewareParams, showAlert) => {
 					try {
 						const middleware = await MiddlewareService.createMiddleware(params);
-						notify({
-							title: translate('general.success'),
-							description: translate('version.middleware.add.success'),
-							type: 'success',
-						});
 						set((prev) => ({ middlewares: [middleware, ...prev.middlewares] }));
+						if (showAlert) {
+							notify({
+								title: translate('general.success'),
+								description: translate('version.middleware.add.success'),
+								type: 'success',
+							});
+						}
 						return middleware;
 					} catch (e) {
 						const error = e as APIError;
@@ -82,17 +90,19 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 					set({ middleware });
 					return middleware;
 				},
-				deleteMiddleware: async (params: DeleteMiddlewareParams) => {
+				deleteMiddleware: async (params: DeleteMiddlewareParams, showAlert) => {
 					try {
 						await MiddlewareService.deleteMiddleware(params);
 						set((prev) => ({
 							middlewares: prev.middlewares.filter((mw) => mw._id !== params.mwId),
 						}));
-						notify({
-							title: translate('general.success'),
-							description: translate('version.middleware.delete.success'),
-							type: 'success',
-						});
+						if (showAlert) {
+							notify({
+								title: translate('general.success'),
+								description: translate('version.middleware.delete.success'),
+								type: 'success',
+							});
+						}
 					} catch (e) {
 						const error = e as APIError;
 						notify({
@@ -103,17 +113,19 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 						throw e;
 					}
 				},
-				deleteMultipleMiddlewares: async (params: DeleteMultipleMiddlewares) => {
+				deleteMultipleMiddlewares: async (params: DeleteMultipleMiddlewares, showAlert) => {
 					try {
 						await MiddlewareService.deleteMultipleMiddlewares(params);
 						set((prev) => ({
 							middlewares: prev.middlewares.filter((mw) => !params.middlewareIds.includes(mw._id)),
 						}));
-						notify({
-							title: translate('general.success'),
-							description: translate('version.middleware.delete.success'),
-							type: 'success',
-						});
+						if (showAlert) {
+							notify({
+								title: translate('general.success'),
+								description: translate('version.middleware.delete.success'),
+								type: 'success',
+							});
+						}
 					} catch (e) {
 						const error = e as APIError;
 						notify({
@@ -124,18 +136,20 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 						throw e;
 					}
 				},
-				updateMiddleware: async (params: UpdateMiddlewareParams) => {
+				updateMiddleware: async (params: UpdateMiddlewareParams, showAlert) => {
 					try {
 						const middleware = await MiddlewareService.updateMiddleware(params);
 						console.log({ middleware });
 						set((prev) => ({
 							middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
 						}));
-						notify({
-							title: translate('general.success'),
-							description: translate('version.middleware.edit.success'),
-							type: 'success',
-						});
+						if (showAlert) {
+							notify({
+								title: translate('general.success'),
+								description: translate('version.middleware.edit.success'),
+								type: 'success',
+							});
+						}
 						return middleware;
 					} catch (e) {
 						const error = e as APIError;
@@ -147,11 +161,18 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 						throw e;
 					}
 				},
-				saveMiddlewareCode: async (params: SaveMiddlewareCodeParams) => {
+				saveMiddlewareCode: async (params: SaveMiddlewareCodeParams, showAlert) => {
 					const middleware = await MiddlewareService.saveMiddlewareCode(params);
 					set((prev) => ({
 						middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
 					}));
+					if (showAlert) {
+						notify({
+							title: translate('general.success'),
+							description: translate('version.middleware.edit.success'),
+							type: 'success',
+						});
+					}
 					return middleware;
 				},
 				setEditMiddlewareDrawerIsOpen: (open: boolean) => {

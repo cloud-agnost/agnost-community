@@ -1,6 +1,7 @@
 import { axios } from '@/helpers';
 import {
 	CreateDatabaseParams,
+	Database,
 	DeleteDatabaseParams,
 	GetDatabaseOfAppByIdParams,
 	GetDatabasesOfAppParams,
@@ -10,16 +11,30 @@ import {
 export default class DatabaseService {
 	static url = '/v1/org';
 
-	static async getDatabasesOfApp({ orgId, appId, versionId }: GetDatabasesOfAppParams) {
-		return (await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}`)).data;
+	static async getDatabasesOfApp({
+		orgId,
+		appId,
+		versionId,
+	}: GetDatabasesOfAppParams): Promise<Database[]> {
+		return (await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/db`)).data;
 	}
 
-	static async getDatabaseOfAppById({ orgId, appId, versionId, dbId }: GetDatabaseOfAppByIdParams) {
+	static async getDatabaseOfAppById({
+		orgId,
+		appId,
+		versionId,
+		dbId,
+	}: GetDatabaseOfAppByIdParams): Promise<Database> {
 		return (await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}`))
 			.data;
 	}
 
-	static async createDatabase({ orgId, appId, versionId, ...data }: CreateDatabaseParams) {
+	static async createDatabase({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: CreateDatabaseParams): Promise<Database> {
 		return (await axios.post(`${this.url}/${orgId}/app/${appId}/version/${versionId}/db`, data))
 			.data;
 	}
@@ -30,14 +45,22 @@ export default class DatabaseService {
 		versionId,
 		dbId,
 		...data
-	}: UpdateDatabaseNameParams) {
+	}: UpdateDatabaseNameParams): Promise<Database> {
 		return (
 			await axios.put(`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}`, data)
 		).data;
 	}
 
-	static async deleteDatabase({ orgId, appId, versionId, dbId }: DeleteDatabaseParams) {
-		return (await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}`))
-			.data;
+	static async deleteDatabase({
+		orgId,
+		appId,
+		versionId,
+		dbId,
+	}: DeleteDatabaseParams): Promise<void> {
+		return (
+			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}`, {
+				data: {},
+			})
+		).data;
 	}
 }

@@ -33,7 +33,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		),
 		enableSorting: false,
 		enableHiding: false,
-		size: 40,
+		className: '!pr-1',
 	},
 	{
 		id: 'name',
@@ -165,6 +165,28 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		},
 	},
 	{
+		id: 'expiryDate',
+		header: ({ column }) => (
+			<SortButton
+				className='whitespace-nowrap'
+				text={translate('general.expires_at').toUpperCase()}
+				column={column}
+			/>
+		),
+		accessorKey: 'expiryDate',
+		enableSorting: true,
+		sortingFn: 'datetime',
+		size: 200,
+		cell: ({
+			row: {
+				original: { expiryDate },
+			},
+		}) => {
+			if (!expiryDate) return;
+			return <DateText date={expiryDate} />;
+		},
+	},
+	{
 		id: 'created_at',
 		header: ({ column }) => (
 			<SortButton
@@ -213,24 +235,25 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	},
 	{
 		id: 'actions',
-		size: 45,
-		cell: ({
-			row: {
-				original: { _id },
-			},
-		}) => {
+		className: 'actions',
+		cell: ({ row: { original } }) => {
 			async function clickHandler() {
 				const { deleteAPIKey, version } = useVersionStore.getState();
 				if (!version) return;
 				await deleteAPIKey({
 					appId: version.appId,
 					orgId: version.orgId,
-					keyId: _id,
+					keyId: original._id,
 					versionId: version._id,
 				});
 			}
 
-			function editHandler() {}
+			function editHandler() {
+				const { setSelectedAPIKey, setEditAPIKeyDrawerIsOpen } = useVersionStore.getState();
+				setSelectedAPIKey(original);
+				setEditAPIKeyDrawerIsOpen(true);
+			}
+
 			return (
 				<div className='flex items-center justify-end gap-0.5'>
 					<Button

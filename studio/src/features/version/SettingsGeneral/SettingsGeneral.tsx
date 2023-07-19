@@ -147,8 +147,9 @@ export default function SettingsGeneral() {
 				</Form>
 			</SettingsFormItem>
 			<SettingsFormItem
+				twoColumns
 				className='space-y-0 py-6'
-				contentClassName='pt-6'
+				contentClassName='flex items-center justify-end'
 				title={t('version.read_only')}
 				description={t('version.settings.read_only_desc')}
 			>

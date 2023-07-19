@@ -10,7 +10,6 @@ import {
 	Connect,
 	Database as DatabaseIcon,
 	DeviceMobile,
-	DoubleGear,
 	Environment,
 	EnvironmentVariable,
 	LightBulb,
@@ -30,12 +29,12 @@ import {
 import { ConnectDatabase, CreateDatabase, SelectResourceType } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { Application, Instance, SortOption, Tab } from '@/types';
+import { Application, Instance, Method, SortOption, Tab } from '@/types';
 import { history, translate } from '@/utils';
 import { FileText, GearSix, Plus } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { DropdownMenuSeparator } from 'components/Dropdown';
-import { Fragment } from 'react';
+import { ElementType, Fragment } from 'react';
 
 export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
@@ -339,12 +338,6 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 		path: 'real-time',
 		icon: RealTime,
 	},
-	{
-		id: 10,
-		title: translate('version.settings.other'),
-		path: 'other',
-		icon: DoubleGear,
-	},
 ];
 
 export const RESOURCE_TYPES = [
@@ -435,6 +428,14 @@ export const DATABASE_TYPES: Instance[] = [
 		isConnectOnly: true,
 	},
 ];
+
+export const DATABASE_ICON_MAP: Record<string, ElementType> = {
+	MongoDB: MongoDb,
+	MySQL: MySql,
+	PostgreSQL: PostgreSql,
+	Oracle: Oracle,
+	'SQL Server': Oracle,
+};
 
 export const CREATE_RESOURCES_ELEMENTS = [
 	{
@@ -594,3 +595,30 @@ export const ADD_API_KEYS_MENU_ITEMS = [
 		href: '?t=allowed-ips',
 	},
 ];
+
+export const ENDPOINT_OPTIONS: SortOption[] = [
+	{
+		name: translate('general.sortOptions.default'),
+		value: 'createdAt',
+		sortDir: 'desc',
+	},
+	{
+		name: translate('general.sortOptions.nameAsc'),
+		value: 'name',
+		sortDir: 'asc',
+	},
+	{
+		name: translate('general.sortOptions.nameDesc'),
+		value: 'name',
+		sortDir: 'desc',
+	},
+];
+
+export const ALL_HTTP_METHODS: Method[] = ['GET', 'POST', 'PUT', 'DELETE'];
+
+export const HTTP_METHOD_BADGE_MAP: Record<string, BadgeColors> = {
+	GET: 'orange',
+	POST: 'green',
+	PUT: 'yellow',
+	DELETE: 'red',
+};
