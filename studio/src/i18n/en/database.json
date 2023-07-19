@@ -1,27 +1,53 @@
 {
-  "page_title": "Databases",
-  "add": {
-    "title": "Create Database",
-    "field": "Database Name",
-    "resource" : {
-        "title": "Resource Management",
-        "field": "Database Server",
-        "placeholder": "Select Database Server",
-        "add": "Add Database Server"
-    },
-    "type" : {
-        "title": "Database Type",
-        "field": "Database type",
-        "placeholder": "Select Database Type"
-    }
-  },
-  "edit": {
-    "title": "Edit Database"
-  },
-  "delete": {
-    "title": "Delete Database",
-    "confirm": "Confirm database delete by typing <confirmCode>{{confirmCode}}</confirmCode> below.",
-    "confirm_title": "Are you sure you want to delete this database?",
-    "confirm_description": "Deleting this database will remove all associated data and cannot be undone."
-  }
+	"page_title": "Databases",
+	"add": {
+		"title": "Create Database",
+		"field": "Database Name",
+		"resource": {
+			"title": "Resource Management",
+			"field": "Database Server",
+			"placeholder": "Select Database Server",
+			"add": "Add Database Server"
+		},
+		"type": {
+			"title": "Database Type",
+			"field": "Database type",
+			"placeholder": "Select Database Type"
+		}
+	},
+	"edit": {
+		"title": "Edit Database"
+	},
+	"delete": {
+		"title": "Delete Database",
+		"confirm": "Confirm database delete by typing <confirmCode>{{confirmCode}}</confirmCode> below.",
+		"confirm_title": "Are you sure you want to delete this database?",
+		"confirm_description": "Deleting this database will remove all associated data and cannot be undone."
+	},
+	"models": {
+		"add": {
+			"name": {
+				"field": "Model Name"
+			},
+			"description": {
+				"field": "Model Description"
+			},
+			"timestamps": {
+				"enabled": {
+					"field": "Enable Timestamps",
+					"desc": "Models with timestamps automatically set create and update timestamp fields so that you can track creation and last modification date of model objects."
+				},
+				"createdAt": {
+					"field": "Created At Field"
+				},
+				"updatedAt": {
+					"field": "Updated At Field"
+				}
+			}
+		},
+		"title": "Models of {{database}}",
+		"create": "Create Model",
+		"edit": "Edit Model",
+		"no_models": "You have not defined any for models for this database"
+	}
 }

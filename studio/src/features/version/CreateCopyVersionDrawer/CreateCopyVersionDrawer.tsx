@@ -1,6 +1,5 @@
 import './CreateCopyVersionDrawer.scss';
 import * as z from 'zod';
-import { translate } from '@/utils';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -19,26 +18,10 @@ import { Input } from 'components/Input';
 import { Button } from 'components/Button';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Switch } from 'components/Switch';
+import { NAME_SCHEMA } from '@/constants';
 
 const CreateCopyVersionForm = z.object({
-	name: z
-		.string({
-			required_error: translate('forms.required', {
-				label: translate('general.name'),
-			}),
-		})
-		.min(2, translate('forms.min2.error', { label: translate('general.name') }))
-		.max(64, translate('forms.max64.error', { label: translate('general.name') }))
-		.regex(/^[a-zA-Z0-9_]*$/, {
-			message: translate('forms.alphanumeric', { label: translate('general.name') }),
-		})
-		.trim()
-		.refine(
-			(value) => value.trim().length > 0,
-			translate('forms.required', {
-				label: translate('general.name'),
-			}),
-		),
+	name: NAME_SCHEMA,
 	private: z.boolean(),
 	readOnly: z.boolean(),
 });

@@ -6,7 +6,8 @@
 	@apply p-6 full-height-without-header;
 
 	&.middleware,
-	&.database {
+	&.database,
+	&.models {
 		@apply p-0;
 	}
 }

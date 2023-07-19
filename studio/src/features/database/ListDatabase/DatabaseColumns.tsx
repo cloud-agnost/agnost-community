@@ -7,7 +7,7 @@ import { CopyButton } from 'components/CopyButton';
 import { Badge } from 'components/Badge';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import { DATABASE_ICON_MAP } from '@/constants';
-import { Trash } from '@phosphor-icons/react';
+import { Table, Trash } from '@phosphor-icons/react';
 
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
@@ -101,13 +101,22 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 			}
 
 			return (
-				<div className='flex items-center justify-end'>
+				<div className='flex items-center gap-0.5 justify-end'>
+					<Button
+						iconOnly
+						variant='blank'
+						rounded
+						to={`${original._id}/models`}
+						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default text-xl'
+					>
+						<Table />
+					</Button>
 					<Button
 						onClick={openEditDrawer}
 						iconOnly
 						variant='blank'
 						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
+						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default text-xl'
 					>
 						<Pencil />
 					</Button>
@@ -115,16 +124,16 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 						onClick={deleteHandler}
 						variant='blank'
 						rounded
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
+						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default text-xl'
 						iconOnly
 					>
-						<Trash size={20} />
+						<Trash />
 					</Button>
 					<Button
 						iconOnly
 						variant='blank'
 						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
+						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default text-xl'
 					>
 						<Refresh />
 					</Button>

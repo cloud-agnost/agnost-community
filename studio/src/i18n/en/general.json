@@ -1,6 +1,8 @@
 {
 	"cancel": "Cancel",
+	"field": "Field",
 	"ok": "OK",
+	"description": "Description",
 	"close": "Close",
 	"delete": "Delete",
 	"domain": "Domain",

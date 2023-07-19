@@ -52,6 +52,7 @@ import { FileText, GearSix, Plus } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { DropdownMenuSeparator } from 'components/Dropdown';
 import { ElementType, Fragment } from 'react';
+import * as z from 'zod';
 
 export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
@@ -755,3 +756,22 @@ export const ENDPOINT_RESPONSE_TABS = [
 		name: translate('endpoint.test.console_logs'),
 	},
 ];
+
+export const NAME_SCHEMA = z
+	.string({
+		required_error: translate('forms.required', {
+			label: translate('general.name'),
+		}),
+	})
+	.min(2, translate('forms.min2.error', { label: translate('general.name') }))
+	.max(64, translate('forms.max64.error', { label: translate('general.name') }))
+	.regex(/^[a-zA-Z0-9_]*$/, {
+		message: translate('forms.alphanumeric', { label: translate('general.name') }),
+	})
+	.trim()
+	.refine(
+		(value) => value.trim().length > 0,
+		translate('forms.required', {
+			label: translate('general.name'),
+		}),
+	);

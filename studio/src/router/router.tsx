@@ -38,6 +38,7 @@ const paths = {
 		version: `${versionPath}/Version.tsx`,
 		dashboard: `${versionPath}/VersionDashboard.tsx`,
 		database: `${versionPath}/VersionDatabase.tsx`,
+		models: `${versionPath}/models/Models.tsx`,
 		endpoint: `${versionPath}/VersionEndpoint.tsx`,
 		storage: `${versionPath}/VersionStorage.tsx`,
 		middlewares: `${versionPath}/VersionMiddlewares.tsx`,
@@ -166,6 +167,10 @@ const router = createBrowserRouter([
 					{
 						path: 'database',
 						lazy: () => lazyRouteImport(paths.version.database),
+					},
+					{
+						path: 'database/:dbId/models',
+						lazy: () => lazyRouteImport(paths.version.models),
 					},
 					{
 						path: 'endpoint',
