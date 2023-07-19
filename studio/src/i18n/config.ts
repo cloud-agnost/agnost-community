@@ -11,6 +11,7 @@ import {
 	onboarding,
 	database,
 	resources as rs,
+	endpoint,
 } from './en';
 
 export const resources = {
@@ -26,6 +27,7 @@ export const resources = {
 			onboarding,
 			version,
 			resources: rs,
+			endpoint,
 		},
 	},
 };
