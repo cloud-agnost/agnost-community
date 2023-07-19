@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { EndpointService } from '@/services';
 import {
+	APIError,
 	CreateEndpointParams,
 	DeleteEndpointParams,
 	DeleteMultipleEndpointsParams,
@@ -11,7 +11,8 @@ import {
 	SaveEndpointLogicParams,
 	UpdateEndpointParams,
 } from '@/types';
-import { EndpointService } from '@/services';
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
 
 interface EndpointStore {
 	selectEndpointDialogOpen: boolean;
@@ -20,6 +21,7 @@ interface EndpointStore {
 	endpoint: Endpoint | null;
 	selectedEndpointIds: string[];
 	setSelectedEndpointIds: (ids: string[]) => void;
+	lastFetchedCount: number;
 	setEndpoints: (endpoints: Endpoint[]) => void;
 	createEndpoint: (endpoint: CreateEndpointParams) => Promise<Endpoint>;
 	getEndpointById: (endpoint: GetEndpointByIdParams) => Promise<Endpoint>;
@@ -41,6 +43,7 @@ const useEndpointStore = create<EndpointStore>()(
 				selectedEndpointIds: [],
 				setSelectedEndpointIds: (ids) => set({ selectedEndpointIds: ids }),
 				setSelectEndpointDialogOpen: (open) => set({ selectEndpointDialogOpen: open }),
+				lastFetchedCount: 0,
 				setEndpoints: (endpoints) => set({ endpoints }),
 				createEndpoint: async (params) => {
 					const endpoint = await EndpointService.createEndpoint(params);
@@ -53,9 +56,20 @@ const useEndpointStore = create<EndpointStore>()(
 					return endpoint;
 				},
 				getEndpoints: async (params) => {
-					const endpoints = await EndpointService.getEndpoints(params);
-					set({ endpoints });
-					return endpoints;
+					try {
+						const endpoints = await EndpointService.getEndpoints(params);
+						if (params.initialFetch) {
+							set({ endpoints, lastFetchedCount: endpoints.length });
+						} else {
+							set((prev) => ({
+								endpoints: [...prev.endpoints, ...endpoints],
+								lastFetchedCount: endpoints.length,
+							}));
+						}
+						return endpoints;
+					} catch (error) {
+						throw error as APIError;
+					}
 				},
 				deleteEndpoint: async (params) => {
 					await EndpointService.deleteEndpoint(params);

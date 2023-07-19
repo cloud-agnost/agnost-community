@@ -12,7 +12,9 @@ export default function VersionLayout({ children, className }: VersionLayoutProp
 	return (
 		<Layout>
 			<Tabs />
-			<div className={cn('version-layout', className)}>{children}</div>
+			<div className={cn('version-layout', className)} id='version-layout'>
+				{children}
+			</div>
 		</Layout>
 	);
 }
