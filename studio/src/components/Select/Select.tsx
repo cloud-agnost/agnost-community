@@ -12,11 +12,21 @@ const SelectGroup = SelectPrimitive.Group;
 
 const SelectValue = SelectPrimitive.Value;
 
+interface SelectTriggerProps
+	extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> {
+	className?: string;
+	error?: boolean;
+}
+
 const SelectTrigger = React.forwardRef<
 	React.ElementRef<typeof SelectPrimitive.Trigger>,
-	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-	<SelectPrimitive.Trigger ref={ref} className={cn('select', className)} {...props}>
+	SelectTriggerProps
+>(({ className, children, error, ...props }, ref) => (
+	<SelectPrimitive.Trigger
+		ref={ref}
+		className={cn('select', error && 'border-error-default', className)}
+		{...props}
+	>
 		{children}
 		<SelectPrimitive.Icon asChild>
 			<CaretDown className='h-4 w-4' />

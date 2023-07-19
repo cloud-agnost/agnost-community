@@ -1,5 +1,5 @@
+import { BaseGetRequest, Middleware } from '@/types/type.ts';
 import { RateLimit } from '@/types/version.ts';
-import { Middleware } from '@/types/type.ts';
 
 export type Method = 'POST' | 'GET' | 'PUT' | 'DELETE';
 
@@ -21,6 +21,7 @@ export interface Endpoint {
 	rateLimits: RateLimit[];
 	middlewares: Middleware[];
 	createdBy: string;
+	updatedBy: string;
 	_id: string;
 	createdAt: string;
 	updatedAt: string;
@@ -32,6 +33,8 @@ export interface EndpointBase {
 	appId: string;
 	versionId: string;
 }
+
+export type Method = 'POST' | 'GET' | 'PUT' | 'DELETE';
 
 export interface CreateEndpointParams extends EndpointBase {
 	name: string;
@@ -65,13 +68,4 @@ export interface DeleteMultipleEndpointsParams extends EndpointBase {
 export interface GetEndpointsByIidParams extends EndpointBase {
 	iids: string[];
 }
-
-export interface GetEndpointsParams extends EndpointBase {
-	page: number;
-	size: number;
-	search?: string;
-	start?: string;
-	end?: string;
-	sortBy?: string;
-	sortDir?: 'asc' | 'desc' | '';
-}
+export interface GetEndpointsParams extends EndpointBase, BaseGetRequest {}

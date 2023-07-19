@@ -116,6 +116,7 @@
 	"limiter_deleted": "Rate limiter(s) deleted successfully",
 	"limiter_added_to_default": "Rate limiter added to default rate limiters",
 	"edit_rate_limiter": "Edit Rate Limiter",
+	"rate_limiters_empty": "No rate limit selected",
 	"handler_code": "Handler Code",
 	"middleware": {
 		"default": "Middlewares",
@@ -131,7 +132,8 @@
 		"delete": {
 			"success": "Middleware(s) deleted successfully"
 		},
-		"no_middleware_found": "You have not defined any databases for this app version"
+		"no_middleware_found": "You have not defined any databases for this app version",
+		"empty": "No middleware selected"
 	},
 	"npm": {
 		"install": "Install Packages",
