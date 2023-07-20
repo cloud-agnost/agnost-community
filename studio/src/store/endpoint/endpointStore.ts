@@ -1,6 +1,4 @@
-import { EndpointService } from '@/services';
 import {
-	APIError,
 	CreateEndpointParams,
 	DeleteEndpointParams,
 	DeleteMultipleEndpointsParams,
@@ -14,6 +12,9 @@ import {
 	UpdateEndpointParams,
 } from '@/types';
 import { AxiosResponse } from 'axios';
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+import { EndpointService } from '@/services';
 
 interface EndpointStore {
 	selectEndpointDialogOpen: boolean;
@@ -75,20 +76,9 @@ const useEndpointStore = create<EndpointStore>()(
 					return endpoint;
 				},
 				getEndpoints: async (params) => {
-					try {
-						const endpoints = await EndpointService.getEndpoints(params);
-						if (params.initialFetch) {
-							set({ endpoints, lastFetchedCount: endpoints.length });
-						} else {
-							set((prev) => ({
-								endpoints: [...prev.endpoints, ...endpoints],
-								lastFetchedCount: endpoints.length,
-							}));
-						}
-						return endpoints;
-					} catch (error) {
-						throw error as APIError;
-					}
+					const endpoints = await EndpointService.getEndpoints(params);
+					set({ endpoints });
+					return endpoints;
 				},
 				deleteEndpoint: async (params) => {
 					try {
