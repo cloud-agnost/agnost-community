@@ -9,9 +9,7 @@ export default function AddMiddlewareButton() {
 
 	return (
 		<>
-			<Button type='button' onClick={() => setOpen(true)}>
-				{t('version.add_new_limiter')}
-			</Button>
+			<Button onClick={() => setOpen(true)}>{t('version.add_new_limiter')}</Button>
 			<EditOrAddEndpointRateLimiterDrawer open={open} onOpenChange={setOpen} />
 		</>
 	);
