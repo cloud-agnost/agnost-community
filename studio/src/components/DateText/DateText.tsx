@@ -1,23 +1,15 @@
 import { ReactNode } from 'react';
 import { cn, formatDate } from '@/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '../Avatar';
-import { OrganizationMember } from '@/types';
+
 interface DateTextProps {
 	date: string | Date;
 	children?: ReactNode;
 	className?: string;
-	user?: OrganizationMember;
 }
-export default function DateText({ date, children, className, user }: DateTextProps) {
+export default function DateText({ date, children, className }: DateTextProps) {
 	return (
-		<div className={cn('flex items-center gap-4 whitespace-nowrap', className)}>
+		<div className={cn('flex items-center gap-2 whitespace-nowrap', className)}>
 			{children}
-			{user && (
-				<Avatar size='sm'>
-					<AvatarImage src={user.member.pictureUrl} />
-					<AvatarFallback isUserAvatar color={user.member?.color} name={user.member?.name} />
-				</Avatar>
-			)}
 			<div>
 				<span className='block text-default text-sm leading-6'>
 					{formatDate(date, {

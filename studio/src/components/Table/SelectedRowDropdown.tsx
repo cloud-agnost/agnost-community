@@ -1,5 +1,4 @@
-import { Minus, Trash } from '@phosphor-icons/react';
-import { Table } from '@tanstack/react-table';
+import { Trash } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,9 +7,8 @@ import { Warning } from '../icons';
 interface Props {
 	onDelete: () => void;
 	selectedRowLength: number;
-	table: Table<any>;
 }
-function SelectedRowDropdown({ onDelete, selectedRowLength, table }: Props) {
+function SelectedRowDropdown({ onDelete, selectedRowLength }: Props) {
 	const { t } = useTranslation();
 	const [openInfoModal, setOpenInfoModal] = useState(false);
 	return selectedRowLength > 0 ? (
