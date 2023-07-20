@@ -9,9 +9,7 @@ export default function AddMiddlewareButton() {
 
 	return (
 		<>
-			<Button type='button' onClick={() => setOpen(true)}>
-				{t('version.middleware.add_middleware')}
-			</Button>
+			<Button onClick={() => setOpen(true)}>{t('version.middleware.add_middleware')}</Button>
 			<AddMiddlewareDrawer open={open} onOpenChange={setOpen} />
 		</>
 	);

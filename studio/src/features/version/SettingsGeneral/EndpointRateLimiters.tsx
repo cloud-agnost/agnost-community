@@ -1,12 +1,6 @@
-import { SortableRateLimits } from '@/features/version/SettingsGeneral';
-import useVersionStore from '@/store/version/versionStore.ts';
-import { reorder } from '@/utils';
-import { DropResult } from 'react-beautiful-dnd';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import { useToast } from '@/hooks';
-import { APIError, RateLimit } from '@/types';
-import { useState } from 'react';
+import { AddRateLimiterDropdown, SortableRateLimits } from '@/features/version/SettingsGeneral';
+
 export default function EndpointRateLimiters() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
