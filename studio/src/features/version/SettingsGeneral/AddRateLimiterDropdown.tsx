@@ -1,6 +1,7 @@
-import { Button } from 'components/Button';
+import { EditOrAddEndpointRateLimiterDrawer } from '@/features/version/SettingsGeneral';
+import { RateLimit } from '@/types';
 import { CaretDown, CaretUp, Plus } from '@phosphor-icons/react';
-import { useTranslation } from 'react-i18next';
+import { Button } from 'components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -9,12 +10,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import useVersionStore from '@/store/version/versionStore.ts';
-import { APIError, RateLimit } from '@/types';
-import { useParams } from 'react-router-dom';
-import { useToast } from '@/hooks';
 import { useState } from 'react';
-import { EditOrAddEndpointRateLimiterDrawer } from '@/features/version/SettingsGeneral';
+import { useTranslation } from 'react-i18next';
 
 interface AddRateLimiterDropdownProps {
 	options: RateLimit[] | undefined;
@@ -30,36 +27,6 @@ export default function AddRateLimiterDropdown({
 	const [addRateLimiterDropDownIsOpen, setAddRateLimiterDropDownIsOpen] = useState(false);
 	const [addRateLimitDrawerIsOpen, setAddRateLimitDrawerIsOpen] = useState(false);
 	const { t } = useTranslation();
-	const { orgId, versionId, appId } = useParams<{
-		versionId: string;
-		appId: string;
-		orgId: string;
-	}>();
-	const { notify } = useToast();
-
-	async function addToDefault(limiter: RateLimit) {
-		if (!defaultLimits || !versionId || !appId || !orgId) return;
-		try {
-			await updateVersionProperties({
-				orgId,
-				versionId,
-				appId,
-				defaultEndpointLimits: [...(defaultLimits ?? []), limiter.iid],
-			});
-			notify({
-				type: 'success',
-				title: t('general.success'),
-				description: t('version.limiter_added_to_default'),
-			});
-		} catch (e) {
-			const error = e as APIError;
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
-			});
-		}
-	}
 
 	return (
 		<>
@@ -88,12 +55,10 @@ export default function AddRateLimiterDropdown({
 							<Plus weight='bold' />
 							<span>{t('version.add_new_limiter')}</span>
 						</DropdownMenuItem>
-						{rateLimitsNotInDefault && rateLimitsNotInDefault.length > 1 && (
-							<DropdownMenuSeparator />
-						)}
+						{options && options.length > 1 && <DropdownMenuSeparator />}
 
-						{rateLimitsNotInDefault?.map((limiter, index) => (
-							<DropdownMenuItem onClick={() => addToDefault(limiter)} key={index}>
+						{options?.map((limiter, index) => (
+							<DropdownMenuItem onClick={() => onSelect(limiter)} key={index}>
 								<div className='flex flex-col'>
 									<span>{limiter.name}</span>
 									<span className='font-sfCompact text-[11px] text-subtle leading-[21px]'>
