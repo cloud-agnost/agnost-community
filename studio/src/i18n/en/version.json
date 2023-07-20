@@ -116,7 +116,6 @@
 	"limiter_deleted": "Rate limiter(s) deleted successfully",
 	"limiter_added_to_default": "Rate limiter added to default rate limiters",
 	"edit_rate_limiter": "Edit Rate Limiter",
-	"rate_limiters_empty": "No rate limit selected",
 	"handler_code": "Handler Code",
 	"middleware": {
 		"default": "Middlewares",

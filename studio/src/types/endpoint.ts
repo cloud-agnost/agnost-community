@@ -1,5 +1,5 @@
-import { BaseGetRequest, Middleware } from '@/types/type.ts';
 import { RateLimit } from '@/types/version.ts';
+import { BaseGetRequest, Middleware } from '@/types/type.ts';
 
 export type Method = 'POST' | 'GET' | 'PUT' | 'DELETE';
 
@@ -21,7 +21,6 @@ export interface Endpoint {
 	rateLimits: RateLimit[];
 	middlewares: Middleware[];
 	createdBy: string;
-	updatedBy: string;
 	_id: string;
 	createdAt: string;
 	updatedAt: string;
@@ -34,11 +33,9 @@ export interface EndpointBase {
 	versionId: string;
 }
 
-export type Method = 'POST' | 'GET' | 'PUT' | 'DELETE';
-
 export interface CreateEndpointParams extends EndpointBase {
 	name: string;
-	method: Method;
+	method: 'POST' | 'GET' | 'PUT' | 'DELETE';
 	path: string;
 	apiKeyRequired: boolean;
 	sessionRequired: boolean;

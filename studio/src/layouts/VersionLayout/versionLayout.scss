@@ -3,7 +3,7 @@
 }
 
 .version-layout {
-	@apply p-6 full-height-without-header overflow-auto;
+	@apply p-6 full-height-without-header;
 
 	&.middleware,
 	&.database {

@@ -21,8 +21,7 @@ import { APIError } from '@/types';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { useParams } from 'react-router-dom';
 import { useToast } from '@/hooks';
-import { RateLimit } from '@/types';
-import { NUMBER_REGEX } from '@/constants';
+
 const FormSchema = z.object({
 	name: z
 		.string({
@@ -56,7 +55,7 @@ const FormSchema = z.object({
 			}),
 		})
 		.regex(
-			NUMBER_REGEX,
+			/^[0-9]+$/,
 			translate('forms.number', {
 				label: translate('version.add.rate_limiter.rate.label_lower'),
 			}),
@@ -69,7 +68,7 @@ const FormSchema = z.object({
 			}),
 		})
 		.regex(
-			NUMBER_REGEX,
+			/^[0-9]+$/,
 			translate('forms.number', {
 				label: translate('version.add.rate_limiter.duration.label_lower'),
 			}),
@@ -87,7 +86,6 @@ interface AddEndpointRateLimiterDrawerProps {
 	onOpenChange: (open: boolean) => void;
 	editMode?: boolean;
 	addToDefault?: boolean;
-	onCreate?: (limiter: RateLimit) => void;
 }
 
 export default function EditOrAddEndpointRateLimiterDrawer({
@@ -95,7 +93,6 @@ export default function EditOrAddEndpointRateLimiterDrawer({
 	onOpenChange,
 	editMode = false,
 	addToDefault,
-	onCreate,
 }: AddEndpointRateLimiterDrawerProps) {
 	const [loading, setLoading] = useState(false);
 	const { t } = useTranslation();
@@ -180,8 +177,6 @@ export default function EditOrAddEndpointRateLimiterDrawer({
 				appId,
 				defaultEndpointLimits: [...(defaultEndpointLimits ?? []), rateLimit.iid],
 			});
-		} else {
-			onCreate?.(rateLimit);
 		}
 		notify({
 			type: 'success',
@@ -310,14 +305,7 @@ export default function EditOrAddEndpointRateLimiterDrawer({
 								)}
 							/>
 							<div className='mt-4 flex justify-end'>
-								<Button
-									loading={loading}
-									size='lg'
-									type='button'
-									onClick={() => {
-										form.handleSubmit(onSubmit)();
-									}}
-								>
+								<Button loading={loading} size='lg'>
 									{editMode ? t('general.save') : t('general.create')}
 								</Button>
 							</div>
