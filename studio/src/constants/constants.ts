@@ -89,7 +89,7 @@ export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
 export const MIN_DB_SIZE = 1;
 export const MAX_DB_SIZE = 50;
-export const IP_REGEX = /^([0-9]{1,3}\.){3}[0-9]{1,3}$/;
+export const IP_REGEX = /^(\d{1,3}\.){3}\d{1,3}$/;
 export const URL_REGEX = /^(http|https):\/\/[^ "]+$/;
 export const NUMBER_REGEX = /^[0-9]+$/;
 export const SLIDER_IMAGES = [
@@ -322,6 +322,12 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	UPDATING: 'yellow',
 	DELETING: 'red',
 	BINDING: 'blue',
+	GET: 'blue',
+	POST: 'green',
+	PUT: 'yellow',
+	DELETE: 'red',
+	OPTIONAL: 'yellow',
+	REQUIRED: 'blue',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
