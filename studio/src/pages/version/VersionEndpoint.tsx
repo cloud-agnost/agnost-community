@@ -1,7 +1,7 @@
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
 import { PAGE_SIZE } from '@/constants';
-import { EndpointFilter, EndpointColumns } from '@/features/endpoints';
+import { EndpointFilter, EndpointColumns, CreateEndpoint } from '@/features/endpoints';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import { Endpoint } from '@/types';
 import { Row, Table } from '@tanstack/react-table';
@@ -10,6 +10,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams, useSearchParams } from 'react-router-dom';
 
 export default function VersionDatabase() {
+	const [openCreateModal, setOpenCreateModal] = useState(false);
 	const [page, setPage] = useState(0);
 	const { endpoints, lastFetchedCount, getEndpoints } = useEndpointStore();
 	const [searchParams] = useSearchParams();
@@ -33,7 +34,12 @@ export default function VersionDatabase() {
 
 	return (
 		<div className='p-4 space-y-4'>
-			<EndpointFilter table={table as Table<any>} selectedRows={selectedRows} setPage={setPage} />
+			<EndpointFilter
+				table={table as Table<any>}
+				selectedRows={selectedRows}
+				setPage={setPage}
+				setOpenCreateModal={setOpenCreateModal}
+			/>
 			<InfiniteScroll
 				scrollableTarget='version-layout'
 				dataLength={endpoints.length}
@@ -50,6 +56,7 @@ export default function VersionDatabase() {
 					setTable={setTable}
 				/>
 			</InfiniteScroll>
+			<CreateEndpoint open={openCreateModal} onClose={() => setOpenCreateModal(false)} />
 		</div>
 	);
 }

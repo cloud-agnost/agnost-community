@@ -40,8 +40,15 @@ export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
 export const MIN_DB_SIZE = 1;
 export const MAX_DB_SIZE = 50;
-export const IP_REGEX = /^([0-9]{1,3}\.){3}[0-9]{1,3}$/;
+export const IP_REGEX = /^(\d{1,3}\.){3}\d{1,3}$/;
 export const URL_REGEX = /^(http|https):\/\/[^ "]+$/;
+export const NUMBER_REGEX = /^[0-9]+$/;
+export const NAME_REGEX = /^[A-Za-z0-9_]+$/;
+export const NOT_START_WITH_NUMBER_REGEX = /^[A-Za-z_][A-Za-z0-9_]*$/;
+export const ROUTE_NAME_REGEX = /^\/[a-zA-Z0-9_-]+(?:\/:[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)*)*$/;
+export const PARAM_REGEX = /:([^/?]+)/g;
+export const PARAM_NAME_REGEX = /^[a-zA-Z0-9_-]+$/;
+
 export const SLIDER_IMAGES = [
 	{
 		text: 'Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.',
@@ -272,6 +279,12 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	UPDATING: 'yellow',
 	DELETING: 'red',
 	BINDING: 'blue',
+	GET: 'blue',
+	POST: 'green',
+	PUT: 'yellow',
+	DELETE: 'red',
+	OPTIONAL: 'yellow',
+	REQUIRED: 'blue',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
@@ -621,4 +634,18 @@ export const HTTP_METHOD_BADGE_MAP: Record<string, BadgeColors> = {
 	POST: 'green',
 	PUT: 'yellow',
 	DELETE: 'red',
+};
+export const INSTANCE_PORT_MAP: Record<string, string> = {
+	PostgreSQL: '5432',
+	MySQL: '3306',
+	'SQL Server': '1433',
+	MongoDB: '27017',
+	Oracle: '1521',
+	Redis: '6379',
+};
+export const ENDPOINT_METHOD_TEXT_COLOR: Record<string, string> = {
+	GET: 'text-elements-blue',
+	POST: 'text-elements-green',
+	PUT: 'text-elements-yellow',
+	DELETE: 'text-elements-red',
 };
