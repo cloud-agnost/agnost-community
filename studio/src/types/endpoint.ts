@@ -144,7 +144,6 @@ export interface Endpoint {
 	rateLimits: string[];
 	middlewares: string[];
 	createdBy: string;
-	updatedBy: string;
 	_id: string;
 	createdAt: string;
 	updatedAt: string;
