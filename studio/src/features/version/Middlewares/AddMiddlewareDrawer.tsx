@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { nameSchema } from '@/features/version/Middlewares/formSchema.ts';
-
+import { Middleware } from '@/types';
 const MiddlewareFormSchema = z.object({
 	name: nameSchema,
 });
@@ -26,9 +26,14 @@ const MiddlewareFormSchema = z.object({
 interface AddMiddlewareDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	onCreate?: (middleware: Middleware) => void;
 }
 
-export default function AddMiddlewareDrawer({ open, onOpenChange }: AddMiddlewareDrawerProps) {
+export default function AddMiddlewareDrawer({
+	open,
+	onOpenChange,
+	onCreate,
+}: AddMiddlewareDrawerProps) {
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 	const { createMiddleware } = useMiddlewareStore();
@@ -49,13 +54,14 @@ export default function AddMiddlewareDrawer({ open, onOpenChange }: AddMiddlewar
 		if (!orgId || !appId || !versionId) return;
 		setLoading(true);
 		try {
-			await createMiddleware({
+			const mw = await createMiddleware({
 				orgId,
 				appId,
 				versionId,
 				name: data.name,
 			});
 			onOpenChange(false);
+			if (onCreate) onCreate(mw);
 		} finally {
 			setLoading(false);
 		}
@@ -68,7 +74,7 @@ export default function AddMiddlewareDrawer({ open, onOpenChange }: AddMiddlewar
 					<DrawerTitle>{t('version.middleware.add_middleware')}</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
-					<form className='p-6' onSubmit={form.handleSubmit(onSubmit)}>
+					<form className='p-6'>
 						<FormField
 							control={form.control}
 							name='name'
@@ -93,7 +99,14 @@ export default function AddMiddlewareDrawer({ open, onOpenChange }: AddMiddlewar
 							)}
 						/>
 						<div className='flex justify-end mt-4'>
-							<Button loading={loading} size='lg'>
+							<Button
+								loading={loading}
+								size='lg'
+								type='button'
+								onClick={() => {
+									form.handleSubmit(onSubmit)();
+								}}
+							>
 								{t('general.save')}
 							</Button>
 						</div>
