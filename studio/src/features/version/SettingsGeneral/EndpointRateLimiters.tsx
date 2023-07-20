@@ -1,6 +1,12 @@
+import { SortableRateLimits } from '@/features/version/SettingsGeneral';
+import useVersionStore from '@/store/version/versionStore.ts';
+import { reorder } from '@/utils';
+import { DropResult } from 'react-beautiful-dnd';
 import { useTranslation } from 'react-i18next';
-import { AddRateLimiterDropdown, SortableRateLimits } from '@/features/version/SettingsGeneral';
-
+import { useParams } from 'react-router-dom';
+import { useToast } from '@/hooks';
+import { APIError, RateLimit } from '@/types';
+import { useState } from 'react';
 export default function EndpointRateLimiters() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
@@ -13,7 +19,7 @@ export default function EndpointRateLimiters() {
 	const rateLimitsNotInDefault = rateLimits?.filter(
 		(item) => !defaultRateLimiters?.includes(item.iid),
 	);
-	const orderLimits = useVersionStore((state) => state.orderEndpointRateLimits);
+	const orderLimits = useVersionStore((state) => state.orderLimits);
 	const { orgId, versionId, appId } = useParams<{
 		versionId: string;
 		appId: string;
