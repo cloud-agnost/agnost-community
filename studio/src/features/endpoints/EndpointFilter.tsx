@@ -10,8 +10,14 @@ interface EndpointFilterProps {
 	table: Table<any>;
 	selectedRows: Row<Endpoint>[];
 	setPage: (page: number) => void;
+	setOpenCreateModal: (open: boolean) => void;
 }
-export default function EndpointFilter({ table, selectedRows, setPage }: EndpointFilterProps) {
+export default function EndpointFilter({
+	table,
+	selectedRows,
+	setPage,
+	setOpenCreateModal,
+}: EndpointFilterProps) {
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
 
@@ -41,12 +47,7 @@ export default function EndpointFilter({ table, selectedRows, setPage }: Endpoin
 						console.log('delete');
 					}}
 				/>
-				<Button
-					variant='primary'
-					onClick={() => {
-						console.log('click');
-					}}
-				>
+				<Button variant='primary' onClick={() => setOpenCreateModal(true)}>
 					<Plus size={16} />
 					<span className='ml-2'>{t('endpoint.add')}</span>
 				</Button>

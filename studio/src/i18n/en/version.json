@@ -116,6 +116,7 @@
 	"limiter_deleted": "Rate limiter(s) deleted successfully",
 	"limiter_added_to_default": "Rate limiter added to default rate limiters",
 	"edit_rate_limiter": "Edit Rate Limiter",
+	"rate_limiters_empty": "No rate limit selected",
 	"handler_code": "Handler Code",
 	"middleware": {
 		"default": "Middlewares",
@@ -216,6 +217,7 @@
 		"session_required": "Session Required",
 		"session_required_desc": "App users are required to be signed in (e.g., have a session token) to use the realtime services through Agnost client library.",
 		"rate_limiter": "Rate Limiters",
-		"rate_limiter_desc": "Rate limiting puts a cap on how often someone can send realtime messages within a certain timeframe. By rate limiting, you can help stop certain kinds of malicious activity. You can define multiple rate limits which are applied sequentially"
+		"rate_limiter_desc": "Rate limiting puts a cap on how often someone can send realtime messages within a certain timeframe. By rate limiting, you can help stop certain kinds of malicious activity. You can define multiple rate limits which are applied sequentially",
+		"endpoint_access_custom_excluded_desc": "API key cannot be used with below excluded endpoints but with all others not selected"
 	}
 }

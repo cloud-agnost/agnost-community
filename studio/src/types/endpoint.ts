@@ -34,6 +34,8 @@ export interface EndpointBase {
 	versionId: string;
 }
 
+export type Method = 'POST' | 'GET' | 'PUT' | 'DELETE';
+
 export interface CreateEndpointParams extends EndpointBase {
 	name: string;
 	method: 'POST' | 'GET' | 'PUT' | 'DELETE';
