@@ -67,7 +67,6 @@ export default function Root() {
 					organizationId: orgId,
 					page: memberPage,
 					size: 100,
-					initialFetch: memberPage === 0,
 				});
 			};
 			fetchData().then((res) => {

@@ -16,11 +16,6 @@ import * as z from 'zod';
 import './auth.scss';
 import { GuestOnly } from '@/router';
 
-async function loader(params: any) {
-	console.log(params);
-	return null;
-}
-
 const FormSchema = z.object({
 	email: z
 		.string({
@@ -139,5 +134,3 @@ export default function ForgotPassword() {
 		</AuthLayout>
 	);
 }
-
-ForgotPassword.loader = loader;

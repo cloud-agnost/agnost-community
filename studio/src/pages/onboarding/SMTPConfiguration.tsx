@@ -26,10 +26,6 @@ import { useTranslation } from 'react-i18next';
 import { RequireAuth } from '@/router';
 import { NUMBER_REGEX } from '@/constants';
 
-async function loader() {
-	return null;
-}
-
 const FormSchema = z.object({
 	host: z
 		.string({ required_error: 'Host is required' })
@@ -247,5 +243,3 @@ export default function SMTPConfiguration() {
 		</RequireAuth>
 	);
 }
-
-SMTPConfiguration.loader = loader;

@@ -19,10 +19,6 @@ import { translate } from '@/utils';
 import { useTranslation } from 'react-i18next';
 import { RequireAuth } from '@/router';
 
-async function loader() {
-	return null;
-}
-
 const FormSchema = z.object({
 	appName: z
 		.string({
@@ -105,5 +101,3 @@ export default function CreateApp() {
 		</RequireAuth>
 	);
 }
-
-CreateApp.loader = loader;

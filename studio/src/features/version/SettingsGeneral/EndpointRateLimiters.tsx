@@ -19,7 +19,7 @@ export default function EndpointRateLimiters() {
 	const rateLimitsNotInDefault = rateLimits?.filter(
 		(item) => !defaultRateLimiters?.includes(item.iid),
 	);
-	const orderLimits = useVersionStore((state) => state.orderLimits);
+	const orderLimits = useVersionStore((state) => state.orderEndpointRateLimits);
 	const { orgId, versionId, appId } = useParams<{
 		versionId: string;
 		appId: string;

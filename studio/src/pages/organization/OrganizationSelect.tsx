@@ -11,10 +11,6 @@ import { useOutletContext } from 'react-router-dom';
 import './organization.scss';
 import { useEffect } from 'react';
 
-async function loader() {
-	return null;
-}
-
 export default function OrganizationSelect() {
 	const { organizations, selectOrganization, getAllOrganizationByUser } = useOrganizationStore();
 	const { user, isAuthenticated } = useAuthStore();
@@ -80,5 +76,3 @@ export default function OrganizationSelect() {
 		</div>
 	);
 }
-
-OrganizationSelect.loader = loader;

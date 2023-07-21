@@ -15,6 +15,8 @@ export type {
 export type * from './application.ts';
 export { CreateApplicationSchema } from './application.ts';
 export type * from './database.ts';
+export type * from './endpoint.ts';
+export { CreateEndpointSchema } from './endpoint.ts';
 export type * from './environment.ts';
 export type * from './middleware.ts';
 export { CreateOrganizationSchema } from './organization.ts';
@@ -27,4 +29,3 @@ export {
 } from './resource.ts';
 export type * from './type.ts';
 export type * from './version.ts';
-export type * from './endpoint.ts';

@@ -15,11 +15,6 @@ import { useSearchParams } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
 
-async function loader(params: any) {
-	console.log(params);
-	return null;
-}
-
 const FormSchema = z.object({
 	code: z
 		.string({
@@ -105,5 +100,3 @@ export default function VerifyEmail() {
 		</AuthLayout>
 	);
 }
-
-VerifyEmail.loader = loader;

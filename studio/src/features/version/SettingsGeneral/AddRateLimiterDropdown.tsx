@@ -17,7 +17,6 @@ interface AddRateLimiterDropdownProps {
 	options: RateLimit[] | undefined;
 	onSelect: (limiter: RateLimit) => void;
 	hasToAddAsDefault?: 'endpoint' | 'realtime';
-	type: 'endpoint' | 'realtime';
 }
 
 export default function AddRateLimiterDropdown({

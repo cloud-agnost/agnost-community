@@ -11,6 +11,7 @@ const organizationPath = `${path}/organization`;
 const versionPath = `${path}/version`;
 const profilePath = `${path}/profile`;
 const onboardingPath = `${path}/onboarding`;
+const endpointPath = `${path}/endpoint`;
 
 const paths = {
 	home: `${path}/home/Home.tsx`,
@@ -54,6 +55,10 @@ const paths = {
 			realTime: `${versionPath}/settings/VersionSettingsRealTime.tsx`,
 			npmPackages: `${versionPath}/settings/VersionSettingsNPMPackages.tsx`,
 		},
+	},
+	endpoint: {
+		endpoint: `${endpointPath}/Endpoint.tsx`,
+		editEndpoint: `${endpointPath}/EditEndpoint.tsx`,
 	},
 	profileSettings: {
 		profileSettings: `${profilePath}/ProfileSettings.tsx`,
@@ -165,6 +170,17 @@ const router = createBrowserRouter([
 					{
 						path: 'endpoint',
 						lazy: () => lazyRouteImport(paths.version.endpoint),
+						children: [
+							{
+								index: true,
+								path: '',
+								lazy: () => lazyRouteImport(paths.endpoint.endpoint),
+							},
+							{
+								path: ':endpointId',
+								lazy: () => lazyRouteImport(paths.endpoint.editEndpoint),
+							},
+						],
 					},
 					{
 						path: 'storage',
