@@ -294,6 +294,11 @@
 		-ms-overflow-style: none;
 		scrollbar-width: none;
 	}
+
+	.scroll {
+		overflow-y: scroll;
+		height: 90%;
+	}
 }
 .Toastify {
 	z-index: 999999999;

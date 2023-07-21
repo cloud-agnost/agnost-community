@@ -15,10 +15,6 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 
-function loader() {
-	return null;
-}
-
 export default function OrganizationApps() {
 	const [isCard, setIsCard] = useState(true);
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -105,7 +101,6 @@ export default function OrganizationApps() {
 		</div>
 	);
 }
-OrganizationApps.loader = loader;
 
 function CreateApplicationButton() {
 	const { t } = useTranslation();

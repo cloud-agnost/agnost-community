@@ -5,10 +5,8 @@
 	@apply placeholder:text-subtle focus:outline-none;
 	@apply focus:border-button-primary;
 	@apply truncate max-w-[calc(100%)];
-	@apply disabled:cursor-not-allowed disabled:bg-input-disabled-background;
 	@apply border-input-disabled-border disabled:text-subtle;
-	@apply space-x-4;
-	@apply disabled:border-input-disabled-border disabled:text-subtle;
+	@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border disabled:cursor-not-allowed;
 	&[data-placeholder] span {
 		@apply text-subtle focus:outline-none;
 	}
