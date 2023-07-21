@@ -18,7 +18,7 @@ import { ControllerRenderProps } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { AddMiddlewareDrawer } from '../version/Middlewares';
-import { CreateEndpointSchema } from './CreateEndpoint';
+import { CreateEndpointSchema } from '@/types';
 
 interface EndpointMiddlewaresProps {
 	field: ControllerRenderProps<z.infer<typeof CreateEndpointSchema>, 'middlewares'>;

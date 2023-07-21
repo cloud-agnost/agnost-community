@@ -10,7 +10,7 @@ import { BADGE_COLOR_MAP, ENDPOINT_METHOD_TEXT_COLOR } from '@/constants';
 import { cn, translate } from '@/utils';
 import { CopyButton } from '@/components/CopyButton';
 import useOrganizationStore from '@/store/organization/organizationStore';
-
+import { Link } from 'react-router-dom';
 const EndpointColumns: ColumnDef<Endpoint>[] = [
 	{
 		id: 'select',
@@ -132,18 +132,19 @@ const EndpointColumns: ColumnDef<Endpoint>[] = [
 			const user = useOrganizationStore
 				.getState()
 				.members.find((member) => member.member._id === updatedBy);
-			return <DateText date={updatedAt} user={user} />;
+			return updatedBy && <DateText date={updatedAt} user={user} />;
 		},
 	},
 	{
 		id: 'actions',
 		size: 45,
-		cell: () => {
+		cell: ({ row }) => {
+			const { _id } = row.original;
 			return (
 				<div className='flex items-center justify-end'>
-					<Button variant='blank' iconOnly>
+					<Link to={`${_id}`}>
 						<Pencil className='w-6 h-6 text-icon-base' />
-					</Button>
+					</Link>
 					<Button variant='blank' iconOnly>
 						<Trash size={24} className='text-icon-base' />
 					</Button>
