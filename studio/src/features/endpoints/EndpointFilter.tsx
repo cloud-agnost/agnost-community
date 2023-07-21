@@ -5,21 +5,18 @@ import { Endpoint } from '@/types';
 import { Plus } from '@phosphor-icons/react';
 import { Row, Table } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useOutletContext } from 'react-router-dom';
 interface EndpointFilterProps {
-	table: Table<any>;
+	table: Table<Endpoint>;
 	selectedRows: Row<Endpoint>[];
 	setPage: (page: number) => void;
-	setOpenCreateModal: (open: boolean) => void;
+	setIsCreateModalOpen: (open: boolean) => void;
 }
-export default function EndpointFilter({
-	table,
-	selectedRows,
-	setPage,
-	setOpenCreateModal,
-}: EndpointFilterProps) {
+export default function EndpointFilter() {
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { table, selectedRows, setPage, setIsCreateModalOpen } =
+		useOutletContext() as EndpointFilterProps;
 
 	function onInput(value: string) {
 		value = value.trim();
@@ -47,7 +44,7 @@ export default function EndpointFilter({
 						console.log('delete');
 					}}
 				/>
-				<Button variant='primary' onClick={() => setOpenCreateModal(true)}>
+				<Button variant='primary' onClick={() => setIsCreateModalOpen(true)}>
 					<Plus size={16} />
 					<span className='ml-2'>{t('endpoint.add')}</span>
 				</Button>

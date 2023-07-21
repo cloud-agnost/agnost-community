@@ -11,7 +11,7 @@ interface SortableRateLimitsProps {
 	options: RateLimit[] | undefined;
 	selectedLimits: string[];
 	loading?: boolean;
-	form?: boolean;
+	hasToAddAsDefault?: 'endpoint' | 'realtime';
 }
 
 export default function SortableRateLimits({
@@ -21,7 +21,7 @@ export default function SortableRateLimits({
 	loading,
 	options,
 	selectedLimits,
-	form,
+	hasToAddAsDefault,
 }: SortableRateLimitsProps) {
 	const { t } = useTranslation();
 	const rateLimits = useVersionStore((state) => state.version?.limits);
@@ -29,7 +29,13 @@ export default function SortableRateLimits({
 	return (
 		<SortableContainer
 			title={t('version.rate_limiters')}
-			actions={<AddRateLimiterDropdown options={options} onSelect={onSelect} form={form} />}
+			actions={
+				<AddRateLimiterDropdown
+					options={options}
+					onSelect={onSelect}
+					hasToAddAsDefault={hasToAddAsDefault}
+				/>
+			}
 		>
 			<Sortable onDragEnd={onDragEnd}>
 				{selectedLimits?.length > 0 ? (
