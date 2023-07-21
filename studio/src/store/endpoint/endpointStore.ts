@@ -23,14 +23,8 @@ interface EndpointStore {
 	endpoint: Endpoint | null;
 	selectedEndpointIds: string[];
 	lastFetchedCount: number;
-	endpointRequest: TestEndpointParams[];
-	endpointResponse: EndpointResponse[];
-	toDeleteEndpoint: Endpoint | null;
-	isEndpointDeleteDialogOpen: boolean;
-	openDeleteEndpointDialog: (endpoint: Endpoint) => void;
 	setSelectEndpointDialogOpen: (open: boolean) => void;
 	setSelectedEndpointIds: (ids: string[]) => void;
-	lastFetchedCount: number;
 	setEndpoints: (endpoints: Endpoint[]) => void;
 	createEndpoint: (endpoint: CreateEndpointParams) => Promise<Endpoint>;
 	getEndpointById: (endpoint: GetEndpointByIdParams) => Promise<Endpoint>;

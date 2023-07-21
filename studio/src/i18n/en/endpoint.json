@@ -8,6 +8,7 @@
 	"createdAt": "CREATED AT",
 	"updatedAt": "UPDATED AT",
 	"add": "Create Endpoint",
+	"test": "Test",
 	"create": {
 		"title": "Create New Endpoint",
 		"name": "Name",
@@ -32,5 +33,9 @@
 		"notValidRoute": "Not a valid endpoint route",
 		"invalidParams": "Invalid route parameter name {{param}}",
 		"duplicateParam": "Duplicate parameter names in route"
-	}
+	},
+
+	"edit": "Edit {{name}}",
+	"editLogicSuccess": "Endpoint logic updated successfully",
+	"editSuccess": "Endpoint updated successfully"
 }
