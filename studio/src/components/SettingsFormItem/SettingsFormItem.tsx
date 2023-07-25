@@ -1,5 +1,6 @@
-import { ReactNode } from 'react';
+import { ElementType, ReactNode } from 'react';
 import { cn } from '@/utils';
+
 interface SettingsFormItemProps {
 	title: string;
 	description?: string | null;
@@ -7,6 +8,7 @@ interface SettingsFormItemProps {
 	className?: string;
 	contentClassName?: string;
 	twoColumns?: boolean;
+	as?: ElementType;
 }
 export default function SettingsFormItem({
 	title,
@@ -15,12 +17,15 @@ export default function SettingsFormItem({
 	contentClassName,
 	className,
 	twoColumns = false,
+	as = 'div',
 }: SettingsFormItemProps) {
+	const Component = as;
 	return (
-		<div
+		<Component
 			className={cn(
 				'space-y-6 py-8 max-w-2xl',
 				twoColumns && 'flex justify-between gap-10',
+				as === 'label' && 'cursor-pointer',
 				className,
 			)}
 		>
@@ -31,6 +36,6 @@ export default function SettingsFormItem({
 				)}
 			</div>
 			<div className={contentClassName}>{children}</div>
-		</div>
+		</Component>
 	);
 }
