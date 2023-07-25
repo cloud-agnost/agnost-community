@@ -171,3 +171,7 @@ export function objToArray(obj: object | undefined): { key: string; value: strin
 export function generateId() {
 	return Math.random().toString(36).substring(2, 15);
 }
+
+export function toDisplayName(name: string) {
+	return name.replace(/-/g, ' ').split(' ').map(capitalize).join(' ');
+}
