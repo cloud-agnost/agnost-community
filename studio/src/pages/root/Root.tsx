@@ -3,13 +3,11 @@ import EditApplication from '@/features/application/EditApplication.tsx';
 import { CreateResource } from '@/features/resources';
 import { CreateCopyVersionDrawer } from '@/features/version/CreateCopyVersionDrawer';
 import { EditMiddlewareDrawer } from '@/features/version/Middlewares';
-import useApplicationStore from '@/store/app/applicationStore.ts';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
 import { history, removeLastSlash } from '@/utils';
 import { LoaderFunctionArgs, Outlet, useLocation, useNavigate } from 'react-router-dom';
-
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 const authPaths = [
@@ -22,7 +20,7 @@ const authPaths = [
 	'/complete-account-setup/verify-email',
 ];
 
-async function loader({ request, params }: LoaderFunctionArgs) {
+async function loader({ request }: LoaderFunctionArgs) {
 	const isAuthenticated = useAuthStore.getState().isAuthenticated();
 	await useClusterStore.getState().checkClusterSmtpStatus();
 	await useClusterStore.getState().checkClusterSetup();
@@ -33,23 +31,6 @@ async function loader({ request, params }: LoaderFunctionArgs) {
 	if (!isAuthPath && isAuthenticated) {
 		await useAuthStore.getState().getUser();
 	}
-
-	const { appId, orgId } = params;
-
-	useOrganizationStore.setState((prev) => {
-		const organization = prev.organizations.find((org) => org._id === orgId);
-		if (organization) prev.organization = organization;
-		else prev.organization = null;
-
-		return prev;
-	});
-
-	useApplicationStore.setState((prev) => {
-		const application = prev.applications.find((app) => app._id === appId);
-		if (application) prev.application = application;
-
-		return prev;
-	});
 
 	return null;
 }

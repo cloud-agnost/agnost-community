@@ -1,17 +1,17 @@
-import { ColumnDefWithClassName, Model } from '@/types';
+import { ColumnDefWithClassName, Field } from '@/types';
 import { SortButton } from 'components/DataTable';
 import { translate } from '@/utils';
 import { Button } from 'components/Button';
-import { Pencil, Refresh } from 'components/icons';
+import { Pencil } from 'components/icons';
 import { CopyButton } from 'components/CopyButton';
-import { Columns, Trash } from '@phosphor-icons/react';
+import { Trash } from '@phosphor-icons/react';
 import { Checkbox } from 'components/Checkbox';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { DateText } from 'components/DateText';
-import useModelStore from '@/store/database/modelStore.ts';
+import { Badge } from 'components/Badge';
 
-const ModelColumns: ColumnDefWithClassName<Model>[] = [
+const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'select',
 		className: '!max-w-[40px] !w-[40px]',
@@ -35,7 +35,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	{
 		id: 'name',
 		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
+			<SortButton text={translate('general.field').toUpperCase()} column={column} />
 		),
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
@@ -55,6 +55,83 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 					<span className='whitespace-nowrap'>{iid}</span>
 					<CopyButton text={iid} />
 				</div>
+			);
+		},
+	},
+	{
+		id: 'unique',
+		header: translate('general.unique').toUpperCase(),
+		accessorKey: 'iid',
+		sortingFn: 'textCaseSensitive',
+		cell: ({
+			row: {
+				original: { unique },
+			},
+		}) => {
+			return (
+				<Badge
+					rounded
+					variant={unique ? 'green' : 'red'}
+					text={unique ? translate('general.yes') : translate('general.no')}
+				/>
+			);
+		},
+	},
+	{
+		id: 'indexed',
+		header: translate('general.indexed').toUpperCase(),
+		accessorKey: 'iid',
+		sortingFn: 'textCaseSensitive',
+		cell: ({
+			row: {
+				original: { indexed },
+			},
+		}) => {
+			return (
+				<Badge
+					rounded
+					variant={indexed ? 'green' : 'red'}
+					text={indexed ? translate('general.yes') : translate('general.no')}
+				/>
+			);
+		},
+	},
+	{
+		id: 'required',
+		header: translate('general.required').toUpperCase(),
+		accessorKey: 'iid',
+		sortingFn: 'textCaseSensitive',
+		cell: ({
+			row: {
+				original: { required },
+			},
+		}) => {
+			return (
+				<Badge
+					rounded
+					variant={required ? 'green' : 'red'}
+					text={required ? translate('general.yes') : translate('general.no')}
+				/>
+			);
+		},
+	},
+	{
+		id: 'immutable',
+		className: 'whitespace-nowrap',
+		header: translate('general.read-only').toUpperCase(),
+		accessorKey: 'iid',
+		sortingFn: 'textCaseSensitive',
+		cell: ({
+			row: {
+				original: { immutable },
+			},
+		}) => {
+			return (
+				<Badge
+					rounded
+					variant={immutable ? 'green' : 'red'}
+					text={immutable ? translate('general.yes') : translate('general.no')}
+				/>
 			);
 		},
 	},
@@ -108,28 +185,17 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	{
 		id: 'actions',
 		className: 'actions !w-[50px]',
-		cell: ({ row: { original } }) => {
-			const { setModelToEdit, setIsOpenEditModelDialog } = useModelStore.getState();
+		cell: () => {
 			function openEditDrawer() {
-				setModelToEdit(original);
-				setIsOpenEditModelDialog(true);
+				// TODO
 			}
 
 			function deleteHandler() {
-				console.log('');
+				// TODO
 			}
 
 			return (
 				<div className='flex items-center justify-end'>
-					<Button
-						to={`${original._id}/fields`}
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-					>
-						<Columns />
-					</Button>
 					<Button
 						onClick={openEditDrawer}
 						iconOnly
@@ -148,18 +214,10 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 					>
 						<Trash size={20} />
 					</Button>
-					<Button
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-					>
-						<Refresh />
-					</Button>
 				</div>
 			);
 		},
 	},
 ];
 
-export default ModelColumns;
+export default FieldColumns;

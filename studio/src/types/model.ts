@@ -34,6 +34,7 @@ export interface Field {
 	immutable: boolean;
 	indexed: boolean;
 	createdBy: string;
+	updatedBy: string;
 	_id: string;
 	createdAt: string;
 	updatedAt: string;
@@ -58,3 +59,52 @@ export type UpdateNameAndDescriptionParams = GetModelsOfDatabaseParams & {
 	name: string;
 	description: string;
 };
+
+export type AddNewFieldParams = GetModelsOfDatabaseParams & {
+	type: string;
+	modelId: string;
+	name: string;
+	description?: string;
+	required: boolean;
+	unique: boolean;
+	immutable: boolean;
+	indexed: boolean;
+	defaultValue?: string;
+	text?: {
+		searchable: boolean;
+		maxLength: number;
+	};
+	richText?: {
+		searchable: boolean;
+		maxLength: number;
+	};
+	encryptedText?: {
+		maxLength: number;
+	};
+	decimal?: {
+		decimalDigits: number;
+	};
+	enum?: {
+		selectList: string[];
+	};
+	object?: {
+		timestamps: {
+			enabled: boolean;
+			createdAt: string;
+			updatedAt: string;
+		};
+	};
+	objectList?: {
+		timestamps: {
+			enabled: boolean;
+			createdAt: string;
+			updatedAt: string;
+		};
+	};
+	reference?: {
+		iid: string;
+		action: ReferenceAction;
+	};
+};
+
+export type ReferenceAction = 'CASCADE' | 'NO ACTION' | 'SET NULL' | 'SET DEFAULT';

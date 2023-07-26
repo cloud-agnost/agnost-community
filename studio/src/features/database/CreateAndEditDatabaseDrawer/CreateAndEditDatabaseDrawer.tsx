@@ -197,7 +197,8 @@ export default function CreateAndEditDatabaseDrawer({
 																<Plus weight='bold' size={16} />
 																{t('database.add.resource.add')}
 															</Button>
-															<SelectSeparator />
+															{resources.length > 0 && <SelectSeparator />}
+
 															{resources.map((resource) => {
 																const Icon = DATABASE_ICON_MAP[resource.instance];
 																return (

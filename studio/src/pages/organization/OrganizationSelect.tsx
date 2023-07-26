@@ -6,14 +6,12 @@ import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization } from '@/types';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import './organization.scss';
-import { useEffect } from 'react';
 
 export default function OrganizationSelect() {
-	const { organizations, selectOrganization, getAllOrganizationByUser } = useOrganizationStore();
-	const { user, isAuthenticated } = useAuthStore();
+	const { organizations, selectOrganization } = useOrganizationStore();
+	const { user } = useAuthStore();
 	const { openOrgCreateModal } = useOutletContext<{
 		openOrgCreateModal: () => void;
 	}>();
@@ -25,12 +23,6 @@ export default function OrganizationSelect() {
 		selectOrganization(org);
 		navigate(`/organization/${org?._id}`);
 	}
-
-	useEffect(() => {
-		if (isAuthenticated()) {
-			getAllOrganizationByUser();
-		}
-	}, [user?._id, isAuthenticated]);
 
 	return (
 		<div>
