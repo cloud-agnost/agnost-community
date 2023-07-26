@@ -17,6 +17,7 @@ import { checkSession } from "../middlewares/checkSession.js";
 import { handleFileUploads } from "../middlewares/handleFileUploads.js";
 import { checkContentType } from "../middlewares/checkContentType.js";
 import { applyCustomMiddleware } from "../middlewares/applyCustomMiddleware.js";
+import { clearTemporaryFileStorage } from "../middlewares/clearTemporaryFileStorage.js";
 import {
 	turnOnLogging,
 	turnOffLogging,
@@ -207,13 +208,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 			// Add rate limiter middlewares if any
 			this.addRateLimiters(endpoint, handlers);
-			// If the endpoint is marked as log enabled then add logging middleware
 			this.addTimeoutMiddleware(endpoint, handlers);
-			// If the endpoint is marked as log enabled then add logging middleware
 			this.addClearTimeoutMiddleware(endpoint, handlers);
-			// Add the server status checker middleware
 			handlers.push(getResponseBody);
-			// Add the server status checker middleware
 			handlers.push(checkServerStatus);
 			// If the endpoint is marked as log enabled then add logging middleware
 			this.addLogMiddleware(endpoint, handlers);
@@ -229,6 +226,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			handlers.push(turnOnLogging);
 			// When headers are sent, automatically turn off logging
 			handlers.push(turnOffLogging);
+			handlers.push(clearTemporaryFileStorage);
 			// If the endpoint has custom defined middlewares then add those middlewares
 			await this.addCustomMiddlewares(endpoint, handlers);
 			// Add the route handler

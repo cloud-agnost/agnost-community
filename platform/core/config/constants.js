@@ -79,6 +79,7 @@ export const bvlTypes = [
 export const fieldTypes = [
 	{
 		name: "id",
+		group: "none",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -93,6 +94,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "text",
+		group: "textual",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -107,6 +109,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "rich-text",
+		group: "textual",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -121,6 +124,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "encrypted-text",
+		group: "textual",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -135,6 +139,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "email",
+		group: "textual",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -149,6 +154,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "link",
+		group: "textual",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -163,6 +169,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "phone",
+		group: "textual",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -177,6 +184,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "boolean",
+		group: "numeric",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -191,6 +199,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "integer",
+		group: "numeric",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -205,6 +214,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "decimal",
+		group: "numeric",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -219,6 +229,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "monetary",
+		group: "numeric",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -233,6 +244,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "createdat",
+		group: "none",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -247,6 +259,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "updatedat",
+		group: "none",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -261,6 +274,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "datetime",
+		group: "datetime",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -275,6 +289,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "date",
+		group: "datetime",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -289,6 +304,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "time",
+		group: "datetime",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -303,6 +319,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "enum",
+		group: "advanced",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -317,6 +334,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "geo-point",
+		group: "advanced",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -331,6 +349,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "binary",
+		group: "advanced",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -345,6 +364,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "json",
+		group: "advanced",
 		PostgreSQL: true,
 		MySQL: true,
 		"SQL Server": true,
@@ -359,6 +379,37 @@ export const fieldTypes = [
 	},
 	{
 		name: "parent",
+		group: "none",
+		PostgreSQL: false,
+		MySQL: false,
+		"SQL Server": false,
+		MongoDB: true,
+		Oracle: false,
+		view: {
+			unique: false,
+			indexed: true,
+			immutable: true,
+			searchable: false,
+		},
+	},
+	{
+		name: "reference",
+		group: "advanced",
+		PostgreSQL: true,
+		MySQL: true,
+		"SQL Server": true,
+		MongoDB: true,
+		Oracle: true,
+		view: {
+			unique: true,
+			indexed: true,
+			immutable: true,
+			searchable: false,
+		},
+	},
+	{
+		name: "basic-values-list",
+		group: "advanced",
 		PostgreSQL: false,
 		MySQL: false,
 		"SQL Server": false,
@@ -373,6 +424,7 @@ export const fieldTypes = [
 	},
 	{
 		name: "object",
+		group: "sub-models",
 		PostgreSQL: false,
 		MySQL: false,
 		"SQL Server": false,
@@ -382,25 +434,12 @@ export const fieldTypes = [
 			unique: false,
 			indexed: false,
 			immutable: false,
-			searchable: false,
-		},
-	},
-	{
-		name: "reference",
-		PostgreSQL: true,
-		MySQL: true,
-		"SQL Server": true,
-		MongoDB: true,
-		Oracle: true,
-		view: {
-			unique: true,
-			indexed: true,
-			immutable: true,
 			searchable: false,
 		},
 	},
 	{
 		name: "object-list",
+		group: "sub-models",
 		PostgreSQL: false,
 		MySQL: false,
 		"SQL Server": false,
@@ -410,20 +449,6 @@ export const fieldTypes = [
 			unique: false,
 			indexed: false,
 			immutable: false,
-			searchable: false,
-		},
-	},
-	{
-		name: "basic-values-list",
-		PostgreSQL: false,
-		MySQL: false,
-		"SQL Server": false,
-		MongoDB: true,
-		Oracle: false,
-		view: {
-			unique: false,
-			indexed: true,
-			immutable: true,
 			searchable: false,
 		},
 	},

@@ -3,6 +3,7 @@ import { customAlphabet } from "nanoid";
 import mongo from "mongodb";
 import querystring from "querystring";
 import { sendMessage } from "../init/sync.js";
+import ERROR_CODES from "../config/errorCodes.js";
 
 /**
  * Generates a hihg probability unique slugs
@@ -306,6 +307,51 @@ function decryptSensitiveData(access) {
 	return decrypted;
 }
 
+/**
+ * Removes leading slash character from input string.
+ * @export
+ * @param {string} str  The string to revove leading slash
+ * @returns Trailed string
+ */
+function removeLeadingSlash(str) {
+	return str.replace(/\/$/, "");
+}
+
+/**
+ * Removes leading and trailing slash charactesr from input string.
+ * @export
+ * @param {string} str  The string to revove leading and trailing slashes
+ * @returns Trailed string
+ */
+function removeLeadingAndTrailingSlash(str) {
+	return str.replace(/^\/+|\/+$/g, "");
+}
+
+// Handle exceptions in route handlers
+function handleError(req, res, error) {
+	let entry = {
+		code: ERROR_CODES.internalServerError,
+		name: error.name,
+		message: error.message,
+		stack: error.stack,
+	};
+
+	if (error.name === "CastError") {
+		entry.error = t("Not Found");
+		entry.details = t("The object identifier is not recognized.");
+		res.status(400).json(entry);
+	} else {
+		entry.error = t("Internal Server Error");
+		entry.details = t(
+			"The server has encountered a situation it does not know how to handle."
+		);
+		res.status(500).json(entry);
+	}
+
+	// Log also the error message in console
+	logger.error(JSON.stringify(entry, null, 2));
+}
+
 export default {
 	generateSlug,
 	generateFileName,
@@ -322,4 +368,7 @@ export default {
 	getQueryString,
 	getAsObject,
 	decryptSensitiveData,
+	removeLeadingSlash,
+	removeLeadingAndTrailingSlash,
+	handleError,
 };

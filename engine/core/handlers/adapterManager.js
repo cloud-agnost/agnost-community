@@ -6,13 +6,11 @@ import redis from "redis";
 import amqp from "amqplib";
 import * as Minio from "minio";
 import { Kafka } from "kafkajs";
-import { S3Client } from "@aws-sdk/client-s3";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { Storage } from "@google-cloud/storage";
 import { io } from "socket.io-client";
 import { getMQClient } from "../init/queue.js";
 import { MinIOStorage } from "../adapters/storage/MinIOStorage.js";
-import { AWSStorage } from "../adapters/storage/AWSStorage.js";
 import { GCPStorage } from "../adapters/storage/GCPStorage.js";
 import { AzureStorage } from "../adapters/storage/AzureStorage.js";
 import { PostgreSQL } from "../adapters/database/PostgreSQL.js";
@@ -69,6 +67,33 @@ export class AdapterManager {
 	}
 
 	/**
+	 * Returns the connection object matching the type and name
+	 * @param  {string} name The design iid of the resource
+	 * @param  {string} type The resource type
+	 * @param  {boolean} readOnly Whether to return the read-only connection if available, otherwise return read-write connection
+	 */
+	getAdapterObjectById(id, type, readOnly = false) {
+		// Iterate the environment resource mappings to find the corresponding resource mapping
+		const mappings = META.getResourceMappings();
+		const mapping = mappings.find(
+			(entry) => entry.design.type === type && entry.design.iid === id
+		);
+
+		if (mapping) {
+			let adapterObj = this.adapters.get(mapping.resource.iid);
+
+			if (readOnly) {
+				// If the readonly connection is not there then return the read-write connection
+				if (adapterObj?.slaves && adapterObj.slaves.length > 0) {
+					return adapterObj.slaves[
+						helper.randomInt(1, adapterObj.slaves.length) - 1
+					];
+				} else return adapterObj;
+			} else return adapterObj;
+		} else return null;
+	}
+
+	/**
 	 * Returns the database connection object matching the name
 	 * @param  {string} name The design name of the resource
 	 * @param  {boolean} readOnly Whether to return the read-only connection if available otherwise return read-write connection
@@ -94,6 +119,15 @@ export class AdapterManager {
 	 */
 	getStorageAdapter(name) {
 		const adapterObj = this.getAdapterObject(name, "storage", false);
+		return adapterObj?.adapter || null;
+	}
+
+	/**
+	 * Returns the storage connection object matching the name
+	 * @param  {string} id The design iid of the resource
+	 */
+	getStorageAdapterById(id) {
+		const adapterObj = this.getAdapterObjectById(id, "storage", false);
 		return adapterObj?.adapter || null;
 	}
 
@@ -661,7 +695,7 @@ export class AdapterManager {
 	}
 
 	/**
-	 * Creates an S3 client
+	 * Creates a MinIO client to manage AWS S3 storage. MinIO is compatible with AWS S3.
 	 * @param  {Object} resource The resource object
 	 */
 	async connectToAWSStorage(resource) {
@@ -674,11 +708,12 @@ export class AdapterManager {
 			let connSettings = access;
 			if (!connSettings) return;
 
-			const s3 = new S3Client({
-				credentials: {
-					accessKeyId: connSettings.accessKeyId,
-					secretAccessKey: connSettings.secretAccessKey,
-				},
+			const minioClient = new Minio.Client({
+				endPoint: "s3.amazonaws.com",
+				port: 443,
+				useSSL: true,
+				accessKey: connSettings.accessKeyId,
+				secretKey: connSettings.secretAccessKey,
 				region: connSettings.region,
 			});
 
@@ -688,7 +723,7 @@ export class AdapterManager {
 				instance,
 				iid,
 				readOnly: false,
-				adapter: new AWSStorage(s3),
+				adapter: new MinIOStorage(minioClient),
 			});
 		} catch (err) {}
 	}

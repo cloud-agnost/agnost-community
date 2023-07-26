@@ -272,7 +272,7 @@ router.put(
 				{ cacheKey: ep._id }
 			);
 
-			res.json(ep);
+			res.json(updatedEp);
 
 			// Deploy endpoint updates to environments if auto-deployment is enabled
 			await deployCtrl.updateEndpoints(

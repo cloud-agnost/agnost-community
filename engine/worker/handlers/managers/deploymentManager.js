@@ -509,6 +509,9 @@ export class DeploymentManager {
 			// Create all required indices
 			await collection.createIndexes([
 				{
+					key: { id: 1 },
+				},
+				{
 					key: { path: 1 },
 				},
 				{
@@ -555,6 +558,9 @@ export class DeploymentManager {
 			collection2 = await db.createCollection("buckets");
 			//Create all required indices
 			await collection2.createIndexes([
+				{
+					key: { id: 1 },
+				},
 				{
 					key: { storageId: 1 },
 				},

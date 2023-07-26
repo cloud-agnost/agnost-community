@@ -38,6 +38,11 @@ const ERROR_CODES = {
 	queueNotFound: "queue_not_found",
 	cronJobNotFound: "cronjob_not_found",
 	invalidValue: "invalid_value",
+	missingFileIdentifier: "missing_file_identifier",
+	invalidFileIdentifier: "invalid_file_identifier",
+	invalidFilePath: "invalid_file_path",
+	invalidBucketName: "invalid_bucket_name",
+	notPublic: "not_public",
 };
 
 export default ERROR_CODES;

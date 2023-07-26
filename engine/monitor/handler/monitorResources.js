@@ -8,7 +8,6 @@ import amqp from "amqplib";
 import * as Minio from "minio";
 import { Kafka } from "kafkajs";
 import axios from "axios";
-import { S3Client, HeadBucketCommand } from "@aws-sdk/client-s3";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { Storage } from "@google-cloud/storage";
 
@@ -790,31 +789,20 @@ async function checkDefaultRealtime(connSettings) {
  * @param  {object} connSettings The connection settings needed to connect to the AWS S3 storage
  */
 async function checkAWSStorage(connSettings) {
+	const minioClient = new Minio.Client({
+		endPoint: `s3.amazonaws.com`,
+		port: 443,
+		useSSL: true,
+		accessKey: connSettings.accessKeyId,
+		secretKey: connSettings.secretAccessKey,
+		region: connSettings.region,
+	});
+
 	try {
-		const s3 = new S3Client({
-			credentials: {
-				accessKeyId: connSettings.accessKeyId,
-				secretAccessKey: connSettings.secretAccessKey,
-			},
-			region: connSettings.region,
-		});
-
-		try {
-			const command = new HeadBucketCommand({
-				Bucket: "agnoststorage",
-			});
-			await s3.send(command);
-		} catch (err) {}
-
+		await minioClient.listBuckets();
 		return true;
 	} catch (err) {
-		if (err.statusCode === 404) {
-			return true;
-		} else {
-			throw new AgnostError(
-				t("Cannot connect to the AWS S3 storage. %s", err.message)
-			);
-		}
+		reject(t("Cannot connect to AWS S3 storage. %s", err.message));
 	}
 }
 

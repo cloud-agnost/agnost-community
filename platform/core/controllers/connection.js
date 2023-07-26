@@ -4,9 +4,9 @@ import mssql from "mssql";
 import mongo from "mongodb";
 import amqp from "amqplib";
 import redis from "redis";
+import * as Minio from "minio";
 import { Kafka } from "kafkajs";
 import { Storage } from "@google-cloud/storage";
-import { S3Client, HeadBucketCommand } from "@aws-sdk/client-s3";
 import { BlobServiceClient } from "@azure/storage-blob";
 
 class ConnectionController {
@@ -193,18 +193,16 @@ class ConnectionController {
 				break;
 			case "AWS S3":
 				try {
-					const s3 = new S3Client({
-						credentials: {
-							accessKeyId: connSettings.accessKeyId,
-							secretAccessKey: connSettings.secretAccessKey,
-						},
+					const minioClient = new Minio.Client({
+						endPoint: "s3.amazonaws.com",
+						port: 443,
+						useSSL: true,
+						accessKey: connSettings.accessKeyId,
+						secretKey: connSettings.secretAccessKey,
 						region: connSettings.region,
 					});
 
-					const command = new HeadBucketCommand({
-						Bucket: "agnoststorage",
-					});
-					await s3.send(command);
+					await minioClient.bucketExists("agnoststorage123");
 				} catch (err) {
 					throw new AgnostError(
 						t("Cannot connect to the AWS S3 storage. %s", err.message)
