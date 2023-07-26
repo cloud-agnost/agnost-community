@@ -1,7 +1,6 @@
 export const corePackages = [
 	"amqplib",
 	"axios",
-	"@aws-sdk/client-s3",
 	"@azure/storage-blob",
 	"cookie-parser",
 	"config",

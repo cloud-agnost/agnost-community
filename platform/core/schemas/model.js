@@ -488,7 +488,7 @@ export const applyRules = (type) => {
 							});
 						} else {
 							// Get the parent model and check the field names of this parent model
-							let parentModel = await await ModelModel.find({
+							let parentModel = await ModelModel.find({
 								dbId: req.db._id,
 								iid: req.model.parentiid,
 							});

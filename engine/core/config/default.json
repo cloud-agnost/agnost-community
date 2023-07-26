@@ -36,11 +36,13 @@
         "maxPoolSize": 3,
         "maxLogPayloadSizeKB": 100,
         "fileStorageFolder": "/tmp/uploads",
+        "deleteFilesOlderThanMinues": 30, 
         "expressRequestMaxBodySize": "100mb",
         "endpointPrefix": "/api",
         "gcSeconds": 30,
         "heartbeatIntervalSeconds": 15,
         "heartbeatTimeoutSeconds": 10,
-        "defaultPageSize": 20
+        "defaultPageSize": 20,
+        "batchBucketFileDeleteSize": 1000
      }
 }

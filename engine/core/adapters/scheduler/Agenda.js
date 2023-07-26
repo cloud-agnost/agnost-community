@@ -61,7 +61,6 @@ export class Agenda extends SchedulerBase {
 
 			await channel.close();
 		} catch (error) {
-			console.log("****err", error);
 			logger.error(
 				"Cannot create channel to cron job processing message queue",
 				{

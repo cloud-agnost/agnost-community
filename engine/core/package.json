@@ -11,7 +11,6 @@
    "author": "Ümit Çakmak",
    "license": "ISC",
    "dependencies": {
-      "@aws-sdk/client-s3": "3.325.0",
       "@azure/storage-blob": "12.14.0",
       "@google-cloud/storage": "6.10.0",
       "amqplib": "0.10.3",
