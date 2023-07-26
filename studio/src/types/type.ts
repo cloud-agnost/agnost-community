@@ -142,7 +142,6 @@ export interface Types {
 	}[];
 }
 export interface BaseGetRequest extends BaseRequest {
-	initialFetch: boolean;
 	page: number;
 	size: number;
 	sortBy?: string;

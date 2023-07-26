@@ -5,14 +5,33 @@ import { Button } from 'components/Button';
 import { Pencil } from 'components/icons';
 import { CopyButton } from 'components/CopyButton';
 import { Trash } from '@phosphor-icons/react';
+import { Checkbox } from 'components/Checkbox';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { DateText } from 'components/DateText';
 import { Badge } from 'components/Badge';
-import useModelStore from '@/store/database/modelStore.ts';
-import { TableConfirmation } from 'components/Table';
 
 const FieldColumns: ColumnDefWithClassName<Field>[] = [
+	{
+		id: 'select',
+		className: '!max-w-[40px] !w-[40px]',
+		header: ({ table }) => (
+			<Checkbox
+				checked={table.getIsAllPageRowsSelected()}
+				onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+				aria-label='Select all'
+			/>
+		),
+		cell: ({ row }) => (
+			<Checkbox
+				checked={row.getIsSelected()}
+				onCheckedChange={(value) => row.toggleSelected(!!value)}
+				aria-label='Select row'
+			/>
+		),
+		enableSorting: false,
+		enableHiding: false,
+	},
 	{
 		id: 'name',
 		header: ({ column }) => (

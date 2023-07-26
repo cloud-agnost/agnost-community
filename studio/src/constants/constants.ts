@@ -792,6 +792,17 @@ export const NAME_SCHEMA = z
 		}),
 	);
 
+export const ADD_MODEL_FIELDS_TAB_ITEMS = [
+	{
+		name: 'General Properties',
+		href: '?t=general',
+	},
+	{
+		name: 'Specific Properties',
+		href: '?t=specific',
+	},
+];
+
 export const MODEL_FIELD_DEFAULT_VALUE_TYPES = [
 	{
 		name: 'Constant',
@@ -901,3 +912,7 @@ export const HEADER_USER_DROPDOWN = [
 		beforeHasSeparator: true,
 	},
 ];
+export const TEXT_MAX_LENGTH = 256;
+export const RICH_TEXT_MAX_LENGTH = 1024;
+export const ENCRYPTED_TEXT_MAX_LENGTH = 256;
+export const DECIMAL_DIGITS = 2;
