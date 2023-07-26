@@ -25,6 +25,12 @@ Organization.loader = async function ({ params }: LoaderFunctionArgs) {
 		},
 		{ fireImmediately: true },
 	);
+	useAuthStore.subscribe(
+		(state) => state.user,
+		(user, prevUser) => {
+			if (user && prevUser?._id !== user?._id) getAllOrganizationByUser();
+		},
+	);
 
 	return null;
 };

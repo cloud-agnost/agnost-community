@@ -84,9 +84,7 @@ export default function ModelActions({
 				<div className='flex items-center gap-2 text-sm leading-6'>
 					<span className='text-default'>{t('database.page_title')}</span>
 					<CaretRight className='text-icon-base' weight='bold' size={20} />
-					<Link to={goBackLink} className='!text-subtle hover:underline'>
-						{database?.name}
-					</Link>
+					<span className='text-subtle'>{database?.name}</span>
 				</div>
 			</div>
 			<div className='flex flex-col gap-2 sm:items-center sm:flex-row justify-between'>
