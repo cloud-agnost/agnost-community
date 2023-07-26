@@ -1,5 +1,6 @@
 import { axios } from '@/helpers';
 import {
+	AddNewFieldParams,
 	CreateModelParams,
 	GetModelsOfDatabaseParams,
 	Model,
@@ -40,6 +41,15 @@ export default class ModelService {
 		return (
 			await axios.put(
 				`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}/model/${modelId}`,
+				data,
+			)
+		).data;
+	}
+
+	static async addNewField({ orgId, appId, versionId, dbId, modelId, ...data }: AddNewFieldParams) {
+		return (
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}/model/${modelId}/fields`,
 				data,
 			)
 		).data;

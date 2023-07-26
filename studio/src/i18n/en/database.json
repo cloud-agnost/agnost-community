@@ -49,5 +49,22 @@
 		"create": "Create Model",
 		"edit": "Edit Model",
 		"no_models": "You have not defined any for models for this database"
+	},
+	"fields": {
+		"title": "Fields of {{model}}",
+		"create": "Create Field",
+		"add": "Add Field",
+		"add_field": "Add {{field}} Field",
+		"edit": "Edit Field",
+		"no_fields": "You have not defined any fields for this model",
+		"form": {
+			"name": "Field Name",
+			"unique_desc": "The value of the field is different across model objects.",
+			"indexed_desc": "The value of the field is indexed in database for faster.",
+			"required_desc": "Field value existence checks are applied during object.",
+			"immutable_desc": "The value of the field once set cannot be modified later.",
+			"searchable_desc": "Enable text search of string content.",
+			"default_value": "Default Value"
+		}
 	}
 }

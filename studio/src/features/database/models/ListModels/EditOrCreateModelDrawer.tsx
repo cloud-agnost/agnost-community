@@ -14,7 +14,7 @@ import {
 } from 'components/Form';
 import { Input, Textarea } from 'components/Input';
 import { Button } from 'components/Button';
-import { NAME_SCHEMA } from '@/constants';
+import { NAME_SCHEMA, TIMESTAMPS_SCHEMA } from '@/constants';
 import { useEffect } from 'react';
 import { APIError } from '@/types';
 import { Separator } from 'components/Separator';
@@ -25,41 +25,12 @@ import useModelStore from '@/store/database/modelStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { useParams } from 'react-router-dom';
 
-const fieldSchema = z
-	.string()
-	.min(2, translate('forms.min2.error', { label: translate('general.field') }))
-	.max(64, translate('forms.max64.error', { label: translate('general.field') }))
-	.regex(/^[a-zA-Z0-9_]*$/, {
-		message: translate('forms.alphanumeric', { label: translate('general.field') }),
-	})
-	.or(z.literal(''));
-
 const Schema = z.object({
 	name: NAME_SCHEMA,
 	description: z.string({
 		required_error: translate('forms.required', { label: translate('general.description') }),
 	}),
-	timestamps: z
-		.object({
-			enabled: z.boolean(),
-			createdAt: fieldSchema,
-			updatedAt: fieldSchema,
-		})
-		.superRefine((arg, ctx) => {
-			if (arg.enabled) {
-				Object.entries(arg).forEach(([key, value]) => {
-					if (key !== 'enabled' && typeof value === 'string' && value.length === 0) {
-						ctx.addIssue({
-							code: z.ZodIssueCode.custom,
-							message: translate('forms.required', {
-								label: translate('general.field'),
-							}),
-							path: [key],
-						});
-					}
-				});
-			}
-		}),
+	timestamps: TIMESTAMPS_SCHEMA,
 });
 
 interface EditOrCreateModelDrawerProps {
@@ -104,7 +75,6 @@ export default function EditOrCreateModelDrawer({
 	}, [form.getValues('timestamps.enabled')]);
 
 	function setDefaultsForEdit() {
-		console.log(modelToEdit);
 		if (!modelToEdit || !open) return;
 		form.setValue('name', modelToEdit.name);
 		form.setValue('description', modelToEdit.description);

@@ -703,3 +703,63 @@ export const NAME_SCHEMA = z
 			label: translate('general.name'),
 		}),
 	);
+
+export const ADD_MODEL_FIELDS_TAB_ITEMS = [
+	{
+		name: 'General Properties',
+		href: '?t=general',
+	},
+	{
+		name: 'Specific Properties',
+		href: '?t=specific',
+	},
+];
+
+export const MODEL_FIELD_DEFAULT_VALUE_TYPES = [
+	{
+		name: 'Constant',
+		value: '',
+	},
+	{
+		name: 'JS Function',
+		value: `export default function getDefaultValues(value, allValues) {
+	return value;
+}`,
+	},
+];
+
+export const fieldSchema = z
+	.string()
+	.min(2, translate('forms.min2.error', { label: translate('general.field') }))
+	.max(64, translate('forms.max64.error', { label: translate('general.field') }))
+	.regex(/^[a-zA-Z0-9_]*$/, {
+		message: translate('forms.alphanumeric', { label: translate('general.field') }),
+	})
+	.or(z.literal(''));
+
+export const TIMESTAMPS_SCHEMA = z
+	.object({
+		enabled: z.boolean(),
+		createdAt: fieldSchema,
+		updatedAt: fieldSchema,
+	})
+	.superRefine((arg, ctx) => {
+		if (arg.enabled) {
+			Object.entries(arg).forEach(([key, value]) => {
+				if (key !== 'enabled' && typeof value === 'string' && value.length === 0) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: translate('forms.required', {
+							label: translate('general.field'),
+						}),
+						path: [key],
+					});
+				}
+			});
+		}
+	});
+
+export const TEXT_MAX_LENGTH = 256;
+export const RICH_TEXT_MAX_LENGTH = 1024;
+export const ENCRYPTED_TEXT_MAX_LENGTH = 256;
+export const DECIMAL_DIGITS = 2;
