@@ -302,6 +302,21 @@ export const EDIT_APPLICATION_MENU_ITEMS = [
 	},
 ];
 
+export const TEST_ENDPOINTS_MENU_ITEMS = [
+	{
+		name: translate('endpoint.test.params'),
+		href: '?t=params',
+	},
+	{
+		name: translate('endpoint.test.headers'),
+		href: '?t=headers',
+	},
+	{
+		name: translate('endpoint.test.body'),
+		href: '?t=body',
+	},
+];
+
 export const VERSION_SETTINGS_MENU_ITEMS = [
 	{
 		id: 1,
@@ -649,3 +664,22 @@ export const ENDPOINT_METHOD_TEXT_COLOR: Record<string, string> = {
 	PUT: 'text-elements-yellow',
 	DELETE: 'text-elements-red',
 };
+
+export const ENDPOINT_RESPONSE_TABS = [
+	{
+		id: 'body',
+		name: translate('endpoint.test.body'),
+	},
+	{
+		id: 'cookies',
+		name: translate('endpoint.test.cookies'),
+	},
+	{
+		id: 'headers',
+		name: translate('endpoint.test.headers'),
+	},
+	{
+		id: 'console',
+		name: translate('endpoint.test.console_logs'),
+	},
+];

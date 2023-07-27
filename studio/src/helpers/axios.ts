@@ -1,7 +1,6 @@
-import axios from 'axios';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { APIError } from '@/types';
 import { ERROR_CODES_TO_REDIRECT_LOGIN_PAGE } from '@/constants';
+import useAuthStore from '@/store/auth/authStore.ts';
+import axios from 'axios';
 const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost/api';
 
 export const instance = axios.create({
@@ -24,10 +23,11 @@ instance.interceptors.response.use(
 		return response;
 	},
 	(error) => {
-		const apiError = error.response.data as APIError;
+		const apiError = error.response?.data ?? error;
 		if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
 			// TODO: redirect to login page and clear store
 		}
-		return Promise.reject(apiError);
+		console.log(error);
+		return error;
 	},
 );

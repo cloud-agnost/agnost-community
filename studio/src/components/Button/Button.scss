@@ -7,7 +7,7 @@
 		@apply hover:bg-button-primary-hover text-white bg-button-primary #{!important};
 	}
 	&-secondary {
-		@apply bg-button-secondary hover:bg-button-secondary-hover text-default #{!important};
+		@apply bg-button-secondary hover:bg-button-secondary-hover text-default border-none #{!important};
 		@apply border border-button-border hover:border-button-border-hover #{!important};
 	}
 	&-text {

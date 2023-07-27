@@ -5,6 +5,7 @@ import { cn } from '@/utils';
 
 interface CodeEditorProps extends Omit<EditorProps, 'onMount' | 'defaultLanguage'> {
 	containerClassName?: string;
+	defaultLanguage?: string;
 }
 export default function CodeEditor({
 	containerClassName,
@@ -14,6 +15,7 @@ export default function CodeEditor({
 	onValidate,
 	loading,
 	className,
+	defaultLanguage = 'javascript',
 }: CodeEditorProps) {
 	const editorRef = useRef(null);
 
@@ -36,7 +38,7 @@ export default function CodeEditor({
 				value={value}
 				loading={loading}
 				onMount={handleEditorDidMount}
-				defaultLanguage='javascript'
+				defaultLanguage={defaultLanguage}
 			/>
 		</div>
 	);

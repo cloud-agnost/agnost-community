@@ -1,12 +1,11 @@
+import { PARAM_REGEX } from '@/constants';
 import { socket } from '@/helpers';
 import { useToast as toast } from '@/hooks';
-import { ToastType } from '@/types';
-import { RealtimeData } from '@/types/type';
+import { t } from '@/i18n/config.ts';
+import { RealtimeData, ToastType } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
 import { DateTime } from 'luxon';
 import { twMerge } from 'tailwind-merge';
-import { t } from '@/i18n/config.ts';
-
 type EmptyableArray = readonly [] | [];
 type EmptyableString = '' | string;
 type EmptyableObject<T extends object> = T & Record<keyof T, never>;
@@ -136,3 +135,39 @@ export const reorder = (list: string[], startIndex: number, endIndex: number) =>
 
 	return result;
 };
+
+export function getPathParams(path: string) {
+	const params: string[] = [];
+
+	let match;
+	while ((match = PARAM_REGEX.exec(path)) !== null) {
+		params.push(match[1]);
+	}
+
+	return params;
+}
+
+export function getEndpointPath(path: string, params: Record<string, string>) {
+	const pathParams = getPathParams(path);
+
+	for (const param of pathParams) {
+		path = path.replace(`:${param}`, params[param]);
+	}
+
+	return path;
+}
+
+export function arrayToObj(arr: { key: string; value: string }[]): Record<string, string> {
+	return arr.reduce((acc, curr) => {
+		acc[curr.key] = curr.value;
+		return acc;
+	}, {});
+}
+
+export function objToArray(obj: object | undefined): { key: string; value: string }[] {
+	return Object.entries(obj ?? {}).map(([key, value]) => ({ key, value }));
+}
+
+export function generateId() {
+	return Math.random().toString(36).substring(2, 15);
+}

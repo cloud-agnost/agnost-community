@@ -8,7 +8,7 @@
 	"createdAt": "CREATED AT",
 	"updatedAt": "UPDATED AT",
 	"add": "Create Endpoint",
-	"test": "Test",
+
 	"create": {
 		"title": "Create New Endpoint",
 		"name": "Name",
@@ -37,5 +37,28 @@
 
 	"edit": "Edit {{name}}",
 	"editLogicSuccess": "Endpoint logic updated successfully",
-	"editSuccess": "Endpoint updated successfully"
+	"editSuccess": "Endpoint updated successfully",
+	"test": {
+		"test": "Test",
+		"title": "Test Endpoint",
+		"params": "Params",
+		"headers": "Headers",
+		"body": "Body",
+		"files": "Files",
+		"query_params": "Query Params",
+		"path_variables": "Path Variables",
+		"cookies": "Cookies",
+		"console_logs": "Console Logs",
+		"file_name": "File Name",
+		"file": "File",
+		"send": "Send",
+		"key": "Key",
+		"value": "Value",
+		"add_query_param": "Add Query Param"
+	},
+	"duration": "Duration",
+	"status": "Status",
+	"json": "JSON",
+	"form-data": "Form Data",
+	"bodyType": "Body Type"
 }

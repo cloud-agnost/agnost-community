@@ -1,5 +1,6 @@
 import { BaseGetRequest, BaseRequest } from '@/types';
-import { translate as t } from '@/utils';
+import { getPathParams, translate as t } from '@/utils';
+import { AxiosError, AxiosResponse } from 'axios';
 import * as z from 'zod';
 
 export const NUMBER_REGEX = /^[0-9]+$/;
@@ -85,12 +86,7 @@ export const CreateEndpointSchema = z.object({
 			}),
 		})
 		.superRefine((value, ctx) => {
-			const parameterNames: string[] = [];
-
-			let match;
-			while ((match = PARAM_REGEX.exec(value)) !== null) {
-				parameterNames.push(match[1]);
-			}
+			const parameterNames = getPathParams(value);
 
 			// Validate parameter names
 			for (const paramName of parameterNames) {
@@ -195,3 +191,27 @@ export interface GetEndpointsByIidParams extends EndpointBase {
 	iids: string[];
 }
 export interface GetEndpointsParams extends EndpointBase, BaseGetRequest {}
+
+export interface TestEndpointParams extends BaseRequest {
+	epId: string;
+	path: string;
+	envId: string;
+	params: {
+		queryParams?: Record<string, string>;
+		pathParams?: Record<string, string>;
+	};
+	body?: string;
+	bodyType?: 'json' | 'form-data';
+	headers?: Record<string, string>;
+	method: 'get' | 'post' | 'put' | 'delete';
+	formData?: {
+		key: string;
+		value?: string;
+		file?: File;
+	}[];
+}
+export interface EndpointResponse extends AxiosResponse {
+	epId: string;
+	duration: number;
+	response?: AxiosError['response'];
+}

@@ -25,7 +25,7 @@ export default function EditEndpointDrawer({ open, onClose }: CreateEndpointProp
 		resolver: zodResolver(CreateEndpointSchema),
 		defaultValues: {
 			name: endpoint?.name,
-			timeout: endpoint?.timeout
+			timeout: endpoint?.timeout,
 			method: endpoint?.method,
 			path: endpoint?.path,
 			rateLimits: endpoint?.rateLimits,

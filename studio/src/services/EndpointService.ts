@@ -8,6 +8,7 @@ import {
 	GetEndpointsByIidParams,
 	GetEndpointsParams,
 	SaveEndpointLogicParams,
+	TestEndpointParams,
 	UpdateEndpointParams,
 } from '@/types';
 
@@ -107,5 +108,34 @@ export default class EndpointService {
 				data,
 			)
 		).data;
+	}
+
+	static async testEndpoint({
+		method,
+		envId,
+		path,
+		params,
+		headers,
+		body,
+		formData,
+	}: TestEndpointParams): Promise<any> {
+		if (formData) {
+			const formDataObj = new FormData();
+			formData.forEach((data) => {
+				if (data.file) {
+					formDataObj.append(data.key, data.file);
+				} else {
+					formDataObj.append(data.key, data.value as string);
+				}
+			});
+		}
+		console.log('formData', headers);
+		return await axios[method](path, body, {
+			baseURL: `http://localhost/${envId}/api`,
+			headers,
+			params: {
+				...params.queryParams,
+			},
+		});
 	}
 }

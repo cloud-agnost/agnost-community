@@ -8,11 +8,12 @@ const Tabs = TabsPrimitive.Root;
 interface TabsListProps extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.List> {
 	align?: 'start' | 'center' | 'end';
 	title?: string;
+	containerClassName?: string;
 }
 const TabsList = React.forwardRef<React.ElementRef<typeof TabsPrimitive.List>, TabsListProps>(
-	({ align = 'start', title, className, ...props }, ref) => {
+	({ align = 'start', title, className, containerClassName, ...props }, ref) => {
 		return (
-			<div className={cn('tab-list-container', title ? 'has-title' : align)}>
+			<div className={cn(containerClassName, 'tab-list-container', title ? 'has-title' : align)}>
 				{title && <h2 className='tab-list-title'>{title}</h2>}
 				<TabsPrimitive.List ref={ref} className={cn('tab-list', className)} {...props} />
 			</div>
