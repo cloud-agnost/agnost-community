@@ -4,7 +4,6 @@ import useModelStore from '@/store/database/modelStore.ts';
 
 export default function Models() {
 	const { isOpenEditModelDialog, setIsOpenEditModelDialog } = useModelStore();
-	console.log('girdi');
 	return (
 		<>
 			<ListModels />

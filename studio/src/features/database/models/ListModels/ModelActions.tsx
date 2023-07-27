@@ -11,7 +11,7 @@ import { SearchInput } from 'components/SearchInput';
 import { SelectedRowDropdown } from 'components/Table';
 import { Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 interface ModelActionsProps {
 	setSelectedRows: Dispatch<SetStateAction<Row<Model>[] | undefined>>;

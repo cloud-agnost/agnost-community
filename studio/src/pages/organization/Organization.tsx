@@ -30,6 +30,7 @@ Organization.loader = async function ({ params }: LoaderFunctionArgs) {
 		(user, prevUser) => {
 			if (user && prevUser?._id !== user?._id) getAllOrganizationByUser();
 		},
+		{ fireImmediately: true },
 	);
 
 	return null;
