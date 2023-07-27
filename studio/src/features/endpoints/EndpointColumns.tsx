@@ -11,6 +11,9 @@ import { cn, translate } from '@/utils';
 import { CopyButton } from '@/components/CopyButton';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Link } from 'react-router-dom';
+import useEndpointStore from '@/store/endpoint/endpointStore';
+
+const { openDeleteEndpointDialog } = useEndpointStore.getState();
 const EndpointColumns: ColumnDef<Endpoint>[] = [
 	{
 		id: 'select',
@@ -145,7 +148,7 @@ const EndpointColumns: ColumnDef<Endpoint>[] = [
 					<Link to={`${_id}`}>
 						<Pencil className='w-6 h-6 text-icon-base' />
 					</Link>
-					<Button variant='blank' iconOnly>
+					<Button variant='blank' iconOnly onClick={() => openDeleteEndpointDialog(row.original)}>
 						<Trash size={24} className='text-icon-base' />
 					</Button>
 				</div>

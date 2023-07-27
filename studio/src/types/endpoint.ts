@@ -182,8 +182,11 @@ export interface SaveEndpointLogicParams extends EndpointBase, BaseRequest {
 	logic: string;
 }
 
-export type DeleteEndpointParams = GetEndpointByIdParams;
-export interface DeleteMultipleEndpointsParams extends EndpointBase {
+export interface DeleteEndpointParams extends EndpointBase, BaseRequest {
+	epId: string;
+}
+
+export interface DeleteMultipleEndpointsParams extends EndpointBase, BaseRequest {
 	endpointIds: string[];
 }
 

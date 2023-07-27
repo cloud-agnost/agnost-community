@@ -77,7 +77,7 @@ export default class EndpointService {
 		...data
 	}: DeleteMultipleEndpointsParams): Promise<void> {
 		return (
-			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/ep`, {
+			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/ep/delete-multi`, {
 				data,
 			})
 		).data;
@@ -112,7 +112,6 @@ export default class EndpointService {
 
 	static async testEndpoint({
 		method,
-		envId,
 		path,
 		params,
 		headers,

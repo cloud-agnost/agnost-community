@@ -1,11 +1,14 @@
 import { Button } from '@/components/Button';
 import { SearchInput } from '@/components/SearchInput';
 import { SelectedRowDropdown } from '@/components/Table';
+import useEndpointStore from '@/store/endpoint/endpointStore';
 import { Endpoint } from '@/types';
 import { Plus } from '@phosphor-icons/react';
 import { Row, Table } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useOutletContext } from 'react-router-dom';
+import { useToast } from '@/hooks';
+import { useParams } from 'react-router-dom';
 interface EndpointFilterProps {
 	table: Table<Endpoint>;
 	selectedRows: Row<Endpoint>[];
@@ -13,10 +16,13 @@ interface EndpointFilterProps {
 	setIsCreateModalOpen: (open: boolean) => void;
 }
 export default function EndpointFilter() {
+	const { notify } = useToast();
 	const { t } = useTranslation();
+	const { deleteMultipleEndpoints } = useEndpointStore();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { table, selectedRows, setPage, setIsCreateModalOpen } =
 		useOutletContext() as EndpointFilterProps;
+	const { versionId, orgId, appId } = useParams();
 
 	function onInput(value: string) {
 		value = value.trim();
@@ -27,6 +33,22 @@ export default function EndpointFilter() {
 		}
 		setPage(0);
 		setSearchParams({ ...searchParams, q: value });
+	}
+
+	function deleteMultipleEndpointsHandler() {
+		deleteMultipleEndpoints({
+			endpointIds: selectedRows.map((row) => row.original._id),
+			orgId: orgId as string,
+			appId: appId as string,
+			versionId: versionId as string,
+			onSuccess: () => {
+				table.toggleAllRowsSelected(false);
+				setPage(0);
+			},
+			onError: ({ error, details }) => {
+				notify({ type: 'error', description: details, title: error });
+			},
+		});
 	}
 	return (
 		<div className='flex items-center justify-between'>
@@ -40,9 +62,7 @@ export default function EndpointFilter() {
 				<SelectedRowDropdown
 					selectedRowLength={selectedRows.length}
 					table={table as Table<any>}
-					onDelete={() => {
-						console.log('delete');
-					}}
+					onDelete={deleteMultipleEndpointsHandler}
 				/>
 				<Button variant='primary' onClick={() => setIsCreateModalOpen(true)}>
 					<Plus size={16} />
