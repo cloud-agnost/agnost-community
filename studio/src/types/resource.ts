@@ -171,9 +171,9 @@ export interface AddExistingResourceRequest extends BaseRequest {
 		port: string;
 		username: string;
 		password: string;
-		options: {
-			key: string;
-			value: string;
+		options?: {
+			key?: string;
+			value?: string;
 		}[];
 	};
 }

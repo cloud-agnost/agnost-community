@@ -66,7 +66,12 @@ export default function ModelActions({ selectedRows, setSearch }: ModelActionsPr
 						className='flex-1 lg:w-[450px]'
 					/>
 					{!!selectedRows?.length && (
-						<SelectedRowDropdown onDelete={() => {}} selectedRowLength={selectedRows?.length} />
+						<SelectedRowDropdown
+							onDelete={() => {
+								// TODO
+							}}
+							selectedRowLength={selectedRows?.length}
+						/>
 					)}
 					<CreateFieldButton />
 				</div>

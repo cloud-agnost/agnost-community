@@ -310,7 +310,6 @@ const router = createBrowserRouter([
 	},
 ]);
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function RequireAuth({ children }: { children: JSX.Element }): JSX.Element {
 	const { isAuthenticated } = useAuthStore();
 	const location = useLocation();
@@ -321,7 +320,7 @@ export function RequireAuth({ children }: { children: JSX.Element }): JSX.Elemen
 
 	return children;
 }
-// eslint-disable-next-line react-refresh/only-export-components
+
 export function GuestOnly({ children }: { children: ReactNode }): JSX.Element {
 	const { isAuthenticated } = useAuthStore();
 	const { isCompleted } = useClusterStore();

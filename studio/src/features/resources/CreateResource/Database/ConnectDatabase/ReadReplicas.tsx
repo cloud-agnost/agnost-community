@@ -13,7 +13,7 @@ import { Pencil } from '@/components/icons';
 import { AccessDbSchema, ConnectDatabaseSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash } from '@phosphor-icons/react';
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
@@ -23,8 +23,7 @@ import DatabaseInfo from './DatabaseInfo';
 export default function ReadReplicas() {
 	const { t } = useTranslation();
 	const [openModal, setOpenModal] = useState(false);
-	const { setValue, getValues, reset, handleSubmit } =
-		useFormContext<z.infer<typeof ConnectDatabaseSchema>>();
+	const { setValue, getValues, reset } = useFormContext<z.infer<typeof ConnectDatabaseSchema>>();
 	const readReplicas = getValues('accessReadOnly') ?? [];
 	const replicasForm = useForm<z.infer<typeof AccessDbSchema>>({
 		resolver: zodResolver(AccessDbSchema),

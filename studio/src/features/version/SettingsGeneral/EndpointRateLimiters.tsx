@@ -104,7 +104,6 @@ export default function EndpointRateLimiters() {
 			selectedLimits={defaultRateLimiters}
 			onDeleteItem={(limitId: string) => deleteHandler(limitId)}
 			loading={deleting}
-			type='endpoint'
 			hasToAddAsDefault='endpoint'
 		/>
 	);

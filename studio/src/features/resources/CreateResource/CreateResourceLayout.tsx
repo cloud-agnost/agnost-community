@@ -75,7 +75,7 @@ export default function CreateResourceLayout({
 						<Controller
 							control={control}
 							name='allowedRoles'
-							render={({ field: { onChange, value }, formState: { errors } }) => (
+							render={({ field: { onChange, value } }) => (
 								<FormItem className='flex items-center space-x-6 space-y-0'>
 									{appRoles.map((role) => (
 										<FormField

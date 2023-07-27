@@ -1,6 +1,3 @@
-/* eslint-disable react/no-unknown-property */
-'use client';
-
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import { DialogProps } from '@radix-ui/react-dialog';
 import { Command as CommandPrimitive } from 'cmdk';
