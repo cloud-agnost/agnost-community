@@ -5,12 +5,15 @@ import {
 	DeleteEndpointParams,
 	DeleteMultipleEndpointsParams,
 	Endpoint,
+	EndpointResponse,
 	GetEndpointByIdParams,
 	GetEndpointsByIidParams,
 	GetEndpointsParams,
 	SaveEndpointLogicParams,
+	TestEndpointParams,
 	UpdateEndpointParams,
 } from '@/types';
+import { AxiosResponse } from 'axios';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -20,6 +23,8 @@ interface EndpointStore {
 	endpoint: Endpoint | null;
 	selectedEndpointIds: string[];
 	lastFetchedCount: number;
+	endpointRequest: TestEndpointParams[];
+	endpointResponse: EndpointResponse[];
 	setSelectEndpointDialogOpen: (open: boolean) => void;
 	setSelectedEndpointIds: (ids: string[]) => void;
 	setEndpoints: (endpoints: Endpoint[]) => void;
@@ -31,19 +36,22 @@ interface EndpointStore {
 	updateEndpoint: (endpoint: UpdateEndpointParams) => Promise<Endpoint>;
 	saveEndpointLogic: (endpoint: SaveEndpointLogicParams) => Promise<Endpoint>;
 	getEndpointsByIid: (endpoint: GetEndpointsByIidParams) => Promise<Endpoint[]>;
+	testEndpoint: (endpoint: TestEndpointParams) => Promise<AxiosResponse>;
 }
 
 const useEndpointStore = create<EndpointStore>()(
 	devtools(
 		persist(
-			(set) => ({
+			(set, get) => ({
 				selectEndpointDialogOpen: false,
 				endpoints: [],
 				endpoint: null,
 				selectedEndpointIds: [],
+				endpointRequest: [],
+				endpointResponse: [],
+				lastFetchedCount: 0,
 				setSelectedEndpointIds: (ids) => set({ selectedEndpointIds: ids }),
 				setSelectEndpointDialogOpen: (open) => set({ selectEndpointDialogOpen: open }),
-				lastFetchedCount: 0,
 				setEndpoints: (endpoints) => set({ endpoints }),
 				createEndpoint: async (params) => {
 					try {
@@ -118,6 +126,73 @@ const useEndpointStore = create<EndpointStore>()(
 				},
 				getEndpointsByIid: async (params) => {
 					return EndpointService.getEndpointsByIid(params);
+				},
+				testEndpoint: async (params) => {
+					const startTime = performance.now();
+					console.log('store');
+					const response = await EndpointService.testEndpoint(params);
+					const prevRequest = get().endpointRequest;
+					const prevResponse = get().endpointResponse;
+
+					if (prevRequest.some((r) => r.epId === params.epId)) {
+						set({
+							endpointRequest: prevRequest.map((r) => {
+								if (r.epId === params.epId) {
+									return params;
+								}
+								return r;
+							}),
+						});
+					} else {
+						set({
+							endpointRequest: [
+								...prevRequest,
+								{
+									...params,
+								},
+							],
+						});
+					}
+					const endTime = performance.now();
+					if (prevResponse.some((r) => r.epId === params.epId)) {
+						set((prev) => ({
+							endpointResponse: prev.endpointResponse.map((r) => {
+								if (r.epId === params.epId) {
+									console.log(response?.response?.status ?? response?.status, 'r2esponse');
+									return {
+										...r,
+										epId: params.epId,
+										duration: endTime - startTime,
+										status: response?.response?.status ?? response?.status,
+										statusText: response?.response?.statusText ?? response?.statusText,
+										data: response?.response?.data ?? response?.data,
+										headers: response?.response?.headers ?? response?.headers,
+										config: response?.response?.config ?? response?.config,
+									};
+								}
+
+								return r;
+							}),
+						}));
+					} else {
+						set((prev) => ({
+							endpointResponse: [
+								...prev.endpointResponse,
+								{
+									...response,
+									epId: params.epId,
+									duration: endTime - startTime,
+									status: response?.response?.status ?? response?.status,
+									statusText: response?.response?.statusText ?? response?.statusText,
+									data: response?.response?.data ?? response?.data,
+									headers: response?.response?.headers ?? response?.headers,
+									config: response?.response?.config ?? response?.config,
+								},
+							],
+						}));
+					}
+					if (params.onSuccess) params.onSuccess();
+					return response;
 				},
 			}),
 			{

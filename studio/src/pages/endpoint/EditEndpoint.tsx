@@ -9,8 +9,16 @@ import { Endpoint } from '@/types';
 import { FloppyDisk, TestTube } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LoaderFunctionArgs, useLoaderData, useOutletContext, useParams } from 'react-router-dom';
+import {
+	LoaderFunctionArgs,
+	useLoaderData,
+	useOutletContext,
+	useParams,
+	useSearchParams,
+} from 'react-router-dom';
 import { useToast } from '@/hooks';
+import TestEndpoint from '@/features/endpoints/TestEndpoint';
+
 EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { endpointId, orgId, versionId, appId } = params;
 	if (!endpointId) return null;
@@ -29,7 +37,9 @@ export default function EditEndpoint() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
 	const { endpoint } = useLoaderData() as { endpoint: Endpoint };
+	const [searchParams, setSearchParams] = useSearchParams();
 	const [endpointLogic, setEndpointLogic] = useState<string | undefined>('');
+	const [isTestEndpointOpen, setIsTestEndpointOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const { saveEndpointLogic } = useEndpointStore();
 	const { versionId, appId, orgId } = useParams<{
@@ -83,12 +93,24 @@ export default function EditEndpoint() {
 					<Input className='rounded-none rounded-r max-w-5xl' value={endpoint.path} disabled />
 				</div>
 				<div className='space-x-4'>
-					<Button variant='secondary' iconOnly onClick={() => setIsEditEndpointOpen(true)}>
+					<Button
+						variant='secondary'
+						iconOnly
+						onClick={() => {
+							setIsEditEndpointOpen(true);
+						}}
+					>
 						<Pencil className='text-icon-base w-5 h-5' />
 					</Button>
-					<Button variant='secondary'>
+					<Button
+						variant='secondary'
+						onClick={() => {
+							setIsTestEndpointOpen(true);
+							setSearchParams({ t: 'params' });
+						}}
+					>
 						<TestTube size={20} className='text-icon-base mr-2' />
-						{t('endpoint.test')}
+						{t('endpoint.test.test')}
 					</Button>
 					<Button variant='primary' onClick={saveLogic} loading={loading}>
 						<FloppyDisk size={20} className='text-icon-secondary mr-2' />
@@ -98,6 +120,14 @@ export default function EditEndpoint() {
 			</div>
 
 			<CodeEditor containerClassName='h-[95%]' value={endpoint.logic} onChange={setEndpointLogic} />
+			<TestEndpoint
+				open={isTestEndpointOpen}
+				onClose={() => {
+					setIsTestEndpointOpen(false);
+					searchParams.delete('t');
+					setSearchParams(searchParams);
+				}}
+			/>
 		</div>
 	);
 }
