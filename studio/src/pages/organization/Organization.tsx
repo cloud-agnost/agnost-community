@@ -30,11 +30,18 @@ Organization.loader = async function ({ params }: LoaderFunctionArgs) {
 		{ fireImmediately: true },
 	);
 
-	useAuthStore.subscribe(
-		(state) => state.user,
-		(user, prevUser) => {
-			if (user && prevUser?._id !== user?._id) getAllOrganizationByUser();
+	if (isAuthenticated()) getAllOrganizationByUser();
+
+	useOrganizationStore.subscribe(
+		(state) => state.organization,
+		(organization) => {
+			if (organization) {
+				getAppsByOrgId(organization._id);
+			} else if (orgId) {
+				getAppsByOrgId(orgId);
+			}
 		},
+		{ fireImmediately: true },
 	);
 
 	return null;
