@@ -10,6 +10,7 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { DateText } from 'components/DateText';
 import useModelStore from '@/store/database/modelStore.ts';
+import { TableConfirmation } from 'components/Table';
 
 const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	{
@@ -109,14 +110,20 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { setModelToEdit, setIsOpenEditModelDialog } = useModelStore.getState();
+			const { setModelToEdit, setIsOpenEditModelDialog, deleteModel } = useModelStore.getState();
 			function openEditDrawer() {
 				setModelToEdit(original);
 				setIsOpenEditModelDialog(true);
 			}
 
-			function deleteHandler() {
-				console.log('');
+			async function deleteHandler() {
+				await deleteModel({
+					orgId: original.orgId,
+					modelId: original._id,
+					appId: original.appId,
+					dbId: original.dbId,
+					versionId: original.versionId,
+				});
 			}
 
 			return (
@@ -139,15 +146,24 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 					>
 						<Pencil />
 					</Button>
-					<Button
-						onClick={deleteHandler}
-						variant='blank'
-						rounded
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-						iconOnly
+					<TableConfirmation
+						align='end'
+						closeOnConfirm
+						showAvatar={false}
+						title={translate('database.models.delete.title')}
+						description={translate('database.models.delete.description')}
+						onConfirm={deleteHandler}
+						contentClassName='m-0'
 					>
-						<Trash size={20} />
-					</Button>
+						<Button
+							variant='blank'
+							rounded
+							className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
+							iconOnly
+						>
+							<Trash size={20} />
+						</Button>
+					</TableConfirmation>
 					<Button
 						iconOnly
 						variant='blank'

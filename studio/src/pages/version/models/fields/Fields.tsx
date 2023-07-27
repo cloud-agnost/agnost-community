@@ -7,6 +7,7 @@ export default function Fields() {
 		<>
 			<ListFields />
 			<EditOrCreateFieldDrawer
+				key={isOpenEditFieldDialog.toString()}
 				open={isOpenEditFieldDialog}
 				onOpenChange={setIsOpenEditFieldDialog}
 				editMode

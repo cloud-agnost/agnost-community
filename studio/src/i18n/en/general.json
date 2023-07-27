@@ -80,5 +80,9 @@
 	"required": "Required",
 	"read-only": "Read-Only",
 	"immutable": "Read-Only",
-	"searchable": "Searchable"
+	"searchable": "Searchable",
+	"max_length": "Max Length",
+	"decimal_digits": "Decimal Digits",
+	"account_settings": "Account Settings",
+	"logout": "Log Out"
 }

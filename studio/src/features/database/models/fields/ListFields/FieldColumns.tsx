@@ -5,33 +5,14 @@ import { Button } from 'components/Button';
 import { Pencil } from 'components/icons';
 import { CopyButton } from 'components/CopyButton';
 import { Trash } from '@phosphor-icons/react';
-import { Checkbox } from 'components/Checkbox';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { DateText } from 'components/DateText';
 import { Badge } from 'components/Badge';
+import useModelStore from '@/store/database/modelStore.ts';
+import { TableConfirmation } from 'components/Table';
 
 const FieldColumns: ColumnDefWithClassName<Field>[] = [
-	{
-		id: 'select',
-		className: '!max-w-[40px] !w-[40px]',
-		header: ({ table }) => (
-			<Checkbox
-				checked={table.getIsAllPageRowsSelected()}
-				onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-				aria-label='Select all'
-			/>
-		),
-		cell: ({ row }) => (
-			<Checkbox
-				checked={row.getIsSelected()}
-				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label='Select row'
-			/>
-		),
-		enableSorting: false,
-		enableHiding: false,
-	},
 	{
 		id: 'name',
 		header: ({ column }) => (
@@ -185,14 +166,32 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'actions',
 		className: 'actions !w-[50px]',
-		cell: () => {
+		cell: ({ row: { original } }) => {
+			const { setFieldToEdit, setIsOpenEditFieldDialog, deleteField, models } =
+				useModelStore.getState();
+
 			function openEditDrawer() {
-				// TODO
+				setFieldToEdit(original);
+				setIsOpenEditFieldDialog(true);
 			}
 
-			function deleteHandler() {
-				// TODO
+			async function deleteHandler() {
+				const model = models.find((model) =>
+					model.fields.find((field) => field._id === original._id),
+				);
+				if (!model) return;
+
+				await deleteField({
+					dbId: model.dbId,
+					appId: model.appId,
+					orgId: model.orgId,
+					modelId: model._id,
+					fieldId: original._id,
+					versionId: model.versionId,
+				});
 			}
+
+			if (original.creator === 'system') return null;
 
 			return (
 				<div className='flex items-center justify-end'>
@@ -205,15 +204,24 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 					>
 						<Pencil />
 					</Button>
-					<Button
-						onClick={deleteHandler}
-						variant='blank'
-						rounded
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-						iconOnly
+					<TableConfirmation
+						align='end'
+						closeOnConfirm
+						showAvatar={false}
+						title={translate('database.fields.delete.title')}
+						description={translate('database.fields.delete.description')}
+						onConfirm={deleteHandler}
+						contentClassName='m-0'
 					>
-						<Trash size={20} />
-					</Button>
+						<Button
+							variant='blank'
+							rounded
+							className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
+							iconOnly
+						>
+							<Trash size={20} />
+						</Button>
+					</TableConfirmation>
 				</div>
 			);
 		},

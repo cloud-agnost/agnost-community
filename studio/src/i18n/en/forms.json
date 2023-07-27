@@ -17,6 +17,10 @@
 		"error": "{{label}} must be at most 64 characters long",
 		"description": "Maximum 64 characters"
 	},
+	"maxLength": {
+		"error": "Max length must be greater than or equal to 1 and less than or equal to {{length}}",
+		"description": "Maximum {{length}} characters"
+	},
 	"verificationCode": {
 		"length": {
 			"error": "Verification code must be 6 digits long"
@@ -34,6 +38,7 @@
 		"error": "Please enter a valid IP address"
 	},
 	"enterAtLeastOne": "Please enter at least one {{label}}",
+	"enterAtLeastOneValue": "Please enter at least one value",
 	"placeholder": "Enter {{label}}",
 	"alphanumeric": "{{label}} must only contain alphanumeric characters",
 	"number": "{{label}} must be a number",

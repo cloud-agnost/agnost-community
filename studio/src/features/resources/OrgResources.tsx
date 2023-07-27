@@ -1,6 +1,6 @@
 import { Button } from '@/components/Button';
 import { SearchInput } from '@/components/SearchInput';
-import { CreateResource, ResourceTable } from '@/features/resources';
+import { ResourceTable } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
 import useResourcesStore from '@/store/resources/resourceStore';
 import { Plus } from '@phosphor-icons/react';

@@ -1,7 +1,7 @@
 import { Plus } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 import { useTranslation } from 'react-i18next';
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -9,6 +9,8 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenuItem,
 	DropdownMenuItemContainer,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
 } from 'components/Dropdown';
 import useTypeStore from '@/store/types/typeStore.ts';
 import { toDisplayName } from '@/utils';
@@ -16,6 +18,8 @@ import { DatabaseType, FieldType } from '@/types';
 import { EditOrCreateFieldDrawer } from '@/features/database/models/fields/ListFields';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import { useParams } from 'react-router-dom';
+import groupBy from 'utils/utils.ts';
+import { FIELD_ICON_MAP } from '@/constants';
 
 export default function CreateFieldButton() {
 	const { t } = useTranslation();
@@ -30,9 +34,8 @@ export default function CreateFieldButton() {
 	}, [databases, dbId]);
 
 	const types = useMemo(() => {
-		return fieldTypes.filter(
-			(item) => !['createdat', 'updatedat'].includes(item.name) && item[databaseType],
-		);
+		const types = fieldTypes.filter((item) => item.group !== 'none' /* && item[databaseType] */);
+		return groupBy(types, (item) => item.group);
 	}, [databaseType, fieldTypes]);
 
 	function onSelectedType(type: FieldType) {
@@ -50,18 +53,35 @@ export default function CreateFieldButton() {
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align='end' className='w-[330px] max-h-[650px] overflow-y-auto'>
-					<DropdownMenuItemContainer className='divide-y [&>*:not(:first-child)]:pt-3 [&>*:not(:last-child)]:pb-3'>
-						<DropdownMenuGroup className='grid grid-cols-2 gap-0.5'>
-							{types.map((item, index) => (
-								<DropdownMenuItem onClick={() => onSelectedType(item)} key={index}>
-									{toDisplayName(item.name)}
-								</DropdownMenuItem>
-							))}
-						</DropdownMenuGroup>
+					<DropdownMenuItemContainer>
+						{Object.entries(types).map(([key, types], index) => (
+							<Fragment key={index}>
+								{index !== 0 && <DropdownMenuSeparator />}
+								<DropdownMenuGroup className='grid grid-cols-2 gap-y-1 gap-1'>
+									<DropdownMenuLabel className='py-[6px] col-span-2 text-subtle leading-6 text-sm font-medium'>
+										{toDisplayName(key)}
+									</DropdownMenuLabel>
+									{types.map((item, index) => {
+										const Icon = FIELD_ICON_MAP[item.name];
+										return (
+											<DropdownMenuItem
+												className='gap-2'
+												onClick={() => onSelectedType(item)}
+												key={index}
+											>
+												<Icon className='text-icon-base text-xl' />
+												{toDisplayName(item.name)}
+											</DropdownMenuItem>
+										);
+									})}
+								</DropdownMenuGroup>
+							</Fragment>
+						))}
 					</DropdownMenuItemContainer>
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<EditOrCreateFieldDrawer
+				key={open.toString()}
 				type={selectedType}
 				open={open}
 				onOpenChange={() => setOpen(false)}

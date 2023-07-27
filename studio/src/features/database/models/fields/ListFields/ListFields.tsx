@@ -58,7 +58,7 @@ export default function ListFields() {
 				) : (
 					<DataTable<Field>
 						columns={FieldColumns}
-						data={filteredFields}
+						data={filteredFields.sort((a, b) => b.order - a.order)}
 						noDataMessage={<p className='text-xl'>{t('database.fields.no_fields')}</p>}
 						setSelectedRows={setSelectedRows}
 					/>
