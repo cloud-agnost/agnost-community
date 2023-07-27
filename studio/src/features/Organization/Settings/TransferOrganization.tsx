@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { AutoComplete } from '@/components/AutoComplete';
 import { Button } from '@/components/Button';

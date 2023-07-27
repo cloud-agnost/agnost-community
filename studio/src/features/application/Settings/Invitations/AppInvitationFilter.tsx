@@ -17,7 +17,6 @@ import { SelectedRowDropdown } from 'components/Table';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-
 interface Props {
 	selectedRows: Row<Invitation>[] | undefined;
 }

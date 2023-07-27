@@ -10,5 +10,7 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		'org.app': Application,
 	};
 	// TODO: can you fix this?
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	return new keys[type]();
 }

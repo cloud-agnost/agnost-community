@@ -49,6 +49,7 @@ export default function AppMembers() {
 						<SelectedRowDropdown
 							onDelete={removeMultipleMembers}
 							selectedRowLength={selectedRows?.length}
+							table={table as Table<ApplicationMember>}
 						/>
 					)}
 					<RoleDropdown

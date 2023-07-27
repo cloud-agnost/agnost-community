@@ -1,21 +1,17 @@
 import { Button } from '@/components/Button';
-import { CodeEditor } from '@/components/CodeEditor';
 import { Input } from '@/components/Input';
 import { TableCell, TableRow } from '@/components/Table';
-import { Tabs, TabsList, TabsTrigger } from '@/components/Tabs';
-import { ENDPOINT_RESPONSE_TABS } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore';
-import { cn, getPathParams, objToArray } from '@/utils';
+import { getPathParams } from '@/utils';
 import { Plus, Trash } from '@phosphor-icons/react';
-import { TabsContent } from '@radix-ui/react-tabs';
 import { FormControl, FormField, FormItem, FormMessage } from 'components/Form';
 import { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { TestEndpointSchema } from '../TestEndpoint';
-import TestEndpointTable from './TestEndpointTable';
 import EndpointResponse from './EndpointResponse';
+import TestEndpointTable from './TestEndpointTable';
 export default function TestEndpointParams() {
 	const { t } = useTranslation();
 	const {

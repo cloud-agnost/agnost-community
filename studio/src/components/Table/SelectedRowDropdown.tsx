@@ -7,6 +7,7 @@ import { Warning } from '../icons';
 interface Props {
 	onDelete: () => void;
 	selectedRowLength: number;
+	table?: Table<any>;
 }
 function SelectedRowDropdown({ onDelete, selectedRowLength }: Props) {
 	const { t } = useTranslation();
@@ -15,14 +16,16 @@ function SelectedRowDropdown({ onDelete, selectedRowLength }: Props) {
 		<>
 			<div className='flex items-center  border border-border rounded-md bg-lighter'>
 				<div className='flex items-center gap-2 border-r border-button-border p-1.5'>
-					<Button
-						size='sm'
-						variant='primary'
-						className=' bg-button-primary h-1/2 px-1'
-						onClick={() => table?.resetRowSelection()}
-					>
-						<Minus size={16} weight='bold' className='text-icon-secondary' />
-					</Button>
+					{table && (
+						<Button
+							size='sm'
+							variant='primary'
+							className=' bg-button-primary h-1/2 px-1'
+							onClick={() => table?.resetRowSelection()}
+						>
+							<Minus size={16} weight='bold' className='text-icon-secondary' />
+						</Button>
+					)}
 
 					<span className='font-sfCompact text-sm text-elements-blue'>
 						{t('general.selected', {

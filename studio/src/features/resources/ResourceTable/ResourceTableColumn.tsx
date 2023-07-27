@@ -72,7 +72,7 @@ export const ResourceTableColumn: ColumnDef<Resource>[] = [
 		id: 'actions',
 		header: translate('resources.table.actions'),
 		size: 45,
-		cell: ({ row }) => {
+		cell: () => {
 			return (
 				<div className='flex items-center '>
 					<Button variant='blank' iconOnly>

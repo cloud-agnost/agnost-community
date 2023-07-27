@@ -1,15 +1,14 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
+import { useToast } from '@/hooks';
+import useEndpointStore from '@/store/endpoint/endpointStore';
 import { CreateEndpointSchema } from '@/types';
 import { translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import EndpointForm from './EndpointForm';
-import useOrganizationStore from '@/store/organization/organizationStore';
-import useEndpointStore from '@/store/endpoint/endpointStore';
-import { useParams } from 'react-router-dom';
-import { useToast } from '@/hooks';
 interface CreateEndpointProps {
 	open: boolean;
 	onClose: () => void;
