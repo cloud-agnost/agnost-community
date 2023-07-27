@@ -34,6 +34,7 @@
 	"delete_all": "Delete All",
 	"actions": "Actions",
 	"selected": "{{count}} selected",
+	"select": "Select",
 	"search": "Search",
 	"invitation": {
 		"success": "Invitation sent successfully",
@@ -69,5 +70,7 @@
 	"no_results": "No results",
 	"key": "Key",
 	"value": "Value",
-	"step":  "Step {{currentStep}} of {{totalSteps}}"
+	"step": "Step {{currentStep}} of {{totalSteps}}",
+	"multiDelete": "Are you sure you want to delete the selected items?",
+	"deleteDescription": "This action cannot be undone."
 }

@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { ColumnDef } from '@tanstack/react-table';
+import { z } from 'zod';
 
 export const UserSchema = z.object({
 	iid: z.string(),
@@ -160,6 +160,7 @@ export interface BaseGetRequest extends BaseRequest {
 	start?: string;
 	end?: string;
 	search?: string;
+	initialFetch?: boolean;
 }
 
 export interface SortOption {

@@ -1,0 +1,70 @@
+{
+	"title": "Endpoints",
+	"name": "NAME / ID",
+	"method": "METHOD",
+	"path": "PATH",
+	"apiKey": "API KEY",
+	"session": "SESSION",
+	"createdAt": "CREATED AT",
+	"updatedAt": "UPDATED AT",
+	"add": "Create Endpoint",
+
+	"create": {
+		"title": "Create New Endpoint",
+		"name": "Name",
+		"timeout": "Timeout",
+		"methodAndPath": "Method & Path",
+		"method": "Method",
+		"path": "Path",
+		"apiKey": {
+			"title": "API key required",
+			"label": "Require a valid API key to call this endpoint"
+		},
+		"session": {
+			"title": "Session required",
+			"label": "Require a valid session token in \"Session\" header of the request"
+		},
+		"logExecution": {
+			"title": "Log execution",
+			"label": "Log endpoint request, response, status and execution duration"
+		}
+	},
+	"errors": {
+		"notValidRoute": "Not a valid endpoint route",
+		"invalidParams": "Invalid route parameter name {{param}}",
+		"duplicateParam": "Duplicate parameter names in route"
+	},
+
+	"edit": "Edit {{name}}",
+	"editLogicSuccess": "Endpoint logic updated successfully",
+	"editSuccess": "Endpoint updated successfully",
+	"test": {
+		"test": "Test",
+		"title": "Test Endpoint",
+		"params": "Params",
+		"headers": "Headers",
+		"body": "Body",
+		"files": "Files",
+		"query_params": "Query Params",
+		"path_variables": "Path Variables",
+		"cookies": "Cookies",
+		"console_logs": "Console Logs",
+		"file_name": "File Name",
+		"file": "File",
+		"send": "Send",
+		"key": "Key",
+		"value": "Value",
+		"add_query_param": "Add Query Param"
+	},
+	"duration": "Duration",
+	"status": "Status",
+	"json": "JSON",
+	"form-data": "Form Data",
+	"bodyType": "Body Type",
+	"delete": {
+		"title": "Delete Endpoint",
+		"message": "Are you sure you want to delete endpoint ?",
+		"description": "This action is not reversible — please continue with caution.",
+		"confirmCode": "Confirm endpoint delete by typing {{confirmCode}} below."
+	}
+}

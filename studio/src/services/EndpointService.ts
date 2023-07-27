@@ -1,3 +1,4 @@
+import { axios, http } from '@/helpers';
 import {
 	CreateEndpointParams,
 	DeleteEndpointParams,
@@ -7,9 +8,9 @@ import {
 	GetEndpointsByIidParams,
 	GetEndpointsParams,
 	SaveEndpointLogicParams,
+	TestEndpointParams,
 	UpdateEndpointParams,
 } from '@/types';
-import { axios } from '@/helpers';
 
 export default class EndpointService {
 	static url = '/v1/org';
@@ -34,15 +35,15 @@ export default class EndpointService {
 			.data;
 	}
 
-	static async getEndpoints({
-		orgId,
-		appId,
-		versionId,
-		...params
-	}: GetEndpointsParams): Promise<Endpoint[]> {
+	static async getEndpoints(params: GetEndpointsParams): Promise<Endpoint[]> {
+		const { orgId, appId, versionId, search, size, page } = params;
 		return (
 			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/ep`, {
-				params,
+				params: {
+					search,
+					size,
+					page,
+				},
 			})
 		).data;
 	}
@@ -76,7 +77,7 @@ export default class EndpointService {
 		...data
 	}: DeleteMultipleEndpointsParams): Promise<void> {
 		return (
-			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/ep`, {
+			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/ep/delete-multi`, {
 				data,
 			})
 		).data;
@@ -107,5 +108,31 @@ export default class EndpointService {
 				data,
 			)
 		).data;
+	}
+
+	static async testEndpoint({
+		method,
+		path,
+		params,
+		headers,
+		body,
+		formData,
+	}: TestEndpointParams): Promise<any> {
+		if (formData) {
+			const formDataObj = new FormData();
+			formData.forEach((data) => {
+				if (data.file) {
+					formDataObj.append(data.key, data.file);
+				} else {
+					formDataObj.append(data.key, data.value as string);
+				}
+			});
+		}
+		return await http[method](path, body, {
+			headers,
+			params: {
+				...params.queryParams,
+			},
+		});
 	}
 }

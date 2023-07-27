@@ -19,10 +19,6 @@ import { translate } from '@/utils';
 import { useTranslation } from 'react-i18next';
 import { RequireAuth } from '@/router';
 
-async function loader() {
-	return null;
-}
-
 const FormSchema = z.object({
 	orgName: z
 		.string({
@@ -102,5 +98,3 @@ export default function CreateOrganization() {
 		</RequireAuth>
 	);
 }
-
-CreateOrganization.loader = loader;

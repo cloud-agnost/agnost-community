@@ -1,11 +1,19 @@
-import axios from 'axios';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { APIError } from '@/types';
 import { ERROR_CODES_TO_REDIRECT_LOGIN_PAGE } from '@/constants';
+import useAuthStore from '@/store/auth/authStore.ts';
+import useEnvironmentStore from '@/store/environment/environmentStore';
+import { APIError } from '@/types';
+import axios from 'axios';
 const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost/api';
 
 export const instance = axios.create({
 	baseURL,
+	headers: {
+		'Content-Type': 'application/json',
+	},
+});
+
+export const testEndpointInstance = axios.create({
+	baseURL: `http://localhost/${useEnvironmentStore.getState().environment?.iid}/api`,
 	headers: {
 		'Content-Type': 'application/json',
 	},
@@ -29,5 +37,14 @@ instance.interceptors.response.use(
 			// TODO: redirect to login page and clear store
 		}
 		return Promise.reject(apiError);
+	},
+);
+
+testEndpointInstance.interceptors.response.use(
+	(response) => {
+		return response;
+	},
+	(error) => {
+		return error;
 	},
 );

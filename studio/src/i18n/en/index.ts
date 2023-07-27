@@ -8,6 +8,7 @@ import version from './version.json';
 import onboarding from './onboarding.json';
 import resources from './resources.json';
 import database from './database.json';
+import endpoint from './endpoint.json';
 export {
 	forms,
 	database,
@@ -19,4 +20,5 @@ export {
 	version,
 	onboarding,
 	resources,
+	endpoint,
 };

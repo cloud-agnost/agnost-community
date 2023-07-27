@@ -131,7 +131,7 @@ export default function EditMiddlewareDrawer() {
 							render={({ field }) => (
 								<FormItem className='flex-1 flex flex-col'>
 									<FormLabel>{t('version.handler_code')}</FormLabel>
-									<FormControl className='flex-1 özgem'>
+									<FormControl className='flex-1'>
 										<CodeEditor containerClassName='flex-1' {...field} />
 									</FormControl>
 									<FormMessage />

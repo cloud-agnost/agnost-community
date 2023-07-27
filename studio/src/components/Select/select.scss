@@ -1,17 +1,16 @@
 .select {
 	@apply flex h-9 items-center justify-between text-default;
-	@apply rounded-md border border-border bg-transparent;
+	@apply rounded-md border border-input-border bg-transparent;
 	@apply px-3 py-2 text-sm ring-offset-button-primary;
 	@apply placeholder:text-subtle focus:outline-none;
 	@apply focus:border-button-primary;
 	@apply truncate max-w-[calc(100%)];
-	@apply disabled:cursor-not-allowed disabled:bg-input-disabled-background;
 	@apply border-input-disabled-border disabled:text-subtle;
-	@apply space-x-4;
-
+	@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border disabled:cursor-not-allowed;
 	&[data-placeholder] span {
 		@apply text-subtle focus:outline-none;
 	}
+
 	&-content {
 		@apply relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-wrapper-background-light;
 		@apply text-subtle shadow-md;
@@ -40,7 +39,7 @@
 		@apply -mx-1 my-1 h-px bg-subtle;
 	}
 	span {
-		@apply truncate max-w-[calc(100%-1rem)] block;
+		@apply truncate max-w-[calc(100%-1rem)] block flex-1 text-start;
 	}
 
 	&.input {
