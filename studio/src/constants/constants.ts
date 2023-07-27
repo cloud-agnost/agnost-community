@@ -2,9 +2,9 @@ import Database from '@/assets/images/database.png';
 import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
 import {
+	AWSS3,
 	ApiKeys,
 	Authentication,
-	AWSS3,
 	AzureBlobStorage,
 	BellRing,
 	Binary,
@@ -19,9 +19,7 @@ import {
 	Environment,
 	EnvironmentVariable,
 	GCPStorage,
-	Kafka,
 	Integer,
-	GCPStorage,
 	Kafka,
 	LightBulb,
 	LineSegments,
@@ -37,7 +35,6 @@ import {
 	RateLimit,
 	RealTime,
 	Resource,
-	SqlServer,
 	RichText,
 	SqlServer,
 	Storage,
@@ -57,6 +54,7 @@ import {
 	SelectResourceType,
 } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
+import useAuthStore from '@/store/auth/authStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Application, Instance, Method, SortOption, Tab } from '@/types';
 import { history, translate } from '@/utils';
@@ -83,7 +81,6 @@ import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { DropdownMenuSeparator } from 'components/Dropdown';
 import { ElementType, Fragment } from 'react';
 import * as z from 'zod';
-import useAuthStore from '@/store/auth/authStore.ts';
 
 export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
