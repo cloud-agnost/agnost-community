@@ -255,6 +255,7 @@ export type DatabaseType = {
 
 export interface FieldType extends DatabaseType {
 	name: string;
+	group: string;
 	view: {
 		unique: boolean;
 		indexed: boolean;

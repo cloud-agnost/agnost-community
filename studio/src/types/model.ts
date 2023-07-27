@@ -25,10 +25,12 @@ export interface Model {
 export interface Field {
 	name: string;
 	iid: string;
-	creator: string;
+	creator: 'system' | 'user';
 	type: string;
+	description: string;
+	defaultValue: string;
 	dbType: string;
-	order: boolean;
+	order: number;
 	required: boolean;
 	unique: boolean;
 	immutable: boolean;
@@ -38,6 +40,40 @@ export interface Field {
 	_id: string;
 	createdAt: string;
 	updatedAt: string;
+	text?: {
+		searchable: boolean;
+		maxLength: number;
+	};
+	richText?: {
+		searchable: boolean;
+	};
+	encryptedText?: {
+		maxLength: number;
+	};
+	decimal?: {
+		decimalDigits: number;
+	};
+	object?: {
+		timestamps: {
+			enabled: boolean;
+			createdAt: string;
+			updatedAt: string;
+		};
+	};
+	objectList?: {
+		timestamps: {
+			enabled: boolean;
+			createdAt: string;
+			updatedAt: string;
+		};
+	};
+	reference?: {
+		iid: string;
+		action: ReferenceAction;
+	};
+	enum?: {
+		selectList: string[];
+	};
 }
 
 export type GetModelsOfDatabaseParams = GetDatabasesOfAppParams & {
@@ -54,12 +90,27 @@ export type CreateModelParams = GetModelsOfDatabaseParams & {
 	};
 };
 
+export type DeleteModelParams = GetModelsOfDatabaseParams & {
+	modelId: string;
+};
+
+export type DeleteMultipleModelParams = GetModelsOfDatabaseParams & {
+	modelIds: string[];
+};
+
 export type UpdateNameAndDescriptionParams = GetModelsOfDatabaseParams & {
 	modelId: string;
 	name: string;
 	description: string;
 };
-
+export type DeleteFieldParams = GetModelsOfDatabaseParams & {
+	modelId: string;
+	fieldId: string;
+};
+export type DeleteMultipleFieldParams = GetModelsOfDatabaseParams & {
+	modelId: string;
+	fieldIds: string[];
+};
 export type AddNewFieldParams = GetModelsOfDatabaseParams & {
 	type: string;
 	modelId: string;
@@ -105,6 +156,26 @@ export type AddNewFieldParams = GetModelsOfDatabaseParams & {
 		iid: string;
 		action: ReferenceAction;
 	};
+	basicValuesList?: {
+		type: BasicValueListType;
+	};
 };
+
+export type UpdateFieldParams = AddNewFieldParams & {
+	fieldId: string;
+};
+
+export type BasicValueListType =
+	| 'text'
+	| 'integer'
+	| 'decimal'
+	| 'monetary'
+	| 'datetime'
+	| 'date'
+	| 'time'
+	| 'email'
+	| 'link'
+	| 'phone'
+	| 'id';
 
 export type ReferenceAction = 'CASCADE' | 'NO ACTION' | 'SET NULL' | 'SET DEFAULT';

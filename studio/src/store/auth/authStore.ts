@@ -74,10 +74,10 @@ const useAuthStore = create<AuthStore>()(
 					logout: async () => {
 						const user = get().user;
 						if (user) leaveChannel(user?._id);
-						const res = await AuthService.logout();
+						await AuthService.logout();
 						get().setUser(null);
 						localStorage.clear();
-						return res;
+						location.href = '/login';
 					},
 					setToken: (accessToken) => set({ accessToken }),
 					setRefreshToken: (refreshToken) => set({ refreshToken }),

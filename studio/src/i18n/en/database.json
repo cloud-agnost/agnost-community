@@ -45,6 +45,16 @@
 				}
 			}
 		},
+		"delete": {
+			"title": "Delete Model",
+			"description": "Deleting this model will remove all associated data and cannot be undone."
+		},
+		"delete_multi": {
+			"code": "Confirm selected models delete by typing <confirmCode>{{confirmCode}}</confirmCode> below.",
+			"confirm_text": "Yes, I am sure",
+			"title": "Delete Selected Models",
+			"description": "Deleting these models will remove all associated data and cannot be undone."
+		},
 		"title": "Models of {{database}}",
 		"create": "Create Model",
 		"edit": "Edit Model",
@@ -57,6 +67,21 @@
 		"add_field": "Add {{field}} Field",
 		"edit": "Edit Field",
 		"no_fields": "You have not defined any fields for this model",
+		"basic_value_list": "Basic Value List",
+		"basic_value_list_type": "Basic Value List Type",
+		"basic_value_list_placeholder": "Select basic value list type",
+		"enum_values": "Enum Values",
+		"enum_placeholder": "Enter enum values separated by new line",
+		"reference_action": "Reference Action",
+		"reference_action_placeholder": "Select reference action",
+		"reference_model": "Reference Model",
+		"reference_model_placeholder": "Select reference model",
+		"delete": {
+			"title": "Delete Field",
+			"description": "Deleting this field will remove all associated data and cannot be undone."
+		},
+		"field_desc": "Field Description",
+		"field_desc_placeholder": "Enter field description",
 		"form": {
 			"name": "Field Name",
 			"unique_desc": "The value of the field is different across model objects.",
