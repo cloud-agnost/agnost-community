@@ -60,5 +60,11 @@
 	"status": "Status",
 	"json": "JSON",
 	"form-data": "Form Data",
-	"bodyType": "Body Type"
+	"bodyType": "Body Type",
+	"delete": {
+		"title": "Delete Endpoint",
+		"message": "Are you sure you want to delete endpoint ?",
+		"description": "This action is not reversible — please continue with caution.",
+		"confirmCode": "Confirm endpoint delete by typing {{confirmCode}} below."
+	}
 }

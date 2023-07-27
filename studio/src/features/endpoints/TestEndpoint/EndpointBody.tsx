@@ -1,17 +1,12 @@
-import React, { useEffect } from 'react';
 import { CodeEditor } from '@/components/CodeEditor';
-import useEndpointStore from '@/store/endpoint/endpointStore';
-import { FormField, FormItem, FormControl, FormMessage, FormLabel } from '@/components/Form';
-import { useFormContext } from 'react-hook-form';
-import { TestEndpointSchema } from '../TestEndpoint';
-import * as z from 'zod';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { RadioGroup, RadioGroupItem } from '@/components/RadioGroup';
-import EndpointFiles from './EndpointFiles';
-import { useState } from 'react';
-import { Label } from '@/components/Label';
+import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import * as z from 'zod';
+import { TestEndpointSchema } from '../TestEndpoint';
+import EndpointFiles from './EndpointFiles';
 export default function EndpointBody() {
-	const { endpoint } = useEndpointStore();
 	const { control, watch } = useFormContext<z.infer<typeof TestEndpointSchema>>();
 	const { t } = useTranslation();
 

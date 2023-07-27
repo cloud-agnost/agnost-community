@@ -1,6 +1,7 @@
 import { ERROR_CODES_TO_REDIRECT_LOGIN_PAGE } from '@/constants';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore';
+import { APIError } from '@/types';
 import axios from 'axios';
 const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost/api';
 
@@ -31,11 +32,11 @@ instance.interceptors.response.use(
 		return response;
 	},
 	(error) => {
-		const apiError = error.response?.data ?? error;
+		const apiError = error.response.data as APIError;
 		if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
 			// TODO: redirect to login page and clear store
 		}
-		Promise.reject(apiError);
+		return Promise.reject(apiError);
 	},
 );
 

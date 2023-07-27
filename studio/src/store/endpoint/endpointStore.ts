@@ -25,6 +25,9 @@ interface EndpointStore {
 	lastFetchedCount: number;
 	endpointRequest: TestEndpointParams[];
 	endpointResponse: EndpointResponse[];
+	toDeleteEndpoint: Endpoint | null;
+	isEndpointDeleteDialogOpen: boolean;
+	openDeleteEndpointDialog: (endpoint: Endpoint) => void;
 	setSelectEndpointDialogOpen: (open: boolean) => void;
 	setSelectedEndpointIds: (ids: string[]) => void;
 	setEndpoints: (endpoints: Endpoint[]) => void;
@@ -37,6 +40,7 @@ interface EndpointStore {
 	saveEndpointLogic: (endpoint: SaveEndpointLogicParams) => Promise<Endpoint>;
 	getEndpointsByIid: (endpoint: GetEndpointsByIidParams) => Promise<Endpoint[]>;
 	testEndpoint: (endpoint: TestEndpointParams) => Promise<AxiosResponse>;
+	closeEndpointDeleteDialog: () => void;
 }
 
 const useEndpointStore = create<EndpointStore>()(
@@ -50,6 +54,8 @@ const useEndpointStore = create<EndpointStore>()(
 				endpointRequest: [],
 				endpointResponse: [],
 				lastFetchedCount: 0,
+				toDeleteEndpoint: null,
+				isEndpointDeleteDialogOpen: false,
 				setSelectedEndpointIds: (ids) => set({ selectedEndpointIds: ids }),
 				setSelectEndpointDialogOpen: (open) => set({ selectEndpointDialogOpen: open }),
 				setEndpoints: (endpoints) => set({ endpoints }),
@@ -86,16 +92,28 @@ const useEndpointStore = create<EndpointStore>()(
 					}
 				},
 				deleteEndpoint: async (params) => {
-					await EndpointService.deleteEndpoint(params);
-					set((prev) => ({
-						endpoints: prev.endpoints.filter((e) => e._id !== params.versionId),
-					}));
+					try {
+						await EndpointService.deleteEndpoint(params);
+						set((prev) => ({
+							endpoints: prev.endpoints.filter((e) => e._id !== params.epId),
+						}));
+						if (params.onSuccess) params.onSuccess();
+					} catch (error) {
+						if (params.onError) params.onError(error as APIError);
+						throw error as APIError;
+					}
 				},
 				deleteMultipleEndpoints: async (params) => {
-					await EndpointService.deleteMultipleEndpoints(params);
-					set((prev) => ({
-						endpoints: prev.endpoints.filter((e) => !params.endpointIds.includes(e._id)),
-					}));
+					try {
+						await EndpointService.deleteMultipleEndpoints(params);
+						set((prev) => ({
+							endpoints: prev.endpoints.filter((e) => !params.endpointIds.includes(e._id)),
+						}));
+						if (params.onSuccess) params.onSuccess();
+					} catch (error) {
+						if (params.onError) params.onError(error as APIError);
+						throw error as APIError;
+					}
 				},
 				updateEndpoint: async (params) => {
 					try {
@@ -194,6 +212,10 @@ const useEndpointStore = create<EndpointStore>()(
 					if (params.onSuccess) params.onSuccess();
 					return response;
 				},
+				openDeleteEndpointDialog: (endpoint) =>
+					set({ toDeleteEndpoint: endpoint, isEndpointDeleteDialogOpen: true }),
+				closeEndpointDeleteDialog: () =>
+					set({ toDeleteEndpoint: null, isEndpointDeleteDialogOpen: false }),
 			}),
 			{
 				name: 'endpoint-storage',
