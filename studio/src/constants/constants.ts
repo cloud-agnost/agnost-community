@@ -21,6 +21,7 @@ import {
 	GCPStorage,
 	Integer,
 	Kafka,
+	Integer,
 	LightBulb,
 	LineSegments,
 	MessageQueue,
@@ -37,6 +38,7 @@ import {
 	Resource,
 	RichText,
 	SqlServer,
+	RichText,
 	Storage,
 	Team,
 	Timestamp,
@@ -791,17 +793,6 @@ export const NAME_SCHEMA = z
 			label: translate('general.name'),
 		}),
 	);
-
-export const ADD_MODEL_FIELDS_TAB_ITEMS = [
-	{
-		name: 'General Properties',
-		href: '?t=general',
-	},
-	{
-		name: 'Specific Properties',
-		href: '?t=specific',
-	},
-];
 
 export const MODEL_FIELD_DEFAULT_VALUE_TYPES = [
 	{
