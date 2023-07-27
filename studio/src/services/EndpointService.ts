@@ -1,4 +1,4 @@
-import { axios } from '@/helpers';
+import { axios, http } from '@/helpers';
 import {
 	CreateEndpointParams,
 	DeleteEndpointParams,
@@ -129,9 +129,7 @@ export default class EndpointService {
 				}
 			});
 		}
-		console.log('formData', headers);
-		return await axios[method](path, body, {
-			baseURL: `http://localhost/${envId}/api`,
+		return await http[method](path, body, {
 			headers,
 			params: {
 				...params.queryParams,

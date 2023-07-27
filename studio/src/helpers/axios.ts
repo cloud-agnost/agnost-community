@@ -1,10 +1,18 @@
 import { ERROR_CODES_TO_REDIRECT_LOGIN_PAGE } from '@/constants';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import axios from 'axios';
 const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost/api';
 
 export const instance = axios.create({
 	baseURL,
+	headers: {
+		'Content-Type': 'application/json',
+	},
+});
+
+export const testEndpointInstance = axios.create({
+	baseURL: `http://localhost/${useEnvironmentStore.getState().environment?.iid}/api`,
 	headers: {
 		'Content-Type': 'application/json',
 	},
@@ -27,7 +35,15 @@ instance.interceptors.response.use(
 		if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
 			// TODO: redirect to login page and clear store
 		}
-		console.log(error);
+		Promise.reject(apiError);
+	},
+);
+
+testEndpointInstance.interceptors.response.use(
+	(response) => {
+		return response;
+	},
+	(error) => {
 		return error;
 	},
 );

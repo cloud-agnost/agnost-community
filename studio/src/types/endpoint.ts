@@ -192,6 +192,7 @@ export interface GetEndpointsByIidParams extends EndpointBase {
 }
 export interface GetEndpointsParams extends EndpointBase, BaseGetRequest {}
 
+export type TestMethods = 'get' | 'post' | 'put' | 'delete';
 export interface TestEndpointParams extends BaseRequest {
 	epId: string;
 	path: string;
