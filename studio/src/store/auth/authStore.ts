@@ -7,7 +7,7 @@ import type {
 } from '@/types/type.ts';
 import { joinChannel, leaveChannel } from '@/utils';
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 
 interface AuthStore {
 	accessToken: string | null | undefined;
@@ -50,167 +50,169 @@ interface AuthStore {
 }
 
 const useAuthStore = create<AuthStore>()(
-	devtools(
-		persist(
-			(set, get) => ({
-				accessToken: '',
-				refreshToken: '',
-				loading: false,
-				error: null,
-				user: null,
-				email: null,
-				setUser: (user) => {
-					set({ user });
-					if (user) joinChannel(user._id);
-					if (user?.at) get().setToken(user.at);
-					if (user?.rt) get().setRefreshToken(user.rt);
-				},
-				login: async (email, password) => {
-					const res = await AuthService.login(email, password);
-					get().setUser(res);
-					return res;
-				},
-				logout: async () => {
-					const user = get().user;
-					if (user) leaveChannel(user?._id);
-					const res = await AuthService.logout();
-					get().setUser(null);
-					localStorage.clear();
-					return res;
-				},
-				setToken: (accessToken) => set({ accessToken }),
-				setRefreshToken: (refreshToken) => set({ refreshToken }),
-				isAuthenticated: () => Boolean(get().accessToken),
-				renewAccessToken: async () => {
-					if (!get().isAuthenticated()) return;
-					const res = await AuthService.renewAccessToken();
-					get().setRefreshToken(res.rt);
-					get().setToken(res.at);
-				},
-				completeAccountSetup: async (data) => {
-					try {
-						const user = await AuthService.completeAccountSetup(data);
-						get().setUser(user);
-						return user;
-					} catch (error) {
-						throw error as APIError;
-					}
-				},
-				resetPassword(email) {
-					return UserService.resetPassword({
-						email,
-						uiBaseURL: window.location.origin,
-					});
-				},
-				async verifyEmail(email: string, code: number) {
-					try {
-						const user = await AuthService.validateEmail(email, code);
-						get().setUser(user);
-						return user;
-					} catch (error) {
-						throw error as APIError;
-					}
-				},
-				changePasswordWithToken(token: string, newPassword: string) {
-					return UserService.changePasswordWithToken({
-						token,
-						newPassword,
-					});
-				},
-				async resendEmailVerificationCode(email: string) {
-					await AuthService.resendEmailVerificationCode(email);
-				},
-				async initiateAccountSetup(
-					email: string,
-					onSuccess: () => void,
-					onError: (err: APIError) => void,
-				) {
-					try {
-						await AuthService.initiateAccountSetup(email);
-						set({ email });
-						onSuccess();
-					} catch (error) {
-						onError(error as APIError);
-					}
-				},
-				async finalizeAccountSetup(data: FinalizeAccountSetupRequest) {
-					try {
-						const res = await AuthService.finalizeAccountSetup(data);
+	subscribeWithSelector(
+		devtools(
+			persist(
+				(set, get) => ({
+					accessToken: '',
+					refreshToken: '',
+					loading: false,
+					error: null,
+					user: null,
+					email: null,
+					setUser: (user) => {
+						set({ user });
+						if (user) joinChannel(user._id);
+						if (user?.at) get().setToken(user.at);
+						if (user?.rt) get().setRefreshToken(user.rt);
+					},
+					login: async (email, password) => {
+						const res = await AuthService.login(email, password);
 						get().setUser(res);
 						return res;
-					} catch (error) {
-						throw error as APIError;
-					}
-				},
-				async acceptInvite(token: string) {
-					try {
-						return UserService.acceptInvite(token);
-					} catch (err) {
-						set({ error: err as APIError });
-					}
-				},
-				async changeName(name: string) {
-					const user = await UserService.changeName(name);
-					set({ user });
-					return user;
-				},
-				async changeEmail(email: string, password) {
-					const newEmail = await UserService.changeEmail({
-						email,
-						password,
-						uiBaseURL: window.location.origin,
-					});
-					console.log(newEmail);
-					return newEmail;
-				},
-				async changeAvatar(avatar: File) {
-					const user = await UserService.changeAvatar(avatar);
-					set({ user });
-					return user;
-				},
-				async removeAvatar() {
-					try {
-						await UserService.removeAvatar();
-						set((prev) => {
-							delete prev.user?.pictureUrl;
-							return prev;
+					},
+					logout: async () => {
+						const user = get().user;
+						if (user) leaveChannel(user?._id);
+						await AuthService.logout();
+						get().setUser(null);
+						localStorage.clear();
+						location.href = '/login';
+					},
+					setToken: (accessToken) => set({ accessToken }),
+					setRefreshToken: (refreshToken) => set({ refreshToken }),
+					isAuthenticated: () => Boolean(get().accessToken),
+					renewAccessToken: async () => {
+						if (!get().isAuthenticated()) return;
+						const res = await AuthService.renewAccessToken();
+						get().setRefreshToken(res.rt);
+						get().setToken(res.at);
+					},
+					completeAccountSetup: async (data) => {
+						try {
+							const user = await AuthService.completeAccountSetup(data);
+							get().setUser(user);
+							return user;
+						} catch (error) {
+							throw error as APIError;
+						}
+					},
+					resetPassword(email) {
+						return UserService.resetPassword({
+							email,
+							uiBaseURL: window.location.origin,
 						});
-					} catch (err) {
-						set({ error: err as APIError });
-						throw err;
-					}
+					},
+					async verifyEmail(email: string, code: number) {
+						try {
+							const user = await AuthService.validateEmail(email, code);
+							get().setUser(user);
+							return user;
+						} catch (error) {
+							throw error as APIError;
+						}
+					},
+					changePasswordWithToken(token: string, newPassword: string) {
+						return UserService.changePasswordWithToken({
+							token,
+							newPassword,
+						});
+					},
+					async resendEmailVerificationCode(email: string) {
+						await AuthService.resendEmailVerificationCode(email);
+					},
+					async initiateAccountSetup(
+						email: string,
+						onSuccess: () => void,
+						onError: (err: APIError) => void,
+					) {
+						try {
+							await AuthService.initiateAccountSetup(email);
+							set({ email });
+							onSuccess();
+						} catch (error) {
+							onError(error as APIError);
+						}
+					},
+					async finalizeAccountSetup(data: FinalizeAccountSetupRequest) {
+						try {
+							const res = await AuthService.finalizeAccountSetup(data);
+							get().setUser(res);
+							return res;
+						} catch (error) {
+							throw error as APIError;
+						}
+					},
+					async acceptInvite(token: string) {
+						try {
+							return UserService.acceptInvite(token);
+						} catch (err) {
+							set({ error: err as APIError });
+						}
+					},
+					async changeName(name: string) {
+						const user = await UserService.changeName(name);
+						set({ user });
+						return user;
+					},
+					async changeEmail(email: string, password) {
+						const newEmail = await UserService.changeEmail({
+							email,
+							password,
+							uiBaseURL: window.location.origin,
+						});
+						console.log(newEmail);
+						return newEmail;
+					},
+					async changeAvatar(avatar: File) {
+						const user = await UserService.changeAvatar(avatar);
+						set({ user });
+						return user;
+					},
+					async removeAvatar() {
+						try {
+							await UserService.removeAvatar();
+							set((prev) => {
+								delete prev.user?.pictureUrl;
+								return prev;
+							});
+						} catch (err) {
+							set({ error: err as APIError });
+							throw err;
+						}
+					},
+					async changePassword(currentPassword: string, newPassword: string) {
+						return UserService.changePassword(currentPassword, newPassword);
+					},
+					async deleteAccount() {
+						return UserService.deleteAccount();
+					},
+					async updateNotifications(notifications: string[]) {
+						const res = await UserService.updateNotifications({ notifications });
+						set({ user: res });
+						return res;
+					},
+					confirmChangeLoginEmail(token: string) {
+						return UserService.confirmChangeLoginEmail(token);
+					},
+					async getUser() {
+						const user = await UserService.getUser();
+						if (user) joinChannel(user._id);
+						set({ user });
+						return user;
+					},
+					getUserPicture() {
+						return location.origin.replace(':4000', '') + '/api' + get().user?.pictureUrl;
+					},
+				}),
+				{
+					name: 'auth-storage',
 				},
-				async changePassword(currentPassword: string, newPassword: string) {
-					return UserService.changePassword(currentPassword, newPassword);
-				},
-				async deleteAccount() {
-					return UserService.deleteAccount();
-				},
-				async updateNotifications(notifications: string[]) {
-					const res = await UserService.updateNotifications({ notifications });
-					set({ user: res });
-					return res;
-				},
-				confirmChangeLoginEmail(token: string) {
-					return UserService.confirmChangeLoginEmail(token);
-				},
-				async getUser() {
-					const user = await UserService.getUser();
-					if (user) joinChannel(user._id);
-					set({ user });
-					return user;
-				},
-				getUserPicture() {
-					return location.origin.replace(':4000', '') + '/api' + get().user?.pictureUrl;
-				},
-			}),
+			),
 			{
-				name: 'auth-storage',
+				name: 'auth',
 			},
 		),
-		{
-			name: 'auth',
-		},
 	),
 );
 

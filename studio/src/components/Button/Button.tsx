@@ -78,7 +78,7 @@ const Button = React.forwardRef<
 				/* @ts-ignore */
 				<Link
 					to={to}
-					className={cn(buttonVariants({ variant, size, className }))}
+					className={cn(buttonVariants({ size, variant, loading, rounded, iconOnly, className }))}
 					ref={ref}
 					{...props}
 				>

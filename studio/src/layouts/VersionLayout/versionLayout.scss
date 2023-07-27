@@ -6,7 +6,9 @@
 	@apply p-6 full-height-without-header overflow-auto;
 
 	&.middleware,
-	&.database {
+	&.database,
+	&.fields,
+	&.models {
 		@apply p-0;
 	}
 }

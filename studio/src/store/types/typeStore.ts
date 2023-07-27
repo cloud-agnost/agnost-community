@@ -1,24 +1,13 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import TypesService from '@/services/TypesService';
-import { APIError, Types } from '@/types/type';
+import { APIError, FieldType, Types } from '@/types/type';
 
 interface TypesStore {
 	orgRoles: string[];
 	appRoles: string[];
 	bvlTypes: string[];
-	fieldTypes: {
-		name: string;
-		PostgreSQL: boolean;
-		MySQL: boolean;
-		'SQL Server': boolean;
-		MongoDB: boolean;
-		view: {
-			unique: boolean;
-			indexed: boolean;
-			immutable: boolean;
-		};
-	}[];
+	fieldTypes: FieldType[];
 	databaseTypes: string[];
 	instanceTypes: {
 		engine: string[];
@@ -67,20 +56,7 @@ const useTypeStore = create<TypesStore>()(
 				orgRoles: [],
 				appRoles: [],
 				bvlTypes: [],
-				fieldTypes: [
-					{
-						name: '',
-						PostgreSQL: true,
-						MySQL: true,
-						'SQL Server': true,
-						MongoDB: true,
-						view: {
-							unique: true,
-							indexed: true,
-							immutable: true,
-						},
-					},
-				],
+				fieldTypes: [],
 				databaseTypes: [],
 				instanceTypes: {
 					engine: [],

@@ -1,25 +1,22 @@
 import { Button, ButtonGroup } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { SearchInput } from '@/components/SearchInput';
-import { ApplicationCardSkeleton } from '@/components/Skeletons';
 import { List, SquaresFour } from '@/components/icons';
 import { ApplicationCard } from '@/features/application';
 import AppInviteMember from '@/features/application/AppInviteMember';
 import ApplicationTable from '@/features/application/ApplicationTable/ApplicationTable';
-import useOrganizationStore from '@/store/organization/organizationStore';
+import useApplicationStore from '@/store/app/applicationStore.ts';
 import { Application } from '@/types';
 import { cn } from '@/utils';
 import { Plus } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
-import useApplicationStore from '@/store/app/applicationStore.ts';
 
 export default function OrganizationApps() {
 	const [isCard, setIsCard] = useState(true);
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { organization, loading } = useOrganizationStore();
-	const { applications, temp, searchApplications, getAppsByOrgId } = useApplicationStore();
+	const { applications, temp, searchApplications } = useApplicationStore();
 	const { t } = useTranslation();
 
 	useEffect(() => {
@@ -27,10 +24,6 @@ export default function OrganizationApps() {
 		if (query) searchApplications(query);
 		else searchApplications('');
 	}, [searchParams.get('q')]);
-
-	useEffect(() => {
-		if (organization) getAppsByOrgId(organization._id);
-	}, [organization]);
 
 	return (
 		<div
@@ -80,13 +73,9 @@ export default function OrganizationApps() {
 					</div>
 					{isCard ? (
 						<div className='mt-8 flex flex-wrap gap-6 items-center'>
-							{loading ? (
-								<ApplicationCardSkeleton />
-							) : (
-								applications.map((application: Application) => (
-									<ApplicationCard key={application._id} application={application} />
-								))
-							)}
+							{applications.map((application: Application) => (
+								<ApplicationCard key={application._id} application={application} />
+							))}
 						</div>
 					) : (
 						<ApplicationTable apps={applications} />

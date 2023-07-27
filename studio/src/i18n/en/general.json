@@ -1,6 +1,8 @@
 {
 	"cancel": "Cancel",
+	"field": "Field",
 	"ok": "OK",
+	"description": "Description",
 	"close": "Close",
 	"delete": "Delete",
 	"domain": "Domain",
@@ -72,5 +74,15 @@
 	"value": "Value",
 	"step": "Step {{currentStep}} of {{totalSteps}}",
 	"multiDelete": "Are you sure you want to delete the selected items?",
-	"deleteDescription": "This action cannot be undone."
+	"deleteDescription": "This action cannot be undone.",
+	"indexed": "Indexed",
+	"unique": "Unique",
+	"required": "Required",
+	"read-only": "Read-Only",
+	"immutable": "Read-Only",
+	"searchable": "Searchable",
+	"max_length": "Max Length",
+	"decimal_digits": "Decimal Digits",
+	"account_settings": "Account Settings",
+	"logout": "Log Out"
 }

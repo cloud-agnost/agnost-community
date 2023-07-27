@@ -171,3 +171,23 @@ export function objToArray(obj: object | undefined): { key: string; value: strin
 export function generateId() {
 	return Math.random().toString(36).substring(2, 15);
 }
+
+export function toDisplayName(name: string) {
+	return name.replace(/-/g, ' ').split(' ').map(capitalize).join(' ');
+}
+
+export default function groupBy<T>(list: T[], keyGetter: (item: T) => string) {
+	const map: Record<string, T[]> = {};
+
+	for (const item of list) {
+		const key = keyGetter(item);
+		const collection = map[key];
+		if (!collection) {
+			map[key] = [item];
+		} else {
+			collection.push(item);
+		}
+	}
+
+	return map;
+}

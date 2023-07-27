@@ -1,14 +1,14 @@
 import { Button } from '@/components/Button';
 import { AgnostOnlyLogo } from '@/components/icons';
 import { MENU_ITEMS } from '@/constants';
-import { OrganizationDropdown } from '@/features/organization/OrganizationDropdown';
+import { OrganizationDropdown } from '@/features/Organization/OrganizationDropdown';
 import { ApplicationSelectDropdown } from '@/features/application';
 import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
 import { VersionDropdown } from '@/features/version/VersionDropdown';
 import { Bell, CaretRight, Cloud } from '@phosphor-icons/react';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Link, useParams } from 'react-router-dom';
 import './header.scss';
+import AuthUserDropdown from '../../features/auth/AuthUserDropdown/AuthUserDropdown.tsx';
 
 export function Header() {
 	const { versionId, appId } = useParams();
@@ -58,9 +58,7 @@ export function Header() {
 						</Button>
 					</div>
 					<div className='header-menu-right-actions-user'>
-						<Link to='/profile/settings' className='header-menu-right-actions-user-avatar'>
-							<AuthUserAvatar size='sm' />
-						</Link>
+						<AuthUserDropdown />
 					</div>
 				</div>
 			</div>

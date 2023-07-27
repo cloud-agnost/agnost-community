@@ -102,18 +102,7 @@ export interface Types {
 	orgRoles: string[];
 	appRoles: string[];
 	bvlTypes: string[];
-	fieldTypes: {
-		name: string;
-		PostgreSQL: boolean;
-		MySQL: boolean;
-		'SQL Server': boolean;
-		MongoDB: boolean;
-		view: {
-			unique: boolean;
-			indexed: boolean;
-			immutable: boolean;
-		};
-	}[];
+	fieldTypes: FieldType[];
 	databaseTypes: string[];
 	instanceTypes: {
 		engine: string[];
@@ -254,3 +243,22 @@ export interface SearchNPMPackages {
 export type ColumnDefWithClassName<TData> = ColumnDef<TData> & {
 	className?: string;
 };
+
+export type DatabaseType = {
+	PostgreSQL: boolean;
+	MySQL: boolean;
+	'SQL Server': boolean;
+	MongoDB: boolean;
+	Oracle: boolean;
+};
+
+export interface FieldType extends DatabaseType {
+	name: string;
+	group: string;
+	view: {
+		unique: boolean;
+		indexed: boolean;
+		immutable: boolean;
+		searchable: boolean;
+	};
+}

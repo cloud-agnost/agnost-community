@@ -5,10 +5,9 @@ import { TableConfirmation } from '@/components/Table';
 import useApplicationStore from '@/store/app/applicationStore';
 import { Invitation } from '@/types';
 import { notify, translate } from '@/utils';
-import { EnvelopeSimple, Trash } from '@phosphor-icons/react';
+import { Trash } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
-import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '@/components/Tooltip';
 import { ResendButton } from '@/components/ResendButton';
 function updateInvitationUserRole(token: string, role: string) {
 	useApplicationStore.getState?.().updateInvitationUserRole({

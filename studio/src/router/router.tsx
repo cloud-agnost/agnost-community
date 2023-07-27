@@ -38,6 +38,8 @@ const paths = {
 		version: `${versionPath}/Version.tsx`,
 		dashboard: `${versionPath}/VersionDashboard.tsx`,
 		database: `${versionPath}/VersionDatabase.tsx`,
+		models: `${versionPath}/models/Models.tsx`,
+		fields: `${versionPath}/models/fields/Fields.tsx`,
 		endpoint: `${versionPath}/VersionEndpoint.tsx`,
 		storage: `${versionPath}/VersionStorage.tsx`,
 		middlewares: `${versionPath}/VersionMiddlewares.tsx`,
@@ -68,11 +70,11 @@ const paths = {
 	},
 	onboarding: {
 		onboarding: `${onboardingPath}/Onboarding.tsx`,
-		accountInformation: `${onboardingPath}/OnboardingAccountInformation.tsx`,
-		createOrganization: `${onboardingPath}/OnboardingCreateOrganization.tsx`,
-		createApp: `${onboardingPath}/OnboardingCreateApp.tsx`,
-		inviteTeamMembers: `${onboardingPath}/OnboardingInviteTeamMembers.tsx`,
-		smtpConfiguration: `${onboardingPath}/OnboardingSMTPConfiguration.tsx`,
+		accountInformation: `${onboardingPath}/AccountInformation.tsx`,
+		createOrganization: `${onboardingPath}/CreateOrganization.tsx`,
+		createApp: `${onboardingPath}/CreateApp.tsx`,
+		inviteTeamMembers: `${onboardingPath}/InviteTeamMembers.tsx`,
+		smtpConfiguration: `${onboardingPath}/SMTPConfiguration.tsx`,
 	},
 	redirectHandle: `${path}/RedirectHandle.tsx`,
 };
@@ -118,7 +120,6 @@ const router = createBrowserRouter([
 			{
 				path: '/organization',
 				lazy: () => lazyRouteImport(paths.organization.organization),
-
 				children: [
 					{
 						lazy: () => lazyRouteImport(paths.organization.select),
@@ -129,8 +130,108 @@ const router = createBrowserRouter([
 						lazy: () => lazyRouteImport(paths.organization.details),
 						children: [
 							{
-								lazy: () => lazyRouteImport(paths.organization.apps),
 								path: 'apps',
+								children: [
+									{
+										index: true,
+										lazy: () => lazyRouteImport(paths.organization.apps),
+									},
+									{
+										path: ':appId/version/:versionId',
+										lazy: () => lazyRouteImport(paths.version.version),
+										children: [
+											{
+												path: '',
+												lazy: () => lazyRouteImport(paths.version.dashboard),
+											},
+											{
+												path: 'database',
+												children: [
+													{
+														index: true,
+														lazy: () => lazyRouteImport(paths.version.database),
+													},
+													{
+														path: ':dbId/models',
+														children: [
+															{
+																index: true,
+																lazy: () => lazyRouteImport(paths.version.models),
+															},
+															{
+																path: ':modelId/fields',
+																lazy: () => lazyRouteImport(paths.version.fields),
+															},
+														],
+													},
+												],
+											},
+											{
+												path: 'endpoint',
+												lazy: () => lazyRouteImport(paths.version.endpoint),
+											},
+											{
+												path: 'storage',
+												lazy: () => lazyRouteImport(paths.version.storage),
+											},
+											{
+												path: 'middleware',
+												lazy: () => lazyRouteImport(paths.version.middlewares),
+											},
+											{
+												path: 'cache',
+												lazy: () => lazyRouteImport(paths.version.cache),
+											},
+											{
+												path: 'message-queue',
+												lazy: () => lazyRouteImport(paths.version.messageQueue),
+											},
+											{
+												path: 'cron-job',
+												lazy: () => lazyRouteImport(paths.version.cronJob),
+											},
+											{
+												path: 'settings',
+												lazy: () => lazyRouteImport(paths.version.settings.versionSettings),
+												children: [
+													{
+														index: true,
+														lazy: () => lazyRouteImport(paths.version.settings.general),
+													},
+													{
+														path: 'environment',
+														lazy: () => lazyRouteImport(paths.version.settings.environment),
+													},
+													{
+														path: 'npm-packages',
+														lazy: () => lazyRouteImport(paths.version.settings.npmPackages),
+													},
+													{
+														path: 'environment-variables',
+														lazy: () =>
+															lazyRouteImport(paths.version.settings.environmentVariables),
+													},
+													{
+														path: 'rate-limits',
+														lazy: () => lazyRouteImport(paths.version.settings.rateLimits),
+													},
+													{
+														path: 'authentications',
+														lazy: () => lazyRouteImport(paths.version.settings.authentications),
+													},
+													{
+														path: 'api-keys',
+														lazy: () => lazyRouteImport(paths.version.settings.apiKeys),
+													},
+													{
+														path: 'real-time',
+														lazy: () => lazyRouteImport(paths.version.settings.realTime),
+													},
+												],
+											},
+										],
+									},
+								],
 							},
 							{
 								path: 'resources',
@@ -149,94 +250,6 @@ const router = createBrowserRouter([
 										lazy: () => lazyRouteImport(paths.organization.settings.members),
 									},
 								],
-							},
-						],
-					},
-				],
-			},
-			{
-				path: '/organization/:orgId/apps/:appId/version/:versionId',
-				lazy: () => lazyRouteImport(paths.version.version),
-
-				children: [
-					{
-						path: '',
-						lazy: () => lazyRouteImport(paths.version.dashboard),
-					},
-					{
-						path: 'database',
-						lazy: () => lazyRouteImport(paths.version.database),
-					},
-					{
-						path: 'endpoint',
-						lazy: () => lazyRouteImport(paths.version.endpoint),
-						children: [
-							{
-								index: true,
-								path: '',
-								lazy: () => lazyRouteImport(paths.endpoint.endpoint),
-							},
-							{
-								path: ':endpointId',
-								lazy: () => lazyRouteImport(paths.endpoint.editEndpoint),
-							},
-						],
-					},
-					{
-						path: 'storage',
-						lazy: () => lazyRouteImport(paths.version.storage),
-					},
-					{
-						path: 'middleware',
-						lazy: () => lazyRouteImport(paths.version.middlewares),
-					},
-					{
-						path: 'cache',
-						lazy: () => lazyRouteImport(paths.version.cache),
-					},
-					{
-						path: 'message-queue',
-						lazy: () => lazyRouteImport(paths.version.messageQueue),
-					},
-					{
-						path: 'cron-job',
-						lazy: () => lazyRouteImport(paths.version.cronJob),
-					},
-					{
-						path: 'settings',
-						lazy: () => lazyRouteImport(paths.version.settings.versionSettings),
-						children: [
-							{
-								index: true,
-								lazy: () => lazyRouteImport(paths.version.settings.general),
-							},
-							{
-								path: 'environment',
-								lazy: () => lazyRouteImport(paths.version.settings.environment),
-							},
-							{
-								path: 'npm-packages',
-								lazy: () => lazyRouteImport(paths.version.settings.npmPackages),
-							},
-							{
-								path: 'environment-variables',
-								lazy: () => lazyRouteImport(paths.version.settings.environmentVariables),
-							},
-							{
-								path: 'rate-limits',
-								lazy: () => lazyRouteImport(paths.version.settings.rateLimits),
-							},
-							{
-								path: 'authentications',
-								lazy: () => lazyRouteImport(paths.version.settings.authentications),
-							},
-							{
-								path: 'api-keys',
-								lazy: () => lazyRouteImport(paths.version.settings.apiKeys),
-							},
-							{
-								path: 'real-time',
-								lazy: () => lazyRouteImport(paths.version.settings.realTime),
 							},
 						],
 					},
