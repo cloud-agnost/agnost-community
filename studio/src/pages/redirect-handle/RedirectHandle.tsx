@@ -3,8 +3,8 @@ import { LoaderFunctionArgs, redirect } from 'react-router-dom';
 const REDIRECT_URLS = {
 	'app-invite': '/complete-account-setup/verify-email?token=:token&isVerified=true',
 	'org-invite': '/org-invite?token=:token',
-	'change-email': '/change-email?token:token',
-	'reset-pwd': '/forgot-password/:token',
+	'change-email': '/confirm-change-email?token=:token',
+	'reset-pwd': '/forgot-password?token=:token',
 };
 
 function loader(params: LoaderFunctionArgs) {

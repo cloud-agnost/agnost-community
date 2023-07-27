@@ -70,11 +70,11 @@ router.put(
 		try {
 			const { org, user, app, version, env } = req;
 			let { autoDeploy } = req.body;
-
+			let updatedEnv;
 			// If auto deploy turned on then we need to do a redeployment
 			if (env.autoDeploy === false && autoDeploy) {
 				// Update environment data
-				let updatedEnv = await envCtrl.updateOneById(
+				updatedEnv = await envCtrl.updateOneById(
 					env._id,
 					{
 						autoDeploy,
@@ -102,7 +102,7 @@ router.put(
 				await deployCtrl.redeploy(envLog, app, version, updatedEnv, user);
 			} else {
 				// Update environment data
-				let updatedEnv = await envCtrl.updateOneById(
+				updatedEnv = await envCtrl.updateOneById(
 					env._id,
 					{
 						autoDeploy,

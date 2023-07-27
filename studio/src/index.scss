@@ -6,8 +6,12 @@
 
 @layer base {
 	:root {
+		--header-menu-height: 72px;
+		--navigation-tab-menu-height: 41px;
+
 		--font-sans: 'Rubik', sans-serif;
 		--font-albert: 'Albert Sans', sans-serif;
+		--font-sf: 'SF Compact Display', sans-serif;
 
 		/* Color styles */
 		--brand-color-primary--darker: 37, 54, 127;
@@ -51,14 +55,26 @@
 		--theme-lighter-background: 237, 238, 243;
 		--theme-border: 237, 238, 243;
 
+		--theme-base-reverse-background: 25, 28, 41;
+		--theme-subtle-reverse-background: 33, 37, 48;
+		--theme-lighter-reverse-background: 50, 56, 73;
+		--theme-border-reverse: 50, 56, 73;
+
 		--text-base: 25, 28, 41;
 		--text-subtle: 146, 154, 181;
 		--text-disabled: 219, 221, 230;
 
-		--icon-darker: 33, 37, 48;
-		--icon-lighter: 255, 255, 255;
+		--icon-secondary: 33, 37, 48;
 		--icon-base: 146, 154, 181;
 		--icon-disabled: 219, 221, 230;
+
+		--text-base-reverse: 255, 255, 255;
+		--text-subtle-reverse: 146, 154, 181;
+		--text-disabled-reverse: 99, 111, 146;
+
+		--icon-secondary-reverse: 255, 255, 255;
+		--icon-base-reverse: 146, 154, 181;
+		--icon-disabled-reverse: 99, 111, 146;
 
 		--form-input-base-background: 255, 255, 255;
 		--form-input-base-border: 219, 221, 230;
@@ -78,6 +94,7 @@
 		--button-border-base: 219, 221, 230;
 
 		--surface-blue: 219, 226, 255;
+		--surface-dark-blue: 25, 36, 84;
 		--surface-green: 207, 241, 225;
 		--surface-yellow: 251, 241, 206;
 		--surface-purple: 243, 219, 255;
@@ -141,16 +158,16 @@
 		--purple-800: 98, 37, 127;
 		--purple-900: 65, 25, 84;
 
-		--red--50: 252, 218, 226;
-		--red--100: 249, 193, 206;
-		--red--200: 246, 161, 182;
-		--red--300: 244, 130, 158;
-		--red--400: 241, 99, 133;
-		--red--500: 238, 68, 109;
-		--red--600: 198, 57, 91;
-		--red--700: 159, 45, 73;
-		--red--800: 119, 34, 55;
-		--red--900: 79, 23, 36;
+		--red-50: 252, 218, 226;
+		--red-100: 249, 193, 206;
+		--red-200: 246, 161, 182;
+		--red-300: 244, 130, 158;
+		--red-400: 241, 99, 133;
+		--red-500: 238, 68, 109;
+		--red-600: 198, 57, 91;
+		--red-700: 159, 45, 73;
+		--red-800: 119, 34, 55;
+		--red-900: 79, 23, 36;
 
 		--green-50: 207, 241, 225;
 		--green-100: 176, 232, 205;
@@ -165,6 +182,7 @@
 
 		--wrapper-background-base: 255, 255, 255;
 		--wrapper-background-hover: 237, 238, 243;
+		--wrapper-background-light: 42, 47, 60;
 
 		--radius: 0.5rem;
 
@@ -177,20 +195,33 @@
 		--theme-lighter-background: 50, 56, 73;
 		--theme-border: 50, 56, 73;
 
+		--text-base: 255, 255, 255;
+		--text-subtle: 146, 154, 181;
+		--text-disabled: 99, 111, 146;
+
+		--icon-secondary: 255, 255, 255;
+		--icon-base: 146, 154, 181;
+		--icon-disabled: 99, 111, 146;
+
+		--theme-base-reverse-background: 255, 255, 255;
+		--theme-subtle-reverse-background: 249, 249, 251;
+		--theme-lighter-reverse-background: 237, 238, 243;
+		--theme-border-reverse: 237, 238, 243;
+
+		--text-base-reverse: 25, 28, 41;
+		--text-subtle-reverse: 146, 154, 181;
+		--text-disabled-reverse: 219, 221, 230;
+
+		--icon-secondary-reverse: 33, 37, 48;
+		--icon-base-reverse: 146, 154, 181;
+		--icon-disabled-reverse: 219, 221, 230;
+
 		--surface-blue: 25, 36, 84;
 		--surface-green: 6, 62, 35;
 		--surface-yellow: 78, 62, 4;
 		--surface-purple: 65, 25, 84;
 		--surface-red: 79, 23, 36;
 		--surface-orange: 78, 35, 4;
-
-		--text-base: 255, 255, 255;
-		--text-subtle: 146, 154, 181;
-		--text-disabled: 99, 111, 146;
-
-		--icon-lighter: 255, 255, 255;
-		--icon-base: 146, 154, 181;
-		--icon-disabled: 99, 111, 146;
 
 		--button-background-base-secondary: 50, 56, 73;
 		--button-background-hover-secondary: 66, 74, 97;
@@ -232,5 +263,92 @@
 	}
 	.loading {
 		@apply animate-spin mr-2;
+	}
+	.main {
+		height: calc(100vh - 72px);
+	}
+	.editor {
+		.overflow-guard,
+		.monaco-editor {
+			border-radius: 8px !important;
+		}
+	}
+}
+
+@layer utilities {
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+
+	.full-height-without-header {
+		--height: calc(100vh - (var(--header-menu-height) + var(--navigation-tab-menu-height)));
+		height: var(--height);
+	}
+
+	.full-max-height-without-header {
+		--height: calc(100vh - (var(--header-menu-height) + var(--navigation-tab-menu-height)));
+		max-height: var(--height);
+	}
+
+	.no-scrollbar {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+
+	.scroll {
+		overflow-y: scroll;
+		height: 90%;
+	}
+}
+.Toastify {
+	z-index: 999999999;
+	pointer-events: auto;
+}
+.Toastify__toast-container {
+	min-width: 400px;
+}
+.Toastify__toast-theme--dark {
+	background-color: rgb(var(--wrapper-background-light));
+	color: var(--text-base);
+}
+.Toastify__toast-theme--light {
+	background-color: rgb(var(--theme-base-background));
+}
+.Toastify__toast-container--top-right {
+	top: 5rem;
+}
+.Toastify__close-button {
+	align-self: center;
+}
+.Toastify__close-button--light {
+	color: rgb(var(--icon-base));
+	opacity: 1;
+}
+.Toastify__close-button > svg {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+.select-box {
+	@apply min-h-[34px] h-9;
+
+	.select__placeholder,
+	.select__input-container {
+		padding: 0 !important;
+	}
+	.select__value-container {
+		padding-inline: 12px !important;
+	}
+	.select__control {
+		@apply shadow-none hover:border-input-hover min-h-[34px] h-9 #{!important};
+	}
+	&:focus-within {
+		.select__control {
+			@apply border-input-focus outline-none ring-0 #{!important};
+		}
+	}
+
+	&.error:not(:focus-within) .select__control {
+		@apply border-error-default #{!important};
 	}
 }

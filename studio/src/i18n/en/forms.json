@@ -1,13 +1,52 @@
 {
 	"required": "{{label}} is required",
+	"invalid": "{{label}} is invalid",
 	"min2": {
 		"error": "{{label}} must be at least 2 characters long",
 		"description": "Minimum 2 characters"
+	},
+	"min3": {
+		"error": "{{label}} must be at least 3 characters long",
+		"description": "Minimum 3 characters"
+	},
+	"min8": {
+		"error": "{{label}} must be at least 8 characters long",
+		"description": "Minimum 8 characters"
 	},
 	"max64": {
 		"error": "{{label}} must be at most 64 characters long",
 		"description": "Maximum 64 characters"
 	},
+	"maxLength": {
+		"error": "Max length must be greater than or equal to 1 and less than or equal to {{length}}",
+		"description": "Maximum {{length}} characters"
+	},
+	"verificationCode": {
+		"length": {
+			"error": "Verification code must be 6 digits long"
+		}
+	},
+	"email": {
+		"error": "Please enter a valid email address"
+	},
+	"url": {
+		"error": "Please enter a valid URL",
+		"without_http_error": "URL must start with http:// or https://",
+		"without_path_error": "Please enter a valid URL without path"
+	},
+	"IP": {
+		"error": "Please enter a valid IP address"
+	},
+	"enterAtLeastOne": "Please enter at least one {{label}}",
+	"enterAtLeastOneValue": "Please enter at least one value",
 	"placeholder": "Enter {{label}}",
-	"alphanumeric": "{{label}} must only contain alphanumeric characters"
+	"alphanumeric": "{{label}} must only contain alphanumeric characters",
+	"number": "{{label}} must be a number",
+	"search_to_add": "Search to add {{label}}",
+	"pick_a_date": "Pick a date",
+	"select": "Select {{label}}",
+	"invalid_character": "{{label}} can include only numbers, letters and underscore (_) characters",
+	"notStartWithNumber": "{{label}} cannot start with a number",
+	"notStartWithUnderscore": "{{label}}  cannot start with underscore (_) character",
+	"reservedKeyword": "{{keyword}} is a reserved keyword and cannot be used as {{label}}"
 }

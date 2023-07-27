@@ -7,6 +7,9 @@
 	}
 	&-slider {
 		@apply flex items-center justify-center gap-16;
+		.swiper-slide {
+			width: 176px !important;
+		}
 	}
 	&-item {
 		@apply flex flex-col items-center justify-center gap-4;
@@ -15,9 +18,25 @@
 		@apply space-y-2 text-center;
 	}
 	&-name {
-		@apply text-default text-xl  font-semibold truncate max-w-[16ch];
+		@apply text-default text-xl truncate max-w-[16ch];
 	}
 	&-role {
-		@apply text-default text-sm  font-semibold;
+		@apply text-default text-sm;
+	}
+	&-button {
+		@apply h-[13rem];
+	}
+}
+
+.members {
+	@apply mt-8;
+	&-header {
+		@apply flex justify-between items-center;
+	}
+	&-filter {
+		@apply flex justify-end gap-4 flex-1;
+	}
+	&-table {
+		@apply mt-8;
 	}
 }

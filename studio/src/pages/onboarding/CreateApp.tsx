@@ -15,24 +15,37 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
-
-async function loader() {
-	return null;
-}
+import { translate } from '@/utils';
+import { useTranslation } from 'react-i18next';
+import { RequireAuth } from '@/router';
 
 const FormSchema = z.object({
 	appName: z
-		.string({ required_error: 'App name is required' })
-		.min(2, 'App name must be at least 2 characters long')
-		.max(64, 'App name must be at most 64 characters long')
+		.string({
+			required_error: translate('forms.required', {
+				label: translate('application.short_name'),
+			}),
+		})
+		.min(2, {
+			message: translate('forms.min2.error', { label: translate('application.short_name') }),
+		})
+		.max(64, {
+			message: translate('forms.max64.error', { label: translate('application.short_name') }),
+		})
 		.trim()
-		.refine((value) => value.trim().length > 0, 'App name is required'),
+		.refine(
+			(value) => value.trim().length > 0,
+			translate('forms.required', {
+				label: translate('application.short_name'),
+			}),
+		),
 });
 
 export default function CreateApp() {
 	const navigate = useNavigate();
 	const { goBack } = useOutletContext() as { goBack: () => void };
 	const { setDataPartially, getCurrentStep, goToNextStep, data } = useOnboardingStore();
+	const { t } = useTranslation();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -51,43 +64,40 @@ export default function CreateApp() {
 	}
 
 	return (
-		<>
-			<Description title='Create Your First App'>
-				In Agnost, you work on apps and their versions. An app is your workspace that packages all
-				required design and configuration elements to run your backend app services.
-			</Description>
+		<RequireAuth>
+			<>
+				<Description title={t('onboarding.app.title')}>{t('onboarding.app.desc')}</Description>
 
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-					<FormField
-						control={form.control}
-						name='appName'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>App Name</FormLabel>
-								<FormControl>
-									<Input
-										error={!!form.formState.errors.appName}
-										placeholder='Enter app name'
-										{...field}
-									/>
-								</FormControl>
-								<FormDescription>Maximum 64 characters</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+						<FormField
+							control={form.control}
+							name='appName'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>{t('application.short_name')}</FormLabel>
+									<FormControl>
+										<Input
+											error={!!form.formState.errors.appName}
+											placeholder={t('application.enter_name') as string}
+											{...field}
+										/>
+									</FormControl>
+									<FormDescription>{t('forms.max64.description')}</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-					<div className='flex gap-4 justify-end'>
-						<Button onClick={goBack} type={'button'} variant='text' size='lg'>
-							Previous
-						</Button>
-						<Button size='lg'>Next</Button>
-					</div>
-				</form>
-			</Form>
-		</>
+						<div className='flex gap-4 justify-end'>
+							<Button onClick={goBack} type={'button'} variant='text' size='lg'>
+								{t('onboarding.previous')}
+							</Button>
+							<Button size='lg'>{t('onboarding.next')}</Button>
+						</div>
+					</form>
+				</Form>
+			</>
+		</RequireAuth>
 	);
 }
-
-CreateApp.loader = loader;

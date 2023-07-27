@@ -22,10 +22,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import * as z from 'zod';
-
-async function loader() {
-	return null;
-}
+import { useTranslation } from 'react-i18next';
+import { RequireAuth } from '@/router';
 
 const FormSchema = z.object({
 	host: z
@@ -50,6 +48,7 @@ export default function SMTPConfiguration() {
 	const [error, setError] = useState<APIError | null>(null);
 	const [isTesting, setIsTesting] = useState(false);
 	const [finalizing, setFinalizing] = useState(false);
+	const { t } = useTranslation();
 
 	const {
 		setDataPartially,
@@ -106,139 +105,140 @@ export default function SMTPConfiguration() {
 	}
 
 	return (
-		<>
-			<Description title='SMTP Configuration'>
-				In order to send invitation emails, you need to configure your SMTP server (email server)
-				connection parameters. This email server configuration will be used to send organization and
-				application invitations and also other platform-related notification messages.
-			</Description>
+		<RequireAuth>
+			<>
+				<Description title={t('onboarding.smtp.title')}>{t('onboarding.smtp.desc')}</Description>
 
-			{error && (
-				<Alert className='!max-w-full' variant='error'>
-					<AlertTitle>{error.error}</AlertTitle>
-					<AlertDescription>{error.details}</AlertDescription>
-				</Alert>
-			)}
+				{error && (
+					<Alert className='!max-w-full' variant='error'>
+						<AlertTitle>{error.error}</AlertTitle>
+						<AlertDescription>{error.details}</AlertDescription>
+					</Alert>
+				)}
 
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-					<FormField
-						control={form.control}
-						name='host'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Host</FormLabel>
-								<FormControl>
-									<Input
-										error={!!form.formState.errors.host}
-										placeholder='Enter hostname'
-										{...field}
-									/>
-								</FormControl>
-								<FormDescription>The hostname or IP address to connect to</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name='port'
-						render={({ field }) => {
-							return (
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+						<FormField
+							control={form.control}
+							name='host'
+							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Port</FormLabel>
+									<FormLabel>{t('onboarding.smtp.host')}</FormLabel>
 									<FormControl>
 										<Input
-											error={!!form.formState.errors.port}
-											placeholder='Enter port'
+											error={!!form.formState.errors.host}
+											placeholder={t('onboarding.smtp.enter_host').toString()}
 											{...field}
 										/>
 									</FormControl>
-									<FormDescription>The port to connect to</FormDescription>
+									<FormDescription>{t('onboarding.smtp.host_desc')}</FormDescription>
 									<FormMessage />
 								</FormItem>
-							);
-						}}
-					/>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='port'
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel>{t('onboarding.smtp.port')}</FormLabel>
+										<FormControl>
+											<Input
+												error={!!form.formState.errors.port}
+												placeholder={t('onboarding.smtp.enter_port').toString()}
+												{...field}
+											/>
+										</FormControl>
+										<FormDescription>{t('onboarding.smtp.port_desc')}</FormDescription>
+										<FormMessage />
+									</FormItem>
+								);
+							}}
+						/>
 
-					<FormField
-						control={form.control}
-						name='user'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>User</FormLabel>
-								<FormControl>
-									<Input
-										error={!!form.formState.errors.user}
-										placeholder='Enter username'
-										{...field}
-									/>
-								</FormControl>
-								<FormDescription>Username for authentication</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name='password'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Password</FormLabel>
-								<FormControl>
-									<PasswordInput
-										error={Boolean(form.formState.errors.password)}
-										type='password'
-										placeholder='Enter Password'
-										{...field}
-									/>
-								</FormControl>
-								<FormDescription>The password for the user</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name='useTLS'
-						render={({ field }) => {
-							console.log(field);
-							return (
-								<FormItem className='flex items-center gap-2'>
-									<FormLabel>Use TLS</FormLabel>
+						<FormField
+							control={form.control}
+							name='user'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>{t('onboarding.smtp.username')}</FormLabel>
 									<FormControl>
-										{/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-										{/* @ts-ignore */}
-										<Switch className='flex !m-0' {...field} />
+										<Input
+											error={!!form.formState.errors.user}
+											placeholder={t('onboarding.smtp.enter_username').toString()}
+											{...field}
+										/>
 									</FormControl>
+									<FormDescription>{t('onboarding.smtp.username_desc')}</FormDescription>
 									<FormMessage />
 								</FormItem>
-							);
-						}}
-					/>
+							)}
+						/>
 
-					<div className='flex gap-4 justify-end'>
-						<Button onClick={goBack} type='button' variant='text' size='lg'>
-							Previous
-						</Button>
-						<Button
-							loading={finalizing}
-							onClick={finishSetup}
-							type='button'
-							variant='secondary'
-							size='lg'
-						>
-							Skip & Finish
-						</Button>
-						<Button loading={isTesting} size='lg'>
-							Next
-						</Button>
-					</div>
-				</form>
-			</Form>
-		</>
+						<FormField
+							control={form.control}
+							name='password'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>{t('onboarding.smtp.password')}</FormLabel>
+									<FormControl>
+										<PasswordInput
+											error={Boolean(form.formState.errors.password)}
+											type='password'
+											placeholder={t('onboarding.smtp.enter_password').toString()}
+											{...field}
+										/>
+									</FormControl>
+									<FormDescription>{t('onboarding.smtp.password_desc')}</FormDescription>
+
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='useTLS'
+							render={({ field }) => {
+								return (
+									<FormItem className='flex items-center gap-2'>
+										<FormLabel>{t('onboarding.smtp.useTLS')}</FormLabel>
+										<FormControl>
+											<Switch
+												className='flex !m-0'
+												onBlur={field.onBlur}
+												ref={field.ref}
+												name={field.name}
+												checked={field.value}
+												onCheckedChange={field.onChange}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								);
+							}}
+						/>
+
+						<div className='flex gap-4 justify-end'>
+							<Button onClick={goBack} type='button' variant='text' size='lg'>
+								{t('onboarding.previous')}
+							</Button>
+							<Button
+								loading={finalizing}
+								onClick={finishSetup}
+								type='button'
+								variant='secondary'
+								size='lg'
+							>
+								{t('onboarding.skip_and_finish')}
+							</Button>
+							<Button loading={isTesting} size='lg'>
+								{t('onboarding.next')}
+							</Button>
+						</div>
+					</form>
+				</Form>
+			</>
+		</RequireAuth>
 	);
 }
-
-SMTPConfiguration.loader = loader;

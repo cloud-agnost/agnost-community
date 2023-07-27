@@ -1,12 +1,24 @@
 .modal {
-	@apply fixed inset-0 z-50 flex items-center justify-center bg-base/80;
+	@apply fixed inset-0 z-50 flex items-center justify-center bg-base/80 pointer-events-auto overflow-auto;
 
-	.modal-body {
+	&-title {
+		@apply text-xl text-default font-semibold leading-8;
+	}
+
+	&-body {
 		width: min(100% - 2rem, 570px);
-		@apply relative bg-subtle rounded-lg p-6;
-
-		.modal-close {
-			@apply absolute top-4 right-4;
+		@apply relative bg-subtle rounded-lg;
+	}
+	&-content {
+		@apply px-6 py-6;
+		&:not(.no-header) {
+			@apply pt-4;
 		}
+	}
+	&-close {
+		@apply absolute top-4 right-4 aspect-square w-10 h-10 text-icon-base hover:text-icon-secondary;
+	}
+	&-header {
+		@apply flex items-center justify-between border-b border-border px-6 pb-6 pt-10;
 	}
 }

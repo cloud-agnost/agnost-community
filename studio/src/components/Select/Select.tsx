@@ -12,11 +12,21 @@ const SelectGroup = SelectPrimitive.Group;
 
 const SelectValue = SelectPrimitive.Value;
 
+interface SelectTriggerProps
+	extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> {
+	className?: string;
+	error?: boolean;
+}
+
 const SelectTrigger = React.forwardRef<
 	React.ElementRef<typeof SelectPrimitive.Trigger>,
-	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-	<SelectPrimitive.Trigger ref={ref} className={cn('select', className)} {...props}>
+	SelectTriggerProps
+>(({ className, children, error, ...props }, ref) => (
+	<SelectPrimitive.Trigger
+		ref={ref}
+		className={cn('select', error && 'border-error-default', className)}
+		{...props}
+	>
 		{children}
 		<SelectPrimitive.Icon asChild>
 			<CaretDown className='h-4 w-4' />
@@ -56,10 +66,14 @@ SelectLabel.displayName = SelectPrimitive.Label.displayName;
 
 const SelectItem = React.forwardRef<
 	React.ElementRef<typeof SelectPrimitive.Item>,
-	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
->(({ className, children, ...props }, ref) => (
+	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item> & {
+		checkClassName?: string;
+	}
+>(({ className, checkClassName, children, ...props }, ref) => (
 	<SelectPrimitive.Item ref={ref} className={cn('select-item', className)} {...props}>
-		<span className='absolute left-2 flex h-3.5 w-3.5 items-center justify-center'>
+		<span
+			className={cn('absolute left-2 flex h-3.5 w-3.5 items-center justify-center', checkClassName)}
+		>
 			<SelectPrimitive.ItemIndicator>
 				<Check className='h-4 w-4' />
 			</SelectPrimitive.ItemIndicator>
@@ -74,7 +88,11 @@ const SelectSeparator = React.forwardRef<
 	React.ElementRef<typeof SelectPrimitive.Separator>,
 	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>
 >(({ className, ...props }, ref) => (
-	<SelectPrimitive.Separator ref={ref} className={cn('', className)} {...props} />
+	<SelectPrimitive.Separator
+		ref={ref}
+		className={cn('h-[1px] my-1 bg-border -mx-1', className)}
+		{...props}
+	/>
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 

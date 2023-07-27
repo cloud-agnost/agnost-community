@@ -1,40 +1,44 @@
-import { Description } from '@/components/Description';
-import { AuthLayout } from '@/layouts/AuthLayout';
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Button } from '@/components/Button';
-import * as z from 'zod';
+import { Description } from '@/components/Description';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
+import { AuthLayout } from '@/layouts/AuthLayout';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 
-import './auth.scss';
-import { APIError } from '@/types';
-import useAuthStore from '@/store/auth/authStore.ts';
 import { PasswordInput } from '@/components/PasswordInput';
-import { Link, useParams } from 'react-router-dom';
+import useAuthStore from '@/store/auth/authStore.ts';
+import { APIError } from '@/types';
+import { translate } from '@/utils';
 import { CaretLeft } from '@phosphor-icons/react';
+import { useTranslation } from 'react-i18next';
+import { Link, LoaderFunctionArgs, redirect, useLoaderData } from 'react-router-dom';
+import './auth.scss';
 
 const FormSchema = z.object({
 	password: z
-		.string({ required_error: 'Password is required' })
-		.min(8, 'Password must be at least 8 characters long'),
+		.string({
+			required_error: translate('forms.required', {
+				label: translate('login.password'),
+			}),
+		})
+		.min(8, translate('forms.min8.error', { label: translate('login.password') })),
 });
 
-export default function ForgotPassword() {
+export default function ChangePasswordWithToken() {
 	const { changePasswordWithToken } = useAuthStore();
-	const { token } = useParams<{ token: string }>();
+	const token = useLoaderData() as string;
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
 	const [success, setSuccess] = useState(false);
-
+	const { t } = useTranslation();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		if (!token) return;
-
 		try {
 			setError(null);
 			setLoading(true);
@@ -52,8 +56,8 @@ export default function ForgotPassword() {
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
-				<Description title='Change Your Password'>
-					Enter your new password below to change your password.
+				<Description title={t('login.change_your_password')}>
+					{t('login.enter_new_password_desc')}
 				</Description>
 
 				{error && (
@@ -66,15 +70,15 @@ export default function ForgotPassword() {
 				{success ? (
 					<div className='space-y-8'>
 						<Alert className='!max-w-full mb-8' variant='success'>
-							<AlertTitle>Your password has been changed successfully.</AlertTitle>
-							<AlertDescription>You can now login with your new password.</AlertDescription>
+							<AlertTitle>{t('login.changed_successfully')}</AlertTitle>
+							<AlertDescription>{t('login.changed_successfully_desc')}</AlertDescription>
 						</Alert>
 						<Link
 							to='/login'
 							className='text-default hover:underline mt-4 flex items-center justify-center'
 						>
 							<CaretLeft className='mr-1 inline-block' />
-							Back to Login
+							{t('login.back_to_login')}
 						</Link>
 					</div>
 				) : (
@@ -85,11 +89,11 @@ export default function ForgotPassword() {
 								name='password'
 								render={({ field }) => (
 									<FormItem className='space-y-1'>
-										<FormLabel>Password</FormLabel>
+										<FormLabel>{t('login.password')}</FormLabel>
 										<FormControl>
 											<PasswordInput
 												error={Boolean(form.formState.errors.password)}
-												placeholder='Enter your new password'
+												placeholder={t('login.enter_new_password') as string}
 												{...field}
 											/>
 										</FormControl>
@@ -100,10 +104,10 @@ export default function ForgotPassword() {
 
 							<div className='flex justify-end gap-4'>
 								<Button to='/login' variant='text' type='button' size='lg'>
-									Back to Login
+									{t('login.back_to_login')}
 								</Button>
 								<Button loading={loading} size='lg'>
-									Change Password
+									{t('login.change_password')}
 								</Button>
 							</div>
 						</form>
@@ -113,3 +117,12 @@ export default function ForgotPassword() {
 		</AuthLayout>
 	);
 }
+
+ChangePasswordWithToken.loader = ({ request }: LoaderFunctionArgs) => {
+	const token = new URL(request.url).searchParams.get('token');
+	if (!token) {
+		return redirect('/login');
+	}
+
+	return token;
+};

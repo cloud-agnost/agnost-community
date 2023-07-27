@@ -1,13 +1,18 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { AgnostOnlyLogo } from '@/components/icons';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { Bell, Cloud } from '@phosphor-icons/react';
-import { Link } from 'react-router-dom';
-import './header.scss';
 import { MENU_ITEMS } from '@/constants';
+import { OrganizationDropdown } from '@/features/organization/OrganizationDropdown';
+import { ApplicationSelectDropdown } from '@/features/application';
+import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
+import { VersionDropdown } from '@/features/version/VersionDropdown';
+import { Bell, CaretRight, Cloud } from '@phosphor-icons/react';
+import { Link, useParams } from 'react-router-dom';
+import './header.scss';
+import AuthUserDropdown from '../../features/auth/AuthUserDropdown/AuthUserDropdown.tsx';
+
 export function Header() {
-	const { user } = useAuthStore();
+	const { versionId, appId } = useParams();
+
 	return (
 		<header className='header-menu'>
 			<div className='header-menu-left'>
@@ -15,7 +20,21 @@ export function Header() {
 					<AgnostOnlyLogo width='40' height='40' />
 				</Link>
 				<div className='header-menu-divider' />
-				<div className='header-menu-left-organization-select'>Organization Select Dropdown</div>
+				<div className='flex items-center gap-2'>
+					<OrganizationDropdown />
+					{appId && (
+						<>
+							<CaretRight size={20} className='text-icon-disabled' />
+							<ApplicationSelectDropdown />
+						</>
+					)}
+					{versionId && (
+						<>
+							<CaretRight size={20} className='text-icon-disabled' />
+							<VersionDropdown />
+						</>
+					)}
+				</div>
 			</div>
 			<div className='header-menu-right'>
 				<nav className='header-menu-right-nav'>
@@ -31,22 +50,15 @@ export function Header() {
 				<div className='header-menu-divider' />
 				<div className='header-menu-right-actions'>
 					<div className='header-menu-right-actions-versions'>
-						<Button variant='icon'>
-							<Cloud />
-						</Button>
+						<DeploymentStatusCard triggerIcon={<Cloud />} />
 					</div>
 					<div className='header-menu-right-actions-notification'>
-						<Button variant='icon'>
+						<Button variant='blank'>
 							<Bell />
 						</Button>
 					</div>
 					<div className='header-menu-right-actions-user'>
-						<Link to='/profile' className='header-menu-right-actions-user-avatar'>
-							<Avatar size='sm'>
-								<AvatarImage src='https://avatars.githubusercontent.com/u/1500684?s=400&u=3a3d2f8d7d1b5c2b5f5d9f3e3b9e5f6f8b0c9b8a&v=4' />
-								{user && <AvatarFallback color={user?.color} name={user?.name} />}
-							</Avatar>
-						</Link>
+						<AuthUserDropdown />
 					</div>
 				</div>
 			</div>

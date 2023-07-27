@@ -2,8 +2,9 @@ import { Button } from '@/components/Button';
 import { cn } from '@/utils';
 import { X } from '@phosphor-icons/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
+import { MouseEvent, ReactNode, useRef, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import './Modal.scss';
+import { createPortal } from 'react-dom';
 
 export interface ModalProps {
 	title?: string | null;
@@ -12,34 +13,47 @@ export interface ModalProps {
 	isOpen: boolean;
 	closeModal: () => void;
 	closeOnOverlayClick?: boolean;
+	parentClassNames?: string;
+	contentClassNames?: string;
+	hideHeader?: boolean;
+	closeOnEsc?: boolean;
 }
 export default function Modal({
 	title,
 	children,
 	className,
 	isOpen = false,
-	closeModal = () => {},
+	parentClassNames,
+	closeModal,
+	contentClassNames,
 	closeOnOverlayClick = false,
+	closeOnEsc = false,
+	hideHeader = false,
 }: ModalProps) {
 	const modalOverlay = useRef(null);
 
-	useEffect(() => {
-		const handleEsc = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') closeModal();
-		};
-		window.addEventListener('keydown', handleEsc);
-		return () => window.removeEventListener('keydown', handleEsc);
-	}, []);
+	function handleEsc(event: KeyboardEvent | ReactKeyboardEvent<HTMLDivElement>) {
+		if (!closeOnEsc) return;
+		if (event.key === 'Escape') closeModal();
+	}
 
 	const clickOutside = (event: MouseEvent) => {
 		if (!closeOnOverlayClick) return;
 		if (modalOverlay?.current === event.target) closeModal();
 	};
 
-	return (
+	return createPortal(
 		<AnimatePresence>
 			{isOpen && (
-				<div ref={modalOverlay} className='modal open' onClick={clickOutside}>
+				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+				<div
+					role='dialog'
+					ref={modalOverlay}
+					className={cn('modal', parentClassNames)}
+					onClick={isOpen ? clickOutside : undefined}
+					onKeyDown={handleEsc}
+					aria-hidden={!isOpen}
+				>
 					<motion.div
 						initial={{ scale: '0', opacity: 0 }}
 						animate={{ scale: 1, opacity: 1 }}
@@ -47,17 +61,40 @@ export default function Modal({
 						transition={{ type: 'tween' }}
 						className={cn('modal-body', className)}
 					>
-						<Button size='sm' onClick={closeModal} className='modal-close' variant='link'>
-							<X size={24} className='text-icon-base' />
-						</Button>
-
-						<div className='space-y-6'>
-							<h5 className='text-xl text-default'>{title}</h5>
-							{children}
+						<div>
+							{!hideHeader &&
+								(title ? (
+									<div className='modal-header'>
+										<h5 className='modal-title'>{title}</h5>
+										<Button
+											size='sm'
+											onClick={closeModal}
+											className='modal-close'
+											variant='text'
+											rounded
+										>
+											<X size={24} />
+										</Button>
+									</div>
+								) : (
+									<Button
+										size='sm'
+										onClick={closeModal}
+										className='modal-close'
+										variant='text'
+										rounded
+									>
+										<X size={24} />
+									</Button>
+								))}
+							<div className={cn('modal-content', hideHeader && 'no-header', contentClassNames)}>
+								{children}
+							</div>
 						</div>
 					</motion.div>
 				</div>
 			)}
-		</AnimatePresence>
+		</AnimatePresence>,
+		document.body,
 	);
 }

@@ -1,11 +1,16 @@
 .select {
-	@apply flex h-9 w-full items-center justify-between text-default;
-	@apply rounded-md border border-border bg-transparent;
+	@apply flex h-9 items-center justify-between text-default;
+	@apply rounded-md border border-input-border bg-transparent;
 	@apply px-3 py-2 text-sm ring-offset-button-primary;
 	@apply placeholder:text-subtle focus:outline-none;
 	@apply focus:border-button-primary;
-	@apply disabled:cursor-not-allowed disabled:bg-input-disabled-background;
 	@apply truncate max-w-[calc(100%)];
+	@apply border-input-disabled-border disabled:text-subtle;
+	@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border disabled:cursor-not-allowed;
+	&[data-placeholder] span {
+		@apply text-subtle focus:outline-none;
+	}
+
 	&-content {
 		@apply relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-wrapper-background-light;
 		@apply text-subtle shadow-md;
@@ -34,6 +39,17 @@
 		@apply -mx-1 my-1 h-px bg-subtle;
 	}
 	span {
-		@apply truncate max-w-[calc(100%-1rem)] block;
+		@apply truncate max-w-[calc(100%-1rem)] block flex-1 text-start;
+	}
+
+	&.input {
+		@apply flex h-9 w-full px-3 py-2 text-sm text-default bg-input-background rounded appearance-none;
+		@apply border border-input-border hover:border-input-hover;
+		@apply disabled:cursor-not-allowed disabled:opacity-50;
+		@apply focus:border-input-focus focus:outline-none focus:ring-0;
+		@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border;
+		&-error {
+			@apply border-error-default;
+		}
 	}
 }
