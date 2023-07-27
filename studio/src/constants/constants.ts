@@ -5,37 +5,65 @@ import {
 	ApiKeys,
 	Authentication,
 	BellRing,
+	Binary,
 	Cache,
+	Calendar,
 	ChangeLog,
 	Connect,
 	Database as DatabaseIcon,
+	Decimal,
+	Decision,
 	DeviceMobile,
 	Environment,
 	EnvironmentVariable,
+	Integer,
 	LightBulb,
 	LineSegments,
 	MessageQueue,
 	MongoDb,
 	MySql,
 	NpmPackage,
+	Object as ObjectIcon,
+	ObjectList,
 	Oracle,
 	PostgreSql,
 	RateLimit,
 	RealTime,
 	Resource,
+	RichText,
 	Storage,
 	Team,
+	Timestamp,
 } from '@/components/icons';
 import { ConnectDatabase, CreateDatabase, SelectResourceType } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Application, Instance, Method, SortOption, Tab } from '@/types';
 import { history, translate } from '@/utils';
-import { FileText, GearSix, Plus } from '@phosphor-icons/react';
+import {
+	BracketsCurly,
+	Clock,
+	CurrencyDollarSimple,
+	Envelope,
+	FileText,
+	GearSix,
+	IdentificationBadge,
+	LinkSimple,
+	ListChecks,
+	ListNumbers,
+	LockSimple,
+	MapPin,
+	Phone,
+	Plus,
+	Share,
+	SignOut,
+	TextAa,
+} from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { DropdownMenuSeparator } from 'components/Dropdown';
 import { ElementType, Fragment } from 'react';
 import * as z from 'zod';
+import useAuthStore from '@/store/auth/authStore.ts';
 
 export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
@@ -704,17 +732,6 @@ export const NAME_SCHEMA = z
 		}),
 	);
 
-export const ADD_MODEL_FIELDS_TAB_ITEMS = [
-	{
-		name: 'General Properties',
-		href: '?t=general',
-	},
-	{
-		name: 'Specific Properties',
-		href: '?t=specific',
-	},
-];
-
 export const MODEL_FIELD_DEFAULT_VALUE_TYPES = [
 	{
 		name: 'Constant',
@@ -759,7 +776,68 @@ export const TIMESTAMPS_SCHEMA = z
 		}
 	});
 
-export const TEXT_MAX_LENGTH = 256;
-export const RICH_TEXT_MAX_LENGTH = 1024;
-export const ENCRYPTED_TEXT_MAX_LENGTH = 256;
-export const DECIMAL_DIGITS = 2;
+export const FIELD_ICON_MAP: Record<string, ElementType> = {
+	text: TextAa,
+	email: Envelope,
+	link: LinkSimple,
+	'encrypted-text': LockSimple,
+	phone: Phone,
+	'rich-text': RichText,
+	boolean: Decision,
+	integer: Integer,
+	decimal: Decimal,
+	monetary: CurrencyDollarSimple,
+	datetime: Timestamp,
+	date: Calendar,
+	time: Clock,
+	enum: ListChecks,
+	'geo-point': MapPin,
+	binary: Binary,
+	json: BracketsCurly,
+	reference: Share,
+	'basic-values-list': ListNumbers,
+	object: ObjectIcon,
+	'object-list': ObjectList,
+	id: IdentificationBadge,
+};
+
+/**
+ * @type ReferenceAction
+ */
+export const REFERENCE_FIELD_ACTION = ['CASCADE', 'NO ACTION', 'SET NULL', 'SET DEFAULT'] as const;
+
+export const MAX_LENGTHS: Record<string, number> = {
+	'encrypted-text': 50,
+	decimal: 10,
+	enum: 1000,
+	text: 10240,
+};
+
+export const HEADER_USER_DROPDOWN = [
+	{
+		iconClassName: 'text-lg',
+		title: translate('general.account_settings'),
+		url: '/profile/settings',
+		Icon: GearSix,
+		action: undefined,
+		beforeHasSeparator: false,
+	},
+	{
+		iconClassName: 'text-lg',
+		title: translate('profileSettings.clusters_title'),
+		url: '/profile/settings/cluster-management',
+		Icon: LineSegments,
+		action: undefined,
+		beforeHasSeparator: false,
+	},
+	{
+		iconClassName: 'text-lg',
+		title: translate('general.logout'),
+		url: undefined,
+		Icon: SignOut,
+		action: () => {
+			useAuthStore.getState().logout();
+		},
+		beforeHasSeparator: true,
+	},
+];
