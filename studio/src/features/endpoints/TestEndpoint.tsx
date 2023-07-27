@@ -24,6 +24,7 @@ import { OrganizationMenuItem } from '../organization';
 import EndpointBody from './TestEndpoint/EndpointBody';
 import EndpointHeaders from './TestEndpoint/EndpointHeaders';
 import TestEndpointParams from './TestEndpoint/TestEndpointParams';
+import { TestMethods } from '@/types';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -68,9 +69,8 @@ export const TestEndpointSchema = z.object({
 export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { t } = useTranslation();
 	const { environment } = useEnvironmentStore();
-	const { endpoint, testEndpoint, endpointRequest, endpointResponse } = useEndpointStore();
+	const { endpoint, testEndpoint, endpointRequest } = useEndpointStore();
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState({});
 	const [path, setPath] = useState(endpoint?.path as string);
 	const [searchParams] = useSearchParams();
 	const form = useForm<z.infer<typeof TestEndpointSchema>>({
@@ -99,7 +99,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			epId: endpoint?.iid as string,
 			envId: environment?.iid as string,
 			path: testPath,
-			method: 'post',
+			method: endpoint?.method.toLowerCase() as TestMethods,
 			params: {
 				queryParams: arrayToObj(data.params.queryParams),
 			},
@@ -116,7 +116,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 		});
 		console.log(params);
 	}
-	console.log(form.formState.errors);
 
 	useEffect(() => {
 		const params = form.getValues('params.queryParams');
