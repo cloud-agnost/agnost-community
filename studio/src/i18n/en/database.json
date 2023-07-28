@@ -29,6 +29,9 @@
 			"name": {
 				"field": "Model Name"
 			},
+			"schema": {
+				"field": "Schema Name"
+			},
 			"description": {
 				"field": "Model Description"
 			},

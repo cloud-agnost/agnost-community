@@ -84,5 +84,6 @@
 	"max_length": "Max Length",
 	"decimal_digits": "Decimal Digits",
 	"account_settings": "Account Settings",
-	"logout": "Log Out"
+	"logout": "Log Out",
+	"optional": "Optional"
 }
