@@ -2,7 +2,7 @@ import ApplicationCreateModal from '@/features/application/ApplicationCreateModa
 import { Layout } from '@/layouts/Layout';
 import { useState } from 'react';
 import { LoaderFunctionArgs, Outlet, useMatch } from 'react-router-dom';
-import { OrganizationMenu } from '@/features/organization';
+import { OrganizationMenu } from '@/features/Organization';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useApplicationStore from '@/store/app/applicationStore.ts';

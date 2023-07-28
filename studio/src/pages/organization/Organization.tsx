@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
-import { OrganizationCreateModal } from '@/features/organization';
+import { OrganizationCreateModal } from '@/features/Organization';
 import { RequireAuth } from '@/router';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
 import useAuthStore from '@/store/auth/authStore.ts';
