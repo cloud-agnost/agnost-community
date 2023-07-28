@@ -206,7 +206,7 @@ export default function EndpointForm() {
 										);
 										field.onChange(ordered);
 									}}
-									options={rateLimits?.filter((lmt) => field.value?.includes(lmt.iid))}
+									options={rateLimits?.filter((lmt) => !field.value?.includes(lmt.iid))}
 									onSelect={(limiter: RateLimit) => {
 										if (!field.value) field.onChange([limiter.iid]);
 										else field.onChange([...field.value, limiter.iid]);

@@ -26,8 +26,8 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 		resolver: zodResolver(CreateEndpointSchema),
 	});
 
-	function onSubmit(data: z.infer<typeof CreateEndpointSchema>) {
-		createEndpoint({
+	async function onSubmit(data: z.infer<typeof CreateEndpointSchema>) {
+		await createEndpoint({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
