@@ -734,11 +734,11 @@ export const NAME_SCHEMA = z
 
 export const MODEL_FIELD_DEFAULT_VALUE_TYPES = [
 	{
-		name: 'Constant',
+		name: translate('database.fields.constant'),
 		value: '',
 	},
 	{
-		name: 'JS Function',
+		name: translate('database.fields.js_function'),
 		value: `export default function getDefaultValues(value, allValues) {
 	return value;
 }`,

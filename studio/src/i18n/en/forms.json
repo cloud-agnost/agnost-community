@@ -18,8 +18,11 @@
 		"description": "Maximum 64 characters"
 	},
 	"maxLength": {
-		"error": "Max length must be greater than or equal to 1 and less than or equal to {{length}}",
+		"error": "{{label}} must be greater than or equal to 1 and less than or equal to {{length}}",
 		"description": "Maximum {{length}} characters"
+	},
+	"doesntStartWithNumber": {
+		"error": "{{label}} cannot start with a number"
 	},
 	"verificationCode": {
 		"length": {

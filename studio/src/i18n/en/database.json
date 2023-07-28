@@ -64,6 +64,8 @@
 		"no_models": "You have not defined any for models for this database"
 	},
 	"fields": {
+		"constant": "Constant",
+		"js_function": "JS Function",
 		"title": "Fields of {{model}}",
 		"create": "Create Field",
 		"add": "Add Field",

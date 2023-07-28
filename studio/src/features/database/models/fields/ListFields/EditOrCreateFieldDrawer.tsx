@@ -24,7 +24,7 @@ import {
 } from '@/constants';
 import { useEffect, useState } from 'react';
 import { APIError, BasicValueListType, Field, FieldType, ReferenceAction } from '@/types';
-import { capitalize, cn, toDisplayName, translate } from '@/utils';
+import { capitalize, cn, toDisplayName } from '@/utils';
 import { useParams } from 'react-router-dom';
 import { Switch } from 'components/Switch';
 import { SettingsFormItem } from 'components/SettingsFormItem';
@@ -93,7 +93,11 @@ export default function EditOrCreateFieldDrawer({
 	const Schema = z.object({
 		general: z
 			.object({
-				name: NAME_SCHEMA,
+				name: NAME_SCHEMA.refine((value) => /^(?![0-9])/.test(value), {
+					message: t('forms.doesntStartWithNumber.error', {
+						label: t('general.name'),
+					}).toString(),
+				}),
 				required: z.boolean(),
 				unique: z.boolean(),
 				indexed: z.boolean(),
@@ -104,38 +108,45 @@ export default function EditOrCreateFieldDrawer({
 				maxLength: z
 					.string()
 					.regex(/^\d+$/, {
-						message: translate('forms.number', {
-							label: capitalize(translate('general.max_length').toLowerCase()),
-						}),
+						message: t('forms.number', {
+							label: capitalize(t('general.max_length').toLowerCase()),
+						}).toString(),
 					})
 					.refine((value) => Number(value) > 0 && Number(value) <= MAX_LENGTH, {
 						message: t('forms.maxLength.error', {
 							length: MAX_LENGTH,
+							label: capitalize(t('general.max_length').toLowerCase()),
 						}).toString(),
 					})
 					.optional(),
 				decimalDigits: z
 					.string()
 					.regex(/^\d+$/, {
-						message: translate('forms.number', {
-							label: capitalize(translate('general.decimal_digits').toLowerCase()),
-						}),
+						message: t('forms.number', {
+							label: capitalize(t('general.decimal_digits').toLowerCase()),
+						}).toString(),
+					})
+					.refine((value) => Number(value) > 0 && Number(value) <= MAX_LENGTH, {
+						message: t('forms.maxLength.error', {
+							length: MAX_LENGTH,
+							label: capitalize(t('general.decimal_digits').toLowerCase()),
+						}).toString(),
 					})
 					.optional(),
 				basicValueList: z
 					.string()
 					.refine((value) => basicValueListTypes.includes(value), {
-						message: translate('forms.invalid', {
-							label: translate('database.fields.basic_value_list_type'),
-						}),
+						message: t('forms.invalid', {
+							label: t('database.fields.basic_value_list_type'),
+						}).toString(),
 					})
 					.optional(),
 				referenceModelIid: z
 					.string()
 					.refine((value) => models.some((model) => model.iid === value), {
-						message: translate('forms.invalid', {
-							label: translate('database.fields.reference_model'),
-						}),
+						message: t('forms.invalid', {
+							label: t('database.fields.reference_model'),
+						}).toString(),
 					})
 					.optional(),
 				referenceAction: z.enum(REFERENCE_FIELD_ACTION).optional(),
@@ -146,9 +157,9 @@ export default function EditOrCreateFieldDrawer({
 				if (hasMaxLength && !arg.maxLength) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
-						message: translate('forms.required', {
-							label: capitalize(translate('general.max_length').toLowerCase()),
-						}),
+						message: t('forms.required', {
+							label: capitalize(t('general.max_length').toLowerCase()),
+						}).toString(),
 						path: ['maxLength'],
 					});
 				}
@@ -156,9 +167,9 @@ export default function EditOrCreateFieldDrawer({
 				if (isDecimal && !arg.decimalDigits) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
-						message: translate('forms.required', {
-							label: capitalize(translate('general.decimal_digits').toLowerCase()),
-						}),
+						message: t('forms.required', {
+							label: capitalize(t('general.decimal_digits').toLowerCase()),
+						}).toString(),
 						path: ['decimalDigits'],
 					});
 				}
@@ -166,9 +177,9 @@ export default function EditOrCreateFieldDrawer({
 				if (isBasicValueList && !arg.basicValueList) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
-						message: translate('forms.required', {
-							label: capitalize(translate('database.fields.basic_value_list_type').toLowerCase()),
-						}),
+						message: t('forms.required', {
+							label: capitalize(t('database.fields.basic_value_list_type').toLowerCase()),
+						}).toString(),
 						path: ['basicValueList'],
 					});
 				}
@@ -176,7 +187,7 @@ export default function EditOrCreateFieldDrawer({
 				if (isEnum && (!arg.enumSelectList || arg.enumSelectList?.trim().length === 0)) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
-						message: translate('forms.enterAtLeastOneValue'),
+						message: t('forms.enterAtLeastOneValue').toString(),
 						path: ['enumSelectList'],
 					});
 				}
@@ -184,9 +195,9 @@ export default function EditOrCreateFieldDrawer({
 				if (isReference && !arg.referenceModelIid) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
-						message: translate('forms.required', {
-							label: capitalize(translate('database.fields.reference_model').toLowerCase()),
-						}),
+						message: t('forms.required', {
+							label: capitalize(t('database.fields.reference_model').toLowerCase()),
+						}).toString(),
 						path: ['referenceModelIid'],
 					});
 				}
@@ -194,9 +205,9 @@ export default function EditOrCreateFieldDrawer({
 				if (isReference && !arg.referenceAction) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
-						message: translate('forms.required', {
-							label: capitalize(translate('database.fields.reference_action').toLowerCase()),
-						}),
+						message: t('forms.required', {
+							label: capitalize(t('database.fields.reference_action').toLowerCase()),
+						}).toString(),
 						path: ['referenceAction'],
 					});
 				}

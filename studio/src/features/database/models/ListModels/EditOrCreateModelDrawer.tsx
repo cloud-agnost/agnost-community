@@ -27,7 +27,11 @@ import { useParams } from 'react-router-dom';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 
 const Schema = z.object({
-	name: NAME_SCHEMA,
+	name: NAME_SCHEMA.refine((value) => /^(?![0-9])/.test(value), {
+		message: translate('forms.doesntStartWithNumber.error', {
+			label: translate('general.name'),
+		}).toString(),
+	}),
 	schema: z.string().optional(),
 	description: z.string({
 		required_error: translate('forms.required', { label: translate('general.description') }),
