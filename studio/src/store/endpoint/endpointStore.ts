@@ -20,7 +20,7 @@ import { devtools, persist } from 'zustand/middleware';
 interface EndpointStore {
 	selectEndpointDialogOpen: boolean;
 	endpoints: Endpoint[];
-	endpoint: Endpoint | null;
+	endpoint: Endpoint;
 	selectedEndpointIds: string[];
 	lastFetchedCount: number;
 	endpointRequest: TestEndpointParams[];
@@ -49,7 +49,7 @@ const useEndpointStore = create<EndpointStore>()(
 			(set, get) => ({
 				selectEndpointDialogOpen: false,
 				endpoints: [],
-				endpoint: null,
+				endpoint: {} as Endpoint,
 				selectedEndpointIds: [],
 				endpointRequest: [],
 				endpointResponse: [],
@@ -120,6 +120,7 @@ const useEndpointStore = create<EndpointStore>()(
 						const endpoint = await EndpointService.updateEndpoint(params);
 						set((prev) => ({
 							endpoints: prev.endpoints.map((e) => (e._id === endpoint._id ? endpoint : e)),
+							endpoint,
 						}));
 						if (params.onSuccess) params.onSuccess();
 						return endpoint;
