@@ -1,6 +1,6 @@
 import { SettingsContainer } from '@/features/version/SettingsContainer';
 import { useState } from 'react';
-import { Row } from '@tanstack/react-table';
+import { Row, Table } from '@tanstack/react-table';
 import { RateLimit } from '@/types';
 import { useTranslation } from 'react-i18next';
 import { SettingsRateLimits } from '@/features/version/SettingsRateLimits';
@@ -8,15 +8,26 @@ import RateLimitsActions from '@/features/version/SettingsRateLimits/RateLimitsA
 
 export default function VersionSettingsRateLimits() {
 	const [selectedRows, setSelectedRows] = useState<Row<RateLimit>[]>();
+	const [table, setTable] = useState<Table<RateLimit>>();
 	const { t } = useTranslation();
 
 	return (
 		<SettingsContainer
-			action={<RateLimitsActions selectedRows={selectedRows} />}
+			action={
+				<RateLimitsActions
+					setSelectedRows={setSelectedRows}
+					table={table}
+					selectedRows={selectedRows}
+				/>
+			}
 			pageTitle={t('version.settings.rate_limits')}
 			className='table-view'
 		>
-			<SettingsRateLimits selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
+			<SettingsRateLimits
+				setTable={setTable}
+				selectedRows={selectedRows}
+				setSelectedRows={setSelectedRows}
+			/>
 		</SettingsContainer>
 	);
 }
