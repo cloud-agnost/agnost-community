@@ -277,7 +277,7 @@ export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 	},
 	{
 		title: translate('version.message_queues'),
-		path: 'message-queue',
+		path: 'queue',
 	},
 	{
 		title: translate('version.cron_jobs'),
