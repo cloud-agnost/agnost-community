@@ -7,7 +7,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { SearchInput } from 'components/SearchInput';
 import { Button } from 'components/Button';
 import { ArrowLeft, CaretRight } from '@phosphor-icons/react';
-import { Row } from '@tanstack/react-table';
+import { Row, Table } from '@tanstack/react-table';
 import { SelectedRowDropdown } from 'components/Table';
 import useModelStore from '@/store/database/modelStore.ts';
 import { CreateFieldButton } from '@/features/database/models/fields/ListFields';
@@ -16,10 +16,11 @@ interface ModelActionsProps {
 	setSelectedRows: Dispatch<SetStateAction<Row<Field>[] | undefined>>;
 	selectedRows: Row<Field>[] | undefined;
 	setSearch: Dispatch<SetStateAction<string>>;
+	table: Table<Field> | undefined;
 }
-export default function ModelActions({ selectedRows, setSearch }: ModelActionsProps) {
+export default function ModelActions({ selectedRows, setSearch, table }: ModelActionsProps) {
 	const { databases } = useDatabaseStore();
-	const { models } = useModelStore();
+	const { models, deleteMultipleField } = useModelStore();
 	const { t } = useTranslation();
 	const { dbId, modelId } = useParams();
 
@@ -39,6 +40,18 @@ export default function ModelActions({ selectedRows, setSearch }: ModelActionsPr
 			.slice(0, -1)
 			.join('/'),
 	);
+
+	async function deleteHandler() {
+		await deleteMultipleField({
+			dbId: model.dbId,
+			modelId: model._id,
+			appId: database.appId,
+			orgId: database.orgId,
+			versionId: database.versionId,
+			fieldIds: selectedRows?.map((row) => row.original._id) as string[],
+		});
+		table?.resetRowSelection?.();
+	}
 
 	return (
 		<>
@@ -67,9 +80,8 @@ export default function ModelActions({ selectedRows, setSearch }: ModelActionsPr
 					/>
 					{!!selectedRows?.length && (
 						<SelectedRowDropdown
-							onDelete={() => {
-								// TODO
-							}}
+							table={table}
+							onDelete={deleteHandler}
 							selectedRowLength={selectedRows?.length}
 						/>
 					)}

@@ -1,7 +1,7 @@
 import './SettingsNPMPackages.scss';
 import { Dispatch, SetStateAction } from 'react';
 import { DataTable } from 'components/DataTable';
-import { Row } from '@tanstack/react-table';
+import { Row, Table } from '@tanstack/react-table';
 import { NPMPackage } from '@/types';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { useTranslation } from 'react-i18next';
@@ -11,9 +11,13 @@ import { EmptyState } from 'components/EmptyState';
 interface SettingsNPMPackagesProps {
 	selectedRows: Row<NPMPackage>[] | undefined;
 	setSelectedRows: Dispatch<SetStateAction<Row<NPMPackage>[] | undefined>>;
+	setTable: Dispatch<SetStateAction<Table<NPMPackage> | undefined>>;
 }
 
-export default function SettingsNPMPackages({ setSelectedRows }: SettingsNPMPackagesProps) {
+export default function SettingsNPMPackages({
+	setSelectedRows,
+	setTable,
+}: SettingsNPMPackagesProps) {
 	const { t } = useTranslation();
 	const npmPackages = useVersionStore((state) => state.version?.npmPackages ?? []);
 
@@ -30,6 +34,7 @@ export default function SettingsNPMPackages({ setSelectedRows }: SettingsNPMPack
 			<DataTable<NPMPackage>
 				columns={NPMPackagesColumns}
 				data={npmPackages}
+				setTable={setTable}
 				setSelectedRows={setSelectedRows}
 				noDataMessage={<p className='text-xl'>{t('version.npm.no_package_found')}</p>}
 			/>

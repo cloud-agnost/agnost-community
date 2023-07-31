@@ -22,7 +22,7 @@
 		}
 	}
 	&-label {
-		@apply flex items-center px-1 rounded-none h-full w-full hover:bg-wrapper-background-hover transition;
+		@apply flex items-center px-1 rounded-none h-full w-full hover:bg-wrapper-background-hover transition font-normal;
 	}
 	&-dropdown {
 		@apply w-[210px] h-12 relative border border-border rounded-sm;

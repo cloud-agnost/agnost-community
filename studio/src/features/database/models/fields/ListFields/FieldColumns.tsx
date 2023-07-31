@@ -11,8 +11,41 @@ import { DateText } from 'components/DateText';
 import { Badge } from 'components/Badge';
 import useModelStore from '@/store/database/modelStore.ts';
 import { TableConfirmation } from 'components/Table';
+import { Checkbox } from 'components/Checkbox';
 
 const FieldColumns: ColumnDefWithClassName<Field>[] = [
+	{
+		id: 'select',
+		className: '!max-w-[40px] !w-[40px]',
+		header: (props) => {
+			return (
+				<Checkbox
+					checked={props.table.getIsAllPageRowsSelected()}
+					onCheckedChange={(value) => props.table.toggleAllPageRowsSelected(!!value)}
+					aria-label='Select all'
+				/>
+			);
+		},
+		cell: (props) => {
+			const isSystem = props.row.original.creator === 'system';
+			return (
+				<Checkbox
+					disabled={isSystem}
+					checked={props.row.original.creator !== 'system' && props.row.getIsSelected()}
+					onCheckedChange={(value) => props.row.toggleSelected(!!value)}
+					aria-label='Select row'
+				/>
+			);
+		},
+		meta: {
+			disabled: {
+				key: 'creator',
+				value: 'system',
+			},
+		},
+		enableSorting: false,
+		enableHiding: false,
+	},
 	{
 		id: 'name',
 		header: ({ column }) => (

@@ -8,7 +8,7 @@ import {
 	ModelActions,
 	ModelColumns,
 } from '@/features/database/models/ListModels/index.ts';
-import { Row } from '@tanstack/react-table';
+import { Row, Table } from '@tanstack/react-table';
 import { EmptyState } from 'components/EmptyState';
 import { Model as ModelIcon } from '@/components/icons';
 import useModelStore from '@/store/database/modelStore.ts';
@@ -18,6 +18,7 @@ export default function ListModels() {
 	const [selectedRows, setSelectedRows] = useState<Row<Model>[]>();
 	const [search, setSearch] = useState('');
 	const { t } = useTranslation();
+	const [table, setTable] = useState<Table<Model>>();
 
 	const filteredModels = useMemo(() => {
 		if (!search) return models;
@@ -32,6 +33,7 @@ export default function ListModels() {
 	return (
 		<div className='px-6 h-full flex flex-col overflow-auto'>
 			<ModelActions
+				table={table}
 				setSearch={setSearch}
 				selectedRows={selectedRows}
 				setSelectedRows={setSelectedRows}
@@ -53,6 +55,7 @@ export default function ListModels() {
 					<DataTable<Model>
 						columns={ModelColumns}
 						data={filteredModels}
+						setTable={setTable}
 						noDataMessage={<p className='text-xl'>{t('database.models.no_models')}</p>}
 						setSelectedRows={setSelectedRows}
 					/>
