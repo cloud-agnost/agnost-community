@@ -1,9 +1,9 @@
 import { cn } from '@/utils';
 import { Field, Model } from '@/types';
 import { useTranslation } from 'react-i18next';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DataTable } from 'components/DataTable';
-import { Row } from '@tanstack/react-table';
+import { Row, Table } from '@tanstack/react-table';
 import { EmptyState } from 'components/EmptyState';
 import { Model as ModelIcon } from '@/components/icons';
 import useModelStore from '@/store/database/modelStore.ts';
@@ -20,6 +20,7 @@ export default function ListFields() {
 	const [search, setSearch] = useState('');
 	const { t } = useTranslation();
 	const { modelId } = useParams();
+	const [table, setTable] = useState<Table<Field>>();
 
 	const model = useMemo(() => {
 		return models.find((model) => model._id === modelId) as Model;
@@ -33,11 +34,28 @@ export default function ListFields() {
 		});
 	}, [search, model]);
 
+	useEffect(() => {
+		setSelectedRows((selectedRows) => {
+			const systemFieldsIndex = selectedRows
+				?.filter((row) => row.original.creator === 'system')
+				.map((row) => row.index);
+			console.log(systemFieldsIndex);
+			return selectedRows?.filter((row) => row.original.creator !== 'system');
+		});
+		if (table) {
+			table?.setRowSelection((updater) => {
+				console.log(updater);
+				return updater;
+			});
+		}
+	}, []);
+
 	const hasNoFields = filteredFields.length === 0;
 
 	return (
 		<div className='px-6 h-full flex flex-col overflow-auto'>
 			<FieldActions
+				table={table}
 				setSearch={setSearch}
 				selectedRows={selectedRows}
 				setSelectedRows={setSelectedRows}
@@ -57,6 +75,7 @@ export default function ListFields() {
 					</EmptyState>
 				) : (
 					<DataTable<Field>
+						setTable={setTable}
 						columns={FieldColumns}
 						data={filteredFields.sort((a, b) => b.order - a.order)}
 						noDataMessage={<p className='text-xl'>{t('database.fields.no_fields')}</p>}

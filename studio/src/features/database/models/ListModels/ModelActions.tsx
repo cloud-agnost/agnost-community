@@ -7,7 +7,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { SearchInput } from 'components/SearchInput';
 import { Button } from 'components/Button';
 import { ArrowLeft, CaretRight } from '@phosphor-icons/react';
-import { Row } from '@tanstack/react-table';
+import { Row, Table } from '@tanstack/react-table';
 import { SelectedRowDropdown } from 'components/Table';
 import { CreateModelButton } from '@/features/database/models/ListModels/index.ts';
 import useModelStore from '@/store/database/modelStore.ts';
@@ -16,11 +16,13 @@ interface ModelActionsProps {
 	setSelectedRows: Dispatch<SetStateAction<Row<Model>[] | undefined>>;
 	selectedRows: Row<Model>[] | undefined;
 	setSearch: Dispatch<SetStateAction<string>>;
+	table: Table<Model> | undefined;
 }
 export default function ModelActions({
 	selectedRows,
 	setSearch,
 	setSelectedRows,
+	table,
 }: ModelActionsProps) {
 	const { databases } = useDatabaseStore();
 	const deleteMultipleModel = useModelStore((state) => state.deleteMultipleModel);
@@ -76,7 +78,11 @@ export default function ModelActions({
 						className='flex-1 lg:w-[450px]'
 					/>
 					{!!selectedRows?.length && (
-						<SelectedRowDropdown onDelete={deleteAll} selectedRowLength={selectedRows?.length} />
+						<SelectedRowDropdown
+							table={table}
+							onDelete={deleteAll}
+							selectedRowLength={selectedRows?.length}
+						/>
 					)}
 					<CreateModelButton />
 				</div>

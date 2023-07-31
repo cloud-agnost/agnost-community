@@ -2,8 +2,10 @@ import Database from '@/assets/images/database.png';
 import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
 import {
+	Awss3,
 	ApiKeys,
 	Authentication,
+	AzureBlobStorage,
 	BellRing,
 	Binary,
 	Cache,
@@ -16,7 +18,9 @@ import {
 	DeviceMobile,
 	Environment,
 	EnvironmentVariable,
+	GcpStorage,
 	Integer,
+	Kafka,
 	LightBulb,
 	LineSegments,
 	MessageQueue,
@@ -27,16 +31,30 @@ import {
 	ObjectList,
 	Oracle,
 	PostgreSql,
+	RabbitMq,
 	RateLimit,
 	RealTime,
 	Resource,
 	RichText,
+	SqlServer,
 	Storage,
 	Team,
 	Timestamp,
 } from '@/components/icons';
-import { ConnectDatabase, CreateDatabase, SelectResourceType } from '@/features/resources';
+import {
+	ConnectAWS,
+	ConnectAzure,
+	ConnectCache,
+	ConnectDatabase,
+	ConnectGCP,
+	ConnectQueue,
+	CreateCache,
+	CreateDatabase,
+	CreateQueue,
+	SelectResourceType,
+} from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
+import useAuthStore from '@/store/auth/authStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Application, Instance, Method, SortOption, Tab } from '@/types';
 import { history, translate } from '@/utils';
@@ -63,7 +81,6 @@ import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { DropdownMenuSeparator } from 'components/Dropdown';
 import { ElementType, Fragment } from 'react';
 import * as z from 'zod';
-import useAuthStore from '@/store/auth/authStore.ts';
 
 export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
@@ -308,12 +325,6 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	UPDATING: 'yellow',
 	DELETING: 'red',
 	BINDING: 'blue',
-	GET: 'blue',
-	POST: 'green',
-	PUT: 'yellow',
-	DELETE: 'red',
-	OPTIONAL: 'yellow',
-	REQUIRED: 'blue',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
@@ -437,22 +448,17 @@ export const STORAGE_TYPES: Instance[] = [
 	{
 		id: 'AWS S3',
 		name: 'AWS S3',
-		icon: MongoDb,
+		icon: Awss3,
 	},
 	{
 		id: 'Azure Blob Storage',
 		name: 'Azure Blob Storage',
-		icon: MySql,
+		icon: AzureBlobStorage,
 	},
 	{
 		id: 'GCP Cloud Storage',
 		name: 'GCP Cloud Storage',
-		icon: MySql,
-	},
-	{
-		id: 'Cluster Storage - MinIO',
-		name: 'MinIO',
-		icon: PostgreSql,
+		icon: GcpStorage,
 	},
 ];
 
@@ -481,7 +487,7 @@ export const DATABASE_TYPES: Instance[] = [
 	{
 		id: 'SQL Server',
 		name: 'SQL Server',
-		icon: Oracle,
+		icon: SqlServer,
 		isConnectOnly: true,
 	},
 ];
@@ -493,6 +499,18 @@ export const DATABASE_ICON_MAP: Record<string, ElementType> = {
 	Oracle: Oracle,
 	'SQL Server': Oracle,
 };
+export const QUEUE_TYPES: Instance[] = [
+	{
+		id: 'RabbitMQ',
+		name: 'RabbitMQ',
+		icon: RabbitMq,
+	},
+	{
+		id: 'Kafka',
+		name: 'Kafka',
+		icon: Kafka,
+	},
+];
 
 export const CREATE_RESOURCES_ELEMENTS = [
 	{
@@ -511,6 +529,49 @@ export const CREATE_RESOURCES_ELEMENTS = [
 		name: translate('version.databases'),
 		type: translate('resources.connect_existing'),
 		CurrentResourceElement: ConnectDatabase,
+	},
+	{
+		step: 2,
+		name: translate('version.storage'),
+		type: 'AWS S3',
+		CurrentResourceElement: ConnectAWS,
+	},
+	{
+		step: 2,
+		name: translate('version.storage'),
+		type: 'Azure Blob Storage',
+		CurrentResourceElement: ConnectAzure,
+	},
+	{
+		step: 2,
+		name: translate('version.storage'),
+		type: 'GCP Cloud Storage',
+		CurrentResourceElement: ConnectGCP,
+	},
+
+	{
+		step: 2,
+		name: translate('version.cache'),
+		type: translate('resources.create_new'),
+		CurrentResourceElement: CreateCache,
+	},
+	{
+		step: 2,
+		name: translate('version.cache'),
+		type: translate('resources.connect_existing'),
+		CurrentResourceElement: ConnectCache,
+	},
+	{
+		step: 2,
+		name: translate('version.message_queues'),
+		type: translate('resources.create_new'),
+		CurrentResourceElement: CreateQueue,
+	},
+	{
+		step: 2,
+		name: translate('version.message_queues'),
+		type: translate('resources.connect_existing'),
+		CurrentResourceElement: ConnectQueue,
 	},
 ];
 
@@ -638,6 +699,11 @@ export const ENDPOINT_ACCESS_PROPERTIES = [
  */
 export const AUTHORIZATION_OPTIONS = ['all', 'specified'] as const;
 
+export const RABBITMQ_CONNECTION_TYPES = ['url', 'object'] as const;
+export const RABBITMQ_CONNECTION_SCHEMES = ['amqp', 'amqps'] as const;
+export const KAFKA_CONNECTION_SCHEMES = ['simple', 'ssl', 'sasl'] as const;
+export const KAFKA_SASL_MECHANISM = ['plain', 'scram-sha-256', 'scram-sha-512'] as const;
+export const MONGODB_CONNECTION_FORMATS = ['mongodb', 'mongodb+srv'] as const;
 export const ADD_API_KEYS_MENU_ITEMS = [
 	{
 		name: translate('application.edit.general'),

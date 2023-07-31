@@ -43,6 +43,24 @@ export function DataTable<TData>({
 		onRowSelectionChange: setRowSelection,
 		onColumnFiltersChange: setColumnFilters,
 		getFilteredRowModel: getFilteredRowModel(),
+		enableRowSelection(row) {
+			const cell = row.getAllCells().find((item) => item.column.id === 'select');
+			if (!cell) return false;
+
+			const meta = cell.column.columnDef?.meta;
+			if (!meta) return true;
+
+			const { disabled } = cell.column.columnDef.meta as {
+				disabled: {
+					key: string;
+					value: string;
+				};
+			};
+
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			return row.original[disabled?.key] !== disabled?.value;
+		},
 		state: {
 			sorting,
 			rowSelection,

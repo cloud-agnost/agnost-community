@@ -8,7 +8,7 @@
 	"createdAt": "CREATED AT",
 	"updatedAt": "UPDATED AT",
 	"add": "Create Endpoint",
-
+	"test": "Test",
 	"create": {
 		"title": "Create New Endpoint",
 		"name": "Name",

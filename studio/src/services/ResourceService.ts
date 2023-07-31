@@ -35,4 +35,11 @@ export default class ResourceService {
 	static async addExistingResource(req: AddExistingResourceRequest) {
 		return (await axios.post(`${this.getUrl()}/add`, req)).data;
 	}
+	static async deleteResource(resourceId: string) {
+		return (
+			await axios.delete(`${this.getUrl()}/${resourceId}`, {
+				data: { resourceId },
+			})
+		).data;
+	}
 }

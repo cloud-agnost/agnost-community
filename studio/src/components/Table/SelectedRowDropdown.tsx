@@ -5,23 +5,25 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InfoModal } from '../InfoModal';
 import { Warning } from '../icons';
-interface Props<T> {
+import { cn } from '@/utils';
+interface Props {
 	onDelete: () => void;
 	selectedRowLength: number;
-	table?: Table<T>;
+	table?: Table<any>;
+	className?: string;
 }
-function SelectedRowDropdown<T>({ onDelete, selectedRowLength, table }: Props<T>) {
+function SelectedRowDropdown({ onDelete, selectedRowLength, table, className }: Props) {
 	const { t } = useTranslation();
 	const [openInfoModal, setOpenInfoModal] = useState(false);
 	return selectedRowLength > 0 ? (
 		<>
-			<div className='flex items-center  border border-border rounded-md bg-lighter'>
+			<div className={cn('flex items-center rounded-md bg-lighter', className)}>
 				<div className='flex items-center gap-2 border-r border-button-border p-1.5'>
 					{table && (
 						<Button
 							size='sm'
 							variant='primary'
-							className=' bg-button-primary h-1/2 px-1'
+							className='bg-button-primary h-1/2 p-1'
 							onClick={() => table?.resetRowSelection()}
 						>
 							<Minus size={16} weight='bold' className='text-icon-secondary' />
