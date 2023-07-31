@@ -1,20 +1,20 @@
-import { ColumnDef } from '@tanstack/react-table';
-import { Endpoint } from '@/types';
-import { Checkbox } from '@/components/Checkbox';
 import { Badge } from '@/components/Badge';
-import { DateText } from '@/components/DateText';
 import { Button } from '@/components/Button';
-import { Trash } from '@phosphor-icons/react';
+import { Checkbox } from '@/components/Checkbox';
+import { CopyButton } from '@/components/CopyButton';
+import { DateText } from '@/components/DateText';
 import { Pencil } from '@/components/icons';
 import { BADGE_COLOR_MAP, ENDPOINT_METHOD_TEXT_COLOR } from '@/constants';
-import { cn, translate } from '@/utils';
-import { CopyButton } from '@/components/CopyButton';
-import useOrganizationStore from '@/store/organization/organizationStore';
-import { Link } from 'react-router-dom';
 import useEndpointStore from '@/store/endpoint/endpointStore';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { ColumnDefWithClassName, Endpoint } from '@/types';
+import { cn, translate } from '@/utils';
+import { Trash } from '@phosphor-icons/react';
+import { Link } from 'react-router-dom';
 
 const { openDeleteEndpointDialog } = useEndpointStore.getState();
-const EndpointColumns: ColumnDef<Endpoint>[] = [
+
+const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	{
 		id: 'select',
 		header: ({ table }) => (
@@ -140,11 +140,12 @@ const EndpointColumns: ColumnDef<Endpoint>[] = [
 	},
 	{
 		id: 'actions',
+		className: 'actions',
 		size: 45,
 		cell: ({ row }) => {
 			const { _id } = row.original;
 			return (
-				<div className='flex items-center justify-end'>
+				<div className='action flex items-center justify-end'>
 					<Link to={`${_id}`}>
 						<Pencil className='w-6 h-6 text-icon-base' />
 					</Link>
