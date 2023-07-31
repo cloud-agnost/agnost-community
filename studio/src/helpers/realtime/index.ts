@@ -1,16 +1,16 @@
 import { RealtimeObjectTypes } from '@/types';
-import Organization from './Organization';
-import User from './User';
 import Application from './Application';
+import Organization from './Organization';
+import Resource from './Resources';
+import User from './User';
 
 export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 	const keys = {
 		user: User,
 		org: Organization,
 		'org.app': Application,
+		'org.resource': Resource,
 	};
-	// TODO: can you fix this?
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
+
 	return new keys[type]();
 }

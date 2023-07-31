@@ -18,11 +18,8 @@
 		"description": "Maximum 64 characters"
 	},
 	"maxLength": {
-		"error": "{{label}} must be greater than or equal to 1 and less than or equal to {{length}}",
+		"error": "Max length must be greater than or equal to 1 and less than or equal to {{length}}",
 		"description": "Maximum {{length}} characters"
-	},
-	"doesntStartWithNumber": {
-		"error": "{{label}} cannot start with a number"
 	},
 	"verificationCode": {
 		"length": {
@@ -47,9 +44,5 @@
 	"number": "{{label}} must be a number",
 	"search_to_add": "Search to add {{label}}",
 	"pick_a_date": "Pick a date",
-	"select": "Select {{label}}",
-	"invalid_character": "{{label}} can include only numbers, letters and underscore (_) characters",
-	"notStartWithNumber": "{{label}} cannot start with a number",
-	"notStartWithUnderscore": "{{label}}  cannot start with underscore (_) character",
-	"reservedKeyword": "{{keyword}} is a reserved keyword and cannot be used as {{label}}"
+	"select": "Select {{label}}"
 }

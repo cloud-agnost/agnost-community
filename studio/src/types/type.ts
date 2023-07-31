@@ -194,8 +194,8 @@ export interface RemoveMemberRequest extends BaseRequest {
 	userId?: string;
 	userIds?: string[];
 }
-export type RealtimeActionTypes = 'update' | 'create' | 'delete';
-export type RealtimeObjectTypes = 'user' | 'organization';
+export type RealtimeActionTypes = 'update' | 'create' | 'delete' | 'telemetry';
+export type RealtimeObjectTypes = 'user' | 'org' | 'org.app' | 'org.resource';
 export interface RealtimeIdentifiers {
 	orgId?: string;
 	appId?: string;

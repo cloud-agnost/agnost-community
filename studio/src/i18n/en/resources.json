@@ -11,8 +11,8 @@
 	},
 	"delete": {
 		"title": "Delete Resource",
-		"message": "Are you sure you want to delete this resource?",
-		"alert": "All organization apps and managed resource and associated data will be deleted. This action is not reversible — please continue with caution."
+		"message": "Are you sure to delete this resource??",
+		"description": "All organization apps and managed resource and associated data will be deleted. This action is not reversible — please continue with caution."
 	},
 	"step": "Step {{currentStep}} of 2",
 	"select": "Select Resource Type",
@@ -43,8 +43,61 @@
 		"test": "Test Connection",
 		"test_success": "Connection Successful",
 		"connect": "Connect",
-		"select_connection_format": "Select Connection Format",
 		"username": "Username",
-		"password": "Password"
+		"password": "Password",
+		"mongodb": "MongoDB",
+		"mongodb+srv": "MongoDB + SRV",
+		"selectConnFormat": "SELECT CONNECTION FORMAT"
+	},
+	"storage": {
+		"aws": {
+			"title": "Add AWS S3 Credentials",
+			"accessKeyId": "Access Key ID",
+			"secret": "Secret Access Key",
+			"region": "Region"
+		},
+		"gcp": {
+			"title": "Add GCP Credentials",
+			"projectId": "Project ID",
+			"keyFileContents": "Key File Contents"
+		},
+		"azure": {
+			"title": "Add Azure Credentials",
+			"connectionString": "Connection String"
+		},
+		"minio": "Add Cluster Storage Credentials"
+	},
+	"cache": {
+		"title": "Choose Cache Size",
+		"cacheSize": "Cache Size",
+		"createdReadReplica": "Create also a read replica"
+	},
+	"queue": {
+		"connect": "Connect To Existing Message Queue",
+		"choose": "CHOOSE MESSAGE QUEUE TYPE",
+		"url": "URI",
+		"object": "Object",
+		"scheme": "Scheme",
+		"host": "Host",
+		"port": "Port",
+		"vhost": "Vhost",
+		"password": "Password",
+		"username": "Username",
+		"connFormat": "CONNECTION FORMAT",
+		"simple": "Simple",
+		"ssl": "SSL",
+		"sasl": "SASL",
+		"clientId": "Client ID",
+		"brokers": "BROKERS",
+		"addBroker": "Add Broker",
+		"mechanism": "Mechanism",
+		"plain": "Plain",
+		"scram-sha-256": "SCRAM-SHA-256",
+		"scram-sha-512": "SCRAM-SHA-512",
+		"rejectUnauthorized": "Reject Unauthorized",
+		"ca": "CA (Certificate Authority)",
+		"certificateAuthority": "Certificate Authority",
+		"publicKey": "Public Key",
+		"certificate": "Certificate"
 	}
 }
