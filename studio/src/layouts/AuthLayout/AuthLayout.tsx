@@ -1,8 +1,9 @@
 import { ReactNode } from 'react';
 import './AuthLayout.scss';
 import { Logo } from '@/components/Logo';
-import { Slider } from '@/components/Slider';
+import { Carousel } from '@/components/Carousel';
 import { SLIDER_IMAGES } from '@/constants';
+import { GuestOnly } from '@/router';
 
 type AuthLayoutProps = {
 	children: ReactNode;
@@ -13,7 +14,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 		<div className='auth-layout'>
 			<div className='auth-layout-left'>
 				<Logo className='auth-layout-app-logo' />
-				<Slider
+				<Carousel
 					className='!m-0'
 					pagination
 					autoplay
@@ -27,7 +28,9 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 					})}
 				/>
 			</div>
-			<div className='auth-layout-right'>{children}</div>
+			<div className='auth-layout-right'>
+				<GuestOnly>{children}</GuestOnly>
+			</div>
 		</div>
 	);
 }

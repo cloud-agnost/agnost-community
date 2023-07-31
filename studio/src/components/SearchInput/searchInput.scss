@@ -1,0 +1,14 @@
+.search-input-wrapper {
+	@apply relative max-h-[36px];
+	.search-input {
+		@apply pr-14 pl-8;
+
+		&-button {
+			@apply absolute text-subtle right-0 top-0 hover:text-default;
+		}
+	}
+}
+.search-input-icon {
+	@apply absolute text-subtle top-1/2 ml-2;
+	transform: translateY(-50%);
+}

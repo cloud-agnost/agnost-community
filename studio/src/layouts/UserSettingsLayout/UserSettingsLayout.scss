@@ -1,0 +1,15 @@
+.user-settings-layout {
+	@apply grid md:grid-cols-[285px_auto] h-full min-h-screen;
+
+	&-left {
+		@apply hidden md:flex px-6 py-8 h-screen flex-col items-center gap-y-8 sticky top-0 border-r border-border;
+	}
+
+	&-right {
+		@apply p-4 md:p-[40px];
+
+		&-divider {
+			@apply border-b border-border pb-4 md:pb-8 mb-4 md:mb-8;
+		}
+	}
+}

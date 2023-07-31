@@ -1,6 +1,7 @@
 .description {
+	@apply space-y-2;
 	&-title {
-		@apply text-default text-xl	leading-8 font-semibold mb-2;
+		@apply text-default text-xl	leading-8 font-semibold;
 	}
 	&-content {
 		@apply text-sm text-subtle font-normal leading-6;

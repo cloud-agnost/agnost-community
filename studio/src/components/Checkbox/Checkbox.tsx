@@ -24,9 +24,11 @@ const Checkbox = React.forwardRef<React.ElementRef<typeof CheckboxPrimitive.Root
 					<Check size={20} />
 				</CheckboxPrimitive.Indicator>
 			</CheckboxPrimitive.Root>
-			<Label htmlFor={id} className='checkbox-label'>
-				{label}
-			</Label>
+			{label && (
+				<Label htmlFor={id} className='checkbox-label'>
+					{label}
+				</Label>
+			)}
 		</div>
 	),
 );

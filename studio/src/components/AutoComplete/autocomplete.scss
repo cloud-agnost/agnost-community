@@ -1,0 +1,45 @@
+.select {
+	&-container {
+		@apply flex h-10 w-full  text-sm text-default  rounded appearance-none;
+		@apply placeholder:text-subtle placeholder:text-sm;
+		@apply disabled:cursor-not-allowed disabled:opacity-50;
+		@apply focus:border-input-focus focus:outline-none focus:ring-0;
+		@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border;
+	}
+	&__control {
+		@apply w-full h-full  #{!important};
+		@apply bg-input-background border border-input-border hover:border-input-hover #{!important};
+	}
+	&__indicators {
+		@apply hidden #{!important};
+	}
+	&__input-container {
+		@apply px-2 #{!important};
+	}
+	&__input {
+		@apply text-default font-sfCompact #{!important};
+	}
+	&__placeholder {
+		@apply text-subtle text-sm font-sfCompact px-2 #{!important};
+	}
+	&__menu {
+		@apply bg-wrapper-background-light rounded  #{!important};
+	}
+	&__single-value {
+		@apply text-default #{!important};
+	}
+	&__value-container {
+		@apply py-0  #{!important};
+	}
+
+	&__option {
+		@apply text-default hover:bg-wrapper-background-hover border-b border-border #{!important};
+		&--is-selected {
+			@apply bg-wrapper-background-hover #{!important};
+		}
+
+		&--is-focused {
+			@apply bg-wrapper-background-hover #{!important};
+		}
+	}
+}

@@ -1,0 +1,65 @@
+{
+	"apps": "Apps",
+	"create": "Create Application",
+	"create-new": "Create New Application",
+	"name": "Application Name",
+	"short_name": "App Name",
+	"enter_name": "Enter app name",
+	"empty": "You have not created any apps yet!",
+	"settings": {
+		"openVersion": "Open Version",
+		"editApp": "Edit App",
+		"leaveTeam": "Leave Team"
+	},
+	"leave": {
+		"title": "Leave App Team",
+		"description": "You are about the leave the app team. After leaving the team you will not be able to access it again. Are you sure you would like to leave the {{name}} team?"
+	},
+	"delete": {
+		"title": "Delete App",
+		"description": "You are about to delete the app. After deleting the app you will not be able to access it again. Are you sure you would like to delete the {{name}} app?"
+	},
+	"version": {
+		"title": "Open Version",
+		"search": "Search Versions"
+	},
+	"table": {
+		"name": "Name",
+		"role": "Role",
+		"createdAt": "Created",
+		"team": "Team"
+	},
+	"edit": {
+		"general": "General",
+		"members": "Members",
+		"invitations": "Pending Invitations",
+		"invite": "Invite",
+		"name": {
+			"title": "App Name",
+			"success": "App name has been updated successfully",
+			"successDesc": "The app name has been updated successfully."
+		},
+
+		"avatar": {
+			"title": "App Avatar",
+			"description": "Click on the avatar to upload a custom one from your files. An avatar is optional but strongly recommended.",
+			"success": "App avatar has been updated successfully",
+			"successDesc": "The app avatar has been updated successfully."
+		},
+		"transfer": {
+			"title": "Transfer Ownership",
+			"description": "The organization owner is the person who has created the organization or the person to whom the organization ownership has been transferred. The Owner has full control over the organization and only organization owners can delete the organization or transfer its ownership to someone else.",
+			"subDesc": "Select the organization member with Admin role to transfer ownership",
+			"placeholder": "Select a member",
+			"success": "Ownership has been transferred successfully",
+			"successDesc": "You are no longer the owner of this organization. You can still access it as an admin."
+		}
+	},
+	"invite_member": {
+		"title": "Invite Members To App",
+		"subTitle": "Invite Application Members",
+		"description": "Each application member can have different role assigned to authorize certain actions within the organization itself. Organization members can also be added to app teams.",
+		"success": "Invitation has been sent successfully",
+		"successDesc": "The invitation has been sent successfully. The invited member will be able to access the app once they accept the invitation."
+	}
+}

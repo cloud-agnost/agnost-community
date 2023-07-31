@@ -4,3 +4,4 @@ export { default as VerifyEmail } from './VerifyEmail.tsx';
 export { default as CompleteAccountSetup } from './CompleteAccountSetup.tsx';
 export { default as CompleteAccountSetupVerifyEmail } from './CompleteAccountSetupVerifyEmail.tsx';
 export { default as ChangePasswordWithToken } from './ChangePasswordWithToken.tsx';
+export { default as ConfirmChangeEmail } from './ConfirmChangeEmail.tsx';

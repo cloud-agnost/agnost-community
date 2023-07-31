@@ -11,7 +11,9 @@ export default defineConfig({
 			routes: `${path.resolve(__dirname, './src/routes/')}`,
 			services: `${path.resolve(__dirname, './src/services/')}`,
 			utils: `${path.resolve(__dirname, './src/utils/')}`,
+			components: `${path.resolve(__dirname, './src/components/')}`,
 			constants: `${path.resolve(__dirname, './src/constants/')}`,
+			'˜': `${path.resolve(__dirname, './src/assets/')}`,
 		},
 	},
 	server: {

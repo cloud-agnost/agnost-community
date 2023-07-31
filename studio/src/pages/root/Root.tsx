@@ -1,26 +1,70 @@
-import { LoaderFunctionArgs, Outlet, redirect } from 'react-router-dom';
-import useClusterStore from '@/store/cluster/clusterStore.ts';
+import { ApplicationVersions } from '@/features/application';
+import EditApplication from '@/features/application/EditApplication.tsx';
+import { CreateResource } from '@/features/resources';
+import { CreateCopyVersionDrawer } from '@/features/version/CreateCopyVersionDrawer';
+import { EditMiddlewareDrawer } from '@/features/version/Middlewares';
 import useAuthStore from '@/store/auth/authStore.ts';
-import { removeLastSlash } from 'utils/utils.ts';
+import useClusterStore from '@/store/cluster/clusterStore.ts';
+import useOrganizationStore from '@/store/organization/organizationStore.ts';
+import { history, removeLastSlash } from '@/utils';
+import { useEffect } from 'react';
+import { LoaderFunctionArgs, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+const authPaths = [
+	'/login',
+	'/forgot-password',
+	'/confirm-change-email',
+	'/forgot-password',
+	'/verify-email',
+	'/complete-account-setup',
+	'/complete-account-setup/verify-email',
+];
 
-async function loader(params: LoaderFunctionArgs) {
-	const status = await useClusterStore.getState().checkClusterSetup();
-	await useClusterStore.getState().checkClusterSmtpStatus();
+async function loader({ request }: LoaderFunctionArgs) {
 	const isAuthenticated = useAuthStore.getState().isAuthenticated();
+	await useClusterStore.getState().checkClusterSmtpStatus();
+	await useClusterStore.getState().checkClusterSetup();
+	const currentPathname = removeLastSlash(new URL(request.url).pathname);
 
-	const requestURL = new URL(params.request.url);
+	const isAuthPath = authPaths.includes(currentPathname);
 
-	if (!status) {
-		return redirect('/onboarding');
-	} else if (status && !isAuthenticated && removeLastSlash(requestURL.pathname) !== '/login') {
-		return redirect('/login');
+	if (!isAuthPath && isAuthenticated) {
+		await useAuthStore.getState().getUser();
 	}
 
 	return null;
 }
 
 export default function Root() {
-	return <Outlet />;
+	history.navigate = useNavigate();
+	history.location = useLocation();
+	const { orgId } = useParams();
+	const { getOrganizationMembers, memberPage, setMemberPage } = useOrganizationStore();
+
+	useEffect(() => {
+		if (orgId) {
+			const fetchData = async () => {
+				return await getOrganizationMembers({
+					organizationId: orgId,
+					page: memberPage,
+					size: 100,
+				});
+			};
+			fetchData().then((res) => {
+				if (res.length > 0) setMemberPage(memberPage + 1);
+			});
+		}
+	}, [memberPage, orgId]);
+
+	return (
+		<>
+			<Outlet />
+			<ApplicationVersions />
+			<EditApplication />
+			<EditMiddlewareDrawer />
+			<CreateCopyVersionDrawer />
+			<CreateResource />
+		</>
+	);
 }
 
 Root.loader = loader;

@@ -15,9 +15,12 @@ const buttonVariants = cva('btn', {
 			destructive: 'btn-destructive',
 			text: 'btn-text',
 			link: 'btn-link',
-			icon: 'btn-icon',
+			blank: 'btn-blank',
+			outline: 'btn-outline',
 		},
-
+		iconOnly: {
+			true: 'btn-icon-only',
+		},
 		size: {
 			md: 'btn-md',
 			sm: 'btn-sm',
@@ -27,10 +30,15 @@ const buttonVariants = cva('btn', {
 		loading: {
 			true: 'btn-loading',
 		},
+		rounded: {
+			true: 'btn-rounded',
+		},
 	},
 	defaultVariants: {
 		variant: 'primary',
 		size: 'md',
+		loading: false,
+		rounded: false,
 	},
 });
 
@@ -46,35 +54,55 @@ export interface ButtonProps
 const Button = React.forwardRef<
 	HTMLButtonElement & (LinkProps & RefAttributes<HTMLAnchorElement>),
 	ButtonProps
->(({ className, variant, children, to, size, loading, asChild = false, ...props }, ref) => {
-	const Comp = asChild ? Slot : 'button';
+>(
+	(
+		{
+			className,
+			variant,
+			children,
+			to,
+			size,
+			loading,
+			rounded,
+			iconOnly,
+			asChild = false,
+			...props
+		},
+		ref,
+	) => {
+		const Comp = asChild ? Slot : 'button';
 
-	if (to) {
+		if (to) {
+			return (
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				/* @ts-ignore */
+				<Link
+					to={to}
+					className={cn(buttonVariants({ size, variant, loading, rounded, iconOnly, className }))}
+					ref={ref}
+					{...props}
+				>
+					{loading && <CircleNotch size={20} className='loading' />}
+					{children}
+				</Link>
+			);
+		}
 		return (
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			/* @ts-ignore */
-			<Link
-				to={to}
-				className={cn(buttonVariants({ variant, size, className }))}
+			<Comp
+				className={cn(buttonVariants({ size, variant, loading, rounded, iconOnly, className }))}
 				ref={ref}
 				{...props}
 			>
 				{loading && <CircleNotch size={20} className='loading' />}
 				{children}
-			</Link>
+			</Comp>
 		);
-	}
-	return (
-		<Comp
-			className={cn(buttonVariants({ variant, size, loading, className }))}
-			ref={ref}
-			{...props}
-		>
-			{loading && <CircleNotch size={20} className='loading' />}
-			{children}
-		</Comp>
-	);
-});
+	},
+);
 Button.displayName = 'Button';
 
-export { Button, buttonVariants };
+const ButtonGroup = ({ children }: { children: React.ReactNode }) => {
+	return <div className='btn-group'>{children}</div>;
+};
+
+export { Button, buttonVariants, ButtonGroup };
