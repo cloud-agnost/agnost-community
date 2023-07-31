@@ -19,7 +19,7 @@ export default function ConnectOptions() {
 	} = useFormContext<z.infer<typeof ConnectDatabaseSchema>>();
 
 	const { fields, append, remove } = useFieldArray({
-		control: control,
+		control,
 		name: 'access.options',
 	});
 	useEffect(() => {

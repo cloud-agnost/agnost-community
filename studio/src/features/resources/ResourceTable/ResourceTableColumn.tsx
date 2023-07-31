@@ -1,12 +1,14 @@
 import { Badge } from '@/components/Badge';
+import { Button } from '@/components/Button';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
-import { TableActions } from '@/components/Table';
+import { Pencil } from '@/components/icons';
 import { BADGE_COLOR_MAP } from '@/constants';
+import useResourceStore from '@/store/resources/resourceStore';
 import { Resource } from '@/types';
 import { translate } from '@/utils';
+import { Trash } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
-
 export const ResourceTableColumn: ColumnDef<Resource>[] = [
 	{
 		id: 'name',
@@ -47,7 +49,7 @@ export const ResourceTableColumn: ColumnDef<Resource>[] = [
 			const { allowedRoles } = row.original;
 			return (
 				<div className='flex gap-2'>
-					{allowedRoles.map((role) => {
+					{allowedRoles.sort().map((role) => {
 						return <Badge key={role} text={role} variant={BADGE_COLOR_MAP[role.toUpperCase()]} />;
 					})}
 				</div>
@@ -70,16 +72,26 @@ export const ResourceTableColumn: ColumnDef<Resource>[] = [
 		id: 'actions',
 		header: translate('resources.table.actions'),
 		size: 45,
-		cell: () => {
+		cell: ({ row }) => {
 			return (
-				<>
-					<TableActions
-						onDelete={() => console.log('delete')}
-						onEdit={() => console.log('edit')}
-						confirmationTitle='delete'
-						confirmationDescription='delete'
-					/>
-				</>
+				<div className='flex items-center '>
+					<Button variant='blank' iconOnly>
+						<Pencil className='w-6 h-6 text-icon-base' />
+					</Button>
+
+					<Button
+						variant='blank'
+						iconOnly
+						onClick={() =>
+							useResourceStore.setState({
+								deletedResource: row.original,
+								isDeletedResourceModalOpen: true,
+							})
+						}
+					>
+						<Trash size={24} className='text-icon-base' />
+					</Button>
+				</div>
 			);
 		},
 	},

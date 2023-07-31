@@ -14,6 +14,7 @@ import * as z from 'zod';
 import CreateResourceLayout from '../../CreateResourceLayout';
 import ConnectOptions from './ConnectOptions';
 import DatabaseInfo from './DatabaseInfo';
+import MongoConnectionFormat from './MongoConnectionFormat';
 import ReadReplicas from './ReadReplicas';
 
 export default function ConnectDatabase() {
@@ -22,7 +23,7 @@ export default function ConnectDatabase() {
 	const { notify } = useToast();
 	const {
 		testExistingResourceConnection,
-		returnToPreviousStep,
+
 		addExistingResource,
 		toggleCreateResourceModal,
 	} = useResourceStore();
@@ -82,48 +83,44 @@ export default function ConnectDatabase() {
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='max-h-[90%] overflow-auto'>
+			<form onSubmit={form.handleSubmit(onSubmit)} className='scroll'>
 				<CreateResourceLayout
 					title={t('resources.connect_existing')}
 					control={form.control}
 					actions={
-						<div className='flex gap-4'>
-							<Button
-								variant='outline'
-								loading={loading}
-								onClick={testResourceConnection}
-								type='button'
-								size='lg'
-							>
-								<TestConnection className='w-4 h-4 text-icon-default mr-2' />
-								{t('resources.database.test')}
-							</Button>
-							<Button variant='secondary' onClick={returnToPreviousStep} type='button' size='lg'>
-								{t('general.previous')}
-							</Button>
-							<Button variant='primary' loading={loading} type='submit' size='lg'>
-								{t('resources.database.connect')}
-							</Button>
-						</div>
+						<Button
+							variant='outline'
+							loading={loading}
+							onClick={testResourceConnection}
+							type='button'
+							size='lg'
+							className=' self-start'
+						>
+							<TestConnection className='w-4 h-4 text-icon-default mr-2' />
+							{t('resources.database.test')}
+						</Button>
 					}
 					instances={DATABASE_TYPES}
 				>
-					<DatabaseInfo modal={false} control={form.control} errors={form.formState.errors} />
+					{form.watch('instance') === 'MongoDB' && <MongoConnectionFormat />}
+					<DatabaseInfo modal={false} />
 					<ConnectOptions />
 					<ReadReplicas />
 
-					<FormField
-						control={form.control}
-						name='secureConnection'
-						render={({ field }) => (
-							<FormItem className='flex justify-start gap-4 items-center space-y-0'>
-								<FormLabel>{t('resources.database.secure_connection')}</FormLabel>
-								<FormControl>
-									<Switch checked={field.value} onCheckedChange={field.onChange} />
-								</FormControl>
-							</FormItem>
-						)}
-					/>
+					{form.watch('instance') === 'SQL Server' && (
+						<FormField
+							control={form.control}
+							name='secureConnection'
+							render={({ field }) => (
+								<FormItem className='flex justify-start gap-4 items-center space-y-0'>
+									<FormLabel>{t('resources.database.secure_connection')}</FormLabel>
+									<FormControl>
+										<Switch checked={field.value} onCheckedChange={field.onChange} />
+									</FormControl>
+								</FormItem>
+							)}
+						/>
+					)}
 				</CreateResourceLayout>
 			</form>
 		</Form>

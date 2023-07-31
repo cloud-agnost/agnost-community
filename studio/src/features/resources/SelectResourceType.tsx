@@ -1,4 +1,3 @@
-import { Button } from '@/components/Button';
 import { RadioGroup } from '@/components/RadioGroup';
 import { DEFAULT_RESOURCE_INSTANCES, RESOURCE_TYPES, STORAGE_TYPES } from '@/constants';
 import useResourceStore from '@/store/resources/resourceStore';
@@ -6,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import CreateResourceLayout from './CreateResource/CreateResourceLayout';
 import ResourceType from './ResourceType/ResourceType';
 export default function SelectResourceType() {
-	const { selectResourceType, goToNextStep, resourceType } = useResourceStore();
+	const { selectResourceType, resourceType } = useResourceStore();
 	const { t } = useTranslation();
 	const selectResource = (val: string) => {
 		console.log(val);
@@ -19,20 +18,7 @@ export default function SelectResourceType() {
 			onValueChange={selectResource}
 			className='h-full'
 		>
-			<CreateResourceLayout
-				title={t('resources.select')}
-				actions={
-					<Button
-						variant='primary'
-						size='lg'
-						onClick={goToNextStep}
-						disabled={resourceType.type && resourceType.name ? false : true}
-					>
-						{t('general.next')}
-					</Button>
-				}
-				typeSelection
-			>
+			<CreateResourceLayout title={t('resources.select')} typeSelection>
 				<div className='space-y-4'>
 					{RESOURCE_TYPES.map((type) => (
 						<ResourceType

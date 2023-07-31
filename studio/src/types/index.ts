@@ -24,6 +24,11 @@ export { CreateOrganizationSchema } from './organization.ts';
 export type * from './queue.ts';
 export { CreateMessageQueueSchema } from './queue.ts';
 export type * from './resource.ts';
-export { AccessDbSchema, ConnectDatabaseSchema } from './resource.ts';
+export {
+	AccessDbSchema,
+	ConnectDatabaseSchema,
+	ConnectResourceSchema,
+	ConnectQueueSchema,
+} from './resource.ts';
 export type * from './type.ts';
 export type * from './version.ts';
