@@ -1,4 +1,4 @@
-import { BaseGetRequest, BaseRequest } from '@/types';
+import { BaseGetRequest, BaseParams, BaseRequest } from '@/types';
 import { getPathParams, translate as t } from '@/utils';
 import { AxiosError, AxiosResponse } from 'axios';
 import * as z from 'zod';
@@ -151,13 +151,7 @@ export interface Endpoint {
 	__v: number;
 }
 
-export interface EndpointBase {
-	orgId: string;
-	appId: string;
-	versionId: string;
-}
-
-export interface CreateEndpointParams extends EndpointBase, BaseRequest {
+export interface CreateEndpointParams extends BaseParams, BaseRequest {
 	name: string;
 	method: Method;
 	path: string;
@@ -173,26 +167,26 @@ export type UpdateEndpointParams = CreateEndpointParams & {
 	epId: string;
 };
 
-export interface GetEndpointByIdParams extends EndpointBase {
+export interface GetEndpointByIdParams extends BaseParams {
 	epId: string;
 }
-export interface SaveEndpointLogicParams extends EndpointBase, BaseRequest {
+export interface SaveEndpointLogicParams extends BaseParams, BaseRequest {
 	epId: string;
 	logic: string;
 }
 
-export interface DeleteEndpointParams extends EndpointBase, BaseRequest {
+export interface DeleteEndpointParams extends BaseParams, BaseRequest {
 	epId: string;
 }
 
-export interface DeleteMultipleEndpointsParams extends EndpointBase, BaseRequest {
+export interface DeleteMultipleEndpointsParams extends BaseParams, BaseRequest {
 	endpointIds: string[];
 }
 
-export interface GetEndpointsByIidParams extends EndpointBase {
+export interface GetEndpointsByIidParams extends BaseParams {
 	iids: string[];
 }
-export interface GetEndpointsParams extends EndpointBase, BaseGetRequest {}
+export interface GetEndpointsParams extends BaseParams, BaseGetRequest {}
 
 export type TestMethods = 'get' | 'post' | 'put' | 'delete';
 export interface TestEndpointParams extends BaseRequest {
