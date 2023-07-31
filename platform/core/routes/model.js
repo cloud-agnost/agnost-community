@@ -115,6 +115,40 @@ router.post(
 );
 
 /*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/ref
+@method     GET
+@desc       Get a list of models that can be referenced
+@access     private
+*/
+router.get(
+	"/ref",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateDb,
+	authorizeAppAction("app.model.view"),
+	async (req, res) => {
+		try {
+			const models = await modelCtrl.getManyByQuery(
+				{ dbId: req.db._id },
+				{ sort: { name: 1 } }
+			);
+
+			res.json(
+				modelCtrl.getReferenceModelsList(models).sort((a, b) => {
+					if (a.name < b.name) return -1;
+					if (a.name > b.name) return 1;
+					return 0;
+				})
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/:modelId
 @method     GET
 @desc       Get a specific database model
