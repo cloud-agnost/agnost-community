@@ -12,6 +12,7 @@ const versionPath = `${path}/version`;
 const profilePath = `${path}/profile`;
 const onboardingPath = `${path}/onboarding`;
 const endpointPath = `${path}/endpoint`;
+const queuePath = `${path}/queue`;
 
 const paths = {
 	home: `${path}/home/Home.tsx`,
@@ -61,6 +62,10 @@ const paths = {
 	endpoint: {
 		endpoint: `${endpointPath}/Endpoint.tsx`,
 		editEndpoint: `${endpointPath}/EditEndpoint.tsx`,
+	},
+	queue: {
+		queue: `${queuePath}/MessageQueue.tsx`,
+		editQueue: `${queuePath}/EditMessageQueue.tsx`,
 	},
 	profileSettings: {
 		profileSettings: `${profilePath}/ProfileSettings.tsx`,
@@ -169,6 +174,16 @@ const router = createBrowserRouter([
 											{
 												path: 'endpoint',
 												lazy: () => lazyRouteImport(paths.version.endpoint),
+												children: [
+													{
+														index: true,
+														lazy: () => lazyRouteImport(paths.endpoint.endpoint),
+													},
+													{
+														path: ':endpointId',
+														lazy: () => lazyRouteImport(paths.endpoint.editEndpoint),
+													},
+												],
 											},
 											{
 												path: 'storage',
@@ -183,8 +198,18 @@ const router = createBrowserRouter([
 												lazy: () => lazyRouteImport(paths.version.cache),
 											},
 											{
-												path: 'message-queue',
+												path: 'queue',
 												lazy: () => lazyRouteImport(paths.version.messageQueue),
+												children: [
+													{
+														index: true,
+														lazy: () => lazyRouteImport(paths.queue.queue),
+													},
+													{
+														path: ':queueId',
+														lazy: () => lazyRouteImport(paths.queue.editQueue),
+													},
+												],
 											},
 											{
 												path: 'cron-job',

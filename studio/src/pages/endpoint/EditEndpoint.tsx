@@ -36,12 +36,12 @@ EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 export default function EditEndpoint() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const { endpoint } = useLoaderData() as { endpoint: Endpoint };
+	const { saveEndpointLogic, endpoint } = useEndpointStore();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [endpointLogic, setEndpointLogic] = useState<string | undefined>('');
+	const [endpointLogic, setEndpointLogic] = useState<string | undefined>(endpoint?.logic);
 	const [isTestEndpointOpen, setIsTestEndpointOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const { saveEndpointLogic } = useEndpointStore();
+
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;

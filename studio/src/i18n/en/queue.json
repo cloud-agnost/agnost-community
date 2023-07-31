@@ -1,0 +1,25 @@
+{
+	"title": "Message Queue",
+	"empty_text": "You have not defined any message queues for this app version",
+	"delay": "Delay",
+	"view_logs": "View Logs",
+	"delete": {
+		"title": "Delete Queue",
+		"message": "Are you sure you want to delete this queue?",
+		"description": "All organization apps and managed resource and associated data will be deleted. This action is not reversible — please continue with caution.",
+		"confirmCode": "Confirm resource delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
+	},
+	"create": {
+		"title": "Create Queue",
+		"delay": "Message Delay Duration",
+		"delay_description": "Keep the message in the queue for the duration of specified delay seconds",
+		"logExec": "Log Execution",
+		"logExecDescription": "Log endpoint request, response, status and execution duration"
+	},
+	"test": {
+		"title": "Test Message Queue",
+		"submit": "Submit Message",
+		"payload": "Message Payload",
+		"console": "Console Logs"
+	}
+}
