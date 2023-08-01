@@ -28,7 +28,7 @@ import useDatabaseStore from '@/store/database/databaseStore.ts';
 
 const Schema = z.object({
 	name: NAME_SCHEMA.refine((value) => /^(?![0-9])/.test(value), {
-		message: translate('forms.doesntStartWithNumber.error', {
+		message: translate('forms.notStartWithNumber', {
 			label: translate('general.name'),
 		}).toString(),
 	}),

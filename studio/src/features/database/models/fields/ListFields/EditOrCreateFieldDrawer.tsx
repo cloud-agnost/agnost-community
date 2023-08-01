@@ -88,7 +88,7 @@ export default function EditOrCreateFieldDrawer({
 		general: z
 			.object({
 				name: NAME_SCHEMA.refine((value) => /^(?![0-9])/.test(value), {
-					message: t('forms.doesntStartWithNumber.error', {
+					message: t('forms.notStartWithNumber', {
 						label: t('general.name'),
 					}).toString(),
 				}),
@@ -258,7 +258,6 @@ export default function EditOrCreateFieldDrawer({
 			},
 			richText: {
 				searchable: data.general.searchable,
-				maxLength: Number(data.general.maxLength),
 			},
 			encryptedText: {
 				maxLength: Number(data.general.maxLength),

@@ -797,19 +797,6 @@ export const NAME_SCHEMA = z
 		}),
 	);
 
-export const MODEL_FIELD_DEFAULT_VALUE_TYPES = [
-	{
-		name: translate('database.fields.constant'),
-		value: '',
-	},
-	{
-		name: translate('database.fields.js_function'),
-		value: `export default function getDefaultValues(value, allValues) {
-	return value;
-}`,
-	},
-];
-
 export const fieldSchema = z
 	.string()
 	.min(2, translate('forms.min2.error', { label: translate('general.field') }))
