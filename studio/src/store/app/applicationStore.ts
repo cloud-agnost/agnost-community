@@ -20,7 +20,7 @@ import {
 	UpdateRoleRequest,
 } from '@/types';
 
-import { translate } from '@/utils';
+import { joinChannel, leaveChannel, translate } from '@/utils';
 import OrganizationService from 'services/OrganizationService.ts';
 import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
@@ -346,6 +346,9 @@ const useApplicationStore = create<ApplicationStore>()(
 							set({ loading: true });
 							const applications = await OrganizationService.getOrganizationApps(orgId);
 							set({ applications, temp: applications });
+							applications.forEach((app) => {
+								joinChannel(app._id);
+							});
 							return applications;
 						} catch (error) {
 							throw error as APIError;
@@ -367,6 +370,7 @@ const useApplicationStore = create<ApplicationStore>()(
 								applications: [...prev.applications, res.app],
 								temp: [...prev.applications, res.app],
 							}));
+							joinChannel(res._id);
 							return res;
 						} catch (error) {
 							if (onError) onError(error as APIError);
@@ -382,6 +386,7 @@ const useApplicationStore = create<ApplicationStore>()(
 								applications: prev.applications.filter((app) => app._id !== appId),
 								temp: prev.applications.filter((app) => app._id !== appId),
 							}));
+							leaveChannel(appId);
 							if (onSuccess) onSuccess();
 						} catch (error) {
 							if (onError) onError(error as APIError);
@@ -400,6 +405,7 @@ const useApplicationStore = create<ApplicationStore>()(
 								applications: prev.applications.filter((app) => app._id !== appId),
 								temp: prev.applications.filter((app) => app._id !== appId),
 							}));
+							leaveChannel(appId);
 							if (onSuccess) onSuccess();
 						} catch (error) {
 							if (onError) onError(error as APIError);
