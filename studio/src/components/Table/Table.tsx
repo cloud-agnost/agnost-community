@@ -6,9 +6,13 @@ import { Button } from 'components/Button';
 import { useToast } from '@/hooks';
 import { useTranslation } from 'react-i18next';
 
-const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
-	({ className, ...props }, ref) => (
-		<div className='table-container'>
+interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
+	containerClassName?: string;
+}
+
+const Table = React.forwardRef<HTMLTableElement, TableProps>(
+	({ className, containerClassName, ...props }, ref) => (
+		<div className={cn('table-container', containerClassName)}>
 			<table ref={ref} className={cn('table', className)} {...props} />
 		</div>
 	),
