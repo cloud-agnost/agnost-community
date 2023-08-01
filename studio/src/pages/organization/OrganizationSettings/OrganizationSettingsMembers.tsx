@@ -6,7 +6,7 @@ import {
 	OrganizationInvitationTable,
 	OrganizationMembersTable,
 	OrganizationMembersTableHeader,
-} from '@/features/Organization';
+} from '@/features/organization';
 import { useUpdateEffect } from '@/hooks';
 import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout';
 import useClusterStore from '@/store/cluster/clusterStore';
