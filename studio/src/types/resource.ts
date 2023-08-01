@@ -216,7 +216,8 @@ export const ConnectQueueSchema = z.object({
 			.refine(
 				(value) => value.trim().length > 0,
 				translate('forms.required', { label: translate('resources.database.port') }),
-			),
+			)
+			.optional(),
 		username: z.string().optional(),
 		password: z.string().optional(),
 		vhost: z.string().optional(),
