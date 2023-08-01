@@ -27,6 +27,10 @@ export default function ConnectQueue() {
 		setLoading(true);
 		addExistingResource({
 			...data,
+			access: {
+				...data.access,
+				brokers: data.access.brokers?.map((broker) => broker.key) as string[],
+			},
 			type: 'queue',
 			onSuccess: () => {
 				setLoading(false);
