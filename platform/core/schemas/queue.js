@@ -253,6 +253,16 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty")),
 			];
+		case "test-logic":
+			return [
+				body("debugChannel")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+				body("payload")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+			];
 		case "delete-multi":
 			return [
 				body("queueIds.*")

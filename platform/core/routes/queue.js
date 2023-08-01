@@ -1,3 +1,4 @@
+import axios from "axios";
 import express from "express";
 import deployCtrl from "../controllers/deployment.js";
 import envCtrl from "../controllers/environment.js";
@@ -305,7 +306,7 @@ router.put(
 			const { org, user, app, version, queue } = req;
 			const { logic } = req.body;
 
-			// Update the endpoing logic/code
+			// Update the endpoint logic/code
 			const updatedQueue = await queueCtrl.updateOneById(
 				queue._id,
 				{ logic, updatedBy: user._id },
@@ -339,6 +340,54 @@ router.put(
 					queueId: queue._id,
 				}
 			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/queue/:queueId/test
+@method     POST
+@desc       Triggers the testing of the queue
+@access     private
+*/
+router.post(
+	"/:queueId/test",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateQueue,
+	authorizeAppAction("app.queue.update"),
+	applyRules("test-logic"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app, version, queue } = req;
+			const { payload, debugChannel } = req.body;
+
+			// Get the environment
+			const env = await envCtrl.getOneByQuery({
+				orgId: org._id,
+				appId: app._id,
+				versionId: version._id,
+			});
+
+			//Make api call to environment API server to trigger testing of the message queue
+			await axios.post(
+				`http://${env.iid}.default.svc.cluster.local/test/queue`,
+				{ queueiid: queue.iid, delay: 0, payload, debugChannel },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			res.json();
 		} catch (err) {
 			handleError(req, res, err);
 		}

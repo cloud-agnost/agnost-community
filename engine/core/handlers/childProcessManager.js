@@ -93,7 +93,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// If we do  not have the envObj yet then just spin up the express server to serve system default endpoints
 		if (!envObj) {
 			// Initialize express server
-			await this.initExpressServer();
+			await this.initExpressServer(false);
 			// Spin up the express server
 			await this.startExpressServer();
 			return;
@@ -150,7 +150,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	/**
 	 * Initializes the express server
 	 */
-	async initExpressServer() {
+	async initExpressServer(fullInit = true) {
 		this.addLog(`Initializing express server`);
 		// Create and set the express application
 		var app = express();
@@ -169,6 +169,13 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// Add the default system endpoints
 		app.use("/", (await import("../routes/system.js")).default);
+
+		if (fullInit) {
+			// Add the default storage endpoints
+			app.use("/storage", (await import("../routes/storage.js")).default);
+			// Add the test queue and cron job handlers
+			app.use("/test", (await import("../routes/test.js")).default);
+		}
 	}
 
 	/**

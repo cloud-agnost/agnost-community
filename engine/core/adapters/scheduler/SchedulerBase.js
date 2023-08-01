@@ -6,11 +6,16 @@ export class SchedulerBase {
 
 	/**
 	 * Adds the listerer to listen messages for the provided taskId
-	 * @param  {string} queueId The iid of the queue
+	 * @param  {object} task The task object
 	 */
-	async listenMessages(taskId) {}
+	async listenMessages(task) {}
 
-	async triggerCronJob(task) {}
+	/**
+	 * Trigger the execution of the cron job
+	 * @param  {object} task The task object
+	 * @param  {string} debugChannel The debugChannel id
+	 */
+	async triggerCronJob(task, debugChannel = null) {}
 
 	/**
 	 * Gets the cron job task tracking record information
