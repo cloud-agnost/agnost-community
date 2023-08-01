@@ -79,12 +79,7 @@ export default function EditMessageQueue() {
 					>
 						<Pencil className='text-icon-base w-5 h-5' />
 					</Button>
-					<Button
-						variant='secondary'
-						onClick={() => {
-							console.log('test');
-						}}
-					>
+					<Button variant='secondary'>
 						<TestTube size={20} className='text-icon-base mr-2' />
 						{t('endpoint.test.test')}
 					</Button>
