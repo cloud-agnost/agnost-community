@@ -520,7 +520,7 @@ export const dbTypeMappings = {
 	MySQL: {
 		id: "bigint",
 		text: "varchar",
-		"rich-text": "lnogtext",
+		"rich-text": "longtext",
 		"encrypted-text": "varchar",
 		email: "varchar",
 		link: "varchar",
