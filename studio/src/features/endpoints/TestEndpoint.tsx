@@ -1,6 +1,12 @@
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
+import {
+	Drawer,
+	DrawerContent,
+	DrawerFooter,
+	DrawerHeader,
+	DrawerTitle,
+} from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { BADGE_COLOR_MAP, TEST_ENDPOINTS_MENU_ITEMS } from '@/constants';
@@ -20,11 +26,12 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import * as z from 'zod';
-import { OrganizationMenuItem } from '../Organization';
+import { OrganizationMenuItem } from '../organization';
 import EndpointBody from './TestEndpoint/EndpointBody';
 import EndpointHeaders from './TestEndpoint/EndpointHeaders';
 import TestEndpointParams from './TestEndpoint/TestEndpointParams';
 import { TestMethods } from '@/types';
+import EndpointResponse from './TestEndpoint/EndpointResponse';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -71,7 +78,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { environment } = useEnvironmentStore();
 	const { endpoint, testEndpoint, endpointRequest } = useEndpointStore();
 	const [loading, setLoading] = useState(false);
-	const [path, setPath] = useState(endpoint?.path as string);
 	const [searchParams] = useSearchParams();
 	const form = useForm<z.infer<typeof TestEndpointSchema>>({
 		resolver: zodResolver(TestEndpointSchema),
@@ -86,16 +92,16 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					value: '',
 				},
 			],
+			bodyType: 'json',
 		},
 	});
-
 	async function onSubmit(data: z.infer<typeof TestEndpointSchema>) {
 		setLoading(true);
 		const pathVariables = arrayToObj(data.params.pathVariables);
 		const testPath = getEndpointPath(endpoint?.path as string, pathVariables);
 		const consoleLogId = generateId();
 		joinChannel(consoleLogId);
-		const params = await testEndpoint({
+		await testEndpoint({
 			epId: endpoint?.iid as string,
 			envId: environment?.iid as string,
 			path: testPath,
@@ -114,16 +120,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 				leaveChannel(consoleLogId);
 			},
 		});
-		console.log(params);
 	}
-
-	useEffect(() => {
-		const params = form.getValues('params.queryParams');
-		if (params?.length > 0) {
-			const queryParams = params.map((p) => `${p.key}=${p.value}`).join('&');
-			setPath(`${endpoint?.path}?${queryParams}`);
-		}
-	}, [form.getValues('params.queryParams')]);
 
 	useEffect(() => {
 		const header = {
@@ -159,7 +156,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 							text={endpoint?.method as string}
 						/>
 					</div>
-					<Input className='rounded-none rounded-r' value={path} disabled />
+					<Input className='rounded-none rounded-r' value={endpoint.path} disabled />
 					<Button
 						className='ml-3'
 						size='lg'
@@ -183,14 +180,18 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 						);
 					})}
 				</nav>
-				<div className='p-6 h-full scroll'>
+				<div className='p-6 scroll space-y-6'>
 					<Form {...form}>
-						<form className='h-full'>
+						<form className='inline space-y-6'>
 							{searchParams.get('t') === 'params' && <TestEndpointParams />}
 							{searchParams.get('t') === 'headers' && <EndpointHeaders />}
 							{searchParams.get('t') === 'body' && <EndpointBody />}
 						</form>
 					</Form>
+
+					<DrawerFooter className='block h-3/4'>
+						<EndpointResponse />
+					</DrawerFooter>
 				</div>
 			</DrawerContent>
 		</Drawer>

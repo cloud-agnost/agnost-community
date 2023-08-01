@@ -1,15 +1,13 @@
-import { Button } from '@/components/Button';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
-import { EmptyState } from '@/components/EmptyState';
 import { TableLoading } from '@/components/Table/Table';
 import { EmptyQueue } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
-import { MessageQueueColumns, MessageQueueFilter } from '@/features/queue';
+import { MessageQueueColumns } from '@/features/queue';
+import { useToast } from '@/hooks';
+import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { APIError, MessageQueue } from '@/types';
-import { cn } from '@/utils';
-import { Plus } from '@phosphor-icons/react';
 import { Row, Table } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -33,16 +31,25 @@ export default function MainMessageQueue() {
 		lastFetchedCount,
 		toDeleteQueue,
 		deleteQueue,
+		deleteMultipleQueues,
 	} = useMessageQueueStore();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
+	const { notify } = useToast();
 
-	const [searchParams] = useSearchParams();
+	const [searchParams, setSearchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 
-	const { setSelectedRows, setTable, page, setPage, setIsCreateModalOpen } =
-		useOutletContext() as OutletContext;
+	const {
+		setSelectedRows,
+		setTable,
+		page,
+		setPage,
+		setIsCreateModalOpen,
+		table,
+		selectedRows,
+	}: OutletContext = useOutletContext();
 
 	function deleteQueueHandler() {
 		setLoading(true);
@@ -62,6 +69,32 @@ export default function MainMessageQueue() {
 			},
 		});
 	}
+	function onInput(value: string) {
+		value = value.trim();
+		if (!value) {
+			searchParams.delete('q');
+			setSearchParams(searchParams);
+			return;
+		}
+		setPage(0);
+		setSearchParams({ ...searchParams, q: value });
+	}
+
+	function deleteMultipleQueuesHandler() {
+		deleteMultipleQueues({
+			queueIds: selectedRows.map((row) => row.original._id),
+			orgId: orgId as string,
+			appId: appId as string,
+			versionId: versionId as string,
+			onSuccess: () => {
+				table.toggleAllRowsSelected(false);
+				setPage(0);
+			},
+			onError: ({ error, details }) => {
+				notify({ type: 'error', description: details, title: error });
+			},
+		});
+	}
 
 	useEffect(() => {
 		if (versionId && orgId && appId) {
@@ -78,56 +111,55 @@ export default function MainMessageQueue() {
 	}, [searchParams.get('q'), page]);
 
 	return (
-		<div className={cn(queues.length === 0 && 'flex flex-col items-center justify-center h-[80%]')}>
-			{queues.length === 0 ? (
-				<EmptyState title={t('queue.empty_text')} icon={<EmptyQueue className='w-44 h-44' />}>
-					<Button onClick={() => setIsCreateModalOpen(true)}>
-						<Plus size={16} className='mr-2' weight='bold' />
-						{t('queue.create.title')}
-					</Button>
-				</EmptyState>
-			) : (
-				<div className='space-y-6'>
-					<MessageQueueFilter />
-					<InfiniteScroll
-						scrollableTarget='version-layout'
-						dataLength={queues.length}
-						next={() => {
-							setPage(page + 1);
+		<VersionTabLayout<MessageQueue>
+			isEmpty={queues.length === 0}
+			title={t('queue.title')}
+			icon={<EmptyQueue className='w-44 h-44' />}
+			openCreateModal={() => setIsCreateModalOpen(true)}
+			createButtonTitle={t('queue.create.title')}
+			emptyStateTitle={t('queue.empty_text')}
+			table={table}
+			selectedRowLength={selectedRows?.length}
+			onSearch={onInput}
+			onMultipleDelete={deleteMultipleQueuesHandler}
+		>
+			<InfiniteScroll
+				scrollableTarget='version-layout'
+				dataLength={queues.length}
+				next={() => {
+					setPage(page + 1);
+				}}
+				hasMore={lastFetchedCount >= PAGE_SIZE}
+				loader={queues.length > 0 && <TableLoading />}
+			>
+				<DataTable
+					columns={MessageQueueColumns}
+					data={queues}
+					setSelectedRows={setSelectedRows}
+					setTable={setTable}
+				/>
+			</InfiniteScroll>
+			<ConfirmationModal
+				loading={loading}
+				error={error}
+				title={t('queue.delete.title')}
+				alertTitle={t('queue.delete.message')}
+				alertDescription={t('queue.delete.description')}
+				description={
+					<Trans
+						i18nKey='queue.delete.confirmCode'
+						values={{ confirmCode: toDeleteQueue?.iid }}
+						components={{
+							confirmCode: <span className='font-bold text-default' />,
 						}}
-						hasMore={lastFetchedCount >= PAGE_SIZE}
-						loader={queues.length > 0 && <TableLoading />}
-					>
-						<DataTable
-							columns={MessageQueueColumns}
-							data={queues}
-							setSelectedRows={setSelectedRows}
-							setTable={setTable}
-						/>
-					</InfiniteScroll>
-					<ConfirmationModal
-						loading={loading}
-						error={error}
-						title={t('queue.delete.title')}
-						alertTitle={t('queue.delete.message')}
-						alertDescription={t('queue.delete.description')}
-						description={
-							<Trans
-								i18nKey='queue.delete.confirmCode'
-								values={{ confirmCode: toDeleteQueue?.iid }}
-								components={{
-									confirmCode: <span className='font-bold text-default' />,
-								}}
-							/>
-						}
-						confirmCode={toDeleteQueue?.iid as string}
-						onConfirm={deleteQueueHandler}
-						isOpen={isDeleteModalOpen}
-						closeModal={closeDeleteModal}
-						closable
 					/>
-				</div>
-			)}
-		</div>
+				}
+				confirmCode={toDeleteQueue?.iid as string}
+				onConfirm={deleteQueueHandler}
+				isOpen={isDeleteModalOpen}
+				closeModal={closeDeleteModal}
+				closable
+			/>
+		</VersionTabLayout>
 	);
 }

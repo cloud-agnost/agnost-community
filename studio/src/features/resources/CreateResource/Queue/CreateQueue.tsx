@@ -1,12 +1,9 @@
 import { Input } from '@/components/Input';
 import { Slider } from '@/components/Slider';
 import { MAX_DB_SIZE, MIN_DB_SIZE, QUEUE_TYPES } from '@/constants';
-import { useToast } from '@/hooks';
-import useResourceStore from '@/store/resources/resourceStore';
 import { ConnectResourceSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
@@ -20,10 +17,8 @@ const CreateQueueSchema = z.object({
 });
 
 export default function CreateQueue() {
-	const [loading, setLoading] = useState(false);
 	const { t } = useTranslation();
-	const { notify } = useToast();
-	const { addExistingResource, toggleCreateResourceModal } = useResourceStore();
+
 	const form = useForm<z.infer<typeof CreateQueueSchema>>({
 		resolver: zodResolver(CreateQueueSchema),
 	});
@@ -38,7 +33,6 @@ export default function CreateQueue() {
 				<CreateResourceLayout
 					title={t('resources.connect_existing')}
 					control={form.control}
-					loading={loading}
 					instances={QUEUE_TYPES}
 				>
 					<FormField

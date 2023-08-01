@@ -8,6 +8,7 @@ import * as z from 'zod';
 export default function ConnectRabbitMqWithURI() {
 	const { t } = useTranslation();
 	const form = useFormContext<z.infer<typeof ConnectQueueSchema>>();
+
 	return (
 		<div className='flex flex-col gap-2'>
 			<FormField

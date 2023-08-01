@@ -5,7 +5,6 @@ export const DEFAULT_THEME = 'light';
 
 export const withTailwindTheme = (Story: any, context: any) => {
 	const { theme } = context.globals;
-	console.log('theme', context);
 	const sbRoot = document.getElementsByClassName('sb-show-main')[0];
 	sbRoot.classList.add('sb-show-main--' + theme);
 	useEffect(() => {

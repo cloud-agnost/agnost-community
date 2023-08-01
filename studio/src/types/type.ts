@@ -196,6 +196,12 @@ export interface RemoveMemberRequest extends BaseRequest {
 }
 export type RealtimeActionTypes = 'update' | 'create' | 'delete' | 'telemetry';
 export type RealtimeObjectTypes = 'user' | 'org' | 'org.app' | 'org.resource';
+
+export interface BaseParams {
+	orgId: string;
+	appId: string;
+	versionId: string;
+}
 export interface RealtimeIdentifiers {
 	orgId?: string;
 	appId?: string;

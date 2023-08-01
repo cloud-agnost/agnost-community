@@ -34,7 +34,17 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 			...data,
 			onSuccess: () => {
 				onClose();
-				form.reset();
+				form.reset({
+					name: '',
+					path: '',
+					timeout: '',
+					apiKeyRequired: false,
+					method: 'GET',
+					sessionRequired: false,
+					logExecution: false,
+					rateLimits: [],
+					middlewares: [],
+				});
 			},
 			onError: ({ error, details }) => {
 				notify({

@@ -8,7 +8,6 @@ export default function SelectResourceType() {
 	const { selectResourceType, resourceType } = useResourceStore();
 	const { t } = useTranslation();
 	const selectResource = (val: string) => {
-		console.log(val);
 		const [name, type] = val.split('-');
 		selectResourceType(name, type);
 	};

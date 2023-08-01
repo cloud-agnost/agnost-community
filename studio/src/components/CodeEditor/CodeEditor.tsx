@@ -6,6 +6,7 @@ import { cn } from '@/utils';
 interface CodeEditorProps extends Omit<EditorProps, 'onMount' | 'defaultLanguage'> {
 	containerClassName?: string;
 	defaultLanguage?: string;
+	readonly?: boolean;
 	onSave?: () => void;
 }
 export default function CodeEditor({
@@ -17,6 +18,7 @@ export default function CodeEditor({
 	loading,
 	className,
 	onSave,
+	readonly,
 	defaultLanguage = 'javascript',
 }: CodeEditorProps) {
 	const editorRef = useRef(null);
@@ -57,6 +59,15 @@ export default function CodeEditor({
 				loading={loading}
 				onMount={handleEditorDidMount}
 				defaultLanguage={defaultLanguage}
+				options={{
+					readOnly: readonly,
+					minimap: {
+						enabled: false,
+					},
+					theme: 'nightOwl',
+					autoClosingBrackets: 'always',
+					autoDetectHighContrast: true,
+				}}
 			/>
 		</div>
 	);

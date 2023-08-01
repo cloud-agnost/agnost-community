@@ -8,14 +8,31 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/Form';
+import { useParams } from 'react-router-dom';
 import { Input } from '@/components/Input';
 import { Switch } from '@/components/Switch';
 import { CreateMessageQueueSchema } from '@/types';
 import { translate as t } from '@/utils';
 import { useFormContext } from 'react-hook-form';
 import * as z from 'zod';
+import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from '@/components/Select';
+import { useEffect } from 'react';
+import useResourceStore from '@/store/resources/resourceStore';
+import { cn } from '@/utils';
 export default function MessageQueueForm() {
 	const form = useFormContext<z.infer<typeof CreateMessageQueueSchema>>();
+	const { getResources, resources } = useResourceStore();
+	const { appId } = useParams<{
+		appId: string;
+		orgId: string;
+	}>();
+	useEffect(() => {
+		getResources({
+			appId: appId as string,
+			type: 'queue',
+		});
+	}, []);
+
 	return (
 		<div className='space-y-6'>
 			<FormField
@@ -77,6 +94,43 @@ export default function MessageQueueForm() {
 						<FormControl>
 							<Switch checked={field.value} onCheckedChange={field.onChange} />
 						</FormControl>
+					</FormItem>
+				)}
+			/>
+			<FormField
+				control={form.control}
+				name='resourceId'
+				render={({ field }) => (
+					<FormItem className='space-y-1'>
+						<FormLabel>{t('queue.create.resource.title')}</FormLabel>
+						<FormControl>
+							<Select
+								defaultValue={field.value}
+								value={field.value}
+								name={field.name}
+								onValueChange={field.onChange}
+							>
+								<FormControl>
+									<SelectTrigger
+										error={Boolean(form.formState.errors.resourceId)}
+										className='w-1/2'
+									>
+										<SelectValue
+											placeholder={`${t('general.select')} ${t('queue.create.resource.title')}`}
+										/>
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent align='center'>
+									{resources.map((resource) => (
+										<SelectItem key={resource._id} value={resource._id}>
+											<div className='flex items-center gap-2'>{resource.name}</div>
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</FormControl>
+						<FormDescription>{t('queue.create.resource.description')}</FormDescription>
+						<FormMessage />
 					</FormItem>
 				)}
 			/>

@@ -84,7 +84,6 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 		size: 45,
 		cell: ({ row: { original } }) => {
 			function openEditDrawer() {
-				console.log('openEditDrawer');
 				const { setEditMiddlewareDrawerIsOpen, setMiddleware } = useMiddlewareStore.getState();
 				setEditMiddlewareDrawerIsOpen(true);
 				setMiddleware(original);

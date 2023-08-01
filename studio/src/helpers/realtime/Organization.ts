@@ -25,6 +25,9 @@ class Organization extends RealtimeActions<OrganizationType> {
 			organizations: [...useOrganizationStore.getState().organizations, data],
 		});
 	}
+	telemetry(params: RealtimeActionParams<OrganizationType>) {
+		this.update(params);
+	}
 }
 
 export default Organization;

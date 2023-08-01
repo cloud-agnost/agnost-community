@@ -17,9 +17,8 @@ import {
 	TransferOrganizationRequest,
 	UpdateRoleRequest,
 } from '@/types';
-import { joinChannel, leaveChannel } from '@/utils';
 import { BaseRequest } from '@/types/type';
-import { translate } from '@/utils';
+import { joinChannel, leaveChannel, translate } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 interface OrganizationStore {
@@ -95,6 +94,9 @@ const useOrganizationStore = create<OrganizationStore>()(
 							set({ loading: true });
 							const res = await OrganizationService.getAllOrganizationsByUser();
 							set({ organizations: res, loading: false });
+							res.forEach((organization) => {
+								joinChannel(organization._id);
+							});
 							return res;
 						} catch (error) {
 							throw error as APIError;
@@ -113,6 +115,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 								],
 							});
 							if (onSuccess) onSuccess();
+							joinChannel(res._id);
 							return res;
 						} catch (error) {
 							if (onError) onError(error as APIError);

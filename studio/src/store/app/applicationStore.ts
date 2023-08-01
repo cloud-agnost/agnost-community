@@ -20,7 +20,7 @@ import {
 	UpdateRoleRequest,
 } from '@/types';
 
-import { translate } from '@/utils';
+import { joinChannel, leaveChannel, translate } from '@/utils';
 import OrganizationService from 'services/OrganizationService.ts';
 import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
@@ -101,7 +101,6 @@ const useApplicationStore = create<ApplicationStore>()(
 					invitationRoleFilter: [],
 
 					selectApplication: (application: Application) => {
-						console.log('selectApplication', application);
 						set({ application });
 					},
 					changeAppName: async (req: ChangeAppNameRequest) => {
@@ -227,7 +226,6 @@ const useApplicationStore = create<ApplicationStore>()(
 					},
 					inviteUsersToApp: async (req: AppInviteRequest) => {
 						try {
-							console.log('req', req);
 							const invitations = await ApplicationService.inviteUsersToApp(req);
 							if (req.onSuccess) req.onSuccess();
 							return invitations;
@@ -348,6 +346,9 @@ const useApplicationStore = create<ApplicationStore>()(
 							set({ loading: true });
 							const applications = await OrganizationService.getOrganizationApps(orgId);
 							set({ applications, temp: applications });
+							applications.forEach((app) => {
+								joinChannel(app._id);
+							});
 							return applications;
 						} catch (error) {
 							throw error as APIError;
@@ -369,6 +370,7 @@ const useApplicationStore = create<ApplicationStore>()(
 								applications: [...prev.applications, res.app],
 								temp: [...prev.applications, res.app],
 							}));
+							joinChannel(res.app._id);
 							return res;
 						} catch (error) {
 							if (onError) onError(error as APIError);
@@ -384,6 +386,7 @@ const useApplicationStore = create<ApplicationStore>()(
 								applications: prev.applications.filter((app) => app._id !== appId),
 								temp: prev.applications.filter((app) => app._id !== appId),
 							}));
+							leaveChannel(appId);
 							if (onSuccess) onSuccess();
 						} catch (error) {
 							if (onError) onError(error as APIError);
@@ -402,6 +405,7 @@ const useApplicationStore = create<ApplicationStore>()(
 								applications: prev.applications.filter((app) => app._id !== appId),
 								temp: prev.applications.filter((app) => app._id !== appId),
 							}));
+							leaveChannel(appId);
 							if (onSuccess) onSuccess();
 						} catch (error) {
 							if (onError) onError(error as APIError);

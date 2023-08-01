@@ -49,7 +49,6 @@ export default function ConnectCache() {
 			},
 		});
 	}
-	console.log(form.formState.errors);
 
 	return (
 		<Form {...form}>

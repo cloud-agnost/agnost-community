@@ -45,7 +45,6 @@ export default function OrganizationMembersTableHeader() {
 	const sortOptions: SortOption[] =
 		selectedTab === 'member' ? ORG_MEMBERS_SORT_OPTIONS : INVITATIONS_SORT_OPTIONS;
 
-	console.log('selectedRows', selectedRows);
 	function deleteMulti() {
 		if (selectedTab === 'member') {
 			removeMultipleMembersFromOrganization({

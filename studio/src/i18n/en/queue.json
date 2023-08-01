@@ -14,7 +14,12 @@
 		"delay": "Message Delay Duration",
 		"delay_description": "Keep the message in the queue for the duration of specified delay seconds",
 		"logExec": "Log Execution",
-		"logExecDescription": "Log endpoint request, response, status and execution duration"
+		"logExecDescription": "Log endpoint request, response, status and execution duration",
+		"resource": {
+			"title": "Resource",
+			"description": "Select a resource to associate with this queue",
+			"placeholder": "Select a resource"
+		}
 	},
 	"test": {
 		"title": "Test Message Queue",

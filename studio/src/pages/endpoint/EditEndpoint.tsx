@@ -3,21 +3,14 @@ import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { Input } from '@/components/Input';
 import { Pencil } from '@/components/icons';
-import { BADGE_COLOR_MAP } from '@/constants';
+import { HTTP_METHOD_BADGE_MAP } from '@/constants';
+import TestEndpoint from '@/features/endpoints/TestEndpoint';
+import { useToast } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
-import { Endpoint } from '@/types';
 import { FloppyDisk, TestTube } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-	LoaderFunctionArgs,
-	useLoaderData,
-	useOutletContext,
-	useParams,
-	useSearchParams,
-} from 'react-router-dom';
-import { useToast } from '@/hooks';
-import TestEndpoint from '@/features/endpoints/TestEndpoint';
+import { LoaderFunctionArgs, useOutletContext, useParams, useSearchParams } from 'react-router-dom';
 
 EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { endpointId, orgId, versionId, appId } = params;
@@ -86,7 +79,7 @@ export default function EditEndpoint() {
 					<div className='border border-input-disabled-border rounded-l w-16 h-9'>
 						<Badge
 							className='w-full h-full rounded-l rounded-r-none'
-							variant={BADGE_COLOR_MAP[endpoint.method]}
+							variant={HTTP_METHOD_BADGE_MAP[endpoint.method]}
 							text={endpoint.method}
 						/>
 					</div>
@@ -119,7 +112,12 @@ export default function EditEndpoint() {
 				</div>
 			</div>
 
-			<CodeEditor containerClassName='h-[95%]' value={endpoint.logic} onChange={setEndpointLogic} />
+			<CodeEditor
+				containerClassName='h-[95%]'
+				value={endpoint.logic}
+				onChange={setEndpointLogic}
+				onSave={saveLogic}
+			/>
 			<TestEndpoint
 				open={isTestEndpointOpen}
 				onClose={() => {

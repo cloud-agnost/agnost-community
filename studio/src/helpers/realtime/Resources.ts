@@ -25,6 +25,9 @@ class Resource extends RealtimeActions<ResourceType> {
 			resources: [...useResourceStore.getState().resources, data],
 		});
 	}
+	telemetry(params: RealtimeActionParams<ResourceType>) {
+		this.update(params);
+	}
 }
 
 export default Resource;

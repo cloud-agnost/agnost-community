@@ -33,7 +33,7 @@ interface MessageQueueStore {
 const useMessageQueueStore = create<MessageQueueStore>()(
 	devtools(
 		persist(
-			(set, get) => ({
+			(set) => ({
 				queues: [],
 				queue: {} as MessageQueue,
 				toDeleteQueue: {} as MessageQueue,

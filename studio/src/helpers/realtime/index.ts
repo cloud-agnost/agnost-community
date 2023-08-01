@@ -10,6 +10,8 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		org: Organization,
 		'org.app': Application,
 		'org.resource': Resource,
+		app: Application,
+		resource: Resource,
 	};
 
 	return new keys[type]();

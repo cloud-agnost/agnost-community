@@ -4,7 +4,7 @@ import { Checkbox } from '@/components/Checkbox';
 import { CopyButton } from '@/components/CopyButton';
 import { DateText } from '@/components/DateText';
 import { Pencil } from '@/components/icons';
-import { BADGE_COLOR_MAP, ENDPOINT_METHOD_TEXT_COLOR } from '@/constants';
+import { HTTP_METHOD_BADGE_MAP, ENDPOINT_METHOD_TEXT_COLOR, BADGE_COLOR_MAP } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, Endpoint } from '@/types';
@@ -67,7 +67,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		size: 100,
 		cell: ({ row }) => {
 			const { method } = row.original;
-			return <Badge variant={BADGE_COLOR_MAP[method]} text={method} />;
+			return <Badge variant={HTTP_METHOD_BADGE_MAP[method]} text={method} />;
 		},
 	},
 	{
@@ -83,7 +83,9 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { apiKeyRequired } = row.original;
-			const apiKeyRequiredText = apiKeyRequired ? 'Required' : 'Optional';
+			const apiKeyRequiredText = apiKeyRequired
+				? translate('endpoint.required')
+				: translate('endpoint.optional');
 			return (
 				<Badge
 					variant={BADGE_COLOR_MAP[apiKeyRequiredText.toUpperCase()]}
@@ -100,7 +102,9 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { sessionRequired } = row.original;
-			const sessionRequiredText = sessionRequired ? 'Required' : 'Optional';
+			const sessionRequiredText = sessionRequired
+				? translate('endpoint.required')
+				: translate('endpoint.optional');
 			return (
 				<Badge
 					variant={BADGE_COLOR_MAP[sessionRequiredText.toUpperCase()]}

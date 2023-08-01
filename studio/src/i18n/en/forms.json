@@ -44,5 +44,7 @@
 	"number": "{{label}} must be a number",
 	"search_to_add": "Search to add {{label}}",
 	"pick_a_date": "Pick a date",
-	"select": "Select {{label}}"
+	"select": "Select {{label}}",
+	"notStartWithNumber": "{{label}} must not start with a number",
+	"notStartWithUnderscore": "{{label}} must not start with an underscore"
 }

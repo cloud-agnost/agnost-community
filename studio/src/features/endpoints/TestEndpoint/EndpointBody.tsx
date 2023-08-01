@@ -39,8 +39,8 @@ export default function EndpointBody() {
 					</FormItem>
 				)}
 			/>
-			<div className='mt-6 h-full'>
-				{watch('bodyType') === 'json' && (
+			{watch('bodyType') === 'json' && (
+				<div className='mt-6 h-1/2'>
 					<FormField
 						control={control}
 						name='body'
@@ -58,10 +58,9 @@ export default function EndpointBody() {
 							</FormItem>
 						)}
 					/>
-				)}
-
-				{watch('bodyType') === 'form-data' && <EndpointFiles />}
-			</div>
+				</div>
+			)}
+			{watch('bodyType') === 'form-data' && <EndpointFiles />}
 		</>
 	);
 }

@@ -2,9 +2,9 @@ import Database from '@/assets/images/database.png';
 import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
 import {
-	Awss3,
 	ApiKeys,
 	Authentication,
+	Awss3,
 	AzureBlobStorage,
 	BellRing,
 	Binary,
@@ -86,14 +86,6 @@ export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
 export const MIN_DB_SIZE = 1;
 export const MAX_DB_SIZE = 50;
-export const IP_REGEX = /^(\d{1,3}\.){3}\d{1,3}$/;
-export const URL_REGEX = /^(http|https):\/\/[^ "]+$/;
-export const NUMBER_REGEX = /^[0-9]+$/;
-export const NAME_REGEX = /^[A-Za-z0-9_]+$/;
-export const NOT_START_WITH_NUMBER_REGEX = /^[A-Za-z_][A-Za-z0-9_]*$/;
-export const ROUTE_NAME_REGEX = /^\/[a-zA-Z0-9_-]+(?:\/:[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)*)*$/;
-export const PARAM_REGEX = /:([^/?]+)/g;
-export const PARAM_NAME_REGEX = /^[a-zA-Z0-9_-]+$/;
 
 export const SLIDER_IMAGES = [
 	{
@@ -169,7 +161,6 @@ export const APPLICATION_SETTINGS = [
 		id: 'open-version',
 		name: translate('application.settings.openVersion'),
 		onClick: (application: Application) => {
-			console.log('application', application);
 			useApplicationStore.getState().openVersionDrawer(application);
 		},
 	},
@@ -325,6 +316,8 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	UPDATING: 'yellow',
 	DELETING: 'red',
 	BINDING: 'blue',
+	OPTIONAL: 'yellow',
+	REQUIRED: 'blue',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
@@ -740,7 +733,7 @@ export const ENDPOINT_OPTIONS: SortOption[] = [
 export const ALL_HTTP_METHODS: Method[] = ['GET', 'POST', 'PUT', 'DELETE'];
 
 export const HTTP_METHOD_BADGE_MAP: Record<string, BadgeColors> = {
-	GET: 'orange',
+	GET: 'blue',
 	POST: 'green',
 	PUT: 'yellow',
 	DELETE: 'red',
@@ -758,6 +751,12 @@ export const ENDPOINT_METHOD_TEXT_COLOR: Record<string, string> = {
 	POST: 'text-elements-green',
 	PUT: 'text-elements-yellow',
 	DELETE: 'text-elements-red',
+};
+export const ENDPOINT_METHOD_BG_COLOR: Record<string, string> = {
+	GET: 'bg-elements-strong-blue',
+	POST: 'bg-elements-strong-green',
+	PUT: 'bg-elements-strong-yellow',
+	DELETE: 'bg-elements-strong-red',
 };
 
 export const ENDPOINT_RESPONSE_TABS = [

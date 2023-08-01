@@ -36,15 +36,10 @@ export default function ListFields() {
 
 	useEffect(() => {
 		setSelectedRows((selectedRows) => {
-			const systemFieldsIndex = selectedRows
-				?.filter((row) => row.original.creator === 'system')
-				.map((row) => row.index);
-			console.log(systemFieldsIndex);
 			return selectedRows?.filter((row) => row.original.creator !== 'system');
 		});
 		if (table) {
 			table?.setRowSelection((updater) => {
-				console.log(updater);
 				return updater;
 			});
 		}

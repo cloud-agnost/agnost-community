@@ -30,7 +30,6 @@ export default function ConnectAWS() {
 	useEffect(() => {
 		form.setValue('instance', 'AWS S3');
 	}, [form]);
-	console.log(form.formState.errors);
 	function onSubmit(data: z.infer<typeof ConnectAWSSchema>) {
 		setLoading(true);
 		addExistingResource({

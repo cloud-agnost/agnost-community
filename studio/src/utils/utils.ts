@@ -161,7 +161,7 @@ export function arrayToObj(arr: { key: string; value: string }[]): Record<string
 	return arr.reduce((acc, curr) => {
 		acc[curr.key] = curr.value;
 		return acc;
-	}, {});
+	}, {} as Record<string, string>);
 }
 
 export function objToArray(obj: object | undefined): { key: string; value: string }[] {

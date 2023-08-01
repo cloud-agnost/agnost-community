@@ -39,7 +39,7 @@
 		@apply -mx-1 my-1 h-px bg-subtle;
 	}
 	span {
-		@apply truncate max-w-[calc(100%-1rem)] block flex-1 text-start;
+		@apply truncate max-w-[calc(100%-1rem)] flex-1 text-start;
 	}
 
 	&.input {

@@ -7,7 +7,6 @@ export default function EmptyStatus() {
 
 	function deployHandler() {
 		// TODO: implement deployHandler
-		console.log('deployHandler');
 	}
 
 	return (

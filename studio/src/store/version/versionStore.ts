@@ -1,3 +1,4 @@
+import { VersionService } from '@/services';
 import {
 	AddNPMPackageParams,
 	AddVersionVariableParams,
@@ -28,10 +29,9 @@ import {
 	VersionProperties,
 	VersionRealtimeProperties,
 } from '@/types';
-import { devtools } from 'zustand/middleware';
+import { history, joinChannel, notify, translate } from '@/utils';
 import { create } from 'zustand';
-import { VersionService } from '@/services';
-import { history, notify, translate } from '@/utils';
+import { devtools } from 'zustand/middleware';
 
 interface VersionStore {
 	loading: boolean;
@@ -132,6 +132,9 @@ const useVersionStore = create<VersionStore>()(
 					const versions = await VersionService.getAllVersionsVisibleToUser(req);
 					if (!get().versionPage) set({ versions });
 					else set((prev) => ({ versions: [...prev.versions, ...versions] }));
+					versions.forEach((version: Version) => {
+						joinChannel(version._id);
+					});
 				} catch (error) {
 					set({ error: error as APIError });
 				} finally {

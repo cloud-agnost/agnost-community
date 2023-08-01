@@ -111,7 +111,6 @@ const useModelStore = create<ModelStore>()(
 					}
 				},
 				addNewField: async (params: AddNewFieldParams): Promise<Model> => {
-					console.log({ params });
 					try {
 						const model = await ModelService.addNewField(params);
 						set((state) => ({

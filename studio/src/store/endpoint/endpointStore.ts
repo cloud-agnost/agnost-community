@@ -148,7 +148,6 @@ const useEndpointStore = create<EndpointStore>()(
 				},
 				testEndpoint: async (params) => {
 					const startTime = performance.now();
-					console.log('store');
 					const response = await EndpointService.testEndpoint(params);
 					const prevRequest = get().endpointRequest;
 					const prevResponse = get().endpointResponse;
@@ -177,7 +176,6 @@ const useEndpointStore = create<EndpointStore>()(
 						set((prev) => ({
 							endpointResponse: prev.endpointResponse.map((r) => {
 								if (r.epId === params.epId) {
-									console.log(response?.response?.status ?? response?.status, 'r2esponse');
 									return {
 										...r,
 										epId: params.epId,
