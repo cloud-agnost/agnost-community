@@ -1,16 +1,15 @@
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
-import { EmptyState } from '@/components/EmptyState';
 import { TableLoading } from '@/components/Table/Table';
 import { EmptyEndpoint } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
-import { EndpointColumns, EndpointFilter } from '@/features/endpoints';
+import { EndpointColumns } from '@/features/endpoints';
+import { useToast } from '@/hooks';
+import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import { APIError, Endpoint } from '@/types';
-import { cn } from '@/utils';
 import { Row, Table } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/Button';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useOutletContext, useParams, useSearchParams } from 'react-router-dom';
@@ -20,27 +19,38 @@ interface OutletContext {
 	setTable: (table: Table<Endpoint>) => void;
 	page: number;
 	setPage: (page: number) => void;
+	table: Table<Endpoint>;
+	selectedRows: Row<Endpoint>[];
 }
 
 export default function MainEndpoint() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const { notify } = useToast();
 	const {
 		endpoints,
 		lastFetchedCount,
-		endpoint,
 		isEndpointDeleteDialogOpen,
 		toDeleteEndpoint,
 		deleteEndpoint,
 		getEndpoints,
 		closeEndpointDeleteDialog,
+		deleteMultipleEndpoints,
 	} = useEndpointStore();
-	const [searchParams] = useSearchParams();
+
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 
-	const { setSelectedRows, setTable, page, setPage, setIsCreateModalOpen } =
-		useOutletContext() as OutletContext;
+	const {
+		setSelectedRows,
+		setTable,
+		page,
+		setPage,
+		setIsCreateModalOpen,
+		table,
+		selectedRows,
+	}: OutletContext = useOutletContext();
 
 	function deleteEndpointHandler() {
 		setLoading(true);
@@ -60,6 +70,32 @@ export default function MainEndpoint() {
 			},
 		});
 	}
+	function onInput(value: string) {
+		value = value.trim();
+		if (!value) {
+			searchParams.delete('q');
+			setSearchParams(searchParams);
+			return;
+		}
+		setPage(0);
+		setSearchParams({ ...searchParams, q: value });
+	}
+
+	function deleteMultipleEndpointsHandler() {
+		deleteMultipleEndpoints({
+			endpointIds: selectedRows.map((row) => row.original._id),
+			orgId: orgId as string,
+			appId: appId as string,
+			versionId: versionId as string,
+			onSuccess: () => {
+				table.toggleAllRowsSelected(false);
+				setPage(0);
+			},
+			onError: ({ error, details }) => {
+				notify({ type: 'error', description: details, title: error });
+			},
+		});
+	}
 
 	useEffect(() => {
 		if (versionId && orgId && appId) {
@@ -75,60 +111,57 @@ export default function MainEndpoint() {
 		}
 	}, [searchParams.get('q'), page]);
 	return (
-		<div className={cn(!endpoints.length && 'h-3/4 flex items-center justify-center')}>
-			{!endpoints.length ? (
-				<EmptyState icon={<EmptyEndpoint className='w-32 h-32' />} title={t('endpoint.empty')}>
-					<Button
-						className='btn btn-primary'
-						onClick={() => {
-							setIsCreateModalOpen(true);
+		<VersionTabLayout<Endpoint>
+			icon={<EmptyEndpoint className='w-44 h-44' />}
+			title={t('endpoint.title')}
+			createButtonTitle={t('endpoint.add')}
+			emptyStateTitle={t('endpoint.empty')}
+			isEmpty={!endpoints.length}
+			openCreateModal={() => {
+				setIsCreateModalOpen(true);
+			}}
+			onMultipleDelete={deleteMultipleEndpointsHandler}
+			onSearch={onInput}
+			table={table}
+			selectedRowLength={selectedRows.length}
+		>
+			<InfiniteScroll
+				scrollableTarget='version-layout'
+				dataLength={endpoints.length}
+				next={() => {
+					setPage(page + 1);
+				}}
+				hasMore={lastFetchedCount >= PAGE_SIZE}
+				loader={endpoints.length > 0 && <TableLoading />}
+			>
+				<DataTable
+					columns={EndpointColumns}
+					data={endpoints}
+					setSelectedRows={setSelectedRows}
+					setTable={setTable}
+				/>
+			</InfiniteScroll>
+			<ConfirmationModal
+				loading={loading}
+				error={error}
+				title={t('endpoint.delete.title')}
+				alertTitle={t('endpoint.delete.message')}
+				alertDescription={t('endpoint.delete.description')}
+				description={
+					<Trans
+						i18nKey='endpoint.delete.confirmCode'
+						values={{ confirmCode: toDeleteEndpoint?.iid }}
+						components={{
+							confirmCode: <span className='font-bold text-default' />,
 						}}
-					>
-						{t('endpoint.add')}
-					</Button>
-				</EmptyState>
-			) : (
-				<div className='p-4 space-y-4'>
-					<EndpointFilter />
-					<InfiniteScroll
-						scrollableTarget='version-layout'
-						dataLength={endpoints.length}
-						next={() => {
-							setPage(page + 1);
-						}}
-						hasMore={lastFetchedCount >= PAGE_SIZE}
-						loader={endpoints.length > 0 && <TableLoading />}
-					>
-						<DataTable
-							columns={EndpointColumns}
-							data={endpoints}
-							setSelectedRows={setSelectedRows}
-							setTable={setTable}
-						/>
-					</InfiniteScroll>
-					<ConfirmationModal
-						loading={loading}
-						error={error}
-						title={t('endpoint.delete.title')}
-						alertTitle={t('endpoint.delete.message')}
-						alertDescription={t('endpoint.delete.description')}
-						description={
-							<Trans
-								i18nKey='endpoint.delete.confirmCode'
-								values={{ confirmCode: toDeleteEndpoint?.iid }}
-								components={{
-									confirmCode: <span className='font-bold text-default' />,
-								}}
-							/>
-						}
-						confirmCode={endpoint?.iid as string}
-						onConfirm={deleteEndpointHandler}
-						isOpen={isEndpointDeleteDialogOpen}
-						closeModal={closeEndpointDeleteDialog}
-						closable
 					/>
-				</div>
-			)}
-		</div>
+				}
+				confirmCode={toDeleteEndpoint?.iid as string}
+				onConfirm={deleteEndpointHandler}
+				isOpen={isEndpointDeleteDialogOpen}
+				closeModal={closeEndpointDeleteDialog}
+				closable
+			/>
+		</VersionTabLayout>
 	);
 }
