@@ -32,7 +32,6 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			resourceId: '64aff4ab40d7d62bf137a1ab',
 			...data,
 			onSuccess: () => {
 				form.reset({

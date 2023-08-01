@@ -1,29 +1,23 @@
 import { Button } from '@/components/Button';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { SearchInput } from '@/components/SearchInput';
-import { ResourceTable } from '@/features/resources';
+import { CreateResource, ResourceTable } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
 import useResourcesStore from '@/store/resources/resourceStore';
 import { Plus } from '@phosphor-icons/react';
 import { useEffect } from 'react';
-import { useTranslation, Trans } from 'react-i18next';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import { Trans, useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import { useState } from 'react';
-import { PAGE_SIZE } from '@/constants';
-import { TableLoading } from '@/components/Table/Table';
-import { CreateResource } from '@/features/resources';
 
 export default function OrgResources() {
 	const { t } = useTranslation();
 	const { application } = useApplicationStore();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [page, setPage] = useState(0);
+
 	const {
 		resources,
 		isDeletedResourceModalOpen,
 		deletedResource,
-		lastFetchedCount,
 		deleteResource,
 		getResources,
 		toggleCreateResourceModal,
@@ -42,13 +36,10 @@ export default function OrgResources() {
 
 	useEffect(() => {
 		getResources({
-			initialFetch: page === 0,
 			appId: application?._id as string,
-			page,
-			size: PAGE_SIZE,
-			search: searchParams.get('q') ?? undefined,
+			search: searchParams.get('q') as string,
 		});
-	}, [searchParams.get('q'), page]);
+	}, [searchParams.get('q')]);
 	return (
 		<div className='p-8 scroll' id='resource-scroll'>
 			<div className='flex items-center justify-between'>
@@ -67,16 +58,7 @@ export default function OrgResources() {
 			</div>
 
 			<div className='mt-8'>
-				<InfiniteScroll
-					next={() => setPage(page + 1)}
-					className='max-h-full'
-					hasMore={lastFetchedCount >= PAGE_SIZE}
-					scrollableTarget='resource-scroll'
-					loader={resources.length > 0 && <TableLoading />}
-					dataLength={resources.length}
-				>
-					<ResourceTable resources={resources} />
-				</InfiniteScroll>
+				<ResourceTable resources={resources} />
 			</div>
 			<CreateResource />
 			<ConfirmationModal

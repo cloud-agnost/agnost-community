@@ -93,6 +93,11 @@ export const CreateMessageQueueSchema = z.object({
 				label: translate('endpoint.create.timeout'),
 			}),
 		),
+	resourceId: z.string({
+		required_error: translate('forms.required', {
+			label: translate('queue.create.resource.title'),
+		}),
+	}),
 });
 
 export interface CreateMessageQueueParams extends BaseRequest, BaseParams {

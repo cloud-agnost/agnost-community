@@ -1,7 +1,7 @@
 import useTypeStore from '@/store/types/typeStore';
 import { translate } from '@/utils';
 import * as z from 'zod';
-import { BaseGetRequest, BaseRequest } from '.';
+import { BaseRequest } from '.';
 
 const NUMBER_REGEX = /^[0-9]+$/;
 export interface Resource {
@@ -59,10 +59,13 @@ export interface ResLog {
 	updatedAt: string;
 	__v: number;
 }
-export interface GetResourcesRequest extends BaseGetRequest {
+export interface GetResourcesRequest {
 	appId: string;
 	type?: string;
 	instance?: string;
+	sortBy?: string;
+	sortDir?: string;
+	search?: string;
 }
 export interface Instance {
 	id: string;
