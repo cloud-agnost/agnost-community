@@ -1,14 +1,15 @@
+import {
+	NAME_REGEX,
+	NOT_START_WITH_NUMBER_REGEX,
+	NUMBER_REGEX,
+	PARAM_NAME_REGEX,
+	ROUTE_NAME_REGEX,
+} from '@/constants/regex';
 import { BaseGetRequest, BaseParams, BaseRequest } from '@/types';
 import { getPathParams, translate as t } from '@/utils';
 import { AxiosError, AxiosResponse } from 'axios';
 import * as z from 'zod';
 
-export const NUMBER_REGEX = /^[0-9]+$/;
-export const NAME_REGEX = /^[A-Za-z0-9_]+$/;
-export const NOT_START_WITH_NUMBER_REGEX = /^[A-Za-z_][A-Za-z0-9_]*$/;
-export const ROUTE_NAME_REGEX = /^\/[a-zA-Z0-9_-]+(?:\/:[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)*)*$/;
-export const PARAM_REGEX = /:([^/?]+)/g;
-export const PARAM_NAME_REGEX = /^[a-zA-Z0-9_-]+$/;
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const;
 
 export type Method = 'POST' | 'GET' | 'PUT' | 'DELETE';

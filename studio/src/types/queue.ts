@@ -1,9 +1,8 @@
+import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX, NUMBER_REGEX } from '@/constants/regex';
 import { translate } from '@/utils';
 import * as z from 'zod';
 import { BaseGetRequest, BaseParams, BaseRequest } from '.';
-const NUMBER_REGEX = /^[0-9]+$/;
-export const NAME_REGEX = /^[A-Za-z0-9_]+$/;
-export const NOT_START_WITH_NUMBER_REGEX = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
 export interface MessageQueue {
 	orgId: string;
 	appId: string;
