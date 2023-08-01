@@ -2,9 +2,9 @@ import Database from '@/assets/images/database.png';
 import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
 import {
-	Awss3,
 	ApiKeys,
 	Authentication,
+	Awss3,
 	AzureBlobStorage,
 	BellRing,
 	Binary,
@@ -169,7 +169,6 @@ export const APPLICATION_SETTINGS = [
 		id: 'open-version',
 		name: translate('application.settings.openVersion'),
 		onClick: (application: Application) => {
-			console.log('application', application);
 			useApplicationStore.getState().openVersionDrawer(application);
 		},
 	},
@@ -325,6 +324,8 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	UPDATING: 'yellow',
 	DELETING: 'red',
 	BINDING: 'blue',
+	OPTIONAL: 'yellow',
+	REQUIRED: 'blue',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
@@ -740,7 +741,7 @@ export const ENDPOINT_OPTIONS: SortOption[] = [
 export const ALL_HTTP_METHODS: Method[] = ['GET', 'POST', 'PUT', 'DELETE'];
 
 export const HTTP_METHOD_BADGE_MAP: Record<string, BadgeColors> = {
-	GET: 'orange',
+	GET: 'blue',
 	POST: 'green',
 	PUT: 'yellow',
 	DELETE: 'red',
@@ -758,6 +759,12 @@ export const ENDPOINT_METHOD_TEXT_COLOR: Record<string, string> = {
 	POST: 'text-elements-green',
 	PUT: 'text-elements-yellow',
 	DELETE: 'text-elements-red',
+};
+export const ENDPOINT_METHOD_BG_COLOR: Record<string, string> = {
+	GET: 'bg-elements-strong-blue',
+	POST: 'bg-elements-strong-green',
+	PUT: 'bg-elements-strong-yellow',
+	DELETE: 'bg-elements-strong-red',
 };
 
 export const ENDPOINT_RESPONSE_TABS = [
