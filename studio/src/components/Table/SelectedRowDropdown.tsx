@@ -6,13 +6,13 @@ import { useTranslation } from 'react-i18next';
 import { InfoModal } from '../InfoModal';
 import { Warning } from '../icons';
 import { cn } from '@/utils';
-interface Props {
+interface Props<T> {
 	onDelete: () => void;
 	selectedRowLength: number;
-	table?: Table<any>;
+	table?: Table<T>;
 	className?: string;
 }
-function SelectedRowDropdown({ onDelete, selectedRowLength, table, className }: Props) {
+function SelectedRowDropdown<T>({ onDelete, selectedRowLength, table, className }: Props<T>) {
 	const { t } = useTranslation();
 	const [openInfoModal, setOpenInfoModal] = useState(false);
 	return selectedRowLength > 0 ? (
