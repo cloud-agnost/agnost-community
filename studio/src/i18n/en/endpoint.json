@@ -8,11 +8,11 @@
 	"createdAt": "CREATED AT",
 	"updatedAt": "UPDATED AT",
 	"add": "Create Endpoint",
-	"test": "Test",
 	"create": {
 		"title": "Create New Endpoint",
 		"name": "Name",
 		"timeout": "Timeout",
+		"timeout_description": "Maximum time in milliseconds to wait for endpoint logic to execute",
 		"methodAndPath": "Method & Path",
 		"method": "Method",
 		"path": "Path",
