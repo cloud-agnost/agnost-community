@@ -2,86 +2,80 @@ import Field from "./Field.js";
 import { DATABASE } from "../../../config/constants.js";
 
 export default class Reference extends Field {
-	/**
-	 * @description The name of the data type.
-	 */
-	static typeName = "Reference";
-	/**
-	 * @description The name of the database adapter.
-	 */
-	adapter;
+    getReferenceModelIid() {
+        return this.config?.reference?.iid;
+    }
 
-	/**
-	 * @description The data type of the field.
-	 */
-	type = "string";
+    afterQuery = {
+        [DATABASE.MySQL]:
+            `ALTER TABLE {{TABLE_NAME}} ADD COLUMN {{COLUMN_NAME}} ${
+                this.versions[DATABASE.MySQL]
+            };` + "\n",
+        [DATABASE.PostgreSQL]:
+            `ALTER TABLE {{TABLE_NAME}} ADD COLUMN {{COLUMN_NAME}} ${
+                this.versions[DATABASE.PostgreSQL]
+            };` + "\n",
+        [DATABASE.SQLServer]:
+            `ALTER TABLE {{TABLE_NAME}} ADD {{COLUMN_NAME}} ${
+                this.versions[DATABASE.SQLServer]
+            };` + "\n",
+    };
 
-	/**
-	 * @description The name of the field.
-	 */
-	name;
+    /**
+     * @description Generates the query for the field.
+     */
+    toDefinitionQuery() {
+        return (
+            this.getName() +
+            " " +
+            this.versions[this.adapter] +
+            `, CONSTRAINT FK_${this.getName()} FOREIGN KEY(${this.getName()}) REFERENCES ${
+                this.config.reference.modelName
+            }(${this.defaultField})` +
+            this.onDelete() +
+            this.onUpdate()
+        );
+    }
 
-	/**
-	 * @description The name of the data type.
-	 */
-	versions = {
-		[DATABASE.MySQL]: "VARCHAR(36)",
-		[DATABASE.PostgreSQL]: "VARCHAR(36)",
-		[DATABASE.SQLServer]: "NVARCHAR(36)",
-		[DATABASE.Oracle]: "VARCHAR2(36)",
-	};
+    afterCreateQuery(tableName) {
+        const foreignTable = this.config.reference.modelName;
+        const foreignName = `fk_${tableName}_${foreignTable}`;
 
-	/**
-	 * @description The default value for the data type.
-	 * @param {DatabaseType} adapter - The database adapter.
-	 * @param {string} name - The name of the field.
-	 */
-	constructor(adapter, name) {
-		super();
-		this.adapter = adapter;
-		this.name = name;
-	}
+        let SQL = this.afterQuery[this.adapter]
+            .replaceAll("{{TABLE_NAME}}", tableName)
+            .replaceAll("{{COLUMN_NAME}}", this.getName());
 
-	/**
-	 * @description Generates the query for the field.
-	 */
-	toDefinitionQuery() {
-		return (
-			this.name +
-			" " +
-			this.versions[this.adapter] +
-			`, CONSTRAINT FK_${this.name} FOREIGN KEY(${this.name}) REFERENCES ${this.config.referenceTable}(${this.config.referenceColumn})` +
-			this.onDelete() +
-			this.onUpdate()
-		);
-	}
+        SQL += `ALTER TABLE ${tableName} ADD CONSTRAINT ${foreignName} FOREIGN KEY (${this.getName()}) REFERENCES ${foreignTable}(${
+            this.defaultField
+        })`;
 
-	/**
-	 * @description Generates the query for the rename field.
-	 */
-	toDefinitionQueryForRename() {
-		return this.versions[this.adapter];
-	}
+        SQL += this.onDelete();
+        SQL += this.onUpdate();
 
-	/**
-	 * @description Returns the onDelete part of the query
-	 * @private
-	 */
-	onDelete() {
-		if (this.config.onDelete) {
-			return ` ON DELETE ${this.config.onDelete}`;
-		}
-		return "";
-	}
+        SQL += ";";
 
-	/**
-	 * @description Returns the onUpdate part of the query
-	 * @private
-	 */
-	onUpdate() {
-		if (this.config.onUpdate) {
-			return ` ON UPDATE ${this.config.onUpdate}`;
-		}
-		return "";
-	}
+        return SQL;
+    }
+
+    /**
+     * @description Returns the onDelete part of the query
+     * @private
+     */
+    onDelete() {
+        if (this.config.reference.onDelete) {
+            return ` ON DELETE ${this.config.reference.onDelete}`;
+        }
+        return "";
+    }
+
+    /**
+     * @description Returns the onUpdate part of the query
+     * @private
+     */
+    onUpdate() {
+        if (this.config.reference.onUpdate) {
+            return ` ON UPDATE ${this.config.reference.onUpdate}`;
+        }
+        return "";
+    }
 }
