@@ -2,17 +2,6 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization as OrganizationType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Organization extends RealtimeActions<OrganizationType> {
-	telemetry({ data }: RealtimeActionParams<OrganizationType>): void {
-		useOrganizationStore.setState?.({
-			organization: data,
-			organizations: useOrganizationStore.getState?.().organizations.map((org) => {
-				if (org._id === data._id) {
-					return data;
-				}
-				return org;
-			}),
-		});
-	}
 	delete({ identifiers }: RealtimeActionParams<OrganizationType>) {
 		useOrganizationStore.setState?.({
 			organizations: useOrganizationStore
@@ -35,6 +24,9 @@ class Organization extends RealtimeActions<OrganizationType> {
 		useOrganizationStore.setState?.({
 			organizations: [...useOrganizationStore.getState().organizations, data],
 		});
+	}
+	telemetry(params: RealtimeActionParams<OrganizationType>) {
+		this.update(params);
 	}
 }
 

@@ -26,16 +26,8 @@ class Application extends RealtimeActions<ApplicationType> {
 			applications: [...useApplicationStore.getState().applications, data],
 		});
 	}
-	telemetry({ data }: RealtimeActionParams<ApplicationType>) {
-		useApplicationStore.setState?.({
-			application: data,
-			applications: useApplicationStore.getState?.().applications.map((app) => {
-				if (app._id === data._id) {
-					return data;
-				}
-				return app;
-			}),
-		});
+	telemetry(params: RealtimeActionParams<ApplicationType>) {
+		this.update(params);
 	}
 }
 export default Application;
