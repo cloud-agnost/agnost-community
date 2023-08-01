@@ -266,7 +266,7 @@ export interface AddExistingResourceRequest extends BaseRequest {
 		vhost?: string;
 		scheme?: 'amqp' | 'amqps';
 		clientId?: string;
-		brokers?: string[];
+		brokers?: { key?: string }[];
 		ssl?: {
 			rejectUnauthorized?: boolean;
 			ca?: string;
