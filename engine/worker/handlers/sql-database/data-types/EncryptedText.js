@@ -2,16 +2,20 @@ import Field from "./Field.js";
 
 export default class EncryptedText extends Field {
     /**
-     * @description Generates the query for the field.
+     * @description Gets the max length of the field
+     * @return {number | undefined}
      */
-    toDefinitionQuery() {
-        return this.name + " " + this.versions[this.adapter];
+    getMaxLength() {
+        return this.options?.encryptedText?.maxLength;
     }
 
-    /**
-     * @description Generates the query for the rename field.
-     */
-    toDefinitionQueryForRename() {
-        return this.versions[this.adapter];
+    toDefinitionQuery() {
+        const schema = "`{name}` {type}({maxLength}) {required}";
+
+        return schema
+            .replace("{name}", this.getName())
+            .replace("{type}", this.getDbType())
+            .replace("{maxLength}", this.getMaxLength())
+            .replace("{required}", this.isRequired() ? "NOT NULL" : "");
     }
 }

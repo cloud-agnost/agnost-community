@@ -4,6 +4,8 @@
  * @description Abstract class for fields
  */
 export default class Field {
+    nullableFields = ["createdat", "updatedat"];
+
     constructor(options) {
         this.options = options;
     }
@@ -49,13 +51,19 @@ export default class Field {
     }
 
     /**
-     * @description Converts the field to a query string
-     */
-    /**
      * @description Generates the query for the field.
      */
     toDefinitionQuery() {
-        return this.getName() + " " + this.getDbType();
+        let schema = "`{name}` {type}";
+
+        if (!this.nullableFields.includes(this.getType())) {
+            schema += " {required}";
+        }
+
+        return schema
+            .replace("{name}", this.getName())
+            .replace("{type}", this.getDbType())
+            .replace("{required}", this.isRequired() ? "NOT NULL" : "");
     }
 
     /**

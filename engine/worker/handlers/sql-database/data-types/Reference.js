@@ -1,25 +1,15 @@
 import Field from "./Field.js";
-import { DATABASE } from "../../../config/constants.js";
 
 export default class Reference extends Field {
+    defaultField = "_id";
+
     getReferenceModelIid() {
         return this.config?.reference?.iid;
     }
 
-    afterQuery = {
-        [DATABASE.MySQL]:
-            `ALTER TABLE {{TABLE_NAME}} ADD COLUMN {{COLUMN_NAME}} ${
-                this.versions[DATABASE.MySQL]
-            };` + "\n",
-        [DATABASE.PostgreSQL]:
-            `ALTER TABLE {{TABLE_NAME}} ADD COLUMN {{COLUMN_NAME}} ${
-                this.versions[DATABASE.PostgreSQL]
-            };` + "\n",
-        [DATABASE.SQLServer]:
-            `ALTER TABLE {{TABLE_NAME}} ADD {{COLUMN_NAME}} ${
-                this.versions[DATABASE.SQLServer]
-            };` + "\n",
-    };
+    getReferenceModelName() {
+        return this.config?.reference?.modelName;
+    }
 
     /**
      * @description Generates the query for the field.
@@ -29,21 +19,19 @@ export default class Reference extends Field {
             this.getName() +
             " " +
             this.versions[this.adapter] +
-            `, CONSTRAINT FK_${this.getName()} FOREIGN KEY(${this.getName()}) REFERENCES ${
-                this.config.reference.modelName
-            }(${this.defaultField})` +
+            `, CONSTRAINT FK_${this.getName()} FOREIGN KEY(${this.getName()}) REFERENCES ${this.getReferenceModelName()}(${
+                this.defaultField
+            })` +
             this.onDelete() +
             this.onUpdate()
         );
     }
 
     afterCreateQuery(tableName) {
-        const foreignTable = this.config.reference.modelName;
+        const foreignTable = this.getReferenceModelName();
         const foreignName = `fk_${tableName}_${foreignTable}`;
 
-        let SQL = this.afterQuery[this.adapter]
-            .replaceAll("{{TABLE_NAME}}", tableName)
-            .replaceAll("{{COLUMN_NAME}}", this.getName());
+        let SQL = "";
 
         SQL += `ALTER TABLE ${tableName} ADD CONSTRAINT ${foreignName} FOREIGN KEY (${this.getName()}) REFERENCES ${foreignTable}(${
             this.defaultField

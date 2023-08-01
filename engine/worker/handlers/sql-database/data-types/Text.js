@@ -6,20 +6,24 @@ export default class Text extends Field {
      * @return {boolean}
      */
     isSearchable() {
-        return this.options?.text?.searchable ?? false;
+        return this.options?.text?.searchable;
     }
 
     /**
-     * @description Generates the query for the field.
+     * @description Gets the max length of the field
+     * @return {number | undefined}
      */
+    getMaxLength() {
+        return this.options?.text?.maxLength;
+    }
+
     toDefinitionQuery() {
-        return this.name + " " + this.versions[this.adapter];
-    }
+        const schema = "`{name}` {type}({maxLength}) {required}";
 
-    /**
-     * @description Generates the query for the rename field.
-     */
-    toDefinitionQueryForRename() {
-        return this.versions[this.adapter];
+        return schema
+            .replace("{name}", this.getName())
+            .replace("{type}", this.getDbType())
+            .replace("{maxLength}", this.getMaxLength())
+            .replace("{required}", this.isRequired() ? "NOT NULL" : "");
     }
 }
