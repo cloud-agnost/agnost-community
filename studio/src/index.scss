@@ -299,6 +299,35 @@
 		overflow-y: scroll;
 		height: 90%;
 	}
+
+	@keyframes slideInRight {
+		from {
+			transform: translateX(100%);
+			opacity: 0;
+		}
+		to {
+			transform: translateX(0);
+			opacity: 1;
+		}
+	}
+
+	@keyframes slideOutRight {
+		from {
+			transform: translateX(0);
+			opacity: 1;
+		}
+		to {
+			transform: translateX(100%);
+			opacity: 0;
+		}
+	}
+
+	.slideInRight {
+		animation: slideInRight 0.5s forwards;
+	}
+	slideOutRight {
+		animation: slideOutRight 0.5s forwards;
+	}
 }
 .Toastify {
 	z-index: 999999999;
