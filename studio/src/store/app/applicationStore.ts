@@ -370,7 +370,7 @@ const useApplicationStore = create<ApplicationStore>()(
 								applications: [...prev.applications, res.app],
 								temp: [...prev.applications, res.app],
 							}));
-							joinChannel(res._id);
+							joinChannel(res.app._id);
 							return res;
 						} catch (error) {
 							if (onError) onError(error as APIError);
