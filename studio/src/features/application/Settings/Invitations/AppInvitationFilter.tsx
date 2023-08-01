@@ -3,7 +3,7 @@ import { useToast } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
 import { Invitation } from '@/types';
 import { FunnelSimple } from '@phosphor-icons/react';
-import { Row } from '@tanstack/react-table';
+import { Row, Table } from '@tanstack/react-table';
 import { Button } from 'components/Button';
 import {
 	DropdownMenu,
@@ -19,8 +19,9 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 interface Props {
 	selectedRows: Row<Invitation>[] | undefined;
+	table: Table<Invitation>;
 }
-function AppInvitationFilter({ selectedRows }: Props) {
+function AppInvitationFilter({ selectedRows, table }: Props) {
 	const { notify } = useToast();
 	const { t } = useTranslation();
 	const [searchParams] = useSearchParams();
@@ -121,6 +122,7 @@ function AppInvitationFilter({ selectedRows }: Props) {
 				<SelectedRowDropdown
 					onDelete={deleteInvitations}
 					selectedRowLength={selectedRows?.length}
+					table={table}
 				/>
 			)}
 		</div>
