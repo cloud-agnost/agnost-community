@@ -1,20 +1,22 @@
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
+import { EmptyState } from '@/components/EmptyState';
 import { TableLoading } from '@/components/Table/Table';
+import { EmptyEndpoint } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
 import { EndpointColumns, EndpointFilter } from '@/features/endpoints';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import { APIError, Endpoint } from '@/types';
+import { cn } from '@/utils';
 import { Row, Table } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
+import { Button } from '@/components/Button';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useOutletContext, useParams, useSearchParams } from 'react-router-dom';
 interface OutletContext {
 	setIsCreateModalOpen: (isOpen: boolean) => void;
-	selectedRows: Row<Endpoint>[];
 	setSelectedRows: (rows: Row<Endpoint>[]) => void;
-	table: Table<Endpoint>;
 	setTable: (table: Table<Endpoint>) => void;
 	page: number;
 	setPage: (page: number) => void;
@@ -37,7 +39,8 @@ export default function MainEndpoint() {
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 
-	const { setSelectedRows, setTable, page, setPage } = useOutletContext() as OutletContext;
+	const { setSelectedRows, setTable, page, setPage, setIsCreateModalOpen } =
+		useOutletContext() as OutletContext;
 
 	function deleteEndpointHandler() {
 		setLoading(true);
@@ -72,45 +75,60 @@ export default function MainEndpoint() {
 		}
 	}, [searchParams.get('q'), page]);
 	return (
-		<div className='p-4 space-y-4'>
-			<EndpointFilter />
-			<InfiniteScroll
-				scrollableTarget='version-layout'
-				dataLength={endpoints.length}
-				next={() => {
-					setPage(page + 1);
-				}}
-				hasMore={lastFetchedCount >= PAGE_SIZE}
-				loader={endpoints.length > 0 && <TableLoading />}
-			>
-				<DataTable
-					columns={EndpointColumns}
-					data={endpoints}
-					setSelectedRows={setSelectedRows}
-					setTable={setTable}
-				/>
-			</InfiniteScroll>
-			<ConfirmationModal
-				loading={loading}
-				error={error}
-				title={t('endpoint.delete.title')}
-				alertTitle={t('endpoint.delete.message')}
-				alertDescription={t('endpoint.delete.description')}
-				description={
-					<Trans
-						i18nKey='endpoint.delete.confirmCode'
-						values={{ confirmCode: toDeleteEndpoint?.iid }}
-						components={{
-							confirmCode: <span className='font-bold text-default' />,
+		<div className={cn(!endpoints.length && 'h-3/4 flex items-center justify-center')}>
+			{!endpoints.length ? (
+				<EmptyState icon={<EmptyEndpoint className='w-32 h-32' />} title={t('endpoint.empty')}>
+					<Button
+						className='btn btn-primary'
+						onClick={() => {
+							setIsCreateModalOpen(true);
 						}}
+					>
+						{t('endpoint.add')}
+					</Button>
+				</EmptyState>
+			) : (
+				<div className='p-4 space-y-4'>
+					<EndpointFilter />
+					<InfiniteScroll
+						scrollableTarget='version-layout'
+						dataLength={endpoints.length}
+						next={() => {
+							setPage(page + 1);
+						}}
+						hasMore={lastFetchedCount >= PAGE_SIZE}
+						loader={endpoints.length > 0 && <TableLoading />}
+					>
+						<DataTable
+							columns={EndpointColumns}
+							data={endpoints}
+							setSelectedRows={setSelectedRows}
+							setTable={setTable}
+						/>
+					</InfiniteScroll>
+					<ConfirmationModal
+						loading={loading}
+						error={error}
+						title={t('endpoint.delete.title')}
+						alertTitle={t('endpoint.delete.message')}
+						alertDescription={t('endpoint.delete.description')}
+						description={
+							<Trans
+								i18nKey='endpoint.delete.confirmCode'
+								values={{ confirmCode: toDeleteEndpoint?.iid }}
+								components={{
+									confirmCode: <span className='font-bold text-default' />,
+								}}
+							/>
+						}
+						confirmCode={endpoint?.iid as string}
+						onConfirm={deleteEndpointHandler}
+						isOpen={isEndpointDeleteDialogOpen}
+						closeModal={closeEndpointDeleteDialog}
+						closable
 					/>
-				}
-				confirmCode={endpoint?.iid as string}
-				onConfirm={deleteEndpointHandler}
-				isOpen={isEndpointDeleteDialogOpen}
-				closeModal={closeEndpointDeleteDialog}
-				closable
-			/>
+				</div>
+			)}
 		</div>
 	);
 }

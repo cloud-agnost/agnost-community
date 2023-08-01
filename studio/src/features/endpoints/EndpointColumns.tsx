@@ -83,7 +83,9 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { apiKeyRequired } = row.original;
-			const apiKeyRequiredText = apiKeyRequired ? 'Required' : 'Optional';
+			const apiKeyRequiredText = apiKeyRequired
+				? translate('endpoint.required')
+				: translate('endpoint.optional');
 			return (
 				<Badge
 					variant={BADGE_COLOR_MAP[apiKeyRequiredText.toUpperCase()]}
@@ -100,7 +102,9 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { sessionRequired } = row.original;
-			const sessionRequiredText = sessionRequired ? 'Required' : 'Optional';
+			const sessionRequiredText = sessionRequired
+				? translate('endpoint.required')
+				: translate('endpoint.optional');
 			return (
 				<Badge
 					variant={BADGE_COLOR_MAP[sessionRequiredText.toUpperCase()]}

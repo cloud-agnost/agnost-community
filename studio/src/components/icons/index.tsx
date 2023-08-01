@@ -17,6 +17,7 @@ export { default as Decision } from './Decision';
 export { default as DeviceMobile } from './DeviceMobile';
 export { default as Document } from './Document';
 export { default as DoubleGear } from './DoubleGear';
+export { default as EmptyEndpoint } from './EmptyEndpoint';
 export { default as EmptyQueue } from './EmptyQueue';
 export { default as Environment } from './Environment';
 export { default as EnvironmentVariable } from './EnvironmentVariable';

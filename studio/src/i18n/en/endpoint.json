@@ -8,6 +8,9 @@
 	"createdAt": "CREATED AT",
 	"updatedAt": "UPDATED AT",
 	"add": "Create Endpoint",
+	"required": "Required",
+	"optional": "Optional",
+	"empty": "You have not defined any endpoints for this app version",
 	"create": {
 		"title": "Create New Endpoint",
 		"name": "Name",
