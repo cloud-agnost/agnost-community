@@ -12,7 +12,7 @@ export default function EndpointResponse() {
 	const { endpointResponse, endpoint } = useEndpointStore();
 	const response = endpointResponse?.find((r) => r.epId === endpoint?.iid);
 	return (
-		<Tabs defaultValue='body' className='h-full border border-border rounded px-4 pb-4'>
+		<Tabs defaultValue='body' className='border border-border rounded px-4 pb-4 h-3/4'>
 			<div className='flex items-center justify-between'>
 				<TabsList defaultValue='body' align='center' className='flex-1'>
 					{ENDPOINT_RESPONSE_TABS.map((tab) => (
@@ -48,11 +48,12 @@ export default function EndpointResponse() {
 					)}
 				</div>
 			</div>
-			<TabsContent value='body' className='h-full'>
+			<TabsContent value='body' className='h-3/4'>
 				<CodeEditor
 					containerClassName='h-full'
 					value={JSON.stringify(response?.data)}
 					defaultLanguage='json'
+					readonly
 				/>
 			</TabsContent>
 			<TabsContent value='cookies'>

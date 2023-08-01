@@ -10,7 +10,6 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { TestEndpointSchema } from '../TestEndpoint';
-import EndpointResponse from './EndpointResponse';
 import TestEndpointTable from './TestEndpointTable';
 export default function TestEndpointParams() {
 	const { t } = useTranslation();
@@ -37,14 +36,15 @@ export default function TestEndpointParams() {
 	useEffect(() => {
 		if (endpoint?.path) {
 			const pathParams = getPathParams(endpoint?.path);
-			pathParams.forEach((p) => {
-				appendPathParams({ key: p, value: '' });
-			});
+			if (pathParams.length > pathParamFields.length)
+				pathParams.forEach((p) => {
+					appendPathParams({ key: p, value: '' });
+				});
 		}
 	}, [endpoint?.path]);
 
 	return (
-		<div className='space-y-6 h-full'>
+		<>
 			<TestEndpointTable title={t('endpoint.test.query_params') ?? ''}>
 				{queryParamsFields.map((f, index) => (
 					<TableRow key={f.id}>
@@ -169,7 +169,6 @@ export default function TestEndpointParams() {
 					))}
 				</TestEndpointTable>
 			)}
-			<EndpointResponse />
-		</div>
+		</>
 	);
 }

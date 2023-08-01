@@ -30,6 +30,7 @@ export default function EndpointFiles() {
 			const file = (e.target as HTMLInputElement).files?.[0];
 			if (file) {
 				setValue(`formData.${index}.file`, file);
+				setValue(`formData.${index}.key`, file.name);
 			}
 		};
 		input.click();
@@ -40,7 +41,15 @@ export default function EndpointFiles() {
 			{fields.map((f, index) => (
 				<TableRow key={f.id}>
 					<TableCell>
-						<Select onValueChange={setType}>
+						<Select
+							onValueChange={(val) => {
+								if (type !== val) {
+									setValue(`formData.${index}.file`, undefined);
+									setValue(`formData.${index}.key`, '');
+								}
+								setType(val);
+							}}
+						>
 							<SelectTrigger defaultValue={type} className='w-[120px]'>
 								<SelectValue>{capitalize(type)}</SelectValue>
 							</SelectTrigger>
@@ -54,6 +63,7 @@ export default function EndpointFiles() {
 							</SelectContent>
 						</Select>
 					</TableCell>
+
 					<TableCell>
 						<FormField
 							control={control}
@@ -62,6 +72,7 @@ export default function EndpointFiles() {
 								<FormItem className='flex-1'>
 									<FormControl>
 										<Input
+											disabled={type === 'file'}
 											placeholder={
 												t('forms.placeholder', {
 													label: t('resources.database.key'),
@@ -75,6 +86,7 @@ export default function EndpointFiles() {
 							)}
 						/>
 					</TableCell>
+
 					<TableCell>
 						{type === 'text' ? (
 							<FormField
@@ -134,11 +146,7 @@ export default function EndpointFiles() {
 			))}
 			<TableRow>
 				<TableCell colSpan={4} className='text-center'>
-					<Button
-						type='button'
-						variant='secondary'
-						onClick={() => append({ key: '', value: undefined })}
-					>
+					<Button type='button' variant='secondary' onClick={() => append({ key: '', value: '' })}>
 						<Plus size={16} className='text-icon-secondary mr-2' weight='bold' />
 						{t('endpoint.test.add_query_param')}
 					</Button>
