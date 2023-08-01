@@ -77,8 +77,7 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 						<CommandGroup>
 							<CommandItem
 								id='delete-app'
-								onSelect={(e) => {
-									console.log(e);
+								onSelect={() => {
 									setOpen(false);
 									setOpenInfoModal(true);
 									setModalInfo({

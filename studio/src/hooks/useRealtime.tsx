@@ -11,11 +11,9 @@ export default function useRealtime() {
 	useEffect(() => {
 		const cb = onChannelMessage('notification', (message) => {
 			const { data, object, action, identifiers } = message;
-			console.log('message', object, action, identifiers);
 			const fn = realtimeObjectMapper(object);
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-
 			fn[action]({ data, identifiers });
 		});
 

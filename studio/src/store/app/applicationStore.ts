@@ -101,7 +101,6 @@ const useApplicationStore = create<ApplicationStore>()(
 					invitationRoleFilter: [],
 
 					selectApplication: (application: Application) => {
-						console.log('selectApplication', application);
 						set({ application });
 					},
 					changeAppName: async (req: ChangeAppNameRequest) => {
@@ -227,7 +226,6 @@ const useApplicationStore = create<ApplicationStore>()(
 					},
 					inviteUsersToApp: async (req: AppInviteRequest) => {
 						try {
-							console.log('req', req);
 							const invitations = await ApplicationService.inviteUsersToApp(req);
 							if (req.onSuccess) req.onSuccess();
 							return invitations;

@@ -51,7 +51,6 @@ export default function ApplicationVersions() {
 		if (isVersionOpen) {
 			getVersions();
 		}
-		console.log('isVersionOpen', isVersionOpen);
 	}, [getVersions, isVersionOpen]);
 
 	return (

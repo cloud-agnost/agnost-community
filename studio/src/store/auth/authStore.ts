@@ -161,7 +161,6 @@ const useAuthStore = create<AuthStore>()(
 							password,
 							uiBaseURL: window.location.origin,
 						});
-						console.log(newEmail);
 						return newEmail;
 					},
 					async changeAvatar(avatar: File) {

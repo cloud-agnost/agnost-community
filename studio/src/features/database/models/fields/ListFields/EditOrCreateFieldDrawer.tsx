@@ -259,8 +259,6 @@ export default function EditOrCreateFieldDrawer({
 
 	useEffect(() => {
 		if (!open) return;
-		console.log('values', form.getValues());
-		console.log('errors', form.formState.errors);
 	}, [form.formState.errors, open]);
 
 	async function onSubmit(data: z.infer<typeof Schema>) {

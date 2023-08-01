@@ -61,7 +61,6 @@ export default function EditOrAddVariableDrawer({
 	});
 
 	async function onSubmit(data: z.infer<typeof MiddlewareFormSchema>) {
-		console.log(data);
 		if (!orgId || !appId || !versionId) return;
 		setLoading(true);
 		setError(null);

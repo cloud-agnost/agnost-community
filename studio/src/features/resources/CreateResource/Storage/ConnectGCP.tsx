@@ -51,7 +51,6 @@ export default function ConnectGCP() {
 	useEffect(() => {
 		form.setValue('instance', 'GCP Cloud Storage');
 	}, [form]);
-	console.log(form.formState.errors);
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)}>

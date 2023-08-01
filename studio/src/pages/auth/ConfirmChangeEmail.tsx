@@ -14,8 +14,7 @@ ConfirmChangeEmail.loader = async function ({ request }: LoaderFunctionArgs) {
 	}
 
 	try {
-		const res = await useAuthStore.getState().confirmChangeLoginEmail(token);
-		console.log(res);
+		await useAuthStore.getState().confirmChangeLoginEmail(token);
 		return redirect('/profile/settings');
 	} catch (error) {
 		return json({ error });
