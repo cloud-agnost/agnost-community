@@ -127,7 +127,6 @@ export type AddNewFieldParams = GetModelsOfDatabaseParams & {
 	};
 	richText?: {
 		searchable: boolean;
-		maxLength: number;
 	};
 	encryptedText?: {
 		maxLength: number;
