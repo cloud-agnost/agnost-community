@@ -1368,7 +1368,11 @@ export class StorageBase {
 					)
 				);
 
-			const destFileObj = await this.getFileMetadata(bucketObj.id, toPath);
+			const toPathSanitized = helper.removeLeadingAndTrailingSlash(toPath);
+			const destFileObj = await this.getFileMetadata(
+				bucketObj.id,
+				toPathSanitized
+			);
 			if (destFileObj)
 				throw new AgnostError(
 					t(
@@ -1384,7 +1388,7 @@ export class StorageBase {
 				id: id,
 				storageId: storage.iid,
 				bucketId: bucketObj.id,
-				path: toPath,
+				path: toPathSanitized,
 				size: fileObj.size,
 				mimeType: fileObj.mimeType,
 				uploadedAt: dtm,
@@ -1429,7 +1433,11 @@ export class StorageBase {
 					)
 				);
 
-			const destFileObj = await this.getFileMetadata(bucketObj.id, toPath);
+			const toPathSanitized = helper.removeLeadingAndTrailingSlash(toPath);
+			const destFileObj = await this.getFileMetadata(
+				bucketObj.id,
+				toPathSanitized
+			);
 			if (destFileObj)
 				throw new AgnostError(
 					t(
@@ -1442,7 +1450,7 @@ export class StorageBase {
 			const updatedAt = new Date();
 			const updatedFile = await this.updateFileMetadata(fileObj.id, {
 				updatedAt: updatedAt,
-				path: toPath,
+				path: toPathSanitized,
 			});
 
 			return updatedFile;
@@ -1543,7 +1551,11 @@ export class StorageBase {
 					)
 				);
 
-			const destFileObj = await this.getFileMetadata(bucketObj.id, newPath);
+			const newPathSanitized = helper.removeLeadingAndTrailingSlash(newPath);
+			const destFileObj = await this.getFileMetadata(
+				bucketObj.id,
+				newPathSanitized
+			);
 			if (destFileObj)
 				throw new AgnostError(
 					t(
@@ -1556,7 +1568,7 @@ export class StorageBase {
 			const updatedAt = new Date();
 			const updatedFile = await this.updateFileMetadata(fileObj.id, {
 				updatedAt: updatedAt,
-				path: newPath,
+				path: newPathSanitized,
 				isPublic,
 				tags,
 			});

@@ -351,6 +351,43 @@ class ModelController extends BaseController {
 
 		return fieldsToAdd;
 	}
+
+	/**
+	 * Returns the list of models that can be referened in a reference field
+	 * @param  {Array} models The list all models defined in the database including sub-object and sub-object-list models
+	 */
+	getReferenceModelsList(models) {
+		const refModels = [];
+		for (const model of models) {
+			refModels.push({
+				name: this.getModelFullName(models, model),
+				iid: model.iid,
+			});
+		}
+
+		return refModels;
+	}
+
+	/**
+	 * Returns the full name of the model (if there are parent models then parent names are also prepended)
+	 * @param  {Array} models The list all models defined in the database including sub-object and sub-object-list models
+	 * @param  {Objecdt} model The model object
+	 */
+	getModelFullName(models, model) {
+		if (model.parentiid) {
+			let parent = this.getModel(models, model.parentiid);
+			return this.getModelFullName(models, parent) + "." + model.name;
+		} else return model.name;
+	}
+
+	/**
+	 * Returns the model info identified by iid
+	 * @param  {Array} models The list all models defined in the database including sub-object and sub-object-list models
+	 * @param  {string} iid The iid of the model
+	 */
+	getModel(models, iid) {
+		return models.find((model) => model.iid === iid);
+	}
 }
 
 export default new ModelController();

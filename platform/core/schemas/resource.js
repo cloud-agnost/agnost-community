@@ -511,35 +511,6 @@ export const applyRules = (type) => {
 						}
 						return true;
 					}),
-				query("page")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isInt({
-						min: 0,
-					})
-					.withMessage(
-						t("Page number needs to be a positive integer or 0 (zero)")
-					)
-					.toInt(),
-				query("size")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isInt({
-						min: config.get("general.minPageSize"),
-						max: config.get("general.maxPageSize"),
-					})
-					.withMessage(
-						t(
-							"Page size needs to be an integer, between %s and %s",
-							config.get("general.minPageSize"),
-							config.get("general.maxPageSize")
-						)
-					)
-					.toInt(),
 			];
 		case "update":
 			return [

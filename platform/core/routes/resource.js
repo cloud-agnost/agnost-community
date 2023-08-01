@@ -202,17 +202,8 @@ router.get(
 	async (req, res) => {
 		try {
 			const { org } = req;
-			const {
-				page,
-				size,
-				search,
-				type,
-				instance,
-				sortBy,
-				sortDir,
-				appId,
-				status,
-			} = req.query;
+			const { search, type, instance, sortBy, sortDir, appId, status } =
+				req.query;
 
 			let query = { orgId: org._id };
 
@@ -256,8 +247,6 @@ router.get(
 
 			let resources = await resourceCtrl.getManyByQuery(query, {
 				sort,
-				skip: size * page,
-				limit: size,
 			});
 
 			res.json(resources);
