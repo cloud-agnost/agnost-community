@@ -4,40 +4,64 @@
  * @description Abstract class for fields
  */
 export default class Field {
-	static typeName;
-	/**
-	 * @description The database provider that this field is for (e.g. MySQL, Postgres and MsSQLDriver)
-	 */
-	adapter;
-	/**
-	 * @description The type of the field (e.g. numeric, string and date)
-	 */
-	type;
-	/**
-	 * @description The configuration of the field (e.g. unique, not null and default value)
-	 */
-	config;
-	/**
-	 * @description The name of the field
-	 */
-	name;
+    constructor(options) {
+        this.options = options;
+    }
 
-	/**
-	 * @description The type name of the field for each database provider (e.g. MySQL, Postgres and MsSQLDriver)
-	 */
-	versions;
-	/**
-	 * @description Converts the field to a query string
-	 */
-	toDefinitionQuery() {}
-	/**
-	 * @description Converts the field to a query string for renaming the field
-	 */
-	toDefinitionQueryForRename() {}
-	getName() {
-		return this.name;
-	}
-	getType() {
-		return this.type;
-	}
+    getName() {
+        return this.options.name;
+    }
+
+    getType() {
+        return this.options.type;
+    }
+
+    isRequired() {
+        return this.options.required;
+    }
+
+    isUnique() {
+        return this.options.unique;
+    }
+
+    isImmutable() {
+        return this.options.immutable;
+    }
+
+    isIndexed() {
+        return this.options.indexed;
+    }
+
+    getDbType() {
+        return this.options.dbType;
+    }
+
+    getIid() {
+        return this.options.iid;
+    }
+
+    /**
+     * @description Checks if the field is searchable
+     * @return {boolean}
+     */
+    isSearchable() {
+        return false;
+    }
+
+    /**
+     * @description Converts the field to a query string
+     */
+    /**
+     * @description Generates the query for the field.
+     */
+    toDefinitionQuery() {
+        return this.getName() + " " + this.getDbType();
+    }
+
+    /**
+     * @description Converts the field to a query string for renaming the field
+     */
+    toDefinitionQueryForRename() {
+        return this.getDbType();
+    }
 }

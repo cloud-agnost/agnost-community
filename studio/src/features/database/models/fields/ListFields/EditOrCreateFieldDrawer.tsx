@@ -17,18 +17,16 @@ import { Button } from 'components/Button';
 import {
 	FIELD_ICON_MAP,
 	MAX_LENGTHS,
-	MODEL_FIELD_DEFAULT_VALUE_TYPES,
 	NAME_SCHEMA,
 	REFERENCE_FIELD_ACTION,
 	TIMESTAMPS_SCHEMA,
 } from '@/constants';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { APIError, BasicValueListType, Field, FieldType, ReferenceAction } from '@/types';
 import { capitalize, cn, toDisplayName } from '@/utils';
 import { useParams } from 'react-router-dom';
 import { Switch } from 'components/Switch';
 import { SettingsFormItem } from 'components/SettingsFormItem';
-import { CodeEditor } from 'components/CodeEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'components/Select';
 import { Separator } from 'components/Separator';
 import useModelStore from '@/store/database/modelStore.ts';
@@ -56,10 +54,6 @@ export default function EditOrCreateFieldDrawer({
 	const addNewField = useModelStore((state) => state.addNewField);
 	const updateField = useModelStore((state) => state.updateField);
 	const models = useModelStore((state) => state.models);
-
-	const [defaultValueType, setDefaultValueType] = useState<
-		(typeof MODEL_FIELD_DEFAULT_VALUE_TYPES)[0] | undefined
-	>(MODEL_FIELD_DEFAULT_VALUE_TYPES[0]);
 
 	const MAX_LENGTH = MAX_LENGTHS[editMode ? fieldToEdit?.type : type?.name ?? ''];
 
@@ -233,26 +227,6 @@ export default function EditOrCreateFieldDrawer({
 	});
 
 	useEffect(() => {
-		if (defaultValueType?.name === 'Constant' && !editMode) {
-			form.setValue('general.defaultValue', '');
-		}
-	}, [defaultValueType, editMode]);
-
-	useEffect(() => {
-		if (editMode && fieldToEdit?.defaultValue?.includes('export')) {
-			setDefaultValueType(
-				MODEL_FIELD_DEFAULT_VALUE_TYPES.find((item) => item.name === 'JS Function'),
-			);
-		}
-	}, [editMode, fieldToEdit]);
-
-	useEffect(() => {
-		if (!editMode && defaultValueType?.name === 'JS Function') {
-			form.setValue('general.defaultValue', defaultValueType.value);
-		}
-	}, [defaultValueType, editMode]);
-
-	useEffect(() => {
 		if (!open) form.reset();
 		setDefaultsForEdit();
 	}, [open]);
@@ -358,15 +332,15 @@ export default function EditOrCreateFieldDrawer({
 		}
 
 		if (fieldToEdit.object) {
-			form.setValue('general.timeStamps.enabled', fieldToEdit.object.timestamps.enabled);
-			form.setValue('general.timeStamps.createdAt', fieldToEdit.object.timestamps.createdAt);
-			form.setValue('general.timeStamps.updatedAt', fieldToEdit.object.timestamps.updatedAt);
+			form.setValue('general.timeStamps.enabled', fieldToEdit.object.timestamps?.enabled);
+			form.setValue('general.timeStamps.createdAt', fieldToEdit.object.timestamps?.createdAt);
+			form.setValue('general.timeStamps.updatedAt', fieldToEdit.object.timestamps?.updatedAt);
 		}
 
 		if (fieldToEdit.objectList) {
-			form.setValue('general.timeStamps.enabled', fieldToEdit.objectList.timestamps.enabled);
-			form.setValue('general.timeStamps.createdAt', fieldToEdit.objectList.timestamps.createdAt);
-			form.setValue('general.timeStamps.updatedAt', fieldToEdit.objectList.timestamps.updatedAt);
+			form.setValue('general.timeStamps.enabled', fieldToEdit.objectList.timestamps?.enabled);
+			form.setValue('general.timeStamps.createdAt', fieldToEdit.objectList.timestamps?.createdAt);
+			form.setValue('general.timeStamps.updatedAt', fieldToEdit.objectList.timestamps?.updatedAt);
 		}
 
 		if (fieldToEdit.reference) {
@@ -807,65 +781,22 @@ export default function EditOrCreateFieldDrawer({
 							</div>
 							<Separator />
 							<div className='space-y-6'>
-								<SettingsFormItem
-									className='w-full py-0 space-y-0 [&>*:first-child]:flex [&>*:first-child]:items-end'
-									title={t('database.fields.form.default_value')}
-									twoColumns
-								>
-									<Select
-										onValueChange={(value) =>
-											setDefaultValueType(
-												MODEL_FIELD_DEFAULT_VALUE_TYPES.find((item) => item.name === value),
-											)
-										}
-										value={defaultValueType?.name}
-									>
-										<FormControl>
-											<SelectTrigger className={cn('!w-[155px] input')}>
-												<SelectValue className={cn('text-subtle')} />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent align='center'>
-											{MODEL_FIELD_DEFAULT_VALUE_TYPES.map((item, index) => {
-												return (
-													<SelectItem
-														checkClassName='right-2 left-auto top-1/2 -translate-y-1/2'
-														className='px-3 py-[6px] w-full max-w-full cursor-pointer'
-														key={index}
-														value={item.name}
-													>
-														<div className='flex items-center gap-2'>{item.name}</div>
-													</SelectItem>
-												);
-											})}
-										</SelectContent>
-									</Select>
-								</SettingsFormItem>
 								<FormField
 									control={form.control}
 									name='general.defaultValue'
 									render={({ field }) => (
-										<FormItem
-											className={cn(
-												'flex-1 flex flex-col ',
-												defaultValueType?.name === 'JS Function' && 'h-[150px]',
-											)}
-										>
+										<FormItem className={cn('flex-1 flex flex-col ')}>
+											<FormLabel>{t('database.fields.form.default_value')}</FormLabel>
 											<FormControl className='flex-1'>
-												{defaultValueType?.name === 'Constant' ? (
-													<Textarea
-														rows={4}
-														error={Boolean(form.formState.errors.general?.defaultValue)}
-														placeholder={
-															t('forms.placeholder', {
-																label: t('database.fields.form.default_value').toLowerCase(),
-															}) as string
-														}
-														{...field}
-													/>
-												) : (
-													<CodeEditor containerClassName='flex-1' {...field} />
-												)}
+												<Input
+													error={Boolean(form.formState.errors.general?.defaultValue)}
+													placeholder={
+														t('forms.placeholder', {
+															label: t('database.fields.form.default_value').toLowerCase(),
+														}) as string
+													}
+													{...field}
+												/>
 											</FormControl>
 											<FormMessage />
 										</FormItem>

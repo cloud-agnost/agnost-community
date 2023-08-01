@@ -89,7 +89,7 @@ export default function AddNPMPackagesDrawer({ open, onOpenChange }: AddNPMPacka
 		<Drawer open={open} onOpenChange={onOpenChange}>
 			<DrawerContent className='flex flex-col gap-0 overflow-auto' position='right'>
 				<DrawerHeader>
-					<DrawerTitle>{t('version.middleware.add_middleware')}</DrawerTitle>
+					<DrawerTitle>{t('version.npm.install')}</DrawerTitle>
 				</DrawerHeader>
 				<div
 					id={scrollContainerId}

@@ -34,7 +34,7 @@ export default function CreateFieldButton() {
 	}, [databases, dbId]);
 
 	const types = useMemo(() => {
-		const types = fieldTypes.filter((item) => item.group !== 'none' /* && item[databaseType] */);
+		const types = fieldTypes.filter((item) => item.group !== 'none' && item[databaseType]);
 		return groupBy(types, (item) => item.group);
 	}, [databaseType, fieldTypes]);
 

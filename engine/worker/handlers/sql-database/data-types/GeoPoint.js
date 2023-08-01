@@ -1,11 +1,11 @@
 import Field from "./Field.js";
 
-export default class Time extends Field {
+export default class GeoPoint extends Field {
     /**
      * @description Generates the query for the field.
      */
     toDefinitionQuery() {
-        return this.name + " " + this.versions[this.adapter];
+        return this.getName() + " " + this.versions[this.adapter];
     }
 
     /**
