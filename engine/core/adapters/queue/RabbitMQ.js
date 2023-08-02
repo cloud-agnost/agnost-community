@@ -220,6 +220,7 @@ export class RabbitMQ extends QueueBase {
 						);
 
 						const handlerFunction = handlerModule.default;
+
 						// Check the endpoint module has a default exprot or not
 						if (!handlerFunction) {
 							// Log processing of the message
@@ -275,6 +276,7 @@ export class RabbitMQ extends QueueBase {
 						try {
 							// Run the function
 							await handlerFunction(payload);
+
 							// Log processing of the message
 							this.logMessageProcessing(
 								debugChannel,

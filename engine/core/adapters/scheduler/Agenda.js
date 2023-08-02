@@ -18,7 +18,7 @@ export class Agenda extends SchedulerBase {
 	 * Manually triggers the execution of the task
 	 * @param  {object} task The task object
 	 */
-	async triggerCronJob(task) {
+	async triggerCronJob(task, debugChannel = null) {
 		// Add a tracking record to track progress of this message
 		const trackingId = helper.generateId();
 		const trackingRecord = await this.createCronJobTrackingRecord({
@@ -37,6 +37,7 @@ export class Agenda extends SchedulerBase {
 				envId: envId,
 				taskName: task.name,
 				trackingId,
+				debugChannel,
 			};
 
 			const queueNumber = helper.randomInt(

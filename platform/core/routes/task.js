@@ -1,3 +1,4 @@
+import axios from "axios";
 import express from "express";
 import deployCtrl from "../controllers/deployment.js";
 import envCtrl from "../controllers/environment.js";
@@ -324,6 +325,54 @@ router.put(
 					taskId: task._id,
 				}
 			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/task/:taskId/test
+@method     POST
+@desc       Triggers the testing of the task
+@access     private
+*/
+router.post(
+	"/:taskId/test",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateTask,
+	authorizeAppAction("app.task.update"),
+	applyRules("test-logic"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, app, version, task } = req;
+			const { debugChannel } = req.body;
+
+			// Get the environment
+			const env = await envCtrl.getOneByQuery({
+				orgId: org._id,
+				appId: app._id,
+				versionId: version._id,
+			});
+
+			//Make api call to environment API server to trigger testing of the message queue
+			await axios.post(
+				`http://${env.iid}.default.svc.cluster.local/test/task`,
+				{ taskiid: task.iid, debugChannel },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			res.json();
 		} catch (err) {
 			handleError(req, res, err);
 		}

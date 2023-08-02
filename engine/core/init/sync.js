@@ -29,6 +29,5 @@ export function disconnectSyncClient() {
 }
 
 export function sendMessage(channel, message) {
-	console.log("**sending message", channel.toString(), message);
 	socket.emit("channel:message", { channel: channel.toString(), message });
 }

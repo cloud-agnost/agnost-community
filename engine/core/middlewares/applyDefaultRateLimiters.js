@@ -3,7 +3,7 @@ import { applyRateLimit } from "./applyRateLimit.js";
 // Apply rate limits to platform endpoints
 export const applyDefaultRateLimiters = () => {
 	// If no meta manager then return
-	if (!META) return [];
+	if (!global.META) return [];
 
 	const limits = META.getLimits();
 	const defaultEndpointLimits = META.getEndpointDefaultRateLimits();
