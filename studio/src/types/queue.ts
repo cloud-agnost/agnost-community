@@ -113,3 +113,8 @@ export interface UpdateQueueLogicParams extends BaseRequest, BaseParams {
 	logic: string;
 	queueId: string;
 }
+export interface TestQueueParams extends BaseRequest, BaseParams {
+	queueId: string;
+	debugChannel: string;
+	payload: Record<string, string>;
+}

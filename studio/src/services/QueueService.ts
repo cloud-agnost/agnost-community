@@ -6,6 +6,7 @@ import {
 	GetMessageQueueByIdParams,
 	GetMessageQueuesParams,
 	MessageQueue,
+	TestQueueParams,
 	UpdateQueueLogicParams,
 	UpdateQueueParams,
 } from '@/types';
@@ -87,6 +88,21 @@ export default class QueueService {
 		return (
 			await axios.put(
 				`${this.url}/${orgId}/app/${appId}/version/${versionId}/queue/${queueId}/logic`,
+				data,
+			)
+		).data;
+	}
+
+	static async testQueue({
+		orgId,
+		appId,
+		versionId,
+		queueId,
+		...data
+	}: TestQueueParams): Promise<MessageQueue> {
+		return (
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/queue/${queueId}/test`,
 				data,
 			)
 		).data;
