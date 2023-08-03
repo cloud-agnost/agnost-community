@@ -6,6 +6,7 @@ import { Pencil } from '@/components/icons';
 import { HTTP_METHOD_BADGE_MAP } from '@/constants';
 import TestEndpoint from '@/features/endpoints/TestEndpoint';
 import { useToast } from '@/hooks';
+import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import { FloppyDisk, TestTube } from '@phosphor-icons/react';
 import { useState } from 'react';
@@ -73,51 +74,24 @@ export default function EditEndpoint() {
 	}
 
 	return (
-		<div className='p-4 space-y-6 h-full'>
-			<div className='flex items-center justify-between'>
-				<div className='flex items-center flex-1'>
-					<div className='border border-input-disabled-border rounded-l w-16 h-9'>
-						<Badge
-							className='w-full h-full rounded-l rounded-r-none'
-							variant={HTTP_METHOD_BADGE_MAP[endpoint.method]}
-							text={endpoint.method}
-						/>
-					</div>
-					<Input className='rounded-none rounded-r max-w-5xl' value={endpoint.path} disabled />
+		<VersionEditorLayout
+			onEditModalOpen={() => setIsEditEndpointOpen(true)}
+			onTestModalOpen={() => setIsTestEndpointOpen(true)}
+			onSaveLogic={saveLogic}
+			loading={loading}
+			logic={endpoint?.logic}
+			setLogic={setEndpointLogic}
+		>
+			<div className='flex items-center flex-1'>
+				<div className='border border-input-disabled-border rounded-l w-16 h-9'>
+					<Badge
+						className='w-full h-full rounded-l rounded-r-none'
+						variant={HTTP_METHOD_BADGE_MAP[endpoint.method]}
+						text={endpoint.method}
+					/>
 				</div>
-				<div className='space-x-4'>
-					<Button
-						variant='secondary'
-						iconOnly
-						onClick={() => {
-							setIsEditEndpointOpen(true);
-						}}
-					>
-						<Pencil className='text-icon-base w-5 h-5' />
-					</Button>
-					<Button
-						variant='secondary'
-						onClick={() => {
-							setIsTestEndpointOpen(true);
-							setSearchParams({ t: 'params' });
-						}}
-					>
-						<TestTube size={20} className='text-icon-base mr-2' />
-						{t('endpoint.test.test')}
-					</Button>
-					<Button variant='primary' onClick={saveLogic} loading={loading}>
-						<FloppyDisk size={20} className='text-icon-secondary mr-2' />
-						{t('general.save')}
-					</Button>
-				</div>
+				<Input className='rounded-none rounded-r max-w-5xl' value={endpoint.path} disabled />
 			</div>
-
-			<CodeEditor
-				containerClassName='h-[95%]'
-				value={endpoint.logic}
-				onChange={setEndpointLogic}
-				onSave={saveLogic}
-			/>
 			<TestEndpoint
 				open={isTestEndpointOpen}
 				onClose={() => {
@@ -126,6 +100,6 @@ export default function EditEndpoint() {
 					setSearchParams(searchParams);
 				}}
 			/>
-		</div>
+		</VersionEditorLayout>
 	);
 }
