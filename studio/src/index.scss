@@ -299,7 +299,6 @@
 		overflow-y: scroll;
 		height: 90%;
 	}
-
 	@keyframes slideInRight {
 		from {
 			transform: translateX(100%);
@@ -325,10 +324,11 @@
 	.slideInRight {
 		animation: slideInRight 0.5s forwards;
 	}
-	slideOutRight {
+	.slideOutRight {
 		animation: slideOutRight 0.5s forwards;
 	}
 }
+
 .Toastify {
 	z-index: 999999999;
 	pointer-events: auto;
@@ -356,6 +356,28 @@
 .Toastify__close-button > svg {
 	width: 1.25rem;
 	height: 1.25rem;
+}
+@keyframes Toastify__trackProgress {
+	0% {
+		transform: scaleX(1);
+	}
+	100% {
+		transform: scaleX(0);
+	}
+}
+.Toastify__progress-bar {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 5px;
+	z-index: var(--toastify-z-index);
+	opacity: 0.7;
+	transform-origin: left;
+}
+
+.Toastify__progress-bar--animated {
+	animation: Toastify__trackProgress linear 1 forwards;
 }
 
 .select-box {
