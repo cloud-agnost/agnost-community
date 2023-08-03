@@ -12,14 +12,15 @@ import { Input } from '@/components/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { Switch } from '@/components/Switch';
 import useResourceStore from '@/store/resources/resourceStore';
-import { CreateMessageQueueSchema } from '@/types';
+import { CreateTaskSchema } from '@/types';
 import { translate as t } from '@/utils';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
-export default function MessageQueueForm() {
-	const form = useFormContext<z.infer<typeof CreateMessageQueueSchema>>();
+
+export default function TaskForm() {
+	const form = useFormContext<z.infer<typeof CreateTaskSchema>>();
 	const { getResources, resources } = useResourceStore();
 	const { appId } = useParams<{
 		appId: string;
@@ -27,10 +28,9 @@ export default function MessageQueueForm() {
 	useEffect(() => {
 		getResources({
 			appId: appId as string,
-			type: 'queue',
+			type: 'scheduler',
 		});
 	}, []);
-
 	return (
 		<div className='space-y-6'>
 			<FormField
@@ -55,29 +55,6 @@ export default function MessageQueueForm() {
 					</FormItem>
 				)}
 			/>
-			<FormField
-				control={form.control}
-				name='delay'
-				render={({ field }) => (
-					<FormItem>
-						<FormLabel>{t('queue.create.delay')}</FormLabel>
-						<FormControl>
-							<Input
-								type='number'
-								error={Boolean(form.formState.errors.delay)}
-								placeholder={
-									t('forms.placeholder', {
-										label: t('queue.create.delay'),
-									}) ?? ''
-								}
-								{...field}
-							/>
-						</FormControl>
-						<FormDescription>{t('queue.create.delay_description')}</FormDescription>
-						<FormMessage />
-					</FormItem>
-				)}
-			/>
 
 			<FormField
 				control={form.control}
@@ -85,13 +62,35 @@ export default function MessageQueueForm() {
 				render={({ field }) => (
 					<FormItem className='flex justify-between gap-4 items-center space-y-0'>
 						<FormLabel>
-							<p>{t('queue.create.logExec')}</p>
-							<p className='text-subtle'>{t('queue.create.logExecDescription')}</p>
+							<p>{t('task.logExec')}</p>
+							<p className='text-subtle'>{t('task.logExecDesc')}</p>
 						</FormLabel>
 
 						<FormControl>
 							<Switch checked={field.value} onCheckedChange={field.onChange} />
 						</FormControl>
+					</FormItem>
+				)}
+			/>
+			<FormField
+				control={form.control}
+				name='cronExpression'
+				render={({ field }) => (
+					<FormItem>
+						<FormLabel>{t('task.syntax')}</FormLabel>
+						<FormControl>
+							<Input
+								error={Boolean(form.formState.errors.cronExpression)}
+								placeholder={
+									t('forms.placeholder', {
+										label: t('task.syntax'),
+									}) ?? ''
+								}
+								{...field}
+							/>
+						</FormControl>
+
+						<FormMessage />
 					</FormItem>
 				)}
 			/>
@@ -111,7 +110,7 @@ export default function MessageQueueForm() {
 								<FormControl>
 									<SelectTrigger
 										error={Boolean(form.formState.errors.resourceId)}
-										className='w-1/2'
+										className='w-1/3'
 									>
 										<SelectValue
 											placeholder={`${t('general.select')} ${t('queue.create.resource.title')}`}

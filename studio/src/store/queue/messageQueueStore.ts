@@ -1,17 +1,18 @@
 import QueueService from '@/services/QueueService';
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
 import {
-	MessageQueue,
-	GetMessageQueueByIdParams,
-	GetMessageQueuesParams,
+	APIError,
+	CreateMessageQueueParams,
 	DeleteMessageQueueParams,
 	DeleteMultipleQueuesParams,
-	CreateMessageQueueParams,
-	UpdateQueueParams,
-	APIError,
+	GetMessageQueueByIdParams,
+	GetMessageQueuesParams,
+	MessageQueue,
+	TestQueueParams,
 	UpdateQueueLogicParams,
+	UpdateQueueParams,
 } from '@/types';
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
 
 interface MessageQueueStore {
 	queues: MessageQueue[];
@@ -26,6 +27,7 @@ interface MessageQueueStore {
 	createQueue: (params: CreateMessageQueueParams) => Promise<MessageQueue>;
 	updateQueue: (params: UpdateQueueParams) => Promise<MessageQueue>;
 	updateQueueLogic: (params: UpdateQueueLogicParams) => Promise<MessageQueue>;
+	testQueue: (params: TestQueueParams) => Promise<void>;
 	openDeleteModal: (queue: MessageQueue) => void;
 	closeDeleteModal: () => void;
 }
@@ -115,6 +117,15 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 						}));
 						if (params.onSuccess) params.onSuccess();
 						return queue;
+					} catch (error) {
+						if (params.onError) params.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				testQueue: async (params: TestQueueParams) => {
+					try {
+						await QueueService.testQueue(params);
+						if (params.onSuccess) params.onSuccess();
 					} catch (error) {
 						if (params.onError) params.onError(error as APIError);
 						throw error as APIError;

@@ -289,7 +289,7 @@ export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 	},
 	{
 		title: translate('version.cron_jobs'),
-		path: 'cron-job',
+		path: 'task',
 	},
 	{
 		title: translate('version.middleware.default'),
@@ -318,6 +318,8 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	BINDING: 'blue',
 	OPTIONAL: 'yellow',
 	REQUIRED: 'blue',
+	ENABLED: 'green',
+	DISABLED: 'red',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
