@@ -70,7 +70,7 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 		>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
-					<DrawerTitle>{t('endpoint.create.title')}</DrawerTitle>
+					<DrawerTitle>{t('task.add')}</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>

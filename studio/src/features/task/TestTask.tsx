@@ -58,7 +58,11 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 		>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
-					<DrawerTitle>{t('endpoint.create.title')}</DrawerTitle>
+					<DrawerTitle>
+						{t('task.test', {
+							name: task.name,
+						})}
+					</DrawerTitle>
 				</DrawerHeader>
 				<div className='p-6'>
 					<div className='flex items-center justify-between flex-1'>

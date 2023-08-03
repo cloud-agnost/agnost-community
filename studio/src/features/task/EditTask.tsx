@@ -61,7 +61,11 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 		>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
-					<DrawerTitle>{t('endpoint.create.title')}</DrawerTitle>
+					<DrawerTitle>
+						{t('task.edit', {
+							name: task.name,
+						})}
+					</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>

@@ -12,17 +12,13 @@
 	"defineJobSchedule": "Define Job Schedule",
 	"useTemplate": "Use Common Template",
 	"useCronSyntax": "Use Cron Syntax",
-	"every": {
-		"minute": "Every minute",
-		"day": "Every day at",
-		"week": "Every week on",
-		"month": "Every month on"
-	},
 	"delete": {
 		"title": "Delete Cron Job",
 		"message": "Are you sure you want to delete cron job ?",
 		"description": "This action is not reversible — please continue with caution.",
 		"confirmCode": "Confirm cron job delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
 	},
-	"resource": "Resource"
+	"resource": "Resource",
+	"edit": "Edit {{name}}",
+	"test": "Test {{name}}"
 }
