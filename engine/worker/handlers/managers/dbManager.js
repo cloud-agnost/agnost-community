@@ -117,18 +117,14 @@ export class DBManager {
      */
     async getConn() {
         if (!this.conn) {
-            this.conn = await connManager.getConn(
-                this.getDbId(),
-                this.getDbType(),
-                this.getResourceAccessSettings()
-            );
+            this.conn = await connManager.getConn(this.getDbId(), this.getDbType(), this.getResourceAccessSettings());
         }
 
         return this.conn;
     }
 
     /**
-     * Returns the list of models that have been changed in the current configuration
+     * @description Returns the list of models that have been changed in the current configuration
      * @return {{
      * 	added: object[],
      * 	updated: {
@@ -157,6 +153,13 @@ export class DBManager {
      * 		},
      * 		isNameChanged: boolean,
      * 		oldName: string,
+     * 	    isRefChanged: boolean,
+     * 	    isActionChanged: boolean,
+     * 	    isRequiredChanged: boolean,
+     * 	    isIndexedChanged: boolean,
+     * 	    isUniqueChanged: boolean,
+     * 	    isSearchableChanged: boolean,
+     * 	    oldIid: string,
      * 	}[],
      * 	deleted: object[],
      * } | null}
@@ -170,17 +173,16 @@ export class DBManager {
             deleted: [],
         };
 
+        const models = structuredClone(this.getModels());
+
         // find added and updated models
-        for (const model of this.getModels()) {
+        for (const model of models) {
             const prevModel = this.getPrevModel(model.iid);
 
             // if model is not found in the previous configuration, it is added
             if (!prevModel) changes.added.push(model);
 
-            if (
-                Object.keys(model).length > 0 &&
-                prevModel?.updatedAt !== model?.updatedAt
-            ) {
+            if (Object.keys(model).length > 0 && prevModel?.updatedAt !== model?.updatedAt) {
                 model.isNameChanged = prevModel?.name !== model?.name;
                 model.oldName = prevModel?.name;
                 model.fieldChanges = {
@@ -194,24 +196,37 @@ export class DBManager {
 
                 // find added and updated fields
                 for (const field of fields) {
-                    const prevField = prevFields.find(
-                        (prevField) => prevField.iid === field.iid
-                    );
+                    const prevField = prevFields.find((prevField) => prevField.iid === field.iid);
 
                     if (!prevField) {
                         model.fieldChanges.added.push(field);
                     } else if (prevField.updatedAt !== field.updatedAt) {
+                        field.isRequiredChanged = prevField.required !== field.required;
                         field.isNameChanged = prevField.name !== field.name;
-                        field.oldName = prevField.name;
+                        field.isIndexedChanged = prevField.indexed !== field.indexed;
+                        field.isUniqueChanged = prevField.unique !== field.unique;
+
+                        if (field.isNameChanged) field.oldName = prevField.name;
+
+                        if (field.type === "text")
+                            field.isSearchableChanged = prevField.text.searchable !== field.text.searchable;
+
+                        if (field.type === "rich-text")
+                            field.isSearchableChanged = prevField.richText.searchable !== field.richText.searchable;
+
+                        if (field.type === "reference") {
+                            field.isRefChanged = prevField.reference.iid !== field.reference.iid;
+                            field.isActionChanged = prevField.reference.action !== field.reference.action;
+                            if (field.isRefChanged) field.oldIid = prevField.reference.iid;
+                        }
+
                         model.fieldChanges.updated.push(field);
                     }
                 }
 
                 // find deleted fields
                 for (const prevField of prevFields) {
-                    const field = fields.find(
-                        (field) => field.iid === prevField.iid
-                    );
+                    const field = fields.find((field) => field.iid === prevField.iid);
 
                     if (!field) model.fieldChanges.deleted.push(prevField);
                 }
@@ -229,9 +244,7 @@ export class DBManager {
             }
         }
 
-        const hasNoChanges = Object.values(changes).every(
-            (value) => value.length === 0
-        );
+        const hasNoChanges = Object.values(changes).every((value) => value.length === 0);
 
         return hasNoChanges ? null : changes;
     }
