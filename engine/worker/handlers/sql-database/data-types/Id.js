@@ -5,6 +5,10 @@ export default class Id extends Field {
      * @description Generates the query for the field.
      */
     toDefinitionQuery() {
-        return this.getName() + " " + this.getDbType() + " PRIMARY KEY";
+        const schema = "`{NAME}` {TYPE} PRIMARY KEY";
+
+        return schema
+            .replaceAll("{NAME}", this.getName())
+            .replaceAll("{TYPE}", this.getDbType());
     }
 }

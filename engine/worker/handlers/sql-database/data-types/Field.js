@@ -54,22 +54,19 @@ export default class Field {
      * @description Generates the query for the field.
      */
     toDefinitionQuery() {
-        let schema = "`{name}` {type}";
+        let schema = "`{NAME}` {TYPE}";
 
         if (!this.nullableFields.includes(this.getType())) {
-            schema += " {required}";
+            schema += " {REQUIRED}";
         }
 
         return schema
-            .replace("{name}", this.getName())
-            .replace("{type}", this.getDbType())
-            .replace("{required}", this.isRequired() ? "NOT NULL" : "");
+            .replace("{NAME}", this.getName())
+            .replace("{TYPE}", this.getDbType())
+            .replace("{REQUIRED}", this.isRequired() ? "NOT NULL" : "NULL");
     }
 
-    /**
-     * @description Converts the field to a query string for renaming the field
-     */
-    toDefinitionQueryForRename() {
-        return this.getDbType();
+    toDefinitionQueryForModify() {
+        return this.toDefinitionQuery();
     }
 }

@@ -1,21 +1,15 @@
-import Field from "./Field.js";
+import Text from "./Text.js";
 
-export default class EncryptedText extends Field {
+export default class EncryptedText extends Text {
+    isSearchable() {
+        return false;
+    }
+
     /**
      * @description Gets the max length of the field
      * @return {number | undefined}
      */
     getMaxLength() {
         return this.options?.encryptedText?.maxLength;
-    }
-
-    toDefinitionQuery() {
-        const schema = "`{name}` {type}({maxLength}) {required}";
-
-        return schema
-            .replace("{name}", this.getName())
-            .replace("{type}", this.getDbType())
-            .replace("{maxLength}", this.getMaxLength())
-            .replace("{required}", this.isRequired() ? "NOT NULL" : "");
     }
 }

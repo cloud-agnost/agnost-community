@@ -24,6 +24,6 @@ export default class Text extends Field {
             .replace("{name}", this.getName())
             .replace("{type}", this.getDbType())
             .replace("{maxLength}", this.getMaxLength())
-            .replace("{required}", this.isRequired() ? "NOT NULL" : "");
+            .replace("{required}", this.isRequired() ? "NOT NULL" : "NULL");
     }
 }

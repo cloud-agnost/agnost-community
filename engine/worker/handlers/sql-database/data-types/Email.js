@@ -1,3 +1,15 @@
-import Field from "./Field.js";
+import Text from "./Text.js";
 
-export default class Email extends Field {}
+export default class Email extends Text {
+    isSearchable() {
+        return false;
+    }
+
+    /**
+     * @description Gets the max length of the field
+     * @return {number | undefined}
+     */
+    getMaxLength() {
+        return config.get("database.mailMaxLength") ?? 320;
+    }
+}
