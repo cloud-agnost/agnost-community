@@ -145,4 +145,15 @@ export default class ModelService {
 			)
 		).data;
 	}
+
+	static async getReferenceModels({
+		orgId,
+		appId,
+		versionId,
+		dbId,
+	}: GetModelsOfDatabaseParams): Promise<Model[]> {
+		return (
+			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}/model/ref`)
+		).data;
+	}
 }
