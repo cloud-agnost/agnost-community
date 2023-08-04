@@ -17,18 +17,16 @@ import { Button } from 'components/Button';
 import {
 	FIELD_ICON_MAP,
 	MAX_LENGTHS,
-	MODEL_FIELD_DEFAULT_VALUE_TYPES,
 	NAME_SCHEMA,
 	REFERENCE_FIELD_ACTION,
 	TIMESTAMPS_SCHEMA,
 } from '@/constants';
 import { useEffect, useState } from 'react';
-import { APIError, BasicValueListType, Field, FieldType, ReferenceAction } from '@/types';
+import { APIError, BasicValueListType, Field, FieldType, Model, ReferenceAction } from '@/types';
 import { capitalize, cn, toDisplayName } from '@/utils';
 import { useParams } from 'react-router-dom';
 import { Switch } from 'components/Switch';
 import { SettingsFormItem } from 'components/SettingsFormItem';
-import { CodeEditor } from 'components/CodeEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'components/Select';
 import { Separator } from 'components/Separator';
 import useModelStore from '@/store/database/modelStore.ts';
@@ -43,6 +41,17 @@ interface EditOrCreateModelDrawerProps {
 	type?: FieldType;
 }
 
+const defaultValueDisabledTypes = [
+	'reference',
+	'object',
+	'object-list',
+	'encrypted-text',
+	'geo-point',
+	'rich-text',
+	'binary',
+	'json',
+];
+
 export default function EditOrCreateFieldDrawer({
 	open,
 	onOpenChange,
@@ -55,11 +64,8 @@ export default function EditOrCreateFieldDrawer({
 	const fieldToEdit = useModelStore((state) => state.fieldToEdit) as Field;
 	const addNewField = useModelStore((state) => state.addNewField);
 	const updateField = useModelStore((state) => state.updateField);
-	const models = useModelStore((state) => state.models);
-
-	const [defaultValueType, setDefaultValueType] = useState<
-		(typeof MODEL_FIELD_DEFAULT_VALUE_TYPES)[0] | undefined
-	>(MODEL_FIELD_DEFAULT_VALUE_TYPES[0]);
+	const getReferenceModels = useModelStore((state) => state.getReferenceModels);
+	const [models, setModels] = useState<Model[]>([]);
 
 	const MAX_LENGTH = MAX_LENGTHS[editMode ? fieldToEdit?.type : type?.name ?? ''];
 
@@ -71,16 +77,14 @@ export default function EditOrCreateFieldDrawer({
 		modelId: string;
 	};
 
-	const hasMaxLength = ['text', 'encrypted-text'].includes(
-		editMode ? fieldToEdit?.type : type?.name ?? '',
-	);
-	const isDecimal = (editMode ? fieldToEdit?.type : type?.name) === 'decimal';
-	const isBasicValueList = (editMode ? fieldToEdit?.type : type?.name) === 'basic-values-list';
-	const isEnum = (editMode ? fieldToEdit?.type : type?.name) === 'enum';
-	const isReference = (editMode ? fieldToEdit?.type : type?.name) === 'reference';
-	const hasTimestamps = ['object', 'object-list'].includes(
-		editMode ? fieldToEdit?.type : type?.name ?? '',
-	);
+	const TYPE = editMode ? fieldToEdit?.type : type?.name ?? '';
+	const hasMaxLength = ['text', 'encrypted-text'].includes(TYPE);
+	const isDecimal = TYPE === 'decimal';
+	const isBasicValueList = TYPE === 'basic-values-list';
+	const isEnum = TYPE === 'enum';
+	const isReference = TYPE === 'reference';
+	const hasTimestamps = ['object', 'object-list'].includes(TYPE);
+	const hasDefaultValue = !defaultValueDisabledTypes.includes(TYPE);
 
 	const view = editMode
 		? fieldTypes.find((type) => type.name === fieldToEdit?.type)?.view
@@ -94,7 +98,7 @@ export default function EditOrCreateFieldDrawer({
 		general: z
 			.object({
 				name: NAME_SCHEMA.refine((value) => /^(?![0-9])/.test(value), {
-					message: t('forms.doesntStartWithNumber.error', {
+					message: t('forms.notStartWithNumber', {
 						label: t('general.name'),
 					}).toString(),
 				}),
@@ -228,38 +232,32 @@ export default function EditOrCreateFieldDrawer({
 					createdAt: 'createdAt',
 					updatedAt: 'updatedAt',
 				},
+				referenceModelIid: fieldToEdit?.reference?.iid,
 			},
 		},
 	});
 
 	useEffect(() => {
-		if (defaultValueType?.name === 'Constant' && !editMode) {
-			form.setValue('general.defaultValue', '');
-		}
-	}, [defaultValueType, editMode]);
-
-	useEffect(() => {
-		if (editMode && fieldToEdit?.defaultValue?.includes('export')) {
-			setDefaultValueType(
-				MODEL_FIELD_DEFAULT_VALUE_TYPES.find((item) => item.name === 'JS Function'),
-			);
-		}
-	}, [editMode, fieldToEdit]);
-
-	useEffect(() => {
-		if (!editMode && defaultValueType?.name === 'JS Function') {
-			form.setValue('general.defaultValue', defaultValueType.value);
-		}
-	}, [defaultValueType, editMode]);
-
-	useEffect(() => {
 		if (!open) form.reset();
-		setDefaultsForEdit();
+		else getModels();
 	}, [open]);
 
 	useEffect(() => {
-		if (!open) return;
-	}, [form.formState.errors, open]);
+		if (fieldToEdit && open && editMode) setDefaultsForEdit();
+	}, [fieldToEdit, open, editMode]);
+
+	async function getModels() {
+		if (TYPE !== 'reference') return;
+
+		const models = await getReferenceModels({
+			orgId: params?.orgId,
+			appId: params?.appId,
+			versionId: params?.versionId,
+			dbId: params?.dbId,
+		});
+
+		setModels(models);
+	}
 
 	async function onSubmit(data: z.infer<typeof Schema>) {
 		if (!params) return;
@@ -284,7 +282,6 @@ export default function EditOrCreateFieldDrawer({
 			},
 			richText: {
 				searchable: data.general.searchable,
-				maxLength: Number(data.general.maxLength),
 			},
 			encryptedText: {
 				maxLength: Number(data.general.maxLength),
@@ -326,8 +323,6 @@ export default function EditOrCreateFieldDrawer({
 	}
 
 	function setDefaultsForEdit() {
-		if (!open || !editMode) return;
-
 		form.setValue('general.name', fieldToEdit.name);
 		form.setValue('general.required', fieldToEdit.required);
 		form.setValue('general.unique', fieldToEdit.unique);
@@ -358,15 +353,15 @@ export default function EditOrCreateFieldDrawer({
 		}
 
 		if (fieldToEdit.object) {
-			form.setValue('general.timeStamps.enabled', fieldToEdit.object.timestamps.enabled);
-			form.setValue('general.timeStamps.createdAt', fieldToEdit.object.timestamps.createdAt);
-			form.setValue('general.timeStamps.updatedAt', fieldToEdit.object.timestamps.updatedAt);
+			form.setValue('general.timeStamps.enabled', fieldToEdit.object.timestamps?.enabled);
+			form.setValue('general.timeStamps.createdAt', fieldToEdit.object.timestamps?.createdAt);
+			form.setValue('general.timeStamps.updatedAt', fieldToEdit.object.timestamps?.updatedAt);
 		}
 
 		if (fieldToEdit.objectList) {
-			form.setValue('general.timeStamps.enabled', fieldToEdit.objectList.timestamps.enabled);
-			form.setValue('general.timeStamps.createdAt', fieldToEdit.objectList.timestamps.createdAt);
-			form.setValue('general.timeStamps.updatedAt', fieldToEdit.objectList.timestamps.updatedAt);
+			form.setValue('general.timeStamps.enabled', fieldToEdit.objectList.timestamps?.enabled);
+			form.setValue('general.timeStamps.createdAt', fieldToEdit.objectList.timestamps?.createdAt);
+			form.setValue('general.timeStamps.updatedAt', fieldToEdit.objectList.timestamps?.updatedAt);
 		}
 
 		if (fieldToEdit.reference) {
@@ -713,48 +708,49 @@ export default function EditOrCreateFieldDrawer({
 										<FormField
 											control={form.control}
 											name='general.referenceModelIid'
-											render={({ field, formState: { errors } }) => (
-												<FormItem className='space-y-1'>
-													<FormLabel>{t('database.fields.reference_model')}</FormLabel>
-													<FormControl>
-														<Select
-															defaultValue={field.value}
-															value={field.value}
-															name={field.name}
-															onValueChange={field.onChange}
-														>
-															<FormControl>
-																<SelectTrigger
-																	className={cn(
-																		'w-full input',
-																		errors.general?.referenceModelIid && 'input-error',
-																	)}
-																>
-																	<SelectValue
-																		className='text-subtle'
-																		placeholder={t('database.fields.reference_model_placeholder')}
-																	/>
-																</SelectTrigger>
-															</FormControl>
-															<SelectContent align='center'>
-																{models.map((model, index) => {
-																	return (
-																		<SelectItem
-																			checkClassName='right-2 left-auto top-1/2 -translate-y-1/2'
-																			className='px-3 py-[6px] w-full max-w-full cursor-pointer'
-																			key={index}
-																			value={model.iid}
-																		>
-																			{model.name}
-																		</SelectItem>
-																	);
-																})}
-															</SelectContent>
-														</Select>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
+											render={({ field, formState: { errors } }) => {
+												return (
+													<FormItem className='space-y-1'>
+														<FormLabel>{t('database.fields.reference_model')}</FormLabel>
+														<FormControl>
+															<Select
+																value={field.value}
+																name={field.name}
+																onValueChange={field.onChange}
+															>
+																<FormControl>
+																	<SelectTrigger
+																		className={cn(
+																			'w-full input',
+																			errors.general?.referenceModelIid && 'input-error',
+																		)}
+																	>
+																		<SelectValue
+																			className='text-subtle'
+																			placeholder={t('database.fields.reference_model_placeholder')}
+																		/>
+																	</SelectTrigger>
+																</FormControl>
+																<SelectContent align='center'>
+																	{models.map((model, index) => {
+																		return (
+																			<SelectItem
+																				checkClassName='right-2 left-auto top-1/2 -translate-y-1/2'
+																				className='px-3 py-[6px] w-full max-w-full cursor-pointer'
+																				key={index}
+																				value={model.iid}
+																			>
+																				{model.name}
+																			</SelectItem>
+																		);
+																	})}
+																</SelectContent>
+															</Select>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												);
+											}}
 										/>
 									</div>
 									<Separator />
@@ -776,7 +772,11 @@ export default function EditOrCreateFieldDrawer({
 													description={t(`database.fields.form.${key}_desc`)}
 													twoColumns
 												>
-													<Switch checked={field.value} onCheckedChange={field.onChange} />
+													<Switch
+														disabled={editMode && key === 'unique'}
+														checked={field.value}
+														onCheckedChange={field.onChange}
+													/>
 												</SettingsFormItem>
 												<FormMessage />
 											</FormItem>
@@ -797,7 +797,11 @@ export default function EditOrCreateFieldDrawer({
 													description={t('database.fields.form.required_desc')}
 													twoColumns
 												>
-													<Switch checked={field.value} onCheckedChange={field.onChange} />
+													<Switch
+														disabled={editMode && !fieldToEdit.required}
+														checked={field.value}
+														onCheckedChange={field.onChange}
+													/>
 												</SettingsFormItem>
 											</FormControl>
 											<FormMessage />
@@ -805,73 +809,34 @@ export default function EditOrCreateFieldDrawer({
 									)}
 								/>
 							</div>
-							<Separator />
-							<div className='space-y-6'>
-								<SettingsFormItem
-									className='w-full py-0 space-y-0 [&>*:first-child]:flex [&>*:first-child]:items-end'
-									title={t('database.fields.form.default_value')}
-									twoColumns
-								>
-									<Select
-										onValueChange={(value) =>
-											setDefaultValueType(
-												MODEL_FIELD_DEFAULT_VALUE_TYPES.find((item) => item.name === value),
-											)
-										}
-										value={defaultValueType?.name}
-									>
-										<FormControl>
-											<SelectTrigger className={cn('!w-[155px] input')}>
-												<SelectValue className={cn('text-subtle')} />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent align='center'>
-											{MODEL_FIELD_DEFAULT_VALUE_TYPES.map((item, index) => {
-												return (
-													<SelectItem
-														checkClassName='right-2 left-auto top-1/2 -translate-y-1/2'
-														className='px-3 py-[6px] w-full max-w-full cursor-pointer'
-														key={index}
-														value={item.name}
-													>
-														<div className='flex items-center gap-2'>{item.name}</div>
-													</SelectItem>
-												);
-											})}
-										</SelectContent>
-									</Select>
-								</SettingsFormItem>
-								<FormField
-									control={form.control}
-									name='general.defaultValue'
-									render={({ field }) => (
-										<FormItem
-											className={cn(
-												'flex-1 flex flex-col ',
-												defaultValueType?.name === 'JS Function' && 'h-[150px]',
+							{hasDefaultValue && (
+								<>
+									<Separator />
+									<div className='space-y-6'>
+										<FormField
+											control={form.control}
+											name='general.defaultValue'
+											render={({ field }) => (
+												<FormItem className={cn('flex-1 flex flex-col ')}>
+													<FormLabel>{t('database.fields.form.default_value')}</FormLabel>
+													<FormControl className='flex-1'>
+														<Input
+															error={Boolean(form.formState.errors.general?.defaultValue)}
+															placeholder={
+																t('forms.placeholder', {
+																	label: t('database.fields.form.default_value').toLowerCase(),
+																}) as string
+															}
+															{...field}
+														/>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
 											)}
-										>
-											<FormControl className='flex-1'>
-												{defaultValueType?.name === 'Constant' ? (
-													<Textarea
-														rows={4}
-														error={Boolean(form.formState.errors.general?.defaultValue)}
-														placeholder={
-															t('forms.placeholder', {
-																label: t('database.fields.form.default_value').toLowerCase(),
-															}) as string
-														}
-														{...field}
-													/>
-												) : (
-													<CodeEditor containerClassName='flex-1' {...field} />
-												)}
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
+										/>
+									</div>
+								</>
+							)}
 							<div className='flex justify-end'>
 								<Button size='lg'>{editMode ? t('general.save') : t('general.add')}</Button>
 							</div>

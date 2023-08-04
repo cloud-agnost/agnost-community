@@ -31,6 +31,7 @@ import { Plus } from '@phosphor-icons/react';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIError } from '@/types';
+import useResourcesStore from '@/store/resources/resourceStore.ts';
 
 interface CreateDatabaseDrawerProps {
 	open: boolean;
@@ -62,16 +63,24 @@ export default function CreateAndEditDatabaseDrawer({
 	const { t } = useTranslation();
 	const { version } = useVersionStore();
 	const { createDatabase, toEditDatabase, updateDatabaseName } = useDatabaseStore();
+	const getResources = useResourcesStore((state) => state.getResources);
+	const toggleCreateResourceModal = useResourceStore((state) => state.toggleCreateResourceModal);
 	const resources = useResourceStore((state) =>
 		state.resources.filter((resource) => resource.type === 'database'),
 	);
-	const { toggleCreateResourceModal } = useResourceStore();
 	const form = useForm<z.infer<typeof CreateSchema>>({
 		resolver: zodResolver(CreateSchema),
 		defaultValues: {
 			managed: true,
 		},
 	});
+
+	useEffect(() => {
+		if (!open || !version) return;
+		getResources({
+			appId: version?.appId,
+		}).catch(console.error);
+	}, [open]);
 
 	useEffect(() => {
 		if (!open || !editMode || !toEditDatabase) return;

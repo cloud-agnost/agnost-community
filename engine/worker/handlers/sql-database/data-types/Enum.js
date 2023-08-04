@@ -1,6 +1,6 @@
 import Text from "./Text.js";
 
-export default class PhoneNumber extends Text {
+export default class Enum extends Text {
     isSearchable() {
         return false;
     }
@@ -10,6 +10,6 @@ export default class PhoneNumber extends Text {
      * @return {number | undefined}
      */
     getMaxLength() {
-        return config.get("database.phoneMaxLength") ?? 30;
+        return config.get("database.enumMaxLength") ?? 2048;
     }
 }

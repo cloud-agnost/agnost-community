@@ -4,53 +4,61 @@
         "port": 4000,
         "timeout": 3600000,
         "maxBodySize": "50mb"
-     },
-     "rateLimiters": [{      
-        "rateLimitWindowSec": 30,
-        "rateLimitMaxHits": 300}],
+    },
+    "rateLimiters": [
+        {
+            "rateLimitWindowSec": 30,
+            "rateLimitMaxHits": 300
+        }
+    ],
     "database": {
-        "minPoolSize": 3
-     },
-     "cache": {
+        "minPoolSize": 3,
+        "mailMaxLength": 320,
+        "linkMaxLength": 2048,
+        "phoneMaxLength": 15,
+        "monetaryDecimalDigits": 4,
+        "enumMaxLength": 2048
+    },
+    "cache": {
         "port": 6379
-     },
-     "queue": {
+    },
+    "queue": {
         "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
         "port": 5672,
         "reconnectInterval": 1000,
         "retryCount": 30
-     },
-     "sync": {
+    },
+    "sync": {
         "serverURL": "http://platform-sync-clusterip-service:4000",
         "namespace": "",
         "reconnection": true,
         "reconnectionDelay": 500,
         "path": "/sync/"
-     },
-     "general": { 
+    },
+    "general": {
         "generalQueueCount": 1,
         "maxMessageWaitMinues": 5,
         "maxMongoDBIndexNumberPerCollection": 64,
         "k8sNamespace": "default",
-        "ingressServiceName": "ingress-service", 
+        "ingressServiceName": "ingress-service",
         "platformBaseUrl": "http://platform-core-clusterip-service:4000",
         "maxPoolSize": 3,
         "defaultClusterIPPort": 4000,
         "defaultKnativeIngressPort": 80,
         "livenessProbe": {
-           "timeoutSeconds": 10,
-           "periodSeconds": 30,
-           "initialDelaySeconds": 30
+            "timeoutSeconds": 10,
+            "periodSeconds": 30,
+            "initialDelaySeconds": 30
         },
         "readinessProbe": {
-           "timeoutSeconds": 10,
-           "periodSeconds": 30,
-           "initialDelaySeconds": 30
+            "timeoutSeconds": 10,
+            "periodSeconds": 30,
+            "initialDelaySeconds": 30
         },
         "startupProbe": {
-         "timeoutSeconds": 10,
-         "periodSeconds": 30,
-         "failureThreshold": 30
-      }
-     }
+            "timeoutSeconds": 10,
+            "periodSeconds": 30,
+            "failureThreshold": 30
+        }
+    }
 }

@@ -1,87 +1,60 @@
 import Field from "./Field.js";
-import { DATABASE } from "../../../config/constants.js";
+import { SQLBaseManager } from "../../managers/SQLBaseManager.js";
 
 export default class Reference extends Field {
-	/**
-	 * @description The name of the data type.
-	 */
-	static typeName = "Reference";
-	/**
-	 * @description The name of the database adapter.
-	 */
-	adapter;
+    defaultField = "id";
 
-	/**
-	 * @description The data type of the field.
-	 */
-	type = "string";
+    getReferenceModelIid() {
+        return this.options?.reference?.iid;
+    }
 
-	/**
-	 * @description The name of the field.
-	 */
-	name;
+    getReferenceModelName() {
+        return this.options?.reference?.modelName;
+    }
 
-	/**
-	 * @description The name of the data type.
-	 */
-	versions = {
-		[DATABASE.MySQL]: "VARCHAR(36)",
-		[DATABASE.PostgreSQL]: "VARCHAR(36)",
-		[DATABASE.SQLServer]: "NVARCHAR(36)",
-		[DATABASE.Oracle]: "VARCHAR2(36)",
-	};
+    getAction() {
+        return this.options?.reference?.action;
+    }
 
-	/**
-	 * @description The default value for the data type.
-	 * @param {DatabaseType} adapter - The database adapter.
-	 * @param {string} name - The name of the field.
-	 */
-	constructor(adapter, name) {
-		super();
-		this.adapter = adapter;
-		this.name = name;
-	}
+    /**
+     * @description Generates the query for the field.
+     */
+    toDefinitionQuery() {
+        throw new AgnostError("toDefinitionQuery not implemented for Reference and will not be used.");
+    }
 
-	/**
-	 * @description Generates the query for the field.
-	 */
-	toDefinitionQuery() {
-		return (
-			this.name +
-			" " +
-			this.versions[this.adapter] +
-			`, CONSTRAINT FK_${this.name} FOREIGN KEY(${this.name}) REFERENCES ${this.config.referenceTable}(${this.config.referenceColumn})` +
-			this.onDelete() +
-			this.onUpdate()
-		);
-	}
+    createConstraint(modelName, createField = false) {
+        const foreignTable = this.getReferenceModelName();
+        const foreignName = SQLBaseManager.getForeignKeyName(this.getIid());
 
-	/**
-	 * @description Generates the query for the rename field.
-	 */
-	toDefinitionQueryForRename() {
-		return this.versions[this.adapter];
-	}
+        const createFieldSchema = "ALTER TABLE {TABLE_NAME} ADD COLUMN `{FIELD_NAME}` {TYPE} {REQUIRED};";
 
-	/**
-	 * @description Returns the onDelete part of the query
-	 * @private
-	 */
-	onDelete() {
-		if (this.config.onDelete) {
-			return ` ON DELETE ${this.config.onDelete}`;
-		}
-		return "";
-	}
+        const createConstraintSchema =
+            "ALTER TABLE {TABLE_NAME} ADD CONSTRAINT {FOREIGN_NAME} FOREIGN KEY ({FIELD_NAME}) REFERENCES {FOREIGN_TABLE}({DEFAULT_FIELD}) ON DELETE {ACTION};";
 
-	/**
-	 * @description Returns the onUpdate part of the query
-	 * @private
-	 */
-	onUpdate() {
-		if (this.config.onUpdate) {
-			return ` ON UPDATE ${this.config.onUpdate}`;
-		}
-		return "";
-	}
+        let schema = createConstraintSchema;
+
+        if (createField) {
+            schema = `${createFieldSchema} ${createConstraintSchema}`;
+        }
+
+        return schema
+            .replaceAll("{TABLE_NAME}", modelName)
+            .replaceAll("{TYPE}", this.getDbType())
+            .replaceAll("{FOREIGN_NAME}", foreignName)
+            .replaceAll("{FIELD_NAME}", this.getName())
+            .replaceAll("{REQUIRED}", this.isRequired() ? "NOT NULL" : "NULL")
+            .replaceAll("{FOREIGN_TABLE}", foreignTable)
+            .replaceAll("{DEFAULT_FIELD}", this.defaultField)
+            .replaceAll("{ACTION}", this.getAction());
+    }
+
+    toDefinitionQueryForModify() {
+        let schema = "`{NAME}` {TYPE} {REQUIRED}";
+
+        return schema
+            .replace("{NAME}", this.getName())
+            .replace("{TYPE}", this.getDbType())
+            .replace("{REQUIRED}", this.isRequired() ? "NOT NULL" : "NULL");
+    }
 }

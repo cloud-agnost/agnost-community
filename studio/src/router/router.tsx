@@ -40,6 +40,7 @@ const paths = {
 		dashboard: `${versionPath}/VersionDashboard.tsx`,
 		database: `${versionPath}/VersionDatabase.tsx`,
 		models: `${versionPath}/models/Models.tsx`,
+		modelsOutlet: `${versionPath}/models/ModelsOutlet.tsx`,
 		fields: `${versionPath}/models/fields/Fields.tsx`,
 		endpoint: `${versionPath}/VersionEndpoint.tsx`,
 		storage: `${versionPath}/VersionStorage.tsx`,
@@ -158,6 +159,7 @@ const router = createBrowserRouter([
 													},
 													{
 														path: ':dbId/models',
+														lazy: () => lazyRouteImport(paths.version.modelsOutlet),
 														children: [
 															{
 																index: true,

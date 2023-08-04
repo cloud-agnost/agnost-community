@@ -36,6 +36,7 @@ interface ModelStore {
 	deleteField: (params: DeleteFieldParams) => Promise<Model>;
 	deleteMultipleField: (params: DeleteMultipleFieldParams) => Promise<Model>;
 	updateField: (params: UpdateFieldParams) => Promise<Model>;
+	getReferenceModels: (params: GetModelsOfDatabaseParams) => Promise<Model[]>;
 }
 
 const useModelStore = create<ModelStore>()(
@@ -225,6 +226,19 @@ const useModelStore = create<ModelStore>()(
 								description: field.msg,
 							});
 						}
+						throw e;
+					}
+				},
+				getReferenceModels: async (params: GetModelsOfDatabaseParams): Promise<Model[]> => {
+					try {
+						return ModelService.getReferenceModels(params);
+					} catch (e) {
+						const error = e as APIError;
+						notify({
+							type: 'error',
+							title: error.error,
+							description: error.details,
+						});
 						throw e;
 					}
 				},

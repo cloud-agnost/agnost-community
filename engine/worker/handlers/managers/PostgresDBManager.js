@@ -1,39 +1,41 @@
-import PostgresSQLDriver from "../sql-database/drivers/PostgresSQLDriver.js";
 import { SQLBaseManager } from "./SQLBaseManager.js";
 
 export class PostgresDBManager extends SQLBaseManager {
-	constructor(env, dbConfig, prevDbConfig, addLogFn) {
-		super(env, dbConfig, prevDbConfig, addLogFn, PostgresSQLDriver);
-	}
+    constructor(env, dbConfig, prevDbConfig, addLogFn) {
+        super(env, dbConfig, prevDbConfig, addLogFn);
+    }
 
-	beginSession() {
-		this.sql = `DO $$
+    beginSession() {
+        this.sql = `DO $$
 BEGIN
 `;
-	}
-	endSession() {
-		this.sql += `
+    }
+    endSession() {
+        this.sql += `
 EXCEPTION
 	WHEN OTHERS THEN
 		ROLLBACK;
 		RAISE EXCEPTION '%', SQLERRM;
 END
 $$;`;
-	}
-	async runQuery() {
-		/**
-		 * @type {Pool}
-		 */
-		const conn = await this.getConn();
-		try {
-			const result = await conn.query(this.getQuery());
-			this.addLog(
-				"⤵\n" + this.getQuery() + "\n" + t("Query executed successfully")
-			);
-			this.resetQuery();
-			return result;
-		} catch (e) {
-			throw e;
-		}
-	}
+    }
+    async runQuery() {
+        /**
+         * @type {Pool}
+         */
+        const conn = await this.getConn();
+        try {
+            const result = await conn.query(this.getQuery());
+            this.addLog(
+                "⤵\n" +
+                    this.getQuery() +
+                    "\n" +
+                    t("Query executed successfully")
+            );
+            this.resetQuery();
+            return result;
+        } catch (e) {
+            throw e;
+        }
+    }
 }

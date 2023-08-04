@@ -1,56 +1,29 @@
 import Field from "./Field.js";
-import { DATABASE } from "../../../config/constants.js";
 
 export default class Text extends Field {
-	maxLength = 4000;
-	static typeName = "Text";
-	/**
-	 * @description The name of the database adapter.
-	 */
-	adapter;
+    /**
+     * @description Checks if the field is searchable
+     * @return {boolean}
+     */
+    isSearchable() {
+        return this.options?.text?.searchable;
+    }
 
-	/**
-	 * @description The name of the field.
-	 */
-	name;
+    /**
+     * @description Gets the max length of the field
+     * @return {number | undefined}
+     */
+    getMaxLength() {
+        return this.options?.text?.maxLength;
+    }
 
-	/**
-	 * @description The data type of the field.
-	 */
-	type = "string";
+    toDefinitionQuery() {
+        const schema = "`{name}` {type}({maxLength}) {required}";
 
-	/**
-	 * @description The name of the data type.
-	 */
-	versions = {
-		[DATABASE.MySQL]: `VARCHAR(${this.maxLength})`,
-		[DATABASE.PostgreSQL]: `VARCHAR(${this.maxLength})`,
-		[DATABASE.SQLServer]: `NVARCHAR(${this.maxLength})`,
-		[DATABASE.Oracle]: `VARCHAR2(${this.maxLength})`,
-	};
-
-	/**
-	 * @description The default value for the data type.
-	 * @param {string} adapter - The database adapter.
-	 * @param {string} name - The name of the field.
-	 */
-	constructor(adapter, name) {
-		super();
-		this.adapter = adapter;
-		this.name = name;
-	}
-
-	/**
-	 * @description Generates the query for the field.
-	 */
-	toDefinitionQuery() {
-		return this.name + " " + this.versions[this.adapter];
-	}
-
-	/**
-	 * @description Generates the query for the rename field.
-	 */
-	toDefinitionQueryForRename() {
-		return this.versions[this.adapter];
-	}
+        return schema
+            .replace("{name}", this.getName())
+            .replace("{type}", this.getDbType())
+            .replace("{maxLength}", this.getMaxLength())
+            .replace("{required}", this.isRequired() ? "NOT NULL" : "NULL");
+    }
 }

@@ -101,7 +101,7 @@ export type DeleteMultipleModelParams = GetModelsOfDatabaseParams & {
 export type UpdateNameAndDescriptionParams = GetModelsOfDatabaseParams & {
 	modelId: string;
 	name: string;
-	description: string;
+	description?: string;
 };
 export type DeleteFieldParams = GetModelsOfDatabaseParams & {
 	modelId: string;
@@ -127,7 +127,6 @@ export type AddNewFieldParams = GetModelsOfDatabaseParams & {
 	};
 	richText?: {
 		searchable: boolean;
-		maxLength: number;
 	};
 	encryptedText?: {
 		maxLength: number;
