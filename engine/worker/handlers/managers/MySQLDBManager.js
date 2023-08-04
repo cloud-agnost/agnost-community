@@ -1,13 +1,36 @@
 import { SQLBaseManager } from "./SQLBaseManager.js";
 import fieldMap from "../sql-database/fieldMap.js";
+import { customAlphabet } from "nanoid";
 
 export class MySQLDBManager extends SQLBaseManager {
+    static dropForeignKeySchema = "ALTER TABLE `{TABLE_NAME}` DROP FOREIGN KEY `{CONSTRAINT_NAME}`;";
+    static deleteFieldSchema = "ALTER TABLE `{TABLE_NAME}` DROP COLUMN `{COLUMN_NAME}`;";
+    static checkForeignKeySchema =
+        "SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = '{DATABASE_NAME}' AND CONSTRAINT_NAME = '{CONSTRAINT_NAME}' AND CONSTRAINT_TYPE = 'FOREIGN KEY'";
+    static foreignKeyConditionSchema = `IF EXISTS(${MySQLDBManager.checkForeignKeySchema}) THEN {FOREIGN_KEY_DROP_SQL} END IF;`;
+    static checkConstraintSchema =
+        "SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_NAME = '{TABLE_NAME}' && CONSTRAINT_NAME = '{CONSTRAINT_NAME}'";
+    static checkIndexConditionSchema =
+        "NOT EXISTS(SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE table_name = '{TABLE_NAME}' AND index_name = '{INDEX_NAME}')";
+    static checkFieldConditionSchema =
+        "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{DATABASE_NAME}' AND TABLE_NAME = '{TABLE_NAME}' AND COLUMN_NAME = '{FIELD_NAME}'";
+
     constructor(env, dbConfig, prevDbConfig, addLogFn) {
         super(env, dbConfig, prevDbConfig, addLogFn);
     }
 
-    startTransaction() {
-        this.sql = `CREATE PROCEDURE TransactionFN()
+    /**
+     * @description Returns the query in a transaction, if the query fails, it will roll back
+     * @param {string} query
+     * @param query
+     * @return {string}
+     */
+    inTransaction(query) {
+        if (!query) throw new AgnostError(t("Query is required"));
+
+        const name = this.getRandomProcedureName("TransactionFN_");
+        return `DROP PROCEDURE IF EXISTS ${name};
+CREATE PROCEDURE ${name}()
 BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
@@ -16,19 +39,18 @@ BEGIN
         ROLLBACK;
         SIGNAL SQLSTATE '99999' SET MESSAGE_TEXT = @p2;
     END;
-
     START TRANSACTION;
-`;
-    }
-    endTransaction() {
-        this.sql += `COMMIT;
+        ${query}
+    COMMIT;
 END;
-CALL TransactionFN();
-DROP PROCEDURE IF EXISTS TransactionFN;
+    CALL ${name}();
+    DROP PROCEDURE IF EXISTS ${name};
 `;
     }
+
     async runQuery() {
-        if (!this.getQuery()) return;
+        const hasQuery = this.getQuery().trim().length > 0;
+        if (!hasQuery) return;
 
         /**
          * @type {import("mysql2/promise").Connection}
@@ -39,12 +61,19 @@ DROP PROCEDURE IF EXISTS TransactionFN;
             this.setQuery(`USE ${this.getDatabaseName()};\n` + this.getQuery());
         }
 
-        console.log("query \n", this.getQuery(), "\n end query");
+        if (hasQuery) {
+            console.log("-------------- QUERY START --------------");
+            console.log(this.getQuery());
+            console.log("-------------- QUERY END --------------");
+        }
+
+        if (typeof this.getQuery() !== "string") {
+            console.log(JSON.stringify(this.getQuery(), null, 2));
+            return;
+        }
 
         const result = await conn.query(this.getQuery());
-        this.addLog(
-            "⤵\n" + this.getQuery() + "\n" + t("Query executed successfully")
-        );
+        this.addLog(t("Query executed successfully"));
         this.resetQuery();
         return result;
     }
@@ -55,12 +84,10 @@ DROP PROCEDURE IF EXISTS TransactionFN;
      * @throws Rejects when the query fails
      */
     async getExistingDatabases() {
-        this.setQuery(
-            `SELECT schema_name as name FROM information_schema.schemata;`
-        );
+        this.setQuery("SELECT schema_name as name FROM information_schema.schemata;");
+
         const [databases] = await this.runQuery();
-        if (Array.isArray(databases))
-            return databases.map((database) => database.name);
+        if (Array.isArray(databases)) return databases.map((database) => database.name);
         return [];
     }
 
@@ -70,9 +97,11 @@ DROP PROCEDURE IF EXISTS TransactionFN;
      * @throws Rejects when the query fails;
      */
     async getExistingModels() {
-        this.addQuery(
-            `SELECT TABLE_NAME as name FROM information_schema.TABLES WHERE TABLE_SCHEMA = '${this.getDatabaseName()}' AND TABLE_TYPE LIKE 'BASE_TABLE';`
-        );
+        const schema =
+            "SELECT TABLE_NAME as name FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{DATABASE_NAME}' AND TABLE_TYPE LIKE 'BASE_TABLE';";
+
+        this.addQuery(schema.replace("{DATABASE_NAME}", this.getDatabaseName()));
+
         const [[_, rows]] = await this.runQuery();
         if (Array.isArray(rows)) return rows.map((database) => database.name);
         return [];
@@ -91,37 +120,28 @@ DROP PROCEDURE IF EXISTS TransactionFN;
 
         for (let model of modelsWithRefs) {
             for (let field of model.fields) {
-                const reference = new Ref(this.databaseType, field);
-                addFieldQuery += `
-IF NOT EXISTS(
-		SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
-		WHERE COLUMN_NAME='${field.name}'
-		AND TABLE_NAME='${model.name}'
-		AND TABLE_SCHEMA='${this.getDatabaseName()}'
-) THEN
-${reference.afterCreateQuery(model.name)}
-END IF;
-`;
+                const reference = new Ref(field);
+
+                const foreignName = SQLBaseManager.getForeignKeyName(field.iid);
+
+                const condition = MySQLDBManager.checkFieldConditionSchema
+                    .replace("{DATABASE_NAME}", this.getDatabaseName())
+                    .replace("{TABLE_NAME}", model.name)
+                    .replace("{FIELD_NAME}", reference.getName());
+
+                const foreignKeyCondition = MySQLDBManager.checkForeignKeySchema
+                    .replace("{DATABASE_NAME}", this.getDatabaseName())
+                    .replace("{CONSTRAINT_NAME}", foreignName);
+
+                const onlyConstraint = reference.createConstraint(model.name);
+                const withField = reference.createConstraint(model.name, true);
+
+                addFieldQuery += `IF EXISTS(${condition}) AND NOT EXISTS(${foreignKeyCondition}) THEN ${onlyConstraint} END IF; \n`;
+                addFieldQuery += `IF NOT EXISTS(${condition}) THEN ${withField} END IF;`;
             }
         }
 
-        let SQL = `
-DROP PROCEDURE IF EXISTS ADD_NEW_COLUMN;
-CREATE PROCEDURE ADD_NEW_COLUMN()
-BEGIN
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        GET DIAGNOSTICS CONDITION 1
-        @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-        SIGNAL SQLSTATE '99999' SET MESSAGE_TEXT = @p2;
-    END;
-    ${addFieldQuery}
-END;
-CALL ADD_NEW_COLUMN();		
-DROP PROCEDURE IF EXISTS ADD_NEW_COLUMN;
-`;
-
-        return SQL;
+        return !addFieldQuery ? addFieldQuery : this.procedureWrapper(addFieldQuery, "CREATE FOREIGN KEY QUERY");
     }
 
     /**
@@ -133,42 +153,23 @@ DROP PROCEDURE IF EXISTS ADD_NEW_COLUMN;
      */
     createField(modelName, fields, returnQuery = false) {
         let addFieldQuery = "";
+        for (let field of fields) {
+            const condition = MySQLDBManager.checkFieldConditionSchema
+                .replace("{DATABASE_NAME}", this.getDatabaseName())
+                .replace("{TABLE_NAME}", modelName)
+                .replace("{FIELD_NAME}", field.getName());
 
-        fields.forEach((field) => {
-            addFieldQuery += `
-IF NOT EXISTS(
-		SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
-		WHERE COLUMN_NAME='${field.getName()}'
-		AND TABLE_NAME='${modelName}'
-		AND TABLE_SCHEMA='${this.getDatabaseName()}'
-) THEN
- ALTER TABLE ${modelName} ADD COLUMN ${field.toDefinitionQuery()};
-END IF;
-`;
-        });
+            addFieldQuery += `IF NOT EXISTS(${condition}) THEN ALTER TABLE \`${modelName}\` ADD COLUMN ${field.toDefinitionQuery()}; END IF;`;
+        }
 
-        const SQL = `
-DROP PROCEDURE IF EXISTS ADD_NEW_COLUMN;
-CREATE PROCEDURE ADD_NEW_COLUMN()
-BEGIN
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        GET DIAGNOSTICS CONDITION 1
-        @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-        SIGNAL SQLSTATE '99999' SET MESSAGE_TEXT = @p2;
-    END;
-    ${addFieldQuery}
-END;
-
-CALL ADD_NEW_COLUMN();		
-DROP PROCEDURE IF EXISTS ADD_NEW_COLUMN;
-`;
+        const SQL = addFieldQuery ? this.procedureWrapper(addFieldQuery, "CREATE FIELD QUERY") : "";
 
         if (returnQuery) return SQL;
 
         this.setQuery(SQL);
         return this.runQuery();
     }
+
     /**
      * @description Add an index to the column
      * @param {string} tableName - The table name
@@ -179,28 +180,19 @@ DROP PROCEDURE IF EXISTS ADD_NEW_COLUMN;
     addIndex(tableName, columnName, returnQuery = false) {
         const indexName = `${tableName}_index_${columnName}`.toLowerCase();
 
-        const SQL = `DROP PROCEDURE IF EXISTS ADD_INDEX_PROCEDURE;
-CREATE PROCEDURE ADD_INDEX_PROCEDURE()
-BEGIN
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        GET DIAGNOSTICS CONDITION 1
-        @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-        SIGNAL SQLSTATE '99999' SET MESSAGE_TEXT = @p2;
-    END;
-    IF NOT EXISTS(
-        SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE table_name = '${tableName}' AND index_name = '${indexName}'
-    ) THEN
-     CREATE INDEX ${indexName} ON ${tableName}(${columnName});
-    END IF;
-END;
+        const schema = "CREATE INDEX `{INDEX_NAME}` ON {TABLE_NAME}({FIELD_NAME});";
 
-CALL ADD_INDEX_PROCEDURE();
-DROP PROCEDURE IF EXISTS ADD_INDEX_PROCEDURE;`;
+        const SQL = this.ifWrapper(
+            MySQLDBManager.checkIndexConditionSchema
+                .replace("{TABLE_NAME}", tableName)
+                .replace("{INDEX_NAME}", indexName),
+            schema
+                .replace("{INDEX_NAME}", indexName)
+                .replace("{TABLE_NAME}", tableName)
+                .replace("{FIELD_NAME}", columnName),
+            "ADD INDEX TO COLUMN"
+        );
 
-        console.log({
-            addIndex: SQL,
-        });
         if (returnQuery) return SQL;
         this.setQuery(SQL);
         return this.runQuery();
@@ -214,28 +206,22 @@ DROP PROCEDURE IF EXISTS ADD_INDEX_PROCEDURE;`;
      * @return {Promise<Object|[]>|string}
      */
     dropIndex(tableName, columnName, returnQuery = false) {
-        console.log("dropIndex", tableName, columnName);
         const indexName = `${tableName}_index_${columnName}`.toLowerCase();
 
-        const SQL = `DROP PROCEDURE IF EXISTS DROP_INDEX_PROCEDURE;
-CREATE PROCEDURE DROP_INDEX_PROCEDURE()
-BEGIN
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        GET DIAGNOSTICS CONDITION 1
-        @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-        SIGNAL SQLSTATE '99999' SET MESSAGE_TEXT = @p2;
-    END;
-    IF EXISTS(
-        SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE table_name = '${tableName}' AND index_name = '${indexName}'
-    ) THEN
-     ALTER TABLE ${tableName} DROP INDEX ${indexName};
-    END IF;
-END;
+        const schema = "ALTER TABLE `{TABLE_NAME}` DROP INDEX `{INDEX_NAME}`;";
 
-CALL DROP_INDEX_PROCEDURE();
-DROP PROCEDURE IF EXISTS DROP_INDEX_PROCEDURE;`;
-        console.log(SQL);
+        const conditionSchema =
+            "EXISTS(SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE table_name = '{TABLE_NAME}' AND index_name = '{INDEX_NAME}')";
+
+        const SQL = this.ifWrapper(
+            conditionSchema.replace("{TABLE_NAME}", tableName).replace("{INDEX_NAME}", indexName),
+            schema
+                .replace("{INDEX_NAME}", indexName)
+                .replace("{TABLE_NAME}", tableName)
+                .replace("{FIELD_NAME}", columnName),
+            "DROP INDEX FROM COLUMN"
+        );
+
         if (returnQuery) return SQL;
         this.setQuery(SQL);
         return this.runQuery();
@@ -251,26 +237,18 @@ DROP PROCEDURE IF EXISTS DROP_INDEX_PROCEDURE;`;
     addUniqueConstraint(tableName, columnName, returnQuery = false) {
         const constraintName = `uc_${tableName}_${columnName}`.toLowerCase();
 
-        const SQL = `DROP PROCEDURE IF EXISTS ADD_UNIQUE_INDEX_PROCEDURE;
-CREATE PROCEDURE ADD_UNIQUE_INDEX_PROCEDURE()
-BEGIN
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        GET DIAGNOSTICS CONDITION 1
-        @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-        SIGNAL SQLSTATE '99999' SET MESSAGE_TEXT = @p2;
-    END;
-    IF NOT EXISTS(
-        SELECT CONSTRAINT_NAME
-            FROM information_schema.KEY_COLUMN_USAGE
-            WHERE TABLE_NAME = '${tableName}' && CONSTRAINT_NAME = '${constraintName}'
-    ) THEN
-     ALTER TABLE ${tableName} ADD CONSTRAINT ${constraintName} UNIQUE(${columnName});
-    END IF;
-END;
+        const schema = "ALTER TABLE `{TABLE_NAME}` ADD CONSTRAINT `{CONSTRAINT_NAME}` UNIQUE({FIELD_NAME});";
 
-CALL ADD_UNIQUE_INDEX_PROCEDURE;
-DROP PROCEDURE IF EXISTS ADD_UNIQUE_INDEX_PROCEDURE;`;
+        const conditionSchema = `NOT EXISTS(${MySQLDBManager.checkConstraintSchema})`;
+
+        const SQL = this.ifWrapper(
+            conditionSchema.replace("{TABLE_NAME}", tableName).replace("{CONSTRAINT_NAME}", constraintName),
+            schema
+                .replace("{CONSTRAINT_NAME}", constraintName)
+                .replace("{TABLE_NAME}", tableName)
+                .replace("{FIELD_NAME}", columnName),
+            "ADD UNIQUE CONSTRAINT TO COLUMN"
+        );
 
         if (returnQuery) return SQL;
         this.setQuery(SQL);
@@ -287,26 +265,18 @@ DROP PROCEDURE IF EXISTS ADD_UNIQUE_INDEX_PROCEDURE;`;
     dropUniqueConstraint(tableName, columnName, returnQuery = false) {
         const constraintName = `uc_${tableName}_${columnName}`.toLowerCase();
 
-        const SQL = `DROP PROCEDURE IF EXISTS DROP_UNIQUE_INDEX_PROCEDURE;
-CREATE PROCEDURE DROP_UNIQUE_INDEX_PROCEDURE()
-BEGIN
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        GET DIAGNOSTICS CONDITION 1
-        @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-        SIGNAL SQLSTATE '99999' SET MESSAGE_TEXT = @p2;
-    END;
-    IF EXISTS(
-        SELECT CONSTRAINT_NAME
-            FROM information_schema.KEY_COLUMN_USAGE
-            WHERE TABLE_NAME = '${tableName}' && CONSTRAINT_NAME = '${constraintName}'
-    ) THEN
-     ALTER TABLE ${tableName} DROP INDEX ${constraintName};
-    END IF;
-END;
+        const schema = "ALTER TABLE `{TABLE_NAME}` DROP INDEX `{FIELD_NAME}`;";
 
-CALL DROP_UNIQUE_INDEX_PROCEDURE();
-DROP PROCEDURE IF EXISTS DROP_UNIQUE_INDEX_PROCEDURE;`;
+        const conditionSchema = `EXISTS(${MySQLDBManager.checkConstraintSchema})`;
+
+        const SQL = this.ifWrapper(
+            conditionSchema.replace("{TABLE_NAME}", tableName).replace("{CONSTRAINT_NAME}", constraintName),
+            schema
+                .replace("{CONSTRAINT_NAME}", constraintName)
+                .replace("{TABLE_NAME}", tableName)
+                .replace("{FIELD_NAME}", columnName),
+            "DROP UNIQUE CONSTRAINT FROM COLUMN"
+        );
 
         if (returnQuery) return SQL;
         this.setQuery(SQL);
@@ -323,24 +293,18 @@ DROP PROCEDURE IF EXISTS DROP_UNIQUE_INDEX_PROCEDURE;`;
     addFullTextIndex(tableName, columnName, returnQuery = false) {
         const indexName = `${tableName}_fulltext_${columnName}`.toLowerCase();
 
-        const SQL = `DROP PROCEDURE IF EXISTS ADD_FULLTEXT_INDEX_PROCEDURE;
-CREATE PROCEDURE ADD_FULLTEXT_INDEX_PROCEDURE()
-BEGIN
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        GET DIAGNOSTICS CONDITION 1
-        @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-        SIGNAL SQLSTATE '99999' SET MESSAGE_TEXT = @p2;
-    END;
-    IF NOT EXISTS(
-        SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE table_name = '${tableName}' AND index_name = '${indexName}'
-    ) THEN
-     CREATE FULLTEXT INDEX ${indexName} ON ${tableName}(${columnName});
-    END IF;
-END;
+        const schema = "CREATE FULLTEXT INDEX `{INDEX_NAME}` ON {TABLE_NAME}({FIELD_NAME});";
 
-CALL ADD_FULLTEXT_INDEX_PROCEDURE();
-DROP PROCEDURE IF EXISTS ADD_FULLTEXT_INDEX_PROCEDURE;`;
+        const SQL = this.ifWrapper(
+            MySQLDBManager.checkIndexConditionSchema
+                .replace("{TABLE_NAME}", tableName)
+                .replace("{INDEX_NAME}", indexName),
+            schema
+                .replace("{INDEX_NAME}", indexName)
+                .replace("{TABLE_NAME}", tableName)
+                .replace("{FIELD_NAME}", columnName),
+            "ADD FULLTEXT INDEX TO COLUMN"
+        );
 
         if (returnQuery) return SQL;
         this.setQuery(SQL);
@@ -357,8 +321,106 @@ DROP PROCEDURE IF EXISTS ADD_FULLTEXT_INDEX_PROCEDURE;`;
     dropFullTextIndex(tableName, columnName, returnQuery = false) {
         const indexName = `${tableName}_fulltext_${columnName}`.toLowerCase();
 
-        const SQL = `DROP PROCEDURE IF EXISTS DROP_FULLTEXT_INDEX_PROCEDURE;
-CREATE PROCEDURE DROP_FULLTEXT_INDEX_PROCEDURE()
+        const schema = "DROP INDEX `{INDEX_NAME}` ON `{TABLE_NAME}`;";
+
+        const conditionSchema =
+            "EXISTS(SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE table_name = '{TABLE_NAME}' AND index_name = '{INDEX_NAME}')";
+
+        const SQL = this.ifWrapper(
+            conditionSchema.replace("{TABLE_NAME}", tableName).replace("{INDEX_NAME}", indexName),
+            schema.replace("{INDEX_NAME}", indexName).replace("{TABLE_NAME}", tableName),
+            "DROP FULLTEXT INDEX FROM COLUMN"
+        );
+
+        if (returnQuery) return SQL;
+        this.setQuery(SQL);
+        return this.runQuery();
+    }
+
+    /**
+     * Drop the table
+     * @param {object} model - the model object
+     * @param {boolean} returnQuery - return the query or run it
+     * @return {Promise<void|string>}
+     */
+    async dropModel(model, returnQuery = false) {
+        let SQL = "SET FOREIGN_KEY_CHECKS = 0;";
+        SQL += `\n DROP TABLE IF EXISTS \`${model.name}\`;`;
+        SQL += "SET FOREIGN_KEY_CHECKS = 1;\n";
+
+        if (returnQuery) return SQL;
+        this.setQuery(SQL);
+        return this.runQuery();
+    }
+
+    dropForeignKey(modelName, foreignKeyName, returnQuery = false) {
+        const query = MySQLDBManager.foreignKeyConditionSchema
+            .replaceAll("{FOREIGN_KEY_DROP_SQL}", MySQLDBManager.dropForeignKeySchema)
+            .replaceAll("{CONSTRAINT_NAME}", foreignKeyName)
+            .replaceAll("{DATABASE_NAME}", this.getDatabaseName())
+            .replaceAll("{TABLE_NAME}", modelName);
+
+        const SQL = this.procedureWrapper(query, "DROP FOREIGN KEY");
+        if (returnQuery) return SQL;
+        this.setQuery(SQL);
+        return this.runQuery();
+    }
+
+    /**
+     * Drop the field from the table
+     * @param {string} modelName - name of the table
+     * @param {object} field - the field to drop
+     * @param {boolean} returnQuery - return the query or run it
+     * @return {Promise<Object|[]> | string}
+     */
+    async dropField(modelName, field, returnQuery = false) {
+        const conditionSchema = `EXISTS(${MySQLDBManager.checkFieldConditionSchema})`;
+
+        const foreignName = SQLBaseManager.getForeignKeyName(field.iid);
+
+        let query = MySQLDBManager.foreignKeyConditionSchema
+            .replace("{DATABASE_NAME}", this.getDatabaseName())
+            .replace("{CONSTRAINT_NAME}", foreignName)
+            .replace(
+                "{FOREIGN_KEY_DROP_SQL}",
+                MySQLDBManager.dropForeignKeySchema
+                    .replace("{TABLE_NAME}", modelName)
+                    .replace("{CONSTRAINT_NAME}", foreignName)
+            );
+
+        query += "\n";
+
+        query += MySQLDBManager.deleteFieldSchema
+            .replace("{TABLE_NAME}", modelName)
+            .replace("{COLUMN_NAME}", field.name);
+
+        const SQL = this.ifWrapper(
+            conditionSchema
+                .replace("{DATABASE_NAME}", this.getDatabaseName())
+                .replace("{TABLE_NAME}", modelName)
+                .replace("{FIELD_NAME}", field.name),
+            query,
+            "DROP FIELD"
+        );
+
+        if (returnQuery) return SQL;
+        this.setQuery(SQL);
+        return this.runQuery();
+    }
+
+    /**
+     *
+     * @param query {string} - Query to run
+     * @param debugMessage {string?} - Debugging message
+     * @return {string}
+     */
+    procedureWrapper(query, debugMessage) {
+        if (!query) throw new AgnostError(t("Query is required"));
+
+        const name = this.getRandomProcedureName("PROCEDURE_WRAPPER");
+
+        return `DROP PROCEDURE IF EXISTS ${name};
+CREATE PROCEDURE ${name}()
 BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
@@ -366,16 +428,78 @@ BEGIN
         @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
         SIGNAL SQLSTATE '99999' SET MESSAGE_TEXT = @p2;
     END;
-    IF EXISTS(
-        SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE table_name = '${tableName}' AND index_name = '${indexName}'
-    ) THEN
-     DROP INDEX ${indexName} ON ${tableName};
+    ${debugMessage ? `-- ${debugMessage} \n` : ""}
+    ${query}
+END;
+
+CALL ${name}();
+DROP PROCEDURE IF EXISTS ${name};
+    `;
+    }
+
+    /**
+     *
+     * @param conditionQuery {string} - query to check if the query should be run
+     * @param query {string} - query to run
+     * @param debugMessage {string?} - Debugging message
+     * @return {string}
+     */
+    ifWrapper(conditionQuery, query, debugMessage) {
+        if (!query || !conditionQuery) {
+            throw new AgnostError(t("Query and conditionQuery are required"));
+        }
+
+        const name = this.getRandomProcedureName("IF_WRAPPER");
+
+        return `DROP PROCEDURE IF EXISTS ${name};
+CREATE PROCEDURE ${name}()
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+        @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
+        SIGNAL SQLSTATE '99999' SET MESSAGE_TEXT = @p2;
+    END;
+    ${debugMessage ? `-- ${debugMessage} \n` : ""}
+    IF ${conditionQuery} THEN
+        ${query}
     END IF;
 END;
 
-CALL DROP_FULLTEXT_INDEX_PROCEDURE();
-DROP PROCEDURE IF EXISTS DROP_FULLTEXT_INDEX_PROCEDURE;`;
+CALL ${name}();
+DROP PROCEDURE IF EXISTS ${name};`;
+    }
 
+    getRandomProcedureName(prefix) {
+        const nanoid = customAlphabet("qwertyuiopasdfghjklzxcvbnm");
+        return `${prefix ?? "procedure"}_${nanoid()}`;
+    }
+
+    /**
+     * @description Drop the database
+     * @param {string?} dbName
+     * @return {Promise<Object|[]>}
+     */
+    async dropDatabase(dbName) {
+        this.setQuery(`DROP DATABASE IF EXISTS ${dbName ?? this.getDbName()};`);
+        return this.runQuery();
+    }
+
+    /**
+     * @description Set the nullability of the field
+     * @param modelName {string} - The name of the model
+     * @param field {object} - The field to set nullability
+     * @param returnQuery {boolean} - return the query or run it
+     */
+    setNullability(modelName, field, returnQuery = false) {
+        const FieldType = fieldMap.get(field.type);
+        if (!FieldType) throw new AgnostError(t(`Field type '${field.type}' is not supported`));
+        /**
+         * @type {Field}
+         */
+        const refField = new FieldType(field);
+
+        const SQL = `ALTER TABLE ${modelName} MODIFY ${refField.toDefinitionQueryForModify()};`;
         if (returnQuery) return SQL;
         this.setQuery(SQL);
         return this.runQuery();

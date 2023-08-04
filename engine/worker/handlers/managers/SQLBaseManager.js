@@ -1,6 +1,7 @@
 import { DBManager } from "./dbManager.js";
 import fieldMap from "../sql-database/fieldMap.js";
 import Model from "../sql-database/Model.js";
+import { customAlphabet } from "nanoid";
 
 export class SQLBaseManager extends DBManager {
     /**
@@ -11,15 +12,9 @@ export class SQLBaseManager extends DBManager {
 
     /**
      * SQL query to be executed
-     * @type {string}
+     * @type {string[]}
      */
-    sql = "";
-
-    /**
-     * Is creating table or not
-     * @type {boolean}
-     */
-    isCreatingTable = false;
+    sqlQueries = [];
 
     /**
      * Check if the transaction is open
@@ -67,10 +62,6 @@ export class SQLBaseManager extends DBManager {
     async createDatabase() {
         const dbName = this.getDbName();
 
-        // TODO: remove this after testing
-        // await this.dropDatabase(dbName);
-        // console.log("...Database removed...");
-
         if (await this.isDatabaseExists(dbName)) {
             await this.useDatabase(dbName);
             return;
@@ -78,10 +69,7 @@ export class SQLBaseManager extends DBManager {
 
         this.addQuery(`CREATE DATABASE ${dbName};`);
         await this.runQuery();
-
         this.addLog(t("Created the database"));
-        console.log(`********* Database created: ${dbName} *********`);
-
         await this.useDatabase(dbName);
     }
 
@@ -89,19 +77,12 @@ export class SQLBaseManager extends DBManager {
         let createSQL = "";
         // existing models in the database
         const existingModels = await this.getExistingModels();
-        console.log("Existing models: ", existingModels);
-        const { modelsWithRefs, modelsWithoutRefs } =
-            this.getConfiguredModels();
+        const { modelsWithRefs, modelsWithoutRefs } = this.getConfiguredModels();
 
         // Create tables and regular indexes
         for (let model of modelsWithoutRefs) {
             const modelName = model.name.toLowerCase();
-            console.log({
-                type: model.type,
-            });
-            if (model.type !== "model" || existingModels.includes(modelName)) {
-                continue;
-            }
+            if (model.type !== "model" || existingModels.includes(modelName)) continue;
 
             createSQL += this.createModel(model);
         }
@@ -116,54 +97,40 @@ export class SQLBaseManager extends DBManager {
         await this.runQuery();
 
         this.addLog(t("Tables created successfully"));
-        console.log(`********* Tables created successfully *********`);
 
         // Create unique indexes and full text search indexes
         for (let model of modelsWithoutRefs) {
             if (model.type !== "model") continue;
 
-            const queries = [
-                await this.handleIndexes(model, true),
-                await this.handleUniqueIndexes(model, true),
-                await this.handleFullTextSearchIndexes(model, true),
-            ].join("\n");
-
-            this.addQuery(queries);
+            this.addQuery(await this.handleIndexes(model, true));
+            this.addQuery(await this.handleUniqueIndexes(model, true));
+            this.addQuery(await this.handleFullTextSearchIndexes(model, true));
         }
+
         // run the query
         await this.runQuery();
 
         this.addLog(t("Tables' indexes created successfully"));
-        console.log(`********* Tables' indexes created successfully *********`);
     }
 
     async redeploy() {
         const changedModels = this.getChangedModels();
-        // console.log("changedModels", JSON.stringify(changedModels, null, 4));
+        console.log("changedModels", JSON.stringify(changedModels, null, 4));
         if (!changedModels) return;
 
         const existingModels = await this.getExistingModels();
 
-        let createSQL = "";
-
-        const { modelsWithRefs, modelsWithoutRefs } = this.getConfiguredModels(
-            changedModels?.added
-        );
+        const { modelsWithRefs, modelsWithoutRefs } = this.getConfiguredModels(changedModels?.added);
 
         // Create tables and regular indexes
         // TODO refactor it later
         for (const model of modelsWithoutRefs) {
             const modelName = model.name.toLowerCase();
-            if (model.type !== "model" || existingModels.includes(modelName)) {
-                continue;
-            }
-            createSQL += this.createModel(model);
+            if (model.type !== "model" || existingModels.includes(modelName)) continue;
+            this.addQuery(this.createModel(model));
         }
 
-        this.addQuery(createSQL);
-
         this.addQuery(this.createForeignKeyQuery(modelsWithRefs));
-        console.log("after createForeignKeyQuery");
         await this.runQuery();
 
         for (let updatedModel of changedModels?.updated) {
@@ -174,36 +141,26 @@ export class SQLBaseManager extends DBManager {
 
             // if the model is existing, update it
             if (existingModels.includes(updatedModel?.name)) {
-                this.setQuery(
-                    [
-                        await this.handleAddFields(updatedModel, true),
-                        await this.handleRenameField(updatedModel, true),
-                        await this.handleIndexes(updatedModel, true),
-                        await this.handleUniqueIndexes(updatedModel, true),
-                        await this.handleFullTextSearchIndexes(
-                            updatedModel,
-                            true
-                        ),
-                    ].join("\n")
-                );
-                console.log({
-                    1: await this.handleAddFields(updatedModel, true),
-                    2: await this.handleRenameField(updatedModel, true),
-                    3: await this.handleIndexes(updatedModel, true),
-                    4: await this.handleUniqueIndexes(updatedModel, true),
-                    5: await this.handleFullTextSearchIndexes(
-                        updatedModel,
-                        true
-                    ),
-                });
-
-                // Adding foreign Keys
-                await this.runQuery();
+                this.addQuery(await this.handleRequiredField(updatedModel, true));
+                this.addQuery(await this.handleAddFields(updatedModel, true));
+                this.addQuery(await this.handleRenameField(updatedModel, true));
+                this.addQuery(await this.handleIndexes(updatedModel, true));
+                this.addQuery(await this.handleUniqueIndexes(updatedModel, true));
+                this.addQuery(await this.handleFullTextSearchIndexes(updatedModel, true));
+                this.addQuery(await this.handleReferenceModelChanges(updatedModel, true));
             }
+
+            await this.runQuery();
         }
 
-        await this.handleModelsDrop(changedModels?.deleted);
-        await this.handleDropFields(changedModels?.updated);
+        this.setQuery(
+            [
+                await this.handleModelsDrop(changedModels?.deleted, true),
+                await this.handleDropFields(changedModels?.updated, true),
+            ].join("\n")
+        );
+
+        await this.runQuery();
     }
 
     /**
@@ -211,23 +168,15 @@ export class SQLBaseManager extends DBManager {
      * @return {Promise<void>}
      */
     async manageModels() {
-        console.log(
-            `\n--------------- ${this.getType()} started ---------------\n`
-        );
+        console.log(`\n--------------- ${this.getType()} started ---------------\n`);
 
         if (this.getType() === "redeploy") {
-            console.log("...Redeploying...");
-            this.isCreatingTable = false;
             await this.redeploy();
         } else {
-            console.log("...Deploying...");
-            this.isCreatingTable = true;
             await this.deploy();
         }
 
-        console.log(
-            `\n--------------- ${this.getType()} ended ---------------\n`
-        );
+        console.log(`\n--------------- ${this.getType()} ended ---------------\n`);
     }
 
     /**
@@ -237,46 +186,58 @@ export class SQLBaseManager extends DBManager {
      * @return {Promise<string>}
      */
     async handleRenameField(model, returnQuery = false) {
-        console.log("handleRenameField");
         let SQL = "";
 
         for (const field of model.fieldChanges.updated) {
             if (!field.isNameChanged) continue;
 
-            const query = await this.renameField(
-                model.name,
-                field.oldName,
-                field.name,
-                returnQuery
-            );
+            const query = await this.renameField(model.name, field.oldName, field.name, returnQuery);
 
             if (returnQuery) SQL += query + "\n";
         }
 
         if (returnQuery) return SQL;
+        this.setQuery(SQL);
+        return this.runQuery();
+    }
+
+    /**
+     *
+     * @param {{name: string, fieldChanges: {updated:[]}}} model
+     * @param returnQuery
+     * @return {Promise<string>}
+     */
+    async handleRequiredField(model, returnQuery = false) {
+        let SQL = "";
+
+        for (const field of model.fieldChanges.updated) {
+            if (!field.isRequiredChanged) continue;
+            const query = await this.setNullability(model.name, field, returnQuery);
+            if (returnQuery) SQL += query + "\n";
+        }
+
+        if (returnQuery) return SQL;
+        this.setQuery(SQL);
+        return this.runQuery();
     }
 
     /**
      * Returns models with and without references
-     * @param {array| null} models
+     * @param {[]?} models
      * @return {{modelsWithoutRefs: object[], modelsWithRefs: object[]}}
      */
-    getConfiguredModels(models = null) {
+    getConfiguredModels(models) {
         const modelsWithRefs = [];
         const _models = models ?? this.getModels();
         const modelsWithoutRefs = _models.reduce((acc, curr) => {
             const withReferences = curr.fields
                 .filter((field) => field.type === "reference")
                 .map((field) => {
-                    field.reference.modelName = this.getModelNameByIid(
-                        field?.reference?.iid
-                    );
+                    field.reference.modelName = this.getModelNameByIid(field?.reference?.iid);
                     return field;
                 });
 
-            const nonReferences = curr.fields.filter(
-                (field) => field.type !== "reference"
-            );
+            const nonReferences = curr.fields.filter((field) => field.type !== "reference");
 
             if (nonReferences.length > 0) {
                 curr.fields = nonReferences;
@@ -300,8 +261,8 @@ export class SQLBaseManager extends DBManager {
     }
 
     /**
-     * Delete fields from tables
-     * @param {object[]} models - model object
+     * @description Delete fields from tables
+     * @param {object[]} models - array of models
      * @param {boolean} returnQuery - return query or not
      * @return {Promise<void> | string}
      */
@@ -310,28 +271,26 @@ export class SQLBaseManager extends DBManager {
 
         for (const model of models) {
             for (const field of model.fieldChanges.deleted) {
-                const query = await this.dropField(
-                    model.name,
-                    field.name,
-                    true
-                );
+                const query = await this.dropField(model.name, field, true);
                 SQL += query + "\n";
             }
         }
-        console.log(SQL);
         if (returnQuery) return SQL;
 
         this.setQuery(SQL);
         return this.runQuery();
     }
 
+    /**
+     * @description Add fields to tables
+     * @param {object} model - model object
+     * @param returnQuery
+     * @return {Promise<string|[]>}
+     */
     async handleAddFields(model, returnQuery = false) {
-        console.log("handleAddFields");
         let SQL = "";
 
-        if (model.fieldChanges.added.length === 0)
-            if (returnQuery) return SQL;
-            else return;
+        if (model.fieldChanges.added.length === 0) return "";
 
         const fields = model.fieldChanges.added
             .filter((field) => field.type !== "reference")
@@ -339,40 +298,43 @@ export class SQLBaseManager extends DBManager {
                 const FieldClass = fieldMap.get(field.type);
 
                 if (!FieldClass) {
-                    throw new AgnostError(
-                        t(`Field type '${field.type}' is not supported`)
-                    );
+                    throw new AgnostError(t(`Field type '${field.type}' is not supported`));
                 }
 
                 return new FieldClass(field);
             });
-
         SQL = await this.createField(model.name, fields, returnQuery);
 
         const modelToCreate = structuredClone(model);
         modelToCreate.fields = model.fieldChanges.added
             .filter((field) => field.type === "reference")
             .map((field) => {
-                field.reference.modelName = this.getModelNameByIid(
-                    field.reference.iid
-                );
+                field.reference.modelName = this.getModelNameByIid(field.reference.iid);
                 return field;
             });
-
         SQL += this.createForeignKeyQuery([modelToCreate]);
 
         if (returnQuery) return SQL;
+        this.setQuery(SQL);
+        return this.runQuery();
     }
 
     /**
      * Delete models from database
      * @param {object[]} deletedModels
-     * @return {Promise<void>}
+     * @param {boolean} returnQuery - return the query or run it
+     * @return {Promise<void|string>}
      */
-    async handleModelsDrop(deletedModels) {
+    async handleModelsDrop(deletedModels, returnQuery = false) {
+        let SQL = "";
         for (const model of deletedModels) {
-            await this.dropModel(model);
+            const query = await this.dropModel(model, returnQuery);
+            SQL += query + "\n";
         }
+
+        if (returnQuery) return SQL;
+        this.setQuery(SQL);
+        return this.runQuery();
     }
 
     /**
@@ -397,29 +359,23 @@ export class SQLBaseManager extends DBManager {
      * @return {Promise<void> | string}
      */
     async handleIndexes(model, returnQuery = false) {
-        console.log("handleIndexes");
         let SQL = "";
 
-        for (const field of model.fields) {
+        for (const { indexed, name } of model.fields) {
             let query = "";
 
-            if (field.indexed) {
-                query =
-                    (await this.addIndex(model.name, field.name, returnQuery)) +
-                    "\n";
-            } else if (!this.isCreatingTable) {
-                query =
-                    (await this.dropIndex(
-                        model.name,
-                        field.name,
-                        returnQuery
-                    )) + "\n";
+            if (indexed) {
+                query = (await this.addIndex(model.name, name, returnQuery)) + "\n";
+            } else {
+                query = (await this.dropIndex(model.name, name, returnQuery)) + "\n";
             }
 
             if (returnQuery) SQL += query;
         }
 
         if (returnQuery) return SQL;
+        this.setQuery(SQL);
+        return this.runQuery();
     }
 
     /**
@@ -429,36 +385,51 @@ export class SQLBaseManager extends DBManager {
      * @return {Promise<void> | string}
      */
     async handleUniqueIndexes(model, returnQuery = false) {
-        console.log("handleUniqueIndexes");
         let SQL = "";
 
         for (const field of model.fields) {
             let query = "";
 
             if (field.unique) {
-                query =
-                    "\n" +
-                    (await this.addUniqueConstraint(
-                        model.name,
-                        field.name,
-                        returnQuery
-                    )) +
-                    "\n";
-            } else if (!this.isCreatingTable) {
-                query =
-                    "\n" +
-                    (await this.dropUniqueConstraint(
-                        model.name,
-                        field.name,
-                        returnQuery
-                    )) +
-                    "\n";
+                query = "\n" + (await this.addUniqueConstraint(model.name, field.name, returnQuery)) + "\n";
+            } else {
+                query = "\n" + (await this.dropUniqueConstraint(model.name, field.name, returnQuery)) + "\n";
             }
 
             if (returnQuery) SQL += query;
         }
 
         if (returnQuery) return SQL;
+        this.setQuery(SQL);
+        return this.runQuery();
+    }
+
+    /**
+     * Add or drop unique constraint from fields
+     * @param {object} model
+     * @param {boolean} returnQuery - return query or not
+     * @return {Promise<void> | string}
+     */
+    async handleReferenceModelChanges(model, returnQuery = false) {
+        let SQL = "";
+
+        for (const field of model.fields) {
+            if (field.type !== "reference") continue;
+            if (field?.isRefChanged || field?.isActionChanged) {
+                const modelName = this.getModelNameByIid(field?.oldIid ?? field.reference.iid);
+                const foreignName = SQLBaseManager.getForeignKeyName(field.iid);
+
+                SQL += this.dropForeignKey(model.name, foreignName, returnQuery);
+                SQL += "\n";
+            }
+        }
+
+        const { modelsWithRefs } = this.getConfiguredModels([model]);
+        SQL += this.createForeignKeyQuery(modelsWithRefs);
+
+        if (returnQuery) return SQL;
+        this.setQuery(SQL);
+        return this.runQuery();
     }
 
     /**
@@ -468,31 +439,24 @@ export class SQLBaseManager extends DBManager {
      * @return {Promise<void> | string}
      */
     async handleFullTextSearchIndexes(model, returnQuery = false) {
-        console.log("handleFullTextSearchIndexes");
         let SQL = "";
 
         for (const field of model.fields) {
+            if (!["text", "rich-text"].includes(field.type) || !field.isSearchableChanged) continue;
             let query = "";
+
             if (field?.text?.searchable || field?.richText?.searchable) {
-                query =
-                    (await this.addFullTextIndex(
-                        model.name,
-                        field.name,
-                        returnQuery
-                    )) + "\n";
-            } else if (!this.isCreatingTable) {
-                query =
-                    (await this.dropFullTextIndex(
-                        model.name,
-                        field.name,
-                        returnQuery
-                    )) + "\n";
+                query = (await this.addFullTextIndex(model.name, field.name, returnQuery)) + "\n";
+            } else {
+                query = (await this.dropFullTextIndex(model.name, field.name, returnQuery)) + "\n";
             }
 
             if (returnQuery) SQL += query;
         }
 
         if (returnQuery) return SQL;
+        this.setQuery(SQL);
+        return this.runQuery();
     }
 
     /**
@@ -509,9 +473,7 @@ export class SQLBaseManager extends DBManager {
             const FieldClass = fieldMap.get(field.type);
 
             if (!FieldClass) {
-                throw new AgnostError(
-                    t(`Field type '${field.type}' is not supported`)
-                );
+                throw new AgnostError(t(`Field type '${field.type}' is not supported`));
             }
             model.addField(new FieldClass(field));
         }
@@ -563,12 +525,7 @@ export class SQLBaseManager extends DBManager {
      * @param {boolean} returnQuery - return the query or run it
      * @return {Promise<Object|[]> | string}
      */
-    async renameField(
-        modelName,
-        fieldOldName,
-        fieldNewName,
-        returnQuery = false
-    ) {
+    async renameField(modelName, fieldOldName, fieldNewName, returnQuery = false) {
         const SQL = `ALTER TABLE ${modelName} RENAME COLUMN ${fieldOldName} TO ${fieldNewName};`;
         if (returnQuery) return SQL;
         this.setQuery(SQL);
@@ -576,14 +533,25 @@ export class SQLBaseManager extends DBManager {
     }
 
     /**
+     * @description Set the nullability of the field
+     * @param modelName {string} - The name of the model
+     * @param field {object} - The field to set nullability
+     * @param returnQuery {boolean} - return the query or run it
+     */
+    setNullability(modelName, field, returnQuery = false) {}
+
+    /**
      * Drop the field from the table
      * @param {string} modelName - name of the table
-     * @param {string} fieldName - name of the field
+     * @param {object} field - the field to drop
      * @param {boolean} returnQuery - return the query or run it
      * @return {Promise<Object|[]> | string}
      */
-    async dropField(modelName, fieldName, returnQuery = false) {
-        const SQL = `ALTER TABLE ${modelName} DROP COLUMN ${fieldName};`;
+    async dropField(modelName, field, returnQuery = false) {
+        const schema = "ALTER TABLE `{TABLE_NAME}` DROP COLUMN `{COLUMN_NAME}`;";
+
+        const SQL = schema.replace("{TABLE_NAME}", modelName).replace("{COLUMN_NAME}", field.name);
+
         if (returnQuery) return SQL;
         this.setQuery(SQL);
         return this.runQuery();
@@ -624,14 +592,14 @@ export class SQLBaseManager extends DBManager {
      * @param {string} query
      */
     addQuery(query) {
-        this.sql += query;
+        this.sqlQueries.push(query);
     }
 
     /**
      * Reset the query
      */
     resetQuery() {
-        this.setQuery("");
+        this.sqlQueries = [];
     }
 
     /**
@@ -639,7 +607,7 @@ export class SQLBaseManager extends DBManager {
      * @param {string} query
      */
     setQuery(query) {
-        this.sql = query;
+        this.sqlQueries = [query];
     }
 
     /**
@@ -665,7 +633,7 @@ export class SQLBaseManager extends DBManager {
      * @return {string}
      */
     getQuery() {
-        return this.sql;
+        return this.sqlQueries.join("\n");
     }
 
     /**
@@ -750,14 +718,24 @@ export class SQLBaseManager extends DBManager {
     /**
      * Drop the table
      * @param {object} model - the model object
+     * @param {boolean} returnQuery - return the query or run it
      * @return {Promise<void>}
      */
-    async dropModel(model) {}
+    async dropModel(model, returnQuery = false) {}
+
+    /**
+     * @description Drop the foreign key
+     * @param modelName {string} - the model name
+     * @param foreignKeyName {string} - the foreign key name
+     * @param returnQuery {boolean} - return the query or run it
+     * @return {Promise<void> | string}
+     */
+    dropForeignKey(modelName, foreignKeyName, returnQuery = false) {}
 
     /**
      *
-     * @param {object} baseModel - the model object
-     * @return {*[]}
+     * @param baseModel {object} - the model object
+     * @return {[]}
      */
     getForeignKeyField(baseModel) {
         const models = this.getPrevModels();
@@ -765,11 +743,7 @@ export class SQLBaseManager extends DBManager {
 
         for (let model of models) {
             for (let field of model.fields) {
-                console.log({ field });
-                if (
-                    field.type === "reference" &&
-                    field?.reference?.iid === baseModel.iid
-                ) {
+                if (field.type === "reference" && field?.reference?.iid === baseModel.iid) {
                     field.belongsTo = model.name;
                     foreignKeys.push(field);
                 }
@@ -777,5 +751,14 @@ export class SQLBaseManager extends DBManager {
         }
 
         return foreignKeys;
+    }
+
+    /**
+     * @description Return the foreign key name
+     * @param iid {string} - The field iid
+     * @return {string}
+     */
+    static getForeignKeyName(iid) {
+        return `fk_${iid.replaceAll("-", "_")}`;
     }
 }
