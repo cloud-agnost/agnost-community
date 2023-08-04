@@ -2,7 +2,7 @@ import { ColumnDefWithClassName, Model } from '@/types';
 import { SortButton } from 'components/DataTable';
 import { translate } from '@/utils';
 import { Button } from 'components/Button';
-import { Pencil, Refresh } from 'components/icons';
+import { Pencil } from 'components/icons';
 import { CopyButton } from 'components/CopyButton';
 import { Columns, Trash } from '@phosphor-icons/react';
 import { Checkbox } from 'components/Checkbox';
@@ -11,6 +11,7 @@ import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { DateText } from 'components/DateText';
 import useModelStore from '@/store/database/modelStore.ts';
 import { TableConfirmation } from 'components/Table';
+import { Link } from 'react-router-dom';
 
 const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	{
@@ -40,6 +41,20 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 		),
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
+		cell: ({
+			row: {
+				original: { _id, name },
+			},
+		}) => {
+			return (
+				<Link
+					to={`${_id}/fields`}
+					className='flex items-center gap-2 justify-between hover:underline'
+				>
+					{name}
+				</Link>
+			);
+		},
 	},
 	{
 		id: 'iid',
@@ -164,14 +179,6 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 							<Trash size={20} />
 						</Button>
 					</TableConfirmation>
-					<Button
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-					>
-						<Refresh />
-					</Button>
 				</div>
 			);
 		},
