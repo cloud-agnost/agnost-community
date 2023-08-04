@@ -2,12 +2,13 @@ import { ColumnDefWithClassName, Database } from '@/types';
 import { SortButton } from 'components/DataTable';
 import { translate } from '@/utils';
 import { Button } from 'components/Button';
-import { Pencil, Refresh } from 'components/icons';
+import { Pencil } from 'components/icons';
 import { CopyButton } from 'components/CopyButton';
 import { Badge } from 'components/Badge';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import { DATABASE_ICON_MAP } from '@/constants';
 import { Table, Trash } from '@phosphor-icons/react';
+import { Link } from 'react-router-dom';
 
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
@@ -17,6 +18,20 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		),
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
+		cell: ({
+			row: {
+				original: { _id, name },
+			},
+		}) => {
+			return (
+				<Link
+					to={`${_id}/models`}
+					className='flex items-center gap-2 justify-between hover:underline'
+				>
+					{name}
+				</Link>
+			);
+		},
 	},
 	{
 		id: 'iid',
@@ -128,14 +143,6 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 						iconOnly
 					>
 						<Trash />
-					</Button>
-					<Button
-						iconOnly
-						variant='blank'
-						rounded
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default text-xl'
-					>
-						<Refresh />
 					</Button>
 				</div>
 			);
