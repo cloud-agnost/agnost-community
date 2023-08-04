@@ -33,9 +33,11 @@ const Schema = z.object({
 		}).toString(),
 	}),
 	schema: z.string().optional(),
-	description: z.string({
-		required_error: translate('forms.required', { label: translate('general.description') }),
-	}),
+	description: z
+		.string({
+			required_error: translate('forms.required', { label: translate('general.description') }),
+		})
+		.optional(),
 	timestamps: TIMESTAMPS_SCHEMA,
 });
 
