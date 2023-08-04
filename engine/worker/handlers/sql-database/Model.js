@@ -1,12 +1,12 @@
 /**
  * @description The model class for create a table
  * @class Model
- * @export
  * @classdesc The model class for create a table
  */
 export default class Model {
     /**
      * @description The fields of the model
+     * @type {Field[]}
      */
     fields = [];
 
