@@ -105,6 +105,212 @@ export const appAuthorization = {
 			},
 		},
 	},
+	Developer: {
+		app: {
+			view: true,
+			update: false,
+			delete: false,
+			transfer: false,
+			viewLogs: false,
+			invite: {
+				view: false,
+				create: false,
+				update: false,
+				resend: false,
+				delete: false,
+			},
+			team: {
+				view: true,
+				update: false,
+				delete: false,
+			},
+			version: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+				param: {
+					create: true,
+					update: true,
+					delete: true,
+				},
+				limit: {
+					create: true,
+					update: true,
+					delete: true,
+				},
+				key: {
+					create: true,
+					update: true,
+					delete: true,
+				},
+				package: {
+					create: true,
+					update: true,
+					delete: true,
+				},
+				auth: {
+					update: true,
+				},
+			},
+			db: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
+			model: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
+			resource: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
+			env: {
+				view: true,
+				update: true,
+				deploy: true,
+			},
+			endpoint: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
+			middleware: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
+			queue: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
+			task: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
+			storage: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
+		},
+	},
+	Viewer: {
+		app: {
+			view: true,
+			update: false,
+			delete: false,
+			transfer: false,
+			viewLogs: false,
+			invite: {
+				view: false,
+				create: false,
+				update: false,
+				resend: false,
+				delete: false,
+			},
+			team: {
+				view: true,
+				update: false,
+				delete: false,
+			},
+			version: {
+				view: true,
+				create: false,
+				update: false,
+				delete: false,
+				param: {
+					create: false,
+					update: false,
+					delete: false,
+				},
+				limit: {
+					create: false,
+					update: false,
+					delete: false,
+				},
+				key: {
+					create: false,
+					update: false,
+					delete: false,
+				},
+				package: {
+					create: false,
+					update: false,
+					delete: false,
+				},
+				auth: {
+					update: false,
+				},
+			},
+			db: {
+				view: true,
+				create: false,
+				update: false,
+				delete: false,
+			},
+			model: {
+				view: true,
+				create: false,
+				update: false,
+				delete: false,
+			},
+			resource: {
+				view: true,
+				create: false,
+				update: false,
+				delete: false,
+			},
+			env: {
+				view: true,
+				update: false,
+				deploy: false,
+			},
+			endpoint: {
+				view: true,
+				create: false,
+				update: false,
+				delete: false,
+			},
+			middleware: {
+				view: true,
+				create: false,
+				update: false,
+				delete: false,
+			},
+			queue: {
+				view: true,
+				create: false,
+				update: false,
+				delete: false,
+			},
+			task: {
+				view: true,
+				create: false,
+				update: false,
+				delete: false,
+			},
+			storage: {
+				view: true,
+				create: false,
+				update: false,
+				delete: false,
+			},
+		},
+	},
 };
 
 // Middleare to create the error message for failed request input validations
