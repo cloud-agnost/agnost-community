@@ -269,38 +269,54 @@ export const INVITATIONS_SORT_OPTIONS: SortOption[] = [
 	},
 ];
 
-export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
+export const NEW_TAB_ITEMS: Tab[] = [
 	{
 		title: translate('version.databases'),
 		path: 'database',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.storage'),
 		path: 'storage',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.cache'),
 		path: 'cache',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.endpoints'),
 		path: 'endpoint',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.message_queues'),
 		path: 'queue',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.cron_jobs'),
-		path: 'task',
+		path: 'cron-job',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.middleware.default'),
 		path: 'middleware',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.settings.default'),
 		path: 'settings',
+		isActive: false,
+		isDashboard: false,
 	},
 ];
 

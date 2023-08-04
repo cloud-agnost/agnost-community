@@ -9,7 +9,7 @@ import {
 import { Button } from 'components/Button';
 import { DotsThreeVertical } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Fragment } from 'react';
 import useTabStore from '@/store/version/tabStore.ts';
 
@@ -18,39 +18,51 @@ interface TabOptionsDropdownProps {
 }
 export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropdownProps) {
 	const { t } = useTranslation();
-	const { removeAllTabs, currentTab, tabs, removeTab, removeAllTabsExcept } = useTabStore();
+	const {
+		removeAllTabs,
+		getCurrentTab,
+		getTabsByVersionId,
+		removeTab,
+		getCurrentTabId,
+		removeAllTabsExcept,
+	} = useTabStore();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
+	const { versionId } = useParams() as { versionId: string };
+
+	const currentTab = getCurrentTab(versionId);
+
+	const tabs = getTabsByVersionId(versionId);
+	const currentTabId = getCurrentTabId(versionId);
 
 	const tabOptions = [
 		{
 			title: t('version.close_selected_tab'),
 			action: () => {
-				if (!currentTab) return;
-				const redirectPath = removeTab(currentTab.id);
-				const path = redirectPath ?? getDashboardPath();
+				if (!currentTab || !currentTabId) return;
+				const redirectPath = removeTab(versionId, currentTabId);
 
 				setTimeout(() => {
-					navigate(path);
+					if (redirectPath) navigate(redirectPath);
 				}, 1);
 			},
-			disabled: pathname === getDashboardPath(),
+			disabled: pathname.split('?')[0] === getDashboardPath(),
 		},
 		{
 			title: t('version.close_all_tabs_except_current'),
 			action: () => {
 				if (!currentTab) return;
-				removeAllTabsExcept(currentTab?.id);
+				removeAllTabsExcept(versionId);
 			},
-			disabled: pathname === getDashboardPath(),
+			disabled: tabs.filter((tab) => !tab.isDashboard).length < 2,
 		},
 		{
 			title: t('version.close_all_tabs'),
 			action: () => {
-				removeAllTabs();
+				removeAllTabs(versionId);
 				navigate(getDashboardPath());
 			},
-			disabled: tabs.length === 0,
+			disabled: tabs.length < 2,
 		},
 	];
 
