@@ -1,3 +1,5 @@
+import { QUEUE_ICON_MAP } from '@/constants';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { ColumnDefWithClassName, MessageQueue } from '@/types';
@@ -67,7 +69,28 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 		enableSorting: true,
 		sortingFn: 'alphanumeric',
 	},
-
+	{
+		id: 'instance',
+		header: translate('general.instance').toUpperCase(),
+		cell: ({
+			row: {
+				original: { iid },
+			},
+		}) => {
+			const environment = useEnvironmentStore.getState().environment;
+			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)?.resource
+				.instance;
+			const Icon = QUEUE_ICON_MAP[instance as string];
+			return instance ? (
+				<div className='flex items-center gap-2'>
+					<Icon className='w-5 h-5' />
+					<span className='whitespace-nowrap'>{instance}</span>
+				</div>
+			) : (
+				<span className='whitespace-nowrap'>-</span>
+			);
+		},
+	},
 	{
 		id: 'created_at',
 		header: ({ column }) => (
