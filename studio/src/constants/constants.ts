@@ -494,6 +494,10 @@ export const DATABASE_ICON_MAP: Record<string, ElementType> = {
 	Oracle: Oracle,
 	'SQL Server': Oracle,
 };
+export const QUEUE_ICON_MAP: Record<string, ElementType> = {
+	RabbitMQ: RabbitMq,
+	Kafka: Kafka,
+};
 export const QUEUE_TYPES: Instance[] = [
 	{
 		id: 'RabbitMQ',

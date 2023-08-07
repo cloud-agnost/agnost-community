@@ -11,13 +11,15 @@ import {
 import { Input } from '@/components/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { Switch } from '@/components/Switch';
+import { QUEUE_ICON_MAP } from '@/constants';
 import useResourceStore from '@/store/resources/resourceStore';
 import { CreateMessageQueueSchema } from '@/types';
 import { translate as t } from '@/utils';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
+
 export default function MessageQueueForm() {
 	const form = useFormContext<z.infer<typeof CreateMessageQueueSchema>>();
 	const { getResources, resources } = useResourceStore();
@@ -31,6 +33,10 @@ export default function MessageQueueForm() {
 		});
 	}, []);
 
+	function getQueueIcon(type: string): React.ReactNode {
+		const Icon = QUEUE_ICON_MAP[type];
+		return <Icon className='w-6 h-6' />;
+	}
 	return (
 		<div className='space-y-6'>
 			<FormField
@@ -111,7 +117,7 @@ export default function MessageQueueForm() {
 								<FormControl>
 									<SelectTrigger
 										error={Boolean(form.formState.errors.resourceId)}
-										className='w-1/2'
+										className='w-1/3'
 									>
 										<SelectValue
 											placeholder={`${t('general.select')} ${t('queue.create.resource.title')}`}
@@ -121,7 +127,10 @@ export default function MessageQueueForm() {
 								<SelectContent align='center'>
 									{resources.map((resource) => (
 										<SelectItem key={resource._id} value={resource._id}>
-											<div className='flex items-center gap-2'>{resource.name}</div>
+											<div className='flex items-center gap-2'>
+												{getQueueIcon(resource.instance)}
+												{resource.name}
+											</div>
 										</SelectItem>
 									))}
 								</SelectContent>
