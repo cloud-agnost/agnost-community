@@ -29,5 +29,7 @@ const ERROR_CODES = {
 	setupCompleted: "setup_completed",
 	connectionError: "connection_error",
 	invalidUserDataModel: "invalid_user_data_model",
+	invalidTimeRange: "invalid_time_range",
+	invalidBucketSize: "invalid_bucket_size",
 };
 export default ERROR_CODES;

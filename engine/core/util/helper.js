@@ -176,9 +176,9 @@ function isValidId(id) {
  * Bind console ouptput to send realtime messages to the client during debug mode
  * @param  {string} debugChannel The debug channel unique id for realtime messages
  * @param  {string} id The id of the object generating this log e.g., the id of the endpoint, queue or cron job object
- * @param  {string} objecType The type of the object generating this log can be either "endpoint", "queue", "task"
+ * @param  {string} objectType The type of the object generating this log can be either "endpoint", "queue", "task"
  */
-function turnOnLogging(debugChannel, id, objecType) {
+function turnOnLogging(debugChannel, id, objectType) {
 	// Register the original console methods
 	console.stdlog = console.log.bind(console);
 	console.stderror = console.error.bind(console);
@@ -199,9 +199,10 @@ function turnOnLogging(debugChannel, id, objecType) {
 
 			sendMessage(debugChannel, {
 				timestamp: new Date().toISOString(),
+				action: "log",
 				type: type,
-				objecType,
-				id,
+				object: objectType,
+				id: id,
 				message: args.join(" "),
 			});
 		};

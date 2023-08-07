@@ -507,6 +507,18 @@ export const applyRules = (type) => {
 			];
 		case "view":
 			return [
+				query("start")
+					.trim()
+					.optional()
+					.isISO8601({ strict: true, strictSeparator: true })
+					.withMessage(t("Not a valid ISO 8061 date-time"))
+					.toDate(),
+				query("end")
+					.trim()
+					.optional()
+					.isISO8601({ strict: true, strictSeparator: true })
+					.withMessage(t("Not a valid ISO 8061 date-time"))
+					.toDate(),
 				query("page")
 					.trim()
 					.notEmpty()
@@ -533,6 +545,98 @@ export const applyRules = (type) => {
 							"Page size needs to be an integer, between %s and %s",
 							config.get("general.minPageSize"),
 							config.get("general.maxPageSize")
+						)
+					)
+					.toInt(),
+			];
+		case "view-logs":
+			return [
+				query("type")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(["endpoint", "queue", "task"])
+					.withMessage(t("Log type can be either endpoint, queue or task")),
+				query("start")
+					.trim()
+					.optional()
+					.isISO8601({ strict: true, strictSeparator: true })
+					.withMessage(t("Not a valid ISO 8061 date-time"))
+					.toDate(),
+				query("end")
+					.trim()
+					.optional()
+					.isISO8601({ strict: true, strictSeparator: true })
+					.withMessage(t("Not a valid ISO 8061 date-time"))
+					.toDate(),
+				query("page")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isInt({
+						min: 0,
+					})
+					.withMessage(
+						t("Page number needs to be a positive integer or 0 (zero)")
+					)
+					.toInt(),
+				query("size")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isInt({
+						min: config.get("general.minPageSize"),
+						max: config.get("general.maxPageSize"),
+					})
+					.withMessage(
+						t(
+							"Page size needs to be an integer, between %s and %s",
+							config.get("general.minPageSize"),
+							config.get("general.maxPageSize")
+						)
+					)
+					.toInt(),
+			];
+		case "log-buckets":
+			return [
+				query("type")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(["endpoint", "queue", "task"])
+					.withMessage(t("Log type can be either endpoint, queue or task")),
+				query("start")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isISO8601({ strict: true, strictSeparator: true })
+					.withMessage(t("Not a valid ISO 8061 date-time"))
+					.toDate(),
+				query("end")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isISO8601({ strict: true, strictSeparator: true })
+					.withMessage(t("Not a valid ISO 8061 date-time"))
+					.toDate(),
+				query("buckets")
+					.trim()
+					.optional()
+					.isInt({
+						min: config.get("general.minBucketCount"),
+						max: config.get("general.maxBucketCount"),
+					})
+					.withMessage(
+						t(
+							"Bucket count needs to be an integer, between %s and %s",
+							config.get("general.minBucketCount"),
+							config.get("general.maxBucketCount")
 						)
 					)
 					.toInt(),

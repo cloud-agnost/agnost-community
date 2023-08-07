@@ -732,6 +732,8 @@ router.get(
 	validateOrg,
 	validateResource,
 	authorizeOrgAction("org.resource.view"),
+	applyRules("view-logs"),
+	validate,
 	async (req, res) => {
 		try {
 			const { org, resource } = req;
@@ -763,7 +765,7 @@ router.get(
 
 			if (start && !end) query.createdAt = { $gte: start };
 			else if (!start && end) query.createdAt = { $lte: end };
-			else if (start && end) query.createdAt = { $gte: start, $lt: end };
+			else if (start && end) query.createdAt = { $gte: start, $lte: end };
 
 			let sort = {};
 			if (sortBy && sortDir) {
