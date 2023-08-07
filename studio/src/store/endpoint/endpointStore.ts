@@ -41,6 +41,7 @@ interface EndpointStore {
 	getEndpointsByIid: (endpoint: GetEndpointsByIidParams) => Promise<Endpoint[]>;
 	testEndpoint: (endpoint: TestEndpointParams) => Promise<AxiosResponse>;
 	closeEndpointDeleteDialog: () => void;
+	setEndpointLog: (epId: string, log: string) => void;
 }
 
 const useEndpointStore = create<EndpointStore>()(
@@ -215,6 +216,19 @@ const useEndpointStore = create<EndpointStore>()(
 					set({ toDeleteEndpoint: endpoint, isEndpointDeleteDialogOpen: true }),
 				closeEndpointDeleteDialog: () =>
 					set({ toDeleteEndpoint: null, isEndpointDeleteDialogOpen: false }),
+				setEndpointLog(epId, log) {
+					set((prev) => ({
+						endpointResponse: prev.endpointResponse.map((r) => {
+							if (r.epId === epId) {
+								return {
+									...r,
+									logs: [...(r.logs as string[]), log],
+								};
+							}
+							return r;
+						}),
+					}));
+				},
 			}),
 			{
 				name: 'endpoint-storage',

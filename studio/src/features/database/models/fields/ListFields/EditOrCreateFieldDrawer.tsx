@@ -542,7 +542,6 @@ export default function EditOrCreateFieldDrawer({
 																const Icon = FIELD_ICON_MAP[type];
 																return (
 																	<SelectItem
-																		checkClassName='right-2 left-auto top-1/2 -translate-y-1/2'
 																		className='px-3 py-[6px] w-full max-w-full cursor-pointer'
 																		key={index}
 																		value={type}
@@ -689,7 +688,6 @@ export default function EditOrCreateFieldDrawer({
 																{REFERENCE_FIELD_ACTION.map((action, index) => {
 																	return (
 																		<SelectItem
-																			checkClassName='right-2 left-auto top-1/2 -translate-y-1/2'
 																			className='px-3 py-[6px] w-full max-w-full cursor-pointer'
 																			key={index}
 																			value={action}
@@ -735,7 +733,6 @@ export default function EditOrCreateFieldDrawer({
 																	{models.map((model, index) => {
 																		return (
 																			<SelectItem
-																				checkClassName='right-2 left-auto top-1/2 -translate-y-1/2'
 																				className='px-3 py-[6px] w-full max-w-full cursor-pointer'
 																				key={index}
 																				value={model.iid}

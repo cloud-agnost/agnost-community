@@ -289,7 +289,7 @@ export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 	},
 	{
 		title: translate('version.cron_jobs'),
-		path: 'cron-job',
+		path: 'task',
 	},
 	{
 		title: translate('version.middleware.default'),
@@ -318,6 +318,8 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	BINDING: 'blue',
 	OPTIONAL: 'yellow',
 	REQUIRED: 'blue',
+	ENABLED: 'green',
+	DISABLED: 'red',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
@@ -491,6 +493,10 @@ export const DATABASE_ICON_MAP: Record<string, ElementType> = {
 	PostgreSQL: PostgreSql,
 	Oracle: Oracle,
 	'SQL Server': Oracle,
+};
+export const QUEUE_ICON_MAP: Record<string, ElementType> = {
+	RabbitMQ: RabbitMq,
+	Kafka: Kafka,
 };
 export const QUEUE_TYPES: Instance[] = [
 	{

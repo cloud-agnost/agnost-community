@@ -32,3 +32,5 @@ export {
 } from './resource.ts';
 export type * from './type.ts';
 export type * from './version.ts';
+export type * from './task.ts';
+export { CreateTaskSchema } from './task.ts';

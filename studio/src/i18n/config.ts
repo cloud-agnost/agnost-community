@@ -12,6 +12,7 @@ import {
 	profileSettings,
 	queue,
 	resources as rs,
+	task,
 	version,
 } from './en';
 
@@ -30,6 +31,7 @@ export const resources = {
 			version,
 			resources: rs,
 			endpoint,
+			task,
 		},
 	},
 };

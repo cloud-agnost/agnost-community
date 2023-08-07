@@ -2,6 +2,9 @@ import useApplicationStore from '@/store/app/applicationStore';
 import { Application as ApplicationType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Application extends RealtimeActions<ApplicationType> {
+	info(param: RealtimeActionParams<ApplicationType>): void {
+		throw new Error('Method not implemented.');
+	}
 	delete({ identifiers }: RealtimeActionParams<ApplicationType>) {
 		useApplicationStore.setState?.({
 			applications: useApplicationStore

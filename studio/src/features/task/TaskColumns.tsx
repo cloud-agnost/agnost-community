@@ -1,8 +1,6 @@
-import { QUEUE_ICON_MAP } from '@/constants';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import { ColumnDefWithClassName, MessageQueue } from '@/types';
+import useTaskStore from '@/store/task/taskStore';
+import { ColumnDefWithClassName, Task } from '@/types';
 import { translate } from '@/utils';
 import { Trash } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
@@ -10,9 +8,12 @@ import { Checkbox } from 'components/Checkbox';
 import { CopyButton } from 'components/CopyButton';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
-import { Pencil } from 'components/icons';
+import { Calendar, Pencil } from 'components/icons';
+import { Badge } from '@/components/Badge';
+import { BADGE_COLOR_MAP } from '@/constants';
+import cronstrue from 'cronstrue';
 
-const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
+const TaskColumns: ColumnDefWithClassName<Task>[] = [
 	{
 		id: 'select',
 		className: '!max-w-[40px] !w-[40px]',
@@ -46,7 +47,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 		header: translate('general.id').toUpperCase(),
 		accessorKey: 'iid',
 		sortingFn: 'textCaseSensitive',
-		className: '!max-w-[100px] !w-[100px]',
+		className: '!max-w-[160px] !w-[160px]',
 		cell: ({
 			row: {
 				original: { iid },
@@ -62,32 +63,37 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 	},
 	{
 		id: 'delay',
-		header: ({ column }) => (
-			<SortButton text={translate('queue.delay').toUpperCase()} column={column} />
-		),
-		accessorKey: 'delay',
+		header: translate('task.schedule'),
+		accessorKey: 'cronExpression',
 		enableSorting: true,
-		sortingFn: 'alphanumeric',
+		size: 300,
+		cell: ({ row }) => {
+			const { cronExpression } = row.original;
+			const result = cronstrue.toString(cronExpression);
+			return (
+				<div className='grid grid-cols-[1fr,10fr] items-center gap-2'>
+					<Calendar className='w-4 h-4' />
+					{result}
+				</div>
+			);
+		},
 	},
 	{
-		id: 'instance',
-		header: translate('general.instance').toUpperCase(),
-		cell: ({
-			row: {
-				original: { iid },
-			},
-		}) => {
-			const environment = useEnvironmentStore.getState().environment;
-			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)?.resource
-				.instance;
-			const Icon = QUEUE_ICON_MAP[instance as string];
-			return instance ? (
-				<div className='flex items-center gap-2'>
-					<Icon className='w-5 h-5' />
-					<span className='whitespace-nowrap'>{instance}</span>
-				</div>
-			) : (
-				<span className='whitespace-nowrap'>-</span>
+		id: 'logExecution',
+		header: translate('task.logExec').toUpperCase(),
+		accessorKey: 'logExecution',
+		size: 200,
+		cell: ({ row }) => {
+			const { logExecution } = row.original;
+			const logExecutionText = logExecution
+				? translate('general.enabled')
+				: translate('general.disabled');
+			return (
+				<Badge
+					variant={BADGE_COLOR_MAP[logExecutionText.toUpperCase()]}
+					text={logExecutionText}
+					rounded
+				/>
 			);
 		},
 	},
@@ -142,11 +148,12 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 			return updatedBy && <DateText date={updatedAt} user={user} />;
 		},
 	},
+
 	{
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { openDeleteModal } = useMessageQueueStore.getState();
+			const { openDeleteTaskModal } = useTaskStore.getState();
 			return (
 				<div className='flex items-center justify-end'>
 					<Button
@@ -163,7 +170,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 						rounded
 						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
 						iconOnly
-						onClick={() => openDeleteModal(original)}
+						onClick={() => openDeleteTaskModal(original)}
 					>
 						<Trash size={20} />
 					</Button>
@@ -173,4 +180,4 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 	},
 ];
 
-export default MessageQueueColumns;
+export default TaskColumns;

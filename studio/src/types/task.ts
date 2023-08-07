@@ -1,36 +1,28 @@
-import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX, NUMBER_REGEX } from '@/constants/regex';
+import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants';
 import { translate } from '@/utils';
+import parser from 'cron-parser';
 import * as z from 'zod';
 import { BaseGetRequest, BaseParams, BaseRequest } from '.';
-
-export interface MessageQueue {
+export interface Task {
 	orgId: string;
 	appId: string;
 	versionId: string;
 	iid: string;
 	name: string;
 	logExecution: boolean;
-	delay: number;
+	resourceId: string;
 	type: 'code' | 'flow';
 	logic: string;
+	cronExpression: string;
 	createdBy: string;
 	updatedBy: string;
+	__v: string;
 	_id: string;
 	createdAt: string;
 	updatedAt: string;
-	__v: number;
 }
 
-export type GetMessageQueuesParams = BaseParams & BaseGetRequest;
-export interface GetMessageQueueByIdParams extends BaseParams {
-	queueId: string;
-}
-export type DeleteMessageQueueParams = GetMessageQueueByIdParams & BaseRequest;
-export interface DeleteMultipleQueuesParams extends BaseParams, BaseRequest {
-	queueIds: string[];
-}
-
-export const CreateMessageQueueSchema = z.object({
+export const CreateTaskSchema = z.object({
 	name: z
 		.string({
 			required_error: translate('forms.required', {
@@ -81,47 +73,60 @@ export const CreateMessageQueueSchema = z.object({
 		),
 
 	logExecution: z.boolean().default(false),
-	delay: z
+	type: z.enum(['code', 'flow']).default('code'),
+	cronExpression: z
 		.string({
 			required_error: translate('forms.required', {
-				label: translate('endpoint.create.timeout'),
+				label: translate('task.syntax'),
 			}),
 		})
-		.regex(
-			NUMBER_REGEX,
-			translate('forms.number', {
-				label: translate('endpoint.create.timeout'),
-			}),
-		),
-	resourceId: z.string({
-		required_error: translate('forms.required', {
-			label: translate('queue.create.resource.title'),
+		.nonempty()
+		.superRefine((value, ctx) => {
+			try {
+				parser.parseExpression(value);
+				return true;
+			} catch (e) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: translate('forms.invalid', {
+						label: translate('task.syntax'),
+					}),
+				});
+				return false;
+			}
 		}),
-	}),
 });
 
-export interface CreateMessageQueueParams extends BaseRequest, BaseParams {
+export interface CreateTaskParams extends BaseParams, BaseRequest {
 	name: string;
 	logExecution: boolean;
-	delay: string;
+	type: 'code' | 'flow';
+	cronExpression: string;
 	resourceId: string;
 }
-export interface UpdateQueueParams extends CreateMessageQueueParams {
-	queueId: string;
+export interface UpdateTaskParams extends CreateTaskParams {
+	taskId: string;
 }
-export interface UpdateQueueLogicParams extends BaseRequest, BaseParams {
+export interface DeleteTaskParams extends BaseRequest, BaseParams {
+	taskId: string;
+}
+export interface DeleteMultipleTasksParams extends BaseRequest, BaseParams {
+	taskIds: string[];
+}
+export interface GetTaskParams extends BaseParams {
+	taskId: string;
+}
+export type GetTasksParams = BaseGetRequest & BaseParams;
+
+export interface SaveTaskLogicParams extends BaseParams, BaseRequest {
+	taskId: string;
 	logic: string;
-	queueId: string;
-}
-export interface TestQueueParams extends BaseRequest, BaseParams {
-	queueId: string;
-	debugChannel: string;
-	payload: Record<string, string>;
 }
 
-export interface TestQueueLogs {
-	[key: string]: {
-		payload: Record<string, string>;
-		logs?: string[];
-	};
+export interface TestTaskParams extends BaseParams, BaseRequest {
+	taskId: string;
+	debugChannel: string;
+}
+export interface TestTaskLogs {
+	[key: string]: string[];
 }

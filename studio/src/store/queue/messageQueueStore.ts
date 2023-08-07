@@ -1,17 +1,19 @@
 import QueueService from '@/services/QueueService';
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
 import {
-	MessageQueue,
-	GetMessageQueueByIdParams,
-	GetMessageQueuesParams,
+	APIError,
+	CreateMessageQueueParams,
 	DeleteMessageQueueParams,
 	DeleteMultipleQueuesParams,
-	CreateMessageQueueParams,
-	UpdateQueueParams,
-	APIError,
+	GetMessageQueueByIdParams,
+	GetMessageQueuesParams,
+	MessageQueue,
+	TestQueueLogs,
+	TestQueueParams,
 	UpdateQueueLogicParams,
+	UpdateQueueParams,
 } from '@/types';
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
 
 interface MessageQueueStore {
 	queues: MessageQueue[];
@@ -19,6 +21,7 @@ interface MessageQueueStore {
 	toDeleteQueue: MessageQueue;
 	isDeleteModalOpen: boolean;
 	lastFetchedCount: number;
+	testQueueLogs: TestQueueLogs;
 	getQueues: (params: GetMessageQueuesParams) => Promise<MessageQueue[]>;
 	getQueueById: (params: GetMessageQueueByIdParams) => Promise<MessageQueue>;
 	deleteQueue: (params: DeleteMessageQueueParams) => Promise<void>;
@@ -26,8 +29,10 @@ interface MessageQueueStore {
 	createQueue: (params: CreateMessageQueueParams) => Promise<MessageQueue>;
 	updateQueue: (params: UpdateQueueParams) => Promise<MessageQueue>;
 	updateQueueLogic: (params: UpdateQueueLogicParams) => Promise<MessageQueue>;
+	testQueue: (params: TestQueueParams) => Promise<void>;
 	openDeleteModal: (queue: MessageQueue) => void;
 	closeDeleteModal: () => void;
+	setQueueLogs: (queueId: string, log: string) => void;
 }
 
 const useMessageQueueStore = create<MessageQueueStore>()(
@@ -40,6 +45,7 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 				isDeleteModalOpen: false,
 				lastFetchedCount: 0,
 				createQueueModalOpen: false,
+				testQueueLogs: {} as TestQueueLogs,
 				getQueues: async (params: GetMessageQueuesParams) => {
 					const queues = await QueueService.getQueues(params);
 					if (params.initialFetch) {
@@ -120,11 +126,40 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 						throw error as APIError;
 					}
 				},
+				testQueue: async (params: TestQueueParams) => {
+					try {
+						await QueueService.testQueue(params);
+						set((prev) => ({
+							testQueueLogs: {
+								...prev.testQueueLogs,
+								[params.queueId]: {
+									payload: params.payload,
+									logs: [],
+								},
+							},
+						}));
+						if (params.onSuccess) params.onSuccess();
+					} catch (error) {
+						if (params.onError) params.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
 				openDeleteModal: (queue: MessageQueue) => {
 					set({ toDeleteQueue: queue, isDeleteModalOpen: true });
 				},
 				closeDeleteModal: () => {
 					set({ isDeleteModalOpen: false, toDeleteQueue: {} as MessageQueue });
+				},
+				setQueueLogs: (queueId: string, log: string) => {
+					set((prev) => ({
+						testQueueLogs: {
+							...prev.testQueueLogs,
+							[queueId]: {
+								...prev.testQueueLogs[queueId],
+								logs: [...(prev.testQueueLogs[queueId].logs as string[]), log],
+							},
+						},
+					}));
 				},
 			}),
 			{

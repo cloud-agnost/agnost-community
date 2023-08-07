@@ -10,6 +10,7 @@ import profileSettings from './profileSettings.json';
 import queue from './queue.json';
 import resources from './resources.json';
 import version from './version.json';
+import task from './task.json';
 export {
 	application,
 	database,
@@ -23,4 +24,5 @@ export {
 	queue,
 	resources,
 	version,
+	task,
 };

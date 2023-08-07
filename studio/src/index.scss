@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700;900&family=Rubik:wght@300;400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&family=Space+Mono&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,6 +12,7 @@
 		--font-sans: 'Rubik', sans-serif;
 		--font-albert: 'Albert Sans', sans-serif;
 		--font-sf: 'SF Compact Display', sans-serif;
+		--font-mono: 'Space Mono', monospace;
 
 		/* Color styles */
 		--brand-color-primary--darker: 37, 54, 127;
@@ -299,7 +300,6 @@
 		overflow-y: scroll;
 		height: 90%;
 	}
-
 	@keyframes slideInRight {
 		from {
 			transform: translateX(100%);
@@ -325,10 +325,11 @@
 	.slideInRight {
 		animation: slideInRight 0.5s forwards;
 	}
-	slideOutRight {
+	.slideOutRight {
 		animation: slideOutRight 0.5s forwards;
 	}
 }
+
 .Toastify {
 	z-index: 999999999;
 	pointer-events: auto;
@@ -356,6 +357,28 @@
 .Toastify__close-button > svg {
 	width: 1.25rem;
 	height: 1.25rem;
+}
+@keyframes Toastify__trackProgress {
+	0% {
+		transform: scaleX(1);
+	}
+	100% {
+		transform: scaleX(0);
+	}
+}
+.Toastify__progress-bar {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 5px;
+	z-index: var(--toastify-z-index);
+	opacity: 0.7;
+	transform-origin: left;
+}
+
+.Toastify__progress-bar--animated {
+	animation: Toastify__trackProgress linear 1 forwards;
 }
 
 .select-box {
