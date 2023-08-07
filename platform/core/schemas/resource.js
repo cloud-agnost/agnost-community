@@ -543,6 +543,50 @@ export const applyRules = (type) => {
 					.isIn(appRoles)
 					.withMessage(t("Unsupported app role")),
 			];
+		case "view-logs":
+			return [
+				query("start")
+					.trim()
+					.optional()
+					.isISO8601({ strict: true, strictSeparator: true })
+					.withMessage(t("Not a valid ISO 8061 date-time"))
+					.toDate(),
+				query("end")
+					.trim()
+					.optional()
+					.isISO8601({ strict: true, strictSeparator: true })
+					.withMessage(t("Not a valid ISO 8061 date-time"))
+					.toDate(),
+				query("page")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isInt({
+						min: 0,
+					})
+					.withMessage(
+						t("Page number needs to be a positive integer or 0 (zero)")
+					)
+					.toInt(),
+				query("size")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isInt({
+						min: config.get("general.minPageSize"),
+						max: config.get("general.maxPageSize"),
+					})
+					.withMessage(
+						t(
+							"Page size needs to be an integer, between %s and %s",
+							config.get("general.minPageSize"),
+							config.get("general.maxPageSize")
+						)
+					)
+					.toInt(),
+			];
 		default:
 			return [];
 	}

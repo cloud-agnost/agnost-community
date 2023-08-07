@@ -18,7 +18,6 @@ import { applyRules as applyLogRules } from "../schemas/environmentLog.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
-import resource from "../controllers/resource.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -493,6 +492,8 @@ router.get(
 	validateVersion,
 	validateEnv,
 	authorizeAppAction("app.env.view"),
+	applyRules("view-logs"),
+	validate,
 	async (req, res) => {
 		try {
 			const { org, app, version, env } = req;
@@ -523,7 +524,7 @@ router.get(
 
 			if (start && !end) query.createdAt = { $gte: start };
 			else if (!start && end) query.createdAt = { $lte: end };
-			else if (start && end) query.createdAt = { $gte: start, $lt: end };
+			else if (start && end) query.createdAt = { $gte: start, $lte: end };
 
 			let sort = {};
 			if (sortBy && sortDir) {

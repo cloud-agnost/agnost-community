@@ -1,5 +1,6 @@
 import axios from "axios";
 import express from "express";
+import mongoose from "mongoose";
 import versionCtrl from "../controllers/version.js";
 import envCtrl from "../controllers/environment.js";
 import deployCtrl from "../controllers/deployment.js";
@@ -58,7 +59,7 @@ router.get(
 
 			if (start && !end) query.createdAt = { $gte: start };
 			else if (!start && end) query.createdAt = { $lte: end };
-			else if (start && end) query.createdAt = { $gte: start, $lt: end };
+			else if (start && end) query.createdAt = { $gte: start, $lte: end };
 
 			let sort = {};
 			if (sortBy && sortDir) {
@@ -102,7 +103,7 @@ router.get(
 
 			if (start && !end) query.createdAt = { $gte: start };
 			else if (!start && end) query.createdAt = { $lte: end };
-			else if (start && end) query.createdAt = { $gte: start, $lt: end };
+			else if (start && end) query.createdAt = { $gte: start, $lte: end };
 
 			let sort = {};
 			if (sortBy && sortDir) {
@@ -449,6 +450,226 @@ router.delete(
 			);
 		} catch (err) {
 			await versionCtrl.rollback(session);
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/log-buckets?type=endpoint&start&end
+@method     GET
+@desc       Returns log buckets information
+@access     private
+*/
+router.get(
+	"/:versionId/log-buckets",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.view"),
+	applyRules("log-buckets"),
+	validate,
+	async (req, res) => {
+		try {
+			const { version } = req;
+			const { type, start, end, buckets } = req.query;
+
+			if (start >= end) {
+				return res.status(422).json({
+					error: t("Invalid Time Range"),
+					details: t(
+						"The start timestamp '%s' cannot be equal or later than the end timestamp '%s'.",
+						start.toISOString(),
+						end.toISOString()
+					),
+					code: ERROR_CODES.invalidTimeRange,
+				});
+			}
+
+			if (end - start < config.get("general.minLogBucketDurationMs")) {
+				return res.status(422).json({
+					error: t("Invalid Bucket Size"),
+					details: t(
+						"The duration between end and start timestamps cannot be less than '%s' milliseconds",
+						config.get("general.minLogBucketDurationMs")
+					),
+					code: ERROR_CODES.invalidBucketSize,
+				});
+			}
+
+			// Get the environment of the version
+			const envObj = await envCtrl.getOneByQuery({ versionId: version._id });
+
+			// Calculate the number of buckets
+			const numBuckets = buckets ?? config.get("general.defaultBucketCount");
+			// Calculate the interval duration for each bucket
+			const intervalDuration = (end - start) / numBuckets;
+
+			// Aggregation pipeline stages
+			const pipeline = [
+				{
+					$match: {
+						timestamp: {
+							$gte: start,
+							$lte: end,
+						},
+					},
+				},
+				{
+					$project: {
+						status: 1,
+						bucketIndex: {
+							$floor: {
+								$divide: [
+									{
+										$subtract: ["$timestamp", start],
+									},
+									intervalDuration,
+								],
+							},
+						},
+					},
+				},
+				{
+					$group: {
+						_id: {
+							bucketIndex: "$bucketIndex",
+							status: "$status",
+						},
+						count: { $sum: 1 },
+					},
+				},
+				{
+					$group: {
+						_id: "$_id.bucketIndex",
+						statusCounts: {
+							$push: {
+								status: "$_id.status",
+								count: "$count",
+							},
+						},
+					},
+				},
+				{
+					$sort: {
+						_id: 1,
+					},
+				},
+			];
+
+			const mongoClient = mongoose.connection.client;
+			const db = mongoClient.db(envObj.iid);
+			const collectionName = type === "task" ? "cronjob_logs" : `${type}_logs`;
+
+			// Execute the aggregation pipeline
+			const result = await db
+				.collection(collectionName)
+				.aggregate(pipeline)
+				.toArray();
+
+			let totalHits = 0;
+			// Create the entries for each bucket, since the above query does not return all the bucket data
+			const allBuckets = Array.from({ length: numBuckets }, (element, i) => {
+				const resultBucket = result.find((entry) => entry._id === i + 1);
+				const countInfo = { success: 0, error: 0 };
+				if (resultBucket?.statusCounts) {
+					if (type === "queue" || type === "task") {
+						let errorCount = resultBucket.statusCounts.find(
+							(entry) => entry.status === "error"
+						);
+						if (errorCount) countInfo.error = errorCount.count;
+
+						let successCount = resultBucket.statusCounts.find(
+							(entry) => entry.status === "success"
+						);
+						if (successCount) countInfo.success = successCount.count;
+					} else {
+						let errorEntries = resultBucket.statusCounts.filter(
+							(entry) => entry.status !== 200
+						);
+						if (errorEntries)
+							countInfo.error = errorEntries.reduce(
+								(accumulator, currentValue) => accumulator + currentValue.count,
+								0
+							);
+
+						let successCount = resultBucket.statusCounts.find(
+							(entry) => entry.status === 200
+						);
+						if (successCount) countInfo.success = successCount.count;
+					}
+				}
+
+				totalHits += countInfo.success + countInfo.error;
+				return {
+					bucket: i + 1,
+					start: new Date(start.valueOf() + i * intervalDuration),
+					end:
+						i === numBuckets - 1
+							? end
+							: new Date(start.valueOf() + (i + 1) * intervalDuration),
+					...countInfo,
+				};
+			});
+
+			res.json({ totalHits, buckets: allBuckets });
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/logs?page=0&size=10&name=&sortBy=email&sortDir=asc&start&end
+@method     GET
+@desc       Get version specific logs
+@access     private
+*/
+router.get(
+	"/:versionId/logs",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.view"),
+	applyRules("view-logs"),
+	validate,
+	async (req, res) => {
+		try {
+			const { version } = req;
+			const { page, size, type, sortBy, sortDir, start, end } = req.query;
+			const query = {};
+
+			if (start && !end) query.timestamp = { $gte: start };
+			else if (!start && end) query.timestamp = { $lte: end };
+			else if (start && end) query.timestamp = { $gte: start, $lte: end };
+
+			let sort = {};
+			if (sortBy && sortDir) {
+				sort[sortBy] = sortDir === "asc" ? 1 : -1;
+			} else sort = { timestamp: -1 };
+
+			// Get the environment of the version
+			const envObj = await envCtrl.getOneByQuery({ versionId: version._id });
+
+			const mongoClient = mongoose.connection.client;
+			const db = mongoClient.db(envObj.iid);
+			const collectionName = type === "task" ? "cronjob_logs" : `${type}_logs`;
+
+			console.log("***here", collectionName, query);
+			// Execute the aggregation pipeline
+			const logs = await db
+				.collection(collectionName)
+				.find(query, {
+					sort,
+					skip: size * page,
+					limit: size,
+				})
+				.toArray();
+
+			res.json(logs);
+		} catch (err) {
 			handleError(req, res, err);
 		}
 	}

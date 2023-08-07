@@ -67,6 +67,18 @@ export const applyRules = (type) => {
 	switch (type) {
 		case "view":
 			return [
+				query("start")
+					.trim()
+					.optional()
+					.isISO8601({ strict: true, strictSeparator: true })
+					.withMessage(t("Not a valid ISO 8061 date-time"))
+					.toDate(),
+				query("end")
+					.trim()
+					.optional()
+					.isISO8601({ strict: true, strictSeparator: true })
+					.withMessage(t("Not a valid ISO 8061 date-time"))
+					.toDate(),
 				query("page")
 					.trim()
 					.notEmpty()

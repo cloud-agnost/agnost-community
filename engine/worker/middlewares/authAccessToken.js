@@ -1,4 +1,3 @@
-import { getKey } from "../init/cache.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 export const authAccessToken = async (req, res, next) => {
@@ -14,28 +13,13 @@ export const authAccessToken = async (req, res, next) => {
 		});
 	}
 
-	// Check if token is valid or not for development environments
-	if (
-		process.env.NODE_ENV === "development" &&
-		token !== process.env.ACCESS_TOKEN
-	) {
+	// Check if token is valid or not
+	if (token !== process.env.ACCESS_TOKEN) {
 		return res.status(401).json({
 			error: t("Unauthorized"),
 			details: t("The access token was not authorized or has expired."),
-			code: ERROR_CODES.invalidCredentials,
+			code: ERROR_CODES.invalidAccessToken,
 		});
-	}
-
-	// Check if token is valid or not for production environments
-	if (["production", "clouddev"].includes(process.env.NODE_ENV)) {
-		let storedToken = await getKey(token);
-		if (!storedToken) {
-			return res.status(401).json({
-				error: t("Unauthorized"),
-				details: t("The access token was not authorized or has expired."),
-				code: ERROR_CODES.invalidCredentials,
-			});
-		}
 	}
 
 	next();

@@ -92,10 +92,10 @@ spec:
                    valueFrom:
                       secretKeyRef:
                          name: minio-credentials
-                         key: userName
+                         key: rootUser
                  - name: MINIO_SECRET_KEY
                    valueFrom:
                       secretKeyRef:
                          name: minio-credentials
-                         key: userPassword
+                         key: rootPassword
 

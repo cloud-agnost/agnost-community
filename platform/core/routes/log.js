@@ -1,7 +1,6 @@
 import express from "express";
 import auditCtrl from "../controllers/audit.js";
 import { authSession } from "../middlewares/authSession.js";
-import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateApp } from "../middlewares/validateApp.js";
 import { validateVersion } from "../middlewares/validateVersion.js";
@@ -15,7 +14,7 @@ const router = express.Router({ mergeParams: true });
 /*
 @route      /v1/log/org/:orgId/app/:appId/version/:versionId?page=0&size=50&action=&actor=&sortBy=createdAt&sortDir=desc&start&end
 @method     GET
-@desc       Get version logs
+@desc       Get version audit trails
 @access     private
 */
 router.get(
@@ -53,7 +52,7 @@ router.get(
 
 			if (start && !end) query.createdAt = { $gte: start };
 			else if (!start && end) query.createdAt = { $lte: end };
-			else if (start && end) query.createdAt = { $gte: start, $lt: end };
+			else if (start && end) query.createdAt = { $gte: start, $lte: end };
 
 			let sort = {};
 			if (sortBy && sortDir) {

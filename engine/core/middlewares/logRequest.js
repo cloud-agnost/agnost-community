@@ -28,7 +28,7 @@ export const logRequest = (endpoint) => (req, res, time) => {
 		method: endpoint.method,
 		path: endpoint.path,
 		status: res.statusCode,
-		duration: time,
+		duration: Math.round(time * 10) / 10,
 		orgId: endpoint.orgId,
 		appId: endpoint.appId,
 		versionId: endpoint.versionId,
