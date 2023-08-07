@@ -33,7 +33,7 @@ export default function CodeEditor({
 		monaco.editor.addCommand({
 			id: 'save',
 			run:
-				onSave ||
+				onSave ??
 				(() => {
 					return;
 				}),
