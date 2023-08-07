@@ -1,6 +1,7 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
+import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { CreateMessageQueueSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -8,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MessageQueueForm from './MessageQueueForm';
-import useMessageQueueStore from '@/store/queue/messageQueueStore';
 interface CreateQueueProps {
 	open: boolean;
 	onClose: () => void;
@@ -28,11 +28,10 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 		resolver: zodResolver(CreateMessageQueueSchema),
 		defaultValues: {
 			name: queue?.name,
-			delay: queue?.delay.toString(),
+			delay: queue?.delay?.toString(),
 			logExecution: queue?.logExecution,
 		},
 	});
-
 	function onSubmit(data: z.infer<typeof CreateMessageQueueSchema>) {
 		updateQueue({
 			orgId: orgId as string,
