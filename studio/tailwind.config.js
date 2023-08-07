@@ -220,6 +220,7 @@ module.exports = {
 				sans: ['var(--font-sans)', ...fontFamily.sans],
 				albert: ['var(--font-albert)'],
 				sfCompact: ['var(--font-sf)', ...fontFamily.sans],
+				mono: ['var(--font-mono)', ...fontFamily.mono],
 			},
 			fontSize: {
 				xs: ['var(--font-size-xs)', 'var(--font-size-xs-line-height)'],

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700;900&family=Rubik:wght@300;400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&family=Space+Mono&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,6 +12,7 @@
 		--font-sans: 'Rubik', sans-serif;
 		--font-albert: 'Albert Sans', sans-serif;
 		--font-sf: 'SF Compact Display', sans-serif;
+		--font-mono: 'Space Mono', monospace;
 
 		/* Color styles */
 		--brand-color-primary--darker: 37, 54, 127;
