@@ -9,7 +9,8 @@ import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import useTaskStore from '@/store/task/taskStore';
 import TaskForm from './TaskForm';
-
+import useResourceStore from '@/store/resources/resourceStore';
+import { useEffect } from 'react';
 interface CreateTaskProps {
 	open: boolean;
 	onClose: () => void;
@@ -19,6 +20,8 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 	const { t } = useTranslation();
 	const { createTask } = useTaskStore();
 	const { notify } = useToast();
+	const { resources } = useResourceStore();
+
 	const form = useForm<z.infer<typeof CreateTaskSchema>>({
 		resolver: zodResolver(CreateTaskSchema),
 	});
@@ -27,19 +30,26 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 		appId: string;
 		orgId: string;
 	}>();
+	const { getResources } = useResourceStore();
 
+	useEffect(() => {
+		getResources({
+			appId: appId as string,
+			type: 'scheduler',
+		});
+	}, []);
 	function onSubmit(data: z.infer<typeof CreateTaskSchema>) {
 		createTask({
 			...data,
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
+			resourceId: resources[0]._id,
 			onSuccess: () => {
 				form.reset({
 					name: '',
 					cronExpression: '',
 					logExecution: false,
-					resourceId: '',
 				});
 				onClose();
 			},
@@ -48,7 +58,6 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 					name: '',
 					cronExpression: '',
 					logExecution: false,
-					resourceId: '',
 				});
 				notify({ type: 'error', description: details, title: error });
 			},
@@ -63,7 +72,6 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 					name: '',
 					cronExpression: '',
 					logExecution: false,
-					resourceId: '',
 				});
 				onClose();
 			}}

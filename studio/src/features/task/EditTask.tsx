@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import TaskForm from './TaskForm';
+import useResourceStore from '@/store/resources/resourceStore';
 
 interface EditTaskProps {
 	open: boolean;
@@ -19,7 +20,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 	const { t } = useTranslation();
 	const { updateTask, task } = useTaskStore();
 	const { notify } = useToast();
-
+	const { resources } = useResourceStore();
 	const { versionId, appId, orgId, taskId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -33,7 +34,6 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 			name: task.name,
 			cronExpression: task.cronExpression,
 			logExecution: task.logExecution,
-			resourceId: task.resourceId,
 		},
 	});
 
@@ -43,6 +43,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 			appId: appId as string,
 			versionId: versionId as string,
 			taskId: taskId as string,
+			resourceId: resources[0]._id,
 			...data,
 			onSuccess: () => {
 				onClose();
