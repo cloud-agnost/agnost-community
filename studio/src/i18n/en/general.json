@@ -86,5 +86,6 @@
 	"account_settings": "Account Settings",
 	"logout": "Log Out",
 	"enabled": "Enabled",
-	"disabled": "Disabled"
+	"disabled": "Disabled",
+	"instance": "Instance"
 }

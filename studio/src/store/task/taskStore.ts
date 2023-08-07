@@ -8,6 +8,7 @@ import {
 	GetTasksParams,
 	SaveTaskLogicParams,
 	Task,
+	TestTaskLogs,
 	TestTaskParams,
 	UpdateTaskParams,
 } from '@/types';
@@ -19,6 +20,7 @@ export interface TaskStore {
 	toDeleteTask: Task;
 	isDeleteTaskModalOpen: boolean;
 	lastFetchedCount: number;
+	taskLogs: TestTaskLogs;
 	getTask: (params: GetTaskParams) => Promise<Task>;
 	getTasks: (params: GetTasksParams) => Promise<Task[]>;
 	createTask: (params: CreateTaskParams) => Promise<Task>;
@@ -26,9 +28,10 @@ export interface TaskStore {
 	deleteTask: (params: DeleteTaskParams) => Promise<Task>;
 	deleteMultipleTasks: (params: DeleteMultipleTasksParams) => Promise<Task[]>;
 	saveTaskLogic: (params: SaveTaskLogicParams) => Promise<Task>;
-	testTask: (params: TestTaskParams) => Promise<Task>;
+	testTask: (params: TestTaskParams) => Promise<void>;
 	openDeleteTaskModal: (task: Task) => void;
 	closeDeleteTaskModal: () => void;
+	setTaskLog: (taskId: string, log: string) => void;
 }
 
 const useTaskStore = create<TaskStore>()(
@@ -40,6 +43,7 @@ const useTaskStore = create<TaskStore>()(
 				toDeleteTask: {} as Task,
 				isDeleteTaskModalOpen: false,
 				lastFetchedCount: 0,
+				taskLogs: {} as TestTaskLogs,
 				getTask: async (params: GetTaskParams) => {
 					const task = await TaskService.getTask(params);
 					set({ task });
@@ -117,10 +121,14 @@ const useTaskStore = create<TaskStore>()(
 				},
 				testTask: async (params) => {
 					try {
-						const task = await TaskService.testTask(params);
+						await TaskService.testTask(params);
 						if (params.onSuccess) params.onSuccess();
-						set({ task });
-						return task;
+						set((prev) => ({
+							taskLogs: {
+								...prev.taskLogs,
+								[params.taskId]: [],
+							},
+						}));
 					} catch (error) {
 						if (params.onError) params.onError(error as APIError);
 						throw error as APIError;
@@ -132,13 +140,24 @@ const useTaskStore = create<TaskStore>()(
 				closeDeleteTaskModal: () => {
 					set({ toDeleteTask: {} as Task, isDeleteTaskModalOpen: false });
 				},
+				setTaskLog: (taskId: string, log: string) => {
+					set((prev) => {
+						console.log(prev.taskLogs[taskId]);
+						return {
+							taskLogs: {
+								...prev.taskLogs,
+								[taskId]: [...(prev.taskLogs[taskId] as string[]), log],
+							},
+						};
+					});
+				},
 			}),
 			{
-				name: 'endpoint-storage',
+				name: 'task-storage',
 			},
 		),
 		{
-			name: 'endpoint',
+			name: 'task',
 		},
 	),
 );

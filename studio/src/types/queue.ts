@@ -118,3 +118,10 @@ export interface TestQueueParams extends BaseRequest, BaseParams {
 	debugChannel: string;
 	payload: Record<string, string>;
 }
+
+export interface TestQueueLogs {
+	[key: string]: {
+		payload: Record<string, string>;
+		logs?: string[];
+	};
+}

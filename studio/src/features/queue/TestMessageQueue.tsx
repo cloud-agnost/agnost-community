@@ -8,6 +8,7 @@ import { generateId, joinChannel, leaveChannel } from '@/utils';
 import { useToast } from '@/hooks';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { CodeEditor } from '@/components/CodeEditor';
+import { Logs } from '@/components/Logs';
 
 interface TestMessageQueueProps {
 	open: boolean;
@@ -15,9 +16,9 @@ interface TestMessageQueueProps {
 }
 export default function TestMessageQueue({ open, onClose }: TestMessageQueueProps) {
 	const { t } = useTranslation();
-	const { queue, testQueue } = useMessageQueueStore();
+	const { queue, testQueue, testQueueLogs } = useMessageQueueStore();
 	const [loading, setLoading] = useState(false);
-	const [payload, setPayload] = useState({});
+	const [payload, setPayload] = useState(testQueueLogs[queue?._id]?.payload ?? {});
 	const { notify } = useToast();
 	const { versionId, appId, orgId, queueId } = useParams<{
 		versionId: string;
@@ -37,7 +38,6 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 			debugChannel,
 			payload,
 			onSuccess: () => {
-				leaveChannel(debugChannel);
 				setLoading(false);
 			},
 			onError: ({ error, details }) => {
@@ -46,10 +46,12 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 					description: details,
 					type: 'error',
 				});
-				leaveChannel(debugChannel);
 				setLoading(false);
 			},
 		});
+		setTimeout(() => {
+			leaveChannel(debugChannel);
+		}, 1000);
 	}
 	return (
 		<Drawer
@@ -79,15 +81,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 					/>
 					<Separator className='my-6' />
 					<p className='text-sm text-default font-sfCompact mb-4'>{t('task.console')}</p>
-					<div className='whitespace-pre text-default leading-6 text-sm font-mono bg-wrapper-background-light p-4'>
-						<>{`2023-03-01T09:28:45 Started deployment process
-2023-03-01T09:28:45 Started processing HR portal database (2ms)
-2023-03-01T09:28:45 Completed processing database (2ms)
-2023-03-01T09:28:45 Started processing Accounting database (2ms)
-2023-03-01T09:28:45 Completed processing Accounting database (2ms)
-2023-03-01T09:28:45 Created default collections (2ms)
-2023-03-01T09:28:45 Deployed endpoints (2ms)`}</>
-					</div>
+					<Logs logs={testQueueLogs[queue?._id]?.logs as string[]} />
 				</div>
 			</DrawerContent>
 		</Drawer>

@@ -212,4 +212,5 @@ export interface EndpointResponse extends AxiosResponse {
 	epId: string;
 	duration: number;
 	response?: AxiosError['response'];
+	logs?: string[];
 }

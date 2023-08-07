@@ -95,11 +95,6 @@ export const CreateTaskSchema = z.object({
 				return false;
 			}
 		}),
-	resourceId: z.string({
-		required_error: translate('forms.required', {
-			label: translate('task.resource'),
-		}),
-	}),
 });
 
 export interface CreateTaskParams extends BaseParams, BaseRequest {
@@ -131,4 +126,7 @@ export interface SaveTaskLogicParams extends BaseParams, BaseRequest {
 export interface TestTaskParams extends BaseParams, BaseRequest {
 	taskId: string;
 	debugChannel: string;
+}
+export interface TestTaskLogs {
+	[key: string]: string[];
 }

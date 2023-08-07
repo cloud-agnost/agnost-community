@@ -1,13 +1,12 @@
+import { Separator } from '@/components/Separator';
+import { TestTask } from '@/features/task';
 import { useToast } from '@/hooks';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useTaskStore from '@/store/task/taskStore';
+import cronstrue from 'cronstrue';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useOutletContext, useParams } from 'react-router-dom';
-import { Separator } from '@/components/Separator';
-import cronstrue from 'cronstrue';
-import { TestTask } from '@/features/task';
-
 EditTask.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { taskId, orgId, versionId, appId } = params;
 	if (!taskId) return null;
