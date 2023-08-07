@@ -110,7 +110,13 @@ const router = createBrowserRouter([
 											},
 											{
 												path: 'storage',
-												lazy: () => lazyRouteImport(PATHS.version.storage),
+												lazy: () => lazyRouteImport(paths.version.storage),
+												children: [
+													{
+														index: true,
+														lazy: () => lazyRouteImport(paths.storage.storage),
+													},
+												],
 											},
 											{
 												path: 'middleware',

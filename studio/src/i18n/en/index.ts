@@ -11,7 +11,9 @@ import queue from './queue.json';
 import resources from './resources.json';
 import version from './version.json';
 import task from './task.json';
+import storage from './storage.json';
 export {
+	storage,
 	application,
 	database,
 	endpoint,

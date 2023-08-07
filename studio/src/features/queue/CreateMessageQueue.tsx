@@ -65,7 +65,7 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 		>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
-					<DrawerTitle>{t('endpoint.create.title')}</DrawerTitle>
+					<DrawerTitle>{t('queue.create.title')}</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
