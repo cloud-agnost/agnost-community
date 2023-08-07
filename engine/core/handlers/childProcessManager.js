@@ -230,7 +230,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			// Add file handler middleware
 			handlers.push(handleFileUploads);
 			// Add debug channel handlers
-			handlers.push(turnOnLogging);
+			handlers.push(turnOnLogging(endpoint));
 			// When headers are sent, automatically turn off logging
 			handlers.push(turnOffLogging);
 			handlers.push(clearTemporaryFileStorage);

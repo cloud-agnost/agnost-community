@@ -117,7 +117,8 @@ export class Agenda extends SchedulerBase {
 					const { trackingId, debugChannel } = messageObj;
 
 					// If we have a debug channel then turn on debug logging
-					if (debugChannel) helper.turnOnLogging(debugChannel);
+					if (debugChannel)
+						helper.turnOnLogging(debugChannel, taskObj._id, "task");
 
 					// Mark the message as being processed
 					await this.startProcessingTask(trackingId, new Date(start));
