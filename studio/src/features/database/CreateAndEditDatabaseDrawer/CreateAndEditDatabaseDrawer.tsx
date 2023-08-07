@@ -212,7 +212,6 @@ export default function CreateAndEditDatabaseDrawer({
 																const Icon = DATABASE_ICON_MAP[resource.instance];
 																return (
 																	<SelectItem
-																		checkClassName='right-2 left-auto top-1/2 -translate-y-1/2'
 																		className='px-3 py-[6px] w-full max-w-full cursor-pointer'
 																		key={resource._id}
 																		value={resource._id}
