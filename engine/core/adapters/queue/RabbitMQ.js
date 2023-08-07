@@ -187,7 +187,8 @@ export class RabbitMQ extends QueueBase {
 					const { trackingId, payload, debugChannel } = messageObj;
 
 					// If we have a debug channel then turn on debug logging
-					if (debugChannel) helper.turnOnLogging(debugChannel);
+					if (debugChannel)
+						helper.turnOnLogging(debugChannel, queueObj._id, "queue");
 
 					// Mark the message as being processed
 					await this.startProcessingMessage(trackingId, new Date(start));

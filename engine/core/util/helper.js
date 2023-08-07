@@ -175,8 +175,10 @@ function isValidId(id) {
 /**
  * Bind console ouptput to send realtime messages to the client during debug mode
  * @param  {string} debugChannel The debug channel unique id for realtime messages
+ * @param  {string} id The id of the object generating this log e.g., the id of the endpoint, queue or cron job object
+ * @param  {string} objecType The type of the object generating this log can be either "endpoint", "queue", "task"
  */
-function turnOnLogging(debugChannel) {
+function turnOnLogging(debugChannel, id, objecType) {
 	// Register the original console methods
 	console.stdlog = console.log.bind(console);
 	console.stderror = console.error.bind(console);
@@ -184,7 +186,7 @@ function turnOnLogging(debugChannel) {
 	console.stddebug = console.debug.bind(console);
 	console.stdwarn = console.warn.bind(console);
 
-	const debugLogger = (type, debugChannel) => {
+	const debugLogger = (type, debugChannel, id, objecType) => {
 		return function () {
 			var args = [];
 			Array.from(arguments).forEach((arg) => {
@@ -198,17 +200,19 @@ function turnOnLogging(debugChannel) {
 			sendMessage(debugChannel, {
 				timestamp: new Date().toISOString(),
 				type: type,
+				objecType,
+				id,
 				message: args.join(" "),
 			});
 		};
 	};
 
 	// Override the console output methods
-	console.log = debugLogger("log", debugChannel);
-	console.info = debugLogger("info", debugChannel);
-	console.debug = debugLogger("debug", debugChannel);
-	console.error = debugLogger("error", debugChannel);
-	console.warn = debugLogger("warn", debugChannel);
+	console.log = debugLogger("log", debugChannel, id, objecType);
+	console.info = debugLogger("info", debugChannel, id, objecType);
+	console.debug = debugLogger("debug", debugChannel, id, objecType);
+	console.error = debugLogger("error", debugChannel, id, objecType);
+	console.warn = debugLogger("warn", debugChannel, id, objecType);
 }
 
 /**

@@ -1,10 +1,11 @@
 import onHeaders from "on-headers";
 
 // This middleware is called after the response headers are set
-export const turnOnLogging = (req, res, next) => {
+export const turnOnLogging = (endpoint) => (req, res, next) => {
 	const debugChannel = req.header("Agnost-Session");
 	// If we have a debug channel then turn on debug logging
-	if (debugChannel) helper.turnOnLogging(debugChannel);
+	if (debugChannel)
+		helper.turnOnLogging(debugChannel, endpoint._id, "endpoint");
 	next();
 };
 

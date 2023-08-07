@@ -43,6 +43,7 @@ const ERROR_CODES = {
 	invalidFilePath: "invalid_file_path",
 	invalidBucketName: "invalid_bucket_name",
 	notPublic: "not_public",
+	invalidAccessToken: "invalid_access_token",
 };
 
 export default ERROR_CODES;

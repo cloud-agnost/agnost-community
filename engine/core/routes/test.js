@@ -15,9 +15,9 @@ const router = express.Router({ mergeParams: true });
 */
 router.post(
 	"/queue",
+	responseTime(logRequestToConsole),
 	checkContentType,
 	authAccessToken,
-	responseTime(logRequestToConsole),
 	async (req, res) => {
 		const { queueiid, delay, payload, debugChannel } = req.body;
 		const queue = await META.getQueue(queueiid);
@@ -39,11 +39,10 @@ router.post(
 */
 router.post(
 	"/task",
+	responseTime(logRequestToConsole),
 	checkContentType,
 	authAccessToken,
-	responseTime(logRequestToConsole),
 	async (req, res) => {
-		console.log("***here task test");
 		const { taskiid, debugChannel } = req.body;
 		const task = await META.getTask(taskiid);
 		if (task) {
