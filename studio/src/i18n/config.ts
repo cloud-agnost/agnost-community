@@ -13,6 +13,7 @@ import {
 	queue,
 	resources as rs,
 	task,
+	storage,
 	version,
 } from './en';
 
@@ -32,6 +33,7 @@ export const resources = {
 			resources: rs,
 			endpoint,
 			task,
+			storage,
 		},
 	},
 };

@@ -48,7 +48,7 @@ export default function EditMessageQueue() {
 				setLoading(false);
 				notify({
 					title: t('general.success'),
-					description: t('endpoint.editLogicSuccess'),
+					description: t('queue.editLogicSuccess'),
 					type: 'success',
 				});
 			},

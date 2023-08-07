@@ -1,45 +1,49 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
-import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import { CreateMessageQueueSchema } from '@/types';
+import StorageForm from './StorageForm';
+import { StorageSchema } from '@/types';
+import { useTranslation } from 'react-i18next';
+import useStorageStore from '@/store/storage/storageStore';
+import { useParams } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 import * as z from 'zod';
-import MessageQueueForm from './MessageQueueForm';
-interface CreateQueueProps {
+
+interface CreateStorageProps {
 	open: boolean;
 	onClose: () => void;
 }
 
-export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
+export default function EditStorage({ open, onClose }: CreateStorageProps) {
 	const { t } = useTranslation();
-	const { updateQueue, queue } = useMessageQueueStore();
-	const { versionId, appId, orgId, queueId } = useParams<{
+	const { updateStorage, storage } = useStorageStore();
+	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
 		orgId: string;
-		queueId: string;
 	}>();
 	const { notify } = useToast();
-	const form = useForm<z.infer<typeof CreateMessageQueueSchema>>({
-		resolver: zodResolver(CreateMessageQueueSchema),
+	const form = useForm<z.infer<typeof StorageSchema>>({
+		resolver: zodResolver(StorageSchema),
 		defaultValues: {
-			name: queue?.name,
-			delay: queue?.delay?.toString(),
-			logExecution: queue?.logExecution,
+			name: storage.name,
+			// resourceId: storage.resourceId,
 		},
 	});
-	function onSubmit(data: z.infer<typeof CreateMessageQueueSchema>) {
-		updateQueue({
+
+	function onSubmit(data: z.infer<typeof StorageSchema>) {
+		updateStorage({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			queueId: queueId as string,
+			storageId: storage._id,
 			...data,
 			onSuccess: () => {
+				form.reset({
+					name: '',
+					resourceId: '',
+				});
 				onClose();
 			},
 			onError: ({ error, details }) => {
@@ -51,20 +55,24 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 		<Drawer
 			open={open}
 			onOpenChange={() => {
+				form.reset({
+					name: '',
+					resourceId: '',
+				});
 				onClose();
 			}}
 		>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>
-						{t('queue.edit', {
-							name: queue?.name,
+						{t('storage.edit', {
+							name: storage.name,
 						})}
 					</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<MessageQueueForm />
+						<StorageForm />
 					</form>
 				</Form>
 			</DrawerContent>

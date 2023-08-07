@@ -511,6 +511,13 @@ export const QUEUE_TYPES: Instance[] = [
 	},
 ];
 
+export const STORAGE_ICON_MAP: Record<string, ElementType> = {
+	'AWS S3': Awss3,
+	'Azure Blob Storage': AzureBlobStorage,
+	'GCP Cloud Storage': GcpStorage,
+	MinIO: Storage,
+};
+
 export const CREATE_RESOURCES_ELEMENTS = [
 	{
 		step: 1,

@@ -10,7 +10,7 @@
 		"confirmCode": "Confirm resource delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
 	},
 	"create": {
-		"title": "Create Queue",
+		"title": "Create Message Queue",
 		"delay": "Message Delay Duration",
 		"delay_description": "Keep the message in the queue for the duration of specified delay seconds",
 		"logExec": "Log Execution",
@@ -25,6 +25,7 @@
 		"title": "Test Message Queue",
 		"submit": "Submit Message",
 		"payload": "Message Payload",
-		"console": "Console Logs"
+		"console": "Console Logs",
+		"editLogicSuccess": "MEssage Queue logic updated successfully"
 	}
 }
