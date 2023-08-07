@@ -80,7 +80,7 @@ const router = createBrowserRouter([
 													},
 													{
 														path: ':dbId/models',
-														lazy: () => lazyRouteImport(paths.version.modelsOutlet),
+														lazy: () => lazyRouteImport(PATHS.version.modelsOutlet),
 														children: [
 															{
 																index: true,
@@ -110,11 +110,11 @@ const router = createBrowserRouter([
 											},
 											{
 												path: 'storage',
-												lazy: () => lazyRouteImport(paths.version.storage),
+												lazy: () => lazyRouteImport(PATHS.version.storage),
 												children: [
 													{
 														index: true,
-														lazy: () => lazyRouteImport(paths.storage.storage),
+														lazy: () => lazyRouteImport(PATHS.storage),
 													},
 												],
 											},

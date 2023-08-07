@@ -6,6 +6,7 @@ const profilePath = `${path}/profile`;
 const onboardingPath = `${path}/onboarding`;
 const endpointPath = `${path}/endpoint`;
 const queuePath = `${path}/queue`;
+const storagePath = `${path}/storage`;
 
 export const PATHS = {
 	home: `${path}/home/Home.tsx`,
@@ -64,6 +65,7 @@ export const PATHS = {
 		task: `${path}/task/Task.tsx`,
 		editTask: `${path}/task/EditTask.tsx`,
 	},
+	storage: `${storagePath}/Storage.tsx`,
 	profileSettings: {
 		profileSettings: `${profilePath}/ProfileSettings.tsx`,
 		account: `${profilePath}/ProfileSettingsGeneral.tsx`,
