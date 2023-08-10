@@ -9,7 +9,7 @@ export class MySQLDBManager extends SQLBaseManager {
         "SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = '{DATABASE_NAME}' AND CONSTRAINT_NAME = '{CONSTRAINT_NAME}' AND CONSTRAINT_TYPE = 'FOREIGN KEY'";
     static foreignKeyConditionSchema = `IF EXISTS(${MySQLDBManager.checkForeignKeySchema}) THEN {FOREIGN_KEY_DROP_SQL} END IF;`;
     static checkConstraintSchema =
-        "SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_NAME = '{TABLE_NAME}' && CONSTRAINT_NAME = '{CONSTRAINT_NAME}'";
+        "SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE CONSTRAINT_NAME = '{CONSTRAINT_NAME}'";
     static checkIndexConditionSchema =
         "NOT EXISTS(SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE table_name = '{TABLE_NAME}' AND index_name = '{INDEX_NAME}')";
     static checkFieldConditionSchema =
@@ -48,33 +48,40 @@ END;
 `;
     }
 
-    async runQuery() {
-        const hasQuery = this.getQuery().trim().length > 0;
-        if (!hasQuery) return;
+    async runQuery(query) {
+        let resetQuery = true;
+        let SQL = this.getQuery();
+
+        if (query) {
+            resetQuery = false;
+            SQL = query;
+        }
+
+        const hasSQL = SQL.trim().length > 0;
+        if (!hasSQL) return;
+
+        if (this.getDatabaseName()) {
+            SQL = `USE ${this.getDatabaseName()};\n` + SQL;
+        }
 
         /**
          * @type {import("mysql2/promise").Connection}
          */
         const conn = await this.getConn();
 
-        if (this.getDatabaseName()) {
-            this.setQuery(`USE ${this.getDatabaseName()};\n` + this.getQuery());
-        }
-
-        if (hasQuery) {
+        // TODO - Remove this
+        if (hasSQL) {
             console.log("-------------- QUERY START --------------");
-            console.log(this.getQuery());
+            console.log(SQL.trim());
             console.log("-------------- QUERY END --------------");
         }
 
-        if (typeof this.getQuery() !== "string") {
-            console.log(JSON.stringify(this.getQuery(), null, 2));
-            return;
-        }
-
-        const result = await conn.query(this.getQuery());
+        const result = await conn.query(query);
         this.addLog(t("Query executed successfully"));
-        this.resetQuery();
+        if (resetQuery) {
+            console.log("============== RESET QUERY ==============");
+            this.resetQuery();
+        }
         return result;
     }
 
@@ -84,9 +91,7 @@ END;
      * @throws Rejects when the query fails
      */
     async getExistingDatabases() {
-        this.setQuery("SELECT schema_name as name FROM information_schema.schemata;");
-
-        const [databases] = await this.runQuery();
+        const [databases] = await this.runQuery("SELECT schema_name as name FROM information_schema.schemata;");
         if (Array.isArray(databases)) return databases.map((database) => database.name);
         return [];
     }
@@ -100,9 +105,7 @@ END;
         const schema =
             "SELECT TABLE_NAME as name FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{DATABASE_NAME}' AND TABLE_TYPE LIKE 'BASE_TABLE';";
 
-        this.addQuery(schema.replace("{DATABASE_NAME}", this.getDatabaseName()));
-
-        const [[_, rows]] = await this.runQuery();
+        const [[_, rows]] = await this.runQuery(schema.replace("{DATABASE_NAME}", this.getDatabaseName()));
         if (Array.isArray(rows)) return rows.map((database) => database.name);
         return [];
     }
@@ -120,7 +123,7 @@ END;
 
         for (let model of modelsWithRefs) {
             for (let field of model.fields) {
-                const reference = new Ref(field);
+                const reference = new Ref(field, this.getDbType());
 
                 const foreignName = SQLBaseManager.getForeignKeyName(field.iid);
 
@@ -165,9 +168,7 @@ END;
         const SQL = addFieldQuery ? this.procedureWrapper(addFieldQuery, "CREATE FIELD QUERY") : "";
 
         if (returnQuery) return SQL;
-
-        this.setQuery(SQL);
-        return this.runQuery();
+        return this.runQuery(SQL);
     }
 
     /**
@@ -194,8 +195,7 @@ END;
         );
 
         if (returnQuery) return SQL;
-        this.setQuery(SQL);
-        return this.runQuery();
+        return this.runQuery(SQL);
     }
 
     /**
@@ -211,20 +211,16 @@ END;
         const schema = "ALTER TABLE `{TABLE_NAME}` DROP INDEX `{INDEX_NAME}`;";
 
         const conditionSchema =
-            "EXISTS(SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE table_name = '{TABLE_NAME}' AND index_name = '{INDEX_NAME}')";
+            "EXISTS(SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE index_name = '{INDEX_NAME}')";
 
         const SQL = this.ifWrapper(
-            conditionSchema.replace("{TABLE_NAME}", tableName).replace("{INDEX_NAME}", indexName),
-            schema
-                .replace("{INDEX_NAME}", indexName)
-                .replace("{TABLE_NAME}", tableName)
-                .replace("{FIELD_NAME}", columnName),
+            conditionSchema.replace("{INDEX_NAME}", indexName),
+            schema.replace("{INDEX_NAME}", indexName).replace("{TABLE_NAME}", tableName),
             "DROP INDEX FROM COLUMN"
         );
 
         if (returnQuery) return SQL;
-        this.setQuery(SQL);
-        return this.runQuery();
+        return this.runQuery(SQL);
     }
 
     /**
@@ -242,7 +238,7 @@ END;
         const conditionSchema = `NOT EXISTS(${MySQLDBManager.checkConstraintSchema})`;
 
         const SQL = this.ifWrapper(
-            conditionSchema.replace("{TABLE_NAME}", tableName).replace("{CONSTRAINT_NAME}", constraintName),
+            conditionSchema.replace("{CONSTRAINT_NAME}", constraintName),
             schema
                 .replace("{CONSTRAINT_NAME}", constraintName)
                 .replace("{TABLE_NAME}", tableName)
@@ -251,8 +247,7 @@ END;
         );
 
         if (returnQuery) return SQL;
-        this.setQuery(SQL);
-        return this.runQuery();
+        return this.runQuery(SQL);
     }
 
     /**
@@ -265,22 +260,18 @@ END;
     dropUniqueConstraint(tableName, columnName, returnQuery = false) {
         const constraintName = `uc_${tableName}_${columnName}`.toLowerCase();
 
-        const schema = "ALTER TABLE `{TABLE_NAME}` DROP INDEX `{FIELD_NAME}`;";
+        const schema = "ALTER TABLE `{TABLE_NAME}` DROP INDEX `{CONSTRAINT_NAME}`;";
 
         const conditionSchema = `EXISTS(${MySQLDBManager.checkConstraintSchema})`;
 
         const SQL = this.ifWrapper(
-            conditionSchema.replace("{TABLE_NAME}", tableName).replace("{CONSTRAINT_NAME}", constraintName),
-            schema
-                .replace("{CONSTRAINT_NAME}", constraintName)
-                .replace("{TABLE_NAME}", tableName)
-                .replace("{FIELD_NAME}", columnName),
+            conditionSchema.replace("{CONSTRAINT_NAME}", constraintName),
+            schema.replace("{CONSTRAINT_NAME}", constraintName).replace("{TABLE_NAME}", tableName),
             "DROP UNIQUE CONSTRAINT FROM COLUMN"
         );
 
         if (returnQuery) return SQL;
-        this.setQuery(SQL);
-        return this.runQuery();
+        return this.runQuery(SQL);
     }
 
     /**
@@ -307,8 +298,7 @@ END;
         );
 
         if (returnQuery) return SQL;
-        this.setQuery(SQL);
-        return this.runQuery();
+        return this.runQuery(SQL);
     }
 
     /**
@@ -324,17 +314,16 @@ END;
         const schema = "DROP INDEX `{INDEX_NAME}` ON `{TABLE_NAME}`;";
 
         const conditionSchema =
-            "EXISTS(SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE table_name = '{TABLE_NAME}' AND index_name = '{INDEX_NAME}')";
+            "EXISTS(SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE index_name = '{INDEX_NAME}')";
 
         const SQL = this.ifWrapper(
-            conditionSchema.replace("{TABLE_NAME}", tableName).replace("{INDEX_NAME}", indexName),
+            conditionSchema.replace("{INDEX_NAME}", indexName),
             schema.replace("{INDEX_NAME}", indexName).replace("{TABLE_NAME}", tableName),
             "DROP FULLTEXT INDEX FROM COLUMN"
         );
 
         if (returnQuery) return SQL;
-        this.setQuery(SQL);
-        return this.runQuery();
+        return this.runQuery(SQL);
     }
 
     /**
@@ -349,8 +338,7 @@ END;
         SQL += "SET FOREIGN_KEY_CHECKS = 1;\n";
 
         if (returnQuery) return SQL;
-        this.setQuery(SQL);
-        return this.runQuery();
+        return this.runQuery(SQL);
     }
 
     dropForeignKey(modelName, foreignKeyName, returnQuery = false) {
@@ -362,8 +350,7 @@ END;
 
         const SQL = this.procedureWrapper(query, "DROP FOREIGN KEY");
         if (returnQuery) return SQL;
-        this.setQuery(SQL);
-        return this.runQuery();
+        return this.runQuery(SQL);
     }
 
     /**
@@ -404,8 +391,7 @@ END;
         );
 
         if (returnQuery) return SQL;
-        this.setQuery(SQL);
-        return this.runQuery();
+        return this.runQuery(SQL);
     }
 
     /**
@@ -481,8 +467,7 @@ DROP PROCEDURE IF EXISTS ${name};`;
      * @return {Promise<Object|[]>}
      */
     async dropDatabase(dbName) {
-        this.setQuery(`DROP DATABASE IF EXISTS ${dbName ?? this.getDbName()};`);
-        return this.runQuery();
+        return this.runQuery(`DROP DATABASE IF EXISTS ${dbName ?? this.getDbName()};`);
     }
 
     /**
@@ -497,11 +482,10 @@ DROP PROCEDURE IF EXISTS ${name};`;
         /**
          * @type {Field}
          */
-        const refField = new FieldType(field);
+        const refField = new FieldType(field, this.getDbType());
 
         const SQL = `ALTER TABLE ${modelName} MODIFY ${refField.toDefinitionQueryForModify()};`;
         if (returnQuery) return SQL;
-        this.setQuery(SQL);
-        return this.runQuery();
+        return this.runQuery(SQL);
     }
 }
