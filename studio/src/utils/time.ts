@@ -4,3 +4,54 @@ export function formatDate(date: string | Date, option: Intl.DateTimeFormatOptio
 	const dt = date instanceof Date ? DateTime.fromJSDate(date) : DateTime.fromISO(date);
 	return dt.setLocale('en').toLocaleString(option);
 }
+
+export function getRelativeTime(date: string) {
+	return DateTime.fromISO(date).setLocale('en').toRelative();
+}
+
+export function convertDateToMilliseconds(dateString: string): number {
+	const [datePart, timePart] = dateString.split(' ');
+	const [day, month, year] = datePart.split('.');
+	const [hours, minutes] = timePart.split(':');
+
+	const dateTime = DateTime.utc(
+		Number(year),
+		Number(month),
+		Number(day),
+		Number(hours),
+		Number(minutes),
+	);
+	const milliseconds = dateTime.toMillis();
+	return milliseconds;
+}
+export function calculateRecommendedBuckets(start: Date, end: Date): number {
+	const startDate = DateTime.fromJSDate(start);
+	const endDate = DateTime.fromJSDate(end);
+	const { years, months, days } = endDate.diff(startDate, ['years', 'months', 'days']);
+
+	const totalMonths = years * 12 + months;
+	const totalDays = months * 30 + days;
+
+	if (years && totalMonths < 30) {
+		return Math.floor(totalMonths);
+	}
+
+	if (months && totalDays < 30) {
+		return Math.floor(totalDays);
+	}
+
+	if (years > 0) {
+		return years === 1 ? 12 : Math.floor(years + 1);
+	}
+
+	if (months && months > 0) {
+		return months === 1 && !days ? 30 : Math.floor(months + 1);
+	}
+
+	if (days && days > 0) {
+		console.log('days', days);
+		return days > 1 ? Math.floor(days + 1) : 24;
+	}
+
+	return 24;
+}

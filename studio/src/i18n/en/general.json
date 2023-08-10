@@ -87,5 +87,6 @@
 	"logout": "Log Out",
 	"enabled": "Enabled",
 	"disabled": "Disabled",
-	"instance": "Instance"
+	"instance": "Instance",
+	"status": "Status"
 }

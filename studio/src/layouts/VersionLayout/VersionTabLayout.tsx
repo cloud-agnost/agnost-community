@@ -6,6 +6,7 @@ import { cn } from '@/utils';
 import { Plus } from '@phosphor-icons/react';
 import { Table } from '@tanstack/react-table';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 interface Props<T> {
 	isEmpty: boolean;
 	table: Table<T>;
@@ -34,6 +35,7 @@ export default function VersionTabLayout<T>({
 	openCreateModal,
 }: Props<T>) {
 	const [searchParams] = useSearchParams();
+	const { t } = useTranslation();
 	return (
 		<div className={cn(isEmpty && 'h-3/4 flex items-center justify-center')}>
 			{isEmpty ? (
@@ -58,6 +60,9 @@ export default function VersionTabLayout<T>({
 								table={table}
 								onDelete={onMultipleDelete}
 							/>
+							<Button variant='secondary' to='logs'>
+								{t('queue.view_logs')}
+							</Button>
 							<Button variant='primary' onClick={openCreateModal}>
 								<Plus size={16} />
 								<span className='ml-2'>{createButtonTitle}</span>

@@ -3,7 +3,7 @@ import { Badge } from '@/components/Badge';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import { Application } from '@/types';
-import { getRelativeTime } from '@/utils/utils';
+import { getRelativeTime } from '@/utils';
 import { useTranslation } from 'react-i18next';
 import { ApplicationTeam } from '.';
 import ApplicationSettings from './ApplicationSettings';
