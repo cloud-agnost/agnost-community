@@ -404,3 +404,88 @@
 		@apply border-error-default #{!important};
 	}
 }
+
+.rdrDefinedRangesWrapper,
+.rdrStaticRange {
+	background-color: rgb(var(--wrapper-background-light)) !important;
+}
+.rdrStaticRange {
+	border: none !important;
+}
+.rdrDefinedRangesWrapper {
+	border-right: solid 1px rgb(var(--theme-border)) !important;
+}
+.rdrStaticRange:hover .rdrStaticRangeLabel,
+.rdrStaticRange:focus .rdrStaticRangeLabel {
+	background: rgb(var(--wrapper-background-hover)) !important;
+}
+.rdrInputRangeInput,
+.rdrDateInput input {
+	background-color: rgb(var(--wrapper-background-base)) !important;
+	border: 1px solid rgb(var(--form-input-base-border)) !important;
+	color: rgb(var(--text-subtle)) !important;
+	border-radius: 4px;
+}
+.rdrInputRangeInput:focus,
+.rdrDateInput input:focus {
+	border: 1px solid rgb(var(--form-input-focus)) !important;
+}
+.rdrDateDisplayItem {
+	border: none !important;
+}
+.rdrDateDisplayWrapper {
+	background-color: rgb(var(--wrapper-background-light)) !important;
+}
+.rdrDateDisplay {
+	color: rgb(var(--form-input-focus)) !important;
+}
+.rdrMonthAndYearWrapper {
+	background-color: rgb(var(--wrapper-background-light)) !important;
+	color: rgb(var(--text-base));
+}
+:has(.rdrYearPicker, .rdrMonthPicker) select {
+	color: rgb(var(--text-base)) !important;
+}
+:has(.rdrYearPicker, .rdrMonthPicker) select:hover {
+	background: rgb(var(--wrapper-background-hover)) !important;
+}
+.rdrMonths {
+	background-color: rgb(var(--wrapper-background-light));
+}
+.rdrDayNumber span {
+	color: rgb(var(--text-base)) !important;
+}
+.rdrDayPassive .rdrDayNumber span,
+.rdrMonthName,
+.rdrWeekDay {
+	color: rgb(var(--text-subtle)) !important;
+}
+.rdrStartEdge,
+.rdrEndEdge {
+	border-radius: var(--radius) !important;
+	background: rgb(var(--button-background-base-primary)) !important;
+}
+.rdrInRange {
+	background: rgb(var(--brand-color-primary--darker)) !important;
+}
+.rdrDayHovered {
+	color: rgb(var(--button-background-base-primary)) !important;
+}
+.rdrDayHovered,
+.rdrDayStartEdge,
+.rdrDayEndEdge,
+.rdrDaySelected {
+	border: rgb(var(--button-background-base-primary)) !important;
+	border-radius: var(--radius) !important;
+}
+.rdrPprevButton i {
+	border-color: transparent rgb(var(--icon-base)) transparent transparent !important;
+	border-width: 6px 9px 6px 6px !important;
+}
+.rdrNextButton i {
+	border-color: transparent transparent transparent rgb(var(--icon-base)) !important;
+	border-width: 6px 6px 6px 9px !important;
+}
+.rdrNextPrevButton {
+	background-color: rgb(var(--wrapper-background-light)) !important;
+}
