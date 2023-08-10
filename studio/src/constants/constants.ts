@@ -320,6 +320,7 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	REQUIRED: 'blue',
 	ENABLED: 'green',
 	DISABLED: 'red',
+	SUCCESS: 'green',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
