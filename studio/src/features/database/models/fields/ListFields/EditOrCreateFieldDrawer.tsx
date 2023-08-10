@@ -17,12 +17,22 @@ import { Button } from 'components/Button';
 import {
 	FIELD_ICON_MAP,
 	MAX_LENGTHS,
+	MYSQL_RESERVED_WORDS,
 	NAME_SCHEMA,
+	POSTGRES_RESERVED_WORDS,
 	REFERENCE_FIELD_ACTION,
 	TIMESTAMPS_SCHEMA,
 } from '@/constants';
-import { useEffect, useState } from 'react';
-import { APIError, BasicValueListType, Field, FieldType, Model, ReferenceAction } from '@/types';
+import { useEffect, useMemo, useState } from 'react';
+import {
+	APIError,
+	BasicValueListType,
+	Database,
+	Field,
+	FieldType,
+	Model,
+	ReferenceAction,
+} from '@/types';
 import { capitalize, cn, toDisplayName } from '@/utils';
 import { useParams } from 'react-router-dom';
 import { Switch } from 'components/Switch';
@@ -31,6 +41,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'c
 import { Separator } from 'components/Separator';
 import useModelStore from '@/store/database/modelStore.ts';
 import useTypeStore from '@/store/types/typeStore.ts';
+import useDatabaseStore from '@/store/database/databaseStore.ts';
 
 type View = keyof FieldType['view'];
 
@@ -59,6 +70,7 @@ export default function EditOrCreateFieldDrawer({
 	type,
 }: EditOrCreateModelDrawerProps) {
 	const { t } = useTranslation();
+	const databases = useDatabaseStore((state) => state.databases);
 	const basicValueListTypes = useTypeStore((state) => state.bvlTypes);
 	const fieldTypes = useTypeStore((state) => state.fieldTypes);
 	const fieldToEdit = useModelStore((state) => state.fieldToEdit) as Field;
@@ -69,13 +81,17 @@ export default function EditOrCreateFieldDrawer({
 
 	const MAX_LENGTH = MAX_LENGTHS[editMode ? fieldToEdit?.type : type?.name ?? ''];
 
-	const params = useParams() as {
+	const { dbId, modelId, appId, versionId, orgId } = useParams() as {
 		orgId: string;
 		appId: string;
 		versionId: string;
 		dbId: string;
 		modelId: string;
 	};
+
+	const database = useMemo(() => {
+		return databases.find((database) => database._id === dbId) as Database;
+	}, [databases, dbId]);
 
 	const TYPE = editMode ? fieldToEdit?.type : type?.name ?? '';
 	const hasMaxLength = ['text', 'encrypted-text'].includes(TYPE);
@@ -89,6 +105,14 @@ export default function EditOrCreateFieldDrawer({
 	const view = editMode
 		? fieldTypes.find((type) => type.name === fieldToEdit?.type)?.view
 		: type?.view;
+
+	if (
+		database.type === 'SQL Server' &&
+		['rich-text', 'geo-point'].includes(TYPE) &&
+		view?.indexed
+	) {
+		view.indexed = false;
+	}
 
 	const views = Object.entries(view ?? {})
 		.filter(([, value]) => !!value)
@@ -215,6 +239,29 @@ export default function EditOrCreateFieldDrawer({
 						path: ['referenceAction'],
 					});
 				}
+
+				if (
+					database?.type === 'PostgreSQL' &&
+					POSTGRES_RESERVED_WORDS.includes(arg.name.toLowerCase())
+				) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: t('forms.reservedWord', {
+							label: arg.name,
+						}).toString(),
+						path: ['name'],
+					});
+				}
+
+				if (database?.type === 'MySQL' && MYSQL_RESERVED_WORDS.includes(arg.name.toLowerCase())) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: t('forms.reservedWord', {
+							label: arg.name,
+						}).toString(),
+						path: ['name'],
+					});
+				}
 			}),
 	});
 
@@ -250,25 +297,24 @@ export default function EditOrCreateFieldDrawer({
 		if (TYPE !== 'reference') return;
 
 		const models = await getReferenceModels({
-			orgId: params?.orgId,
-			appId: params?.appId,
-			versionId: params?.versionId,
-			dbId: params?.dbId,
+			orgId: orgId,
+			appId: appId,
+			versionId: versionId,
+			dbId: dbId,
 		});
 
 		setModels(models);
 	}
 
 	async function onSubmit(data: z.infer<typeof Schema>) {
-		if (!params) return;
 		const dataForAPI = {
 			fieldId: editMode ? fieldToEdit._id : '',
 			type: editMode ? fieldToEdit.type : type?.name ?? '',
-			orgId: params.orgId,
-			appId: params.appId,
-			versionId: params.versionId,
-			dbId: params.dbId,
-			modelId: params.modelId,
+			orgId: orgId,
+			appId: appId,
+			versionId: versionId,
+			dbId: dbId,
+			modelId: modelId,
 			name: data.general.name,
 			required: data.general.required,
 			unique: data.general.unique,
