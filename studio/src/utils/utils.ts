@@ -4,7 +4,6 @@ import { useToast as toast } from '@/hooks';
 import { t } from '@/i18n/config.ts';
 import { RealtimeData, ToastType } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
-import { DateTime } from 'luxon';
 import { twMerge } from 'tailwind-merge';
 type EmptyableArray = readonly [] | [];
 type EmptyableString = '' | string;
@@ -80,10 +79,6 @@ export function capitalize(str: string) {
 		return '';
 	}
 	return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-export function getRelativeTime(date: string) {
-	return DateTime.fromISO(date).setLocale('en').toRelative();
 }
 
 export function notify(params: ToastType) {
