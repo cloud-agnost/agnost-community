@@ -56,14 +56,17 @@ export const PATHS = {
 	endpoint: {
 		endpoint: `${endpointPath}/Endpoint.tsx`,
 		editEndpoint: `${endpointPath}/EditEndpoint.tsx`,
+		endpointLogs: `${endpointPath}/EndpointLogs.tsx`,
 	},
 	queue: {
 		queue: `${queuePath}/MessageQueue.tsx`,
 		editQueue: `${queuePath}/EditMessageQueue.tsx`,
+		queueLogs: `${queuePath}/MessageQueueLogs.tsx`,
 	},
 	task: {
 		task: `${path}/task/Task.tsx`,
 		editTask: `${path}/task/EditTask.tsx`,
+		taskLogs: `${path}/task/TaskLogs.tsx`,
 	},
 	storage: `${storagePath}/Storage.tsx`,
 	profileSettings: {
