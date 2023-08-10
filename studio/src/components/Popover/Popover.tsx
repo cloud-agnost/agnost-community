@@ -8,6 +8,7 @@ import './popover.scss';
 const Popover = PopoverPrimitive.Root;
 
 const PopoverTrigger = PopoverPrimitive.Trigger;
+const PopoverClose = PopoverPrimitive.Close;
 
 const PopoverContent = React.forwardRef<
 	React.ElementRef<typeof PopoverPrimitive.Content>,
@@ -20,9 +21,12 @@ const PopoverContent = React.forwardRef<
 			sideOffset={sideOffset}
 			className={cn(className, 'popover-content')}
 			{...props}
-		/>
+		>
+			{props.children}
+			<PopoverPrimitive.Arrow />
+		</PopoverPrimitive.Content>
 	</PopoverPrimitive.Portal>
 ));
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
-export { Popover, PopoverContent, PopoverTrigger };
+export { Popover, PopoverContent, PopoverTrigger, PopoverClose };
