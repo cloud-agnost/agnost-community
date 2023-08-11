@@ -21,6 +21,7 @@ import {
 	NAME_SCHEMA,
 	POSTGRES_RESERVED_WORDS,
 	REFERENCE_FIELD_ACTION,
+	SQL_SERVER_RESERVED_WORDS,
 	TIMESTAMPS_SCHEMA,
 } from '@/constants';
 import { useEffect, useMemo, useState } from 'react';
@@ -254,6 +255,19 @@ export default function EditOrCreateFieldDrawer({
 				}
 
 				if (database?.type === 'MySQL' && MYSQL_RESERVED_WORDS.includes(arg.name.toLowerCase())) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: t('forms.reservedWord', {
+							label: arg.name,
+						}).toString(),
+						path: ['name'],
+					});
+				}
+
+				if (
+					database?.type === 'SQL Server' &&
+					SQL_SERVER_RESERVED_WORDS.includes(arg.name.toLowerCase())
+				) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: t('forms.reservedWord', {
