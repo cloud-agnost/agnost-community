@@ -12,19 +12,20 @@ Organization.loader = async function ({ params }: LoaderFunctionArgs) {
 	const { getAppsByOrgId } = useApplicationStore.getState();
 	const { isAuthenticated } = useAuthStore.getState();
 
-	if (isAuthenticated()) getAllOrganizationByUser();
-
-	useOrganizationStore.subscribe(
-		(state) => state.organization,
-		(organization) => {
-			if (organization) {
-				getAppsByOrgId(organization._id);
-			} else if (orgId) {
-				getAppsByOrgId(orgId);
-			}
-		},
-		{ fireImmediately: true },
-	);
+	if (isAuthenticated()) {
+		getAllOrganizationByUser();
+		useOrganizationStore.subscribe(
+			(state) => state.organization,
+			(organization) => {
+				if (organization) {
+					getAppsByOrgId(organization._id);
+				} else if (orgId) {
+					getAppsByOrgId(orgId);
+				}
+			},
+			{ fireImmediately: true },
+		);
+	}
 
 	return null;
 };
