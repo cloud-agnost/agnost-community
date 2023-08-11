@@ -487,7 +487,7 @@ export default function EditOrCreateFieldDrawer({
 								)}
 							/>
 							<Separator />
-							{hasMaxLength && (
+							{!editMode && hasMaxLength && (
 								<>
 									<FormField
 										control={form.control}
