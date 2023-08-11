@@ -176,17 +176,13 @@ export class MsSQLDBManager extends SQLBaseManager {
      * @return {Promise<Object|[]> | string}
      */
     async dropField(modelName, field, returnQuery = false) {
-        let SQL = this.ifWrapper(
-            `(SELECT COLUMNPROPERTY(OBJECT_ID('${modelName}'), '${field.name}', 'IsFulltextIndexed')) = 1`,
-            `ALTER FULLTEXT INDEX ON ${modelName} DROP (${field.name})`
-        );
-        SQL += `\nALTER TABLE ${modelName} DROP COLUMN IF EXISTS ${field.name};`;
-        SQL +=
-            "\n" +
-            this.ifWrapper(
-                `EXISTS(SELECT is_enabled FROM sys.fulltext_indexes WHERE object_id = OBJECT_ID('${modelName}') AND is_enabled = 0)`,
-                `DROP FULLTEXT INDEX ON ${modelName};`
-            );
+        const SQL = [
+            await this.dropFullTextIndexByColumn(modelName, field.name, true),
+            await this.dropUniqueConstraint(modelName, field.name, true),
+            await this.dropIndex(modelName, field.name, true),
+            `ALTER TABLE ${modelName} DROP COLUMN IF EXISTS ${field.name};`,
+            await this.dropFullTextIndexIfDisabled(modelName, true),
+        ].join("\n");
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
@@ -286,6 +282,26 @@ export class MsSQLDBManager extends SQLBaseManager {
         const SQL = this.ifWrapper(
             `EXISTS(${MsSQLDBManager.CHECK_FULL_TEXT_INDEX_SCHEMA.replace("{TABLE_NAME}", tableName)})`,
             `DROP FULLTEXT INDEX ON ${tableName};`
+        );
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    dropFullTextIndexIfDisabled(tableName, returnQuery = false) {
+        const SQL = this.ifWrapper(
+            `EXISTS(SELECT is_enabled FROM sys.fulltext_indexes WHERE object_id = OBJECT_ID('${tableName}') AND is_enabled = 0)`,
+            `DROP FULLTEXT INDEX ON ${tableName};`
+        );
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    dropFullTextIndexByColumn(tableName, columnName, returnQuery = false) {
+        const SQL = this.ifWrapper(
+            `(SELECT COLUMNPROPERTY(OBJECT_ID('${tableName}'), '${columnName}', 'IsFulltextIndexed')) = 1`,
+            `ALTER FULLTEXT INDEX ON ${tableName} DROP (${columnName})`
         );
 
         if (returnQuery) return SQL;
