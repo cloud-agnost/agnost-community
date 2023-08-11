@@ -46,5 +46,6 @@
 	"pick_a_date": "Pick a date",
 	"select": "Select {{label}}",
 	"notStartWithNumber": "{{label}} must not start with a number",
-	"notStartWithUnderscore": "{{label}} must not start with an underscore"
+	"notStartWithUnderscore": "{{label}} must not start with an underscore",
+	"reservedWord": "{{label}} is a reserved word and cannot be used"
 }

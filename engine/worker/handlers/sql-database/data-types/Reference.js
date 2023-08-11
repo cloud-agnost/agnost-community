@@ -1,8 +1,37 @@
 import Field from "./Field.js";
 import { SQLBaseManager } from "../../managers/SQLBaseManager.js";
+import { DATABASE } from "../../../config/constants.js";
 
 export default class Reference extends Field {
     defaultField = "id";
+
+    dbMap = {
+        [DATABASE.SQLServer]: {
+            CREATE_SCHEMA: "ALTER TABLE {TABLE_NAME} ADD {FIELD_NAME} {TYPE} {REQUIRED};",
+            CREATE_CONSTRAINT_SCHEMA:
+                "ALTER TABLE {TABLE_NAME} ADD CONSTRAINT {FOREIGN_NAME} FOREIGN KEY ({FIELD_NAME}) REFERENCES {FOREIGN_TABLE}({DEFAULT_FIELD}) ON DELETE {ACTION};",
+        },
+        [DATABASE.PostgreSQL]: {
+            CREATE_SCHEMA: "ALTER TABLE {TABLE_NAME} ADD COLUMN {FIELD_NAME} {TYPE} {REQUIRED};",
+            CREATE_CONSTRAINT_SCHEMA:
+                "ALTER TABLE {TABLE_NAME} ADD CONSTRAINT {FOREIGN_NAME} FOREIGN KEY ({FIELD_NAME}) REFERENCES {FOREIGN_TABLE}({DEFAULT_FIELD}) ON DELETE {ACTION};",
+        },
+        [DATABASE.MySQL]: {
+            CREATE_SCHEMA: "ALTER TABLE {TABLE_NAME} ADD COLUMN `{FIELD_NAME}` {TYPE} {REQUIRED};",
+            CREATE_CONSTRAINT_SCHEMA:
+                "ALTER TABLE {TABLE_NAME} ADD CONSTRAINT {FOREIGN_NAME} FOREIGN KEY ({FIELD_NAME}) REFERENCES {FOREIGN_TABLE}({DEFAULT_FIELD}) ON DELETE {ACTION};",
+        },
+    };
+
+    createMap = {
+        [DATABASE.PostgreSQL]: "{NAME} {TYPE} {REQUIRED}",
+        [DATABASE.MySQL]: "`{NAME}` {TYPE} {REQUIRED}",
+        [DATABASE.SQLServer]: "{NAME} {TYPE} {REQUIRED}",
+    };
+
+    isIndexed() {
+        return false;
+    }
 
     getReferenceModelIid() {
         return this.options?.reference?.iid;
@@ -26,12 +55,8 @@ export default class Reference extends Field {
     createConstraint(modelName, createField = false) {
         const foreignTable = this.getReferenceModelName();
         const foreignName = SQLBaseManager.getForeignKeyName(this.getIid());
-
-        const createFieldSchema = "ALTER TABLE {TABLE_NAME} ADD COLUMN `{FIELD_NAME}` {TYPE} {REQUIRED};";
-
-        const createConstraintSchema =
-            "ALTER TABLE {TABLE_NAME} ADD CONSTRAINT {FOREIGN_NAME} FOREIGN KEY ({FIELD_NAME}) REFERENCES {FOREIGN_TABLE}({DEFAULT_FIELD}) ON DELETE {ACTION};";
-
+        const createFieldSchema = this.dbMap[this.getDatabaseType()].CREATE_SCHEMA;
+        const createConstraintSchema = this.dbMap[this.getDatabaseType()].CREATE_CONSTRAINT_SCHEMA;
         let schema = createConstraintSchema;
 
         if (createField) {
@@ -50,7 +75,7 @@ export default class Reference extends Field {
     }
 
     toDefinitionQueryForModify() {
-        let schema = "`{NAME}` {TYPE} {REQUIRED}";
+        const schema = this.createMap[this.type];
 
         return schema
             .replace("{NAME}", this.getName())

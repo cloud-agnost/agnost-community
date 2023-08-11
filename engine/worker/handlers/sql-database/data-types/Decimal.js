@@ -1,7 +1,14 @@
 import Field from "./Field.js";
+import { DATABASE } from "../../../config/constants.js";
 
 export default class Decimal extends Field {
     baseLength = 10;
+
+    createMap = {
+        [DATABASE.PostgreSQL]: "{name} {type}({BASE_LENGTH},{DIGITS}) {required}",
+        [DATABASE.MySQL]: "`{name}` {type}({BASE_LENGTH},{DIGITS}) {required}",
+        [DATABASE.SQLServer]: "{name} {type}({BASE_LENGTH},{DIGITS}) {required}",
+    };
 
     /**
      * @description Gets the decimal digits
@@ -16,7 +23,7 @@ export default class Decimal extends Field {
      * @return {string}
      */
     toDefinitionQuery() {
-        let schema = "`{name}` {type}({BASE_LENGTH},{DIGITS}) {required}";
+        const schema = this.createMap[this.getDatabaseType()];
 
         return schema
             .replace("{name}", this.getName())

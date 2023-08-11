@@ -14,10 +14,12 @@
     "database": {
         "minPoolSize": 3,
         "mailMaxLength": 320,
+        "jsonMaxLength": 4000,
         "linkMaxLength": 2048,
         "phoneMaxLength": 15,
         "monetaryDecimalDigits": 4,
-        "enumMaxLength": 2048
+        "enumMaxLength": 2048,
+        "timeout": 60000
     },
     "cache": {
         "port": 6379

@@ -1,3 +1,5 @@
+import { DATABASE } from "../../../config/constants.js";
+
 /**
  * @description The base class for all fields
  * @class Field
@@ -6,8 +8,19 @@
 export default class Field {
     nullableFields = ["createdat", "updatedat"];
 
-    constructor(options) {
+    createMap = {
+        [DATABASE.PostgreSQL]: "{NAME} {TYPE}",
+        [DATABASE.MySQL]: "`{NAME}` {TYPE}",
+        [DATABASE.SQLServer]: "{NAME} {TYPE}",
+    };
+
+    constructor(options, type) {
         this.options = options;
+        this.type = type;
+    }
+
+    getDatabaseType() {
+        return this.type;
     }
 
     getName() {
@@ -54,7 +67,7 @@ export default class Field {
      * @description Generates the query for the field.
      */
     toDefinitionQuery() {
-        let schema = "`{NAME}` {TYPE}";
+        let schema = this.createMap[this.type];
 
         if (!this.nullableFields.includes(this.getType())) {
             schema += " {REQUIRED}";
