@@ -26,6 +26,9 @@
 	},
 	"models": {
 		"add": {
+			"schema": {
+				"field": "Schema Name"
+			},
 			"name": {
 				"field": "Model Name"
 			},

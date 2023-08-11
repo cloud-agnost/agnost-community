@@ -5,6 +5,7 @@
 	"description": "Description",
 	"close": "Close",
 	"delete": "Delete",
+	"optional": "Optional",
 	"domain": "Domain",
 	"IP": "IP",
 	"url": "url",
