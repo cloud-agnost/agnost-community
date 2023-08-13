@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const k8s = require('@kubernetes/client-node');
+const fs = require('fs');
 
 console.log(k8s);
 
@@ -14,8 +15,27 @@ const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api)
 const k8sAutoscalingApi = kc.makeApiClient(k8s.AutoscalingV1Api);
 const k8sExtensionsApi = kc.makeApiClient(k8s.NetworkingV1Api);
 const k8sCustomApi = kc.makeApiClient(k8s.CustomObjectsApi);
+const k8sDynamicApi = kc.makeApiClient(k8s.KubeConfig);
 
 app.use(bodyParser.json());
+
+async function applyManifest(manifestFilePath) {
+  const manifest = fs.readFileSync(manifestFilePath, 'utf8');
+  const resources = k8s.loadAllYaml(manifest);
+
+  for (const resource of resources) {
+    try {
+      const { kind, metadata } = resource;
+
+      // Using the kind and metadata, you can apply the resource
+      const response = await k8sDynamicApi.apply(resource);
+
+      console.log(`${kind} ${metadata.name} created/updated.`, response);
+    } catch (error) {
+      console.error('Error applying resource:', error);
+    }
+  }
+}
 
 async function createDeployment(deploymentName, imageName, replicaCount, containerPort, memoryRequest, memoryLimit, cpuRequest, cpuLimit) {
   const deployment = {
@@ -559,6 +579,23 @@ app.delete('/deployments/:podIdentifier', async (req, res) => {
     await deleteIngress(podIdentifier);
     await deleteHpa(podIdentifier + 'hpa');
     res.json({ message: `Deleted deployment ${podIdentifier}, service, ingress, and HPA` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// Install Extra Operators: postgres | mariadb | kafka
+app.post('/install-operator', async (req, res) => {
+  const { operatorName } = req.body;
+  const manifestFilePath = '/manifests/' + operatorName + '-operator.yaml';
+
+  try {
+    const operatorResult = await applyManifest();
+    res.json({
+      operator: operatorResult.body
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
