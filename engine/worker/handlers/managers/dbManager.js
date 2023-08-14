@@ -261,4 +261,5 @@ export class DBManager {
     async createField() {}
     async dropField() {}
     async updateField() {}
+    setType() {}
 }
