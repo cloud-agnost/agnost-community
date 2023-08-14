@@ -173,6 +173,37 @@ router.get(
 );
 
 /*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/iid/:iid
+@method     GET
+@desc       Get a specific database model by iid
+@access     private
+*/
+router.get(
+	"/iid/:iid",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateDb,
+	authorizeAppAction("app.model.view"),
+	async (req, res) => {
+		try {
+			const { version } = req;
+			const { iid } = req.params;
+
+			const model  = await modelCtrl.getOneByQuery({
+				iid: iid,
+				versionId: version._id,
+			});
+
+			res.json(model);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId/model/delete-multi
 @method     DELETE
 @desc       Deletes the list of top-level models
