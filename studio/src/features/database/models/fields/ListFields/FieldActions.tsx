@@ -82,6 +82,7 @@ export default function ModelActions({
 				</h1>
 				<div className='flex gap-4 w-full sm:w-auto'>
 					<SearchInput
+						onClear={() => setSearch('')}
 						onChange={(e) => setSearch(e.target.value)}
 						className='flex-1 lg:w-[450px]'
 					/>
