@@ -1,16 +1,14 @@
-import { removeLastSlash } from '@/utils';
 import { Database, Model } from '@/types';
 import { useTranslation } from 'react-i18next';
 import { Dispatch, SetStateAction, useMemo } from 'react';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { SearchInput } from 'components/SearchInput';
-import { Button } from 'components/Button';
-import { ArrowLeft, CaretRight } from '@phosphor-icons/react';
 import { Row, Table } from '@tanstack/react-table';
 import { SelectedRowDropdown } from 'components/Table';
 import { CreateModelButton } from '@/features/database/models/ListModels/index.ts';
 import useModelStore from '@/store/database/modelStore.ts';
+import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 
 interface ModelActionsProps {
 	setSelectedRows: Dispatch<SetStateAction<Row<Model>[] | undefined>>;
@@ -33,15 +31,6 @@ export default function ModelActions({
 		return databases.find((database) => database._id === dbId) as Database;
 	}, [databases, dbId]);
 
-	const { pathname } = useLocation();
-
-	const goBackLink = removeLastSlash(
-		pathname
-			.split(dbId as string)
-			.slice(0, -1)
-			.join('/'),
-	);
-
 	async function deleteAll() {
 		if (!database) return;
 		await deleteMultipleModel({
@@ -54,18 +43,21 @@ export default function ModelActions({
 		setSelectedRows(undefined);
 	}
 
+	const databasesUrl = `/organization/${database?.orgId}/apps/${database?.appId}/version/${database?.versionId}/database`;
+
+	const breadcrumbItems: BreadCrumbItem[] = [
+		{
+			name: t('database.page_title').toString(),
+			url: databasesUrl,
+		},
+		{
+			name: database?.name,
+		},
+	];
+
 	return (
 		<>
-			<div className='h-20 shrink-0 flex items-center gap-x-6'>
-				<Button to={goBackLink} className='text-lg border-none h-8 w-8 p-0' variant='secondary'>
-					<ArrowLeft weight='bold' />
-				</Button>
-				<div className='flex items-center gap-2 text-sm leading-6'>
-					<span className='text-default'>{t('database.page_title')}</span>
-					<CaretRight className='text-icon-base' weight='bold' size={20} />
-					<span className='text-subtle'>{database?.name}</span>
-				</div>
-			</div>
+			<BreadCrumb goBackLink={databasesUrl} items={breadcrumbItems} />
 			<div className='flex flex-col gap-2 sm:items-center sm:flex-row justify-between'>
 				<h1 className='text-[26px] text-default leading-[44px] font-semibold'>
 					{t('database.models.title', {

@@ -9,6 +9,7 @@ export interface Model {
 	name: string;
 	type: string;
 	description: string;
+	parentiid?: string;
 	timestamps: {
 		enabled: boolean;
 		createdAt: string;
@@ -54,6 +55,7 @@ export interface Field {
 		decimalDigits: number;
 	};
 	object?: {
+		iid: string;
 		timestamps: {
 			enabled: boolean;
 			createdAt: string;
@@ -61,6 +63,7 @@ export interface Field {
 		};
 	};
 	objectList?: {
+		iid: string;
 		timestamps: {
 			enabled: boolean;
 			createdAt: string;
@@ -76,8 +79,11 @@ export interface Field {
 	};
 }
 
-export type GetModelsOfDatabaseParams = GetDatabasesOfAppParams & {
+export type GetModelsOfDatabaseParams = Omit<GetDatabasesOfAppParams, 'modelId'> & {
 	dbId: string;
+};
+export type GetSpecificModelOfDatabaseParams = GetModelsOfDatabaseParams & {
+	modelIid: string;
 };
 
 export type CreateModelParams = GetModelsOfDatabaseParams & {

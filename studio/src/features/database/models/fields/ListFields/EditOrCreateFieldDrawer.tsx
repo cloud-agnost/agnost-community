@@ -71,21 +71,24 @@ export default function EditOrCreateFieldDrawer({
 	type,
 }: EditOrCreateModelDrawerProps) {
 	const { t } = useTranslation();
+	const [loading, setLoading] = useState(false);
 	const databases = useDatabaseStore((state) => state.databases);
 	const basicValueListTypes = useTypeStore((state) => state.bvlTypes);
 	const fieldTypes = useTypeStore((state) => state.fieldTypes);
 	const fieldToEdit = useModelStore((state) => state.fieldToEdit) as Field;
 	const addNewField = useModelStore((state) => state.addNewField);
 	const updateField = useModelStore((state) => state.updateField);
+	const subModel = useModelStore((state) => state.subModel);
 	const getReferenceModels = useModelStore((state) => state.getReferenceModels);
 	const [models, setModels] = useState<Model[]>([]);
 
 	const MAX_LENGTH = MAX_LENGTHS[editMode ? fieldToEdit?.type : type?.name ?? ''];
 
-	const { dbId, modelId, appId, versionId, orgId } = useParams() as {
+	const { dbId, modelId, appId, modelIid, versionId, orgId } = useParams() as {
 		orgId: string;
 		appId: string;
 		versionId: string;
+		modelIid: string;
 		dbId: string;
 		modelId: string;
 	};
@@ -321,6 +324,7 @@ export default function EditOrCreateFieldDrawer({
 	}
 
 	async function onSubmit(data: z.infer<typeof Schema>) {
+		if (loading) return;
 		const dataForAPI = {
 			fieldId: editMode ? fieldToEdit._id : '',
 			type: editMode ? fieldToEdit.type : type?.name ?? '',
@@ -328,7 +332,7 @@ export default function EditOrCreateFieldDrawer({
 			appId: appId,
 			versionId: versionId,
 			dbId: dbId,
-			modelId: modelId,
+			modelId: modelIid && subModel ? subModel._id : modelId,
 			name: data.general.name,
 			required: data.general.required,
 			unique: data.general.unique,
@@ -367,7 +371,10 @@ export default function EditOrCreateFieldDrawer({
 			},
 		};
 		try {
-			editMode ? await updateField(dataForAPI) : await addNewField(dataForAPI);
+			setLoading(true);
+			editMode
+				? await updateField(dataForAPI, Boolean(modelIid))
+				: await addNewField(dataForAPI, Boolean(modelIid));
 			onOpenChange(false);
 			form.reset();
 		} catch (e) {
@@ -379,6 +386,8 @@ export default function EditOrCreateFieldDrawer({
 					message: field.msg,
 				});
 			});
+		} finally {
+			setLoading(false);
 		}
 	}
 
@@ -895,7 +904,9 @@ export default function EditOrCreateFieldDrawer({
 								</>
 							)}
 							<div className='flex justify-end'>
-								<Button size='lg'>{editMode ? t('general.save') : t('general.add')}</Button>
+								<Button loading={loading} size='lg'>
+									{editMode ? t('general.save') : t('general.add')}
+								</Button>
 							</div>
 						</form>
 					</Form>

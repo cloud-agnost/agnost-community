@@ -88,7 +88,16 @@ const router = createBrowserRouter([
 															},
 															{
 																path: ':modelId/fields',
-																lazy: () => lazyRouteImport(PATHS.version.fields),
+																children: [
+																	{
+																		index: true,
+																		lazy: () => lazyRouteImport(PATHS.version.fields),
+																	},
+																	{
+																		path: ':modelIid',
+																		lazy: () => lazyRouteImport(PATHS.version.objectFields),
+																	},
+																],
 															},
 														],
 													},
