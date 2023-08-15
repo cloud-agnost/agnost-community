@@ -659,7 +659,7 @@ const useVersionStore = create<VersionStore>()(
 					set({ log, showLogDetails: true });
 				},
 				closeVersionLogDetails() {
-					set({ log: null, showLogDetails: false });
+					set({ log: {} as VersionLog, showLogDetails: false });
 				},
 			}),
 			{

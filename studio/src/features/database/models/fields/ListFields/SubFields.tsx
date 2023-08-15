@@ -1,7 +1,7 @@
-import { Field, Model } from '@/types';
-import { Link, useLocation, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import useModelStore from '@/store/database/modelStore.ts';
+import { Field, Model } from '@/types';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 
 interface SubFieldsProps {
 	field: Field;
@@ -12,7 +12,6 @@ export default function SubFields({ field, name }: SubFieldsProps) {
 	const [model, setModel] = useState<Model>();
 	const getModel = useModelStore((state) => state.getSpecificModelByIidOfDatabase);
 	const { orgId, appId, versionId, dbId } = useParams() as Record<string, string>;
-	const { pathname } = useLocation();
 
 	useEffect(() => {
 		if (iid) getModelByIid();

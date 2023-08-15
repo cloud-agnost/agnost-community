@@ -1,6 +1,9 @@
 import { RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class User extends RealtimeActions<User> {
+	info(): void {
+		throw new Error('Method not implemented.');
+	}
 	delete({ data, identifiers }: RealtimeActionParams<User>) {
 		console.log(data, identifiers);
 	}

@@ -1,14 +1,10 @@
 import { Badge } from '@/components/Badge';
-import { Button } from '@/components/Button';
-import { CodeEditor } from '@/components/CodeEditor';
 import { Input } from '@/components/Input';
-import { Pencil } from '@/components/icons';
 import { HTTP_METHOD_BADGE_MAP } from '@/constants';
 import TestEndpoint from '@/features/endpoints/TestEndpoint';
 import { useToast } from '@/hooks';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
-import { FloppyDisk, TestTube } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useOutletContext, useParams, useSearchParams } from 'react-router-dom';

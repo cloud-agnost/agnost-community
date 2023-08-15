@@ -11,7 +11,7 @@ import { DateText } from 'components/DateText';
 import useModelStore from '@/store/database/modelStore.ts';
 import { TableConfirmation } from 'components/Table';
 import { Link } from 'react-router-dom';
-
+import { ColumnDefWithClassName, Model } from '@/types';
 const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	{
 		id: 'select',
