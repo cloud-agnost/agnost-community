@@ -11,6 +11,8 @@ import {
 	DeleteMultipleModelParams,
 	Field,
 	GetModelsOfDatabaseParams,
+	GetSpecificModelByIidOfDatabase,
+	GetSpecificModelOfDatabase,
 	Model,
 	UpdateFieldParams,
 	UpdateNameAndDescriptionParams,
@@ -19,6 +21,7 @@ import { notify } from '@/utils';
 
 interface ModelStore {
 	models: Model[];
+	subModel: Model | null;
 	modelToEdit: Model | null;
 	fieldToEdit: Field | null;
 	isOpenEditModelDialog: boolean;
@@ -28,6 +31,8 @@ interface ModelStore {
 	setModelToEdit: (model: Model | null) => void;
 	setIsOpenEditModelDialog: (isOpen: boolean) => void;
 	getModelsOfDatabase: (params: GetModelsOfDatabaseParams) => Promise<Model[]>;
+	getSpecificModelByIidOfDatabase: (params: GetSpecificModelByIidOfDatabase) => Promise<Model>;
+	getSpecificModelOfDatabase: (params: GetSpecificModelOfDatabase) => Promise<Model>;
 	createModel: (params: CreateModelParams) => Promise<Model>;
 	deleteModel: (params: DeleteModelParams) => Promise<void>;
 	deleteMultipleModel: (params: DeleteMultipleModelParams) => Promise<void>;
@@ -44,6 +49,7 @@ const useModelStore = create<ModelStore>()(
 		persist(
 			(set) => ({
 				models: [],
+				subModel: null,
 				modelToEdit: null,
 				fieldToEdit: null,
 				isOpenEditModelDialog: false,
@@ -70,6 +76,47 @@ const useModelStore = create<ModelStore>()(
 					const models = await ModelService.getModelsOfDatabase(params);
 					set({ models });
 					return models;
+				},
+				getSpecificModelByIidOfDatabase: async (
+					params: GetSpecificModelByIidOfDatabase,
+				): Promise<Model> => {
+					try {
+						const subModel = await ModelService.getSpecificModelByIidOfDatabase(params);
+						set({ subModel });
+						return subModel;
+					} catch (e) {
+						const error = e as APIError;
+						notify({
+							type: 'error',
+							title: error.error,
+							description: error.details,
+						});
+						throw e;
+					}
+				},
+				getSpecificModelOfDatabase: async (params: GetSpecificModelOfDatabase): Promise<Model> => {
+					try {
+						const model = await ModelService.getSpecificModelOfDatabase(params);
+						set((state) => {
+							if (state.models.some((m) => m._id === model._id)) {
+								return {
+									models: state.models.map((m) => (m._id === model._id ? model : m)),
+								};
+							}
+							return {
+								models: [model, ...state.models],
+							};
+						});
+						return model;
+					} catch (e) {
+						const error = e as APIError;
+						notify({
+							type: 'error',
+							title: error.error,
+							description: error.details,
+						});
+						throw e;
+					}
 				},
 				createModel: async (params: CreateModelParams): Promise<Model> => {
 					try {

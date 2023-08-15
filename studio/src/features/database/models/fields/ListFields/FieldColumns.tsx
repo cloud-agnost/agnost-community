@@ -1,10 +1,9 @@
 import { ColumnDefWithClassName, Field } from '@/types';
 import { SortButton } from 'components/DataTable';
-import { translate } from '@/utils';
+import { toDisplayName, translate } from '@/utils';
 import { Button } from 'components/Button';
 import { Pencil } from 'components/icons';
-import { CopyButton } from 'components/CopyButton';
-import { Trash } from '@phosphor-icons/react';
+import { Columns, Trash } from '@phosphor-icons/react';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { DateText } from 'components/DateText';
@@ -12,6 +11,7 @@ import { Badge } from 'components/Badge';
 import useModelStore from '@/store/database/modelStore.ts';
 import { TableConfirmation } from 'components/Table';
 import { Checkbox } from 'components/Checkbox';
+import { SubFields } from '@/features/database/models/fields/ListFields/index.ts';
 
 const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
@@ -51,10 +51,17 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		header: ({ column }) => (
 			<SortButton text={translate('general.field').toUpperCase()} column={column} />
 		),
+		cell({ row: { original } }) {
+			if (['object-list', 'object'].includes(original.type)) {
+				return <SubFields field={original} name={original.name} />;
+			}
+
+			return original.name;
+		},
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 	},
-	{
+	/*{
 		id: 'iid',
 		header: translate('general.id').toUpperCase(),
 		accessorKey: 'iid',
@@ -71,11 +78,28 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 				</div>
 			);
 		},
+	}*/ {
+		id: 'type',
+		header: translate('general.type').toUpperCase(),
+		accessorKey: 'type',
+		sortingFn: 'textCaseSensitive',
+		cell: ({
+			row: {
+				original: { type },
+			},
+		}) => {
+			const mapper: Record<string, string> = {
+				createdat: 'datetime',
+				updatedat: 'datetime',
+				parent: 'reference',
+			};
+			return <span className='whitespace-nowrap'>{toDisplayName(mapper[type] ?? type)}</span>;
+		},
 	},
 	{
 		id: 'unique',
 		header: translate('general.unique').toUpperCase(),
-		accessorKey: 'iid',
+		accessorKey: 'unique',
 		sortingFn: 'textCaseSensitive',
 		cell: ({
 			row: {
@@ -94,7 +118,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'indexed',
 		header: translate('general.indexed').toUpperCase(),
-		accessorKey: 'iid',
+		accessorKey: 'indexed',
 		sortingFn: 'textCaseSensitive',
 		cell: ({
 			row: {
@@ -113,7 +137,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'required',
 		header: translate('general.required').toUpperCase(),
-		accessorKey: 'iid',
+		accessorKey: 'required',
 		sortingFn: 'textCaseSensitive',
 		cell: ({
 			row: {
@@ -133,7 +157,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		id: 'immutable',
 		className: 'whitespace-nowrap',
 		header: translate('general.read-only').toUpperCase(),
-		accessorKey: 'iid',
+		accessorKey: 'immutable',
 		sortingFn: 'textCaseSensitive',
 		cell: ({
 			row: {
@@ -228,6 +252,17 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 
 			return (
 				<div className='flex items-center justify-end'>
+					{['object-list', 'object'].includes(original.type) && (
+						<Button
+							to={(original?.object || original?.objectList)?.iid}
+							iconOnly
+							variant='blank'
+							rounded
+							className='text-xl hover:bg-wrapper-background-hover text-icon-base'
+						>
+							<Columns />
+						</Button>
+					)}
 					<Button
 						onClick={openEditDrawer}
 						iconOnly

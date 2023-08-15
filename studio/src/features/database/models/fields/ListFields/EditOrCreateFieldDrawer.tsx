@@ -71,6 +71,7 @@ export default function EditOrCreateFieldDrawer({
 	type,
 }: EditOrCreateModelDrawerProps) {
 	const { t } = useTranslation();
+	const [loading, setLoading] = useState(false);
 	const databases = useDatabaseStore((state) => state.databases);
 	const basicValueListTypes = useTypeStore((state) => state.bvlTypes);
 	const fieldTypes = useTypeStore((state) => state.fieldTypes);
@@ -321,6 +322,7 @@ export default function EditOrCreateFieldDrawer({
 	}
 
 	async function onSubmit(data: z.infer<typeof Schema>) {
+		if (loading) return;
 		const dataForAPI = {
 			fieldId: editMode ? fieldToEdit._id : '',
 			type: editMode ? fieldToEdit.type : type?.name ?? '',
@@ -328,7 +330,7 @@ export default function EditOrCreateFieldDrawer({
 			appId: appId,
 			versionId: versionId,
 			dbId: dbId,
-			modelId: modelId,
+			modelId,
 			name: data.general.name,
 			required: data.general.required,
 			unique: data.general.unique,
@@ -367,6 +369,7 @@ export default function EditOrCreateFieldDrawer({
 			},
 		};
 		try {
+			setLoading(true);
 			editMode ? await updateField(dataForAPI) : await addNewField(dataForAPI);
 			onOpenChange(false);
 			form.reset();
@@ -379,6 +382,8 @@ export default function EditOrCreateFieldDrawer({
 					message: field.msg,
 				});
 			});
+		} finally {
+			setLoading(false);
 		}
 	}
 
@@ -895,7 +900,9 @@ export default function EditOrCreateFieldDrawer({
 								</>
 							)}
 							<div className='flex justify-end'>
-								<Button size='lg'>{editMode ? t('general.save') : t('general.add')}</Button>
+								<Button loading={loading} size='lg'>
+									{editMode ? t('general.save') : t('general.add')}
+								</Button>
 							</div>
 						</form>
 					</Form>

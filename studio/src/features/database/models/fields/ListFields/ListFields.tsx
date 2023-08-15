@@ -6,31 +6,28 @@ import { DataTable } from 'components/DataTable';
 import { Row, Table } from '@tanstack/react-table';
 import { EmptyState } from 'components/EmptyState';
 import { Model as ModelIcon } from '@/components/icons';
-import useModelStore from '@/store/database/modelStore.ts';
 import {
 	CreateFieldButton,
 	FieldActions,
 	FieldColumns,
 } from '@/features/database/models/fields/ListFields';
-import { useParams } from 'react-router-dom';
 
-export default function ListFields() {
-	const { models } = useModelStore();
+interface ListFieldsProps {
+	model: Model;
+	parentModel?: Model;
+}
+
+export default function ListFields({ model, parentModel }: ListFieldsProps) {
 	const [selectedRows, setSelectedRows] = useState<Row<Field>[]>();
 	const [search, setSearch] = useState('');
 	const { t } = useTranslation();
-	const { modelId } = useParams();
 	const [table, setTable] = useState<Table<Field>>();
 
-	const model = useMemo(() => {
-		return models.find((model) => model._id === modelId) as Model;
-	}, [models, modelId]);
-
 	const filteredFields = useMemo(() => {
-		if (!search) return model?.fields ?? [];
+		if (!search) return model.fields;
 
-		return model.fields.filter((model) => {
-			return model.name.toLowerCase().includes(search.toLowerCase());
+		return model.fields.filter((f) => {
+			return f.name.toLowerCase().includes(search.toLowerCase());
 		});
 	}, [search, model]);
 
@@ -51,6 +48,8 @@ export default function ListFields() {
 		<div className='px-6 h-full flex flex-col overflow-auto'>
 			<FieldActions
 				table={table}
+				model={model}
+				parentModel={parentModel}
 				setSearch={setSearch}
 				selectedRows={selectedRows}
 				setSelectedRows={setSelectedRows}

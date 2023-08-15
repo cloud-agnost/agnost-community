@@ -8,8 +8,9 @@ import useAuthStore from '@/store/auth/authStore.ts';
 
 export default function Version() {
 	const { pathname } = useLocation();
+	const paths = pathname.split('/').filter((item) => /^[a-zA-Z-_]+$/.test(item));
 	return (
-		<VersionLayout className={cn(pathname.split('/').at(-1))}>
+		<VersionLayout className={cn(paths.at(-1))}>
 			<Outlet />
 		</VersionLayout>
 	);
