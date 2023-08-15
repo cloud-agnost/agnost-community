@@ -29,10 +29,11 @@ export default function VersionEditorLayout({
 		<div className='p-4 space-y-6 h-full'>
 			<div className='flex items-center justify-between'>
 				{children}
-				<div className='space-x-4'>
+				<div className='flex items-center gap-4'>
 					<Button variant='secondary' iconOnly onClick={onEditModalOpen}>
 						<Pencil className='text-icon-base w-5 h-5' />
 					</Button>
+
 					<Button variant='secondary' onClick={onTestModalOpen}>
 						<TestTube size={20} className='text-icon-base mr-2' />
 						{t('endpoint.test.test')}

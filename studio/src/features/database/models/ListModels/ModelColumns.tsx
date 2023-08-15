@@ -1,4 +1,3 @@
-import { ColumnDefWithClassName, Model } from '@/types';
 import { SortButton } from 'components/DataTable';
 import { translate } from '@/utils';
 import { Button } from 'components/Button';

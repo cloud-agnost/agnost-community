@@ -15,9 +15,11 @@ import {
 	DeleteRateLimitParams,
 	DeleteVersionVariableParams,
 	EditRateLimitParams,
-	Environment,
 	EnvLog,
+	Environment,
 	GetVersionByIdParams,
+	GetVersionLogBucketsParams,
+	GetVersionLogsParams,
 	GetVersionRequest,
 	ResLog,
 	Resource,
@@ -28,6 +30,8 @@ import {
 	UpdateVersionRealtimePropertiesParams,
 	UpdateVersionVariableParams,
 	Version,
+	VersionLog,
+	VersionLogBucket,
 } from '@/types';
 
 export default class VersionService {
@@ -267,6 +271,32 @@ export default class VersionService {
 	}: UpdateVersionRealtimePropertiesParams): Promise<Version> {
 		return (
 			await axios.put(`${this.url}/${orgId}/app/${appId}/version/${versionId}/realtime`, data)
+		).data;
+	}
+
+	static async getVersionLogBuckets({
+		orgId,
+		appId,
+		versionId,
+		...params
+	}: GetVersionLogBucketsParams): Promise<VersionLogBucket> {
+		return (
+			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/log-buckets`, {
+				params,
+			})
+		).data;
+	}
+
+	static async getVersionLogs({
+		orgId,
+		appId,
+		versionId,
+		...params
+	}: GetVersionLogsParams): Promise<VersionLog[]> {
+		return (
+			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/logs`, {
+				params,
+			})
 		).data;
 	}
 }

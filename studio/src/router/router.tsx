@@ -106,6 +106,10 @@ const router = createBrowserRouter([
 														path: ':endpointId',
 														lazy: () => lazyRouteImport(PATHS.endpoint.editEndpoint),
 													},
+													{
+														path: 'logs',
+														lazy: () => lazyRouteImport(PATHS.endpoint.endpointLogs),
+													},
 												],
 											},
 											{
@@ -138,6 +142,10 @@ const router = createBrowserRouter([
 														path: ':queueId',
 														lazy: () => lazyRouteImport(PATHS.queue.editQueue),
 													},
+													{
+														path: 'logs',
+														lazy: () => lazyRouteImport(PATHS.queue.queueLogs),
+													},
 												],
 											},
 											{
@@ -151,6 +159,10 @@ const router = createBrowserRouter([
 													{
 														path: ':taskId',
 														lazy: () => lazyRouteImport(PATHS.task.editTask),
+													},
+													{
+														path: 'logs',
+														lazy: () => lazyRouteImport(PATHS.task.taskLogs),
 													},
 												],
 											},

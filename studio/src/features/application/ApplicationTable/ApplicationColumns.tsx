@@ -5,8 +5,7 @@ import { Refresh } from '@/components/icons';
 import { ApplicationSettings, ApplicationTeam } from '@/features/application';
 import useAuthStore from '@/store/auth/authStore';
 import { Application } from '@/types';
-import { translate } from '@/utils';
-import { getRelativeTime } from '@/utils/utils';
+import { getRelativeTime, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 export const ApplicationColumns: ColumnDef<Application>[] = [
 	{

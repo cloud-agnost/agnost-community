@@ -13,7 +13,9 @@ export default function useRealtime() {
 			fn[action ?? 'info']({
 				data,
 				identifiers,
-				timestamp: DateTime.fromISO(timestamp).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
+				timestamp: DateTime.fromISO(timestamp)
+					.setLocale('en')
+					.toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
 				message: log,
 				id,
 			});
