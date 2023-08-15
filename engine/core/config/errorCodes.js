@@ -33,6 +33,7 @@ const ERROR_CODES = {
 	taskImportError: "task_import_error",
 	requestTimedOut: "request_timed_out",
 	missingAccessToken: "missing_access_token",
+	invalidSession: "invalid_session",
 	invalidCredentials: "invalid_credentials",
 	storageNotFound: "storage_not_found",
 	queueNotFound: "queue_not_found",

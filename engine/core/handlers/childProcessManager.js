@@ -171,10 +171,12 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		app.use("/", (await import("../routes/system.js")).default);
 
 		if (fullInit) {
-			// Add the default storage endpoints
-			app.use("/storage", (await import("../routes/storage.js")).default);
+			// Add the default storage object endpoints to access stored objects
+			app.use("/object", (await import("../routes/object.js")).default);
 			// Add the test queue and cron job handlers
 			app.use("/test", (await import("../routes/test.js")).default);
+			// Add the default storage object endpoints
+			app.use("/storage", (await import("../routes/storage.js")).default);
 		}
 	}
 
