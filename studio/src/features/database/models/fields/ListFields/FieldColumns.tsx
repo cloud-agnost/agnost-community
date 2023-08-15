@@ -11,7 +11,7 @@ import { Badge } from 'components/Badge';
 import useModelStore from '@/store/database/modelStore.ts';
 import { TableConfirmation } from 'components/Table';
 import { Checkbox } from 'components/Checkbox';
-import { Link } from 'react-router-dom';
+import { SubFields } from '@/features/database/models/fields/ListFields/index.ts';
 
 const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
@@ -53,14 +53,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		),
 		cell({ row: { original } }) {
 			if (['object-list', 'object'].includes(original.type)) {
-				return (
-					<Link
-						to={(original?.object || original?.objectList)?.iid as string}
-						className='flex items-center gap-2 justify-between hover:underline'
-					>
-						{original.name}
-					</Link>
-				);
+				return <SubFields field={original} name={original.name} />;
 			}
 
 			return original.name;

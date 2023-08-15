@@ -7,7 +7,8 @@ import {
 	DeleteMultipleFieldParams,
 	DeleteMultipleModelParams,
 	GetModelsOfDatabaseParams,
-	GetSpecificModelOfDatabaseParams,
+	GetSpecificModelByIidOfDatabase,
+	GetSpecificModelOfDatabase,
 	Model,
 	UpdateFieldParams,
 	UpdateNameAndDescriptionParams,
@@ -33,10 +34,23 @@ export default class ModelService {
 		versionId,
 		dbId,
 		modelIid,
-	}: GetSpecificModelOfDatabaseParams) {
+	}: GetSpecificModelByIidOfDatabase): Promise<Model> {
 		return (
 			await axios.get(
 				`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}/model/iid/${modelIid}`,
+			)
+		).data;
+	}
+	static async getSpecificModelOfDatabase({
+		orgId,
+		appId,
+		versionId,
+		dbId,
+		modelId,
+	}: GetSpecificModelOfDatabase): Promise<Model> {
+		return (
+			await axios.get(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}/model/${modelId}`,
 			)
 		).data;
 	}

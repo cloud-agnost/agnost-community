@@ -78,17 +78,15 @@ export default function EditOrCreateFieldDrawer({
 	const fieldToEdit = useModelStore((state) => state.fieldToEdit) as Field;
 	const addNewField = useModelStore((state) => state.addNewField);
 	const updateField = useModelStore((state) => state.updateField);
-	const subModel = useModelStore((state) => state.subModel);
 	const getReferenceModels = useModelStore((state) => state.getReferenceModels);
 	const [models, setModels] = useState<Model[]>([]);
 
 	const MAX_LENGTH = MAX_LENGTHS[editMode ? fieldToEdit?.type : type?.name ?? ''];
 
-	const { dbId, modelId, appId, modelIid, versionId, orgId } = useParams() as {
+	const { dbId, modelId, appId, versionId, orgId } = useParams() as {
 		orgId: string;
 		appId: string;
 		versionId: string;
-		modelIid: string;
 		dbId: string;
 		modelId: string;
 	};
@@ -332,7 +330,7 @@ export default function EditOrCreateFieldDrawer({
 			appId: appId,
 			versionId: versionId,
 			dbId: dbId,
-			modelId: modelIid && subModel ? subModel._id : modelId,
+			modelId,
 			name: data.general.name,
 			required: data.general.required,
 			unique: data.general.unique,
@@ -372,9 +370,7 @@ export default function EditOrCreateFieldDrawer({
 		};
 		try {
 			setLoading(true);
-			editMode
-				? await updateField(dataForAPI, Boolean(modelIid))
-				: await addNewField(dataForAPI, Boolean(modelIid));
+			editMode ? await updateField(dataForAPI) : await addNewField(dataForAPI);
 			onOpenChange(false);
 			form.reset();
 		} catch (e) {

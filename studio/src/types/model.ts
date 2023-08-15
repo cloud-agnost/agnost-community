@@ -82,8 +82,11 @@ export interface Field {
 export type GetModelsOfDatabaseParams = Omit<GetDatabasesOfAppParams, 'modelId'> & {
 	dbId: string;
 };
-export type GetSpecificModelOfDatabaseParams = GetModelsOfDatabaseParams & {
+export type GetSpecificModelByIidOfDatabase = GetModelsOfDatabaseParams & {
 	modelIid: string;
+};
+export type GetSpecificModelOfDatabase = GetModelsOfDatabaseParams & {
+	modelId: string;
 };
 
 export type CreateModelParams = GetModelsOfDatabaseParams & {

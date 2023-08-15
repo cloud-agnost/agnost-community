@@ -54,7 +54,7 @@ export default function ListModels() {
 				) : (
 					<DataTable<Model>
 						columns={ModelColumns}
-						data={filteredModels}
+						data={filteredModels.filter((model) => model.type === 'model')}
 						setTable={setTable}
 						noDataMessage={<p className='text-xl'>{t('database.models.no_models')}</p>}
 						setSelectedRows={setSelectedRows}

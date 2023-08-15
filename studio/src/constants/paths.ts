@@ -36,7 +36,6 @@ export const PATHS = {
 		models: `${versionPath}/models/Models.tsx`,
 		modelsOutlet: `${versionPath}/models/ModelsOutlet.tsx`,
 		fields: `${versionPath}/models/fields/Fields.tsx`,
-		objectFields: `${versionPath}/models/fields/ObjectFields.tsx`,
 		endpoint: `${versionPath}/VersionEndpoint.tsx`,
 		storage: `${versionPath}/VersionStorage.tsx`,
 		middlewares: `${versionPath}/VersionMiddlewares.tsx`,
