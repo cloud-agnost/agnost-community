@@ -1,19 +1,16 @@
-import { Checkbox } from 'components/Checkbox';
-import { SortButton } from 'components/DataTable';
-import { translate } from '@/utils';
+import { ActionsCell } from '@/components/ActionsCell';
+import useAuthStore from '@/store/auth/authStore.ts';
+import useVersionStore from '@/store/version/versionStore.ts';
 import { APIKey, APIKeyTypes, ColumnDefWithClassName } from '@/types';
+import { translate } from '@/utils';
+import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Badge } from 'components/Badge';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
+import { Checkbox } from 'components/Checkbox';
 import { CopyButton } from 'components/CopyButton';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
+import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
-import { Button } from 'components/Button';
-import { Pencil } from 'components/icons';
 import { TableConfirmation } from 'components/Table';
-import { Trash } from '@phosphor-icons/react';
-import useVersionStore from '@/store/version/versionStore.ts';
-import { ActionsCell } from '@/components/ActionsCell';
 
 const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	{

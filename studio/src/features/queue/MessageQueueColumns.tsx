@@ -152,6 +152,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 					to={`${original._id}`}
 					canDeleteKey='queue.delete'
 					canEditKey='queue.edit'
+					type='version'
 				/>
 			);
 		},
