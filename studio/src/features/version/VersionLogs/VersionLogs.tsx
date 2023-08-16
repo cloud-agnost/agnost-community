@@ -8,12 +8,12 @@ import { calculateRecommendedBuckets, convertDateToMilliseconds, formatDate } fr
 import { DateTime } from 'luxon';
 import { useEffect, useMemo, useState } from 'react';
 import { Range } from 'react-date-range';
+import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart';
-import { useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+
 interface VersionLogsProps {
 	type: 'queue' | 'task' | 'endpoint';
 }
