@@ -1,4 +1,4 @@
-import VersionLogs from '../../features/version/VersionLogs/VersionLogs';
+import { VersionLogs } from '@/features/version/VersionLogs';
 export default function EndpointLogs() {
 	return <VersionLogs type='endpoint' />;
 }
