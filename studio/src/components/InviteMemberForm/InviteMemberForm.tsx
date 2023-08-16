@@ -19,6 +19,7 @@ interface InviteMemberFormProps {
 	actions: React.ReactNode;
 	title?: string;
 	description?: string;
+	disabled?: boolean;
 }
 
 export default function InviteMemberForm({
@@ -27,6 +28,7 @@ export default function InviteMemberForm({
 	actions,
 	title,
 	description,
+	disabled,
 }: InviteMemberFormProps) {
 	const [error, setError] = useState<APIError | null>();
 	const FormSchema = z.object({
@@ -184,6 +186,7 @@ export default function InviteMemberForm({
 					<div className='flex justify-between items-center mt-8'>
 						{fields.length < 50 && (
 							<Button
+								disabled={disabled}
 								type='button'
 								variant='text'
 								onClick={() => {

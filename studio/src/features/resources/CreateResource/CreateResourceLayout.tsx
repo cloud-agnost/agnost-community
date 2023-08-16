@@ -11,8 +11,8 @@ import useTypeStore from '@/store/types/typeStore';
 import { Checkbox } from '@/components/Checkbox';
 import { Button } from '@/components/Button';
 import { INSTANCE_PORT_MAP } from '@/constants';
-
 import * as z from 'zod';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 interface Props {
 	title: string;
 	children: React.ReactNode;
@@ -34,6 +34,7 @@ export default function CreateResourceLayout({
 	const { t } = useTranslation();
 	const { resourceType, returnToPreviousStep, goToNextStep } = useResourceStore();
 	const { appRoles } = useTypeStore();
+	const canCreateResource = useAuthorizeOrg('resource.create');
 	const form = useFormContext<z.infer<typeof ConnectDatabaseSchema>>();
 
 	return (
@@ -168,7 +169,7 @@ export default function CreateResourceLayout({
 					<Button size='lg' type='button' variant='secondary' onClick={returnToPreviousStep}>
 						{t('general.previous')}
 					</Button>
-					<Button size='lg' type='submit' loading={loading}>
+					<Button size='lg' type='submit' loading={loading} disabled={canCreateResource}>
 						{t('general.add')}
 					</Button>
 				</DrawerFooter>

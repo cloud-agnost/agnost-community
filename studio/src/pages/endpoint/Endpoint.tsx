@@ -5,6 +5,7 @@ import { EmptyEndpoint } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
 import { EndpointColumns } from '@/features/endpoints';
 import { useToast } from '@/hooks';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import { APIError, Endpoint } from '@/types';
@@ -28,6 +29,7 @@ export default function MainEndpoint() {
 	const [error, setError] = useState<APIError>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { notify } = useToast();
+	const canCreate = useAuthorizeVersion('endpoint.create');
 	const {
 		endpoints,
 		lastFetchedCount,
@@ -124,6 +126,7 @@ export default function MainEndpoint() {
 			onSearch={onInput}
 			table={table}
 			selectedRowLength={selectedRows.length}
+			disabled={!canCreate}
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'

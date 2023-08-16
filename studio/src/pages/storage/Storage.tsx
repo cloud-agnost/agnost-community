@@ -5,6 +5,7 @@ import { EmptyBucket } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
 import { StorageColumns } from '@/features/storage';
 import { useToast } from '@/hooks';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useStorageStore from '@/store/storage/storageStore';
 import { APIError, Storage } from '@/types';
@@ -26,7 +27,7 @@ export default function MainStorage() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
-
+	const canCreateStorages = useAuthorizeVersion('storage.add');
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
@@ -52,7 +53,7 @@ export default function MainStorage() {
 		selectedRows,
 	}: OutletContext = useOutletContext();
 
-	function deleteQueueHandler() {
+	function deleteStorageHandler() {
 		setLoading(true);
 		deleteStorage({
 			storageId: toDeleteStorage?._id as string,
@@ -81,7 +82,7 @@ export default function MainStorage() {
 		setSearchParams({ ...searchParams, q: value });
 	}
 
-	function deleteMultipleQueuesHandler() {
+	function deleteMultipleStoragesHandler() {
 		deleteMultipleStorages({
 			storageIds: selectedRows.map((row) => row.original._id),
 			orgId: orgId as string,
@@ -120,7 +121,8 @@ export default function MainStorage() {
 			table={table}
 			selectedRowLength={selectedRows?.length}
 			onSearch={onInput}
-			onMultipleDelete={deleteMultipleQueuesHandler}
+			onMultipleDelete={deleteMultipleStoragesHandler}
+			disabled={!canCreateStorages}
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'
@@ -154,7 +156,7 @@ export default function MainStorage() {
 					/>
 				}
 				confirmCode={toDeleteStorage?.iid as string}
-				onConfirm={deleteQueueHandler}
+				onConfirm={deleteStorageHandler}
 				isOpen={isStorageDeleteDialogOpen}
 				closeModal={closeStorageDeleteDialog}
 				closable

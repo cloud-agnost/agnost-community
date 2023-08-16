@@ -5,6 +5,7 @@ import { List, SquaresFour } from '@/components/icons';
 import { ApplicationCard } from '@/features/application';
 import AppInviteMember from '@/features/application/AppInviteMember';
 import ApplicationTable from '@/features/application/ApplicationTable/ApplicationTable';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import { Application } from '@/types';
 import { cn } from '@/utils';
@@ -12,11 +13,11 @@ import { Plus } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
-
 export default function OrganizationApps() {
 	const [isCard, setIsCard] = useState(true);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { applications, temp, searchApplications } = useApplicationStore();
+	const canAppCreate = useAuthorizeOrg('app.create');
 	const { t } = useTranslation();
 
 	useEffect(() => {
@@ -68,7 +69,7 @@ export default function OrganizationApps() {
 									/>
 								</Button>
 							</ButtonGroup>
-							<CreateApplicationButton />
+							<CreateApplicationButton disabled={!canAppCreate} />
 						</div>
 					</div>
 					{isCard ? (
@@ -83,7 +84,7 @@ export default function OrganizationApps() {
 				</div>
 			) : (
 				<EmptyState title={t('application.empty')}>
-					<CreateApplicationButton />
+					<CreateApplicationButton disabled={!canAppCreate} />
 				</EmptyState>
 			)}
 			<AppInviteMember />
@@ -91,13 +92,13 @@ export default function OrganizationApps() {
 	);
 }
 
-function CreateApplicationButton() {
+function CreateApplicationButton({ disabled }: { disabled?: boolean }) {
 	const { t } = useTranslation();
 	const { openAppCreateModal } = useOutletContext<{
 		openAppCreateModal: () => void;
 	}>();
 	return (
-		<Button variant='primary' onClick={openAppCreateModal}>
+		<Button variant='primary' onClick={openAppCreateModal} disabled={disabled}>
 			<Plus size={16} className='mr-2 text-icon-secondary' />
 			{t('application.create')}
 		</Button>

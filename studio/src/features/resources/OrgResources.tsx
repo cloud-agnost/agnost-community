@@ -2,6 +2,7 @@ import { Button } from '@/components/Button';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { SearchInput } from '@/components/SearchInput';
 import { CreateResource, ResourceTable } from '@/features/resources';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useApplicationStore from '@/store/app/applicationStore';
 import useResourcesStore from '@/store/resources/resourceStore';
 import { Plus } from '@phosphor-icons/react';
@@ -13,7 +14,7 @@ export default function OrgResources() {
 	const { t } = useTranslation();
 	const { application } = useApplicationStore();
 	const [searchParams, setSearchParams] = useSearchParams();
-
+	const canCreateResource = useAuthorizeOrg('resource.create');
 	const {
 		resources,
 		isDeletedResourceModalOpen,
@@ -50,7 +51,11 @@ export default function OrgResources() {
 						onSearch={onInput}
 						className='sm:w-[450px] flex-1'
 					/>
-					<Button variant='primary' onClick={toggleCreateResourceModal}>
+					<Button
+						variant='primary'
+						onClick={toggleCreateResourceModal}
+						disabled={!canCreateResource}
+					>
 						<Plus size={16} />
 						<span className='ml-2'>{t('resources.add')}</span>
 					</Button>

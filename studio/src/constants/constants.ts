@@ -158,14 +158,15 @@ export const ORGANIZATION_MENU_ITEMS = [
 
 export const APPLICATION_SETTINGS = [
 	{
-		id: 'open-version',
+		id: 'version',
 		name: translate('application.settings.openVersion'),
 		onClick: (application: Application) => {
 			useApplicationStore.getState().openVersionDrawer(application);
 		},
+		permissionKey: 'version.view',
 	},
 	{
-		id: 'edit-app',
+		id: 'update',
 		name: translate('application.settings.editApp'),
 		onClick: (application: Application) => {
 			useApplicationStore.getState().openEditAppDrawer(application);
@@ -179,13 +180,15 @@ export const APPLICATION_SETTINGS = [
 				);
 			}
 		},
+		permissionKey: 'update',
 	},
 	{
-		id: 'add-members',
+		id: 'invite',
 		name: translate('general.addMembers'),
 		onClick: (application: Application) => {
 			useApplicationStore.getState().openInviteMemberDrawer(application);
 		},
+		permissionKey: 'invite.create',
 	},
 ];
 

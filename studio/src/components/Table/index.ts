@@ -10,5 +10,5 @@ export {
 } from './Table';
 
 export { TableConfirmation } from './TableConfirmation';
-export { default as SelectedRowDropdown } from './SelectedRowDropdown';
+export { default as SelectedRowButton } from './SelectedRowButton';
 export { default as TableActions } from './TableActions';

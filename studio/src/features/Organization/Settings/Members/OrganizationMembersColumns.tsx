@@ -3,6 +3,7 @@ import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { DateText } from '@/components/DateText';
 import { RoleSelect } from '@/components/RoleDropdown';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { OrganizationMember } from '@/types';
 import { Trash } from '@phosphor-icons/react';
@@ -70,24 +71,33 @@ export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 		accessorKey: 'role',
 		size: 200,
 		cell: ({ row }) => {
-			const { member, role } = row.original;
-			return (
-				<RoleSelect
-					disabled={member.isOrgOwner}
-					role={role}
-					type={'app'}
-					onSelect={(newRole) => updateRole(member._id, newRole)}
-				/>
-			);
+			const { role } = row.original;
+			return <UpdateInvitationUserRole member={row.original} role={role} />;
 		},
 	},
 	{
 		id: 'actions',
 		size: 25,
-		cell: () => (
-			<Button variant='blank' iconOnly>
-				<Trash size={24} className='text-icon-base' />
-			</Button>
-		),
+		cell: () => <DeleteCell />,
 	},
 ];
+
+function DeleteCell() {
+	const canDelete = useAuthorizeOrg('member.delete');
+	return (
+		<Button variant='blank' iconOnly disabled={!canDelete}>
+			<Trash size={24} className='text-icon-base' />
+		</Button>
+	);
+}
+function UpdateInvitationUserRole({ member, role }: { member: OrganizationMember; role: string }) {
+	const canUpdate = useAuthorizeOrg('member.update');
+	return (
+		<RoleSelect
+			disabled={member.member.isOrgOwner || !canUpdate}
+			role={role}
+			type={'app'}
+			onSelect={(newRole) => updateRole(member.member._id, newRole)}
+		/>
+	);
+}

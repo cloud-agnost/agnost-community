@@ -1,4 +1,5 @@
 import { ChangeAvatar } from '@/components/ChangeAvatar';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError } from '@/types';
 import { useState } from 'react';
@@ -6,7 +7,7 @@ import { useState } from 'react';
 export default function ChangeOrganizationAvatar() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
-
+	const canUpdate = useAuthorizeOrg('org.update');
 	const { organization, changeOrganizationAvatar, removeOrganizationAvatar } =
 		useOrganizationStore();
 	async function onChangeHandler(file: File) {
@@ -49,6 +50,7 @@ export default function ChangeOrganizationAvatar() {
 			removeAvatar={onClickHandler}
 			error={error}
 			loading={loading}
+			disabled={!canUpdate}
 		/>
 	);
 }

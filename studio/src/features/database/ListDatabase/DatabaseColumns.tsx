@@ -1,13 +1,13 @@
-import { ColumnDefWithClassName, Database } from '@/types';
-import { SortButton } from 'components/DataTable';
-import { translate } from '@/utils';
-import { Button } from 'components/Button';
-import { Pencil } from 'components/icons';
-import { CopyButton } from 'components/CopyButton';
-import { Badge } from 'components/Badge';
-import useDatabaseStore from '@/store/database/databaseStore.ts';
+import ActionCell from '@/components/ActionsCell/ActionsCell';
 import { DATABASE_ICON_MAP } from '@/constants';
-import { Table, Trash } from '@phosphor-icons/react';
+import useDatabaseStore from '@/store/database/databaseStore.ts';
+import { ColumnDefWithClassName, Database } from '@/types';
+import { translate } from '@/utils';
+import { Table } from '@phosphor-icons/react';
+import { Badge } from 'components/Badge';
+import { Button } from 'components/Button';
+import { CopyButton } from 'components/CopyButton';
+import { SortButton } from 'components/DataTable';
 import { Link } from 'react-router-dom';
 
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
@@ -115,6 +115,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 				setIsOpenDeleteDatabaseDialog(true);
 			}
 
+			//Todo: Table permissions
 			return (
 				<div className='flex items-center gap-0.5 justify-end'>
 					<Button
@@ -126,24 +127,14 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 					>
 						<Table />
 					</Button>
-					<Button
-						onClick={openEditDrawer}
-						iconOnly
-						variant='blank'
-						rounded
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default text-xl'
-					>
-						<Pencil />
-					</Button>
-					<Button
-						onClick={deleteHandler}
-						variant='blank'
-						rounded
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default text-xl'
-						iconOnly
-					>
-						<Trash />
-					</Button>
+					<ActionCell
+						original={original}
+						onDelete={deleteHandler}
+						onEdit={openEditDrawer}
+						canDeleteKey='db.delete'
+						canEditKey='db.update'
+						type='version'
+					/>
 				</div>
 			);
 		},

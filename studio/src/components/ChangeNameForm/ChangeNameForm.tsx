@@ -41,6 +41,7 @@ interface ChangeNameFormProps {
 	loading: boolean;
 	defaultValue: string;
 	label?: string;
+	disabled?: boolean;
 }
 
 export default function ChangeNameForm({
@@ -49,6 +50,7 @@ export default function ChangeNameForm({
 	loading,
 	defaultValue,
 	label,
+	disabled,
 }: ChangeNameFormProps) {
 	const { t } = useTranslation();
 
@@ -97,7 +99,7 @@ export default function ChangeNameForm({
 						)}
 					/>
 					<div className='mt-4'>
-						<Button loading={loading} size='lg'>
+						<Button loading={loading} size='lg' disabled={disabled}>
 							{t('general.save')}
 						</Button>
 					</div>

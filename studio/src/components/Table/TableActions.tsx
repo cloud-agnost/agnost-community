@@ -1,7 +1,6 @@
-import { Button } from '../Button';
-import { Trash } from '@phosphor-icons/react';
-import { TableConfirmation } from '../Table';
 import { Pencil } from 'components/icons';
+import { Button } from '../Button';
+import { TableConfirmation } from '../Table';
 interface Props {
 	onDelete: () => void;
 	onEdit: () => void;
@@ -23,11 +22,7 @@ export default function TableActions({
 				title={confirmationTitle}
 				description={confirmationDescription}
 				onConfirm={onDelete}
-			>
-				<Button variant='blank' iconOnly>
-					<Trash size={24} className='text-icon-base' />
-				</Button>
-			</TableConfirmation>
+			/>
 		</div>
 	);
 }

@@ -1,9 +1,10 @@
-import { SelectedRowDropdown } from 'components/Table';
+import { SelectedRowButton } from 'components/Table';
 import { Row, Table } from '@tanstack/react-table';
 import { Param } from '@/types';
 import { AddVariableButton } from '@/features/version/SettingsEnvironmentVariables/';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Dispatch, SetStateAction } from 'react';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 
 interface VariableActionsProps {
 	selectedRows: Row<Param>[] | undefined;
@@ -16,7 +17,7 @@ export default function VariableActions({
 	setSelectedRows,
 }: VariableActionsProps) {
 	const { deleteMultipleParams, version } = useVersionStore();
-
+	const canDeleteMultiple = useAuthorizeVersion('version.param.delete');
 	async function onDelete() {
 		if (!version || !selectedRows?.length) return;
 		await deleteMultipleParams({
@@ -32,10 +33,11 @@ export default function VariableActions({
 	return (
 		<div className='flex gap-4'>
 			{!!selectedRows?.length && (
-				<SelectedRowDropdown
+				<SelectedRowButton<Param>
 					table={table}
 					onDelete={onDelete}
 					selectedRowLength={selectedRows?.length}
+					disabled={!canDeleteMultiple}
 				/>
 			)}
 			<AddVariableButton />

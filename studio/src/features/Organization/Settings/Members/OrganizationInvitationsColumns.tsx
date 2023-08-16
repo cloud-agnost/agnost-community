@@ -1,11 +1,9 @@
-import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { ResendButton } from '@/components/ResendButton';
 import { TableConfirmation } from '@/components/Table';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Invitation } from '@/types';
 import { formatDate, notify, translate } from '@/utils';
-import { Trash } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
@@ -98,6 +96,7 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 					<TableConfirmation
 						title={translate('organization.settings.members.invite.delete')}
 						description={translate('organization.settings.members.invite.deleteDesc')}
+						authorizedKey='invite.delete'
 						onConfirm={() => {
 							useOrganizationStore.getState().deleteInvitation({
 								token,
@@ -117,11 +116,7 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 								},
 							});
 						}}
-					>
-						<Button variant='blank' iconOnly>
-							<Trash size={24} className='text-icon-base' />
-						</Button>
-					</TableConfirmation>
+					/>
 				</div>
 			);
 		},
