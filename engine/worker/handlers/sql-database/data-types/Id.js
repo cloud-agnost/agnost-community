@@ -2,58 +2,26 @@ import Field from "./Field.js";
 import { DATABASE } from "../../../config/constants.js";
 
 export default class Id extends Field {
-	/**
-	 * @description The name of the data type.
-	 */
-	static typeName = "Id";
+    createMap = {
+        [DATABASE.PostgreSQL]: "{NAME} {TYPE} PRIMARY KEY",
+        [DATABASE.MySQL]: "`{NAME}` {TYPE} PRIMARY KEY",
+        [DATABASE.SQLServer]: "{NAME} {TYPE} PRIMARY KEY",
+    };
 
-	/**
-	 * @description The name of the database adapter.
-	 */
-	adapter;
+    isIndexed() {
+        return false;
+    }
 
-	/**
-	 * @description The data type of the field.
-	 */
-	type = "string";
+    isUnique() {
+        return false;
+    }
 
-	/**
-	 * @description The name of the field.
-	 */
-	name;
+    /**
+     * @description Generates the query for the field.
+     */
+    toDefinitionQuery() {
+        const schema = this.createMap[this.type];
 
-	/**
-	 * @description The name of the data type.
-	 */
-	versions = {
-		[DATABASE.MySQL]: "VARCHAR(36)",
-		[DATABASE.PostgreSQL]: "VARCHAR(36)",
-		[DATABASE.SQLServer]: "NVARCHAR(36)",
-		[DATABASE.Oracle]: "VARCHAR2(36)",
-	};
-
-	/**
-	 * @description The default value for the data type.
-	 * @param {DatabaseType} adapter - The database adapter.
-	 * @param {string} name - The name of the field.
-	 */
-	constructor(adapter, name) {
-		super();
-		this.adapter = adapter;
-		this.name = name;
-	}
-
-	/**
-	 * @description Generates the query for the field.
-	 */
-	toDefinitionQuery() {
-		return this.name + " " + this.versions[this.adapter] + " PRIMARY KEY";
-	}
-
-	/**
-	 * @description Generates the query for the rename field.
-	 */
-	toDefinitionQueryForRename() {
-		return this.versions[this.adapter];
-	}
+        return schema.replaceAll("{NAME}", this.getName()).replaceAll("{TYPE}", this.getDbType());
+    }
 }

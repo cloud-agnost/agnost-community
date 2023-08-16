@@ -86,9 +86,7 @@ export default function AccountInformation() {
 			const user = await initializeClusterSetup(data);
 			setUser(user as User);
 			const { nextPath } = getCurrentStep();
-			console.log(nextPath);
 			if (nextPath) {
-				console.log(nextPath);
 				navigate(nextPath);
 				goToNextStep(true);
 			}

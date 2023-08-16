@@ -9,6 +9,7 @@ export interface Model {
 	name: string;
 	type: string;
 	description: string;
+	parentiid?: string;
 	timestamps: {
 		enabled: boolean;
 		createdAt: string;
@@ -54,6 +55,7 @@ export interface Field {
 		decimalDigits: number;
 	};
 	object?: {
+		iid: string;
 		timestamps: {
 			enabled: boolean;
 			createdAt: string;
@@ -61,6 +63,7 @@ export interface Field {
 		};
 	};
 	objectList?: {
+		iid: string;
 		timestamps: {
 			enabled: boolean;
 			createdAt: string;
@@ -76,8 +79,14 @@ export interface Field {
 	};
 }
 
-export type GetModelsOfDatabaseParams = GetDatabasesOfAppParams & {
+export type GetModelsOfDatabaseParams = Omit<GetDatabasesOfAppParams, 'modelId'> & {
 	dbId: string;
+};
+export type GetSpecificModelByIidOfDatabase = GetModelsOfDatabaseParams & {
+	modelIid: string;
+};
+export type GetSpecificModelOfDatabase = GetModelsOfDatabaseParams & {
+	modelId: string;
 };
 
 export type CreateModelParams = GetModelsOfDatabaseParams & {
@@ -101,7 +110,7 @@ export type DeleteMultipleModelParams = GetModelsOfDatabaseParams & {
 export type UpdateNameAndDescriptionParams = GetModelsOfDatabaseParams & {
 	modelId: string;
 	name: string;
-	description: string;
+	description?: string;
 };
 export type DeleteFieldParams = GetModelsOfDatabaseParams & {
 	modelId: string;
@@ -127,7 +136,6 @@ export type AddNewFieldParams = GetModelsOfDatabaseParams & {
 	};
 	richText?: {
 		searchable: boolean;
-		maxLength: number;
 	};
 	encryptedText?: {
 		maxLength: number;

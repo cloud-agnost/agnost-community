@@ -116,7 +116,6 @@
 	"limiter_deleted": "Rate limiter(s) deleted successfully",
 	"limiter_added_to_default": "Rate limiter added to default rate limiters",
 	"edit_rate_limiter": "Edit Rate Limiter",
-	"rate_limiters_empty": "No rate limit selected",
 	"handler_code": "Handler Code",
 	"middleware": {
 		"default": "Middlewares",
@@ -219,5 +218,15 @@
 		"rate_limiter": "Rate Limiters",
 		"rate_limiter_desc": "Rate limiting puts a cap on how often someone can send realtime messages within a certain timeframe. By rate limiting, you can help stop certain kinds of malicious activity. You can define multiple rate limits which are applied sequentially",
 		"endpoint_access_custom_excluded_desc": "API key cannot be used with below excluded endpoints but with all others not selected"
-	}
+	},
+	"view_log": "View Log",
+	"log": "Logs",
+	"hits": "Hits",
+	"hit": "Hit",
+	"timestamp": "TIMESTAMP",
+	"response_time": "RESPONSE TIME",
+	"success_count": "Success Count",
+	"error_count": "Error Count",
+	"readOnly": "Readonly",
+	"read_write": "Read/Write"
 }

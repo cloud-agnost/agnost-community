@@ -2,9 +2,10 @@ import { PARAM_REGEX } from '@/constants';
 import { socket } from '@/helpers';
 import { useToast as toast } from '@/hooks';
 import { t } from '@/i18n/config.ts';
-import { RealtimeData, ToastType } from '@/types';
+import useApplicationStore from '@/store/app/applicationStore';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { AppRoles, OrgRoles, RealtimeData, ToastType } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
-import { DateTime } from 'luxon';
 import { twMerge } from 'tailwind-merge';
 type EmptyableArray = readonly [] | [];
 type EmptyableString = '' | string;
@@ -80,10 +81,6 @@ export function capitalize(str: string) {
 		return '';
 	}
 	return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-export function getRelativeTime(date: string) {
-	return DateTime.fromISO(date).setLocale('en').toRelative();
 }
 
 export function notify(params: ToastType) {
@@ -191,3 +188,38 @@ export default function groupBy<T>(list: T[], keyGetter: (item: T) => string) {
 
 	return map;
 }
+export const getPermission = (permissions: any, pathParts: string[]): boolean | undefined => {
+	let entity = permissions;
+	for (let i = 0; i < pathParts.length - 1; i++) {
+		entity = entity[pathParts[i]];
+		if (!entity) break;
+	}
+
+	if (entity && entity[pathParts[pathParts.length - 1]])
+		return entity[pathParts[pathParts.length - 1]];
+};
+
+export const getAppPermission = (userRole: AppRoles, path: string) => {
+	const pathParts = path.split('.');
+	const userPermissions = useApplicationStore.getState().appAuthorization;
+	if (userPermissions[userRole]) {
+		const currentPermissions = userPermissions[userRole];
+		const permission = getPermission(currentPermissions, pathParts);
+		console.log(permission);
+		return permission;
+	}
+	return undefined;
+};
+
+export const getOrgPermission = (path: string) => {
+	const pathParts = path.split('.');
+	const userPermissions = useOrganizationStore.getState().orgAuthorization;
+	const role = useOrganizationStore.getState().organization?.role as OrgRoles;
+	if (userPermissions[role]) {
+		const currentPermissions = userPermissions[role];
+		const permission = getPermission(currentPermissions, pathParts);
+
+		return permission;
+	}
+	return undefined;
+};

@@ -1,4 +1,4 @@
-import { BaseGetRequest, User } from './type';
+import { BaseGetRequest, BaseParams, User } from './type';
 
 export interface APIKey {
 	expiryDate?: string;
@@ -20,6 +20,44 @@ export interface APIKey {
 }
 export type APIKeyTypes = 'no-access' | 'full-access' | 'custom-allowed' | 'custom-excluded';
 export type AllAndSpecified = 'all' | 'specified';
+export type VersionLogTypes = 'endpoint' | 'queue' | 'task';
+export interface VersionLog {
+	_id: string;
+	timestamp: string;
+	name: string;
+	status: 'success' | 'error';
+	duration: number;
+	orgId: string;
+	appId: string;
+	versionId: string;
+	envId: string;
+	queueId?: string;
+	taskId?: string;
+	epId?: string;
+	message: any;
+	errors: any;
+}
+
+export interface GetVersionLogsParams extends BaseGetRequest, BaseParams {
+	type: VersionLogTypes;
+}
+export interface VersionLogBucket {
+	totalHits: number;
+	buckets: {
+		bucket: number;
+		start: string;
+		end: string;
+		success: number;
+		error: number;
+	}[];
+}
+
+export interface GetVersionLogBucketsParams extends BaseParams {
+	buckets: number;
+	type: VersionLogTypes;
+	start: string;
+	end: string;
+}
 
 export interface RateLimit {
 	_id: string;
@@ -64,7 +102,8 @@ export interface Version {
 		providers: [];
 		messages: [];
 	};
-	createdBy: User;
+	createdBy: string;
+	updatedBy: string;
 	_id: string;
 	params: Param[];
 	limits: RateLimit[];

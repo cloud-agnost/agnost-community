@@ -17,3 +17,5 @@ export { default as Reference } from "./Reference.js";
 export { default as RichText } from "./RichText.js";
 export { default as Text } from "./Text.js";
 export { default as Time } from "./Time.js";
+export { default as Enum } from "./Enum.js";
+export { default as GeoPoint } from "./GeoPoint.js";

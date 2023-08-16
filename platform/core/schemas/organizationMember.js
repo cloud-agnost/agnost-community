@@ -12,127 +12,95 @@ import { orgRoles } from "../config/constants.js";
  * Viewer: Read-only access to organization information
  */
 export const OrganizationMemberModel = mongoose.model(
-	"organization_member",
-	new mongoose.Schema({
-		orgId: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "organization",
-			index: true,
-			immutable: true,
-		},
-		userId: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "user",
-			index: true,
-			immutable: true,
-		},
-		role: {
-			type: String,
-			required: true,
-			index: true,
-			enum: orgRoles,
-		},
-		joinDate: {
-			type: Date,
-			default: Date.now,
-			immutable: true,
-		},
-		__v: {
-			type: Number,
-			select: false,
-		},
-	})
+  "organization_member",
+  new mongoose.Schema({
+    orgId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "organization",
+      index: true,
+      immutable: true,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      index: true,
+      immutable: true,
+    },
+    role: {
+      type: String,
+      required: true,
+      index: true,
+      enum: orgRoles,
+    },
+    joinDate: {
+      type: Date,
+      default: Date.now,
+      immutable: true,
+    },
+    __v: {
+      type: Number,
+      select: false,
+    },
+  })
 );
 
 export const applyRules = (type) => {
-	switch (type) {
-		case "get-members":
-			return [
-				query("page")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isInt({
-						min: 0,
-					})
-					.withMessage(
-						t("Page number needs to be a positive integer or 0 (zero)")
-					)
-					.toInt(),
-				query("size")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isInt({
-						min: config.get("general.minPageSize"),
-						max: config.get("general.maxPageSize"),
-					})
-					.withMessage(
-						t(
-							"Page size needs to be an integer, between %s and %s",
-							config.get("general.minPageSize"),
-							config.get("general.maxPageSize")
-						)
-					)
-					.toInt(),
-			];
-		case "update-member-role":
-			return [
-				param("userId")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom(async (value, { req }) => {
-						if (!helper.isValidId(value))
-							throw new AgnostError(t("Not a valid user identifier"));
+  switch (type) {
+    case "update-member-role":
+      return [
+        param("userId")
+          .trim()
+          .notEmpty()
+          .withMessage(t("Required field, cannot be left empty"))
+          .bail()
+          .custom(async (value, { req }) => {
+            if (!helper.isValidId(value))
+              throw new AgnostError(t("Not a valid user identifier"));
 
-						return true;
-					}),
-				body("role")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isIn(orgRoles)
-					.withMessage(t("Unsupported member role")),
-			];
-		case "remove-member":
-			return [
-				param("userId")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom(async (value, { req }) => {
-						if (!helper.isValidId(value))
-							throw new AgnostError(t("Not a valid user identifier"));
+            return true;
+          }),
+        body("role")
+          .trim()
+          .notEmpty()
+          .withMessage(t("Required field, cannot be left empty"))
+          .bail()
+          .isIn(orgRoles)
+          .withMessage(t("Unsupported member role")),
+      ];
+    case "remove-member":
+      return [
+        param("userId")
+          .trim()
+          .notEmpty()
+          .withMessage(t("Required field, cannot be left empty"))
+          .bail()
+          .custom(async (value, { req }) => {
+            if (!helper.isValidId(value))
+              throw new AgnostError(t("Not a valid user identifier"));
 
-						return true;
-					}),
-			];
-		case "remove-members":
-			return [
-				body("userIds")
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.isArray()
-					.withMessage(t("User identifiers need to be an array of strings")),
-				body("userIds.*")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom(async (value, { req }) => {
-						if (!helper.isValidId(value))
-							throw new AgnostError(t("Not a valid user identifier"));
+            return true;
+          }),
+      ];
+    case "remove-members":
+      return [
+        body("userIds")
+          .notEmpty()
+          .withMessage(t("Required field, cannot be left empty"))
+          .isArray()
+          .withMessage(t("User identifiers need to be an array of strings")),
+        body("userIds.*")
+          .trim()
+          .notEmpty()
+          .withMessage(t("Required field, cannot be left empty"))
+          .bail()
+          .custom(async (value, { req }) => {
+            if (!helper.isValidId(value))
+              throw new AgnostError(t("Not a valid user identifier"));
 
-						return true;
-					}),
-			];
-		default:
-			return [];
-	}
+            return true;
+          }),
+      ];
+    default:
+      return [];
+  }
 };

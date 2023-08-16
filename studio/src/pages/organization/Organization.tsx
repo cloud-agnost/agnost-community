@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
-import { OrganizationCreateModal } from '@/features/Organization';
+import { OrganizationCreateModal } from '@/features/organization';
 import { RequireAuth } from '@/router';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
 import useAuthStore from '@/store/auth/authStore.ts';
@@ -8,8 +8,8 @@ import useApplicationStore from '@/store/app/applicationStore.ts';
 
 Organization.loader = async function ({ params }: LoaderFunctionArgs) {
 	const { orgId } = params;
-	const { getAllOrganizationByUser } = useOrganizationStore.getState();
-	const { getAppsByOrgId } = useApplicationStore.getState();
+	const { getAllOrganizationByUser, getOrgPermissions } = useOrganizationStore.getState();
+	const { getAppsByOrgId, getAppPermissions } = useApplicationStore.getState();
 	const { isAuthenticated } = useAuthStore.getState();
 
 	if (isAuthenticated()) getAllOrganizationByUser();
@@ -22,6 +22,8 @@ Organization.loader = async function ({ params }: LoaderFunctionArgs) {
 			} else if (orgId) {
 				getAppsByOrgId(orgId);
 			}
+			getAppPermissions();
+			getOrgPermissions();
 		},
 		{ fireImmediately: true },
 	);

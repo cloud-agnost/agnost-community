@@ -1,12 +1,12 @@
+import ActionCell from '@/components/ActionsCell/ActionsCell';
 import { Badge } from '@/components/Badge';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
-import { TableActions } from '@/components/Table';
 import { BADGE_COLOR_MAP } from '@/constants';
+import useResourceStore from '@/store/resources/resourceStore';
 import { Resource } from '@/types';
 import { translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
-
 export const ResourceTableColumn: ColumnDef<Resource>[] = [
 	{
 		id: 'name',
@@ -47,7 +47,7 @@ export const ResourceTableColumn: ColumnDef<Resource>[] = [
 			const { allowedRoles } = row.original;
 			return (
 				<div className='flex gap-2'>
-					{allowedRoles.map((role) => {
+					{allowedRoles.sort().map((role) => {
 						return <Badge key={role} text={role} variant={BADGE_COLOR_MAP[role.toUpperCase()]} />;
 					})}
 				</div>
@@ -70,16 +70,19 @@ export const ResourceTableColumn: ColumnDef<Resource>[] = [
 		id: 'actions',
 		header: translate('resources.table.actions'),
 		size: 45,
-		cell: () => {
+		cell: ({ row }) => {
 			return (
-				<>
-					<TableActions
-						onDelete={() => console.log('delete')}
-						onEdit={() => console.log('edit')}
-						confirmationTitle='delete'
-						confirmationDescription='delete'
-					/>
-				</>
+				<ActionCell
+					original={row.original}
+					onDelete={() => () =>
+						useResourceStore.setState({
+							deletedResource: row.original,
+							isDeletedResourceModalOpen: true,
+						})}
+					canEditKey='resource.update'
+					canDeleteKey='resource.delete'
+					type='org'
+				/>
 			);
 		},
 	},

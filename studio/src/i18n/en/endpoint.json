@@ -8,11 +8,14 @@
 	"createdAt": "CREATED AT",
 	"updatedAt": "UPDATED AT",
 	"add": "Create Endpoint",
-
+	"required": "Required",
+	"optional": "Optional",
+	"empty": "You have not defined any endpoints for this app version",
 	"create": {
 		"title": "Create New Endpoint",
 		"name": "Name",
 		"timeout": "Timeout",
+		"timeout_description": "Maximum time in milliseconds to wait for endpoint logic to execute",
 		"methodAndPath": "Method & Path",
 		"method": "Method",
 		"path": "Path",
@@ -65,6 +68,6 @@
 		"title": "Delete Endpoint",
 		"message": "Are you sure you want to delete endpoint ?",
 		"description": "This action is not reversible — please continue with caution.",
-		"confirmCode": "Confirm endpoint delete by typing {{confirmCode}} below."
+		"confirmCode": "Confirm endpoint delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
 	}
 }

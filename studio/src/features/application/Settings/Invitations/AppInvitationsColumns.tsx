@@ -1,14 +1,14 @@
-import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { DateText } from '@/components/DateText';
+import { ResendButton } from '@/components/ResendButton';
 import { TableConfirmation } from '@/components/Table';
+import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
-import { Invitation } from '@/types';
+import { AppRoles, Invitation } from '@/types';
 import { notify, translate } from '@/utils';
-import { Trash } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
-import { ResendButton } from '@/components/ResendButton';
+
 function updateInvitationUserRole(token: string, role: string) {
 	useApplicationStore.getState?.().updateInvitationUserRole({
 		token,
@@ -109,13 +109,7 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { token, role } = row.original;
-			return (
-				<RoleSelect
-					role={role}
-					type={'app'}
-					onSelect={(newRole) => updateInvitationUserRole(token, newRole)}
-				/>
-			);
+			return <UpdateInvitationUserRole token={token} role={role} />;
 		},
 	},
 	{
@@ -125,18 +119,31 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 			const { token, email } = row.original;
 			return (
 				<div className='flex items-center justify-end'>
-					<ResendButton onResend={() => resendInvitation(token, email)} />
+					<ResendButton
+						onResend={() => resendInvitation(token, email)}
+						permissionKey='invite.resend'
+					/>
 					<TableConfirmation
 						title={translate('organization.settings.members.invite.delete')}
 						description={translate('organization.settings.members.invite.deleteDesc')}
 						onConfirm={() => deleteInvitation(token)}
-					>
-						<Button variant='blank' iconOnly>
-							<Trash size={24} className='text-icon-base' />
-						</Button>
-					</TableConfirmation>
+						authorizedKey='invite.delete'
+					/>
 				</div>
 			);
 		},
 	},
 ];
+
+function UpdateInvitationUserRole({ token, role }: { token: string; role: string }) {
+	const appRole = useApplicationStore((state) => state.application?.role);
+	const canUpdate = useAuthorizeApp({ role: appRole as AppRoles, key: 'invite.update' });
+	return (
+		<RoleSelect
+			role={role}
+			type={'app'}
+			onSelect={(newRole) => updateInvitationUserRole(token, newRole)}
+			disabled={!canUpdate}
+		/>
+	);
+}

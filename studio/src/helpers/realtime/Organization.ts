@@ -1,7 +1,10 @@
+import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization as OrganizationType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
-import useOrganizationStore from '@/store/organization/organizationStore';
 class Organization extends RealtimeActions<OrganizationType> {
+	info(): void {
+		throw new Error('Method not implemented.');
+	}
 	delete({ identifiers }: RealtimeActionParams<OrganizationType>) {
 		useOrganizationStore.setState?.({
 			organizations: useOrganizationStore
@@ -24,6 +27,9 @@ class Organization extends RealtimeActions<OrganizationType> {
 		useOrganizationStore.setState?.({
 			organizations: [...useOrganizationStore.getState().organizations, data],
 		});
+	}
+	telemetry(params: RealtimeActionParams<OrganizationType>) {
+		this.update(params);
 	}
 }
 

@@ -7,7 +7,7 @@ export default function VersionEndpoint() {
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const [isEditEndpointOpen, setIsEditEndpointOpen] = useState(false);
 	const [selectedRows, setSelectedRows] = useState<Row<Endpoint>[]>([]);
-	const [table, setTable] = useState<Table<any>>();
+	const [table, setTable] = useState<Table<Endpoint>>();
 	const [page, setPage] = useState(0);
 	return (
 		<>

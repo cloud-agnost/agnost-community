@@ -15,7 +15,7 @@ export default function TestEndpointTable({
 	return (
 		<div className='space-y-4'>
 			{title && <span className='text-sm text-default font-semibold'>{title}</span>}
-			<Table>
+			<Table containerClassName='max-h-[270px] overflow-auto'>
 				<TableHeader>
 					<TableRow className='head bg-wrapper-background-light'>
 						{isFormData && <TableHead>{t('general.type')} </TableHead>}

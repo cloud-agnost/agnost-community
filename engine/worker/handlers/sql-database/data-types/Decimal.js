@@ -2,69 +2,34 @@ import Field from "./Field.js";
 import { DATABASE } from "../../../config/constants.js";
 
 export default class Decimal extends Field {
-	static typeName = "Decimal";
-	/**
-	 * @description The name of the database adapter.
-	 */
-	adapter;
+    baseLength = 10;
 
-	/**
-	 * @description The data type of the field.
-	 */
-	type = "number";
+    createMap = {
+        [DATABASE.PostgreSQL]: "{name} {type}({BASE_LENGTH},{DIGITS}) {required}",
+        [DATABASE.MySQL]: "`{name}` {type}({BASE_LENGTH},{DIGITS}) {required}",
+        [DATABASE.SQLServer]: "{name} {type}({BASE_LENGTH},{DIGITS}) {required}",
+    };
 
-	/**
-	 * @description The name of the field.
-	 */
-	name;
+    /**
+     * @description Gets the decimal digits
+     * @return {number}
+     */
+    getDecimalDigits() {
+        return this.options.decimal.decimalDigits;
+    }
 
-	/**
-	 * @description The configuration for the field.
-	 */
-	config = {
-		precision: 10,
-		scale: 2,
-	};
+    /**
+     * @description Generates the query for the field.
+     * @return {string}
+     */
+    toDefinitionQuery() {
+        const schema = this.createMap[this.getDatabaseType()];
 
-	/**
-	 * @description The name of the data type.
-	 */
-	versions = {
-		[DATABASE.MySQL]: "DECIMAL",
-		[DATABASE.PostgreSQL]: "DECIMAL",
-		[DATABASE.SQLServer]: "DECIMAL",
-		[DATABASE.Oracle]: "DECIMAL",
-	};
-
-	/**
-	 * @description The default value for the data type.
-	 * @param {DatabaseType} adapter - The database adapter.
-	 * @param {string} name - The name of the field.
-	 */
-	constructor(adapter, name) {
-		super();
-		this.adapter = adapter;
-		this.name = name;
-	}
-
-	/**
-	 * @description Max length for the data type.
-	 */
-	maxLength() {
-		return `(${this.config.precision},${this.config.scale})`;
-	}
-
-	/**
-	 * @description Generates the query for the field.
-	 */
-	toDefinitionQuery() {
-		return this.name + " " + this.versions[this.adapter] + this.maxLength();
-	}
-
-	/**
-	 * @description Generates the query for the rename field.
-	 */
-	toDefinitionQueryForRename() {
-		return this.versions[this.adapter];
-	}
+        return schema
+            .replace("{name}", this.getName())
+            .replace("{type}", this.getDbType())
+            .replace("{BASE_LENGTH}", this.baseLength.toString())
+            .replace("{DIGITS}", this.getDecimalDigits().toString())
+            .replace("{required}", this.isRequired() ? "NOT NULL" : "NULL");
+    }
 }

@@ -1,20 +1,17 @@
-import { ColumnDef } from '@tanstack/react-table';
-import { Endpoint } from '@/types';
-import { Checkbox } from '@/components/Checkbox';
+import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
-import { DateText } from '@/components/DateText';
-import { Button } from '@/components/Button';
-import { Trash } from '@phosphor-icons/react';
-import { Pencil } from '@/components/icons';
-import { BADGE_COLOR_MAP, ENDPOINT_METHOD_TEXT_COLOR } from '@/constants';
-import { cn, translate } from '@/utils';
+import { Checkbox } from '@/components/Checkbox';
 import { CopyButton } from '@/components/CopyButton';
-import useOrganizationStore from '@/store/organization/organizationStore';
-import { Link } from 'react-router-dom';
+import { DateText } from '@/components/DateText';
+import { BADGE_COLOR_MAP, ENDPOINT_METHOD_TEXT_COLOR, HTTP_METHOD_BADGE_MAP } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { ColumnDefWithClassName, Endpoint } from '@/types';
+import { cn, translate } from '@/utils';
 
 const { openDeleteEndpointDialog } = useEndpointStore.getState();
-const EndpointColumns: ColumnDef<Endpoint>[] = [
+
+const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	{
 		id: 'select',
 		header: ({ table }) => (
@@ -67,7 +64,7 @@ const EndpointColumns: ColumnDef<Endpoint>[] = [
 		size: 100,
 		cell: ({ row }) => {
 			const { method } = row.original;
-			return <Badge variant={BADGE_COLOR_MAP[method]} text={method} />;
+			return <Badge variant={HTTP_METHOD_BADGE_MAP[method]} text={method} />;
 		},
 	},
 	{
@@ -83,7 +80,9 @@ const EndpointColumns: ColumnDef<Endpoint>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { apiKeyRequired } = row.original;
-			const apiKeyRequiredText = apiKeyRequired ? 'Required' : 'Optional';
+			const apiKeyRequiredText = apiKeyRequired
+				? translate('endpoint.required')
+				: translate('endpoint.optional');
 			return (
 				<Badge
 					variant={BADGE_COLOR_MAP[apiKeyRequiredText.toUpperCase()]}
@@ -100,7 +99,9 @@ const EndpointColumns: ColumnDef<Endpoint>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { sessionRequired } = row.original;
-			const sessionRequiredText = sessionRequired ? 'Required' : 'Optional';
+			const sessionRequiredText = sessionRequired
+				? translate('endpoint.required')
+				: translate('endpoint.optional');
 			return (
 				<Badge
 					variant={BADGE_COLOR_MAP[sessionRequiredText.toUpperCase()]}
@@ -140,18 +141,19 @@ const EndpointColumns: ColumnDef<Endpoint>[] = [
 	},
 	{
 		id: 'actions',
+		className: 'actions',
 		size: 45,
 		cell: ({ row }) => {
 			const { _id } = row.original;
 			return (
-				<div className='flex items-center justify-end'>
-					<Link to={`${_id}`}>
-						<Pencil className='w-6 h-6 text-icon-base' />
-					</Link>
-					<Button variant='blank' iconOnly onClick={() => openDeleteEndpointDialog(row.original)}>
-						<Trash size={24} className='text-icon-base' />
-					</Button>
-				</div>
+				<ActionsCell<Endpoint>
+					original={row.original}
+					onDelete={() => openDeleteEndpointDialog(row.original)}
+					canDeleteKey='endpoint.delete'
+					canEditKey='endpoint.update'
+					to={`${_id}`}
+					type='version'
+				/>
 			);
 		},
 	},

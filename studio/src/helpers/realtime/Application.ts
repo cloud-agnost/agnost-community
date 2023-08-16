@@ -1,7 +1,10 @@
+import useApplicationStore from '@/store/app/applicationStore';
 import { Application as ApplicationType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
-import useApplicationStore from '@/store/app/applicationStore';
 class Application extends RealtimeActions<ApplicationType> {
+	info(): void {
+		throw new Error('Method not implemented.');
+	}
 	delete({ identifiers }: RealtimeActionParams<ApplicationType>) {
 		useApplicationStore.setState?.({
 			applications: useApplicationStore
@@ -11,7 +14,7 @@ class Application extends RealtimeActions<ApplicationType> {
 	}
 
 	update({ data }: RealtimeActionParams<ApplicationType>) {
-	useApplicationStore.setState?.({
+		useApplicationStore.setState?.({
 			application: data,
 			applications: useApplicationStore.getState?.().applications.map((app) => {
 				if (app._id === data._id) {
@@ -25,6 +28,9 @@ class Application extends RealtimeActions<ApplicationType> {
 		useApplicationStore.setState?.({
 			applications: [...useApplicationStore.getState().applications, data],
 		});
+	}
+	telemetry(params: RealtimeActionParams<ApplicationType>) {
+		this.update(params);
 	}
 }
 export default Application;

@@ -10,7 +10,7 @@ import {
 } from '@/components/Command';
 import { InfoModal } from '@/components/InfoModal';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
-import { OrganizationCreateModal } from '@/features/Organization';
+import { OrganizationCreateModal } from '@/features/organization';
 import { useToast } from '@/hooks';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization } from '@/types';
@@ -20,6 +20,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import './organization.scss';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 
 export function OrganizationDropdown() {
 	const { t } = useTranslation();
@@ -30,7 +31,7 @@ export function OrganizationDropdown() {
 		useOrganizationStore();
 	const navigate = useNavigate();
 	const { notify } = useToast();
-
+	const hasPermission = useAuthorizeOrg('org.create');
 	function handleLeave() {
 		leaveOrganization({
 			organizationId: organization?._id as string,
@@ -113,6 +114,7 @@ export function OrganizationDropdown() {
 						<CommandGroup className='organization-dropdown-footer'>
 							<CommandItem className='organization-dropdown-leave'>
 								<Button
+									disabled={organization?.role === 'Admin'}
 									variant='blank'
 									className='text-subtle'
 									onClick={() => {
@@ -125,6 +127,7 @@ export function OrganizationDropdown() {
 							</CommandItem>
 							<CommandItem>
 								<Button
+									disabled={!hasPermission}
 									size='full'
 									variant='secondary'
 									onClick={() => {

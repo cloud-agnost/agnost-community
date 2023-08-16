@@ -7,6 +7,8 @@ import {
 	DeleteMultipleFieldParams,
 	DeleteMultipleModelParams,
 	GetModelsOfDatabaseParams,
+	GetSpecificModelByIidOfDatabase,
+	GetSpecificModelOfDatabase,
 	Model,
 	UpdateFieldParams,
 	UpdateNameAndDescriptionParams,
@@ -23,6 +25,33 @@ export default class ModelService {
 	}: GetModelsOfDatabaseParams): Promise<Model[]> {
 		return (
 			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}/model`)
+		).data;
+	}
+
+	static async getSpecificModelByIidOfDatabase({
+		orgId,
+		appId,
+		versionId,
+		dbId,
+		modelIid,
+	}: GetSpecificModelByIidOfDatabase): Promise<Model> {
+		return (
+			await axios.get(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}/model/iid/${modelIid}`,
+			)
+		).data;
+	}
+	static async getSpecificModelOfDatabase({
+		orgId,
+		appId,
+		versionId,
+		dbId,
+		modelId,
+	}: GetSpecificModelOfDatabase): Promise<Model> {
+		return (
+			await axios.get(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}/model/${modelId}`,
+			)
 		).data;
 	}
 
@@ -143,6 +172,17 @@ export default class ModelService {
 				`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}/model/${modelId}/fields/${fieldId}`,
 				data,
 			)
+		).data;
+	}
+
+	static async getReferenceModels({
+		orgId,
+		appId,
+		versionId,
+		dbId,
+	}: GetModelsOfDatabaseParams): Promise<Model[]> {
+		return (
+			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}/model/ref`)
 		).data;
 	}
 }

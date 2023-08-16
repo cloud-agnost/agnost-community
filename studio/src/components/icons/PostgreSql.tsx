@@ -9,7 +9,7 @@ const SvgPostgreSql = (props: SVGProps<SVGSVGElement>) => (
 		xmlnsXlink='http://www.w3.org/1999/xlink'
 		{...props}
 	>
-		<rect width={40} height={40} rx={20} fill='url(#PostgreSQL_svg__a)' />
+		<path fill='url(#PostgreSQL_svg__a)' d='M0 0h40v40H0z' />
 		<defs>
 			<pattern id='PostgreSQL_svg__a' patternContentUnits='objectBoundingBox' width={1} height={1}>
 				<use xlinkHref='#PostgreSQL_svg__b' transform='matrix(.00118 0 0 .00118 .015 0)' />

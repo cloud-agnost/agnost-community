@@ -43,7 +43,6 @@ export default function Middlewares({ setSelectedRows, parentId, selectedRows }:
 		if (searchParams.has('q')) {
 			data.search = searchParams.get('q') as string;
 		}
-		console.log(data);
 		await getMiddlewaresOfAppVersion(data);
 	}
 

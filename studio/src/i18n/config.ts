@@ -1,17 +1,20 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import {
+	application,
+	database,
+	endpoint,
 	forms,
 	general,
 	login,
+	onboarding,
 	organization,
 	profileSettings,
-	application,
-	version,
-	onboarding,
-	database,
+	queue,
 	resources as rs,
-	endpoint,
+	task,
+	storage,
+	version,
 } from './en';
 
 export const resources = {
@@ -19,6 +22,7 @@ export const resources = {
 		translation: {
 			login,
 			database,
+			queue,
 			forms,
 			general,
 			organization,
@@ -28,6 +32,8 @@ export const resources = {
 			version,
 			resources: rs,
 			endpoint,
+			task,
+			storage,
 		},
 	},
 };

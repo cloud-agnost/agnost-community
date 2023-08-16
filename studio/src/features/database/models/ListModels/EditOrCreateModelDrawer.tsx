@@ -15,8 +15,8 @@ import {
 import { Input, Textarea } from 'components/Input';
 import { Button } from 'components/Button';
 import { NAME_SCHEMA, TIMESTAMPS_SCHEMA } from '@/constants';
-import { useEffect } from 'react';
-import { APIError } from '@/types';
+import { useEffect, useMemo } from 'react';
+import { APIError, Database } from '@/types';
 import { Separator } from 'components/Separator';
 import { SettingsFormItem } from 'components/SettingsFormItem';
 import { Switch } from 'components/Switch';
@@ -24,12 +24,20 @@ import { translate } from '@/utils';
 import useModelStore from '@/store/database/modelStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { useParams } from 'react-router-dom';
+import useDatabaseStore from '@/store/database/databaseStore.ts';
 
 const Schema = z.object({
-	name: NAME_SCHEMA,
-	description: z.string({
-		required_error: translate('forms.required', { label: translate('general.description') }),
+	name: NAME_SCHEMA.refine((value) => /^(?![0-9])/.test(value), {
+		message: translate('forms.notStartWithNumber', {
+			label: translate('general.name'),
+		}).toString(),
 	}),
+	schema: z.string().optional(),
+	description: z
+		.string({
+			required_error: translate('forms.required', { label: translate('general.description') }),
+		})
+		.optional(),
 	timestamps: TIMESTAMPS_SCHEMA,
 });
 
@@ -46,7 +54,8 @@ export default function EditOrCreateModelDrawer({
 }: EditOrCreateModelDrawerProps) {
 	const { t } = useTranslation();
 	const { createModel, updateNameAndDescription, modelToEdit } = useModelStore();
-	const { version } = useVersionStore();
+	const version = useVersionStore((state) => state.version);
+	const databases = useDatabaseStore((state) => state.databases);
 	const { dbId } = useParams();
 
 	const form = useForm<z.infer<typeof Schema>>({
@@ -59,6 +68,10 @@ export default function EditOrCreateModelDrawer({
 			},
 		},
 	});
+
+	const database = useMemo(() => {
+		return databases.find((db) => db._id === dbId) as Database;
+	}, [dbId]);
 
 	useEffect(() => {
 		if (!open) {
@@ -166,6 +179,34 @@ export default function EditOrCreateModelDrawer({
 								)}
 							/>
 							<Separator />
+							{['PostgreSQL', 'SQL Server'].includes(database?.type) && (
+								<>
+									<FormField
+										control={form.control}
+										name='schema'
+										render={({ field, formState: { errors } }) => (
+											<FormItem className='space-y-1'>
+												<FormLabel>
+													{t('database.models.add.schema.field')} {''}
+													<span className='text-[10px]'>({t('general.optional')})</span>
+												</FormLabel>
+												<FormControl>
+													<Input
+														error={Boolean(errors.schema)}
+														type='text'
+														placeholder={t('forms.placeholder', {
+															label: t('database.models.add.schema.field').toLowerCase(),
+														}).toString()}
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<Separator />
+								</>
+							)}
 							<FormField
 								control={form.control}
 								name='description'

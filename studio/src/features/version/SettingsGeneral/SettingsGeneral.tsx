@@ -1,28 +1,18 @@
-import { SettingsFormItem } from 'components/SettingsFormItem';
-import { CopyInput } from 'components/CopyInput';
-import useVersionStore from '@/store/version/versionStore.ts';
-import { useTranslation } from 'react-i18next';
-import * as z from 'zod';
-import { translate } from '@/utils';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { APIError, VersionProperties } from '@/types';
-import { useState } from 'react';
-import { useToast } from '@/hooks';
-import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormMessage,
-} from 'components/Form';
-import { Input } from 'components/Input';
-import { Button } from 'components/Button';
-import { useParams } from 'react-router-dom';
-import { Switch } from 'components/Switch';
+import { ChangeNameForm } from '@/components/ChangeNameForm';
 import { EndpointRateLimiters } from '@/features/version/SettingsGeneral';
+import { useToast } from '@/hooks';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import useVersionStore from '@/store/version/versionStore.ts';
+import { APIError, VersionProperties } from '@/types';
+import { translate } from '@/utils';
+import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
+import { CopyInput } from 'components/CopyInput';
+import { SettingsFormItem } from 'components/SettingsFormItem';
+import { Switch } from 'components/Switch';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import * as z from 'zod';
 
 const FormSchema = z.object({
 	name: z
@@ -47,7 +37,7 @@ export default function SettingsGeneral() {
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
-
+	const canEdit = useAuthorizeVersion('version.update');
 	const params = useParams<{
 		versionId: string;
 		appId: string;
@@ -71,13 +61,6 @@ export default function SettingsGeneral() {
 			setError(e as APIError);
 		}
 	}
-
-	const form = useForm<z.infer<typeof FormSchema>>({
-		resolver: zodResolver(FormSchema),
-		defaultValues: {
-			name: version?.name,
-		},
-	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		if (version?.name === data.name) return;
@@ -118,33 +101,13 @@ export default function SettingsGeneral() {
 						<AlertDescription>{error.details}</AlertDescription>
 					</Alert>
 				)}
-
-				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)}>
-						<FormField
-							control={form.control}
-							name='name'
-							render={({ field }) => (
-								<FormItem>
-									<FormControl>
-										<Input
-											error={Boolean(form.formState.errors.name)}
-											placeholder={t('profileSettings.name_placeholder') ?? ''}
-											{...field}
-										/>
-									</FormControl>
-									<FormDescription>{t('forms.max64.description')}</FormDescription>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<div className='mt-4'>
-							<Button loading={loading} size='lg'>
-								{t('profileSettings.save')}
-							</Button>
-						</div>
-					</form>
-				</Form>
+				<ChangeNameForm
+					onFormSubmit={onSubmit}
+					loading={loading}
+					error={error}
+					defaultValue={version?.name as string}
+					disabled={!canEdit}
+				/>
 			</SettingsFormItem>
 			<SettingsFormItem
 				twoColumns
@@ -154,6 +117,7 @@ export default function SettingsGeneral() {
 				description={t('version.settings.read_only_desc')}
 			>
 				<Switch
+					disabled={!canEdit}
 					checked={version?.readOnly}
 					onCheckedChange={(checked) => update({ readOnly: checked })}
 				/>
@@ -166,7 +130,7 @@ export default function SettingsGeneral() {
 					description={t('version.settings.private_desc')}
 				>
 					<Switch
-						disabled={version?.master}
+						disabled={version?.master ?? !canEdit}
 						checked={version?.private}
 						onCheckedChange={(checked) => update({ private: checked })}
 					/>

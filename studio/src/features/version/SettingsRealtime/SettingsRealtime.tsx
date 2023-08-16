@@ -7,10 +7,12 @@ import { SettingsFormItem } from 'components/SettingsFormItem';
 import { APIError, VersionRealtimeProperties } from '@/types';
 import { useToast } from '@/hooks';
 import { RealtimeRateLimits } from '@/features/version/SettingsRealtime';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 
 export default function SettingsRealtime() {
 	const realtime = useVersionStore((state) => state.version?.realtime);
 	const { version, updateVersionRealtimeProperties } = useVersionStore();
+	const canEdit = useAuthorizeVersion('version.update');
 	const { notify } = useToast();
 	const { t } = useTranslation();
 
@@ -53,6 +55,7 @@ export default function SettingsRealtime() {
 				description={t('version.realtime.api_key_required_desc')}
 			>
 				<Switch
+					disabled={!canEdit}
 					onCheckedChange={(apiKeyRequired) => update({ apiKeyRequired })}
 					checked={realtime?.apiKeyRequired}
 				/>
@@ -65,6 +68,7 @@ export default function SettingsRealtime() {
 				description={t('version.realtime.session_required_desc')}
 			>
 				<Switch
+					disabled={!canEdit}
 					onCheckedChange={(sessionRequired) => update({ sessionRequired })}
 					checked={realtime?.sessionRequired}
 				/>

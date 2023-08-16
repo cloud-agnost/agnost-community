@@ -1,30 +1,15 @@
-import Field from "./Field.js";
-import { DATABASE } from "../../../config/constants.js";
+import Text from "./Text.js";
 
-export default class PhoneNumber extends Field {
-	adapter;
-	type = "number";
-	name;
-	static typeName = "PhoneNumber";
+export default class PhoneNumber extends Text {
+    isSearchable() {
+        return false;
+    }
 
-	versions = {
-		[DATABASE.MySQL]: "VARCHAR(20)",
-		[DATABASE.PostgreSQL]: "VARCHAR(20)",
-		[DATABASE.SQLServer]: "NVARCHAR(20)",
-		[DATABASE.Oracle]: "VARCHAR2(20)",
-	};
-
-	constructor(adapter, name) {
-		super();
-		this.adapter = adapter;
-		this.name = name;
-	}
-
-	toDefinitionQuery() {
-		return `${this.name} ${this.versions[this.adapter]}`;
-	}
-
-	toDefinitionQueryForRename() {
-		return this.versions[this.adapter];
-	}
+    /**
+     * @description Gets the max length of the field
+     * @return {number | undefined}
+     */
+    getMaxLength() {
+        return config.get("database.phoneMaxLength") ?? 30;
+    }
 }

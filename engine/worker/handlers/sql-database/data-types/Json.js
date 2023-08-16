@@ -2,68 +2,30 @@ import Field from "./Field.js";
 import { DATABASE } from "../../../config/constants.js";
 
 export default class Json extends Field {
-	static typeName = "Json";
-	/**
-	 * @description The configuration for the field.
-	 */
-	config = {
-		creator: "user",
-	};
+    createMap = {
+        [DATABASE.PostgreSQL]: "{NAME} {TYPE} {REQUIRED}",
+        [DATABASE.MySQL]: "`{NAME}` {TYPE} {REQUIRED}",
+        [DATABASE.SQLServer]: "{NAME} {TYPE}({MAX_LENGTH}) {REQUIRED}",
+    };
 
-	/**
-	 * @description The name of the database adapter.
-	 */
-	adapter;
+    /**
+     * @description Gets the max length of the field
+     * @return {number}
+     */
+    getMaxLength() {
+        return config.get("database.jsonMaxLength") ?? 4000;
+    }
 
-	/**
-	 * @description The name of the field.
-	 */
-	name;
+    /**
+     * @description Generates the query for the field.
+     */
+    toDefinitionQuery() {
+        const schema = this.createMap[this.type];
 
-	/**
-	 * @description The data type of the field.
-	 */
-	type = "string";
-
-	/**
-	 * @description The name of the data type.
-	 */
-	versions = {
-		[DATABASE.MySQL]: `JSON`,
-		[DATABASE.PostgreSQL]: `JSON`,
-		[DATABASE.SQLServer]: "",
-		[DATABASE.Oracle]: "",
-	};
-
-	/**
-	 * @description The default value for the data type.
-	 * @param {string} adapter - The database adapter.
-	 * @param {string} name - The name of the field.
-	 */
-	constructor(adapter, name) {
-		if ([DATABASE.SQLServer, DATABASE.Oracle].includes(adapter)) {
-			throw new AgnostError(
-				t(
-					`JSON is not supported by ${DATABASE.SQLServer} or ${DATABASE.Oracle}`
-				)
-			);
-		}
-		super();
-		this.adapter = adapter;
-		this.name = name;
-	}
-
-	/**
-	 * @description Generates the query for the field.
-	 */
-	toDefinitionQuery() {
-		return this.name + " " + this.versions[this.adapter];
-	}
-
-	/**
-	 * @description Generates the query for the rename field.
-	 */
-	toDefinitionQueryForRename() {
-		return this.versions[this.adapter];
-	}
+        return schema
+            .replace("{NAME}", this.getName())
+            .replace("{TYPE}", this.getDbType())
+            .replace("{MAX_LENGTH}", this.getMaxLength())
+            .replace("{REQUIRED}", this.isRequired() ? "NOT NULL" : "NULL");
+    }
 }

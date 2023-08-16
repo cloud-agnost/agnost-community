@@ -1,14 +1,15 @@
-import { BaseGetRequest, BaseRequest } from '@/types';
+import {
+	NAME_REGEX,
+	NOT_START_WITH_NUMBER_REGEX,
+	NUMBER_REGEX,
+	PARAM_NAME_REGEX,
+	ROUTE_NAME_REGEX,
+} from '@/constants/regex';
+import { BaseGetRequest, BaseParams, BaseRequest } from '@/types';
 import { getPathParams, translate as t } from '@/utils';
 import { AxiosError, AxiosResponse } from 'axios';
 import * as z from 'zod';
 
-export const NUMBER_REGEX = /^[0-9]+$/;
-export const NAME_REGEX = /^[A-Za-z0-9_]+$/;
-export const NOT_START_WITH_NUMBER_REGEX = /^[A-Za-z_][A-Za-z0-9_]*$/;
-export const ROUTE_NAME_REGEX = /^\/[a-zA-Z0-9_-]+(?:\/:[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)*)*$/;
-export const PARAM_REGEX = /:([^/?]+)/g;
-export const PARAM_NAME_REGEX = /^[a-zA-Z0-9_-]+$/;
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const;
 
 export type Method = 'POST' | 'GET' | 'PUT' | 'DELETE';
@@ -151,13 +152,7 @@ export interface Endpoint {
 	__v: number;
 }
 
-export interface EndpointBase {
-	orgId: string;
-	appId: string;
-	versionId: string;
-}
-
-export interface CreateEndpointParams extends EndpointBase, BaseRequest {
+export interface CreateEndpointParams extends BaseParams, BaseRequest {
 	name: string;
 	method: Method;
 	path: string;
@@ -173,26 +168,26 @@ export type UpdateEndpointParams = CreateEndpointParams & {
 	epId: string;
 };
 
-export interface GetEndpointByIdParams extends EndpointBase {
+export interface GetEndpointByIdParams extends BaseParams {
 	epId: string;
 }
-export interface SaveEndpointLogicParams extends EndpointBase, BaseRequest {
+export interface SaveEndpointLogicParams extends BaseParams, BaseRequest {
 	epId: string;
 	logic: string;
 }
 
-export interface DeleteEndpointParams extends EndpointBase, BaseRequest {
+export interface DeleteEndpointParams extends BaseParams, BaseRequest {
 	epId: string;
 }
 
-export interface DeleteMultipleEndpointsParams extends EndpointBase, BaseRequest {
+export interface DeleteMultipleEndpointsParams extends BaseParams, BaseRequest {
 	endpointIds: string[];
 }
 
-export interface GetEndpointsByIidParams extends EndpointBase {
+export interface GetEndpointsByIidParams extends BaseParams {
 	iids: string[];
 }
-export interface GetEndpointsParams extends EndpointBase, BaseGetRequest {}
+export interface GetEndpointsParams extends BaseParams, BaseGetRequest {}
 
 export type TestMethods = 'get' | 'post' | 'put' | 'delete';
 export interface TestEndpointParams extends BaseRequest {
@@ -217,4 +212,5 @@ export interface EndpointResponse extends AxiosResponse {
 	epId: string;
 	duration: number;
 	response?: AxiosError['response'];
+	logs?: string[];
 }

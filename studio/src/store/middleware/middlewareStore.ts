@@ -139,7 +139,6 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 				updateMiddleware: async (params: UpdateMiddlewareParams, showAlert) => {
 					try {
 						const middleware = await MiddlewareService.updateMiddleware(params);
-						console.log({ middleware });
 						set((prev) => ({
 							middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
 						}));

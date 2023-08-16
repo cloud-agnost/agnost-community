@@ -17,7 +17,8 @@ import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
 import '../../organization.scss';
-import { SelectedRowDropdown } from 'components/Table';
+import { SelectedRowButton } from 'components/Table';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 
 interface RowTypes extends Omit<Invitation, 'role'>, OrganizationMember {}
 
@@ -30,7 +31,7 @@ export default function OrganizationMembersTableHeader() {
 	const { t } = useTranslation();
 	const { selectedRows, setSelectedRows } = useOutletContext() as OutletContextTypes;
 	const { notify } = useToast();
-
+	const canMultipleDelete = useAuthorizeOrg('team.delete');
 	const {
 		memberSearch,
 		memberSort,
@@ -45,7 +46,6 @@ export default function OrganizationMembersTableHeader() {
 	const sortOptions: SortOption[] =
 		selectedTab === 'member' ? ORG_MEMBERS_SORT_OPTIONS : INVITATIONS_SORT_OPTIONS;
 
-	console.log('selectedRows', selectedRows);
 	function deleteMulti() {
 		if (selectedTab === 'member') {
 			removeMultipleMembersFromOrganization({
@@ -128,7 +128,11 @@ export default function OrganizationMembersTableHeader() {
 				</DropdownMenuContent>
 			</DropdownMenu>
 			{selectedRows?.length && (
-				<SelectedRowDropdown onDelete={deleteMulti} selectedRowLength={selectedRows?.length} />
+				<SelectedRowButton<OrganizationMember>
+					onDelete={deleteMulti}
+					selectedRowLength={selectedRows?.length}
+					disabled={!canMultipleDelete}
+				/>
 			)}
 		</div>
 	);

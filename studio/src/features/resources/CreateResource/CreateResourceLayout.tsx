@@ -1,21 +1,26 @@
 import { DrawerFooter } from '@/components/Drawer';
 import { Input } from '@/components/Input';
 import useResourceStore from '@/store/resources/resourceStore';
-import { Instance } from '@/types';
+import { Instance, ConnectDatabaseSchema } from '@/types';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import CreateResourceItem from '../CreateResourceItem';
 import ResourceInstance from '../ResourceType/ResourceInstance';
 import useTypeStore from '@/store/types/typeStore';
 import { Checkbox } from '@/components/Checkbox';
+import { Button } from '@/components/Button';
+import { INSTANCE_PORT_MAP } from '@/constants';
+import * as z from 'zod';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 interface Props {
 	title: string;
 	children: React.ReactNode;
-	actions: React.ReactNode;
+	actions?: React.ReactNode;
 	instances?: Instance[];
 	control?: Control<any>;
 	typeSelection?: boolean;
+	loading?: boolean;
 }
 export default function CreateResourceLayout({
 	title,
@@ -24,10 +29,13 @@ export default function CreateResourceLayout({
 	instances,
 	control,
 	typeSelection,
+	loading,
 }: Props) {
 	const { t } = useTranslation();
-	const { resourceType } = useResourceStore();
+	const { resourceType, returnToPreviousStep, goToNextStep } = useResourceStore();
 	const { appRoles } = useTypeStore();
+	const canCreateResource = useAuthorizeOrg('resource.create');
+	const form = useFormContext<z.infer<typeof ConnectDatabaseSchema>>();
 
 	return (
 		<div className='px-6 py-4 space-y-6 max-h-[90%] overflow-auto'>
@@ -86,7 +94,7 @@ export default function CreateResourceLayout({
 												return (
 													<FormItem
 														key={role}
-														className='flex flex-row items-start space-x-3 space-y-0'
+														className='flex flex-row items-start space-x-1 space-y-0'
 													>
 														<FormControl>
 															<Checkbox
@@ -115,33 +123,57 @@ export default function CreateResourceLayout({
 							)}
 						/>
 					</CreateResourceItem>
-					<CreateResourceItem title={t('resources.database.choose_type')}>
-						<Controller
-							control={control}
-							name='instance'
-							render={({ field: { onChange, value }, formState: { errors } }) => (
-								<div className='grid grid-cols-4 gap-4'>
-									{instances?.map((type) => (
-										<ResourceInstance
-											key={type.id}
-											instance={type}
-											onSelect={() => {
-												onChange(type.name);
-											}}
-											active={value === type.name}
-										/>
-									))}
-									<p className='col-span-4 text-error-default text-sm font-sfCompact'>
-										{errors.instance?.message?.toString()}
-									</p>
-								</div>
-							)}
-						/>
-					</CreateResourceItem>
+					{instances?.length && (
+						<CreateResourceItem title={t('resources.database.choose_type')}>
+							<Controller
+								control={control}
+								name='instance'
+								render={({ field: { onChange, value }, formState: { errors } }) => (
+									<div className='grid grid-cols-4 gap-4'>
+										{instances?.map((type) => (
+											<ResourceInstance
+												key={type.id}
+												instance={type}
+												onSelect={() => {
+													onChange(type.name);
+													form.setValue('access.port', INSTANCE_PORT_MAP[type.name]);
+												}}
+												active={value === type.name}
+											/>
+										))}
+										<p className='col-span-4 text-error-default text-sm font-sfCompact'>
+											{errors.instance?.message?.toString()}
+										</p>
+									</div>
+								)}
+							/>
+						</CreateResourceItem>
+					)}
 				</>
 			)}
 			{children}
-			<DrawerFooter>{actions}</DrawerFooter>
+			{typeSelection ? (
+				<DrawerFooter>
+					<Button
+						variant='primary'
+						size='lg'
+						onClick={goToNextStep}
+						disabled={resourceType.type && resourceType.name ? false : true}
+					>
+						{t('general.next')}
+					</Button>
+				</DrawerFooter>
+			) : (
+				<DrawerFooter>
+					{actions}
+					<Button size='lg' type='button' variant='secondary' onClick={returnToPreviousStep}>
+						{t('general.previous')}
+					</Button>
+					<Button size='lg' type='submit' loading={loading} disabled={canCreateResource}>
+						{t('general.add')}
+					</Button>
+				</DrawerFooter>
+			)}
 		</div>
 	);
 }

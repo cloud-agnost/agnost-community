@@ -10,6 +10,7 @@ import {
 	InvitationRequest,
 	InviteOrgRequest,
 	LeaveOrganizationRequest,
+	OrgPermissions,
 	Organization,
 	OrganizationMember,
 	RemoveMemberFromOrganizationRequest,
@@ -17,9 +18,8 @@ import {
 	TransferOrganizationRequest,
 	UpdateRoleRequest,
 } from '@/types';
-import { joinChannel, leaveChannel } from '@/utils';
 import { BaseRequest } from '@/types/type';
-import { translate } from '@/utils';
+import { joinChannel, leaveChannel, translate } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 interface OrganizationStore {
@@ -31,8 +31,9 @@ interface OrganizationStore {
 	memberSearch: string;
 	memberRoleFilter: string[];
 	memberSort: SortOption;
-	memberPage: number;
 	selectedTab: 'member' | 'invitation';
+	orgAuthorization: OrgPermissions;
+	memberPage: number;
 	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
 	createOrganization: (req: CreateOrganizationRequest) => Promise<Organization | APIError>;
 	selectOrganization: (organization: Organization) => void;
@@ -57,8 +58,9 @@ interface OrganizationStore {
 	setMemberSearch: (search: string) => void;
 	setMemberRoleFilter: (roles: string[]) => void;
 	setMemberSort: (sort: SortOption) => void;
-	setMemberPage: (page: number) => void;
 	clearFilter: () => void;
+	getOrgPermissions: () => Promise<OrgPermissions>;
+	setMemberPage: (page: number) => void;
 }
 
 const useOrganizationStore = create<OrganizationStore>()(
@@ -90,11 +92,15 @@ const useOrganizationStore = create<OrganizationStore>()(
 					},
 					invitationsFilter: [],
 					selectedTab: 'member',
+					orgAuthorization: {} as OrgPermissions,
 					getAllOrganizationByUser: async () => {
 						try {
 							set({ loading: true });
 							const res = await OrganizationService.getAllOrganizationsByUser();
 							set({ organizations: res, loading: false });
+							res.forEach((organization) => {
+								joinChannel(organization._id);
+							});
 							return res;
 						} catch (error) {
 							throw error as APIError;
@@ -113,6 +119,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 								],
 							});
 							if (onSuccess) onSuccess();
+							joinChannel(res._id);
 							return res;
 						} catch (error) {
 							if (onError) onError(error as APIError);
@@ -282,12 +289,11 @@ const useOrganizationStore = create<OrganizationStore>()(
 					getOrganizationMembers: async (req: GetOrganizationMembersRequest) => {
 						try {
 							const members = await OrganizationService.getOrganizationMembers(req);
-							if (get().memberPage === 0) set({ members });
-							else set({ members: [...get().members, ...members] });
-							if (req.onSuccess) req.onSuccess();
+							set({
+								members,
+							});
 							return members;
 						} catch (error) {
-							if (req.onError) req.onError(error as APIError);
 							throw error as APIError;
 						}
 					},
@@ -401,6 +407,11 @@ const useOrganizationStore = create<OrganizationStore>()(
 								sortDir: '',
 							},
 						});
+					},
+					async getOrgPermissions() {
+						const orgAuthorization = await OrganizationService.getAllOrganizationRoleDefinitions();
+						set({ orgAuthorization });
+						return orgAuthorization;
 					},
 				}),
 				{

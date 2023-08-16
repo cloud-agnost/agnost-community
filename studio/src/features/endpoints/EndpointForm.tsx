@@ -1,4 +1,3 @@
-import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { DrawerClose, DrawerFooter } from '@/components/Drawer';
 import {
@@ -14,17 +13,18 @@ import { Label } from '@/components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { Separator } from '@/components/Separator';
 import { Switch } from '@/components/Switch';
-import { ALL_HTTP_METHODS, BADGE_COLOR_MAP } from '@/constants';
+import { ALL_HTTP_METHODS, ENDPOINT_METHOD_BG_COLOR } from '@/constants';
 import useVersionStore from '@/store/version/versionStore';
 import { CreateEndpointSchema, RateLimit } from '@/types';
-import { cn, reorder, translate as t } from '@/utils';
+import { cn, reorder } from '@/utils';
 import { DropResult } from 'react-beautiful-dnd';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { SortableRateLimits } from '../version/SettingsGeneral';
 import EndpointMiddlewares from './EndpointMiddlewares';
-
 export default function EndpointForm() {
+	const { t } = useTranslation();
 	const form = useFormContext<z.infer<typeof CreateEndpointSchema>>();
 	const rateLimits = useVersionStore((state) => state.version?.limits);
 	return (
@@ -69,6 +69,7 @@ export default function EndpointForm() {
 								{...field}
 							/>
 						</FormControl>
+						<FormDescription>{t('endpoint.create.timeout_description')}</FormDescription>
 						<FormMessage />
 					</FormItem>
 				)}
@@ -86,35 +87,36 @@ export default function EndpointForm() {
 				<FormField
 					control={form.control}
 					name='method'
-					render={({ field }) => (
-						<FormItem>
-							<Select onValueChange={field.onChange} value={field.value}>
-								<FormControl>
-									<SelectTrigger
-										className='w-[117px] bg-input-background rounded-none rounded-l'
-										error={Boolean(form.formState.errors.method)}
-									>
-										<SelectValue placeholder='Select a role' className='flex-1'>
-											<Badge
-												className='w-3/4'
-												variant={BADGE_COLOR_MAP[field.value]}
-												text={field.value}
-											/>
-										</SelectValue>
-									</SelectTrigger>
-								</FormControl>
-								<SelectContent>
-									{ALL_HTTP_METHODS.map((role) => (
-										<SelectItem key={role} value={role}>
-											{role}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+					render={({ field }) => {
+						return (
+							<FormItem>
+								<Select onValueChange={field.onChange} value={field.value}>
+									<FormControl>
+										<SelectTrigger
+											className={cn(
+												'w-[100px] bg-input-background rounded-none rounded-l ',
+												ENDPOINT_METHOD_BG_COLOR[field.value],
+											)}
+											error={Boolean(form.formState.errors.method)}
+										>
+											<SelectValue placeholder={t('general.select')} className='flex-1'>
+												{field.value}
+											</SelectValue>
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{ALL_HTTP_METHODS.map((role) => (
+											<SelectItem key={role} value={role}>
+												{role}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
 
-							<FormMessage />
-						</FormItem>
-					)}
+								<FormMessage />
+							</FormItem>
+						);
+					}}
 				/>
 				<FormField
 					control={form.control}
@@ -127,7 +129,7 @@ export default function EndpointForm() {
 									error={Boolean(form.formState.errors.path)}
 									placeholder={
 										t('forms.placeholder', {
-											label: t('general.name'),
+											label: t('endpoint.create.path'),
 										}) ?? ''
 									}
 									{...field}
@@ -206,7 +208,7 @@ export default function EndpointForm() {
 										);
 										field.onChange(ordered);
 									}}
-									options={rateLimits?.filter((lmt) => field.value?.includes(lmt.iid))}
+									options={rateLimits?.filter((lmt) => !field.value?.includes(lmt.iid))}
 									onSelect={(limiter: RateLimit) => {
 										if (!field.value) field.onChange([limiter.iid]);
 										else field.onChange([...field.value, limiter.iid]);

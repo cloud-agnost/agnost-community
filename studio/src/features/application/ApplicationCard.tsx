@@ -2,8 +2,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Badge } from '@/components/Badge';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
-import { Application } from '@/types';
-import { getRelativeTime } from '@/utils/utils';
+import { AppRoles, Application } from '@/types';
+import { getRelativeTime } from '@/utils';
 import { useTranslation } from 'react-i18next';
 import { ApplicationTeam } from '.';
 import ApplicationSettings from './ApplicationSettings';
@@ -51,7 +51,11 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 				<span className='text-subtle font-sfCompact text-xs'>
 					{t('general.created')} {getRelativeTime(application.createdAt)}
 				</span>
-				<ApplicationSettings appId={application._id} appName={application.name} />
+				<ApplicationSettings
+					appId={application._id}
+					appName={application.name}
+					role={role as AppRoles}
+				/>
 			</div>
 		</div>
 	);

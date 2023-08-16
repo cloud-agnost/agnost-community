@@ -10,20 +10,16 @@ export default class ResourceService {
 	}
 
 	static async getResources(req: GetResourcesRequest): Promise<Resource[]> {
-		const { appId, page, size, instance, search, type, sortBy, sortDir, start, end } = req;
+		const { appId, instance, search, type, sortBy, sortDir } = req;
 		return (
 			await axios.get(`${this.getUrl()}`, {
 				params: {
 					appId,
-					page,
-					size,
 					instance,
 					search,
 					type,
 					sortBy,
 					sortDir,
-					start,
-					end,
 				},
 			})
 		).data;
@@ -34,5 +30,12 @@ export default class ResourceService {
 	}
 	static async addExistingResource(req: AddExistingResourceRequest) {
 		return (await axios.post(`${this.getUrl()}/add`, req)).data;
+	}
+	static async deleteResource(resourceId: string) {
+		return (
+			await axios.delete(`${this.getUrl()}/${resourceId}`, {
+				data: { resourceId },
+			})
+		).data;
 	}
 }

@@ -1,43 +1,55 @@
 import { cn } from '@/utils';
 import { Field, Model } from '@/types';
 import { useTranslation } from 'react-i18next';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DataTable } from 'components/DataTable';
-import { Row } from '@tanstack/react-table';
+import { Row, Table } from '@tanstack/react-table';
 import { EmptyState } from 'components/EmptyState';
 import { Model as ModelIcon } from '@/components/icons';
-import useModelStore from '@/store/database/modelStore.ts';
 import {
 	CreateFieldButton,
 	FieldActions,
 	FieldColumns,
 } from '@/features/database/models/fields/ListFields';
-import { useParams } from 'react-router-dom';
 
-export default function ListFields() {
-	const { models } = useModelStore();
+interface ListFieldsProps {
+	model: Model;
+	parentModel?: Model;
+}
+
+export default function ListFields({ model, parentModel }: ListFieldsProps) {
 	const [selectedRows, setSelectedRows] = useState<Row<Field>[]>();
 	const [search, setSearch] = useState('');
 	const { t } = useTranslation();
-	const { modelId } = useParams();
-
-	const model = useMemo(() => {
-		return models.find((model) => model._id === modelId) as Model;
-	}, [models, modelId]);
+	const [table, setTable] = useState<Table<Field>>();
 
 	const filteredFields = useMemo(() => {
-		if (!search) return model?.fields ?? [];
+		if (!search) return model.fields;
 
-		return model.fields.filter((model) => {
-			return model.name.toLowerCase().includes(search.toLowerCase());
+		return model.fields.filter((f) => {
+			return f.name.toLowerCase().includes(search.toLowerCase());
 		});
 	}, [search, model]);
+
+	useEffect(() => {
+		setSelectedRows((selectedRows) => {
+			return selectedRows?.filter((row) => row.original.creator !== 'system');
+		});
+		if (table) {
+			table?.setRowSelection((updater) => {
+				return updater;
+			});
+		}
+	}, []);
 
 	const hasNoFields = filteredFields.length === 0;
 
 	return (
 		<div className='px-6 h-full flex flex-col overflow-auto'>
 			<FieldActions
+				table={table}
+				model={model}
+				parentModel={parentModel}
 				setSearch={setSearch}
 				selectedRows={selectedRows}
 				setSelectedRows={setSelectedRows}
@@ -57,6 +69,7 @@ export default function ListFields() {
 					</EmptyState>
 				) : (
 					<DataTable<Field>
+						setTable={setTable}
 						columns={FieldColumns}
 						data={filteredFields.sort((a, b) => b.order - a.order)}
 						noDataMessage={<p className='text-xl'>{t('database.fields.no_fields')}</p>}

@@ -6,6 +6,8 @@ import { cn } from '@/utils';
 interface CodeEditorProps extends Omit<EditorProps, 'onMount' | 'defaultLanguage'> {
 	containerClassName?: string;
 	defaultLanguage?: string;
+	readonly?: boolean;
+	onSave?: () => void;
 }
 export default function CodeEditor({
 	containerClassName,
@@ -15,6 +17,8 @@ export default function CodeEditor({
 	onValidate,
 	loading,
 	className,
+	onSave,
+	readonly,
 	defaultLanguage = 'javascript',
 }: CodeEditorProps) {
 	const editorRef = useRef(null);
@@ -26,6 +30,22 @@ export default function CodeEditor({
 		// @ts-ignore
 		monaco.editor.defineTheme('nightOwl', nightOwl);
 		monaco.editor.setTheme('nightOwl');
+		monaco.editor.addCommand({
+			id: 'save',
+			run:
+				onSave ??
+				(() => {
+					return;
+				}),
+		});
+		monaco.editor.addKeybindingRule({
+			keybinding: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
+			command: 'save',
+			commandArgs: {
+				arg: 'my argument',
+			},
+			when: undefined,
+		});
 	}
 
 	return (
@@ -39,6 +59,15 @@ export default function CodeEditor({
 				loading={loading}
 				onMount={handleEditorDidMount}
 				defaultLanguage={defaultLanguage}
+				options={{
+					readOnly: readonly,
+					minimap: {
+						enabled: false,
+					},
+					theme: 'nightOwl',
+					autoClosingBrackets: 'always',
+					autoDetectHighContrast: true,
+				}}
 			/>
 		</div>
 	);

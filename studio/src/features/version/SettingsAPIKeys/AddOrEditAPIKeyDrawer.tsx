@@ -3,7 +3,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Dra
 import { FormEvent, ReactNode, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ADD_API_KEYS_MENU_ITEMS } from '@/constants';
-import { OrganizationMenuItem } from '@/features/Organization';
+import { OrganizationMenuItem } from '@/features/organization';
 import {
 	AddOrEditAPIKeyAllowedDomains,
 	AddOrEditAPIKeyAllowedIPs,

@@ -12,7 +12,6 @@ export default function ChangeAppAvatar() {
 	const { notify } = useToast();
 	async function onChangeHandler(file: File) {
 		setLoading(true);
-		console.log('file', file);
 		setAppAvatar({
 			picture: file,
 			appId: application?._id as string,

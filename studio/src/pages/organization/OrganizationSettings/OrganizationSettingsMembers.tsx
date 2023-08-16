@@ -6,8 +6,9 @@ import {
 	OrganizationInvitationTable,
 	OrganizationMembersTable,
 	OrganizationMembersTableHeader,
-} from '@/features/Organization';
+} from '@/features/organization';
 import { useUpdateEffect } from '@/hooks';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout';
 import useClusterStore from '@/store/cluster/clusterStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
@@ -19,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 export default function OrganizationSettingsMembers() {
 	const { t } = useTranslation();
 	const { canClusterSendEmail } = useClusterStore();
+	const canInvite = useAuthorizeOrg('invite.create');
 	const {
 		inviteUsersToOrganization,
 		getOrganizationInvitations,
@@ -75,19 +77,23 @@ export default function OrganizationSettingsMembers() {
 			description={t('organization.settings.members.description')}
 		>
 			{canClusterSendEmail && (
-				<InviteMemberForm
-					submitForm={onSubmit}
-					roles={orgRoles}
-					title={t('organization.settings.members.invite.title') as string}
-					description={t('organization.settings.members.invite.desc') as string}
-					actions={
-						<Button variant='primary' size='lg'>
-							{t('organization.settings.members.invite.button')}
-						</Button>
-					}
-				/>
+				<>
+					<InviteMemberForm
+						submitForm={onSubmit}
+						roles={orgRoles}
+						title={t('organization.settings.members.invite.title') as string}
+						description={t('organization.settings.members.invite.desc') as string}
+						actions={
+							<Button variant='primary' size='lg' disabled={!canInvite}>
+								{t('organization.settings.members.invite.button')}
+							</Button>
+						}
+						disabled={!canInvite}
+					/>
+					<Separator className='my-12' />
+				</>
 			)}
-			<Separator className='my-12' />
+
 			<div className='members'>
 				<Tabs
 					defaultValue={selectedTab}

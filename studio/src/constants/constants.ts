@@ -4,6 +4,8 @@ import Realtime from '@/assets/images/realtime.png';
 import {
 	ApiKeys,
 	Authentication,
+	Awss3,
+	AzureBlobStorage,
 	BellRing,
 	Binary,
 	Cache,
@@ -16,7 +18,9 @@ import {
 	DeviceMobile,
 	Environment,
 	EnvironmentVariable,
+	GcpStorage,
 	Integer,
+	Kafka,
 	LightBulb,
 	LineSegments,
 	MessageQueue,
@@ -27,16 +31,30 @@ import {
 	ObjectList,
 	Oracle,
 	PostgreSql,
+	RabbitMq,
 	RateLimit,
 	RealTime,
 	Resource,
 	RichText,
+	SqlServer,
 	Storage,
 	Team,
 	Timestamp,
 } from '@/components/icons';
-import { ConnectDatabase, CreateDatabase, SelectResourceType } from '@/features/resources';
+import {
+	ConnectAWS,
+	ConnectAzure,
+	ConnectCache,
+	ConnectDatabase,
+	ConnectGCP,
+	ConnectQueue,
+	CreateCache,
+	CreateDatabase,
+	CreateQueue,
+	SelectResourceType,
+} from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
+import useAuthStore from '@/store/auth/authStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Application, Instance, Method, SortOption, Tab } from '@/types';
 import { history, translate } from '@/utils';
@@ -63,20 +81,11 @@ import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { DropdownMenuSeparator } from 'components/Dropdown';
 import { ElementType, Fragment } from 'react';
 import * as z from 'zod';
-import useAuthStore from '@/store/auth/authStore.ts';
 
 export const PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
 export const MIN_DB_SIZE = 1;
 export const MAX_DB_SIZE = 50;
-export const IP_REGEX = /^(\d{1,3}\.){3}\d{1,3}$/;
-export const URL_REGEX = /^(http|https):\/\/[^ "]+$/;
-export const NUMBER_REGEX = /^[0-9]+$/;
-export const NAME_REGEX = /^[A-Za-z0-9_]+$/;
-export const NOT_START_WITH_NUMBER_REGEX = /^[A-Za-z_][A-Za-z0-9_]*$/;
-export const ROUTE_NAME_REGEX = /^\/[a-zA-Z0-9_-]+(?:\/:[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)*)*$/;
-export const PARAM_REGEX = /:([^/?]+)/g;
-export const PARAM_NAME_REGEX = /^[a-zA-Z0-9_-]+$/;
 
 export const SLIDER_IMAGES = [
 	{
@@ -149,15 +158,15 @@ export const ORGANIZATION_MENU_ITEMS = [
 
 export const APPLICATION_SETTINGS = [
 	{
-		id: 'open-version',
+		id: 'version',
 		name: translate('application.settings.openVersion'),
 		onClick: (application: Application) => {
-			console.log('application', application);
 			useApplicationStore.getState().openVersionDrawer(application);
 		},
+		permissionKey: 'version.view',
 	},
 	{
-		id: 'edit-app',
+		id: 'update',
 		name: translate('application.settings.editApp'),
 		onClick: (application: Application) => {
 			useApplicationStore.getState().openEditAppDrawer(application);
@@ -171,13 +180,15 @@ export const APPLICATION_SETTINGS = [
 				);
 			}
 		},
+		permissionKey: 'update',
 	},
 	{
-		id: 'add-members',
+		id: 'invite',
 		name: translate('general.addMembers'),
 		onClick: (application: Application) => {
 			useApplicationStore.getState().openInviteMemberDrawer(application);
 		},
+		permissionKey: 'invite.create',
 	},
 ];
 
@@ -277,11 +288,11 @@ export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 	},
 	{
 		title: translate('version.message_queues'),
-		path: 'message-queue',
+		path: 'queue',
 	},
 	{
 		title: translate('version.cron_jobs'),
-		path: 'cron-job',
+		path: 'task',
 	},
 	{
 		title: translate('version.middleware.default'),
@@ -308,12 +319,11 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	UPDATING: 'yellow',
 	DELETING: 'red',
 	BINDING: 'blue',
-	GET: 'blue',
-	POST: 'green',
-	PUT: 'yellow',
-	DELETE: 'red',
 	OPTIONAL: 'yellow',
 	REQUIRED: 'blue',
+	ENABLED: 'green',
+	DISABLED: 'red',
+	SUCCESS: 'green',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
@@ -437,22 +447,17 @@ export const STORAGE_TYPES: Instance[] = [
 	{
 		id: 'AWS S3',
 		name: 'AWS S3',
-		icon: MongoDb,
+		icon: Awss3,
 	},
 	{
 		id: 'Azure Blob Storage',
 		name: 'Azure Blob Storage',
-		icon: MySql,
+		icon: AzureBlobStorage,
 	},
 	{
 		id: 'GCP Cloud Storage',
 		name: 'GCP Cloud Storage',
-		icon: MySql,
-	},
-	{
-		id: 'Cluster Storage - MinIO',
-		name: 'MinIO',
-		icon: PostgreSql,
+		icon: GcpStorage,
 	},
 ];
 
@@ -481,7 +486,7 @@ export const DATABASE_TYPES: Instance[] = [
 	{
 		id: 'SQL Server',
 		name: 'SQL Server',
-		icon: Oracle,
+		icon: SqlServer,
 		isConnectOnly: true,
 	},
 ];
@@ -491,7 +496,30 @@ export const DATABASE_ICON_MAP: Record<string, ElementType> = {
 	MySQL: MySql,
 	PostgreSQL: PostgreSql,
 	Oracle: Oracle,
-	'SQL Server': Oracle,
+	'SQL Server': SqlServer,
+};
+export const QUEUE_ICON_MAP: Record<string, ElementType> = {
+	RabbitMQ: RabbitMq,
+	Kafka: Kafka,
+};
+export const QUEUE_TYPES: Instance[] = [
+	{
+		id: 'RabbitMQ',
+		name: 'RabbitMQ',
+		icon: RabbitMq,
+	},
+	{
+		id: 'Kafka',
+		name: 'Kafka',
+		icon: Kafka,
+	},
+];
+
+export const STORAGE_ICON_MAP: Record<string, ElementType> = {
+	'AWS S3': Awss3,
+	'Azure Blob Storage': AzureBlobStorage,
+	'GCP Cloud Storage': GcpStorage,
+	MinIO: Storage,
 };
 
 export const CREATE_RESOURCES_ELEMENTS = [
@@ -511,6 +539,49 @@ export const CREATE_RESOURCES_ELEMENTS = [
 		name: translate('version.databases'),
 		type: translate('resources.connect_existing'),
 		CurrentResourceElement: ConnectDatabase,
+	},
+	{
+		step: 2,
+		name: translate('version.storage'),
+		type: 'AWS S3',
+		CurrentResourceElement: ConnectAWS,
+	},
+	{
+		step: 2,
+		name: translate('version.storage'),
+		type: 'Azure Blob Storage',
+		CurrentResourceElement: ConnectAzure,
+	},
+	{
+		step: 2,
+		name: translate('version.storage'),
+		type: 'GCP Cloud Storage',
+		CurrentResourceElement: ConnectGCP,
+	},
+
+	{
+		step: 2,
+		name: translate('version.cache'),
+		type: translate('resources.create_new'),
+		CurrentResourceElement: CreateCache,
+	},
+	{
+		step: 2,
+		name: translate('version.cache'),
+		type: translate('resources.connect_existing'),
+		CurrentResourceElement: ConnectCache,
+	},
+	{
+		step: 2,
+		name: translate('version.message_queues'),
+		type: translate('resources.create_new'),
+		CurrentResourceElement: CreateQueue,
+	},
+	{
+		step: 2,
+		name: translate('version.message_queues'),
+		type: translate('resources.connect_existing'),
+		CurrentResourceElement: ConnectQueue,
 	},
 ];
 
@@ -638,6 +709,11 @@ export const ENDPOINT_ACCESS_PROPERTIES = [
  */
 export const AUTHORIZATION_OPTIONS = ['all', 'specified'] as const;
 
+export const RABBITMQ_CONNECTION_TYPES = ['url', 'object'] as const;
+export const RABBITMQ_CONNECTION_SCHEMES = ['amqp', 'amqps'] as const;
+export const KAFKA_CONNECTION_SCHEMES = ['simple', 'ssl', 'sasl'] as const;
+export const KAFKA_SASL_MECHANISM = ['plain', 'scram-sha-256', 'scram-sha-512'] as const;
+export const MONGODB_CONNECTION_FORMATS = ['mongodb', 'mongodb+srv'] as const;
 export const ADD_API_KEYS_MENU_ITEMS = [
 	{
 		name: translate('application.edit.general'),
@@ -674,7 +750,7 @@ export const ENDPOINT_OPTIONS: SortOption[] = [
 export const ALL_HTTP_METHODS: Method[] = ['GET', 'POST', 'PUT', 'DELETE'];
 
 export const HTTP_METHOD_BADGE_MAP: Record<string, BadgeColors> = {
-	GET: 'orange',
+	GET: 'blue',
 	POST: 'green',
 	PUT: 'yellow',
 	DELETE: 'red',
@@ -692,6 +768,12 @@ export const ENDPOINT_METHOD_TEXT_COLOR: Record<string, string> = {
 	POST: 'text-elements-green',
 	PUT: 'text-elements-yellow',
 	DELETE: 'text-elements-red',
+};
+export const ENDPOINT_METHOD_BG_COLOR: Record<string, string> = {
+	GET: 'bg-elements-strong-blue',
+	POST: 'bg-elements-strong-green',
+	PUT: 'bg-elements-strong-yellow',
+	DELETE: 'bg-elements-strong-red',
 };
 
 export const ENDPOINT_RESPONSE_TABS = [
@@ -731,19 +813,6 @@ export const NAME_SCHEMA = z
 			label: translate('general.name'),
 		}),
 	);
-
-export const MODEL_FIELD_DEFAULT_VALUE_TYPES = [
-	{
-		name: 'Constant',
-		value: '',
-	},
-	{
-		name: 'JS Function',
-		value: `export default function getDefaultValues(value, allValues) {
-	return value;
-}`,
-	},
-];
 
 export const fieldSchema = z
 	.string()

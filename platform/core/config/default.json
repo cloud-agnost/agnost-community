@@ -1,90 +1,93 @@
 {
-    "server": {
-        "host": "localhost",
-        "port": 4000,
-        "timeout": 3600000,
-        "maxBodySize": "50mb"
-     },
-     "rateLimiters": [{      
-        "rateLimitWindowSec": 30,
-        "rateLimitMaxHits": 300}],
-    "session": {
-        "validationCodeExpiry": 600,
-        "accessTokenExpiry": 31536000,
-        "refreshTokenExpiry": 31536000
-    },
-    "storage": {
-        "profileImagesBucket": "agnost-profile-pictures",
-        "orgImagesBucket": "agnost-organization-pictures",
-        "appImagesBucket": "agnost-app-pictures"
-    },
-    "cache": {
-        "port": 6379
-    },
-    "queue": {
-        "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
-        "port": 5672,
-        "reconnectInterval": 1000,
-        "retryCount": 30
-    },
-    "database": {
-        "minPoolSize": 3
-    },
-    "sync": {
-      "serverURL": "http://platform-sync-clusterip-service:4000",
-      "namespace": "",
-      "reconnection": true,
-      "reconnectionDelay": 500,
-      "path": "/sync/"
-   },
-    "general": {
-        "minPwdLength": 8,
-        "minNameLength": 2,
-        "maxTextLength": 64,
-        "maxDetailTxtLength": 1024,
-        "maxImageSizeMB": 3,
-        "maxDbNameLength": 58,
-        "maxOracleDbNameLength": 30,
-        "maxModelNameLength": 58,
-        "maxFieldNameLength": 58,
-        "profileImgSizePx": 512,
-        "minPageSize": 1,
-        "maxPageSize": 100,
-        "maxTextFieldLength": 10240,
-        "maxRichTextFieldLength": 524288,
-        "maxEncryptedTextFieldLength": 50,
-        "maxDecimalDigits": 10,
-        "maxOptionsCount": 1000,
-        "minLogBucketDurationMs": 1000, 
-        "defaultBucketCount": 24,
-        "minBucketCount": 7,
-        "maxBucketCount": 30,
-        "storageBucket": "cluster-storage",
-         "platformBaseUrl": "http://platform-core-clusterip-service:4000",
-         "workerUrl": "http://engine-worker-clusterip-service:4000",
-         "defaulPVCSize": "1Gi",
-         "defaultSchedulerDeploymentName": "engine-scheduler-deployment",
-         "defaultRealtimeDeploymentName": "engine-realtime-deployment",
-         "defaultRealtimeServerURL": "http://engine-realtime-clusterip-service:4000",
-         "defaultAuthRedirect": "http://localhost:3000/auth-redirect",
-         "emailTokenExpiresInSeconds": 3600,
-         "minEmailTokenExpirySeconds": 60,
-         "SMSCodeExpiresInSeconds": 3600,
-         "minSMSCodeExpirySeconds": 60,
-         "defaultEngineConfig": {
-            "initialScale": 1,
-            "maxScale": 10,
-            "scaleDownDelay": "5m00s",
-            "scaleToZeroPodRetentionPeriod": "10m00s",
-            "containerConcurrency": 40,
-            "cpu": {
-                "request": "125m",
-                "limit": "250m"
-            },
-            "memory": {
-                "request": "128Mi",
-                "limit": "512Mi"
-            }
-         }
+  "server": {
+    "host": "localhost",
+    "port": 4000,
+    "timeout": 3600000,
+    "maxBodySize": "50mb"
+  },
+  "rateLimiters": [
+    {
+      "rateLimitWindowSec": 30,
+      "rateLimitMaxHits": 300
     }
+  ],
+  "session": {
+    "validationCodeExpiry": 600,
+    "accessTokenExpiry": 31536000,
+    "refreshTokenExpiry": 31536000
+  },
+  "storage": {
+    "profileImagesBucket": "agnost-profile-pictures",
+    "orgImagesBucket": "agnost-organization-pictures",
+    "appImagesBucket": "agnost-app-pictures"
+  },
+  "cache": {
+    "port": 6379
+  },
+  "queue": {
+    "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
+    "port": 5672,
+    "reconnectInterval": 1000,
+    "retryCount": 30
+  },
+  "database": {
+    "minPoolSize": 3
+  },
+  "sync": {
+    "serverURL": "http://platform-sync-clusterip-service:4000",
+    "namespace": "",
+    "reconnection": true,
+    "reconnectionDelay": 500,
+    "path": "/sync/"
+  },
+  "general": {
+    "minPwdLength": 8,
+    "minNameLength": 2,
+    "maxTextLength": 64,
+    "maxDetailTxtLength": 1024,
+    "maxImageSizeMB": 3,
+    "maxDbNameLength": 58,
+    "maxOracleDbNameLength": 30,
+    "maxModelNameLength": 58,
+    "maxFieldNameLength": 58,
+    "profileImgSizePx": 512,
+    "minPageSize": 1,
+    "maxPageSize": 100,
+    "maxTextFieldLength": 10240,
+    "maxRichTextFieldLength": 524288,
+    "maxEncryptedTextFieldLength": 50,
+    "maxDecimalDigits": 10,
+    "maxOptionsCount": 1000,
+    "minLogBucketDurationMs": 1000,
+    "defaultBucketCount": 24,
+    "minBucketCount": 1,
+    "maxBucketCount": 31,
+    "storageBucket": "cluster-storage",
+    "platformBaseUrl": "http://platform-core-clusterip-service:4000",
+    "workerUrl": "http://engine-worker-clusterip-service:4000",
+    "defaulPVCSize": "1Gi",
+    "defaultSchedulerDeploymentName": "engine-scheduler-deployment",
+    "defaultRealtimeDeploymentName": "engine-realtime-deployment",
+    "defaultRealtimeServerURL": "http://engine-realtime-clusterip-service:4000",
+    "defaultAuthRedirect": "http://localhost:3000/auth-redirect",
+    "emailTokenExpiresInSeconds": 3600,
+    "minEmailTokenExpirySeconds": 60,
+    "SMSCodeExpiresInSeconds": 3600,
+    "minSMSCodeExpirySeconds": 60,
+    "defaultEngineConfig": {
+      "initialScale": 1,
+      "maxScale": 10,
+      "scaleDownDelay": "5m00s",
+      "scaleToZeroPodRetentionPeriod": "10m00s",
+      "containerConcurrency": 40,
+      "cpu": {
+        "request": "125m",
+        "limit": "250m"
+      },
+      "memory": {
+        "request": "128Mi",
+        "limit": "512Mi"
+      }
+    }
+  }
 }

@@ -20,7 +20,7 @@ import useDatabaseStore from '@/store/database/databaseStore.ts';
 import { useParams } from 'react-router-dom';
 import groupBy from 'utils/utils.ts';
 import { FIELD_ICON_MAP } from '@/constants';
-
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 export default function CreateFieldButton() {
 	const { t } = useTranslation();
 	const databases = useDatabaseStore((state) => state.databases);
@@ -28,13 +28,13 @@ export default function CreateFieldButton() {
 	const [selectedType, setSelectedType] = useState<FieldType>();
 	const fieldTypes = useTypeStore((state) => state.fieldTypes);
 	const { dbId } = useParams();
-
+	const canCreateField = useAuthorizeVersion('model.create');
 	const databaseType = useMemo(() => {
 		return databases.find((item) => item._id === dbId)?.type as keyof DatabaseType;
 	}, [databases, dbId]);
 
 	const types = useMemo(() => {
-		const types = fieldTypes.filter((item) => item.group !== 'none' /* && item[databaseType] */);
+		const types = fieldTypes.filter((item) => item.group !== 'none' && item[databaseType]);
 		return groupBy(types, (item) => item.group);
 	}, [databaseType, fieldTypes]);
 
@@ -46,8 +46,8 @@ export default function CreateFieldButton() {
 	return (
 		<>
 			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<Button className='gap-2 whitespace-nowrap'>
+				<DropdownMenuTrigger asChild disabled={!canCreateField}>
+					<Button className='gap-2 whitespace-nowrap' disabled={!canCreateField}>
 						<Plus weight='bold' />
 						{t('database.fields.add')}
 					</Button>

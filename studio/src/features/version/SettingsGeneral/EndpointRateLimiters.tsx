@@ -12,7 +12,9 @@ export default function EndpointRateLimiters() {
 	const { notify } = useToast();
 	const [deleting, setDeleting] = useState(false);
 	const defaultEndpointLimits = useVersionStore((state) => state.version?.defaultEndpointLimits);
-	const defaultRateLimiters = useVersionStore((state) => state.version?.defaultEndpointLimits);
+	const defaultRateLimiters = useVersionStore(
+		(state) => state.version?.defaultEndpointLimits ?? [],
+	);
 	const updateVersionProperties = useVersionStore((state) => state.updateVersionProperties);
 	const rateLimits = useVersionStore((state) => state.version?.limits);
 
@@ -89,13 +91,6 @@ export default function EndpointRateLimiters() {
 		}
 	}
 
-	if (
-		!defaultRateLimiters ||
-		!rateLimits ||
-		defaultRateLimiters.length === 0 ||
-		rateLimits.length === 0
-	)
-		return <></>;
 	return (
 		<SortableRateLimits
 			onDragEnd={onDragEnd}

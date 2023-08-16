@@ -1,87 +1,85 @@
 import Field from "./Field.js";
+import { SQLBaseManager } from "../../managers/SQLBaseManager.js";
 import { DATABASE } from "../../../config/constants.js";
 
 export default class Reference extends Field {
-	/**
-	 * @description The name of the data type.
-	 */
-	static typeName = "Reference";
-	/**
-	 * @description The name of the database adapter.
-	 */
-	adapter;
+    defaultField = "id";
 
-	/**
-	 * @description The data type of the field.
-	 */
-	type = "string";
+    dbMap = {
+        [DATABASE.SQLServer]: {
+            CREATE_SCHEMA: "ALTER TABLE {TABLE_NAME} ADD {FIELD_NAME} {TYPE} {REQUIRED};",
+            CREATE_CONSTRAINT_SCHEMA:
+                "ALTER TABLE {TABLE_NAME} ADD CONSTRAINT {FOREIGN_NAME} FOREIGN KEY ({FIELD_NAME}) REFERENCES {FOREIGN_TABLE}({DEFAULT_FIELD}) ON DELETE {ACTION};",
+        },
+        [DATABASE.PostgreSQL]: {
+            CREATE_SCHEMA: "ALTER TABLE {TABLE_NAME} ADD COLUMN {FIELD_NAME} {TYPE} {REQUIRED};",
+            CREATE_CONSTRAINT_SCHEMA:
+                "ALTER TABLE {TABLE_NAME} ADD CONSTRAINT {FOREIGN_NAME} FOREIGN KEY ({FIELD_NAME}) REFERENCES {FOREIGN_TABLE}({DEFAULT_FIELD}) ON DELETE {ACTION};",
+        },
+        [DATABASE.MySQL]: {
+            CREATE_SCHEMA: "ALTER TABLE {TABLE_NAME} ADD COLUMN `{FIELD_NAME}` {TYPE} {REQUIRED};",
+            CREATE_CONSTRAINT_SCHEMA:
+                "ALTER TABLE {TABLE_NAME} ADD CONSTRAINT {FOREIGN_NAME} FOREIGN KEY ({FIELD_NAME}) REFERENCES {FOREIGN_TABLE}({DEFAULT_FIELD}) ON DELETE {ACTION};",
+        },
+    };
 
-	/**
-	 * @description The name of the field.
-	 */
-	name;
+    createMap = {
+        [DATABASE.PostgreSQL]: "{NAME} {TYPE} {REQUIRED}",
+        [DATABASE.MySQL]: "`{NAME}` {TYPE} {REQUIRED}",
+        [DATABASE.SQLServer]: "{NAME} {TYPE} {REQUIRED}",
+    };
 
-	/**
-	 * @description The name of the data type.
-	 */
-	versions = {
-		[DATABASE.MySQL]: "VARCHAR(36)",
-		[DATABASE.PostgreSQL]: "VARCHAR(36)",
-		[DATABASE.SQLServer]: "NVARCHAR(36)",
-		[DATABASE.Oracle]: "VARCHAR2(36)",
-	};
+    isIndexed() {
+        return false;
+    }
 
-	/**
-	 * @description The default value for the data type.
-	 * @param {DatabaseType} adapter - The database adapter.
-	 * @param {string} name - The name of the field.
-	 */
-	constructor(adapter, name) {
-		super();
-		this.adapter = adapter;
-		this.name = name;
-	}
+    getReferenceModelIid() {
+        return this.options?.reference?.iid;
+    }
 
-	/**
-	 * @description Generates the query for the field.
-	 */
-	toDefinitionQuery() {
-		return (
-			this.name +
-			" " +
-			this.versions[this.adapter] +
-			`, CONSTRAINT FK_${this.name} FOREIGN KEY(${this.name}) REFERENCES ${this.config.referenceTable}(${this.config.referenceColumn})` +
-			this.onDelete() +
-			this.onUpdate()
-		);
-	}
+    getReferenceModelName() {
+        return this.options?.reference?.modelName;
+    }
 
-	/**
-	 * @description Generates the query for the rename field.
-	 */
-	toDefinitionQueryForRename() {
-		return this.versions[this.adapter];
-	}
+    getAction() {
+        return this.options?.reference?.action;
+    }
 
-	/**
-	 * @description Returns the onDelete part of the query
-	 * @private
-	 */
-	onDelete() {
-		if (this.config.onDelete) {
-			return ` ON DELETE ${this.config.onDelete}`;
-		}
-		return "";
-	}
+    /**
+     * @description Generates the query for the field.
+     */
+    toDefinitionQuery() {
+        throw new AgnostError("toDefinitionQuery not implemented for Reference and will not be used.");
+    }
 
-	/**
-	 * @description Returns the onUpdate part of the query
-	 * @private
-	 */
-	onUpdate() {
-		if (this.config.onUpdate) {
-			return ` ON UPDATE ${this.config.onUpdate}`;
-		}
-		return "";
-	}
+    createConstraint(modelName, createField = false) {
+        const foreignTable = this.getReferenceModelName();
+        const foreignName = SQLBaseManager.getForeignKeyName(this.getIid());
+        const createFieldSchema = this.dbMap[this.getDatabaseType()].CREATE_SCHEMA;
+        const createConstraintSchema = this.dbMap[this.getDatabaseType()].CREATE_CONSTRAINT_SCHEMA;
+        let schema = createConstraintSchema;
+
+        if (createField) {
+            schema = `${createFieldSchema} ${createConstraintSchema}`;
+        }
+
+        return schema
+            .replaceAll("{TABLE_NAME}", modelName)
+            .replaceAll("{TYPE}", this.getDbType())
+            .replaceAll("{FOREIGN_NAME}", foreignName)
+            .replaceAll("{FIELD_NAME}", this.getName())
+            .replaceAll("{REQUIRED}", this.isRequired() ? "NOT NULL" : "NULL")
+            .replaceAll("{FOREIGN_TABLE}", foreignTable)
+            .replaceAll("{DEFAULT_FIELD}", this.defaultField)
+            .replaceAll("{ACTION}", this.getAction());
+    }
+
+    toDefinitionQueryForModify() {
+        const schema = this.createMap[this.type];
+
+        return schema
+            .replace("{NAME}", this.getName())
+            .replace("{TYPE}", this.getDbType())
+            .replace("{REQUIRED}", this.isRequired() ? "NOT NULL" : "NULL");
+    }
 }

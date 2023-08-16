@@ -25,21 +25,21 @@
 		}
 	}
 	&-label {
-		@apply py-1.5 pl-8 pr-2 text-default text-sm font-semibold;
+		@apply py-1.5 px-2 text-default text-sm font-semibold;
 	}
 	&-item {
-		@apply relative flex w-full cursor-default select-none items-center rounded-sm;
-		@apply py-1.5 pl-8 pr-2 text-sm outline-none text-default;
+		@apply flex items-center justify-between w-full cursor-default select-none rounded-sm;
+		@apply py-1.5 px-2 text-sm outline-none text-default;
 		@apply focus:bg-subtle focus:text-default;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:text-subtle data-[disabled]:bg-subtle;
 		@apply checked:bg-subtle checked:text-default;
-		@apply truncate max-w-xs block;
+		@apply truncate max-w-xs;
 	}
 	&-seperator {
 		@apply -mx-1 my-1 h-px bg-subtle;
 	}
 	span {
-		@apply truncate max-w-[calc(100%-1rem)] block flex-1 text-start;
+		@apply truncate max-w-[calc(100%-1rem)] flex-1 text-start;
 	}
 
 	&.input {

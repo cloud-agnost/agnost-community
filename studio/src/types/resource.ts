@@ -1,7 +1,9 @@
 import useTypeStore from '@/store/types/typeStore';
 import { translate } from '@/utils';
 import * as z from 'zod';
-import { BaseGetRequest, BaseRequest } from '.';
+import { BaseRequest } from '.';
+
+const NUMBER_REGEX = /^[0-9]+$/;
 export interface Resource {
 	orgId: string;
 	iid: string;
@@ -57,10 +59,13 @@ export interface ResLog {
 	updatedAt: string;
 	__v: number;
 }
-export interface GetResourcesRequest extends BaseGetRequest {
+export interface GetResourcesRequest {
 	appId: string;
 	type?: string;
 	instance?: string;
+	sortBy?: string;
+	sortDir?: string;
+	search?: string;
 }
 export interface Instance {
 	id: string;
@@ -68,9 +73,40 @@ export interface Instance {
 	icon: React.ElementType;
 	isConnectOnly?: boolean;
 }
+export const ConnectResourceSchema = z.object({
+	name: z.string({
+		required_error: translate('forms.required', {
+			label: translate('general.name'),
+		}),
+	}),
+
+	instance: z
+		.string({
+			required_error: translate('forms.required', {
+				label: translate('resources.database.instance'),
+			}),
+		})
+		.refine(
+			(value) =>
+				useTypeStore.getState().instanceTypes.database.includes(value) ||
+				useTypeStore.getState().instanceTypes.storage.includes(value) ||
+				useTypeStore.getState().instanceTypes.cache.includes(value) ||
+				useTypeStore.getState().instanceTypes.queue.includes(value),
+			{
+				message: translate('forms.invalid', {
+					label: translate('resources.database.instance'),
+				}),
+			},
+		),
+	allowedRoles: z.array(z.string()),
+});
 export const AccessDbSchema = z.object({
 	host: z
-		.string()
+		.string({
+			required_error: translate('forms.required', {
+				label: translate('resources.database.host'),
+			}),
+		})
 		.nonempty({
 			message: translate('forms.required', {
 				label: translate('resources.database.host'),
@@ -91,13 +127,22 @@ export const AccessDbSchema = z.object({
 	// 		}),
 	// 	},
 	// ),
-
+	connFormat: z.enum(['mongodb', 'mongodb+srv']).optional(),
 	port: z
-		.string()
-		.regex(/^[0-9]+$/, 'Port must be a number')
-		.min(3, 'Port must be at least 3 characters long')
+		.string({
+			required_error: translate('forms.required', { label: translate('resources.database.port') }),
+		})
+		.regex(NUMBER_REGEX, {
+			message: translate('forms.invalid', { label: translate('resources.database.port') }),
+		})
+		.min(3, {
+			message: translate('forms.invalid', { label: translate('resources.database.port') }),
+		})
 		.trim()
-		.refine((value) => value.trim().length > 0, "Port can't be empty"),
+		.refine(
+			(value) => value.trim().length > 0,
+			translate('forms.required', { label: translate('resources.database.port') }),
+		),
 	username: z.string().nonempty({
 		message: translate('forms.required', {
 			label: translate('resources.database.username'),
@@ -139,26 +184,64 @@ export const AccessDbSchema = z.object({
 		.optional(),
 });
 export const ConnectDatabaseSchema = z.object({
-	name: z.string({
-		required_error: translate('forms.required', {
-			label: translate('general.name'),
-		}),
-	}),
-	instance: z
-		.string({
-			required_error: translate('forms.required', {
-				label: translate('resources.database.instance'),
-			}),
-		})
-		.refine((value) => useTypeStore.getState().instanceTypes.database.includes(value), {
-			message: translate('forms.invalid', {
-				label: translate('resources.database.instance'),
-			}),
-		}),
+	...ConnectResourceSchema.shape,
 	access: AccessDbSchema,
-	allowedRoles: z.array(z.string()),
 	accessReadOnly: z.array(AccessDbSchema).optional(),
 	secureConnection: z.boolean().default(false),
+});
+
+export const ConnectQueueSchema = z.object({
+	...ConnectResourceSchema.shape,
+	access: z.object({
+		brokers: z
+			.array(
+				z.object({
+					key: z.string().optional().or(z.literal('')),
+				}),
+			)
+			.optional(),
+		format: z.enum(['url', 'object', 'ssl', 'sasl', 'simple']),
+		url: z.string().optional(),
+		host: z.string().optional(),
+		port: z
+			.string({
+				required_error: translate('forms.required', {
+					label: translate('resources.database.port'),
+				}),
+			})
+			.regex(NUMBER_REGEX, {
+				message: translate('forms.invalid', { label: translate('resources.database.port') }),
+			})
+			.min(3, {
+				message: translate('forms.invalid', { label: translate('resources.database.port') }),
+			})
+			.trim()
+			.refine(
+				(value) => value.trim().length > 0,
+				translate('forms.required', { label: translate('resources.database.port') }),
+			)
+			.optional(),
+		username: z.string().optional(),
+		password: z.string().optional(),
+		vhost: z.string().optional(),
+		scheme: z.enum(['amqp', 'amqps']).optional(),
+		clientId: z.string().optional(),
+		ssl: z
+			.object({
+				rejectUnauthorized: z.boolean().optional(),
+				ca: z.string().optional(),
+				key: z.string().optional(),
+				cert: z.string().optional(),
+			})
+			.optional(),
+		sasl: z
+			.object({
+				mechanism: z.enum(['plain', 'scram-sha-256', 'scram-sha-512']).optional(),
+				username: z.string().optional(),
+				password: z.string().optional(),
+			})
+			.optional(),
+	}),
 });
 
 export interface AddExistingResourceRequest extends BaseRequest {
@@ -167,13 +250,33 @@ export interface AddExistingResourceRequest extends BaseRequest {
 	instance: string;
 	allowedRoles: string[];
 	access: {
-		host: string;
-		port: string;
-		username: string;
-		password: string;
+		host?: string;
+		port?: string;
+		username?: string;
+		password?: string;
 		options?: {
 			key?: string;
 			value?: string;
 		}[];
+		accessIdKey?: string;
+		secretAccessKey?: string;
+		region?: string;
+		projectId?: string;
+		keyFileContents?: string;
+		connectionString?: string;
+		format?: 'url' | 'sasl' | 'object' | 'ssl' | 'simple';
+		connFormat?: 'mongodb' | 'mongodb+srv';
+		url?: string;
+		vhost?: string;
+		scheme?: 'amqp' | 'amqps';
+		clientId?: string;
+		brokers?: string[];
+		ssl?: {
+			rejectUnauthorized?: boolean;
+			ca?: string;
+			key?: string;
+			cert?: string;
+		};
+		sasl?: { mechanism?: string; username?: string; password?: string };
 	};
 }

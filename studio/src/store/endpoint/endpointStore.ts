@@ -20,7 +20,7 @@ import { devtools, persist } from 'zustand/middleware';
 interface EndpointStore {
 	selectEndpointDialogOpen: boolean;
 	endpoints: Endpoint[];
-	endpoint: Endpoint | null;
+	endpoint: Endpoint;
 	selectedEndpointIds: string[];
 	lastFetchedCount: number;
 	endpointRequest: TestEndpointParams[];
@@ -41,6 +41,7 @@ interface EndpointStore {
 	getEndpointsByIid: (endpoint: GetEndpointsByIidParams) => Promise<Endpoint[]>;
 	testEndpoint: (endpoint: TestEndpointParams) => Promise<AxiosResponse>;
 	closeEndpointDeleteDialog: () => void;
+	setEndpointLog: (epId: string, log: string) => void;
 }
 
 const useEndpointStore = create<EndpointStore>()(
@@ -49,7 +50,7 @@ const useEndpointStore = create<EndpointStore>()(
 			(set, get) => ({
 				selectEndpointDialogOpen: false,
 				endpoints: [],
-				endpoint: null,
+				endpoint: {} as Endpoint,
 				selectedEndpointIds: [],
 				endpointRequest: [],
 				endpointResponse: [],
@@ -120,6 +121,7 @@ const useEndpointStore = create<EndpointStore>()(
 						const endpoint = await EndpointService.updateEndpoint(params);
 						set((prev) => ({
 							endpoints: prev.endpoints.map((e) => (e._id === endpoint._id ? endpoint : e)),
+							endpoint,
 						}));
 						if (params.onSuccess) params.onSuccess();
 						return endpoint;
@@ -147,7 +149,6 @@ const useEndpointStore = create<EndpointStore>()(
 				},
 				testEndpoint: async (params) => {
 					const startTime = performance.now();
-					console.log('store');
 					const response = await EndpointService.testEndpoint(params);
 					const prevRequest = get().endpointRequest;
 					const prevResponse = get().endpointResponse;
@@ -176,7 +177,6 @@ const useEndpointStore = create<EndpointStore>()(
 						set((prev) => ({
 							endpointResponse: prev.endpointResponse.map((r) => {
 								if (r.epId === params.epId) {
-									console.log(response?.response?.status ?? response?.status, 'r2esponse');
 									return {
 										...r,
 										epId: params.epId,
@@ -216,6 +216,19 @@ const useEndpointStore = create<EndpointStore>()(
 					set({ toDeleteEndpoint: endpoint, isEndpointDeleteDialogOpen: true }),
 				closeEndpointDeleteDialog: () =>
 					set({ toDeleteEndpoint: null, isEndpointDeleteDialogOpen: false }),
+				setEndpointLog(epId, log) {
+					set((prev) => ({
+						endpointResponse: prev.endpointResponse.map((r) => {
+							if (r.epId === epId) {
+								return {
+									...r,
+									logs: [...(r.logs as string[]), log],
+								};
+							}
+							return r;
+						}),
+					}));
+				},
 			}),
 			{
 				name: 'endpoint-storage',

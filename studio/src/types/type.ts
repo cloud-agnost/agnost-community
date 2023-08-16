@@ -194,8 +194,24 @@ export interface RemoveMemberRequest extends BaseRequest {
 	userId?: string;
 	userIds?: string[];
 }
-export type RealtimeActionTypes = 'update' | 'create' | 'delete';
-export type RealtimeObjectTypes = 'user' | 'organization';
+export type RealtimeActionTypes = 'update' | 'create' | 'delete' | 'telemetry' | 'info';
+export type RealtimeObjectTypes =
+	| 'user'
+	| 'org'
+	| 'org.app'
+	| 'app'
+	| 'org.resource'
+	| 'resource'
+	| 'task'
+	| 'queue'
+	| 'org.app.version.queue'
+	| 'endpoint';
+
+export interface BaseParams {
+	orgId: string;
+	appId: string;
+	versionId: string;
+}
 export interface RealtimeIdentifiers {
 	orgId?: string;
 	appId?: string;
@@ -203,19 +219,28 @@ export interface RealtimeIdentifiers {
 	versionId?: string;
 	resourceId?: string;
 	envId?: string;
+	queueId?: string;
 }
 export interface RealtimeData<T> {
 	actor: Partial<User>;
 	action: RealtimeActionTypes;
 	object: RealtimeObjectTypes;
+	objectType: RealtimeObjectTypes;
 	description: string;
-	timestamp: number;
+	timestamp: string;
 	data: T;
 	identifiers: RealtimeIdentifiers;
+	id: string;
+	message: string;
+	type: string;
+	objecType: any;
 }
 export interface RealtimeActionParams<T> {
 	data: T;
 	identifiers: RealtimeIdentifiers;
+	message?: string;
+	id?: string;
+	timestamp?: string;
 }
 
 export interface Middleware {

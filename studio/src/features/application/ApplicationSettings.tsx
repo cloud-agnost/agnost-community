@@ -9,20 +9,24 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks';
 import { InfoModal } from '@/components/InfoModal';
 import { Avatar, AvatarFallback } from '@/components/Avatar';
-import { Application } from '@/types';
+import { AppRoles, Application } from '@/types';
 import useApplicationStore from '@/store/app/applicationStore.ts';
+import useAuthorizeApp from '@/hooks/useAuthorizeApp';
+
 interface ApplicationSettingsProps {
 	appId: string;
 	appName: string;
+	role: AppRoles;
 }
 interface InformationModal {
 	title: string;
 	description: string;
 	onConfirm?: () => void;
 }
-export default function ApplicationSettings({ appId, appName }: ApplicationSettingsProps) {
+export default function ApplicationSettings({ appId, appName, role }: ApplicationSettingsProps) {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
+	const canAppDelete = useAuthorizeApp({ role, key: 'app.delete' });
 	const [modalInfo, setModalInfo] = useState<InformationModal>({
 		title: '',
 		description: '',
@@ -35,6 +39,12 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 	const { deleteApplication, leaveAppTeam } = useApplicationStore();
 
 	const { notify } = useToast();
+
+	const HAS_PERMISSION: Record<string, boolean> = {
+		update: useAuthorizeApp({ role, key: 'update' }),
+		'invite.create': useAuthorizeApp({ role, key: 'invite.create' }),
+		'version.view': useAuthorizeApp({ role, key: 'version.view' }),
+	};
 	return (
 		<>
 			<Popover open={open} onOpenChange={setOpen}>
@@ -58,6 +68,7 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 								<CommandItem
 									id={setting.id}
 									key={setting.name}
+									disabled={HAS_PERMISSION[setting.permissionKey]}
 									onSelect={() => {
 										setOpen(false);
 										if (setting.onClick)
@@ -76,9 +87,9 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 						<CommandSeparator />
 						<CommandGroup>
 							<CommandItem
-								id='delete-app'
-								onSelect={(e) => {
-									console.log(e);
+								id='leave-app'
+								disabled={role === 'Admin'}
+								onSelect={() => {
 									setOpen(false);
 									setOpenInfoModal(true);
 									setModalInfo({
@@ -110,7 +121,8 @@ export default function ApplicationSettings({ appId, appName }: ApplicationSetti
 						<CommandSeparator />
 						<CommandGroup>
 							<CommandItem
-								id='leave-app'
+								id='delete-app'
+								disabled={!canAppDelete}
 								onSelect={() => {
 									setOpen(false);
 									setOpenInfoModal(true);

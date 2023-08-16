@@ -45,8 +45,7 @@
 	"search_to_add": "Search to add {{label}}",
 	"pick_a_date": "Pick a date",
 	"select": "Select {{label}}",
-	"invalid_character": "{{label}} can include only numbers, letters and underscore (_) characters",
-	"notStartWithNumber": "{{label}} cannot start with a number",
-	"notStartWithUnderscore": "{{label}}  cannot start with underscore (_) character",
-	"reservedKeyword": "{{keyword}} is a reserved keyword and cannot be used as {{label}}"
+	"notStartWithNumber": "{{label}} must not start with a number",
+	"notStartWithUnderscore": "{{label}} must not start with an underscore",
+	"reservedWord": "{{label}} is a reserved word and cannot be used"
 }
