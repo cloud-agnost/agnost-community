@@ -228,5 +228,8 @@
 	"success_count": "Success Count",
 	"error_count": "Error Count",
 	"readOnly": "Readonly",
-	"read_write": "Read/Write"
+	"read_write": "Read/Write",
+	"log_details": "View Log Details",
+	"details": "Details",
+	"errors": "Errors"
 }
