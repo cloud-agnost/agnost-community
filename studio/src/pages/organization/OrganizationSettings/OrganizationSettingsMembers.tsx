@@ -6,7 +6,7 @@ import {
 	OrganizationInvitationTable,
 	OrganizationMembersTable,
 	OrganizationMembersTableHeader,
-} from '@/features/organization';
+} from '@/features/Organization';
 import { useUpdateEffect } from '@/hooks';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout';
