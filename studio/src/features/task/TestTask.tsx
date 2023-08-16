@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { generateId, joinChannel, leaveChannel } from '@/utils';
 import { useToast } from '@/hooks';
-import Logs from '../../components/Logs/Logs';
+import { Logs } from '@/components/Logs';
 interface TestTaskProps {
 	open: boolean;
 	onClose: () => void;
