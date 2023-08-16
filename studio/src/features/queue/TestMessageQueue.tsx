@@ -8,7 +8,7 @@ import { generateId, joinChannel, leaveChannel } from '@/utils';
 import { useToast } from '@/hooks';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { CodeEditor } from '@/components/CodeEditor';
-import { Logs } from '@/components/logs';
+import { Logs } from '@/components/Logs';
 
 interface TestMessageQueueProps {
 	open: boolean;

@@ -26,7 +26,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import * as z from 'zod';
-import { OrganizationMenuItem } from '../Organization';
+import { OrganizationMenuItem } from '../organization';
 import EndpointBody from './TestEndpoint/EndpointBody';
 import EndpointHeaders from './TestEndpoint/EndpointHeaders';
 import TestEndpointParams from './TestEndpoint/TestEndpointParams';

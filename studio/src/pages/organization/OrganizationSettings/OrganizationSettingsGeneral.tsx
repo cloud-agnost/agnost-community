@@ -5,7 +5,7 @@ import {
 	ChangeOrganizationName,
 	DeleteOrganization,
 	TransferOrganization,
-} from '@/features/Organization';
+} from '@/features/organization';
 import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { useTranslation } from 'react-i18next';
