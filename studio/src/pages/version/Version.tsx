@@ -1,14 +1,24 @@
 import { VersionLayout } from '@/layouts/VersionLayout';
 import useEnvironmentStore from '@/store/environment/environmentStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { LoaderFunctionArgs, Outlet, useLocation } from 'react-router-dom';
+import { LoaderFunctionArgs, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
 import { cn } from '@/utils';
 import useAuthStore from '@/store/auth/authStore.ts';
-
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import { useEffect } from 'react';
 export default function Version() {
 	const { pathname } = useLocation();
 	const paths = pathname.split('/').filter((item) => /^[a-zA-Z-_]+$/.test(item));
+	const navigate = useNavigate();
+	const canView = useAuthorizeVersion('version.view');
+
+	useEffect(() => {
+		if (!canView) {
+			navigate('/404');
+		}
+	}, [canView]);
+
 	return (
 		<VersionLayout className={cn(paths.at(-1))}>
 			<Outlet />

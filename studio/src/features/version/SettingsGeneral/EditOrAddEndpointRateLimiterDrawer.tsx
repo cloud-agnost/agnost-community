@@ -1,3 +1,12 @@
+import { NUMBER_REGEX } from '@/constants';
+import { useToast } from '@/hooks';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import useVersionStore from '@/store/version/versionStore.ts';
+import { APIError, RateLimit } from '@/types';
+import { translate } from '@/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
+import { Button } from 'components/Button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import {
 	Form,
@@ -8,21 +17,13 @@ import {
 	FormLabel,
 	FormMessage,
 } from 'components/Form';
-import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
 import { Input } from 'components/Input';
-import { Button } from 'components/Button';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import * as z from 'zod';
-import { translate } from '@/utils';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { APIError } from '@/types';
-import useVersionStore from '@/store/version/versionStore.ts';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { useToast } from '@/hooks';
-import { RateLimit } from '@/types';
-import { NUMBER_REGEX } from '@/constants';
+import * as z from 'zod';
+
 const FormSchema = z.object({
 	name: z
 		.string({
@@ -100,6 +101,7 @@ export default function EditOrAddEndpointRateLimiterDrawer({
 	const [loading, setLoading] = useState(false);
 	const { t } = useTranslation();
 	const [error, setError] = useState<APIError | null>(null);
+	const canEdit = useAuthorizeVersion('version.limit.create');
 	const {
 		createRateLimit,
 		updateVersionProperties,
@@ -320,6 +322,7 @@ export default function EditOrAddEndpointRateLimiterDrawer({
 							/>
 							<div className='mt-4 flex justify-end'>
 								<Button
+									disabled={loading || !canEdit}
 									loading={loading}
 									size='lg'
 									type='button'

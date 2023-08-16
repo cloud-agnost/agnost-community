@@ -32,6 +32,9 @@
 		@apply text-sm outline-none;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
 		@apply cursor-pointer hover:bg-wrapper-background-hover;
+		&-disabled {
+			@apply opacity-50 pointer-events-none cursor-not-allowed;
+		}
 	}
 	&-shortcut {
 		@apply ml-auto text-xs tracking-widest text-subtle;

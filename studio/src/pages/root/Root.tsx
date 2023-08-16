@@ -38,22 +38,15 @@ export default function Root() {
 	history.navigate = useNavigate();
 	history.location = useLocation();
 	const { orgId } = useParams();
-	const { getOrganizationMembers, memberPage, setMemberPage } = useOrganizationStore();
+	const { getOrganizationMembers } = useOrganizationStore();
 
 	useEffect(() => {
 		if (orgId) {
-			const fetchData = async () => {
-				return await getOrganizationMembers({
-					organizationId: orgId,
-					page: memberPage,
-					size: 100,
-				});
-			};
-			fetchData().then((res) => {
-				if (res.length > 0) setMemberPage(memberPage + 1);
+			getOrganizationMembers({
+				organizationId: orgId,
 			});
 		}
-	}, [memberPage, orgId]);
+	}, [orgId]);
 
 	return (
 		<>

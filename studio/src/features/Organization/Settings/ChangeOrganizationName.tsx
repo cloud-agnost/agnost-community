@@ -1,4 +1,5 @@
 import { ChangeNameForm } from '@/components/ChangeNameForm';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError } from '@/types';
 import { useState } from 'react';
@@ -7,7 +8,7 @@ export default function ChangeOrganizationName() {
 	const [error, setError] = useState<APIError | null>(null);
 	const [loading, setLoading] = useState(false);
 	const { organization, changeOrganizationName } = useOrganizationStore();
-
+	const canOrgUpdate = useAuthorizeOrg('org.update');
 	async function onSubmit(data: any) {
 		if (organization?.name === data.name) return;
 		else {
@@ -32,6 +33,7 @@ export default function ChangeOrganizationName() {
 			loading={loading}
 			error={error}
 			defaultValue={organization?.name as string}
+			disabled={!canOrgUpdate}
 		/>
 	);
 }

@@ -1,9 +1,10 @@
-import { SelectedRowDropdown } from 'components/Table';
+import { SelectedRowButton } from 'components/Table';
 import { Row, Table } from '@tanstack/react-table';
 import { APIKey } from '@/types';
 import { AddAPIKeyButton } from '@/features/version/SettingsAPIKeys';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Dispatch, SetStateAction } from 'react';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 
 interface APIKeysActionsProps {
 	selectedRows: Row<APIKey>[] | undefined;
@@ -16,6 +17,7 @@ export default function APIKeysActions({
 	setSelectedRows,
 }: APIKeysActionsProps) {
 	const { version, deleteMultipleAPIKeys } = useVersionStore();
+	const canDeleteMultiple = useAuthorizeVersion('version.key.delete');
 	async function onDelete() {
 		if (!version || !selectedRows || selectedRows?.length === 0) return;
 
@@ -32,10 +34,11 @@ export default function APIKeysActions({
 	return (
 		<div className='flex gap-4'>
 			{!!selectedRows?.length && (
-				<SelectedRowDropdown
+				<SelectedRowButton<APIKey>
 					table={table}
 					onDelete={onDelete}
 					selectedRowLength={selectedRows?.length}
+					disabled={!canDeleteMultiple}
 				/>
 			)}
 			<AddAPIKeyButton />

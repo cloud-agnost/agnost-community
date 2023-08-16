@@ -2,6 +2,7 @@ import ApplicationService from '@/services/ApplicationService';
 import {
 	APIError,
 	AppInviteRequest,
+	AppPermissions,
 	Application,
 	ApplicationMember,
 	BaseRequest,
@@ -43,6 +44,7 @@ interface ApplicationStore {
 	invitationSort: SortOption;
 	invitationSearch: string;
 	invitationRoleFilter: string[] | null;
+	appAuthorization: AppPermissions;
 	selectApplication: (application: Application) => void;
 	changeAppName: (req: ChangeAppNameRequest) => Promise<Application>;
 	setAppAvatar: (req: SetAppAvatarRequest) => Promise<Application>;
@@ -72,6 +74,7 @@ interface ApplicationStore {
 	leaveAppTeam: (req: DeleteApplicationRequest) => Promise<void>;
 	deleteApplication: (req: DeleteApplicationRequest) => Promise<void>;
 	searchApplications: (query: string) => Promise<Application[] | APIError>;
+	getAppPermissions: () => Promise<AppPermissions>;
 }
 
 const useApplicationStore = create<ApplicationStore>()(
@@ -99,7 +102,7 @@ const useApplicationStore = create<ApplicationStore>()(
 					},
 					invitationSearch: '',
 					invitationRoleFilter: [],
-
+					appAuthorization: {} as AppPermissions,
 					selectApplication: (application: Application) => {
 						set({ application });
 					},
@@ -428,6 +431,15 @@ const useApplicationStore = create<ApplicationStore>()(
 							throw error as APIError;
 						} finally {
 							set({ loading: false });
+						}
+					},
+					getAppPermissions: async () => {
+						try {
+							const appAuthorization = await ApplicationService.getAllAppRoleDefinitions();
+							set({ appAuthorization });
+							return appAuthorization;
+						} catch (error) {
+							throw error as APIError;
 						}
 					},
 				}),

@@ -8,10 +8,13 @@ import { CopyInput } from 'components/CopyInput';
 import { useParams } from 'react-router-dom';
 import { cn } from '@/utils';
 import { EnvironmentResourcesTable } from '@/features/version/SettingsEnvironment';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 
 export default function SettingsEnvironment() {
 	const { t } = useTranslation();
 	const environment = useEnvironmentStore((state) => state.environment);
+	const canEdit = useAuthorizeVersion('version.update');
+	const canDeploy = useAuthorizeVersion('version.deploy');
 	const { toggleAutoDeploy, suspendEnvironment, activateEnvironment } = useEnvironmentStore();
 	const { orgId, versionId, appId } = useParams<{
 		versionId: string;
@@ -50,7 +53,11 @@ export default function SettingsEnvironment() {
 				title={t('version.auto_deploy')}
 				description={t('version.auto_redeploy_desc')}
 			>
-				<Switch checked={!!environment?.autoDeploy} onCheckedChange={onAutoDeployStatusChanged} />
+				<Switch
+					disabled={!canDeploy}
+					checked={!!environment?.autoDeploy}
+					onCheckedChange={onAutoDeployStatusChanged}
+				/>
 			</SettingsFormItem>
 			<SettingsFormItem
 				className='space-y-0 py-6'
@@ -73,6 +80,7 @@ export default function SettingsEnvironment() {
 				}
 			>
 				<Button
+					disabled={!canEdit}
 					className={cn(!environment?.suspended && '!text-elements-red')}
 					variant={environment?.suspended ? 'primary' : 'outline'}
 					onClick={suspendOrActive}

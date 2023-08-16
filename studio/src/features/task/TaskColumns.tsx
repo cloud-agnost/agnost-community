@@ -1,16 +1,15 @@
+import { ActionsCell } from '@/components/ActionsCell';
+import { Badge } from '@/components/Badge';
+import { BADGE_COLOR_MAP } from '@/constants';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTaskStore from '@/store/task/taskStore';
 import { ColumnDefWithClassName, Task } from '@/types';
 import { translate } from '@/utils';
-import { Trash } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
 import { Checkbox } from 'components/Checkbox';
 import { CopyButton } from 'components/CopyButton';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
-import { Calendar, Pencil } from 'components/icons';
-import { Badge } from '@/components/Badge';
-import { BADGE_COLOR_MAP } from '@/constants';
+import { Calendar } from 'components/icons';
 import cronstrue from 'cronstrue';
 
 const TaskColumns: ColumnDefWithClassName<Task>[] = [
@@ -155,26 +154,14 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		cell: ({ row: { original } }) => {
 			const { openDeleteTaskModal } = useTaskStore.getState();
 			return (
-				<div className='flex items-center justify-end'>
-					<Button
-						to={`${original._id}`}
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-					>
-						<Pencil />
-					</Button>
-					<Button
-						variant='blank'
-						rounded
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-						iconOnly
-						onClick={() => openDeleteTaskModal(original)}
-					>
-						<Trash size={20} />
-					</Button>
-				</div>
+				<ActionsCell
+					to={`${original._id}`}
+					onDelete={() => openDeleteTaskModal(original)}
+					original={original}
+					canDeleteKey='task.delete'
+					canEditKey='task.edit'
+					type='version'
+				/>
 			);
 		},
 	},

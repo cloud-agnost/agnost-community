@@ -11,8 +11,15 @@ interface Props<T> {
 	selectedRowLength: number;
 	table?: Table<T>;
 	className?: string;
+	disabled?: boolean;
 }
-function SelectedRowDropdown<T>({ onDelete, selectedRowLength, table, className }: Props<T>) {
+function SelectedRowButton<T>({
+	onDelete,
+	selectedRowLength,
+	table,
+	className,
+	disabled,
+}: Props<T>) {
 	const { t } = useTranslation();
 	const [openInfoModal, setOpenInfoModal] = useState(false);
 	return selectedRowLength > 0 ? (
@@ -37,7 +44,7 @@ function SelectedRowDropdown<T>({ onDelete, selectedRowLength, table, className 
 					</span>
 				</div>
 
-				<Button variant='blank' iconOnly onClick={() => setOpenInfoModal(true)}>
+				<Button variant='blank' iconOnly onClick={() => setOpenInfoModal(true)} disabled={disabled}>
 					<Trash size={20} className='text-icon-base' />
 				</Button>
 			</div>
@@ -60,6 +67,7 @@ function SelectedRowDropdown<T>({ onDelete, selectedRowLength, table, className 
 							{t('general.cancel')}
 						</Button>
 						<Button
+							disabled={disabled}
 							size='lg'
 							variant='primary'
 							onClick={(e) => {
@@ -76,4 +84,4 @@ function SelectedRowDropdown<T>({ onDelete, selectedRowLength, table, className 
 	) : null;
 }
 
-export default SelectedRowDropdown;
+export default SelectedRowButton;

@@ -5,6 +5,7 @@ import { EmptyQueue } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
 import { MessageQueueColumns } from '@/features/queue';
 import { useToast } from '@/hooks';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { APIError, MessageQueue } from '@/types';
@@ -36,7 +37,7 @@ export default function MainMessageQueue() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
-
+	const canEdit = useAuthorizeVersion('queue.create');
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
@@ -122,6 +123,7 @@ export default function MainMessageQueue() {
 			selectedRowLength={selectedRows?.length}
 			onSearch={onInput}
 			onMultipleDelete={deleteMultipleQueuesHandler}
+			disabled={!canEdit}
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'

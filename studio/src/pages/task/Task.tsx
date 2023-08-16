@@ -5,6 +5,7 @@ import { EmptyTask } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
 import { TaskColumns } from '@/features/task';
 import { useToast } from '@/hooks';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useTaskStore from '@/store/task/taskStore';
 import { APIError, Task } from '@/types';
@@ -26,6 +27,7 @@ interface OutletContext {
 export default function MainTask() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
+	const canEdit = useAuthorizeVersion('task.edit');
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
 	const {
@@ -123,6 +125,7 @@ export default function MainTask() {
 			onSearch={onInput}
 			table={table}
 			selectedRowLength={selectedRows.length}
+			disabled={!canEdit}
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'

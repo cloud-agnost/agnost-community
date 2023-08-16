@@ -1,16 +1,14 @@
+import { ActionsCell } from '@/components/ActionsCell';
 import { STORAGE_ICON_MAP } from '@/constants';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useStorageStore from '@/store/storage/storageStore';
 import { ColumnDefWithClassName, Storage } from '@/types';
 import { translate } from '@/utils';
-import { Trash } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
 import { Checkbox } from 'components/Checkbox';
 import { CopyButton } from 'components/CopyButton';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
-import { Pencil } from 'components/icons';
 
 const MessageQueueColumns: ColumnDefWithClassName<Storage>[] = [
 	{
@@ -139,26 +137,14 @@ const MessageQueueColumns: ColumnDefWithClassName<Storage>[] = [
 		cell: ({ row: { original } }) => {
 			const { openDeleteStorageDialog, openEditStorageDialog } = useStorageStore.getState();
 			return (
-				<div className='flex items-center justify-end'>
-					<Button
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-						onClick={() => openEditStorageDialog(original)}
-					>
-						<Pencil />
-					</Button>
-					<Button
-						variant='blank'
-						rounded
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-						iconOnly
-						onClick={() => openDeleteStorageDialog(original)}
-					>
-						<Trash size={20} />
-					</Button>
-				</div>
+				<ActionsCell<Storage>
+					original={original}
+					onEdit={() => openEditStorageDialog(original)}
+					onDelete={() => openDeleteStorageDialog(original)}
+					canEditKey='storage.update'
+					canDeleteKey='storage.delete'
+					type='version'
+				/>
 			);
 		},
 	},

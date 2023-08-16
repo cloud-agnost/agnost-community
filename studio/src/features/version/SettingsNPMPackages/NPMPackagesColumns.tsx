@@ -1,14 +1,12 @@
+import useAuthStore from '@/store/auth/authStore.ts';
+import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, NPMPackage } from '@/types';
+import { translate } from '@/utils';
+import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
-import { translate } from '@/utils';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { DateText } from 'components/DateText';
-import useVersionStore from '@/store/version/versionStore.ts';
 import { TableConfirmation } from 'components/Table';
-import { Button } from 'components/Button';
-import { Trash } from '@phosphor-icons/react';
 
 const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	{
@@ -84,6 +82,7 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 					packageId: _id,
 				});
 			}
+
 			return (
 				<div className='flex items-center'>
 					<TableConfirmation
@@ -94,16 +93,8 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 						description={translate('version.npm.delete_modal_desc')}
 						onConfirm={clickHandler}
 						contentClassName='m-0'
-					>
-						<Button
-							variant='blank'
-							rounded
-							className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-							iconOnly
-						>
-							<Trash size={20} />
-						</Button>
-					</TableConfirmation>
+						authorizedKey='version.package.delete'
+					/>
 				</div>
 			);
 		},

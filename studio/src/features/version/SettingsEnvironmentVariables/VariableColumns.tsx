@@ -1,15 +1,13 @@
+import { ActionsCell } from '@/components/ActionsCell';
+import useAuthStore from '@/store/auth/authStore.ts';
+import useVersionStore from '@/store/version/versionStore.ts';
+import { ColumnDefWithClassName, Param } from '@/types';
+import { translate } from '@/utils';
+import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
-import { translate } from '@/utils';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { DateText } from 'components/DateText';
-import useVersionStore from '@/store/version/versionStore.ts';
 import { TableConfirmation } from 'components/Table';
-import { Button } from 'components/Button';
-import { Trash } from '@phosphor-icons/react';
-import { ColumnDefWithClassName, Param } from '@/types';
-import { Pencil } from 'components/icons';
 
 const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	{
@@ -131,16 +129,12 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 				setEditParamDrawerIsOpen(true);
 			}
 			return (
-				<div className='flex items-center gap-0.5'>
-					<Button
-						variant='blank'
-						onClick={editHandler}
-						rounded
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-						iconOnly
-					>
-						<Pencil className='text-lg' />
-					</Button>
+				<ActionsCell
+					original={original}
+					canEditKey='version.key.update'
+					onEdit={editHandler}
+					type='version'
+				>
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
@@ -149,17 +143,9 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 						description={translate('version.variable.delete_modal_desc')}
 						onConfirm={clickHandler}
 						contentClassName='m-0'
-					>
-						<Button
-							variant='blank'
-							rounded
-							className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-							iconOnly
-						>
-							<Trash size={20} />
-						</Button>
-					</TableConfirmation>
-				</div>
+						authorizedKey='version.key.delete'
+					/>
+				</ActionsCell>
 			);
 		},
 	},

@@ -1,17 +1,18 @@
 import { axios } from '@/helpers';
+import useOrganizationStore from '@/store/organization/organizationStore';
 import {
 	Application,
-	CreateApplicationResponse,
-	Organization,
-	CreateApplicationRequest,
-	GetOrganizationMembersRequest,
 	ChangeOrganizationAvatarRequest,
-	OrganizationMember,
-	InviteOrgRequest,
-	Invitation,
+	CreateApplicationRequest,
+	CreateApplicationResponse,
 	GetInvitationRequest,
+	GetOrganizationMembersRequest,
+	Invitation,
+	InviteOrgRequest,
+	OrgPermissions,
+	Organization,
+	OrganizationMember,
 } from '@/types';
-import useOrganizationStore from '@/store/organization/organizationStore';
 import { arrayToQueryString } from '@/utils';
 export default class OrganizationService {
 	static url = '/v1/org';
@@ -62,15 +63,13 @@ export default class OrganizationService {
 	static async getOrganizationMembers(
 		req: GetOrganizationMembersRequest,
 	): Promise<OrganizationMember[]> {
-		const { page, size, roles, sortBy, sortDir, search, organizationId, excludeSelf } = req;
+		const { roles, sortBy, sortDir, search, organizationId, excludeSelf } = req;
 		const role = arrayToQueryString(roles ?? [], 'role');
 		return (
 			await axios.get(
 				`${this.url}/${organizationId}/member${excludeSelf ? '/exclude-current' : ''}?${role}`,
 				{
 					params: {
-						page,
-						size,
 						role,
 						sortBy,
 						sortDir,
@@ -222,5 +221,9 @@ export default class OrganizationService {
 				data: {},
 			})
 		).data;
+	}
+
+	static async getAllOrganizationRoleDefinitions(): Promise<OrgPermissions> {
+		return (await axios.get(`${this.url}/roles`)).data;
 	}
 }

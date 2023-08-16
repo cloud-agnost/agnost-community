@@ -1,10 +1,15 @@
-import useOrganizationStore from '@/store/organization/organizationStore';
-import { axios } from '@/helpers';
-import { Application, GetInvitationRequest, Invitation } from '@/types';
-import useApplicationStore from '@/store/app/applicationStore';
-import { ApplicationMember } from '@/types';
-import { AppInviteRequest } from '@/types/application';
 import { UI_BASE_URL } from '@/constants';
+import { axios } from '@/helpers';
+import useApplicationStore from '@/store/app/applicationStore';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import {
+	AppPermissions,
+	Application,
+	ApplicationMember,
+	GetInvitationRequest,
+	Invitation,
+} from '@/types';
+import { AppInviteRequest } from '@/types/application';
 import { arrayToQueryString } from '@/utils';
 export default class ApplicationService {
 	static url = '/v1/org/:orgId/app/:appId';
@@ -121,6 +126,12 @@ export default class ApplicationService {
 					tokens,
 				},
 			})
+		).data;
+	}
+
+	static async getAllAppRoleDefinitions(): Promise<AppPermissions> {
+		return (
+			await axios.get(`v1/org/${useOrganizationStore.getState().organization?._id}/app/roles`)
 		).data;
 	}
 }

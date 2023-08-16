@@ -43,6 +43,7 @@ import { Separator } from 'components/Separator';
 import useModelStore from '@/store/database/modelStore.ts';
 import useTypeStore from '@/store/types/typeStore.ts';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 
 type View = keyof FieldType['view'];
 
@@ -80,7 +81,7 @@ export default function EditOrCreateFieldDrawer({
 	const updateField = useModelStore((state) => state.updateField);
 	const getReferenceModels = useModelStore((state) => state.getReferenceModels);
 	const [models, setModels] = useState<Model[]>([]);
-
+	const canCreate = useAuthorizeVersion('model.create');
 	const MAX_LENGTH = MAX_LENGTHS[editMode ? fieldToEdit?.type : type?.name ?? ''];
 
 	const { dbId, modelId, appId, versionId, orgId } = useParams() as {
@@ -900,7 +901,7 @@ export default function EditOrCreateFieldDrawer({
 								</>
 							)}
 							<div className='flex justify-end'>
-								<Button loading={loading} size='lg'>
+								<Button disabled={!canCreate} size='lg'>
 									{editMode ? t('general.save') : t('general.add')}
 								</Button>
 							</div>

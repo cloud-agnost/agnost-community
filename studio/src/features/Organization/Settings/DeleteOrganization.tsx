@@ -6,6 +6,8 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { APIError } from '@/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
+
 export default function DeleteOrganization() {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
@@ -14,6 +16,7 @@ export default function DeleteOrganization() {
 	const [isOpen, setIsOpen] = useState(false);
 	const confirmCode = useOrganizationStore((state) => state.organization?.iid) as string;
 	const { deleteOrganization } = useOrganizationStore();
+	const canDelete = useAuthorizeOrg('org.delete');
 	function onConfirm() {
 		deleteOrganization({
 			onSuccess: () => {
@@ -43,6 +46,7 @@ export default function DeleteOrganization() {
 				className='text-elements-red'
 				onClick={() => setIsOpen(true)}
 				size='lg'
+				disabled={!canDelete}
 			>
 				{t('general.delete')}
 			</Button>

@@ -13,7 +13,7 @@ import useVersionStore from '@/store/version/versionStore.ts';
 import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
 import { APIError } from '@/types';
 import { NAME_SCHEMA } from '@/constants';
-
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 const MiddlewareFormSchema = z.object({
 	name: NAME_SCHEMA,
 	value: z
@@ -47,7 +47,8 @@ export default function EditOrAddVariableDrawer({
 	const { orgId, appId, versionId } = useParams();
 	const { param, addParam, updateParam } = useVersionStore();
 	const [error, setError] = useState<APIError | null>(null);
-
+	const canCreate = useAuthorizeVersion('version.param.create');
+	const canEdit = useAuthorizeVersion('version.param.update');
 	useEffect(() => {
 		if (!open) form.reset();
 		else if (param && editMode) {
@@ -174,7 +175,7 @@ export default function EditOrAddVariableDrawer({
 							)}
 						/>
 						<div className='flex justify-end mt-4'>
-							<Button loading={loading} size='lg'>
+							<Button loading={loading} size='lg' disabled={editMode ? !canEdit : !canCreate}>
 								{editMode ? t('general.save') : t('general.add')}
 							</Button>
 						</div>
