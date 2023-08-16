@@ -8,6 +8,7 @@ import { DateText } from 'components/DateText';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
 import { Button } from 'components/Button';
 import { Pencil } from 'components/icons';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 
 const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
@@ -83,26 +84,29 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 		className: 'actions',
 		size: 45,
 		cell: ({ row: { original } }) => {
-			function openEditDrawer() {
-				const { setEditMiddlewareDrawerIsOpen, setMiddleware } = useMiddlewareStore.getState();
-				setEditMiddlewareDrawerIsOpen(true);
-				setMiddleware(original);
-			}
-			return (
-				<div className='flex items-center justify-end'>
-					<Button
-						onClick={openEditDrawer}
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-					>
-						<Pencil />
-					</Button>
-				</div>
-			);
+			return <UpdateMiddlewareButton middleware={original} />;
 		},
 	},
 ];
 
+function UpdateMiddlewareButton({ middleware }: { middleware: Middleware }) {
+	const { setEditMiddlewareDrawerIsOpen, setMiddleware } = useMiddlewareStore.getState();
+	const canUpdate = useAuthorizeVersion('middleware.update');
+	function openEditDrawer() {
+		setEditMiddlewareDrawerIsOpen(true);
+		setMiddleware(middleware);
+	}
+	return (
+		<Button
+			onClick={openEditDrawer}
+			iconOnly
+			variant='blank'
+			rounded
+			className='text-xl hover:bg-wrapper-background-hover text-icon-base'
+			disabled={!canUpdate}
+		>
+			<Pencil />
+		</Button>
+	);
+}
 export default MiddlewaresColumns;

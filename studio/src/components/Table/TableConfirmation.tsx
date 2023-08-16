@@ -1,13 +1,14 @@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
-import { X } from '@phosphor-icons/react';
-import { ReactNode, useState } from 'react';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import { cn } from '@/utils';
+import { Trash, X } from '@phosphor-icons/react';
+import { Align } from '@radix-ui/react-popper';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback } from '../Avatar';
 import { Button } from '../Button';
-import { Align } from '@radix-ui/react-popper';
-import { cn } from '@/utils';
 interface TableConfirmationProps {
-	children: ReactNode;
 	onConfirm: () => void;
 	title: string;
 	showAvatar?: boolean;
@@ -15,11 +16,12 @@ interface TableConfirmationProps {
 	align?: Align;
 	contentClassName?: string;
 	closeOnConfirm?: boolean;
+	authorizedKey?: string;
 }
 
 export function TableConfirmation({
-	children,
 	onConfirm,
+	authorizedKey,
 	showAvatar = true,
 	title,
 	description,
@@ -33,9 +35,22 @@ export function TableConfirmation({
 		onConfirm();
 		if (closeOnConfirm) setOpen(false);
 	}
+	const hasVersionPermission = useAuthorizeVersion(authorizedKey as string);
+	const hasOrgPermission = useAuthorizeOrg(authorizedKey as string);
+	// const appDisabled = useAuthorizeApp(authorizedKey as string);
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger asChild>{children}</PopoverTrigger>
+			<PopoverTrigger asChild>
+				<Button
+					disabled={!hasVersionPermission || !hasOrgPermission}
+					variant='blank'
+					rounded
+					className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
+					iconOnly
+				>
+					<Trash size={20} />
+				</Button>
+			</PopoverTrigger>
 			<PopoverContent align={align} className={cn('mr-2', contentClassName)}>
 				<div id='popup-modal' tabIndex={-1}>
 					<div className='relative w-full max-w-sm max-h-full'>

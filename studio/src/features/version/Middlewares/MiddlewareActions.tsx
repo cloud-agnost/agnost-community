@@ -1,9 +1,10 @@
-import { SelectedRowDropdown } from 'components/Table';
 import { AddMiddlewareButton } from '@/features/version/Middlewares/index.ts';
-import { Row } from '@tanstack/react-table';
-import { Middleware } from '@/types';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
+import { Middleware } from '@/types';
+import { Row } from '@tanstack/react-table';
 import { SearchInput } from 'components/SearchInput';
+import { SelectedRowButton } from 'components/Table';
 import { useSearchParams } from 'react-router-dom';
 
 interface MiddlewareActionsProps {
@@ -13,6 +14,7 @@ interface MiddlewareActionsProps {
 export default function MiddlewareActions({ selectedRows, onSearch }: MiddlewareActionsProps) {
 	const { deleteMiddleware, deleteMultipleMiddlewares } = useMiddlewareStore();
 	const [searchParams, setSearchParams] = useSearchParams();
+	const canDeleteMultiple = useAuthorizeVersion('middleware.delete');
 	async function deleteHandler() {
 		const rows = selectedRows?.map((row) => row.original);
 		if (!rows || rows.length === 0) return;
@@ -55,7 +57,11 @@ export default function MiddlewareActions({ selectedRows, onSearch }: Middleware
 				placeholder='Search'
 			/>
 			{!!selectedRows?.length && (
-				<SelectedRowDropdown onDelete={deleteHandler} selectedRowLength={selectedRows?.length} />
+				<SelectedRowButton<Middleware>
+					onDelete={deleteHandler}
+					selectedRowLength={selectedRows?.length}
+					disabled={!canDeleteMultiple}
+				/>
 			)}
 			<AddMiddlewareButton />
 		</div>

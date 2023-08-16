@@ -5,6 +5,7 @@ import { ResLog, Resource } from './resource';
 import { BaseRequest } from './type';
 import { Version } from './version';
 
+export type AppRoles = 'Admin' | 'Developer' | 'Viewer';
 export interface Application {
 	_id: string;
 	orgId: string;
@@ -17,6 +18,7 @@ export interface Application {
 	createdAt: string;
 	updatedAt: string;
 	pictureUrl: string;
+	role: AppRoles;
 }
 
 export interface Team {
@@ -95,9 +97,131 @@ export interface TeamOption {
 }
 interface AppMemberRequest {
 	email: string;
-	role: 'Admin' | 'Developer' | 'Viewer' | '';
+	role: AppRoles | '';
 }
 export interface AppInviteRequest extends BaseRequest {
 	members: AppMemberRequest[];
 	uiBaseUrl: string;
+}
+
+interface AuthPermissions {
+	update: boolean;
+}
+
+interface PackagePermissions extends AuthPermissions {
+	create: boolean;
+	update: boolean;
+	delete: boolean;
+}
+
+interface KeyPermissions extends AuthPermissions {
+	create: boolean;
+	update: boolean;
+	delete: boolean;
+}
+
+interface LimitPermissions extends AuthPermissions {
+	create: boolean;
+	update: boolean;
+	delete: boolean;
+}
+
+interface ParamPermissions extends AuthPermissions {
+	create: boolean;
+	update: boolean;
+	delete: boolean;
+}
+
+export interface AppRoleDefinition {
+	view: boolean;
+	update: boolean;
+	delete: boolean;
+	transfer: boolean;
+	viewLogs: boolean;
+	invite: {
+		view: boolean;
+		create: boolean;
+		update: boolean;
+		resend: boolean;
+		delete: boolean;
+	};
+	team: {
+		view: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	version: {
+		view: boolean;
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+		param: ParamPermissions;
+		limit: LimitPermissions;
+		key: KeyPermissions;
+		package: PackagePermissions;
+		auth: AuthPermissions;
+	};
+	db: {
+		view: boolean;
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	model: {
+		view: boolean;
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	resource: {
+		view: boolean;
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	env: {
+		view: boolean;
+		update: boolean;
+		deploy: boolean;
+	};
+	endpoint: {
+		view: boolean;
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	middleware: {
+		view: boolean;
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	queue: {
+		view: boolean;
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	task: {
+		view: boolean;
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	storage: {
+		view: boolean;
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+}
+
+export interface AppRolePermissions {
+	app: AppRoleDefinition;
+}
+
+export interface AppPermissions {
+	Admin: AppRolePermissions;
+	Developer: AppRolePermissions;
+	Viewer: AppRolePermissions;
 }

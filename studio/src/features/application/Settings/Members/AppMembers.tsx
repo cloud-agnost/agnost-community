@@ -1,22 +1,28 @@
 import { Button } from '@/components/Button';
 import { DataTable } from '@/components/DataTable';
 import { SearchInput } from '@/components/SearchInput';
+import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
+import useClusterStore from '@/store/cluster/clusterStore';
 import { Application, ApplicationMember } from '@/types';
+import { notify } from '@/utils';
 import { Row, Table } from '@tanstack/react-table';
+import { RoleDropdown } from 'components/RoleDropdown';
+import { SelectedRowButton } from 'components/Table';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppMembersTableColumns } from './AppMembersTableColumns';
-import { SelectedRowDropdown } from 'components/Table';
-import { notify } from '@/utils';
-import { RoleDropdown } from 'components/RoleDropdown';
-import useClusterStore from '@/store/cluster/clusterStore';
-export default function AppMembers() {
+export default function MainAppMembers() {
 	const { applicationTeam, application, openInviteMemberDrawer, removeMultipleAppMembers } =
 		useApplicationStore();
 	const { canClusterSendEmail } = useClusterStore();
 	const [table, setTable] = useState<Table<ApplicationMember>>();
 	const [selectedRows, setSelectedRows] = useState<Row<ApplicationMember>[]>();
+	const role = useApplicationStore((state) => state.application?.role);
+	const canMultiDelete = useAuthorizeApp({
+		role,
+		key: 'team.delete',
+	});
 	const { t } = useTranslation();
 
 	function removeMultipleMembers() {
@@ -46,10 +52,11 @@ export default function AppMembers() {
 				<SearchInput placeholder={t('general.search') as string} />
 				<div className='flex items-center gap-4'>
 					{!!selectedRows?.length && (
-						<SelectedRowDropdown
+						<SelectedRowButton<ApplicationMember>
 							onDelete={removeMultipleMembers}
 							selectedRowLength={selectedRows?.length}
 							table={table as Table<ApplicationMember>}
+							disabled={!canMultiDelete}
 						/>
 					)}
 					<RoleDropdown

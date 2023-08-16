@@ -1,5 +1,6 @@
 import { INVITATIONS_SORT_OPTIONS, PAGE_SIZE } from '@/constants';
 import { useToast } from '@/hooks';
+import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import { Invitation } from '@/types';
 import { FunnelSimple } from '@phosphor-icons/react';
@@ -13,7 +14,7 @@ import {
 } from 'components/Dropdown';
 import { RoleDropdown } from 'components/RoleDropdown';
 import { SearchInput } from 'components/SearchInput';
-import { SelectedRowDropdown } from 'components/Table';
+import { SelectedRowButton } from 'components/Table';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -25,7 +26,11 @@ function AppInvitationFilter({ selectedRows, table }: Props) {
 	const { notify } = useToast();
 	const { t } = useTranslation();
 	const [searchParams] = useSearchParams();
-
+	const role = useApplicationStore((state) => state.application?.role);
+	const canMultiDeleteInvite = useAuthorizeApp({
+		role,
+		key: 'invitation.delete',
+	});
 	const {
 		invitationRoleFilter,
 		invitationSearch,
@@ -119,10 +124,11 @@ function AppInvitationFilter({ selectedRows, table }: Props) {
 				</DropdownMenuContent>
 			</DropdownMenu>
 			{!!selectedRows?.length && (
-				<SelectedRowDropdown
+				<SelectedRowButton<Invitation>
 					onDelete={deleteInvitations}
 					selectedRowLength={selectedRows?.length}
 					table={table}
+					disabled={!canMultiDeleteInvite}
 				/>
 			)}
 		</div>

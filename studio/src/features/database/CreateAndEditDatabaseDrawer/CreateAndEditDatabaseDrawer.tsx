@@ -1,7 +1,17 @@
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
-import { useTranslation } from 'react-i18next';
-import * as z from 'zod';
+import { DATABASE_ICON_MAP, NAME_SCHEMA } from '@/constants';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import useDatabaseStore from '@/store/database/databaseStore.ts';
+import {
+	default as useResourceStore,
+	default as useResourcesStore,
+} from '@/store/resources/resourceStore.ts';
+import useVersionStore from '@/store/version/versionStore.ts';
+import { APIError } from '@/types';
 import { cn, translate } from '@/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Plus } from '@phosphor-icons/react';
+import { Button } from 'components/Button';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import {
 	Form,
 	FormControl,
@@ -11,11 +21,7 @@ import {
 	FormLabel,
 	FormMessage,
 } from 'components/Form';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from 'components/Input';
-import { FormEvent, useEffect } from 'react';
-import { Separator } from 'components/Separator';
 import {
 	Select,
 	SelectContent,
@@ -24,15 +30,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from 'components/Select';
-import { DATABASE_ICON_MAP, NAME_SCHEMA } from '@/constants';
-import { Button } from 'components/Button';
-import useResourceStore from '@/store/resources/resourceStore.ts';
-import { Plus } from '@phosphor-icons/react';
-import useDatabaseStore from '@/store/database/databaseStore.ts';
-import useVersionStore from '@/store/version/versionStore.ts';
-import { APIError } from '@/types';
-import useResourcesStore from '@/store/resources/resourceStore.ts';
-
+import { Separator } from 'components/Separator';
+import { FormEvent, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import * as z from 'zod';
 interface CreateDatabaseDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -65,6 +67,7 @@ export default function CreateAndEditDatabaseDrawer({
 	const { createDatabase, toEditDatabase, updateDatabaseName } = useDatabaseStore();
 	const getResources = useResourcesStore((state) => state.getResources);
 	const toggleCreateResourceModal = useResourceStore((state) => state.toggleCreateResourceModal);
+	const canCreateDatabase = useAuthorizeVersion('db.create');
 	const resources = useResourceStore((state) =>
 		state.resources.filter((resource) => resource.type === 'database'),
 	);
@@ -234,7 +237,9 @@ export default function CreateAndEditDatabaseDrawer({
 							)}
 
 							<div className='flex justify-end'>
-								<Button size='lg'>{editMode ? t('general.save') : t('general.create')}</Button>
+								<Button size='lg' disabled={!canCreateDatabase}>
+									{editMode ? t('general.save') : t('general.create')}
+								</Button>
 							</div>
 						</form>
 					</Form>

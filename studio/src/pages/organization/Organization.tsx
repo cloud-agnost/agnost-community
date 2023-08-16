@@ -8,24 +8,25 @@ import useApplicationStore from '@/store/app/applicationStore.ts';
 
 Organization.loader = async function ({ params }: LoaderFunctionArgs) {
 	const { orgId } = params;
-	const { getAllOrganizationByUser } = useOrganizationStore.getState();
-	const { getAppsByOrgId } = useApplicationStore.getState();
+	const { getAllOrganizationByUser, getOrgPermissions } = useOrganizationStore.getState();
+	const { getAppsByOrgId, getAppPermissions } = useApplicationStore.getState();
 	const { isAuthenticated } = useAuthStore.getState();
 
-	if (isAuthenticated()) {
-		getAllOrganizationByUser();
-		useOrganizationStore.subscribe(
-			(state) => state.organization,
-			(organization) => {
-				if (organization) {
-					getAppsByOrgId(organization._id);
-				} else if (orgId) {
-					getAppsByOrgId(orgId);
-				}
-			},
-			{ fireImmediately: true },
-		);
-	}
+	if (isAuthenticated()) getAllOrganizationByUser();
+
+	useOrganizationStore.subscribe(
+		(state) => state.organization,
+		(organization) => {
+			if (organization) {
+				getAppsByOrgId(organization._id);
+			} else if (orgId) {
+				getAppsByOrgId(orgId);
+			}
+			getAppPermissions();
+			getOrgPermissions();
+		},
+		{ fireImmediately: true },
+	);
 
 	return null;
 };

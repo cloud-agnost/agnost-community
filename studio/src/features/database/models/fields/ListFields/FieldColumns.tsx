@@ -1,17 +1,15 @@
-import { ColumnDefWithClassName, Field } from '@/types';
-import { SortButton } from 'components/DataTable';
-import { toDisplayName, translate } from '@/utils';
-import { Button } from 'components/Button';
-import { Pencil } from 'components/icons';
-import { Columns, Trash } from '@phosphor-icons/react';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
-import { DateText } from 'components/DateText';
-import { Badge } from 'components/Badge';
-import useModelStore from '@/store/database/modelStore.ts';
-import { TableConfirmation } from 'components/Table';
-import { Checkbox } from 'components/Checkbox';
+import { ActionsCell } from '@/components/ActionsCell';
 import { SubFields } from '@/features/database/models/fields/ListFields/index.ts';
+import useAuthStore from '@/store/auth/authStore.ts';
+import useModelStore from '@/store/database/modelStore.ts';
+import { ColumnDefWithClassName, Field } from '@/types';
+import { toDisplayName, translate } from '@/utils';
+import { AuthUserAvatar } from 'components/AuthUserAvatar';
+import { Badge } from 'components/Badge';
+import { Checkbox } from 'components/Checkbox';
+import { SortButton } from 'components/DataTable';
+import { DateText } from 'components/DateText';
+import { TableConfirmation } from 'components/Table';
 
 const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
@@ -251,27 +249,12 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 			if (original.creator === 'system') return null;
 
 			return (
-				<div className='flex items-center justify-end'>
-					{['object-list', 'object'].includes(original.type) && (
-						<Button
-							to={(original?.object || original?.objectList)?.iid}
-							iconOnly
-							variant='blank'
-							rounded
-							className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-						>
-							<Columns />
-						</Button>
-					)}
-					<Button
-						onClick={openEditDrawer}
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-					>
-						<Pencil />
-					</Button>
+				<ActionsCell
+					original={original}
+					canEditKey='model.update'
+					onEdit={openEditDrawer}
+					type='version'
+				>
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
@@ -280,17 +263,9 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 						description={translate('database.fields.delete.description')}
 						onConfirm={deleteHandler}
 						contentClassName='m-0'
-					>
-						<Button
-							variant='blank'
-							rounded
-							className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-							iconOnly
-						>
-							<Trash size={20} />
-						</Button>
-					</TableConfirmation>
-				</div>
+						authorizedKey='model.delete'
+					/>
+				</ActionsCell>
 			);
 		},
 	},

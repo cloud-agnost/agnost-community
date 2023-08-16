@@ -226,5 +226,7 @@
 	"timestamp": "TIMESTAMP",
 	"response_time": "RESPONSE TIME",
 	"success_count": "Success Count",
-	"error_count": "Error Count"
+	"error_count": "Error Count",
+	"readOnly": "Readonly",
+	"read_write": "Read/Write"
 }

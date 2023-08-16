@@ -4,8 +4,8 @@ import { SortButton } from '@/components/DataTable';
 import { Refresh } from '@/components/icons';
 import { ApplicationSettings, ApplicationTeam } from '@/features/application';
 import useAuthStore from '@/store/auth/authStore';
-import { Application } from '@/types';
-import { getRelativeTime, translate } from '@/utils';
+import { AppRoles, Application } from '@/types';
+import { translate, getRelativeTime } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 export const ApplicationColumns: ColumnDef<Application>[] = [
 	{
@@ -69,10 +69,11 @@ export const ApplicationColumns: ColumnDef<Application>[] = [
 	{
 		id: 'actions',
 		cell: ({ row }) => {
-			const { _id, name } = row.original;
+			const { _id, name, team } = row.original;
+			const me = team.find((member) => member._id === useAuthStore.getState().user?._id);
 			return (
 				<div className='text-center'>
-					<ApplicationSettings appId={_id} appName={name} />
+					<ApplicationSettings appId={_id} appName={name} role={me?.role as AppRoles} />
 				</div>
 			);
 		},

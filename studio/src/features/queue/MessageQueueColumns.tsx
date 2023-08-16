@@ -1,16 +1,14 @@
+import { ActionsCell } from '@/components/ActionsCell';
 import { QUEUE_ICON_MAP } from '@/constants';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { ColumnDefWithClassName, MessageQueue } from '@/types';
 import { translate } from '@/utils';
-import { Trash } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
 import { Checkbox } from 'components/Checkbox';
 import { CopyButton } from 'components/CopyButton';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
-import { Pencil } from 'components/icons';
 
 const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 	{
@@ -148,26 +146,13 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 		cell: ({ row: { original } }) => {
 			const { openDeleteModal } = useMessageQueueStore.getState();
 			return (
-				<div className='flex items-center justify-end'>
-					<Button
-						to={`${original._id}`}
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-					>
-						<Pencil />
-					</Button>
-					<Button
-						variant='blank'
-						rounded
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-						iconOnly
-						onClick={() => openDeleteModal(original)}
-					>
-						<Trash size={20} />
-					</Button>
-				</div>
+				<ActionsCell
+					original={original}
+					onDelete={() => openDeleteModal(original)}
+					to={`${original._id}`}
+					canDeleteKey='queue.delete'
+					canEditKey='queue.edit'
+				/>
 			);
 		},
 	},

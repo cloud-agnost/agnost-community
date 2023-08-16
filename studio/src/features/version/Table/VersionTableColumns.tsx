@@ -1,16 +1,18 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Button } from '@/components/Button';
+import { DateText } from '@/components/DateText';
 import { Version as VersionIcon } from '@/components/icons';
-import { Version } from '@/types';
+import useApplicationStore from '@/store/app/applicationStore.ts';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { Application, Version } from '@/types';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import { translate } from '@/utils';
 import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Link } from 'react-router-dom';
-import useApplicationStore from '@/store/app/applicationStore.ts';
 
 export const VersionTableColumns: ColumnDef<Version>[] = [
 	{
 		id: 'name',
-		header: 'Name',
+		header: translate('general.name').toUpperCase(),
 		accessorKey: 'name',
 		size: 75,
 		cell: ({ row }) => {
@@ -25,28 +27,20 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 	},
 	{
 		id: 'createdBy',
-		header: 'Created By',
+		header: translate('general.created_at').toUpperCase(),
 		accessorKey: 'createdBy',
 		size: 200,
 		cell: ({ row }) => {
-			const { createdBy } = row.original;
-			return (
-				<div className='flex items-center gap-3'>
-					<Avatar size='sm'>
-						<AvatarImage src={createdBy?.pictureUrl as string} />
-						<AvatarFallback name={createdBy?.name} color={createdBy?.color} />
-					</Avatar>
-					<div className='flex flex-col'>
-						<span className='font-sfCompact text-sm'>{createdBy?.name}</span>
-						<span className='font-sfCompact text-xs text-subtle'>{createdBy?.contactEmail}</span>
-					</div>
-				</div>
-			);
+			const { createdAt, createdBy } = row.original;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === createdBy);
+			return <DateText date={createdAt} user={user} />;
 		},
 	},
 	{
 		id: 'permissions',
-		header: 'Read/Write',
+		header: translate('version.read_write').toUpperCase(),
 		accessorKey: 'readOnly',
 		size: 100,
 		cell: ({ row }) => {
@@ -58,7 +52,9 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 					) : (
 						<LockSimpleOpen size={20} className='text-elements-green' />
 					)}
-					<span className='font-sfCompact text-sm'>{readOnly ? 'Read Only' : 'Read/Write'}</span>
+					<span className='font-sfCompact text-sm'>
+						{readOnly ? translate('version.readOnly') : translate('version.read_write')}
+					</span>
 				</div>
 			);
 		},
@@ -77,19 +73,30 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 				selectApplication(app);
 				closeVersionDrawer();
 			};
-
-			return (
-				<div className='flex items-center gap-3'>
-					<Link
-						onClick={onSelect}
-						to={`/organization/${app?.orgId}/apps/${app?._id}/version/${_id}`}
-					>
-						<Button size='sm' variant='secondary'>
-							Open
-						</Button>
-					</Link>
-				</div>
-			);
+			return <OpenVersion id={_id} app={app as Application} onSelect={onSelect} />;
 		},
 	},
 ];
+
+function OpenVersion({
+	id,
+	app,
+	onSelect,
+}: {
+	id: string;
+	app: Application;
+	onSelect: () => void;
+}) {
+	const canViewVersion = useAuthorizeVersion('version.view');
+	return (
+		<Button
+			disabled={!canViewVersion}
+			size='sm'
+			variant='secondary'
+			onClick={onSelect}
+			to={`/organization/${app?.orgId}/apps/${app?._id}/version/${id}`}
+		>
+			{translate('general.open')}
+		</Button>
+	);
+}

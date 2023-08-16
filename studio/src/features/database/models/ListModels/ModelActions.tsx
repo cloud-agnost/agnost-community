@@ -5,10 +5,11 @@ import useDatabaseStore from '@/store/database/databaseStore.ts';
 import { useParams } from 'react-router-dom';
 import { SearchInput } from 'components/SearchInput';
 import { Row, Table } from '@tanstack/react-table';
-import { SelectedRowDropdown } from 'components/Table';
+import { SelectedRowButton } from 'components/Table';
 import { CreateModelButton } from '@/features/database/models/ListModels/index.ts';
 import useModelStore from '@/store/database/modelStore.ts';
 import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 
 interface ModelActionsProps {
 	setSelectedRows: Dispatch<SetStateAction<Row<Model>[] | undefined>>;
@@ -26,7 +27,7 @@ export default function ModelActions({
 	const deleteMultipleModel = useModelStore((state) => state.deleteMultipleModel);
 	const { t } = useTranslation();
 	const { dbId } = useParams();
-
+	const canMultiDelete = useAuthorizeVersion('model.delete');
 	const database = useMemo(() => {
 		return databases.find((database) => database._id === dbId) as Database;
 	}, [databases, dbId]);
@@ -70,10 +71,11 @@ export default function ModelActions({
 						className='flex-1 lg:w-[450px]'
 					/>
 					{!!selectedRows?.length && (
-						<SelectedRowDropdown
+						<SelectedRowButton<Model>
 							table={table}
 							onDelete={deleteAll}
 							selectedRowLength={selectedRows?.length}
+							disabled={!canMultiDelete}
 						/>
 					)}
 					<CreateModelButton />

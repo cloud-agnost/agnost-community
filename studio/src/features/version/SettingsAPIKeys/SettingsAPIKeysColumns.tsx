@@ -13,6 +13,7 @@ import { Pencil } from 'components/icons';
 import { TableConfirmation } from 'components/Table';
 import { Trash } from '@phosphor-icons/react';
 import useVersionStore from '@/store/version/versionStore.ts';
+import { ActionsCell } from '@/components/ActionsCell';
 
 const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	{
@@ -256,33 +257,23 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 
 			return (
 				<div className='flex items-center justify-end gap-0.5'>
-					<Button
-						variant='blank'
-						onClick={editHandler}
-						rounded
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-						iconOnly
+					<ActionsCell
+						onEdit={editHandler}
+						canEditKey='version.key.edit'
+						original={original}
+						type='version'
 					>
-						<Pencil className='text-lg' />
-					</Button>
-					<TableConfirmation
-						align='end'
-						closeOnConfirm
-						showAvatar={false}
-						title={translate('version.api_key.delete_modal_title')}
-						description={translate('version.api_key.delete_modal_desc')}
-						onConfirm={clickHandler}
-						contentClassName='m-0'
-					>
-						<Button
-							variant='blank'
-							rounded
-							className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-							iconOnly
-						>
-							<Trash size={20} />
-						</Button>
-					</TableConfirmation>
+						<TableConfirmation
+							align='end'
+							closeOnConfirm
+							showAvatar={false}
+							title={translate('version.api_key.delete_modal_title')}
+							description={translate('version.api_key.delete_modal_desc')}
+							onConfirm={clickHandler}
+							contentClassName='m-0'
+							authorizedKey='key.delete'
+						/>
+					</ActionsCell>
 				</div>
 			);
 		},

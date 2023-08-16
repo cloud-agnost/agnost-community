@@ -102,7 +102,8 @@ export interface Version {
 		providers: [];
 		messages: [];
 	};
-	createdBy: User;
+	createdBy: string;
+	updatedBy: string;
 	_id: string;
 	params: Param[];
 	limits: RateLimit[];

@@ -1,6 +1,8 @@
 import { translate } from '@/utils';
 import { z } from 'zod';
-import { BaseGetRequest, BaseRequest } from './type';
+import { BaseRequest } from './type';
+
+export type OrgRoles = 'Admin' | 'Member' | 'Resource Manager' | 'Viewer';
 export interface Organization {
 	_id: string;
 	ownerUserId: string;
@@ -13,7 +15,7 @@ export interface Organization {
 	pictureUrl: string;
 	updatedBy: string;
 	__v: number;
-	role: 'Admin' | 'Member' | 'Resource Manager' | 'Viewer';
+	role: OrgRoles;
 }
 export interface CreateOrganizationRequest extends BaseRequest {
 	name: string;
@@ -47,8 +49,13 @@ export interface ChangeOrganizationAvatarRequest extends BaseRequest {
 	picture: File;
 }
 
-export interface GetOrganizationMembersRequest extends BaseGetRequest {
+export interface GetOrganizationMembersRequest {
 	roles?: string[];
+	sortBy?: string;
+	sortDir?: string;
+	start?: string;
+	end?: string;
+	search?: string;
 	organizationId: string;
 	excludeSelf?: boolean;
 }
@@ -75,7 +82,7 @@ export interface OrganizationMember {
 }
 export interface OrgMemberRequest {
 	email: string;
-	role: 'Admin' | 'Member' | 'Resource Manager' | 'Viewer' | '';
+	role: OrgRoles | '';
 }
 export interface InviteOrgRequest extends BaseRequest {
 	members: OrgMemberRequest[];
@@ -86,4 +93,44 @@ export interface InviteOrgRequest extends BaseRequest {
 export interface RemoveMemberFromOrganizationRequest extends BaseRequest {
 	userId?: string;
 	userIds?: string[];
+}
+export interface OrgRoleDefinition {
+	update: boolean;
+	delete: boolean;
+	transfer: boolean;
+	viewLogs: boolean;
+	invite: {
+		view: boolean;
+		create: boolean;
+		update: boolean;
+		resend: boolean;
+		delete: boolean;
+	};
+	member: {
+		view: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	app: {
+		view: boolean;
+		viewAll: boolean;
+		create: boolean;
+		update: boolean;
+	};
+	resource: {
+		view: boolean;
+		add: boolean;
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+}
+export interface OrgRolePermissions {
+	org: OrgRoleDefinition;
+}
+export interface OrgPermissions {
+	Admin: OrgRolePermissions;
+	Member: OrgRolePermissions;
+	Viewer: OrgRolePermissions;
+	'Resource Manager': OrgRolePermissions;
 }

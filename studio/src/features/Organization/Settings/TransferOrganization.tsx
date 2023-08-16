@@ -2,6 +2,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { AutoComplete } from '@/components/AutoComplete';
 import { Button } from '@/components/Button';
 import { useToast } from '@/hooks';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { FormatOptionLabelProps, GroupedOption, OrganizationMember } from '@/types';
 import { APIError } from '@/types/type';
@@ -15,8 +16,6 @@ const loadOptions = async (inputValue: string) => {
 			search: inputValue,
 			excludeSelf: false,
 			organizationId: useOrganizationStore.getState?.().organization?._id as string,
-			page: 0,
-			size: 50,
 		});
 	return members.map((res) => ({
 		label: res.member.name,
@@ -69,6 +68,7 @@ export default function TransferOrganization() {
 	const { organization, transferOrganization } = useOrganizationStore();
 	const { notify } = useToast();
 	const navigate = useNavigate();
+	const canUpdate = useAuthorizeOrg('org.update');
 	function transferOrganizationHandle() {
 		setLoading(true);
 		transferOrganization({
@@ -105,7 +105,13 @@ export default function TransferOrganization() {
 				formatOptionLabel={formatOptionLabel}
 				formatGroupLabel={formatGroupLabel}
 			/>
-			<Button size='lg' className='text-end' onClick={transferOrganizationHandle} loading={loading}>
+			<Button
+				size='lg'
+				className='text-end'
+				onClick={transferOrganizationHandle}
+				loading={loading}
+				disabled={!canUpdate}
+			>
 				Transfer
 			</Button>
 		</div>

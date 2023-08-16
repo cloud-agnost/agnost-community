@@ -1,9 +1,6 @@
 .avatar {
 	&-actions {
 		@apply inline-flex relative;
-		label {
-			@apply cursor-pointer;
-		}
 		&-button {
 			@apply absolute bottom-0 left-1/2 bg-base/70 w-full hidden;
 			@apply transform -translate-x-1/2 rounded-none space-x-2;

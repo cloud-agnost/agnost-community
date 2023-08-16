@@ -22,6 +22,7 @@ interface ChangeAvatarProps {
 	title?: string;
 	description?: string;
 	className?: string;
+	disabled?: boolean;
 }
 
 export default function ChangeAvatar({
@@ -33,6 +34,7 @@ export default function ChangeAvatar({
 	title,
 	description,
 	className,
+	disabled,
 }: ChangeAvatarProps) {
 	const fileInput = useRef<HTMLInputElement>(null);
 	const filePickerId = useId();
@@ -63,8 +65,12 @@ export default function ChangeAvatar({
 						id={filePickerId}
 						type='file'
 						className='hidden'
+						disabled={disabled}
 					/>
-					<label htmlFor={filePickerId}>
+					<label
+						htmlFor={filePickerId}
+						className={cn('cursor-pointer', disabled && 'cursor-not-allowed opacity-50')}
+					>
 						<Avatar size='3xl' square>
 							<AvatarImage
 								src={location.protocol + '//' + location.hostname + '/api' + item?.pictureUrl}
@@ -79,7 +85,7 @@ export default function ChangeAvatar({
 								<Trash className='avatar-actions-icon' />
 							</Button>
 						)}
-						<Button variant='blank' size='sm' disabled={loading}>
+						<Button variant='blank' size='sm' disabled={disabled || loading}>
 							<label htmlFor={filePickerId}>
 								<Pencil className='avatar-actions-icon' />
 							</label>

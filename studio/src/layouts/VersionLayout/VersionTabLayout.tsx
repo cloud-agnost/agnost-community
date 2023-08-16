@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { SearchInput } from '@/components/SearchInput';
-import { SelectedRowDropdown } from '@/components/Table';
+import { SelectedRowButton } from '@/components/Table';
 import { cn } from '@/utils';
 import { Plus } from '@phosphor-icons/react';
 import { Table } from '@tanstack/react-table';
@@ -19,6 +19,7 @@ interface Props<T> {
 	onMultipleDelete: () => void;
 	onSearch: (value: string) => void;
 	openCreateModal: () => void;
+	disabled?: boolean;
 }
 
 export default function VersionTabLayout<T>({
@@ -30,6 +31,7 @@ export default function VersionTabLayout<T>({
 	title,
 	emptyStateTitle,
 	createButtonTitle,
+	disabled,
 	onMultipleDelete,
 	onSearch,
 	openCreateModal,
@@ -55,15 +57,13 @@ export default function VersionTabLayout<T>({
 								onSearch={onSearch}
 								className='sm:w-[450px] flex-1'
 							/>
-							<SelectedRowDropdown
+							<SelectedRowButton
 								selectedRowLength={selectedRowLength}
 								table={table}
 								onDelete={onMultipleDelete}
+								disabled={disabled}
 							/>
-							<Button variant='secondary' to='logs'>
-								{t('queue.view_logs')}
-							</Button>
-							<Button variant='primary' onClick={openCreateModal}>
+							<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
 								<Plus size={16} />
 								<span className='ml-2'>{createButtonTitle}</span>
 							</Button>
