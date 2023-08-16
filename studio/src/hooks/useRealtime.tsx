@@ -11,6 +11,8 @@ export default function useRealtime() {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			fn[action ?? 'info']({
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
 				data,
 				identifiers,
 				timestamp: DateTime.fromISO(timestamp)

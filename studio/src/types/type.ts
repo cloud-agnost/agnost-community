@@ -233,6 +233,7 @@ export interface RealtimeData<T> {
 	id: string;
 	message: string;
 	type: string;
+	objecType: any;
 }
 export interface RealtimeActionParams<T> {
 	data: T;
