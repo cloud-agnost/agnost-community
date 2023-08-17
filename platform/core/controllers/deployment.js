@@ -206,7 +206,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
-			env: { ...env, callback, version, resources, timestamp: new Date() },
+			env: { ...env, callback, app, version, resources, timestamp: new Date() },
 			databases: await this.getDatabases(version._id),
 			endpoints: await this.getEndpoints(version._id),
 			middlewares: await this.getMiddlewares(version._id),
@@ -260,7 +260,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
-			env: { ...env, callback, version, resources, timestamp: new Date() },
+			env: { ...env, callback, app, version, resources, timestamp: new Date() },
 			databases: await this.getDatabases(version._id),
 			endpoints: await this.getEndpoints(version._id),
 			middlewares: await this.getMiddlewares(version._id),
@@ -306,7 +306,7 @@ class DeploymentController {
 				contactEmail: user.contactEmail,
 			},
 			app,
-			env: { ...env, version, resources, timestamp: new Date() },
+			env: { ...env, version, app, resources, timestamp: new Date() },
 		};
 
 		//Make api call to environment worker engine to delete the environment
@@ -364,7 +364,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
-			env: { ...env, callback, version, resources, timestamp: new Date() },
+			env: { ...env, callback, app, version, resources, timestamp: new Date() },
 		};
 
 		// Make api call to environment worker engine to update environment data
@@ -428,7 +428,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
-			env: { ...env, callback, version, resources, timestamp: new Date() },
+			env: { ...env, callback, app, version, resources, timestamp: new Date() },
 			updatedResource: resource,
 		};
 
@@ -496,7 +496,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
-			env: { ...env, callback, version, resources, timestamp: new Date() },
+			env: { ...env, callback, app, version, resources, timestamp: new Date() },
 			databases: [database],
 		};
 
@@ -558,7 +558,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
-			env: { ...env, callback, version, resources, timestamp: new Date() },
+			env: { ...env, callback, app, version, resources, timestamp: new Date() },
 			endpoints: endpoints,
 		};
 
@@ -620,7 +620,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
-			env: { ...env, callback, version, resources, timestamp: new Date() },
+			env: { ...env, callback, app, version, resources, timestamp: new Date() },
 			middlewares: middlewares,
 		};
 
@@ -682,7 +682,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
-			env: { ...env, callback, version, resources, timestamp: new Date() },
+			env: { ...env, callback, app, version, resources, timestamp: new Date() },
 			queues: queues,
 		};
 
@@ -744,7 +744,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
-			env: { ...env, callback, version, resources, timestamp: new Date() },
+			env: { ...env, callback, app, version, resources, timestamp: new Date() },
 			tasks: tasks,
 		};
 
@@ -806,7 +806,7 @@ class DeploymentController {
 			},
 			app,
 			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
-			env: { ...env, callback, version, resources, timestamp: new Date() },
+			env: { ...env, callback, app, version, resources, timestamp: new Date() },
 			storages: storages,
 		};
 

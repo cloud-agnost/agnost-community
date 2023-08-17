@@ -300,12 +300,12 @@ export class RabbitMQ extends QueueBase {
 									ERROR_CODES.clientError,
 									ERROR_CODES.queueExecutionError,
 									t(
-										"An error occurred while executing the '%s' queue handler function. %s",
-										queueObj.name,
-										error.message
+										"An error occurred while executing the '%s' queue handler function.",
+										queueObj.name
 									),
 									{
 										name: error.name,
+										code: error.code,
 										message: error.message,
 										stack: error.stack,
 									}

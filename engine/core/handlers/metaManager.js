@@ -22,6 +22,20 @@ export class MetaManager {
 	}
 
 	/**
+	 * Returns the app object
+	 */
+	getAppObj() {
+		return this.envObj.app;
+	}
+
+	/**
+	 * Returns the app team members
+	 */
+	getAppTeam() {
+		return this.envObj.app?.tean;
+	}
+
+	/**
 	 * Returns the environment iid (internal identifier)
 	 */
 	getEnvId() {
@@ -116,7 +130,6 @@ export class MetaManager {
 	 */
 	getDatabaseByName(name) {
 		const databases = this.getDatabasesSync();
-
 		return databases.find((entry) => entry.name === name);
 	}
 
@@ -282,7 +295,7 @@ export class MetaManager {
 	loadEntityConfigFileSync(contentType) {
 		try {
 			const appPath = path.resolve(__dirname);
-			const fileContents = fs.readFileSync(
+			const fileContents = readFileSync(
 				`${appPath}/meta/config/${contentType}.json`,
 				"utf8"
 			);

@@ -38,6 +38,9 @@ const ERROR_CODES = {
 	storageNotFound: "storage_not_found",
 	queueNotFound: "queue_not_found",
 	cronJobNotFound: "cronjob_not_found",
+	databaseNotFound: "database_not_found",
+	modelNotFound: "model_not_found",
+	submodelNotFound: "submodel_not_found",
 	invalidValue: "invalid_value",
 	missingFileIdentifier: "missing_file_identifier",
 	invalidFileIdentifier: "invalid_file_identifier",
@@ -45,6 +48,8 @@ const ERROR_CODES = {
 	invalidBucketName: "invalid_bucket_name",
 	notPublic: "not_public",
 	invalidAccessToken: "invalid_access_token",
+	invalidUser: "invalid_user",
+	unauthorized: "unauthorized",
 };
 
 export default ERROR_CODES;

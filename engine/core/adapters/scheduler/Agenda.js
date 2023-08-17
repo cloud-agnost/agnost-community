@@ -224,12 +224,12 @@ export class Agenda extends SchedulerBase {
 									ERROR_CODES.clientError,
 									ERROR_CODES.taskExecutionError,
 									t(
-										"An error occurred while executing the '%s' cron job handler function. %s",
-										taskObj.name,
-										error.message
+										"An error occurred while executing the '%s' cron job handler function.",
+										taskObj.name
 									),
 									{
 										name: error.name,
+										code: error.code,
 										message: error.message,
 										stack: error.stack,
 									}

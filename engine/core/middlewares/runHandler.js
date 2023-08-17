@@ -59,12 +59,12 @@ export const runHandler = (endpoint) => async (req, res) => {
 					ERROR_CODES.clientError,
 					ERROR_CODES.endpointExecutionError,
 					t(
-						"An error occurred while executing the '%s' endpoint handler function. %s",
-						endpoint.name,
-						error.message
+						"An error occurred while executing the '%s' endpoint handler function.",
+						endpoint.name
 					),
 					{
 						name: error.name,
+						code: error.code,
 						message: error.message,
 						stack: error.stack,
 					}

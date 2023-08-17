@@ -20,7 +20,7 @@ class ModelController extends BaseController {
 
 		//First set-up the ID field
 		let id = {};
-		id.name = "id";
+		id.name = dbType === "MongoDB" ? "_id" : "id";
 		id.creator = "system";
 		id.order = orderNumber;
 		id.type = "id";

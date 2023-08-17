@@ -154,6 +154,7 @@ export class StorageBase {
 			limit: pageSize,
 			skip: skip,
 			readPreference: "secondaryPreferred",
+			projection: { _id: 0 },
 		});
 
 		if (returnCountInfo) {
@@ -229,6 +230,7 @@ export class StorageBase {
 			limit: pageSize,
 			skip: skip,
 			readPreference: "secondaryPreferred",
+			projection: { _id: 0 },
 		});
 
 		if (returnCountInfo) {
@@ -705,6 +707,7 @@ export class StorageBase {
 			limit: pageSize,
 			skip: skip,
 			readPreference: "secondaryPreferred",
+			projection: { _id: 0 },
 		});
 
 		if (returnCountInfo) {
