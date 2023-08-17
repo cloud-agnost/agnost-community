@@ -13,7 +13,7 @@ export default function CreateModelButton() {
 			<Button
 				onClick={() => setOpen(true)}
 				className='gap-2 whitespace-nowrap'
-				disabled={canCreateModel}
+				disabled={!canCreateModel}
 			>
 				<Plus weight='bold' />
 				{t('database.models.create')}

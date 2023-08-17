@@ -169,7 +169,7 @@ export default function CreateResourceLayout({
 					<Button size='lg' type='button' variant='secondary' onClick={returnToPreviousStep}>
 						{t('general.previous')}
 					</Button>
-					<Button size='lg' type='submit' loading={loading} disabled={canCreateResource}>
+					<Button size='lg' type='submit' loading={loading} disabled={!canCreateResource}>
 						{t('general.add')}
 					</Button>
 				</DrawerFooter>
