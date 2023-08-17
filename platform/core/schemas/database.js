@@ -37,6 +37,11 @@ export const DatabaseModel = mongoose.model(
 				required: true,
 				index: true,
 			},
+			assignUniqueName: {
+				type: Boolean,
+				required: true,
+				default: true,
+			},
 			type: {
 				type: String,
 				required: true,
@@ -51,6 +56,23 @@ export const DatabaseModel = mongoose.model(
 				immutable: true,
 				default: true,
 			},
+			schemas: [
+				{
+					iid: {
+						// Internal identifier
+						type: String,
+						index: true,
+						immutable: true,
+					},
+					name: {
+						type: String,
+					},
+					createdAt: { type: Date, default: Date.now, immutable: true },
+					updatedAt: { type: Date, default: Date.now },
+					createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+					updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+				},
+			],
 			createdBy: {
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "user",

@@ -74,3 +74,5 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: passPhrase
+                 - name: NAMESPACE
+                   value: default

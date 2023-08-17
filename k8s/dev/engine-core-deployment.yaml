@@ -77,6 +77,8 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: passPhrase
+                 - name: NAMESPACE
+                   value: default
                  - name: AGNOST_ENVIRONMENT_ID
                    value: env-l05et1xpq7lw
                  - name: AGNOST_ENGINE_ID

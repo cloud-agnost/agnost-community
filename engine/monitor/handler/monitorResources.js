@@ -687,7 +687,7 @@ async function checkAPIServer(connSettings) {
 		result = await k8sApi.getNamespacedCustomObjectStatus(
 			"serving.knative.dev",
 			"v1",
-			config.get("general.k8sNamespace"),
+			process.env.NAMESPACE,
 			"services",
 			connSettings.name
 		);
@@ -715,7 +715,7 @@ async function checkDeployment(deploymentName) {
 	try {
 		result = await coreApi.readNamespacedDeployment(
 			`${deploymentName}-deployment`,
-			config.get("general.k8sNamespace")
+			process.env.NAMESPACE
 		);
 	} catch (err) {
 		throw new AgnostError(
@@ -738,7 +738,7 @@ async function checkDefaultScheduler(connSettings) {
 	try {
 		result = await coreApi.readNamespacedDeployment(
 			connSettings.name,
-			config.get("general.k8sNamespace")
+			process.env.NAMESPACE
 		);
 	} catch (err) {
 		return null;
@@ -767,7 +767,7 @@ async function checkDefaultRealtime(connSettings) {
 	try {
 		result = await coreApi.readNamespacedDeployment(
 			connSettings.name,
-			config.get("general.k8sNamespace")
+			process.env.NAMESPACE
 		);
 	} catch (err) {
 		return null;

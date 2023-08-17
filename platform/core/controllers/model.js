@@ -361,6 +361,7 @@ class ModelController extends BaseController {
 		for (const model of models) {
 			refModels.push({
 				name: this.getModelFullName(models, model),
+				schema: model.schema,
 				iid: model.iid,
 			});
 		}

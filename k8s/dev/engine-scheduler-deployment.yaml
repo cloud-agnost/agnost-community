@@ -66,3 +66,5 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: accessToken
+                 - name: NAMESPACE
+                   value: default

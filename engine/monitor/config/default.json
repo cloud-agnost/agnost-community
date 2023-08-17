@@ -10,7 +10,6 @@
     "general": {  
         "monitoringInterval": 3000,
         "resourcePaginationSize": 100,
-        "k8sNamespace": "default",
         "initialDelaySeconds": 20,
         "maxResourceOpWaitMinues": 5,
         "gcSeconds": 30,

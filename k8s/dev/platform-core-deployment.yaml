@@ -98,4 +98,6 @@ spec:
                       secretKeyRef:
                          name: minio-credentials
                          key: rootPassword
+                 - name: NAMESPACE
+                   value: default
 

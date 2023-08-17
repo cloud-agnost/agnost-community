@@ -66,7 +66,7 @@ router.post(
 	async (req, res) => {
 		try {
 			const { user, org, app, version, db } = req;
-			const { name, description, timestamps } = req.body;
+			const { name, description, timestamps, schemaiid } = req.body;
 
 			// Create the new model object
 			let modelId = helper.generateId();
@@ -81,6 +81,7 @@ router.post(
 					name,
 					type: "model",
 					description,
+					schemaiid,
 					timestamps,
 					fields: modelCtrl.getDefaultFields(
 						db.type,
@@ -191,7 +192,7 @@ router.get(
 			const { version } = req;
 			const { iid } = req.params;
 
-			const model  = await modelCtrl.getOneByQuery({
+			const model = await modelCtrl.getOneByQuery({
 				iid: iid,
 				versionId: version._id,
 			});
@@ -770,6 +771,7 @@ router.post(
 					name,
 					type: type === "object" ? "sub-model-object" : "sub-model-list",
 					parentiid: model.iid,
+					schemaiid: model.schemaiid,
 					timestamps: pointer.timestamps,
 					fields: modelCtrl.getDefaultFields(
 						db.type,

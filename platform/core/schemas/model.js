@@ -59,6 +59,11 @@ export const ModelModel = mongoose.model(
 			description: {
 				type: String,
 			},
+			schemaiid: {
+				// Schema info, only valid for postgresql, mssql and oracle databases
+				type: String,
+				index: true,
+			},
 			timestamps: {
 				enabled: {
 					type: Boolean,
@@ -422,6 +427,30 @@ export const applyRules = (type) => {
 							config.get("general.maxDetailTxtLength")
 						)
 					),
+				body("schemaiid")
+					.trim()
+					.optional()
+					.custom((value, { req }) => {
+						const { db } = req;
+						// Check if the schema exists
+						if (db.schemas) {
+							const schema = db.schemas.find((entry) => entry.iid === value);
+
+							if (!schema)
+								throw new AgnostError(
+									t(
+										"Schema with the provided iid '%s' does not exist in database '%s'",
+										value,
+										req.db.name
+									)
+								);
+
+							req.schema = schema;
+						}
+
+						//Indicates the success of this synchronous custom validator
+						return true;
+					}),
 			];
 		case "update":
 			return [

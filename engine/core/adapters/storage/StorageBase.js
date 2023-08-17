@@ -746,8 +746,8 @@ export class StorageBase {
 	 *
 	 * @param {object} storage The storage object metadata
 	 * @param {string} bucketName The bucket name
-	 * @param {string} fileObject.path The path of the file e.g., *image/png*
-	 * @param {string} fileObject.mimeType The mime-type of the file e.g.,
+	 * @param {string} fileObject.path The path of the file e.g., *path/to/my/file/filename.jpg*
+	 * @param {string} fileObject.mimeType The mime-type of the file e.g., *image/png*
 	 * @param {number} fileObject.size The size of the file in bytes
 	 * @param {Readable} fileObject.stream The contents of the file as a readable stream
 	 * @param {string} fileObject.localPath  The local path of the file where it is stored locally
