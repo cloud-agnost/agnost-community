@@ -156,6 +156,7 @@
 						t.AgnostServerSideClient =
 						t.APIBase =
 						t.createServerSideClient =
+						t.agnost =
 							void 0);
 				const a = i(602);
 				Object.defineProperty(t, "APIBase", {
@@ -226,10 +227,11 @@
 					get: function () {
 						return f.Field;
 					},
-				}),
-					(t.createServerSideClient = (e, t) =>
-						new s.AgnostServerSideClient(e, t)),
-					r(i(307), t);
+				});
+				const p = (e, t) => new s.AgnostServerSideClient(e, t);
+				t.createServerSideClient = p;
+				const m = p(globalThis.META, globalThis.ADAPTERS);
+				(t.agnost = m), r(i(307), t);
 			},
 			414: function (e, t, i) {
 				var n =
@@ -294,7 +296,12 @@
 									"invalid_value",
 									"Detailed parameter needs to be a boolean value"
 								);
-							return yield this.adapter.getBucketInfo(this.meta, this.name, e);
+							const t = yield this.adapter.getBucketInfo(
+								this.meta,
+								this.name,
+								e
+							);
+							return null != t ? t : null;
 						});
 					}
 					rename(e) {
@@ -566,13 +573,13 @@
 						const { models: n } = this.meta,
 							s = n.filter((e) => "model" === e.type);
 						for (const e of s) {
-							console.log("model", e.name);
 							const t = new r.Model(e, null, this);
 							this.addModel(e.name, t);
 						}
 					}
 					addModel(e, t) {
-						console.log("**add model", e), this.models.set(e, t);
+						const i = t.getSchema();
+						i ? this.models.set(`${i}.${e}`, t) : this.models.set(e, t);
 					}
 					getName() {
 						return this.meta.name;
@@ -1272,6 +1279,9 @@
 					}
 					getName() {
 						return this.meta.name;
+					}
+					getSchema() {
+						return this.meta.schema;
 					}
 				};
 			},

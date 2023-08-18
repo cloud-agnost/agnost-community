@@ -25,7 +25,6 @@ import {
 import { runHandler } from "../middlewares/runHandler.js";
 import { adapterManager } from "./adapterManager.js";
 import { MetaManager } from "./metaManager.js";
-import pkg from "../agnost-server-client.cjs";
 
 export class ChildProcessDeploymentManager extends DeploymentManager {
 	constructor(msgObj, envObj, i18n) {
@@ -105,6 +104,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		global.META = new MetaManager(envObj);
 		// We are initializing the server, do not process any incoming requests
 		global.SERVER_STATUS = "initializing";
+		// Save the metadata manager to globals for faster access
+		global.ADAPTERS = adapterManager;
 
 		// Initialize express server
 		await this.initExpressServer();
@@ -130,8 +131,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// Create the agnost server-side client instance
 		// Save agnost server side client to globals for faster access
-		const { createServerSideClient } = pkg;
-		global.agnost = createServerSideClient(META, adapterManager);
+		const pkg = (await import("../agnost-server-client.cjs")).default;
+		const { agnost } = pkg;
+		global.agnost = agnost;
 	}
 
 	/**

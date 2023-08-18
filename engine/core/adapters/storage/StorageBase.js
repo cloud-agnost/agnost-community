@@ -220,7 +220,7 @@ export class StorageBase {
 		}
 
 		const query = { storageId: storage.iid };
-		if (search) query.name = { $regex: search, $options: "i" };
+		if (search) query.path = { $regex: search, $options: "i" };
 		const skip = pageSize * (pageNumber - 1);
 
 		// Get connection to storage metadata database
