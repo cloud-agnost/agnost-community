@@ -110,6 +110,7 @@ router.post(
 				{ orgId: org._id, appId: app._id, versionId: version._id, dbId: db._id }
 			);
 		} catch (err) {
+			console.log("***here", err);
 			handleError(req, res, err);
 		}
 	}

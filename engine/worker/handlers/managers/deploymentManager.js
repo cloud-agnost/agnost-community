@@ -1,14 +1,7 @@
 import axios from "axios";
 import util from "util";
 import { getDBClient } from "../../init/db.js";
-import {
-    createPipeline,
-    getKey,
-    setKey,
-    scanKeys,
-    addToCache,
-    removeFromCache,
-} from "../../init/cache.js";
+import { createPipeline, getKey, setKey, scanKeys, addToCache, removeFromCache } from "../../init/cache.js";
 import { MongoDBManager } from "./mongoDBManager.js";
 import { PostgresDBManager } from "./PostgresDBManager.js";
 import { MySQLDBManager } from "./MySQLDBManager.js";
@@ -16,7 +9,6 @@ import { MsSQLDBManager } from "./MsSQLDBManager.js";
 import { OracleDBManager } from "./OracleDBManager.js";
 import { DATABASE } from "../../config/constants.js";
 import { manageAPIServers } from "../../init/queue.js";
-import { resolveSrv } from "dns";
 
 export class DeploymentManager {
     constructor(msgObj) {
@@ -221,14 +213,10 @@ export class DeploymentManager {
      */
     getDatabaseResource(dbConfig) {
         const mappings = this.getResourceMappings();
-        const mapping = mappings.find(
-            (entry) => entry.design.iid === dbConfig.iid
-        );
+        const mapping = mappings.find((entry) => entry.design.iid === dbConfig.iid);
         // We have the mapping return the corresponding resource
         if (mapping) {
-            const resource = this.getResources().find(
-                (entry) => entry.iid === mapping.resource.iid
-            );
+            const resource = this.getResources().find((entry) => entry.iid === mapping.resource.iid);
 
             return resource;
         }
@@ -305,13 +293,7 @@ export class DeploymentManager {
 
             // Add databases and its associated models to the cache
             this.addToCache(`${this.getEnvId()}.db.${this.getDbId(db)}`, db);
-            this.addLog(
-                t(
-                    "Loaded and cached '%s' database '%s' and its associated models",
-                    db.type,
-                    db.name
-                )
-            );
+            this.addLog(t("Loaded and cached '%s' database '%s' and its associated models", db.type, db.name));
         }
     }
 
@@ -327,10 +309,8 @@ export class DeploymentManager {
             // during POST requests for parent object, we shoul have the _id values created before other fields not to face any issues
             model.fields.sort(function (a, b) {
                 if (a.creator === "system" && b.creator === "user") return -1;
-                else if (a.creator === "user" && b.creator === "system")
-                    return 1;
-                else if (a.creator === "system" && b.creator === "system")
-                    return 0;
+                else if (a.creator === "user" && b.creator === "system") return 1;
+                else if (a.creator === "system" && b.creator === "system") return 0;
                 else return a.order - b.order;
             });
 
@@ -339,17 +319,15 @@ export class DeploymentManager {
                 // Create query path of the field starting from the topmost model
                 field.queryPath = this.getFieldPath(models, model, field.name);
                 // Unwinded query path is used to delete or rename fields deep in a document hierarchy with multiple levels of sub-object arrays
-                field.unwindQueryPath = this.getUnwindFieldPath(
-                    models,
-                    model,
-                    field.name
-                );
+                field.unwindQueryPath = this.getUnwindFieldPath(models, model, field.name);
             }
 
             // This is valid mainly for no-sql databases, creates the parent hierarchy if any
             model.parentHierarchy = this.createParentHierarchy(models, model);
             // Create query path of model starting from the topmost model
             model.queryPath = this.getModelPath(models, model);
+            // Assign the schema name of the model
+            model.schema = this.getModelSchema(model.schemaiid, db);
         }
     }
 
@@ -379,14 +357,22 @@ export class DeploymentManager {
         else if (cutOffModel && cutOffModel.iid === model.iid) return null;
         else {
             let parentModel = this.getModel(models, model.parentiid);
-            let parentPath = this.getModelPath(
-                models,
-                parentModel,
-                cutOffModel
-            );
+            let parentPath = this.getModelPath(models, parentModel, cutOffModel);
             if (parentPath) return parentPath + "." + model.name;
             else return model.name;
         }
+    }
+
+    /**
+     * Returns the schema name of the model
+     * @param  {string} schemaiid The iid of the schema object
+     * @param  {object} db The database object
+     */
+    getModelSchema(schemaiid, db) {
+        const schema = db.schemas?.find((entry) => entry.iid === schemaiid);
+
+        if (schema) return schema.name;
+        return null;
     }
 
     /**
@@ -401,14 +387,9 @@ export class DeploymentManager {
         else if (cutOffModel && cutOffModel.iid === model.iid) return null;
         else {
             let parentModel = this.getModel(models, model.parentiid);
-            let parentPath = this.getUnwindModelPath(
-                models,
-                parentModel,
-                cutOffModel
-            );
+            let parentPath = this.getUnwindModelPath(models, parentModel, cutOffModel);
             if (parentPath) {
-                if (model.type === "sub-model-list")
-                    return parentPath + "." + model.name + ".$[]";
+                if (model.type === "sub-model-list") return parentPath + "." + model.name + ".$[]";
                 else return parentPath + "." + model.name;
             } else {
                 if (model.type === "sub-model-list") return model.name + ".$[]";
@@ -465,11 +446,7 @@ export class DeploymentManager {
 
         let parentModel = this.getModel(models, model.parentiid);
         if (parentModel) {
-            return this.createParentHierarchy(
-                models,
-                parentModel,
-                hierarchyList
-            );
+            return this.createParentHierarchy(models, parentModel, hierarchyList);
         } else return hierarchyList;
     }
 
@@ -640,10 +617,7 @@ export class DeploymentManager {
             ]);
 
             // Delete records after 1 week
-            await collection.createIndex(
-                { submittedAt: 1 },
-                { expireAfterSeconds: helper.constants["1week"] }
-            );
+            await collection.createIndex({ submittedAt: 1 }, { expireAfterSeconds: helper.constants["1week"] });
 
             this.addLog(t("Created message info collection"));
         }
@@ -685,10 +659,7 @@ export class DeploymentManager {
             ]);
 
             // Delete records after 1 week
-            await collection.createIndex(
-                { triggeredAt: 1 },
-                { expireAfterSeconds: helper.constants["1week"] }
-            );
+            await collection.createIndex({ triggeredAt: 1 }, { expireAfterSeconds: helper.constants["1week"] });
 
             this.addLog(t("Created cron job info collection"));
         }
@@ -744,10 +715,7 @@ export class DeploymentManager {
             ]);
 
             // Delete records after 1 week
-            await collection.createIndex(
-                { timestamp: 1 },
-                { expireAfterSeconds: helper.constants["6months"] }
-            );
+            await collection.createIndex({ timestamp: 1 }, { expireAfterSeconds: helper.constants["6months"] });
 
             this.addLog(t("Created endpoint execution logs collection"));
         }
@@ -799,10 +767,7 @@ export class DeploymentManager {
             ]);
 
             // Delete records after 1 week
-            await collection.createIndex(
-                { timestamp: 1 },
-                { expireAfterSeconds: helper.constants["6months"] }
-            );
+            await collection.createIndex({ timestamp: 1 }, { expireAfterSeconds: helper.constants["6months"] });
 
             this.addLog(t("Created message queue execution logs collection"));
         }
@@ -851,10 +816,7 @@ export class DeploymentManager {
             ]);
 
             // Delete records after 1 week
-            await collection.createIndex(
-                { timestamp: 1 },
-                { expireAfterSeconds: helper.constants["6months"] }
-            );
+            await collection.createIndex({ timestamp: 1 }, { expireAfterSeconds: helper.constants["6months"] });
 
             this.addLog(t("Created cron job execution logs collection"));
         }
@@ -871,13 +833,7 @@ export class DeploymentManager {
             // We only process databases managed by the platform
             if (!db.managed) continue;
 
-            this.addLog(
-                t(
-                    "Started preparing database schema for '%s' database '%s'",
-                    db.type,
-                    db.name
-                )
-            );
+            this.addLog(t("Started preparing database schema for '%s' database '%s'", db.type, db.name));
 
             // Load the previous database configuration if there is any
             let prevConfig = await this.getPrevDBDefinition(db);
@@ -889,13 +845,7 @@ export class DeploymentManager {
             await dbManager.manageModels();
             await dbManager.endSession();
 
-            this.addLog(
-                t(
-                    "Completed preparing '%s' database '%s' schema and its associated models",
-                    db.type,
-                    db.name
-                )
-            );
+            this.addLog(t("Completed preparing '%s' database '%s' schema and its associated models", db.type, db.name));
         }
 
         // Iterate over the previous db configurations and drop deleted databases
@@ -903,19 +853,41 @@ export class DeploymentManager {
         for (let i = 0; i < prevConfig.length; i++) {
             const prevdbConfig = prevConfig[i];
             // Check if this database exists in the new configuration or not
-            const newdbConfig = databases.find(
-                (entry) => entry.iid === prevdbConfig.iid
-            );
+            const newdbConfig = databases.find((entry) => entry.iid === prevdbConfig.iid);
             if (newdbConfig) continue;
             else {
-                let dbManager = this.createDBManager(
-                    prevdbConfig,
-                    prevdbConfig
-                );
+                let dbManager = this.createDBManager(prevdbConfig, prevdbConfig);
                 await dbManager.beginSession();
                 await dbManager.dropDatabase();
                 await dbManager.endSession();
             }
+        }
+    }
+
+    /**
+     * Creates or updates the database schema in the target database
+     * @param {"deploy"|"redeploy"} type
+     */
+    async prepareDatabasesForUpdates(type) {
+        const databases = this.getDatabases();
+        for (let i = 0; i < databases.length; i++) {
+            const db = databases[i];
+            // We only process databases managed by the platform
+            if (!db.managed) continue;
+
+            this.addLog(t("Started preparing database schema for '%s' database '%s'", db.type, db.name));
+
+            // Load the previous database configuration if there is any
+            let prevConfig = await this.getPrevDBDefinition(db);
+            let dbManager = this.createDBManager(db, prevConfig);
+            dbManager.setType(type);
+
+            await dbManager.beginSession();
+            await dbManager.createDatabase();
+            await dbManager.manageModels();
+            await dbManager.endSession();
+
+            this.addLog(t("Completed preparing '%s' database '%s' schema and its associated models", db.type, db.name));
         }
     }
 
@@ -938,9 +910,7 @@ export class DeploymentManager {
             await dbManager.dropDatabase();
             await dbManager.endSession();
 
-            this.addLog(
-                t("Completed deleting '%s' database '%s'", db.type, db.name)
-            );
+            this.addLog(t("Completed deleting '%s' database '%s'", db.type, db.name));
         }
     }
 
@@ -961,9 +931,7 @@ export class DeploymentManager {
             await dbManager.dropDatabase();
             await dbManager.endSession();
 
-            this.addLog(
-                t("Completed deleting '%s' database '%s'", db.type, db.name)
-            );
+            this.addLog(t("Completed deleting '%s' database '%s'", db.type, db.name));
         }
     }
 
@@ -982,44 +950,27 @@ export class DeploymentManager {
 
         switch (dbConfig.type) {
             case DATABASE.MongoDB:
-                return new MongoDBManager(
-                    this.getEnvObj(),
-                    dbConfig,
-                    prevConfig,
-                    (message, status) => this.addLog(message, status)
+                return new MongoDBManager(this.getEnvObj(), dbConfig, prevConfig, (message, status) =>
+                    this.addLog(message, status)
                 );
             case DATABASE.PostgreSQL:
-                return new PostgresDBManager(
-                    this.getEnvObj(),
-                    dbConfig,
-                    prevConfig,
-                    (message, status) => this.addLog(message, status)
+                return new PostgresDBManager(this.getEnvObj(), dbConfig, prevConfig, (message, status) =>
+                    this.addLog(message, status)
                 );
             case DATABASE.MySQL:
-                return new MySQLDBManager(
-                    this.getEnvObj(),
-                    dbConfig,
-                    prevConfig,
-                    (message, status) => this.addLog(message, status)
+                return new MySQLDBManager(this.getEnvObj(), dbConfig, prevConfig, (message, status) =>
+                    this.addLog(message, status)
                 );
             case DATABASE.SQLServer:
-                return new MsSQLDBManager(
-                    this.getEnvObj(),
-                    dbConfig,
-                    prevConfig,
-                    (message, status) => this.addLog(message, status)
+                return new MsSQLDBManager(this.getEnvObj(), dbConfig, prevConfig, (message, status) =>
+                    this.addLog(message, status)
                 );
             case DATABASE.Oracle:
-                return new OracleDBManager(
-                    this.getEnvObj(),
-                    dbConfig,
-                    prevConfig,
-                    (message, status) => this.addLog(message, status)
+                return new OracleDBManager(this.getEnvObj(), dbConfig, prevConfig, (message, status) =>
+                    this.addLog(message, status)
                 );
             default:
-                throw new AgnostError(
-                    t("Unsupported database type '%s'", dbConfig.type)
-                );
+                throw new AgnostError(t("Unsupported database type '%s'", dbConfig.type));
         }
     }
 
@@ -1031,9 +982,7 @@ export class DeploymentManager {
     async getPrevDBDefinition(dbJson) {
         // Database configuration is not in the cache, load it from the database
         const engineDb = this.getEnvDB();
-        const db = await engineDb
-            .collection("databases")
-            .findOne({ iid: dbJson.iid });
+        const db = await engineDb.collection("databases").findOne({ iid: dbJson.iid });
         if (db) return db;
 
         return null;
@@ -1109,26 +1058,16 @@ export class DeploymentManager {
         // Save environment and version information
         await engineDb.collection("environment").insertOne(this.getEnvObj());
         // We should have records to insert into database if not mongodb raises an error
-        if (this.getDatabases().length > 0)
-            await engineDb
-                .collection("databases")
-                .insertMany(this.getDatabases());
+        if (this.getDatabases().length > 0) await engineDb.collection("databases").insertMany(this.getDatabases());
 
-        if (this.getEndpoints().length > 0)
-            await engineDb
-                .collection("endpoints")
-                .insertMany(this.getEndpoints());
+        if (this.getEndpoints().length > 0) await engineDb.collection("endpoints").insertMany(this.getEndpoints());
 
         if (this.getMiddlewares().length > 0)
-            await engineDb
-                .collection("middlewares")
-                .insertMany(this.getMiddlewares());
+            await engineDb.collection("middlewares").insertMany(this.getMiddlewares());
 
-        if (this.getQueues().length > 0)
-            await engineDb.collection("queues").insertMany(this.getQueues());
+        if (this.getQueues().length > 0) await engineDb.collection("queues").insertMany(this.getQueues());
 
-        if (this.getTasks().length > 0)
-            await engineDb.collection("tasks").insertMany(this.getTasks());
+        if (this.getTasks().length > 0) await engineDb.collection("tasks").insertMany(this.getTasks());
 
         this.addLog("Saved deployment configuration to database");
     }
@@ -1140,8 +1079,7 @@ export class DeploymentManager {
         const engineDb = this.getEnvDB();
         // First clear any existing configuration
         await engineDb.collection("databases").deleteMany({});
-        if (databases.length > 0)
-            await engineDb.collection("databases").insertMany(databases);
+        if (databases.length > 0) await engineDb.collection("databases").insertMany(databases);
 
         this.addLog("Saved database configurations to environment database");
     }
@@ -1153,8 +1091,7 @@ export class DeploymentManager {
         const engineDb = this.getEnvDB();
         // First clear any existing configuration
         await engineDb.collection("endpoints").deleteMany({});
-        if (endpoints.length > 0)
-            await engineDb.collection("endpoints").insertMany(endpoints);
+        if (endpoints.length > 0) await engineDb.collection("endpoints").insertMany(endpoints);
 
         this.addLog("Saved endpoint configurations to environment database");
     }
@@ -1166,8 +1103,7 @@ export class DeploymentManager {
         const engineDb = this.getEnvDB();
         // First clear any existing configuration
         await engineDb.collection("middlewares").deleteMany({});
-        if (middlewares.length > 0)
-            await engineDb.collection("middlewares").insertMany(middlewares);
+        if (middlewares.length > 0) await engineDb.collection("middlewares").insertMany(middlewares);
 
         this.addLog("Saved middleware configurations to environment database");
     }
@@ -1179,8 +1115,7 @@ export class DeploymentManager {
         const engineDb = this.getEnvDB();
         // First clear any existing configuration
         await engineDb.collection("queues").deleteMany({});
-        if (queues.length > 0)
-            await engineDb.collection("queues").insertMany(queues);
+        if (queues.length > 0) await engineDb.collection("queues").insertMany(queues);
 
         this.addLog("Saved queue configurations to environment database");
     }
@@ -1192,8 +1127,7 @@ export class DeploymentManager {
         const engineDb = this.getEnvDB();
         // First clear any existing configuration
         await engineDb.collection("tasks").deleteMany({});
-        if (tasks.length > 0)
-            await engineDb.collection("tasks").insertMany(tasks);
+        if (tasks.length > 0) await engineDb.collection("tasks").insertMany(tasks);
 
         this.addLog("Saved tasks configurations to environment database");
     }
@@ -1205,8 +1139,7 @@ export class DeploymentManager {
         const engineDb = this.getEnvDB();
         // First clear any existing configuration
         await engineDb.collection("storages").deleteMany({});
-        if (storages.length > 0)
-            await engineDb.collection("storages").insertMany(storages);
+        if (storages.length > 0) await engineDb.collection("storages").insertMany(storages);
 
         this.addLog("Saved storage configurations to environment database");
     }
@@ -1235,57 +1168,24 @@ export class DeploymentManager {
             const ids = objects.map((entry) => entry._id);
             await engineDb
                 .collection("endpoint_logs")
-                .deleteMany(
-                    { endpointId: { $in: ids } },
-                    { writeConcern: { w: 0 } }
-                );
+                .deleteMany({ endpointId: { $in: ids } }, { writeConcern: { w: 0 } });
         } else if (type === "queue") {
             const ids = objects.map((entry) => entry._id);
-            await engineDb
-                .collection("queue_logs")
-                .deleteMany(
-                    { queueId: { $in: ids } },
-                    { writeConcern: { w: 0 } }
-                );
+            await engineDb.collection("queue_logs").deleteMany({ queueId: { $in: ids } }, { writeConcern: { w: 0 } });
 
             const iids = objects.map((entry) => entry.iid);
-            await engineDb
-                .collection("messages")
-                .deleteMany(
-                    { queueId: { $in: iids } },
-                    { writeConcern: { w: 0 } }
-                );
+            await engineDb.collection("messages").deleteMany({ queueId: { $in: iids } }, { writeConcern: { w: 0 } });
         } else if (type === "task") {
             const ids = objects.map((entry) => entry._id);
-            await engineDb
-                .collection("cronjob_logs")
-                .deleteMany(
-                    { taskId: { $in: ids } },
-                    { writeConcern: { w: 0 } }
-                );
+            await engineDb.collection("cronjob_logs").deleteMany({ taskId: { $in: ids } }, { writeConcern: { w: 0 } });
 
             const iids = objects.map((entry) => entry.iid);
-            await engineDb
-                .collection("cronjobs")
-                .deleteMany(
-                    { taskId: { $in: iids } },
-                    { writeConcern: { w: 0 } }
-                );
+            await engineDb.collection("cronjobs").deleteMany({ taskId: { $in: iids } }, { writeConcern: { w: 0 } });
         } else if (type === "storage") {
             const iids = objects.map((entry) => entry.iid);
-            await engineDb
-                .collection("buckets")
-                .deleteMany(
-                    { storageId: { $in: iids } },
-                    { writeConcern: { w: 0 } }
-                );
+            await engineDb.collection("buckets").deleteMany({ storageId: { $in: iids } }, { writeConcern: { w: 0 } });
 
-            await engineDb
-                .collection("files")
-                .deleteMany(
-                    { storageId: { $in: iids } },
-                    { writeConcern: { w: 0 } }
-                );
+            await engineDb.collection("files").deleteMany({ storageId: { $in: iids } }, { writeConcern: { w: 0 } });
         }
 
         this.addLog(`Cleared ${type} logs and tracking entries`);
@@ -1318,10 +1218,7 @@ export class DeploymentManager {
             case "add": {
                 const prevDbDefinitions = await this.getPrevDBDefinitions();
                 prevDbDefinitions.push(...databases);
-                this.addToCache(
-                    `${this.getEnvId()}.databases`,
-                    prevDbDefinitions
-                );
+                this.addToCache(`${this.getEnvId()}.databases`, prevDbDefinitions);
                 return prevDbDefinitions;
             }
             case "update": {
@@ -1331,21 +1228,14 @@ export class DeploymentManager {
                     this.addToCache(`${this.getEnvId()}.databases`, databases);
                     return databases;
                 } else {
-                    const updatedDbDefinitions = prevDbDefinitions.map(
-                        (entry) => {
-                            const updatedDb = databases.find(
-                                (entry2) => entry2.iid === entry.iid
-                            );
+                    const updatedDbDefinitions = prevDbDefinitions.map((entry) => {
+                        const updatedDb = databases.find((entry2) => entry2.iid === entry.iid);
 
-                            if (updatedDb) return updatedDb;
-                            else return entry;
-                        }
-                    );
+                        if (updatedDb) return updatedDb;
+                        else return entry;
+                    });
 
-                    this.addToCache(
-                        `${this.getEnvId()}.databases`,
-                        updatedDbDefinitions
-                    );
+                    this.addToCache(`${this.getEnvId()}.databases`, updatedDbDefinitions);
 
                     return updatedDbDefinitions;
                 }
@@ -1353,13 +1243,9 @@ export class DeploymentManager {
             case "delete": {
                 const prevDbDefinitions = await this.getPrevDBDefinitions();
                 const updatedDbDefinitions = prevDbDefinitions.filter(
-                    (entry) =>
-                        !databases.find((entry2) => entry.iid === entry2.iid)
+                    (entry) => !databases.find((entry2) => entry.iid === entry2.iid)
                 );
-                this.addToCache(
-                    `${this.getEnvId()}.databases`,
-                    updatedDbDefinitions
-                );
+                this.addToCache(`${this.getEnvId()}.databases`, updatedDbDefinitions);
 
                 return updatedDbDefinitions;
             }
@@ -1379,53 +1265,36 @@ export class DeploymentManager {
                 this.addToCache(`${this.getEnvId()}.endpoints`, endpoints);
                 return endpoints;
             case "add": {
-                const prevEpDefinitions =
-                    await this.getPrevEndpointDefinitions();
+                const prevEpDefinitions = await this.getPrevEndpointDefinitions();
                 prevEpDefinitions.push(...endpoints);
-                this.addToCache(
-                    `${this.getEnvId()}.endpoints`,
-                    prevEpDefinitions
-                );
+                this.addToCache(`${this.getEnvId()}.endpoints`, prevEpDefinitions);
                 return prevEpDefinitions;
             }
             case "update": {
-                const prevEpDefinitions =
-                    await this.getPrevEndpointDefinitions();
+                const prevEpDefinitions = await this.getPrevEndpointDefinitions();
 
                 if (prevEpDefinitions.length === 0) {
                     this.addToCache(`${this.getEnvId()}.endpoints`, endpoints);
                     return endpoints;
                 } else {
-                    const updatedEpDefinitions = prevEpDefinitions.map(
-                        (entry) => {
-                            const updatedEp = endpoints.find(
-                                (entry2) => entry2.iid === entry.iid
-                            );
+                    const updatedEpDefinitions = prevEpDefinitions.map((entry) => {
+                        const updatedEp = endpoints.find((entry2) => entry2.iid === entry.iid);
 
-                            if (updatedEp) return updatedEp;
-                            else return entry;
-                        }
-                    );
+                        if (updatedEp) return updatedEp;
+                        else return entry;
+                    });
 
-                    this.addToCache(
-                        `${this.getEnvId()}.endpoints`,
-                        updatedEpDefinitions
-                    );
+                    this.addToCache(`${this.getEnvId()}.endpoints`, updatedEpDefinitions);
 
                     return updatedEpDefinitions;
                 }
             }
             case "delete": {
-                const prevEpDefinitions =
-                    await this.getPrevEndpointDefinitions();
+                const prevEpDefinitions = await this.getPrevEndpointDefinitions();
                 const updatedEpDefinitions = prevEpDefinitions.filter(
-                    (entry) =>
-                        !endpoints.find((entry2) => entry.iid === entry2.iid)
+                    (entry) => !endpoints.find((entry2) => entry.iid === entry2.iid)
                 );
-                this.addToCache(
-                    `${this.getEnvId()}.endpoints`,
-                    updatedEpDefinitions
-                );
+                this.addToCache(`${this.getEnvId()}.endpoints`, updatedEpDefinitions);
 
                 return updatedEpDefinitions;
             }
@@ -1445,56 +1314,36 @@ export class DeploymentManager {
                 this.addToCache(`${this.getEnvId()}.middlewares`, middlewares);
                 return middlewares;
             case "add": {
-                const prevMwDefinitions =
-                    await this.getPrevMiddlewareDefinitions();
+                const prevMwDefinitions = await this.getPrevMiddlewareDefinitions();
                 prevMwDefinitions.push(...middlewares);
-                this.addToCache(
-                    `${this.getEnvId()}.middlewares`,
-                    prevMwDefinitions
-                );
+                this.addToCache(`${this.getEnvId()}.middlewares`, prevMwDefinitions);
                 return prevMwDefinitions;
             }
             case "update": {
-                const prevMwDefinitions =
-                    await this.getPrevMiddlewareDefinitions();
+                const prevMwDefinitions = await this.getPrevMiddlewareDefinitions();
 
                 if (prevMwDefinitions.length === 0) {
-                    this.addToCache(
-                        `${this.getEnvId()}.middlewares`,
-                        middlewares
-                    );
+                    this.addToCache(`${this.getEnvId()}.middlewares`, middlewares);
                     return middlewares;
                 } else {
-                    const updatedMwDefinitions = prevMwDefinitions.map(
-                        (entry) => {
-                            const updatedMw = middlewares.find(
-                                (entry2) => entry2.iid === entry.iid
-                            );
+                    const updatedMwDefinitions = prevMwDefinitions.map((entry) => {
+                        const updatedMw = middlewares.find((entry2) => entry2.iid === entry.iid);
 
-                            if (updatedMw) return updatedMw;
-                            else return entry;
-                        }
-                    );
+                        if (updatedMw) return updatedMw;
+                        else return entry;
+                    });
 
-                    this.addToCache(
-                        `${this.getEnvId()}.middlewares`,
-                        updatedMwDefinitions
-                    );
+                    this.addToCache(`${this.getEnvId()}.middlewares`, updatedMwDefinitions);
 
                     return updatedMwDefinitions;
                 }
             }
             case "delete": {
-                const prevMwDefinitions =
-                    await this.getPrevMiddlewareDefinitions();
+                const prevMwDefinitions = await this.getPrevMiddlewareDefinitions();
                 const updatedMwDefinitions = prevMwDefinitions.filter(
-                    (entry) =>
-                        !middlewares.find((entry2) => entry.iid === entry2.iid)
+                    (entry) => !middlewares.find((entry2) => entry.iid === entry2.iid)
                 );
-                this.addToCache(
-                    `${this.getEnvId()}.middlewares`,
-                    updatedMwDefinitions
-                );
+                this.addToCache(`${this.getEnvId()}.middlewares`, updatedMwDefinitions);
 
                 return updatedMwDefinitions;
             }
@@ -1514,53 +1363,36 @@ export class DeploymentManager {
                 this.addToCache(`${this.getEnvId()}.queues`, queues);
                 return queues;
             case "add": {
-                const prevQueueDefinitions =
-                    await this.getPrevQueueDefinitions();
+                const prevQueueDefinitions = await this.getPrevQueueDefinitions();
                 prevQueueDefinitions.push(...queues);
-                this.addToCache(
-                    `${this.getEnvId()}.queues`,
-                    prevQueueDefinitions
-                );
+                this.addToCache(`${this.getEnvId()}.queues`, prevQueueDefinitions);
                 return prevQueueDefinitions;
             }
             case "update": {
-                const prevQueueDefinitions =
-                    await this.getPrevQueueDefinitions();
+                const prevQueueDefinitions = await this.getPrevQueueDefinitions();
 
                 if (prevQueueDefinitions.length === 0) {
                     this.addToCache(`${this.getEnvId()}.queues`, queues);
                     return queues;
                 } else {
-                    const updatedQueueDefinitions = prevQueueDefinitions.map(
-                        (entry) => {
-                            const updatedQueue = queues.find(
-                                (entry2) => entry2.iid === entry.iid
-                            );
+                    const updatedQueueDefinitions = prevQueueDefinitions.map((entry) => {
+                        const updatedQueue = queues.find((entry2) => entry2.iid === entry.iid);
 
-                            if (updatedQueue) return updatedQueue;
-                            else return entry;
-                        }
-                    );
+                        if (updatedQueue) return updatedQueue;
+                        else return entry;
+                    });
 
-                    this.addToCache(
-                        `${this.getEnvId()}.queues`,
-                        updatedQueueDefinitions
-                    );
+                    this.addToCache(`${this.getEnvId()}.queues`, updatedQueueDefinitions);
 
                     return updatedQueueDefinitions;
                 }
             }
             case "delete": {
-                const prevQueueDefinitions =
-                    await this.getPrevQueueDefinitions();
+                const prevQueueDefinitions = await this.getPrevQueueDefinitions();
                 const updatedQueueDefinitions = prevQueueDefinitions.filter(
-                    (entry) =>
-                        !queues.find((entry2) => entry.iid === entry2.iid)
+                    (entry) => !queues.find((entry2) => entry.iid === entry2.iid)
                 );
-                this.addToCache(
-                    `${this.getEnvId()}.queues`,
-                    updatedQueueDefinitions
-                );
+                this.addToCache(`${this.getEnvId()}.queues`, updatedQueueDefinitions);
 
                 return updatedQueueDefinitions;
             }
@@ -1582,10 +1414,7 @@ export class DeploymentManager {
             case "add": {
                 const prevTaskDefinitions = await this.getPrevTaskDefinitions();
                 prevTaskDefinitions.push(...tasks);
-                this.addToCache(
-                    `${this.getEnvId()}.tasks`,
-                    prevTaskDefinitions
-                );
+                this.addToCache(`${this.getEnvId()}.tasks`, prevTaskDefinitions);
                 return prevTaskDefinitions;
             }
             case "update": {
@@ -1595,21 +1424,14 @@ export class DeploymentManager {
                     this.addToCache(`${this.getEnvId()}.tasks`, tasks);
                     return tasks;
                 } else {
-                    const updatedTaskDefinitions = prevTaskDefinitions.map(
-                        (entry) => {
-                            const updatedTask = tasks.find(
-                                (entry2) => entry2.iid === entry.iid
-                            );
+                    const updatedTaskDefinitions = prevTaskDefinitions.map((entry) => {
+                        const updatedTask = tasks.find((entry2) => entry2.iid === entry.iid);
 
-                            if (updatedTask) return updatedTask;
-                            else return entry;
-                        }
-                    );
+                        if (updatedTask) return updatedTask;
+                        else return entry;
+                    });
 
-                    this.addToCache(
-                        `${this.getEnvId()}.tasks`,
-                        updatedTaskDefinitions
-                    );
+                    this.addToCache(`${this.getEnvId()}.tasks`, updatedTaskDefinitions);
 
                     return updatedTaskDefinitions;
                 }
@@ -1619,10 +1441,7 @@ export class DeploymentManager {
                 const updatedTaskDefinitions = prevTaskDefinitions.filter(
                     (entry) => !tasks.find((entry2) => entry.iid === entry2.iid)
                 );
-                this.addToCache(
-                    `${this.getEnvId()}.tasks`,
-                    updatedTaskDefinitions
-                );
+                this.addToCache(`${this.getEnvId()}.tasks`, updatedTaskDefinitions);
 
                 return updatedTaskDefinitions;
             }
@@ -1642,52 +1461,36 @@ export class DeploymentManager {
                 this.addToCache(`${this.getEnvId()}.storages`, storages);
                 return storages;
             case "add": {
-                const prevStorageDefinitions =
-                    await this.getPrevStorageDefinitions();
+                const prevStorageDefinitions = await this.getPrevStorageDefinitions();
                 prevStorageDefinitions.push(...storages);
-                this.addToCache(
-                    `${this.getEnvId()}.storages`,
-                    prevStorageDefinitions
-                );
+                this.addToCache(`${this.getEnvId()}.storages`, prevStorageDefinitions);
                 return prevStorageDefinitions;
             }
             case "update": {
-                const prevStorageDefinitions =
-                    await this.getPrevStorageDefinitions();
+                const prevStorageDefinitions = await this.getPrevStorageDefinitions();
 
                 if (prevStorageDefinitions.length === 0) {
                     this.addToCache(`${this.getEnvId()}.storages`, storages);
                     return storages;
                 } else {
-                    const updatedStorageDefinitions =
-                        prevStorageDefinitions.map((entry) => {
-                            const updatedStorage = storages.find(
-                                (entry2) => entry2.iid === entry.iid
-                            );
+                    const updatedStorageDefinitions = prevStorageDefinitions.map((entry) => {
+                        const updatedStorage = storages.find((entry2) => entry2.iid === entry.iid);
 
-                            if (updatedStorage) return updatedStorage;
-                            else return entry;
-                        });
+                        if (updatedStorage) return updatedStorage;
+                        else return entry;
+                    });
 
-                    this.addToCache(
-                        `${this.getEnvId()}.storages`,
-                        updatedStorageDefinitions
-                    );
+                    this.addToCache(`${this.getEnvId()}.storages`, updatedStorageDefinitions);
 
                     return updatedStorageDefinitions;
                 }
             }
             case "delete": {
-                const prevStorageDefinitions =
-                    await this.getPrevStorageDefinitions();
+                const prevStorageDefinitions = await this.getPrevStorageDefinitions();
                 const updatedStorageDefinitions = prevStorageDefinitions.filter(
-                    (entry) =>
-                        !storages.find((entry2) => entry.iid === entry2.iid)
+                    (entry) => !storages.find((entry2) => entry.iid === entry2.iid)
                 );
-                this.addToCache(
-                    `${this.getEnvId()}.storages`,
-                    updatedStorageDefinitions
-                );
+                this.addToCache(`${this.getEnvId()}.storages`, updatedStorageDefinitions);
 
                 return updatedStorageDefinitions;
             }
@@ -1706,10 +1509,7 @@ export class DeploymentManager {
             await this.setStatus("Deploying");
             // First add environment object data to cache
             this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
-            this.addToCache(
-                `${this.getEnvId()}.timestamp`,
-                this.getTimestamp()
-            );
+            this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
             // Load all data models and do deployment initializations
             await this.loadDatabases();
@@ -1737,15 +1537,7 @@ export class DeploymentManager {
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
-            this.addLog(
-                [
-                    t("Deployment failed"),
-                    error.name,
-                    error.message,
-                    error.stack,
-                ].join("\n"),
-                "Error"
-            );
+            this.addLog([t("Deployment failed"), error.name, error.message, error.stack].join("\n"), "Error");
             await this.sendEnvironmentLogs("Error");
             return { success: false, error };
         }
@@ -1764,10 +1556,7 @@ export class DeploymentManager {
             await this.clearCachedData(`${this.getEnvId()}.*`);
             // Add environment object data to cache
             this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
-            this.addToCache(
-                `${this.getEnvId()}.timestamp`,
-                this.getTimestamp()
-            );
+            this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
             // Load all data models and do deployment initializations
             await this.loadDatabases();
@@ -1795,15 +1584,7 @@ export class DeploymentManager {
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
-            this.addLog(
-                [
-                    t("Redeployment failed"),
-                    error.name,
-                    error.message,
-                    error.stack,
-                ].join("\n"),
-                "Error"
-            );
+            this.addLog([t("Redeployment failed"), error.name, error.message, error.stack].join("\n"), "Error");
             await this.sendEnvironmentLogs("Error");
             return { success: false, error };
         }
@@ -1843,15 +1624,7 @@ export class DeploymentManager {
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
-            this.addLog(
-                [
-                    t("Environment deletion failed"),
-                    error.name,
-                    error.message,
-                    error.stack,
-                ].join("\n"),
-                "Error"
-            );
+            this.addLog([t("Environment deletion failed"), error.name, error.message, error.stack].join("\n"), "Error");
             await this.sendEnvironmentLogs("Error");
             return { success: false, error };
         }
@@ -1867,10 +1640,7 @@ export class DeploymentManager {
             await this.setStatus("Deploying");
             // First add environment object data to cache
             this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
-            this.addToCache(
-                `${this.getEnvId()}.timestamp`,
-                this.getTimestamp()
-            );
+            this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
             // Execute all redis commands altogether
             await this.commitPipeline();
@@ -1889,15 +1659,7 @@ export class DeploymentManager {
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
-            this.addLog(
-                [
-                    t("Metadata update failed"),
-                    error.name,
-                    error.message,
-                    error.stack,
-                ].join("\n"),
-                "Error"
-            );
+            this.addLog([t("Metadata update failed"), error.name, error.message, error.stack].join("\n"), "Error");
             await this.sendEnvironmentLogs("Error");
             return { success: false, error };
         }
@@ -1915,28 +1677,18 @@ export class DeploymentManager {
 
             // Update environment object data in cache
             this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
-            this.addToCache(
-                `${this.getEnvId()}.timestamp`,
-                this.getTimestamp()
-            );
+            this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
             if (subAction === "delete") {
                 // Clear cache of databases
-                this.getDatabases().forEach((db) =>
-                    this.removeFromCache(
-                        `${this.getEnvId()}.db.${this.getDbId(db)}`
-                    )
-                );
+                this.getDatabases().forEach((db) => this.removeFromCache(`${this.getEnvId()}.db.${this.getDbId(db)}`));
             } else {
                 // Load updated data models and do deployments
                 await this.loadDatabases();
             }
 
             // Cache updated database configurations (subaction can be add, delete or update)
-            const databases = await this.cacheDatabases(
-                this.getDatabases(),
-                subAction
-            );
+            const databases = await this.cacheDatabases(this.getDatabases(), subAction);
 
             // Execute all redis commands altogether
             await this.commitPipeline();
@@ -1949,7 +1701,7 @@ export class DeploymentManager {
                 await this.deleteManagedDatabases(this.getDatabases());
             } else {
                 // Update database structure for databases and models (e.g.,tables, collections, indices)
-                await this.prepareDatabases("redeploy");
+                await this.prepareDatabasesForUpdates("redeploy");
             }
 
             // Save updated deployment to database
@@ -1968,15 +1720,7 @@ export class DeploymentManager {
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
-            this.addLog(
-                [
-                    t("Database updates failed"),
-                    error.name,
-                    error.message,
-                    error.stack,
-                ].join("\n"),
-                "Error"
-            );
+            this.addLog([t("Database updates failed"), error.name, error.message, error.stack].join("\n"), "Error");
             await this.sendEnvironmentLogs("Error");
             return { success: false, error };
         }
@@ -1994,16 +1738,10 @@ export class DeploymentManager {
 
             // Update environment object data in cache
             this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
-            this.addToCache(
-                `${this.getEnvId()}.timestamp`,
-                this.getTimestamp()
-            );
+            this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
             // Cache updated database configurations (subaction can be add, delete or update)
-            const endpoints = await this.cacheEndpoints(
-                this.getEndpoints(),
-                subAction
-            );
+            const endpoints = await this.cacheEndpoints(this.getEndpoints(), subAction);
 
             // Execute all redis commands altogether
             await this.commitPipeline();
@@ -2012,10 +1750,7 @@ export class DeploymentManager {
             this.notifyAPIServers();
 
             if (subAction === "delete") {
-                await this.deleteLogsAndTrackingEntries(
-                    "endpoint",
-                    this.getEndpoints()
-                );
+                await this.deleteLogsAndTrackingEntries("endpoint", this.getEndpoints());
             }
             // Save updated deployment to database
             await this.saveEndpointDeploymentConfigs(endpoints);
@@ -2033,15 +1768,7 @@ export class DeploymentManager {
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
-            this.addLog(
-                [
-                    t("Endpoint updates failed"),
-                    error.name,
-                    error.message,
-                    error.stack,
-                ].join("\n"),
-                "Error"
-            );
+            this.addLog([t("Endpoint updates failed"), error.name, error.message, error.stack].join("\n"), "Error");
             await this.sendEnvironmentLogs("Error");
             return { success: false, error };
         }
@@ -2059,16 +1786,10 @@ export class DeploymentManager {
 
             // Update environment object data in cache
             this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
-            this.addToCache(
-                `${this.getEnvId()}.timestamp`,
-                this.getTimestamp()
-            );
+            this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
             // Cache updated database configurations (subaction can be add, delete or update)
-            const middlewares = await this.cacheMiddlewares(
-                this.getMiddlewares(),
-                subAction
-            );
+            const middlewares = await this.cacheMiddlewares(this.getMiddlewares(), subAction);
 
             // Execute all redis commands altogether
             await this.commitPipeline();
@@ -2092,15 +1813,7 @@ export class DeploymentManager {
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
-            this.addLog(
-                [
-                    t("Middleware updates failed"),
-                    error.name,
-                    error.message,
-                    error.stack,
-                ].join("\n"),
-                "Error"
-            );
+            this.addLog([t("Middleware updates failed"), error.name, error.message, error.stack].join("\n"), "Error");
             await this.sendEnvironmentLogs("Error");
             return { success: false, error };
         }
@@ -2118,10 +1831,7 @@ export class DeploymentManager {
 
             // Update environment object data in cache
             this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
-            this.addToCache(
-                `${this.getEnvId()}.timestamp`,
-                this.getTimestamp()
-            );
+            this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
             // Cache updated database configurations (subaction can be add, delete or update)
             const queues = await this.cacheQueues(this.getQueues(), subAction);
@@ -2133,10 +1843,7 @@ export class DeploymentManager {
             this.notifyAPIServers();
 
             if (subAction === "delete") {
-                await this.deleteLogsAndTrackingEntries(
-                    "queue",
-                    this.getQueues()
-                );
+                await this.deleteLogsAndTrackingEntries("queue", this.getQueues());
             }
             // Save updated deployment to database
             await this.saveQueueDeploymentConfigs(queues);
@@ -2154,15 +1861,7 @@ export class DeploymentManager {
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
-            this.addLog(
-                [
-                    t("Queue updates failed"),
-                    error.name,
-                    error.message,
-                    error.stack,
-                ].join("\n"),
-                "Error"
-            );
+            this.addLog([t("Queue updates failed"), error.name, error.message, error.stack].join("\n"), "Error");
             await this.sendEnvironmentLogs("Error");
             return { success: false, error };
         }
@@ -2180,10 +1879,7 @@ export class DeploymentManager {
 
             // Update environment object data in cache
             this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
-            this.addToCache(
-                `${this.getEnvId()}.timestamp`,
-                this.getTimestamp()
-            );
+            this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
             // Cache updated database configurations (subaction can be add, delete or update)
             const tasks = await this.cacheTasks(this.getTasks(), subAction);
@@ -2195,10 +1891,7 @@ export class DeploymentManager {
             this.notifyAPIServers();
 
             if (subAction === "delete") {
-                await this.deleteLogsAndTrackingEntries(
-                    "task",
-                    this.getTasks()
-                );
+                await this.deleteLogsAndTrackingEntries("task", this.getTasks());
             }
             // Save updated deployment to database
             await this.saveTaskDeploymentConfigs(tasks);
@@ -2216,15 +1909,7 @@ export class DeploymentManager {
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
-            this.addLog(
-                [
-                    t("Task updates failed"),
-                    error.name,
-                    error.message,
-                    error.stack,
-                ].join("\n"),
-                "Error"
-            );
+            this.addLog([t("Task updates failed"), error.name, error.message, error.stack].join("\n"), "Error");
             await this.sendEnvironmentLogs("Error");
             return { success: false, error };
         }
@@ -2242,16 +1927,10 @@ export class DeploymentManager {
 
             // Update environment object data in cache
             this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
-            this.addToCache(
-                `${this.getEnvId()}.timestamp`,
-                this.getTimestamp()
-            );
+            this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
             // Cache updated database configurations (subaction can be add, delete or update)
-            const storages = await this.cacheStorages(
-                this.getStorages(),
-                subAction
-            );
+            const storages = await this.cacheStorages(this.getStorages(), subAction);
 
             // Execute all redis commands altogether
             await this.commitPipeline();
@@ -2260,10 +1939,7 @@ export class DeploymentManager {
             this.notifyAPIServers();
 
             if (subAction === "delete") {
-                await this.deleteLogsAndTrackingEntries(
-                    "storage",
-                    this.getStorages()
-                );
+                await this.deleteLogsAndTrackingEntries("storage", this.getStorages());
             }
             // Save updated deployment to database
             await this.saveStorageDeploymentConfigs(storages);
@@ -2281,15 +1957,7 @@ export class DeploymentManager {
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
-            this.addLog(
-                [
-                    t("Storage updates failed"),
-                    error.name,
-                    error.message,
-                    error.stack,
-                ].join("\n"),
-                "Error"
-            );
+            this.addLog([t("Storage updates failed"), error.name, error.message, error.stack].join("\n"), "Error");
             await this.sendEnvironmentLogs("Error");
             return { success: false, error };
         }
@@ -2307,32 +1975,21 @@ export class DeploymentManager {
 
             // Update environment object data in cache
             this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
-            this.addToCache(
-                `${this.getEnvId()}.timestamp`,
-                this.getTimestamp()
-            );
+            this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
 
             // If the access setting of a database resource has changed then we need to update respective database objects
             let updatedDbList = null;
             if (updatedResource.type === "database") {
                 const databases = await this.getPrevDBDefinitions();
-                const impactedDB = databases.find(
-                    (db) => db.resource.iid === updatedResource.iid
-                );
+                const impactedDB = databases.find((db) => db.resource.iid === updatedResource.iid);
 
                 if (impactedDB) {
                     impactedDB.resource = updatedResource;
                     // Update individual DB cache
-                    this.addToCache(
-                        `${this.getEnvId()}.db.${this.getDbId(impactedDB)}`,
-                        impactedDB
-                    );
+                    this.addToCache(`${this.getEnvId()}.db.${this.getDbId(impactedDB)}`, impactedDB);
 
                     // Update the overall databases list
-                    updatedDbList = await this.cacheDatabases(
-                        [impactedDB],
-                        "update"
-                    );
+                    updatedDbList = await this.cacheDatabases([impactedDB], "update");
                 }
             }
 
@@ -2343,15 +2000,12 @@ export class DeploymentManager {
             this.notifyAPIServers();
 
             // Save updated deployment to database
-            if (updatedDbList)
-                await this.saveDatabaseDeploymentConfigs(updatedDbList);
+            if (updatedDbList) await this.saveDatabaseDeploymentConfigs(updatedDbList);
             // Save updated deployment to database
             await this.saveEnvironmentDeploymentConfig();
 
             // Update status of environment in engine cluster
-            this.addLog(
-                t("Completed resource access settings update successfully")
-            );
+            this.addLog(t("Completed resource access settings update successfully"));
             // Send the deployment telemetry information to the platform
             await this.sendEnvironmentLogs("OK");
             // Update status of environment in engine cluster
@@ -2362,12 +2016,7 @@ export class DeploymentManager {
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
             this.addLog(
-                [
-                    t("Resource access settings update failed"),
-                    error.name,
-                    error.message,
-                    error.stack,
-                ].join("\n"),
+                [t("Resource access settings update failed"), error.name, error.message, error.stack].join("\n"),
                 "Error"
             );
             await this.sendEnvironmentLogs("Error");

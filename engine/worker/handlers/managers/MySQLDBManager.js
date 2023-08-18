@@ -76,7 +76,7 @@ END;
             console.log("-------------- QUERY END --------------");
         }
 
-        const result = await conn.query(query);
+        const result = await conn.query(SQL);
         this.addLog(t("Query executed successfully"));
         if (resetQuery) {
             console.log("============== RESET QUERY ==============");
