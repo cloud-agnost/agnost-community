@@ -24,7 +24,7 @@ async function createMongoDBResource(mongoName, mongoVersion, memoryRequest, mem
           resource.metadata.name = mongoName + '-user';
           resource.stringData.password = passwd;
           const secretResult = k8sCoreApi.createNamespacedSecret(namespace, resource);
-          console.log(secretResult.body);
+          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case 'MongoDBCommunity':
           resource.metadata.name = mongoName;
@@ -41,7 +41,7 @@ async function createMongoDBResource(mongoName, mongoVersion, memoryRequest, mem
           resource.spec.statefulSet.spec.template.spec.containers[0].resources.requests.cpu = cpuRequest;
           resource.spec.statefulSet.spec.template.spec.containers[0].resources.requests.memory = memoryRequest;
           const dbResult = await k8sCustomApi.createNamespacedCustomObject('mongodbcommunity.mongodb.com', 'v1', namespace, 'mongodbcommunity', resource);
-          console.log(dbResult.body);
+          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         default:
           console.log('Skipping: ' + kind);
