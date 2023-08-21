@@ -434,7 +434,6 @@ export class SQLBaseManager extends DBManager {
             "geo-point",
             "rich-text",
             "encrypted-text",
-            "parent",
             "basic-values-list",
         ];
 

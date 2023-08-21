@@ -66,14 +66,10 @@ export const bvlTypes = [
 	"text",
 	"integer",
 	"decimal",
-	"monetary",
 	"datetime",
-	"date",
-	"time",
 	"email",
 	"link",
 	"phone",
-	"id",
 ];
 
 export const fieldTypes = [
@@ -117,7 +113,7 @@ export const fieldTypes = [
 		Oracle: true,
 		view: {
 			unique: false,
-			indexed: true,
+			indexed: false,
 			immutable: true,
 			searchable: true,
 		},
@@ -342,7 +338,7 @@ export const fieldTypes = [
 		Oracle: true,
 		view: {
 			unique: false,
-			indexed: false,
+			indexed: true,
 			immutable: true,
 			searchable: false,
 		},
@@ -373,21 +369,6 @@ export const fieldTypes = [
 		view: {
 			unique: false,
 			indexed: false,
-			immutable: true,
-			searchable: false,
-		},
-	},
-	{
-		name: "parent",
-		group: "none",
-		PostgreSQL: false,
-		MySQL: false,
-		"SQL Server": false,
-		MongoDB: true,
-		Oracle: false,
-		view: {
-			unique: false,
-			indexed: true,
 			immutable: true,
 			searchable: false,
 		},
@@ -488,7 +469,6 @@ export const dbTypeMappings = {
 		"basic-values-list": "basic-values-list",
 		"object-list": "object-list",
 		object: "object",
-		parent: "parent",
 	},
 	PostgreSQL: {
 		id: "bigserial",
@@ -515,7 +495,6 @@ export const dbTypeMappings = {
 		"basic-values-list": "undefined",
 		"object-list": "undefined",
 		object: "undefined",
-		parent: "bigint",
 	},
 	MySQL: {
 		id: "bigint",
@@ -542,12 +521,11 @@ export const dbTypeMappings = {
 		"basic-values-list": "undefined",
 		"object-list": "undefined",
 		object: "undefined",
-		parent: "bigint",
 	},
 	"SQL Server": {
 		id: "bigint",
 		text: "nvarchar",
-		"rich-text": "text",
+		"rich-text": "nvarchar(max)",
 		"encrypted-text": "nvarchar",
 		email: "nvarchar",
 		link: "nvarchar",
@@ -569,7 +547,6 @@ export const dbTypeMappings = {
 		"basic-values-list": "undefined",
 		"object-list": "undefined",
 		object: "undefined",
-		parent: "bigint",
 	},
 	Oracle: {
 		id: "number",
@@ -596,7 +573,6 @@ export const dbTypeMappings = {
 		"basic-values-list": "undefined",
 		"object-list": "undefined",
 		object: "undefined",
-		parent: "number",
 	},
 };
 

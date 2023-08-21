@@ -230,7 +230,7 @@
 				});
 				const p = (e, t) => new s.AgnostServerSideClient(e, t);
 				t.createServerSideClient = p;
-				const m = p(globalThis.META, globalThis.ADAPTERS);
+				const m = p(global.META, global.ADAPTERS);
 				(t.agnost = m), r(i(307), t);
 			},
 			414: function (e, t, i) {
@@ -554,6 +554,7 @@
 						if (
 							(super(e, t),
 							(this.models = new Map()),
+							(this.subModels = new Map()),
 							(this.name = i),
 							(this.meta = this.getMetadata("database", i)),
 							!this.meta)
@@ -580,6 +581,10 @@
 					addModel(e, t) {
 						const i = t.getSchema();
 						i ? this.models.set(`${i}.${e}`, t) : this.models.set(e, t);
+					}
+					addSubModel(e, t) {
+						const i = t.getSchema();
+						i ? this.subModels.set(`${i}.${e}`, t) : this.subModels.set(e, t);
 					}
 					getName() {
 						return this.meta.name;
@@ -1191,15 +1196,15 @@
 					F = i(335),
 					P = i(620),
 					E = i(337),
-					C = i(811),
-					M = i(321),
+					M = i(811),
+					C = i(321),
 					j = i(300);
 				t.createField = function (e, t) {
 					switch (e.type) {
 						case "id":
 							return new f.IdField(e, t);
 						case "text":
-							return new C.TextField(e, t);
+							return new M.TextField(e, t);
 						case "rich-text":
 							return new E.RichTextField(e, t);
 						case "encrypted-text":
@@ -1227,7 +1232,7 @@
 						case "date":
 							return new o.DateField(e, t);
 						case "time":
-							return new M.TimeField(e, t);
+							return new C.TimeField(e, t);
 						case "enum":
 							return new h.EnumField(e, t);
 						case "geo-point":
@@ -1483,7 +1488,7 @@
 						(this.subModel = new n.Model(i, t, t.getDb())),
 							t
 								.getDb()
-								.addModel(
+								.addSubModel(
 									i.parentHierarchy.map((e) => e.name).join("."),
 									this.subModel
 								);
@@ -1513,7 +1518,7 @@
 						(this.subModel = new n.Model(i, t, t.getDb())),
 							t
 								.getDb()
-								.addModel(
+								.addSubModel(
 									i.parentHierarchy.map((e) => e.name).join("."),
 									this.subModel
 								);

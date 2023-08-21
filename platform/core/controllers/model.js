@@ -11,10 +11,9 @@ class ModelController extends BaseController {
 	 * Returns the list of the default model fields
 	 * @param  {string} dbType The database type
 	 * @param  {Object} timestamps The timestamps configuration of the model
-	 * @param  {string} parentiid For no-sql databases the parent object internal identifier
 	 * @param  {string} userId The it the of the user who is creating the new model
 	 */
-	getDefaultFields(dbType, timestamps, parentiid, userId) {
+	getDefaultFields(dbType, timestamps, userId) {
 		let fields = [];
 		let orderNumber = 10000;
 
@@ -34,28 +33,6 @@ class ModelController extends BaseController {
 
 		orderNumber += 10000;
 		fields.push(id);
-
-		if (parentiid) {
-			//Set-up the parent field
-			let parent = {};
-			parent.reference = {};
-			parent.name = "parent";
-			parent.creator = "system";
-			parent.order = orderNumber;
-			parent.type = "parent";
-			parent.dbType = dbTypeMappings[dbType]["parent"];
-			parent.required = true;
-			parent.unique = false;
-			parent.immutable = true;
-			parent.indexed = true;
-			parent.reference.iid = parentiid;
-			parent.createdBy = userId;
-			parent.iid = helper.generateSlug("fld");
-
-			orderNumber += 10000;
-			//Add it to fields array
-			fields.push(parent);
-		}
 
 		if (!timestamps || timestamps.enabled === false) return fields;
 

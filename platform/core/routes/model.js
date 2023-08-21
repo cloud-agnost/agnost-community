@@ -83,12 +83,7 @@ router.post(
 					description,
 					schemaiid,
 					timestamps,
-					fields: modelCtrl.getDefaultFields(
-						db.type,
-						timestamps,
-						null,
-						user._id
-					),
+					fields: modelCtrl.getDefaultFields(db.type, timestamps, user._id),
 					createdBy: user._id,
 				},
 				{ cacheKey: modelId }
@@ -774,12 +769,14 @@ router.post(
 					parentiid: model.iid,
 					schemaiid: model.schemaiid,
 					timestamps: pointer.timestamps,
-					fields: modelCtrl.getDefaultFields(
-						db.type,
-						pointer.timestamps,
-						model.iid,
-						user._id
-					),
+					fields:
+						type === "object-list"
+							? modelCtrl.getDefaultFields(
+									db.type,
+									pointer.timestamps,
+									user._id
+							  )
+							: [],
 					createdBy: user._id,
 				};
 

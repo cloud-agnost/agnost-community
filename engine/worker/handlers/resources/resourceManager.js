@@ -472,7 +472,7 @@ export class ResourceManager {
                         "nginx.ingress.kubernetes.io/proxy-read-timeout": "6000",
                         "nginx.ingress.kubernetes.io/proxy-next-upstream-timeout": "6000",
                         "nginx.ingress.kubernetes.io/rewrite-target": "/$1",
-                        "nginx.ingress.kubernetes.io/upstream-vhost": `${ingressName}.{process.env.NAMESPACE}.svc.cluster.local`,
+                        "nginx.ingress.kubernetes.io/upstream-vhost": `${ingressName}.${process.env.NAMESPACE}.svc.cluster.local`,
                     },
                 },
                 spec: {
