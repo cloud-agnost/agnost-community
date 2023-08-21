@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secret-name
+type: Opaque
+stringData:
+  password: qwe123
+---
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: mongodb-name
+spec:
+  members: 1
+  type: ReplicaSet
+  version: "6.0.5"
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+    - name: mongo-user
+      db: admin
+      passwordSecretRef: # a reference to the secret that will be used to generate the user's password
+        name: secret-name
+      roles:
+        - name: clusterAdmin
+          db: admin
+        - name: readWriteAnyDatabase
+          db: admin
+      scramCredentialsSecretName: mongo-user
+  additionalMongodConfig:
+    storage.wiredTiger.engineConfig.journalCompressor: zlib
+  statefulSet:
+    spec:
+      selector:
+        matchLabels:
+          app: mongodb-name-svc
+      template:
+        metadata:
+          labels:
+            app: mongodb-name-svc
+        spec:
+          persistence:
+            single:
+              storage: 1Gi
+          containers:
+            - name: mongod
+              resources:
+                limits:
+                  cpu: 1000m
+                  memory: 1Gi
+                requests:
+                  cpu: 1000m
+                  memory: 1Gi
+            - name: mongodb-agent
+              readinessProbe:
+                exec:
+                  command:
+                  - /opt/scripts/readinessprobe
+                failureThreshold: 40
+                initialDelaySeconds: 5
+                periodSeconds: 30
+                successThreshold: 1
+                timeoutSeconds: 20
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 256Mi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi

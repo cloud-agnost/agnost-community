@@ -1,0 +1,890 @@
+---
+# Source: mariadb-operator/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mariadb-operator
+  labels:
+    helm.sh/chart: mariadb-operator-0.19.0
+    app.kubernetes.io/name: mariadb-operator
+    app.kubernetes.io/instance: mariadb-operator
+    app.kubernetes.io/version: "v0.0.19"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: mariadb-operator/templates/webhook-serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mariadb-operator-webhook
+  labels:
+    helm.sh/chart: mariadb-operator-0.19.0
+    app.kubernetes.io/name: mariadb-operator-webhook
+    app.kubernetes.io/instance: mariadb-operator
+    
+    app.kubernetes.io/version: "v0.0.19"
+    
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: mariadb-operator/templates/webhook-config.yaml
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: mariadb-operator-webhook-default-cert
+  labels:
+    
+    helm.sh/chart: mariadb-operator-0.19.0
+    app.kubernetes.io/name: mariadb-operator-webhook
+    app.kubernetes.io/instance: mariadb-operator
+    
+    app.kubernetes.io/version: "v0.0.19"
+    
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    
+    
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUR0ekNDQXArZ0F3SUJBZ0lSQUtoWXB3cHkxemFEZFZiSGJlc1J1R2N3RFFZSktvWklodmNOQVFFTEJRQXcKR3pFWk1CY0dBMVVFQXhNUWJXRnlhV0ZrWWkxdmNHVnlZWFJ2Y2pBZUZ3MHlNekE0TWpFd016STJNVGxhRncweQpOREE0TWpBd016STJNVGxhTURneE5qQTBCZ05WQkFNVExXMWhjbWxoWkdJdGIzQmxjbUYwYjNJdGQyVmlhRzl2CmF5NXRZWEpwWVdSaUxXOXdaWEpoZEc5eUxuTjJZekNDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0MKQVFvQ2dnRUJBTFpBWFM2Zlg3enpXd1picWFjODR2ZG5hTGMwY3praUE3YUpYN1lIWHNreitPcWx0UTZ2UVpWQgpoRTVJVGpVYkUrUXJ6Y2M5OStJejhZa25Rbkp5QzZDRVF3Ukk4a1VqdnRDOFkxK0xJY3BRS0xUeHVSaGpnUXVYCkswTHhPNXFwNDJBbmRCWHkzMm05VVgxNzhWZmhzRDZQMlc0bDBOVDZ6QUxWeitnOUhINXV1ZG9waVlLeFY0UHkKemY3c3NaNU1ZSVRRYmJRNWdIUFJmZC9lekFEamFCTjlpanoxbWhrczZpQ1NVR05wZ28wNXhPR2hxcCs0SUR0awpIOGhnS0oxend0WXlJYWtYbXZTdi85TjBiZ2V2RHQ1eDYvR0gvWTV0QmVmcDV0YjdnbWhNcUNhUkNEVkRXcGNBCmRSR0dSc01oTExtZ1M5Z0wrbXk2emhjMExTYjVPVWNDQXdFQUFhT0IyRENCMVRBT0JnTlZIUThCQWY4RUJBTUMKQmFBd0hRWURWUjBsQkJZd0ZBWUlLd1lCQlFVSEF3RUdDQ3NHQVFVRkJ3TUNNQXdHQTFVZEV3RUIvd1FDTUFBdwpId1lEVlIwakJCZ3dGb0FVQUlrenhzbE5WSjdVZEZ2ZUNqS0hWMnF5R3VZd2RRWURWUjBSQkc0d2JJSXRiV0Z5CmFXRmtZaTF2Y0dWeVlYUnZjaTEzWldKb2IyOXJMbTFoY21saFpHSXRiM0JsY21GMGIzSXVjM1pqZ2p0dFlYSnAKWVdSaUxXOXdaWEpoZEc5eUxYZGxZbWh2YjJzdWJXRnlhV0ZrWWkxdmNHVnlZWFJ2Y2k1emRtTXViV0Z5YVdGawpZaTVzYjJOaGJEQU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFwQkNjeVpnbDNlV0lmQjZTNURnMGVwVjQ3RzRrClV1TnJGVWxZRjZoQlM5dVR2cTgxdklULzVGeVRkNUhNZytMQmp6K0hsa3cyc3VuOG81UVROUHpldEg0V1ErNmQKSTlPdDUxbmJreks0Q1hKeWh6bG8rdlRSSEZPLzQ1RzgyNFQrZ2d2a3lnQWFMRm5oSEU4elF4S1ZacDZqYkZDcQpXcUEva2NlWWdPeUZoM0p3WmtUTlhTY0wvc2tTTVcwSENZaXdjSEprUFpsTDJQdkJ3NTNQNmtwZGtKQ25iVi83Cm9SN0dmSGdTb3p6eFk4QzM4YzkzNzRkL2Q0RFVsc3A2ZHFhclZnVEltbmJYbUtxZHl6aHdsMmlLemI3VGhVT1UKTFlCSk4wdEFtVG12Qk9MK0VOZmJxTGw1YUhPRElWb29tOHpsdkprOVdTVjVabEduN1E1TkxGOTFzUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+  tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBdGtCZExwOWZ2UE5iQmx1cHB6emk5MmRvdHpSek9TSUR0b2xmdGdkZXlUUDQ2cVcxCkRxOUJsVUdFVGtoT05Sc1Q1Q3ZOeHozMzRqUHhpU2RDY25JTG9JUkRCRWp5UlNPKzBMeGpYNHNoeWxBb3RQRzUKR0dPQkM1Y3JRdkU3bXFuallDZDBGZkxmYWIxUmZYdnhWK0d3UG8vWmJpWFExUHJNQXRYUDZEMGNmbTY1MmltSgpnckZYZy9MTi91eXhua3hnaE5CdHREbUFjOUY5Mzk3TUFPTm9FMzJLUFBXYUdTenFJSkpRWTJtQ2pUbkU0YUdxCm43Z2dPMlFmeUdBb25YUEMxaklocVJlYTlLLy8wM1J1QjY4TzNuSHI4WWY5am0wRjUrbm0xdnVDYUV5b0pwRUkKTlVOYWx3QjFFWVpHd3lFc3VhQkwyQXY2YkxyT0Z6UXRKdms1UndJREFRQUJBb0lCQVFDWjNlbE56VndreUVoWApLOWdseTIvTGRGQ2lLL1FEamtZWVBBN0VQYUMydWR3ekxzZVhxRHIwYWlYcmVYd2R0Y2lyWUpnUTJLNkpHVldZCmQ3N1BwSjFRWFptKzZsOHdKQ2ViVHhHT3ZvWStxa0pUMGFoMWdMeVlMbjVsdkFpWVlVb0lDZ2NsNkxEYU11MnoKeFlwU3FjWUVhNm9rSm1VVEN0Sm1xbUVuTDBENU05RGVYL1JBMkg5SEp0Q2dZaElYa1RiWUtHdXU2c3kzd3BpMAp1djU2S3I4WUZqdTVicW8wb3RRc3NqMVFzTmRpTng2d2tzMk1ReDdQR0xTQVhCTjBrRkdLTWd5cTE0N3AyUG51CmdkbGlZTlpPbTl6M3IxakVTeDBCaUJlV3RZS3A4RkxXVDRFMERTQ3NkU3ZJamZiOXB1dUF6K1FiZWs1ZkU1L0IKMEVEbkFsYVJBb0dCQU1yVXFRYU1nODBhK3VUTDA2aHQrZ3JONm9qMTJHQTFDNHEvZmpkQUx0R1B4RU51dzNRWApOSTh3cTlWRG5UTzVOVXh0bzNZOTJFQTA5OUxKSDl4S2JFVHN3aDJjNEVSazJJSWRzOEJBMWlhN2EycC9ST0MwCnRMY0dnV0pMTHBFSndRZjg0elJGVDR3YUc2NXJ6eWZTRjFhR2VCSFVqODN0VFhyK2dYblZ0KzNWQW9HQkFPWUcKc1NCOW5uRmhlUHNTYTVOV1E3UDVaY2RTQkpMTlEwdmhiVGRDTWJmWGtHNmt4QTk0SDhwSm1qMmhRNWhvWGt6TAowaXFUN3VnOXd2c1d1K3JjM3hsN0FlS1ZLdjY0Y21wVGZYRmdyWGVreS9OMkx5anY4cFRDcm14YzRUK0NUazdTCkxQbGplTzh4SUVzM0dXeHpnNkI1ajZQbnRwTGtNRzZuL1ZGajZleXJBb0dBRTFTdFAwaUpEelV4RURrMDFPcVcKV0ExRCt3V2pONWdXbjRTY25OdHJHdUhlektaenprNmYzYjIvd3JXTTkrOEEyMlhmbkZkTWt1SDVkSWRpbC9ZbgoxM0hSRmsxck9sbDZJUHgvc3lUNncvbzh4SXVZbnVuYUIwK0JhVUxORDFta29nUkNDeXRINTR4ZGN3UW5YQjR6Cnh6Vk5vRFZuOXpKVW5oSS9lTU1ib25rQ2dZQjRzTFlyQi80a0d6SncrWjg3OVIwY3h4UmgybVRQNmFjUG56M0EKcXBpUGp5a1hCSmhpVFhMUW5vR3hLSFhnOTVIUzFYWjJKSnhMZW14ZGRmWXZLcWhjSkRBL0JHbEVzTjVIYjNyNApDL080UE4xTjVvcWovaEhYZjdZbzRTckdPY2FBa01KTUw2YjZTVnBhWEpTWVZKdVJqWGFTVnpkeUp3eEtZeFlFCnFGbktkUUtCZ0huYnpTTGpHc0dTZ0t5QnNBSnZ1YXFndVlBbnducHNuWm8yOHVlTFBKcUEza0lEQTBDbTVwR2YKaXBBK3dKTEJHUXFjM3E3RVNTeGtOVngrOXViaDYrUXFDRTFPTFlkZHNYellVbUg1dml1YlJKMGZ1a00yNE5waQpCRzJrUnExRmdmUXBzbG44eEpSV3VKM3BzMXgydjIrTmt3QkhFdnljV2ZhMEFwN2FQaU9xCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+---
+# Source: mariadb-operator/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: mariadb-operator
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - create
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - delete
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - create
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  verbs:
+  - create
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - create
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - backups
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - backups/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - backups/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - connections
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - connections
+  - restores
+  verbs:
+  - create
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - connections/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - connections/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - databases
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - databases/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - databases/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - grants
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - grants/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - grants/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - mariadbs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - mariadbs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - mariadbs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - restores
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - restores/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - restores/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - sqljobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - sqljobs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - sqljobs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - users
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - users/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - mariadb.mmontes.io
+  resources:
+  - users/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  verbs:
+  - create
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - create
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  - rolebindings
+  - roles
+  verbs:
+  - create
+  - list
+  - patch
+  - watch
+---
+# Source: mariadb-operator/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: mariadb-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: mariadb-operator
+subjects:
+- kind: ServiceAccount
+  name: mariadb-operator
+  namespace: mariadb-operator
+---
+# Source: mariadb-operator/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: mariadb-operator:auth-delegator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+- kind: ServiceAccount
+  name: mariadb-operator
+  namespace: mariadb-operator
+---
+# Source: mariadb-operator/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mariadb-operator
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+# Source: mariadb-operator/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mariadb-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: mariadb-operator
+subjects:
+- kind: ServiceAccount
+  name: mariadb-operator
+  namespace: mariadb-operator
+---
+# Source: mariadb-operator/templates/webhook-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-operator-webhook
+  labels:
+    
+    helm.sh/chart: mariadb-operator-0.19.0
+    app.kubernetes.io/name: mariadb-operator-webhook
+    app.kubernetes.io/instance: mariadb-operator
+    
+    app.kubernetes.io/version: "v0.0.19"
+    
+    app.kubernetes.io/managed-by: Helm
+spec:
+  ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 10250
+  selector:
+    
+    app.kubernetes.io/name: mariadb-operator-webhook
+    app.kubernetes.io/instance: mariadb-operator
+---
+# Source: mariadb-operator/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-operator
+  labels:
+    
+    helm.sh/chart: mariadb-operator-0.19.0
+    app.kubernetes.io/name: mariadb-operator
+    app.kubernetes.io/instance: mariadb-operator
+    app.kubernetes.io/version: "v0.0.19"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: mariadb-operator
+      app.kubernetes.io/instance: mariadb-operator
+  template:
+    metadata:
+      
+      labels:
+        
+        app.kubernetes.io/name: mariadb-operator
+        app.kubernetes.io/instance: mariadb-operator
+    spec:
+      serviceAccountName: mariadb-operator
+      automountServiceAccountToken: true
+      terminationGracePeriodSeconds: 10
+      
+      
+      
+      
+      containers:
+        - image: "ghcr.io/mariadb-operator/mariadb-operator:v0.0.19"
+          imagePullPolicy: IfNotPresent
+          name: controller
+          args:
+            - --metrics-addr=:8080
+            - --log-level=INFO
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+              name: metrics
+          env: 
+            - name: CLUSTER_NAME
+              value: mariadb.local
+            - name: MARIADB_OPERATOR_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.serviceAccountName
+            - name: MARIADB_OPERATOR_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: MARIADB_OPERATOR_SA_PATH
+              value: /var/run/secrets/kubernetes.io/serviceaccount/token
+                    
+          resources:
+            
+            requests:
+              memory: 64Mi
+---
+# Source: mariadb-operator/templates/webhook-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-operator-webhook
+  labels:
+    
+    helm.sh/chart: mariadb-operator-0.19.0
+    app.kubernetes.io/name: mariadb-operator-webhook
+    app.kubernetes.io/instance: mariadb-operator
+    
+    app.kubernetes.io/version: "v0.0.19"
+    
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: mariadb-operator-webhook
+      app.kubernetes.io/instance: mariadb-operator
+  template:
+    metadata:
+      
+      labels:
+        
+        app.kubernetes.io/name: mariadb-operator-webhook
+        app.kubernetes.io/instance: mariadb-operator
+    spec:
+      serviceAccountName: mariadb-operator-webhook
+      automountServiceAccountToken: true
+      
+      
+      
+      
+      hostNetwork: false
+      containers:
+        - image: "ghcr.io/mariadb-operator/mariadb-operator:v0.0.19"
+          imagePullPolicy: IfNotPresent
+          name: webhook
+          args:
+            - webhook
+            - --cert-dir=/tmp/k8s-webhook-server/serving-certs
+            - --port=10250
+            - --metrics-addr=:8080
+            - --health-addr=:8081
+            - --log-level=INFO
+          ports:
+            - containerPort: 10250
+              protocol: TCP
+              name: https
+            - containerPort: 8080
+              protocol: TCP
+              name: metrics
+            - containerPort: 8081
+              protocol: TCP
+              name: health
+          volumeMounts:
+            - mountPath: /tmp/k8s-webhook-server/serving-certs
+              name: cert
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          
+          
+      volumes:
+        - name: cert
+          secret:
+            defaultMode: 420
+            secretName: mariadb-operator-webhook-default-cert
+---
+# Source: mariadb-operator/templates/webhook-config.yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: mariadb-operator-webhook
+  labels:
+    
+    helm.sh/chart: mariadb-operator-0.19.0
+    app.kubernetes.io/name: mariadb-operator-webhook
+    app.kubernetes.io/instance: mariadb-operator
+    
+    app.kubernetes.io/version: "v0.0.19"
+    
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    
+    
+    
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: mariadb-operator-webhook
+      namespace: mariadb-operator
+      path: /mutate-mariadb-mmontes-io-v1alpha1-mariadb
+    
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJVENDQWdtZ0F3SUJBZ0lRQnNRMy92TktNUnpVY0dEelVMbENTekFOQmdrcWhraUc5dzBCQVFzRkFEQWIKTVJrd0Z3WURWUVFERXhCdFlYSnBZV1JpTFc5d1pYSmhkRzl5TUI0WERUSXpNRGd5TVRBek1qWXhPVm9YRFRJMApNRGd5TURBek1qWXhPVm93R3pFWk1CY0dBMVVFQXhNUWJXRnlhV0ZrWWkxdmNHVnlZWFJ2Y2pDQ0FTSXdEUVlKCktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQUx3akhtYkpOZ2hGRndvSmtKOG5nYk9HVmdJRk1nNkkKcnVyRlFNQjFkWDRFRFlJSnk0b3MvdW05MDN1dDFBNkIwQ1NGdlpramtRKy9OZGdDOGxWY2VsZ1FSSjRyWXVCZwpHOElKOFp0VDNVY2M0TkR1Mnd0WS9XbHlkWUhUV2xUc1hoSnBXSmZxYlFDOE5mMmgwZGNXNHFSOStzUTNFQktECkFFUmhHejVmblVqbHBubVc0VzZWTnIyZDJBTWhYL05TYzJWOUNxQTlYMENhc3pqUVJqY2FJakcxWmRLL01Ya0oKdG9TLzQ5OUpzZFk0eERuTGxubG5EQkUramtscFlvOEJ1eDBiSGx5SndYWXhwd2tsbjN4a0tCMFIxTFBMbWxTOQpUSExPVHFpaXZiTzBpUWFURGpodW9Ub3I1S1VIMXRPQUxZTGtWSWR6Tkw0bFR6ejdDV3psRXlFQ0F3RUFBYU5oCk1GOHdEZ1lEVlIwUEFRSC9CQVFEQWdLa01CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUJCZ2dyQmdFRkJRY0QKQWpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJRQWlUUEd5VTFVbnRSMFc5NEtNb2RYYXJJYQo1akFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBQ0RXSkxQUWlrbExUUyt6VFoyRjRQQno1cUJZTmsxaDV3R093CmVxR0xnMHZ1M080djM0NVhIRlJYMkc0RnkzNEUvdGIzVGNnTjJzQThNNTVKRHQ1RTVwMGJ5bHc0YWE2aFdrd1oKdWNoOUhFUC9YZVdlMU5WY2dEZUdSUW5HRnRzQ1NwRllUcmJyMnhEMDYrRzZVTkFiYm14Z1poSFNNY2FEdmcxdwo1U2ZaL2laYmRDWHh4VTYyRHVGZ2VmM2haUkhDdXE1NStsdnpZNk9oeWJCNUs5SCsvQ29YM0xmK2YrS0RSd1E5CnB3NTFoWm9pdTFXa25rRlk5a2d5a0R3VGlmWVV4d1RCOUFxaVE4UXU2S1l3elNNak5vcHZFdC9tZlZzOHVwNUYKWS9TelRNZ1J0U3FmeTNhK3h6bitNclA2a1FXdi8xalZaSi8vcFJaU0FkVXA0aWpQdlE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+    
+  failurePolicy: Fail
+  name: mmariadb.kb.io
+  rules:
+  - apiGroups:
+    - mariadb.mmontes.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - mariadbs
+  sideEffects: None
+---
+# Source: mariadb-operator/templates/webhook-config.yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: mariadb-operator-webhook
+  labels:
+    
+    helm.sh/chart: mariadb-operator-0.19.0
+    app.kubernetes.io/name: mariadb-operator-webhook
+    app.kubernetes.io/instance: mariadb-operator
+    
+    app.kubernetes.io/version: "v0.0.19"
+    
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    
+    
+    
+webhooks:
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: mariadb-operator-webhook
+        namespace: mariadb-operator
+        path: /validate-mariadb-mmontes-io-v1alpha1-backup
+      
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJVENDQWdtZ0F3SUJBZ0lRQnNRMy92TktNUnpVY0dEelVMbENTekFOQmdrcWhraUc5dzBCQVFzRkFEQWIKTVJrd0Z3WURWUVFERXhCdFlYSnBZV1JpTFc5d1pYSmhkRzl5TUI0WERUSXpNRGd5TVRBek1qWXhPVm9YRFRJMApNRGd5TURBek1qWXhPVm93R3pFWk1CY0dBMVVFQXhNUWJXRnlhV0ZrWWkxdmNHVnlZWFJ2Y2pDQ0FTSXdEUVlKCktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQUx3akhtYkpOZ2hGRndvSmtKOG5nYk9HVmdJRk1nNkkKcnVyRlFNQjFkWDRFRFlJSnk0b3MvdW05MDN1dDFBNkIwQ1NGdlpramtRKy9OZGdDOGxWY2VsZ1FSSjRyWXVCZwpHOElKOFp0VDNVY2M0TkR1Mnd0WS9XbHlkWUhUV2xUc1hoSnBXSmZxYlFDOE5mMmgwZGNXNHFSOStzUTNFQktECkFFUmhHejVmblVqbHBubVc0VzZWTnIyZDJBTWhYL05TYzJWOUNxQTlYMENhc3pqUVJqY2FJakcxWmRLL01Ya0oKdG9TLzQ5OUpzZFk0eERuTGxubG5EQkUramtscFlvOEJ1eDBiSGx5SndYWXhwd2tsbjN4a0tCMFIxTFBMbWxTOQpUSExPVHFpaXZiTzBpUWFURGpodW9Ub3I1S1VIMXRPQUxZTGtWSWR6Tkw0bFR6ejdDV3psRXlFQ0F3RUFBYU5oCk1GOHdEZ1lEVlIwUEFRSC9CQVFEQWdLa01CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUJCZ2dyQmdFRkJRY0QKQWpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJRQWlUUEd5VTFVbnRSMFc5NEtNb2RYYXJJYQo1akFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBQ0RXSkxQUWlrbExUUyt6VFoyRjRQQno1cUJZTmsxaDV3R093CmVxR0xnMHZ1M080djM0NVhIRlJYMkc0RnkzNEUvdGIzVGNnTjJzQThNNTVKRHQ1RTVwMGJ5bHc0YWE2aFdrd1oKdWNoOUhFUC9YZVdlMU5WY2dEZUdSUW5HRnRzQ1NwRllUcmJyMnhEMDYrRzZVTkFiYm14Z1poSFNNY2FEdmcxdwo1U2ZaL2laYmRDWHh4VTYyRHVGZ2VmM2haUkhDdXE1NStsdnpZNk9oeWJCNUs5SCsvQ29YM0xmK2YrS0RSd1E5CnB3NTFoWm9pdTFXa25rRlk5a2d5a0R3VGlmWVV4d1RCOUFxaVE4UXU2S1l3elNNak5vcHZFdC9tZlZzOHVwNUYKWS9TelRNZ1J0U3FmeTNhK3h6bitNclA2a1FXdi8xalZaSi8vcFJaU0FkVXA0aWpQdlE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+      
+    failurePolicy: Fail
+    name: vbackup.kb.io
+    rules:
+      - apiGroups:
+          - mariadb.mmontes.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - backups
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: mariadb-operator-webhook
+        namespace: mariadb-operator
+        path: /validate-mariadb-mmontes-io-v1alpha1-connection
+      
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJVENDQWdtZ0F3SUJBZ0lRQnNRMy92TktNUnpVY0dEelVMbENTekFOQmdrcWhraUc5dzBCQVFzRkFEQWIKTVJrd0Z3WURWUVFERXhCdFlYSnBZV1JpTFc5d1pYSmhkRzl5TUI0WERUSXpNRGd5TVRBek1qWXhPVm9YRFRJMApNRGd5TURBek1qWXhPVm93R3pFWk1CY0dBMVVFQXhNUWJXRnlhV0ZrWWkxdmNHVnlZWFJ2Y2pDQ0FTSXdEUVlKCktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQUx3akhtYkpOZ2hGRndvSmtKOG5nYk9HVmdJRk1nNkkKcnVyRlFNQjFkWDRFRFlJSnk0b3MvdW05MDN1dDFBNkIwQ1NGdlpramtRKy9OZGdDOGxWY2VsZ1FSSjRyWXVCZwpHOElKOFp0VDNVY2M0TkR1Mnd0WS9XbHlkWUhUV2xUc1hoSnBXSmZxYlFDOE5mMmgwZGNXNHFSOStzUTNFQktECkFFUmhHejVmblVqbHBubVc0VzZWTnIyZDJBTWhYL05TYzJWOUNxQTlYMENhc3pqUVJqY2FJakcxWmRLL01Ya0oKdG9TLzQ5OUpzZFk0eERuTGxubG5EQkUramtscFlvOEJ1eDBiSGx5SndYWXhwd2tsbjN4a0tCMFIxTFBMbWxTOQpUSExPVHFpaXZiTzBpUWFURGpodW9Ub3I1S1VIMXRPQUxZTGtWSWR6Tkw0bFR6ejdDV3psRXlFQ0F3RUFBYU5oCk1GOHdEZ1lEVlIwUEFRSC9CQVFEQWdLa01CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUJCZ2dyQmdFRkJRY0QKQWpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJRQWlUUEd5VTFVbnRSMFc5NEtNb2RYYXJJYQo1akFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBQ0RXSkxQUWlrbExUUyt6VFoyRjRQQno1cUJZTmsxaDV3R093CmVxR0xnMHZ1M080djM0NVhIRlJYMkc0RnkzNEUvdGIzVGNnTjJzQThNNTVKRHQ1RTVwMGJ5bHc0YWE2aFdrd1oKdWNoOUhFUC9YZVdlMU5WY2dEZUdSUW5HRnRzQ1NwRllUcmJyMnhEMDYrRzZVTkFiYm14Z1poSFNNY2FEdmcxdwo1U2ZaL2laYmRDWHh4VTYyRHVGZ2VmM2haUkhDdXE1NStsdnpZNk9oeWJCNUs5SCsvQ29YM0xmK2YrS0RSd1E5CnB3NTFoWm9pdTFXa25rRlk5a2d5a0R3VGlmWVV4d1RCOUFxaVE4UXU2S1l3elNNak5vcHZFdC9tZlZzOHVwNUYKWS9TelRNZ1J0U3FmeTNhK3h6bitNclA2a1FXdi8xalZaSi8vcFJaU0FkVXA0aWpQdlE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+      
+    failurePolicy: Fail
+    name: vconnection.kb.io
+    rules:
+      - apiGroups:
+          - mariadb.mmontes.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - connections
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: mariadb-operator-webhook
+        namespace: mariadb-operator
+        path: /validate-mariadb-mmontes-io-v1alpha1-database
+      
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJVENDQWdtZ0F3SUJBZ0lRQnNRMy92TktNUnpVY0dEelVMbENTekFOQmdrcWhraUc5dzBCQVFzRkFEQWIKTVJrd0Z3WURWUVFERXhCdFlYSnBZV1JpTFc5d1pYSmhkRzl5TUI0WERUSXpNRGd5TVRBek1qWXhPVm9YRFRJMApNRGd5TURBek1qWXhPVm93R3pFWk1CY0dBMVVFQXhNUWJXRnlhV0ZrWWkxdmNHVnlZWFJ2Y2pDQ0FTSXdEUVlKCktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQUx3akhtYkpOZ2hGRndvSmtKOG5nYk9HVmdJRk1nNkkKcnVyRlFNQjFkWDRFRFlJSnk0b3MvdW05MDN1dDFBNkIwQ1NGdlpramtRKy9OZGdDOGxWY2VsZ1FSSjRyWXVCZwpHOElKOFp0VDNVY2M0TkR1Mnd0WS9XbHlkWUhUV2xUc1hoSnBXSmZxYlFDOE5mMmgwZGNXNHFSOStzUTNFQktECkFFUmhHejVmblVqbHBubVc0VzZWTnIyZDJBTWhYL05TYzJWOUNxQTlYMENhc3pqUVJqY2FJakcxWmRLL01Ya0oKdG9TLzQ5OUpzZFk0eERuTGxubG5EQkUramtscFlvOEJ1eDBiSGx5SndYWXhwd2tsbjN4a0tCMFIxTFBMbWxTOQpUSExPVHFpaXZiTzBpUWFURGpodW9Ub3I1S1VIMXRPQUxZTGtWSWR6Tkw0bFR6ejdDV3psRXlFQ0F3RUFBYU5oCk1GOHdEZ1lEVlIwUEFRSC9CQVFEQWdLa01CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUJCZ2dyQmdFRkJRY0QKQWpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJRQWlUUEd5VTFVbnRSMFc5NEtNb2RYYXJJYQo1akFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBQ0RXSkxQUWlrbExUUyt6VFoyRjRQQno1cUJZTmsxaDV3R093CmVxR0xnMHZ1M080djM0NVhIRlJYMkc0RnkzNEUvdGIzVGNnTjJzQThNNTVKRHQ1RTVwMGJ5bHc0YWE2aFdrd1oKdWNoOUhFUC9YZVdlMU5WY2dEZUdSUW5HRnRzQ1NwRllUcmJyMnhEMDYrRzZVTkFiYm14Z1poSFNNY2FEdmcxdwo1U2ZaL2laYmRDWHh4VTYyRHVGZ2VmM2haUkhDdXE1NStsdnpZNk9oeWJCNUs5SCsvQ29YM0xmK2YrS0RSd1E5CnB3NTFoWm9pdTFXa25rRlk5a2d5a0R3VGlmWVV4d1RCOUFxaVE4UXU2S1l3elNNak5vcHZFdC9tZlZzOHVwNUYKWS9TelRNZ1J0U3FmeTNhK3h6bitNclA2a1FXdi8xalZaSi8vcFJaU0FkVXA0aWpQdlE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+      
+    failurePolicy: Fail
+    name: vdatabase.kb.io
+    rules:
+      - apiGroups:
+          - mariadb.mmontes.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - databases
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: mariadb-operator-webhook
+        namespace: mariadb-operator
+        path: /validate-mariadb-mmontes-io-v1alpha1-grant
+      
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJVENDQWdtZ0F3SUJBZ0lRQnNRMy92TktNUnpVY0dEelVMbENTekFOQmdrcWhraUc5dzBCQVFzRkFEQWIKTVJrd0Z3WURWUVFERXhCdFlYSnBZV1JpTFc5d1pYSmhkRzl5TUI0WERUSXpNRGd5TVRBek1qWXhPVm9YRFRJMApNRGd5TURBek1qWXhPVm93R3pFWk1CY0dBMVVFQXhNUWJXRnlhV0ZrWWkxdmNHVnlZWFJ2Y2pDQ0FTSXdEUVlKCktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQUx3akhtYkpOZ2hGRndvSmtKOG5nYk9HVmdJRk1nNkkKcnVyRlFNQjFkWDRFRFlJSnk0b3MvdW05MDN1dDFBNkIwQ1NGdlpramtRKy9OZGdDOGxWY2VsZ1FSSjRyWXVCZwpHOElKOFp0VDNVY2M0TkR1Mnd0WS9XbHlkWUhUV2xUc1hoSnBXSmZxYlFDOE5mMmgwZGNXNHFSOStzUTNFQktECkFFUmhHejVmblVqbHBubVc0VzZWTnIyZDJBTWhYL05TYzJWOUNxQTlYMENhc3pqUVJqY2FJakcxWmRLL01Ya0oKdG9TLzQ5OUpzZFk0eERuTGxubG5EQkUramtscFlvOEJ1eDBiSGx5SndYWXhwd2tsbjN4a0tCMFIxTFBMbWxTOQpUSExPVHFpaXZiTzBpUWFURGpodW9Ub3I1S1VIMXRPQUxZTGtWSWR6Tkw0bFR6ejdDV3psRXlFQ0F3RUFBYU5oCk1GOHdEZ1lEVlIwUEFRSC9CQVFEQWdLa01CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUJCZ2dyQmdFRkJRY0QKQWpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJRQWlUUEd5VTFVbnRSMFc5NEtNb2RYYXJJYQo1akFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBQ0RXSkxQUWlrbExUUyt6VFoyRjRQQno1cUJZTmsxaDV3R093CmVxR0xnMHZ1M080djM0NVhIRlJYMkc0RnkzNEUvdGIzVGNnTjJzQThNNTVKRHQ1RTVwMGJ5bHc0YWE2aFdrd1oKdWNoOUhFUC9YZVdlMU5WY2dEZUdSUW5HRnRzQ1NwRllUcmJyMnhEMDYrRzZVTkFiYm14Z1poSFNNY2FEdmcxdwo1U2ZaL2laYmRDWHh4VTYyRHVGZ2VmM2haUkhDdXE1NStsdnpZNk9oeWJCNUs5SCsvQ29YM0xmK2YrS0RSd1E5CnB3NTFoWm9pdTFXa25rRlk5a2d5a0R3VGlmWVV4d1RCOUFxaVE4UXU2S1l3elNNak5vcHZFdC9tZlZzOHVwNUYKWS9TelRNZ1J0U3FmeTNhK3h6bitNclA2a1FXdi8xalZaSi8vcFJaU0FkVXA0aWpQdlE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+      
+    failurePolicy: Fail
+    name: vgrant.kb.io
+    rules:
+      - apiGroups:
+          - mariadb.mmontes.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - grants
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: mariadb-operator-webhook
+        namespace: mariadb-operator
+        path: /validate-mariadb-mmontes-io-v1alpha1-mariadb
+      
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJVENDQWdtZ0F3SUJBZ0lRQnNRMy92TktNUnpVY0dEelVMbENTekFOQmdrcWhraUc5dzBCQVFzRkFEQWIKTVJrd0Z3WURWUVFERXhCdFlYSnBZV1JpTFc5d1pYSmhkRzl5TUI0WERUSXpNRGd5TVRBek1qWXhPVm9YRFRJMApNRGd5TURBek1qWXhPVm93R3pFWk1CY0dBMVVFQXhNUWJXRnlhV0ZrWWkxdmNHVnlZWFJ2Y2pDQ0FTSXdEUVlKCktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQUx3akhtYkpOZ2hGRndvSmtKOG5nYk9HVmdJRk1nNkkKcnVyRlFNQjFkWDRFRFlJSnk0b3MvdW05MDN1dDFBNkIwQ1NGdlpramtRKy9OZGdDOGxWY2VsZ1FSSjRyWXVCZwpHOElKOFp0VDNVY2M0TkR1Mnd0WS9XbHlkWUhUV2xUc1hoSnBXSmZxYlFDOE5mMmgwZGNXNHFSOStzUTNFQktECkFFUmhHejVmblVqbHBubVc0VzZWTnIyZDJBTWhYL05TYzJWOUNxQTlYMENhc3pqUVJqY2FJakcxWmRLL01Ya0oKdG9TLzQ5OUpzZFk0eERuTGxubG5EQkUramtscFlvOEJ1eDBiSGx5SndYWXhwd2tsbjN4a0tCMFIxTFBMbWxTOQpUSExPVHFpaXZiTzBpUWFURGpodW9Ub3I1S1VIMXRPQUxZTGtWSWR6Tkw0bFR6ejdDV3psRXlFQ0F3RUFBYU5oCk1GOHdEZ1lEVlIwUEFRSC9CQVFEQWdLa01CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUJCZ2dyQmdFRkJRY0QKQWpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJRQWlUUEd5VTFVbnRSMFc5NEtNb2RYYXJJYQo1akFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBQ0RXSkxQUWlrbExUUyt6VFoyRjRQQno1cUJZTmsxaDV3R093CmVxR0xnMHZ1M080djM0NVhIRlJYMkc0RnkzNEUvdGIzVGNnTjJzQThNNTVKRHQ1RTVwMGJ5bHc0YWE2aFdrd1oKdWNoOUhFUC9YZVdlMU5WY2dEZUdSUW5HRnRzQ1NwRllUcmJyMnhEMDYrRzZVTkFiYm14Z1poSFNNY2FEdmcxdwo1U2ZaL2laYmRDWHh4VTYyRHVGZ2VmM2haUkhDdXE1NStsdnpZNk9oeWJCNUs5SCsvQ29YM0xmK2YrS0RSd1E5CnB3NTFoWm9pdTFXa25rRlk5a2d5a0R3VGlmWVV4d1RCOUFxaVE4UXU2S1l3elNNak5vcHZFdC9tZlZzOHVwNUYKWS9TelRNZ1J0U3FmeTNhK3h6bitNclA2a1FXdi8xalZaSi8vcFJaU0FkVXA0aWpQdlE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+      
+    failurePolicy: Fail
+    name: vmariadb.kb.io
+    rules:
+      - apiGroups:
+          - mariadb.mmontes.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - mariadbs
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: mariadb-operator-webhook
+        namespace: mariadb-operator
+        path: /validate-mariadb-mmontes-io-v1alpha1-restore
+      
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJVENDQWdtZ0F3SUJBZ0lRQnNRMy92TktNUnpVY0dEelVMbENTekFOQmdrcWhraUc5dzBCQVFzRkFEQWIKTVJrd0Z3WURWUVFERXhCdFlYSnBZV1JpTFc5d1pYSmhkRzl5TUI0WERUSXpNRGd5TVRBek1qWXhPVm9YRFRJMApNRGd5TURBek1qWXhPVm93R3pFWk1CY0dBMVVFQXhNUWJXRnlhV0ZrWWkxdmNHVnlZWFJ2Y2pDQ0FTSXdEUVlKCktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQUx3akhtYkpOZ2hGRndvSmtKOG5nYk9HVmdJRk1nNkkKcnVyRlFNQjFkWDRFRFlJSnk0b3MvdW05MDN1dDFBNkIwQ1NGdlpramtRKy9OZGdDOGxWY2VsZ1FSSjRyWXVCZwpHOElKOFp0VDNVY2M0TkR1Mnd0WS9XbHlkWUhUV2xUc1hoSnBXSmZxYlFDOE5mMmgwZGNXNHFSOStzUTNFQktECkFFUmhHejVmblVqbHBubVc0VzZWTnIyZDJBTWhYL05TYzJWOUNxQTlYMENhc3pqUVJqY2FJakcxWmRLL01Ya0oKdG9TLzQ5OUpzZFk0eERuTGxubG5EQkUramtscFlvOEJ1eDBiSGx5SndYWXhwd2tsbjN4a0tCMFIxTFBMbWxTOQpUSExPVHFpaXZiTzBpUWFURGpodW9Ub3I1S1VIMXRPQUxZTGtWSWR6Tkw0bFR6ejdDV3psRXlFQ0F3RUFBYU5oCk1GOHdEZ1lEVlIwUEFRSC9CQVFEQWdLa01CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUJCZ2dyQmdFRkJRY0QKQWpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJRQWlUUEd5VTFVbnRSMFc5NEtNb2RYYXJJYQo1akFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBQ0RXSkxQUWlrbExUUyt6VFoyRjRQQno1cUJZTmsxaDV3R093CmVxR0xnMHZ1M080djM0NVhIRlJYMkc0RnkzNEUvdGIzVGNnTjJzQThNNTVKRHQ1RTVwMGJ5bHc0YWE2aFdrd1oKdWNoOUhFUC9YZVdlMU5WY2dEZUdSUW5HRnRzQ1NwRllUcmJyMnhEMDYrRzZVTkFiYm14Z1poSFNNY2FEdmcxdwo1U2ZaL2laYmRDWHh4VTYyRHVGZ2VmM2haUkhDdXE1NStsdnpZNk9oeWJCNUs5SCsvQ29YM0xmK2YrS0RSd1E5CnB3NTFoWm9pdTFXa25rRlk5a2d5a0R3VGlmWVV4d1RCOUFxaVE4UXU2S1l3elNNak5vcHZFdC9tZlZzOHVwNUYKWS9TelRNZ1J0U3FmeTNhK3h6bitNclA2a1FXdi8xalZaSi8vcFJaU0FkVXA0aWpQdlE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+      
+    failurePolicy: Fail
+    name: vrestore.kb.io
+    rules:
+      - apiGroups:
+          - mariadb.mmontes.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - restores
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: mariadb-operator-webhook
+        namespace: mariadb-operator
+        path: /validate-mariadb-mmontes-io-v1alpha1-sqljob
+      
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJVENDQWdtZ0F3SUJBZ0lRQnNRMy92TktNUnpVY0dEelVMbENTekFOQmdrcWhraUc5dzBCQVFzRkFEQWIKTVJrd0Z3WURWUVFERXhCdFlYSnBZV1JpTFc5d1pYSmhkRzl5TUI0WERUSXpNRGd5TVRBek1qWXhPVm9YRFRJMApNRGd5TURBek1qWXhPVm93R3pFWk1CY0dBMVVFQXhNUWJXRnlhV0ZrWWkxdmNHVnlZWFJ2Y2pDQ0FTSXdEUVlKCktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQUx3akhtYkpOZ2hGRndvSmtKOG5nYk9HVmdJRk1nNkkKcnVyRlFNQjFkWDRFRFlJSnk0b3MvdW05MDN1dDFBNkIwQ1NGdlpramtRKy9OZGdDOGxWY2VsZ1FSSjRyWXVCZwpHOElKOFp0VDNVY2M0TkR1Mnd0WS9XbHlkWUhUV2xUc1hoSnBXSmZxYlFDOE5mMmgwZGNXNHFSOStzUTNFQktECkFFUmhHejVmblVqbHBubVc0VzZWTnIyZDJBTWhYL05TYzJWOUNxQTlYMENhc3pqUVJqY2FJakcxWmRLL01Ya0oKdG9TLzQ5OUpzZFk0eERuTGxubG5EQkUramtscFlvOEJ1eDBiSGx5SndYWXhwd2tsbjN4a0tCMFIxTFBMbWxTOQpUSExPVHFpaXZiTzBpUWFURGpodW9Ub3I1S1VIMXRPQUxZTGtWSWR6Tkw0bFR6ejdDV3psRXlFQ0F3RUFBYU5oCk1GOHdEZ1lEVlIwUEFRSC9CQVFEQWdLa01CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUJCZ2dyQmdFRkJRY0QKQWpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJRQWlUUEd5VTFVbnRSMFc5NEtNb2RYYXJJYQo1akFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBQ0RXSkxQUWlrbExUUyt6VFoyRjRQQno1cUJZTmsxaDV3R093CmVxR0xnMHZ1M080djM0NVhIRlJYMkc0RnkzNEUvdGIzVGNnTjJzQThNNTVKRHQ1RTVwMGJ5bHc0YWE2aFdrd1oKdWNoOUhFUC9YZVdlMU5WY2dEZUdSUW5HRnRzQ1NwRllUcmJyMnhEMDYrRzZVTkFiYm14Z1poSFNNY2FEdmcxdwo1U2ZaL2laYmRDWHh4VTYyRHVGZ2VmM2haUkhDdXE1NStsdnpZNk9oeWJCNUs5SCsvQ29YM0xmK2YrS0RSd1E5CnB3NTFoWm9pdTFXa25rRlk5a2d5a0R3VGlmWVV4d1RCOUFxaVE4UXU2S1l3elNNak5vcHZFdC9tZlZzOHVwNUYKWS9TelRNZ1J0U3FmeTNhK3h6bitNclA2a1FXdi8xalZaSi8vcFJaU0FkVXA0aWpQdlE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+      
+    failurePolicy: Fail
+    name: vsqljob.kb.io
+    rules:
+      - apiGroups:
+          - mariadb.mmontes.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - sqljobs
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: mariadb-operator-webhook
+        namespace: mariadb-operator
+        path: /validate-mariadb-mmontes-io-v1alpha1-user
+      
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJVENDQWdtZ0F3SUJBZ0lRQnNRMy92TktNUnpVY0dEelVMbENTekFOQmdrcWhraUc5dzBCQVFzRkFEQWIKTVJrd0Z3WURWUVFERXhCdFlYSnBZV1JpTFc5d1pYSmhkRzl5TUI0WERUSXpNRGd5TVRBek1qWXhPVm9YRFRJMApNRGd5TURBek1qWXhPVm93R3pFWk1CY0dBMVVFQXhNUWJXRnlhV0ZrWWkxdmNHVnlZWFJ2Y2pDQ0FTSXdEUVlKCktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQUx3akhtYkpOZ2hGRndvSmtKOG5nYk9HVmdJRk1nNkkKcnVyRlFNQjFkWDRFRFlJSnk0b3MvdW05MDN1dDFBNkIwQ1NGdlpramtRKy9OZGdDOGxWY2VsZ1FSSjRyWXVCZwpHOElKOFp0VDNVY2M0TkR1Mnd0WS9XbHlkWUhUV2xUc1hoSnBXSmZxYlFDOE5mMmgwZGNXNHFSOStzUTNFQktECkFFUmhHejVmblVqbHBubVc0VzZWTnIyZDJBTWhYL05TYzJWOUNxQTlYMENhc3pqUVJqY2FJakcxWmRLL01Ya0oKdG9TLzQ5OUpzZFk0eERuTGxubG5EQkUramtscFlvOEJ1eDBiSGx5SndYWXhwd2tsbjN4a0tCMFIxTFBMbWxTOQpUSExPVHFpaXZiTzBpUWFURGpodW9Ub3I1S1VIMXRPQUxZTGtWSWR6Tkw0bFR6ejdDV3psRXlFQ0F3RUFBYU5oCk1GOHdEZ1lEVlIwUEFRSC9CQVFEQWdLa01CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUJCZ2dyQmdFRkJRY0QKQWpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJRQWlUUEd5VTFVbnRSMFc5NEtNb2RYYXJJYQo1akFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBQ0RXSkxQUWlrbExUUyt6VFoyRjRQQno1cUJZTmsxaDV3R093CmVxR0xnMHZ1M080djM0NVhIRlJYMkc0RnkzNEUvdGIzVGNnTjJzQThNNTVKRHQ1RTVwMGJ5bHc0YWE2aFdrd1oKdWNoOUhFUC9YZVdlMU5WY2dEZUdSUW5HRnRzQ1NwRllUcmJyMnhEMDYrRzZVTkFiYm14Z1poSFNNY2FEdmcxdwo1U2ZaL2laYmRDWHh4VTYyRHVGZ2VmM2haUkhDdXE1NStsdnpZNk9oeWJCNUs5SCsvQ29YM0xmK2YrS0RSd1E5CnB3NTFoWm9pdTFXa25rRlk5a2d5a0R3VGlmWVV4d1RCOUFxaVE4UXU2S1l3elNNak5vcHZFdC9tZlZzOHVwNUYKWS9TelRNZ1J0U3FmeTNhK3h6bitNclA2a1FXdi8xalZaSi8vcFJaU0FkVXA0aWpQdlE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+      
+    failurePolicy: Fail
+    name: vuser.kb.io
+    rules:
+      - apiGroups:
+          - mariadb.mmontes.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - users
+    sideEffects: None
