@@ -16,10 +16,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 				<Logo className='auth-layout-app-logo' />
 				<Carousel
 					className='!m-0'
-					pagination
-					autoplay
-					loop
-					spaceBetween={10}
+					showArrows={false}
 					items={SLIDER_IMAGES.map(({ image, text }) => {
 						return {
 							element: <img src={image} alt={text} key={image} />,
