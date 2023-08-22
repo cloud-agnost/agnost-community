@@ -33,14 +33,59 @@ export const textRules = (type) => {
 					.optional()
 					.isInt({
 						min: 1,
-						max: config.get("general.maxTextFieldLength"),
 					})
 					.withMessage(
 						t(
-							"%Max length needs to be a positive integer between 1 - %s",
-							config.get("general.maxTextFieldLength")
+							"Max length needs to be a positive integer greater than or equal 1"
 						)
-					),
+					)
+					.bail()
+					.custom((value, { req }) => {
+						const { db } = req;
+						if (db.type === "MongoDB") return true;
+						else if (
+							db.type === "PostgreSQL" &&
+							value > config.get("general.PostgreSQLmaxTextFieldLength")
+						)
+							throw new AgnostError(
+								t(
+									"Max length cannot be larger than %s",
+									config.get("general.PostgreSQLmaxTextFieldLength")
+								)
+							);
+						else if (
+							db.type === "MySQL" &&
+							value > config.get("general.MySQLmaxTextFieldLength")
+						)
+							throw new AgnostError(
+								t(
+									"Max length cannot be larger than %s",
+									config.get("general.MySQLmaxTextFieldLength")
+								)
+							);
+						else if (
+							db.type === "SQL Server" &&
+							value > config.get("general.SQLServermaxTextFieldLength")
+						)
+							throw new AgnostError(
+								t(
+									"Max length cannot be larger than %s",
+									config.get("general.SQLServermaxTextFieldLength")
+								)
+							);
+						else if (
+							db.type === "Oracle" &&
+							value > config.get("general.OraclemaxTextFieldLength")
+						)
+							throw new AgnostError(
+								t(
+									"Max length cannot be larger than %s",
+									config.get("general.OraclemaxTextFieldLength")
+								)
+							);
+
+						return true;
+					}),
 			];
 		default:
 			return [];

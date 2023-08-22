@@ -83,7 +83,12 @@ router.post(
 					description,
 					schemaiid,
 					timestamps,
-					fields: modelCtrl.getDefaultFields(db.type, timestamps, user._id),
+					fields: modelCtrl.getDefaultFields(
+						db.type,
+						timestamps,
+						user._id,
+						"model"
+					),
 					createdBy: user._id,
 				},
 				{ cacheKey: modelId }
@@ -128,17 +133,20 @@ router.get(
 	async (req, res) => {
 		try {
 			const models = await modelCtrl.getManyByQuery(
-				{ dbId: req.db._id },
+				{ dbId: req.db._id, type: "model" },
 				{ sort: { name: 1 } }
 			);
 
+			res.json(models);
+
+			/* If we allow references to sub-model objects then below code is needed 			
 			res.json(
 				modelCtrl.getReferenceModelsList(models).sort((a, b) => {
 					if (a.name < b.name) return -1;
 					if (a.name > b.name) return 1;
 					return 0;
 				})
-			);
+			); */
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -769,14 +777,12 @@ router.post(
 					parentiid: model.iid,
 					schemaiid: model.schemaiid,
 					timestamps: pointer.timestamps,
-					fields:
-						type === "object-list"
-							? modelCtrl.getDefaultFields(
-									db.type,
-									pointer.timestamps,
-									user._id
-							  )
-							: [],
+					fields: modelCtrl.getDefaultFields(
+						db.type,
+						pointer.timestamps,
+						user._id,
+						type === "object" ? "sub-model-object" : "sub-model-list"
+					),
 					createdBy: user._id,
 				};
 

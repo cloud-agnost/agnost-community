@@ -13,7 +13,10 @@ class ModelController extends BaseController {
 	 * @param  {Object} timestamps The timestamps configuration of the model
 	 * @param  {string} userId The it the of the user who is creating the new model
 	 */
-	getDefaultFields(dbType, timestamps, userId) {
+	getDefaultFields(dbType, timestamps, userId, modelType) {
+		// We are not creating the default _id or parent fields for sub-model-object or sub-model-list
+		if (modelType !== "model") return [];
+
 		let fields = [];
 		let orderNumber = 10000;
 

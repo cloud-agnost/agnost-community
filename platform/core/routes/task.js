@@ -139,7 +139,7 @@ router.post(
 				versionId: version._id,
 			});
 
-			await envCtrl.pushObjectById(
+			const updatedEnv = await envCtrl.pushObjectById(
 				env._id,
 				"mappings",
 				{
@@ -178,6 +178,22 @@ router.post(
 					appId: app._id,
 					versionId: version._id,
 					taskId: task._id,
+				}
+			);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.environment",
+				"update",
+				t("Added the cron job '%s' resource mapping to the environment", name),
+				updatedEnv,
+				{
+					orgId: org._id,
+					appId: app._id,
+					versionId: version._id,
+					envId: env._id,
 				}
 			);
 		} catch (err) {
