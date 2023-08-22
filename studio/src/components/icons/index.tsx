@@ -19,6 +19,7 @@ export { default as Document } from './Document';
 export { default as DoubleGear } from './DoubleGear';
 export { default as EmptyBucket } from './EmptyBucket';
 export { default as EmptyEndpoint } from './EmptyEndpoint';
+export { default as EmptyFile } from './EmptyFile';
 export { default as EmptyQueue } from './EmptyQueue';
 export { default as EmptyTask } from './EmptyTask';
 export { default as Environment } from './Environment';

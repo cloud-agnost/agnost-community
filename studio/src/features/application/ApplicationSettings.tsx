@@ -26,7 +26,8 @@ interface InformationModal {
 export default function ApplicationSettings({ appId, appName, role }: ApplicationSettingsProps) {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
-	const canAppDelete = useAuthorizeApp({ role, key: 'app.delete' });
+	const canAppDelete = useAuthorizeApp({ role, key: 'delete' });
+	console.log('ApplicationSettingsProps', { role, canAppDelete });
 	const [modalInfo, setModalInfo] = useState<InformationModal>({
 		title: '',
 		description: '',
@@ -68,7 +69,7 @@ export default function ApplicationSettings({ appId, appName, role }: Applicatio
 								<CommandItem
 									id={setting.id}
 									key={setting.name}
-									disabled={HAS_PERMISSION[setting.permissionKey]}
+									disabled={!HAS_PERMISSION[setting.permissionKey]}
 									onSelect={() => {
 										setOpen(false);
 										if (setting.onClick)

@@ -7,7 +7,6 @@ export default function useRealtime() {
 		const cb = onChannelMessage('notification', (message) => {
 			const { data, object, action, identifiers, objecType, timestamp, message: log, id } = message;
 			const fn = realtimeObjectMapper(object ?? objecType);
-			console.log('realtime', message);
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			fn[action ?? 'info']({

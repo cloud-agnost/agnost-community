@@ -142,7 +142,6 @@ const useTaskStore = create<TaskStore>()(
 				},
 				setTaskLog: (taskId: string, log: string) => {
 					set((prev) => {
-						console.log(prev.taskLogs[taskId]);
 						return {
 							taskLogs: {
 								...prev.taskLogs,

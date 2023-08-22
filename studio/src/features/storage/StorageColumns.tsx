@@ -6,11 +6,11 @@ import useStorageStore from '@/store/storage/storageStore';
 import { ColumnDefWithClassName, Storage } from '@/types';
 import { translate } from '@/utils';
 import { Checkbox } from 'components/Checkbox';
-import { CopyButton } from 'components/CopyButton';
+import { Button } from 'components/Button';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 
-const MessageQueueColumns: ColumnDefWithClassName<Storage>[] = [
+const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 	{
 		id: 'select',
 		className: '!max-w-[40px] !w-[40px]',
@@ -31,25 +31,7 @@ const MessageQueueColumns: ColumnDefWithClassName<Storage>[] = [
 		enableSorting: false,
 		enableHiding: false,
 	},
-	{
-		id: 'iid',
-		header: translate('general.id').toUpperCase(),
-		accessorKey: 'iid',
-		sortingFn: 'textCaseSensitive',
-		className: '!max-w-[100px] !w-[100px]',
-		cell: ({
-			row: {
-				original: { iid },
-			},
-		}) => {
-			return (
-				<div className='flex items-center justify-between group'>
-					<span className='whitespace-nowrap'>{iid}</span>
-					<CopyButton text={iid} className='hidden group-hover:block' />
-				</div>
-			);
-		},
-	},
+
 	{
 		id: 'name',
 		header: ({ column }) => (
@@ -57,6 +39,21 @@ const MessageQueueColumns: ColumnDefWithClassName<Storage>[] = [
 		),
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
+		cell: ({ row: { original } }) => {
+			const { name } = original;
+			return (
+				<Button
+					variant='blank'
+					to={`${original._id}`}
+					onClick={() => {
+						useStorageStore.setState({ storage: original });
+					}}
+					className='link'
+				>
+					<span>{name}</span>
+				</Button>
+			);
+		},
 	},
 	{
 		id: 'instance',
@@ -150,4 +147,4 @@ const MessageQueueColumns: ColumnDefWithClassName<Storage>[] = [
 	},
 ];
 
-export default MessageQueueColumns;
+export default StorageColumns;

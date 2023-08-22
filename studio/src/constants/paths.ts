@@ -69,7 +69,11 @@ export const PATHS = {
 		editTask: `${path}/task/EditTask.tsx`,
 		taskLogs: `${path}/task/TaskLogs.tsx`,
 	},
-	storage: `${storagePath}/Storage.tsx`,
+	storage: {
+		storage: `${storagePath}/Storage.tsx`,
+		bucket: `${storagePath}/Bucket.tsx`,
+		files: `${storagePath}/Files.tsx`,
+	},
 	profileSettings: {
 		profileSettings: `${profilePath}/ProfileSettings.tsx`,
 		account: `${profilePath}/ProfileSettingsGeneral.tsx`,

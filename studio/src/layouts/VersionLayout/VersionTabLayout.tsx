@@ -36,6 +36,7 @@ export default function VersionTabLayout<T>({
 	openCreateModal,
 }: Props<T>) {
 	const [searchParams] = useSearchParams();
+
 	return (
 		<div className={cn(isEmpty && 'h-3/4 flex items-center justify-center')}>
 			{isEmpty ? (

@@ -40,12 +40,12 @@
 			@apply bg-elements-orange;
 		}
 	}
-	// &-gray {
-	// 	@apply bg-elements-subtle-gray dark:bg-elements-strong-gray;
-	// 	.badge-dot {
-	// 		@apply bg-elements-gray;
-	// 	}
-	// }
+	&-gray {
+		@apply dark:bg-lighter;
+		.badge-dot {
+			@apply bg-lighter;
+		}
+	}
 	&-rounded {
 		@apply rounded-full pr-2;
 	}

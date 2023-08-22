@@ -7,6 +7,7 @@ import cronstrue from 'cronstrue';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useOutletContext, useParams } from 'react-router-dom';
+
 EditTask.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { taskId, orgId, versionId, appId } = params;
 	if (!taskId) return null;
@@ -18,7 +19,7 @@ EditTask.loader = async ({ params }: LoaderFunctionArgs) => {
 		taskId: taskId as string,
 	});
 
-	return null;
+	return { props: {} };
 };
 
 export default function EditTask() {

@@ -12,6 +12,7 @@ const badgeVariants = cva('badge', {
 			purple: 'badge-purple',
 			red: 'badge-red',
 			orange: 'badge-orange',
+			gray: 'badge-gray',
 			default: 'badge',
 		},
 		rounded: {
@@ -24,7 +25,15 @@ const badgeVariants = cva('badge', {
 	},
 });
 
-export type BadgeColors = 'green' | 'blue' | 'yellow' | 'purple' | 'red' | 'orange';
+export type BadgeColors =
+	| 'green'
+	| 'blue'
+	| 'yellow'
+	| 'purple'
+	| 'red'
+	| 'orange'
+	| 'gray'
+	| 'default';
 
 interface BadgeProps {
 	variant?: BadgeColors;
@@ -36,7 +45,7 @@ interface BadgeProps {
 export default function Badge({ text, variant, rounded, onClear, className }: BadgeProps) {
 	return (
 		<div className={cn(badgeVariants({ variant, rounded }), 'badge', className)}>
-			{rounded && <div className='badge-dot' />}
+			{rounded && variant !== 'gray' && <div className='badge-dot' />}
 			<span className={cn('badge-text')}>{text}</span>
 			{onClear && (
 				<Button
