@@ -1,11 +1,27 @@
-import { axios } from '@/helpers';
+import { axios, http } from '@/helpers';
+import useStorageStore from '@/store/storage/storageStore';
 import {
+	Bucket,
+	BucketFile,
+	BucketFileWithCountInfo,
+	BucketWithCountInfo,
+	CreateBucketParams,
 	CreateStorageParams,
+	DeleteBucketParams,
+	DeleteFileFromBucketParams,
+	DeleteMultipleBucketParams,
+	DeleteMultipleFilesFromBucketParams,
 	DeleteMultipleStoragesParams,
 	DeleteStorageParams,
+	GetFilesParams,
+	GetStorageBuckets,
 	GetStorageByIdParams,
 	GetStoragesParams,
+	ReplaceFileInBucket,
+	UpdateBucketParams,
+	UpdateFileInBucketParams,
 	UpdateStorageParams,
+	UploadFileToBucketParams,
 } from '@/types';
 
 export default class StorageService {
@@ -58,5 +74,150 @@ export default class StorageService {
 				{ data: { storageIds } },
 			)
 		).data;
+	}
+
+	static async getStorageBuckets({
+		storageName,
+		...params
+	}: GetStorageBuckets): Promise<BucketWithCountInfo> {
+		return (
+			await http.get(`storage/${storageName}/bucket`, {
+				params,
+			})
+		).data;
+	}
+
+	static async createBucket({ storageName, ...data }: CreateBucketParams): Promise<Bucket> {
+		return (await http.post(`/storage/${storageName}/bucket`, data)).data;
+	}
+
+	static async deleteBucket({ storageName, bucketName }: DeleteBucketParams): Promise<void> {
+		return (await http.delete(`/storage/${storageName}/bucket/${bucketName}`)).data;
+	}
+
+	static async emptyBucket({ storageName, bucketName }: DeleteBucketParams): Promise<void> {
+		return (
+			await axios.delete(`/storage/${storageName}/bucket/${bucketName}/empty`, {
+				data: { name: bucketName },
+			})
+		).data;
+	}
+
+	static async deleteMultipleBuckets({
+		storageName,
+		bucketNames,
+	}: DeleteMultipleBucketParams): Promise<void> {
+		return (
+			await axios.delete(`/storage/${storageName}/bucket/delete-multi`, {
+				data: { bucketNames },
+			})
+		).data;
+	}
+
+	static async updateBucket({
+		storageName,
+		bucketName,
+		...data
+	}: UpdateBucketParams): Promise<Bucket> {
+		return (await http.put(`/storage/${storageName}/bucket/${bucketName}`, data)).data;
+	}
+
+	static async getFilesOfBucket({
+		storageName,
+		bucketName,
+		...params
+	}: GetFilesParams): Promise<BucketFileWithCountInfo> {
+		return (
+			await http.get(`storage/${storageName}/bucket/${bucketName}/file`, {
+				params,
+			})
+		).data;
+	}
+
+	static async uploadFileToBucket({
+		storageName,
+		bucketName,
+		...data
+	}: UploadFileToBucketParams): Promise<BucketFile[]> {
+		const formData = new FormData();
+		for (const file of data.files) {
+			formData.append('file', file);
+		}
+
+		return (
+			await http.post(`storage/${storageName}/bucket/${bucketName}/file`, formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
+				onUploadProgress: (progressEvent) => {
+					const uploadProgress = Math.round(
+						(progressEvent.loaded * 100) / Number(progressEvent.total),
+					);
+					useStorageStore.setState({ uploadProgress });
+				},
+			})
+		).data;
+	}
+
+	static async deleteFileFromBucket({
+		storageName,
+		bucketName,
+		filePath,
+	}: DeleteFileFromBucketParams): Promise<void> {
+		return (
+			await http.delete(`storage/${storageName}/bucket/${bucketName}/file`, {
+				data: { filePath },
+			})
+		).data;
+	}
+
+	static async deleteMultipleFilesFromBucket({
+		storageName,
+		bucketName,
+		filePaths,
+	}: DeleteMultipleFilesFromBucketParams): Promise<void> {
+		return (
+			await http.delete(`storage/${storageName}/bucket/${bucketName}/file/delete-multi`, {
+				data: { filePaths },
+			})
+		).data;
+	}
+
+	static async replaceFileInBucket({
+		storageName,
+		bucketName,
+		filePath,
+		...data
+	}: ReplaceFileInBucket): Promise<BucketFile> {
+		const formData = new FormData();
+		formData.append('file', data.file);
+		formData.append('filePath', filePath);
+		return (
+			await http.put(`storage/${storageName}/bucket/${bucketName}/file/replace`, formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
+			})
+		).data;
+	}
+
+	static async copyFileInBucket({
+		storageName,
+		bucketName,
+		filePath,
+	}: DeleteFileFromBucketParams): Promise<BucketFile> {
+		return (
+			await http.put(`storage/${storageName}/bucket/${bucketName}/file/copy`, {
+				filePath,
+			})
+		).data;
+	}
+
+	static async updateFileInBucket({
+		storageName,
+		bucketName,
+		...data
+	}: UpdateFileInBucketParams): Promise<BucketFile> {
+		return (await http.put(`storage/${storageName}/bucket/${bucketName}/file`, data)).data;
 	}
 }

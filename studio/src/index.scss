@@ -328,6 +328,9 @@
 	.slideOutRight {
 		animation: slideOutRight 0.5s forwards;
 	}
+	.link {
+		@apply text-brand-primary hover:underline font-sfCompact text-sm;
+	}
 }
 
 .Toastify {

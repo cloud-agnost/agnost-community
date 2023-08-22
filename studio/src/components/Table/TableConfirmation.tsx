@@ -37,7 +37,7 @@ export function TableConfirmation({
 	}
 	const hasVersionPermission = useAuthorizeVersion(authorizedKey as string);
 	const hasOrgPermission = useAuthorizeOrg(authorizedKey as string);
-	// const appDisabled = useAuthorizeApp(authorizedKey as string);
+	//Todo? const appDisabled = useAuthorizeApp(authorizedKey as string);
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>

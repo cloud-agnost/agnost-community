@@ -118,7 +118,15 @@ const router = createBrowserRouter([
 												children: [
 													{
 														index: true,
-														lazy: () => lazyRouteImport(PATHS.storage),
+														lazy: () => lazyRouteImport(PATHS.storage.storage),
+													},
+													{
+														path: ':storageId',
+														lazy: () => lazyRouteImport(PATHS.storage.bucket),
+													},
+													{
+														path: ':storageId/bucket/:bucketName',
+														lazy: () => lazyRouteImport(PATHS.storage.files),
 													},
 												],
 											},

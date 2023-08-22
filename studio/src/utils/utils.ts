@@ -205,7 +205,6 @@ export const getAppPermission = (userRole: AppRoles, path: string) => {
 	if (userPermissions[userRole]) {
 		const currentPermissions = userPermissions[userRole];
 		const permission = getPermission(currentPermissions, pathParts);
-		console.log(permission);
 		return permission;
 	}
 	return undefined;
@@ -223,3 +222,12 @@ export const getOrgPermission = (path: string) => {
 	}
 	return undefined;
 };
+export function formatFileSize(bytes: number): string {
+	if (bytes === 0) return '0 Bytes';
+
+	const units: string[] = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+	const base = 1024;
+	const exponent: number = Math.floor(Math.log(bytes) / Math.log(base));
+
+	return parseFloat((bytes / Math.pow(base, exponent)).toFixed(2)) + ' ' + units[exponent];
+}
