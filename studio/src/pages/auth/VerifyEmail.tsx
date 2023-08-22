@@ -1,19 +1,19 @@
-import { Description } from '@/components/Description';
-import { AuthLayout } from '@/layouts/AuthLayout';
-import './auth.scss';
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
+import { Description } from '@/components/Description';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
 import { VerificationCodeInput } from '@/components/VerificationCodeInput';
-import { useSearchParams } from 'react-router-dom';
+import { AuthLayout } from '@/layouts/AuthLayout';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { APIError } from '@/types';
-import { useState } from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { translate } from '@/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
+import * as z from 'zod';
+import './auth.scss';
 
 async function loader(params: any) {
 	console.log(params);

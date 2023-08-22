@@ -6,7 +6,12 @@ import useTypeStore from '@/store/types/typeStore';
 import { APIError, AppMembers } from '@/types/type';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+
 async function loader() {
+	const { isTypesOk, getAllTypes } = useTypeStore.getState();
+	if (!isTypesOk) {
+		getAllTypes();
+	}
 	return null;
 }
 
@@ -17,6 +22,7 @@ export default function InviteTeamMembers() {
 	const { appRoles } = useTypeStore();
 	const { t } = useTranslation();
 	const navigate = useNavigate();
+	const { t } = useTranslation();
 
 	async function onSubmit(data: { member: AppMembers[] }, setError: (error: APIError) => void) {
 		const appMembers = data.member.filter((item) => item.email !== '' && item.role !== '');
@@ -35,7 +41,6 @@ export default function InviteTeamMembers() {
 			setError(res);
 			return;
 		}
-		navigate('/organization');
 	}
 
 	return (

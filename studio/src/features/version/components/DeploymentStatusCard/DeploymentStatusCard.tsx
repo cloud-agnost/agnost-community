@@ -1,11 +1,3 @@
-import * as React from 'react';
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import { cn } from '@/utils';
-import { Button } from 'components/Button';
-import { ReactNode, useEffect, useState } from 'react';
-import './deploymentStatusCard.scss';
-import { useTranslation } from 'react-i18next';
-import { GearSix } from '@phosphor-icons/react';
 import {
 	DeploymentLogsDrawer,
 	DeploymentSettings,
@@ -13,8 +5,16 @@ import {
 	LastDeployment,
 	Resources,
 } from '@/features/version/components/DeploymentStatusCard/';
-import { useAnimate } from 'framer-motion';
+import { cn } from '@/utils';
+import { GearSix } from '@phosphor-icons/react';
+import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
+import { Button } from 'components/Button';
 import { ScrollArea, ScrollBar } from 'components/ScrollArea';
+import { useAnimate } from 'framer-motion';
+import * as React from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import './deploymentStatusCard.scss';
 
 const logs = [
 	{
