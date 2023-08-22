@@ -3,66 +3,113 @@ import { devtools, persist } from 'zustand/middleware';
 import { create } from 'zustand';
 
 interface TabStore {
-	tabs: Tab[];
-	currentTab: Tab | null;
-	removeAllTabs: () => void;
-	removeAllTabsExcept: (id: string) => void;
-	setCurrentTab: (tab: Tab | null) => void;
-	removeTab: (id: string) => string | undefined;
-	addTab: (tab: Omit<Tab, 'id'>) => void;
-	getTabByPath: (path: string) => Tab | undefined;
-	getTabById: (id: string) => Tab | undefined;
-	getPreviousTab: (currentTabId: string) => Tab | undefined;
+	tabs: Record<string, Tab[]>;
+	removeAllTabs: (versionId: string) => void;
+	removeAllTabsExcept: (versionId: string) => void;
+	setCurrentTab: (versionId: string, id: number) => void;
+	removeTab: (versionId: string, id: number) => string | undefined;
+	addTab: (versionId: string, tab: Tab) => void;
+	getTabByPath: (versionId: string, path: string) => Tab | undefined;
+	getTabById: (versionId: string, id: number) => Tab | undefined;
+	getPreviousTab: (versionId: string, currentTabId: number) => Tab | undefined;
+	getTabsByVersionId: (versionId: string) => Tab[];
+	getCurrentTab: (versionId: string) => Tab | null;
+	getCurrentTabId: (versionId: string) => number | undefined;
 }
 
 const useTabStore = create<TabStore>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				tabs: [],
-				currentTab: null,
-				removeTab: (id: string) => {
-					const prevPath = get().getPreviousTab(id)?.path;
-
-					set((state) => ({
-						tabs: state.tabs.filter((tab) => tab.id !== id),
-					}));
-
-					return prevPath;
+				tabs: {},
+				getCurrentTabId: (versionId: string) => {
+					const tabs = get().tabs[versionId] ?? [];
+					return tabs?.findIndex((tab) => tab.isActive);
 				},
-				addTab: (tab) => {
-					if (get().getTabByPath(tab.path)) return;
+				getCurrentTab: (versionId: string) => {
+					const tabs = get().tabs[versionId] ?? [];
+					return tabs?.find((tab) => tab.isActive) ?? null;
+				},
+				getTabsByVersionId: (versionId: string) => {
+					return get().tabs[versionId] ?? [];
+				},
+				removeTab: (versionId: string, id: number) => {
+					const tabs = get().tabs[versionId];
+					if (!tabs) return;
 
-					const newTab = tab as Tab;
-					newTab.id = crypto.randomUUID();
-
+					const prev = get().getPreviousTab(versionId, id)?.path;
+					const newTabs = tabs.filter((_, index) => index !== id);
 					set((state) => {
 						return {
-							tabs: [...state.tabs, newTab],
+							tabs: {
+								...state.tabs,
+								[versionId]: newTabs,
+							},
+						};
+					});
+
+					return prev;
+				},
+				addTab: (versionId, tab) => {
+					set((state) => {
+						const tabs = state.tabs[versionId] ?? [];
+						return {
+							tabs: {
+								...state.tabs,
+								[versionId]: [...tabs, tab],
+							},
 						};
 					});
 				},
-				getTabByPath: (path: string) => {
-					return get().tabs.find((tab) => tab.path === path);
+				getTabByPath: (versionId, path) => {
+					const tabs = get().tabs[versionId] ?? [];
+					return tabs.find((tab) => tab.path === path);
 				},
-				getTabById: (id: string) => {
-					return get().tabs.find((tab) => tab.id === id);
+				getTabById: (versionId, id) => {
+					return get().tabs[versionId][id];
 				},
-				getPreviousTab: (currentTabId: string) => {
-					const currentTabIndex = get().tabs.findIndex((tab) => tab.id === currentTabId);
+				getPreviousTab: (versionId, currentTabId) => {
+					const tabs = get().tabs[versionId] ?? [];
+					const currentTabIndex = tabs.findIndex((_, index) => index === currentTabId);
 					if (currentTabIndex === -1) return;
-					return get().tabs[currentTabIndex - 1];
+					return tabs[currentTabIndex - 1];
 				},
-				removeAllTabs: () => {
-					set({ tabs: [] });
+				removeAllTabs: (versionId) => {
+					set((state) => {
+						const tabs = state.tabs[versionId] ?? [];
+						return {
+							tabs: {
+								...state.tabs,
+								[versionId]: tabs.filter((tab) => tab.isDashboard),
+							},
+						};
+					});
 				},
-				removeAllTabsExcept: (id: string) => {
-					set((state) => ({
-						tabs: state.tabs.filter((tab) => tab.id === id),
-					}));
+				removeAllTabsExcept: (versionId) => {
+					set((state) => {
+						const tabs = state.tabs[versionId] ?? [];
+						const newTabs = tabs.filter((tab) => tab.isDashboard || tab.isActive);
+						return {
+							tabs: {
+								...state.tabs,
+								[versionId]: newTabs,
+							},
+						};
+					});
 				},
-				setCurrentTab: (tab) => {
-					set({ currentTab: tab });
+				setCurrentTab: (versionId, id: number) => {
+					set((state) => {
+						const tabs = state.tabs[versionId] ?? [];
+						return {
+							tabs: {
+								...state.tabs,
+								[versionId]: tabs.map((t, index) => ({
+									...t,
+									isActive: index === id,
+								})),
+							},
+						};
+					});
 				},
 			}),
 			{
