@@ -1555,18 +1555,22 @@ export class StorageBase {
 				);
 
 			const newPathSanitized = helper.removeLeadingAndTrailingSlash(newPath);
-			const destFileObj = await this.getFileMetadata(
-				bucketObj.id,
-				newPathSanitized
-			);
-			if (destFileObj)
-				throw new AgnostError(
-					t(
-						"There is already a file '%s' under bucket '%s'. You cannot move a file to a new path that is already in use by another file.",
-						newPath,
-						bucketName
-					)
+			// If the path changed then check whether there is already a file with the same name
+			if (fileObj.path !== newPathSanitized) {
+				const destFileObj = await this.getFileMetadata(
+					bucketObj.id,
+					newPathSanitized
 				);
+
+				if (destFileObj)
+					throw new AgnostError(
+						t(
+							"There is already a file '%s' under bucket '%s'. You cannot rename a file to a new path that is already in use by another file.",
+							newPath,
+							bucketName
+						)
+					);
+			}
 
 			const updatedAt = new Date();
 			const updatedFile = await this.updateFileMetadata(fileObj.id, {

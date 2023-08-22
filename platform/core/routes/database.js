@@ -91,7 +91,7 @@ router.post(
 				versionId: version._id,
 			});
 
-			await envCtrl.pushObjectById(
+			const updatedEnv = await envCtrl.pushObjectById(
 				env._id,
 				"mappings",
 				{
@@ -126,6 +126,22 @@ router.post(
 				t("Created a new '%s' database '%s'", type, name),
 				db,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.environment",
+				"update",
+				t("Added the database '%s' resource mapping to the environment", name),
+				updatedEnv,
+				{
+					orgId: org._id,
+					appId: app._id,
+					versionId: version._id,
+					envId: env._id,
+				}
 			);
 		} catch (err) {
 			await dbCtrl.rollback(session);
