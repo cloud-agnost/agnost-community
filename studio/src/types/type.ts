@@ -42,7 +42,7 @@ export type APIError = {
 };
 export type User = z.infer<typeof UserSchema>;
 
-export interface UserDataToRegister {
+export interface UserDataToRegister extends BaseRequest {
 	name: string;
 	email: string;
 	password: string;
