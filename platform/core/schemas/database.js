@@ -187,6 +187,14 @@ export const applyRules = (type) => {
 					.isBoolean()
 					.withMessage(t("Not a valid boolean value"))
 					.toBoolean(),
+				body("assignUniqueName")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
 				body("resourceId")
 					.trim()
 					.notEmpty()

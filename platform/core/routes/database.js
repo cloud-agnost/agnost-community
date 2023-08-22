@@ -63,7 +63,7 @@ router.post(
 		const session = await dbCtrl.startSession();
 		try {
 			const { org, user, app, version, resource } = req;
-			const { name, type, managed } = req.body;
+			const { name, type, managed, assignUniqueName } = req.body;
 
 			// Create the database
 			let dbId = helper.generateId();
@@ -77,6 +77,7 @@ router.post(
 					iid: dbiid,
 					name,
 					type,
+					assignUniqueName,
 					managed,
 					createdBy: user._id,
 				},

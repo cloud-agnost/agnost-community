@@ -281,7 +281,7 @@ class VersionController extends BaseController {
 		// Copy endpoints to the new version
 		if (endpoints && endpoints.length > 0) {
 			endpoints.forEach((endpoint) => {
-				endpoints.versionId = versionId;
+				endpoint.versionId = versionId;
 				delete endpoint._id;
 			});
 
@@ -328,6 +328,20 @@ class VersionController extends BaseController {
 			});
 
 			await taskCtrl.createMany(tasks, { session });
+		}
+
+		// Copy storages
+		const storages = await storageCtrl.getManyByQuery({
+			versionId: parentVersion._id,
+		});
+		// Copy taks to the new version
+		if (storages && storages.length > 0) {
+			storages.forEach((storage) => {
+				storage.versionId = versionId;
+				delete storage._id;
+			});
+
+			await storageCtrl.createMany(storages, { session });
 		}
 
 		return {

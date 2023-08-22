@@ -697,7 +697,7 @@ export class StorageBase {
 		}
 
 		const query = { bucketId: bucketObj.id };
-		if (search) query.name = { $regex: search, $options: "i" };
+		if (search) query.path = { $regex: search, $options: "i" };
 		const skip = pageSize * (pageNumber - 1);
 
 		// Get connection to storage metadata database

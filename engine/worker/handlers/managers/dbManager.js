@@ -54,6 +54,13 @@ export class DBManager {
     }
 
     /**
+     * Returns whether the database should assign a unique name or use the name given when being created in Agnost studio
+     */
+    getAssignUniqueName() {
+        return this.dbConfig.assignUniqueName ?? true;
+    }
+
+    /**
      * Returns the database resource access settings
      */
     getResourceAccessSettings() {

@@ -186,7 +186,7 @@ function turnOnLogging(debugChannel, id, objectType) {
 	console.stddebug = console.debug.bind(console);
 	console.stdwarn = console.warn.bind(console);
 
-	const debugLogger = (type, debugChannel, id, objecType) => {
+	const debugLogger = (type, debugChannel, id, objectType) => {
 		return function () {
 			var args = [];
 			Array.from(arguments).forEach((arg) => {
@@ -209,11 +209,11 @@ function turnOnLogging(debugChannel, id, objectType) {
 	};
 
 	// Override the console output methods
-	console.log = debugLogger("log", debugChannel, id, objecType);
-	console.info = debugLogger("info", debugChannel, id, objecType);
-	console.debug = debugLogger("debug", debugChannel, id, objecType);
-	console.error = debugLogger("error", debugChannel, id, objecType);
-	console.warn = debugLogger("warn", debugChannel, id, objecType);
+	console.log = debugLogger("log", debugChannel, id, objectType);
+	console.info = debugLogger("info", debugChannel, id, objectType);
+	console.debug = debugLogger("debug", debugChannel, id, objectType);
+	console.error = debugLogger("error", debugChannel, id, objectType);
+	console.warn = debugLogger("warn", debugChannel, id, objectType);
 }
 
 /**
