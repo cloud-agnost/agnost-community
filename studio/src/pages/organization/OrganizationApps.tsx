@@ -1,7 +1,7 @@
 import { Button, ButtonGroup } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { SearchInput } from '@/components/SearchInput';
-import { List, SquaresFour } from '@/components/icons';
+import { EmptyApps, List, SquaresFour } from '@/components/icons';
 import { ApplicationCard } from '@/features/application';
 import AppInviteMember from '@/features/application/AppInviteMember';
 import ApplicationTable from '@/features/application/ApplicationTable/ApplicationTable';
@@ -83,7 +83,7 @@ export default function OrganizationApps() {
 					)}
 				</div>
 			) : (
-				<EmptyState title={t('application.empty')}>
+				<EmptyState title={t('application.empty')} icon={<EmptyApps className='w-44 h-44' />}>
 					<CreateApplicationButton disabled={!canAppCreate} />
 				</EmptyState>
 			)}
