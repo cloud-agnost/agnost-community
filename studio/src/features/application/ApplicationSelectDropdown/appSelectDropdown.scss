@@ -1,15 +1,3 @@
-.create-button {
-	@apply w-32 h-32 rounded-3xl;
-	&-container {
-		@apply h-full flex flex-col items-center gap-4;
-	}
-	&-icon {
-		@apply text-icon-disabled;
-	}
-	&-label {
-		@apply text-default text-xl font-semibold;
-	}
-}
 .application {
 	@apply overflow-hidden;
 	&-form {
