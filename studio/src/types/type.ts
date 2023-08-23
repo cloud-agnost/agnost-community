@@ -222,7 +222,7 @@ export interface RealtimeIdentifiers {
 	queueId?: string;
 }
 export interface RealtimeData<T> {
-	actor: Partial<User>;
+	actor: Partial<User> & { userId: string };
 	action: RealtimeActionTypes;
 	object: RealtimeObjectTypes;
 	objectType: RealtimeObjectTypes;
@@ -233,7 +233,6 @@ export interface RealtimeData<T> {
 	id: string;
 	message: string;
 	type: string;
-	objecType: any;
 }
 export interface RealtimeActionParams<T> {
 	data: T;

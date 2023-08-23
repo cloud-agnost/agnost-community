@@ -1,13 +1,14 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Badge } from '@/components/Badge';
+import { Button } from '@/components/Button';
 import { SortButton } from '@/components/DataTable';
 import { Refresh } from '@/components/icons';
 import { ApplicationSettings, ApplicationTeam } from '@/features/application';
+import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
-import { AppRoles, Application } from '@/types';
-import { translate, getRelativeTime } from '@/utils';
-import { ColumnDef } from '@tanstack/react-table';
-export const ApplicationColumns: ColumnDef<Application>[] = [
+import { AppRoles, Application, ColumnDefWithClassName } from '@/types';
+import { getRelativeTime, translate } from '@/utils';
+export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 	{
 		id: 'name',
 		header: ({ column }) => (
@@ -24,7 +25,15 @@ export const ApplicationColumns: ColumnDef<Application>[] = [
 						<AvatarImage src={pictureUrl} />
 						<AvatarFallback name={name} color={color} />
 					</Avatar>
-					<span className='ml-2'>{name}</span>
+					<Button
+						variant='blank'
+						onClick={() => {
+							useApplicationStore.getState().openVersionDrawer(row.original);
+						}}
+						className='ml-2 link'
+					>
+						{name}
+					</Button>
 				</div>
 			);
 		},
@@ -68,11 +77,13 @@ export const ApplicationColumns: ColumnDef<Application>[] = [
 	},
 	{
 		id: 'actions',
+		className: 'actions !w-[50px]',
 		cell: ({ row }) => {
 			const { _id, name, team } = row.original;
-			const me = team.find((member) => member._id === useAuthStore.getState().user?._id);
+			const user = useAuthStore.getState().user;
+			const me = team.find((member) => member.userId._id === user?._id);
 			return (
-				<div className='text-center'>
+				<div className='text-center action'>
 					<ApplicationSettings appId={_id} appName={name} role={me?.role as AppRoles} />
 				</div>
 			);
