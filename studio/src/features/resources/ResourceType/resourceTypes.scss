@@ -8,7 +8,7 @@
 			@apply grid-cols-3;
 		}
 		&-item {
-			@apply mb-2;
+			@apply mb-2 absolute invisible;
 		}
 	}
 	&-label {
@@ -26,7 +26,7 @@
 		@apply font-sfCompact text-sm whitespace-nowrap;
 	}
 	&-item {
-		@apply border border-border p-2 rounded flex-1;
+		@apply border border-border rounded flex-1 p-4;
 		&.active {
 			@apply border-2 bg-surface-dark-blue border-button-primary;
 		}
