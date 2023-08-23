@@ -8,17 +8,33 @@ export default class Bool extends Field {
         [DATABASE.SQLServer]: "{NAME} {TYPE} {REQUIRED} {DEFAULT_VALUE}",
     };
 
+    defaultMap = {
+        [DATABASE.PostgreSQL]: " DEFAULT {DEFAULT_VALUE}",
+        [DATABASE.MySQL]: " DEFAULT {DEFAULT_VALUE}",
+        [DATABASE.SQLServer]: " CONSTRAINT DC_{CONSTRAINT_NAME} DEFAULT {DEFAULT_VALUE}",
+    };
+
     getDefaultValue() {
+        const defaultValue = super.getDefaultValue();
+        const isBool = typeof defaultValue === "boolean";
+        if (!isBool) return;
+
+        if (this.type === DATABASE.SQLServer) return super.getDefaultValue() ? "1" : "0";
         return super.getDefaultValue() ? "true" : "false";
     }
 
     toDefinitionQuery() {
-        const schema = this.createMap[this.type];
+        let schema = this.createMap[this.type];
+
+        if (this.getDefaultValue()) {
+            schema = schema.replace("{DEFAULT_VALUE}", this.defaultMap[this.getDatabaseType()]);
+        }
 
         return schema
             .replace("{NAME}", this.getName())
             .replace("{TYPE}", this.getDbType())
-            .replace("{DEFAULT_VALUE}", this.getDefaultValue() ? `DEFAULT ${this.getDefaultValue()}` : "")
+            .replace("{DEFAULT_VALUE}", this.getDefaultValue() ?? "")
+            .replace("{CONSTRAINT_NAME}", this.getIid().replaceAll("-", "_"))
             .replace("{REQUIRED}", this.isRequired() ? "NOT NULL" : "NULL");
     }
 }

@@ -488,4 +488,21 @@ DROP PROCEDURE IF EXISTS ${name};`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
+
+    addDefaultValues(model, field, returnQuery = false) {
+        const isString = typeof field.defaultValue === "string";
+        const isNumber = isString && !isNaN(Number(field.defaultValue));
+        const defaultValue = isString && !isNumber ? `'${field.defaultValue}'` : field.defaultValue;
+
+        const SQL = `ALTER TABLE ${model.name} ALTER ${field.name} SET DEFAULT ${defaultValue};`;
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    removeDefaultValues(model, field, returnQuery = false) {
+        const SQL = `ALTER TABLE ${model.name} ALTER ${field.name} DROP DEFAULT;`;
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
 }

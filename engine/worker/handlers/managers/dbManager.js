@@ -166,6 +166,7 @@ export class DBManager {
      * 	    isIndexedChanged: boolean,
      * 	    isUniqueChanged: boolean,
      * 	    isSearchableChanged: boolean,
+     * 	    isDefaultValueChanged: boolean,
      * 	    oldIid: string,
      * 	}[],
      * 	deleted: object[],
@@ -212,6 +213,7 @@ export class DBManager {
                         field.isNameChanged = prevField.name !== field.name;
                         field.isIndexedChanged = prevField.indexed !== field.indexed;
                         field.isUniqueChanged = prevField.unique !== field.unique;
+                        field.isDefaultValueChanged = prevField.defaultValue !== field.defaultValue;
 
                         if (field.isNameChanged) field.oldName = prevField.name;
 

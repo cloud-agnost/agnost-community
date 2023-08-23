@@ -167,6 +167,14 @@ export class SQLBaseManager extends DBManager {
                 this.addQuery(handleUniqueIndexes);
                 console.log({ handleUniqueIndexes });
 
+                const handleDefaultValues = await this.handleDefaultValues(
+                    updatedModel,
+                    updatedModel.fieldChanges.updated,
+                    true
+                );
+                this.addQuery(handleDefaultValues);
+                console.log({ handleDefaultValues });
+
                 const handleFullTextSearchIndexes = await this.handleFullTextSearchIndexes(
                     updatedModel,
                     updatedModel.fields,
@@ -447,6 +455,38 @@ export class SQLBaseManager extends DBManager {
                 query = "\n" + (await this.addUniqueConstraint(model.name, field.name, returnQuery));
             } else {
                 query = "\n" + (await this.dropUniqueConstraint(model.name, field.name, returnQuery));
+            }
+
+            if (returnQuery) SQL += query;
+        }
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    /**
+     * Add or drop unique constraint from fields
+     * @param {object} model
+     * @param {object[]} fields
+     * @param {boolean} returnQuery - return query or not
+     * @return {Promise<void> | string}
+     */
+    async handleDefaultValues(model, fields, returnQuery = false) {
+        let SQL = "";
+
+        for (const field of fields) {
+            if (!field.isDefaultValueChanged) continue;
+            let query = "";
+
+            // TODO change default value
+
+            /** @type {Field} */
+            const fieldClass = new (fieldMap.get(field.type))(field, this.getDbType());
+            const isBoolean = typeof field.defaultValue === "boolean";
+            if (!isBoolean && !field.defaultValue) {
+                query = "\n" + (await this.removeDefaultValues(model, field, returnQuery));
+            } else {
+                query = "\n" + (await this.addDefaultValues(model, field, returnQuery));
             }
 
             if (returnQuery) SQL += query;
@@ -780,4 +820,8 @@ export class SQLBaseManager extends DBManager {
             ? `${this.getEnvId()}_${this.getDbId()}`.replaceAll("-", "_").toLowerCase()
             : this.getDbName();
     }
+
+    addDefaultValues(model, field, returnQuery = false) {}
+
+    removeDefaultValues(model, field, returnQuery = false) {}
 }

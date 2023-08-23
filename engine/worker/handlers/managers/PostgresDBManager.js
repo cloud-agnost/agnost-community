@@ -56,9 +56,10 @@ export class PostgresDBManager extends SQLBaseManager {
             return;
         }
 
-        await this.runQuery(`CREATE DATABASE ${dbName}; CREATE SCHEMA IF NOT EXISTS ${this.getSchemaName()};`);
+        await this.runQuery(`CREATE DATABASE ${dbName};`);
         this.addLog(t("Created the database"));
         await this.useDatabase(dbName);
+        await this.runQuery(`CREATE SCHEMA IF NOT EXISTS ${this.getSchemaName()};`);
     }
 
     /**
@@ -421,6 +422,26 @@ END $$;`;
         const SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} ALTER COLUMN ${field.name} ${
             refField.isRequired() ? "SET NOT NULL" : "DROP NOT NULL"
         };`;
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    addDefaultValues(model, field, returnQuery = false) {
+        const isString = typeof field.defaultValue === "string";
+        const isNumber = isString && !isNaN(Number(field.defaultValue));
+        const defaultValue = isString && !isNumber ? `'${field.defaultValue}'` : field.defaultValue;
+
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} ALTER COLUMN ${
+            field.name
+        } SET DEFAULT ${defaultValue};`;
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    removeDefaultValues(model, field, returnQuery = false) {
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} ALTER COLUMN ${field.name} DROP DEFAULT;`;
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);

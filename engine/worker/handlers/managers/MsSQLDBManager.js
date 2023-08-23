@@ -47,14 +47,15 @@ export class MsSQLDBManager extends SQLBaseManager {
             return;
         }
 
-        await this.runQuery(
-            `CREATE DATABASE ${dbName}; ${this.ifWrapper(
-                `NOT EXISTS(${MsSQLDBManager.CHECK_SCHEMA.replace("{SCHEMA_NAME}", this.getSchemaName())})`,
-                `EXEC('CREATE SCHEMA ${this.getSchemaName()}')`
-            )}`
-        );
+        await this.runQuery(`CREATE DATABASE ${dbName};`);
         this.addLog(t("Created the database"));
         await this.useDatabase(dbName);
+        await this.runQuery(
+            this.ifWrapper(
+                `NOT EXISTS(${MsSQLDBManager.CHECK_SCHEMA.replace("{SCHEMA_NAME}", this.getSchemaName())})`,
+                `EXEC('CREATE SCHEMA ${this.getSchemaName()}')`
+            )
+        );
     }
 
     beginSession() {}
@@ -483,6 +484,29 @@ export class MsSQLDBManager extends SQLBaseManager {
             const query = (await this.dropFullTextIndex(model.name, field.name, returnQuery)) + "\n";
             if (returnQuery) SQL += query;
         }
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    async addDefaultValues(model, field, returnQuery = false) {
+        const constraintName = `DC_${field.iid.replace("-", "_")}`;
+        const isString = typeof field.defaultValue === "string";
+        const isNumber = isString && !isNaN(Number(field.defaultValue));
+        const defaultValue = isString && !isNumber ? `'${field.defaultValue}'` : field.defaultValue;
+
+        let SQL = (await this.removeDefaultValues(model, field, true)) + "\n";
+        SQL += `ALTER TABLE ${this.getSchemaName()}.${
+            model.name
+        } ADD CONSTRAINT ${constraintName} DEFAULT ${defaultValue} FOR ${field.name};`;
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    removeDefaultValues(model, field, returnQuery = false) {
+        const constraintName = `DC_${field.iid.replace("-", "_")}`;
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} DROP CONSTRAINT IF EXISTS ${constraintName};`;
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
