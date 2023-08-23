@@ -555,6 +555,7 @@ router.put(
 			cAt.creator = "system";
 			cAt.order = modelCtrl.getNewFieldOrderNumber(model);
 			cAt.type = "createdat";
+			cAt.dbType = dbTypeMappings[db.type]["createdat"];
 			cAt.required = true;
 			cAt.unique = false;
 			cAt.immutable = true;
@@ -568,6 +569,7 @@ router.put(
 			uAt.creator = "system";
 			uAt.order = cAt.order + 10000;
 			uAt.type = "updatedat";
+			cAt.dbType = dbTypeMappings[db.type]["updatedat"];
 			uAt.required = true;
 			uAt.unique = false;
 			uAt.immutable = false;
