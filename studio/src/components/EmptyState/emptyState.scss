@@ -1,6 +1,6 @@
 .empty-state {
-	@apply flex flex-col items-center justify-center gap-6;
+	@apply flex flex-col items-center justify-center gap-4;
 	&-title {
-		@apply text-default text-xl font-normal leading-6;
+		@apply text-default text-xl font-normal leading-6 font-sfCompact;
 	}
 }
