@@ -467,7 +467,7 @@ DROP PROCEDURE IF EXISTS ${name};`;
      * @return {Promise<Object|[]>}
      */
     async dropDatabase(dbName) {
-        return this.runQuery(`DROP DATABASE IF EXISTS ${dbName ?? this.getDbName()};`);
+        return this.runQuery(`DROP DATABASE IF EXISTS ${dbName ?? this.getDatabaseNameToUse()};`);
     }
 
     /**

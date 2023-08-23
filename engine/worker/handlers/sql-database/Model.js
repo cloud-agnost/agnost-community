@@ -12,22 +12,31 @@ export default class Model {
 
     /**
      * @description The name of the model
+     * @type {string}
      */
     name;
+
+    /**
+     * @description The schema of the model
+     * @type {string}
+     */
+    schema;
 
     /**
      * @description Create a new model
      * @param {string} name - The name of the model
      * @param {undefined|[]} fields - The fields of the model
+     * @param {undefined|string} schema - The schema of the model
      */
-    constructor(name, fields = undefined) {
+    constructor(name, fields = undefined, schema = undefined) {
         this.name = name;
+        this.schema = schema;
         if (fields) this.fields = fields;
     }
 
     /**
      * @description Add a field to the model
-     * @param {object|object[]} field - The field to add
+     * @param {Field|Field[]} field - The field to add
      */
     addField(field) {
         if (Array.isArray(field)) this.fields = [...this.fields, ...field];
@@ -40,17 +49,14 @@ export default class Model {
      */
     toString() {
         const SQL = `
-CREATE TABLE {TABLE_NAME} (
+CREATE TABLE {SCHEMA_NAME}{TABLE_NAME} (
 {TABLE_FIELDS}
 ); \n`;
 
-        const fields = this.fields
-            .map((field) => "\t" + field.toDefinitionQuery())
-            .join(", \n");
+        const fields = this.fields.map((field) => "\t" + field.toDefinitionQuery()).join(", \n");
 
-        return SQL.replaceAll("{TABLE_NAME}", this.name).replaceAll(
-            "{TABLE_FIELDS}",
-            fields
-        );
+        return SQL.replaceAll("{TABLE_NAME}", this.name)
+            .replaceAll("{TABLE_FIELDS}", fields)
+            .replace("{SCHEMA_NAME}", this.schema ? `${this.schema}.` : "");
     }
 }

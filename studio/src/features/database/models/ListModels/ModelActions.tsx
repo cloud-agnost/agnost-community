@@ -60,7 +60,7 @@ export default function ModelActions({
 		<>
 			<BreadCrumb goBackLink={databasesUrl} items={breadcrumbItems} />
 			<div className='flex flex-col gap-2 sm:items-center sm:flex-row justify-between'>
-				<h1 className='text-[26px] text-default leading-[44px] font-semibold'>
+				<h1 className='text-[26px] text-default leading-[44px]'>
 					{t('database.models.title', {
 						database: database?.name,
 					})}

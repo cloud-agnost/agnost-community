@@ -3,9 +3,9 @@ import { DATABASE } from "../../../config/constants.js";
 
 export default class Text extends Field {
     createMap = {
-        [DATABASE.PostgreSQL]: "{name} {type}({maxLength}) {required}",
-        [DATABASE.MySQL]: "`{name}` {type}({maxLength}) {required}",
-        [DATABASE.SQLServer]: "{name} {type}({maxLength}) {required}",
+        [DATABASE.PostgreSQL]: "{name} {type}({maxLength}) {required} {DEFAULT_VALUE}",
+        [DATABASE.MySQL]: "`{name}` {type}({maxLength}) {required} {DEFAULT_VALUE}",
+        [DATABASE.SQLServer]: "{name} {type}({maxLength}) {required} {DEFAULT_VALUE}",
     };
 
     /**
@@ -31,6 +31,7 @@ export default class Text extends Field {
             .replace("{name}", this.getName())
             .replace("{type}", this.getDbType())
             .replace("{maxLength}", this.getMaxLength())
+            .replace("{DEFAULT_VALUE}", this.getDefaultValue() ? `DEFAULT '${this.getDefaultValue()}'` : "")
             .replace("{required}", this.isRequired() ? "NOT NULL" : "NULL");
     }
 }

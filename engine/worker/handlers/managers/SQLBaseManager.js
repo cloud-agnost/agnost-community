@@ -66,7 +66,7 @@ export class SQLBaseManager extends DBManager {
      * @throws Rejects when the query fails or database already exists;
      */
     async createDatabase() {
-        const dbName = this.getDbName();
+        const dbName = this.getDatabaseNameToUse();
 
         if (await this.isDatabaseExists(dbName)) {
             await this.useDatabase(dbName);
@@ -767,33 +767,17 @@ export class SQLBaseManager extends DBManager {
     dropForeignKey(modelName, foreignKeyName, returnQuery = false) {}
 
     /**
-     *
-     * @param baseModel {object} - the model object
-     * @return {[]}
-     */
-    getForeignKeyField(baseModel) {
-        // TODO : remove if not used
-        const models = this.getPrevModels();
-        const foreignKeys = [];
-
-        for (let model of models) {
-            for (let field of model.fields) {
-                if (field.type === "reference" && field?.reference?.iid === baseModel.iid) {
-                    field.belongsTo = model.name;
-                    foreignKeys.push(field);
-                }
-            }
-        }
-
-        return foreignKeys;
-    }
-
-    /**
      * @description Return the foreign key name
      * @param iid {string} - The field iid
      * @return {string}
      */
     static getForeignKeyName(iid) {
         return `fk_${iid.replaceAll("-", "_")}`;
+    }
+
+    getDatabaseNameToUse() {
+        return this.getAssignUniqueName()
+            ? `${this.getEnvId()}_${this.getDbId()}`.replaceAll("-", "_").toLowerCase()
+            : this.getDbName();
     }
 }

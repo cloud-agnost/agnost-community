@@ -1,31 +1,48 @@
 import { DataTable } from 'components/DataTable';
 import { Database } from '@/types';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
-import { useState } from 'react';
-import { Row } from '@tanstack/react-table';
-import { EmptyState } from 'components/EmptyState';
+import { useMemo, useState } from 'react';
+import { Row, Table } from '@tanstack/react-table';
 import { Trans, useTranslation } from 'react-i18next';
-import { cn } from '@/utils';
 import { DatabaseIcon } from 'components/icons';
-import { CreateDatabaseButton } from '@/features/database/CreateDatabaseButton';
 import { DatabaseColumns } from '@/features/database/ListDatabase/index.ts';
-import { SearchInput } from 'components/SearchInput';
 import { CreateAndEditDatabaseDrawer } from '@/features/database/CreateAndEditDatabaseDrawer';
 import { ConfirmationModal } from 'components/ConfirmationModal';
+import { VersionTabLayout } from '@/layouts/VersionLayout';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
+import { useSearchParams } from 'react-router-dom';
 
 export default function ListDatabase() {
 	const {
+		databases,
 		toDeleteDatabase,
-		searchDatabases,
 		isOpenDeleteDatabaseDialog,
 		setIsOpenDeleteDatabaseDialog,
-		databasesForSearch,
 		setEditDatabaseDialogOpen,
 		deleteDatabase,
 		editDatabaseDialogOpen,
 	} = useDatabaseStore();
-	const [, setSelectedRows] = useState<Row<Database>[]>();
+	const [selectedRows, setSelectedRows] = useState<Row<Database>[]>();
 	const { t } = useTranslation();
+	const canEdit = useAuthorizeVersion('db.create');
+	const [createDrawerIsOpen, setCreateDrawerIsOpen] = useState(false);
+	const [table, setTable] = useState<Table<Database>>();
+	const [searchParams, setSearchParams] = useSearchParams();
+
+	const search = searchParams.get('q') ?? '';
+
+	function setSearch(value?: string) {
+		if (!value || value === '') searchParams.delete('q');
+		else searchParams.set('q', value);
+		setSearchParams(searchParams);
+	}
+
+	const databasesForSearch = useMemo(() => {
+		if (!search) return databases;
+		return databases.filter((database) =>
+			database.name.toLowerCase().includes(search.toLowerCase()),
+		);
+	}, [search, databases]);
 
 	async function deleteHandler() {
 		if (!toDeleteDatabase) return;
@@ -38,69 +55,63 @@ export default function ListDatabase() {
 		setIsOpenDeleteDatabaseDialog(false);
 	}
 
+	function onSearch(value: string) {
+		setSearch(value.trim());
+	}
+
+	const data = databasesForSearch.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+
 	return (
 		<>
-			<div className='flex flex-col gap-2 items-center sm:flex-row justify-between'>
-				<h1 className='text-[26px] text-default leading-[44px] font-semibold'>
-					{t('database.page_title')}
-				</h1>
-				<div className='flex gap-4'>
-					<SearchInput
-						onClear={() => searchDatabases('')}
-						onChange={(event) => searchDatabases(event.target.value)}
-						className='w-[450px]'
-					/>
-					<CreateDatabaseButton />
-				</div>
-			</div>
-
-			<div
-				className={cn(
-					'pb-6',
-					databasesForSearch.length === 0 && 'flex items-center justify-center h-full',
-				)}
+			<VersionTabLayout<Database>
+				onSearchInputClear={() => onSearch('')}
+				className='p-0'
+				isEmpty={data.length === 0}
+				title={t('database.page_title')}
+				icon={<DatabaseIcon className='w-44 h-44' />}
+				openCreateModal={() => setCreateDrawerIsOpen(true)}
+				createButtonTitle={t('database.add.title')}
+				emptyStateTitle={t('database.empty_text')}
+				table={table}
+				selectedRowLength={selectedRows?.length}
+				onSearch={onSearch}
+				disabled={!canEdit}
 			>
-				{databasesForSearch.length === 0 ? (
-					<EmptyState
-						title={t('version.middleware.no_middleware_found')}
-						icon={<DatabaseIcon className='text-[110px]' />}
-					>
-						<CreateDatabaseButton />
-					</EmptyState>
-				) : (
-					<DataTable<Database>
-						columns={DatabaseColumns}
-						data={databasesForSearch.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1))}
-						noDataMessage={<p className='text-xl'>{t('version.middleware.no_middleware_found')}</p>}
-						setSelectedRows={setSelectedRows}
-					/>
-				)}
-				<CreateAndEditDatabaseDrawer
-					open={editDatabaseDialogOpen}
-					onOpenChange={setEditDatabaseDialogOpen}
-					editMode
+				<DataTable<Database>
+					columns={DatabaseColumns}
+					setTable={setTable}
+					data={databasesForSearch.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1))}
+					noDataMessage={<p className='text-xl'>{t('database.empty_text')}</p>}
+					setSelectedRows={setSelectedRows}
 				/>
-				{toDeleteDatabase && (
-					<ConfirmationModal
-						alertTitle={t('database.delete.confirm_title')}
-						alertDescription={t('database.delete.confirm_description')}
-						title={t('database.delete.title')}
-						confirmCode={toDeleteDatabase.name}
-						description={
-							<Trans
-								i18nKey='database.delete.confirm'
-								values={{ confirmCode: toDeleteDatabase.name }}
-								components={{
-									confirmCode: <span className='font-bold text-default' />,
-								}}
-							/>
-						}
-						onConfirm={deleteHandler}
-						isOpen={isOpenDeleteDatabaseDialog}
-						closeModal={() => setIsOpenDeleteDatabaseDialog(false)}
-					/>
-				)}
-			</div>
+			</VersionTabLayout>
+
+			<CreateAndEditDatabaseDrawer
+				open={editDatabaseDialogOpen}
+				onOpenChange={setEditDatabaseDialogOpen}
+				editMode
+			/>
+			<CreateAndEditDatabaseDrawer open={createDrawerIsOpen} onOpenChange={setCreateDrawerIsOpen} />
+			{toDeleteDatabase && (
+				<ConfirmationModal
+					alertTitle={t('database.delete.confirm_title')}
+					alertDescription={t('database.delete.confirm_description')}
+					title={t('database.delete.title')}
+					confirmCode={toDeleteDatabase.name}
+					description={
+						<Trans
+							i18nKey='database.delete.confirm'
+							values={{ confirmCode: toDeleteDatabase.name }}
+							components={{
+								confirmCode: <span className='font-bold text-default' />,
+							}}
+						/>
+					}
+					onConfirm={deleteHandler}
+					isOpen={isOpenDeleteDatabaseDialog}
+					closeModal={() => setIsOpenDeleteDatabaseDialog(false)}
+				/>
+			)}
 		</>
 	);
 }

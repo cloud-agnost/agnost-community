@@ -1,5 +1,6 @@
 {
 	"page_title": "Databases",
+	"empty_text": "You have not defined any databases for this app version",
 	"add": {
 		"title": "Create Database",
 		"field": "Database Name",
@@ -13,6 +14,10 @@
 			"title": "Database Type",
 			"field": "Database type",
 			"placeholder": "Select Database Type"
+		},
+		"unique": {
+			"title": "Assign a unique name to this database in different versions of the application.",
+			"desc": "This option ensures that developers working on different versions of the app utilizing this database server will each have a dedicated database in the database server minimizing conflicts in database schema changes."
 		}
 	},
 	"edit": {
@@ -58,13 +63,14 @@
 			"title": "Delete Selected Models",
 			"description": "Deleting these models will remove all associated data and cannot be undone."
 		},
-		"title": "Models of {{database}}",
+		"title": "Models",
 		"create": "Create Model",
 		"edit": "Edit Model",
 		"no_models": "You have not defined any for models for this database"
 	},
 	"fields": {
-		"title": "Fields of {{model}}",
+		"select_default_value": "Select Default Value",
+		"title": "Fields",
 		"create": "Create Field",
 		"add": "Add Field",
 		"add_field": "Add {{field}} Field",

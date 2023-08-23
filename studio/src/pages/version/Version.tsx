@@ -1,7 +1,7 @@
 import { VersionLayout } from '@/layouts/VersionLayout';
 import useEnvironmentStore from '@/store/environment/environmentStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { LoaderFunctionArgs, Outlet, useLocation } from 'react-router-dom';
+import { LoaderFunctionArgs, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/utils';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';

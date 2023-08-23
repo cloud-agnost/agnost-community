@@ -6,6 +6,8 @@ import {
 	DeleteModelParams,
 	DeleteMultipleFieldParams,
 	DeleteMultipleModelParams,
+	DisableTimestampsParams,
+	EnableTimestampsParams,
 	GetModelsOfDatabaseParams,
 	GetSpecificModelByIidOfDatabase,
 	GetSpecificModelOfDatabase,
@@ -183,6 +185,36 @@ export default class ModelService {
 	}: GetModelsOfDatabaseParams): Promise<Model[]> {
 		return (
 			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}/model/ref`)
+		).data;
+	}
+
+	static async enableTimestamps({
+		orgId,
+		appId,
+		versionId,
+		dbId,
+		modelId,
+		...data
+	}: EnableTimestampsParams): Promise<Model> {
+		return (
+			await axios.put(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}/model/${modelId}/enable-timestamps`,
+				data,
+			)
+		).data;
+	}
+	static async disableTimestamps({
+		orgId,
+		appId,
+		versionId,
+		dbId,
+		modelId,
+	}: DisableTimestampsParams): Promise<Model> {
+		return (
+			await axios.put(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}/model/${modelId}/disable-timestamps`,
+				{},
+			)
 		).data;
 	}
 }

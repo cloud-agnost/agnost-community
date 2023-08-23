@@ -1,31 +1,62 @@
 import { SQLBaseManager } from "./SQLBaseManager.js";
 import fieldMap from "../sql-database/fieldMap.js";
+import Model from "../sql-database/Model.js";
 
 export class MsSQLDBManager extends SQLBaseManager {
     static CHECK_UNIQUE_CONSTRAINT_SCHEMA =
-        "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME='{TABLE_NAME}' AND CONSTRAINT_TYPE='UNIQUE' AND CONSTRAINT_NAME='{CONSTRAINT_NAME}'";
+        "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME='{TABLE_NAME}' AND CONSTRAINT_TYPE='UNIQUE' AND CONSTRAINT_NAME='{CONSTRAINT_NAME}' AND CONSTRAINT_SCHEMA = '{SCHEMA_NAME}'";
 
     static CHECK_FOREIGN_KEY_CONSTRAINT_SCHEMA =
-        "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME='{TABLE_NAME}' AND CONSTRAINT_TYPE='FOREIGN KEY' AND CONSTRAINT_NAME='{CONSTRAINT_NAME}'";
+        "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME='{TABLE_NAME}' AND CONSTRAINT_TYPE='FOREIGN KEY' AND CONSTRAINT_NAME='{CONSTRAINT_NAME}' AND CONSTRAINT_SCHEMA = '{SCHEMA_NAME}'";
 
     static CHECK_INDEX_SCHEMA =
-        "SELECT name FROM sys.indexes WHERE name = '{INDEX_NAME}' AND object_id = OBJECT_ID('{TABLE_NAME}')";
+        "SELECT name FROM sys.indexes WHERE name = '{INDEX_NAME}' AND object_id = OBJECT_ID('{SCHEMA_NAME}.{TABLE_NAME}')";
 
     static CHECK_CATALOG_SCHEMA = "SELECT name FROM sys.fulltext_catalogs WHERE name = '{CATALOG_NAME}'";
 
     static CHECK_FIELD_SCHEMA =
-        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{TABLE_NAME}' AND COLUMN_NAME = '{FIELD_NAME}'";
+        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{TABLE_NAME}' AND COLUMN_NAME = '{FIELD_NAME}' AND TABLE_SCHEMA = '{SCHEMA_NAME}'";
 
     static CHECK_FULL_TEXT_INDEX_SCHEMA =
-        "SELECT object_id FROM sys.fulltext_indexes WHERE object_id = OBJECT_ID('{TABLE_NAME}')";
+        "SELECT object_id FROM sys.fulltext_indexes WHERE object_id =  OBJECT_ID('{SCHEMA_NAME}.{TABLE_NAME}')";
+
+    static CHECK_SCHEMA = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{SCHEMA_NAME}'";
 
     constructor(env, dbConfig, prevDbConfig, addLogFn) {
         super(env, dbConfig, prevDbConfig, addLogFn);
     }
 
+    getSchemaName() {
+        return true ? "dbo" : "";
+    }
+
     async useDatabase(databaseName) {
         this.setDatabaseName(databaseName);
     }
+
+    /**
+     * Create the database
+     * @return {Promise<void>}
+     * @throws Rejects when the query fails or database already exists;
+     */
+    async createDatabase() {
+        const dbName = this.getDatabaseNameToUse();
+
+        if (await this.isDatabaseExists(dbName)) {
+            await this.useDatabase(dbName);
+            return;
+        }
+
+        await this.runQuery(
+            `CREATE DATABASE ${dbName}; ${this.ifWrapper(
+                `NOT EXISTS(${MsSQLDBManager.CHECK_SCHEMA.replace("{SCHEMA_NAME}", this.getSchemaName())})`,
+                `EXEC('CREATE SCHEMA ${this.getSchemaName()}')`
+            )}`
+        );
+        this.addLog(t("Created the database"));
+        await this.useDatabase(dbName);
+    }
+
     beginSession() {}
     endSession() {}
     async runQuery(query) {
@@ -73,7 +104,7 @@ export class MsSQLDBManager extends SQLBaseManager {
      * @return {Promise<void> | string}
      */
     async renameModel(oldName, newName, returnQuery = false) {
-        const SQL = `EXEC sp_rename '${oldName}', '${newName}';`;
+        const SQL = `EXEC sp_rename '${this.getSchemaName()}.${oldName}', '${newName}';`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
@@ -87,7 +118,7 @@ export class MsSQLDBManager extends SQLBaseManager {
      * @return {Promise<Object|[]> | string}
      */
     async renameField(modelName, fieldOldName, fieldNewName, returnQuery = false) {
-        const SQL = `EXEC sp_rename '${modelName}.${fieldOldName}', '${fieldNewName}', 'COLUMN';`;
+        const SQL = `EXEC sp_rename '${this.getSchemaName()}.${modelName}.${fieldOldName}', '${fieldNewName}', 'COLUMN';`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
@@ -101,12 +132,12 @@ export class MsSQLDBManager extends SQLBaseManager {
      */
     addUniqueConstraint(tableName, columnName, returnQuery = false) {
         const constraintName = `uc_${tableName}_${columnName}`.toLowerCase();
-        const selectQuery = MsSQLDBManager.CHECK_UNIQUE_CONSTRAINT_SCHEMA.replace("{TABLE_NAME}", tableName).replace(
-            "{CONSTRAINT_NAME}",
-            constraintName
-        );
+        const selectQuery = MsSQLDBManager.CHECK_UNIQUE_CONSTRAINT_SCHEMA.replace("{TABLE_NAME}", tableName)
+            .replace("{CONSTRAINT_NAME}", constraintName)
+            .replace("{SCHEMA_NAME}", this.getSchemaName());
+
         const condition = `NOT EXISTS (${selectQuery})`;
-        const query = `ALTER TABLE ${tableName} ADD CONSTRAINT ${constraintName} UNIQUE(${columnName});`;
+        const query = `ALTER TABLE ${this.getSchemaName()}.${tableName} ADD CONSTRAINT ${constraintName} UNIQUE(${columnName});`;
         const SQL = this.ifWrapper(condition, query);
 
         if (returnQuery) return SQL;
@@ -123,7 +154,7 @@ export class MsSQLDBManager extends SQLBaseManager {
      * @return {Promise<Object|[]>}
      */
     async dropDatabase(dbName) {
-        const db = dbName ?? this.getDbName();
+        const db = dbName ?? this.getDatabaseNameToUse();
         await this.useDatabase("master");
 
         const condition = `EXISTS(SELECT name FROM master.sys.databases WHERE name = '${db}')`;
@@ -138,7 +169,9 @@ export class MsSQLDBManager extends SQLBaseManager {
      * @return {Promise<string[]>}
      */
     async getExistingModels() {
-        const result = await this.runQuery(`SELECT TABLE_NAME as name FROM INFORMATION_SCHEMA.TABLES;`);
+        const result = await this.runQuery(
+            `SELECT TABLE_NAME as name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${this.getSchemaName()}';`
+        );
         if (Array.isArray(result?.recordset)) return result?.recordset?.map((table) => table.name);
         return [];
     }
@@ -162,10 +195,32 @@ export class MsSQLDBManager extends SQLBaseManager {
      */
     dropUniqueConstraint(tableName, columnName, returnQuery = false) {
         const constraintName = `uc_${tableName}_${columnName}`.toLowerCase();
-        const SQL = `ALTER TABLE ${tableName} DROP CONSTRAINT IF EXISTS ${constraintName};`;
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${tableName} DROP CONSTRAINT IF EXISTS ${constraintName};`;
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
+    }
+
+    /**
+     * Create a table and with its fields for the model
+     * @param {object} model
+     * @param {string} model.name
+     * @param {object[]} model.fields
+     * @return {string}
+     */
+    createModel({ fields, name }) {
+        const model = new Model(name, undefined, this.getSchemaName());
+
+        for (const field of fields) {
+            const FieldClass = fieldMap.get(field.type);
+
+            if (!FieldClass) {
+                throw new AgnostError(t(`Field type '${field.type}' is not supported`));
+            }
+            model.addField(new FieldClass(field, this.getDbType()));
+        }
+
+        return model.toString();
     }
 
     /**
@@ -180,7 +235,12 @@ export class MsSQLDBManager extends SQLBaseManager {
             await this.dropFullTextIndexByColumn(modelName, field.name, true),
             await this.dropUniqueConstraint(modelName, field.name, true),
             await this.dropIndex(modelName, field.name, true),
-            `ALTER TABLE ${modelName} DROP COLUMN IF EXISTS ${field.name};`,
+            `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP CONSTRAINT IF EXISTS DC_${field.iid.replaceAll(
+                "-",
+                "_"
+            )};`,
+            `DROP DEFAULT IF EXISTS DC_${field.iid.replaceAll("-", "_")};`,
+            `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP COLUMN IF EXISTS ${field.name};`,
             await this.dropFullTextIndexIfDisabled(modelName, true),
         ].join("\n");
 
@@ -197,7 +257,7 @@ export class MsSQLDBManager extends SQLBaseManager {
      */
     dropIndex(tableName, columnName, returnQuery = false) {
         const indexName = `${tableName}_index_${columnName}`.toLowerCase();
-        const SQL = `DROP INDEX IF EXISTS ${tableName}.${indexName};`;
+        const SQL = `DROP INDEX IF EXISTS ${this.getSchemaName()}.${tableName}.${indexName};`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
@@ -211,12 +271,12 @@ export class MsSQLDBManager extends SQLBaseManager {
      */
     addIndex(tableName, columnName, returnQuery = false) {
         const indexName = `${tableName}_index_${columnName}`.toLowerCase();
-        const selectQuery = MsSQLDBManager.CHECK_INDEX_SCHEMA.replace("{TABLE_NAME}", tableName).replace(
-            "{INDEX_NAME}",
-            indexName
-        );
+        const selectQuery = MsSQLDBManager.CHECK_INDEX_SCHEMA.replace("{TABLE_NAME}", tableName)
+            .replace("{INDEX_NAME}", indexName)
+            .replace("{SCHEMA_NAME}", this.getSchemaName());
+
         const condition = `NOT EXISTS(${selectQuery})`;
-        const query = `CREATE INDEX ${indexName} ON ${tableName}(${columnName})`;
+        const query = `CREATE INDEX ${indexName} ON ${this.getSchemaName()}.${tableName}(${columnName})`;
         const SQL = this.ifWrapper(condition, query);
 
         if (returnQuery) return SQL;
@@ -230,7 +290,7 @@ export class MsSQLDBManager extends SQLBaseManager {
      */
     async getPrimaryKeyName(tableName) {
         const { recordset } = await this.runQuery(
-            `SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('${tableName}') AND is_primary_key = 1;`
+            `SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('${this.getSchemaName()}.${tableName}') AND is_primary_key = 1;`
         );
 
         return recordset[0]?.name;
@@ -259,11 +319,14 @@ export class MsSQLDBManager extends SQLBaseManager {
         const fieldsToIndex = fields.map((field) => field.name).join(", ");
 
         const dropFullTextIndexIfExists = this.ifWrapper(
-            `EXISTS(${MsSQLDBManager.CHECK_FULL_TEXT_INDEX_SCHEMA.replace("{TABLE_NAME}", tableName)})`,
-            `DROP FULLTEXT INDEX ON ${tableName}`
+            `EXISTS(${MsSQLDBManager.CHECK_FULL_TEXT_INDEX_SCHEMA.replace("{TABLE_NAME}", tableName).replace(
+                "{SCHEMA_NAME}",
+                this.getSchemaName()
+            )})`,
+            `DROP FULLTEXT INDEX ON ${this.getSchemaName()}.${tableName}`
         );
 
-        const createFullTextIndex = `CREATE FULLTEXT INDEX ON ${tableName}(${fieldsToIndex}) KEY INDEX ${PK_NAME} WITH CHANGE_TRACKING = AUTO;`;
+        const createFullTextIndex = `CREATE FULLTEXT INDEX ON ${this.getSchemaName()}.${tableName}(${fieldsToIndex}) KEY INDEX ${PK_NAME} WITH CHANGE_TRACKING = AUTO;`;
 
         SQL = [createCatalogIfNotExists, dropFullTextIndexIfExists, createFullTextIndex, "\n"].join("\n");
 
@@ -280,7 +343,10 @@ export class MsSQLDBManager extends SQLBaseManager {
      */
     dropFullTextIndex(tableName, columnName, returnQuery = false) {
         const SQL = this.ifWrapper(
-            `EXISTS(${MsSQLDBManager.CHECK_FULL_TEXT_INDEX_SCHEMA.replace("{TABLE_NAME}", tableName)})`,
+            `EXISTS(${MsSQLDBManager.CHECK_FULL_TEXT_INDEX_SCHEMA.replace(
+                "{SCHEMA_NAME}",
+                this.getSchemaName()
+            ).replace("{TABLE_NAME}", tableName)})`,
             `DROP FULLTEXT INDEX ON ${tableName};`
         );
 
@@ -290,8 +356,8 @@ export class MsSQLDBManager extends SQLBaseManager {
 
     dropFullTextIndexIfDisabled(tableName, returnQuery = false) {
         const SQL = this.ifWrapper(
-            `EXISTS(SELECT is_enabled FROM sys.fulltext_indexes WHERE object_id = OBJECT_ID('${tableName}') AND is_enabled = 0)`,
-            `DROP FULLTEXT INDEX ON ${tableName};`
+            `EXISTS(SELECT is_enabled FROM sys.fulltext_indexes WHERE object_id = OBJECT_ID('${this.getSchemaName()}.${tableName}') AND is_enabled = 0)`,
+            `DROP FULLTEXT INDEX ON ${this.getSchemaName()}.${tableName};`
         );
 
         if (returnQuery) return SQL;
@@ -300,8 +366,8 @@ export class MsSQLDBManager extends SQLBaseManager {
 
     dropFullTextIndexByColumn(tableName, columnName, returnQuery = false) {
         const SQL = this.ifWrapper(
-            `(SELECT COLUMNPROPERTY(OBJECT_ID('${tableName}'), '${columnName}', 'IsFulltextIndexed')) = 1`,
-            `ALTER FULLTEXT INDEX ON ${tableName} DROP (${columnName})`
+            `(SELECT COLUMNPROPERTY(OBJECT_ID('${this.getSchemaName()}.${tableName}'), '${columnName}', 'IsFulltextIndexed')) = 1`,
+            `ALTER FULLTEXT INDEX ON ${this.getSchemaName()}.${tableName} DROP (${columnName})`
         );
 
         if (returnQuery) return SQL;
@@ -312,13 +378,13 @@ export class MsSQLDBManager extends SQLBaseManager {
         let SQL = "";
 
         for (let field of fields) {
-            const schema = MsSQLDBManager.CHECK_FIELD_SCHEMA.replace("{TABLE_NAME}", modelName).replace(
-                "{FIELD_NAME}",
-                field.getName()
-            );
+            const schema = MsSQLDBManager.CHECK_FIELD_SCHEMA.replace("{TABLE_NAME}", modelName)
+                .replace("{FIELD_NAME}", field.getName())
+                .replace("{SCHEMA_NAME}", this.getSchemaName());
+
             SQL += this.ifWrapper(
                 `NOT EXISTS(${schema})`,
-                `ALTER TABLE ${modelName} ADD ${field.toDefinitionQuery()};`
+                `ALTER TABLE ${this.getSchemaName()}.${modelName} ADD ${field.toDefinitionQuery()};`
             );
         }
 
@@ -339,15 +405,16 @@ export class MsSQLDBManager extends SQLBaseManager {
                 const onlyConstraint = reference.createConstraint(model.name);
                 const withField = reference.createConstraint(model.name, true);
 
-                const condition = MsSQLDBManager.CHECK_FIELD_SCHEMA.replace("{TABLE_NAME}", model.name).replace(
-                    "{FIELD_NAME}",
-                    field.name
-                );
+                const condition = MsSQLDBManager.CHECK_FIELD_SCHEMA.replace("{TABLE_NAME}", model.name)
+                    .replace("{FIELD_NAME}", field.name)
+                    .replace("{SCHEMA_NAME}", this.getSchemaName());
 
                 const foreignKeyCondition = MsSQLDBManager.CHECK_FOREIGN_KEY_CONSTRAINT_SCHEMA.replace(
                     "{TABLE_NAME}",
                     model.name
-                ).replace("{CONSTRAINT_NAME}", foreignName);
+                )
+                    .replace("{CONSTRAINT_NAME}", foreignName)
+                    .replace("{SCHEMA_NAME}", this.getSchemaName());
 
                 SQL +=
                     this.ifWrapper(`EXISTS(${condition}) AND NOT EXISTS(${foreignKeyCondition})`, onlyConstraint) +
@@ -366,14 +433,14 @@ export class MsSQLDBManager extends SQLBaseManager {
      * @return {Promise<void|string>}
      */
     async dropModel(model, returnQuery = false) {
-        const SQL = `DROP TABLE IF EXISTS ${model.name};`;
+        const SQL = `DROP TABLE IF EXISTS ${this.getSchemaName()}.${model.name};`;
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
     dropForeignKey(modelName, foreignKeyName, returnQuery = false) {
-        const SQL = `ALTER TABLE ${modelName} DROP CONSTRAINT IF EXISTS ${foreignKeyName};`;
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP CONSTRAINT IF EXISTS ${foreignKeyName};`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
@@ -392,7 +459,7 @@ export class MsSQLDBManager extends SQLBaseManager {
          */
         const refField = new FieldType(field, this.getDbType());
 
-        const SQL = `ALTER TABLE ${modelName} ALTER COLUMN ${refField.toDefinitionQueryForModify()};`;
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} ALTER COLUMN ${refField.toDefinitionQueryForModify()};`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }

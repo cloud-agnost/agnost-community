@@ -10,11 +10,10 @@ import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
-
+import { FIELD_ICON_MAP } from '@/constants';
 const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'select',
-		className: '!max-w-[40px] !w-[40px]',
 		header: (props) => {
 			return (
 				<Checkbox
@@ -57,30 +56,15 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 			return original.name;
 		},
 		accessorKey: 'name',
+		enableSorting: true,
 		sortingFn: 'textCaseSensitive',
 	},
-	/*{
-		id: 'iid',
-		header: translate('general.id').toUpperCase(),
-		accessorKey: 'iid',
-		sortingFn: 'textCaseSensitive',
-		cell: ({
-			row: {
-				original: { iid },
-			},
-		}) => {
-			return (
-				<div className='flex items-center gap-2 justify-between'>
-					<span className='whitespace-nowrap'>{iid}</span>
-					<CopyButton text={iid} />
-				</div>
-			);
-		},
-	}*/ {
+	{
 		id: 'type',
 		header: translate('general.type').toUpperCase(),
 		accessorKey: 'type',
 		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { type },
@@ -91,7 +75,13 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 				updatedat: 'datetime',
 				parent: 'reference',
 			};
-			return <span className='whitespace-nowrap'>{toDisplayName(mapper[type] ?? type)}</span>;
+			const Icon = FIELD_ICON_MAP[mapper[type] ?? type];
+			return (
+				<span className='whitespace-nowrap flex items-center gap-1'>
+					{Icon && <Icon className='w-5 h-5' />}
+					{toDisplayName(mapper[type] ?? type)}
+				</span>
+			);
 		},
 	},
 	{
@@ -99,6 +89,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		header: translate('general.unique').toUpperCase(),
 		accessorKey: 'unique',
 		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { unique },
@@ -118,6 +109,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		header: translate('general.indexed').toUpperCase(),
 		accessorKey: 'indexed',
 		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { indexed },
@@ -137,6 +129,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		header: translate('general.required').toUpperCase(),
 		accessorKey: 'required',
 		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { required },
@@ -157,6 +150,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		header: translate('general.read-only').toUpperCase(),
 		accessorKey: 'immutable',
 		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { immutable },
@@ -173,6 +167,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'created_at',
+		enableSorting: true,
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
@@ -181,7 +176,6 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 			/>
 		),
 		accessorKey: 'created_at',
-		enableSorting: true,
 		sortingFn: 'datetime',
 		size: 200,
 		cell: ({
