@@ -132,7 +132,17 @@ const router = createBrowserRouter([
 											},
 											{
 												path: 'middleware',
-												lazy: () => lazyRouteImport(PATHS.version.middlewares),
+												lazy: () => lazyRouteImport(PATHS.version.middlewareOutlet),
+												children: [
+													{
+														index: true,
+														lazy: () => lazyRouteImport(PATHS.version.middlewares),
+													},
+													{
+														path: ':middlewareId',
+														lazy: () => lazyRouteImport(PATHS.version.editMiddleware),
+													},
+												],
 											},
 											{
 												path: 'cache',

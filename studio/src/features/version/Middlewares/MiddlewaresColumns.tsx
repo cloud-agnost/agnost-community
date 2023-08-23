@@ -5,10 +5,8 @@ import { translate } from '@/utils';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { DateText } from 'components/DateText';
-import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
-import { Button } from 'components/Button';
-import { Pencil } from 'components/icons';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import { ActionsCell } from 'components/ActionsCell';
+import { Link } from 'react-router-dom';
 
 const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
@@ -36,6 +34,20 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 		header: ({ column }) => (
 			<SortButton text={translate('general.name').toUpperCase()} column={column} />
 		),
+		cell: ({
+			row: {
+				original: { _id, name },
+			},
+		}) => {
+			return (
+				<Link
+					to={`${_id}`}
+					className='flex items-center gap-2 justify-between text-button-primary hover:underline'
+				>
+					{name}
+				</Link>
+			);
+		},
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 	},
@@ -90,23 +102,14 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 ];
 
 function UpdateMiddlewareButton({ middleware }: { middleware: Middleware }) {
-	const { setEditMiddlewareDrawerIsOpen, setMiddleware } = useMiddlewareStore.getState();
-	const canUpdate = useAuthorizeVersion('middleware.update');
-	function openEditDrawer() {
-		setEditMiddlewareDrawerIsOpen(true);
-		setMiddleware(middleware);
-	}
 	return (
-		<Button
-			onClick={openEditDrawer}
-			iconOnly
-			variant='blank'
-			rounded
-			className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-			disabled={!canUpdate}
-		>
-			<Pencil />
-		</Button>
+		<ActionsCell<Middleware>
+			original={middleware}
+			canDeleteKey='middleware.delete'
+			canEditKey='middleware.update'
+			to={`${middleware._id}`}
+			type='version'
+		/>
 	);
 }
 export default MiddlewaresColumns;

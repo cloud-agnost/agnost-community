@@ -7,7 +7,7 @@ import { Plus } from '@phosphor-icons/react';
 import { Table } from '@tanstack/react-table';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode } from 'react';
 
 interface Props<T> {
 	isEmpty: boolean;
