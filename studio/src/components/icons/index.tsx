@@ -29,6 +29,7 @@ export { default as Error } from './Error';
 export { default as GcpStorage } from './GcpStorage';
 export { default as Integer } from './Integer';
 export { default as Kafka } from './Kafka';
+export { default as Leave } from './Leave';
 export { default as LightBulb } from './LightBulb';
 export { default as LineSegments } from './LineSegments';
 export { default as List } from './List';
