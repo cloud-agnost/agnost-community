@@ -2,7 +2,7 @@
 	@apply grid lg:grid-cols-2 h-full min-h-screen;
 
 	.auth-layout-left {
-		@apply hidden lg:block p-8 lg:p-16 bg-subtle;
+		@apply hidden lg:block p-8 lg:p-16 bg-subtle space-y-24;
 	}
 
 	.auth-layout-right {
@@ -10,6 +10,6 @@
 	}
 
 	.auth-layout-app-logo {
-		@apply mb-24;
+		@apply w-48 h-10 text-icon-secondary;
 	}
 }

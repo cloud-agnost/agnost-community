@@ -1,9 +1,9 @@
-import { ReactNode } from 'react';
-import './AuthLayout.scss';
-import { Logo } from '@/components/Logo';
 import { Carousel } from '@/components/Carousel';
+import { Logo } from '@/components/Logo';
 import { SLIDER_IMAGES } from '@/constants';
 import { GuestOnly } from '@/router';
+import { ReactNode } from 'react';
+import './AuthLayout.scss';
 
 type AuthLayoutProps = {
 	children: ReactNode;
