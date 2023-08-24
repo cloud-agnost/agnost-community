@@ -88,7 +88,6 @@ export default function ConnectGCP() {
 										<Textarea
 											showCount
 											rows={5}
-											maxLength={50}
 											error={Boolean(form.formState.errors.access?.keyFileContents)}
 											placeholder={
 												t('forms.placeholder', {
