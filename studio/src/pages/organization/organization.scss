@@ -5,14 +5,15 @@
 	&-title {
 		@apply text-default text-2xl md:text-3xl font-semibold;
 	}
-	&-slider {
-		@apply flex items-center justify-center gap-16;
-		.swiper-slide {
-			width: 176px !important;
-		}
+	&-items {
+		@apply flex flex-wrap justify-center items-center gap-4 w-1/2;
 	}
 	&-item {
-		@apply flex flex-col items-center justify-center gap-4;
+		@apply flex flex-col justify-center items-center gap-4;
+	}
+	&-button {
+		flex: 0 0 calc(25% - 20px);
+		@apply h-[13rem];
 	}
 	&-info {
 		@apply space-y-2 text-center;
@@ -22,9 +23,6 @@
 	}
 	&-role {
 		@apply text-default text-sm;
-	}
-	&-button {
-		@apply h-[13rem];
 	}
 }
 

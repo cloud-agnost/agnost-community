@@ -69,11 +69,24 @@ export function isArray<T>(value: unknown): value is T[] {
 	return Array.isArray(value);
 }
 export function getNameForAvatar(name: string) {
-	if (name?.length > 2) {
-		const names = name.split(' ');
-		return names[0].charAt(0).toUpperCase() + names[names.length - 1].charAt(0).toUpperCase();
+	if (!name) {
+		return '';
+	}
+
+	const words = name.trim().split(' ');
+
+	if (words.length === 1) {
+		if (words[0].length === 1) {
+			return words[0];
+		} else if (words[0].length === 2) {
+			return words[0].toUpperCase();
+		} else {
+			return words[0].slice(0, 2).toUpperCase();
+		}
 	} else {
-		return name;
+		const firstInitial = words[0][0];
+		const lastInitial = words[words.length - 1][0];
+		return (firstInitial + lastInitial).toUpperCase();
 	}
 }
 export function capitalize(str: string) {

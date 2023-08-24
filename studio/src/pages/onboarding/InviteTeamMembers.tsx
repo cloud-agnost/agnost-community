@@ -6,8 +6,8 @@ import useOnboardingStore from '@/store/onboarding/onboardingStore';
 import useTypeStore from '@/store/types/typeStore';
 import { APIError, AppMembers } from '@/types/type';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useState } from 'react';
 async function loader() {
 	const { isTypesOk, getAllTypes } = useTypeStore.getState();
 	if (!isTypesOk) {
@@ -18,6 +18,7 @@ async function loader() {
 
 export default function InviteTeamMembers() {
 	const { goBack } = useOutletContext() as { goBack: () => void };
+	const [finalizing, setFinalizing] = useState(false);
 	const { setStepByPath, setDataPartially, data: onboardingReq } = useOnboardingStore();
 	const { finalizeClusterSetup } = useClusterStore();
 	const { appRoles } = useTypeStore();
@@ -26,6 +27,7 @@ export default function InviteTeamMembers() {
 
 	async function onSubmit(data: AppMembers[], setError: (error: APIError) => void) {
 		const appMembers = data;
+		setFinalizing(true);
 		setDataPartially({
 			appMembers,
 		});
@@ -36,7 +38,7 @@ export default function InviteTeamMembers() {
 			...onboardingReq,
 			appMembers,
 		});
-
+		setFinalizing(false);
 		if ('error' in res) {
 			setError(res);
 			return;
@@ -57,7 +59,7 @@ export default function InviteTeamMembers() {
 						<Button variant='text' size='lg' onClick={goBack}>
 							{t('onboarding.previous')}
 						</Button>
-						<Button variant='primary' size='lg'>
+						<Button variant='primary' size='lg' loading={finalizing}>
 							{t('onboarding.finish')}
 						</Button>
 					</div>

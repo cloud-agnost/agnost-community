@@ -89,15 +89,15 @@ export const MAX_DB_SIZE = 50;
 
 export const SLIDER_IMAGES = [
 	{
-		text: 'Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.',
+		text: translate('general.slider.rapid'),
 		image: Rapid,
 	},
 	{
-		text: 'Amplify your backend capabilities and seamlessly integrate, manipulate, and leverage the power of multiple databases, including MySQL, MSSQL, and PostgreSQL.',
+		text: translate('general.slider.database'),
 		image: Database,
 	},
 	{
-		text: 'Amplify your backend capabilities and seamlessly integrate, manipulate, and leverage the power of multiple databases, including MySQL, MSSQL, and PostgreSQL.',
+		text: translate('general.slider.realtime'),
 		image: Realtime,
 	},
 ];

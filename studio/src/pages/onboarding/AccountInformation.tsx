@@ -13,11 +13,9 @@ import {
 import { Input } from '@/components/Input';
 import { PasswordInput } from '@/components/PasswordInput';
 import { GuestOnly } from '@/router';
-import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 import { APIError } from '@/types';
-import { User } from '@/types/type';
 import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
@@ -25,10 +23,6 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import * as z from 'zod';
-
-async function loader() {
-	return null;
-}
 
 const FormSchema = z.object({
 	email: z
@@ -69,7 +63,6 @@ export default function AccountInformation() {
 	const [error, setError] = useState<APIError | null>(null);
 	const { goToNextStep } = useOnboardingStore();
 	const { initializeClusterSetup } = useClusterStore();
-	const { setUser } = useAuthStore();
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 
@@ -80,21 +73,23 @@ export default function AccountInformation() {
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		try {
-			setInitiating(true);
-			setError(null);
-			const user = await initializeClusterSetup(data);
-			setUser(user as User);
-			const { nextPath } = getCurrentStep();
-			if (nextPath) {
-				navigate(nextPath);
-				goToNextStep(true);
-			}
-		} catch (e) {
-			setError(e as APIError);
-		} finally {
-			setInitiating(false);
-		}
+		setInitiating(true);
+		setError(null);
+		initializeClusterSetup({
+			...data,
+			onSuccess: () => {
+				const { nextPath } = getCurrentStep();
+				if (nextPath) {
+					navigate(nextPath);
+					goToNextStep(true);
+				}
+				setInitiating(false);
+			},
+			onError: (e) => {
+				setError(e);
+				setInitiating(false);
+			},
+		});
 	}
 
 	return (
@@ -178,5 +173,3 @@ export default function AccountInformation() {
 		</GuestOnly>
 	);
 }
-
-AccountInformation.loader = loader;
