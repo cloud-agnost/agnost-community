@@ -37,6 +37,10 @@
 	"IP": {
 		"error": "Please enter a valid IP address"
 	},
+	"decimal": {
+		"error": "Please enter a valid decimal number",
+		"decimal_digits": "Please enter a valid decimal number with up to {{decimal_digits}} decimal places"
+	},
 	"enterAtLeastOne": "Please enter at least one {{label}}",
 	"enterAtLeastOneValue": "Please enter at least one value",
 	"placeholder": "Enter {{label}}",

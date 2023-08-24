@@ -66,7 +66,7 @@ export class SQLBaseManager extends DBManager {
      * @throws Rejects when the query fails or database already exists;
      */
     async createDatabase() {
-        const dbName = this.getDbName();
+        const dbName = this.getDatabaseNameToUse();
 
         if (await this.isDatabaseExists(dbName)) {
             await this.useDatabase(dbName);
@@ -166,6 +166,14 @@ export class SQLBaseManager extends DBManager {
                 const handleUniqueIndexes = await this.handleUniqueIndexes(updatedModel, updatedModel.fields, true);
                 this.addQuery(handleUniqueIndexes);
                 console.log({ handleUniqueIndexes });
+
+                const handleDefaultValues = await this.handleDefaultValues(
+                    updatedModel,
+                    updatedModel.fieldChanges.updated,
+                    true
+                );
+                this.addQuery(handleDefaultValues);
+                console.log({ handleDefaultValues });
 
                 const handleFullTextSearchIndexes = await this.handleFullTextSearchIndexes(
                     updatedModel,
@@ -447,6 +455,38 @@ export class SQLBaseManager extends DBManager {
                 query = "\n" + (await this.addUniqueConstraint(model.name, field.name, returnQuery));
             } else {
                 query = "\n" + (await this.dropUniqueConstraint(model.name, field.name, returnQuery));
+            }
+
+            if (returnQuery) SQL += query;
+        }
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    /**
+     * Add or drop unique constraint from fields
+     * @param {object} model
+     * @param {object[]} fields
+     * @param {boolean} returnQuery - return query or not
+     * @return {Promise<void> | string}
+     */
+    async handleDefaultValues(model, fields, returnQuery = false) {
+        let SQL = "";
+
+        for (const field of fields) {
+            if (!field.isDefaultValueChanged) continue;
+            let query = "";
+
+            // TODO change default value
+
+            /** @type {Field} */
+            const fieldClass = new (fieldMap.get(field.type))(field, this.getDbType());
+            const isBoolean = typeof field.defaultValue === "boolean";
+            if (!isBoolean && !field.defaultValue) {
+                query = "\n" + (await this.removeDefaultValues(model, field, returnQuery));
+            } else {
+                query = "\n" + (await this.addDefaultValues(model, field, returnQuery));
             }
 
             if (returnQuery) SQL += query;
@@ -767,28 +807,6 @@ export class SQLBaseManager extends DBManager {
     dropForeignKey(modelName, foreignKeyName, returnQuery = false) {}
 
     /**
-     *
-     * @param baseModel {object} - the model object
-     * @return {[]}
-     */
-    getForeignKeyField(baseModel) {
-        // TODO : remove if not used
-        const models = this.getPrevModels();
-        const foreignKeys = [];
-
-        for (let model of models) {
-            for (let field of model.fields) {
-                if (field.type === "reference" && field?.reference?.iid === baseModel.iid) {
-                    field.belongsTo = model.name;
-                    foreignKeys.push(field);
-                }
-            }
-        }
-
-        return foreignKeys;
-    }
-
-    /**
      * @description Return the foreign key name
      * @param iid {string} - The field iid
      * @return {string}
@@ -796,4 +814,14 @@ export class SQLBaseManager extends DBManager {
     static getForeignKeyName(iid) {
         return `fk_${iid.replaceAll("-", "_")}`;
     }
+
+    getDatabaseNameToUse() {
+        return this.getAssignUniqueName()
+            ? `${this.getEnvId()}_${this.getDbId()}`.replaceAll("-", "_").toLowerCase()
+            : this.getDbName();
+    }
+
+    addDefaultValues(model, field, returnQuery = false) {}
+
+    removeDefaultValues(model, field, returnQuery = false) {}
 }

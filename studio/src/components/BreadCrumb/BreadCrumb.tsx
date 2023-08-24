@@ -11,13 +11,14 @@ export interface BreadCrumbItem {
 
 type BreadCrumbProps = {
 	goBackLink: string;
+	className?: string;
 	items: BreadCrumbItem[];
 };
 
-export default function BreadCrumb({ goBackLink, items }: BreadCrumbProps) {
+export default function BreadCrumb({ goBackLink, className, items }: BreadCrumbProps) {
 	const filteredItems = items.filter((item) => Boolean(item.name));
 	return (
-		<div className='h-20 shrink-0 flex items-center gap-x-6'>
+		<div className={cn('shrink-0 flex items-center gap-x-6', className)}>
 			<Button to={goBackLink} className='text-lg border-none h-8 w-8 p-0' variant='secondary'>
 				<ArrowLeft weight='bold' />
 			</Button>

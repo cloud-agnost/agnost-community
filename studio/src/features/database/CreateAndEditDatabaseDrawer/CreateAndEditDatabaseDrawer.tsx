@@ -1,10 +1,6 @@
 import { DATABASE_ICON_MAP, NAME_SCHEMA } from '@/constants';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
-import {
-	default as useResourceStore,
-	default as useResourcesStore,
-} from '@/store/resources/resourceStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIError } from '@/types';
 import { cn, translate } from '@/utils';
@@ -35,6 +31,9 @@ import { FormEvent, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
+import { SettingsFormItem } from 'components/SettingsFormItem';
+import { Switch } from 'components/Switch';
+import useResourceStore from '@/store/resources/resourceStore.ts';
 interface CreateDatabaseDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -43,6 +42,7 @@ interface CreateDatabaseDrawerProps {
 
 const CreateSchema = z.object({
 	name: NAME_SCHEMA,
+	assignUniqueName: z.boolean(),
 	resourceId: z
 		.string({
 			required_error: translate('forms.required', {
@@ -65,7 +65,7 @@ export default function CreateAndEditDatabaseDrawer({
 	const { t } = useTranslation();
 	const { version } = useVersionStore();
 	const { createDatabase, toEditDatabase, updateDatabaseName } = useDatabaseStore();
-	const getResources = useResourcesStore((state) => state.getResources);
+	const getResources = useResourceStore((state) => state.getResources);
 	const toggleCreateResourceModal = useResourceStore((state) => state.toggleCreateResourceModal);
 	const canCreateDatabase = useAuthorizeVersion('db.create');
 	const resources = useResourceStore((state) =>
@@ -75,6 +75,7 @@ export default function CreateAndEditDatabaseDrawer({
 		resolver: zodResolver(CreateSchema),
 		defaultValues: {
 			managed: true,
+			assignUniqueName: true,
 		},
 	});
 
@@ -115,6 +116,7 @@ export default function CreateAndEditDatabaseDrawer({
 					type: resource.instance,
 					resourceId: data.resourceId,
 					name: data.name,
+					assignUniqueName: data.assignUniqueName,
 				});
 			}
 			openStatusChange(false);
@@ -178,6 +180,32 @@ export default function CreateAndEditDatabaseDrawer({
 									<Separator />
 									<FormField
 										control={form.control}
+										name='assignUniqueName'
+										render={({ field }) => (
+											<FormItem className='space-y-1'>
+												<FormControl>
+													<SettingsFormItem
+														as='label'
+														className='py-0 space-y-0'
+														contentClassName='flex items-center justify-center'
+														title={t('database.add.unique.title')}
+														description={t('database.add.unique.desc')}
+														twoColumns
+													>
+														<Switch checked={field.value} onCheckedChange={field.onChange} />
+													</SettingsFormItem>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</>
+							)}
+							{!editMode && (
+								<>
+									<Separator />
+									<FormField
+										control={form.control}
 										name='resourceId'
 										render={({ field, formState: { errors } }) => (
 											<FormItem className='space-y-1'>
@@ -191,7 +219,10 @@ export default function CreateAndEditDatabaseDrawer({
 													>
 														<FormControl>
 															<SelectTrigger
-																className={cn('w-full input', errors.resourceId && 'input-error')}
+																className={cn(
+																	'w-full input !text-base',
+																	errors.resourceId && 'input-error',
+																)}
 															>
 																<SelectValue
 																	className={cn('text-subtle')}
@@ -215,11 +246,11 @@ export default function CreateAndEditDatabaseDrawer({
 																const Icon = DATABASE_ICON_MAP[resource.instance];
 																return (
 																	<SelectItem
-																		className='px-3 py-[6px] w-full max-w-full cursor-pointer'
+																		className='px-3 py-[6px] w-full max-w-full cursor-pointer text-base'
 																		key={resource._id}
 																		value={resource._id}
 																	>
-																		<div className='flex items-center gap-2'>
+																		<div className='flex items-center gap-2 [&>svg]:text-lg'>
 																			<Icon />
 																			{resource.name}
 																		</div>

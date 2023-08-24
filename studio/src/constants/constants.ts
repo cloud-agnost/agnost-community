@@ -891,11 +891,17 @@ export const FIELD_ICON_MAP: Record<string, ElementType> = {
  */
 export const REFERENCE_FIELD_ACTION = ['CASCADE', 'NO ACTION', 'SET NULL', 'SET DEFAULT'] as const;
 
-export const MAX_LENGTHS: Record<string, number> = {
+export const MAX_LENGTHS: Record<string, number | Record<string, number>> = {
 	'encrypted-text': 50,
 	decimal: 10,
 	enum: 1000,
-	text: 10240,
+	text: {
+		MySQL: 16_382,
+		'SQL Server': 4_000,
+		PostgreSQL: 10_485_760,
+		Oracle: 4_000,
+		MongoDB: Number.MAX_SAFE_INTEGER,
+	},
 };
 
 export const HEADER_USER_DROPDOWN = [

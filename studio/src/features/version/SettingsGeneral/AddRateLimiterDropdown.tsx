@@ -50,7 +50,7 @@ export default function AddRateLimiterDropdown({
 					<DropdownMenuItemContainer>
 						<DropdownMenuItem
 							onClick={() => setAddRateLimitDrawerIsOpen(true)}
-							className='flex gap-[10px] text-blue-500 text-sm font-medium'
+							className='flex gap-[10px] text-sm font-medium'
 						>
 							<Plus weight='bold' />
 							<span>{t('version.add_new_limiter')}</span>

@@ -37,7 +37,7 @@ export default function NewTabDropdown() {
 					<SearchInput placeholder='Search' className='tab-search-input' />
 				</DropdownMenuLabel>
 				<DropdownMenuItemContainer>
-					{NEW_TAB_ITEMS.map((item) => (
+					{NEW_TAB_ITEMS.sort((a, b) => a.title.localeCompare(b.title)).map((item) => (
 						<DropdownMenuItem onClick={() => newTab(item)} asChild key={item.path}>
 							<Link to={`${item.path}?tabId=${newIndex}`}>{item.title}</Link>
 						</DropdownMenuItem>

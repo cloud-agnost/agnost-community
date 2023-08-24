@@ -1,4 +1,9 @@
 {
+	"no_result": "No items matching search criteria",
+	"reset_search_query": "Reset Search Query",
+	"schemas": "Schemas",
+	"schema": "Schema",
+	"default_value": "Default Value",
 	"cancel": "Cancel",
 	"field": "Field",
 	"ok": "OK",

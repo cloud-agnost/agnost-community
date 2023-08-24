@@ -10,6 +10,6 @@ export default class PhoneNumber extends Text {
      * @return {number | undefined}
      */
     getMaxLength() {
-        return config.get("database.phoneMaxLength") ?? 30;
+        return config.get("database.phoneMaxLength") ?? 16;
     }
 }

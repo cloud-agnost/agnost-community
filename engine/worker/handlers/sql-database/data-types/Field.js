@@ -55,6 +55,10 @@ export default class Field {
         return this.options.iid;
     }
 
+    getDefaultValue() {
+        return this.options.defaultValue;
+    }
+
     /**
      * @description Checks if the field is searchable
      * @return {boolean}

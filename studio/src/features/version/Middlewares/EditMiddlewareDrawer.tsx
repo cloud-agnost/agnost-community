@@ -16,12 +16,10 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
-import { CodeEditor } from 'components/CodeEditor';
-import { logicSchema, nameSchema } from '@/features/version/Middlewares/formSchema.ts';
+import { nameSchema } from '@/features/version/Middlewares/formSchema.ts';
 
 const MiddlewareFormSchema = z.object({
 	name: nameSchema,
-	logic: logicSchema,
 });
 
 export default function EditMiddlewareDrawer() {
@@ -33,8 +31,6 @@ export default function EditMiddlewareDrawer() {
 		editMiddlewareDrawerIsOpen,
 		setMiddleware,
 		updateMiddleware,
-		getMiddlewareById,
-		saveMiddlewareCode,
 	} = useMiddlewareStore();
 
 	const form = useForm<z.infer<typeof MiddlewareFormSchema>>({
@@ -44,20 +40,12 @@ export default function EditMiddlewareDrawer() {
 	async function init() {
 		if (!middleware) return;
 		if (editMiddlewareDrawerIsOpen) {
-			const res = await getMiddlewareById({
-				orgId: middleware.orgId,
-				appId: middleware.appId,
-				versionId: middleware.versionId,
-				mwId: middleware._id,
-			});
 			form.reset({
-				name: res.name,
-				logic: res.logic,
+				name: middleware.name,
 			});
 		} else {
 			form.reset({
 				name: '',
-				logic: '',
 			});
 		}
 	}
@@ -80,11 +68,7 @@ export default function EditMiddlewareDrawer() {
 				...params,
 				name: data.name,
 			});
-			await saveMiddlewareCode({
-				...params,
-				logic: data.logic,
-			});
-			await setEditMiddlewareDrawerIsOpen(false);
+			setEditMiddlewareDrawerIsOpen(false);
 		} finally {
 			setLoading(false);
 		}
@@ -125,20 +109,6 @@ export default function EditMiddlewareDrawer() {
 								</FormItem>
 							)}
 						/>
-						<FormField
-							control={form.control}
-							name='logic'
-							render={({ field }) => (
-								<FormItem className='flex-1 flex flex-col'>
-									<FormLabel>{t('version.handler_code')}</FormLabel>
-									<FormControl className='flex-1'>
-										<CodeEditor containerClassName='flex-1' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
 						<div className='flex justify-end mt-4'>
 							<Button loading={loading} size='lg'>
 								{t('general.save')}

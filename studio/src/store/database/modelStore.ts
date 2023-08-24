@@ -9,6 +9,8 @@ import {
 	DeleteModelParams,
 	DeleteMultipleFieldParams,
 	DeleteMultipleModelParams,
+	DisableTimestampsParams,
+	EnableTimestampsParams,
 	Field,
 	GetModelsOfDatabaseParams,
 	GetSpecificModelByIidOfDatabase,
@@ -42,6 +44,8 @@ interface ModelStore {
 	deleteMultipleField: (params: DeleteMultipleFieldParams) => Promise<Model>;
 	updateField: (params: UpdateFieldParams) => Promise<Model>;
 	getReferenceModels: (params: GetModelsOfDatabaseParams) => Promise<Model[]>;
+	enableTimestamps: (params: EnableTimestampsParams) => Promise<Model>;
+	disableTimestamps: (params: DisableTimestampsParams) => Promise<Model>;
 }
 
 const useModelStore = create<ModelStore>()(
@@ -279,6 +283,40 @@ const useModelStore = create<ModelStore>()(
 				getReferenceModels: async (params: GetModelsOfDatabaseParams): Promise<Model[]> => {
 					try {
 						return ModelService.getReferenceModels(params);
+					} catch (e) {
+						const error = e as APIError;
+						notify({
+							type: 'error',
+							title: error.error,
+							description: error.details,
+						});
+						throw e;
+					}
+				},
+				enableTimestamps: async (params: EnableTimestampsParams): Promise<Model> => {
+					try {
+						const model = await ModelService.enableTimestamps(params);
+						set((state) => ({
+							models: state.models.map((m) => (m._id === model._id ? model : m)),
+						}));
+						return model;
+					} catch (e) {
+						const error = e as APIError;
+						notify({
+							type: 'error',
+							title: error.error,
+							description: error.details,
+						});
+						throw e;
+					}
+				},
+				disableTimestamps: async (params: DisableTimestampsParams): Promise<Model> => {
+					try {
+						const model = await ModelService.disableTimestamps(params);
+						set((state) => ({
+							models: state.models.map((m) => (m._id === model._id ? model : m)),
+						}));
+						return model;
 					} catch (e) {
 						const error = e as APIError;
 						notify({
