@@ -50,6 +50,17 @@ const ERROR_CODES = {
 	invalidAccessToken: "invalid_access_token",
 	invalidUser: "invalid_user",
 	unauthorized: "unauthorized",
+	missingInputParameter: "missing_input_parameter",
+	missingRequiredField: "missing_required_field_value",
+	invalidRequiredField: "invalid_required_field_value",
+	notTextValue: "not_text_value",
+	maxLengthThreshold: "max_length_threshold_exceeded",
+	invalidEmailAddress: "invalid_email_address",
+	invalidURL: "invalid_URL",
+	invalidPhoneNumber: "invalid_phone_number",
+	notBooleanValue: "not_boolean_value",
+	notIntegerValue: "not_integer_value",
+	notDecimalValue: "not_decimal_value",
 };
 
 export default ERROR_CODES;
