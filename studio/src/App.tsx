@@ -22,8 +22,8 @@ function App() {
 	}, [isTypesOk, user]);
 
 	const toastSlide = cssTransition({
-		enter: 'slideInRight',
-		exit: 'slideOutRight',
+		enter: 'slideInDown',
+		exit: 'slideOutUp',
 	});
 
 	return (
