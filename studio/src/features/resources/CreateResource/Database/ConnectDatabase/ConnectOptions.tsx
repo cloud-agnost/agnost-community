@@ -22,9 +22,7 @@ export default function ConnectOptions() {
 		control,
 		name: 'access.options',
 	});
-	useEffect(() => {
-		append({ key: '', value: '' });
-	}, []);
+
 	return (
 		<CreateResourceItem title={t('resources.database.connection_options')}>
 			{fields.map((f, index) => (
