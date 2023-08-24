@@ -1,18 +1,17 @@
+import { Button } from '@/components/Button';
+import { Checkbox } from '@/components/Checkbox';
 import { DrawerFooter } from '@/components/Drawer';
 import { Input } from '@/components/Input';
+import { INSTANCE_PORT_MAP } from '@/constants';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useResourceStore from '@/store/resources/resourceStore';
-import { Instance, ConnectDatabaseSchema } from '@/types';
+import useTypeStore from '@/store/types/typeStore';
+import { Instance } from '@/types';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
 import { Control, Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import CreateResourceItem from '../CreateResourceItem';
 import ResourceInstance from '../ResourceType/ResourceInstance';
-import useTypeStore from '@/store/types/typeStore';
-import { Checkbox } from '@/components/Checkbox';
-import { Button } from '@/components/Button';
-import { INSTANCE_PORT_MAP } from '@/constants';
-import * as z from 'zod';
-import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 interface Props {
 	title: string;
 	children: React.ReactNode;
@@ -35,10 +34,10 @@ export default function CreateResourceLayout({
 	const { resourceType, returnToPreviousStep, goToNextStep } = useResourceStore();
 	const { appRoles } = useTypeStore();
 	const canCreateResource = useAuthorizeOrg('resource.create');
-	const form = useFormContext<z.infer<typeof ConnectDatabaseSchema>>();
+	const form = useFormContext();
 
 	return (
-		<div className='px-6 py-4 space-y-6 max-h-[90%] overflow-auto'>
+		<div className='px-6 py-4 space-y-6  overflow-auto'>
 			<div className='font-sfCompact'>
 				<p className='text-subtle text-sm'>
 					{t('resources.step', {
@@ -94,7 +93,7 @@ export default function CreateResourceLayout({
 												return (
 													<FormItem
 														key={role}
-														className='flex flex-row items-start space-x-1 space-y-0'
+														className='flex flex-row items-start space-x-4 space-y-0'
 													>
 														<FormControl>
 															<Checkbox
@@ -158,20 +157,22 @@ export default function CreateResourceLayout({
 						variant='primary'
 						size='lg'
 						onClick={goToNextStep}
-						disabled={resourceType.type && resourceType.name ? false : true}
+						disabled={!(resourceType.type && resourceType.name)}
 					>
 						{t('general.next')}
 					</Button>
 				</DrawerFooter>
 			) : (
-				<DrawerFooter>
+				<DrawerFooter className='justify-between'>
 					{actions}
-					<Button size='lg' type='button' variant='secondary' onClick={returnToPreviousStep}>
-						{t('general.previous')}
-					</Button>
-					<Button size='lg' type='submit' loading={loading} disabled={!canCreateResource}>
-						{t('general.add')}
-					</Button>
+					<div className='flex items-center justify-center gap-4'>
+						<Button size='lg' type='button' variant='secondary' onClick={returnToPreviousStep}>
+							{t('general.previous')}
+						</Button>
+						<Button size='lg' type='submit' loading={loading} disabled={!canCreateResource}>
+							{t('general.add')}
+						</Button>
+					</div>
 				</DrawerFooter>
 			)}
 		</div>
