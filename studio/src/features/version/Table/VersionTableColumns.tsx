@@ -8,26 +8,26 @@ import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { translate } from '@/utils';
 import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
-
+import { cn } from '@/utils';
 export const VersionTableColumns: ColumnDef<Version>[] = [
 	{
 		id: 'name',
-		header: translate('general.name').toUpperCase(),
+		header: translate('general.name'),
 		accessorKey: 'name',
 		size: 75,
 		cell: ({ row }) => {
-			const { name } = row.original;
+			const { name, master } = row.original;
 			return (
 				<div className='flex items-center gap-1'>
 					<VersionIcon className='w-5 h-5 text-subtle mr-2 shrink-0' />
-					<span>{name}</span>
+					<span className={cn(master && 'text-elements-green')}>{name}</span>
 				</div>
 			);
 		},
 	},
 	{
 		id: 'createdBy',
-		header: translate('general.created_at').toUpperCase(),
+		header: translate('general.created_at'),
 		accessorKey: 'createdBy',
 		size: 200,
 		cell: ({ row }) => {
@@ -40,7 +40,7 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 	},
 	{
 		id: 'permissions',
-		header: translate('version.read_write').toUpperCase(),
+		header: translate('version.read_write'),
 		accessorKey: 'readOnly',
 		size: 100,
 		cell: ({ row }) => {

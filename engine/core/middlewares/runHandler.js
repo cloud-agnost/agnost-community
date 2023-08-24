@@ -66,6 +66,7 @@ export const runHandler = (endpoint) => async (req, res) => {
 						name: error.name,
 						code: error.code,
 						message: error.message,
+						details: error.details,
 						stack: error.stack,
 					}
 				)

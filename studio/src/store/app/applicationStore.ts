@@ -8,7 +8,6 @@ import {
 	BaseRequest,
 	ChangeAppNameRequest,
 	CreateApplicationRequest,
-	CreateApplicationResponse,
 	DeleteApplicationRequest,
 	GetInvitationRequest,
 	Invitation,
@@ -30,6 +29,7 @@ import useAuthStore from '../auth/authStore';
 interface ApplicationStore {
 	application: Application | null;
 	applications: Application[];
+	toDeleteApp: Application | null;
 	temp: Application[];
 	loading: boolean;
 	error: APIError | null;
@@ -45,6 +45,8 @@ interface ApplicationStore {
 	invitationSearch: string;
 	invitationRoleFilter: string[] | null;
 	appAuthorization: AppPermissions;
+	isDeleteModalOpen: boolean;
+	isLeaveModalOpen: boolean;
 	selectApplication: (application: Application) => void;
 	changeAppName: (req: ChangeAppNameRequest) => Promise<Application>;
 	setAppAvatar: (req: SetAppAvatarRequest) => Promise<Application>;
@@ -68,13 +70,15 @@ interface ApplicationStore {
 	deleteInvitation: (req: InvitationRequest) => Promise<void>;
 	deleteMultipleInvitations: (req: InvitationRequest) => Promise<void>;
 	getAppsByOrgId: (orgId: string) => Promise<Application[] | APIError>;
-	createApplication: (
-		req: CreateApplicationRequest,
-	) => Promise<CreateApplicationResponse | APIError>;
+	createApplication: (req: CreateApplicationRequest) => Promise<Application | APIError>;
 	leaveAppTeam: (req: DeleteApplicationRequest) => Promise<void>;
 	deleteApplication: (req: DeleteApplicationRequest) => Promise<void>;
-	searchApplications: (query: string) => Promise<Application[] | APIError>;
+	searchApplications: (query: string) => void;
 	getAppPermissions: () => Promise<AppPermissions>;
+	openDeleteModal: (application: Application) => void;
+	closeDeleteModal: () => void;
+	openLeaveModal: (application: Application) => void;
+	closeLeaveModal: () => void;
 }
 
 const useApplicationStore = create<ApplicationStore>()(
@@ -103,6 +107,33 @@ const useApplicationStore = create<ApplicationStore>()(
 					invitationSearch: '',
 					invitationRoleFilter: [],
 					appAuthorization: {} as AppPermissions,
+					isDeleteModalOpen: false,
+					isLeaveModalOpen: false,
+					toDeleteApp: null,
+					openDeleteModal: (application: Application) => {
+						set({
+							isDeleteModalOpen: true,
+							toDeleteApp: application,
+						});
+					},
+					closeDeleteModal: () => {
+						set({
+							isDeleteModalOpen: false,
+							toDeleteApp: null,
+						});
+					},
+					openLeaveModal: (application: Application) => {
+						set({
+							isLeaveModalOpen: true,
+							toDeleteApp: application,
+						});
+					},
+					closeLeaveModal: () => {
+						set({
+							isLeaveModalOpen: false,
+							toDeleteApp: null,
+						});
+					},
 					selectApplication: (application: Application) => {
 						set({ application });
 					},
@@ -366,20 +397,41 @@ const useApplicationStore = create<ApplicationStore>()(
 						onError,
 					}: CreateApplicationRequest) => {
 						try {
-							set({ loading: true });
-							const res = await OrganizationService.createApplication({ orgId, name });
+							const { app } = await OrganizationService.createApplication({ orgId, name });
 							if (onSuccess) onSuccess();
+							const role = app.team.find(
+								// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+								//@ts-ignore
+								(team) => team.userId === useAuthStore.getState().user?._id,
+							)?.role;
+
 							set((prev) => ({
-								applications: [...prev.applications, res.app],
-								temp: [...prev.applications, res.app],
+								applications: [
+									...prev.applications,
+									{
+										...app,
+										team: [
+											{
+												userId: {
+													_id: useAuthStore.getState().user?._id as string,
+													name: useAuthStore.getState().user?.name as string,
+													color: useAuthStore.getState().user?.color as string,
+													pictureUrl: useAuthStore.getState().user?.pictureUrl as string,
+												},
+												role: role as string,
+												_id: '',
+												joinDate: '',
+											},
+										],
+									},
+								],
+								temp: [...prev.applications, app],
 							}));
-							joinChannel(res.app._id);
-							return res;
+							joinChannel(app._id);
+							return app;
 						} catch (error) {
 							if (onError) onError(error as APIError);
 							throw error as APIError;
-						} finally {
-							set({ loading: false });
 						}
 					},
 					leaveAppTeam: async ({ appId, orgId, onSuccess, onError }: DeleteApplicationRequest) => {
@@ -421,16 +473,10 @@ const useApplicationStore = create<ApplicationStore>()(
 								set((prev) => ({ applications: prev.temp }));
 								return get().temp;
 							}
-							set({ loading: true });
-							const res = get().temp.filter((app) =>
-								app.name.toLowerCase().includes(query.toLowerCase()),
-							);
-							set({ applications: res });
-							return res;
+							const applications = await ApplicationService.searchApps(query);
+							set({ applications });
 						} catch (error) {
 							throw error as APIError;
-						} finally {
-							set({ loading: false });
 						}
 					},
 					getAppPermissions: async () => {

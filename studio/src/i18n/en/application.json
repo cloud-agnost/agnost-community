@@ -6,6 +6,7 @@
 	"short_name": "App Name",
 	"enter_name": "Enter app name",
 	"empty": "You have not created any apps yet!",
+	"search_empty": "No applications matching search criteria",
 	"settings": {
 		"openVersion": "Open Version",
 		"editApp": "Edit App",
@@ -14,10 +15,6 @@
 	"leave": {
 		"title": "Leave App Team",
 		"description": "You are about the leave the app team. After leaving the team you will not be able to access it again. Are you sure you would like to leave the {{name}} team?"
-	},
-	"delete": {
-		"title": "Delete App",
-		"description": "You are about to delete the app. After deleting the app you will not be able to access it again. Are you sure you would like to delete the {{name}} app?"
 	},
 	"version": {
 		"title": "Open Version",
@@ -61,5 +58,11 @@
 		"description": "Each application member can have different role assigned to authorize certain actions within the organization itself. Organization members can also be added to app teams.",
 		"success": "Invitation has been sent successfully",
 		"successDesc": "The invitation has been sent successfully. The invited member will be able to access the app once they accept the invitation."
+	},
+	"delete": {
+		"title": "Delete App",
+		"alert": "Are you sure you want to delete this app?",
+		"description": " You are about to delete the app. After deleting the app you will not be able to access it again. Are you sure you would like to delete the this app?",
+		"confirmCode": "Confirm endpoint delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
 	}
 }
