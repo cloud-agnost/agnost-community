@@ -18,7 +18,7 @@
 	"select": "Select Resource Type",
 	"create_new": "Create New",
 	"connect_existing": "Connect to Existing",
-	"fill_parameters": "FILL OUT PARAMETERS",
+	"fill_parameters": "CONNECTION PARAMETERS",
 	"type": {
 		"database": "Database",
 		"storage": "Storage",
@@ -28,7 +28,7 @@
 	"resource_name": "RESOURCE NAME",
 	"database": {
 		"create": "Create New Database",
-		"choose_type": "CHOOSE DATABASE TYPE",
+		"choose_type": "CHOOSE TYPE",
 		"storage_size": "STORAGE SIZE : {{size}} GB",
 		"read_replicas": "READ REPLICAS",
 		"instance": "Instance",
