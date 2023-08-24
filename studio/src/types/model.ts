@@ -183,13 +183,9 @@ export type BasicValueListType =
 	| 'text'
 	| 'integer'
 	| 'decimal'
-	| 'monetary'
 	| 'datetime'
-	| 'date'
-	| 'time'
 	| 'email'
 	| 'link'
-	| 'phone'
-	| 'id';
+	| 'phone';
 
 export type ReferenceAction = 'CASCADE' | 'NO ACTION' | 'SET NULL' | 'SET DEFAULT';
