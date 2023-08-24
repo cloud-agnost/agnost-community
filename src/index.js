@@ -8,6 +8,7 @@ const deploymentRoutes = require('./deployment');
 const operatorInstallRoutes = require('./operetor');
 const redisRoutes = require('./redis');
 const mariadbRoutes = require('./mariadb');
+const postgresRoutes = require('./postgres');
 
 app.use(bodyParser.json());
 app.use('/', mongodbRoutes);
@@ -16,6 +17,7 @@ app.use('/', deploymentRoutes);
 app.use('/', operatorInstallRoutes);
 app.use('/', redisRoutes);
 app.use('/', mariadbRoutes);
+app.use('/', postgresRoutes);
 
 // Start the server
 app.listen(3000, () => console.log('Server started on port 3000.'));

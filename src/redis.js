@@ -29,7 +29,6 @@ async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, 
           resource.metadata.name = clusterName + '-redis-password';
           resource.stringData.password = passwd;
           const secretResult = k8sCoreApi.createNamespacedSecret(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case 'Service':
           switch(resource.metadata.name) {
@@ -44,12 +43,10 @@ async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, 
               break;
           }
           const serviceResult = await k8sCoreApi.createNamespacedService(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case('ServiceAccount'):
           resource.metadata.name = clusterName + '-svc-acc';
           const serviceAccResult = await k8sCoreApi.createNamespacedServiceAccount(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case('StatefulSet'):
           switch(resource.metadata.name) {
@@ -77,7 +74,6 @@ async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, 
           resource.spec.template.spec.volumes[1].configMap.defaultMode = 493;
           resource.spec.template.spec.volumes[2].configMap.name = clusterName + '-redis-configuration';
           const stsResult = await k8sApi.createNamespacedStatefulSet(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case('ConfigMap'):
           switch(resource.metadata.name) {
@@ -92,11 +88,12 @@ async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, 
               break;
           }
           const configMapResult = await k8sCoreApi.createNamespacedConfigMap(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
+          
           break;
         default:
           console.log('Skipping: ' + kind);
       }
+    console.log(kind + ' ' + resource.metadata.name + ' created...');
     } catch (error) {
       console.error('Error applying resource:', error);
     }

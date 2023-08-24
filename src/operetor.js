@@ -13,6 +13,7 @@ const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 const k8sAdmissionApi = kc.makeApiClient(k8s.AdmissionregistrationV1Api);
 const k8sAuthApi = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
 const k8sCustomApi = kc.makeApiClient(k8s.ApiextensionsV1Api);
+const k8sCustomObjectApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
 async function doesNamespaceExist(namespaceName) {
   try {
@@ -52,63 +53,55 @@ async function applyManifest(manifestFilePath) {
       switch(kind) {
         case 'Deployment':
           const deploymentResult = await k8sApi.createNamespacedDeployment(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case 'Service':
           const serviceResult = await k8sCoreApi.createNamespacedService(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case('ServiceAccount'):
           const serviceAccResult = await k8sCoreApi.createNamespacedServiceAccount(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case('Secret'):
           const secretResult = await k8sCoreApi.createNamespacedSecret(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case('ConfigMap'):
           const configMapResult = await k8sCoreApi.createNamespacedConfigMap(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case('ClusterRole'):
           const clusterRoleResult = await k8sAuthApi.createClusterRole(resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case('ClusterRoleBinding'):
           const clusterRoleBindingResult = await k8sAuthApi.createClusterRoleBinding(resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case('Role'):
           const roleResult = await k8sAuthApi.createNamespacedRole(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case('RoleBinding'):
           const roleBindingResult = await k8sAuthApi.createNamespacedRoleBinding(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case('MutatingWebhookConfiguration'):
           const mutatingWebhookConfResult = await k8sAdmissionApi.createMutatingWebhookConfiguration(resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case('ValidatingWebhookConfiguration'):
           const validatingWebHookConfResult = await k8sAdmissionApi.createValidatingWebhookConfiguration(resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case('CustomResourceDefinition'):
           const crdResult = await k8sCustomApi.createCustomResourceDefinition(resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
+          break;
+        case('OperatorConfiguration'):
+          const configResult = await k8sCustomObjectApi.createNamespacedCustomObject('acid.zalan.do', 'v1', namespace, 'operatorconfigurations', resource);
           break;
         default:
           console.log('Skipping: ' + kind);
       }
-      
+    
+    console.log(kind + ' ' + resource.metadata.name + ' created...');
+    
     } catch (error) {
       console.error('Error applying resource:', error);
     }
   }
   return "success";
 }
-
 
 // Install Extra Operators: postgres | mariadb | kafka | mysql
 router.post('/install-operator', async (req, res) => {

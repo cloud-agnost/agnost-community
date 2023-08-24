@@ -25,7 +25,6 @@ async function createMariaDBResource(serverName, dbName, dbVersion, memoryReques
           resource.stringData.password = passwd;
           resource.stringData["root-password"] = rootPasswd;
           const secretResult = k8sCoreApi.createNamespacedSecret(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case 'MariaDB':
           resource.metadata.name = serverName;
@@ -40,11 +39,11 @@ async function createMariaDBResource(serverName, dbName, dbVersion, memoryReques
           resource.spec.resources.requests.cpu = cpuRequest;
           resource.spec.resources.requests.memory = memoryRequest;
           const dbResult = await k8sCustomApi.createNamespacedCustomObject('mariadb.mmontes.io', 'v1alpha1', namespace, 'mariadbs', resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         default:
           console.log('Skipping: ' + kind);
       }
+    console.log(kind + ' ' + resource.metadata.name + ' created...');
     } catch (error) {
       console.error('Error applying resource:', error);
     }

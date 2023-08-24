@@ -26,21 +26,18 @@ async function createRabbitmqCluster(clusterName, memoryRequest, memoryLimit, cp
           resource.stringData.password = passwd;
           resource.stringData.host = clusterName + '.' + namespace + '.svc'
           const secretResult = k8sCoreApi.createNamespacedSecret(namespace, resource);
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case 'User':
           resource.metadata.name = clusterName + '-' + userName;
           resource.spec.rabbitmqClusterReference.name = clusterName;
           resource.spec.importCredentialsSecret.name = clusterName + '-' + userName + '-credentials';
           const userResult = await k8sCustomApi.createNamespacedCustomObject('rabbitmq.com', 'v1beta1', namespace, 'users', resource); 
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case 'Permission':
           resource.metadata.name = clusterName + '-' + userName + '-permission';
           resource.spec.userReference.name =  clusterName + '-' + userName;
           resource.spec.rabbitmqClusterReference.name = clusterName;
           const permissionResult = await k8sCustomApi.createNamespacedCustomObject('rabbitmq.com', 'v1beta1', namespace, 'permissions', resource); 
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         case 'RabbitmqCluster':
           resource.metadata.name = clusterName;
@@ -51,11 +48,11 @@ async function createRabbitmqCluster(clusterName, memoryRequest, memoryLimit, cp
           resource.spec.resources.requests.cpu = cpuRequest;
           resource.spec.resources.requests.memory = memoryRequest;
           const clusterResult = await k8sCustomApi.createNamespacedCustomObject('rabbitmq.com', 'v1beta1', 'default', 'rabbitmqclusters', resource);          
-          console.log(kind + ' ' + resource.metadata.name + ' created...');
           break;
         default:
           console.log('Skipping: ' + kind);
       }
+    console.log(kind + ' ' + resource.metadata.name + ' created...');
     } catch (error) {
       console.error('Error applying resource:', error.body);
     }
