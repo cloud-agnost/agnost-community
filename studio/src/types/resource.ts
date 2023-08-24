@@ -153,7 +153,6 @@ export const AccessDbSchema = z.object({
 			label: translate('resources.database.password'),
 		}),
 	}),
-	dbName: z.string().optional().or(z.literal('')),
 	options: z
 		.array(
 			z

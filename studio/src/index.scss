@@ -300,34 +300,36 @@
 		overflow-y: scroll;
 		height: 90%;
 	}
-	@keyframes slideInRight {
+	@keyframes slideInDown {
 		from {
-			transform: translateX(100%);
-			opacity: 0;
+			transform: translate3d(0, -100%, 0);
+			visibility: visible;
 		}
+
 		to {
-			transform: translateX(0);
-			opacity: 1;
+			transform: translate3d(0, 0, 0);
 		}
 	}
 
-	@keyframes slideOutRight {
+	.slideInDown {
+		animation-name: slideInDown 0.5s forwards;
+	}
+
+	@keyframes slideOutUp {
 		from {
-			transform: translateX(0);
-			opacity: 1;
+			transform: translate3d(0, 0, 0);
 		}
+
 		to {
-			transform: translateX(100%);
-			opacity: 0;
+			visibility: hidden;
+			transform: translate3d(0, -100%, 0);
 		}
 	}
 
-	.slideInRight {
-		animation: slideInRight 0.5s forwards;
+	.slideOutUp {
+		animation-name: slideOutUp 0.5s forwards;
 	}
-	.slideOutRight {
-		animation: slideOutRight 0.5s forwards;
-	}
+
 	.link {
 		@apply text-brand-primary hover:underline font-sfCompact text-sm;
 	}

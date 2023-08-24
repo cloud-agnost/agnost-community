@@ -16,7 +16,7 @@ export default function DeleteOrganization() {
 	const [isOpen, setIsOpen] = useState(false);
 	const confirmCode = useOrganizationStore((state) => state.organization?.iid) as string;
 	const { deleteOrganization } = useOrganizationStore();
-	const canDelete = useAuthorizeOrg('org.delete');
+	const canDelete = useAuthorizeOrg('delete');
 	function onConfirm() {
 		deleteOrganization({
 			onSuccess: () => {

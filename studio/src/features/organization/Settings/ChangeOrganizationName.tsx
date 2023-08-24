@@ -8,7 +8,7 @@ export default function ChangeOrganizationName() {
 	const [error, setError] = useState<APIError | null>(null);
 	const [loading, setLoading] = useState(false);
 	const { organization, changeOrganizationName } = useOrganizationStore();
-	const canOrgUpdate = useAuthorizeOrg('org.update');
+	const canOrgUpdate = useAuthorizeOrg('update');
 	async function onSubmit(data: any) {
 		if (organization?.name === data.name) return;
 		else {

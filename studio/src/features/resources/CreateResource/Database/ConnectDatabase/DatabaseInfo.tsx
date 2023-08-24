@@ -83,28 +83,6 @@ function DatabaseInfoForm({ modal }: DatabaseInfoProps) {
 					/>
 				)}
 			</div>
-			<FormField
-				control={control}
-				name={modal ? 'dbName' : 'access.dbName'}
-				render={({ field }) => (
-					<FormItem>
-						<FormLabel>{t('resources.database.database_name')}</FormLabel>
-						<FormControl>
-							<Input
-								error={Boolean(errors?.dbName)}
-								placeholder={
-									t('forms.placeholder', {
-										label: t('resources.database.database_name'),
-									}) ?? ''
-								}
-								{...field}
-							/>
-						</FormControl>
-
-						<FormMessage />
-					</FormItem>
-				)}
-			/>
 			<div className='flex items-start gap-6'>
 				{watch('instance') !== 'Redis' && (
 					<FormField
