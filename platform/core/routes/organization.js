@@ -1031,7 +1031,7 @@ router.get(
 );
 
 /*
-@route      /v1/org/:orgId/member/exclude-current?page=0&size=10&role=&search&sortBy=email&sortDir=asc
+@route      /v1/org/:orgId/member/exclude-current?role=&search&sortBy=email&sortDir=asc
 @method     GET
 @desc       Get organization members excluding the current user making this request
 @access     private
@@ -1046,7 +1046,7 @@ router.get(
   async (req, res) => {
     try {
       const { user, org } = req;
-      const { page, size, search, role, sortBy, sortDir } = req.query;
+      const { search, role, sortBy, sortDir } = req.query;
 
       let pipeline = [
         {
@@ -1113,14 +1113,6 @@ router.get(
             createdAt: -1,
           },
         });
-
-      // Pagination
-      pipeline.push({
-        $skip: size * page,
-      });
-      pipeline.push({
-        $limit: size,
-      });
 
       let result = await orgMemberCtrl.aggregate(pipeline);
       res.json(
