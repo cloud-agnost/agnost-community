@@ -11,7 +11,6 @@ export { default as Id } from "./Id.js";
 export { default as Integer } from "./Integer.js";
 export { default as Json } from "./Json.js";
 export { default as Link } from "./Link.js";
-export { default as Monetary } from "./Monetary.js";
 export { default as PhoneNumber } from "./PhoneNumber.js";
 export { default as Reference } from "./Reference.js";
 export { default as RichText } from "./RichText.js";
