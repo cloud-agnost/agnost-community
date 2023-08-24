@@ -131,7 +131,7 @@
 		"delete": {
 			"success": "Middleware(s) deleted successfully"
 		},
-		"no_middleware_found": "You have not defined any databases for this app version",
+		"no_middleware_found": "You have not defined any middlewares for this app version",
 		"empty": "No middleware selected"
 	},
 	"npm": {

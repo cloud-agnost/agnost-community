@@ -467,7 +467,7 @@ DROP PROCEDURE IF EXISTS ${name};`;
      * @return {Promise<Object|[]>}
      */
     async dropDatabase(dbName) {
-        return this.runQuery(`DROP DATABASE IF EXISTS ${dbName ?? this.getDbName()};`);
+        return this.runQuery(`DROP DATABASE IF EXISTS ${dbName ?? this.getDatabaseNameToUse()};`);
     }
 
     /**
@@ -485,6 +485,23 @@ DROP PROCEDURE IF EXISTS ${name};`;
         const refField = new FieldType(field, this.getDbType());
 
         const SQL = `ALTER TABLE ${modelName} MODIFY ${refField.toDefinitionQueryForModify()};`;
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    addDefaultValues(model, field, returnQuery = false) {
+        const isString = typeof field.defaultValue === "string";
+        const isNumber = isString && !isNaN(Number(field.defaultValue));
+        const defaultValue = isString && !isNumber ? `'${field.defaultValue}'` : field.defaultValue;
+
+        const SQL = `ALTER TABLE ${model.name} ALTER ${field.name} SET DEFAULT ${defaultValue};`;
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    removeDefaultValues(model, field, returnQuery = false) {
+        const SQL = `ALTER TABLE ${model.name} ALTER ${field.name} DROP DEFAULT;`;
+
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }

@@ -18,7 +18,7 @@ VersionDatabase.loader = function () {
 
 export default function VersionDatabase() {
 	return (
-		<div className='pt-12 px-6 space-y-6 h-full flex flex-col overflow-auto'>
+		<div className='pt-6 px-6 space-y-6 h-full flex flex-col overflow-auto'>
 			<ListDatabase />
 		</div>
 	);

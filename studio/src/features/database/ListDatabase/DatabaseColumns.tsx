@@ -6,7 +6,6 @@ import { translate } from '@/utils';
 import { Table } from '@phosphor-icons/react';
 import { Badge } from 'components/Badge';
 import { Button } from 'components/Button';
-import { CopyButton } from 'components/CopyButton';
 import { SortButton } from 'components/DataTable';
 import { Link } from 'react-router-dom';
 
@@ -18,6 +17,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		),
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { _id, name },
@@ -26,28 +26,10 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 			return (
 				<Link
 					to={`${_id}/models`}
-					className='flex items-center gap-2 justify-between hover:underline'
+					className='flex items-center gap-2 justify-between text-button-primary hover:underline'
 				>
 					{name}
 				</Link>
-			);
-		},
-	},
-	{
-		id: 'iid',
-		header: translate('general.id').toUpperCase(),
-		accessorKey: 'iid',
-		sortingFn: 'textCaseSensitive',
-		cell: ({
-			row: {
-				original: { iid },
-			},
-		}) => {
-			return (
-				<div className='flex items-center gap-2 justify-between'>
-					<span className='whitespace-nowrap'>{iid}</span>
-					<CopyButton text={iid} />
-				</div>
 			);
 		},
 	},
@@ -58,7 +40,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		),
 		accessorKey: 'type',
 		sortingFn: 'textCaseSensitive',
-
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { type },
@@ -66,7 +48,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		}) => {
 			const Icon = DATABASE_ICON_MAP[type];
 			return (
-				<span className='flex items-center gap-2'>
+				<span className='flex items-center gap-2 [&>svg]:text-lg'>
 					<Icon />
 					{type}
 				</span>
@@ -78,7 +60,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		header: translate('general.managed').toUpperCase(),
 		accessorKey: 'managed',
 		sortingFn: 'textCaseSensitive',
-
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { managed },

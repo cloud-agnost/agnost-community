@@ -129,7 +129,7 @@ export type AddNewFieldParams = GetModelsOfDatabaseParams & {
 	unique: boolean;
 	immutable: boolean;
 	indexed: boolean;
-	defaultValue?: string;
+	defaultValue?: string | number | boolean;
 	text?: {
 		searchable: boolean;
 		maxLength: number;
@@ -173,17 +173,19 @@ export type UpdateFieldParams = AddNewFieldParams & {
 	fieldId: string;
 };
 
+export type EnableTimestampsParams = GetSpecificModelOfDatabase & {
+	createdAt: string;
+	updatedAt: string;
+};
+export type DisableTimestampsParams = GetSpecificModelOfDatabase & {};
+
 export type BasicValueListType =
 	| 'text'
 	| 'integer'
 	| 'decimal'
-	| 'monetary'
 	| 'datetime'
-	| 'date'
-	| 'time'
 	| 'email'
 	| 'link'
-	| 'phone'
-	| 'id';
+	| 'phone';
 
 export type ReferenceAction = 'CASCADE' | 'NO ACTION' | 'SET NULL' | 'SET DEFAULT';

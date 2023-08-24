@@ -1,4 +1,9 @@
 {
+	"no_result": "No items matching search criteria",
+	"reset_search_query": "Reset Search Query",
+	"schemas": "Schemas",
+	"schema": "Schema",
+	"default_value": "Default Value",
 	"cancel": "Cancel",
 	"field": "Field",
 	"ok": "OK",
@@ -95,4 +100,5 @@
 		"database": "Amplify your backend capabilities and seamlessly integrate, manipulate, and leverage the power of multiple databases, including MySQL, MSSQL, and PostgreSQL.",
 		"realtime": "Build real-time apps that deliver a seamless user experience with our real-time database that syncs data across all connected devices in milliseconds."
 	}
+	"reset_filter": "Reset Filter"
 }

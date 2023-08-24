@@ -44,14 +44,14 @@
 			779: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.AgnostServerSideClient = void 0);
-				const n = i(602),
-					r = i(120),
+				const r = i(602),
+					n = i(120),
 					a = i(760),
 					s = i(634),
 					o = i(665),
 					l = i(419),
 					d = i(990);
-				class u extends n.APIBase {
+				class u extends r.APIBase {
 					constructor(e, t) {
 						super(e, t), (this.managers = new Map());
 					}
@@ -64,7 +64,7 @@
 						const t = this.managers.get(`storage-${e}`);
 						if (t) return t;
 						{
-							const t = new r.Storage(this.metaManager, this.adapterManager, e);
+							const t = new n.Storage(this.metaManager, this.adapterManager, e);
 							return this.managers.set(`storage-${e}`, t), t;
 						}
 					}
@@ -115,34 +115,34 @@
 				t.AgnostServerSideClient = u;
 			},
 			341: function (e, t, i) {
-				var n =
+				var r =
 						(this && this.__createBinding) ||
 						(Object.create
-							? function (e, t, i, n) {
-									void 0 === n && (n = i);
-									var r = Object.getOwnPropertyDescriptor(t, i);
-									(r &&
-										!("get" in r
+							? function (e, t, i, r) {
+									void 0 === r && (r = i);
+									var n = Object.getOwnPropertyDescriptor(t, i);
+									(n &&
+										!("get" in n
 											? !t.__esModule
-											: r.writable || r.configurable)) ||
-										(r = {
+											: n.writable || n.configurable)) ||
+										(n = {
 											enumerable: !0,
 											get: function () {
 												return t[i];
 											},
 										}),
-										Object.defineProperty(e, n, r);
+										Object.defineProperty(e, r, n);
 							  }
-							: function (e, t, i, n) {
-									void 0 === n && (n = i), (e[n] = t[i]);
+							: function (e, t, i, r) {
+									void 0 === r && (r = i), (e[r] = t[i]);
 							  }),
-					r =
+					n =
 						(this && this.__exportStar) ||
 						function (e, t) {
 							for (var i in e)
 								"default" === i ||
 									Object.prototype.hasOwnProperty.call(t, i) ||
-									n(t, e, i);
+									r(t, e, i);
 						};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Field =
@@ -231,23 +231,23 @@
 				const p = (e, t) => new s.AgnostServerSideClient(e, t);
 				t.createServerSideClient = p;
 				const m = p(global.META, global.ADAPTERS);
-				(t.agnost = m), r(i(307), t);
+				(t.agnost = m), n(i(307), t);
 			},
 			414: function (e, t, i) {
-				var n =
+				var r =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, i, r) {
+						return new (i || (i = Promise))(function (n, a) {
 							function s(e) {
 								try {
-									l(n.next(e));
+									l(r.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
 							function o(e) {
 								try {
-									l(n.throw(e));
+									l(r.throw(e));
 								} catch (e) {
 									a(e);
 								}
@@ -255,7 +255,7 @@
 							function l(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? n(e.value)
 									: ((t = e.value),
 									  t instanceof i
 											? t
@@ -263,12 +263,12 @@
 													e(t);
 											  })).then(s, o);
 							}
-							l((n = n.apply(e, t || [])).next());
+							l((r = r.apply(e, t || [])).next());
 						});
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Bucket = void 0);
-				const r = i(781),
+				const n = i(781),
 					a = i(979),
 					s = i(990),
 					o = i(419);
@@ -285,12 +285,12 @@
 						return new a.File(this.meta, this.adapter, this.name, e);
 					}
 					exists() {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.bucketExists(this.meta, this.name);
 						});
 					}
 					getInfo(e = !1) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, o.isBoolean)(e))
 								throw new s.ClientError(
 									"invalid_value",
@@ -305,7 +305,7 @@
 						});
 					}
 					rename(e) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, o.isString)(e))
 								throw new s.ClientError(
 									"invalid_value",
@@ -315,17 +315,17 @@
 						});
 					}
 					empty() {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							yield this.adapter.emptyBucket(this.meta, this.name);
 						});
 					}
 					delete() {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							yield this.adapter.deleteBucket(this.meta, this.name);
 						});
 					}
 					makePublic(e = !1) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, o.isBoolean)(e))
 								throw new s.ClientError(
 									"invalid_value",
@@ -339,7 +339,7 @@
 						});
 					}
 					makePrivate(e = !1) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, o.isBoolean)(e))
 								throw new s.ClientError(
 									"invalid_value",
@@ -353,7 +353,7 @@
 						});
 					}
 					setTag(e, t) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, o.isString)(e))
 								throw new s.ClientError(
 									"invalid_value",
@@ -368,7 +368,7 @@
 						});
 					}
 					removeTag(e) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, o.isString)(e))
 								throw new s.ClientError(
 									"invalid_value",
@@ -382,15 +382,15 @@
 						});
 					}
 					removeAllTags() {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.removeAllBucketTags(
 								this.meta,
 								this.name
 							);
 						});
 					}
-					updateInfo(e, t, i, r = !1) {
-						return n(this, void 0, void 0, function* () {
+					updateInfo(e, t, i, n = !1) {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, o.isString)(e))
 								throw new s.ClientError(
 									"invalid_value",
@@ -406,7 +406,7 @@
 									"invalid_value",
 									"isPublic parameter needs to be a boolean value"
 								);
-							if (!(0, o.isBoolean)(r))
+							if (!(0, o.isBoolean)(n))
 								throw new s.ClientError(
 									"invalid_value",
 									"includeFiles parameter needs to be a boolean value"
@@ -417,12 +417,12 @@
 								e,
 								t,
 								i,
-								r
+								n
 							);
 						});
 					}
 					deleteFiles(e) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, o.isArray)(e))
 								throw new s.ClientError(
 									"invalid_value",
@@ -432,7 +432,7 @@
 						});
 					}
 					listFiles(e) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (e) {
 								if (!(0, o.isObject)(e))
 									throw new s.ClientError(
@@ -477,7 +477,7 @@
 						});
 					}
 					upload(e, t) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, o.valueExists)(e) || !(0, o.isObject)(e))
 								throw new s.ClientError(
 									"invalid_value",
@@ -498,7 +498,7 @@
 									"invalid_value",
 									"File size needs to be a positive integer value value"
 								);
-							if ("stream" in e && !(e.stream instanceof r.Readable))
+							if ("stream" in e && !(e.stream instanceof n.Readable))
 								throw new s.ClientError(
 									"invalid_value",
 									"File stream needs to be a Readable stream"
@@ -546,10 +546,10 @@
 			665: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Database = void 0);
-				const n = i(602),
-					r = i(831),
+				const r = i(602),
+					n = i(831),
 					a = i(990);
-				class s extends n.APIBase {
+				class s extends r.APIBase {
 					constructor(e, t, i) {
 						if (
 							(super(e, t),
@@ -571,10 +571,10 @@
 								"adapter_not_found",
 								`Cannot find the adapter of the database named '${i}'`
 							);
-						const { models: n } = this.meta,
-							s = n.filter((e) => "model" === e.type);
+						const { models: r } = this.meta,
+							s = r.filter((e) => "model" === e.type);
 						for (const e of s) {
-							const t = new r.Model(e, null, this);
+							const t = new n.Model(e, null, this);
 							this.addModel(e.name, t);
 						}
 					}
@@ -606,20 +606,20 @@
 				t.Database = s;
 			},
 			979: function (e, t, i) {
-				var n =
+				var r =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, i, r) {
+						return new (i || (i = Promise))(function (n, a) {
 							function s(e) {
 								try {
-									l(n.next(e));
+									l(r.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
 							function o(e) {
 								try {
-									l(n.throw(e));
+									l(r.throw(e));
 								} catch (e) {
 									a(e);
 								}
@@ -627,7 +627,7 @@
 							function l(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? n(e.value)
 									: ((t = e.value),
 									  t instanceof i
 											? t
@@ -635,23 +635,23 @@
 													e(t);
 											  })).then(s, o);
 							}
-							l((n = n.apply(e, t || [])).next());
+							l((r = r.apply(e, t || [])).next());
 						});
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.File = void 0);
-				const r = i(781),
+				const n = i(781),
 					a = i(990),
 					s = i(419);
 				t.File = class {
-					constructor(e, t, i, n) {
-						(this.path = n),
+					constructor(e, t, i, r) {
+						(this.path = r),
 							(this.bucketName = i),
 							(this.meta = e),
 							(this.adapter = t);
 					}
 					exists() {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.fileExists(
 								this.meta,
 								this.bucketName,
@@ -660,7 +660,7 @@
 						});
 					}
 					getInfo() {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.getFileInfo(
 								this.meta,
 								this.bucketName,
@@ -669,7 +669,7 @@
 						});
 					}
 					delete() {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							yield this.adapter.deleteFile(
 								this.meta,
 								this.bucketName,
@@ -678,7 +678,7 @@
 						});
 					}
 					makePublic() {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.makeFilePublic(
 								this.meta,
 								this.bucketName,
@@ -687,7 +687,7 @@
 						});
 					}
 					makePrivate() {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.makeFilePrivate(
 								this.meta,
 								this.bucketName,
@@ -696,7 +696,7 @@
 						});
 					}
 					createReadStream() {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.createFileReadStream(
 								this.meta,
 								this.bucketName,
@@ -705,7 +705,7 @@
 						});
 					}
 					setTag(e, t) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, s.isString)(e))
 								throw new a.ClientError(
 									"invalid_value",
@@ -721,7 +721,7 @@
 						});
 					}
 					removeTag(e) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, s.isString)(e))
 								throw new a.ClientError(
 									"invalid_value",
@@ -736,7 +736,7 @@
 						});
 					}
 					removeAllTags() {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.removeAllFileTags(
 								this.meta,
 								this.bucketName,
@@ -745,7 +745,7 @@
 						});
 					}
 					copyTo(e) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, s.isString)(e))
 								throw new a.ClientError(
 									"invalid_value",
@@ -760,7 +760,7 @@
 						});
 					}
 					moveTo(e) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, s.isString)(e))
 								throw new a.ClientError(
 									"invalid_value",
@@ -775,7 +775,7 @@
 						});
 					}
 					replace(e) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, s.valueExists)(e) || !(0, s.isObject)(e))
 								throw new a.ClientError(
 									"invalid_value",
@@ -791,7 +791,7 @@
 									"invalid_value",
 									"File size needs to be a positive integer value value"
 								);
-							if ("stream" in e && !(e.stream instanceof r.Readable))
+							if ("stream" in e && !(e.stream instanceof n.Readable))
 								throw new a.ClientError(
 									"invalid_value",
 									"File stream needs to be a Readable stream"
@@ -810,7 +810,7 @@
 						});
 					}
 					updateInfo(e, t, i) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, s.isString)(e))
 								throw new a.ClientError(
 									"invalid_value",
@@ -839,20 +839,20 @@
 				};
 			},
 			760: function (e, t, i) {
-				var n =
+				var r =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, i, r) {
+						return new (i || (i = Promise))(function (n, a) {
 							function s(e) {
 								try {
-									l(n.next(e));
+									l(r.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
 							function o(e) {
 								try {
-									l(n.throw(e));
+									l(r.throw(e));
 								} catch (e) {
 									a(e);
 								}
@@ -860,7 +860,7 @@
 							function l(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? n(e.value)
 									: ((t = e.value),
 									  t instanceof i
 											? t
@@ -868,14 +868,14 @@
 													e(t);
 											  })).then(s, o);
 							}
-							l((n = n.apply(e, t || [])).next());
+							l((r = r.apply(e, t || [])).next());
 						});
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Queue = void 0);
-				const r = i(602),
+				const n = i(602),
 					a = i(990);
-				class s extends r.APIBase {
+				class s extends n.APIBase {
 					constructor(e, t, i) {
 						if (
 							(super(e, t),
@@ -897,7 +897,7 @@
 							);
 					}
 					submitMessage(e, t) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.sendMessage(
 								this.meta,
 								e,
@@ -906,7 +906,7 @@
 						});
 					}
 					getMessageStatus(e) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.getMessageTrackingRecord(
 								this.meta.iid,
 								e
@@ -917,20 +917,20 @@
 				t.Queue = s;
 			},
 			120: function (e, t, i) {
-				var n =
+				var r =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, i, r) {
+						return new (i || (i = Promise))(function (n, a) {
 							function s(e) {
 								try {
-									l(n.next(e));
+									l(r.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
 							function o(e) {
 								try {
-									l(n.throw(e));
+									l(r.throw(e));
 								} catch (e) {
 									a(e);
 								}
@@ -938,7 +938,7 @@
 							function l(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? n(e.value)
 									: ((t = e.value),
 									  t instanceof i
 											? t
@@ -946,16 +946,16 @@
 													e(t);
 											  })).then(s, o);
 							}
-							l((n = n.apply(e, t || [])).next());
+							l((r = r.apply(e, t || [])).next());
 						});
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Storage = void 0);
-				const r = i(602),
+				const n = i(602),
 					a = i(990),
 					s = i(414),
 					o = i(419);
-				class l extends r.APIBase {
+				class l extends n.APIBase {
 					constructor(e, t, i) {
 						if (
 							(super(e, t),
@@ -984,8 +984,8 @@
 							);
 						return new s.Bucket(this.meta, this.adapter, e.trim());
 					}
-					createBucket(e, t = !0, i, r) {
-						return n(this, void 0, void 0, function* () {
+					createBucket(e, t = !0, i, n) {
+						return r(this, void 0, void 0, function* () {
 							if (!(0, o.isString)(e))
 								throw new a.ClientError(
 									"invalid_value",
@@ -1006,12 +1006,12 @@
 								e.trim(),
 								t,
 								i,
-								r
+								n
 							);
 						});
 					}
 					listBuckets(e) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (e) {
 								if (!(0, o.isObject)(e))
 									throw new a.ClientError(
@@ -1052,7 +1052,7 @@
 						});
 					}
 					listFiles(e) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							if (e) {
 								if (!(0, o.isObject)(e))
 									throw new a.ClientError(
@@ -1093,7 +1093,7 @@
 						});
 					}
 					getStats() {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.getStats(this.meta);
 						});
 					}
@@ -1101,20 +1101,20 @@
 				t.Storage = l;
 			},
 			634: function (e, t, i) {
-				var n =
+				var r =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, i, r) {
+						return new (i || (i = Promise))(function (n, a) {
 							function s(e) {
 								try {
-									l(n.next(e));
+									l(r.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
 							function o(e) {
 								try {
-									l(n.throw(e));
+									l(r.throw(e));
 								} catch (e) {
 									a(e);
 								}
@@ -1122,7 +1122,7 @@
 							function l(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? n(e.value)
 									: ((t = e.value),
 									  t instanceof i
 											? t
@@ -1130,14 +1130,14 @@
 													e(t);
 											  })).then(s, o);
 							}
-							l((n = n.apply(e, t || [])).next());
+							l((r = r.apply(e, t || [])).next());
 						});
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Task = void 0);
-				const r = i(602),
+				const n = i(602),
 					a = i(990);
-				class s extends r.APIBase {
+				class s extends n.APIBase {
 					constructor(e, t, i) {
 						if (
 							(super(e, t),
@@ -1159,23 +1159,65 @@
 							);
 					}
 					runOnce() {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.triggerCronJob(this.meta);
 						});
 					}
 					getTaskStatus(e) {
-						return n(this, void 0, void 0, function* () {
+						return r(this, void 0, void 0, function* () {
 							return yield this.adapter.getTaskTrackingRecord(this.meta.iid, e);
 						});
 					}
 				}
 				t.Task = s;
 			},
+			687: (e, t, i) => {
+				Object.defineProperty(t, "__esModule", { value: !0 }),
+					(t.DBAction = void 0);
+				const r = i(419),
+					n = i(990);
+				t.DBAction = class {
+					constructor(e) {
+						(this.model = e),
+							(this.definition = {
+								method: null,
+								createData: null,
+								select: null,
+							});
+					}
+					setMethod(e) {
+						this.definition.method = e;
+					}
+					setSelect(e) {
+						if (e) {
+							if (!(0, r.isString)(e))
+								throw new n.ClientError(
+									"invalid_value",
+									"Select option needs to specify the names of the fiels to return, either a single field name or space separated list of field names e.g., 'name email profile.age'"
+								);
+							this.definition.select = e;
+						}
+					}
+					setCreateData(e) {
+						if (!e)
+							throw new n.ClientError(
+								"invalid_value",
+								"The data to create in the database table/collection needs to be provided"
+							);
+						if (!(0, r.isObject)(e) && !(0, r.isArray)(e))
+							throw new n.ClientError(
+								"invalid_value",
+								"The data to create in the database table/collection needs to be a single or an array of JSON objects"
+							);
+						this.definition.createData = e;
+					}
+				};
+			},
 			866: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.createField = void 0);
-				const n = i(264),
-					r = i(433),
+				const r = i(264),
+					n = i(433),
 					a = i(984),
 					s = i(199),
 					o = i(977),
@@ -1192,21 +1234,20 @@
 					g = i(361),
 					w = i(175),
 					_ = i(666),
-					y = i(646),
-					F = i(335),
-					P = i(620),
-					E = i(337),
-					M = i(811),
+					y = i(335),
+					F = i(620),
+					P = i(337),
+					E = i(811),
 					C = i(321),
-					j = i(300);
+					M = i(300);
 				t.createField = function (e, t) {
 					switch (e.type) {
 						case "id":
 							return new f.IdField(e, t);
 						case "text":
-							return new M.TextField(e, t);
+							return new E.TextField(e, t);
 						case "rich-text":
-							return new E.RichTextField(e, t);
+							return new P.RichTextField(e, t);
 						case "encrypted-text":
 							return new c.EncryptedTextField(e, t);
 						case "email":
@@ -1214,7 +1255,7 @@
 						case "link":
 							return new b.LinkField(e, t);
 						case "phone":
-							return new F.PhoneField(e, t);
+							return new y.PhoneField(e, t);
 						case "boolean":
 							return new a.BooleanField(e, t);
 						case "integer":
@@ -1226,7 +1267,7 @@
 						case "createdat":
 							return new s.CreatedAtField(e, t);
 						case "updatedat":
-							return new j.UpdatedAtField(e, t);
+							return new M.UpdatedAtField(e, t);
 						case "datetime":
 							return new l.DateTimeField(e, t);
 						case "date":
@@ -1238,35 +1279,176 @@
 						case "geo-point":
 							return new v.GeoPointField(e, t);
 						case "binary":
-							return new r.BinaryField(e, t);
+							return new n.BinaryField(e, t);
 						case "json":
 							return new m.JSONField(e, t);
 						case "reference":
-							return new P.ReferenceField(e, t);
+							return new F.ReferenceField(e, t);
 						case "basic-values-list":
-							return new n.BasicValuesListField(e, t);
+							return new r.BasicValuesListField(e, t);
 						case "object-list":
 							return new _.ObjectListField(e, t);
 						case "object":
 							return new w.ObjectField(e, t);
-						case "parent":
-							return new y.ParentField(e, t);
 					}
 				};
 			},
-			111: (e, t) => {
+			111: function (e, t) {
+				var i =
+					(this && this.__awaiter) ||
+					function (e, t, i, r) {
+						return new (i || (i = Promise))(function (n, a) {
+							function s(e) {
+								try {
+									l(r.next(e));
+								} catch (e) {
+									a(e);
+								}
+							}
+							function o(e) {
+								try {
+									l(r.throw(e));
+								} catch (e) {
+									a(e);
+								}
+							}
+							function l(e) {
+								var t;
+								e.done
+									? n(e.value)
+									: ((t = e.value),
+									  t instanceof i
+											? t
+											: new i(function (e) {
+													e(t);
+											  })).then(s, o);
+							}
+							l((r = r.apply(e, t || [])).next());
+						});
+					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Field = void 0),
 					(t.Field = class {
 						constructor(e, t) {
 							(this.meta = e), (this.model = t);
 						}
+						getName() {
+							return this.meta.name;
+						}
+						getType() {
+							return this.meta.type;
+						}
+						getQueryPath() {
+							return this.meta.queryPath;
+						}
+						hasDefaultValue() {
+							return (
+								null !== this.meta.defaultValue &&
+								void 0 !== this.meta.defaultValue
+							);
+						}
+						hasFieldsWithDefaultValue() {
+							return !1;
+						}
+						getDefaultValue() {
+							return this.meta.defaultValue;
+						}
+						isReadOnly() {
+							return this.meta.immutable;
+						}
+						isRequired() {
+							return this.meta.required;
+						}
+						isSystemField() {
+							return "system" === this.meta.creator;
+						}
+						isUserField() {
+							return "user" === this.meta.creator;
+						}
+						setValue(e, t, r, n = !0) {
+							return i(this, void 0, void 0, function* () {});
+						}
+						addValidationError(e, t, i, r = !0, n = -1) {
+							let a = {};
+							(a.origin = r ? "client_error" : "server_error"),
+								(a.code = i),
+								(a.details = {}),
+								(a.details.field = this.getQueryPath()),
+								n >= 0 && (a.details.index = n),
+								void 0 !== t && (a.details.value = t);
+							let s = e.errors;
+							s ? s.push(a) : ((e.errors = []), e.errors.push(a));
+						}
+						prepare(e, t, r, n = !0) {
+							return i(this, void 0, void 0, function* () {
+								if (null == e || void 0 === e)
+									if (this.hasDefaultValue())
+										yield this.setValue(this.getDefaultValue(), t, r, n);
+									else if (this.isRequired())
+										this.isUserField()
+											? this.addValidationError(
+													r,
+													e,
+													"missing_required_field_value"
+											  )
+											: yield this.setValue(e, t, r, n);
+									else if (
+										"object-list" === this.getType() ||
+										"basic-values-list" === this.getType()
+									)
+										yield this.setValue([], t, r, n);
+									else {
+										if (
+											"object" !== this.getType() ||
+											!this.hasFieldsWithDefaultValue()
+										)
+											return;
+										yield this.setValue({}, t, r, n);
+									}
+								else yield this.setValue(e, t, r, n);
+							});
+						}
 					});
 			},
-			831: (e, t, i) => {
+			831: function (e, t, i) {
+				var r =
+					(this && this.__awaiter) ||
+					function (e, t, i, r) {
+						return new (i || (i = Promise))(function (n, a) {
+							function s(e) {
+								try {
+									l(r.next(e));
+								} catch (e) {
+									a(e);
+								}
+							}
+							function o(e) {
+								try {
+									l(r.throw(e));
+								} catch (e) {
+									a(e);
+								}
+							}
+							function l(e) {
+								var t;
+								e.done
+									? n(e.value)
+									: ((t = e.value),
+									  t instanceof i
+											? t
+											: new i(function (e) {
+													e(t);
+											  })).then(s, o);
+							}
+							l((r = r.apply(e, t || [])).next());
+						});
+					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Model = void 0);
-				const n = i(866);
+				const n = i(687),
+					a = i(866),
+					s = i(419),
+					o = i(990);
 				t.Model = class {
 					constructor(e, t, i) {
 						(this.meta = e),
@@ -1275,7 +1457,7 @@
 							(this.fields = new Map());
 						const { fields: r } = e;
 						for (const e of r) {
-							const t = (0, n.createField)(e, this);
+							const t = (0, a.createField)(e, this);
 							t && this.fields.set(e.name, t);
 						}
 					}
@@ -1288,191 +1470,235 @@
 					getSchema() {
 						return this.meta.schema;
 					}
+					getFields() {
+						return this.fields;
+					}
+					prepareFieldValues(e, t = !0) {
+						return r(this, void 0, void 0, function* () {
+							const i = [],
+								r = [];
+							for (let n = 0; n < e.length; n++) {
+								let a = e[n];
+								const s = {},
+									o = {};
+								if (null != a && void 0 !== a) {
+									for (let [e, i] of this.fields)
+										yield i.prepare(a[e], s, o, t);
+									o.errors ? i.push({ index: n, errors: o.errors }) : r.push(s);
+								}
+							}
+							if (i.length > 0)
+								throw new o.ClientError(
+									"validation_errors",
+									"The input data provided has failed to pass validation rules",
+									i
+								);
+							return r;
+						});
+					}
+					create(e) {
+						return r(this, void 0, void 0, function* () {
+							if (!e)
+								throw new o.ClientError(
+									"missing_input_parameter",
+									"The 'create' method expects an input argument but no input parameters provided"
+								);
+							if (!(0, s.isObject)(e.data))
+								throw new o.ClientError(
+									"invalid_value",
+									"The 'data' to create in the database table/collection needs to be a JSON object"
+								);
+							const t = new n.DBAction(this);
+							t.setMethod("create"), t.setSelect(e.select);
+							const i = yield this.prepareFieldValues([e.data], !0);
+							return t.setCreateData(i[0]), { result: "processed" };
+						});
+					}
 				};
 			},
 			264: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.BasicValuesListField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.BasicValuesListField = r;
+				t.BasicValuesListField = n;
 			},
 			433: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.BinaryField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.BinaryField = r;
+				t.BinaryField = n;
 			},
 			984: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.BooleanField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.BooleanField = r;
+				t.BooleanField = n;
 			},
 			199: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.CreatedAtField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.CreatedAtField = r;
+				t.CreatedAtField = n;
 			},
 			977: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.DateField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.DateField = r;
+				t.DateField = n;
 			},
 			288: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.DateTimeField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.DateTimeField = r;
+				t.DateTimeField = n;
 			},
 			126: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.DecimalField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.DecimalField = r;
+				t.DecimalField = n;
 			},
 			86: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.EmailField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.EmailField = r;
+				t.EmailField = n;
 			},
 			206: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.EncryptedTextField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.EncryptedTextField = r;
+				t.EncryptedTextField = n;
 			},
 			81: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.EnumField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.EnumField = r;
+				t.EnumField = n;
 			},
 			848: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.GeoPointField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.GeoPointField = r;
+				t.GeoPointField = n;
 			},
 			677: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.IdField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.IdField = r;
+				t.IdField = n;
 			},
 			736: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.IntegerField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.IntegerField = r;
+				t.IntegerField = n;
 			},
 			382: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.JSONField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.JSONField = r;
+				t.JSONField = n;
 			},
 			745: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.LinkField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.LinkField = r;
+				t.LinkField = n;
 			},
 			361: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.MonetaryField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.MonetaryField = r;
+				t.MonetaryField = n;
 			},
 			175: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.ObjectField = void 0);
-				const n = i(831),
-					r = i(111),
+				const r = i(831),
+					n = i(111),
 					a = i(990);
-				class s extends r.Field {
+				class s extends n.Field {
 					constructor(e, t) {
 						super(e, t);
 						const i = t.getDb().getModelMetaByIId(e.object.iid);
@@ -1485,7 +1711,7 @@
 									.getDb()
 									.getName()}'`
 							);
-						(this.subModel = new n.Model(i, t, t.getDb())),
+						(this.subModel = new r.Model(i, t, t.getDb())),
 							t
 								.getDb()
 								.addSubModel(
@@ -1493,16 +1719,26 @@
 									this.subModel
 								);
 					}
+					hasFieldsWithDefaultValue() {
+						if (!this.subModel) return !1;
+						let e = this.subModel.getFields();
+						for (let t of e.values()) {
+							if (t.hasDefaultValue()) return !0;
+							if ("object" === t.getType())
+								return t.hasFieldsWithDefaultValue();
+						}
+						return !1;
+					}
 				}
 				t.ObjectField = s;
 			},
 			666: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.ObjectListField = void 0);
-				const n = i(831),
-					r = i(111),
+				const r = i(831),
+					n = i(111),
 					a = i(990);
-				class s extends r.Field {
+				class s extends n.Field {
 					constructor(e, t) {
 						super(e, t);
 						const i = t.getDb().getModelMetaByIId(e.objectList.iid);
@@ -1515,7 +1751,7 @@
 									.getDb()
 									.getName()}'`
 							);
-						(this.subModel = new n.Model(i, t, t.getDb())),
+						(this.subModel = new r.Model(i, t, t.getDb())),
 							t
 								.getDb()
 								.addSubModel(
@@ -1526,82 +1762,71 @@
 				}
 				t.ObjectListField = s;
 			},
-			646: (e, t, i) => {
-				Object.defineProperty(t, "__esModule", { value: !0 }),
-					(t.ParentField = void 0);
-				const n = i(111);
-				class r extends n.Field {
-					constructor(e, t) {
-						super(e, t);
-					}
-				}
-				t.ParentField = r;
-			},
 			335: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.PhoneField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.PhoneField = r;
+				t.PhoneField = n;
 			},
 			620: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.ReferenceField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.ReferenceField = r;
+				t.ReferenceField = n;
 			},
 			337: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.RichTextField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.RichTextField = r;
+				t.RichTextField = n;
 			},
 			811: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.TextField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.TextField = r;
+				t.TextField = n;
 			},
 			321: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.TimeField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.TimeField = r;
+				t.TimeField = n;
 			},
 			300: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.UpdatedAtField = void 0);
-				const n = i(111);
-				class r extends n.Field {
+				const r = i(111);
+				class n extends r.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 				}
-				t.UpdatedAtField = r;
+				t.UpdatedAtField = n;
 			},
 			990: (e, t) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
@@ -1653,11 +1878,11 @@
 			},
 		},
 		t = {},
-		i = (function i(n) {
-			var r = t[n];
-			if (void 0 !== r) return r.exports;
-			var a = (t[n] = { exports: {} });
-			return e[n].call(a.exports, a, a.exports, i), a.exports;
+		i = (function i(r) {
+			var n = t[r];
+			if (void 0 !== n) return n.exports;
+			var a = (t[r] = { exports: {} });
+			return e[r].call(a.exports, a, a.exports, i), a.exports;
 		})(341);
 	module.exports = i;
 })();

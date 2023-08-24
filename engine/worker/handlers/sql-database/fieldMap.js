@@ -15,7 +15,6 @@ const fieldMap = new Map([
     ["boolean", fields.Bool],
     ["integer", fields.Integer],
     ["decimal", fields.Decimal],
-    ["monetary", fields.Monetary],
     ["createdat", fields.DateTime],
     ["updatedat", fields.DateTime],
     ["datetime", fields.DateTime],

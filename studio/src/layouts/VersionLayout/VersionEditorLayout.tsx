@@ -3,13 +3,14 @@ import { CodeEditor } from '@/components/CodeEditor';
 import { Pencil } from '@/components/icons';
 import { FloppyDisk, TestTube } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
+import { ReactNode } from 'react';
 
 interface VersionEditorLayoutProps {
-	children: React.ReactNode;
+	children: ReactNode;
 	loading: boolean;
 	logic: string | undefined;
 	onSaveLogic: () => void;
-	onTestModalOpen: () => void;
+	onTestModalOpen?: () => void;
 	onEditModalOpen: () => void;
 	setLogic: (logic: string | undefined) => void;
 }
@@ -33,11 +34,12 @@ export default function VersionEditorLayout({
 					<Button variant='secondary' iconOnly onClick={onEditModalOpen}>
 						<Pencil className='text-icon-base w-5 h-5' />
 					</Button>
-
-					<Button variant='secondary' onClick={onTestModalOpen}>
-						<TestTube size={20} className='text-icon-base mr-2' />
-						{t('endpoint.test.test')}
-					</Button>
+					{onTestModalOpen && (
+						<Button variant='secondary' onClick={onTestModalOpen}>
+							<TestTube size={20} className='text-icon-base mr-2' />
+							{t('endpoint.test.test')}
+						</Button>
+					)}
 					<Button variant='primary' onClick={onSaveLogic} loading={loading}>
 						<FloppyDisk size={20} className='text-icon-secondary mr-2' />
 						{t('general.save')}

@@ -134,4 +134,10 @@ export default class ApplicationService {
 			await axios.get(`v1/org/${useOrganizationStore.getState().organization?._id}/app/roles`)
 		).data;
 	}
+
+	static async searchApps(query: string): Promise<Application[]> {
+		return useApplicationStore
+			.getState()
+			.temp.filter((app) => app.name.toLowerCase().includes(query.toLowerCase()));
+	}
 }
