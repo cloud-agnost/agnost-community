@@ -1,7 +1,11 @@
 import cyripto from "crypto-js";
+import bcrypt from "bcrypt";
 import { customAlphabet } from "nanoid";
 import mongo from "mongodb";
 import querystring from "querystring";
+import Decimal from "decimal.js";
+import { DateTime } from "luxon";
+import validator from "validator";
 import { sendMessage } from "../init/sync.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
@@ -146,7 +150,11 @@ const generateId = (id = null) => {
  * @param  {string} idString The string representation of the id
  */
 function objectId(idString) {
-	return new mongo.ObjectId(idString);
+	try {
+		return new mongo.ObjectId(idString);
+	} catch (err) {
+		return null;
+	}
 }
 
 /**
@@ -158,7 +166,7 @@ function isValidId(id) {
 
 	try {
 		const objId = objectId(id);
-		if (mongo.ObjectId.isValid(objId)) {
+		if (objId && mongo.ObjectId.isValid(objId)) {
 			if (objId.toString() === id.toString()) {
 				return true;
 			} else {
@@ -357,6 +365,118 @@ function handleError(req, res, error) {
 	logger.error(JSON.stringify(entry, null, 2));
 }
 
+/**
+ * Returns the date representation of the input string. If string cannot be parsed to valid date returns null.
+ * @param {string} str  The string to parse into a date value
+ * @returns Date value
+ */
+function getDtmFromString(str) {
+	let date = null;
+
+	if (!str) return null;
+	str = str.toString().trim();
+
+	try {
+		date = DateTime.fromISO(str);
+	} catch (err) {
+		date = null;
+	}
+
+	if (!date || !date.isValid) {
+		try {
+			date = DateTime.fromRFC2822(str);
+		} catch (err) {
+			date = null;
+		}
+	}
+
+	if (!date || !date.isValid) {
+		try {
+			const millis = Date.parse(str);
+			const tempDate = new Date(millis);
+			date = DateTime.fromJSDate(tempDate);
+		} catch (err) {
+			date = null;
+		}
+	}
+
+	if (!date || !date.isValid) {
+		try {
+			date = DateTime.fromMillis(parseInt(str, 10));
+		} catch (err) {
+			date = null;
+		}
+	}
+
+	if (!date || !date.isValid) return null;
+	else return date;
+}
+
+/**
+ * Parses the input string and returns it in time format if valid otherwise returns null
+ * @returns Parsed time value or null
+ */
+function getTimeFromString(str) {
+	let date = null;
+
+	if (!str) return null;
+	str = str.toString().trim();
+
+	try {
+		date = DateTime.fromISO(str);
+	} catch (err) {
+		date = null;
+	}
+
+	if (!date || !date.isValid) return null;
+
+	const timePortion = date.toFormat("HH:mm:ss.SSS");
+	return timePortion;
+}
+
+/**
+ * Returns the decimal resresentaion of inf put value
+ * @param {number} value The input number
+ * @returns Decimal value
+ */
+function createDecimal(value) {
+	return new Decimal(value);
+}
+
+/**
+ * Checks if the value is a valid email address or not
+ * @returns True if it is an email otherwise false
+ */
+function isEmail(str) {
+	return validator.isEmail(str);
+}
+
+/**
+ * Checks if the value is a valid URL or not
+ * @returns True if it is a URL otherwise false
+ */
+function isLink(str) {
+	return validator.isURL(str, { require_tld: false, require_protocol: true });
+}
+
+/**
+ * Checks if the value is a valid mobile phone number or not
+ * @returns True if it is a valid mobile phone number otherwise false
+ */
+function isMobilePhone(str) {
+	return validator.isMobilePhone(str, null, { strictMode: true });
+}
+
+/**
+ * Encrypts the input text
+ * @returns Enrypted text
+ */
+async function encryptText(text) {
+	// Encrypt field value, this consumes some good time of compute resurces
+	const salt = await bcrypt.genSalt(10);
+	return await bcrypt.hash(text, salt);
+}
+
 export default {
 	generateSlug,
 	generateFileName,
@@ -376,4 +496,11 @@ export default {
 	removeLeadingSlash,
 	removeLeadingAndTrailingSlash,
 	handleError,
+	getDtmFromString,
+	getTimeFromString,
+	createDecimal,
+	isEmail,
+	isLink,
+	isMobilePhone,
+	encryptText,
 };

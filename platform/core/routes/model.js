@@ -1147,11 +1147,11 @@ router.put(
 				};
 			}
 
-			// Assign field specific properties, we cannot update field specific properties for object, object-list, and basic-values-list
+			// Assign field specific properties, we cannot update field specific properties for object and object-list
 			let fieldSpecifcPropName = modelCtrl.getFieldSpecificPropName(field.type);
 			if (
 				fieldSpecifcPropName &&
-				!["object", "object-list", "basic-values-list"].includes(field.type)
+				!["object", "object-list"].includes(field.type)
 			) {
 				fieldUpdateData[`fields.$.${fieldSpecifcPropName}`] =
 					req.body[fieldSpecifcPropName];
@@ -1168,7 +1168,7 @@ router.put(
 			// If we are renaming a sub-model field then we should also rename the sub-model
 			// This update is required, while deploying to an enviroment we use the model names to
 			// cretae paths for fields, especially in handling field name changes
-			if (["object", "object-list", "basic-values-list"].includes(field.type)) {
+			if (["object", "object-list"].includes(field.type)) {
 				let iid =
 					field.type === "object" ? field.object.iid : field.objectList.iid;
 

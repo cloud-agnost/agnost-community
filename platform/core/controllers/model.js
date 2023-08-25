@@ -147,8 +147,6 @@ class ModelController extends BaseController {
 	 */
 	getFieldSpecificPropName(type) {
 		switch (type) {
-			case "basic-values-list":
-				return "basicValuesList";
 			case "decimal":
 				return "decimal";
 			case "integer":

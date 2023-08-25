@@ -307,6 +307,7 @@ export class RabbitMQ extends QueueBase {
 										name: error.name,
 										code: error.code,
 										message: error.message,
+										specifics: error.specifics,
 										stack: error.stack,
 									}
 								)

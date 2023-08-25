@@ -62,15 +62,6 @@ export const envLogTypes = ["db", "server", "scheduler"];
 // sub-model-object: for single child or reference objects
 // sub-model-list: for a collection of child objects within a parent document
 export const modelTypes = ["model", "sub-model-object", "sub-model-list"];
-export const bvlTypes = [
-	"text",
-	"integer",
-	"decimal",
-	"datetime",
-	"email",
-	"link",
-	"phone",
-];
 
 export const fieldTypes = [
 	{

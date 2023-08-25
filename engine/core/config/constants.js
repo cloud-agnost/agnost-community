@@ -28,4 +28,7 @@ export const corePackages = [
 	"ua-parser-js",
 	"winston",
 	"winston-transport",
+	"bcrypt",
+	"luxon",
+	"validator",
 ];
