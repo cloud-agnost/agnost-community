@@ -6,7 +6,6 @@ import { decimalRules } from "./decimal.js";
 import { enumRules } from "./enum.js";
 import { objectRules } from "./object.js";
 import { objectListRules } from "./objectList.js";
-import { bvlRules } from "./bvl.js";
 import { referenceRules } from "./reference.js";
 import { fieldTypes } from "../../config/constants.js";
 
@@ -20,7 +19,6 @@ export const applyRules = (type) => {
 		enumRules(type),
 		objectRules(type),
 		objectListRules(type),
-		bvlRules(type),
 		referenceRules(type),
 	];
 };

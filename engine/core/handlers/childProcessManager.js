@@ -95,6 +95,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			await this.initExpressServer(false);
 			// Spin up the express server
 			await this.startExpressServer();
+			// We completed server initialization and can accept incoming requests
+			global.SERVER_STATUS = "running";
 			return;
 		}
 
@@ -128,6 +130,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		this.addLog(`Completed initializing the API server`);
 		// Send the deployment telemetry information to the platform
 		await this.sendEnvironmentLogs("OK");
+
+		// We completed server initialization and can accept incoming requests
+		global.SERVER_STATUS = "running";
 
 		// Create the agnost server-side client instance
 		// Save agnost server side client to globals for faster access
@@ -195,8 +200,6 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		const PORT = config.get("server.port");
 		var server = app.listen(PORT, () => {
 			this.addLog(`Http server started @ ${HOST}:${PORT}`);
-			// We completed server initialization and can accept incoming requests
-			global.SERVER_STATUS = "running";
 		});
 
 		/* 	Particularly needed in case of bulk insert/update/delete operations, we should not generate 502 Bad Gateway errors at nginex ingress controller, the value specified in default config file is in milliseconds */

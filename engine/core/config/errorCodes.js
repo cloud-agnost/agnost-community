@@ -61,6 +61,22 @@ const ERROR_CODES = {
 	notBooleanValue: "not_boolean_value",
 	notIntegerValue: "not_integer_value",
 	notDecimalValue: "not_decimal_value",
+	notDatetimeValue: "not_datetime_value",
+	notDateValue: "not_date_value",
+	notTimeValue: "not_time_value",
+	invalidEnumerationValue: "invalid_enumeration_value",
+	notGeopointValue: "not_geopoint_value",
+	invalidLongitudeValue: "invalid_longitude_value",
+	invalidLatitudeValue: "invalid_latitude_value",
+	notBufferValue: "not_buffer_value",
+	notJsonValue: "not_json_value",
+	notReferenceValue: "not_reference_value",
+	invalidNongodbId: "invalid_mongodb_id",
+	notBvlArray: "not_array_of_basic_values",
+	unsopportedBvlValue: "unsopported_bvl_value",
+	notObjectValue: "not_object_value",
+	notArrayValue: "not_array_value",
+	invalidObjectArrayEntry: "invalid_object_array_entry",
 };
 
 export default ERROR_CODES;

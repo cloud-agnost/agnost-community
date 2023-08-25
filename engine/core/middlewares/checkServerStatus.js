@@ -7,10 +7,7 @@ export const checkServerStatus = (req, res, next) => {
 			helper.createErrorMessage(
 				ERROR_CODES.clientError,
 				ERROR_CODES.serverNotReady,
-				t(
-					"The API server is in '%' status and is not ready to accept incoming requests.",
-					SERVER_STATUS
-				),
+				t("The API server is not ready yet to accept incoming requests."),
 				{
 					method: req.method,
 					path: req.path,

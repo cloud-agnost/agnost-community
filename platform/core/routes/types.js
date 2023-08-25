@@ -3,7 +3,6 @@ import { authSession } from "../middlewares/authSession.js";
 import {
 	orgRoles,
 	appRoles,
-	bvlTypes,
 	fieldTypes,
 	databaseTypes,
 	resourceTypes,
@@ -25,7 +24,6 @@ router.get("/all", authSession, (req, res) => {
 	res.json({
 		orgRoles,
 		appRoles,
-		bvlTypes,
 		fieldTypes,
 		databaseTypes,
 		resourceTypes,
@@ -34,16 +32,6 @@ router.get("/all", authSession, (req, res) => {
 		oAuthProviderTypes,
 		authUserDataModel,
 	});
-});
-
-/*
-@route      /bvl
-@method     GET
-@desc       Returns the list of basic values list types
-@access     public
-*/
-router.get("/bvl", authSession, (req, res) => {
-	res.json(bvlTypes);
 });
 
 /*

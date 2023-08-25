@@ -473,60 +473,9 @@ export class AdapterManager {
 				iid,
 				readOnly: false,
 				adapter: new MongoDB(client),
-				slaves: [],
 			};
 
 			this.adapters.set(resource.iid, adapterObj);
-
-			// Add readonly connections as slave
-			if (accessReadOnly) {
-				for (let i = 0; i < accessReadOnly.length; i++) {
-					let config = accessReadOnly[i];
-
-					try {
-						let slaveClient = null;
-						// Build query string part of the MongoDB connection string
-						config.connOptions = helper.getQueryString(config.options);
-						if (config.connFormat === "mongodb") {
-							slaveClient = new mongo.MongoClient(
-								config.connOptions
-									? `mongodb://${config.host}:${config.port}?${config.connOptions}`
-									: `mongodb://${config.host}:${config.port}`,
-								{
-									auth: {
-										username: config.username,
-										password: config.password,
-									},
-								}
-							);
-						} else {
-							slaveClient = new mongo.MongoClient(
-								config.connOptions
-									? `mongodb+srv://${config.host}?${config.connOptions}`
-									: `mongodb+srv://${config.host}`,
-								{
-									auth: {
-										username: config.username,
-										password: config.password,
-									},
-								}
-							);
-						}
-
-						// Connect to the database of the application
-						await slaveClient.connect();
-
-						adapterObj.slaves.push({
-							name,
-							type,
-							instance,
-							iid,
-							readOnly: true,
-							adapter: new MongoDB(slaveClient),
-						});
-					} catch (err) {}
-				}
-			}
 		} catch (err) {}
 	}
 

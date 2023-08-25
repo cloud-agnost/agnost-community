@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { body } from "express-validator";
-import { modelTypes, bvlTypes, fieldTypes } from "../config/constants.js";
+import { modelTypes, fieldTypes } from "../config/constants.js";
 
 /**
  * Each database holds models which are tables/collections with fields
@@ -186,12 +186,6 @@ export const ModelModel = mongoose.model(
 						// Reference to model internal identifier
 						iid: {
 							type: String,
-						},
-					},
-					basicValuesList: {
-						type: {
-							type: String,
-							enum: bvlTypes,
 						},
 					},
 					createdAt: { type: Date, default: Date.now, immutable: true },
