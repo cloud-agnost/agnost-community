@@ -41,7 +41,7 @@
 			"description": "All associated data will be deleted. This action is not reversible — please continue with caution.",
 			"confirmCode": "Confirm resource delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
 		},
-		"upsert": "Upsert",
-		"upsert_desc": "If the file already exists, it will be overwritten."
+		"copy": "Duplicate File",
+		"replace": "Replace File"
 	}
 }

@@ -2,12 +2,12 @@
 	"title": "Resources",
 	"add": "Add Resource",
 	"table": {
-		"name": "NAME",
-		"type": "TYPE",
-		"status": "STATUS",
-		"allowedRoles": "ALLOWED ROLES",
-		"createdAt": "DATE CREATED",
-		"actions": "ACTION"
+		"name": "Name",
+		"type": "Type",
+		"status": "Status",
+		"allowedRoles": "Allowed Roles",
+		"createdAt": "Date Created",
+		"actions": "Actions"
 	},
 	"delete": {
 		"title": "Delete Resource",
