@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback } from '../Avatar';
 import { Button } from '../Button';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '../Tooltip';
 interface TableConfirmationProps {
 	onConfirm: () => void;
 	title: string;
@@ -41,15 +42,22 @@ export function TableConfirmation({
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<Button
-					disabled={!hasVersionPermission || !hasOrgPermission}
-					variant='blank'
-					rounded
-					className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-					iconOnly
-				>
-					<Trash size={20} />
-				</Button>
+				<TooltipProvider>
+					<Tooltip>
+						<TooltipTrigger>
+							<Button
+								disabled={!hasVersionPermission || !hasOrgPermission}
+								variant='blank'
+								rounded
+								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
+								iconOnly
+							>
+								<Trash size={20} />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>{t('general.delete')}</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
 			</PopoverTrigger>
 			<PopoverContent align={align} className={cn('mr-2', contentClassName)}>
 				<div id='popup-modal' tabIndex={-1}>
