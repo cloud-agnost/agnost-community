@@ -1,4 +1,4 @@
-import ActionCell from '@/components/ActionsCell/ActionsCell';
+import { ActionsCell } from '@/components/ActionsCell';
 import { DATABASE_ICON_MAP } from '@/constants';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import { ColumnDefWithClassName, Database } from '@/types';
@@ -8,6 +8,7 @@ import { Badge } from 'components/Badge';
 import { Button } from 'components/Button';
 import { SortButton } from 'components/DataTable';
 import { Link } from 'react-router-dom';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from 'components/Tooltip';
 
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
@@ -100,22 +101,30 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 			//Todo: Table permissions
 			return (
 				<div className='flex items-center gap-0.5 justify-end'>
-					<Button
-						iconOnly
-						variant='blank'
-						rounded
-						to={`${original._id}/models`}
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default text-xl'
-					>
-						<Table />
-					</Button>
-					<ActionCell
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger>
+								<Button
+									iconOnly
+									variant='blank'
+									rounded
+									to={`${original._id}/models`}
+									className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default text-xl'
+								>
+									<Table />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>{translate('database.models.title')}</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+					<ActionsCell
 						original={original}
 						onDelete={deleteHandler}
 						onEdit={openEditDrawer}
 						canDeleteKey='db.delete'
 						canEditKey='db.update'
 						type='version'
+						disabled={!original.managed}
 					/>
 				</div>
 			);
