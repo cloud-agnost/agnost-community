@@ -1,14 +1,13 @@
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
+import { ConnectDatabaseSchema } from '@/types';
 import { cn, isEmpty } from '@/utils';
 import { Plus, Trash } from '@phosphor-icons/react';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import CreateResourceItem from '../../../CreateResourceItem';
-import { useEffect } from 'react';
-import { ConnectDatabaseSchema } from '@/types';
 import * as z from 'zod';
+import CreateResourceItem from '../../../CreateResourceItem';
 
 export default function ConnectOptions() {
 	const { t } = useTranslation();
