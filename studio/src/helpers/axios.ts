@@ -3,8 +3,13 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import { APIError } from '@/types';
 import axios from 'axios';
+import { setupCache } from 'axios-cache-adapter';
 const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost/api';
 const envBaseURL = `http://localhost/${useEnvironmentStore.getState().environment?.iid}`;
+
+const cache = setupCache({
+	maxAge: 15 * 60 * 1000,
+});
 
 const headers = {
 	'Content-Type': 'application/json',
@@ -12,11 +17,13 @@ const headers = {
 export const instance = axios.create({
 	baseURL,
 	headers,
+	adapter: cache.adapter,
 });
 
 export const envInstance = axios.create({
 	baseURL: envBaseURL,
 	headers,
+	adapter: cache.adapter,
 });
 
 export const testEndpointInstance = axios.create({
