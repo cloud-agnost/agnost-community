@@ -9,6 +9,7 @@ import { Checkbox } from 'components/Checkbox';
 import { Button } from 'components/Button';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
+import { InstanceType } from '@/components/InstanceType';
 
 const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 	{
@@ -34,9 +35,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 		cell: ({ row: { original } }) => {
@@ -57,7 +56,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 	},
 	{
 		id: 'instance',
-		header: translate('general.instance').toUpperCase(),
+		header: translate('general.instance'),
 		cell: ({
 			row: {
 				original: { iid },
@@ -67,14 +66,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)?.resource
 				.instance;
 			const Icon = STORAGE_ICON_MAP[instance as string];
-			return instance ? (
-				<div className='flex items-center gap-2'>
-					<Icon className='w-5 h-5' />
-					<span className='whitespace-nowrap'>{instance}</span>
-				</div>
-			) : (
-				<span className='whitespace-nowrap'>-</span>
-			);
+			return <InstanceType iid={iid} Icon={Icon} />;
 		},
 	},
 	{
@@ -82,7 +74,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.created_at').toUpperCase()}
+				text={translate('general.created_at')}
 				column={column}
 			/>
 		),
@@ -108,7 +100,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.updated_at').toUpperCase()}
+				text={translate('general.updated_at')}
 				column={column}
 			/>
 		),
