@@ -98,7 +98,7 @@ function AddMiddlewareDropdown({ value, onChange }: AddMiddlewareDropdownProps) 
 					<DropdownMenuItemContainer>
 						<DropdownMenuItem
 							onClick={() => setAddMiddlewareDrawerIsOpen(true)}
-							className='flex gap-[10px] text-blue-500 text-sm font-medium'
+							className='flex gap-[10px] text-default text-sm font-medium'
 						>
 							<Plus weight='bold' />
 							<span>{t('version.middleware.add_middleware')}</span>
