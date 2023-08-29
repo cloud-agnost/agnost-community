@@ -1,13 +1,15 @@
-import './tabs.scss';
 import { NewTabDropdown, TabItem, TabOptionsDropdown } from '@/features/version/Tabs/index.ts';
+import useTabStore from '@/store/version/tabStore.ts';
+import { Tab } from '@/types';
+import { generateId } from '@/utils';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 import { Dashboard } from 'components/icons';
 import { NEW_TAB_ITEMS } from 'constants/constants.ts';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useMatches, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import useTabStore from '@/store/version/tabStore.ts';
+import { useLocation, useMatches, useNavigate, useParams } from 'react-router-dom';
+import './tabs.scss';
 
 const SCROLL_AMOUNT = 200;
 
@@ -16,8 +18,7 @@ export default function Tabs() {
 	const [endOfScroll, setEndOfScroll] = useState(false);
 	const [startOfScroll, setStartOfScroll] = useState(false);
 	const [isScrollable, setIsScrollable] = useState(false);
-	const { getTabsByVersionId, removeTab, getCurrentTab, setCurrentTab, addTab } = useTabStore();
-	const [searchParams] = useSearchParams();
+	const { getTabsByVersionId, removeTab, getPreviousTab, setCurrentTab, addTab } = useTabStore();
 
 	const { t } = useTranslation();
 	const matches = useMatches();
@@ -36,6 +37,7 @@ export default function Tabs() {
 	useEffect(() => {
 		if (getTabsByVersionId(versionId).find((tab) => tab.isDashboard)) return;
 		addTab(versionId, {
+			id: generateId(),
 			title: t('version.dashboard'),
 			path: getDashboardPath(),
 			isDashboard: true,
@@ -52,35 +54,10 @@ export default function Tabs() {
 		const path = pathname?.split('/')?.at(-1);
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
 
-		const tabIndex = findTabIndex();
-		if (typeof tabIndex === 'number' && tabIndex !== -1) setCurrentTab(versionId, tabIndex);
-
 		if (item && !tabs.some((tab) => tab.path === item.path)) {
-			addTab(versionId, { ...item, isActive: true });
+			addTab(versionId, { ...item, isActive: true, id: generateId() });
 		}
 	}, [pathname]);
-
-	function findTabIndex() {
-		if (pathname === getDashboardPath()) return 0;
-
-		const path = pathname?.split('/')?.at(-1);
-		const tabIdFromQuery = searchParams.get('tabId') ? Number(searchParams.get('tabId')) : null;
-
-		const index = tabs.findIndex((tab) => tab.path === path);
-
-		if (tabIdFromQuery) {
-			const tab = tabs[Number(tabIdFromQuery)];
-			if (tab) {
-				if (tab.path === path) {
-					return Number(tabIdFromQuery);
-				} else {
-					return index;
-				}
-			}
-		} else {
-			return index;
-		}
-	}
 
 	function getDashboardPath() {
 		const matched = matches.at(-1);
@@ -117,11 +94,14 @@ export default function Tabs() {
 		};
 	}
 
-	function tabRemoveHandler(id: number) {
-		const currentTab = getCurrentTab(versionId);
-		const path = removeTab(versionId, id);
-		console.log({ currentTab, path });
-		if (currentTab && path) setTimeout(() => navigate(path), 1);
+	function tabRemoveHandler(tab: Tab) {
+		const prevTab = getPreviousTab(versionId, tab.id);
+		removeTab(versionId, tab.id);
+		if (tab.isActive && prevTab) {
+			console.log(prevTab);
+			setCurrentTab(versionId, prevTab?.id as string);
+			navigate(`${prevTab.path}?tabId=${prevTab.id}`);
+		}
 	}
 
 	function move(type: 'next' | 'prev') {
@@ -140,16 +120,16 @@ export default function Tabs() {
 	return (
 		<div className='navigation-tab-container'>
 			<div ref={scrollContainer} className='tab'>
-				{tabs.map((tab, index) => (
+				{tabs.map((tab) => (
 					<TabItem
 						active={tab.isActive}
 						data-active={tab.isActive ? 'true' : undefined}
 						icon={tab.isDashboard ? <Dashboard /> : undefined}
-						onClose={() => tabRemoveHandler(index)}
-						onClick={() => setCurrentTab(versionId, index)}
+						onClose={() => tabRemoveHandler(tab)}
+						onClick={() => setCurrentTab(versionId, tab.id)}
 						closeable={!tab.isDashboard}
-						to={`${tab.path}?tabId=${index}`}
-						key={index}
+						to={`${tab.path}?tabId=${tab.id}`}
+						key={tab.id}
 					>
 						{tab.title}
 					</TabItem>

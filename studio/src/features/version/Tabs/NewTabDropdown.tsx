@@ -1,30 +1,32 @@
+import useTabStore from '@/store/version/tabStore.ts';
+import { generateId } from '@/utils';
+import { Plus } from '@phosphor-icons/react';
+import { Button } from 'components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger,
-	DropdownMenuLabel,
 	DropdownMenuItemContainer,
+	DropdownMenuLabel,
+	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import { Button } from 'components/Button';
-import { Plus } from '@phosphor-icons/react';
-import { Link, useParams } from 'react-router-dom';
 import { SearchInput } from 'components/SearchInput';
-import { Tab } from '@/types';
 import { NEW_TAB_ITEMS } from 'constants/constants.ts';
-import useTabStore from '@/store/version/tabStore.ts';
-
+import { useNavigate, useParams } from 'react-router-dom';
 export default function NewTabDropdown() {
-	const { addTab, getTabsByVersionId } = useTabStore();
+	const { addTab, setCurrentTab } = useTabStore();
 	const { versionId } = useParams() as { versionId: string };
+	const navigate = useNavigate();
 
-	const tabs = getTabsByVersionId(versionId);
-	const newIndex = tabs.length;
-
-	function newTab(item: Tab) {
-		addTab(versionId, item);
+	function handleAddTab(item: (typeof NEW_TAB_ITEMS)[number]) {
+		const tab = {
+			id: generateId(),
+			...item,
+		};
+		addTab(versionId, tab);
+		navigate(`${tab.path}?tabId=${tab.id}`);
+		setCurrentTab(versionId, tab.id);
 	}
-
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -38,8 +40,8 @@ export default function NewTabDropdown() {
 				</DropdownMenuLabel>
 				<DropdownMenuItemContainer>
 					{NEW_TAB_ITEMS.sort((a, b) => a.title.localeCompare(b.title)).map((item) => (
-						<DropdownMenuItem onClick={() => newTab(item)} asChild key={item.path}>
-							<Link to={`${item.path}?tabId=${newIndex}`}>{item.title}</Link>
+						<DropdownMenuItem onClick={() => handleAddTab(item)} asChild key={item.path}>
+							<span>{item.title}</span>
 						</DropdownMenuItem>
 					))}
 				</DropdownMenuItemContainer>

@@ -23,8 +23,8 @@ export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropd
 		getCurrentTab,
 		getTabsByVersionId,
 		removeTab,
-		getCurrentTabId,
 		removeAllTabsExcept,
+		getPreviousTab,
 	} = useTabStore();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
@@ -33,17 +33,16 @@ export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropd
 	const currentTab = getCurrentTab(versionId);
 
 	const tabs = getTabsByVersionId(versionId);
-	const currentTabId = getCurrentTabId(versionId);
 
 	const tabOptions = [
 		{
 			title: t('version.close_selected_tab'),
 			action: () => {
-				if (!currentTab || !currentTabId) return;
-				const redirectPath = removeTab(versionId, currentTabId);
-
+				if (!currentTab) return;
+				const redirectTab = getPreviousTab(versionId, currentTab.id);
+				removeTab(versionId, currentTab.id);
 				setTimeout(() => {
-					if (redirectPath) navigate(redirectPath);
+					if (redirectTab) navigate(redirectTab.path);
 				}, 1);
 			},
 			disabled: pathname.split('?')[0] === getDashboardPath(),
