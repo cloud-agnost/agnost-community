@@ -2,9 +2,15 @@ import useEndpointStore from '@/store/endpoint/endpointStore';
 import { Endpoint as EndpointType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Endpoint extends RealtimeActions<EndpointType> {
-	info({ message, timestamp, id }: RealtimeActionParams<EndpointType>) {
+	deploy(): void {
+		throw new Error('Method not implemented.');
+	}
+	log({ message, timestamp, id, type }: RealtimeActionParams<EndpointType>) {
+		console.log('----endpoint log------', message, timestamp, id, type);
 		setTimeout(() => {
-			useEndpointStore.getState?.().setEndpointLog(id as string, `${timestamp} - ${message}`);
+			useEndpointStore
+				.getState?.()
+				.setEndpointLog(id as string, `${timestamp} - ${message} - ${id} - ${type}`);
 		}, 100);
 	}
 	delete({ identifiers }: RealtimeActionParams<EndpointType>) {

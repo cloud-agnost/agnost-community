@@ -2,7 +2,10 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization as OrganizationType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Organization extends RealtimeActions<OrganizationType> {
-	info(): void {
+	deploy(): void {
+		throw new Error('Method not implemented.');
+	}
+	log(): void {
 		throw new Error('Method not implemented.');
 	}
 	delete({ identifiers }: RealtimeActionParams<OrganizationType>) {

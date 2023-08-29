@@ -1,12 +1,12 @@
 import { RealtimeObjectTypes } from '@/types';
 import Application from './Application';
 import Endpoint from './Endpoint';
+import Environment from './Environment';
 import Organization from './Organization';
 import Queue from './Queue';
 import Resource from './Resources';
 import Task from './Task';
 import User from './User';
-
 export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 	const keys = {
 		user: User,
@@ -20,6 +20,8 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		task: Task,
 		'org.app.version.task': Task,
 		endpoint: Endpoint,
+		'org.app.version.endpoint': Endpoint,
+		'org.app.version.environment': Environment,
 	};
 	return new keys[type]();
 }

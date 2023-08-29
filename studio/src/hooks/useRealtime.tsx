@@ -7,23 +7,12 @@ export default function useRealtime() {
 	const user = useAuthStore((state) => state.user);
 	useEffect(() => {
 		const cb = onChannelMessage('notification', (message) => {
-			const {
-				data,
-				object,
-				action,
-				identifiers,
-				objectType,
-				timestamp,
-				message: log,
-				id,
-			} = message;
-			if (message.actor.userId !== user?._id) {
-				const fn = realtimeObjectMapper(object ?? objectType);
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				fn[action ?? 'info']({
+			const { data, object, action, identifiers, timestamp, message: log, id, type } = message;
+			if (message?.actor?.userId !== user?._id || action !== 'create') {
+				const fn = realtimeObjectMapper(object);
+				fn[action]({
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore
+					//@ts-ignore
 					data,
 					identifiers,
 					timestamp: DateTime.fromISO(timestamp)
@@ -31,6 +20,7 @@ export default function useRealtime() {
 						.toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
 					message: log,
 					id,
+					type,
 				});
 			}
 		});

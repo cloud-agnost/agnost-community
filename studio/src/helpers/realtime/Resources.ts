@@ -3,7 +3,10 @@ import { RealtimeActionParams, Resource as ResourceType } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
 class Resource extends RealtimeActions<ResourceType> {
-	info(): void {
+	deploy(): void {
+		throw new Error('Method not implemented.');
+	}
+	log(): void {
 		throw new Error('Method not implemented.');
 	}
 	delete({ identifiers }: RealtimeActionParams<ResourceType>) {
