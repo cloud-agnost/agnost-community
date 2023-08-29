@@ -110,7 +110,7 @@ export default function StorageForm({ edit = false }: StorageFormProps) {
 
 			<DrawerFooter className='mt-8'>
 				<div className='flex justify-end'>
-					<DrawerClose>
+					<DrawerClose asChild>
 						<Button variant='secondary' size='lg'>
 							{t('general.cancel')}
 						</Button>
