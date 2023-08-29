@@ -36,6 +36,7 @@ export { default as List } from './List';
 export { default as Logo } from './Logo';
 export { default as MessageQueue } from './MessageQueue';
 export { default as Middleware } from './Middleware';
+export { default as MinIo } from './MinIo';
 export { default as Model } from './Model';
 export { default as MongoDb } from './MongoDb';
 export { default as MySql } from './MySql';
