@@ -6,12 +6,11 @@ import useTaskStore from '@/store/task/taskStore';
 import { ColumnDefWithClassName, Task } from '@/types';
 import { translate } from '@/utils';
 import { Checkbox } from 'components/Checkbox';
-import { CopyButton } from 'components/CopyButton';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { Calendar } from 'components/icons';
 import cronstrue from 'cronstrue';
-
+import { Link } from 'react-router-dom';
 const TaskColumns: ColumnDefWithClassName<Task>[] = [
 	{
 		id: 'select',
@@ -35,28 +34,15 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
-	},
-	{
-		id: 'iid',
-		header: translate('general.id').toUpperCase(),
-		accessorKey: 'iid',
-		sortingFn: 'textCaseSensitive',
-		className: '!max-w-[160px] !w-[160px]',
-		cell: ({
-			row: {
-				original: { iid },
-			},
-		}) => {
+		cell: ({ row }) => {
+			const { name, _id } = row.original;
 			return (
-				<div className='flex items-center justify-between group'>
-					<span className='whitespace-nowrap'>{iid}</span>
-					<CopyButton text={iid} className='hidden group-hover:block' />
-				</div>
+				<Link to={`${_id}`} className='link'>
+					{name}
+				</Link>
 			);
 		},
 	},
@@ -79,8 +65,11 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 	},
 	{
 		id: 'logExecution',
-		header: translate('task.logExec').toUpperCase(),
+		header: ({ column }) => (
+			<SortButton className='whitespace-nowrap' text={translate('task.logExec')} column={column} />
+		),
 		accessorKey: 'logExecution',
+		enableSorting: true,
 		size: 200,
 		cell: ({ row }) => {
 			const { logExecution } = row.original;
@@ -101,7 +90,7 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.created_at').toUpperCase()}
+				text={translate('general.created_at')}
 				column={column}
 			/>
 		),
@@ -127,7 +116,7 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.updated_at').toUpperCase()}
+				text={translate('general.updated_at')}
 				column={column}
 			/>
 		),
@@ -152,11 +141,11 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { openDeleteTaskModal } = useTaskStore.getState();
+			const { openDeleteTaskModal, openEditTaskModal } = useTaskStore.getState();
 			return (
-				<ActionsCell
-					to={`${original._id}`}
+				<ActionsCell<Task>
 					onDelete={() => openDeleteTaskModal(original)}
+					onEdit={() => openEditTaskModal(original)}
 					original={original}
 					canDeleteKey='task.delete'
 					canEditKey='task.edit'

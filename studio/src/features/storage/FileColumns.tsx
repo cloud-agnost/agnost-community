@@ -10,6 +10,7 @@ import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { Link } from 'react-router-dom';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from 'components/Tooltip';
 const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 	{
 		id: 'select',
@@ -143,74 +144,91 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 				bucket,
 			} = useStorageStore.getState();
 
+			function replaceFile() {
+				const input = document.createElement('input');
+				input.type = 'file';
+				input.onchange = (e) => {
+					const file = (e.target as HTMLInputElement).files?.[0];
+					if (!file) return;
+					replaceFileInBucket({
+						storageName: storage?.name,
+						bucketName: bucket.name,
+						filePath: original.path,
+						file,
+						onSuccess: () => {
+							notify({
+								title: translate('general.success'),
+								description: translate('storage.bucket.empty'),
+								type: 'success',
+							});
+						},
+						onError: ({ error, details }) => {
+							notify({
+								title: error,
+								description: details,
+								type: 'error',
+							});
+						},
+					});
+				};
+				input.click();
+			}
+			function copyFile() {
+				copyFileInBucket({
+					storageName: storage?.name,
+					bucketName: bucket.name,
+					filePath: original.path,
+					onSuccess: () => {
+						notify({
+							title: translate('general.success'),
+							description: translate('storage.bucket.empty'),
+							type: 'success',
+						});
+					},
+					onError: ({ error, details }) => {
+						notify({
+							title: error,
+							description: details,
+							type: 'error',
+						});
+					},
+				});
+			}
 			return (
 				<div className='flex items-center justify-end'>
-					<Button
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-						onClick={() =>
-							copyFileInBucket({
-								storageName: storage?.name,
-								bucketName: bucket.name,
-								filePath: original.path,
-								onSuccess: () => {
-									notify({
-										title: translate('general.success'),
-										description: translate('storage.bucket.empty'),
-										type: 'success',
-									});
-								},
-								onError: ({ error, details }) => {
-									notify({
-										title: error,
-										description: details,
-										type: 'error',
-									});
-								},
-							})
-						}
-					>
-						<Copy />
-					</Button>
-					<Button
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-						onClick={() => {
-							const input = document.createElement('input');
-							input.type = 'file';
-							input.onchange = (e) => {
-								const file = (e.target as HTMLInputElement).files?.[0];
-								if (!file) return;
-								replaceFileInBucket({
-									storageName: storage?.name,
-									bucketName: bucket.name,
-									filePath: original.path,
-									file,
-									onSuccess: () => {
-										notify({
-											title: translate('general.success'),
-											description: translate('storage.bucket.empty'),
-											type: 'success',
-										});
-									},
-									onError: ({ error, details }) => {
-										notify({
-											title: error,
-											description: details,
-											type: 'error',
-										});
-									},
-								});
-							};
-							input.click();
-						}}
-					>
-						<Swap />
-					</Button>
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger>
+								<Button
+									iconOnly
+									variant='blank'
+									rounded
+									className='text-xl hover:bg-wrapper-background-hover text-icon-base'
+									onClick={copyFile}
+								>
+									<Copy />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>{translate('storage.file.copy')}</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger>
+								<Button
+									iconOnly
+									variant='blank'
+									rounded
+									className='text-xl hover:bg-wrapper-background-hover text-icon-base'
+									onClick={replaceFile}
+								>
+									<Swap />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>{translate('storage.file.replace')}</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+
 					<ActionsCell
 						original={original}
 						onDelete={() => openDeleteFileDialog(original)}
