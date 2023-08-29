@@ -35,7 +35,7 @@
 		@supports (max-height: 100dvh) {
 			max-height: 100dvh;
 		}
-		@apply fixed inset-0 z-50 bg-base/80 backdrop-blur-sm transition-all;
+		@apply fixed inset-0 z-50 bg-base/50  transition-all;
 		@apply duration-100 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in;
 	}
 	&-md {
