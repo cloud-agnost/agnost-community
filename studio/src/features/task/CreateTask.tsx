@@ -11,6 +11,7 @@ import useTaskStore from '@/store/task/taskStore';
 import TaskForm from './TaskForm';
 import useResourceStore from '@/store/resources/resourceStore';
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 interface CreateTaskProps {
 	open: boolean;
 	onClose: () => void;
@@ -21,7 +22,7 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 	const { createTask } = useTaskStore();
 	const { notify } = useToast();
 	const { resources } = useResourceStore();
-
+	const navigate = useNavigate();
 	const form = useForm<z.infer<typeof CreateTaskSchema>>({
 		resolver: zodResolver(CreateTaskSchema),
 	});
@@ -45,13 +46,14 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 			appId: appId as string,
 			versionId: versionId as string,
 			resourceId: resources[0]._id,
-			onSuccess: () => {
+			onSuccess: (task) => {
 				form.reset({
 					name: '',
 					cronExpression: '',
 					logExecution: false,
 				});
 				onClose();
+				navigate(task._id);
 			},
 			onError: ({ error, details }) => {
 				form.reset({
