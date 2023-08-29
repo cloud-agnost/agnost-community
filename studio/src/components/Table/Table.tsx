@@ -8,12 +8,13 @@ import { useTranslation } from 'react-i18next';
 
 interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
 	containerClassName?: string;
+	style?: React.CSSProperties;
 }
 
 const Table = React.forwardRef<HTMLTableElement, TableProps>(
-	({ className, containerClassName, ...props }, ref) => (
-		<div className={cn('table-container', containerClassName)}>
-			<table ref={ref} className={cn('table', className)} {...props} />
+	({ className, containerClassName, style, ...props }, ref) => (
+		<div className={cn('table-container', containerClassName)} style={style}>
+			<table ref={ref} className={cn('table', className)} style={style} {...props} />
 		</div>
 	),
 );
