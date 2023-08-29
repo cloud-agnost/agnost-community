@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MessageQueueForm from './MessageQueueForm';
+import { useEffect } from 'react';
 interface CreateQueueProps {
 	open: boolean;
 	onClose: () => void;
@@ -26,11 +27,6 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 	const { notify } = useToast();
 	const form = useForm<z.infer<typeof CreateMessageQueueSchema>>({
 		resolver: zodResolver(CreateMessageQueueSchema),
-		defaultValues: {
-			name: queue?.name,
-			delay: queue?.delay?.toString(),
-			logExecution: queue?.logExecution,
-		},
 	});
 	function onSubmit(data: z.infer<typeof CreateMessageQueueSchema>) {
 		updateQueue({
@@ -47,6 +43,12 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 			},
 		});
 	}
+
+	useEffect(() => {
+		if (queue) {
+			form.reset(queue);
+		}
+	}, [queue]);
 	return (
 		<Drawer
 			open={open}
@@ -64,7 +66,7 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<MessageQueueForm />
+						<MessageQueueForm edit />
 					</form>
 				</Form>
 			</DrawerContent>
