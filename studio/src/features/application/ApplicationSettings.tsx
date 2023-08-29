@@ -2,10 +2,8 @@ import { Button } from '@/components/Button';
 import { Command, CommandGroup, CommandItem, CommandSeparator } from '@/components/Command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
 import { APPLICATION_SETTINGS } from '@/constants';
-import { useToast } from '@/hooks';
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore.ts';
-import useOrganizationStore from '@/store/organization/organizationStore';
 import { AppRoles, Application } from '@/types';
 import { DotsThreeVertical } from '@phosphor-icons/react';
 import { useState } from 'react';
@@ -17,12 +15,10 @@ interface ApplicationSettingsProps {
 	role: AppRoles;
 }
 
-export default function ApplicationSettings({ appId, appName, role }: ApplicationSettingsProps) {
+export default function ApplicationSettings({ appId, role }: ApplicationSettingsProps) {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 	const canAppDelete = useAuthorizeApp({ role, key: 'delete' });
-	const { organization } = useOrganizationStore();
-	const { notify } = useToast();
 	const { applications, openDeleteModal, openLeaveModal } = useApplicationStore();
 	const HAS_PERMISSION: Record<string, boolean> = {
 		update: useAuthorizeApp({ role, key: 'update' }),
