@@ -5,7 +5,6 @@ import { DATABASE_TYPES, MAX_DB_SIZE, MIN_DB_SIZE } from '@/constants';
 import { AccessDbSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
@@ -18,7 +17,6 @@ const CreateDatabaseSchema = z.object({
 	readReplica: z.number().min(0).max(10),
 });
 export default function CreateDatabase() {
-	const [storageSize, setStorageSize] = useState(25);
 	const form = useForm<z.infer<typeof CreateDatabaseSchema>>({
 		resolver: zodResolver(CreateDatabaseSchema),
 	});
