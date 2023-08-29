@@ -1,4 +1,4 @@
-import ActionCell from '@/components/ActionsCell/ActionsCell';
+import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
@@ -72,7 +72,7 @@ export const ResourceTableColumn: ColumnDef<Resource>[] = [
 		size: 45,
 		cell: ({ row }) => {
 			return (
-				<ActionCell
+				<ActionsCell
 					original={row.original}
 					onDelete={() => () =>
 						useResourceStore.setState({
