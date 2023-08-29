@@ -7,6 +7,7 @@ import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { DateText } from 'components/DateText';
 import { ActionsCell } from 'components/ActionsCell';
 import { Link } from 'react-router-dom';
+import useMiddlewareStore from '@/store/middleware/middlewareStore';
 
 const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
@@ -31,9 +32,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		cell: ({
 			row: {
 				original: { _id, name },
@@ -53,9 +52,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	},
 	{
 		id: 'createdAt',
-		header: ({ column }) => (
-			<SortButton text={translate('general.created_at').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
 		accessorKey: 'createdAt',
 		sortingFn: 'datetime',
 		enableSorting: true,
@@ -73,9 +70,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	},
 	{
 		id: 'updatedAt',
-		header: ({ column }) => (
-			<SortButton text={translate('general.updated_at').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.updated_at')} column={column} />,
 		accessorKey: 'updatedAt',
 		enableSorting: true,
 		sortingFn: 'datetime',
@@ -96,20 +91,22 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 		className: 'actions',
 		size: 45,
 		cell: ({ row: { original } }) => {
-			return <UpdateMiddlewareButton middleware={original} />;
+			const { setMiddleware, setEditMiddlewareDrawerIsOpen } = useMiddlewareStore.getState();
+			function handleEdit() {
+				setMiddleware(original);
+				setEditMiddlewareDrawerIsOpen(true);
+			}
+			return (
+				<ActionsCell<Middleware>
+					original={original}
+					canDeleteKey='middleware.delete'
+					canEditKey='middleware.update'
+					onEdit={handleEdit}
+					type='version'
+				/>
+			);
 		},
 	},
 ];
 
-function UpdateMiddlewareButton({ middleware }: { middleware: Middleware }) {
-	return (
-		<ActionsCell<Middleware>
-			original={middleware}
-			canDeleteKey='middleware.delete'
-			canEditKey='middleware.update'
-			to={`${middleware._id}`}
-			type='version'
-		/>
-	);
-}
 export default MiddlewaresColumns;
