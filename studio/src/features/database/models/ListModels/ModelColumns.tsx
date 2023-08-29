@@ -11,6 +11,8 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 import { Link } from 'react-router-dom';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from 'components/Tooltip';
+
 const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	{
 		id: 'select',
@@ -123,15 +125,23 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 			//TODO: add column permissions
 			return (
 				<div className='flex items-center justify-end'>
-					<Button
-						to={`${original._id}/fields`}
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-					>
-						<Columns />
-					</Button>
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger>
+								<Button
+									to={`${original._id}/fields`}
+									iconOnly
+									variant='blank'
+									rounded
+									className='text-xl hover:bg-wrapper-background-hover text-icon-base'
+								>
+									<Columns />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>{translate('database.fields.title')}</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+
 					<ActionsCell
 						original={original}
 						onEdit={openEditDrawer}
