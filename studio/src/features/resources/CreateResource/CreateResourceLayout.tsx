@@ -12,6 +12,8 @@ import { Control, Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import CreateResourceItem from '../CreateResourceItem';
 import ResourceInstance from '../ResourceType/ResourceInstance';
+import { useEffect } from 'react';
+
 interface Props {
 	title: string;
 	children: React.ReactNode;
@@ -35,6 +37,16 @@ export default function CreateResourceLayout({
 	const { appRoles } = useTypeStore();
 	const canCreateResource = useAuthorizeOrg('resource.create');
 	const form = useFormContext();
+
+	useEffect(() => {
+		if (form) {
+			const roles = form.getValues('allowedRoles');
+
+			if (!roles?.length) {
+				form.setValue('allowedRoles', ['Admin']);
+			}
+		}
+	}, [form]);
 
 	return (
 		<div className='px-6 py-4 space-y-6  overflow-auto'>
@@ -97,6 +109,7 @@ export default function CreateResourceLayout({
 													>
 														<FormControl>
 															<Checkbox
+																disabled={role === 'Admin'}
 																checked={value?.includes(role)}
 																onCheckedChange={(checked) => {
 																	if (checked) {
@@ -164,8 +177,8 @@ export default function CreateResourceLayout({
 				</DrawerFooter>
 			) : (
 				<DrawerFooter className='justify-between'>
-					{actions}
-					<div className='flex items-center justify-center gap-4'>
+					<div>{actions}</div>
+					<div className='flex items-center justify-center gap-4 self-end'>
 						<Button size='lg' type='button' variant='secondary' onClick={returnToPreviousStep}>
 							{t('general.previous')}
 						</Button>
