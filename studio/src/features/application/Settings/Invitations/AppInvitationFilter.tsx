@@ -50,6 +50,7 @@ function AppInvitationFilter({ selectedRows, table }: Props) {
 						description: t('general.invitation.delete'),
 						type: 'success',
 					});
+					table.toggleAllRowsSelected(false);
 				},
 				onError: ({ error, details }) => {
 					notify({
