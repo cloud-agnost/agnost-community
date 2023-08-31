@@ -17,15 +17,16 @@ interface Props<T> {
 	emptyStateTitle: string;
 	createButtonTitle: string;
 	children: ReactNode;
-	onSearchInputClear?: () => void;
 	selectedRowLength?: number;
-	onMultipleDelete?: () => void;
-	onSearch: (value: string) => void;
-	openCreateModal: () => void;
 	disabled?: boolean;
 	className?: string;
 	breadCrumb?: ReactNode;
 	handlerButton?: ReactNode;
+	onSearchInputClear?: () => void;
+	onMultipleDelete?: () => void;
+	onSearch: (value: string) => void;
+	openCreateModal: () => void;
+	viewLogs?: boolean;
 }
 
 export default function VersionTabLayout<T>({
@@ -39,12 +40,13 @@ export default function VersionTabLayout<T>({
 	emptyStateTitle,
 	createButtonTitle,
 	disabled,
+	className,
+	handlerButton,
+	viewLogs,
 	onMultipleDelete,
 	onSearch,
 	openCreateModal,
-	className,
 	onSearchInputClear,
-	handlerButton,
 }: Props<T>) {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { t } = useTranslation();
@@ -85,6 +87,11 @@ export default function VersionTabLayout<T>({
 							disabled={disabled}
 						/>
 					) : null}
+					{viewLogs && (
+						<Button variant='secondary' to='logs'>
+							{t('queue.view_logs')}
+						</Button>
+					)}
 					{handlerButton ?? (
 						<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
 							<Plus size={16} />
