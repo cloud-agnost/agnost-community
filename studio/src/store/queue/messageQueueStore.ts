@@ -22,6 +22,7 @@ interface MessageQueueStore {
 	isDeleteModalOpen: boolean;
 	lastFetchedCount: number;
 	testQueueLogs: TestQueueLogs;
+	isEditModalOpen: boolean;
 	getQueues: (params: GetMessageQueuesParams) => Promise<MessageQueue[]>;
 	getQueueById: (params: GetMessageQueueByIdParams) => Promise<MessageQueue>;
 	deleteQueue: (params: DeleteMessageQueueParams) => Promise<void>;
@@ -33,6 +34,8 @@ interface MessageQueueStore {
 	openDeleteModal: (queue: MessageQueue) => void;
 	closeDeleteModal: () => void;
 	setQueueLogs: (queueId: string, log: string) => void;
+	openEditModal: (queue: MessageQueue) => void;
+	closeEditModal: () => void;
 }
 
 const useMessageQueueStore = create<MessageQueueStore>()(
@@ -46,6 +49,13 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 				lastFetchedCount: 0,
 				createQueueModalOpen: false,
 				testQueueLogs: {} as TestQueueLogs,
+				isEditModalOpen: false,
+				openEditModal: (queue: MessageQueue) => {
+					set({ queue, isEditModalOpen: true });
+				},
+				closeEditModal: () => {
+					set({ isEditModalOpen: false, queue: {} as MessageQueue });
+				},
 				getQueues: async (params: GetMessageQueuesParams) => {
 					const queues = await QueueService.getQueues(params);
 					if (params.initialFetch) {
@@ -77,11 +87,11 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 				},
 				deleteMultipleQueues: async (params: DeleteMultipleQueuesParams) => {
 					try {
-						await QueueService.deleteMultipleQueues(params);
+						const queue = await QueueService.deleteMultipleQueues(params);
 						set((prev) => ({
 							queues: prev.queues.filter((queue) => !params.queueIds.includes(queue._id)),
 						}));
-						if (params.onSuccess) params.onSuccess();
+						if (params.onSuccess) params.onSuccess(queue);
 					} catch (error) {
 						if (params.onError) params.onError(error as APIError);
 						throw error as APIError;
@@ -90,8 +100,8 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 				createQueue: async (params: CreateMessageQueueParams) => {
 					try {
 						const queue = await QueueService.createQueue(params);
-						set((prev) => ({ queues: [...prev.queues, queue] }));
-						if (params.onSuccess) params.onSuccess();
+						set((prev) => ({ queues: [queue, ...prev.queues] }));
+						if (params.onSuccess) params.onSuccess(queue);
 						return queue;
 					} catch (error) {
 						if (params.onError) params.onError(error as APIError);
