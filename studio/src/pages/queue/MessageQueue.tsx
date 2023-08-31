@@ -124,6 +124,7 @@ export default function MainMessageQueue() {
 			onSearch={onInput}
 			onMultipleDelete={deleteMultipleQueuesHandler}
 			disabled={!canEdit}
+			viewLogs
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'

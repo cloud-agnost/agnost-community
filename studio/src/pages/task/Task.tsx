@@ -126,6 +126,7 @@ export default function MainTask() {
 			table={table}
 			selectedRowLength={selectedRows.length}
 			disabled={!canEdit}
+			viewLogs
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'

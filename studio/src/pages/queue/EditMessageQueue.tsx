@@ -4,7 +4,7 @@ import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LoaderFunctionArgs, useOutletContext, useParams } from 'react-router-dom';
+import { LoaderFunctionArgs, useParams } from 'react-router-dom';
 EditMessageQueue.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { queueId, orgId, versionId, appId } = params;
 	if (!queueId) return null;
@@ -22,13 +22,11 @@ EditMessageQueue.loader = async ({ params }: LoaderFunctionArgs) => {
 export default function EditMessageQueue() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const { updateQueueLogic, queue } = useMessageQueueStore();
+	const { updateQueueLogic, queue, openEditModal } = useMessageQueueStore();
 	const [queueLogic, setQueueLogic] = useState<string | undefined>(queue.logic);
 	const [loading, setLoading] = useState(false);
 	const [isTestQueueOpen, setIsTestQueueOpen] = useState(false);
-	const { setIsQueueEditModalOpen } = useOutletContext() as {
-		setIsQueueEditModalOpen: (isOpen: boolean) => void;
-	};
+
 	const { versionId, appId, orgId, queueId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -36,14 +34,14 @@ export default function EditMessageQueue() {
 		queueId: string;
 	}>();
 
-	function saveLogic() {
+	function saveLogic(logic: string) {
 		setLoading(true);
 		updateQueueLogic({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			queueId: queueId as string,
-			logic: queueLogic as string,
+			logic: logic ?? queueLogic,
 			onSuccess: () => {
 				setLoading(false);
 				notify({
@@ -64,12 +62,21 @@ export default function EditMessageQueue() {
 	}
 	return (
 		<VersionEditorLayout
-			onEditModalOpen={() => setIsQueueEditModalOpen(true)}
+			onEditModalOpen={() => openEditModal(queue)}
 			onTestModalOpen={() => setIsTestQueueOpen(true)}
-			onSaveLogic={saveLogic}
+			onSaveLogic={(value) => saveLogic(value as string)}
 			loading={loading}
 			logic={queue?.logic}
 			setLogic={setQueueLogic}
+			breadCrumbItems={[
+				{
+					name: t('queue.title').toString(),
+					url: `/organization/${orgId}/apps/${appId}/version/${versionId}/queue`,
+				},
+				{
+					name: queue?.name,
+				},
+			]}
 		>
 			<div className='flex items-center flex-1'>
 				<span className='text-xl font-semibold text-default'>{queue.name}</span>
