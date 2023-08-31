@@ -117,6 +117,7 @@ export default class EndpointService {
 		headers,
 		body,
 		formData,
+		consoleLogId,
 	}: TestEndpointParams): Promise<any> {
 		if (formData) {
 			const formDataObj = new FormData();
@@ -128,11 +129,16 @@ export default class EndpointService {
 				}
 			});
 		}
-		return await http[method](path, body, {
-			headers,
+
+		const options = {
+			headers: {
+				...headers,
+				'Agnost-Session': consoleLogId,
+			},
 			params: {
 				...params.queryParams,
 			},
-		});
+		};
+		return await http[method](path, ...(method === 'get' ? [options] : [body]), options);
 	}
 }
