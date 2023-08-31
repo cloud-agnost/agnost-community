@@ -65,17 +65,21 @@ export default function OrganizationApps() {
 	}
 
 	function deleteAppHandler() {
+		setLoading(true);
 		deleteApplication({
 			appId: toDeleteApp?._id as string,
 			orgId: organization?._id as string,
 			onSuccess: () => {
 				closeDeleteModal();
+				setLoading(false);
 			},
-			onError: ({ error, details }) => {
+			onError: (err) => {
 				closeDeleteModal();
+				setLoading(false);
+				setError(err);
 				notify({
-					title: error,
-					description: details,
+					title: err.error,
+					description: err.details,
 					type: 'error',
 				});
 			},
