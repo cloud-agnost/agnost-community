@@ -24,6 +24,7 @@ import {
 	LightBulb,
 	LineSegments,
 	MessageQueue,
+	MinIo,
 	MongoDb,
 	MySql,
 	NpmPackage,
@@ -269,7 +270,7 @@ export const INVITATIONS_SORT_OPTIONS: SortOption[] = [
 	},
 ];
 
-export const NEW_TAB_ITEMS: Tab[] = [
+export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 	{
 		title: translate('version.databases'),
 		path: 'database',
@@ -302,7 +303,7 @@ export const NEW_TAB_ITEMS: Tab[] = [
 	},
 	{
 		title: translate('version.cron_jobs'),
-		path: 'cron-job',
+		path: 'task',
 		isActive: false,
 		isDashboard: false,
 	},
@@ -361,14 +362,22 @@ export const TEST_ENDPOINTS_MENU_ITEMS = [
 	{
 		name: translate('endpoint.test.params'),
 		href: '?t=params',
+		isPath: false,
+	},
+	{
+		name: translate('endpoint.test.path_variables'),
+		href: '?t=variables',
+		isPath: true,
 	},
 	{
 		name: translate('endpoint.test.headers'),
 		href: '?t=headers',
+		isPath: false,
 	},
 	{
 		name: translate('endpoint.test.body'),
 		href: '?t=body',
+		isPath: false,
 	},
 ];
 
@@ -535,7 +544,7 @@ export const STORAGE_ICON_MAP: Record<string, ElementType> = {
 	'AWS S3': Awss3,
 	'Azure Blob Storage': AzureBlobStorage,
 	'GCP Cloud Storage': GcpStorage,
-	MinIO: Storage,
+	MinIO: MinIo,
 };
 
 export const CREATE_RESOURCES_ELEMENTS = [
