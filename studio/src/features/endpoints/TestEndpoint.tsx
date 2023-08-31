@@ -150,7 +150,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			form.setValue('formData', objToArray(req.formData));
 		}
 	}, [endpointRequest]);
-	console.log(form.formState.errors);
 
 	useEffect(() => {
 		if (!searchParams.get('t') && open) {
@@ -176,9 +175,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 						className='ml-3'
 						size='lg'
 						variant='primary'
-						onClick={() => {
-							form.handleSubmit(onSubmit)();
-						}}
+						onClick={() => form.handleSubmit(onSubmit)()}
 						loading={loading}
 					>
 						{t('endpoint.test.send')}
