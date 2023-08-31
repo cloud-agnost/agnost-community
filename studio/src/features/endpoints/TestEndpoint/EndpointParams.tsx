@@ -25,7 +25,7 @@ export default function EndpointParams() {
 	});
 
 	return (
-		<TestEndpointTable height={120}>
+		<TestEndpointTable>
 			{queryParamsFields.map((f, index) => (
 				<TableRow key={f.id}>
 					<TableCell>

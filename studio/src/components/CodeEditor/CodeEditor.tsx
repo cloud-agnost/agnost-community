@@ -8,7 +8,6 @@ interface CodeEditorProps extends Omit<EditorProps, 'onMount' | 'defaultLanguage
 	defaultLanguage?: string;
 	readonly?: boolean;
 	onSave?: (logic: string) => void;
-	style?: React.CSSProperties;
 }
 export default function CodeEditor({
 	containerClassName,
@@ -21,7 +20,6 @@ export default function CodeEditor({
 	onSave,
 	readonly,
 	defaultLanguage = 'javascript',
-	style,
 }: CodeEditorProps) {
 	const handleEditorDidMount = (
 		editor: monaco.editor.IStandaloneCodeEditor,
@@ -43,7 +41,7 @@ export default function CodeEditor({
 		_monaco.editor.setTheme('nightOwl');
 	};
 	return (
-		<div className={cn(containerClassName)} style={style}>
+		<div className={cn(containerClassName)}>
 			<MonacoEditor
 				theme='vs-dark'
 				className={cn('editor', className)}
