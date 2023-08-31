@@ -1,11 +1,11 @@
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionLayout } from '@/layouts/VersionLayout';
+import useAuthStore from '@/store/auth/authStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { LoaderFunctionArgs, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/utils';
-import useAuthStore from '@/store/auth/authStore.ts';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { useEffect } from 'react';
+import { LoaderFunctionArgs, Outlet, useLocation, useNavigate } from 'react-router-dom';
 export default function Version() {
 	const { pathname } = useLocation();
 	const paths = pathname.split('/').filter((item) => /^[a-zA-Z-_]+$/.test(item));
