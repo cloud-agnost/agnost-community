@@ -1,3 +1,4 @@
+import { t } from '@/i18n/config.ts';
 import OrganizationService from '@/services/OrganizationService';
 import {
 	APIError,
@@ -78,7 +79,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 					memberSearch: '',
 					memberRoleFilter: [],
 					memberSort: {
-						name: translate('general.sortOptions.default'),
+						name: t('general.sortOptions.default'),
 						value: '',
 						sortDir: '',
 					},
@@ -86,7 +87,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 					invitationsPage: 1,
 					invitationsSearch: '',
 					invitationsSort: {
-						name: translate('general.sortOptions.default'),
+						name: t('general.sortOptions.default'),
 						value: '',
 						sortDir: '',
 					},

@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MessageQueueForm from './MessageQueueForm';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
+import { useNavigate } from 'react-router-dom';
 interface CreateQueueProps {
 	open: boolean;
 	onClose: () => void;
@@ -17,6 +18,7 @@ interface CreateQueueProps {
 export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) {
 	const { t } = useTranslation();
 	const { createQueue } = useMessageQueueStore();
+	const navigate = useNavigate();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -33,36 +35,28 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 			appId: appId as string,
 			versionId: versionId as string,
 			...data,
-			onSuccess: () => {
-				form.reset({
-					name: '',
-					delay: '',
-					logExecution: false,
-				});
-				onClose();
+			onSuccess: (queue) => {
+				handleClose();
+				navigate(queue._id);
 			},
 			onError: ({ error, details }) => {
-				form.reset({
-					name: '',
-					delay: '',
-					logExecution: false,
-				});
+				handleClose();
 				notify({ type: 'error', description: details, title: error });
 			},
 		});
 	}
+
+	function handleClose() {
+		form.reset({
+			name: '',
+			delay: undefined,
+			logExecution: false,
+			resourceId: '',
+		});
+		onClose();
+	}
 	return (
-		<Drawer
-			open={open}
-			onOpenChange={() => {
-				form.reset({
-					name: '',
-					delay: '',
-					logExecution: false,
-				});
-				onClose();
-			}}
-		>
+		<Drawer open={open} onOpenChange={handleClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>{t('queue.create.title')}</DrawerTitle>

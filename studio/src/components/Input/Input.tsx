@@ -15,6 +15,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 				type={type}
 				className={cn('input', error && 'input-error', className)}
 				ref={ref}
+				autoComplete='off'
 				{...props}
 			/>
 		);

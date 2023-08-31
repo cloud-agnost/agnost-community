@@ -1,6 +1,6 @@
 .select {
 	&-container {
-		@apply flex h-10 w-full  text-sm text-default  rounded appearance-none;
+		@apply flex h-12 w-full  text-sm text-default  rounded appearance-none;
 		@apply placeholder:text-subtle placeholder:text-sm;
 		@apply disabled:cursor-not-allowed disabled:opacity-50;
 		@apply focus:border-input-focus focus:outline-none focus:ring-0;

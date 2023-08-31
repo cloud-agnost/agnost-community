@@ -1,13 +1,14 @@
-import Editor, { EditorProps, Monaco } from '@monaco-editor/react';
-import nightOwl from 'monaco-themes/themes/Night Owl.json';
-import { useRef } from 'react';
 import { cn } from '@/utils';
+import MonacoEditor, { EditorProps } from '@monaco-editor/react';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
+import nightOwl from 'monaco-themes/themes/Night Owl.json';
 
 interface CodeEditorProps extends Omit<EditorProps, 'onMount' | 'defaultLanguage'> {
 	containerClassName?: string;
 	defaultLanguage?: string;
 	readonly?: boolean;
-	onSave?: () => void;
+	onSave?: (logic: string) => void;
+	style?: React.CSSProperties;
 }
 export default function CodeEditor({
 	containerClassName,
@@ -20,37 +21,31 @@ export default function CodeEditor({
 	onSave,
 	readonly,
 	defaultLanguage = 'javascript',
+	style,
 }: CodeEditorProps) {
-	const editorRef = useRef(null);
-
-	function handleEditorDidMount(editor: any, monaco: Monaco) {
-		editorRef.current = editor;
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		monaco.editor.defineTheme('nightOwl', nightOwl);
-		monaco.editor.setTheme('nightOwl');
-		monaco.editor.addCommand({
-			id: 'save',
-			run:
-				onSave ??
-				(() => {
-					return;
-				}),
-		});
-		monaco.editor.addKeybindingRule({
-			keybinding: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
-			command: 'save',
-			commandArgs: {
-				arg: 'my argument',
+	const handleEditorDidMount = (
+		editor: monaco.editor.IStandaloneCodeEditor,
+		_monaco: typeof monaco,
+	) => {
+		editor.addAction({
+			id: 'save-action',
+			label: 'Save',
+			keybindings: [_monaco.KeyMod.CtrlCmd | _monaco.KeyCode.KeyS],
+			contextMenuGroupId: 'navigation',
+			contextMenuOrder: 1.5,
+			run: (ed) => {
+				onSave?.(ed.getValue());
 			},
-			when: undefined,
 		});
-	}
-
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		//@ts-ignore
+		_monaco.editor.defineTheme('nightOwl', nightOwl);
+		_monaco.editor.setTheme('nightOwl');
+	};
 	return (
-		<div className={cn(containerClassName)}>
-			<Editor
+		<div className={cn(containerClassName)} style={style}>
+			<MonacoEditor
+				theme='vs-dark'
 				className={cn('editor', className)}
 				onChange={onChange}
 				onValidate={onValidate}
@@ -67,6 +62,8 @@ export default function CodeEditor({
 					theme: 'nightOwl',
 					autoClosingBrackets: 'always',
 					autoDetectHighContrast: true,
+					fontLigatures: true,
+					fontSize: 16,
 				}}
 			/>
 		</div>

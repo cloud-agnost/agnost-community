@@ -21,6 +21,9 @@ export interface TaskStore {
 	isDeleteTaskModalOpen: boolean;
 	lastFetchedCount: number;
 	taskLogs: TestTaskLogs;
+	isEditTaskModalOpen: boolean;
+	openEditTaskModal: (task: Task) => void;
+	closeEditTaskModal: () => void;
 	getTask: (params: GetTaskParams) => Promise<Task>;
 	getTasks: (params: GetTasksParams) => Promise<Task[]>;
 	createTask: (params: CreateTaskParams) => Promise<Task>;
@@ -44,6 +47,13 @@ const useTaskStore = create<TaskStore>()(
 				isDeleteTaskModalOpen: false,
 				lastFetchedCount: 0,
 				taskLogs: {} as TestTaskLogs,
+				isEditTaskModalOpen: false,
+				openEditTaskModal: (task: Task) => {
+					set({ task, isEditTaskModalOpen: true });
+				},
+				closeEditTaskModal: () => {
+					set({ isEditTaskModalOpen: false, task: {} as Task });
+				},
 				getTask: async (params: GetTaskParams) => {
 					const task = await TaskService.getTask(params);
 					set({ task });
@@ -58,7 +68,7 @@ const useTaskStore = create<TaskStore>()(
 					try {
 						const task = await TaskService.createTask(params);
 						set((prev) => ({ tasks: [task, ...prev.tasks] }));
-						if (params.onSuccess) params.onSuccess();
+						if (params.onSuccess) params.onSuccess(task);
 						return task;
 					} catch (error) {
 						if (params.onError) params.onError(error as APIError);
@@ -142,7 +152,6 @@ const useTaskStore = create<TaskStore>()(
 				},
 				setTaskLog: (taskId: string, log: string) => {
 					set((prev) => {
-						console.log(prev.taskLogs[taskId]);
 						return {
 							taskLogs: {
 								...prev.taskLogs,

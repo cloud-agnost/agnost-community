@@ -94,9 +94,9 @@ export default function ConnectDatabase() {
 							onClick={testResourceConnection}
 							type='button'
 							size='lg'
-							className=' self-start'
+							className='self-start'
 						>
-							<TestConnection className='w-4 h-4 text-icon-default mr-2' />
+							{!loading && <TestConnection className='w-4 h-4 text-icon-default mr-2' />}
 							{t('resources.database.test')}
 						</Button>
 					}

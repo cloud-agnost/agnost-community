@@ -38,7 +38,9 @@ export const PATHS = {
 		fields: `${versionPath}/models/fields/Fields.tsx`,
 		endpoint: `${versionPath}/VersionEndpoint.tsx`,
 		storage: `${versionPath}/VersionStorage.tsx`,
+		middlewareOutlet: `${versionPath}/VersionMiddlewaresOutlet.tsx`,
 		middlewares: `${versionPath}/VersionMiddlewares.tsx`,
+		editMiddleware: `${versionPath}/VersionEditMiddlewares.tsx`,
 		cache: `${versionPath}/VersionCache.tsx`,
 		messageQueue: `${versionPath}/VersionMessageQueue.tsx`,
 		task: `${versionPath}/VersionTask.tsx`,
@@ -69,7 +71,11 @@ export const PATHS = {
 		editTask: `${path}/task/EditTask.tsx`,
 		taskLogs: `${path}/task/TaskLogs.tsx`,
 	},
-	storage: `${storagePath}/Storage.tsx`,
+	storage: {
+		storage: `${storagePath}/Storage.tsx`,
+		bucket: `${storagePath}/Bucket.tsx`,
+		files: `${storagePath}/Files.tsx`,
+	},
 	profileSettings: {
 		profileSettings: `${profilePath}/ProfileSettings.tsx`,
 		account: `${profilePath}/ProfileSettingsGeneral.tsx`,

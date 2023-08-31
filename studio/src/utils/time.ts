@@ -49,7 +49,6 @@ export function calculateRecommendedBuckets(start: Date, end: Date): number {
 	}
 
 	if (days && days > 0) {
-		console.log('days', days);
 		return days > 1 ? Math.floor(days + 1) : 24;
 	}
 

@@ -1,13 +1,15 @@
 import { NewTabDropdown, TabItem, TabOptionsDropdown } from '@/features/version/Tabs/index.ts';
+import useTabStore from '@/store/version/tabStore.ts';
+import { Tab } from '@/types';
+import { generateId } from '@/utils';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 import { Dashboard } from 'components/icons';
 import { NEW_TAB_ITEMS } from 'constants/constants.ts';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useMatches, useNavigate } from 'react-router-dom';
+import { useLocation, useMatches, useNavigate, useParams } from 'react-router-dom';
 import './tabs.scss';
-import useTabStore from '@/store/version/tabStore.ts';
 
 const SCROLL_AMOUNT = 200;
 
@@ -16,11 +18,32 @@ export default function Tabs() {
 	const [endOfScroll, setEndOfScroll] = useState(false);
 	const [startOfScroll, setStartOfScroll] = useState(false);
 	const [isScrollable, setIsScrollable] = useState(false);
-	const { tabs, removeTab, currentTab, setCurrentTab, addTab } = useTabStore();
+	const { getTabsByVersionId, removeTab, getPreviousTab, setCurrentTab, addTab } = useTabStore();
+
 	const { t } = useTranslation();
 	const matches = useMatches();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
+
+	const { versionId } = useParams() as { versionId: string };
+
+	const tabs = getTabsByVersionId(versionId);
+
+	useEffect(() => {
+		if (!scrollContainer.current) return;
+		scrollContainer.current.querySelector('[data-active]')?.scrollIntoView({ behavior: 'smooth' });
+	}, [tabs]);
+
+	useEffect(() => {
+		if (getTabsByVersionId(versionId).find((tab) => tab.isDashboard)) return;
+		addTab(versionId, {
+			id: generateId(),
+			title: t('version.dashboard'),
+			path: getDashboardPath(),
+			isDashboard: true,
+			isActive: false,
+		});
+	}, [versionId]);
 
 	useEffect(() => {
 		const reset = handleScrollEvent();
@@ -30,8 +53,10 @@ export default function Tabs() {
 	useEffect(() => {
 		const path = pathname?.split('/')?.at(-1);
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
-		if (!item) return;
-		addTab(item);
+
+		if (item && !tabs.some((tab) => tab.path === item.path)) {
+			addTab(versionId, { ...item, isActive: true, id: generateId() });
+		}
 	}, [pathname]);
 
 	function getDashboardPath() {
@@ -69,16 +94,13 @@ export default function Tabs() {
 		};
 	}
 
-	function tabRemoveHandler(id: string) {
-		const condition = currentTab?.id === id;
-		const redirectPath = removeTab(id);
-
-		const path = redirectPath ?? getDashboardPath();
-
-		if (condition) {
-			setTimeout(() => {
-				navigate(path);
-			}, 1);
+	function tabRemoveHandler(tab: Tab) {
+		const prevTab = getPreviousTab(versionId, tab.id);
+		removeTab(versionId, tab.id);
+		if (tab.isActive && prevTab) {
+			console.log(prevTab);
+			setCurrentTab(versionId, prevTab?.id as string);
+			navigate(`${prevTab.path}?tabId=${prevTab.id}`);
 		}
 	}
 
@@ -98,15 +120,15 @@ export default function Tabs() {
 	return (
 		<div className='navigation-tab-container'>
 			<div ref={scrollContainer} className='tab'>
-				<TabItem onClick={() => setCurrentTab(null)} icon={<Dashboard />} to={getDashboardPath()}>
-					{t('version.dashboard')}
-				</TabItem>
 				{tabs.map((tab) => (
 					<TabItem
-						onClose={() => tabRemoveHandler(tab.id)}
-						onClick={() => setCurrentTab(tab)}
-						closeable
-						to={tab.path}
+						active={tab.isActive}
+						data-active={tab.isActive ? 'true' : undefined}
+						icon={tab.isDashboard ? <Dashboard /> : undefined}
+						onClose={() => tabRemoveHandler(tab)}
+						onClick={() => setCurrentTab(versionId, tab.id)}
+						closeable={!tab.isDashboard}
+						to={`${tab.path}?tabId=${tab.id}`}
 						key={tab.id}
 					>
 						{tab.title}

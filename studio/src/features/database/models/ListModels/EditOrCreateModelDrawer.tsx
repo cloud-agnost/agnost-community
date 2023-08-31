@@ -15,8 +15,8 @@ import {
 import { Input, Textarea } from 'components/Input';
 import { Button } from 'components/Button';
 import { NAME_SCHEMA, TIMESTAMPS_SCHEMA } from '@/constants';
-import { useEffect, useMemo } from 'react';
-import { APIError, Database } from '@/types';
+import { useEffect } from 'react';
+import { APIError } from '@/types';
 import { Separator } from 'components/Separator';
 import { SettingsFormItem } from 'components/SettingsFormItem';
 import { Switch } from 'components/Switch';
@@ -24,7 +24,6 @@ import { translate } from '@/utils';
 import useModelStore from '@/store/database/modelStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { useParams } from 'react-router-dom';
-import useDatabaseStore from '@/store/database/databaseStore.ts';
 
 const Schema = z.object({
 	name: NAME_SCHEMA.refine((value) => /^(?![0-9])/.test(value), {
@@ -32,7 +31,6 @@ const Schema = z.object({
 			label: translate('general.name'),
 		}).toString(),
 	}),
-	schema: z.string().optional(),
 	description: z
 		.string({
 			required_error: translate('forms.required', { label: translate('general.description') }),
@@ -53,9 +51,14 @@ export default function EditOrCreateModelDrawer({
 	editMode,
 }: EditOrCreateModelDrawerProps) {
 	const { t } = useTranslation();
-	const { createModel, updateNameAndDescription, modelToEdit } = useModelStore();
+	const {
+		createModel,
+		updateNameAndDescription,
+		modelToEdit,
+		enableTimestamps,
+		disableTimestamps,
+	} = useModelStore();
 	const version = useVersionStore((state) => state.version);
-	const databases = useDatabaseStore((state) => state.databases);
 	const { dbId } = useParams();
 
 	const form = useForm<z.infer<typeof Schema>>({
@@ -68,10 +71,6 @@ export default function EditOrCreateModelDrawer({
 			},
 		},
 	});
-
-	const database = useMemo(() => {
-		return databases.find((db) => db._id === dbId) as Database;
-	}, [dbId]);
 
 	useEffect(() => {
 		if (!open) {
@@ -91,6 +90,9 @@ export default function EditOrCreateModelDrawer({
 		if (!modelToEdit || !open) return;
 		form.setValue('name', modelToEdit.name);
 		form.setValue('description', modelToEdit.description);
+		form.setValue('timestamps.enabled', modelToEdit.timestamps.enabled);
+		form.setValue('timestamps.createdAt', modelToEdit.timestamps.createdAt);
+		form.setValue('timestamps.updatedAt', modelToEdit.timestamps.updatedAt);
 	}
 
 	async function onSubmit(data: z.infer<typeof Schema>) {
@@ -142,6 +144,27 @@ export default function EditOrCreateModelDrawer({
 			name: data.name,
 			description: data.description,
 		});
+		if (modelToEdit.timestamps.enabled !== data.timestamps.enabled) {
+			if (data.timestamps.enabled) {
+				await enableTimestamps({
+					dbId: modelToEdit.dbId,
+					appId: modelToEdit.appId,
+					orgId: modelToEdit.orgId,
+					modelId: modelToEdit._id,
+					versionId: modelToEdit.versionId,
+					createdAt: data.timestamps.createdAt,
+					updatedAt: data.timestamps.updatedAt,
+				});
+			} else {
+				await disableTimestamps({
+					dbId: modelToEdit.dbId,
+					appId: modelToEdit.appId,
+					orgId: modelToEdit.orgId,
+					modelId: modelToEdit._id,
+					versionId: modelToEdit.versionId,
+				});
+			}
+		}
 	}
 
 	return (
@@ -179,34 +202,6 @@ export default function EditOrCreateModelDrawer({
 								)}
 							/>
 							<Separator />
-							{['PostgreSQL', 'SQL Server'].includes(database?.type) && (
-								<>
-									<FormField
-										control={form.control}
-										name='schema'
-										render={({ field, formState: { errors } }) => (
-											<FormItem className='space-y-1'>
-												<FormLabel>
-													{t('database.models.add.schema.field')} {''}
-													<span className='text-[10px]'>({t('general.optional')})</span>
-												</FormLabel>
-												<FormControl>
-													<Input
-														error={Boolean(errors.schema)}
-														type='text'
-														placeholder={t('forms.placeholder', {
-															label: t('database.models.add.schema.field').toLowerCase(),
-														}).toString()}
-														{...field}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<Separator />
-								</>
-							)}
 							<FormField
 								control={form.control}
 								name='description'
@@ -224,97 +219,100 @@ export default function EditOrCreateModelDrawer({
 									</FormItem>
 								)}
 							/>
-							{!editMode && (
-								<>
-									<Separator />
-									<FormField
-										control={form.control}
-										name='timestamps.enabled'
-										render={({ field }) => (
-											<FormItem className='space-y-1'>
-												<FormControl>
-													<SettingsFormItem
-														twoColumns
-														className='py-0'
-														title={t('database.models.add.timestamps.enabled.field')}
-														description={t('database.models.add.timestamps.enabled.desc')}
-													>
-														<Switch
-															name={field.name}
-															ref={field.ref}
-															checked={field.value}
-															onCheckedChange={field.onChange}
-														/>
-													</SettingsFormItem>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
+							<Separator />
+							<FormField
+								control={form.control}
+								name='timestamps.enabled'
+								render={({ field }) => (
+									<FormItem className='space-y-1'>
+										<FormControl>
+											<SettingsFormItem
+												twoColumns
+												className='py-0'
+												title={t('database.models.add.timestamps.enabled.field')}
+												description={t('database.models.add.timestamps.enabled.desc')}
+											>
+												<Switch
+													name={field.name}
+													ref={field.ref}
+													checked={field.value}
+													onCheckedChange={field.onChange}
+												/>
+											</SettingsFormItem>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							{(() => {
+								const isEnabled = form.watch('timestamps.enabled');
+								const Component = (
+									<>
+										<Separator />
+										<div className='grid grid-cols-2 gap-4'>
+											<FormField
+												control={form.control}
+												name='timestamps.createdAt'
+												render={({ field, formState: { errors } }) => (
+													<FormItem className='space-y-1'>
+														<FormLabel>
+															{t('database.models.add.timestamps.createdAt.field')}
+														</FormLabel>
+														<FormControl>
+															<Input
+																error={Boolean(errors.timestamps?.createdAt)}
+																type='text'
+																readOnly={editMode && modelToEdit?.timestamps.enabled}
+																placeholder={
+																	t('forms.placeholder', {
+																		label: t(
+																			'database.models.add.timestamps.createdAt.field',
+																		).toLowerCase(),
+																	}) as string
+																}
+																{...field}
+															/>
+														</FormControl>
+														<FormDescription>{t('forms.max64.description')}</FormDescription>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+											<FormField
+												control={form.control}
+												name='timestamps.updatedAt'
+												render={({ field, formState: { errors } }) => (
+													<FormItem className='space-y-1'>
+														<FormLabel>
+															{t('database.models.add.timestamps.updatedAt.field')}
+														</FormLabel>
+														<FormControl>
+															<Input
+																error={Boolean(errors.timestamps?.updatedAt)}
+																type='text'
+																readOnly={editMode && modelToEdit?.timestamps.enabled}
+																placeholder={
+																	t('forms.placeholder', {
+																		label: t(
+																			'database.models.add.timestamps.updatedAt.field',
+																		).toLowerCase(),
+																	}) as string
+																}
+																{...field}
+															/>
+														</FormControl>
+														<FormDescription>{t('forms.max64.description')}</FormDescription>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+										</div>
+									</>
+								);
 
-									{form.getValues('timestamps.enabled') && (
-										<>
-											<Separator />
-											<div className='grid grid-cols-2 gap-4'>
-												<FormField
-													control={form.control}
-													name='timestamps.createdAt'
-													render={({ field, formState: { errors } }) => (
-														<FormItem className='space-y-1'>
-															<FormLabel>
-																{t('database.models.add.timestamps.createdAt.field')}
-															</FormLabel>
-															<FormControl>
-																<Input
-																	error={Boolean(errors.timestamps?.createdAt)}
-																	type='text'
-																	placeholder={
-																		t('forms.placeholder', {
-																			label: t(
-																				'database.models.add.timestamps.createdAt.field',
-																			).toLowerCase(),
-																		}) as string
-																	}
-																	{...field}
-																/>
-															</FormControl>
-															<FormDescription>{t('forms.max64.description')}</FormDescription>
-															<FormMessage />
-														</FormItem>
-													)}
-												/>
-												<FormField
-													control={form.control}
-													name='timestamps.updatedAt'
-													render={({ field, formState: { errors } }) => (
-														<FormItem className='space-y-1'>
-															<FormLabel>
-																{t('database.models.add.timestamps.updatedAt.field')}
-															</FormLabel>
-															<FormControl>
-																<Input
-																	error={Boolean(errors.timestamps?.updatedAt)}
-																	type='text'
-																	placeholder={
-																		t('forms.placeholder', {
-																			label: t(
-																				'database.models.add.timestamps.updatedAt.field',
-																			).toLowerCase(),
-																		}) as string
-																	}
-																	{...field}
-																/>
-															</FormControl>
-															<FormDescription>{t('forms.max64.description')}</FormDescription>
-															<FormMessage />
-														</FormItem>
-													)}
-												/>
-											</div>
-										</>
-									)}
-								</>
-							)}
+								if (isEnabled && !editMode) return Component;
+								if (isEnabled && editMode && !modelToEdit?.timestamps.enabled) return Component;
+							})()}
 							<div className='flex justify-end'>
 								<Button size='lg'>{editMode ? t('general.save') : t('general.create')}</Button>
 							</div>

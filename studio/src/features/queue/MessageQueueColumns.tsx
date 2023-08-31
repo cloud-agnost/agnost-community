@@ -1,15 +1,15 @@
 import { ActionsCell } from '@/components/ActionsCell';
-import { QUEUE_ICON_MAP } from '@/constants';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { ColumnDefWithClassName, MessageQueue } from '@/types';
 import { translate } from '@/utils';
 import { Checkbox } from 'components/Checkbox';
-import { CopyButton } from 'components/CopyButton';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
-
+import { InstanceType } from 'components/InstanceType';
+import { Link } from 'react-router-dom';
+import useEnvironmentStore from '@/store/environment/environmentStore';
+import { QUEUE_ICON_MAP } from '@/constants';
 const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 	{
 		id: 'select',
@@ -33,43 +33,29 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
-	},
-	{
-		id: 'iid',
-		header: translate('general.id').toUpperCase(),
-		accessorKey: 'iid',
-		sortingFn: 'textCaseSensitive',
-		className: '!max-w-[100px] !w-[100px]',
-		cell: ({
-			row: {
-				original: { iid },
-			},
-		}) => {
+		cell: ({ row }) => {
+			const { name, _id } = row.original;
 			return (
-				<div className='flex items-center justify-between group'>
-					<span className='whitespace-nowrap'>{iid}</span>
-					<CopyButton text={iid} className='hidden group-hover:block' />
-				</div>
+				<Link to={`${_id}`} className='link'>
+					{name}
+				</Link>
 			);
 		},
 	},
 	{
 		id: 'delay',
-		header: ({ column }) => (
-			<SortButton text={translate('queue.delay').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('queue.delay')} column={column} />,
 		accessorKey: 'delay',
 		enableSorting: true,
 		sortingFn: 'alphanumeric',
 	},
 	{
 		id: 'instance',
-		header: translate('general.instance').toUpperCase(),
+		header: ({ column }) => <SortButton text={translate('general.instance')} column={column} />,
+		accessorKey: 'iid',
 		cell: ({
 			row: {
 				original: { iid },
@@ -79,14 +65,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)?.resource
 				.instance;
 			const Icon = QUEUE_ICON_MAP[instance as string];
-			return instance ? (
-				<div className='flex items-center gap-2'>
-					<Icon className='w-5 h-5' />
-					<span className='whitespace-nowrap'>{instance}</span>
-				</div>
-			) : (
-				<span className='whitespace-nowrap'>-</span>
-			);
+			return <InstanceType iid={iid} Icon={Icon} />;
 		},
 	},
 	{
@@ -94,7 +73,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.created_at').toUpperCase()}
+				text={translate('general.created_at')}
 				column={column}
 			/>
 		),
@@ -120,7 +99,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.updated_at').toUpperCase()}
+				text={translate('general.updated_at')}
 				column={column}
 			/>
 		),
@@ -144,12 +123,12 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { openDeleteModal } = useMessageQueueStore.getState();
+			const { openDeleteModal, openEditModal } = useMessageQueueStore.getState();
 			return (
 				<ActionsCell
 					original={original}
 					onDelete={() => openDeleteModal(original)}
-					to={`${original._id}`}
+					onEdit={() => openEditModal(original)}
 					canDeleteKey='queue.delete'
 					canEditKey='queue.edit'
 					type='version'

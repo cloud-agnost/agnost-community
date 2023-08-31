@@ -9,15 +9,16 @@ import {
 } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { BADGE_COLOR_MAP, TEST_ENDPOINTS_MENU_ITEMS } from '@/constants';
+import { HTTP_METHOD_BADGE_MAP, TEST_ENDPOINTS_MENU_ITEMS } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
+import { TestMethods } from '@/types';
 import {
 	arrayToObj,
 	generateId,
 	getEndpointPath,
+	getPathParams,
 	joinChannel,
-	leaveChannel,
 	objToArray,
 } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,9 +30,9 @@ import * as z from 'zod';
 import { OrganizationMenuItem } from '../organization';
 import EndpointBody from './TestEndpoint/EndpointBody';
 import EndpointHeaders from './TestEndpoint/EndpointHeaders';
-import TestEndpointParams from './TestEndpoint/TestEndpointParams';
-import { TestMethods } from '@/types';
 import EndpointResponse from './TestEndpoint/EndpointResponse';
+import EndpointParams from './TestEndpoint/EndpointParams';
+import EndpointPathVariables from './TestEndpoint/EndpointPathVariables';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -45,12 +46,17 @@ export const TestEndpointSchema = z.object({
 				value: z.string(),
 			}),
 		),
-		pathVariables: z.array(
-			z.object({
-				key: z.string(),
-				value: z.string(),
+		pathVariables: z
+			.array(
+				z.object({
+					key: z.string(),
+					value: z.string(),
+				}),
+			)
+			.optional()
+			.refine(() => !getPathParams(useEndpointStore.getState().endpoint?.path).length, {
+				message: 'Path variables are not allowed for this endpoint',
 			}),
-		),
 	}),
 	bodyType: z.enum(['json', 'form-data']).default('json'),
 	headers: z
@@ -78,7 +84,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { environment } = useEnvironmentStore();
 	const { endpoint, testEndpoint, endpointRequest } = useEndpointStore();
 	const [loading, setLoading] = useState(false);
-	const [searchParams] = useSearchParams();
+	const [searchParams, setSearchParams] = useSearchParams();
 	const form = useForm<z.infer<typeof TestEndpointSchema>>({
 		resolver: zodResolver(TestEndpointSchema),
 		defaultValues: {
@@ -97,27 +103,29 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	});
 	async function onSubmit(data: z.infer<typeof TestEndpointSchema>) {
 		setLoading(true);
-		const pathVariables = arrayToObj(data.params.pathVariables);
+		const pathVariables = arrayToObj(data.params.pathVariables ?? []);
 		const testPath = getEndpointPath(endpoint?.path as string, pathVariables);
 		const consoleLogId = generateId();
 		joinChannel(consoleLogId);
 		await testEndpoint({
-			epId: endpoint?.iid as string,
+			epId: endpoint?._id as string,
 			envId: environment?.iid as string,
-			path: testPath,
+			path: `api${testPath}`,
+			consoleLogId,
 			method: endpoint?.method.toLowerCase() as TestMethods,
 			params: {
 				queryParams: arrayToObj(data.params.queryParams),
 			},
 			headers: {
 				...arrayToObj(data.headers?.filter((h) => h.key && h.value) as any),
-				'Agnost-Session': consoleLogId,
 			},
 			body: data.body,
 			formData: data.formData,
 			onSuccess: () => {
 				setLoading(false);
-				leaveChannel(consoleLogId);
+			},
+			onError: () => {
+				setLoading(false);
 			},
 		});
 	}
@@ -133,7 +141,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	}, [form.getValues('bodyType')]);
 
 	useEffect(() => {
-		const req = endpointRequest.find((r) => r.epId === endpoint?.iid);
+		const req = endpointRequest[endpoint?._id as string];
 		if (req) {
 			form.setValue('body', req.body);
 			form.setValue('headers', objToArray(req.headers));
@@ -142,6 +150,13 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			form.setValue('formData', objToArray(req.formData));
 		}
 	}, [endpointRequest]);
+	console.log(form.formState.errors);
+
+	useEffect(() => {
+		if (!searchParams.get('t') && open) {
+			setSearchParams({ t: 'params' });
+		}
+	}, [searchParams.get('t'), open]);
 	return (
 		<Drawer open={open} onOpenChange={onClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
@@ -152,7 +167,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					<div className='border border-input-disabled-border rounded-l w-16 h-9'>
 						<Badge
 							className='w-full h-full rounded-l rounded-r-none'
-							variant={BADGE_COLOR_MAP[endpoint?.method as string]}
+							variant={HTTP_METHOD_BADGE_MAP[endpoint?.method as string]}
 							text={endpoint?.method as string}
 						/>
 					</div>
@@ -170,7 +185,9 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					</Button>
 				</div>
 				<nav className='mx-auto flex border-b'>
-					{TEST_ENDPOINTS_MENU_ITEMS.map((item) => {
+					{TEST_ENDPOINTS_MENU_ITEMS.filter(
+						(t) => !t.isPath || !!getPathParams(endpoint?.path).length,
+					).map((item) => {
 						return (
 							<OrganizationMenuItem
 								key={item.name}
@@ -183,7 +200,10 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 				<div className='p-6 scroll space-y-6'>
 					<Form {...form}>
 						<form className='inline space-y-6'>
-							{searchParams.get('t') === 'params' && <TestEndpointParams />}
+							{searchParams.get('t') === 'params' && <EndpointParams />}
+							{searchParams.get('t') === 'variables' && !!getPathParams(endpoint?.path).length && (
+								<EndpointPathVariables />
+							)}
 							{searchParams.get('t') === 'headers' && <EndpointHeaders />}
 							{searchParams.get('t') === 'body' && <EndpointBody />}
 						</form>

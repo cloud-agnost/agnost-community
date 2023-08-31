@@ -1,11 +1,10 @@
-import useClusterStore from '@/store/cluster/clusterStore.ts';
-import { OnboardingLayout } from '@/layouts/OnboardingLayout';
-import { LoaderFunctionArgs, Outlet, redirect, useNavigate } from 'react-router-dom';
 import { Stepper } from '@/components/Stepper';
-import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
-
-import './onboarding.scss';
+import { OnboardingLayout } from '@/layouts/OnboardingLayout';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useClusterStore from '@/store/cluster/clusterStore.ts';
+import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
+import { LoaderFunctionArgs, Outlet, redirect, useNavigate } from 'react-router-dom';
+import './onboarding.scss';
 
 async function loader(params: LoaderFunctionArgs) {
 	const status = await useClusterStore.getState().checkClusterSetup();
@@ -17,9 +16,6 @@ async function loader(params: LoaderFunctionArgs) {
 	}
 
 	const url = new URL(params.request.url);
-
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
 	const lastDoneStep = steps[currentStepIndex];
 
 	if (lastDoneStep && lastDoneStep.path !== url.pathname) {

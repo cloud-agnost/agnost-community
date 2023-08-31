@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { useEffect } from 'react';
 
 interface CreateStorageProps {
 	open: boolean;
@@ -26,10 +27,6 @@ export default function EditStorage({ open, onClose }: CreateStorageProps) {
 	const { notify } = useToast();
 	const form = useForm<z.infer<typeof StorageSchema>>({
 		resolver: zodResolver(StorageSchema),
-		defaultValues: {
-			name: storage.name,
-			// resourceId: storage.resourceId,
-		},
 	});
 
 	function onSubmit(data: z.infer<typeof StorageSchema>) {
@@ -51,6 +48,12 @@ export default function EditStorage({ open, onClose }: CreateStorageProps) {
 			},
 		});
 	}
+
+	useEffect(() => {
+		form.reset({
+			name: storage.name,
+		});
+	}, [storage]);
 	return (
 		<Drawer
 			open={open}
@@ -72,7 +75,7 @@ export default function EditStorage({ open, onClose }: CreateStorageProps) {
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<StorageForm />
+						<StorageForm edit />
 					</form>
 				</Form>
 			</DrawerContent>

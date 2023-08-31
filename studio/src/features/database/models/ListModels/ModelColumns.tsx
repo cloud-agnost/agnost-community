@@ -7,11 +7,12 @@ import { Columns } from '@phosphor-icons/react';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Button } from 'components/Button';
 import { Checkbox } from 'components/Checkbox';
-import { CopyButton } from 'components/CopyButton';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 import { Link } from 'react-router-dom';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from 'components/Tooltip';
+
 const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	{
 		id: 'select',
@@ -48,28 +49,10 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 			return (
 				<Link
 					to={`${_id}/fields`}
-					className='flex items-center gap-2 justify-between hover:underline'
+					className='flex items-center gap-2 justify-between text-button-primary hover:underline'
 				>
 					{name}
 				</Link>
-			);
-		},
-	},
-	{
-		id: 'iid',
-		header: translate('general.id').toUpperCase(),
-		accessorKey: 'iid',
-		sortingFn: 'textCaseSensitive',
-		cell: ({
-			row: {
-				original: { iid },
-			},
-		}) => {
-			return (
-				<div className='flex items-center gap-2 justify-between'>
-					<span className='whitespace-nowrap'>{iid}</span>
-					<CopyButton text={iid} />
-				</div>
 			);
 		},
 	},
@@ -142,15 +125,23 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 			//TODO: add column permissions
 			return (
 				<div className='flex items-center justify-end'>
-					<Button
-						to={`${original._id}/fields`}
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-					>
-						<Columns />
-					</Button>
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger>
+								<Button
+									to={`${original._id}/fields`}
+									iconOnly
+									variant='blank'
+									rounded
+									className='text-xl hover:bg-wrapper-background-hover text-icon-base'
+								>
+									<Columns />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>{translate('database.fields.title')}</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+
 					<ActionsCell
 						original={original}
 						onEdit={openEditDrawer}

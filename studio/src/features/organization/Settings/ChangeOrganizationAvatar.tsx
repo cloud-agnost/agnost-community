@@ -7,7 +7,7 @@ import { useState } from 'react';
 export default function ChangeOrganizationAvatar() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
-	const canUpdate = useAuthorizeOrg('org.update');
+	const canUpdate = useAuthorizeOrg('update');
 	const { organization, changeOrganizationAvatar, removeOrganizationAvatar } =
 		useOrganizationStore();
 	async function onChangeHandler(file: File) {

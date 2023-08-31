@@ -9,6 +9,7 @@ import EndpointForm from './EndpointForm';
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 interface CreateEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -23,14 +24,6 @@ export default function EditEndpointDrawer({ open, onClose }: CreateEndpointProp
 	}>();
 	const form = useForm<z.infer<typeof CreateEndpointSchema>>({
 		resolver: zodResolver(CreateEndpointSchema),
-		defaultValues: {
-			name: endpoint?.name,
-			timeout: endpoint?.timeout,
-			method: endpoint?.method,
-			path: endpoint?.path,
-			rateLimits: endpoint?.rateLimits,
-			middlewares: endpoint?.middlewares,
-		},
 	});
 
 	function onSubmit(data: z.infer<typeof CreateEndpointSchema>) {
@@ -58,6 +51,22 @@ export default function EditEndpointDrawer({ open, onClose }: CreateEndpointProp
 			},
 		});
 	}
+
+	useEffect(() => {
+		if (endpoint && open) {
+			form.reset({
+				name: endpoint.name,
+				method: endpoint.method,
+				path: endpoint.path,
+				sessionRequired: endpoint.sessionRequired,
+				apiKeyRequired: endpoint.apiKeyRequired,
+				timeout: endpoint.timeout,
+				logExecution: endpoint.logExecution,
+				rateLimits: endpoint.rateLimits,
+				middlewares: endpoint?.middlewares,
+			});
+		}
+	}, [endpoint, open]);
 
 	return (
 		<Drawer open={open} onOpenChange={onClose}>

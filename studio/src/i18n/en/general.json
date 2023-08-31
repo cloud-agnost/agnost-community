@@ -1,4 +1,9 @@
 {
+	"no_result": "No items matching search criteria",
+	"reset_search_query": "Reset Search Query",
+	"schemas": "Schemas",
+	"schema": "Schema",
+	"default_value": "Default Value",
 	"cancel": "Cancel",
 	"field": "Field",
 	"ok": "OK",
@@ -17,6 +22,7 @@
 	"error": "Error",
 	"addMembers": "Add Members",
 	"created": "Created",
+	"edit": "Edit",
 	"open": "Open",
 	"name": "Name",
 	"save": "Save",
@@ -89,5 +95,10 @@
 	"enabled": "Enabled",
 	"disabled": "Disabled",
 	"instance": "Instance",
-	"status": "Status"
+	"status": "Status",
+	"slider": {
+		"rapid": "Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.",
+		"database": "Amplify your backend capabilities and seamlessly integrate, manipulate, and leverage the power of multiple databases, including MySQL, MSSQL, and PostgreSQL.",
+		"realtime": "Build real-time apps that deliver a seamless user experience with our real-time database that syncs data across all connected devices in milliseconds."
+	}
 }

@@ -21,7 +21,7 @@ export default function EndpointHeaders() {
 	});
 
 	return (
-		<TestEndpointTable title={t('endpoint.test.query_params') ?? ''}>
+		<TestEndpointTable>
 			{fields.map((f, index) => (
 				<TableRow key={f.id}>
 					<TableCell>

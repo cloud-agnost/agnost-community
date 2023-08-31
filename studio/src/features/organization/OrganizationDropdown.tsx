@@ -20,10 +20,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import './organization.scss';
-import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
+import useAuthStore from '@/store/auth/authStore';
 
 export function OrganizationDropdown() {
 	const { t } = useTranslation();
+	const { user } = useAuthStore();
 	const [open, setOpen] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
 	const [openCreateModal, setOpenCreateModal] = useState(false);
@@ -31,7 +32,6 @@ export function OrganizationDropdown() {
 		useOrganizationStore();
 	const navigate = useNavigate();
 	const { notify } = useToast();
-	const hasPermission = useAuthorizeOrg('org.create');
 	function handleLeave() {
 		leaveOrganization({
 			organizationId: organization?._id as string,
@@ -127,7 +127,7 @@ export function OrganizationDropdown() {
 							</CommandItem>
 							<CommandItem>
 								<Button
-									disabled={!hasPermission}
+									disabled={!user?.isClusterOwner}
 									size='full'
 									variant='secondary'
 									onClick={() => {

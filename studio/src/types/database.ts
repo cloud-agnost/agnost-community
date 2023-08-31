@@ -23,6 +23,7 @@ export type CreateDatabaseParams = GetDatabasesOfAppParams & {
 	type: string;
 	managed: boolean;
 	resourceId: string;
+	assignUniqueName: boolean;
 };
 
 export type GetDatabaseOfAppByIdParams = GetDatabasesOfAppParams & {

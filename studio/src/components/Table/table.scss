@@ -17,9 +17,6 @@
 		&.head {
 			@apply border-none;
 		}
-		&.content {
-			@apply hover:bg-subtle;
-		}
 
 		&:hover {
 			.table-cell.actions {

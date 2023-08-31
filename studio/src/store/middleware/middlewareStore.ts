@@ -1,18 +1,18 @@
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { MiddlewareService } from '@/services';
 import {
+	APIError,
 	CreateMiddlewareParams,
 	DeleteMiddlewareParams,
 	DeleteMultipleMiddlewares,
 	GetMiddlewareByIdParams,
 	GetMiddlewaresOfAppVersionParams,
 	Middleware,
-	UpdateMiddlewareParams,
 	SaveMiddlewareCodeParams,
-	APIError,
+	UpdateMiddlewareParams,
 } from '@/types';
-import { MiddlewareService } from '@/services';
 import { notify, translate } from '@/utils';
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
 
 interface MiddlewareStore {
 	middlewares: Middleware[];

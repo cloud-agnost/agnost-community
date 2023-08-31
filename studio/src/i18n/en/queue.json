@@ -3,6 +3,7 @@
 	"empty_text": "You have not defined any message queues for this app version",
 	"delay": "Delay",
 	"view_logs": "View Logs",
+	"edit": "Edit Queue",
 	"delete": {
 		"title": "Delete Queue",
 		"message": "Are you sure you want to delete this queue?",
@@ -25,7 +26,7 @@
 		"title": "Test Message Queue",
 		"submit": "Submit Message",
 		"payload": "Message Payload",
-		"console": "Console Logs",
+		"console": "Console",
 		"editLogicSuccess": "MEssage Queue logic updated successfully"
 	}
 }

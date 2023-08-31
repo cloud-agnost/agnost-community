@@ -143,6 +143,8 @@ export interface Tab {
 	id: string;
 	title: string;
 	path: string;
+	isActive: boolean;
+	isDashboard: boolean;
 }
 
 export interface VersionParams {

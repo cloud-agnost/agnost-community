@@ -29,6 +29,9 @@ export default function MainEndpoint() {
 	const [error, setError] = useState<APIError>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { notify } = useToast();
+	const { t } = useTranslation();
+	const { versionId, orgId, appId } = useParams();
+
 	const canCreate = useAuthorizeVersion('endpoint.create');
 	const {
 		endpoints,
@@ -40,9 +43,6 @@ export default function MainEndpoint() {
 		closeEndpointDeleteDialog,
 		deleteMultipleEndpoints,
 	} = useEndpointStore();
-
-	const { t } = useTranslation();
-	const { versionId, orgId, appId } = useParams();
 
 	const {
 		setSelectedRows,
@@ -127,6 +127,7 @@ export default function MainEndpoint() {
 			table={table}
 			selectedRowLength={selectedRows.length}
 			disabled={!canCreate}
+			viewLogs
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'

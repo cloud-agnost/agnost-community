@@ -8,13 +8,13 @@ import { FormatOptionLabelProps, GroupedOption, OrganizationMember } from '@/typ
 import { APIError } from '@/types/type';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { useTranslation } from 'react-i18next';
 const loadOptions = async (inputValue: string) => {
 	const members: OrganizationMember[] = await useOrganizationStore
 		.getState?.()
 		.getOrganizationMembers({
 			search: inputValue,
-			excludeSelf: false,
+			excludeSelf: true,
 			organizationId: useOrganizationStore.getState?.().organization?._id as string,
 		});
 	return members.map((res) => ({
@@ -68,7 +68,8 @@ export default function TransferOrganization() {
 	const { organization, transferOrganization } = useOrganizationStore();
 	const { notify } = useToast();
 	const navigate = useNavigate();
-	const canUpdate = useAuthorizeOrg('org.update');
+	const canUpdate = useAuthorizeOrg('update');
+	const { t } = useTranslation();
 	function transferOrganizationHandle() {
 		setLoading(true);
 		transferOrganization({
@@ -77,8 +78,8 @@ export default function TransferOrganization() {
 			onSuccess: () => {
 				setLoading(false);
 				notify({
-					title: 'Organization transferred successfully',
-					description: 'You will be redirected to the new organization',
+					title: t('general.success'),
+					description: t('organization.transfer-success'),
 					type: 'success',
 				});
 				setTimeout(() => {
@@ -110,9 +111,9 @@ export default function TransferOrganization() {
 				className='text-end'
 				onClick={transferOrganizationHandle}
 				loading={loading}
-				disabled={!canUpdate}
+				disabled={!canUpdate || !userId}
 			>
-				Transfer
+				{t('organization.transfer')}
 			</Button>
 		</div>
 	);

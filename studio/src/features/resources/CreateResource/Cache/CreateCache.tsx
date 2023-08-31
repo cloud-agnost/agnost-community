@@ -83,7 +83,7 @@ export default function CreateCache() {
 						control={form.control}
 						name='createReplica'
 						render={({ field }) => (
-							<FormItem className='flex  space-y-0 '>
+							<FormItem className='flex space-y-0 space-x-4'>
 								<FormControl>
 									<Checkbox checked={field.value} onCheckedChange={field.onChange} />
 								</FormControl>

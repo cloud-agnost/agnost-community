@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import EndpointForm from './EndpointForm';
+import { useNavigate } from 'react-router-dom';
 interface CreateEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -16,6 +17,7 @@ interface CreateEndpointProps {
 
 export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 	const { createEndpoint } = useEndpointStore();
+	const navigate = useNavigate();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -24,6 +26,9 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 	const { notify } = useToast();
 	const form = useForm<z.infer<typeof CreateEndpointSchema>>({
 		resolver: zodResolver(CreateEndpointSchema),
+		defaultValues: {
+			method: 'GET',
+		},
 	});
 
 	async function onSubmit(data: z.infer<typeof CreateEndpointSchema>) {
@@ -32,19 +37,9 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 			appId: appId as string,
 			versionId: versionId as string,
 			...data,
-			onSuccess: () => {
-				onClose();
-				form.reset({
-					name: '',
-					path: '',
-					timeout: '',
-					apiKeyRequired: false,
-					method: 'GET',
-					sessionRequired: false,
-					logExecution: false,
-					rateLimits: [],
-					middlewares: [],
-				});
+			onSuccess: (endpoint) => {
+				navigate(`${endpoint._id}`);
+				closeDrawer();
 			},
 			onError: ({ error, details }) => {
 				notify({
@@ -56,8 +51,13 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 		});
 	}
 
+	function closeDrawer() {
+		onClose();
+		form.reset();
+	}
+
 	return (
-		<Drawer open={open} onOpenChange={onClose}>
+		<Drawer open={open} onOpenChange={closeDrawer}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>{t('endpoint.create.title')}</DrawerTitle>

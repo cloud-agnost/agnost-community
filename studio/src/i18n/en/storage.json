@@ -8,5 +8,40 @@
 		"message": "Are you sure you want to delete this storage?",
 		"description": "All organization apps and managed resource and associated data will be deleted. This action is not reversible — please continue with caution.",
 		"confirmCode": "Confirm resource delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
+	},
+	"buckets": "Buckets",
+	"bucket": {
+		"create": "Create Bucket",
+		"empty_text": "You have not defined any buckets for this storage",
+		"delete": {
+			"title": "Delete Bucket",
+			"message": "Are you sure you want to delete this bucket?",
+			"description": "All files and associated data will be deleted. This action is not reversible — please continue with caution.",
+			"confirmCode": "Confirm resource delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
+		},
+		"visibility": {
+			"title": "Visibility",
+			"public": "Public",
+			"private": "Private",
+			"desc": "Whether the bucket is publicly accessible or not. Public buckets can be accessed by anyone."
+		},
+		"tags": "Tags",
+		"empty": "Bucket's content has been deleted"
+	},
+	"file": {
+		"upload": "Upload File",
+		"path": "Path",
+		"publicPath": "Public Path",
+		"size": "Size",
+		"mimeType": "Mime Type",
+		"empty_text": "No files have been uploaded to this bucket",
+		"delete": {
+			"title": "Delete File",
+			"message": "Are you sure you want to delete this file?",
+			"description": "All associated data will be deleted. This action is not reversible — please continue with caution.",
+			"confirmCode": "Confirm resource delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
+		},
+		"copy": "Duplicate File",
+		"replace": "Replace File"
 	}
 }

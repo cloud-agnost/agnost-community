@@ -3,20 +3,32 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import { APIError } from '@/types';
 import axios from 'axios';
+import { setupCache } from 'axios-cache-adapter';
 const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost/api';
+const envBaseURL = `http://localhost/${useEnvironmentStore.getState().environment?.iid}`;
 
+const cache = setupCache({
+	maxAge: 15 * 60 * 1000,
+});
+
+const headers = {
+	'Content-Type': 'application/json',
+};
 export const instance = axios.create({
 	baseURL,
-	headers: {
-		'Content-Type': 'application/json',
-	},
+	headers,
+	adapter: cache.adapter,
+});
+
+export const envInstance = axios.create({
+	baseURL: envBaseURL,
+	headers,
+	adapter: cache.adapter,
 });
 
 export const testEndpointInstance = axios.create({
-	baseURL: `http://localhost/${useEnvironmentStore.getState().environment?.iid}/api`,
-	headers: {
-		'Content-Type': 'application/json',
-	},
+	baseURL: `${envBaseURL}/api`,
+	headers,
 });
 
 instance.interceptors.request.use((config) => {
@@ -40,11 +52,34 @@ instance.interceptors.response.use(
 	},
 );
 
+envInstance.interceptors.request.use((config) => {
+	const accessToken = useAuthStore.getState().accessToken;
+	if (accessToken) {
+		config.headers['Authorization'] = accessToken;
+	}
+	return config;
+});
+
 testEndpointInstance.interceptors.response.use(
 	(response) => {
 		return response;
 	},
 	(error) => {
-		return error;
+		return Promise.reject(error);
+	},
+);
+envInstance.interceptors.response.use(
+	(response) => {
+		return response;
+	},
+	(error) => {
+		const err: APIError = {
+			code: error.response.data.code,
+			error: error.response.data.error,
+			details: error.response.data.message,
+		};
+		console.log(err);
+		// if (err.code === '413')
+		return Promise.reject(err);
 	},
 );

@@ -48,7 +48,7 @@ export function uniq<T>(array: T[]): T[] {
 }
 
 export function isEmpty(value: unknown): boolean {
-	if (value === null || value === undefined) {
+	if (value === null || value === undefined || value === '') {
 		return true;
 	}
 
@@ -69,11 +69,24 @@ export function isArray<T>(value: unknown): value is T[] {
 	return Array.isArray(value);
 }
 export function getNameForAvatar(name: string) {
-	if (name?.length > 2) {
-		const names = name.split(' ');
-		return names[0].charAt(0).toUpperCase() + names[names.length - 1].charAt(0).toUpperCase();
+	if (!name) {
+		return '';
+	}
+
+	const words = name.trim().split(' ');
+
+	if (words.length === 1) {
+		if (words[0].length === 1) {
+			return words[0];
+		} else if (words[0].length === 2) {
+			return words[0].toUpperCase();
+		} else {
+			return words[0].slice(0, 2).toUpperCase();
+		}
 	} else {
-		return name;
+		const firstInitial = words[0][0];
+		const lastInitial = words[words.length - 1][0];
+		return (firstInitial + lastInitial).toUpperCase();
 	}
 }
 export function capitalize(str: string) {
@@ -205,7 +218,6 @@ export const getAppPermission = (userRole: AppRoles, path: string) => {
 	if (userPermissions[userRole]) {
 		const currentPermissions = userPermissions[userRole];
 		const permission = getPermission(currentPermissions, pathParts);
-		console.log(permission);
 		return permission;
 	}
 	return undefined;
@@ -223,3 +235,17 @@ export const getOrgPermission = (path: string) => {
 	}
 	return undefined;
 };
+export function formatFileSize(bytes: number): string {
+	if (bytes === 0) return '0 Bytes';
+
+	const units: string[] = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+	const base = 1024;
+	const exponent: number = Math.floor(Math.log(bytes) / Math.log(base));
+
+	return parseFloat((bytes / Math.pow(base, exponent)).toFixed(2)) + ' ' + units[exponent];
+}
+
+export function checkNumber(number: number | undefined): number | undefined {
+	console.log({ number });
+	return number === 0 || number === undefined ? undefined : Number(number);
+}

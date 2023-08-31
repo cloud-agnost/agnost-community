@@ -5,5 +5,6 @@ export abstract class RealtimeActions<T> {
 	abstract update(param: RealtimeActionParams<T>): void;
 	abstract create(param: RealtimeActionParams<T>): void;
 	abstract telemetry(param: RealtimeActionParams<T>): void;
-	abstract info(param: RealtimeActionParams<T>): void;
+	abstract log(param: RealtimeActionParams<T>): void;
+	abstract deploy(param: RealtimeActionParams<T>): void;
 }

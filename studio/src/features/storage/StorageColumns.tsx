@@ -6,11 +6,12 @@ import useStorageStore from '@/store/storage/storageStore';
 import { ColumnDefWithClassName, Storage } from '@/types';
 import { translate } from '@/utils';
 import { Checkbox } from 'components/Checkbox';
-import { CopyButton } from 'components/CopyButton';
+import { Button } from 'components/Button';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
+import { InstanceType } from '@/components/InstanceType';
 
-const MessageQueueColumns: ColumnDefWithClassName<Storage>[] = [
+const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 	{
 		id: 'select',
 		className: '!max-w-[40px] !w-[40px]',
@@ -31,36 +32,31 @@ const MessageQueueColumns: ColumnDefWithClassName<Storage>[] = [
 		enableSorting: false,
 		enableHiding: false,
 	},
+
 	{
-		id: 'iid',
-		header: translate('general.id').toUpperCase(),
-		accessorKey: 'iid',
+		id: 'name',
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
+		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
-		className: '!max-w-[100px] !w-[100px]',
-		cell: ({
-			row: {
-				original: { iid },
-			},
-		}) => {
+		cell: ({ row: { original } }) => {
+			const { name } = original;
 			return (
-				<div className='flex items-center justify-between group'>
-					<span className='whitespace-nowrap'>{iid}</span>
-					<CopyButton text={iid} className='hidden group-hover:block' />
-				</div>
+				<Button
+					variant='blank'
+					to={`${original._id}`}
+					onClick={() => {
+						useStorageStore.setState({ storage: original });
+					}}
+					className='link'
+				>
+					<span>{name}</span>
+				</Button>
 			);
 		},
 	},
 	{
-		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
-		accessorKey: 'name',
-		sortingFn: 'textCaseSensitive',
-	},
-	{
 		id: 'instance',
-		header: translate('general.instance').toUpperCase(),
+		header: translate('general.instance'),
 		cell: ({
 			row: {
 				original: { iid },
@@ -70,14 +66,7 @@ const MessageQueueColumns: ColumnDefWithClassName<Storage>[] = [
 			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)?.resource
 				.instance;
 			const Icon = STORAGE_ICON_MAP[instance as string];
-			return instance ? (
-				<div className='flex items-center gap-2'>
-					<Icon className='w-5 h-5' />
-					<span className='whitespace-nowrap'>{instance}</span>
-				</div>
-			) : (
-				<span className='whitespace-nowrap'>-</span>
-			);
+			return <InstanceType iid={iid} Icon={Icon} />;
 		},
 	},
 	{
@@ -85,7 +74,7 @@ const MessageQueueColumns: ColumnDefWithClassName<Storage>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.created_at').toUpperCase()}
+				text={translate('general.created_at')}
 				column={column}
 			/>
 		),
@@ -111,7 +100,7 @@ const MessageQueueColumns: ColumnDefWithClassName<Storage>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.updated_at').toUpperCase()}
+				text={translate('general.updated_at')}
 				column={column}
 			/>
 		),
@@ -150,4 +139,4 @@ const MessageQueueColumns: ColumnDefWithClassName<Storage>[] = [
 	},
 ];
 
-export default MessageQueueColumns;
+export default StorageColumns;

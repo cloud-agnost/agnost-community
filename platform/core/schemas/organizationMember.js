@@ -1,5 +1,5 @@
+import { body, param } from "express-validator";
 import mongoose from "mongoose";
-import { body, query, param } from "express-validator";
 import { orgRoles } from "../config/constants.js";
 /**
  * An organization is the top level entitiy used to hold all apps and its associated design elements.

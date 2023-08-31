@@ -194,6 +194,7 @@
 		--theme-base-background: 25, 28, 41;
 		--theme-subtle-background: 33, 37, 48;
 		--theme-lighter-background: 50, 56, 73;
+		--theme-base-reverse-background: 255, 255, 255;
 		--theme-border: 50, 56, 73;
 
 		--text-base: 255, 255, 255;
@@ -300,33 +301,38 @@
 		overflow-y: scroll;
 		height: 90%;
 	}
-	@keyframes slideInRight {
+	@keyframes slideInDown {
 		from {
-			transform: translateX(100%);
-			opacity: 0;
+			transform: translate3d(0, -100%, 0);
+			visibility: visible;
 		}
+
 		to {
-			transform: translateX(0);
-			opacity: 1;
+			transform: translate3d(0, 0, 0);
 		}
 	}
 
-	@keyframes slideOutRight {
+	.slideInDown {
+		animation-name: slideInDown 0.5s forwards;
+	}
+
+	@keyframes slideOutUp {
 		from {
-			transform: translateX(0);
-			opacity: 1;
+			transform: translate3d(0, 0, 0);
 		}
+
 		to {
-			transform: translateX(100%);
-			opacity: 0;
+			visibility: hidden;
+			transform: translate3d(0, -100%, 0);
 		}
 	}
 
-	.slideInRight {
-		animation: slideInRight 0.5s forwards;
+	.slideOutUp {
+		animation-name: slideOutUp 0.5s forwards;
 	}
-	.slideOutRight {
-		animation: slideOutRight 0.5s forwards;
+
+	.link {
+		@apply text-brand-primary hover:underline font-sfCompact text-sm;
 	}
 }
 
@@ -488,4 +494,71 @@
 }
 .rdrNextPrevButton {
 	background-color: rgb(var(--wrapper-background-light)) !important;
+}
+
+.react-resizable {
+	position: relative;
+}
+.react-resizable-handle {
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	background-repeat: no-repeat;
+	background-origin: content-box;
+	box-sizing: border-box;
+	background-position: bottom right;
+	border-width: 0px 1px 1px 0px;
+	border-style: solid;
+	border-color: rgb(var(--theme-base-reverse-background));
+}
+.react-resizable-handle-sw {
+	bottom: 0;
+	left: 0;
+	cursor: sw-resize;
+	transform: rotate(90deg);
+}
+.react-resizable-handle-se {
+	bottom: 0;
+	right: 0;
+	cursor: se-resize;
+}
+.react-resizable-handle-nw {
+	top: 0;
+	left: 0;
+	cursor: nw-resize;
+	transform: rotate(180deg);
+}
+.react-resizable-handle-ne {
+	top: 0;
+	right: 0;
+	cursor: ne-resize;
+	transform: rotate(270deg);
+}
+.react-resizable-handle-w,
+.react-resizable-handle-e {
+	top: 50%;
+	margin-top: -10px;
+	cursor: ew-resize;
+}
+.react-resizable-handle-w {
+	left: 0;
+	transform: rotate(135deg);
+}
+.react-resizable-handle-e {
+	right: 0;
+	transform: rotate(315deg);
+}
+.react-resizable-handle-n,
+.react-resizable-handle-s {
+	left: 50%;
+	margin-left: -10px;
+	cursor: ns-resize;
+}
+.react-resizable-handle-n {
+	top: 0;
+	transform: rotate(225deg);
+}
+.react-resizable-handle-s {
+	bottom: 0;
+	transform: rotate(45deg);
 }

@@ -31,7 +31,10 @@ export default function SubFields({ field, name }: SubFieldsProps) {
 	const path = `/organization/${model?.orgId}/apps/${model?.appId}/version/${model?.versionId}/database/${model?.dbId}/models/${model?._id}/fields`;
 	const Component = model ? Link : 'span';
 	return (
-		<Component to={path} className='flex items-center gap-2 justify-between hover:underline'>
+		<Component
+			to={path}
+			className='flex items-center gap-2 justify-between text-button-primary hover:underline'
+		>
 			{name}
 		</Component>
 	);

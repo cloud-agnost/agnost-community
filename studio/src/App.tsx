@@ -22,15 +22,15 @@ function App() {
 	}, [isTypesOk, user]);
 
 	const toastSlide = cssTransition({
-		enter: 'slideInRight',
-		exit: 'slideOutRight',
+		enter: 'slideInDown',
+		exit: 'slideOutUp',
 	});
 
 	return (
 		<>
 			<RouterProvider router={router} />
 			<ToastContainer
-				position='top-right'
+				position='top-center'
 				autoClose={3000}
 				hideProgressBar
 				newestOnTop={false}

@@ -27,7 +27,7 @@ export default function MainStorage() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
-	const canCreateStorages = useAuthorizeVersion('storage.add');
+	const canCreateStorages = useAuthorizeVersion('storage.create');
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();

@@ -118,13 +118,31 @@ const router = createBrowserRouter([
 												children: [
 													{
 														index: true,
-														lazy: () => lazyRouteImport(PATHS.storage),
+														lazy: () => lazyRouteImport(PATHS.storage.storage),
+													},
+													{
+														path: ':storageId',
+														lazy: () => lazyRouteImport(PATHS.storage.bucket),
+													},
+													{
+														path: ':storageId/bucket/:bucketName',
+														lazy: () => lazyRouteImport(PATHS.storage.files),
 													},
 												],
 											},
 											{
 												path: 'middleware',
-												lazy: () => lazyRouteImport(PATHS.version.middlewares),
+												lazy: () => lazyRouteImport(PATHS.version.middlewareOutlet),
+												children: [
+													{
+														index: true,
+														lazy: () => lazyRouteImport(PATHS.version.middlewares),
+													},
+													{
+														path: ':middlewareId',
+														lazy: () => lazyRouteImport(PATHS.version.editMiddleware),
+													},
+												],
 											},
 											{
 												path: 'cache',
@@ -302,7 +320,7 @@ export function GuestOnly({ children }: { children: ReactNode }): JSX.Element {
 	const { isCompleted } = useClusterStore();
 	const { pathname } = useLocation();
 
-	if (isAuthenticated()) {
+	if (isAuthenticated() && isCompleted) {
 		return <Navigate to='/organization' />;
 	} else if (!isCompleted && pathname !== '/onboarding') {
 		return <Navigate to='/onboarding' />;

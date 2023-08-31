@@ -4,7 +4,6 @@
 		"resources": "Resources",
 		"settings": "Settings"
 	},
-
 	"create": "Create Organization",
 	"create-new": "Create New Organization",
 	"name": "Organization Name",
@@ -61,5 +60,9 @@
 				"code": "Confirm organization delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
 			}
 		}
-	}
+	},
+	"transfer": "Transfer",
+	"transfer-ownership": "Transfer Ownership",
+	"transfer-ownership-desc": "The organization owner is the person who has created the organization or the person to whom the organization ownership has been transferred. The Owner has full control over the organization and only organization owners can delete the organization or transfer its ownership to someone else.",
+	"transfer-success": "You have successfully transferred the ownership of the organization."
 }

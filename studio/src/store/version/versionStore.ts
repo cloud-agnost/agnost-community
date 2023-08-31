@@ -55,6 +55,7 @@ interface VersionStore {
 	lastFetchedLogCount: number;
 	log: VersionLog;
 	showLogDetails: boolean;
+	selectVersion: (version: Version) => void;
 	setSelectedAPIKey: (key: APIKey | null) => void;
 	setEditAPIKeyDrawerIsOpen: (isOpen: boolean) => void;
 	getVersionById: (req: GetVersionByIdParams) => Promise<Version>;
@@ -131,6 +132,10 @@ const useVersionStore = create<VersionStore>()(
 				log: {} as VersionLog,
 				lastFetchedLogCount: 0,
 				showLogDetails: false,
+				selectVersion: (version: Version) => {
+					set({ version });
+					joinChannel(version._id);
+				},
 				setSelectedAPIKey: (key: APIKey | null) => {
 					set({ selectedAPIKey: key });
 				},
@@ -151,9 +156,6 @@ const useVersionStore = create<VersionStore>()(
 						const versions = await VersionService.getAllVersionsVisibleToUser(req);
 						if (!get().versionPage) set({ versions });
 						else set((prev) => ({ versions: [...prev.versions, ...versions] }));
-						versions.forEach((version: Version) => {
-							joinChannel(version._id);
-						});
 					} catch (error) {
 						set({ error: error as APIError });
 					} finally {

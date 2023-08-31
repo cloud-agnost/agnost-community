@@ -57,7 +57,6 @@ export default function ReadReplicas() {
 			port: replica.port,
 			username: replica.username,
 			password: replica.password,
-			dbName: replica.dbName,
 		});
 		setOpenModal(true);
 	}

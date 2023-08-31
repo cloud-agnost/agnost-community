@@ -18,7 +18,7 @@ export {
 	ConnectResourceSchema,
 } from './resource.ts';
 export type * from './storage.ts';
-export { StorageSchema } from './storage.ts';
+export { BucketSchema, StorageSchema } from './storage.ts';
 export type * from './task.ts';
 export { CreateTaskSchema } from './task.ts';
 export type * from './type.ts';

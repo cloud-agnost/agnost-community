@@ -1,4 +1,4 @@
-import ActionCell from '@/components/ActionsCell/ActionsCell';
+import { ActionsCell } from '@/components/ActionsCell';
 import { DATABASE_ICON_MAP } from '@/constants';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import { ColumnDefWithClassName, Database } from '@/types';
@@ -6,9 +6,9 @@ import { translate } from '@/utils';
 import { Table } from '@phosphor-icons/react';
 import { Badge } from 'components/Badge';
 import { Button } from 'components/Button';
-import { CopyButton } from 'components/CopyButton';
 import { SortButton } from 'components/DataTable';
 import { Link } from 'react-router-dom';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from 'components/Tooltip';
 
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
@@ -18,6 +18,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		),
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { _id, name },
@@ -26,28 +27,10 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 			return (
 				<Link
 					to={`${_id}/models`}
-					className='flex items-center gap-2 justify-between hover:underline'
+					className='flex items-center gap-2 justify-between text-button-primary hover:underline'
 				>
 					{name}
 				</Link>
-			);
-		},
-	},
-	{
-		id: 'iid',
-		header: translate('general.id').toUpperCase(),
-		accessorKey: 'iid',
-		sortingFn: 'textCaseSensitive',
-		cell: ({
-			row: {
-				original: { iid },
-			},
-		}) => {
-			return (
-				<div className='flex items-center gap-2 justify-between'>
-					<span className='whitespace-nowrap'>{iid}</span>
-					<CopyButton text={iid} />
-				</div>
 			);
 		},
 	},
@@ -58,7 +41,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		),
 		accessorKey: 'type',
 		sortingFn: 'textCaseSensitive',
-
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { type },
@@ -66,7 +49,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		}) => {
 			const Icon = DATABASE_ICON_MAP[type];
 			return (
-				<span className='flex items-center gap-2'>
+				<span className='flex items-center gap-2 [&>svg]:text-lg'>
 					<Icon />
 					{type}
 				</span>
@@ -78,7 +61,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		header: translate('general.managed').toUpperCase(),
 		accessorKey: 'managed',
 		sortingFn: 'textCaseSensitive',
-
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { managed },
@@ -118,22 +101,30 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 			//Todo: Table permissions
 			return (
 				<div className='flex items-center gap-0.5 justify-end'>
-					<Button
-						iconOnly
-						variant='blank'
-						rounded
-						to={`${original._id}/models`}
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default text-xl'
-					>
-						<Table />
-					</Button>
-					<ActionCell
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger>
+								<Button
+									iconOnly
+									variant='blank'
+									rounded
+									to={`${original._id}/models`}
+									className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default text-xl'
+								>
+									<Table />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>{translate('database.models.title')}</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+					<ActionsCell
 						original={original}
 						onDelete={deleteHandler}
 						onEdit={openEditDrawer}
 						canDeleteKey='db.delete'
 						canEditKey='db.update'
 						type='version'
+						disabled={!original.managed}
 					/>
 				</div>
 			);

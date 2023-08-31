@@ -139,7 +139,7 @@ router.get(
 
 			res.json(models);
 
-			/* If we allow references to sub-model objects then below code is needed 			
+			/* If we allow references to sub-model objects then below code is needed
 			res.json(
 				modelCtrl.getReferenceModelsList(models).sort((a, b) => {
 					if (a.name < b.name) return -1;
@@ -569,7 +569,7 @@ router.put(
 			uAt.creator = "system";
 			uAt.order = cAt.order + 10000;
 			uAt.type = "updatedat";
-			cAt.dbType = dbTypeMappings[db.type]["updatedat"];
+			uAt.dbType = dbTypeMappings[db.type]["updatedat"];
 			uAt.required = true;
 			uAt.unique = false;
 			uAt.immutable = false;

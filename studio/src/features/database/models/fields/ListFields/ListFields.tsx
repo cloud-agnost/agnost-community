@@ -1,16 +1,16 @@
-import { cn } from '@/utils';
-import { Field, Model } from '@/types';
+import { Database, Field, Model } from '@/types';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo, useState } from 'react';
 import { DataTable } from 'components/DataTable';
 import { Row, Table } from '@tanstack/react-table';
-import { EmptyState } from 'components/EmptyState';
 import { Model as ModelIcon } from '@/components/icons';
-import {
-	CreateFieldButton,
-	FieldActions,
-	FieldColumns,
-} from '@/features/database/models/fields/ListFields';
+import { CreateFieldButton, FieldColumns } from '@/features/database/models/fields/ListFields';
+import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
+import { VersionTabLayout } from '@/layouts/VersionLayout';
+import { useParams } from 'react-router-dom';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
+import useDatabaseStore from '@/store/database/databaseStore.ts';
+import useModelStore from '@/store/database/modelStore.ts';
 
 interface ListFieldsProps {
 	model: Model;
@@ -22,6 +22,10 @@ export default function ListFields({ model, parentModel }: ListFieldsProps) {
 	const [search, setSearch] = useState('');
 	const { t } = useTranslation();
 	const [table, setTable] = useState<Table<Field>>();
+	const { databases } = useDatabaseStore();
+	const { deleteMultipleField } = useModelStore();
+	const { dbId } = useParams();
+	const canMultiDelete = useAuthorizeVersion('model.delete');
 
 	const filteredFields = useMemo(() => {
 		if (!search) return model.fields;
@@ -42,41 +46,78 @@ export default function ListFields({ model, parentModel }: ListFieldsProps) {
 		}
 	}, []);
 
+	const database = useMemo(() => {
+		return databases.find((database) => database._id === dbId) as Database;
+	}, [databases, dbId]);
+
+	async function deleteHandler() {
+		await deleteMultipleField({
+			dbId: model.dbId,
+			modelId: model._id,
+			appId: database.appId,
+			orgId: database.orgId,
+			versionId: database.versionId,
+			fieldIds: selectedRows?.map((row) => row.original._id) as string[],
+		});
+		setSelectedRows(undefined);
+		table?.resetRowSelection?.();
+	}
+
 	const hasNoFields = filteredFields.length === 0;
+	const databasesUrl = `/organization/${database?.orgId}/apps/${database?.appId}/version/${database?.versionId}/database`;
+	const databaseUrl = `${databasesUrl}/${model.dbId}/models`;
+	const goParentModelUrl = `${databaseUrl}/${parentModel?._id}/fields`;
+
+	const breadcrumbItems: BreadCrumbItem[] = [
+		{
+			name: t('database.page_title').toString(),
+			url: databasesUrl,
+		},
+		{
+			name: database?.name,
+			url: databaseUrl,
+		},
+		{
+			name: parentModel?.name,
+			url: goParentModelUrl,
+		},
+		{
+			name: model?.name,
+		},
+	];
 
 	return (
-		<div className='px-6 h-full flex flex-col overflow-auto'>
-			<FieldActions
-				table={table}
-				model={model}
-				parentModel={parentModel}
-				setSearch={setSearch}
-				selectedRows={selectedRows}
+		<VersionTabLayout<Field>
+			breadCrumb={
+				<BreadCrumb
+					goBackLink={parentModel ? goParentModelUrl : databaseUrl}
+					items={breadcrumbItems}
+				/>
+			}
+			onSearchInputClear={() => setSearch('')}
+			className='p-6'
+			isEmpty={hasNoFields}
+			title={t('database.fields.title')}
+			icon={<ModelIcon className='w-44 h-44' />}
+			handlerButton={<CreateFieldButton />}
+			openCreateModal={() => {
+				/* empty */
+			}}
+			createButtonTitle={t('database.models.create')}
+			emptyStateTitle={t('database.fields.no_fields')}
+			table={table}
+			selectedRowLength={selectedRows?.length}
+			onSearch={(value) => setSearch(value)}
+			disabled={!canMultiDelete}
+			onMultipleDelete={deleteHandler}
+		>
+			<DataTable<Field>
+				setTable={setTable}
+				columns={FieldColumns}
+				data={filteredFields.sort((a, b) => b.order - a.order)}
+				noDataMessage={<p className='text-xl'>{t('database.fields.no_fields')}</p>}
 				setSelectedRows={setSelectedRows}
 			/>
-			<div
-				className={cn(
-					!hasNoFields && 'py-6',
-					hasNoFields && 'flex-1 flex items-center justify-center',
-				)}
-			>
-				{hasNoFields ? (
-					<EmptyState
-						title={t('database.models.no_models')}
-						icon={<ModelIcon className='text-[150px]' />}
-					>
-						<CreateFieldButton />
-					</EmptyState>
-				) : (
-					<DataTable<Field>
-						setTable={setTable}
-						columns={FieldColumns}
-						data={filteredFields.sort((a, b) => b.order - a.order)}
-						noDataMessage={<p className='text-xl'>{t('database.fields.no_fields')}</p>}
-						setSelectedRows={setSelectedRows}
-					/>
-				)}
-			</div>
-		</div>
+		</VersionTabLayout>
 	);
 }

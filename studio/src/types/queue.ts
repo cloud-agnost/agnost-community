@@ -1,4 +1,4 @@
-import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX, NUMBER_REGEX } from '@/constants/regex';
+import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants/regex';
 import { translate } from '@/utils';
 import * as z from 'zod';
 import { BaseGetRequest, BaseParams, BaseRequest } from '.';
@@ -81,18 +81,7 @@ export const CreateMessageQueueSchema = z.object({
 		),
 
 	logExecution: z.boolean().default(false),
-	delay: z
-		.string({
-			required_error: translate('forms.required', {
-				label: translate('endpoint.create.timeout'),
-			}),
-		})
-		.regex(
-			NUMBER_REGEX,
-			translate('forms.number', {
-				label: translate('endpoint.create.timeout'),
-			}),
-		),
+	delay: z.coerce.number().int().positive().optional(),
 	resourceId: z.string({
 		required_error: translate('forms.required', {
 			label: translate('queue.create.resource.title'),
@@ -103,7 +92,7 @@ export const CreateMessageQueueSchema = z.object({
 export interface CreateMessageQueueParams extends BaseRequest, BaseParams {
 	name: string;
 	logExecution: boolean;
-	delay: string;
+	delay?: number;
 	resourceId: string;
 }
 export interface UpdateQueueParams extends CreateMessageQueueParams {

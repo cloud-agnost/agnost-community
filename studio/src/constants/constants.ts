@@ -24,6 +24,7 @@ import {
 	LightBulb,
 	LineSegments,
 	MessageQueue,
+	MinIo,
 	MongoDb,
 	MySql,
 	NpmPackage,
@@ -89,15 +90,15 @@ export const MAX_DB_SIZE = 50;
 
 export const SLIDER_IMAGES = [
 	{
-		text: 'Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.',
+		text: translate('general.slider.rapid'),
 		image: Rapid,
 	},
 	{
-		text: 'Amplify your backend capabilities and seamlessly integrate, manipulate, and leverage the power of multiple databases, including MySQL, MSSQL, and PostgreSQL.',
+		text: translate('general.slider.database'),
 		image: Database,
 	},
 	{
-		text: 'Amplify your backend capabilities and seamlessly integrate, manipulate, and leverage the power of multiple databases, including MySQL, MSSQL, and PostgreSQL.',
+		text: translate('general.slider.realtime'),
 		image: Realtime,
 	},
 ];
@@ -273,34 +274,50 @@ export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 	{
 		title: translate('version.databases'),
 		path: 'database',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.storage'),
 		path: 'storage',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.cache'),
 		path: 'cache',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.endpoints'),
 		path: 'endpoint',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.message_queues'),
 		path: 'queue',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.cron_jobs'),
 		path: 'task',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.middleware.default'),
 		path: 'middleware',
+		isActive: false,
+		isDashboard: false,
 	},
 	{
 		title: translate('version.settings.default'),
 		path: 'settings',
+		isActive: false,
+		isDashboard: false,
 	},
 ];
 
@@ -345,14 +362,22 @@ export const TEST_ENDPOINTS_MENU_ITEMS = [
 	{
 		name: translate('endpoint.test.params'),
 		href: '?t=params',
+		isPath: false,
+	},
+	{
+		name: translate('endpoint.test.path_variables'),
+		href: '?t=variables',
+		isPath: true,
 	},
 	{
 		name: translate('endpoint.test.headers'),
 		href: '?t=headers',
+		isPath: false,
 	},
 	{
 		name: translate('endpoint.test.body'),
 		href: '?t=body',
+		isPath: false,
 	},
 ];
 
@@ -519,7 +544,7 @@ export const STORAGE_ICON_MAP: Record<string, ElementType> = {
 	'AWS S3': Awss3,
 	'Azure Blob Storage': AzureBlobStorage,
 	'GCP Cloud Storage': GcpStorage,
-	MinIO: Storage,
+	MinIO: MinIo,
 };
 
 export const CREATE_RESOURCES_ELEMENTS = [
@@ -875,11 +900,17 @@ export const FIELD_ICON_MAP: Record<string, ElementType> = {
  */
 export const REFERENCE_FIELD_ACTION = ['CASCADE', 'NO ACTION', 'SET NULL', 'SET DEFAULT'] as const;
 
-export const MAX_LENGTHS: Record<string, number> = {
+export const MAX_LENGTHS: Record<string, number | Record<string, number>> = {
 	'encrypted-text': 50,
 	decimal: 10,
 	enum: 1000,
-	text: 10240,
+	text: {
+		MySQL: 16_382,
+		'SQL Server': 4_000,
+		PostgreSQL: 10_485_760,
+		Oracle: 4_000,
+		MongoDB: Number.MAX_SAFE_INTEGER,
+	},
 };
 
 export const HEADER_USER_DROPDOWN = [

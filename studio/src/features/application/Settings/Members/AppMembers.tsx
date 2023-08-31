@@ -36,6 +36,7 @@ export default function MainAppMembers() {
 					description: t('general.member.delete'),
 					type: 'success',
 				});
+				table?.toggleAllRowsSelected(false);
 			},
 			onError: ({ error, details }) => {
 				notify({

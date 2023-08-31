@@ -1,6 +1,6 @@
+import { Logo } from '@/components/Logo';
 import { ReactNode } from 'react';
 import './OnboardingLayout.scss';
-import { Logo } from '@/components/Logo';
 
 type OnboardingLayoutProps = {
 	children: ReactNode;

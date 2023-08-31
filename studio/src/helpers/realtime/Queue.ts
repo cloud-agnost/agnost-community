@@ -3,7 +3,10 @@ import { MessageQueue, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
 class Queue extends RealtimeActions<MessageQueue> {
-	info({ message, timestamp, id }: RealtimeActionParams<MessageQueue>) {
+	deploy(): void {
+		throw new Error('Method not implemented.');
+	}
+	log({ message, timestamp, id }: RealtimeActionParams<MessageQueue>) {
 		setTimeout(() => {
 			useMessageQueueStore.getState?.().setQueueLogs(id as string, `${timestamp} - ${message}`);
 		}, 100);

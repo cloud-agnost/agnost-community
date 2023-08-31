@@ -42,7 +42,7 @@ export type APIError = {
 };
 export type User = z.infer<typeof UserSchema>;
 
-export interface UserDataToRegister {
+export interface UserDataToRegister extends BaseRequest {
 	name: string;
 	email: string;
 	password: string;
@@ -84,7 +84,7 @@ export interface FinalizeAccountSetupRequest {
 	name: string;
 }
 export interface BaseRequest {
-	onSuccess?: () => void;
+	onSuccess?: (data?: any) => void;
 	onError?: (err: APIError) => void;
 }
 
@@ -194,18 +194,21 @@ export interface RemoveMemberRequest extends BaseRequest {
 	userId?: string;
 	userIds?: string[];
 }
-export type RealtimeActionTypes = 'update' | 'create' | 'delete' | 'telemetry' | 'info';
+export type RealtimeActionTypes = 'update' | 'create' | 'delete' | 'telemetry' | 'log' | 'deploy';
 export type RealtimeObjectTypes =
 	| 'user'
 	| 'org'
 	| 'org.app'
-	| 'app'
 	| 'org.resource'
+	| 'app'
 	| 'resource'
-	| 'task'
 	| 'queue'
 	| 'org.app.version.queue'
-	| 'endpoint';
+	| 'task'
+	| 'org.app.version.task'
+	| 'endpoint'
+	| 'org.app.version.endpoint'
+	| 'org.app.version.environment';
 
 export interface BaseParams {
 	orgId: string;
@@ -220,9 +223,10 @@ export interface RealtimeIdentifiers {
 	resourceId?: string;
 	envId?: string;
 	queueId?: string;
+	environmentId?: string;
 }
 export interface RealtimeData<T> {
-	actor: Partial<User>;
+	actor: Partial<User> & { userId: string };
 	action: RealtimeActionTypes;
 	object: RealtimeObjectTypes;
 	objectType: RealtimeObjectTypes;
@@ -233,7 +237,6 @@ export interface RealtimeData<T> {
 	id: string;
 	message: string;
 	type: string;
-	objecType: any;
 }
 export interface RealtimeActionParams<T> {
 	data: T;
@@ -241,6 +244,7 @@ export interface RealtimeActionParams<T> {
 	message?: string;
 	id?: string;
 	timestamp?: string;
+	type?: string;
 }
 
 export interface Middleware {

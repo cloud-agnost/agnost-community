@@ -1,5 +1,4 @@
 import { NUMBER_REGEX } from '@/constants';
-import { useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIError, RateLimit } from '@/types';
@@ -112,8 +111,6 @@ export default function EditOrAddEndpointRateLimiterDrawer({
 	const defaultEndpointLimits = useVersionStore((state) => state.version?.defaultEndpointLimits);
 	const realtimeEndpoints = useVersionStore((state) => state.version?.realtime?.rateLimits);
 
-	const { notify } = useToast();
-
 	const { orgId, versionId, appId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -194,11 +191,6 @@ export default function EditOrAddEndpointRateLimiterDrawer({
 		if (!addToDefault) {
 			onCreate?.(rateLimit);
 		}
-		notify({
-			type: 'success',
-			title: t('general.success'),
-			description: t('version.add.rate_limiter.success'),
-		});
 	}
 
 	async function edit(

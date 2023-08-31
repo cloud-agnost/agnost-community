@@ -37,7 +37,7 @@ export default function EndpointFiles() {
 	}
 
 	return (
-		<TestEndpointTable title={t('endpoint.test.path_variables') ?? ''} isFormData>
+		<TestEndpointTable isFormData>
 			{fields.map((f, index) => (
 				<TableRow key={f.id}>
 					<TableCell>

@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import TaskForm from './TaskForm';
 import useResourceStore from '@/store/resources/resourceStore';
-
+import { useEffect } from 'react';
 interface EditTaskProps {
 	open: boolean;
 	onClose: () => void;
@@ -30,11 +30,6 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 
 	const form = useForm<z.infer<typeof CreateTaskSchema>>({
 		resolver: zodResolver(CreateTaskSchema),
-		defaultValues: {
-			name: task.name,
-			cronExpression: task.cronExpression,
-			logExecution: task.logExecution,
-		},
 	});
 
 	function onSubmit(data: z.infer<typeof CreateTaskSchema>) {
@@ -53,6 +48,12 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 			},
 		});
 	}
+
+	useEffect(() => {
+		if (task) {
+			form.reset(task);
+		}
+	}, [task]);
 	return (
 		<Drawer
 			open={open}
