@@ -4,7 +4,7 @@ import { redirect } from 'react-router-dom';
 
 Home.loader = function () {
 	if (useAuthStore.getState().isAuthenticated()) {
-		// return redirect('/organization');
+		return redirect('/organization');
 	}
 	return null;
 };
