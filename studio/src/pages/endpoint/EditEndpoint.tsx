@@ -7,8 +7,7 @@ import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LoaderFunctionArgs, useOutletContext, useParams, useSearchParams } from 'react-router-dom';
-
+import { LoaderFunctionArgs, useParams, useSearchParams } from 'react-router-dom';
 EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { endpointId, orgId, versionId, appId } = params;
 	if (!endpointId) return null;
@@ -26,7 +25,7 @@ EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 export default function EditEndpoint() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const { saveEndpointLogic, endpoint } = useEndpointStore();
+	const { saveEndpointLogic, openEditEndpointDialog, endpoint } = useEndpointStore();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [endpointLogic, setEndpointLogic] = useState<string | undefined>(endpoint?.logic);
 	const [isTestEndpointOpen, setIsTestEndpointOpen] = useState(false);
@@ -38,18 +37,14 @@ export default function EditEndpoint() {
 		orgId: string;
 	}>();
 
-	const { setIsEditEndpointOpen } = useOutletContext() as {
-		setIsEditEndpointOpen: (isOpen: boolean) => void;
-	};
-
-	function saveLogic() {
+	function saveLogic(logic: string) {
 		setLoading(true);
 		saveEndpointLogic({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			epId: endpoint._id,
-			logic: endpointLogic as string,
+			logic: logic ?? endpointLogic,
 			onSuccess: () => {
 				setLoading(false);
 				notify({
@@ -68,15 +63,23 @@ export default function EditEndpoint() {
 			},
 		});
 	}
-
 	return (
 		<VersionEditorLayout
-			onEditModalOpen={() => setIsEditEndpointOpen(true)}
+			onEditModalOpen={() => openEditEndpointDialog(endpoint)}
 			onTestModalOpen={() => setIsTestEndpointOpen(true)}
-			onSaveLogic={saveLogic}
+			onSaveLogic={(value) => saveLogic(value as string)}
 			loading={loading}
 			logic={endpoint?.logic}
 			setLogic={setEndpointLogic}
+			breadCrumbItems={[
+				{
+					name: t('endpoint.title').toString(),
+					url: `/organization/${orgId}/apps/${appId}/version/${versionId}/endpoint`,
+				},
+				{
+					name: endpoint?.name,
+				},
+			]}
 		>
 			<div className='flex items-center flex-1'>
 				<div className='border border-input-disabled-border rounded-l w-16 h-9'>
