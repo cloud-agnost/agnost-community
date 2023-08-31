@@ -11,15 +11,18 @@ import { LoaderFunctionArgs, useParams, useSearchParams } from 'react-router-dom
 EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { endpointId, orgId, versionId, appId } = params;
 	if (!endpointId) return null;
+	const { endpoint } = useEndpointStore.getState();
 
-	const endpoint = await useEndpointStore.getState().getEndpointById({
+	if (endpoint?._id === endpointId) return { props: {} };
+
+	const ep = await useEndpointStore.getState().getEndpointById({
 		orgId: orgId as string,
 		appId: appId as string,
 		versionId: versionId as string,
 		epId: endpointId as string,
 	});
 
-	return { endpoint };
+	return { endpoin: ep };
 };
 
 export default function EditEndpoint() {
