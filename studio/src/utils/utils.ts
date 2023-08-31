@@ -48,7 +48,7 @@ export function uniq<T>(array: T[]): T[] {
 }
 
 export function isEmpty(value: unknown): boolean {
-	if (value === null || value === undefined) {
+	if (value === null || value === undefined || value === '') {
 		return true;
 	}
 
@@ -243,4 +243,9 @@ export function formatFileSize(bytes: number): string {
 	const exponent: number = Math.floor(Math.log(bytes) / Math.log(base));
 
 	return parseFloat((bytes / Math.pow(base, exponent)).toFixed(2)) + ' ' + units[exponent];
+}
+
+export function checkNumber(number: number | undefined): number | undefined {
+	console.log({ number });
+	return number === 0 || number === undefined ? undefined : Number(number);
 }

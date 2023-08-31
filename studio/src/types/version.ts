@@ -140,6 +140,7 @@ export interface GetVersionRequest extends BaseGetRequest {
 }
 
 export interface Tab {
+	id: string;
 	title: string;
 	path: string;
 	isActive: boolean;

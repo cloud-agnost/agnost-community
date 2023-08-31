@@ -1,7 +1,6 @@
 import {
 	NAME_REGEX,
 	NOT_START_WITH_NUMBER_REGEX,
-	NUMBER_REGEX,
 	PARAM_NAME_REGEX,
 	ROUTE_NAME_REGEX,
 } from '@/constants/regex';
@@ -108,18 +107,16 @@ export const CreateEndpointSchema = z.object({
 				});
 			}
 		}),
-	timeout: z
-		.string({
+	timeout: z.coerce
+		.number({
 			required_error: t('forms.required', {
 				label: t('endpoint.create.timeout'),
 			}),
 		})
-		.regex(
-			NUMBER_REGEX,
-			t('forms.number', {
-				label: t('endpoint.create.timeout'),
-			}),
-		),
+		.int()
+		.positive()
+		.optional(),
+
 	apiKeyRequired: z.boolean().default(false),
 	sessionRequired: z.boolean().default(false),
 	logExecution: z.boolean().default(false),
@@ -136,7 +133,7 @@ export interface Endpoint {
 	method: Method;
 	path: string;
 	fingerprint: string;
-	timeout: string;
+	timeout: number;
 	apiKeyRequired: boolean;
 	sessionRequired: boolean;
 	logExecution: boolean;
@@ -159,7 +156,7 @@ export interface CreateEndpointParams extends BaseParams, BaseRequest {
 	apiKeyRequired: boolean;
 	sessionRequired: boolean;
 	logExecution: boolean;
-	timeout?: string;
+	timeout?: number;
 	rateLimits?: string[];
 	middlewares?: string[];
 }
@@ -194,6 +191,7 @@ export interface TestEndpointParams extends BaseRequest {
 	epId: string;
 	path: string;
 	envId: string;
+	consoleLogId: string;
 	params: {
 		queryParams?: Record<string, string>;
 		pathParams?: Record<string, string>;
@@ -208,9 +206,16 @@ export interface TestEndpointParams extends BaseRequest {
 		file?: File;
 	}[];
 }
-export interface EndpointResponse extends AxiosResponse {
+
+interface TestResponse extends AxiosResponse {
 	epId: string;
 	duration: number;
 	response?: AxiosError['response'];
 	logs?: string[];
+}
+export interface EndpointResponse {
+	[key: string]: TestResponse;
+}
+export interface EndpointRequest {
+	[key: string]: TestEndpointParams;
 }

@@ -84,7 +84,7 @@ export interface FinalizeAccountSetupRequest {
 	name: string;
 }
 export interface BaseRequest {
-	onSuccess?: () => void;
+	onSuccess?: (data?: any) => void;
 	onError?: (err: APIError) => void;
 }
 
@@ -194,18 +194,21 @@ export interface RemoveMemberRequest extends BaseRequest {
 	userId?: string;
 	userIds?: string[];
 }
-export type RealtimeActionTypes = 'update' | 'create' | 'delete' | 'telemetry' | 'info';
+export type RealtimeActionTypes = 'update' | 'create' | 'delete' | 'telemetry' | 'log' | 'deploy';
 export type RealtimeObjectTypes =
 	| 'user'
 	| 'org'
 	| 'org.app'
-	| 'app'
 	| 'org.resource'
+	| 'app'
 	| 'resource'
-	| 'task'
 	| 'queue'
 	| 'org.app.version.queue'
-	| 'endpoint';
+	| 'task'
+	| 'org.app.version.task'
+	| 'endpoint'
+	| 'org.app.version.endpoint'
+	| 'org.app.version.environment';
 
 export interface BaseParams {
 	orgId: string;
@@ -220,6 +223,7 @@ export interface RealtimeIdentifiers {
 	resourceId?: string;
 	envId?: string;
 	queueId?: string;
+	environmentId?: string;
 }
 export interface RealtimeData<T> {
 	actor: Partial<User> & { userId: string };
@@ -240,6 +244,7 @@ export interface RealtimeActionParams<T> {
 	message?: string;
 	id?: string;
 	timestamp?: string;
+	type?: string;
 }
 
 export interface Middleware {
