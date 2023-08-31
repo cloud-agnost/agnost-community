@@ -14,7 +14,6 @@ import { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useOutletContext, useParams, useSearchParams } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 interface OutletContext {
 	setIsCreateModalOpen: (isOpen: boolean) => void;
 	selectedRows: Row<Storage>[];
@@ -29,7 +28,6 @@ export default function MainStorage() {
 	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
 	const canCreateStorages = useAuthorizeVersion('storage.create');
-	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
