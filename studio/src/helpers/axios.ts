@@ -65,7 +65,7 @@ testEndpointInstance.interceptors.response.use(
 		return response;
 	},
 	(error) => {
-		return Promise.reject(error);
+		return error;
 	},
 );
 envInstance.interceptors.response.use(
@@ -79,7 +79,6 @@ envInstance.interceptors.response.use(
 			details: error.response.data.message,
 		};
 		console.log(err);
-		// if (err.code === '413')
 		return Promise.reject(err);
 	},
 );
