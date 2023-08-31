@@ -15,19 +15,14 @@ import { Row, Table } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import {
-	useNavigate,
-	useOutletContext,
-	useParams,
-	useSearchParams,
-	redirect,
-} from 'react-router-dom';
+import { useNavigate, useOutletContext, useParams, useSearchParams } from 'react-router-dom';
 
 Buckets.loader = async () => {
 	const role = useApplicationStore.getState().application?.role;
 	const permission = getAppPermission(role as AppRoles, 'app.storage.viewData');
+	console.log('permission', permission);
 	if (!permission) {
-		return redirect('/404');
+		// return redirect('/404');
 	}
 
 	return { props: {} };
