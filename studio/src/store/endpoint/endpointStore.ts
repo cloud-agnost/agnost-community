@@ -5,6 +5,7 @@ import {
 	DeleteEndpointParams,
 	DeleteMultipleEndpointsParams,
 	Endpoint,
+	EndpointRequest,
 	EndpointResponse,
 	GetEndpointByIdParams,
 	GetEndpointsByIidParams,
@@ -23,10 +24,11 @@ interface EndpointStore {
 	endpoint: Endpoint;
 	selectedEndpointIds: string[];
 	lastFetchedCount: number;
-	endpointRequest: TestEndpointParams[];
-	endpointResponse: EndpointResponse[];
+	endpointRequest: EndpointRequest;
+	endpointResponse: EndpointResponse;
 	toDeleteEndpoint: Endpoint | null;
 	isEndpointDeleteDialogOpen: boolean;
+	isEditEndpointDialogOpen: boolean;
 	openDeleteEndpointDialog: (endpoint: Endpoint) => void;
 	setSelectEndpointDialogOpen: (open: boolean) => void;
 	setSelectedEndpointIds: (ids: string[]) => void;
@@ -42,6 +44,8 @@ interface EndpointStore {
 	testEndpoint: (endpoint: TestEndpointParams) => Promise<AxiosResponse>;
 	closeEndpointDeleteDialog: () => void;
 	setEndpointLog: (epId: string, log: string) => void;
+	openEditEndpointDialog: (endpoint: Endpoint) => void;
+	closeEditEndpointDialog: () => void;
 }
 
 const useEndpointStore = create<EndpointStore>()(
@@ -52,11 +56,14 @@ const useEndpointStore = create<EndpointStore>()(
 				endpoints: [],
 				endpoint: {} as Endpoint,
 				selectedEndpointIds: [],
-				endpointRequest: [],
-				endpointResponse: [],
+				endpointRequest: {} as EndpointRequest,
+				endpointResponse: {} as EndpointResponse,
 				lastFetchedCount: 0,
 				toDeleteEndpoint: null,
 				isEndpointDeleteDialogOpen: false,
+				isEditEndpointDialogOpen: false,
+				openEditEndpointDialog: (endpoint) => set({ endpoint, isEditEndpointDialogOpen: true }),
+				closeEditEndpointDialog: () => set({ isEditEndpointDialogOpen: false }),
 				setSelectedEndpointIds: (ids) => set({ selectedEndpointIds: ids }),
 				setSelectEndpointDialogOpen: (open) => set({ selectEndpointDialogOpen: open }),
 				setEndpoints: (endpoints) => set({ endpoints }),
@@ -64,7 +71,7 @@ const useEndpointStore = create<EndpointStore>()(
 					try {
 						const endpoint = await EndpointService.createEndpoint(params);
 						set((prev) => ({ endpoints: [endpoint, ...prev.endpoints] }));
-						if (params.onSuccess) params.onSuccess();
+						if (params.onSuccess) params.onSuccess(endpoint);
 						return endpoint;
 					} catch (error) {
 						if (params.onError) params.onError(error as APIError);
@@ -152,51 +159,47 @@ const useEndpointStore = create<EndpointStore>()(
 					const response = await EndpointService.testEndpoint(params);
 					const prevRequest = get().endpointRequest;
 					const prevResponse = get().endpointResponse;
-
-					if (prevRequest.some((r) => r.epId === params.epId)) {
+					if (prevRequest[params.epId]) {
 						set({
-							endpointRequest: prevRequest.map((r) => {
-								if (r.epId === params.epId) {
-									return params;
-								}
-								return r;
-							}),
+							endpointRequest: {
+								...prevRequest,
+								[params.epId]: {
+									...prevRequest[params.epId],
+									...params,
+								},
+							},
 						});
 					} else {
 						set({
-							endpointRequest: [
+							endpointRequest: {
 								...prevRequest,
-								{
-									...params,
-								},
-							],
+								[params.epId]: params,
+							},
 						});
 					}
 					const endTime = performance.now();
-					if (prevResponse.some((r) => r.epId === params.epId)) {
+					if (prevResponse[params.epId]) {
 						set((prev) => ({
-							endpointResponse: prev.endpointResponse.map((r) => {
-								if (r.epId === params.epId) {
-									return {
-										...r,
-										epId: params.epId,
-										duration: endTime - startTime,
-										status: response?.response?.status ?? response?.status,
-										statusText: response?.response?.statusText ?? response?.statusText,
-										data: response?.response?.data ?? response?.data,
-										headers: response?.response?.headers ?? response?.headers,
-										config: response?.response?.config ?? response?.config,
-									};
-								}
-
-								return r;
-							}),
+							endpointResponse: {
+								...prev.endpointResponse,
+								[params.epId]: {
+									...prev.endpointResponse[params.epId],
+									epId: params.epId,
+									duration: endTime - startTime,
+									status: response?.response?.status ?? response?.status,
+									statusText: response?.response?.statusText ?? response?.statusText,
+									data: response?.response?.data ?? response?.data,
+									headers: response?.response?.headers ?? response?.headers,
+									config: response?.response?.config ?? response?.config,
+									logs: [],
+								},
+							},
 						}));
 					} else {
 						set((prev) => ({
-							endpointResponse: [
+							endpointResponse: {
 								...prev.endpointResponse,
-								{
+								[params.epId]: {
 									...response,
 									epId: params.epId,
 									duration: endTime - startTime,
@@ -205,8 +208,9 @@ const useEndpointStore = create<EndpointStore>()(
 									data: response?.response?.data ?? response?.data,
 									headers: response?.response?.headers ?? response?.headers,
 									config: response?.response?.config ?? response?.config,
+									logs: [],
 								},
-							],
+							},
 						}));
 					}
 					if (params.onSuccess) params.onSuccess();
@@ -218,15 +222,13 @@ const useEndpointStore = create<EndpointStore>()(
 					set({ toDeleteEndpoint: null, isEndpointDeleteDialogOpen: false }),
 				setEndpointLog(epId, log) {
 					set((prev) => ({
-						endpointResponse: prev.endpointResponse.map((r) => {
-							if (r.epId === epId) {
-								return {
-									...r,
-									logs: [...(r.logs as string[]), log],
-								};
-							}
-							return r;
-						}),
+						endpointResponse: {
+							...prev.endpointResponse,
+							[epId]: {
+								...prev.endpointResponse[epId],
+								logs: [...(prev.endpointResponse[epId]?.logs ?? []), log],
+							},
+						},
 					}));
 				},
 			}),
