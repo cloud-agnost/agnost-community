@@ -30,9 +30,12 @@ import * as z from 'zod';
 import { OrganizationMenuItem } from '../organization';
 import EndpointBody from './TestEndpoint/EndpointBody';
 import EndpointHeaders from './TestEndpoint/EndpointHeaders';
-import EndpointResponse from './TestEndpoint/EndpointResponse';
 import EndpointParams from './TestEndpoint/EndpointParams';
 import EndpointPathVariables from './TestEndpoint/EndpointPathVariables';
+import EndpointResponse from './TestEndpoint/EndpointResponse';
+import { useRef } from 'react';
+import { useUpdateEffect } from '@/hooks';
+import { Separator } from '@/components/Separator';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -84,6 +87,8 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { environment } = useEnvironmentStore();
 	const { endpoint, testEndpoint, endpointRequest } = useEndpointStore();
 	const [loading, setLoading] = useState(false);
+	const resizerRef = useRef<HTMLDivElement>(null);
+
 	const [searchParams, setSearchParams] = useSearchParams();
 	const form = useForm<z.infer<typeof TestEndpointSchema>>({
 		resolver: zodResolver(TestEndpointSchema),
@@ -101,6 +106,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			bodyType: 'json',
 		},
 	});
+
 	async function onSubmit(data: z.infer<typeof TestEndpointSchema>) {
 		setLoading(true);
 		const pathVariables = arrayToObj(data.params.pathVariables ?? []);
@@ -134,9 +140,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 		const header = {
 			key: 'Content-Type',
 			value:
-				form.getValues('bodyType') === 'form-data'
-					? 'multipart/form-data'
-					: 'application/json',
+				form.getValues('bodyType') === 'form-data' ? 'multipart/form-data' : 'application/json',
 		};
 
 		form.setValue('headers', [header]);
@@ -158,6 +162,94 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			setSearchParams({ t: 'params' });
 		}
 	}, [searchParams.get('t'), open]);
+
+	useEffect(() => {
+		if (open && resizerRef.current) {
+			const resizer = resizerRef.current as HTMLDivElement;
+			console.log(resizer);
+			const prevSibling = resizer.previousElementSibling as HTMLElement;
+			const nextSibling = resizer.nextElementSibling as HTMLElement;
+			console.log(prevSibling, nextSibling);
+			// The current position of mouse
+			let y = 0;
+			let prevSiblingHeight = 0;
+
+			// Handle the mousedown event
+			// that's triggered when the user drags the resizer
+			const mouseDownHandler = function (e: MouseEvent) {
+				// Get the current mouse position
+
+				y = e.clientY;
+				const rect = prevSibling.getBoundingClientRect();
+				prevSiblingHeight = rect.height;
+
+				// Attach the listeners to document
+				document.addEventListener('mousemove', mouseMoveHandler);
+				document.addEventListener('mouseup', mouseUpHandler);
+			};
+
+			const mouseMoveHandler = function (e: MouseEvent) {
+				console.log(e);
+				// How far the mouse has been moved
+				const dy = e.clientY - y;
+
+				const h =
+					((prevSiblingHeight + dy) * 100) /
+					(resizer.parentNode as HTMLElement).getBoundingClientRect().height;
+				prevSibling.style.height = h + '%';
+
+				const cursor = 'row-resize';
+				resizer.style.cursor = cursor;
+				document.body.style.cursor = cursor;
+
+				prevSibling.style.userSelect = 'none';
+				prevSibling.style.pointerEvents = 'none';
+
+				nextSibling.style.userSelect = 'none';
+				nextSibling.style.pointerEvents = 'none';
+			};
+
+			const mouseUpHandler = function () {
+				resizer.style.removeProperty('cursor');
+				document.body.style.removeProperty('cursor');
+
+				prevSibling.style.removeProperty('user-select');
+				prevSibling.style.removeProperty('pointer-events');
+
+				nextSibling.style.removeProperty('user-select');
+				nextSibling.style.removeProperty('pointer-events');
+
+				// Remove the handlers of mousemove and mouseup
+				document.removeEventListener('mousemove', mouseMoveHandler);
+				document.removeEventListener('mouseup', mouseUpHandler);
+			};
+
+			// Attach the handler
+			resizer.addEventListener('mousedown', mouseDownHandler);
+
+			return () => {
+				resizer.removeEventListener('mousedown', mouseDownHandler);
+				document.removeEventListener('mousemove', mouseMoveHandler);
+				document.removeEventListener('mouseup', mouseUpHandler);
+			};
+		}
+	}, [open, resizerRef.current]);
+
+	useUpdateEffect(() => {
+		if (open && resizerRef.current) {
+			const resizer = resizerRef.current as HTMLDivElement;
+			const prevSibling = resizer.previousElementSibling as HTMLElement;
+			const nextSibling = resizer.nextElementSibling as HTMLElement;
+
+			if (prevSibling) {
+				prevSibling.style.removeProperty('height');
+			}
+			if (nextSibling) {
+				nextSibling.style.removeProperty('height');
+			}
+		}
+	}, [open, searchParams.get('t'), resizerRef.current]);
+
 	return (
 		<Drawer open={open} onOpenChange={onClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
@@ -198,14 +290,19 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 				</nav>
 				<div className='p-6 scroll space-y-6'>
 					<Form {...form}>
-						<form className='inline space-y-6'>
+						<form className='space-y-6'>
 							{searchParams.get('t') === 'params' && <EndpointParams />}
-							{searchParams.get('t') === 'variables' &&
-								!!getPathParams(endpoint?.path).length && <EndpointPathVariables />}
+							{searchParams.get('t') === 'variables' && !!getPathParams(endpoint?.path).length && (
+								<EndpointPathVariables />
+							)}
 							{searchParams.get('t') === 'headers' && <EndpointHeaders />}
 							{searchParams.get('t') === 'body' && <EndpointBody />}
 						</form>
 					</Form>
+					<Separator
+						className='cursor-row-resize h-1 flex items-center justify-center'
+						ref={resizerRef}
+					/>
 
 					<DrawerFooter className='block h-3/4'>
 						<EndpointResponse />
