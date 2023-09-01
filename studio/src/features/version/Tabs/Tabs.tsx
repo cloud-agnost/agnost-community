@@ -36,6 +36,7 @@ export default function Tabs() {
 
 	useEffect(() => {
 		if (getTabsByVersionId(versionId).find((tab) => tab.isDashboard)) return;
+		console.log('add');
 		addTab(versionId, {
 			id: generateId(),
 			title: t('version.dashboard'),
@@ -54,8 +55,19 @@ export default function Tabs() {
 		const path = pathname?.split('/')?.at(-1);
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
 
-		if (item && !tabs.some((tab) => tab.path === item.path)) {
-			addTab(versionId, { ...item, isActive: true, id: generateId() });
+		if (!item) return;
+
+		const openTab = tabs.find((tab) => tab.path?.split('/')?.at(-1) === item.path);
+		if (openTab) {
+			setCurrentTab(versionId, openTab.id);
+		} else {
+			addTab(versionId, {
+				id: generateId(),
+				title: item.title,
+				path: item.path,
+				isDashboard: false,
+				isActive: true,
+			});
 		}
 	}, [pathname]);
 

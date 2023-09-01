@@ -52,6 +52,7 @@ const useTabStore = create<TabStore>()(
 							},
 						};
 					});
+					get().setCurrentTab(versionId, tab.id);
 				},
 				getTabByPath: (versionId, path) => {
 					const tabs = get().tabs[versionId] ?? [];
