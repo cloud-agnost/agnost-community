@@ -11,6 +11,7 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, Endpoint } from '@/types';
 import { cn, translate } from '@/utils';
 import { TabLink } from '../version/Tabs';
+
 const { openDeleteEndpointDialog, openEditEndpointDialog } = useEndpointStore.getState();
 
 const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
@@ -42,15 +43,9 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		sortingFn: 'textCaseSensitive',
 		size: 200,
 		cell: ({ row }) => {
-			const { name, method, _id } = row.original;
+			const { name, _id } = row.original;
 
-			return (
-				<TabLink
-					name={name}
-					path={`${_id}`}
-					className={cn('truncate max-w-[15ch] underline', ENDPOINT_METHOD_TEXT_COLOR[method])}
-				/>
-			);
+			return <TabLink name={name} path={`${_id}`} />;
 		},
 	},
 	{
@@ -128,7 +123,9 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	},
 	{
 		id: 'created_at',
-		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
+		header: ({ column }) => (
+			<SortButton text={translate('general.created_at')} column={column} />
+		),
 		enableSorting: true,
 		sortingFn: 'datetime',
 		accessorKey: 'createdAt',
@@ -145,7 +142,9 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 
 	{
 		id: 'updated_at',
-		header: ({ column }) => <SortButton text={translate('general.updated_at')} column={column} />,
+		header: ({ column }) => (
+			<SortButton text={translate('general.updated_at')} column={column} />
+		),
 		accessorKey: 'updatedAt',
 		size: 200,
 		cell: ({ row }) => {
@@ -160,18 +159,16 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		id: 'actions',
 		className: 'actions',
 		size: 45,
-		cell: ({ row }) => {
-			return (
-				<ActionsCell<Endpoint>
-					original={row.original}
-					onDelete={() => openDeleteEndpointDialog(row.original)}
-					onEdit={() => openEditEndpointDialog(row.original)}
-					canDeleteKey='endpoint.delete'
-					canEditKey='endpoint.update'
-					type='version'
-				/>
-			);
-		},
+		cell: ({ row }) => (
+			<ActionsCell<Endpoint>
+				original={row.original}
+				onDelete={() => openDeleteEndpointDialog(row.original)}
+				onEdit={() => openEditEndpointDialog(row.original)}
+				canDeleteKey='endpoint.delete'
+				canEditKey='endpoint.update'
+				type='version'
+			/>
+		),
 	},
 ];
 

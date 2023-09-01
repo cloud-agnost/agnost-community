@@ -8,9 +8,10 @@ interface TabLinkProps {
 	className?: string;
 	name: string;
 	path: string;
+	onClick?: () => void;
 }
 
-export default function TabLink({ className, name, path, ...props }: TabLinkProps) {
+export default function TabLink({ className, name, path, onClick, ...props }: TabLinkProps) {
 	const navigate = useTabNavigate();
 	const { pathname } = useLocation();
 	const { getCurrentTab } = useTabStore();
@@ -18,16 +19,17 @@ export default function TabLink({ className, name, path, ...props }: TabLinkProp
 	return (
 		<Button
 			variant='blank'
-			onClick={() =>
+			onClick={() => {
+				onClick?.();
 				navigate({
 					id: getCurrentTab(versionId)?.id as string,
 					title: name,
 					path: `${pathname}/${path}`,
 					isActive: true,
 					isDashboard: false,
-				})
-			}
-			className={cn('link', className)}
+				});
+			}}
+			className={cn(className, 'link')}
 			{...props}
 		>
 			{name}

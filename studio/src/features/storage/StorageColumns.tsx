@@ -1,15 +1,15 @@
 import { ActionsCell } from '@/components/ActionsCell';
+import { InstanceType } from '@/components/InstanceType';
 import { STORAGE_ICON_MAP } from '@/constants';
+import { TabLink } from '@/features/version/Tabs';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useStorageStore from '@/store/storage/storageStore';
 import { ColumnDefWithClassName, Storage } from '@/types';
 import { translate } from '@/utils';
 import { Checkbox } from 'components/Checkbox';
-import { Button } from 'components/Button';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
-import { InstanceType } from '@/components/InstanceType';
 
 const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 	{
@@ -39,18 +39,16 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 		cell: ({ row: { original } }) => {
-			const { name } = original;
+			const { name, _id } = original;
 			return (
-				<Button
-					variant='blank'
-					to={`${original._id}`}
+				<TabLink
+					name={name}
+					path={`${_id}`}
+					className='link'
 					onClick={() => {
 						useStorageStore.setState({ storage: original });
 					}}
-					className='link'
-				>
-					<span>{name}</span>
-				</Button>
+				/>
 			);
 		},
 	},
@@ -63,8 +61,8 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 			},
 		}) => {
 			const environment = useEnvironmentStore.getState().environment;
-			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)?.resource
-				.instance;
+			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)
+				?.resource.instance;
 			const Icon = STORAGE_ICON_MAP[instance as string];
 			return <InstanceType iid={iid} Icon={Icon} />;
 		},

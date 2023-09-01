@@ -110,7 +110,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 		await testEndpoint({
 			epId: endpoint?._id as string,
 			envId: environment?.iid as string,
-			path: `api${testPath}`,
+			path: testPath,
 			consoleLogId,
 			method: endpoint?.method.toLowerCase() as TestMethods,
 			params: {
@@ -134,7 +134,9 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 		const header = {
 			key: 'Content-Type',
 			value:
-				form.getValues('bodyType') === 'form-data' ? 'multipart/form-data' : 'application/json',
+				form.getValues('bodyType') === 'form-data'
+					? 'multipart/form-data'
+					: 'application/json',
 		};
 
 		form.setValue('headers', [header]);
@@ -198,9 +200,8 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					<Form {...form}>
 						<form className='inline space-y-6'>
 							{searchParams.get('t') === 'params' && <EndpointParams />}
-							{searchParams.get('t') === 'variables' && !!getPathParams(endpoint?.path).length && (
-								<EndpointPathVariables />
-							)}
+							{searchParams.get('t') === 'variables' &&
+								!!getPathParams(endpoint?.path).length && <EndpointPathVariables />}
 							{searchParams.get('t') === 'headers' && <EndpointHeaders />}
 							{searchParams.get('t') === 'body' && <EndpointBody />}
 						</form>

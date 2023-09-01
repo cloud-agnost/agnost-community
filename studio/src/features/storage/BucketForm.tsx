@@ -13,7 +13,6 @@ import { Switch } from '@/components/Switch';
 import { BucketSchema } from '@/types';
 import { cn, isEmpty } from '@/utils';
 import { Plus, Trash } from '@phosphor-icons/react';
-import { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
@@ -24,10 +23,6 @@ export default function BucketForm() {
 		control: form.control,
 		name: 'tags',
 	});
-
-	useEffect(() => {
-		append({ key: '', value: '' });
-	}, []);
 
 	return (
 		<div className='space-y-6'>
@@ -64,7 +59,9 @@ export default function BucketForm() {
 							name={`tags.${index}.key`}
 							render={({ field }) => (
 								<FormItem className='flex-1'>
-									{index === 0 && <FormLabel>{t('resources.database.key')}</FormLabel>}
+									{index === 0 && (
+										<FormLabel>{t('resources.database.key')}</FormLabel>
+									)}
 									<FormControl>
 										<Input
 											placeholder={
@@ -85,7 +82,9 @@ export default function BucketForm() {
 							name={`tags.${index}.value`}
 							render={({ field }) => (
 								<FormItem className='flex-1'>
-									{index === 0 && <FormLabel>{t('resources.database.value')}</FormLabel>}
+									{index === 0 && (
+										<FormLabel>{t('resources.database.value')}</FormLabel>
+									)}
 
 									<Input
 										placeholder={
@@ -131,7 +130,9 @@ export default function BucketForm() {
 							}}
 						>
 							<Plus size={16} className='text-brand-primary' />
-							<span className='text-brand-primary ml-2'>{t('general.add_another_one')}</span>
+							<span className='text-brand-primary ml-2'>
+								{t('general.add_another_one')}
+							</span>
 						</Button>
 					)}
 				</div>

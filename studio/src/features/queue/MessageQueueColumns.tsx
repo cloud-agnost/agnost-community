@@ -1,4 +1,7 @@
 import { ActionsCell } from '@/components/ActionsCell';
+import { QUEUE_ICON_MAP } from '@/constants';
+import { TabLink } from '@/features/version/Tabs';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { ColumnDefWithClassName, MessageQueue } from '@/types';
@@ -7,9 +10,6 @@ import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { InstanceType } from 'components/InstanceType';
-import { Link } from 'react-router-dom';
-import useEnvironmentStore from '@/store/environment/environmentStore';
-import { QUEUE_ICON_MAP } from '@/constants';
 const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 	{
 		id: 'select',
@@ -38,11 +38,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 		sortingFn: 'textCaseSensitive',
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
-			return (
-				<Link to={`${_id}`} className='link'>
-					{name}
-				</Link>
-			);
+			return <TabLink name={name} path={`${_id}`} />;
 		},
 	},
 	{
@@ -62,8 +58,8 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 			},
 		}) => {
 			const environment = useEnvironmentStore.getState().environment;
-			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)?.resource
-				.instance;
+			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)
+				?.resource.instance;
 			const Icon = QUEUE_ICON_MAP[instance as string];
 			return <InstanceType iid={iid} Icon={Icon} />;
 		},
