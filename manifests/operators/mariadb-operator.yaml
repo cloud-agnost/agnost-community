@@ -15807,7 +15807,7 @@ spec:
               name: metrics
           env: 
             - name: CLUSTER_NAME
-              value: mariadb.local
+              value: cluster.local
             - name: MARIADB_OPERATOR_NAME
               valueFrom:
                 fieldRef:
