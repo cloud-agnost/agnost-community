@@ -42,10 +42,13 @@ async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, 
               resource.metadata.name = clusterName + '-replicas';
               break;
           }
+          resource.metadata.labels["app.kubernetes.io/instance"] = clusterName;
+          resource.spec.selector["app.kubernetes.io/instance"] = clusterName;
           const serviceResult = await k8sCoreApi.createNamespacedService(namespace, resource);
           break;
         case('ServiceAccount'):
           resource.metadata.name = clusterName + '-svc-acc';
+          resource.metadata.labels["app.kubernetes.io/instance"] = clusterName;
           const serviceAccResult = await k8sCoreApi.createNamespacedServiceAccount(namespace, resource);
           break;
         case('StatefulSet'):
@@ -73,6 +76,12 @@ async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, 
           resource.spec.template.spec.volumes[1].configMap.name = clusterName + '-redis-health';
           resource.spec.template.spec.volumes[1].configMap.defaultMode = 493;
           resource.spec.template.spec.volumes[2].configMap.name = clusterName + '-redis-configuration';
+          // label updates
+          resource.metadata.labels["app.kubernetes.io/instance"] = clusterName;
+          resource.spec.selector.matchLabels["app.kubernetes.io/instance"] = clusterName;
+          resource.spec.template.metadata.labels["app.kubernetes.io/instance"] = clusterName;
+          resource.spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels["app.kubernetes.io/instance"] = clusterName;
+          resource.spec.volumeClaimTemplates[0].metadata.labels["app.kubernetes.io/instance"] = clusterName;
           const stsResult = await k8sApi.createNamespacedStatefulSet(namespace, resource);
           break;
         case('ConfigMap'):
@@ -87,8 +96,8 @@ async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, 
               resource.metadata.name = clusterName + '-redis-scripts';
               break;
           }
+          resource.metadata.labels["app.kubernetes.io/instance"] = clusterName;
           const configMapResult = await k8sCoreApi.createNamespacedConfigMap(namespace, resource);
-          
           break;
         default:
           console.log('Skipping: ' + kind);
