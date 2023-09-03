@@ -8,7 +8,8 @@ import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { TestEndpointSchema } from '../TestEndpoint';
 import TestEndpointTable from './TestEndpointTable';
-export default function EndpointParams() {
+
+export default function EndpointParams({ ...props }) {
 	const { t } = useTranslation();
 	const {
 		control,
@@ -25,7 +26,7 @@ export default function EndpointParams() {
 	});
 
 	return (
-		<TestEndpointTable height={120}>
+		<TestEndpointTable>
 			{queryParamsFields.map((f, index) => (
 				<TableRow key={f.id}>
 					<TableCell>

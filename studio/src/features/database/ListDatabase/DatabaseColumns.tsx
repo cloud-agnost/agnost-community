@@ -7,7 +7,7 @@ import { Table } from '@phosphor-icons/react';
 import { Badge } from 'components/Badge';
 import { Button } from 'components/Button';
 import { SortButton } from 'components/DataTable';
-import { Link } from 'react-router-dom';
+import { TabLink } from '@/features/version/Tabs';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from 'components/Tooltip';
 
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
@@ -24,14 +24,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 				original: { _id, name },
 			},
 		}) => {
-			return (
-				<Link
-					to={`${_id}/models`}
-					className='flex items-center gap-2 justify-between text-button-primary hover:underline'
-				>
-					{name}
-				</Link>
-			);
+			return <TabLink name={name} path={`${_id}/models`} />;
 		},
 	},
 	{

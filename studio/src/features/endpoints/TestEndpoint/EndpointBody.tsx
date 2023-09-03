@@ -11,12 +11,12 @@ export default function EndpointBody() {
 	const { t } = useTranslation();
 
 	return (
-		<>
+		<div className='h-full space-y-4'>
 			<FormField
 				control={control}
 				name='bodyType'
 				render={({ field }) => (
-					<FormItem className='flex-1 space-y-6'>
+					<FormItem className='space-y-6'>
 						<FormLabel>{t('endpoint.bodyType')}</FormLabel>
 						<FormControl>
 							<RadioGroup
@@ -61,6 +61,6 @@ export default function EndpointBody() {
 				</div>
 			)}
 			{watch('bodyType') === 'form-data' && <EndpointFiles />}
-		</>
+		</div>
 	);
 }

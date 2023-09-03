@@ -14,6 +14,7 @@ import { FIELD_ICON_MAP } from '@/constants';
 const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'select',
+		className: '!max-w-[40px] !w-[40px]',
 		header: (props) => {
 			return (
 				<Checkbox
@@ -45,9 +46,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.field').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.field')} column={column} />,
 		cell({ row: { original } }) {
 			if (['object-list', 'object'].includes(original.type)) {
 				return <SubFields field={original} name={original.name} />;
@@ -61,7 +60,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'type',
-		header: translate('general.type').toUpperCase(),
+		header: translate('general.type'),
 		accessorKey: 'type',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -86,7 +85,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'unique',
-		header: translate('general.unique').toUpperCase(),
+		header: translate('general.unique'),
 		accessorKey: 'unique',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -106,7 +105,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'indexed',
-		header: translate('general.indexed').toUpperCase(),
+		header: translate('general.indexed'),
 		accessorKey: 'indexed',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -126,7 +125,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'required',
-		header: translate('general.required').toUpperCase(),
+		header: translate('general.required'),
 		accessorKey: 'required',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -147,7 +146,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'immutable',
 		className: 'whitespace-nowrap',
-		header: translate('general.read-only').toUpperCase(),
+		header: translate('general.read-only'),
 		accessorKey: 'immutable',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -171,7 +170,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.created_at').toUpperCase()}
+				text={translate('general.created_at')}
 				column={column}
 			/>
 		),
@@ -193,7 +192,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.updated_at').toUpperCase()}
+				text={translate('general.updated_at')}
 				column={column}
 			/>
 		),

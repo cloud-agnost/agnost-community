@@ -36,7 +36,7 @@ export default function EndpointPathVariables() {
 	}, [endpoint?.path]);
 
 	return (
-		<TestEndpointTable height={120}>
+		<TestEndpointTable>
 			{pathParamFields.map((f, index) => (
 				<TableRow key={f.id}>
 					<TableCell>

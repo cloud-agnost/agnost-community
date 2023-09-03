@@ -9,6 +9,7 @@ import { Button } from 'components/Button';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
+import { TabLink } from '@/features/version/Tabs';
 
 const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 	{
@@ -38,18 +39,14 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 		sortingFn: 'textCaseSensitive',
 		cell: ({ row: { original } }) => {
 			const { name } = original;
-			return (
-				<Button
-					variant='blank'
-					to={`bucket/${original.name}`}
-					onClick={() => {
-						useStorageStore.setState({ bucket: original });
-					}}
-					className='link'
-				>
-					<span>{name}</span>
-				</Button>
-			);
+			<TabLink
+				name={name}
+				path={`${name}`}
+				className='link'
+				onClick={() => {
+					useStorageStore.setState({ bucket: original });
+				}}
+			/>;
 		},
 	},
 	{

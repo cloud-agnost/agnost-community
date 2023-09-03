@@ -10,7 +10,7 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { Calendar } from 'components/icons';
 import cronstrue from 'cronstrue';
-import { Link } from 'react-router-dom';
+import { TabLink } from '../version/Tabs';
 const TaskColumns: ColumnDefWithClassName<Task>[] = [
 	{
 		id: 'select',
@@ -39,11 +39,7 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		sortingFn: 'textCaseSensitive',
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
-			return (
-				<Link to={`${_id}`} className='link'>
-					{name}
-				</Link>
-			);
+			return <TabLink name={name} path={`${_id}`} />;
 		},
 	},
 	{
@@ -66,7 +62,11 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 	{
 		id: 'logExecution',
 		header: ({ column }) => (
-			<SortButton className='whitespace-nowrap' text={translate('task.logExec')} column={column} />
+			<SortButton
+				className='whitespace-nowrap'
+				text={translate('task.logExec')}
+				column={column}
+			/>
 		),
 		accessorKey: 'logExecution',
 		enableSorting: true,

@@ -1,4 +1,5 @@
 import { ActionsCell } from '@/components/ActionsCell';
+import { TabLink } from '@/features/version/Tabs';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
 import { ColumnDefWithClassName, Model } from '@/types';
@@ -10,8 +11,7 @@ import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
-import { Link } from 'react-router-dom';
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from 'components/Tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'components/Tooltip';
 
 const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	{
@@ -46,14 +46,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 				original: { _id, name },
 			},
 		}) => {
-			return (
-				<Link
-					to={`${_id}/fields`}
-					className='flex items-center gap-2 justify-between text-button-primary hover:underline'
-				>
-					{name}
-				</Link>
-			);
+			return <TabLink name={name} path={`${_id}/fields`} />;
 		},
 	},
 	{
@@ -107,7 +100,8 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { setModelToEdit, setIsOpenEditModelDialog, deleteModel } = useModelStore.getState();
+			const { setModelToEdit, setIsOpenEditModelDialog, deleteModel } =
+				useModelStore.getState();
 			function openEditDrawer() {
 				setModelToEdit(original);
 				setIsOpenEditModelDialog(true);

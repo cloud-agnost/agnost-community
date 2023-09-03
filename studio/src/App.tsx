@@ -5,7 +5,7 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useTypeStore from '@/store/types/typeStore.ts';
 import { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
-import { ToastContainer, cssTransition } from 'react-toastify';
+import { ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
@@ -21,17 +21,13 @@ function App() {
 		}
 	}, [isTypesOk, user]);
 
-	const toastSlide = cssTransition({
-		enter: 'slideInDown',
-		exit: 'slideOutUp',
-	});
-
 	return (
 		<>
 			<RouterProvider router={router} />
 			<ToastContainer
+				transition={Slide}
 				position='top-center'
-				autoClose={3000}
+				autoClose={2000}
 				hideProgressBar
 				newestOnTop={false}
 				closeOnClick
@@ -39,7 +35,6 @@ function App() {
 				pauseOnFocusLoss
 				draggable
 				pauseOnHover
-				transition={toastSlide}
 				theme='dark'
 			/>
 		</>

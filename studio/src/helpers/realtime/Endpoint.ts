@@ -6,7 +6,6 @@ class Endpoint extends RealtimeActions<EndpointType> {
 		throw new Error('Method not implemented.');
 	}
 	log({ message, timestamp, id, type }: RealtimeActionParams<EndpointType>) {
-		console.log('----endpoint log------', message, timestamp, id, type);
 		setTimeout(() => {
 			useEndpointStore
 				.getState?.()

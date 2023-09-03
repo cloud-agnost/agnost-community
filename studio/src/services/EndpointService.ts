@@ -1,4 +1,4 @@
-import { axios, http } from '@/helpers';
+import { axios, test } from '@/helpers';
 import {
 	CreateEndpointParams,
 	DeleteEndpointParams,
@@ -139,6 +139,6 @@ export default class EndpointService {
 				...params.queryParams,
 			},
 		};
-		return await http[method](path, ...(method === 'get' ? [options] : [body]), options);
+		return await test[method](path, ...(method === 'get' ? [options] : [body]), options);
 	}
 }
