@@ -4,12 +4,12 @@ import { Checkbox } from '@/components/Checkbox';
 import { CopyButton } from '@/components/CopyButton';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
-import { BADGE_COLOR_MAP, ENDPOINT_METHOD_TEXT_COLOR, HTTP_METHOD_BADGE_MAP } from '@/constants';
+import { BADGE_COLOR_MAP, HTTP_METHOD_BADGE_MAP } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, Endpoint } from '@/types';
-import { cn, translate } from '@/utils';
+import { translate } from '@/utils';
 import { TabLink } from '../version/Tabs';
 
 const { openDeleteEndpointDialog, openEditEndpointDialog } = useEndpointStore.getState();

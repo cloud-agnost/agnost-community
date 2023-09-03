@@ -9,7 +9,7 @@ import * as z from 'zod';
 import { TestEndpointSchema } from '../TestEndpoint';
 import TestEndpointTable from './TestEndpointTable';
 
-export default function EndpointParams({ ...props }) {
+export default function EndpointParams() {
 	const { t } = useTranslation();
 	const {
 		control,
