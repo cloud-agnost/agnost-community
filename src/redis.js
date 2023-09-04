@@ -10,6 +10,8 @@ kc.loadFromDefault();
 const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 const k8sApi = kc.makeApiClient(k8s.AppsV1Api);
 
+const namespace = process.env.NAMESPACE;
+
 async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, passwd, readReplicaEnabled) {
   if (readReplicaEnabled) {
     var manifest = fs.readFileSync('/manifests/resources/redis-replication.yaml', 'utf8');
@@ -22,7 +24,6 @@ async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, 
   for (const resource of resources) {
     try {
       const { kind, metadata } = resource;
-      const namespace = process.env.NAMESPACE;
 
       switch(kind) {
         case 'Secret':
@@ -110,6 +111,43 @@ async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, 
   return "success";
 }
 
+async function deleteRedis(clusterName) {
+  try {
+    await k8sApi.deleteNamespacedStatefulSet(clusterName + '-master', namespace );
+    console.log('StatefulSet ' + clusterName + '-master deleted...');
+    await k8sCoreApi.deleteNamespacedService(clusterName + '-master', namespace);
+    console.log('Service ' + clusterName + '-master deleted...');
+    await k8sCoreApi.deleteNamespacedService(clusterName + '-headless', namespace);
+    console.log('Service ' + clusterName + '-headless deleted...');
+    await k8sCoreApi.deleteNamespacedConfigMap(clusterName + '-redis-scripts', namespace);
+    console.log('ConfigMap ' + clusterName + '-redis-scripts deleted...');
+    await k8sCoreApi.deleteNamespacedConfigMap(clusterName + '-redis-health', namespace);
+    console.log('ConfigMap ' + clusterName + '-redis-health deleted...');
+    await k8sCoreApi.deleteNamespacedConfigMap(clusterName + '-redis-configuration', namespace);
+    console.log('ConfigMap ' + clusterName + '-redis-configuration deleted...');
+    await k8sCoreApi.deleteNamespacedServiceAccount(clusterName + '-svc-acc', namespace);
+    console.log('ServiceAccount ' + clusterName + '-svc-acc deleted...');
+    await k8sCoreApi.deleteNamespacedSecret(clusterName + '-redis-password', namespace);
+    console.log('Secret ' + clusterName + '-credentials deleted...');
+  } catch (error) {
+    console.error('Error deleting resource:', error);
+    return error
+  }
+
+  // check if it has read replicas
+  try {
+    await k8sApi.deleteNamespacedStatefulSet(clusterName + '-replicas', namespace );
+    console.log('StatefulSet ' + clusterName + '-replicas deleted...');
+    await k8sCoreApi.deleteNamespacedService(clusterName + '-replicas', namespace);
+    console.log('Service ' + clusterName + '-replicas deleted...');
+  } catch {
+    console.log('This has no read replicas...')
+  }
+
+  return { result: 'success' };
+}
+
+
 // Create a Redis Instance
 router.post('/redis', async (req, res) => {
   const { clusterName, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, passwd, readReplicaEnabled } = req.body;
@@ -123,5 +161,17 @@ router.post('/redis', async (req, res) => {
   }
 });
 
+// Delete a Redis instance
+router.delete('/redis', async (req, res) => {
+  const { clusterName } = req.body;
+
+  try {
+    const delResult = await deleteRedis(clusterName);
+    res.json({ redis: delResult});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;
