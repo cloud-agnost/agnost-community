@@ -92,6 +92,7 @@ export default function CreateAndEditDatabaseDrawer({
 		form.setValue('managed', toEditDatabase.managed);
 		// resource id is not editable, and its value is not changed when editing
 		form.setValue('resourceId', useResourceStore.getState().resources[0]._id);
+		form.setValue('assignUniqueName', toEditDatabase.assignUniqueName);
 	}, [open, editMode, toEditDatabase]);
 
 	async function onSubmit(data: z.infer<typeof CreateSchema>) {
@@ -99,7 +100,7 @@ export default function CreateAndEditDatabaseDrawer({
 		if (!version || !resource) return;
 		try {
 			if (editMode) {
-				if (!toEditDatabase) return;
+				if (!toEditDatabase || !toEditDatabase.assignUniqueName) return;
 				await updateDatabaseName({
 					orgId: version.orgId,
 					versionId: version._id,
@@ -162,6 +163,7 @@ export default function CreateAndEditDatabaseDrawer({
 											<Input
 												error={Boolean(errors.name)}
 												type='text'
+												disabled={editMode && !toEditDatabase?.assignUniqueName}
 												placeholder={
 													t('forms.placeholder', {
 														label: t('database.add.field').toLowerCase(),
@@ -175,32 +177,34 @@ export default function CreateAndEditDatabaseDrawer({
 									</FormItem>
 								)}
 							/>
-							{!editMode && (
-								<>
-									<Separator />
-									<FormField
-										control={form.control}
-										name='assignUniqueName'
-										render={({ field }) => (
-											<FormItem className='space-y-1'>
-												<FormControl>
-													<SettingsFormItem
-														as='label'
-														className='py-0 space-y-0'
-														contentClassName='flex items-center justify-center'
-														title={t('database.add.unique.title')}
-														description={t('database.add.unique.desc')}
-														twoColumns
-													>
-														<Switch checked={field.value} onCheckedChange={field.onChange} />
-													</SettingsFormItem>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</>
-							)}
+
+							<Separator />
+							<FormField
+								control={form.control}
+								name='assignUniqueName'
+								render={({ field }) => (
+									<FormItem className='space-y-1'>
+										<FormControl>
+											<SettingsFormItem
+												as='label'
+												className='py-0 space-y-0'
+												contentClassName='flex items-center justify-center'
+												title={t('database.add.unique.title')}
+												description={t('database.add.unique.desc')}
+												twoColumns
+											>
+												<Switch
+													disabled={editMode}
+													checked={field.value}
+													onCheckedChange={field.onChange}
+												/>
+											</SettingsFormItem>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
 							{!editMode && (
 								<>
 									<Separator />
@@ -215,14 +219,12 @@ export default function CreateAndEditDatabaseDrawer({
 														defaultValue={field.value}
 														value={field.value}
 														name={field.name}
+														disabled={editMode}
 														onValueChange={field.onChange}
 													>
 														<FormControl>
 															<SelectTrigger
-																className={cn(
-																	'w-full input !text-base',
-																	errors.resourceId && 'input-error',
-																)}
+																className={cn('w-full input', errors.resourceId && 'input-error')}
 															>
 																<SelectValue
 																	className={cn('text-subtle')}
@@ -246,11 +248,11 @@ export default function CreateAndEditDatabaseDrawer({
 																const Icon = DATABASE_ICON_MAP[resource.instance];
 																return (
 																	<SelectItem
-																		className='px-3 py-[6px] w-full max-w-full cursor-pointer text-base'
+																		className='px-3 py-[6px] w-full max-w-full cursor-pointer'
 																		key={resource._id}
 																		value={resource._id}
 																	>
-																		<div className='flex items-center gap-2 [&>svg]:text-lg'>
+																		<div className='flex items-center gap-2 [&>svg]:text-2xl'>
 																			<Icon />
 																			{resource.name}
 																		</div>
@@ -266,9 +268,11 @@ export default function CreateAndEditDatabaseDrawer({
 									/>
 								</>
 							)}
-
 							<div className='flex justify-end'>
-								<Button size='lg' disabled={!canCreateDatabase}>
+								<Button
+									size='lg'
+									disabled={!canCreateDatabase || (editMode && !toEditDatabase?.assignUniqueName)}
+								>
 									{editMode ? t('general.save') : t('general.create')}
 								</Button>
 							</div>

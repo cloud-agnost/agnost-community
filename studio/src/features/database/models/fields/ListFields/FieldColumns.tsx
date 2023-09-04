@@ -46,7 +46,9 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => <SortButton text={translate('general.field')} column={column} />,
+		header: ({ column }) => (
+			<SortButton text={translate('general.field').toUpperCase()} column={column} />
+		),
 		cell({ row: { original } }) {
 			if (['object-list', 'object'].includes(original.type)) {
 				return <SubFields field={original} name={original.name} />;
@@ -60,7 +62,9 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'type',
-		header: translate('general.type'),
+		header: ({ column }) => (
+			<SortButton text={translate('general.type').toUpperCase()} column={column} />
+		),
 		accessorKey: 'type',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -85,9 +89,10 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'unique',
-		header: translate('general.unique'),
+		header: ({ column }) => (
+			<SortButton text={translate('general.unique').toUpperCase()} column={column} />
+		),
 		accessorKey: 'unique',
-		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
 		cell: ({
 			row: {
@@ -105,9 +110,10 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'indexed',
-		header: translate('general.indexed'),
+		header: ({ column }) => (
+			<SortButton text={translate('general.indexed').toUpperCase()} column={column} />
+		),
 		accessorKey: 'indexed',
-		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
 		cell: ({
 			row: {
@@ -125,9 +131,10 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'required',
-		header: translate('general.required'),
+		header: ({ column }) => (
+			<SortButton text={translate('general.required').toUpperCase()} column={column} />
+		),
 		accessorKey: 'required',
-		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
 		cell: ({
 			row: {
@@ -146,9 +153,10 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'immutable',
 		className: 'whitespace-nowrap',
-		header: translate('general.read-only'),
+		header: ({ column }) => (
+			<SortButton text={translate('general.read-only').toUpperCase()} column={column} />
+		),
 		accessorKey: 'immutable',
-		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
 		cell: ({
 			row: {
@@ -170,7 +178,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.created_at')}
+				text={translate('general.created_at').toUpperCase()}
 				column={column}
 			/>
 		),
@@ -192,7 +200,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.updated_at')}
+				text={translate('general.updated_at').toUpperCase()}
 				column={column}
 			/>
 		),
@@ -245,6 +253,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 				<ActionsCell
 					original={original}
 					canEditKey='model.update'
+					canDeleteKey='model.delete'
 					onEdit={openEditDrawer}
 					type='version'
 				>
