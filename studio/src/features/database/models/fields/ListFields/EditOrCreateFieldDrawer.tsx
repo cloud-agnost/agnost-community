@@ -48,7 +48,6 @@ interface EditOrCreateModelDrawerProps {
 
 const defaultValueDisabledTypes = [
 	'reference',
-	'date',
 	'time',
 	'object',
 	'object-list',
@@ -127,11 +126,12 @@ export default function EditOrCreateFieldDrawer({
 	const isEnum = TYPE === 'enum';
 	const isReference = TYPE === 'reference';
 	const isDatetime = TYPE === 'datetime';
+	const isDate = TYPE === 'date';
 	const isGeoPoint = TYPE === 'geo-point';
 
 	const hasDefaultValue = !defaultValueDisabledTypes.includes(TYPE);
 
-	const defaults = isDatetime ? datetimeDefaults : isBoolean ? booleanDefaults : [];
+	const defaults = isDatetime || isDate ? datetimeDefaults : isBoolean ? booleanDefaults : [];
 
 	const view = editMode
 		? fieldTypes.find((type) => type.name === fieldToEdit?.type)?.view
@@ -403,7 +403,8 @@ export default function EditOrCreateFieldDrawer({
 					createdAt: 'createdAt',
 					updatedAt: 'updatedAt',
 				},
-				defaultValue: !editMode && (isBoolean || isDatetime) ? defaults[0].value : undefined,
+				defaultValue:
+					!editMode && (isBoolean || isDatetime || isDate) ? defaults[0].value : undefined,
 				referenceModelIid: fieldToEdit?.reference?.iid,
 			},
 		},
@@ -905,7 +906,7 @@ export default function EditOrCreateFieldDrawer({
 											render={({ field }) => (
 												<FormItem className={cn('flex-1 flex flex-col ')}>
 													<FormLabel>{t('database.fields.form.default_value')}</FormLabel>
-													{isBoolean || isDatetime ? (
+													{isBoolean || isDatetime || isDate ? (
 														<FormControl>
 															<Select
 																defaultValue={field.value}
