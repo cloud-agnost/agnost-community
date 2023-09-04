@@ -22,7 +22,7 @@ export default function ResendButton({ onResend, disabled, permissionKey, role }
 	return (
 		<TooltipProvider>
 			<Tooltip>
-				<TooltipTrigger disabled={disabled}>
+				<TooltipTrigger asChild>
 					<Button
 						variant='blank'
 						iconOnly
