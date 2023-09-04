@@ -9,7 +9,7 @@ export default class Field {
     nullableFields = ["createdat", "updatedat"];
 
     createMap = {
-        [DATABASE.PostgreSQL]: "{NAME} {TYPE}",
+        [DATABASE.PostgreSQL]: '"{NAME}" {TYPE}',
         [DATABASE.MySQL]: "`{NAME}` {TYPE}",
         [DATABASE.SQLServer]: "{NAME} {TYPE}",
     };

@@ -3,7 +3,7 @@ import { DATABASE } from "../../../config/constants.js";
 
 export default class Id extends Field {
     createMap = {
-        [DATABASE.PostgreSQL]: "{NAME} {TYPE} PRIMARY KEY",
+        [DATABASE.PostgreSQL]: '"{NAME}" {TYPE} PRIMARY KEY',
         [DATABASE.MySQL]: "`{NAME}` {TYPE} PRIMARY KEY",
         [DATABASE.SQLServer]: "{NAME} {TYPE} PRIMARY KEY",
     };
