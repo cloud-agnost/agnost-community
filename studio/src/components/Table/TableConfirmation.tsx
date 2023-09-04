@@ -36,63 +36,67 @@ export function TableConfirmation({
 		onConfirm();
 		if (closeOnConfirm) setOpen(false);
 	}
+
 	const hasVersionPermission = useAuthorizeVersion(authorizedKey as string);
 	const hasOrgPermission = useAuthorizeOrg(authorizedKey as string);
 	//Todo? const appDisabled = useAuthorizeApp(authorizedKey as string);
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger asChild>
-				<TooltipProvider>
-					<Tooltip>
-						<TooltipTrigger>
+			<TooltipProvider>
+				<Tooltip>
+					<PopoverTrigger asChild>
+						<TooltipTrigger asChild>
 							<Button
-								disabled={!hasVersionPermission || !hasOrgPermission}
 								variant='blank'
 								rounded
+								disabled={
+									!hasVersionPermission ||
+									(typeof hasOrgPermission !== 'undefined' && !hasOrgPermission)
+								}
 								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
 								iconOnly
 							>
 								<Trash size={20} />
 							</Button>
 						</TooltipTrigger>
-						<TooltipContent>{t('general.delete')}</TooltipContent>
-					</Tooltip>
-				</TooltipProvider>
-			</PopoverTrigger>
-			<PopoverContent align={align} className={cn('mr-2', contentClassName)}>
-				<div id='popup-modal' tabIndex={-1}>
-					<div className='relative w-full max-w-sm max-h-full'>
-						<Button
-							variant='blank'
-							className='absolute top-3 z-10 right-2.5 text-icon-base hover:text-icon-secondary rounded-full'
-							data-modal-hide='popup-modal'
-							onClick={() => setOpen(false)}
-						>
-							<X size={20} />
-							<span className='sr-only'>Close modal</span>
-						</Button>
-						<div className='relative rounded p-4'>
-							<div className='flex flex-col justify-center items-center space-y-4 text-center'>
-								{showAvatar && (
-									<Avatar size='3xl'>
-										<AvatarFallback color='#9B7B0866' />
-									</Avatar>
-								)}
-								<h3 className='text-lg font-semibold text-default'>{title}</h3>
-								<p className='text-sm font-normal text-subtle'>{description}</p>
-							</div>
-							<div className='flex items-center justify-center gap-4 mt-8'>
-								<Button variant='text' size='lg' onClick={() => setOpen(false)}>
-									{t('general.cancel')}
+					</PopoverTrigger>
+					<TooltipContent>{t('general.delete')}</TooltipContent>
+					<PopoverContent align={align} className={cn(contentClassName)}>
+						<div id='popup-modal'>
+							<div className='relative w-full max-w-sm max-h-full'>
+								<Button
+									variant='blank'
+									className='absolute top-3 z-10 right-2.5 text-icon-base hover:text-icon-secondary rounded-full'
+									data-modal-hide='popup-modal'
+									onClick={() => setOpen(false)}
+								>
+									<X size={20} />
+									<span className='sr-only'>Close modal</span>
 								</Button>
-								<Button variant='primary' size='lg' onClick={confirm}>
-									{t('general.ok')}
-								</Button>
+								<div className='relative rounded p-4'>
+									<div className='flex flex-col justify-center items-center space-y-4 text-center'>
+										{showAvatar && (
+											<Avatar size='3xl'>
+												<AvatarFallback color='#9B7B0866' />
+											</Avatar>
+										)}
+										<h3 className='text-lg font-semibold text-default'>{title}</h3>
+										<p className='text-sm font-normal text-subtle'>{description}</p>
+									</div>
+									<div className='flex items-center justify-center gap-4 mt-8'>
+										<Button variant='text' size='lg' onClick={() => setOpen(false)}>
+											{t('general.cancel')}
+										</Button>
+										<Button variant='primary' size='lg' onClick={confirm}>
+											{t('general.ok')}
+										</Button>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
-				</div>
-			</PopoverContent>
+					</PopoverContent>
+				</Tooltip>
+			</TooltipProvider>
 		</Popover>
 	);
 }
