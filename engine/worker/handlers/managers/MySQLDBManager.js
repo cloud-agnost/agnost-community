@@ -174,12 +174,12 @@ END;
     /**
      * @description Add an index to the column
      * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
+     * @param {object} column - The column
      * @param {boolean} returnQuery - Return the query instead of running it
      * @return {Promise<Object|[]>|string}
      */
-    addIndex(tableName, columnName, returnQuery = false) {
-        const indexName = `${tableName}_index_${columnName}`.toLowerCase();
+    addIndex(tableName, column, returnQuery = false) {
+        const indexName = `${tableName}_index_${column.name}`.toLowerCase();
 
         const schema = "CREATE INDEX `{INDEX_NAME}` ON {TABLE_NAME}({FIELD_NAME});";
 
@@ -190,7 +190,7 @@ END;
             schema
                 .replace("{INDEX_NAME}", indexName)
                 .replace("{TABLE_NAME}", tableName)
-                .replace("{FIELD_NAME}", columnName),
+                .replace("{FIELD_NAME}", column.name),
             "ADD INDEX TO COLUMN"
         );
 

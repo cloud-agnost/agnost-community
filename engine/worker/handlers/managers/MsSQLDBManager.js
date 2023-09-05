@@ -258,7 +258,7 @@ export class MsSQLDBManager extends SQLBaseManager {
      */
     dropIndex(tableName, columnName, returnQuery = false) {
         const indexName = `${tableName}_index_${columnName}`.toLowerCase();
-        const SQL = `DROP INDEX IF EXISTS ${this.getSchemaName()}.${tableName}.${indexName};`;
+        const SQL = `DROP INDEX IF EXISTS ${indexName} ON ${this.getSchemaName()}.${tableName};`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
@@ -266,19 +266,24 @@ export class MsSQLDBManager extends SQLBaseManager {
     /**
      * @description Add an index to the column
      * @param tableName
-     * @param columnName
+     * @param column
      * @param returnQuery
      * @return {Promise|string}
      */
-    addIndex(tableName, columnName, returnQuery = false) {
-        const indexName = `${tableName}_index_${columnName}`.toLowerCase();
+    addIndex(tableName, column, returnQuery = false) {
+        const isGeoPoint = column.type === "geo-point";
+
+        const indexName = `${tableName}_index_${column.name}`.toLowerCase();
         const selectQuery = MsSQLDBManager.CHECK_INDEX_SCHEMA.replace("{TABLE_NAME}", tableName)
             .replace("{INDEX_NAME}", indexName)
             .replace("{SCHEMA_NAME}", this.getSchemaName());
 
         const condition = `NOT EXISTS(${selectQuery})`;
-        const query = `CREATE INDEX ${indexName} ON ${this.getSchemaName()}.${tableName}(${columnName})`;
-        const SQL = this.ifWrapper(condition, query);
+        const query = `CREATE INDEX ${indexName} ON ${this.getSchemaName()}.${tableName}(${column.name})`;
+        const queryWithSpatial = `CREATE SPATIAL INDEX ${indexName} ON ${this.getSchemaName()}.${tableName}(${
+            column.name
+        })`;
+        const SQL = this.ifWrapper(condition, isGeoPoint ? queryWithSpatial : query);
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);

@@ -15,7 +15,7 @@ import {
 import { Input, Textarea } from 'components/Input';
 import { Button } from 'components/Button';
 import {
-	FIELD_ICON_MAP,
+	DATABASE,
 	MAX_LENGTHS,
 	MYSQL_RESERVED_WORDS,
 	NAME_SCHEMA,
@@ -25,15 +25,7 @@ import {
 	TIMESTAMPS_SCHEMA,
 } from '@/constants';
 import { useEffect, useMemo, useState } from 'react';
-import {
-	APIError,
-	BasicValueListType,
-	Database,
-	Field,
-	FieldType,
-	Model,
-	ReferenceAction,
-} from '@/types';
+import { APIError, Database, Field, FieldType, Model, ReferenceAction } from '@/types';
 import { capitalize, cn, toDisplayName } from '@/utils';
 import { useParams } from 'react-router-dom';
 import { Switch } from 'components/Switch';
@@ -56,7 +48,6 @@ interface EditOrCreateModelDrawerProps {
 
 const defaultValueDisabledTypes = [
 	'reference',
-	'date',
 	'time',
 	'object',
 	'object-list',
@@ -135,19 +126,18 @@ export default function EditOrCreateFieldDrawer({
 	const isEnum = TYPE === 'enum';
 	const isReference = TYPE === 'reference';
 	const isDatetime = TYPE === 'datetime';
+	const isDate = TYPE === 'date';
+	const isGeoPoint = TYPE === 'geo-point';
+
 	const hasDefaultValue = !defaultValueDisabledTypes.includes(TYPE);
 
-	const defaults = isDatetime ? datetimeDefaults : isBoolean ? booleanDefaults : [];
+	const defaults = isDatetime || isDate ? datetimeDefaults : isBoolean ? booleanDefaults : [];
 
 	const view = editMode
 		? fieldTypes.find((type) => type.name === fieldToEdit?.type)?.view
 		: type?.view;
 
-	if (
-		database.type === 'SQL Server' &&
-		['rich-text', 'geo-point'].includes(TYPE) &&
-		view?.indexed
-	) {
+	if (database.type === DATABASE.SQLServer && ['rich-text'].includes(TYPE) && view?.indexed) {
 		view.indexed = false;
 	}
 
@@ -348,7 +338,7 @@ export default function EditOrCreateFieldDrawer({
 					});
 				}
 
-				if (isReference && !arg.referenceAction) {
+				if (isReference && database.type !== DATABASE.MongoDB && !arg.referenceAction) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: t('forms.required', {
@@ -359,7 +349,7 @@ export default function EditOrCreateFieldDrawer({
 				}
 
 				if (
-					database?.type === 'PostgreSQL' &&
+					database?.type === DATABASE.PostgreSQL &&
 					POSTGRES_RESERVED_WORDS.includes(arg.name.toLowerCase())
 				) {
 					ctx.addIssue({
@@ -371,7 +361,10 @@ export default function EditOrCreateFieldDrawer({
 					});
 				}
 
-				if (database?.type === 'MySQL' && MYSQL_RESERVED_WORDS.includes(arg.name.toLowerCase())) {
+				if (
+					database?.type === DATABASE.MySQL &&
+					MYSQL_RESERVED_WORDS.includes(arg.name.toLowerCase())
+				) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: t('forms.reservedWord', {
@@ -382,7 +375,7 @@ export default function EditOrCreateFieldDrawer({
 				}
 
 				if (
-					database?.type === 'SQL Server' &&
+					database?.type === DATABASE.SQLServer &&
 					SQL_SERVER_RESERVED_WORDS.includes(arg.name.toLowerCase())
 				) {
 					ctx.addIssue({
@@ -410,11 +403,31 @@ export default function EditOrCreateFieldDrawer({
 					createdAt: 'createdAt',
 					updatedAt: 'updatedAt',
 				},
-				defaultValue: !editMode && (isBoolean || isDatetime) ? defaults[0].value : undefined,
+				defaultValue:
+					!editMode && (isBoolean || isDatetime || isDate) ? defaults[0].value : undefined,
 				referenceModelIid: fieldToEdit?.reference?.iid,
 			},
 		},
 	});
+
+	const indexWatch = form.watch('general.indexed');
+	const requiredWatch = form.watch('general.required');
+
+	useEffect(() => {
+		if (database?.type !== DATABASE.MySQL || !isGeoPoint) return;
+
+		if (form.getValues('general.indexed')) {
+			form.setValue('general.required', true);
+		}
+	}, [indexWatch, database, isGeoPoint]);
+
+	useEffect(() => {
+		if (database?.type !== DATABASE.MySQL || !isGeoPoint) return;
+
+		if (!form.getValues('general.required')) {
+			form.setValue('general.indexed', false);
+		}
+	}, [requiredWatch, database, isGeoPoint]);
 
 	useEffect(() => {
 		if (!open) form.reset();
@@ -454,10 +467,17 @@ export default function EditOrCreateFieldDrawer({
 			dbId: dbId,
 			modelId,
 			name: data.general.name,
-			required: data.general.required,
+			required: editMode && !fieldToEdit.required ? false : data.general.required,
 			unique: data.general.unique,
 			immutable: data.general.immutable,
-			indexed: data.general.indexed,
+			indexed:
+				editMode &&
+				isGeoPoint &&
+				database.type === DATABASE.MySQL &&
+				!fieldToEdit.indexed &&
+				!fieldToEdit.required
+					? false
+					: data.general.indexed,
 			defaultValue: isBoolean
 				? parseForBoolean(data.general.defaultValue)
 				: data.general.defaultValue,
@@ -487,9 +507,6 @@ export default function EditOrCreateFieldDrawer({
 			},
 			objectList: {
 				timestamps: data.general.timeStamps,
-			},
-			basicValuesList: {
-				type: data.general.basicValueList as BasicValueListType,
 			},
 		};
 		try {
@@ -637,7 +654,7 @@ export default function EditOrCreateFieldDrawer({
 													/>
 												</FormControl>
 												<FormMessage />
-												{database.type !== 'MongoDB' && (
+												{database.type !== DATABASE.MongoDB && (
 													<FormDescription>
 														{t('forms.maxLength.description', {
 															length:
@@ -703,69 +720,15 @@ export default function EditOrCreateFieldDrawer({
 									<Separator />
 								</>
 							)}
-							{isBasicValueList && (
-								<>
-									<FormField
-										control={form.control}
-										name='general.basicValueList'
-										render={({ field, formState: { errors } }) => (
-											<FormItem className='space-y-1'>
-												<FormLabel>{t('database.fields.basic_value_list_type')}</FormLabel>
-												<FormControl>
-													<Select
-														defaultValue={field.value}
-														value={field.value}
-														name={field.name}
-														onValueChange={field.onChange}
-													>
-														<FormControl>
-															<SelectTrigger
-																className={cn(
-																	'w-full input',
-																	errors.general?.basicValueList && 'input-error',
-																)}
-															>
-																<SelectValue
-																	className={cn('text-subtle')}
-																	placeholder={t('database.fields.basic_value_list_placeholder')}
-																/>
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent align='center'>
-															{basicValueListTypes.map((type, index) => {
-																const Icon = FIELD_ICON_MAP[type];
-																return (
-																	<SelectItem
-																		className='px-3 py-[6px] w-full max-w-full cursor-pointer'
-																		key={index}
-																		value={type}
-																	>
-																		<div className='flex items-center gap-2'>
-																			{Icon && <Icon className='text-icon-base text-xl' />}
-																			{toDisplayName(type)}
-																		</div>
-																	</SelectItem>
-																);
-															})}
-														</SelectContent>
-													</Select>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<Separator />
-								</>
-							)}
 							{isReference && (
 								<>
 									<div
 										className={cn(
 											'grid grid-cols-2 gap-4',
-											database.type === 'MongoDB' && 'grid-cols-1',
+											database.type === DATABASE.MongoDB && 'grid-cols-1',
 										)}
 									>
-										{database.type !== 'MongoDB' && (
+										{database.type !== DATABASE.MongoDB && (
 											<FormField
 												control={form.control}
 												name='general.referenceAction'
@@ -865,32 +828,42 @@ export default function EditOrCreateFieldDrawer({
 								</>
 							)}
 							<div className='space-y-4'>
-								{views.map((key, index) => (
-									<FormField
-										key={index}
-										control={form.control}
-										name={`general.${key}`}
-										render={({ field }) => (
-											<FormItem>
-												<SettingsFormItem
-													as='label'
-													className='py-0 space-y-0'
-													contentClassName='flex items-center justify-center'
-													title={t(`general.${key}`)}
-													description={t(`database.fields.form.${key}_desc`)}
-													twoColumns
-												>
-													<Switch
-														disabled={editMode && key === 'unique' && !fieldToEdit.unique}
-														checked={field.value}
-														onCheckedChange={field.onChange}
-													/>
-												</SettingsFormItem>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								))}
+								{views.map((key, index) => {
+									const isDisabled =
+										editMode &&
+										((key === 'unique' && !fieldToEdit.unique) ||
+											(isGeoPoint &&
+												key === 'indexed' &&
+												!fieldToEdit.indexed &&
+												!fieldToEdit.required &&
+												database.type === DATABASE.MySQL));
+									return (
+										<FormField
+											key={index}
+											control={form.control}
+											name={`general.${key}`}
+											render={({ field }) => (
+												<FormItem>
+													<SettingsFormItem
+														as='label'
+														className='py-0 space-y-0'
+														contentClassName='flex items-center justify-center'
+														title={t(`general.${key}`)}
+														description={t(`database.fields.form.${key}_desc`)}
+														twoColumns
+													>
+														<Switch
+															disabled={isDisabled}
+															checked={field.value}
+															onCheckedChange={field.onChange}
+														/>
+													</SettingsFormItem>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+									);
+								})}
 								{!['object', 'object-list'].includes(TYPE) && (
 									<FormField
 										control={form.control}
@@ -908,7 +881,9 @@ export default function EditOrCreateFieldDrawer({
 													>
 														<Switch
 															disabled={
-																database.type !== 'MongoDB' && editMode && !fieldToEdit.required
+																database.type !== DATABASE.MongoDB &&
+																editMode &&
+																!fieldToEdit.required
 															}
 															checked={field.value}
 															onCheckedChange={field.onChange}
@@ -931,7 +906,7 @@ export default function EditOrCreateFieldDrawer({
 											render={({ field }) => (
 												<FormItem className={cn('flex-1 flex flex-col ')}>
 													<FormLabel>{t('database.fields.form.default_value')}</FormLabel>
-													{isBoolean || isDatetime ? (
+													{isBoolean || isDatetime || isDate ? (
 														<FormControl>
 															<Select
 																defaultValue={field.value}

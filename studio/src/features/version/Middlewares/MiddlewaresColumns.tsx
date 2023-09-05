@@ -8,6 +8,7 @@ import { DateText } from 'components/DateText';
 import { ActionsCell } from 'components/ActionsCell';
 import { TabLink } from '@/features/version/Tabs';
 import useMiddlewareStore from '@/store/middleware/middlewareStore';
+import { TableConfirmation } from 'components/Table';
 
 const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
@@ -32,7 +33,9 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
+		header: ({ column }) => (
+			<SortButton text={translate('general.name').toUpperCase()} column={column} />
+		),
 		cell: ({
 			row: {
 				original: { _id, name },
@@ -46,7 +49,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
 		id: 'createdAt',
 		header: ({ column }) => (
-			<SortButton text={translate('general.created_at')} column={column} />
+			<SortButton text={translate('general.created_at').toUpperCase()} column={column} />
 		),
 		accessorKey: 'createdAt',
 		sortingFn: 'datetime',
@@ -66,7 +69,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
 		id: 'updatedAt',
 		header: ({ column }) => (
-			<SortButton text={translate('general.updated_at')} column={column} />
+			<SortButton text={translate('general.updated_at').toUpperCase()} column={column} />
 		),
 		accessorKey: 'updatedAt',
 		enableSorting: true,
@@ -88,11 +91,22 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 		className: 'actions',
 		size: 45,
 		cell: ({ row: { original } }) => {
-			const { setMiddleware, setEditMiddlewareDrawerIsOpen } = useMiddlewareStore.getState();
+			const { setMiddleware, setEditMiddlewareDrawerIsOpen, deleteMiddleware } =
+				useMiddlewareStore.getState();
 			function handleEdit() {
 				setMiddleware(original);
 				setEditMiddlewareDrawerIsOpen(true);
 			}
+
+			async function deleteHandler() {
+				await deleteMiddleware({
+					appId: original.appId,
+					orgId: original.orgId,
+					versionId: original.versionId,
+					mwId: original._id,
+				});
+			}
+
 			return (
 				<ActionsCell<Middleware>
 					original={original}
@@ -100,7 +114,18 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 					canEditKey='middleware.update'
 					onEdit={handleEdit}
 					type='version'
-				/>
+				>
+					<TableConfirmation
+						align='end'
+						closeOnConfirm
+						showAvatar={false}
+						title={translate('version.middleware.delete.title')}
+						description={translate('version.middleware.delete.message')}
+						onConfirm={deleteHandler}
+						contentClassName='m-0'
+						authorizedKey='middleware.delete'
+					/>
+				</ActionsCell>
 			);
 		},
 	},
