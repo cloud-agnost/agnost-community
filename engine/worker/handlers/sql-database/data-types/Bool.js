@@ -3,7 +3,7 @@ import { DATABASE } from "../../../config/constants.js";
 
 export default class Bool extends Field {
     createMap = {
-        [DATABASE.PostgreSQL]: "{NAME} {TYPE} {REQUIRED} {DEFAULT_VALUE}",
+        [DATABASE.PostgreSQL]: '"{NAME}" {TYPE} {REQUIRED} {DEFAULT_VALUE}',
         [DATABASE.MySQL]: "`{NAME}` {TYPE} {REQUIRED} {DEFAULT_VALUE}",
         [DATABASE.SQLServer]: "{NAME} {TYPE} {REQUIRED} {DEFAULT_VALUE}",
     };

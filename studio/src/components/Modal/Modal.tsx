@@ -1,7 +1,6 @@
 import { Button } from '@/components/Button';
 import { cn } from '@/utils';
 import { X } from '@phosphor-icons/react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { MouseEvent, ReactNode, useRef, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import './Modal.scss';
 import { createPortal } from 'react-dom';
@@ -43,7 +42,7 @@ export default function Modal({
 	};
 
 	return createPortal(
-		<AnimatePresence>
+		<>
 			{isOpen && (
 				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 				<div
@@ -54,13 +53,7 @@ export default function Modal({
 					onKeyDown={handleEsc}
 					aria-hidden={!isOpen}
 				>
-					<motion.div
-						initial={{ scale: '0', opacity: 0 }}
-						animate={{ scale: 1, opacity: 1 }}
-						exit={{ scale: 0, opacity: 0 }}
-						transition={{ type: 'tween' }}
-						className={cn('modal-body', className)}
-					>
+					<div className={cn('modal-body', className)}>
 						<div>
 							{!hideHeader &&
 								(title ? (
@@ -91,10 +84,10 @@ export default function Modal({
 								{children}
 							</div>
 						</div>
-					</motion.div>
+					</div>
 				</div>
 			)}
-		</AnimatePresence>,
+		</>,
 		document.body,
 	);
 }

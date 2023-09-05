@@ -41,6 +41,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 		),
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { _id, name },
@@ -100,8 +101,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { setModelToEdit, setIsOpenEditModelDialog, deleteModel } =
-				useModelStore.getState();
+			const { setModelToEdit, setIsOpenEditModelDialog, deleteModel } = useModelStore.getState();
 			function openEditDrawer() {
 				setModelToEdit(original);
 				setIsOpenEditModelDialog(true);
@@ -121,7 +121,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 				<div className='flex items-center justify-end'>
 					<TooltipProvider>
 						<Tooltip>
-							<TooltipTrigger>
+							<TooltipTrigger asChild>
 								<Button
 									to={`${original._id}/fields`}
 									iconOnly

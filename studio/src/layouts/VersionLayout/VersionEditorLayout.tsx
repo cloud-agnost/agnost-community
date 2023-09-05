@@ -5,9 +5,10 @@ import { FloppyDisk, TestTube } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { useLocation } from 'react-router-dom';
+import { cn } from '@/utils';
 interface VersionEditorLayoutProps {
 	children: React.ReactNode;
-
+	className?: string;
 	loading: boolean;
 	logic: string | undefined;
 	breadCrumbItems?: BreadCrumbItem[];
@@ -26,11 +27,12 @@ export default function VersionEditorLayout({
 	onTestModalOpen,
 	onEditModalOpen,
 	setLogic,
+	className,
 }: VersionEditorLayoutProps) {
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
 	return (
-		<div className='p-4 space-y-6 h-full'>
+		<div className={cn('p-4 space-y-6 h-full', className)}>
 			{breadCrumbItems && (
 				<BreadCrumb
 					goBackLink={pathname.split('/').slice(0, -1).join('/')}

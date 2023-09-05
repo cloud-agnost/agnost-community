@@ -3,7 +3,7 @@ import { DATABASE } from "../../../config/constants.js";
 
 export default class DateTime extends Field {
     createMap = {
-        [DATABASE.PostgreSQL]: "{NAME} {TYPE}",
+        [DATABASE.PostgreSQL]: '"{NAME}" {TYPE}',
         [DATABASE.MySQL]: "`{NAME}` {TYPE}",
         [DATABASE.SQLServer]: "{NAME} {TYPE}",
     };

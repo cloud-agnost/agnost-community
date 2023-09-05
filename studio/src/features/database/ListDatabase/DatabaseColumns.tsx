@@ -51,7 +51,9 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'managed',
-		header: translate('general.managed').toUpperCase(),
+		header: ({ column }) => (
+			<SortButton text={translate('general.managed').toUpperCase()} column={column} />
+		),
 		accessorKey: 'managed',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -96,7 +98,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 				<div className='flex items-center gap-0.5 justify-end'>
 					<TooltipProvider>
 						<Tooltip>
-							<TooltipTrigger>
+							<TooltipTrigger asChild>
 								<Button
 									iconOnly
 									variant='blank'

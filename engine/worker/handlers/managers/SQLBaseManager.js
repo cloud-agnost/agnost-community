@@ -403,7 +403,6 @@ export class SQLBaseManager extends DBManager {
     async handleIndexes(model, fields, returnQuery = false) {
         let SQL = "";
         const hasNoIndexTypes = ["object-list", "object", "json", "binary", "encrypted-text", "id", "reference"];
-        if (this.getDbType() === DATABASE.SQLServer) hasNoIndexTypes.push("geo-point");
 
         for (const field of fields) {
             if (hasNoIndexTypes.includes(field.type)) continue;
@@ -412,7 +411,7 @@ export class SQLBaseManager extends DBManager {
             const fieldClass = new (fieldMap.get(field.type))(field, this.getDbType());
 
             if (fieldClass.isIndexed()) {
-                query = (await this.addIndex(model.name, field.name, returnQuery)) + "\n";
+                query = (await this.addIndex(model.name, field, returnQuery)) + "\n";
             } else {
                 query = (await this.dropIndex(model.name, field.name, returnQuery)) + "\n";
             }
@@ -740,11 +739,11 @@ export class SQLBaseManager extends DBManager {
     /**
      * @description Add an index to the column
      * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
+     * @param {object} column - The column
      * @param {boolean} returnQuery - return the query or run it
      * @return {Promise<Object|[]>}
      */
-    addIndex(tableName, columnName, returnQuery = false) {}
+    addIndex(tableName, column, returnQuery = false) {}
 
     /**
      * @description Add a unique constraint to a column

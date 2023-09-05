@@ -198,7 +198,7 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 				<div className='flex items-center justify-end'>
 					<TooltipProvider>
 						<Tooltip>
-							<TooltipTrigger>
+							<TooltipTrigger asChild>
 								<Button
 									iconOnly
 									variant='blank'
@@ -214,7 +214,7 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 					</TooltipProvider>
 					<TooltipProvider>
 						<Tooltip>
-							<TooltipTrigger>
+							<TooltipTrigger asChild>
 								<Button
 									iconOnly
 									variant='blank'

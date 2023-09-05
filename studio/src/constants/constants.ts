@@ -941,3 +941,11 @@ export const HEADER_USER_DROPDOWN = [
 		beforeHasSeparator: true,
 	},
 ];
+
+export const DATABASE = {
+	MySQL: 'MySQL',
+	SQLServer: 'SQL Server',
+	PostgreSQL: 'PostgreSQL',
+	Oracle: 'Oracle',
+	MongoDB: 'MongoDB',
+};

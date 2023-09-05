@@ -3,6 +3,7 @@ import { VersionParams } from '@/types/version.ts';
 export interface Database {
 	orgId: string;
 	appId: string;
+	assignUniqueName: boolean;
 	versionId: string;
 	iid: string;
 	name: string;

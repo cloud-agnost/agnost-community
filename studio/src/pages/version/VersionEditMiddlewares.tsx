@@ -3,6 +3,8 @@ import { Middleware } from '@/types';
 import { useParams } from 'react-router-dom';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
+import { BreadCrumbItem } from 'components/BreadCrumb';
+import { useTranslation } from 'react-i18next';
 
 export default function VersionEditMiddlewares() {
 	const { middlewareId, orgId, appId, versionId } = useParams() as Record<string, string>;
@@ -10,7 +12,7 @@ export default function VersionEditMiddlewares() {
 	const [loading, setLoading] = useState(false);
 	const getMiddlewareById = useMiddlewareStore((state) => state.getMiddlewareById);
 	const [middleware, setMiddleware] = useState<Middleware>();
-
+	const { t } = useTranslation();
 	const name = useMemo(() => {
 		return middlewares.find((mw) => mw._id === middlewareId)?.name;
 	}, [middlewares, middlewareId]);
@@ -56,9 +58,21 @@ export default function VersionEditMiddlewares() {
 			return { ...prev, logic };
 		});
 	}
+	const url = `/organization/${orgId}/apps/${appId}/version/${versionId}/middleware`;
+	const breadcrumbItems: BreadCrumbItem[] = [
+		{
+			name: t('version.middleware.default').toString(),
+			url,
+		},
+		{
+			name,
+		},
+	];
 
 	return (
 		<VersionEditorLayout
+			className='p-0'
+			breadCrumbItems={breadcrumbItems}
 			onEditModalOpen={openEditDrawer}
 			onSaveLogic={saveLogic}
 			loading={loading}
