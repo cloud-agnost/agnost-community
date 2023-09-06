@@ -1,5 +1,5 @@
-import { VersionParams } from '@/types/version.ts';
 import { PaginationOptions } from '@/types/database.ts';
+import { VersionParams } from '@/types/version.ts';
 
 export interface Environment {
 	orgId: string;
@@ -12,7 +12,7 @@ export interface Environment {
 	mappings: Mapping[];
 	deploymentDtm: string;
 	dbStatus: string;
-	serverStatus: ServerStatus[];
+	serverStatus: 'Deploying' | 'OK' | 'Redeploying' | 'Suspended';
 	schedulerStatus: string;
 	createdBy: string;
 	updatedBy: string;
@@ -43,11 +43,6 @@ interface EnvironmentResource {
 	instance: string;
 }
 
-interface ServerStatus {
-	pod: string;
-	status: string;
-	_id: string;
-}
 export interface EnvLog {
 	orgId: string;
 	appId: string;
