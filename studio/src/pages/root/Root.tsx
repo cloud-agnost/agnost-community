@@ -6,9 +6,10 @@ import { EditMiddlewareDrawer } from '@/features/version/Middlewares';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
-import { history, removeLastSlash } from '@/utils';
+import { history } from '@/utils';
 import { useEffect } from 'react';
-import { LoaderFunctionArgs, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+
 const authPaths = [
 	'/login',
 	'/forgot-password',
@@ -19,26 +20,15 @@ const authPaths = [
 	'/complete-account-setup/verify-email',
 ];
 
-async function loader({ request }: LoaderFunctionArgs) {
-	const isAuthenticated = useAuthStore.getState().isAuthenticated();
-	await useClusterStore.getState().checkClusterSmtpStatus();
-	await useClusterStore.getState().checkClusterSetup();
-	const currentPathname = removeLastSlash(new URL(request.url).pathname);
-
-	const isAuthPath = authPaths.includes(currentPathname);
-
-	if (!isAuthPath && isAuthenticated) {
-		await useAuthStore.getState().getUser();
-	}
-
-	return null;
-}
-
 export default function Root() {
 	history.navigate = useNavigate();
 	history.location = useLocation();
+	const { pathname } = useLocation();
+	const navigate = useNavigate();
 	const { orgId } = useParams();
+	const { checkClusterSmtpStatus, checkClusterSetup } = useClusterStore();
 	const { getOrganizationMembers } = useOrganizationStore();
+	const { getUser, isAuthenticated } = useAuthStore();
 
 	useEffect(() => {
 		if (orgId) {
@@ -47,6 +37,25 @@ export default function Root() {
 			});
 		}
 	}, [orgId]);
+
+	useEffect(() => {
+		checkClusterSmtpStatus();
+		checkClusterSetup({
+			onSuccess: (isCompleted) => {
+				console.log('isCompleted', isCompleted);
+				if (!isCompleted) {
+					navigate('/onboarding');
+				}
+			},
+		});
+	}, []);
+
+	useEffect(() => {
+		const isAuthPath = authPaths.includes(pathname);
+		if (!isAuthPath && isAuthenticated()) {
+			getUser();
+		}
+	}, [pathname]);
 
 	return (
 		<>
@@ -59,5 +68,3 @@ export default function Root() {
 		</>
 	);
 }
-
-Root.loader = loader;

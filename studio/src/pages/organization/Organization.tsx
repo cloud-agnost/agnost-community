@@ -1,38 +1,26 @@
-import { useState } from 'react';
-import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
 import { OrganizationCreateModal } from '@/features/organization';
 import { RequireAuth } from '@/router';
-import useOrganizationStore from '@/store/organization/organizationStore.ts';
-import useAuthStore from '@/store/auth/authStore.ts';
 import useApplicationStore from '@/store/app/applicationStore.ts';
-
-Organization.loader = async function ({ params }: LoaderFunctionArgs) {
-	const { orgId } = params;
-	const { getAllOrganizationByUser, getOrgPermissions } = useOrganizationStore.getState();
-	const { getAppsByOrgId, getAppPermissions } = useApplicationStore.getState();
-	const { isAuthenticated } = useAuthStore.getState();
-
-	if (isAuthenticated()) getAllOrganizationByUser();
-
-	useOrganizationStore.subscribe(
-		(state) => state.organization,
-		(organization) => {
-			if (organization) {
-				getAppsByOrgId(organization._id);
-			} else if (orgId) {
-				getAppsByOrgId(orgId);
-			}
-			getAppPermissions();
-			getOrgPermissions();
-		},
-		{ fireImmediately: true },
-	);
-
-	return null;
-};
+import useAuthStore from '@/store/auth/authStore.ts';
+import useOrganizationStore from '@/store/organization/organizationStore.ts';
+import { useEffect, useState } from 'react';
+import { Outlet, useParams } from 'react-router-dom';
 
 export default function Organization() {
 	const [openOrgCreateModal, setOpenOrgCreateModal] = useState(false);
+	const { orgId } = useParams();
+	const { getAllOrganizationByUser, getOrgPermissions } = useOrganizationStore();
+	const { getAppPermissions } = useApplicationStore();
+	const { isAuthenticated } = useAuthStore();
+	const isLoggedIn = isAuthenticated();
+	useEffect(() => {
+		if (isLoggedIn) getAllOrganizationByUser();
+	}, [isLoggedIn]);
+
+	useEffect(() => {
+		getAppPermissions();
+		getOrgPermissions();
+	}, [orgId]);
 
 	return (
 		<RequireAuth>
