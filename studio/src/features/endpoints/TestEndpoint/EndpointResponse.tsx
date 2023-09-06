@@ -14,7 +14,7 @@ export default function EndpointResponse() {
 	const response = endpointResponse[endpoint?._id as string];
 
 	return (
-		<Tabs defaultValue='body' className='border border-border rounded px-4 pb-4 h-[90%] box'>
+		<Tabs defaultValue='body' className='h-[90%] box'>
 			<div className='flex items-center justify-between'>
 				<TabsList defaultValue='body' align='center' className='flex-1'>
 					{ENDPOINT_RESPONSE_TABS.map((tab) => (
