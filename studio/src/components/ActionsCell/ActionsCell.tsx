@@ -41,7 +41,7 @@ function ActionsCell<T>({
 		<div className='flex items-center justify-end'>
 			<TooltipProvider>
 				<Tooltip>
-					<TooltipTrigger>
+					<TooltipTrigger asChild>
 						<Button
 							iconOnly
 							variant='blank'
@@ -62,7 +62,7 @@ function ActionsCell<T>({
 			) : (
 				<TooltipProvider>
 					<Tooltip>
-						<TooltipTrigger>
+						<TooltipTrigger asChild>
 							<Button
 								variant='blank'
 								rounded
