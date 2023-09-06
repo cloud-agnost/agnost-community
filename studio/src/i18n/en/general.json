@@ -100,5 +100,15 @@
 		"rapid": "Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.",
 		"database": "Amplify your backend capabilities and seamlessly integrate, manipulate, and leverage the power of multiple databases, including MySQL, MSSQL, and PostgreSQL.",
 		"realtime": "Build real-time apps that deliver a seamless user experience with our real-time database that syncs data across all connected devices in milliseconds."
-	}
+	},
+	"internalServerError": "Internal Server Error",
+	"internalServerErrorDescription": "Our apologies for the inconvenience. We're working to resolve this problem as quickly as possible. Please bear with us.",
+	"unauthorizedAccess": "Unauthorized Access",
+	"unauthorizedAccessDescription": "We're sorry, but you do not have the necessary authorization to access this page. Please contact the administrator for assistance or navigate back to the homepage",
+	"pageNotFound": "Page Not Found",
+	"pageNotFoundDescription": "We’re thinking this isn’t the page you want. Please check for spelling mistake or go back to previous page",
+	"backToHome": "Back to Homepage",
+	"backToLogin": "Back to Login",
+	"messageUs": "Message Us",
+	"stillHavingTrouble": "Still having trouble?"
 }
