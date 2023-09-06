@@ -1,4 +1,5 @@
 import { axios, test } from '@/helpers';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import {
 	CreateEndpointParams,
 	DeleteEndpointParams,
@@ -139,6 +140,11 @@ export default class EndpointService {
 				...params.queryParams,
 			},
 		};
-		return await test[method](path, ...(method === 'get' ? [options] : [body]), options);
+
+		return await test[method](
+			`http://localhost/${useEnvironmentStore.getState().environment?.iid}/api${path}`,
+			...(method === 'get' ? [options] : [body]),
+			options,
+		);
 	}
 }

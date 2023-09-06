@@ -1,4 +1,5 @@
 import { axios, http } from '@/helpers';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useStorageStore from '@/store/storage/storageStore';
 import {
 	Bucket,
@@ -23,9 +24,12 @@ import {
 	UpdateStorageParams,
 	UploadFileToBucketParams,
 } from '@/types';
-
 export default class StorageService {
 	static url = 'v1/org/';
+
+	static getUrl() {
+		return `http://localhost/${useEnvironmentStore.getState().environment?.iid}`;
+	}
 
 	static async getStorages({ orgId, appId, versionId, ...params }: GetStoragesParams) {
 		return (
@@ -81,23 +85,23 @@ export default class StorageService {
 		...params
 	}: GetStorageBuckets): Promise<BucketWithCountInfo> {
 		return (
-			await http.get(`storage/${storageName}/bucket`, {
+			await http.get(`${this.getUrl()}/storage/${storageName}/bucket`, {
 				params,
 			})
 		).data;
 	}
 
 	static async createBucket({ storageName, ...data }: CreateBucketParams): Promise<Bucket> {
-		return (await http.post(`/storage/${storageName}/bucket`, data)).data;
+		return (await http.post(`${this.getUrl()}/storage/${storageName}/bucket`, data)).data;
 	}
 
 	static async deleteBucket({ storageName, bucketName }: DeleteBucketParams): Promise<void> {
-		return (await http.delete(`/storage/${storageName}/bucket/${bucketName}`)).data;
+		return (await http.delete(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}`)).data;
 	}
 
 	static async emptyBucket({ storageName, bucketName }: DeleteBucketParams): Promise<void> {
 		return (
-			await axios.delete(`/storage/${storageName}/bucket/${bucketName}/empty`, {
+			await axios.delete(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}/empty`, {
 				data: { name: bucketName },
 			})
 		).data;
@@ -108,7 +112,7 @@ export default class StorageService {
 		bucketNames,
 	}: DeleteMultipleBucketParams): Promise<void> {
 		return (
-			await axios.delete(`/storage/${storageName}/bucket/delete-multi`, {
+			await axios.delete(`${this.getUrl()}/storage/${storageName}/bucket/delete-multi`, {
 				data: { bucketNames },
 			})
 		).data;
@@ -119,7 +123,8 @@ export default class StorageService {
 		bucketName,
 		...data
 	}: UpdateBucketParams): Promise<Bucket> {
-		return (await http.put(`/storage/${storageName}/bucket/${bucketName}`, data)).data;
+		return (await http.put(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}`, data))
+			.data;
 	}
 
 	static async getFilesOfBucket({
@@ -128,7 +133,7 @@ export default class StorageService {
 		...params
 	}: GetFilesParams): Promise<BucketFileWithCountInfo> {
 		return (
-			await http.get(`storage/${storageName}/bucket/${bucketName}/file`, {
+			await http.get(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}/file`, {
 				params,
 			})
 		).data;
@@ -145,17 +150,21 @@ export default class StorageService {
 		}
 
 		return (
-			await http.post(`storage/${storageName}/bucket/${bucketName}/file`, formData, {
-				headers: {
-					'Content-Type': 'multipart/form-data',
+			await http.post(
+				`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}/file`,
+				formData,
+				{
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+					onUploadProgress: (progressEvent) => {
+						const uploadProgress = Math.round(
+							(progressEvent.loaded * 100) / Number(progressEvent.total),
+						);
+						useStorageStore.setState({ uploadProgress });
+					},
 				},
-				onUploadProgress: (progressEvent) => {
-					const uploadProgress = Math.round(
-						(progressEvent.loaded * 100) / Number(progressEvent.total),
-					);
-					useStorageStore.setState({ uploadProgress });
-				},
-			})
+			)
 		).data;
 	}
 
@@ -165,7 +174,7 @@ export default class StorageService {
 		filePath,
 	}: DeleteFileFromBucketParams): Promise<void> {
 		return (
-			await http.delete(`storage/${storageName}/bucket/${bucketName}/file`, {
+			await http.delete(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}/file`, {
 				data: { filePath },
 			})
 		).data;
@@ -177,9 +186,12 @@ export default class StorageService {
 		filePaths,
 	}: DeleteMultipleFilesFromBucketParams): Promise<void> {
 		return (
-			await http.delete(`storage/${storageName}/bucket/${bucketName}/file/delete-multi`, {
-				data: { filePaths },
-			})
+			await http.delete(
+				`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}/file/delete-multi`,
+				{
+					data: { filePaths },
+				},
+			)
 		).data;
 	}
 
@@ -193,11 +205,15 @@ export default class StorageService {
 		formData.append('file', data.file);
 		formData.append('filePath', filePath);
 		return (
-			await http.put(`storage/${storageName}/bucket/${bucketName}/file/replace`, formData, {
-				headers: {
-					'Content-Type': 'multipart/form-data',
+			await http.put(
+				`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}/file/replace`,
+				formData,
+				{
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
 				},
-			})
+			)
 		).data;
 	}
 
@@ -207,7 +223,7 @@ export default class StorageService {
 		filePath,
 	}: DeleteFileFromBucketParams): Promise<BucketFile> {
 		return (
-			await http.put(`storage/${storageName}/bucket/${bucketName}/file/copy`, {
+			await http.put(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}/file/copy`, {
 				filePath,
 			})
 		).data;
@@ -218,6 +234,8 @@ export default class StorageService {
 		bucketName,
 		...data
 	}: UpdateFileInBucketParams): Promise<BucketFile> {
-		return (await http.put(`storage/${storageName}/bucket/${bucketName}/file`, data)).data;
+		return (
+			await http.put(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}/file`, data)
+		).data;
 	}
 }
