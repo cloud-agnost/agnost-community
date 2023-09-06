@@ -1,17 +1,17 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
-import { useToast } from '@/hooks';
+import { useTabNavigate, useToast } from '@/hooks';
+import useResourceStore from '@/store/resources/resourceStore';
+import useTaskStore from '@/store/task/taskStore';
+import useTabStore from '@/store/version/tabStore';
 import { CreateTaskSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import * as z from 'zod';
-import useTaskStore from '@/store/task/taskStore';
 import TaskForm from './TaskForm';
-import useResourceStore from '@/store/resources/resourceStore';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 interface CreateTaskProps {
 	open: boolean;
 	onClose: () => void;
@@ -22,10 +22,12 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 	const { createTask } = useTaskStore();
 	const { notify } = useToast();
 	const { resources } = useResourceStore();
-	const navigate = useNavigate();
+	const { getCurrentTab } = useTabStore();
+	const navigate = useTabNavigate();
 	const form = useForm<z.infer<typeof CreateTaskSchema>>({
 		resolver: zodResolver(CreateTaskSchema),
 	});
+	const { pathname } = useLocation();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -52,8 +54,14 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 					cronExpression: '',
 					logExecution: false,
 				});
+				navigate({
+					id: getCurrentTab(versionId as string)?.id as string,
+					title: task.name,
+					path: `${pathname}/${task._id}`,
+					isActive: true,
+					isDashboard: false,
+				});
 				onClose();
-				navigate(task._id);
 			},
 			onError: ({ error, details }) => {
 				form.reset({

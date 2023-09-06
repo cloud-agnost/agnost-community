@@ -1,15 +1,15 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
-import { useToast } from '@/hooks';
+import { useTabNavigate, useToast } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
+import useTabStore from '@/store/version/tabStore';
 import { CreateEndpointSchema } from '@/types';
 import { translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import * as z from 'zod';
 import EndpointForm from './EndpointForm';
-import { useNavigate } from 'react-router-dom';
 interface CreateEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -17,7 +17,10 @@ interface CreateEndpointProps {
 
 export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 	const { createEndpoint } = useEndpointStore();
-	const navigate = useNavigate();
+
+	const { pathname } = useLocation();
+	const { getCurrentTab } = useTabStore();
+	const navigate = useTabNavigate();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -38,7 +41,13 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 			versionId: versionId as string,
 			...data,
 			onSuccess: (endpoint) => {
-				navigate(`${endpoint._id}`);
+				navigate({
+					id: getCurrentTab(versionId as string)?.id as string,
+					title: endpoint.name,
+					path: `${pathname}/${endpoint._id}`,
+					isActive: true,
+					isDashboard: false,
+				});
 				closeDrawer();
 			},
 			onError: ({ error, details }) => {
