@@ -27,7 +27,6 @@ export default function EndpointPathVariables() {
 		if (endpoint?.path) {
 			const pathParams = getPathParams(endpoint?.path);
 			if (pathParams.length > pathParamFields.length) {
-				console.log('pathParams', pathParams);
 				pathParams.forEach((p) => {
 					appendPathParams({ key: p, value: '' });
 				});
