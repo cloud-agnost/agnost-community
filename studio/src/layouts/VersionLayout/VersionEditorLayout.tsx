@@ -57,7 +57,8 @@ export default function VersionEditorLayout({
 			</div>
 
 			<CodeEditor
-				containerClassName='h-[95%]'
+				className='h-full'
+				containerClassName='h-[88%]'
 				value={logic}
 				onChange={setLogic}
 				onSave={(value) => onSaveLogic(value)}
