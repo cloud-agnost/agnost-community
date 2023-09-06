@@ -36,6 +36,7 @@ import EndpointResponse from './TestEndpoint/EndpointResponse';
 import { useRef } from 'react';
 import { useUpdateEffect } from '@/hooks';
 import { Separator } from '@/components/Separator';
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -166,10 +167,8 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	useEffect(() => {
 		if (open && resizerRef.current) {
 			const resizer = resizerRef.current as HTMLDivElement;
-			console.log(resizer);
 			const prevSibling = resizer.previousElementSibling as HTMLElement;
 			const nextSibling = resizer.nextElementSibling as HTMLElement;
-			console.log(prevSibling, nextSibling);
 			// The current position of mouse
 			let y = 0;
 			let prevSiblingHeight = 0;
@@ -189,8 +188,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			};
 
 			const mouseMoveHandler = function (e: MouseEvent) {
-				console.log(e);
-				// How far the mouse has been moved
 				const dy = e.clientY - y;
 
 				const h =
@@ -271,6 +268,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 						variant='primary'
 						onClick={() => form.handleSubmit(onSubmit)()}
 						loading={loading}
+						disabled={loading || environment?.serverStatus !== 'OK'}
 					>
 						{t('endpoint.test.send')}
 					</Button>
@@ -288,7 +286,14 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 						);
 					})}
 				</nav>
-				<div className='p-6 scroll space-y-6'>
+
+				<div className='p-6 h-[85%] space-y-6'>
+					{environment?.serverStatus === 'Deploying' && (
+						<Alert variant='warning'>
+							<AlertTitle>{t('endpoint.test.deploy.warning')}</AlertTitle>
+							<AlertDescription>{t('endpoint.test.deploy.description')}</AlertDescription>
+						</Alert>
+					)}
 					<Form {...form}>
 						<form className='space-y-6'>
 							{searchParams.get('t') === 'params' && <EndpointParams />}

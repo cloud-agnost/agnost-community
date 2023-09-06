@@ -36,7 +36,6 @@ export default function Tabs() {
 
 	useEffect(() => {
 		if (getTabsByVersionId(versionId).find((tab) => tab.isDashboard)) return;
-		console.log('add');
 		addTab(versionId, {
 			id: generateId(),
 			title: t('version.dashboard'),
@@ -110,7 +109,6 @@ export default function Tabs() {
 		const prevTab = getPreviousTab(versionId, tab.id);
 		removeTab(versionId, tab.id);
 		if (tab.isActive && prevTab) {
-			console.log(prevTab);
 			setCurrentTab(versionId, prevTab?.id as string);
 			navigate(`${prevTab.path}?tabId=${prevTab.id}`);
 		}

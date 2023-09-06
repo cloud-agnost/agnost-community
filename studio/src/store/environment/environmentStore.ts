@@ -1,18 +1,18 @@
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
 import {
 	APIError,
 	Environment,
-	getAppVersionEnvironmentParams,
 	GetEnvironmentLogsParams,
 	GetEnvironmentResourcesParams,
 	Resource,
 	ToggleAutoDeployParams,
 	UpdateEnvironmentTelemetryLogsParams,
 	VersionParams,
+	getAppVersionEnvironmentParams,
 } from '@/types';
-import EnvironmentService from 'services/EnvironmentService.ts';
 import { notify, translate } from '@/utils';
+import EnvironmentService from 'services/EnvironmentService.ts';
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
 
 interface EnvironmentStore {
 	environments: Environment[];

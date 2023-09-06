@@ -2,6 +2,9 @@ import { cn } from '@/utils';
 import MonacoEditor, { EditorProps } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
 import nightOwl from 'monaco-themes/themes/Night Owl.json';
+import * as prettier from 'prettier';
+import jsParser from 'prettier/plugins/babel';
+import esTreePlugin from 'prettier/plugins/estree';
 
 interface CodeEditorProps extends Omit<EditorProps, 'onMount' | 'defaultLanguage'> {
 	containerClassName?: string;
@@ -31,7 +34,17 @@ export default function CodeEditor({
 			keybindings: [_monaco.KeyMod.CtrlCmd | _monaco.KeyCode.KeyS],
 			contextMenuGroupId: 'navigation',
 			contextMenuOrder: 1.5,
-			run: (ed) => {
+			run: async (ed) => {
+				if (defaultLanguage === 'json') {
+					editor.trigger('', 'editor.action.formatDocument', null);
+				}
+				if (defaultLanguage === 'javascript') {
+					const formatted = await prettier.format(ed.getValue(), {
+						parser: 'babel',
+						plugins: [jsParser, esTreePlugin],
+					});
+					ed.setValue(formatted);
+				}
 				onSave?.(ed.getValue());
 			},
 		});

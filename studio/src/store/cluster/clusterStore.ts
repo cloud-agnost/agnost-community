@@ -1,6 +1,6 @@
 import { AuthService, ClusterService } from '@/services';
 import { APIError } from '@/types';
-import { OnboardingData, User, UserDataToRegister } from '@/types/type.ts';
+import { BaseRequest, OnboardingData, User, UserDataToRegister } from '@/types/type.ts';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import useAuthStore from '../auth/authStore';
@@ -10,7 +10,7 @@ interface ClusterStore {
 	error: APIError | null;
 	isCompleted: boolean;
 	canClusterSendEmail: boolean;
-	checkClusterSetup: () => Promise<boolean>;
+	checkClusterSetup: (req?:BaseRequest) => Promise<boolean>;
 	checkClusterSmtpStatus: () => Promise<boolean>;
 	initializeClusterSetup: (data: UserDataToRegister) => Promise<User>;
 	finalizeClusterSetup: (req: OnboardingData) => Promise<User | APIError>;
@@ -24,10 +24,11 @@ const useClusterStore = create<ClusterStore>()(
 				isCompleted: false,
 				canClusterSendEmail: false,
 				error: null,
-				checkClusterSetup: async () => {
+				checkClusterSetup: async (req) => {
 					try {
 						const { status } = await ClusterService.checkCompleted();
 						set({ isCompleted: status });
+						req?.onSuccess?.(status);
 						return status;
 					} catch (error) {
 						set({ error: error as APIError });

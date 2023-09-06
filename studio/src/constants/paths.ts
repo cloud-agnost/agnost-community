@@ -91,4 +91,6 @@ export const PATHS = {
 		smtpConfiguration: `${onboardingPath}/SMTPConfiguration.tsx`,
 	},
 	redirectHandle: `${path}/RedirectHandle.tsx`,
+	notFound: `${path}/errors/404.tsx`,
+	unauthorized: `${path}/errors/401.tsx`,
 };

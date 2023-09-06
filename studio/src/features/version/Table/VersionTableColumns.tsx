@@ -10,6 +10,7 @@ import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { cn } from '@/utils';
 import useVersionStore from '@/store/version/versionStore';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 export const VersionTableColumns: ColumnDef<Version>[] = [
 	{
 		id: 'name',
@@ -67,14 +68,17 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 		cell: ({ row }) => {
 			const { _id } = row.original;
 			const app = useApplicationStore.getState().application;
+			const orgId = useOrganizationStore.getState().organization?._id as string;
 			const { closeVersionDrawer, selectApplication } = useApplicationStore.getState();
 			const { version, selectVersion } = useVersionStore.getState();
+			const { getAppVersionEnvironment } = useEnvironmentStore.getState();
 			const onSelect = () => {
 				if (!app) return;
 				selectApplication(app);
 				leaveChannel(version?._id as string);
 				selectVersion(row.original as Version);
 				closeVersionDrawer();
+				getAppVersionEnvironment({ appId: app._id, orgId, versionId: _id });
 			};
 			return <OpenVersion id={_id} app={app as Application} onSelect={onSelect} />;
 		},

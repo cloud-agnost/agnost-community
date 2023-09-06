@@ -1,16 +1,23 @@
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionLayout } from '@/layouts/VersionLayout';
-import useAuthStore from '@/store/auth/authStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { cn } from '@/utils';
 import { useEffect } from 'react';
-import { LoaderFunctionArgs, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 export default function Version() {
 	const { pathname } = useLocation();
+	const { getEnvironmentResources, environment } = useEnvironmentStore();
+	const { getVersionById, version } = useVersionStore();
 	const paths = pathname.split('/').filter((item) => /^[a-zA-Z-_]+$/.test(item));
 	const navigate = useNavigate();
 	const canView = useAuthorizeVersion('version.view');
+
+	const { appId, orgId, versionId } = useParams<{
+		appId: string;
+		orgId: string;
+		versionId: string;
+	}>();
 
 	useEffect(() => {
 		if (!canView) {
@@ -18,32 +25,26 @@ export default function Version() {
 		}
 	}, [canView]);
 
+	useEffect(() => {
+		if (versionId && versionId !== version?._id && appId && orgId) {
+			getVersionById({ appId, orgId, versionId });
+		}
+	}, [appId, orgId, versionId]);
+
+	useEffect(() => {
+		if (environment?._id) {
+			getEnvironmentResources({
+				orgId: orgId as string,
+				appId: appId as string,
+				versionId: versionId as string,
+				envId: environment._id,
+			});
+		}
+	}, [environment?._id]);
+
 	return (
 		<VersionLayout className={cn(paths.at(-1))}>
 			<Outlet />
 		</VersionLayout>
 	);
 }
-
-Version.loader = async ({ params }: LoaderFunctionArgs) => {
-	if (!useAuthStore.getState().isAuthenticated()) return null;
-
-	const { appId, orgId, versionId } = params as {
-		appId: string;
-		orgId: string;
-		versionId: string;
-	};
-
-	const environment = await useEnvironmentStore
-		.getState()
-		.getAppVersionEnvironment({ orgId, appId, versionId });
-
-	useVersionStore.getState().getVersionById({ orgId, appId, versionId }).catch(console.error);
-
-	useEnvironmentStore
-		.getState()
-		.getEnvironmentResources({ orgId, appId, versionId, envId: environment._id })
-		.catch(console.error);
-
-	return null;
-};
