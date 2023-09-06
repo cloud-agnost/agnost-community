@@ -9,7 +9,6 @@ import { Navigate, createBrowserRouter, useLocation } from 'react-router-dom';
 const router = createBrowserRouter([
 	{
 		path: '/',
-		loader: Root.loader,
 		element: <Root />,
 		children: [
 			{
@@ -302,6 +301,18 @@ const router = createBrowserRouter([
 		lazy: () => lazyRouteImport(PATHS.redirectHandle),
 		errorElement: <ErrorBoundary />,
 	},
+	{
+		path: '/*',
+		lazy: () => lazyRouteImport(PATHS.notFound),
+		errorElement: <ErrorBoundary />,
+	},
+	{
+		path: '/401',
+		lazy: () => lazyRouteImport(PATHS.unauthorized),
+		errorElement: <ErrorBoundary />,
+	},
+	
+	
 ]);
 
 export function RequireAuth({ children }: { children: JSX.Element }): JSX.Element {

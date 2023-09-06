@@ -35,6 +35,7 @@ export default function OrganizationApps() {
 		closeDeleteModal,
 		isLeaveModalOpen,
 		closeLeaveModal,
+		getAppsByOrgId,
 	} = useApplicationStore();
 	const canAppCreate = useAuthorizeOrg('app.create');
 	const { t } = useTranslation();
@@ -90,6 +91,10 @@ export default function OrganizationApps() {
 		const query = searchParams.get('q');
 		if (temp.length) searchApplications(query as string);
 	}, [searchParams.get('q'), temp]);
+
+	useEffect(() => {
+		getAppsByOrgId(organization?._id as string);
+	}, [organization?._id]);
 	return (
 		<div className={cn('scroll p-8', !temp.length && 'flex items-center justify-center')}>
 			{temp.length > 0 ? (

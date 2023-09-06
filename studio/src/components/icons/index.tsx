@@ -1,3 +1,5 @@
+export { default as Svg401 } from './401';
+export { default as Svg404 } from './404';
 export { default as ApiKeys } from './ApiKeys';
 export { default as Awss3 } from './Awss3';
 export { default as AgnostOnlyLogo } from './AgnostOnlyLogo';
@@ -26,6 +28,7 @@ export { default as EmptyTask } from './EmptyTask';
 export { default as Environment } from './Environment';
 export { default as EnvironmentVariable } from './EnvironmentVariable';
 export { default as Error } from './Error';
+export { default as ErrorPage } from './ErrorPage';
 export { default as GcpStorage } from './GcpStorage';
 export { default as Integer } from './Integer';
 export { default as Kafka } from './Kafka';

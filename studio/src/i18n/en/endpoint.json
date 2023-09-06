@@ -55,7 +55,11 @@
 		"send": "Send",
 		"key": "Key",
 		"value": "Value",
-		"add_query_param": "Add Query Param"
+		"add_query_param": "Add Query Param",
+		"deploy": {
+			"warning": "API Server undergoing deployment",
+			"description": "Please wait a few seconds for deployment to complete before testing endpoint"
+		}
 	},
 	"duration": "Duration",
 	"status": "Status",

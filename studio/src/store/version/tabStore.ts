@@ -64,7 +64,6 @@ const useTabStore = create<TabStore>()(
 				getPreviousTab: (versionId, currentTabId) => {
 					const tabs = get().tabs[versionId] ?? [];
 					const currentTabIndex = tabs.findIndex((tab) => tab.id === currentTabId);
-					console.log({ currentTabIndex, currentTabId });
 					if (currentTabIndex === -1) return;
 					return tabs[currentTabIndex - 1];
 				},

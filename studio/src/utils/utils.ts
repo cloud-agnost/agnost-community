@@ -246,6 +246,5 @@ export function formatFileSize(bytes: number): string {
 }
 
 export function checkNumber(number: number | undefined): number | undefined {
-	console.log({ number });
 	return number === 0 || number === undefined ? undefined : Number(number);
 }

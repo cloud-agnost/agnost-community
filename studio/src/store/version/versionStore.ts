@@ -33,7 +33,7 @@ import {
 	VersionProperties,
 	VersionRealtimeProperties,
 } from '@/types';
-import { history, joinChannel, notify, translate } from '@/utils';
+import { history, notify, translate } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -134,7 +134,6 @@ const useVersionStore = create<VersionStore>()(
 				showLogDetails: false,
 				selectVersion: (version: Version) => {
 					set({ version });
-					joinChannel(version._id);
 				},
 				setSelectedAPIKey: (key: APIKey | null) => {
 					set({ selectedAPIKey: key });

@@ -11,7 +11,7 @@ export default function TestEndpointTable({
 }: TestEndpointTableProps) {
 	const { t } = useTranslation();
 	return (
-		<Table className='h-full' containerClassName='h-full'>
+		<Table className='h-full' containerClassName='h-full max-h-[200px]'>
 			<TableHeader>
 				<TableRow className='head bg-wrapper-background-light'>
 					{isFormData && <TableHead>{t('general.type')} </TableHead>}

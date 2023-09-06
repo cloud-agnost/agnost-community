@@ -1,33 +1,23 @@
 import { ERROR_CODES_TO_REDIRECT_LOGIN_PAGE } from '@/constants';
 import useAuthStore from '@/store/auth/authStore.ts';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import { APIError } from '@/types';
 import axios from 'axios';
-import { setupCache } from 'axios-cache-adapter';
 const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost/api';
-const envBaseURL = `http://localhost/${useEnvironmentStore.getState().environment?.iid}`;
-
-const cache = setupCache({
-	maxAge: 15 * 60 * 1000,
-});
 
 const headers = {
 	'Content-Type': 'application/json',
 };
+console.log('baseURL', baseURL);
 export const instance = axios.create({
 	baseURL,
 	headers,
-	adapter: cache.adapter,
 });
 
 export const envInstance = axios.create({
-	baseURL: envBaseURL,
 	headers,
-	adapter: cache.adapter,
 });
 
 export const testEndpointInstance = axios.create({
-	baseURL: `${envBaseURL}/api`,
 	headers,
 });
 
@@ -46,8 +36,16 @@ instance.interceptors.response.use(
 	(error) => {
 		const apiError = error.response.data as APIError;
 		if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
-			// TODO: redirect to login page and clear store
+			localStorage.clear();
+			useAuthStore.getState().logout();
 		}
+		if (error.response.status === 401) {
+			window.location.href = '/401';
+		}
+		if (error.response.status === 404) {
+			window.location.href = '/404';
+		}
+
 		return Promise.reject(apiError);
 	},
 );
@@ -78,7 +76,6 @@ envInstance.interceptors.response.use(
 			error: error.response.data.error,
 			details: error.response.data.message,
 		};
-		console.log(err);
 		return Promise.reject(err);
 	},
 );

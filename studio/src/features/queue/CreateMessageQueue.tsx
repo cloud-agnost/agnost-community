@@ -5,11 +5,12 @@ import { CreateMessageQueueSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MessageQueueForm from './MessageQueueForm';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
+import useTabStore from '@/store/version/tabStore';
+import { useTabNavigate } from '@/hooks';
 interface CreateQueueProps {
 	open: boolean;
 	onClose: () => void;
@@ -18,7 +19,9 @@ interface CreateQueueProps {
 export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) {
 	const { t } = useTranslation();
 	const { createQueue } = useMessageQueueStore();
-	const navigate = useNavigate();
+	const navigate = useTabNavigate();
+	const { pathname } = useLocation();
+	const { getCurrentTab } = useTabStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -37,7 +40,13 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 			...data,
 			onSuccess: (queue) => {
 				handleClose();
-				navigate(queue._id);
+				navigate({
+					id: getCurrentTab(versionId as string)?.id as string,
+					title: queue.name,
+					path: `${pathname}/${queue._id}`,
+					isActive: true,
+					isDashboard: false,
+				});
 			},
 			onError: ({ error, details }) => {
 				handleClose();
