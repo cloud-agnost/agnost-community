@@ -8,9 +8,9 @@ import { cn } from '@/utils';
 import { GearSix } from '@phosphor-icons/react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Button } from 'components/Button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel } from 'components/Dropdown';
 import { ScrollArea, ScrollBar } from 'components/ScrollArea';
 import { useAnimate } from 'framer-motion';
-import * as React from 'react';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './deploymentStatusCard.scss';
@@ -104,32 +104,3 @@ export default function DeploymentStatusCard({ triggerIcon }: DeploymentStatusCa
 		</>
 	);
 }
-
-const DropdownMenu = DropdownMenuPrimitive.Root;
-
-const DropdownMenuContent = React.forwardRef<
-	React.ElementRef<typeof DropdownMenuPrimitive.Content>,
-	React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
-	<DropdownMenuPrimitive.Portal>
-		<DropdownMenuPrimitive.Content
-			ref={ref}
-			sideOffset={sideOffset}
-			className={cn('deployment-status', className)}
-			{...props}
-		/>
-	</DropdownMenuPrimitive.Portal>
-));
-DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
-
-const DropdownMenuLabel = React.forwardRef<
-	React.ElementRef<typeof DropdownMenuPrimitive.Label>,
-	React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label>
->(({ className, ...props }, ref) => (
-	<DropdownMenuPrimitive.Label
-		ref={ref}
-		className={cn('deployment-status-title', className)}
-		{...props}
-	/>
-));
-DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
