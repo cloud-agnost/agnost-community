@@ -53,10 +53,10 @@ export default function CodeEditor({
 		_monaco.editor.defineTheme('nightOwl', nightOwl);
 		_monaco.editor.setTheme('nightOwl');
 	};
+
 	return (
 		<div className={cn(containerClassName)}>
 			<MonacoEditor
-				theme='vs-dark'
 				className={cn('editor', className)}
 				onChange={onChange}
 				onValidate={onValidate}
@@ -75,6 +75,8 @@ export default function CodeEditor({
 					autoDetectHighContrast: true,
 					fontLigatures: true,
 					fontSize: 16,
+					formatOnPaste: true,
+					formatOnType: true,
 				}}
 			/>
 		</div>
