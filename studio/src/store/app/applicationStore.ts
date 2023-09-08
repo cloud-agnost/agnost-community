@@ -3,6 +3,7 @@ import {
 	APIError,
 	AppInviteRequest,
 	AppPermissions,
+	AppRoles,
 	Application,
 	ApplicationMember,
 	BaseRequest,
@@ -47,6 +48,7 @@ interface ApplicationStore {
 	appAuthorization: AppPermissions;
 	isDeleteModalOpen: boolean;
 	isLeaveModalOpen: boolean;
+	role: AppRoles;
 	selectApplication: (application: Application) => void;
 	changeAppName: (req: ChangeAppNameRequest) => Promise<Application>;
 	setAppAvatar: (req: SetAppAvatarRequest) => Promise<Application>;
@@ -110,6 +112,7 @@ const useApplicationStore = create<ApplicationStore>()(
 					isDeleteModalOpen: false,
 					isLeaveModalOpen: false,
 					toDeleteApp: null,
+					role: '' as AppRoles,
 					openDeleteModal: (application: Application) => {
 						set({
 							isDeleteModalOpen: true,
@@ -135,7 +138,10 @@ const useApplicationStore = create<ApplicationStore>()(
 						});
 					},
 					selectApplication: (application: Application) => {
-						set({ application });
+						const user = useAuthStore.getState()?.user;
+						const role = application?.team.find((t) => t.userId._id === user?._id)
+							?.role as AppRoles;
+						set({ application, role });
 					},
 					changeAppName: async (req: ChangeAppNameRequest) => {
 						try {
