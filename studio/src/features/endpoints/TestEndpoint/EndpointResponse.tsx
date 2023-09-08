@@ -14,9 +14,9 @@ export default function EndpointResponse() {
 	const response = endpointResponse[endpoint?._id as string];
 
 	return (
-		<Tabs defaultValue='body' className='h-[90%] box'>
+		<Tabs defaultValue='body' className='h-[90%]'>
 			<div className='flex items-center justify-between'>
-				<TabsList defaultValue='body' align='center' className='flex-1'>
+				<TabsList defaultValue='body' align='center' className='flex-1' containerClassName='!pt-0'>
 					{ENDPOINT_RESPONSE_TABS.map((tab) => (
 						<TabsTrigger key={tab.id} id={tab.id} value={tab.id} className='flex-1'>
 							{tab.name}
@@ -35,7 +35,7 @@ export default function EndpointResponse() {
 							{response?.status}
 						</span>
 					</div>
-					{response?.duration && response?.duration > 0 && (
+					{response?.duration && (
 						<div className='text-sm text-default'>
 							{t('endpoint.duration')}
 							<span
@@ -44,7 +44,7 @@ export default function EndpointResponse() {
 									response?.statusText === 'OK' ? 'text-green-500' : 'text-red-500',
 								)}
 							>
-								{response?.duration.toFixed(2)} ms
+								{response?.duration}
 							</span>
 						</div>
 					)}
@@ -77,10 +77,8 @@ export default function EndpointResponse() {
 					))}
 				</TestEndpointTable>
 			</TabsContent>
-			<TabsContent value='console'>
-				<div className='flex flex-col gap-6'>
-					<Logs logs={response?.logs as string[]} />
-				</div>
+			<TabsContent value='console' className='scroll'>
+				<Logs logs={response?.logs as string[]} />
 			</TabsContent>
 		</Tabs>
 	);
