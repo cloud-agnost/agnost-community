@@ -1,15 +1,12 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
-import {
-	Drawer,
-	DrawerContent,
-	DrawerFooter,
-	DrawerHeader,
-	DrawerTitle,
-} from '@/components/Drawer';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { Input } from '@/components/Input';
+import { Separator } from '@/components/Separator';
 import { HTTP_METHOD_BADGE_MAP, TEST_ENDPOINTS_MENU_ITEMS } from '@/constants';
+import { useUpdateEffect } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import { TestMethods } from '@/types';
@@ -22,7 +19,7 @@ import {
 	objToArray,
 } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -33,10 +30,6 @@ import EndpointHeaders from './TestEndpoint/EndpointHeaders';
 import EndpointParams from './TestEndpoint/EndpointParams';
 import EndpointPathVariables from './TestEndpoint/EndpointPathVariables';
 import EndpointResponse from './TestEndpoint/EndpointResponse';
-import { useRef } from 'react';
-import { useUpdateEffect } from '@/hooks';
-import { Separator } from '@/components/Separator';
-import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;

@@ -1,13 +1,11 @@
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionLayout } from '@/layouts/VersionLayout';
-import useEnvironmentStore from '@/store/environment/environmentStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { cn } from '@/utils';
 import { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 export default function Version() {
 	const { pathname } = useLocation();
-	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { getVersionById, version } = useVersionStore();
 	const paths = pathname.split('/').filter((item) => /^[a-zA-Z-_]+$/.test(item));
 	const navigate = useNavigate();

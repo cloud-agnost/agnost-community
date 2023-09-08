@@ -15,7 +15,7 @@ function App() {
 
 	const { getAllTypes, isTypesOk } = useTypeStore();
 	const { user } = useAuthStore();
-	const { theme, setTheme } = useThemeStore();
+	const { theme } = useThemeStore();
 
 	useEffect(() => {
 		if (!isTypesOk && user) {
