@@ -253,6 +253,14 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 				<DrawerHeader className='border-none'>
 					<DrawerTitle>{t('endpoint.test.title')}</DrawerTitle>
 				</DrawerHeader>
+				<div className='px-5'>
+					{environment?.serverStatus === 'Deploying' && (
+						<Alert variant='warning'>
+							<AlertTitle>{t('endpoint.test.deploy.warning')}</AlertTitle>
+							<AlertDescription>{t('endpoint.test.deploy.description')}</AlertDescription>
+						</Alert>
+					)}
+				</div>
 				<div className='flex items-center flex-1 px-5 my-6'>
 					<div className='border border-input-disabled-border rounded-l w-16 h-9'>
 						<Badge
@@ -287,13 +295,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					})}
 				</nav>
 
-				<div className='p-6 h-[85%] space-y-6'>
-					{environment?.serverStatus === 'Deploying' && (
-						<Alert variant='warning'>
-							<AlertTitle>{t('endpoint.test.deploy.warning')}</AlertTitle>
-							<AlertDescription>{t('endpoint.test.deploy.description')}</AlertDescription>
-						</Alert>
-					)}
+				<div className='p-6 h-3/4 space-y-6'>
 					<Form {...form}>
 						<form className='space-y-6'>
 							{searchParams.get('t') === 'params' && <EndpointParams />}
@@ -308,10 +310,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 						className='cursor-row-resize h-1 flex items-center justify-center'
 						ref={resizerRef}
 					/>
-
-					<DrawerFooter className='block h-3/4'>
-						<EndpointResponse />
-					</DrawerFooter>
+					<EndpointResponse />
 				</div>
 			</DrawerContent>
 		</Drawer>
