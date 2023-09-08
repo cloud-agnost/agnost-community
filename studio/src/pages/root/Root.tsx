@@ -5,6 +5,7 @@ import { CreateCopyVersionDrawer } from '@/features/version/CreateCopyVersionDra
 import { EditMiddlewareDrawer } from '@/features/version/Middlewares';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
 import { history } from '@/utils';
 import { useEffect } from 'react';
@@ -25,10 +26,11 @@ export default function Root() {
 	history.location = useLocation();
 	const { pathname } = useLocation();
 	const navigate = useNavigate();
-	const { orgId } = useParams();
+	const { orgId, versionId, appId } = useParams();
 	const { checkClusterSmtpStatus, checkClusterSetup } = useClusterStore();
 	const { getOrganizationMembers } = useOrganizationStore();
 	const { getUser, isAuthenticated } = useAuthStore();
+	const { getAppVersionEnvironment } = useEnvironmentStore();
 
 	useEffect(() => {
 		if (orgId) {
@@ -39,10 +41,15 @@ export default function Root() {
 	}, [orgId]);
 
 	useEffect(() => {
+		if (versionId) {
+			getAppVersionEnvironment({ appId: appId as string, orgId: orgId as string, versionId });
+		}
+	}, [versionId]);
+
+	useEffect(() => {
 		checkClusterSmtpStatus();
 		checkClusterSetup({
 			onSuccess: (isCompleted) => {
-				console.log('isCompleted', isCompleted);
 				if (!isCompleted) {
 					navigate('/onboarding');
 				}
