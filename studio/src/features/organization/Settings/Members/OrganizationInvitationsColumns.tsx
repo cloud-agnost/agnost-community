@@ -1,6 +1,7 @@
 import { Checkbox } from '@/components/Checkbox';
 import { ResendButton } from '@/components/ResendButton';
 import { TableConfirmation } from '@/components/Table';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Invitation } from '@/types';
 import { formatDate, notify, translate } from '@/utils';
@@ -70,6 +71,25 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 		size: 45,
 		cell: ({ row }) => {
 			const { token } = row.original;
+			function onDelete() {
+				useOrganizationStore.getState().deleteInvitation({
+					token,
+					onSuccess: () => {
+						notify({
+							title: 'Invitation deleted',
+							description: 'Invitation has been deleted.',
+							type: 'success',
+						});
+					},
+					onError: ({ error, details }) => {
+						notify({
+							title: error,
+							description: details,
+							type: 'error',
+						});
+					},
+				});
+			}
 			return (
 				<div className='flex items-center justify-end'>
 					<ResendButton
@@ -93,32 +113,20 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 							});
 						}}
 					/>
-					<TableConfirmation
-						title={translate('organization.settings.members.invite.delete')}
-						description={translate('organization.settings.members.invite.deleteDesc')}
-						authorizedKey='invite.delete'
-						onConfirm={() => {
-							useOrganizationStore.getState().deleteInvitation({
-								token,
-								onSuccess: () => {
-									notify({
-										title: 'Invitation deleted',
-										description: 'Invitation has been deleted.',
-										type: 'success',
-									});
-								},
-								onError: ({ error, details }) => {
-									notify({
-										title: error,
-										description: details,
-										type: 'error',
-									});
-								},
-							});
-						}}
-					/>
+					<ConfirmTable onDelete={onDelete} />
 				</div>
 			);
 		},
 	},
 ];
+function ConfirmTable({ onDelete }: { onDelete: () => void }) {
+	const hasAppPermission = useAuthorizeOrg('invite.delete');
+	return (
+		<TableConfirmation
+			title={translate('organization.settings.members.invite.delete')}
+			description={translate('organization.settings.members.invite.deleteDesc')}
+			onConfirm={onDelete}
+			disabled={!hasAppPermission}
+		/>
+	);
+}

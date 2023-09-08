@@ -31,17 +31,6 @@ export default function Version() {
 		}
 	}, [appId, orgId, versionId]);
 
-	useEffect(() => {
-		if (environment?._id) {
-			getEnvironmentResources({
-				orgId: orgId as string,
-				appId: appId as string,
-				versionId: versionId as string,
-				envId: environment._id,
-			});
-		}
-	}, [environment?._id]);
-
 	return (
 		<VersionLayout className={cn(paths.at(-1))}>
 			<Outlet />

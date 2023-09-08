@@ -1,6 +1,4 @@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
-import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { cn } from '@/utils';
 import { Trash, X } from '@phosphor-icons/react';
 import { Align } from '@radix-ui/react-popper';
@@ -8,21 +6,21 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback } from '../Avatar';
 import { Button } from '../Button';
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '../Tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
 interface TableConfirmationProps {
 	onConfirm: () => void;
+	disabled?: boolean;
 	title: string;
 	showAvatar?: boolean;
 	description: string;
 	align?: Align;
 	contentClassName?: string;
 	closeOnConfirm?: boolean;
-	authorizedKey?: string;
 }
 
 export function TableConfirmation({
 	onConfirm,
-	authorizedKey,
+	disabled,
 	showAvatar = true,
 	title,
 	description,
@@ -37,9 +35,6 @@ export function TableConfirmation({
 		if (closeOnConfirm) setOpen(false);
 	}
 
-	const hasVersionPermission = useAuthorizeVersion(authorizedKey as string);
-	const hasOrgPermission = useAuthorizeOrg(authorizedKey as string);
-	//Todo? const appDisabled = useAuthorizeApp(authorizedKey as string);
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<TooltipProvider>
@@ -49,10 +44,7 @@ export function TableConfirmation({
 							<Button
 								variant='blank'
 								rounded
-								disabled={
-									!hasVersionPermission ||
-									(typeof hasOrgPermission !== 'undefined' && !hasOrgPermission)
-								}
+								disabled={disabled}
 								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
 								iconOnly
 							>

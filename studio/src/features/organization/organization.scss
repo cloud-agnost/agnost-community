@@ -67,7 +67,7 @@
 }
 .members {
 	&-filter {
-		@apply font-sfCompact font-normal;
+		@apply font-sfCompact font-normal flex justify-between items-center;
 		&-icon {
 			@apply text-icon-base mr-2;
 		}

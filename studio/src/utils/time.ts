@@ -54,3 +54,14 @@ export function calculateRecommendedBuckets(start: Date, end: Date): number {
 
 	return 24;
 }
+export function formatTime(timeInMilliseconds: number) {
+	if (timeInMilliseconds === 0) return undefined;
+	if (timeInMilliseconds < 1000) {
+		// If the time is less than 1 second, format it in milliseconds
+		return `${timeInMilliseconds.toFixed()} ms`;
+	} else {
+		// If the time is 1 second or more, format it in seconds with one decimal place
+		const seconds = (timeInMilliseconds / 1000).toFixed(1);
+		return `${seconds} s`;
+	}
+}

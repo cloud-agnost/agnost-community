@@ -1,4 +1,6 @@
 import { ActionsCell } from '@/components/ActionsCell';
+import useAuthorizeApp from '@/hooks/useAuthorizeApp';
+import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIKey, APIKeyTypes, ColumnDefWithClassName } from '@/types';
@@ -128,8 +130,8 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 			}
 			return (
 				<div className='flex items-center gap-2 overflow-auto max-w-[400px] no-scrollbar'>
-					{authorizedDomains.map((domain, index) => (
-						<Badge key={index} text={domain} variant='orange' />
+					{authorizedDomains.map((domain) => (
+						<Badge key={domain} text={domain} variant='orange' />
 					))}
 				</div>
 			);
@@ -155,8 +157,8 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 			}
 			return (
 				<div className='flex items-center gap-2 overflow-auto max-w-[400px] no-scrollbar'>
-					{authorizedIPs.map((ip, index) => (
-						<Badge key={index} text={ip} variant='blue' />
+					{authorizedIPs.map((ip) => (
+						<Badge key={ip} text={ip} variant='blue' />
 					))}
 				</div>
 			);
@@ -260,24 +262,32 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 						original={original}
 						type='version'
 					>
-						<TableConfirmation
-							align='end'
-							closeOnConfirm
-							showAvatar={false}
-							title={translate('version.api_key.delete_modal_title')}
-							description={translate('version.api_key.delete_modal_desc')}
-							onConfirm={clickHandler}
-							contentClassName='m-0'
-							authorizedKey='key.delete'
-						/>
+						<ConfirmTable onDelete={clickHandler} />
 					</ActionsCell>
 				</div>
 			);
 		},
 	},
 ];
-
-export default SettingsAPIKeysColumns;
+function ConfirmTable({ onDelete }: { onDelete: () => void }) {
+	const role = useApplicationStore.getState().role;
+	const hasAppPermission = useAuthorizeApp({
+		key: 'key.delete',
+		role,
+	});
+	return (
+		<TableConfirmation
+			align='end'
+			closeOnConfirm
+			showAvatar={false}
+			title={translate('version.api_key.delete_modal_title')}
+			description={translate('version.api_key.delete_modal_desc')}
+			onConfirm={onDelete}
+			contentClassName='m-0'
+			disabled={!hasAppPermission}
+		/>
+	);
+}
 
 const mapping: Record<APIKeyTypes, BadgeColors> = {
 	'full-access': 'green',
@@ -285,3 +295,5 @@ const mapping: Record<APIKeyTypes, BadgeColors> = {
 	'custom-allowed': 'blue',
 	'custom-excluded': 'purple',
 };
+
+export default SettingsAPIKeysColumns;

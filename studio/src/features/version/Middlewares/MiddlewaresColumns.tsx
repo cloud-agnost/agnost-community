@@ -1,13 +1,15 @@
+import { TabLink } from '@/features/version/Tabs';
+import useAuthorizeApp from '@/hooks/useAuthorizeApp';
+import useApplicationStore from '@/store/app/applicationStore';
+import useAuthStore from '@/store/auth/authStore.ts';
+import useMiddlewareStore from '@/store/middleware/middlewareStore';
 import { ColumnDefWithClassName, Middleware } from '@/types';
+import { translate } from '@/utils';
+import { ActionsCell } from 'components/ActionsCell';
+import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
-import { translate } from '@/utils';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { DateText } from 'components/DateText';
-import { ActionsCell } from 'components/ActionsCell';
-import { TabLink } from '@/features/version/Tabs';
-import useMiddlewareStore from '@/store/middleware/middlewareStore';
 import { TableConfirmation } from 'components/Table';
 
 const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
@@ -115,20 +117,31 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 					onEdit={handleEdit}
 					type='version'
 				>
-					<TableConfirmation
-						align='end'
-						closeOnConfirm
-						showAvatar={false}
-						title={translate('version.middleware.delete.title')}
-						description={translate('version.middleware.delete.message')}
-						onConfirm={deleteHandler}
-						contentClassName='m-0'
-						authorizedKey='middleware.delete'
-					/>
+					<ConfirmTable onDelete={deleteHandler} />
 				</ActionsCell>
 			);
 		},
 	},
 ];
+
+function ConfirmTable({ onDelete }: { onDelete: () => void }) {
+	const role = useApplicationStore.getState().role;
+	const hasAppPermission = useAuthorizeApp({
+		key: 'middleware.delete',
+		role,
+	});
+	return (
+		<TableConfirmation
+			align='end'
+			closeOnConfirm
+			showAvatar={false}
+			title={translate('version.middleware.delete.title')}
+			description={translate('version.middleware.delete.message')}
+			onConfirm={onDelete}
+			contentClassName='m-0'
+			disabled={!hasAppPermission}
+		/>
+	);
+}
 
 export default MiddlewaresColumns;

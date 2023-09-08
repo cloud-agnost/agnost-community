@@ -209,7 +209,7 @@ export interface TestEndpointParams extends BaseRequest {
 
 interface TestResponse extends AxiosResponse {
 	epId: string;
-	duration: number;
+	duration?: string;
 	response?: AxiosError['response'];
 	logs?: string[];
 }

@@ -66,7 +66,7 @@ export default function EditMessageQueue() {
 			onTestModalOpen={() => setIsTestQueueOpen(true)}
 			onSaveLogic={(value) => saveLogic(value as string)}
 			loading={loading}
-			logic={queue?.logic}
+			logic={queueLogic}
 			setLogic={setQueueLogic}
 			breadCrumbItems={[
 				{
