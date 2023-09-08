@@ -9,6 +9,8 @@ import { notify, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
+const role = useApplicationStore.getState()?.role;
+
 function updateInvitationUserRole(token: string, role: string) {
 	useApplicationStore.getState?.().updateInvitationUserRole({
 		token,
@@ -109,7 +111,7 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { token, role } = row.original;
-			return <UpdateInvitationUserRole token={token} role={role} />;
+			return <UpdateInvitationUserRole token={token} invitationRole={role as AppRoles} />;
 		},
 	},
 	{
@@ -119,31 +121,53 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 			const { token, email } = row.original;
 			return (
 				<div className='flex items-center justify-end'>
-					<ResendButton
-						onResend={() => resendInvitation(token, email)}
-						permissionKey='invite.resend'
-					/>
-					<TableConfirmation
-						title={translate('organization.settings.members.invite.delete')}
-						description={translate('organization.settings.members.invite.deleteDesc')}
-						onConfirm={() => deleteInvitation(token)}
-						authorizedKey='invite.delete'
-					/>
+					<Resend token={token} email={email} />
+					<TableConfirm token={token} />
 				</div>
 			);
 		},
 	},
 ];
 
-function UpdateInvitationUserRole({ token, role }: { token: string; role: string }) {
-	const appRole = useApplicationStore((state) => state.application?.role);
-	const canUpdate = useAuthorizeApp({ role: appRole as AppRoles, key: 'invite.update' });
+function UpdateInvitationUserRole({
+	token,
+	invitationRole,
+}: {
+	token: string;
+	invitationRole: AppRoles;
+}) {
+	const canUpdate = useAuthorizeApp({ role, key: 'invite.update' });
 	return (
 		<RoleSelect
-			role={role}
+			role={invitationRole}
 			type={'app'}
 			onSelect={(newRole) => updateInvitationUserRole(token, newRole)}
 			disabled={!canUpdate}
+		/>
+	);
+}
+
+function Resend({ token, email }: { token: string; email: string }) {
+	const hasAppPermission = useAuthorizeApp({
+		key: 'invite.resend',
+		role,
+	});
+	return (
+		<ResendButton disabled={!hasAppPermission} onResend={() => resendInvitation(token, email)} />
+	);
+}
+
+function TableConfirm({ token }: { token: string }) {
+	const hasAppPermission = useAuthorizeApp({
+		key: 'invite.delete',
+		role,
+	});
+	return (
+		<TableConfirmation
+			title={translate('organization.settings.members.invite.delete')}
+			description={translate('organization.settings.members.invite.deleteDesc')}
+			onConfirm={() => deleteInvitation(token)}
+			disabled={!hasAppPermission}
 		/>
 	);
 }

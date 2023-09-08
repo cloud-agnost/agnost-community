@@ -78,14 +78,14 @@ export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 	{
 		id: 'actions',
 		size: 25,
-		cell: () => <DeleteCell />,
+		cell: ({ row: { original } }) => <DeleteCell isOwner={original.member.isOrgOwner} />,
 	},
 ];
 
-function DeleteCell() {
+function DeleteCell({ isOwner }: { isOwner: boolean }) {
 	const canDelete = useAuthorizeOrg('member.delete');
 	return (
-		<Button variant='blank' iconOnly disabled={!canDelete}>
+		<Button variant='blank' iconOnly disabled={!canDelete || isOwner}>
 			<Trash size={24} className='text-icon-base' />
 		</Button>
 	);
