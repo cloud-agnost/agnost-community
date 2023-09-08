@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import useThemeStore from './store/theme/themeStore';
 
 function App() {
 	useRenewToken(2);
@@ -14,12 +15,22 @@ function App() {
 
 	const { getAllTypes, isTypesOk } = useTypeStore();
 	const { user } = useAuthStore();
+	const { theme, setTheme } = useThemeStore();
 
 	useEffect(() => {
 		if (!isTypesOk && user) {
 			getAllTypes();
 		}
 	}, [isTypesOk, user]);
+
+	useEffect(() => {
+		let systemTheme = theme;
+		if (theme === 'system') {
+			systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+		}
+		document.body.classList.remove('dark', 'light');
+		document.body.classList.add(systemTheme);
+	}, [theme]);
 
 	return (
 		<>
