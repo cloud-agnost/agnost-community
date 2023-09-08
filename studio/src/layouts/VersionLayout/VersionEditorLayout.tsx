@@ -1,15 +1,14 @@
+import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { Pencil } from '@/components/icons';
-import { FloppyDisk, TestTube } from '@phosphor-icons/react';
-import { useTranslation } from 'react-i18next';
-import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
-import { useLocation } from 'react-router-dom';
 import { cn } from '@/utils';
+import { FloppyDisk, TestTube } from '@phosphor-icons/react';
 import * as prettier from 'prettier';
 import jsParser from 'prettier/plugins/babel';
 import esTreePlugin from 'prettier/plugins/estree';
-import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 interface VersionEditorLayoutProps {
 	children: React.ReactNode;
 	className?: string;
