@@ -1,4 +1,6 @@
 import { ActionsCell } from '@/components/ActionsCell';
+import useAuthorizeApp from '@/hooks/useAuthorizeApp';
+import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, Param } from '@/types';
@@ -135,20 +137,31 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 					onEdit={editHandler}
 					type='version'
 				>
-					<TableConfirmation
-						align='end'
-						closeOnConfirm
-						showAvatar={false}
-						title={translate('version.variable.delete_modal_title')}
-						description={translate('version.variable.delete_modal_desc')}
-						onConfirm={clickHandler}
-						contentClassName='m-0'
-						authorizedKey='version.key.delete'
-					/>
+					<ConfirmTable onDelete={clickHandler} />
 				</ActionsCell>
 			);
 		},
 	},
 ];
+
+function ConfirmTable({ onDelete }: { onDelete: () => void }) {
+	const role = useApplicationStore.getState().role;
+	const hasAppPermission = useAuthorizeApp({
+		key: 'version.key.delete',
+		role,
+	});
+	return (
+		<TableConfirmation
+			align='end'
+			closeOnConfirm
+			showAvatar={false}
+			title={translate('version.variable.delete_modal_title')}
+			description={translate('version.variable.delete_modal_desc')}
+			onConfirm={onDelete}
+			contentClassName='m-0'
+			disabled={!hasAppPermission}
+		/>
+	);
+}
 
 export default VariableColumns;

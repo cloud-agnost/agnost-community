@@ -1,3 +1,5 @@
+import useAuthorizeApp from '@/hooks/useAuthorizeApp';
+import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, NPMPackage } from '@/types';
@@ -85,20 +87,31 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 
 			return (
 				<div className='flex items-center'>
-					<TableConfirmation
-						align='end'
-						closeOnConfirm
-						showAvatar={false}
-						title={translate('version.npm.delete_modal_title')}
-						description={translate('version.npm.delete_modal_desc')}
-						onConfirm={clickHandler}
-						contentClassName='m-0'
-						authorizedKey='version.package.delete'
-					/>
+					<ConfirmTable onDelete={clickHandler} />
 				</div>
 			);
 		},
 	},
 ];
+
+function ConfirmTable({ onDelete }: { onDelete: () => void }) {
+	const role = useApplicationStore.getState().role;
+	const hasAppPermission = useAuthorizeApp({
+		key: 'version.package.delete',
+		role,
+	});
+	return (
+		<TableConfirmation
+			align='end'
+			closeOnConfirm
+			showAvatar={false}
+			title={translate('version.npm.delete_modal_title')}
+			description={translate('version.npm.delete_modal_desc')}
+			onConfirm={onDelete}
+			contentClassName='m-0'
+			disabled={!hasAppPermission}
+		/>
+	);
+}
 
 export default NPMPackagesColumns;
