@@ -6,11 +6,15 @@ import { useTranslation } from 'react-i18next';
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { useLocation } from 'react-router-dom';
 import { cn } from '@/utils';
+import * as prettier from 'prettier';
+import jsParser from 'prettier/plugins/babel';
+import esTreePlugin from 'prettier/plugins/estree';
+import { useEffect } from 'react';
 interface VersionEditorLayoutProps {
 	children: React.ReactNode;
 	className?: string;
 	loading: boolean;
-	logic: string | undefined;
+	logic?: string;
 	breadCrumbItems?: BreadCrumbItem[];
 	onSaveLogic: (logic?: string) => void;
 	onTestModalOpen?: () => void;
@@ -31,6 +35,16 @@ export default function VersionEditorLayout({
 }: VersionEditorLayoutProps) {
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
+
+	async function handleSaveLogic() {
+		const formatted = await prettier.format(logic as string, {
+			parser: 'babel',
+			plugins: [jsParser, esTreePlugin],
+		});
+		setLogic(formatted);
+		onSaveLogic(formatted);
+	}
+
 	return (
 		<div className={cn('p-4 space-y-6 h-full', className)}>
 			{breadCrumbItems && (
@@ -51,7 +65,7 @@ export default function VersionEditorLayout({
 						<TestTube size={20} className='text-icon-base mr-2' />
 						{t('endpoint.test.test')}
 					</Button>
-					<Button variant='primary' onClick={() => onSaveLogic()} loading={loading}>
+					<Button variant='primary' onClick={() => handleSaveLogic()} loading={loading}>
 						<FloppyDisk size={20} className='text-icon-secondary mr-2' />
 						{t('general.save')}
 					</Button>
