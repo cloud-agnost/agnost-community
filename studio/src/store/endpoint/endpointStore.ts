@@ -14,6 +14,7 @@ import {
 	TestEndpointParams,
 	UpdateEndpointParams,
 } from '@/types';
+import { formatTime } from '@/utils';
 import { AxiosResponse } from 'axios';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -156,9 +157,21 @@ const useEndpointStore = create<EndpointStore>()(
 				},
 				testEndpoint: async (params) => {
 					const startTime = performance.now();
-					const response = await EndpointService.testEndpoint(params);
 					const prevRequest = get().endpointRequest;
 					const prevResponse = get().endpointResponse;
+					if (prevResponse[params.epId]) {
+						set((prev) => ({
+							endpointResponse: {
+								...prev.endpointResponse,
+								[params.epId]: {
+									...prev.endpointResponse[params.epId],
+									logs: [],
+								},
+							},
+						}));
+					}
+					const response = await EndpointService.testEndpoint(params);
+
 					if (prevRequest[params.epId]) {
 						set({
 							endpointRequest: {
@@ -185,13 +198,12 @@ const useEndpointStore = create<EndpointStore>()(
 								[params.epId]: {
 									...prev.endpointResponse[params.epId],
 									epId: params.epId,
-									duration: endTime - startTime,
+									duration: formatTime(endTime - startTime),
 									status: response?.response?.status ?? response?.status,
 									statusText: response?.response?.statusText ?? response?.statusText,
 									data: response?.response?.data ?? response?.data,
 									headers: response?.response?.headers ?? response?.headers,
 									config: response?.response?.config ?? response?.config,
-									logs: [],
 								},
 							},
 						}));
@@ -202,13 +214,12 @@ const useEndpointStore = create<EndpointStore>()(
 								[params.epId]: {
 									...response,
 									epId: params.epId,
-									duration: endTime - startTime,
+									duration: formatTime(endTime - startTime),
 									status: response?.response?.status ?? response?.status,
 									statusText: response?.response?.statusText ?? response?.statusText,
 									data: response?.response?.data ?? response?.data,
 									headers: response?.response?.headers ?? response?.headers,
 									config: response?.response?.config ?? response?.config,
-									logs: [],
 								},
 							},
 						}));
@@ -221,6 +232,7 @@ const useEndpointStore = create<EndpointStore>()(
 				closeEndpointDeleteDialog: () =>
 					set({ toDeleteEndpoint: null, isEndpointDeleteDialogOpen: false }),
 				setEndpointLog(epId, log) {
+					console.log('setEndpointLog', epId, log);
 					set((prev) => ({
 						endpointResponse: {
 							...prev.endpointResponse,
