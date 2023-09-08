@@ -1,5 +1,8 @@
 import { ActionsCell } from '@/components/ActionsCell';
+import { FIELD_ICON_MAP } from '@/constants';
 import { SubFields } from '@/features/database/models/fields/ListFields/index.ts';
+import useAuthorizeApp from '@/hooks/useAuthorizeApp';
+import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
 import { ColumnDefWithClassName, Field } from '@/types';
@@ -10,7 +13,6 @@ import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
-import { FIELD_ICON_MAP } from '@/constants';
 const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'select',
@@ -46,9 +48,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.field').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.field')} column={column} />,
 		cell({ row: { original } }) {
 			if (['object-list', 'object'].includes(original.type)) {
 				return <SubFields field={original} name={original.name} />;
@@ -62,9 +62,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'type',
-		header: ({ column }) => (
-			<SortButton text={translate('general.type').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.type')} column={column} />,
 		accessorKey: 'type',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -89,9 +87,8 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'unique',
-		header: ({ column }) => (
-			<SortButton text={translate('general.unique').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.unique')} column={column} />,
+
 		accessorKey: 'unique',
 		enableSorting: true,
 		cell: ({
@@ -110,9 +107,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'indexed',
-		header: ({ column }) => (
-			<SortButton text={translate('general.indexed').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.indexed')} column={column} />,
 		accessorKey: 'indexed',
 		enableSorting: true,
 		cell: ({
@@ -131,9 +126,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'required',
-		header: ({ column }) => (
-			<SortButton text={translate('general.required').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.required')} column={column} />,
 		accessorKey: 'required',
 		enableSorting: true,
 		cell: ({
@@ -153,9 +146,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'immutable',
 		className: 'whitespace-nowrap',
-		header: ({ column }) => (
-			<SortButton text={translate('general.read-only').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.read-only')} column={column} />,
 		accessorKey: 'immutable',
 		enableSorting: true,
 		cell: ({
@@ -173,16 +164,16 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		},
 	},
 	{
-		id: 'created_at',
-		enableSorting: true,
+		id: 'createdAt',
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.created_at').toUpperCase()}
+				text={translate('general.created_at')}
 				column={column}
 			/>
 		),
-		accessorKey: 'created_at',
+		accessorKey: 'createdAt',
+		enableSorting: true,
 		sortingFn: 'datetime',
 		size: 200,
 		cell: ({
@@ -200,7 +191,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.updated_at').toUpperCase()}
+				text={translate('general.updated_at')}
 				column={column}
 			/>
 		),
@@ -257,20 +248,31 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 					onEdit={openEditDrawer}
 					type='version'
 				>
-					<TableConfirmation
-						align='end'
-						closeOnConfirm
-						showAvatar={false}
-						title={translate('database.fields.delete.title')}
-						description={translate('database.fields.delete.description')}
-						onConfirm={deleteHandler}
-						contentClassName='m-0'
-						authorizedKey='model.delete'
-					/>
+					<ConfirmTable onDelete={deleteHandler} />
 				</ActionsCell>
 			);
 		},
 	},
 ];
+
+function ConfirmTable({ onDelete }: { onDelete: () => void }) {
+	const role = useApplicationStore.getState().role;
+	const hasAppPermission = useAuthorizeApp({
+		key: 'model.delete',
+		role,
+	});
+	return (
+		<TableConfirmation
+			align='end'
+			closeOnConfirm
+			showAvatar={false}
+			title={translate('database.fields.delete.title')}
+			description={translate('database.fields.delete.description')}
+			onConfirm={onDelete}
+			contentClassName='m-0'
+			disabled={!hasAppPermission}
+		/>
+	);
+}
 
 export default FieldColumns;

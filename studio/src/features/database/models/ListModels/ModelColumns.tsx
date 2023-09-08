@@ -1,5 +1,7 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { TabLink } from '@/features/version/Tabs';
+import useAuthorizeApp from '@/hooks/useAuthorizeApp';
+import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
 import { ColumnDefWithClassName, Model } from '@/types';
@@ -12,7 +14,6 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'components/Tooltip';
-
 const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	{
 		id: 'select',
@@ -36,9 +37,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -51,15 +50,15 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 		},
 	},
 	{
-		id: 'created_at',
+		id: 'createdAt',
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.created_at').toUpperCase()}
+				text={translate('general.created_at')}
 				column={column}
 			/>
 		),
-		accessorKey: 'created_at',
+		accessorKey: 'createdAt',
 		enableSorting: true,
 		sortingFn: 'datetime',
 		size: 200,
@@ -78,7 +77,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.updated_at').toUpperCase()}
+				text={translate('general.updated_at')}
 				column={column}
 			/>
 		),
@@ -142,21 +141,32 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 						canEditKey='model.update'
 						type='version'
 					>
-						<TableConfirmation
-							align='end'
-							closeOnConfirm
-							showAvatar={false}
-							title={translate('database.models.delete.title')}
-							description={translate('database.models.delete.description')}
-							onConfirm={deleteHandler}
-							contentClassName='m-0'
-							authorizedKey='model.delete'
-						/>
+						<ConfirmTable onDelete={deleteHandler} />
 					</ActionsCell>
 				</div>
 			);
 		},
 	},
 ];
+
+function ConfirmTable({ onDelete }: { onDelete: () => void }) {
+	const role = useApplicationStore.getState().role;
+	const hasAppPermission = useAuthorizeApp({
+		key: 'model.delete',
+		role,
+	});
+	return (
+		<TableConfirmation
+			align='end'
+			closeOnConfirm
+			showAvatar={false}
+			title={translate('database.models.delete.title')}
+			description={translate('database.models.delete.description')}
+			onConfirm={onDelete}
+			contentClassName='m-0'
+			disabled={!hasAppPermission}
+		/>
+	);
+}
 
 export default ModelColumns;
