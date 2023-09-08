@@ -72,7 +72,7 @@ export default function EditEndpoint() {
 			onTestModalOpen={() => setIsTestEndpointOpen(true)}
 			onSaveLogic={(value) => saveLogic(value as string)}
 			loading={loading}
-			logic={endpoint?.logic}
+			logic={endpointLogic}
 			setLogic={setEndpointLogic}
 			breadCrumbItems={[
 				{
