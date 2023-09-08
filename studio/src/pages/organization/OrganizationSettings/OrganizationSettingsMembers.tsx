@@ -17,6 +17,7 @@ import { APIError, OrgMemberRequest } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/Tabs';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import '../organization.scss';
 export default function OrganizationSettingsMembers() {
 	const { t } = useTranslation();
 	const { canClusterSendEmail } = useClusterStore();
