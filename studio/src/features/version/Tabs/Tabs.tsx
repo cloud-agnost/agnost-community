@@ -68,7 +68,7 @@ export default function Tabs() {
 				isActive: true,
 			});
 		}
-	}, [pathname]);
+	}, []);
 
 	function getDashboardPath() {
 		const matched = matches.at(-1);
