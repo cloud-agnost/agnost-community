@@ -6,12 +6,14 @@ import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { TestEndpointSchema } from '../TestEndpoint';
 import EndpointFiles from './EndpointFiles';
+import { cn } from '@/utils';
 export default function EndpointBody() {
 	const { control, watch } = useFormContext<z.infer<typeof TestEndpointSchema>>();
 	const { t } = useTranslation();
+	const bodyType = watch('bodyType');
 
 	return (
-		<div className='h-full space-y-4'>
+		<div className={cn('space-y-4', bodyType === 'json' && 'h-full')}>
 			<FormField
 				control={control}
 				name='bodyType'
@@ -39,16 +41,17 @@ export default function EndpointBody() {
 					</FormItem>
 				)}
 			/>
-			{watch('bodyType') === 'json' && (
-				<div className='mt-6 h-1/2'>
+			{bodyType === 'json' && (
+				<div className='mt-6 h-full'>
 					<FormField
 						control={control}
 						name='body'
 						render={({ field }) => (
 							<FormItem className='h-full'>
-								<FormControl>
+								<FormControl className='h-full'>
 									<CodeEditor
-										containerClassName='h-full'
+										className='min-h-[100px] h-full'
+										containerClassName='h-[calc(100%-6rem)]'
 										value={field.value}
 										onChange={field.onChange}
 										defaultLanguage='json'
@@ -60,7 +63,7 @@ export default function EndpointBody() {
 					/>
 				</div>
 			)}
-			{watch('bodyType') === 'form-data' && <EndpointFiles />}
+			{bodyType === 'form-data' && <EndpointFiles />}
 		</div>
 	);
 }

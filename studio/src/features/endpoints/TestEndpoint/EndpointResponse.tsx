@@ -8,15 +8,23 @@ import { cn, objToArray } from '@/utils';
 import { TabsContent } from '@radix-ui/react-tabs';
 import { useTranslation } from 'react-i18next';
 import TestEndpointTable from './TestEndpointTable';
-export default function EndpointResponse() {
+import { CSSProperties } from 'react';
+
+interface EndpointResponseProps {
+	className?: string;
+	style?: CSSProperties;
+	editorClassName?: string;
+}
+
+export default function EndpointResponse(props: EndpointResponseProps) {
 	const { t } = useTranslation();
 	const { endpointResponse, endpoint } = useEndpointStore();
 	const response = endpointResponse[endpoint?._id as string];
 
 	return (
-		<Tabs defaultValue='body' className='h-[90%]'>
-			<div className='flex items-center justify-between'>
-				<TabsList defaultValue='body' align='center' className='flex-1' containerClassName='!pt-0'>
+		<Tabs style={props.style} defaultValue='body' className={cn(props.className)}>
+			<div className='flex items-center pb-6 justify-between'>
+				<TabsList defaultValue='body' align='center' className='flex-1' containerClassName='!p-0'>
 					{ENDPOINT_RESPONSE_TABS.map((tab) => (
 						<TabsTrigger key={tab.id} id={tab.id} value={tab.id} className='flex-1'>
 							{tab.name}
@@ -51,15 +59,16 @@ export default function EndpointResponse() {
 				</div>
 			</div>
 
-			<TabsContent value='body' className='h-[85%]'>
+			<TabsContent value='body' className='h-full'>
 				<CodeEditor
-					containerClassName='h-full'
+					containerClassName='h-[calc(100%-4rem)]'
+					className={cn(props.editorClassName)}
 					value={JSON.stringify(response?.data, null, 2)}
 					defaultLanguage='json'
 					readonly
 				/>
 			</TabsContent>
-			<TabsContent value='cookies'>
+			<TabsContent value='cookies' className='overflow-y-auto h-[calc(100%-4rem)]'>
 				{/* {fields.map((f, index) => (
 						<TableRow key={f.id}>
 							<TableCell></TableCell>
@@ -67,17 +76,19 @@ export default function EndpointResponse() {
 						</TableRow>
 					))} */}
 			</TabsContent>
-			<TabsContent value='headers'>
-				<TestEndpointTable>
-					{objToArray(response?.headers).map((header) => (
-						<TableRow key={header.value}>
-							<TableCell>{header.key}</TableCell>
-							<TableCell>{header.value}</TableCell>
-						</TableRow>
-					))}
-				</TestEndpointTable>
+			<TabsContent value='headers' className='h-[calc(100%-4rem)]'>
+				<div className='h-full overflow-y-auto no-scrollbar'>
+					<TestEndpointTable containerClassName='h-auto'>
+						{objToArray(response?.headers).map((header) => (
+							<TableRow key={header.value}>
+								<TableCell>{header.key}</TableCell>
+								<TableCell>{header.value}</TableCell>
+							</TableRow>
+						))}
+					</TestEndpointTable>
+				</div>
 			</TabsContent>
-			<TabsContent value='console' className='scroll'>
+			<TabsContent value='console' className='overflow-y-auto  h-[calc(100%-4rem)]'>
 				<Logs logs={response?.logs as string[]} />
 			</TabsContent>
 		</Tabs>
