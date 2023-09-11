@@ -219,7 +219,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 							className='max-h-full no-scrollbar !overflow-y-auto'
 							minSize={20}
 						>
-							<div className='overflow-y-auto h-full no-scrollbar'>
+							<div className='overflow-y-auto h-full'>
 								<form className={cn('space-y-6', searchParams.get('t') === 'body' && 'h-full')}>
 									{searchParams.get('t') === 'params' && <EndpointParams />}
 									{searchParams.get('t') === 'variables' &&
