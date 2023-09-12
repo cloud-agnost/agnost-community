@@ -6,12 +6,14 @@ import { Form } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { Separator } from '@/components/Separator';
 import { HTTP_METHOD_BADGE_MAP, TEST_ENDPOINTS_MENU_ITEMS } from '@/constants';
-import { useUpdateEffect } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import { TestMethods } from '@/types';
+import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
+
 import {
 	arrayToObj,
+	cn,
 	generateId,
 	getEndpointPath,
 	getPathParams,
@@ -157,154 +159,87 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 		}
 	}, [searchParams.get('t'), open]);
 
-	useEffect(() => {
-		if (open && resizerRef.current) {
-			const resizer = resizerRef.current as HTMLDivElement;
-			const prevSibling = resizer.previousElementSibling as HTMLElement;
-			const nextSibling = resizer.nextElementSibling as HTMLElement;
-			// The current position of mouse
-			let y = 0;
-			let prevSiblingHeight = 0;
-
-			// Handle the mousedown event
-			// that's triggered when the user drags the resizer
-			const mouseDownHandler = function (e: MouseEvent) {
-				// Get the current mouse position
-
-				y = e.clientY;
-				const rect = prevSibling.getBoundingClientRect();
-				prevSiblingHeight = rect.height;
-
-				// Attach the listeners to document
-				document.addEventListener('mousemove', mouseMoveHandler);
-				document.addEventListener('mouseup', mouseUpHandler);
-			};
-
-			const mouseMoveHandler = function (e: MouseEvent) {
-				const dy = e.clientY - y;
-
-				const h =
-					((prevSiblingHeight + dy) * 100) /
-					(resizer.parentNode as HTMLElement).getBoundingClientRect().height;
-				prevSibling.style.height = h + '%';
-
-				const cursor = 'row-resize';
-				resizer.style.cursor = cursor;
-				document.body.style.cursor = cursor;
-
-				prevSibling.style.userSelect = 'none';
-				prevSibling.style.pointerEvents = 'none';
-
-				nextSibling.style.userSelect = 'none';
-				nextSibling.style.pointerEvents = 'none';
-			};
-
-			const mouseUpHandler = function () {
-				resizer.style.removeProperty('cursor');
-				document.body.style.removeProperty('cursor');
-
-				prevSibling.style.removeProperty('user-select');
-				prevSibling.style.removeProperty('pointer-events');
-
-				nextSibling.style.removeProperty('user-select');
-				nextSibling.style.removeProperty('pointer-events');
-
-				// Remove the handlers of mousemove and mouseup
-				document.removeEventListener('mousemove', mouseMoveHandler);
-				document.removeEventListener('mouseup', mouseUpHandler);
-			};
-
-			// Attach the handler
-			resizer.addEventListener('mousedown', mouseDownHandler);
-
-			return () => {
-				resizer.removeEventListener('mousedown', mouseDownHandler);
-				document.removeEventListener('mousemove', mouseMoveHandler);
-				document.removeEventListener('mouseup', mouseUpHandler);
-			};
-		}
-	}, [open, resizerRef.current]);
-
-	useUpdateEffect(() => {
-		if (open && resizerRef.current) {
-			const resizer = resizerRef.current as HTMLDivElement;
-			const prevSibling = resizer.previousElementSibling as HTMLElement;
-			const nextSibling = resizer.nextElementSibling as HTMLElement;
-
-			if (prevSibling) {
-				prevSibling.style.removeProperty('height');
-			}
-			if (nextSibling) {
-				nextSibling.style.removeProperty('height');
-			}
-		}
-	}, [open, searchParams.get('t'), resizerRef.current]);
-
 	return (
 		<Drawer open={open} onOpenChange={onClose}>
-			<DrawerContent position='right' size='lg' className='h-full'>
-				<DrawerHeader className='border-none'>
+			<DrawerContent
+				position='right'
+				size='lg'
+				className={cn('gap-y-6 h-full flex [&>*]:w-full flex-col')}
+			>
+				<DrawerHeader>
 					<DrawerTitle>{t('endpoint.test.title')}</DrawerTitle>
 				</DrawerHeader>
-				<div className='px-5'>
+				<div>
 					{environment?.serverStatus === 'Deploying' && (
-						<Alert variant='warning'>
-							<AlertTitle>{t('endpoint.test.deploy.warning')}</AlertTitle>
-							<AlertDescription>{t('endpoint.test.deploy.description')}</AlertDescription>
-						</Alert>
+						<div className='px-5'>
+							<Alert variant='warning'>
+								<AlertTitle>{t('endpoint.test.deploy.warning')}</AlertTitle>
+								<AlertDescription>{t('endpoint.test.deploy.description')}</AlertDescription>
+							</Alert>
+						</div>
 					)}
-				</div>
-				<div className='flex items-center flex-1 px-5 my-6'>
-					<div className='border border-input-disabled-border rounded-l w-16 h-9'>
-						<Badge
-							className='w-full h-full rounded-l rounded-r-none'
-							variant={HTTP_METHOD_BADGE_MAP[endpoint?.method as string]}
-							text={endpoint?.method as string}
-						/>
-					</div>
-					<Input className='rounded-none rounded-r' value={endpoint.path} disabled />
-					<Button
-						className='ml-3'
-						size='lg'
-						variant='primary'
-						onClick={() => form.handleSubmit(onSubmit)()}
-						loading={loading}
-						disabled={loading || environment?.serverStatus !== 'OK'}
-					>
-						{t('endpoint.test.send')}
-					</Button>
-				</div>
-				<nav className='mx-auto flex border-b'>
-					{TEST_ENDPOINTS_MENU_ITEMS.filter(
-						(t) => !t.isPath || !!getPathParams(endpoint?.path).length,
-					).map((item) => {
-						return (
-							<OrganizationMenuItem
-								key={item.name}
-								item={item}
-								active={window.location.search.includes(item.href)}
+					<div className='flex items-center px-5 my-6'>
+						<div className='border border-input-disabled-border rounded-l w-16 h-9'>
+							<Badge
+								className='w-full h-full rounded-l rounded-r-none'
+								variant={HTTP_METHOD_BADGE_MAP[endpoint?.method as string]}
+								text={endpoint?.method as string}
 							/>
-						);
-					})}
-				</nav>
-
-				<div className='p-6 h-3/4 space-y-6'>
-					<Form {...form}>
-						<form className='space-y-6'>
-							{searchParams.get('t') === 'params' && <EndpointParams />}
-							{searchParams.get('t') === 'variables' && !!getPathParams(endpoint?.path).length && (
-								<EndpointPathVariables />
-							)}
-							{searchParams.get('t') === 'headers' && <EndpointHeaders />}
-							{searchParams.get('t') === 'body' && <EndpointBody />}
-						</form>
-					</Form>
-					<Separator
-						className='cursor-row-resize h-1 flex items-center justify-center'
-						ref={resizerRef}
-					/>
-					<EndpointResponse />
+						</div>
+						<Input className='rounded-none rounded-r' value={endpoint.path} disabled />
+						<Button
+							className='ml-3'
+							size='lg'
+							variant='primary'
+							onClick={() => form.handleSubmit(onSubmit)()}
+							loading={loading}
+							disabled={loading || environment?.serverStatus !== 'OK'}
+						>
+							{t('endpoint.test.send')}
+						</Button>
+					</div>
+					<nav className='mx-auto flex border-b'>
+						{TEST_ENDPOINTS_MENU_ITEMS.filter(
+							(t) => !t.isPath || !!getPathParams(endpoint?.path).length,
+						).map((item) => {
+							return (
+								<OrganizationMenuItem
+									key={item.name}
+									item={item}
+									active={window.location.search.includes(item.href)}
+								/>
+							);
+						})}
+					</nav>
 				</div>
+				<Form {...form}>
+					<PanelGroup className={cn('p-6 pt-0')} direction='vertical'>
+						<Panel
+							defaultSize={32}
+							className='max-h-full no-scrollbar !overflow-y-auto'
+							minSize={20}
+						>
+							<div className='overflow-y-auto h-full'>
+								<form className={cn('space-y-6', searchParams.get('t') === 'body' && 'h-full')}>
+									{searchParams.get('t') === 'params' && <EndpointParams />}
+									{searchParams.get('t') === 'variables' &&
+										!!getPathParams(endpoint?.path).length && <EndpointPathVariables />}
+									{searchParams.get('t') === 'headers' && <EndpointHeaders />}
+									{searchParams.get('t') === 'body' && <EndpointBody />}
+								</form>
+							</div>
+						</Panel>
+						<PanelResizeHandle className='my-6'>
+							<Separator
+								className='cursor-row-resize h-1 flex items-center justify-center'
+								ref={resizerRef}
+							/>
+						</PanelResizeHandle>
+						<Panel minSize={30}>
+							<EndpointResponse className='h-full' editorClassName='h-full' />
+						</Panel>
+					</PanelGroup>
+				</Form>
 			</DrawerContent>
 		</Drawer>
 	);
