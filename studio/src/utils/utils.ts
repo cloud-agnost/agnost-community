@@ -6,7 +6,11 @@ import useApplicationStore from '@/store/app/applicationStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { AppRoles, OrgRoles, RealtimeData, ToastType } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
+import * as prettier from 'prettier';
+import jsParser from 'prettier/plugins/babel';
+import esTreePlugin from 'prettier/plugins/estree';
 import { twMerge } from 'tailwind-merge';
+
 type EmptyableArray = readonly [] | [];
 type EmptyableString = '' | string;
 type EmptyableObject<T extends object> = T & Record<keyof T, never>;
@@ -250,4 +254,11 @@ export function formatFileSize(bytes: number): string {
 
 export function checkNumber(number: number | undefined): number | undefined {
 	return number === 0 || number === undefined ? undefined : Number(number);
+}
+
+export async function formatCode(code: string) {
+	return await prettier.format(code, {
+		parser: 'babel',
+		plugins: [jsParser, esTreePlugin],
+	});
 }

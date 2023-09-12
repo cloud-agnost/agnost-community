@@ -2,11 +2,8 @@ import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { Pencil } from '@/components/icons';
-import { cn } from '@/utils';
+import { cn, formatCode } from '@/utils';
 import { FloppyDisk, TestTube } from '@phosphor-icons/react';
-import * as prettier from 'prettier';
-import jsParser from 'prettier/plugins/babel';
-import esTreePlugin from 'prettier/plugins/estree';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 interface VersionEditorLayoutProps {
@@ -36,10 +33,7 @@ export default function VersionEditorLayout({
 	const { pathname } = useLocation();
 
 	async function handleSaveLogic() {
-		const formatted = await prettier.format(logic as string, {
-			parser: 'babel',
-			plugins: [jsParser, esTreePlugin],
-		});
+		const formatted = await formatCode(logic as string);
 		setLogic(formatted);
 		onSaveLogic(formatted);
 	}
@@ -76,7 +70,7 @@ export default function VersionEditorLayout({
 				containerClassName='h-[88%]'
 				value={logic}
 				onChange={setLogic}
-				onSave={handleSaveLogic}
+				onSave={(logic) => onSaveLogic(logic)}
 			/>
 		</div>
 	);

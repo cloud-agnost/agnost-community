@@ -1,4 +1,4 @@
-import { cn } from '@/utils';
+import { cn, formatCode } from '@/utils';
 import MonacoEditor, { EditorProps } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
 import nightOwl from 'monaco-themes/themes/Night Owl.json';
@@ -32,6 +32,13 @@ export default function CodeEditor({
 			contextMenuGroupId: 'navigation',
 			contextMenuOrder: 1.5,
 			run: async (ed) => {
+				if (defaultLanguage === 'json') {
+					editor.trigger('', 'editor.action.formatDocument', null);
+				}
+				if (defaultLanguage === 'javascript') {
+					const formatted = await formatCode(ed.getValue());
+					ed.setValue(formatted);
+				}
 				onSave?.(ed.getValue());
 			},
 		});
