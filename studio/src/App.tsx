@@ -29,6 +29,7 @@ function App() {
 			systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 		}
 		document.body.classList.remove('dark', 'light');
+		document.body.dataset.mode = systemTheme;
 		document.body.classList.add(systemTheme);
 	}, [theme]);
 

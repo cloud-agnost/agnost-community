@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import { cn } from '@/utils';
 import { X } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
-
+import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd';
 interface TabItemProps {
 	to: string;
 	children: ReactNode;
@@ -12,6 +12,8 @@ interface TabItemProps {
 	onClose?: () => void;
 	onClick?: () => void;
 	active?: boolean;
+	provided: DraggableProvided;
+	snapshot: DraggableStateSnapshot;
 }
 
 export default function TabItem({
@@ -22,6 +24,8 @@ export default function TabItem({
 	icon,
 	closeable,
 	onClose,
+	provided,
+	snapshot,
 	...props
 }: TabItemProps) {
 	function close() {
@@ -29,7 +33,13 @@ export default function TabItem({
 	}
 
 	return (
-		<span className={cn('tab-item', icon && 'icon', closeable && 'closeable')} {...props}>
+		<div
+			className={cn('tab-item', icon && 'icon', closeable && 'closeable')}
+			{...props}
+			{...provided.draggableProps}
+			{...provided.dragHandleProps}
+			ref={provided.innerRef}
+		>
 			<Link
 				title={children?.toString()}
 				className={cn('tab-item-link', active && 'active')}
@@ -46,6 +56,6 @@ export default function TabItem({
 					</Button>
 				</div>
 			)}
-		</span>
+		</div>
 	);
 }

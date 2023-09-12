@@ -76,7 +76,7 @@ export default function VersionEditorLayout({
 				containerClassName='h-[88%]'
 				value={logic}
 				onChange={setLogic}
-				onSave={(value) => onSaveLogic(value)}
+				onSave={handleSaveLogic}
 			/>
 		</div>
 	);

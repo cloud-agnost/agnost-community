@@ -1,12 +1,20 @@
 import { NewTabDropdown, TabItem, TabOptionsDropdown } from '@/features/version/Tabs/index.ts';
 import useTabStore from '@/store/version/tabStore.ts';
 import { Tab } from '@/types';
-import { generateId } from '@/utils';
+import { generateId, reorder } from '@/utils';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 import { Dashboard } from 'components/icons';
 import { NEW_TAB_ITEMS } from 'constants/constants.ts';
 import { useEffect, useRef, useState } from 'react';
+import {
+	DragDropContext,
+	Draggable,
+	DraggableProvided,
+	DraggableStateSnapshot,
+	Droppable,
+	DroppableProvided,
+} from 'react-beautiful-dnd';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useMatches, useNavigate, useParams } from 'react-router-dom';
 import './tabs.scss';
@@ -18,7 +26,8 @@ export default function Tabs() {
 	const [endOfScroll, setEndOfScroll] = useState(false);
 	const [startOfScroll, setStartOfScroll] = useState(false);
 	const [isScrollable, setIsScrollable] = useState(false);
-	const { getTabsByVersionId, removeTab, getPreviousTab, setCurrentTab, addTab } = useTabStore();
+	const { getTabsByVersionId, removeTab, getPreviousTab, setCurrentTab, addTab, setTabs } =
+		useTabStore();
 
 	const { t } = useTranslation();
 	const matches = useMatches();
@@ -127,23 +136,44 @@ export default function Tabs() {
 		}
 	}
 
+	function onDragEnd(result: any) {
+		if (!result.destination) return;
+		const tabs = getTabsByVersionId(versionId);
+		const newTabs = reorder(tabs, result.source.index, result.destination.index);
+		setTabs(versionId, newTabs);
+	}
+
 	return (
 		<div className='navigation-tab-container'>
-			<div ref={scrollContainer} className='tab'>
-				{tabs.map((tab) => (
-					<TabItem
-						active={tab.isActive}
-						data-active={tab.isActive ? 'true' : undefined}
-						icon={tab.isDashboard ? <Dashboard /> : undefined}
-						onClose={() => tabRemoveHandler(tab)}
-						onClick={() => setCurrentTab(versionId, tab.id)}
-						closeable={!tab.isDashboard}
-						to={`${tab.path}?tabId=${tab.id}`}
-						key={tab.id}
-					>
-						{tab.title}
-					</TabItem>
-				))}
+			<div ref={scrollContainer}>
+				<DragDropContext onDragEnd={onDragEnd}>
+					<Droppable droppableId='TAB' direction='horizontal'>
+						{(dropProvided: DroppableProvided) => (
+							<div {...dropProvided.droppableProps} ref={dropProvided.innerRef} className='tab'>
+								{tabs.map((tab: Tab, index: number) => (
+									<Draggable key={tab.id} draggableId={tab.id} index={index}>
+										{(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
+											<TabItem
+												active={tab.isActive}
+												icon={tab.isDashboard ? <Dashboard /> : undefined}
+												onClose={() => tabRemoveHandler(tab)}
+												onClick={() => setCurrentTab(versionId, tab.id)}
+												closeable={!tab.isDashboard}
+												to={`${tab.path}?tabId=${tab.id}`}
+												key={tab.id}
+												provided={dragProvided}
+												snapshot={dragSnapshot}
+											>
+												{tab.title}
+											</TabItem>
+										)}
+									</Draggable>
+								))}
+								{dropProvided.placeholder}
+							</div>
+						)}
+					</Droppable>
+				</DragDropContext>
 			</div>
 			<div className='tab-control'>
 				{isScrollable && (
