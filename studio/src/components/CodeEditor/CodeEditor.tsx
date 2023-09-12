@@ -35,16 +35,6 @@ export default function CodeEditor({
 			contextMenuGroupId: 'navigation',
 			contextMenuOrder: 1.5,
 			run: async (ed) => {
-				if (defaultLanguage === 'json') {
-					editor.trigger('', 'editor.action.formatDocument', null);
-				}
-				if (defaultLanguage === 'javascript') {
-					const formatted = await prettier.format(ed.getValue(), {
-						parser: 'babel',
-						plugins: [jsParser, esTreePlugin],
-					});
-					ed.setValue(formatted);
-				}
 				onSave?.(ed.getValue());
 			},
 		});
