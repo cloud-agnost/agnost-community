@@ -138,7 +138,7 @@ export async function lazyRouteImport(path: string) {
 		loader: Component.loader,
 	};
 }
-export const reorder = (list: string[], startIndex: number, endIndex: number) => {
+export const reorder = (list: any[], startIndex: number, endIndex: number) => {
 	const result = Array.from(list);
 	const [removed] = result.splice(startIndex, 1);
 	result.splice(endIndex, 0, removed);
@@ -168,10 +168,13 @@ export function getEndpointPath(path: string, params: Record<string, string>) {
 }
 
 export function arrayToObj(arr: { key: string; value: string }[]): Record<string, string> {
-	return arr.reduce((acc, curr) => {
-		acc[curr.key] = curr.value;
-		return acc;
-	}, {} as Record<string, string>);
+	return arr.reduce(
+		(acc, curr) => {
+			acc[curr.key] = curr.value;
+			return acc;
+		},
+		{} as Record<string, string>,
+	);
 }
 
 export function objToArray(obj: object | undefined): { key: string; value: string }[] {

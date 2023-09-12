@@ -15,6 +15,7 @@ interface TabStore {
 	getTabsByVersionId: (versionId: string) => Tab[];
 	getCurrentTab: (versionId: string) => Tab | null;
 	updateCurrentTab: (versionId: string, tab: Tab) => void;
+	setTabs: (versionId: string, tabs: Tab[]) => void;
 }
 
 const useTabStore = create<TabStore>()(
@@ -117,6 +118,16 @@ const useTabStore = create<TabStore>()(
 							tabs: {
 								...state.tabs,
 								[versionId]: newTabs,
+							},
+						};
+					});
+				},
+				setTabs: (versionId, tabs) => {
+					set((state) => {
+						return {
+							tabs: {
+								...state.tabs,
+								[versionId]: tabs,
 							},
 						};
 					});
