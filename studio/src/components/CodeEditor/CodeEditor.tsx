@@ -2,9 +2,6 @@ import { cn } from '@/utils';
 import MonacoEditor, { EditorProps } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
 import nightOwl from 'monaco-themes/themes/Night Owl.json';
-import * as prettier from 'prettier';
-import jsParser from 'prettier/plugins/babel';
-import esTreePlugin from 'prettier/plugins/estree';
 
 interface CodeEditorProps extends Omit<EditorProps, 'onMount' | 'defaultLanguage'> {
 	containerClassName?: string;
