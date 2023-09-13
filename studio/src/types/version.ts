@@ -156,6 +156,7 @@ export interface VersionParams {
 
 export type VersionParamsWithoutEnvId = Omit<VersionParams, 'envId'>;
 export type GetVersionByIdParams = VersionParamsWithoutEnvId;
+export type DeleteVersionParams = VersionParamsWithoutEnvId;
 export type CreateRateLimitParams = VersionParamsWithoutEnvId & {
 	rate: number;
 	duration: number;

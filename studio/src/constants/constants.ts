@@ -619,8 +619,8 @@ export const VERSION_DROPDOWN_ITEM = [
 			if (!application) return;
 			openVersionDrawer(application);
 		},
-		disabled: false,
-		after: Fragment,
+		disabled: () => false,
+		after: () => Fragment,
 	},
 	{
 		title: () => translate('version.create_a_copy'),
@@ -628,8 +628,8 @@ export const VERSION_DROPDOWN_ITEM = [
 		action: async () => {
 			useVersionStore.getState().setCreateCopyVersionDrawerIsOpen(true);
 		},
-		after: Fragment,
-		disabled: false,
+		after: () => Fragment,
+		disabled: () => false,
 	},
 	{
 		title: () => translate('version.merge'),
@@ -637,8 +637,8 @@ export const VERSION_DROPDOWN_ITEM = [
 		action: () => {
 			// TODO: implement
 		},
-		disabled: true,
-		after: DropdownMenuSeparator,
+		disabled: () => true,
+		after: () => DropdownMenuSeparator,
 	},
 	{
 		title: () => translate('version.export'),
@@ -646,8 +646,8 @@ export const VERSION_DROPDOWN_ITEM = [
 		action: () => {
 			// TODO: implement
 		},
-		disabled: true,
-		after: Fragment,
+		disabled: () => true,
+		after: () => Fragment,
 	},
 	{
 		title: () => translate('version.import'),
@@ -655,8 +655,8 @@ export const VERSION_DROPDOWN_ITEM = [
 		action: () => {
 			// TODO: implement
 		},
-		disabled: true,
-		after: DropdownMenuSeparator,
+		disabled: () => true,
+		after: () => DropdownMenuSeparator,
 	},
 	{
 		title: () =>
@@ -674,8 +674,8 @@ export const VERSION_DROPDOWN_ITEM = [
 				readOnly: !version?.readOnly,
 			});
 		},
-		after: Fragment,
-		disabled: false,
+		after: () => Fragment,
+		disabled: () => false,
 	},
 	{
 		title: () =>
@@ -693,8 +693,8 @@ export const VERSION_DROPDOWN_ITEM = [
 				private: !version?.private,
 			});
 		},
-		after: Fragment,
-		disabled: useVersionStore.getState().version?.master,
+		after: () => Fragment,
+		disabled: () => useVersionStore.getState().version?.master,
 	},
 	{
 		title: () => translate('version.settings.default'),
@@ -705,17 +705,17 @@ export const VERSION_DROPDOWN_ITEM = [
 			const versionHomePath = useVersionStore.getState().getVersionDashboardPath('/settings');
 			history.navigate?.(versionHomePath);
 		},
-		disabled: false,
-		after: DropdownMenuSeparator,
+		disabled: () => false,
+		after: () => (useVersionStore.getState().version?.master ? Fragment : DropdownMenuSeparator),
 	},
 	{
 		title: () => translate('version.delete'),
 		active: () => false,
-		after: Fragment,
+		after: () => Fragment,
 		action: () => {
-			// TODO: implement
+			useVersionStore.setState({ deleteVersionDrawerIsOpen: true });
 		},
-		disabled: false,
+		disabled: () => useVersionStore.getState().version?.master,
 	},
 ];
 

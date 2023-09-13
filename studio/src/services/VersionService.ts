@@ -32,6 +32,7 @@ import {
 	Version,
 	VersionLog,
 	VersionLogBucket,
+	DeleteVersionParams,
 } from '@/types';
 
 export default class VersionService {
@@ -296,6 +297,14 @@ export default class VersionService {
 		return (
 			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/logs`, {
 				params,
+			})
+		).data;
+	}
+
+	static async deleteVersion({ versionId, appId, orgId }: DeleteVersionParams) {
+		return (
+			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}`, {
+				data: {},
 			})
 		).data;
 	}
