@@ -2,12 +2,13 @@ import { Badge } from '@/components/Badge';
 import { Input } from '@/components/Input';
 import { HTTP_METHOD_BADGE_MAP } from '@/constants';
 import TestEndpoint from '@/features/endpoints/TestEndpoint';
-import { useToast } from '@/hooks';
+import { useToast, useUpdateEffect } from '@/hooks';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
-import { useState } from 'react';
+import useTabStore from '@/store/version/tabStore';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LoaderFunctionArgs, useParams, useSearchParams } from 'react-router-dom';
+import { LoaderFunctionArgs, useParams, useSearchParams, useLocation } from 'react-router-dom';
 EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { endpointId, orgId, versionId, appId } = params;
 	if (!endpointId) return null;
@@ -21,19 +22,18 @@ EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 		versionId: versionId as string,
 		epId: endpointId as string,
 	});
-
-	return { endpoin: ep };
+	return { endpoint: ep };
 };
 
 export default function EditEndpoint() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const { saveEndpointLogic, openEditEndpointDialog, endpoint } = useEndpointStore();
+	const { saveEndpointLogic, openEditEndpointDialog, endpoint, editedLogic, setEditedLogic } =
+		useEndpointStore();
+	const { pathname } = useLocation();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [endpointLogic, setEndpointLogic] = useState<string | undefined>(endpoint?.logic);
 	const [isTestEndpointOpen, setIsTestEndpointOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
-
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -47,7 +47,7 @@ export default function EditEndpoint() {
 			appId: appId as string,
 			versionId: versionId as string,
 			epId: endpoint._id,
-			logic: logic ?? endpointLogic,
+			logic: logic ?? editedLogic,
 			onSuccess: () => {
 				setLoading(false);
 				notify({
@@ -66,14 +66,15 @@ export default function EditEndpoint() {
 			},
 		});
 	}
+
 	return (
 		<VersionEditorLayout
 			onEditModalOpen={() => openEditEndpointDialog(endpoint)}
 			onTestModalOpen={() => setIsTestEndpointOpen(true)}
 			onSaveLogic={(value) => saveLogic(value as string)}
+			setLogic={(value) => setEditedLogic(value as string)}
 			loading={loading}
-			logic={endpointLogic}
-			setLogic={setEndpointLogic}
+			logic={editedLogic}
 			breadCrumbItems={[
 				{
 					name: t('endpoint.title').toString(),

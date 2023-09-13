@@ -23,6 +23,7 @@ interface EndpointStore {
 	selectEndpointDialogOpen: boolean;
 	endpoints: Endpoint[];
 	endpoint: Endpoint;
+	editedLogic: string;
 	selectedEndpointIds: string[];
 	lastFetchedCount: number;
 	endpointRequest: EndpointRequest;
@@ -47,6 +48,7 @@ interface EndpointStore {
 	setEndpointLog: (epId: string, log: string) => void;
 	openEditEndpointDialog: (endpoint: Endpoint) => void;
 	closeEditEndpointDialog: () => void;
+	setEditedLogic: (logic: string) => void;
 }
 
 const useEndpointStore = create<EndpointStore>()(
@@ -63,6 +65,7 @@ const useEndpointStore = create<EndpointStore>()(
 				toDeleteEndpoint: null,
 				isEndpointDeleteDialogOpen: false,
 				isEditEndpointDialogOpen: false,
+				editedLogic: '',
 				openEditEndpointDialog: (endpoint) => set({ endpoint, isEditEndpointDialogOpen: true }),
 				closeEditEndpointDialog: () => set({ isEditEndpointDialogOpen: false }),
 				setSelectedEndpointIds: (ids) => set({ selectedEndpointIds: ids }),
@@ -81,7 +84,8 @@ const useEndpointStore = create<EndpointStore>()(
 				},
 				getEndpointById: async (params) => {
 					const endpoint = await EndpointService.getEndpointById(params);
-					set({ endpoint });
+					set({ endpoint, editedLogic: endpoint.logic });
+
 					return endpoint;
 				},
 				getEndpoints: async (params) => {
@@ -144,6 +148,7 @@ const useEndpointStore = create<EndpointStore>()(
 						set((prev) => ({
 							endpoints: prev.endpoints.map((e) => (e._id === endpoint._id ? endpoint : e)),
 							endpoint,
+							editedLogic: endpoint.logic,
 						}));
 						if (params.onSuccess) params.onSuccess();
 						return endpoint;
@@ -232,7 +237,6 @@ const useEndpointStore = create<EndpointStore>()(
 				closeEndpointDeleteDialog: () =>
 					set({ toDeleteEndpoint: null, isEndpointDeleteDialogOpen: false }),
 				setEndpointLog(epId, log) {
-					console.log('setEndpointLog', epId, log);
 					set((prev) => ({
 						endpointResponse: {
 							...prev.endpointResponse,
@@ -243,6 +247,7 @@ const useEndpointStore = create<EndpointStore>()(
 						},
 					}));
 				},
+				setEditedLogic: (logic) => set({ editedLogic: logic }),
 			}),
 			{
 				name: 'endpoint-storage',
