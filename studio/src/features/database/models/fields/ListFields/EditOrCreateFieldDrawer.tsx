@@ -94,7 +94,6 @@ export default function EditOrCreateFieldDrawer({
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 	const databases = useDatabaseStore((state) => state.databases);
-	const basicValueListTypes = useTypeStore((state) => state.bvlTypes);
 	const fieldTypes = useTypeStore((state) => state.fieldTypes);
 	const fieldToEdit = useModelStore((state) => state.fieldToEdit) as Field;
 	const addNewField = useModelStore((state) => state.addNewField);
@@ -122,7 +121,6 @@ export default function EditOrCreateFieldDrawer({
 	const isBoolean = TYPE === 'boolean';
 	const isMoney = TYPE === 'monetary';
 	const isInteger = TYPE === 'integer';
-	const isBasicValueList = TYPE === 'basic-values-list';
 	const isEnum = TYPE === 'enum';
 	const isReference = TYPE === 'reference';
 	const isDatetime = TYPE === 'datetime';
@@ -195,14 +193,6 @@ export default function EditOrCreateFieldDrawer({
 						message: t('forms.maxLength.error', {
 							length: MAX_LENGTH,
 							label: capitalize(t('general.decimal_digits').toLowerCase()),
-						}).toString(),
-					})
-					.optional(),
-				basicValueList: z
-					.string()
-					.refine((value) => basicValueListTypes.includes(value), {
-						message: t('forms.invalid', {
-							label: t('database.fields.basic_value_list_type'),
 						}).toString(),
 					})
 					.optional(),
@@ -307,16 +297,6 @@ export default function EditOrCreateFieldDrawer({
 							label: capitalize(t('general.decimal_digits').toLowerCase()),
 						}).toString(),
 						path: ['decimalDigits'],
-					});
-				}
-
-				if (isBasicValueList && !arg.basicValueList) {
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: t('forms.required', {
-							label: capitalize(t('database.fields.basic_value_list_type').toLowerCase()),
-						}).toString(),
-						path: ['basicValueList'],
 					});
 				}
 
