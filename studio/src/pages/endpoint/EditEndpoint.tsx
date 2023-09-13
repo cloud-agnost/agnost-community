@@ -2,13 +2,12 @@ import { Badge } from '@/components/Badge';
 import { Input } from '@/components/Input';
 import { HTTP_METHOD_BADGE_MAP } from '@/constants';
 import TestEndpoint from '@/features/endpoints/TestEndpoint';
-import { useToast, useUpdateEffect } from '@/hooks';
+import { useToast } from '@/hooks';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
-import useTabStore from '@/store/version/tabStore';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LoaderFunctionArgs, useParams, useSearchParams, useLocation } from 'react-router-dom';
+import { LoaderFunctionArgs, useParams, useSearchParams } from 'react-router-dom';
 EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { endpointId, orgId, versionId, appId } = params;
 	if (!endpointId) return null;
@@ -30,7 +29,6 @@ export default function EditEndpoint() {
 	const { notify } = useToast();
 	const { saveEndpointLogic, openEditEndpointDialog, endpoint, editedLogic, setEditedLogic } =
 		useEndpointStore();
-	const { pathname } = useLocation();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [isTestEndpointOpen, setIsTestEndpointOpen] = useState(false);
 	const [loading, setLoading] = useState(false);

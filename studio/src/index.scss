@@ -261,7 +261,9 @@
 
 	body {
 		@apply bg-base;
-		font-feature-settings: 'rlig' 1, 'calt' 1;
+		font-feature-settings:
+			'rlig' 1,
+			'calt' 1;
 	}
 	.loading {
 		@apply animate-spin mr-2;
@@ -332,7 +334,7 @@
 	}
 
 	.link {
-		@apply text-brand-primary hover:underline font-sfCompact text-sm;
+		@apply text-brand-primary hover:underline font-sfCompact text-sm font-normal;
 	}
 }
 
