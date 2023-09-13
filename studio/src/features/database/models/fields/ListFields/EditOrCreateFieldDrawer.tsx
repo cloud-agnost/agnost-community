@@ -389,9 +389,7 @@ export default function EditOrCreateFieldDrawer({
 			},
 		},
 	});
-	useEffect(() => {
-		console.log('form.formState.errors', form.formState.errors);
-	}, [form.formState.errors]);
+
 	const indexWatch = form.watch('general.indexed');
 	const requiredWatch = form.watch('general.required');
 
