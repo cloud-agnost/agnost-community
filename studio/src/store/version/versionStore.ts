@@ -32,6 +32,7 @@ import {
 	VersionParamsWithoutEnvId,
 	VersionProperties,
 	VersionRealtimeProperties,
+	DeleteVersionParams,
 } from '@/types';
 import { history, notify, translate } from '@/utils';
 import { create } from 'zustand';
@@ -51,6 +52,7 @@ interface VersionStore {
 	editAPIKeyDrawerIsOpen: boolean;
 	selectedAPIKey: APIKey | null;
 	logBuckets: VersionLogBucket;
+	deleteVersionDrawerIsOpen: boolean;
 	logs: VersionLog[];
 	lastFetchedLogCount: number;
 	log: VersionLog;
@@ -109,6 +111,7 @@ interface VersionStore {
 	getVersionLogBuckets: (params: GetVersionLogBucketsParams) => Promise<void>;
 	openVersionLogDetails: (log: VersionLog) => void;
 	closeVersionLogDetails: () => void;
+	deleteVersion: (params: DeleteVersionParams, showAlert?: boolean) => Promise<void>;
 }
 
 const useVersionStore = create<VersionStore>()(
@@ -119,6 +122,7 @@ const useVersionStore = create<VersionStore>()(
 				editAPIKeyDrawerIsOpen: false,
 				selectedAPIKey: null,
 				error: null,
+				deleteVersionDrawerIsOpen: false,
 				version: null,
 				versions: [],
 				versionPage: 0,
@@ -661,6 +665,24 @@ const useVersionStore = create<VersionStore>()(
 				},
 				closeVersionLogDetails() {
 					set({ log: {} as VersionLog, showLogDetails: false });
+				},
+				deleteVersion: async (params, showAlert) => {
+					try {
+						await VersionService.deleteVersion(params);
+						set((prev) => ({
+							versions: prev.versions.filter((v) => v._id !== params.versionId),
+						}));
+					} catch (e) {
+						if (showAlert) {
+							const error = e as APIError;
+							notify({
+								type: 'error',
+								title: error.error,
+								description: error.details,
+							});
+						}
+						throw e;
+					}
 				},
 			}),
 			{
