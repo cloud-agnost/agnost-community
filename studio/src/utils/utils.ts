@@ -6,11 +6,11 @@ import useApplicationStore from '@/store/app/applicationStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { AppRoles, OrgRoles, RealtimeData, ToastType } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
 import * as prettier from 'prettier';
 import jsParser from 'prettier/plugins/babel';
 import esTreePlugin from 'prettier/plugins/estree';
 import { twMerge } from 'tailwind-merge';
-
 type EmptyableArray = readonly [] | [];
 type EmptyableString = '' | string;
 type EmptyableObject<T extends object> = T & Record<keyof T, never>;
@@ -261,4 +261,30 @@ export async function formatCode(code: string) {
 		parser: 'babel',
 		plugins: [jsParser, esTreePlugin],
 	});
+}
+export async function saveEditorContent(
+	ed: monaco.editor.IStandaloneCodeEditor,
+	language: 'javascript' | 'json',
+	cb?: (value: string) => void,
+) {
+	console.log('formatting', ed);
+	if (language === 'json') {
+		ed.trigger('', 'editor.action.formatDocument', null);
+	}
+	if (language === 'javascript') {
+		const formatted = await formatCode(ed.getValue());
+		// Select all text
+		const fullRange = ed.getModel()?.getFullModelRange();
+
+		// Apply the text over the range
+		ed.executeEdits(null, [
+			{
+				text: formatted,
+				range: fullRange as monaco.Range,
+			},
+		]);
+
+		ed.pushUndoStop();
+	}
+	cb?.(ed.getValue());
 }
