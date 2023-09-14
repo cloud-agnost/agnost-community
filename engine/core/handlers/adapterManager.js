@@ -30,16 +30,6 @@ export class AdapterManager {
 	}
 
 	/**
-	 * Returns the connection object matching the resource iid
-	 * @param  {string} resourceiid The resource identifier
-	 */
-	getAdapterObject2(resourceiid) {
-		let adapterObj = this.adapters.get(resourceiid);
-		if (adapterObj) return adapterObj;
-		else return null;
-	}
-
-	/**
 	 * Returns the connection object matching the type and name
 	 * @param  {string} name The design name of the resource
 	 * @param  {string} type The resource type
@@ -63,6 +53,36 @@ export class AdapterManager {
 					];
 				} else return adapterObj;
 			} else return adapterObj;
+		} else return null;
+	}
+
+	/**
+	 * Returns the connection object matching the resource iid
+	 * @param  {string} resourceiid The resource identifier
+	 */
+	getAdapterObject2(resourceiid) {
+		let adapterObj = this.adapters.get(resourceiid);
+		if (adapterObj) return adapterObj;
+		else return null;
+	}
+
+	/**
+	 * Returns the adapter object matching the type and name
+	 * @param  {string} name The design name of the resource
+	 * @param  {string} type The resource type
+	 * @param  {boolean} readOnly Whether to return the read-only connection if available, otherwise return read-write connection
+	 */
+	getAdapterObject3(name, type) {
+		// Iterate the environment resource mappings to find the corresponding resource mapping
+		const mappings = META.getResourceMappings();
+		const mapping = mappings.find(
+			(entry) => entry.design.type === type && entry.design.name === name
+		);
+
+		if (mapping) {
+			const adapterObj = this.adapters.get(mapping.resource.iid);
+			if (adapterObj) return adapterObj;
+			else return null;
 		} else return null;
 	}
 
@@ -101,6 +121,16 @@ export class AdapterManager {
 	getDatabaseAdapter(name, readOnly = false) {
 		const adapterObj = this.getAdapterObject(name, "database", readOnly);
 		return adapterObj?.adapter || null;
+	}
+
+	/**
+	 * Returns the database adapter object matching the name, not the driver itself but the adapter object itself
+	 * @param  {string} name The design name of the resource
+	 * @param  {boolean} readOnly Whether to return the read-only connection if available otherwise return read-write connection
+	 */
+	getDatabaseAdapter2(name) {
+		const adapterObj = this.getAdapterObject3(name, "database");
+		return adapterObj;
 	}
 
 	/**

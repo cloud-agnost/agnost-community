@@ -14,4 +14,11 @@ export class MySQL extends DatabaseBase {
 			await this.driver.end();
 		} catch (err) {}
 	}
+
+	/**
+	 * Returns the database driver
+	 */
+	getDriver() {
+		return this.driver;
+	}
 }

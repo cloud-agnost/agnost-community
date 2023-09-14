@@ -13,4 +13,11 @@ export class Oracle extends DatabaseBase {
 		try {
 		} catch (err) {}
 	}
+
+	/**
+	 * Returns the database driver
+	 */
+	getDriver() {
+		return this.driver;
+	}
 }

@@ -14,4 +14,11 @@ export class SQLServer extends DatabaseBase {
 			await this.driver.close();
 		} catch (err) {}
 	}
+
+	/**
+	 * Returns the database driver
+	 */
+	getDriver() {
+		return this.driver;
+	}
 }

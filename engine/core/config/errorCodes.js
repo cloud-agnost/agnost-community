@@ -71,12 +71,22 @@ const ERROR_CODES = {
 	notBufferValue: "not_buffer_value",
 	notJsonValue: "not_json_value",
 	notReferenceValue: "not_reference_value",
-	invalidNongodbId: "invalid_mongodb_id",
+	invalidMongodbId: "invalid_mongodb_id",
 	notBvlArray: "not_array_of_basic_values",
 	unsopportedBvlValue: "unsopported_bvl_value",
 	notObjectValue: "not_object_value",
 	notArrayValue: "not_array_value",
 	invalidObjectArrayEntry: "invalid_object_array_entry",
+	invalidField: "invalid_field",
+	invalidExpression: "invalid_expression",
+	invalidFunction: "invalid_function",
+	invalidJoin: "invalid_join",
+	invalidParameter: "invalid_parameter",
+	validationErrors: "validation_errors",
+	invalidCondition: "invalid_condition",
+	directObjectAssignmentNotAllowed: "direct_object_assignment_not_allowed",
+	directArrayAssignmentNotAllowed: "direct_array_assignment_not_allowed",
+	invalidUpdateInstruction: "invalid_update_instruction",
 };
 
 export default ERROR_CODES;
