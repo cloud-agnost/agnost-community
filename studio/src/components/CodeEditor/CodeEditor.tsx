@@ -1,11 +1,11 @@
-import { cn, formatCode } from '@/utils';
+import { cn, formatCode, saveEditorContent } from '@/utils';
 import MonacoEditor, { EditorProps } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
 import nightOwl from 'monaco-themes/themes/Night Owl.json';
 
-interface CodeEditorProps extends Omit<EditorProps, 'onMount' | 'defaultLanguage'> {
+interface CodeEditorProps extends Omit<EditorProps, 'defaultLanguage'> {
 	containerClassName?: string;
-	defaultLanguage?: string;
+	defaultLanguage?: 'javascript' | 'json';
 	readonly?: boolean;
 	onSave?: (logic: string) => void;
 }
@@ -20,26 +20,21 @@ export default function CodeEditor({
 	onSave,
 	readonly,
 	defaultLanguage = 'javascript',
+	onMount,
 }: CodeEditorProps) {
 	const handleEditorDidMount = (
 		editor: monaco.editor.IStandaloneCodeEditor,
 		_monaco: typeof monaco,
 	) => {
+		onMount?.(editor, _monaco);
 		editor.addAction({
 			id: 'save-action',
 			label: 'Save',
 			keybindings: [_monaco.KeyMod.CtrlCmd | _monaco.KeyCode.KeyS],
 			contextMenuGroupId: 'navigation',
 			contextMenuOrder: 1.5,
-			run: async (ed) => {
-				if (defaultLanguage === 'json') {
-					editor.trigger('', 'editor.action.formatDocument', null);
-				}
-				if (defaultLanguage === 'javascript') {
-					const formatted = await formatCode(ed.getValue());
-					ed.setValue(formatted);
-				}
-				onSave?.(ed.getValue());
+			run: async () => {
+				saveEditorContent(editor, defaultLanguage, onSave);
 			},
 		});
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
