@@ -19,11 +19,8 @@ jobs:
         with:
           node-version: "14" # You can specify your desired Node.js version
 
-      - name: Change directory to studio
-        run: cd studio
-
       - name: Install dependencies
-        run: npm install
+        run: cd studio && npm install
 
       - name: Build project
-        run: npm run build
+        run: cd studio && npm run build
