@@ -8,6 +8,8 @@ import { RouterProvider } from 'react-router-dom';
 import { ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import useThemeStore from './store/theme/themeStore';
+import { Provider } from 'react-keep-alive';
+import KeepAlive from 'react-fiber-keep-alive';
 
 function App() {
 	useRenewToken(2);
@@ -32,9 +34,9 @@ function App() {
 		document.body.dataset.mode = systemTheme;
 		document.body.classList.add(systemTheme);
 	}, [theme]);
-
+	const root = document.getElementById('root');
 	return (
-		<>
+		<KeepAlive.Provider value={root}>
 			<RouterProvider router={router} />
 			<ToastContainer
 				transition={Slide}
@@ -49,7 +51,7 @@ function App() {
 				pauseOnHover
 				theme='dark'
 			/>
-		</>
+		</KeepAlive.Provider>
 	);
 }
 
