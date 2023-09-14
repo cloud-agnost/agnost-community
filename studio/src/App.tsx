@@ -4,12 +4,11 @@ import { router } from '@/router';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useTypeStore from '@/store/types/typeStore.ts';
 import { useEffect } from 'react';
+import KeepAlive from 'react-fiber-keep-alive';
 import { RouterProvider } from 'react-router-dom';
-import { ToastContainer, Slide } from 'react-toastify';
+import { Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import useThemeStore from './store/theme/themeStore';
-import { Provider } from 'react-keep-alive';
-import KeepAlive from 'react-fiber-keep-alive';
 
 function App() {
 	useRenewToken(2);

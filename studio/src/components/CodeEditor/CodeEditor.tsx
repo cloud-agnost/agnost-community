@@ -1,4 +1,4 @@
-import { cn, formatCode, saveEditorContent } from '@/utils';
+import { cn, saveEditorContent } from '@/utils';
 import MonacoEditor, { EditorProps } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
 import nightOwl from 'monaco-themes/themes/Night Owl.json';

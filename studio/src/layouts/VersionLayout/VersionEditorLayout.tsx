@@ -2,16 +2,14 @@ import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { Pencil } from '@/components/icons';
-import { cn, formatCode, saveEditorContent } from '@/utils';
+import { cn, saveEditorContent } from '@/utils';
 import { FloppyDisk, TestTube } from '@phosphor-icons/react';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
+import { useState } from 'react';
+import KeepAlive from 'react-fiber-keep-alive';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import KeepAlive from 'react-fiber-keep-alive';
-import { useState } from 'react';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
 
-import useEndpointStore from '@/store/endpoint/endpointStore';
-import { Dot } from '@phosphor-icons/react';
 interface VersionEditorLayoutProps {
 	children: React.ReactNode;
 	className?: string;
