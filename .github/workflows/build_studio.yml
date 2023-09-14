@@ -1,30 +1,30 @@
-name: Build Studio Folder
+name: Build on PR to Master and Dev
 
 on:
   pull_request:
-    branches:
-      - master
-      - dev
+    branches: ["master", "dev"]
+    paths:
+      - "studio/**"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "14" # Choose the Node.js version you are using
+          node-version: "14" # You can specify your desired Node.js version
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
           cd studio
           npm install
 
-      - name: Build Studio Folder
+      - name: Build project
         run: |
           cd studio
           npm run build
