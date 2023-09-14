@@ -73,6 +73,8 @@ export default function EditEndpoint() {
 			setLogic={(value) => setEditedLogic(value as string)}
 			loading={loading}
 			logic={editedLogic}
+			isSaved={endpoint?.logic === editedLogic}
+			name={endpoint?.name}
 			breadCrumbItems={[
 				{
 					name: t('endpoint.title').toString(),

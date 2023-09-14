@@ -2,16 +2,22 @@ import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { Pencil } from '@/components/icons';
-import { cn, formatCode } from '@/utils';
+import { cn, saveEditorContent } from '@/utils';
 import { FloppyDisk, TestTube } from '@phosphor-icons/react';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
+import { useState } from 'react';
+import KeepAlive from 'react-fiber-keep-alive';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
+
 interface VersionEditorLayoutProps {
 	children: React.ReactNode;
 	className?: string;
 	loading: boolean;
 	logic?: string;
 	breadCrumbItems?: BreadCrumbItem[];
+	name: string;
+	isSaved: boolean;
 	onSaveLogic: (logic?: string) => void;
 	onTestModalOpen?: () => void;
 	onEditModalOpen: () => void;
@@ -28,24 +34,31 @@ export default function VersionEditorLayout({
 	onEditModalOpen,
 	setLogic,
 	className,
+	name,
+	isSaved,
 }: VersionEditorLayoutProps) {
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
-
+	const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
 	async function handleSaveLogic() {
-		const formatted = await formatCode(logic as string);
-		setLogic(formatted);
-		onSaveLogic(formatted);
+		saveEditorContent(editor as monaco.editor.IStandaloneCodeEditor, 'javascript', (val) => {
+			setLogic(val);
+			onSaveLogic(val);
+		});
 	}
 
 	return (
 		<div className={cn('p-4 space-y-6 h-full', className)}>
-			{breadCrumbItems && (
-				<BreadCrumb
-					goBackLink={pathname.split('/').slice(0, -1).join('/')}
-					items={breadCrumbItems}
-				/>
-			)}
+			<div className='flex items-center gap-4'>
+				{breadCrumbItems && (
+					<BreadCrumb
+						goBackLink={pathname.split('/').slice(0, -1).join('/')}
+						items={breadCrumbItems}
+					/>
+				)}
+
+				{!isSaved && <div className='text-default rounded-full bg-base-reverse w-2.5 h-2.5' />}
+			</div>
 			<div className='flex items-center justify-between'>
 				{children}
 				<div className='flex items-center gap-4'>
@@ -64,14 +77,18 @@ export default function VersionEditorLayout({
 					</Button>
 				</div>
 			</div>
-
-			<CodeEditor
-				className='h-full'
-				containerClassName='h-[88%]'
-				value={logic}
-				onChange={setLogic}
-				onSave={(logic) => onSaveLogic(logic)}
-			/>
+			<KeepAlive name={name}>
+				<CodeEditor
+					className='h-full'
+					containerClassName='h-[88%]'
+					value={logic}
+					onChange={setLogic}
+					onSave={(logic) => onSaveLogic(logic)}
+					onMount={(editor) => {
+						setEditor(editor);
+					}}
+				/>
+			</KeepAlive>
 		</div>
 	);
 }

@@ -1,9 +1,9 @@
-import { Link } from 'react-router-dom';
-import { ReactNode } from 'react';
 import { cn } from '@/utils';
 import { X } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
-import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd';
+import { ReactNode } from 'react';
+import { DraggableProvided } from 'react-beautiful-dnd';
+import { Link } from 'react-router-dom';
 interface TabItemProps {
 	to: string;
 	children: ReactNode;
@@ -13,7 +13,6 @@ interface TabItemProps {
 	onClick?: () => void;
 	active?: boolean;
 	provided: DraggableProvided;
-	snapshot: DraggableStateSnapshot;
 }
 
 export default function TabItem({
@@ -25,7 +24,6 @@ export default function TabItem({
 	closeable,
 	onClose,
 	provided,
-	snapshot,
 	...props
 }: TabItemProps) {
 	function close() {
