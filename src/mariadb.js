@@ -16,7 +16,7 @@ const namespace = process.env.NAMESPACE;
 const plural = 'mariadbs';
 
 async function createMariaDBResource(serverName, dbName, dbVersion, replicaCount, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, rootPasswd) {
-  const manifest = fs.readFileSync('/manifests/resources/mariadb.yaml', 'utf8');
+  const manifest = fs.readFileSync('/manifests/mariadb.yaml', 'utf8');
   const resources = k8s.loadAllYaml(manifest);
 
   for (const resource of resources) {

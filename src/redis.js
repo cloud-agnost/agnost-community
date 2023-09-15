@@ -14,9 +14,9 @@ const namespace = process.env.NAMESPACE;
 
 async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, passwd, readReplicaEnabled) {
   if (readReplicaEnabled) {
-    var manifest = fs.readFileSync('/manifests/resources/redis-replication.yaml', 'utf8');
+    var manifest = fs.readFileSync('/manifests/redis-replication.yaml', 'utf8');
   } else {
-    var manifest = fs.readFileSync('/manifests/resources/redis-standalone.yaml', 'utf8');
+    var manifest = fs.readFileSync('/manifests/redis-standalone.yaml', 'utf8');
   }
   
   const resources = k8s.loadAllYaml(manifest);

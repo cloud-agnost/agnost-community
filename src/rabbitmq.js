@@ -11,7 +11,7 @@ const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 const k8sCustomApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
 async function createRabbitmqCluster(clusterName, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, replicaCount) {
-  const manifest = fs.readFileSync('/manifests/resources/rabbitmq-cluster.yaml', 'utf8');
+  const manifest = fs.readFileSync('/manifests/rabbitmq-cluster.yaml', 'utf8');
   const resources = k8s.loadAllYaml(manifest);
 
   for (const resource of resources) {

@@ -16,7 +16,7 @@ const namespace = process.env.NAMESPACE;
 const plural = 'mongodbcommunity';
 
 async function createMongoDBResource(mongoName, mongoVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, replicaCount) {
-  const manifest = fs.readFileSync('/manifests/resources/mongodbcommunity.yaml', 'utf8');
+  const manifest = fs.readFileSync('/manifests/mongodbcommunity.yaml', 'utf8');
   const resources = k8s.loadAllYaml(manifest);
 
   for (const resource of resources) {

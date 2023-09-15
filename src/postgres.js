@@ -15,7 +15,7 @@ const namespace = process.env.NAMESPACE;
 const plural = 'postgresqls';
 
 async function createPostgresql(serverName, teamName, dbVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, numInstances) {
-  const manifest = fs.readFileSync('/manifests/resources/postgres.yaml', 'utf8');
+  const manifest = fs.readFileSync('/manifests/postgres.yaml', 'utf8');
   const resources = k8s.loadAllYaml(manifest);
 
   for (const resource of resources) {
