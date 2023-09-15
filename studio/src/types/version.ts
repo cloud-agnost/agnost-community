@@ -139,12 +139,24 @@ export interface GetVersionRequest extends BaseGetRequest {
 	appId: string;
 }
 
+export type TabTypes =
+	| 'Database'
+	| 'Storage'
+	| 'Cache'
+	| 'Message Queue'
+	| 'Task'
+	| 'Endpoint'
+	| 'Middleware'
+	| 'Settings'
+	| 'Dashboard';
 export interface Tab {
 	id: string;
 	title: string;
 	path: string;
 	isActive: boolean;
 	isDashboard: boolean;
+	isDirty?: boolean;
+	type: TabTypes;
 }
 
 export interface VersionParams {

@@ -30,9 +30,22 @@
 					@apply bg-base;
 				}
 			}
+			&.active {
+				@apply bg-base;
+				&::before {
+					@apply opacity-100;
+				}
+				& + .tab-item-close {
+					@apply bg-base;
+				}
+			}
+			&::before {
+				content: '';
+				@apply absolute bottom-0 left-0 right-0 h-0.5 bg-button-primary opacity-0 transition z-50;
+			}
 
 			.tab-item-link {
-				@apply flex items-center gap-2 p-2 font-sfCompact;
+				@apply p-2 font-sfCompact;
 				@apply text-subtle text-sm leading-6 font-normal w-full;
 
 				svg {
@@ -40,20 +53,7 @@
 				}
 
 				.tab-item-link-text {
-					@apply max-w-[110px] truncate flex-1;
-				}
-				&::before {
-					content: '';
-					@apply absolute bottom-0 left-0 right-0 h-0.5 bg-button-primary opacity-0 transition;
-				}
-				&.active {
-					@apply bg-base;
-					&::before {
-						@apply opacity-100;
-					}
-					& + .tab-item-close {
-						@apply bg-base;
-					}
+					@apply max-w-[15ch] truncate flex-1;
 				}
 			}
 
@@ -68,21 +68,10 @@
 			}
 
 			.tab-item-close {
-				@apply bg-subtle h-full flex items-center justify-center pr-0.5;
+				@apply bg-transparent h-full flex items-center justify-center pr-0.5;
 				&:hover {
 					button {
 						@apply bg-subtle;
-					}
-				}
-				button {
-					@apply opacity-0 text-subtle p-2 w-7 h-7;
-				}
-			}
-
-			&:hover {
-				.tab-item-close {
-					button {
-						@apply opacity-100;
 					}
 				}
 			}
