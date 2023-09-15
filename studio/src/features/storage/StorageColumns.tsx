@@ -48,6 +48,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 					onClick={() => {
 						useStorageStore.setState({ storage: original });
 					}}
+					type='Storage'
 				/>
 			);
 		},
@@ -61,8 +62,8 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 			},
 		}) => {
 			const environment = useEnvironmentStore.getState().environment;
-			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)
-				?.resource.instance;
+			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)?.resource
+				.instance;
 			const Icon = STORAGE_ICON_MAP[instance as string];
 			return <InstanceType iid={iid} Icon={Icon} />;
 		},

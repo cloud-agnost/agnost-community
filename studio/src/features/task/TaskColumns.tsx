@@ -39,7 +39,7 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		sortingFn: 'textCaseSensitive',
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
-			return <TabLink name={name} path={`${_id}`} />;
+			return <TabLink name={name} path={`${_id}`} type='Task' />;
 		},
 	},
 	{
@@ -62,11 +62,7 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 	{
 		id: 'logExecution',
 		header: ({ column }) => (
-			<SortButton
-				className='whitespace-nowrap'
-				text={translate('task.logExec')}
-				column={column}
-			/>
+			<SortButton className='whitespace-nowrap' text={translate('task.logExec')} column={column} />
 		),
 		accessorKey: 'logExecution',
 		enableSorting: true,

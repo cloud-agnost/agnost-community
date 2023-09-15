@@ -38,7 +38,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 		sortingFn: 'textCaseSensitive',
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
-			return <TabLink name={name} path={`${_id}`} />;
+			return <TabLink name={name} path={`${_id}`} type='Message Queue' />;
 		},
 	},
 	{
@@ -58,8 +58,8 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 			},
 		}) => {
 			const environment = useEnvironmentStore.getState().environment;
-			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)
-				?.resource.instance;
+			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)?.resource
+				.instance;
 			const Icon = QUEUE_ICON_MAP[instance as string];
 			return <InstanceType iid={iid} Icon={Icon} />;
 		},
