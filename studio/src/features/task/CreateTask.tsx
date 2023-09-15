@@ -3,7 +3,6 @@ import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
 import useResourceStore from '@/store/resources/resourceStore';
 import useTaskStore from '@/store/task/taskStore';
-import useTabStore from '@/store/version/tabStore';
 import { CreateTaskSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
@@ -22,7 +21,6 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 	const { createTask } = useTaskStore();
 	const { notify } = useToast();
 	const { resources } = useResourceStore();
-	const { getCurrentTab } = useTabStore();
 	const navigate = useTabNavigate();
 	const form = useForm<z.infer<typeof CreateTaskSchema>>({
 		resolver: zodResolver(CreateTaskSchema),
@@ -55,11 +53,11 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 					logExecution: false,
 				});
 				navigate({
-					id: getCurrentTab(versionId as string)?.id as string,
 					title: task.name,
 					path: `${pathname}/${task._id}`,
 					isActive: true,
 					isDashboard: false,
+					type: 'Task',
 				});
 				onClose();
 			},

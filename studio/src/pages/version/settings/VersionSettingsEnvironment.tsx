@@ -5,10 +5,24 @@ import useEnvironmentStore from '@/store/environment/environmentStore.ts';
 import { formatDate } from '@/utils';
 import { DateTime } from 'luxon';
 import { DeployButton } from '@/features/version/DeployButton';
+import { LoaderFunctionArgs } from 'react-router-dom';
+
+VersionSettingsEnvironment.loader = async ({ params }: LoaderFunctionArgs) => {
+	const { versionId, appId, orgId } = params;
+	const { getEnvironmentResources, environment } = useEnvironmentStore.getState();
+	await getEnvironmentResources({
+		orgId: orgId as string,
+		appId: appId as string,
+		versionId: versionId as string,
+		envId: environment?._id as string,
+	});
+	return { props: {} };
+};
 
 export default function VersionSettingsEnvironment() {
 	const { t } = useTranslation();
 	const environment = useEnvironmentStore((state) => state.environment);
+
 	return (
 		<SettingsContainer
 			info={

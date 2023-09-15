@@ -1,22 +1,22 @@
 import { Button } from '@/components/Button';
+import { VERSION_DROPDOWN_ITEM } from '@/constants';
+import useApplicationStore from '@/store/app/applicationStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { cn } from '@/utils';
+import { APIError } from '@/types';
 import { CaretUpDown, LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
+import { ConfirmationModal } from 'components/ConfirmationModal';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuItemContainer,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
 import { Fragment, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import './versionDropdown.scss';
-import { Trans, useTranslation } from 'react-i18next';
-import { ConfirmationModal } from 'components/ConfirmationModal';
-import { APIError } from '@/types';
-import { VERSION_DROPDOWN_ITEM } from '@/constants';
-import useApplicationStore from '@/store/app/applicationStore.ts';
 
 export default function VersionDropdown() {
 	const [open, setOpen] = useState(false);
@@ -99,21 +99,21 @@ export default function VersionDropdown() {
 
 				<DropdownMenuContent align='end' className='version-dropdown-content'>
 					<DropdownMenuItemContainer>
-						{VERSION_DROPDOWN_ITEM.filter((item) => !item.disabled()).map((option, index) => {
-							const After = option.after();
-							return (
-								<Fragment key={index}>
-									<DropdownMenuItem
-										className={cn(option.active() && 'active')}
-										disabled={option.disabled()}
-										onClick={option.action}
-									>
-										{option.title()}
-									</DropdownMenuItem>
-									<After />
-								</Fragment>
-							);
-						})}
+						{VERSION_DROPDOWN_ITEM.map((option) => (
+							<DropdownMenuItem onClick={option.action} key={option.title}>
+								{option.title}
+							</DropdownMenuItem>
+						))}
+						{!version?.master && (
+							<Fragment>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem
+									onClick={() => useVersionStore.setState({ deleteVersionDrawerIsOpen: true })}
+								>
+									{t('version.delete')}
+								</DropdownMenuItem>
+							</Fragment>
+						)}
 					</DropdownMenuItemContainer>
 				</DropdownMenuContent>
 			</DropdownMenu>

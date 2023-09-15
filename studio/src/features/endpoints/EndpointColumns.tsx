@@ -45,7 +45,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
 
-			return <TabLink name={name} path={`${_id}`} />;
+			return <TabLink name={name} path={`${_id}`} type='Endpoint' />;
 		},
 	},
 	{
@@ -123,9 +123,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	},
 	{
 		id: 'created_at',
-		header: ({ column }) => (
-			<SortButton text={translate('general.created_at')} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
 		enableSorting: true,
 		sortingFn: 'datetime',
 		accessorKey: 'createdAt',
@@ -142,9 +140,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 
 	{
 		id: 'updated_at',
-		header: ({ column }) => (
-			<SortButton text={translate('general.updated_at')} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.updated_at')} column={column} />,
 		accessorKey: 'updatedAt',
 		size: 200,
 		cell: ({ row }) => {

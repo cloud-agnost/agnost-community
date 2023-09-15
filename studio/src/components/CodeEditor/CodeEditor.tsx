@@ -2,7 +2,11 @@ import { cn, saveEditorContent } from '@/utils';
 import MonacoEditor, { EditorProps } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
 import nightOwl from 'monaco-themes/themes/Night Owl.json';
-
+import useTabStore from '@/store/version/tabStore';
+import { useDebounceFn } from '@/hooks';
+import { useRef } from 'react';
+import useVersionStore from '@/store/version/versionStore';
+import { Tab } from '@/types';
 interface CodeEditorProps extends Omit<EditorProps, 'defaultLanguage'> {
 	containerClassName?: string;
 	defaultLanguage?: 'javascript' | 'json';
@@ -22,10 +26,33 @@ export default function CodeEditor({
 	defaultLanguage = 'javascript',
 	onMount,
 }: CodeEditorProps) {
+	const { updateCurrentTab, getTabById } = useTabStore();
+	const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
+	const { version } = useVersionStore();
+	const setTabState = useDebounceFn((isDirty) => {
+		const searchParams = new URLSearchParams(window.location.search);
+		const tabId = searchParams.get('tabId');
+		const tab = getTabById(version?._id as string, tabId as string) as Tab;
+		if (tab?.type.toLowerCase() === tab?.path) return;
+		updateCurrentTab(version?._id as string, {
+			...tab,
+			isDirty,
+		});
+	}, 500);
+	function handleEditorChange(
+		value: string | undefined,
+		ev: monaco.editor.IModelContentChangedEvent,
+	) {
+		onChange?.(value, ev);
+		if (defaultLanguage === 'javascript' && !readonly) {
+			setTabState(!!ev.changes[0].text.length);
+		}
+	}
 	const handleEditorDidMount = (
 		editor: monaco.editor.IStandaloneCodeEditor,
 		_monaco: typeof monaco,
 	) => {
+		editorRef.current = editor;
 		onMount?.(editor, _monaco);
 		editor.addAction({
 			id: 'save-action',
@@ -37,6 +64,7 @@ export default function CodeEditor({
 				saveEditorContent(editor, defaultLanguage, onSave);
 			},
 		});
+
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		//@ts-ignore
 		_monaco.editor.defineTheme('nightOwl', nightOwl);
@@ -47,7 +75,7 @@ export default function CodeEditor({
 		<div className={cn(containerClassName)}>
 			<MonacoEditor
 				className={cn('editor', className)}
-				onChange={onChange}
+				onChange={handleEditorChange}
 				onValidate={onValidate}
 				defaultValue={defaultValue}
 				value={value}

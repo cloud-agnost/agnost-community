@@ -1,8 +1,7 @@
 import { DataTable } from '@/components/DataTable';
-import { ResourceTableColumn } from '@/features/resources/ResourceTable/ResourceTableColumn';
 import useEnvironmentStore from '@/store/environment/environmentStore.ts';
-
+import { EnvironmentResourcesColumn } from './EnvironmentResourcesColumn';
 export default function EnvironmentResourcesTable() {
 	const resources = useEnvironmentStore((state) => state.resources);
-	return <DataTable data={resources} columns={ResourceTableColumn} />;
+	return <DataTable data={resources} columns={EnvironmentResourcesColumn} />;
 }

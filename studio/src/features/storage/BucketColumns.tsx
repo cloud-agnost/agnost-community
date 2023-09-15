@@ -46,6 +46,7 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 				onClick={() => {
 					useStorageStore.setState({ bucket: original });
 				}}
+				type='Storage'
 			/>;
 		},
 	},

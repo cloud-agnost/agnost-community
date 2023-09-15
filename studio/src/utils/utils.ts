@@ -267,12 +267,11 @@ export async function saveEditorContent(
 	language: 'javascript' | 'json',
 	cb?: (value: string) => void,
 ) {
-	console.log('formatting', ed);
 	if (language === 'json') {
 		ed.trigger('', 'editor.action.formatDocument', null);
 	}
 	if (language === 'javascript') {
-		const formatted = await formatCode(ed.getValue());
+		const formatted = await formatCode(ed?.getValue());
 		// Select all text
 		const fullRange = ed.getModel()?.getFullModelRange();
 

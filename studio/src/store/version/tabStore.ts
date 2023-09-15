@@ -1,9 +1,14 @@
 import { Tab } from '@/types';
+import { history } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-
+import useVersionStore from './versionStore';
 interface TabStore {
 	tabs: Record<string, Tab[]>;
+	toDeleteTab: Tab;
+	isDeleteTabModalOpen: boolean;
+	openDeleteTabModal: (tab: Tab) => void;
+	closeDeleteTabModal: () => void;
 	removeAllTabs: (versionId: string) => void;
 	removeAllTabsExcept: (versionId: string) => void;
 	setCurrentTab: (versionId: string, id: string) => void;
@@ -13,7 +18,7 @@ interface TabStore {
 	getTabById: (versionId: string, id: string) => Tab | undefined;
 	getPreviousTab: (versionId: string, currentTabId: string) => Tab | undefined;
 	getTabsByVersionId: (versionId: string) => Tab[];
-	getCurrentTab: (versionId: string) => Tab | null;
+	getCurrentTab: (versionId: string) => Tab;
 	updateCurrentTab: (versionId: string, tab: Tab) => void;
 	setTabs: (versionId: string, tabs: Tab[]) => void;
 }
@@ -23,17 +28,27 @@ const useTabStore = create<TabStore>()(
 		persist(
 			(set, get) => ({
 				tabs: {},
+				toDeleteTab: {} as Tab,
+				isDeleteTabModalOpen: false,
+				openDeleteTabModal: (tab) => {
+					set({ toDeleteTab: tab, isDeleteTabModalOpen: true });
+				},
+				closeDeleteTabModal: () => {
+					set({ toDeleteTab: {} as Tab, isDeleteTabModalOpen: false });
+				},
 				getCurrentTab: (versionId: string) => {
 					const tabs = get().tabs[versionId] ?? [];
-					return tabs?.find((tab) => tab.isActive) ?? null;
+					return tabs?.find((tab) => tab.isActive) ?? ({} as Tab);
 				},
 				getTabsByVersionId: (versionId: string) => {
 					return get().tabs[versionId] ?? [];
 				},
 				removeTab: (versionId: string, id: string) => {
 					const tabs = get().tabs[versionId];
+					const tab = tabs?.find((tab) => tab.id === id) ?? ({} as Tab);
 					if (!tabs) return;
 					const newTabs = tabs.filter((tab) => tab.id !== id);
+					const prevTab = get().getPreviousTab(versionId, tab.id);
 					set((state) => {
 						return {
 							tabs: {
@@ -42,6 +57,13 @@ const useTabStore = create<TabStore>()(
 							},
 						};
 					});
+					if (tab.isActive && prevTab) {
+						get().setCurrentTab(versionId, prevTab?.id);
+						const url = prevTab.path.includes('organization')
+							? prevTab.path
+							: useVersionStore.getState().getVersionDashboardPath(prevTab.path);
+						history.navigate?.(`${url}?tabId=${prevTab.id}`);
+					}
 				},
 				addTab: (versionId, tab) => {
 					set((state) => {
@@ -54,6 +76,11 @@ const useTabStore = create<TabStore>()(
 						};
 					});
 					get().setCurrentTab(versionId, tab.id);
+					const url = tab.path.includes('organization')
+						? tab.path
+						: useVersionStore.getState().getVersionDashboardPath(tab.path);
+
+					history.navigate?.(`${url}?tabId=${tab.id}`);
 				},
 				getTabByPath: (versionId, path) => {
 					const tabs = get().tabs[versionId] ?? [];
@@ -97,10 +124,12 @@ const useTabStore = create<TabStore>()(
 						return {
 							tabs: {
 								...state.tabs,
-								[versionId]: tabs.map((t) => ({
-									...t,
-									isActive: t.id === id,
-								})),
+								[versionId]: tabs.map((t) => {
+									return {
+										...t,
+										isActive: t.id === id,
+									};
+								}),
 							},
 						};
 					});
