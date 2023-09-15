@@ -291,3 +291,10 @@ export interface FieldType extends DatabaseType {
 		searchable: boolean;
 	};
 }
+
+export type LogTypes = 'info' | 'log' | 'debug' | 'error' | 'warn';
+export interface Log {
+	message: string;
+	timestamp: string;
+	type: LogTypes;
+}

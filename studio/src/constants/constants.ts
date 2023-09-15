@@ -341,6 +341,10 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	ENABLED: 'green',
 	DISABLED: 'red',
 	SUCCESS: 'green',
+	LOG: 'orange',
+	INFO: 'blue',
+	WARN: 'yellow',
+	DEBUG: 'purple',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [

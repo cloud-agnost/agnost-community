@@ -6,6 +6,7 @@ import {
 	DeleteTaskParams,
 	GetTaskParams,
 	GetTasksParams,
+	Log,
 	SaveTaskLogicParams,
 	Task,
 	TestTaskLogs,
@@ -34,7 +35,7 @@ export interface TaskStore {
 	testTask: (params: TestTaskParams) => Promise<void>;
 	openDeleteTaskModal: (task: Task) => void;
 	closeDeleteTaskModal: () => void;
-	setTaskLog: (taskId: string, log: string) => void;
+	setTaskLog: (taskId: string, log: Log) => void;
 }
 
 const useTaskStore = create<TaskStore>()(
@@ -150,12 +151,12 @@ const useTaskStore = create<TaskStore>()(
 				closeDeleteTaskModal: () => {
 					set({ toDeleteTask: {} as Task, isDeleteTaskModalOpen: false });
 				},
-				setTaskLog: (taskId: string, log: string) => {
+				setTaskLog: (taskId: string, log: Log) => {
 					set((prev) => {
 						return {
 							taskLogs: {
 								...prev.taskLogs,
-								[taskId]: [...(prev.taskLogs[taskId] as string[]), log],
+								[taskId]: [...(prev.taskLogs[taskId] as Log[]), log],
 							},
 						};
 					});

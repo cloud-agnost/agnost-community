@@ -6,6 +6,7 @@ import {
 	DeleteMultipleQueuesParams,
 	GetMessageQueueByIdParams,
 	GetMessageQueuesParams,
+	Log,
 	MessageQueue,
 	TestQueueLogs,
 	TestQueueParams,
@@ -33,7 +34,7 @@ interface MessageQueueStore {
 	testQueue: (params: TestQueueParams) => Promise<void>;
 	openDeleteModal: (queue: MessageQueue) => void;
 	closeDeleteModal: () => void;
-	setQueueLogs: (queueId: string, log: string) => void;
+	setQueueLogs: (queueId: string, log: Log) => void;
 	openEditModal: (queue: MessageQueue) => void;
 	closeEditModal: () => void;
 }
@@ -160,13 +161,13 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 				closeDeleteModal: () => {
 					set({ isDeleteModalOpen: false, toDeleteQueue: {} as MessageQueue });
 				},
-				setQueueLogs: (queueId: string, log: string) => {
+				setQueueLogs: (queueId: string, log: Log) => {
 					set((prev) => ({
 						testQueueLogs: {
 							...prev.testQueueLogs,
 							[queueId]: {
 								...prev.testQueueLogs[queueId],
-								logs: [...(prev.testQueueLogs[queueId].logs as string[]), log],
+								logs: [...(prev.testQueueLogs[queueId].logs as Log[]), log],
 							},
 						},
 					}));

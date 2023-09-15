@@ -4,7 +4,7 @@ import {
 	PARAM_NAME_REGEX,
 	ROUTE_NAME_REGEX,
 } from '@/constants/regex';
-import { BaseGetRequest, BaseParams, BaseRequest } from '@/types';
+import { BaseGetRequest, BaseParams, BaseRequest, Log } from '@/types';
 import { getPathParams, translate as t } from '@/utils';
 import { AxiosError, AxiosResponse } from 'axios';
 import * as z from 'zod';
@@ -211,7 +211,7 @@ interface TestResponse extends AxiosResponse {
 	epId: string;
 	duration?: string;
 	response?: AxiosError['response'];
-	logs?: string[];
+	logs?: Log[];
 }
 export interface EndpointResponse {
 	[key: string]: TestResponse;

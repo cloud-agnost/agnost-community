@@ -1,7 +1,7 @@
 import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants/regex';
 import { translate } from '@/utils';
 import * as z from 'zod';
-import { BaseGetRequest, BaseParams, BaseRequest } from '.';
+import { BaseGetRequest, BaseParams, BaseRequest, Log } from '.';
 
 export interface MessageQueue {
 	orgId: string;
@@ -111,6 +111,6 @@ export interface TestQueueParams extends BaseRequest, BaseParams {
 export interface TestQueueLogs {
 	[key: string]: {
 		payload: Record<string, string>;
-		logs?: string[];
+		logs?: Log[];
 	};
 }

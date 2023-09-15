@@ -1,5 +1,5 @@
 import useEndpointStore from '@/store/endpoint/endpointStore';
-import { Endpoint as EndpointType, RealtimeActionParams } from '@/types';
+import { Endpoint as EndpointType, LogTypes, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Endpoint extends RealtimeActions<EndpointType> {
 	deploy(): void {
@@ -7,9 +7,11 @@ class Endpoint extends RealtimeActions<EndpointType> {
 	}
 	log({ message, timestamp, id, type }: RealtimeActionParams<EndpointType>) {
 		setTimeout(() => {
-			useEndpointStore
-				.getState?.()
-				.setEndpointLog(id as string, `${timestamp} - ${message} - ${id} - ${type}`);
+			useEndpointStore.getState?.().setEndpointLog(id as string, {
+				message: message as string,
+				timestamp: timestamp as string,
+				type: type as LogTypes,
+			});
 		}, 100);
 	}
 	delete({ identifiers }: RealtimeActionParams<EndpointType>) {

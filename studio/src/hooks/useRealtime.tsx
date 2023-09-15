@@ -15,9 +15,7 @@ export default function useRealtime() {
 					//@ts-ignore
 					data,
 					identifiers,
-					timestamp: DateTime.fromISO(timestamp)
-						.setLocale('en')
-						.toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
+					timestamp: DateTime.fromISO(timestamp).toFormat('yyyy-MM-dd hh:mm:ss'),
 					message: log,
 					id,
 					type,
