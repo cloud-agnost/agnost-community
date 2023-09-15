@@ -100,7 +100,8 @@ export default function VersionEditorLayout({
 					</Button>
 				</div>
 			</div>
-
+			{/*  //eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore */}
 			<KeepAlive name={name} key={name}>
 				<CodeEditor
 					className='h-full'
