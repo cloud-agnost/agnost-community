@@ -62,7 +62,6 @@ const useTabStore = create<TabStore>()(
 						const url = prevTab.path.includes('organization')
 							? prevTab.path
 							: useVersionStore.getState().getVersionDashboardPath(prevTab.path);
-						console.log(url);
 						history.navigate?.(`${url}?tabId=${prevTab.id}`);
 					}
 				},

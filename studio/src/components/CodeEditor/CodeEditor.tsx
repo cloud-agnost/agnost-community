@@ -33,7 +33,6 @@ export default function CodeEditor({
 		const searchParams = new URLSearchParams(window.location.search);
 		const tabId = searchParams.get('tabId');
 		const tab = getTabById(version?._id as string, tabId as string) as Tab;
-		console.log(tab?.type.toLowerCase(), tab?.path, tabId, version?._id);
 		if (tab?.type.toLowerCase() === tab?.path) return;
 		updateCurrentTab(version?._id as string, {
 			...tab,
