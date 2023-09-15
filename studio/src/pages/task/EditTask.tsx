@@ -71,6 +71,7 @@ export default function EditTask() {
 			loading={loading}
 			logic={taskLogic}
 			setLogic={setTaskLogic}
+			name={task._id}
 			breadCrumbItems={[
 				{
 					name: t('task.title').toString(),

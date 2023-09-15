@@ -13,10 +13,10 @@ EditMessageQueue.loader = async ({ params }: LoaderFunctionArgs) => {
 		orgId: orgId as string,
 		appId: appId as string,
 		versionId: versionId as string,
-		queueId: queueId as string,
+		queueId: queueId,
 	});
 
-	return null;
+	return { props: {} };
 };
 
 export default function EditMessageQueue() {
@@ -68,6 +68,7 @@ export default function EditMessageQueue() {
 			loading={loading}
 			logic={queueLogic}
 			setLogic={setQueueLogic}
+			name={queue._id}
 			breadCrumbItems={[
 				{
 					name: t('queue.title').toString(),
