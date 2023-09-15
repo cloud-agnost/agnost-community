@@ -57,9 +57,10 @@ import {
 } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Application, Instance, Method, SortOption, Tab, TabTypes } from '@/types';
-import { history, translate } from '@/utils';
+import { generateId, translate } from '@/utils';
 import {
 	BracketsCurly,
 	Clock,
@@ -80,8 +81,7 @@ import {
 	TextAa,
 } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
-import { DropdownMenuSeparator } from 'components/Dropdown';
-import { ElementType, Fragment } from 'react';
+import { ElementType } from 'react';
 import * as z from 'zod';
 
 export const PAGE_SIZE = 10;
@@ -320,13 +320,6 @@ export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 		isActive: false,
 		isDashboard: false,
 		type: 'Middleware',
-	},
-	{
-		title: translate('version.settings.default'),
-		path: 'settings',
-		isActive: false,
-		isDashboard: false,
-		type: 'Settings',
 	},
 ];
 
@@ -622,58 +615,51 @@ export const CREATE_RESOURCES_ELEMENTS = [
 
 export const VERSION_DROPDOWN_ITEM = [
 	{
-		title: () => translate('version.open_version'),
-		active: () => false,
+		title: translate('version.open_version'),
 		action: () => {
 			const { application, openVersionDrawer } = useApplicationStore.getState();
 			if (!application) return;
 			openVersionDrawer(application);
 		},
-		disabled: () => false,
-		after: () => Fragment,
 	},
 	{
-		title: () => translate('version.create_a_copy'),
-		active: () => false,
+		title: translate('version.create_a_copy'),
+
 		action: async () => {
 			useVersionStore.getState().setCreateCopyVersionDrawerIsOpen(true);
 		},
-		after: () => Fragment,
-		disabled: () => false,
 	},
+	// {
+	// 	title: () => translate('version.merge'),
+	// 	active: () => false,
+	// 	action: () => {
+	// 		// TODO: implement
+	// 	},
+	// 	disabled: () => true,
+	// 	after: () => DropdownMenuSeparator,
+	// },
+	// {
+	// 	title: () => translate('version.export'),
+	// 	active: () => false,
+	// 	action: () => {
+	// 		// TODO: implement
+	// 	},
+	// 	disabled: () => true,
+	//
+	// },
+	// {
+	// 	title: () => translate('version.import'),
+	// 	active: () => false,
+	// 	action: () => {
+	// 		// TODO: implement
+	// 	},
+	// 	disabled: () => true,
+	// 	after: () => DropdownMenuSeparator,
+	// },
 	{
-		title: () => translate('version.merge'),
-		active: () => false,
-		action: () => {
-			// TODO: implement
-		},
-		disabled: () => true,
-		after: () => DropdownMenuSeparator,
-	},
-	{
-		title: () => translate('version.export'),
-		active: () => false,
-		action: () => {
-			// TODO: implement
-		},
-		disabled: () => true,
-		after: () => Fragment,
-	},
-	{
-		title: () => translate('version.import'),
-		active: () => false,
-		action: () => {
-			// TODO: implement
-		},
-		disabled: () => true,
-		after: () => DropdownMenuSeparator,
-	},
-	{
-		title: () =>
-			useVersionStore.getState().version?.readOnly
-				? translate('version.mark_read_write')
-				: translate('version.mark_read_only'),
-		active: () => false,
+		title: useVersionStore.getState().version?.readOnly
+			? translate('version.mark_read_write')
+			: translate('version.mark_read_only'),
 		action: () => {
 			const { updateVersionProperties, version } = useVersionStore.getState();
 			if (!version) return;
@@ -684,15 +670,12 @@ export const VERSION_DROPDOWN_ITEM = [
 				readOnly: !version?.readOnly,
 			});
 		},
-		after: () => Fragment,
 		disabled: () => false,
 	},
 	{
-		title: () =>
-			useVersionStore.getState().version?.private
-				? translate('version.set_public')
-				: translate('version.set_private'),
-		active: () => false,
+		title: useVersionStore.getState().version?.private
+			? translate('version.set_public')
+			: translate('version.set_private'),
 		action: () => {
 			const { updateVersionProperties, version } = useVersionStore.getState();
 			if (!version) return;
@@ -703,29 +686,23 @@ export const VERSION_DROPDOWN_ITEM = [
 				private: !version?.private,
 			});
 		},
-		after: () => Fragment,
 		disabled: () => useVersionStore.getState().version?.master,
 	},
 	{
-		title: () => translate('version.settings.default'),
-		active: () =>
-			history.location?.pathname ===
-			`${useVersionStore.getState().getVersionDashboardPath()}/settings`,
+		title: translate('version.settings.default'),
 		action: () => {
-			const versionHomePath = useVersionStore.getState().getVersionDashboardPath('/settings');
-			history.navigate?.(versionHomePath);
+			const { getVersionDashboardPath, version } = useVersionStore.getState();
+			const versionHomePath = getVersionDashboardPath('/settings');
+			useTabStore.getState().addTab(version?._id as string, {
+				id: generateId(),
+				title: translate('version.settings.default'),
+				path: versionHomePath,
+				isActive: true,
+				isDashboard: false,
+				type: 'Settings',
+			});
 		},
 		disabled: () => false,
-		after: () => (useVersionStore.getState().version?.master ? Fragment : DropdownMenuSeparator),
-	},
-	{
-		title: () => translate('version.delete'),
-		active: () => false,
-		after: () => Fragment,
-		action: () => {
-			useVersionStore.setState({ deleteVersionDrawerIsOpen: true });
-		},
-		disabled: () => useVersionStore.getState().version?.master,
 	},
 ];
 
