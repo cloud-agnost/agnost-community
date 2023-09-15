@@ -56,12 +56,63 @@ async function createMongoDBResource(mongoName, mongoVersion, memoryRequest, mem
   return "success";
 }
 
-async function deleteMongoDBResource(mongoName) {
+async function updateMongoDBResource(mongoName, mongoVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit) {
+  const patchData = {
+    spec: {
+      version: mongoVersion,
+      statefulSet: {
+        spec: {
+          template: {
+            spec: {
+              containers: [
+                {
+                  resources: {
+                    limits: {
+                      cpu: cpuLimit,
+                      memory: memoryLimit
+                    },
+                    requests: {
+                      cpu: cpuRequest,
+                      memory: memoryRequest
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  };
+  const requestOptions = { headers: { 'Content-Type': 'application/merge-patch+json' }, };
+
+  try {
+    var dbResult = await k8sCustomApi.patchNamespacedCustomObject(group, version, namespace, plural, mongoName, patchData, undefined, undefined, undefined, requestOptions);
+    console.log('MongoDB ' + mongoName + ' updated...');
+  } catch (error){
+    console.error('Error updating MongoDB ' + mongoName + ' resources...');
+    return error;
+  }
+
+  return { result: 'success' };
+}
+
+async function deleteMongoDBResource(mongoName, purgeData) {
   try {
     const dbResult = await k8sCustomApi.deleteNamespacedCustomObject(group, version, namespace, plural, mongoName);
     console.log('MongoDB ' + mongoName + ' deleted...');
     const secretResult = await k8sCoreApi.deleteNamespacedSecret(mongoName + '-user', namespace);
     console.log('Secret ' + mongoName + '-user deleted...');
+    if (purgeData) {
+      const pvcList = await k8sCoreApi.listNamespacedPersistentVolumeClaim(namespace);
+      pvcList.body.items.forEach(async (pvc) => {
+        var pvcName = pvc.metadata.name;
+        if (pvcName.includes("logs-volume-" + mongoName) || pvcName.includes("data-volume-" + mongoName)) {
+          await k8sCoreApi.deleteNamespacedPersistentVolumeClaim(pvcName, namespace);
+          console.log('PersistentVolumeClaim ' + pvcName + ' deleted...');
+        }
+      });
+    }
   } catch (error) {
     console.error('Error deleting resource:', error);
     return error
@@ -83,12 +134,25 @@ router.post('/mongodb', async (req, res) => {
   }
 });
 
-// Delete a MongoDB Community instance
-router.delete('/mongodb', async (req, res) => {
-  const { mongoName } = req.body;
+// Update MongoDB Instance
+router.put('/mongodb', async (req, res) => {
+  const { mongoName, mongoVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, replicaCount } = req.body;
 
   try {
-    const delResult = await deleteMongoDBResource(mongoName);
+    await updateMongoDBResource(mongoName, mongoVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit);
+    res.json({ 'url': mongoName + '-svc.' + namespace + '.cluster.svc.local' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete a MongoDB Community instance
+router.delete('/mongodb', async (req, res) => {
+  const { mongoName, purgeData } = req.body;
+
+  try {
+    const delResult = await deleteMongoDBResource(mongoName, purgeData);
     res.json({ mongodb: delResult});
   } catch (err) {
     console.error(err);
