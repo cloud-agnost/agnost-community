@@ -110,5 +110,8 @@
 	"backToHome": "Back to Homepage",
 	"backToLogin": "Back to Login",
 	"messageUs": "Message Us",
-	"stillHavingTrouble": "Still having trouble?"
+	"stillHavingTrouble": "Still having trouble?",
+	"tab_close_title": "Are you sure you want to close this tab?",
+	"tab_close_description": "You have unsaved changes. If you close this tab, you will lose your unsaved changes.",
+	"save_and_close": "Save & Close"
 }

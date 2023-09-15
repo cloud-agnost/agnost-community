@@ -4,11 +4,4 @@
 
 .version-layout {
 	@apply p-6 full-height-without-header overflow-auto;
-
-	&.middleware,
-	&.database,
-	&.fields,
-	&.models {
-		@apply p-0;
-	}
 }

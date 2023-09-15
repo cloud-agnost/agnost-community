@@ -12,6 +12,7 @@ import {
 	Calendar,
 	ChangeLog,
 	Connect,
+	Dashboard,
 	Database as DatabaseIcon,
 	Decimal,
 	Decision,
@@ -57,7 +58,7 @@ import {
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { Application, Instance, Method, SortOption, Tab } from '@/types';
+import { Application, Instance, Method, SortOption, Tab, TabTypes } from '@/types';
 import { history, translate } from '@/utils';
 import {
 	BracketsCurly,
@@ -276,48 +277,56 @@ export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 		path: 'database',
 		isActive: false,
 		isDashboard: false,
+		type: 'Database',
 	},
 	{
 		title: translate('version.storage'),
 		path: 'storage',
 		isActive: false,
 		isDashboard: false,
+		type: 'Storage',
 	},
 	{
 		title: translate('version.cache'),
 		path: 'cache',
 		isActive: false,
 		isDashboard: false,
+		type: 'Cache',
 	},
 	{
 		title: translate('version.endpoints'),
 		path: 'endpoint',
 		isActive: false,
 		isDashboard: false,
+		type: 'Endpoint',
 	},
 	{
 		title: translate('version.message_queues'),
 		path: 'queue',
 		isActive: false,
 		isDashboard: false,
+		type: 'Message Queue',
 	},
 	{
 		title: translate('version.cron_jobs'),
 		path: 'task',
 		isActive: false,
 		isDashboard: false,
+		type: 'Task',
 	},
 	{
 		title: translate('version.middleware.default'),
 		path: 'middleware',
 		isActive: false,
 		isDashboard: false,
+		type: 'Middleware',
 	},
 	{
 		title: translate('version.settings.default'),
 		path: 'settings',
 		isActive: false,
 		isDashboard: false,
+		type: 'Settings',
 	},
 ];
 
@@ -341,6 +350,7 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	ENABLED: 'green',
 	DISABLED: 'red',
 	SUCCESS: 'green',
+	IDLE: 'orange',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
@@ -948,4 +958,16 @@ export const DATABASE = {
 	PostgreSQL: 'PostgreSQL',
 	Oracle: 'Oracle',
 	MongoDB: 'MongoDB',
+};
+
+export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
+	Storage: Storage,
+	Database: DatabaseIcon,
+	Cache: Cache,
+	Endpoint: ApiKeys,
+	'Message Queue': MessageQueue,
+	Task: Calendar,
+	Middleware: Connect,
+	Settings: GearSix,
+	Dashboard: Dashboard,
 };

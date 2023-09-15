@@ -5,9 +5,23 @@ import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useParams } from 'react-router-dom';
+import useTabStore from '@/store/version/tabStore';
 EditMessageQueue.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { queueId, orgId, versionId, appId } = params;
 	if (!queueId) return null;
+	const { getCurrentTab, updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
+	const { queue } = useMessageQueueStore.getState();
+	if (queue?._id === queueId && history.state?.type !== 'tabChanged') {
+		useMessageQueueStore.setState({
+			editedLogic: queue.logic,
+		});
+		updateCurrentTab(versionId as string, {
+			...getCurrentTab(versionId as string),
+			isDirty: false,
+		});
+		closeDeleteTabModal();
+		return { queue };
+	}
 
 	await useMessageQueueStore.getState().getQueueById({
 		orgId: orgId as string,
@@ -22,8 +36,8 @@ EditMessageQueue.loader = async ({ params }: LoaderFunctionArgs) => {
 export default function EditMessageQueue() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const { updateQueueLogic, queue, openEditModal } = useMessageQueueStore();
-	const [queueLogic, setQueueLogic] = useState<string | undefined>(queue.logic);
+	const { updateQueueLogic, queue, openEditModal, editedLogic, setEditedLogic } =
+		useMessageQueueStore();
 	const [loading, setLoading] = useState(false);
 	const [isTestQueueOpen, setIsTestQueueOpen] = useState(false);
 
@@ -41,7 +55,7 @@ export default function EditMessageQueue() {
 			appId: appId as string,
 			versionId: versionId as string,
 			queueId: queueId as string,
-			logic: logic ?? queueLogic,
+			logic: logic ?? editedLogic,
 			onSuccess: () => {
 				setLoading(false);
 				notify({
@@ -66,8 +80,8 @@ export default function EditMessageQueue() {
 			onTestModalOpen={() => setIsTestQueueOpen(true)}
 			onSaveLogic={(value) => saveLogic(value as string)}
 			loading={loading}
-			logic={queueLogic}
-			setLogic={setQueueLogic}
+			logic={editedLogic}
+			setLogic={(value) => setEditedLogic(value as string)}
 			name={queue._id}
 			breadCrumbItems={[
 				{

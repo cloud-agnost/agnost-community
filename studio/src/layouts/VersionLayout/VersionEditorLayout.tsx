@@ -1,15 +1,16 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
-import { Pencil } from '@/components/icons';
+import { InfoModal } from '@/components/InfoModal';
+import { Pencil, Warning } from '@/components/icons';
+import useTabStore from '@/store/version/tabStore';
 import { cn, saveEditorContent } from '@/utils';
 import { FloppyDisk, TestTube } from '@phosphor-icons/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
-import { useState } from 'react';
-import KeepAlive from 'react-fiber-keep-alive';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
-
+import { KeepAlive } from 'react-keep-alive';
+import { useLocation, useParams } from 'react-router-dom';
 interface VersionEditorLayoutProps {
 	children: React.ReactNode;
 	className?: string;
@@ -17,12 +18,25 @@ interface VersionEditorLayoutProps {
 	logic?: string;
 	breadCrumbItems?: BreadCrumbItem[];
 	name: string;
-	isSaved: boolean;
 	onSaveLogic: (logic?: string) => void;
 	onTestModalOpen?: () => void;
 	onEditModalOpen: () => void;
 	setLogic: (logic: string | undefined) => void;
 }
+
+const initBeforeUnLoad = (showExitPrompt: boolean) => {
+	window.onbeforeunload = (event) => {
+		// Show prompt based on state
+		if (showExitPrompt) {
+			const e = event || window.event;
+			e.preventDefault();
+			if (e) {
+				e.returnValue = '';
+			}
+			return '';
+		}
+	};
+};
 
 export default function VersionEditorLayout({
 	children,
@@ -35,11 +49,15 @@ export default function VersionEditorLayout({
 	setLogic,
 	className,
 	name,
-	isSaved,
 }: VersionEditorLayoutProps) {
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
+	const { versionId } = useParams<{ versionId: string }>();
+	const { removeTab, toDeleteTab, isDeleteTabModalOpen, closeDeleteTabModal, getCurrentTab } =
+		useTabStore();
+	const tab = getCurrentTab(versionId as string);
 	const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
+
 	async function handleSaveLogic() {
 		saveEditorContent(editor as monaco.editor.IStandaloneCodeEditor, 'javascript', (val) => {
 			setLogic(val);
@@ -47,8 +65,15 @@ export default function VersionEditorLayout({
 		});
 	}
 
+	window.onload = function () {
+		initBeforeUnLoad(tab.isDirty as boolean);
+	};
+
+	useEffect(() => {
+		initBeforeUnLoad(tab.isDirty as boolean);
+	}, [tab.isDirty]);
 	return (
-		<div className={cn('p-4 space-y-6 h-full', className)}>
+		<div className={cn('space-y-6 h-full', className)}>
 			<div className='flex items-center gap-4'>
 				{breadCrumbItems && (
 					<BreadCrumb
@@ -56,8 +81,6 @@ export default function VersionEditorLayout({
 						items={breadCrumbItems}
 					/>
 				)}
-
-				{!isSaved && <div className='text-default rounded-full bg-base-reverse w-2.5 h-2.5' />}
 			</div>
 			<div className='flex items-center justify-between'>
 				{children}
@@ -77,7 +100,8 @@ export default function VersionEditorLayout({
 					</Button>
 				</div>
 			</div>
-			<KeepAlive name={name}>
+
+			<KeepAlive name={name} key={name}>
 				<CodeEditor
 					className='h-full'
 					containerClassName='h-[88%]'
@@ -89,6 +113,37 @@ export default function VersionEditorLayout({
 					}}
 				/>
 			</KeepAlive>
+			<InfoModal
+				isOpen={isDeleteTabModalOpen}
+				closeModal={closeDeleteTabModal}
+				icon={<Warning className='text-icon-danger w-20 h-20' />}
+				action={
+					<div className='flex items-center justify-center gap-4'>
+						<Button variant='text' size='lg' onClick={closeDeleteTabModal}>
+							{t('general.cancel')}
+						</Button>
+						<Button
+							variant='secondary'
+							size='lg'
+							onClick={() => {
+								removeTab(versionId as string, toDeleteTab.id);
+								handleSaveLogic();
+							}}
+						>
+							{t('general.save_and_close')}
+						</Button>
+						<Button
+							size='lg'
+							variant='primary'
+							onClick={() => removeTab(versionId as string, toDeleteTab.id)}
+						>
+							{t('general.ok')}
+						</Button>
+					</div>
+				}
+				title={t('general.tab_close_title')}
+				description={t('general.tab_close_description')}
+			/>
 		</div>
 	);
 }
