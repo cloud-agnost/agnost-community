@@ -20,7 +20,6 @@ import { useNavigate, useOutletContext, useParams, useSearchParams } from 'react
 Buckets.loader = async () => {
 	const role = useApplicationStore.getState().application?.role;
 	const permission = getAppPermission(role as AppRoles, 'app.storage.viewData');
-	console.log('permission', permission);
 	if (!permission) {
 		// return redirect('/404');
 	}

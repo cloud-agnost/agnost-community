@@ -12,11 +12,10 @@ import {
 } from 'components/Dropdown';
 import { SearchInput } from 'components/SearchInput';
 import { NEW_TAB_ITEMS } from 'constants/constants.ts';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 export default function NewTabDropdown() {
 	const { addTab } = useTabStore();
 	const { versionId } = useParams() as { versionId: string };
-	const navigate = useNavigate();
 
 	function handleAddTab(item: (typeof NEW_TAB_ITEMS)[number]) {
 		const tab = {
@@ -24,7 +23,6 @@ export default function NewTabDropdown() {
 			...item,
 		};
 		addTab(versionId, tab);
-		navigate(`${tab.path}?tabId=${tab.id}`);
 	}
 	return (
 		<DropdownMenu>

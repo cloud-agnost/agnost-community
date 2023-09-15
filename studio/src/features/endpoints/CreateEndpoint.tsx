@@ -2,7 +2,6 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
-import useTabStore from '@/store/version/tabStore';
 import { CreateEndpointSchema } from '@/types';
 import { translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,7 +18,6 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 	const { createEndpoint } = useEndpointStore();
 
 	const { pathname } = useLocation();
-	const { getCurrentTab } = useTabStore();
 	const navigate = useTabNavigate();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
@@ -42,11 +40,11 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 			...data,
 			onSuccess: (endpoint) => {
 				navigate({
-					id: getCurrentTab(versionId as string)?.id as string,
 					title: endpoint.name,
 					path: `${pathname}/${endpoint._id}`,
 					isActive: true,
 					isDashboard: false,
+					type: 'Endpoint',
 				});
 				closeDrawer();
 			},

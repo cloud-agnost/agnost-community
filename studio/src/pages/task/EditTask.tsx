@@ -7,10 +7,23 @@ import cronstrue from 'cronstrue';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useParams } from 'react-router-dom';
-
+import useTabStore from '@/store/version/tabStore';
 EditTask.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { taskId, orgId, versionId, appId } = params;
 	if (!taskId) return null;
+	const { getCurrentTab, updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
+	const { task } = useTaskStore.getState();
+	if (task?._id === taskId && history.state?.type !== 'tabChanged') {
+		useTaskStore.setState({
+			editedLogic: task.logic,
+		});
+		updateCurrentTab(versionId as string, {
+			...getCurrentTab(versionId as string),
+			isDirty: false,
+		});
+		closeDeleteTabModal();
+		return { task };
+	}
 
 	await useTaskStore.getState().getTask({
 		orgId: orgId as string,
@@ -25,8 +38,7 @@ EditTask.loader = async ({ params }: LoaderFunctionArgs) => {
 export default function EditTask() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const { task, saveTaskLogic, openEditTaskModal } = useTaskStore();
-	const [taskLogic, setTaskLogic] = useState<string | undefined>(task.logic);
+	const { task, saveTaskLogic, openEditTaskModal, editedLogic, setEditedLogic } = useTaskStore();
 	const [loading, setLoading] = useState(false);
 	const [isTestTaskOpen, setIsTestTaskOpen] = useState(false);
 
@@ -44,7 +56,7 @@ export default function EditTask() {
 			appId: appId as string,
 			versionId: versionId as string,
 			taskId: taskId as string,
-			logic: logic ?? taskLogic,
+			logic: logic ?? editedLogic,
 			onSuccess: () => {
 				setLoading(false);
 				notify({
@@ -69,8 +81,9 @@ export default function EditTask() {
 			onTestModalOpen={() => setIsTestTaskOpen(true)}
 			onSaveLogic={(value) => saveLogic(value as string)}
 			loading={loading}
-			logic={taskLogic}
-			setLogic={setTaskLogic}
+			logic={editedLogic}
+			setLogic={(value) => setEditedLogic(value as string)}
+			name={task._id}
 			breadCrumbItems={[
 				{
 					name: t('task.title').toString(),

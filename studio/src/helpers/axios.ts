@@ -7,7 +7,6 @@ const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost/api';
 const headers = {
 	'Content-Type': 'application/json',
 };
-console.log('baseURL', baseURL);
 export const instance = axios.create({
 	baseURL,
 	headers,

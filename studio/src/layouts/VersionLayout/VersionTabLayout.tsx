@@ -68,7 +68,7 @@ export default function VersionTabLayout<T>({
 	}
 
 	return (
-		<div className={cn('p-4 h-full flex gap-y-4 flex-col', className)}>
+		<div className={cn('h-full flex gap-y-4 flex-col', className)}>
 			{breadCrumb}
 			<div className='flex items-center justify-between'>
 				<h1 className='text-default text-2xl text-center'>{title}</h1>

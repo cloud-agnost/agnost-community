@@ -43,7 +43,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 				original: { _id, name },
 			},
 		}) => {
-			return <TabLink name={name} path={`${_id}`} />;
+			return <TabLink name={name} path={`${_id}`} type='Middleware' />;
 		},
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',

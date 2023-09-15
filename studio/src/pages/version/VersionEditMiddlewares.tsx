@@ -78,6 +78,7 @@ export default function VersionEditMiddlewares() {
 			loading={loading}
 			logic={middleware?.logic}
 			setLogic={setLogic}
+			name={middlewareId}
 		>
 			<span className='text-default text-xl'>{name}</span>
 		</VersionEditorLayout>

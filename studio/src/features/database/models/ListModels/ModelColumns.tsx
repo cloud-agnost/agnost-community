@@ -46,7 +46,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 				original: { _id, name },
 			},
 		}) => {
-			return <TabLink name={name} path={`${_id}/fields`} />;
+			return <TabLink name={name} path={`${_id}/fields`} type='Database' />;
 		},
 	},
 	{

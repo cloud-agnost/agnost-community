@@ -495,49 +495,49 @@
 .rdrNextPrevButton {
 	background-color: rgb(var(--wrapper-background-light)) !important;
 }
-// ::-webkit-scrollbar {
-// 	width: 10px;
-// }
+::-webkit-scrollbar {
+	width: 10px;
+}
 
-// /* Track */
-// ::-webkit-scrollbar-track {
-// 	box-shadow: inset 0 0 5px rgb(var(--form-input-base-border));
-// 	border-radius: var(--radius);
-// }
+/* Track */
+::-webkit-scrollbar-track {
+	box-shadow: inset 0 0 5px rgb(var(--form-input-base-border));
+	border-radius: var(--radius);
+}
 
-// /* Handle */
-// ::-webkit-scrollbar-thumb {
-// 	background: rgb(var(--wrapper-background-light));
-// 	border-radius: var(--radius);
-// }
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: rgb(var(--wrapper-background-light));
+	border-radius: var(--radius);
+}
 
-// /* Handle on hover */
-// ::-webkit-scrollbar-thumb:hover {
-// 	background: rgb(var(--wrapper-background-hover));
-// }
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: rgb(var(--wrapper-background-hover));
+}
 
-// /* width */
-// ::-moz-scrollbar {
-// 	width: 10px;
-// }
+/* width */
+::-moz-scrollbar {
+	width: 10px;
+}
 
-// /* Track */
-// ::-moz-scrollbar-track {
-// 	box-shadow: inset 0 0 5px rgb(var(--form-input-base-border));
-// 	border-radius: var(--radius);
-// }
+/* Track */
+::-moz-scrollbar-track {
+	box-shadow: inset 0 0 5px rgb(var(--form-input-base-border));
+	border-radius: var(--radius);
+}
 
-// /* Handle */
-// ::-moz-scrollbar-thumb {
-// 	background: rgb(var(--wrapper-background-light));
-// 	border-radius: var(--radius);
-// }
+/* Handle */
+::-moz-scrollbar-thumb {
+	background: rgb(var(--wrapper-background-light));
+	border-radius: var(--radius);
+}
 
-// /* Handle on hover */
-// ::-moz-scrollbar-thumb:hover {
-// 	background: rgb(var(--wrapper-background-hover));
-// }
-// html {
-// 	scrollbar-width: thin;
-// 	scrollbar-color: var(--wrapper-background-light) var(--form-input-base-border);
-// }
+/* Handle on hover */
+::-moz-scrollbar-thumb:hover {
+	background: rgb(var(--wrapper-background-hover));
+}
+html {
+	scrollbar-width: thin;
+	scrollbar-color: var(--wrapper-background-light) var(--form-input-base-border);
+}
