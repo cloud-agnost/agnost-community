@@ -109,7 +109,7 @@ async function deleteMySQLResource(clusterName, purgeData) {
     if (purgeData) {
       const pvcList = await k8sCoreApi.listNamespacedPersistentVolumeClaim(namespace);
       pvcList.body.items.forEach(async (pvc) => {
-        var pvcName = pvc.metadata.name
+        var pvcName = pvc.metadata.name;
         if (pvcName.includes("datadir-" + clusterName)) {
           await k8sCoreApi.deleteNamespacedPersistentVolumeClaim(pvcName, namespace);
           console.log('PersistentVolumeClaim ' + pvcName + ' deleted...');

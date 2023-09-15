@@ -111,7 +111,48 @@ async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, 
   return "success";
 }
 
-async function deleteRedis(clusterName) {
+async function updateRedis(clusterName, dbVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit) {
+  const patchData = {
+    spec: {
+      version: dbVersion,
+      router: {
+        version: dbVersion
+      },
+      template: {
+        spec: {
+          containers: [
+            {
+              resources: {
+                limits: {
+                  cpu: cpuLimit,
+                  memory: memoryLimit
+                },
+                requests: {
+                  cpu: cpuRequest,
+                  memory: memoryRequest
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  };
+  const requestOptions = { headers: { 'Content-Type': 'application/merge-patch+json' }, };
+
+  try {
+    var dbResult = await k8sCustomApi.patchNamespacedCustomObject(group, version, namespace, plural, clusterName, patchData, undefined, undefined, undefined, requestOptions);
+    console.log('MySQL ' + clusterName + ' updated...');
+  } catch (error){
+    console.error('Error updating MySQL ' + clusterName + ' resources...');
+    return error;
+  }
+
+  return { result: 'success' };
+}
+
+
+async function deleteRedis(clusterName, purgeData) {
   try {
     await k8sApi.deleteNamespacedStatefulSet(clusterName + '-master', namespace );
     console.log('StatefulSet ' + clusterName + '-master deleted...');
@@ -129,6 +170,11 @@ async function deleteRedis(clusterName) {
     console.log('ServiceAccount ' + clusterName + '-svc-acc deleted...');
     await k8sCoreApi.deleteNamespacedSecret(clusterName + '-redis-password', namespace);
     console.log('Secret ' + clusterName + '-credentials deleted...');
+    if (purgeData) {
+      var pvcName = 'redis-data-' + clusterName + '-master-0';
+      await k8sCoreApi.deleteNamespacedPersistentVolumeClaim(pvcName, namespace);
+      console.log('PersistentVolumeClaim ' + pvcName + ' deleted...');
+    }
   } catch (error) {
     console.error('Error deleting resource:', error);
     return error
@@ -140,6 +186,11 @@ async function deleteRedis(clusterName) {
     console.log('StatefulSet ' + clusterName + '-replicas deleted...');
     await k8sCoreApi.deleteNamespacedService(clusterName + '-replicas', namespace);
     console.log('Service ' + clusterName + '-replicas deleted...');
+    if (purgeData) {
+      var pvcName = 'redis-data-' + clusterName + '-replicas-0';
+      await k8sCoreApi.deleteNamespacedPersistentVolumeClaim(pvcName, namespace);
+      console.log('PersistentVolumeClaim ' + pvcName + ' deleted...');
+    }
   } catch {
     console.log('This has no read replicas...')
   }
@@ -161,12 +212,25 @@ router.post('/redis', async (req, res) => {
   }
 });
 
-// Delete a Redis instance
-router.delete('/redis', async (req, res) => {
-  const { clusterName } = req.body;
+// Update Redis Instance
+router.put('/redis', async (req, res) => {
+  const { clusterName, dbVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, rootPasswd } = req.body;
 
   try {
-    const delResult = await deleteRedis(clusterName);
+    await updateRedis(clusterName, dbVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit);
+    res.json({ 'url': clusterName + '-master.' + namespace + '.cluster.svc.local' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete a Redis instance
+router.delete('/redis', async (req, res) => {
+  const { clusterName, purgeData } = req.body;
+
+  try {
+    const delResult = await deleteRedis(clusterName, purgeData);
     res.json({ redis: delResult});
   } catch (err) {
     console.error(err);
