@@ -323,8 +323,6 @@ spec:
                     app.kubernetes.io/component: master
                 topologyKey: kubernetes.io/hostname
               weight: 1
-        nodeAffinity:
-          
       terminationGracePeriodSeconds: 30
       containers:
         - name: redis
@@ -389,10 +387,10 @@ spec:
                 - /health/ping_readiness_local.sh 1
           resources:
             limits:
-              cpu: 1
+              cpu: "1"
               memory: 1Gi
             requests:
-              cpu: 1
+              cpu: "1"
               memory: 1Gi
           volumeMounts:
             - name: start-scripts
@@ -559,10 +557,10 @@ spec:
                 - /health/ping_readiness_local_and_master.sh 1
           resources:
             limits:
-              cpu: 1
+              cpu: "1"
               memory: 1Gi
             requests:
-              cpu: 1
+              cpu: "1"
               memory: 1Gi
           volumeMounts:
             - name: start-scripts

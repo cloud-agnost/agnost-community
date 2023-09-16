@@ -12,7 +12,7 @@ const k8sApi = kc.makeApiClient(k8s.AppsV1Api);
 
 const namespace = process.env.NAMESPACE;
 
-async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, passwd, readReplicaEnabled) {
+async function createRedis(clusterName, version, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, passwd, readReplicaEnabled) {
   if (readReplicaEnabled) {
     var manifest = fs.readFileSync('/manifests/redis-replication.yaml', 'utf8');
   } else {
@@ -56,6 +56,7 @@ async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, 
           switch(resource.metadata.name) {
             case 'redis-replicas':
               resource.metadata.name = clusterName + '-replicas';
+              resource.spec.template.spec.containers[0].image = 'docker.io/bitnami/redis:' + version;
               resource.spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.name = clusterName + '-redis-password';
               resource.spec.template.spec.containers[0].env[2].value = clusterName + '-master-0.' + clusterName + '-headless.' + namespace + '.svc.cluster.local';
               break;
@@ -66,6 +67,7 @@ async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, 
           resource.spec.volumeClaimTemplates[0].spec.resources.requests.storage = diskSize;
           resource.spec.serviceName = clusterName + '-headless';
           resource.spec.template.spec.serviceAccountName = clusterName + '-svc-acc';
+          resource.spec.template.spec.containers[0].image = 'docker.io/bitnami/redis:' + version;
           resource.spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name = clusterName + '-redis-password';
           resource.spec.template.spec.containers[0].resources.limits.cpu = cpuLimit;
           resource.spec.template.spec.containers[0].resources.limits.memory = memoryLimit;
@@ -111,17 +113,16 @@ async function createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, 
   return "success";
 }
 
-async function updateRedis(clusterName, dbVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit) {
+/*
+async function updateRedis(clusterName, version, memoryRequest, memoryLimit, cpuRequest, cpuLimit, readReplicaEnabled) {
   const patchData = {
     spec: {
-      version: dbVersion,
-      router: {
-        version: dbVersion
-      },
       template: {
         spec: {
           containers: [
             {
+              name: 'redis',
+              image: 'docker.io/bitnami/redis:' + version,
               resources: {
                 limits: {
                   cpu: cpuLimit,
@@ -141,16 +142,19 @@ async function updateRedis(clusterName, dbVersion, memoryRequest, memoryLimit, c
   const requestOptions = { headers: { 'Content-Type': 'application/merge-patch+json' }, };
 
   try {
-    var dbResult = await k8sCustomApi.patchNamespacedCustomObject(group, version, namespace, plural, clusterName, patchData, undefined, undefined, undefined, requestOptions);
-    console.log('MySQL ' + clusterName + ' updated...');
+    await k8sApi.patchNamespacedStatefulSet(clusterName + '-master', namespace, patchData, undefined, undefined, undefined, undefined, undefined, requestOptions);
+    console.log('StatefulSet ' + clusterName + '-master updated...');
+    if (readReplicaEnabled) {
+      await k8sApi.patchNamespacedStatefulSet(clusterName + '-replicas', namespace, patchData, undefined, undefined, undefined, undefined, undefined, requestOptions);
+      console.log('StatefulSet ' + clusterName + '-replicas updated...');
+    }
   } catch (error){
-    console.error('Error updating MySQL ' + clusterName + ' resources...');
-    return error;
+    console.error('Error updating StatefulSet ' + clusterName + ' resources...', error);
   }
 
   return { result: 'success' };
 }
-
+*/
 
 async function deleteRedis(clusterName, purgeData) {
   try {
@@ -201,10 +205,10 @@ async function deleteRedis(clusterName, purgeData) {
 
 // Create a Redis Instance
 router.post('/redis', async (req, res) => {
-  const { clusterName, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, passwd, readReplicaEnabled } = req.body;
+  const { clusterName, version, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, passwd, readReplicaEnabled } = req.body;
 
   try {
-    const redisResult = await createRedis(clusterName, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, passwd, readReplicaEnabled);
+    const redisResult = await createRedis(clusterName, version, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, passwd, readReplicaEnabled);
     res.json({ redis: redisResult.body });
   } catch (err) {
     console.error(err);
@@ -212,18 +216,20 @@ router.post('/redis', async (req, res) => {
   }
 });
 
+/*
 // Update Redis Instance
 router.put('/redis', async (req, res) => {
-  const { clusterName, dbVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, rootPasswd } = req.body;
+  const { clusterName, version, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, rootPasswd, readReplicaEnabled } = req.body;
 
   try {
-    await updateRedis(clusterName, dbVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit);
+    await updateRedis(clusterName, version, memoryRequest, memoryLimit, cpuRequest, cpuLimit, readReplicaEnabled);
     res.json({ 'url': clusterName + '-master.' + namespace + '.cluster.svc.local' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
+*/
 
 // Delete a Redis instance
 router.delete('/redis', async (req, res) => {
