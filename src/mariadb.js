@@ -95,12 +95,22 @@ async function updateMariaDBResource(serverName, dbVersion, memoryRequest, memor
 }
 
 
-async function deleteMariaDBResource(serverName) {
+async function deleteMariaDBResource(serverName, purgeData) {
   try {
     const dbResult = await k8sCustomApi.deleteNamespacedCustomObject(group, version, namespace, plural, serverName);
     console.log('MariaDB ' + serverName + ' deleted...');
     const secretResult = await k8sCoreApi.deleteNamespacedSecret(serverName + '-credentials', namespace);
     console.log('Secret ' + serverName + '-credentials deleted...');
+    if (purgeData) {
+      const pvcList = await k8sCoreApi.listNamespacedPersistentVolumeClaim(namespace);
+      pvcList.body.items.forEach(async (pvc) => {
+        var pvcName = pvc.metadata.name;
+        if (pvcName.includes("storage-" + serverName)) {
+          await k8sCoreApi.deleteNamespacedPersistentVolumeClaim(pvcName, namespace);
+          console.log('PersistentVolumeClaim ' + pvcName + ' deleted...');
+        }
+      });
+    }
   } catch (error) {
     console.error('Error deleting resource:', error);
     return error
@@ -139,10 +149,10 @@ router.put('/mariadb', async (req, res) => {
 
 // Delete a MariaDB instance
 router.delete('/mariadb', async (req, res) => {
-  const { serverName } = req.body;
+  const { serverName, purgeData } = req.body;
 
   try {
-    const delResult = await deleteMariaDBResource(serverName);
+    const delResult = await deleteMariaDBResource(serverName, purgeData);
     res.json({ mariadb: delResult});
   } catch (err) {
     console.error(err);
