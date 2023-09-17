@@ -13,6 +13,7 @@ kind: RabbitmqCluster
 metadata:
   name: rabbitmq
 spec:
+  image: docker.io/bitnami/rabbitmq:3.10.2
   replicas: 3
   resources:
     requests:
@@ -40,10 +41,13 @@ spec:
               - command:
                   - sh
                   - -c
-                  - curl -L -v https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/3.11.1/rabbitmq_delayed_message_exchange-3.11.1.ez --output /community-plugins/rabbitmq_delayed_message_exchange-3.11.1.ez
+                  - if [[ $RMQ_VERSION =~ 3.12* ]]; then DIR="v${RMQ_VERSION}"; else DIR=${RMQ_VERSION}; fi && curl -L -v https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/${DIR}/rabbitmq_delayed_message_exchange-${RMQ_VERSION}.ez --output /community-plugins/rabbitmq_delayed_message_exchange-${RMQ_VERSION}.ez
                 image: curlimages/curl
                 imagePullPolicy: IfNotPresent
                 name: copy-community-plugins
+                env:
+                  - name: RMQ_VERSION
+                    value: "3.10.2"
                 resources:
                   limits:
                     cpu: 100m
