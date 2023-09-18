@@ -74,7 +74,7 @@ curl -XPOST http://localhost:3000/redis -d '{
     "readReplicaEnabled": true
 }' -H "Content-type: application/json"
 ```
-<!-- Commenting out as it is broken at the moment
+
 ### Update redis
 
 ```bash
@@ -85,10 +85,10 @@ curl -XPUT http://localhost:3000/redis -d '{
     "memoryLimit": "500Mi",
     "cpuRequest": "200m",
     "cpuLimit": "500m",
-    "readReplicasEnabled": true
+    "readReplicaEnabled": true
 }' -H "Content-type: application/json"
 ```
---->
+
 ### Delete redis
 
 ```bash

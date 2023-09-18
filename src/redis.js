@@ -113,39 +113,26 @@ async function createRedis(clusterName, version, memoryRequest, memoryLimit, cpu
   return "success";
 }
 
-/*
+
 async function updateRedis(clusterName, version, memoryRequest, memoryLimit, cpuRequest, cpuLimit, readReplicaEnabled) {
-  const patchData = {
-    spec: {
-      template: {
-        spec: {
-          containers: [
-            {
-              name: 'redis',
-              image: 'docker.io/bitnami/redis:' + version,
-              resources: {
-                limits: {
-                  cpu: cpuLimit,
-                  memory: memoryLimit
-                },
-                requests: {
-                  cpu: cpuRequest,
-                  memory: memoryRequest
-                }
-              }
-            }
-          ]
-        }
-      }
-    }
-  };
-  const requestOptions = { headers: { 'Content-Type': 'application/merge-patch+json' }, };
+  const sts = await k8sApi.readNamespacedStatefulSet(clusterName + '-master', namespace);
+  sts.body.spec.template.spec.containers[0].image = 'docker.io/bitnami/redis:' + version;
+  sts.body.spec.template.spec.containers[0].resources.limits.cpu = cpuLimit;
+  sts.body.spec.template.spec.containers[0].resources.limits.memory = memoryLimit;
+  sts.body.spec.template.spec.containers[0].resources.requests.cpu = cpuRequest;
+  sts.body.spec.template.spec.containers[0].resources.requests.memory = memoryRequest;
 
   try {
-    await k8sApi.patchNamespacedStatefulSet(clusterName + '-master', namespace, patchData, undefined, undefined, undefined, undefined, undefined, requestOptions);
+    await k8sApi.replaceNamespacedStatefulSet(clusterName + '-master', namespace, sts.body);
     console.log('StatefulSet ' + clusterName + '-master updated...');
     if (readReplicaEnabled) {
-      await k8sApi.patchNamespacedStatefulSet(clusterName + '-replicas', namespace, patchData, undefined, undefined, undefined, undefined, undefined, requestOptions);
+      const replica = await k8sApi.readNamespacedStatefulSet(clusterName + '-replicas', namespace);
+      replica.body.spec.template.spec.containers[0].image = 'docker.io/bitnami/redis:' + version;
+      replica.body.spec.template.spec.containers[0].resources.limits.cpu = cpuLimit;
+      replica.body.spec.template.spec.containers[0].resources.limits.memory = memoryLimit;
+      replica.body.spec.template.spec.containers[0].resources.requests.cpu = cpuRequest;
+      replica.body.spec.template.spec.containers[0].resources.requests.memory = memoryRequest;
+      await k8sApi.replaceNamespacedStatefulSet(clusterName + '-replicas', namespace, replica.body);
       console.log('StatefulSet ' + clusterName + '-replicas updated...');
     }
   } catch (error){
@@ -154,7 +141,7 @@ async function updateRedis(clusterName, version, memoryRequest, memoryLimit, cpu
 
   return { result: 'success' };
 }
-*/
+
 
 async function deleteRedis(clusterName, purgeData) {
   try {
@@ -216,7 +203,7 @@ router.post('/redis', async (req, res) => {
   }
 });
 
-/*
+
 // Update Redis Instance
 router.put('/redis', async (req, res) => {
   const { clusterName, version, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, rootPasswd, readReplicaEnabled } = req.body;
@@ -229,7 +216,7 @@ router.put('/redis', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-*/
+
 
 // Delete a Redis instance
 router.delete('/redis', async (req, res) => {
