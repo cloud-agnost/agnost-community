@@ -87,6 +87,11 @@ const ERROR_CODES = {
 	directObjectAssignmentNotAllowed: "direct_object_assignment_not_allowed",
 	directArrayAssignmentNotAllowed: "direct_array_assignment_not_allowed",
 	invalidUpdateInstruction: "invalid_update_instruction",
+	invalidGrouping: "invalid_grouping",
+	invalidGroupingEntry: "invalid_grouping_entry",
+	invalidComputations: "invalid_computations",
+	invalidComputationEntry: "invalid_computation_entry",
+	invalidComputationOperator: "invalid_computation_operator",
 };
 
 export default ERROR_CODES;

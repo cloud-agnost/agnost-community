@@ -118,7 +118,6 @@ export class MongoDB extends DatabaseBase {
 	 * @param  {string} objectId The object identifier
 	 * @param  {any[]} pipeline The pipeline array
 	 */
-
 	createMatchStage(id, pipeline) {
 		pipeline.push({
 			$match: { _id: helper.objectId(id) },
@@ -131,7 +130,6 @@ export class MongoDB extends DatabaseBase {
 	 * @param  {object} where The where expression
 	 * @param  {any[]} pipeline The pipeline array
 	 */
-
 	createWhereStage(where, pipeline) {
 		if (!where) return;
 		pipeline.push({
@@ -159,8 +157,8 @@ export class MongoDB extends DatabaseBase {
 	 * @param  {Array} joins The list of join definitions
 	 * @param  {any[]} pipeline The pipeline array
 	 */
-
 	createJoinStage(joins, pipeline) {
+		if (!joins) return;
 		for (const joinDef of joins) {
 			if (joinDef.joinType === "simple") {
 				// For simple lookups we just need to return one matching record
@@ -251,7 +249,6 @@ export class MongoDB extends DatabaseBase {
   	 * @param  {Array} sort The sort definition list
 	 * @param  {any[]} pipeline The pipeline array
 	 */
-
 	createSortStage(sort, pipeline) {
 		if (!sort) return;
 
@@ -268,7 +265,6 @@ export class MongoDB extends DatabaseBase {
 	 * @param  {number} skip The skip count
 	 * @param  {any[]} pipeline The pipeline array
 	 */
-
 	createSkipStage(skip, pipeline) {
 		if (skip === null) return;
 		pipeline.push({ $skip: skip });
@@ -279,12 +275,73 @@ export class MongoDB extends DatabaseBase {
 	 * @param  {number} limit The max number of records to return
 	 * @param  {any[]} pipeline The pipeline array
 	 */
-
 	createLimitStage(limit, pipeline) {
 		if (!limit) return;
 		pipeline.push({ $limit: limit });
 	}
 
+	/**
+	 * Creates group by stage
+	 * @param  {any[]} groupBy The group by defintions array
+	 * @param  {any[]} computations The computation definition array
+	 */
+	createGroupStage(groupBy, computations, pipeline) {
+		let _id = null;
+		const projection = {};
+		if (groupBy) {
+			_id = {};
+			projection._id = 0;
+			for (const entry of groupBy) {
+				_id[entry.as] = entry.expression.getQuery("MongoDB");
+				projection[entry.as] = `$_id.${entry.as}`;
+			}
+		} else {
+			projection._id = 0;
+		}
+
+		const comps = {};
+		for (const comp of computations) {
+			switch (comp.operator) {
+				case "$count":
+					comps[comp.as] = { $sum: 1 };
+					break;
+				case "$countIf":
+					comps[comp.as] = {
+						$sum: {
+							$cond: { if: comp.compute.getQuery("MongoDB"), then: 1, else: 0 },
+						},
+					};
+					break;
+				case "$sum":
+					comps[comp.as] = {
+						$sum: comp.compute.getQuery("MongoDB"),
+					};
+					break;
+				case "$avg":
+					comps[comp.as] = {
+						$avg: comp.compute.getQuery("MongoDB"),
+					};
+					break;
+				case "$min":
+					comps[comp.as] = {
+						$min: comp.compute.getQuery("MongoDB"),
+					};
+					break;
+				case "$max":
+					comps[comp.as] = {
+						$max: comp.compute.getQuery("MongoDB"),
+					};
+					break;
+				default:
+					break;
+			}
+
+			projection[comp.as] = 1;
+		}
+
+		pipeline.push({ $group: { _id, ...comps } });
+		pipeline.push({ $project: projection });
+	}
 	/**
 	 * Starts a new transaction on the database server. Any database CRUD operation that is executed after a call to `beginTransaction` will be executed within the transaction context. If the transaction is not committed then the changes will not be applied to the database.
 	 */
@@ -442,8 +499,6 @@ export class MongoDB extends DatabaseBase {
 					_id: 1,
 				},
 			});
-
-			console.log("***pipeline", JSON.stringify(pipeline, null, 2));
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
@@ -721,8 +776,6 @@ export class MongoDB extends DatabaseBase {
 				},
 			});
 
-			console.log("***pipeline", JSON.stringify(pipeline, null, 2));
-
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
 				raw: false, // Whether to return document results as raw BSON buffers
@@ -761,9 +814,57 @@ export class MongoDB extends DatabaseBase {
 				}
 			);
 
-			console.stdlog("***here", updateResult);
-
 			return { count: updateResult.modifiedCount };
 		}
+	}
+
+	/**
+	 * Groups the records and performs computations on these groups
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The `where`, `join`, `groupBy`, `computations`, `having`, `sort`, `limit` and `skip`  instructions
+	 * @returns  Group computation results
+	 */
+	async aggregate(dbMeta, modelMeta, options) {
+		const dbName = this.getAppliedDbName(dbMeta);
+		const modelName = this.getModelName(modelMeta);
+
+		const db = this.driver.db(dbName);
+		const collection = db.collection(modelName);
+		const readPreference = this.session
+			? "primary"
+			: options.useReadReplica
+			? "secondaryPreferred"
+			: "primary";
+
+		const pipeline = [];
+		if (options.where && options.where.hasJoinFieldValues()) {
+			this.createJoinStage(options.join, pipeline);
+			this.createWhereStage(options.where, pipeline);
+		} else {
+			this.createWhereStage(options.where, pipeline);
+			this.createJoinStage(options.join, pipeline);
+		}
+
+		this.createGroupStage(options.groupBy, options.computations, pipeline);
+
+		this.createWhereStage(options.having, pipeline);
+
+		this.createSortStage(options.sort, pipeline);
+		this.createSkipStage(options.skip, pipeline);
+		this.createLimitStage(options.limit, pipeline);
+
+		console.stdlog("***pipeline", JSON.stringify(pipeline, null, 2));
+		const dataCursor = await collection.aggregate(pipeline, {
+			allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
+			raw: false, // Whether to return document results as raw BSON buffers
+			bypassDocumentValidation: true, // Allow driver to bypass schema validation
+			session: this.session,
+			readPreference: readPreference,
+		});
+
+		const findResult = await dataCursor.toArray();
+		await dataCursor.close();
+		return findResult;
 	}
 }

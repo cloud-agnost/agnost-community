@@ -125,6 +125,15 @@ export class DatabaseBase {
 	async update(dbMeta, modelMeta, options) {}
 
 	/**
+	 * Groups the records and performs computations on these groups
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The `where`, `join`, `groupBy`, `computations`, `having`, `sort`, `limit` and `skip`  instructions
+	 * @returns  Group computation results
+	 */
+	async aggregate(dbMeta, modelMeta, options) {}
+
+	/**
 	 * Returns the database name
 	 * @param  {Object} dbMeta The database metadata
 	 */
