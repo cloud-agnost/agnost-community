@@ -25,6 +25,7 @@ import {
 	LightBulb,
 	LineSegments,
 	MessageQueue,
+	Middleware,
 	MinIo,
 	MongoDb,
 	MySql,
@@ -59,7 +60,15 @@ import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { Application, Instance, Method, SortOption, Tab, TabTypes } from '@/types';
+import {
+	Application,
+	EnvironmentStatus,
+	Instance,
+	Method,
+	SortOption,
+	Tab,
+	TabTypes,
+} from '@/types';
 import { generateId, translate } from '@/utils';
 import {
 	BracketsCurly,
@@ -948,7 +957,17 @@ export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
 	Endpoint: ApiKeys,
 	'Message Queue': MessageQueue,
 	Task: Calendar,
-	Middleware: Connect,
+	Middleware: Middleware,
 	Settings: GearSix,
 	Dashboard: Dashboard,
+};
+
+export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
+	Deploying: ['bg-elements-subtle-blue', 'bg-elements-blue'],
+	Error: ['bg-elements-subtle-red', 'bg-elements-red'],
+	Idle: ['bg-elements-subtle-orange', 'bg-elements-orange'],
+	OK: ['bg-elements-subtle-green', 'bg-elements-green'],
+	Suspended: ['bg-elements-subtle-yellow', 'bg-elements-yellow'],
+	Redeploying: ['bg-elements-subtle-blue', 'bg-elements-blue'],
+	Deleting: ['bg-elements-subtle-red', 'bg-elements-red'],
 };

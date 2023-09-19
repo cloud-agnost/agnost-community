@@ -6,6 +6,9 @@ import {
 } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Application extends RealtimeActions<ApplicationType | CreateApplicationResponse> {
+	redeploy(): void {
+		throw new Error('Method not implemented.');
+	}
 	deploy(): void {
 		throw new Error('Method not implemented.');
 	}

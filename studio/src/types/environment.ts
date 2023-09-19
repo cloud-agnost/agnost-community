@@ -1,6 +1,14 @@
-import { PaginationOptions } from '@/types/database.ts';
 import { VersionParams } from '@/types/version.ts';
+import { BaseGetRequest, Log } from '.';
 
+export type EnvironmentStatus =
+	| 'OK'
+	| 'Error'
+	| 'Deploying'
+	| 'Redeploying'
+	| 'Deleting'
+	| 'Suspended'
+	| 'Idle';
 export interface Environment {
 	orgId: string;
 	appId: string;
@@ -11,9 +19,9 @@ export interface Environment {
 	suspended: boolean;
 	mappings: Mapping[];
 	deploymentDtm: string;
-	dbStatus: string;
-	serverStatus: 'Deploying' | 'OK' | 'Redeploying' | 'Suspended';
-	schedulerStatus: string;
+	dbStatus: EnvironmentStatus;
+	serverStatus: EnvironmentStatus;
+	schedulerStatus: EnvironmentStatus;
 	createdBy: string;
 	updatedBy: string;
 	_id: string;
@@ -43,29 +51,35 @@ interface EnvironmentResource {
 	instance: string;
 }
 
+export interface EnvLogDetail {
+	startedAt: string;
+	status: EnvironmentStatus;
+	message: string;
+	_id: string;
+}
 export interface EnvLog {
 	orgId: string;
 	appId: string;
 	versionId: string;
 	envId: string;
 	action: string;
-	dbStatus: string;
-	serverStatus: [
-		{
-			pod: string;
-			status: string;
-			_id: string;
-		},
-	];
-	schedulerStatus: string;
-	dbLogs: [];
-	serverLogs: [];
-	schedulerLogs: [];
+	dbStatus: EnvironmentStatus;
+	serverStatus: EnvironmentStatus;
+	schedulerStatus: EnvironmentStatus;
+	dbLogs: EnvLogDetail[];
+	serverLogs: EnvLogDetail[];
+	schedulerLogs: EnvLogDetail[];
 	createdBy: string;
 	_id: string;
 	createdAt: string;
 	updatedAt: string;
 	__v: number;
+}
+
+export interface SelectedEnvLog {
+	dbLogs: Log[];
+	serverLogs: Log[];
+	schedulerLogs: Log[];
 }
 
 export type UpdateEnvironmentTelemetryLogsParams = VersionParams & {
@@ -79,7 +93,7 @@ export type ToggleAutoDeployParams = VersionParams & {
 export type GetEnvironmentLogsParams = VersionParams & {
 	actor?: string;
 	status?: string;
-} & PaginationOptions;
+} & BaseGetRequest;
 
 export type getAppVersionEnvironmentParams = Omit<VersionParams, 'envId'>;
 export type GetEnvironmentResourcesParams = VersionParams;

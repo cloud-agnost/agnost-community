@@ -2,6 +2,9 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization as OrganizationType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Organization extends RealtimeActions<OrganizationType> {
+	redeploy(): void {
+		throw new Error('Method not implemented.');
+	}
 	deploy(): void {
 		throw new Error('Method not implemented.');
 	}

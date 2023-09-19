@@ -18,7 +18,7 @@
 	"dashboard": "Dashboard",
 	"deployment_status_empty": "We do not have such a view anymore",
 	"deploy": "Deploy",
-	"deployment_status": "Deployment status",
+	"deployment_status": "Deployment Status",
 	"close_selected_tab": "Close selected tab",
 	"close_all_tabs": "Close all tabs",
 	"close_all_tabs_except_current": "Close all tabs except current",

@@ -38,12 +38,3 @@ export type DeleteDatabaseParams = GetDatabasesOfAppParams & {
 export type UpdateDatabaseNameParams = GetDatabaseOfAppByIdParams & {
 	name: string;
 };
-
-export interface PaginationOptions {
-	page?: number;
-	size?: number;
-	sort?: string;
-	sortDir?: string;
-	start?: string;
-	end?: string;
-}

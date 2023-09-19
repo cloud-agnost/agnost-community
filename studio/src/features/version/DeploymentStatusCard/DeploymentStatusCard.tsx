@@ -1,97 +1,62 @@
+import { ENV_STATUS_CLASS_MAP } from '@/constants';
 import {
 	DeploymentLogsDrawer,
 	DeploymentSettings,
 	LastDeployment,
 	Resources,
 } from '@/features/version/DeploymentStatusCard/index.ts';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import { cn } from '@/utils';
-import { GearSix } from '@phosphor-icons/react';
+import { Cloud, GearSix } from '@phosphor-icons/react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Button } from 'components/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel } from 'components/Dropdown';
-import { ScrollArea, ScrollBar } from 'components/ScrollArea';
-import { useAnimate } from 'framer-motion';
-import { ReactNode, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './deploymentStatusCard.scss';
-
-const logs = [
-	{
-		id: 1,
-		user: {
-			name: 'John Doe',
-			profilePicture: '',
-			color: '#fff',
-		},
-		description: 'Depoyed version to its environment',
-		status: 'Good',
-		date: new Date(),
-	},
-	{
-		id: 2,
-		user: {
-			name: 'John Doe',
-			profilePicture: '',
-			color: '#fff',
-		},
-		description: 'Depoyed version to its environment',
-		status: 'Error',
-		date: new Date(),
-	},
-	{
-		id: 3,
-		user: {
-			name: 'John Doe',
-			color: '#fff',
-			profilePicture: '',
-		},
-		description: 'Depoyed version to its environment',
-		status: 'Good',
-		date: new Date(),
-	},
-];
-
-interface DeploymentStatusCardProps {
-	triggerIcon: ReactNode;
-}
-
-export default function DeploymentStatusCard({ triggerIcon }: DeploymentStatusCardProps) {
+export default function DeploymentStatusCard() {
 	const { t } = useTranslation();
 	const [settingsIsOpen, setSettingsIsOpen] = useState(false);
-	const [scope, animate] = useAnimate();
 	const [isLogsOpen, setIsLogsOpen] = useState(false);
-
-	useEffect(() => {
-		if (!scope.current) return;
-		animate(scope.current, { height: settingsIsOpen ? '420px' : 'auto' });
-	}, [settingsIsOpen]);
-
+	const { envStatus } = useEnvironmentStore();
+	const classes = ENV_STATUS_CLASS_MAP[envStatus];
 	return (
 		<>
 			<DropdownMenu onOpenChange={(open) => !open && setSettingsIsOpen(false)}>
 				<DropdownMenuPrimitive.Trigger asChild>
-					<Button variant='blank'>{triggerIcon}</Button>
+					<Button variant='blank' iconOnly className='relative'>
+						<div className='absolute top-1 right-0.5'>
+							<span className='relative flex items-center justify-center h-3 w-3'>
+								<span
+									className={cn(
+										'animate-ping absolute inline-flex h-full w-full rounded-full ',
+										classes[0],
+									)}
+								/>
+								<span className={cn('relative inline-flex rounded-full h-2 w-2', classes[1])} />
+							</span>
+						</div>
+						<Cloud size={24} />
+					</Button>
 				</DropdownMenuPrimitive.Trigger>
-				<DropdownMenuContent ref={scope} className={cn('overflow-hidden relative')}>
-					<DropdownMenuLabel className='relative flex justify-between items-center'>
-						<span className='pr-10 truncate'>{t('version.deployment_status')}</span>
+				<DropdownMenuContent className={cn('overflow-hidden relative p-4 w-[21rem] space-y-6')}>
+					<DropdownMenuLabel className='relative flex justify-between items-center p-0'>
+						<span className='truncate text-default'>{t('version.deployment_status')}</span>
 						<Button
 							onClick={() => setSettingsIsOpen((prev) => !prev)}
 							variant='blank'
 							iconOnly
 							rounded
-							className='absolute hover:bg-subtle right-4 p-0 aspect-square'
+							className='hover:bg-subtle aspect-square'
 						>
 							<GearSix size={20} />
 						</Button>
 					</DropdownMenuLabel>
-					<ScrollArea className='h-[500px]'>
-						<ScrollBar orientation='vertical' />
-						<div className='deployment-status-content'>
-							<LastDeployment />
-							<Resources />
-						</div>
-					</ScrollArea>
+					<div className='deployment-status-content'>
+						<LastDeployment />
+						<Resources />
+					</div>
+
 					<DeploymentSettings isOpen={settingsIsOpen} close={() => setSettingsIsOpen(false)} />
 					<footer className='deployment-status-footer'>
 						<Button onClick={() => setIsLogsOpen(true)} variant='link'>
@@ -100,7 +65,7 @@ export default function DeploymentStatusCard({ triggerIcon }: DeploymentStatusCa
 					</footer>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			<DeploymentLogsDrawer logs={logs} open={isLogsOpen} onOpenChange={setIsLogsOpen} />
+			<DeploymentLogsDrawer open={isLogsOpen} onOpenChange={setIsLogsOpen} />
 		</>
 	);
 }

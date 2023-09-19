@@ -2,6 +2,9 @@ import useEndpointStore from '@/store/endpoint/endpointStore';
 import { Endpoint as EndpointType, LogTypes, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Endpoint extends RealtimeActions<EndpointType> {
+	redeploy(): void {
+		throw new Error('Method not implemented.');
+	}
 	deploy(): void {
 		throw new Error('Method not implemented.');
 	}

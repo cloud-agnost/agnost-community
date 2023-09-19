@@ -4,3 +4,4 @@ export { default as EmptyStatus } from './EmptyStatus.tsx';
 export { default as Resources } from './Resources.tsx';
 export { default as LastDeployment } from './LastDeployment.tsx';
 export { default as DeploymentLogsDrawer } from './DeploymentLogsDrawer.tsx';
+export { default as DeploymentLogColumn } from './DeploymentLogColumns.tsx';
