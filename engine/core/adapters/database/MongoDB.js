@@ -342,6 +342,24 @@ export class MongoDB extends DatabaseBase {
 		pipeline.push({ $group: { _id, ...comps } });
 		pipeline.push({ $project: projection });
 	}
+
+	/**
+	 * Creates the text search stage of the aggregation pipeline
+	 * @param  {string} searchText The search text
+	 * @param  {any[]} pipeline The pipeline array
+	 */
+	createTextSearchStage(searchText, pipeline) {
+		pipeline.push({
+			$match: {
+				$text: {
+					$search: searchText,
+					$caseSensitive: false,
+					$diacriticSensitive: false,
+				},
+			},
+		});
+	}
+
 	/**
 	 * Starts a new transaction on the database server. Any database CRUD operation that is executed after a call to `beginTransaction` will be executed within the transaction context. If the transaction is not committed then the changes will not be applied to the database.
 	 */
@@ -853,6 +871,55 @@ export class MongoDB extends DatabaseBase {
 		this.createSortStage(options.sort, pipeline);
 		this.createSkipStage(options.skip, pipeline);
 		this.createLimitStage(options.limit, pipeline);
+
+		console.stdlog("***pipeline", JSON.stringify(pipeline, null, 2));
+		const dataCursor = await collection.aggregate(pipeline, {
+			allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
+			raw: false, // Whether to return document results as raw BSON buffers
+			bypassDocumentValidation: true, // Allow driver to bypass schema validation
+			session: this.session,
+			readPreference: readPreference,
+		});
+
+		const findResult = await dataCursor.toArray();
+		await dataCursor.close();
+		return findResult;
+	}
+
+	/**
+	 * Returns the records matching the search query
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The searchText, where, select, omit, join, sort, skip, limit and useReadReplica options
+	 * @returns  The fetched records otherwise an empty array [] if no records can be found
+	 */
+	async searchText(dbMeta, modelMeta, options) {
+		const dbName = this.getAppliedDbName(dbMeta);
+		const modelName = this.getModelName(modelMeta);
+
+		const db = this.driver.db(dbName);
+		const collection = db.collection(modelName);
+		const readPreference = this.session
+			? "primary"
+			: options.useReadReplica
+			? "secondaryPreferred"
+			: "primary";
+
+		const pipeline = [];
+		this.createTextSearchStage(options.searchText, pipeline);
+
+		if (options.where && options.where.hasJoinFieldValues()) {
+			this.createJoinStage(options.join, pipeline);
+			this.createWhereStage(options.where, pipeline);
+		} else {
+			this.createWhereStage(options.where, pipeline);
+			this.createJoinStage(options.join, pipeline);
+		}
+
+		this.createSortStage(options.sort, pipeline);
+		this.createSkipStage(options.skip, pipeline);
+		this.createLimitStage(options.limit, pipeline);
+		this.createProjectStage(options.select, options.omit, pipeline);
 
 		console.stdlog("***pipeline", JSON.stringify(pipeline, null, 2));
 		const dataCursor = await collection.aggregate(pipeline, {

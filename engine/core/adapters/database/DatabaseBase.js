@@ -134,6 +134,15 @@ export class DatabaseBase {
 	async aggregate(dbMeta, modelMeta, options) {}
 
 	/**
+	 * Returns the records matching the search query
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The searchText, where, select, omit, join, sort, skip, limit and useReadReplica options
+	 * @returns  The fetched records otherwise an empty array [] if no records can be found
+	 */
+	async searchText(dbMeta, modelMeta, options) {}
+
+	/**
 	 * Returns the database name
 	 * @param  {Object} dbMeta The database metadata
 	 */

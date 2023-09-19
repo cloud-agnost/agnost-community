@@ -92,6 +92,7 @@ const ERROR_CODES = {
 	invalidComputations: "invalid_computations",
 	invalidComputationEntry: "invalid_computation_entry",
 	invalidComputationOperator: "invalid_computation_operator",
+	notSearchableModel: "not_searchable_model",
 };
 
 export default ERROR_CODES;
