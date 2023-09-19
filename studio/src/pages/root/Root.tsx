@@ -30,7 +30,7 @@ export default function Root() {
 	const { checkClusterSmtpStatus, checkClusterSetup } = useClusterStore();
 	const { getOrganizationMembers } = useOrganizationStore();
 	const { getUser, isAuthenticated } = useAuthStore();
-	const { getAppVersionEnvironment } = useEnvironmentStore();
+	const { getAppVersionEnvironment, getEnvironmentResources } = useEnvironmentStore();
 
 	useEffect(() => {
 		if (orgId) {
@@ -41,8 +41,26 @@ export default function Root() {
 	}, [orgId]);
 
 	useEffect(() => {
-		if (versionId) {
-			getAppVersionEnvironment({ appId: appId as string, orgId: orgId as string, versionId });
+		const getEnv = async () => {
+			return await getAppVersionEnvironment({
+				appId: appId as string,
+				orgId: orgId as string,
+				versionId: versionId as string,
+			});
+		};
+
+		const getResources = async () => {
+			const env = await getEnv();
+			return await getEnvironmentResources({
+				appId: appId as string,
+				orgId: orgId as string,
+				versionId: versionId as string,
+				envId: env._id,
+			});
+		};
+
+		if (orgId && versionId && appId) {
+			getResources();
 		}
 	}, [versionId]);
 
