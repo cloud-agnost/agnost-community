@@ -1511,6 +1511,45 @@ router.delete(
 );
 
 /*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/search?keyword
+@method     GET
+@desc       Searches the design elements of the version
+@access     private
+*/
+router.get(
+	"/:versionId/search",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.view"),
+	applyRules("entity-search"),
+	validate,
+	async (req, res) => {
+		try {
+			const { keyword } = req.query;
+
+			const conn = mongoose.connection;
+
+			const dataCursor = await conn.db.collection("search_view").find(
+				{ name: { $regex: keyword, $options: "i" } },
+				{
+					sort: { name: 1 },
+					skip: 0,
+					limit: config.get("general.maxSearchResults"),
+				}
+			);
+
+			const findResult = await dataCursor.toArray();
+			await dataCursor.close();
+			res.json(findResult);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/npm-search?package=&page=&size=
 @method     GET
 @desc       Searches the NPM packages

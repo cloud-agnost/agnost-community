@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { initializeSearchView } from "./searchView.js";
 
 export const connectToDatabase = async () => {
 	try {
@@ -8,6 +9,8 @@ export const connectToDatabase = async () => {
 			pass: process.env.CLUSTER_DB_PWD,
 			minPoolSize: config.get("database.minPoolSize"),
 		});
+
+		await initializeSearchView();
 
 		logger.info(`Connected to the database @${process.env.CLUSTER_DB_URI}`);
 	} catch (err) {
