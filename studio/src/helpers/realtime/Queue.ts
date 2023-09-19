@@ -2,6 +2,9 @@ import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { LogTypes, MessageQueue, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Queue extends RealtimeActions<MessageQueue> {
+	redeploy(): void {
+		throw new Error('Method not implemented.');
+	}
 	deploy(): void {
 		throw new Error('Method not implemented.');
 	}

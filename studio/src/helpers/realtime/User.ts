@@ -1,6 +1,9 @@
 import { RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class User extends RealtimeActions<User> {
+	redeploy(): void {
+		throw new Error('Method not implemented.');
+	}
 	deploy(): void {
 		throw new Error('Method not implemented.');
 	}
