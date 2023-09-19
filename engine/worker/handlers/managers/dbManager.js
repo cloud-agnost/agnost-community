@@ -47,7 +47,7 @@ export class DBManager {
     }
 
     /**
-     * Returns the database type
+     * Returns the database name
      */
     getDbName() {
         return this.dbConfig.name;

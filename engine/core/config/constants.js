@@ -1,4 +1,5 @@
 export const corePackages = [
+	"@agnost/server",
 	"amqplib",
 	"axios",
 	"@azure/storage-blob",
