@@ -71,14 +71,15 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 			const orgId = useOrganizationStore.getState().organization?._id as string;
 			const { closeVersionDrawer, selectApplication } = useApplicationStore.getState();
 			const { version, selectVersion } = useVersionStore.getState();
-			const { getAppVersionEnvironment } = useEnvironmentStore.getState();
-			const onSelect = () => {
+			const { getAppVersionEnvironment, getEnvironmentResources } = useEnvironmentStore.getState();
+			const onSelect = async () => {
 				if (!app) return;
 				selectApplication(app);
 				leaveChannel(version?._id as string);
 				selectVersion(row.original as Version);
 				closeVersionDrawer();
-				getAppVersionEnvironment({ appId: app._id, orgId, versionId: _id });
+				const env = await getAppVersionEnvironment({ appId: app._id, orgId, versionId: _id });
+				getEnvironmentResources({ appId: app._id, orgId, versionId: _id, envId: env._id });
 			};
 			return <OpenVersion id={_id} app={app as Application} onSelect={onSelect} />;
 		},
