@@ -1,24 +1,23 @@
 import { Button } from '@/components/Button';
 import { AgnostOnlyLogo } from '@/components/icons';
 import { MENU_ITEMS } from '@/constants';
-import { OrganizationDropdown } from '@/features/organization/OrganizationDropdown';
 import { ApplicationSelectDropdown } from '@/features/application';
+import { OrganizationDropdown } from '@/features/organization/OrganizationDropdown';
 import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
 import { VersionDropdown } from '@/features/version/VersionDropdown';
-import { Bell, CaretRight, Cloud } from '@phosphor-icons/react';
-import { Link, useParams } from 'react-router-dom';
-import './header.scss';
-import AuthUserDropdown from '../../features/auth/AuthUserDropdown/AuthUserDropdown.tsx';
-import { MoonStars, SunDim, Laptop } from '@phosphor-icons/react';
+import useThemeStore from '@/store/theme/themeStore.ts';
+import { cn } from '@/utils';
+import { Bell, CaretRight, Laptop, MoonStars, SunDim } from '@phosphor-icons/react';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger,
 	DropdownMenuItemContainer,
+	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import useThemeStore from '@/store/theme/themeStore.ts';
-import { cn } from '@/utils';
+import { Link, useParams } from 'react-router-dom';
+import { AuthUserDropdown } from '@/features/auth/AuthUserDropdown';
+import './header.scss';
 
 export function Header() {
 	const { versionId, appId } = useParams();
@@ -60,7 +59,7 @@ export function Header() {
 				<div className='header-menu-divider' />
 				<div className='header-menu-right-actions'>
 					<div className='header-menu-right-actions-versions'>
-						<DeploymentStatusCard triggerIcon={<Cloud />} />
+						<DeploymentStatusCard />
 					</div>
 					<div className='header-menu-right-actions-notification'>
 						<Button variant='blank'>
