@@ -273,3 +273,14 @@ export type DeleteAPIKeyParams = VersionParamsWithoutEnvId & {
 export type DeleteMultipleAPIKeys = VersionParamsWithoutEnvId & {
 	keyIds: string[];
 };
+
+export type TabTypes =
+	| 'Storage'
+	| 'Database'
+	| 'Cache'
+	| 'Endpoint'
+	| 'Message Queue'
+	| 'Task'
+	| 'Middleware'
+	| 'Settings'
+	| 'Dashboard';
