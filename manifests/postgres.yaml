@@ -3,10 +3,10 @@ kind: postgresql
 metadata:
   name: servername
   labels:
-    team: teamname
+    team: agnost
 spec:
   dockerImage: ghcr.io/zalando/spilo-15:3.0-p1
-  teamId: "teamname"
+  teamId: "agnost"
   numberOfInstances: 1
   enableMasterLoadBalancer: false
   enableReplicaLoadBalancer: false
@@ -76,10 +76,10 @@ spec:
 #      value: "00 10 * * *"
 #    - name: BACKUP_NUM_TO_RETAIN
 #      value: "10"
-  resources:
-    requests:
-      cpu: 50m
-      memory: 100Mi
-    limits:
-      cpu: 500m
-      memory: 500Mi
+#  resources:
+#    requests:
+#      cpu: 50m
+#      memory: 100Mi
+#    limits:
+#      cpu: 500m
+#      memory: 500Mi

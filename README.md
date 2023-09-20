@@ -49,11 +49,7 @@ curl -XDELETE http://localhost:3000/mongodb -d '{
 curl -XPOST http://localhost:3000/redis -d '{
     "clusterName": "standalone",
     "version": "7.2.0",
-    "memoryRequest": "250Mi",
-    "memoryLimit": "500Mi",
-    "cpuRequest": "200m",
-    "cpuLimit": "500m",
-    "diskSize": "1Gi",
+    "size": "1Gi",
     "passwd": "P4sSW0rD",
     "readReplicaEnabled": false
 }' -H "Content-type: application/json"
@@ -65,11 +61,7 @@ curl -XPOST http://localhost:3000/redis -d '{
 curl -XPOST http://localhost:3000/redis -d '{
     "clusterName": "replicated",
     "version": "7.2.0",
-    "memoryRequest": "250Mi",
-    "memoryLimit": "500Mi",
-    "cpuRequest": "200m",
-    "cpuLimit": "500m",
-    "diskSize": "1Gi",
+    "size": "1Gi",
     "passwd": "P4sSW0rD",
     "readReplicaEnabled": true
 }' -H "Content-type: application/json"
@@ -81,10 +73,7 @@ curl -XPOST http://localhost:3000/redis -d '{
 curl -XPUT http://localhost:3000/redis -d '{
     "clusterName": "replicated",
     "version": "7.2.1",
-    "memoryRequest": "250Mi",
-    "memoryLimit": "500Mi",
-    "cpuRequest": "200m",
-    "cpuLimit": "500m",
+    "size": "2Gi",
     "readReplicaEnabled": true
 }' -H "Content-type: application/json"
 ```
@@ -93,8 +82,7 @@ curl -XPUT http://localhost:3000/redis -d '{
 
 ```bash
 curl -XDELETE http://localhost:3000/redis -d '{
-    "clusterName": "replicated",
-    "purgeData": true
+    "clusterName": "replicated"
 }' -H "Content-type: application/json"
 ```
 
@@ -148,12 +136,7 @@ curl -XDELETE http://localhost:3000/mariadb -d '{
 ```bash
 curl -XPOST http://localhost:3000/postgres -d '{
     "serverName": "pgsql",
-    "teamName": "agnost",
-    "memoryRequest": "250Mi",
-    "memoryLimit": "500Mi",
-    "cpuRequest": "200m",
-    "cpuLimit": "500m",
-    "diskSize": "5Gi",
+    "size": "5Gi",
     "dbVersion": "14",
     "numInstances": 1
 }' -H "Content-type: application/json"
@@ -164,11 +147,9 @@ curl -XPOST http://localhost:3000/postgres -d '{
 ```bash
 curl -XPUT http://localhost:3000/postgres -d '{
     "serverName": "pgsql",
-    "memoryRequest": "500Mi",
-    "memoryLimit": "500Mi",
-    "cpuRequest": "500m",
-    "cpuLimit": "500m",
-    "dbVersion": "15"
+    "size": "10Gi",
+    "dbVersion": "15",
+    "numInstances": 2
 }' -H "Content-type: application/json"
 ```
 
