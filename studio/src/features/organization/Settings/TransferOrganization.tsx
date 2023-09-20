@@ -100,9 +100,9 @@ export default function TransferOrganization() {
 					<AlertDescription>{error?.details}</AlertDescription>
 				</Alert>
 			)}
-			<AutoComplete<OrganizationMember>
+			<AutoComplete
 				loadOptions={loadOptions}
-				onChange={(res) => setUserId(res.member._id)}
+				onChange={(res: OrganizationMember) => setUserId(res.member._id)}
 				formatOptionLabel={formatOptionLabel}
 				formatGroupLabel={formatGroupLabel}
 			/>

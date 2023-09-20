@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { generateId, joinChannel, leaveChannel } from '@/utils';
 import { useToast } from '@/hooks';
 import { Logs } from '@/components/Log';
+import { Log } from '@/types';
 interface TestTaskProps {
 	open: boolean;
 	onClose: () => void;
@@ -74,7 +75,7 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 					</div>
 					<Separator />
 					<p className='text-sm text-default font-sfCompact mb-4'>{t('task.console')}</p>
-					<Logs logs={taskLogs[taskId as string] as string[]} />
+					<Logs logs={taskLogs[taskId as string] as Log[]} />
 				</div>
 			</DrawerContent>
 		</Drawer>
