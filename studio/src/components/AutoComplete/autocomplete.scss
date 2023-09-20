@@ -1,13 +1,13 @@
 .select {
 	&-container {
-		@apply flex h-12 w-full  text-sm text-default  rounded appearance-none;
+		@apply flex  w-full  text-sm text-default  rounded appearance-none;
 		@apply placeholder:text-subtle placeholder:text-sm;
 		@apply disabled:cursor-not-allowed disabled:opacity-50;
 		@apply focus:border-input-focus focus:outline-none focus:ring-0;
 		@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border;
 	}
 	&__control {
-		@apply w-full h-full  #{!important};
+		@apply max-w-sm w-full h-full  #{!important};
 		@apply bg-input-background border border-input-border hover:border-input-hover #{!important};
 	}
 	&__indicators {
@@ -29,7 +29,16 @@
 		@apply text-default #{!important};
 	}
 	&__value-container {
-		@apply py-0  #{!important};
+		@apply py-0 gap-2 #{!important};
+	}
+	&__multi-value {
+		@apply bg-wrapper-background-light flex-wrap #{!important};
+	}
+	&__multi-value__remove {
+		@apply text-icon-base #{!important};
+		&:hover {
+			@apply bg-button-secondary-hover #{!important};
+		}
 	}
 
 	&__option {
