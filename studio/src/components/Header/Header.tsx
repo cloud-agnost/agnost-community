@@ -1,22 +1,14 @@
-import { Button } from '@/components/Button';
 import { AgnostOnlyLogo } from '@/components/icons';
 import { MENU_ITEMS } from '@/constants';
 import { ApplicationSelectDropdown } from '@/features/application';
 import { OrganizationDropdown } from '@/features/organization/OrganizationDropdown';
 import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
 import { VersionDropdown } from '@/features/version/VersionDropdown';
-import useThemeStore from '@/store/theme/themeStore.ts';
-import { cn } from '@/utils';
-import { Bell, CaretRight, Laptop, MoonStars, SunDim } from '@phosphor-icons/react';
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuItemContainer,
-	DropdownMenuTrigger,
-} from 'components/Dropdown';
-import { Link, useParams } from 'react-router-dom';
+import { CaretRight } from '@phosphor-icons/react';
+
 import { AuthUserDropdown } from '@/features/auth/AuthUserDropdown';
+import { Notification } from '@/features/version/Notification';
+import { Link, useParams } from 'react-router-dom';
 import './header.scss';
 
 export function Header() {
@@ -62,67 +54,14 @@ export function Header() {
 						<DeploymentStatusCard />
 					</div>
 					<div className='header-menu-right-actions-notification'>
-						<Button variant='blank'>
-							<Bell />
-						</Button>
+						<Notification />
 					</div>
-					<ThemeChanger />
+
 					<div className='header-menu-right-actions-user'>
 						<AuthUserDropdown />
 					</div>
 				</div>
 			</div>
 		</header>
-	);
-}
-
-function ThemeChanger() {
-	const { setTheme, theme } = useThemeStore();
-
-	const THEMES = [
-		{
-			id: 'light',
-			title: 'Light',
-			icon: <SunDim size={24} />,
-		},
-		{
-			id: 'dark',
-			title: 'Dark',
-			icon: <MoonStars size={24} />,
-		},
-		{
-			id: 'system',
-			title: 'System',
-			icon: <Laptop size={24} />,
-		},
-	];
-
-	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button rounded variant='blank' iconOnly>
-					<SunDim size={17} />
-				</Button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent>
-				<DropdownMenuItemContainer>
-					{THEMES.map((t) => (
-						<DropdownMenuItem
-							onClick={() => setTheme(t.id)}
-							asChild
-							key={t.id}
-							className={cn({
-								' text-brand-primary': t.id === theme,
-							})}
-						>
-							<span className='flex items-center gap-2'>
-								{t.icon}
-								{t.title}
-							</span>
-						</DropdownMenuItem>
-					))}
-				</DropdownMenuItemContainer>
-			</DropdownMenuContent>
-		</DropdownMenu>
 	);
 }
