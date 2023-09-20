@@ -15,7 +15,7 @@ import {
 	DroppableProvided,
 } from 'react-beautiful-dnd';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useMatches, useParams } from 'react-router-dom';
+import { useLocation, useMatches, useParams, useNavigate } from 'react-router-dom';
 import './tabs.scss';
 
 const SCROLL_AMOUNT = 200;
@@ -25,6 +25,7 @@ export default function Tabs() {
 	const [endOfScroll, setEndOfScroll] = useState(false);
 	const [startOfScroll, setStartOfScroll] = useState(false);
 	const [isScrollable, setIsScrollable] = useState(false);
+	const navigate = useNavigate();
 	const { openDeleteTabModal, getTabsByVersionId, removeTab, setCurrentTab, addTab, setTabs } =
 		useTabStore();
 
@@ -62,17 +63,25 @@ export default function Tabs() {
 		const path = pathname?.split('/')?.at(-1);
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
 
-		if (!item) return;
+		if (item) {
+			const openTab = tabs.find((tab) => tab.path?.split('/')?.at(-1) === item.path);
 
-		const openTab = tabs.find((tab) => tab.path?.split('/')?.at(-1) === item.path);
-		if (openTab) {
-			setCurrentTab(versionId, openTab.id);
+			if (openTab) {
+				setCurrentTab(versionId, openTab.id);
+			} else {
+				addTab(versionId, {
+					id: generateId(),
+					...item,
+					isActive: true,
+				});
+			}
 		} else {
-			addTab(versionId, {
-				id: generateId(),
-				...item,
-				isActive: true,
-			});
+			const currentTab = tabs.find((tab) => tab.isActive);
+
+			if (currentTab?.path !== pathname) {
+				const targetPath = currentTab?.path || getDashboardPath();
+				navigate(targetPath);
+			}
 		}
 	}, []);
 
