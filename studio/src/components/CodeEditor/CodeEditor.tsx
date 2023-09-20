@@ -45,7 +45,7 @@ export default function CodeEditor({
 	) {
 		onChange?.(value, ev);
 		if (defaultLanguage === 'javascript' && !readonly) {
-			setTabState(!!ev.changes[0].text.length);
+			setTabState(value !== ev.changes[0].text);
 		}
 	}
 	const handleEditorDidMount = (
