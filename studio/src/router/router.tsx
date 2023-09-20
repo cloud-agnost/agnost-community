@@ -184,6 +184,10 @@ const router = createBrowserRouter([
 												],
 											},
 											{
+												path: 'notifications',
+												lazy: () => lazyRouteImport(PATHS.version.notifications),
+											},
+											{
 												path: 'settings',
 												lazy: () => lazyRouteImport(PATHS.version.settings.versionSettings),
 												children: [
