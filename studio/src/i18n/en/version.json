@@ -239,5 +239,8 @@
 	"read_write": "Read/Write",
 	"log_details": "View Log Details",
 	"details": "Details",
-	"errors": "Errors"
+	"errors": "Errors",
+	"notifications": "Notifications",
+	"view_all_notifications": "View All Notifications",
+	"mark_all_as_read": "Mark All as Read"
 }

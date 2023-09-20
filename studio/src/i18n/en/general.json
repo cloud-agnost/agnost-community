@@ -116,9 +116,9 @@
 	"tab_close_description": "You have unsaved changes. If you close this tab, you will lose your unsaved changes.",
 	"save_and_close": "Save & Close",
 	"action": "Action",
-	"dbStatus": "Database Status",
-	"serverStatus": "Server Status",
-	"schedulerStatus": "Scheduler Status",
+	"dbStatus": "Database",
+	"serverStatus": "API Server",
+	"schedulerStatus": "Scheduler",
 	"dbLogs": "Database Logs",
 	"serverLogs": "Server Logs",
 	"schedulerLogs": "Scheduler Logs"

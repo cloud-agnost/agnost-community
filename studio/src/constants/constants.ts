@@ -57,7 +57,6 @@ import {
 	SelectResourceType,
 } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
-import useAuthStore from '@/store/auth/authStore.ts';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import {
@@ -86,7 +85,6 @@ import {
 	Phone,
 	Plus,
 	Share,
-	SignOut,
 	TextAa,
 } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
@@ -915,30 +913,14 @@ export const MAX_LENGTHS: Record<string, number | Record<string, number>> = {
 
 export const HEADER_USER_DROPDOWN = [
 	{
-		iconClassName: 'text-lg',
 		title: translate('general.account_settings'),
 		url: '/profile/settings',
 		Icon: GearSix,
-		action: undefined,
-		beforeHasSeparator: false,
 	},
 	{
-		iconClassName: 'text-lg',
 		title: translate('profileSettings.clusters_title'),
 		url: '/profile/settings/cluster-management',
 		Icon: LineSegments,
-		action: undefined,
-		beforeHasSeparator: false,
-	},
-	{
-		iconClassName: 'text-lg',
-		title: translate('general.logout'),
-		url: undefined,
-		Icon: SignOut,
-		action: () => {
-			useAuthStore.getState().logout();
-		},
-		beforeHasSeparator: true,
 	},
 ];
 
@@ -960,6 +942,7 @@ export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
 	Middleware: Middleware,
 	Settings: GearSix,
 	Dashboard: Dashboard,
+	Notifications: BellRing,
 };
 
 export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
@@ -971,3 +954,5 @@ export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
 	Redeploying: ['bg-elements-subtle-blue', 'bg-elements-blue'],
 	Deleting: ['bg-elements-subtle-red', 'bg-elements-red'],
 };
+
+export const NOTIFICATION_ACTIONS = ['create', 'update', 'deploy', 'redeploy', 'delete'];

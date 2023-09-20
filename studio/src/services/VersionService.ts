@@ -13,6 +13,7 @@ import {
 	DeleteMultipleVersionVariablesParams,
 	DeleteNPMPackageParams,
 	DeleteRateLimitParams,
+	DeleteVersionParams,
 	DeleteVersionVariableParams,
 	EditRateLimitParams,
 	EnvLog,
@@ -20,7 +21,9 @@ import {
 	GetVersionByIdParams,
 	GetVersionLogBucketsParams,
 	GetVersionLogsParams,
+	GetVersionNotificationParams,
 	GetVersionRequest,
+	Notification,
 	ResLog,
 	Resource,
 	SearchNPMPackages,
@@ -32,7 +35,6 @@ import {
 	Version,
 	VersionLog,
 	VersionLogBucket,
-	DeleteVersionParams,
 } from '@/types';
 
 export default class VersionService {
@@ -305,6 +307,19 @@ export default class VersionService {
 		return (
 			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}`, {
 				data: {},
+			})
+		).data;
+	}
+
+	static async getVersionNotifications({
+		versionId,
+		appId,
+		orgId,
+		...params
+	}: GetVersionNotificationParams): Promise<Notification[]> {
+		return (
+			await axios.get(`v1/log/org/${orgId}/app/${appId}/version/${versionId}`, {
+				params,
 			})
 		).data;
 	}

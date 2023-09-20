@@ -7,6 +7,7 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
+import useVersionStore from '@/store/version/versionStore';
 import { history } from '@/utils';
 import { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -29,8 +30,9 @@ export default function Root() {
 	const { orgId, versionId, appId } = useParams();
 	const { checkClusterSmtpStatus, checkClusterSetup } = useClusterStore();
 	const { getOrganizationMembers } = useOrganizationStore();
-	const { getUser, isAuthenticated } = useAuthStore();
+	const { getUser, isAuthenticated, user } = useAuthStore();
 	const { getAppVersionEnvironment, getEnvironmentResources } = useEnvironmentStore();
+	const { getVersionNotifications } = useVersionStore();
 
 	useEffect(() => {
 		if (orgId) {
@@ -61,6 +63,16 @@ export default function Root() {
 
 		if (orgId && versionId && appId) {
 			getResources();
+			getVersionNotifications({
+				appId,
+				orgId,
+				versionId,
+				page: 0,
+				size: 50,
+				sortBy: 'createdAt',
+				sortDir: 'desc',
+				initialFetch: true,
+			});
 		}
 	}, [versionId]);
 
@@ -77,7 +89,7 @@ export default function Root() {
 
 	useEffect(() => {
 		const isAuthPath = authPaths.includes(pathname);
-		if (!isAuthPath && isAuthenticated()) {
+		if (!isAuthPath && isAuthenticated() && !user?._id) {
 			getUser();
 		}
 	}, [pathname]);

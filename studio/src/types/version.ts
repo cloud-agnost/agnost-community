@@ -133,6 +133,38 @@ export interface NPMPackage {
 	createdAt: string;
 	updatedAt: string;
 }
+export type NotificationActions = 'create' | 'update' | 'delete' | 'deploy' | 'redeploy';
+export interface Notification {
+	_id: string;
+	object: string;
+	orgId: string;
+	appId: string;
+	versionId: string;
+	dbId?: string;
+	modelId?: string;
+	fieldId?: string;
+	resourceId?: string;
+	envId?: string;
+	endpointId?: string;
+	middlewareId?: string;
+	queueId?: string;
+	taskId?: string;
+	storageId?: string;
+	action: NotificationActions;
+	actor: Partial<User>;
+	description: string;
+	data: any;
+	createdAt: string;
+	__v: number;
+}
+
+export interface GetVersionNotificationParams extends BaseGetRequest {
+	orgId: string;
+	appId: string;
+	versionId: string;
+	actor?: string[];
+	action?: NotificationActions[];
+}
 
 export interface GetVersionRequest extends BaseGetRequest {
 	name?: string;
@@ -148,7 +180,8 @@ export type TabTypes =
 	| 'Endpoint'
 	| 'Middleware'
 	| 'Settings'
-	| 'Dashboard';
+	| 'Dashboard'
+	| 'Notifications';
 export interface Tab {
 	id: string;
 	title: string;
@@ -273,14 +306,3 @@ export type DeleteAPIKeyParams = VersionParamsWithoutEnvId & {
 export type DeleteMultipleAPIKeys = VersionParamsWithoutEnvId & {
 	keyIds: string[];
 };
-
-export type TabTypes =
-	| 'Storage'
-	| 'Database'
-	| 'Cache'
-	| 'Endpoint'
-	| 'Message Queue'
-	| 'Task'
-	| 'Middleware'
-	| 'Settings'
-	| 'Dashboard';
