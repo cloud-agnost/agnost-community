@@ -195,6 +195,13 @@ export class DeploymentManager {
     }
 
     /**
+     * Returns the endpoints of the input message
+     */
+    getCaches() {
+        return this.msgObj.caches || [];
+    }
+
+    /**
      * Returns the sub-action of the message
      */
     getSubAction() {
@@ -1054,6 +1061,8 @@ export class DeploymentManager {
         await engineDb.collection("middlewares").deleteMany({});
         await engineDb.collection("queues").deleteMany({});
         await engineDb.collection("tasks").deleteMany({});
+        await engineDb.collection("storages").deleteMany({});
+        await engineDb.collection("caches").deleteMany({});
 
         // Save environment and version information
         await engineDb.collection("environment").insertOne(this.getEnvObj());
@@ -1068,6 +1077,10 @@ export class DeploymentManager {
         if (this.getQueues().length > 0) await engineDb.collection("queues").insertMany(this.getQueues());
 
         if (this.getTasks().length > 0) await engineDb.collection("tasks").insertMany(this.getTasks());
+
+        if (this.getStorages().length > 0) await engineDb.collection("storages").insertMany(this.getStorages());
+
+        if (this.getCaches().length > 0) await engineDb.collection("caches").insertMany(this.getCaches());
 
         this.addLog("Saved deployment configuration to database");
     }
@@ -1145,6 +1158,18 @@ export class DeploymentManager {
     }
 
     /**
+     * Save the cache configurations to the engine cluster database
+     */
+    async saveCacheDeploymentConfigs(caches) {
+        const engineDb = this.getEnvDB();
+        // First clear any existing configuration
+        await engineDb.collection("caches").deleteMany({});
+        if (caches.length > 0) await engineDb.collection("caches").insertMany(caches);
+
+        this.addLog("Saved cache configurations to environment database");
+    }
+
+    /**
      * Save new deployment configuration to the engine cluster database
      */
     async saveEnvironmentDeploymentConfig() {
@@ -1181,11 +1206,6 @@ export class DeploymentManager {
 
             const iids = objects.map((entry) => entry.iid);
             await engineDb.collection("cronjobs").deleteMany({ taskId: { $in: iids } }, { writeConcern: { w: 0 } });
-        } else if (type === "storage") {
-            const iids = objects.map((entry) => entry.iid);
-            await engineDb.collection("buckets").deleteMany({ storageId: { $in: iids } }, { writeConcern: { w: 0 } });
-
-            await engineDb.collection("files").deleteMany({ storageId: { $in: iids } }, { writeConcern: { w: 0 } });
         }
 
         this.addLog(`Cleared ${type} logs and tracking entries`);
@@ -1731,6 +1751,20 @@ export class DeploymentManager {
      */
     async updateEndpoints() {
         try {
+            // Update the environment log object
+            const response = await axios.get(
+                `http://${this.getEnvId()}.${process.env.NAMESPACE}.svc.cluster.local/health`
+            );
+            console.log("***********pinged api server", response.data);
+        } catch (err) {
+            console.log(
+                "****here errorr",
+                `http://${this.getEnvId()}.${process.env.NAMESPACE}.svc.cluster.local/health`,
+                err
+            );
+        }
+
+        try {
             this.addLog(t("Started updating endpoints"));
             // Set current status of environment in engine cluster
             await this.setStatus("Deploying");
@@ -1939,7 +1973,7 @@ export class DeploymentManager {
             this.notifyAPIServers();
 
             if (subAction === "delete") {
-                await this.deleteLogsAndTrackingEntries("storage", this.getStorages());
+                await this.deleteStorageData(this.getStorages());
             }
             // Save updated deployment to database
             await this.saveStorageDeploymentConfigs(storages);
@@ -2028,6 +2062,9 @@ export class DeploymentManager {
      * Sends the message to the engine API servers so that they can update their state
      */
     notifyAPIServers() {
+        // Before sending the message the API server send a ping message to the server so that if it is on standby we can start it up.
+        axios.get(`http://${this.getEnvId()}.${process.env.NAMESPACE}.svc.cluster.local/health`).catch((error) => {});
+
         const msgObj = this.getMsgObj();
         manageAPIServers(this.getEnvId(), {
             action: msgObj.action,
@@ -2037,5 +2074,37 @@ export class DeploymentManager {
             app: msgObj.app,
             env: msgObj.env,
         });
+    }
+
+    async deleteStorageData(storages) {
+        for (const storage of storages) {
+            // First get all buckets of the storage
+            const engineDb = this.getEnvDB();
+            // First clear any existing configuration
+            const dataCursor = await engineDb
+                .collection("buckets")
+                .find({ storageId: storage.iid }, { projection: { name: 1, id: 1 } });
+            const buckets = await dataCursor.toArray();
+            await dataCursor.close();
+
+            // Call the engine endpoint to delete the bucket and associated files
+            // Update the environment log object
+            axios
+                .post(
+                    `http://${this.getEnvId()}.${process.env.NAMESPACE}.svc.cluster.local/storage/${
+                        storage.name
+                    }/bucket/delete-multi`,
+                    {
+                        bucketNames: buckets.map((entry) => entry.name),
+                    },
+                    {
+                        headers: {
+                            Authorization: process.env.ACCESS_TOKEN,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                )
+                .catch((error) => {});
+        }
     }
 }

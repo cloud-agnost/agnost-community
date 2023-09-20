@@ -250,11 +250,16 @@ class VersionController extends BaseController {
 		const databases = await dbCtrl.getManyByQuery({
 			versionId: parentVersion._id,
 		});
+
+		// Store old and new database ids, we need them when copying the models
+		const idMapping = [];
 		// Copy databases to the new version
 		if (databases && databases.length > 0) {
 			databases.forEach((database) => {
+				const newId = helper.generateId();
+				idMapping.push({ new: newId, old: database._id });
 				database.versionId = versionId;
-				delete database._id;
+				database._id = newId;
 			});
 
 			await dbCtrl.createMany(databases, { session });
@@ -267,6 +272,9 @@ class VersionController extends BaseController {
 		// Copy models to the new version
 		if (models && models.length > 0) {
 			models.forEach((model) => {
+				model.dbId = idMapping.find(
+					(entry) => model.dbId.toString() === entry.old.toString()
+				).new;
 				model.versionId = versionId;
 				delete model._id;
 			});
@@ -334,7 +342,7 @@ class VersionController extends BaseController {
 		const storages = await storageCtrl.getManyByQuery({
 			versionId: parentVersion._id,
 		});
-		// Copy taks to the new version
+		// Copy storages to the new version
 		if (storages && storages.length > 0) {
 			storages.forEach((storage) => {
 				storage.versionId = versionId;
