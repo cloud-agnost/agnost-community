@@ -95,12 +95,8 @@ curl -XPOST http://localhost:3000/mariadb -d '{
     "serverName": "mariadb",
     "dbName": "app",
     "dbVersion": "11.0.3",
-    "replicaCount": 3,
-    "memoryRequest": "250Mi",
-    "memoryLimit": "500Mi",
-    "cpuRequest": "200m",
-    "cpuLimit": "500m",
-    "diskSize": "5Gi",
+    "replicaCount": 1,
+    "size": "5Gi",
     "userName": "appuser",
     "passwd": "P4sSW0rD",
     "rootPasswd": "r00tP4sSW0rD"
@@ -109,13 +105,24 @@ curl -XPOST http://localhost:3000/mariadb -d '{
 
 ### Update mariadb
 
+> Make sure to change the replicaCount and size on different calls.
+
 ```bash
+## Change for version and replicaCount
 curl -XPUT http://localhost:3000/mariadb -d '{
     "serverName": "mariadb",
-    "memoryRequest": "500Mi",
-    "memoryLimit": "500Mi",
-    "cpuRequest": "700m",
-    "cpuLimit": "700m",
+    "replicaCount": 3,
+    "size": "5Gi",
+    "dbVersion": "11.1.2"
+}' -H "Content-type: application/json"
+```
+
+```bash
+## Change for size
+curl -XPUT http://localhost:3000/mariadb -d '{
+    "serverName": "mariadb",
+    "replicaCount": 3,
+    "size": "10Gi",
     "dbVersion": "11.1.2"
 }' -H "Content-type: application/json"
 ```
@@ -124,8 +131,7 @@ curl -XPUT http://localhost:3000/mariadb -d '{
 
 ```bash
 curl -XDELETE http://localhost:3000/mariadb -d '{
-    "serverName": "mariadb",
-    "purgeData": true
+    "serverName": "mariadb"
 }' -H "Content-type: application/json"
 ```
 

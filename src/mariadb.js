@@ -15,7 +15,7 @@ const version = 'v1alpha1';
 const namespace = process.env.NAMESPACE;
 const plural = 'mariadbs';
 
-async function createMariaDBResource(serverName, dbName, dbVersion, replicaCount, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, rootPasswd) {
+async function createMariaDBResource(serverName, dbName, dbVersion, replicaCount, size, userName, passwd, rootPasswd) {
   const manifest = fs.readFileSync('/manifests/mariadb.yaml', 'utf8');
   const resources = k8s.loadAllYaml(manifest);
 
@@ -28,7 +28,7 @@ async function createMariaDBResource(serverName, dbName, dbVersion, replicaCount
           resource.metadata.name = serverName + '-credentials';
           resource.stringData.password = passwd;
           resource.stringData["root-password"] = rootPasswd;
-          var secretResult = await k8sCoreApi.createNamespacedSecret(namespace, resource);
+          await k8sCoreApi.createNamespacedSecret(namespace, resource);
           break;
         case 'MariaDB':
           resource.metadata.name = serverName;
@@ -37,11 +37,7 @@ async function createMariaDBResource(serverName, dbName, dbVersion, replicaCount
           resource.spec.database = dbName;
           resource.spec.username = userName;
           resource.spec.image.tag = dbVersion;
-          resource.spec.volumeClaimTemplate.resources.requests.storage = diskSize;
-          resource.spec.resources.limits.cpu = cpuLimit;
-          resource.spec.resources.limits.memory = memoryLimit;
-          resource.spec.resources.requests.cpu = cpuRequest;
-          resource.spec.resources.requests.memory = memoryRequest;
+          resource.spec.volumeClaimTemplate.resources.requests.storage = size;
           resource.spec.replicas = replicaCount;
           if (replicaCount > 1) {
             resource.spec.replication.replica.replPasswordSecretKeyRef.name = serverName + '-credentials';
@@ -49,34 +45,41 @@ async function createMariaDBResource(serverName, dbName, dbVersion, replicaCount
             // if the replica count is 1, then you can't configure replication
             delete resource.spec.replication;
           }
-          var dbResult = await k8sCustomApi.createNamespacedCustomObject(group, version, namespace, plural, resource);
+          await k8sCustomApi.createNamespacedCustomObject(group, version, namespace, plural, resource);
           break;
         default:
           console.log('Skipping: ' + kind);
       }
     console.log(kind + ' ' + resource.metadata.name + ' created...');
     } catch (error) {
-      console.error('Error applying resource:', error);
-      return error
+      console.error('Error applying resource:', error.body);
+      throw new Error(JSON.stringify(error.body));
     }
   }
-  return { ...dbResult, ...secretResult };
+  return 'success';
 }
 
-async function updateMariaDBResource(serverName, dbVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit) {
+async function updateMariaDBResource(serverName, dbVersion, replicaCount, size) {
   const patchData = {
     spec: {
+      replicas: replicaCount,
       image: {
         tag: dbVersion
       },
+      volumeClaimTemplate: {
+        resources: {
+          requests: {
+            storage: size
+          }
+        }
+      }
+    }
+  };
+  const pvcPatch = {
+    spec: {
       resources: {
-        limits: {
-          cpu: cpuLimit,
-          memory: memoryLimit
-        },
         requests: {
-          cpu: cpuRequest,
-          memory: memoryRequest
+          storage: size
         }
       }
     }
@@ -84,79 +87,111 @@ async function updateMariaDBResource(serverName, dbVersion, memoryRequest, memor
   const requestOptions = { headers: { 'Content-Type': 'application/merge-patch+json' }, };
 
   try {
-    var dbResult = await k8sCustomApi.patchNamespacedCustomObject(group, version, namespace, plural, serverName, patchData, undefined, undefined, undefined, requestOptions);
+    await k8sCustomApi.patchNamespacedCustomObject(group, version, namespace, plural, serverName, patchData, undefined, undefined, undefined, requestOptions);
     console.log('MariaDB ' + serverName + ' updated...');
+    
+    const pvcList = await k8sCoreApi.listNamespacedPersistentVolumeClaim(namespace);
+    pvcList.body.items.forEach(async (pvc) => {
+      var pvcName = pvc.metadata.name;
+      if (pvcName.includes("storage-" + serverName + '-')) {
+        await k8sCoreApi.patchNamespacedPersistentVolumeClaim(pvcName, namespace, pvcPatch, undefined, undefined, undefined, undefined, undefined, requestOptions);
+        console.log('PersistentVolumeClaim ' + pvcName + ' updated...');
+      }
+    });
   } catch (error){
-    console.error('Error updating MariaDB ' + serverName + ' resources...');
-    return error;
+    console.error('Error updating MariaDB ' + serverName + ' resources...', error.body);
+    throw new Error(JSON.stringify(error.body));
   }
 
-  return { result: 'success' };
+  return 'success';
 }
 
 
-async function deleteMariaDBResource(serverName, purgeData) {
+async function deleteMariaDBResource(serverName) {
   try {
     const dbResult = await k8sCustomApi.deleteNamespacedCustomObject(group, version, namespace, plural, serverName);
     console.log('MariaDB ' + serverName + ' deleted...');
     const secretResult = await k8sCoreApi.deleteNamespacedSecret(serverName + '-credentials', namespace);
     console.log('Secret ' + serverName + '-credentials deleted...');
-    if (purgeData) {
-      const pvcList = await k8sCoreApi.listNamespacedPersistentVolumeClaim(namespace);
-      pvcList.body.items.forEach(async (pvc) => {
-        var pvcName = pvc.metadata.name;
-        if (pvcName.includes("storage-" + serverName)) {
-          await k8sCoreApi.deleteNamespacedPersistentVolumeClaim(pvcName, namespace);
-          console.log('PersistentVolumeClaim ' + pvcName + ' deleted...');
-        }
-      });
-    }
+
+    const pvcList = await k8sCoreApi.listNamespacedPersistentVolumeClaim(namespace);
+    pvcList.body.items.forEach(async (pvc) => {
+      var pvcName = pvc.metadata.name;
+      if (pvcName.includes("storage-" + serverName + '-')) {
+        await k8sCoreApi.deleteNamespacedPersistentVolumeClaim(pvcName, namespace);
+        console.log('PersistentVolumeClaim ' + pvcName + ' deleted...');
+      }
+    });
   } catch (error) {
-    console.error('Error deleting resource:', error);
-    return error
+    console.error('Error deleting resource:', error.body);
+    throw new Error(JSON.stringify(error.body));
   }
 
-  return { result: 'success' };
+  return 'success';
 }
+
+// some helper functions
+async function waitForSecret(secretName) {
+  const pollingInterval = 2000;
+  while (true) {
+    try {
+      const response = await k8sCoreApi.readNamespacedSecret(secretName, namespace);
+      return response.body.data;
+    } catch (error) {
+      await sleep(pollingInterval);
+    }
+  }
+}
+
+// Function to simulate sleep
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 
 // Create a MariaDB Instance
 router.post('/mariadb', async (req, res) => {
-  const { serverName, dbName, dbVersion, replicaCount, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, rootPasswd } = req.body;
+  const { serverName, dbName, dbVersion, replicaCount, size, userName, passwd, rootPasswd } = req.body;
 
   try {
-    await createMariaDBResource(serverName, dbName, dbVersion, replicaCount, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, rootPasswd);
-    res.json({ 'url': serverName + '.' + namespace + '.cluster.svc.local',
-               'username': userName,
-               'password': passwd, });
+    await createMariaDBResource(serverName, dbName, dbVersion, replicaCount, size, userName, passwd, rootPasswd);
+    res.json({ 'connectionString': serverName + '.' + namespace + '.cluster.svc.local',
+               'userName': userName, 'password': passwd, 'rootPassword': rootPasswd });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json(JSON.parse(err.message));
   }
 });
 
 // Update MariaDB Instance
 router.put('/mariadb', async (req, res) => {
-  const { serverName, dbName, dbVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, rootPasswd } = req.body;
+  const { serverName, dbVersion, replicaCount, size } = req.body;
 
   try {
-    await updateMariaDBResource(serverName, dbVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit);
-    res.json({ 'url': serverName + '.' + namespace + '.cluster.svc.local' });
+    await updateMariaDBResource(serverName, dbVersion, replicaCount, size);
+    var secretName = serverName + '-credentials';
+    credentials = await waitForSecret(secretName);
+    res.json({ 'connectionString': serverName + '.' + namespace + '.cluster.svc.local',
+               'password': Buffer.from(credentials.password, 'base64').toString('utf-8'),
+               'rootPassword': Buffer.from(credentials['root-password'], 'base64').toString('utf-8')  });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json(JSON.parse(err.message));
   }
 });
 
 // Delete a MariaDB instance
 router.delete('/mariadb', async (req, res) => {
-  const { serverName, purgeData } = req.body;
+  const { serverName } = req.body;
 
   try {
-    const delResult = await deleteMariaDBResource(serverName, purgeData);
-    res.json({ mariadb: delResult});
+    const delResult = await deleteMariaDBResource(serverName);
+    res.json({ mariadb: 'deleted'});
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json(JSON.parse(err.message));
   }
 });
 

@@ -202,6 +202,25 @@ async function deleteRedis(clusterName) {
   return 'success!';
 }
 
+// some helper functions
+async function waitForSecret(secretName) {
+  const pollingInterval = 2000;
+  while (true) {
+    try {
+      const response = await k8sCoreApi.readNamespacedSecret(secretName, namespace);
+      return response.body.data.password;
+    } catch (error) {
+      await sleep(pollingInterval);
+    }
+  }
+}
+
+// Function to simulate sleep
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 
 // Create a Redis Instance
 router.post('/redis', async (req, res) => {
@@ -223,15 +242,17 @@ router.post('/redis', async (req, res) => {
 
 // Update Redis Instance
 router.put('/redis', async (req, res) => {
-  const { clusterName, version, size, passwd, readReplicaEnabled } = req.body;
+  const { clusterName, version, size, readReplicaEnabled } = req.body;
 
   try {
     await updateRedis(clusterName, version, size, readReplicaEnabled);
+    var secretName = clusterName + '-redis-password';
+    passWord = await waitForSecret(secretName);
     response = readReplicaEnabled ? { 'connectionStringMaster': clusterName + '-master.' + namespace + '.svc.cluster.local',
                                       'connectionStringReplicas': clusterName + '-replicas.' + namespace + '.svc.cluster.local',
-                                      'password': passwd }
+                                      'password': Buffer.from(passWord, 'base64').toString('utf-8') }
                                   : { 'connectionStringMaster': clusterName + '-master.' + namespace + '.svc.cluster.local',
-                                      'password': passwd };
+                                      'password': Buffer.from(passWord, 'base64').toString('utf-8') };
     res.json(response);
   } catch (err) {
     res.status(500).json(JSON.parse(err.message));
