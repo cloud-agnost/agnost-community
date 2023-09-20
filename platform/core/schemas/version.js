@@ -1109,6 +1109,13 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty")),
 			];
+		case "entity-search":
+			return [
+				query("keyword")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+			];
 		case "add-npm-package":
 			return [
 				body("name")

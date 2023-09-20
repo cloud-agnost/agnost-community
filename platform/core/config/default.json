@@ -77,6 +77,7 @@
     "minEmailTokenExpirySeconds": 60,
     "SMSCodeExpiresInSeconds": 3600,
     "minSMSCodeExpirySeconds": 60,
+    "maxSearchResults": 50,
     "defaultEngineConfig": {
       "initialScale": 1,
       "maxScale": 10,
