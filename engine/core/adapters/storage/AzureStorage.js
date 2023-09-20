@@ -29,7 +29,7 @@ export class AzureStorage extends StorageBase {
 	async deleteBucketUsingDriver(name) {
 		// Get a reference to a container
 		const containerClient = this.driver.getContainerClient(name);
-		// Create the container
+		// Delete the container
 		await containerClient.delete();
 	}
 

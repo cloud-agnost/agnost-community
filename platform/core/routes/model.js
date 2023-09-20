@@ -600,7 +600,7 @@ router.put(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.db.model.timestamps",
+				"org.app.version.db.model",
 				"update",
 				t("Enabled the timestamps of model '%s'", model.name),
 				updatedModel,
@@ -677,7 +677,7 @@ router.put(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.db.model.timestamps",
+				"org.app.version.db.model",
 				"update",
 				t("Disabled the timestamps of model '%s'", model.name),
 				updatedModel,
@@ -820,7 +820,7 @@ router.post(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.db.model.fields",
+				"org.app.version.db.model.field",
 				"create",
 				t(
 					"Added a new '%s' field named '%s' to model '%s'",
@@ -944,7 +944,7 @@ router.delete(
 				auditCtrl.logAndNotify(
 					version._id,
 					user,
-					"org.app.version.db.model.fields",
+					"org.app.version.db.model.field",
 					"delete",
 					t(
 						"Deleted the '%s' field '%s' from model '%s'",
@@ -1062,7 +1062,7 @@ router.delete(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.db.model.fields",
+				"org.app.version.db.model.field",
 				"delete",
 				t(
 					"Deleted the '%s' field '%s' from model '%s'",
@@ -1202,7 +1202,7 @@ router.put(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.db.model.fields",
+				"org.app.version.db.model.field",
 				"update",
 				t(
 					"Updated the properties of '%s' field '%s' in model '%s'",

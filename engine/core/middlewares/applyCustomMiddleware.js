@@ -102,7 +102,7 @@ export const applyCustomMiddleware =
 /**
  * Helper function to return error message
  * @param  {Object} res The express response object
- * @param  {Object} endpoint The endpoint object
+ * @param  {Object} middleware The middleware object
  * @param  {Object} errorObj The error object
  * @param  {Number} status The HTTP response status code
  */

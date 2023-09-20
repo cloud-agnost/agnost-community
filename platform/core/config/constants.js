@@ -12,11 +12,13 @@ export const notificationTypes = [
 	"field",
 	"endpoint",
 	"queue",
-	"cronjob",
+	"task",
 	"cache",
 	"storage",
 	"resource",
 	"environment",
+	"middleware",
+	"function",
 ];
 
 // User statuses. The Pending status is only used during the sign up of the cluster owner, e.g., initialization of the cluster
@@ -919,3 +921,9 @@ export const defaultTaskCode = `const cronJobHandler = async () => {
 };
 
 export default cronJobHandler;`;
+
+export const defaultFunctionCode = `const helperFunction = async (param) => {
+
+};
+
+export default defaultFunctionCode;`;

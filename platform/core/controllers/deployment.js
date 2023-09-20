@@ -11,6 +11,8 @@ import versionCtrl from "../controllers/version.js";
 import appCtrl from "../controllers/app.js";
 import envCtrl from "../controllers/environment.js";
 import envLogCtrl from "../controllers/environmentLog.js";
+import funcCtrl from "../controllers/function.js";
+import cacheCtrl from "../controllers/cache.js";
 import { sendMessage } from "../init/sync.js";
 
 class DeploymentController {
@@ -166,11 +168,31 @@ class DeploymentController {
 	}
 
 	/**
-	 * Returns the tasks
+	 * Returns the storages
 	 * @param  {string} versionId The version id
 	 */
 	async getStorages(versionId) {
 		let storages = await storageCtrl.getManyByQuery({ versionId });
+
+		return storages;
+	}
+
+	/**
+	 * Returns the functions
+	 * @param  {string} versionId The version id
+	 */
+	async getFunctions(versionId) {
+		let storages = await funcCtrl.getManyByQuery({ versionId });
+
+		return storages;
+	}
+
+	/**
+	 * Returns the caches
+	 * @param  {string} versionId The version id
+	 */
+	async getCaches(versionId) {
+		let storages = await cacheCtrl.getManyByQuery({ versionId });
 
 		return storages;
 	}
@@ -213,7 +235,8 @@ class DeploymentController {
 			queues: await this.getQueues(version._id),
 			tasks: await this.getTasks(version._id),
 			storages: await this.getStorages(version._id),
-			cache: [],
+			functions: await this.getFunctions(version._id),
+			cache: await this.getCaches(version._id),
 		};
 
 		//Make api call to environment worker engine to deploy app version
@@ -267,7 +290,8 @@ class DeploymentController {
 			queues: await this.getQueues(version._id),
 			tasks: await this.getTasks(version._id),
 			storages: await this.getStorages(version._id),
-			cache: [],
+			functions: await this.getFunctions(version._id),
+			cache: await this.getCaches(version._id),
 		};
 
 		//Make api call to environment worker engine to redeploy app version
@@ -284,7 +308,7 @@ class DeploymentController {
 	}
 
 	/**
-	 * Deletes the environment. Please note that when we delete an organization we pass the app and version parameters null.
+	 * Deletes the environment.
 	 * @param  {object} app The application object
 	 * @param  {object} version The version object
 	 * @param  {object} env The environment object
@@ -813,6 +837,68 @@ class DeploymentController {
 		// Make api call to environment worker engine to update storages
 		await axios.post(
 			config.get("general.workerUrl") + "/v1/env/update-storages",
+			payload,
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
+	}
+
+	/**
+	 * Updates the functions if autoDeploy is turned on
+	 * @param  {object} app The application object
+	 * @param  {object} version The version object
+	 * @param  {object} user The user who initiated the update
+	 * @param  {object} functions The functions that are created/updated/deleted
+	 * @param  {string} subAction Can be either add, update, delete
+	 */
+	async updateFunctions(app, version, user, functions, subAction) {
+		const env = await this.getEnvironment(version);
+		// If auto deploy is turned off or version has not been deployed to the environment then we do not send the environment updates to the engine cluster
+		if (!env.autoDeploy || !env.deploymentDtm) return;
+
+		// Create the environment log entry
+		const envLog = await this.createEnvLog(
+			version,
+			env,
+			user,
+			"Deploying",
+			"Deploying",
+			env.schedulerStatus
+		);
+
+		// First get the list of environment resources
+		const resources = await this.getEnvironmentResources(env);
+
+		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
+			env.orgId
+		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
+			envLog._id
+		}`;
+		// Start building the deployment instructions that will be sent to the engine cluster worker
+		let payload = {
+			action: "deploy",
+			subAction: subAction,
+			callback: callback,
+			actor: {
+				userId: user._id,
+				name: user.name,
+				pictureUrl: user.pictureUrl,
+				color: user.color,
+				contactEmail: user.contactEmail,
+			},
+			app,
+			// We pass the list of resources in env object, the callback is also required in the env object so that engine-core send back deployment status info
+			env: { ...env, callback, app, version, resources, timestamp: new Date() },
+			functions: functions,
+		};
+
+		// Make api call to environment worker engine to update functions
+		await axios.post(
+			config.get("general.workerUrl") + "/v1/env/update-functions",
 			payload,
 			{
 				headers: {

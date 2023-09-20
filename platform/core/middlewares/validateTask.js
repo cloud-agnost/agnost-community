@@ -6,7 +6,7 @@ export const validateTask = async (req, res, next) => {
 	try {
 		const { taskId } = req.params;
 
-		// Get the database object
+		// Get the task object
 		let task = await taskCtrl.getOneById(taskId, { cacheKey: taskId });
 
 		if (!task) {

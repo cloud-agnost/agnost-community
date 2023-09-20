@@ -24,7 +24,9 @@ export const checkSession = async (req, res, next) => {
 	}
 
 	// Check to see if this token is a valid token, valid tokens should be stored in redis cache
-	const sessionObj = await getKey(sessionToken);
+	const sessionObj = await getKey(
+		`sessions.${META.getEnvId()}.${sessionToken}`
+	);
 	if (!sessionObj) {
 		return res
 			.status(401)

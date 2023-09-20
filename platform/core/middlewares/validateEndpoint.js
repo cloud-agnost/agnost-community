@@ -7,7 +7,7 @@ export const validateEndpoint = async (req, res, next) => {
 	try {
 		const { epId } = req.params;
 
-		// Get the database object
+		// Get the endpoint object
 		let ep = await epCtrl.getOneById(epId, { cacheKey: epId });
 
 		if (!ep) {

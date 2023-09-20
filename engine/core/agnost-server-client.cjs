@@ -18,6 +18,10 @@
 									return this.metaManager.getTaskByName(t);
 								case "storage":
 									return this.metaManager.getStorageByName(t);
+								case "function":
+									return this.metaManager.getFunctionByName(t);
+								case "cache":
+									return this.metaManager.getCacheByName(t);
 								default:
 									return null;
 							}
@@ -32,6 +36,8 @@
 									return this.adapterManager.getTaskAdapter(t);
 								case "storage":
 									return this.adapterManager.getStorageAdapter(t);
+								case "function":
+									return this.adapterManager.getFunctionAdapter();
 								default:
 									return null;
 							}
@@ -46,15 +52,16 @@
 					a = r(6760),
 					o = r(9634),
 					s = r(665),
-					u = r(9419),
-					l = r(990);
-				class d extends i.APIBase {
+					u = r(9949),
+					l = r(9419),
+					d = r(990);
+				class c extends i.APIBase {
 					constructor(e, t) {
 						super(e, t), (this.managers = new Map());
 					}
 					storage(e) {
-						if (!(0, u.isString)(e))
-							throw new l.ClientError(
+						if (!(0, l.isString)(e))
+							throw new d.ClientError(
 								"invalid_value",
 								"Storage name needs to be a string value"
 							);
@@ -66,8 +73,8 @@
 						}
 					}
 					queue(e) {
-						if (!(0, u.isString)(e))
-							throw new l.ClientError(
+						if (!(0, l.isString)(e))
+							throw new d.ClientError(
 								"invalid_value",
 								"Queue name needs to be a string value"
 							);
@@ -79,8 +86,8 @@
 						}
 					}
 					task(e) {
-						if (!(0, u.isString)(e))
-							throw new l.ClientError(
+						if (!(0, l.isString)(e))
+							throw new d.ClientError(
 								"invalid_value",
 								"Task name needs to be a string value"
 							);
@@ -92,8 +99,8 @@
 						}
 					}
 					db(e) {
-						if (!(0, u.isString)(e))
-							throw new l.ClientError(
+						if (!(0, l.isString)(e))
+							throw new d.ClientError(
 								"invalid_value",
 								"Database name needs to be a string value"
 							);
@@ -108,8 +115,21 @@
 							return this.managers.set(`db-${e}`, t), t;
 						}
 					}
+					func(e) {
+						if (!(0, l.isString)(e))
+							throw new d.ClientError(
+								"invalid_value",
+								"Function name needs to be a string value"
+							);
+						const t = this.managers.get(`func-${e}`);
+						if (t) return t;
+						{
+							const t = new u.Func(this.metaManager, this.adapterManager, e);
+							return this.managers.set(`func-${e}`, t), t;
+						}
+					}
 				}
-				t.AgnostServerSideClient = d;
+				t.AgnostServerSideClient = c;
 			},
 			6098: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
@@ -3664,6 +3684,72 @@
 					}
 				};
 			},
+			9949: function (e, t, r) {
+				var i =
+					(this && this.__awaiter) ||
+					function (e, t, r, i) {
+						return new (r || (r = Promise))(function (n, a) {
+							function o(e) {
+								try {
+									u(i.next(e));
+								} catch (e) {
+									a(e);
+								}
+							}
+							function s(e) {
+								try {
+									u(i.throw(e));
+								} catch (e) {
+									a(e);
+								}
+							}
+							function u(e) {
+								var t;
+								e.done
+									? n(e.value)
+									: ((t = e.value),
+									  t instanceof r
+											? t
+											: new r(function (e) {
+													e(t);
+											  })).then(o, s);
+							}
+							u((i = i.apply(e, t || [])).next());
+						});
+					};
+				Object.defineProperty(t, "__esModule", { value: !0 }),
+					(t.Func = void 0);
+				const n = r(7602),
+					a = r(990);
+				class o extends n.APIBase {
+					constructor(e, t, r) {
+						if (
+							(super(e, t),
+							(this.name = r),
+							(this.meta = this.getMetadata("function", r)),
+							!this.meta)
+						)
+							throw new a.ClientError(
+								"function_not_found",
+								`Cannot find the function identified by name '${r}'`
+							);
+						if (
+							((this.adapter = this.getAdapter("function", this.name)),
+							!this.adapter)
+						)
+							throw new a.ClientError(
+								"adapter_not_found",
+								`Cannot find the adapter of the function named '${r}'`
+							);
+					}
+					run(...e) {
+						return i(this, void 0, void 0, function* () {
+							return yield this.adapter.run(this.name, ...e);
+						});
+					}
+				}
+				t.Func = o;
+			},
 			6760: function (e, t, r) {
 				var i =
 					(this && this.__awaiter) ||
@@ -3981,7 +4067,7 @@
 						)
 							throw new a.ClientError(
 								"adapter_not_found",
-								`Cannot find the adapter of the queue named '${r}'`
+								`Cannot find the adapter of the cron job named '${r}'`
 							);
 					}
 					runOnce() {

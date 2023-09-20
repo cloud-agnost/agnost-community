@@ -22,11 +22,13 @@ import { Kafka as KafkaAdapter } from "../adapters/queue/Kafka.js";
 import { Redis } from "../adapters/cache/Redis.js";
 import { Socketio } from "../adapters/realtime/Socketio.js";
 import { Agenda } from "../adapters/scheduler/Agenda.js";
+import { FunctionAdapter } from "../adapters/function/FunctionAdapter.js";
 
 export class AdapterManager {
 	constructor() {
 		// Keeps the list of connections object {type, instance, iid, readOnly, adapter}
 		this.adapters = new Map();
+		this.functionAdapter = new FunctionAdapter();
 	}
 
 	/**
@@ -186,6 +188,13 @@ export class AdapterManager {
 	getRealtimeAdapter(name) {
 		const adapterObj = this.getAdapterObject(name, "realtime", false);
 		return adapterObj?.adapter || null;
+	}
+
+	/**
+	 * Returns the helper function execution adapter
+	 */
+	getFunctionAdapter() {
+		return this.functionAdapter;
 	}
 
 	/**

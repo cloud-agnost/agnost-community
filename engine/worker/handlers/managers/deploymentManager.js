@@ -167,35 +167,42 @@ export class DeploymentManager {
     }
 
     /**
-     * Returns the endpoints of the input message
+     * Returns the middlewares of the input message
      */
     getMiddlewares() {
         return this.msgObj.middlewares || [];
     }
 
     /**
-     * Returns the endpoints of the input message
+     * Returns the functions of the input message
+     */
+    getFunctions() {
+        return this.msgObj.functions || [];
+    }
+
+    /**
+     * Returns the queues of the input message
      */
     getQueues() {
         return this.msgObj.queues || [];
     }
 
     /**
-     * Returns the endpoints of the input message
+     * Returns the tasks of the input message
      */
     getTasks() {
         return this.msgObj.tasks || [];
     }
 
     /**
-     * Returns the endpoints of the input message
+     * Returns the storages of the input message
      */
     getStorages() {
         return this.msgObj.storages || [];
     }
 
     /**
-     * Returns the endpoints of the input message
+     * Returns the caches of the input message
      */
     getCaches() {
         return this.msgObj.caches || [];
@@ -862,7 +869,7 @@ export class DeploymentManager {
             // Check if this database exists in the new configuration or not
             const newdbConfig = databases.find((entry) => entry.iid === prevdbConfig.iid);
             if (newdbConfig) continue;
-            else {
+            else if (prevdbConfig.managed) {
                 let dbManager = this.createDBManager(prevdbConfig, prevdbConfig);
                 await dbManager.beginSession();
                 await dbManager.dropDatabase();
@@ -1026,6 +1033,14 @@ export class DeploymentManager {
     }
 
     /**
+     * Gets all existing function configurations from the cache.
+     */
+    async getPrevFunctionDefinitions() {
+        let functions = await getKey(`${this.getEnvId()}.functions`);
+        return functions ?? [];
+    }
+
+    /**
      * Gets all existing queue configurations from the cache.
      */
     async getPrevQueueDefinitions() {
@@ -1050,6 +1065,14 @@ export class DeploymentManager {
     }
 
     /**
+     * Gets all existing cache configurations from the cache.
+     */
+    async getPrevCacheDefinitions() {
+        let caches = await getKey(`${this.getEnvId()}.caches`);
+        return caches ?? [];
+    }
+
+    /**
      * Save new deployment configuration to the engine cluster database
      */
     async saveDeploymentConfig() {
@@ -1063,6 +1086,7 @@ export class DeploymentManager {
         await engineDb.collection("tasks").deleteMany({});
         await engineDb.collection("storages").deleteMany({});
         await engineDb.collection("caches").deleteMany({});
+        await engineDb.collection("functions").deleteMany({});
 
         // Save environment and version information
         await engineDb.collection("environment").insertOne(this.getEnvObj());
@@ -1081,6 +1105,8 @@ export class DeploymentManager {
         if (this.getStorages().length > 0) await engineDb.collection("storages").insertMany(this.getStorages());
 
         if (this.getCaches().length > 0) await engineDb.collection("caches").insertMany(this.getCaches());
+
+        if (this.getFunctions().length > 0) await engineDb.collection("functions").insertMany(this.getFunctions());
 
         this.addLog("Saved deployment configuration to database");
     }
@@ -1119,6 +1145,18 @@ export class DeploymentManager {
         if (middlewares.length > 0) await engineDb.collection("middlewares").insertMany(middlewares);
 
         this.addLog("Saved middleware configurations to environment database");
+    }
+
+    /**
+     * Save the function configurations to the engine cluster database
+     */
+    async saveFunctionDeploymentConfigs(functions) {
+        const engineDb = this.getEnvDB();
+        // First clear any existing configuration
+        await engineDb.collection("functions").deleteMany({});
+        if (functions.length > 0) await engineDb.collection("functions").insertMany(functions);
+
+        this.addLog("Saved function configurations to environment database");
     }
 
     /**
@@ -1221,6 +1259,8 @@ export class DeploymentManager {
         this.cacheQueues(this.getQueues(), "set");
         this.cacheTasks(this.getTasks(), "set");
         this.cacheStorages(this.getStorages(), "set");
+        this.cacheFunctions(this.getFunctions(), "set");
+        this.cacheCaches(this.getCaches(), "set");
 
         this.addLog(t("Cached application metadata"));
     }
@@ -1520,6 +1560,104 @@ export class DeploymentManager {
     }
 
     /**
+     * Caches the function metadata of the app version
+     * @param  {Array} functions The list of functions data to cache
+     * @param  {String} actionType The action type can be either set, udpate or delete
+     */
+    async cacheFunctions(functions, actionType) {
+        switch (actionType) {
+            case "set":
+                this.addToCache(`${this.getEnvId()}.functions`, functions);
+                return functions;
+            case "add": {
+                const prevFuncDefinitions = await this.getPrevFunctionDefinitions();
+                prevFuncDefinitions.push(...functions);
+                this.addToCache(`${this.getEnvId()}.functions`, prevFuncDefinitions);
+                return prevFuncDefinitions;
+            }
+            case "update": {
+                const prevFuncDefinitions = await this.getPrevFunctionDefinitions();
+
+                if (prevFuncDefinitions.length === 0) {
+                    this.addToCache(`${this.getEnvId()}.functions`, functions);
+                    return functions;
+                } else {
+                    const updatedFuncDefinitions = prevFuncDefinitions.map((entry) => {
+                        const updatedFunc = functions.find((entry2) => entry2.iid === entry.iid);
+
+                        if (updatedFunc) return updatedFunc;
+                        else return entry;
+                    });
+
+                    this.addToCache(`${this.getEnvId()}.functions`, updatedFuncDefinitions);
+
+                    return updatedFuncDefinitions;
+                }
+            }
+            case "delete": {
+                const prevFuncDefinitions = await this.getPrevFunctionDefinitions();
+                const updatedFuncDefinitions = prevFuncDefinitions.filter(
+                    (entry) => !functions.find((entry2) => entry.iid === entry2.iid)
+                );
+                this.addToCache(`${this.getEnvId()}.functions`, updatedFuncDefinitions);
+
+                return updatedFuncDefinitions;
+            }
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Caches the cache metadata of the app version
+     * @param  {Array} caches The list of caches data to cache
+     * @param  {String} actionType The action type can be either set, udpate or delete
+     */
+    async cacheCaches(caches, actionType) {
+        switch (actionType) {
+            case "set":
+                this.addToCache(`${this.getEnvId()}.caches`, caches);
+                return caches;
+            case "add": {
+                const prevCacheDefinitions = await this.getPrevCacheDefinitions();
+                prevCacheDefinitions.push(...caches);
+                this.addToCache(`${this.getEnvId()}.caches`, prevCacheDefinitions);
+                return prevCacheDefinitions;
+            }
+            case "update": {
+                const prevCacheDefinitions = await this.getPrevCacheDefinitions();
+
+                if (prevCacheDefinitions.length === 0) {
+                    this.addToCache(`${this.getEnvId()}.caches`, caches);
+                    return caches;
+                } else {
+                    const updatedCacheDefinitions = prevCacheDefinitions.map((entry) => {
+                        const updatedCache = caches.find((entry2) => entry2.iid === entry.iid);
+
+                        if (updatedCache) return updatedCache;
+                        else return entry;
+                    });
+
+                    this.addToCache(`${this.getEnvId()}.caches`, updatedCacheDefinitions);
+
+                    return updatedCacheDefinitions;
+                }
+            }
+            case "delete": {
+                const prevCacheDefinitions = await this.getPrevCacheDefinitions();
+                const updatedCacheDefinitions = prevCacheDefinitions.filter(
+                    (entry) => !caches.find((entry2) => entry.iid === entry2.iid)
+                );
+                this.addToCache(`${this.getEnvId()}.caches`, updatedCacheDefinitions);
+
+                return updatedCacheDefinitions;
+            }
+            default:
+                break;
+        }
+    }
+
+    /**
      * Deploys the application version to the engine cluster
      */
     async deployVersion() {
@@ -1624,8 +1762,8 @@ export class DeploymentManager {
 
             // Drop application specific data (e.g., cache, database, storage)
             await this.clearCachedData(`sessions.${this.getEnvId()}.*`);
-            await this.clearCachedData(`cache.${this.getEnvId()}.*`);
-            await this.clearCachedData(`tokens.${this.getEnvId()}.*`);
+            await this.dropStorages();
+            await this.dropCaches();
             await this.dropDatabases();
 
             // Delete environment configuration database
@@ -1854,6 +1992,96 @@ export class DeploymentManager {
     }
 
     /**
+     * Updates the functions
+     */
+    async updateFunctions() {
+        try {
+            this.addLog(t("Started updating functions"));
+            // Set current status of environment in engine cluster
+            await this.setStatus("Deploying");
+            const subAction = this.getSubAction();
+
+            // Update environment object data in cache
+            this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
+            this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
+
+            // Cache updated function configurations (subaction can be add, delete or update)
+            const functions = await this.cacheFunctions(this.getFunctions(), subAction);
+
+            // Execute all redis commands altogether
+            await this.commitPipeline();
+            // We first cache all data and then notify api servers
+            // After we load all configuration data to the cache we can notify engine API servers to update themselves
+            this.notifyAPIServers();
+
+            // Save updated deployment to database
+            await this.saveFunctionDeploymentConfigs(functions);
+            // Save updated deployment to database
+            await this.saveEnvironmentDeploymentConfig();
+
+            // Update status of environment in engine cluster
+            this.addLog(t("Completed function updates successfully"));
+            // Send the deployment telemetry information to the platform
+            await this.sendEnvironmentLogs("OK");
+            // Update status of environment in engine cluster
+            await this.setStatus("OK");
+            return { success: true };
+        } catch (error) {
+            // Update status of environment in engine cluster
+            await this.setStatus("Error");
+            // Send the deployment telemetry information to the platform
+            this.addLog([t("Function updates failed"), error.name, error.message, error.stack].join("\n"), "Error");
+            await this.sendEnvironmentLogs("Error");
+            return { success: false, error };
+        }
+    }
+
+    /**
+     * Updates the caches
+     */
+    async updateCaches() {
+        try {
+            this.addLog(t("Started updating caches"));
+            // Set current status of environment in engine cluster
+            await this.setStatus("Deploying");
+            const subAction = this.getSubAction();
+
+            // Update environment object data in cache
+            this.addToCache(`${this.getEnvId()}.object`, this.getEnvObj());
+            this.addToCache(`${this.getEnvId()}.timestamp`, this.getTimestamp());
+
+            // Cache updated cache configurations (subaction can be add, delete or update)
+            const caches = await this.cacheCaches(this.getCaches(), subAction);
+
+            // Execute all redis commands altogether
+            await this.commitPipeline();
+            // We first cache all data and then notify api servers
+            // After we load all configuration data to the cache we can notify engine API servers to update themselves
+            this.notifyAPIServers();
+
+            // Save updated deployment to database
+            await this.saveCacheDeploymentConfigs(caches);
+            // Save updated deployment to database
+            await this.saveEnvironmentDeploymentConfig();
+
+            // Update status of environment in engine cluster
+            this.addLog(t("Completed cache updates successfully"));
+            // Send the deployment telemetry information to the platform
+            await this.sendEnvironmentLogs("OK");
+            // Update status of environment in engine cluster
+            await this.setStatus("OK");
+            return { success: true };
+        } catch (error) {
+            // Update status of environment in engine cluster
+            await this.setStatus("Error");
+            // Send the deployment telemetry information to the platform
+            this.addLog([t("Cache updates failed"), error.name, error.message, error.stack].join("\n"), "Error");
+            await this.sendEnvironmentLogs("Error");
+            return { success: false, error };
+        }
+    }
+
+    /**
      * Updates the queues
      */
     async updateQueues() {
@@ -1972,9 +2200,6 @@ export class DeploymentManager {
             // After we load all configuration data to the cache we can notify engine API servers to update themselves
             this.notifyAPIServers();
 
-            if (subAction === "delete") {
-                await this.deleteStorageData(this.getStorages());
-            }
             // Save updated deployment to database
             await this.saveStorageDeploymentConfigs(storages);
             // Save updated deployment to database
@@ -2076,7 +2301,10 @@ export class DeploymentManager {
         });
     }
 
-    async deleteStorageData(storages) {
+    async dropStorages() {}
+    async dropCaches() {}
+
+    /*     async deleteStorageData(storages) {
         for (const storage of storages) {
             // First get all buckets of the storage
             const engineDb = this.getEnvDB();
@@ -2106,5 +2334,5 @@ export class DeploymentManager {
                 )
                 .catch((error) => {});
         }
-    }
+    } */
 }

@@ -2,7 +2,6 @@ import express from "express";
 import responseTime from "response-time";
 import { applyDefaultRateLimiters } from "../middlewares/applyDefaultRateLimiters.js";
 import { authManageStorage } from "../middlewares/authManageStorage.js";
-import { authAccessToken } from "../middlewares/authAccessToken.js";
 import { checkContentType } from "../middlewares/checkContentType.js";
 import { getResponseBody } from "../middlewares/getResponseBody.js";
 import { logRequestToConsole } from "../middlewares/logRequest.js";
@@ -166,33 +165,6 @@ router.delete(
 	async (req, res) => {
 		try {
 			const { storageName, bucketNames } = req.params;
-			bucketNames.forEach(async (bucketName) => {
-				await agnost.storage(storageName).bucket(bucketName).delete();
-			});
-
-			res.json();
-		} catch (error) {
-			helper.handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /storage/:storageName/bucket/delete-multi
-@method     POST
-@desc       Deletes list of buckets. This is called from the engine-worker deployment manager when a storage is deleted
-@access     private
-*/
-
-router.post(
-	"/:storageName/bucket/delete-multi",
-	checkContentType,
-	authAccessToken,
-	responseTime(logRequestToConsole),
-	async (req, res) => {
-		try {
-			const { storageName } = req.params;
-			const { bucketNames } = req.body;
 			bucketNames.forEach(async (bucketName) => {
 				await agnost.storage(storageName).bucket(bucketName).delete();
 			});

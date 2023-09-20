@@ -12,6 +12,8 @@ import mwCtrl from "../controllers/middleware.js";
 import queueCtrl from "../controllers/queue.js";
 import taskCtrl from "../controllers/task.js";
 import storageCtrl from "../controllers/storage.js";
+import funcCtrl from "../controllers/function.js";
+import cacheCtrl from "../controllers/cache.js";
 
 class VersionController extends BaseController {
 	constructor() {
@@ -310,6 +312,20 @@ class VersionController extends BaseController {
 			await mwCtrl.createMany(middlewares, { session });
 		}
 
+		// Copy functions
+		const functions = await funcCtrl.getManyByQuery({
+			versionId: parentVersion._id,
+		});
+		// Copy middlewares to the new version
+		if (functions && functions.length > 0) {
+			functions.forEach((func) => {
+				func.versionId = versionId;
+				delete func._id;
+			});
+
+			await funcCtrl.createMany(functions, { session });
+		}
+
 		// Copy queueus
 		const queues = await queueCtrl.getManyByQuery({
 			versionId: parentVersion._id,
@@ -416,6 +432,14 @@ class VersionController extends BaseController {
 			{ session }
 		);
 		await storageCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id, versionId: version._id },
+			{ session }
+		);
+		await funcCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id, versionId: version._id },
+			{ session }
+		);
+		await cacheCtrl.deleteManyByQuery(
 			{ orgId: org._id, appId: app._id, versionId: version._id },
 			{ session }
 		);

@@ -13,6 +13,8 @@ import mwCtrl from "../controllers/middleware.js";
 import queueCtrl from "../controllers/queue.js";
 import taskCtrl from "../controllers/task.js";
 import storageCtrl from "../controllers/storage.js";
+import funcCtrl from "../controllers/function.js";
+import cacheCtrl from "../controllers/cache.js";
 import { AppModel } from "../schemas/app.js";
 
 class AppController extends BaseController {
@@ -116,6 +118,14 @@ class AppController extends BaseController {
 			{ session }
 		);
 		await storageCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await funcCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await cacheCtrl.deleteManyByQuery(
 			{ orgId: org._id, appId: app._id },
 			{ session }
 		);

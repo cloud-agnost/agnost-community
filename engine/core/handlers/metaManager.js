@@ -12,6 +12,8 @@ export class MetaManager {
 		this.queues = null;
 		this.tasks = null;
 		this.storages = null;
+		this.functions = null;
+		this.caches = null;
 	}
 
 	/**
@@ -227,7 +229,7 @@ export class MetaManager {
 	}
 
 	/**
-	 * Returns a specific task
+	 * Returns a specific storage
 	 */
 	getStorageByName(name) {
 		const storages = this.getStoragesSync();
@@ -253,6 +255,62 @@ export class MetaManager {
 		if (!this.tasks) this.tasks = await this.loadEntityConfigFile("tasks");
 
 		return this.tasks.find((entry) => entry.iid === taskId);
+	}
+
+	/**
+	 * Returns the list of functions
+	 */
+	async getFunctions() {
+		if (!this.functions)
+			this.functions = await this.loadEntityConfigFile("functions");
+
+		return this.functions;
+	}
+
+	/**
+	 * Returns the list of functions
+	 */
+	getFunctionsSync() {
+		if (!this.functions)
+			this.functions = this.loadEntityConfigFileSync("functions");
+
+		return this.functions;
+	}
+
+	/**
+	 * Returns a specific function
+	 */
+	getFunctionByName(name) {
+		const functions = this.getFunctionsSync();
+
+		return functions.find((entry) => entry.name === name);
+	}
+
+	/**
+	 * Returns the list of caches
+	 */
+	async getCaches() {
+		if (!this.caches) this.caches = await this.loadEntityConfigFile("caches");
+
+		return this.caches;
+	}
+
+	/**
+	 * Returns the list of caches
+	 */
+	getCachesSync() {
+		if (!this.caches) this.caches = this.loadEntityConfigFileSync("caches");
+
+		return this.caches;
+	}
+
+	/**
+	 * Returns a specific cache
+	 */
+	getCacheByName(name) {
+		const caches = this.getCachesSync();
+
+		return caches.find((entry) => entry.name === name);
 	}
 
 	/**

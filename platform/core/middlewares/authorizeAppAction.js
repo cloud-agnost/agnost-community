@@ -107,6 +107,20 @@ export const appAuthorization = {
 				viewData: true,
 				manageData: false,
 			},
+			function: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
+			cache: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+				viewData: true,
+				manageData: true,
+			},
 		},
 	},
 	Developer: {
@@ -214,6 +228,20 @@ export const appAuthorization = {
 				viewData: true,
 				manageData: true,
 			},
+			function: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+			},
+			cache: {
+				view: true,
+				create: true,
+				update: true,
+				delete: true,
+				viewData: true,
+				manageData: true,
+			},
 		},
 	},
 	Viewer: {
@@ -314,6 +342,20 @@ export const appAuthorization = {
 				delete: false,
 			},
 			storage: {
+				view: true,
+				create: false,
+				update: false,
+				delete: false,
+				viewData: false,
+				manageData: false,
+			},
+			function: {
+				view: true,
+				create: false,
+				update: false,
+				delete: false,
+			},
+			cache: {
 				view: true,
 				create: false,
 				update: false,

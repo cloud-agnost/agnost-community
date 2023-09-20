@@ -6,7 +6,7 @@ export const validateQueue = async (req, res, next) => {
 	try {
 		const { queueId } = req.params;
 
-		// Get the database object
+		// Get the queue object
 		let queue = await queueCtrl.getOneById(queueId, { cacheKey: queueId });
 
 		if (!queue) {

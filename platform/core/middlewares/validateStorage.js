@@ -1,4 +1,4 @@
-import storageCtrl from "../controllers/middleware.js";
+import storageCtrl from "../controllers/cache.js";
 import { handleError } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
@@ -6,7 +6,7 @@ export const validateStorage = async (req, res, next) => {
 	try {
 		const { storageId } = req.params;
 
-		// Get the database object
+		// Get the storage object
 		let storage = await storageCtrl.getOneById(storageId, {
 			cacheKey: storageId,
 		});

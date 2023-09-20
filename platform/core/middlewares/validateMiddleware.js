@@ -6,7 +6,7 @@ export const validateMiddleware = async (req, res, next) => {
 	try {
 		const { mwId } = req.params;
 
-		// Get the database object
+		// Get the middleware object
 		let mw = await mwCtrl.getOneById(mwId, { cacheKey: mwId });
 
 		if (!mw) {

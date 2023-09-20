@@ -5,6 +5,8 @@ import { updateEnvironmentHandler } from "../consumers/updateEnvironment.js";
 import { updateDatabaseHandler } from "../consumers/updateDatabase.js";
 import { updateEndpointsHandler } from "../consumers/updateEndpoints.js";
 import { updateMiddlewaresHandler } from "../consumers/updateMiddlewares.js";
+import { updateFunctionsHandler } from "../consumers/updateFunctions.js";
+import { updateCachesHandler } from "../consumers/updateCaches.js";
 import { updateQueuesHandler } from "../consumers/updateQueues.js";
 import { updateTasksHandler } from "../consumers/updateTasks.js";
 import { updateStoragesHandler } from "../consumers/updateStorages.js";
@@ -19,616 +21,547 @@ var retryCount = 0;
 
 // There is no default connection retry mechanism in the RabbitMQ client library for this reason we implement it
 export const connectToQueue = () => {
-	if (isConnecting) return;
-	isConnecting = true;
-	retryCount++;
-	// Get the RabbitMQ connection credentials from environment variables
-	const amqpUsername = process.env.QUEUE_USERNAME;
-	const amqpPassword = process.env.QUEUE_PASSWORD;
-	const amqpHost = process.env.QUEUE_HOST;
-	// Construct the connection URL with the credentials
-	const amqpServerUrl = `amqp://${amqpUsername}:${amqpPassword}@${amqpHost}`;
+    if (isConnecting) return;
+    isConnecting = true;
+    retryCount++;
+    // Get the RabbitMQ connection credentials from environment variables
+    const amqpUsername = process.env.QUEUE_USERNAME;
+    const amqpPassword = process.env.QUEUE_PASSWORD;
+    const amqpHost = process.env.QUEUE_HOST;
+    // Construct the connection URL with the credentials
+    const amqpServerUrl = `amqp://${amqpUsername}:${amqpPassword}@${amqpHost}`;
 
-	amqp.connect(amqpServerUrl, (error, connection) => {
-		isConnecting = false;
-		if (error) {
-			if (retryCount < config.get("queue.retryCount")) {
-				return setTimeout(
-					connectToQueue,
-					config.get("queue.reconnectInterval")
-				);
-			} else {
-				logger.error(
-					"Cannot connect to the message queue, retry attempts exhausted",
-					{
-						details: error,
-					}
-				);
-				process.exit(1);
-			}
-		}
+    amqp.connect(amqpServerUrl, (error, connection) => {
+        isConnecting = false;
+        if (error) {
+            if (retryCount < config.get("queue.retryCount")) {
+                return setTimeout(connectToQueue, config.get("queue.reconnectInterval"));
+            } else {
+                logger.error("Cannot connect to the message queue, retry attempts exhausted", {
+                    details: error,
+                });
+                process.exit(1);
+            }
+        }
 
-		connection.on("error", (error) => {
-			if (error.message !== "Connection closing") {
-				logger.error(`Cannot connect to the message queue`, {
-					details: error,
-				});
-			}
+        connection.on("error", (error) => {
+            if (error.message !== "Connection closing") {
+                logger.error(`Cannot connect to the message queue`, {
+                    details: error,
+                });
+            }
 
-			if (retryCount < config.get("queue.retryCount")) {
-				return setTimeout(
-					connectToQueue,
-					config.get("queue.reconnectInterval")
-				);
-			}
-		});
+            if (retryCount < config.get("queue.retryCount")) {
+                return setTimeout(connectToQueue, config.get("queue.reconnectInterval"));
+            }
+        });
 
-		connection.on("close", function (error) {
-			// If this is not a user initiated close then reconnect to the message queue
-			if (error && retryCount < config.get("queue.retryCount")) {
-				return setTimeout(
-					connectToQueue,
-					config.get("queue.reconnectInterval")
-				);
-			}
-		});
+        connection.on("close", function (error) {
+            // If this is not a user initiated close then reconnect to the message queue
+            if (error && retryCount < config.get("queue.retryCount")) {
+                return setTimeout(connectToQueue, config.get("queue.reconnectInterval"));
+            }
+        });
 
-		retryCount = 0;
-		amqpConnection = connection;
+        retryCount = 0;
+        amqpConnection = connection;
 
-		logger.info(`Connected to the message queue @${amqpHost}`);
+        logger.info(`Connected to the message queue @${amqpHost}`);
 
-		// Register queue message handlers
-		let queueCount = config.get("general.generalQueueCount");
-		for (let i = 1; i <= queueCount; i++) {
-			deployVersionHandler(connection, `deploy-version-${i}`);
-			redeployVersionHandler(connection, `redeploy-version-${i}`);
-			deleteEnvironmentHandler(connection, `delete-environment-${i}`);
-			updateEnvironmentHandler(connection, `update-environment-${i}`);
-			updateDatabaseHandler(connection, `update-db-${i}`);
-			manageResourceHandler(connection, `manage-resource-${i}`);
-			updateResourceAccessHandler(connection, `update-resource-access-${i}`);
-			manageEngineWorkersHandler(connection, "manage-engine-workers");
-			updateEndpointsHandler(connection, `update-endpoints-${i}`);
-			updateMiddlewaresHandler(connection, `update-middlewares-${i}`);
-			updateQueuesHandler(connection, `update-queues-${i}`);
-			updateTasksHandler(connection, `update-tasks-${i}`);
-			updateStoragesHandler(connection, `update-storages-${i}`);
-		}
-	});
+        // Register queue message handlers
+        let queueCount = config.get("general.generalQueueCount");
+        for (let i = 1; i <= queueCount; i++) {
+            deployVersionHandler(connection, `deploy-version-${i}`);
+            redeployVersionHandler(connection, `redeploy-version-${i}`);
+            deleteEnvironmentHandler(connection, `delete-environment-${i}`);
+            updateEnvironmentHandler(connection, `update-environment-${i}`);
+            updateDatabaseHandler(connection, `update-db-${i}`);
+            manageResourceHandler(connection, `manage-resource-${i}`);
+            updateResourceAccessHandler(connection, `update-resource-access-${i}`);
+            manageEngineWorkersHandler(connection, "manage-engine-workers");
+            updateEndpointsHandler(connection, `update-endpoints-${i}`);
+            updateMiddlewaresHandler(connection, `update-middlewares-${i}`);
+            updateFunctionsHandler(connection, `update-functions-${i}`);
+            updateQueuesHandler(connection, `update-queues-${i}`);
+            updateTasksHandler(connection, `update-tasks-${i}`);
+            updateStoragesHandler(connection, `update-storages-${i}`);
+            updateCachesHandler(connection, `update-caches-${i}`);
+        }
+    });
 };
 
 export const disconnectFromQueue = () => {
-	amqpConnection.close();
-	logger.info("Disconnected from the message queue");
+    amqpConnection.close();
+    logger.info("Disconnected from the message queue");
 };
 
 export const getMQClient = () => {
-	return amqpConnection;
+    return amqpConnection;
 };
 
 export const deployVersion = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`deploy-version-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`deploy-version-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`deploy-version-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`deploy-version-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const redeployVersion = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`redeploy-version-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`redeploy-version-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`redeploy-version-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`redeploy-version-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const deleteEnvironment = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`delete-environment-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`delete-environment-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`delete-environment-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`delete-environment-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const updateEnvironment = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`update-environment-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`update-environment-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`update-environment-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`update-environment-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const updateDatabase = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`update-db-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`update-db-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`update-db-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`update-db-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const updateEndpoints = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`update-endpoints-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`update-endpoints-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`update-endpoints-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`update-endpoints-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const updateMiddlewares = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`update-middlewares-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`update-middlewares-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`update-middlewares-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`update-middlewares-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
+};
+
+export const updateFunctions = (payload) => {
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
+
+            return;
+        }
+
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
+
+        channel.assertQueue(`update-functions-${randNumber}`, {
+            durable: true,
+        });
+
+        channel.sendToQueue(`update-functions-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
+
+        channel.close();
+    });
+};
+
+export const updateCaches = (payload) => {
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
+
+            return;
+        }
+
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
+
+        channel.assertQueue(`update-caches-${randNumber}`, {
+            durable: true,
+        });
+
+        channel.sendToQueue(`update-caches-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
+
+        channel.close();
+    });
 };
 
 export const updateQueues = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`update-queues-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`update-queues-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`update-queues-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`update-queues-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const updateTasks = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`update-tasks-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`update-tasks-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`update-tasks-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`update-tasks-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const deployTasks = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`deploy-tasks-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`deploy-tasks-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`deploy-tasks-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`deploy-tasks-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const redeployTasks = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`redeploy-tasks-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`redeploy-tasks-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`redeploy-tasks-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`redeploy-tasks-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const deleteTasks = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`delete-tasks-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`delete-tasks-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`delete-tasks-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`delete-tasks-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const updateStorages = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`update-storages-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`update-storages-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`update-storages-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`update-storages-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const manageResource = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`manage-resource-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`manage-resource-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`manage-resource-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`manage-resource-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const manageAPIServers = (envId, payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		channel.assertExchange(envId, "fanout", {
-			durable: true,
-			autoDelete: true,
-		});
+        channel.assertExchange(envId, "fanout", {
+            durable: true,
+            autoDelete: true,
+        });
 
-		channel.publish(envId, "", Buffer.from(JSON.stringify(payload)));
+        channel.publish(envId, "", Buffer.from(JSON.stringify(payload)));
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const updateResourceAccess = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		let randNumber = helper.randomInt(
-			1,
-			config.get("general.generalQueueCount")
-		);
+        let randNumber = helper.randomInt(1, config.get("general.generalQueueCount"));
 
-		channel.assertQueue(`update-resource-access-${randNumber}`, {
-			durable: true,
-		});
+        channel.assertQueue(`update-resource-access-${randNumber}`, {
+            durable: true,
+        });
 
-		channel.sendToQueue(
-			`update-resource-access-${randNumber}`,
-			Buffer.from(JSON.stringify(payload)),
-			{
-				persistent: true,
-				timestamp: Date.now(),
-			}
-		);
+        channel.sendToQueue(`update-resource-access-${randNumber}`, Buffer.from(JSON.stringify(payload)), {
+            persistent: true,
+            timestamp: Date.now(),
+        });
 
-		channel.close();
-	});
+        channel.close();
+    });
 };
 
 export const manageEngineWorkers = (payload) => {
-	amqpConnection.createChannel(function (error, channel) {
-		if (error) {
-			logger.error("Cannot create channel to message queue", {
-				details: error,
-			});
+    amqpConnection.createChannel(function (error, channel) {
+        if (error) {
+            logger.error("Cannot create channel to message queue", {
+                details: error,
+            });
 
-			return;
-		}
+            return;
+        }
 
-		channel.assertExchange("manage-engine-workers", "fanout", {
-			durable: true,
-			autoDelete: true,
-		});
+        channel.assertExchange("manage-engine-workers", "fanout", {
+            durable: true,
+            autoDelete: true,
+        });
 
-		channel.publish(
-			"manage-engine-workers",
-			"",
-			Buffer.from(JSON.stringify(payload))
-		);
+        channel.publish("manage-engine-workers", "", Buffer.from(JSON.stringify(payload)));
 
-		channel.close();
-	});
+        channel.close();
+    });
 };

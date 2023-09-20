@@ -62,6 +62,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 		await this.deleteFilesInFolder("middlewares");
 		await this.deleteFilesInFolder("queues");
 		await this.deleteFilesInFolder("tasks");
+		await this.deleteFilesInFolder("functions");
 
 		this.addLog(t("Cleared app configuration files and metadata"));
 	}
@@ -133,6 +134,16 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 		const storages =
 			(await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.storages`)) ?? [];
 		await this.saveEntityConfigFile("storages", storages);
+
+		// Save functions
+		const functions =
+			(await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.functions`)) ?? [];
+		await this.manageConfigFiles("functions", functions, "set");
+
+		// Save caches
+		const caches =
+			(await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.caches`)) ?? [];
+		await this.saveEntityConfigFile("caches", caches);
 
 		// Save environment and version info
 		await this.saveEnvConfigFile();
@@ -231,7 +242,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 				break;
 		}
 
-		await this.saveEntityConfigFile(contentType, configEntries);
+		await this.saveEntityConfigFile(contentType, config);
 	}
 
 	/**
@@ -261,7 +272,11 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 			if (corePackages.includes(pkg.name)) continue;
 
 			// Check whether the package is installed as an add-on and has the same version
-			if (installedPackages[pkg.name] === `^${pkg.version}`) continue;
+			if (
+				installedPackages[pkg.name] === `^${pkg.version}` ||
+				installedPackages[pkg.name] === pkg.version
+			)
+				continue;
 
 			// This is a new package or the package has a different version, we need to add it to our installation list
 			packagesToInstall.push(`${pkg.name}@${pkg.version}`);

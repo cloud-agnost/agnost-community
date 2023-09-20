@@ -150,6 +150,10 @@ async function initExpress(i18n) {
 		(await import("./routes/middleware.js")).default
 	);
 	app.use(
+		"/v1/org/:orgId/app/:appId/version/:versionId/func",
+		(await import("./routes/function.js")).default
+	);
+	app.use(
 		"/v1/org/:orgId/app/:appId/version/:versionId/queue",
 		(await import("./routes/queue.js")).default
 	);
