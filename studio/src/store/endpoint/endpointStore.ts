@@ -10,6 +10,7 @@ import {
 	GetEndpointByIdParams,
 	GetEndpointsByIidParams,
 	GetEndpointsParams,
+	Log,
 	SaveEndpointLogicParams,
 	TestEndpointParams,
 	UpdateEndpointParams,
@@ -45,7 +46,7 @@ interface EndpointStore {
 	getEndpointsByIid: (endpoint: GetEndpointsByIidParams) => Promise<Endpoint[]>;
 	testEndpoint: (endpoint: TestEndpointParams) => Promise<AxiosResponse>;
 	closeEndpointDeleteDialog: () => void;
-	setEndpointLog: (epId: string, log: string) => void;
+	setEndpointLog: (epId: string, log: Log) => void;
 	openEditEndpointDialog: (endpoint: Endpoint) => void;
 	closeEditEndpointDialog: () => void;
 	setEditedLogic: (logic: string) => void;

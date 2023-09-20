@@ -1,6 +1,8 @@
 import { realtimeObjectMapper } from '@/helpers/realtime';
 import useAuthStore from '@/store/auth/authStore';
-import { onChannelMessage } from '@/utils';
+import useVersionStore from '@/store/version/versionStore';
+import { NotificationActions } from '@/types';
+import { generateId, onChannelMessage } from '@/utils';
 import { DateTime } from 'luxon';
 import { useEffect } from 'react';
 export default function useRealtime() {
@@ -15,12 +17,30 @@ export default function useRealtime() {
 					//@ts-ignore
 					data,
 					identifiers,
-					timestamp: DateTime.fromISO(timestamp)
-						.setLocale('en')
-						.toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
+					timestamp: DateTime.fromISO(timestamp).toFormat('yyyy-MM-dd hh:mm:ss'),
 					message: log,
 					id,
 					type,
+				});
+				console.log('message', message);
+				useVersionStore.setState({
+					notificationsPreview: [
+						{
+							_id: generateId(),
+							...identifiers,
+							orgId: identifiers.orgId as string,
+							appId: identifiers.appId as string,
+							versionId: identifiers.versionId as string,
+							object,
+							action: action as NotificationActions,
+							actor: message.actor,
+							description: message.description,
+							data,
+							createdAt: new Date(timestamp).toISOString(),
+							__v: 0,
+						},
+						...useVersionStore.getState().notificationsPreview,
+					],
 				});
 			}
 		});

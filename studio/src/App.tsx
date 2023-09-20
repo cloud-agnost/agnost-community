@@ -4,8 +4,9 @@ import { router } from '@/router';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useTypeStore from '@/store/types/typeStore.ts';
 import { useEffect } from 'react';
+import { Provider } from 'react-keep-alive';
 import { RouterProvider } from 'react-router-dom';
-import { ToastContainer, Slide } from 'react-toastify';
+import { Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import useThemeStore from './store/theme/themeStore';
 
@@ -32,9 +33,8 @@ function App() {
 		document.body.dataset.mode = systemTheme;
 		document.body.classList.add(systemTheme);
 	}, [theme]);
-
 	return (
-		<>
+		<Provider>
 			<RouterProvider router={router} />
 			<ToastContainer
 				transition={Slide}
@@ -49,7 +49,7 @@ function App() {
 				pauseOnHover
 				theme='dark'
 			/>
-		</>
+		</Provider>
 	);
 }
 

@@ -7,7 +7,6 @@ import {
 	DrawerHeader,
 	DrawerTitle,
 } from '@/components/Drawer';
-import { ScrollArea } from '@/components/ScrollArea';
 import { SearchInput } from '@/components/SearchInput';
 import { useUpdateEffect } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
@@ -59,7 +58,7 @@ export default function ApplicationVersions() {
 				<DrawerHeader>
 					<DrawerTitle>{t('application.version.title')}</DrawerTitle>
 				</DrawerHeader>
-				<ScrollArea className='h-[calc(100vh-81px)]' id='infinite-scroll'>
+				<div className='scroll' id='infinite-scroll'>
 					<div className='space-y-6 p-6'>
 						<SearchInput
 							placeholder={t('application.version.search') as string}
@@ -82,7 +81,7 @@ export default function ApplicationVersions() {
 							</DrawerClose>
 						</DrawerFooter>
 					</div>
-				</ScrollArea>
+				</div>
 			</DrawerContent>
 		</Drawer>
 	);

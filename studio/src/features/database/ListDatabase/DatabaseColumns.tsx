@@ -24,7 +24,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 				original: { _id, name },
 			},
 		}) => {
-			return <TabLink name={name} path={`${_id}/models`} />;
+			return <TabLink name={name} path={`${_id}/models`} type='Database' />;
 		},
 	},
 	{

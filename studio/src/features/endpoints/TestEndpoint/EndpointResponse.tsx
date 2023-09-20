@@ -9,6 +9,7 @@ import { TabsContent } from '@radix-ui/react-tabs';
 import { useTranslation } from 'react-i18next';
 import TestEndpointTable from './TestEndpointTable';
 import { CSSProperties } from 'react';
+import { Log } from '@/types';
 
 interface EndpointResponseProps {
 	className?: string;
@@ -89,7 +90,7 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 				</div>
 			</TabsContent>
 			<TabsContent value='console' className='overflow-y-auto  h-[calc(100%-4rem)]'>
-				<Logs logs={response?.logs as string[]} />
+				<Logs logs={response?.logs as Log[]} />
 			</TabsContent>
 		</Tabs>
 	);

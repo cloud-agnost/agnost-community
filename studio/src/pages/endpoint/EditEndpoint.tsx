@@ -8,12 +8,24 @@ import useEndpointStore from '@/store/endpoint/endpointStore';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useParams, useSearchParams } from 'react-router-dom';
+
+import useTabStore from '@/store/version/tabStore';
 EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { endpointId, orgId, versionId, appId } = params;
 	if (!endpointId) return null;
+	const { getCurrentTab, updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
 	const { endpoint } = useEndpointStore.getState();
-
-	if (endpoint?._id === endpointId) return { props: {} };
+	if (endpoint?._id === endpointId && history.state?.type !== 'tabChanged') {
+		useEndpointStore.setState({
+			editedLogic: endpoint.logic,
+		});
+		updateCurrentTab(versionId as string, {
+			...getCurrentTab(versionId as string),
+			isDirty: false,
+		});
+		closeDeleteTabModal();
+		return { endpoint };
+	}
 
 	const ep = await useEndpointStore.getState().getEndpointById({
 		orgId: orgId as string,
@@ -73,6 +85,7 @@ export default function EditEndpoint() {
 			setLogic={(value) => setEditedLogic(value as string)}
 			loading={loading}
 			logic={editedLogic}
+			name={endpoint?._id}
 			breadCrumbItems={[
 				{
 					name: t('endpoint.title').toString(),

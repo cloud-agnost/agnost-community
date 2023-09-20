@@ -14,12 +14,15 @@ import {
 	DeleteMultipleVersionVariablesParams,
 	DeleteNPMPackageParams,
 	DeleteRateLimitParams,
+	DeleteVersionParams,
 	DeleteVersionVariableParams,
 	EditRateLimitParams,
 	GetVersionByIdParams,
 	GetVersionLogBucketsParams,
 	GetVersionLogsParams,
+	GetVersionNotificationParams,
 	GetVersionRequest,
+	Notification,
 	Param,
 	RateLimit,
 	SearchNPMPackages,
@@ -36,6 +39,7 @@ import {
 import { history, notify, translate } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import useAuthStore from '../auth/authStore';
 
 interface VersionStore {
 	loading: boolean;
@@ -51,10 +55,15 @@ interface VersionStore {
 	editAPIKeyDrawerIsOpen: boolean;
 	selectedAPIKey: APIKey | null;
 	logBuckets: VersionLogBucket;
+	deleteVersionDrawerIsOpen: boolean;
 	logs: VersionLog[];
+	notifications: Notification[];
+	notificationsPreview: Notification[];
 	lastFetchedLogCount: number;
 	log: VersionLog;
 	showLogDetails: boolean;
+	notificationLastSeen: Date;
+	notificationLastFetchedCount: number;
 	selectVersion: (version: Version) => void;
 	setSelectedAPIKey: (key: APIKey | null) => void;
 	setEditAPIKeyDrawerIsOpen: (isOpen: boolean) => void;
@@ -109,16 +118,21 @@ interface VersionStore {
 	getVersionLogBuckets: (params: GetVersionLogBucketsParams) => Promise<void>;
 	openVersionLogDetails: (log: VersionLog) => void;
 	closeVersionLogDetails: () => void;
+	deleteVersion: (params: DeleteVersionParams, showAlert?: boolean) => Promise<void>;
+	getVersionNotifications: (params: GetVersionNotificationParams) => Promise<void>;
+	updateNotificationLastSeen: () => void;
 }
 
 const useVersionStore = create<VersionStore>()(
 	persist(
 		devtools(
 			(set, get) => ({
+				notificationLastFetchedCount: 0,
 				loading: false,
 				editAPIKeyDrawerIsOpen: false,
 				selectedAPIKey: null,
 				error: null,
+				deleteVersionDrawerIsOpen: false,
 				version: null,
 				versions: [],
 				versionPage: 0,
@@ -129,9 +143,12 @@ const useVersionStore = create<VersionStore>()(
 				createCopyVersionDrawerIsOpen: false,
 				logBuckets: {} as VersionLogBucket,
 				logs: [],
+				notifications: [],
+				notificationsPreview: [],
 				log: {} as VersionLog,
 				lastFetchedLogCount: 0,
 				showLogDetails: false,
+				notificationLastSeen: new Date(),
 				selectVersion: (version: Version) => {
 					set({ version });
 				},
@@ -661,6 +678,57 @@ const useVersionStore = create<VersionStore>()(
 				},
 				closeVersionLogDetails() {
 					set({ log: {} as VersionLog, showLogDetails: false });
+				},
+				deleteVersion: async (params, showAlert) => {
+					try {
+						await VersionService.deleteVersion(params);
+						set((prev) => ({
+							versions: prev.versions.filter((v) => v._id !== params.versionId),
+						}));
+					} catch (e) {
+						if (showAlert) {
+							const error = e as APIError;
+							notify({
+								type: 'error',
+								title: error.error,
+								description: error.details,
+							});
+						}
+						throw e;
+					}
+				},
+				getVersionNotifications: async (params) => {
+					try {
+						const notifications = await VersionService.getVersionNotifications(params);
+						const user = useAuthStore.getState().user;
+
+						const allowedNotifications = user?.notifications.map((ntf) => {
+							if (ntf === 'org') return ntf;
+							if (ntf === 'app') return `org.${ntf}`;
+							if (ntf === 'version') return `org.app.${ntf}`;
+							return `org.app.version.${ntf}`;
+						});
+						const filteredNotifications = notifications.filter(
+							(ntf) => allowedNotifications?.includes(ntf.object),
+						);
+						if (params.initialFetch) {
+							set({ notifications, notificationsPreview: filteredNotifications });
+						} else {
+							set((prev) => ({
+								notifications: [...prev.notifications, ...notifications],
+								notificationsPreview: [
+									...prev.notificationsPreview,
+									...filteredNotifications,
+								].splice(0, 100),
+								notificationLastFetchedCount: notifications.length,
+							}));
+						}
+					} catch (error) {
+						throw error as APIError;
+					}
+				},
+				updateNotificationLastSeen: () => {
+					set({ notificationLastSeen: new Date() });
 				},
 			}),
 			{

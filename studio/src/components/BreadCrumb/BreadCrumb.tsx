@@ -1,10 +1,10 @@
-import { ArrowLeft, CaretRight } from '@phosphor-icons/react';
-import { useTabNavigate } from '@/hooks';
-import { Fragment } from 'react';
-import { Button } from 'components/Button';
-import { cn } from '@/utils';
-import { useParams } from 'react-router-dom';
 import useTabStore from '@/store/version/tabStore';
+import { TabTypes } from '@/types';
+import { cn, generateId } from '@/utils';
+import { ArrowLeft, CaretRight } from '@phosphor-icons/react';
+import { Button } from 'components/Button';
+import { Fragment } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 export interface BreadCrumbItem {
 	name?: string;
 	url?: string;
@@ -18,9 +18,9 @@ type BreadCrumbProps = {
 
 export default function BreadCrumb({ goBackLink, className, items }: BreadCrumbProps) {
 	const filteredItems = items.filter((item) => Boolean(item.name));
-	const navigate = useTabNavigate();
-	const { getCurrentTab } = useTabStore();
-	const { versionId } = useParams() as { versionId: string };
+	const { updateCurrentTab, getCurrentTab } = useTabStore();
+	const versionId = useParams<{ versionId: string }>().versionId as string;
+	const navigate = useNavigate();
 	return (
 		<div className={cn('shrink-0 flex items-center gap-x-6', className)}>
 			<Button to={goBackLink} className='text-lg border-none h-8 w-8 p-0' variant='secondary'>
@@ -30,7 +30,7 @@ export default function BreadCrumb({ goBackLink, className, items }: BreadCrumbP
 				{filteredItems.map((item, index) => {
 					const Component = item.url ? Button : 'span';
 					return (
-						<Fragment key={index}>
+						<Fragment key={item.name}>
 							<Component
 								variant='blank'
 								className={cn(
@@ -39,12 +39,14 @@ export default function BreadCrumb({ goBackLink, className, items }: BreadCrumbP
 									index === filteredItems.length - 1 ? 'text-default' : 'text-subtle',
 								)}
 								onClick={() => {
-									navigate({
-										id: getCurrentTab(versionId)?.id as string,
+									navigate(item.url as string);
+									updateCurrentTab(versionId, {
+										id: generateId(),
 										title: item.name as string,
 										path: item.url as string,
 										isActive: true,
 										isDashboard: false,
+										type: getCurrentTab(versionId)?.type as TabTypes,
 									});
 								}}
 							>

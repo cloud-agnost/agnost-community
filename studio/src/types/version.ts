@@ -133,18 +133,63 @@ export interface NPMPackage {
 	createdAt: string;
 	updatedAt: string;
 }
+export type NotificationActions = 'create' | 'update' | 'delete' | 'deploy' | 'redeploy';
+export interface Notification {
+	_id: string;
+	object: string;
+	orgId: string;
+	appId: string;
+	versionId: string;
+	dbId?: string;
+	modelId?: string;
+	fieldId?: string;
+	resourceId?: string;
+	envId?: string;
+	endpointId?: string;
+	middlewareId?: string;
+	queueId?: string;
+	taskId?: string;
+	storageId?: string;
+	action: NotificationActions;
+	actor: Partial<User>;
+	description: string;
+	data: any;
+	createdAt: string;
+	__v: number;
+}
+
+export interface GetVersionNotificationParams extends BaseGetRequest {
+	orgId: string;
+	appId: string;
+	versionId: string;
+	actor?: string[];
+	action?: NotificationActions[];
+}
 
 export interface GetVersionRequest extends BaseGetRequest {
 	name?: string;
 	appId: string;
 }
 
+export type TabTypes =
+	| 'Database'
+	| 'Storage'
+	| 'Cache'
+	| 'Message Queue'
+	| 'Task'
+	| 'Endpoint'
+	| 'Middleware'
+	| 'Settings'
+	| 'Dashboard'
+	| 'Notifications';
 export interface Tab {
 	id: string;
 	title: string;
 	path: string;
 	isActive: boolean;
 	isDashboard: boolean;
+	isDirty?: boolean;
+	type: TabTypes;
 }
 
 export interface VersionParams {
@@ -156,6 +201,7 @@ export interface VersionParams {
 
 export type VersionParamsWithoutEnvId = Omit<VersionParams, 'envId'>;
 export type GetVersionByIdParams = VersionParamsWithoutEnvId;
+export type DeleteVersionParams = VersionParamsWithoutEnvId;
 export type CreateRateLimitParams = VersionParamsWithoutEnvId & {
 	rate: number;
 	duration: number;

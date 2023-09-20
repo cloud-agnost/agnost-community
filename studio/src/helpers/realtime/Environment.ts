@@ -3,6 +3,9 @@ import { Environment as EnvType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
 class Environment extends RealtimeActions<EnvType> {
+	redeploy(param: RealtimeActionParams<EnvType>): void {
+		this.update(param);
+	}
 	deploy(param: RealtimeActionParams<EnvType>): void {
 		this.update(param);
 	}
@@ -22,6 +25,7 @@ class Environment extends RealtimeActions<EnvType> {
 				return env;
 			}),
 			environment: param.data,
+			envStatus: useEnvironmentStore.getState?.().setEnvStatus(param.data),
 		});
 	}
 	create(param: RealtimeActionParams<EnvType>): void {

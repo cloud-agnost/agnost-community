@@ -71,7 +71,6 @@ export default function ListModels() {
 			<VersionTabLayout<Model>
 				breadCrumb={<BreadCrumb goBackLink={databasesUrl} items={breadcrumbItems} />}
 				onSearchInputClear={() => setSearch('')}
-				className='p-6'
 				isEmpty={hasNoModels}
 				title={t('database.models.title')}
 				icon={<ModelIcon className='w-44 h-44' />}

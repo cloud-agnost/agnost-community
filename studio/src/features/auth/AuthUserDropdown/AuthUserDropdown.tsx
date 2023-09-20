@@ -1,21 +1,47 @@
-import './AuthUserDropdown.scss';
+import { HEADER_USER_DROPDOWN } from '@/constants';
+import useAuthStore from '@/store/auth/authStore.ts';
+import useThemeStore from '@/store/theme/themeStore.ts';
+import { cn } from '@/utils';
+import { Laptop, MoonStars, SignOut, SunDim } from '@phosphor-icons/react';
+import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuItemContainer,
 	DropdownMenuLabel,
+	DropdownMenuPortal,
 	DropdownMenuSeparator,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { Fragment } from 'react';
-import { cn } from '@/utils';
-import { HEADER_USER_DROPDOWN } from '@/constants';
+import './AuthUserDropdown.scss';
 
 export default function AuthUserDropdown() {
 	const user = useAuthStore((state) => state.user);
+	const { t } = useTranslation();
+	const { setTheme, theme } = useThemeStore();
+	const THEMES = [
+		{
+			id: 'light',
+			title: 'Light',
+			icon: <SunDim size={24} />,
+		},
+		{
+			id: 'dark',
+			title: 'Dark',
+			icon: <MoonStars size={24} />,
+		},
+		{
+			id: 'system',
+			title: 'System',
+			icon: <Laptop size={24} />,
+		},
+	];
 
 	return (
 		<DropdownMenu>
@@ -31,32 +57,54 @@ export default function AuthUserDropdown() {
 					</div>
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator />
-				{HEADER_USER_DROPDOWN.map((item, index) => {
-					const content = (
-						<span
-							className={cn('flex text-sm text-default leading-6 font-normal items-center gap-2')}
-						>
-							<span className='w-6 h-6 flex items-center justify-center'>
-								<item.Icon className={cn('text-icon-base', item.iconClassName)} />
-							</span>
-							{item.title}
-						</span>
-					);
-					return (
-						<Fragment key={index}>
-							{item.beforeHasSeparator && <DropdownMenuSeparator />}
-							<DropdownMenuItem onClick={item.action} asChild>
-								{item.url ? (
-									<Link className={cn('flex items-center gap-2')} to={item.url}>
-										{content}
-									</Link>
-								) : (
-									content
-								)}
-							</DropdownMenuItem>
-						</Fragment>
-					);
-				})}
+
+				<DropdownMenuItemContainer className='space-y-2'>
+					{HEADER_USER_DROPDOWN.map((item) => (
+						<DropdownMenuItem key={item.title} asChild>
+							<Link className={cn('flex items-center gap-2')} to={item.url}>
+								<item.Icon className='text-icon-base text-lg' />
+								{item.title}
+							</Link>
+						</DropdownMenuItem>
+					))}
+
+					<DropdownMenuSub>
+						<DropdownMenuSubTrigger className='dropdown-item flex items-center gap-2'>
+							<SunDim className='text-icon-base text-lg' />
+							Theme
+						</DropdownMenuSubTrigger>
+						<DropdownMenuPortal>
+							<DropdownMenuSubContent
+								className='dropdown-content data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade'
+								sideOffset={2}
+								alignOffset={-5}
+							>
+								{THEMES.map((t) => (
+									<DropdownMenuItem
+										onClick={() => setTheme(t.id)}
+										asChild
+										key={t.id}
+										className={cn({
+											' text-brand-primary': t.id === theme,
+										})}
+									>
+										<span className='flex items-center gap-2'>
+											{t.icon}
+											{t.title}
+										</span>
+									</DropdownMenuItem>
+								))}
+							</DropdownMenuSubContent>
+						</DropdownMenuPortal>
+					</DropdownMenuSub>
+				</DropdownMenuItemContainer>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem className='flex text-sm text-default leading-6 font-normal items-center gap-2'>
+					<span className='w-6 h-6 flex items-center justify-center'>
+						<SignOut className='text-icon-base text-lg' />
+					</span>
+					{t('general.logout')}
+				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

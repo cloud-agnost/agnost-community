@@ -1,22 +1,42 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
-import { Pencil } from '@/components/icons';
-import { cn, formatCode } from '@/utils';
+import { InfoModal } from '@/components/InfoModal';
+import { Pencil, Warning } from '@/components/icons';
+import useTabStore from '@/store/version/tabStore';
+import { cn, saveEditorContent } from '@/utils';
 import { FloppyDisk, TestTube } from '@phosphor-icons/react';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
+import { KeepAlive } from 'react-keep-alive';
+import { useLocation, useParams } from 'react-router-dom';
 interface VersionEditorLayoutProps {
 	children: React.ReactNode;
 	className?: string;
 	loading: boolean;
 	logic?: string;
 	breadCrumbItems?: BreadCrumbItem[];
+	name: string;
 	onSaveLogic: (logic?: string) => void;
 	onTestModalOpen?: () => void;
 	onEditModalOpen: () => void;
 	setLogic: (logic: string | undefined) => void;
 }
+
+const initBeforeUnLoad = (showExitPrompt: boolean) => {
+	window.onbeforeunload = (event) => {
+		// Show prompt based on state
+		if (showExitPrompt) {
+			const e = event || window.event;
+			e.preventDefault();
+			if (e) {
+				e.returnValue = '';
+			}
+			return '';
+		}
+	};
+};
 
 export default function VersionEditorLayout({
 	children,
@@ -28,24 +48,40 @@ export default function VersionEditorLayout({
 	onEditModalOpen,
 	setLogic,
 	className,
+	name,
 }: VersionEditorLayoutProps) {
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
+	const { versionId } = useParams<{ versionId: string }>();
+	const { removeTab, toDeleteTab, isDeleteTabModalOpen, closeDeleteTabModal, getCurrentTab } =
+		useTabStore();
+	const tab = getCurrentTab(versionId as string);
+	const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
 
 	async function handleSaveLogic() {
-		const formatted = await formatCode(logic as string);
-		setLogic(formatted);
-		onSaveLogic(formatted);
+		saveEditorContent(editor as monaco.editor.IStandaloneCodeEditor, 'javascript', (val) => {
+			setLogic(val);
+			onSaveLogic(val);
+		});
 	}
 
+	window.onload = function () {
+		initBeforeUnLoad(tab.isDirty as boolean);
+	};
+
+	useEffect(() => {
+		initBeforeUnLoad(tab.isDirty as boolean);
+	}, [tab.isDirty]);
 	return (
-		<div className={cn('p-4 space-y-6 h-full', className)}>
-			{breadCrumbItems && (
-				<BreadCrumb
-					goBackLink={pathname.split('/').slice(0, -1).join('/')}
-					items={breadCrumbItems}
-				/>
-			)}
+		<div className={cn('space-y-6 h-full', className)}>
+			<div className='flex items-center gap-4'>
+				{breadCrumbItems && (
+					<BreadCrumb
+						goBackLink={pathname.split('/').slice(0, -1).join('/')}
+						items={breadCrumbItems}
+					/>
+				)}
+			</div>
 			<div className='flex items-center justify-between'>
 				{children}
 				<div className='flex items-center gap-4'>
@@ -64,13 +100,50 @@ export default function VersionEditorLayout({
 					</Button>
 				</div>
 			</div>
-
-			<CodeEditor
-				className='h-full'
-				containerClassName='h-[88%]'
-				value={logic}
-				onChange={setLogic}
-				onSave={(logic) => onSaveLogic(logic)}
+			{/*  //eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore */}
+			<KeepAlive name={name} key={name}>
+				<CodeEditor
+					className='h-full'
+					containerClassName='h-[88%]'
+					value={logic}
+					onChange={setLogic}
+					onSave={(logic) => onSaveLogic(logic)}
+					onMount={(editor) => {
+						setEditor(editor);
+					}}
+				/>
+			</KeepAlive>
+			<InfoModal
+				isOpen={isDeleteTabModalOpen}
+				closeModal={closeDeleteTabModal}
+				icon={<Warning className='text-icon-danger w-20 h-20' />}
+				action={
+					<div className='flex items-center justify-center gap-4'>
+						<Button variant='text' size='lg' onClick={closeDeleteTabModal}>
+							{t('general.cancel')}
+						</Button>
+						<Button
+							variant='secondary'
+							size='lg'
+							onClick={() => {
+								removeTab(versionId as string, toDeleteTab.id);
+								handleSaveLogic();
+							}}
+						>
+							{t('general.save_and_close')}
+						</Button>
+						<Button
+							size='lg'
+							variant='primary'
+							onClick={() => removeTab(versionId as string, toDeleteTab.id)}
+						>
+							{t('general.ok')}
+						</Button>
+					</div>
+				}
+				title={t('general.tab_close_title')}
+				description={t('general.tab_close_description')}
 			/>
 		</div>
 	);

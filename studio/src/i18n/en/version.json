@@ -1,4 +1,8 @@
 {
+	"delete_version": "Delete Version",
+	"delete_alert_title": "Are you sure to delete this version?",
+	"delete_alert_desc": "This action cannot be undone",
+	"delete_confirm_description": "Confirm version delete by typing <confirmCode>{{confirmCode}}</confirmCode> below.",
 	"deployment_settings": "Deployment Settings",
 	"name": "Version name",
 	"only_version": "Version",
@@ -14,7 +18,7 @@
 	"dashboard": "Dashboard",
 	"deployment_status_empty": "We do not have such a view anymore",
 	"deploy": "Deploy",
-	"deployment_status": "Deployment status",
+	"deployment_status": "Deployment Status",
 	"close_selected_tab": "Close selected tab",
 	"close_all_tabs": "Close all tabs",
 	"close_all_tabs_except_current": "Close all tabs except current",
@@ -235,5 +239,8 @@
 	"read_write": "Read/Write",
 	"log_details": "View Log Details",
 	"details": "Details",
-	"errors": "Errors"
+	"errors": "Errors",
+	"notifications": "Notifications",
+	"view_all_notifications": "View All Notifications",
+	"mark_all_as_read": "Mark All as Read"
 }

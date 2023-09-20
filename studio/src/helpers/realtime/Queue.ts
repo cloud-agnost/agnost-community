@@ -1,14 +1,20 @@
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import { MessageQueue, RealtimeActionParams } from '@/types';
+import { LogTypes, MessageQueue, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
-
 class Queue extends RealtimeActions<MessageQueue> {
+	redeploy(): void {
+		throw new Error('Method not implemented.');
+	}
 	deploy(): void {
 		throw new Error('Method not implemented.');
 	}
-	log({ message, timestamp, id }: RealtimeActionParams<MessageQueue>) {
+	log({ message, timestamp, id, type }: RealtimeActionParams<MessageQueue>) {
 		setTimeout(() => {
-			useMessageQueueStore.getState?.().setQueueLogs(id as string, `${timestamp} - ${message}`);
+			useMessageQueueStore.getState?.().setQueueLogs(id as string, {
+				message: message as string,
+				timestamp: timestamp as string,
+				type: type as LogTypes,
+			});
 		}, 100);
 	}
 	delete({ identifiers }: RealtimeActionParams<MessageQueue>) {

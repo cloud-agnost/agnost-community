@@ -1,19 +1,20 @@
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab } from '@/types';
-import { useNavigate } from 'react-router-dom';
+import { generateId } from '@/utils';
 
 export default function useTabNavigate() {
-	const { getCurrentTab, updateCurrentTab } = useTabStore();
+	const { getCurrentTab, addTab } = useTabStore();
 	const { version } = useVersionStore();
-	const navigate = useNavigate();
 
-	return (tab: Tab) => {
+	return (tab: Omit<Tab, 'id'>) => {
 		const currentTab = getCurrentTab(version?._id as string);
 		if (currentTab?.path === tab.path) return;
-		navigate(tab.path);
 		if (currentTab) {
-			updateCurrentTab(version?._id as string, tab);
+			addTab(version?._id as string, {
+				...tab,
+				id: generateId(),
+			});
 		}
 	};
 }

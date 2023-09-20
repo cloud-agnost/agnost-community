@@ -2,7 +2,7 @@ import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants';
 import { translate } from '@/utils';
 import parser from 'cron-parser';
 import * as z from 'zod';
-import { BaseGetRequest, BaseParams, BaseRequest } from '.';
+import { BaseGetRequest, BaseParams, BaseRequest, Log } from '.';
 export interface Task {
 	orgId: string;
 	appId: string;
@@ -128,5 +128,5 @@ export interface TestTaskParams extends BaseParams, BaseRequest {
 	debugChannel: string;
 }
 export interface TestTaskLogs {
-	[key: string]: string[];
+	[key: string]: Log[];
 }

@@ -9,6 +9,7 @@ import { useToast } from '@/hooks';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { CodeEditor } from '@/components/CodeEditor';
 import { Logs } from '@/components/Log';
+import { Log } from '@/types';
 
 interface TestMessageQueueProps {
 	open: boolean;
@@ -81,7 +82,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 					/>
 					<Separator className='my-6' />
 					<p className='text-sm text-default font-sfCompact mb-4'>{t('task.console')}</p>
-					<Logs logs={testQueueLogs[queue?._id]?.logs as string[]} />
+					<Logs logs={testQueueLogs[queue?._id]?.logs as Log[]} />
 				</div>
 			</DrawerContent>
 		</Drawer>

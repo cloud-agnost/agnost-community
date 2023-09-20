@@ -44,6 +44,7 @@ export const PATHS = {
 		cache: `${versionPath}/VersionCache.tsx`,
 		messageQueue: `${versionPath}/VersionMessageQueue.tsx`,
 		task: `${versionPath}/VersionTask.tsx`,
+		notifications: `${versionPath}/VersionNotifications.tsx`,
 		settings: {
 			versionSettings: `${versionPath}/settings/VersionSettings.tsx`,
 			general: `${versionPath}/settings/VersionSettingsGeneral.tsx`,

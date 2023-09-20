@@ -184,6 +184,10 @@ const router = createBrowserRouter([
 												],
 											},
 											{
+												path: 'notifications',
+												lazy: () => lazyRouteImport(PATHS.version.notifications),
+											},
+											{
 												path: 'settings',
 												lazy: () => lazyRouteImport(PATHS.version.settings.versionSettings),
 												children: [
@@ -311,8 +315,6 @@ const router = createBrowserRouter([
 		lazy: () => lazyRouteImport(PATHS.unauthorized),
 		errorElement: <ErrorBoundary />,
 	},
-	
-	
 ]);
 
 export function RequireAuth({ children }: { children: JSX.Element }): JSX.Element {

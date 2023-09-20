@@ -1,6 +1,8 @@
 import {
 	APIError,
+	EnvLog,
 	Environment,
+	EnvironmentStatus,
 	GetEnvironmentLogsParams,
 	GetEnvironmentResourcesParams,
 	Resource,
@@ -8,6 +10,7 @@ import {
 	UpdateEnvironmentTelemetryLogsParams,
 	VersionParams,
 	getAppVersionEnvironmentParams,
+	SelectedEnvLog,
 } from '@/types';
 import { notify, translate } from '@/utils';
 import EnvironmentService from 'services/EnvironmentService.ts';
@@ -16,37 +19,49 @@ import { devtools, persist } from 'zustand/middleware';
 
 interface EnvironmentStore {
 	environments: Environment[];
-	environment: Environment | null;
+	environment: Environment;
 	resources: Resource[];
+	envStatus: EnvironmentStatus;
+	envLogs: EnvLog[];
+	selectedLog: SelectedEnvLog;
+	isLogDetailsOpen: boolean;
+	openLogDetails: (log: SelectedEnvLog) => void;
+	closeLogDetails: () => void;
 	getAppVersionEnvironment: (params: getAppVersionEnvironmentParams) => Promise<Environment>;
-	getEnvironmentLogs: (params: GetEnvironmentLogsParams) => Promise<any>;
+	getEnvironmentLogs: (params: GetEnvironmentLogsParams) => Promise<void>;
 	toggleAutoDeploy: (params: ToggleAutoDeployParams) => Promise<Environment>;
-	suspendEnvironment: (params: VersionParams) => Promise<any>;
-	activateEnvironment: (params: VersionParams) => Promise<any>;
-	redeployAppVersionToEnvironment: (params: VersionParams) => Promise<any>;
+	suspendEnvironment: (params: VersionParams) => Promise<void>;
+	activateEnvironment: (params: VersionParams) => Promise<void>;
+	redeployAppVersionToEnvironment: (params: VersionParams) => Promise<void>;
 	updateEnvironmentTelemetryLogs: (params: UpdateEnvironmentTelemetryLogsParams) => Promise<any>;
 	getEnvironmentResources: (params: GetEnvironmentResourcesParams) => Promise<Resource[]>;
+	setEnvStatus: (env: Environment) => EnvironmentStatus;
 }
 
 const useEnvironmentStore = create<EnvironmentStore>()(
 	devtools(
 		persist(
-			(set) => ({
+			(set, get) => ({
 				environments: [],
-				environment: null,
+				environment: {} as Environment,
 				resources: [],
+				envStatus: '' as EnvironmentStatus,
+				envLogs: [],
+				selectedLog: {} as SelectedEnvLog,
+				isLogDetailsOpen: false,
 				getAppVersionEnvironment: async (params: getAppVersionEnvironmentParams) => {
 					const environment = await EnvironmentService.getAppVersionEnvironment(params);
-					set({ environment });
+					set({ environment, envStatus: get().setEnvStatus(environment) });
 					return environment;
 				},
-				getEnvironmentLogs: (params: GetEnvironmentLogsParams) => {
-					return EnvironmentService.getEnvironmentLogs(params);
+				getEnvironmentLogs: async (params: GetEnvironmentLogsParams) => {
+					const logs = await EnvironmentService.getEnvironmentLogs(params);
+					set({ envLogs: logs });
 				},
 				toggleAutoDeploy: async (params: ToggleAutoDeployParams) => {
 					try {
 						const environment = await EnvironmentService.toggleAutoDeploy(params);
-						set({ environment });
+						set({ environment, envStatus: get().setEnvStatus(environment) });
 						return environment;
 					} catch (e) {
 						const error = e as APIError;
@@ -61,13 +76,12 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 				suspendEnvironment: async (params: VersionParams) => {
 					try {
 						const environment = await EnvironmentService.suspendEnvironment(params);
-						set({ environment });
+						set({ environment, envStatus: get().setEnvStatus(environment) });
 						notify({
 							type: 'success',
 							title: translate('general.success'),
 							description: translate('version.suspended_successfully'),
 						});
-						return environment;
 					} catch (e) {
 						const error = e as APIError;
 						notify({
@@ -81,13 +95,12 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 				activateEnvironment: async (params: VersionParams) => {
 					try {
 						const environment = await EnvironmentService.activateEnvironment(params);
-						set({ environment });
+						set({ environment, envStatus: get().setEnvStatus(environment) });
 						notify({
 							type: 'success',
 							title: translate('general.success'),
 							description: translate('version.reactivated_successfully'),
 						});
-						return environment;
 					} catch (e) {
 						const error = e as APIError;
 						notify({
@@ -101,8 +114,7 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 				redeployAppVersionToEnvironment: async (params: VersionParams) => {
 					try {
 						const environment = await EnvironmentService.redeployAppVersionToEnvironment(params);
-						set({ environment });
-						return environment;
+						set({ environment, envStatus: get().setEnvStatus(environment) });
 					} catch (e) {
 						const error = e as APIError;
 						notify({
@@ -120,6 +132,43 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 					const resources = await EnvironmentService.getEnvironmentResources(params);
 					set({ resources });
 					return resources;
+				},
+				openLogDetails: (log: SelectedEnvLog) => {
+					set({ selectedLog: log, isLogDetailsOpen: true });
+				},
+				closeLogDetails: () => {
+					set({ selectedLog: {} as SelectedEnvLog, isLogDetailsOpen: false });
+				},
+				setEnvStatus: (env: Environment) => {
+					const statuses = [
+						{
+							check: () =>
+								Object.values(env).some(
+									(status) => status === 'Deploying' || status === 'Redeploying',
+								),
+							value: 'Deploying',
+						},
+						{
+							check: () => Object.values(env).some((status) => status === 'error'),
+							value: 'Error',
+						},
+						{ check: () => env.suspended, value: 'Suspended' },
+						{
+							check: () =>
+								get()
+									.resources.map((resource) => resource.status)
+									.includes('Idle'),
+							value: 'Idle',
+						},
+					];
+
+					for (const status of statuses) {
+						if (status.check()) {
+							return status.value as EnvironmentStatus;
+						}
+					}
+
+					return 'OK' as EnvironmentStatus;
 				},
 			}),
 			{

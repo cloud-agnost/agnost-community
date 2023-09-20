@@ -4,19 +4,18 @@ import { Tab } from '@/types';
 import { generateId, reorder } from '@/utils';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
-import { Dashboard } from 'components/icons';
 import { NEW_TAB_ITEMS } from 'constants/constants.ts';
 import { useEffect, useRef, useState } from 'react';
 import {
 	DragDropContext,
 	Draggable,
 	DraggableProvided,
-	DraggableStateSnapshot,
+	DropResult,
 	Droppable,
 	DroppableProvided,
 } from 'react-beautiful-dnd';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useMatches, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useMatches, useParams, useNavigate } from 'react-router-dom';
 import './tabs.scss';
 
 const SCROLL_AMOUNT = 200;
@@ -26,12 +25,12 @@ export default function Tabs() {
 	const [endOfScroll, setEndOfScroll] = useState(false);
 	const [startOfScroll, setStartOfScroll] = useState(false);
 	const [isScrollable, setIsScrollable] = useState(false);
-	const { getTabsByVersionId, removeTab, getPreviousTab, setCurrentTab, addTab, setTabs } =
+	const navigate = useNavigate();
+	const { openDeleteTabModal, getTabsByVersionId, removeTab, setCurrentTab, addTab, setTabs } =
 		useTabStore();
 
 	const { t } = useTranslation();
 	const matches = useMatches();
-	const navigate = useNavigate();
 	const { pathname } = useLocation();
 
 	const { versionId } = useParams() as { versionId: string };
@@ -51,6 +50,7 @@ export default function Tabs() {
 			path: getDashboardPath(),
 			isDashboard: true,
 			isActive: false,
+			type: 'Dashboard',
 		});
 	}, [versionId]);
 
@@ -63,19 +63,25 @@ export default function Tabs() {
 		const path = pathname?.split('/')?.at(-1);
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
 
-		if (!item) return;
+		if (item) {
+			const openTab = tabs.find((tab) => tab.path?.split('/')?.at(-1) === item.path);
 
-		const openTab = tabs.find((tab) => tab.path?.split('/')?.at(-1) === item.path);
-		if (openTab) {
-			setCurrentTab(versionId, openTab.id);
+			if (openTab) {
+				setCurrentTab(versionId, openTab.id);
+			} else {
+				addTab(versionId, {
+					id: generateId(),
+					...item,
+					isActive: true,
+				});
+			}
 		} else {
-			addTab(versionId, {
-				id: generateId(),
-				title: item.title,
-				path: item.path,
-				isDashboard: false,
-				isActive: true,
-			});
+			const currentTab = tabs.find((tab) => tab.isActive);
+
+			if (currentTab?.path !== pathname) {
+				const targetPath = currentTab?.path || getDashboardPath();
+				navigate(targetPath);
+			}
 		}
 	}, []);
 
@@ -115,11 +121,10 @@ export default function Tabs() {
 	}
 
 	function tabRemoveHandler(tab: Tab) {
-		const prevTab = getPreviousTab(versionId, tab.id);
-		removeTab(versionId, tab.id);
-		if (tab.isActive && prevTab) {
-			setCurrentTab(versionId, prevTab?.id as string);
-			navigate(`${prevTab.path}?tabId=${prevTab.id}`);
+		if (tab.isDirty) {
+			openDeleteTabModal(tab);
+		} else {
+			removeTab(versionId, tab.id);
 		}
 	}
 
@@ -136,7 +141,7 @@ export default function Tabs() {
 		}
 	}
 
-	function onDragEnd(result: any) {
+	function onDragEnd(result: DropResult) {
 		if (!result.destination) return;
 		const tabs = getTabsByVersionId(versionId);
 		const newTabs = reorder(tabs, result.source.index, result.destination.index);
@@ -152,19 +157,30 @@ export default function Tabs() {
 							<div {...dropProvided.droppableProps} ref={dropProvided.innerRef} className='tab'>
 								{tabs.map((tab: Tab, index: number) => (
 									<Draggable key={tab.id} draggableId={tab.id} index={index}>
-										{(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
+										{(dragProvided: DraggableProvided) => (
 											<TabItem
 												active={tab.isActive}
-												icon={tab.isDashboard ? <Dashboard /> : undefined}
 												onClose={() => tabRemoveHandler(tab)}
-												onClick={() => setCurrentTab(versionId, tab.id)}
-												closeable={!tab.isDashboard}
+												onClick={() => {
+													setCurrentTab(versionId, tab.id);
+													history.pushState(
+														{
+															tabId: tab.id,
+															type: 'tabChanged',
+														},
+														'',
+														`${tab.path}?tabId=${tab.id}`,
+													);
+												}}
 												to={`${tab.path}?tabId=${tab.id}`}
-												key={tab.id}
+												closeable={!tab.isDashboard}
+												isDirty={tab.isDirty}
 												provided={dragProvided}
-												snapshot={dragSnapshot}
+												title={tab.title}
+												key={tab.id}
+												type={tab.type}
 											>
-												{tab.title}
+												<p className='tab-item-link-text'>{tab.title} </p>
 											</TabItem>
 										)}
 									</Draggable>

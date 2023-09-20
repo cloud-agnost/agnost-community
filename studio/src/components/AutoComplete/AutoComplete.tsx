@@ -1,24 +1,12 @@
-import AsyncSelect from 'react-select/async';
+import ReactSelectAsync, { AsyncProps } from 'react-select/async';
+import { GroupBase } from 'react-select';
+
 import './autocomplete.scss';
 
-interface Props<T> {
-	onChange: (value: T) => void;
-	loadOptions: (inputValue: string) => void;
-	formatOptionLabel?: (props: any) => JSX.Element;
-	formatGroupLabel?: (props: any) => JSX.Element;
-}
-
-export default function AutoComplete<T>({ onChange, loadOptions, ...props }: Props<T>) {
-	return (
-		<AsyncSelect
-			cacheOptions
-			loadOptions={loadOptions}
-			onChange={({ value }) => onChange(value)}
-			defaultOptions
-			className='select-container'
-			classNamePrefix='select'
-			placeholder='Enter username or email'
-			{...props}
-		/>
-	);
+export default function AutoComplete<
+	OptionType,
+	IsMulti extends boolean = false,
+	GroupType extends GroupBase<OptionType> = GroupBase<OptionType>,
+>({ ...props }: AsyncProps<OptionType, IsMulti, GroupType>) {
+	return <ReactSelectAsync className='select-container' classNamePrefix='select' {...props} />;
 }

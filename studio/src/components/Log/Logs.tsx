@@ -1,11 +1,37 @@
+import { BADGE_COLOR_MAP } from '@/constants';
+import { Log } from '@/types';
+import { Badge } from '../Badge';
+import { cn } from '@/utils';
+import { useTranslation } from 'react-i18next';
 interface LogsProps {
-	logs: string[];
+	logs: Log[];
+	className?: string;
 }
 
-export default function Logs({ logs }: LogsProps) {
+export default function Logs({ logs, className }: LogsProps) {
+	const { t } = useTranslation();
 	return (
-		<div className='text-default overflow-y-auto text-sm font-mono bg-base p-4 space-y-2 overflow-auto'>
-			{logs?.map((log) => <p key={log}>{log}</p>)}
+		<div
+			className={cn(
+				'overflow-auto bg-base whitespace-pre text-default text-sm font-mono',
+				className,
+			)}
+		>
+			{logs?.length ? (
+				logs?.map((log, index) => (
+					<div key={index} className='flex items-center gap-6  px-4 py-2'>
+						<p>{log.timestamp}</p>
+						{log.type && (
+							<Badge variant={BADGE_COLOR_MAP[log.type.toUpperCase()]} text={log.type} />
+						)}
+						<p className='whitespace-pre-wrap'>{log.message}</p>
+					</div>
+				))
+			) : (
+				<div className='flex items-center justify-center h-32'>
+					<p>{t('general.no_logs')}</p>
+				</div>
+			)}
 		</div>
 	);
 }

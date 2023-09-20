@@ -1,5 +1,6 @@
 {
 	"no_result": "No items matching search criteria",
+	"no_logs": "No logs found",
 	"reset_search_query": "Reset Search Query",
 	"schemas": "Schemas",
 	"schema": "Schema",
@@ -110,5 +111,15 @@
 	"backToHome": "Back to Homepage",
 	"backToLogin": "Back to Login",
 	"messageUs": "Message Us",
-	"stillHavingTrouble": "Still having trouble?"
+	"stillHavingTrouble": "Still having trouble?",
+	"tab_close_title": "Are you sure you want to close this tab?",
+	"tab_close_description": "You have unsaved changes. If you close this tab, you will lose your unsaved changes.",
+	"save_and_close": "Save & Close",
+	"action": "Action",
+	"dbStatus": "Database",
+	"serverStatus": "API Server",
+	"schedulerStatus": "Scheduler",
+	"dbLogs": "Database Logs",
+	"serverLogs": "Server Logs",
+	"schedulerLogs": "Scheduler Logs"
 }

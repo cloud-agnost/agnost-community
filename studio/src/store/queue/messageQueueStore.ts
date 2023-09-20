@@ -6,6 +6,7 @@ import {
 	DeleteMultipleQueuesParams,
 	GetMessageQueueByIdParams,
 	GetMessageQueuesParams,
+	Log,
 	MessageQueue,
 	TestQueueLogs,
 	TestQueueParams,
@@ -18,6 +19,7 @@ import { devtools, persist } from 'zustand/middleware';
 interface MessageQueueStore {
 	queues: MessageQueue[];
 	queue: MessageQueue;
+	editedLogic: string;
 	toDeleteQueue: MessageQueue;
 	isDeleteModalOpen: boolean;
 	lastFetchedCount: number;
@@ -33,9 +35,10 @@ interface MessageQueueStore {
 	testQueue: (params: TestQueueParams) => Promise<void>;
 	openDeleteModal: (queue: MessageQueue) => void;
 	closeDeleteModal: () => void;
-	setQueueLogs: (queueId: string, log: string) => void;
+	setQueueLogs: (queueId: string, log: Log) => void;
 	openEditModal: (queue: MessageQueue) => void;
 	closeEditModal: () => void;
+	setEditedLogic: (logic: string) => void;
 }
 
 const useMessageQueueStore = create<MessageQueueStore>()(
@@ -50,6 +53,7 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 				createQueueModalOpen: false,
 				testQueueLogs: {} as TestQueueLogs,
 				isEditModalOpen: false,
+				editedLogic: '',
 				openEditModal: (queue: MessageQueue) => {
 					set({ queue, isEditModalOpen: true });
 				},
@@ -70,7 +74,7 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 				},
 				getQueueById: async (params: GetMessageQueueByIdParams) => {
 					const queue = await QueueService.getQueueById(params);
-					set({ queue });
+					set({ queue, editedLogic: queue.logic });
 					return queue;
 				},
 				deleteQueue: async (params: DeleteMessageQueueParams) => {
@@ -128,6 +132,7 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 						set((prev) => ({
 							queues: prev.queues.map((q) => (q._id === queue._id ? queue : q)),
 							queue,
+							editedLogic: queue.logic,
 						}));
 						if (params.onSuccess) params.onSuccess();
 						return queue;
@@ -160,16 +165,19 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 				closeDeleteModal: () => {
 					set({ isDeleteModalOpen: false, toDeleteQueue: {} as MessageQueue });
 				},
-				setQueueLogs: (queueId: string, log: string) => {
+				setQueueLogs: (queueId: string, log: Log) => {
 					set((prev) => ({
 						testQueueLogs: {
 							...prev.testQueueLogs,
 							[queueId]: {
 								...prev.testQueueLogs[queueId],
-								logs: [...(prev.testQueueLogs[queueId].logs as string[]), log],
+								logs: [...(prev.testQueueLogs[queueId].logs as Log[]), log],
 							},
 						},
 					}));
+				},
+				setEditedLogic: (logic: string) => {
+					set({ editedLogic: logic });
 				},
 			}),
 			{

@@ -1,5 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { z } from 'zod';
+import { EnvironmentStatus } from '.';
 
 export const UserSchema = z.object({
 	iid: z.string(),
@@ -194,7 +195,14 @@ export interface RemoveMemberRequest extends BaseRequest {
 	userId?: string;
 	userIds?: string[];
 }
-export type RealtimeActionTypes = 'update' | 'create' | 'delete' | 'telemetry' | 'log' | 'deploy';
+export type RealtimeActionTypes =
+	| 'update'
+	| 'create'
+	| 'delete'
+	| 'telemetry'
+	| 'log'
+	| 'deploy'
+	| 'redeploy';
 export type RealtimeObjectTypes =
 	| 'user'
 	| 'org'
@@ -290,4 +298,11 @@ export interface FieldType extends DatabaseType {
 		immutable: boolean;
 		searchable: boolean;
 	};
+}
+
+export type LogTypes = 'info' | 'log' | 'debug' | 'error' | 'warn';
+export interface Log {
+	message: string;
+	timestamp: string;
+	type: LogTypes | EnvironmentStatus;
 }

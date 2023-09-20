@@ -6,6 +6,7 @@ import {
 	DeleteTaskParams,
 	GetTaskParams,
 	GetTasksParams,
+	Log,
 	SaveTaskLogicParams,
 	Task,
 	TestTaskLogs,
@@ -22,6 +23,7 @@ export interface TaskStore {
 	lastFetchedCount: number;
 	taskLogs: TestTaskLogs;
 	isEditTaskModalOpen: boolean;
+	editedLogic: string;
 	openEditTaskModal: (task: Task) => void;
 	closeEditTaskModal: () => void;
 	getTask: (params: GetTaskParams) => Promise<Task>;
@@ -34,7 +36,8 @@ export interface TaskStore {
 	testTask: (params: TestTaskParams) => Promise<void>;
 	openDeleteTaskModal: (task: Task) => void;
 	closeDeleteTaskModal: () => void;
-	setTaskLog: (taskId: string, log: string) => void;
+	setTaskLog: (taskId: string, log: Log) => void;
+	setEditedLogic: (logic: string) => void;
 }
 
 const useTaskStore = create<TaskStore>()(
@@ -48,6 +51,7 @@ const useTaskStore = create<TaskStore>()(
 				lastFetchedCount: 0,
 				taskLogs: {} as TestTaskLogs,
 				isEditTaskModalOpen: false,
+				editedLogic: '',
 				openEditTaskModal: (task: Task) => {
 					set({ task, isEditTaskModalOpen: true });
 				},
@@ -56,7 +60,7 @@ const useTaskStore = create<TaskStore>()(
 				},
 				getTask: async (params: GetTaskParams) => {
 					const task = await TaskService.getTask(params);
-					set({ task });
+					set({ task, editedLogic: task.logic });
 					return task;
 				},
 				getTasks: async (params: GetTasksParams) => {
@@ -95,6 +99,7 @@ const useTaskStore = create<TaskStore>()(
 						set((prev) => ({
 							tasks: prev.tasks.map((t) => (t._id === task._id ? task : t)),
 							task,
+							editedLogic: task.logic,
 						}));
 						if (params.onSuccess) params.onSuccess();
 						return task;
@@ -150,15 +155,18 @@ const useTaskStore = create<TaskStore>()(
 				closeDeleteTaskModal: () => {
 					set({ toDeleteTask: {} as Task, isDeleteTaskModalOpen: false });
 				},
-				setTaskLog: (taskId: string, log: string) => {
+				setTaskLog: (taskId: string, log: Log) => {
 					set((prev) => {
 						return {
 							taskLogs: {
 								...prev.taskLogs,
-								[taskId]: [...(prev.taskLogs[taskId] as string[]), log],
+								[taskId]: [...(prev.taskLogs[taskId] as Log[]), log],
 							},
 						};
 					});
+				},
+				setEditedLogic: (logic: string) => {
+					set({ editedLogic: logic });
 				},
 			}),
 			{

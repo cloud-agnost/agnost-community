@@ -111,8 +111,8 @@ export default function DeploymentSettings({ isOpen, close }: DeploymentSettings
 						</header>
 						<div className='deployment-settings-items'>
 							{settings.map(({ title, description, element }, index) => (
-								<div key={index}>
-									<div>
+								<div className='deployment-settings-item' key={index}>
+									<div className='deployment-settings-text'>
 										<h5>{title}</h5>
 										<p>{description}</p>
 									</div>

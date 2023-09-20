@@ -187,7 +187,11 @@
 
 		--radius: 0.5rem;
 
-		--font-size-xs: 0.5rem;
+		--font-size-xs: 0.75rem;
+		--font-size-xs-line-height: 1.125rem;
+
+		--font-size-sm: 0.875rem;
+		--font-size-sm-line-height: 1.5rem;
 	}
 
 	.dark {
@@ -245,12 +249,6 @@
 		--form-input-focus: 134, 157, 254;
 		--form-input-disabled-background: 33, 37, 48;
 		--form-input-disabled-border: 50, 56, 73;
-
-		--font-size-xs: 12px;
-		--font-size-xs-line-height: 18px;
-
-		--font-size-sm: 14px;
-		--font-size-sm-line-height: 24px;
 	}
 }
 
