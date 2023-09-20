@@ -30,10 +30,10 @@ export default function DeploymentStatusCard() {
 								<span
 									className={cn(
 										'animate-ping absolute inline-flex h-full w-full rounded-full ',
-										classes[0],
+										classes?.[0],
 									)}
 								/>
-								<span className={cn('relative inline-flex rounded-full h-2 w-2', classes[1])} />
+								<span className={cn('relative inline-flex rounded-full h-2 w-2', classes?.[1])} />
 							</span>
 						</div>
 						<Cloud size={24} />
