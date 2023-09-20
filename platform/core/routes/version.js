@@ -1532,7 +1532,10 @@ router.get(
 			const conn = mongoose.connection;
 
 			const dataCursor = await conn.db.collection("search_view").find(
-				{ name: { $regex: keyword, $options: "i" } },
+				{
+					versionId: helper.objectId(req.version._id),
+					name: { $regex: keyword, $options: "i" },
+				},
 				{
 					sort: { name: 1 },
 					skip: 0,
