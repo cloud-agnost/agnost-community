@@ -15,7 +15,7 @@ const version = 'v2';
 const namespace = process.env.NAMESPACE;
 const plural = 'innodbclusters';
 
-async function createMySQLResource(clusterName, dbVersion, replicaCount, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd) {
+async function createMySQLResource(clusterName, dbVersion, replicaCount, size, userName, passwd) {
   const manifest = fs.readFileSync('/manifests/mysql.yaml', 'utf8');
   const resources = k8s.loadAllYaml(manifest);
 
@@ -40,11 +40,7 @@ async function createMySQLResource(clusterName, dbVersion, replicaCount, memoryR
           resource.spec.version = dbVersion;
           resource.spec.router.version = dbVersion;
           resource.spec.secretName = clusterName + '-cluster-secret';
-          resource.spec.datadirVolumeClaimTemplate.resources.requests.storage = diskSize;
-          resource.spec.podSpec.containers[0].resources.limits.cpu = cpuLimit;
-          resource.spec.podSpec.containers[0].resources.limits.memory = memoryLimit;
-          resource.spec.podSpec.containers[0].resources.requests.cpu = cpuRequest;
-          resource.spec.podSpec.containers[0].resources.requests.memory = memoryRequest;
+          resource.spec.datadirVolumeClaimTemplate.resources.requests.storage = size;
           var dbResult = await k8sCustomApi.createNamespacedCustomObject(group, version, namespace, plural, resource);
           break;
         default:
@@ -52,35 +48,36 @@ async function createMySQLResource(clusterName, dbVersion, replicaCount, memoryR
       }
     console.log(kind + ' ' + resource.metadata.name + ' created...');
     } catch (error) {
-      console.error('Error applying resource:', error);
-      return error
+      console.error('Error applying resource:', error.body);
+      throw new Error(JSON.stringify(error.body));
     }
   }
   return { ...dbResult, ...secretResult };
 }
 
-async function updateMySQLResource(clusterName, dbVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit) {
+async function updateMySQLResource(clusterName, dbVersion, replicaCount, size) {
   const patchData = {
     spec: {
       version: dbVersion,
       router: {
         version: dbVersion
       },
-      podSpec: {
-        containers: [
-          {
-            resources: {
-              limits: {
-                cpu: cpuLimit,
-                memory: memoryLimit
-              },
-              requests: {
-                cpu: cpuRequest,
-                memory: memoryRequest
-              }
-            }
-          } 
-        ]
+      instances: replicaCount,
+      datadirVolumeClaimTemplate: {
+        resources: {
+          requests: {
+            storage: size
+          }
+        }
+      }
+    }
+  };
+  const pvcPatch = {
+    spec: {
+      resources: {
+        requests: {
+          storage: size
+        }
       }
     }
   };
@@ -89,16 +86,25 @@ async function updateMySQLResource(clusterName, dbVersion, memoryRequest, memory
   try {
     var dbResult = await k8sCustomApi.patchNamespacedCustomObject(group, version, namespace, plural, clusterName, patchData, undefined, undefined, undefined, requestOptions);
     console.log('MySQL ' + clusterName + ' updated...');
+
+    const pvcList = await k8sCoreApi.listNamespacedPersistentVolumeClaim(namespace);
+    pvcList.body.items.forEach(async (pvc) => {
+      var pvcName = pvc.metadata.name;
+      if (pvcName.includes("datadir-" + clusterName + '-')) {
+        await k8sCoreApi.patchNamespacedPersistentVolumeClaim(pvcName, namespace, pvcPatch, undefined, undefined, undefined, undefined, undefined, requestOptions);
+        console.log('PersistentVolumeClaim ' + pvcName + ' updated...');
+      }
+    });
   } catch (error){
-    console.error('Error updating MySQL ' + clusterName + ' resources...');
-    return error;
+    console.error('Error updating MySQL ' + clusterName + ' resources...', error.body);
+    throw new Error(JSON.stringify(error.body));
   }
 
   return { result: 'success' };
 }
 
 
-async function deleteMySQLResource(clusterName, purgeData) {
+async function deleteMySQLResource(clusterName) {
   try {
     await k8sCustomApi.deleteNamespacedCustomObject(group, version, namespace, plural, clusterName);
     console.log('MySQL ' + clusterName + ' deleted...');
@@ -106,62 +112,84 @@ async function deleteMySQLResource(clusterName, purgeData) {
     console.log('Secret ' + clusterName + '-cluster-secret deleted...');
     await k8sCoreApi.deleteNamespacedServiceAccount(clusterName + '-sa', namespace);
     console.log('ServiceAccount ' + clusterName + '-sa deleted...');
-    if (purgeData) {
-      const pvcList = await k8sCoreApi.listNamespacedPersistentVolumeClaim(namespace);
-      pvcList.body.items.forEach(async (pvc) => {
-        var pvcName = pvc.metadata.name;
-        if (pvcName.includes("datadir-" + clusterName)) {
-          await k8sCoreApi.deleteNamespacedPersistentVolumeClaim(pvcName, namespace);
-          console.log('PersistentVolumeClaim ' + pvcName + ' deleted...');
-        }
-      });
-    }
+
+    const pvcList = await k8sCoreApi.listNamespacedPersistentVolumeClaim(namespace);
+    pvcList.body.items.forEach(async (pvc) => {
+      var pvcName = pvc.metadata.name;
+      if (pvcName.includes("datadir-" + clusterName + '-')) {
+        await k8sCoreApi.deleteNamespacedPersistentVolumeClaim(pvcName, namespace);
+        console.log('PersistentVolumeClaim ' + pvcName + ' deleted...');
+      }
+    });
   } catch (error) {
-    console.error('Error deleting resource:', error);
-    return error
+    console.error('Error deleting resource:', error.body);
+    throw new Error(JSON.stringify(error.body));
   }
 
   return { result: 'success' };
 }
 
+// some helper functions
+async function waitForSecret(secretName) {
+  const pollingInterval = 2000;
+  while (true) {
+    try {
+      const response = await k8sCoreApi.readNamespacedSecret(secretName, namespace);
+      return response.body.data;
+    } catch (error) {
+      await sleep(pollingInterval);
+    }
+  }
+}
+
+// Function to simulate sleep
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 // Create a MySQL Instance
 router.post('/mysql', async (req, res) => {
-  const { clusterName, dbVersion, replicaCount, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd } = req.body;
+  const { clusterName, dbVersion, replicaCount, size, userName, passwd } = req.body;
 
   try {
-    await createMySQLResource(clusterName, dbVersion, replicaCount, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd);
-    res.json({ 'url': clusterName + '.' + namespace + '.cluster.svc.local',
-               'username': userName,
-               'password': passwd, });
+    await createMySQLResource(clusterName, dbVersion, replicaCount, size, userName, passwd);
+    res.json({ 'connectionString': clusterName + '.' + namespace + '.cluster.svc.local',
+               'username': userName, 'password': passwd, });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json(JSON.parse(err.message));
   }
 });
 
 // Update MySQL Instance
 router.put('/mysql', async (req, res) => {
-  const { clusterName, dbVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, rootPasswd } = req.body;
+  const { clusterName, dbVersion, replicaCount, size} = req.body;
 
   try {
-    await updateMySQLResource(clusterName, dbVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit);
-    res.json({ 'url': clusterName + '.' + namespace + '.cluster.svc.local' });
+    await updateMySQLResource(clusterName, dbVersion, replicaCount, size);
+    var secretName = clusterName + '-cluster-secret';
+    credentials = await waitForSecret(secretName);
+    res.json({ 'connectionString': clusterName + '.' + namespace + '.cluster.svc.local',
+               'password': Buffer.from(credentials.rootPassword, 'base64').toString('utf-8'),
+               'username': Buffer.from(credentials.rootUser, 'base64').toString('utf-8')  });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json(JSON.parse(err.message));
   }
 });
 
 // Delete a MySQL instance
 router.delete('/mysql', async (req, res) => {
-  const { clusterName, purgeData } = req.body;
+  const { clusterName } = req.body;
 
   try {
-    const delResult = await deleteMySQLResource(clusterName, purgeData);
+    const delResult = await deleteMySQLResource(clusterName);
     res.json({ mysql: delResult});
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json(JSON.parse(err.message));
   }
 });
 

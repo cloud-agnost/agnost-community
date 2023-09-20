@@ -38,11 +38,11 @@ spec:
     - name: mysql
       resources:
         requests:
-          memory: "2048Mi"
-          cpu: "1800m"
+          memory: "512Mi"
+          cpu: "180m"
         limits:
-          memory: "8192Mi"
-          cpu: "3600m"
+          memory: "1024Mi"
+          cpu: "500m"
   mycnf: |
     [mysqld]
     max_connections=200

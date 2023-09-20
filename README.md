@@ -175,12 +175,8 @@ curl -XDELETE http://localhost:3000/postgres -d '{
 curl -XPOST http://localhost:3000/mysql -d '{
     "clusterName": "mycluster",
     "dbVersion": "8.0.33",
-    "replicaCount": 3,
-    "memoryRequest": "512Mi",
-    "memoryLimit": "1024Mi",
-    "cpuRequest": "500m",
-    "cpuLimit": "1000m",
-    "diskSize": "20Gi",
+    "replicaCount": 1,
+    "size": "5Gi",
     "userName": "root",
     "passwd": "P4sSW0rD"
 }' -H "Content-type: application/json"
@@ -188,13 +184,24 @@ curl -XPOST http://localhost:3000/mysql -d '{
 
 ### Update mysql
 
+> Make sure to change the replicaCount and size on different calls.
+
 ```bash
+## Change for version and replicaCount
 curl -XPUT http://localhost:3000/mysql -d '{
     "clusterName": "mycluster",
-    "memoryRequest": "512Mi",
-    "memoryLimit": "2048Mi",
-    "cpuRequest": "500m",
-    "cpuLimit": "1000m",
+    "replicaCount": 3,
+    "size": "5Gi",
+    "dbVersion": "8.0.34"
+}' -H "Content-type: application/json"
+```
+
+```bash
+## Change for size
+curl -XPUT http://localhost:3000/mysql -d '{
+    "clusterName": "mycluster",
+    "replicaCount": 3,
+    "size": "10Gi",
     "dbVersion": "8.0.34"
 }' -H "Content-type: application/json"
 ```
@@ -203,8 +210,7 @@ curl -XPUT http://localhost:3000/mysql -d '{
 
 ```bash
 curl -XDELETE http://localhost:3000/mysql -d '{
-    "clusterName": "mycluster",
-    "purgeData": true
+    "clusterName": "mycluster"
 }' -H "Content-type: application/json"
 ```
 
