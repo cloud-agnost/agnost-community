@@ -44,7 +44,7 @@
 	}
 
 	&-item-container {
-		@apply flex flex-col gap-0.5 p-0.5 bg-base text-default;
+		@apply flex flex-col gap-0.5 p-0.5 bg-wrapper-background-light text-default;
 	}
 
 	&-separator {
