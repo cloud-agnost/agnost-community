@@ -13,7 +13,24 @@ import { Row, Table } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useSearchParams } from 'react-router-dom';
+import { LoaderFunctionArgs, useSearchParams } from 'react-router-dom';
+
+Files.Loader = async ({ params }: LoaderFunctionArgs) => {
+	const { bucketName } = params;
+	const { bucket, buckets, storage, getBucket } = useStorageStore.getState();
+	if (bucketName !== bucket?.name) {
+		let selectedBucket = buckets.find((bucket) => bucket.name === bucketName);
+		if (!selectedBucket) {
+			selectedBucket = await getBucket({
+				storageName: storage?.name as string,
+				bucketName: bucketName as string,
+			});
+		}
+		useStorageStore.setState({ bucket: selectedBucket });
+	}
+	return { props: {} };
+};
+
 export default function Files() {
 	const [selectedRows, setSelectedRows] = useState<Row<BucketFile>[]>([]);
 	const [table, setTable] = useState<Table<BucketFile>>();
@@ -124,7 +141,7 @@ export default function Files() {
 				returnCountInfo: true,
 			});
 		}
-	}, [searchParams.get('q'), page]);
+	}, [searchParams.get('q'), page, bucket?.name]);
 	return (
 		<VersionTabLayout
 			isEmpty={files.length === 0}

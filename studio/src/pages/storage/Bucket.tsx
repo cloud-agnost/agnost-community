@@ -15,10 +15,33 @@ import { Row, Table } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useNavigate, useOutletContext, useParams, useSearchParams } from 'react-router-dom';
+import {
+	LoaderFunctionArgs,
+	useNavigate,
+	useOutletContext,
+	useParams,
+	useSearchParams,
+} from 'react-router-dom';
 
-Buckets.loader = async () => {
+Buckets.loader = async ({ params }: LoaderFunctionArgs) => {
 	const role = useApplicationStore.getState().application?.role;
+
+	const { storageId, appId, orgId, versionId } = params;
+	const { storage, storages } = useStorageStore.getState();
+
+	if (storageId !== storage?._id) {
+		let selectedStorage = storages.find((storage) => storage._id === storageId);
+		if (!selectedStorage) {
+			selectedStorage = await useStorageStore.getState().getStorageById({
+				storageId: storageId as string,
+				appId: appId as string,
+				orgId: orgId as string,
+				versionId: versionId as string,
+			});
+		}
+		useStorageStore.setState({ storage: selectedStorage });
+	}
+
 	const permission = getAppPermission(role as AppRoles, 'app.storage.viewData');
 	if (!permission) {
 		// return redirect('/404');
@@ -119,7 +142,7 @@ export default function Buckets() {
 				returnCountInfo: true,
 			});
 		}
-	}, [searchParams.get('q'), bucketPage]);
+	}, [searchParams.get('q'), bucketPage, versionId, storage?.name]);
 
 	useEffect(() => {
 		if (!viewData) {
