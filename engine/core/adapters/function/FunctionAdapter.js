@@ -2,7 +2,9 @@
  * Runs the customer helper functions
  */
 export class FunctionAdapter {
-	constructor() {}
+	constructor(manager) {
+		this.manager = manager;
+	}
 
 	/**
 	 * Runs the custom helper function identified by the name
@@ -12,7 +14,13 @@ export class FunctionAdapter {
 		let functionModule = null;
 
 		// Dynamicly import the
-		functionModule = await import(`../../meta/functions/${functionName}.js`);
+		functionModule = await import(
+			`../../meta/functions/${functionName}.js${
+				this.manager.getModuleLoaderQuery()
+					? "?" + this.manager.getModuleLoaderQuery()
+					: ""
+			}`
+		);
 
 		const funcHandler = functionModule.default;
 		// Check the function module has a default exprot or not

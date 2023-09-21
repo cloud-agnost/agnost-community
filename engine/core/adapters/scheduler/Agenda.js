@@ -5,13 +5,35 @@ import ERROR_CODES from "../../config/errorCodes.js";
  * Manages listening and processing the cron job triggered tasks
  */
 export class Agenda extends SchedulerBase {
-	constructor(driver) {
+	constructor(driver, manager) {
 		super();
 		this.driver = driver;
+		this.manager = manager;
+		this.channels = [];
 	}
 
 	async disconnect() {
 		// We are using the default queue connection, do not disconnect
+		await this.closeChannels();
+	}
+
+	addChannel(channelObj) {
+		this.channels.push(channelObj);
+	}
+
+	/**
+	 * In order to correctly and effectively update the child process resources we need to close the old channels
+	 */
+	async closeChannels() {
+		for (const entry of this.channels) {
+			if (entry) {
+				try {
+					await entry.close();
+				} catch (err) {}
+			}
+		}
+
+		this.channels = [];
 	}
 
 	/**
@@ -31,6 +53,7 @@ export class Agenda extends SchedulerBase {
 
 		try {
 			const channel = await this.driver.createChannel();
+			this.addChannel(channel);
 			const envId = META.getEnvId();
 			const message = {
 				taskId: task.iid,
@@ -95,6 +118,7 @@ export class Agenda extends SchedulerBase {
 	async processTask(taskObj, queue) {
 		try {
 			const channel = await this.driver.createChannel();
+			this.addChannel(channel);
 
 			channel.assertQueue(queue, {
 				durable: true,
@@ -147,7 +171,11 @@ export class Agenda extends SchedulerBase {
 					try {
 						// Dynamicly import the
 						const handlerModule = await import(
-							`../../meta/tasks/${taskObj.name}.js`
+							`../../meta/tasks/${taskObj.name}.js${
+								this.manager.getModuleLoaderQuery()
+									? "?" + this.manager.getModuleLoaderQuery()
+									: ""
+							}`
 						);
 
 						const handlerFunction = handlerModule.default;

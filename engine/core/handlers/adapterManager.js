@@ -28,7 +28,16 @@ export class AdapterManager {
 	constructor() {
 		// Keeps the list of connections object {type, instance, iid, readOnly, adapter}
 		this.adapters = new Map();
-		this.functionAdapter = new FunctionAdapter();
+		this.functionAdapter = new FunctionAdapter(this);
+		this.query = null;
+	}
+
+	setModuleLoaderQuery(query) {
+		this.query = query;
+	}
+
+	getModuleLoaderQuery(query) {
+		return this.query;
 	}
 
 	/**
@@ -619,7 +628,7 @@ export class AdapterManager {
 				instance,
 				iid,
 				readOnly: false,
-				adapter: new RabbitMQ(client),
+				adapter: new RabbitMQ(client, this),
 			});
 		} catch (err) {}
 	}
@@ -857,7 +866,7 @@ export class AdapterManager {
 				instance,
 				iid,
 				readOnly: false,
-				adapter: new Agenda(getMQClient()),
+				adapter: new Agenda(getMQClient(), this),
 			});
 		} catch (err) {}
 	}

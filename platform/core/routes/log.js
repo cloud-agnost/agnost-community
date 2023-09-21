@@ -1,5 +1,6 @@
 import express from "express";
 import auditCtrl from "../controllers/audit.js";
+import { AuditModel } from "../schemas/audit.js";
 import { authSession } from "../middlewares/authSession.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateApp } from "../middlewares/validateApp.js";
@@ -66,6 +67,36 @@ router.get(
 			});
 
 			res.json(logs);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/log/org/:orgId/app/:appId/version/:versionId/filters
+@method     GET
+@desc       Get distinct actions
+@access     private
+*/
+router.get(
+	"/org/:orgId/app/:appId/version/:versionId/filters",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.viewLogs"),
+	async (req, res) => {
+		try {
+			const { org, app, version } = req;
+
+			let results = await AuditModel.find({
+				orgId: org._id,
+				appId: app._id,
+				versionId: version._id,
+			}).distinct("action");
+
+			res.json(results);
 		} catch (error) {
 			handleError(req, res, error);
 		}

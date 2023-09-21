@@ -5,15 +5,36 @@ import ERROR_CODES from "../../config/errorCodes.js";
  * Manages message listen and dispatch operations in RabbitMQ
  */
 export class RabbitMQ extends QueueBase {
-	constructor(driver) {
+	constructor(driver, manager) {
 		super();
 		this.driver = driver;
+		this.manager = manager;
+		this.channels = [];
 	}
 
 	async disconnect() {
 		try {
 			await this.driver.close();
 		} catch (err) {}
+	}
+
+	addChannel(channelObj) {
+		this.channels.push(channelObj);
+	}
+
+	/**
+	 * In order to correctly and effectively update the child process resources we need to close the old channels
+	 */
+	async closeChannels() {
+		for (const entry of this.channels) {
+			if (entry) {
+				try {
+					await entry.close();
+				} catch (err) {}
+			}
+		}
+
+		this.channels = [];
 	}
 
 	/**
@@ -61,6 +82,7 @@ export class RabbitMQ extends QueueBase {
 
 		try {
 			const channel = await this.driver.createChannel();
+			this.addChannel(channel);
 			const envId = META.getEnvId();
 			const message = {
 				timestamp: new Date(),
@@ -139,6 +161,7 @@ export class RabbitMQ extends QueueBase {
 	async processMessage(queueObj, queue, exchange) {
 		try {
 			const channel = await this.driver.createChannel();
+			this.addChannel(channel);
 
 			// If this is a delayed message then we need to bind the queue to the exchange
 			if (exchange) {
@@ -217,7 +240,11 @@ export class RabbitMQ extends QueueBase {
 					try {
 						// Dynamicly import the
 						const handlerModule = await import(
-							`../../meta/queues/${queueObj.name}.js`
+							`../../meta/queues/${queueObj.name}.js${
+								this.manager.getModuleLoaderQuery()
+									? "?" + this.manager.getModuleLoaderQuery()
+									: ""
+							}`
 						);
 
 						const handlerFunction = handlerModule.default;

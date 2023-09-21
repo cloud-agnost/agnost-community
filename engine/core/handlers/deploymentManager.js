@@ -12,6 +12,13 @@ export class DeploymentManager {
 	}
 
 	/**
+	 * Clear logs
+	 */
+	clearLogs() {
+		this.logs = [];
+	}
+
+	/**
 	 * Set the environment object of the deployment manager
 	 * @param  {Object} envObj Environment object json
 	 */

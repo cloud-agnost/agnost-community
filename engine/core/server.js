@@ -68,6 +68,14 @@ if (cluster.isPrimary) {
 		const manager = new ChildProcessDeploymentManager(null, null, i18n);
 		await manager.initializeCore();
 		childManager = manager;
+
+		// Listen for child process update messages (not restart but update)
+		process.on("message", (message) => {
+			if (message === "restart") {
+				logger.info(`Child process update started`);
+				childManager.restartCore();
+			}
+		});
 	});
 	// Connect to synchronization server
 	initializeSyncClient();
@@ -193,8 +201,4 @@ function setUpGC() {
 			global.gc();
 		}
 	}, config.get("general.gcSeconds") * 1000);
-}
-
-export function setChildProcess(newChild) {
-	childProcess = newChild;
 }

@@ -12,6 +12,44 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	}
 
 	/**
+	 * Checks to see if there is any resource change in environment configuration
+	 */
+	async hasResourceChange() {
+		const oldConfig = await this.loadEnvConfigFile();
+		const oldResources = oldConfig.resources ?? [];
+		const newResources = this.envObj.resources ?? [];
+
+		// Check to see if there is any new resource addition
+		for (const newRes of newResources) {
+			const matchingRes = oldResources.find(
+				(entry) => entry.iid === newRes.iid
+			);
+
+			if (!matchingRes) return true;
+		}
+
+		// Check to see if there is any resource removal
+		for (const oldRes of oldResources) {
+			const matchingRes = newResources.find(
+				(entry) => entry.iid === oldRes.iid
+			);
+
+			if (!matchingRes) return true;
+		}
+
+		// Check to see if there is any change in resource config
+		for (const newRes of newResources) {
+			const matchingRes = oldResources.find(
+				(entry) => entry.iid === newRes.iid
+			);
+
+			if (matchingRes.updatedAt !== newRes.updatedAt) return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Manages the metadata of the api server
 	 */
 	async initializeCore() {

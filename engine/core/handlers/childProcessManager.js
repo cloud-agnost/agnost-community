@@ -32,6 +32,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		this.expressApp = null;
 		this.httpServer = null;
 		this.i18n = i18n;
+		this.loaderQuery = null;
 	}
 
 	/**
@@ -108,6 +109,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		global.SERVER_STATUS = "initializing";
 		// Save the metadata manager to globals for faster access
 		global.ADAPTERS = adapterManager;
+		adapterManager.setModuleLoaderQuery(this.loaderQuery);
 
 		// Initialize express server
 		await this.initExpressServer();
@@ -143,6 +145,87 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		const pkg = (await import("@agnost/server")).default;
 		const { agnost } = pkg;
 		global.agnost = agnost;
+	}
+
+	/**
+	 * Cleans up the child process to speed up API server updates. If we do not have any changes in resource definitions then we
+	 * can update an API server faster
+	 */
+	async restartCore() {
+		global.SERVER_STATUS = "initializing";
+		this.loaderQuery = helper.generateSlug(null, 6);
+		// First clear the logs
+		this.clearLogs();
+		this.addLog(`Started updating the API server`);
+		await this.closeHttpServer();
+
+		// We haven't refreshed the META manager so that we can access the old values
+		// Clear queue channels
+		const queueus = await META.getQueues();
+		for (const queue of queueus) {
+			const adapterObj = adapterManager.getQueueAdapter(queue.name);
+			if (adapterObj) {
+				await adapterObj.closeChannels();
+			}
+		}
+
+		// We haven't refreshed the META manager so that we can access the old values
+		// Clear task channels
+		const tasks = await META.getTasks();
+		for (const task of tasks) {
+			const adapterObj = adapterManager.getTaskAdapter(task.name);
+			if (adapterObj) {
+				await adapterObj.closeChannels();
+			}
+		}
+
+		// We haven't refreshed the META manager so that we can access the old values
+		// Clear environment variables
+		const variables = META.getEnvironmentVariables();
+		for (const variable of variables) {
+			delete process.env[variable.name];
+		}
+
+		// First load the environment and vesion configuration file
+		const envObj = await this.loadEnvConfigFile();
+		// If we do  not have the envObj yet then just spin up the express server to serve system default endpoints
+		if (!envObj) {
+			// Initialize express server
+			await this.initExpressServer(false);
+			// Spin up the express server
+			await this.startExpressServer();
+			// We completed server initialization and can accept incoming requests
+			global.SERVER_STATUS = "running";
+			return;
+		}
+
+		// Set the environment object of the deployment manager
+		this.setEnvObj(envObj);
+		// Save the metadata manager to globals for faster access
+		global.META = new MetaManager(envObj);
+		adapterManager.setModuleLoaderQuery(this.loaderQuery);
+		// Initialize express server
+		await this.initExpressServer();
+		// Manage endpoints
+		await this.manageEndpoints();
+		// Spin up the express server
+		await this.startExpressServer();
+
+		// Set the environment variables of the API server
+		this.manageEnvironmentVariables(this.getEnvironmentVariables());
+		// Create initial buckets if needed, don't call it with await it can run in parallel
+		this.manageStorages();
+		// Set up the queue listeners
+		await this.manageQueues();
+		// Set up the task listeners
+		await this.manageTasks();
+
+		this.addLog(`Completed updating the API server`);
+		// Send the deployment telemetry information to the platform
+		await this.sendEnvironmentLogs("OK");
+
+		// We completed server initialization and can accept incoming requests
+		global.SERVER_STATUS = "running";
 	}
 
 	/**
@@ -376,7 +459,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 			// Add the middleware handler
 			if (middleware) {
-				handlers.push(applyCustomMiddleware(endpoint, middleware));
+				handlers.push(
+					applyCustomMiddleware(endpoint, middleware, this.loaderQuery)
+				);
 			}
 		}
 	}
@@ -387,7 +472,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * @param  {Array} handlers The array where the route handler will be will be added
 	 */
 	addEndpointHandler(endpoint, handlers) {
-		handlers.push(runHandler(endpoint));
+		handlers.push(runHandler(endpoint, this.loaderQuery));
 	}
 
 	/**
@@ -422,6 +507,44 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			const adapterObj = adapterManager.getStorageAdapter(storage.name);
 			if (adapterObj) {
 				this.addLog(`Initialized storage adapter '${storage.name}'`);
+			}
+		}
+	}
+
+	/**
+	 * Sets up the message queue listeners
+	 * @param  {Object} endpoint The endpoint JSON object
+	 * @param  {Array} handlers The array where the route handler will be will be added
+	 */
+	async manageQueues() {
+		// First load the queues configuration file
+		const queueus = await META.getQueues();
+		if (queueus.length === 0) return;
+
+		for (const queue of queueus) {
+			const adapterObj = adapterManager.getQueueAdapter(queue.name);
+			if (adapterObj) {
+				adapterObj.listenMessages(queue);
+				this.addLog(`Initialized handler of queue '${queue.name}'`);
+			}
+		}
+	}
+
+	/**
+	 * Sets up the cron job listeners
+	 * @param  {Object} endpoint The endpoint JSON object
+	 * @param  {Array} handlers The array where the route handler will be will be added
+	 */
+	async manageTasks() {
+		// First load the tasks configuration file
+		const tasks = await META.getTasks();
+		if (tasks.length === 0) return;
+
+		for (const task of tasks) {
+			const adapterObj = adapterManager.getTaskAdapter(task.name);
+			if (adapterObj) {
+				adapterObj.listenMessages(task);
+				this.addLog(`Initialized handler of task '${task.name}'`);
 			}
 		}
 	}

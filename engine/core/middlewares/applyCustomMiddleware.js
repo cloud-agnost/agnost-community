@@ -2,13 +2,16 @@ import ERROR_CODES from "../config/errorCodes.js";
 
 // Custom middlewares added to the endpoint
 export const applyCustomMiddleware =
-	(endpoint, middleware) => async (req, res, next) => {
+	(endpoint, middleware, loaderQuery = null) =>
+	async (req, res, next) => {
 		let middlewareModule = null;
 
 		try {
 			// Dynamicly import the
 			middlewareModule = await import(
-				`../meta/middlewares/${middleware.name}.js`
+				`../meta/middlewares/${middleware.name}.js${
+					loaderQuery ? "?" + loaderQuery : ""
+				}`
 			);
 
 			const middlewareFunction = middlewareModule.default;

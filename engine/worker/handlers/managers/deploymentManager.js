@@ -1889,20 +1889,6 @@ export class DeploymentManager {
      */
     async updateEndpoints() {
         try {
-            // Update the environment log object
-            const response = await axios.get(
-                `http://${this.getEnvId()}.${process.env.NAMESPACE}.svc.cluster.local/health`
-            );
-            console.log("***********pinged api server", response.data);
-        } catch (err) {
-            console.log(
-                "****here errorr",
-                `http://${this.getEnvId()}.${process.env.NAMESPACE}.svc.cluster.local/health`,
-                err
-            );
-        }
-
-        try {
             this.addLog(t("Started updating endpoints"));
             // Set current status of environment in engine cluster
             await this.setStatus("Deploying");

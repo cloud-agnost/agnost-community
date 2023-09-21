@@ -44,11 +44,26 @@ export const manageAPIServerHandler = (connection, envId) => {
 						);
 						// Create the primary process deployment manager and set up the engine core (API Server)
 						const manager = new PrimaryProcessDeploymentManager(msgObj, envObj);
-						await manager.initializeCore();
-						// Restart worker(s)
-						for (const worker of Object.values(cluster.workers)) {
-							worker.kill("SIGINT");
+						// Check to see if resources have changed or not and whether we are dedeploying the version, if not we can update the child process faster, no need to kill it
+						const hasResourceChange = await manager.hasResourceChange();
+						if (
+							hasResourceChange ||
+							msgObj.subAction === "deploy" ||
+							msgObj.subAction === "redeploy"
+						) {
+							await manager.initializeCore();
+							// Restart worker(s)
+							for (const worker of Object.values(cluster.workers)) {
+								worker.kill("SIGINT");
+							}
+						} else {
+							await manager.initializeCore();
+							// Send a message from the master process to the worker.
+							for (const worker of Object.values(cluster.workers)) {
+								worker.send("restart");
+							}
 						}
+
 						break;
 				}
 

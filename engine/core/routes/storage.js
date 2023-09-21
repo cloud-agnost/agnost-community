@@ -64,7 +64,6 @@ router.post(
 
 			res.json(bucket);
 		} catch (error) {
-			console.log(error);
 			helper.handleError(req, res, error);
 		}
 	}
@@ -193,7 +192,6 @@ router.delete(
 		try {
 			const { storageName, bucketName } = req.params;
 			const { paths } = req.query;
-			console.log(paths);
 			await agnost.storage(storageName).bucket(bucketName).deleteFiles(paths);
 
 			res.json();
@@ -312,7 +310,6 @@ router.delete(
 				.storage(storageName)
 				.bucket(bucketName)
 				.removeTags();
-			console.log(bucket);
 			res.json(bucket);
 		} catch (error) {
 			helper.handleError(req, res, error);
@@ -366,7 +363,6 @@ router.get(
 			const { storageName, bucketName } = req.params;
 			const { page, limit, sortBy, sortDir, returnCountInfo, search } =
 				req.query;
-			console.log({ page, limit, sortBy, sortDir, returnCountInfo, search });
 			const files = await agnost
 				.storage(storageName)
 				.bucket(bucketName)
@@ -402,7 +398,6 @@ router.post(
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
-			console.log(storageName);
 			const result = [];
 			for (const file of req.files) {
 				const fileMetadata = await agnost
@@ -548,7 +543,6 @@ router.put(
 					limit: 100,
 					search: filePath,
 				});
-			console.log(files);
 			const result = await agnost
 				.storage(storageName)
 				.bucket(bucketName)
@@ -578,7 +572,6 @@ router.put(
 		try {
 			const { storageName, bucketName } = req.params;
 			const { path, isPublic, tags, filePath } = req.body;
-			console.log({ path, isPublic, tags, filePath });
 			const result = await agnost
 				.storage(storageName)
 				.bucket(bucketName)
