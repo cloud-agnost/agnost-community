@@ -64,6 +64,7 @@ export interface StorageStore {
 	deleteMultipleStorages: (storage: DeleteMultipleStoragesParams) => Promise<void>;
 	updateStorage: (storage: UpdateStorageParams) => Promise<Storage>;
 	getBuckets: (req: GetStorageBuckets) => Promise<Bucket[]>;
+	getBucket: (req: DeleteBucketParams) => Promise<Bucket>;
 	createBucket: (req: CreateBucketParams) => Promise<Bucket>;
 	deleteBucket: (req: DeleteBucketParams) => Promise<void>;
 	emptyBucket: (req: DeleteBucketParams) => Promise<void>;
@@ -219,6 +220,11 @@ const useStorageStore = create<StorageStore>()(
 						}));
 					}
 					return buckets.data;
+				},
+				getBucket: async (params: DeleteBucketParams) => {
+					const bucket = await StorageService.getBucket(params);
+					set({ bucket });
+					return bucket;
 				},
 				createBucket: async (params: CreateBucketParams) => {
 					try {
