@@ -35,14 +35,26 @@ spec:
       selector:
         matchLabels:
           app: mongodb-name-svc
+      volumeClaimTemplates:
+        - metadata:
+            name: data-volume
+          spec:
+            accessModes: [ "ReadWriteOnce" ]
+            resources:
+              requests:
+                storage: 1Gi
+        - metadata:
+            name: logs-volume
+          spec:
+            accessModes: [ "ReadWriteOnce" ]
+            resources:
+              requests:
+                storage: 1Gi
       template:
         metadata:
           labels:
             app: mongodb-name-svc
         spec:
-          persistence:
-            single:
-              storage: 1Gi
           containers:
             - name: mongod
               resources:
@@ -50,8 +62,8 @@ spec:
                   cpu: 1000m
                   memory: 1Gi
                 requests:
-                  cpu: 1000m
-                  memory: 1Gi
+                  cpu: 100m
+                  memory: 256Mi
             - name: mongodb-agent
               readinessProbe:
                 exec:
@@ -68,4 +80,4 @@ spec:
                   memory: 256Mi
                 requests:
                   cpu: 100m
-                  memory: 256Mi
+                  memory: 128Mi

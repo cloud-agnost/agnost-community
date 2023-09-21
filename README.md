@@ -6,29 +6,34 @@
 
 ```bash
 curl -XPOST http://localhost:3000/mongodb -d '{
-    "mongoName": "mongodb-comm",
+    "mongoName": "mymongo",
     "mongoVersion": "6.0.4",
-    "memoryRequest": "250Mi",
-    "memoryLimit": "500Mi",
-    "cpuRequest": "200m",
-    "cpuLimit": "500m",
-    "diskSize": "5Gi",
+    "size": "5Gi",
     "userName": "appuser",
     "passwd": "P4sSW0rD",
-    "replicaCount": 3
+    "replicaCount": 1
 }' -H "Content-type: application/json"
 ```
 
 ### Update mongodb
 
 ```bash
+## Change for version and replicaCount
 curl -XPUT http://localhost:3000/mongodb -d '{
-    "mongoName": "mongodb-comm",
+    "mongoName": "mymongo",
     "mongoVersion": "6.0.5",
-    "memoryRequest": "250Mi",
-    "memoryLimit": "500Mi",
-    "cpuRequest": "200m",
-    "cpuLimit": "500m"
+    "size": "5Gi",
+    "replicaCount": 3
+}' -H "Content-type: application/json"
+```
+
+```bash
+## Change for size
+curl -XPUT http://localhost:3000/mongodb -d '{
+    "mongoName": "mymongo",
+    "mongoVersion": "6.0.5",
+    "size": "10Gi",
+    "replicaCount": 3
 }' -H "Content-type: application/json"
 ```
 
@@ -36,8 +41,7 @@ curl -XPUT http://localhost:3000/mongodb -d '{
 
 ```bash
 curl -XDELETE http://localhost:3000/mongodb -d '{
-    "mongoName": "mongodb-comm",
-    "purgeData": true
+    "mongoName": "mymongo"
 }' -H "Content-type: application/json"
 ```
 
