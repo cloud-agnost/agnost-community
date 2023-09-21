@@ -103,7 +103,7 @@
 		"realtime": "Build real-time apps that deliver a seamless user experience with our real-time database that syncs data across all connected devices in milliseconds."
 	},
 	"internalServerError": "Internal Server Error",
-	"internalServerErrorDescription": "Our apologies for the inconvenience. We're working to resolve this problem as quickly as possible. Please bear with us.",
+	"internalServerErrorDescription": "Our apologies for the inconvenience. Please help us to resolve this issue by providing the steps to replicate it, screenshots, or any other relevant information.",
 	"unauthorizedAccess": "Unauthorized Access",
 	"unauthorizedAccessDescription": "We're sorry, but you do not have the necessary authorization to access this page. Please contact the administrator for assistance or navigate back to the homepage",
 	"pageNotFound": "Page Not Found",
