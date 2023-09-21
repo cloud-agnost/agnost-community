@@ -2,6 +2,8 @@ import cluster from "cluster";
 import { getKey } from "../init/cache.js";
 import { PrimaryProcessDeploymentManager } from "../handlers/primaryProcessManager.js";
 
+var updateCount = 0;
+
 export const manageAPIServerHandler = (connection, envId) => {
 	connection.createChannel(function (error, channel) {
 		if (error) {
@@ -49,19 +51,26 @@ export const manageAPIServerHandler = (connection, envId) => {
 						if (
 							hasResourceChange ||
 							msgObj.subAction === "deploy" ||
-							msgObj.subAction === "redeploy"
+							msgObj.subAction === "redeploy" ||
+							updateCount >= config.get("general.maxUpdatesBeforeRestart")
 						) {
 							await manager.initializeCore();
 							// Restart worker(s)
 							for (const worker of Object.values(cluster.workers)) {
 								worker.kill("SIGINT");
 							}
+
+							// Reset update count
+							updateCount = 0;
 						} else {
 							await manager.initializeCore();
 							// Send a message from the master process to the worker.
 							for (const worker of Object.values(cluster.workers)) {
 								worker.send("restart");
 							}
+
+							// Increment update count
+							updateCount++;
 						}
 
 						break;
