@@ -16,36 +16,43 @@ import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { VersionTable } from '../version/Table';
 import { useMatch } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 export default function ApplicationVersions() {
 	const { t } = useTranslation();
 	const { isVersionOpen, application, closeVersionDrawer } = useApplicationStore();
-	const { getAllVersionsVisibleToUser, versions, versionPage, setVersionPage } = useVersionStore();
-
-	const [name, setName] = useState('');
-	const prevQueryRef = useRef(name);
-	const prevPageRef = useRef(versionPage);
+	const { getAllVersionsVisibleToUser, versions } = useVersionStore();
+	const [page, setPage] = useState(0);
+	const [searchParams, setSearchParams] = useSearchParams();
 
 	const match = useMatch('/organization/:orgId/apps');
 
 	const getVersions = useCallback(() => {
-		if (application?._id || (name && prevPageRef.current !== versionPage)) {
+		if (application?._id) {
 			getAllVersionsVisibleToUser({
 				appId: application?._id as string,
-				page: versionPage,
+				page,
 				size: 10,
-				...(name && { name }),
+				name: searchParams.get('q') || '',
 			});
-			prevQueryRef.current = name;
-			prevPageRef.current = versionPage;
 		}
-	}, [versionPage, name, application?._id]);
+	}, [page, searchParams, application?._id]);
 
-	function handleSearch(val: string) {
-		setName(val);
-		setVersionPage(0);
+	function onInput(value: string) {
+		value = value.trim();
+		if (!value) {
+			searchParams.delete('q');
+			setSearchParams(searchParams);
+			return;
+		}
+		setSearchParams({ ...searchParams, q: value });
 	}
 
+	function closeDrawerHandler() {
+		searchParams.delete('q');
+		setSearchParams(searchParams);
+		closeVersionDrawer(!!match);
+	}
 	useUpdateEffect(() => {
 		if (isVersionOpen) {
 			getVersions();
@@ -53,7 +60,7 @@ export default function ApplicationVersions() {
 	}, [getVersions, isVersionOpen]);
 
 	return (
-		<Drawer open={isVersionOpen} onOpenChange={() => closeVersionDrawer(!!match)}>
+		<Drawer open={isVersionOpen} onOpenChange={closeDrawerHandler}>
 			<DrawerContent position='right' size='lg'>
 				<DrawerHeader>
 					<DrawerTitle>{t('application.version.title')}</DrawerTitle>
@@ -62,12 +69,12 @@ export default function ApplicationVersions() {
 					<div className='space-y-6 p-6'>
 						<SearchInput
 							placeholder={t('application.version.search') as string}
-							onSearch={handleSearch}
+							onSearch={onInput}
 						/>
 						<InfiniteScroll
 							scrollableTarget='infinite-scroll'
 							dataLength={versions.length}
-							next={() => setVersionPage(versionPage + 1)}
+							next={() => setPage((prev) => prev + 1)}
 							hasMore={true}
 							loader={<></>}
 						>
