@@ -17,6 +17,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useLocation, useMatches, useParams, useNavigate } from 'react-router-dom';
 import './tabs.scss';
+import { useUpdateEffect } from '@/hooks';
 
 const SCROLL_AMOUNT = 200;
 
@@ -62,11 +63,11 @@ export default function Tabs() {
 	useEffect(() => {
 		const path = pathname?.split('/')?.at(-1);
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
-
 		if (item) {
 			const openTab = tabs.find((tab) => tab.path?.split('/')?.at(-1) === item.path);
 
 			if (openTab) {
+				console.log('openTab', openTab);
 				setCurrentTab(versionId, openTab.id);
 			} else {
 				addTab(versionId, {
@@ -77,13 +78,39 @@ export default function Tabs() {
 			}
 		} else {
 			const currentTab = tabs.find((tab) => tab.isActive);
-
 			if (currentTab?.path !== pathname) {
+				console.log('openTab', currentTab, currentTab?.path, pathname);
 				const targetPath = currentTab?.path || getDashboardPath();
 				navigate(targetPath);
 			}
 		}
 	}, []);
+
+	useEffect(() => {
+		const path = pathname?.split('/')?.at(-1);
+		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
+
+		if (!item) return;
+
+		const openTab = tabs.find((tab) => tab.path?.split('/')?.at(-1) === item.path);
+		if (openTab) {
+			setCurrentTab(versionId, openTab.id);
+		} else {
+			addTab(versionId, {
+				id: generateId(),
+				...item,
+				isActive: true,
+			});
+		}
+	}, []);
+
+	useUpdateEffect(() => {
+		const currentTab = tabs.find((tab) => tab.isActive);
+		if (currentTab?.path !== pathname) {
+			const targetPath = currentTab?.path || getDashboardPath();
+			navigate(targetPath);
+		}
+	}, [versionId]);
 
 	function getDashboardPath() {
 		const matched = matches.at(-1);
