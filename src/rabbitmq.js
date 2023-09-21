@@ -14,7 +14,7 @@ const group = 'rabbitmq.com';
 const version = 'v1beta1';
 const namespace = process.env.NAMESPACE;
 
-async function createRabbitmqCluster(clusterName, rmqVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, replicaCount) {
+async function createRabbitmqCluster(clusterName, rmqVersion, size, userName, passwd, replicaCount) {
   const manifest = fs.readFileSync('/manifests/rabbitmq-cluster.yaml', 'utf8');
   const resources = k8s.loadAllYaml(manifest);
 
@@ -25,7 +25,7 @@ async function createRabbitmqCluster(clusterName, rmqVersion, memoryRequest, mem
 
       switch(kind) {
         case 'Secret':
-          resource.metadata.name = clusterName + '-' + userName + '-credentials';
+          resource.metadata.name = clusterName + '-credentials';
           resource.stringData.username = userName;
           resource.stringData.password = passwd;
           resource.stringData.host = clusterName + '.' + namespace + '.svc'
@@ -34,7 +34,7 @@ async function createRabbitmqCluster(clusterName, rmqVersion, memoryRequest, mem
         case 'User':
           resource.metadata.name = clusterName + '-' + userName;
           resource.spec.rabbitmqClusterReference.name = clusterName;
-          resource.spec.importCredentialsSecret.name = clusterName + '-' + userName + '-credentials';
+          resource.spec.importCredentialsSecret.name = clusterName + '-credentials';
           const userResult = await k8sCustomApi.createNamespacedCustomObject(group, version, namespace, 'users', resource);
           break;
         case 'Permission':
@@ -47,11 +47,7 @@ async function createRabbitmqCluster(clusterName, rmqVersion, memoryRequest, mem
           resource.metadata.name = clusterName;
           resource.spec.image = 'docker.io/bitnami/rabbitmq:' + rmqVersion;
           resource.spec.replicas = replicaCount;
-          resource.spec.persistence.storage = diskSize;
-          resource.spec.resources.limits.cpu = cpuLimit;
-          resource.spec.resources.limits.memory = memoryLimit;
-          resource.spec.resources.requests.cpu = cpuRequest;
-          resource.spec.resources.requests.memory = memoryRequest;
+          resource.spec.persistence.storage = size;
           resource.spec.override.statefulSet.spec.template.spec.initContainers[0].env[0].value = rmqVersion;
           const clusterResult = await k8sCustomApi.createNamespacedCustomObject(group, version, namespace, 'rabbitmqclusters', resource);
           break;
@@ -63,57 +59,25 @@ async function createRabbitmqCluster(clusterName, rmqVersion, memoryRequest, mem
       console.error('Error applying resource:', error.body);
     }
   }
-  return "success";
+  return 'success';
 }
 
-async function updateRabbitmqCluster(clusterName, rmqVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit) {
-  const patchData = {
-    spec: {
-      image: 'docker.io/bitnami/rabbitmq:' + rmqVersion,
-      override: {
-        statefulSet: {
-          spec: {
-            template: {
-              spec: {
-                initContainers: [
-                  {
-                    name: "copy-community-plugins",
-                    env: [
-                      {
-                        name: "RMQ_VERSION",
-                        value: rmqVersion
-                      }
-                    ]
-                  }
-                ]
-              }
-            }
-          }
-        }
-      },
-      resources: {
-        limits: {
-          cpu: cpuLimit,
-          memory: memoryLimit
-        },
-        requests: {
-          cpu: cpuRequest,
-          memory: memoryRequest
-        }
-      }
-    }
-  };
-  const requestOptions = { headers: { 'Content-Type': 'application/merge-patch+json' }, };
-
+async function updateRabbitmqCluster(clusterName, rmqVersion, size, replicaCount) {
   try {
-    await k8sCustomApi.patchNamespacedCustomObject(group, version, namespace, 'rabbitmqclusters', clusterName, patchData, undefined, undefined, undefined, requestOptions);
+    const rmq = await k8sCustomApi.getNamespacedCustomObject(group, version, namespace, 'rabbitmqclusters', clusterName);
+    rmq.body.spec.image = 'docker.io/bitnami/rabbitmq:' + rmqVersion;
+    rmq.body.spec.replicas = replicaCount;
+    rmq.body.spec.persistence.storage = size;
+    rmq.body.spec.override.statefulSet.spec.template.spec.initContainers[0].env[0].value = rmqVersion;
+
+    await k8sCustomApi.replaceNamespacedCustomObject(group, version, namespace, 'rabbitmqclusters', clusterName, rmq.body);
     console.log('RabbitMQ ' + clusterName + ' updated...');
   } catch (error){
     console.error('Error updating RabbitMQ ' + clusterName + ' resources...', error);
     return error;
   }
 
-  return { result: 'success' };
+  return 'success';
 }
 
 async function deleteRabbitmqCluster(clusterName, userName) {
@@ -123,42 +87,63 @@ async function deleteRabbitmqCluster(clusterName, userName) {
     await k8sCustomApi.deleteNamespacedCustomObject(group, version, namespace, 'users', clusterName + '-' + userName);
     console.log('User ' + clusterName + '-' + userName + ' deleted...');
     await k8sCustomApi.deleteNamespacedCustomObject(group, version, namespace, 'rabbitmqclusters', clusterName);
-    console.log('Cluster ' + clusterName + 'deleted...');
-    await k8sCoreApi.deleteNamespacedSecret(clusterName + '-' + userName + '-credentials', namespace);
-    console.log('Secret ' + clusterName + '-' + userName + '-credentials deleted...');
+    console.log('Cluster ' + clusterName + ' deleted...');
+    await k8sCoreApi.deleteNamespacedSecret(clusterName + '-credentials', namespace);
+    console.log('Secret ' + clusterName + '-credentials deleted...');
   } catch (error) {
-    console.error('Error deleting resource:', error);
+    console.error('Error deleting resource:', error.body);
     return error
   }
 
-  return { result: 'success' };
+  return 'success';
+}
+
+// some helper functions
+async function waitForSecret(secretName) {
+  const pollingInterval = 2000;
+  while (true) {
+    try {
+      const response = await k8sCoreApi.readNamespacedSecret(secretName, namespace);
+      return response.body.data;
+    } catch (error) {
+      await sleep(pollingInterval);
+    }
+  }
+}
+
+// Function to simulate sleep
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
 
 // Create a RabbitMQ Cluster
 router.post('/rabbitmq', async (req, res) => {
-  const { clusterName, rmqVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, replicaCount } = req.body;
+  const { clusterName, rmqVersion, size, userName, passwd, replicaCount } = req.body;
 
   try {
-    const clusterResult = await createRabbitmqCluster(clusterName, rmqVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, replicaCount);
-    res.json({
-      rabbitmq: clusterResult.body
-    });
+    await createRabbitmqCluster(clusterName, rmqVersion, size, userName, passwd, replicaCount);
+    res.json({ 'connectionString': clusterName + '.' + namespace + '.cluster.svc.local',
+               'username': userName, 'password': passwd });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json(JSON.parse(err.message));
   }
 });
 
 // Update RabbitMQ Cluster
 router.put('/rabbitmq', async (req, res) => {
-  const { clusterName, rmqVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit, diskSize, userName, passwd, replicaCount } = req.body;
+  const { clusterName, rmqVersion, size, replicaCount } = req.body;
 
   try {
-    await updateRabbitmqCluster(clusterName, rmqVersion, memoryRequest, memoryLimit, cpuRequest, cpuLimit);
-    res.json({ 'url': clusterName + '.' + namespace + '.cluster.svc.local' });
+    await updateRabbitmqCluster(clusterName, rmqVersion, size, replicaCount);
+    var secretName = clusterName + '-credentials';
+    credentials = await waitForSecret(secretName);
+    res.json({ 'connectionString': clusterName + '.' + namespace + '.cluster.svc.local',
+               'username': Buffer.from(credentials.username, 'base64').toString('utf-8') ,
+               'password': Buffer.from(credentials.password, 'base64').toString('utf-8') });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json(JSON.parse(err.message));
   }
 });
 
@@ -167,11 +152,10 @@ router.delete('/rabbitmq', async (req, res) => {
   const { clusterName, userName } = req.body;
 
   try {
-    const delResult = await deleteRabbitmqCluster(clusterName, userName);
-    res.json({ rabbitmq: delResult});
+    await deleteRabbitmqCluster(clusterName, userName);
+    res.json({ rabbitmq: 'deleted'});
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json(JSON.parse(err.message));
   }
 });
 

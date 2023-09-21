@@ -158,7 +158,6 @@ router.post('/mysql', async (req, res) => {
     res.json({ 'connectionString': clusterName + '.' + namespace + '.cluster.svc.local',
                'username': userName, 'password': passwd, });
   } catch (err) {
-    console.error(err);
     res.status(500).json(JSON.parse(err.message));
   }
 });
@@ -175,7 +174,6 @@ router.put('/mysql', async (req, res) => {
                'password': Buffer.from(credentials.rootPassword, 'base64').toString('utf-8'),
                'username': Buffer.from(credentials.rootUser, 'base64').toString('utf-8')  });
   } catch (err) {
-    console.error(err);
     res.status(500).json(JSON.parse(err.message));
   }
 });
@@ -188,7 +186,6 @@ router.delete('/mysql', async (req, res) => {
     const delResult = await deleteMySQLResource(clusterName);
     res.json({ mysql: delResult});
   } catch (err) {
-    console.error(err);
     res.status(500).json(JSON.parse(err.message));
   }
 });

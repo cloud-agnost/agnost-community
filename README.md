@@ -226,11 +226,7 @@ curl -XDELETE http://localhost:3000/mysql -d '{
 curl -XPOST http://localhost:3000/rabbitmq -d '{
     "clusterName": "rabbitmq-test",
     "rmqVersion": "3.11.1",
-    "memoryRequest": "250Mi",
-    "memoryLimit": "500Mi",
-    "cpuRequest": "200m",
-    "cpuLimit": "500m",
-    "diskSize": "5Gi",
+    "size": "5Gi",
     "userName": "appuser",
     "passwd": "P4sSW0rD",
     "replicaCount": 1
@@ -242,11 +238,9 @@ curl -XPOST http://localhost:3000/rabbitmq -d '{
 ```bash
 curl -XPUT http://localhost:3000/rabbitmq -d '{
     "clusterName": "rabbitmq-test",
-    "memoryRequest": "512Mi",
-    "memoryLimit": "1024Mi",
-    "cpuRequest": "500m",
-    "cpuLimit": "1000m",
-    "rmqVersion": "3.12.0"
+    "rmqVersion": "3.12.0",
+    "replicaCount": 2,
+    "size": "10Gi"
 }' -H "Content-type: application/json"
 ```
 
