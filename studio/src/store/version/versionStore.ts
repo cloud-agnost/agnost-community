@@ -4,6 +4,7 @@ import {
 	APIKey,
 	AddNPMPackageParams,
 	AddVersionVariableParams,
+	BaseParams,
 	CreateAPIKeyParams,
 	CreateCopyOfVersionParams,
 	CreateRateLimitParams,
@@ -16,6 +17,7 @@ import {
 	DeleteRateLimitParams,
 	DeleteVersionParams,
 	DeleteVersionVariableParams,
+	DesignElement,
 	EditRateLimitParams,
 	GetVersionByIdParams,
 	GetVersionLogBucketsParams,
@@ -25,6 +27,7 @@ import {
 	Notification,
 	Param,
 	RateLimit,
+	SearchDesignElementParams,
 	SearchNPMPackages,
 	SearchNPMPackagesParams,
 	UpdateAPIKeyParams,
@@ -32,7 +35,6 @@ import {
 	Version,
 	VersionLog,
 	VersionLogBucket,
-	VersionParamsWithoutEnvId,
 	VersionProperties,
 	VersionRealtimeProperties,
 } from '@/types';
@@ -64,15 +66,14 @@ interface VersionStore {
 	showLogDetails: boolean;
 	notificationLastSeen: Date;
 	notificationLastFetchedCount: number;
+	designElements: DesignElement[];
 	selectVersion: (version: Version) => void;
 	setSelectedAPIKey: (key: APIKey | null) => void;
 	setEditAPIKeyDrawerIsOpen: (isOpen: boolean) => void;
 	getVersionById: (req: GetVersionByIdParams) => Promise<Version>;
 	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<void>;
 	setVersionPage: (page: number) => void;
-	updateVersionProperties: (
-		params: VersionParamsWithoutEnvId & Partial<VersionProperties>,
-	) => Promise<Version>;
+	updateVersionProperties: (params: BaseParams & Partial<VersionProperties>) => Promise<Version>;
 	createRateLimit: (params: CreateRateLimitParams) => Promise<RateLimit>;
 	deleteRateLimit: (params: DeleteRateLimitParams) => Promise<Version>;
 	orderEndpointRateLimits: (limits: string[]) => void;
@@ -111,7 +112,7 @@ interface VersionStore {
 	deleteAPIKey: (params: DeleteAPIKeyParams, showAlert?: boolean) => Promise<Version>;
 	deleteMultipleAPIKeys: (params: DeleteMultipleAPIKeys, showAlert?: boolean) => Promise<Version>;
 	updateVersionRealtimeProperties: (
-		version: VersionParamsWithoutEnvId & Partial<VersionRealtimeProperties>,
+		version: BaseParams & Partial<VersionRealtimeProperties>,
 		showAlert?: boolean,
 	) => Promise<Version>;
 	getVersionLogs: (params: GetVersionLogsParams) => Promise<void>;
@@ -121,6 +122,8 @@ interface VersionStore {
 	deleteVersion: (params: DeleteVersionParams, showAlert?: boolean) => Promise<void>;
 	getVersionNotifications: (params: GetVersionNotificationParams) => Promise<void>;
 	updateNotificationLastSeen: () => void;
+	searchDesignElements: (params: SearchDesignElementParams) => Promise<DesignElement[]>;
+	resetDesignElements: () => void;
 }
 
 const useVersionStore = create<VersionStore>()(
@@ -149,6 +152,7 @@ const useVersionStore = create<VersionStore>()(
 				lastFetchedLogCount: 0,
 				showLogDetails: false,
 				notificationLastSeen: new Date(),
+				designElements: [],
 				selectVersion: (version: Version) => {
 					set({ version });
 				},
@@ -186,7 +190,7 @@ const useVersionStore = create<VersionStore>()(
 					versionId,
 					appId,
 					...data
-				}: VersionParamsWithoutEnvId & Partial<VersionProperties>) => {
+				}: BaseParams & Partial<VersionProperties>) => {
 					try {
 						const version = await VersionService.updateVersionProperties({
 							orgId,
@@ -729,6 +733,18 @@ const useVersionStore = create<VersionStore>()(
 				},
 				updateNotificationLastSeen: () => {
 					set({ notificationLastSeen: new Date() });
+				},
+				searchDesignElements: async (params) => {
+					try {
+						const designElements = await VersionService.searchDesignElement(params);
+						set({ designElements });
+						return designElements;
+					} catch (error) {
+						throw error as APIError;
+					}
+				},
+				resetDesignElements: () => {
+					set({ designElements: [] });
 				},
 			}),
 			{
