@@ -80,7 +80,7 @@
 }
 
 .tab-dropdown-content {
-	@apply w-[272px] mr-6 mt-3;
+	@apply w-[272px] mr-6 mt-3 max-h-96 overflow-auto;
 
 	.tab-search-input {
 		input {

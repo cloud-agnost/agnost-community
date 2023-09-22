@@ -126,6 +126,7 @@ export default function Tabs() {
 		if (!container) return;
 
 		const handleScroll = () => {
+			console.log('handleScroll', container.scrollWidth > container.clientWidth);
 			setIsScrollable(container.scrollWidth > container.clientWidth);
 			setEndOfScroll(container.scrollLeft + container.clientWidth >= container.scrollWidth);
 			setStartOfScroll(container.scrollLeft === 0);
@@ -177,42 +178,44 @@ export default function Tabs() {
 
 	return (
 		<div className='navigation-tab-container'>
-			<div ref={scrollContainer}>
+			<div className='max-w-full overflow-auto'>
 				<DragDropContext onDragEnd={onDragEnd}>
 					<Droppable droppableId='TAB' direction='horizontal'>
 						{(dropProvided: DroppableProvided) => (
-							<div {...dropProvided.droppableProps} ref={dropProvided.innerRef} className='tab'>
-								{tabs.map((tab: Tab, index: number) => (
-									<Draggable key={tab.id} draggableId={tab.id} index={index}>
-										{(dragProvided: DraggableProvided) => (
-											<TabItem
-												active={tab.isActive}
-												onClose={() => tabRemoveHandler(tab)}
-												onClick={() => {
-													setCurrentTab(versionId, tab.id);
-													history.pushState(
-														{
-															tabId: tab.id,
-															type: 'tabChanged',
-														},
-														'',
-														`${tab.path}?tabId=${tab.id}`,
-													);
-												}}
-												to={`${tab.path}?tabId=${tab.id}`}
-												closeable={!tab.isDashboard}
-												isDirty={tab.isDirty}
-												provided={dragProvided}
-												title={tab.title}
-												key={tab.id}
-												type={tab.type}
-											>
-												<p className='tab-item-link-text'>{tab.title} </p>
-											</TabItem>
-										)}
-									</Draggable>
-								))}
-								{dropProvided.placeholder}
+							<div {...dropProvided.droppableProps} ref={dropProvided.innerRef}>
+								<div ref={scrollContainer} className='tab'>
+									{tabs.map((tab: Tab, index: number) => (
+										<Draggable key={tab.id} draggableId={tab.id} index={index}>
+											{(dragProvided: DraggableProvided) => (
+												<TabItem
+													active={tab.isActive}
+													onClose={() => tabRemoveHandler(tab)}
+													onClick={() => {
+														setCurrentTab(versionId, tab.id);
+														history.pushState(
+															{
+																tabId: tab.id,
+																type: 'tabChanged',
+															},
+															'',
+															`${tab.path}?tabId=${tab.id}`,
+														);
+													}}
+													to={`${tab.path}?tabId=${tab.id}`}
+													closeable={!tab.isDashboard}
+													isDirty={tab.isDirty}
+													provided={dragProvided}
+													title={tab.title}
+													key={tab.id}
+													type={tab.type}
+												>
+													<p className='tab-item-link-text'>{tab.title} </p>
+												</TabItem>
+											)}
+										</Draggable>
+									))}
+									{dropProvided.placeholder}
+								</div>
 							</div>
 						)}
 					</Droppable>
