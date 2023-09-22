@@ -17,6 +17,11 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { NOTIFICATION_ACTIONS } from '@/constants';
 import { capitalize } from '@/utils';
 
+interface MemberSearch {
+	label: string;
+	value: ApplicationMember;
+}
+
 const filterMembers = (inputValue: string) => {
 	const { tempTeam: members } = useApplicationStore.getState();
 
@@ -169,13 +174,11 @@ export default function VersionNotifications() {
 				</div>
 				<div className='space-y-3'>
 					<h5 className='text-default text-sm font-sfCompact'>Team Member</h5>
-					<AutoComplete
+					<AutoComplete<MemberSearch[]>
 						isMulti
-						cacheOptions
-						defaultOptions
 						loadOptions={promiseOptions}
 						formatOptionLabel={formatOptionLabel}
-						onChange={(value: { label: string; value: ApplicationMember }[]) => {
+						onChange={(value: MemberSearch[]) => {
 							setPage(0);
 							handleQueryParamChange('u', value.map((v) => v.value.member._id).join(','));
 						}}
