@@ -12,6 +12,7 @@ import resources from './resources.json';
 import version from './version.json';
 import task from './task.json';
 import storage from './storage.json';
+import func from './function.json';
 export {
 	storage,
 	application,
@@ -27,4 +28,5 @@ export {
 	resources,
 	version,
 	task,
+	func,
 };

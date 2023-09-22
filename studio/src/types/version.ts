@@ -183,7 +183,8 @@ export type TabTypes =
 	| 'Settings'
 	| 'Dashboard'
 	| 'Notifications'
-	| 'Queue';
+	| 'Queue'
+	| 'Function';
 
 export type DesignElementTypes = Lowercase<TabTypes>;
 export interface Tab {

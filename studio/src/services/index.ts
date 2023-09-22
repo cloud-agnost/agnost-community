@@ -9,3 +9,4 @@ export { default as DatabaseService } from './DatabaseService.ts';
 export { default as MiddlewareService } from './MiddlewareService.ts';
 export { default as ResourceService } from './ResourceService.ts';
 export { default as EndpointService } from './EndpointService.ts';
+export { default as FunctionService } from './FunctionService.ts';

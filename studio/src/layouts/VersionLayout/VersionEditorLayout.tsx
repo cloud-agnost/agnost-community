@@ -90,10 +90,12 @@ export default function VersionEditorLayout({
 						{t('general.edit')}
 					</Button>
 
-					<Button variant='secondary' onClick={onTestModalOpen}>
-						<TestTube size={20} className='text-icon-base mr-2' />
-						{t('endpoint.test.test')}
-					</Button>
+					{onTestModalOpen && (
+						<Button variant='secondary' onClick={onTestModalOpen}>
+							<TestTube size={20} className='text-icon-base mr-2' />
+							{t('endpoint.test.test')}
+						</Button>
+					)}
 					<Button variant='primary' onClick={() => handleSaveLogic()} loading={loading}>
 						<FloppyDisk size={20} className='text-icon-secondary mr-2' />
 						{t('general.save')}
