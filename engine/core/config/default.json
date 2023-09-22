@@ -44,6 +44,7 @@
         "heartbeatTimeoutSeconds": 10,
         "defaultPageSize": 20,
         "batchBucketFileDeleteSize": 1000,
-        "maxUpdatesBeforeRestart": 100
+        "maxUpdatesBeforeRestart": 100,
+        "redisKeysDefaultPageSize": 200
      }
 }

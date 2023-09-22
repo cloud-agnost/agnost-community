@@ -122,8 +122,12 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		this.manageEnvironmentVariables(this.getEnvironmentVariables());
 		// Initialize the connection manager
 		await this.setupResourceConnections();
-		// Create initial buckets if needed, don't call it with await it can run in parallel
-		this.manageStorages();
+		// Check databases
+		await this.manageDatabases();
+		// Check storages
+		await this.manageStorages();
+		// Check caches
+		await this.manageCaches();
 		// Set up the queue listeners
 		await this.manageQueues();
 		// Set up the task listeners
@@ -138,13 +142,13 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// Create the agnost server-side client instance
 		// Save agnost server side client to globals for faster access
-		/* 		const pkg = (await import("../agnost-server-client.cjs")).default;
-		const { agnost } = pkg;
-		global.agnost = agnost; */
-
-		const pkg = (await import("@agnost/server")).default;
+		const pkg = (await import("../agnost-server-client.cjs")).default;
 		const { agnost } = pkg;
 		global.agnost = agnost;
+
+		/* 		const pkg = (await import("@agnost/server")).default;
+		const { agnost } = pkg;
+		global.agnost = agnost; */
 	}
 
 	/**
@@ -213,8 +217,12 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// Set the environment variables of the API server
 		this.manageEnvironmentVariables(this.getEnvironmentVariables());
-		// Create initial buckets if needed, don't call it with await it can run in parallel
-		this.manageStorages();
+		// Check databases
+		await this.manageDatabases();
+		// Check storages
+		await this.manageStorages();
+		// Check caches
+		await this.manageCaches();
 		// Set up the queue listeners
 		await this.manageQueues();
 		// Set up the task listeners
@@ -226,6 +234,16 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// We completed server initialization and can accept incoming requests
 		global.SERVER_STATUS = "running";
+
+		// Create the agnost server-side client instance
+		// Save agnost server side client to globals for faster access
+		const pkg = (await import("../agnost-server-client.cjs")).default;
+		const { agnost } = pkg;
+		global.agnost = agnost;
+
+		/* 		const pkg = (await import("@agnost/server")).default;
+		const { agnost } = pkg;
+		global.agnost = agnost; */
 	}
 
 	/**
@@ -498,6 +516,23 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * @param  {Object} endpoint The endpoint JSON object
 	 * @param  {Array} handlers The array where the route handler will be will be added
 	 */
+	async manageDatabases() {
+		// First load the tasks configuration file
+		const dbs = await META.getDatabases();
+		if (dbs.length === 0) return;
+
+		for (const db of dbs) {
+			const adapterObj = adapterManager.getDatabaseAdapter(db.name);
+			if (adapterObj) this.addLog(`Initialized database adapter '${db.name}'`);
+			else this.addLog(`Cannot initialize database adapter '${db.name}'`);
+		}
+	}
+
+	/**
+	 * Sets up the storage resources for the api server
+	 * @param  {Object} endpoint The endpoint JSON object
+	 * @param  {Array} handlers The array where the route handler will be will be added
+	 */
 	async manageStorages() {
 		// First load the tasks configuration file
 		const storages = await META.getStorages();
@@ -505,9 +540,26 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		for (const storage of storages) {
 			const adapterObj = adapterManager.getStorageAdapter(storage.name);
-			if (adapterObj) {
+			if (adapterObj)
 				this.addLog(`Initialized storage adapter '${storage.name}'`);
-			}
+			else this.addLog(`Cannot initialize storage adapter '${storage.name}'`);
+		}
+	}
+
+	/**
+	 * Sets up the storage resources for the api server
+	 * @param  {Object} endpoint The endpoint JSON object
+	 * @param  {Array} handlers The array where the route handler will be will be added
+	 */
+	async manageCaches() {
+		// First load the tasks configuration file
+		const caches = await META.getCaches();
+		if (caches.length === 0) return;
+
+		for (const cache of caches) {
+			const adapterObj = adapterManager.getCacheAdapter(cache.name);
+			if (adapterObj) this.addLog(`Initialized cache adapter '${cache.name}'`);
+			else this.addLog(`Cannot initialize cache adapter '${cache.name}'`);
 		}
 	}
 
@@ -526,7 +578,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			if (adapterObj) {
 				adapterObj.listenMessages(queue);
 				this.addLog(`Initialized handler of queue '${queue.name}'`);
-			}
+			} else this.addLog(`Cannot initialize handler of queue '${queue.name}'`);
 		}
 	}
 
@@ -545,45 +597,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			if (adapterObj) {
 				adapterObj.listenMessages(task);
 				this.addLog(`Initialized handler of task '${task.name}'`);
-			}
-		}
-	}
-
-	/**
-	 * Sets up the message queue listeners
-	 * @param  {Object} endpoint The endpoint JSON object
-	 * @param  {Array} handlers The array where the route handler will be will be added
-	 */
-	async manageQueues() {
-		// First load the queues configuration file
-		const queueus = await META.getQueues();
-		if (queueus.length === 0) return;
-
-		for (const queue of queueus) {
-			const adapterObj = adapterManager.getQueueAdapter(queue.name);
-			if (adapterObj) {
-				adapterObj.listenMessages(queue);
-				this.addLog(`Initialized handler of queue '${queue.name}'`);
-			}
-		}
-	}
-
-	/**
-	 * Sets up the cron job listeners
-	 * @param  {Object} endpoint The endpoint JSON object
-	 * @param  {Array} handlers The array where the route handler will be will be added
-	 */
-	async manageTasks() {
-		// First load the tasks configuration file
-		const tasks = await META.getTasks();
-		if (tasks.length === 0) return;
-
-		for (const task of tasks) {
-			const adapterObj = adapterManager.getTaskAdapter(task.name);
-			if (adapterObj) {
-				adapterObj.listenMessages(task);
-				this.addLog(`Initialized handler of task '${task.name}'`);
-			}
+			} else this.addLog(`Cannot initialize handler of task '${task.name}'`);
 		}
 	}
 }

@@ -1,5 +1,4 @@
 import redis from "redis";
-import util from "util";
 
 //Redis client
 var client;
@@ -14,34 +13,26 @@ export const connectToRedisCache = async (callback) => {
 
 	try {
 		let cacheConfig = config.get("cache");
-		client = redis.createClient({
-			host: process.env.CACHE_HOSTNAME,
-			port: cacheConfig.port,
-			password:
-				process.env.CACHE_PWD && process.env.CACHE_PWD !== "null"
-					? process.env.CACHE_PWD
-					: undefined,
-		});
+		client = await redis
+			.createClient({
+				socket: { host: process.env.CACHE_HOSTNAME, port: cacheConfig.port },
+				password:
+					process.env.CACHE_PWD && process.env.CACHE_PWD !== "null"
+						? process.env.CACHE_PWD
+						: undefined,
+			})
+			.on("error", function (err) {
+				console.log("***err", err);
+				logger.error(`Cannot connect to the cache server`, { details: err });
+				process.exit(1);
+			})
+			.connect();
 
-		client.on("connect", function () {
-			// Promisify the methods
-			client.get = util.promisify(client.get);
-			client.set = util.promisify(client.set);
-			client.del = util.promisify(client.del);
-			client.scan = util.promisify(client.scan);
-
-			logger.info(
-				`Connected to the cache server @${process.env.CACHE_HOSTNAME}:${cacheConfig.port}`
-			);
-
-			// If we have a callback function and do not have a read replica cache then execute the callback function
-			if (callback && !readReplicaConfig) callback();
-		});
-
-		client.on("error", function (err) {
-			logger.error(`Cannot connect to the cache server`, { details: err });
-			process.exit(1);
-		});
+		logger.info(
+			`Connected to the cache server @${process.env.CACHE_HOSTNAME}:${cacheConfig.port}`
+		);
+		// If we have a callback function and do not have a read replica cache then execute the callback function
+		if (callback && !readReplicaConfig) callback();
 	} catch (err) {
 		logger.error(`Cannot connect to the cache server`, { details: err });
 		process.exit(1);
@@ -49,35 +40,32 @@ export const connectToRedisCache = async (callback) => {
 
 	if (readReplicaConfig) {
 		try {
-			clientReadReplica = redis.createClient({
-				host: process.env.CACHE_READ_REPLICA_HOSTNAME,
-				port: readReplicaConfig.port,
-				password:
-					process.env.CACHE_READ_REPLICA_PWD &&
-					process.env.CACHE_READ_REPLICA_PWD !== "null"
-						? process.env.CACHE_READ_REPLICA_PWD
-						: undefined,
-			});
+			clientReadReplica = await redis
+				.createClient({
+					socket: {
+						host: process.env.CACHE_READ_REPLICA_HOSTNAME,
+						port: readReplicaConfig.port,
+					},
+					password:
+						process.env.CACHE_READ_REPLICA_PWD &&
+						process.env.CACHE_READ_REPLICA_PWD !== "null"
+							? process.env.CACHE_READ_REPLICA_PWD
+							: undefined,
+				})
+				.on("error", function (err) {
+					logger.error(`Cannot connect to the replica cache server`, {
+						details: err,
+					});
+					process.exit(1);
+				})
+				.connect();
 
-			clientReadReplica.on("connect", async function () {
-				// Promisify the get method
-				clientReadReplica.get = util.promisify(clientReadReplica.get);
-				clientReadReplica.scan = util.promisify(clientReadReplica.scan);
+			logger.info(
+				`Connected to the read replica cache server @${process.env.CACHE_READ_REPLICA_HOSTNAME}:${readReplicaConfig.port}`
+			);
 
-				logger.info(
-					`Connected to the read replica cache server @${process.env.CACHE_READ_REPLICA_HOSTNAME}:${readReplicaConfig.port}`
-				);
-
-				// If we have a callback function then execute it
-				if (callback) callback();
-			});
-
-			clientReadReplica.on("error", function (err) {
-				logger.error(`Cannot connect to the replica cache server`, {
-					details: err,
-				});
-				process.exit(1);
-			});
+			// If we have a callback function then execute it
+			if (callback) callback();
 		} catch (err) {
 			logger.error(`Cannot connect to the cache read replica server`, {
 				details: err,
@@ -87,29 +75,18 @@ export const connectToRedisCache = async (callback) => {
 	}
 };
 
-export const disconnectFromRedisCache = () => {
-	if (client) client.quit();
+export const disconnectFromRedisCache = async () => {
+	if (client) client.disconnect();
 	logger.info("Disconnected from the cache server");
 
 	if (clientReadReplica) {
-		clientReadReplica.quit();
+		clientReadReplica.disconnect();
 		logger.info("Disconnected from the read-replica cache server");
 	}
 };
 
 export const getRedisClient = () => {
 	return client;
-};
-
-export const getRedisClientForInit = () => {
-	//If we have the read replica cache then connect to it
-	let readReplicaConfig = null;
-	try {
-		readReplicaConfig = config.get("cache.readReplica");
-	} catch (err) {}
-
-	if (readReplicaConfig) return clientReadReplica;
-	else return client;
 };
 
 /**

@@ -155,6 +155,16 @@ export class AdapterManager {
 	}
 
 	/**
+	 * Returns the cache connection object matching the name
+	 * @param  {string} name The design name of the resource
+	 * @param  {boolean} readOnly Whether to return the read-only connection if available otherwise return read-write connection
+	 */
+	getCacheAdapter2(name) {
+		const adapterObj = this.getAdapterObject3(name, "cache");
+		return adapterObj;
+	}
+
+	/**
 	 * Returns the storage connection object matching the name
 	 * @param  {string} name The design name of the resource
 	 */
@@ -470,7 +480,7 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, accessReadOnly, iid, instance, type, name } = resource;
+			const { access, iid, instance, type, name } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -539,62 +549,76 @@ export class AdapterManager {
 
 		try {
 			const { access, accessReadOnly, iid, instance, type, name } = resource;
-			let connSettings = access;
+			let client = await this.createRedisClient(access, false);
 
-			let client = redis.createClient({
-				host: connSettings.host,
-				port: connSettings.port,
-				password:
-					connSettings.password && connSettings.password !== "null"
-						? connSettings.password
-						: undefined,
-				database: connSettings.databaseNumber ?? 0,
-			});
+			if (!client) return;
 
-			client.on("connect", () => {
-				const adapterObj = {
-					name,
-					type,
-					instance,
-					iid,
-					readOnly: false,
-					adapter: new Redis(client),
-					slaves: [],
-				};
+			const adapterObj = {
+				name,
+				type,
+				instance,
+				iid,
+				readOnly: false,
+				adapter: new Redis(client),
+				slaves: [],
+			};
 
-				this.adapters.set(resource.iid, adapterObj);
+			this.adapters.set(resource.iid, adapterObj);
 
-				// Add readonly connections as slave
-				if (accessReadOnly) {
-					for (let i = 0; i < accessReadOnly.length; i++) {
-						let config = accessReadOnly[i];
+			// Add readonly connections as slave
+			if (accessReadOnly) {
+				for (let i = 0; i < accessReadOnly.length; i++) {
+					let config = accessReadOnly[i];
 
-						try {
-							const slaveClient = redis.createClient({
-								host: config.host,
-								port: config.port,
-								password:
-									config.password && config.password !== "null"
-										? config.password
-										: undefined,
-								database: config.databaseNumber ?? 0,
-							});
+					try {
+						const slaveClient = await this.createRedisClient(config, true);
+						if (!slaveClient) continue;
 
-							adapterObj.slaves.push({
-								name,
-								type,
-								instance,
-								iid,
-								readOnly: true,
-								adapter: new SQLServer(slaveClient),
-							});
-						} catch (err) {}
-					}
+						adapterObj.slaves.push({
+							name,
+							type,
+							instance,
+							iid,
+							readOnly: true,
+							adapter: new Redis(slaveClient),
+						});
+					} catch (err) {}
 				}
-			});
-
-			client.on("error", (err) => {});
+			}
 		} catch (err) {}
+	}
+
+	/**
+	 * Returns true if successfully connects to the Redis cache otherwise throws an exception
+	 * @param  {object} connSettings The connection settings needed to connect to the Redis cache
+	 * @param  {boolean} readOnly Connect in READONLY mode
+	 */
+	async createRedisClient(connSettings, readOnly) {
+		try {
+			let redisClient = await redis
+				.createClient({
+					...helper.getAsObject(connSettings.options),
+					socket: {
+						host: connSettings.host,
+						port: connSettings.port,
+						tls: connSettings.tls ?? false,
+					},
+					password:
+						connSettings.password && connSettings.password !== "null"
+							? connSettings.password
+							: undefined,
+					database: connSettings.databaseNumber ?? 0,
+					readonly: readOnly,
+				})
+				.on("error", (err) => {
+					redisClient = null;
+				})
+				.connect();
+
+			return redisClient;
+		} catch (err) {
+			return null;
+		}
 	}
 
 	/**

@@ -18,6 +18,9 @@ export const applyTimeout = (endpoint) => (req, res, next) => {
 					)
 				);
 		} else res.status(504).end();
+
+		// Restart the process
+		process.exit(1);
 	}, endpoint.timeout);
 
 	// Function to clear the timeout

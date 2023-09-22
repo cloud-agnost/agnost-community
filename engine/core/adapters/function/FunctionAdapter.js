@@ -25,7 +25,7 @@ export class FunctionAdapter {
 		const funcHandler = functionModule.default;
 		// Check the function module has a default exprot or not
 		if (!funcHandler) {
-			throw new Error(
+			throw new AgnostError(
 				t(
 					"The helper function '%s' code does not have a default exported function.",
 					functionName
@@ -41,7 +41,7 @@ export class FunctionAdapter {
 				(funcHandler.constructor || funcHandler.call || funcHandler.apply)
 			)
 		) {
-			throw new Error(
+			throw new AgnostError(
 				t(
 					"Function specified in helper function '%s' is not valid. A callable function is required.",
 					functionName
@@ -53,7 +53,7 @@ export class FunctionAdapter {
 			// Run the function
 			return await funcHandler(...params);
 		} catch (error) {
-			throw new Error(
+			throw new AgnostError(
 				t(
 					"An error occurred while running the '%s' helper function. %s",
 					functionName,

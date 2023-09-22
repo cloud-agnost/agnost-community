@@ -630,6 +630,7 @@ async function checkRedisConnection(connSettings) {
 	return new Promise((resolve, reject) => {
 		try {
 			let redisClient = redis.createClient({
+				...helper.getAsObject(connSettings.options),
 				host: connSettings.host,
 				port: connSettings.port,
 				password:

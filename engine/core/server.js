@@ -9,7 +9,6 @@ import { fileURLToPath } from "url";
 import {
 	connectToRedisCache,
 	disconnectFromRedisCache,
-	getRedisClient,
 	getKey,
 } from "./init/cache.js";
 import { connectToDatabase, disconnectFromDatabase } from "./init/db.js";
@@ -63,19 +62,17 @@ if (cluster.isPrimary) {
 	connectToQueue(false);
 	// Connect to cache server(s)
 	connectToRedisCache();
-	getRedisClient().on("connect", async function () {
-		// Create the child process manager which will set up the API server
-		const manager = new ChildProcessDeploymentManager(null, null, i18n);
-		await manager.initializeCore();
-		childManager = manager;
+	// Create the child process manager which will set up the API server
+	const manager = new ChildProcessDeploymentManager(null, null, i18n);
+	await manager.initializeCore();
+	childManager = manager;
 
-		// Listen for child process update messages (not restart but update)
-		process.on("message", (message) => {
-			if (message === "restart") {
-				logger.info(`Child process update started`);
-				childManager.restartCore();
-			}
-		});
+	// Listen for child process update messages (not restart but update)
+	process.on("message", (message) => {
+		if (message === "restart") {
+			logger.info(`Child process update started`);
+			childManager.restartCore();
+		}
 	});
 	// Connect to synchronization server
 	initializeSyncClient();
@@ -87,7 +84,7 @@ if (cluster.isPrimary) {
 		// Disconnect all connections/adapters
 		await adapterManager.disconnectAll();
 		// Close connection to cache server(s)
-		disconnectFromRedisCache();
+		await disconnectFromRedisCache();
 		// Close connection to the database
 		await disconnectFromDatabase();
 		// Close synchronization server connection
@@ -188,7 +185,7 @@ function handlePrimaryProcessExit() {
 	//Gracefully exit if we force quit through cntr+C
 	process.on("SIGINT", async () => {
 		// Close connection to cache server(s)
-		disconnectFromRedisCache();
+		await disconnectFromRedisCache();
 		// Close connection to message queue
 		disconnectFromQueue();
 	});

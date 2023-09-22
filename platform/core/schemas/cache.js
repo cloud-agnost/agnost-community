@@ -36,6 +36,11 @@ export const CacheModel = mongoose.model(
 				required: true,
 				index: true,
 			},
+			assignUniqueName: {
+				type: Boolean,
+				required: true,
+				default: true,
+			},
 			createdBy: {
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "user",
@@ -100,6 +105,134 @@ export const applyRules = (type) => {
 					.toInt(),
 			];
 		case "create":
+			return [
+				body("name")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isLength({
+						min: config.get("general.minNameLength"),
+						max: config.get("general.maxTextLength"),
+					})
+					.withMessage(
+						t(
+							"Name must be minimum %s and maximum %s characters long",
+							config.get("general.minNameLength"),
+							config.get("general.maxTextLength")
+						)
+					)
+					.bail()
+					.custom((value) => {
+						let regex = /^[A-Za-z0-9_]+$/;
+						if (!regex.test(value)) {
+							throw new AgnostError(
+								t(
+									"Cache names can include only numbers, letters and underscore (_) characters"
+								)
+							);
+						}
+
+						let regex2 = /^[0-9].*$/;
+						if (regex2.test(value)) {
+							throw new AgnostError(
+								t("Cache names cannot start with a number")
+							);
+						}
+
+						if (value.startsWith("_")) {
+							throw new AgnostError(
+								t("Cache names cannot start with underscore (_) character")
+							);
+						}
+
+						//Indicates the success of this synchronous custom validator
+						return true;
+					})
+					.bail()
+					.custom(async (value, { req }) => {
+						//Check whether model name is unique or not
+						let caches = await CacheModel.find({
+							versionId: req.version._id,
+						});
+						caches.forEach((cache) => {
+							if (
+								(cache.name.toLowerCase() === value.toLowerCase() &&
+									type === "create") ||
+								(cache.name.toLowerCase() === value.toLowerCase() &&
+									type === "update" &&
+									req.cache._id.toString() !== cache._id.toString())
+							)
+								throw new AgnostError(
+									t("Cache with the provided name already exists")
+								);
+						});
+
+						if (value.toLowerCase() === "this") {
+							throw new AgnostError(
+								t(
+									"'%s' is a reserved keyword and cannot be used as Cache name",
+									value
+								)
+							);
+						}
+
+						//Indicates the success of this synchronous custom validator
+						return true;
+					}),
+				body("assignUniqueName")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
+				body("resourceId")
+					.if(() => type === "create")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom(async (value, { req }) => {
+						if (!helper.isValidId(value))
+							throw new AgnostError(t("Not a valid resource identifier"));
+
+						let resource = await resourceCtrl.getOneById(value, {
+							cacheKey: value,
+						});
+
+						if (!resource)
+							throw new AgnostError(
+								t("No such resource with the provided id '%s' exists.", value)
+							);
+
+						// Check if the selected resource is a cache
+						if (resource.type !== "cache")
+							throw new AgnostError(
+								t(
+									"The selected resource '%s' (%s) is not a cache",
+									resource.name,
+									resource.instance
+								)
+							);
+
+						// Check the status of the resource whether it is in OK status or not
+						if (resource.status !== "OK")
+							throw new AgnostError(
+								t(
+									"Only resorces in ready (OK) status can be mapped to a cache. The selected '%s' resoure '%s' is in '%s' status",
+									resource.instance,
+									resource.name,
+									resource.status
+								)
+							);
+
+						// Assign the resource object
+						req.resource = resource;
+						return true;
+					}),
+			];
 		case "update":
 			return [
 				body("name")
@@ -151,7 +284,7 @@ export const applyRules = (type) => {
 						let caches = await CacheModel.find({
 							versionId: req.version._id,
 						});
-						Cache.forEach((cache) => {
+						caches.forEach((cache) => {
 							if (
 								(cache.name.toLowerCase() === value.toLowerCase() &&
 									type === "create") ||
@@ -174,50 +307,6 @@ export const applyRules = (type) => {
 						}
 
 						//Indicates the success of this synchronous custom validator
-						return true;
-					}),
-				body("resourceId")
-					.if(() => type === "create")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom(async (value, { req }) => {
-						if (!helper.isValidId(value))
-							throw new AgnostError(t("Not a valid resource identifier"));
-
-						let resource = await resourceCtrl.getOneById(value, {
-							cacheKey: value,
-						});
-
-						if (!resource)
-							throw new AgnostError(
-								t("No such resource with the provided id '%s' exists.", value)
-							);
-
-						// Check if the selected resource is a cache
-						if (resource.type !== "cache")
-							throw new AgnostError(
-								t(
-									"The selected resource '%s' (%s) is not a cache",
-									resource.name,
-									resource.instance
-								)
-							);
-
-						// Check the status of the resource whether it is in OK status or not
-						if (resource.status !== "OK")
-							throw new AgnostError(
-								t(
-									"Only resorces in ready (OK) status can be mapped to a cache. The selected '%s' resoure '%s' is in '%s' status",
-									resource.instance,
-									resource.name,
-									resource.status
-								)
-							);
-
-						// Assign the resource object
-						req.resource = resource;
 						return true;
 					}),
 			];

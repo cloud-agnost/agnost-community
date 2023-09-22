@@ -167,7 +167,7 @@ export class DatabaseBase {
 	}
 
 	/**
-	 * Returns the database iid (internal identifier)
+	 * Returns the environment iid (internal identifier)
 	 */
 	getEnvId() {
 		return META.getEnvId();
