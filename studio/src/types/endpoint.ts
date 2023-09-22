@@ -11,7 +11,7 @@ import * as z from 'zod';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const;
 
-export type Method = 'POST' | 'GET' | 'PUT' | 'DELETE';
+export type HttpMethod = 'POST' | 'GET' | 'PUT' | 'DELETE';
 
 export const CreateEndpointSchema = z.object({
 	name: z
@@ -130,7 +130,7 @@ export interface Endpoint {
 	versionId: string;
 	iid: string;
 	name: string;
-	method: Method;
+	method: HttpMethod;
 	path: string;
 	fingerprint: string;
 	timeout: number;
@@ -151,7 +151,7 @@ export interface Endpoint {
 
 export interface CreateEndpointParams extends BaseParams, BaseRequest {
 	name: string;
-	method: Method;
+	method: HttpMethod;
 	path: string;
 	apiKeyRequired: boolean;
 	sessionRequired: boolean;

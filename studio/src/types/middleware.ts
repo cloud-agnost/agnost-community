@@ -1,7 +1,6 @@
-import { VersionParamsWithoutEnvId } from '@/types/version.ts';
-import { Middleware } from '@/types/type.ts';
+import { BaseParams, Middleware } from '@/types';
 
-export type GetMiddlewaresOfAppVersionParams = VersionParamsWithoutEnvId & {
+export type GetMiddlewaresOfAppVersionParams = BaseParams & {
 	page: number;
 	size: number;
 	search?: string;
@@ -11,16 +10,16 @@ export type GetMiddlewaresOfAppVersionParams = VersionParamsWithoutEnvId & {
 	end?: number;
 };
 
-export type GetMiddlewareByIdParams = VersionParamsWithoutEnvId & {
+export type GetMiddlewareByIdParams = BaseParams & {
 	mwId: string;
 };
 
 export type DeleteMiddlewareParams = GetMiddlewareByIdParams;
-export type DeleteMultipleMiddlewares = VersionParamsWithoutEnvId & {
+export type DeleteMultipleMiddlewares = BaseParams & {
 	middlewareIds: string[];
 };
 
-export type CreateMiddlewareParams = VersionParamsWithoutEnvId & {
+export type CreateMiddlewareParams = BaseParams & {
 	name: string;
 };
 

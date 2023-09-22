@@ -1,3 +1,4 @@
+import { NOTIFICATION_ACTIONS } from '@/constants';
 import { realtimeObjectMapper } from '@/helpers/realtime';
 import useAuthStore from '@/store/auth/authStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -22,26 +23,27 @@ export default function useRealtime() {
 					id,
 					type,
 				});
-				console.log('message', message);
-				useVersionStore.setState({
-					notificationsPreview: [
-						{
-							_id: generateId(),
-							...identifiers,
-							orgId: identifiers.orgId as string,
-							appId: identifiers.appId as string,
-							versionId: identifiers.versionId as string,
-							object,
-							action: action as NotificationActions,
-							actor: message.actor,
-							description: message.description,
-							data,
-							createdAt: new Date(timestamp).toISOString(),
-							__v: 0,
-						},
-						...useVersionStore.getState().notificationsPreview,
-					],
-				});
+				if (NOTIFICATION_ACTIONS.includes(action)) {
+					useVersionStore.setState({
+						notificationsPreview: [
+							{
+								_id: generateId(),
+								...identifiers,
+								orgId: identifiers.orgId as string,
+								appId: identifiers.appId as string,
+								versionId: identifiers.versionId as string,
+								object,
+								action: action as NotificationActions,
+								actor: message.actor,
+								description: message.description,
+								data,
+								createdAt: new Date(timestamp).toISOString(),
+								__v: 0,
+							},
+							...useVersionStore.getState().notificationsPreview,
+						],
+					});
+				}
 			}
 		});
 

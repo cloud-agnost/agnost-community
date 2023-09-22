@@ -15,6 +15,7 @@ import {
 	DeleteRateLimitParams,
 	DeleteVersionParams,
 	DeleteVersionVariableParams,
+	DesignElement,
 	EditRateLimitParams,
 	EnvLog,
 	Environment,
@@ -26,6 +27,7 @@ import {
 	Notification,
 	ResLog,
 	Resource,
+	SearchDesignElementParams,
 	SearchNPMPackages,
 	SearchNPMPackagesParams,
 	UpdateAPIKeyParams,
@@ -320,6 +322,21 @@ export default class VersionService {
 		return (
 			await axios.get(`v1/log/org/${orgId}/app/${appId}/version/${versionId}`, {
 				params,
+			})
+		).data;
+	}
+
+	static async searchDesignElement({
+		orgId,
+		appId,
+		versionId,
+		keyword,
+	}: SearchDesignElementParams): Promise<DesignElement[]> {
+		return (
+			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/search`, {
+				params: {
+					keyword,
+				},
 			})
 		).data;
 	}

@@ -62,8 +62,8 @@ import useVersionStore from '@/store/version/versionStore.ts';
 import {
 	Application,
 	EnvironmentStatus,
+	HttpMethod,
 	Instance,
-	Method,
 	SortOption,
 	Tab,
 	TabTypes,
@@ -770,7 +770,7 @@ export const ENDPOINT_OPTIONS: SortOption[] = [
 	},
 ];
 
-export const ALL_HTTP_METHODS: Method[] = ['GET', 'POST', 'PUT', 'DELETE'];
+export const ALL_HTTP_METHODS: HttpMethod[] = ['GET', 'POST', 'PUT', 'DELETE'];
 
 export const HTTP_METHOD_BADGE_MAP: Record<string, BadgeColors> = {
 	GET: 'blue',
@@ -938,6 +938,7 @@ export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
 	Cache: Cache,
 	Endpoint: ApiKeys,
 	'Message Queue': MessageQueue,
+	Queue: MessageQueue,
 	Task: Calendar,
 	Middleware: Middleware,
 	Settings: GearSix,

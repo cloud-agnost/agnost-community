@@ -17,6 +17,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useLocation, useMatches, useParams, useNavigate } from 'react-router-dom';
 import './tabs.scss';
+import { useUpdateEffect } from '@/hooks';
 
 const SCROLL_AMOUNT = 200;
 
@@ -62,11 +63,11 @@ export default function Tabs() {
 	useEffect(() => {
 		const path = pathname?.split('/')?.at(-1);
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
-
 		if (item) {
 			const openTab = tabs.find((tab) => tab.path?.split('/')?.at(-1) === item.path);
 
 			if (openTab) {
+				console.log('openTab', openTab);
 				setCurrentTab(versionId, openTab.id);
 			} else {
 				addTab(versionId, {
@@ -77,13 +78,39 @@ export default function Tabs() {
 			}
 		} else {
 			const currentTab = tabs.find((tab) => tab.isActive);
-
 			if (currentTab?.path !== pathname) {
+				console.log('openTab', currentTab, currentTab?.path, pathname);
 				const targetPath = currentTab?.path || getDashboardPath();
 				navigate(targetPath);
 			}
 		}
 	}, []);
+
+	useEffect(() => {
+		const path = pathname?.split('/')?.at(-1);
+		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
+
+		if (!item) return;
+
+		const openTab = tabs.find((tab) => tab.path?.split('/')?.at(-1) === item.path);
+		if (openTab) {
+			setCurrentTab(versionId, openTab.id);
+		} else {
+			addTab(versionId, {
+				id: generateId(),
+				...item,
+				isActive: true,
+			});
+		}
+	}, []);
+
+	useUpdateEffect(() => {
+		const currentTab = tabs.find((tab) => tab.isActive);
+		if (currentTab?.path !== pathname) {
+			const targetPath = currentTab?.path || getDashboardPath();
+			navigate(targetPath);
+		}
+	}, [versionId]);
 
 	function getDashboardPath() {
 		const matched = matches.at(-1);
@@ -99,6 +126,7 @@ export default function Tabs() {
 		if (!container) return;
 
 		const handleScroll = () => {
+			console.log('handleScroll', container.scrollWidth > container.clientWidth);
 			setIsScrollable(container.scrollWidth > container.clientWidth);
 			setEndOfScroll(container.scrollLeft + container.clientWidth >= container.scrollWidth);
 			setStartOfScroll(container.scrollLeft === 0);
@@ -150,42 +178,44 @@ export default function Tabs() {
 
 	return (
 		<div className='navigation-tab-container'>
-			<div ref={scrollContainer}>
+			<div className='max-w-full overflow-auto'>
 				<DragDropContext onDragEnd={onDragEnd}>
 					<Droppable droppableId='TAB' direction='horizontal'>
 						{(dropProvided: DroppableProvided) => (
-							<div {...dropProvided.droppableProps} ref={dropProvided.innerRef} className='tab'>
-								{tabs.map((tab: Tab, index: number) => (
-									<Draggable key={tab.id} draggableId={tab.id} index={index}>
-										{(dragProvided: DraggableProvided) => (
-											<TabItem
-												active={tab.isActive}
-												onClose={() => tabRemoveHandler(tab)}
-												onClick={() => {
-													setCurrentTab(versionId, tab.id);
-													history.pushState(
-														{
-															tabId: tab.id,
-															type: 'tabChanged',
-														},
-														'',
-														`${tab.path}?tabId=${tab.id}`,
-													);
-												}}
-												to={`${tab.path}?tabId=${tab.id}`}
-												closeable={!tab.isDashboard}
-												isDirty={tab.isDirty}
-												provided={dragProvided}
-												title={tab.title}
-												key={tab.id}
-												type={tab.type}
-											>
-												<p className='tab-item-link-text'>{tab.title} </p>
-											</TabItem>
-										)}
-									</Draggable>
-								))}
-								{dropProvided.placeholder}
+							<div {...dropProvided.droppableProps} ref={dropProvided.innerRef}>
+								<div ref={scrollContainer} className='tab'>
+									{tabs.map((tab: Tab, index: number) => (
+										<Draggable key={tab.id} draggableId={tab.id} index={index}>
+											{(dragProvided: DraggableProvided) => (
+												<TabItem
+													active={tab.isActive}
+													onClose={() => tabRemoveHandler(tab)}
+													onClick={() => {
+														setCurrentTab(versionId, tab.id);
+														history.pushState(
+															{
+																tabId: tab.id,
+																type: 'tabChanged',
+															},
+															'',
+															`${tab.path}?tabId=${tab.id}`,
+														);
+													}}
+													to={`${tab.path}?tabId=${tab.id}`}
+													closeable={!tab.isDashboard}
+													isDirty={tab.isDirty}
+													provided={dragProvided}
+													title={tab.title}
+													key={tab.id}
+													type={tab.type}
+												>
+													<p className='tab-item-link-text'>{tab.title} </p>
+												</TabItem>
+											)}
+										</Draggable>
+									))}
+									{dropProvided.placeholder}
+								</div>
 							</div>
 						)}
 					</Droppable>

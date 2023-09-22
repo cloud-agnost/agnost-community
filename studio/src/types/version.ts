@@ -1,3 +1,4 @@
+import { HttpMethod } from '.';
 import { BaseGetRequest, BaseParams, User } from './type';
 
 export interface APIKey {
@@ -181,7 +182,10 @@ export type TabTypes =
 	| 'Middleware'
 	| 'Settings'
 	| 'Dashboard'
-	| 'Notifications';
+	| 'Notifications'
+	| 'Queue';
+
+export type DesignElementTypes = Lowercase<TabTypes>;
 export interface Tab {
 	id: string;
 	title: string;
@@ -192,6 +196,17 @@ export interface Tab {
 	type: TabTypes;
 }
 
+export interface DesignElement {
+	_id: string;
+	versionId: string;
+	name: string;
+	type: DesignElementTypes;
+	meta: {
+		method: HttpMethod;
+		path: string;
+	};
+}
+
 export interface VersionParams {
 	orgId: string;
 	appId: string;
@@ -199,20 +214,19 @@ export interface VersionParams {
 	envId: string;
 }
 
-export type VersionParamsWithoutEnvId = Omit<VersionParams, 'envId'>;
-export type GetVersionByIdParams = VersionParamsWithoutEnvId;
-export type DeleteVersionParams = VersionParamsWithoutEnvId;
-export type CreateRateLimitParams = VersionParamsWithoutEnvId & {
+export type GetVersionByIdParams = BaseParams;
+export type DeleteVersionParams = BaseParams;
+export type CreateRateLimitParams = BaseParams & {
 	rate: number;
 	duration: number;
 	name: string;
 	errorMessage: string;
 };
-export type DeleteRateLimitParams = VersionParamsWithoutEnvId & {
+export type DeleteRateLimitParams = BaseParams & {
 	limitId: string;
 };
 
-export type DeleteMultipleRateLimitsParams = VersionParamsWithoutEnvId & {
+export type DeleteMultipleRateLimitsParams = BaseParams & {
 	limitIds: string[];
 };
 
@@ -230,40 +244,39 @@ export type VersionRealtimeProperties = {
 	rateLimits: string[];
 };
 
-export type UpdateVersionPropertiesParams = VersionParamsWithoutEnvId & VersionProperties;
-export type UpdateVersionRealtimePropertiesParams = VersionParamsWithoutEnvId &
-	VersionRealtimeProperties;
+export type UpdateVersionPropertiesParams = BaseParams & VersionProperties;
+export type UpdateVersionRealtimePropertiesParams = BaseParams & VersionRealtimeProperties;
 
-export type SearchNPMPackagesParams = VersionParamsWithoutEnvId & {
+export type SearchNPMPackagesParams = BaseParams & {
 	page: number;
 	size: number;
 	package: string;
 	sortBy?: string;
 };
 
-export type AddNPMPackageParams = VersionParamsWithoutEnvId & {
+export type AddNPMPackageParams = BaseParams & {
 	name: string;
 	version: string;
 	description: string;
 };
 
-export type DeleteNPMPackageParams = VersionParamsWithoutEnvId & {
+export type DeleteNPMPackageParams = BaseParams & {
 	packageId: string;
 };
 
-export type DeleteMultipleNPMPackagesParams = VersionParamsWithoutEnvId & {
+export type DeleteMultipleNPMPackagesParams = BaseParams & {
 	packageIds: string[];
 };
 
-export type DeleteVersionVariableParams = VersionParamsWithoutEnvId & {
+export type DeleteVersionVariableParams = BaseParams & {
 	paramId: string;
 };
 
-export type DeleteMultipleVersionVariablesParams = VersionParamsWithoutEnvId & {
+export type DeleteMultipleVersionVariablesParams = BaseParams & {
 	paramIds: string[];
 };
 
-export type AddVersionVariableParams = VersionParamsWithoutEnvId & {
+export type AddVersionVariableParams = BaseParams & {
 	name: string;
 	value: string;
 };
@@ -272,7 +285,7 @@ export type UpdateVersionVariableParams = AddVersionVariableParams & {
 	paramId: string;
 };
 
-export type CreateCopyOfVersionParams = Omit<VersionParamsWithoutEnvId, 'versionId'> & {
+export type CreateCopyOfVersionParams = Omit<BaseParams, 'versionId'> & {
 	name: string;
 	private: boolean;
 	readOnly: boolean;
@@ -283,7 +296,7 @@ export type EditRateLimitParams = CreateRateLimitParams & {
 	limitId: string;
 };
 
-export type CreateAPIKeyParams = VersionParamsWithoutEnvId & {
+export type CreateAPIKeyParams = BaseParams & {
 	name: string;
 	allowRealtime: boolean;
 	type: APIKeyTypes;
@@ -296,13 +309,16 @@ export type CreateAPIKeyParams = VersionParamsWithoutEnvId & {
 	authorizedIPs?: string[];
 };
 
-export type UpdateAPIKeyParams = VersionParamsWithoutEnvId &
+export type UpdateAPIKeyParams = BaseParams &
 	CreateAPIKeyParams & {
 		keyId: string;
 	};
-export type DeleteAPIKeyParams = VersionParamsWithoutEnvId & {
+export type DeleteAPIKeyParams = BaseParams & {
 	keyId: string;
 };
-export type DeleteMultipleAPIKeys = VersionParamsWithoutEnvId & {
+export type DeleteMultipleAPIKeys = BaseParams & {
 	keyIds: string[];
+};
+export type SearchDesignElementParams = BaseParams & {
+	keyword: string;
 };

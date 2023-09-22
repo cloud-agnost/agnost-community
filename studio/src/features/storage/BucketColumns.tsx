@@ -37,19 +37,18 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
-		cell: ({ row: { original } }) => {
-			const { name } = original;
+		cell: ({ row: { original } }) => (
 			<TabLink
-				name={name}
-				path={`${name}`}
-				className='link'
+				name={original.name}
+				path={original.name}
+				type='Storage'
 				onClick={() => {
 					useStorageStore.setState({ bucket: original });
 				}}
-				type='Storage'
-			/>;
-		},
+			/>
+		),
 	},
+
 	{
 		id: 'visibility',
 		header: translate('storage.bucket.visibility.title'),

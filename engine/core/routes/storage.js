@@ -124,6 +124,31 @@ router.get(
 
 /*
 @route      /storage/:storageName/bucket/:bucketName
+@method     GET
+@desc       Get a bucket from the storage
+@access     private
+*/
+
+router.get(
+  "/:storageName/bucket/:bucketName",
+  authManageStorage,
+  getResponseBody,
+  responseTime(logRequestToConsole),
+  applyDefaultRateLimiters(),
+  async (req, res) => {
+    try {
+      const { storageName, bucketName } = req.params;
+
+      await agnost.storage(storageName).bucket(bucketName).getInfo();
+
+      res.json();
+    } catch (error) {
+      helper.handleError(req, res, error);
+    }
+  }
+);
+/*
+@route      /storage/:storageName/bucket/:bucketName
 @method     DELETE
 @desc       Delete a bucket from the storage
 @access     private

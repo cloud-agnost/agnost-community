@@ -1,9 +1,7 @@
-import './CreateCopyVersionDrawer.scss';
-import * as z from 'zod';
-import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import useVersionStore from '@/store/version/versionStore.ts';
+import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from 'components/Button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import {
 	Form,
@@ -15,13 +13,28 @@ import {
 	FormMessage,
 } from 'components/Form';
 import { Input } from 'components/Input';
-import { Button } from 'components/Button';
-import useVersionStore from '@/store/version/versionStore.ts';
 import { Switch } from 'components/Switch';
-import { NAME_SCHEMA } from '@/constants';
-
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import * as z from 'zod';
+import './CreateCopyVersionDrawer.scss';
 const CreateCopyVersionForm = z.object({
-	name: NAME_SCHEMA,
+	name: z
+		.string({
+			required_error: translate('forms.required', {
+				label: translate('general.name'),
+			}),
+		})
+		.min(2, translate('forms.min2.error', { label: translate('general.name') }))
+		.max(64, translate('forms.max64.error', { label: translate('general.name') }))
+		.trim()
+		.refine(
+			(value) => value.trim().length > 0,
+			translate('forms.required', {
+				label: translate('general.name'),
+			}),
+		),
 	private: z.boolean(),
 	readOnly: z.boolean(),
 });

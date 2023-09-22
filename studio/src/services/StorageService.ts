@@ -98,6 +98,9 @@ export default class StorageService {
 	static async deleteBucket({ storageName, bucketName }: DeleteBucketParams): Promise<void> {
 		return (await http.delete(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}`)).data;
 	}
+	static async getBucket({ storageName, bucketName }: DeleteBucketParams): Promise<Bucket> {
+		return (await http.get(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}`)).data;
+	}
 
 	static async emptyBucket({ storageName, bucketName }: DeleteBucketParams): Promise<void> {
 		return (

@@ -1,9 +1,8 @@
-import { Switch } from '@/components/Switch';
 import { useToast } from '@/hooks';
 import useResourceStore from '@/store/resources/resourceStore';
 import { ConnectDatabaseSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel } from 'components/Form';
+import { Form } from 'components/Form';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +24,7 @@ export default function ConnectCache() {
 
 	useEffect(() => {
 		form.setValue('instance', 'Redis');
+		form.setValue('access.username', 'root');
 	}, [form]);
 
 	function onSubmit(data: z.infer<typeof ConnectDatabaseSchema>) {
@@ -61,19 +61,6 @@ export default function ConnectCache() {
 					<DatabaseInfo modal={false} />
 					<ConnectOptions />
 					<ReadReplicas />
-
-					<FormField
-						control={form.control}
-						name='secureConnection'
-						render={({ field }) => (
-							<FormItem className='flex justify-start gap-4 items-center space-y-0'>
-								<FormLabel>{t('resources.database.secure_connection')}</FormLabel>
-								<FormControl>
-									<Switch checked={field.value} onCheckedChange={field.onChange} />
-								</FormControl>
-							</FormItem>
-						)}
-					/>
 				</CreateResourceLayout>
 			</form>
 		</Form>
