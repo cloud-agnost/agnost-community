@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { SearchInput } from 'components/SearchInput';
 import { Badge } from 'components/Badge';
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter } from 'components/Drawer';
-import { Endpoint, Method, SortOption } from '@/types';
+import { Endpoint, HttpMethod, SortOption } from '@/types';
 import useEndpointStore from '@/store/endpoint/endpointStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -51,7 +51,7 @@ export default function EndpointSelectModal({
 	const [page, setPage] = useState(0);
 	const [lastDataCount, setLastDataCount] = useState(endpoints.length);
 	const [selected, setSelected] = useState<string[]>(defaultSelected ?? []);
-	const [methods, setMethods] = useState<Method[]>([]);
+	const [methods, setMethods] = useState<HttpMethod[]>([]);
 	const [sortOption, setSortOption] = useState<SortOption>(ENDPOINT_OPTIONS[0]);
 	const { version } = useVersionStore();
 	const { t } = useTranslation();
@@ -105,7 +105,7 @@ export default function EndpointSelectModal({
 		fetchEndpoints({ init: true, search: value });
 	}
 
-	function onMethodSelect(method: Method) {
+	function onMethodSelect(method: HttpMethod) {
 		setMethods((prev) => {
 			return prev.includes(method) ? prev.filter((m) => m !== method) : [...prev, method];
 		});

@@ -11,12 +11,11 @@ import { SearchInput } from '@/components/SearchInput';
 import { useUpdateEffect } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useMatch, useSearchParams } from 'react-router-dom';
 import { VersionTable } from '../version/Table';
-import { useMatch } from 'react-router-dom';
-import { useSearchParams } from 'react-router-dom';
 
 export default function ApplicationVersions() {
 	const { t } = useTranslation();
