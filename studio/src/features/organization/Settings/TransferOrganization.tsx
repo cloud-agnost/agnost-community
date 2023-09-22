@@ -9,6 +9,11 @@ import { APIError } from '@/types/type';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+
+interface MemberSearch {
+	label: string;
+	value: OrganizationMember;
+}
 const loadOptions = async (inputValue: string) => {
 	const members: OrganizationMember[] = await useOrganizationStore
 		.getState?.()
@@ -100,9 +105,9 @@ export default function TransferOrganization() {
 					<AlertDescription>{error?.details}</AlertDescription>
 				</Alert>
 			)}
-			<AutoComplete
+			<AutoComplete<MemberSearch>
 				loadOptions={loadOptions}
-				onChange={(res: OrganizationMember) => setUserId(res.member._id)}
+				onChange={({ value }: MemberSearch) => setUserId(value.member._id)}
 				formatOptionLabel={formatOptionLabel}
 				formatGroupLabel={formatGroupLabel}
 			/>
