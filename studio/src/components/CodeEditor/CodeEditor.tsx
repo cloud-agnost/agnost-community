@@ -64,16 +64,16 @@ export default function CodeEditor({
 				saveEditorContent(editor, defaultLanguage, onSave);
 			},
 		});
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		//@ts-ignore
-		_monaco.editor.defineTheme('nightOwl', nightOwl);
-		_monaco.editor.setTheme('nightOwl');
 	};
+	function setEditorTheme(monaco: any) {
+		monaco.editor.defineTheme('nightOwl', nightOwl);
+	}
 
 	return (
 		<div className={cn(containerClassName)}>
 			<MonacoEditor
+				theme='nightOwl'
+				beforeMount={setEditorTheme}
 				className={cn('editor', className)}
 				onChange={handleEditorChange}
 				onValidate={onValidate}
@@ -87,7 +87,6 @@ export default function CodeEditor({
 					minimap: {
 						enabled: false,
 					},
-					theme: 'nightOwl',
 					autoClosingBrackets: 'always',
 					autoDetectHighContrast: true,
 					fontLigatures: true,
