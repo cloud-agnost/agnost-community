@@ -2,6 +2,7 @@ import { ChangeNameForm } from '@/components/ChangeNameForm';
 import { EndpointRateLimiters } from '@/features/version/SettingsGeneral';
 import { useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIError, VersionProperties } from '@/types';
 import { translate } from '@/utils';
@@ -34,6 +35,7 @@ const FormSchema = z.object({
 
 export default function SettingsGeneral() {
 	const { version, updateVersionProperties } = useVersionStore();
+	const { environment } = useEnvironmentStore();
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
@@ -87,7 +89,7 @@ export default function SettingsGeneral() {
 				title={t('version.settings.version_id')}
 				description={t('version.settings.version_id_desc')}
 			>
-				<CopyInput readOnly value={version?.iid} />
+				<CopyInput readOnly value={`${window.location.origin}/${environment.iid}`} />
 			</SettingsFormItem>
 			<SettingsFormItem
 				className='space-y-0 py-6'
