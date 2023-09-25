@@ -3,7 +3,7 @@ import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import { CreateEndpointSchema } from '@/types';
-import { translate as t } from '@/utils';
+import { removeEmptyFields, translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useLocation, useParams } from 'react-router-dom';
@@ -33,11 +33,12 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 	});
 
 	async function onSubmit(data: z.infer<typeof CreateEndpointSchema>) {
+		const params = removeEmptyFields(data) as z.infer<typeof CreateEndpointSchema>;
 		await createEndpoint({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			...data,
+			...params,
 			onSuccess: (endpoint) => {
 				navigate({
 					title: endpoint.name,

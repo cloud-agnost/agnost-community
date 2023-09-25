@@ -7,4 +7,5 @@ export { default as VersionMessageQueue } from './VersionMessageQueue.tsx';
 export { default as VersionNotifications } from './VersionNotifications.tsx';
 export { default as VersionStorage } from './VersionStorage.tsx';
 export { default as VersionTask } from './VersionTask.tsx';
+export { default as VersionFunction } from './VersionFunction.tsx';
 export * from './settings';

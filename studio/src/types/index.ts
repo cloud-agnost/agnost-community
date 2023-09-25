@@ -1,5 +1,7 @@
 export type * from './application.ts';
 export { CreateApplicationSchema } from './application.ts';
+export type * from './cache.ts';
+export { CreateCacheSchema, CacheSchema } from './cache.ts';
 export type * from './database.ts';
 export type * from './endpoint.ts';
 export { CreateEndpointSchema } from './endpoint.ts';
@@ -21,5 +23,7 @@ export type * from './storage.ts';
 export { BucketSchema, StorageSchema } from './storage.ts';
 export type * from './task.ts';
 export { CreateTaskSchema } from './task.ts';
+export { CreateFunctionSchema } from './function.ts';
 export type * from './type.ts';
 export type * from './version.ts';
+export type * from './function.ts';

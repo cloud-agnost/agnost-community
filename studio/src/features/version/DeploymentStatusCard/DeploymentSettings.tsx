@@ -101,7 +101,7 @@ export default function DeploymentSettings({ isOpen, close }: DeploymentSettings
 						exit={{
 							x: '100%',
 						}}
-						className='deployment-settings'
+						className='deployment-settings p-4'
 					>
 						<header className='deployment-settings-header'>
 							<Button onClick={close} rounded variant='blank' iconOnly>

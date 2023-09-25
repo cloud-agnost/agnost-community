@@ -112,6 +112,20 @@ const router = createBrowserRouter([
 												],
 											},
 											{
+												path: 'function',
+												lazy: () => lazyRouteImport(PATHS.version.function),
+												children: [
+													{
+														index: true,
+														lazy: () => lazyRouteImport(PATHS.function.function),
+													},
+													{
+														path: ':funcId',
+														lazy: () => lazyRouteImport(PATHS.function.editFunction),
+													},
+												],
+											},
+											{
 												path: 'storage',
 												lazy: () => lazyRouteImport(PATHS.version.storage),
 												children: [

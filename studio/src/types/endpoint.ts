@@ -107,7 +107,7 @@ export const CreateEndpointSchema = z.object({
 				});
 			}
 		}),
-	timeout: z.coerce
+	timeout: z
 		.number({
 			required_error: t('forms.required', {
 				label: t('endpoint.create.timeout'),
@@ -115,8 +115,8 @@ export const CreateEndpointSchema = z.object({
 		})
 		.int()
 		.positive()
-		.optional(),
-
+		.optional()
+		.nullish(),
 	apiKeyRequired: z.boolean().default(false),
 	sessionRequired: z.boolean().default(false),
 	logExecution: z.boolean().default(false),
@@ -156,7 +156,7 @@ export interface CreateEndpointParams extends BaseParams, BaseRequest {
 	apiKeyRequired: boolean;
 	sessionRequired: boolean;
 	logExecution: boolean;
-	timeout?: number;
+	timeout?: number | null;
 	rateLimits?: string[];
 	middlewares?: string[];
 }
