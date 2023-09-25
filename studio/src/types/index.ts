@@ -1,5 +1,7 @@
 export type * from './application.ts';
 export { CreateApplicationSchema } from './application.ts';
+export type * from './cache.ts';
+export { CreateCacheSchema, CacheSchema } from './cache.ts';
 export type * from './database.ts';
 export type * from './endpoint.ts';
 export { CreateEndpointSchema } from './endpoint.ts';
