@@ -1,18 +1,15 @@
 import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants/regex';
 import { translate } from '@/utils';
 import * as z from 'zod';
-import { BaseGetRequest, BaseParams, BaseRequest, Log } from '.';
+import { BaseGetRequest, BaseParams, BaseRequest } from '.';
 
-export interface MessageQueue {
+export interface Cache {
 	orgId: string;
 	appId: string;
 	versionId: string;
 	iid: string;
 	name: string;
-	logExecution: boolean;
-	delay: number;
-	type: 'code' | 'flow';
-	logic: string;
+	assignUniqueName: boolean;
 	createdBy: string;
 	updatedBy: string;
 	_id: string;
@@ -20,17 +17,22 @@ export interface MessageQueue {
 	updatedAt: string;
 	__v: number;
 }
-
-export type GetMessageQueuesParams = BaseParams & BaseGetRequest;
-export interface GetMessageQueueByIdParams extends BaseParams {
-	queueId: string;
+export type GetCachesOfAppVersionParams = BaseParams & BaseGetRequest;
+export type GetCacheByIdParams = BaseParams & {
+	cacheId: string;
+};
+export interface DeleteMultipleCachesParams extends BaseParams, BaseRequest {
+	cacheIds: string[];
 }
-export type DeleteMessageQueueParams = GetMessageQueueByIdParams & BaseRequest;
-export interface DeleteMultipleQueuesParams extends BaseParams, BaseRequest {
-	queueIds: string[];
+export type DeleteCacheParams = GetCacheByIdParams & BaseRequest;
+export interface CreateCacheParams extends BaseParams, BaseRequest {
+	name: string;
+	assignUniqueName: boolean;
+	resourceId: string;
 }
+export type UpdateCacheParams = GetCacheByIdParams & Partial<Cache> & BaseRequest;
 
-export const CreateMessageQueueSchema = z.object({
+export const CacheSchema = z.object({
 	name: z
 		.string({
 			required_error: translate('forms.required', {
@@ -79,38 +81,13 @@ export const CreateMessageQueueSchema = z.object({
 				}),
 			}),
 		),
-
-	delay: z.coerce.number().int().positive().optional(),
-	logExecution: z.boolean().default(false),
+	assignUniqueName: z.boolean().default(false),
+});
+export const CreateCacheSchema = z.object({
+	...CacheSchema.shape,
 	resourceId: z.string({
 		required_error: translate('forms.required', {
 			label: translate('queue.create.resource.title'),
 		}),
 	}),
 });
-
-export interface CreateMessageQueueParams extends BaseRequest, BaseParams {
-	name: string;
-	logExecution: boolean;
-	delay?: number;
-	resourceId: string;
-}
-export interface UpdateQueueParams extends CreateMessageQueueParams {
-	queueId: string;
-}
-export interface UpdateQueueLogicParams extends BaseRequest, BaseParams {
-	logic: string;
-	queueId: string;
-}
-export interface TestQueueParams extends BaseRequest, BaseParams {
-	queueId: string;
-	debugChannel: string;
-	payload: Record<string, string>;
-}
-
-export interface TestQueueLogs {
-	[key: string]: {
-		payload: Record<string, string>;
-		logs?: Log[];
-	};
-}

@@ -1,4 +1,5 @@
 import application from './application.json';
+import cache from './cache.json';
 import database from './database.json';
 import endpoint from './endpoint.json';
 import forms from './forms.json';
@@ -9,12 +10,12 @@ import organization from './organization.json';
 import profileSettings from './profileSettings.json';
 import queue from './queue.json';
 import resources from './resources.json';
-import version from './version.json';
-import task from './task.json';
 import storage from './storage.json';
+import task from './task.json';
+import version from './version.json';
 export {
-	storage,
 	application,
+	cache,
 	database,
 	endpoint,
 	forms,
@@ -25,6 +26,7 @@ export {
 	profileSettings,
 	queue,
 	resources,
-	version,
+	storage,
 	task,
+	version,
 };

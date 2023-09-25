@@ -2,6 +2,7 @@ import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import {
 	application,
+	cache,
 	database,
 	endpoint,
 	forms,
@@ -12,8 +13,8 @@ import {
 	profileSettings,
 	queue,
 	resources as rs,
-	task,
 	storage,
+	task,
 	version,
 } from './en';
 
@@ -34,6 +35,7 @@ export const resources = {
 			endpoint,
 			task,
 			storage,
+			cache,
 		},
 	},
 };
