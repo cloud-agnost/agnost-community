@@ -1,7 +1,7 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import { CreateEndpointSchema } from '@/types';
-import { translate as t } from '@/utils';
+import { translate as t, removeEmptyFields } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -27,12 +27,13 @@ export default function EditEndpointDrawer({ open, onClose }: CreateEndpointProp
 	});
 
 	function onSubmit(data: z.infer<typeof CreateEndpointSchema>) {
+		const params = removeEmptyFields(data) as z.infer<typeof CreateEndpointSchema>;
 		updateEndpoint({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			epId: endpoint?._id as string,
-			...data,
+			...params,
 			onSuccess: () => {
 				notify({
 					title: t('general.success'),

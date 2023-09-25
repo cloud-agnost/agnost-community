@@ -58,6 +58,8 @@ export default function EndpointForm() {
 					<FormItem className='mt-6'>
 						<FormLabel>{t('endpoint.create.timeout')}</FormLabel>
 						<FormControl>
+							{/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				/* @ts-ignore */}
 							<Input
 								type='number'
 								error={Boolean(form.formState.errors.timeout)}
@@ -67,6 +69,9 @@ export default function EndpointForm() {
 									}) ?? ''
 								}
 								{...field}
+								{...form.register('timeout', {
+									setValueAs: (v) => (v === '' ? null : parseInt(v)),
+								})}
 							/>
 						</FormControl>
 						<FormDescription>{t('endpoint.create.timeout_description')}</FormDescription>

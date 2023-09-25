@@ -287,3 +287,11 @@ export async function saveEditorContent(
 	}
 	cb?.(ed.getValue());
 }
+export function removeEmptyFields(data: Record<string, any>) {
+	Object.keys(data).forEach((key) => {
+		if (data[key] === '' || data[key] == null) {
+			delete data[key];
+		}
+	});
+	return data;
+}
