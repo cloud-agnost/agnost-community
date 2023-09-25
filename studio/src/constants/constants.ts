@@ -75,6 +75,7 @@ import {
 	CurrencyDollarSimple,
 	Envelope,
 	FileText,
+	Function,
 	GearSix,
 	IdentificationBadge,
 	LinkSimple,
@@ -327,6 +328,13 @@ export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 		isActive: false,
 		isDashboard: false,
 		type: 'Middleware',
+	},
+	{
+		title: translate('version.function'),
+		path: 'function',
+		isActive: false,
+		isDashboard: false,
+		type: 'Function',
 	},
 ];
 
@@ -944,6 +952,7 @@ export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
 	Settings: GearSix,
 	Dashboard: Dashboard,
 	Notifications: BellRing,
+	Function: Function,
 };
 
 export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {

@@ -1,0 +1,13 @@
+{
+	"empty_text": "You have not defined any helper function for this app version",
+	"add": "Create Function",
+	"title": "Functions",
+	"delete": {
+		"title": "Delete Helper Function",
+		"message": "Are you sure you want to delete this function ?",
+		"description": "This action is not reversible — please continue with caution.",
+		"confirmCode": "Confirm function delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
+	},
+	"edit": "Edit {{name}}",
+	"test": "Test {{name}}"
+}
