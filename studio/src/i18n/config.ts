@@ -6,6 +6,7 @@ import {
 	database,
 	endpoint,
 	forms,
+	func,
 	general,
 	login,
 	onboarding,
@@ -36,6 +37,7 @@ export const resources = {
 			task,
 			storage,
 			cache,
+			function: func,
 		},
 	},
 };

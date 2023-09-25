@@ -13,6 +13,8 @@ import resources from './resources.json';
 import storage from './storage.json';
 import task from './task.json';
 import version from './version.json';
+import func from './function.json';
+
 export {
 	application,
 	cache,
@@ -29,4 +31,5 @@ export {
 	storage,
 	task,
 	version,
+	func,
 };

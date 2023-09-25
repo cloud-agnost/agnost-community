@@ -10,3 +10,5 @@ export { default as PlatformService } from './PlatformService.ts';
 export { default as ResourceService } from './ResourceService.ts';
 export { default as UserService } from './UserService.ts';
 export { default as VersionService } from './VersionService.ts';
+export { default as EndpointService } from './EndpointService.ts';
+export { default as FunctionService } from './FunctionService.ts';

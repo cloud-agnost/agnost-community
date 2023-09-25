@@ -38,6 +38,7 @@ export const PATHS = {
 		fields: `${versionPath}/models/fields/Fields.tsx`,
 		endpoint: `${versionPath}/VersionEndpoint.tsx`,
 		storage: `${versionPath}/VersionStorage.tsx`,
+		function: `${versionPath}/VersionFunction.tsx`,
 		middlewareOutlet: `${versionPath}/VersionMiddlewaresOutlet.tsx`,
 		middlewares: `${versionPath}/VersionMiddlewares.tsx`,
 		editMiddleware: `${versionPath}/VersionEditMiddlewares.tsx`,
@@ -71,6 +72,10 @@ export const PATHS = {
 		task: `${path}/task/Task.tsx`,
 		editTask: `${path}/task/EditTask.tsx`,
 		taskLogs: `${path}/task/TaskLogs.tsx`,
+	},
+	function: {
+		function: `${path}/function/Function.tsx`,
+		editFunction: `${path}/function/EditFunction.tsx`,
 	},
 	storage: {
 		storage: `${storagePath}/Storage.tsx`,
