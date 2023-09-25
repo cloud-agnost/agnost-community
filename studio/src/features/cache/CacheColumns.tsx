@@ -39,20 +39,20 @@ const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
-		cell: ({ row: { original } }) => {
-			const { name, _id } = original;
-			return (
-				<TabLink
-					name={name}
-					path={`${_id}`}
-					className='link'
-					onClick={() => {
-						useCacheStore.setState({ cache: original });
-					}}
-					type='Storage'
-				/>
-			);
-		},
+		// cell: ({ row: { original } }) => {
+		// 	const { name, _id } = original;
+		// 	return (
+		// 		<TabLink
+		// 			name={name}
+		// 			path={`${_id}`}
+		// 			className='link'
+		// 			onClick={() => {
+		// 				useCacheStore.setState({ cache: original });
+		// 			}}
+		// 			type='Storage'
+		// 		/>
+		// 	);
+		// },
 	},
 	{
 		id: 'instance',
