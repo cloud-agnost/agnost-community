@@ -28,7 +28,7 @@ export default function Resources() {
 		}
 	}
 	return (
-		<div className='w-full space-y-2'>
+		<div className='w-full space-y-2 max-h-[200px] p-4 overflow-auto'>
 			<div className='text-subtle text-sm font-sfCompact leading-6 flex justify-between gap-4'>
 				<p>{t('version.resources')}</p>
 				<p>{t('version.status')}</p>

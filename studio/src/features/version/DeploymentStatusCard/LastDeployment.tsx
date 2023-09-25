@@ -9,7 +9,7 @@ export default function LastDeployment() {
 	const { t } = useTranslation();
 
 	return (
-		<div className='w-full space-y-2'>
+		<div className='w-full space-y-2 p-4'>
 			<div className='text-subtle text-sm font-sfCompact leading-6 flex justify-between gap-4'>
 				<p>{t('version.last_deployment')}</p>
 				<p>{t('version.status')}</p>

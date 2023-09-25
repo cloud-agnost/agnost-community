@@ -39,8 +39,8 @@ export default function DeploymentStatusCard() {
 						<Cloud size={24} />
 					</Button>
 				</DropdownMenuPrimitive.Trigger>
-				<DropdownMenuContent className={cn('overflow-hidden relative p-4 w-[21rem] space-y-6')}>
-					<DropdownMenuLabel className='relative flex justify-between items-center p-0'>
+				<DropdownMenuContent className={cn('overflow-hidden relative w-[21rem] space-y-6')}>
+					<DropdownMenuLabel className='relative flex justify-between items-center p-4'>
 						<span className='truncate text-default'>{t('version.deployment_status')}</span>
 						<Button
 							onClick={() => setSettingsIsOpen((prev) => !prev)}
@@ -58,7 +58,7 @@ export default function DeploymentStatusCard() {
 					</div>
 
 					<DeploymentSettings isOpen={settingsIsOpen} close={() => setSettingsIsOpen(false)} />
-					<footer className='deployment-status-footer'>
+					<footer className='deployment-status-footer p-4'>
 						<Button onClick={() => setIsLogsOpen(true)} variant='link'>
 							{t('version.view_logs')}
 						</Button>
