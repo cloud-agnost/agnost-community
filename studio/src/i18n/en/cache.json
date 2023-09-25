@@ -3,7 +3,7 @@
 	"create": "Create Cache",
 	"title": "Caches",
 	"assignUniqueName": "Assign Unique Name",
-	"assignUniqueNameDesc": "Assign a unique name to this cache",
+	"assignUniqueNameDesc": "Allows you to give a unique name to a cache server during creation, aiding in easy identification and management.",
 	"delete": {
 		"title": "Delete Cache",
 		"message": "Are you sure you want to delete cache ?",

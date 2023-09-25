@@ -81,7 +81,7 @@ export const CacheSchema = z.object({
 				}),
 			}),
 		),
-	assignUniqueName: z.boolean().default(false),
+	assignUniqueName: z.boolean().default(true),
 });
 export const CreateCacheSchema = z.object({
 	...CacheSchema.shape,
