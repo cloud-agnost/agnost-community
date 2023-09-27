@@ -95,7 +95,6 @@ export default function ListFields({ model, parentModel }: ListFieldsProps) {
 				/>
 			}
 			onSearchInputClear={() => setSearch('')}
-			className='p-6'
 			isEmpty={hasNoFields}
 			title={t('database.fields.title')}
 			icon={<ModelIcon className='w-44 h-44' />}

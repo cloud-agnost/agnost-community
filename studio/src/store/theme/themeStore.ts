@@ -10,7 +10,7 @@ const useThemeStore = create<ThemeStore>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				theme: document.body.classList.contains('dark') ? 'dark' : 'light',
+				theme: 'dark',
 				setTheme: (theme) => {
 					document.body.classList.remove(get().theme);
 					document.body.classList.add(theme);
