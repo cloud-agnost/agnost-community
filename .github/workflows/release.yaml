@@ -49,13 +49,53 @@ on:
         default: "not-changed"
         type: string
 
+env:
+  ENGINE_CORE: '${{ github.event.inputs.engine-core }}'
+  ENGINE_MONITOR: '${{ github.event.inputs.engine-monitor }}'
+  ENGINE_REALTIME: '${{ github.event.inputs.engine-realtime }}'
+  ENGINE_SCHEDULER: '${{ github.event.inputs.engine-scheduler }}'
+  ENGINE_WORKER: '${{ github.event.inputs.engine-worker }}'
+  PLATFORM_CORE: '${{ github.event.inputs.platform-core }}'
+  PLATFORM_SYNC: '${{ github.event.inputs.platform-sync }}'
+  PLATFORM_WORKER: '${{ github.event.inputs.platform-worker }}'
+  STUDIO: '${{ github.event.inputs.studio }}'
+
 jobs:
+  get_released_apps:
+    runs-on: ubuntu-latest
+    outputs:
+      applications: ${{ steps.get-clusters.outputs.APPLICATIONS }}
+      versions: ${{ steps.get-versions.outputs.VERSIONS }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      -
+        name: get-apps-versions
+        run: |
+          read -r APPLICATIONS VERSIONS <<< $(python .github/scripts/get_released_apps.py)
+          echo APPLICATIONS=$APPLICATIONS >> $GITHUB_ENV
+          echo VERSIONS=$VERSIONS >> $GITHUB_ENV
+      -
+        id: get-applications
+        run: echo "APPLICATIONS=${{ env.APPLICATIONS }}" >> $GITHUB_OUTPUT
+      -
+        id: get-versions
+        run: echo "VERSIONS=${{ env.VERSIONS }}" >> $GITHUB_OUTPUT
+
+
   build:
     runs-on: ubuntu-latest
+    needs: get_released_apps
     strategy:
       matrix:
-        application: [engine-core, engine-monitor, engine-realtime, engine-scheduler, platform-core, platform-sync, platform-worker, studio]
-    if: ${{ github.event.inputs["${{ matrix.application }}"] != 'not-changed' }}
+        application: ${{ fromJSON(needs.get_released_apps.outputs.applications) }}
+        include: ${{ fromJSON(needs.get_released_apps.outputs.versions) }}
     steps:
       -
         name: Checkout
@@ -89,5 +129,5 @@ jobs:
           file: ./${{ matrix.application }}/Dockerfile
           platforms: linux/amd64,linux/arm64
           tags: |
-            ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:${{ github.event.inputs["${{ matrix.application }}"] }}
-            ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:latest
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:${{ matrix.version }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:latest-release
