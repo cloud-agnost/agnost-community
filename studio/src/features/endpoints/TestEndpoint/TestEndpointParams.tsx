@@ -45,7 +45,7 @@ export default function TestEndpointParams() {
 
 	return (
 		<>
-			<TestEndpointTable title={t('endpoint.test.query_params') ?? ''}>
+			<TestEndpointTable>
 				{queryParamsFields.map((f, index) => (
 					<TableRow key={f.id}>
 						<TableCell>
@@ -117,7 +117,7 @@ export default function TestEndpointParams() {
 				</TableRow>
 			</TestEndpointTable>
 			{pathParamFields.length > 0 && (
-				<TestEndpointTable title={t('endpoint.test.path_variables') as string}>
+				<TestEndpointTable>
 					{pathParamFields.map((f, index) => (
 						<TableRow key={f.id}>
 							<TableCell>
