@@ -46,5 +46,10 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: accessToken
+                 - name: JWT_SECRET
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: jwtSecret
                  - name: NAMESPACE
                    value: default

@@ -136,6 +136,31 @@ export class MetaManager {
 	}
 
 	/**
+	 * Returns a specific database model
+	 */
+	getDatabaseModelByName(dbName, modelName) {
+		const databases = this.getDatabasesSync();
+		const db = databases.find((entry) => entry.name === dbName);
+
+		if (!db) return null;
+		return db.models.find((entry) => entry.name === modelName);
+	}
+
+	/**
+	 * Returns a specific database model
+	 */
+	getDatabaseModelByIId(dbIId, modelIId) {
+		const databases = this.getDatabasesSync();
+		const db = databases.find((entry) => entry.iid === dbIId);
+
+		if (!db) return { userDb: null, userModel: null };
+		return {
+			userDb: db,
+			userModel: db.models.find((entry) => entry.iid === modelIId),
+		};
+	}
+
+	/**
 	 * Returns the list of endpoints
 	 */
 	async getEndpoints() {
@@ -361,5 +386,19 @@ export class MetaManager {
 		} catch (error) {
 			return [];
 		}
+	}
+
+	/**
+	 * Returns the message template that is used during authentication flow
+	 * @param  {string} templateType The type of the template, can be one of the following:
+	 * verify_sms_code
+	 * confirm_email
+	 * reset_password
+	 * magic_link
+	 * confirm_email_change
+	 */
+	getMessageTemplate(templateType) {
+		const messageTemplates = this.getVersion().authentication.messages;
+		return messageTemplates.find((entry) => entry.type === templateType);
 	}
 }

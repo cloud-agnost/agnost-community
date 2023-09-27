@@ -21,5 +21,7 @@ const ERROR_CODES = {
 	invalidRequestBody: "invalid_request_body",
 	rateLimitExceeded: "rate_limit_exceeded",
 	resourceNotFound: "resource_not_found",
+	missingSessionToken: "missing_session_token",
+	invalidSessionToken: "invalid_session_token",
 };
 export default ERROR_CODES;

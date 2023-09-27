@@ -22,7 +22,6 @@ export const connectToRedisCache = async (callback) => {
 						: undefined,
 			})
 			.on("error", function (err) {
-				console.log("***err", err);
 				logger.error(`Cannot connect to the cache server`, { details: err });
 				process.exit(1);
 			})

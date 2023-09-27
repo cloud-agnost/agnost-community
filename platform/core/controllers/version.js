@@ -14,6 +14,7 @@ import taskCtrl from "../controllers/task.js";
 import storageCtrl from "../controllers/storage.js";
 import funcCtrl from "../controllers/function.js";
 import cacheCtrl from "../controllers/cache.js";
+import { defaultMessages } from "../config/constants.js";
 
 class VersionController extends BaseController {
 	constructor() {
@@ -48,6 +49,9 @@ class VersionController extends BaseController {
 				readOnly: readOnly,
 				master: master,
 				createdBy: user._id,
+				authentication: {
+					messages: defaultMessages(user._id),
+				},
 			},
 			{ session, cacheKey: versionId }
 		);

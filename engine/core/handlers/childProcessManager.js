@@ -25,6 +25,11 @@ import {
 import { runHandler } from "../middlewares/runHandler.js";
 import { adapterManager } from "./adapterManager.js";
 import { MetaManager } from "./metaManager.js";
+import { setUpSMTPConnection } from "../util/authHelper.js";
+import {
+	initializeRealtimeServer,
+	disconnectRealtimeClient,
+} from "../init/realtime.js";
 
 export class ChildProcessDeploymentManager extends DeploymentManager {
 	constructor(msgObj, envObj, i18n) {
@@ -120,8 +125,12 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// Set the environment variables of the API server
 		this.manageEnvironmentVariables(this.getEnvironmentVariables());
+		// Set up the authentication flow SMTP server connection if specified
+		this.setUpAuthSMTPConnection();
 		// Initialize the connection manager
 		await this.setupResourceConnections();
+		// Manage the realtime connection
+		this.manageRealtimeConnection();
 		// Check databases
 		await this.manageDatabases();
 		// Check storages
@@ -217,6 +226,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// Set the environment variables of the API server
 		this.manageEnvironmentVariables(this.getEnvironmentVariables());
+		// Set up the authentication flow SMTP server connection if specified
+		this.setUpAuthSMTPConnection();
 		// Check databases
 		await this.manageDatabases();
 		// Check storages
@@ -270,8 +281,21 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		//Secure express app by setting various HTTP headers
 		app.use(helmet());
+		//Parses incoming requests with urlencoded payloads
+		app.use(
+			express.urlencoded({
+				extended: true,
+			})
+		);
 		//Enable cross-origin resource sharing
-		app.use(cors());
+		app.use(
+			cors({
+				origin: function (origin, callback) {
+					callback(null, true);
+				},
+				credentials: true,
+			})
+		);
 		//Disable client side caching
 		app.use(nocache());
 		app.set("etag", false);
@@ -289,6 +313,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			app.use("/test", (await import("../routes/test.js")).default);
 			// Add the default storage object endpoints
 			app.use("/storage", (await import("../routes/storage.js")).default);
+			// Add the default user authentication endpoints
+			app.use("/auth", (await import("../routes/auth.js")).default);
 		}
 	}
 
@@ -457,7 +483,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	addSessionMiddleware(endpoint, handlers) {
 		if (!endpoint.sessionRequired) return;
 
-		handlers.push(checkSession);
+		handlers.push(checkSession(true));
 	}
 
 	/**
@@ -599,5 +625,25 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 				this.addLog(`Initialized handler of task '${task.name}'`);
 			} else this.addLog(`Cannot initialize handler of task '${task.name}'`);
 		}
+	}
+
+	/**
+	 *  Sets up the authentication flow SMTP server connection if specified
+	 */
+	setUpAuthSMTPConnection() {
+		const { authentication } = this.getVersion();
+		if (authentication.email.confirmEmail)
+			setUpSMTPConnection(authentication.email.customSMTP);
+	}
+
+	/**
+	 *  Sets up or disconnects the realtime connection
+	 */
+	manageRealtimeConnection() {
+		const { realtime } = this.getVersion();
+		if (realtime.enabled) {
+			initializeRealtimeServer();
+			this.addLog(`Initialized realtime server connection`);
+		} else disconnectRealtimeClient();
 	}
 }

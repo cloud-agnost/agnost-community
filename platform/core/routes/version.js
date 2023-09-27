@@ -1,6 +1,7 @@
 import axios from "axios";
 import express from "express";
 import mongoose from "mongoose";
+import nodemailer from "nodemailer";
 import versionCtrl from "../controllers/version.js";
 import envCtrl from "../controllers/environment.js";
 import deployCtrl from "../controllers/deployment.js";
@@ -2098,6 +2099,31 @@ router.post(
 	async (req, res) => {
 		try {
 			const { org, app, user, version } = req;
+
+			// If email confirmation is required then we need to check the STP connection
+			if (req.body.confirmEmail) {
+				const { host, port, useTLS, user, password } = req.body.customSMTP;
+				let transport = nodemailer.createTransport({
+					host: host,
+					port: port,
+					secure: useTLS,
+					auth: {
+						user: user,
+						pass: password,
+					},
+					pool: false,
+				});
+
+				try {
+					await transport.verify();
+				} catch (err) {
+					return res.status(400).json({
+						error: t("Connection Error"),
+						details: t("Cannot connect to the SMTP server. %s", err.message),
+						code: ERROR_CODES.connectionError,
+					});
+				}
+			}
 
 			// If we have the password then encrypt it
 			if (req.body.customSMTP?.password)

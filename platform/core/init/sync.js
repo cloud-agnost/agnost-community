@@ -19,7 +19,7 @@ export function initializeSyncClient() {
 
 	socket.io.on("reconnect", () => {
 		logger.info(
-			`Connection established to synronization server @${syncConfig.serverURL}`
+			`Connection re-established to synronization server @${syncConfig.serverURL}`
 		);
 	});
 }
