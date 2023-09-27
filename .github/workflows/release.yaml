@@ -55,7 +55,7 @@ jobs:
     strategy:
       matrix:
         application: [engine-core, engine-monitor, engine-realtime, engine-scheduler, platform-core, platform-sync, platform-worker, studio]
-    if: ${{ github.event.inputs.${{ matrix.application }} != 'not-changed' }}
+    if: ${{ github.event.inputs."${{ matrix.application }}" != 'not-changed' }}
     steps:
       -
         name: Checkout
@@ -89,5 +89,5 @@ jobs:
           file: ./${{ matrix.application }}/Dockerfile
           platforms: linux/amd64,linux/arm64
           tags: |
-            ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:${{ github.event.inputs.${{ matrix.application }} }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:${{ github.event.inputs."${{ matrix.application }}" }}
             ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:latest
