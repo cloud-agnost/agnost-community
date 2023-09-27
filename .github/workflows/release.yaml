@@ -1,0 +1,93 @@
+name: Create New Agnost Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      engine-core:
+        description: 'Engine Core Release Version'
+        required: false
+        default: "not-changed"
+        type: string
+      engine-monitor:
+        description: 'Engine Monitor Release Version'
+        required: false
+        default: "not-changed"
+        type: string
+      engine-realtime:
+        description: 'Engine Realtime Release Version'
+        required: false
+        default: "not-changed"
+        type: string
+      engine-scheduler:
+        description: 'Engine Scheduler Release Version'
+        required: false
+        default: "not-changed"
+        type: string
+      engine-worker:
+        description: 'Engine Worker Release Version'
+        required: false
+        default: "not-changed"
+        type: string
+      platform-core:
+        description: 'Platform Core Release Version'
+        required: false
+        default: "not-changed"
+        type: string
+      platform-sync:
+        description: 'Platform Sync Release Version'
+        required: false
+        default: "not-changed"
+        type: string
+      platform-worker:
+        description: 'Platform Worker Release Version'
+        required: false
+        default: "not-changed"
+        type: string
+      studio:
+        description: 'Studio Release Version'
+        required: false
+        default: "not-changed"
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        application: [engine-core, engine-monitor, engine-realtime, engine-scheduler, platform-core, platform-sync, platform-worker, studio]
+    if: ${{ github.event.inputs.${{ matrix.application }} != 'not-changed' }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: 'Authenticate to GCP'
+        id: 'auth'
+        uses: google-github-actions/auth@v0
+        with:
+          token_format: 'access_token'
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+      -
+        name: Login to GCR
+        uses: docker/login-action@v2
+        with:
+          registry: '${{ env.DOCKER_REGISTRY }}'
+          username: 'oauth2accesstoken'
+          password: '${{ steps.auth.outputs.access_token }}'
+      -
+        name: Build and Push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          context: ./${{ matrix.application }}
+          file: ./${{ matrix.application }}/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:${{ github.event.inputs.${{ matrix.application }} }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:latest
