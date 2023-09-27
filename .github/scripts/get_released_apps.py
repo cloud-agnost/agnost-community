@@ -17,7 +17,7 @@ version_list = []
 for k,v in app_env_dict.items():
     if os.environ[k] != 'not-changed':
         released_app_list.append(v)
-        version_list.append({'app': v, 'version': os.environ[k]})
+        version_list.append({'application': v, 'version': os.environ[k]})
 
 released_apps = str(released_app_list).replace(' ', '')
 versions = json.dumps(version_list, separators=(',', ':')).replace('"', '\\"')
