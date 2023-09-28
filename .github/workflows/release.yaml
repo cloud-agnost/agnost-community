@@ -64,7 +64,7 @@ jobs:
   get_released_apps:
     runs-on: ubuntu-latest
     outputs:
-      applications: ${{ steps.get-clusters.outputs.APPLICATIONS }}
+      applications: ${{ steps.get-applications.outputs.APPLICATIONS }}
       versions: ${{ steps.get-versions.outputs.VERSIONS }}
     steps:
       -
