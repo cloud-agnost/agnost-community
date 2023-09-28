@@ -1,11 +1,8 @@
 import json
 import os
 
-app_env_list = [ 'ENGINE_CORE', 'ENGINE_MONITOR', 'PLATFORM_CORE']
-#, 'ENGINE_REALTIME' ]
-
-#, 'ENGINE_SCHEDULER',
-#                 'ENGINE_WORKER','PLATFORM_CORE', 'PLATFORM_SYNC', 'PLATFORM_WORKER', 'STUDIO']
+app_env_list = ['ENGINE_CORE', 'ENGINE_MONITOR', 'ENGINE_REALTIME', 'ENGINE_SCHEDULER',
+                'ENGINE_WORKER','PLATFORM_CORE', 'PLATFORM_SYNC', 'PLATFORM_WORKER', 'STUDIO']
 
 released_app_list = []
 details_list = []
