@@ -59,6 +59,8 @@ env:
   PLATFORM_SYNC: '${{ github.event.inputs.platform-sync }}'
   PLATFORM_WORKER: '${{ github.event.inputs.platform-worker }}'
   STUDIO: '${{ github.event.inputs.studio }}'
+  DOCKER_REGISTRY: 'gcr.io'
+  GCR_PROJECT: 'agnost-community'
 
 jobs:
   get_released_apps:
