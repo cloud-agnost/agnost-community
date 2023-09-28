@@ -125,7 +125,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          context: ${{ matrix.rootdir }}./${{ matrix.application }}
+          context: ${{ matrix.rootdir }}/${{ matrix.application }}
           file: ${{ matrix.rootdir }}/${{ matrix.application }}/Dockerfile
           platforms: linux/amd64,linux/arm64
           tags: |
