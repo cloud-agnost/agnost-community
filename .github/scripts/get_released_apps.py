@@ -9,14 +9,9 @@ details_list = []
 
 for env in app_env_list:
     if os.environ[env] != 'not-changed':
-        if env == 'STUDIO':
-            appdir = 'studio'
-            rootdir = '.'
-        else:
-            rootdir, appdir = env.lower().split('_')
-        app = env.lower().replace('_', '-')
+        app = env.lower().replace('_', '/')
         released_app_list.append(app)
-        details_list.append({"application": app, "version": os.environ[env], "rootdir": rootdir, "appdir": appdir})
+        details_list.append({"application": app, "version": os.environ[env]})
 
 released_apps = str(released_app_list).replace(' ', '').replace('\'', '\\"')
 details = json.dumps(details_list, separators=(',', ':')).replace('"', '\\"')
