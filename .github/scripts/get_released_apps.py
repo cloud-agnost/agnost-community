@@ -12,13 +12,19 @@ app_env_dict = { 'ENGINE_CORE': 'engine-core',
                  'STUDIO': 'studio'}
 
 released_app_list = []
-version_list = []
+details_list = []
 
 for k,v in app_env_dict.items():
     if os.environ[k] != 'not-changed':
         released_app_list.append(v)
-        version_list.append({"application": v, "version": os.environ[k]})
+        if v.startswith('engine'):
+            root_dir = "engine"
+        elif v.startswith('platform'):
+            root_dir = "platform"
+        else:
+            root_dir = "."
+        details_list.append({"application": v, "version": os.environ[k], "rootdir": root_dir})
 
 released_apps = str(released_app_list).replace(' ', '').replace('\'', '\\"')
-versions = json.dumps(version_list, separators=(',', ':')).replace('"', '\\"')
-print("{} {}".format(released_apps, versions))
+details = json.dumps(details_list, separators=(',', ':')).replace('"', '\\"')
+print("{} {}".format(released_apps, details))
