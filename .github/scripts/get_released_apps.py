@@ -1,29 +1,25 @@
 import json
 import os
 
-app_env_dict = { 'ENGINE_CORE': 'engine-core',
-                 'ENGINE_MONITOR': 'engine-monitor',
-                 'ENGINE_REALTIME': 'engine-realtime',
-                 'ENGINE_SCHEDULER': 'engine-scheduler',
-                 'ENGINE_WORKER': 'engine-worker',
-                 'PLATFORM_CORE': 'platform-core',
-                 'PLATFORM_SYNC': 'platform-sync',
-                 'PLATFORM_WORKER': 'platform-worker',
-                 'STUDIO': 'studio'}
+app_env_list = [ 'ENGINE_CORE', 'ENGINE_MONITOR', 'PLATFORM_CORE']
+#, 'ENGINE_REALTIME' ]
+
+#, 'ENGINE_SCHEDULER',
+#                 'ENGINE_WORKER','PLATFORM_CORE', 'PLATFORM_SYNC', 'PLATFORM_WORKER', 'STUDIO']
 
 released_app_list = []
 details_list = []
 
-for k,v in app_env_dict.items():
-    if os.environ[k] != 'not-changed':
-        released_app_list.append(v)
-        if v.startswith('engine'):
-            root_dir = "engine"
-        elif v.startswith('platform'):
-            root_dir = "platform"
+for env in app_env_list:
+    if os.environ[env] != 'not-changed':
+        if env == 'STUDIO':
+            appdir = 'studio'
+            rootdir = '.'
         else:
-            root_dir = "."
-        details_list.append({"application": v, "version": os.environ[k], "rootdir": root_dir})
+            rootdir, appdir = env.lower().split('_')
+        app = env.lower().replace('_', '-')
+        released_app_list.append(app)
+        details_list.append({"application": app, "version": os.environ[env], "rootdir": rootdir, "appdir": appdir})
 
 released_apps = str(released_app_list).replace(' ', '').replace('\'', '\\"')
 details = json.dumps(details_list, separators=(',', ':')).replace('"', '\\"')
