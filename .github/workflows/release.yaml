@@ -156,5 +156,5 @@ jobs:
         name: Update Helm Chart
         run: |
           cd charts
-          python ../.github/scripts/update_helm_chart.py ${{ needs.get_released_apps.outputs.details }}
+          python ../.github/scripts/update_helm_chart.py '${{ needs.get_released_apps.outputs.details }}'
           git diff
