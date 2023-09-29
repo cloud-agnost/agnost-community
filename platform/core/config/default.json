@@ -75,8 +75,10 @@
     "defaultAuthRedirect": "http://localhost:3000/auth-redirect",
     "emailTokenExpiresInSeconds": 3600,
     "minEmailTokenExpirySeconds": 60,
+    "maxEmailTokenExpirySeconds": 604800,
     "SMSCodeExpiresInSeconds": 3600,
     "minSMSCodeExpirySeconds": 60,
+    "maxSMSCodeExpirySeconds": 604800,
     "maxSearchResults": 50,
     "defaultEngineConfig": {
       "initialScale": 1,

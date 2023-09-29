@@ -6,7 +6,7 @@
 		@apply text-default text-2xl md:text-3xl font-semibold;
 	}
 	&-items {
-		@apply flex flex-wrap justify-center items-center gap-4 w-1/2;
+		@apply flex flex-wrap justify-center gap-4 w-1/2;
 	}
 	&-item {
 		@apply flex flex-col justify-center items-center gap-4;

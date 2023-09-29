@@ -11,6 +11,12 @@
 		},
 		{
 			"path": "../agnost-website"
+		},
+		{
+			"path": "../agnost-client"
+		},
+		{
+			"path": "../test-app"
 		}
 	],
 	"settings": {}

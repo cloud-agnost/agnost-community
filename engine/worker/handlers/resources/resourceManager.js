@@ -335,6 +335,10 @@ export class ResourceManager {
                                         name: "NAMESPACE",
                                         value: process.env.NAMESPACE,
                                     },
+                                    {
+                                        name: "JWT_SECRET",
+                                        value: process.env.JWT_SECRET,
+                                    },
                                 ],
                                 resources: {
                                     requests: {

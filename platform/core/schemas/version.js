@@ -1280,11 +1280,13 @@ export const applyRules = (type) => {
 					.bail()
 					.isInt({
 						min: config.get("general.minEmailTokenExpirySeconds"),
+						max: config.get("general.maxEmailTokenExpirySeconds"),
 					})
 					.withMessage(
 						t(
-							"Email validation token expiry can be minimum '%s' seconds",
-							config.get("general.minEmailTokenExpirySeconds")
+							"Email validation token expiry can be minimum '%s' and maximum '%s' seconds",
+							config.get("general.minEmailTokenExpirySeconds"),
+							config.get("general.maxEmailTokenExpirySeconds")
 						)
 					)
 					.toInt(),
@@ -1294,7 +1296,7 @@ export const applyRules = (type) => {
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty")),
 				body("customSMTP.port")
-					.if((value, { req }) => req.body.confirmEmail)
+					.if((value, { req }) => req.body.confirmEmail && req.body.enabled)
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
@@ -1357,12 +1359,14 @@ export const applyRules = (type) => {
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
 					.isInt({
-						min: config.get("general.minEmailTokenExpirySeconds"),
+						min: config.get("general.minSMSCodeExpirySeconds"),
+						max: config.get("general.maxSMSCodeExpirySeconds"),
 					})
 					.withMessage(
 						t(
-							"SMS code expiry can be minimum '%s' seconds",
-							config.get("general.minSMSCodeExpirySeconds")
+							"SMS code expiry can be minimum '%s' and maximum '%s' seconds",
+							config.get("general.minSMSCodeExpirySeconds"),
+							config.get("general.maxSMSCodeExpirySeconds")
 						)
 					)
 					.toInt(),

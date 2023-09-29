@@ -17,6 +17,7 @@ import { initializeSyncClient, disconnectSyncClient } from "./init/sync.js";
 import { PrimaryProcessDeploymentManager } from "./handlers/primaryProcessManager.js";
 import { ChildProcessDeploymentManager } from "./handlers/childProcessManager.js";
 import { adapterManager } from "./handlers/adapterManager.js";
+import { disconnectRealtimeClient } from "./init/realtime.js";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -87,6 +88,8 @@ if (cluster.isPrimary) {
 		await disconnectFromRedisCache();
 		// Close connection to the database
 		await disconnectFromDatabase();
+		// Disconnect from realtime client
+		disconnectRealtimeClient();
 		// Close synchronization server connection
 		disconnectSyncClient();
 		// Close connection to message queue
@@ -148,8 +151,12 @@ function initGlobals() {
 
 	// To correctly identify errors thrown by the engine vs. system thrown errors
 	global.AgnostError = class extends Error {
-		constructor(message) {
+		constructor(message, code, specifics) {
 			super(message);
+			this.origin = "client_error";
+			this.code = code;
+			this.message = message;
+			this.specifics = specifics;
 		}
 	};
 	// Add config to the global object

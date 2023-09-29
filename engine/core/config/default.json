@@ -23,10 +23,12 @@
       "reconnectionDelay": 500,
       "path": "/sync/"
    },
-     "realtime": {
-        "reconnection": true,
-        "reconnectionDelay": 500
-     },
+   "realtime": {
+      "serverURL": "http://engine-realtime-clusterip-service:4000",
+      "namespace": "",
+      "reconnection": true,
+      "reconnectionDelay": 500
+   },
      "general": {
         "generalQueueCount": 1,
         "taskProcessQueueCount": 1,
@@ -45,6 +47,12 @@
         "defaultPageSize": 20,
         "batchBucketFileDeleteSize": 1000,
         "maxUpdatesBeforeRestart": 100,
-        "redisKeysDefaultPageSize": 200
+        "redisKeysDefaultPageSize": 200,
+        "SMTPserverConnectionPoolSize": 5,
+        "SMTPserverConnectionMaxMessages": 500,
+        "cookieExpiryDays": 365,
+        "minPwdLength": 6,
+        "maxPwdLength": 50,
+        "defaultTokenExpiryDuration": 3600
      }
 }

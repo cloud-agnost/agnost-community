@@ -35,7 +35,9 @@ export const checkAPIKey = (endpoint) => (req, res, next) => {
 				helper.createErrorMessage(
 					ERROR_CODES.clientError,
 					ERROR_CODES.invalidAPIKey,
-					t("API key is not valid, application does not have such a key.")
+					t(
+						"API key is not valid, application version does not have such a key."
+					)
 				)
 			);
 	}
@@ -59,54 +61,56 @@ export const checkAPIKey = (endpoint) => (req, res, next) => {
 		}
 	}
 
-	// Check whether this endpoint is allowed by the API key or not
-	switch (apiKeyObj.type) {
-		case "full-access":
-			break;
-		case "no-access":
-			return res
-				.status(401)
-				.json(
-					helper.createErrorMessage(
-						ERROR_CODES.clientError,
-						ERROR_CODES.endpointsNotAllowed,
-						t("API key does not allow calling endpoints.")
-					)
-				);
-		case "custom-allowed":
-			if (!apiKeyObj.allowedEndpoints.includes(endpoint.iid)) {
+	// Check whether this endpoint is allowed by the API key or not. We ignore this part if the endpoint is a handler for the Agnost client library, in such case the endpoint parameter is null
+	if (endpoint) {
+		switch (apiKeyObj.type) {
+			case "full-access":
+				break;
+			case "no-access":
 				return res
 					.status(401)
 					.json(
 						helper.createErrorMessage(
 							ERROR_CODES.clientError,
-							ERROR_CODES.endpointNotAllowed,
-							t(
-								"Endpoint '%s - %s' is not allowed with the provided API key.",
-								endpoint.method,
-								endpoint.path
-							)
+							ERROR_CODES.endpointsNotAllowed,
+							t("API key does not allow calling endpoints.")
 						)
 					);
-			}
-			break;
-		case "custom-excluded":
-			if (apiKeyObj.excludedEndpoints.includes(endpoint.iid)) {
-				return res
-					.status(401)
-					.json(
-						helper.createErrorMessage(
-							ERROR_CODES.clientError,
-							ERROR_CODES.endpointNotAllowed,
-							t(
-								"Endpoint '%s - %s' is not allowed with the provided API key.",
-								endpoint.method,
-								endpoint.path
+			case "custom-allowed":
+				if (!apiKeyObj.allowedEndpoints.includes(endpoint.iid)) {
+					return res
+						.status(401)
+						.json(
+							helper.createErrorMessage(
+								ERROR_CODES.clientError,
+								ERROR_CODES.endpointNotAllowed,
+								t(
+									"Endpoint '%s - %s' is not allowed with the provided API key.",
+									endpoint.method,
+									endpoint.path
+								)
 							)
-						)
-					);
-			}
-			break;
+						);
+				}
+				break;
+			case "custom-excluded":
+				if (apiKeyObj.excludedEndpoints.includes(endpoint.iid)) {
+					return res
+						.status(401)
+						.json(
+							helper.createErrorMessage(
+								ERROR_CODES.clientError,
+								ERROR_CODES.endpointNotAllowed,
+								t(
+									"Endpoint '%s - %s' is not allowed with the provided API key.",
+									endpoint.method,
+									endpoint.path
+								)
+							)
+						);
+				}
+				break;
+		}
 	}
 
 	// Check if the api key requires authorized domains and if yes check whether the request origin is from a valid domain

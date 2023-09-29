@@ -1762,6 +1762,7 @@ export class DeploymentManager {
 
             // Drop application specific data (e.g., cache, database, storage)
             await this.clearCachedData(`sessions.${this.getEnvId()}.*`);
+            await this.clearCachedData(`tokens.${this.getEnvId()}.*`);
             await this.dropStorages();
             await this.dropCaches();
             await this.dropDatabases();

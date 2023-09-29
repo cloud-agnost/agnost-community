@@ -19,6 +19,7 @@ import ReadReplicas from './ReadReplicas';
 
 export default function ConnectDatabase() {
 	const [loading, setLoading] = useState(false);
+	const [testLoading, setTestLoading] = useState(false);
 	const { t } = useTranslation();
 	const { notify } = useToast();
 	const {
@@ -54,7 +55,7 @@ export default function ConnectDatabase() {
 	}
 
 	function testResourceConnection() {
-		setLoading(true);
+		setTestLoading(true);
 		testExistingResourceConnection({
 			...form.getValues(),
 			access: {
@@ -63,7 +64,7 @@ export default function ConnectDatabase() {
 			},
 			type: 'database',
 			onSuccess: () => {
-				setLoading(false);
+				setTestLoading(false);
 				notify({
 					title: t('general.success'),
 					description: t('resources.database.test_success'),
@@ -71,7 +72,7 @@ export default function ConnectDatabase() {
 				});
 			},
 			onError: ({ error, details }) => {
-				setLoading(false);
+				setTestLoading(false);
 				notify({
 					title: error,
 					description: details,
@@ -90,17 +91,18 @@ export default function ConnectDatabase() {
 					actions={
 						<Button
 							variant='outline'
-							loading={loading}
+							loading={testLoading}
 							onClick={testResourceConnection}
 							type='button'
 							size='lg'
 							className='self-start'
 						>
-							{!loading && <TestConnection className='w-4 h-4 text-icon-default mr-2' />}
+							{!testLoading && <TestConnection className='w-4 h-4 text-icon-default mr-2' />}
 							{t('resources.database.test')}
 						</Button>
 					}
 					instances={DATABASE_TYPES}
+					loading={loading}
 				>
 					{form.watch('instance') === 'MongoDB' && <MongoConnectionFormat />}
 					<DatabaseInfo modal={false} />

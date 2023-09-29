@@ -343,22 +343,29 @@ function removeLeadingAndTrailingSlash(str) {
 // Handle exceptions in route handlers
 function handleError(req, res, error) {
 	let entry = {
-		code: ERROR_CODES.internalServerError,
-		name: error.name,
+		origin: error.origin ?? ERROR_CODES.serverError,
+		code: error.code ?? ERROR_CODES.internalServerError,
+		name: error.code ? undefined : error.name,
 		message: error.message,
 		stack: error.stack,
+		specifics: error.specifics,
 	};
 
 	if (error.name === "CastError") {
 		entry.error = t("Not Found");
 		entry.details = t("The object identifier is not recognized.");
-		res.status(400).json(entry);
+		res.status(400).json({ errors: [entry] });
 	} else {
-		entry.error = t("Internal Server Error");
-		entry.details = t(
-			"The server has encountered a situation it does not know how to handle."
-		);
-		res.status(500).json(entry);
+		entry.error = error.code ? undefined : t("Internal Server Error");
+		entry.details = error.code
+			? undefined
+			: t(
+					"The server has encountered a situation it does not know how to handle."
+			  );
+
+		res
+			.status(entry.code !== ERROR_CODES.internalServerError ? 400 : 500)
+			.json({ errors: [entry] });
 	}
 
 	// Log also the error message in console
@@ -503,4 +510,5 @@ export default {
 	isLink,
 	isMobilePhone,
 	encryptText,
+	decryptText,
 };

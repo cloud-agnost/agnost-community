@@ -22,7 +22,6 @@ export default function AutoComplete<T>({
 		<AsyncSelect
 			cacheOptions
 			defaultOptions
-			de
 			loadOptions={loadOptions}
 			onChange={({ value }: { value: T }) => onChange(value)}
 			className='select-container'
