@@ -4,9 +4,11 @@ import {
 	APIKey,
 	AddNPMPackageParams,
 	AddVersionVariableParams,
+	AuthMessageTemplateParams,
 	BaseParams,
 	CreateAPIKeyParams,
 	CreateCopyOfVersionParams,
+	CreateOAuthConfigParams,
 	CreateRateLimitParams,
 	DeleteAPIKeyParams,
 	DeleteMultipleAPIKeys,
@@ -14,6 +16,7 @@ import {
 	DeleteMultipleRateLimitsParams,
 	DeleteMultipleVersionVariablesParams,
 	DeleteNPMPackageParams,
+	DeleteOAuthConfigParams,
 	DeleteRateLimitParams,
 	DeleteVersionParams,
 	DeleteVersionVariableParams,
@@ -27,15 +30,19 @@ import {
 	Notification,
 	Param,
 	RateLimit,
+	SaveEmailAuthParams,
+	SaveEmailPhoneParams,
+	SaveRedirectURLsParams,
+	SaveUserDataModelInfoParams,
 	SearchDesignElementParams,
 	SearchNPMPackages,
 	SearchNPMPackagesParams,
 	UpdateAPIKeyParams,
+	UpdateOAuthConfigParams,
 	UpdateVersionVariableParams,
 	Version,
 	VersionLog,
 	VersionLogBucket,
-	VersionProperties,
 	VersionRealtimeProperties,
 } from '@/types';
 import { history, notify, translate } from '@/utils';
@@ -45,17 +52,17 @@ import useAuthStore from '../auth/authStore';
 
 interface VersionStore {
 	loading: boolean;
-	error: APIError | null;
-	version: Version | null;
+	error: APIError;
+	version: Version;
 	versions: Version[];
-	param: Param | null;
-	rateLimit: RateLimit | null;
+	param: Param;
+	rateLimit: RateLimit;
 	versionPage: number;
 	editParamDrawerIsOpen: boolean;
 	editRateLimitDrawerIsOpen: boolean;
 	createCopyVersionDrawerIsOpen: boolean;
 	editAPIKeyDrawerIsOpen: boolean;
-	selectedAPIKey: APIKey | null;
+	selectedAPIKey: APIKey;
 	logBuckets: VersionLogBucket;
 	deleteVersionDrawerIsOpen: boolean;
 	logs: VersionLog[];
@@ -68,12 +75,12 @@ interface VersionStore {
 	notificationLastFetchedCount: number;
 	designElements: DesignElement[];
 	selectVersion: (version: Version) => void;
-	setSelectedAPIKey: (key: APIKey | null) => void;
+	setSelectedAPIKey: (key: APIKey) => void;
 	setEditAPIKeyDrawerIsOpen: (isOpen: boolean) => void;
 	getVersionById: (req: GetVersionByIdParams) => Promise<Version>;
 	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<void>;
 	setVersionPage: (page: number) => void;
-	updateVersionProperties: (params: BaseParams & Partial<VersionProperties>) => Promise<Version>;
+	updateVersionProperties: (params: BaseParams & Partial<Version>) => Promise<Version>;
 	createRateLimit: (params: CreateRateLimitParams) => Promise<RateLimit>;
 	deleteRateLimit: (params: DeleteRateLimitParams) => Promise<Version>;
 	orderEndpointRateLimits: (limits: string[]) => void;
@@ -85,7 +92,7 @@ interface VersionStore {
 		params: DeleteMultipleNPMPackagesParams,
 		showAlert?: boolean,
 	) => Promise<Version>;
-	setParam: (param: Param | null) => void;
+	setParam: (param: Param) => void;
 	addParam: (params: AddVersionVariableParams, showAlert?: boolean) => Promise<Version>;
 	deleteParam: (params: DeleteVersionVariableParams, showAlert?: boolean) => Promise<Version>;
 	deleteMultipleParams: (
@@ -99,7 +106,7 @@ interface VersionStore {
 		returnRedirect?: boolean,
 	) => Promise<Version | void>;
 	setEditRateLimitDrawerIsOpen: (isOpen: boolean) => void;
-	setRateLimit: (rateLimit: RateLimit | null) => void;
+	setRateLimit: (rateLimit: RateLimit) => void;
 	editRateLimit: (params: EditRateLimitParams, showAlert?: boolean) => Promise<Version>;
 	deleteMultipleRateLimits: (
 		params: DeleteMultipleRateLimitsParams,
@@ -124,6 +131,15 @@ interface VersionStore {
 	updateNotificationLastSeen: () => void;
 	searchDesignElements: (params: SearchDesignElementParams) => Promise<DesignElement[]>;
 	resetDesignElements: () => void;
+	saveUserDataModelInfo: (params: SaveUserDataModelInfoParams) => Promise<void>;
+	addMissingUserDataModelFields: (params: SaveUserDataModelInfoParams) => Promise<void>;
+	saveRedirectURLs: (params: SaveRedirectURLsParams) => Promise<void>;
+	saveEmailAuthSettings: (params: SaveEmailAuthParams) => Promise<void>;
+	savePhoneAuthSettings: (params: SaveEmailPhoneParams) => Promise<void>;
+	createOAuthConfig: (params: CreateOAuthConfigParams) => Promise<void>;
+	updateOAuthConfig: (params: UpdateOAuthConfigParams) => Promise<void>;
+	deleteOAuthConfig: (params: DeleteOAuthConfigParams) => Promise<void>;
+	setAuthMessageTemplate: (params: AuthMessageTemplateParams) => Promise<void>;
 }
 
 const useVersionStore = create<VersionStore>()(
@@ -133,14 +149,14 @@ const useVersionStore = create<VersionStore>()(
 				notificationLastFetchedCount: 0,
 				loading: false,
 				editAPIKeyDrawerIsOpen: false,
-				selectedAPIKey: null,
-				error: null,
+				selectedAPIKey: {} as APIKey,
+				error: {} as APIError,
 				deleteVersionDrawerIsOpen: false,
-				version: null,
+				version: {} as Version,
 				versions: [],
 				versionPage: 0,
-				param: null,
-				rateLimit: null,
+				param: {} as Param,
+				rateLimit: {} as RateLimit,
 				editParamDrawerIsOpen: false,
 				editRateLimitDrawerIsOpen: false,
 				createCopyVersionDrawerIsOpen: false,
@@ -156,7 +172,7 @@ const useVersionStore = create<VersionStore>()(
 				selectVersion: (version: Version) => {
 					set({ version });
 				},
-				setSelectedAPIKey: (key: APIKey | null) => {
+				setSelectedAPIKey: (key: APIKey) => {
 					set({ selectedAPIKey: key });
 				},
 				setEditAPIKeyDrawerIsOpen: (isOpen: boolean) => {
@@ -190,7 +206,7 @@ const useVersionStore = create<VersionStore>()(
 					versionId,
 					appId,
 					...data
-				}: BaseParams & Partial<VersionProperties>) => {
+				}: BaseParams & Partial<Version>) => {
 					try {
 						const version = await VersionService.updateVersionProperties({
 							orgId,
@@ -339,7 +355,7 @@ const useVersionStore = create<VersionStore>()(
 						throw e;
 					}
 				},
-				setParam: (param: Param | null) => {
+				setParam: (param: Param) => {
 					set({ param });
 				},
 				addParam: async (params: AddVersionVariableParams, showAlert) => {
@@ -523,6 +539,7 @@ const useVersionStore = create<VersionStore>()(
 					if (!_version) return '/organization';
 					const { orgId, appId, _id } = _version;
 					path = path ? `/${path.replace(/^\//, '')}` : '';
+					console.log('path', path);
 					return `/organization/${orgId}/apps/${appId}/version/${_id}` + path;
 				},
 				createAPIKey: async (params, showAlert) => {
@@ -745,6 +762,104 @@ const useVersionStore = create<VersionStore>()(
 				},
 				resetDesignElements: () => {
 					set({ designElements: [] });
+				},
+				saveUserDataModelInfo: async (params) => {
+					try {
+						const version = await VersionService.saveUserDataModelInfo(params);
+						set({ version });
+						if (params.onSuccess) params?.onSuccess();
+					} catch (error) {
+						if (params.onError) params?.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				addMissingUserDataModelFields: async (params) => {
+					try {
+						await VersionService.addMissingUserDataModelFields(params);
+						if (params.onSuccess) params?.onSuccess();
+					} catch (error) {
+						if (params.onError) params?.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				saveRedirectURLs: async (params) => {
+					try {
+						const version = await VersionService.saveRedirectURLs(params);
+						set({ version });
+						if (params.onSuccess) params?.onSuccess();
+					} catch (error) {
+						if (params.onError) params?.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				saveEmailAuthSettings: async (params) => {
+					try {
+						const version = await VersionService.saveEmailAuthSettings(params);
+						set({ version });
+						if (params.onSuccess) params?.onSuccess();
+					} catch (error) {
+						if (params.onError) params?.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				savePhoneAuthSettings: async (params) => {
+					try {
+						const version = await VersionService.savePhoneAuthSettings(params);
+						set({ version });
+						if (params.onSuccess) params?.onSuccess();
+					} catch (error) {
+						if (params.onError) params?.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				createOAuthConfig: async (params) => {
+					try {
+						const version = await VersionService.createOAuthConfig(params);
+						set({ version });
+						if (params.onSuccess) params?.onSuccess();
+					} catch (error) {
+						if (params.onError) params?.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				updateOAuthConfig: async (params) => {
+					try {
+						await VersionService.updateOAuthConfig(params);
+						if (params.onSuccess) params?.onSuccess();
+					} catch (error) {
+						if (params.onError) params?.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				deleteOAuthConfig: async (params) => {
+					try {
+						await VersionService.deleteOAuthConfig(params);
+						set((prev) => ({
+							version: {
+								...prev.version,
+								authentication: {
+									...prev.version.authentication,
+									providers: prev.version.authentication.providers.filter(
+										(p) => p._id !== params.providerId,
+									),
+								},
+							},
+						}));
+						if (params.onSuccess) params?.onSuccess();
+					} catch (error) {
+						if (params.onError) params?.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				setAuthMessageTemplate: async (params) => {
+					try {
+						const version = await VersionService.setAuthMessageTemplate(params);
+						set({ version });
+						if (params.onSuccess) params?.onSuccess();
+					} catch (error) {
+						if (params.onError) params?.onError(error as APIError);
+						throw error as APIError;
+					}
 				},
 			}),
 			{
