@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { SVGProps } from 'react';
 const SvgApple = (props: SVGProps<SVGSVGElement>) => (
 	<svg
