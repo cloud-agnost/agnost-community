@@ -18,7 +18,8 @@
         "transports": ["websocket", "polling"],
         "allowUpgrades": true,
         "serveClient": false,
-        "gcSeconds": 30
+        "gcSeconds": 30,
+        "path": "/realtime/"
     },
     "cache": {
         "port": 6379

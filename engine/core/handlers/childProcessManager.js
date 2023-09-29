@@ -4,6 +4,8 @@ import helmet from "helmet";
 import nocache from "nocache";
 import responseTime from "response-time";
 import cookieParser from "cookie-parser";
+import RedisStore from "connect-redis";
+import session from "express-session";
 import { DeploymentManager } from "./deploymentManager.js";
 import { handleUndefinedPaths } from "../middlewares/undefinedPaths.js";
 import { getResponseBody } from "../middlewares/getResponseBody.js";
@@ -30,6 +32,7 @@ import {
 	initializeRealtimeServer,
 	disconnectRealtimeClient,
 } from "../init/realtime.js";
+import { getRedisClient } from "../init/cache.js";
 
 export class ChildProcessDeploymentManager extends DeploymentManager {
 	constructor(msgObj, envObj, i18n) {
@@ -279,6 +282,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		var app = express();
 		this.setExpressApp(app);
 
+		// Initialize store
+		const redisStore = new RedisStore({ client: getRedisClient() });
+
 		//Secure express app by setting various HTTP headers
 		app.use(helmet());
 		//Parses incoming requests with urlencoded payloads
@@ -294,6 +300,15 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 					callback(null, true);
 				},
 				credentials: true,
+			})
+		);
+		// Initialize sesssion storage
+		app.use(
+			session({
+				store: redisStore,
+				saveUninitialized: false,
+				secret: config.get("general.expressSessionSecret"),
+				resave: false,
 			})
 		);
 		//Disable client side caching
@@ -315,6 +330,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			app.use("/storage", (await import("../routes/storage.js")).default);
 			// Add the default user authentication endpoints
 			app.use("/auth", (await import("../routes/auth.js")).default);
+			app.use("/oauth", (await import("../routes/oauth.js")).default);
+			app.use("/realtime", (await import("../routes/realtime.js")).default);
 		}
 	}
 

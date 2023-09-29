@@ -5043,6 +5043,7 @@
 									yield this.setValue(r, e, null);
 								} else if (
 									("object" != typeof a && !Array.isArray(a)) ||
+									a instanceof Date ||
 									(Array.isArray(a) &&
 										"basic-values-list" === e.field.getType()) ||
 									(Array.isArray(a) && "geo-point" === e.field.getType())
@@ -8090,7 +8091,6 @@
 					}),
 					(t.isValidId = function (e, t) {
 						if (!e) return !1;
-						if ("number" != typeof e && "string" != typeof e) return !1;
 						switch (t) {
 							case r.DBTYPE.MONGODB:
 								return !!n.isValidId(e.toString());

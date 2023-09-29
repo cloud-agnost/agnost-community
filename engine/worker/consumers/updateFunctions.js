@@ -29,7 +29,6 @@ export const updateFunctionsHandler = (connection, queue) => {
 
                 // Check the environment status if it is in a deployment state then do not acknowledge the message unless it is timed out
                 let envStatus = await getKey(`${msgObj.env.iid}.status`);
-                console.log("status", envStatus);
                 if (envStatus === "Deleting") {
                     // If the environment is being deleted then do not process deployment messages
                     channel.ack(msg);

@@ -20,6 +20,7 @@ export function setUpRealtimeServer(expressServer) {
 		cors: {
 			origin: "*",
 		},
+		path: config.get("realtime.path"),
 	});
 
 	try {
@@ -39,10 +40,11 @@ export function setUpRealtimeServer(expressServer) {
 		const subClient = pubClient.duplicate();
 
 		pubClient.on("connect", function () {
-			// Crate socket.io redis adapter
-			realtimeServer.adapter(createAdapter(pubClient, subClient));
 			logger.info("Realtime server attached to Http server and cache");
 		});
+
+		// Crate socket.io redis adapter
+		realtimeServer.adapter(createAdapter(pubClient, subClient));
 
 		// Register middlewares that get executed for every incoming connection apply the middlewares and join to the default channels
 		realtimeServer.use(applyRealtimeMiddlewares());
@@ -96,7 +98,12 @@ export function setUpRealtimeServer(expressServer) {
 			socket.on("user_event", (payload) => {
 				realtimeServer
 					.to(`${payload.envId}.${payload.userId}`)
-					.emit(payload.eventName, payload.eventName, payload.session);
+					.emit(
+						payload.eventName,
+						payload.eventName,
+						payload.session,
+						payload.user
+					);
 			});
 
 			socket.on("send_message", async (payload) => {

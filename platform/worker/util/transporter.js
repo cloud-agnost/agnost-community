@@ -30,6 +30,10 @@ export async function getTransport() {
 			pool: config.get("emailServer.pool"),
 		});
 
-		return transporter;
+		return {
+			transporter,
+			fromEmail: smtpConfig.data.fromEmail,
+			fromName: smtpConfig.data.fromName,
+		};
 	} catch (err) {}
 }

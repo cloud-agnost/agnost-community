@@ -11,17 +11,12 @@ body
           tr
             td.content
               h1= t('Confirm your email address')
-              p= t('You requested a change to the email address that you use to sign in to Altogic.')
+              p= t('You requested a change to the email address that you use to sign in to Agnost cluster.')
               p= t('Please click below button to confirm that this is the right address. If you don\’t use this link within 24 hours, it will expire.')
           tr
             td.button
               a.button(href=`${url}` rel='nofollow' target='_blank')= t('Confirm your email address')
           tr
             td.content
-              p= t('Once verified, you can use your new email address to sing in to Altogic.')
-              p= t('If you did not request a change to your email address, please contact us at ')
-                a(href='mailto:support@altogic.com' rel='nofollow' target='_blank') support@altogic.com
-                span .
-                br
-              p= t('The Altogic Team')
+              p= t('Once verified, you can use your new email address to sing in to Agnost.')
           include ../templates/footer.pug
