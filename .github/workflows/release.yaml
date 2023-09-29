@@ -136,6 +136,9 @@ jobs:
     needs: [get_released_apps, build]
     steps:
       -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
         name: Checkout Charts
         uses: actions/checkout@v4
         with:
