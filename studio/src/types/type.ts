@@ -40,6 +40,21 @@ export type APIError = {
 		param: string;
 		location: string;
 	}[];
+	missingFields?: {
+		name:
+			| 'provider'
+			| 'providerUserId'
+			| 'email'
+			| 'phone'
+			| 'password'
+			| 'name'
+			| 'profilePicture'
+			| 'signUpAt'
+			| 'lastLoginAt'
+			| 'emailVerified'
+			| 'phoneVerified';
+		type: 'text' | 'boolean' | 'datetime' | 'link' | 'encrypted-text' | 'array' | 'phone' | 'email';
+	}[];
 };
 export type User = z.infer<typeof UserSchema>;
 
@@ -99,6 +114,48 @@ export interface UpdateNotificationData {
 	notifications: string[];
 }
 
+export enum PhoneAuthSMSProviders {
+	TWILIO = 'Twilio',
+	MESSAGEBIRD = 'MessageBird',
+	VONAGE = 'Vonage',
+}
+export type PhoneAuthSMSProviderParams =
+	| 'accountSID'
+	| 'authToken'
+	| 'fromNumberOrSID'
+	| 'accessKey'
+	| 'originator'
+	| 'apiKey'
+	| 'apiSecret'
+	| 'from';
+
+export enum OAuthProviderParams {
+	Key = 'key',
+	Secret = 'secret',
+	TeamId = 'teamId',
+	ServiceId = 'serviceId',
+	KeyId = 'keyId',
+	PrivateKey = 'privateKey',
+}
+
+export enum OAuthProviderTypes {
+	Google = 'google',
+	Facebook = 'facebook',
+	Github = 'github',
+	Apple = 'apple',
+	Twitter = 'twitter',
+	Discord = 'discord',
+}
+
+export interface OAuthProvider {
+	provider: OAuthProviderTypes;
+	params: {
+		name: OAuthProviderParams;
+		title: string;
+		type: string;
+		multiline: boolean;
+	}[];
+}
 export interface Types {
 	orgRoles: string[];
 	appRoles: string[];
@@ -114,29 +171,17 @@ export interface Types {
 		scheduler: string[];
 		realtime: string[];
 	};
-	phoneAuthSMSProviders: [
-		{
-			provider: string;
-			params: {
-				name: string;
-				title: string;
-				type: string;
-				description: string;
-				multiline: boolean;
-			}[];
-		}[],
-	];
-	oAuthProviderTypes: [
-		{
-			provider: string;
-			params: {
-				name: string;
-				title: string;
-				type: string;
-				multiline: boolean;
-			}[];
-		}[],
-	];
+	phoneAuthSMSProviders: {
+		provider: PhoneAuthSMSProviders;
+		params: {
+			name: PhoneAuthSMSProviderParams;
+			title: string;
+			type: string;
+			description: string;
+			multiline: boolean;
+		}[];
+	}[];
+	oAuthProviderTypes: OAuthProvider[];
 	authUserDataModel: {
 		name: string;
 		type: string;
@@ -306,3 +351,23 @@ export interface Log {
 	timestamp: string;
 	type: LogTypes | EnvironmentStatus;
 }
+
+export const SMTPSchema = z.object({
+	host: z
+		.string({ required_error: 'Host is required' })
+		.trim()
+		.refine((value) => value.trim().length > 0, 'Host is required'),
+	port: z.coerce
+		.number({
+			required_error: 'Port is required',
+		})
+		.int()
+		.positive()
+		.min(100, 'Port must be at least 3 characters long'),
+	user: z
+		.string({ required_error: 'Username is required' })
+		.trim()
+		.refine((value) => value.trim().length > 0, 'Username is required'),
+	password: z.string({ required_error: 'Password is required' }),
+	useTLS: z.boolean(),
+});
