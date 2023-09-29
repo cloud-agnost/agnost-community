@@ -36,7 +36,6 @@ export default function SMTPConfiguration() {
 		resolver: zodResolver(SMTPSchema),
 		defaultValues: {
 			...onboardingData.smtp,
-			port: onboardingData.smtp.port,
 		},
 	});
 
