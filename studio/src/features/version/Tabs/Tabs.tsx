@@ -67,7 +67,6 @@ export default function Tabs() {
 			const openTab = tabs.find((tab) => tab.path?.split('/')?.at(-1) === item.path);
 
 			if (openTab) {
-				console.log('openTab', openTab);
 				setCurrentTab(versionId, openTab.id);
 			} else {
 				addTab(versionId, {
@@ -79,7 +78,6 @@ export default function Tabs() {
 		} else {
 			const currentTab = tabs.find((tab) => tab.isActive);
 			if (currentTab?.path !== pathname) {
-				console.log('openTab', currentTab, currentTab?.path, pathname);
 				const targetPath = currentTab?.path || getDashboardPath();
 				navigate(targetPath);
 			}
@@ -126,7 +124,6 @@ export default function Tabs() {
 		if (!container) return;
 
 		const handleScroll = () => {
-			console.log('handleScroll', container.scrollWidth > container.clientWidth);
 			setIsScrollable(container.scrollWidth > container.clientWidth);
 			setEndOfScroll(container.scrollLeft + container.clientWidth >= container.scrollWidth);
 			setStartOfScroll(container.scrollLeft === 0);
@@ -201,7 +198,9 @@ export default function Tabs() {
 															`${tab.path}?tabId=${tab.id}`,
 														);
 													}}
-													to={`${tab.path}?tabId=${tab.id}`}
+													to={`${
+														tab.path.includes('?') ? tab.path : `${tab.path}?tabId=${tab.id}`
+													} `}
 													closeable={!tab.isDashboard}
 													isDirty={tab.isDirty}
 													provided={dragProvided}
