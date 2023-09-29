@@ -3,8 +3,10 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import {
 	AddNPMPackageParams,
 	AddVersionVariableParams,
+	AuthMessageTemplateParams,
 	CreateAPIKeyParams,
 	CreateCopyOfVersionParams,
+	CreateOAuthConfigParams,
 	CreateRateLimitParams,
 	DeleteAPIKeyParams,
 	DeleteMultipleAPIKeys,
@@ -12,6 +14,7 @@ import {
 	DeleteMultipleRateLimitsParams,
 	DeleteMultipleVersionVariablesParams,
 	DeleteNPMPackageParams,
+	DeleteOAuthConfigParams,
 	DeleteRateLimitParams,
 	DeleteVersionParams,
 	DeleteVersionVariableParams,
@@ -27,10 +30,15 @@ import {
 	Notification,
 	ResLog,
 	Resource,
+	SaveEmailAuthParams,
+	SaveEmailPhoneParams,
+	SaveRedirectURLsParams,
+	SaveUserDataModelInfoParams,
 	SearchDesignElementParams,
 	SearchNPMPackages,
 	SearchNPMPackagesParams,
 	UpdateAPIKeyParams,
+	UpdateOAuthConfigParams,
 	UpdateVersionPropertiesParams,
 	UpdateVersionRealtimePropertiesParams,
 	UpdateVersionVariableParams,
@@ -338,6 +346,130 @@ export default class VersionService {
 					keyword,
 				},
 			})
+		).data;
+	}
+
+	static async saveUserDataModelInfo({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: SaveUserDataModelInfoParams): Promise<Version> {
+		return (
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/auth/save-model`,
+				data,
+			)
+		).data;
+	}
+
+	static async addMissingUserDataModelFields({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: SaveUserDataModelInfoParams): Promise<void> {
+		return (
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/auth/add-fields`,
+				data,
+			)
+		).data;
+	}
+	static async saveRedirectURLs({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: SaveRedirectURLsParams): Promise<Version> {
+		return (
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/auth/save-redirect`,
+				data,
+			)
+		).data;
+	}
+
+	static async saveEmailAuthSettings({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: SaveEmailAuthParams): Promise<Version> {
+		return (
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/auth/save-email`,
+				data,
+			)
+		).data;
+	}
+
+	static async savePhoneAuthSettings({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: SaveEmailPhoneParams): Promise<Version> {
+		return (
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/auth/save-phone`,
+				data,
+			)
+		).data;
+	}
+
+	static async createOAuthConfig({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: CreateOAuthConfigParams): Promise<Version> {
+		return (
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/auth/providers`,
+				data,
+			)
+		).data;
+	}
+	static async updateOAuthConfig({
+		orgId,
+		appId,
+		versionId,
+		providerId,
+		...data
+	}: UpdateOAuthConfigParams): Promise<Version> {
+		return (
+			await axios.put(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/auth/providers/${providerId}`,
+				data,
+			)
+		).data;
+	}
+
+	static async deleteOAuthConfig({
+		orgId,
+		appId,
+		versionId,
+		providerId,
+	}: DeleteOAuthConfigParams): Promise<Version> {
+		return (
+			await axios.delete(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/auth/providers/${providerId}`,
+				{
+					data: {},
+				},
+			)
+		).data;
+	}
+
+	static async setAuthMessageTemplate({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: AuthMessageTemplateParams): Promise<Version> {
+		return (
+			await axios.post(`${this.url}/${orgId}/app/${appId}/version/${versionId}/auth/messages`, data)
 		).data;
 	}
 }
