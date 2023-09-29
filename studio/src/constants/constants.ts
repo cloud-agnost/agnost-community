@@ -3,6 +3,7 @@ import Rapid from '@/assets/images/rapid.png';
 import Realtime from '@/assets/images/realtime.png';
 import {
 	ApiKeys,
+	Apple,
 	Authentication,
 	Awss3,
 	AzureBlobStorage,
@@ -17,9 +18,13 @@ import {
 	Decimal,
 	Decision,
 	DeviceMobile,
+	Discord,
 	Environment,
 	EnvironmentVariable,
+	Facebook,
 	GcpStorage,
+	Github,
+	Google,
 	Integer,
 	Kafka,
 	LightBulb,
@@ -43,6 +48,7 @@ import {
 	Storage,
 	Team,
 	Timestamp,
+	Twitter,
 } from '@/components/icons';
 import {
 	ConnectAWS,
@@ -64,6 +70,7 @@ import {
 	EnvironmentStatus,
 	HttpMethod,
 	Instance,
+	OAuthProviderTypes,
 	SortOption,
 	Tab,
 	TabTypes,
@@ -380,6 +387,21 @@ export const EDIT_APPLICATION_MENU_ITEMS = [
 	},
 ];
 
+export const AUTH_MENU_ITEMS = [
+	{
+		name: translate('version.settings.general'),
+		href: '?a=general',
+	},
+	{
+		name: translate('version.authentication.providers'),
+		href: '?a=providers',
+	},
+	{
+		name: translate('version.authentication.message_templates'),
+		href: '?a=templates',
+	},
+];
+
 export const TEST_ENDPOINTS_MENU_ITEMS = [
 	{
 		name: translate('endpoint.test.params'),
@@ -437,7 +459,7 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 	{
 		id: 7,
 		title: translate('version.settings.authentications'),
-		path: 'authentications',
+		path: 'authentications?a=general',
 		icon: Authentication,
 	},
 	{
@@ -966,3 +988,19 @@ export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
 };
 
 export const NOTIFICATION_ACTIONS = ['create', 'update', 'deploy', 'redeploy', 'delete'];
+export const OAUTH_ICON_MAP: Record<OAuthProviderTypes, ElementType> = {
+	google: Google,
+	github: Github,
+	facebook: Facebook,
+	twitter: Twitter,
+	discord: Discord,
+	apple: Apple,
+};
+export const OAUTH_URL_MAP: Record<OAuthProviderTypes, string> = {
+	google: 'https://console.developers.google.com/',
+	github: 'https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app',
+	facebook: 'https://developers.facebook.com/',
+	twitter: 'https://dev.twitter.com/',
+	discord: 'https://discord.com/developers/docs/topics/oauth2',
+	apple: 'https://developer.apple.com/',
+};
