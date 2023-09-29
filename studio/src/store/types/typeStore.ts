@@ -70,7 +70,7 @@ const useTypeStore = create<TypesStore>()(
 				},
 				phoneAuthSMSProviders: [
 					{
-						provider: 'Twilio',
+						provider: PhoneAuthSMSProviders.TWILIO,
 						params: [
 							{
 								name: 'accountSID',
@@ -84,7 +84,7 @@ const useTypeStore = create<TypesStore>()(
 				],
 				oAuthProviderTypes: [
 					{
-						provider: 'google',
+						provider: OAuthProviderTypes.Google,
 						params: [
 							{
 								name: 'key',

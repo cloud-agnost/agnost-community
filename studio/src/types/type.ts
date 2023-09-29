@@ -74,7 +74,7 @@ export interface OnboardingData {
 
 export interface SMTPSettings {
 	host: string;
-	port: string;
+	port: number;
 	useTLS: boolean;
 	user: string;
 	password: string;
@@ -129,14 +129,13 @@ export type PhoneAuthSMSProviderParams =
 	| 'apiSecret'
 	| 'from';
 
-export enum OAuthProviderParams {
-	Key = 'key',
-	Secret = 'secret',
-	TeamId = 'teamId',
-	ServiceId = 'serviceId',
-	KeyId = 'keyId',
-	PrivateKey = 'privateKey',
-}
+export type OAuthProviderParams =
+	| 'key'
+	| 'secret'
+	| 'teamId'
+	| 'serviceId'
+	| 'keyId'
+	| 'privateKey';
 
 export enum OAuthProviderTypes {
 	Google = 'google',
