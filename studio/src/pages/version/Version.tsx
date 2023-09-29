@@ -24,9 +24,11 @@ export default function Version() {
 	}, [canView]);
 
 	useEffect(() => {
-		if (versionId && versionId !== version?._id && appId && orgId) {
-			getVersionById({ appId, orgId, versionId });
-		}
+		getVersionById({
+			appId: appId as string,
+			orgId: orgId as string,
+			versionId: versionId as string,
+		});
 	}, [appId, orgId, versionId]);
 
 	return (
