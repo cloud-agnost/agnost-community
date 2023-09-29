@@ -11,7 +11,6 @@ import {
 import { handleTabChange } from '@/utils';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import { useEffect } from 'react';
 enum AUTH_TABS {
 	GENERAL = 'general',
 	PROVIDERS = 'providers',

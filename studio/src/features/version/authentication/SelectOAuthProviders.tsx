@@ -1,12 +1,13 @@
 import { Button } from '@/components/Button';
+import { InfoModal } from '@/components/InfoModal';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
+import { Pencil, Warning } from '@/components/icons';
 import { OAUTH_ICON_MAP } from '@/constants';
 import useTypeStore from '@/store/types/typeStore';
 import useVersionStore from '@/store/version/versionStore';
 import { OAuthProvider, OAuthProviderTypes, VersionOAuthProvider } from '@/types';
 import { capitalize } from '@/utils';
 import { Plus, Trash } from '@phosphor-icons/react';
-import { Pencil, Warning } from '@/components/icons';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -14,10 +15,9 @@ import {
 	DropdownMenuItemContainer,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import { useReducer, useState } from 'react';
+import { useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
 import AddProvider from './AddProvider';
-import { InfoModal } from '@/components/InfoModal';
 
 interface SelectProvider {
 	provider: OAuthProvider;

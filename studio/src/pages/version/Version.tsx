@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 export default function Version() {
 	const { pathname } = useLocation();
-	const { getVersionById, version } = useVersionStore();
+	const { getVersionById } = useVersionStore();
 	const paths = pathname.split('/').filter((item) => /^[a-zA-Z-_]+$/.test(item));
 	const navigate = useNavigate();
 	const canView = useAuthorizeVersion('version.view');
