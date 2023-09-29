@@ -37,9 +37,12 @@ export default function VersionSettingsAuthentications() {
 	];
 
 	return (
-		<SettingsContainer pageTitle={t('version.settings.authentications')}>
-			<div className='space-y-8'>
-				<nav className='flex border-b'>
+		<SettingsContainer
+			pageTitle={t('version.settings.authentications')}
+			contentClassName='!overflow-hidden !p-0 h-full'
+		>
+			<div className='h-full'>
+				<nav className='flex border-b pt-6 px-6'>
 					{AUTH_MENU_ITEMS.map((item) => (
 						<OrganizationMenuItem
 							key={item.name}
@@ -49,16 +52,18 @@ export default function VersionSettingsAuthentications() {
 						/>
 					))}
 				</nav>
-				{searchParams.get('a') === AUTH_TABS.GENERAL && (
-					<>
-						<SelectUserDataModel />
-						<RedirectURLs />
-						<EmailAuthentication />
-						<PhoneAuthentication />
-					</>
-				)}
-				{searchParams.get('a') === AUTH_TABS.PROVIDERS && <SelectOAuthProviders />}
-				{searchParams.get('a') === AUTH_TABS.TEMPLATES && <MessageTemplates />}
+				<div className='scroll space-y-8 p-6'>
+					{searchParams.get('a') === AUTH_TABS.GENERAL && (
+						<>
+							<SelectUserDataModel />
+							<RedirectURLs />
+							<EmailAuthentication />
+							<PhoneAuthentication />
+						</>
+					)}
+					{searchParams.get('a') === AUTH_TABS.PROVIDERS && <SelectOAuthProviders />}
+					{searchParams.get('a') === AUTH_TABS.TEMPLATES && <MessageTemplates />}/
+				</div>
 			</div>
 		</SettingsContainer>
 	);
