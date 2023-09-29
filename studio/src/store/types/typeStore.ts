@@ -1,8 +1,13 @@
+import TypesService from '@/services/TypesService';
+import {
+	OAuthProviderParams,
+	OAuthProviderTypes,
+	PhoneAuthSMSProviderParams,
+	PhoneAuthSMSProviders,
+} from '@/types';
+import { APIError, FieldType, Types } from '@/types/type';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import TypesService from '@/services/TypesService';
-import { APIError, FieldType, Types } from '@/types/type';
-
 interface TypesStore {
 	orgRoles: string[];
 	appRoles: string[];
@@ -18,29 +23,25 @@ interface TypesStore {
 		scheduler: string[];
 		realtime: string[];
 	};
-	phoneAuthSMSProviders: [
-		{
-			provider: string;
-			params: {
-				name: string;
-				title: string;
-				type: string;
-				description: string;
-				multiline: boolean;
-			}[];
-		}[],
-	];
-	oAuthProviderTypes: [
-		{
-			provider: string;
-			params: {
-				name: string;
-				title: string;
-				type: string;
-				multiline: boolean;
-			}[];
-		}[],
-	];
+	phoneAuthSMSProviders: {
+		provider: PhoneAuthSMSProviders;
+		params: {
+			name: PhoneAuthSMSProviderParams;
+			title: string;
+			type: string;
+			description: string;
+			multiline: boolean;
+		}[];
+	}[];
+	oAuthProviderTypes: {
+		provider: OAuthProviderTypes;
+		params: {
+			name: OAuthProviderParams;
+			title: string;
+			type: string;
+			multiline: boolean;
+		}[];
+	}[];
 	authUserDataModel: {
 		name: string;
 		type: string;
@@ -68,35 +69,31 @@ const useTypeStore = create<TypesStore>()(
 					realtime: [],
 				},
 				phoneAuthSMSProviders: [
-					[
-						{
-							provider: '',
-							params: [
-								{
-									name: '',
-									title: '',
-									type: '',
-									description: '',
-									multiline: true,
-								},
-							],
-						},
-					],
+					{
+						provider: 'Twilio',
+						params: [
+							{
+								name: 'accountSID',
+								title: '',
+								type: '',
+								description: '',
+								multiline: false,
+							},
+						],
+					},
 				],
 				oAuthProviderTypes: [
-					[
-						{
-							provider: '',
-							params: [
-								{
-									name: '',
-									title: '',
-									type: '',
-									multiline: true,
-								},
-							],
-						},
-					],
+					{
+						provider: 'google',
+						params: [
+							{
+								name: 'key',
+								title: '',
+								type: '',
+								multiline: true,
+							},
+						],
+					},
 				],
 				authUserDataModel: [
 					{
