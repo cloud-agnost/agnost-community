@@ -338,5 +338,13 @@ export const applyRules = (action) => {
 					.isEmpty()
 					.withMessage(t("Channel name is required, cannot be left empty.")),
 			];
+		case "upload-formdata":
+			return [
+				query("fileName")
+					.trim()
+					.not()
+					.isEmpty()
+					.withMessage(t("File name is required, cannot be left empty.")),
+			];
 	}
 };

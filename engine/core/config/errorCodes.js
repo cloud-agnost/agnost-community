@@ -36,6 +36,7 @@ const ERROR_CODES = {
 	invalidSession: "invalid_session",
 	invalidCredentials: "invalid_credentials",
 	storageNotFound: "storage_not_found",
+	bucketNotFound: "bucket_not_found",
 	queueNotFound: "queue_not_found",
 	cronJobNotFound: "cronjob_not_found",
 	databaseNotFound: "database_not_found",
@@ -134,6 +135,7 @@ const ERROR_CODES = {
 	OAuthProviderNotConfigured: "oauth_provider_not_configured",
 	realtimeNotEnabled: "realtime_not_enabled",
 	getMembersError: "get_channel_members_error",
+	fileUploadError: "file_upload_error",
 };
 
 export default ERROR_CODES;

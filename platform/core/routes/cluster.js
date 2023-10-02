@@ -1,3 +1,4 @@
+import axios from "axios";
 import express from "express";
 import userCtrl from "../controllers/user.js";
 import clsCtrl from "../controllers/cluster.js";
@@ -57,6 +58,31 @@ router.get("/smtp", authMasterToken, async (req, res) => {
 		if (cluster?.smtp) {
 			res.json(helper.decryptSensitiveData(cluster.smtp));
 		} else res.json();
+	} catch (error) {
+		handleError(req, res, error);
+	}
+});
+
+/*
+@route      /v1/cluster/components
+@method     GET
+@desc       Returns information about the cluster components, core, engine, studio etc.
+@access     public
+*/
+router.get("/components", async (req, res) => {
+	try {
+		// Get cluster configuration
+		const info = await axios.get(
+			config.get("general.workerUrl") + "/v1/resource/cluster-info",
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
+
+		res.json(info.data);
 	} catch (error) {
 		handleError(req, res, error);
 	}

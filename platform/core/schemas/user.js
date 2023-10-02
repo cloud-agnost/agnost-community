@@ -240,6 +240,24 @@ export const applyRules = (type) => {
 
 						return true;
 					}),
+				body("smtp.fromEmail")
+					.if(
+						(value, { req }) => req.body.smtp && helper.isObject(req.body.smtp)
+					)
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isEmail()
+					.withMessage(t("Not a valid email address"))
+					.bail()
+					.normalizeEmail({ gmail_remove_dots: false }),
+				body("smtp.fromName")
+					.if(
+						(value, { req }) => req.body.smtp && helper.isObject(req.body.smtp)
+					)
+					.trim()
+					.optional(),
 				body("smtp.host")
 					.if(
 						(value, { req }) => req.body.smtp && helper.isObject(req.body.smtp)

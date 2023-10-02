@@ -71,13 +71,22 @@ export class DatabaseBase {
 	async deleteById(dbMeta, modelMeta, options) {}
 
 	/**
-	 * Deletes the record matching the where condition and returns the deleted record count
+	 * Deletes the first record matching the where condition and returns the deleted record count
 	 * @param  {Object} dbMeta The database metadata
 	 * @param  {Object} modelMeta The model metadata
 	 * @param  {Object} options The where condition and join options
 	 * @returns  Deleted record count
 	 */
-	async delete(dbMeta, modelMeta, options) {}
+	async deleteOne(dbMeta, modelMeta, options) {}
+
+	/**
+	 * Deletes the records matching the where condition and returns the deleted record count
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The where condition and join options
+	 * @returns  Deleted record count
+	 */
+	async deleteMany(dbMeta, modelMeta, options) {}
 
 	/**
 	 * Retrieves the record identified by id from the database.
@@ -116,13 +125,22 @@ export class DatabaseBase {
 	async updateById(dbMeta, modelMeta, options) {}
 
 	/**
+	 * Updates the first record matching the where condition using the update instructions.
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The where, join and update options
+	 * @returns  The updated record otherwise null if no record can be found
+	 */
+	async updateOne(dbMeta, modelMeta, options) {}
+
+	/**
 	 * Updates the records matching the where condition using the update instructions.
 	 * @param  {Object} dbMeta The database metadata
 	 * @param  {Object} modelMeta The model metadata
 	 * @param  {Object} options The where, join and update options
 	 * @returns  Updated record count
 	 */
-	async update(dbMeta, modelMeta, options) {}
+	async updateMany(dbMeta, modelMeta, options) {}
 
 	/**
 	 * Groups the records and performs computations on these groups

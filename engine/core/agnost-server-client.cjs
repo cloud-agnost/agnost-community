@@ -238,8 +238,8 @@
 					M = r(i(9660)),
 					O = r(i(3481)),
 					x = r(i(789)),
-					P = r(i(6587)),
-					B = r(i(7267)),
+					B = r(i(6587)),
+					P = r(i(7267)),
 					C = r(i(6835)),
 					j = r(i(5191)),
 					F = r(i(2115)),
@@ -258,8 +258,8 @@
 					J = r(i(5331)),
 					G = r(i(3236)),
 					K = r(i(2970)),
-					X = r(i(6903)),
-					W = r(i(1421)),
+					W = r(i(6903)),
+					X = r(i(1421)),
 					z = r(i(8354)),
 					H = r(i(9135)),
 					Z = r(i(7665)),
@@ -315,8 +315,8 @@
 					$multiply: M.default,
 					$neq: O.default,
 					$nin: x.default,
-					$not: P.default,
-					$or: B.default,
+					$not: B.default,
+					$or: P.default,
 					$right: C.default,
 					$round: j.default,
 					$rtrim: F.default,
@@ -335,8 +335,8 @@
 					$sin: J.default,
 					$cos: G.default,
 					$tan: K.default,
-					$sinh: X.default,
-					$cosh: W.default,
+					$sinh: W.default,
+					$cosh: X.default,
 					$tanh: z.default,
 					$asin: H.default,
 					$acos: Z.default,
@@ -2827,7 +2827,8 @@
 									r(t, e, i);
 						};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
-					(t.Func =
+					(t.Cache =
+						t.Func =
 						t.Expression =
 						t.DBAction =
 						t.Field =
@@ -2943,17 +2944,24 @@
 						return g.DBAction;
 					},
 				});
-				const T = i(6098);
+				const T = i(4079);
+				Object.defineProperty(t, "Cache", {
+					enumerable: !0,
+					get: function () {
+						return T.Cache;
+					},
+				});
+				const b = i(6098);
 				Object.defineProperty(t, "Expression", {
 					enumerable: !0,
 					get: function () {
-						return T.Expression;
+						return b.Expression;
 					},
 				});
-				const b = (e, t) => new o.AgnostServerSideClient(e, t);
-				t.createServerSideClient = b;
-				const E = b(global.META, global.ADAPTERS);
-				(t.agnost = E), n(i(9307), t), n(i(2548), t);
+				const E = (e, t) => new o.AgnostServerSideClient(e, t);
+				t.createServerSideClient = E;
+				const w = E(global.META, global.ADAPTERS);
+				(t.agnost = w), n(i(9307), t), n(i(2548), t);
 			},
 			8414: function (e, t, i) {
 				var r =
@@ -5594,10 +5602,19 @@
 											this.definition
 										);
 									break;
-								case "delete":
+								case "deleteOne":
 									e = yield t
 										.getAdapterObj(!1)
-										.delete(
+										.deleteOne(
+											t.getMetaObj(),
+											this.model.getMetaObj(),
+											this.definition
+										);
+									break;
+								case "deleteMany":
+									e = yield t
+										.getAdapterObj(!1)
+										.deleteMany(
 											t.getMetaObj(),
 											this.model.getMetaObj(),
 											this.definition
@@ -5639,10 +5656,19 @@
 											this.definition
 										);
 									break;
-								case "update":
+								case "updateOne":
 									e = yield t
 										.getAdapterObj(!1)
-										.update(
+										.updateOne(
+											t.getMetaObj(),
+											this.model.getMetaObj(),
+											this.definition
+										);
+									break;
+								case "updateMany":
+									e = yield t
+										.getAdapterObj(!1)
+										.updateMany(
 											t.getMetaObj(),
 											this.model.getMetaObj(),
 											this.definition
@@ -5983,9 +6009,14 @@
 								return yield this.modelBase.deleteById(e);
 							});
 						}
-						delete(e, t) {
+						deleteOne(e, t) {
 							return i(this, void 0, void 0, function* () {
-								return yield this.modelBase.delete(e, t);
+								return yield this.modelBase.deleteOne(e, t);
+							});
+						}
+						deleteMany(e, t) {
+							return i(this, void 0, void 0, function* () {
+								return yield this.modelBase.deleteMany(e, t);
 							});
 						}
 						updateById(e, t, r) {
@@ -5993,9 +6024,14 @@
 								return yield this.modelBase.updateById(e, t, r);
 							});
 						}
-						update(e, t, r) {
+						updateOne(e, t, r) {
 							return i(this, void 0, void 0, function* () {
-								return yield this.modelBase.update(e, t, r);
+								return yield this.modelBase.updateOne(e, t, r);
+							});
+						}
+						updateMany(e, t, r) {
+							return i(this, void 0, void 0, function* () {
+								return yield this.modelBase.updateMany(e, t, r);
 							});
 						}
 						aggregate(e) {
@@ -6235,7 +6271,7 @@
 							return t.setMethod("deleteById"), t.setId(e), yield t.execute();
 						});
 					}
-					delete(e, t) {
+					deleteOne(e, t) {
 						return r(this, void 0, void 0, function* () {
 							if (!e)
 								throw new s.ClientError(
@@ -6244,7 +6280,27 @@
 								);
 							const i = new n.DBAction(this);
 							return (
-								i.setMethod("delete"),
+								i.setMethod("deleteOne"),
+								i.setWhere(
+									e,
+									null == t ? void 0 : t.join,
+									u.ConditionType.QUERY
+								),
+								t && i.setJoin(t.join),
+								yield i.execute()
+							);
+						});
+					}
+					deleteMany(e, t) {
+						return r(this, void 0, void 0, function* () {
+							if (!e)
+								throw new s.ClientError(
+									"missing_input_parameter",
+									"The 'delete' method expects the where condition to query database records"
+								);
+							const i = new n.DBAction(this);
+							return (
+								i.setMethod("deleteMany"),
 								i.setWhere(
 									e,
 									null == t ? void 0 : t.join,
@@ -6286,7 +6342,7 @@
 							);
 						});
 					}
-					update(e, t, i) {
+					updateOne(e, t, i) {
 						return r(this, void 0, void 0, function* () {
 							if (!e)
 								throw new s.ClientError(
@@ -6306,7 +6362,43 @@
 							this.resetTimestamp();
 							const r = new n.DBAction(this);
 							return (
-								r.setMethod("update"),
+								r.setMethod("updateOne"),
+								r.setWhere(
+									e,
+									null == i ? void 0 : i.join,
+									u.ConditionType.QUERY
+								),
+								yield r.setUpdates(t, null),
+								i &&
+									(r.setSelect(i.select, null),
+									r.setOmit(i.omit, null),
+									r.setJoin(i.join),
+									r.setArrayFilters(i.arrayFilters)),
+								yield r.execute()
+							);
+						});
+					}
+					updateMany(e, t, i) {
+						return r(this, void 0, void 0, function* () {
+							if (!e)
+								throw new s.ClientError(
+									"missing_input_parameter",
+									"The 'update' method expects the where condition to query database records"
+								);
+							if (!t)
+								throw new s.ClientError(
+									"missing_input_parameter",
+									"The 'update' method expects the update definitions as input parameter"
+								);
+							if (!(0, o.isObject)(t))
+								throw new s.ClientError(
+									"invalid_value",
+									"The 'update' method expects the update definitions as an object of key-value pairs"
+								);
+							this.resetTimestamp();
+							const r = new n.DBAction(this);
+							return (
+								r.setMethod("updateMany"),
 								r.setWhere(
 									e,
 									null == i ? void 0 : i.join,

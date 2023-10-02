@@ -525,4 +525,37 @@ export class ResourceManager {
             throw new AgnostError(err.body?.message);
         }
     }
+
+    /**
+     * Returns information about the Agnost cluster default deployments and horizontal pod autoscalers
+     */
+    async getClusterInfo() {
+        // Create a Kubernetes core API client
+        const kubeconfig = new k8s.KubeConfig();
+        kubeconfig.loadFromDefault();
+        const k8sApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
+        const k8sAutoscalingApi = kubeconfig.makeApiClient(k8s.AutoscalingV1Api);
+
+        try {
+            let deployments = await k8sApi.listNamespacedDeployment(process.env.NAMESPACE);
+            for (let deployment of deployments.body.items) {
+                console.log(`Deployment Name: ${deployment.metadata.name}`);
+                console.log(`Configured Replicas: ${deployment.spec.replicas}`);
+                console.log(`Running Replicas: ${deployment.status.replicas}`);
+            }
+
+            let hpas = await k8sAutoscalingApi.listNamespacedHorizontalPodAutoscaler(process.env.NAMESPACE);
+            for (let hpa of hpas.body.items) {
+                console.log(`HPA Name: ${hpa.metadata.name}`);
+                console.log(`Min Replicas: ${hpa.spec.minReplicas}`);
+                console.log(`Max Replicas: ${hpa.spec.maxReplicas}`);
+                console.log(`Current Replicas: ${hpa.status.currentReplicas}`);
+            }
+
+            return [];
+        } catch (err) {
+            console.log("***err", err);
+            throw new AgnostError(err.body?.message);
+        }
+    }
 }

@@ -6,6 +6,15 @@ import { checkContentType } from "../middlewares/checkContentType.js";
 import { getResponseBody } from "../middlewares/getResponseBody.js";
 import { logRequestToConsole } from "../middlewares/logRequest.js";
 import { handleFileUploads } from "../middlewares/handleFileUploads.js";
+import { checkServerStatus } from "../middlewares/checkServerStatus.js";
+import { checkAPIKey } from "../middlewares/checkAPIKey.js";
+import {
+	checkStorage,
+	checkBucket,
+} from "../middlewares/checkStorageBucket.js";
+import { applyRules, validate } from "../util/authRules.js";
+import ERROR_CODES from "../config/errorCodes.js";
+
 const router = express.Router({ mergeParams: true });
 
 /*
@@ -130,22 +139,22 @@ router.get(
 */
 
 router.get(
-  "/:storageName/bucket/:bucketName",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
+	"/:storageName/bucket/:bucketName",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
 
-      await agnost.storage(storageName).bucket(bucketName).getInfo();
+			await agnost.storage(storageName).bucket(bucketName).getInfo();
 
-      res.json();
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 /*
 @route      /storage/:storageName/bucket/:bucketName
@@ -603,6 +612,77 @@ router.put(
 				.file(filePath)
 				.updateInfo(path, isPublic, tags);
 			res.json(result);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /storage/:storageName/bucket/:bucketName/upload-formdata
+@method     POST
+@desc       Upload a formdata, File or Blob object. This handler is to handle upload operations peformed through the @agnost/client library.
+@access     public
+*/
+router.post(
+	"/:storageName/bucket/:bucketName/upload-formdata",
+	responseTime(logRequestToConsole),
+	getResponseBody,
+	applyDefaultRateLimiters(),
+	checkServerStatus,
+	handleFileUploads,
+	checkContentType,
+	checkAPIKey(null),
+	checkStorage,
+	checkBucket,
+	applyRules("upload-formdata"),
+	validate,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
+			console.log("****here123", storageName, bucketName);
+
+			let isPublic = req.bucket.isPublic;
+			let tags = [];
+			if (req.query?.options) {
+				try {
+					req.query.options = JSON.parse(req.query.options);
+					isPublic = req.query.options.isPublic ?? req.bucket.isPublic;
+					isPublic = isPublic ? true : false;
+
+					tags = req.query.options.tags;
+				} catch (err) {}
+			}
+
+			if (!req.files || req.files.length === 0) {
+				return res
+					.status(400)
+					.json(
+						helper.createErrorMessage(
+							ERROR_CODES.clientError,
+							ERROR_CODES.fileUploadError,
+							t(
+								"The file to upload cannot be recognized in the body of the request."
+							)
+						)
+					);
+			}
+
+			const file = req.files[0];
+			const fileMetadata = await agnost
+				.storage(storageName)
+				.bucket(bucketName)
+				.upload(
+					{
+						path: req.query.fileName,
+						size: file.size,
+						mimeType: file.mimetype,
+						localPath: file.path,
+					},
+					{ isPublic: isPublic, tags: tags }
+				);
+
+			res.status(200).json(fileMetadata);
 		} catch (error) {
 			helper.handleError(req, res, error);
 		}
