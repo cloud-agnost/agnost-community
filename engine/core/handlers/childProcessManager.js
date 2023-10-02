@@ -86,7 +86,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 						logger.info("Http server closed");
 						resolve();
 					});
-				} catch (err) {}
+				} catch (err) {
+					resolve();
+				}
 			} else resolve();
 		});
 	}
