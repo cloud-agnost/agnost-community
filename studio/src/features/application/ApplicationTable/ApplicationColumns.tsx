@@ -3,6 +3,7 @@ import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { SortButton } from '@/components/DataTable';
 import { Refresh } from '@/components/icons';
+import { BADGE_COLOR_MAP } from '@/constants';
 import { ApplicationSettings, ApplicationTeam } from '@/features/application';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
@@ -46,8 +47,9 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 		accessorKey: 'role',
 		cell: ({ row }) => {
 			const { team } = row.original;
-			const role = team.find((member) => member._id !== useAuthStore.getState().user?._id)?.role;
-			return <Badge text={role as string} />;
+			const role = team.find((member) => member._id !== useAuthStore.getState().user?._id)
+				?.role as string;
+			return <Badge text={role} variant={BADGE_COLOR_MAP[role.toUpperCase()]} />;
 		},
 	},
 

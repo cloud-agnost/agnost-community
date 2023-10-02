@@ -28,7 +28,7 @@ export default function VersionCache() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
-
+	console.log('versionId', isCreateModalOpen);
 	const {
 		getCaches,
 		closeDeleteCacheModal,
@@ -101,58 +101,60 @@ export default function VersionCache() {
 	}, [searchParams.get('q'), page]);
 
 	return (
-		<VersionTabLayout
-			isEmpty={caches.length === 0}
-			title={t('cache.title')}
-			icon={<EmptyBucket className='w-44 h-44' />}
-			openCreateModal={() => setIsCreateModalOpen(true)}
-			createButtonTitle={t('cache.create')}
-			emptyStateTitle={t('cache.empty_text')}
-			table={table}
-			selectedRowLength={selectedRows?.length}
-			onSearch={onInput}
-			onMultipleDelete={deleteMultipleCachesHandler}
-			disabled={!canCreateCache}
-		>
-			<InfiniteScroll
-				scrollableTarget='version-layout'
-				dataLength={caches.length}
-				next={() => {
-					setPage(page + 1);
-				}}
-				hasMore={lastFetchedCount >= PAGE_SIZE}
-				loader={caches.length > 0 && <TableLoading />}
+		<>
+			<VersionTabLayout
+				isEmpty={caches.length === 0}
+				title={t('cache.title')}
+				icon={<EmptyBucket className='w-44 h-44' />}
+				openCreateModal={() => setIsCreateModalOpen(true)}
+				createButtonTitle={t('cache.create')}
+				emptyStateTitle={t('cache.empty_text')}
+				table={table}
+				selectedRowLength={selectedRows?.length}
+				onSearch={onInput}
+				onMultipleDelete={deleteMultipleCachesHandler}
+				disabled={!canCreateCache}
 			>
-				<DataTable
-					columns={CacheColumns}
-					data={caches}
-					setSelectedRows={setSelectedRows}
-					setTable={setTable}
-				/>
-			</InfiniteScroll>
-			<ConfirmationModal
-				loading={loading}
-				error={error}
-				title={t('cache.delete.title')}
-				alertTitle={t('cache.delete.message')}
-				alertDescription={t('cache.delete.description')}
-				description={
-					<Trans
-						i18nKey='cache.delete.confirmCode'
-						values={{ confirmCode: toDeleteCache?.iid }}
-						components={{
-							confirmCode: <span className='font-bold text-default' />,
-						}}
+				<InfiniteScroll
+					scrollableTarget='version-layout'
+					dataLength={caches.length}
+					next={() => {
+						setPage(page + 1);
+					}}
+					hasMore={lastFetchedCount >= PAGE_SIZE}
+					loader={caches.length > 0 && <TableLoading />}
+				>
+					<DataTable
+						columns={CacheColumns}
+						data={caches}
+						setSelectedRows={setSelectedRows}
+						setTable={setTable}
 					/>
-				}
-				confirmCode={toDeleteCache?.iid}
-				onConfirm={deleteCacheHandler}
-				isOpen={isDeleteCacheModalOpen}
-				closeModal={closeDeleteCacheModal}
-				closable
-			/>
+				</InfiniteScroll>
+				<ConfirmationModal
+					loading={loading}
+					error={error}
+					title={t('cache.delete.title')}
+					alertTitle={t('cache.delete.message')}
+					alertDescription={t('cache.delete.description')}
+					description={
+						<Trans
+							i18nKey='cache.delete.confirmCode'
+							values={{ confirmCode: toDeleteCache?.iid }}
+							components={{
+								confirmCode: <span className='font-bold text-default' />,
+							}}
+						/>
+					}
+					confirmCode={toDeleteCache?.iid}
+					onConfirm={deleteCacheHandler}
+					isOpen={isDeleteCacheModalOpen}
+					closeModal={closeDeleteCacheModal}
+					closable
+				/>
+			</VersionTabLayout>
 			<CreateCache open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
 			<EditCache open={isEditCacheModalOpen} onClose={closeEditCacheModal} />
-		</VersionTabLayout>
+		</>
 	);
 }
