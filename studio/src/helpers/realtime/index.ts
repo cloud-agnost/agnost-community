@@ -7,6 +7,7 @@ import Queue from './Queue';
 import Resource from './Resources';
 import Task from './Task';
 import User from './User';
+import Version from './Version';
 export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 	const keys = {
 		user: User,
@@ -22,6 +23,10 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		endpoint: Endpoint,
 		'org.app.version.endpoint': Endpoint,
 		'org.app.version.environment': Environment,
+		'org.app.version.keys': Version,
+		'org.app.version.limits': Version,
+		'org.app.version.version': Version,
+		version: Version,
 	};
 	return new keys[type]();
 }

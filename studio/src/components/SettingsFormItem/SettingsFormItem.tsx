@@ -23,7 +23,7 @@ export default function SettingsFormItem({
 	return (
 		<Component
 			className={cn(
-				'space-y-6 py-8 max-w-2xl',
+				'space-y-6  max-w-2xl',
 				twoColumns && 'flex justify-between gap-10',
 				as === 'label' && 'cursor-pointer',
 				className,

@@ -26,71 +26,69 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 		'version.view': useAuthorizeApp({ role, key: 'version.view' }),
 	};
 	return (
-		<>
-			<Popover open={open} onOpenChange={setOpen}>
-				<PopoverTrigger asChild>
-					<Button
-						variant='text'
-						rounded
-						className='p-2'
-						onClick={(e) => {
-							e.stopPropagation();
-						}}
-					>
-						<DotsThreeVertical className='w-5 h-5 text-icon-secondary' />
-						<span className='sr-only'>Open popover</span>
-					</Button>
-				</PopoverTrigger>
-				<PopoverContent className='w-[181px]'>
-					<Command>
-						<CommandGroup>
-							{APPLICATION_SETTINGS.map((setting) => (
-								<CommandItem
-									id={setting.id}
-									key={setting.name}
-									disabled={!HAS_PERMISSION[setting.permissionKey]}
-									onSelect={() => {
-										setOpen(false);
-										if (setting.onClick)
-											setting.onClick(applications.find((app) => app._id === appId) as Application);
-									}}
-									className='font-sfCompact px-3'
-								>
-									{setting.name}
-								</CommandItem>
-							))}
-						</CommandGroup>
-						<CommandSeparator />
-						<CommandGroup>
+		<Popover open={open} onOpenChange={setOpen}>
+			<PopoverTrigger asChild>
+				<Button
+					variant='text'
+					rounded
+					className='p-2'
+					onClick={(e) => {
+						e.stopPropagation();
+					}}
+				>
+					<DotsThreeVertical className='w-5 h-5 text-icon-secondary' />
+					<span className='sr-only'>Open popover</span>
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent className='w-[181px]'>
+				<Command>
+					<CommandGroup>
+						{APPLICATION_SETTINGS.map((setting) => (
 							<CommandItem
-								id='leave-app'
-								disabled={role === 'Admin'}
+								id={setting.id}
+								key={setting.name}
+								disabled={!HAS_PERMISSION[setting.permissionKey]}
 								onSelect={() => {
 									setOpen(false);
-									openLeaveModal(applications.find((app) => app._id === appId) as Application);
+									if (setting.onClick)
+										setting.onClick(applications.find((app) => app._id === appId) as Application);
 								}}
 								className='font-sfCompact px-3'
 							>
-								{t('application.settings.leaveTeam')}
+								{setting.name}
 							</CommandItem>
-						</CommandGroup>
-						<CommandSeparator />
-						<CommandGroup>
-							<CommandItem
-								id='delete-app'
-								disabled={!canAppDelete}
-								onSelect={() => {
-									setOpen(false);
-									openDeleteModal(applications.find((app) => app._id === appId) as Application);
-								}}
-								className='font-sfCompact px-3'
-							>
-								{t('general.delete')}
-							</CommandItem>
-						</CommandGroup>
-					</Command>
-				</PopoverContent>
-			</Popover>
-		</>
+						))}
+					</CommandGroup>
+					<CommandSeparator />
+					<CommandGroup>
+						<CommandItem
+							id='leave-app'
+							disabled={role === 'Admin'}
+							onSelect={() => {
+								setOpen(false);
+								openLeaveModal(applications.find((app) => app._id === appId) as Application);
+							}}
+							className='font-sfCompact px-3'
+						>
+							{t('application.settings.leaveTeam')}
+						</CommandItem>
+					</CommandGroup>
+					<CommandSeparator />
+					<CommandGroup>
+						<CommandItem
+							id='delete-app'
+							disabled={!canAppDelete}
+							onSelect={() => {
+								setOpen(false);
+								openDeleteModal(applications.find((app) => app._id === appId) as Application);
+							}}
+							className='font-sfCompact px-3'
+						>
+							{t('general.delete')}
+						</CommandItem>
+					</CommandGroup>
+				</Command>
+			</PopoverContent>
+		</Popover>
 	);
 }

@@ -16,7 +16,7 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Button } from 'components/Button';
-import { CreateAPIKeyParams, Endpoint, UpdateAPIKeyParams } from '@/types';
+import { APIKey, CreateAPIKeyParams, Endpoint, UpdateAPIKeyParams } from '@/types';
 import useEndpointStore from '@/store/endpoint/endpointStore.ts';
 
 interface AddAPIKeyDrawerProps {
@@ -201,7 +201,7 @@ export default function AddOrEditAPIKeyDrawer({
 	function handleOnOpenChange(status: boolean) {
 		onOpenChange(status);
 		if (!status) {
-			setSelectedAPIKey(null);
+			setSelectedAPIKey({} as APIKey);
 		}
 	}
 

@@ -1,4 +1,4 @@
-import { HttpMethod } from '.';
+import { BaseRequest, HttpMethod, OAuthProviderTypes, PhoneAuthSMSProviders } from '.';
 import { BaseGetRequest, BaseParams, User } from './type';
 
 export interface APIKey {
@@ -83,26 +83,7 @@ export interface Version {
 	master: boolean;
 	realtime: VersionRealtimeProperties;
 	defaultEndpointLimits: string[];
-	authentication: {
-		email: {
-			customSMTP: {
-				useTLS: boolean;
-			};
-			enabled: boolean;
-			confirmEmail: boolean;
-			expiresIn: number;
-		};
-		phone: {
-			enabled: boolean;
-			confirmPhone: boolean;
-			allowCodeSignIn: boolean;
-			smsProvider: string;
-			expiresIn: number;
-		};
-		redirectURLs: string[];
-		providers: [];
-		messages: [];
-	};
+	authentication: VersionAuthentication;
 	createdBy: string;
 	updatedBy: string;
 	_id: string;
@@ -114,7 +95,78 @@ export interface Version {
 	updatedAt: string;
 	__v: number;
 }
+export interface VersionOAuthProvider {
+	provider: OAuthProviderTypes;
+	config: {
+		key: string;
+		secret: string;
+		teamId: string;
+		serviceId: string;
+		keyId: string;
+		privateKey: string;
+	};
+	createdBy: string;
+	_id: string;
+	createdAt: string;
+	updatedAt: string;
+}
 
+export enum TemplateTypes {
+	ConfirmEmail = 'confirm_email',
+	ResetPassword = 'reset_password',
+	MagicLink = 'magic_link',
+	ConfirmEmailChange = 'confirm_email_change',
+	VerifySMSCode = 'verify_sms_code',
+}
+
+export interface VersionMessageTemplate {
+	type: TemplateTypes;
+	subject: string;
+	body: string;
+	createdBy: string;
+	_id: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+interface VersionAuthentication {
+	email: {
+		enabled: boolean;
+		confirmEmail: boolean;
+		expiresIn: number;
+		customSMTP: {
+			useTLS: boolean;
+			host: string;
+			port: number;
+			user: string;
+			password: string;
+		};
+	};
+	phone: {
+		enabled: boolean;
+		confirmPhone: boolean;
+		allowCodeSignIn: boolean;
+		smsProvider: PhoneAuthSMSProviders;
+		expiresIn: number;
+		providerConfig: {
+			accountSID?: string;
+			authToken?: string;
+			fromNumberOrSID?: string;
+			accessKey?: string;
+			originator?: string;
+			apiKey?: string;
+			apiSecret?: string;
+			from?: string;
+		};
+	};
+	redirectURLs: string[];
+	providers: VersionOAuthProvider[];
+	messages: VersionMessageTemplate[];
+	userDataModel: {
+		database: string;
+		model: string;
+	};
+}
 export interface Param {
 	name: string;
 	value: string;
@@ -323,3 +375,65 @@ export type DeleteMultipleAPIKeys = BaseParams & {
 export type SearchDesignElementParams = BaseParams & {
 	keyword: string;
 };
+export type SaveUserDataModelInfoParams = BaseParams &
+	BaseRequest & {
+		modelId: string;
+		databaseId: string;
+	};
+export type SaveRedirectURLsParams = BaseParams &
+	BaseRequest & {
+		redirectURLs: string[];
+	};
+
+export interface SaveEmailAuthParams extends BaseParams, BaseRequest {
+	enabled: boolean;
+	confirmEmail: boolean;
+	expiresIn: number;
+	customSMTP: {
+		host: string;
+		port: number;
+		useTLS: boolean;
+		user: string;
+		password: string;
+	};
+}
+export interface SaveEmailPhoneParams extends BaseParams, BaseRequest {
+	enabled: boolean;
+	confirmPhone: boolean;
+	allowCodeSignIn: boolean;
+	expiresIn: number;
+	smsProvider: 'Twilio' | 'Vonage' | 'MessageBird';
+	providerConfig: {
+		accountSID?: string;
+		authToken?: string;
+		fromNumberOrSID?: string;
+		accessKey?: string;
+		originator?: string;
+		apiKey?: string;
+		apiSecret?: string;
+		from?: string;
+	};
+}
+export interface CreateOAuthConfigParams extends BaseParams, BaseRequest {
+	provider: OAuthProviderTypes;
+	config: {
+		key?: string;
+		secret?: string;
+		teamId?: string;
+		serviceId?: string;
+		keyId?: string;
+		privateKey?: string;
+	};
+}
+export interface UpdateOAuthConfigParams extends BaseParams, BaseRequest {
+	providerId: string;
+	key: string;
+	secret: string;
+}
+export interface DeleteOAuthConfigParams extends BaseParams, BaseRequest {
+	providerId: string;
+}
+export interface AuthMessageTemplateParams extends BaseParams, BaseRequest {
+	type: string;
+	body: string;
+}
