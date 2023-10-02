@@ -12,7 +12,7 @@ export const applyRealtimeMiddlewares = () => async (socket, next) => {
 		if (error) return next(error);
 	}
 
-	if (socket.temp?.envId && socket.temp?.apiKey) {
+	if (socket.temp?.envId) {
 		error = await checkSession(socket);
 		if (error) return next(error);
 	}
@@ -29,7 +29,7 @@ export const applySocketMiddlewares = (socket) => async (params, next) => {
 		if (error) return next(error);
 	}
 
-	if (socket.temp?.envId && socket.temp?.apiKey) {
+	if (socket.temp?.envId) {
 		error = await applyRateLimiters2(socket)(params, next);
 		if (error) return next(error);
 

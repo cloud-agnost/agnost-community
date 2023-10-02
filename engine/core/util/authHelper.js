@@ -1,3 +1,4 @@
+import axios from "axios";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import uaParser from "ua-parser-js";
@@ -95,6 +96,29 @@ export function createEmailToken(
 	return token;
 }
 
+export function createPhoneToken(userId, phone, actionType, expireDuration) {
+	let code = Math.floor(100000 + Math.random() * 900000);
+
+	let createdAt = Date.now();
+	let expiresAt = createdAt + expireDuration * 1000;
+
+	let token = {
+		envId: META.getEnvId(),
+		phone: phone,
+		userId: userId,
+		actionType: actionType,
+		expiresIn: expireDuration,
+		createdAt: new Date(createdAt),
+		expiresAt: new Date(expiresAt),
+		code: code,
+		type: "phone",
+	};
+
+	// Cache the token
+	setKey(`tokens.${META.getEnvId()}.${phone}.${code}`, token, expireDuration);
+	return token;
+}
+
 /**
  * Removes the token from cache
  */
@@ -112,7 +136,7 @@ export function createAccessToken(userId, actionType, expireDuration = null) {
 	let expiresAt = createdAt + expireDuration * 1000;
 
 	let token = {
-		envId: envObj._id,
+		envId: META.getEnvId(),
 		userId: userId,
 		createdAt: new Date(createdAt),
 		expiresAt: new Date(expiresAt),
@@ -243,16 +267,20 @@ async function sendEmail(from, to, subject, body) {
 /**
  * Creates a new session
  */
-export async function createSession(userId, userAgentStr = null) {
+export async function createSession(
+	userId,
+	userAgentStr = null,
+	userObj = null
+) {
 	// Get session of the users
 	let userSessions = await getKey(`sessions.${META.getEnvId()}.${userId}`);
 
 	const key = helper.generateSlug("sn", 36);
-	const token = createSessionToken(META.getEnvId(), userId, key);
+	const token = createSessionToken(userId, key);
 	const session = {
 		userId: userId,
 		token: token,
-		creationDtm: new Date().toISOString(),
+		creationDtm: new Date(),
 		userAgent: userAgentStr ? getUserAgentObject(userAgentStr) : undefined,
 	};
 
@@ -272,6 +300,7 @@ export async function createSession(userId, userAgentStr = null) {
 			envId: META.getEnvId(),
 			userId,
 			session,
+			user: userObj,
 		});
 
 	return session;
@@ -345,13 +374,156 @@ function buildURL(res, url, queryParams) {
 /**
  * Sends a realtime user event
  */
-export function sendRealtimeUserEvent(eventName, userId, session) {
+export function sendRealtimeUserEvent(eventName, userId, session, user) {
 	const realtime = getRealtime();
 	if (realtime)
 		realtime.emit("user_event", {
 			eventName: eventName,
 			envId: META.getEnvId(),
-			userId,
-			session,
+			userId: userId.toString(),
+			session: session ?? null,
+			user: user ?? null,
 		});
+}
+
+/**
+ * Decodes the jsonwebtoken string
+ */
+export function verifySessionToken(token) {
+	try {
+		return jwt.verify(token, process.env.JWT_SECRET);
+	} catch (error) {
+		return null;
+	}
+}
+
+/**
+ * Decodes the jsonwebtoken string and returns the key
+ */
+export function getSessionKey(token) {
+	let decoded = null;
+	try {
+		decoded = jwt.verify(token, process.env.JWT_SECRET);
+		return decoded.key;
+	} catch (error) {
+		return null;
+	}
+}
+
+/**
+ * Sends the SMS code using the template
+ */
+export async function sendTemplatedSMS(templateType, inputObjects) {
+	const template = META.getMessageTemplate(templateType);
+	if (!template) {
+		throw new AgnostError(
+			t("Cannot identify the message template for '%s'", templateType),
+			ERROR_CODES.missingMessageTemplate
+		);
+	}
+
+	// Create SMS message body
+	const body = processTemplate(inputObjects, template.body);
+	// Get SMS provider configuration
+	const smsProvider = META.getVersion().authentication.phone.smsProvider;
+	const providerConfig = helper.decryptSensitiveData(
+		META.getVersion().authentication.phone.providerConfig
+	);
+
+	if (smsProvider === "Twilio") {
+		const params = new URLSearchParams();
+		params.append("From", providerConfig.fromNumberOrSID);
+		params.append("To", inputObjects.token.phone);
+		params.append("Body", body);
+
+		try {
+			await axios.post(
+				`https://api.twilio.com/2010-04-01/Accounts/${providerConfig.accountSID}/Messages.json`,
+				params,
+				{
+					headers: { "Content-Type": "application/x-www-form-urlencoded" },
+					auth: {
+						username: providerConfig.accountSID,
+						password: providerConfig.authToken,
+					},
+				}
+			);
+		} catch (err) {
+			const message =
+				err.response && err.response.data && err.response.data.message
+					? err.response.data.message
+					: err.message;
+
+			throw new AgnostError(
+				t("Cannot send SMS message using '%s'. %s", smsProvider, message),
+				ERROR_CODES.cannotSendSMSCode
+			);
+		}
+	} else if (smsProvider === "MessageBird") {
+		const params = new URLSearchParams();
+		params.append("originator", providerConfig.originator);
+		params.append("recipients", inputObjects.token.phone);
+		params.append("body", body);
+
+		try {
+			await axios.post("https://rest.messagebird.com/messages", params, {
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					Accept: "application/json",
+					Authorization: `AccessKey ${providerConfig.accessKey}`,
+				},
+			});
+		} catch (err) {
+			let message = err.message;
+			if (
+				err.response.data &&
+				err.response.data.errors &&
+				Array.isArray(err.response.data.errors) &&
+				err.response.data.errors.length > 0
+			) {
+				message = err.response.data.errors[0].description;
+			}
+
+			throw new AgnostError(
+				t("Cannot send SMS message using '%s'. %s", smsProvider, message),
+				ERROR_CODES.cannotSendSMSCode
+			);
+		}
+	} else if (smsProvider === "Vonage") {
+		const params = new URLSearchParams();
+		params.append("from", providerConfig.from);
+		params.append("text", body);
+		params.append("to", inputObjects.token.phone);
+		params.append("api_key", providerConfig.apiKey);
+		params.append("api_secret", providerConfig.apiSecret);
+
+		try {
+			let result = await axios.post("https://rest.nexmo.com/sms/json", params, {
+				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			});
+
+			// Error messages are also returned with 200 code
+			if (
+				result.data &&
+				result.data.messages &&
+				Array.isArray(result.data.messages) &&
+				result.data.messages.length > 0 &&
+				result.data.messages[0]["error-text"]
+			) {
+				throw new AgnostError(
+					t(
+						"Cannot send SMS message using '%s'. %s",
+						smsProvider,
+						result.data.messages[0]["error-text"]
+					),
+					ERROR_CODES.cannotSendSMSCode
+				);
+			}
+		} catch (err) {
+			throw new AgnostError(
+				t("Cannot send SMS message using '%s'. %s", smsProvider, err.message),
+				ERROR_CODES.cannotSendSMSCode
+			);
+		}
+	}
 }

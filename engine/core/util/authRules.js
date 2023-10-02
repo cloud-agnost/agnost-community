@@ -84,8 +84,7 @@ export const applyRules = (action) => {
 							config.get("general.maxPwdLength")
 						)
 					),
-				body("name").optional({ checkFalsy: true }).trim(),
-				body("nameOrUserData").optional({ checkFalsy: true }),
+				body("userData").optional({ checkFalsy: true }),
 			];
 		case "signin-email":
 			return [
@@ -109,7 +108,7 @@ export const applyRules = (action) => {
 						if (typeof value === "string" || typeof value === "number")
 							return true;
 						else
-							throw new AltogicError(
+							throw new AgnostError(
 								t("Password needs to be a string/text value")
 							);
 					}),
@@ -139,7 +138,7 @@ export const applyRules = (action) => {
 						if (typeof value === "string" || typeof value === "number")
 							return true;
 						else
-							throw new AltogicError(
+							throw new AgnostError(
 								t("Password needs to be a string/text value")
 							);
 					}),
@@ -212,7 +211,7 @@ export const applyRules = (action) => {
 						if (typeof value === "string" || typeof value === "number")
 							return true;
 						else
-							throw new AltogicError(
+							throw new AgnostError(
 								t("Old password needs to be a string/text value")
 							);
 					}),
@@ -221,7 +220,7 @@ export const applyRules = (action) => {
 		case "send-magic":
 		case "resend":
 			return [
-				query("email")
+				body("email")
 					.trim()
 					.toLowerCase()
 					.not()
@@ -230,6 +229,12 @@ export const applyRules = (action) => {
 					.bail()
 					.isEmail()
 					.withMessage(t("Not a valid email address format")),
+				body("redirectURL")
+					.not()
+					.isEmpty()
+					.withMessage(
+						t("Redirect URL needs to be provided, cannot be left empty.")
+					),
 			];
 		case "send-reset-code":
 		case "resend-code":
@@ -282,7 +287,7 @@ export const applyRules = (action) => {
 						if (typeof value === "string" || typeof value === "number")
 							return true;
 						else
-							throw new AltogicError(
+							throw new AgnostError(
 								t("Password needs to be a string/text value")
 							);
 					}),
@@ -308,7 +313,7 @@ export const applyRules = (action) => {
 						if (typeof value === "string" || typeof value === "number")
 							return true;
 						else
-							throw new AltogicError(
+							throw new AgnostError(
 								t("Password needs to be a string/text value")
 							);
 					}),
@@ -324,6 +329,22 @@ export const applyRules = (action) => {
 							"Not a valid phone number. Phone number must be in international format [+] [country code] [subscriber number including area code]"
 						)
 					),
+			];
+		case "realtime-get-members":
+			return [
+				body("channel")
+					.trim()
+					.not()
+					.isEmpty()
+					.withMessage(t("Channel name is required, cannot be left empty.")),
+			];
+		case "upload-formdata":
+			return [
+				query("fileName")
+					.trim()
+					.not()
+					.isEmpty()
+					.withMessage(t("File name is required, cannot be left empty.")),
 			];
 	}
 };

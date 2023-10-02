@@ -15,6 +15,7 @@ export function initializeRealtimeServer() {
 		auth: {
 			accessToken: process.env.ACCESS_TOKEN,
 		},
+		path: "/realtime/",
 	});
 
 	realtime.on("connect", () => {

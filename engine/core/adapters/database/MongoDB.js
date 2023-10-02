@@ -488,13 +488,79 @@ export class MongoDB extends DatabaseBase {
 	}
 
 	/**
-	 * Deletes the record matching the where condition and returns the deleted record count
+	 * Deletes the first record matching the where condition and returns the deleted record count
 	 * @param  {Object} dbMeta The database metadata
 	 * @param  {Object} modelMeta The model metadata
 	 * @param  {Object} options The where condition and join options
 	 * @returns  Deleted record count
 	 */
-	async delete(dbMeta, modelMeta, options) {
+	async deleteOne(dbMeta, modelMeta, options) {
+		const dbName = this.getAppliedDbName(dbMeta);
+		const modelName = this.getModelName(modelMeta);
+
+		const db = this.driver.db(dbName);
+		const collection = db.collection(modelName);
+
+		const requiresAggreation =
+			options.join?.length > 0 && options.where?.hasJoinFieldValues()
+				? true
+				: false;
+
+		if (requiresAggreation) {
+			const pipeline = [];
+			this.createJoinStage(options.join, pipeline);
+			this.createWhereStage(options.where, pipeline);
+
+			// Only return the ids of the records to delete
+			pipeline.push({
+				$project: {
+					_id: 1,
+				},
+			});
+
+			const dataCursor = await collection.aggregate(pipeline, {
+				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
+				raw: false, // Whether to return document results as raw BSON buffers
+				bypassDocumentValidation: true, // Allow driver to bypass schema validation
+				session: this.session,
+			});
+
+			// Get the first element
+			const findResult = await dataCursor.next();
+			await dataCursor.close();
+
+			if (findResult) {
+				const deleteResult = await collection.deleteOne(
+					{ _id: findResult._id },
+					{
+						session: this.session,
+					}
+				);
+
+				return { count: deleteResult.deletedCount };
+			}
+
+			return { count: 0 };
+		} else {
+			const filter = {};
+			if (options.where) filter.$expr = options.where.getQuery("MongoDB");
+
+			const deleteResult = await collection.deleteOne(filter, {
+				session: this.session,
+			});
+
+			return { count: deleteResult.deletedCount };
+		}
+	}
+
+	/**
+	 * Deletes the records matching the where condition and returns the deleted record count
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The where condition and join options
+	 * @returns  Deleted record count
+	 */
+	async deleteMany(dbMeta, modelMeta, options) {
 		const dbName = this.getAppliedDbName(dbMeta);
 		const modelName = this.getModelName(modelMeta);
 
@@ -764,13 +830,89 @@ export class MongoDB extends DatabaseBase {
 	}
 
 	/**
+	 * Updates the first record matching the where condition using the update instructions.
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The where, join and update options
+	 * @returns  The updated record otherwise null if no record can be found
+	 */
+	async updateOne(dbMeta, modelMeta, options) {
+		const dbName = this.getAppliedDbName(dbMeta);
+		const modelName = this.getModelName(modelMeta);
+
+		const db = this.driver.db(dbName);
+		const collection = db.collection(modelName);
+
+		const requiresAggreation =
+			options.join?.length > 0 && options.where?.hasJoinFieldValues()
+				? true
+				: false;
+
+		if (requiresAggreation) {
+			const pipeline = [];
+			this.createJoinStage(options.join, pipeline);
+			this.createWhereStage(options.where, pipeline);
+
+			// Only return the ids of the records to delete
+			pipeline.push({
+				$project: {
+					_id: 1,
+				},
+			});
+
+			const dataCursor = await collection.aggregate(pipeline, {
+				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
+				raw: false, // Whether to return document results as raw BSON buffers
+				bypassDocumentValidation: true, // Allow driver to bypass schema validation
+				session: this.session,
+			});
+
+			const findResult = await dataCursor.next();
+			await dataCursor.close();
+
+			if (findResult) {
+				const updateResult = await collection.findOneAndUpdate(
+					{ _id: findResult._id },
+					this.getUpdateDefinition(options.updateData),
+					{
+						returnDocument: "after",
+						session: this.session,
+						projection: this.getSelectDefinition(options.select, options.omit),
+						arrayFilters: this.getArrayFilters(options.arrayFilters),
+					}
+				);
+
+				return updateResult.value;
+			}
+
+			return null;
+		} else {
+			const filter = {};
+			if (options.where) filter.$expr = options.where.getQuery("MongoDB");
+
+			const updateResult = await collection.findOneAndUpdate(
+				filter,
+				this.getUpdateDefinition(options.updateData),
+				{
+					returnDocument: "after",
+					session: this.session,
+					projection: this.getSelectDefinition(options.select, options.omit),
+					arrayFilters: this.getArrayFilters(options.arrayFilters),
+				}
+			);
+
+			return updateResult.value;
+		}
+	}
+
+	/**
 	 * Updates the records matching the where condition using the update instructions.
 	 * @param  {Object} dbMeta The database metadata
 	 * @param  {Object} modelMeta The model metadata
 	 * @param  {Object} options The where, join and update options
 	 * @returns  Updated record count
 	 */
-	async update(dbMeta, modelMeta, options) {
+	async updateMany(dbMeta, modelMeta, options) {
 		const dbName = this.getAppliedDbName(dbMeta);
 		const modelName = this.getModelName(modelMeta);
 
@@ -872,7 +1014,6 @@ export class MongoDB extends DatabaseBase {
 		this.createSkipStage(options.skip, pipeline);
 		this.createLimitStage(options.limit, pipeline);
 
-		console.stdlog("***pipeline", JSON.stringify(pipeline, null, 2));
 		const dataCursor = await collection.aggregate(pipeline, {
 			allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
 			raw: false, // Whether to return document results as raw BSON buffers

@@ -11,7 +11,7 @@ body
           tr
             td.content
               h1= t('Join Application')
-              p= t('You have been invited you to join the application ')
+              p= t('You have been invited you to join the Agnost application ')
                 span.bold #{app}
                 span= t(" in organization '%s' with '%s' permissions.", `${organization}`, `${role}`)
               p= t('Please click below button to join and start developing apps!')
@@ -20,10 +20,10 @@ body
               a.button.marginbottom(href=`${url}` rel='nofollow' target='_blank')= t('Accept Invitation')
           tr
             td.content
-              h2= t('What is Altogic?')
-              p= t('Altogic is a backend service development and execution platform enabling people and businesses to design, deploy and manage scalable web services.')
+              h2= t('What is Agnost?')
+              p= t('Agnost is an open-source development platform for building backend applications running in Kubernetes clusters easily at scale.')
               |
-              a(href='http://www.altogic.com' rel='nofollow' target='_blank') Learn more about Altogic
+              a(href='https://www.agnost.dev' rel='nofollow' target='_blank') Learn more about Agnost
           tr
             td.content
           include ../templates/footer.pug

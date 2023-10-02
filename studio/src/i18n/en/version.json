@@ -30,7 +30,7 @@
 	"reactivated_successfully": "Environment activated successfully",
 	"environment_id": "Environment ID",
 	"environment_id_desc": "This is your environment's id within your Agnost Cluster.",
-	"suspend_services_desc": "Suspend access to the execution environment of this version. Version will be kept deployed but no requests will be handled",
+	"suspend_services_desc": "Suspend access to the API server of this version.",
 	"reactivate": "Reactivate",
 	"reactivate_services": "Reactivate Services",
 	"reactivate_services_desc": "Reactivate access to the execution environment of this version.",

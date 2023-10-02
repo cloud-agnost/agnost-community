@@ -33,7 +33,7 @@ export const sendEmail = (connection, queue, template) => {
 				channel.ack(msg);
 
 				let msgObj = JSON.parse(msg.content.toString());
-				const transporter = await getTransport();
+				const { transporter, fromEmail, fromName } = await getTransport();
 				if (!transporter) {
 					channel.ack(msg);
 					logger.error(
@@ -72,7 +72,7 @@ export const sendEmail = (connection, queue, template) => {
 					.send({
 						template: template,
 						message: {
-							from: '"Altogic" <noreply@altogic.com>',
+							from: `"${fromName ?? "Agnost"}" <${fromEmail}>`,
 							to: msgObj.to,
 							attachDataUrls: false,
 							attachments: [

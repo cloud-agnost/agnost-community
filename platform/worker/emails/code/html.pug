@@ -11,21 +11,17 @@ body
           tr
             td.content
               h1= t('Confirm your email address')
-              p= t('Thank you for signing up for Altogic. We\'re happy you\'re joining our growing community!')
-              p= t('To complete your sign up and activate your account, we just need to verify your email address. Please enter the code below in the window where you began creating or signing into your Altogic account:')
+              p= t('Thank you for start using Agnost. We\'re happy you\'re joining our growing community!')
+              p= t('To complete your sign up and activate your account, we just need to verify your email address. Please enter the code below in the window where you began creating or signing into your Agnost account:')
           tr
             td.code
               p
                 | #{code1}#{code2}
           tr
             td.content
-              p= t('Once verified, you can start using Altogic\'s features to build your applications.')
-              p= t('Questions about using Altogic? Email us at ')
-                a(href='mailto:support@altogic.com' rel='nofollow' target='_blank') support@altogic.com
-                span .
-                br
-              p= t('The Altogic Team')
+              p= t('Once verified, you can start using Agnost\'s features to build your applications.')
+              p= t('Questions about developing apps in Agnost? ')
+                a(href='https://www.agnost.dev' rel='nofollow' target='_blank') Learn more about Agnost
           tr
-            td.footer
-              p= t('You\'re receiving this email because you recently created a new Altogic account. If this wasn\'t you, please ignore this email.')
+            td.content
           include ../templates/footer.pug

@@ -10,6 +10,7 @@ export const checkSession =
 			next();
 			return;
 		}
+
 		//First check the Session header whether there is a session token or not
 		let sessionToken = req.header("Session");
 		//If we do not have a session token in headers, then look for the Cookies
@@ -47,6 +48,7 @@ export const checkSession =
 				const session = await getKey(
 					`sessions.${META.getEnvId()}.${decoded.key}`
 				);
+
 				if (!session) {
 					return res
 						.status(401)

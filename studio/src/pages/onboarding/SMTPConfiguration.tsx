@@ -14,6 +14,15 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import * as z from 'zod';
+import {
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from '@/components/Form';
+import { Input } from '@/components/Input';
 export default function SMTPConfiguration() {
 	const [error, setError] = useState<APIError | null>(null);
 	const [isTesting, setIsTesting] = useState(false);
@@ -86,7 +95,43 @@ export default function SMTPConfiguration() {
 				)}
 
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-3.5'>
+						<FormField
+							control={form.control}
+							name='fromName'
+							render={({ field }) => (
+								<FormItem className='flex-1'>
+									<FormLabel>{t('onboarding.smtp.fromName')}</FormLabel>
+									<FormControl>
+										<Input
+											error={!!form.formState.errors.host}
+											placeholder={t('onboarding.smtp.enter_fromName').toString()}
+											{...field}
+										/>
+									</FormControl>
+									<FormDescription>{t('onboarding.smtp.fromName_desc')}</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='fromEmail'
+							render={({ field }) => (
+								<FormItem className='flex-1'>
+									<FormLabel>{t('onboarding.smtp.fromEmail')}</FormLabel>
+									<FormControl>
+										<Input
+											error={!!form.formState.errors.host}
+											placeholder={t('onboarding.smtp.enter_fromEmail').toString()}
+											{...field}
+										/>
+									</FormControl>
+									<FormDescription>{t('onboarding.smtp.fromEmail_desc')}</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 						<SMTPForm />
 						<div className='flex gap-4 justify-end'>
 							<Button onClick={goBack} type='button' variant='text' size='lg'>

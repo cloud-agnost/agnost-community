@@ -658,7 +658,6 @@ router.get(
 			const db = mongoClient.db(envObj.iid);
 			const collectionName = type === "task" ? "cronjob_logs" : `${type}_logs`;
 
-			console.log("***here", collectionName, query);
 			// Execute the aggregation pipeline
 			const logs = await db
 				.collection(collectionName)

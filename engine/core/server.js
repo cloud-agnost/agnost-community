@@ -62,7 +62,7 @@ if (cluster.isPrimary) {
 	// Connect to message queue
 	connectToQueue(false);
 	// Connect to cache server(s)
-	connectToRedisCache();
+	await connectToRedisCache();
 	// Create the child process manager which will set up the API server
 	const manager = new ChildProcessDeploymentManager(null, null, i18n);
 	await manager.initializeCore();

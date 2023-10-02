@@ -150,7 +150,7 @@ export const checkApiKey = async function (socket) {
 
 	// Check if the api key requires authorized IP addresses or adress ranges and if yes the request IP is from a valid IP address
 	if (apiKeyObj.IPAuthorization === "specified") {
-		let clientIP = socket.handshakeaddress;
+		let clientIP = socket.handshake.address;
 		// If the IP address is in IPv6 format, convert it to IPv4 format
 		clientIP = clientIP
 			? net.isIPv4(clientIP)
