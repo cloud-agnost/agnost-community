@@ -33,69 +33,67 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 		'version.view': useAuthorizeApp({ role, key: 'version.view' }),
 	};
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button
-					variant='text'
-					rounded
-					className='p-2'
-					onClick={(e) => {
-						e.stopPropagation();
-					}}
-				>
-					<DotsThreeVertical className='w-5 h-5 text-icon-secondary' />
-					<span className='sr-only'>Open popover</span>
-				</Button>
-			</DropdownMenuTrigger>
+		<>
+			<DropdownMenu open={open}>
+				<DropdownMenuTrigger asChild>
+					<Button
+						variant='text'
+						rounded
+						className='p-2'
+						onClick={(e) => {
+							e.stopPropagation();
+						}}
+					>
+						<DotsThreeVertical className='w-5 h-5 text-icon-secondary' />
+						<span className='sr-only'>Open popover</span>
+					</Button>
+				</DropdownMenuTrigger>
 
-			<DropdownMenuContent align='end' className='version-dropdown-content'>
-				<DropdownMenuItemContainer>
-					{APPLICATION_SETTINGS.map((setting) => (
-						<DropdownMenuItem
-							id={setting.id}
-							key={setting.name}
-							disabled={!HAS_PERMISSION[setting.permissionKey]}
-							onClick={() => {
-								setOpen(false);
-								if (setting.onClick)
-									setting.onClick(applications.find((app) => app._id === appId) as Application);
-							}}
-							className='font-sfCompact px-3'
-						>
-							{setting.name}
-						</DropdownMenuItem>
-					))}
-					<DropdownMenuSeparator />
-					<DropdownMenuGroup>
-						<DropdownMenuItem
-							id='leave-app'
-							disabled={role === 'Admin'}
-							onSelect={() => {
-								setOpen(false);
-								if (setting.onClick)
-									setting.onClick(applications.find((app) => app._id === appId) as Application);
-							}}
-							className='font-sfCompact px-3'
-						>
-							{t('application.settings.leaveTeam')}
-						</DropdownMenuItem>
-					</DropdownMenuGroup>
-					<DropdownMenuSeparator />
-					<DropdownMenuGroup>
-						<DropdownMenuItem
-							id='delete-app'
-							disabled={!canAppDelete}
-							onSelect={() => {
-								setOpen(false);
-								openDeleteModal(applications.find((app) => app._id === appId) as Application);
-							}}
-							className='font-sfCompact px-3'
-						>
-							{t('general.delete')}
-						</DropdownMenuItem>
-					</DropdownMenuGroup>
-				</DropdownMenuItemContainer>
-			</DropdownMenuContent>
-		</DropdownMenu>
+				<DropdownMenuContent align='end' className='version-dropdown-content'>
+					<DropdownMenuItemContainer>
+						{APPLICATION_SETTINGS.map((setting) => (
+							<DropdownMenuItem
+								id={setting.id}
+								key={setting.name}
+								disabled={!HAS_PERMISSION[setting.permissionKey]}
+								onClick={() => {
+									setOpen(false);
+									if (setting.onClick)
+										setting.onClick(applications.find((app) => app._id === appId) as Application);
+								}}
+								className='font-sfCompact px-3'
+							>
+								{setting.name}
+							</DropdownMenuItem>
+						))}
+						<DropdownMenuSeparator />
+						<DropdownMenuGroup>
+							<DropdownMenuItem
+								id='leave-app'
+								disabled={role === 'Admin'}
+								onSelect={() => {
+									setOpen(false);
+									openLeaveModal(applications.find((app) => app._id === appId) as Application);
+								}}
+								className='font-sfCompact px-3'
+							>
+								{t('application.settings.leaveTeam')}
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								id='delete-app'
+								disabled={!canAppDelete}
+								onSelect={() => {
+									setOpen(false);
+									openDeleteModal(applications.find((app) => app._id === appId) as Application);
+								}}
+								className='font-sfCompact px-3'
+							>
+								{t('general.delete')}
+							</DropdownMenuItem>
+						</DropdownMenuGroup>
+					</DropdownMenuItemContainer>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</>
 	);
 }

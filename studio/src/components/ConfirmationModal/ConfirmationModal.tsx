@@ -1,12 +1,12 @@
-import { Modal, ModalProps } from 'components/Modal';
-import { Button } from 'components/Button';
-import { ReactNode, useEffect, useState, KeyboardEvent } from 'react';
-import { useTranslation } from 'react-i18next';
-import './confirmationModal.scss';
-import { Input } from 'components/Input';
-import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
 import { APIError } from '@/types';
+import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
+import { Button } from 'components/Button';
+import { Input } from 'components/Input';
+import { ModalProps } from 'components/Modal';
+import { KeyboardEvent, ReactNode, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../Dialog';
+import './confirmationModal.scss';
 
 interface ConfirmationModalProps extends ModalProps {
 	error?: APIError | null;
@@ -26,7 +26,6 @@ export default function ConfirmationModal({
 	loading,
 	error,
 	closeModal,
-	closeOnOverlayClick,
 	isOpen,
 	description,
 	title,
