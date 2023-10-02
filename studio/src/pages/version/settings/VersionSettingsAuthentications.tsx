@@ -61,7 +61,7 @@ export default function VersionSettingsAuthentications() {
 						</>
 					)}
 					{searchParams.get('a') === AUTH_TABS.PROVIDERS && <SelectOAuthProviders />}
-					{searchParams.get('a') === AUTH_TABS.TEMPLATES && <MessageTemplates />}/
+					{searchParams.get('a') === AUTH_TABS.TEMPLATES && <MessageTemplates />}
 				</div>
 			</div>
 		</SettingsContainer>

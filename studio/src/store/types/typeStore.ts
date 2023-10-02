@@ -1,11 +1,13 @@
 import TypesService from '@/services/TypesService';
 import {
+	APIError,
+	FieldType,
 	OAuthProviderParams,
 	OAuthProviderTypes,
 	PhoneAuthSMSProviderParams,
 	PhoneAuthSMSProviders,
-} from '@/types';
-import { APIError, FieldType, Types } from '@/types/type';
+	Types,
+} from '@/types/type';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 interface TypesStore {
