@@ -41,7 +41,7 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 						<span className='text-xl text-default font-semibold block truncate max-w-[11ch]'>
 							{application.name}
 						</span>
-						<Badge text={role} variant={BADGE_COLOR_MAP[role.toUpperCase()]} />
+						<Badge text={role} variant={BADGE_COLOR_MAP[role?.toUpperCase()]} />
 					</div>
 					<div>
 						<ApplicationTeam team={application.team} />

@@ -37,7 +37,7 @@ export default function ResourceType({ type, instances, isDefault }: ResourceTyp
 									className={cn(
 										'type-icon',
 										resourceType.type === instance.name && resourceType.name === type.name
-											? 'bg-elements-strong-blue'
+											? 'bg-elements-blue dark:bg-elements-strong-blue'
 											: 'bg-lighter',
 									)}
 								>
