@@ -1,12 +1,14 @@
+import { useDebounceFn } from '@/hooks';
+import useThemeStore from '@/store/theme/themeStore';
+import useTabStore from '@/store/version/tabStore';
+import useVersionStore from '@/store/version/versionStore';
+import { Tab } from '@/types';
 import { cn, saveEditorContent } from '@/utils';
 import MonacoEditor, { EditorProps } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
+import github from 'monaco-themes/themes/Github.json';
 import nightOwl from 'monaco-themes/themes/Night Owl.json';
-import useTabStore from '@/store/version/tabStore';
-import { useDebounceFn } from '@/hooks';
 import { useRef } from 'react';
-import useVersionStore from '@/store/version/versionStore';
-import { Tab } from '@/types';
 interface CodeEditorProps extends Omit<EditorProps, 'defaultLanguage'> {
 	containerClassName?: string;
 	defaultLanguage?: 'javascript' | 'json';
@@ -27,6 +29,7 @@ export default function CodeEditor({
 	onMount,
 }: CodeEditorProps) {
 	const { updateCurrentTab, getTabById } = useTabStore();
+	const { theme } = useThemeStore();
 	const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
 	const { version } = useVersionStore();
 	const setTabState = useDebounceFn((isDirty) => {
@@ -67,12 +70,13 @@ export default function CodeEditor({
 	};
 	function setEditorTheme(monaco: any) {
 		monaco.editor.defineTheme('nightOwl', nightOwl);
+		monaco.editor.defineTheme('github', github);
 	}
 
 	return (
 		<div className={cn(containerClassName)}>
 			<MonacoEditor
-				theme='nightOwl'
+				theme={theme === 'dark' ? 'nightOwl' : 'github'}
 				beforeMount={setEditorTheme}
 				className={cn('editor', className)}
 				onChange={handleEditorChange}

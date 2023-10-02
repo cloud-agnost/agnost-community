@@ -70,6 +70,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
 			<Avatar size='sm'>
 				<AvatarImage src={notification.actor.pictureUrl as string} />
 				<AvatarFallback
+					isUserAvatar
 					color={notification.actor.color as string}
 					name={notification.actor.name}
 					className='text-sm'

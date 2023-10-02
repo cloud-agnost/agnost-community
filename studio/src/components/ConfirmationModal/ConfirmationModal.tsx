@@ -6,6 +6,7 @@ import './confirmationModal.scss';
 import { Input } from 'components/Input';
 import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
 import { APIError } from '@/types';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../Dialog';
 
 interface ConfirmationModalProps extends ModalProps {
 	error?: APIError | null;
@@ -51,48 +52,47 @@ export default function ConfirmationModal({
 	}
 
 	return (
-		<Modal
-			closeModal={closeModal}
-			className={className}
-			title={title}
-			closeOnOverlayClick={closeOnOverlayClick}
-			isOpen={isOpen}
-		>
-			<div className='confirmation-modal'>
-				{error ? (
-					<Alert variant='error'>
-						{alertTitle && <AlertTitle>{error.error}</AlertTitle>}
-						{alertDescription && <AlertDescription>{error.details}</AlertDescription>}
-					</Alert>
-				) : (
-					showAlert && (
-						<Alert variant='warning'>
-							{alertTitle && <AlertTitle>{alertTitle}</AlertTitle>}
-							{alertDescription && <AlertDescription>{alertDescription}</AlertDescription>}
+		<Dialog open={isOpen} onOpenChange={closeModal}>
+			<DialogContent className={className}>
+				<DialogHeader>
+					<DialogTitle>{title}</DialogTitle>
+				</DialogHeader>
+				<div className='confirmation-modal'>
+					{error ? (
+						<Alert variant='error'>
+							{alertTitle && <AlertTitle>{error.error}</AlertTitle>}
+							{alertDescription && <AlertDescription>{error.details}</AlertDescription>}
 						</Alert>
-					)
-				)}
-				<p className='confirmation-modal-desc'>{description}</p>
-				{confirmCode && (
-					<Input
-						value={code}
-						placeholder={t('general.enter_confirmation_code_here') ?? ''}
-						maxLength={confirmCode.length}
-						onChange={(e) => setCode(e.target.value)}
-						onKeyDown={checkPressEnter}
-					/>
-				)}
-				<div className='confirmation-modal-actions'>
-					{closable && (
-						<Button onClick={closeModal} variant='text' size='lg'>
-							{closeButtonText ?? t('general.cancel')}
-						</Button>
+					) : (
+						showAlert && (
+							<Alert variant='warning'>
+								{alertTitle && <AlertTitle>{alertTitle}</AlertTitle>}
+								{alertDescription && <AlertDescription>{alertDescription}</AlertDescription>}
+							</Alert>
+						)
 					)}
-					<Button loading={loading} onClick={onConfirm} size='lg' disabled={code !== confirmCode}>
-						{confirmButtonText ?? t('general.delete')}
-					</Button>
+					<p className='confirmation-modal-desc'>{description}</p>
+					{confirmCode && (
+						<Input
+							value={code}
+							placeholder={t('general.enter_confirmation_code_here') ?? ''}
+							maxLength={confirmCode.length}
+							onChange={(e) => setCode(e.target.value)}
+							onKeyDown={checkPressEnter}
+						/>
+					)}
+					<div className='confirmation-modal-actions'>
+						{closable && (
+							<Button onClick={closeModal} variant='text' size='lg'>
+								{closeButtonText ?? t('general.cancel')}
+							</Button>
+						)}
+						<Button loading={loading} onClick={onConfirm} size='lg' disabled={code !== confirmCode}>
+							{confirmButtonText ?? t('general.delete')}
+						</Button>
+					</div>
 				</div>
-			</div>
-		</Modal>
+			</DialogContent>
+		</Dialog>
 	);
 }

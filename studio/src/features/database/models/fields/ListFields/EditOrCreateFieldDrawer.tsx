@@ -438,6 +438,7 @@ export default function EditOrCreateFieldDrawer({
 			if (value === 'false') return false;
 			return undefined;
 		};
+
 		const dataForAPI = {
 			fieldId: editMode ? fieldToEdit._id : '',
 			type: editMode ? fieldToEdit.type : type?.name ?? '',
@@ -460,6 +461,8 @@ export default function EditOrCreateFieldDrawer({
 					: data.general.indexed,
 			defaultValue: isBoolean
 				? parseForBoolean(data.general.defaultValue)
+				: isDecimal || isInteger
+				? Number(data.general.defaultValue)
 				: data.general.defaultValue,
 			description: data.general.description,
 			text: {
