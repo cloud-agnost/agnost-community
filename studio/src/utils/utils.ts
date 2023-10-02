@@ -4,6 +4,8 @@ import { useToast as toast } from '@/hooks';
 import { t } from '@/i18n/config.ts';
 import useApplicationStore from '@/store/app/applicationStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
+import useTabStore from '@/store/version/tabStore';
+import useVersionStore from '@/store/version/versionStore';
 import { AppRoles, OrgRoles, RealtimeData, ToastType } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
@@ -264,7 +266,7 @@ export async function formatCode(code: string) {
 }
 export async function saveEditorContent(
 	ed: monaco.editor.IStandaloneCodeEditor,
-	language: 'javascript' | 'json',
+	language: 'javascript' | 'json' | 'html',
 	cb?: (value: string) => void,
 ) {
 	if (language === 'json') {
@@ -294,4 +296,17 @@ export function removeEmptyFields(data: Record<string, any>) {
 		}
 	});
 	return data;
+}
+
+export function handleTabChange(name: string, url: string) {
+	const { getCurrentTab, updateCurrentTab } = useTabStore.getState();
+	const { version, getVersionDashboardPath } = useVersionStore.getState();
+	const tab = getCurrentTab(version._id as string);
+	const versionUrl = getVersionDashboardPath(url);
+	const hasAnotherParams = versionUrl.includes('?');
+	updateCurrentTab(version._id as string, {
+		...tab,
+		path: hasAnotherParams ? `${url}&tabId=${tab.id}` : `${url}?tabId=${tab.id}`,
+		title: ` ${name} - ${t('version.settings.authentications')}`,
+	});
 }

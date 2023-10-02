@@ -10,6 +10,7 @@ import { AuthUserDropdown } from '@/features/auth/AuthUserDropdown';
 import { Notification } from '@/features/version/Notification';
 import { Link, useParams } from 'react-router-dom';
 import './header.scss';
+import Feedback from './Feedback';
 
 export function Header() {
 	const { versionId, appId } = useParams();
@@ -39,6 +40,7 @@ export function Header() {
 			</div>
 			<div className='header-menu-right'>
 				<nav className='header-menu-right-nav'>
+					<Feedback />
 					{MENU_ITEMS.map((item, index) => (
 						<Link className='header-menu-right-nav-item' key={index} to={item.url}>
 							<span className='header-menu-right-nav-item-icon'>

@@ -7,7 +7,7 @@ export default function AuthUserAvatar(props: AvatarProps) {
 
 	return (
 		<Avatar {...props}>
-			<AvatarImage src={user.pictureUrl} />
+			<AvatarImage src={user.pictureUrl as string} />
 			<AvatarFallback isUserAvatar color={user.color} name={user.name} />
 		</Avatar>
 	);

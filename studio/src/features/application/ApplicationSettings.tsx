@@ -34,7 +34,7 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 	};
 	return (
 		<>
-			<DropdownMenu>
+			<DropdownMenu open={open}>
 				<DropdownMenuTrigger asChild>
 					<Button
 						variant='text'
@@ -79,9 +79,6 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 							>
 								{t('application.settings.leaveTeam')}
 							</DropdownMenuItem>
-						</DropdownMenuGroup>
-						<DropdownMenuSeparator />
-						<DropdownMenuGroup>
 							<DropdownMenuItem
 								id='delete-app'
 								disabled={!canAppDelete}
