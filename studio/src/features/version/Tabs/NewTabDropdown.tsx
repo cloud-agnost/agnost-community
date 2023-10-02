@@ -46,7 +46,6 @@ export default function NewTabDropdown() {
 			type: capitalize(item.type) as TabTypes,
 		};
 		addTab(versionId, tab);
-		console.log(path);
 	}
 
 	function onInput(value: string) {

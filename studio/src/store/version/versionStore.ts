@@ -539,7 +539,6 @@ const useVersionStore = create<VersionStore>()(
 					if (!_version) return '/organization';
 					const { orgId, appId, _id } = _version;
 					path = path ? `/${path.replace(/^\//, '')}` : '';
-					console.log('path', path);
 					return `/organization/${orgId}/apps/${appId}/version/${_id}` + path;
 				},
 				createAPIKey: async (params, showAlert) => {
