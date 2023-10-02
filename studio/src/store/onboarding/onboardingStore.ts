@@ -72,7 +72,7 @@ const useOnboardingStore = create<OnboardingStore>()(
 					uiBaseURL: window.location.origin,
 					smtp: {
 						host: 'smtp.mandrillapp.com',
-						port: '587',
+						port: 587,
 						useTLS: false,
 						user: 'Altogic',
 						password: 'iS-pNHmBJIXIpjOUXgYmZQ',

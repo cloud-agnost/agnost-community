@@ -8,8 +8,16 @@ interface Props {
 	info?: ReactNode | string;
 	action?: ReactNode;
 	className?: string;
+	contentClassName?: string;
 }
-export default function SettingsContainer({ children, pageTitle, info, action, className }: Props) {
+export default function SettingsContainer({
+	children,
+	pageTitle,
+	info,
+	action,
+	className,
+	contentClassName,
+}: Props) {
 	return (
 		<div className={cn('setting-container', className)}>
 			<div className='setting-container-header'>
@@ -19,7 +27,10 @@ export default function SettingsContainer({ children, pageTitle, info, action, c
 				</div>
 				{action && <div className='setting-container-header-action'>{action}</div>}
 			</div>
-			<div id='setting-container-content' className='setting-container-content'>
+			<div
+				id='setting-container-content'
+				className={cn('setting-container-content', contentClassName)}
+			>
 				{children}
 			</div>
 		</div>

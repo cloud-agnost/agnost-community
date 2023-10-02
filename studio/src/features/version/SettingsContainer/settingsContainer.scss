@@ -15,7 +15,7 @@
 	}
 
 	&-content {
-		@apply bg-base flex-1 mt-0 m-[3px] rounded-b overflow-auto p-[21px];
+		@apply bg-base flex-1 mt-0 m-[3px] rounded-b overflow-auto px-6 py-8;
 	}
 
 	&.table-view {

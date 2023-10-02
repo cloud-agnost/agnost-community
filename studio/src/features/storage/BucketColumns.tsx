@@ -40,7 +40,7 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 		cell: ({ row: { original } }) => (
 			<TabLink
 				name={original.name}
-				path={original.name}
+				path={`bucket/${original.name}`}
 				type='Storage'
 				onClick={() => {
 					useStorageStore.setState({ bucket: original });

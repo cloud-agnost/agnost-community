@@ -11,7 +11,7 @@ import nightOwl from 'monaco-themes/themes/Night Owl.json';
 import { useRef } from 'react';
 interface CodeEditorProps extends Omit<EditorProps, 'defaultLanguage'> {
 	containerClassName?: string;
-	defaultLanguage?: 'javascript' | 'json';
+	defaultLanguage?: 'javascript' | 'json' | 'html';
 	readonly?: boolean;
 	onSave?: (logic: string) => void;
 }
