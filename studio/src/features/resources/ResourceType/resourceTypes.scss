@@ -18,7 +18,7 @@
 		@apply w-10 h-10 p-2 rounded-full flex items-center justify-center;
 
 		.icon {
-			@apply text-default w-6 h-6;
+			@apply text-icon-base w-6 h-6;
 		}
 	}
 
@@ -28,7 +28,10 @@
 	&-item {
 		@apply border border-border rounded flex-1 p-4;
 		&.active {
-			@apply border-2 bg-surface-dark-blue border-button-primary;
+			@apply border-2 bg-surface-blue dark:bg-surface-dark-blue border-button-primary;
+			.icon {
+				@apply text-white;
+			}
 		}
 	}
 }
