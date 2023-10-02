@@ -22,7 +22,6 @@ import {
 	GcpStorage,
 	Integer,
 	Kafka,
-	LightBulb,
 	LineSegments,
 	MessageQueue,
 	Middleware,
@@ -113,11 +112,6 @@ export const SLIDER_IMAGES = [
 ];
 
 export const MENU_ITEMS = [
-	{
-		title: 'Feedback',
-		url: '/feedback',
-		icon: LightBulb,
-	},
 	{
 		title: 'Change Log',
 		url: '/change-log',

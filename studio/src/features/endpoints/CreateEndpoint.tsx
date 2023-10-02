@@ -61,7 +61,17 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 
 	function closeDrawer() {
 		onClose();
-		form.reset();
+		form.reset({
+			method: 'GET',
+			path: '',
+			name: '',
+			middlewares: [],
+			apiKeyRequired: false,
+			sessionRequired: false,
+			timeout: null,
+			logExecution: false,
+			rateLimits: [],
+		});
 	}
 
 	return (

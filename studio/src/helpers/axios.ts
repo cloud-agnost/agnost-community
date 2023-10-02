@@ -39,7 +39,7 @@ instance.interceptors.response.use(
 			useAuthStore.getState().logout();
 		}
 		if (error.response.status === 401) {
-			window.location.href = '/401';
+			// window.location.href = '/401';
 		}
 		if (error.response.status === 404) {
 			window.location.href = '/404';
