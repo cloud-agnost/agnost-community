@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { ApplicationTeam } from '.';
 import ApplicationSettings from './ApplicationSettings';
 import './application.scss';
+import { BADGE_COLOR_MAP } from '@/constants';
 interface ApplicationCardProps {
 	application: Application;
 }
@@ -17,7 +18,7 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 	const { t } = useTranslation();
 	const { openVersionDrawer } = useApplicationStore();
 
-	const role = application.team?.find(({ userId }) => userId._id === user?._id)?.role;
+	const role = application.team?.find(({ userId }) => userId._id === user?._id)?.role as string;
 	return (
 		<div
 			className='application-card'
@@ -40,7 +41,7 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 						<span className='text-xl text-default font-semibold block truncate max-w-[11ch]'>
 							{application.name}
 						</span>
-						<Badge text={role as string} />
+						<Badge text={role} variant={BADGE_COLOR_MAP[role.toUpperCase()]} />
 					</div>
 					<div>
 						<ApplicationTeam team={application.team} />

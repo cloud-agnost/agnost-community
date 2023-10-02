@@ -817,10 +817,10 @@ export const ENDPOINT_METHOD_TEXT_COLOR: Record<string, string> = {
 	DELETE: 'text-elements-red',
 };
 export const ENDPOINT_METHOD_BG_COLOR: Record<string, string> = {
-	GET: 'bg-elements-strong-blue',
-	POST: 'bg-elements-strong-green',
-	PUT: 'bg-elements-strong-yellow',
-	DELETE: 'bg-elements-strong-red',
+	GET: 'bg-elements-subtle-blue dark:bg-elements-strong-blue',
+	POST: 'bg-elements-subtle-green dark:bg-elements-strong-green',
+	PUT: 'bg-elements-subtle-yellow dark:bg-elements-strong-yellow',
+	DELETE: 'bg-elements-subtle-red dark:bg-elements-strong-red',
 };
 
 export const ENDPOINT_RESPONSE_TABS = [

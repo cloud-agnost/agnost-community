@@ -104,7 +104,7 @@ export default function EndpointForm() {
 											)}
 											error={Boolean(form.formState.errors.method)}
 										>
-											<SelectValue placeholder={t('general.select')} className='flex-1'>
+											<SelectValue placeholder={t('general.select')} className='flex-1 '>
 												{field.value}
 											</SelectValue>
 										</SelectTrigger>

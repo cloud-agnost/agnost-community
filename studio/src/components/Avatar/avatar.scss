@@ -6,10 +6,10 @@
 	&-fallback {
 		@apply flex h-full w-full items-center justify-center font-albert;
 		&-user {
-			@apply text-default;
+			@apply text-default-reverse dark:text-default;
 		}
 		&-org {
-			@apply text-default-reverse;
+			@apply text-default dark:text-default-reverse;
 		}
 	}
 	&-xxs {

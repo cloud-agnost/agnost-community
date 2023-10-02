@@ -49,6 +49,7 @@ export default function CreateCache({ open, onClose }: CreateCacheProps) {
 			},
 		});
 	}
+
 	return (
 		<Drawer open={open} onOpenChange={resetAndClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>

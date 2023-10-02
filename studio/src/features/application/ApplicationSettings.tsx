@@ -1,11 +1,18 @@
 import { Button } from '@/components/Button';
-import { Command, CommandGroup, CommandItem, CommandSeparator } from '@/components/Command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
 import { APPLICATION_SETTINGS } from '@/constants';
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import { AppRoles, Application } from '@/types';
 import { DotsThreeVertical } from '@phosphor-icons/react';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuItemContainer,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from 'components/Dropdown';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -26,8 +33,8 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 		'version.view': useAuthorizeApp({ role, key: 'version.view' }),
 	};
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger asChild>
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
 				<Button
 					variant='text'
 					rounded
@@ -39,43 +46,43 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 					<DotsThreeVertical className='w-5 h-5 text-icon-secondary' />
 					<span className='sr-only'>Open popover</span>
 				</Button>
-			</PopoverTrigger>
-			<PopoverContent className='w-[181px]'>
-				<Command>
-					<CommandGroup>
-						{APPLICATION_SETTINGS.map((setting) => (
-							<CommandItem
-								id={setting.id}
-								key={setting.name}
-								disabled={!HAS_PERMISSION[setting.permissionKey]}
-								onSelect={() => {
-									setOpen(false);
-									if (setting.onClick)
-										setting.onClick(applications.find((app) => app._id === appId) as Application);
-								}}
-								className='font-sfCompact px-3'
-							>
-								{setting.name}
-							</CommandItem>
-						))}
-					</CommandGroup>
-					<CommandSeparator />
-					<CommandGroup>
-						<CommandItem
+			</DropdownMenuTrigger>
+
+			<DropdownMenuContent align='end' className='version-dropdown-content'>
+				<DropdownMenuItemContainer>
+					{APPLICATION_SETTINGS.map((setting) => (
+						<DropdownMenuItem
+							id={setting.id}
+							key={setting.name}
+							disabled={!HAS_PERMISSION[setting.permissionKey]}
+							onClick={() => {
+								setOpen(false);
+								if (setting.onClick)
+									setting.onClick(applications.find((app) => app._id === appId) as Application);
+							}}
+							className='font-sfCompact px-3'
+						>
+							{setting.name}
+						</DropdownMenuItem>
+					))}
+					<DropdownMenuSeparator />
+					<DropdownMenuGroup>
+						<DropdownMenuItem
 							id='leave-app'
 							disabled={role === 'Admin'}
 							onSelect={() => {
 								setOpen(false);
-								openLeaveModal(applications.find((app) => app._id === appId) as Application);
+								if (setting.onClick)
+									setting.onClick(applications.find((app) => app._id === appId) as Application);
 							}}
 							className='font-sfCompact px-3'
 						>
 							{t('application.settings.leaveTeam')}
-						</CommandItem>
-					</CommandGroup>
-					<CommandSeparator />
-					<CommandGroup>
-						<CommandItem
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+					<DropdownMenuSeparator />
+					<DropdownMenuGroup>
+						<DropdownMenuItem
 							id='delete-app'
 							disabled={!canAppDelete}
 							onSelect={() => {
@@ -85,10 +92,10 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 							className='font-sfCompact px-3'
 						>
 							{t('general.delete')}
-						</CommandItem>
-					</CommandGroup>
-				</Command>
-			</PopoverContent>
-		</Popover>
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+				</DropdownMenuItemContainer>
+			</DropdownMenuContent>
+		</DropdownMenu>
 	);
 }
