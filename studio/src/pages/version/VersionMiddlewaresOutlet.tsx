@@ -26,7 +26,7 @@ VersionMiddlewaresOutlet.loader = async ({ params, request }: LoaderFunctionArgs
 
 export default function VersionMiddlewaresOutlet() {
 	return (
-		<div className='pt-6 px-6 space-y-6 h-full flex flex-col overflow-auto'>
+		<div className='space-y-6 h-full flex flex-col'>
 			<Outlet />
 		</div>
 	);

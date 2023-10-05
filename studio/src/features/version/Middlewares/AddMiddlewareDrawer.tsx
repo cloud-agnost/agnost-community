@@ -13,12 +13,13 @@ import { Button } from 'components/Button';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { nameSchema } from '@/features/version/Middlewares/formSchema.ts';
 import { Middleware } from '@/types';
+import { useTabNavigate } from '@/hooks';
 const MiddlewareFormSchema = z.object({
 	name: nameSchema,
 });
@@ -37,6 +38,8 @@ export default function AddMiddlewareDrawer({
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 	const { createMiddleware } = useMiddlewareStore();
+	const navigate = useTabNavigate();
+	const { pathname } = useLocation();
 	const { orgId, appId, versionId } = useParams();
 
 	useEffect(() => {
@@ -62,6 +65,15 @@ export default function AddMiddlewareDrawer({
 			});
 			onOpenChange(false);
 			if (onCreate) onCreate(mw);
+			else {
+				navigate({
+					title: data.name,
+					path: `${pathname}/${mw._id}`,
+					isActive: true,
+					isDashboard: false,
+					type: 'Middleware',
+				});
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -74,7 +86,7 @@ export default function AddMiddlewareDrawer({
 					<DrawerTitle>{t('version.middleware.add_middleware')}</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
-					<form className='p-6'>
+					<form className='p-6' onSubmit={(e) => e.preventDefault()}>
 						<FormField
 							control={form.control}
 							name='name'
@@ -83,6 +95,9 @@ export default function AddMiddlewareDrawer({
 									<FormLabel>{t('version.middleware.name')}</FormLabel>
 									<FormControl>
 										<Input
+											onKeyDown={(e) => {
+												if (e.code === 'Enter') form.handleSubmit(onSubmit)();
+											}}
 											value={field.value}
 											onChange={field.onChange}
 											error={Boolean(form.formState.errors.name)}
