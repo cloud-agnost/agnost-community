@@ -28,8 +28,8 @@ export default function VersionEditMiddlewares() {
 		return middlewares.find((mw) => mw._id === middlewareId)?.name;
 	}, [middlewares, middlewareId]);
 
-	async function saveLogic(logic?: string) {
-		if (!logic) return;
+	async function saveLogic() {
+		if (!middleware?.logic) return;
 		try {
 			setLoading(true);
 			await saveMiddlewareCode(
@@ -38,7 +38,7 @@ export default function VersionEditMiddlewares() {
 					appId,
 					versionId,
 					mwId: middlewareId,
-					logic,
+					logic: middleware?.logic,
 				},
 				true,
 			);

@@ -530,6 +530,8 @@ export class ResourceManager {
      * Returns information about the Agnost cluster default deployments and horizontal pod autoscalers
      */
     async getClusterInfo() {
+        const clusterInfo = [];
+        const clusterComponents = (await import("./clusterComponents.js")).clusterComponents;
         // Create a Kubernetes core API client
         const kubeconfig = new k8s.KubeConfig();
         kubeconfig.loadFromDefault();
@@ -544,6 +546,11 @@ export class ResourceManager {
                 console.log(`Running Replicas: ${deployment.status.replicas}`);
             }
 
+            let statefulSets = await k8sApi.listNamespacedStatefulSet(process.env.NAMESPACE);
+            for (let statefulSet of statefulSets.body.items) {
+                console.log(`Deployment Name: ${statefulSet.metadata.name}`);
+            }
+
             let hpas = await k8sAutoscalingApi.listNamespacedHorizontalPodAutoscaler(process.env.NAMESPACE);
             for (let hpa of hpas.body.items) {
                 console.log(`HPA Name: ${hpa.metadata.name}`);
@@ -552,10 +559,58 @@ export class ResourceManager {
                 console.log(`Current Replicas: ${hpa.status.currentReplicas}`);
             }
 
-            return [];
+            for (const comp of clusterComponents) {
+                if (comp.k8sType === "Deployment") {
+                    clusterInfo.push(this.getDeploymentInfo(comp, deployments.body.items, hpas.body.items));
+                } else if (comp.k8sType === "StatefulSet") {
+                    clusterInfo.push(this.getStatefulSetInfo(comp, statefulSets.body.items));
+                }
+            }
+
+            return clusterInfo;
         } catch (err) {
             console.log("***err", err);
             throw new AgnostError(err.body?.message);
         }
+    }
+
+    /**
+     * Returns information about the Agnost cluster default deployments and horizontal pod autoscalers
+     */
+    getDeploymentInfo(component, deployments, hpas) {
+        const deployment = deployments.find((entry) => entry.metadata.name === component.deploymentName);
+        const hpa = component.hasHpa ? hpas.find((entry) => entry.metadata.name === component.hpaName) : null;
+        let container = deployment.spec.template.spec.containers[0];
+
+        const info = {
+            version: container.image.split(":")[1],
+            configuredReplicas: deployment.spec.replicas,
+            runningReplicas: deployment.status.replicas,
+        };
+
+        if (hpa) {
+            info.minReplicas = hpa.spec.minReplicas;
+            info.maxReplicas = hpa.spec.maxReplicas;
+        }
+
+        const comp = { ...component, info };
+        return comp;
+    }
+
+    /**
+     * Returns information about the Agnost cluster default deployments and horizontal pod autoscalers
+     */
+    getStatefulSetInfo(component, statefulSets) {
+        const statefulSet = statefulSets.find((entry) => entry.metadata.name === component.statefulSetName);
+        let container = statefulSet.spec.template.spec.containers[0];
+
+        const info = {
+            version: container.image.split(":")[1],
+            configuredReplicas: statefulSet.spec.replicas,
+            runningReplicas: statefulSet.status.replicas,
+        };
+
+        const comp = { ...component, info };
+        return comp;
     }
 }
