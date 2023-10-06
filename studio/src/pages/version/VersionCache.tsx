@@ -28,7 +28,6 @@ export default function VersionCache() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
-	console.log('versionId', isCreateModalOpen);
 	const {
 		getCaches,
 		closeDeleteCacheModal,

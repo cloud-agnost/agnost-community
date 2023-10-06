@@ -29,6 +29,7 @@ router.get(
 	getResponseBody,
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName } = req.params;
@@ -62,6 +63,7 @@ router.post(
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
 	checkContentType,
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName } = req.params;
@@ -90,6 +92,7 @@ router.get(
 	getResponseBody,
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName } = req.params;
@@ -112,6 +115,7 @@ router.get(
 	getResponseBody,
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName } = req.params;
@@ -144,6 +148,7 @@ router.get(
 	getResponseBody,
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
@@ -169,6 +174,7 @@ router.delete(
 	getResponseBody,
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
@@ -195,6 +201,7 @@ router.delete(
 	getResponseBody,
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketNames } = req.params;
@@ -222,6 +229,7 @@ router.delete(
 	getResponseBody,
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
@@ -248,6 +256,7 @@ router.delete(
 	getResponseBody,
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
@@ -275,6 +284,7 @@ router.post(
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
 	checkContentType,
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
@@ -308,6 +318,7 @@ router.delete(
 	getResponseBody,
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName, tagKey } = req.params;
@@ -336,6 +347,7 @@ router.delete(
 	getResponseBody,
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
@@ -364,6 +376,7 @@ router.put(
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
 	checkContentType,
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
@@ -392,6 +405,7 @@ router.get(
 	getResponseBody,
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
@@ -429,6 +443,7 @@ router.post(
 	applyDefaultRateLimiters(),
 	handleFileUploads,
 	checkContentType,
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
@@ -467,6 +482,7 @@ router.delete(
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
 	checkContentType,
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
@@ -496,6 +512,7 @@ router.delete(
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
 	checkContentType,
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
@@ -528,6 +545,7 @@ router.put(
 	applyDefaultRateLimiters(),
 	handleFileUploads,
 	checkContentType,
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
@@ -564,6 +582,7 @@ router.put(
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
 	checkContentType,
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
@@ -602,6 +621,7 @@ router.put(
 	responseTime(logRequestToConsole),
 	applyDefaultRateLimiters(),
 	checkContentType,
+	checkServerStatus,
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;

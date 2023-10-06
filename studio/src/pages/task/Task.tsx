@@ -27,7 +27,7 @@ interface OutletContext {
 export default function MainTask() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const canEdit = useAuthorizeVersion('task.edit');
+	const canEdit = useAuthorizeVersion('task.create');
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
 	const {

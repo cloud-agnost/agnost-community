@@ -41,7 +41,6 @@ export default function OrganizationApps() {
 	const { t } = useTranslation();
 
 	function onInput(value: string) {
-		console.log(value);
 		value = value.trim();
 		if (!value) {
 			searchParams.delete('q');
