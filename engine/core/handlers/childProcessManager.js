@@ -44,6 +44,26 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	}
 
 	/**
+	 * Helper method to destroy http server during engine updates
+	 */
+	enableDestroy(server) {
+		var connections = {};
+
+		server.on("connection", function (conn) {
+			var key = conn.remoteAddress + ":" + conn.remotePort;
+			connections[key] = conn;
+			conn.on("close", function () {
+				delete connections[key];
+			});
+		});
+
+		server.destroy = function (cb) {
+			server.close(cb);
+			for (var key in connections) connections[key].destroy();
+		};
+	}
+
+	/**
 	 * Sets the express app
 	 * @param  {Object} app The express app
 	 */
@@ -77,20 +97,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * Shuts down the http server
 	 */
 	async closeHttpServer() {
-		return new Promise((resolve, reject) => {
-			const server = this.getHttpServer();
-			if (server) {
-				try {
-					//Close Http server
-					server.close(() => {
-						logger.info("Http server closed");
-						resolve();
-					});
-				} catch (err) {
-					resolve();
-				}
-			} else resolve();
-		});
+		const server = this.getHttpServer();
+		server.destroy();
+		logger.info("Http server closed");
 	}
 
 	/**
@@ -233,6 +242,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		this.manageEnvironmentVariables(this.getEnvironmentVariables());
 		// Set up the authentication flow SMTP server connection if specified
 		this.setUpAuthSMTPConnection();
+		// Manage the realtime connection
+		this.manageRealtimeConnection();
 		// Check databases
 		await this.manageDatabases();
 		// Check storages
@@ -355,6 +366,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		/* 	Particularly needed in case of bulk insert/update/delete operations, we should not generate 502 Bad Gateway errors at nginex ingress controller, the value specified in default config file is in milliseconds */
 		server.timeout = config.get("server.timeout");
 		this.setHttpServer(server);
+		this.enableDestroy(server);
 	}
 
 	/**
@@ -370,6 +382,10 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			// Create a new router for the endpoint
 			const router = express.Router();
 
+			// Add debug channel handlers
+			handlers.push(turnOnLogging(endpoint));
+			// When headers are sent, automatically turn off logging
+			handlers.push(turnOffLogging);
 			// Add rate limiter middlewares if any
 			this.addRateLimiters(endpoint, handlers);
 			this.addTimeoutMiddleware(endpoint, handlers);
@@ -386,10 +402,6 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			this.addSessionMiddleware(endpoint, handlers);
 			// Add file handler middleware
 			handlers.push(handleFileUploads);
-			// Add debug channel handlers
-			handlers.push(turnOnLogging(endpoint));
-			// When headers are sent, automatically turn off logging
-			handlers.push(turnOffLogging);
 			handlers.push(clearTemporaryFileStorage);
 			// If the endpoint has custom defined middlewares then add those middlewares
 			await this.addCustomMiddlewares(endpoint, handlers);

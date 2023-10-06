@@ -1,18 +1,20 @@
 import multer from "multer";
+import config from "config";
 import ERROR_CODES from "../config/errorCodes.js";
+
+const upload = multer({
+	storage: multer.diskStorage({
+		destination: config.get("general.fileStorageFolder"),
+		filename: function (req, file, cb) {
+			cb(null, `${helper.generateFileName()}-${file.originalname}`);
+		},
+	}),
+}).any();
 
 // Multer is required to process file uploads and make them available via req.files
 export const handleFileUploads = (req, res, next) => {
-	const upload = multer({
-		storage: multer.diskStorage({
-			destination: config.get("general.fileStorageFolder"),
-			filename: function (req, file, cb) {
-				cb(null, `${helper.generateFileName()}-${file.originalname}`);
-			},
-		}),
-	}).any();
-
 	upload(req, res, function (err) {
+		if (console.stdlog) console.log("Handling file upload");
 		if (err) {
 			return res
 				.status(400)

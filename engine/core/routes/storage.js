@@ -9,8 +9,8 @@ import { handleFileUploads } from "../middlewares/handleFileUploads.js";
 import { checkServerStatus } from "../middlewares/checkServerStatus.js";
 import { checkAPIKey } from "../middlewares/checkAPIKey.js";
 import {
-  checkStorage,
-  checkBucket,
+	checkStorage,
+	checkBucket,
 } from "../middlewares/checkStorageBucket.js";
 import { applyRules, validate } from "../util/authRules.js";
 import ERROR_CODES from "../config/errorCodes.js";
@@ -24,30 +24,30 @@ const router = express.Router({ mergeParams: true });
 @access     private
 */
 router.get(
-  "/:storageName/bucket",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName } = req.params;
-      const { page, limit, sortBy, sortDir, search, returnCountInfo } =
-        req.query;
-      const bucket = await agnost.storage(storageName).listBuckets({
-        page: Number(page),
-        limit: Number(limit),
-        search,
-        sort: { field: sortBy, order: sortDir },
-        returnCountInfo: returnCountInfo ? JSON.parse(returnCountInfo) : false,
-      });
+	"/:storageName/bucket",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName } = req.params;
+			const { page, limit, sortBy, sortDir, search, returnCountInfo } =
+				req.query;
+			const bucket = await agnost.storage(storageName).listBuckets({
+				page: Number(page),
+				limit: Number(limit),
+				search,
+				sort: { field: sortBy, order: sortDir },
+				returnCountInfo: returnCountInfo ? JSON.parse(returnCountInfo) : false,
+			});
 
-      res.json(bucket);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json(bucket);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -57,27 +57,27 @@ router.get(
 @access     private
 */
 router.post(
-  "/:storageName/bucket",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkContentType,
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName } = req.params;
-      const { name, isPublic, tags, userId } = req.body;
+	"/:storageName/bucket",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkContentType,
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName } = req.params;
+			const { name, isPublic, tags, userId } = req.body;
 
-      const bucket = await agnost
-        .storage(storageName)
-        .createBucket(name, isPublic, tags, userId);
+			const bucket = await agnost
+				.storage(storageName)
+				.createBucket(name, isPublic, tags, userId);
 
-      res.json(bucket);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json(bucket);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -87,21 +87,21 @@ router.post(
 @access     private
 */
 router.get(
-  "/:storageName/get-stats",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName } = req.params;
-      const stats = await agnost.storage(storageName).getStats();
-      res.json(stats);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+	"/:storageName/get-stats",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName } = req.params;
+			const stats = await agnost.storage(storageName).getStats();
+			res.json(stats);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 /*
 @route      /storage/:storageName/files?page=0&limit=10&search=&sortBy=email&sortDir=asc
@@ -110,29 +110,29 @@ router.get(
 @access     private
 */
 router.get(
-  "/:storageName/files",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName } = req.params;
-      const { page, limit, sortBy, sortDir, search } = req.query;
+	"/:storageName/files",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName } = req.params;
+			const { page, limit, sortBy, sortDir, search } = req.query;
 
-      const files = await agnost.storage(storageName).listFiles({
-        page: Number(page),
-        limit: Number(limit),
-        sort: { field: sortBy, order: sortDir },
-        search,
-      });
+			const files = await agnost.storage(storageName).listFiles({
+				page: Number(page),
+				limit: Number(limit),
+				sort: { field: sortBy, order: sortDir },
+				search,
+			});
 
-      res.json(files);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json(files);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -143,23 +143,23 @@ router.get(
 */
 
 router.get(
-  "/:storageName/bucket/:bucketName",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
+	"/:storageName/bucket/:bucketName",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
 
-      await agnost.storage(storageName).bucket(bucketName).getInfo();
+			await agnost.storage(storageName).bucket(bucketName).getInfo();
 
-      res.json();
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 /*
 @route      /storage/:storageName/bucket/:bucketName
@@ -169,23 +169,23 @@ router.get(
 */
 
 router.delete(
-  "/:storageName/bucket/:bucketName",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
+	"/:storageName/bucket/:bucketName",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
 
-      await agnost.storage(storageName).bucket(bucketName).delete();
+			await agnost.storage(storageName).bucket(bucketName).delete();
 
-      res.json();
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -196,24 +196,24 @@ router.delete(
 */
 
 router.delete(
-  "/:storageName/bucket/delete-multi",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketNames } = req.params;
-      bucketNames.forEach(async (bucketName) => {
-        await agnost.storage(storageName).bucket(bucketName).delete();
-      });
+	"/:storageName/bucket/delete-multi",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketNames } = req.params;
+			bucketNames.forEach(async (bucketName) => {
+				await agnost.storage(storageName).bucket(bucketName).delete();
+			});
 
-      res.json();
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -224,23 +224,23 @@ router.delete(
 */
 
 router.delete(
-  "/:storageName/bucket/:bucketName/delete-multi-files",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
-      const { paths } = req.query;
-      await agnost.storage(storageName).bucket(bucketName).deleteFiles(paths);
+	"/:storageName/bucket/:bucketName/delete-multi-files",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
+			const { paths } = req.query;
+			await agnost.storage(storageName).bucket(bucketName).deleteFiles(paths);
 
-      res.json();
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -251,23 +251,23 @@ router.delete(
 */
 
 router.delete(
-  "/:storageName/bucket/:bucketName/empty",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
+	"/:storageName/bucket/:bucketName/empty",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
 
-      await agnost.storage(storageName).bucket(bucketName).empty();
+			await agnost.storage(storageName).bucket(bucketName).empty();
 
-      res.json();
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -278,31 +278,31 @@ router.delete(
 */
 
 router.post(
-  "/:storageName/bucket/:bucketName/tag",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkContentType,
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
-      const buckets = [];
-      await Promise.all(
-        Object.entries(req.body).map(async ([key, value]) => {
-          const bucket = await agnost
-            .storage(storageName)
-            .bucket(bucketName)
-            .setTag(key, value);
-          buckets.push(bucket);
-        })
-      );
-      res.json(buckets);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+	"/:storageName/bucket/:bucketName/tag",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkContentType,
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
+			const buckets = [];
+			await Promise.all(
+				Object.entries(req.body).map(async ([key, value]) => {
+					const bucket = await agnost
+						.storage(storageName)
+						.bucket(bucketName)
+						.setTag(key, value);
+					buckets.push(bucket);
+				})
+			);
+			res.json(buckets);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -313,25 +313,25 @@ router.post(
 */
 
 router.delete(
-  "/:storageName/bucket/:bucketName/tag/:tagKey",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName, tagKey } = req.params;
-      const bucket = await agnost
-        .storage(storageName)
-        .bucket(bucketName)
-        .removeTag(tagKey);
+	"/:storageName/bucket/:bucketName/tag/:tagKey",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName, tagKey } = req.params;
+			const bucket = await agnost
+				.storage(storageName)
+				.bucket(bucketName)
+				.removeTag(tagKey);
 
-      res.json(bucket);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json(bucket);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -342,25 +342,25 @@ router.delete(
 */
 
 router.delete(
-  "/:storageName/bucket/:bucketName/tag/delete-multi",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
+	"/:storageName/bucket/:bucketName/tag/delete-multi",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
 
-      const bucket = await agnost
-        .storage(storageName)
-        .bucket(bucketName)
-        .removeTags();
-      res.json(bucket);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			const bucket = await agnost
+				.storage(storageName)
+				.bucket(bucketName)
+				.removeTags();
+			res.json(bucket);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -370,27 +370,27 @@ router.delete(
 @access     private
 */
 router.put(
-  "/:storageName/bucket/:bucketName",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkContentType,
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
-      const { name, isPublic, tags, includeFiles } = req.body;
-      const bucket = await agnost
-        .storage(storageName)
-        .bucket(bucketName)
-        .updateInfo(name, isPublic, tags, includeFiles);
+	"/:storageName/bucket/:bucketName",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkContentType,
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
+			const { name, isPublic, tags, includeFiles } = req.body;
+			const bucket = await agnost
+				.storage(storageName)
+				.bucket(bucketName)
+				.updateInfo(name, isPublic, tags, includeFiles);
 
-      res.json(bucket);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json(bucket);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 /*
 @route      /storage/:storageName/bucket/:bucketName/file?page=0&limit=10&search=&sortBy=email&sortDir=asc&search=
@@ -400,33 +400,33 @@ router.put(
 */
 
 router.get(
-  "/:storageName/bucket/:bucketName/file",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
-      const { page, limit, sortBy, sortDir, returnCountInfo, search } =
-        req.query;
-      const files = await agnost
-        .storage(storageName)
-        .bucket(bucketName)
-        .listFiles({
-          page: Number(page),
-          limit: Number(limit),
-          sort: { field: sortBy, order: sortDir },
-          returnCountInfo: !!returnCountInfo,
-          search,
-        });
+	"/:storageName/bucket/:bucketName/file",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
+			const { page, limit, sortBy, sortDir, returnCountInfo, search } =
+				req.query;
+			const files = await agnost
+				.storage(storageName)
+				.bucket(bucketName)
+				.listFiles({
+					page: Number(page),
+					limit: Number(limit),
+					sort: { field: sortBy, order: sortDir },
+					returnCountInfo: !!returnCountInfo,
+					search,
+				});
 
-      res.json(files);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json(files);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -436,36 +436,36 @@ router.get(
 @access     private
 */
 router.post(
-  "/:storageName/bucket/:bucketName/file",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  handleFileUploads,
-  checkContentType,
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
-      const result = [];
-      for (const file of req.files) {
-        const fileMetadata = await agnost
-          .storage(storageName)
-          .bucket(bucketName)
-          .upload({
-            path: file.filename,
-            size: file.size,
-            mimeType: file.mimetype,
-            localPath: file.path,
-          });
-        result.push(fileMetadata);
-      }
+	"/:storageName/bucket/:bucketName/file",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	handleFileUploads,
+	checkContentType,
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
+			const result = [];
+			for (const file of req.files) {
+				const fileMetadata = await agnost
+					.storage(storageName)
+					.bucket(bucketName)
+					.upload({
+						path: file.filename,
+						size: file.size,
+						mimeType: file.mimetype,
+						localPath: file.path,
+					});
+				result.push(fileMetadata);
+			}
 
-      res.json(result);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json(result);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -476,27 +476,27 @@ router.post(
 */
 
 router.delete(
-  "/:storageName/bucket/:bucketName/file",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkContentType,
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
-      const { filePath } = req.body;
-      await agnost
-        .storage(storageName)
-        .bucket(bucketName)
-        .file(filePath)
-        .delete();
-      res.json();
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+	"/:storageName/bucket/:bucketName/file",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkContentType,
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
+			const { filePath } = req.body;
+			await agnost
+				.storage(storageName)
+				.bucket(bucketName)
+				.file(filePath)
+				.delete();
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 /*
 @route      /storage/:storageName/bucket/:bucketName/file/delete-multi
@@ -506,29 +506,29 @@ router.delete(
 */
 
 router.delete(
-  "/:storageName/bucket/:bucketName/file/delete-multi",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkContentType,
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
-      const { filePaths } = req.body;
-      filePaths.forEach(async (path) => {
-        await agnost
-          .storage(storageName)
-          .bucket(bucketName)
-          .file(path)
-          .delete();
-      });
-      res.json();
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+	"/:storageName/bucket/:bucketName/file/delete-multi",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkContentType,
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
+			const { filePaths } = req.body;
+			filePaths.forEach(async (path) => {
+				await agnost
+					.storage(storageName)
+					.bucket(bucketName)
+					.file(path)
+					.delete();
+			});
+			res.json();
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 /*
 @route      /storage/:storageName/bucket/:bucketName/file/replace
@@ -538,35 +538,35 @@ router.delete(
 */
 
 router.put(
-  "/:storageName/bucket/:bucketName/file/replace",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  handleFileUploads,
-  checkContentType,
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
-      const { filePath } = req.body;
-      const file = req.files[0];
-      const result = await agnost
-        .storage(storageName)
-        .bucket(bucketName)
-        .file(filePath)
-        .replace({
-          path: file.filename,
-          size: file.size,
-          mimeType: file.mimetype,
-          localPath: file.path,
-        });
+	"/:storageName/bucket/:bucketName/file/replace",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	handleFileUploads,
+	checkContentType,
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
+			const { filePath } = req.body;
+			const file = req.files[0];
+			const result = await agnost
+				.storage(storageName)
+				.bucket(bucketName)
+				.file(filePath)
+				.replace({
+					path: file.filename,
+					size: file.size,
+					mimeType: file.mimetype,
+					localPath: file.path,
+				});
 
-      res.json(result);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.json(result);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 /*
 @route      /storage/:storageName/bucket/:bucketName/file/copy
@@ -576,36 +576,36 @@ router.put(
 */
 
 router.put(
-  "/:storageName/bucket/:bucketName/file/copy",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkContentType,
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
-      const { filePath } = req.body;
+	"/:storageName/bucket/:bucketName/file/copy",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkContentType,
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
+			const { filePath } = req.body;
 
-      const files = await agnost
-        .storage(storageName)
-        .bucket(bucketName)
-        .listFiles({
-          page: 1,
-          limit: 100,
-          search: filePath,
-        });
-      const result = await agnost
-        .storage(storageName)
-        .bucket(bucketName)
-        .file(filePath)
-        .copyTo(`${filePath} copy - ${files.length}`);
-      res.json(result);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			const files = await agnost
+				.storage(storageName)
+				.bucket(bucketName)
+				.listFiles({
+					page: 1,
+					limit: 100,
+					search: filePath,
+				});
+			const result = await agnost
+				.storage(storageName)
+				.bucket(bucketName)
+				.file(filePath)
+				.copyTo(`${filePath} copy - ${files.length}`);
+			res.json(result);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 /*
 @route      /storage/:storageName/bucket/:bucketName/file
@@ -615,27 +615,27 @@ router.put(
 */
 
 router.put(
-  "/:storageName/bucket/:bucketName/file",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkContentType,
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
-      const { path, isPublic, tags, filePath } = req.body;
-      const result = await agnost
-        .storage(storageName)
-        .bucket(bucketName)
-        .file(filePath)
-        .updateInfo(path, isPublic, tags);
-      res.json(result);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+	"/:storageName/bucket/:bucketName/file",
+	authManageStorage,
+	getResponseBody,
+	responseTime(logRequestToConsole),
+	applyDefaultRateLimiters(),
+	checkContentType,
+	checkServerStatus,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
+			const { path, isPublic, tags, filePath } = req.body;
+			const result = await agnost
+				.storage(storageName)
+				.bucket(bucketName)
+				.file(filePath)
+				.updateInfo(path, isPublic, tags);
+			res.json(result);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -645,68 +645,67 @@ router.put(
 @access     public
 */
 router.post(
-  "/:storageName/bucket/:bucketName/upload-formdata",
-  responseTime(logRequestToConsole),
-  getResponseBody,
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  handleFileUploads,
-  checkContentType,
-  checkAPIKey(null),
-  checkStorage,
-  checkBucket,
-  applyRules("upload-formdata"),
-  validate,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
-      console.log("****here123", storageName, bucketName);
+	"/:storageName/bucket/:bucketName/upload-formdata",
+	responseTime(logRequestToConsole),
+	getResponseBody,
+	applyDefaultRateLimiters(),
+	checkServerStatus,
+	handleFileUploads,
+	checkContentType,
+	checkAPIKey(null),
+	checkStorage,
+	checkBucket,
+	applyRules("upload-formdata"),
+	validate,
+	async (req, res) => {
+		try {
+			const { storageName, bucketName } = req.params;
 
-      let isPublic = req.bucket.isPublic;
-      let tags = [];
-      if (req.query?.options) {
-        try {
-          req.query.options = JSON.parse(req.query.options);
-          isPublic = req.query.options.isPublic ?? req.bucket.isPublic;
-          isPublic = isPublic ? true : false;
+			let isPublic = req.bucket.isPublic;
+			let tags = [];
+			if (req.query?.options) {
+				try {
+					req.query.options = JSON.parse(req.query.options);
+					isPublic = req.query.options.isPublic ?? req.bucket.isPublic;
+					isPublic = isPublic ? true : false;
 
-          tags = req.query.options.tags;
-        } catch (err) {}
-      }
+					tags = req.query.options.tags;
+				} catch (err) {}
+			}
 
-      if (!req.files || req.files.length === 0) {
-        return res
-          .status(400)
-          .json(
-            helper.createErrorMessage(
-              ERROR_CODES.clientError,
-              ERROR_CODES.fileUploadError,
-              t(
-                "The file to upload cannot be recognized in the body of the request."
-              )
-            )
-          );
-      }
+			if (!req.files || req.files.length === 0) {
+				return res
+					.status(400)
+					.json(
+						helper.createErrorMessage(
+							ERROR_CODES.clientError,
+							ERROR_CODES.fileUploadError,
+							t(
+								"The file to upload cannot be recognized in the body of the request."
+							)
+						)
+					);
+			}
 
-      const file = req.files[0];
-      const fileMetadata = await agnost
-        .storage(storageName)
-        .bucket(bucketName)
-        .upload(
-          {
-            path: req.query.fileName,
-            size: file.size,
-            mimeType: file.mimetype,
-            localPath: file.path,
-          },
-          { isPublic: isPublic, tags: tags }
-        );
+			const file = req.files[0];
+			const fileMetadata = await agnost
+				.storage(storageName)
+				.bucket(bucketName)
+				.upload(
+					{
+						path: req.query.fileName,
+						size: file.size,
+						mimeType: file.mimetype,
+						localPath: file.path,
+					},
+					{ isPublic: isPublic, tags: tags }
+				);
 
-      res.status(200).json(fileMetadata);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
+			res.status(200).json(fileMetadata);
+		} catch (error) {
+			helper.handleError(req, res, error);
+		}
+	}
 );
 
 export default router;

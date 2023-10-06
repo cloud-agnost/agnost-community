@@ -297,6 +297,22 @@ function getAsObject(keyValuePairs) {
 	return obj;
 }
 
+/**
+ * Helper function to convert memory string to bytes
+ * @param  {string} memoryStr Memory size such as 500Mi or 1Gi
+ */
+function memoryToBytes(memoryStr) {
+	const value = parseInt(memoryStr, 10);
+
+	if (memoryStr.endsWith("Mi")) {
+		return value * Math.pow(2, 20); // Convert mebibytes to bytes
+	}
+
+	if (memoryStr.endsWith("Gi")) {
+		return value * Math.pow(2, 30); // Convert gibibytes to bytes
+	}
+}
+
 export default {
 	constants,
 	isObject,
@@ -317,4 +333,5 @@ export default {
 	isValidIPAddress,
 	getQueryString,
 	getAsObject,
+	memoryToBytes,
 };

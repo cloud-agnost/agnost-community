@@ -17,6 +17,8 @@ export const checkSession =
 		if (!sessionToken && req.cookies && req.cookies.session_token)
 			sessionToken = req.cookies.session_token;
 
+		if (console.stdlog) console.log("Checking client session:", sessionToken);
+
 		if (!sessionToken) {
 			return res
 				.status(401)

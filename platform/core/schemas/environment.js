@@ -201,6 +201,163 @@ export const applyRules = (type) => {
 					.withMessage(t("Not a valid boolean value"))
 					.toBoolean(),
 			];
+		case "update-apiserver":
+			return [
+				body("minScale")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isInt({
+						min: 0,
+					})
+					.withMessage(
+						t("Minimum scale needs to be a positive integer or 0 (zero)")
+					)
+					.bail()
+					.toInt(),
+				body("maxScale")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isInt({
+						min: 1,
+					})
+					.withMessage(t("Maximum scale needs to be a positive integer"))
+					.bail()
+					.toInt()
+					.custom(async (value, { req }) => {
+						if (req.body.minScale > value)
+							throw new AgnostError(
+								t("Maximum scale cannot be smaller than minimum scale")
+							);
+
+						return true;
+					}),
+				body("scaleDownDelay")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom(async (value, { req }) => {
+						const regex = /^\d+m\d{2}s$/;
+						const result = regex.test(value);
+
+						if (!result)
+							throw new AgnostError(
+								t(
+									"Not a valid duration format. The duration needs to be as minutes and seconds e.g., 5m30s which is 5 minutes 30 seconds"
+								)
+							);
+
+						const minutesMatch = value.match(/(\d+)m/);
+						const secondsMatch = value.match(/(\d+)s/);
+
+						const minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+						const seconds = secondsMatch ? parseInt(secondsMatch[1], 10) : 0;
+
+						if (
+							minutes * 60 + seconds <
+							config.get("general.scaleDownDelaySeconds")
+						)
+							throw new AgnostError(
+								t(
+									"Scale down duration cannot be less than %s seconds",
+									config.get("general.scaleDownDelaySeconds")
+								)
+							);
+					}),
+				body("scaleToZeroPodRetentionPeriod")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom(async (value, { req }) => {
+						const regex = /^\d+m\d{2}s$/;
+						const result = regex.test(value);
+
+						if (!result)
+							throw new AgnostError(
+								t(
+									"Not a valid duration format. The duration needs to be as minutes and seconds e.g., 5m30s which is 5 minutes 30 seconds"
+								)
+							);
+
+						const minutesMatch = value.match(/(\d+)m/);
+						const secondsMatch = value.match(/(\d+)s/);
+
+						const minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+						const seconds = secondsMatch ? parseInt(secondsMatch[1], 10) : 0;
+
+						if (
+							minutes * 60 + seconds <
+							config.get("general.scaleToZeroPodRetentionPeriodSeconds")
+						)
+							throw new AgnostError(
+								t(
+									"Scale to zero pod retention period cannot be less than %s seconds",
+									config.get("general.scaleToZeroPodRetentionPeriodSeconds")
+								)
+							);
+					}),
+				body("cpu.request")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.matches(/^([1-9]\d*)m$/)
+					.withMessage(
+						t("CPU should be specified in non-zero millicores (e.g., 250m)")
+					)
+					.bail()
+					.custom((value, { req }) => {
+						const request = parseInt(value, 10);
+						const limit = parseInt(req.body.cpu?.limit, 10);
+						return request <= limit;
+					})
+					.withMessage(t("CPU request cannot be greater than CPU limit")),
+				body("cpu.limit")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.matches(/^([1-9]\d*)m$/)
+					.withMessage(
+						t("CPU should be specified in non-zero millicores (e.g., 250m)")
+					),
+				body("memory.request")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.matches(/^([1-9]\d*(Mi|Gi))$/)
+					.withMessage(
+						t(
+							"Memory should be specified in non-zero Mi or Gi (e.g., 500Mi or 1Gi)"
+						)
+					)
+					.bail()
+					.custom((value, { req }) => {
+						const request = helper.memoryToBytes(value);
+						const limit = helper.memoryToBytes(req.body.memory?.limit);
+						if (request !== undefined && limit !== undefined)
+							return request <= limit;
+						return true;
+					})
+					.withMessage(t("Memory request cannot be greater than Memory limit")),
+				body("memory.limit")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.matches(/^([1-9]\d*(Mi|Gi))$/)
+					.withMessage(
+						t(
+							"Memory should be specified in non-zero Mi or Gi (e.g., 500Mi or 1Gi)"
+						)
+					),
+			];
 		default:
 			return [];
 	}

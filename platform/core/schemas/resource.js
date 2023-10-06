@@ -6,6 +6,7 @@ import {
 	addResourceTypes,
 	instanceTypes,
 	addInstanceTypes,
+	configInstanceTypes,
 	appRoles,
 	resourceStatuses,
 } from "../config/constants.js";
@@ -14,6 +15,7 @@ import accessDatabaseRules from "./access/database.js";
 import accessCacheRules from "./access/cache.js";
 import accessQueueRules from "./access/queue.js";
 import accessStorageRules from "./access/storage.js";
+import configEngineRules from "./config/engine.js";
 
 /**
  * Resources are the actual instances of IaaS or PaaS from specific providers. There resources can be managed by the platform or
@@ -228,6 +230,55 @@ export const applyRules = (type) => {
 				...accessCacheRules,
 				...accessQueueRules,
 				...accessStorageRules,
+			];
+		case "update-config":
+			return [
+				body("type")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(addResourceTypes)
+					.withMessage(t("Unsupported resource type")),
+				body("instance")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom((value, { req }) => {
+						let instanceList = configInstanceTypes[req.body.type];
+						if (!instanceList)
+							throw new AgnostError(
+								t(
+									"Cannot identify the instance types for the provided resource type"
+								)
+							);
+
+						if (!instanceList.includes(value))
+							throw new AgnostError(
+								t(
+									"Not a valid instance type for respource type '%s'",
+									req.body.type
+								)
+							);
+
+						return true;
+					}),
+				body("config")
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.custom((value, { req }) => {
+						if (typeof value !== "object" || Array.isArray(value))
+							throw new AgnostError(t("Not a valid resource config setting"));
+
+						return true;
+					}),
+				...configEngineRules,
+				//...configDatabaseRules,
+				//...configCacheRules,
+				//...configQueueRules,
+				//...configStorageRules,
 			];
 		case "add":
 			return [

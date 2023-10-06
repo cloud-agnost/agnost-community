@@ -247,9 +247,10 @@ export class ResourceManager {
                         },
                         annotations: {
                             "autoscaling.knative.dev/initial-scale": deploymentConfig.initialScale.toString(),
-                            "autoscaling.knative.dev/target": deploymentConfig.maxScale.toString(),
+                            "autoscaling.knative.dev/target": deploymentConfig.target.toString(),
                             "autoscaling.knative.dev/metric": "concurrency",
                             "autoscaling.knative.dev/max-scale": deploymentConfig.maxScale.toString(),
+                            "autoscaling.knative.dev/min-scale": deploymentConfig.minScale.toString(),
                             "autoscaling.knative.dev/target-utilization-percentage": "80",
                             "autoscaling.knative.dev/scale-down-delay": deploymentConfig.scaleDownDelay.toString(),
                             "autoscaling.knative.dev/scale-to-zero-pod-retention-period":
@@ -398,27 +399,51 @@ export class ResourceManager {
         // Create a Kubernetes core API client
         const kubeconfig = new k8s.KubeConfig();
         kubeconfig.loadFromDefault();
-        const appsApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
+        const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
         try {
-            // Get the existing Deployment
-            const { body: deployment } = await appsApi.readNamespacedDeployment(
-                `${deploymentName}-deployment`,
-                process.env.NAMESPACE
+            const existingService = await k8sApi.getNamespacedCustomObjectStatus(
+                "serving.knative.dev",
+                "v1",
+                process.env.NAMESPACE,
+                "services",
+                deploymentName
             );
 
-            // Update the replica count, resource requests, and limits
-            deployment.spec.replicas = deploymentConfig.replicas;
-            deployment.spec.template.spec.containers[0].resources.requests.cpu = deploymentConfig.cpu.request;
-            deployment.spec.template.spec.containers[0].resources.requests.memory = deploymentConfig.memory.request;
-            deployment.spec.template.spec.containers[0].resources.limits.cpu = deploymentConfig.cpu.limit;
-            deployment.spec.template.spec.containers[0].resources.limits.memory = deploymentConfig.memory.limit;
+            // Update annotations
+            existingService.body.spec.template.metadata.annotations = {
+                ...existingService.body.spec.template.metadata.annotations,
+                "autoscaling.knative.dev/target":
+                    deploymentConfig.target?.toString() ??
+                    existingService.body.spec.template.metadata.annotations["autoscaling.knative.dev/target"],
+                "autoscaling.knative.dev/max-scale": deploymentConfig.maxScale.toString(),
+                "autoscaling.knative.dev/min-scale": deploymentConfig.minScale.toString(),
+                "autoscaling.knative.dev/scale-down-delay": deploymentConfig.scaleDownDelay.toString(),
+                "autoscaling.knative.dev/scale-to-zero-pod-retention-period":
+                    deploymentConfig.scaleToZeroPodRetentionPeriod.toString(),
+            };
 
-            // Update the deployment
-            await appsApi.replaceNamespacedDeployment(
-                `${deploymentName}-deployment`,
+            existingService.body.spec.template.spec.containerConcurrency = deploymentConfig.containerConcurrency;
+            const container = existingService.body.spec.template.spec.containers[0];
+            container.resources = {
+                requests: {
+                    cpu: deploymentConfig.cpu.request.toString(),
+                    memory: deploymentConfig.memory.request.toString(),
+                },
+                limits: {
+                    cpu: deploymentConfig.cpu.limit.toString(),
+                    memory: deploymentConfig.memory.limit.toString(),
+                },
+            };
+
+            // Apply updated Knative Service
+            await k8sApi.replaceNamespacedCustomObject(
+                "serving.knative.dev",
+                "v1",
                 process.env.NAMESPACE,
-                deployment
+                "services",
+                deploymentName,
+                existingService.body
             );
         } catch (err) {
             throw new AgnostError(err.body?.message);
@@ -540,24 +565,8 @@ export class ResourceManager {
 
         try {
             let deployments = await k8sApi.listNamespacedDeployment(process.env.NAMESPACE);
-            for (let deployment of deployments.body.items) {
-                console.log(`Deployment Name: ${deployment.metadata.name}`);
-                console.log(`Configured Replicas: ${deployment.spec.replicas}`);
-                console.log(`Running Replicas: ${deployment.status.replicas}`);
-            }
-
             let statefulSets = await k8sApi.listNamespacedStatefulSet(process.env.NAMESPACE);
-            for (let statefulSet of statefulSets.body.items) {
-                console.log(`Deployment Name: ${statefulSet.metadata.name}`);
-            }
-
             let hpas = await k8sAutoscalingApi.listNamespacedHorizontalPodAutoscaler(process.env.NAMESPACE);
-            for (let hpa of hpas.body.items) {
-                console.log(`HPA Name: ${hpa.metadata.name}`);
-                console.log(`Min Replicas: ${hpa.spec.minReplicas}`);
-                console.log(`Max Replicas: ${hpa.spec.maxReplicas}`);
-                console.log(`Current Replicas: ${hpa.status.currentReplicas}`);
-            }
 
             for (const comp of clusterComponents) {
                 if (comp.k8sType === "Deployment") {
@@ -569,7 +578,6 @@ export class ResourceManager {
 
             return clusterInfo;
         } catch (err) {
-            console.log("***err", err);
             throw new AgnostError(err.body?.message);
         }
     }
@@ -585,7 +593,7 @@ export class ResourceManager {
         const info = {
             version: container.image.split(":")[1],
             configuredReplicas: deployment.spec.replicas,
-            runningReplicas: deployment.status.replicas,
+            runningReplicas: deployment.status.availableReplicas,
         };
 
         if (hpa) {
@@ -607,10 +615,100 @@ export class ResourceManager {
         const info = {
             version: container.image.split(":")[1],
             configuredReplicas: statefulSet.spec.replicas,
-            runningReplicas: statefulSet.status.replicas,
+            runningReplicas: statefulSet.status.availableReplicas,
         };
 
         const comp = { ...component, info };
         return comp;
+    }
+
+    /**
+     * Returns information about the app version's API server
+     * @param  {string} envId The environment id
+     */
+    async getAPIServerInfo(envId) {
+        // Create a Kubernetes core API client
+        const kubeconfig = new k8s.KubeConfig();
+        kubeconfig.loadFromDefault();
+        const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
+
+        let result = null;
+        try {
+            const revResponse = await k8sApi.listNamespacedCustomObject(
+                "serving.knative.dev",
+                "v1",
+                process.env.NAMESPACE,
+                "revisions",
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                `app=${envId}`
+            );
+
+            let finalStatus = "Idle";
+            let totalAvailable = 0;
+            const revisions = revResponse.body.items;
+
+            for (let index = 0; index < revisions.length; index++) {
+                const revision = revisions[index];
+                const { status, runningReplicas } = await this.checkAPIServerStatus(revision.metadata.name);
+                totalAvailable += runningReplicas;
+                console.log(revision.metadata.name, status, runningReplicas);
+            }
+
+            if (totalAvailable > 0) finalStatus = "OK";
+
+            const ksResponse = await k8sApi.getNamespacedCustomObjectStatus(
+                "serving.knative.dev",
+                "v1",
+                process.env.NAMESPACE,
+                "services",
+                envId
+            );
+
+            const annotations = ksResponse.body?.spec?.template?.metadata?.annotations ?? {};
+            let container = ksResponse.body.spec.template.spec.containers[0];
+
+            return {
+                name: envId,
+                status: finalStatus,
+                initialScale: annotations["autoscaling.knative.dev/initial-scale"],
+                maxScale: annotations["autoscaling.knative.dev/max-scale"],
+                minScale: annotations["autoscaling.knative.dev/min-scale"],
+                scaleDownDelay: annotations["autoscaling.knative.dev/scale-down-delay"],
+                scaleToZeroPodRetentionPeriod:
+                    annotations["autoscaling.knative.dev/scale-to-zero-pod-retention-period"],
+                runningReplicas: totalAvailable,
+                version: container.image.split(":")[1],
+            };
+        } catch (err) {
+            throw new AgnostError(err.body?.message);
+        }
+    }
+
+    /**
+     * Returns the status of the API server
+     * @param  {object} connSettings The connection settings needed to connect to the API server
+     */
+    async checkAPIServerStatus(deploymentName) {
+        if (!deploymentName) return { status: "Error", runningReplicas: 0 };
+
+        // Create a Kubernetes core API client
+        const kubeconfig = new k8s.KubeConfig();
+        kubeconfig.loadFromDefault();
+        const coreApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
+
+        let result = null;
+        try {
+            result = await coreApi.readNamespacedDeployment(`${deploymentName}-deployment`, process.env.NAMESPACE);
+        } catch (err) {
+            return { status: "Error", runningReplicas: 0 };
+        }
+
+        return {
+            status: result.body?.status?.availableReplicas > 0 ? "OK" : "Idle",
+            runningReplicas: result.body?.status?.availableReplicas ?? 0,
+        };
     }
 }

@@ -8,7 +8,6 @@ import * as Minio from "minio";
 import { Kafka } from "kafkajs";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { Storage } from "@google-cloud/storage";
-import { io } from "socket.io-client";
 import { getMQClient } from "../init/queue.js";
 import { MinIOStorage } from "../adapters/storage/MinIOStorage.js";
 import { GCPStorage } from "../adapters/storage/GCPStorage.js";
@@ -20,15 +19,16 @@ import { MongoDB } from "../adapters/database/MongoDB.js";
 import { RabbitMQ } from "../adapters/queue/RabbitMQ.js";
 import { Kafka as KafkaAdapter } from "../adapters/queue/Kafka.js";
 import { Redis } from "../adapters/cache/Redis.js";
-import { Socketio } from "../adapters/realtime/Socketio.js";
 import { Agenda } from "../adapters/scheduler/Agenda.js";
 import { FunctionAdapter } from "../adapters/function/FunctionAdapter.js";
+import { RealtimeAdapter } from "../adapters/realtime/RealtimeAdapter.js";
 
 export class AdapterManager {
 	constructor() {
 		// Keeps the list of connections object {type, instance, iid, readOnly, adapter}
 		this.adapters = new Map();
 		this.functionAdapter = new FunctionAdapter(this);
+		this.realtimeAdapter = new RealtimeAdapter(this);
 		this.query = null;
 	}
 
@@ -201,19 +201,17 @@ export class AdapterManager {
 	}
 
 	/**
-	 * Returns the realtime connection object matching the name
-	 * @param  {string} name The design name of the resource
+	 * Returns the helper function execution adapter
 	 */
-	getRealtimeAdapter(name) {
-		const adapterObj = this.getAdapterObject(name, "realtime", false);
-		return adapterObj?.adapter || null;
+	getFunctionAdapter() {
+		return this.functionAdapter;
 	}
 
 	/**
 	 * Returns the helper function execution adapter
 	 */
-	getFunctionAdapter() {
-		return this.functionAdapter;
+	getRealtimeAdapter() {
+		return this.realtimeAdapter;
 	}
 
 	/**
@@ -258,9 +256,6 @@ export class AdapterManager {
 				break;
 			case "Kafka":
 				await this.connectToKafka(resource);
-				break;
-			case "Socket.io":
-				await this.connectToRealtimeServer(resource);
 				break;
 			case "Agenda":
 				await this.connectToScheduler(resource);
@@ -645,6 +640,9 @@ export class AdapterManager {
 			}
 
 			const client = await amqp.connect(connSettings.url);
+			client.on("error", (err) => {
+				console.error("RabbitMQ connection error:", err);
+			});
 
 			this.adapters.set(resource.iid, {
 				name,
@@ -652,7 +650,7 @@ export class AdapterManager {
 				instance,
 				iid,
 				readOnly: false,
-				adapter: new RabbitMQ(client, this),
+				adapter: new RabbitMQ(client, this, resource.config),
 			});
 		} catch (err) {}
 	}
@@ -837,37 +835,6 @@ export class AdapterManager {
 				iid,
 				readOnly: false,
 				adapter: new MinIOStorage(minioClient),
-			});
-		} catch (err) {}
-	}
-
-	/**
-	 * Creates a websocket connection to the realtime server
-	 * @param  {Object} resource The resource object
-	 */
-	async connectToRealtimeServer(resource) {
-		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid);
-		if (adapterObj) return;
-
-		try {
-			const { access, iid, instance, type, name } = resource;
-			let connSettings = access;
-			if (!connSettings) return;
-
-			const socket = io(`${connSettings.serverURL}`, {
-				reconnection: config.get("realtime.reconnection"),
-				reconnectionDelay: config.get("realtime.reconnectionDelay"),
-				transports: ["websocket", "polling"],
-			});
-
-			this.adapters.set(resource.iid, {
-				name,
-				type,
-				instance,
-				iid,
-				readOnly: false,
-				adapter: new Socketio(socket),
 			});
 		} catch (err) {}
 	}

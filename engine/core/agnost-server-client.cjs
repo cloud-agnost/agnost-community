@@ -40,6 +40,8 @@
 									return this.adapterManager.getFunctionAdapter();
 								case "cache":
 									return this.adapterManager.getCacheAdapter2(t);
+								case "realtime":
+									return this.adapterManager.getRealtimeAdapter();
 								default:
 									return null;
 							}
@@ -55,16 +57,17 @@
 					o = i(9634),
 					s = i(665),
 					u = i(9949),
-					l = i(4079),
-					d = i(9419),
-					c = i(990);
-				class p extends r.APIBase {
+					l = i(2847),
+					d = i(4079),
+					c = i(9419),
+					p = i(990);
+				class h extends r.APIBase {
 					constructor(e, t) {
 						super(e, t), (this.managers = new Map());
 					}
 					storage(e) {
-						if (!(0, d.isString)(e))
-							throw new c.ClientError(
+						if (!(0, c.isString)(e))
+							throw new p.ClientError(
 								"invalid_value",
 								"Storage name needs to be a string value"
 							);
@@ -76,8 +79,8 @@
 						}
 					}
 					queue(e) {
-						if (!(0, d.isString)(e))
-							throw new c.ClientError(
+						if (!(0, c.isString)(e))
+							throw new p.ClientError(
 								"invalid_value",
 								"Queue name needs to be a string value"
 							);
@@ -89,8 +92,8 @@
 						}
 					}
 					task(e) {
-						if (!(0, d.isString)(e))
-							throw new c.ClientError(
+						if (!(0, c.isString)(e))
+							throw new p.ClientError(
 								"invalid_value",
 								"Task name needs to be a string value"
 							);
@@ -102,8 +105,8 @@
 						}
 					}
 					db(e) {
-						if (!(0, d.isString)(e))
-							throw new c.ClientError(
+						if (!(0, c.isString)(e))
+							throw new p.ClientError(
 								"invalid_value",
 								"Database name needs to be a string value"
 							);
@@ -119,8 +122,8 @@
 						}
 					}
 					func(e) {
-						if (!(0, d.isString)(e))
-							throw new c.ClientError(
+						if (!(0, c.isString)(e))
+							throw new p.ClientError(
 								"invalid_value",
 								"Function name needs to be a string value"
 							);
@@ -132,20 +135,28 @@
 						}
 					}
 					cache(e) {
-						if (!(0, d.isString)(e))
-							throw new c.ClientError(
+						if (!(0, c.isString)(e))
+							throw new p.ClientError(
 								"invalid_value",
 								"Cache name needs to be a string value"
 							);
 						const t = this.managers.get(`cache-${e}`);
 						if (t) return t;
 						{
-							const t = new l.Cache(this.metaManager, this.adapterManager, e);
+							const t = new d.Cache(this.metaManager, this.adapterManager, e);
 							return this.managers.set(`cache-${e}`, t), t;
 						}
 					}
+					get realtime() {
+						const e = this.managers.get("realtime");
+						if (e) return e;
+						{
+							const e = new l.Realtime(this.adapterManager);
+							return this.managers.set("realtime", e), e;
+						}
+					}
 				}
-				t.AgnostServerSideClient = p;
+				t.AgnostServerSideClient = h;
 			},
 			6098: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
@@ -230,16 +241,16 @@
 					g = r(i(9674)),
 					T = r(i(5850)),
 					b = r(i(1946)),
-					E = r(i(3115)),
-					w = r(i(5616)),
+					w = r(i(3115)),
+					E = r(i(5616)),
 					_ = r(i(7934)),
 					R = r(i(6489)),
 					$ = r(i(2237)),
 					M = r(i(9660)),
 					O = r(i(3481)),
 					x = r(i(789)),
-					B = r(i(6587)),
-					P = r(i(7267)),
+					P = r(i(6587)),
+					B = r(i(7267)),
 					C = r(i(6835)),
 					j = r(i(5191)),
 					F = r(i(2115)),
@@ -252,8 +263,8 @@
 					U = r(i(5102)),
 					Q = r(i(4175)),
 					L = r(i(929)),
-					Y = r(i(1021)),
-					k = r(i(1401)),
+					k = r(i(1021)),
+					Y = r(i(1401)),
 					q = r(i(6222)),
 					J = r(i(5331)),
 					G = r(i(3236)),
@@ -284,8 +295,8 @@
 					ge = r(i(3057)),
 					Te = r(i(6923)),
 					be = r(i(8051)),
-					Ee = r(i(4184)),
-					we = r(i(6768)),
+					we = r(i(4184)),
+					Ee = r(i(6768)),
 					_e = r(i(6735)),
 					Re = r(i(107)),
 					$e = r(i(4997));
@@ -307,16 +318,16 @@
 					$includes: g.default,
 					$left: T.default,
 					$length: b.default,
-					$lower: E.default,
-					$lt: w.default,
+					$lower: w.default,
+					$lt: E.default,
 					$lte: _.default,
 					$ltrim: R.default,
 					$mod: $.default,
 					$multiply: M.default,
 					$neq: O.default,
 					$nin: x.default,
-					$not: B.default,
-					$or: P.default,
+					$not: P.default,
+					$or: B.default,
 					$right: C.default,
 					$round: j.default,
 					$rtrim: F.default,
@@ -329,8 +340,8 @@
 					$size: U.default,
 					$exp: Q.default,
 					$ln: L.default,
-					$log: Y.default,
-					$log10: k.default,
+					$log: k.default,
+					$log10: Y.default,
 					$pow: q.default,
 					$sin: J.default,
 					$cos: G.default,
@@ -347,23 +358,23 @@
 					$atanh: ne.default,
 					$radians: ae.default,
 					$degrees: oe.default,
-					$dateAdd: se.default,
-					$dateDiff: ue.default,
+					$dateadd: se.default,
+					$datediff: ue.default,
 					$hour: le.default,
 					$minute: de.default,
 					$second: ce.default,
 					$year: pe.default,
 					$month: he.default,
-					$dayOfMonth: fe.default,
-					$dayOfWeek: ye.default,
-					$dayOfYear: me.default,
-					$strToDate: ve.default,
-					$toDecimal: ge.default,
-					$toBoolean: Te.default,
-					$toInteger: be.default,
-					$toDate: Ee.default,
-					$toString: we.default,
-					$toObjectId: _e.default,
+					$dayofmonth: fe.default,
+					$dayofweek: ye.default,
+					$dayofyear: me.default,
+					$strtodate: ve.default,
+					$todecimal: ge.default,
+					$toboolean: Te.default,
+					$tointeger: be.default,
+					$todate: we.default,
+					$tostring: Ee.default,
+					$toobjectid: _e.default,
 					$distance: Re.default,
 					$point: $e.default,
 				};
@@ -2827,7 +2838,9 @@
 									r(t, e, i);
 						};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
-					(t.Cache =
+					(t.Realtime =
+						t.CacheBase =
+						t.Cache =
 						t.Func =
 						t.Expression =
 						t.DBAction =
@@ -2902,66 +2915,80 @@
 						return p.Func;
 					},
 				});
-				const h = i(665);
+				const h = i(2847);
+				Object.defineProperty(t, "Realtime", {
+					enumerable: !0,
+					get: function () {
+						return h.Realtime;
+					},
+				});
+				const f = i(665);
 				Object.defineProperty(t, "Database", {
 					enumerable: !0,
 					get: function () {
-						return h.Database;
+						return f.Database;
 					},
 				});
-				const f = i(5421);
+				const y = i(5421);
 				Object.defineProperty(t, "DatabaseBase", {
 					enumerable: !0,
 					get: function () {
-						return f.DatabaseBase;
+						return y.DatabaseBase;
 					},
 				});
-				const y = i(9831);
+				const m = i(9831);
 				Object.defineProperty(t, "Model", {
 					enumerable: !0,
 					get: function () {
-						return y.Model;
+						return m.Model;
 					},
 				});
-				const m = i(892);
+				const v = i(892);
 				Object.defineProperty(t, "ModelBase", {
 					enumerable: !0,
 					get: function () {
-						return m.ModelBase;
+						return v.ModelBase;
 					},
 				});
-				const v = i(1111);
+				const g = i(1111);
 				Object.defineProperty(t, "Field", {
 					enumerable: !0,
 					get: function () {
-						return v.Field;
+						return g.Field;
 					},
 				});
-				const g = i(1687);
+				const T = i(1687);
 				Object.defineProperty(t, "DBAction", {
 					enumerable: !0,
 					get: function () {
-						return g.DBAction;
+						return T.DBAction;
 					},
 				});
-				const T = i(4079);
+				const b = i(4079);
 				Object.defineProperty(t, "Cache", {
 					enumerable: !0,
 					get: function () {
-						return T.Cache;
+						return b.Cache;
 					},
 				});
-				const b = i(6098);
+				const w = i(9);
+				Object.defineProperty(t, "CacheBase", {
+					enumerable: !0,
+					get: function () {
+						return w.CacheBase;
+					},
+				});
+				const E = i(6098);
 				Object.defineProperty(t, "Expression", {
 					enumerable: !0,
 					get: function () {
-						return b.Expression;
+						return E.Expression;
 					},
 				});
-				const E = (e, t) => new o.AgnostServerSideClient(e, t);
-				t.createServerSideClient = E;
-				const w = E(global.META, global.ADAPTERS);
-				(t.agnost = w), n(i(9307), t), n(i(2548), t);
+				const _ = (e, t) => new o.AgnostServerSideClient(e, t);
+				t.createServerSideClient = _;
+				const R = _(global.META, global.ADAPTERS);
+				(t.agnost = R), n(i(9307), t), n(i(2548), t);
 			},
 			8414: function (e, t, i) {
 				var r =
@@ -4139,6 +4166,90 @@
 					}
 				}
 				t.Queue = o;
+			},
+			2847: function (e, t, i) {
+				var r =
+					(this && this.__awaiter) ||
+					function (e, t, i, r) {
+						return new (i || (i = Promise))(function (n, a) {
+							function o(e) {
+								try {
+									u(r.next(e));
+								} catch (e) {
+									a(e);
+								}
+							}
+							function s(e) {
+								try {
+									u(r.throw(e));
+								} catch (e) {
+									a(e);
+								}
+							}
+							function u(e) {
+								var t;
+								e.done
+									? n(e.value)
+									: ((t = e.value),
+									  t instanceof i
+											? t
+											: new i(function (e) {
+													e(t);
+											  })).then(o, s);
+							}
+							u((r = r.apply(e, t || [])).next());
+						});
+					};
+				Object.defineProperty(t, "__esModule", { value: !0 }),
+					(t.Realtime = void 0);
+				const n = i(7602),
+					a = i(990),
+					o = i(9419);
+				class s extends n.APIBase {
+					constructor(e) {
+						if (
+							(super(null, e),
+							(this.adapter = this.getAdapter("realtime", null)),
+							!this.adapter)
+						)
+							throw new a.ClientError(
+								"adapter_not_found",
+								"Cannot find the adapter for realtime"
+							);
+					}
+					broadcast(e, t) {
+						if (!(0, o.checkRequired)(e, !0))
+							throw new a.ClientError(
+								"invalid_value",
+								"The 'event name' needs to be a string value"
+							);
+						this.adapter.broadcast(e, t);
+					}
+					send(e, t, i) {
+						if (!(0, o.checkRequired)(e, !0))
+							throw new a.ClientError(
+								"invalid_value",
+								"The 'channel name' needs to be a string value"
+							);
+						if (!(0, o.checkRequired)(t, !0))
+							throw new a.ClientError(
+								"invalid_value",
+								"The 'event name' needs to be a string value"
+							);
+						this.adapter.send(e, t, i);
+					}
+					getMembers(e) {
+						return r(this, void 0, void 0, function* () {
+							if (!(0, o.checkRequired)(e, !0))
+								throw new a.ClientError(
+									"invalid_value",
+									"The 'channel name' needs to be a string value"
+								);
+							return yield this.adapter.getMembers(e);
+						});
+					}
+				}
+				t.Realtime = s;
 			},
 			6120: function (e, t, i) {
 				var r =
@@ -5719,8 +5830,8 @@
 					g = i(9175),
 					T = i(6666),
 					b = i(335),
-					E = i(1620),
-					w = i(9337),
+					w = i(1620),
+					E = i(9337),
 					_ = i(8811),
 					R = i(8321),
 					$ = i(300);
@@ -5731,7 +5842,7 @@
 						case "text":
 							return new _.TextField(e, t);
 						case "rich-text":
-							return new w.RichTextField(e, t);
+							return new E.RichTextField(e, t);
 						case "encrypted-text":
 							return new c.EncryptedTextField(e, t);
 						case "email":
@@ -5765,7 +5876,7 @@
 						case "json":
 							return new m.JSONField(e, t);
 						case "reference":
-							return new E.ReferenceField(e, t);
+							return new w.ReferenceField(e, t);
 						case "basic-values-list":
 							return new r.BasicValuesListField(e, t);
 						case "object-list":
@@ -8142,7 +8253,8 @@
 			},
 			9419: (e, t, i) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
-					(t.isValidId =
+					(t.checkRequired =
+						t.isValidId =
 						t.isArray =
 						t.isInteger =
 						t.isPositiveInteger =
@@ -8194,6 +8306,12 @@
 							default:
 								return !1;
 						}
+					}),
+					(t.checkRequired = function (e, t = !0) {
+						return (
+							null != e &&
+							(!t || ("" !== e && ("string" != typeof e || "" !== e.trim())))
+						);
 					});
 			},
 			2548: (e, t) => {

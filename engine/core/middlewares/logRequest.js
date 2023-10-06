@@ -11,6 +11,8 @@ export const logRequestToConsole = (req, res, time) => {
 
 // Log requests to console and add the log to the environment database
 export const logRequest = (endpoint) => (req, res, time) => {
+	if (console.stdlog) console.log("Logging handler execution");
+
 	logger.info(
 		`${req.method} (${res.statusCode}) ${Math.round(time * 10) / 10}ms ${
 			req.originalUrl

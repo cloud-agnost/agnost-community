@@ -614,6 +614,13 @@ export const addInstanceTypes = {
 	queue: ["RabbitMQ", "Kafka"],
 };
 
+export const configInstanceTypes = {
+	database: ["PostgreSQL", "MySQL", "MongoDB"],
+	cache: ["Redis"],
+	storage: ["MinIO"],
+	queue: ["RabbitMQ", "Kafka"],
+};
+
 export const methodTypes = ["GET", "POST", "PUT", "DELETE"];
 
 export const logicTypes = ["code", "flow"];

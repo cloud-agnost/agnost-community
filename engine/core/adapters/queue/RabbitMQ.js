@@ -5,11 +5,12 @@ import ERROR_CODES from "../../config/errorCodes.js";
  * Manages message listen and dispatch operations in RabbitMQ
  */
 export class RabbitMQ extends QueueBase {
-	constructor(driver, manager) {
+	constructor(driver, manager, config) {
 		super();
 		this.driver = driver;
 		this.manager = manager;
 		this.channels = [];
+		this.config = config;
 	}
 
 	async disconnect() {
@@ -51,6 +52,8 @@ export class RabbitMQ extends QueueBase {
 			this.processMessage(queue, `process-message-${envId}-${queue.name}-${i}`);
 		}
 
+		// Check if the message broker supports delayed messages or not
+		if (!this.config?.delayedMessages) return;
 		// Listen for delayed messages
 		for (let i = 1; i <= exchangeCount; i++) {
 			this.processMessage(
@@ -83,6 +86,10 @@ export class RabbitMQ extends QueueBase {
 		try {
 			const channel = await this.driver.createChannel();
 			this.addChannel(channel);
+			channel.on("error", (err) => {
+				console.error("RabbitMQ channel error to send messages:", queue, err);
+			});
+
 			const envId = META.getEnvId();
 			const message = {
 				timestamp: new Date(),
@@ -92,7 +99,7 @@ export class RabbitMQ extends QueueBase {
 			};
 
 			// Check if this is a delayed message or not
-			if (delayMs && delayMs > 0) {
+			if (delayMs && delayMs > 0 && this.config?.delayedMessages) {
 				const exchangeNumber = helper.randomInt(
 					1,
 					config.get("general.delayedMessageExchangeCount")
@@ -162,6 +169,14 @@ export class RabbitMQ extends QueueBase {
 		try {
 			const channel = await this.driver.createChannel();
 			this.addChannel(channel);
+			channel.on("error", (err) => {
+				console.error(
+					"RabbitMQ channel error to process messages:",
+					queue,
+					exchange,
+					err
+				);
+			});
 
 			// If this is a delayed message then we need to bind the queue to the exchange
 			if (exchange) {
@@ -375,9 +390,12 @@ export class RabbitMQ extends QueueBase {
 				}
 			);
 		} catch (error) {
-			logger.error("Cannot process queue message", {
-				details: error,
-			});
+			logger.error(
+				`Cannot process queue '${queue}' exchange '${exchange}' message`,
+				{
+					details: error,
+				}
+			);
 
 			return;
 		}

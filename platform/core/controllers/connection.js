@@ -14,11 +14,11 @@ class ConnectionController {
 
 	/**
 	 * Returns true if successfully connects to the database otherwise throws an exception
-	 * @param  {string} dbType The type of the datbase e.g., PostgreSQL, MySQL
+	 * @param  {string} instance The instance type of the resource
 	 * @param  {string} connSettings The connection settings needed to connect to the database
 	 */
-	async testConnection(dbType, connSettings) {
-		switch (dbType) {
+	async testConnection(instance, connSettings) {
+		switch (instance) {
 			case "PostgreSQL":
 				try {
 					const client = new pg.Client({
@@ -136,7 +136,29 @@ class ConnectionController {
 					}
 
 					const client = await amqp.connect(connSettings.url);
-					await client.close();
+					client.on("error", (err) => {});
+					const channel = await client.createChannel();
+					channel.on("error", (err) => {});
+
+					try {
+						await channel.assertExchange(
+							"test-delayed-exchange",
+							"x-delayed-message",
+							{
+								arguments: { "x-delayed-type": "direct" },
+							}
+						);
+
+						await channel.deleteExchange("test-delayed-exchange");
+						await client.close();
+						return { delayedMessages: true };
+					} catch (err) {
+						try {
+							await client.close();
+						} catch (err) {}
+
+						return { delayedMessages: false };
+					}
 				} catch (err) {
 					throw new AgnostError(
 						t("Cannot establish connection to RabbitMQ. %s", err.message)

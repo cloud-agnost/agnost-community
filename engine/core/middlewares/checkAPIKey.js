@@ -10,6 +10,8 @@ export const checkAPIKey = (endpoint) => (req, res, next) => {
 		apiKey = req.query.apikey;
 	}
 
+	if (console.stdlog) console.log("Checking API key:", apiKey);
+
 	if (!apiKey) {
 		return res
 			.status(401)

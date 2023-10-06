@@ -80,11 +80,15 @@
     "minSMSCodeExpirySeconds": 60,
     "maxSMSCodeExpirySeconds": 604800,
     "maxSearchResults": 50,
+    "scaleDownDelaySeconds": 300,
+    "scaleToZeroPodRetentionPeriodSeconds": 600,
     "defaultEngineConfig": {
       "initialScale": 1,
+      "minScale": 0,
       "maxScale": 10,
       "scaleDownDelay": "5m00s",
       "scaleToZeroPodRetentionPeriod": "10m00s",
+      "target": 10,
       "containerConcurrency": 40,
       "cpu": {
         "request": "125m",
@@ -92,7 +96,7 @@
       },
       "memory": {
         "request": "128Mi",
-        "limit": "512Mi"
+        "limit": "1024Mi"
       }
     }
   }

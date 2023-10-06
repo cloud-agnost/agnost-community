@@ -43,4 +43,22 @@ router.get("/cluster-info", authAccessToken, async (req, res) => {
     }
 });
 
+/*
+@route      /resource/apiserver/:envId
+@method     GET
+@desc       Get information about the version's API server
+@access     public
+*/
+router.get("/apiserver/:envId", authAccessToken, async (req, res) => {
+    try {
+        const { envId } = req.params;
+        let manager = new ResourceManager(null);
+        const apiServerInfo = await manager.getAPIServerInfo(envId);
+
+        res.json(apiServerInfo);
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
 export default router;

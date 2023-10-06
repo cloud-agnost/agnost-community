@@ -92,9 +92,10 @@ router.post(
 			if (!allowedRoles.includes("Admin")) allowedRoles.push("Admin");
 
 			// Try to connect to the resource
+			let connResult = null;
 			try {
 				// Test connection
-				await connCtrl.testConnection(instance, access);
+				connResult = await connCtrl.testConnection(instance, access);
 			} catch (err) {
 				await resourceCtrl.endSession(session);
 
@@ -142,6 +143,7 @@ router.post(
 					managed: false,
 					deletable: true,
 					allowedRoles,
+					config: instance === "RabbitMQ" ? connResult : undefined,
 					access,
 					accessReadOnly,
 					status: "Binding",
@@ -501,9 +503,10 @@ router.put(
 			}
 
 			// Try to connect to the resource
+			let connResult = null;
 			try {
 				// Test connection
-				await connCtrl.testConnection(resource.instance, access);
+				connResult = await connCtrl.testConnection(resource.instance, access);
 			} catch (err) {
 				await resourceCtrl.endSession(session);
 
@@ -537,10 +540,16 @@ router.put(
 			if (accessReadOnly)
 				accessReadOnly = helper.encyrptSensitiveData(accessReadOnly);
 
-			let updatedResource = null;
-			updatedResource = await resourceCtrl.updateOneById(
+			// Update info whether rabbitmq support delayed messages or not
+			let config = resource.config;
+			if (resource.instance === "RabbitMQ") {
+				config = { ...config, ...connResult };
+			}
+
+			const updatedResource = await resourceCtrl.updateOneById(
 				resource._id,
 				{
+					config,
 					access,
 					accessReadOnly,
 					updatedBy: user._id,
