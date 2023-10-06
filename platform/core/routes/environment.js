@@ -1,9 +1,11 @@
+import axios from "axios";
 import express from "express";
 import envCtrl from "../controllers/environment.js";
 import envLogCtrl from "../controllers/environmentLog.js";
 import userCtrl from "../controllers/user.js";
 import deployCtrl from "../controllers/deployment.js";
 import resourceCtrl from "../controllers/resource.js";
+import resLogCtrl from "../controllers/resourceLog.js";
 import auditCtrl from "../controllers/audit.js";
 import { authSession } from "../middlewares/authSession.js";
 import { authMasterToken } from "../middlewares/authMasterToken.js";
@@ -578,6 +580,129 @@ router.get(
 
 			res.json(resources);
 		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/apiserver
+@method     GET
+@desc       Returns information about environment's API server
+@access     private
+*/
+router.get(
+	"/:envId/apiserver",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateEnv,
+	authorizeAppAction("app.env.view"),
+	async (req, res) => {
+		try {
+			const { env } = req;
+
+			const apiInfo = await axios.get(
+				config.get("general.workerUrl") + `/v1/resource/apiserver/${env.iid}`,
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			res.json(apiInfo.data);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/apiserver
+@method     PUT
+@desc       Updates the API server configuration
+@access     private
+*/
+router.put(
+	"/:envId/apiserver",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateEnv,
+	authorizeAppAction("app.env.update"),
+	applyRules("update-apiserver"),
+	validate,
+	async (req, res) => {
+		// Start new database transaction session
+		const session = await resourceCtrl.startSession();
+		try {
+			const { version, env, org, app, user } = req;
+
+			// Get the API server resource, the api server has the same iid of the environment
+			const resource = await resourceCtrl.getOneByQuery(
+				{
+					iid: env.iid,
+				},
+				{ projection: "-access -accessReadOnly" }
+			);
+
+			const log = await resLogCtrl.create(
+				{
+					orgId: org._id,
+					appId: app._id,
+					versionId: version._id,
+					resourceId: resource._id,
+					action: "update",
+					status: "Updating",
+					createdBy: user._id,
+				},
+				{ session }
+			);
+
+			const updatedConfig = { ...resource.config, ...req.body };
+			const updatedResource = await resourceCtrl.updateOneById(
+				resource._id,
+				{
+					config: updatedConfig,
+				},
+				{},
+				{ session }
+			);
+
+			// Commit changes to the database
+			await userCtrl.commit(session);
+			res.json(updatedResource);
+
+			// Apply changes to the API server
+			await resourceCtrl.manageClusterResources([
+				{ resource: updatedResource, log: log },
+			]);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				org._id,
+				user,
+				"org.resource",
+				"update",
+				t(
+					"Started updating '%s' resource named '%s'",
+					resource.instance,
+					resource.name
+				),
+				updatedResource,
+				{
+					orgId: org._id,
+					appId: updatedResource.appId,
+					resourceId: resource._id,
+				}
+			);
+		} catch (error) {
+			await resourceCtrl.rollback(session);
 			handleError(req, res, error);
 		}
 	}

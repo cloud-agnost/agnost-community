@@ -5,6 +5,8 @@ export const applyCustomMiddleware =
 	(endpoint, middleware, loaderQuery = null) =>
 	async (req, res, next) => {
 		let middlewareModule = null;
+		if (console.stdlog)
+			console.log("Applying custom middleware:", middleware.name);
 
 		try {
 			// Dynamicly import the

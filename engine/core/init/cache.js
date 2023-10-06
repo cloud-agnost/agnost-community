@@ -13,7 +13,7 @@ export const connectToRedisCache = async (callback) => {
 
 	try {
 		let cacheConfig = config.get("cache");
-		client = await redis
+		client = redis
 			.createClient({
 				socket: { host: process.env.CACHE_HOSTNAME, port: cacheConfig.port },
 				password:
@@ -24,8 +24,9 @@ export const connectToRedisCache = async (callback) => {
 			.on("error", function (err) {
 				logger.error(`Cannot connect to the cache server`, { details: err });
 				process.exit(1);
-			})
-			.connect();
+			});
+
+		await client.connect();
 
 		logger.info(
 			`Connected to the cache server @${process.env.CACHE_HOSTNAME}:${cacheConfig.port}`

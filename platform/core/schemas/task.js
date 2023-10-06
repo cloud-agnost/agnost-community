@@ -267,11 +267,7 @@ export const applyRules = (type) => {
 					}),
 			];
 		case "save-logic":
-			return [
-				body("logic")
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty")),
-			];
+			return [body("logic").optional()];
 		case "test-logic":
 			return [
 				body("debugChannel")

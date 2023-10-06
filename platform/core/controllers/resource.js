@@ -89,7 +89,10 @@ class ResourceController extends BaseController {
 				instance: "RabbitMQ",
 				managed: false, // Default queue is a cluster resource and only cluster owner can update its configuration
 				allowedRoles: ["Admin", "Developer", "Viewer"],
-				config: {},
+				config: {
+					// By default the cluster rabbitmq supports delayed message exchange
+					delayedMessages: true,
+				},
 				access: helper.encyrptSensitiveData({
 					format: "object", // can be either object or url
 					scheme: "amqp",

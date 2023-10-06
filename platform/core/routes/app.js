@@ -13,8 +13,8 @@ import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateApp } from "../middlewares/validateApp.js";
 import { authorizeOrgAction } from "../middlewares/authorizeOrgAction.js";
 import {
-  authorizeAppAction,
-  appAuthorization,
+	authorizeAppAction,
+	appAuthorization,
 } from "../middlewares/authorizeAppAction.js";
 import { applyRules } from "../schemas/app.js";
 import { validate } from "../middlewares/validate.js";
@@ -33,11 +33,11 @@ const router = express.Router({ mergeParams: true });
 @access     private
 */
 router.get("/roles", authSession, async (req, res) => {
-  try {
-    res.json(appAuthorization);
-  } catch (error) {
-    handleError(req, res, error);
-  }
+	try {
+		res.json(appAuthorization);
+	} catch (error) {
+		handleError(req, res, error);
+	}
 });
 
 /*
@@ -48,59 +48,59 @@ router.get("/roles", authSession, async (req, res) => {
 @access     private
 */
 router.post(
-  "/",
-  checkContentType,
-  authSession,
-  validateOrg,
-  authorizeOrgAction("org.app.create"),
-  applyRules("create"),
-  validate,
-  async (req, res) => {
-    // Start new database transaction session
-    const session = await appCtrl.startSession();
-    try {
-      const { org, user } = req;
-      const { name } = req.body;
+	"/",
+	checkContentType,
+	authSession,
+	validateOrg,
+	authorizeOrgAction("org.app.create"),
+	applyRules("create"),
+	validate,
+	async (req, res) => {
+		// Start new database transaction session
+		const session = await appCtrl.startSession();
+		try {
+			const { org, user } = req;
+			const { name } = req.body;
 
-      // Create the new app and associated master version, environment and engine API server
-      const { app, version, resource, resLog, env, envLog } =
-        await appCtrl.createApp(session, user, org, name);
+			// Create the new app and associated master version, environment and engine API server
+			const { app, version, resource, resLog, env, envLog } =
+				await appCtrl.createApp(session, user, org, name);
 
-      await appCtrl.commit(session);
-      res.json({
-        app,
-        version,
-        resource,
-        resLog,
-        env,
-        envLog,
-      });
+			await appCtrl.commit(session);
+			res.json({
+				app,
+				version,
+				resource,
+				resLog,
+				env,
+				envLog,
+			});
 
-      // Deploy application version to the environment
-      await deployCtrl.deploy(envLog, app, version, env, user);
+			// Deploy application version to the environment
+			await deployCtrl.deploy(envLog, app, version, env, user);
 
-      // We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
-      await setKey(env._id, env, helper.constants["1month"]);
+			// We can update the environment value in cache only after the deployment instructions are successfully sent to the engine cluster
+			await setKey(env._id, env, helper.constants["1month"]);
 
-      // We first deploy the app then create the resources. The environment data needs to be cached before the api-server pod starts up.
-      // Create the engine deployment (API server), associated HPA, service and ingress rule
-      await resourceCtrl.manageClusterResources([{ resource, log: resLog }]);
+			// We first deploy the app then create the resources. The environment data needs to be cached before the api-server pod starts up.
+			// Create the engine deployment (API server), associated HPA, service and ingress rule
+			await resourceCtrl.manageClusterResources([{ resource, log: resLog }]);
 
-      // Log action
-      auditCtrl.logAndNotify(
-        org._id,
-        user,
-        "org.app",
-        "create",
-        t("Created new app '%s'", name),
-        { app, version, resource, env },
-        { orgId: org._id, appId: app._id }
-      );
-    } catch (err) {
-      await appCtrl.rollback(session);
-      handleError(req, res, err);
-    }
-  }
+			// Log action
+			auditCtrl.logAndNotify(
+				org._id,
+				user,
+				"org.app",
+				"create",
+				t("Created new app '%s'", name),
+				{ app, version, resource, env },
+				{ orgId: org._id, appId: app._id }
+			);
+		} catch (err) {
+			await appCtrl.rollback(session);
+			handleError(req, res, err);
+		}
+	}
 );
 
 /*
@@ -110,58 +110,58 @@ router.post(
 @access     private
 */
 router.get(
-  "/",
-  authSession,
-  validateOrg,
-  authorizeOrgAction("org.app.view"),
-  async (req, res) => {
-    try {
-      const { org, user } = req;
-      let apps = [];
+	"/",
+	authSession,
+	validateOrg,
+	authorizeOrgAction("org.app.view"),
+	async (req, res) => {
+		try {
+			const { org, user } = req;
+			let apps = [];
 
-      // Cluster owner is by default Admin member of all apps
-      if (user.isClusterOwner) {
-        apps = await appCtrl.getManyByQuery(
-          { orgId: org._id },
-          {
-            lookup: {
-              path: "team.userId",
-              select: "-loginProfiles -notifications",
-            },
-          }
-        );
-        res.json(
-          apps.map((app) => ({
-            ...app,
-            role: "Admin",
-          }))
-        );
-      } else {
-        apps = await appCtrl.getManyByQuery(
-          {
-            orgId: org._id,
-            "team.userId": user._id,
-          },
-          {
-            lookup: {
-              path: "team.userId",
-              select: "-loginProfiles -notifications",
-            },
-          }
-        );
-        res.json(
-          apps.map((app) => ({
-            ...app,
-            role: app.team.find(
-              (member) => member.userId._id.toString() === user._id.toString()
-            ).role,
-          }))
-        );
-      }
-    } catch (err) {
-      handleError(req, res, err);
-    }
-  }
+			// Cluster owner is by default Admin member of all apps
+			if (user.isClusterOwner) {
+				apps = await appCtrl.getManyByQuery(
+					{ orgId: org._id },
+					{
+						lookup: {
+							path: "team.userId",
+							select: "-loginProfiles -notifications",
+						},
+					}
+				);
+				res.json(
+					apps.map((app) => ({
+						...app,
+						role: "Admin",
+					}))
+				);
+			} else {
+				apps = await appCtrl.getManyByQuery(
+					{
+						orgId: org._id,
+						"team.userId": user._id,
+					},
+					{
+						lookup: {
+							path: "team.userId",
+							select: "-loginProfiles -notifications",
+						},
+					}
+				);
+				res.json(
+					apps.map((app) => ({
+						...app,
+						role: app.team.find(
+							(member) => member.userId._id.toString() === user._id.toString()
+						).role,
+					}))
+				);
+			}
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
 );
 
 /*
@@ -171,31 +171,31 @@ router.get(
 @access     private
 */
 router.get(
-  "/all",
-  authSession,
-  validateOrg,
-  authorizeOrgAction("org.app.viewAll"),
-  async (req, res) => {
-    try {
-      const { org } = req;
+	"/all",
+	authSession,
+	validateOrg,
+	authorizeOrgAction("org.app.viewAll"),
+	async (req, res) => {
+		try {
+			const { org } = req;
 
-      let apps = await appCtrl.getManyByQuery(
-        {
-          orgId: org._id,
-        },
-        {
-          lookup: {
-            path: "team.userId",
-            select: "-loginProfiles -notifications",
-          },
-        }
-      );
+			let apps = await appCtrl.getManyByQuery(
+				{
+					orgId: org._id,
+				},
+				{
+					lookup: {
+						path: "team.userId",
+						select: "-loginProfiles -notifications",
+					},
+				}
+			);
 
-      res.json(apps);
-    } catch (err) {
-      handleError(req, res, err);
-    }
-  }
+			res.json(apps);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
 );
 
 /*
@@ -205,43 +205,43 @@ router.get(
 @access     private
 */
 router.put(
-  "/:appId",
-  checkContentType,
-  authSession,
-  validateOrg,
-  validateApp,
-  authorizeAppAction("app.update"),
-  applyRules("update"),
-  validate,
-  async (req, res) => {
-    try {
-      const { org, user, app } = req;
-      const { name } = req.body;
+	"/:appId",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	authorizeAppAction("app.update"),
+	applyRules("update"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, user, app } = req;
+			const { name } = req.body;
 
-      // Update app name
-      let updatedApp = await appCtrl.updateOneById(
-        app._id,
-        { name, updatedBy: user._id },
-        {},
-        { cacheKey: app._id }
-      );
+			// Update app name
+			let updatedApp = await appCtrl.updateOneById(
+				app._id,
+				{ name, updatedBy: user._id },
+				{},
+				{ cacheKey: app._id }
+			);
 
-      res.json(updatedApp);
+			res.json(updatedApp);
 
-      // Log action
-      auditCtrl.logAndNotify(
-        app._id,
-        user,
-        "org.app",
-        "update",
-        t("Updated the name of app from '%s' to '%s' ", app.name, name),
-        updatedApp,
-        { orgId: org._id, appId: app._id }
-      );
-    } catch (err) {
-      handleError(req, res, err);
-    }
-  }
+			// Log action
+			auditCtrl.logAndNotify(
+				app._id,
+				user,
+				"org.app",
+				"update",
+				t("Updated the name of app from '%s' to '%s' ", app.name, name),
+				updatedApp,
+				{ orgId: org._id, appId: app._id }
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
 );
 
 /*
@@ -251,75 +251,75 @@ router.put(
 @access     private
 */
 router.put(
-  "/:appId/picture",
-  handleFile.single("picture"),
-  authSession,
-  validateOrg,
-  validateApp,
-  authorizeAppAction("app.update"),
-  applyRules("upload-picture"),
-  validate,
-  async (req, res) => {
-    try {
-      let buffer = req.file?.buffer;
-      let { width, height } = req.query;
-      if (!width) width = config.get("general.profileImgSizePx");
-      if (!height) height = config.get("general.profileImgSizePx");
+	"/:appId/picture",
+	handleFile.single("picture"),
+	authSession,
+	validateOrg,
+	validateApp,
+	authorizeAppAction("app.update"),
+	applyRules("upload-picture"),
+	validate,
+	async (req, res) => {
+		try {
+			let buffer = req.file?.buffer;
+			let { width, height } = req.query;
+			if (!width) width = config.get("general.profileImgSizePx");
+			if (!height) height = config.get("general.profileImgSizePx");
 
-      if (!req.file) {
-        return res.status(422).json({
-          error: t("Missing Upload File"),
-          details: t("Missing file, no file uploaded."),
-          code: ERROR_CODES.fileUploadError,
-        });
-      }
+			if (!req.file) {
+				return res.status(422).json({
+					error: t("Missing Upload File"),
+					details: t("Missing file, no file uploaded."),
+					code: ERROR_CODES.fileUploadError,
+				});
+			}
 
-      // Resize image if width and height specifiec
-      buffer = await sharp(req.file.buffer).resize(width, height).toBuffer();
+			// Resize image if width and height specifiec
+			buffer = await sharp(req.file.buffer).resize(width, height).toBuffer();
 
-      // Specify the directory where you want to store the image
-      const uploadBucket = config.get("general.storageBucket");
-      // Ensure file storage folder exists
-      await storage.ensureBucket(uploadBucket);
-      // Delete existing file if it exists
-      await storage.deleteFile(uploadBucket, req.org.pictureUrl);
-      // Save the new file
-      const filePath = `storage/avatars/${helper.generateSlug("img", 6)}-${
-        req.file.originalname
-      }`;
+			// Specify the directory where you want to store the image
+			const uploadBucket = config.get("general.storageBucket");
+			// Ensure file storage folder exists
+			await storage.ensureBucket(uploadBucket);
+			// Delete existing file if it exists
+			await storage.deleteFile(uploadBucket, req.org.pictureUrl);
+			// Save the new file
+			const filePath = `storage/avatars/${helper.generateSlug("img", 6)}-${
+				req.file.originalname
+			}`;
 
-      const metaData = {
-        "Content-Type": req.file.mimetype,
-      };
-      await storage.saveFile(uploadBucket, filePath, buffer, metaData);
+			const metaData = {
+				"Content-Type": req.file.mimetype,
+			};
+			await storage.saveFile(uploadBucket, filePath, buffer, metaData);
 
-      // Update app with the new profile image url
-      let appObj = await appCtrl.updateOneById(
-        req.app._id,
-        {
-          pictureUrl: filePath,
-          updatedBy: req.user._id,
-        },
-        {},
-        { cacheKey: req.app._id }
-      );
+			// Update app with the new profile image url
+			let appObj = await appCtrl.updateOneById(
+				req.app._id,
+				{
+					pictureUrl: filePath,
+					updatedBy: req.user._id,
+				},
+				{},
+				{ cacheKey: req.app._id }
+			);
 
-      res.json(appObj);
+			res.json(appObj);
 
-      // Log action
-      auditCtrl.logAndNotify(
-        req.app._id,
-        req.user,
-        "org.app",
-        "update",
-        t("Updated application picture"),
-        appObj,
-        { orgId: req.org._id, appId: req.app._id }
-      );
-    } catch (error) {
-      handleError(req, res, error);
-    }
-  }
+			// Log action
+			auditCtrl.logAndNotify(
+				req.app._id,
+				req.user,
+				"org.app",
+				"update",
+				t("Updated application picture"),
+				appObj,
+				{ orgId: req.org._id, appId: req.app._id }
+			);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -329,41 +329,41 @@ router.put(
 @access     private
 */
 router.delete(
-  "/:appId/picture",
-  authSession,
-  validateOrg,
-  validateApp,
-  authorizeAppAction("app.update"),
-  validate,
-  async (req, res) => {
-    try {
-      // Delete existing file if it exists
-      storage.deleteFile(req.app.pictureUrl);
+	"/:appId/picture",
+	authSession,
+	validateOrg,
+	validateApp,
+	authorizeAppAction("app.update"),
+	validate,
+	async (req, res) => {
+		try {
+			// Delete existing file if it exists
+			storage.deleteFile(req.app.pictureUrl);
 
-      // Update user with the new profile image url
-      let appObj = await appCtrl.updateOneById(
-        req.app._id,
-        { updatedBy: req.user._id },
-        { pictureUrl: 1 },
-        { cacheKey: req.app._id }
-      );
+			// Update user with the new profile image url
+			let appObj = await appCtrl.updateOneById(
+				req.app._id,
+				{ updatedBy: req.user._id },
+				{ pictureUrl: 1 },
+				{ cacheKey: req.app._id }
+			);
 
-      res.json(appObj);
+			res.json(appObj);
 
-      // Log action
-      auditCtrl.logAndNotify(
-        req.app._id,
-        req.user,
-        "org.app",
-        "update",
-        t("Removed application picture"),
-        appObj,
-        { orgId: req.org._id, appId: req.app._id }
-      );
-    } catch (error) {
-      handleError(req, res, error);
-    }
-  }
+			// Log action
+			auditCtrl.logAndNotify(
+				req.app._id,
+				req.user,
+				"org.app",
+				"update",
+				t("Removed application picture"),
+				appObj,
+				{ orgId: req.org._id, appId: req.app._id }
+			);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
 );
 
 /*
@@ -373,19 +373,19 @@ router.delete(
 @access     private
 */
 router.get(
-  "/:appId",
-  authSession,
-  validateOrg,
-  validateApp,
-  authorizeAppAction("app.view"),
-  async (req, res) => {
-    try {
-      const { app } = req;
-      res.json(app);
-    } catch (err) {
-      handleError(req, res, err);
-    }
-  }
+	"/:appId",
+	authSession,
+	validateOrg,
+	validateApp,
+	authorizeAppAction("app.view"),
+	async (req, res) => {
+		try {
+			const { app } = req;
+			res.json(app);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
 );
 
 /*
@@ -395,88 +395,88 @@ router.get(
 @access     private
 */
 router.delete(
-  "/:appId",
-  checkContentType,
-  authSession,
-  validateOrg,
-  validateApp,
-  authorizeAppAction("app.delete"),
-  async (req, res) => {
-    const session = await appCtrl.startSession();
+	"/:appId",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	authorizeAppAction("app.delete"),
+	async (req, res) => {
+		const session = await appCtrl.startSession();
 
-    try {
-      const { org, app, user } = req;
-      if (
-        app.ownerUserId.toString() !== req.user._id.toString() &&
-        !req.user.isClusterOwner
-      ) {
-        return res.status(401).json({
-          error: t("Not Authorized"),
-          details: t(
-            "You are not authorized to delete app '%s'. Only the creator of the app or cluster owner can delete it.",
-            app.name
-          ),
-          code: ERROR_CODES.unauthorized,
-        });
-      }
+		try {
+			const { org, app, user } = req;
+			if (
+				app.ownerUserId.toString() !== req.user._id.toString() &&
+				!req.user.isClusterOwner
+			) {
+				return res.status(401).json({
+					error: t("Not Authorized"),
+					details: t(
+						"You are not authorized to delete app '%s'. Only the creator of the app or cluster owner can delete it.",
+						app.name
+					),
+					code: ERROR_CODES.unauthorized,
+				});
+			}
 
-      // First get all app resources, environments and versions
-      const resources = await resourceCtrl.getManyByQuery({
-        orgId: org._id,
-        appId: app._id,
-      });
-      const envs = await envCtrl.getManyByQuery({
-        orgId: org._id,
-        appId: app._id,
-      });
-      const versions = await versionCtrl.getManyByQuery({
-        orgId: org._id,
-        appId: app._id,
-      });
+			// First get all app resources, environments and versions
+			const resources = await resourceCtrl.getManyByQuery({
+				orgId: org._id,
+				appId: app._id,
+			});
+			const envs = await envCtrl.getManyByQuery({
+				orgId: org._id,
+				appId: app._id,
+			});
+			const versions = await versionCtrl.getManyByQuery({
+				orgId: org._id,
+				appId: app._id,
+			});
 
-      // Delete all app related data
-      await appCtrl.deleteApp(session, org, app);
-      // Commit transaction
-      await appCtrl.commit(session);
+			// Delete all app related data
+			await appCtrl.deleteApp(session, org, app);
+			// Commit transaction
+			await appCtrl.commit(session);
 
-      // Iterate through all environments and delete them
-      for (let i = 0; i < envs.length; i++) {
-        const env = envs[i];
-        deployCtrl.delete(
-          app,
-          versions.find(
-            (entry) => env.versionId.toString() === entry._id.toString()
-          ),
-          env,
-          user
-        );
-      }
+			// Iterate through all environments and delete them
+			for (let i = 0; i < envs.length; i++) {
+				const env = envs[i];
+				deployCtrl.delete(
+					app,
+					versions.find(
+						(entry) => env.versionId.toString() === entry._id.toString()
+					),
+					env,
+					user
+				);
+			}
 
-      // Iterate through all resources and delete them if they are managed
-      const managedResources = resources.filter(
-        (entry) => entry.managed === true && entry.deletable === true
-      );
+			// Iterate through all resources and delete them if they are managed
+			const managedResources = resources.filter(
+				(entry) => entry.managed === true && entry.deletable === true
+			);
 
-      // Delete managed organization resources
-      resourceCtrl.deleteClusterResources(managedResources);
+			// Delete managed organization resources
+			resourceCtrl.deleteClusterResources(managedResources);
 
-      res.json();
+			res.json();
 
-      // Log action
-      auditCtrl.logAndNotify(
-        app._id,
-        user,
-        "org.app",
-        "delete",
-        t("Deleted app '%s'", app.name),
-        {},
-        { orgId: org._id, appId: app._id }
-      );
-    } catch (err) {
-      await appCtrl.rollback(session);
-      handleError(req, res, err);
-    }
-  }
+			// Log action
+			auditCtrl.logAndNotify(
+				app._id,
+				user,
+				"org.app",
+				"delete",
+				t("Deleted app '%s'", app.name),
+				{},
+				{ orgId: org._id, appId: app._id }
+			);
+		} catch (err) {
+			await appCtrl.rollback(session);
+			handleError(req, res, err);
+		}
+	}
 );
 
 /*
@@ -486,49 +486,49 @@ router.delete(
 @access     private
 */
 router.post(
-  "/:appId/transfer/:userId",
-  checkContentType,
-  authSession,
-  validateOrg,
-  validateApp,
-  authorizeAppAction("app.transfer"),
-  applyRules("transfer"),
-  validate,
-  async (req, res) => {
-    try {
-      const { org, user, app } = req;
+	"/:appId/transfer/:userId",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	authorizeAppAction("app.transfer"),
+	applyRules("transfer"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, user, app } = req;
 
-      // Get transferred user information
-      let transferredUser = await userCtrl.getOneById(req.params.userId);
+			// Get transferred user information
+			let transferredUser = await userCtrl.getOneById(req.params.userId);
 
-      // Update app name
-      let updatedApp = await appCtrl.updateOneById(
-        app._id,
-        { ownerUserId: req.params.userId, updatedBy: user._id },
-        {},
-        { cacheKey: app._id }
-      );
+			// Update app name
+			let updatedApp = await appCtrl.updateOneById(
+				app._id,
+				{ ownerUserId: req.params.userId, updatedBy: user._id },
+				{},
+				{ cacheKey: app._id }
+			);
 
-      res.json(updatedApp);
+			res.json(updatedApp);
 
-      // Log action
-      auditCtrl.logAndNotify(
-        app._id,
-        user,
-        "org.app",
-        "transfer",
-        t(
-          "Transferred app ownership to '%s' (%s)",
-          transferredUser.name,
-          transferredUser.contactEmail
-        ),
-        updatedApp,
-        { orgId: org._id, appId: app._id }
-      );
-    } catch (error) {
-      handleError(req, res, error);
-    }
-  }
+			// Log action
+			auditCtrl.logAndNotify(
+				app._id,
+				user,
+				"org.app",
+				"transfer",
+				t(
+					"Transferred app ownership to '%s' (%s)",
+					transferredUser.name,
+					transferredUser.contactEmail
+				),
+				updatedApp,
+				{ orgId: org._id, appId: app._id }
+			);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
 );
 
 export default router;

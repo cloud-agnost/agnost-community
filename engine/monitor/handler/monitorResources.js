@@ -683,23 +683,31 @@ async function checkClusterStorage(connSettings) {
 async function checkAPIServer(connSettings) {
 	const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
-	let result = null;
 	try {
-		result = await k8sApi.getNamespacedCustomObjectStatus(
+		const revResponse = await k8sApi.listNamespacedCustomObject(
 			"serving.knative.dev",
 			"v1",
 			process.env.NAMESPACE,
-			"services",
-			connSettings.name
+			"revisions",
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			`app=${connSettings.name}`
 		);
 
-		// Get the last created revision name, we will use this to check the status of the deployment
-		const latestCreatedRevisionName =
-			result.body?.status?.latestCreatedRevisionName;
+		let totalAvailable = 0;
+		const revisions = revResponse.body.items;
 
-		if (latestCreatedRevisionName) {
-			return await checkDeployment(latestCreatedRevisionName);
+		for (let index = 0; index < revisions.length; index++) {
+			const revision = revisions[index];
+			const { availableReplicas } = await checkDeployment(
+				revision.metadata.name
+			);
+			totalAvailable += availableReplicas;
 		}
+
+		return { availableReplicas: totalAvailable };
 	} catch (err) {
 		return await checkDeployment(connSettings.name);
 	}

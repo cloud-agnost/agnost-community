@@ -640,7 +640,6 @@ router.post(
 	async (req, res) => {
 		try {
 			const { storageName, bucketName } = req.params;
-			console.log("****here123", storageName, bucketName);
 
 			let isPublic = req.bucket.isPublic;
 			let tags = [];

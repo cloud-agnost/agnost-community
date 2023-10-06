@@ -8,9 +8,11 @@ export const applyRateLimit = (limitObj) => {
 		storeClient: getRedisClient(),
 		points: limitObj.rate, // Limit each unique identifier (IP or userId) to N requests per `window`
 		duration: limitObj.duration, // Window duration in seconds
+		useRedisPackage: true,
 	});
 
 	return (req, res, next) => {
+		if (console.stdlog) console.log("Applying rate limit:", limitObj.name);
 		rateLimiter
 			.consume(`${helper.getIP(req)}-${limitObj.iid}`)
 			.then(() => {

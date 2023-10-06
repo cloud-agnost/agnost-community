@@ -46,7 +46,7 @@
       "passport-discord": "0.1.4",
       "passport-apple": "2.0.2",
       "pg": "8.10.0",
-      "rate-limiter-flexible": "2.4.1",
+      "rate-limiter-flexible": "3.0.0",
       "redis": "4.6.9",
       "response-time": "2.3.2",
       "socket.io-client": "4.6.1",

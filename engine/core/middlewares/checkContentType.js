@@ -4,6 +4,7 @@ import ERROR_CODES from "../config/errorCodes.js";
 // Middleware to check and process content type
 export const checkContentType = (req, res, next) => {
 	const contentType = req.get("Content-Type");
+	if (console.stdlog) console.log("Checking content type:", contentType);
 
 	// Check whether the content-type is a supported one or not
 	if (

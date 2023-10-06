@@ -16,7 +16,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	 */
 	async hasResourceChange() {
 		const oldConfig = await this.loadEnvConfigFile();
-		const oldResources = oldConfig.resources ?? [];
+		const oldResources = oldConfig?.resources ?? [];
 		const newResources = this.envObj.resources ?? [];
 
 		// Check to see if there is any new resource addition

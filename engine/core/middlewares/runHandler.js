@@ -4,6 +4,7 @@ import ERROR_CODES from "../config/errorCodes.js";
 export const runHandler =
 	(endpoint, loaderQuery = null) =>
 	async (req, res) => {
+		if (console.stdlog) console.log("Running endpoint handler:", endpoint.name);
 		let handlerModule = null;
 		try {
 			// Dynamicly import the

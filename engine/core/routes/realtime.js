@@ -50,7 +50,6 @@ router.post(
 					"get_members",
 					{ envId: META.getEnvId(), channel: req.body.channel },
 					(err, response) => {
-						console.log("***memmber", response);
 						if (err) {
 							return res
 								.status(400)

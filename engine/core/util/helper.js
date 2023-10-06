@@ -233,6 +233,12 @@ function turnOffLogging() {
 	console.debug = console.stddebug;
 	console.warn = console.stdwarn;
 	console.info = console.stdinfo;
+
+	console.stdlog = null;
+	console.stderror = null;
+	console.stdinfo = null;
+	console.stddebug = null;
+	console.stdwarn = null;
 }
 
 /**

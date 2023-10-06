@@ -2,6 +2,7 @@ import ERROR_CODES from "../config/errorCodes.js";
 
 // Middleware to handle server status
 export const checkServerStatus = (req, res, next) => {
+	if (console.stdlog) console.log("Checking servers status:", SERVER_STATUS);
 	if (SERVER_STATUS !== "running") {
 		return res.status(403).json(
 			helper.createErrorMessage(

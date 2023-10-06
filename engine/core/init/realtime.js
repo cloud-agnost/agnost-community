@@ -33,8 +33,11 @@ export function initializeRealtimeServer() {
 
 export function disconnectRealtimeClient() {
 	if (realtime) {
-		realtime.close();
-		realtime = null;
+		try {
+			realtime.close();
+		} finally {
+			realtime = null;
+		}
 	}
 }
 

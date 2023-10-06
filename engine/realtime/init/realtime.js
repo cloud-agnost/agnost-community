@@ -243,18 +243,6 @@ export function setUpRealtimeServer(expressServer) {
 				);
 			});
 
-			socket.on("members", async (payload, callback) => {
-				let sockets = await realtimeServer
-					.to(`${socket.data.envId}.${payload.channel}`)
-					.fetchSockets();
-
-				callback(
-					(sockets ?? []).map((entry) => {
-						return { id: entry.id, data: entry.data.profile };
-					})
-				);
-			});
-
 			socket.on("error", (err) => {
 				if (err && err.message === "unauthorized event") {
 					socket.disconnect();
