@@ -18,7 +18,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
+import * as monaco from 'monaco-editor';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
