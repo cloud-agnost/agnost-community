@@ -25,8 +25,16 @@ import * as z from 'zod';
 import { useToast } from '@/hooks';
 import { translate as t } from '@/utils';
 
-const USER_VARIABLES = ['name', 'email', 'firstName', 'lastName'];
-const TOKEN_VARIABLES = ['email', 'confirmationUrl', 'redirectUrl', 'token', 'expiresIn'];
+const USER_VARIABLES = ['name', 'email', 'phone', 'sigUpAt', 'lastLoginAt'];
+const EMAIL_TOKEN_VARIABLES = [
+	'email',
+	'confirmationUrl',
+	'redirectUrl',
+	'createdAt',
+	'expiresAt',
+	'actionType',
+];
+const PHONE_TOKEN_VARIABLES = ['code', 'phone', 'createdAt', 'expiresAt', 'actionType'];
 
 const MessageTemplatesSchema = z
 	.object({
@@ -250,7 +258,7 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 													<DropdownMenuGroup>
 														{USER_VARIABLES.map((variable) => (
 															<DropdownMenuItem
-																onClick={() => insertVariable(variable)}
+																onClick={() => insertVariable(`user.${variable}`)}
 																key={variable}
 															>
 																{variable}
@@ -258,11 +266,23 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 														))}
 													</DropdownMenuGroup>
 													<DropdownMenuSeparator />
-													<DropdownMenuLabel className='text-subtle'>Token</DropdownMenuLabel>
+													<DropdownMenuLabel className='text-subtle'>Email</DropdownMenuLabel>
 													<DropdownMenuGroup>
-														{TOKEN_VARIABLES.map((variable) => (
+														{EMAIL_TOKEN_VARIABLES.map((variable) => (
 															<DropdownMenuItem
-																onClick={() => insertVariable(variable)}
+																onClick={() => insertVariable(`token.${variable}`)}
+																key={variable}
+															>
+																{variable}
+															</DropdownMenuItem>
+														))}
+													</DropdownMenuGroup>
+													<DropdownMenuSeparator />
+													<DropdownMenuLabel className='text-subtle'>Phone</DropdownMenuLabel>
+													<DropdownMenuGroup>
+														{PHONE_TOKEN_VARIABLES.map((variable) => (
+															<DropdownMenuItem
+																onClick={() => insertVariable(`token.${variable}`)}
 																key={variable}
 															>
 																{variable}

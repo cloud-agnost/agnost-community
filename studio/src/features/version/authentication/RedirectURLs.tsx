@@ -15,17 +15,11 @@ const RedirectURLsSchema = z.object({
 	redirectURLs: z
 		.array(
 			z.object({
-				url: z
-					.string({
-						required_error: t('forms.required', {
-							label: t('version.authentication.redirect_url'),
-						}),
-					})
-					.url({
-						message: t('forms.invalid', {
-							label: t('version.authentication.redirect_url'),
-						}),
+				url: z.string({
+					required_error: t('forms.required', {
+						label: t('version.authentication.redirect_url'),
 					}),
+				}),
 			}),
 		)
 		.nonempty({

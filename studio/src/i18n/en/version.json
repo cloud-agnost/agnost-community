@@ -146,7 +146,7 @@
 		"facebook": "Meta For Developer",
 		"twitter": "Twitter Developer Platform",
 		"apple": "Apple Developer",
-		"discord:": "Discord Developer Portal",
+		"discord": "Discord Developer Portal",
 		"github": "GitHub Docs - Creating an OAuth App",
 		"add_provider_title": "Add {{provider}} Auth Configuration",
 		"fromName": "From Name",

@@ -76,15 +76,7 @@ export default function EmailAuthentication() {
 							<FormItem className='flex justify-between gap-4 items-center space-y-0'>
 								<FormLabel>{t('version.authentication.email_authentication_title')}</FormLabel>
 								<FormControl>
-									<Switch
-										checked={field.value}
-										onCheckedChange={(val) => {
-											field.onChange(val);
-											if (!val) {
-												form.setValue('confirmEmail', false);
-											}
-										}}
-									/>
+									<Switch checked={field.value} onCheckedChange={field.onChange} />
 								</FormControl>
 							</FormItem>
 						)}

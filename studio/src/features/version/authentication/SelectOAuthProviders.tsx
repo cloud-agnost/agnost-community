@@ -15,7 +15,7 @@ import {
 	DropdownMenuItemContainer,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import { useReducer } from 'react';
+import { useMemo, useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
 import AddProvider from './AddProvider';
 
@@ -68,6 +68,12 @@ export default function SelectOAuthProviders() {
 			},
 		});
 	}
+
+	const providers = useMemo(() => {
+		return oAuthProviderTypes.filter((type) => {
+			return !version.authentication.providers.find((p) => p.provider === type.provider);
+		});
+	}, [version.authentication.providers]);
 	return (
 		<SettingsFormItem
 			className='py-0'
@@ -78,7 +84,7 @@ export default function SelectOAuthProviders() {
 			<div className='flex items-center justify-between'>
 				<p className='text-subtle font-sfCompact'>{t('version.authentication.providers')}</p>
 				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
+					<DropdownMenuTrigger asChild disabled={!providers.length}>
 						<Button variant='secondary'>
 							<Plus className='mr-2' />
 							{t('version.authentication.add_auth_provider')}
@@ -87,7 +93,7 @@ export default function SelectOAuthProviders() {
 
 					<DropdownMenuContent align='end' className='version-dropdown-content'>
 						<DropdownMenuItemContainer className='space-y-2'>
-							{oAuthProviderTypes?.map((p) => (
+							{providers.map((p) => (
 								<DropdownMenuItem
 									key={p.provider}
 									className='flex items-center gap-4'
