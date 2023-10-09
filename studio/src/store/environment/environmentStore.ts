@@ -6,11 +6,11 @@ import {
 	GetEnvironmentLogsParams,
 	GetEnvironmentResourcesParams,
 	Resource,
+	SelectedEnvLog,
 	ToggleAutoDeployParams,
 	UpdateEnvironmentTelemetryLogsParams,
 	VersionParams,
 	getAppVersionEnvironmentParams,
-	SelectedEnvLog,
 } from '@/types';
 import { notify, translate } from '@/utils';
 import EnvironmentService from 'services/EnvironmentService.ts';
@@ -141,6 +141,7 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 				},
 				setEnvStatus: (env: Environment) => {
 					const statuses = [
+						{ check: () => env.suspended, value: 'Suspended' },
 						{
 							check: () =>
 								Object.values(env).some(
@@ -152,7 +153,6 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 							check: () => Object.values(env).some((status) => status === 'error'),
 							value: 'Error',
 						},
-						{ check: () => env.suspended, value: 'Suspended' },
 						{
 							check: () =>
 								get()

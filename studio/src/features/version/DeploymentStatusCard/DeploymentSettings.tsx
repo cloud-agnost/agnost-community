@@ -23,18 +23,18 @@ export default function DeploymentSettings({ isOpen, close }: DeploymentSettings
 		orgId: string;
 	}>();
 
-	async function suspendOrActive() {
+	function suspendOrActive() {
 		if (!versionId || !appId || !orgId || !environment?._id) return;
 
 		if (environment?.suspended) {
-			await activateEnvironment({
+			activateEnvironment({
 				envId: environment._id,
 				orgId,
 				appId,
 				versionId,
 			});
 		} else {
-			await suspendEnvironment({
+			suspendEnvironment({
 				envId: environment._id,
 				orgId,
 				appId,
@@ -43,9 +43,9 @@ export default function DeploymentSettings({ isOpen, close }: DeploymentSettings
 		}
 	}
 
-	async function onAutoDeployStatusChanged(autoDeploy: boolean) {
+	function onAutoDeployStatusChanged(autoDeploy: boolean) {
 		if (!versionId || !appId || !orgId || !environment?._id) return;
-		await toggleAutoDeploy({
+		toggleAutoDeploy({
 			envId: environment._id,
 			orgId,
 			appId,
@@ -101,7 +101,7 @@ export default function DeploymentSettings({ isOpen, close }: DeploymentSettings
 						exit={{
 							x: '100%',
 						}}
-						className='deployment-settings p-4'
+						className='deployment-settings'
 					>
 						<header className='deployment-settings-header'>
 							<Button onClick={close} rounded variant='blank' iconOnly>
