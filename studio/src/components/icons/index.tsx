@@ -49,6 +49,7 @@ export { default as Model } from './Model';
 export { default as MongoDb } from './MongoDb';
 export { default as MySql } from './MySql';
 export { default as NpmPackage } from './NpmPackage';
+export { default as Nodejs } from './Nodejs';
 export { default as Object } from './Object';
 export { default as ObjectList } from './ObjectList';
 export { default as Oracle } from './Oracle';
