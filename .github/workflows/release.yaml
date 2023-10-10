@@ -3,6 +3,10 @@ name: Create New Agnost Release
 on:
   workflow_dispatch:
     inputs:
+      release-number:
+        description: 'Release Number'
+        required: true
+        type: string
       engine-core:
         description: 'Engine Core Release Version'
         required: false
@@ -50,6 +54,7 @@ on:
         type: string
 
 env:
+  RELEASE_NUMBER: '${{ github.event.inputs.release-number }}'
   ENGINE_CORE: '${{ github.event.inputs.engine-core }}'
   ENGINE_MONITOR: '${{ github.event.inputs.engine-monitor }}'
   ENGINE_REALTIME: '${{ github.event.inputs.engine-realtime }}'
@@ -89,6 +94,7 @@ jobs:
       -
         id: get-details
         run: echo "DETAILS=${{ env.DETAILS }}" >> $GITHUB_OUTPUT
+
   build:
     runs-on: ubuntu-latest
     needs: get_released_apps
@@ -131,6 +137,37 @@ jobs:
           tags: |
             ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:${{ matrix.version }}
             ${{ env.DOCKER_REGISTRY }}/${{ env.GCR_PROJECT }}/${{ matrix.application }}:latest-release
+
+  update-package-json:
+    runs-on: ubuntu-latest
+    needs: [get_released_apps, build]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      -
+        name: Install yaml library
+        run: python -m pip install ruamel.yaml
+      -
+        name: Update Helm Chart
+        run: |
+          python ../.github/scripts/update_package_json.py '${{ needs.get_released_apps.outputs.details }}'
+          git diff
+#          if [ $(git status | grep -c "nothing to commit") == 0 ]; then
+#            git config user.name ${{ secrets.REPO_ACCESS_USER }}
+#            git config user.email ${{ secrets.REPO_ACCESS_EMAIL }}
+#            git diff
+#            git commit -am "New chart version"
+#            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/altogic/charts
+#          else
+#              echo "No changes, skipping..."
+#          fi
+
   update-helm-chart:
     runs-on: ubuntu-latest
     needs: [get_released_apps, build]
@@ -150,7 +187,7 @@ jobs:
         with:
           python-version: "3.11"
       -
-        name: Install requests
+        name: Install yaml library
         run: python -m pip install ruamel.yaml
       -
         name: Update Helm Chart
@@ -158,3 +195,43 @@ jobs:
           cd charts
           python ../.github/scripts/update_helm_chart.py '${{ needs.get_released_apps.outputs.details }}'
           git diff
+#          if [ $(git status | grep -c "nothing to commit") == 0 ]; then
+#            git config user.name ${{ secrets.REPO_ACCESS_USER }}
+#            git config user.email ${{ secrets.REPO_ACCESS_EMAIL }}
+#            git diff
+#            git commit -am "New chart version"
+#            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/altogic/charts
+#          else
+#              echo "No changes, skipping..."
+#          fi
+
+  create-release-manifest:
+    runs-on: ubuntu-latest
+    needs: [update-package-json, update-helm-chart]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      -
+        name: Install yaml library
+        run: python -m pip install ruamel.yaml
+      -
+        name: Create Release Manifest
+        run: |
+          python ../.github/scripts/create_release_manifest.py '${{ needs.get_released_apps.outputs.details }}'
+          ls -l Releases/*.json
+          cat Releases/*.json
+#          if [ $(git status | grep -c "nothing to commit") == 0 ]; then
+#            git config user.name ${{ secrets.REPO_ACCESS_USER }}
+#            git config user.email ${{ secrets.REPO_ACCESS_EMAIL }}
+#            git diff
+#            git commit -am "New chart version"
+#            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/altogic/charts
+#          else
+#              echo "No changes, skipping..."
+#          fi
