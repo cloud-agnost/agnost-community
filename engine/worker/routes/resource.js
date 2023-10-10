@@ -44,6 +44,26 @@ router.get("/cluster-info", authAccessToken, async (req, res) => {
 });
 
 /*
+@route      /resource/cluster-info
+@method     POST
+@desc       Updates the cluster component settings (configured replicas, HPA min-max replicas)
+@access     public
+*/
+router.post("/cluster-info", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        res.json();
+
+        const { deploymentName, hpaName, replicas, minReplicas, maxReplicas } = req.body;
+        let manager = new ResourceManager(null);
+        await manager.updateDeployment(deploymentName, replicas);
+        await manager.updateHPA(hpaName, minReplicas, maxReplicas);
+    } catch (error) {
+        console.log("***err", error);
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
 @route      /resource/apiserver/:envId
 @method     GET
 @desc       Get information about the version's API server

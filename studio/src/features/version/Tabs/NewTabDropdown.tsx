@@ -1,9 +1,9 @@
 import useTabStore from '@/store/version/tabStore.ts';
 import useVersionStore from '@/store/version/versionStore';
+import { DesignElement, Tab, TabTypes } from '@/types';
 import { capitalize, generateId } from '@/utils';
 import { Plus } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
-import { TAB_ICON_MAP } from 'constants/constants.ts';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -13,9 +13,8 @@ import {
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
 import { SearchInput } from 'components/SearchInput';
-import { NEW_TAB_ITEMS } from 'constants/constants.ts';
+import { NEW_TAB_ITEMS, TAB_ICON_MAP } from 'constants/constants.ts';
 import { useParams } from 'react-router-dom';
-import { DesignElement, Tab, TabTypes } from '@/types';
 export default function NewTabDropdown() {
 	const { addTab } = useTabStore();
 	const { searchDesignElements, designElements, resetDesignElements, getVersionDashboardPath } =

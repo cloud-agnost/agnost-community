@@ -31,8 +31,10 @@ import {
 	MessageQueue,
 	Middleware,
 	MinIo,
+	Model,
 	MongoDb,
 	MySql,
+	Nodejs,
 	NpmPackage,
 	Object as ObjectIcon,
 	ObjectList,
@@ -41,6 +43,7 @@ import {
 	RabbitMq,
 	RateLimit,
 	RealTime,
+	Redis,
 	Resource,
 	RichText,
 	SqlServer,
@@ -956,12 +959,11 @@ export const DATABASE = {
 	MongoDB: 'MongoDB',
 };
 
-export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
+export const TAB_ICON_MAP: Record<string, ElementType> = {
 	Storage: Storage,
 	Database: DatabaseIcon,
 	Cache: Cache,
 	Endpoint: ApiKeys,
-	'Message Queue': MessageQueue,
 	Queue: MessageQueue,
 	Task: Calendar,
 	Middleware: Middleware,
@@ -969,6 +971,8 @@ export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
 	Dashboard: Dashboard,
 	Notifications: BellRing,
 	Function: Function,
+	Field: Model,
+	Model: Model,
 };
 
 export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
@@ -997,4 +1001,20 @@ export const OAUTH_URL_MAP: Record<OAuthProviderTypes, string> = {
 	twitter: 'https://dev.twitter.com/',
 	discord: 'https://discord.com/developers/docs/topics/oauth2',
 	apple: 'https://developer.apple.com/',
+};
+
+export const RESOURCE_ICON_MAP: Record<string, ElementType> = {
+	MongoDB: MongoDb,
+	MySQL: MySql,
+	PostgreSQL: PostgreSql,
+	Oracle: Oracle,
+	'SQL Server': SqlServer,
+	RabbitMQ: RabbitMq,
+	Kafka: Kafka,
+	'AWS S3': Awss3,
+	'Azure Blob Storage': AzureBlobStorage,
+	'GCP Cloud Storage': GcpStorage,
+	MinIO: MinIo,
+	Redis: Redis,
+	'API Server': Nodejs,
 };

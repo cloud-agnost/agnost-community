@@ -1,34 +1,18 @@
-import { Database, MessageQueue, Storage, Cache, ApiKeys, Calendar } from 'components/icons';
-import { Badge } from 'components/Badge';
-import { BADGE_COLOR_MAP } from 'constants/constants.ts';
-import { useTranslation } from 'react-i18next';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import { formatDate } from '@/utils';
+import { Badge } from 'components/Badge';
+import { BADGE_COLOR_MAP, RESOURCE_ICON_MAP } from 'constants/constants.ts';
+import { useTranslation } from 'react-i18next';
 export default function Resources() {
 	const { t } = useTranslation();
 	const { resources } = useEnvironmentStore();
 
 	function getIcon(type: string) {
-		switch (type) {
-			case 'database':
-				return <Database className='w-5 h-5' />;
-			case 'storage':
-				return <Storage className='w-5 h-5' />;
-			case 'message-queue':
-				return <MessageQueue className='w-5 h-5' />;
-			case 'cache':
-				return <Cache className='w-5 h-5' />;
-			case 'engine':
-				return <ApiKeys className='w-5 h-5' />;
-			case 'task':
-				return <Calendar className='w-5 h-5' />;
-
-			default:
-				return null;
-		}
+		const Icon = RESOURCE_ICON_MAP[type];
+		return <Icon className='w-8 h-8' />;
 	}
 	return (
-		<div className='w-full space-y-2 max-h-[200px] p-4 overflow-auto'>
+		<div className='w-full space-y-2 max-h-[200px] px-4 py-2 overflow-auto'>
 			<div className='text-subtle text-sm font-sfCompact leading-6 flex justify-between gap-4'>
 				<p>{t('version.resources')}</p>
 				<p>{t('version.status')}</p>
@@ -38,7 +22,7 @@ export default function Resources() {
 					<div key={index} className='py-[9px] flex justify-between gap-4'>
 						<div className='flex items-center gap-2'>
 							<span className='w-10 h-10 rounded-full bg-lighter flex items-center justify-center p-2'>
-								{getIcon(resource.type)}
+								{getIcon(resource.instance)}
 							</span>
 							<div className='flex flex-col'>
 								<p className='text-sm font-sfCompact font-normal leading-6 text-default'>

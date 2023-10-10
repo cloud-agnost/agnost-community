@@ -120,7 +120,7 @@ export default function AddProvider({ open, onClose, provider, editedProvider }:
 			versionId: version?._id,
 			appId: version?.appId,
 			onSuccess: () => {
-				onClose();
+				handleCloseModel();
 			},
 			onError: (error: APIError) => {
 				notify({
@@ -145,21 +145,40 @@ export default function AddProvider({ open, onClose, provider, editedProvider }:
 			});
 		}
 	}
+
+	function handleCloseModel() {
+		console.log(provider, '4');
+		form.reset({
+			provider: '' as OAuthProviderTypes,
+			config: {
+				key: '',
+				secret: '',
+				teamId: '',
+				serviceId: '',
+				keyId: '',
+				privateKey: '',
+			},
+		});
+		onClose();
+	}
 	const callbackUrl = `${window.location.origin}/${environment?.iid}/oauth/${provider.provider}/callback`;
+
 	useEffect(() => {
 		if (open && provider) {
+			console.log(provider, '2');
 			form.setValue('provider', provider.provider);
 		}
 	}, [provider]);
 
 	useEffect(() => {
 		if (editedProvider) {
+			console.log(provider, '3');
 			form.reset(editedProvider);
 		}
 	}, [editedProvider]);
 
 	return (
-		<Drawer open={open} onOpenChange={onClose}>
+		<Drawer open={open} onOpenChange={handleCloseModel}>
 			<DrawerContent position='right' size='lg'>
 				<DrawerHeader>
 					<DrawerTitle>

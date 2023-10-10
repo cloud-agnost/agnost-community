@@ -259,10 +259,14 @@ export function checkNumber(number: number | undefined): number | undefined {
 }
 
 export async function formatCode(code: string) {
-	return await prettier.format(code, {
-		parser: 'babel',
-		plugins: [jsParser, esTreePlugin],
-	});
+	try {
+		return await prettier.format(code, {
+			parser: 'babel',
+			plugins: [jsParser, esTreePlugin],
+		});
+	} catch (error) {
+		return code;
+	}
 }
 export async function saveEditorContent(
 	ed: monaco.editor.IStandaloneCodeEditor,

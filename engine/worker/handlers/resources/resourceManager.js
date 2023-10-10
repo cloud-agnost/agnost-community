@@ -623,6 +623,59 @@ export class ResourceManager {
     }
 
     /**
+     * Updates the cluster component - deployment
+     * @param  {string} component The component name
+     * @param  {number} replicas The initial replicas of the component
+     * @param  {string} imageName The new docker image name and version
+     */
+    async updateDeployment(deploymentName, replicas = null, imageName = null) {
+        // Create a Kubernetes core API client
+        const kubeconfig = new k8s.KubeConfig();
+        kubeconfig.loadFromDefault();
+        const k8sApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
+
+        try {
+            const response = await k8sApi.readNamespacedDeployment(deploymentName, process.env.NAMESPACE);
+
+            if (replicas) response.body.spec.replicas = replicas;
+            if (imageName) {
+                let container = response.body.spec.template.spec.containers[0];
+                container.image = imageName;
+            }
+
+            // Update the deployment
+            await k8sApi.replaceNamespacedDeployment(deploymentName, process.env.NAMESPACE, response.body);
+        } catch (err) {
+            logger.error(`Cannot update deployment '${deploymentName}'`, { details: err });
+        }
+    }
+
+    /**
+     * Updates the cluster component - hpa
+     * @param  {string} component The component name
+     * @param  {number} minReplicas The min replicas
+     * @param  {number} maxReplicas The max replicas
+     */
+    async updateHPA(hpaName, minReplicas, maxReplicas) {
+        // Create a Kubernetes core API client
+        const kubeconfig = new k8s.KubeConfig();
+        kubeconfig.loadFromDefault();
+        const k8sApi = kubeconfig.makeApiClient(k8s.AutoscalingV2Api);
+
+        try {
+            const response = await k8sApi.readNamespacedHorizontalPodAutoscaler(hpaName, process.env.NAMESPACE);
+
+            response.body.spec.minReplicas = minReplicas;
+            response.body.spec.maxReplicas = maxReplicas;
+
+            // Update the deployment
+            await k8sApi.replaceNamespacedHorizontalPodAutoscaler(hpaName, process.env.NAMESPACE, response.body);
+        } catch (err) {
+            logger.error(`Cannot update HPA '${hpaName}'`, { details: err });
+        }
+    }
+
+    /**
      * Returns information about the app version's API server
      * @param  {string} envId The environment id
      */
@@ -632,7 +685,6 @@ export class ResourceManager {
         kubeconfig.loadFromDefault();
         const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
-        let result = null;
         try {
             const revResponse = await k8sApi.listNamespacedCustomObject(
                 "serving.knative.dev",
@@ -654,7 +706,6 @@ export class ResourceManager {
                 const revision = revisions[index];
                 const { status, runningReplicas } = await this.checkAPIServerStatus(revision.metadata.name);
                 totalAvailable += runningReplicas;
-                console.log(revision.metadata.name, status, runningReplicas);
             }
 
             if (totalAvailable > 0) finalStatus = "OK";

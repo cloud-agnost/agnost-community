@@ -181,16 +181,7 @@ export default function PhoneAuthentication() {
 								<FormLabel>{t('version.authentication.mobile_authentication_title')}</FormLabel>
 
 								<FormControl>
-									<Switch
-										checked={field.value}
-										onCheckedChange={(val) => {
-											field.onChange(val);
-											if (!val) {
-												form.setValue('confirmPhone', false);
-												form.setValue('allowCodeSignIn', false);
-											}
-										}}
-									/>
+									<Switch checked={field.value} onCheckedChange={field.onChange} />
 								</FormControl>
 							</FormItem>
 						)}

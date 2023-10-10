@@ -39,8 +39,8 @@ export default function DeploymentStatusCard() {
 						<Cloud size={24} />
 					</Button>
 				</DropdownMenuPrimitive.Trigger>
-				<DropdownMenuContent className={cn('overflow-hidden relative w-[21rem] space-y-6')}>
-					<DropdownMenuLabel className='relative flex justify-between items-center p-4'>
+				<DropdownMenuContent className={cn('overflow-hidden relative w-[21rem]')}>
+					<DropdownMenuLabel className='relative flex justify-between items-center px-4 py-2'>
 						<span className='truncate text-default'>{t('version.deployment_status')}</span>
 						<Button
 							onClick={() => setSettingsIsOpen((prev) => !prev)}

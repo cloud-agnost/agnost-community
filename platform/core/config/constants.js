@@ -969,3 +969,30 @@ export const defaultMessages = (userId) => {
 		},
 	];
 };
+
+export const clusterComponents = [
+	{
+		deploymentName: "engine-worker-deployment",
+		hpaName: "engine-worker-hpa",
+	},
+	{
+		deploymentName: "engine-realtime-deployment",
+		hpaName: "engine-realtime-hpa",
+	},
+	{
+		deploymentName: "platform-core-deployment",
+		hpaName: "platform-core-hpa",
+	},
+	{
+		deploymentName: "platform-sync-deployment",
+		hpaName: "platform-sync-hpa",
+	},
+	{
+		deploymentName: "platform-worker-deployment",
+		hpaName: "platform-worker-hpa",
+	},
+	{
+		deploymentName: "studio-deployment",
+		hpaName: "studio-hpa",
+	},
+];

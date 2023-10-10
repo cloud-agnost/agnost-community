@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-
+import { body } from "express-validator";
+import { clusterComponents } from "../config/constants.js";
 /**
  * Account is the top level model which will hold the list of organizations, under organization there will be users and apps etc.
  * Whenever a new users signs up a personal account with 'Admin' role will be creted. When a user joins to an organization, a new account entry
@@ -64,3 +65,68 @@ export const ClusterModel = mongoose.model(
 		{ timestamps: true }
 	)
 );
+
+export const applyRules = (type) => {
+	switch (type) {
+		case "update-component":
+			return [
+				body("deploymentName")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(clusterComponents.map((entry) => entry.deploymentName))
+					.withMessage(t("Unsupported cluster component type")),
+				body("hpaName")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isIn(clusterComponents.map((entry) => entry.hpaName))
+					.withMessage(t("Unsupported cluster HPA type")),
+				body("replicas")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isInt({
+						min: 1,
+					})
+					.withMessage(t("Initial replicas needs to be a positive integer"))
+					.bail()
+					.toInt(),
+				body("minReplicas")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isInt({
+						min: 1,
+					})
+					.withMessage(t("Minimum replicas needs to be a positive integer"))
+					.bail()
+					.toInt(),
+				body("maxReplicas")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isInt({
+						min: 1,
+					})
+					.withMessage(t("Maximum replicas needs to be a positive integer"))
+					.bail()
+					.toInt()
+					.custom(async (value, { req }) => {
+						if (req.body.minReplicas > value)
+							throw new AgnostError(
+								t("Maximum replicas cannot be smaller than minimum replicas")
+							);
+
+						return true;
+					}),
+			];
+		default:
+			return [];
+	}
+};
