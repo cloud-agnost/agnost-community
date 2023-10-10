@@ -31,6 +31,7 @@ import {
 	MessageQueue,
 	Middleware,
 	MinIo,
+	Model,
 	MongoDb,
 	MySql,
 	Nodejs,
@@ -958,12 +959,11 @@ export const DATABASE = {
 	MongoDB: 'MongoDB',
 };
 
-export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
+export const TAB_ICON_MAP: Record<string, ElementType> = {
 	Storage: Storage,
 	Database: DatabaseIcon,
 	Cache: Cache,
 	Endpoint: ApiKeys,
-	'Message Queue': MessageQueue,
 	Queue: MessageQueue,
 	Task: Calendar,
 	Middleware: Middleware,
@@ -971,6 +971,8 @@ export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
 	Dashboard: Dashboard,
 	Notifications: BellRing,
 	Function: Function,
+	Field: Model,
+	Model: Model,
 };
 
 export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
