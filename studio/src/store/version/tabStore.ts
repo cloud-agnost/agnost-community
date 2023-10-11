@@ -66,16 +66,19 @@ const useTabStore = create<TabStore>()(
 					}
 				},
 				addTab: (versionId, tab) => {
-					set((state) => {
-						const tabs = state.tabs[versionId] ?? [];
-						return {
-							tabs: {
-								...state.tabs,
-								[versionId]: [...tabs, tab],
-							},
-						};
-					});
-					get().setCurrentTab(versionId, tab.id);
+					const existingTab = get().tabs[versionId].find((t) => t.path === tab.path);
+					if (!existingTab) {
+						set((state) => {
+							const tabs = state.tabs[versionId] ?? [];
+							return {
+								tabs: {
+									...state.tabs,
+									[versionId]: [...tabs, tab],
+								},
+							};
+						});
+					}
+					get().setCurrentTab(versionId, existingTab?.id ?? tab.id);
 					const url = tab.path.includes('organization')
 						? tab.path
 						: useVersionStore.getState().getVersionDashboardPath(tab.path);
