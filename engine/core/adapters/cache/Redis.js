@@ -18,6 +18,13 @@ export class Redis extends CacheBase {
 	}
 
 	/**
+	 * Returns the cache driver
+	 */
+	getDriver() {
+		return this.driver;
+	}
+
+	/**
 	 * Gets an item from the cache by key. If key is not found, then `null` is returned as data.
 	 *
 	 * @param {Object} meta The cache metadata

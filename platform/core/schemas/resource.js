@@ -4,9 +4,10 @@ import appCtrl from "../controllers/app.js";
 import {
 	resourceTypes,
 	addResourceTypes,
+	createResourceTypes,
 	instanceTypes,
 	addInstanceTypes,
-	configInstanceTypes,
+	createInstanceTypes,
 	appRoles,
 	resourceStatuses,
 } from "../config/constants.js";
@@ -15,7 +16,9 @@ import accessDatabaseRules from "./access/database.js";
 import accessCacheRules from "./access/cache.js";
 import accessQueueRules from "./access/queue.js";
 import accessStorageRules from "./access/storage.js";
-import configEngineRules from "./config/engine.js";
+import configDatabaseRules from "./config/database.js";
+import configCacheRules from "./config/cache.js";
+import configQueueRules from "./config/queue.js";
 
 /**
  * Resources are the actual instances of IaaS or PaaS from specific providers. There resources can be managed by the platform or
@@ -246,7 +249,7 @@ export const applyRules = (type) => {
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
 					.custom((value, { req }) => {
-						let instanceList = configInstanceTypes[req.body.type];
+						let instanceList = addInstanceTypes[req.body.type];
 						if (!instanceList)
 							throw new AgnostError(
 								t(
@@ -264,21 +267,9 @@ export const applyRules = (type) => {
 
 						return true;
 					}),
-				body("config")
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.custom((value, { req }) => {
-						if (typeof value !== "object" || Array.isArray(value))
-							throw new AgnostError(t("Not a valid resource config setting"));
-
-						return true;
-					}),
-				...configEngineRules,
-				//...configDatabaseRules,
-				//...configCacheRules,
-				//...configQueueRules,
-				//...configStorageRules,
+				...configDatabaseRules(type),
+				...configCacheRules(type),
+				...configQueueRules(type),
 			];
 		case "add":
 			return [
@@ -316,15 +307,58 @@ export const applyRules = (type) => {
 					.bail()
 					.isLength({
 						min: config.get("general.minNameLength"),
-						max: config.get("general.maxTextLength"),
+						max: config.get("general.maxDbNameLength"),
 					})
 					.withMessage(
 						t(
 							"Name must be minimum %s and maximum %s characters long",
 							config.get("general.minNameLength"),
-							config.get("general.maxTextLength")
+							config.get("general.maxDbNameLength")
 						)
-					),
+					)
+					.bail()
+					.custom((value) => {
+						let regex = /^[A-Za-z0-9-]+$/;
+						if (!regex.test(value)) {
+							throw new AgnostError(
+								t(
+									"Resource names can include only numbers, letters and '-' characters"
+								)
+							);
+						}
+
+						let regex2 = /^[0-9].*$/;
+						if (regex2.test(value)) {
+							throw new AgnostError(
+								t("Resource names cannot start with a number")
+							);
+						}
+
+						return true;
+					})
+					.bail()
+					.custom(async (value, { req }) => {
+						let resources = await ResourceModel.find({
+							orgId: req.org._id,
+							type: { $ne: "engine" },
+						});
+
+						resources.forEach((res) => {
+							if (res.name.toLowerCase() === value.toLowerCase())
+								throw new AgnostError(
+									t("Resource with the provided name already exists")
+								);
+						});
+
+						if (value.toLowerCase() === "this") {
+							throw new AgnostError(
+								t(
+									"'%s' is a reserved keyword and cannot be used as resource name",
+									value
+								)
+							);
+						}
+					}),
 				body("type")
 					.trim()
 					.notEmpty()
@@ -397,10 +431,28 @@ export const applyRules = (type) => {
 				body("appId")
 					.trim()
 					.optional()
-					.custom((value, { req }) => {
+					.custom(async (value, { req }) => {
 						if (!helper.isValidId(value))
 							throw new AgnostError(t("Not a valid app identifier"));
 
+						const app = await appCtrl.getOneById(value, { cacheKey: value });
+						if (!app)
+							throw new AgnostError(
+								t(
+									"No such application with the provided id '%s' exists.",
+									value
+								)
+							);
+
+						if (app.orgId.toString() !== req.org._id.toString())
+							throw new AgnostError(
+								t(
+									"Organization does not have an app with the provided id '%s'",
+									value
+								)
+							);
+
+						req.app = app;
 						return true;
 					}),
 				body("name")
@@ -410,21 +462,64 @@ export const applyRules = (type) => {
 					.bail()
 					.isLength({
 						min: config.get("general.minNameLength"),
-						max: config.get("general.maxTextLength"),
+						max: config.get("general.maxDbNameLength"),
 					})
 					.withMessage(
 						t(
 							"Name must be minimum %s and maximum %s characters long",
 							config.get("general.minNameLength"),
-							config.get("general.maxTextLength")
+							config.get("general.maxDbNameLength")
 						)
-					),
+					)
+					.bail()
+					.custom((value) => {
+						let regex = /^[A-Za-z0-9-]+$/;
+						if (!regex.test(value)) {
+							throw new AgnostError(
+								t(
+									"Resource names can include only numbers, letters and '-' characters"
+								)
+							);
+						}
+
+						let regex2 = /^[0-9].*$/;
+						if (regex2.test(value)) {
+							throw new AgnostError(
+								t("Resource names cannot start with a number")
+							);
+						}
+
+						return true;
+					})
+					.bail()
+					.custom(async (value, { req }) => {
+						let resources = await ResourceModel.find({
+							orgId: req.org._id,
+							type: { $ne: "engine" },
+						});
+
+						resources.forEach((res) => {
+							if (res.name.toLowerCase() === value.toLowerCase())
+								throw new AgnostError(
+									t("Resource with the provided name already exists")
+								);
+						});
+
+						if (value.toLowerCase() === "this") {
+							throw new AgnostError(
+								t(
+									"'%s' is a reserved keyword and cannot be used as resource name",
+									value
+								)
+							);
+						}
+					}),
 				body("type")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
-					.isIn(resourceTypes)
+					.isIn(createResourceTypes)
 					.withMessage(t("Unsupported resource type")),
 				body("instance")
 					.trim()
@@ -432,7 +527,7 @@ export const applyRules = (type) => {
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
 					.custom((value, { req }) => {
-						let instanceList = instanceTypes[req.body.type];
+						let instanceList = createInstanceTypes[req.body.type];
 						if (!instanceList)
 							throw new AgnostError(
 								t(
@@ -450,22 +545,10 @@ export const applyRules = (type) => {
 
 						return true;
 					}),
-				body("managed")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isBoolean()
-					.withMessage(t("Not a valid boolean value"))
-					.toBoolean(),
 				body("allowedRoles")
 					.isArray()
 					.withMessage(t("Allowed roles needs to be an array of strings")),
 				body("allowedRoles.*")
-					.if((value, { req }) => {
-						if (Array.isArray(req.body.allowedRoles)) return true;
-						else return false;
-					})
 					.notEmpty()
 					.withMessage(
 						t("Allowed role needs to be provided, cannot be left empty")
@@ -474,22 +557,6 @@ export const applyRules = (type) => {
 					.isIn(appRoles)
 					.withMessage(t("Unsupported app role")),
 				body("config")
-					.if((value, { req }) => {
-						// Local engine cluster we do not need configuration settings
-						if (req.body.managed === false) return false;
-						else return true;
-					})
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isObject()
-					.withMessage(t("Not a valid resource configuration"))
-					.bail()
-					.custom((value, { req }) => {
-						// This is where we perform the resource configuation checks
-						return true;
-					}),
-				body("access")
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
@@ -498,11 +565,10 @@ export const applyRules = (type) => {
 							throw new AgnostError(t("Not a valid resource access setting"));
 
 						return true;
-					})
-					.custom((value, { req }) => {
-						return true;
 					}),
-				...accessDatabaseRules,
+				...configDatabaseRules(type),
+				...configCacheRules(type),
+				...configQueueRules(type),
 			];
 		case "get-resources":
 			return [
@@ -565,32 +631,7 @@ export const applyRules = (type) => {
 			];
 		case "update":
 			return [
-				body("name")
-					.trim()
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty"))
-					.bail()
-					.isLength({
-						min: config.get("general.minNameLength"),
-						max: config.get("general.maxTextLength"),
-					})
-					.withMessage(
-						t(
-							"Name must be minimum %s and maximum %s characters long",
-							config.get("general.minNameLength"),
-							config.get("general.maxTextLength")
-						)
-					),
-				body("allowedRoles")
-					.isArray()
-					.withMessage(t("Allowed roles needs to be an array of strings")),
 				body("allowedRoles.*")
-					.trim()
-					.notEmpty()
-					.withMessage(
-						t("Allowed role needs to be provided, cannot be left empty")
-					)
-					.bail()
 					.isIn(appRoles)
 					.withMessage(t("Unsupported app role")),
 			];

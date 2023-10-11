@@ -82,6 +82,8 @@
     "maxSearchResults": 50,
     "scaleDownDelaySeconds": 300,
     "scaleToZeroPodRetentionPeriodSeconds": 600,
+    "minCacheSizeMi": 256,
+    "minQueueSizeMi": 256,
     "defaultEngineConfig": {
       "initialScale": 1,
       "minScale": 0,

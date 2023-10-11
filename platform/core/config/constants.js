@@ -586,6 +586,7 @@ export const resourceTypes = [
 ];
 
 export const addResourceTypes = ["database", "cache", "storage", "queue"];
+export const createResourceTypes = ["database", "cache", "queue"];
 
 export const designElementTypes = [
 	"engine",
@@ -614,10 +615,9 @@ export const addInstanceTypes = {
 	queue: ["RabbitMQ", "Kafka"],
 };
 
-export const configInstanceTypes = {
+export const createInstanceTypes = {
 	database: ["PostgreSQL", "MySQL", "MongoDB"],
 	cache: ["Redis"],
-	storage: ["MinIO"],
 	queue: ["RabbitMQ", "Kafka"],
 };
 

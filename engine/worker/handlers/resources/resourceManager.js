@@ -1,5 +1,7 @@
 import axios from "axios";
 import k8s from "@kubernetes/client-node";
+import { createRedis, deleteRedis, updateRedis } from "./redis.js";
+import { getDBClient } from "../../init/db.js";
 
 export class ResourceManager {
     constructor(resourceObj) {
@@ -8,6 +10,9 @@ export class ResourceManager {
 
         // Resource management operation logs
         this.logs = [];
+
+        this.conn = null; //MongoDB MongoClient connection
+        this.platformDB = null; //MongoDB DB object reference
     }
 
     /**
@@ -15,6 +20,13 @@ export class ResourceManager {
      */
     getAction() {
         return this.resourceObj.action;
+    }
+
+    /**
+     * Returns the resource object
+     */
+    getResourceName() {
+        return this.resourceObj.name;
     }
 
     /**
@@ -95,6 +107,9 @@ export class ResourceManager {
                 case "engine":
                     await this.createAPIServer();
                     break;
+                case "cache":
+                    if (this.getResourceInstance() === "Redis") await this.createRedisCache();
+                    break;
                 default:
                     break;
             }
@@ -134,9 +149,19 @@ export class ResourceManager {
     async updateResource() {
         try {
             this.addLog(t("Started resource update"));
+            const resource = this.getResource();
             switch (this.getResourceType()) {
                 case "engine":
                     await this.updateAPIServer();
+                    break;
+                case "cache":
+                    if (this.getResourceInstance() === "Redis")
+                        await updateRedis(
+                            this.getResourceName(),
+                            resource.config.version,
+                            resource.config.size,
+                            resource.config.readReplica
+                        );
                     break;
                 default:
                     break;
@@ -162,6 +187,9 @@ export class ResourceManager {
             switch (this.getResourceType()) {
                 case "engine":
                     await this.deleteAPIServer();
+                    break;
+                case "cache":
+                    if (this.getResourceInstance() === "Redis") await deleteRedis(this.getResourceName());
                     break;
                 default:
                     break;
@@ -761,5 +789,83 @@ export class ResourceManager {
             status: result.body?.status?.availableReplicas > 0 ? "OK" : "Idle",
             runningReplicas: result.body?.status?.availableReplicas ?? 0,
         };
+    }
+
+    /**
+     * Returns the database object pointing to the MongoDB database of the engine cluster, which is used to store environment configuration info
+     */
+    getPlatformDB() {
+        if (!this.platformDB) {
+            if (!this.conn) {
+                this.conn = getDBClient();
+            }
+            this.platformDB = this.conn.db("agnost");
+        }
+
+        return this.platformDB;
+    }
+
+    /**
+     * Updates the access settings of the resource
+     */
+    async updateResourceAccessSettings(access, accessReadOnly) {
+        const resource = this.getResource();
+        const db = this.getPlatformDB();
+
+        // Encrypt sensitive access data
+        access = helper.encyrptSensitiveData(access);
+        if (accessReadOnly) accessReadOnly = helper.encyrptSensitiveData(accessReadOnly);
+
+        // Update resource access and access read only settings
+        await db.collection("resources").findOneAndUpdate(
+            { _id: helper.objectId(resource._id) },
+            {
+                $set: {
+                    access,
+                    accessReadOnly,
+                },
+            }
+        );
+    }
+
+    /**
+     * Creates a new Redis cache
+     */
+    async createRedisCache() {
+        const resource = this.getResource();
+        if (resource.config.readReplica)
+            this.addLog(
+                t("Creating '%s'GB Redis cache '%s' with a read-replica.", resource.config.size, resource.name)
+            );
+        else
+            this.addLog(
+                t("Creating '%s'GB Redis cache '%s' without a read-replica.", resource.config.size, resource.name)
+            );
+
+        await createRedis(
+            resource.name,
+            resource.config.version,
+            resource.config.size,
+            resource.config.password,
+            resource.config.readReplica
+        );
+
+        const access = {
+            host: `${resource.name}-master.${process.env.NAMESPACE}.svc.cluster.local`,
+            password: resource.config.password,
+            port: 6379,
+        };
+
+        const accessReadOnly = [];
+        if (resource.config.readReplica) {
+            accessReadOnly.push({
+                host: `${resource.name}-replicas.${process.env.NAMESPACE}.svc.cluster.local`,
+                password: resource.config.password,
+                port: 6379,
+            });
+        }
+
+        // Update resource access settings
+        await this.updateResourceAccessSettings(access, accessReadOnly);
     }
 }

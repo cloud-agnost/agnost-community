@@ -19,7 +19,6 @@ import { applyRules } from "../schemas/resource.js";
 import { applyRules as applyLogRules } from "../schemas/resourceLog.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
-import { deleteKey } from "../init/cache.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
@@ -176,8 +175,97 @@ router.post(
 				org._id,
 				user,
 				"org.resource",
-				"create",
+				"add",
 				t("Added new '%s' resource '%s' named '%s'", type, instance, name),
+				resourceObj,
+				{ orgId: org._id, appId, resourceId }
+			);
+		} catch (error) {
+			await resourceCtrl.rollback(session);
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/resource/create
+@method     POST
+@desc       Creates a new resource that is managed by the cluster. 
+@access     private
+*/
+router.post(
+	"/create",
+	checkContentType,
+	authSession,
+	validateOrg,
+	authorizeOrgAction("org.resource.create"),
+	applyRules("create"),
+	validate,
+	async (req, res) => {
+		const session = await resourceCtrl.startSession();
+		try {
+			const { org, user } = req;
+			let { appId, name, type, instance, allowedRoles, config } = req.body;
+
+			// We create RabbitMQ clusters with delayed-message-exchange add-on
+			if (instance !== "RabbitMQ") config.delayedMessages = true;
+			return res.json(req.body);
+
+			// Create the new organization resource. The access settings will be updated later by the engine-worker
+			let resourceId = helper.generateId();
+			let resourceObj = await resourceCtrl.create(
+				{
+					_id: resourceId,
+					orgId: org._id,
+					iid: helper.generateSlug("res"),
+					appId,
+					name,
+					type,
+					instance,
+					managed: true,
+					deletable: true,
+					allowedRoles,
+					config,
+					status: "Creating",
+					createdBy: user._id,
+				},
+				{ cacheKey: resourceId, session }
+			);
+
+			const logObj = await resLogCtrl.create(
+				{
+					orgId: org._id,
+					resourceId: resourceId,
+					action: "create",
+					status: "Creating",
+					createdBy: user._id,
+				},
+				{ session }
+			);
+
+			await resourceCtrl.commit(session);
+			res.json(resourceObj);
+
+			// For PostgreSQL the password is created by the operator
+			if (instance !== "PostgreSQL")
+				resourceObj.config.password = helper.generatePassword(16);
+
+			// For PostgreSQL the username is created by the operator, for Redis we do not need a username
+			if (instance !== "PostgreSQL" && instance !== "Redis")
+				resourceObj.config.username = helper.generateUsername(16);
+
+			// Create the managed resource
+			await resourceCtrl.manageClusterResources([
+				{ resource: resourceObj, log: logObj },
+			]);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				org._id,
+				user,
+				"org.resource",
+				"create",
+				t("Created new '%s' resource '%s' named '%s'", type, instance, name),
 				resourceObj,
 				{ orgId: org._id, appId, resourceId }
 			);
@@ -191,7 +279,7 @@ router.post(
 /*
 @route      /v1/org/:orgId/resource?page=0&size=50&type=engine&instance=Agnost K8s Cluster&search=&sortBy=name&sortDir=asc&appId
 @method     GET
-@desc       Get organization/app resources
+@desc       Get organization/app resources (only resources that are marked as deleteable are returned)
 @access     private
 */
 router.get(
@@ -207,7 +295,7 @@ router.get(
 			const { search, type, instance, sortBy, sortDir, appId, status } =
 				req.query;
 
-			let query = { orgId: org._id };
+			let query = { orgId: org._id, deletable: true };
 
 			// App filter and app member filter
 			if (appId) {
@@ -261,7 +349,7 @@ router.get(
 /*
 @route      /v1/org/:orgId/resource/:resourceId
 @method     PUT
-@desc       Update organization resource info (e.g., name and allowedRoles)
+@desc       Update organization resource info (e.g., allowedRoles). We do not allow update of the name of the resource
 @access     private
 */
 router.put(
@@ -277,7 +365,7 @@ router.put(
 		const session = await resourceCtrl.startSession();
 		try {
 			const { org, user, resource } = req;
-			let { name, allowedRoles } = req.body;
+			let { allowedRoles } = req.body;
 
 			// Admin should always be included in allowedRoles list
 			if (!allowedRoles.includes("Admin")) allowedRoles.push("Admin");
@@ -285,41 +373,12 @@ router.put(
 			let updatedResource = await resourceCtrl.updateOneById(
 				resource._id,
 				{
-					name,
 					allowedRoles,
 					updatedBy: user._id,
 				},
 				{},
 				{ cacheKey: resource._id, session }
 			);
-
-			// If we are updating the name of the resource, we should also update the resouce mapping name info in environments if there is any
-			if (resource.name !== name) {
-				let environments = await envCtrl.getManyByQuery(
-					{
-						orgId: org._id,
-						"mappings.resource.iid": resource.iid,
-					},
-					{ session }
-				);
-
-				if (environments.length > 0) {
-					await envCtrl.updateMultiByQuery(
-						{
-							orgId: org._id,
-							"mappings.resource.iid": resource.iid,
-						},
-						{ "mappings.$.resource.name": name },
-						{},
-						{ session }
-					);
-
-					// Clear cache for environments
-					environments.forEach((element) => {
-						deleteKey(element._id.toString());
-					});
-				}
-			}
 
 			await resourceCtrl.commit(session);
 			res.json(updatedResource);
@@ -335,116 +394,6 @@ router.put(
 					resource.type,
 					resource.instance,
 					name
-				),
-				updatedResource,
-				{
-					orgId: org._id,
-					appId: updatedResource.appId,
-					resourceId: resource._id,
-				}
-			);
-		} catch (error) {
-			await resourceCtrl.rollback(session);
-			handleError(req, res, error);
-		}
-	}
-);
-
-/*
-@route      /v1/org/:orgId/resource/:resourceId/config
-@method     PUT
-@desc       Update managed resource configuration
-@access     private
-*/
-router.put(
-	"/:resourceId/config",
-	checkContentType,
-	authSession,
-	validateOrg,
-	validateResource,
-	authorizeOrgAction("org.resource.update"),
-	applyRules("update-config"),
-	validate,
-	async (req, res) => {
-		const session = await resourceCtrl.startSession();
-		try {
-			const { org, user, resource } = req;
-
-			if (!resource.managed) {
-				await resourceCtrl.endSession(session);
-
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"You can update the configuration parameters of a managed resource. The resource '%s' named '%s' is not a managed resource.",
-						resource.instance,
-						resource.name
-					),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
-			// unless the previous one is completed
-			if (
-				["Creating", "Updating", "Deleting", "Binding"].includes(
-					resource.status
-				)
-			) {
-				await resourceCtrl.endSession(session);
-
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"The %s resource '%s' named '%s' is in '%s' status. You need to wait for the completion of the existing operation.",
-						resource.instance,
-						resource.name,
-						resource.status
-					),
-					code: ERROR_CODES.notAllowed,
-				});
-			}
-
-			let updatedResource = await resourceCtrl.updateOneById(
-				resource._id,
-				{
-					config: req.body,
-					status: "Updating",
-					updatedBy: user._id,
-				},
-				{},
-				{ cacheKey: resource._id, session }
-			);
-
-			let resLog = await resLogCtrl.create(
-				{
-					orgId: org._id,
-					resourceId: resource._id,
-					action: "update",
-					status: "Updating",
-					createdBy: user._id,
-				},
-				{ session }
-			);
-
-			await resourceCtrl.commit(session);
-			res.json(updatedResource);
-
-			// Apply the changes to the managed resource
-			await resourceCtrl.manageClusterResources([
-				{ resource: updatedResource, log: resLog },
-			]);
-
-			// Log action
-			auditCtrl.logAndNotify(
-				org._id,
-				user,
-				"org.resource",
-				"update",
-				t(
-					"Started updating '%s' resource named '%s'",
-					resource.instance,
-					resource.name
 				),
 				updatedResource,
 				{
@@ -603,6 +552,121 @@ router.put(
 );
 
 /*
+@route      /v1/org/:orgId/resource/:resourceId/config
+@method     PUT
+@desc       Update resource configuration
+@access     private
+*/
+router.put(
+	"/:resourceId/config",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateResource,
+	authorizeOrgAction("org.resource.update"),
+	applyRules("update-config"),
+	validate,
+	async (req, res) => {
+		const session = await resourceCtrl.startSession();
+		try {
+			const { org, user, resource } = req;
+			let { config } = req.body;
+
+			if (!resource.managed) {
+				await resourceCtrl.endSession(session);
+
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"The %s resource named '%s' is not a managed resource. You need update configuration of a resource that is not managed by the Agnost cluster.",
+						resource.instance,
+						resource.name
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
+			// unless the previous one is completed
+			if (
+				["Creating", "Updating", "Deleting", "Binding"].includes(
+					resource.status
+				)
+			) {
+				await resourceCtrl.endSession(session);
+
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"The %s resource named '%s' is in '%s' status. You need to wait for the completion of the existing operation.",
+						resource.instance,
+						resource.name,
+						resource.status
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// We cannot change the read-replica configuration of a Redis resource
+			if (resource.instance === "Redis")
+				config.readReplica = resource.config.readReplica;
+
+			const updatedResource = await resourceCtrl.updateOneById(
+				resource._id,
+				{
+					config,
+					status: "Updating",
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: resource._id, session }
+			);
+
+			const logObj = await resLogCtrl.create(
+				{
+					orgId: org._id,
+					resourceId: resource._id,
+					action: "update",
+					status: "Updating",
+					createdBy: user._id,
+				},
+				{ session }
+			);
+
+			await resourceCtrl.commit(session);
+			res.json(updatedResource);
+
+			// Update the managed resource
+			await resourceCtrl.manageClusterResources([
+				{ resource: updatedResource, log: logObj },
+			]);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				org._id,
+				user,
+				"org.resource",
+				"update",
+				t(
+					"Updated configuration of '%s' resource named '%s'",
+					resource.instance,
+					resource.name
+				),
+				updatedResource,
+				{
+					orgId: org._id,
+					appId: updatedResource.appId,
+					resourceId: resource._id,
+				}
+			);
+		} catch (error) {
+			await resourceCtrl.rollback(session);
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
 @route      /v1/org/:orgId/resource/:resourceId
 @method     DELETE
 @desc       Delete organization resource. Organization resouces can only be deleted if they are not used by any version environment.
@@ -646,7 +710,7 @@ router.delete(
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"The %s resource named '%s' is being used by at least one environment of the organization '%s'. You cannot delete a resource that is used by an environment. First remove resource dependencies in environments and then delete the resource.",
+						"The %s resource named '%s' is being used by at least one app version of the organization '%s'. You cannot delete a resource that is used by an app version. First remove resource dependencies in app versions and then delete the resource.",
 						resource.instance,
 						resource.name,
 						org.name
