@@ -75,7 +75,6 @@ import {
 	OAuthProviderTypes,
 	SortOption,
 	Tab,
-	TabTypes,
 } from '@/types';
 import { generateId, translate } from '@/utils';
 import {
