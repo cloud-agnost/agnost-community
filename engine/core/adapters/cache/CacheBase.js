@@ -4,6 +4,13 @@ export class CacheBase {
 	async disconnect() {}
 
 	/**
+	 * Returns the cache driver
+	 */
+	getDriver() {
+		return null;
+	}
+
+	/**
 	 * Returns the cache name
 	 * @param  {Object} cacheMeta The cche metadata
 	 */

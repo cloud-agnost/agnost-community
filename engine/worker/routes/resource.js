@@ -58,7 +58,6 @@ router.post("/cluster-info", checkContentType, authAccessToken, async (req, res)
         await manager.updateDeployment(deploymentName, replicas);
         await manager.updateHPA(hpaName, minReplicas, maxReplicas);
     } catch (error) {
-        console.log("***err", error);
         helper.handleError(req, res, error);
     }
 });
