@@ -73,3 +73,4 @@ export { default as Timestamp } from './Timestamp';
 export { default as Twitter } from './Twitter';
 export { default as Version } from './Version';
 export { default as Warning } from './Warning';
+export { default as SocketIo } from './SocketIo';
