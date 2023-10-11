@@ -313,7 +313,7 @@ export function handleTabChange(name: string, url: string) {
 	updateCurrentTab(version._id as string, {
 		...tab,
 		path: hasAnotherParams ? `${url}&tabId=${tab.id}` : `${url}?tabId=${tab.id}`,
-		title: ` ${name} - ${t('version.settings.authentications')}`,
+		title: name,
 	});
 }
 
