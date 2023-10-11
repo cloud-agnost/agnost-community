@@ -154,19 +154,18 @@ jobs:
         name: Install yaml library
         run: python -m pip install ruamel.yaml
       -
-        name: Update Helm Chart
+        name: Update Package Json
         run: |
           python .github/scripts/update_package_json.py '${{ needs.get_released_apps.outputs.details }}'
-          git diff
-#          if [ $(git status | grep -c "nothing to commit") == 0 ]; then
-#            git config user.name ${{ secrets.REPO_ACCESS_USER }}
-#            git config user.email ${{ secrets.REPO_ACCESS_EMAIL }}
-#            git diff
-#            git commit -am "New chart version"
-#            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/altogic/charts
-#          else
-#              echo "No changes, skipping..."
-#          fi
+          if [ $(git status | grep -c "nothing to commit") == 0 ]; then
+            git config user.name ${{ secrets.REPO_ACCESS_USER }}
+            git config user.email ${{ secrets.REPO_ACCESS_EMAIL }}
+            git diff
+            git commit -am "Updated package.json files"
+            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/cloud-agnost/agnost-community
+          else
+              echo "No changes, skipping..."
+          fi
 
   update-helm-chart:
     runs-on: ubuntu-latest
@@ -194,16 +193,15 @@ jobs:
         run: |
           cd charts
           python ../.github/scripts/update_helm_chart.py '${{ needs.get_released_apps.outputs.details }}'
-          git diff
-#          if [ $(git status | grep -c "nothing to commit") == 0 ]; then
-#            git config user.name ${{ secrets.REPO_ACCESS_USER }}
-#            git config user.email ${{ secrets.REPO_ACCESS_EMAIL }}
-#            git diff
-#            git commit -am "New chart version"
-#            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/altogic/charts
-#          else
-#              echo "No changes, skipping..."
-#          fi
+          if [ $(git status | grep -c "nothing to commit") == 0 ]; then
+            git config user.name ${{ secrets.REPO_ACCESS_USER }}
+            git config user.email ${{ secrets.REPO_ACCESS_EMAIL }}
+            git diff
+            git commit -am "New chart version"
+            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/cloud-agnost/charts
+          else
+              echo "No changes, skipping..."
+          fi
 
   create-release-manifest:
     runs-on: ubuntu-latest
@@ -224,14 +222,13 @@ jobs:
         name: Create Release Manifest
         run: |
           python .github/scripts/create_release_manifest.py '${{ needs.get_released_apps.outputs.details }}'
-          ls -l Releases/*.json
-          cat Releases/*.json
-#          if [ $(git status | grep -c "nothing to commit") == 0 ]; then
-#            git config user.name ${{ secrets.REPO_ACCESS_USER }}
-#            git config user.email ${{ secrets.REPO_ACCESS_EMAIL }}
-#            git diff
-#            git commit -am "New chart version"
-#            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/altogic/charts
-#          else
-#              echo "No changes, skipping..."
-#          fi
+          if [ $(git status | grep -c "nothing to commit") == 0 ]; then
+            git config user.name ${{ secrets.REPO_ACCESS_USER }}
+            git config user.email ${{ secrets.REPO_ACCESS_EMAIL }}
+            git diff
+            git add Releases/
+            git commit -am "New chart version"
+            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/cloud-agnost/agnost-community
+          else
+              echo "No changes, skipping..."
+          fi
