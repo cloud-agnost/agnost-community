@@ -150,7 +150,9 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 							value: 'Deploying',
 						},
 						{
-							check: () => Object.values(env).some((status) => status === 'error'),
+							check: () =>
+								Object.values(env).some((status) => status === 'error') ||
+								get().resources.some((resource) => resource.status === 'Error'),
 							value: 'Error',
 						},
 						{
