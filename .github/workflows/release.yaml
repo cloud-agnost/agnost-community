@@ -162,7 +162,7 @@ jobs:
             git config user.email ${{ secrets.REPO_ACCESS_EMAIL }}
             git diff
             git commit -am "Updated package.json files"
-            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/cloud-agnost/agnost-community
+            git push
           else
               echo "No changes, skipping..."
           fi
@@ -180,6 +180,7 @@ jobs:
         with:
           repository: cloud-agnost/charts
           path: charts
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
       -
         name: Set up Python 3.11
         uses: actions/setup-python@v4
@@ -198,7 +199,7 @@ jobs:
             git config user.email ${{ secrets.REPO_ACCESS_EMAIL }}
             git diff
             git commit -am "New chart version"
-            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/cloud-agnost/charts
+            git push
           else
               echo "No changes, skipping..."
           fi
@@ -228,7 +229,7 @@ jobs:
             git diff
             git add Releases/
             git commit -am "New chart version"
-            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/cloud-agnost/agnost-community
+            git push
           else
               echo "No changes, skipping..."
           fi
