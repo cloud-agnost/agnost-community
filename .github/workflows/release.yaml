@@ -156,7 +156,7 @@ jobs:
       -
         name: Update Helm Chart
         run: |
-          python ../.github/scripts/update_package_json.py '${{ needs.get_released_apps.outputs.details }}'
+          python .github/scripts/update_package_json.py '${{ needs.get_released_apps.outputs.details }}'
           git diff
 #          if [ $(git status | grep -c "nothing to commit") == 0 ]; then
 #            git config user.name ${{ secrets.REPO_ACCESS_USER }}
@@ -223,7 +223,7 @@ jobs:
       -
         name: Create Release Manifest
         run: |
-          python ../.github/scripts/create_release_manifest.py '${{ needs.get_released_apps.outputs.details }}'
+          python .github/scripts/create_release_manifest.py '${{ needs.get_released_apps.outputs.details }}'
           ls -l Releases/*.json
           cat Releases/*.json
 #          if [ $(git status | grep -c "nothing to commit") == 0 ]; then
