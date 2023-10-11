@@ -21,7 +21,7 @@ interface OutletContext {
 export default function Function() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const canEdit = useAuthorizeVersion('function.edit');
+	const canCreate = useAuthorizeVersion('function.create');
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
 	const [selectedRows, setSelectedRows] = useState<Row<HelperFunction>[]>([]);
@@ -114,7 +114,7 @@ export default function Function() {
 			onSearch={onInput}
 			table={table}
 			selectedRowLength={selectedRows.length}
-			disabled={canEdit}
+			disabled={!canCreate}
 			viewLogs
 		>
 			<InfiniteScroll
