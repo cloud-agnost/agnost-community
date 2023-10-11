@@ -19,9 +19,9 @@ for app in applications:
   new_release_dict[app_name] = version
 
 with open(release_file, 'w') as fp:
-  fp.write(json.dumps(new_release_dict, indent="\t"))
+  fp.write(json.dumps(new_release_dict, indent=3))
   fp.close()
 
 with open(latest_file, 'w') as fp:
-  fp.write(json.dumps(new_release_dict, indent="\t"))
+  fp.write(json.dumps(new_release_dict, indent=3))
   fp.close()

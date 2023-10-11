@@ -12,4 +12,4 @@ for app in applications:
     package_json['version'] = app['version']
 
     with open(package_json_file, 'w') as fp:
-        fp.write(json.dumps(package_json, indent="\t"))
+        fp.write(json.dumps(package_json, indent=3))
