@@ -1,8 +1,10 @@
 import { Button } from '@/components/Button';
 import { VERSION_DROPDOWN_ITEM } from '@/constants';
 import useApplicationStore from '@/store/app/applicationStore.ts';
+import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIError } from '@/types';
+import { generateId } from '@/utils';
 import { CaretUpDown, LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ConfirmationModal } from 'components/ConfirmationModal';
 import {
@@ -15,10 +17,8 @@ import {
 } from 'components/Dropdown';
 import { Fragment, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import './versionDropdown.scss';
-import useTabStore from '@/store/version/tabStore';
-import { generateId } from '@/utils';
 
 export default function VersionDropdown() {
 	const [open, setOpen] = useState(false);

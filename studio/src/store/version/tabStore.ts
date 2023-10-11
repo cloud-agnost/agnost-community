@@ -66,7 +66,7 @@ const useTabStore = create<TabStore>()(
 					}
 				},
 				addTab: (versionId, tab) => {
-					const existingTab = get().tabs[versionId].find((t) => t.path === tab.path);
+					const existingTab = get().tabs[versionId]?.find((t) => t.path === tab.path);
 					if (!existingTab) {
 						set((state) => {
 							const tabs = state.tabs[versionId] ?? [];
