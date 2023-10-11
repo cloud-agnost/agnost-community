@@ -305,10 +305,10 @@ export function removeEmptyFields(data: Record<string, any>) {
 export function handleTabChange(name: string, url: string) {
 	const { getCurrentTab, updateCurrentTab } = useTabStore.getState();
 	const { version, getVersionDashboardPath } = useVersionStore.getState();
-	const tab = getCurrentTab(version._id as string);
+	const tab = getCurrentTab(version._id);
 	const versionUrl = getVersionDashboardPath(url);
 	const hasAnotherParams = versionUrl.includes('?');
-	updateCurrentTab(version._id as string, {
+	updateCurrentTab(version._id, {
 		...tab,
 		path: hasAnotherParams ? `${url}&tabId=${tab.id}` : `${url}?tabId=${tab.id}`,
 		title: name,
