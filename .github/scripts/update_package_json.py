@@ -11,5 +11,5 @@ for app in applications:
     
     package_json['version'] = app['version']
 
-    with open(package_json_file, 'w') as fp:
-        fp.write(json.dumps(package_json, indent=3))
+    with open(package_json_file, 'w', encoding='utf8') as fp:
+        fp.write(json.dumps(package_json, indent=3, ensure_ascii=False))
