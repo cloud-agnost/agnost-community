@@ -17,6 +17,8 @@ import { Fragment, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import './versionDropdown.scss';
+import useTabStore from '@/store/version/tabStore';
+import { generateId } from '@/utils';
 
 export default function VersionDropdown() {
 	const [open, setOpen] = useState(false);
@@ -30,6 +32,7 @@ export default function VersionDropdown() {
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 	const navigate = useNavigate();
 	const { application, openVersionDrawer } = useApplicationStore();
+	const { addTab } = useTabStore();
 
 	async function onConfirm() {
 		setLoading(true);
@@ -75,7 +78,20 @@ export default function VersionDropdown() {
 			/>
 			<DropdownMenu open={open} onOpenChange={setOpen}>
 				<div className='version-dropdown'>
-					<Link to={`${getVersionDashboardPath('/settings')}`} className='version-dropdown-label'>
+					<Button
+						variant='blank'
+						className='version-dropdown-label'
+						onClick={() => {
+							addTab(version?._id as string, {
+								path: getVersionDashboardPath('/settings'),
+								id: generateId(),
+								title: t('version.settings.default'),
+								isActive: true,
+								isDashboard: false,
+								type: 'Settings',
+							});
+						}}
+					>
 						<div className='version-label-icon'>
 							{version?.readOnly ? <LockSimple size={20} /> : <LockSimpleOpen size={20} />}
 						</div>
@@ -85,7 +101,7 @@ export default function VersionDropdown() {
 								{version?.readOnly ? 'Read Only' : 'Read/Write'}
 							</div>
 						</div>
-					</Link>
+					</Button>
 					<DropdownMenuTrigger asChild>
 						<div className='version-dropdown-button'>
 							<Button variant='blank' role='combobox' aria-expanded={open} rounded>
