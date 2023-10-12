@@ -68,7 +68,6 @@ export default function VersionEditMiddlewares() {
 			name,
 		},
 	];
-
 	return (
 		<VersionEditorLayout
 			className='p-0'

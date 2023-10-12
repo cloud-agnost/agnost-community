@@ -93,12 +93,8 @@ export default function VersionMiddlewares() {
 			className='p-0'
 			icon={<EmptyEndpoint className='w-44 h-44' />}
 			title={t('version.settings.middlewares')}
-			createButtonTitle=''
 			emptyStateTitle={t('version.middleware.no_middleware_found')}
 			isEmpty={!filteredMiddlewares.length}
-			openCreateModal={() => {
-				// empty
-			}}
 			handlerButton={<AddMiddlewareButton />}
 			onMultipleDelete={deleteHandler}
 			onSearch={onInput}
