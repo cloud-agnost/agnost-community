@@ -87,7 +87,7 @@ export const PATHS = {
 		profileSettings: `${profilePath}/ProfileSettings.tsx`,
 		account: `${profilePath}/ProfileSettingsGeneral.tsx`,
 		notifications: `${profilePath}/ProfileSettingsNotifications.tsx`,
-		clusterManagement: `${profilePath}/ProfileSettingsClusterManagement.tsx`,
+		clusterManagement: `${profilePath}/ClusterManagement.tsx`,
 	},
 	onboarding: {
 		onboarding: `${onboardingPath}/Onboarding.tsx`,
