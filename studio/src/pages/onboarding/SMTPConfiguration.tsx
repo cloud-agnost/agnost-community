@@ -29,6 +29,12 @@ export default function SMTPConfiguration() {
 	const [finalizing, setFinalizing] = useState(false);
 	const { t } = useTranslation();
 
+	const Schema = z.object({
+		fromEmail: z.string({ required_error: 'Email is required' }).email(),
+		fromName: z.string().optional(),
+		...SMTPSchema.shape,
+	});
+
 	const {
 		setDataPartially,
 		getCurrentStep,
@@ -41,14 +47,14 @@ export default function SMTPConfiguration() {
 	const { goBack } = useOutletContext() as { goBack: () => void };
 
 	const navigate = useNavigate();
-	const form = useForm<z.infer<typeof SMTPSchema>>({
-		resolver: zodResolver(SMTPSchema),
+	const form = useForm<z.infer<typeof Schema>>({
+		resolver: zodResolver(Schema),
 		defaultValues: {
 			...onboardingData.smtp,
 		},
 	});
 
-	async function onSubmit(data: z.infer<typeof SMTPSchema>) {
+	async function onSubmit(data: z.infer<typeof Schema>) {
 		try {
 			setIsTesting(true);
 			setError(null);
