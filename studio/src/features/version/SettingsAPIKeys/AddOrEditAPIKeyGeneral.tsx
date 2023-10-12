@@ -206,6 +206,7 @@ export default function AddOrEditAPIKeyGeneral({
 								selected={field.value}
 								onSelect={field.onChange}
 								initialFocus
+								clearable
 							/>
 							<FormDescription>{t('version.api_key.expire_date_desc')}</FormDescription>
 							<FormMessage />
