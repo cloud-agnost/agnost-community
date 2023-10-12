@@ -82,8 +82,8 @@ export default function CreateAndEditDatabaseDrawer({
 	useEffect(() => {
 		if (!open || !version) return;
 		getResources({
-			appId: version?.appId,
-		}).catch(console.error);
+			type: 'database',
+		});
 	}, [open]);
 
 	useEffect(() => {

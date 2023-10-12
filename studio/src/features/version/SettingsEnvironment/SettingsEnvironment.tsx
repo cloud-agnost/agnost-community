@@ -15,8 +15,7 @@ export default function SettingsEnvironment() {
 	const environment = useEnvironmentStore((state) => state.environment);
 	const canEdit = useAuthorizeVersion('version.update');
 	const canDeploy = useAuthorizeVersion('version.deploy');
-	const { toggleAutoDeploy, suspendEnvironment, activateEnvironment, getEnvironmentResources } =
-		useEnvironmentStore();
+	const { toggleAutoDeploy, suspendEnvironment, activateEnvironment } = useEnvironmentStore();
 	const { orgId, versionId, appId } = useParams<{
 		versionId: string;
 		appId: string;
