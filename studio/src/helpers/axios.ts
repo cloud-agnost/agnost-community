@@ -33,13 +33,17 @@ instance.interceptors.response.use(
 		return response;
 	},
 	(error) => {
-		const apiError = error.response.data as APIError;
+		const err = error.response.data as APIError;
+		const apiError = {
+			...err,
+			details: err.fields?.[0]?.msg ?? err.details,
+		};
 		if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
 			localStorage.clear();
 			useAuthStore.getState().logout();
 		}
 		if (error.response.status === 401) {
-			// window.location.href = '/401';
+			window.location.href = '/401';
 		}
 		if (error.response.status === 404) {
 			window.location.href = '/404';
