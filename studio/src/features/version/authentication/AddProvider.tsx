@@ -14,15 +14,14 @@ import { OAUTH_URL_MAP } from '@/constants';
 import { useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useVersionStore from '@/store/version/versionStore';
-import { APIError, OAuthProvider, VersionOAuthProvider, OAuthProviderTypes } from '@/types';
-import { capitalize, isEmpty } from '@/utils';
+import { APIError, OAuthProvider, OAuthProviderTypes, VersionOAuthProvider } from '@/types';
+import { capitalize, isEmpty, translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import * as z from 'zod';
-import { translate as t } from '@/utils';
 
 interface AddProviderProps {
 	open: boolean;

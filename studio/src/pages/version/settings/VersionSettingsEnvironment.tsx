@@ -14,10 +14,7 @@ export default function VersionSettingsEnvironment() {
 		<SettingsContainer
 			info={
 				environment?.deploymentDtm &&
-				`Last deployment at: ${formatDate(
-					environment?.deploymentDtm as string,
-					DateTime.DATETIME_MED,
-				)}`
+				`Last deployment at: ${formatDate(environment?.deploymentDtm, DateTime.DATETIME_MED)}`
 			}
 			pageTitle={t('version.settings.environment')}
 			action={<DeployButton />}
