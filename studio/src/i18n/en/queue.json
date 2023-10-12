@@ -4,6 +4,7 @@
 	"delay": "Delay",
 	"view_logs": "View Logs",
 	"edit": "Edit Queue",
+	"editLogicSuccess": "Message Queue logic updated successfully",
 	"delete": {
 		"title": "Delete Queue",
 		"message": "Are you sure you want to delete this queue?",
@@ -13,7 +14,7 @@
 	"create": {
 		"title": "Create Message Queue",
 		"delay": "Message Delay Duration",
-		"delay_description": "Keep the message in the queue for the duration of specified delay seconds",
+		"delay_description": "Keep the message in the queue for the duration of specified delay milliseconds",
 		"logExec": "Log Execution",
 		"logExecDescription": "Log endpoint request, response, status and execution duration",
 		"resource": {
