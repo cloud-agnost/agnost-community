@@ -9,7 +9,7 @@ const Switch = React.forwardRef<
 	React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
 >(({ className, ...props }, ref) => (
 	<SwitchPrimitives.Root className={cn('switch-root', className)} ref={ref} {...props}>
-		<SwitchPrimitives.Thumb className={cn('switch-thumb')} />
+		<SwitchPrimitives.Thumb className={cn('switch-thumb cursor-pointer')} />
 		<Lock className='switch-lock' />
 	</SwitchPrimitives.Root>
 ));
