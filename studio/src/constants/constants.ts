@@ -367,6 +367,8 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	WARN: 'yellow',
 	DEBUG: 'purple',
 	IDLE: 'orange',
+	TRUE: 'green',
+	FALSE: 'red',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
