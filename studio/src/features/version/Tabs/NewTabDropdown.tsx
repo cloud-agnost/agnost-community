@@ -57,7 +57,7 @@ export default function NewTabDropdown() {
 			orgId,
 			appId,
 			versionId,
-			keyword: value as string,
+			keyword: value,
 		});
 	}
 

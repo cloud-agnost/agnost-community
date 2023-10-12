@@ -17,6 +17,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import {
 	LoaderFunctionArgs,
+	redirect,
 	useNavigate,
 	useOutletContext,
 	useParams,
@@ -44,7 +45,7 @@ Buckets.loader = async ({ params }: LoaderFunctionArgs) => {
 
 	const permission = getAppPermission(role as AppRoles, 'app.storage.viewData');
 	if (!permission) {
-		// return redirect('/404');
+		return redirect('/404');
 	}
 
 	return { props: {} };
@@ -105,7 +106,7 @@ export default function Buckets() {
 	function deleteMultipleBucketsHandler() {
 		deleteMultipleBuckets({
 			bucketNames: selectedBuckets.map((row) => row.original.name),
-			storageName: storage?.name as string,
+			storageName: storage?.name,
 			onSuccess: () => {
 				bucketTable.toggleAllRowsSelected(false);
 				setBucketPage(1);
@@ -118,7 +119,7 @@ export default function Buckets() {
 	function deleteBucketHandler() {
 		setLoading(true);
 		deleteBucket({
-			storageName: storage?.name as string,
+			storageName: storage?.name,
 			bucketName: toDeleteBucket?.name as string,
 			onSuccess: () => {
 				setLoading(false);
@@ -135,7 +136,7 @@ export default function Buckets() {
 	useEffect(() => {
 		if (versionId && orgId && appId) {
 			getBuckets({
-				storageName: storage?.name as string,
+				storageName: storage?.name,
 				page: bucketPage,
 				limit: PAGE_SIZE,
 				search: searchParams.get('q') as string,
