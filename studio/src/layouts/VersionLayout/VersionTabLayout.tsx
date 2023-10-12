@@ -15,7 +15,7 @@ interface Props<T> {
 	icon?: ReactNode;
 	title: string;
 	emptyStateTitle: string;
-	createButtonTitle: string;
+	createButtonTitle?: string | null;
 	children: ReactNode;
 	selectedRowLength?: number;
 	disabled?: boolean;
@@ -24,9 +24,8 @@ interface Props<T> {
 	handlerButton?: ReactNode;
 	onSearchInputClear?: () => void;
 	onMultipleDelete?: () => void;
-	onSearch: (value: string) => void;
-	openCreateModal: () => void;
-	viewLogs?: boolean;
+	onSearch?: (value: string) => void;
+	openCreateModal?: () => void;
 }
 
 export default function VersionTabLayout<T>({
@@ -42,7 +41,6 @@ export default function VersionTabLayout<T>({
 	disabled,
 	className,
 	handlerButton,
-	viewLogs,
 	onMultipleDelete,
 	onSearch,
 	openCreateModal,
@@ -57,7 +55,7 @@ export default function VersionTabLayout<T>({
 	}
 
 	function onClearHandler() {
-		setQueryParam(undefined);
+		setQueryParam();
 		onSearchInputClear?.();
 	}
 
@@ -67,18 +65,47 @@ export default function VersionTabLayout<T>({
 		setSearchParams(searchParams);
 	}
 
+	let content;
+
+	if (isEmpty) {
+		if (searchParams.has('q')) {
+			content = (
+				<EmptyState icon={icon} className='flex-1' title={t('general.no_result')}>
+					<Button className='btn btn-primary' onClick={onClearHandler}>
+						{t('general.reset_search_query')}
+					</Button>
+				</EmptyState>
+			);
+		} else {
+			content = (
+				<EmptyState icon={icon} className='flex-1' title={emptyStateTitle}>
+					{handlerButton ?? (
+						<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
+							<Plus size={16} />
+							<span className='ml-2'>{createButtonTitle}</span>
+						</Button>
+					)}
+				</EmptyState>
+			);
+		}
+	} else {
+		content = children;
+	}
+
 	return (
-		<div className={cn('h-full flex gap-y-4 flex-col', className)}>
+		<div className={cn('h-full space-y-4', className)}>
 			{breadCrumb}
 			<div className='flex items-center justify-between'>
 				<h1 className='text-default text-2xl text-center'>{title}</h1>
 				<div className='flex items-center justify-center gap-4'>
-					<SearchInput
-						value={searchParams.get('q') ?? undefined}
-						onSearch={onSearchHandler}
-						onClear={onClearHandler}
-						className='sm:w-[450px] flex-1'
-					/>
+					{onSearch && (
+						<SearchInput
+							value={searchParams.get('q') ?? undefined}
+							onSearch={onSearchHandler}
+							onClear={onClearHandler}
+							className='sm:w-[450px] flex-1'
+						/>
+					)}
 					{selectedRowLength ? (
 						<SelectedRowButton
 							selectedRowLength={selectedRowLength}
@@ -87,12 +114,8 @@ export default function VersionTabLayout<T>({
 							disabled={disabled}
 						/>
 					) : null}
-					{viewLogs && (
-						<Button variant='secondary' to='logs'>
-							{t('queue.view_logs')}
-						</Button>
-					)}
-					{handlerButton ?? (
+					{handlerButton}
+					{!!createButtonTitle && !!openCreateModal && (
 						<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
 							<Plus size={16} />
 							<span className='ml-2'>{createButtonTitle}</span>
@@ -100,28 +123,7 @@ export default function VersionTabLayout<T>({
 					)}
 				</div>
 			</div>
-			{isEmpty ? (
-				searchParams.has('q') ? (
-					<>
-						<EmptyState icon={icon} className='flex-1' title={t('general.no_result')}>
-							<Button className='btn btn-primary' onClick={onClearHandler}>
-								{t('general.reset_search_query')}
-							</Button>
-						</EmptyState>
-					</>
-				) : (
-					<EmptyState icon={icon} className='flex-1' title={emptyStateTitle}>
-						{handlerButton ?? (
-							<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
-								<Plus size={16} />
-								<span className='ml-2'>{createButtonTitle}</span>
-							</Button>
-						)}
-					</EmptyState>
-				)
-			) : (
-				children
-			)}
+			{content}
 		</div>
 	);
 }
