@@ -1,3 +1,4 @@
+import { Button } from '@/components/Button';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
@@ -55,7 +56,7 @@ export default function MainMessageQueue() {
 	function deleteQueueHandler() {
 		setLoading(true);
 		deleteQueue({
-			queueId: toDeleteQueue?._id as string,
+			queueId: toDeleteQueue?._id,
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
@@ -124,7 +125,11 @@ export default function MainMessageQueue() {
 			onSearch={onInput}
 			onMultipleDelete={deleteMultipleQueuesHandler}
 			disabled={!canEdit}
-			viewLogs
+			handlerButton={
+				<Button variant='secondary' to='logs'>
+					{t('queue.view_logs')}
+				</Button>
+			}
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'
@@ -157,7 +162,7 @@ export default function MainMessageQueue() {
 						}}
 					/>
 				}
-				confirmCode={toDeleteQueue?.iid as string}
+				confirmCode={toDeleteQueue?.iid}
 				onConfirm={deleteQueueHandler}
 				isOpen={isDeleteModalOpen}
 				closeModal={closeDeleteModal}

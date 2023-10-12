@@ -1,3 +1,4 @@
+import { Button } from '@/components/Button';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
@@ -127,7 +128,11 @@ export default function MainEndpoint() {
 			table={table}
 			selectedRowLength={selectedRows.length}
 			disabled={!canCreate}
-			viewLogs
+			handlerButton={
+				<Button variant='secondary' to='logs'>
+					{t('queue.view_logs')}
+				</Button>
+			}
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'
