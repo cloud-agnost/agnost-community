@@ -33,6 +33,7 @@ export const PATHS = {
 		version: `${versionPath}/Version.tsx`,
 		dashboard: `${versionPath}/VersionDashboard.tsx`,
 		database: `${versionPath}/VersionDatabase.tsx`,
+		navigator: `${versionPath}/navigator/Navigator.tsx`,
 		models: `${versionPath}/models/Models.tsx`,
 		modelsOutlet: `${versionPath}/models/ModelsOutlet.tsx`,
 		fields: `${versionPath}/models/fields/Fields.tsx`,
