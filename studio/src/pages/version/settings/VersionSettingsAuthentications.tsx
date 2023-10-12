@@ -47,7 +47,12 @@ export default function VersionSettingsAuthentications() {
 							key={item.name}
 							item={item}
 							active={window.location.search.includes(item.href)}
-							onClick={() => handleTabChange(item.name, `settings/authentications/${item.href}`)}
+							onClick={() =>
+								handleTabChange(
+									t('version.settings.authentications'),
+									`settings/authentications/${item.href}`,
+								)
+							}
 						/>
 					))}
 				</nav>

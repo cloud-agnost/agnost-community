@@ -9,8 +9,8 @@ import { CaretRight } from '@phosphor-icons/react';
 import { AuthUserDropdown } from '@/features/auth/AuthUserDropdown';
 import { Notification } from '@/features/version/Notification';
 import { Link, useParams } from 'react-router-dom';
-import './header.scss';
 import Feedback from './Feedback';
+import './header.scss';
 
 export function Header() {
 	const { versionId, appId } = useParams();
@@ -52,12 +52,16 @@ export function Header() {
 				</nav>
 				<div className='header-menu-divider' />
 				<div className='header-menu-right-actions'>
-					<div className='header-menu-right-actions-versions'>
-						<DeploymentStatusCard />
-					</div>
-					<div className='header-menu-right-actions-notification'>
-						<Notification />
-					</div>
+					{versionId && (
+						<>
+							<div className='header-menu-right-actions-versions'>
+								<DeploymentStatusCard />
+							</div>
+							<div className='header-menu-right-actions-notification'>
+								<Notification />
+							</div>
+						</>
+					)}
 
 					<div className='header-menu-right-actions-user'>
 						<AuthUserDropdown />

@@ -46,6 +46,7 @@ import {
 	Redis,
 	Resource,
 	RichText,
+	SocketIo,
 	SqlServer,
 	Storage,
 	Team,
@@ -75,7 +76,6 @@ import {
 	OAuthProviderTypes,
 	SortOption,
 	Tab,
-	TabTypes,
 } from '@/types';
 import { generateId, translate } from '@/utils';
 import {
@@ -1017,4 +1017,6 @@ export const RESOURCE_ICON_MAP: Record<string, ElementType> = {
 	MinIO: MinIo,
 	Redis: Redis,
 	'API Server': Nodejs,
+	Agenda: Nodejs,
+	'Socket.io': SocketIo,
 };

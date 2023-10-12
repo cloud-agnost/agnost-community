@@ -308,8 +308,6 @@ class ResourceController extends BaseController {
 		resources = resources.map((entry) => {
 			return {
 				...entry,
-				access: helper.decryptSensitiveData(entry.access),
-				accessReadOnly: helper.decryptSensitiveData(entry.accessReadOnly),
 				action: "delete",
 			};
 		});

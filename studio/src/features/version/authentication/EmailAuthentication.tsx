@@ -4,15 +4,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { Separator } from '@/components/Separator';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { Switch } from '@/components/Switch';
+import { useToast } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
+import { translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import EmailSmtpForm from './EmailSmtpForm';
-import { useToast } from '@/hooks';
-import { useState } from 'react';
-import { translate as t } from '@/utils';
-import { SMTPSchema } from '@/types';
 export const EmailAuthenticationSchema = z.object({
 	enabled: z.boolean().default(true),
 	confirmEmail: z.boolean().default(false),
@@ -24,7 +23,25 @@ export const EmailAuthenticationSchema = z.object({
 		})
 		.int()
 		.positive(),
-	customSMTP: SMTPSchema,
+	customSMTP: z.object({
+		host: z
+			.string({ required_error: 'Host is required' })
+			.trim()
+			.refine((value) => value.trim().length > 0, 'Host is required'),
+		port: z.coerce
+			.number({
+				required_error: 'Port is required',
+			})
+			.int()
+			.positive()
+			.min(100, 'Port must be at least 3 characters long'),
+		user: z
+			.string({ required_error: 'Username is required' })
+			.trim()
+			.refine((value) => value.trim().length > 0, 'Username is required'),
+		password: z.string({ required_error: 'Password is required' }),
+		useTLS: z.boolean(),
+	}),
 });
 
 export default function EmailAuthentication() {
@@ -60,6 +77,7 @@ export default function EmailAuthentication() {
 			},
 		});
 	}
+	console.log(form.formState.errors);
 	return (
 		<SettingsFormItem
 			className='py-0'

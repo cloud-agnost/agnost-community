@@ -2,7 +2,7 @@ import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
-import { BADGE_COLOR_MAP } from '@/constants';
+import { BADGE_COLOR_MAP, RESOURCE_ICON_MAP } from '@/constants';
 import useResourceStore from '@/store/resources/resourceStore';
 import { Resource } from '@/types';
 import { translate } from '@/utils';
@@ -23,6 +23,16 @@ export const ResourceTableColumn: ColumnDef<Resource>[] = [
 		},
 		accessorKey: 'instance',
 		size: 200,
+		cell: ({ row }) => {
+			const { instance } = row.original;
+			const Icon = RESOURCE_ICON_MAP[instance];
+			return (
+				<div className='flex gap-1 items-center'>
+					{Icon && <Icon className='w-6 h-6' />}
+					<span>{instance}</span>
+				</div>
+			);
+		},
 	},
 	{
 		id: 'status',
@@ -78,7 +88,8 @@ export const ResourceTableColumn: ColumnDef<Resource>[] = [
 						useResourceStore.setState({
 							deletedResource: row.original,
 							isDeletedResourceModalOpen: true,
-						})}
+						})
+					}
 					canEditKey='resource.update'
 					canDeleteKey='resource.delete'
 					type='org'

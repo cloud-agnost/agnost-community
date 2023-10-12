@@ -249,8 +249,8 @@
 					M = r(i(9660)),
 					O = r(i(3481)),
 					x = r(i(789)),
-					P = r(i(6587)),
-					B = r(i(7267)),
+					B = r(i(6587)),
+					P = r(i(7267)),
 					C = r(i(6835)),
 					j = r(i(5191)),
 					F = r(i(2115)),
@@ -326,8 +326,8 @@
 					$multiply: M.default,
 					$neq: O.default,
 					$nin: x.default,
-					$not: P.default,
-					$or: B.default,
+					$not: B.default,
+					$or: P.default,
 					$right: C.default,
 					$round: j.default,
 					$rtrim: F.default,
@@ -3375,6 +3375,9 @@
 							return yield this.cacheBase.listKeys(e, t, i);
 						});
 					}
+					getClient() {
+						return this.cacheBase.getClient();
+					}
 				};
 			},
 			9: function (e, t, i) {
@@ -3576,6 +3579,9 @@
 								);
 							return yield this.getAdapterObj(i).listKeys(this.meta, e, t);
 						});
+					}
+					getClient() {
+						return this.getAdapterObj(!1).getDriver();
 					}
 				}
 				t.CacheBase = u;
@@ -5272,7 +5278,7 @@
 									"invalid_value",
 									"Update type '$set' can have a primitive data value such as number, string, boolean but not an object."
 								);
-							if (null === t && e.field.isRequired())
+							if (null == t && e.field.isRequired())
 								throw new f.ClientError(
 									"invalid_value",
 									`Field '${e.fieldPath}' is a a required field. Null value cannot be assigned to a required field.`
