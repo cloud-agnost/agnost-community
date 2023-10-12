@@ -79,11 +79,13 @@ export default function VersionTabLayout<T>({
 		} else {
 			content = (
 				<EmptyState icon={icon} className='flex-1' title={emptyStateTitle}>
-					{handlerButton ?? (
+					{!!createButtonTitle && !!openCreateModal ? (
 						<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
 							<Plus size={16} />
 							<span className='ml-2'>{createButtonTitle}</span>
 						</Button>
+					) : (
+						handlerButton
 					)}
 				</EmptyState>
 			);
@@ -93,7 +95,7 @@ export default function VersionTabLayout<T>({
 	}
 
 	return (
-		<div className={cn('h-full space-y-4', className)}>
+		<div className={cn('h-full space-y-4 flex flex-col', className)}>
 			{breadCrumb}
 			<div className='flex items-center justify-between'>
 				<h1 className='text-default text-2xl text-center'>{title}</h1>
