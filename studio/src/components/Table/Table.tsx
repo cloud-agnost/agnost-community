@@ -70,7 +70,7 @@ const TableHead = React.forwardRef<
 	HTMLTableCellElement,
 	React.ThHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
-	<th ref={ref} className={cn('table-head', className)} {...props} />
+	<th ref={ref} className={cn('table-head ', className)} {...props} />
 ));
 TableHead.displayName = 'TableHead';
 
