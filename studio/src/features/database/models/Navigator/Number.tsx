@@ -1,13 +1,12 @@
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { NUMBER_REGEX } from '@/constants';
 import { useUpdateData } from '@/hooks';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { NavigatorComponentProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-export default function Number({ isEditable, row, field }: NavigatorComponentProps) {
+export default function NumberField({ isEditable, row, field }: NavigatorComponentProps) {
 	const { setEditedField } = useNavigatorStore();
 	const updateData = useUpdateData(field);
 	const data = row?.original;
