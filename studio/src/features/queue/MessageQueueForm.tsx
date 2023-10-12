@@ -37,6 +37,7 @@ export default function MessageQueueForm({ edit }: { edit?: boolean }) {
 		const Icon = QUEUE_ICON_MAP[type];
 		return <Icon className='w-6 h-6' />;
 	}
+
 	return (
 		<div className='space-y-6'>
 			<FormField

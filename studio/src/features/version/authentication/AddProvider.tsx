@@ -147,7 +147,6 @@ export default function AddProvider({ open, onClose, provider, editedProvider }:
 	}
 
 	function handleCloseModel() {
-		console.log(provider, '4');
 		form.reset({
 			provider: '' as OAuthProviderTypes,
 			config: {
@@ -165,14 +164,12 @@ export default function AddProvider({ open, onClose, provider, editedProvider }:
 
 	useEffect(() => {
 		if (open && provider) {
-			console.log(provider, '2');
 			form.setValue('provider', provider.provider);
 		}
 	}, [provider]);
 
 	useEffect(() => {
 		if (editedProvider) {
-			console.log(provider, '3');
 			form.reset(editedProvider);
 		}
 	}, [editedProvider]);
