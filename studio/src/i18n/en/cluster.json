@@ -1,0 +1,18 @@
+{
+	"running_replicas": "Running Replicas",
+	"k8sType": "K8s Type",
+	"editClusterComponent": "Edit Cluster Component",
+	"hpaName": "HPA Name",
+	"replicas": "Replica Count",
+	"replicasDescription": "Specifies the desired number of identical replicas of a pod that should be created and maintained by the Kubernetes deployment controller. Each replica represents a single instance of the application.",
+	"minReplicas": "Min Replicas",
+	"minReplicasDescription": "Specifies the minimum number of replicas that should be maintained by the Kubernetes deployment controller.",
+	"maxReplicas": "Max Replicas",
+	"maxReplicasDescription": "Specifies the maximum number of replicas that should be maintained by the Kubernetes deployment controller.",
+	"smtpDescription": "In order to send invitation emails or be notified about your cluster status through email, you need to provide SMTP (email) server connection parameters",
+	"yourClusterId": "Your Cluster ID",
+	"yourClusterIdDescription": "This is your Agnost Enterprise Cluster id.",
+	"clusterVersion": "Cluster Version",
+	"transferClusterOwnership": "Transfer Cluster Ownership",
+	"transferClusterOwnershipDescription": "Select the organization member that you would like to transfer the ownership of the cluster."
+}

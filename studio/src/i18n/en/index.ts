@@ -14,6 +14,7 @@ import storage from './storage.json';
 import task from './task.json';
 import version from './version.json';
 import func from './function.json';
+import cluster from './cluster.json';
 
 export {
 	application,
@@ -32,4 +33,5 @@ export {
 	task,
 	version,
 	func,
+	cluster,
 };

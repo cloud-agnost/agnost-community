@@ -27,6 +27,7 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		'org.app.version.limits': Version,
 		'org.app.version.version': Version,
 		version: Version,
+		// TODO: "org.resource.log"
 	};
 	return new keys[type]();
 }

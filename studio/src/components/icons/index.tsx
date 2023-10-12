@@ -57,6 +57,7 @@ export { default as Pencil } from './Pencil';
 export { default as PostgreSql } from './PostgreSql';
 export { default as RabbitMq } from './RabbitMq';
 export { default as RateLimit } from './RateLimit';
+export { default as React } from './React';
 export { default as RealTime } from './RealTime';
 export { default as Redis } from './Redis';
 export { default as Refresh } from './Refresh';

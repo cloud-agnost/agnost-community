@@ -3,6 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import {
 	application,
 	cache,
+	cluster,
 	database,
 	endpoint,
 	forms,
@@ -38,6 +39,7 @@ export const resources = {
 			storage,
 			cache,
 			function: func,
+			cluster,
 		},
 	},
 };

@@ -3,7 +3,7 @@ import { Button } from '@/components/Button';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { APIError, FormatOptionLabelProps, GroupedOption, OrganizationMember } from '@/types';
+import { APIError, FormatOptionLabelProps } from '@/types';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Select from 'react-select';

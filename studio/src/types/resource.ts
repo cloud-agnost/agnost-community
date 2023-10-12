@@ -17,6 +17,11 @@ export interface Resource {
 	allowedRoles: string[];
 	config: {
 		replicas: number;
+		initialScale: number;
+		minScale: number;
+		maxScale: number;
+		scaleDownDelay: string;
+		scaleToZeroPodRetentionPeriod: string;
 		hpa: {
 			avgCPU: number;
 			avgMemory: number;
@@ -60,7 +65,6 @@ export interface ResLog {
 	__v: number;
 }
 export interface GetResourcesRequest {
-	appId: string;
 	type?: string;
 	instance?: string;
 	sortBy?: string;

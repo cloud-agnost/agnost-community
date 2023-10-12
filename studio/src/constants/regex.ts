@@ -6,3 +6,6 @@ export const NOT_START_WITH_NUMBER_REGEX = /^[A-Za-z_][A-Za-z0-9_]*$/;
 export const ROUTE_NAME_REGEX = /^\/[a-zA-Z0-9_-]+(?:\/:[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)*)*$/;
 export const PARAM_REGEX = /:([^/?]+)/g;
 export const PARAM_NAME_REGEX = /^[a-zA-Z0-9_-]+$/;
+export const API_SERVER_PARAM_REGEX = /^\d+m\d{2}s$/;
+export const CPU_REGEX = /^([1-9]\d*)m$/;
+export const MEMORY_REGEX = /^([1-9]\d*(Mi|Gi))$/;
