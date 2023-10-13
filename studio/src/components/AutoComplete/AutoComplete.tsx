@@ -15,7 +15,6 @@ export default function AutoComplete<T>({
 	loadOptions,
 	isMulti,
 	placeholder,
-
 	...props
 }: Props<T>) {
 	return (
@@ -23,7 +22,7 @@ export default function AutoComplete<T>({
 			cacheOptions
 			defaultOptions
 			loadOptions={loadOptions}
-			onChange={({ value }: { value: T }) => onChange(value)}
+			onChange={(val) => onChange(val)}
 			className='select-container'
 			classNamePrefix='select'
 			placeholder={placeholder || 'Search...'}

@@ -2,7 +2,6 @@ import { CopyInput } from '@/components/CopyInput';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/Tabs';
 import { UserSettingsLayout } from '@/layouts/UserSettingsLayout';
-import useClusterStore from '@/store/cluster/clusterStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { useTranslation } from 'react-i18next';
 import ClusterResources from './ClusterComponents';
@@ -12,7 +11,6 @@ import TransferClusterOwnership from './TransferClusterOwnership';
 export default function ProfileSettingsClusterManagement() {
 	const { t } = useTranslation();
 	const TabItems = ['General', 'Cluster Resources', 'SMTP'];
-	const cluster = useClusterStore();
 	const { organization } = useOrganizationStore();
 	return (
 		<UserSettingsLayout title={t('profileSettings.clusters_title')}>
