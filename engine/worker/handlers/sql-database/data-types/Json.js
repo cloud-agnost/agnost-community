@@ -3,7 +3,7 @@ import { DATABASE } from "../../../config/constants.js";
 
 export default class Json extends Field {
     createMap = {
-        [DATABASE.PostgreSQL]: '"{NAME}" {TYPE} {REQUIRED}',
+        [DATABASE.PostgreSQL]: "{NAME} {TYPE} {REQUIRED}",
         [DATABASE.MySQL]: "`{NAME}` {TYPE} {REQUIRED}",
         [DATABASE.SQLServer]: "{NAME} {TYPE}({MAX_LENGTH}) {REQUIRED}",
     };
