@@ -1,5 +1,5 @@
 import { VersionParams } from '@/types/version.ts';
-import { BaseGetRequest, Log } from '.';
+import { BaseGetRequest, BaseParams, BaseRequest, Log } from '.';
 
 export type EnvironmentStatus =
 	| 'OK'
@@ -95,5 +95,19 @@ export type GetEnvironmentLogsParams = VersionParams & {
 	status?: string;
 } & BaseGetRequest;
 
-export type getAppVersionEnvironmentParams = Omit<VersionParams, 'envId'>;
+export type getAppVersionEnvironmentParams = BaseParams;
 export type GetEnvironmentResourcesParams = VersionParams;
+export interface UpdateAPIServerConfParams extends VersionParams, BaseRequest {
+	minScale: number;
+	maxScale: number;
+	scaleDownDelay: string;
+	scaleToZeroPodRetentionPeriod: string;
+	cpu: {
+		request: string;
+		limit: string;
+	};
+	memory: {
+		request: string;
+		limit: string;
+	};
+}

@@ -1,4 +1,5 @@
 import { GetDatabasesOfAppParams } from '@/types/database.ts';
+import { BaseRequest } from '.';
 
 export interface Model {
 	orgId: string;
@@ -82,9 +83,10 @@ export interface Field {
 export type GetModelsOfDatabaseParams = Omit<GetDatabasesOfAppParams, 'modelId'> & {
 	dbId: string;
 };
-export type GetSpecificModelByIidOfDatabase = GetModelsOfDatabaseParams & {
-	modelIid: string;
-};
+export type GetSpecificModelByIidOfDatabase = GetModelsOfDatabaseParams &
+	BaseRequest & {
+		modelIid: string;
+	};
 export type GetSpecificModelOfDatabase = GetModelsOfDatabaseParams & {
 	modelId: string;
 };
@@ -177,7 +179,7 @@ export type EnableTimestampsParams = GetSpecificModelOfDatabase & {
 	createdAt: string;
 	updatedAt: string;
 };
-export type DisableTimestampsParams = GetSpecificModelOfDatabase & {};
+export type DisableTimestampsParams = GetSpecificModelOfDatabase & object;
 
 export type BasicValueListType =
 	| 'text'

@@ -7,6 +7,7 @@ import useVersionStore from '@/store/version/versionStore.ts';
 import { useTranslation } from 'react-i18next';
 import NPMPackagesColumns from '@/features/version/SettingsNPMPackages/NPMPackagesColumns.tsx';
 import { EmptyState } from 'components/EmptyState';
+import { NpmPackage } from '@/components/icons';
 
 interface SettingsNPMPackagesProps {
 	selectedRows: Row<NPMPackage>[] | undefined;
@@ -24,7 +25,10 @@ export default function SettingsNPMPackages({
 	if (npmPackages.length === 0) {
 		return (
 			<div className='h-full flex items-center justify-center'>
-				<EmptyState title={t('version.npm.no_package_found')} />
+				<EmptyState
+					icon={<NpmPackage className='w-44 h-44' />}
+					title={t('version.npm.no_package_found')}
+				/>
 			</div>
 		);
 	}

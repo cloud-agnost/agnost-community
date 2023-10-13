@@ -63,7 +63,7 @@ export default function ApplicationCreateModal({
 	return (
 		<Dialog open={isOpen} {...props} onOpenChange={closeModal}>
 			<DialogContent>
-				<DialogTitle>{t('organization.create-new')}</DialogTitle>
+				<DialogTitle>{t('application.create')}</DialogTitle>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='organization-form'>
 						<FormField

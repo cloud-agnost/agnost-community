@@ -1,5 +1,3 @@
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
 import { DatabaseService } from '@/services';
 import {
 	APIError,
@@ -11,11 +9,13 @@ import {
 	UpdateDatabaseNameParams,
 } from '@/types';
 import { notify } from '@/utils';
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
 
 interface DatabaseStore {
 	databases: Database[];
 	databasesForSearch: Database[];
-	database: Database | null;
+	database: Database;
 	toEditDatabase: Database | null;
 	toDeleteDatabase: Database | null;
 	isOpenDeleteDatabaseDialog: boolean;
@@ -34,6 +34,7 @@ interface DatabaseStore {
 	updateDatabaseName: (params: UpdateDatabaseNameParams) => Promise<Database>;
 	deleteDatabase: (params: DeleteDatabaseParams) => Promise<void>;
 	searchDatabases: (search: string) => void;
+	setDatabase: (database: Database) => void;
 }
 
 const useDatabaseStore = create<DatabaseStore>()(
@@ -42,7 +43,7 @@ const useDatabaseStore = create<DatabaseStore>()(
 			(set) => ({
 				databases: [],
 				databasesForSearch: [],
-				database: null,
+				database: {} as Database,
 				editDatabaseDialogOpen: false,
 				apps: [],
 				isOpenDeleteDatabaseDialog: false,
@@ -128,6 +129,7 @@ const useDatabaseStore = create<DatabaseStore>()(
 						}));
 					}
 				},
+				setDatabase: (database: Database) => set({ database }),
 			}),
 			{
 				name: 'database-storage',

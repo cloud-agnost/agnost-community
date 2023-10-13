@@ -618,7 +618,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			return `${this.getEnvId()}_${database.iid}`
 				.replaceAll("-", "_")
 				.toLowerCase();
-		else return database.name;
+		else return database.name.toLowerCase();
 	}
 
 	/**

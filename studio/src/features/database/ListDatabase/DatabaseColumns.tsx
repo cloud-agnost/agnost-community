@@ -19,12 +19,16 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
-		cell: ({
-			row: {
-				original: { _id, name },
-			},
-		}) => {
-			return <TabLink name={name} path={`${_id}/models`} type='Database' />;
+		cell: ({ row: { original } }) => {
+			const { setDatabase } = useDatabaseStore.getState();
+			return (
+				<TabLink
+					name={original.name}
+					path={`${original._id}/models`}
+					type='Database'
+					onClick={() => setDatabase(original)}
+				/>
+			);
 		},
 	},
 	{

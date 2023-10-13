@@ -143,8 +143,8 @@ interface VersionStore {
 }
 
 const useVersionStore = create<VersionStore>()(
-	persist(
-		devtools(
+	devtools(
+		persist(
 			(set, get) => ({
 				notificationLastFetchedCount: 0,
 				loading: false,
@@ -865,10 +865,6 @@ const useVersionStore = create<VersionStore>()(
 				name: 'version-storage',
 			},
 		),
-		{
-			name: 'version-storage',
-			getStorage: () => localStorage,
-		},
 	),
 );
 

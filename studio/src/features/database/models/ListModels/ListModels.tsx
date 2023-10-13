@@ -14,7 +14,8 @@ import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { useParams } from 'react-router-dom';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
-
+import { Button } from '@/components/Button';
+import { useTabNavigate } from '@/hooks';
 export default function ListModels() {
 	const { models } = useModelStore();
 	const [selectedRows, setSelectedRows] = useState<Row<Model>[]>();
@@ -26,7 +27,7 @@ export default function ListModels() {
 	const deleteMultipleModel = useModelStore((state) => state.deleteMultipleModel);
 	const { dbId } = useParams();
 	const { databases } = useDatabaseStore();
-
+	const navigate = useTabNavigate();
 	const filteredModels = useMemo(() => {
 		if (!search) return models;
 
@@ -65,7 +66,6 @@ export default function ListModels() {
 			name: database?.name,
 		},
 	];
-
 	return (
 		<>
 			<VersionTabLayout<Model>
@@ -82,6 +82,22 @@ export default function ListModels() {
 				onSearch={(value) => setSearch(value)}
 				disabled={!canCreateModel}
 				onMultipleDelete={deleteAll}
+				handlerButton={
+					<Button
+						variant='secondary'
+						onClick={() => {
+							navigate({
+								title: 'Navigator',
+								path: `${databasesUrl}/${database._id}/navigator`,
+								isActive: true,
+								isDashboard: false,
+								type: 'Database',
+							});
+						}}
+					>
+						View Data
+					</Button>
+				}
 			>
 				<DataTable<Model>
 					columns={ModelColumns}

@@ -3,7 +3,7 @@ import { DATABASE } from "../../../config/constants.js";
 
 export default class Text extends Field {
     createMap = {
-        [DATABASE.PostgreSQL]: '"{name}" {type}({maxLength}) {required} {DEFAULT_VALUE}',
+        [DATABASE.PostgreSQL]: "{name} {type}({maxLength}) {required} {DEFAULT_VALUE}",
         [DATABASE.MySQL]: "`{name}` {type}({maxLength}) {required} {DEFAULT_VALUE}",
         [DATABASE.SQLServer]: "{name} {type}({maxLength}) {required} {DEFAULT_VALUE}",
     };

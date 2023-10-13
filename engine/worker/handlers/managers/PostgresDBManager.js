@@ -84,7 +84,7 @@ export class PostgresDBManager extends SQLBaseManager {
      * @return {Promise<Object|[]> | string}
      */
     async renameField(modelName, fieldOldName, fieldNewName, returnQuery = false) {
-        const SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} RENAME COLUMN "${fieldOldName}" TO "${fieldNewName}";`;
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} RENAME COLUMN ${fieldOldName} TO ${fieldNewName};`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
@@ -207,7 +207,7 @@ $$;`;
             .replace("{CONSTRAINT_NAME}", constraintName)
             .replace("{SCHEMA_NAME}", this.getSchemaName());
 
-        const query = `ALTER TABLE ${tableName} ADD CONSTRAINT ${constraintName} UNIQUE("${columnName}");`;
+        const query = `ALTER TABLE ${tableName} ADD CONSTRAINT ${constraintName} UNIQUE(${columnName});`;
         const SQL = this.ifWrapper(`NOT EXISTS(${condition})`, query);
 
         if (returnQuery) return SQL;
@@ -256,7 +256,7 @@ $$;`;
         const indexName = `${tableName}_index_${column.name}`.toLowerCase();
         const SQL = `CREATE INDEX IF NOT EXISTS ${indexName} ON ${this.getSchemaName()}.${tableName} USING ${
             isGeoPoint ? "GIST" : "BTREE"
-        }("${column.name}");`;
+        }(${column.name});`;
 
         if (returnQuery) return SQL;
 
@@ -272,7 +272,7 @@ $$;`;
      */
     addFullTextIndex(tableName, columnName, returnQuery = false) {
         const indexName = `${tableName}_fulltext_${columnName}`.toLowerCase();
-        const SQL = `CREATE INDEX IF NOT EXISTS ${indexName} ON ${this.getSchemaName()}.${tableName} USING GIN(to_tsvector('english', "${columnName}"));`;
+        const SQL = `CREATE INDEX IF NOT EXISTS ${indexName} ON ${this.getSchemaName()}.${tableName} USING GIN(to_tsvector('english', ${columnName}));`;
 
         if (returnQuery) return SQL;
 
@@ -397,7 +397,7 @@ END $$;`;
      * @return {Promise<Object|[]> | string}
      */
     async dropField(modelName, field, returnQuery = false) {
-        const schema = 'ALTER TABLE {SCHEMA_NAME}.{TABLE_NAME} DROP COLUMN IF EXISTS "{COLUMN_NAME}";';
+        const schema = "ALTER TABLE {SCHEMA_NAME}.{TABLE_NAME} DROP COLUMN IF EXISTS {COLUMN_NAME};";
 
         const SQL = schema
             .replace("{TABLE_NAME}", modelName)
@@ -422,7 +422,7 @@ END $$;`;
          */
         const refField = new FieldType(field, this.getDbType());
 
-        const SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} ALTER COLUMN "${field.name}" ${
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} ALTER COLUMN ${field.name} ${
             refField.isRequired() ? "SET NOT NULL" : "DROP NOT NULL"
         };`;
 
@@ -435,16 +435,16 @@ END $$;`;
         const isNumber = isString && !isNaN(Number(field.defaultValue));
         const defaultValue = isString && !isNumber ? `'${field.defaultValue}'` : field.defaultValue;
 
-        const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} ALTER COLUMN "${
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} ALTER COLUMN ${
             field.name
-        }" SET DEFAULT ${defaultValue};`;
+        } SET DEFAULT ${defaultValue};`;
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
     removeDefaultValues(model, field, returnQuery = false) {
-        const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} ALTER COLUMN "${field.name}" DROP DEFAULT;`;
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} ALTER COLUMN ${field.name} DROP DEFAULT;`;
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);

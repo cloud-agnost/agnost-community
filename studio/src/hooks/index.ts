@@ -5,3 +5,5 @@ export { default as useTabNavigate } from './useTabNavigate.tsx';
 export { default as useDebounceFn } from './useDebounceFn.tsx';
 export { default as useToast } from './useToast.tsx';
 export { default as useUpdateEffect } from './useUpdateEffect.tsx';
+export { default as useNavigatorColumns } from './useNavigatorColumns.tsx';
+export { default as useUpdateData } from './useUpdateData.tsx';

@@ -201,7 +201,6 @@ export default function EndpointForm() {
 					name='rateLimits'
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>{t('general.name')}</FormLabel>
 							<FormControl>
 								<SortableRateLimits
 									selectedLimits={field.value as string[]}
@@ -233,7 +232,6 @@ export default function EndpointForm() {
 					name='middlewares'
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>{t('general.name')}</FormLabel>
 							<FormControl>
 								<EndpointMiddlewares field={field} />
 							</FormControl>

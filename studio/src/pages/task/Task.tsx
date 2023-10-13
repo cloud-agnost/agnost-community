@@ -81,7 +81,7 @@ export default function MainTask() {
 	function deleteTaskHandler() {
 		setLoading(true);
 		deleteTask({
-			taskId: toDeleteTask?._id as string,
+			taskId: toDeleteTask?._id,
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
@@ -126,7 +126,6 @@ export default function MainTask() {
 			table={table}
 			selectedRowLength={selectedRows.length}
 			disabled={!canEdit}
-			viewLogs
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'
@@ -157,7 +156,7 @@ export default function MainTask() {
 						}}
 					/>
 				}
-				confirmCode={toDeleteTask?.iid as string}
+				confirmCode={toDeleteTask?.iid}
 				onConfirm={deleteTaskHandler}
 				isOpen={isDeleteTaskModalOpen}
 				closeModal={closeDeleteTaskModal}

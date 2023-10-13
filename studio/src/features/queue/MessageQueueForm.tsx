@@ -17,18 +17,14 @@ import { CreateMessageQueueSchema } from '@/types';
 import { translate as t } from '@/utils';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 
 export default function MessageQueueForm({ edit }: { edit?: boolean }) {
 	const form = useFormContext<z.infer<typeof CreateMessageQueueSchema>>();
 	const { getResources, resources } = useResourceStore();
-	const { appId } = useParams<{
-		appId: string;
-	}>();
+
 	useEffect(() => {
 		getResources({
-			appId: appId as string,
 			type: 'queue',
 		});
 	}, []);
@@ -37,6 +33,7 @@ export default function MessageQueueForm({ edit }: { edit?: boolean }) {
 		const Icon = QUEUE_ICON_MAP[type];
 		return <Icon className='w-6 h-6' />;
 	}
+
 	return (
 		<div className='space-y-6'>
 			<FormField

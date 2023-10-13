@@ -7,6 +7,8 @@
 	"name": "Version name",
 	"only_version": "Version",
 	"status": "Status",
+	"apiServer": "API Server",
+	"apiServer_desc": "This is your version's API server which runs the endpoint, queue and task handlers.",
 	"resources": "Resources",
 	"last_deployment": "Last Deployment",
 	"databases": "Databases",
@@ -329,5 +331,16 @@
 	"notifications": "Notifications",
 	"view_all_notifications": "View All Notifications",
 	"mark_all_as_read": "Mark All as Read",
-	"function": "Function"
+	"function": "Function",
+	"update_engine_desc": "Agnost Enterprise clusters, creates a deployment for each app engine of the version which manages a set of replicas of a specific pod template. The replica count specifies the number of replicas (identical copies) of the specified pod template that should be running at any given time.",
+	"replicas": "Replicas",
+	"maxReplicas": "Max Replicas",
+	"requestAndLimits": "Request & Limits",
+	"cpuRequest": "CPU Request",
+	"cpuLimit": "CPU Limit",
+	"memoryRequest": "Memory Request",
+	"memoryLimit": "Memory Limit",
+	"scaleDownDelay": "Scale Down Delay",
+	"scaleToZeroPodRetentionPeriod": "Scale To Zero Pod Retention Period",
+	"request_Desc": "Limits and requests for CPU resources are measured in cpu units. In Kubernetes, 1 CPU unit is equivalent to 1 physical CPU core, or 1 virtual core, depending on whether the node is a physical host or a virtual machine running inside a physical machine. Fractional requests are allowed. For CPU resource units, the quantity expression 0.1 is equivalent to the expression 100m, which can be read as 'one hundred millicpu'"
 }

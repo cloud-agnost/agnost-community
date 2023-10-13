@@ -4,6 +4,7 @@ import { useToast as toast } from '@/hooks';
 import { t } from '@/i18n/config.ts';
 import useApplicationStore from '@/store/app/applicationStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
+import useTypeStore from '@/store/types/typeStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { AppRoles, OrgRoles, RealtimeData, ToastType } from '@/types';
@@ -12,6 +13,7 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the 
 import * as prettier from 'prettier';
 import jsParser from 'prettier/plugins/babel';
 import esTreePlugin from 'prettier/plugins/estree';
+import { HTMLInputTypeAttribute } from 'react';
 import { twMerge } from 'tailwind-merge';
 type EmptyableArray = readonly [] | [];
 type EmptyableString = '' | string;
@@ -313,4 +315,51 @@ export function handleTabChange(name: string, url: string) {
 		path: hasAnotherParams ? `${url}&tabId=${tab.id}` : `${url}?tabId=${tab.id}`,
 		title: name,
 	});
+}
+
+export function getInputType(fieldType: string): HTMLInputTypeAttribute {
+	const { fieldTypes } = useTypeStore.getState();
+	const typeGroup = fieldTypes.find((type) => type.name === fieldType)?.group;
+	return typeGroup === 'numeric' ? 'number' : 'text';
+}
+
+export function updateObject(object: Record<any, any>, path: string, updater: (value: any) => any) {
+	const pathArray = Array.isArray(path) ? path : path.split('.');
+	const lastKey = pathArray.pop();
+
+	let currentObject = object;
+	for (const key of pathArray) {
+		if (key in currentObject) {
+			currentObject = currentObject[key];
+		} else {
+			return object;
+		}
+	}
+
+	if (updater instanceof Function) {
+		currentObject[lastKey] = updater(currentObject[lastKey]);
+	} else {
+		currentObject[lastKey] = updater;
+	}
+
+	return object;
+}
+export function getNestedPropertyValue<T>(
+	object: T,
+	path: string | string[],
+	defaultValue: any,
+): any {
+	const pathArray = Array.isArray(path) ? path : path.split('.');
+
+	let result: any = object;
+
+	for (const key of pathArray) {
+		if (result && key in result) {
+			result = result[key];
+		} else {
+			return defaultValue;
+		}
+	}
+
+	return result;
 }

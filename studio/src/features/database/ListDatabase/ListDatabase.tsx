@@ -39,9 +39,9 @@ export default function ListDatabase() {
 
 	const databasesForSearch = useMemo(() => {
 		if (!search) return databases;
-		return databases.filter((database) =>
-			database.name.toLowerCase().includes(search.toLowerCase()),
-		);
+		return databases
+			.filter((database) => database.name.toLowerCase().includes(search.toLowerCase()))
+			.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
 	}, [search, databases]);
 
 	async function deleteHandler() {
@@ -59,14 +59,12 @@ export default function ListDatabase() {
 		setSearch(value.trim());
 	}
 
-	const data = databasesForSearch.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
-
 	return (
 		<>
 			<VersionTabLayout<Database>
 				onSearchInputClear={() => onSearch('')}
 				className='p-0'
-				isEmpty={data.length === 0}
+				isEmpty={databasesForSearch.length === 0}
 				title={t('database.page_title')}
 				icon={<DatabaseIcon className='w-44 h-44' />}
 				openCreateModal={() => setCreateDrawerIsOpen(true)}
@@ -80,7 +78,7 @@ export default function ListDatabase() {
 				<DataTable<Database>
 					columns={DatabaseColumns}
 					setTable={setTable}
-					data={databasesForSearch.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1))}
+					data={databasesForSearch}
 					noDataMessage={<p className='text-xl'>{t('database.empty_text')}</p>}
 					setSelectedRows={setSelectedRows}
 				/>

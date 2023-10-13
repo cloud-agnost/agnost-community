@@ -10,11 +10,10 @@ export default class ResourceService {
 	}
 
 	static async getResources(req: GetResourcesRequest): Promise<Resource[]> {
-		const { appId, instance, search, type, sortBy, sortDir } = req;
+		const { instance, search, type, sortBy, sortDir } = req;
 		return (
 			await axios.get(`${this.getUrl()}`, {
 				params: {
-					appId,
 					instance,
 					search,
 					type,

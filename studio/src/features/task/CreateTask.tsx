@@ -35,7 +35,6 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 
 	useEffect(() => {
 		getResources({
-			appId: appId as string,
 			type: 'scheduler',
 		});
 	}, []);

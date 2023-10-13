@@ -260,10 +260,7 @@ export interface DesignElement {
 	};
 }
 
-export interface VersionParams {
-	orgId: string;
-	appId: string;
-	versionId: string;
+export interface VersionParams extends BaseParams {
 	envId: string;
 }
 

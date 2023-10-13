@@ -3,7 +3,6 @@ import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { SearchInput } from '@/components/SearchInput';
 import { CreateResource, ResourceTable } from '@/features/resources';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
-import useApplicationStore from '@/store/app/applicationStore';
 import useResourcesStore from '@/store/resources/resourceStore';
 import { Plus } from '@phosphor-icons/react';
 import { useEffect } from 'react';
@@ -12,7 +11,6 @@ import { useSearchParams } from 'react-router-dom';
 
 export default function OrgResources() {
 	const { t } = useTranslation();
-	const { application } = useApplicationStore();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const canCreateResource = useAuthorizeOrg('resource.create');
 	const {
@@ -37,7 +35,6 @@ export default function OrgResources() {
 
 	useEffect(() => {
 		getResources({
-			appId: application?._id as string,
 			search: searchParams.get('q') as string,
 		});
 	}, [searchParams.get('q')]);

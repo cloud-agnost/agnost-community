@@ -57,7 +57,6 @@ export default function EditCache({ open, onClose }: CreateCacheProps) {
 			assignUniqueName: cache.assignUniqueName,
 		});
 	}, [cache]);
-	console.log(form.formState.errors);
 	return (
 		<Drawer open={open} onOpenChange={resetAndClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>

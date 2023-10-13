@@ -19,14 +19,10 @@ export default function Logs({ logs, className }: LogsProps) {
 		>
 			{logs?.length ? (
 				logs?.map((log, index) => (
-					<div key={index} className='flex items-center gap-6  px-4 py-2'>
-						<p className='self-start'>{log.timestamp}</p>
+					<div key={index} className='grid grid-cols-[1fr,0.5fr,3fr] gap-6  px-4 py-2'>
+						<p>{log.timestamp}</p>
 						{log.type && (
-							<Badge
-								variant={BADGE_COLOR_MAP[log.type.toUpperCase()]}
-								text={log.type}
-								className='self-start'
-							/>
+							<Badge variant={BADGE_COLOR_MAP[log.type.toUpperCase()]} text={log.type} />
 						)}
 						<pre className='whitespace-pre-wrap'>{log.message}</pre>
 					</div>

@@ -278,7 +278,7 @@ router.post(
 /*
 @route      /v1/org/:orgId/resource?page=0&size=50&type=engine&instance=Agnost K8s Cluster&search=&sortBy=name&sortDir=asc&appId
 @method     GET
-@desc       Get organization/app resources (only resources that are marked as deleteable are returned)
+@desc       Get organization/app resources
 @access     private
 */
 router.get(
@@ -291,21 +291,9 @@ router.get(
 	async (req, res) => {
 		try {
 			const { org } = req;
-			const { search, type, instance, sortBy, sortDir, appId, status } =
-				req.query;
+			const { search, type, instance, sortBy, sortDir, status } = req.query;
 
-			let query = { orgId: org._id /* deletable: true */ };
-
-			/* 			// App filter and app member filter
-			if (appId) {
-				query.$or = [
-					{ $and: [{ appId: appId }, { allowedRoles: req.appMember.role }] },
-					{ createdBy: req.user._id },
-				];
-			} else {
-				// If we are looking for organization level resources then appId should not be assigned. When appId assigned, the resouce can only be used within that app only.
-				query.appId = { $exists: false };
-			} */
+			let query = { orgId: org._id };
 
 			// Search resource
 			if (search && search !== "null")

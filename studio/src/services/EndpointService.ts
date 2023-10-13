@@ -140,10 +140,20 @@ export default class EndpointService {
 				...params.queryParams,
 			},
 		};
+		let opt: any;
+		if (method === 'get') {
+			opt = options;
+		} else if (method === 'delete') {
+			opt = {
+				data: body,
+			};
+		} else {
+			opt = body;
+		}
 
 		return await test[method](
 			`http://localhost/${useEnvironmentStore.getState().environment?.iid}/api${path}`,
-			...(method === 'get' ? [options] : [body]),
+			opt,
 			options,
 		);
 	}

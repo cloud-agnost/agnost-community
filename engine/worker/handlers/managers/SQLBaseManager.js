@@ -817,7 +817,7 @@ export class SQLBaseManager extends DBManager {
     getDatabaseNameToUse() {
         return this.getAssignUniqueName()
             ? `${this.getEnvId()}_${this.getDbId()}`.replaceAll("-", "_").toLowerCase()
-            : this.getDbName();
+            : this.getDbName().toLowerCase();
     }
 
     addDefaultValues(model, field, returnQuery = false) {}

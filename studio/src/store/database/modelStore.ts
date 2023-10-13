@@ -1,9 +1,7 @@
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
 import { ModelService } from '@/services';
 import {
-	AddNewFieldParams,
 	APIError,
+	AddNewFieldParams,
 	CreateModelParams,
 	DeleteFieldParams,
 	DeleteModelParams,
@@ -20,10 +18,17 @@ import {
 	UpdateNameAndDescriptionParams,
 } from '@/types';
 import { notify } from '@/utils';
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
 
 interface ModelStore {
 	models: Model[];
-	subModel: Model | null;
+	model: Model;
+	subModel: Model;
+	nestedModels: {
+		name: string;
+		index: number;
+	}[];
 	modelToEdit: Model | null;
 	fieldToEdit: Field | null;
 	isOpenEditModelDialog: boolean;
@@ -46,18 +51,24 @@ interface ModelStore {
 	getReferenceModels: (params: GetModelsOfDatabaseParams) => Promise<Model[]>;
 	enableTimestamps: (params: EnableTimestampsParams) => Promise<Model>;
 	disableTimestamps: (params: DisableTimestampsParams) => Promise<Model>;
+	setModel: (model: Model) => void;
+	setNestedModels: (modelName: string, index: number) => void;
+	resetNestedModels: () => void;
+	getModelsTitle: () => string;
 }
 
 const useModelStore = create<ModelStore>()(
 	devtools(
 		persist(
-			(set) => ({
+			(set, get) => ({
 				models: [],
-				subModel: null,
+				subModel: {} as Model,
 				modelToEdit: null,
 				fieldToEdit: null,
 				isOpenEditModelDialog: false,
 				isOpenEditFieldDialog: false,
+				model: {} as Model,
+				nestedModels: [],
 				setFieldToEdit: (field: Field | null) => {
 					set({ fieldToEdit: field });
 				},
@@ -78,7 +89,7 @@ const useModelStore = create<ModelStore>()(
 				},
 				getModelsOfDatabase: async (params: GetModelsOfDatabaseParams): Promise<Model[]> => {
 					const models = await ModelService.getModelsOfDatabase(params);
-					set({ models });
+					set({ models, model: models[0] });
 					return models;
 				},
 				getSpecificModelByIidOfDatabase: async (
@@ -87,9 +98,11 @@ const useModelStore = create<ModelStore>()(
 					try {
 						const subModel = await ModelService.getSpecificModelByIidOfDatabase(params);
 						set({ subModel });
+						if (params.onSuccess) params.onSuccess(subModel);
 						return subModel;
 					} catch (e) {
 						const error = e as APIError;
+						if (params.onError) params.onError(error);
 						notify({
 							type: 'error',
 							title: error.error,
@@ -326,6 +339,33 @@ const useModelStore = create<ModelStore>()(
 						});
 						throw e;
 					}
+				},
+				setModel: (model: Model) => {
+					set({ subModel: {} as Model, model });
+				},
+				setNestedModels: (modelName: string, index: number) => {
+					set((state) => ({
+						nestedModels: [
+							...state.nestedModels,
+							{
+								name: modelName,
+								index,
+							},
+						],
+					}));
+				},
+				resetNestedModels: () => {
+					set({ nestedModels: [] });
+				},
+				getModelsTitle: () => {
+					return `${get().model.name}${
+						get().nestedModels.length
+							? '.' +
+							  get()
+									.nestedModels.map((m) => m.name)
+									.join('.')
+							: ''
+					}`;
 				},
 			}),
 			{

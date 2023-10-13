@@ -42,6 +42,7 @@ import {
 	PostgreSql,
 	RabbitMq,
 	RateLimit,
+	React,
 	RealTime,
 	Redis,
 	Resource,
@@ -362,11 +363,13 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	ENABLED: 'green',
 	DISABLED: 'red',
 	SUCCESS: 'green',
-	LOG: 'orange',
+	LOG: 'green',
 	INFO: 'blue',
 	WARN: 'yellow',
 	DEBUG: 'purple',
 	IDLE: 'orange',
+	TRUE: 'green',
+	FALSE: 'red',
 };
 
 export const EDIT_APPLICATION_MENU_ITEMS = [
@@ -938,19 +941,6 @@ export const MAX_LENGTHS: Record<string, number | Record<string, number>> = {
 	},
 };
 
-export const HEADER_USER_DROPDOWN = [
-	{
-		title: translate('general.account_settings'),
-		url: '/profile/settings',
-		Icon: GearSix,
-	},
-	{
-		title: translate('profileSettings.clusters_title'),
-		url: '/profile/settings/cluster-management',
-		Icon: LineSegments,
-	},
-];
-
 export const DATABASE = {
 	MySQL: 'MySQL',
 	SQLServer: 'SQL Server',
@@ -1015,8 +1005,10 @@ export const RESOURCE_ICON_MAP: Record<string, ElementType> = {
 	'Azure Blob Storage': AzureBlobStorage,
 	'GCP Cloud Storage': GcpStorage,
 	MinIO: MinIo,
-	Redis: Redis,
+	Redis,
 	'API Server': Nodejs,
 	Agenda: Nodejs,
 	'Socket.io': SocketIo,
+	'Node.js': Nodejs,
+	React,
 };

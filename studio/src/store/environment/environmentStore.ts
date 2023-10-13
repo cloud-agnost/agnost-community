@@ -8,6 +8,7 @@ import {
 	Resource,
 	SelectedEnvLog,
 	ToggleAutoDeployParams,
+	UpdateAPIServerConfParams,
 	UpdateEnvironmentTelemetryLogsParams,
 	VersionParams,
 	getAppVersionEnvironmentParams,
@@ -36,6 +37,7 @@ interface EnvironmentStore {
 	updateEnvironmentTelemetryLogs: (params: UpdateEnvironmentTelemetryLogsParams) => Promise<any>;
 	getEnvironmentResources: (params: GetEnvironmentResourcesParams) => Promise<Resource[]>;
 	setEnvStatus: (env: Environment) => EnvironmentStatus;
+	updateApiServerConf: (params: UpdateAPIServerConfParams) => Promise<void>;
 }
 
 const useEnvironmentStore = create<EnvironmentStore>()(
@@ -130,7 +132,7 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 				},
 				getEnvironmentResources: async (params: GetEnvironmentResourcesParams) => {
 					const resources = await EnvironmentService.getEnvironmentResources(params);
-					set({ resources });
+					set({ resources, envStatus: get().setEnvStatus(get().environment) });
 					return resources;
 				},
 				openLogDetails: (log: SelectedEnvLog) => {
@@ -171,6 +173,23 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 					}
 
 					return 'OK' as EnvironmentStatus;
+				},
+				updateApiServerConf: async (params: UpdateAPIServerConfParams) => {
+					try {
+						const apiServer = await EnvironmentService.updateAPIServerConf(params);
+						set((prev) => ({
+							resources: prev.resources.map((resource) => {
+								if (resource._id === apiServer._id) {
+									return { ...resource, ...apiServer };
+								}
+								return resource;
+							}),
+						}));
+						if (params.onSuccess) params.onSuccess();
+					} catch (e) {
+						if (params.onError) params.onError(e as APIError);
+						throw e;
+					}
 				},
 			}),
 			{
