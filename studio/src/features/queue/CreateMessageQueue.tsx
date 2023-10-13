@@ -35,6 +35,7 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 			appId: appId as string,
 			versionId: versionId as string,
 			...data,
+			resourceId: data.resourceId as string,
 			onSuccess: (queue) => {
 				handleClose();
 				navigate({

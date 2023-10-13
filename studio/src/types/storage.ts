@@ -193,6 +193,9 @@ export const StorageSchema = z.object({
 				}),
 			}),
 		),
+});
+
+export const CreateStorageSchema = StorageSchema.extend({
 	resourceId: z.string({
 		required_error: translate('forms.required', {
 			label: translate('queue.create.resource.title'),
