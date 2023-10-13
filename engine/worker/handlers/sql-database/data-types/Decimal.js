@@ -5,7 +5,7 @@ export default class Decimal extends Field {
     baseLength = 15;
 
     createMap = {
-        [DATABASE.PostgreSQL]: '"{NAME}" {TYPE}({BASE_LENGTH},{DIGITS}) {REQUIRED} {DEFAULT_VALUE}',
+        [DATABASE.PostgreSQL]: "{NAME} {TYPE}({BASE_LENGTH},{DIGITS}) {REQUIRED} {DEFAULT_VALUE}",
         [DATABASE.MySQL]: "`{NAME}` {TYPE}({BASE_LENGTH},{DIGITS}) {REQUIRED} {DEFAULT_VALUE}",
         [DATABASE.SQLServer]: "{NAME} {TYPE}({BASE_LENGTH},{DIGITS}) {REQUIRED} {DEFAULT_VALUE}",
     };
