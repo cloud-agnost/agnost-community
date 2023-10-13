@@ -12,7 +12,7 @@ import { Input } from '@/components/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { STORAGE_ICON_MAP } from '@/constants';
 import useResourceStore from '@/store/resources/resourceStore';
-import { StorageSchema } from '@/types';
+import { CreateStorageSchema } from '@/types';
 import { translate as t } from '@/utils';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -22,7 +22,7 @@ interface StorageFormProps {
 	edit?: boolean;
 }
 export default function StorageForm({ edit = false }: StorageFormProps) {
-	const form = useFormContext<z.infer<typeof StorageSchema>>();
+	const form = useFormContext<z.infer<typeof CreateStorageSchema>>();
 	const { getResources, resources } = useResourceStore();
 
 	function getResourceIcon(type: string) {

@@ -4,6 +4,7 @@ import Database from './Database';
 import Endpoint from './Endpoint';
 import Environment from './Environment';
 import Field from './Field';
+import Function from './Function';
 import Model from './Model';
 import Organization from './Organization';
 import Queue from './Queue';
@@ -36,6 +37,7 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		'org.app.version.db.model.field': Field,
 		'org.app.version.storage': Storage,
 		'org.app.version.cache': Cache,
+		'org.app.version.function': Function,
 		// TODO: "org.resource.log"
 	};
 	return new keys[type]();

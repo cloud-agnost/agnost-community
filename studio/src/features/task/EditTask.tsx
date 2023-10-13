@@ -21,11 +21,10 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 	const { updateTask, task } = useTaskStore();
 	const { notify } = useToast();
 	const { resources } = useResourceStore();
-	const { versionId, appId, orgId, taskId } = useParams<{
+	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
 		orgId: string;
-		taskId: string;
 	}>();
 
 	const form = useForm<z.infer<typeof CreateTaskSchema>>({
@@ -37,7 +36,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			taskId: taskId as string,
+			taskId: task._id as string,
 			resourceId: resources[0]._id,
 			...data,
 			onSuccess: () => {

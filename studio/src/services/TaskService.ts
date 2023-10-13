@@ -41,7 +41,7 @@ export default class TaskService {
 		taskId,
 		...body
 	}: UpdateTaskParams): Promise<Task> {
-		const { data } = await axios.patch(
+		const { data } = await axios.put(
 			`${this.url}/${orgId}/app/${appId}/version/${versionId}/task/${taskId}`,
 			body,
 		);

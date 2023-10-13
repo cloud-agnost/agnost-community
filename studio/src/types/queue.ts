@@ -29,15 +29,14 @@ export type DeleteMessageQueueParams = GetMessageQueueByIdParams & BaseRequest;
 export interface DeleteMultipleQueuesParams extends BaseParams, BaseRequest {
 	queueIds: string[];
 }
-
-export const CreateMessageQueueSchema = z.object({
+export const MessageQueueSchema = z.object({
 	name: z
 		.string({
 			required_error: translate('forms.required', {
 				label: translate('general.name'),
 			}),
 		})
-		.nonempty()
+
 		.regex(NAME_REGEX, {
 			message: translate('forms.invalid', {
 				label: translate('general.name'),
@@ -82,6 +81,9 @@ export const CreateMessageQueueSchema = z.object({
 
 	delay: z.coerce.number().int().positive().optional(),
 	logExecution: z.boolean().default(false),
+});
+export const CreateMessageQueueSchema = z.object({
+	...MessageQueueSchema.shape,
 	resourceId: z.string({
 		required_error: translate('forms.required', {
 			label: translate('queue.create.resource.title'),
@@ -95,7 +97,7 @@ export interface CreateMessageQueueParams extends BaseRequest, BaseParams {
 	delay?: number;
 	resourceId: string;
 }
-export interface UpdateQueueParams extends CreateMessageQueueParams {
+export interface UpdateQueueParams extends Omit<CreateMessageQueueParams, 'resourceId'> {
 	queueId: string;
 }
 export interface UpdateQueueLogicParams extends BaseRequest, BaseParams {

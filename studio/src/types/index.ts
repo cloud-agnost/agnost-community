@@ -15,7 +15,7 @@ export type * from './navigator.ts';
 export type * from './organization.ts';
 export { CreateOrganizationSchema } from './organization.ts';
 export type * from './queue.ts';
-export { CreateMessageQueueSchema } from './queue.ts';
+export { CreateMessageQueueSchema, MessageQueueSchema } from './queue.ts';
 export type * from './resource.ts';
 export {
 	AccessDbSchema,
@@ -24,7 +24,7 @@ export {
 	ConnectResourceSchema,
 } from './resource.ts';
 export type * from './storage.ts';
-export { BucketSchema, StorageSchema } from './storage.ts';
+export { BucketSchema, CreateStorageSchema, StorageSchema } from './storage.ts';
 export type * from './task.ts';
 export { CreateTaskSchema } from './task.ts';
 export type * from './type.ts';
