@@ -363,7 +363,7 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	ENABLED: 'green',
 	DISABLED: 'red',
 	SUCCESS: 'green',
-	LOG: 'orange',
+	LOG: 'green',
 	INFO: 'blue',
 	WARN: 'yellow',
 	DEBUG: 'purple',
@@ -940,19 +940,6 @@ export const MAX_LENGTHS: Record<string, number | Record<string, number>> = {
 		MongoDB: Number.MAX_SAFE_INTEGER,
 	},
 };
-
-export const HEADER_USER_DROPDOWN = [
-	{
-		title: translate('general.account_settings'),
-		url: '/profile/settings',
-		Icon: GearSix,
-	},
-	{
-		title: translate('profileSettings.clusters_title'),
-		url: '/profile/settings/cluster-management',
-		Icon: LineSegments,
-	},
-];
 
 export const DATABASE = {
 	MySQL: 'MySQL',
