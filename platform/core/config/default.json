@@ -84,6 +84,7 @@
     "scaleToZeroPodRetentionPeriodSeconds": 600,
     "minCacheSizeMi": 256,
     "minQueueSizeMi": 256,
+    "minDatabaseSizeMi": 512,
     "defaultEngineConfig": {
       "initialScale": 1,
       "minScale": 0,

@@ -16,9 +16,9 @@ spec:
   image: docker.io/bitnami/rabbitmq:3.10.2
   replicas: 3
   resources:
-    #requests:
-    #  cpu: 200m
-    #  memory: 500Mi
+    requests:
+      cpu: 200m
+      memory: 500Mi
     limits:
       cpu: 200m
       memory: 500Mi
@@ -52,9 +52,9 @@ spec:
                   limits:
                     cpu: 100m
                     memory: 500Mi
-                  #requests:
-                  #  cpu: 100m
-                   # memory: 500Mi
+                  requests:
+                    cpu: 100m
+                    memory: 500Mi
                 terminationMessagePolicy: FallbackToLogsOnError
                 volumeMounts:
                   - mountPath: /community-plugins/

@@ -1,6 +1,9 @@
 import axios from "axios";
 import k8s from "@kubernetes/client-node";
 import { createRedis, deleteRedis, updateRedis } from "./redis.js";
+import { createRabbitmqCluster, updateRabbitmqCluster, deleteRabbitmqCluster } from "./rabbitmq.js";
+import { createMongoDBResource, updateMongoDBResource, deleteMongoDBResource } from "./mongodb.js";
+import { createPostgresql, updatePostgresql, deletePostgresql, waitForSecret } from "./postgres.js";
 import { getDBClient } from "../../init/db.js";
 
 export class ResourceManager {
@@ -110,6 +113,13 @@ export class ResourceManager {
                 case "cache":
                     if (this.getResourceInstance() === "Redis") await this.createRedisCache();
                     break;
+                case "queue":
+                    if (this.getResourceInstance() === "RabbitMQ") await this.createRabbitMQMessageBroker();
+                    break;
+                case "database":
+                    if (this.getResourceInstance() === "MongoDB") await this.createMongoDBReplicaSet();
+                    else if (this.getResourceInstance() === "PostgreSQL") await this.createPostgreSQLCluster();
+                    break;
                 default:
                     break;
             }
@@ -163,6 +173,31 @@ export class ResourceManager {
                             resource.config.readReplica
                         );
                     break;
+                case "queue":
+                    if (this.getResourceInstance() === "RabbitMQ")
+                        await updateRabbitmqCluster(
+                            this.getResourceName(),
+                            resource.config.version,
+                            resource.config.size,
+                            resource.config.replicas
+                        );
+                    break;
+                case "database":
+                    if (this.getResourceInstance() === "MongoDB")
+                        await updateMongoDBResource(
+                            this.getResourceName(),
+                            resource.config.version,
+                            resource.config.size,
+                            resource.config.replicas
+                        );
+                    else if (this.getResourceInstance() === "PostgreSQL")
+                        await updatePostgresql(
+                            this.getResourceName(),
+                            resource.config.version,
+                            resource.config.size,
+                            resource.config.instances
+                        );
+                    break;
                 default:
                     break;
             }
@@ -184,12 +219,26 @@ export class ResourceManager {
     async deleteResource() {
         try {
             this.addLog(t("Started resource deletion"));
+            const resource = this.getResource();
             switch (this.getResourceType()) {
                 case "engine":
                     await this.deleteAPIServer();
                     break;
                 case "cache":
                     if (this.getResourceInstance() === "Redis") await deleteRedis(this.getResourceName());
+                    break;
+                case "queue":
+                    if (this.getResourceInstance() === "RabbitMQ") {
+                        const access = helper.decryptSensitiveData(resource.access);
+                        await deleteRabbitmqCluster(this.getResourceName(), access.username);
+                    }
+                    break;
+                case "database":
+                    if (this.getResourceInstance() === "MongoDB") {
+                        await deleteMongoDBResource(this.getResourceName());
+                    } else if (this.getResourceInstance() === "PostgreSQL") {
+                        await deletePostgresql(this.getResourceName());
+                    }
                     break;
                 default:
                     break;
@@ -864,6 +913,116 @@ export class ResourceManager {
                 port: 6379,
             });
         }
+
+        // Update resource access settings
+        await this.updateResourceAccessSettings(access, accessReadOnly);
+    }
+
+    /**
+     * Creates a new RabbitMQ cluster
+     */
+    async createRabbitMQMessageBroker() {
+        const resource = this.getResource();
+        this.addLog(
+            t(
+                "Creating RabbitMQ cluster '%s' with '%s' replica(s) and '%s' persistent storage.",
+                resource.name,
+                resource.config.replicas,
+                resource.config.size
+            )
+        );
+
+        await createRabbitmqCluster(
+            resource.name,
+            resource.config.version,
+            resource.config.size,
+            resource.config.username,
+            resource.config.password,
+            resource.config.replicas
+        );
+
+        const access = {
+            host: `${resource.name}.${process.env.NAMESPACE}.svc.cluster.local`,
+            port: 5672,
+            username: resource.config.username,
+            password: resource.config.password,
+            scheme: "amqp",
+            vhost: "",
+            format: "object",
+        };
+
+        // Update resource access settings
+        await this.updateResourceAccessSettings(access, []);
+    }
+
+    /**
+     * Creates a new MongoDB replica set
+     */
+    async createMongoDBReplicaSet() {
+        const resource = this.getResource();
+        this.addLog(
+            t(
+                "Creating MongoDB replica set '%s' with '%s' replica(s) and '%s' storage size.",
+                resource.name,
+                resource.config.replicas,
+                resource.config.size
+            )
+        );
+
+        await createMongoDBResource(
+            resource.name,
+            resource.config.version,
+            resource.config.size,
+            resource.config.username,
+            resource.config.password,
+            resource.config.replicas
+        );
+
+        const access = {
+            connFormat: "mongodb",
+            host: `${resource.name}-svc.${process.env.NAMESPACE}.svc.cluster.local`,
+            port: 27017,
+            username: resource.config.username,
+            password: resource.config.password,
+        };
+
+        // Update resource access settings
+        await this.updateResourceAccessSettings(access, []);
+    }
+
+    /**
+     * Creates a new PostgreSQL database server
+     */
+    async createPostgreSQLCluster() {
+        const resource = this.getResource();
+        this.addLog(
+            t(
+                "Creating PostgreSQL database server '%s' with '%s' instance(s) and '%s' storage size.",
+                resource.name,
+                resource.config.instances,
+                resource.config.size
+            )
+        );
+
+        await createPostgresql(resource.name, resource.config.version, resource.config.size, resource.config.instances);
+        const secretName = "postgres." + resource.name + ".credentials.postgresql.acid.zalan.do";
+        const password = await waitForSecret(secretName);
+
+        const access = {
+            host: `${resource.name}.${process.env.NAMESPACE}.svc.cluster.local`,
+            port: 5432,
+            username: "postgres",
+            password: Buffer.from(password, "base64").toString("utf-8"),
+        };
+
+        const accessReadOnly = [
+            {
+                host: `${resource.name}-repl.${process.env.NAMESPACE}.svc.cluster.local`,
+                port: 5432,
+                username: "postgres",
+                password: Buffer.from(password, "base64").toString("utf-8"),
+            },
+        ];
 
         // Update resource access settings
         await this.updateResourceAccessSettings(access, accessReadOnly);

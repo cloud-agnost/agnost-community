@@ -40,7 +40,7 @@ class ResourceController extends BaseController {
 				name: t("Default Storage"),
 				type: "storage",
 				instance: "MinIO",
-				managed: false, // The size of the storage can be updated
+				managed: false, // Not created by the user but by the cluster itself
 				allowedRoles: ["Admin", "Developer", "Viewer"],
 				config: {},
 				access: helper.encyrptSensitiveData({

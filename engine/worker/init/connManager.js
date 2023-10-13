@@ -69,6 +69,9 @@ class ConnectionManager {
                     });
 
                     await client.connect();
+                    client.on("error", (err) => {});
+                    client.on("end", () => {});
+
                     this.addConnection(id, client);
 
                     return client;
@@ -88,6 +91,7 @@ class ConnectionManager {
                         multipleStatements: true,
                     });
 
+                    connection.on("error", (err) => {});
                     this.addConnection(id, connection);
 
                     return connection;

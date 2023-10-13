@@ -141,7 +141,7 @@ export async function updateRedis(clusterName, version, size, readReplicaEnabled
         const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
 
         await k8sApi.replaceNamespacedStatefulSet(clusterName + "-master", namespace, sts.body);
-        console.log("StatefulSet " + clusterName + "-master updated...");
+        // console.log("StatefulSet " + clusterName + "-master updated...");
 
         await k8sCoreApi.patchNamespacedPersistentVolumeClaim(
             pvcName,
@@ -154,7 +154,7 @@ export async function updateRedis(clusterName, version, size, readReplicaEnabled
             undefined,
             requestOptions
         );
-        console.log("PVC " + pvcName + " updated...");
+        // console.log("PVC " + pvcName + " updated...");
 
         if (readReplicaEnabled) {
             const replica = await k8sApi.readNamespacedStatefulSet(clusterName + "-replicas", namespace);
@@ -162,7 +162,7 @@ export async function updateRedis(clusterName, version, size, readReplicaEnabled
             replica.body.spec.template.spec.containers[0].resources.limits.memory = size;
 
             await k8sApi.replaceNamespacedStatefulSet(clusterName + "-replicas", namespace, replica.body);
-            console.log("StatefulSet " + clusterName + "-replicas updated...");
+            // console.log("StatefulSet " + clusterName + "-replicas updated...");
 
             var pvcNameReplica = "redis-data-" + clusterName + "-replicas-0";
 
@@ -178,7 +178,7 @@ export async function updateRedis(clusterName, version, size, readReplicaEnabled
                 requestOptions
             );
 
-            console.log("PVC " + pvcNameReplica + " updated...");
+            // console.log("PVC " + pvcNameReplica + " updated...");
         }
 
         return "success";
@@ -228,24 +228,4 @@ export async function deleteRedis(clusterName) {
     }
 
     return "success!";
-}
-
-// some helper functions
-export async function waitForSecret(secretName) {
-    const pollingInterval = 2000;
-    while (true) {
-        try {
-            const response = await k8sCoreApi.readNamespacedSecret(secretName, namespace);
-            return response.body.data.password;
-        } catch (error) {
-            await sleep(pollingInterval);
-        }
-    }
-}
-
-// Function to simulate sleep
-function sleep(ms) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
 }

@@ -93,8 +93,8 @@ function generatePassword(length = 16) {
  */
 function generateUsername(length = 16) {
 	// Kubernetes resource names need to be alphanumeric and in lowercase letters
-	const alphabet =
-		"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	// No uppercase letters since rabbitmq requires lowercase alphanumeric characters
+	const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
 	const nanoid = customAlphabet(alphabet, length);
 	return nanoid();
 }

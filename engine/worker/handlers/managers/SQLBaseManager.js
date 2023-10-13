@@ -120,10 +120,10 @@ export class SQLBaseManager extends DBManager {
 
     async redeploy() {
         const changedModels = this.getChangedModels();
-        // console.log("changedModels", JSON.stringify(changedModels, null, 4));
+        //console.log("changedModels", JSON.stringify(changedModels, null, 4));
         if (!changedModels) return;
 
-        const existingModels = await this.getExistingModels();
+        const existingModels = (await this.getExistingModels()).map((dbName) => dbName.toLowerCase());
 
         const { modelsWithRefs, modelsWithoutRefs } = this.getConfiguredModels(changedModels?.added);
 
@@ -141,10 +141,11 @@ export class SQLBaseManager extends DBManager {
 
         for (let updatedModel of changedModels?.updated) {
             // if the model is existing, update its name
-            if (existingModels.includes(updatedModel?.oldName)) await this.handleRenameModel(updatedModel);
+            if (existingModels.includes(updatedModel?.oldName?.toLowerCase()))
+                await this.handleRenameModel(updatedModel);
 
             // if the model is existing, update it
-            if (existingModels.includes(updatedModel?.name)) {
+            if (existingModels.includes(updatedModel?.name?.toLowerCase())) {
                 const updatedFields = updatedModel.fieldChanges.updated;
 
                 const requiredFields = await this.handleRequiredField(updatedModel, updatedFields, true);
@@ -717,7 +718,7 @@ export class SQLBaseManager extends DBManager {
 
     /**
      * Get the models
-     * @return {Promise<[]>}
+     * @return {Promise<string[]>}
      */
     async getExistingModels() {}
 
@@ -817,7 +818,7 @@ export class SQLBaseManager extends DBManager {
     getDatabaseNameToUse() {
         return this.getAssignUniqueName()
             ? `${this.getEnvId()}_${this.getDbId()}`.replaceAll("-", "_").toLowerCase()
-            : this.getDbName();
+            : this.getDbName().toLowerCase();
     }
 
     addDefaultValues(model, field, returnQuery = false) {}

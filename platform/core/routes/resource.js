@@ -279,7 +279,7 @@ router.post(
 /*
 @route      /v1/org/:orgId/resource?page=0&size=50&type=engine&instance=Agnost K8s Cluster&search=&sortBy=name&sortDir=asc&appId
 @method     GET
-@desc       Get organization/app resources (only resources that are marked as deleteable are returned)
+@desc       Get organization/app resources
 @access     private
 */
 router.get(
@@ -292,25 +292,9 @@ router.get(
   async (req, res) => {
     try {
       const { org } = req;
-      const { search, type, instance, sortBy, sortDir, appId, status } =
-        req.query;
-      //, deletable: true
+      const { search, type, instance, sortBy, sortDir, status } = req.query;
+
       let query = { orgId: org._id };
-
-      // App filter and app member filter
-      // if (appId) {
-      //   query.$or = [
-      //     { $and: [{ appId: appId }, { allowedRoles: req.appMember.role }] },
-      //     { createdBy: req.user._id },
-      //   ];
-      // } else {
-      //   // If we are looking for organization level resources then appId should not be assigned. When appId assigned, the resouce can only be used within that app only.
-      //   query.appId = { $exists: false };
-      // }
-
-      // Search resource
-      if (search && search !== "null")
-        query.name = { $regex: search, $options: "i" };
 
       // Type filter
       if (type) {
@@ -570,7 +554,7 @@ router.put(
     const session = await resourceCtrl.startSession();
     try {
       const { org, user, resource } = req;
-      let { config } = req.body;
+      let { config, updateType } = req.body;
 
       if (!resource.managed) {
         await resourceCtrl.endSession(session);
@@ -607,8 +591,17 @@ router.put(
         });
       }
 
-      // We cannot change the read-replica configuration of a Redis resource
+      // In case of database resource the size and other parameters (replicas/instances and version) need to be upated separately
+      if (resource.type === "database") {
+        if (updateType === "size") {
+          config = { ...resource.config, size: config.size };
+        } else {
+          config = { ...config, size: resource.config.size };
+        }
+      }
+
       if (resource.instance === "Redis")
+        // We cannot change the read-replica configuration of a Redis resource
         config.readReplica = resource.config.readReplica;
 
       const updatedResource = await resourceCtrl.updateOneById(

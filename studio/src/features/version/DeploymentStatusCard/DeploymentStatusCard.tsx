@@ -11,7 +11,7 @@ import { Cloud, GearSix } from '@phosphor-icons/react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Button } from 'components/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel } from 'components/Dropdown';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './deploymentStatusCard.scss';
 export default function DeploymentStatusCard() {

@@ -120,7 +120,7 @@
 		"auth_providers_desc": "Add the providers that you want to use to authenticate your application users.",
 		"add_auth_provider": "Add Provider",
 		"model": "Model",
-		"provider": "Stores the type of the authentication provider such as “google” , ”facebook”, “altogic”",
+		"provider": "Stores the type of the authentication provider such as “google” , ”facebook”, agnost",
 		"providerUserId": "Stores the type of provider user identifier e.9., google user id, facebook user id",
 		"email": "Stores the user’s email address",
 		"phone": "Stores the user’s mobile phone number",
