@@ -66,6 +66,21 @@ export default (actionType) => {
 				min: 1,
 			})
 			.withMessage(t("Replica count needs to be a positive integer"))
+			.bail()
+			.custom((value, { req }) => {
+				if (
+					value < req.resource.config.replicas &&
+					actionType === "update-config"
+				)
+					throw new AgnostError(
+						t(
+							"RabbitMQ cluster scale down not supported. You cannot decrease the replica count from '%s' to '%s'.",
+							req.resource.config.size,
+							value
+						)
+					);
+				return true;
+			})
 			.toInt(),
 	];
 };

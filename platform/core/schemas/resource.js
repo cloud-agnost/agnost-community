@@ -5,7 +5,6 @@ import {
 	resourceTypes,
 	addResourceTypes,
 	createResourceTypes,
-	instanceTypes,
 	addInstanceTypes,
 	createInstanceTypes,
 	appRoles,
@@ -350,7 +349,11 @@ export const applyRules = (type) => {
 								);
 						});
 
-						if (value.toLowerCase() === "this") {
+						if (
+							["this", "mongodb", "rabbitmq-server", "redis-master"].includes(
+								value.toLowerCase()
+							)
+						) {
 							throw new AgnostError(
 								t(
 									"'%s' is a reserved keyword and cannot be used as resource name",
@@ -505,7 +508,11 @@ export const applyRules = (type) => {
 								);
 						});
 
-						if (value.toLowerCase() === "this") {
+						if (
+							["this", "mongodb", "rabbitmq-server", "redis-master"].includes(
+								value.toLowerCase()
+							)
+						) {
 							throw new AgnostError(
 								t(
 									"'%s' is a reserved keyword and cannot be used as resource name",

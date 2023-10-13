@@ -208,8 +208,7 @@ router.post(
 			let { appId, name, type, instance, allowedRoles, config } = req.body;
 
 			// We create RabbitMQ clusters with delayed-message-exchange add-on
-			if (instance !== "RabbitMQ") config.delayedMessages = true;
-			return res.json(req.body);
+			if (instance === "RabbitMQ") config.delayedMessages = true;
 
 			// Create the new organization resource. The access settings will be updated later by the engine-worker
 			let resourceId = helper.generateId();
@@ -295,9 +294,9 @@ router.get(
 			const { search, type, instance, sortBy, sortDir, appId, status } =
 				req.query;
 
-			let query = { orgId: org._id, deletable: true };
+			let query = { orgId: org._id /* deletable: true */ };
 
-			// App filter and app member filter
+			/* 			// App filter and app member filter
 			if (appId) {
 				query.$or = [
 					{ $and: [{ appId: appId }, { allowedRoles: req.appMember.role }] },
@@ -306,7 +305,7 @@ router.get(
 			} else {
 				// If we are looking for organization level resources then appId should not be assigned. When appId assigned, the resouce can only be used within that app only.
 				query.appId = { $exists: false };
-			}
+			} */
 
 			// Search resource
 			if (search && search !== "null")
@@ -570,7 +569,7 @@ router.put(
 		const session = await resourceCtrl.startSession();
 		try {
 			const { org, user, resource } = req;
-			let { config } = req.body;
+			let { config, updateType } = req.body;
 
 			if (!resource.managed) {
 				await resourceCtrl.endSession(session);
@@ -607,8 +606,17 @@ router.put(
 				});
 			}
 
-			// We cannot change the read-replica configuration of a Redis resource
+			// In case of database resource the size and other parameters (replicas/instances and version) need to be upated separately
+			if (resource.type === "database") {
+				if (updateType === "size") {
+					config = { ...resource.config, size: config.size };
+				} else {
+					config = { ...config, size: resource.config.size };
+				}
+			}
+
 			if (resource.instance === "Redis")
+				// We cannot change the read-replica configuration of a Redis resource
 				config.readReplica = resource.config.readReplica;
 
 			const updatedResource = await resourceCtrl.updateOneById(

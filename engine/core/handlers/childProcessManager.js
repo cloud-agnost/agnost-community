@@ -231,6 +231,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Save the metadata manager to globals for faster access
 		global.META = new MetaManager(envObj);
 		adapterManager.setModuleLoaderQuery(this.loaderQuery);
+		// Save the adapter manager to globals for faster access
+		global.ADAPTERS = adapterManager;
 		// Initialize express server
 		await this.initExpressServer();
 		// Manage endpoints
@@ -558,14 +560,65 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	async setupResourceConnections() {
 		const resources = this.getResources();
 		for (const resource of resources) {
+			// Check whether this is a PostgreSQL database or not
+			// We need to connect to the actual database not to the default database
+			// For this reason we connect based on database not based on resource
+			if (resource.instance === "PostgreSQL") continue;
+
 			resource.access = helper.decryptSensitiveData(resource.access);
 			if (resource.accessReadOnly)
 				resource.accessReadOnly = helper.decryptSensitiveData(
 					resource.accessReadOnly
 				);
 
+			// Set up the connection
 			await adapterManager.setupConnection(resource);
 		}
+
+		// Get the list of databases and filter the ones that are PostgreSQL
+		const postgresDbs = await META.getDatabasesSync().filter(
+			(entry) => entry.type === "PostgreSQL"
+		);
+
+		for (const db of postgresDbs) {
+			// First find the corresponding resource mapping
+			const mapping = this.getResourceMappings().find(
+				(entry) => entry.design.iid === db.iid
+			);
+
+			// Get the resource corresponding to this mapping
+			const resource = this.getResources().find(
+				(entry) => entry.iid === mapping.resource.iid
+			);
+
+			resource.access = helper.decryptSensitiveData(resource.access);
+			// Add the database name info to the access settings
+			resource.access.dbName = this.getAppliedDbName(db);
+
+			if (resource.accessReadOnly) {
+				resource.accessReadOnly = helper.decryptSensitiveData(
+					resource.accessReadOnly
+				);
+				// Add the database name info to the access settings
+				for (const readOnly of resource.accessReadOnly) {
+					readOnly.dbName = this.getAppliedDbName(db);
+				}
+			}
+
+			// Set up the connection
+			await adapterManager.setupConnection(resource);
+		}
+	}
+
+	/**
+	 * Returns the name of the database to use
+	 */
+	getAppliedDbName(database) {
+		if (database.assignUniqueName)
+			return `${this.getEnvId()}_${database.iid}`
+				.replaceAll("-", "_")
+				.toLowerCase();
+		else return database.name;
 	}
 
 	/**

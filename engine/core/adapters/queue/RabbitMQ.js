@@ -180,7 +180,7 @@ export class RabbitMQ extends QueueBase {
 
 			// If this is a delayed message then we need to bind the queue to the exchange
 			if (exchange) {
-				channel.assertExchange(exchange, "x-delayed-message", {
+				await channel.assertExchange(exchange, "x-delayed-message", {
 					durable: true,
 					autoDelete: true,
 					arguments: {
@@ -188,13 +188,13 @@ export class RabbitMQ extends QueueBase {
 					},
 				});
 
-				channel.assertQueue(queue, {
+				await channel.assertQueue(queue, {
 					durable: true,
 					autoDelete: true,
 				});
 
 				// Bind exchange to the queue
-				channel.bindQueue(queue, exchange, "");
+				await channel.bindQueue(queue, exchange, "");
 				logger.info(
 					"Listening delayed messages from <" +
 						exchange +
@@ -203,7 +203,7 @@ export class RabbitMQ extends QueueBase {
 						"> queue"
 				);
 			} else {
-				channel.assertQueue(queue, {
+				await channel.assertQueue(queue, {
 					durable: true,
 					autoDelete: true,
 				});

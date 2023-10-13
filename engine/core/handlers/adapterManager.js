@@ -290,6 +290,8 @@ export class AdapterManager {
 			});
 
 			await client.connect();
+			client.on("error", (err) => {});
+			client.on("end", () => {});
 
 			const adapterObj = {
 				name,
@@ -319,6 +321,8 @@ export class AdapterManager {
 						});
 
 						await slaveClient.connect();
+						slaveClient.on("error", (err) => {});
+
 						adapterObj.slaves.push({
 							name,
 							type,
@@ -357,6 +361,8 @@ export class AdapterManager {
 				database: connSettings.dbName,
 			});
 
+			client.on("error", (err) => {});
+
 			const adapterObj = {
 				name,
 				type,
@@ -383,6 +389,8 @@ export class AdapterManager {
 							password: config.password,
 							database: config.dbName,
 						});
+
+						slaveClient.on("error", (err) => {});
 
 						adapterObj.slaves.push({
 							name,
