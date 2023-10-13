@@ -116,7 +116,11 @@ export default function VersionDropdown() {
 				<DropdownMenuContent align='end' className='version-dropdown-content'>
 					<DropdownMenuItemContainer>
 						{VERSION_DROPDOWN_ITEM.map((option) => (
-							<DropdownMenuItem onClick={option.action} key={option.title}>
+							<DropdownMenuItem
+								onClick={option.action}
+								key={option.title}
+								disabled={option.disabled}
+							>
 								{option.title}
 							</DropdownMenuItem>
 						))}
