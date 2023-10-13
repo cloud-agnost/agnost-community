@@ -276,6 +276,15 @@ export interface RealtimeIdentifiers {
 	envId?: string;
 	queueId?: string;
 	environmentId?: string;
+	endpointId?: string;
+	taskId?: string;
+	dbId?: string;
+	modelId?: string;
+	fieldId?: string;
+	storageId?: string;
+	cacheId?: string;
+	middlewareId?: string;
+	functionId?: string;
 }
 export interface RealtimeData<T> {
 	actor: Partial<User> & { userId: string };

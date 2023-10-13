@@ -28,8 +28,8 @@ interface DrawerPortalProps
 	extends SheetPrimitive.DialogPortalProps,
 		VariantProps<typeof portalVariants> {}
 
-const DrawerPortal = ({ position, className, children, ...props }: DrawerPortalProps) => (
-	<SheetPrimitive.Portal className={cn(className)} {...props}>
+const DrawerPortal = ({ position, children, ...props }: DrawerPortalProps) => (
+	<SheetPrimitive.Portal {...props}>
 		<div className={portalVariants({ position })}>{children}</div>
 	</SheetPrimitive.Portal>
 );

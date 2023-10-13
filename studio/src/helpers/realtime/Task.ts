@@ -1,6 +1,7 @@
 import useTaskStore from '@/store/task/taskStore';
 import { LogTypes, RealtimeActionParams, Task as TaskType } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
+import useTabStore from '@/store/version/tabStore';
 class Task extends RealtimeActions<TaskType> {
 	redeploy(): void {
 		throw new Error('Method not implemented.');
@@ -18,9 +19,11 @@ class Task extends RealtimeActions<TaskType> {
 		}, 100);
 	}
 	delete({ identifiers }: RealtimeActionParams<TaskType>) {
+		const { removeTabByPath } = useTabStore.getState();
 		useTaskStore.setState?.({
-			tasks: useTaskStore.getState?.().tasks.filter((queue) => queue._id !== identifiers.queueId),
+			tasks: useTaskStore.getState?.().tasks.filter((task) => task._id !== identifiers.taskId),
 		});
+		removeTabByPath(identifiers.versionId as string, identifiers.taskId as string);
 	}
 	update({ data }: RealtimeActionParams<TaskType>) {
 		useTaskStore.setState?.({
