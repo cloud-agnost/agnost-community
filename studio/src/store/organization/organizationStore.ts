@@ -25,7 +25,7 @@ import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 interface OrganizationStore {
 	loading: boolean;
-	organization: Organization | null;
+	organization: Organization;
 	organizations: Organization[];
 	members: OrganizationMember[];
 	invitations: Invitation[];
@@ -70,7 +70,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 			persist(
 				(set, get) => ({
 					loading: false,
-					organization: null,
+					organization: {} as Organization,
 					organizations: [],
 					applications: [],
 					temp: [],
@@ -213,7 +213,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 								organizations: get().organizations.filter(
 									(organization) => organization._id !== get()?.organization?._id,
 								),
-								organization: null,
+								organization: {} as Organization,
 							});
 							if (req.onSuccess) req.onSuccess();
 							return res;
@@ -305,7 +305,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 								organizations: get().organizations.filter(
 									(organization) => organization._id !== get()?.organization?._id,
 								),
-								organization: null,
+								organization: {} as Organization,
 							});
 							if (req.onSuccess) req.onSuccess();
 						} catch (error) {

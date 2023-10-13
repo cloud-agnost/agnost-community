@@ -33,13 +33,17 @@ instance.interceptors.response.use(
 		return response;
 	},
 	(error) => {
-		const apiError = error.response.data as APIError;
+		const err = error.response.data as APIError;
+		const apiError = {
+			...err,
+			details: err.fields?.[0]?.msg ?? err.details,
+		};
 		if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
 			localStorage.clear();
 			useAuthStore.getState().logout();
 		}
 		if (error.response.status === 401) {
-			// window.location.href = '/401';
+			window.location.href = '/401';
 		}
 		if (error.response.status === 404) {
 			window.location.href = '/404';
@@ -69,12 +73,14 @@ envInstance.interceptors.response.use(
 	(response) => {
 		return response;
 	},
-	(error) => {
+	({ response: { data } }) => {
+		console.log(data);
 		const err: APIError = {
-			code: error.response.data.code,
-			error: error.response.data.error,
-			details: error.response.data.message,
+			code: data.code ?? data.errors[0].code,
+			error: data.error ?? data.errors[0].specifics[0].code,
+			details: data.message ?? data.errors[0].message,
 		};
+		console.log(err);
 		return Promise.reject(err);
 	},
 );

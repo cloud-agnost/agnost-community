@@ -17,7 +17,6 @@ import { CreateCacheSchema } from '@/types';
 import { translate as t } from '@/utils';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 
 interface CacheFormProps {
@@ -26,14 +25,9 @@ interface CacheFormProps {
 export default function CacheForm({ edit = false }: CacheFormProps) {
 	const form = useFormContext<z.infer<typeof CreateCacheSchema>>();
 	const { getResources, resources } = useResourceStore();
-	const { appId } = useParams<{
-		appId: string;
-		orgId: string;
-	}>();
 
 	useEffect(() => {
 		getResources({
-			appId: appId as string,
 			type: 'cache',
 		});
 	}, []);

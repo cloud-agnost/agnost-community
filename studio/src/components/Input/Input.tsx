@@ -3,7 +3,7 @@ import * as React from 'react';
 import './input.scss';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-	type?: 'text' | 'password' | 'email' | 'number' | 'search' | 'tel' | 'url' | 'file';
+	type?: React.HTMLInputTypeAttribute;
 	className?: string;
 	error?: boolean;
 }

@@ -11,8 +11,9 @@ import { MouseEvent } from 'react';
 export type DatePickerProps = CalendarProps & {
 	className?: string;
 	error?: boolean;
+	clearable?: boolean;
 };
-export default function DatePicker({ className, error, ...props }: DatePickerProps) {
+export default function DatePicker({ className, error, clearable, ...props }: DatePickerProps) {
 	const { t } = useTranslation();
 	const formatted = (
 		<span className={cn('text-subtle text-sm', props.selected && 'text-default')}>
@@ -38,12 +39,13 @@ export default function DatePicker({ className, error, ...props }: DatePickerPro
 						'w-full px-3 relative justify-start text-left font-normal bg-input-background disabled:cursor-not-allowed disabled:opacity-50',
 						!props.selected && 'text-muted-foreground',
 					)}
+					onClick={(e) => e.stopPropagation()}
 				>
 					<CalendarBlank
 						className={cn('mr-2 h-4 w-4', !props.selected ? 'text-subtle' : 'text-default')}
 					/>
 					{formatted}
-					{props.selected && (
+					{clearable && props.selected && (
 						<span
 							role='button'
 							className='absolute h-full right-0 px-2 text-subtle hover:text-default flex items-center justify-center'

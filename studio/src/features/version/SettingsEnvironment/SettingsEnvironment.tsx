@@ -1,14 +1,14 @@
-import './SettingsEnvironment.scss';
-import { SettingsFormItem } from 'components/SettingsFormItem';
-import { useTranslation } from 'react-i18next';
-import { Switch } from 'components/Switch';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useEnvironmentStore from '@/store/environment/environmentStore.ts';
+import { cn } from '@/utils';
 import { Button } from 'components/Button';
 import { CopyInput } from 'components/CopyInput';
+import { SettingsFormItem } from 'components/SettingsFormItem';
+import { Switch } from 'components/Switch';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { cn } from '@/utils';
-import { EnvironmentResourcesTable } from '@/features/version/SettingsEnvironment';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import APIServerForm from './APIServerForm';
+import './SettingsEnvironment.scss';
 
 export default function SettingsEnvironment() {
 	const { t } = useTranslation();
@@ -70,6 +70,14 @@ export default function SettingsEnvironment() {
 			<SettingsFormItem
 				className='space-y-0 py-6'
 				contentClassName='pt-6'
+				title={t('version.apiServer')}
+				description={t('version.apiServer_desc')}
+			>
+				<APIServerForm />
+			</SettingsFormItem>
+			<SettingsFormItem
+				className='space-y-0 py-6'
+				contentClassName='pt-6'
 				title={
 					environment?.suspended ? t('version.reactivate_services') : t('version.suspend_services')
 				}
@@ -87,13 +95,6 @@ export default function SettingsEnvironment() {
 				>
 					{environment?.suspended ? t('version.reactivate') : t('version.suspend')}
 				</Button>
-			</SettingsFormItem>
-			<SettingsFormItem
-				className='space-y-0 py-6 max-w-full w-full'
-				contentClassName='pt-6'
-				title={t('version.resources')}
-			>
-				<EnvironmentResourcesTable />
 			</SettingsFormItem>
 		</div>
 	);

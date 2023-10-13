@@ -11,18 +11,31 @@ import { Cloud, GearSix } from '@phosphor-icons/react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Button } from 'components/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel } from 'components/Dropdown';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './deploymentStatusCard.scss';
 export default function DeploymentStatusCard() {
 	const { t } = useTranslation();
 	const [settingsIsOpen, setSettingsIsOpen] = useState(false);
 	const [isLogsOpen, setIsLogsOpen] = useState(false);
-	const { envStatus } = useEnvironmentStore();
+	const { envStatus, getEnvironmentResources, environment } = useEnvironmentStore();
 	const classes = ENV_STATUS_CLASS_MAP[envStatus];
+
+	function handleOpenChange(open: boolean) {
+		if (!open) {
+			setSettingsIsOpen(false);
+		} else {
+			getEnvironmentResources({
+				orgId: environment?.orgId,
+				appId: environment?.appId,
+				envId: environment?._id,
+				versionId: environment?.versionId,
+			});
+		}
+	}
 	return (
 		<>
-			<DropdownMenu onOpenChange={(open) => !open && setSettingsIsOpen(false)}>
+			<DropdownMenu onOpenChange={(open) => handleOpenChange(open)}>
 				<DropdownMenuPrimitive.Trigger asChild>
 					<Button variant='blank' iconOnly className='relative'>
 						<div className='absolute top-1 right-0.5'>

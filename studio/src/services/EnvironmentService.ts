@@ -1,13 +1,14 @@
 import { axios } from '@/helpers';
 import {
 	Environment,
-	getAppVersionEnvironmentParams,
 	GetEnvironmentLogsParams,
 	GetEnvironmentResourcesParams,
 	Resource,
 	ToggleAutoDeployParams,
+	UpdateAPIServerConfParams,
 	UpdateEnvironmentTelemetryLogsParams,
 	VersionParams,
+	getAppVersionEnvironmentParams,
 } from '@/types';
 
 export default class EnvironmentService {
@@ -113,6 +114,21 @@ export default class EnvironmentService {
 		return (
 			await axios.get(
 				`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/resources`,
+			)
+		).data;
+	}
+
+	static async updateAPIServerConf({
+		orgId,
+		appId,
+		versionId,
+		envId,
+		...data
+	}: UpdateAPIServerConfParams): Promise<Resource> {
+		return (
+			await axios.put(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/apiserver`,
+				data,
 			)
 		).data;
 	}

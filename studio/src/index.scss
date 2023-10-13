@@ -387,30 +387,6 @@
 	animation: Toastify__trackProgress linear 1 forwards;
 }
 
-.select-box {
-	@apply min-h-[34px] h-9;
-
-	.select__placeholder,
-	.select__input-container {
-		padding: 0 !important;
-	}
-	.select__value-container {
-		padding-inline: 12px !important;
-	}
-	.select__control {
-		@apply shadow-none hover:border-input-hover min-h-[34px] h-9 #{!important};
-	}
-	&:focus-within {
-		.select__control {
-			@apply border-input-focus outline-none ring-0 #{!important};
-		}
-	}
-
-	&.error:not(:focus-within) .select__control {
-		@apply border-error-default #{!important};
-	}
-}
-
 .rdrDefinedRangesWrapper,
 .rdrStaticRange {
 	background-color: rgb(var(--wrapper-background-light)) !important;
@@ -540,4 +516,40 @@
 html {
 	scrollbar-width: thin;
 	scrollbar-color: var(--wrapper-background-light) var(--form-input-base-border);
+}
+
+.select-box {
+	@apply min-h-[34px] h-9;
+}
+.select-box:focus-within {
+	.select__control {
+		@apply border-input-focus outline-none ring-0 #{!important};
+	}
+}
+
+.select-box.error:not(:focus-within) .select__control {
+	@apply border-error-default #{!important};
+}
+.select__placeholder,
+.select__input-container {
+	padding: 0 !important;
+}
+.select__value-container {
+	padding-inline: 12px !important;
+}
+.select__control {
+	@apply shadow-none hover:border-input-hover min-h-[34px] h-[42px] bg-input-background border-input-border #{!important};
+}
+.select__menu {
+	@apply bg-wrapper-background-light rounded  #{!important};
+}
+.select__option {
+	@apply text-default hover:bg-wrapper-background-hover border-b border-border #{!important};
+}
+.select__option--is-selected {
+	@apply bg-wrapper-background-hover #{!important};
+}
+
+.select__option--is-focused {
+	@apply bg-wrapper-background-hover #{!important};
 }

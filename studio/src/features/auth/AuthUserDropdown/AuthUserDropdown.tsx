@@ -1,8 +1,8 @@
-import { HEADER_USER_DROPDOWN } from '@/constants';
+import { LineSegments } from '@/components/icons';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useThemeStore from '@/store/theme/themeStore.ts';
 import { cn } from '@/utils';
-import { Laptop, MoonStars, SignOut, SunDim } from '@phosphor-icons/react';
+import { GearSix, Laptop, MoonStars, SignOut, SunDim } from '@phosphor-icons/react';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import {
 	DropdownMenu,
@@ -59,14 +59,23 @@ export default function AuthUserDropdown() {
 				<DropdownMenuSeparator />
 
 				<DropdownMenuItemContainer className='space-y-2'>
-					{HEADER_USER_DROPDOWN.map((item) => (
-						<DropdownMenuItem key={item.title} asChild>
-							<Link className={cn('flex items-center gap-2')} to={item.url}>
-								<item.Icon className='text-icon-base text-lg' />
-								{item.title}
+					<DropdownMenuItem asChild>
+						<Link className={cn('flex items-center gap-2')} to='/profile/settings'>
+							<GearSix className='text-icon-base text-lg' />
+							{t('general.account_settings')}
+						</Link>
+					</DropdownMenuItem>
+					{user?.isClusterOwner && (
+						<DropdownMenuItem asChild>
+							<Link
+								className={cn('flex items-center gap-2')}
+								to={'/profile/settings/cluster-management'}
+							>
+								<LineSegments className='text-icon-base text-lg' />
+								{t('profileSettings.clusters_title')}
 							</Link>
 						</DropdownMenuItem>
-					))}
+					)}
 
 					<DropdownMenuSub>
 						<DropdownMenuSubTrigger className='dropdown-item flex items-center gap-2'>

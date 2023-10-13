@@ -46,7 +46,6 @@ export default function ErrorBoundary() {
 			baseUrl: window.location.origin,
 			error: error?.stack,
 		});
-		console.log(error.message, error.name, error.stack);
 		const requestOptions = {
 			method: 'POST',
 			headers: myHeaders,

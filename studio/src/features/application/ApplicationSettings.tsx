@@ -41,6 +41,7 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 						rounded
 						className='p-2'
 						onClick={(e) => {
+							setOpen(!open);
 							e.stopPropagation();
 						}}
 					>

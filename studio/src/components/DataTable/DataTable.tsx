@@ -10,14 +10,18 @@ import {
 	ColumnFiltersState,
 	getFilteredRowModel,
 	Table as TableType,
+	Cell,
 } from '@tanstack/react-table';
 import { ReactNode, useEffect, useState } from 'react';
 import { ColumnDefWithClassName } from '@/types';
-
+import './sortButton.scss';
 interface DataTableProps<TData> {
 	columns: ColumnDefWithClassName<TData>[];
 	data: TData[];
+	className?: string;
+	containerClassName?: string;
 	onRowClick?: (row: TData) => void;
+	onCellClick?: (cell: Cell<TData, any>) => void;
 	setSelectedRows?: (table: Row<TData>[]) => void;
 	setTable?: (table: TableType<TData>) => void;
 	noDataMessage?: string | ReactNode;
@@ -29,7 +33,10 @@ export function DataTable<TData>({
 	setSelectedRows,
 	setTable,
 	onRowClick,
+	onCellClick,
 	noDataMessage = translate('general.no_results'),
+	className,
+	containerClassName,
 }: DataTableProps<TData>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [rowSelection, setRowSelection] = useState({});
@@ -37,6 +44,7 @@ export function DataTable<TData>({
 	const table = useReactTable({
 		data,
 		columns,
+		columnResizeMode: 'onChange',
 		getCoreRowModel: getCoreRowModel(),
 		onSortingChange: setSorting,
 		getSortedRowModel: getSortedRowModel(),
@@ -83,9 +91,9 @@ export function DataTable<TData>({
 	}, [table]);
 
 	return (
-		<Table>
+		<Table className={className} containerClassName={containerClassName}>
 			{columns.map((column) => column.header).filter(Boolean).length > 0 && (
-				<TableHeader>
+				<TableHeader className='sticky top-0 z-50'>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<TableRow key={headerGroup.id} className='head'>
 							{headerGroup.headers.map((header, index) => {
@@ -96,10 +104,23 @@ export function DataTable<TData>({
 											header.column.columnDef.enableSorting && 'sortable',
 											columns[index].className,
 										)}
+										colSpan={header.colSpan}
+										style={{
+											width: header.getSize(),
+										}}
 									>
 										{header.isPlaceholder
 											? null
 											: flexRender(header.column.columnDef.header, header.getContext())}
+										<div
+											{...{
+												onMouseDown: header.getResizeHandler(),
+												onTouchStart: header.getResizeHandler(),
+												className: `resizer absolute right-0 top-0 h-full w-1 bg-border cursor-col-resize select-none touch-none ${
+													header.column.getIsResizing() ? 'opacity-100 bg-elements-strong-blue' : ''
+												}`,
+											}}
+										/>
 									</TableHead>
 								);
 							})}
@@ -121,7 +142,11 @@ export function DataTable<TData>({
 									key={cell.id}
 									className={cn('font-sfCompact', columns[index].className)}
 									style={{
-										width: cell.column.columnDef.size,
+										width: cell.column.getSize(),
+									}}
+									onClick={(e) => {
+										e.stopPropagation();
+										onCellClick?.(cell);
 									}}
 								>
 									{flexRender(cell.column.columnDef.cell, cell.getContext())}

@@ -16,7 +16,6 @@ import { StorageSchema } from '@/types';
 import { translate as t } from '@/utils';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 
 interface StorageFormProps {
@@ -25,10 +24,6 @@ interface StorageFormProps {
 export default function StorageForm({ edit = false }: StorageFormProps) {
 	const form = useFormContext<z.infer<typeof StorageSchema>>();
 	const { getResources, resources } = useResourceStore();
-	const { appId } = useParams<{
-		appId: string;
-		orgId: string;
-	}>();
 
 	function getResourceIcon(type: string) {
 		const Icon = STORAGE_ICON_MAP[type];
@@ -36,7 +31,6 @@ export default function StorageForm({ edit = false }: StorageFormProps) {
 	}
 	useEffect(() => {
 		getResources({
-			appId: appId as string,
 			type: 'storage',
 		});
 	}, []);

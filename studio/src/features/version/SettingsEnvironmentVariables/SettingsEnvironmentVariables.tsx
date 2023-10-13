@@ -10,6 +10,7 @@ import {
 	VariableColumns,
 } from '@/features/version/SettingsEnvironmentVariables';
 import { EmptyState } from 'components/EmptyState';
+import { EnvironmentVariable } from '@/components/icons';
 
 interface SettingsEnvironmentVariablesProps {
 	selectedRows: Row<Param>[] | undefined;
@@ -29,7 +30,10 @@ export default function SettingsEnvironmentVariables({
 		<>
 			{variables.length === 0 ? (
 				<div className='h-full flex items-center justify-center'>
-					<EmptyState title={t('version.variable.no_variable_found')} />
+					<EmptyState
+						icon={<EnvironmentVariable className='w-44 h-44' />}
+						title={t('version.variable.no_variable_found')}
+					/>
 				</div>
 			) : (
 				<div className='data-table-container'>

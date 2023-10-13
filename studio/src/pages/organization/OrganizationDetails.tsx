@@ -6,6 +6,7 @@ import { OrganizationMenu } from '@/features/organization';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useApplicationStore from '@/store/app/applicationStore.ts';
+import { Organization } from '@/types';
 
 OrganizationDetails.loader = function ({ params }: LoaderFunctionArgs) {
 	const { isAuthenticated } = useAuthStore.getState();
@@ -18,7 +19,7 @@ OrganizationDetails.loader = function ({ params }: LoaderFunctionArgs) {
 				useOrganizationStore.setState((prev) => {
 					const organization = prev.organizations.find((org) => org._id === orgId);
 					if (organization) prev.organization = organization;
-					else prev.organization = null;
+					else prev.organization = {} as Organization;
 
 					unSubscribeOrg();
 					return prev;

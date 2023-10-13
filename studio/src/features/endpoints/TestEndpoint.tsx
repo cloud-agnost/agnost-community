@@ -106,12 +106,12 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	async function onSubmit(data: z.infer<typeof TestEndpointSchema>) {
 		setLoading(true);
 		const pathVariables = arrayToObj(data.params.pathVariables ?? []);
-		const testPath = getEndpointPath(endpoint?.path as string, pathVariables);
+		const testPath = getEndpointPath(endpoint?.path, pathVariables);
 		const consoleLogId = generateId();
 		joinChannel(consoleLogId);
 		await testEndpoint({
-			epId: endpoint?._id as string,
-			envId: environment?.iid as string,
+			epId: endpoint?._id,
+			envId: environment?.iid,
 			path: testPath,
 			consoleLogId,
 			method: endpoint?.method.toLowerCase() as TestMethods,

@@ -56,7 +56,7 @@ const useTaskStore = create<TaskStore>()(
 					set({ task, isEditTaskModalOpen: true });
 				},
 				closeEditTaskModal: () => {
-					set({ isEditTaskModalOpen: false, task: {} as Task });
+					set({ isEditTaskModalOpen: false });
 				},
 				getTask: async (params: GetTaskParams) => {
 					const task = await TaskService.getTask(params);

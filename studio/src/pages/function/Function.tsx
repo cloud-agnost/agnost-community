@@ -18,7 +18,7 @@ interface OutletContext {
 	setIsCreateModalOpen: (isOpen: boolean) => void;
 }
 
-export default function Function() {
+export default function MainFunction() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
 	const canCreate = useAuthorizeVersion('function.create');
@@ -70,7 +70,7 @@ export default function Function() {
 	function deleteFunctionHandler() {
 		setLoading(true);
 		deleteFunction({
-			funcId: toDeleteFunction?._id as string,
+			funcId: toDeleteFunction?._id,
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
@@ -115,7 +115,6 @@ export default function Function() {
 			table={table}
 			selectedRowLength={selectedRows.length}
 			disabled={!canCreate}
-			viewLogs
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'
@@ -146,7 +145,7 @@ export default function Function() {
 						}}
 					/>
 				}
-				confirmCode={toDeleteFunction?.iid as string}
+				confirmCode={toDeleteFunction?.iid}
 				onConfirm={deleteFunctionHandler}
 				isOpen={isDeleteFunctionModalOpen}
 				closeModal={closeDeleteFunctionModal}

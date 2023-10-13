@@ -47,7 +47,6 @@ export default function CreateResourceLayout({
 			}
 		}
 	}, [form]);
-
 	return (
 		<div className='px-6 py-4 space-y-6  overflow-auto'>
 			<div className='font-sfCompact'>

@@ -30,9 +30,11 @@ export default function ListFields({ model, parentModel }: ListFieldsProps) {
 	const filteredFields = useMemo(() => {
 		if (!search) return model.fields;
 
-		return model.fields.filter((f) => {
-			return f.name.toLowerCase().includes(search.toLowerCase());
-		});
+		return model.fields
+			.filter((f) => {
+				return f.name.toLowerCase().includes(search.toLowerCase());
+			})
+			.sort((a, b) => b.order - a.order);
 	}, [search, model]);
 
 	useEffect(() => {
@@ -63,7 +65,6 @@ export default function ListFields({ model, parentModel }: ListFieldsProps) {
 		table?.resetRowSelection?.();
 	}
 
-	const hasNoFields = filteredFields.length === 0;
 	const databasesUrl = `/organization/${database?.orgId}/apps/${database?.appId}/version/${database?.versionId}/database`;
 	const databaseUrl = `${databasesUrl}/${model.dbId}/models`;
 	const goParentModelUrl = `${databaseUrl}/${parentModel?._id}/fields`;
@@ -95,14 +96,10 @@ export default function ListFields({ model, parentModel }: ListFieldsProps) {
 				/>
 			}
 			onSearchInputClear={() => setSearch('')}
-			isEmpty={hasNoFields}
+			isEmpty={!filteredFields.length}
 			title={t('database.fields.title')}
 			icon={<ModelIcon className='w-44 h-44' />}
 			handlerButton={<CreateFieldButton />}
-			openCreateModal={() => {
-				/* empty */
-			}}
-			createButtonTitle={t('database.models.create')}
 			emptyStateTitle={t('database.fields.no_fields')}
 			table={table}
 			selectedRowLength={selectedRows?.length}
@@ -113,7 +110,7 @@ export default function ListFields({ model, parentModel }: ListFieldsProps) {
 			<DataTable<Field>
 				setTable={setTable}
 				columns={FieldColumns}
-				data={filteredFields.sort((a, b) => b.order - a.order)}
+				data={filteredFields}
 				noDataMessage={<p className='text-xl'>{t('database.fields.no_fields')}</p>}
 				setSelectedRows={setSelectedRows}
 			/>

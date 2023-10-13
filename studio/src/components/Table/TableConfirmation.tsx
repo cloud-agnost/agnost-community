@@ -47,6 +47,9 @@ export function TableConfirmation({
 								disabled={disabled}
 								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
 								iconOnly
+								onClick={(e) => {
+									e.stopPropagation();
+								}}
 							>
 								<Trash size={20} />
 							</Button>

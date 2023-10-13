@@ -7,10 +7,11 @@ interface DateTextProps {
 	children?: ReactNode;
 	className?: string;
 	user?: OrganizationMember;
+	style?: React.CSSProperties;
 }
-export default function DateText({ date, children, className, user }: DateTextProps) {
+export default function DateText({ date, children, className, user, ...props }: DateTextProps) {
 	return (
-		<div className={cn('flex items-center gap-4 whitespace-nowrap', className)}>
+		<div className={cn('flex items-center gap-4 whitespace-nowrap', className)} {...props}>
 			{children}
 			{user && (
 				<Avatar size='sm'>

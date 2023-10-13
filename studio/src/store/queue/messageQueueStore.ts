@@ -58,7 +58,7 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 					set({ queue, isEditModalOpen: true });
 				},
 				closeEditModal: () => {
-					set({ isEditModalOpen: false, queue: {} as MessageQueue });
+					set({ isEditModalOpen: false });
 				},
 				getQueues: async (params: GetMessageQueuesParams) => {
 					const queues = await QueueService.getQueues(params);
