@@ -8,6 +8,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { reverseArray } from '@/utils';
 import { EmptyState } from 'components/EmptyState';
+import { ApiKeys } from '@/components/icons';
 
 interface SettingsAPIKeysProps {
 	selectedRows: Row<APIKey>[] | undefined;
@@ -23,7 +24,10 @@ export default function SettingsAPIKeys({ setSelectedRows, setTable }: SettingsA
 	if (apiKeys.length === 0) {
 		return (
 			<div className='h-full flex items-center justify-center'>
-				<EmptyState title={t('version.api_key.no_api_key_found')} />
+				<EmptyState
+					icon={<ApiKeys className='w-44 h-44' />}
+					title={t('version.api_key.no_api_key_found')}
+				/>
 			</div>
 		);
 	}
