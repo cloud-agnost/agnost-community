@@ -10,7 +10,6 @@ import {
 } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { ResourceSelect } from '@/components/ResourceSelect';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { STORAGE_ICON_MAP } from '@/constants';
 import useResourceStore from '@/store/resources/resourceStore';
 import { CreateStorageSchema } from '@/types';

@@ -10,9 +10,7 @@ import {
 } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { ResourceSelect } from '@/components/ResourceSelect';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { Switch } from '@/components/Switch';
-import { Redis } from '@/components/icons';
 import useResourceStore from '@/store/resources/resourceStore';
 import { CreateCacheSchema } from '@/types';
 import { translate as t } from '@/utils';

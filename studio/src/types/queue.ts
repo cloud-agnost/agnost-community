@@ -79,7 +79,7 @@ export const MessageQueueSchema = z.object({
 			}),
 		),
 
-	delay: z.coerce.number().int().positive().optional(),
+	delay: z.coerce.number().int().positive().optional().nullish(),
 	logExecution: z.boolean().default(false),
 });
 export const CreateMessageQueueSchema = z.object({
@@ -94,7 +94,7 @@ export const CreateMessageQueueSchema = z.object({
 export interface CreateMessageQueueParams extends BaseRequest, BaseParams {
 	name: string;
 	logExecution: boolean;
-	delay?: number;
+	delay?: number | null;
 	resourceId: string;
 }
 export interface UpdateQueueParams extends Omit<CreateMessageQueueParams, 'resourceId'> {
