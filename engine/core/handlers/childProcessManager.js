@@ -560,10 +560,11 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	async setupResourceConnections() {
 		const resources = this.getResources();
 		for (const resource of resources) {
-			// Check whether this is a PostgreSQL database or not
+			// Check whether this is a PostgreSQL, MySQL or SQL Server database or not
 			// We need to connect to the actual database not to the default database
 			// For this reason we connect based on database not based on resource
-			if (resource.instance === "PostgreSQL") continue;
+			if (["PostgreSQL", "MySQL", "SQL Server"].includes(resource.instance))
+				continue;
 
 			resource.access = helper.decryptSensitiveData(resource.access);
 			if (resource.accessReadOnly)
@@ -575,12 +576,12 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			await adapterManager.setupConnection(resource);
 		}
 
-		// Get the list of databases and filter the ones that are PostgreSQL
-		const postgresDbs = await META.getDatabasesSync().filter(
-			(entry) => entry.type === "PostgreSQL"
+		// Get the list of databases and filter the ones that are PostgreSQL, MySQL or SQL Server
+		const dbs = await META.getDatabasesSync().filter((entry) =>
+			["PostgreSQL", "MySQL", "SQL Server"].includes(entry.type)
 		);
 
-		for (const db of postgresDbs) {
+		for (const db of dbs) {
 			// First find the corresponding resource mapping
 			const mapping = this.getResourceMappings().find(
 				(entry) => entry.design.iid === db.iid
@@ -611,7 +612,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	}
 
 	/**
-	 * Returns the name of the database to use
+	 * Returns the name of the database to use. We need to make the letters lowercase e.g., postgresql users lowercase letters for database names
 	 */
 	getAppliedDbName(database) {
 		if (database.assignUniqueName)

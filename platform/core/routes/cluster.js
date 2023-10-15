@@ -1,5 +1,6 @@
 import axios from "axios";
 import express from "express";
+import nodemailer from "nodemailer";
 import userCtrl from "../controllers/user.js";
 import clsCtrl from "../controllers/cluster.js";
 import { authMasterToken } from "../middlewares/authMasterToken.js";
@@ -50,6 +51,36 @@ router.get("/smtp-status", async (req, res) => {
 });
 
 /*
+@route      /v1/cluster/info
+@method     GET
+@desc       Returns information about the cluster itself
+@access     public
+*/
+router.get("/info", authSession, async (req, res) => {
+	try {
+		const { user } = req;
+		if (!user.isClusterOwner) {
+			return res.status(401).json({
+				error: t("Not Authorized"),
+				details: t(
+					"You are not authorized to view cluster information. Only the cluster owner can view and manage cluster info."
+				),
+				code: ERROR_CODES.unauthorized,
+			});
+		}
+
+		// Get cluster configuration
+		let cluster = await clsCtrl.getOneByQuery({
+			clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+		});
+
+		res.json({ ...cluster, smtp: helper.decryptSensitiveData(cluster.smtp) });
+	} catch (error) {
+		handleError(req, res, error);
+	}
+});
+
+/*
 @route      /v1/cluster/smtp
 @method     GET
 @desc       Returns the smtp configuration of the cluster object
@@ -68,6 +99,68 @@ router.get("/smtp", authMasterToken, async (req, res) => {
 		handleError(req, res, error);
 	}
 });
+
+/*
+@route      /v1/cluster/smtp
+@method     PUT
+@desc       Updates the smtp configuration of the cluster object
+@access     public
+*/
+router.put(
+	"/smtp",
+	checkContentType,
+	authSession,
+	applyRules("update-smtp"),
+	validate,
+	async (req, res) => {
+		try {
+			const { user } = req;
+
+			if (!user.isClusterOwner) {
+				return res.status(401).json({
+					error: t("Not Authorized"),
+					details: t(
+						"You are not authorized to update cluster information. Only the cluster owner can view and manage cluster info."
+					),
+					code: ERROR_CODES.unauthorized,
+				});
+			}
+
+			let transport = nodemailer.createTransport({
+				host: req.body.host,
+				port: req.body.port,
+				secure: req.body.useTLS,
+				auth: {
+					user: req.body.user,
+					pass: req.body.password,
+				},
+				pool: false,
+			});
+
+			try {
+				await transport.verify();
+			} catch (err) {
+				return res.status(400).json({
+					error: t("Connection Error"),
+					details: t("Cannot connect to the SMTP server. %s", err.message),
+					code: ERROR_CODES.connectionError,
+				});
+			}
+
+			// Update cluster configuration
+			let updatedCluster = await clsCtrl.updateOneByQuery(
+				{
+					clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+				},
+				{ smtp: helper.encyrptSensitiveData(req.body) }
+			);
+
+			res.json({ ...updatedCluster, smtp: req.body });
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
 
 /*
 @route      /v1/cluster/components
