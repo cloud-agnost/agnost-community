@@ -6,7 +6,6 @@ import { Tab } from '@/types';
 import { cn, saveEditorContent } from '@/utils';
 import MonacoEditor, { EditorProps } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
-import github from 'monaco-themes/themes/Github.json';
 import nightOwl from 'monaco-themes/themes/Night Owl.json';
 import { useRef } from 'react';
 interface CodeEditorProps extends Omit<EditorProps, 'defaultLanguage'> {
@@ -70,13 +69,12 @@ export default function CodeEditor({
 	};
 	function setEditorTheme(monaco: any) {
 		monaco.editor.defineTheme('nightOwl', nightOwl);
-		monaco.editor.defineTheme('github', github);
 	}
 
 	return (
 		<div className={cn(containerClassName)}>
 			<MonacoEditor
-				theme={theme === 'dark' ? 'nightOwl' : 'github'}
+				theme={theme === 'dark' ? 'nightOwl' : 'vs'}
 				beforeMount={setEditorTheme}
 				className={cn('editor', className)}
 				onChange={handleEditorChange}

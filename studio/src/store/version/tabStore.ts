@@ -21,6 +21,7 @@ interface TabStore {
 	getCurrentTab: (versionId: string) => Tab;
 	updateCurrentTab: (versionId: string, tab: Tab) => void;
 	setTabs: (versionId: string, tabs: Tab[]) => void;
+	removeTabByPath: (versionId: string, path: string) => void;
 }
 
 const useTabStore = create<TabStore>()(
@@ -163,6 +164,11 @@ const useTabStore = create<TabStore>()(
 							},
 						};
 					});
+				},
+				removeTabByPath: (versionId, path) => {
+					const tab = get().tabs[versionId]?.find((tab) => tab.path.includes(path));
+					if (!tab) return;
+					get().removeTab(versionId, tab.id);
 				},
 			}),
 			{

@@ -2,7 +2,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import { CreateMessageQueueSchema } from '@/types';
+import { MessageQueueSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -18,22 +18,22 @@ interface CreateQueueProps {
 export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 	const { t } = useTranslation();
 	const { updateQueue, queue } = useMessageQueueStore();
-	const { versionId, appId, orgId, queueId } = useParams<{
+	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
 		orgId: string;
 		queueId: string;
 	}>();
 	const { notify } = useToast();
-	const form = useForm<z.infer<typeof CreateMessageQueueSchema>>({
-		resolver: zodResolver(CreateMessageQueueSchema),
+	const form = useForm<z.infer<typeof MessageQueueSchema>>({
+		resolver: zodResolver(MessageQueueSchema),
 	});
-	function onSubmit(data: z.infer<typeof CreateMessageQueueSchema>) {
+	function onSubmit(data: z.infer<typeof MessageQueueSchema>) {
 		updateQueue({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			queueId: queueId as string,
+			queueId: queue._id as string,
 			...data,
 			onSuccess: () => {
 				onClose();
@@ -49,6 +49,8 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 			form.reset(queue);
 		}
 	}, [queue]);
+
+	console.log(form.formState.errors);
 	return (
 		<Drawer
 			open={open}

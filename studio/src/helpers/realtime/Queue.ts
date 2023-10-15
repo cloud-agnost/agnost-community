@@ -1,4 +1,5 @@
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
+import useTabStore from '@/store/version/tabStore';
 import { LogTypes, MessageQueue, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Queue extends RealtimeActions<MessageQueue> {
@@ -18,11 +19,13 @@ class Queue extends RealtimeActions<MessageQueue> {
 		}, 100);
 	}
 	delete({ identifiers }: RealtimeActionParams<MessageQueue>) {
+		const { removeTabByPath } = useTabStore.getState();
 		useMessageQueueStore.setState?.({
 			queues: useMessageQueueStore
 				.getState?.()
 				.queues.filter((queue) => queue._id !== identifiers.queueId),
 		});
+		removeTabByPath(identifiers.versionId as string, identifiers.queueId as string);
 	}
 	update({ data }: RealtimeActionParams<MessageQueue>) {
 		useMessageQueueStore.setState?.({

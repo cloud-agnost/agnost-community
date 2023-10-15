@@ -22,6 +22,8 @@ export interface Task {
 	updatedAt: string;
 }
 
+export const TaskScheme = z.object({});
+
 export const CreateTaskSchema = z.object({
 	name: z
 		.string({
