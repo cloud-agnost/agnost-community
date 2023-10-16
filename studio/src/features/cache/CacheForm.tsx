@@ -9,9 +9,8 @@ import {
 	FormMessage,
 } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
+import { ResourceSelect } from '@/components/ResourceSelect';
 import { Switch } from '@/components/Switch';
-import { Redis } from '@/components/icons';
 import useResourceStore from '@/store/resources/resourceStore';
 import { CreateCacheSchema } from '@/types';
 import { translate as t } from '@/utils';
@@ -81,33 +80,14 @@ export default function CacheForm({ edit = false }: CacheFormProps) {
 							<FormItem className='space-y-1'>
 								<FormLabel>{t('queue.create.resource.title')}</FormLabel>
 								<FormControl>
-									<Select
+									<ResourceSelect
 										defaultValue={field.value}
 										value={field.value}
 										name={field.name}
 										onValueChange={field.onChange}
-									>
-										<FormControl>
-											<SelectTrigger
-												error={Boolean(form.formState.errors.resourceId)}
-												className='w-1/3'
-											>
-												<SelectValue
-													placeholder={`${t('general.select')} ${t('queue.create.resource.title')}`}
-												/>
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent align='center'>
-											{resources.map((resource) => (
-												<SelectItem key={resource._id} value={resource._id}>
-													<div className='flex items-center gap-2'>
-														<Redis className='w-5 h-5' />
-														{resource.name}
-													</div>
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
+										error={Boolean(form.formState.errors.resourceId)}
+										resources={resources}
+									/>
 								</FormControl>
 								<FormDescription>{t('queue.create.resource.description')}</FormDescription>
 								<FormMessage />

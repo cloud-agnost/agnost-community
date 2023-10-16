@@ -9,8 +9,7 @@ import {
 	FormMessage,
 } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
-import { STORAGE_ICON_MAP } from '@/constants';
+import { ResourceSelect } from '@/components/ResourceSelect';
 import useResourceStore from '@/store/resources/resourceStore';
 import { CreateStorageSchema } from '@/types';
 import { translate as t } from '@/utils';
@@ -25,10 +24,6 @@ export default function StorageForm({ edit = false }: StorageFormProps) {
 	const form = useFormContext<z.infer<typeof CreateStorageSchema>>();
 	const { getResources, resources } = useResourceStore();
 
-	function getResourceIcon(type: string) {
-		const Icon = STORAGE_ICON_MAP[type];
-		return <Icon className='w-6 h-6' /> ?? null;
-	}
 	useEffect(() => {
 		getResources({
 			type: 'storage',
@@ -67,33 +62,14 @@ export default function StorageForm({ edit = false }: StorageFormProps) {
 						<FormItem className='space-y-1'>
 							<FormLabel>{t('queue.create.resource.title')}</FormLabel>
 							<FormControl>
-								<Select
+								<ResourceSelect
 									defaultValue={field.value}
 									value={field.value}
 									name={field.name}
 									onValueChange={field.onChange}
-								>
-									<FormControl>
-										<SelectTrigger
-											error={Boolean(form.formState.errors.resourceId)}
-											className='w-1/3'
-										>
-											<SelectValue
-												placeholder={`${t('general.select')} ${t('queue.create.resource.title')}`}
-											/>
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent align='center'>
-										{resources.map((resource) => (
-											<SelectItem key={resource._id} value={resource._id}>
-												<div className='flex items-center gap-2'>
-													{getResourceIcon(resource.instance ?? '')}
-													{resource.name}
-												</div>
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
+									error={Boolean(form.formState.errors.resourceId)}
+									resources={resources}
+								/>
 							</FormControl>
 							<FormDescription>{t('queue.create.resource.description')}</FormDescription>
 							<FormMessage />

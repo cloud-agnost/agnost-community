@@ -38,9 +38,10 @@ export default function SelectUserDataModel() {
 	const { notify } = useToast();
 	const form = useForm<z.infer<typeof SaveUserModelSchema>>({
 		defaultValues: {
-			databaseId: databases?.find((db) => db.iid === version?.authentication.userDataModel.database)
-				?._id,
-			modelId: models?.find((model) => model.iid === version?.authentication.userDataModel.model)
+			databaseId: databases?.find(
+				(db) => db.iid === version?.authentication?.userDataModel?.database,
+			)?._id,
+			modelId: models?.find((model) => model.iid === version?.authentication?.userDataModel?.model)
 				?._id,
 		},
 		resolver: zodResolver(SaveUserModelSchema),

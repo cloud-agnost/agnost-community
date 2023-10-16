@@ -145,13 +145,27 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	useEffect(() => {
 		const req = endpointRequest[endpoint?._id as string];
 		if (req) {
-			form.setValue('body', req.body);
-			form.setValue('headers', objToArray(req.headers));
-			form.setValue('params.queryParams', objToArray(req.params.queryParams));
-			form.setValue('params.pathVariables', objToArray(req.params.pathParams));
-			form.setValue('formData', objToArray(req.formData));
+			form.reset({
+				params: {
+					queryParams: objToArray(req.params.queryParams),
+					pathVariables: objToArray(req.params.pathParams),
+				},
+				headers: objToArray(req.headers),
+				body: req.body,
+				formData: objToArray(req.formData),
+			});
+		} else {
+			form.reset({
+				params: {
+					queryParams: [],
+					pathVariables: [],
+				},
+				headers: [],
+				body: '',
+				formData: [],
+			});
 		}
-	}, [endpointRequest]);
+	}, [endpointRequest[endpoint?._id as string]]);
 
 	useEffect(() => {
 		if (!searchParams.get('t') && open) {

@@ -10,6 +10,7 @@ import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MessageQueueForm from './MessageQueueForm';
 import { useEffect } from 'react';
+import { removeEmptyFields } from '@/utils';
 interface CreateQueueProps {
 	open: boolean;
 	onClose: () => void;
@@ -29,12 +30,13 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 		resolver: zodResolver(MessageQueueSchema),
 	});
 	function onSubmit(data: z.infer<typeof MessageQueueSchema>) {
+		const params = removeEmptyFields(data) as z.infer<typeof MessageQueueSchema>;
 		updateQueue({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			queueId: queue._id as string,
-			...data,
+			...params,
 			onSuccess: () => {
 				onClose();
 			},

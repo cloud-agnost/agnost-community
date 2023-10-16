@@ -86,18 +86,18 @@ export default function VersionEditorLayout({
 				{children}
 				<div className='flex items-center gap-4'>
 					<Button variant='secondary' onClick={onEditModalOpen}>
-						<Pencil className='text-icon-base w-5 h-5 mr-2' />
+						<Pencil className='text-icon-default w-5 h-5 mr-2' />
 						{t('general.edit')}
 					</Button>
 
 					{onTestModalOpen && (
 						<Button variant='secondary' onClick={onTestModalOpen}>
-							<TestTube size={20} className='text-icon-base mr-2' />
+							<TestTube size={20} className='text-icon-default mr-2' />
 							{t('endpoint.test.test')}
 						</Button>
 					)}
 					<Button variant='primary' onClick={() => handleSaveLogic()} loading={loading}>
-						<FloppyDisk size={20} className='text-icon-secondary mr-2' />
+						<FloppyDisk size={20} className='text-icon-default mr-2' />
 						{t('general.save')}
 					</Button>
 				</div>

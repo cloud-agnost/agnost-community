@@ -662,6 +662,7 @@ export const VERSION_DROPDOWN_ITEM = [
 			if (!application) return;
 			openVersionDrawer(application);
 		},
+		disabled: useVersionStore.getState().versions.length <= 1,
 	},
 	{
 		title: translate('version.create_a_copy'),
@@ -711,7 +712,7 @@ export const VERSION_DROPDOWN_ITEM = [
 				readOnly: !version?.readOnly,
 			});
 		},
-		disabled: () => false,
+		disabled: false,
 	},
 	{
 		title: useVersionStore.getState().version?.private
@@ -727,7 +728,7 @@ export const VERSION_DROPDOWN_ITEM = [
 				private: !version?.private,
 			});
 		},
-		disabled: () => useVersionStore.getState().version?.master,
+		disabled: useVersionStore.getState().version?.master,
 	},
 	{
 		title: translate('version.settings.default'),
@@ -743,7 +744,7 @@ export const VERSION_DROPDOWN_ITEM = [
 				type: 'Settings',
 			});
 		},
-		disabled: () => false,
+		disabled: false,
 	},
 ];
 
@@ -955,6 +956,7 @@ export const TAB_ICON_MAP: Record<string, ElementType> = {
 	Cache: Cache,
 	Endpoint: ApiKeys,
 	Queue: MessageQueue,
+	'Message Queue': MessageQueue,
 	Task: Calendar,
 	Middleware: Middleware,
 	Settings: GearSix,

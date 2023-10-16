@@ -20,7 +20,6 @@ export const CreateEndpointSchema = z.object({
 				label: t('general.name'),
 			}),
 		})
-		.nonempty()
 		.regex(NAME_REGEX, {
 			message: t('forms.invalid', {
 				label: t('general.name'),
@@ -76,7 +75,6 @@ export const CreateEndpointSchema = z.object({
 				label: t('endpoint.create.path'),
 			}),
 		})
-		.nonempty()
 		.regex(ROUTE_NAME_REGEX, {
 			message: t('endpoint.errors.notValidRoute'),
 		})

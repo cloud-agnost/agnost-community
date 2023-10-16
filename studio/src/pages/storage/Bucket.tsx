@@ -1,3 +1,4 @@
+import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
@@ -23,7 +24,6 @@ import {
 	useParams,
 	useSearchParams,
 } from 'react-router-dom';
-
 Buckets.loader = async ({ params }: LoaderFunctionArgs) => {
 	const role = useApplicationStore.getState().application?.role;
 
@@ -70,6 +70,7 @@ export default function Buckets() {
 	const { versionId, orgId, appId } = useParams();
 	const navigate = useNavigate();
 	const viewData = useAuthorizeVersion('storage.viewData');
+
 	const {
 		getBuckets,
 		closeBucketDeleteDialog,
@@ -91,6 +92,16 @@ export default function Buckets() {
 		bucketPage,
 		setBucketPage,
 	}: OutletContext = useOutletContext();
+	const storageUrl = `/organization/${orgId}/apps/${appId}/version/${versionId}/storage`;
+	const breadcrumbItems: BreadCrumbItem[] = [
+		{
+			name: t('storage.title').toString(),
+			url: storageUrl,
+		},
+		{
+			name: t('storage.buckets') as string,
+		},
+	];
 
 	function onInput(value: string) {
 		value = value.trim();
@@ -163,6 +174,7 @@ export default function Buckets() {
 			selectedRowLength={selectedBuckets?.length}
 			onSearch={onInput}
 			onMultipleDelete={deleteMultipleBucketsHandler}
+			breadCrumb={<BreadCrumb goBackLink={storageUrl} items={breadcrumbItems} />}
 		>
 			<InfiniteScroll
 				scrollableTarget='version-layout'

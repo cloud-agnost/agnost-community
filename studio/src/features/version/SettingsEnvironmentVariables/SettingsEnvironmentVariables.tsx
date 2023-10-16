@@ -31,7 +31,7 @@ export default function SettingsEnvironmentVariables({
 			{variables.length === 0 ? (
 				<div className='h-full flex items-center justify-center'>
 					<EmptyState
-						icon={<EnvironmentVariable className='w-44 h-44' />}
+						icon={<EnvironmentVariable className='w-44 h-44 text-icon-secondary' />}
 						title={t('version.variable.no_variable_found')}
 					/>
 				</div>

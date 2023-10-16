@@ -1,16 +1,18 @@
 import { Button } from '@/components/Button';
 import { DateText } from '@/components/DateText';
 import { Version as VersionIcon } from '@/components/icons';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore';
+import useVersionStore from '@/store/version/versionStore';
 import { Application, Version } from '@/types';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
-import { leaveChannel, translate } from '@/utils';
+import { cn, translate } from '@/utils';
 import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { cn } from '@/utils';
-import useVersionStore from '@/store/version/versionStore';
-import useEnvironmentStore from '@/store/environment/environmentStore';
+
+const { selectVersion } = useVersionStore.getState();
+const app = useApplicationStore.getState().application;
+
 export const VersionTableColumns: ColumnDef<Version>[] = [
 	{
 		id: 'name',
@@ -67,43 +69,21 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 		size: 75,
 		cell: ({ row }) => {
 			const { _id } = row.original;
-			const app = useApplicationStore.getState().application;
-			const orgId = useOrganizationStore.getState().organization?._id as string;
-			const { closeVersionDrawer, selectApplication } = useApplicationStore.getState();
-			const { version, selectVersion } = useVersionStore.getState();
-			const { getAppVersionEnvironment } = useEnvironmentStore.getState();
-			const onSelect = async () => {
-				if (!app) return;
-				selectApplication(app);
-				leaveChannel(version?._id as string);
-				selectVersion(row.original as Version);
-				getAppVersionEnvironment({ appId: app._id, orgId, versionId: _id });
-
-				closeVersionDrawer();
-			};
-			return <OpenVersion id={_id} app={app as Application} onSelect={onSelect} />;
+			return (
+				<OpenVersion
+					id={_id}
+					app={app as Application}
+					onSelect={() => selectVersion(row.original)}
+				/>
+			);
 		},
 	},
 ];
 
-function OpenVersion({
-	id,
-	app,
-	onSelect,
-}: {
-	id: string;
-	app: Application;
-	onSelect: () => void;
-}) {
+function OpenVersion({ onSelect }: { id: string; app: Application; onSelect: () => void }) {
 	const canViewVersion = useAuthorizeVersion('version.view');
 	return (
-		<Button
-			disabled={!canViewVersion}
-			size='sm'
-			variant='secondary'
-			onClick={onSelect}
-			to={`/organization/${app?.orgId}/apps/${app?._id}/version/${id}`}
-		>
+		<Button disabled={!canViewVersion} size='sm' variant='secondary' onClick={onSelect}>
 			{translate('general.open')}
 		</Button>
 	);
