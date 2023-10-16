@@ -39,7 +39,6 @@ export default function EditStorage({ open, onClose }: CreateStorageProps) {
 			onSuccess: () => {
 				form.reset({
 					name: '',
-					resourceId: '',
 				});
 				onClose();
 			},
@@ -60,7 +59,6 @@ export default function EditStorage({ open, onClose }: CreateStorageProps) {
 			onOpenChange={() => {
 				form.reset({
 					name: '',
-					resourceId: '',
 				});
 				onClose();
 			}}

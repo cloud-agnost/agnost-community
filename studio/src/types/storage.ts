@@ -66,7 +66,7 @@ export interface GetStorageByIdParams extends BaseParams {
 	storageId: string;
 }
 
-export interface UpdateStorageParams extends CreateStorageParams {
+export interface UpdateStorageParams extends Omit<CreateStorageParams, 'resourceId'> {
 	storageId: string;
 }
 export interface DeleteStorageParams extends BaseRequest, BaseParams {
