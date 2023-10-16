@@ -74,13 +74,11 @@ envInstance.interceptors.response.use(
 		return response;
 	},
 	({ response: { data } }) => {
-		console.log(data);
 		const err: APIError = {
 			code: data.code ?? data.errors[0].code,
 			error: data.error ?? data.errors[0].specifics[0].code,
 			details: data.message ?? data.errors[0].message,
 		};
-		console.log(err);
 		return Promise.reject(err);
 	},
 );
