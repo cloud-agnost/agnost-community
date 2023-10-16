@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MessageQueueForm from './MessageQueueForm';
+import { removeEmptyFields } from '@/utils';
 interface CreateQueueProps {
 	open: boolean;
 	onClose: () => void;
@@ -30,11 +31,12 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 	});
 
 	function onSubmit(data: z.infer<typeof CreateMessageQueueSchema>) {
+		const params = removeEmptyFields(data) as z.infer<typeof CreateMessageQueueSchema>;
 		createQueue({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			...data,
+			...params,
 			resourceId: data.resourceId as string,
 			onSuccess: (queue) => {
 				handleClose();

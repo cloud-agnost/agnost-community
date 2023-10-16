@@ -10,7 +10,6 @@ import {
 } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { ResourceSelect } from '@/components/ResourceSelect';
-import { STORAGE_ICON_MAP } from '@/constants';
 import useResourceStore from '@/store/resources/resourceStore';
 import { CreateStorageSchema } from '@/types';
 import { translate as t } from '@/utils';
@@ -25,10 +24,6 @@ export default function StorageForm({ edit = false }: StorageFormProps) {
 	const form = useFormContext<z.infer<typeof CreateStorageSchema>>();
 	const { getResources, resources } = useResourceStore();
 
-	function getResourceIcon(type: string) {
-		const Icon = STORAGE_ICON_MAP[type];
-		return <Icon className='w-6 h-6' /> ?? null;
-	}
 	useEffect(() => {
 		getResources({
 			type: 'storage',

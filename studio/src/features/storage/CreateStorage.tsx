@@ -1,14 +1,14 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
-import StorageForm from './StorageForm';
-import { StorageSchema } from '@/types';
-import { useTranslation } from 'react-i18next';
 import useStorageStore from '@/store/storage/storageStore';
-import { useParams } from 'react-router-dom';
+import { CreateStorageSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import * as z from 'zod';
+import StorageForm from './StorageForm';
 
 interface CreateStorageProps {
 	open: boolean;
@@ -24,11 +24,11 @@ export default function CreateStorage({ open, onClose }: CreateStorageProps) {
 		orgId: string;
 	}>();
 	const { notify } = useToast();
-	const form = useForm<z.infer<typeof StorageSchema>>({
-		resolver: zodResolver(StorageSchema),
+	const form = useForm<z.infer<typeof CreateStorageSchema>>({
+		resolver: zodResolver(CreateStorageSchema),
 	});
 
-	function onSubmit(data: z.infer<typeof StorageSchema>) {
+	function onSubmit(data: z.infer<typeof CreateStorageSchema>) {
 		createStorage({
 			orgId: orgId as string,
 			appId: appId as string,
