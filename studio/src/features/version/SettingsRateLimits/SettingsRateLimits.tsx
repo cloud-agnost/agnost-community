@@ -29,7 +29,7 @@ export default function SettingsRateLimits({
 			{limits.length === 0 ? (
 				<div className='h-full flex items-center justify-center'>
 					<EmptyState
-						icon={<RateLimitIcon className='w-44 h-44' />}
+						icon={<RateLimitIcon className='w-44 h-44 text-icon-secondary' />}
 						title={t('version.no_rate_limiters')}
 					/>
 				</div>

@@ -26,7 +26,7 @@ export default function SettingsNPMPackages({
 		return (
 			<div className='h-full flex items-center justify-center'>
 				<EmptyState
-					icon={<NpmPackage className='w-44 h-44' />}
+					icon={<NpmPackage className='w-44 h-44 text-icon-secondary' />}
 					title={t('version.npm.no_package_found')}
 				/>
 			</div>

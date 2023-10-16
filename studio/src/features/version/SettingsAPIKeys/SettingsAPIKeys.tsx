@@ -25,7 +25,7 @@ export default function SettingsAPIKeys({ setSelectedRows, setTable }: SettingsA
 		return (
 			<div className='h-full flex items-center justify-center'>
 				<EmptyState
-					icon={<ApiKeys className='w-44 h-44' />}
+					icon={<ApiKeys className='w-44 h-44 text-icon-secondary' />}
 					title={t('version.api_key.no_api_key_found')}
 				/>
 			</div>
