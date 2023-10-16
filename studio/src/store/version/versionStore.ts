@@ -45,10 +45,13 @@ import {
 	VersionLogBucket,
 	VersionRealtimeProperties,
 } from '@/types';
-import { history, notify, translate } from '@/utils';
+import { history, leaveChannel, notify, translate } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import useApplicationStore from '../app/applicationStore';
 import useAuthStore from '../auth/authStore';
+import useEnvironmentStore from '../environment/environmentStore';
+import useOrganizationStore from '../organization/organizationStore';
 
 interface VersionStore {
 	loading: boolean;
@@ -78,7 +81,7 @@ interface VersionStore {
 	setSelectedAPIKey: (key: APIKey) => void;
 	setEditAPIKeyDrawerIsOpen: (isOpen: boolean) => void;
 	getVersionById: (req: GetVersionByIdParams) => Promise<Version>;
-	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<void>;
+	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<Version[]>;
 	setVersionPage: (page: number) => void;
 	updateVersionProperties: (params: BaseParams & Partial<Version>) => Promise<Version>;
 	createRateLimit: (params: CreateRateLimitParams) => Promise<RateLimit>;
@@ -170,7 +173,19 @@ const useVersionStore = create<VersionStore>()(
 				notificationLastSeen: new Date(),
 				designElements: [],
 				selectVersion: (version: Version) => {
+					const { closeVersionDrawer, selectApplication, application } =
+						useApplicationStore.getState();
+					const { getAppVersionEnvironment } = useEnvironmentStore.getState();
+					const orgId = useOrganizationStore.getState().organization?._id as string;
+					if (!application) return;
+					selectApplication(application);
+					leaveChannel(version?._id as string);
+					getAppVersionEnvironment({ appId: application._id, orgId, versionId: version._id });
 					set({ version });
+					closeVersionDrawer();
+					history.navigate?.(
+						`/organization/${version.orgId}/apps/${version.appId}/version/${version._id}`,
+					);
 				},
 				setSelectedAPIKey: (key: APIKey) => {
 					set({ selectedAPIKey: key });
@@ -192,6 +207,7 @@ const useVersionStore = create<VersionStore>()(
 						const versions = await VersionService.getAllVersionsVisibleToUser(req);
 						if (!get().versionPage) set({ versions });
 						else set((prev) => ({ versions: [...prev.versions, ...versions] }));
+						return versions;
 					} catch (error) {
 						set({ error: error as APIError });
 					} finally {
