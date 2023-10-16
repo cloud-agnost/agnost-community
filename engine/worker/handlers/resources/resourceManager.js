@@ -4,6 +4,7 @@ import { createRedis, deleteRedis, updateRedis } from "./redis.js";
 import { createRabbitmqCluster, updateRabbitmqCluster, deleteRabbitmqCluster } from "./rabbitmq.js";
 import { createMongoDBResource, updateMongoDBResource, deleteMongoDBResource } from "./mongodb.js";
 import { createPostgresql, updatePostgresql, deletePostgresql, waitForSecret } from "./postgres.js";
+import { createMySQLResource, updateMySQLResource, deleteMySQLResource } from "./mysql.js";
 import { getDBClient } from "../../init/db.js";
 
 export class ResourceManager {
@@ -119,6 +120,7 @@ export class ResourceManager {
                 case "database":
                     if (this.getResourceInstance() === "MongoDB") await this.createMongoDBReplicaSet();
                     else if (this.getResourceInstance() === "PostgreSQL") await this.createPostgreSQLCluster();
+                    else if (this.getResourceInstance() === "MySQL") await this.createMySQLCluster();
                     break;
                 default:
                     break;
@@ -197,6 +199,13 @@ export class ResourceManager {
                             resource.config.size,
                             resource.config.instances
                         );
+                    else if (this.getResourceInstance() === "MySQL")
+                        await updateMySQLResource(
+                            this.getResourceName(),
+                            resource.config.version,
+                            resource.config.instances,
+                            resource.config.size
+                        );
                     break;
                 default:
                     break;
@@ -238,6 +247,8 @@ export class ResourceManager {
                         await deleteMongoDBResource(this.getResourceName());
                     } else if (this.getResourceInstance() === "PostgreSQL") {
                         await deletePostgresql(this.getResourceName());
+                    } else if (this.getResourceInstance() === "MySQL") {
+                        await deleteMySQLResource(this.getResourceName());
                     }
                     break;
                 default:
@@ -1015,14 +1026,58 @@ export class ResourceManager {
             password: Buffer.from(password, "base64").toString("utf-8"),
         };
 
-        const accessReadOnly = [
-            {
+        const accessReadOnly = [];
+        if (resource.config.instances > 1) {
+            accessReadOnly.push({
                 host: `${resource.name}-repl.${process.env.NAMESPACE}.svc.cluster.local`,
                 port: 5432,
                 username: "postgres",
                 password: Buffer.from(password, "base64").toString("utf-8"),
-            },
-        ];
+            });
+        }
+        // Update resource access settings
+        await this.updateResourceAccessSettings(access, accessReadOnly);
+    }
+
+    /**
+     * Creates a new MySQL database server
+     */
+    async createMySQLCluster() {
+        const resource = this.getResource();
+        this.addLog(
+            t(
+                "Creating MySQL database server '%s' with '%s' instance(s) and '%s' storage size.",
+                resource.name,
+                resource.config.instances,
+                resource.config.size
+            )
+        );
+
+        await createMySQLResource(
+            resource.name,
+            resource.config.version,
+            resource.config.instances,
+            resource.config.size,
+            resource.config.username,
+            resource.config.password
+        );
+
+        const access = {
+            host: `${resource.name}.${process.env.NAMESPACE}.svc.cluster.local`,
+            port: 3306,
+            username: resource.config.username,
+            password: resource.config.password,
+        };
+
+        const accessReadOnly = [];
+        if (resource.config.instances > 1) {
+            accessReadOnly.push({
+                host: `${resource.name}.${process.env.NAMESPACE}.svc.cluster.local`,
+                port: 6447, // Readonly port
+                username: resource.config.username,
+                password: resource.config.password,
+            });
+        }
 
         // Update resource access settings
         await this.updateResourceAccessSettings(access, accessReadOnly);

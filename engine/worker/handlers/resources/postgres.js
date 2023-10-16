@@ -34,11 +34,12 @@ export async function createPostgresql(serverName, dbVersion, size, numInstances
                     await k8sCustomApi.createNamespacedCustomObject(group, version, namespace, plural, resource);
                     break;
                 default:
-                    console.log("Skipping: " + kind);
+                    break;
+                // console.log("Skipping: " + kind);
             }
-            console.log(kind + " " + resource.metadata.name + " created...");
+            // console.log(kind + " " + resource.metadata.name + " created...");
         } catch (error) {
-            console.error("Error applying resource:", error.body);
+            // console.error("Error applying resource:", error.body);
             throw new AgnostError(error.body?.message);
         }
     }
@@ -73,9 +74,9 @@ export async function updatePostgresql(serverName, dbVersion, size, numInstances
             undefined,
             requestOptions
         );
-        console.log("PostgreSQL " + serverName + " updated...");
+        // console.log("PostgreSQL " + serverName + " updated...");
     } catch (error) {
-        console.error("Error applying resource:", error.body);
+        // console.error("Error applying resource:", error.body);
         throw new AgnostError(error.body?.message);
     }
 
@@ -85,9 +86,9 @@ export async function updatePostgresql(serverName, dbVersion, size, numInstances
 export async function deletePostgresql(serverName) {
     try {
         await k8sCustomApi.deleteNamespacedCustomObject(group, version, namespace, plural, serverName);
-        console.log("PostgreSQL " + serverName + " deleted...");
+        // console.log("PostgreSQL " + serverName + " deleted...");
     } catch (error) {
-        console.error("Error applying resource:", error.body);
+        // console.error("Error applying resource:", error.body);
         throw new AgnostError(error.body?.message);
     }
 
