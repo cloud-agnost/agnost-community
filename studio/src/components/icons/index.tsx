@@ -2,6 +2,7 @@ export { default as Svg401 } from './401';
 export { default as Svg404 } from './404';
 export { default as ApiKeys } from './ApiKeys';
 export { default as Awss3 } from './Awss3';
+export { default as Agnost } from './Agnost';
 export { default as AgnostOnlyLogo } from './AgnostOnlyLogo';
 export { default as Apple } from './Apple';
 export { default as Authentication } from './Authentication';

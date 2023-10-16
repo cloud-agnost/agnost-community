@@ -1,4 +1,4 @@
-import { AgnostOnlyLogo } from '@/components/icons';
+import { Agnost } from '@/components/icons';
 import { MENU_ITEMS } from '@/constants';
 import { ApplicationSelectDropdown } from '@/features/application';
 import { OrganizationDropdown } from '@/features/organization/OrganizationDropdown';
@@ -19,7 +19,7 @@ export function Header() {
 		<header className='header-menu'>
 			<div className='header-menu-left'>
 				<Link to='/' className='header-menu-left-logo'>
-					<AgnostOnlyLogo width='40' height='40' />
+					<Agnost width='40' height='40' />
 				</Link>
 				<div className='header-menu-divider' />
 				<div className='flex items-center gap-2'>
