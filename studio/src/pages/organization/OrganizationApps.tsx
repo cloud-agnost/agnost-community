@@ -229,7 +229,7 @@ function CreateApplicationButton({ disabled }: { disabled?: boolean }) {
 	}>();
 	return (
 		<Button variant='primary' onClick={openAppCreateModal} disabled={disabled}>
-			<Plus size={16} className='mr-2 text-icon-secondary' />
+			<Plus size={16} className='mr-2 text-icon-default' />
 			{t('application.create')}
 		</Button>
 	);

@@ -16,14 +16,12 @@ import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useMatch, useSearchParams } from 'react-router-dom';
 import { VersionTable } from '../version/Table';
-import { useNavigate } from 'react-router-dom';
 export default function ApplicationVersions() {
 	const { t } = useTranslation();
 	const { isVersionOpen, application, closeVersionDrawer } = useApplicationStore();
-	const { getAllVersionsVisibleToUser, versions } = useVersionStore();
+	const { getAllVersionsVisibleToUser, versions, selectVersion } = useVersionStore();
 	const [page, setPage] = useState(0);
 	const [searchParams, setSearchParams] = useSearchParams();
-	const navigate = useNavigate();
 	const match = useMatch('/organization/:orgId/apps');
 
 	const getVersions = useCallback(async () => {
@@ -36,10 +34,7 @@ export default function ApplicationVersions() {
 			});
 
 			if (versions.length === 1) {
-				closeVersionDrawer(!!match);
-				navigate(
-					`/organization/${application?.orgId}/apps/${application?._id}/version/${versions[0]._id}`,
-				);
+				selectVersion(versions[0]);
 			}
 		}
 	}, [page, searchParams, application?._id]);
