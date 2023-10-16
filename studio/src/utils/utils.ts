@@ -363,3 +363,41 @@ export function getNestedPropertyValue<T>(
 
 	return result;
 }
+
+export async function fileToSerializedString(file: File): Promise<string> {
+	const reader = new FileReader();
+	reader.readAsDataURL(file);
+
+	await new Promise<string>((resolve) => {
+		reader.onload = (event: ProgressEvent<FileReader>) => {
+			const fileContents = event.target?.result as string;
+			resolve(fileContents);
+		};
+
+		reader.onerror = () => {
+			resolve('');
+		};
+	});
+	return reader.result as string;
+}
+
+// export Function to deserialize a string back to a File object
+export function serializedStringToFile(data: string, fileName: string): File {
+	const blob = dataURItoBlob(data);
+
+	// You can create a File object from the Blob
+	return new File([blob], fileName);
+}
+
+// Helper function to convert Data URI to Blob
+export function dataURItoBlob(dataURI: string): Blob {
+	if (isEmpty(dataURI)) return new Blob();
+	const byteString = atob(dataURI.split(',')[1]);
+	const ab = new ArrayBuffer(byteString.length);
+	const ia = new Uint8Array(ab);
+	for (let i = 0; i < byteString.length; i++) {
+		ia[i] = byteString.charCodeAt(i);
+	}
+
+	return new Blob([ab], { type: 'application/octet-stream' });
+}

@@ -202,6 +202,7 @@ export interface TestEndpointParams extends BaseRequest {
 		key: string;
 		value?: string;
 		file?: File;
+		type: 'text' | 'file';
 	}[];
 }
 

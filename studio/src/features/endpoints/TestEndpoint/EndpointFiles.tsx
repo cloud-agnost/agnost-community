@@ -3,10 +3,9 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { TableCell, TableRow } from '@/components/Table';
-import { capitalize } from '@/utils';
+import { capitalize, fileToSerializedString } from '@/utils';
 import { Plus, Trash } from '@phosphor-icons/react';
 import { FormControl, FormField, FormItem, FormMessage } from 'components/Form';
-import { useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
@@ -14,8 +13,8 @@ import { TestEndpointSchema } from '../TestEndpoint';
 import TestEndpointTable from './TestEndpointTable';
 
 export default function EndpointFiles() {
-	const { control, setValue } = useFormContext<z.infer<typeof TestEndpointSchema>>();
-	const [type, setType] = useState('text');
+	const { control, setValue, watch, getValues } =
+		useFormContext<z.infer<typeof TestEndpointSchema>>();
 	const { t } = useTranslation();
 
 	const { fields, append, remove } = useFieldArray({
@@ -26,42 +25,54 @@ export default function EndpointFiles() {
 	function selectFile(index: number) {
 		const input = document.createElement('input');
 		input.type = 'file';
-		input.onchange = (e) => {
+		input.onchange = async (e) => {
 			const file = (e.target as HTMLInputElement).files?.[0];
 			if (file) {
+				const f = await fileToSerializedString(file);
 				setValue(`formData.${index}.file`, file);
 				setValue(`formData.${index}.key`, file.name);
+				setValue(`formData.${index}.value`, f);
 			}
 		};
 		input.click();
 	}
-
 	return (
 		<TestEndpointTable isFormData>
 			{fields.map((f, index) => (
 				<TableRow key={f.id}>
 					<TableCell>
-						<Select
-							onValueChange={(val) => {
-								if (type !== val) {
-									setValue(`formData.${index}.file`, undefined);
-									setValue(`formData.${index}.key`, '');
-								}
-								setType(val);
-							}}
-						>
-							<SelectTrigger defaultValue={type} className='w-[120px]'>
-								<SelectValue>{capitalize(type)}</SelectValue>
-							</SelectTrigger>
+						<FormField
+							control={control}
+							name={`formData.${index}.type`}
+							render={({ field }) => (
+								<FormItem className='flex-1'>
+									<FormControl>
+										<Select
+											onValueChange={(val) => {
+												if (field.value !== val) {
+													setValue(`formData.${index}.file`, undefined);
+													setValue(`formData.${index}.key`, '');
+												}
+												field.onChange(val);
+											}}
+										>
+											<SelectTrigger defaultValue={field.value} className='w-[120px]'>
+												<SelectValue>{capitalize(field.value)}</SelectValue>
+											</SelectTrigger>
 
-							<SelectContent>
-								{['text', 'file']?.map((role) => (
-									<SelectItem key={role} value={role}>
-										{role}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+											<SelectContent>
+												{['text', 'file']?.map((role) => (
+													<SelectItem key={role} value={role}>
+														{role}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 					</TableCell>
 
 					<TableCell>
@@ -72,7 +83,7 @@ export default function EndpointFiles() {
 								<FormItem className='flex-1'>
 									<FormControl>
 										<Input
-											disabled={type === 'file'}
+											disabled={watch(`formData.${index}.type`) === 'file'}
 											placeholder={
 												t('forms.placeholder', {
 													label: t('resources.database.key'),
@@ -88,7 +99,7 @@ export default function EndpointFiles() {
 					</TableCell>
 
 					<TableCell>
-						{type === 'text' ? (
+						{watch(`formData.${index}.type`) === 'text' ? (
 							<FormField
 								control={control}
 								name={`formData.${index}.value`}
@@ -146,7 +157,11 @@ export default function EndpointFiles() {
 			))}
 			<TableRow>
 				<TableCell colSpan={4} className='text-center'>
-					<Button type='button' variant='secondary' onClick={() => append({ key: '', value: '' })}>
+					<Button
+						type='button'
+						variant='secondary'
+						onClick={() => append({ key: '', value: '', type: 'text' })}
+					>
 						<Plus size={16} className='text-icon-secondary mr-2' weight='bold' />
 						{t('endpoint.test.add_query_param')}
 					</Button>
