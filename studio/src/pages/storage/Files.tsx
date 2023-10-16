@@ -1,3 +1,4 @@
+import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { Progress } from '@/components/Progress';
@@ -68,7 +69,21 @@ export default function Files() {
 		setPage(1);
 		setSearchParams({ ...searchParams, q: value });
 	}
-
+	const storageUrl = `/organization/${storage?.orgId}/apps/${storage?.appId}/version/${storage?.versionId}/storage`;
+	const bucketUrl = `${storageUrl}/${storage._id}`;
+	const breadcrumbItems: BreadCrumbItem[] = [
+		{
+			name: t('storage.title').toString(),
+			url: storageUrl,
+		},
+		{
+			name: t('storage.buckets') as string,
+			url: bucketUrl,
+		},
+		{
+			name: bucket?.name as string,
+		},
+	];
 	function deleteMultipleFilesHandler() {
 		deleteMultipleFileFromBucket({
 			filePaths: selectedRows.map((row) => row.original.path),
@@ -144,6 +159,7 @@ export default function Files() {
 	}, [searchParams.get('q'), page, bucket?.name]);
 	return (
 		<VersionTabLayout
+			breadCrumb={<BreadCrumb goBackLink={bucketUrl} items={breadcrumbItems} />}
 			isEmpty={files.length === 0}
 			title={bucket?.name}
 			icon={<EmptyFile className='w-44 h-44' />}
