@@ -28,6 +28,7 @@ export default class StorageService {
 	static url = 'v1/org/';
 
 	static getUrl() {
+		//Todo: change localhost to actual url
 		return `http://localhost/${useEnvironmentStore.getState().environment?.iid}`;
 	}
 

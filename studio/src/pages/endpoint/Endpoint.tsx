@@ -2,7 +2,6 @@ import { Button } from '@/components/Button';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { EmptyEndpoint } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
 import { EndpointColumns } from '@/features/endpoints';
 import { useToast } from '@/hooks';
@@ -115,7 +114,7 @@ export default function MainEndpoint() {
 	}, [searchParams.get('q'), page]);
 	return (
 		<VersionTabLayout<Endpoint>
-			icon={<EmptyEndpoint className='w-44 h-44' />}
+			type='endpoint'
 			title={t('endpoint.title')}
 			createButtonTitle={t('endpoint.add')}
 			emptyStateTitle={t('endpoint.empty')}

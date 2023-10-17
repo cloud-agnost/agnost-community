@@ -22,7 +22,7 @@ import { Link } from 'react-router-dom';
 import './AuthUserDropdown.scss';
 
 export default function AuthUserDropdown() {
-	const user = useAuthStore((state) => state.user);
+	const { user, logout } = useAuthStore();
 	const { t } = useTranslation();
 	const { setTheme, theme } = useThemeStore();
 	const THEMES = [
@@ -108,7 +108,10 @@ export default function AuthUserDropdown() {
 					</DropdownMenuSub>
 				</DropdownMenuItemContainer>
 				<DropdownMenuSeparator />
-				<DropdownMenuItem className='flex text-sm text-default leading-6 font-normal items-center gap-2'>
+				<DropdownMenuItem
+					className='flex text-sm text-default leading-6 font-normal items-center gap-2'
+					onClick={logout}
+				>
 					<span className='w-6 h-6 flex items-center justify-center'>
 						<SignOut className='text-icon-base text-lg' />
 					</span>

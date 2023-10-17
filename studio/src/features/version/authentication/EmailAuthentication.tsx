@@ -77,7 +77,6 @@ export default function EmailAuthentication() {
 			},
 		});
 	}
-	console.log(form.formState.errors);
 	return (
 		<SettingsFormItem
 			className='py-0'

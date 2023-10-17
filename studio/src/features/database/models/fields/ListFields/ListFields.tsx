@@ -1,16 +1,15 @@
-import { Database, Field, Model } from '@/types';
-import { useTranslation } from 'react-i18next';
-import { useEffect, useMemo, useState } from 'react';
-import { DataTable } from 'components/DataTable';
-import { Row, Table } from '@tanstack/react-table';
-import { Model as ModelIcon } from '@/components/icons';
 import { CreateFieldButton, FieldColumns } from '@/features/database/models/fields/ListFields';
-import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
-import { VersionTabLayout } from '@/layouts/VersionLayout';
-import { useParams } from 'react-router-dom';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
+import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
+import { Database, Field, Model } from '@/types';
+import { Row, Table } from '@tanstack/react-table';
+import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
+import { DataTable } from 'components/DataTable';
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 
 interface ListFieldsProps {
 	model: Model;
@@ -98,7 +97,7 @@ export default function ListFields({ model, parentModel }: ListFieldsProps) {
 			onSearchInputClear={() => setSearch('')}
 			isEmpty={!filteredFields.length}
 			title={t('database.fields.title')}
-			icon={<ModelIcon className='w-44 h-44' />}
+			type='field'
 			handlerButton={<CreateFieldButton />}
 			emptyStateTitle={t('database.fields.no_fields')}
 			table={table}

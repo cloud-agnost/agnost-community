@@ -88,6 +88,7 @@ import {
 	Function,
 	GearSix,
 	IdentificationBadge,
+	Key,
 	LinkSimple,
 	ListChecks,
 	ListNumbers,
@@ -466,7 +467,7 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 		id: 8,
 		title: translate('version.settings.api_keys'),
 		path: 'api-keys',
-		icon: ApiKeys,
+		icon: Key,
 	},
 	{
 		id: 9,

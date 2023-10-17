@@ -2,7 +2,6 @@ import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { EmptyBucket } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
 import { BucketColumns } from '@/features/storage';
 import { useToast } from '@/hooks';
@@ -166,7 +165,7 @@ export default function Buckets() {
 		<VersionTabLayout
 			isEmpty={buckets.length === 0}
 			title={t('storage.buckets')}
-			icon={<EmptyBucket className='w-44 h-44' />}
+			type='bucket'
 			openCreateModal={() => setIsBucketCreateOpen(true)}
 			createButtonTitle={t('storage.bucket.create')}
 			emptyStateTitle={t('storage.bucket.empty_text')}

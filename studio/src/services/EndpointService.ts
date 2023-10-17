@@ -12,6 +12,7 @@ import {
 	TestEndpointParams,
 	UpdateEndpointParams,
 } from '@/types';
+import { isEmpty } from '@/utils';
 
 export default class EndpointService {
 	static url = '/v1/org';
@@ -120,20 +121,20 @@ export default class EndpointService {
 		formData,
 		consoleLogId,
 	}: TestEndpointParams): Promise<any> {
+		const formDataObj = new FormData();
 		if (formData) {
-			const formDataObj = new FormData();
 			formData.forEach((data) => {
 				if (data.file) {
-					formDataObj.append(data.key, data.file);
+					formDataObj.append(data.key, data.file, data.file.name);
 				} else {
 					formDataObj.append(data.key, data.value as string);
 				}
 			});
 		}
-
 		const options = {
 			headers: {
 				...headers,
+				'Content-Type': formData ? 'multipart/form-data' : 'application/json',
 				'Agnost-Session': consoleLogId,
 			},
 			params: {
@@ -148,9 +149,8 @@ export default class EndpointService {
 				data: body,
 			};
 		} else {
-			opt = body;
+			opt = isEmpty(body) ? formDataObj : body;
 		}
-
 		return await test[method](
 			`http://localhost/${useEnvironmentStore.getState().environment?.iid}/api${path}`,
 			opt,

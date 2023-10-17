@@ -19,6 +19,7 @@ import {
 	getPathParams,
 	joinChannel,
 	objToArray,
+	serializedStringToFile,
 } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useRef, useState } from 'react';
@@ -70,6 +71,7 @@ export const TestEndpointSchema = z.object({
 	formData: z
 		.array(
 			z.object({
+				type: z.enum(['text', 'file']),
 				key: z.string(),
 				value: z.string().optional(),
 				file: z.instanceof(File).optional(),
@@ -123,6 +125,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			},
 			body: data.body,
 			formData: data.formData,
+			bodyType: data.bodyType,
 			onSuccess: () => {
 				setLoading(false);
 			},
@@ -131,7 +134,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			},
 		});
 	}
-
 	useEffect(() => {
 		const header = {
 			key: 'Content-Type',
@@ -143,7 +145,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	}, [form.getValues('bodyType')]);
 
 	useEffect(() => {
-		const req = endpointRequest[endpoint?._id as string];
+		const req = endpointRequest[endpoint?._id];
 		if (req) {
 			form.reset({
 				params: {
@@ -152,7 +154,11 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 				},
 				headers: objToArray(req.headers),
 				body: req.body,
-				formData: objToArray(req.formData),
+				formData: req?.formData?.map((f) => ({
+					...f,
+					...(f.type === 'file' && { file: serializedStringToFile(f.value as string, f.key) }),
+				})),
+				bodyType: req.bodyType,
 			});
 		} else {
 			form.reset({
@@ -160,12 +166,22 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					queryParams: [],
 					pathVariables: [],
 				},
-				headers: [],
+				headers: [
+					{
+						key: 'Content-Type',
+						value: 'application/json',
+					},
+					{
+						key: 'Authorization',
+						value: '',
+					},
+				],
+				bodyType: 'json',
 				body: '',
 				formData: [],
 			});
 		}
-	}, [endpointRequest[endpoint?._id as string]]);
+	}, [endpointRequest[endpoint?._id]]);
 
 	useEffect(() => {
 		if (!searchParams.get('t') && open) {

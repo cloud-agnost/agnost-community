@@ -2,7 +2,6 @@ import { Button } from '@/components/Button';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { EmptyQueue } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
 import { MessageQueueColumns } from '@/features/queue';
 import { useToast } from '@/hooks';
@@ -116,7 +115,7 @@ export default function MainMessageQueue() {
 		<VersionTabLayout<MessageQueue>
 			isEmpty={queues.length === 0}
 			title={t('queue.title')}
-			icon={<EmptyQueue className='w-44 h-44' />}
+			type='queue'
 			openCreateModal={() => setIsCreateModalOpen(true)}
 			createButtonTitle={t('queue.create.title')}
 			emptyStateTitle={t('queue.empty_text')}

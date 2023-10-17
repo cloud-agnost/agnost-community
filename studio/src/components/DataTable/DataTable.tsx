@@ -25,6 +25,7 @@ interface DataTableProps<TData> {
 	setSelectedRows?: (table: Row<TData>[]) => void;
 	setTable?: (table: TableType<TData>) => void;
 	noDataMessage?: string | ReactNode;
+	headerClassName?: string;
 }
 
 export function DataTable<TData>({
@@ -37,6 +38,7 @@ export function DataTable<TData>({
 	noDataMessage = translate('general.no_results'),
 	className,
 	containerClassName,
+	headerClassName,
 }: DataTableProps<TData>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [rowSelection, setRowSelection] = useState({});
@@ -93,7 +95,7 @@ export function DataTable<TData>({
 	return (
 		<Table className={className} containerClassName={containerClassName}>
 			{columns.map((column) => column.header).filter(Boolean).length > 0 && (
-				<TableHeader className='sticky top-0 z-50'>
+				<TableHeader className={headerClassName}>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<TableRow key={headerGroup.id} className='head'>
 							{headerGroup.headers.map((header, index) => {

@@ -1,4 +1,3 @@
-import { Stepper } from '@/components/Stepper';
 import { OnboardingLayout } from '@/layouts/OnboardingLayout';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
@@ -26,7 +25,7 @@ async function loader(params: LoaderFunctionArgs) {
 }
 
 export default function Onboarding() {
-	const { steps, getPrevPath, goToPrevStep } = useOnboardingStore();
+	const { getPrevPath, goToPrevStep } = useOnboardingStore();
 	const navigate = useNavigate();
 
 	function goBack() {
@@ -37,10 +36,8 @@ export default function Onboarding() {
 		}
 	}
 
-	const stepper = <Stepper steps={steps} classname='w-full' />;
-
 	return (
-		<OnboardingLayout stepper={stepper}>
+		<OnboardingLayout>
 			<div className='onboarding-page'>
 				<Outlet context={{ goBack }} />
 			</div>

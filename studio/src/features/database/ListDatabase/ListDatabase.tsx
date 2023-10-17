@@ -1,15 +1,14 @@
-import { DataTable } from 'components/DataTable';
-import { Database } from '@/types';
-import useDatabaseStore from '@/store/database/databaseStore.ts';
-import { useMemo, useState } from 'react';
-import { Row, Table } from '@tanstack/react-table';
-import { Trans, useTranslation } from 'react-i18next';
-import { DatabaseIcon } from 'components/icons';
-import { DatabaseColumns } from '@/features/database/ListDatabase/index.ts';
 import { CreateAndEditDatabaseDrawer } from '@/features/database/CreateAndEditDatabaseDrawer';
-import { ConfirmationModal } from 'components/ConfirmationModal';
-import { VersionTabLayout } from '@/layouts/VersionLayout';
+import { DatabaseColumns } from '@/features/database/ListDatabase/index.ts';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
+import { VersionTabLayout } from '@/layouts/VersionLayout';
+import useDatabaseStore from '@/store/database/databaseStore.ts';
+import { Database } from '@/types';
+import { Row, Table } from '@tanstack/react-table';
+import { ConfirmationModal } from 'components/ConfirmationModal';
+import { DataTable } from 'components/DataTable';
+import { useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
 export default function ListDatabase() {
@@ -66,7 +65,7 @@ export default function ListDatabase() {
 				className='p-0'
 				isEmpty={databasesForSearch.length === 0}
 				title={t('database.page_title')}
-				icon={<DatabaseIcon className='w-44 h-44' />}
+				type='database'
 				openCreateModal={() => setCreateDrawerIsOpen(true)}
 				createButtonTitle={t('database.add.title')}
 				emptyStateTitle={t('database.empty_text')}

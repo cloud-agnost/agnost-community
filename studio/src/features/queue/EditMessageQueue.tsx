@@ -52,7 +52,6 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 		}
 	}, [queue]);
 
-	console.log(form.formState.errors);
 	return (
 		<Drawer
 			open={open}

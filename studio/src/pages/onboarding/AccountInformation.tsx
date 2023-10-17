@@ -58,6 +58,11 @@ const FormSchema = z.object({
 		),
 });
 
+AccountInformation.loader = async () => {
+	localStorage.clear();
+	return {};
+};
+
 export default function AccountInformation() {
 	const [initiating, setInitiating] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);

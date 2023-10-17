@@ -1,17 +1,13 @@
-import './Stepper.scss';
-import { cn } from '@/utils';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
+import { cn } from '@/utils';
+import './Stepper.scss';
 
 interface StepperProps {
 	classname?: string;
-	steps: {
-		text: string;
-		isDone: boolean;
-	}[];
 }
 
-export default function Stepper({ classname, steps }: StepperProps) {
-	const { currentStepIndex } = useOnboardingStore();
+export default function Stepper({ classname }: StepperProps) {
+	const { currentStepIndex, steps } = useOnboardingStore();
 	return (
 		<ol className={cn('auth-stepper', classname)}>
 			{steps.map(({ text, isDone }, index) => (
@@ -43,8 +39,12 @@ export default function Stepper({ classname, steps }: StepperProps) {
 								index + 1
 							)}
 						</span>
-						<h3 className='auth-stepper-item-text'>{text}</h3>
+						<div className='auth-stepper-item-text'>
+							<h3>{text}</h3>
+							{index > 2 && <p className='auth-stepper-item-description italic'>Optional</p>}
+						</div>
 					</div>
+
 					{index !== steps.length - 1 ? (
 						<div className='w-7 my-1 flex justify-center'>
 							<div className='dark:bg-lighter w-[2px] h-8' />

@@ -1,7 +1,6 @@
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { EmptyBucket } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
 import { CacheColumns, CreateCache, EditCache } from '@/features/cache';
 import { useToast } from '@/hooks';
@@ -104,7 +103,7 @@ export default function VersionCache() {
 			<VersionTabLayout
 				isEmpty={caches.length === 0}
 				title={t('cache.title')}
-				icon={<EmptyBucket className='w-44 h-44' />}
+				type='cache'
 				openCreateModal={() => setIsCreateModalOpen(true)}
 				createButtonTitle={t('cache.create')}
 				emptyStateTitle={t('cache.empty_text')}

@@ -9,13 +9,14 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-	({ className, type, error, ...props }, ref) => {
+	({ className, type, error, value, ...props }, ref) => {
 		return (
 			<input
 				type={type}
 				className={cn('input', error && 'input-error', className)}
 				ref={ref}
 				autoComplete='off'
+				defaultValue={value}
 				{...props}
 			/>
 		);

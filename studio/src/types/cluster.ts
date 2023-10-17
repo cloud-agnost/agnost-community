@@ -1,4 +1,4 @@
-import { BaseRequest } from '.';
+import { Application, BaseRequest, Environment, Organization, Version } from '.';
 
 export type ClusterComponentsType =
 	| 'Node.js'
@@ -37,4 +37,10 @@ export interface UpdateClusterComponentParams extends BaseRequest {
 
 export interface TransferClusterOwnershipParams extends BaseRequest {
 	userId: string;
+}
+export interface ClusterSetupResponse {
+	org: Organization;
+	app: Application;
+	version: Version;
+	env: Environment;
 }

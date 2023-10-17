@@ -3,7 +3,6 @@ import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { Progress } from '@/components/Progress';
 import { TableLoading } from '@/components/Table/Table';
-import { EmptyFile } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
 import { EditFile, FileColumns } from '@/features/storage';
 import { useToast } from '@/hooks';
@@ -162,7 +161,7 @@ export default function Files() {
 			breadCrumb={<BreadCrumb goBackLink={bucketUrl} items={breadcrumbItems} />}
 			isEmpty={files.length === 0}
 			title={bucket?.name}
-			icon={<EmptyFile className='w-44 h-44' />}
+			type='file'
 			openCreateModal={uploadFileHandler}
 			createButtonTitle={t('storage.file.upload')}
 			emptyStateTitle={t('storage.file.empty_text')}

@@ -1,7 +1,6 @@
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { EmptyBucket } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
 import { StorageColumns } from '@/features/storage';
 import { useToast } from '@/hooks';
@@ -114,7 +113,7 @@ export default function MainStorage() {
 		<VersionTabLayout
 			isEmpty={storages.length === 0}
 			title={t('storage.title')}
-			icon={<EmptyBucket className='w-44 h-44' />}
+			type='storage'
 			openCreateModal={() => setIsCreateModalOpen(true)}
 			createButtonTitle={t('storage.create')}
 			emptyStateTitle={t('storage.empty_text')}

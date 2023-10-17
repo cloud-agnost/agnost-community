@@ -1,22 +1,22 @@
 import { Button, ButtonGroup } from '@/components/Button';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { EmptyState } from '@/components/EmptyState';
+import { InfoModal } from '@/components/InfoModal';
 import { SearchInput } from '@/components/SearchInput';
-import { EmptyApps, Leave, List, SquaresFour } from '@/components/icons';
+import { Leave, List, SquaresFour } from '@/components/icons';
 import { ApplicationCard } from '@/features/application';
 import AppInviteMember from '@/features/application/AppInviteMember';
 import ApplicationTable from '@/features/application/ApplicationTable/ApplicationTable';
+import { useToast } from '@/hooks';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useApplicationStore from '@/store/app/applicationStore.ts';
-import { Application, APIError } from '@/types';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { APIError, Application } from '@/types';
 import { cn } from '@/utils';
 import { Plus } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
-import { useTranslation, Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
-import { useToast } from '@/hooks';
-import useOrganizationStore from '@/store/organization/organizationStore';
-import { InfoModal } from '@/components/InfoModal';
 export default function OrganizationApps() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<null | APIError>(null);
@@ -146,10 +146,7 @@ export default function OrganizationApps() {
 									<ApplicationCard key={application._id} application={application} />
 								))
 							) : (
-								<EmptyState
-									title={t('application.search_empty')}
-									icon={<EmptyApps className='w-44 h-44' />}
-								/>
+								<EmptyState title={t('application.search_empty')} type='app' />
 							)}
 						</div>
 					) : (
@@ -157,7 +154,7 @@ export default function OrganizationApps() {
 					)}
 				</>
 			) : (
-				<EmptyState title={t('application.empty')} icon={<EmptyApps className='w-44 h-44' />}>
+				<EmptyState title={t('application.empty')} type='app'>
 					<CreateApplicationButton disabled={!canAppCreate} />
 				</EmptyState>
 			)}
