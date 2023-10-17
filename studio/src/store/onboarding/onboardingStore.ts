@@ -1,16 +1,8 @@
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { Step } from '@/types';
 import { OnboardingData } from '@/types/type.ts';
 import { removeLastSlash, translate } from '@/utils/utils.ts';
-
-export interface Step {
-	text: string;
-	path: string;
-	isDone: boolean;
-	prevPath?: string;
-	nextPath?: string;
-}
-
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
 interface OnboardingStore {
 	steps: Step[];
 	currentStepIndex: number;
@@ -76,6 +68,8 @@ const useOnboardingStore = create<OnboardingStore>()(
 						useTLS: false,
 						user: 'Altogic',
 						password: 'iS-pNHmBJIXIpjOUXgYmZQ',
+						fromName: 'Altogic',
+						fromEmail: 'enesmozer@gmail.com',
 					},
 					appMembers: [],
 				},
