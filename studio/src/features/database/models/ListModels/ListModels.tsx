@@ -1,21 +1,20 @@
-import { Database, Model } from '@/types';
-import { useTranslation } from 'react-i18next';
-import { useMemo, useState } from 'react';
-import { DataTable } from 'components/DataTable';
+import { Button } from '@/components/Button';
 import {
 	EditOrCreateModelDrawer,
 	ModelColumns,
 } from '@/features/database/models/ListModels/index.ts';
-import { Row, Table } from '@tanstack/react-table';
-import { Model as ModelIcon } from '@/components/icons';
-import useModelStore from '@/store/database/modelStore.ts';
-import { VersionTabLayout } from '@/layouts/VersionLayout';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
-import { useParams } from 'react-router-dom';
-import useDatabaseStore from '@/store/database/databaseStore.ts';
-import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
-import { Button } from '@/components/Button';
 import { useTabNavigate } from '@/hooks';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
+import { VersionTabLayout } from '@/layouts/VersionLayout';
+import useDatabaseStore from '@/store/database/databaseStore.ts';
+import useModelStore from '@/store/database/modelStore.ts';
+import { Database, Model } from '@/types';
+import { Row, Table } from '@tanstack/react-table';
+import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
+import { DataTable } from 'components/DataTable';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 export default function ListModels() {
 	const { models } = useModelStore();
 	const [selectedRows, setSelectedRows] = useState<Row<Model>[]>();
@@ -73,7 +72,7 @@ export default function ListModels() {
 				onSearchInputClear={() => setSearch('')}
 				isEmpty={hasNoModels}
 				title={t('database.models.title')}
-				icon={<ModelIcon className='w-44 h-44' />}
+				type='model'
 				openCreateModal={() => setCreateModelDrawerIsOpen(true)}
 				createButtonTitle={t('database.models.create')}
 				emptyStateTitle={t('database.models.no_models')}

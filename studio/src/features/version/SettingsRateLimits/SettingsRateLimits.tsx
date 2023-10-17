@@ -1,14 +1,13 @@
-import './SettingsRateLimits.scss';
-import { Dispatch, SetStateAction } from 'react';
-import { DataTable } from 'components/DataTable';
-import { Row, Table } from '@tanstack/react-table';
-import { RateLimit } from '@/types';
-import useVersionStore from '@/store/version/versionStore.ts';
-import { useTranslation } from 'react-i18next';
-import { RateLimitsColumns } from '@/features/version/SettingsRateLimits';
 import { EditOrAddEndpointRateLimiterDrawer } from '@/features/version/SettingsGeneral';
+import { RateLimitsColumns } from '@/features/version/SettingsRateLimits';
+import useVersionStore from '@/store/version/versionStore.ts';
+import { RateLimit } from '@/types';
+import { Row, Table } from '@tanstack/react-table';
+import { DataTable } from 'components/DataTable';
 import { EmptyState } from 'components/EmptyState';
-import { RateLimit as RateLimitIcon } from '@/components/icons';
+import { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import './SettingsRateLimits.scss';
 
 interface SettingsNPMPackagesProps {
 	selectedRows: Row<RateLimit>[] | undefined;
@@ -28,10 +27,7 @@ export default function SettingsRateLimits({
 		<>
 			{limits.length === 0 ? (
 				<div className='h-full flex items-center justify-center'>
-					<EmptyState
-						icon={<RateLimitIcon className='w-44 h-44 text-icon-secondary' />}
-						title={t('version.no_rate_limiters')}
-					/>
+					<EmptyState type='rate-limit' title={t('version.no_rate_limiters')} />
 				</div>
 			) : (
 				<div className='data-table-container'>

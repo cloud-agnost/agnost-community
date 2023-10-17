@@ -66,7 +66,7 @@ export default function Middlewares({ setSelectedRows, parentId, selectedRows }:
 				)}
 			>
 				{middlewares.length === 0 ? (
-					<EmptyState title={t('version.middleware.no_middleware_found')} />
+					<EmptyState title={t('version.middleware.no_middleware_found')} type='middleware' />
 				) : (
 					<InfiniteScroll
 						next={next}

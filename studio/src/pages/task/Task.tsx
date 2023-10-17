@@ -1,7 +1,6 @@
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { EmptyTask } from '@/components/icons';
 import { PAGE_SIZE } from '@/constants';
 import { TaskColumns } from '@/features/task';
 import { useToast } from '@/hooks';
@@ -113,7 +112,7 @@ export default function MainTask() {
 
 	return (
 		<VersionTabLayout
-			icon={<EmptyTask className='w-44 h-44' />}
+			type='task'
 			title={t('task.title')}
 			createButtonTitle={t('task.add')}
 			emptyStateTitle={t('task.empty_text')}

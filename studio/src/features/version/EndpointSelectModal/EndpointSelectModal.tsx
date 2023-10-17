@@ -215,7 +215,7 @@ export default function EndpointSelectModal({
 							)}
 						>
 							{!loading && filtered.length === 0 ? (
-								<EmptyState title='No endpoints found' />
+								<EmptyState title='No endpoints found' type='endpoint' />
 							) : (
 								<InfiniteScroll
 									scrollableTarget='endpoint-list-container'

@@ -1,16 +1,15 @@
-import './SettingsEnvironmentVariables.scss';
-import { Param } from '@/types';
-import { DataTable } from 'components/DataTable';
-import useVersionStore from '@/store/version/versionStore.ts';
-import { Row, Table } from '@tanstack/react-table';
-import { Dispatch, SetStateAction } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
 	EditOrAddVariableDrawer,
 	VariableColumns,
 } from '@/features/version/SettingsEnvironmentVariables';
+import useVersionStore from '@/store/version/versionStore.ts';
+import { Param } from '@/types';
+import { Row, Table } from '@tanstack/react-table';
+import { DataTable } from 'components/DataTable';
 import { EmptyState } from 'components/EmptyState';
-import { EnvironmentVariable } from '@/components/icons';
+import { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import './SettingsEnvironmentVariables.scss';
 
 interface SettingsEnvironmentVariablesProps {
 	selectedRows: Row<Param>[] | undefined;
@@ -30,10 +29,7 @@ export default function SettingsEnvironmentVariables({
 		<>
 			{variables.length === 0 ? (
 				<div className='h-full flex items-center justify-center'>
-					<EmptyState
-						icon={<EnvironmentVariable className='w-44 h-44 text-icon-secondary' />}
-						title={t('version.variable.no_variable_found')}
-					/>
+					<EmptyState type='variable' title={t('version.variable.no_variable_found')} />
 				</div>
 			) : (
 				<div className='data-table-container'>

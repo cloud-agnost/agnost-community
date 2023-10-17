@@ -1,13 +1,12 @@
-import './SettingsNPMPackages.scss';
-import { Dispatch, SetStateAction } from 'react';
-import { DataTable } from 'components/DataTable';
-import { Row, Table } from '@tanstack/react-table';
-import { NPMPackage } from '@/types';
-import useVersionStore from '@/store/version/versionStore.ts';
-import { useTranslation } from 'react-i18next';
 import NPMPackagesColumns from '@/features/version/SettingsNPMPackages/NPMPackagesColumns.tsx';
+import useVersionStore from '@/store/version/versionStore.ts';
+import { NPMPackage } from '@/types';
+import { Row, Table } from '@tanstack/react-table';
+import { DataTable } from 'components/DataTable';
 import { EmptyState } from 'components/EmptyState';
-import { NpmPackage } from '@/components/icons';
+import { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import './SettingsNPMPackages.scss';
 
 interface SettingsNPMPackagesProps {
 	selectedRows: Row<NPMPackage>[] | undefined;
@@ -25,10 +24,7 @@ export default function SettingsNPMPackages({
 	if (npmPackages.length === 0) {
 		return (
 			<div className='h-full flex items-center justify-center'>
-				<EmptyState
-					icon={<NpmPackage className='w-44 h-44 text-icon-secondary' />}
-					title={t('version.npm.no_package_found')}
-				/>
+				<EmptyState type='package' title={t('version.npm.no_package_found')} />
 			</div>
 		);
 	}

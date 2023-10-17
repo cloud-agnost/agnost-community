@@ -1,17 +1,16 @@
 import { AddMiddlewareButton } from '@/features/version/Middlewares';
-import { useId, useMemo, useState } from 'react';
-import { Row, Table } from '@tanstack/react-table';
-import { GetMiddlewaresOfAppVersionParams, Middleware } from '@/types';
-import { useParams, useSearchParams } from 'react-router-dom';
-import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
-import { EmptyEndpoint } from 'components/icons';
-import { VersionTabLayout } from '@/layouts/VersionLayout';
-import { useTranslation } from 'react-i18next';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
-import { TableLoading } from 'components/Table/Table.tsx';
-import { DataTable } from 'components/DataTable';
 import MiddlewaresColumns from '@/features/version/Middlewares/MiddlewaresColumns.tsx';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
+import { VersionTabLayout } from '@/layouts/VersionLayout';
+import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
+import { GetMiddlewaresOfAppVersionParams, Middleware } from '@/types';
+import { Row, Table } from '@tanstack/react-table';
+import { DataTable } from 'components/DataTable';
+import { TableLoading } from 'components/Table/Table.tsx';
+import { useId, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useParams, useSearchParams } from 'react-router-dom';
 const SIZE = 15;
 
 export default function VersionMiddlewares() {
@@ -91,7 +90,7 @@ export default function VersionMiddlewares() {
 	return (
 		<VersionTabLayout<Middleware>
 			className='p-0'
-			icon={<EmptyEndpoint className='w-44 h-44' />}
+			type='middleware'
 			title={t('version.settings.middlewares')}
 			emptyStateTitle={t('version.middleware.no_middleware_found')}
 			isEmpty={!filteredMiddlewares.length}
