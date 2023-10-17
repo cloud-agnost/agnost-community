@@ -11,6 +11,7 @@ import {
 
 export default class NavigatorService {
 	static getUrl() {
+		//Todo: change localhost to actual url
 		const dbName = useDatabaseStore.getState().database.name;
 		const modelName = useModelStore.getState().model.name;
 		return `http://localhost/${useEnvironmentStore.getState().environment
