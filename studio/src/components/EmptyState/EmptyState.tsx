@@ -1,15 +1,18 @@
-import React, { ElementType } from 'react';
-import './emptyState.scss';
+import useThemeStore from '@/store/theme/themeStore';
 import { cn } from '@/utils';
+import { Function, Key } from '@phosphor-icons/react';
+import React, { ElementType } from 'react';
 import {
+	ApiKeys,
 	EmptyApps,
 	EmptyAppsLight,
+	EmptyBucket,
+	EmptyBucketLight,
 	EmptyDatabase,
 	EmptyDatabaseLight,
-	EmptyTaskLight,
-	EmptyTask,
 	EmptyFields,
 	EmptyFieldsLight,
+	EmptyFile,
 	EmptyFilesLight,
 	EmptyInvitation,
 	EmptyInvitationLight,
@@ -17,19 +20,15 @@ import {
 	EmptyModelsLight,
 	EmptyQueue,
 	EmptyQueueLight,
-	EmptyEndpoint,
-	EmptyBucket,
-	EmptyFile,
-	Middleware,
-	ApiKeys,
+	EmptyTask,
+	EmptyTaskLight,
 	EnvironmentVariable,
+	Middleware,
 	NpmPackage,
 	RateLimit,
-	EmptyBucketLight,
 	Storage,
 } from '../icons';
-import { Function, Key } from '@phosphor-icons/react';
-import useThemeStore from '@/store/theme/themeStore';
+import './emptyState.scss';
 
 export type Modules =
 	| 'app'
