@@ -8,6 +8,7 @@ import { APIError, AppMembers } from '@/types/type';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useState } from 'react';
+import { ClusterSetupResponse } from '@/types';
 async function loader() {
 	const { isTypesOk, getAllTypes } = useTypeStore.getState();
 	if (!isTypesOk) {
@@ -25,26 +26,27 @@ export default function InviteTeamMembers() {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 
-	async function onSubmit(data: AppMembers[], setError: (error: APIError) => void) {
-		const appMembers = data;
+	async function onSubmit(appMembers: AppMembers[], setError: (error: APIError) => void) {
 		setFinalizing(true);
 		setDataPartially({
 			appMembers,
 		});
-		setStepByPath('/onboarding/invite-team-members', {
-			isDone: true,
-		});
-		const res = await finalizeClusterSetup({
+
+		finalizeClusterSetup({
 			...onboardingReq,
 			appMembers,
+			onSuccess: (res: ClusterSetupResponse) => {
+				setStepByPath('/onboarding/invite-team-members', {
+					isDone: true,
+				});
+				setFinalizing(false);
+				navigate(`/organization/${res.org._id}/apps`);
+			},
+			onError: (error: APIError) => {
+				setError(error as APIError);
+				setFinalizing(false);
+			},
 		});
-		setFinalizing(false);
-		if ('error' in res) {
-			setError(res);
-			return;
-		}
-
-		navigate('/organization');
 	}
 
 	return (

@@ -7,7 +7,7 @@ import { RequireAuth } from '@/router';
 import { PlatformService } from '@/services';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
-import { APIError, SMTPSchema } from '@/types';
+import { APIError, ClusterSetupResponse, SMTPSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -75,17 +75,21 @@ export default function SMTPConfiguration() {
 	}
 
 	async function finishSetup() {
-		try {
-			setFinalizing(true);
-			await finalizeClusterSetup(onboardingData);
-			setFinalizing(false);
-			setStepByPath('/onboarding/smtp-configuration', {
-				isDone: true,
-			});
-			navigate('/organization');
-		} catch (error) {
-			setError(error as APIError);
-		}
+		setFinalizing(true);
+		finalizeClusterSetup({
+			...onboardingData,
+			onSuccess: (res: ClusterSetupResponse) => {
+				setStepByPath('/onboarding/smtp-configuration', {
+					isDone: true,
+				});
+				setFinalizing(false);
+				navigate(`/organization/${res.org._id}/apps`);
+			},
+			onError: (error: APIError) => {
+				setError(error as APIError);
+				setFinalizing(false);
+			},
+		});
 	}
 
 	return (
