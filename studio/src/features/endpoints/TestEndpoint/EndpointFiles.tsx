@@ -13,8 +13,7 @@ import { TestEndpointSchema } from '../TestEndpoint';
 import TestEndpointTable from './TestEndpointTable';
 
 export default function EndpointFiles() {
-	const { control, setValue, watch, getValues } =
-		useFormContext<z.infer<typeof TestEndpointSchema>>();
+	const { control, setValue, watch } = useFormContext<z.infer<typeof TestEndpointSchema>>();
 	const { t } = useTranslation();
 
 	const { fields, append, remove } = useFieldArray({
