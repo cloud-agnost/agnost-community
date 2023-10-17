@@ -134,7 +134,7 @@ export default class EndpointService {
 		const options = {
 			headers: {
 				...headers,
-				'Content-Type': formData ? 'multipart/form-data' : 'application/json',
+				'Content-Type': !isEmpty(formData) ? 'multipart/form-data' : 'application/json',
 				'Agnost-Session': consoleLogId,
 			},
 			params: {
@@ -149,7 +149,7 @@ export default class EndpointService {
 				data: body,
 			};
 		} else {
-			opt = isEmpty(body) ? formDataObj : body;
+			opt = !isEmpty(formData) ? formDataObj : body;
 		}
 		return await test[method](
 			`http://localhost/${useEnvironmentStore.getState().environment?.iid}/api${path}`,
