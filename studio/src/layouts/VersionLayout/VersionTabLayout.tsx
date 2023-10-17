@@ -1,5 +1,5 @@
 import { Button } from '@/components/Button';
-import { EmptyState } from '@/components/EmptyState';
+import { EmptyState, Modules } from '@/components/EmptyState';
 import { SearchInput } from '@/components/SearchInput';
 import { SelectedRowButton } from '@/components/Table';
 import { cn } from '@/utils';
@@ -12,7 +12,7 @@ import { ReactNode } from 'react';
 interface Props<T> {
 	isEmpty: boolean;
 	table?: Table<T>;
-	icon?: ReactNode;
+	type: Modules;
 	title: string;
 	emptyStateTitle: string;
 	createButtonTitle?: string | null;
@@ -31,7 +31,7 @@ interface Props<T> {
 export default function VersionTabLayout<T>({
 	isEmpty,
 	children,
-	icon,
+	type,
 	breadCrumb,
 	table,
 	selectedRowLength,
@@ -70,7 +70,7 @@ export default function VersionTabLayout<T>({
 	if (isEmpty) {
 		if (searchParams.has('q')) {
 			content = (
-				<EmptyState icon={icon} className='flex-1' title={t('general.no_result')}>
+				<EmptyState type={type} className='flex-1' title={t('general.no_result')}>
 					<Button className='btn btn-primary' onClick={onClearHandler}>
 						{t('general.reset_search_query')}
 					</Button>
@@ -78,7 +78,7 @@ export default function VersionTabLayout<T>({
 			);
 		} else {
 			content = (
-				<EmptyState icon={icon} className='flex-1' title={emptyStateTitle}>
+				<EmptyState type={type} className='flex-1' title={emptyStateTitle}>
 					{!!createButtonTitle && !!openCreateModal ? (
 						<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
 							<Plus size={16} />
