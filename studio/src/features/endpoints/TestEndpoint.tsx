@@ -53,10 +53,7 @@ export const TestEndpointSchema = z.object({
 					value: z.string(),
 				}),
 			)
-			.optional()
-			.refine(() => getPathParams(useEndpointStore.getState().endpoint?.path).length, {
-				message: 'Path variables are not allowed for this endpoint',
-			}),
+			.optional(),
 	}),
 	bodyType: z.enum(['json', 'form-data']).default('json'),
 	headers: z
@@ -67,7 +64,7 @@ export const TestEndpointSchema = z.object({
 			}),
 		)
 		.optional(),
-	body: z.string().optional(),
+	body: z.string().optional().default('{}'),
 	formData: z
 		.array(
 			z.object({
@@ -101,9 +98,10 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 				},
 			],
 			bodyType: 'json',
+			body: '{}',
 		},
 	});
-
+	console.log(form.getValues());
 	async function onSubmit(data: z.infer<typeof TestEndpointSchema>) {
 		setLoading(true);
 		const pathVariables = arrayToObj(data.params.pathVariables ?? []);
@@ -123,7 +121,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			headers: {
 				...arrayToObj(data.headers?.filter((h) => h.key && h.value) as any),
 			},
-			body: data.body,
+			body: data.body ?? {},
 			formData: data.formData,
 			bodyType: data.bodyType,
 			onSuccess: () => {
@@ -177,7 +175,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					},
 				],
 				bodyType: 'json',
-				body: '',
+				body: JSON.stringify({}),
 				formData: [],
 			});
 		}

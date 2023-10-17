@@ -18,7 +18,6 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import {
 	LoaderFunctionArgs,
 	redirect,
-	useNavigate,
 	useOutletContext,
 	useParams,
 	useSearchParams,
@@ -67,7 +66,6 @@ export default function Buckets() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
-	const navigate = useNavigate();
 	const viewData = useAuthorizeVersion('storage.viewData');
 
 	const {

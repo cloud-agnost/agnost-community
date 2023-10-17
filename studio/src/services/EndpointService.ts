@@ -131,7 +131,7 @@ export default class EndpointService {
 				}
 			});
 		}
-
+		console.log(body);
 		const options = {
 			headers: {
 				...headers,
@@ -141,7 +141,7 @@ export default class EndpointService {
 			params: {
 				...params.queryParams,
 			},
-			data: body || {},
+			data: body,
 		};
 		let opt: any;
 		if (method === 'get' || method === 'delete') {
