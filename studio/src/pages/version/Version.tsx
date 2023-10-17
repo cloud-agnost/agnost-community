@@ -19,7 +19,7 @@ export default function Version() {
 
 	useEffect(() => {
 		if (!canView) {
-			navigate('/404');
+			// navigate('/404');
 		}
 	}, [canView]);
 

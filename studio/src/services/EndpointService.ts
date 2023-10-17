@@ -131,6 +131,7 @@ export default class EndpointService {
 				}
 			});
 		}
+
 		const options = {
 			headers: {
 				...headers,
@@ -140,14 +141,11 @@ export default class EndpointService {
 			params: {
 				...params.queryParams,
 			},
+			data: body || {},
 		};
 		let opt: any;
-		if (method === 'get') {
+		if (method === 'get' || method === 'delete') {
 			opt = options;
-		} else if (method === 'delete') {
-			opt = {
-				data: body,
-			};
 		} else {
 			opt = !isEmpty(formData) ? formDataObj : body;
 		}

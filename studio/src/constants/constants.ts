@@ -408,21 +408,25 @@ export const TEST_ENDPOINTS_MENU_ITEMS = [
 		name: translate('endpoint.test.params'),
 		href: '?t=params',
 		isPath: false,
+		allowedMethods: ['GET', 'DELETE', 'PUT', 'POST'],
 	},
 	{
 		name: translate('endpoint.test.path_variables'),
 		href: '?t=variables',
 		isPath: true,
+		allowedMethods: ['GET', 'DELETE', 'PUT', 'POST'],
 	},
 	{
 		name: translate('endpoint.test.headers'),
 		href: '?t=headers',
 		isPath: false,
+		allowedMethods: ['GET', 'DELETE', 'PUT', 'POST'],
 	},
 	{
 		name: translate('endpoint.test.body'),
 		href: '?t=body',
 		isPath: false,
+		allowedMethods: ['DELETE', 'PUT', 'POST'],
 	},
 ];
 

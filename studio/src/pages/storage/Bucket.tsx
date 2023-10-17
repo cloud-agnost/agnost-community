@@ -24,7 +24,7 @@ import {
 	useSearchParams,
 } from 'react-router-dom';
 Buckets.loader = async ({ params }: LoaderFunctionArgs) => {
-	const role = useApplicationStore.getState().application?.role;
+	const role = useApplicationStore.getState().role;
 
 	const { storageId, appId, orgId, versionId } = params;
 	const { storage, storages } = useStorageStore.getState();
@@ -42,7 +42,7 @@ Buckets.loader = async ({ params }: LoaderFunctionArgs) => {
 		useStorageStore.setState({ storage: selectedStorage });
 	}
 
-	const permission = getAppPermission(role as AppRoles, 'app.storage.viewData');
+	const permission = getAppPermission(role as AppRoles, 'app.storage.view');
 	if (!permission) {
 		return redirect('/404');
 	}
@@ -157,7 +157,7 @@ export default function Buckets() {
 
 	useEffect(() => {
 		if (!viewData) {
-			navigate('/404');
+			// navigate('/404');
 		}
 	}, [viewData]);
 

@@ -54,7 +54,7 @@ export const TestEndpointSchema = z.object({
 				}),
 			)
 			.optional()
-			.refine(() => !getPathParams(useEndpointStore.getState().endpoint?.path).length, {
+			.refine(() => getPathParams(useEndpointStore.getState().endpoint?.path).length, {
 				message: 'Path variables are not allowed for this endpoint',
 			}),
 	}),
@@ -86,7 +86,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { endpoint, testEndpoint, endpointRequest } = useEndpointStore();
 	const [loading, setLoading] = useState(false);
 	const resizerRef = useRef<HTMLDivElement>(null);
-
 	const [searchParams, setSearchParams] = useSearchParams();
 	const form = useForm<z.infer<typeof TestEndpointSchema>>({
 		resolver: zodResolver(TestEndpointSchema),
@@ -119,6 +118,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			method: endpoint?.method.toLowerCase() as TestMethods,
 			params: {
 				queryParams: arrayToObj(data.params.queryParams),
+				pathParams: pathVariables,
 			},
 			headers: {
 				...arrayToObj(data.headers?.filter((h) => h.key && h.value) as any),
@@ -188,7 +188,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			setSearchParams({ t: 'params' });
 		}
 	}, [searchParams.get('t'), open]);
-
 	return (
 		<Drawer open={open} onOpenChange={onClose}>
 			<DrawerContent
@@ -231,15 +230,17 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					<nav className='mx-auto flex border-b'>
 						{TEST_ENDPOINTS_MENU_ITEMS.filter(
 							(t) => !t.isPath || !!getPathParams(endpoint?.path).length,
-						).map((item) => {
-							return (
-								<OrganizationMenuItem
-									key={item.name}
-									item={item}
-									active={window.location.search.includes(item.href)}
-								/>
-							);
-						})}
+						)
+							.filter((t) => t.allowedMethods?.includes(endpoint?.method))
+							.map((item) => {
+								return (
+									<OrganizationMenuItem
+										key={item.name}
+										item={item}
+										active={window.location.search.includes(item.href)}
+									/>
+								);
+							})}
 					</nav>
 				</div>
 				<Form {...form}>
