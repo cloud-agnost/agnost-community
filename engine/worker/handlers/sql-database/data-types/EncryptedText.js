@@ -10,6 +10,6 @@ export default class EncryptedText extends Text {
      * @return {number | undefined}
      */
     getMaxLength() {
-        return this.options?.encryptedText?.maxLength;
+        return config.get("general.encryptedTextFieldSQLMaxLength");
     }
 }

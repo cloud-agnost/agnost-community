@@ -1116,8 +1116,14 @@ router.put(
 			// Assign the field update values
 			let fieldUpdateData = null;
 			let updatedAt = Date.now();
-			// For system managed fields only description can be updated
+			const fieldUnsetData = {};
+
+			if (defaultValue === "$$unset") {
+				fieldUnsetData = { "fields.$.defaultValue": "" };
+			}
+
 			if (field.creator === "system") {
+				// For system managed fields only description can be updated
 				fieldUpdateData = {
 					"fields.$.description": description,
 					"fields.$.updatedBy": user._id,
@@ -1139,11 +1145,13 @@ router.put(
 						field.type,
 						indexed
 					),
-					"fields.$.defaultValue": defaultValue,
 					"fields.$.updatedBy": user._id,
 					"fields.$.updatedAt": updatedAt,
 					updatedBy: user._id,
 				};
+
+				if (defaultValue && defaultValue !== "$$unset")
+					fieldUpdateData["fields.$.defaultValue"] = defaultValue;
 			}
 
 			// Assign field specific properties, we cannot update field specific properties for object and object-list
@@ -1160,7 +1168,7 @@ router.put(
 			let updatedModel = await modelCtrl.updateOneByQuery(
 				{ _id: model._id, "fields._id": field._id },
 				fieldUpdateData,
-				{},
+				fieldUnsetData,
 				{ cacheKey: model._id, session }
 			);
 

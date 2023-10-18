@@ -46,6 +46,7 @@
         "maxPoolSize": 3,
         "defaultClusterIPPort": 4000,
         "defaultKnativeIngressPort": 80,
+        "encryptedTextFieldSQLMaxLength": 64,
         "livenessProbe": {
             "timeoutSeconds": 10,
             "periodSeconds": 30,

@@ -210,5 +210,3 @@ export class DatabaseBase {
 		else return this.getDbName(dbMeta);
 	}
 }
-
-export default new DatabaseBase();
