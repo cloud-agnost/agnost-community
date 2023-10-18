@@ -86,6 +86,7 @@ class ConnectionManager {
                         user: connSettings.username,
                         password: connSettings.password,
                         database: connSettings.database,
+                        multipleStatements: true, // - it's necessary for multiple statements in one query
                     });
 
                     connection.on("error", (err) => {});

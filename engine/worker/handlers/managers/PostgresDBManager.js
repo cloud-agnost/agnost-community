@@ -335,19 +335,22 @@ $$;`;
                 const onlyConstraint = reference.createConstraint(model.name);
                 const withField = reference.createConstraint(model.name, true);
 
-                const condition = PostgresDBManager.CHECK_FIELD_EXISTS.replace("{TABLE_NAME}", model.name)
-                    .replace("{FIELD_NAME}", field.name)
+                const fieldCondition = PostgresDBManager.CHECK_FIELD_EXISTS.replace(
+                    "{TABLE_NAME}",
+                    model.name.toLowerCase()
+                )
+                    .replace("{FIELD_NAME}", field.name.toLowerCase())
                     .replace("{SCHEMA_NAME}", this.getSchemaName());
 
                 const foreignKeyCondition = PostgresDBManager.CHECK_FOREIGN_KEY_EXISTS.replace(
                     "{TABLE_NAME}",
-                    model.name
+                    model.name.toLowerCase()
                 )
                     .replace("{CONSTRAINT_NAME}", foreignName)
                     .replace("{SCHEMA_NAME}", this.getSchemaName());
 
-                addFieldQuery += `IF EXISTS(${condition}) AND NOT EXISTS(${foreignKeyCondition}) THEN ${onlyConstraint} END IF; \n`;
-                addFieldQuery += `IF NOT EXISTS(${condition}) THEN ${withField} END IF;`;
+                addFieldQuery += `IF EXISTS(${fieldCondition}) AND NOT EXISTS(${foreignKeyCondition}) THEN ${onlyConstraint} END IF; \n`;
+                addFieldQuery += `IF NOT EXISTS(${fieldCondition}) THEN ${withField} END IF;`;
             }
         }
 
