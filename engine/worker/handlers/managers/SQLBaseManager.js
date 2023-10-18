@@ -1,7 +1,6 @@
 import { DBManager } from "./dbManager.js";
 import fieldMap from "../sql-database/fieldMap.js";
 import Model from "../sql-database/Model.js";
-import { DATABASE } from "../../config/constants.js";
 
 export class SQLBaseManager extends DBManager {
     /**
@@ -120,7 +119,7 @@ export class SQLBaseManager extends DBManager {
 
     async redeploy() {
         const changedModels = this.getChangedModels();
-        //console.log("changedModels", JSON.stringify(changedModels, null, 4));
+        console.log("changedModels", JSON.stringify(changedModels, null, 4));
         if (!changedModels) return;
 
         const existingModels = (await this.getExistingModels()).map((dbName) => dbName.toLowerCase());
@@ -159,6 +158,10 @@ export class SQLBaseManager extends DBManager {
                 const renameField = await this.handleRenameField(updatedModel, updatedFields, true);
                 this.addQuery(renameField);
                 if (renameField.trim()) console.log("renameField", renameField);
+
+                const changeMaxLength = await this.handleMaxLength(updatedModel, updatedFields, true);
+                this.addQuery(changeMaxLength);
+                if (changeMaxLength.trim()) console.log("changeMaxLength", changeMaxLength);
 
                 const handleIndexes = await this.handleIndexes(updatedModel, updatedModel.fields, true);
                 this.addQuery(handleIndexes);
@@ -239,6 +242,20 @@ export class SQLBaseManager extends DBManager {
                 await this.dropUniqueConstraint(model.name, field.oldName, returnQuery),
                 await this.dropFullTextIndex(model.name, field.oldName, returnQuery),
             ].join("\n");
+            if (returnQuery) SQL += query + "\n";
+        }
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    async handleMaxLength(model, fields, returnQuery = false) {
+        let SQL = "";
+        const types = ["text", "encrypted-text"];
+
+        for (const field of fields) {
+            if (!field.isMaxLengthChanged || !types.includes(field.type)) continue;
+            const query = await this.changeMaxLength(model, field, returnQuery);
             if (returnQuery) SQL += query + "\n";
         }
 
@@ -825,7 +842,30 @@ export class SQLBaseManager extends DBManager {
             : this.getDbName().toLowerCase();
     }
 
+    /**
+     * @param model {object}
+     * @param field {object}
+     * @param returnQuery {boolean}
+     */
     addDefaultValues(model, field, returnQuery = false) {}
 
+    /**
+     * @param model {object}
+     * @param field {object}
+     * @param returnQuery {boolean}
+     */
     removeDefaultValues(model, field, returnQuery = false) {}
+
+    /**
+     * @param model {object}
+     * @param field {object}
+     * @param returnQuery {boolean}
+     */
+    changeMaxLength(model, field, returnQuery = false) {
+        const fieldClass = new (fieldMap.get(field.type))(field, this.getDbType());
+        const SQL = fieldClass.changeMaxLengthQuery(model, field);
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
 }

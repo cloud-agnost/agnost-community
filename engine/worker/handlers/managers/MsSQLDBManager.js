@@ -225,24 +225,56 @@ export class MsSQLDBManager extends SQLBaseManager {
     }
 
     /**
-     * Drop the field from the table
+     * @description Drop the field from the table
      * @param {string} modelName - name of the table
      * @param {object} field - the field to drop
      * @param {boolean} returnQuery - return the query or run it
      * @return {Promise<Object|[]> | string}
      */
     async dropField(modelName, field, returnQuery = false) {
-        const iid = field.iid.replaceAll("-", "_");
+        const DROP_FIELD_QUERY = `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP COLUMN IF EXISTS ${
+            field.name
+        };`;
 
         const SQL = [
             await this.dropFullTextIndexByColumn(modelName, field.name, true),
             await this.dropUniqueConstraint(modelName, field.name, true),
             await this.dropIndex(modelName, field.name, true),
-            `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP CONSTRAINT IF EXISTS fk_${iid}`,
-            `DROP DEFAULT IF EXISTS DC_${iid};`,
-            `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP COLUMN IF EXISTS ${field.name};`,
+            await this.dropForeignKeyConstraint(modelName, field, true),
+            await this.dropDefaultConstraint(modelName, field, true),
+            DROP_FIELD_QUERY,
             await this.dropFullTextIndexIfDisabled(modelName, true),
         ].join("\n");
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    /**
+     * @description Drop the foreign key constraint from the column
+     * @param modelName {string}
+     * @param field {object}
+     * @param returnQuery {boolean}
+     * @return {Promise<Object|[]>|string}
+     */
+    dropForeignKeyConstraint(modelName, field, returnQuery = false) {
+        const FK_NAME = SQLBaseManager.getForeignKeyName(field.iid);
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP CONSTRAINT IF EXISTS ${FK_NAME};`;
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    /**
+     * @description Drop the default constraint from the column
+     * @param modelName {string}
+     * @param field {object}
+     * @param returnQuery {boolean}
+     * @return {Promise<Object|[]>|string}
+     */
+    dropDefaultConstraint(modelName, field, returnQuery = false) {
+        const DC_NAME = `DC_${field.iid.replaceAll("-", "_")}`;
+        let SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP CONSTRAINT IF EXISTS ${DC_NAME};\n`;
+        SQL += `DROP DEFAULT IF EXISTS ${DC_NAME};`;
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
