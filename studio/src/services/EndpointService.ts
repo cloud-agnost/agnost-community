@@ -131,25 +131,23 @@ export default class EndpointService {
 				}
 			});
 		}
+		console.log(body);
 		const options = {
 			headers: {
 				...headers,
-				'Content-Type': formData ? 'multipart/form-data' : 'application/json',
+				'Content-Type': !isEmpty(formData) ? 'multipart/form-data' : 'application/json',
 				'Agnost-Session': consoleLogId,
 			},
 			params: {
 				...params.queryParams,
 			},
+			data: body,
 		};
 		let opt: any;
-		if (method === 'get') {
+		if (method === 'get' || method === 'delete') {
 			opt = options;
-		} else if (method === 'delete') {
-			opt = {
-				data: body,
-			};
 		} else {
-			opt = isEmpty(body) ? formDataObj : body;
+			opt = !isEmpty(formData) ? formDataObj : body;
 		}
 		return await test[method](
 			`http://localhost/${useEnvironmentStore.getState().environment?.iid}/api${path}`,

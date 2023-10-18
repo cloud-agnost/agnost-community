@@ -53,10 +53,7 @@ export const TestEndpointSchema = z.object({
 					value: z.string(),
 				}),
 			)
-			.optional()
-			.refine(() => !getPathParams(useEndpointStore.getState().endpoint?.path).length, {
-				message: 'Path variables are not allowed for this endpoint',
-			}),
+			.optional(),
 	}),
 	bodyType: z.enum(['json', 'form-data']).default('json'),
 	headers: z
@@ -67,7 +64,7 @@ export const TestEndpointSchema = z.object({
 			}),
 		)
 		.optional(),
-	body: z.string().optional(),
+	body: z.string().optional().default('{}'),
 	formData: z
 		.array(
 			z.object({
@@ -86,7 +83,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { endpoint, testEndpoint, endpointRequest } = useEndpointStore();
 	const [loading, setLoading] = useState(false);
 	const resizerRef = useRef<HTMLDivElement>(null);
-
 	const [searchParams, setSearchParams] = useSearchParams();
 	const form = useForm<z.infer<typeof TestEndpointSchema>>({
 		resolver: zodResolver(TestEndpointSchema),
@@ -102,9 +98,10 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 				},
 			],
 			bodyType: 'json',
+			body: '{}',
 		},
 	});
-
+	console.log(form.getValues());
 	async function onSubmit(data: z.infer<typeof TestEndpointSchema>) {
 		setLoading(true);
 		const pathVariables = arrayToObj(data.params.pathVariables ?? []);
@@ -119,11 +116,12 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			method: endpoint?.method.toLowerCase() as TestMethods,
 			params: {
 				queryParams: arrayToObj(data.params.queryParams),
+				pathParams: pathVariables,
 			},
 			headers: {
 				...arrayToObj(data.headers?.filter((h) => h.key && h.value) as any),
 			},
-			body: data.body,
+			body: data.body ?? {},
 			formData: data.formData,
 			bodyType: data.bodyType,
 			onSuccess: () => {
@@ -177,7 +175,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					},
 				],
 				bodyType: 'json',
-				body: '',
+				body: JSON.stringify({}),
 				formData: [],
 			});
 		}
@@ -188,7 +186,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			setSearchParams({ t: 'params' });
 		}
 	}, [searchParams.get('t'), open]);
-
 	return (
 		<Drawer open={open} onOpenChange={onClose}>
 			<DrawerContent
@@ -231,15 +228,17 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					<nav className='mx-auto flex border-b'>
 						{TEST_ENDPOINTS_MENU_ITEMS.filter(
 							(t) => !t.isPath || !!getPathParams(endpoint?.path).length,
-						).map((item) => {
-							return (
-								<OrganizationMenuItem
-									key={item.name}
-									item={item}
-									active={window.location.search.includes(item.href)}
-								/>
-							);
-						})}
+						)
+							.filter((t) => t.allowedMethods?.includes(endpoint?.method))
+							.map((item) => {
+								return (
+									<OrganizationMenuItem
+										key={item.name}
+										item={item}
+										active={window.location.search.includes(item.href)}
+									/>
+								);
+							})}
 					</nav>
 				</div>
 				<Form {...form}>

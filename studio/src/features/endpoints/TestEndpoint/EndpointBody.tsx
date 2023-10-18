@@ -1,12 +1,12 @@
 import { CodeEditor } from '@/components/CodeEditor';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { RadioGroup, RadioGroupItem } from '@/components/RadioGroup';
+import { cn } from '@/utils';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { TestEndpointSchema } from '../TestEndpoint';
 import EndpointFiles from './EndpointFiles';
-import { cn } from '@/utils';
 export default function EndpointBody() {
 	const { control, watch } = useFormContext<z.infer<typeof TestEndpointSchema>>();
 	const { t } = useTranslation();
@@ -41,6 +41,7 @@ export default function EndpointBody() {
 					</FormItem>
 				)}
 			/>
+
 			{bodyType === 'json' && (
 				<div className='mt-6 h-full'>
 					<FormField

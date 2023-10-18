@@ -448,7 +448,7 @@ export const dbTypeMappings = {
 		object: "object",
 	},
 	PostgreSQL: {
-		id: "bigserial",
+		id: "serial",
 		text: "varchar",
 		"rich-text": "text",
 		"encrypted-text": "varchar",
@@ -473,7 +473,7 @@ export const dbTypeMappings = {
 		object: "undefined",
 	},
 	MySQL: {
-		id: "bigint",
+		id: "int",
 		text: "varchar",
 		"rich-text": "longtext",
 		"encrypted-text": "varchar",
@@ -498,7 +498,7 @@ export const dbTypeMappings = {
 		object: "undefined",
 	},
 	"SQL Server": {
-		id: "bigint",
+		id: "int",
 		text: "nvarchar",
 		"rich-text": "nvarchar(max)",
 		"encrypted-text": "nvarchar",
