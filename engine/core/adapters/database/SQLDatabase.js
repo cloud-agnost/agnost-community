@@ -61,6 +61,15 @@ export class SQLDatabase extends DatabaseBase {
 	}
 
 	/**
+	 * Returns the SQL represenation of id value
+	 * @param  {Object} id The id value
+	 */
+	getIdSQLValue(id) {
+		if (typeof id === "string") return `'${id}'`;
+		else return id;
+	}
+
+	/**
 	 * Prepares the select part of the query namely the fields that will be returned.
 	 * @param  {Object} modelMeta The model metadata
 	 * @param  {Array} select The included fields
@@ -140,50 +149,6 @@ export class SQLDatabase extends DatabaseBase {
 
 		return { updates: updates.join(", \n\t"), values };
 	}
-
-	/* 	getSQLUpdateValue(fieldType, value) {
-		if (value === null) return value;
-		switch (fieldType) {
-			case "id":
-			case "reference":
-				return value;
-			case "text":
-			case "rich-text":
-			case "encrypted-text":
-			case "email":
-			case "link":
-			case "phone":
-			case "createdat":
-			case "updatedat":
-			case "datetime":
-			case "date":
-			case "time":
-			case "enum":
-				return `'${value}'`;
-			case "boolean":
-			case "integer":
-			case "decimal":
-				return value;
-			case "geo-point":
-				return `'${value}'`;
-			case "binary":
-				return ReturnType.BINARY;
-			case "json":
-				return ReturnType.JSON;
-			case "basic-values-list":
-				return ReturnType.ARRAY;
-			case "object-list":
-				return ReturnType.ARRAY;
-			case "object":
-				return ReturnType.OBJECT;
-			case "join":
-				return ReturnType.ARRAY;
-			case "array-filter":
-				return ReturnType.ANY;
-			default:
-				return ReturnType.UNDEFINED;
-		}
-	} */
 }
 
 export default new DatabaseBase();

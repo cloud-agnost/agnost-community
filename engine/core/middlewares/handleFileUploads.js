@@ -14,7 +14,7 @@ const upload = multer({
 // Multer is required to process file uploads and make them available via req.files
 export const handleFileUploads = (req, res, next) => {
 	upload(req, res, function (err) {
-		if (console.stdlog) console.log("Handling file upload");
+		if (console.stdlog) console.log("Checking file uploads");
 		if (err) {
 			return res
 				.status(400)

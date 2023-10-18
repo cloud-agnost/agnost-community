@@ -48,19 +48,19 @@
 						}
 					});
 			},
-			2779: (e, t, i) => {
+			2779: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.AgnostServerSideClient = void 0);
-				const n = i(7602),
-					r = i(6120),
-					a = i(6760),
-					o = i(9634),
-					s = i(665),
-					u = i(9949),
-					l = i(2847),
-					d = i(4079),
-					c = i(9419),
-					p = i(990);
+				const n = r(7602),
+					i = r(6120),
+					a = r(6760),
+					o = r(9634),
+					s = r(665),
+					u = r(9949),
+					l = r(2847),
+					d = r(4079),
+					c = r(9419),
+					p = r(990);
 				class h extends n.APIBase {
 					constructor(e, t) {
 						super(e, t), (this.managers = new Map());
@@ -74,7 +74,7 @@
 						const t = this.managers.get(`storage-${e}`);
 						if (t) return t;
 						{
-							const t = new r.Storage(this.metaManager, this.adapterManager, e);
+							const t = new i.Storage(this.metaManager, this.adapterManager, e);
 							return this.managers.set(`storage-${e}`, t), t;
 						}
 					}
@@ -158,10 +158,10 @@
 				}
 				t.AgnostServerSideClient = h;
 			},
-			6098: (e, t, i) => {
+			6098: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Expression = void 0);
-				const n = i(9307);
+				const n = r(9307);
 				t.Expression = class {
 					getFunctionName() {
 						return null;
@@ -216,7 +216,7 @@
 					}
 				};
 			},
-			7853: function (e, t, i) {
+			7853: function (e, t, r) {
 				var n =
 					(this && this.__importDefault) ||
 					function (e) {
@@ -224,84 +224,84 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.FunctionManager = void 0);
-				const r = n(i(5581)),
-					a = n(i(7013)),
-					o = n(i(3188)),
-					s = n(i(9225)),
-					u = n(i(9080)),
-					l = n(i(4021)),
-					d = n(i(2998)),
-					c = n(i(273)),
-					p = n(i(756)),
-					h = n(i(2897)),
-					f = n(i(9335)),
-					y = n(i(711)),
-					m = n(i(3510)),
-					v = n(i(2327)),
-					g = n(i(9674)),
-					T = n(i(5850)),
-					b = n(i(1946)),
-					w = n(i(3115)),
-					E = n(i(5616)),
-					_ = n(i(7934)),
-					R = n(i(6489)),
-					$ = n(i(2237)),
-					M = n(i(9660)),
-					O = n(i(3481)),
-					x = n(i(789)),
-					B = n(i(6587)),
-					P = n(i(7267)),
-					C = n(i(6835)),
-					j = n(i(5191)),
-					F = n(i(2115)),
-					A = n(i(6509)),
-					N = n(i(4207)),
-					D = n(i(6032)),
-					I = n(i(2228)),
-					S = n(i(6683)),
-					V = n(i(587)),
-					U = n(i(5102)),
-					Q = n(i(4175)),
-					L = n(i(929)),
-					Y = n(i(1021)),
-					k = n(i(1401)),
-					q = n(i(6222)),
-					J = n(i(5331)),
-					G = n(i(3236)),
-					K = n(i(2970)),
-					W = n(i(6903)),
-					X = n(i(1421)),
-					z = n(i(8354)),
-					H = n(i(9135)),
-					Z = n(i(7665)),
-					ee = n(i(3221)),
-					te = n(i(6308)),
-					ie = n(i(2734)),
-					ne = n(i(8374)),
-					re = n(i(6743)),
-					ae = n(i(3725)),
-					oe = n(i(1357)),
-					se = n(i(2415)),
-					ue = n(i(923)),
-					le = n(i(8949)),
-					de = n(i(6336)),
-					ce = n(i(5365)),
-					pe = n(i(4210)),
-					he = n(i(4410)),
-					fe = n(i(7821)),
-					ye = n(i(4232)),
-					me = n(i(4617)),
-					ve = n(i(5160)),
-					ge = n(i(3057)),
-					Te = n(i(6923)),
-					be = n(i(8051)),
-					we = n(i(4184)),
-					Ee = n(i(6768)),
-					_e = n(i(6735)),
-					Re = n(i(107)),
-					$e = n(i(4997));
+				const i = n(r(5581)),
+					a = n(r(7013)),
+					o = n(r(3188)),
+					s = n(r(9225)),
+					u = n(r(9080)),
+					l = n(r(4021)),
+					d = n(r(2998)),
+					c = n(r(273)),
+					p = n(r(756)),
+					h = n(r(2897)),
+					f = n(r(9335)),
+					y = n(r(711)),
+					m = n(r(3510)),
+					g = n(r(2327)),
+					v = n(r(9674)),
+					T = n(r(5850)),
+					b = n(r(1946)),
+					E = n(r(3115)),
+					w = n(r(5616)),
+					_ = n(r(7934)),
+					R = n(r(6489)),
+					M = n(r(2237)),
+					O = n(r(9660)),
+					$ = n(r(3481)),
+					B = n(r(789)),
+					P = n(r(6587)),
+					x = n(r(7267)),
+					C = n(r(6835)),
+					j = n(r(5191)),
+					D = n(r(2115)),
+					F = n(r(6509)),
+					A = n(r(4207)),
+					N = n(r(6032)),
+					I = n(r(2228)),
+					S = n(r(6683)),
+					Q = n(r(587)),
+					L = n(r(5102)),
+					U = n(r(4175)),
+					V = n(r(929)),
+					Y = n(r(1021)),
+					k = n(r(1401)),
+					q = n(r(6222)),
+					G = n(r(5331)),
+					J = n(r(3236)),
+					K = n(r(2970)),
+					X = n(r(6903)),
+					W = n(r(1421)),
+					z = n(r(8354)),
+					H = n(r(9135)),
+					Z = n(r(7665)),
+					ee = n(r(3221)),
+					te = n(r(6308)),
+					re = n(r(2734)),
+					ne = n(r(8374)),
+					ie = n(r(6743)),
+					ae = n(r(3725)),
+					oe = n(r(1357)),
+					se = n(r(2415)),
+					ue = n(r(923)),
+					le = n(r(8949)),
+					de = n(r(6336)),
+					ce = n(r(5365)),
+					pe = n(r(4210)),
+					he = n(r(4410)),
+					fe = n(r(7821)),
+					ye = n(r(4232)),
+					me = n(r(4617)),
+					ge = n(r(5160)),
+					ve = n(r(3057)),
+					Te = n(r(6923)),
+					be = n(r(8051)),
+					Ee = n(r(4184)),
+					we = n(r(6768)),
+					_e = n(r(6735)),
+					Re = n(r(107)),
+					Me = n(r(4997));
 				t.FunctionManager = {
-					$abs: r.default,
+					$abs: i.default,
 					$add: a.default,
 					$and: o.default,
 					$ceil: s.default,
@@ -314,48 +314,48 @@
 					$floor: f.default,
 					$gt: y.default,
 					$gte: m.default,
-					$in: v.default,
-					$includes: g.default,
+					$in: g.default,
+					$includes: v.default,
 					$left: T.default,
 					$length: b.default,
-					$lower: w.default,
-					$lt: E.default,
+					$lower: E.default,
+					$lt: w.default,
 					$lte: _.default,
 					$ltrim: R.default,
-					$mod: $.default,
-					$multiply: M.default,
-					$neq: O.default,
-					$nin: x.default,
-					$not: B.default,
-					$or: P.default,
+					$mod: M.default,
+					$multiply: O.default,
+					$neq: $.default,
+					$nin: B.default,
+					$not: P.default,
+					$or: x.default,
 					$right: C.default,
 					$round: j.default,
-					$rtrim: F.default,
-					$sqrt: A.default,
-					$startswith: N.default,
-					$substring: D.default,
+					$rtrim: D.default,
+					$sqrt: F.default,
+					$startswith: A.default,
+					$substring: N.default,
 					$subtract: I.default,
 					$trim: S.default,
-					$upper: V.default,
-					$size: U.default,
-					$exp: Q.default,
-					$ln: L.default,
+					$upper: Q.default,
+					$size: L.default,
+					$exp: U.default,
+					$ln: V.default,
 					$log: Y.default,
 					$log10: k.default,
 					$pow: q.default,
-					$sin: J.default,
-					$cos: G.default,
+					$sin: G.default,
+					$cos: J.default,
 					$tan: K.default,
-					$sinh: W.default,
-					$cosh: X.default,
+					$sinh: X.default,
+					$cosh: W.default,
 					$tanh: z.default,
 					$asin: H.default,
 					$acos: Z.default,
 					$atan: ee.default,
 					$atan2: te.default,
-					$asinh: ie.default,
+					$asinh: re.default,
 					$acosh: ne.default,
-					$atanh: re.default,
+					$atanh: ie.default,
 					$radians: ae.default,
 					$degrees: oe.default,
 					$dateadd: se.default,
@@ -368,23 +368,23 @@
 					$dayofmonth: fe.default,
 					$dayofweek: ye.default,
 					$dayofyear: me.default,
-					$strtodate: ve.default,
-					$todecimal: ge.default,
+					$strtodate: ge.default,
+					$todecimal: ve.default,
 					$toboolean: Te.default,
 					$tointeger: be.default,
-					$todate: we.default,
-					$tostring: Ee.default,
+					$todate: Ee.default,
+					$tostring: we.default,
 					$toobjectid: _e.default,
 					$distance: Re.default,
-					$point: $e.default,
+					$point: Me.default,
 				};
 			},
-			5145: (e, t, i) => {
+			5145: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Function = void 0);
-				const n = i(6098),
-					r = i(9307),
-					a = i(990);
+				const n = r(6098),
+					i = r(9307),
+					a = r(990);
 				class o extends n.Expression {
 					constructor(e, t) {
 						super(),
@@ -396,7 +396,7 @@
 						return this.name;
 					}
 					getExpressionType() {
-						return r.ExpressionType.FUNCTION;
+						return i.ExpressionType.FUNCTION;
 					}
 					getReturnType() {
 						return this.definition.returnType;
@@ -425,23 +425,23 @@
 								`Function '${this.name}' expects ${this.definition.paramCount} input parameter(s) but received ${t}.`
 							);
 						for (let t = 0; t < this.parameters.length; t++) {
-							const i = this.parameters[t],
-								n = i.getReturnType(),
+							const r = this.parameters[t],
+								n = r.getReturnType(),
 								o = Array.isArray(this.definition.params)
 									? this.definition.params[t]
 									: this.definition.params;
 							if (
-								o !== r.ReturnType.ANY &&
-								((o !== r.ReturnType.DATE && o !== r.ReturnType.DATETIME) ||
-									(n !== r.ReturnType.DATE && n !== r.ReturnType.DATETIME))
+								o !== i.ReturnType.ANY &&
+								((o !== i.ReturnType.DATE && o !== i.ReturnType.DATETIME) ||
+									(n !== i.ReturnType.DATE && n !== i.ReturnType.DATETIME))
 							) {
-								if (o === r.ReturnType.PRIMITIVE) {
+								if (o === i.ReturnType.PRIMITIVE) {
 									if (
 										[
-											r.ReturnType.OBJECT,
-											r.ReturnType.ARRAY,
-											r.ReturnType.BINARY,
-											r.ReturnType.JSON,
+											i.ReturnType.OBJECT,
+											i.ReturnType.ARRAY,
+											i.ReturnType.BINARY,
+											i.ReturnType.JSON,
 										].includes(n)
 									)
 										throw new a.ClientError(
@@ -454,10 +454,10 @@
 												t + 1
 											} but received '${this.getReturnTypeText(n)}'.`
 										);
-								} else if (o === r.ReturnType.STATICBOOLEAN) {
+								} else if (o === i.ReturnType.STATICBOOLEAN) {
 									if (
-										n !== r.ReturnType.BOOLEAN &&
-										i.getExpressionType() !== r.ExpressionType.STATIC
+										n !== i.ReturnType.BOOLEAN &&
+										r.getExpressionType() !== i.ExpressionType.STATIC
 									)
 										throw new a.ClientError(
 											"invalid_parameter",
@@ -478,12 +478,12 @@
 											t + 1
 										} but received '${this.getReturnTypeText(n)}'.`
 									);
-								i.validate(e);
+								r.validate(e);
 							}
 						}
 					}
 					validateForPull(e) {
-						if (!r.UpdatePullFunctions.includes(`$${this.name}`))
+						if (!i.UpdatePullFunctions.includes(`$${this.name}`))
 							throw new a.ClientError(
 								"unsupported_function",
 								`Function '${this.name}' cannot be used to define $pull update queries.`
@@ -508,24 +508,24 @@
 								`Function '${this.name}' expects ${this.definition.paramCount} input parameter(s) but received ${t}.`
 							);
 						for (let t = 0; t < this.parameters.length; t++) {
-							const i = this.parameters[t],
-								n = i.getReturnType(),
+							const r = this.parameters[t],
+								n = r.getReturnType(),
 								o = Array.isArray(this.definition.params)
 									? this.definition.params[t]
 									: this.definition.params;
 							if (
 								(0 !== t ||
-									(i.getExpressionType() !== r.ExpressionType.FIELD &&
-										i.getExpressionType() !== r.ExpressionType.ARRAY_FIELD)) &&
-								o !== r.ReturnType.ANY
+									(r.getExpressionType() !== i.ExpressionType.FIELD &&
+										r.getExpressionType() !== i.ExpressionType.ARRAY_FIELD)) &&
+								o !== i.ReturnType.ANY
 							) {
-								if (o === r.ReturnType.PRIMITIVE) {
+								if (o === i.ReturnType.PRIMITIVE) {
 									if (
 										[
-											r.ReturnType.OBJECT,
-											r.ReturnType.ARRAY,
-											r.ReturnType.BINARY,
-											r.ReturnType.JSON,
+											i.ReturnType.OBJECT,
+											i.ReturnType.ARRAY,
+											i.ReturnType.BINARY,
+											i.ReturnType.JSON,
 										].includes(n)
 									)
 										throw new a.ClientError(
@@ -538,10 +538,10 @@
 												t + 1
 											} but received '${this.getReturnTypeText(n)}'.`
 										);
-								} else if (o === r.ReturnType.STATICBOOLEAN) {
+								} else if (o === i.ReturnType.STATICBOOLEAN) {
 									if (
-										n !== r.ReturnType.BOOLEAN &&
-										i.getExpressionType() !== r.ExpressionType.STATIC
+										n !== i.ReturnType.BOOLEAN &&
+										r.getExpressionType() !== i.ExpressionType.STATIC
 									)
 										throw new a.ClientError(
 											"invalid_parameter",
@@ -562,32 +562,39 @@
 											t + 1
 										} but received '${this.getReturnTypeText(n)}'.`
 									);
-								i.validateForPull(e);
+								r.validateForPull(e);
 							}
 						}
 					}
 					getQuery(e, t) {
-						if (e === r.DBTYPE.MONGODB) {
-							const i = this.definition.mapping[e];
-							if (1 === this.parameters.length)
-								return { [i]: this.parameters[0].getQuery(e, t) };
-							{
+						const r = this.definition.mapping[e];
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								if (1 === this.parameters.length)
+									return { [r]: this.parameters[0].getQuery(e, t) };
+								{
+									const n = [];
+									for (const r of this.parameters) n.push(r.getQuery(e, t));
+									return { [r]: n };
+								}
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
 								const n = [];
-								for (const i of this.parameters) n.push(i.getQuery(e, t));
-								return { [i]: n };
-							}
+								for (const r of this.parameters) n.push(r.getQuery(e, t));
+								return `${r}(${n.join(", ")})`;
+							default:
+								return null;
 						}
-						return null;
 					}
 					getPullQuery(e, t) {
-						if (e === r.DBTYPE.MONGODB) {
-							const i = this.definition.mapping[e];
+						if (e === i.DBTYPE.MONGODB) {
+							const r = this.definition.mapping[e];
 							if (1 === this.parameters.length)
-								return { [i]: this.parameters[0].getPullQuery(e, t) };
+								return { [r]: this.parameters[0].getPullQuery(e, t) };
 							{
 								const n = [];
-								for (const i of this.parameters) n.push(i.getPullQuery(e, t));
-								return { [i]: n };
+								for (const r of this.parameters) n.push(r.getPullQuery(e, t));
+								return { [r]: n };
 							}
 						}
 						return null;
@@ -600,209 +607,222 @@
 				}
 				t.Function = o;
 			},
-			5581: (e, t, i) => {
+			5581: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("abs", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$abs" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			7665: (e, t, i) => {
+			7665: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("acos", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$acos" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			8374: (e, t, i) => {
+			8374: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("acosh", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$acosh" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			7013: (e, t, i) => {
+			7013: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("add", {
 							paramCount: -1,
-							returnType: r.ReturnType.NUMBER,
-							params: r.ReturnType.NUMBER,
+							returnType: i.ReturnType.NUMBER,
+							params: i.ReturnType.NUMBER,
 							mapping: { MongoDB: "$add" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			3188: (e, t, i) => {
+			3188: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("and", {
 							paramCount: -1,
-							returnType: r.ReturnType.BOOLEAN,
-							params: r.ReturnType.BOOLEAN,
-							mapping: { MongoDB: "$and" },
+							returnType: i.ReturnType.BOOLEAN,
+							params: i.ReturnType.BOOLEAN,
+							mapping: { MongoDB: "$and", PostgreSQL: "AND", MySQL: "AND" },
 						});
 					}
 					getPullQuery(e, t) {
 						if (t) {
-							const i = [];
-							for (const n of this.parameters) i.push(n.getPullQuery(e, t));
-							return Object.assign({}, ...i);
+							const r = [];
+							for (const n of this.parameters) r.push(n.getPullQuery(e, t));
+							return Object.assign({}, ...r);
 						}
 						return super.getPullQuery(e, t);
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								const r = [];
+								for (const n of this.parameters) r.push(n.getQuery(e, t));
+								return `(${r.join(" AND ")})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
 			},
-			9135: (e, t, i) => {
+			9135: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("asin", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$asin" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			2734: (e, t, i) => {
+			2734: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("asinh", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$asinh" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			3221: (e, t, i) => {
+			3221: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("atan", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$atan" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			6308: (e, t, i) => {
+			6308: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("atan2", {
 							paramCount: 2,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER, r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$atan2" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			6743: (e, t, i) => {
+			6743: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("atanh", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$atanh" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			9225: (e, t, i) => {
+			9225: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("ceil", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$ceil" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			9080: (e, t, i) => {
+			9080: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("charIndex", {
 							paramCount: 3,
-							returnType: r.ReturnType.NUMBER,
+							returnType: i.ReturnType.NUMBER,
 							params: [
-								r.ReturnType.TEXT,
-								r.ReturnType.TEXT,
-								r.ReturnType.NUMBER,
+								i.ReturnType.TEXT,
+								i.ReturnType.TEXT,
+								i.ReturnType.NUMBER,
 							],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? this.parameters[2]
 								? {
 										$indexOfCP: [
@@ -822,73 +842,73 @@
 				}
 				t.default = a;
 			},
-			4021: (e, t, i) => {
+			4021: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("concat", {
 							paramCount: -1,
-							returnType: r.ReturnType.TEXT,
-							params: r.ReturnType.PRIMITIVE,
+							returnType: i.ReturnType.TEXT,
+							params: i.ReturnType.PRIMITIVE,
 							mapping: { MongoDB: "$concat" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			3236: (e, t, i) => {
+			3236: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("cos", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$cos" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			1421: (e, t, i) => {
+			1421: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("cosh", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$cosh" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			2415: (e, t, i) => {
+			2415: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("dateAdd", {
 							paramCount: 3,
-							returnType: r.ReturnType.DATE,
+							returnType: i.ReturnType.DATE,
 							params: [
-								r.ReturnType.DATE,
-								r.ReturnType.NUMBER,
-								r.ReturnType.TEXT,
+								i.ReturnType.DATE,
+								i.ReturnType.NUMBER,
+								i.ReturnType.TEXT,
 							],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? {
 									$dateAdd: {
 										startDate: this.parameters[0].getQuery(e, t),
@@ -901,21 +921,21 @@
 				}
 				t.default = a;
 			},
-			923: (e, t, i) => {
+			923: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("dateDiff", {
 							paramCount: 3,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.DATE, r.ReturnType.DATE, r.ReturnType.TEXT],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.DATE, i.ReturnType.DATE, i.ReturnType.TEXT],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? {
 									$dateDiff: {
 										startDate: this.parameters[0].getQuery(e, t),
@@ -928,80 +948,80 @@
 				}
 				t.default = a;
 			},
-			7821: (e, t, i) => {
+			7821: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("dayOfMonth", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.DATE],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.DATE],
 							mapping: { MongoDB: "$dayOfMonth" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			4232: (e, t, i) => {
+			4232: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("dayOfWeek", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.DATE],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.DATE],
 							mapping: { MongoDB: "$dayOfWeek" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			4617: (e, t, i) => {
+			4617: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("dayOfYear", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.DATE],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.DATE],
 							mapping: { MongoDB: "$dayOfYear" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			1357: (e, t, i) => {
+			1357: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("degrees", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$radiansToDegrees" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			107: (e, t, i) => {
+			107: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("distance", {
 							paramCount: 2,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.GEOPOINT, r.ReturnType.GEOPOINT],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.GEOPOINT, i.ReturnType.GEOPOINT],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
@@ -1011,14 +1031,14 @@
 							: e + ".coordinates";
 					}
 					getQuery(e, t) {
-						if (e === r.DBTYPE.MONGODB) {
-							const i = this.parameters[0].getQuery(e, t),
+						if (e === i.DBTYPE.MONGODB) {
+							const r = this.parameters[0].getQuery(e, t),
 								n = this.parameters[1].getQuery(e, t);
 							return {
 								$let: {
 									vars: {
-										lon1: { $arrayElemAt: [this.getCoordinates(i), 0] },
-										lat1: { $arrayElemAt: [this.getCoordinates(i), 1] },
+										lon1: { $arrayElemAt: [this.getCoordinates(r), 0] },
+										lat1: { $arrayElemAt: [this.getCoordinates(r), 1] },
 										lon2: { $arrayElemAt: [this.getCoordinates(n), 0] },
 										lat2: { $arrayElemAt: [this.getCoordinates(n), 1] },
 										pi: 3.141592653589793,
@@ -1243,37 +1263,37 @@
 				}
 				t.default = a;
 			},
-			2998: (e, t, i) => {
+			2998: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("divide", {
 							paramCount: 2,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER, r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$divide" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			273: (e, t, i) => {
+			273: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("endsWith", {
 							paramCount: 2,
-							returnType: r.ReturnType.BOOLEAN,
-							params: [r.ReturnType.TEXT, r.ReturnType.PRIMITIVE],
+							returnType: i.ReturnType.BOOLEAN,
+							params: [i.ReturnType.TEXT, i.ReturnType.PRIMITIVE],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? {
 									$cond: {
 										if: {
@@ -1321,25 +1341,37 @@
 				}
 				t.default = a;
 			},
-			756: (e, t, i) => {
+			756: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307),
-					a = i(990);
+				const n = r(5145),
+					i = r(9307),
+					a = r(990);
 				class o extends n.Function {
 					constructor() {
 						super("eq", {
 							paramCount: 2,
-							returnType: r.ReturnType.BOOLEAN,
-							params: [r.ReturnType.PRIMITIVE, r.ReturnType.PRIMITIVE],
-							mapping: { MongoDB: "$eq" },
+							returnType: i.ReturnType.BOOLEAN,
+							params: [i.ReturnType.PRIMITIVE, i.ReturnType.PRIMITIVE],
+							mapping: { MongoDB: "$eq", PostgreSQL: "=", MySQL: "=" },
 						});
 					}
 					validate(e) {
 						super.validate(e);
 						const t = this.parameters[0],
-							i = this.parameters[1];
-						if (t.getReturnType() !== i.getReturnType())
+							r = this.parameters[1];
+						if (
+							!(
+								(t.getReturnType() === i.ReturnType.ID &&
+									r.getReturnType() === i.ReturnType.NUMBER) ||
+								(r.getReturnType() === i.ReturnType.ID &&
+									t.getReturnType() === i.ReturnType.NUMBER) ||
+								(t.getReturnType() === i.ReturnType.ID &&
+									r.getReturnType() === i.ReturnType.TEXT) ||
+								(r.getReturnType() === i.ReturnType.ID &&
+									t.getReturnType() === i.ReturnType.TEXT)
+							) &&
+							t.getReturnType() !== r.getReturnType()
+						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first and second parameters of the '${this.name}' function needs to have the same return type.`
@@ -1349,17 +1381,17 @@
 						super.validateForPull(e);
 						const t = this.parameters[0];
 						if (
-							t.getExpressionType() !== r.ExpressionType.FIELD &&
-							t.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							t.getExpressionType() !== i.ExpressionType.FIELD &&
+							t.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first parameter of the '${this.name}' function when used for a $pull update operation or array filter condition should be a field value. Either you have typed the field name wrong or you have used a static value or function instead of a field value.`
 							);
-						const i = this.parameters[1];
+						const r = this.parameters[1];
 						if (
-							i.getExpressionType() !== r.ExpressionType.STATIC &&
-							i.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							r.getExpressionType() !== i.ExpressionType.STATIC &&
+							r.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_value",
@@ -1375,25 +1407,39 @@
 									},
 							  };
 					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return `${this.parameters[0].getQuery(
+									e,
+									t
+								)} = ${this.parameters[1].getQuery(e, t)}`;
+							default:
+								return null;
+						}
+					}
 				}
 				t.default = o;
 			},
-			2897: (e, t, i) => {
+			2897: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307),
-					a = i(990);
+				const n = r(5145),
+					i = r(9307),
+					a = r(990);
 				class o extends n.Function {
 					constructor() {
 						super("exists", {
 							paramCount: 1,
-							returnType: r.ReturnType.BOOLEAN,
-							params: r.ReturnType.ANY,
+							returnType: i.ReturnType.BOOLEAN,
+							params: i.ReturnType.ANY,
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? {
 									$ne: [
 										{ $type: this.parameters[0].getQuery(e, t) },
@@ -1406,8 +1452,8 @@
 						super.validateForPull(e);
 						const t = this.parameters[0];
 						if (
-							t.getExpressionType() !== r.ExpressionType.FIELD &&
-							t.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							t.getExpressionType() !== i.ExpressionType.FIELD &&
+							t.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_field",
@@ -1422,57 +1468,69 @@
 				}
 				t.default = o;
 			},
-			4175: (e, t, i) => {
+			4175: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("exp", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$exp" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			9335: (e, t, i) => {
+			9335: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("floor", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$floor" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			711: (e, t, i) => {
+			711: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307),
-					a = i(990);
+				const n = r(5145),
+					i = r(9307),
+					a = r(990);
 				class o extends n.Function {
 					constructor() {
 						super("gt", {
 							paramCount: 2,
-							returnType: r.ReturnType.BOOLEAN,
-							params: [r.ReturnType.PRIMITIVE, r.ReturnType.PRIMITIVE],
-							mapping: { MongoDB: "$gt" },
+							returnType: i.ReturnType.BOOLEAN,
+							params: [i.ReturnType.PRIMITIVE, i.ReturnType.PRIMITIVE],
+							mapping: { MongoDB: "$gt", PostgreSQL: ">", MySQL: ">" },
 						});
 					}
 					validate(e) {
 						super.validate(e);
 						const t = this.parameters[0],
-							i = this.parameters[1];
-						if (t.getReturnType() !== i.getReturnType())
+							r = this.parameters[1];
+						if (
+							!(
+								(t.getReturnType() === i.ReturnType.ID &&
+									r.getReturnType() === i.ReturnType.NUMBER) ||
+								(r.getReturnType() === i.ReturnType.ID &&
+									t.getReturnType() === i.ReturnType.NUMBER) ||
+								(t.getReturnType() === i.ReturnType.ID &&
+									r.getReturnType() === i.ReturnType.TEXT) ||
+								(r.getReturnType() === i.ReturnType.ID &&
+									t.getReturnType() === i.ReturnType.TEXT)
+							) &&
+							t.getReturnType() !== r.getReturnType()
+						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first and second parameters of the '${this.name}' function needs to have the same return type.`
@@ -1482,17 +1540,17 @@
 						super.validateForPull(e);
 						const t = this.parameters[0];
 						if (
-							t.getExpressionType() !== r.ExpressionType.FIELD &&
-							t.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							t.getExpressionType() !== i.ExpressionType.FIELD &&
+							t.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first parameter of the '${this.name}' function when used for a $pull update operation or array filter condition should be a field value. Either you have typed the field name wrong or you have used a static value or function instead of a field value.`
 							);
-						const i = this.parameters[1];
+						const r = this.parameters[1];
 						if (
-							i.getExpressionType() !== r.ExpressionType.STATIC &&
-							i.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							r.getExpressionType() !== i.ExpressionType.STATIC &&
+							r.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_value",
@@ -1508,28 +1566,54 @@
 									},
 							  };
 					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return `${this.parameters[0].getQuery(
+									e,
+									t
+								)} > ${this.parameters[1].getQuery(e, t)}`;
+							default:
+								return null;
+						}
+					}
 				}
 				t.default = o;
 			},
-			3510: (e, t, i) => {
+			3510: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307),
-					a = i(990);
+				const n = r(5145),
+					i = r(9307),
+					a = r(990);
 				class o extends n.Function {
 					constructor() {
 						super("gte", {
 							paramCount: 2,
-							returnType: r.ReturnType.BOOLEAN,
-							params: [r.ReturnType.PRIMITIVE, r.ReturnType.PRIMITIVE],
-							mapping: { MongoDB: "$gte" },
+							returnType: i.ReturnType.BOOLEAN,
+							params: [i.ReturnType.PRIMITIVE, i.ReturnType.PRIMITIVE],
+							mapping: { MongoDB: "$gte", PostgreSQL: ">=", MySQL: ">=" },
 						});
 					}
 					validate(e) {
 						super.validate(e);
 						const t = this.parameters[0],
-							i = this.parameters[1];
-						if (t.getReturnType() !== i.getReturnType())
+							r = this.parameters[1];
+						if (
+							!(
+								(t.getReturnType() === i.ReturnType.ID &&
+									r.getReturnType() === i.ReturnType.NUMBER) ||
+								(r.getReturnType() === i.ReturnType.ID &&
+									t.getReturnType() === i.ReturnType.NUMBER) ||
+								(t.getReturnType() === i.ReturnType.ID &&
+									r.getReturnType() === i.ReturnType.TEXT) ||
+								(r.getReturnType() === i.ReturnType.ID &&
+									t.getReturnType() === i.ReturnType.TEXT)
+							) &&
+							t.getReturnType() !== r.getReturnType()
+						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first and second parameters of the '${this.name}' function needs to have the same return type.`
@@ -1539,17 +1623,17 @@
 						super.validateForPull(e);
 						const t = this.parameters[0];
 						if (
-							t.getExpressionType() !== r.ExpressionType.FIELD &&
-							t.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							t.getExpressionType() !== i.ExpressionType.FIELD &&
+							t.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first parameter of the '${this.name}' function when used for a $pull update operation or array filter condition should be a field value. Either you have typed the field name wrong or you have used a static value or function instead of a field value.`
 							);
-						const i = this.parameters[1];
+						const r = this.parameters[1];
 						if (
-							i.getExpressionType() !== r.ExpressionType.STATIC &&
-							i.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							r.getExpressionType() !== i.ExpressionType.STATIC &&
+							r.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_value",
@@ -1565,64 +1649,87 @@
 									},
 							  };
 					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return `${this.parameters[0].getQuery(
+									e,
+									t
+								)} >= ${this.parameters[1].getQuery(e, t)}`;
+							default:
+								return null;
+						}
+					}
 				}
 				t.default = o;
 			},
-			8949: (e, t, i) => {
+			8949: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("hour", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.DATE],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.DATE],
 							mapping: { MongoDB: "$hour" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			2327: (e, t, i) => {
+			2327: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307),
-					a = i(990);
+				const n = r(5145),
+					i = r(9307),
+					a = r(990);
 				class o extends n.Function {
 					constructor() {
 						super("in", {
 							paramCount: 2,
-							returnType: r.ReturnType.BOOLEAN,
-							params: [r.ReturnType.PRIMITIVE, r.ReturnType.ARRAY],
-							mapping: { MongoDB: "$custom" },
+							returnType: i.ReturnType.BOOLEAN,
+							params: [i.ReturnType.PRIMITIVE, i.ReturnType.ARRAY],
+							mapping: { MongoDB: "$custom", PostgreSQL: "IN", MySQL: "IN" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
-							? {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return {
 									$in: [
 										this.parameters[0].getQuery(e, t),
 										{ $ifNull: [this.parameters[1].getQuery(e, t), []] },
 									],
-							  }
-							: null;
+								};
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return `${this.parameters[0].getQuery(
+									e,
+									t
+								)} IN (${this.parameters[1].getQuery(e, t)})`;
+							default:
+								return null;
+						}
 					}
 					validateForPull(e) {
 						super.validateForPull(e);
 						const t = this.parameters[0];
 						if (
-							t.getExpressionType() !== r.ExpressionType.FIELD &&
-							t.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							t.getExpressionType() !== i.ExpressionType.FIELD &&
+							t.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first parameter of the '${this.name}' function when used for a $pull update operation or array filter condition should be a field value. Either you have typed the field name wrong or you have used a static value or function instead of a field value.`
 							);
-						const i = this.parameters[1];
+						const r = this.parameters[1];
 						if (
-							i.getExpressionType() !== r.ExpressionType.STATIC &&
-							i.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							r.getExpressionType() !== i.ExpressionType.STATIC &&
+							r.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_value",
@@ -1641,25 +1748,25 @@
 				}
 				t.default = o;
 			},
-			9674: (e, t, i) => {
+			9674: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("includes", {
 							paramCount: 3,
-							returnType: r.ReturnType.BOOLEAN,
+							returnType: i.ReturnType.BOOLEAN,
 							params: [
-								r.ReturnType.TEXT,
-								r.ReturnType.TEXT,
-								r.ReturnType.STATICBOOLEAN,
+								i.ReturnType.TEXT,
+								i.ReturnType.TEXT,
+								i.ReturnType.STATICBOOLEAN,
 							],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? {
 									$regexMatch: {
 										input: this.parameters[0].getQuery(e, t),
@@ -1673,21 +1780,21 @@
 				}
 				t.default = a;
 			},
-			5850: (e, t, i) => {
+			5850: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("left", {
 							paramCount: 2,
-							returnType: r.ReturnType.TEXT,
-							params: [r.ReturnType.TEXT, r.ReturnType.NUMBER],
+							returnType: i.ReturnType.TEXT,
+							params: [i.ReturnType.TEXT, i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? {
 									$substrCP: [
 										this.parameters[0].getQuery(e, t),
@@ -1700,105 +1807,117 @@
 				}
 				t.default = a;
 			},
-			1946: (e, t, i) => {
+			1946: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("length", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.TEXT],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.TEXT],
 							mapping: { MongoDB: "$strLenCP" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			929: (e, t, i) => {
+			929: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("ln", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$ln" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			1021: (e, t, i) => {
+			1021: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("log", {
 							paramCount: 2,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER, r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$log" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			1401: (e, t, i) => {
+			1401: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("log10", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$log10" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			3115: (e, t, i) => {
+			3115: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("lower", {
 							paramCount: 1,
-							returnType: r.ReturnType.TEXT,
-							params: [r.ReturnType.TEXT],
+							returnType: i.ReturnType.TEXT,
+							params: [i.ReturnType.TEXT],
 							mapping: { MongoDB: "$toLower" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			5616: (e, t, i) => {
+			5616: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307),
-					a = i(990);
+				const n = r(5145),
+					i = r(9307),
+					a = r(990);
 				class o extends n.Function {
 					constructor() {
 						super("lt", {
 							paramCount: 2,
-							returnType: r.ReturnType.BOOLEAN,
-							params: [r.ReturnType.PRIMITIVE, r.ReturnType.PRIMITIVE],
-							mapping: { MongoDB: "$lt" },
+							returnType: i.ReturnType.BOOLEAN,
+							params: [i.ReturnType.PRIMITIVE, i.ReturnType.PRIMITIVE],
+							mapping: { MongoDB: "$lt", PostgreSQL: "<", MySQL: "<" },
 						});
 					}
 					validate(e) {
 						super.validate(e);
 						const t = this.parameters[0],
-							i = this.parameters[1];
-						if (t.getReturnType() !== i.getReturnType())
+							r = this.parameters[1];
+						if (
+							!(
+								(t.getReturnType() === i.ReturnType.ID &&
+									r.getReturnType() === i.ReturnType.NUMBER) ||
+								(r.getReturnType() === i.ReturnType.ID &&
+									t.getReturnType() === i.ReturnType.NUMBER) ||
+								(t.getReturnType() === i.ReturnType.ID &&
+									r.getReturnType() === i.ReturnType.TEXT) ||
+								(r.getReturnType() === i.ReturnType.ID &&
+									t.getReturnType() === i.ReturnType.TEXT)
+							) &&
+							t.getReturnType() !== r.getReturnType()
+						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first and second parameters of the '${this.name}' function needs to have the same return type.`
@@ -1808,17 +1927,17 @@
 						super.validateForPull(e);
 						const t = this.parameters[0];
 						if (
-							t.getExpressionType() !== r.ExpressionType.FIELD &&
-							t.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							t.getExpressionType() !== i.ExpressionType.FIELD &&
+							t.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first parameter of the '${this.name}' function when used for a $pull update operation or array filter condition should be a field value. Either you have typed the field name wrong or you have used a static value or function instead of a field value.`
 							);
-						const i = this.parameters[1];
+						const r = this.parameters[1];
 						if (
-							i.getExpressionType() !== r.ExpressionType.STATIC &&
-							i.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							r.getExpressionType() !== i.ExpressionType.STATIC &&
+							r.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_value",
@@ -1834,28 +1953,54 @@
 									},
 							  };
 					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return `${this.parameters[0].getQuery(
+									e,
+									t
+								)} < ${this.parameters[1].getQuery(e, t)}`;
+							default:
+								return null;
+						}
+					}
 				}
 				t.default = o;
 			},
-			7934: (e, t, i) => {
+			7934: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307),
-					a = i(990);
+				const n = r(5145),
+					i = r(9307),
+					a = r(990);
 				class o extends n.Function {
 					constructor() {
 						super("lte", {
 							paramCount: 2,
-							returnType: r.ReturnType.BOOLEAN,
-							params: [r.ReturnType.PRIMITIVE, r.ReturnType.PRIMITIVE],
-							mapping: { MongoDB: "$lte" },
+							returnType: i.ReturnType.BOOLEAN,
+							params: [i.ReturnType.PRIMITIVE, i.ReturnType.PRIMITIVE],
+							mapping: { MongoDB: "$lte", PostgreSQL: "<=", MySQL: "<=" },
 						});
 					}
 					validate(e) {
 						super.validate(e);
 						const t = this.parameters[0],
-							i = this.parameters[1];
-						if (t.getReturnType() !== i.getReturnType())
+							r = this.parameters[1];
+						if (
+							!(
+								(t.getReturnType() === i.ReturnType.ID &&
+									r.getReturnType() === i.ReturnType.NUMBER) ||
+								(r.getReturnType() === i.ReturnType.ID &&
+									t.getReturnType() === i.ReturnType.NUMBER) ||
+								(t.getReturnType() === i.ReturnType.ID &&
+									r.getReturnType() === i.ReturnType.TEXT) ||
+								(r.getReturnType() === i.ReturnType.ID &&
+									t.getReturnType() === i.ReturnType.TEXT)
+							) &&
+							t.getReturnType() !== r.getReturnType()
+						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first and second parameters of the '${this.name}' function needs to have the same return type.`
@@ -1865,17 +2010,17 @@
 						super.validateForPull(e);
 						const t = this.parameters[0];
 						if (
-							t.getExpressionType() !== r.ExpressionType.FIELD &&
-							t.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							t.getExpressionType() !== i.ExpressionType.FIELD &&
+							t.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first parameter of the '${this.name}' function when used for a $pull update operation or array filter condition should be a field value. Either you have typed the field name wrong or you have used a static value or function instead of a field value.`
 							);
-						const i = this.parameters[1];
+						const r = this.parameters[1];
 						if (
-							i.getExpressionType() !== r.ExpressionType.STATIC &&
-							i.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							r.getExpressionType() !== i.ExpressionType.STATIC &&
+							r.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_value",
@@ -1891,113 +2036,139 @@
 									},
 							  };
 					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return `${this.parameters[0].getQuery(
+									e,
+									t
+								)} <= ${this.parameters[1].getQuery(e, t)}`;
+							default:
+								return null;
+						}
+					}
 				}
 				t.default = o;
 			},
-			6489: (e, t, i) => {
+			6489: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("ltrim", {
 							paramCount: 1,
-							returnType: r.ReturnType.TEXT,
-							params: [r.ReturnType.TEXT],
+							returnType: i.ReturnType.TEXT,
+							params: [i.ReturnType.TEXT],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? { $ltrim: { input: this.parameters[0].getQuery(e, t) } }
 							: null;
 					}
 				}
 				t.default = a;
 			},
-			6336: (e, t, i) => {
+			6336: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("minute", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.DATE],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.DATE],
 							mapping: { MongoDB: "$minute" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			2237: (e, t, i) => {
+			2237: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("mod", {
 							paramCount: 2,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER, r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$mod" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			4410: (e, t, i) => {
+			4410: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("month", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.DATE],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.DATE],
 							mapping: { MongoDB: "$month" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			9660: (e, t, i) => {
+			9660: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("multiply", {
 							paramCount: -1,
-							returnType: r.ReturnType.NUMBER,
-							params: r.ReturnType.NUMBER,
+							returnType: i.ReturnType.NUMBER,
+							params: i.ReturnType.NUMBER,
 							mapping: { MongoDB: "$multiply" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			3481: (e, t, i) => {
+			3481: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307),
-					a = i(990);
+				const n = r(5145),
+					i = r(9307),
+					a = r(990);
 				class o extends n.Function {
 					constructor() {
 						super("neq", {
 							paramCount: 2,
-							returnType: r.ReturnType.BOOLEAN,
-							params: [r.ReturnType.PRIMITIVE, r.ReturnType.PRIMITIVE],
-							mapping: { MongoDB: "$ne" },
+							returnType: i.ReturnType.BOOLEAN,
+							params: [i.ReturnType.PRIMITIVE, i.ReturnType.PRIMITIVE],
+							mapping: { MongoDB: "$ne", PostgreSQL: "!=", MySQL: "!=" },
 						});
 					}
 					validate(e) {
 						super.validate(e);
 						const t = this.parameters[0],
-							i = this.parameters[1];
-						if (t.getReturnType() !== i.getReturnType())
+							r = this.parameters[1];
+						if (
+							!(
+								(t.getReturnType() === i.ReturnType.ID &&
+									r.getReturnType() === i.ReturnType.NUMBER) ||
+								(r.getReturnType() === i.ReturnType.ID &&
+									t.getReturnType() === i.ReturnType.NUMBER) ||
+								(t.getReturnType() === i.ReturnType.ID &&
+									r.getReturnType() === i.ReturnType.TEXT) ||
+								(r.getReturnType() === i.ReturnType.ID &&
+									t.getReturnType() === i.ReturnType.TEXT)
+							) &&
+							t.getReturnType() !== r.getReturnType()
+						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first and second parameters of the '${this.name}' function needs to have the same return type.`
@@ -2007,17 +2178,17 @@
 						super.validateForPull(e);
 						const t = this.parameters[0];
 						if (
-							t.getExpressionType() !== r.ExpressionType.FIELD &&
-							t.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							t.getExpressionType() !== i.ExpressionType.FIELD &&
+							t.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first parameter of the '${this.name}' function when used for a $pull update operation or array filter condition should be a field value. Either you have typed the field name wrong or you have used a static value or function instead of a field value.`
 							);
-						const i = this.parameters[1];
+						const r = this.parameters[1];
 						if (
-							i.getExpressionType() !== r.ExpressionType.STATIC &&
-							i.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							r.getExpressionType() !== i.ExpressionType.STATIC &&
+							r.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_value",
@@ -2033,26 +2204,45 @@
 									},
 							  };
 					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return `${this.parameters[0].getQuery(
+									e,
+									t
+								)} != ${this.parameters[1].getQuery(e, t)}`;
+							default:
+								return null;
+						}
+					}
 				}
 				t.default = o;
 			},
-			789: (e, t, i) => {
+			789: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307),
-					a = i(990);
+				const n = r(5145),
+					i = r(9307),
+					a = r(990);
 				class o extends n.Function {
 					constructor() {
 						super("nin", {
 							paramCount: 2,
-							returnType: r.ReturnType.BOOLEAN,
-							params: [r.ReturnType.PRIMITIVE, r.ReturnType.ARRAY],
-							mapping: { MongoDB: "$custom" },
+							returnType: i.ReturnType.BOOLEAN,
+							params: [i.ReturnType.PRIMITIVE, i.ReturnType.ARRAY],
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "NOT IN",
+								MySQL: "NOT IN",
+							},
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
-							? {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return {
 									$not: [
 										{
 											$in: [
@@ -2061,24 +2251,32 @@
 											],
 										},
 									],
-							  }
-							: null;
+								};
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return `${this.parameters[0].getQuery(
+									e,
+									t
+								)} NOT IN (${this.parameters[1].getQuery(e, t)})`;
+							default:
+								return null;
+						}
 					}
 					validateForPull(e) {
 						super.validateForPull(e);
 						const t = this.parameters[0];
 						if (
-							t.getExpressionType() !== r.ExpressionType.FIELD &&
-							t.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							t.getExpressionType() !== i.ExpressionType.FIELD &&
+							t.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_field",
 								`The first parameter of the '${this.name}' function when used for a $pull update operation or array filter condition should be a field value. Either you have typed the field name wrong or you have used a static value or function instead of a field value.`
 							);
-						const i = this.parameters[1];
+						const r = this.parameters[1];
 						if (
-							i.getExpressionType() !== r.ExpressionType.STATIC &&
-							i.getExpressionType() !== r.ExpressionType.ARRAY_FIELD
+							r.getExpressionType() !== i.ExpressionType.STATIC &&
+							r.getExpressionType() !== i.ExpressionType.ARRAY_FIELD
 						)
 							throw new a.ClientError(
 								"invalid_value",
@@ -2097,53 +2295,77 @@
 				}
 				t.default = o;
 			},
-			6587: (e, t, i) => {
+			6587: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("not", {
 							paramCount: 1,
-							returnType: r.ReturnType.BOOLEAN,
-							params: r.ReturnType.BOOLEAN,
-							mapping: { MongoDB: "$custom" },
+							returnType: i.ReturnType.BOOLEAN,
+							params: i.ReturnType.BOOLEAN,
+							mapping: { MongoDB: "$not", PostgreSQL: "NOT", MySQL: "NOT" },
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return `NOT ${this.parameters[0].getQuery(e, t)}`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
 			},
-			7267: (e, t, i) => {
+			7267: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("or", {
 							paramCount: -1,
-							returnType: r.ReturnType.BOOLEAN,
-							params: r.ReturnType.BOOLEAN,
-							mapping: { MongoDB: "$or" },
+							returnType: i.ReturnType.BOOLEAN,
+							params: i.ReturnType.BOOLEAN,
+							mapping: { MongoDB: "$or", PostgreSQL: "OR", MySQL: "OR" },
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								const r = [];
+								for (const n of this.parameters) r.push(n.getQuery(e, t));
+								return `(${r.join(" OR ")})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
 			},
-			4997: (e, t, i) => {
+			4997: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("point", {
 							paramCount: 2,
-							returnType: r.ReturnType.GEOPOINT,
-							params: [r.ReturnType.NUMBER, r.ReturnType.NUMBER],
+							returnType: i.ReturnType.GEOPOINT,
+							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? {
 									type: "Point",
 									coordinates: [
@@ -2156,53 +2378,53 @@
 				}
 				t.default = a;
 			},
-			6222: (e, t, i) => {
+			6222: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("pow", {
 							paramCount: 2,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER, r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$pow" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			3725: (e, t, i) => {
+			3725: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("radians", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$degreesToRadians" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			6835: (e, t, i) => {
+			6835: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("right", {
 							paramCount: 2,
-							returnType: r.ReturnType.TEXT,
-							params: [r.ReturnType.TEXT, r.ReturnType.NUMBER],
+							returnType: i.ReturnType.TEXT,
+							params: [i.ReturnType.TEXT, i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? {
 									$cond: {
 										if: {
@@ -2231,106 +2453,106 @@
 				}
 				t.default = a;
 			},
-			5191: (e, t, i) => {
+			5191: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("round", {
 							paramCount: 2,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER, r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$round" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			2115: (e, t, i) => {
+			2115: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("rtrim", {
 							paramCount: 1,
-							returnType: r.ReturnType.TEXT,
-							params: [r.ReturnType.TEXT],
+							returnType: i.ReturnType.TEXT,
+							params: [i.ReturnType.TEXT],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? { $rtrim: { input: this.parameters[0].getQuery(e, t) } }
 							: null;
 					}
 				}
 				t.default = a;
 			},
-			5365: (e, t, i) => {
+			5365: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("second", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.DATE],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.DATE],
 							mapping: { MongoDB: "$second" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			5331: (e, t, i) => {
+			5331: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("sin", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$sin" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			6903: (e, t, i) => {
+			6903: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("sinh", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$sinh" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			5102: (e, t, i) => {
+			5102: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("size", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.ARRAY],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.ARRAY],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						if (e === r.DBTYPE.MONGODB)
+						if (e === i.DBTYPE.MONGODB)
 							return {
 								$size: { $ifNull: [this.parameters[0].getQuery(e, t), []] },
 							};
@@ -2338,37 +2560,37 @@
 				}
 				t.default = a;
 			},
-			6509: (e, t, i) => {
+			6509: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("sqrt", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$sqrt" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			4207: (e, t, i) => {
+			4207: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("startsWith", {
 							paramCount: 2,
-							returnType: r.ReturnType.BOOLEAN,
-							params: [r.ReturnType.TEXT, r.ReturnType.PRIMITIVE],
+							returnType: i.ReturnType.BOOLEAN,
+							params: [i.ReturnType.TEXT, i.ReturnType.PRIMITIVE],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? {
 									$eq: [
 										{
@@ -2385,21 +2607,21 @@
 				}
 				t.default = a;
 			},
-			5160: (e, t, i) => {
+			5160: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("strToDate", {
 							paramCount: 1,
-							returnType: r.ReturnType.DATE,
-							params: r.ReturnType.TEXT,
+							returnType: i.ReturnType.DATE,
+							params: i.ReturnType.TEXT,
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? {
 									$dateFromString: {
 										dateString: this.parameters[0].getQuery(e, t),
@@ -2411,19 +2633,19 @@
 				}
 				t.default = a;
 			},
-			6032: (e, t, i) => {
+			6032: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("substring", {
 							paramCount: 3,
-							returnType: r.ReturnType.TEXT,
+							returnType: i.ReturnType.TEXT,
 							params: [
-								r.ReturnType.TEXT,
-								r.ReturnType.NUMBER,
-								r.ReturnType.NUMBER,
+								i.ReturnType.TEXT,
+								i.ReturnType.NUMBER,
+								i.ReturnType.NUMBER,
 							],
 							mapping: { MongoDB: "$substrCP" },
 						});
@@ -2431,233 +2653,233 @@
 				}
 				t.default = a;
 			},
-			2228: (e, t, i) => {
+			2228: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("subtract", {
 							paramCount: 2,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER, r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$subtract" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			2970: (e, t, i) => {
+			2970: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("tan", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$tan" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			8354: (e, t, i) => {
+			8354: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("tanh", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.NUMBER],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.NUMBER],
 							mapping: { MongoDB: "$tanh" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			6923: (e, t, i) => {
+			6923: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("toBoolean", {
 							paramCount: 1,
-							returnType: r.ReturnType.BOOLEAN,
-							params: [r.ReturnType.ANY],
+							returnType: i.ReturnType.BOOLEAN,
+							params: [i.ReturnType.ANY],
 							mapping: { MongoDB: "$toBool" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			4184: (e, t, i) => {
+			4184: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("toDate", {
 							paramCount: 1,
-							returnType: r.ReturnType.DATE,
-							params: [r.ReturnType.ANY],
+							returnType: i.ReturnType.DATE,
+							params: [i.ReturnType.ANY],
 							mapping: { MongoDB: "$toDate" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			3057: (e, t, i) => {
+			3057: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("toDecimal", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.ANY],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.ANY],
 							mapping: { MongoDB: "$toDecimal" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			8051: (e, t, i) => {
+			8051: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("toInteger", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.ANY],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.ANY],
 							mapping: { MongoDB: "$toInt" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			6735: (e, t, i) => {
+			6735: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("toObjectId", {
 							paramCount: 1,
-							returnType: r.ReturnType.ID,
-							params: [r.ReturnType.ANY],
+							returnType: i.ReturnType.ID,
+							params: [i.ReturnType.ANY],
 							mapping: { MongoDB: "$toObjectId" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			6768: (e, t, i) => {
+			6768: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("toString", {
 							paramCount: 1,
-							returnType: r.ReturnType.TEXT,
-							params: [r.ReturnType.ANY],
+							returnType: i.ReturnType.TEXT,
+							params: [i.ReturnType.ANY],
 							mapping: { MongoDB: "$toString" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			6683: (e, t, i) => {
+			6683: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("trim", {
 							paramCount: 1,
-							returnType: r.ReturnType.TEXT,
-							params: [r.ReturnType.TEXT],
+							returnType: i.ReturnType.TEXT,
+							params: [i.ReturnType.TEXT],
 							mapping: { MongoDB: "$custom" },
 						});
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
+						return e === i.DBTYPE.MONGODB
 							? { $trim: { input: this.parameters[0].getQuery(e, t) } }
 							: null;
 					}
 				}
 				t.default = a;
 			},
-			587: (e, t, i) => {
+			587: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("upper", {
 							paramCount: 1,
-							returnType: r.ReturnType.TEXT,
-							params: [r.ReturnType.TEXT],
+							returnType: i.ReturnType.TEXT,
+							params: [i.ReturnType.TEXT],
 							mapping: { MongoDB: "$toUpper" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			4210: (e, t, i) => {
+			4210: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
-				const n = i(5145),
-					r = i(9307);
+				const n = r(5145),
+					i = r(9307);
 				class a extends n.Function {
 					constructor() {
 						super("year", {
 							paramCount: 1,
-							returnType: r.ReturnType.NUMBER,
-							params: [r.ReturnType.DATE],
+							returnType: i.ReturnType.NUMBER,
+							params: [i.ReturnType.DATE],
 							mapping: { MongoDB: "$year" },
 						});
 					}
 				}
 				t.default = a;
 			},
-			3819: (e, t, i) => {
+			3819: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.ArrayFilterFieldValue = void 0);
-				const n = i(3100),
-					r = i(9307);
+				const n = r(3100),
+					i = r(9307);
 				class a extends n.FieldValue {
-					constructor(e, t, i, n) {
-						super(e, t, i, n);
+					constructor(e, t, r, n) {
+						super(e, t, r, n);
 					}
 					getExpressionType() {
-						return r.ExpressionType.ARRAY_FIELD;
+						return i.ExpressionType.ARRAY_FIELD;
 					}
 					validateForPull(e) {}
 				}
 				t.ArrayFilterFieldValue = a;
 			},
-			4167: (e, t, i) => {
+			4167: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.ArrayValue = void 0);
-				const n = i(6098),
-					r = i(9307);
+				const n = r(6098),
+					i = r(9307);
 				class a extends n.Expression {
 					constructor() {
 						super(), (this.array = []);
 					}
 					getExpressionType() {
-						return r.ExpressionType.STATIC;
+						return i.ExpressionType.STATIC;
 					}
 					getReturnType() {
-						return r.ReturnType.ARRAY;
+						return i.ReturnType.ARRAY;
 					}
 					addEntry(e) {
 						this.array.push(e);
@@ -2669,14 +2891,22 @@
 						for (const t of this.array) t.validateForPull(e);
 					}
 					getQuery(e, t) {
-						const i = [];
-						for (const n of this.array) i.push(n.getQuery(e, t));
-						return i;
+						const r = [];
+						for (const n of this.array) r.push(n.getQuery(e, t));
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return r;
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return "output.join(', ')";
+							default:
+								return r;
+						}
 					}
 					getPullQuery(e, t) {
-						const i = [];
-						for (const n of this.array) i.push(n.getPullQuery(e, t));
-						return i;
+						const r = [];
+						for (const n of this.array) r.push(n.getPullQuery(e, t));
+						return r;
 					}
 					hasJoinFieldValues() {
 						for (const e of this.array) if (e.hasJoinFieldValues()) return !0;
@@ -2685,28 +2915,28 @@
 				}
 				t.ArrayValue = a;
 			},
-			3100: (e, t, i) => {
+			3100: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.FieldValue = void 0);
-				const n = i(6098),
-					r = i(9307),
-					a = i(990);
+				const n = r(6098),
+					i = r(9307),
+					a = r(990);
 				class o extends n.Expression {
-					constructor(e, t, i, n) {
+					constructor(e, t, r, n) {
 						super(),
 							(this.field = e),
 							(this.fieldPath = t),
-							(this.joinType = i),
+							(this.joinType = r),
 							(this.joinModel = n);
 					}
 					getExpressionType() {
-						return r.ExpressionType.FIELD;
+						return i.ExpressionType.FIELD;
 					}
 					getReturnType() {
 						switch (this.field.getType()) {
 							case "id":
 							case "reference":
-								return r.ReturnType.ID;
+								return i.ReturnType.ID;
 							case "text":
 							case "rich-text":
 							case "encrypted-text":
@@ -2714,46 +2944,54 @@
 							case "link":
 							case "phone":
 							case "enum":
-								return r.ReturnType.TEXT;
+								return i.ReturnType.TEXT;
 							case "createdat":
 							case "updatedat":
 							case "datetime":
-								return r.ReturnType.DATETIME;
+								return i.ReturnType.DATETIME;
 							case "date":
-								return r.ReturnType.DATE;
+								return i.ReturnType.DATE;
 							case "time":
-								return r.ReturnType.TIME;
+								return i.ReturnType.TIME;
 							case "boolean":
-								return r.ReturnType.BOOLEAN;
+								return i.ReturnType.BOOLEAN;
 							case "integer":
 							case "decimal":
-								return r.ReturnType.NUMBER;
+								return i.ReturnType.NUMBER;
 							case "geo-point":
-								return r.ReturnType.GEOPOINT;
+								return i.ReturnType.GEOPOINT;
 							case "binary":
-								return r.ReturnType.BINARY;
+								return i.ReturnType.BINARY;
 							case "json":
-								return r.ReturnType.JSON;
+								return i.ReturnType.JSON;
 							case "basic-values-list":
 							case "object-list":
 							case "join":
-								return r.ReturnType.ARRAY;
+								return i.ReturnType.ARRAY;
 							case "object":
-								return r.ReturnType.OBJECT;
+								return i.ReturnType.OBJECT;
 							case "array-filter":
-								return r.ReturnType.ANY;
+								return i.ReturnType.ANY;
 							default:
-								return r.ReturnType.UNDEFINED;
+								return i.ReturnType.UNDEFINED;
 						}
 					}
 					getQuery(e, t) {
-						return e === r.DBTYPE.MONGODB
-							? "none" === this.joinType && t
-								? `$${t(this.fieldPath)}`
-								: "complex" === this.joinType
-								? `$${this.field.getQueryPath()}`
-								: `$${this.fieldPath}`
-							: this.fieldPath;
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return "none" === this.joinType && t
+									? `$${t(this.fieldPath)}`
+									: "complex" === this.joinType && t
+									? `$${this.field.getQueryPath()}`
+									: `$${this.fieldPath}`;
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return "none" === this.joinType
+									? `${this.field.getModel().getName()}.${this.field.getName()}`
+									: this.fieldPath;
+							default:
+								return this.fieldPath;
+						}
 					}
 					getPullQuery(e, t) {
 						return this.field.getName();
@@ -2777,29 +3015,41 @@
 				}
 				t.FieldValue = o;
 			},
-			7523: (e, t, i) => {
+			7523: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.StaticValue = void 0);
-				const n = i(6098),
-					r = i(9307);
+				const n = r(6098),
+					i = r(9307);
 				class a extends n.Expression {
 					constructor(e) {
 						super(), (this.value = e);
 					}
 					getExpressionType() {
-						return r.ExpressionType.STATIC;
+						return i.ExpressionType.STATIC;
 					}
 					getReturnType() {
 						return null === this.value
-							? r.ReturnType.NULL
+							? i.ReturnType.NULL
 							: "string" == typeof this.value
-							? r.ReturnType.TEXT
+							? i.ReturnType.TEXT
 							: "number" == typeof this.value
-							? r.ReturnType.NUMBER
-							: r.ReturnType.BOOLEAN;
+							? i.ReturnType.NUMBER
+							: i.ReturnType.BOOLEAN;
 					}
 					getQuery(e, t) {
-						return this.value;
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return this.value;
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return null === this.value
+									? "NULL"
+									: "string" == typeof this.value
+									? `'${this.value}'`
+									: this.value;
+							default:
+								return this.value;
+						}
 					}
 					getPullQuery(e, t) {
 						return this.getQuery(e);
@@ -2807,35 +3057,35 @@
 				}
 				t.StaticValue = a;
 			},
-			341: function (e, t, i) {
+			341: function (e, t, r) {
 				var n =
 						(this && this.__createBinding) ||
 						(Object.create
-							? function (e, t, i, n) {
-									void 0 === n && (n = i);
-									var r = Object.getOwnPropertyDescriptor(t, i);
-									(r &&
-										!("get" in r
+							? function (e, t, r, n) {
+									void 0 === n && (n = r);
+									var i = Object.getOwnPropertyDescriptor(t, r);
+									(i &&
+										!("get" in i
 											? !t.__esModule
-											: r.writable || r.configurable)) ||
-										(r = {
+											: i.writable || i.configurable)) ||
+										(i = {
 											enumerable: !0,
 											get: function () {
-												return t[i];
+												return t[r];
 											},
 										}),
-										Object.defineProperty(e, n, r);
+										Object.defineProperty(e, n, i);
 							  }
-							: function (e, t, i, n) {
-									void 0 === n && (n = i), (e[n] = t[i]);
+							: function (e, t, r, n) {
+									void 0 === n && (n = r), (e[n] = t[r]);
 							  }),
-					r =
+					i =
 						(this && this.__exportStar) ||
 						function (e, t) {
-							for (var i in e)
-								"default" === i ||
-									Object.prototype.hasOwnProperty.call(t, i) ||
-									n(t, e, i);
+							for (var r in e)
+								"default" === r ||
+									Object.prototype.hasOwnProperty.call(t, r) ||
+									n(t, e, r);
 						};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Realtime =
@@ -2859,142 +3109,142 @@
 						t.createServerSideClient =
 						t.agnost =
 							void 0);
-				const a = i(7602);
+				const a = r(7602);
 				Object.defineProperty(t, "APIBase", {
 					enumerable: !0,
 					get: function () {
 						return a.APIBase;
 					},
 				});
-				const o = i(2779);
+				const o = r(2779);
 				Object.defineProperty(t, "AgnostServerSideClient", {
 					enumerable: !0,
 					get: function () {
 						return o.AgnostServerSideClient;
 					},
 				});
-				const s = i(6120);
+				const s = r(6120);
 				Object.defineProperty(t, "Storage", {
 					enumerable: !0,
 					get: function () {
 						return s.Storage;
 					},
 				});
-				const u = i(8414);
+				const u = r(8414);
 				Object.defineProperty(t, "Bucket", {
 					enumerable: !0,
 					get: function () {
 						return u.Bucket;
 					},
 				});
-				const l = i(5979);
+				const l = r(5979);
 				Object.defineProperty(t, "File", {
 					enumerable: !0,
 					get: function () {
 						return l.File;
 					},
 				});
-				const d = i(6760);
+				const d = r(6760);
 				Object.defineProperty(t, "Queue", {
 					enumerable: !0,
 					get: function () {
 						return d.Queue;
 					},
 				});
-				const c = i(9634);
+				const c = r(9634);
 				Object.defineProperty(t, "Task", {
 					enumerable: !0,
 					get: function () {
 						return c.Task;
 					},
 				});
-				const p = i(9949);
+				const p = r(9949);
 				Object.defineProperty(t, "Func", {
 					enumerable: !0,
 					get: function () {
 						return p.Func;
 					},
 				});
-				const h = i(2847);
+				const h = r(2847);
 				Object.defineProperty(t, "Realtime", {
 					enumerable: !0,
 					get: function () {
 						return h.Realtime;
 					},
 				});
-				const f = i(665);
+				const f = r(665);
 				Object.defineProperty(t, "Database", {
 					enumerable: !0,
 					get: function () {
 						return f.Database;
 					},
 				});
-				const y = i(5421);
+				const y = r(5421);
 				Object.defineProperty(t, "DatabaseBase", {
 					enumerable: !0,
 					get: function () {
 						return y.DatabaseBase;
 					},
 				});
-				const m = i(9831);
+				const m = r(9831);
 				Object.defineProperty(t, "Model", {
 					enumerable: !0,
 					get: function () {
 						return m.Model;
 					},
 				});
-				const v = i(892);
+				const g = r(892);
 				Object.defineProperty(t, "ModelBase", {
 					enumerable: !0,
 					get: function () {
-						return v.ModelBase;
+						return g.ModelBase;
 					},
 				});
-				const g = i(1111);
+				const v = r(1111);
 				Object.defineProperty(t, "Field", {
 					enumerable: !0,
 					get: function () {
-						return g.Field;
+						return v.Field;
 					},
 				});
-				const T = i(1687);
+				const T = r(1687);
 				Object.defineProperty(t, "DBAction", {
 					enumerable: !0,
 					get: function () {
 						return T.DBAction;
 					},
 				});
-				const b = i(4079);
+				const b = r(4079);
 				Object.defineProperty(t, "Cache", {
 					enumerable: !0,
 					get: function () {
 						return b.Cache;
 					},
 				});
-				const w = i(9);
+				const E = r(9);
 				Object.defineProperty(t, "CacheBase", {
 					enumerable: !0,
 					get: function () {
-						return w.CacheBase;
+						return E.CacheBase;
 					},
 				});
-				const E = i(6098);
+				const w = r(6098);
 				Object.defineProperty(t, "Expression", {
 					enumerable: !0,
 					get: function () {
-						return E.Expression;
+						return w.Expression;
 					},
 				});
 				const _ = (e, t) => new o.AgnostServerSideClient(e, t);
 				t.createServerSideClient = _;
 				const R = _(global.META, global.ADAPTERS);
-				(t.agnost = R), r(i(9307), t), r(i(2548), t);
+				(t.agnost = R), i(r(9307), t), i(r(2548), t);
 			},
-			8414: function (e, t, i) {
+			8414: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -3012,11 +3262,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -3025,13 +3275,13 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Bucket = void 0);
-				const r = i(2781),
-					a = i(5979),
-					o = i(990),
-					s = i(9419);
+				const i = r(2781),
+					a = r(5979),
+					o = r(990),
+					s = r(9419);
 				t.Bucket = class {
-					constructor(e, t, i) {
-						(this.name = i), (this.meta = e), (this.adapter = t);
+					constructor(e, t, r) {
+						(this.name = r), (this.meta = e), (this.adapter = t);
 					}
 					file(e) {
 						if (!(0, s.isString)(e))
@@ -3146,14 +3396,14 @@
 							);
 						});
 					}
-					updateInfo(e, t, i, r = !1) {
+					updateInfo(e, t, r, i = !1) {
 						return n(this, void 0, void 0, function* () {
 							if (!(0, s.isString)(e))
 								throw new o.ClientError(
 									"invalid_value",
 									"New name parameter needs to be a string value"
 								);
-							if (!(0, s.isObject)(i))
+							if (!(0, s.isObject)(r))
 								throw new o.ClientError(
 									"invalid_value",
 									"Tags parameter needs to be a JSON object"
@@ -3163,7 +3413,7 @@
 									"invalid_value",
 									"isPublic parameter needs to be a boolean value"
 								);
-							if (!(0, s.isBoolean)(r))
+							if (!(0, s.isBoolean)(i))
 								throw new o.ClientError(
 									"invalid_value",
 									"includeFiles parameter needs to be a boolean value"
@@ -3173,8 +3423,8 @@
 								this.name,
 								e,
 								t,
-								i,
-								r
+								r,
+								i
 							);
 						});
 					}
@@ -3255,7 +3505,7 @@
 									"invalid_value",
 									"File size needs to be a positive integer value value"
 								);
-							if ("stream" in e && !(e.stream instanceof r.Readable))
+							if ("stream" in e && !(e.stream instanceof i.Readable))
 								throw new o.ClientError(
 									"invalid_value",
 									"File stream needs to be a Readable stream"
@@ -3300,11 +3550,11 @@
 					}
 				};
 			},
-			4079: function (e, t, i) {
+			4079: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -3322,11 +3572,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -3335,19 +3585,19 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Cache = void 0);
-				const r = i(9);
+				const i = r(9);
 				t.Cache = class {
-					constructor(e, t, i) {
-						this.cacheBase = new r.CacheBase(e, t, i);
+					constructor(e, t, r) {
+						this.cacheBase = new i.CacheBase(e, t, r);
 					}
 					getKeyValue(e, t = !1) {
 						return n(this, void 0, void 0, function* () {
 							return yield this.cacheBase.getKeyValue(e, t);
 						});
 					}
-					setKeyValue(e, t, i) {
+					setKeyValue(e, t, r) {
 						return n(this, void 0, void 0, function* () {
-							yield this.cacheBase.setKeyValue(e, t, i);
+							yield this.cacheBase.setKeyValue(e, t, r);
 						});
 					}
 					deleteKey(e) {
@@ -3355,14 +3605,14 @@
 							yield this.cacheBase.deleteKey(e);
 						});
 					}
-					incrementKeyValue(e, t = 1, i) {
+					incrementKeyValue(e, t = 1, r) {
 						return n(this, void 0, void 0, function* () {
-							return yield this.cacheBase.incrementKeyValue(e, t, i);
+							return yield this.cacheBase.incrementKeyValue(e, t, r);
 						});
 					}
-					decrementKeyValue(e, t = 1, i) {
+					decrementKeyValue(e, t = 1, r) {
 						return n(this, void 0, void 0, function* () {
-							return yield this.cacheBase.decrementKeyValue(e, t, i);
+							return yield this.cacheBase.decrementKeyValue(e, t, r);
 						});
 					}
 					expireKey(e, t) {
@@ -3370,9 +3620,9 @@
 							yield this.cacheBase.expireKey(e, t);
 						});
 					}
-					listKeys(e, t, i = !1) {
+					listKeys(e, t, r = !1) {
 						return n(this, void 0, void 0, function* () {
-							return yield this.cacheBase.listKeys(e, t, i);
+							return yield this.cacheBase.listKeys(e, t, r);
 						});
 					}
 					getClient() {
@@ -3380,11 +3630,11 @@
 					}
 				};
 			},
-			9: function (e, t, i) {
+			9: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -3402,11 +3652,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -3415,21 +3665,21 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.CacheBase = void 0);
-				const r = i(7602),
-					a = i(990),
-					o = i(9419),
+				const i = r(7602),
+					a = r(990),
+					o = r(9419),
 					s = global.helper;
-				class u extends r.APIBase {
-					constructor(e, t, i) {
+				class u extends i.APIBase {
+					constructor(e, t, r) {
 						if (
 							(super(e, t),
-							(this.name = i),
-							(this.meta = this.getMetadata("cache", i)),
+							(this.name = r),
+							(this.meta = this.getMetadata("cache", r)),
 							!this.meta)
 						)
 							throw new a.ClientError(
 								"cache_not_found",
-								`Cannot find the cache identified by name '${i}'`
+								`Cannot find the cache identified by name '${r}'`
 							);
 						if (
 							((this.adapter = this.getAdapter("cache", this.name)),
@@ -3437,7 +3687,7 @@
 						)
 							throw new a.ClientError(
 								"adapter_not_found",
-								`Cannot find the adapter of the cache named '${i}'`
+								`Cannot find the adapter of the cache named '${r}'`
 							);
 					}
 					getAdapterObj(e = !1) {
@@ -3462,14 +3712,14 @@
 							return yield this.getAdapterObj(t).getKeyValue(this.meta, e);
 						});
 					}
-					setKeyValue(e, t, i) {
+					setKeyValue(e, t, r) {
 						return n(this, void 0, void 0, function* () {
 							if (!(0, o.isKey)(e))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Key needs to be a string or numeric value"
 								);
-							if (i && !(0, o.isPositiveInteger)(i))
+							if (r && !(0, o.isPositiveInteger)(r))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Time to live needs to be positive integer"
@@ -3478,7 +3728,7 @@
 								this.meta,
 								e,
 								t,
-								null != i ? i : void 0
+								null != r ? r : void 0
 							);
 						});
 					}
@@ -3495,7 +3745,7 @@
 							yield this.getAdapterObj(!1).deleteKey(this.meta, t);
 						});
 					}
-					incrementKeyValue(e, t = 1, i) {
+					incrementKeyValue(e, t = 1, r) {
 						return n(this, void 0, void 0, function* () {
 							if (!(0, o.isKey)(e))
 								throw new a.ClientError(
@@ -3507,7 +3757,7 @@
 									"invalid_parameter",
 									"Increment needs to be an integer"
 								);
-							if (i && !(0, o.isPositiveInteger)(i))
+							if (r && !(0, o.isPositiveInteger)(r))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Time to live needs to be positive integer"
@@ -3516,11 +3766,11 @@
 								this.meta,
 								e,
 								t,
-								i
+								r
 							);
 						});
 					}
-					decrementKeyValue(e, t = 1, i) {
+					decrementKeyValue(e, t = 1, r) {
 						return n(this, void 0, void 0, function* () {
 							if (!(0, o.isKey)(e))
 								throw new a.ClientError(
@@ -3532,7 +3782,7 @@
 									"invalid_parameter",
 									"Increment needs to be an integer"
 								);
-							if (i && !(0, o.isPositiveInteger)(i))
+							if (r && !(0, o.isPositiveInteger)(r))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Time to live needs to be positive integer"
@@ -3541,7 +3791,7 @@
 								this.meta,
 								e,
 								t,
-								i
+								r
 							);
 						});
 					}
@@ -3560,7 +3810,7 @@
 							return yield this.getAdapterObj(!1).expireKey(this.meta, e, t);
 						});
 					}
-					listKeys(e, t, i = !1) {
+					listKeys(e, t, r = !1) {
 						return n(this, void 0, void 0, function* () {
 							if (!(0, o.isString)(e))
 								throw new a.ClientError(
@@ -3572,12 +3822,12 @@
 									"invalid_parameter",
 									"Count needs to be a number value"
 								);
-							if (!(0, o.isBoolean)(i))
+							if (!(0, o.isBoolean)(r))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Use read replica needs to be a boolean value"
 								);
-							return yield this.getAdapterObj(i).listKeys(this.meta, e, t);
+							return yield this.getAdapterObj(r).listKeys(this.meta, e, t);
 						});
 					}
 					getClient() {
@@ -3586,11 +3836,11 @@
 				}
 				t.CacheBase = u;
 			},
-			665: function (e, t, i) {
+			665: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -3608,11 +3858,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -3621,11 +3871,11 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Database = void 0);
-				const r = i(5421),
-					a = i(9831);
+				const i = r(5421),
+					a = r(9831);
 				t.Database = class {
-					constructor(e, t, i) {
-						this.dbBase = new r.DatabaseBase(e, t, i);
+					constructor(e, t, r) {
+						this.dbBase = new i.DatabaseBase(e, t, r);
 					}
 					model(e) {
 						const t = this.dbBase.model(e);
@@ -3654,11 +3904,11 @@
 					}
 				};
 			},
-			5421: function (e, t, i) {
+			5421: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -3676,11 +3926,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -3689,25 +3939,25 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.DatabaseBase = void 0);
-				const r = i(7602),
-					a = i(892),
-					o = i(990),
-					s = i(9307),
+				const i = r(7602),
+					a = r(892),
+					o = r(990),
+					s = r(9307),
 					u = global.helper,
 					l = global.META;
-				class d extends r.APIBase {
-					constructor(e, t, i) {
+				class d extends i.APIBase {
+					constructor(e, t, r) {
 						if (
 							(super(e, t),
 							(this.models = new Map()),
 							(this.subModels = new Map()),
-							(this.name = i),
-							(this.meta = this.getMetadata("database", i)),
+							(this.name = r),
+							(this.meta = this.getMetadata("database", r)),
 							!this.meta)
 						)
 							throw new o.ClientError(
 								"database_not_found",
-								`Cannot find the database object identified by name '${i}'`
+								`Cannot find the database object identified by name '${r}'`
 							);
 						if (
 							((this.adapter = this.getAdapter("database", this.name)),
@@ -3715,22 +3965,22 @@
 						)
 							throw new o.ClientError(
 								"adapter_not_found",
-								`Cannot find the adapter of the database named '${i}'`
+								`Cannot find the adapter of the database named '${r}'`
 							);
 						const { models: n } = this.meta,
-							r = n.filter((e) => "model" === e.type);
-						for (const e of r) {
+							i = n.filter((e) => "model" === e.type);
+						for (const e of i) {
 							const t = new a.ModelBase(e, null, this);
 							this.addModel(e.name, t);
 						}
 					}
 					addModel(e, t) {
-						const i = t.getSchema();
-						i ? this.models.set(`${i}.${e}`, t) : this.models.set(e, t);
+						const r = t.getSchema();
+						r ? this.models.set(`${r}.${e}`, t) : this.models.set(e, t);
 					}
 					addSubModel(e, t) {
-						const i = t.getSchema();
-						i ? this.subModels.set(`${i}.${e}`, t) : this.subModels.set(e, t);
+						const r = t.getSchema();
+						r ? this.subModels.set(`${r}.${e}`, t) : this.subModels.set(e, t);
 					}
 					getMetaObj() {
 						return this.meta;
@@ -3800,11 +4050,11 @@
 				}
 				t.DatabaseBase = d;
 			},
-			5979: function (e, t, i) {
+			5979: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -3822,11 +4072,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -3835,13 +4085,13 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.File = void 0);
-				const r = i(2781),
-					a = i(990),
-					o = i(9419);
+				const i = r(2781),
+					a = r(990),
+					o = r(9419);
 				t.File = class {
-					constructor(e, t, i, n) {
+					constructor(e, t, r, n) {
 						(this.path = n),
-							(this.bucketName = i),
+							(this.bucketName = r),
 							(this.meta = e),
 							(this.adapter = t);
 					}
@@ -3986,7 +4236,7 @@
 									"invalid_value",
 									"File size needs to be a positive integer value value"
 								);
-							if ("stream" in e && !(e.stream instanceof r.Readable))
+							if ("stream" in e && !(e.stream instanceof i.Readable))
 								throw new a.ClientError(
 									"invalid_value",
 									"File stream needs to be a Readable stream"
@@ -4004,14 +4254,14 @@
 							);
 						});
 					}
-					updateInfo(e, t, i) {
+					updateInfo(e, t, r) {
 						return n(this, void 0, void 0, function* () {
 							if (!(0, o.isString)(e))
 								throw new a.ClientError(
 									"invalid_value",
 									"New path parameter needs to be a string value"
 								);
-							if (!(0, o.isObject)(i))
+							if (!(0, o.isObject)(r))
 								throw new a.ClientError(
 									"invalid_value",
 									"Tags parameter needs to be a JSON object"
@@ -4027,17 +4277,17 @@
 								this.path,
 								e,
 								t,
-								i
+								r
 							);
 						});
 					}
 				};
 			},
-			9949: function (e, t, i) {
+			9949: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -4055,11 +4305,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -4068,19 +4318,19 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Func = void 0);
-				const r = i(7602),
-					a = i(990);
-				class o extends r.APIBase {
-					constructor(e, t, i) {
+				const i = r(7602),
+					a = r(990);
+				class o extends i.APIBase {
+					constructor(e, t, r) {
 						if (
 							(super(e, t),
-							(this.name = i),
-							(this.meta = this.getMetadata("function", i)),
+							(this.name = r),
+							(this.meta = this.getMetadata("function", r)),
 							!this.meta)
 						)
 							throw new a.ClientError(
 								"function_not_found",
-								`Cannot find the function identified by name '${i}'`
+								`Cannot find the function identified by name '${r}'`
 							);
 						if (
 							((this.adapter = this.getAdapter("function", this.name)),
@@ -4088,7 +4338,7 @@
 						)
 							throw new a.ClientError(
 								"adapter_not_found",
-								`Cannot find the adapter of the function named '${i}'`
+								`Cannot find the adapter of the function named '${r}'`
 							);
 					}
 					run(...e) {
@@ -4099,11 +4349,11 @@
 				}
 				t.Func = o;
 			},
-			6760: function (e, t, i) {
+			6760: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -4121,11 +4371,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -4134,19 +4384,19 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Queue = void 0);
-				const r = i(7602),
-					a = i(990);
-				class o extends r.APIBase {
-					constructor(e, t, i) {
+				const i = r(7602),
+					a = r(990);
+				class o extends i.APIBase {
+					constructor(e, t, r) {
 						if (
 							(super(e, t),
-							(this.name = i),
-							(this.meta = this.getMetadata("queue", i)),
+							(this.name = r),
+							(this.meta = this.getMetadata("queue", r)),
 							!this.meta)
 						)
 							throw new a.ClientError(
 								"queue_not_found",
-								`Cannot find the queue object identified by name '${i}'`
+								`Cannot find the queue object identified by name '${r}'`
 							);
 						if (
 							((this.adapter = this.getAdapter("queue", this.name)),
@@ -4154,7 +4404,7 @@
 						)
 							throw new a.ClientError(
 								"adapter_not_found",
-								`Cannot find the adapter of the queue named '${i}'`
+								`Cannot find the adapter of the queue named '${r}'`
 							);
 					}
 					submitMessage(e, t) {
@@ -4177,11 +4427,11 @@
 				}
 				t.Queue = o;
 			},
-			2847: function (e, t, i) {
+			2847: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -4199,11 +4449,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -4212,10 +4462,10 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Realtime = void 0);
-				const r = i(7602),
-					a = i(990),
-					o = i(9419);
-				class s extends r.APIBase {
+				const i = r(7602),
+					a = r(990),
+					o = r(9419);
+				class s extends i.APIBase {
 					constructor(e) {
 						if (
 							(super(null, e),
@@ -4235,7 +4485,7 @@
 							);
 						this.adapter.broadcast(e, t);
 					}
-					send(e, t, i) {
+					send(e, t, r) {
 						if (!(0, o.checkRequired)(e, !0))
 							throw new a.ClientError(
 								"invalid_value",
@@ -4246,7 +4496,7 @@
 								"invalid_value",
 								"The 'event name' needs to be a string value"
 							);
-						this.adapter.send(e, t, i);
+						this.adapter.send(e, t, r);
 					}
 					getMembers(e) {
 						return n(this, void 0, void 0, function* () {
@@ -4261,11 +4511,11 @@
 				}
 				t.Realtime = s;
 			},
-			6120: function (e, t, i) {
+			6120: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -4283,11 +4533,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -4296,21 +4546,21 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Storage = void 0);
-				const r = i(7602),
-					a = i(990),
-					o = i(8414),
-					s = i(9419);
-				class u extends r.APIBase {
-					constructor(e, t, i) {
+				const i = r(7602),
+					a = r(990),
+					o = r(8414),
+					s = r(9419);
+				class u extends i.APIBase {
+					constructor(e, t, r) {
 						if (
 							(super(e, t),
-							(this.name = i),
-							(this.meta = this.getMetadata("storage", i)),
+							(this.name = r),
+							(this.meta = this.getMetadata("storage", r)),
 							!this.meta)
 						)
 							throw new a.ClientError(
 								"storage_not_found",
-								`Cannot find the storage object identified by name '${i}'`
+								`Cannot find the storage object identified by name '${r}'`
 							);
 						if (
 							((this.adapter = this.getAdapter("storage", this.name)),
@@ -4318,7 +4568,7 @@
 						)
 							throw new a.ClientError(
 								"adapter_not_found",
-								`Cannot find the adapter of the storage named '${i}'`
+								`Cannot find the adapter of the storage named '${r}'`
 							);
 					}
 					bucket(e) {
@@ -4329,7 +4579,7 @@
 							);
 						return new o.Bucket(this.meta, this.adapter, e.trim());
 					}
-					createBucket(e, t = !0, i, r) {
+					createBucket(e, t = !0, r, i) {
 						return n(this, void 0, void 0, function* () {
 							if (!(0, s.isString)(e))
 								throw new a.ClientError(
@@ -4341,7 +4591,7 @@
 									"invalid_value",
 									"Public flag needs to be a boolean value"
 								);
-							if (i && !(0, s.isObject)(i))
+							if (r && !(0, s.isObject)(r))
 								throw new a.ClientError(
 									"invalid_value",
 									"Bucket tags need to be a JSON object"
@@ -4350,8 +4600,8 @@
 								this.meta,
 								e.trim(),
 								t,
-								i,
-								r
+								r,
+								i
 							);
 						});
 					}
@@ -4445,11 +4695,11 @@
 				}
 				t.Storage = u;
 			},
-			9634: function (e, t, i) {
+			9634: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -4467,11 +4717,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -4480,19 +4730,19 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.Task = void 0);
-				const r = i(7602),
-					a = i(990);
-				class o extends r.APIBase {
-					constructor(e, t, i) {
+				const i = r(7602),
+					a = r(990);
+				class o extends i.APIBase {
+					constructor(e, t, r) {
 						if (
 							(super(e, t),
-							(this.name = i),
-							(this.meta = this.getMetadata("task", i)),
+							(this.name = r),
+							(this.meta = this.getMetadata("task", r)),
 							!this.meta)
 						)
 							throw new a.ClientError(
 								"cronjob_not_found",
-								`Cannot find the cron job object identified by name '${i}'`
+								`Cannot find the cron job object identified by name '${r}'`
 							);
 						if (
 							((this.adapter = this.getAdapter("task", this.name)),
@@ -4500,7 +4750,7 @@
 						)
 							throw new a.ClientError(
 								"adapter_not_found",
-								`Cannot find the adapter of the cron job named '${i}'`
+								`Cannot find the adapter of the cron job named '${r}'`
 							);
 					}
 					runOnce() {
@@ -4516,11 +4766,11 @@
 				}
 				t.Task = o;
 			},
-			1687: function (e, t, i) {
+			1687: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -4538,11 +4788,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -4551,17 +4801,17 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.DBAction = void 0);
-				const r = i(892),
-					a = i(1779),
-					o = i(8054),
-					s = i(7523),
-					u = i(3100),
-					l = i(3819),
-					d = i(4167),
-					c = i(7853),
-					p = i(9307),
-					h = i(9419),
-					f = i(990);
+				const i = r(892),
+					a = r(1779),
+					o = r(8054),
+					s = r(7523),
+					u = r(3100),
+					l = r(3819),
+					d = r(4167),
+					c = r(7853),
+					p = r(9307),
+					h = r(9419),
+					f = r(990);
 				class y {
 					constructor(e) {
 						(this.model = e),
@@ -4613,9 +4863,9 @@
 							);
 						this.definition.searchText = e;
 					}
-					setWhere(e, t, i) {
+					setWhere(e, t, r) {
 						if (!e) return;
-						const n = this.processWhereCondition(e, t, i);
+						const n = this.processWhereCondition(e, t, r);
 						this.definition.where = n;
 					}
 					setSelect(e, t) {
@@ -4632,11 +4882,11 @@
 							);
 						if (0 === (e = e.filter((e) => "string" == typeof e && e)).length)
 							return;
-						const i = [],
+						const r = [],
 							n = [];
-						for (const r of e) {
-							const e = this.getFieldObject(r, t);
-							e ? i.push(Object.assign({ fieldName: r }, e)) : n.push(r);
+						for (const i of e) {
+							const e = this.getFieldObject(i, t);
+							e ? r.push(Object.assign({ fieldName: i }, e)) : n.push(i);
 						}
 						if (n.length > 0)
 							throw new f.ClientError(
@@ -4645,7 +4895,7 @@
 									", "
 								)}'`
 							);
-						this.definition.select = i;
+						this.definition.select = r;
 					}
 					setOmit(e, t) {
 						if (!e) return;
@@ -4661,11 +4911,11 @@
 							);
 						if (0 === (e = e.filter((e) => "string" == typeof e && e)).length)
 							return;
-						const i = [],
+						const r = [],
 							n = [];
-						for (const r of e) {
-							const e = this.getFieldObject(r, t);
-							e ? i.push(Object.assign({ fieldName: r }, e)) : n.push(r);
+						for (const i of e) {
+							const e = this.getFieldObject(i, t);
+							e ? r.push(Object.assign({ fieldName: i }, e)) : n.push(i);
 						}
 						if (n.length > 0)
 							throw new f.ClientError(
@@ -4674,27 +4924,27 @@
 									", "
 								)}'`
 							);
-						this.definition.omit = i;
+						this.definition.omit = r;
 					}
 					getFieldObject(e, t) {
-						const i = e.split(".").filter((e) => !e.startsWith("$"));
-						if (1 === i.length) {
-							const i = this.model.getField(e);
-							if (i)
+						const r = e.split(".").filter((e) => !e.startsWith("$"));
+						if (1 === r.length) {
+							const r = this.model.getField(e);
+							if (r)
 								return {
 									fieldPath: e,
-									field: i,
+									field: r,
 									joinType: "none",
 									joinModel: this.model,
 								};
 							{
-								const i = this.getJoinDefinition(e, t);
-								if (i) {
-									const t = this.model.getDb().model(i.from);
+								const r = this.getJoinDefinition(e, t);
+								if (r) {
+									const t = this.model.getDb().model(r.from);
 									if (t)
 										return {
 											fieldPath: e,
-											field: new a.JoinField({ name: i.as }, t),
+											field: new a.JoinField({ name: r.as }, t),
 											joinType: "complex",
 											joinModel: t,
 										};
@@ -4704,17 +4954,17 @@
 						}
 						{
 							let n = this.model,
-								r = "none";
-							for (let a = 0; a < i.length; a++) {
-								const o = i[a],
+								i = "none";
+							for (let a = 0; a < r.length; a++) {
+								const o = r[a],
 									s = n.getField(o);
 								if (s) {
 									const o = s.getType();
-									if (a === i.length - 1)
+									if (a === r.length - 1)
 										return {
 											fieldPath: e,
 											field: s,
-											joinType: r,
+											joinType: i,
 											joinModel: n,
 										};
 									if ("object" === o || "object-list" === o)
@@ -4726,7 +4976,7 @@
 										)
 											return null;
 										(n = this.model.getDb().getModelByIId(s.getRefModelIId())),
-											(r = "complex" === r ? r : "simple");
+											(i = "complex" === i ? i : "simple");
 									}
 								} else {
 									if (0 !== a) return null;
@@ -4736,7 +4986,7 @@
 										{
 											const t = this.model.getDb().model(e.from);
 											if (!t) return null;
-											(n = t), (r = "complex");
+											(n = t), (i = "complex");
 										}
 									}
 								}
@@ -4750,9 +5000,9 @@
 						if ("object" == typeof t && !Array.isArray(t) && t.as === e)
 							return !0;
 						if (Array.isArray(t))
-							for (const i of t) {
-								if ("string" == typeof i && e === i) return !0;
-								if ("object" == typeof i && !Array.isArray(i) && i.as === e)
+							for (const r of t) {
+								if ("string" == typeof r && e === r) return !0;
+								if ("object" == typeof r && !Array.isArray(r) && r.as === e)
 									return !0;
 							}
 						return !1;
@@ -4763,10 +5013,10 @@
 						if ("object" == typeof t && !Array.isArray(t) && t.as === e)
 							return t;
 						if (Array.isArray(t))
-							for (const i of t) {
-								if ("string" == typeof i && e === i) return null;
-								if ("object" == typeof i && !Array.isArray(i) && i.as === e)
-									return i;
+							for (const r of t) {
+								if ("string" == typeof r && e === r) return null;
+								if ("object" == typeof r && !Array.isArray(r) && r.as === e)
+									return r;
 							}
 						return null;
 					}
@@ -4780,45 +5030,45 @@
 									"invalid_join",
 									"Not a valid join definition."
 								);
-							for (const i of e)
-								if ("string" == typeof i) this.processStringBasedJoin(i, e, t);
+							for (const r of e)
+								if ("string" == typeof r) this.processStringBasedJoin(r, e, t);
 								else {
-									if ("object" != typeof i || Array.isArray(i))
+									if ("object" != typeof r || Array.isArray(r))
 										throw new f.ClientError(
 											"invalid_join",
 											"Not a valid join definition. The join array needs to include either reference field names as string or complex join definition as JSON object with 'as', 'from' and 'where' values."
 										);
-									this.processObjectBasedJoin(i, e, t);
+									this.processObjectBasedJoin(r, e, t);
 								}
 						} else this.processObjectBasedJoin(e, e, t);
 						this.definition.join = t;
 					}
-					processStringBasedJoin(e, t, i) {
+					processStringBasedJoin(e, t, r) {
 						const n = this.getFieldObject(e, t);
 						if (!n || "reference" !== n.field.getType())
 							throw new f.ClientError(
 								"invalid_join",
 								`'${e}' is not a valid reference field to join. You can either join reference fields or define join queries.`
 							);
-						const r = this.model
+						const i = this.model
 							.getDb()
 							.getModelByIId(n.field.getRefModelIId());
-						if (i.find((t) => t.as === e))
+						if (r.find((t) => t.as === e))
 							throw new f.ClientError(
 								"invalid_join",
 								`There is already a join definition with the alias '${e}'.`
 							);
-						i.push({
-							fieldPath: n.fieldName,
+						r.push({
+							fieldPath: n.fieldPath,
 							field: n.field,
 							joinType: "simple",
-							joinModel: r,
+							joinModel: i,
 							where: null,
 							as: e,
-							from: r.getName(),
+							from: i.getName(),
 						});
 					}
-					processObjectBasedJoin(e, t, i) {
+					processObjectBasedJoin(e, t, r) {
 						if (!e.as || !e.from || !e.where)
 							throw new f.ClientError(
 								"invalid_join",
@@ -4864,63 +5114,63 @@
 								"invalid_join",
 								`Join from '${e.from}' as '${e.as}' is not a valid join definition. You can either join reference fields or define join queries.`
 							);
-						const r = this.processWhereCondition(
+						const i = this.processWhereCondition(
 							e.where,
 							t,
 							p.ConditionType.QUERY
 						);
-						if (!r)
+						if (!i)
 							throw new f.ClientError(
 								"invalid_join",
 								"The 'where' condition of the join definition is missing."
 							);
-						if (i.find((t) => t.as === e.as))
+						if (r.find((t) => t.as === e.as))
 							throw new f.ClientError(
 								"invalid_join",
 								`There is already a join definition with the alias '${e.as}'.`
 							);
-						i.push(
+						r.push(
 							Object.assign(Object.assign({}, n), {
-								where: r,
+								where: i,
 								as: e.as,
 								from: e.from,
 							})
 						);
 					}
-					processWhereCondition(e, t, i) {
+					processWhereCondition(e, t, r) {
 						if (!e) return null;
 						const n = Object.entries(e);
 						if (0 === n.length) return null;
 						if (n.length > 1) {
 							const e = new c.FunctionManager.$and();
-							for (const [r, a] of n) {
-								const n = this.processExpression(r, a, t, i);
+							for (const [i, a] of n) {
+								const n = this.processExpression(i, a, t, r);
 								e.addParam(n);
 							}
 							return (
-								i === p.ConditionType.QUERY
+								r === p.ConditionType.QUERY
 									? e.validate(this.model.getDb().getType())
 									: e.validateForPull(this.model.getDb().getType()),
 								e
 							);
 						}
 						{
-							const [e, r] = n[0];
-							return this.processExpression(e, r, t, i);
+							const [e, i] = n[0];
+							return this.processExpression(e, i, t, r);
 						}
 					}
-					processExpression(e, t, i, n) {
-						const r = c.FunctionManager[e.toLowerCase()];
-						if (r) {
-							const e = new r();
+					processExpression(e, t, r, n) {
+						const i = c.FunctionManager[e.toLowerCase()];
+						if (i) {
+							const e = new i();
 							if (Array.isArray(t))
-								for (const r of t) {
-									const t = this.parseValue(r, i, n);
+								for (const i of t) {
+									const t = this.parseValue(i, r, n);
 									e.addParam(t);
 								}
 							else {
-								const r = this.parseValue(t, i, n);
-								e.addParam(r);
+								const i = this.parseValue(t, r, n);
+								e.addParam(i);
 							}
 							return (
 								n === p.ConditionType.QUERY
@@ -4930,22 +5180,22 @@
 							);
 						}
 						{
-							const r = this.getFieldObject(e, i);
-							if (r && "join" !== r.field.getType()) {
-								const r = new c.FunctionManager.$eq(),
-									a = this.parseValue(e, i, n),
-									o = this.parseValue(t, i, n);
+							const i = this.getFieldObject(e, r);
+							if (i && "join" !== i.field.getType()) {
+								const i = new c.FunctionManager.$eq(),
+									a = this.parseValue(e, r, n),
+									o = this.parseValue(t, r, n);
 								return (
-									r.addParam(a),
-									r.addParam(o),
+									i.addParam(a),
+									i.addParam(o),
 									n === p.ConditionType.QUERY
-										? r.validate(this.model.getDb().getType())
-										: r.validateForPull(this.model.getDb().getType()),
-									r
+										? i.validate(this.model.getDb().getType())
+										: i.validateForPull(this.model.getDb().getType()),
+									i
 								);
 							}
 							if (
-								r ||
+								i ||
 								"string" != typeof e ||
 								n !== p.ConditionType.ARRAY_FILTER
 							)
@@ -4954,24 +5204,24 @@
 									`There is no comparison operator, logical operator, function or model field named '${e}'.`
 								);
 							{
-								const r = new c.FunctionManager.$eq(),
+								const i = new c.FunctionManager.$eq(),
 									a = new l.ArrayFilterFieldValue(
 										new o.ArrayFilterField({ name: e }, this.model, e),
 										e,
 										"none",
 										this.model
 									),
-									s = this.parseValue(t, i, n);
+									s = this.parseValue(t, r, n);
 								return (
-									r.addParam(a),
-									r.addParam(s),
-									r.validateForPull(this.model.getDb().getType()),
-									r
+									i.addParam(a),
+									i.addParam(s),
+									i.validateForPull(this.model.getDb().getType()),
+									i
 								);
 							}
 						}
 					}
-					parseValue(e, t, i) {
+					parseValue(e, t, r) {
 						if ("boolean" == typeof e || "number" == typeof e || null === e)
 							return new s.StaticValue(e);
 						if ("string" == typeof e) {
@@ -4983,7 +5233,7 @@
 										n.joinType,
 										n.JoinModel
 								  )
-								: "string" == typeof e && i === p.ConditionType.ARRAY_FILTER
+								: "string" == typeof e && r === p.ConditionType.ARRAY_FILTER
 								? new l.ArrayFilterFieldValue(
 										new o.ArrayFilterField({ name: e }, this.model, e),
 										e,
@@ -4995,8 +5245,8 @@
 						if ("object" != typeof e || Array.isArray(e)) {
 							if (Array.isArray(e)) {
 								const n = new d.ArrayValue();
-								for (const r of e) {
-									const e = this.parseValue(r, t, i);
+								for (const i of e) {
+									const e = this.parseValue(i, t, r);
 									n.addEntry(e);
 								}
 								return n;
@@ -5020,8 +5270,8 @@
 										e
 									)}' has ${n.length} keys.`
 								);
-							const [r, a] = n[0];
-							return this.processExpression(r, a, t, i);
+							const [i, a] = n[0];
+							return this.processExpression(i, a, t, r);
 						}
 					}
 					setSort(e, t) {
@@ -5031,24 +5281,24 @@
 								"invalid_value",
 								'Sort definition needs to specify the fields and  their sorting order e.g., {"field1": "asc", "field2": "desc"}'
 							);
-						const i = [],
+						const r = [],
 							n = Object.keys(e);
-						for (const r of n) {
-							const n = this.getFieldObject(r, t);
+						for (const i of n) {
+							const n = this.getFieldObject(i, t);
 							if (!n)
 								throw new f.ClientError(
 									"invalid_field",
-									`'${r}' is not a valid field that can be used to sort query results.`
+									`'${i}' is not a valid field that can be used to sort query results.`
 								);
-							const a = e[r];
+							const a = e[i];
 							if ("asc" !== a && "desc" !== a)
 								throw new f.ClientError(
 									"invalid_field",
-									`Sorting order '${a}' is not a valid ordering type for '${r}'. Ordering can be either 'asc' or 'desc'.`
+									`Sorting order '${a}' is not a valid ordering type for '${i}'. Ordering can be either 'asc' or 'desc'.`
 								);
-							i.push(Object.assign({ fieldName: r, order: a }, n));
+							r.push(Object.assign({ fieldName: i, order: a }, n));
 						}
-						i.length > 0 && (this.definition.sort = i);
+						r.length > 0 && (this.definition.sort = r);
 					}
 					setSkip(e) {
 						if (null != e) {
@@ -5081,7 +5331,7 @@
 						}
 					}
 					setCreateData(e) {
-						var t, i;
+						var t, r;
 						return n(this, void 0, void 0, function* () {
 							if (!e)
 								throw new f.ClientError(
@@ -5094,31 +5344,31 @@
 									"The data to create in the database table/collection needs to be a single or an array of JSON objects"
 								);
 							if ((0, h.isObject)(e)) {
-								const i = {},
-									n = yield this.model.prepareFieldValues(e, !0, i);
+								const r = {},
+									n = yield this.model.prepareFieldValues(e, !0, r);
 								if (
-									(null === (t = i.errors) || void 0 === t
+									(null === (t = r.errors) || void 0 === t
 										? void 0
 										: t.length) > 0
 								)
 									throw new f.ClientError(
 										"validation_errors",
 										"The input data provided has failed to pass validation rules",
-										i.errors
+										r.errors
 									);
 								this.definition.createData = n;
 							} else {
 								const t = [],
 									n = [];
-								for (let r = 0; r < e.length; r++) {
+								for (let i = 0; i < e.length; i++) {
 									const a = {},
-										o = e[r];
+										o = e[i];
 									if (!o) continue;
 									const s = yield this.model.prepareFieldValues(o, !0, a);
-									(null === (i = a.errors) || void 0 === i
+									(null === (r = a.errors) || void 0 === r
 										? void 0
-										: i.length) > 0
-										? n.push({ entry: r, errors: a.errors })
+										: r.length) > 0
+										? n.push({ entry: i, errors: a.errors })
 										: t.push(s);
 								}
 								if (n.length > 0)
@@ -5132,7 +5382,7 @@
 						});
 					}
 					setUpdates(e, t) {
-						var i;
+						var r;
 						return n(this, void 0, void 0, function* () {
 							if (0 === Object.keys(e).length)
 								throw new f.ClientError(
@@ -5140,34 +5390,34 @@
 									"The updates object needs to define at least one key-value pair"
 								);
 							const n = { main: {}, sub: {} },
-								r = [];
-							for (const [i, a] of Object.entries(e)) {
-								const e = this.getFieldObject(i, t);
+								i = [];
+							for (const [r, a] of Object.entries(e)) {
+								const e = this.getFieldObject(r, t);
 								if (!e)
 									throw new f.ClientError(
 										"invalid_field",
-										`There is no field named '${i}' in model '${this.model.getName()}'`
+										`There is no field named '${r}' in model '${this.model.getName()}'`
 									);
 								if ("none" !== e.joinType)
 									throw new f.ClientError(
 										"invalid_field",
-										`Field '${i}' is a field of a joined model. Only fields of model '${this.model.getName()}' can be updated.`
+										`Field '${r}' is a field of a joined model. Only fields of model '${this.model.getName()}' can be updated.`
 									);
 								if (e.field.isSystemField())
 									throw new f.ClientError(
 										"invalid_field",
-										`Field '${i}' is a system managed field. System managed fields cannot be upddate manually.'`
+										`Field '${r}' is a system managed field. System managed fields cannot be upddate manually.'`
 									);
 								if (e.field.isReadOnly())
 									throw new f.ClientError(
 										"invalid_field",
-										`Field '${i}' is a a read-only field. Read-only fields cannot be upddated.'`
+										`Field '${r}' is a a read-only field. Read-only fields cannot be upddated.'`
 									);
 								if (null === a) {
 									if (e.field.isRequired())
 										throw new f.ClientError(
 											"invalid_value",
-											`Field '${i}' is a a required field. Null value cannot be assigned to a required field.`
+											`Field '${r}' is a a required field. Null value cannot be assigned to a required field.`
 										);
 									yield this.setValue(n, e, null);
 								} else if (
@@ -5184,13 +5434,13 @@
 											"invalid_value",
 											`Unrecognized value '${a}' in update operation. Update instruction should be key-value paris where the value can be the value to set for the field or udpate instruction object e.g., { $inc: 4 }`
 										);
-									yield this.processUpdateInstruction(e, a, n, r);
+									yield this.processUpdateInstruction(e, a, n, i);
 								}
 							}
 							const a = {},
 								o = yield this.model.prepareFieldValues(n.main, !1, a);
 							if (
-								(null === (i = a.errors) || void 0 === i ? void 0 : i.length) >
+								(null === (r = a.errors) || void 0 === r ? void 0 : r.length) >
 								0
 							)
 								throw new f.ClientError(
@@ -5200,21 +5450,21 @@
 								);
 							this.definition.updateData = {
 								set: Object.assign(Object.assign({}, o), n.sub),
-								others: r,
+								others: i,
 							};
 						});
 					}
-					setValue(e, t, i) {
-						var r;
+					setValue(e, t, r) {
+						var i;
 						return n(this, void 0, void 0, function* () {
 							if (t.field.getModel().getIid() !== this.model.getIid()) {
 								const n = {},
 									a = {};
 								if (
-									(yield t.field.prepare(i, n, a, !1),
-									(null === (r = a.errors) || void 0 === r
+									(yield t.field.prepare(r, n, a, !1),
+									(null === (i = a.errors) || void 0 === i
 										? void 0
-										: r.length) > 0)
+										: i.length) > 0)
 								)
 									throw new f.ClientError(
 										"validation_errors",
@@ -5222,21 +5472,21 @@
 										a.errors
 									);
 								e.sub[t.fieldPath] = n[t.field.getName()];
-							} else e.main[t.fieldPath] = i;
+							} else e.main[t.fieldPath] = r;
 						});
 					}
-					processUpdateInstruction(e, t, i, r) {
+					processUpdateInstruction(e, t, r, i) {
 						return n(this, void 0, void 0, function* () {
 							const n = Object.keys(t);
 							if (n.length > 0) {
-								const r = n[0];
+								const i = n[0];
 								if (
-									!p.UpdateOperators.includes(r) &&
+									!p.UpdateOperators.includes(i) &&
 									("json" === e.field.getType() ||
 										"binary" === e.field.getType())
 								)
-									return void (yield this.setValue(i, e, t));
-							} else if ("json" === e.field.getType() || "binary" === e.field.getType()) return void (yield this.setValue(i, e, t));
+									return void (yield this.setValue(r, e, t));
+							} else if ("json" === e.field.getType() || "binary" === e.field.getType()) return void (yield this.setValue(r, e, t));
 							if (n.length > 1)
 								throw new f.ClientError(
 									"invalid_update_instruction",
@@ -5253,30 +5503,30 @@
 								);
 							switch (a) {
 								case "$set":
-									yield this.processSetInstruction(e, o, i);
+									yield this.processSetInstruction(e, o, r);
 									break;
 								case "$unset":
-									this.processUnsetInstruction(e, r);
+									this.processUnsetInstruction(e, i);
 									break;
 								case "$inc":
 								case "$mul":
 								case "$min":
 								case "$max":
-									this.processNumericInstruction(e, a, o, r);
+									this.processNumericInstruction(e, a, o, i);
 									break;
 								case "$push":
-									yield this.processPushInstruction(e, o, r);
+									yield this.processPushInstruction(e, o, i);
 									break;
 								case "$pull":
-									this.processPullInstruction(e, o, r);
+									this.processPullInstruction(e, o, i);
 									break;
 								case "$pop":
 								case "$shift":
-									this.processPopShiftInstruction(e, a, r);
+									this.processPopShiftInstruction(e, a, i);
 							}
 						});
 					}
-					processSetInstruction(e, t, i) {
+					processSetInstruction(e, t, r) {
 						return n(this, void 0, void 0, function* () {
 							if (
 								"object" == typeof t &&
@@ -5293,7 +5543,7 @@
 									"invalid_value",
 									`Field '${e.fieldPath}' is a a required field. Null value cannot be assigned to a required field.`
 								);
-							yield this.setValue(i, e, t);
+							yield this.setValue(r, e, t);
 						});
 					}
 					processUnsetInstruction(e, t) {
@@ -5316,7 +5566,7 @@
 							value: "",
 						});
 					}
-					processNumericInstruction(e, t, i, n) {
+					processNumericInstruction(e, t, r, n) {
 						if (!["integer", "decimal"].includes(e.field.getType()))
 							throw new f.ClientError(
 								"invalid_update_instruction",
@@ -5324,15 +5574,15 @@
 									e.fieldPath
 								}' which has '${e.field.getType()}' type.`
 							);
-						if ("number" != typeof i)
+						if ("number" != typeof r)
 							throw new f.ClientError(
 								"invalid_value",
 								`Update type '${t}' needs to have a numeric value.`
 							);
 						if (
-							"number" == typeof i &&
+							"number" == typeof r &&
 							"integer" === e.field.getType() &&
-							!(0, h.isInteger)(i)
+							!(0, h.isInteger)(r)
 						)
 							throw new f.ClientError(
 								"invalid_value",
@@ -5342,10 +5592,10 @@
 							fieldName: e.fieldPath,
 							field: e.field,
 							type: t,
-							value: i,
+							value: r,
 						});
 					}
-					processPushInstruction(e, t, i) {
+					processPushInstruction(e, t, r) {
 						return n(this, void 0, void 0, function* () {
 							if (this.model.getDb().getType() !== p.DBTYPE.MONGODB)
 								throw new f.ClientError(
@@ -5389,7 +5639,7 @@
 								) {
 									const t = new y(e.field.getSubModel());
 									yield t.setCreateData(n),
-										i.push({
+										r.push({
 											fieldName: e.fieldPath,
 											field: e.field,
 											type: "$push",
@@ -5404,16 +5654,16 @@
 										`Field '${e.fieldPath}' is a basic values list field. You can only add basic values (e.g., number, text, boolean) or array of basic values to this field.`
 									);
 								if (Array.isArray(t))
-									for (const i of t)
+									for (const r of t)
 										if (
-											("object" == typeof i && !1 === Array.isArray(i)) ||
-											Array.isArray(i)
+											("object" == typeof r && !1 === Array.isArray(r)) ||
+											Array.isArray(r)
 										)
 											throw new f.ClientError(
 												"invalid_value",
 												`Field '${e.fieldPath}' is a basic values list field. You can only add basic values (e.g., number, text, boolean) or array of basic values to this field.`
 											);
-								i.push({
+								r.push({
 									fieldName: e.fieldPath,
 									field: e.field,
 									type: "$push",
@@ -5422,7 +5672,7 @@
 							}
 						});
 					}
-					processPopShiftInstruction(e, t, i) {
+					processPopShiftInstruction(e, t, r) {
 						if (this.model.getDb().getType() !== p.DBTYPE.MONGODB)
 							throw new f.ClientError(
 								"invalid_update_instruction",
@@ -5439,14 +5689,14 @@
 									e.fieldPath
 								}' which has '${e.field.getType()}' type.`
 							);
-						i.push({
+						r.push({
 							fieldName: e.fieldPath,
 							field: e.field,
 							type: "$pop",
 							value: "$pop" === t ? 1 : -1,
 						});
 					}
-					processPullInstruction(e, t, i) {
+					processPullInstruction(e, t, r) {
 						if (this.model.getDb().getType() !== p.DBTYPE.MONGODB)
 							throw new f.ClientError(
 								"invalid_update_instruction",
@@ -5471,7 +5721,7 @@
 						if ("object-list" === e.field.getType()) {
 							const n = new y(e.field.getSubModel());
 							n.setWhere(t, null, p.ConditionType.PULL_CONDITION),
-								i.push({
+								r.push({
 									fieldName: e.fieldPath,
 									field: e.field,
 									type: "$pull",
@@ -5488,7 +5738,7 @@
 							if ("object" == typeof t) {
 								const n = new y(this.model);
 								n.setWhere(t, null, p.ConditionType.PULL_CONDITION),
-									i.push({
+									r.push({
 										fieldName: e.fieldPath,
 										field: e.field,
 										type: "$pull",
@@ -5497,7 +5747,7 @@
 										includeFields: !1,
 									});
 							} else
-								i.push({
+								r.push({
 									fieldName: e.fieldPath,
 									field: e.field,
 									type: "$pull",
@@ -5515,17 +5765,17 @@
 								"Array filters need to be an array of conditions and can only be used in MongoDB databases."
 							);
 						const t = [];
-						for (const i of e) {
+						for (const r of e) {
 							const e = new y(this.model);
-							e.setWhere(i, null, p.ConditionType.ARRAY_FILTER),
+							e.setWhere(r, null, p.ConditionType.ARRAY_FILTER),
 								t.push(e.getWhere());
 						}
 						this.definition.arrayFilters = t;
 					}
 					setGroupBy(e, t) {
 						if (!e) return;
-						const i = [];
-						if ("string" == typeof e) this.processStringBasedGrouping(e, t, i);
+						const r = [];
+						if ("string" == typeof e) this.processStringBasedGrouping(e, t, r);
 						else if ("object" != typeof e || Array.isArray(e)) {
 							if (!Array.isArray(e))
 								throw new f.ClientError(
@@ -5534,31 +5784,31 @@
 								);
 							for (const n of e)
 								if ("string" == typeof n)
-									this.processStringBasedGrouping(n, t, i);
+									this.processStringBasedGrouping(n, t, r);
 								else {
 									if ("object" != typeof n || Array.isArray(n))
 										throw new f.ClientError(
 											"invalid_grouping",
 											"Not a valid grouping definition. The grouping array needs to include either field names as string or group by definitions as JSON object with 'as' and 'expression' values."
 										);
-									this.processObjectBasedGrouping(n, t, i);
+									this.processObjectBasedGrouping(n, t, r);
 								}
-						} else this.processObjectBasedGrouping(e, t, i);
-						this.definition.groupBy = i;
+						} else this.processObjectBasedGrouping(e, t, r);
+						this.definition.groupBy = r;
 					}
-					processStringBasedGrouping(e, t, i) {
+					processStringBasedGrouping(e, t, r) {
 						const n = this.getFieldObject(e, t);
 						if (!n)
 							throw new f.ClientError(
 								"invalid_grouping_entry",
 								`'${e}' is not a valid field to group database records.`
 							);
-						if (i.find((e) => e.as === n.field.getName))
+						if (r.find((e) => e.as === n.field.getName))
 							throw new f.ClientError(
 								"invalid_grouping_entry",
 								`There is already a grouping with the alias '${e}'.`
 							);
-						i.push({
+						r.push({
 							as: e,
 							expression: new u.FieldValue(
 								n.field,
@@ -5568,7 +5818,7 @@
 							),
 						});
 					}
-					processObjectBasedGrouping(e, t, i) {
+					processObjectBasedGrouping(e, t, r) {
 						if (!e.as || !e.expression)
 							throw new f.ClientError(
 								"invalid_grouping_entry",
@@ -5599,17 +5849,17 @@
 								"invalid_grouping_entry",
 								"The 'expression' of the group definition is missing."
 							);
-						if (i.find((t) => t.as === e.as))
+						if (r.find((t) => t.as === e.as))
 							throw new f.ClientError(
 								"invalid_grouping_entry",
 								`There is already a grouping with the alias '${e.as}'.`
 							);
-						i.push({ as: e.as, expression: n });
+						r.push({ as: e.as, expression: n });
 					}
 					setComputations(e, t) {
-						var i;
+						var r;
 						const n = [],
-							r = [];
+							i = [];
 						if ("object" == typeof e && !Array.isArray(e) && e) n.push(e);
 						else {
 							if (!Array.isArray(e))
@@ -5657,52 +5907,52 @@
 							let o = null;
 							if ("$count" !== a) {
 								o = this.parseValue(e.compute[a], t, p.ConditionType.QUERY);
-								const i = o.getReturnType();
+								const r = o.getReturnType();
 								if (
 									"$countIf" === a &&
-									i !== p.ReturnType.BOOLEAN &&
-									i !== p.ReturnType.STATICBOOLEAN
+									r !== p.ReturnType.BOOLEAN &&
+									r !== p.ReturnType.STATICBOOLEAN
 								)
 									throw new f.ClientError(
 										"invalid_computation_operator",
 										`Computation type '${a}' expects a boolean computation but received a computation which returns '${o.getReturnTypeText(
-											i
+											r
 										)}'.`
 									);
-								if ("$countIf" !== a && i !== p.ReturnType.NUMBER)
+								if ("$countIf" !== a && r !== p.ReturnType.NUMBER)
 									throw new f.ClientError(
 										"invalid_computation_operator",
 										`Computation type '${a}' expects a numeric computation but received a computation which returns '${o.getReturnTypeText(
-											i
+											r
 										)}'.`
 									);
 							}
 							if (
-								r.find((t) => t.as === e.as) ||
-								(null === (i = this.definition.groupBy) || void 0 === i
+								i.find((t) => t.as === e.as) ||
+								(null === (r = this.definition.groupBy) || void 0 === r
 									? void 0
-									: i.find((t) => t.as === e.as))
+									: r.find((t) => t.as === e.as))
 							)
 								throw new f.ClientError(
 									"invalid_computation_entry",
 									`There is already a computation or grouping with the alias '${e.as}'.`
 								);
-							r.push({ as: e.as, operator: a, compute: o });
+							i.push({ as: e.as, operator: a, compute: o });
 						}
-						this.definition.computations = r;
+						this.definition.computations = i;
 					}
 					setGroupSort(e) {
 						if (!e) return;
 						const t = this.createGroupingModel(),
-							i = new y(t);
-						i.setSort(e, null), (this.definition.sort = i.getSort());
+							r = new y(t);
+						r.setSort(e, null), (this.definition.sort = r.getSort());
 					}
 					setHaving(e) {
 						if (!e) return;
 						const t = this.createGroupingModel(),
-							i = new y(t);
-						i.setWhere(e, null, p.ConditionType.QUERY),
-							(this.definition.having = i.getWhere());
+							r = new y(t);
+						r.setWhere(e, null, p.ConditionType.QUERY),
+							(this.definition.having = r.getWhere());
 					}
 					createGroupingModel() {
 						const e = [];
@@ -5712,7 +5962,7 @@
 						if (this.definition.computations)
 							for (const t of this.definition.computations)
 								e.push({ name: t.as, type: "integer" });
-						return new r.ModelBase(
+						return new i.ModelBase(
 							{ name: "dummy", type: "model", fields: e },
 							null,
 							this.model.getDb()
@@ -5846,32 +6096,32 @@
 				}
 				t.DBAction = y;
 			},
-			5866: (e, t, i) => {
+			5866: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.createField = void 0);
-				const n = i(1264),
-					r = i(7433),
-					a = i(7984),
-					o = i(6199),
-					s = i(7781),
-					u = i(1990),
-					l = i(1126),
-					d = i(86),
-					c = i(5206),
-					p = i(6081),
-					h = i(2848),
-					f = i(9677),
-					y = i(736),
-					m = i(2382),
-					v = i(3745),
-					g = i(9175),
-					T = i(6666),
-					b = i(335),
-					w = i(1620),
-					E = i(9337),
-					_ = i(8811),
-					R = i(8321),
-					$ = i(300);
+				const n = r(1264),
+					i = r(7433),
+					a = r(7984),
+					o = r(6199),
+					s = r(7781),
+					u = r(1990),
+					l = r(1126),
+					d = r(86),
+					c = r(5206),
+					p = r(6081),
+					h = r(2848),
+					f = r(9677),
+					y = r(736),
+					m = r(2382),
+					g = r(3745),
+					v = r(9175),
+					T = r(6666),
+					b = r(335),
+					E = r(1620),
+					w = r(9337),
+					_ = r(8811),
+					R = r(8321),
+					M = r(300);
 				t.createField = function (e, t) {
 					switch (e.type) {
 						case "id":
@@ -5879,13 +6129,13 @@
 						case "text":
 							return new _.TextField(e, t);
 						case "rich-text":
-							return new E.RichTextField(e, t);
+							return new w.RichTextField(e, t);
 						case "encrypted-text":
 							return new c.EncryptedTextField(e, t);
 						case "email":
 							return new d.EmailField(e, t);
 						case "link":
-							return new v.LinkField(e, t);
+							return new g.LinkField(e, t);
 						case "phone":
 							return new b.PhoneField(e, t);
 						case "boolean":
@@ -5897,7 +6147,7 @@
 						case "createdat":
 							return new o.CreatedAtField(e, t);
 						case "updatedat":
-							return new $.UpdatedAtField(e, t);
+							return new M.UpdatedAtField(e, t);
 						case "datetime":
 							return new u.DateTimeField(e, t);
 						case "date":
@@ -5909,25 +6159,25 @@
 						case "geo-point":
 							return new h.GeoPointField(e, t);
 						case "binary":
-							return new r.BinaryField(e, t);
+							return new i.BinaryField(e, t);
 						case "json":
 							return new m.JSONField(e, t);
 						case "reference":
-							return new w.ReferenceField(e, t);
+							return new E.ReferenceField(e, t);
 						case "basic-values-list":
 							return new n.BasicValuesListField(e, t);
 						case "object-list":
 							return new T.ObjectListField(e, t);
 						case "object":
-							return new g.ObjectField(e, t);
+							return new v.ObjectField(e, t);
 					}
 				};
 			},
 			1111: function (e, t) {
-				var i =
+				var r =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -5945,11 +6195,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -6017,13 +6267,13 @@
 						getRefModelIId() {
 							return "";
 						}
-						setValue(e, t, n, r = !0, a = -1) {
-							return i(this, void 0, void 0, function* () {});
+						setValue(e, t, n, i = !0, a = -1) {
+							return r(this, void 0, void 0, function* () {});
 						}
-						addValidationError(e, t, i, n = -1, r = !0) {
+						addValidationError(e, t, r, n = -1, i = !0) {
 							const a = {};
-							(a.origin = r ? "client_error" : "server_error"),
-								(a.code = i),
+							(a.origin = i ? "client_error" : "server_error"),
+								(a.code = r),
 								(a.details = {}),
 								(a.details.field = this.getQueryPath()),
 								n >= 0 && (a.details.index = n),
@@ -6031,74 +6281,74 @@
 							const o = e.errors;
 							o ? o.push(a) : ((e.errors = []), e.errors.push(a));
 						}
-						prepare(e, t, n, r = !0, a = -1) {
-							return i(this, void 0, void 0, function* () {
-								r
+						prepare(e, t, n, i = !0, a = -1) {
+							return r(this, void 0, void 0, function* () {
+								i
 									? yield this.prepareForCrete(e, t, n, a)
 									: yield this.prepareForUpdate(e, t, n, a);
 							});
 						}
-						prepareForCrete(e, t, n, r) {
-							return i(this, void 0, void 0, function* () {
+						prepareForCrete(e, t, n, i) {
+							return r(this, void 0, void 0, function* () {
 								if (null == e || void 0 === e)
 									if (this.hasDefaultValue())
-										yield this.setValue(this.getDefaultValue(), t, n, !0, r);
+										yield this.setValue(this.getDefaultValue(), t, n, !0, i);
 									else if (this.isRequired())
 										this.isUserField()
 											? this.addValidationError(
 													n,
 													e,
 													"missing_required_field_value",
-													r
+													i
 											  )
-											: yield this.setValue(e, t, n, !0, r);
+											: yield this.setValue(e, t, n, !0, i);
 									else if (
 										"object-list" === this.getType() ||
 										"basic-values-list" === this.getType()
 									)
-										yield this.setValue([], t, n, !0, r);
+										yield this.setValue([], t, n, !0, i);
 									else if (
 										"object" === this.getType() &&
 										this.hasFieldsWithDefaultValue()
 									)
-										yield this.setValue({}, t, n, !0, r);
+										yield this.setValue({}, t, n, !0, i);
 									else {
 										if (!this.isSQLDB() && (this.isSQLDB() || null !== e))
 											return;
-										yield this.setValue(null, t, n, !0, r);
+										yield this.setValue(null, t, n, !0, i);
 									}
-								else yield this.setValue(e, t, n, !0, r);
+								else yield this.setValue(e, t, n, !0, i);
 							});
 						}
-						prepareForUpdate(e, t, n, r) {
-							return i(this, void 0, void 0, function* () {
+						prepareForUpdate(e, t, n, i) {
+							return r(this, void 0, void 0, function* () {
 								if (null == e || void 0 === e)
 									if (this.isSystemField()) {
 										if ("updatedat" !== this.getType()) return;
-										yield this.setValue(e, t, n, !1, r);
+										yield this.setValue(e, t, n, !1, i);
 									} else
 										null === e &&
 											(!1 === this.isRequired()
-												? yield this.setValue(e, t, n, !1, r)
+												? yield this.setValue(e, t, n, !1, i)
 												: this.addValidationError(
 														n,
 														e,
 														"invalid_required_field_value",
-														r
+														i
 												  ));
 								else {
 									if (this.isReadOnly() && this.isUserField()) return;
-									yield this.setValue(e, t, n, !1, r);
+									yield this.setValue(e, t, n, !1, i);
 								}
 							});
 						}
 					});
 			},
 			9831: function (e, t) {
-				var i =
+				var r =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -6116,11 +6366,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -6134,77 +6384,77 @@
 							this.modelBase = e;
 						}
 						createOne(e) {
-							return i(this, void 0, void 0, function* () {
+							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.createOne(e);
 							});
 						}
 						createMany(e) {
-							return i(this, void 0, void 0, function* () {
+							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.createMany(e);
 							});
 						}
 						findById(e, t) {
-							return i(this, void 0, void 0, function* () {
+							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.findById(e, t);
 							});
 						}
 						findOne(e, t) {
-							return i(this, void 0, void 0, function* () {
+							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.findOne(e, t);
 							});
 						}
 						findMany(e, t) {
-							return i(this, void 0, void 0, function* () {
+							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.findMany(e, t);
 							});
 						}
 						deleteById(e) {
-							return i(this, void 0, void 0, function* () {
+							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.deleteById(e);
 							});
 						}
 						deleteOne(e, t) {
-							return i(this, void 0, void 0, function* () {
+							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.deleteOne(e, t);
 							});
 						}
 						deleteMany(e, t) {
-							return i(this, void 0, void 0, function* () {
+							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.deleteMany(e, t);
 							});
 						}
 						updateById(e, t, n) {
-							return i(this, void 0, void 0, function* () {
+							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.updateById(e, t, n);
 							});
 						}
 						updateOne(e, t, n) {
-							return i(this, void 0, void 0, function* () {
+							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.updateOne(e, t, n);
 							});
 						}
 						updateMany(e, t, n) {
-							return i(this, void 0, void 0, function* () {
+							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.updateMany(e, t, n);
 							});
 						}
 						aggregate(e) {
-							return i(this, void 0, void 0, function* () {
+							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.aggregate(e);
 							});
 						}
 						searchText(e, t) {
-							return i(this, void 0, void 0, function* () {
+							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.searchText(e, t);
 							});
 						}
 					});
 			},
-			892: function (e, t, i) {
+			892: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -6222,11 +6472,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -6235,16 +6485,16 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.ModelBase = void 0);
-				const r = i(1687),
-					a = i(5866),
-					o = i(9419),
-					s = i(990),
-					u = i(9307);
+				const i = r(1687),
+					a = r(5866),
+					o = r(9419),
+					s = r(990),
+					u = r(9307);
 				t.ModelBase = class {
-					constructor(e, t, i) {
+					constructor(e, t, r) {
 						(this.meta = e),
 							(this.parent = t),
-							(this.db = i),
+							(this.db = r),
 							(this.fields = new Map()),
 							(this.timestamp = null);
 						const { fields: n } = e;
@@ -6292,17 +6542,17 @@
 						for (const [e, t] of this.fields) if (t.isSearchable()) return !0;
 						return !1;
 					}
-					prepareFieldValues(e, t = !0, i, r = -1) {
+					prepareFieldValues(e, t = !0, r, i = -1) {
 						return n(this, void 0, void 0, function* () {
 							const n = {},
-								a = null != i ? i : {};
-							for (const [i, o] of this.fields)
-								yield o.prepare(e[i], n, a, t, r),
+								a = null != r ? r : {};
+							for (const [r, o] of this.fields)
+								yield o.prepare(e[r], n, a, t, i),
 									t &&
-										void 0 === n[i] &&
+										void 0 === n[r] &&
 										"id" !== o.getType() &&
 										this.db.isSQLDB() &&
-										(n[i] = null);
+										(n[r] = null);
 							return n;
 						});
 					}
@@ -6318,7 +6568,7 @@
 									"invalid_value",
 									"The 'data' to create in the database table/collection needs to be a JSON object"
 								);
-							const t = new r.DBAction(this);
+							const t = new i.DBAction(this);
 							return (
 								t.setMethod("createOne"),
 								yield t.setCreateData(e),
@@ -6338,7 +6588,7 @@
 									"invalid_value",
 									"The 'data' to create in the database table/collection needs to be an array of JSON objects"
 								);
-							const t = new r.DBAction(this);
+							const t = new i.DBAction(this);
 							return (
 								t.setMethod("createMany"),
 								yield t.setCreateData(e),
@@ -6353,16 +6603,16 @@
 									"missing_input_parameter",
 									"The 'findById' method expects id of the record to fetch as input"
 								);
-							const i = new r.DBAction(this);
+							const r = new i.DBAction(this);
 							return (
-								i.setMethod("findById"),
-								i.setId(e),
+								r.setMethod("findById"),
+								r.setId(e),
 								t &&
-									(i.setReadReplica(t.useReadReplica),
-									i.setSelect(t.select, t.join),
-									i.setOmit(t.omit, t.join),
-									i.setJoin(t.join)),
-								yield i.execute()
+									(r.setReadReplica(t.useReadReplica),
+									r.setSelect(t.select, t.join),
+									r.setOmit(t.omit, t.join),
+									r.setJoin(t.join)),
+								yield r.execute()
 							);
 						});
 					}
@@ -6373,22 +6623,22 @@
 									"missing_input_parameter",
 									"The 'findOne' method expects the where condition to query database records"
 								);
-							const i = new r.DBAction(this);
+							const r = new i.DBAction(this);
 							return (
-								i.setMethod("findOne"),
-								i.setWhere(
+								r.setMethod("findOne"),
+								r.setWhere(
 									e,
 									null == t ? void 0 : t.join,
 									u.ConditionType.QUERY
 								),
 								t &&
-									(i.setReadReplica(t.useReadReplica),
-									i.setSelect(t.select, t.join),
-									i.setOmit(t.omit, t.join),
-									i.setJoin(t.join),
-									i.setSort(t.sort, t.join),
-									i.setSkip(t.skip)),
-								yield i.execute()
+									(r.setReadReplica(t.useReadReplica),
+									r.setSelect(t.select, t.join),
+									r.setOmit(t.omit, t.join),
+									r.setJoin(t.join),
+									r.setSort(t.sort, t.join),
+									r.setSkip(t.skip)),
+								yield r.execute()
 							);
 						});
 					}
@@ -6399,23 +6649,23 @@
 									"missing_input_parameter",
 									"The 'findMany' method expects the where condition to query database records"
 								);
-							const i = new r.DBAction(this);
+							const r = new i.DBAction(this);
 							return (
-								i.setMethod("findMany"),
-								i.setWhere(
+								r.setMethod("findMany"),
+								r.setWhere(
 									e,
 									null == t ? void 0 : t.join,
 									u.ConditionType.QUERY
 								),
 								t &&
-									(i.setReadReplica(t.useReadReplica),
-									i.setSelect(t.select, t.join),
-									i.setOmit(t.omit, t.join),
-									i.setJoin(t.join),
-									i.setSort(t.sort, t.join),
-									i.setSkip(t.skip),
-									i.setLimit(t.limit)),
-								yield i.execute()
+									(r.setReadReplica(t.useReadReplica),
+									r.setSelect(t.select, t.join),
+									r.setOmit(t.omit, t.join),
+									r.setJoin(t.join),
+									r.setSort(t.sort, t.join),
+									r.setSkip(t.skip),
+									r.setLimit(t.limit)),
+								yield r.execute()
 							);
 						});
 					}
@@ -6426,7 +6676,7 @@
 									"missing_input_parameter",
 									"The 'deleteById' method expects id of the record to delete as input"
 								);
-							const t = new r.DBAction(this);
+							const t = new i.DBAction(this);
 							return t.setMethod("deleteById"), t.setId(e), yield t.execute();
 						});
 					}
@@ -6437,16 +6687,16 @@
 									"missing_input_parameter",
 									"The 'delete' method expects the where condition to query database records"
 								);
-							const i = new r.DBAction(this);
+							const r = new i.DBAction(this);
 							return (
-								i.setMethod("deleteOne"),
-								i.setWhere(
+								r.setMethod("deleteOne"),
+								r.setWhere(
 									e,
 									null == t ? void 0 : t.join,
 									u.ConditionType.QUERY
 								),
-								t && i.setJoin(t.join),
-								yield i.execute()
+								t && r.setJoin(t.join),
+								yield r.execute()
 							);
 						});
 					}
@@ -6457,20 +6707,20 @@
 									"missing_input_parameter",
 									"The 'delete' method expects the where condition to query database records"
 								);
-							const i = new r.DBAction(this);
+							const r = new i.DBAction(this);
 							return (
-								i.setMethod("deleteMany"),
-								i.setWhere(
+								r.setMethod("deleteMany"),
+								r.setWhere(
 									e,
 									null == t ? void 0 : t.join,
 									u.ConditionType.QUERY
 								),
-								t && i.setJoin(t.join),
-								yield i.execute()
+								t && r.setJoin(t.join),
+								yield r.execute()
 							);
 						});
 					}
-					updateById(e, t, i) {
+					updateById(e, t, r) {
 						return n(this, void 0, void 0, function* () {
 							if (!e)
 								throw new s.ClientError(
@@ -6488,20 +6738,20 @@
 									"The 'updateById' method expects the update definitions as an object of key-value pairs"
 								);
 							this.resetTimestamp();
-							const n = new r.DBAction(this);
+							const n = new i.DBAction(this);
 							return (
 								n.setMethod("updateById"),
 								n.setId(e),
 								yield n.setUpdates(t, null),
-								i &&
-									(n.setSelect(i.select, null),
-									n.setOmit(i.omit, null),
-									n.setArrayFilters(i.arrayFilters)),
+								r &&
+									(n.setSelect(r.select, null),
+									n.setOmit(r.omit, null),
+									n.setArrayFilters(r.arrayFilters)),
 								yield n.execute()
 							);
 						});
 					}
-					updateOne(e, t, i) {
+					updateOne(e, t, r) {
 						return n(this, void 0, void 0, function* () {
 							if (!e)
 								throw new s.ClientError(
@@ -6519,25 +6769,25 @@
 									"The 'update' method expects the update definitions as an object of key-value pairs"
 								);
 							this.resetTimestamp();
-							const n = new r.DBAction(this);
+							const n = new i.DBAction(this);
 							return (
 								n.setMethod("updateOne"),
 								n.setWhere(
 									e,
-									null == i ? void 0 : i.join,
+									null == r ? void 0 : r.join,
 									u.ConditionType.QUERY
 								),
 								yield n.setUpdates(t, null),
-								i &&
-									(n.setSelect(i.select, null),
-									n.setOmit(i.omit, null),
-									n.setJoin(i.join),
-									n.setArrayFilters(i.arrayFilters)),
+								r &&
+									(n.setSelect(r.select, null),
+									n.setOmit(r.omit, null),
+									n.setJoin(r.join),
+									n.setArrayFilters(r.arrayFilters)),
 								yield n.execute()
 							);
 						});
 					}
-					updateMany(e, t, i) {
+					updateMany(e, t, r) {
 						return n(this, void 0, void 0, function* () {
 							if (!e)
 								throw new s.ClientError(
@@ -6555,16 +6805,16 @@
 									"The 'update' method expects the update definitions as an object of key-value pairs"
 								);
 							this.resetTimestamp();
-							const n = new r.DBAction(this);
+							const n = new i.DBAction(this);
 							return (
 								n.setMethod("updateMany"),
 								n.setWhere(
 									e,
-									null == i ? void 0 : i.join,
+									null == r ? void 0 : r.join,
 									u.ConditionType.QUERY
 								),
 								yield n.setUpdates(t, null),
-								i && (n.setJoin(i.join), n.setArrayFilters(i.arrayFilters)),
+								r && (n.setJoin(r.join), n.setArrayFilters(r.arrayFilters)),
 								yield n.execute()
 							);
 						});
@@ -6576,7 +6826,7 @@
 									"missing_input_parameter",
 									"The 'aggregate' method expects at least one computation to aggregate database records"
 								);
-							const t = new r.DBAction(this);
+							const t = new i.DBAction(this);
 							return (
 								t.setMethod("aggregate"),
 								t.setWhere(e.where, e.join, u.ConditionType.QUERY),
@@ -6603,36 +6853,36 @@
 									"not_searchable_model",
 									"To run text search on a model records you need to have at least one 'searchable' text or rich-text field."
 								);
-							const i = new r.DBAction(this);
+							const r = new i.DBAction(this);
 							return (
-								i.setMethod("searchText"),
-								i.setSearchText(e),
+								r.setMethod("searchText"),
+								r.setSearchText(e),
 								t &&
-									(i.setWhere(
+									(r.setWhere(
 										null == t ? void 0 : t.where,
 										null == t ? void 0 : t.join,
 										u.ConditionType.QUERY
 									),
-									i.setReadReplica(t.useReadReplica),
-									i.setSelect(t.select, t.join),
-									i.setOmit(t.omit, t.join),
-									i.setJoin(t.join),
-									i.setSort(t.sort, t.join),
-									i.setSkip(t.skip),
-									i.setLimit(t.limit)),
-								yield i.execute()
+									r.setReadReplica(t.useReadReplica),
+									r.setSelect(t.select, t.join),
+									r.setOmit(t.omit, t.join),
+									r.setJoin(t.join),
+									r.setSort(t.sort, t.join),
+									r.setSkip(t.skip),
+									r.setLimit(t.limit)),
+								yield r.execute()
 							);
 						});
 					}
 				};
 			},
-			8054: (e, t, i) => {
+			8054: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.ArrayFilterField = void 0);
-				const n = i(1111);
-				class r extends n.Field {
-					constructor(e, t, i) {
-						super(e, t), (this.fieldName = i);
+				const n = r(1111);
+				class i extends n.Field {
+					constructor(e, t, r) {
+						super(e, t), (this.fieldName = r);
 					}
 					getType() {
 						return "array-filter";
@@ -6644,13 +6894,13 @@
 						return this.fieldName;
 					}
 				}
-				t.ArrayFilterField = r;
+				t.ArrayFilterField = i;
 			},
-			1264: function (e, t, i) {
+			1264: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -6668,11 +6918,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -6681,25 +6931,25 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.BasicValuesListField = void 0);
-				const r = i(1111);
-				class a extends r.Field {
+				const i = r(1111);
+				class a extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, a = -1) {
+					setValue(e, t, r, i = !0, a = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (r || !this.isReadOnly())
-								if (r || null !== e || !1 !== this.isRequired()) {
+							if (i || !this.isReadOnly())
+								if (i || null !== e || !1 !== this.isRequired()) {
 									if (!1 === Array.isArray(e))
 										return this.addValidationError(
-											i,
+											r,
 											e,
 											"not_array_of_basic_values",
 											a
 										);
 									if (0 === e.length && this.isRequired())
 										return this.addValidationError(
-											i,
+											r,
 											e,
 											"invalid_required_field_value",
 											a
@@ -6710,7 +6960,7 @@
 											Array.isArray(t)
 										)
 											return this.addValidationError(
-												i,
+												r,
 												t,
 												"unsopported_bvl_value",
 												a
@@ -6722,11 +6972,11 @@
 				}
 				t.BasicValuesListField = a;
 			},
-			7433: function (e, t, i) {
+			7433: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -6744,11 +6994,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -6757,17 +7007,17 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.BinaryField = void 0);
-				const r = i(1111);
-				class a extends r.Field {
+				const i = r(1111);
+				class a extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, a = -1) {
+					setValue(e, t, r, i = !0, a = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (r || !this.isReadOnly()) {
+							if (i || !this.isReadOnly()) {
 								if (null !== e || !1 !== this.isRequired())
 									return e && !1 === Buffer.isBuffer(e)
-										? this.addValidationError(i, e, "not_buffer_value", a)
+										? this.addValidationError(r, e, "not_buffer_value", a)
 										: void (t[this.getName()] = e);
 								t[this.getName()] = null;
 							}
@@ -6776,11 +7026,11 @@
 				}
 				t.BinaryField = a;
 			},
-			7984: function (e, t, i) {
+			7984: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -6798,11 +7048,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -6811,17 +7061,17 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.BooleanField = void 0);
-				const r = i(1111);
-				class a extends r.Field {
+				const i = r(1111);
+				class a extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, a = -1) {
+					setValue(e, t, r, i = !0, a = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (r || !this.isReadOnly()) {
+							if (i || !this.isReadOnly()) {
 								if (null !== e || !1 !== this.isRequired())
 									return "boolean" != typeof e
-										? this.addValidationError(i, e, "not_boolean_value", a)
+										? this.addValidationError(r, e, "not_boolean_value", a)
 										: void (t[this.getName()] = e);
 								t[this.getName()] = null;
 							}
@@ -6830,11 +7080,11 @@
 				}
 				t.BooleanField = a;
 			},
-			6199: function (e, t, i) {
+			6199: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -6852,11 +7102,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -6865,24 +7115,24 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.CreatedAtField = void 0);
-				const r = i(1111);
-				class a extends r.Field {
+				const i = r(1111);
+				class a extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, a = -1) {
+					setValue(e, t, r, i = !0, a = -1) {
 						return n(this, void 0, void 0, function* () {
-							r && (t[this.getName()] = this.model.getTimestamp());
+							i && (t[this.getName()] = this.model.getTimestamp());
 						});
 					}
 				}
 				t.CreatedAtField = a;
 			},
-			7781: function (e, t, i) {
+			7781: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -6900,11 +7150,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -6913,33 +7163,33 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.DateField = void 0);
-				const r = i(1111),
+				const i = r(1111),
 					a = global.helper;
-				class o extends r.Field {
+				class o extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, o = -1) {
+					setValue(e, t, r, i = !0, o = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
-							if (r && "$$NOW" === e)
+							if (i && "$$NOW" === e)
 								return void (t[this.getName()] = this.model.getTimestamp());
 							const n = a.getDtmFromString(e.toString());
 							if (!n || !n.isValid)
-								return this.addValidationError(i, e, "not_date_value", o);
+								return this.addValidationError(r, e, "not_date_value", o);
 							t[this.getName()] = n.toJSDate();
 						});
 					}
 				}
 				t.DateField = o;
 			},
-			1990: function (e, t, i) {
+			1990: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -6957,11 +7207,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -6970,33 +7220,33 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.DateTimeField = void 0);
-				const r = i(1111),
+				const i = r(1111),
 					a = global.helper;
-				class o extends r.Field {
+				class o extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, o = -1) {
+					setValue(e, t, r, i = !0, o = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
-							if (r && "$$NOW" === e)
+							if (i && "$$NOW" === e)
 								return void (t[this.getName()] = this.model.getTimestamp());
 							const n = a.getDtmFromString(e.toString());
 							if (!n || !n.isValid)
-								return this.addValidationError(i, e, "not_datetime_value", o);
+								return this.addValidationError(r, e, "not_datetime_value", o);
 							t[this.getName()] = n.toJSDate();
 						});
 					}
 				}
 				t.DateTimeField = o;
 			},
-			1126: function (e, t, i) {
+			1126: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -7014,11 +7264,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -7027,19 +7277,19 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.DecimalField = void 0);
-				const r = i(1111),
+				const i = r(1111),
 					a = global.helper;
-				class o extends r.Field {
+				class o extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, o = -1) {
+					setValue(e, t, r, i = !0, o = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if ("number" != typeof e || !isFinite(e))
-								return this.addValidationError(i, e, "not_decimal_value", o);
+								return this.addValidationError(r, e, "not_decimal_value", o);
 							const n = this.meta.decimal,
 								s = a
 									.createDecimal(e)
@@ -7051,11 +7301,11 @@
 				}
 				t.DecimalField = o;
 			},
-			86: function (e, t, i) {
+			86: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -7073,11 +7323,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -7086,50 +7336,50 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.EmailField = void 0);
-				const r = i(1111),
+				const i = r(1111),
 					a = global.helper;
-				class o extends r.Field {
+				class o extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, o = -1) {
+					setValue(e, t, r, i = !0, o = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if (
 								("object" == typeof e && !1 === Array.isArray(e)) ||
 								Array.isArray(e)
 							)
-								return this.addValidationError(i, e, "not_text_value", o);
+								return this.addValidationError(r, e, "not_text_value", o);
 							const n = e.toString().trim();
 							return "" === n && this.isRequired()
 								? this.addValidationError(
-										i,
+										r,
 										n,
 										"invalid_required_field_value",
 										o
 								  )
 								: n.length > 320
 								? this.addValidationError(
-										i,
+										r,
 										n,
 										"max_length_threshold_exceeded",
 										o
 								  )
 								: !1 === a.isEmail(n)
-								? this.addValidationError(i, n, "invalid_email_address", o)
+								? this.addValidationError(r, n, "invalid_email_address", o)
 								: void (t[this.getName()] = n);
 						});
 					}
 				}
 				t.EmailField = o;
 			},
-			5206: function (e, t, i) {
+			5206: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -7147,11 +7397,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -7160,26 +7410,26 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.EncryptedTextField = void 0);
-				const r = i(1111),
+				const i = r(1111),
 					a = global.helper;
-				class o extends r.Field {
+				class o extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, o = -1) {
+					setValue(e, t, r, i = !0, o = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if (
 								("object" == typeof e && !1 === Array.isArray(e)) ||
 								Array.isArray(e)
 							)
-								return this.addValidationError(i, e, "not_text_value", o);
+								return this.addValidationError(r, e, "not_text_value", o);
 							let n = e.toString();
 							if ("" === n && this.isRequired())
 								return this.addValidationError(
-									i,
+									r,
 									n,
 									"invalid_required_field_value",
 									o
@@ -7187,7 +7437,7 @@
 							const s = this.meta.encryptedText;
 							if (n.length > s.maxLength)
 								return this.addValidationError(
-									i,
+									r,
 									n,
 									"max_length_threshold_exceeded",
 									o
@@ -7200,11 +7450,11 @@
 				}
 				t.EncryptedTextField = o;
 			},
-			6081: function (e, t, i) {
+			6081: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -7222,11 +7472,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -7235,20 +7485,20 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.EnumField = void 0);
-				const r = i(1111);
-				class a extends r.Field {
+				const i = r(1111);
+				class a extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
 					isValueFromList(e, t) {
-						const i = e.length;
-						for (let n = 0; n < i; n++) if (e[n] === t) return !0;
+						const r = e.length;
+						for (let n = 0; n < r; n++) if (e[n] === t) return !0;
 						return !1;
 					}
-					setValue(e, t, i, r = !0, a = -1) {
+					setValue(e, t, r, i = !0, a = -1) {
 						var o, s;
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if (
@@ -7256,7 +7506,7 @@
 								Array.isArray(e)
 							)
 								return this.addValidationError(
-									i,
+									r,
 									e,
 									"not_enumeration_value",
 									a
@@ -7264,7 +7514,7 @@
 							const n = e.toString();
 							if ("" === n && this.isRequired())
 								return this.addValidationError(
-									i,
+									r,
 									n,
 									"invalid_required_field_value",
 									a
@@ -7279,7 +7529,7 @@
 									: [];
 							if (!this.isValueFromList(u, n))
 								return this.addValidationError(
-									i,
+									r,
 									e,
 									"invalid_enumeration_value",
 									a
@@ -7290,11 +7540,11 @@
 				}
 				t.EnumField = a;
 			},
-			2848: function (e, t, i) {
+			2848: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -7312,11 +7562,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -7325,29 +7575,29 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.GeoPointField = void 0);
-				const r = i(1111),
-					a = i(9307);
-				class o extends r.Field {
+				const i = r(1111),
+					a = r(9307);
+				class o extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, o = -1) {
+					setValue(e, t, r, i = !0, o = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if (!Array.isArray(e) || 2 !== e.length)
-								return this.addValidationError(i, e, "not_geopoint_value"), o;
+								return this.addValidationError(r, e, "not_geopoint_value"), o;
 							if ("number" != typeof e[0] || !isFinite(e[0]))
 								return this.addValidationError(
-									i,
+									r,
 									e,
 									"invalid_longitude_value",
 									o
 								);
 							if ("number" != typeof e[1] || !isFinite(e[1]))
 								return this.addValidationError(
-									i,
+									r,
 									e,
 									"invalid_latitude_value",
 									o
@@ -7356,14 +7606,14 @@
 								s = e[1];
 							if (n < -180 || n > 180)
 								return this.addValidationError(
-									i,
+									r,
 									e,
 									"invalid_longitude_value",
 									o
 								);
 							if (s < -90 || s > 90)
 								return this.addValidationError(
-									i,
+									r,
 									e,
 									"invalid_latitude_value",
 									o
@@ -7391,11 +7641,11 @@
 				}
 				t.GeoPointField = o;
 			},
-			9677: function (e, t, i) {
+			9677: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -7413,11 +7663,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -7426,23 +7676,23 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.IdField = void 0);
-				const r = i(1111);
+				const i = r(1111);
 				global.helper;
-				class a extends r.Field {
+				class a extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, a = -1) {
+					setValue(e, t, r, i = !0, a = -1) {
 						return n(this, void 0, void 0, function* () {});
 					}
 				}
 				t.IdField = a;
 			},
-			736: function (e, t, i) {
+			736: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -7460,11 +7710,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -7473,19 +7723,19 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.IntegerField = void 0);
-				const r = i(1111),
+				const i = r(1111),
 					a = global.helper;
-				class o extends r.Field {
+				class o extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, o = -1) {
+					setValue(e, t, r, i = !0, o = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if ("number" != typeof e || !isFinite(e))
-								return this.addValidationError(i, e, "not_integer_value", o);
+								return this.addValidationError(r, e, "not_integer_value", o);
 							const n = a.createDecimal(e).toDecimalPlaces(0).toNumber();
 							t[this.getName()] = n;
 						});
@@ -7493,11 +7743,11 @@
 				}
 				t.IntegerField = o;
 			},
-			1779: (e, t, i) => {
+			1779: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.JoinField = void 0);
-				const n = i(1111);
-				class r extends n.Field {
+				const n = r(1111);
+				class i extends n.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
@@ -7508,13 +7758,13 @@
 						return this.getName();
 					}
 				}
-				t.JoinField = r;
+				t.JoinField = i;
 			},
-			2382: function (e, t, i) {
+			2382: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -7532,11 +7782,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -7545,18 +7795,18 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.JSONField = void 0);
-				const r = i(1111),
-					a = i(9307);
-				class o extends r.Field {
+				const i = r(1111),
+					a = r(9307);
+				class o extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, o = -1) {
+					setValue(e, t, r, i = !0, o = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (r || !this.isReadOnly())
+							if (i || !this.isReadOnly())
 								if (null !== e || !1 !== this.isRequired()) {
 									if ("object" != typeof e)
-										return this.addValidationError(i, e, "not_json_value", o);
+										return this.addValidationError(r, e, "not_json_value", o);
 									switch (this.getDBType()) {
 										case a.DBTYPE.MONGODB:
 											t[this.getName()] = e;
@@ -7573,11 +7823,11 @@
 				}
 				t.JSONField = o;
 			},
-			3745: function (e, t, i) {
+			3745: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -7595,11 +7845,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -7608,50 +7858,50 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.LinkField = void 0);
-				const r = i(1111),
+				const i = r(1111),
 					a = global.helper;
-				class o extends r.Field {
+				class o extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, o = -1) {
+					setValue(e, t, r, i = !0, o = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if (
 								("object" == typeof e && !1 === Array.isArray(e)) ||
 								Array.isArray(e)
 							)
-								return this.addValidationError(i, e, "not_text_value", o);
+								return this.addValidationError(r, e, "not_text_value", o);
 							const n = e.toString().trim();
 							return "" === n && this.isRequired()
 								? this.addValidationError(
-										i,
+										r,
 										n,
 										"invalid_required_field_value",
 										o
 								  )
 								: n.length > 2048
 								? this.addValidationError(
-										i,
+										r,
 										n,
 										"max_length_threshold_exceeded",
 										o
 								  )
 								: !1 === a.isLink(n)
-								? this.addValidationError(i, n, "invalid_URL", o)
+								? this.addValidationError(r, n, "invalid_URL", o)
 								: void (t[this.getName()] = n);
 						});
 					}
 				}
 				t.LinkField = o;
 			},
-			9175: function (e, t, i) {
+			9175: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -7669,11 +7919,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -7682,14 +7932,14 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.ObjectField = void 0);
-				const r = i(892),
-					a = i(1111),
-					o = i(990);
+				const i = r(892),
+					a = r(1111),
+					o = r(990);
 				class s extends a.Field {
 					constructor(e, t) {
 						super(e, t);
-						const i = t.getDb().getModelMetaByIId(e.object.iid);
-						if (!i)
+						const r = t.getDb().getModelMetaByIId(e.object.iid);
+						if (!r)
 							throw new o.ClientError(
 								"submodel_not_found",
 								`Cannot find the sub-model of the field '${
@@ -7698,11 +7948,11 @@
 									.getDb()
 									.getName()}'`
 							);
-						(this.subModel = new r.ModelBase(i, t, t.getDb())),
+						(this.subModel = new i.ModelBase(r, t, t.getDb())),
 							t
 								.getDb()
 								.addSubModel(
-									i.parentHierarchy.map((e) => e.name).join("."),
+									r.parentHierarchy.map((e) => e.name).join("."),
 									this.subModel
 								);
 					}
@@ -7731,32 +7981,32 @@
 						}
 						return !1;
 					}
-					setValue(e, t, i, r = !0, a = -1) {
+					setValue(e, t, r, i = !0, a = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (r || null !== e || !1 !== this.isRequired())
-								return !r && e
+							if (i || null !== e || !1 !== this.isRequired())
+								return !i && e
 									? this.addValidationError(
-											i,
+											r,
 											e,
 											"direct_object_assignment_not_allowed",
 											a
 									  )
 									: "object" != typeof e || Array.isArray(e)
-									? this.addValidationError(i, e, "not_object_value", a)
-									: void (r && (t[this.getName()] = {}));
+									? this.addValidationError(r, e, "not_object_value", a)
+									: void (i && (t[this.getName()] = {}));
 							t[this.getName()] = null;
 						});
 					}
-					prepare(e, t, i, r = !0, a = -1) {
+					prepare(e, t, r, i = !0, a = -1) {
 						const o = Object.create(null, {
 							prepare: { get: () => super.prepare },
 						});
 						return n(this, void 0, void 0, function* () {
-							if ((yield o.prepare.call(this, e, t, i, r), r)) {
+							if ((yield o.prepare.call(this, e, t, r, i), i)) {
 								const n = yield this.subModel.prepareFieldValues(
 									e || {},
-									r,
 									i,
+									r,
 									a
 								);
 								t[this.getName()] = n;
@@ -7766,11 +8016,11 @@
 				}
 				t.ObjectField = s;
 			},
-			6666: function (e, t, i) {
+			6666: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -7788,11 +8038,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -7801,14 +8051,14 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.ObjectListField = void 0);
-				const r = i(892),
-					a = i(1111),
-					o = i(990);
+				const i = r(892),
+					a = r(1111),
+					o = r(990);
 				class s extends a.Field {
 					constructor(e, t) {
 						super(e, t);
-						const i = t.getDb().getModelMetaByIId(e.objectList.iid);
-						if (!i)
+						const r = t.getDb().getModelMetaByIId(e.objectList.iid);
+						if (!r)
 							throw new o.ClientError(
 								"submodel_not_found",
 								`Cannot find the sub-model of the field '${
@@ -7817,11 +8067,11 @@
 									.getDb()
 									.getName()}'`
 							);
-						(this.subModel = new r.ModelBase(i, t, t.getDb())),
+						(this.subModel = new i.ModelBase(r, t, t.getDb())),
 							t
 								.getDb()
 								.addSubModel(
-									i.parentHierarchy.map((e) => e.name).join("."),
+									r.parentHierarchy.map((e) => e.name).join("."),
 									this.subModel
 								);
 					}
@@ -7831,40 +8081,40 @@
 					isSearchable() {
 						return this.subModel.hasSearchIndex();
 					}
-					setValue(e, t, i, r = !0, a = -1) {
+					setValue(e, t, r, i = !0, a = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (r || null !== e || !1 !== this.isRequired()) {
-								if (!r && Array.isArray(e))
+							if (i || null !== e || !1 !== this.isRequired()) {
+								if (!i && Array.isArray(e))
 									return this.addValidationError(
-										i,
+										r,
 										e,
 										"direct_array_assignment_not_allowed",
 										a
 									);
 								if (!Array.isArray(e))
-									return this.addValidationError(i, e, "not_array_value", a);
+									return this.addValidationError(r, e, "not_array_value", a);
 								for (const t of e)
 									if ("object" != typeof t || Array.isArray(t))
 										return this.addValidationError(
-											i,
+											r,
 											t,
 											"invalid_object_array_entry",
 											a
 										);
-								r && (t[this.getName()] = []);
+								i && (t[this.getName()] = []);
 							} else t[this.getName()] = [];
 						});
 					}
-					prepare(e, t, i, r = !0, a = -1) {
+					prepare(e, t, r, i = !0, a = -1) {
 						const o = Object.create(null, {
 							prepare: { get: () => super.prepare },
 						});
 						return n(this, void 0, void 0, function* () {
-							if ((yield o.prepare.call(this, e, t, i, r, a), r)) {
+							if ((yield o.prepare.call(this, e, t, r, i, a), i)) {
 								e = e || [];
 								for (let n = 0; n < e.length; n++) {
 									const a = e[n],
-										o = yield this.subModel.prepareFieldValues(a, r, i, n);
+										o = yield this.subModel.prepareFieldValues(a, i, r, n);
 									t[this.getName()].push(o);
 								}
 							}
@@ -7873,11 +8123,11 @@
 				}
 				t.ObjectListField = s;
 			},
-			335: function (e, t, i) {
+			335: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -7895,11 +8145,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -7908,50 +8158,50 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.PhoneField = void 0);
-				const r = i(1111),
+				const i = r(1111),
 					a = global.helper;
-				class o extends r.Field {
+				class o extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, o = -1) {
+					setValue(e, t, r, i = !0, o = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if (
 								("object" == typeof e && !1 === Array.isArray(e)) ||
 								Array.isArray(e)
 							)
-								return this.addValidationError(i, e, "not_text_value", o);
+								return this.addValidationError(r, e, "not_text_value", o);
 							const n = e.toString().trim();
 							return "" === n && this.isRequired()
 								? this.addValidationError(
-										i,
+										r,
 										n,
 										"invalid_required_field_value",
 										o
 								  )
 								: n.length > 16
 								? this.addValidationError(
-										i,
+										r,
 										n,
 										"max_length_threshold_exceeded",
 										o
 								  )
 								: !1 === a.isMobilePhone(n)
-								? this.addValidationError(i, n, "invalid_phone_number", o)
+								? this.addValidationError(r, n, "invalid_phone_number", o)
 								: void (t[this.getName()] = n);
 						});
 					}
 				}
 				t.PhoneField = o;
 			},
-			1620: function (e, t, i) {
+			1620: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -7969,11 +8219,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -7982,10 +8232,10 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.ReferenceField = void 0);
-				const r = i(1111),
-					a = i(9307),
+				const i = r(1111),
+					a = r(9307),
 					o = global.helper;
-				class s extends r.Field {
+				class s extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
@@ -7995,20 +8245,20 @@
 							? void 0
 							: e.iid;
 					}
-					setValue(e, t, i, r = !0, s = -1) {
+					setValue(e, t, r, i = !0, s = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if (
 								("object" == typeof e && !1 === Array.isArray(e)) ||
 								Array.isArray(e)
 							)
-								return this.addValidationError(i, e, "not_reference_value", s);
+								return this.addValidationError(r, e, "not_reference_value", s);
 							const n = e.toString().trim();
 							if (!n && this.isRequired())
 								return this.addValidationError(
-									i,
+									r,
 									n,
 									"invalid_required_field_value",
 									s
@@ -8017,7 +8267,7 @@
 								case a.DBTYPE.MONGODB:
 									if (!o.isValidId(n))
 										return this.addValidationError(
-											i,
+											r,
 											n,
 											"invalid_mongodb_id",
 											s
@@ -8035,11 +8285,11 @@
 				}
 				t.ReferenceField = s;
 			},
-			9337: function (e, t, i) {
+			9337: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -8057,11 +8307,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -8070,8 +8320,8 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.RichTextField = void 0);
-				const r = i(1111);
-				class a extends r.Field {
+				const i = r(1111);
+				class a extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
@@ -8081,20 +8331,20 @@
 							? void 0
 							: e.searchable;
 					}
-					setValue(e, t, i, r = !0, a = -1) {
+					setValue(e, t, r, i = !0, a = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if (
 								("object" == typeof e && !1 === Array.isArray(e)) ||
 								Array.isArray(e)
 							)
-								return this.addValidationError(i, e, "not_text_value", a);
+								return this.addValidationError(r, e, "not_text_value", a);
 							const n = e.toString();
 							if ("" === n && this.isRequired())
 								return this.addValidationError(
-									i,
+									r,
 									n,
 									"invalid_required_field_value",
 									a
@@ -8105,11 +8355,11 @@
 				}
 				t.RichTextField = a;
 			},
-			8811: function (e, t, i) {
+			8811: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -8127,11 +8377,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -8140,8 +8390,8 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.TextField = void 0);
-				const r = i(1111);
-				class a extends r.Field {
+				const i = r(1111);
+				class a extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
@@ -8151,20 +8401,20 @@
 							? void 0
 							: e.searchable;
 					}
-					setValue(e, t, i, r = !0, a = -1) {
+					setValue(e, t, r, i = !0, a = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if (
 								("object" == typeof e && !1 === Array.isArray(e)) ||
 								Array.isArray(e)
 							)
-								return this.addValidationError(i, e, "not_text_value", a);
+								return this.addValidationError(r, e, "not_text_value", a);
 							const n = e.toString();
 							if ("" === n && this.isRequired())
 								return this.addValidationError(
-									i,
+									r,
 									n,
 									"invalid_required_field_value",
 									a
@@ -8172,7 +8422,7 @@
 							const o = this.meta.text;
 							if (n.length > o.maxLength)
 								return this.addValidationError(
-									i,
+									r,
 									n,
 									"max_length_threshold_exceeded",
 									a
@@ -8183,11 +8433,11 @@
 				}
 				t.TextField = a;
 			},
-			8321: function (e, t, i) {
+			8321: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -8205,11 +8455,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -8218,30 +8468,30 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.TimeField = void 0);
-				const r = i(1111),
+				const i = r(1111),
 					a = global.helper;
-				class o extends r.Field {
+				class o extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, o = -1) {
+					setValue(e, t, r, i = !0, o = -1) {
 						return n(this, void 0, void 0, function* () {
-							if (!r && this.isReadOnly()) return;
+							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							const n = a.getTimeFromString(e.toString());
-							if (!n) return this.addValidationError(i, e, "not_time_value", o);
+							if (!n) return this.addValidationError(r, e, "not_time_value", o);
 							t[this.getName()] = n;
 						});
 					}
 				}
 				t.TimeField = o;
 			},
-			300: function (e, t, i) {
+			300: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
-					function (e, t, i, n) {
-						return new (i || (i = Promise))(function (r, a) {
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
 							function o(e) {
 								try {
 									u(n.next(e));
@@ -8259,11 +8509,11 @@
 							function u(e) {
 								var t;
 								e.done
-									? r(e.value)
+									? i(e.value)
 									: ((t = e.value),
-									  t instanceof i
+									  t instanceof r
 											? t
-											: new i(function (e) {
+											: new r(function (e) {
 													e(t);
 											  })).then(o, s);
 							}
@@ -8272,12 +8522,12 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.UpdatedAtField = void 0);
-				const r = i(1111);
-				class a extends r.Field {
+				const i = r(1111);
+				class a extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, i, r = !0, a = -1) {
+					setValue(e, t, r, i = !0, a = -1) {
 						return n(this, void 0, void 0, function* () {
 							t[this.getName()] = this.model.getTimestamp();
 						});
@@ -8288,18 +8538,18 @@
 			990: (e, t) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.ClientError = void 0);
-				class i extends Error {
-					constructor(e, t, i) {
+				class r extends Error {
+					constructor(e, t, r) {
 						super(t),
 							(this.origin = "client_error"),
 							(this.code = e),
 							(this.message = t),
-							(this.specifics = i);
+							(this.specifics = r);
 					}
 				}
-				t.ClientError = i;
+				t.ClientError = r;
 			},
-			9419: (e, t, i) => {
+			9419: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.checkRequired =
 						t.isValidId =
@@ -8312,8 +8562,8 @@
 						t.isBoolean =
 						t.isObject =
 							void 0);
-				const n = i(9307),
-					r = global.helper;
+				const n = r(9307),
+					i = global.helper;
 				(t.isObject = function (e) {
 					return "object" == typeof e && !Array.isArray(e) && null !== e;
 				}),
@@ -8345,7 +8595,7 @@
 						if (!e) return !1;
 						switch (t) {
 							case n.DBTYPE.MONGODB:
-								return !!r.isValidId(e.toString());
+								return !!i.isValidId(e.toString());
 							case n.DBTYPE.POSTGRESQL:
 							case n.DBTYPE.MYSQL:
 							case n.DBTYPE.SQLSERVER:
@@ -8366,7 +8616,7 @@
 				Object.defineProperty(t, "__esModule", { value: !0 });
 			},
 			9307: (e, t) => {
-				var i, n, r;
+				var r, n, i;
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.ComputeOperators =
 						t.NumericUpdateOperators =
@@ -8396,7 +8646,7 @@
 						(e[(e.QUERY = 1)] = "QUERY"),
 							(e[(e.PULL_CONDITION = 2)] = "PULL_CONDITION"),
 							(e[(e.ARRAY_FILTER = 3)] = "ARRAY_FILTER");
-					})(i || (t.ConditionType = i = {})),
+					})(r || (t.ConditionType = r = {})),
 					(function (e) {
 						(e[(e.FIELD = 2)] = "FIELD"),
 							(e[(e.STATIC = 3)] = "STATIC"),
@@ -8421,7 +8671,7 @@
 							(e[(e.DATE = 15)] = "DATE"),
 							(e[(e.TIME = 16)] = "TIME"),
 							(e[(e.STATICBOOLEAN = 17)] = "STATICBOOLEAN");
-					})(r || (t.ReturnType = r = {})),
+					})(i || (t.ReturnType = i = {})),
 					(t.UpdatePullFunctions = [
 						"$eq",
 						"$neq",
@@ -8462,11 +8712,11 @@
 			},
 		},
 		t = {},
-		i = (function i(n) {
-			var r = t[n];
-			if (void 0 !== r) return r.exports;
+		r = (function r(n) {
+			var i = t[n];
+			if (void 0 !== i) return i.exports;
 			var a = (t[n] = { exports: {} });
-			return e[n].call(a.exports, a, a.exports, i), a.exports;
+			return e[n].call(a.exports, a, a.exports, r), a.exports;
 		})(341);
-	module.exports = i;
+	module.exports = r;
 })();
