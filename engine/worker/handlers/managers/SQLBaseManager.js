@@ -150,23 +150,23 @@ export class SQLBaseManager extends DBManager {
 
                 const requiredFields = await this.handleRequiredField(updatedModel, updatedFields, true);
                 this.addQuery(requiredFields);
-                console.log({ requiredFields });
+                if (requiredFields.trim()) console.log("requiredFields", requiredFields);
 
                 const addField = await this.handleAddFields(updatedModel, updatedModel.fieldChanges.added, true);
                 this.addQuery(addField);
-                console.log({ addField });
+                if (addField.trim()) console.log("addField", addField);
 
                 const renameField = await this.handleRenameField(updatedModel, updatedFields, true);
                 this.addQuery(renameField);
-                console.log({ renameField });
+                if (renameField.trim()) console.log("renameField", renameField);
 
                 const handleIndexes = await this.handleIndexes(updatedModel, updatedModel.fields, true);
                 this.addQuery(handleIndexes);
-                console.log({ handleIndexes });
+                if (handleIndexes.trim()) console.log("handleIndexes", handleIndexes);
 
                 const handleUniqueIndexes = await this.handleUniqueIndexes(updatedModel, updatedModel.fields, true);
                 this.addQuery(handleUniqueIndexes);
-                console.log({ handleUniqueIndexes });
+                if (handleUniqueIndexes.trim()) console.log("handleUniqueIndexes", handleUniqueIndexes);
 
                 const handleDefaultValues = await this.handleDefaultValues(
                     updatedModel,
@@ -174,7 +174,7 @@ export class SQLBaseManager extends DBManager {
                     true
                 );
                 this.addQuery(handleDefaultValues);
-                console.log({ handleDefaultValues });
+                if (handleDefaultValues.trim()) console.log("handleDefaultValues", handleDefaultValues);
 
                 const handleFullTextSearchIndexes = await this.handleFullTextSearchIndexes(
                     updatedModel,
@@ -182,7 +182,8 @@ export class SQLBaseManager extends DBManager {
                     true
                 );
                 this.addQuery(handleFullTextSearchIndexes);
-                console.log({ handleFullTextSearchIndexes });
+                if (handleFullTextSearchIndexes.trim())
+                    console.log("handleFullTextSearchIndexes", handleFullTextSearchIndexes);
 
                 const handleReferenceModelChanges = await this.handleReferenceModelChanges(
                     updatedModel,
@@ -190,7 +191,8 @@ export class SQLBaseManager extends DBManager {
                     true
                 );
                 this.addQuery(handleReferenceModelChanges);
-                console.log({ handleReferenceModelChanges });
+                if (handleReferenceModelChanges.trim())
+                    console.log("handleReferenceModelChanges", handleReferenceModelChanges);
             }
         }
 
@@ -332,7 +334,6 @@ export class SQLBaseManager extends DBManager {
      */
     async handleAddFields(model, fields, returnQuery = false) {
         let SQL = "";
-
         if (fields.length === 0) return "";
 
         const _fields = fields
@@ -346,6 +347,7 @@ export class SQLBaseManager extends DBManager {
 
                 return new FieldClass(field, this.getDbType());
             });
+
         SQL = await this.createField(model.name, _fields, returnQuery);
 
         const modelToCreate = structuredClone(model);
@@ -355,7 +357,8 @@ export class SQLBaseManager extends DBManager {
                 field.reference.modelName = this.getModelNameByIid(field.reference.iid);
                 return field;
             });
-        SQL += this.createForeignKeyQuery([modelToCreate]);
+        // TODO: uncomment this line if it is needed
+        //SQL += this.createForeignKeyQuery([modelToCreate]);
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
@@ -497,7 +500,7 @@ export class SQLBaseManager extends DBManager {
     }
 
     /**
-     * Add or drop unique constraint from fields
+     * Add or drop foreign key from fields
      * @param {object} model
      * @param {object[]} fields
      * @param {boolean} returnQuery - return query or not
@@ -505,6 +508,7 @@ export class SQLBaseManager extends DBManager {
      */
     async handleReferenceModelChanges(model, fields, returnQuery = false) {
         let SQL = "";
+
         for (const field of fields) {
             if (field.type !== "reference") continue;
             if (field?.isRefChanged || field?.isActionChanged) {

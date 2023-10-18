@@ -232,15 +232,14 @@ export class MsSQLDBManager extends SQLBaseManager {
      * @return {Promise<Object|[]> | string}
      */
     async dropField(modelName, field, returnQuery = false) {
+        const iid = field.iid.replaceAll("-", "_");
+
         const SQL = [
             await this.dropFullTextIndexByColumn(modelName, field.name, true),
             await this.dropUniqueConstraint(modelName, field.name, true),
             await this.dropIndex(modelName, field.name, true),
-            `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP CONSTRAINT IF EXISTS DC_${field.iid.replaceAll(
-                "-",
-                "_"
-            )};`,
-            `DROP DEFAULT IF EXISTS DC_${field.iid.replaceAll("-", "_")};`,
+            `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP CONSTRAINT IF EXISTS fk_${iid}`,
+            `DROP DEFAULT IF EXISTS DC_${iid};`,
             `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP COLUMN IF EXISTS ${field.name};`,
             await this.dropFullTextIndexIfDisabled(modelName, true),
         ].join("\n");
