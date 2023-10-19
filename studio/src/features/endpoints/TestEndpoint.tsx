@@ -101,7 +101,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			body: '{}',
 		},
 	});
-	console.log(form.getValues());
 	async function onSubmit(data: z.infer<typeof TestEndpointSchema>) {
 		setLoading(true);
 		const pathVariables = arrayToObj(data.params.pathVariables ?? []);

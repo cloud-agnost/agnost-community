@@ -131,7 +131,6 @@ export default class EndpointService {
 				}
 			});
 		}
-		console.log(body);
 		const options = {
 			headers: {
 				...headers,
