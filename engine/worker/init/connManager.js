@@ -58,13 +58,14 @@ class ConnectionManager {
         switch (type) {
             case DATABASE.PostgreSQL:
                 try {
-                    const client = new pg.Client({
+                    const client = new pg.Pool({
                         ...helper.getAsObject(connSettings.options),
                         host: connSettings.host,
                         port: connSettings.port,
                         user: connSettings.username,
                         password: connSettings.password,
                         database: connSettings.database,
+                        max: config.get("general.maxPoolSize"),
                     });
 
                     await client.connect();
@@ -79,13 +80,14 @@ class ConnectionManager {
                 }
             case DATABASE.MySQL:
                 try {
-                    const connection = await mysql.createConnection({
+                    const connection = await mysql.createPool({
                         ...helper.getAsObject(connSettings.options),
                         host: connSettings.host,
                         port: connSettings.port,
                         user: connSettings.username,
                         password: connSettings.password,
                         database: connSettings.database,
+                        connectionLimit: config.get("general.maxPoolSize"),
                         multipleStatements: true, // - it's necessary for multiple statements in one query
                     });
 

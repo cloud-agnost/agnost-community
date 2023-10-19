@@ -295,6 +295,8 @@ router.get(
 
 			let query = { orgId: org._id };
 
+			if (search) query.name = { $regex: search, $options: "i" };
+
 			// Type filter
 			if (type) {
 				if (Array.isArray(type)) query.type = { $in: type };
@@ -323,6 +325,51 @@ router.get(
 			});
 
 			res.json(resources);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/resource/edit-list?search=&sortBy=name&sortDir=asc
+@method     GET
+@desc       Get organization/app resources
+@access     private
+*/
+router.get(
+	"/edit-list",
+	authSession,
+	validateOrg,
+	authorizeOrgAction("org.resource.view"),
+	applyRules("get-resources"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org } = req;
+			const { search, sortBy, sortDir } = req.query;
+
+			let query = { orgId: org._id, deletable: true };
+			query.$and = [{ deletable: true }, { instance: { $ne: "API Server" } }];
+
+			if (search) query.name = { $regex: search, $options: "i" };
+
+			let sort = {};
+			if (sortBy && sortDir) {
+				sort[sortBy] = sortDir;
+			} else sort = { createdAt: "desc" };
+
+			let resources = await resourceCtrl.getManyByQuery(query, {
+				sort,
+			});
+
+			res.json(
+				resources.map((entry) => {
+					if (entry.access)
+						entry.access = helper.decryptSensitiveData(entry.access);
+					return entry;
+				})
+			);
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -373,10 +420,10 @@ router.put(
 				"org.resource",
 				"update",
 				t(
-					"Updated '%s' resource '%s' named '%s'",
+					"Updated allowed roles of '%s' resource '%s' named '%s'",
 					resource.type,
 					resource.instance,
-					name
+					resource.name
 				),
 				updatedResource,
 				{
