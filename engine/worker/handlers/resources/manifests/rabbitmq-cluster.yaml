@@ -41,13 +41,13 @@ spec:
               - command:
                   - sh
                   - -c
-                  - if [[ $RMQ_VERSION =~ 3.12* ]]; then DIR="v${RMQ_VERSION}"; else DIR=${RMQ_VERSION}; fi && curl -L -v https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/${DIR}/rabbitmq_delayed_message_exchange-${RMQ_VERSION}.ez --output /community-plugins/rabbitmq_delayed_message_exchange-${RMQ_VERSION}.ez
+                  - curl -L -v https://storage.googleapis.com/rmq-delayed-message-exchange/rabbitmq_delayed_message_exchange-${RMQ_VERSION%\.*}.ez --output /community-plugins/rabbitmq_delayed_message_exchange-${RMQ_VERSION%\.*}.ez
                 image: curlimages/curl
                 imagePullPolicy: IfNotPresent
                 name: copy-community-plugins
                 env:
                   - name: RMQ_VERSION
-                    value: "3.10.2"
+                    value: "3.11.1"
                 resources:
                   limits:
                     cpu: 100m
