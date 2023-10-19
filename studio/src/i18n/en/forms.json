@@ -41,6 +41,9 @@
 		"error": "Please enter a valid decimal number",
 		"decimal_digits": "Please enter a valid decimal number with up to {{decimal_digits}} decimal places"
 	},
+	"fieldMaxLength": {
+		"error": "Max length cannot be less than the current max length"
+	},
 	"enterAtLeastOne": "Please enter at least one {{label}}",
 	"enterAtLeastOneValue": "Please enter at least one value",
 	"placeholder": "Enter {{label}}",

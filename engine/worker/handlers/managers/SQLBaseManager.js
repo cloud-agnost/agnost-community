@@ -1,7 +1,6 @@
 import { DBManager } from "./dbManager.js";
 import fieldMap from "../sql-database/fieldMap.js";
 import Model from "../sql-database/Model.js";
-import { DATABASE } from "../../config/constants.js";
 
 export class SQLBaseManager extends DBManager {
     /**
@@ -120,7 +119,7 @@ export class SQLBaseManager extends DBManager {
 
     async redeploy() {
         const changedModels = this.getChangedModels();
-        //console.log("changedModels", JSON.stringify(changedModels, null, 4));
+        console.log("changedModels", JSON.stringify(changedModels, null, 4));
         if (!changedModels) return;
 
         const existingModels = (await this.getExistingModels()).map((dbName) => dbName.toLowerCase());
@@ -159,6 +158,10 @@ export class SQLBaseManager extends DBManager {
                 const renameField = await this.handleRenameField(updatedModel, updatedFields, true);
                 this.addQuery(renameField);
                 if (renameField.trim()) console.log("renameField", renameField);
+
+                const changeMaxLength = await this.handleMaxLength(updatedModel, updatedFields, true);
+                this.addQuery(changeMaxLength);
+                if (changeMaxLength.trim()) console.log("changeMaxLength", changeMaxLength);
 
                 const handleIndexes = await this.handleIndexes(updatedModel, updatedModel.fields, true);
                 this.addQuery(handleIndexes);
@@ -232,13 +235,21 @@ export class SQLBaseManager extends DBManager {
 
         for (const field of fields) {
             if (!field.isNameChanged) continue;
-            const query = [
-                await this.renameField(model.name, field.oldName, field.name, returnQuery),
-                await this.dropIndex(model.name, field.oldName, returnQuery),
-                await this.dropForeignKey(model.name, SQLBaseManager.getForeignKeyName(field.iid), returnQuery),
-                await this.dropUniqueConstraint(model.name, field.oldName, returnQuery),
-                await this.dropFullTextIndex(model.name, field.oldName, returnQuery),
-            ].join("\n");
+            const query = await this.renameField(model.name, field.oldName, field.name, returnQuery);
+            if (returnQuery) SQL += query + "\n";
+        }
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    async handleMaxLength(model, fields, returnQuery = false) {
+        let SQL = "";
+        const types = ["text", "encrypted-text"];
+
+        for (const field of fields) {
+            if (!field.isMaxLengthChanged || !types.includes(field.type)) continue;
+            const query = await this.changeMaxLength(model, field, returnQuery);
             if (returnQuery) SQL += query + "\n";
         }
 
@@ -316,7 +327,7 @@ export class SQLBaseManager extends DBManager {
 
         for (const model of models) {
             for (const field of model.fieldChanges.deleted) {
-                const query = await this.dropField(model.name, field, true);
+                const query = await this.dropField(model, field, true);
                 SQL += query + "\n";
             }
         }
@@ -415,9 +426,9 @@ export class SQLBaseManager extends DBManager {
             const fieldClass = new (fieldMap.get(field.type))(field, this.getDbType());
 
             if (fieldClass.isIndexed()) {
-                query = (await this.addIndex(model.name, field, returnQuery)) + "\n";
+                query = (await this.addIndex(model, field, returnQuery)) + "\n";
             } else {
-                query = (await this.dropIndex(model.name, field.name, returnQuery)) + "\n";
+                query = (await this.dropIndex(model, field, returnQuery)) + "\n";
             }
 
             if (returnQuery) SQL += query;
@@ -455,9 +466,9 @@ export class SQLBaseManager extends DBManager {
             /** @type {Field} */
             const fieldClass = new (fieldMap.get(field.type))(field, this.getDbType());
             if (fieldClass.isUnique()) {
-                query = "\n" + (await this.addUniqueConstraint(model.name, field.name, returnQuery));
+                query = "\n" + (await this.addUniqueConstraint(model, field, returnQuery));
             } else {
-                query = "\n" + (await this.dropUniqueConstraint(model.name, field.name, returnQuery));
+                query = "\n" + (await this.dropUniqueConstraint(model, field, returnQuery));
             }
 
             if (returnQuery) SQL += query;
@@ -480,12 +491,8 @@ export class SQLBaseManager extends DBManager {
         for (const field of fields) {
             if (!field.isDefaultValueChanged) continue;
             let query = "";
-
-            // TODO change default value
-
-            /** @type {Field} */
-            const fieldClass = new (fieldMap.get(field.type))(field, this.getDbType());
             const isBoolean = typeof field.defaultValue === "boolean";
+
             if (!isBoolean && !field.defaultValue) {
                 query = "\n" + (await this.removeDefaultValues(model, field, returnQuery));
             } else {
@@ -509,17 +516,21 @@ export class SQLBaseManager extends DBManager {
     async handleReferenceModelChanges(model, fields, returnQuery = false) {
         let SQL = "";
 
-        for (const field of fields) {
-            if (field.type !== "reference") continue;
-            if (field?.isRefChanged || field?.isActionChanged) {
-                const foreignName = SQLBaseManager.getForeignKeyName(field.iid);
-                SQL += this.dropForeignKey(model.name, foreignName, returnQuery);
-                SQL += "\n";
-            }
+        const filteredFields = fields.filter(
+            (field) => field.type === "reference" && (field?.isRefChanged || field?.isActionChanged)
+        );
+
+        for (const field of filteredFields) {
+            const foreignName = SQLBaseManager.getForeignKeyName(field.iid);
+            SQL += this.dropForeignKey(model, foreignName, returnQuery);
+            SQL += "\n";
         }
 
-        const { modelsWithRefs } = this.getConfiguredModels([model]);
-        SQL += this.createForeignKeyQuery(modelsWithRefs);
+        if (filteredFields.length > 0) {
+            const { modelsWithRefs } = this.getConfiguredModels([model]);
+            SQL += this.createForeignKeyQuery(modelsWithRefs);
+        }
+
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
@@ -539,9 +550,9 @@ export class SQLBaseManager extends DBManager {
             let query = "";
 
             if (field?.text?.searchable || field?.richText?.searchable) {
-                query = (await this.addFullTextIndex(model.name, field.name, returnQuery)) + "\n";
+                query = (await this.addFullTextIndex(model, field, returnQuery)) + "\n";
             } else {
-                query = (await this.dropFullTextIndex(model.name, field.name, returnQuery)) + "\n";
+                query = (await this.dropFullTextIndex(model, field, returnQuery)) + "\n";
             }
 
             if (returnQuery) SQL += query;
@@ -559,7 +570,7 @@ export class SQLBaseManager extends DBManager {
      * @return {string}
      */
     createModel({ fields, name }) {
-        const model = new Model(name);
+        const model = new Model(name, undefined, this.getSchemaName());
 
         for (const field of fields) {
             const FieldClass = fieldMap.get(field.type);
@@ -620,15 +631,14 @@ export class SQLBaseManager extends DBManager {
 
     /**
      * Drop the field from the table
-     * @param {string} modelName - name of the table
+     * @param {object} model - the model object
      * @param {object} field - the field to drop
      * @param {boolean} returnQuery - return the query or run it
      * @return {Promise<Object|[]> | string}
      */
-    async dropField(modelName, field, returnQuery = false) {
+    async dropField(model, field, returnQuery = false) {
         const schema = "ALTER TABLE `{TABLE_NAME}` DROP COLUMN `{COLUMN_NAME}`;";
-
-        const SQL = schema.replace("{TABLE_NAME}", modelName).replace("{COLUMN_NAME}", field.name);
+        const SQL = schema.replace("{TABLE_NAME}", model.name).replace("{COLUMN_NAME}", field.name);
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
@@ -734,57 +744,57 @@ export class SQLBaseManager extends DBManager {
 
     /**
      * @description Drop an index from the column
-     * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
+     * @param {object} model - The model object
+     * @param {object} field - The field object
      * @param {boolean} returnQuery - return the query or run it
      * @return {Promise<Object|[]>}
      */
-    dropIndex(tableName, columnName, returnQuery = false) {}
+    dropIndex(model, field, returnQuery = false) {}
 
     /**
      * @description Add an index to the column
-     * @param {string} tableName - The table name
-     * @param {object} column - The column
+     * @param {object} model - The model object
+     * @param {object} field - The field object
      * @param {boolean} returnQuery - return the query or run it
      * @return {Promise<Object|[]>}
      */
-    addIndex(tableName, column, returnQuery = false) {}
+    addIndex(model, field, returnQuery = false) {}
 
     /**
-     * @description Add a unique constraint to a column
-     * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
+     * @description Add a unique index to the column
+     * @param {object} model - The model object
+     * @param {object} field - The field object
      * @param {boolean} returnQuery - return the query or run it
      * @return {Promise<Object|[]>}
      */
-    addUniqueConstraint(tableName, columnName, returnQuery = false) {}
+    addUniqueConstraint(model, field, returnQuery = false) {}
 
     /**
-     * @description Drop a unique constraint from the column
-     * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
+     * @description Drop unique index from the column
+     * @param {object} model - The model object
+     * @param {object} field - The field object
      * @param {boolean} returnQuery - return the query or run it
      * @return {Promise<Object|[]>}
      */
-    dropUniqueConstraint(tableName, columnName, returnQuery = false) {}
+    dropUniqueConstraint(model, field, returnQuery = false) {}
 
     /**
      * @description Add a full text index to the table
-     * @param {string} tableName
-     * @param {string} columnName
+     * @param {object} model
+     * @param {object} field
      * @param {boolean} returnQuery - return the query or run it
      * @return {Promise<Object|[]>}
      */
-    async addFullTextIndex(tableName, columnName, returnQuery = false) {}
+    addFullTextIndex(model, field, returnQuery = false) {}
 
     /**
      * @description Drop the full text index from the table
-     * @param {string} tableName
-     * @param {string} columnName
+     * @param {object} model
+     * @param {object} field
      * @param {boolean} returnQuery - return the query or run it
      * @return {Promise<Object|[]>}
      */
-    dropFullTextIndex(tableName, columnName, returnQuery = false) {}
+    dropFullTextIndex(model, field, returnQuery = false) {}
 
     /**
      * Create the foreign key query
@@ -797,18 +807,18 @@ export class SQLBaseManager extends DBManager {
      * Drop the table
      * @param {object} model - the model object
      * @param {boolean} returnQuery - return the query or run it
-     * @return {Promise<void>}
+     * @return {Promise<void>|string}
      */
     async dropModel(model, returnQuery = false) {}
 
     /**
      * @description Drop the foreign key
-     * @param modelName {string} - the model name
+     * @param model {object} - the model object
      * @param foreignKeyName {string} - the foreign key name
      * @param returnQuery {boolean} - return the query or run it
      * @return {Promise<void> | string}
      */
-    dropForeignKey(modelName, foreignKeyName, returnQuery = false) {}
+    dropForeignKey(model, foreignKeyName, returnQuery = false) {}
 
     /**
      * @description Return the foreign key name
@@ -819,13 +829,79 @@ export class SQLBaseManager extends DBManager {
         return `fk_${iid.replaceAll("-", "_")}`;
     }
 
+    /**
+     * @description Return the unique index name
+     * @param iid {string} - The field iid
+     * @return {string}
+     */
+    static getUniqueIndexName(iid) {
+        return `uq_${iid.replaceAll("-", "_")}`;
+    }
+
+    /**
+     * @description Return the index name
+     * @param iid {string} - The field iid
+     * @return {string}
+     */
+    static getIndexName(iid) {
+        return `idx_${iid.replaceAll("-", "_")}`;
+    }
+
+    /**
+     * @description Return the full text index name
+     * @param iid {string} - The field iid
+     * @return {string}
+     */
+    static getFullTextIndexName(iid) {
+        return `fti_${iid.replaceAll("-", "_")}`;
+    }
+
+    /**
+     * @description Return the default value constraint name
+     * @param iid {string} - The field iid
+     * @return {string}
+     */
+    static getDefaultConstraintName(iid) {
+        return `dc_${iid.replaceAll("-", "_")}`;
+    }
+
     getDatabaseNameToUse() {
         return this.getAssignUniqueName()
             ? `${this.getEnvId()}_${this.getDbId()}`.replaceAll("-", "_").toLowerCase()
             : this.getDbName().toLowerCase();
     }
 
+    /**
+     * @param model {object}
+     * @param field {object}
+     * @param returnQuery {boolean}
+     */
     addDefaultValues(model, field, returnQuery = false) {}
 
+    /**
+     * @param model {object}
+     * @param field {object}
+     * @param returnQuery {boolean}
+     */
     removeDefaultValues(model, field, returnQuery = false) {}
+
+    /**
+     * @param model {object}
+     * @param field {object}
+     * @param returnQuery {boolean}
+     */
+    changeMaxLength(model, field, returnQuery = false) {
+        const fieldClass = new (fieldMap.get(field.type))(field, this.getDbType());
+        const SQL = fieldClass.changeMaxLengthQuery(model, field);
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    /**
+     * @param modelName {string}
+     * @param fields {object[]}
+     * @param returnQuery {boolean}
+     */
+    createField(modelName, fields, returnQuery = false) {}
 }

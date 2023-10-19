@@ -52,6 +52,12 @@ export default class Reference extends Field {
         throw new AgnostError("toDefinitionQuery not implemented for Reference and will not be used.");
     }
 
+    /**
+     *
+     * @param modelName {string}
+     * @param createField {boolean}
+     * @return {string}
+     */
     createConstraint(modelName, createField = false) {
         const foreignTable = this.getReferenceModelName();
         const foreignName = SQLBaseManager.getForeignKeyName(this.getIid());

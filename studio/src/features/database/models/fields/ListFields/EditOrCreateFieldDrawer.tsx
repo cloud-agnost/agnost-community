@@ -165,22 +165,6 @@ export default function EditOrCreateFieldDrawer({
 							label: capitalize(t('general.max_length').toLowerCase()),
 						}).toString(),
 					})
-					.refine(
-						(value) => () => {
-							if (TYPE === 'text' && typeof MAX_LENGTH === 'object')
-								return Number(value) > 0 && Number(value) <= MAX_LENGTH[database.type];
-							return Number(value) > 0 && Number(value) <= (MAX_LENGTH as number);
-						},
-						{
-							message: t('forms.maxLength.error', {
-								length:
-									TYPE === 'text' && typeof MAX_LENGTH === 'object'
-										? MAX_LENGTH[database.type]
-										: MAX_LENGTH,
-								label: capitalize(t('general.max_length').toLowerCase()),
-							}).toString(),
-						},
-					)
 					.optional(),
 				decimalDigits: z
 					.string()
@@ -290,14 +274,40 @@ export default function EditOrCreateFieldDrawer({
 					});
 				}
 
-				if (isDecimal && !arg.decimalDigits) {
+				if (
+					editMode &&
+					hasMaxLength &&
+					((fieldToEdit.text?.maxLength && Number(arg.maxLength) < fieldToEdit.text.maxLength) ||
+						(fieldToEdit.encryptedText?.maxLength &&
+							Number(arg.maxLength) < fieldToEdit.encryptedText.maxLength))
+				) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
-						message: t('forms.required', {
-							label: capitalize(t('general.decimal_digits').toLowerCase()),
-						}).toString(),
-						path: ['decimalDigits'],
+						message: t('forms.fieldMaxLength.error').toString(),
+						path: ['maxLength'],
 					});
+				}
+
+				if (hasMaxLength) {
+					const valueAsNumber = Number(arg.maxLength);
+					const isText = TYPE === 'text' && typeof MAX_LENGTH === 'object';
+					const isBetween = (min: number, max: number) =>
+						valueAsNumber >= min && valueAsNumber <= max;
+
+					const conditionForText = isText && !isBetween(1, MAX_LENGTH[database.type]);
+					const conditionForEncryptedText =
+						typeof MAX_LENGTH === 'number' && !isBetween(1, MAX_LENGTH);
+
+					if (conditionForText || conditionForEncryptedText) {
+						ctx.addIssue({
+							code: z.ZodIssueCode.custom,
+							message: t('forms.maxLength.error', {
+								length: conditionForText ? MAX_LENGTH[database.type] : MAX_LENGTH,
+								label: capitalize(t('general.max_length').toLowerCase()),
+							}).toString(),
+							path: ['maxLength'],
+						});
+					}
 				}
 
 				if (isEnum && (!arg.enumSelectList || arg.enumSelectList?.trim().length === 0)) {
@@ -438,6 +448,29 @@ export default function EditOrCreateFieldDrawer({
 			if (value === 'false') return false;
 			return undefined;
 		};
+		const getDefaultValue = () => {
+			if (editMode && hasDefaultValue && !data.general.defaultValue) return '$$unset';
+			if (isBoolean) return parseForBoolean(data.general.defaultValue);
+			if (isDecimal || isInteger) return Number(data.general.defaultValue);
+			return data.general.defaultValue;
+		};
+		const getIndexed = () => {
+			if (
+				editMode &&
+				isGeoPoint &&
+				database.type === DATABASE.MySQL &&
+				!fieldToEdit.indexed &&
+				!fieldToEdit.required
+			) {
+				return false;
+			}
+
+			return data.general.indexed;
+		};
+		const getRequired = () => {
+			if (editMode && !fieldToEdit.required) return false;
+			return data.general.required;
+		};
 
 		const dataForAPI = {
 			fieldId: editMode ? fieldToEdit._id : '',
@@ -448,22 +481,11 @@ export default function EditOrCreateFieldDrawer({
 			dbId: dbId,
 			modelId,
 			name: data.general.name,
-			required: editMode && !fieldToEdit.required ? false : data.general.required,
+			required: getRequired(),
 			unique: data.general.unique,
 			immutable: data.general.immutable,
-			indexed:
-				editMode &&
-				isGeoPoint &&
-				database.type === DATABASE.MySQL &&
-				!fieldToEdit.indexed &&
-				!fieldToEdit.required
-					? false
-					: data.general.indexed,
-			defaultValue: isBoolean
-				? parseForBoolean(data.general.defaultValue)
-				: isDecimal || isInteger
-				? Number(data.general.defaultValue)
-				: data.general.defaultValue,
+			indexed: getIndexed(),
+			defaultValue: getDefaultValue(),
 			description: data.general.description,
 			text: {
 				searchable: data.general.searchable,
@@ -616,7 +638,7 @@ export default function EditOrCreateFieldDrawer({
 								)}
 							/>
 							<Separator />
-							{!editMode && hasMaxLength && (
+							{hasMaxLength && (
 								<>
 									<FormField
 										control={form.control}
@@ -932,6 +954,7 @@ export default function EditOrCreateFieldDrawer({
 																	}) as string
 																}
 																{...field}
+																onInput={field.onChange}
 															/>
 														</FormControl>
 													)}

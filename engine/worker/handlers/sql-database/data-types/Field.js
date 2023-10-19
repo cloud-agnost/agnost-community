@@ -6,7 +6,7 @@ import { DATABASE } from "../../../config/constants.js";
  * @description Abstract class for fields
  */
 export default class Field {
-    nullableFields = ["createdat", "updatedat"];
+    nullableFields = [];
 
     createMap = {
         [DATABASE.PostgreSQL]: "{NAME} {TYPE}",

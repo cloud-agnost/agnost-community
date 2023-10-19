@@ -1,17 +1,24 @@
 import Field from "./Field.js";
 import { DATABASE } from "../../../config/constants.js";
+import { SQLBaseManager } from "../../managers/SQLBaseManager.js";
 
 export default class Text extends Field {
     createMap = {
-        [DATABASE.PostgreSQL]: "{name} {type}({maxLength}) {required} {DEFAULT_VALUE}",
-        [DATABASE.MySQL]: "`{name}` {type}({maxLength}) {required} {DEFAULT_VALUE}",
-        [DATABASE.SQLServer]: "{name} {type}({maxLength}) {required} {DEFAULT_VALUE}",
+        [DATABASE.PostgreSQL]: "{NAME} {TYPE}({MAX_LENGTH}) {REQUIRED} {DEFAULT_VALUE}",
+        [DATABASE.MySQL]: "`{NAME}` {TYPE}({MAX_LENGTH}) {REQUIRED} {DEFAULT_VALUE}",
+        [DATABASE.SQLServer]: "{NAME} {TYPE}({MAX_LENGTH}) {REQUIRED} {DEFAULT_VALUE}",
     };
 
     defaultMap = {
-        [DATABASE.PostgreSQL]: " DEFAULT {DEFAULT_VALUE}",
-        [DATABASE.MySQL]: " DEFAULT {DEFAULT_VALUE}",
-        [DATABASE.SQLServer]: " CONSTRAINT DC_{CONSTRAINT_NAME} DEFAULT {DEFAULT_VALUE}",
+        [DATABASE.PostgreSQL]: " DEFAULT '{DEFAULT_VALUE}'",
+        [DATABASE.MySQL]: " DEFAULT '{DEFAULT_VALUE}'",
+        [DATABASE.SQLServer]: " CONSTRAINT {CONSTRAINT_NAME} DEFAULT '{DEFAULT_VALUE}'",
+    };
+
+    maxLengthMap = {
+        [DATABASE.PostgreSQL]: "ALTER TABLE {TABLE_NAME} ALTER COLUMN {NAME} TYPE {TYPE}({MAX_LENGTH});",
+        [DATABASE.MySQL]: "ALTER TABLE {TABLE_NAME} MODIFY {NAME} {TYPE}({MAX_LENGTH});",
+        [DATABASE.SQLServer]: "ALTER TABLE {TABLE_NAME} ALTER COLUMN {NAME} {TYPE}({MAX_LENGTH});",
     };
 
     /**
@@ -38,11 +45,19 @@ export default class Text extends Field {
         }
 
         return schema
-            .replace("{name}", this.getName())
-            .replace("{type}", this.getDbType())
-            .replace("{maxLength}", this.getMaxLength())
+            .replace("{NAME}", this.getName())
+            .replace("{TYPE}", this.getDbType())
+            .replace("{MAX_LENGTH}", this.getMaxLength())
             .replace("{DEFAULT_VALUE}", this.getDefaultValue() ?? "")
-            .replace("{CONSTRAINT_NAME}", this.getIid().replaceAll("-", "_"))
-            .replace("{required}", this.isRequired() ? "NOT NULL" : "NULL");
+            .replace("{CONSTRAINT_NAME}", SQLBaseManager.getDefaultConstraintName(this.getIid()))
+            .replace("{REQUIRED}", this.isRequired() ? "NOT NULL" : "NULL");
+    }
+
+    changeMaxLengthQuery(model, field) {
+        return this.maxLengthMap[this.getDatabaseType()]
+            .replace("{TABLE_NAME}", model.name)
+            .replace("{NAME}", field.name)
+            .replace("{TYPE}", this.getDbType())
+            .replace("{MAX_LENGTH}", this.getMaxLength());
     }
 }

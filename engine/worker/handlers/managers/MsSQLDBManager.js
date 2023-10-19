@@ -1,6 +1,5 @@
 import { SQLBaseManager } from "./SQLBaseManager.js";
 import fieldMap from "../sql-database/fieldMap.js";
-import Model from "../sql-database/Model.js";
 
 export class MsSQLDBManager extends SQLBaseManager {
     static CHECK_UNIQUE_CONSTRAINT_SCHEMA =
@@ -97,48 +96,28 @@ export class MsSQLDBManager extends SQLBaseManager {
         return result;
     }
 
-    /**
-     * Rename the table
-     * @param {string} oldName - old name of the model
-     * @param {string} newName - new name of the model
-     * @param {boolean} returnQuery - return the query or run it
-     * @return {Promise<void> | string}
-     */
     async renameModel(oldName, newName, returnQuery = false) {
         const SQL = `EXEC sp_rename '${this.getSchemaName()}.${oldName}', '${newName}';`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    /**
-     * Rename the field
-     * @param {string} modelName - name of the table
-     * @param {string} fieldOldName - old name of the field
-     * @param {string} fieldNewName - new name of the field
-     * @param {boolean} returnQuery - return the query or run it
-     * @return {Promise<Object|[]> | string}
-     */
     async renameField(modelName, fieldOldName, fieldNewName, returnQuery = false) {
         const SQL = `EXEC sp_rename '${this.getSchemaName()}.${modelName}.${fieldOldName}', '${fieldNewName}', 'COLUMN';`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Add a unique constraint to a column
-     * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    addUniqueConstraint(tableName, columnName, returnQuery = false) {
-        const constraintName = `uc_${tableName}_${columnName}`.toLowerCase();
-        const selectQuery = MsSQLDBManager.CHECK_UNIQUE_CONSTRAINT_SCHEMA.replace("{TABLE_NAME}", tableName)
+    addUniqueConstraint(model, field, returnQuery = false) {
+        const constraintName = SQLBaseManager.getUniqueIndexName(field.iid);
+        const selectQuery = MsSQLDBManager.CHECK_UNIQUE_CONSTRAINT_SCHEMA.replace("{TABLE_NAME}", model.name)
             .replace("{CONSTRAINT_NAME}", constraintName)
             .replace("{SCHEMA_NAME}", this.getSchemaName());
 
         const condition = `NOT EXISTS (${selectQuery})`;
-        const query = `ALTER TABLE ${this.getSchemaName()}.${tableName} ADD CONSTRAINT ${constraintName} UNIQUE(${columnName});`;
+        const query = `ALTER TABLE ${this.getSchemaName()}.${model.name} ADD CONSTRAINT ${constraintName} UNIQUE(${
+            field.name
+        });`;
         const SQL = this.ifWrapper(condition, query);
 
         if (returnQuery) return SQL;
@@ -187,61 +166,27 @@ export class MsSQLDBManager extends SQLBaseManager {
         return [];
     }
 
-    /**
-     * @description Drop a unique constraint from the column
-     * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    dropUniqueConstraint(tableName, columnName, returnQuery = false) {
-        const constraintName = `uc_${tableName}_${columnName}`.toLowerCase();
-        const SQL = `ALTER TABLE ${this.getSchemaName()}.${tableName} DROP CONSTRAINT IF EXISTS ${constraintName};`;
+    dropUniqueConstraint(model, field, returnQuery = false) {
+        const constraintName = SQLBaseManager.getUniqueIndexName(field.iid);
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} DROP CONSTRAINT IF EXISTS ${constraintName};`;
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    /**
-     * Create a table and with its fields for the model
-     * @param {object} model
-     * @param {string} model.name
-     * @param {object[]} model.fields
-     * @return {string}
-     */
-    createModel({ fields, name }) {
-        const model = new Model(name, undefined, this.getSchemaName());
-
-        for (const field of fields) {
-            const FieldClass = fieldMap.get(field.type);
-
-            if (!FieldClass) {
-                throw new AgnostError(t(`Field type '${field.type}' is not supported`));
-            }
-            model.addField(new FieldClass(field, this.getDbType()));
-        }
-
-        return model.toString();
-    }
-
-    /**
-     * Drop the field from the table
-     * @param {string} modelName - name of the table
-     * @param {object} field - the field to drop
-     * @param {boolean} returnQuery - return the query or run it
-     * @return {Promise<Object|[]> | string}
-     */
-    async dropField(modelName, field, returnQuery = false) {
-        const iid = field.iid.replaceAll("-", "_");
+    async dropField(model, field, returnQuery = false) {
+        const DROP_FIELD_QUERY = `ALTER TABLE ${this.getSchemaName()}.${model.name} DROP COLUMN IF EXISTS ${
+            field.name
+        };`;
 
         const SQL = [
-            await this.dropFullTextIndexByColumn(modelName, field.name, true),
-            await this.dropUniqueConstraint(modelName, field.name, true),
-            await this.dropIndex(modelName, field.name, true),
-            `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP CONSTRAINT IF EXISTS fk_${iid}`,
-            `DROP DEFAULT IF EXISTS DC_${iid};`,
-            `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP COLUMN IF EXISTS ${field.name};`,
-            await this.dropFullTextIndexIfDisabled(modelName, true),
+            await this.dropFullTextIndexByColumn(model.name, field.name, true),
+            await this.dropUniqueConstraint(model, field, true),
+            await this.dropIndex(model, field, true),
+            await this.dropForeignKeyConstraint(model.name, field, true),
+            await this.dropDefaultConstraint(model.name, field, true),
+            DROP_FIELD_QUERY,
+            await this.dropFullTextIndexIfDisabled(model.name, true),
         ].join("\n");
 
         if (returnQuery) return SQL;
@@ -249,38 +194,54 @@ export class MsSQLDBManager extends SQLBaseManager {
     }
 
     /**
-     * @description Drop an index from the column
-     * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
-     * @param {boolean} returnQuery - Return the query instead of running it
+     * @description Drop the foreign key constraint from the column
+     * @param modelName {string}
+     * @param field {object}
+     * @param returnQuery {boolean}
      * @return {Promise<Object|[]>|string}
      */
-    dropIndex(tableName, columnName, returnQuery = false) {
-        const indexName = `${tableName}_index_${columnName}`.toLowerCase();
-        const SQL = `DROP INDEX IF EXISTS ${indexName} ON ${this.getSchemaName()}.${tableName};`;
+    dropForeignKeyConstraint(modelName, field, returnQuery = false) {
+        const FK_NAME = SQLBaseManager.getForeignKeyName(field.iid);
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP CONSTRAINT IF EXISTS ${FK_NAME};`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
     /**
-     * @description Add an index to the column
-     * @param tableName
-     * @param column
-     * @param returnQuery
-     * @return {Promise|string}
+     * @description Drop the default constraint from the column
+     * @param modelName {string}
+     * @param field {object}
+     * @param returnQuery {boolean}
+     * @return {Promise<Object|[]>|string}
      */
-    addIndex(tableName, column, returnQuery = false) {
-        const isGeoPoint = column.type === "geo-point";
+    dropDefaultConstraint(modelName, field, returnQuery = false) {
+        const DC_NAME = SQLBaseManager.getDefaultConstraintName(field.iid);
+        let SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP CONSTRAINT IF EXISTS ${DC_NAME};\n`;
+        SQL += `DROP DEFAULT IF EXISTS ${DC_NAME};`;
 
-        const indexName = `${tableName}_index_${column.name}`.toLowerCase();
-        const selectQuery = MsSQLDBManager.CHECK_INDEX_SCHEMA.replace("{TABLE_NAME}", tableName)
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    dropIndex(model, field, returnQuery = false) {
+        const indexName = SQLBaseManager.getIndexName(field.iid);
+        const SQL = `DROP INDEX IF EXISTS ${indexName} ON ${this.getSchemaName()}.${model.name};`;
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    addIndex(model, field, returnQuery = false) {
+        const isGeoPoint = field.type === "geo-point";
+        const indexName = SQLBaseManager.getIndexName(field.iid);
+
+        const selectQuery = MsSQLDBManager.CHECK_INDEX_SCHEMA.replace("{TABLE_NAME}", model.name)
             .replace("{INDEX_NAME}", indexName)
             .replace("{SCHEMA_NAME}", this.getSchemaName());
 
         const condition = `NOT EXISTS(${selectQuery})`;
-        const query = `CREATE INDEX ${indexName} ON ${this.getSchemaName()}.${tableName}(${column.name})`;
-        const queryWithSpatial = `CREATE SPATIAL INDEX ${indexName} ON ${this.getSchemaName()}.${tableName}(${
-            column.name
+        const query = `CREATE INDEX ${indexName} ON ${this.getSchemaName()}.${model.name}(${field.name})`;
+        const queryWithSpatial = `CREATE SPATIAL INDEX ${indexName} ON ${this.getSchemaName()}.${model.name}(${
+            field.name
         })`;
         const SQL = this.ifWrapper(condition, isGeoPoint ? queryWithSpatial : query);
 
@@ -303,18 +264,18 @@ export class MsSQLDBManager extends SQLBaseManager {
 
     /**
      * @description Add a full text index to the table
-     * @param {string} tableName
+     * @param {object} model
      * @param {object[]} fields
      * @param {boolean} returnQuery - Return the query instead of running it
      * @return {Promise<string | object>}
      */
-    async addFullTextIndex(tableName, fields, returnQuery = false) {
+    async addFullTextIndex(model, fields, returnQuery = false) {
         if (!Array.isArray(fields)) throw AgnostError(t(`fields must be an array`));
         let SQL = "";
         if (fields.length === 0) return SQL;
 
         const catalogName = `agnost_default_fulltext_catalog`;
-        const PK_NAME = await this.getPrimaryKeyName(tableName);
+        const PK_NAME = await this.getPrimaryKeyName(model.name);
 
         const createCatalogIfNotExists = this.ifWrapper(
             `NOT EXISTS(${MsSQLDBManager.CHECK_CATALOG_SCHEMA.replace("{CATALOG_NAME}", catalogName)})`,
@@ -324,14 +285,16 @@ export class MsSQLDBManager extends SQLBaseManager {
         const fieldsToIndex = fields.map((field) => field.name).join(", ");
 
         const dropFullTextIndexIfExists = this.ifWrapper(
-            `EXISTS(${MsSQLDBManager.CHECK_FULL_TEXT_INDEX_SCHEMA.replace("{TABLE_NAME}", tableName).replace(
+            `EXISTS(${MsSQLDBManager.CHECK_FULL_TEXT_INDEX_SCHEMA.replace("{TABLE_NAME}", model.name).replace(
                 "{SCHEMA_NAME}",
                 this.getSchemaName()
             )})`,
-            `DROP FULLTEXT INDEX ON ${this.getSchemaName()}.${tableName}`
+            `DROP FULLTEXT INDEX ON ${this.getSchemaName()}.${model.name}`
         );
 
-        const createFullTextIndex = `CREATE FULLTEXT INDEX ON ${this.getSchemaName()}.${tableName}(${fieldsToIndex}) KEY INDEX ${PK_NAME} WITH CHANGE_TRACKING = AUTO;`;
+        const createFullTextIndex = `CREATE FULLTEXT INDEX ON ${this.getSchemaName()}.${
+            model.name
+        }(${fieldsToIndex}) KEY INDEX ${PK_NAME} WITH CHANGE_TRACKING = AUTO;`;
 
         SQL = [createCatalogIfNotExists, dropFullTextIndexIfExists, createFullTextIndex, "\n"].join("\n");
 
@@ -339,40 +302,46 @@ export class MsSQLDBManager extends SQLBaseManager {
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Drop the full text index from the table
-     * @param {string} tableName
-     * @param {string} columnName
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    dropFullTextIndex(tableName, columnName, returnQuery = false) {
+    dropFullTextIndex(model, field, returnQuery = false) {
         const SQL = this.ifWrapper(
             `EXISTS(${MsSQLDBManager.CHECK_FULL_TEXT_INDEX_SCHEMA.replace(
                 "{SCHEMA_NAME}",
                 this.getSchemaName()
-            ).replace("{TABLE_NAME}", tableName)})`,
-            `DROP FULLTEXT INDEX ON ${tableName};`
+            ).replace("{TABLE_NAME}", model.name)})`,
+            `DROP FULLTEXT INDEX ON ${model.name};`
         );
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    dropFullTextIndexIfDisabled(tableName, returnQuery = false) {
+    /**
+     *
+     * @param modelName {string}
+     * @param returnQuery {boolean}
+     * @return {Promise<Object|[]>|string}
+     */
+    dropFullTextIndexIfDisabled(modelName, returnQuery = false) {
         const SQL = this.ifWrapper(
-            `EXISTS(SELECT is_enabled FROM sys.fulltext_indexes WHERE object_id = OBJECT_ID('${this.getSchemaName()}.${tableName}') AND is_enabled = 0)`,
-            `DROP FULLTEXT INDEX ON ${this.getSchemaName()}.${tableName};`
+            `EXISTS(SELECT is_enabled FROM sys.fulltext_indexes WHERE object_id = OBJECT_ID('${this.getSchemaName()}.${modelName}') AND is_enabled = 0)`,
+            `DROP FULLTEXT INDEX ON ${this.getSchemaName()}.${modelName};`
         );
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    dropFullTextIndexByColumn(tableName, columnName, returnQuery = false) {
+    /**
+     *
+     * @param modelName {string}
+     * @param fieldName {string}
+     * @param returnQuery {boolean}
+     * @return {Promise<Object|[]>|string}
+     */
+    dropFullTextIndexByColumn(modelName, fieldName, returnQuery = false) {
         const SQL = this.ifWrapper(
-            `(SELECT COLUMNPROPERTY(OBJECT_ID('${this.getSchemaName()}.${tableName}'), '${columnName}', 'IsFulltextIndexed')) = 1`,
-            `ALTER FULLTEXT INDEX ON ${this.getSchemaName()}.${tableName} DROP (${columnName})`
+            `(SELECT COLUMNPROPERTY(OBJECT_ID('${this.getSchemaName()}.${modelName}'), '${fieldName}', 'IsFulltextIndexed')) = 1`,
+            `ALTER FULLTEXT INDEX ON ${this.getSchemaName()}.${modelName} DROP (${fieldName})`
         );
 
         if (returnQuery) return SQL;
@@ -431,12 +400,6 @@ export class MsSQLDBManager extends SQLBaseManager {
         return SQL;
     }
 
-    /**
-     * Drop the table
-     * @param {object} model - the model object
-     * @param {boolean} returnQuery - return the query or run it
-     * @return {Promise<void|string>}
-     */
     async dropModel(model, returnQuery = false) {
         const SQL = `DROP TABLE IF EXISTS ${this.getSchemaName()}.${model.name};`;
 
@@ -444,18 +407,12 @@ export class MsSQLDBManager extends SQLBaseManager {
         return this.runQuery(SQL);
     }
 
-    dropForeignKey(modelName, foreignKeyName, returnQuery = false) {
-        const SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP CONSTRAINT IF EXISTS ${foreignKeyName};`;
+    dropForeignKey(model, foreignKeyName, returnQuery = false) {
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} DROP CONSTRAINT IF EXISTS ${foreignKeyName};`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Set the nullability of the field
-     * @param modelName {string} - The name of the model
-     * @param field {object} - The field to set nullability
-     * @param returnQuery {boolean} - return the query or run it
-     */
     setNullability(modelName, field, returnQuery = false) {
         const FieldType = fieldMap.get(field.type);
         if (!FieldType) throw new AgnostError(t(`Field type '${field.type}' is not supported`));
@@ -469,23 +426,16 @@ export class MsSQLDBManager extends SQLBaseManager {
         return this.runQuery(SQL);
     }
 
-    /**
-     * Add or drop full text search indexes from the table
-     * @param {object} model
-     * @param {object[]} fields
-     * @param {boolean} returnQuery - return query or not
-     * @return {Promise<void> | string}
-     */
     async handleFullTextSearchIndexes(model, fields, returnQuery = false) {
         const searchableFields = fields.filter((field) => field?.text?.searchable || field?.richText?.searchable);
-        let SQL = await this.addFullTextIndex(model.name, searchableFields, returnQuery);
+        let SQL = await this.addFullTextIndex(model, searchableFields, returnQuery);
 
         for (const field of fields) {
             if (!["text", "rich-text"].includes(field.type) || field?.text?.searchable || field?.richText?.searchable) {
                 continue;
             }
 
-            const query = (await this.dropFullTextIndex(model.name, field.name, returnQuery)) + "\n";
+            const query = (await this.dropFullTextIndex(model, field, returnQuery)) + "\n";
             if (returnQuery) SQL += query;
         }
 
@@ -494,7 +444,7 @@ export class MsSQLDBManager extends SQLBaseManager {
     }
 
     async addDefaultValues(model, field, returnQuery = false) {
-        const constraintName = `DC_${field.iid.replace("-", "_")}`;
+        const constraintName = SQLBaseManager.getDefaultConstraintName(field.iid);
         const isString = typeof field.defaultValue === "string";
         const isNumber = isString && !isNaN(Number(field.defaultValue));
         const defaultValue = isString && !isNumber ? `'${field.defaultValue}'` : field.defaultValue;
@@ -509,7 +459,7 @@ export class MsSQLDBManager extends SQLBaseManager {
     }
 
     removeDefaultValues(model, field, returnQuery = false) {
-        const constraintName = `DC_${field.iid.replace("-", "_")}`;
+        const constraintName = SQLBaseManager.getDefaultConstraintName(field.iid);
         const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} DROP CONSTRAINT IF EXISTS ${constraintName};`;
 
         if (returnQuery) return SQL;

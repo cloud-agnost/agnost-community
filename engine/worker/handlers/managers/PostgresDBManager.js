@@ -1,11 +1,10 @@
 import { SQLBaseManager } from "./SQLBaseManager.js";
 import connManager from "../../init/connManager.js";
 import fieldMap from "../sql-database/fieldMap.js";
-import Model from "../sql-database/Model.js";
 
 export class PostgresDBManager extends SQLBaseManager {
     static CHECK_FIELD_EXISTS =
-        "SELECT column_name FROM information_schema.columns WHERE table_name = '{TABLE_NAME}' AND column_name = '{FIELD_NAME}' AND table_catalog = '{SCHEMA_NAME}'";
+        "SELECT column_name FROM information_schema.columns WHERE table_name = '{TABLE_NAME}' AND column_name = '{FIELD_NAME}' AND table_schema = '{SCHEMA_NAME}'";
 
     static CHECK_CONSTRAINT_EXISTS =
         "SELECT constraint_name FROM information_schema.constraint_column_usage WHERE table_name = '{TABLE_NAME}' AND constraint_name = '{CONSTRAINT_NAME}' AND table_schema = '{SCHEMA_NAME}'";
@@ -19,28 +18,6 @@ export class PostgresDBManager extends SQLBaseManager {
 
     getSchemaName() {
         return true ? "public" : "";
-    }
-
-    /**
-     * Create a table and with its fields for the model
-     * @param {object} model
-     * @param {string} model.name
-     * @param {object[]} model.fields
-     * @return {string}
-     */
-    createModel({ fields, name }) {
-        const model = new Model(name, undefined, this.getSchemaName());
-
-        for (const field of fields) {
-            const FieldClass = fieldMap.get(field.type);
-
-            if (!FieldClass) {
-                throw new AgnostError(t(`Field type '${field.type}' is not supported`));
-            }
-            model.addField(new FieldClass(field, this.getDbType()));
-        }
-
-        return model.toString();
     }
 
     /**
@@ -62,27 +39,12 @@ export class PostgresDBManager extends SQLBaseManager {
         await this.runQuery(`CREATE SCHEMA IF NOT EXISTS ${this.getSchemaName()};`);
     }
 
-    /**
-     * Rename the table
-     * @param {string} oldName - old name of the model
-     * @param {string} newName - new name of the model
-     * @param {boolean} returnQuery - return the query or run it
-     * @return {Promise<void> | string}
-     */
     async renameModel(oldName, newName, returnQuery = false) {
         const SQL = `ALTER TABLE ${this.getSchemaName()}.${oldName} RENAME TO ${newName};`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    /**
-     * Rename the field
-     * @param {string} modelName - name of the table
-     * @param {string} fieldOldName - old name of the field
-     * @param {string} fieldNewName - new name of the field
-     * @param {boolean} returnQuery - return the query or run it
-     * @return {Promise<Object|[]> | string}
-     */
     async renameField(modelName, fieldOldName, fieldNewName, returnQuery = false) {
         const SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} RENAME COLUMN ${fieldOldName} TO ${fieldNewName};`;
         if (returnQuery) return SQL;
@@ -104,6 +66,7 @@ export class PostgresDBManager extends SQLBaseManager {
         // so we need to set true as the 4th parameter of getConn
         this.conn = await connManager.getConn(this.getDbId(), this.getDbType(), config, true);
     }
+
     /**
      * Drop the database
      * @param {string} dbName - name of the database
@@ -114,8 +77,8 @@ export class PostgresDBManager extends SQLBaseManager {
         return this.runQuery(`DROP DATABASE IF EXISTS ${dbName ?? this.getDatabaseNameToUse()} WITH (FORCE);`);
     }
 
-    dropForeignKey(modelName, foreignKeyName, returnQuery = false) {
-        const SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP CONSTRAINT IF EXISTS ${foreignKeyName};`;
+    dropForeignKey(model, foreignKeyName, returnQuery = false) {
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} DROP CONSTRAINT IF EXISTS ${foreignKeyName};`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
@@ -194,100 +157,59 @@ $$;`;
         return [];
     }
 
-    /**
-     * @description Add a unique constraint to a column
-     * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    addUniqueConstraint(tableName, columnName, returnQuery = false) {
-        const constraintName = `uc_${tableName}_${columnName}`.toLowerCase();
-        const condition = PostgresDBManager.CHECK_CONSTRAINT_EXISTS.replace("{TABLE_NAME}", tableName)
+    addUniqueConstraint(model, field, returnQuery = false) {
+        const constraintName = SQLBaseManager.getUniqueIndexName(field.iid);
+        const condition = PostgresDBManager.CHECK_CONSTRAINT_EXISTS.replace("{TABLE_NAME}", model.name)
             .replace("{CONSTRAINT_NAME}", constraintName)
             .replace("{SCHEMA_NAME}", this.getSchemaName());
 
-        const query = `ALTER TABLE ${tableName} ADD CONSTRAINT ${constraintName} UNIQUE(${columnName});`;
+        const query = `ALTER TABLE ${model.name} ADD CONSTRAINT ${constraintName} UNIQUE(${field.name});`;
         const SQL = this.ifWrapper(`NOT EXISTS(${condition})`, query);
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Drop a unique constraint from the column
-     * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    dropUniqueConstraint(tableName, columnName, returnQuery = false) {
-        const constraintName = `uc_${tableName}_${columnName}`.toLowerCase();
-        const SQL = `ALTER TABLE ${this.getSchemaName()}.${tableName} DROP CONSTRAINT IF EXISTS ${constraintName};`;
+    dropUniqueConstraint(model, field, returnQuery = false) {
+        const constraintName = SQLBaseManager.getUniqueIndexName(field.iid);
+        const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} DROP CONSTRAINT IF EXISTS ${constraintName};`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Drop an index from the column
-     * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    dropIndex(tableName, columnName, returnQuery = false) {
-        const indexName = `${tableName}_index_${columnName}`.toLowerCase();
+    dropIndex(model, field, returnQuery = false) {
+        const indexName = SQLBaseManager.getIndexName(field.iid);
         const SQL = `DROP INDEX IF EXISTS ${indexName};`;
-
         if (returnQuery) return SQL;
-
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Add an index to the column
-     * @param {string} tableName - The table name
-     * @param {object} column - The column
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    addIndex(tableName, column, returnQuery = false) {
-        const isGeoPoint = column.type === "geo-point";
-        const indexName = `${tableName}_index_${column.name}`.toLowerCase();
-        const SQL = `CREATE INDEX IF NOT EXISTS ${indexName} ON ${this.getSchemaName()}.${tableName} USING ${
+    addIndex(model, field, returnQuery = false) {
+        const isGeoPoint = field.type === "geo-point";
+        const indexName = SQLBaseManager.getIndexName(field.iid);
+
+        const SQL = `CREATE INDEX IF NOT EXISTS ${indexName} ON ${this.getSchemaName()}.${model.name} USING ${
             isGeoPoint ? "GIST" : "BTREE"
-        }(${column.name});`;
+        }(${field.name});`;
 
         if (returnQuery) return SQL;
 
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Add a full text index to the table
-     * @param {string} tableName
-     * @param {string} columnName
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    addFullTextIndex(tableName, columnName, returnQuery = false) {
-        const indexName = `${tableName}_fulltext_${columnName}`.toLowerCase();
-        const SQL = `CREATE INDEX IF NOT EXISTS ${indexName} ON ${this.getSchemaName()}.${tableName} USING GIN(to_tsvector('english', ${columnName}));`;
+    addFullTextIndex(model, field, returnQuery = false) {
+        const indexName = SQLBaseManager.getFullTextIndexName(field.iid);
+        const SQL = `CREATE INDEX IF NOT EXISTS ${indexName} ON ${this.getSchemaName()}.${
+            model.name
+        } USING GIN(to_tsvector('english', ${field.name}));`;
 
         if (returnQuery) return SQL;
 
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Drop the full text index from the table
-     * @param {string} tableName
-     * @param {string} columnName
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    dropFullTextIndex(tableName, columnName, returnQuery = false) {
-        const indexName = `${tableName}_fulltext_${columnName}`.toLowerCase();
+    dropFullTextIndex(model, field, returnQuery = false) {
+        const indexName = SQLBaseManager.getFullTextIndexName(field.iid);
         const SQL = `DROP INDEX IF EXISTS ${indexName};`;
 
         if (returnQuery) return SQL;
@@ -295,13 +217,6 @@ $$;`;
         return this.runQuery(SQL);
     }
 
-    /**
-     * Create a new field in the table
-     * @param {string} modelName - name of the table
-     * @param {Field[]} fields
-     * @param {boolean} returnQuery - return the query or run it
-     * @return {Promise<Object|[]> | string}
-     */
     createField(modelName, fields, returnQuery = false) {
         const SQL =
             fields
@@ -315,11 +230,6 @@ $$;`;
         return this.runQuery(SQL);
     }
 
-    /**
-     * Create the foreign key query
-     * @param {object[]} modelsWithRefs
-     * @return {string}
-     */
     createForeignKeyQuery(modelsWithRefs) {
         const Ref = fieldMap.get("reference");
         if (!Ref || modelsWithRefs.length === 0) return "";
@@ -357,12 +267,6 @@ $$;`;
         return this.doWrapper(addFieldQuery);
     }
 
-    /**
-     * Drop the table
-     * @param {object} model - the model object
-     * @param {boolean} returnQuery - return the query or run it
-     * @return {Promise<void>|string}
-     */
     async dropModel(model, returnQuery = false) {
         const SQL = `DROP TABLE IF EXISTS ${this.getSchemaName()}.${model.name} CASCADE;`;
 
@@ -392,18 +296,11 @@ BEGIN
 END $$;`;
     }
 
-    /**
-     * Drop the field from the table
-     * @param {string} modelName - name of the table
-     * @param {object} field - the field to drop
-     * @param {boolean} returnQuery - return the query or run it
-     * @return {Promise<Object|[]> | string}
-     */
-    async dropField(modelName, field, returnQuery = false) {
+    async dropField(model, field, returnQuery = false) {
         const schema = "ALTER TABLE {SCHEMA_NAME}.{TABLE_NAME} DROP COLUMN IF EXISTS {COLUMN_NAME};";
 
         const SQL = schema
-            .replace("{TABLE_NAME}", modelName)
+            .replace("{TABLE_NAME}", model.name)
             .replace("{COLUMN_NAME}", field.name)
             .replace("{SCHEMA_NAME}", this.getSchemaName());
 
@@ -411,12 +308,6 @@ END $$;`;
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Set the nullability of the field
-     * @param modelName {string} - The name of the model
-     * @param field {object} - The field to set nullability
-     * @param returnQuery {boolean} - return the query or run it
-     */
     setNullability(modelName, field, returnQuery = false) {
         const FieldType = fieldMap.get(field.type);
         if (!FieldType) throw new AgnostError(t(`Field type '${field.type}' is not supported`));
