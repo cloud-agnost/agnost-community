@@ -224,4 +224,4 @@ jobs:
           prerelease: false
           automatic_release_tag: ${{ env.RELEASE_NUMBER }}
           files: |
-            CHANGELOG.md
+            releases/${{ env.RELEASE_NUMBER }}.json
