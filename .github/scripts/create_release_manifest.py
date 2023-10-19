@@ -3,8 +3,8 @@ import json
 import os
 
 release_number = os.environ['RELEASE_NUMBER']
-release_file = os.path.join('Releases', release_number + '.json')
-latest_file = os.path.join('Releases', 'latest.json')
+release_file = os.path.join('releases', release_number + '.json')
+latest_file = os.path.join('releases', 'latest.json')
 applications = ['engine/core', 'engine/monitor', 'engine/realtime', 'engine/scheduler', 'engine/worker',
                 'platform/core', 'platform/sync', 'platform/worker', 'studio']
 
