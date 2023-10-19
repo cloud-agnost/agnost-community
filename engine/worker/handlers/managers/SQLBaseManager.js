@@ -368,8 +368,7 @@ export class SQLBaseManager extends DBManager {
                 field.reference.modelName = this.getModelNameByIid(field.reference.iid);
                 return field;
             });
-        // TODO: uncomment this line if it is needed
-        //SQL += this.createForeignKeyQuery([modelToCreate]);
+        SQL += this.createForeignKeyQuery([modelToCreate]);
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
