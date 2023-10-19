@@ -1,5 +1,6 @@
 import Field from "./Field.js";
 import { DATABASE } from "../../../config/constants.js";
+import { SQLBaseManager } from "../../managers/SQLBaseManager.js";
 
 export default class Integer extends Field {
     createMap = {
@@ -11,7 +12,7 @@ export default class Integer extends Field {
     defaultMap = {
         [DATABASE.PostgreSQL]: " DEFAULT {DEFAULT_VALUE}",
         [DATABASE.MySQL]: " DEFAULT {DEFAULT_VALUE}",
-        [DATABASE.SQLServer]: " CONSTRAINT DC_{CONSTRAINT_NAME} DEFAULT {DEFAULT_VALUE}",
+        [DATABASE.SQLServer]: " CONSTRAINT {CONSTRAINT_NAME} DEFAULT {DEFAULT_VALUE}",
     };
 
     toDefinitionQuery() {
@@ -25,7 +26,7 @@ export default class Integer extends Field {
             .replace("{NAME}", this.getName())
             .replace("{TYPE}", this.getDbType())
             .replace("{DEFAULT_VALUE}", this.getDefaultValue() ?? "")
-            .replace("{CONSTRAINT_NAME}", this.getIid().replaceAll("-", "_"))
+            .replace("{CONSTRAINT_NAME}", SQLBaseManager.getDefaultConstraintName(this.getIid()))
             .replace("{REQUIRED}", this.isRequired() ? "NOT NULL" : "NULL");
     }
 }

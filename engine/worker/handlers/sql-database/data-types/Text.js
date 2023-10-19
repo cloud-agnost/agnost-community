@@ -1,5 +1,6 @@
 import Field from "./Field.js";
 import { DATABASE } from "../../../config/constants.js";
+import { SQLBaseManager } from "../../managers/SQLBaseManager.js";
 
 export default class Text extends Field {
     createMap = {
@@ -11,7 +12,7 @@ export default class Text extends Field {
     defaultMap = {
         [DATABASE.PostgreSQL]: " DEFAULT '{DEFAULT_VALUE}'",
         [DATABASE.MySQL]: " DEFAULT '{DEFAULT_VALUE}'",
-        [DATABASE.SQLServer]: " CONSTRAINT DC_{CONSTRAINT_NAME} DEFAULT '{DEFAULT_VALUE}'",
+        [DATABASE.SQLServer]: " CONSTRAINT {CONSTRAINT_NAME} DEFAULT '{DEFAULT_VALUE}'",
     };
 
     maxLengthMap = {
@@ -48,7 +49,7 @@ export default class Text extends Field {
             .replace("{TYPE}", this.getDbType())
             .replace("{MAX_LENGTH}", this.getMaxLength())
             .replace("{DEFAULT_VALUE}", this.getDefaultValue() ?? "")
-            .replace("{CONSTRAINT_NAME}", this.getIid().replaceAll("-", "_"))
+            .replace("{CONSTRAINT_NAME}", SQLBaseManager.getDefaultConstraintName(this.getIid()))
             .replace("{REQUIRED}", this.isRequired() ? "NOT NULL" : "NULL");
     }
 

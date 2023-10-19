@@ -1,5 +1,6 @@
 import Field from "./Field.js";
 import { DATABASE } from "../../../config/constants.js";
+import { SQLBaseManager } from "../../managers/SQLBaseManager.js";
 
 export default class DateTime extends Field {
     createMap = {
@@ -11,7 +12,7 @@ export default class DateTime extends Field {
     defaultMap = {
         [DATABASE.PostgreSQL]: " DEFAULT CURRENT_TIMESTAMP",
         [DATABASE.MySQL]: " DEFAULT CURRENT_TIMESTAMP",
-        [DATABASE.SQLServer]: " CONSTRAINT DC_{CONSTRAINT_NAME} DEFAULT CURRENT_TIMESTAMP",
+        [DATABASE.SQLServer]: " CONSTRAINT {CONSTRAINT_NAME} DEFAULT CURRENT_TIMESTAMP",
     };
 
     getDefaultValue() {
@@ -35,7 +36,7 @@ export default class DateTime extends Field {
             schema += this.defaultMap[this.getDatabaseType()];
         } else {
             if (DATABASE.SQLServer === this.getDatabaseType() && this.getDefaultValue()) {
-                schema += " CONSTRAINT DC_{CONSTRAINT_NAME} {DEFAULT_VALUE}";
+                schema += " CONSTRAINT {CONSTRAINT_NAME} {DEFAULT_VALUE}";
             } else {
                 schema += " {DEFAULT_VALUE}";
             }
@@ -45,7 +46,7 @@ export default class DateTime extends Field {
             .replace("{NAME}", this.getName())
             .replace("{TYPE}", this.getDbType())
             .replace("{DEFAULT_VALUE}", this.getDefaultValue() ?? "")
-            .replace("{CONSTRAINT_NAME}", this.getIid().replaceAll("-", "_"))
+            .replace("{CONSTRAINT_NAME}", SQLBaseManager.getDefaultConstraintName(this.getIid()))
             .replace("{REQUIRED}", this.isRequired() ? "NOT NULL" : "NULL");
     }
 }

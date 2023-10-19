@@ -2,6 +2,7 @@ import { SQLBaseManager } from "./SQLBaseManager.js";
 import fieldMap from "../sql-database/fieldMap.js";
 import { Text } from "../sql-database/data-types/index.js";
 import { customAlphabet } from "nanoid";
+import Model from "../sql-database/Model.js";
 
 export class MySQLDBManager extends SQLBaseManager {
     static dropForeignKeySchema = "ALTER TABLE `{TABLE_NAME}` DROP FOREIGN KEY `{CONSTRAINT_NAME}`;";
@@ -148,13 +149,6 @@ END;
         return !addFieldQuery ? addFieldQuery : this.procedureWrapper(addFieldQuery, "CREATE FOREIGN KEY QUERY");
     }
 
-    /**
-     * Create a new field in the table
-     * @param {string} modelName - name of the table
-     * @param {Field[]} fields
-     * @param {boolean} returnQuery - return the query or run it
-     * @return {Promise<Object|[]> | string}
-     */
     createField(modelName, fields, returnQuery = false) {
         let addFieldQuery = "";
         for (let field of fields) {
@@ -172,26 +166,19 @@ END;
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Add an index to the column
-     * @param {string} tableName - The table name
-     * @param {object} column - The column
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    addIndex(tableName, column, returnQuery = false) {
-        const indexName = `${tableName}_index_${column.name}`.toLowerCase();
+    addIndex(model, field, returnQuery = false) {
+        const indexName = SQLBaseManager.getIndexName(field.iid);
 
         const schema = "CREATE INDEX `{INDEX_NAME}` ON {TABLE_NAME}({FIELD_NAME});";
 
         const SQL = this.ifWrapper(
             MySQLDBManager.checkIndexConditionSchema
-                .replace("{TABLE_NAME}", tableName)
+                .replace("{TABLE_NAME}", model.name)
                 .replace("{INDEX_NAME}", indexName),
             schema
                 .replace("{INDEX_NAME}", indexName)
-                .replace("{TABLE_NAME}", tableName)
-                .replace("{FIELD_NAME}", column.name),
+                .replace("{TABLE_NAME}", model.name)
+                .replace("{FIELD_NAME}", field.name),
             "ADD INDEX TO COLUMN"
         );
 
@@ -199,15 +186,8 @@ END;
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Drop an index from the column
-     * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    dropIndex(tableName, columnName, returnQuery = false) {
-        const indexName = `${tableName}_index_${columnName}`.toLowerCase();
+    dropIndex(model, field, returnQuery = false) {
+        const indexName = SQLBaseManager.getIndexName(field.iid);
 
         const schema = "ALTER TABLE `{TABLE_NAME}` DROP INDEX `{INDEX_NAME}`;";
 
@@ -216,23 +196,15 @@ END;
 
         const SQL = this.ifWrapper(
             conditionSchema.replace("{INDEX_NAME}", indexName),
-            schema.replace("{INDEX_NAME}", indexName).replace("{TABLE_NAME}", tableName),
-            "DROP INDEX FROM COLUMN"
+            schema.replace("{INDEX_NAME}", indexName).replace("{TABLE_NAME}", model.name)
         );
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Add a unique constraint to a column
-     * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    addUniqueConstraint(tableName, columnName, returnQuery = false) {
-        const constraintName = `uc_${tableName}_${columnName}`.toLowerCase();
+    addUniqueConstraint(model, field, returnQuery = false) {
+        const constraintName = SQLBaseManager.getUniqueIndexName(field.iid);
 
         const schema = "ALTER TABLE `{TABLE_NAME}` ADD CONSTRAINT `{CONSTRAINT_NAME}` UNIQUE({FIELD_NAME});";
 
@@ -242,8 +214,8 @@ END;
             conditionSchema.replace("{CONSTRAINT_NAME}", constraintName),
             schema
                 .replace("{CONSTRAINT_NAME}", constraintName)
-                .replace("{TABLE_NAME}", tableName)
-                .replace("{FIELD_NAME}", columnName),
+                .replace("{TABLE_NAME}", model.name)
+                .replace("{FIELD_NAME}", field.name),
             "ADD UNIQUE CONSTRAINT TO COLUMN"
         );
 
@@ -251,15 +223,8 @@ END;
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Drop a unique constraint from the column
-     * @param {string} tableName - The table name
-     * @param {string} columnName - The column name
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    dropUniqueConstraint(tableName, columnName, returnQuery = false) {
-        const constraintName = `uc_${tableName}_${columnName}`.toLowerCase();
+    dropUniqueConstraint(model, field, returnQuery = false) {
+        const constraintName = SQLBaseManager.getUniqueIndexName(field.iid);
 
         const schema = "ALTER TABLE `{TABLE_NAME}` DROP INDEX `{CONSTRAINT_NAME}`;";
 
@@ -267,50 +232,34 @@ END;
 
         const SQL = this.ifWrapper(
             conditionSchema.replace("{CONSTRAINT_NAME}", constraintName),
-            schema.replace("{CONSTRAINT_NAME}", constraintName).replace("{TABLE_NAME}", tableName),
-            "DROP UNIQUE CONSTRAINT FROM COLUMN"
+            schema.replace("{CONSTRAINT_NAME}", constraintName).replace("{TABLE_NAME}", model.name)
         );
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Add a full text index to the table
-     * @param {string} tableName
-     * @param {string} columnName
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    addFullTextIndex(tableName, columnName, returnQuery = false) {
-        const indexName = `${tableName}_fulltext_${columnName}`.toLowerCase();
+    addFullTextIndex(model, field, returnQuery = false) {
+        const indexName = SQLBaseManager.getFullTextIndexName(field.iid);
 
         const schema = "CREATE FULLTEXT INDEX `{INDEX_NAME}` ON {TABLE_NAME}({FIELD_NAME});";
 
         const SQL = this.ifWrapper(
             MySQLDBManager.checkIndexConditionSchema
-                .replace("{TABLE_NAME}", tableName)
+                .replace("{TABLE_NAME}", model.name)
                 .replace("{INDEX_NAME}", indexName),
             schema
                 .replace("{INDEX_NAME}", indexName)
-                .replace("{TABLE_NAME}", tableName)
-                .replace("{FIELD_NAME}", columnName),
-            "ADD FULLTEXT INDEX TO COLUMN"
+                .replace("{TABLE_NAME}", model.name)
+                .replace("{FIELD_NAME}", field.name)
         );
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    /**
-     * @description Drop the full text index from the table
-     * @param {string} tableName
-     * @param {string} columnName
-     * @param {boolean} returnQuery - Return the query instead of running it
-     * @return {Promise<Object|[]>|string}
-     */
-    dropFullTextIndex(tableName, columnName, returnQuery = false) {
-        const indexName = `${tableName}_fulltext_${columnName}`.toLowerCase();
+    dropFullTextIndex(model, field, returnQuery = false) {
+        const indexName = SQLBaseManager.getFullTextIndexName(field.iid);
 
         const schema = "DROP INDEX `{INDEX_NAME}` ON `{TABLE_NAME}`;";
 
@@ -319,20 +268,13 @@ END;
 
         const SQL = this.ifWrapper(
             conditionSchema.replace("{INDEX_NAME}", indexName),
-            schema.replace("{INDEX_NAME}", indexName).replace("{TABLE_NAME}", tableName),
-            "DROP FULLTEXT INDEX FROM COLUMN"
+            schema.replace("{INDEX_NAME}", indexName).replace("{TABLE_NAME}", model.name)
         );
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    /**
-     * Drop the table
-     * @param {object} model - the model object
-     * @param {boolean} returnQuery - return the query or run it
-     * @return {Promise<void|string>}
-     */
     async dropModel(model, returnQuery = false) {
         let SQL = "SET FOREIGN_KEY_CHECKS = 0;";
         SQL += `\n DROP TABLE IF EXISTS \`${model.name}\`;`;
@@ -342,26 +284,34 @@ END;
         return this.runQuery(SQL);
     }
 
-    dropForeignKey(modelName, foreignKeyName, returnQuery = false) {
+    createModel({ fields, name }) {
+        const model = new Model(name);
+
+        for (const field of fields) {
+            const FieldClass = fieldMap.get(field.type);
+
+            if (!FieldClass) {
+                throw new AgnostError(t(`Field type '${field.type}' is not supported`));
+            }
+            model.addField(new FieldClass(field, this.getDbType()));
+        }
+
+        return model.toString();
+    }
+
+    dropForeignKey(model, foreignKeyName, returnQuery = false) {
         const query = MySQLDBManager.foreignKeyConditionSchema
             .replaceAll("{FOREIGN_KEY_DROP_SQL}", MySQLDBManager.dropForeignKeySchema)
             .replaceAll("{CONSTRAINT_NAME}", foreignKeyName)
             .replaceAll("{DATABASE_NAME}", this.getDatabaseName())
-            .replaceAll("{TABLE_NAME}", modelName);
+            .replaceAll("{TABLE_NAME}", model.name);
 
         const SQL = this.procedureWrapper(query, "DROP FOREIGN KEY");
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
 
-    /**
-     * Drop the field from the table
-     * @param {string} modelName - name of the table
-     * @param {object} field - the field to drop
-     * @param {boolean} returnQuery - return the query or run it
-     * @return {Promise<Object|[]> | string}
-     */
-    async dropField(modelName, field, returnQuery = false) {
+    async dropField(model, field, returnQuery = false) {
         const conditionSchema = `EXISTS(${MySQLDBManager.checkFieldConditionSchema})`;
 
         const foreignName = SQLBaseManager.getForeignKeyName(field.iid);
@@ -372,20 +322,20 @@ END;
             .replace(
                 "{FOREIGN_KEY_DROP_SQL}",
                 MySQLDBManager.dropForeignKeySchema
-                    .replace("{TABLE_NAME}", modelName)
+                    .replace("{TABLE_NAME}", model.name)
                     .replace("{CONSTRAINT_NAME}", foreignName)
             );
 
         query += "\n";
 
         query += MySQLDBManager.deleteFieldSchema
-            .replace("{TABLE_NAME}", modelName)
+            .replace("{TABLE_NAME}", model.name)
             .replace("{COLUMN_NAME}", field.name);
 
         const SQL = this.ifWrapper(
             conditionSchema
                 .replace("{DATABASE_NAME}", this.getDatabaseName())
-                .replace("{TABLE_NAME}", modelName)
+                .replace("{TABLE_NAME}", model.name)
                 .replace("{FIELD_NAME}", field.name),
             query,
             "DROP FIELD"
@@ -471,12 +421,6 @@ DROP PROCEDURE IF EXISTS ${name};`;
         return this.runQuery(`DROP DATABASE IF EXISTS ${dbName ?? this.getDatabaseNameToUse()};`);
     }
 
-    /**
-     * @description Set the nullability of the field
-     * @param modelName {string} - The name of the model
-     * @param field {object} - The field to set nullability
-     * @param returnQuery {boolean} - return the query or run it
-     */
     setNullability(modelName, field, returnQuery = false) {
         const FieldType = fieldMap.get(field.type);
         if (!FieldType) throw new AgnostError(t(`Field type '${field.type}' is not supported`));
