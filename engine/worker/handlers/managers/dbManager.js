@@ -217,8 +217,15 @@ export class DBManager {
 
                         if (field.isNameChanged) field.oldName = prevField.name;
 
-                        if (field.type === "text")
+                        if (field.type === "text") {
                             field.isSearchableChanged = prevField.text.searchable !== field.text.searchable;
+                            field.isMaxLengthChanged = prevField.text.maxLength < field.text.maxLength;
+                        }
+
+                        if (field.type === "encrypted-text") {
+                            field.isMaxLengthChanged =
+                                prevField.encryptedText.maxLength < field.encryptedText.maxLength;
+                        }
 
                         if (field.type === "rich-text")
                             field.isSearchableChanged = prevField.richText.searchable !== field.richText.searchable;

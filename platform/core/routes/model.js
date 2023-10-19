@@ -1116,7 +1116,7 @@ router.put(
 			// Assign the field update values
 			let fieldUpdateData = null;
 			let updatedAt = Date.now();
-			const fieldUnsetData = {};
+			let fieldUnsetData = {};
 
 			if (defaultValue === "$$unset") {
 				fieldUnsetData = { "fields.$.defaultValue": "" };

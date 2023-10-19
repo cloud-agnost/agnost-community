@@ -1,5 +1,6 @@
 import { SQLBaseManager } from "./SQLBaseManager.js";
 import fieldMap from "../sql-database/fieldMap.js";
+import { Text } from "../sql-database/data-types/index.js";
 import { customAlphabet } from "nanoid";
 
 export class MySQLDBManager extends SQLBaseManager {
@@ -500,7 +501,7 @@ DROP PROCEDURE IF EXISTS ${name};`;
     }
 
     removeDefaultValues(model, field, returnQuery = false) {
-        const SQL = `ALTER TABLE ${model.name} ALTER ${field.name} DROP DEFAULT;`;
+        const SQL = `ALTER TABLE ${model.name} ALTER ${field.name} SET DEFAULT NULL;`;
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
