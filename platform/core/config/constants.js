@@ -517,7 +517,7 @@ export const dbTypeMappings = {
 		"geo-point": "geography",
 		binary: "binary",
 		json: "nvarchar",
-		reference: "bigint",
+		reference: "int",
 		"basic-values-list": "undefined",
 		"object-list": "undefined",
 		object: "undefined",
