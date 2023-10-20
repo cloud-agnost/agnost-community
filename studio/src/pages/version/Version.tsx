@@ -3,12 +3,11 @@ import { VersionLayout } from '@/layouts/VersionLayout';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { cn } from '@/utils';
 import { useEffect } from 'react';
-import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
 export default function Version() {
 	const { pathname } = useLocation();
 	const { getVersionById } = useVersionStore();
 	const paths = pathname.split('/').filter((item) => /^[a-zA-Z-_]+$/.test(item));
-	const navigate = useNavigate();
 	const canView = useAuthorizeVersion('version.view');
 
 	const { appId, orgId, versionId } = useParams<{

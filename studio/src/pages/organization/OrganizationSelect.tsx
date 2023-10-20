@@ -23,7 +23,7 @@ export default function OrganizationSelect() {
 	}
 
 	return (
-		<div className='scroll p-6'>
+		<div className='p-6'>
 			<div className='select-organization-container'>
 				<h1 className='select-organization-title'>{t('organization.select')}</h1>
 				<div className='select-organization-items'>
