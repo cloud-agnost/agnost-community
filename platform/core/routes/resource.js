@@ -367,6 +367,10 @@ router.get(
 				resources.map((entry) => {
 					if (entry.access)
 						entry.access = helper.decryptSensitiveData(entry.access);
+					if (entry.accessReadOnly)
+						entry.accessReadOnly = helper.decryptSensitiveData(
+							entry.accessReadOnly
+						);
 					return entry;
 				})
 			);

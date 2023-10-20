@@ -271,11 +271,18 @@ export class MongoDB extends DatabaseBase {
 					return `$${tempName}`;
 				};
 				const joinQuery = joinDef.where.getQuery("MongoDB", letFillerFunction);
+
+				// If we have sort, skip and limit then add them
+				const tempPipeline = [];
+				this.createSortStage(joinDef.sort, tempPipeline);
+				this.createSkipStage(joinDef.skip, tempPipeline);
+				this.createLimitStage(joinDef.limit, tempPipeline);
+
 				pipeline.push({
 					$lookup: {
 						from: joinDef.from,
 						let: letPart,
-						pipeline: [{ $match: { $expr: joinQuery } }],
+						pipeline: [{ $match: { $expr: joinQuery } }, ...tempPipeline],
 						as: joinDef.as,
 					},
 				});
