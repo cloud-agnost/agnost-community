@@ -1,6 +1,5 @@
 import { SQLBaseManager } from "./SQLBaseManager.js";
 import fieldMap from "../sql-database/fieldMap.js";
-import { Text } from "../sql-database/data-types/index.js";
 import { customAlphabet } from "nanoid";
 import Model from "../sql-database/Model.js";
 
