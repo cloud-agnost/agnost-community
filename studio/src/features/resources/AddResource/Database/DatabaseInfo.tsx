@@ -1,40 +1,28 @@
 import { Input } from '@/components/Input';
 import { PasswordInput } from '@/components/PasswordInput';
-import { AccessDbSchema, ConnectDatabaseSchema } from '@/types';
+import { AccessDbSchema, ConnectResourceSchema, ResourceInstances } from '@/types';
 import { cn } from '@/utils';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-import CreateResourceItem from '../../../CreateResourceItem';
 interface DatabaseInfoProps {
 	modal: boolean;
 }
-
-type DatabaseInfoType = typeof ConnectDatabaseSchema & typeof AccessDbSchema;
+type DatabaseInfoType = typeof ConnectResourceSchema & typeof AccessDbSchema;
 
 export default function DatabaseInfo({ modal }: DatabaseInfoProps) {
-	const { t } = useTranslation();
-
-	return modal ? (
-		<DatabaseInfoForm modal={modal} />
-	) : (
-		<CreateResourceItem title={t('resources.fill_parameters')}>
-			<DatabaseInfoForm modal={modal} />
-		</CreateResourceItem>
-	);
-}
-
-function DatabaseInfoForm({ modal }: DatabaseInfoProps) {
-	const { t } = useTranslation();
 	const {
 		control,
 		formState: { errors },
 		watch,
 	} = useFormContext<z.infer<DatabaseInfoType>>();
-
+	const { t } = useTranslation();
 	return (
-		<div className='space-y-6'>
+		<div className='space-y-4'>
+			<h6 className=' font-sfCompact text-sm text-subtle '>
+				{t('resources.database.connection_info')}
+			</h6>
 			<div className='flex gap-6'>
 				<FormField
 					control={control}
@@ -84,7 +72,7 @@ function DatabaseInfoForm({ modal }: DatabaseInfoProps) {
 				)}
 			</div>
 			<div className='flex items-start gap-6'>
-				{watch('instance') !== 'Redis' && (
+				{watch('instance') !== ResourceInstances.Redis && (
 					<FormField
 						control={control}
 						name={modal ? 'username' : 'access.username'}

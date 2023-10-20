@@ -19,9 +19,17 @@ export { CreateMessageQueueSchema, MessageQueueSchema } from './queue.ts';
 export type * from './resource.ts';
 export {
 	AccessDbSchema,
-	ConnectDatabaseSchema,
-	ConnectQueueSchema,
+	AllowedRole,
 	ConnectResourceSchema,
+	KafkaConnFormat,
+	KafkaSaslMechanism,
+	MongoDBConnFormat,
+	RabbitMQConnFormat,
+	RabbitMQConnScheme,
+	ResourceCreateType,
+	ResourceInstances,
+	ResourceType,
+	CreateResourceSchema,
 } from './resource.ts';
 export type * from './storage.ts';
 export { BucketSchema, CreateStorageSchema, StorageSchema } from './storage.ts';

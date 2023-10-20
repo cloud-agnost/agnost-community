@@ -10,19 +10,18 @@ import {
 } from '@/components/Dialog';
 import { Form } from '@/components/Form';
 import { Pencil, TestConnection } from '@/components/icons';
-import { AccessDbSchema, ConnectDatabaseSchema } from '@/types';
+import { AccessDbSchema, ConnectResourceSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash } from '@phosphor-icons/react';
 import { useState, useEffect } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-import CreateResourceItem from '../../../CreateResourceItem';
-import DatabaseInfo from './DatabaseInfo';
-import MongoConnectionFormat from './MongoConnectionFormat';
+import { DatabaseInfo, MongoConnectionFormat } from '@/features/resources';
 import useResourceStore from '@/store/resources/resourceStore';
 import { useToast } from '@/hooks';
 import { INSTANCE_PORT_MAP } from '@/constants';
+
 export default function ReadReplicas() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
@@ -30,7 +29,7 @@ export default function ReadReplicas() {
 	const [loading, setLoading] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
 	const { setValue, getValues, reset, watch } =
-		useFormContext<z.infer<typeof ConnectDatabaseSchema>>();
+		useFormContext<z.infer<typeof ConnectResourceSchema>>();
 	const readReplicas = getValues('accessReadOnly') ?? [];
 	const replicasForm = useForm<z.infer<typeof AccessDbSchema>>({
 		resolver: zodResolver(AccessDbSchema),
@@ -65,10 +64,12 @@ export default function ReadReplicas() {
 		testExistingResourceConnection({
 			access: {
 				...replicasForm.getValues(),
+				options: replicasForm.getValues().options?.filter((option) => option.key && option.value),
+				brokers: replicasForm.getValues().brokers?.map((broker) => broker.key) as string[],
 			},
+			type: getValues('type'),
 			instance: getValues('instance'),
 			allowedRoles: getValues('allowedRoles'),
-			type: 'database',
 			onSuccess: () => {
 				setLoading(false);
 				notify({
@@ -93,11 +94,14 @@ export default function ReadReplicas() {
 		}
 	}, [watch('instance')]);
 	return (
-		<CreateResourceItem title={t('resources.database.add_replica')}>
+		<div>
+			<h6 className=' font-sfCompact text-sm text-subtle '>
+				{t('resources.database.read_replicas')}
+			</h6>
 			<div className='space-y-3'>
 				{getValues('accessReadOnly')?.map((replica, index) => (
 					<div
-						key={replica.host + replica.port}
+						key={index}
 						className='bg-wrapper-background-light p-3 flex items-center justify-between gap-6'
 					>
 						<div>
@@ -158,6 +162,6 @@ export default function ReadReplicas() {
 					</Form>
 				</DialogContent>
 			</Dialog>
-		</CreateResourceItem>
+		</div>
 	);
 }

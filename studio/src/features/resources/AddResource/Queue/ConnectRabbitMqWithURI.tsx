@@ -1,13 +1,18 @@
 import { Input } from '@/components/Input';
-import { FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
+import { ConnectResourceSchema, RabbitMQConnFormat } from '@/types';
+import { FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
+import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { ConnectQueueSchema } from '@/types';
 import * as z from 'zod';
 
 export default function ConnectRabbitMqWithURI() {
 	const { t } = useTranslation();
-	const form = useFormContext<z.infer<typeof ConnectQueueSchema>>();
+	const form = useFormContext<z.infer<typeof ConnectResourceSchema>>();
+
+	useEffect(() => {
+		form.setValue('access.format', RabbitMQConnFormat.URL);
+	}, []);
 
 	return (
 		<div className='flex flex-col gap-2'>
