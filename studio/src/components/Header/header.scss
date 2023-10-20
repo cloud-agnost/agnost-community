@@ -8,9 +8,7 @@
 
 	&-left {
 		@apply flex gap-4 items-center;
-		&-logo {
-			@apply flex items-center text-default;
-		}
+
 		&-organization-select {
 			@apply text-icon-base;
 		}
