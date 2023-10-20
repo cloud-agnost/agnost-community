@@ -6,6 +6,23 @@ export class SQLDatabase extends DatabaseBase {
 	}
 
 	/**
+	 * Merges two input arrays
+	 * @param  {Array} arr1 The first array
+	 * @param  {Array} arr2 The second array
+	 * @returns  Merged array
+	 */
+	mergeArrays(arr1, arr2) {
+		if (!arr1 && !arr2) return null;
+		// If arr1 is not an array, default to an empty array
+		arr1 = Array.isArray(arr1) ? arr1 : [];
+
+		// If arr2 is not an array, default to an empty array
+		arr2 = Array.isArray(arr2) ? arr2 : [];
+
+		return [...arr1, ...arr2];
+	}
+
+	/**
 	 * Returns the name of the SQL database table name. If schema exists then prepends the schema name.
 	 * @param  {Object} dbMeta The database metadata
 	 * @param  {Object} modelMeta The model metadata

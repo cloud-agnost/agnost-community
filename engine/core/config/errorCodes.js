@@ -81,7 +81,7 @@ const ERROR_CODES = {
 	invalidField: "invalid_field",
 	invalidExpression: "invalid_expression",
 	invalidFunction: "invalid_function",
-	invalidJoin: "invalid_join",
+	invalidJoin: "invalid_join_or_lookup",
 	invalidParameter: "invalid_parameter",
 	validationErrors: "validation_errors",
 	invalidCondition: "invalid_condition",

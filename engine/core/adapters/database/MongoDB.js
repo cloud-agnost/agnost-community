@@ -138,7 +138,7 @@ export class MongoDB extends DatabaseBase {
 	}
 
 	/**
-	 * Creates the lookup (join) stage of the pipeline
+	 * Creates the lookup stage of the pipeline
 	 * For referecen fields look up, uses the following structure
 		{
 			"$lookup": {
@@ -158,6 +158,82 @@ export class MongoDB extends DatabaseBase {
 	 * @param  {any[]} pipeline The pipeline array
 	 */
 	createJoinStage(joins, pipeline) {
+		if (!joins) return;
+		for (const joinDef of joins) {
+			if (joinDef.joinType === "simple") {
+				// For simple lookups we just need to return one matching record
+				const tempName = this.generateTempFieldName();
+				pipeline.push({
+					$lookup: {
+						from: joinDef.joinModel.getName(),
+						let: { [tempName]: `$${joinDef.field.getQueryPath()}` },
+						pipeline: [
+							{ $match: { $expr: { $eq: ["$_id", `$$${tempName}`] } } },
+						],
+						as: joinDef.field.getQueryPath(),
+					},
+				});
+
+				pipeline.push({
+					$unwind: {
+						path: `$${joinDef.field.getQueryPath()}`,
+						preserveNullAndEmptyArrays: true,
+					},
+				});
+			} else {
+				const letPart = {};
+				const letFillerFunction = (fieldName) => {
+					// If a temp let value for the field has already been created use it
+					for (const [key, value] of Object.entries(letPart)) {
+						if (value === `$${fieldName}`) return `$${key}`;
+					}
+
+					// This is a new let entry create a new one
+					const tempName = this.generateTempFieldName();
+					letPart[tempName] = `$${fieldName}`;
+					return `$${tempName}`;
+				};
+				const joinQuery = joinDef.where.getQuery("MongoDB", letFillerFunction);
+				pipeline.push({
+					$lookup: {
+						from: joinDef.from,
+						let: letPart,
+						pipeline: [{ $match: { $expr: joinQuery } }],
+						as: joinDef.as,
+					},
+				});
+
+				pipeline.push({
+					$unwind: {
+						path: `$${joinDef.as}`,
+						preserveNullAndEmptyArrays: true,
+					},
+				});
+			}
+		}
+	}
+
+	/**
+	 * Creates the lookup stage of the pipeline
+	 * For referecen fields look up, uses the following structure
+		{
+			"$lookup": {
+				"from": "target_model_name",
+				"let": {"fieldName": "$appPlan"},
+				"pipeline": [{$match: { $expr: { $eq: ["$_id", "$$fieldName"] } } }]
+				"as": "appPlan"
+			}
+		},
+		{
+			"$unwind": {
+				"path": "$appPlan",
+				"preserveNullAndEmptyArrays": true
+			}
+		}
+	 * @param  {Array} joins The list of lookup definitions
+	 * @param  {any[]} pipeline The pipeline array
+	 */
+	createLookupStage(joins, pipeline) {
 		if (!joins) return;
 		for (const joinDef of joins) {
 			if (joinDef.joinType === "simple") {
@@ -468,7 +544,7 @@ export class MongoDB extends DatabaseBase {
 	 * @param  {Object} dbMeta The database metadata
 	 * @param  {Object} modelMeta The model metadata
 	 * @param  {Object} options The id option
-	 * @returns  Inserted record count
+	 * @returns  Deleted record count
 	 */
 	async deleteById(dbMeta, modelMeta, options) {
 		const dbName = this.getAppliedDbName(dbMeta);
@@ -512,11 +588,18 @@ export class MongoDB extends DatabaseBase {
 			this.createWhereStage(options.where, pipeline);
 
 			// Only return the ids of the records to delete
-			pipeline.push({
-				$project: {
-					_id: 1,
+			pipeline.push(
+				{
+					$group: {
+						_id: "$_id",
+					},
 				},
-			});
+				{
+					$project: {
+						_id: 1,
+					},
+				}
+			);
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
@@ -578,11 +661,18 @@ export class MongoDB extends DatabaseBase {
 			this.createWhereStage(options.where, pipeline);
 
 			// Only return the ids of the records to delete
-			pipeline.push({
-				$project: {
-					_id: 1,
+			pipeline.push(
+				{
+					$group: {
+						_id: "$_id",
+					},
 				},
-			});
+				{
+					$project: {
+						_id: 1,
+					},
+				}
+			);
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
@@ -642,7 +732,7 @@ export class MongoDB extends DatabaseBase {
 		if (options.join?.length > 0) {
 			const pipeline = [];
 			this.createMatchStage(options.id, pipeline);
-			this.createJoinStage(options.join, pipeline);
+			this.createLookupStage(options.lookup, pipeline);
 			this.createProjectStage(options.select, options.omit, pipeline);
 
 			const dataCursor = await collection.aggregate(pipeline, {
@@ -691,13 +781,15 @@ export class MongoDB extends DatabaseBase {
 			: "primary";
 
 		// If we the the lookups the we need to rund the aggregation pipeline
-		if (options.join?.length > 0) {
+		if (options.join?.length > 0 || options.lookup?.length > 0) {
 			const pipeline = [];
 			if (options.where && options.where.hasJoinFieldValues()) {
 				this.createJoinStage(options.join, pipeline);
 				this.createWhereStage(options.where, pipeline);
+				this.createLookupStage(options.lookup, pipeline);
 			} else {
 				this.createWhereStage(options.where, pipeline);
+				this.createLookupStage(options.lookup, pipeline);
 				this.createJoinStage(options.join, pipeline);
 			}
 
@@ -705,8 +797,6 @@ export class MongoDB extends DatabaseBase {
 			this.createSkipStage(options.skip, pipeline);
 			this.createLimitStage(1, pipeline);
 			this.createProjectStage(options.select, options.omit, pipeline);
-
-			console.log("***here", JSON.stringify(pipeline, null, 2));
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
@@ -755,13 +845,15 @@ export class MongoDB extends DatabaseBase {
 			: "primary";
 
 		// If we the the lookups the we need to rund the aggregation pipeline
-		if (options.join?.length > 0) {
+		if (options.join?.length > 0 || options.lookup?.length > 0) {
 			const pipeline = [];
 			if (options.where && options.where.hasJoinFieldValues()) {
 				this.createJoinStage(options.join, pipeline);
 				this.createWhereStage(options.where, pipeline);
+				this.createLookupStage(options.lookup, pipeline);
 			} else {
 				this.createWhereStage(options.where, pipeline);
+				this.createLookupStage(options.lookup, pipeline);
 				this.createJoinStage(options.join, pipeline);
 			}
 
@@ -856,11 +948,18 @@ export class MongoDB extends DatabaseBase {
 			this.createWhereStage(options.where, pipeline);
 
 			// Only return the ids of the records to delete
-			pipeline.push({
-				$project: {
-					_id: 1,
+			pipeline.push(
+				{
+					$group: {
+						_id: "$_id",
+					},
 				},
-			});
+				{
+					$project: {
+						_id: 1,
+					},
+				}
+			);
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
@@ -932,11 +1031,18 @@ export class MongoDB extends DatabaseBase {
 			this.createWhereStage(options.where, pipeline);
 
 			// Only return the ids of the records to delete
-			pipeline.push({
-				$project: {
-					_id: 1,
+			pipeline.push(
+				{
+					$group: {
+						_id: "$_id",
+					},
 				},
-			});
+				{
+					$project: {
+						_id: 1,
+					},
+				}
+			);
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
@@ -1054,8 +1160,10 @@ export class MongoDB extends DatabaseBase {
 		if (options.where && options.where.hasJoinFieldValues()) {
 			this.createJoinStage(options.join, pipeline);
 			this.createWhereStage(options.where, pipeline);
+			this.createLookupStage(options.lookup, pipeline);
 		} else {
 			this.createWhereStage(options.where, pipeline);
+			this.createLookupStage(options.lookup, pipeline);
 			this.createJoinStage(options.join, pipeline);
 		}
 

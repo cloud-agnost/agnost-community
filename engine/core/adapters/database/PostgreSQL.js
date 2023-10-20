@@ -56,13 +56,14 @@ export class PostgreSQL extends SQLDatabase {
 
 	/**
 	 * Prepares the select part of the query namely the fields that will be returned.
+	 * @param  {Object} dbMeta The database metadata
 	 * @param  {Object} modelMeta The model metadata
 	 * @param  {Array} select The included fields
 	 * @param  {Array} omit The exdluded fields
 	 * @param  {Array} joins The list of join definitions
 	 * @returns  The select for SQL or projection for no-SQL definiton
 	 */
-	getJoinedSelectDefinition(modelMeta, select, omit, joins) {
+	getJoinLookupSelectDefinition(dbMeta, modelMeta, select, omit, joins) {
 		// If no select or omit definition or joins then return all fields of the base model
 		if (!select && !omit && (!joins || joins.length === 0))
 			return `${modelMeta.name}.*`;
@@ -91,10 +92,19 @@ export class PostgreSQL extends SQLDatabase {
 		// If we have joins but no select or omit definition then return all
 		if (joins.length > 0 && !select && !omit) {
 			// Add the base model entries
-			const selectEntries = [`${modelMeta.name}.*`];
+			const selectEntries = [
+				this.getBaseModelSelectEntries(
+					modelMeta.name,
+					modelMeta.fields,
+					null,
+					false
+				),
+			];
+
 			for (const joinDef of joins) {
 				const joinedModelMeta = joinDef.joinModel.getMetaObj();
-				if (joinDef.joinType === "simple") {
+				// Join type if join (not lookup) then aggregate as json object
+				if (joinDef.type === "join") {
 					selectEntries.push(
 						`CASE WHEN ${joinDef.as}.${
 							this.getIdField(joinedModelMeta).name
@@ -105,16 +115,39 @@ export class PostgreSQL extends SQLDatabase {
 							false
 						)} END AS ${joinDef.as}`
 					);
+				} else if (joinDef.joinType === "simple") {
+					selectEntries.push(
+						`COALESCE(
+							(
+								SELECT ${this.getJsonBuildObjectString(
+									joinDef.as,
+									joinedModelMeta.fields,
+									null,
+									false
+								)}
+								FROM ${this.getTableName(dbMeta, joinedModelMeta)} AS ${joinDef.as}
+								WHERE ${modelMeta.name}.${joinDef.field.getName()} = ${joinDef.as}.${
+							this.getIdField(joinedModelMeta).name
+						}
+							),
+							NULL
+						) AS ${joinDef.as}`
+					);
 				} else if (joinDef.joinType === "complex") {
 					selectEntries.push(
-						`CASE WHEN COUNT(${joinDef.as}.${
-							this.getIdField(joinedModelMeta).name
-						}) = 0 THEN '[]'::json ELSE json_agg(${this.getJsonBuildObjectString(
-							joinDef.as,
-							joinedModelMeta.fields,
-							null,
-							false
-						)}) END AS ${joinDef.as}`
+						`COALESCE(
+						(
+							SELECT json_agg(${this.getJsonBuildObjectString(
+								joinDef.as,
+								joinedModelMeta.fields,
+								null,
+								false
+							)})
+							FROM ${this.getTableName(dbMeta, joinedModelMeta)} AS ${joinDef.as}
+							WHERE ${joinDef.where.getQuery("PostgreSQL")}
+						),
+						'[]'::json
+					) AS ${joinDef.as}`
 					);
 				}
 			}
@@ -133,12 +166,23 @@ export class PostgreSQL extends SQLDatabase {
 			list,
 			include
 		);
+
 		if (baseModelEntries && baseModelEntries !== "")
 			selectEntries.push(baseModelEntries);
 
 		for (const joinDef of joins) {
 			const joinedModelMeta = joinDef.joinModel.getMetaObj();
-			if (joinDef.joinType === "simple") {
+			const hasSelectEntry = this.hasJoinedModelSelectEntry(
+				joinDef.as,
+				joinedModelMeta.fields,
+				list,
+				include
+			);
+
+			// If joined model does not have any select entry then skip
+			if (!hasSelectEntry) continue;
+
+			if (joinDef.type === "join") {
 				selectEntries.push(
 					`CASE WHEN ${joinDef.as}.${
 						this.getIdField(joinedModelMeta).name
@@ -149,16 +193,40 @@ export class PostgreSQL extends SQLDatabase {
 						include
 					)} END AS ${joinDef.as}`
 				);
+			} else if (joinDef.joinType === "simple") {
+				selectEntries.push(
+					`COALESCE(
+						(
+							SELECT ${this.getJsonBuildObjectString(
+								joinDef.as,
+								joinedModelMeta.fields,
+								list,
+								include
+							)}
+							FROM ${this.getTableName(dbMeta, joinedModelMeta)} AS ${joinDef.as}
+							WHERE ${modelMeta.name}.${joinDef.field.getName()} = ${joinDef.as}.${
+						this.getIdField(joinedModelMeta).name
+					}
+							LIMIT 1
+						),
+						NULL
+					) AS ${joinDef.as}`
+				);
 			} else if (joinDef.joinType === "complex") {
 				selectEntries.push(
-					`CASE WHEN COUNT(${joinDef.as}.${
-						this.getIdField(joinedModelMeta).name
-					}) = 0 THEN '[]'::json ELSE json_agg(${this.getJsonBuildObjectString(
-						joinDef.as,
-						joinedModelMeta.fields,
-						list,
-						include
-					)}) END AS ${joinDef.as}`
+					`COALESCE(
+						(
+							SELECT json_agg(${this.getJsonBuildObjectString(
+								joinDef.as,
+								joinedModelMeta.fields,
+								list,
+								include
+							)})
+							FROM ${this.getTableName(dbMeta, joinedModelMeta)} AS ${joinDef.as}
+							WHERE ${joinDef.where.getQuery("PostgreSQL")}
+						),
+						'[]'::json
+					) AS ${joinDef.as}`
 				);
 			}
 		}
@@ -189,6 +257,27 @@ export class PostgreSQL extends SQLDatabase {
 		if (fields.length === filteredFields.length) return `${prefix}.*`;
 
 		return filteredFields.map((entry) => `${prefix}.${entry.name}`).join(", ");
+	}
+
+	// Returns true if the joined model has select entries. We should not return joined model values if they are not selected
+	hasJoinedModelSelectEntry(prefix, fields, list, include) {
+		let filteredFields = fields;
+
+		// If we have omits or select definitions then come up with the final list
+		if (list) {
+			const listFields = list.map((entry) => entry.fieldName);
+
+			if (include)
+				filteredFields = filteredFields.filter((entry) =>
+					listFields.includes(`${prefix}.${entry.name}`)
+				);
+			else
+				filteredFields = filteredFields.filter(
+					(entry) => !listFields.includes(`${prefix}.${entry.name}`)
+				);
+		}
+
+		return filteredFields.length > 0;
 	}
 
 	// Returns the json object in following format
@@ -254,6 +343,45 @@ export class PostgreSQL extends SQLDatabase {
 	}
 
 	/**
+	 * Prepares the where part of the query
+	 * @param  {object} where The where expression
+	 * @returns  The WHERE query string
+	 */
+	getWhereDefinition(where) {
+		if (!where) return null;
+
+		return where.getQuery("PostgreSQL");
+	}
+
+	/**
+	 * Prepares the 'group by' part of the query
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Array} joins The list of join definitions
+	 * @returns  The GROUP BY query string
+	 */
+	getGroupByDefinition(modelMeta, joins) {}
+
+	/**
+	 * Prepares the 'order by' part of the query
+	 * @param  {Array} sort The sort definition list
+	 * @returns  The ORDER BY query string
+	 */
+	getOrderByDefinition(sort) {
+		if (!sort || sort.length === 0) return null;
+
+		const sortList = [];
+		for (const entry of sort) {
+			if (entry.joinType === "none")
+				sortList.push(
+					`${entry.joinModel.getName()}.${entry.field.getName()} ${entry.order.toUpperCase()}`
+				);
+			else sortList.push(`${entry.fieldPath} ${entry.order.toUpperCase()}`);
+		}
+
+		return sortList.join(", ");
+	}
+
+	/**
 	 * Inserts a new record to the database and returns the inserted record
 	 * @param  {Object} dbMeta The database metadata
 	 * @param  {Object} modelMeta The model metadata
@@ -287,7 +415,8 @@ export class PostgreSQL extends SQLDatabase {
 	 * @returns  Inserted record count
 	 */
 	async createMany(dbMeta, modelMeta, data) {
-		if (data.length === 0) return 0;
+		// If nothing to insert return zero
+		if (data.length === 0) return { count: 0 };
 
 		try {
 			// Begin the transaction
@@ -309,7 +438,7 @@ export class PostgreSQL extends SQLDatabase {
 			const result = await this.driver.query(insertQuery, values);
 			await this.commitTransaction(dbMeta);
 
-			return result.rowCount;
+			return { count: result.rowCount };
 		} catch (err) {
 			await this.rollbackTransaction(dbMeta);
 			throw err;
@@ -325,10 +454,12 @@ export class PostgreSQL extends SQLDatabase {
 	 */
 	async findById(dbMeta, modelMeta, options) {
 		const from = this.getTableName(dbMeta, modelMeta);
-		const select = this.getSelectDefinition(
+		const select = this.getJoinLookupSelectDefinition(
+			dbMeta,
 			modelMeta,
 			options.select,
-			options.omit
+			options.omit,
+			options.lookup
 		);
 		const idField = this.getIdField(modelMeta);
 
@@ -354,33 +485,83 @@ export class PostgreSQL extends SQLDatabase {
 	 * @returns  The fetched record otherwise null if no record can be found
 	 */
 	async findOne(dbMeta, modelMeta, options) {
-		for (const join of options.join) {
-			console.log("***join", {
-				joinType: join.joinType,
-				as: join.as,
-				from: join.from,
-				fieldPath: join.fieldPath,
-			});
-		}
-
 		const from = this.getTableName(dbMeta, modelMeta);
-		const select = this.getJoinedSelectDefinition(
+		const select = this.getJoinLookupSelectDefinition(
+			dbMeta,
 			modelMeta,
 			options.select,
 			options.omit,
-			options.join
+			this.mergeArrays(options.lookup, options.join)
 		);
+
 		const joins = this.getJoinDefinitions(modelMeta, options.join);
+		const where = this.getWhereDefinition(options.where);
+		const orderBy = this.getOrderByDefinition(options.sort);
+		const limit = 1;
+		const offset = options.skip ?? 0;
 
 		// SQL query to select a record from the database
-		const selectQuery = `
-				SELECT ${select} FROM ${from} as ${modelMeta.name}
-			  `;
+		let selectQuery = "";
+		selectQuery = `SELECT ${select}`;
+		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
 
-		console.log("***joins", joins);
+		if (joins) selectQuery = `${selectQuery}\n${joins}`;
+		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
+		if (orderBy) selectQuery = `${selectQuery}\nORDER BY ${orderBy}`;
 
-		//const sort = this.getSortDefinition(options.sort);
-		return null;
+		selectQuery = `${selectQuery}\nLIMIT ${limit}`;
+		selectQuery = `${selectQuery}\nOFFSET ${offset};`;
+
+		console.log("***sql", selectQuery);
+
+		// Execute the SELECT query
+		const result = await this.driver.query(selectQuery);
+
+		return result.rows && result.rows.length > 0 ? result.rows[0] : null;
+	}
+
+	/**
+	 * Returns the records matching the where condition from the database.
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The where, select, omit, join, sort, skip, limit and useReadReplica options
+	 * @returns  The fetched records otherwise an empty array [] if no records can be found
+	 */
+	async findMany(dbMeta, modelMeta, options) {
+		const from = this.getTableName(dbMeta, modelMeta);
+		const select = this.getJoinLookupSelectDefinition(
+			dbMeta,
+			modelMeta,
+			options.select,
+			options.omit,
+			this.mergeArrays(options.lookup, options.join)
+		);
+
+		const joins = this.getJoinDefinitions(modelMeta, options.join);
+		const where = this.getWhereDefinition(options.where);
+		//const groupBy = this.getGroupByDefinition(modelMeta, options.join);
+		const orderBy = this.getOrderByDefinition(options.sort);
+		const limit = options.limit ?? null;
+		const offset = options.skip ?? null;
+
+		// SQL query to select a record from the database
+		let selectQuery = "";
+		selectQuery = `SELECT ${select}`;
+		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+
+		if (joins) selectQuery = `${selectQuery}\n${joins}`;
+		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
+		if (orderBy) selectQuery = `${selectQuery}\nORDER BY ${orderBy}`;
+
+		if (limit) selectQuery = `${selectQuery}\nLIMIT ${limit}`;
+		if (offset) selectQuery = `${selectQuery}\nOFFSET ${offset};`;
+
+		console.log("***sql", selectQuery);
+
+		// Execute the SELECT query
+		const result = await this.driver.query(selectQuery);
+
+		return result.rows && result.rows.length > 0 ? result.rows : [];
 	}
 
 	/**
@@ -394,7 +575,7 @@ export class PostgreSQL extends SQLDatabase {
 		const from = this.getTableName(dbMeta, modelMeta);
 		const idField = this.getIdField(modelMeta);
 
-		// SQL query to select a record from the database
+		// SQL query to delete a record from the database
 		const deleteQuery = `
 					DELETE FROM ${from}
 					WHERE ${idField.name} = ${this.getIdSQLValue(options.id)};
@@ -402,10 +583,107 @@ export class PostgreSQL extends SQLDatabase {
 
 		console.log("***sql", deleteQuery);
 
-		// Execute the SELECT query
+		// Execute the DELETE query
 		const result = await this.driver.query(deleteQuery);
 
-		return result.rowCount;
+		return { count: result.rowCount };
+	}
+
+	/**
+	 * Deletes the first record matching the where condition and returns the deleted record count
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The where condition and join options
+	 * @returns  Deleted record count
+	 */
+	async deleteOne(dbMeta, modelMeta, options) {
+		// We first identify the id of the record to update
+		const idField = this.getIdField(modelMeta);
+		const from = this.getTableName(dbMeta, modelMeta);
+		const select = `${modelMeta.name}.${idField.name}`;
+		const joins = this.getJoinDefinitions(modelMeta, options.join);
+		const where = this.getWhereDefinition(options.where);
+		const limit = 1;
+		const offset = 0;
+
+		// SQL query to select a record from the database
+		let selectQuery = "";
+		selectQuery = `SELECT ${select}`;
+		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+
+		if (joins) selectQuery = `${selectQuery}\n${joins}`;
+		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
+		selectQuery = `${selectQuery}\nLIMIT ${limit}`;
+		selectQuery = `${selectQuery}\nOFFSET ${offset};`;
+
+		console.log("***sql", selectQuery);
+
+		// Execute the SELECT query
+		const result = await this.driver.query(selectQuery);
+
+		const id =
+			result.rows && result.rows.length > 0
+				? result.rows[0][idField.name]
+				: null;
+
+		if (id === null) return { count: 0 };
+
+		// Set options id value and perform the updates
+		options.id = id;
+		return await this.deleteById(dbMeta, modelMeta, options);
+	}
+
+	/**
+	 * Deletes the records matching the where condition and returns the deleted record count
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The where condition and join options
+	 * @returns  Deleted record count
+	 */
+	async deleteMany(dbMeta, modelMeta, options) {
+		// We first identify the ids of the records to update
+		// const updates = this.getUpdateDefinition(dbMeta, modelMeta);
+		const idField = this.getIdField(modelMeta);
+		const from = this.getTableName(dbMeta, modelMeta);
+		const select = `${modelMeta.name}.${idField.name}`;
+		const joins = this.getJoinDefinitions(modelMeta, options.join);
+		const where = this.getWhereDefinition(options.where);
+
+		// SQL query to select a record from the database
+		let selectQuery = "";
+		selectQuery = `SELECT ${select}`;
+		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+
+		if (joins) selectQuery = `${selectQuery}\n${joins}`;
+		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
+		selectQuery = `${selectQuery}\nGROUP BY ${select}`;
+
+		console.log("***sql", selectQuery);
+
+		// Execute the SELECT query
+		const selectResult = await this.driver.query(selectQuery);
+		const rows =
+			selectResult.rows && selectResult.rows.length > 0
+				? selectResult.rows
+				: null;
+
+		if (rows === null) return { count: 0 };
+
+		// Get the list of id values
+		const ids = rows.map((entry) => entry[idField.name]);
+
+		// SQL query to delete records from the database
+		const deleteQuery = `
+						DELETE FROM ${from}
+						WHERE ${idField.name} IN (${ids.join(", ")});
+					`;
+
+		console.log("***sql", deleteQuery);
+
+		// Execute the DELETE query
+		const result = await this.driver.query(deleteQuery);
+
+		return { count: result.rowCount };
 	}
 
 	/**
@@ -429,7 +707,7 @@ export class PostgreSQL extends SQLDatabase {
 		// const updates = this.getUpdateDefinition(dbMeta, modelMeta);
 		const idField = this.getIdField(modelMeta);
 
-		// SQL query to select a record from the database
+		// SQL query to update a record
 		const updateQuery = `
 						UPDATE ${from}
 						SET ${updates}
@@ -440,9 +718,112 @@ export class PostgreSQL extends SQLDatabase {
 		console.log("***sql", updateQuery);
 		console.log("***values", values);
 
-		// Execute the SELECT query
+		// Execute the UPDATE query
 		const result = await this.driver.query(updateQuery, values);
 
 		return result.rows && result.rows.length > 0 ? result.rows[0] : null;
+	}
+
+	/**
+	 * Updates the first record matching the where condition using the update instructions.
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The where, join and update options
+	 * @returns  The updated record otherwise null if no record can be found
+	 */
+	async updateOne(dbMeta, modelMeta, options) {
+		// We first identify the id of the record to update
+		const idField = this.getIdField(modelMeta);
+		const from = this.getTableName(dbMeta, modelMeta);
+		const select = `${modelMeta.name}.${idField.name}`;
+		const joins = this.getJoinDefinitions(modelMeta, options.join);
+		const where = this.getWhereDefinition(options.where);
+		const limit = 1;
+		const offset = 0;
+
+		// SQL query to select a record from the database
+		let selectQuery = "";
+		selectQuery = `SELECT ${select}`;
+		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+
+		if (joins) selectQuery = `${selectQuery}\n${joins}`;
+		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
+		selectQuery = `${selectQuery}\nLIMIT ${limit}`;
+		selectQuery = `${selectQuery}\nOFFSET ${offset};`;
+
+		console.log("***sql", selectQuery);
+
+		// Execute the SELECT query
+		const result = await this.driver.query(selectQuery);
+
+		const id =
+			result.rows && result.rows.length > 0
+				? result.rows[0][idField.name]
+				: null;
+
+		if (id === null) return null;
+
+		// Set options id value and perform the updates
+		options.id = id;
+		return await this.updateById(dbMeta, modelMeta, options);
+	}
+
+	/**
+	 * Updates the records matching the where condition using the update instructions.
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The where, join and update options
+	 * @returns  Updated record count
+	 */
+	async updateMany(dbMeta, modelMeta, options) {
+		// We first identify the ids of the records to update
+		// const updates = this.getUpdateDefinition(dbMeta, modelMeta);
+		const idField = this.getIdField(modelMeta);
+		const from = this.getTableName(dbMeta, modelMeta);
+		const select = `${modelMeta.name}.${idField.name}`;
+		const joins = this.getJoinDefinitions(modelMeta, options.join);
+		const where = this.getWhereDefinition(options.where);
+
+		// SQL query to select a record from the database
+		let selectQuery = "";
+		selectQuery = `SELECT ${select}`;
+		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+
+		if (joins) selectQuery = `${selectQuery}\n${joins}`;
+		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
+		selectQuery = `${selectQuery}\nGROUP BY ${select}`;
+
+		console.log("***sql", selectQuery);
+
+		// Execute the SELECT query
+		const selectResult = await this.driver.query(selectQuery);
+		const rows =
+			selectResult.rows && selectResult.rows.length > 0
+				? selectResult.rows
+				: null;
+
+		if (rows === null) return { count: 0 };
+
+		// Get the list of id values
+		const ids = rows.map((entry) => entry[idField.name]);
+		const { updates, values } = this.getUpdateDefinition(
+			modelMeta,
+			options.updateData
+		);
+
+		// SQL query to update records
+		const updateQuery = `
+						UPDATE ${from}
+						SET ${updates}
+						WHERE ${idField.name} IN (${ids.join(", ")});
+					`;
+
+		console.log("***sql", updateQuery);
+		console.log("***values", values);
+
+		// Execute the UPDATE query
+		const result = await this.driver.query(updateQuery, values);
+
+		return { count: result.rowCount };
 	}
 }

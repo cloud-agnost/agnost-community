@@ -65,6 +65,9 @@
 					constructor(e, t) {
 						super(e, t), (this.managers = new Map());
 					}
+					clearClientCache() {
+						this.managers.clear();
+					}
 					storage(e) {
 						if (!(0, c.isString)(e))
 							throw new p.ClientError(
@@ -254,17 +257,17 @@
 					C = n(r(6835)),
 					j = n(r(5191)),
 					D = n(r(2115)),
-					F = n(r(6509)),
-					A = n(r(4207)),
+					A = n(r(6509)),
+					F = n(r(4207)),
 					N = n(r(6032)),
 					I = n(r(2228)),
 					S = n(r(6683)),
 					Q = n(r(587)),
 					L = n(r(5102)),
-					U = n(r(4175)),
-					V = n(r(929)),
+					k = n(r(4175)),
+					U = n(r(929)),
 					Y = n(r(1021)),
-					k = n(r(1401)),
+					V = n(r(1401)),
 					q = n(r(6222)),
 					G = n(r(5331)),
 					J = n(r(3236)),
@@ -331,17 +334,17 @@
 					$right: C.default,
 					$round: j.default,
 					$rtrim: D.default,
-					$sqrt: F.default,
-					$startswith: A.default,
+					$sqrt: A.default,
+					$startswith: F.default,
 					$substring: N.default,
 					$subtract: I.default,
 					$trim: S.default,
 					$upper: Q.default,
 					$size: L.default,
-					$exp: U.default,
-					$ln: V.default,
+					$exp: k.default,
+					$ln: U.default,
 					$log: Y.default,
-					$log10: k.default,
+					$log10: V.default,
 					$pow: q.default,
 					$sin: G.default,
 					$cos: J.default,
@@ -2898,7 +2901,7 @@
 								return r;
 							case i.DBTYPE.POSTGRESQL:
 							case i.DBTYPE.MYSQL:
-								return "output.join(', ')";
+								return `${r.join(", ")}`;
 							default:
 								return r;
 						}
@@ -4824,6 +4827,7 @@
 								id: null,
 								skip: null,
 								limit: null,
+								lookup: null,
 								join: null,
 								where: null,
 								sort: null,
@@ -4891,7 +4895,7 @@
 						if (n.length > 0)
 							throw new f.ClientError(
 								"invalid_field",
-								`Select option needs to specify the names of valid fields of the base model or fields of the joined models. The following fields cannot be specified in select option '${n.join(
+								`Select option needs to specify the names of valid fields of the base model or fields of the joined/lookup models. The following fields cannot be specified in select option '${n.join(
 									", "
 								)}'`
 							);
@@ -5020,6 +5024,41 @@
 							}
 						return null;
 					}
+					checkJoinAndLookupDuplicates() {
+						if (this.definition.lookup && this.definition.join)
+							for (const e of this.definition.lookup)
+								for (const t of this.definition.join)
+									if (e.as.toLowerCase() === t.as.toLowerCase())
+										throw new f.ClientError(
+											"invalid_join_or_lookup",
+											`Not a valid join/lookup definition. The alias '${e.as}' has been used in both lookup and join definitions. The alias names need to be unique across lookup and join definitions.`
+										);
+					}
+					setLookup(e) {
+						if (!e) return;
+						const t = [];
+						if ("string" == typeof e) this.processStringBasedJoin(e, e, t);
+						else if ("object" != typeof e || Array.isArray(e)) {
+							if (!Array.isArray(e))
+								throw new f.ClientError(
+									"invalid_join_or_lookup",
+									"Not a valid join/lookup definition."
+								);
+							for (const r of e)
+								if ("string" == typeof r) this.processStringBasedJoin(r, e, t);
+								else {
+									if ("object" != typeof r || Array.isArray(r))
+										throw new f.ClientError(
+											"invalid_join_or_lookup",
+											"Not a valid join/lookup definition. The join/lookup array needs to include either reference field names as string or complex join/lookup definition as JSON object with 'as', 'from' and 'where' values."
+										);
+									this.processObjectBasedJoin(r, e, t);
+								}
+						} else this.processObjectBasedJoin(e, e, t);
+						0 !== t.length &&
+							(t.forEach((e) => (e.type = "lookup")),
+							(this.definition.lookup = t));
+					}
 					setJoin(e) {
 						if (!e) return;
 						const t = [];
@@ -5027,36 +5066,37 @@
 						else if ("object" != typeof e || Array.isArray(e)) {
 							if (!Array.isArray(e))
 								throw new f.ClientError(
-									"invalid_join",
-									"Not a valid join definition."
+									"invalid_join_or_lookup",
+									"Not a valid join/lookup definition."
 								);
 							for (const r of e)
 								if ("string" == typeof r) this.processStringBasedJoin(r, e, t);
 								else {
 									if ("object" != typeof r || Array.isArray(r))
 										throw new f.ClientError(
-											"invalid_join",
-											"Not a valid join definition. The join array needs to include either reference field names as string or complex join definition as JSON object with 'as', 'from' and 'where' values."
+											"invalid_join_or_lookup",
+											"Not a valid join/lookup definition. The join/lookup array needs to include either reference field names as string or complex join/lookup definition as JSON object with 'as', 'from' and 'where' values."
 										);
 									this.processObjectBasedJoin(r, e, t);
 								}
 						} else this.processObjectBasedJoin(e, e, t);
-						this.definition.join = t;
+						0 !== t.length &&
+							(t.forEach((e) => (e.type = "join")), (this.definition.join = t));
 					}
 					processStringBasedJoin(e, t, r) {
 						const n = this.getFieldObject(e, t);
 						if (!n || "reference" !== n.field.getType())
 							throw new f.ClientError(
-								"invalid_join",
-								`'${e}' is not a valid reference field to join. You can either join reference fields or define join queries.`
+								"invalid_join_or_lookup",
+								`'${e}' is not a valid reference field to join/lookup. You can either join/lookup reference fields or define join/lookup queries.`
 							);
 						const i = this.model
 							.getDb()
 							.getModelByIId(n.field.getRefModelIId());
-						if (r.find((t) => t.as === e))
+						if (r.find((t) => t.as.toLowerCase() === e.toLowerCase()))
 							throw new f.ClientError(
-								"invalid_join",
-								`There is already a join definition with the alias '${e}'.`
+								"invalid_join_or_lookup",
+								`There is already a join/lookup definition with the alias '${e}'.`
 							);
 						r.push({
 							fieldPath: n.fieldPath,
@@ -5071,48 +5111,48 @@
 					processObjectBasedJoin(e, t, r) {
 						if (!e.as || !e.from || !e.where)
 							throw new f.ClientError(
-								"invalid_join",
-								"The 'from', 'as' and 'where' parameters of a join definition need to be specified."
+								"invalid_join_or_lookup",
+								"The 'from', 'as' and 'where' parameters of a join/lookup definition need to be specified."
 							);
 						if (!(0, h.isString)(e.as))
 							throw new f.ClientError(
-								"invalid_join",
-								"The 'as' parameter of the join definition needs to be string value."
+								"invalid_join_or_lookup",
+								"The 'as' parameter of the join/lookup definition needs to be string value."
 							);
 						if (e.as.includes("."))
 							throw new f.ClientError(
-								"invalid_join",
-								"The 'as' parameter of the join definition cannot include '.'(dot) characters."
+								"invalid_join_or_lookup",
+								"The 'as' parameter of the join/lookup definition cannot include '.'(dot) characters."
 							);
 						if (this.model.getField(e.as))
 							throw new f.ClientError(
-								"invalid_join",
+								"invalid_join_or_lookup",
 								`The 'as' parameter should not conflict with an existing field of the base model. There is already a field named '${
 									e.as
 								}' in model '${this.model.getName()}'`
 							);
 						if (!(0, h.isString)(e.from))
 							throw new f.ClientError(
-								"invalid_join",
-								"The 'from' parameter of the join definition needs to be string value."
+								"invalid_join_or_lookup",
+								"The 'from' parameter of the join/lookup definition needs to be string value."
 							);
 						if (!this.model.getDb().model(e.from))
 							throw new f.ClientError(
-								"invalid_join",
-								`The 'from' parameter should match to the model to join. There no model named '${this.model.getName()}' in datababase '${this.model
+								"invalid_join_or_lookup",
+								`The 'from' parameter should match to the model to join/lookup. There no model named '${this.model.getName()}' in datababase '${this.model
 									.getDb()
 									.getName()}'`
 							);
 						if (!(0, h.isObject)(e.where))
 							throw new f.ClientError(
-								"invalid_join",
-								"The 'where' parameter of the join definition needs to define the query structure as a JSON object."
+								"invalid_join_or_lookup",
+								"The 'where' parameter of the join/lookup definition needs to define the query structure as a JSON object."
 							);
 						const n = this.getFieldObject(e.as, t);
 						if (!n || "complex" !== n.joinType || "join" !== n.field.getType())
 							throw new f.ClientError(
-								"invalid_join",
-								`Join from '${e.from}' as '${e.as}' is not a valid join definition. You can either join reference fields or define join queries.`
+								"invalid_join_or_lookup",
+								`Join/lookup from '${e.from}' as '${e.as}' is not a valid join/lookup definition. You can either join/lookup reference fields or define join/lookup queries.`
 							);
 						const i = this.processWhereCondition(
 							e.where,
@@ -5121,13 +5161,13 @@
 						);
 						if (!i)
 							throw new f.ClientError(
-								"invalid_join",
-								"The 'where' condition of the join definition is missing."
+								"invalid_join_or_lookup",
+								"The 'where' condition of the join/lookup definition is missing."
 							);
-						if (r.find((t) => t.as === e.as))
+						if (r.find((t) => t.as.toLowerCase() === e.as.toLowerCase()))
 							throw new f.ClientError(
-								"invalid_join",
-								`There is already a join definition with the alias '${e.as}'.`
+								"invalid_join_or_lookup",
+								`There is already a join/lookup definition with the alias '${e.as}'.`
 							);
 						r.push(
 							Object.assign(Object.assign({}, n), {
@@ -5201,7 +5241,7 @@
 							)
 								throw new f.ClientError(
 									"invalid_expression",
-									`There is no comparison operator, logical operator, function or model field named '${e}'.`
+									`There is no comparison operator, logical operator, function or model field named '${e}'. You can use predefined functions, base model fields or joined model fields in your query expressions.`
 								);
 							{
 								const i = new c.FunctionManager.$eq(),
@@ -5288,7 +5328,7 @@
 							if (!n)
 								throw new f.ClientError(
 									"invalid_field",
-									`'${i}' is not a valid field that can be used to sort query results.`
+									`'${i}' is not a valid field that can be used to sort query results. Only base model and joined model fields can be used in sort definitions.`
 								);
 							const a = e[i];
 							if ("asc" !== a && "desc" !== a)
@@ -6542,6 +6582,13 @@
 						for (const [e, t] of this.fields) if (t.isSearchable()) return !0;
 						return !1;
 					}
+					mergeArrays(e, t) {
+						return e || t
+							? ((e = Array.isArray(e) ? e : [e]),
+							  (t = Array.isArray(t) ? t : [t]),
+							  [...e, ...t])
+							: null;
+					}
 					prepareFieldValues(e, t = !0, r, i = -1) {
 						return n(this, void 0, void 0, function* () {
 							const n = {},
@@ -6609,9 +6656,9 @@
 								r.setId(e),
 								t &&
 									(r.setReadReplica(t.useReadReplica),
-									r.setSelect(t.select, t.join),
-									r.setOmit(t.omit, t.join),
-									r.setJoin(t.join)),
+									r.setSelect(t.select, t.lookup),
+									r.setOmit(t.omit, t.lookup),
+									r.setLookup(t.lookup)),
 								yield r.execute()
 							);
 						});
@@ -6633,11 +6680,13 @@
 								),
 								t &&
 									(r.setReadReplica(t.useReadReplica),
-									r.setSelect(t.select, t.join),
-									r.setOmit(t.omit, t.join),
+									r.setSelect(t.select, this.mergeArrays(t.join, t.lookup)),
+									r.setOmit(t.omit, this.mergeArrays(t.join, t.lookup)),
+									r.setLookup(t.lookup),
 									r.setJoin(t.join),
 									r.setSort(t.sort, t.join),
-									r.setSkip(t.skip)),
+									r.setSkip(t.skip),
+									r.checkJoinAndLookupDuplicates()),
 								yield r.execute()
 							);
 						});
@@ -6659,12 +6708,14 @@
 								),
 								t &&
 									(r.setReadReplica(t.useReadReplica),
-									r.setSelect(t.select, t.join),
-									r.setOmit(t.omit, t.join),
+									r.setSelect(t.select, this.mergeArrays(t.join, t.lookup)),
+									r.setOmit(t.omit, this.mergeArrays(t.join, t.lookup)),
+									r.setLookup(t.lookup),
 									r.setJoin(t.join),
 									r.setSort(t.sort, t.join),
 									r.setSkip(t.skip),
-									r.setLimit(t.limit)),
+									r.setLimit(t.limit),
+									r.checkJoinAndLookupDuplicates()),
 								yield r.execute()
 							);
 						});
@@ -6864,8 +6915,9 @@
 										u.ConditionType.QUERY
 									),
 									r.setReadReplica(t.useReadReplica),
-									r.setSelect(t.select, t.join),
-									r.setOmit(t.omit, t.join),
+									r.setSelect(t.select, this.mergeArrays(t.join, t.lookup)),
+									r.setOmit(t.omit, this.mergeArrays(t.join, t.lookup)),
+									r.setLookup(t.lookup),
 									r.setJoin(t.join),
 									r.setSort(t.sort, t.join),
 									r.setSkip(t.skip),

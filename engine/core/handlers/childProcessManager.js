@@ -268,10 +268,14 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Save agnost server side client to globals for faster access
 		const pkg = (await import("../agnost-server-client.cjs")).default;
 		const { agnost } = pkg;
+		// Rest the cache of the client
+		agnost.clearClientCache();
 		global.agnost = agnost;
 
 		/* 		const pkg = (await import("@agnost/server")).default;
 		const { agnost } = pkg;
+		// Rest the cache of the client
+		agnost.clearClientCache();
 		global.agnost = agnost; */
 	}
 
