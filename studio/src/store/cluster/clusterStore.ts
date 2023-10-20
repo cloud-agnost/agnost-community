@@ -2,10 +2,12 @@ import { AuthService, ClusterService } from '@/services';
 import {
 	APIError,
 	ClusterComponent,
+	ClusterSetupResponse,
+	SetupCluster,
 	TransferClusterOwnershipParams,
 	UpdateClusterComponentParams,
 } from '@/types';
-import { BaseRequest, OnboardingData, User, UserDataToRegister } from '@/types/type.ts';
+import { BaseRequest, User, UserDataToRegister } from '@/types/type.ts';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import useAuthStore from '../auth/authStore';
@@ -18,15 +20,18 @@ interface ClusterStore {
 	clusterComponents: ClusterComponent[];
 	isEditClusterComponentOpen: boolean;
 	clusterComponent: ClusterComponent;
+	clusterInfo: any;
 	checkClusterSetup: (req?: BaseRequest) => Promise<boolean>;
 	checkClusterSmtpStatus: () => Promise<boolean>;
 	initializeClusterSetup: (data: UserDataToRegister) => Promise<User>;
-	finalizeClusterSetup: (req: OnboardingData) => Promise<User | APIError>;
+	finalizeClusterSetup: (params: SetupCluster) => Promise<ClusterSetupResponse>;
 	getClusterComponents: () => Promise<ClusterComponent[]>;
 	updateClusterComponent: (data: UpdateClusterComponentParams) => Promise<void>;
 	openEditClusterComponent: (editedClusterComponent: ClusterComponent) => void;
 	closeEditClusterComponent: () => void;
 	transferClusterOwnership: (params: TransferClusterOwnershipParams) => Promise<void>;
+	getClusterInfo: () => Promise<any>;
+	updateSmtpSettings: (data: any) => Promise<any>;
 }
 
 const useClusterStore = create<ClusterStore>()(
@@ -40,6 +45,7 @@ const useClusterStore = create<ClusterStore>()(
 				clusterComponents: [],
 				clusterComponent: {} as ClusterComponent,
 				isEditClusterComponentOpen: false,
+				clusterInfo: {},
 				checkClusterSetup: async (req) => {
 					try {
 						const { status } = await ClusterService.checkCompleted();
@@ -73,8 +79,17 @@ const useClusterStore = create<ClusterStore>()(
 						throw error;
 					}
 				},
-				finalizeClusterSetup: async (data: OnboardingData) => {
-					return AuthService.finalizeClusterSetup(data);
+				finalizeClusterSetup: async (params: SetupCluster) => {
+					try {
+						const clusterSetupResponse = await AuthService.finalizeClusterSetup(params);
+						set({ isCompleted: true });
+						if (params.onSuccess) params.onSuccess(clusterSetupResponse);
+						return clusterSetupResponse;
+					} catch (error) {
+						set({ error: error as APIError });
+						if (params.onError) params.onError(error as APIError);
+						throw error;
+					}
 				},
 				getClusterComponents: async () => {
 					try {
@@ -107,6 +122,26 @@ const useClusterStore = create<ClusterStore>()(
 						if (params.onSuccess) params.onSuccess();
 					} catch (error) {
 						if (params.onError) params.onError(error as APIError);
+						throw error;
+					}
+				},
+				getClusterInfo: async () => {
+					try {
+						const clusterInfo = await ClusterService.getClusterInfo();
+						set({ clusterInfo });
+						return clusterInfo;
+					} catch (error) {
+						set({ error: error as APIError });
+						throw error;
+					}
+				},
+				updateSmtpSettings: async (data: any) => {
+					try {
+						const smtpSettings = await ClusterService.updateSmtpSettings(data);
+
+						return smtpSettings;
+					} catch (error) {
+						set({ error: error as APIError });
 						throw error;
 					}
 				},
