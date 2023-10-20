@@ -1,21 +1,101 @@
+import { MEMORY_REGEX } from '@/constants/regex';
+import useResourceStore from '@/store/resources/resourceStore';
 import useTypeStore from '@/store/types/typeStore';
 import { translate } from '@/utils';
 import * as z from 'zod';
 import { BaseRequest } from '.';
 
-const NUMBER_REGEX = /^[0-9]+$/;
+export enum AllowedRole {
+	Admin = 'Admin',
+	Developer = 'Developer',
+	Viewer = 'Viewer',
+}
+export enum ResourceCreateType {
+	Existing = 'connect_existing',
+	New = 'New',
+}
+
+export enum RabbitMQConnFormat {
+	Object = 'object',
+	URL = 'url',
+}
+export enum KafkaConnFormat {
+	Simple = 'simple',
+	SSL = 'ssl',
+	SASL = 'sasl',
+}
+export enum KafkaSaslMechanism {
+	Plain = 'plain',
+	ScramSha256 = 'scram-sha-256',
+	ScramSha512 = 'scram-sha-512',
+}
+export enum RabbitMQConnScheme {
+	AMQP = 'amqp',
+	AMQPS = 'amqps',
+}
+export enum MongoDBConnFormat {
+	MongoDB = 'mongodb',
+	MongoDBSRV = 'mongodb+srv',
+}
+
+export type DatabaseTypes = 'MySQL' | 'PostgreSQL' | 'MongoDB';
+
+export interface ResourceAccessReadOnly {
+	host?: string;
+	port?: number;
+	username?: string;
+	password?: string;
+	connFormat?: MongoDBConnFormat;
+	encrypt?: boolean;
+	options?: {
+		key?: string;
+		value?: string;
+	}[];
+	databaseNumber?: number;
+}
+export interface ResourceAccess extends ResourceAccessReadOnly {
+	options?: {
+		key?: string;
+		value?: string;
+	}[];
+	accessIdKey?: string;
+	secretAccessKey?: string;
+	region?: string;
+	projectId?: string;
+	keyFileContents?: string;
+	connectionString?: string;
+	format?: RabbitMQConnFormat | KafkaConnFormat;
+	url?: string;
+	vhost?: string;
+	scheme?: RabbitMQConnScheme;
+	clientId?: string;
+	brokers?: string[];
+	ssl?: {
+		rejectUnauthorized?: boolean;
+		ca?: string;
+		key?: string;
+		cert?: string;
+	};
+	sasl?: { mechanism?: KafkaSaslMechanism; username?: string; password?: string };
+}
+
 export interface Resource {
 	orgId: string;
 	iid: string;
 	appId: string;
 	versionId: string;
 	name: string;
-	type: string;
+	type: ResourceType;
 	instance: string;
 	managed: boolean;
 	deletable: boolean;
-	allowedRoles: string[];
+	allowedRoles: AllowedRole[];
 	config: {
+		delayedMessages: boolean;
+		size: string;
+		instances: number;
+		version: string;
+		readReplica: true;
 		replicas: number;
 		initialScale: number;
 		minScale: number;
@@ -37,12 +117,8 @@ export interface Resource {
 			limit: string;
 		};
 	};
-	access: {
-		name: string;
-		versionId: string;
-		envId: string;
-	};
-	accessReadOnly: any[];
+	access: ResourceAccess;
+	accessReadOnly?: ResourceAccessReadOnly[];
 	status: string;
 	createdBy: string;
 	_id: string;
@@ -77,13 +153,359 @@ export interface Instance {
 	icon: React.ElementType;
 	isConnectOnly?: boolean;
 }
+
+export enum ResourceType {
+	Database = 'database',
+	Cache = 'cache',
+	Storage = 'storage',
+	Queue = 'queue',
+	Scheduler = 'scheduler',
+	Realtime = 'realtime',
+	Engine = 'engine',
+}
+
+export enum ResourceInstances {
+	MySQL = 'MySQL',
+	PostgreSQL = 'PostgreSQL',
+	MongoDB = 'MongoDB',
+	Redis = 'Redis',
+	MinIO = 'MinIO',
+	RabbitMQ = 'RabbitMQ',
+	Kafka = 'Kafka',
+	AWSS3 = 'AWS S3',
+	AzureBlob = 'Azure Blob Storage',
+	GCPStorage = 'GCP Cloud Storage',
+	SQLServer = 'SQL Server',
+}
+const { resourceConfig } = useResourceStore.getState();
+export const AccessDbSchema = z
+	.object({
+		host: z.string().optional(),
+		port: z.coerce
+			.number()
+			.int()
+			.min(0, {
+				message: translate('forms.invalid', { label: translate('resources.database.port') }),
+			})
+			.max(65535, {
+				message: translate('forms.invalid', { label: translate('resources.database.port') }),
+			})
+			.optional(),
+		username: z.string().optional(),
+		password: z.string().optional(),
+		encrypt: z.boolean().default(false).optional(),
+		options: z
+			.array(
+				z
+					.object({
+						key: z.string().optional().or(z.literal('')),
+						value: z.string().optional().or(z.literal('')),
+					})
+					.superRefine((val, ctx) => {
+						const { key, value } = val;
+						if (key && !value) {
+							return ctx.addIssue({
+								code: z.ZodIssueCode.custom,
+								message: translate('forms.required', {
+									label: translate('resources.database.key'),
+								}),
+							});
+						}
+						if (!key && value) {
+							return ctx.addIssue({
+								code: z.ZodIssueCode.custom,
+								message: translate('forms.required', {
+									label: translate('resources.database.value'),
+								}),
+							});
+						}
+					}),
+			)
+			.optional(),
+		connFormat: z.nativeEnum(MongoDBConnFormat).default(MongoDBConnFormat.MongoDB).optional(),
+		brokers: z
+			.array(
+				z.object({
+					key: z.string().optional().or(z.literal('')),
+				}),
+			)
+			.optional(),
+		format: z.custom<RabbitMQConnFormat | KafkaConnFormat>().optional(),
+		url: z.string().optional(),
+		vhost: z.string().optional(),
+		scheme: z.nativeEnum(RabbitMQConnScheme).default(RabbitMQConnScheme.AMQP).optional(),
+		clientId: z.string().optional(),
+		ssl: z
+			.object({
+				rejectUnauthorized: z.boolean().default(false),
+				ca: z.string().optional(),
+				key: z.string().optional(),
+				cert: z.string().optional(),
+			})
+			.optional(),
+		sasl: z
+			.object({
+				mechanism: z.nativeEnum(KafkaSaslMechanism).default(KafkaSaslMechanism.Plain),
+				username: z.string().optional(),
+				password: z.string().optional(),
+			})
+			.optional(),
+		accessKeyId: z.string().optional(),
+		secretAccessKey: z.string().optional(),
+		region: z.string().optional(),
+		connectionString: z.string().optional(),
+		projectId: z.string().optional(),
+		keyFileContents: z.string().optional(),
+		dbNumber: z.coerce.number().int().optional(),
+	})
+	.superRefine((val, ctx) => {
+		if (
+			!val.host &&
+			resourceConfig.resourceType !== ResourceType.Storage &&
+			resourceConfig.type !== ResourceType.Queue
+		) {
+			return ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: translate('forms.required', {
+					label: translate('resources.database.host'),
+				}),
+				path: ['host'],
+			});
+		}
+		if (
+			!val.port &&
+			resourceConfig.resourceType !== ResourceType.Storage &&
+			resourceConfig.type !== ResourceType.Queue
+		) {
+			return ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: translate('forms.required', {
+					label: translate('resources.database.port'),
+				}),
+				path: ['port'],
+			});
+		}
+
+		if (!val.username && resourceConfig.resourceType === ResourceType.Database) {
+			return ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: translate('forms.required', {
+					label: translate('resources.database.username'),
+				}),
+				path: ['username'],
+			});
+		}
+		if (!val.password && resourceConfig.resourceType === ResourceType.Database) {
+			return ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: translate('forms.required', {
+					label: translate('resources.database.password'),
+				}),
+				path: ['password'],
+			});
+		}
+
+		if (!val.format && resourceConfig.resourceType === ResourceType.Queue) {
+			return ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: translate('forms.required', {
+					label: translate('resources.database.selectConnFormat'),
+				}),
+				path: ['format'],
+			});
+		}
+		if (val.format === 'object' && resourceConfig.instance === ResourceInstances.RabbitMQ) {
+			if (!val.scheme) {
+				return ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: translate('forms.required', {
+						label: translate('resources.queue.scheme'),
+					}),
+					path: ['scheme'],
+				});
+			}
+			if (!val.host) {
+				return ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: translate('forms.required', {
+						label: translate('resources.database.host'),
+					}),
+					path: ['host'],
+				});
+			}
+			if (!val.port) {
+				return ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: translate('forms.required', {
+						label: translate('resources.database.port'),
+					}),
+					path: ['port'],
+				});
+			}
+
+			if (!val.username) {
+				return ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: translate('forms.required', {
+						label: translate('resources.database.username'),
+					}),
+					path: ['username'],
+				});
+			}
+			if (!val.password) {
+				return ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: translate('forms.required', {
+						label: translate('resources.database.password'),
+					}),
+					path: ['password'],
+				});
+			}
+		}
+		if (
+			!val.url &&
+			resourceConfig.instance === ResourceInstances.RabbitMQ &&
+			val.format === 'url'
+		) {
+			return ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: translate('forms.required', {
+					label: translate('resources.queue.url'),
+				}),
+				path: ['url'],
+			});
+		}
+
+		if (resourceConfig.instance === ResourceInstances.Kafka && val.format === 'ssl') {
+			if (!val.ssl?.key) {
+				return ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: translate('forms.required', {
+						label: translate('resources.queue.publicKey'),
+					}),
+					path: ['ssl', 'key'],
+				});
+			}
+			if (!val.ssl?.cert) {
+				return ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: translate('forms.required', {
+						label: translate('resources.queue.certificate'),
+					}),
+					path: ['ssl', 'cert'],
+				});
+			}
+			if (!val.ssl?.ca) {
+				return ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: translate('forms.required', {
+						label: translate('resources.queue.ca'),
+					}),
+					path: ['ssl', 'ca'],
+				});
+			}
+		}
+		if (val.format === 'sasl' && resourceConfig.instance === ResourceInstances.Kafka) {
+			if (!val.sasl?.mechanism) {
+				return ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: translate('forms.required', {
+						label: translate('resources.queue.mechanism'),
+					}),
+					path: ['sasl', 'mechanism'],
+				});
+			}
+			if (!val.sasl?.username) {
+				return ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: translate('forms.required', {
+						label: translate('resources.database.username'),
+					}),
+					path: ['sasl', 'username'],
+				});
+			}
+			if (!val.sasl?.password) {
+				return ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: translate('forms.required', {
+						label: translate('resources.database.password'),
+					}),
+					path: ['sasl', 'password'],
+				});
+			}
+		}
+		if (resourceConfig.type === ResourceType.Storage) {
+			if (resourceConfig.instance === ResourceInstances.AWSS3) {
+				if (!val.accessKeyId) {
+					return ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: translate('forms.required', {
+							label: translate('resources.storage.aws.accessKeyId'),
+						}),
+						path: ['accessKeyId'],
+					});
+				}
+
+				if (!val.secretAccessKey) {
+					return ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: translate('forms.required', {
+							label: translate('resources.storage.aws.secretAccessKey'),
+						}),
+						path: ['secretAccessKey'],
+					});
+				}
+				if (!val.region) {
+					return ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: translate('forms.required', {
+							label: translate('resources.storage.aws.region'),
+						}),
+						path: ['region'],
+					});
+				}
+			}
+			if (resourceConfig.instance === ResourceInstances.AzureBlob) {
+				if (!val.connectionString) {
+					return ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: translate('forms.required', {
+							label: translate('resources.storage.azure.connectionString'),
+						}),
+						path: ['connectionString'],
+					});
+				}
+			}
+
+			if (resourceConfig.instance === ResourceInstances.GCPStorage) {
+				if (!val.projectId) {
+					return ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: translate('forms.required', {
+							label: translate('resources.storage.gcp.projectId'),
+						}),
+						path: ['projectId'],
+					});
+				}
+				if (!val.keyFileContents) {
+					return ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: translate('forms.required', {
+							label: translate('resources.storage.gcp.keyFileContents'),
+						}),
+						path: ['keyFileContents'],
+					});
+				}
+			}
+		}
+	});
+
 export const ConnectResourceSchema = z.object({
 	name: z.string({
 		required_error: translate('forms.required', {
 			label: translate('general.name'),
 		}),
 	}),
-
 	instance: z
 		.string({
 			required_error: translate('forms.required', {
@@ -102,184 +524,89 @@ export const ConnectResourceSchema = z.object({
 				}),
 			},
 		),
-	allowedRoles: z.array(z.string()),
-});
-export const AccessDbSchema = z.object({
-	host: z
-		.string({
-			required_error: translate('forms.required', {
-				label: translate('resources.database.host'),
-			}),
-		})
-		.nonempty({
-			message: translate('forms.required', {
-				label: translate('resources.database.host'),
-			}),
-		})
-		.refine((value) => value.trim().length > 0, {
-			message: translate('forms.required', {
-				label: translate('resources.database.host'),
-			}),
-		}),
-	// .refine(
-	// 	(value) => {
-	// 		URL_REGEX.test(value) || IP_REGEX.test(value);
-	// 	},
-	// 	{
-	// 		message: translate('forms.invalid', {
-	// 			label: translate('resources.database.host'),
-	// 		}),
-	// 	},
-	// ),
-	connFormat: z.enum(['mongodb', 'mongodb+srv']).optional(),
-	port: z
-		.string({
-			required_error: translate('forms.required', { label: translate('resources.database.port') }),
-		})
-		.regex(NUMBER_REGEX, {
-			message: translate('forms.invalid', { label: translate('resources.database.port') }),
-		})
-		.min(3, {
-			message: translate('forms.invalid', { label: translate('resources.database.port') }),
-		})
-		.trim()
-		.refine(
-			(value) => value.trim().length > 0,
-			translate('forms.required', { label: translate('resources.database.port') }),
-		),
-	username: z.string().nonempty({
-		message: translate('forms.required', {
-			label: translate('resources.database.username'),
-		}),
-	}),
-	password: z.string().nonempty({
-		message: translate('forms.required', {
-			label: translate('resources.database.password'),
-		}),
-	}),
-	options: z
-		.array(
-			z
-				.object({
-					key: z.string().optional().or(z.literal('')),
-					value: z.string().optional().or(z.literal('')),
-				})
-				.superRefine((val, ctx) => {
-					const { key, value } = val;
-					if (key && !value) {
-						return ctx.addIssue({
-							code: z.ZodIssueCode.custom,
-							message: translate('forms.required', {
-								label: translate('resources.database.key'),
-							}),
-						});
-					}
-					if (!key && value) {
-						return ctx.addIssue({
-							code: z.ZodIssueCode.custom,
-							message: translate('forms.required', {
-								label: translate('resources.database.value'),
-							}),
-						});
-					}
-				}),
-		)
-		.optional(),
-});
-export const ConnectDatabaseSchema = z.object({
-	...ConnectResourceSchema.shape,
+	allowedRoles: z.nativeEnum(AllowedRole).array(),
+	type: z.nativeEnum(ResourceType),
 	access: AccessDbSchema,
 	accessReadOnly: z.array(AccessDbSchema).optional(),
-	secureConnection: z.boolean().default(false),
 });
 
-export const ConnectQueueSchema = z.object({
-	...ConnectResourceSchema.shape,
-	access: z.object({
-		brokers: z
-			.array(
-				z.object({
-					key: z.string().optional().or(z.literal('')),
+export const CreateResourceSchema = ConnectResourceSchema.omit({
+	access: true,
+})
+	.extend({
+		config: z.object({
+			size: z.string().regex(MEMORY_REGEX, {
+				message:
+					translate('forms.invalid', {
+						label: translate('version.memoryRequest'),
+					}) ?? '',
+			}),
+			instances: z.coerce.number().min(1).optional(),
+			replicas: z.coerce.number().min(1).optional(),
+			version: z.string(),
+			readReplica: z.boolean().optional().default(false),
+		}),
+	})
+	.superRefine((data, ctx) => {
+		if (
+			(data.instance === ResourceInstances.MongoDB ||
+				data.instance === ResourceInstances.RabbitMQ) &&
+			!data.config.replicas
+		) {
+			return ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: translate('forms.required', {
+					label: translate('resources.database.replicas'),
 				}),
-			)
-			.optional(),
-		format: z.enum(['url', 'object', 'ssl', 'sasl', 'simple']),
-		url: z.string().optional(),
-		host: z.string().optional(),
-		port: z
-			.string({
-				required_error: translate('forms.required', {
-					label: translate('resources.database.port'),
+				path: ['config', 'replicas'],
+			});
+		} else if (
+			!data.config.instances &&
+			!(
+				data.instance === ResourceInstances.MongoDB || data.instance === ResourceInstances.RabbitMQ
+			) &&
+			data.instance !== ResourceInstances.Redis
+		) {
+			return ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: translate('forms.required', {
+					label: translate('resources.database.instances'),
 				}),
-			})
-			.regex(NUMBER_REGEX, {
-				message: translate('forms.invalid', { label: translate('resources.database.port') }),
-			})
-			.min(3, {
-				message: translate('forms.invalid', { label: translate('resources.database.port') }),
-			})
-			.trim()
-			.refine(
-				(value) => value.trim().length > 0,
-				translate('forms.required', { label: translate('resources.database.port') }),
-			)
-			.optional(),
-		username: z.string().optional(),
-		password: z.string().optional(),
-		vhost: z.string().optional(),
-		scheme: z.enum(['amqp', 'amqps']).optional(),
-		clientId: z.string().optional(),
-		ssl: z
-			.object({
-				rejectUnauthorized: z.boolean().optional(),
-				ca: z.string().optional(),
-				key: z.string().optional(),
-				cert: z.string().optional(),
-			})
-			.optional(),
-		sasl: z
-			.object({
-				mechanism: z.enum(['plain', 'scram-sha-256', 'scram-sha-512']).optional(),
-				username: z.string().optional(),
-				password: z.string().optional(),
-			})
-			.optional(),
-	}),
-});
-
+				path: ['config', 'instances'],
+			});
+		}
+	});
 export interface AddExistingResourceRequest extends BaseRequest {
 	name?: string;
-	type: 'database' | 'cache' | 'storage' | 'queue';
+	type: ResourceType;
 	instance: string;
 	allowedRoles: string[];
-	access: {
-		host?: string;
-		port?: string;
-		username?: string;
-		password?: string;
-		options?: {
-			key?: string;
-			value?: string;
-		}[];
-		accessIdKey?: string;
-		secretAccessKey?: string;
-		region?: string;
-		projectId?: string;
-		keyFileContents?: string;
-		connectionString?: string;
-		format?: 'url' | 'sasl' | 'object' | 'ssl' | 'simple';
-		connFormat?: 'mongodb' | 'mongodb+srv';
-		url?: string;
-		vhost?: string;
-		scheme?: 'amqp' | 'amqps';
-		clientId?: string;
-		brokers?: string[];
-		ssl?: {
-			rejectUnauthorized?: boolean;
-			ca?: string;
-			key?: string;
-			cert?: string;
-		};
-		sasl?: { mechanism?: string; username?: string; password?: string };
+	access: ResourceAccess;
+}
+
+export interface CreateResourceRequest extends BaseRequest {
+	name: string;
+	type: ResourceType;
+	instance: string;
+	allowedRoles: AllowedRole[];
+	config: {
+		version: string;
+		size: string;
+		instances?: number;
+		replicas?: number;
 	};
+}
+export interface UpdateResourceAllowedRolesRequest extends BaseRequest {
+	resourceId: string;
+	allowedRoles: AllowedRole[];
+	name: string;
+}
+export interface UpdateResourceAccessSettingsRequest extends BaseRequest {
+	resourceId: string;
+	access: ResourceAccess;
+}
+export interface UpdateManagedResourceConfigurationRequest
+	extends Omit<CreateResourceRequest, 'name' | 'allowedRoles'> {
+	resourceId: string;
+	updateType?: 'size' | 'others';
 }
