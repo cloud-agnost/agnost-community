@@ -61,10 +61,6 @@ import {
 	ConnectDatabase,
 	ConnectGCP,
 	ConnectQueue,
-	CreateCache,
-	CreateDatabase,
-	CreateQueue,
-	SelectResourceType,
 } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
 import useTabStore from '@/store/version/tabStore';
@@ -75,6 +71,9 @@ import {
 	HttpMethod,
 	Instance,
 	OAuthProviderTypes,
+	ResourceCreateType,
+	ResourceInstances,
+	ResourceType,
 	SortOption,
 	Tab,
 } from '@/types';
@@ -355,7 +354,7 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	ADMIN: 'orange',
 	DEVELOPER: 'purple',
 	VIEWER: 'blue',
-	CREATING: 'green',
+	CREATING: 'blue',
 	UPDATING: 'yellow',
 	DELETING: 'red',
 	BINDING: 'blue',
@@ -506,62 +505,14 @@ export const RESOURCE_TYPES = [
 
 export const DEFAULT_RESOURCE_INSTANCES: Instance[] = [
 	{
-		id: 'create_new',
+		id: ResourceCreateType.New,
 		name: translate('resources.create_new'),
 		icon: Plus,
 	},
 	{
-		id: 'connect_existing',
+		id: ResourceCreateType.Existing,
 		name: translate('resources.connect_existing'),
 		icon: Connect,
-	},
-];
-
-export const STORAGE_TYPES: Instance[] = [
-	{
-		id: 'AWS S3',
-		name: 'AWS S3',
-		icon: Awss3,
-	},
-	{
-		id: 'Azure Blob Storage',
-		name: 'Azure Blob Storage',
-		icon: AzureBlobStorage,
-	},
-	{
-		id: 'GCP Cloud Storage',
-		name: 'GCP Cloud Storage',
-		icon: GcpStorage,
-	},
-];
-
-export const DATABASE_TYPES: Instance[] = [
-	{
-		id: 'MongoDB',
-		name: 'MongoDB',
-		icon: MongoDb,
-	},
-	{
-		id: 'MySQL',
-		name: 'MySQL',
-		icon: MySql,
-	},
-	{
-		id: 'PostgreSQL',
-		name: 'PostgreSQL',
-		icon: PostgreSql,
-	},
-	{
-		id: 'Oracle',
-		name: 'Oracle',
-		icon: Oracle,
-		isConnectOnly: true,
-	},
-	{
-		id: 'SQL Server',
-		name: 'SQL Server',
-		icon: SqlServer,
-		isConnectOnly: true,
 	},
 ];
 
@@ -576,18 +527,6 @@ export const QUEUE_ICON_MAP: Record<string, ElementType> = {
 	RabbitMQ: RabbitMq,
 	Kafka: Kafka,
 };
-export const QUEUE_TYPES: Instance[] = [
-	{
-		id: 'RabbitMQ',
-		name: 'RabbitMQ',
-		icon: RabbitMq,
-	},
-	{
-		id: 'Kafka',
-		name: 'Kafka',
-		icon: Kafka,
-	},
-];
 
 export const STORAGE_ICON_MAP: Record<string, ElementType> = {
 	'AWS S3': Awss3,
@@ -598,63 +537,39 @@ export const STORAGE_ICON_MAP: Record<string, ElementType> = {
 
 export const CREATE_RESOURCES_ELEMENTS = [
 	{
-		step: 1,
-		title: translate('resources.select'),
-		CurrentResourceElement: SelectResourceType,
-	},
-	{
-		step: 2,
 		name: translate('version.databases'),
-		type: translate('resources.create_new'),
-		CurrentResourceElement: CreateDatabase,
-	},
-	{
-		step: 2,
-		name: translate('version.databases'),
-		type: translate('resources.connect_existing'),
+		resourceType: ResourceType.Database,
+		instance: ResourceType.Database,
 		CurrentResourceElement: ConnectDatabase,
 	},
 	{
-		step: 2,
 		name: translate('version.storage'),
-		type: 'AWS S3',
+		resourceType: ResourceType.Storage,
+		instance: ResourceInstances.GCPStorage,
+		CurrentResourceElement: ConnectGCP,
+	},
+	{
+		name: translate('version.storage'),
+		resourceType: ResourceType.Storage,
+		instance: ResourceInstances.AWSS3,
 		CurrentResourceElement: ConnectAWS,
 	},
 	{
-		step: 2,
 		name: translate('version.storage'),
-		type: 'Azure Blob Storage',
+		resourceType: ResourceType.Storage,
+		instance: ResourceInstances.AzureBlob,
 		CurrentResourceElement: ConnectAzure,
 	},
 	{
-		step: 2,
-		name: translate('version.storage'),
-		type: 'GCP Cloud Storage',
-		CurrentResourceElement: ConnectGCP,
-	},
-
-	{
-		step: 2,
 		name: translate('version.cache'),
-		type: translate('resources.create_new'),
-		CurrentResourceElement: CreateCache,
-	},
-	{
-		step: 2,
-		name: translate('version.cache'),
-		type: translate('resources.connect_existing'),
+		resourceType: ResourceType.Cache,
+		instance: ResourceInstances.Redis,
 		CurrentResourceElement: ConnectCache,
 	},
 	{
-		step: 2,
 		name: translate('version.message_queues'),
-		type: translate('resources.create_new'),
-		CurrentResourceElement: CreateQueue,
-	},
-	{
-		step: 2,
-		name: translate('version.message_queues'),
-		type: translate('resources.connect_existing'),
+		resourceType: ResourceType.Queue,
+		instance: ResourceInstances.RabbitMQ,
 		CurrentResourceElement: ConnectQueue,
 	},
 ];
@@ -814,13 +729,14 @@ export const HTTP_METHOD_BADGE_MAP: Record<string, BadgeColors> = {
 	PUT: 'yellow',
 	DELETE: 'red',
 };
-export const INSTANCE_PORT_MAP: Record<string, string> = {
-	PostgreSQL: '5432',
-	MySQL: '3306',
-	'SQL Server': '1433',
-	MongoDB: '27017',
-	Oracle: '1521',
-	Redis: '6379',
+export const INSTANCE_PORT_MAP: Record<string, number> = {
+	PostgreSQL: 5432,
+	MySQL: 3306,
+	'SQL Server': 1433,
+	MongoDB: 27017,
+	Oracle: 1521,
+	Redis: 6379,
+	RabbitMQ: 5672,
 };
 export const ENDPOINT_METHOD_TEXT_COLOR: Record<string, string> = {
 	GET: 'text-elements-blue',

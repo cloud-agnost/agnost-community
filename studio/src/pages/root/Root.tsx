@@ -1,6 +1,6 @@
 import { ApplicationVersions } from '@/features/application';
 import EditApplication from '@/features/application/EditApplication.tsx';
-import { CreateResource } from '@/features/resources';
+import { AddResourceDrawer } from '@/features/resources';
 import { CreateCopyVersionDrawer } from '@/features/version/CreateCopyVersionDrawer';
 import { EditMiddlewareDrawer } from '@/features/version/Middlewares';
 import useAuthStore from '@/store/auth/authStore.ts';
@@ -101,7 +101,7 @@ export default function Root() {
 			<EditApplication />
 			<EditMiddlewareDrawer />
 			<CreateCopyVersionDrawer />
-			<CreateResource />
+			<AddResourceDrawer />
 		</>
 	);
 }

@@ -1,46 +1,68 @@
 import { ResourceService } from '@/services';
-import { APIError, AddExistingResourceRequest, GetResourcesRequest, Resource } from '@/types';
+import {
+	APIError,
+	AddExistingResourceRequest,
+	CreateResourceRequest,
+	GetResourcesRequest,
+	Resource,
+	ResourceType,
+	UpdateManagedResourceConfigurationRequest,
+	UpdateResourceAccessSettingsRequest,
+	UpdateResourceAllowedRolesRequest,
+} from '@/types';
 import { joinChannel, leaveChannel } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 export interface ResourceStore {
 	resources: Resource[];
 	isCreateResourceModalOpen: boolean;
-	resourceType: {
-		name: string;
+	resourceConfig: {
+		instance: string;
 		type: string;
-		step: number;
+		resourceType: ResourceType;
 	};
 	openCreateReplicaModal: boolean;
 	isDeletedResourceModalOpen: boolean;
 	deletedResource: Resource | null;
+	isEditResourceModalOpen: boolean;
+	resourceToEdit: Resource;
 	getResources: (req: GetResourcesRequest) => Promise<Resource[]>;
 	testExistingResourceConnection: (req: AddExistingResourceRequest) => Promise<void>;
 	addExistingResource: (req: AddExistingResourceRequest) => Promise<Resource>;
 	toggleCreateResourceModal: () => void;
-	selectResourceType: (name: string, type: string) => void;
-	goToNextStep: () => void;
-	returnToPreviousStep: () => void;
+	selectResourceType: (instance: string, type: string, resourceType: ResourceType) => void;
 	openDeleteResourceModal: (resource: Resource) => void;
 	closeDeleteResourceModal: () => void;
 	deleteResource: (resourceId: string) => Promise<void>;
+	createNewResource: (req: CreateResourceRequest) => Promise<Resource>;
+	updateResourceAllowedRoles: (req: UpdateResourceAllowedRolesRequest) => Promise<Resource>;
+	updateResourceAccessSettings: (req: UpdateResourceAccessSettingsRequest) => Promise<Resource>;
+	updateManagedResourceConfiguration: (
+		req: UpdateManagedResourceConfigurationRequest,
+	) => Promise<Resource>;
+	openEditResourceModal: (resource: Resource, type: string) => void;
+	closeEditResourceModal: () => void;
+	getOrgResources: (req: GetResourcesRequest) => Promise<Resource[]>;
 }
 
 const useResourceStore = create<ResourceStore>()(
 	devtools(
 		persist(
-			(set, get) => ({
+			(set) => ({
 				resources: [],
 				isCreateResourceModalOpen: false,
-				resourceType: {
+				resourceConfig: {
 					type: '',
-					name: '',
-					step: 1,
+					instance: '',
+					resourceType: '' as ResourceType,
 				},
 				openCreateReplicaModal: false,
 				isDeletedResourceModalOpen: false,
 				deletedResource: null,
 				lastFetchedCount: 0,
+				isEditResourceModalOpen: false,
+				resourceToEdit: {} as Resource,
+				orgResources: [],
 				getResources: async (req: GetResourcesRequest) => {
 					try {
 						const resources = await ResourceService.getResources(req);
@@ -71,8 +93,8 @@ const useResourceStore = create<ResourceStore>()(
 							resources: [resource, ...state.resources],
 							resourceType: {
 								type: '',
-								name: '',
-								step: 1,
+								instance: '',
+								resourceType: '',
 							},
 						}));
 						if (req.onSuccess) req.onSuccess();
@@ -88,31 +110,15 @@ const useResourceStore = create<ResourceStore>()(
 						isCreateResourceModalOpen: !state.isCreateResourceModalOpen,
 						resourceType: {
 							type: '',
-							name: '',
-							step: 1,
+							instance: '',
 						},
 					})),
-				selectResourceType: (name: string, type: string) =>
+				selectResourceType: (instance: string, type: string, resourceType: ResourceType) =>
 					set({
-						resourceType: {
+						resourceConfig: {
 							type,
-							name,
-							step: get().resourceType.step,
-						},
-					}),
-				goToNextStep: () =>
-					set((state) => ({
-						resourceType: {
-							...state.resourceType,
-							step: 2,
-						},
-					})),
-				returnToPreviousStep: () =>
-					set({
-						resourceType: {
-							type: '',
-							name: '',
-							step: 1,
+							instance,
+							resourceType,
 						},
 					}),
 				openDeleteResourceModal: (resource: Resource) => {
@@ -140,9 +146,106 @@ const useResourceStore = create<ResourceStore>()(
 						throw error as APIError;
 					}
 				},
+				createNewResource: async (req: CreateResourceRequest) => {
+					try {
+						const resource = await ResourceService.createNewResource(req);
+						set((state) => ({
+							resources: [resource, ...state.resources],
+							resourceType: {
+								type: '',
+								instance: '',
+								resourceType: '',
+							},
+						}));
+						joinChannel(resource._id);
+						if (req.onSuccess) req.onSuccess();
+						return resource;
+					} catch (error) {
+						if (req.onError) req.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				updateResourceAllowedRoles: async (req: UpdateResourceAllowedRolesRequest) => {
+					try {
+						const resource = await ResourceService.updateResourceAllowedRoles(req);
+						set((state) => ({
+							resources: state.resources.map((r) => (r._id === resource._id ? resource : r)),
+							resourceToEdit: resource,
+						}));
+						if (req.onSuccess) req.onSuccess();
+						return resource;
+					} catch (error) {
+						if (req.onError) req.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				updateResourceAccessSettings: async (req: UpdateResourceAccessSettingsRequest) => {
+					try {
+						const resource = await ResourceService.updateResourceAccessSettings(req);
+						set((state) => ({
+							resources: state.resources.map((r) => (r._id === resource._id ? resource : r)),
+							resourceToEdit: resource,
+						}));
+						if (req.onSuccess) req.onSuccess();
+						return resource;
+					} catch (error) {
+						if (req.onError) req.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				updateManagedResourceConfiguration: async (
+					req: UpdateManagedResourceConfigurationRequest,
+				) => {
+					try {
+						const resource = await ResourceService.updateManagedResourceConfiguration(req);
+						set((state) => ({
+							resources: state.resources.map((r) => (r._id === resource._id ? resource : r)),
+							resourceToEdit: resource,
+						}));
+						if (req.onSuccess) req.onSuccess();
+						return resource;
+					} catch (error) {
+						if (req.onError) req.onError(error as APIError);
+						throw error as APIError;
+					}
+				},
+				openEditResourceModal: (resource: Resource, type: string) => {
+					set({
+						isEditResourceModalOpen: true,
+						resourceToEdit: resource,
+						resourceConfig: {
+							type: type,
+							instance: resource.instance,
+							resourceType: resource.type,
+						},
+					});
+				},
+				closeEditResourceModal: () => {
+					set({
+						isEditResourceModalOpen: false,
+						resourceToEdit: {} as Resource,
+					});
+				},
+				getOrgResources: async (req: GetResourcesRequest) => {
+					try {
+						const resources = await ResourceService.getOrganizationResources(req);
+						set({
+							resources,
+						});
+						return resources;
+					} catch (error) {
+						throw error as APIError;
+					}
+				},
 			}),
 			{
 				name: 'resources-store',
+				partialize: (state) =>
+					Object.fromEntries(
+						Object.entries(state).filter(
+							([key]) => !['resourceToEdit', 'orgResources'].includes(key),
+						),
+					),
 			},
 		),
 	),

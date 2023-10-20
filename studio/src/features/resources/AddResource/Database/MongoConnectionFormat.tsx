@@ -1,17 +1,24 @@
 import { RadioGroup, RadioGroupItem } from '@/components/RadioGroup';
 import { MONGODB_CONNECTION_FORMATS } from '@/constants';
-import CreateResourceItem from '@/features/resources/CreateResourceItem';
-import { ConnectDatabaseSchema } from '@/types';
+import { ConnectResourceSchema, MongoDBConnFormat } from '@/types';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
+import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 
 export default function MongoConnectionFormat() {
 	const { t } = useTranslation();
-	const form = useFormContext<z.infer<typeof ConnectDatabaseSchema>>();
+	const form = useFormContext<z.infer<typeof ConnectResourceSchema>>();
+
+	useEffect(() => {
+		form.setValue('access.connFormat', MongoDBConnFormat.MongoDB);
+	}, []);
 	return (
-		<CreateResourceItem title={t('resources.database.selectConnFormat')}>
+		<>
+			<h6 className=' font-sfCompact text-sm text-subtle '>
+				{t('resources.database.selectConnFormat').toUpperCase()}
+			</h6>
 			<FormField
 				control={form.control}
 				name='access.connFormat'
@@ -37,6 +44,6 @@ export default function MongoConnectionFormat() {
 					</FormItem>
 				)}
 			/>
-		</CreateResourceItem>
+		</>
 	);
 }

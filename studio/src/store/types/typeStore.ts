@@ -6,8 +6,9 @@ import {
 	OAuthProviderTypes,
 	PhoneAuthSMSProviderParams,
 	PhoneAuthSMSProviders,
+	ResourceType,
 	Types,
-} from '@/types/type';
+} from '@/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 interface TypesStore {
@@ -48,6 +49,7 @@ interface TypesStore {
 		name: string;
 		type: string;
 	}[];
+	resourceTypes: ResourceType[];
 	isTypesOk: boolean;
 	getAllTypes: () => Promise<Types | APIError>;
 }
@@ -104,6 +106,7 @@ const useTypeStore = create<TypesStore>()(
 					},
 				],
 				isTypesOk: false,
+				resourceTypes: [],
 				getAllTypes: async () => {
 					try {
 						const res = await TypesService.getAllTypes();
