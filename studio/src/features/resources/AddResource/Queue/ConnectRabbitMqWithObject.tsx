@@ -2,15 +2,15 @@ import { Input } from '@/components/Input';
 import { PasswordInput } from '@/components/PasswordInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { RABBITMQ_CONNECTION_SCHEMES } from '@/constants';
-import { ConnectQueueSchema } from '@/types';
+import { ConnectResourceSchema } from '@/types';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-import ConnectOptions from '../Database/ConnectDatabase/ConnectOptions';
+import { ConnectOptions } from '@/features/resources';
 export default function ConnectRabbitMqWithObject() {
 	const { t } = useTranslation();
-	const form = useFormContext<z.infer<typeof ConnectQueueSchema>>();
+	const form = useFormContext<z.infer<typeof ConnectResourceSchema>>();
 
 	return (
 		<div className='flex flex-col gap-2'>

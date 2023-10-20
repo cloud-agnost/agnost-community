@@ -4,10 +4,11 @@ import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
 import { BADGE_COLOR_MAP, RESOURCE_ICON_MAP } from '@/constants';
 import useResourceStore from '@/store/resources/resourceStore';
-import { Resource } from '@/types';
+import { ColumnDefWithClassName, Resource, ResourceCreateType } from '@/types';
 import { translate } from '@/utils';
-import { ColumnDef } from '@tanstack/react-table';
-export const ResourceTableColumn: ColumnDef<Resource>[] = [
+
+const { openEditResourceModal } = useResourceStore.getState();
+export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 	{
 		id: 'name',
 		header: ({ column }) => {
@@ -43,7 +44,7 @@ export const ResourceTableColumn: ColumnDef<Resource>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { status } = row.original;
-			return <Badge text={status} variant={BADGE_COLOR_MAP[status.toUpperCase()]} rounded />;
+			return <Badge text={status} variant={BADGE_COLOR_MAP[status?.toUpperCase()]} rounded />;
 		},
 	},
 	{
@@ -80,20 +81,26 @@ export const ResourceTableColumn: ColumnDef<Resource>[] = [
 		id: 'actions',
 		header: translate('resources.table.actions'),
 		size: 45,
+		className: 'actions',
 		cell: ({ row }) => {
+			const resourceCreateType =
+				'access' in row.original ? ResourceCreateType.Existing : ResourceCreateType.New;
 			return (
-				<ActionsCell
-					original={row.original}
-					onDelete={() => () =>
-						useResourceStore.setState({
-							deletedResource: row.original,
-							isDeletedResourceModalOpen: true,
-						})
-					}
-					canEditKey='resource.update'
-					canDeleteKey='resource.delete'
-					type='org'
-				/>
+				row.original.deletable && (
+					<ActionsCell
+						original={row.original}
+						onDelete={() =>
+							useResourceStore.setState({
+								deletedResource: row.original,
+								isDeletedResourceModalOpen: true,
+							})
+						}
+						onEdit={() => openEditResourceModal(row.original, resourceCreateType)}
+						canEditKey='resource.update'
+						canDeleteKey='resource.delete'
+						type='org'
+					/>
+				)
 			);
 		},
 	},

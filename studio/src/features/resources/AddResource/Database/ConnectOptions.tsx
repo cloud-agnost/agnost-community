@@ -1,13 +1,12 @@
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
-import { ConnectDatabaseSchema } from '@/types';
+import { ConnectResourceSchema } from '@/types';
 import { cn, isEmpty } from '@/utils';
 import { Plus, Trash } from '@phosphor-icons/react';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-import CreateResourceItem from '../../../CreateResourceItem';
 
 export default function ConnectOptions() {
 	const { t } = useTranslation();
@@ -15,7 +14,7 @@ export default function ConnectOptions() {
 	const {
 		control,
 		formState: { errors },
-	} = useFormContext<z.infer<typeof ConnectDatabaseSchema>>();
+	} = useFormContext<z.infer<typeof ConnectResourceSchema>>();
 
 	const { fields, append, remove } = useFieldArray({
 		control,
@@ -23,7 +22,10 @@ export default function ConnectOptions() {
 	});
 
 	return (
-		<CreateResourceItem title={t('resources.database.connection_options')}>
+		<div className='space-y-4'>
+			<h6 className=' font-sfCompact text-sm text-subtle '>
+				{t('resources.database.connection_options')}
+			</h6>
 			{fields.map((f, index) => (
 				<div className='flex gap-4' key={f.id}>
 					<FormField
@@ -70,7 +72,6 @@ export default function ConnectOptions() {
 					<Button
 						type='button'
 						variant='secondary'
-						disabled={fields.length === 1}
 						iconOnly
 						className={cn(
 							!index && 'self-end',
@@ -95,10 +96,10 @@ export default function ConnectOptions() {
 						}}
 					>
 						<Plus size={16} className='text-brand-primary' />
-						<span className='text-brand-primary ml-2'>{t('general.add_another_one')}</span>
+						<span className='text-brand-primary ml-2'>{t('general.add')}</span>
 					</Button>
 				)}
 			</div>
-		</CreateResourceItem>
+		</div>
 	);
 }

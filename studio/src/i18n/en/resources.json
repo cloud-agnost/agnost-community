@@ -26,17 +26,22 @@
 		"cache": "Cache",
 		"mq": "Message Queue"
 	},
-	"resource_name": "RESOURCE NAME",
+	"resource_name": "Resource Name",
 	"database": {
 		"create": "Create New Database",
-		"choose_type": "CHOOSE TYPE",
-		"storage_size": "STORAGE SIZE : {{size}} GB",
+		"storage_size": "Storage Size",
+		"storage_size_placeholder": "Enter storage size eg. 512Mi",
+		"storage_size_description": "Storage size must be a number followed by Mi or Gi",
 		"read_replicas": "READ REPLICAS",
+		"instances": "Instances",
+		"replicas": "Replicas",
+		"instance_placeholder": "Enter instance count",
 		"instance": "Instance",
 		"host": "Host",
 		"port": "Port",
 		"database_name": "Database Name (optional)",
 		"connection_options": "CONNECTION OPTIONS",
+		"connection_info": "CONNECTION INFORMATION",
 		"key": "Key",
 		"value": "Value",
 		"secure_connection": "Secure Connection",
@@ -46,9 +51,9 @@
 		"connect": "Connect",
 		"username": "Username",
 		"password": "Password",
-		"mongodb": "MongoDB",
-		"mongodb+srv": "MongoDB + SRV",
-		"selectConnFormat": "SELECT CONNECTION FORMAT"
+		"mongodb": "Standart",
+		"mongodb+srv": "DNS Seed List (MongoDb + SRV)",
+		"selectConnFormat": "Connection Format"
 	},
 	"storage": {
 		"aws": {
@@ -76,8 +81,8 @@
 	"queue": {
 		"connect": "Connect To Existing Message Queue",
 		"choose": "CHOOSE MESSAGE QUEUE TYPE",
-		"url": "URI",
-		"object": "Object",
+		"url": "Connection String",
+		"object": "Credentials",
 		"scheme": "Scheme",
 		"host": "Host",
 		"port": "Port",
