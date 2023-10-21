@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { EditOrAddEndpointRateLimiterDrawer } from '@/features/version/SettingsGeneral';
 
-export default function AddMiddlewareButton() {
+export default function AddRateLimitButton() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 
