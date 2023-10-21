@@ -21,11 +21,13 @@ import {
 	UpdateRoleRequest,
 } from '@/types';
 
+import { PAGE_SIZE } from '@/constants';
 import { joinChannel, leaveChannel, translate } from '@/utils';
 import OrganizationService from 'services/OrganizationService.ts';
 import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import useAuthStore from '../auth/authStore';
+import useVersionStore from '../version/versionStore';
 
 interface ApplicationStore {
 	application: Application | null;
@@ -210,13 +212,13 @@ const useApplicationStore = create<ApplicationStore>()(
 						const { tempTeam, applicationTeam } = get();
 						if (search === '') {
 							set({ applicationTeam: tempTeam });
-							return tempTeam as ApplicationMember[];
+							return tempTeam;
 						} else {
 							const filteredTeam = applicationTeam?.filter(({ member }) =>
 								member.name.toLowerCase().includes(search.toLowerCase()),
 							);
-							set({ applicationTeam: filteredTeam as ApplicationMember[] });
-							return filteredTeam as ApplicationMember[];
+							set({ applicationTeam: filteredTeam });
+							return filteredTeam;
 						}
 					},
 					changeAppTeamRole: async (req: UpdateRoleRequest) => {
@@ -284,11 +286,22 @@ const useApplicationStore = create<ApplicationStore>()(
 							throw error as APIError;
 						}
 					},
-					openVersionDrawer: (application: Application) => {
+					openVersionDrawer: async (application: Application) => {
 						set({
-							isVersionOpen: true,
 							application,
 						});
+						const { getAllVersionsVisibleToUser, selectVersion } = useVersionStore.getState();
+						const versions = await getAllVersionsVisibleToUser({
+							appId: application._id,
+							page: 0,
+							size: PAGE_SIZE,
+						});
+						if (versions.length === 1) {
+							selectVersion(versions[0]);
+						} else
+							set({
+								isVersionOpen: true,
+							});
 					},
 					closeVersionDrawer: (clearApp?: boolean) => {
 						set({
@@ -475,7 +488,7 @@ const useApplicationStore = create<ApplicationStore>()(
 					},
 					searchApplications: async (query: string) => {
 						try {
-							if (query === '') {
+							if (!query) {
 								set((prev) => ({ applications: prev.temp }));
 								return get().temp;
 							}
