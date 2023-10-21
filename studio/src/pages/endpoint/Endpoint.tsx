@@ -91,6 +91,7 @@ export default function MainEndpoint() {
 
 	useEffect(() => {
 		if (versionId && orgId && appId) {
+			setLoading(true);
 			getEndpoints({
 				orgId,
 				appId,
@@ -98,8 +99,8 @@ export default function MainEndpoint() {
 				page,
 				size: PAGE_SIZE,
 				search: searchParams.get('q') ?? undefined,
-				initialFetch: page === 0,
 			});
+			setLoading(false);
 		}
 	}, [searchParams.get('q'), page]);
 	return (
@@ -126,11 +127,9 @@ export default function MainEndpoint() {
 			<InfiniteScroll
 				scrollableTarget='version-layout'
 				dataLength={endpoints.length}
-				next={() => {
-					setPage(page + 1);
-				}}
+				next={() => setPage(page + 1)}
 				hasMore={lastFetchedCount >= PAGE_SIZE}
-				loader={endpoints.length > 0 && <TableLoading />}
+				loader={loading && <TableLoading />}
 			>
 				<DataTable
 					columns={EndpointColumns}

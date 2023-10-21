@@ -132,6 +132,7 @@ export default function Buckets() {
 
 	useEffect(() => {
 		if (versionId && orgId && appId) {
+			setLoading(true);
 			getBuckets({
 				storageName: storage?.name,
 				page: bucketPage,
@@ -139,6 +140,7 @@ export default function Buckets() {
 				search: searchParams.get('q') as string,
 				returnCountInfo: true,
 			});
+			setLoading(false);
 		}
 	}, [searchParams.get('q'), bucketPage, versionId, storage?.name]);
 
@@ -169,7 +171,7 @@ export default function Buckets() {
 					setBucketPage(bucketPage + 1);
 				}}
 				hasMore={bucketCountInfo.count >= PAGE_SIZE}
-				loader={buckets.length > 0 && <TableLoading />}
+				loader={loading && <TableLoading />}
 			>
 				<DataTable
 					columns={BucketColumns}

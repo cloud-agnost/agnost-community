@@ -76,6 +76,7 @@ export default function VersionCache() {
 	}
 	useEffect(() => {
 		if (versionId && orgId && appId) {
+			setLoading(true);
 			getCaches({
 				orgId,
 				appId,
@@ -83,8 +84,8 @@ export default function VersionCache() {
 				page,
 				size: PAGE_SIZE,
 				search: searchParams.get('q') ?? undefined,
-				initialFetch: page === 0,
 			});
+			setLoading(false);
 		}
 	}, [searchParams.get('q'), page]);
 
@@ -110,7 +111,7 @@ export default function VersionCache() {
 						setPage(page + 1);
 					}}
 					hasMore={lastFetchedCount >= PAGE_SIZE}
-					loader={caches.length > 0 && <TableLoading />}
+					loader={loading && <TableLoading />}
 				>
 					<DataTable
 						columns={CacheColumns}

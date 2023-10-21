@@ -91,7 +91,7 @@ export default function VersionTabLayout<T>({
 		setSearchParams({ ...searchParams, q: value });
 	}
 	return (
-		<div className={cn('h-full space-y-4 flex flex-col', className)}>
+		<div className={cn('h-full space-y-4 ', className)}>
 			{breadCrumb}
 			<div className='flex items-center justify-between'>
 				<h1 className='text-default text-2xl text-center'>{title}</h1>

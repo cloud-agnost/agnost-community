@@ -76,6 +76,7 @@ export default function MainFunction() {
 
 	useEffect(() => {
 		if (versionId && orgId && appId) {
+			setLoading(true);
 			getFunctionsOfAppVersion({
 				orgId,
 				appId,
@@ -83,9 +84,9 @@ export default function MainFunction() {
 				page,
 				size: PAGE_SIZE,
 				search: searchParams.get('q') ?? undefined,
-				initialFetch: page === 0,
 			});
 		}
+		setLoading(false);
 	}, [searchParams.get('q'), page]);
 
 	return (
@@ -109,7 +110,7 @@ export default function MainFunction() {
 				dataLength={functions.length}
 				next={() => setPage(page + 1)}
 				hasMore={lastFetchedCount >= PAGE_SIZE}
-				loader={functions.length > 0 && <TableLoading />}
+				loader={loading && <TableLoading />}
 			>
 				<DataTable<HelperFunction>
 					data={functions}

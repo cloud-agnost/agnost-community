@@ -89,6 +89,7 @@ export default function MainMessageQueue() {
 
 	useEffect(() => {
 		if (versionId && orgId && appId) {
+			setLoading(true);
 			getQueues({
 				orgId,
 				appId,
@@ -96,11 +97,10 @@ export default function MainMessageQueue() {
 				page,
 				size: PAGE_SIZE,
 				search: searchParams.get('q') ?? undefined,
-				initialFetch: page === 0,
 			});
+			setLoading(false);
 		}
 	}, [searchParams.get('q'), page]);
-
 	return (
 		<VersionTabLayout<MessageQueue>
 			isEmpty={queues.length === 0}
@@ -124,10 +124,11 @@ export default function MainMessageQueue() {
 				scrollableTarget='version-layout'
 				dataLength={queues.length}
 				next={() => {
+					console.log('next');
 					setPage(page + 1);
 				}}
 				hasMore={lastFetchedCount >= PAGE_SIZE}
-				loader={queues.length > 0 && <TableLoading />}
+				loader={loading && <TableLoading />}
 			>
 				<DataTable
 					columns={MessageQueueColumns}

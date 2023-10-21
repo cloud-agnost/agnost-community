@@ -136,6 +136,7 @@ export default function Files() {
 
 	useEffect(() => {
 		if (storage?.name && bucket?.name && page) {
+			setLoading(true);
 			getFilesOfBucket({
 				storageName: storage?.name,
 				bucketName: bucket?.name,
@@ -144,6 +145,7 @@ export default function Files() {
 				search: searchParams.get('q') as string,
 				returnCountInfo: true,
 			});
+			setLoading(false);
 		}
 	}, [searchParams.get('q'), page, bucket?.name]);
 	return (
@@ -170,7 +172,7 @@ export default function Files() {
 					setPage(page + 1);
 				}}
 				hasMore={fileCountInfo.count >= PAGE_SIZE}
-				loader={files.length === 0 && <TableLoading />}
+				loader={loading && <TableLoading />}
 			>
 				<DataTable
 					columns={FileColumns}
