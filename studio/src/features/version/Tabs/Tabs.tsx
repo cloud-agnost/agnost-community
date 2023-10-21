@@ -1,6 +1,6 @@
 import { NewTabDropdown, TabItem, TabOptionsDropdown } from '@/features/version/Tabs/index.ts';
 import useTabStore from '@/store/version/tabStore.ts';
-import { Tab } from '@/types';
+import { Tab, TabTypes } from '@/types';
 import { generateId, reorder } from '@/utils';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
@@ -44,14 +44,14 @@ export default function Tabs() {
 	}, [tabs]);
 
 	useEffect(() => {
-		if (getTabsByVersionId(versionId).find((tab) => tab.isDashboard)) return;
+		if (getTabsByVersionId(versionId).find((tab: Tab) => tab.isDashboard)) return;
 		addTab(versionId, {
 			id: generateId(),
 			title: t('version.dashboard'),
 			path: getDashboardPath(),
 			isDashboard: true,
 			isActive: false,
-			type: 'Dashboard',
+			type: TabTypes.Dashboard,
 		});
 	}, [versionId]);
 
