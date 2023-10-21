@@ -9,7 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 export default function OrgResources() {
 	const { t } = useTranslation();
 
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const {
 		resources,
 		isDeletedResourceModalOpen,
@@ -18,16 +18,6 @@ export default function OrgResources() {
 		getOrgResources,
 		closeDeleteResourceModal,
 	} = useResourcesStore();
-
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		setSearchParams({ ...searchParams, q: value });
-	}
 
 	useEffect(() => {
 		getOrgResources({
@@ -39,11 +29,7 @@ export default function OrgResources() {
 			<div className='flex items-center justify-between'>
 				<h1 className='text-default text-2xl font-semibold text-center'>{t('resources.title')}</h1>
 				<div className='flex items-center justify-center gap-6'>
-					<SearchInput
-						value={searchParams.get('q') ?? undefined}
-						onSearch={onInput}
-						className='sm:w-[450px] flex-1'
-					/>
+					<SearchInput value={searchParams.get('q') ?? undefined} className='sm:w-[450px] flex-1' />
 					<AddResourceButton />
 				</div>
 			</div>

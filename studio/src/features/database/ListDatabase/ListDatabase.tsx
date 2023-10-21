@@ -26,15 +26,9 @@ export default function ListDatabase() {
 	const canEdit = useAuthorizeVersion('db.create');
 	const [createDrawerIsOpen, setCreateDrawerIsOpen] = useState(false);
 	const [table, setTable] = useState<Table<Database>>();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 
 	const search = searchParams.get('q') ?? '';
-
-	function setSearch(value?: string) {
-		if (!value || value === '') searchParams.delete('q');
-		else searchParams.set('q', value);
-		setSearchParams(searchParams);
-	}
 
 	const databasesForSearch = useMemo(() => {
 		if (!search) return databases;
@@ -54,14 +48,9 @@ export default function ListDatabase() {
 		setIsOpenDeleteDatabaseDialog(false);
 	}
 
-	function onSearch(value: string) {
-		setSearch(value.trim());
-	}
-
 	return (
 		<>
 			<VersionTabLayout<Database>
-				onSearchInputClear={() => onSearch('')}
 				className='p-0'
 				isEmpty={databasesForSearch.length === 0}
 				title={t('database.page_title')}
@@ -71,7 +60,7 @@ export default function ListDatabase() {
 				emptyStateTitle={t('database.empty_text')}
 				table={table}
 				selectedRowLength={selectedRows?.length}
-				onSearch={onSearch}
+				onSearch={() => {}}
 				disabled={!canEdit}
 			>
 				<DataTable<Database>

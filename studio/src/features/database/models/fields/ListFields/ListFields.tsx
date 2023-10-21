@@ -9,7 +9,7 @@ import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 import { DataTable } from 'components/DataTable';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 interface ListFieldsProps {
 	model: Model;
@@ -18,15 +18,16 @@ interface ListFieldsProps {
 
 export default function ListFields({ model, parentModel }: ListFieldsProps) {
 	const [selectedRows, setSelectedRows] = useState<Row<Field>[]>();
-	const [search, setSearch] = useState('');
 	const { t } = useTranslation();
 	const [table, setTable] = useState<Table<Field>>();
 	const { databases } = useDatabaseStore();
 	const { deleteMultipleField } = useModelStore();
 	const { dbId } = useParams();
 	const canMultiDelete = useAuthorizeVersion('model.delete');
+	const [searchParams] = useSearchParams();
 
 	const filteredFields = useMemo(() => {
+		const search = searchParams.get('q') ?? '';
 		if (!search) return model.fields;
 
 		return model.fields
@@ -34,7 +35,7 @@ export default function ListFields({ model, parentModel }: ListFieldsProps) {
 				return f.name.toLowerCase().includes(search.toLowerCase());
 			})
 			.sort((a, b) => b.order - a.order);
-	}, [search, model]);
+	}, [searchParams.get('q'), model]);
 
 	useEffect(() => {
 		setSelectedRows((selectedRows) => {
@@ -94,7 +95,6 @@ export default function ListFields({ model, parentModel }: ListFieldsProps) {
 					items={breadcrumbItems}
 				/>
 			}
-			onSearchInputClear={() => setSearch('')}
 			isEmpty={!filteredFields.length}
 			title={t('database.fields.title')}
 			type='field'
@@ -102,7 +102,7 @@ export default function ListFields({ model, parentModel }: ListFieldsProps) {
 			emptyStateTitle={t('database.fields.no_fields')}
 			table={table}
 			selectedRowLength={selectedRows?.length}
-			onSearch={(value) => setSearch(value)}
+			onSearch={() => {}}
 			disabled={!canMultiDelete}
 			onMultipleDelete={deleteHandler}
 		>

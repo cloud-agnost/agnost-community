@@ -8,17 +8,17 @@ import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
-import { Database, Model } from '@/types';
+import { Database, Model, TabTypes } from '@/types';
 import { Row, Table } from '@tanstack/react-table';
 import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 import { DataTable } from 'components/DataTable';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 export default function ListModels() {
 	const { models } = useModelStore();
 	const [selectedRows, setSelectedRows] = useState<Row<Model>[]>();
-	const [search, setSearch] = useState('');
+	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const [table, setTable] = useState<Table<Model>>();
 	const [createModelDrawerIsOpen, setCreateModelDrawerIsOpen] = useState(false);
@@ -28,12 +28,13 @@ export default function ListModels() {
 	const { databases } = useDatabaseStore();
 	const navigate = useTabNavigate();
 	const filteredModels = useMemo(() => {
+		const search = searchParams.get('q') ?? '';
 		if (!search) return models;
 
 		return models.filter((model) => {
 			return model.name.toLowerCase().includes(search.toLowerCase());
 		});
-	}, [search, models]);
+	}, [searchParams.get('q'), models]);
 
 	const database = useMemo(() => {
 		return databases.find((database) => database._id === dbId) as Database;
@@ -69,7 +70,6 @@ export default function ListModels() {
 		<>
 			<VersionTabLayout<Model>
 				breadCrumb={<BreadCrumb goBackLink={databasesUrl} items={breadcrumbItems} />}
-				onSearchInputClear={() => setSearch('')}
 				isEmpty={hasNoModels}
 				title={t('database.models.title')}
 				type='model'
@@ -78,7 +78,7 @@ export default function ListModels() {
 				emptyStateTitle={t('database.models.no_models')}
 				table={table}
 				selectedRowLength={selectedRows?.length}
-				onSearch={(value) => setSearch(value)}
+				onSearch={() => {}}
 				disabled={!canCreateModel}
 				onMultipleDelete={deleteAll}
 				handlerButton={
@@ -90,7 +90,7 @@ export default function ListModels() {
 								path: `${databasesUrl}/${database._id}/navigator`,
 								isActive: true,
 								isDashboard: false,
-								type: 'Database',
+								type: TabTypes.Navigator,
 							});
 						}}
 					>

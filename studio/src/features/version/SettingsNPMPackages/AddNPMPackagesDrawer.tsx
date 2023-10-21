@@ -1,14 +1,14 @@
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
-import { Button } from 'components/Button';
-import { useTranslation } from 'react-i18next';
-import { SearchInput } from 'components/SearchInput';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { useEffect, useId, useRef, useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/Table';
 import { SearchNPMPackages } from '@/types';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import { Button } from 'components/Button';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
+import { SearchInput } from 'components/SearchInput';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/Table';
 import { TableLoading } from 'components/Table/Table.tsx';
-
+import { useEffect, useId, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { useSearchParams } from 'react-router-dom';
 interface AddNPMPackagesDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -22,16 +22,10 @@ export default function AddNPMPackagesDrawer({ open, onOpenChange }: AddNPMPacka
 	const { searchNPMPackages, version, addNPMPackage } = useVersionStore();
 	const npmPackages = useVersionStore((state) => state.version?.npmPackages ?? []);
 	const [packages, setPackages] = useState<SearchNPMPackages[] | null>(null);
-	const inputRef = useRef<HTMLInputElement>(null);
 	const scrollContainerId = useId();
 	const [lastDataLength, setLastDataLength] = useState(0);
-
+	const [searchParams] = useSearchParams();
 	useEffect(() => {
-		setTimeout(() => {
-			if (open) {
-				inputRef.current?.focus();
-			}
-		}, 100);
 		if (!open) {
 			setPackages(null);
 			setPage(0);
@@ -80,9 +74,9 @@ export default function AddNPMPackagesDrawer({ open, onOpenChange }: AddNPMPacka
 	}
 
 	async function next() {
-		if (!inputRef.current) return;
+		if (!searchParams.get('q')) return;
 		setPage((prev) => prev + 1);
-		await onSearch(inputRef.current.value, false, true);
+		await onSearch(searchParams.get('q') as string, false, true);
 	}
 
 	return (
@@ -96,7 +90,6 @@ export default function AddNPMPackagesDrawer({ open, onOpenChange }: AddNPMPacka
 					className='p-6 flex-1 flex flex-col gap-4 overflow-auto h-[calc(100vh-97px)]'
 				>
 					<SearchInput
-						ref={inputRef}
 						onClear={() => setPackages(null)}
 						onSearch={(value) => onSearch(value, true)}
 						className='[&_input]:bg-transparent'
