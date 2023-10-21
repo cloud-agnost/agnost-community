@@ -1,13 +1,14 @@
-import { AddMiddlewareButton } from '@/features/version/Middlewares';
+import { PAGE_SIZE } from '@/constants';
+import { AddMiddlewareDrawer } from '@/features/version/Middlewares';
 import MiddlewaresColumns from '@/features/version/Middlewares/MiddlewaresColumns.tsx';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
-import { GetMiddlewaresOfAppVersionParams, Middleware } from '@/types';
+import { Middleware } from '@/types';
 import { Row, Table } from '@tanstack/react-table';
 import { DataTable } from 'components/DataTable';
 import { TableLoading } from 'components/Table/Table.tsx';
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams, useSearchParams } from 'react-router-dom';
@@ -15,14 +16,9 @@ const SIZE = 15;
 
 export default function VersionMiddlewares() {
 	const [selectedRows, setSelectedRows] = useState<Row<Middleware>[]>();
-	const {
-		getMiddlewaresOfAppVersion,
-		deleteMiddleware,
-		deleteMultipleMiddlewares,
-		middlewares,
-		lastFetchedCount,
-	} = useMiddlewareStore();
-	const [search, setSearch] = useState<string>('');
+	const { getMiddlewaresOfAppVersion, deleteMultipleMiddlewares, middlewares, lastFetchedCount } =
+		useMiddlewareStore();
+
 	const [page, setPage] = useState(0);
 	const [table, setTable] = useState<Table<Middleware>>();
 	const { orgId, appId, versionId } = useParams();
@@ -30,73 +26,42 @@ export default function VersionMiddlewares() {
 	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const id = useId();
+	const [open, setOpen] = useState(false);
 
-	const filteredMiddlewares = useMemo(() => {
-		if (!search) return middlewares;
-		return middlewares.filter((middleware) =>
-			middleware.name.toLowerCase().includes(search.toLowerCase()),
-		);
-	}, [middlewares, search]);
-
-	function onInput(value: string) {
-		value = value.trim();
-		setSearch(value);
-	}
-
-	async function deleteHandler() {
+	function deleteMultipleMiddlewaresHandler() {
 		const rows = selectedRows?.map((row) => row.original);
-		if (!rows || rows.length === 0) return;
-		const { orgId, versionId, appId } = rows[0];
-
-		if (rows.length === 1) {
-			await deleteMiddleware({
-				orgId,
-				versionId,
-				appId,
-				mwId: rows[0]._id,
-			});
-		} else {
-			await deleteMultipleMiddlewares({
-				orgId,
-				versionId,
-				appId,
-				middlewareIds: rows.map((row) => row._id),
-			});
-		}
-	}
-
-	async function getMiddlewares() {
-		if (!orgId || !appId || !versionId) return;
-
-		const data: GetMiddlewaresOfAppVersionParams = {
-			orgId,
-			appId,
-			versionId,
-			page,
-			size: SIZE,
-		};
-
-		if (searchParams.has('q')) {
-			data.search = searchParams.get('q') as string;
-		}
-		await getMiddlewaresOfAppVersion(data);
+		deleteMultipleMiddlewares({
+			orgId: orgId as string,
+			versionId: versionId as string,
+			appId: appId as string,
+			middlewareIds: rows?.map((row) => row._id) as string[],
+		});
 	}
 
 	function next() {
 		setPage((prevState) => prevState + 1);
-		getMiddlewares();
 	}
-
+	useEffect(() => {
+		getMiddlewaresOfAppVersion({
+			orgId: orgId as string,
+			versionId: versionId as string,
+			appId: appId as string,
+			size: PAGE_SIZE,
+			page,
+			search: searchParams.get('q') as string,
+			initialFetch: page === 0,
+		});
+	}, [page, searchParams.get('q')]);
 	return (
 		<VersionTabLayout<Middleware>
 			className='p-0'
 			type='middleware'
 			title={t('version.settings.middlewares')}
 			emptyStateTitle={t('version.middleware.no_middleware_found')}
-			isEmpty={!filteredMiddlewares.length}
-			handlerButton={<AddMiddlewareButton />}
-			onMultipleDelete={deleteHandler}
-			onSearch={onInput}
+			isEmpty={!middlewares.length}
+			openCreateModal={() => setOpen(true)}
+			onMultipleDelete={deleteMultipleMiddlewaresHandler}
+			onSearch={() => setPage(0)}
 			table={table}
 			selectedRowLength={selectedRows?.length}
 			disabled={!canCreate}
@@ -118,6 +83,7 @@ export default function VersionMiddlewares() {
 					/>
 				</InfiniteScroll>
 			</div>
+			<AddMiddlewareDrawer open={open} onOpenChange={setOpen} />
 		</VersionTabLayout>
 	);
 }
