@@ -19,10 +19,7 @@ interface MiddlewareStore {
 	middleware: Middleware | null;
 	editMiddlewareDrawerIsOpen: boolean;
 	lastFetchedCount: number;
-	getMiddlewaresOfAppVersion: (
-		params: GetMiddlewaresOfAppVersionParams,
-		init?: boolean,
-	) => Promise<Middleware[]>;
+	getMiddlewaresOfAppVersion: (params: GetMiddlewaresOfAppVersionParams) => Promise<Middleware[]>;
 	getMiddlewareById: (params: GetMiddlewareByIdParams) => Promise<Middleware>;
 	deleteMiddleware: (params: DeleteMiddlewareParams, showAlert?: boolean) => Promise<void>;
 	deleteMultipleMiddlewares: (
@@ -72,12 +69,9 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 						throw e;
 					}
 				},
-				getMiddlewaresOfAppVersion: async (
-					params: GetMiddlewaresOfAppVersionParams,
-					init?: boolean,
-				) => {
+				getMiddlewaresOfAppVersion: async (params: GetMiddlewaresOfAppVersionParams) => {
 					const middlewares = await MiddlewareService.getMiddlewaresOfAppVersion(params);
-					if (init) {
+					if (params.initialFetch) {
 						set({ middlewares });
 					} else {
 						set((prev) => ({ middlewares: [...prev.middlewares, ...middlewares] }));
