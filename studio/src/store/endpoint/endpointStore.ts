@@ -1,3 +1,4 @@
+import { CustomStateStorage } from '@/helpers';
 import { EndpointService } from '@/services';
 import {
 	APIError,
@@ -92,7 +93,7 @@ const useEndpointStore = create<EndpointStore>()(
 				getEndpoints: async (params) => {
 					try {
 						const endpoints = await EndpointService.getEndpoints(params);
-						if (params.initialFetch) {
+						if (params.page === 0) {
 							set({ endpoints, lastFetchedCount: endpoints.length });
 						} else {
 							set((prev) => ({
@@ -252,6 +253,7 @@ const useEndpointStore = create<EndpointStore>()(
 			}),
 			{
 				name: 'endpoint-storage',
+				storage: CustomStateStorage,
 			},
 		),
 		{

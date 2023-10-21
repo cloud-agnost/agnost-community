@@ -1,3 +1,4 @@
+import { CustomStateStorage } from '@/helpers';
 import { FunctionService } from '@/services';
 import * as funcTypes from '@/types';
 import { create } from 'zustand';
@@ -39,7 +40,7 @@ const useFunctionStore = create<FunctionStore>()(
 				isDeleteFunctionModalOpen: false,
 				getFunctionsOfAppVersion: async (params) => {
 					const functions = await FunctionService.getFunctionsOfAppVersion(params);
-					if (params.initialFetch) {
+					if (params.page === 0) {
 						set({ functions });
 					} else {
 						set((prev) => ({ functions: [...prev.functions, ...functions] }));
@@ -129,6 +130,7 @@ const useFunctionStore = create<FunctionStore>()(
 			}),
 			{
 				name: 'function-store',
+				storage: CustomStateStorage,
 			},
 		),
 	),

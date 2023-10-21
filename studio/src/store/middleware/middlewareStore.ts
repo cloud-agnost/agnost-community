@@ -71,10 +71,13 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 				},
 				getMiddlewaresOfAppVersion: async (params: GetMiddlewaresOfAppVersionParams) => {
 					const middlewares = await MiddlewareService.getMiddlewaresOfAppVersion(params);
-					if (params.initialFetch) {
-						set({ middlewares });
+					if (params.page === 0) {
+						set({ middlewares, lastFetchedCount: middlewares.length });
 					} else {
-						set((prev) => ({ middlewares: [...prev.middlewares, ...middlewares] }));
+						set((prev) => ({
+							middlewares: [...prev.middlewares, ...middlewares],
+							lastFetchedCount: middlewares.length,
+						}));
 					}
 					set({ lastFetchedCount: middlewares.length });
 					return middlewares;

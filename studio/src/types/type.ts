@@ -194,7 +194,6 @@ export interface BaseGetRequest extends BaseRequest {
 	start?: string;
 	end?: string;
 	search?: string;
-	initialFetch?: boolean;
 }
 
 export interface SortOption {

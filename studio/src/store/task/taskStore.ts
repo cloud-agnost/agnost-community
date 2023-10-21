@@ -1,3 +1,4 @@
+import { CustomStateStorage } from '@/helpers/state';
 import TaskService from '@/services/TaskService';
 import {
 	APIError,
@@ -65,7 +66,12 @@ const useTaskStore = create<TaskStore>()(
 				},
 				getTasks: async (params: GetTasksParams) => {
 					const tasks = await TaskService.getTasks(params);
-					set({ tasks, lastFetchedCount: tasks.length });
+					if (params.page === 0) {
+						set({ tasks, lastFetchedCount: tasks.length });
+					} else {
+						set({ tasks: [...tasks, ...tasks], lastFetchedCount: tasks.length });
+					}
+
 					return tasks;
 				},
 				createTask: async (params: CreateTaskParams) => {
@@ -171,6 +177,7 @@ const useTaskStore = create<TaskStore>()(
 			}),
 			{
 				name: 'task-storage',
+				storage: CustomStateStorage,
 			},
 		),
 		{

@@ -1,3 +1,4 @@
+import { CustomStateStorage } from '@/helpers';
 import QueueService from '@/services/QueueService';
 import {
 	APIError,
@@ -62,11 +63,11 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 				},
 				getQueues: async (params: GetMessageQueuesParams) => {
 					const queues = await QueueService.getQueues(params);
-					if (params.initialFetch) {
+					if (params.page === 0) {
 						set({ queues, lastFetchedCount: queues.length });
 					} else {
 						set((prev) => ({
-							endpoints: [...prev.queues, ...queues],
+							queues: [...prev.queues, ...queues],
 							lastFetchedCount: queues.length,
 						}));
 					}
@@ -182,6 +183,7 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 			}),
 			{
 				name: 'message-queue-store',
+				storage: CustomStateStorage,
 			},
 		),
 	),

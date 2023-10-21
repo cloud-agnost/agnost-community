@@ -1,3 +1,4 @@
+import { CustomStateStorage } from '@/helpers';
 import { CacheService } from '@/services';
 import {
 	APIError,
@@ -48,10 +49,10 @@ const useCacheStore = create<CacheStore>()(
 				getCaches: async (params: GetCachesOfAppVersionParams) => {
 					try {
 						const caches = await CacheService.getCaches(params);
-						if (params.initialFetch) {
-							set({ caches });
+						if (params.page === 0) {
+							set({ caches, lastFetchedCount: caches.length });
 						} else {
-							set({ caches: [...get().caches, ...caches] });
+							set({ caches: [...get().caches, ...caches], lastFetchedCount: caches.length });
 						}
 						set({ lastFetchedCount: caches.length });
 					} catch (error) {
@@ -128,6 +129,7 @@ const useCacheStore = create<CacheStore>()(
 			}),
 			{
 				name: 'cache-store',
+				storage: CustomStateStorage,
 			},
 		),
 	),
