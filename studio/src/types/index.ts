@@ -21,6 +21,7 @@ export {
 	AccessDbSchema,
 	AllowedRole,
 	ConnectResourceSchema,
+	CreateResourceSchema,
 	KafkaConnFormat,
 	KafkaSaslMechanism,
 	MongoDBConnFormat,
@@ -29,7 +30,6 @@ export {
 	ResourceCreateType,
 	ResourceInstances,
 	ResourceType,
-	CreateResourceSchema,
 } from './resource.ts';
 export type * from './storage.ts';
 export { BucketSchema, CreateStorageSchema, StorageSchema } from './storage.ts';
@@ -38,4 +38,4 @@ export { CreateTaskSchema } from './task.ts';
 export type * from './type.ts';
 export { OAuthProviderTypes, PhoneAuthSMSProviders, SMTPSchema } from './type.ts';
 export type * from './version.ts';
-export { TemplateTypes } from './version.ts';
+export { TabTypes, TemplateTypes } from './version.ts';

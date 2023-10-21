@@ -1,14 +1,6 @@
-import { BaseParams, Middleware } from '@/types';
+import { BaseGetRequest, BaseParams, Middleware } from '@/types';
 
-export type GetMiddlewaresOfAppVersionParams = BaseParams & {
-	page: number;
-	size: number;
-	search?: string;
-	sortBy?: string;
-	sortDir?: 'asc' | 'desc';
-	start?: number;
-	end?: number;
-};
+export type GetMiddlewaresOfAppVersionParams = BaseParams & BaseGetRequest;
 
 export type GetMiddlewareByIdParams = BaseParams & {
 	mwId: string;

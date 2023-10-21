@@ -224,19 +224,25 @@ export interface GetVersionRequest extends BaseGetRequest {
 	appId: string;
 }
 
-export type TabTypes =
-	| 'Database'
-	| 'Storage'
-	| 'Cache'
-	| 'Message Queue'
-	| 'Task'
-	| 'Endpoint'
-	| 'Middleware'
-	| 'Settings'
-	| 'Dashboard'
-	| 'Notifications'
-	| 'Queue'
-	| 'Function';
+export enum TabTypes {
+	Database = 'Database',
+	Storage = 'Storage',
+	Cache = 'Cache',
+	MessageQueue = 'Message Queue',
+	Task = 'Task',
+	Endpoint = 'Endpoint',
+	Middleware = 'Middleware',
+	Settings = 'Settings',
+	Dashboard = 'Dashboard',
+	Notifications = 'Notifications',
+	Queue = 'Queue',
+	Function = 'Function',
+	Model = 'Model',
+	Field = 'Field',
+	Bucket = 'Bucket',
+	File = 'File',
+	Navigator = 'Navigator',
+}
 
 export type DesignElementTypes = Lowercase<TabTypes>;
 export interface Tab {
