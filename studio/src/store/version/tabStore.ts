@@ -11,6 +11,7 @@ interface TabStore {
 	closeDeleteTabModal: () => void;
 	removeAllTabs: (versionId: string) => void;
 	removeAllTabsExcept: (versionId: string) => void;
+	removeAllAtRight: (versionId: string) => void;
 	setCurrentTab: (versionId: string, id: string) => void;
 	removeTab: (versionId: string, id: string) => void;
 	addTab: (versionId: string, tab: Tab) => void;
@@ -21,7 +22,9 @@ interface TabStore {
 	getCurrentTab: (versionId: string) => Tab;
 	updateCurrentTab: (versionId: string, tab: Tab) => void;
 	setTabs: (versionId: string, tabs: Tab[]) => void;
+	filterTabs: (versionId: string, filter: (tab: Tab) => boolean) => Tab;
 	removeTabByPath: (versionId: string, path: string) => void;
+	updateTab: (versionId: string, updatedTab: Tab, filter: (tab: Tab) => boolean) => void;
 }
 
 const useTabStore = create<TabStore>()(
@@ -68,6 +71,7 @@ const useTabStore = create<TabStore>()(
 				},
 				addTab: (versionId, tab) => {
 					const existingTab = get().tabs[versionId]?.find((t) => t.path === tab.path);
+					console.log('existingTab', existingTab, tab.path);
 					if (!existingTab) {
 						set((state) => {
 							const tabs = state.tabs[versionId] ?? [];
@@ -114,6 +118,21 @@ const useTabStore = create<TabStore>()(
 					set((state) => {
 						const tabs = state.tabs[versionId] ?? [];
 						const newTabs = tabs.filter((tab) => tab.isDashboard || tab.isActive);
+						return {
+							tabs: {
+								...state.tabs,
+								[versionId]: newTabs,
+							},
+						};
+					});
+				},
+				removeAllAtRight: (versionId) => {
+					const currentTab = get().getCurrentTab(versionId);
+					const tabs = get().tabs[versionId] ?? [];
+					const currentTabIndex = tabs.findIndex((tab) => tab.id === currentTab.id);
+					if (currentTabIndex === -1) return;
+					const newTabs = tabs.slice(0, currentTabIndex + 1);
+					set((state) => {
 						return {
 							tabs: {
 								...state.tabs,
@@ -169,6 +188,18 @@ const useTabStore = create<TabStore>()(
 					const tab = get().tabs[versionId]?.find((tab) => tab.path.includes(path));
 					if (!tab) return;
 					get().removeTab(versionId, tab.id);
+				},
+				filterTabs: (versionId, filter) => {
+					const tabs = get().tabs[versionId] ?? [];
+					return tabs.find(filter) ?? ({} as Tab);
+				},
+				updateTab: (versionId, updatedTab, filter) => {
+					const tab = get().filterTabs(versionId, filter);
+					if (!tab) return;
+					get().updateCurrentTab(versionId, {
+						...tab,
+						...updatedTab,
+					});
 				},
 			}),
 			{
