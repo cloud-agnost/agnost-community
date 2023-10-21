@@ -6,7 +6,7 @@ import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import { BreadCrumbItem } from 'components/BreadCrumb';
 import { useTranslation } from 'react-i18next';
 
-VersionEditMiddlewares.loader = async ({ params }: LoaderFunctionArgs) => {
+EditMiddleware.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { middlewareId, orgId, appId, versionId } = params as Record<string, string>;
 	const res = await useMiddlewareStore.getState().getMiddlewareById({
 		orgId,
@@ -17,7 +17,7 @@ VersionEditMiddlewares.loader = async ({ params }: LoaderFunctionArgs) => {
 	return { middlewareFromApi: res };
 };
 
-export default function VersionEditMiddlewares() {
+export default function EditMiddleware() {
 	const { middlewareFromApi } = useLoaderData() as { middlewareFromApi: Middleware };
 	const { middlewareId, orgId, appId, versionId } = useParams() as Record<string, string>;
 	const { saveMiddlewareCode, setEditMiddlewareDrawerIsOpen, middlewares } = useMiddlewareStore();
