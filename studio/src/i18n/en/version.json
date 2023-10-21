@@ -23,6 +23,7 @@
 	"deployment_status": "Deployment Status",
 	"close_selected_tab": "Close selected tab",
 	"close_all_tabs": "Close all tabs",
+	"close_at_right": "Close tabs at right",
 	"close_all_tabs_except_current": "Close all tabs except current",
 	"duplicate_tab": "Duplicate selected tab",
 	"suspend_services": "Suspend services",
