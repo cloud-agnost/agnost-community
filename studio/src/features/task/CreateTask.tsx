@@ -3,7 +3,7 @@ import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
 import useResourceStore from '@/store/resources/resourceStore';
 import useTaskStore from '@/store/task/taskStore';
-import { CreateTaskSchema } from '@/types';
+import { CreateTaskSchema, TabTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -56,7 +56,7 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 					path: `${pathname}/${task._id}`,
 					isActive: true,
 					isDashboard: false,
-					type: 'Task',
+					type: TabTypes.Task,
 				});
 				onClose();
 			},

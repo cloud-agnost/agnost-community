@@ -2,7 +2,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
-import { CreateEndpointSchema } from '@/types';
+import { CreateEndpointSchema, TabTypes } from '@/types';
 import { removeEmptyFields, translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -45,7 +45,7 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 					path: `${pathname}/${endpoint._id}`,
 					isActive: true,
 					isDashboard: false,
-					type: 'Endpoint',
+					type: TabTypes.Endpoint,
 				});
 				closeDrawer();
 			},

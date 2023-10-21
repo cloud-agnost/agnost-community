@@ -76,6 +76,7 @@ import {
 	ResourceType,
 	SortOption,
 	Tab,
+	TabTypes,
 } from '@/types';
 import { generateId, translate } from '@/utils';
 import {
@@ -283,63 +284,63 @@ export const INVITATIONS_SORT_OPTIONS: SortOption[] = [
 		sortDir: 'desc',
 	},
 ];
-
+const { getVersionDashboardPath } = useVersionStore.getState();
 export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 	{
 		title: translate('version.databases'),
-		path: 'database',
+		path: getVersionDashboardPath('/database'),
 		isActive: false,
 		isDashboard: false,
-		type: 'Database',
+		type: TabTypes.Database,
 	},
 	{
 		title: translate('version.storage'),
-		path: 'storage',
+		path: getVersionDashboardPath('/storage'),
 		isActive: false,
 		isDashboard: false,
-		type: 'Storage',
+		type: TabTypes.Storage,
 	},
 	{
 		title: translate('version.cache'),
-		path: 'cache',
+		path: getVersionDashboardPath('/cache'),
 		isActive: false,
 		isDashboard: false,
-		type: 'Cache',
+		type: TabTypes.Cache,
 	},
 	{
 		title: translate('version.endpoints'),
-		path: 'endpoint',
+		path: getVersionDashboardPath('/endpoint'),
 		isActive: false,
 		isDashboard: false,
-		type: 'Endpoint',
+		type: TabTypes.Endpoint,
 	},
 	{
 		title: translate('version.message_queues'),
-		path: 'queue',
+		path: getVersionDashboardPath('/queue'),
 		isActive: false,
 		isDashboard: false,
-		type: 'Message Queue',
+		type: TabTypes.MessageQueue,
 	},
 	{
 		title: translate('version.cron_jobs'),
-		path: 'task',
+		path: getVersionDashboardPath('/task'),
 		isActive: false,
 		isDashboard: false,
-		type: 'Task',
+		type: TabTypes.Task,
 	},
 	{
 		title: translate('version.middleware.default'),
 		path: 'middleware',
 		isActive: false,
 		isDashboard: false,
-		type: 'Middleware',
+		type: TabTypes.Middleware,
 	},
 	{
 		title: translate('version.function'),
-		path: 'function',
+		path: getVersionDashboardPath('/function'),
 		isActive: false,
 		isDashboard: false,
-		type: 'Function',
+		type: TabTypes.Function,
 	},
 ];
 
@@ -661,7 +662,7 @@ export const VERSION_DROPDOWN_ITEM = [
 				path: versionHomePath,
 				isActive: true,
 				isDashboard: false,
-				type: 'Settings',
+				type: TabTypes.Settings,
 			});
 		},
 		disabled: false,

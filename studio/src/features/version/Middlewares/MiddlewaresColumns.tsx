@@ -3,7 +3,7 @@ import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useMiddlewareStore from '@/store/middleware/middlewareStore';
-import { ColumnDefWithClassName, Middleware } from '@/types';
+import { ColumnDefWithClassName, Middleware, TabTypes } from '@/types';
 import { translate } from '@/utils';
 import { ActionsCell } from 'components/ActionsCell';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
@@ -43,7 +43,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 				original: { _id, name },
 			},
 		}) => {
-			return <TabLink name={name} path={`${_id}`} type='Middleware' />;
+			return <TabLink name={name} path={`${_id}`} type={TabTypes.Middleware} />;
 		},
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',

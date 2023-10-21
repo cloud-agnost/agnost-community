@@ -1,7 +1,7 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { DATABASE_ICON_MAP } from '@/constants';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
-import { ColumnDefWithClassName, Database } from '@/types';
+import { ColumnDefWithClassName, Database, TabTypes } from '@/types';
 import { translate } from '@/utils';
 import { Table } from '@phosphor-icons/react';
 import { Badge } from 'components/Badge';
@@ -25,7 +25,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 				<TabLink
 					name={original.name}
 					path={`${original._id}/models`}
-					type='Database'
+					type={TabTypes.Model}
 					onClick={() => setDatabase(original)}
 				/>
 			);

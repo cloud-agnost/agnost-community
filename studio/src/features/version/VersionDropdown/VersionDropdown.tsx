@@ -3,7 +3,7 @@ import { VERSION_DROPDOWN_ITEM } from '@/constants';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { APIError } from '@/types';
+import { APIError, TabTypes } from '@/types';
 import { generateId } from '@/utils';
 import { CaretUpDown, LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ConfirmationModal } from 'components/ConfirmationModal';
@@ -88,7 +88,7 @@ export default function VersionDropdown() {
 								title: t('version.settings.default'),
 								isActive: true,
 								isDashboard: false,
-								type: 'Settings',
+								type: TabTypes.Settings,
 							});
 						}}
 					>

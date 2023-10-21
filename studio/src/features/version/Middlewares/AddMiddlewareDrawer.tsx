@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { nameSchema } from '@/features/version/Middlewares/formSchema.ts';
-import { Middleware } from '@/types';
+import { Middleware, TabTypes } from '@/types';
 import { useTabNavigate } from '@/hooks';
 const MiddlewareFormSchema = z.object({
 	name: nameSchema,
@@ -71,7 +71,7 @@ export default function AddMiddlewareDrawer({
 					path: `${pathname}/${mw._id}`,
 					isActive: true,
 					isDashboard: false,
-					type: 'Middleware',
+					type: TabTypes.Middleware,
 				});
 			}
 		} finally {

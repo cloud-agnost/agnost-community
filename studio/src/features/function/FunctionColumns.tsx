@@ -1,7 +1,7 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import useFunctionStore from '@/store/function/functionStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { ColumnDefWithClassName, HelperFunction } from '@/types';
+import { ColumnDefWithClassName, HelperFunction, TabTypes } from '@/types';
 import { translate } from '@/utils';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
@@ -35,7 +35,7 @@ const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
 		sortingFn: 'textCaseSensitive',
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
-			return <TabLink name={name} path={`${_id}`} type='Function' />;
+			return <TabLink name={name} path={`${_id}`} type={TabTypes.Function} />;
 		},
 	},
 	{
