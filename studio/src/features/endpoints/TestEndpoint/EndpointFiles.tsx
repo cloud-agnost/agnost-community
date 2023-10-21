@@ -108,7 +108,7 @@ export default function EndpointFiles() {
 											<Input
 												placeholder={
 													t('forms.placeholder', {
-														label: t('resources.database.key'),
+														label: t('resources.database.value'),
 													}) ?? ''
 												}
 												{...field}
@@ -162,7 +162,7 @@ export default function EndpointFiles() {
 						onClick={() => append({ key: '', value: '', type: 'text' })}
 					>
 						<Plus size={16} className='text-icon-secondary mr-2' weight='bold' />
-						{t('endpoint.test.add_query_param')}
+						{t('endpoint.test.add_form_data')}
 					</Button>
 				</TableCell>
 			</TableRow>

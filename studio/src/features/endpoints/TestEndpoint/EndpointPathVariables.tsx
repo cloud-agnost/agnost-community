@@ -71,7 +71,7 @@ export default function EndpointPathVariables() {
 										<Input
 											placeholder={
 												t('forms.placeholder', {
-													label: t('resources.database.key'),
+													label: t('resources.database.value'),
 												}) ?? ''
 											}
 											error={!!errors.params?.queryParams?.[index]?.value}
