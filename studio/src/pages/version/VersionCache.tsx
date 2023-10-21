@@ -24,7 +24,7 @@ export default function VersionCache() {
 	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
 	const canCreateCache = useAuthorizeVersion('cache.create');
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 	const {
@@ -57,16 +57,6 @@ export default function VersionCache() {
 				closeDeleteCacheModal();
 			},
 		});
-	}
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		setPage(0);
-		setSearchParams({ ...searchParams, q: value });
 	}
 
 	function deleteMultipleCachesHandler() {
@@ -109,7 +99,7 @@ export default function VersionCache() {
 				emptyStateTitle={t('cache.empty_text')}
 				table={table}
 				selectedRowLength={selectedRows?.length}
-				onSearch={onInput}
+				onSearch={() => setPage(0)}
 				onMultipleDelete={deleteMultipleCachesHandler}
 				disabled={!canCreateCache}
 			>

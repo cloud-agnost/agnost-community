@@ -63,7 +63,7 @@ export default function Buckets() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 	const viewData = useAuthorizeVersion('storage.viewData');
@@ -99,17 +99,6 @@ export default function Buckets() {
 			name: t('storage.buckets') as string,
 		},
 	];
-
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		setBucketPage(1);
-		setSearchParams({ ...searchParams, q: value });
-	}
 
 	function deleteMultipleBucketsHandler() {
 		deleteMultipleBuckets({
@@ -169,7 +158,7 @@ export default function Buckets() {
 			emptyStateTitle={t('storage.bucket.empty_text')}
 			table={bucketTable}
 			selectedRowLength={selectedBuckets?.length}
-			onSearch={onInput}
+			onSearch={() => setBucketPage(1)}
 			onMultipleDelete={deleteMultipleBucketsHandler}
 			breadCrumb={<BreadCrumb goBackLink={storageUrl} items={breadcrumbItems} />}
 		>

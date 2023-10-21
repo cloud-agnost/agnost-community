@@ -22,10 +22,9 @@ interface Props<T> {
 	className?: string;
 	breadCrumb?: ReactNode;
 	handlerButton?: ReactNode;
-	onSearchInputClear?: () => void;
 	onMultipleDelete?: () => void;
-	onSearch?: (value: string) => void;
 	openCreateModal?: () => void;
+	onSearch?: () => void;
 }
 
 export default function VersionTabLayout<T>({
@@ -42,26 +41,14 @@ export default function VersionTabLayout<T>({
 	className,
 	handlerButton,
 	onMultipleDelete,
-	onSearch,
 	openCreateModal,
-	onSearchInputClear,
+	onSearch,
 }: Props<T>) {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { t } = useTranslation();
 
-	function onSearchHandler(value: string) {
-		setQueryParam(value);
-		onSearch?.(value);
-	}
-
 	function onClearHandler() {
-		setQueryParam();
-		onSearchInputClear?.();
-	}
-
-	function setQueryParam(value?: string) {
-		if (!value || value === '') searchParams.delete('q');
-		else searchParams.set('q', value);
+		searchParams.delete('q');
 		setSearchParams(searchParams);
 	}
 
@@ -93,7 +80,16 @@ export default function VersionTabLayout<T>({
 	} else {
 		content = children;
 	}
-
+	function onInput(value: string) {
+		value = value.trim();
+		if (!value) {
+			searchParams.delete('q');
+			setSearchParams(searchParams);
+			return;
+		}
+		if (onSearch) onSearch();
+		setSearchParams({ ...searchParams, q: value });
+	}
 	return (
 		<div className={cn('h-full space-y-4 flex flex-col', className)}>
 			{breadCrumb}
@@ -103,7 +99,7 @@ export default function VersionTabLayout<T>({
 					{onSearch && (
 						<SearchInput
 							value={searchParams.get('q') ?? undefined}
-							onSearch={onSearchHandler}
+							onSearch={onInput}
 							onClear={onClearHandler}
 							className='sm:w-[450px] flex-1'
 						/>

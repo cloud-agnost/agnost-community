@@ -38,7 +38,7 @@ export default function Files() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 
 	const {
@@ -58,16 +58,6 @@ export default function Files() {
 		uploadProgress,
 	} = useStorageStore();
 
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		setPage(1);
-		setSearchParams({ ...searchParams, q: value });
-	}
 	const storageUrl = `/organization/${storage?.orgId}/apps/${storage?.appId}/version/${storage?.versionId}/storage`;
 	const bucketUrl = `${storageUrl}/${storage._id}`;
 	const breadcrumbItems: BreadCrumbItem[] = [
@@ -167,7 +157,7 @@ export default function Files() {
 			emptyStateTitle={t('storage.file.empty_text')}
 			table={table as Table<BucketFile>}
 			selectedRowLength={selectedRows?.length}
-			onSearch={onInput}
+			onSearch={() => setPage(1)}
 			onMultipleDelete={deleteMultipleFilesHandler}
 		>
 			{loading && (uploadProgress > 0 || uploadProgress < 100) && (

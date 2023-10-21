@@ -27,7 +27,7 @@ interface OutletContext {
 export default function MainEndpoint() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const { notify } = useToast();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
@@ -72,16 +72,6 @@ export default function MainEndpoint() {
 			},
 		});
 	}
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		setPage(0);
-		setSearchParams({ ...searchParams, q: value });
-	}
 
 	function deleteMultipleEndpointsHandler() {
 		deleteMultipleEndpoints({
@@ -123,7 +113,7 @@ export default function MainEndpoint() {
 				setIsCreateModalOpen(true);
 			}}
 			onMultipleDelete={deleteMultipleEndpointsHandler}
-			onSearch={onInput}
+			onSearch={() => setPage(0)}
 			table={table}
 			selectedRowLength={selectedRows.length}
 			disabled={!canCreate}

@@ -27,7 +27,7 @@ export default function MainStorage() {
 	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
 	const canCreateStorages = useAuthorizeVersion('storage.create');
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 
@@ -70,17 +70,6 @@ export default function MainStorage() {
 			},
 		});
 	}
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		setPage(0);
-		setSearchParams({ ...searchParams, q: value });
-	}
-
 	function deleteMultipleStoragesHandler() {
 		deleteMultipleStorages({
 			storageIds: selectedRows.map((row) => row.original._id),
@@ -119,7 +108,7 @@ export default function MainStorage() {
 			emptyStateTitle={t('storage.empty_text')}
 			table={table}
 			selectedRowLength={selectedRows?.length}
-			onSearch={onInput}
+			onSearch={() => setPage(0)}
 			onMultipleDelete={deleteMultipleStoragesHandler}
 			disabled={!canCreateStorages}
 		>

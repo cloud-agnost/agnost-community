@@ -22,7 +22,7 @@ export default function OrganizationApps() {
 	const [error, setError] = useState<null | APIError>(null);
 	const [isCard, setIsCard] = useState(true);
 	const { notify } = useToast();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const { organization } = useOrganizationStore();
 	const {
 		applications,
@@ -39,14 +39,6 @@ export default function OrganizationApps() {
 	} = useApplicationStore();
 	const canAppCreate = useAuthorizeOrg('app.create');
 	const { t } = useTranslation();
-
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-		} else setSearchParams({ ...searchParams, q: value });
-	}
 
 	function leaveAppHandler() {
 		leaveAppTeam({
@@ -89,7 +81,7 @@ export default function OrganizationApps() {
 
 	useEffect(() => {
 		const query = searchParams.get('q');
-		if (temp.length && query) searchApplications(query as string);
+		if (temp.length) searchApplications(query as string);
 	}, [searchParams.get('q'), temp]);
 
 	useEffect(() => {
@@ -104,11 +96,7 @@ export default function OrganizationApps() {
 							{applications.length} {t('application.apps')}
 						</h1>
 						<div className='flex items-center justify-center gap-6'>
-							<SearchInput
-								placeholder='Search apps'
-								onSearch={onInput}
-								value={searchParams.get('q') as string}
-							/>
+							<SearchInput placeholder='Search apps' value={searchParams.get('q') as string} />
 							<ButtonGroup>
 								<Button
 									variant='outline'

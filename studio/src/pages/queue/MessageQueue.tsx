@@ -38,7 +38,7 @@ export default function MainMessageQueue() {
 	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
 	const canEdit = useAuthorizeVersion('queue.create');
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 
@@ -69,16 +69,6 @@ export default function MainMessageQueue() {
 				closeDeleteModal();
 			},
 		});
-	}
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		setPage(0);
-		setSearchParams({ ...searchParams, q: value });
 	}
 
 	function deleteMultipleQueuesHandler() {
@@ -121,7 +111,7 @@ export default function MainMessageQueue() {
 			emptyStateTitle={t('queue.empty_text')}
 			table={table}
 			selectedRowLength={selectedRows?.length}
-			onSearch={onInput}
+			onSearch={() => setPage(0)}
 			onMultipleDelete={deleteMultipleQueuesHandler}
 			disabled={!canEdit}
 			handlerButton={

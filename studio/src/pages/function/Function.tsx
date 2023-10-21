@@ -37,19 +37,8 @@ export default function MainFunction() {
 		closeDeleteFunctionModal,
 	} = useFunctionStore();
 	const { versionId, orgId, appId } = useParams();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const { setIsCreateModalOpen }: OutletContext = useOutletContext();
-
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		setPage(0);
-		setSearchParams({ ...searchParams, q: value });
-	}
 
 	function deleteMultipleFunctionsHandler() {
 		deleteMultipleFunctions({
@@ -110,7 +99,7 @@ export default function MainFunction() {
 				setIsCreateModalOpen(true);
 			}}
 			onMultipleDelete={deleteMultipleFunctionsHandler}
-			onSearch={onInput}
+			onSearch={() => setPage(0)}
 			table={table}
 			selectedRowLength={selectedRows.length}
 			disabled={!canCreate}
