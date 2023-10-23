@@ -1,31 +1,28 @@
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectSeparator,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/Select';
-import { FormControl } from '../Form';
-import { Resource, ResourceType } from '@/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { RESOURCE_ICON_MAP } from '@/constants';
-import { useTranslation } from 'react-i18next';
-import { SelectProps } from '@radix-ui/react-select';
-import { Button } from '../Button';
-import { Plus } from '@phosphor-icons/react';
 import useResourceStore from '@/store/resources/resourceStore';
+import { SelectProps } from '@radix-ui/react-select';
+import { useTranslation } from 'react-i18next';
+import { FormControl } from '../Form';
 import { useEffect } from 'react';
+import { ResourceType } from '@/types';
 interface ResourceSelectProps extends SelectProps {
 	error: boolean;
+	type: ResourceType;
 }
-export default function ResourceSelect({ error, ...props }: ResourceSelectProps) {
+export default function ResourceSelect({ error, type, ...props }: ResourceSelectProps) {
 	const { t } = useTranslation();
-	const { toggleCreateResourceModal, selectResourceType, getResources, resources } =
-		useResourceStore();
+	const { resources, getResources } = useResourceStore();
 	function getIcon(type: string): React.ReactNode {
 		const Icon = RESOURCE_ICON_MAP[type];
 		return <Icon className='w-6 h-6' />;
 	}
+
+	useEffect(() => {
+		getResources({
+			type,
+		});
+	}, []);
 
 	return (
 		<Select {...props}>
@@ -33,9 +30,7 @@ export default function ResourceSelect({ error, ...props }: ResourceSelectProps)
 				<SelectTrigger error={error} className='w-1/3'>
 					<SelectValue placeholder={`${t('general.select')} ${t('queue.create.resource.title')}`} />
 				</SelectTrigger>
-				[
 			</FormControl>
-			]
 			<SelectContent align='center'>
 				{/* <Button
 					size='full'

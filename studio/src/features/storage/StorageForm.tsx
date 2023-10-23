@@ -11,7 +11,7 @@ import {
 import { Input } from '@/components/Input';
 import { ResourceSelect } from '@/components/ResourceSelect';
 import useResourceStore from '@/store/resources/resourceStore';
-import { CreateStorageSchema } from '@/types';
+import { CreateStorageSchema, ResourceType } from '@/types';
 import { translate as t } from '@/utils';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -22,7 +22,7 @@ interface StorageFormProps {
 }
 export default function StorageForm({ edit = false }: StorageFormProps) {
 	const form = useFormContext<z.infer<typeof CreateStorageSchema>>();
-	const { getResources, resources } = useResourceStore();
+	const { getResources } = useResourceStore();
 
 	useEffect(() => {
 		getResources({
@@ -68,7 +68,7 @@ export default function StorageForm({ edit = false }: StorageFormProps) {
 									name={field.name}
 									onValueChange={field.onChange}
 									error={Boolean(form.formState.errors.resourceId)}
-									resources={resources}
+									type={ResourceType.Storage}
 								/>
 							</FormControl>
 							<FormDescription>{t('queue.create.resource.description')}</FormDescription>

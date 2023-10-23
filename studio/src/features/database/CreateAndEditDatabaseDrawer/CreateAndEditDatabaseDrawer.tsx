@@ -1,11 +1,12 @@
-import { DATABASE_ICON_MAP, NAME_SCHEMA } from '@/constants';
+import { ResourceSelect } from '@/components/ResourceSelect';
+import { NAME_SCHEMA } from '@/constants';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
+import useResourceStore from '@/store/resources/resourceStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { APIError } from '@/types';
-import { cn, translate } from '@/utils';
+import { APIError, ResourceType } from '@/types';
+import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import {
@@ -18,22 +19,13 @@ import {
 	FormMessage,
 } from 'components/Form';
 import { Input } from 'components/Input';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectSeparator,
-	SelectTrigger,
-	SelectValue,
-} from 'components/Select';
 import { Separator } from 'components/Separator';
+import { SettingsFormItem } from 'components/SettingsFormItem';
+import { Switch } from 'components/Switch';
 import { FormEvent, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-import { SettingsFormItem } from 'components/SettingsFormItem';
-import { Switch } from 'components/Switch';
-import useResourceStore from '@/store/resources/resourceStore.ts';
 interface CreateDatabaseDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -66,7 +58,6 @@ export default function CreateAndEditDatabaseDrawer({
 	const { version } = useVersionStore();
 	const { createDatabase, toEditDatabase, updateDatabaseName } = useDatabaseStore();
 	const getResources = useResourceStore((state) => state.getResources);
-	const toggleCreateResourceModal = useResourceStore((state) => state.toggleCreateResourceModal);
 	const canCreateDatabase = useAuthorizeVersion('db.create');
 	const resources = useResourceStore((state) =>
 		state.resources.filter((resource) => resource.type === 'database'),
@@ -133,7 +124,7 @@ export default function CreateAndEditDatabaseDrawer({
 			});
 		}
 	}
-
+	console.log('modelToEdit', form.formState.errors);
 	function formHandler(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		form.handleSubmit(onSubmit)(event);
@@ -214,54 +205,15 @@ export default function CreateAndEditDatabaseDrawer({
 										render={({ field, formState: { errors } }) => (
 											<FormItem className='space-y-1'>
 												<FormLabel>{t('database.add.resource.field')}</FormLabel>
-												<FormControl>
-													<Select
-														defaultValue={field.value}
-														value={field.value}
-														name={field.name}
-														disabled={editMode}
-														onValueChange={field.onChange}
-													>
-														<FormControl>
-															<SelectTrigger
-																className={cn('w-full input', errors.resourceId && 'input-error')}
-															>
-																<SelectValue
-																	className={cn('text-subtle')}
-																	placeholder={t('database.add.resource.placeholder')}
-																/>
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent align='center'>
-															<Button
-																size='full'
-																onClick={toggleCreateResourceModal}
-																variant='blank'
-																className='gap-2 px-3 !no-underline text-button-primary font-normal text-left justify-start hover:bg-subtle'
-															>
-																<Plus weight='bold' size={16} />
-																{t('database.add.resource.add')}
-															</Button>
-															{resources.length > 0 && <SelectSeparator />}
 
-															{resources.map((resource) => {
-																const Icon = DATABASE_ICON_MAP[resource.instance];
-																return (
-																	<SelectItem
-																		className='px-3 py-[6px] w-full max-w-full cursor-pointer'
-																		key={resource._id}
-																		value={resource._id}
-																	>
-																		<div className='flex items-center gap-2 [&>svg]:text-2xl'>
-																			<Icon />
-																			{resource.name}
-																		</div>
-																	</SelectItem>
-																);
-															})}
-														</SelectContent>
-													</Select>
-												</FormControl>
+												<ResourceSelect
+													defaultValue={field.value}
+													value={field.value}
+													name={field.name}
+													onValueChange={field.onChange}
+													error={Boolean(form.formState.errors.resourceId)}
+													type={ResourceType.Database}
+												/>
 												<FormMessage />
 											</FormItem>
 										)}

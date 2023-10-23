@@ -11,22 +11,13 @@ import {
 import { Input } from '@/components/Input';
 import { ResourceSelect } from '@/components/ResourceSelect';
 import { Switch } from '@/components/Switch';
-import useResourceStore from '@/store/resources/resourceStore';
-import { CreateMessageQueueSchema } from '@/types';
+import { CreateMessageQueueSchema, ResourceType } from '@/types';
 import { translate as t } from '@/utils';
-import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import * as z from 'zod';
 
 export default function MessageQueueForm({ edit }: { edit?: boolean }) {
 	const form = useFormContext<z.infer<typeof CreateMessageQueueSchema>>();
-	const { getResources, resources } = useResourceStore();
-
-	useEffect(() => {
-		getResources({
-			type: 'queue',
-		});
-	}, []);
 
 	return (
 		<div className='space-y-6'>
@@ -111,7 +102,7 @@ export default function MessageQueueForm({ edit }: { edit?: boolean }) {
 									name={field.name}
 									onValueChange={field.onChange}
 									error={Boolean(form.formState.errors.resourceId)}
-									resources={resources}
+									type={ResourceType.Queue}
 								/>
 							</FormControl>
 							<FormDescription>{t('queue.create.resource.description')}</FormDescription>
