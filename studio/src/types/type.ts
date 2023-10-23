@@ -194,6 +194,7 @@ export interface BaseGetRequest extends BaseRequest {
 	start?: string;
 	end?: string;
 	search?: string;
+	initialFetch?: boolean;
 }
 
 export interface SortOption {
@@ -323,6 +324,13 @@ export interface Middleware {
 	__v: number;
 }
 
+export interface Step {
+	text: string;
+	path: string;
+	isDone: boolean;
+	prevPath?: string;
+	nextPath?: string;
+}
 export interface SearchNPMPackages {
 	package: string;
 	version: string;
@@ -378,3 +386,5 @@ export const SMTPSchema = z.object({
 	password: z.string({ required_error: 'Password is required' }),
 	useTLS: z.boolean(),
 });
+
+export type SetupCluster = OnboardingData & BaseRequest;

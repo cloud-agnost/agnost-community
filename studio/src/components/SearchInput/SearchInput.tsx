@@ -4,11 +4,10 @@ import { cn } from '@/utils';
 import { MagnifyingGlass, X } from '@phosphor-icons/react';
 import * as React from 'react';
 import { useState } from 'react';
-import { Button } from '../Button';
-import './searchInput.scss';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import { use } from 'i18next';
+import { Button } from '../Button';
+import './searchInput.scss';
 interface SearchInputProps extends React.ComponentPropsWithoutRef<'input'> {
 	onSearch?: (value: string) => void;
 	onClear?: () => void;
@@ -29,6 +28,8 @@ export default function SearchInput({
 	const ref = React.useRef<HTMLInputElement>(null);
 	function clear() {
 		setInputValue('');
+		searchParams.delete('q');
+		setSearchParams(searchParams);
 		onClear?.();
 	}
 
@@ -39,8 +40,9 @@ export default function SearchInput({
 			setSearchParams(searchParams);
 			return;
 		}
+		searchParams.set('q', value);
+		setSearchParams(searchParams);
 		onSearch?.(value);
-		setSearchParams({ ...searchParams, q: value });
 	}
 
 	useUpdateEffect(() => {

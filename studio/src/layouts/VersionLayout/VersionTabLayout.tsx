@@ -8,7 +8,10 @@ import { Table } from '@tanstack/react-table';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ReactNode } from 'react';
-
+import useTabStore from '@/store/version/tabStore';
+import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useUpdateEffect } from '@/hooks';
 interface Props<T> {
 	isEmpty: boolean;
 	table?: Table<T>;
@@ -45,7 +48,10 @@ export default function VersionTabLayout<T>({
 	onSearch,
 }: Props<T>) {
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { versionId } = useParams<{ versionId: string }>();
+	const { pathname, search } = useLocation();
 	const { t } = useTranslation();
+	const { updateCurrentTab } = useTabStore();
 
 	function onClearHandler() {
 		searchParams.delete('q');
@@ -80,16 +86,11 @@ export default function VersionTabLayout<T>({
 	} else {
 		content = children;
 	}
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		if (onSearch) onSearch();
-		setSearchParams({ ...searchParams, q: value });
-	}
+	useUpdateEffect(() => {
+		updateCurrentTab(versionId as string, {
+			path: pathname + search,
+		});
+	}, [search]);
 	return (
 		<div className={cn('h-full space-y-4 ', className)}>
 			{breadCrumb}
@@ -99,8 +100,7 @@ export default function VersionTabLayout<T>({
 					{onSearch && (
 						<SearchInput
 							value={searchParams.get('q') ?? undefined}
-							onSearch={onInput}
-							onClear={onClearHandler}
+							onSearch={onSearch}
 							className='sm:w-[450px] flex-1'
 						/>
 					)}

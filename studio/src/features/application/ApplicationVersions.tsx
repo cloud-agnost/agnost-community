@@ -39,16 +39,6 @@ export default function ApplicationVersions() {
 		}
 	}, [page, searchParams, application?._id]);
 
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		setSearchParams({ ...searchParams, q: value });
-	}
-
 	function closeDrawerHandler() {
 		searchParams.delete('q');
 		setSearchParams(searchParams);
@@ -68,10 +58,7 @@ export default function ApplicationVersions() {
 				</DrawerHeader>
 				<div className='scroll' id='infinite-scroll'>
 					<div className='space-y-6 p-6'>
-						<SearchInput
-							placeholder={t('application.version.search') as string}
-							onSearch={onInput}
-						/>
+						<SearchInput placeholder={t('application.version.search') as string} />
 						<InfiniteScroll
 							scrollableTarget='infinite-scroll'
 							dataLength={versions.length}
