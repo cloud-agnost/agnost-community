@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useMatches, useParams, useNavigate } from 'react-router-dom';
 import './tabs.scss';
 import { useUpdateEffect } from '@/hooks';
+import useVersionStore from '@/store/version/versionStore';
 
 const SCROLL_AMOUNT = 200;
 
@@ -29,7 +30,7 @@ export default function Tabs() {
 	const navigate = useNavigate();
 	const { openDeleteTabModal, getTabsByVersionId, removeTab, setCurrentTab, addTab, setTabs } =
 		useTabStore();
-
+	const { getVersionDashboardPath } = useVersionStore();
 	const { t } = useTranslation();
 	const matches = useMatches();
 	const { pathname } = useLocation();
@@ -63,32 +64,15 @@ export default function Tabs() {
 	useEffect(() => {
 		const path = pathname?.split('/')?.at(-1);
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
-		if (item) {
-			const openTab = tabs.find((tab) => tab.path?.split('/')?.at(-1) === item.path);
 
-			if (openTab) {
-				setCurrentTab(versionId, openTab.id);
-			} else {
-				addTab(versionId, {
-					id: generateId(),
-					...item,
-					isActive: true,
-				});
-			}
-		} else {
+		if (!item) {
 			const currentTab = tabs.find((tab) => tab.isActive);
 			if (currentTab?.path !== pathname) {
 				const targetPath = currentTab?.path || getDashboardPath();
 				navigate(targetPath);
 			}
+			return;
 		}
-	}, []);
-
-	useEffect(() => {
-		const path = pathname?.split('/')?.at(-1);
-		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
-
-		if (!item) return;
 
 		const openTab = tabs.find((tab) => tab.path?.split('/')?.at(-1) === item.path);
 		if (openTab) {
@@ -98,6 +82,7 @@ export default function Tabs() {
 				id: generateId(),
 				...item,
 				isActive: true,
+				path: getVersionDashboardPath(item.path),
 			});
 		}
 	}, []);
@@ -195,12 +180,10 @@ export default function Tabs() {
 																type: 'tabChanged',
 															},
 															'',
-															`${tab.path}?tabId=${tab.id}`,
+															tab.path,
 														);
 													}}
-													to={`${
-														tab.path.includes('?') ? tab.path : `${tab.path}?tabId=${tab.id}`
-													} `}
+													to={tab.path}
 													closeable={!tab.isDashboard}
 													isDirty={tab.isDirty}
 													provided={dragProvided}

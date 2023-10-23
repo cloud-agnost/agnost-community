@@ -29,7 +29,9 @@ export default function NewTabDropdown() {
 		const tab = {
 			id: generateId(),
 			...item,
+			path: getVersionDashboardPath(item.path),
 		};
+
 		addTab(versionId, tab);
 	}
 
