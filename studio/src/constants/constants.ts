@@ -31,7 +31,6 @@ import {
 	MessageQueue,
 	Middleware,
 	MinIo,
-	Model,
 	MongoDb,
 	MySql,
 	Nodejs,
@@ -78,7 +77,7 @@ import {
 	Tab,
 	TabTypes,
 } from '@/types';
-import { generateId, translate } from '@/utils';
+import { generateId, notify, translate } from '@/utils';
 import {
 	BracketsCurly,
 	Clock,
@@ -97,7 +96,9 @@ import {
 	Phone,
 	Plus,
 	Share,
+	Table,
 	TextAa,
+	Textbox,
 } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { ElementType } from 'react';
@@ -284,60 +285,59 @@ export const INVITATIONS_SORT_OPTIONS: SortOption[] = [
 		sortDir: 'desc',
 	},
 ];
-const { getVersionDashboardPath } = useVersionStore.getState();
 export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 	{
 		title: translate('version.databases'),
-		path: getVersionDashboardPath('/database'),
+		path: 'database',
 		isActive: false,
 		isDashboard: false,
 		type: TabTypes.Database,
 	},
 	{
 		title: translate('version.storage'),
-		path: getVersionDashboardPath('/storage'),
+		path: '/storage',
 		isActive: false,
 		isDashboard: false,
 		type: TabTypes.Storage,
 	},
 	{
 		title: translate('version.cache'),
-		path: getVersionDashboardPath('/cache'),
+		path: '/cache',
 		isActive: false,
 		isDashboard: false,
 		type: TabTypes.Cache,
 	},
 	{
 		title: translate('version.endpoints'),
-		path: getVersionDashboardPath('/endpoint'),
+		path: '/endpoint',
 		isActive: false,
 		isDashboard: false,
 		type: TabTypes.Endpoint,
 	},
 	{
 		title: translate('version.message_queues'),
-		path: getVersionDashboardPath('/queue'),
+		path: '/queue',
 		isActive: false,
 		isDashboard: false,
 		type: TabTypes.MessageQueue,
 	},
 	{
 		title: translate('version.cron_jobs'),
-		path: getVersionDashboardPath('/task'),
+		path: '/task',
 		isActive: false,
 		isDashboard: false,
 		type: TabTypes.Task,
 	},
 	{
 		title: translate('version.middleware.default'),
-		path: 'middleware',
+		path: '/middleware',
 		isActive: false,
 		isDashboard: false,
 		type: TabTypes.Middleware,
 	},
 	{
 		title: translate('version.function'),
-		path: getVersionDashboardPath('/function'),
+		path: '/function',
 		isActive: false,
 		isDashboard: false,
 		type: TabTypes.Function,
@@ -376,15 +376,15 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 export const EDIT_APPLICATION_MENU_ITEMS = [
 	{
 		name: translate('application.edit.general'),
-		href: '?t=general',
+		href: 'general',
 	},
 	{
 		name: translate('application.edit.members'),
-		href: '?t=members',
+		href: 'members',
 	},
 	{
 		name: translate('application.edit.invitations'),
-		href: '?t=invitations',
+		href: 'invitations',
 	},
 ];
 
@@ -406,25 +406,25 @@ export const AUTH_MENU_ITEMS = [
 export const TEST_ENDPOINTS_MENU_ITEMS = [
 	{
 		name: translate('endpoint.test.params'),
-		href: '?t=params',
+		href: 'params',
 		isPath: false,
 		allowedMethods: ['GET', 'DELETE', 'PUT', 'POST'],
 	},
 	{
 		name: translate('endpoint.test.path_variables'),
-		href: '?t=variables',
+		href: 'variables',
 		isPath: true,
 		allowedMethods: ['GET', 'DELETE', 'PUT', 'POST'],
 	},
 	{
 		name: translate('endpoint.test.headers'),
-		href: '?t=headers',
+		href: 'headers',
 		isPath: false,
 		allowedMethods: ['GET', 'DELETE', 'PUT', 'POST'],
 	},
 	{
 		name: translate('endpoint.test.body'),
-		href: '?t=body',
+		href: 'body',
 		isPath: false,
 		allowedMethods: ['DELETE', 'PUT', 'POST'],
 	},
@@ -574,7 +574,6 @@ export const CREATE_RESOURCES_ELEMENTS = [
 		CurrentResourceElement: ConnectQueue,
 	},
 ];
-
 export const VERSION_DROPDOWN_ITEM = [
 	{
 		title: translate('version.open_version'),
@@ -583,7 +582,7 @@ export const VERSION_DROPDOWN_ITEM = [
 			if (!application) return;
 			openVersionDrawer(application);
 		},
-		disabled: useVersionStore.getState().versions.length <= 1,
+		//TODO disabled: useVersionStore.getState().versions.length <= 1,
 	},
 	{
 		title: translate('version.create_a_copy'),
@@ -631,6 +630,13 @@ export const VERSION_DROPDOWN_ITEM = [
 				versionId: version._id,
 				appId: version.appId,
 				readOnly: !version?.readOnly,
+				onError: (error) => {
+					notify({
+						type: 'error',
+						title: translate('general.error'),
+						description: error.details,
+					});
+				},
 			});
 		},
 		disabled: false,
@@ -647,6 +653,13 @@ export const VERSION_DROPDOWN_ITEM = [
 				versionId: version._id,
 				appId: version.appId,
 				private: !version?.private,
+				onError: (error) => {
+					notify({
+						type: 'error',
+						title: translate('general.error'),
+						description: error.details,
+					});
+				},
 			});
 		},
 		disabled: useVersionStore.getState().version?.master,
@@ -692,15 +705,15 @@ export const MONGODB_CONNECTION_FORMATS = ['mongodb', 'mongodb+srv'] as const;
 export const ADD_API_KEYS_MENU_ITEMS = [
 	{
 		name: translate('application.edit.general'),
-		href: '?t=general',
+		href: 'general',
 	},
 	{
 		name: translate('version.api_key.allowed_domains'),
-		href: '?t=allowed-domains',
+		href: 'allowed-domains',
 	},
 	{
 		name: translate('version.api_key.allowed_ips'),
-		href: '?t=allowed-ips',
+		href: 'allowed-ips',
 	},
 ];
 
@@ -885,8 +898,9 @@ export const TAB_ICON_MAP: Record<string, ElementType> = {
 	Dashboard: Dashboard,
 	Notifications: BellRing,
 	Function: Function,
-	Field: Model,
-	Model: Model,
+	Field: Textbox,
+	Model: Table,
+	Navigator: Table,
 };
 
 export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
