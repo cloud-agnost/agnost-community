@@ -18,7 +18,12 @@ export default function OrganizationMenu() {
 		<nav className='org-menu'>
 			{ORGANIZATION_MENU_ITEMS.map((item) => {
 				return (
-					<OrganizationMenuItem key={item.name} item={item} active={pathname.includes(item.href)} />
+					<OrganizationMenuItem
+						key={item.name}
+						item={item}
+						active={pathname.includes(item.href)}
+						isNavigate
+					/>
 				);
 			})}
 		</nav>
