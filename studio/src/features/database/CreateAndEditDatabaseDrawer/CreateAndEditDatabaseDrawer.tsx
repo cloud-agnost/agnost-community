@@ -202,7 +202,7 @@ export default function CreateAndEditDatabaseDrawer({
 									<FormField
 										control={form.control}
 										name='resourceId'
-										render={({ field, formState: { errors } }) => (
+										render={({ field }) => (
 											<FormItem className='space-y-1'>
 												<FormLabel>{t('database.add.resource.field')}</FormLabel>
 
