@@ -5,7 +5,7 @@ import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import { BreadCrumbItem } from 'components/BreadCrumb';
 import { useTranslation } from 'react-i18next';
-
+import { useToast } from '@/hooks';
 EditMiddleware.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { middlewareId, orgId, appId, versionId } = params as Record<string, string>;
 	const res = await useMiddlewareStore.getState().getMiddlewareById({
@@ -18,6 +18,7 @@ EditMiddleware.loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export default function EditMiddleware() {
+	const { notify } = useToast();
 	const { middlewareFromApi } = useLoaderData() as { middlewareFromApi: Middleware };
 	const { middlewareId, orgId, appId, versionId } = useParams() as Record<string, string>;
 	const { saveMiddlewareCode, setEditMiddlewareDrawerIsOpen, middlewares } = useMiddlewareStore();
@@ -32,16 +33,27 @@ export default function EditMiddleware() {
 		if (!middleware?.logic) return;
 		try {
 			setLoading(true);
-			await saveMiddlewareCode(
-				{
-					orgId,
-					appId,
-					versionId,
-					mwId: middlewareId,
-					logic: middleware?.logic,
+			saveMiddlewareCode({
+				orgId,
+				appId,
+				versionId,
+				mwId: middlewareId,
+				logic: middleware?.logic,
+				onSuccess: () => {
+					notify({
+						title: t('general.success'),
+						description: t('version.middleware.edit.success'),
+						type: 'success',
+					});
 				},
-				true,
-			);
+				onError: (error) => {
+					notify({
+						title: t('general.error'),
+						description: error.details,
+						type: 'error',
+					});
+				},
+			});
 		} finally {
 			setLoading(false);
 		}

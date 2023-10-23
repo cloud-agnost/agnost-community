@@ -12,8 +12,9 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams, useSearchParams } from 'react-router-dom';
-
+import { useToast } from '@/hooks';
 export default function MainMiddleware() {
+	const { notify } = useToast();
 	const [selectedRows, setSelectedRows] = useState<Row<Middleware>[]>();
 	const { getMiddlewaresOfAppVersion, deleteMultipleMiddlewares, middlewares, lastFetchedCount } =
 		useMiddlewareStore();
@@ -33,6 +34,20 @@ export default function MainMiddleware() {
 			versionId: versionId as string,
 			appId: appId as string,
 			middlewareIds: rows?.map((row) => row._id) as string[],
+			onSuccess: () => {
+				notify({
+					title: t('general.success'),
+					description: t('version.middleware.delete.success'),
+					type: 'success',
+				});
+			},
+			onError: (error) => {
+				notify({
+					title: error.error,
+					description: error.details,
+					type: 'error',
+				});
+			},
 		});
 	}
 

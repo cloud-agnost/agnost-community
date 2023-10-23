@@ -51,17 +51,27 @@ export default function SettingsGeneral() {
 		const { orgId, versionId, appId } = params;
 		if (!orgId || !versionId || !appId) return;
 
-		try {
-			await updateVersionProperties({ orgId, versionId, appId, ...data });
-		} catch (e) {
-			const error = e as APIError;
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
-			});
-			setError(e as APIError);
-		}
+		await updateVersionProperties({
+			orgId,
+			versionId,
+			appId,
+			...data,
+			onSuccess: () => {
+				notify({
+					type: 'success',
+					title: t('general.success'),
+					description: t('version.limiter_added_to_default'),
+				});
+			},
+			onError: (error) => {
+				notify({
+					type: 'error',
+					title: t('general.error'),
+					description: error.details,
+				});
+				setError(error);
+			},
+		});
 	}
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {

@@ -19,9 +19,10 @@ import { Fragment, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import './versionDropdown.scss';
-
+import { useToast } from '@/hooks';
 export default function VersionDropdown() {
 	const [open, setOpen] = useState(false);
+	const { notify } = useToast();
 	const { version, getVersionDashboardPath } = useVersionStore();
 	const { t } = useTranslation();
 	const [error, setError] = useState<null | APIError>(null);
@@ -37,20 +38,27 @@ export default function VersionDropdown() {
 	async function onConfirm() {
 		setLoading(true);
 		setError(null);
-		try {
-			await deleteVersion({
-				orgId,
-				appId,
-				versionId,
-			});
-			useVersionStore.setState({ deleteVersionDrawerIsOpen: false });
-			navigate(`/organization/${orgId}/apps`);
-			if (application) openVersionDrawer(application);
-		} catch (e) {
-			setError(e as APIError);
-		} finally {
-			setLoading(false);
-		}
+
+		deleteVersion({
+			orgId,
+			appId,
+			versionId,
+			onSuccess: () => {
+				useVersionStore.setState({ deleteVersionDrawerIsOpen: false });
+				navigate(`/organization/${orgId}/apps`);
+				if (application) openVersionDrawer(application);
+			},
+			onError: (error) => {
+				notify({
+					type: 'error',
+					title: error.error,
+					description: error.details,
+				});
+				setError(error as APIError);
+			},
+		});
+
+		setLoading(false);
 	}
 
 	return (
