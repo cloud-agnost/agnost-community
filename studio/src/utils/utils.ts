@@ -401,3 +401,14 @@ export function dataURItoBlob(dataURI: string): Blob {
 
 	return new Blob([ab], { type: 'application/octet-stream' });
 }
+export function getUrlWithoutQuery(url: string) {
+	const queryIndex = url.indexOf('?');
+	if (queryIndex !== -1) {
+		return url.substring(0, queryIndex);
+	}
+	return url;
+}
+export function getTabIdFromUrl() {
+	const searchParams = new URLSearchParams(window.location.search);
+	return searchParams.get('tabId');
+}
