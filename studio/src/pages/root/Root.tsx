@@ -71,7 +71,6 @@ export default function Root() {
 				size: 50,
 				sortBy: 'createdAt',
 				sortDir: 'desc',
-				initialFetch: true,
 			});
 		}
 	}, [versionId]);

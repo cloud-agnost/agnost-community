@@ -94,7 +94,6 @@ export default function MainStorage() {
 				page,
 				size: PAGE_SIZE,
 				search: searchParams.get('q') ?? undefined,
-				initialFetch: page === 0,
 			});
 		}
 	}, [searchParams.get('q'), page]);
