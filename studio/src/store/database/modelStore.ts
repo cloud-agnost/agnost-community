@@ -1,3 +1,4 @@
+import { CustomStateStorage } from '@/helpers/state';
 import { ModelService } from '@/services';
 import {
 	APIError,
@@ -372,6 +373,7 @@ const useModelStore = create<ModelStore>()(
 			}),
 			{
 				name: 'model-storage',
+				storage: CustomStateStorage,
 			},
 		),
 		{

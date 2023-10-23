@@ -1,3 +1,4 @@
+import { CustomStateStorage } from '@/helpers/state';
 import { DatabaseService } from '@/services';
 import {
 	APIError,
@@ -133,6 +134,7 @@ const useDatabaseStore = create<DatabaseStore>()(
 			}),
 			{
 				name: 'database-storage',
+				storage: CustomStateStorage,
 			},
 		),
 		{

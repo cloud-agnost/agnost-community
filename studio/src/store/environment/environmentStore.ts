@@ -1,3 +1,4 @@
+import { CustomStateStorage } from '@/helpers/state';
 import {
 	APIError,
 	EnvLog,
@@ -194,6 +195,7 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 			}),
 			{
 				name: 'environment-storage',
+				storage: CustomStateStorage,
 			},
 		),
 		{
