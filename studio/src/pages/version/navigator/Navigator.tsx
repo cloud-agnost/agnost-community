@@ -50,7 +50,7 @@ export default function Navigator() {
 	const title = getModelsTitle();
 	const canMultiDelete = true;
 	const hasSubModel = !isEmpty(subModel);
-	const columns = useNavigatorColumns(hasSubModel ? subModel.fields : model.fields);
+	const columns = useNavigatorColumns(hasSubModel ? subModel.fields : model?.fields);
 	const { orgId, appId, versionId } = useParams<{
 		orgId: string;
 		appId: string;
