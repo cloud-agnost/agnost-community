@@ -63,7 +63,6 @@ export default function Models() {
 			name: database?.name,
 		},
 	];
-	console.log('breadcrumbItems', isOpenEditModelDialog);
 	return (
 		<>
 			<VersionTabLayout<Model>

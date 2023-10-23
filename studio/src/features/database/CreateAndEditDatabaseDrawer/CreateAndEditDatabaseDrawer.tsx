@@ -124,7 +124,6 @@ export default function CreateAndEditDatabaseDrawer({
 			});
 		}
 	}
-	console.log('modelToEdit', form.formState.errors);
 	function formHandler(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		form.handleSubmit(onSubmit)(event);

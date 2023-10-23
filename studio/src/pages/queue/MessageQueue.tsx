@@ -123,10 +123,7 @@ export default function MainMessageQueue() {
 			<InfiniteScroll
 				scrollableTarget='version-layout'
 				dataLength={queues.length}
-				next={() => {
-					console.log('next');
-					setPage(page + 1);
-				}}
+				next={() => setPage(page + 1)}
 				hasMore={lastFetchedCount >= PAGE_SIZE}
 				loader={loading && <TableLoading />}
 			>
