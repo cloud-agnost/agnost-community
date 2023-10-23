@@ -6,8 +6,10 @@ import { SQLDatabase } from "./SQLDatabase.js";
 export class PostgreSQL extends SQLDatabase {
 	constructor(driver) {
 		super();
+		// Driver is the pool of PostgreSQL connections
 		this.driver = driver;
 		this.inTransaction = false;
+		this.connection = null;
 	}
 
 	async disconnect() {
@@ -134,20 +136,31 @@ export class PostgreSQL extends SQLDatabase {
 						) AS ${joinDef.as}`
 					);
 				} else if (joinDef.joinType === "complex") {
+					// This is a complex lookup
+					const orderBy = this.getOrderByDefinition(joinDef.sort);
+					const limit = joinDef.limit ?? null;
+					const offset = joinDef.skip ?? null;
+
 					selectEntries.push(
 						`COALESCE(
-						(
-							SELECT json_agg(${this.getJsonBuildObjectString(
-								joinDef.as,
-								joinedModelMeta.fields,
-								null,
-								false
-							)})
-							FROM ${this.getTableName(dbMeta, joinedModelMeta)} AS ${joinDef.as}
-							WHERE ${joinDef.where.getQuery("PostgreSQL")}
-						),
-						'[]'::json
-					) AS ${joinDef.as}`
+							(
+								SELECT json_agg(${this.getJsonBuildObjectString(
+									joinDef.as,
+									joinedModelMeta.fields,
+									null,
+									false
+								)})
+								FROM (
+									SELECT ${joinDef.as}.*
+									FROM ${this.getTableName(dbMeta, joinedModelMeta)} AS ${joinDef.as}
+									WHERE ${joinDef.where.getQuery("PostgreSQL")}
+									${orderBy ? `ORDER BY ${orderBy}` : ""}
+									${limit ? `LIMIT ${limit}` : ""}
+									${offset ? `OFFSET ${offset}` : ""}
+								) AS ${joinDef.as}
+							),
+							'[]'::json
+						) AS ${joinDef.as}`
 					);
 				}
 			}
@@ -213,6 +226,11 @@ export class PostgreSQL extends SQLDatabase {
 					) AS ${joinDef.as}`
 				);
 			} else if (joinDef.joinType === "complex") {
+				// This is a complex lookup
+				const orderBy = this.getOrderByDefinition(joinDef.sort);
+				const limit = joinDef.limit ?? null;
+				const offset = joinDef.skip ?? null;
+
 				selectEntries.push(
 					`COALESCE(
 						(
@@ -222,8 +240,14 @@ export class PostgreSQL extends SQLDatabase {
 								list,
 								include
 							)})
-							FROM ${this.getTableName(dbMeta, joinedModelMeta)} AS ${joinDef.as}
-							WHERE ${joinDef.where.getQuery("PostgreSQL")}
+							FROM (
+								SELECT ${joinDef.as}.*
+								FROM ${this.getTableName(dbMeta, joinedModelMeta)} AS ${joinDef.as}
+								WHERE ${joinDef.where.getQuery("PostgreSQL")}
+								${orderBy ? `ORDER BY ${orderBy}` : ""}
+								${limit ? `LIMIT ${limit}` : ""}
+								${offset ? `OFFSET ${offset}` : ""}
+							) AS ${joinDef.as}
 						),
 						'[]'::json
 					) AS ${joinDef.as}`

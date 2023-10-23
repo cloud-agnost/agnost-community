@@ -228,11 +228,11 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// Set the environment object of the deployment manager
 		this.setEnvObj(envObj);
-		// Save the metadata manager to globals for faster access
-		global.META = new MetaManager(envObj);
+		// Reset the metadata manager
+		META.reset(envObj);
+		// Set module loader query in adapter manager
 		adapterManager.setModuleLoaderQuery(this.loaderQuery);
-		// Save the adapter manager to globals for faster access
-		global.ADAPTERS = adapterManager;
+
 		// Initialize express server
 		await this.initExpressServer();
 		// Manage endpoints
@@ -266,9 +266,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// Create the agnost server-side client instance
 		// Save agnost server side client to globals for faster access
-		const pkg = (await import("../agnost-server-client.cjs")).default;
+		const pkg = (await import(`../agnost-server-client.cjs`)).default;
 		const { agnost } = pkg;
-		// Rest the cache of the client
+		// Reset the cache of the client
 		agnost.clearClientCache();
 		global.agnost = agnost;
 
@@ -597,6 +597,15 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			);
 
 			resource.access = helper.decryptSensitiveData(resource.access);
+			// Assign the database pool size value to the resource config
+			if (resource.config)
+				resource.config.poolSize =
+					db.poolSize ?? config.get("general.defaultDBPoolSize");
+			else {
+				resource.config = {
+					poolSize: db.poolSize ?? config.get("general.defaultDBPoolSize"),
+				};
+			}
 			// Add the database name info to the access settings
 			resource.access.dbName = this.getAppliedDbName(db);
 

@@ -185,6 +185,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 
 		// Save environment and version info
 		await this.saveEnvConfigFile();
+
 		// Save databases info
 		const databases =
 			(await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.databases`)) ?? [];

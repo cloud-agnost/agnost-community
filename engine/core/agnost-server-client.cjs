@@ -114,8 +114,9 @@
 								"Database name needs to be a string value"
 							);
 						const t = this.managers.get(`db-${e}`);
-						if (t) return t;
+						if (t) return console.log("*******EXISTING DB ********"), t;
 						{
+							console.log("*******NEW DB ********");
 							const t = new s.Database(
 								this.metaManager,
 								this.adapterManager,
@@ -254,8 +255,8 @@
 					B = n(r(789)),
 					P = n(r(6587)),
 					x = n(r(7267)),
-					C = n(r(6835)),
-					j = n(r(5191)),
+					j = n(r(6835)),
+					C = n(r(5191)),
 					D = n(r(2115)),
 					A = n(r(6509)),
 					F = n(r(4207)),
@@ -331,8 +332,8 @@
 					$nin: B.default,
 					$not: P.default,
 					$or: x.default,
-					$right: C.default,
-					$round: j.default,
+					$right: j.default,
+					$round: C.default,
 					$rtrim: D.default,
 					$sqrt: A.default,
 					$startswith: F.default,
@@ -5037,7 +5038,8 @@
 					setLookup(e) {
 						if (!e) return;
 						const t = [];
-						if ("string" == typeof e) this.processStringBasedJoin(e, e, t);
+						if ("string" == typeof e)
+							this.processStringBasedJoin(e, e, t, "lookup");
 						else if ("object" != typeof e || Array.isArray(e)) {
 							if (!Array.isArray(e))
 								throw new f.ClientError(
@@ -5045,24 +5047,24 @@
 									"Not a valid join/lookup definition."
 								);
 							for (const r of e)
-								if ("string" == typeof r) this.processStringBasedJoin(r, e, t);
+								if ("string" == typeof r)
+									this.processStringBasedJoin(r, e, t, "lookup");
 								else {
 									if ("object" != typeof r || Array.isArray(r))
 										throw new f.ClientError(
 											"invalid_join_or_lookup",
 											"Not a valid join/lookup definition. The join/lookup array needs to include either reference field names as string or complex join/lookup definition as JSON object with 'as', 'from' and 'where' values."
 										);
-									this.processObjectBasedJoin(r, e, t);
+									this.processObjectBasedJoin(r, e, t, "lookup");
 								}
-						} else this.processObjectBasedJoin(e, e, t);
-						0 !== t.length &&
-							(t.forEach((e) => (e.type = "lookup")),
-							(this.definition.lookup = t));
+						} else this.processObjectBasedJoin(e, e, t, "lookup");
+						this.definition.lookup = t;
 					}
 					setJoin(e) {
 						if (!e) return;
 						const t = [];
-						if ("string" == typeof e) this.processStringBasedJoin(e, e, t);
+						if ("string" == typeof e)
+							this.processStringBasedJoin(e, e, t, "join");
 						else if ("object" != typeof e || Array.isArray(e)) {
 							if (!Array.isArray(e))
 								throw new f.ClientError(
@@ -5070,45 +5072,46 @@
 									"Not a valid join/lookup definition."
 								);
 							for (const r of e)
-								if ("string" == typeof r) this.processStringBasedJoin(r, e, t);
+								if ("string" == typeof r)
+									this.processStringBasedJoin(r, e, t, "join");
 								else {
 									if ("object" != typeof r || Array.isArray(r))
 										throw new f.ClientError(
 											"invalid_join_or_lookup",
 											"Not a valid join/lookup definition. The join/lookup array needs to include either reference field names as string or complex join/lookup definition as JSON object with 'as', 'from' and 'where' values."
 										);
-									this.processObjectBasedJoin(r, e, t);
+									this.processObjectBasedJoin(r, e, t, "join");
 								}
-						} else this.processObjectBasedJoin(e, e, t);
-						0 !== t.length &&
-							(t.forEach((e) => (e.type = "join")), (this.definition.join = t));
+						} else this.processObjectBasedJoin(e, e, t, "join");
+						this.definition.join = t;
 					}
-					processStringBasedJoin(e, t, r) {
-						const n = this.getFieldObject(e, t);
-						if (!n || "reference" !== n.field.getType())
+					processStringBasedJoin(e, t, r, n) {
+						const i = this.getFieldObject(e, t);
+						if (!i || "reference" !== i.field.getType())
 							throw new f.ClientError(
 								"invalid_join_or_lookup",
 								`'${e}' is not a valid reference field to join/lookup. You can either join/lookup reference fields or define join/lookup queries.`
 							);
-						const i = this.model
+						const a = this.model
 							.getDb()
-							.getModelByIId(n.field.getRefModelIId());
+							.getModelByIId(i.field.getRefModelIId());
 						if (r.find((t) => t.as.toLowerCase() === e.toLowerCase()))
 							throw new f.ClientError(
 								"invalid_join_or_lookup",
 								`There is already a join/lookup definition with the alias '${e}'.`
 							);
 						r.push({
-							fieldPath: n.fieldPath,
-							field: n.field,
+							type: n,
+							fieldPath: i.fieldPath,
+							field: i.field,
 							joinType: "simple",
-							joinModel: i,
+							joinModel: a,
 							where: null,
 							as: e,
-							from: i.getName(),
+							from: a.getName(),
 						});
 					}
-					processObjectBasedJoin(e, t, r) {
+					processObjectBasedJoin(e, t, r, n) {
 						if (!e.as || !e.from || !e.where)
 							throw new f.ClientError(
 								"invalid_join_or_lookup",
@@ -5148,18 +5151,18 @@
 								"invalid_join_or_lookup",
 								"The 'where' parameter of the join/lookup definition needs to define the query structure as a JSON object."
 							);
-						const n = this.getFieldObject(e.as, t);
-						if (!n || "complex" !== n.joinType || "join" !== n.field.getType())
+						const i = this.getFieldObject(e.as, t);
+						if (!i || "complex" !== i.joinType || "join" !== i.field.getType())
 							throw new f.ClientError(
 								"invalid_join_or_lookup",
 								`Join/lookup from '${e.from}' as '${e.as}' is not a valid join/lookup definition. You can either join/lookup reference fields or define join/lookup queries.`
 							);
-						const i = this.processWhereCondition(
+						const a = this.processWhereCondition(
 							e.where,
 							t,
 							p.ConditionType.QUERY
 						);
-						if (!i)
+						if (!a)
 							throw new f.ClientError(
 								"invalid_join_or_lookup",
 								"The 'where' condition of the join/lookup definition is missing."
@@ -5169,11 +5172,39 @@
 								"invalid_join_or_lookup",
 								`There is already a join/lookup definition with the alias '${e.as}'.`
 							);
+						if ("lookup" === n) {
+							if (
+								((i.skip = null),
+								(i.limit = null),
+								(i.sort = null),
+								null !== e.skip && void 0 !== e.skip)
+							) {
+								if (!(0, h.isInteger)(e.skip) || e.skip < 0)
+									throw new f.ClientError(
+										"invalid_value",
+										`Skip count can be zero or positive integer in lookup definition with alias '${e.as}'`
+									);
+								i.skip = e.skip;
+							}
+							if (e.limit) {
+								if (!(0, h.isPositiveInteger)(e.limit))
+									throw new f.ClientError(
+										"invalid_value",
+										`Limit needs to be a positive integer value in lookup definition with alias '${e.as}'`
+									);
+								i.limit = e.limit;
+							}
+							if (e.sort) {
+								const t = new y(i.joinModel);
+								t.setSort(e.sort, e), (i.sort = t.getSort());
+							}
+						}
 						r.push(
-							Object.assign(Object.assign({}, n), {
-								where: i,
+							Object.assign(Object.assign({}, i), {
+								where: a,
 								as: e.as,
 								from: e.from,
+								type: n,
 							})
 						);
 					}

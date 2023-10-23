@@ -85,6 +85,8 @@
     "minCacheSizeMi": 256,
     "minQueueSizeMi": 256,
     "minDatabaseSizeMi": 512,
+    "defaultDBPoolSize": 3,
+    "maxDBPoolSize": 50,
     "defaultEngineConfig": {
       "initialScale": 1,
       "minScale": 0,

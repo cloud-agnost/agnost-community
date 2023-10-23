@@ -1150,7 +1150,11 @@ router.put(
 					updatedBy: user._id,
 				};
 
-				if (defaultValue && defaultValue !== "$$unset")
+				if (
+					defaultValue !== null &&
+					defaultValue !== undefined &&
+					defaultValue !== "$$unset"
+				)
 					fieldUpdateData["fields.$.defaultValue"] = defaultValue;
 			}
 

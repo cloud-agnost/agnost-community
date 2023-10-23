@@ -63,7 +63,7 @@ router.post(
 		const session = await dbCtrl.startSession();
 		try {
 			const { org, user, app, version, resource } = req;
-			const { name, type, managed, assignUniqueName } = req.body;
+			const { name, type, managed, assignUniqueName, poolSize } = req.body;
 
 			// Create the database
 			let dbId = helper.generateId();
@@ -79,6 +79,7 @@ router.post(
 					type,
 					assignUniqueName,
 					managed,
+					poolSize,
 					createdBy: user._id,
 				},
 				{ cacheKey: dbId, session }
@@ -176,7 +177,7 @@ router.get(
 /*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/db/:dbId
 @method     PUT
-@desc       Upadate database name
+@desc       Upadate database name and pool size
 @access     private
 */
 router.put(
@@ -194,12 +195,12 @@ router.put(
 		const session = await dbCtrl.startSession();
 		try {
 			const { org, user, app, version, db } = req;
-			const { name } = req.body;
+			const { name, poolSize } = req.body;
 
 			// Update database name
 			let updatedDb = await dbCtrl.updateOneById(
 				db._id,
-				{ name, updatedBy: user._id },
+				{ name, poolSize, updatedBy: user._id },
 				{},
 				{ cacheKey: db._id }
 			);
