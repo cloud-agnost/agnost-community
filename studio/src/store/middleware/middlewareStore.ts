@@ -1,3 +1,4 @@
+import { CustomStateStorage } from '@/helpers/state';
 import { MiddlewareService } from '@/services';
 import {
 	APIError,
@@ -10,7 +11,6 @@ import {
 	SaveMiddlewareCodeParams,
 	UpdateMiddlewareParams,
 } from '@/types';
-import { notify, translate } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -21,17 +21,11 @@ interface MiddlewareStore {
 	lastFetchedCount: number;
 	getMiddlewaresOfAppVersion: (params: GetMiddlewaresOfAppVersionParams) => Promise<Middleware[]>;
 	getMiddlewareById: (params: GetMiddlewareByIdParams) => Promise<Middleware>;
-	deleteMiddleware: (params: DeleteMiddlewareParams, showAlert?: boolean) => Promise<void>;
-	deleteMultipleMiddlewares: (
-		params: DeleteMultipleMiddlewares,
-		showAlert?: boolean,
-	) => Promise<void>;
-	createMiddleware: (params: CreateMiddlewareParams, showAlert?: boolean) => Promise<Middleware>;
-	updateMiddleware: (params: UpdateMiddlewareParams, showAlert?: boolean) => Promise<Middleware>;
-	saveMiddlewareCode: (
-		params: SaveMiddlewareCodeParams,
-		showAlert?: boolean,
-	) => Promise<Middleware>;
+	deleteMiddleware: (params: DeleteMiddlewareParams) => Promise<void>;
+	deleteMultipleMiddlewares: (params: DeleteMultipleMiddlewares) => Promise<void>;
+	createMiddleware: (params: CreateMiddlewareParams) => Promise<Middleware>;
+	updateMiddleware: (params: UpdateMiddlewareParams) => Promise<Middleware>;
+	saveMiddlewareCode: (params: SaveMiddlewareCodeParams) => Promise<Middleware>;
 	setEditMiddlewareDrawerIsOpen: (open: boolean) => void;
 	setMiddleware: (middleware: Middleware | null) => void;
 }
@@ -44,28 +38,17 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 				middleware: null,
 				lastFetchedCount: 0,
 				editMiddlewareDrawerIsOpen: false,
-				createMiddleware: async (params: CreateMiddlewareParams, showAlert) => {
+				createMiddleware: async (params: CreateMiddlewareParams) => {
 					try {
 						const middleware = await MiddlewareService.createMiddleware(params);
 						set((prev) => ({ middlewares: [middleware, ...prev.middlewares] }));
-						if (showAlert) {
-							notify({
-								title: translate('general.success'),
-								description: translate('version.middleware.add.success'),
-								type: 'success',
-							});
+						if (params.onSuccess) {
+							params.onSuccess(middleware);
 						}
 						return middleware;
 					} catch (e) {
 						const error = e as APIError;
-						const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-						for (const field of errorArray) {
-							notify({
-								type: 'error',
-								title: error.error,
-								description: field.msg,
-							});
-						}
+						if (params.onError) params.onError(error);
 						throw e;
 					}
 				},
@@ -87,88 +70,51 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 					set({ middleware });
 					return middleware;
 				},
-				deleteMiddleware: async (params: DeleteMiddlewareParams, showAlert) => {
+				deleteMiddleware: async (params: DeleteMiddlewareParams) => {
 					try {
 						await MiddlewareService.deleteMiddleware(params);
 						set((prev) => ({
 							middlewares: prev.middlewares.filter((mw) => mw._id !== params.mwId),
 						}));
-						if (showAlert) {
-							notify({
-								title: translate('general.success'),
-								description: translate('version.middleware.delete.success'),
-								type: 'success',
-							});
-						}
+						if (params.onSuccess) params.onSuccess();
 					} catch (e) {
 						const error = e as APIError;
-						notify({
-							title: error.error,
-							description: error.details,
-							type: 'error',
-						});
+						if (params.onError) params.onError(error);
 						throw e;
 					}
 				},
-				deleteMultipleMiddlewares: async (params: DeleteMultipleMiddlewares, showAlert) => {
+				deleteMultipleMiddlewares: async (params: DeleteMultipleMiddlewares) => {
 					try {
 						await MiddlewareService.deleteMultipleMiddlewares(params);
 						set((prev) => ({
 							middlewares: prev.middlewares.filter((mw) => !params.middlewareIds.includes(mw._id)),
 						}));
-						if (showAlert) {
-							notify({
-								title: translate('general.success'),
-								description: translate('version.middleware.delete.success'),
-								type: 'success',
-							});
-						}
+						if (params.onSuccess) params.onSuccess();
 					} catch (e) {
 						const error = e as APIError;
-						notify({
-							title: error.error,
-							description: error.details,
-							type: 'error',
-						});
+						if (params.onError) params.onError(error);
 						throw e;
 					}
 				},
-				updateMiddleware: async (params: UpdateMiddlewareParams, showAlert) => {
+				updateMiddleware: async (params: UpdateMiddlewareParams) => {
 					try {
 						const middleware = await MiddlewareService.updateMiddleware(params);
 						set((prev) => ({
 							middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
 						}));
-						if (showAlert) {
-							notify({
-								title: translate('general.success'),
-								description: translate('version.middleware.edit.success'),
-								type: 'success',
-							});
-						}
+						if (params.onSuccess) params.onSuccess(middleware);
 						return middleware;
 					} catch (e) {
 						const error = e as APIError;
-						notify({
-							title: error.error,
-							description: error.details,
-							type: 'error',
-						});
+						if (params.onError) params.onError(error);
 						throw e;
 					}
 				},
-				saveMiddlewareCode: async (params: SaveMiddlewareCodeParams, showAlert) => {
+				saveMiddlewareCode: async (params: SaveMiddlewareCodeParams) => {
 					const middleware = await MiddlewareService.saveMiddlewareCode(params);
 					set((prev) => ({
 						middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
 					}));
-					if (showAlert) {
-						notify({
-							title: translate('general.success'),
-							description: translate('version.middleware.edit.success'),
-							type: 'success',
-						});
-					}
 					return middleware;
 				},
 				setEditMiddlewareDrawerIsOpen: (open: boolean) => {
@@ -180,6 +126,7 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 			}),
 			{
 				name: 'middleware-storage',
+				storage: CustomStateStorage,
 			},
 		),
 		{

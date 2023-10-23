@@ -11,7 +11,7 @@ import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
-
+import { notify } from '@/utils';
 const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
 		id: 'select',
@@ -101,11 +101,25 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 			}
 
 			async function deleteHandler() {
-				await deleteMiddleware({
+				deleteMiddleware({
 					appId: original.appId,
 					orgId: original.orgId,
 					versionId: original.versionId,
 					mwId: original._id,
+					onSuccess: () => {
+						notify({
+							title: translate('general.success'),
+							description: translate('version.middleware.delete.success'),
+							type: 'success',
+						});
+					},
+					onError: (error) => {
+						notify({
+							title: error.error,
+							description: error.details,
+							type: 'error',
+						});
+					},
 				});
 			}
 
