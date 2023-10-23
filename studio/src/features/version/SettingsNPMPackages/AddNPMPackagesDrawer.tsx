@@ -1,3 +1,4 @@
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { SearchNPMPackages } from '@/types';
 import { Button } from 'components/Button';
@@ -19,7 +20,8 @@ const SIZE = 15;
 export default function AddNPMPackagesDrawer({ open, onOpenChange }: AddNPMPackagesDrawerProps) {
 	const { t } = useTranslation();
 	const [page, setPage] = useState(0);
-	const { searchNPMPackages, version, addNPMPackage } = useVersionStore();
+	const { searchNPMPackages, addNPMPackage } = useSettingsStore();
+	const { version } = useVersionStore();
 	const npmPackages = useVersionStore((state) => state.version?.npmPackages ?? []);
 	const [packages, setPackages] = useState<SearchNPMPackages[] | null>(null);
 	const scrollContainerId = useId();

@@ -2,6 +2,7 @@ import { ActionsCell } from '@/components/ActionsCell';
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, RateLimit } from '@/types';
 import { translate } from '@/utils';
@@ -120,8 +121,9 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { version, setEditRateLimitDrawerIsOpen, setRateLimit, deleteRateLimit } =
-				useVersionStore.getState();
+			const { version } = useVersionStore.getState();
+			const { setEditRateLimitDrawerIsOpen, setRateLimit, deleteRateLimit } =
+				useSettingsStore.getState();
 			async function clickHandler() {
 				if (!version) return;
 				await deleteRateLimit({

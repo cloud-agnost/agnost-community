@@ -10,6 +10,7 @@ import { EmptyState } from 'components/EmptyState';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import './SettingsEnvironmentVariables.scss';
+import useSettingsStore from '@/store/version/settingsStore';
 
 interface SettingsEnvironmentVariablesProps {
 	selectedRows: Row<Param>[] | undefined;
@@ -23,7 +24,7 @@ export default function SettingsEnvironmentVariables({
 }: SettingsEnvironmentVariablesProps) {
 	const { t } = useTranslation();
 	const variables = useVersionStore((state) => state.version?.params ?? []);
-	const { setEditParamDrawerIsOpen, editParamDrawerIsOpen } = useVersionStore();
+	const { setEditParamDrawerIsOpen, editParamDrawerIsOpen } = useSettingsStore();
 
 	return (
 		<>

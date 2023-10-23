@@ -2,6 +2,7 @@ import { ActionsCell } from '@/components/ActionsCell';
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, Param } from '@/types';
 import { translate } from '@/utils';
@@ -114,8 +115,8 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 		id: 'actions',
 		className: 'actions',
 		cell: ({ row: { original } }) => {
-			const { version, deleteParam, setParam, setEditParamDrawerIsOpen } =
-				useVersionStore.getState();
+			const { version } = useVersionStore.getState();
+			const { deleteParam, setParam, setEditParamDrawerIsOpen } = useSettingsStore.getState();
 			async function clickHandler() {
 				if (!version) return;
 				await deleteParam({

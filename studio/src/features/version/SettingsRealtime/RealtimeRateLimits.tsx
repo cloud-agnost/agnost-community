@@ -7,15 +7,16 @@ import { DropResult } from 'react-beautiful-dnd';
 import { reorder } from '@/utils';
 import { useState } from 'react';
 import { useToast } from '@/hooks';
+import useSettingsStore from '@/store/version/settingsStore';
 
 export default function RealtimeRateLimits() {
 	const [deleting, setDeleting] = useState(false);
 	const { notify } = useToast();
 	const { t } = useTranslation();
-	const { updateVersionRealtimeProperties } = useVersionStore();
+	const { updateVersionRealtimeProperties } = useSettingsStore();
 	const rateLimits = useVersionStore((state) => state.version?.limits);
 	const realtimeEndpoints = useVersionStore((state) => state.version?.realtime?.rateLimits ?? []);
-	const orderLimits = useVersionStore((state) => state.orderRealtimeRateLimits);
+	const orderLimits = useSettingsStore((state) => state.orderRealtimeRateLimits);
 
 	const { orgId, versionId, appId } = useParams<{
 		versionId: string;

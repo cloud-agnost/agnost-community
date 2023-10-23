@@ -8,10 +8,12 @@ import { APIError, VersionRealtimeProperties } from '@/types';
 import { useToast } from '@/hooks';
 import { RealtimeRateLimits } from '@/features/version/SettingsRealtime';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import useSettingsStore from '@/store/version/settingsStore';
 
 export default function SettingsRealtime() {
 	const realtime = useVersionStore((state) => state.version?.realtime);
-	const { version, updateVersionRealtimeProperties } = useVersionStore();
+	const { version } = useVersionStore();
+	const { updateVersionRealtimeProperties } = useSettingsStore();
 	const canEdit = useAuthorizeVersion('version.update');
 	const { notify } = useToast();
 	const { t } = useTranslation();

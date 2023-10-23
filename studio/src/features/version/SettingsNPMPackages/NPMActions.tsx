@@ -5,6 +5,7 @@ import useVersionStore from '@/store/version/versionStore.ts';
 import { NPMPackage } from '@/types';
 import { Dispatch, SetStateAction } from 'react';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import useSettingsStore from '@/store/version/settingsStore';
 
 interface NPMActionsProps {
 	selectedRows: Row<NPMPackage>[] | undefined;
@@ -12,7 +13,8 @@ interface NPMActionsProps {
 	setSelectedRows: Dispatch<SetStateAction<Row<NPMPackage>[] | undefined>>;
 }
 export default function NPMActions({ selectedRows, table, setSelectedRows }: NPMActionsProps) {
-	const { version, deleteMultipleNPMPackages } = useVersionStore();
+	const { version } = useVersionStore();
+	const { deleteMultipleNPMPackages } = useSettingsStore();
 	const canDeleteMultiple = useAuthorizeVersion('version.package.delete');
 	async function deleteHandler() {
 		if (!version) return;

@@ -1,6 +1,7 @@
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, NPMPackage } from '@/types';
 import { translate } from '@/utils';
@@ -74,7 +75,8 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 				original: { _id },
 			},
 		}) => {
-			const { version, deleteNPMPackage } = useVersionStore.getState();
+			const { version } = useVersionStore.getState();
+			const { deleteNPMPackage } = useSettingsStore.getState();
 			async function clickHandler() {
 				if (!version) return;
 				await deleteNPMPackage({

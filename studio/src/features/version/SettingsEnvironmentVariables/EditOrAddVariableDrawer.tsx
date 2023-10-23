@@ -1,19 +1,19 @@
+import { NAME_SCHEMA } from '@/constants';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import useSettingsStore from '@/store/version/settingsStore';
+import { APIError } from '@/types';
+import { translate } from '@/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
+import { Button } from 'components/Button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
 import { Input } from 'components/Input';
-import { Button } from 'components/Button';
-import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { translate } from '@/utils';
-import useVersionStore from '@/store/version/versionStore.ts';
-import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
-import { APIError } from '@/types';
-import { NAME_SCHEMA } from '@/constants';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 const MiddlewareFormSchema = z.object({
 	name: NAME_SCHEMA,
 	value: z
@@ -45,7 +45,7 @@ export default function EditOrAddVariableDrawer({
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 	const { orgId, appId, versionId } = useParams();
-	const { param, addParam, updateParam } = useVersionStore();
+	const { param, addParam, updateParam } = useSettingsStore();
 	const [error, setError] = useState<APIError | null>(null);
 	const canCreate = useAuthorizeVersion('version.param.create');
 	const canEdit = useAuthorizeVersion('version.param.update');

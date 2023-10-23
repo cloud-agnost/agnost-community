@@ -2,6 +2,7 @@ import { ActionsCell } from '@/components/ActionsCell';
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIKey, APIKeyTypes, ColumnDefWithClassName } from '@/types';
 import { translate } from '@/utils';
@@ -238,7 +239,8 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		className: 'actions',
 		cell: ({ row: { original } }) => {
 			async function clickHandler() {
-				const { deleteAPIKey, version } = useVersionStore.getState();
+				const { version } = useVersionStore.getState();
+				const { deleteAPIKey } = useSettingsStore.getState();
 				if (!version) return;
 				await deleteAPIKey({
 					appId: version.appId,
@@ -249,7 +251,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 			}
 
 			function editHandler() {
-				const { setSelectedAPIKey, setEditAPIKeyDrawerIsOpen } = useVersionStore.getState();
+				const { setSelectedAPIKey, setEditAPIKeyDrawerIsOpen } = useSettingsStore.getState();
 				setSelectedAPIKey(original);
 				setEditAPIKeyDrawerIsOpen(true);
 			}

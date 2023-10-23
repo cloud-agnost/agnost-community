@@ -5,6 +5,7 @@ import { AddAPIKeyButton } from '@/features/version/SettingsAPIKeys';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Dispatch, SetStateAction } from 'react';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import useSettingsStore from '@/store/version/settingsStore';
 
 interface APIKeysActionsProps {
 	selectedRows: Row<APIKey>[] | undefined;
@@ -16,7 +17,8 @@ export default function APIKeysActions({
 	table,
 	setSelectedRows,
 }: APIKeysActionsProps) {
-	const { version, deleteMultipleAPIKeys } = useVersionStore();
+	const { version } = useVersionStore();
+	const { deleteMultipleAPIKeys } = useSettingsStore();
 	const canDeleteMultiple = useAuthorizeVersion('version.key.delete');
 	async function onDelete() {
 		if (!version || !selectedRows || selectedRows?.length === 0) return;

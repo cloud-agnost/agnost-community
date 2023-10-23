@@ -5,6 +5,7 @@ import { AddVariableButton } from '@/features/version/SettingsEnvironmentVariabl
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Dispatch, SetStateAction } from 'react';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import useSettingsStore from '@/store/version/settingsStore';
 
 interface VariableActionsProps {
 	selectedRows: Row<Param>[] | undefined;
@@ -16,7 +17,8 @@ export default function VariableActions({
 	table,
 	setSelectedRows,
 }: VariableActionsProps) {
-	const { deleteMultipleParams, version } = useVersionStore();
+	const { version } = useVersionStore();
+	const { deleteMultipleParams } = useSettingsStore();
 	const canDeleteMultiple = useAuthorizeVersion('version.param.delete');
 	async function onDelete() {
 		if (!version || !selectedRows?.length) return;

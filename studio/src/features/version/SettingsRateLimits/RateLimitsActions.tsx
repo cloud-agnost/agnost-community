@@ -5,6 +5,7 @@ import { AddRateLimitButton } from '@/features/version/SettingsRateLimits/index.
 import useVersionStore from '@/store/version/versionStore.ts';
 import { Dispatch, SetStateAction } from 'react';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import useSettingsStore from '@/store/version/settingsStore';
 
 interface RateLimitsActionsProps {
 	selectedRows: Row<RateLimit>[] | undefined;
@@ -16,7 +17,8 @@ export default function RateLimitsActions({
 	selectedRows,
 	setSelectedRows,
 }: RateLimitsActionsProps) {
-	const { version, deleteMultipleRateLimits } = useVersionStore();
+	const { version } = useVersionStore();
+	const { deleteMultipleRateLimits } = useSettingsStore();
 	const canDeleteMultiple = useAuthorizeVersion('version.limit.delete');
 	async function deleteHandler() {
 		if (!version) return;

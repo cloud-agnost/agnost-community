@@ -8,6 +8,7 @@ import { EmptyState } from 'components/EmptyState';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import './SettingsAPIKeys.scss';
+import useSettingsStore from '@/store/version/settingsStore';
 
 interface SettingsAPIKeysProps {
 	selectedRows: Row<APIKey>[] | undefined;
@@ -17,7 +18,7 @@ interface SettingsAPIKeysProps {
 
 export default function SettingsAPIKeys({ setSelectedRows, setTable }: SettingsAPIKeysProps) {
 	const apiKeys = useVersionStore((state) => state.version?.apiKeys ?? []);
-	const { editAPIKeyDrawerIsOpen, setEditAPIKeyDrawerIsOpen } = useVersionStore();
+	const { editAPIKeyDrawerIsOpen, setEditAPIKeyDrawerIsOpen } = useSettingsStore();
 	const { t } = useTranslation();
 
 	if (apiKeys.length === 0) {

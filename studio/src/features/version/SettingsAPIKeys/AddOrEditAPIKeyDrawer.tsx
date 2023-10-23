@@ -18,6 +18,7 @@ import useVersionStore from '@/store/version/versionStore.ts';
 import { Button } from 'components/Button';
 import { APIKey, CreateAPIKeyParams, Endpoint, UpdateAPIKeyParams } from '@/types';
 import useEndpointStore from '@/store/endpoint/endpointStore.ts';
+import useSettingsStore from '@/store/version/settingsStore';
 
 interface AddAPIKeyDrawerProps {
 	open: boolean;
@@ -32,8 +33,8 @@ export default function AddOrEditAPIKeyDrawer({
 }: AddAPIKeyDrawerProps) {
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { createAPIKey, editAPIKey, version, selectedAPIKey, setSelectedAPIKey } =
-		useVersionStore();
+	const { createAPIKey, editAPIKey, selectedAPIKey, setSelectedAPIKey } = useSettingsStore();
+	const { version } = useVersionStore();
 	const { getEndpointsByIid } = useEndpointStore();
 	const [endpoints, setEndpoints] = useState<Endpoint[]>();
 

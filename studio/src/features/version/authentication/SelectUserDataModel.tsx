@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { translate as t } from '@/utils';
+import useSettingsStore from '@/store/version/settingsStore';
 
 const SaveUserModelSchema = z.object({
 	databaseId: z.string({
@@ -32,7 +33,8 @@ const SaveUserModelSchema = z.object({
 
 export default function SelectUserDataModel() {
 	const [error, setError] = useState<APIError>();
-	const { version, saveUserDataModelInfo, addMissingUserDataModelFields } = useVersionStore();
+	const { saveUserDataModelInfo, addMissingUserDataModelFields } = useSettingsStore();
+	const { version } = useVersionStore();
 	const { databases, getDatabasesOfApp } = useDatabaseStore();
 	const { models, getModelsOfDatabase } = useModelStore();
 	const { notify } = useToast();
