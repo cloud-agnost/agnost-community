@@ -1,5 +1,3 @@
-import { TableLoading } from '@/components/Table/Table';
-import { PAGE_SIZE } from '@/constants';
 import { CreateAndEditDatabaseDrawer } from '@/features/database/CreateAndEditDatabaseDrawer';
 import { DatabaseColumns } from '@/features/database/ListDatabase/index.ts';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
@@ -11,7 +9,6 @@ import { ConfirmationModal } from 'components/ConfirmationModal';
 import { DataTable } from 'components/DataTable';
 import { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams, useSearchParams } from 'react-router-dom';
 
 export default function VersionDatabase() {
@@ -24,7 +21,7 @@ export default function VersionDatabase() {
 		deleteDatabase,
 		getDatabasesOfApp,
 		editDatabaseDialogOpen,
-		lastFetchedCount,
+		// lastFetchedCount,
 	} = useDatabaseStore();
 	const [page, setPage] = useState(0);
 	const { t } = useTranslation();
@@ -63,6 +60,7 @@ export default function VersionDatabase() {
 		// size: PAGE_SIZE,
 		setLoading(false);
 	}, [page, searchParams.get('q')]);
+	console.log(loading);
 	return (
 		<VersionTabLayout<Database>
 			className='p-0'
@@ -77,21 +75,21 @@ export default function VersionDatabase() {
 			onSearch={() => setPage(0)}
 			disabled={!canEdit}
 		>
-			<InfiniteScroll
+			{/* <InfiniteScroll
 				scrollableTarget='version-layout'
 				dataLength={databases.length}
 				next={() => setPage(page + 1)}
 				hasMore={lastFetchedCount >= PAGE_SIZE}
 				loader={loading && <TableLoading />}
 			>
-				<DataTable<Database>
-					columns={DatabaseColumns}
-					setTable={setTable}
-					data={databases}
-					noDataMessage={<p className='text-xl'>{t('database.empty_text')}</p>}
-					setSelectedRows={setSelectedRows}
-				/>
-			</InfiniteScroll>
+			</InfiniteScroll> */}
+			<DataTable<Database>
+				columns={DatabaseColumns}
+				setTable={setTable}
+				data={databases}
+				noDataMessage={<p className='text-xl'>{t('database.empty_text')}</p>}
+				setSelectedRows={setSelectedRows}
+			/>
 			<CreateAndEditDatabaseDrawer
 				open={editDatabaseDialogOpen}
 				onOpenChange={setEditDatabaseDialogOpen}
