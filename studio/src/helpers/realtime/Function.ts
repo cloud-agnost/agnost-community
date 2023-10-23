@@ -14,6 +14,14 @@ export default class Function extends RealtimeActions<HelperFunction> {
 		removeTabByPath(identifiers.versionId as string, identifiers.functionId as string);
 	}
 	update({ data }: RealtimeActionParams<HelperFunction>): void {
+		const { updateTab } = useTabStore.getState();
+		updateTab({
+			versionId: data.versionId as string,
+			tab: {
+				title: data.name,
+			},
+			filter: (tab) => tab.path.includes(data._id as string),
+		});
 		useFunctionStore.setState?.({
 			functions: useFunctionStore.getState?.().functions.map((ep) => {
 				if (ep._id === data._id) {

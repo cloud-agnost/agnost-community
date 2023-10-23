@@ -29,6 +29,14 @@ class Endpoint extends RealtimeActions<EndpointType> {
 		removeTabByPath(identifiers.versionId as string, identifiers.endpointId as string);
 	}
 	update({ data }: RealtimeActionParams<EndpointType>) {
+		const { updateTab } = useTabStore.getState();
+		updateTab({
+			versionId: data.versionId as string,
+			tab: {
+				title: data.name,
+			},
+			filter: (tab) => tab.path.includes(data._id as string),
+		});
 		useEndpointStore.setState?.({
 			endpoints: useEndpointStore.getState?.().endpoints.map((ep) => {
 				if (ep._id === data._id) {

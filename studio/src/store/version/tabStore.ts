@@ -1,5 +1,5 @@
-import { Tab } from '@/types';
-import { history } from '@/utils';
+import { Tab, UpdateTabParams } from '@/types';
+import { getUrlWithoutQuery, history } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import useVersionStore from './versionStore';
@@ -20,11 +20,11 @@ interface TabStore {
 	getPreviousTab: (versionId: string, currentTabId: string) => Tab | undefined;
 	getTabsByVersionId: (versionId: string) => Tab[];
 	getCurrentTab: (versionId: string) => Tab;
-	updateCurrentTab: (versionId: string, tab: Tab) => void;
+	updateCurrentTab: (versionId: string, tab: Partial<Tab>) => void;
 	setTabs: (versionId: string, tabs: Tab[]) => void;
 	filterTabs: (versionId: string, filter: (tab: Tab) => boolean) => Tab;
 	removeTabByPath: (versionId: string, path: string) => void;
-	updateTab: (versionId: string, updatedTab: Tab, filter: (tab: Tab) => boolean) => void;
+	updateTab: (param: UpdateTabParams) => void;
 }
 
 const useTabStore = create<TabStore>()(
@@ -70,23 +70,28 @@ const useTabStore = create<TabStore>()(
 					}
 				},
 				addTab: (versionId, tab) => {
-					const existingTab = get().tabs[versionId]?.find((t) => t.path === tab.path);
-					console.log('existingTab', existingTab, tab.path);
+					const existingTab = get().tabs[versionId]?.find(
+						(t) => getUrlWithoutQuery(t.path) === tab.path,
+					);
+					const url = useVersionStore.getState().getVersionDashboardPath(tab.path);
 					if (!existingTab) {
 						set((state) => {
 							const tabs = state.tabs[versionId] ?? [];
 							return {
 								tabs: {
 									...state.tabs,
-									[versionId]: [...tabs, tab],
+									[versionId]: [
+										...tabs,
+										{
+											...tab,
+											path: `${url}?tabId=${tab.id}`,
+										},
+									],
 								},
 							};
 						});
 					}
 					get().setCurrentTab(versionId, existingTab?.id ?? tab.id);
-					const url = tab.path.includes('organization')
-						? tab.path
-						: useVersionStore.getState().getVersionDashboardPath(tab.path);
 
 					history.navigate?.(`${url}?tabId=${tab.id}`);
 				},
@@ -162,9 +167,11 @@ const useTabStore = create<TabStore>()(
 						const tabs = state.tabs[versionId] ?? [];
 						const currentTabIndex = tabs.findIndex((t) => t.isActive);
 						if (currentTabIndex === -1) return state;
-
 						const newTabs = [...tabs];
-						newTabs[currentTabIndex] = tab;
+						newTabs[currentTabIndex] = {
+							...newTabs[currentTabIndex],
+							...tab,
+						};
 
 						return {
 							tabs: {
@@ -193,13 +200,22 @@ const useTabStore = create<TabStore>()(
 					const tabs = get().tabs[versionId] ?? [];
 					return tabs.find(filter) ?? ({} as Tab);
 				},
-				updateTab: (versionId, updatedTab, filter) => {
-					const tab = get().filterTabs(versionId, filter);
+				updateTab: (param) => {
+					const { versionId, tab, filter } = param;
 					if (!tab) return;
-					get().updateCurrentTab(versionId, {
-						...tab,
-						...updatedTab,
-					});
+					const toUpdateTab = get().filterTabs(versionId, filter);
+					set((state) => ({
+						tabs: {
+							...state.tabs,
+							[versionId]:
+								state.tabs[versionId]?.map((t) => {
+									if (t.id === toUpdateTab.id) {
+										return { ...t, ...tab };
+									}
+									return t;
+								}) ?? [],
+						},
+					}));
 				},
 			}),
 			{
