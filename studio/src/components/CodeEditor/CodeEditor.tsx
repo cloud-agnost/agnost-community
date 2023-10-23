@@ -3,7 +3,7 @@ import useThemeStore from '@/store/theme/themeStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab } from '@/types';
-import { cn, saveEditorContent } from '@/utils';
+import { cn, getTabIdFromUrl, saveEditorContent } from '@/utils';
 import MonacoEditor, { EditorProps } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
 import nightOwl from 'monaco-themes/themes/Night Owl.json';
@@ -32,8 +32,7 @@ export default function CodeEditor({
 	const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
 	const { version } = useVersionStore();
 	const setTabState = useDebounceFn((isDirty) => {
-		const searchParams = new URLSearchParams(window.location.search);
-		const tabId = searchParams.get('tabId');
+		const tabId = getTabIdFromUrl();
 		const tab = getTabById(version?._id as string, tabId as string) as Tab;
 		if (tab?.type.toLowerCase() === tab?.path) return;
 		updateCurrentTab(version?._id as string, {
