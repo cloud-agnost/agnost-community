@@ -6,6 +6,7 @@ import type {
 	User,
 } from '@/types/type.ts';
 import { joinChannel, leaveChannel } from '@/utils';
+import localforage from 'localforage';
 import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 
@@ -77,6 +78,7 @@ const useAuthStore = create<AuthStore>()(
 						await AuthService.logout();
 						get().setUser(null);
 						localStorage.clear();
+						localforage.clear();
 						location.href = '/login';
 					},
 					setToken: (accessToken) => set({ accessToken }),

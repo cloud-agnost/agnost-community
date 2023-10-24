@@ -8,12 +8,18 @@ import {
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import { cn } from '@/utils';
 import { Cloud, GearSix } from '@phosphor-icons/react';
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
+
 import { Button } from 'components/Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel } from 'components/Dropdown';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuLabel,
+	DropdownMenuTrigger,
+} from 'components/Dropdown';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './deploymentStatusCard.scss';
+
 export default function DeploymentStatusCard() {
 	const { t } = useTranslation();
 	const [settingsIsOpen, setSettingsIsOpen] = useState(false);
@@ -36,7 +42,7 @@ export default function DeploymentStatusCard() {
 	return (
 		<>
 			<DropdownMenu onOpenChange={(open) => handleOpenChange(open)}>
-				<DropdownMenuPrimitive.Trigger asChild>
+				<DropdownMenuTrigger asChild>
 					<Button variant='blank' iconOnly className='relative'>
 						<div className='absolute top-1 right-0.5'>
 							<span className='relative flex items-center justify-center h-3 w-3'>
@@ -51,8 +57,8 @@ export default function DeploymentStatusCard() {
 						</div>
 						<Cloud size={24} />
 					</Button>
-				</DropdownMenuPrimitive.Trigger>
-				<DropdownMenuContent className={cn('overflow-hidden relative w-[21rem]')}>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent className={cn('overflow-hidden relative w-[21rem]')} align='end'>
 					<DropdownMenuLabel className='relative flex justify-between items-center px-4 py-2'>
 						<span className='truncate text-default'>{t('version.deployment_status')}</span>
 						<Button

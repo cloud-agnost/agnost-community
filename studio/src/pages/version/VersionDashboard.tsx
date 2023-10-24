@@ -55,7 +55,7 @@ export default function VersionDashboard() {
 	return (
 		<div className='space-y-8 max-w-7xl'>
 			<h1 className='text-default text-2xl'>{t('version.dashboard')}</h1>
-			<div className='grid grid-cols-4 gap-4 mt-10 '>
+			<div className='grid grid-cols-4 gap-6 mt-10 '>
 				{Object.entries(dashboard).map(([key, value]) => (
 					<div
 						key={key}

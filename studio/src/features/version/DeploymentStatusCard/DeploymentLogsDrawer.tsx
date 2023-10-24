@@ -67,19 +67,23 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 				</DrawerContent>
 			</Drawer>
 			<Dialog open={isLogDetailsOpen} onOpenChange={closeLogDetails}>
-				<DialogContent className=' max-w-3xl'>
+				<DialogContent className='max-w-3xl'>
 					<DialogHeader>
 						<DialogTitle>{t('version.log_details')}</DialogTitle>
 					</DialogHeader>
 
-					<Tabs defaultValue={selectedTab} onValueChange={setSelectedTab}>
+					<Tabs
+						defaultValue={selectedTab}
+						onValueChange={setSelectedTab}
+						className='max-w-full overflow-auto'
+					>
 						<TabsList>
 							<TabsTrigger value='db'>{t('general.dbLogs')}</TabsTrigger>
 							<TabsTrigger value='server'>{t('general.serverLogs')}</TabsTrigger>
 							<TabsTrigger value='scheduler'>{t('general.schedulerLogs')}</TabsTrigger>
 						</TabsList>
 
-						<TabsContent className='h-[300px]' value='db'>
+						<TabsContent className='h-[300px] w-full' value='db'>
 							<Logs className='h-full' logs={selectedLog.dbLogs} />
 						</TabsContent>
 						<TabsContent className='h-[300px]' value='server'>

@@ -2,6 +2,7 @@ import { ERROR_CODES_TO_REDIRECT_LOGIN_PAGE } from '@/constants';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { APIError } from '@/types';
 import axios from 'axios';
+import localforage from 'localforage';
 const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost/api';
 
 const headers = {
@@ -40,6 +41,7 @@ instance.interceptors.response.use(
 		};
 		if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
 			localStorage.clear();
+			localforage.clear();
 			useAuthStore.getState().logout();
 		}
 		// if (error.response.status === 401) {
