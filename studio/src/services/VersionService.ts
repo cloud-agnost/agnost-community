@@ -4,6 +4,7 @@ import {
 	AddNPMPackageParams,
 	AddVersionVariableParams,
 	AuthMessageTemplateParams,
+	BaseParams,
 	CreateAPIKeyParams,
 	CreateCopyOfVersionParams,
 	CreateOAuthConfigParams,
@@ -45,6 +46,7 @@ import {
 	Version,
 	VersionLog,
 	VersionLogBucket,
+	Dashboard,
 } from '@/types';
 
 export default class VersionService {
@@ -471,5 +473,14 @@ export default class VersionService {
 		return (
 			await axios.post(`${this.url}/${orgId}/app/${appId}/version/${versionId}/auth/messages`, data)
 		).data;
+	}
+
+	static async getVersionsDashboardInfo({
+		orgId,
+		appId,
+		versionId,
+	}: BaseParams): Promise<Dashboard> {
+		return (await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/dashboard`))
+			.data;
 	}
 }

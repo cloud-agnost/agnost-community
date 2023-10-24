@@ -448,3 +448,13 @@ export type UpdateTabParams = {
 	tab: Partial<Tab>;
 	filter(tab: Tab): boolean;
 };
+export interface Dashboard {
+	database: number;
+	cache: number;
+	storage: number;
+	endpoint: number;
+	middleware: number;
+	function: number;
+	queue: number;
+	task: number;
+}

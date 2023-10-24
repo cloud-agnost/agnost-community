@@ -75,6 +75,8 @@
 		"rate_limits": "Rate Limits",
 		"authentications": "Authentication",
 		"api_keys": "API Keys",
+		"api_keys_desc": "Integrate your backend app to your frontend using Agnost's client library. Client library keys are used to authenticate and authorize your front end apps. Your backend app is secured behind a gateway which requires a client key for every request made through Agnost's client library.",
+		"manage_api_keys": "Manage API Keys",
 		"real_time": "Real Time",
 		"other": "Other Settings",
 		"version_id": "API Server Base URL",

@@ -2,7 +2,9 @@ import { CustomStateStorage } from '@/helpers';
 import { VersionService } from '@/services';
 import {
 	APIError,
+	BaseParams,
 	CreateCopyOfVersionParams,
+	Dashboard,
 	DeleteVersionParams,
 	DesignElement,
 	GetVersionByIdParams,
@@ -42,6 +44,7 @@ interface VersionStore {
 	notificationLastSeen: Date;
 	notificationLastFetchedCount: number;
 	designElements: DesignElement[];
+	dashboard: Dashboard;
 	selectVersion: (version: Version) => void;
 	getVersionById: (req: GetVersionByIdParams) => Promise<Version>;
 	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<Version[]>;
@@ -62,6 +65,7 @@ interface VersionStore {
 	updateNotificationLastSeen: () => void;
 	searchDesignElements: (params: SearchDesignElementParams) => Promise<DesignElement[]>;
 	resetDesignElements: () => void;
+	getVersionDashboardInfo: (params: BaseParams) => Promise<void>;
 }
 
 const useVersionStore = create<VersionStore>()(
@@ -85,6 +89,7 @@ const useVersionStore = create<VersionStore>()(
 				showLogDetails: false,
 				notificationLastSeen: new Date(),
 				designElements: [],
+				dashboard: {} as Dashboard,
 				selectVersion: (version: Version) => {
 					localforage.clear();
 					set({ version });
@@ -247,6 +252,14 @@ const useVersionStore = create<VersionStore>()(
 				},
 				resetDesignElements: () => {
 					set({ designElements: [] });
+				},
+				getVersionDashboardInfo: async (params) => {
+					try {
+						const dashboard = await VersionService.getVersionsDashboardInfo(params);
+						set({ dashboard });
+					} catch (error) {
+						throw error as APIError;
+					}
 				},
 			}),
 			{
