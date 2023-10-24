@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from 'components/Drawer';
 import {
 	Form,
 	FormControl,
@@ -15,7 +15,7 @@ import {
 import { Input, Textarea } from 'components/Input';
 import { Button } from 'components/Button';
 import { NAME_SCHEMA, TIMESTAMPS_SCHEMA } from '@/constants';
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { APIError } from '@/types';
 import { Separator } from 'components/Separator';
 import { SettingsFormItem } from 'components/SettingsFormItem';
@@ -40,15 +40,17 @@ const Schema = z.object({
 });
 
 interface EditOrCreateModelDrawerProps {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
 	editMode?: boolean;
+	children?: ReactNode;
 }
 
 export default function EditOrCreateModelDrawer({
 	open,
 	onOpenChange,
-	editMode,
+	editMode = false,
+	children,
 }: EditOrCreateModelDrawerProps) {
 	const { t } = useTranslation();
 	const {
@@ -97,12 +99,12 @@ export default function EditOrCreateModelDrawer({
 
 	async function onSubmit(data: z.infer<typeof Schema>) {
 		try {
-			if (editMode) {
+			if (editMode && modelToEdit) {
 				await update(data);
 			} else {
 				await create(data);
 			}
-			onOpenChange(false);
+			onOpenChange?.(false);
 			form.reset();
 		} catch (e) {
 			const error = e as APIError;
@@ -169,10 +171,11 @@ export default function EditOrCreateModelDrawer({
 
 	return (
 		<Drawer open={open} onOpenChange={onOpenChange}>
+			{children && <DrawerTrigger asChild>{children}</DrawerTrigger>}
 			<DrawerContent className='overflow-x-hidden'>
 				<DrawerHeader className='relative'>
 					<DrawerTitle>
-						{editMode ? t('database.models.edit') : t('database.models.create')}
+						{editMode && modelToEdit ? t('database.models.edit') : t('database.models.create')}
 					</DrawerTitle>
 				</DrawerHeader>
 				<div className='p-6 space-y-6'>
@@ -262,7 +265,9 @@ export default function EditOrCreateModelDrawer({
 															<Input
 																error={Boolean(errors.timestamps?.createdAt)}
 																type='text'
-																readOnly={editMode && modelToEdit?.timestamps.enabled}
+																readOnly={
+																	editMode && !!modelToEdit && modelToEdit?.timestamps.enabled
+																}
 																placeholder={
 																	t('forms.placeholder', {
 																		label: t(
@@ -290,7 +295,9 @@ export default function EditOrCreateModelDrawer({
 															<Input
 																error={Boolean(errors.timestamps?.updatedAt)}
 																type='text'
-																readOnly={editMode && modelToEdit?.timestamps.enabled}
+																readOnly={
+																	editMode && !!modelToEdit && modelToEdit?.timestamps.enabled
+																}
 																placeholder={
 																	t('forms.placeholder', {
 																		label: t(
@@ -310,11 +317,14 @@ export default function EditOrCreateModelDrawer({
 									</>
 								);
 
-								if (isEnabled && !editMode) return Component;
-								if (isEnabled && editMode && !modelToEdit?.timestamps.enabled) return Component;
+								if (isEnabled && (!editMode || !modelToEdit)) return Component;
+								if (isEnabled && editMode && modelToEdit && !modelToEdit?.timestamps.enabled)
+									return Component;
 							})()}
 							<div className='flex justify-end'>
-								<Button size='lg'>{editMode ? t('general.save') : t('general.create')}</Button>
+								<Button size='lg'>
+									{editMode && modelToEdit ? t('general.save') : t('general.create')}
+								</Button>
 							</div>
 						</form>
 					</Form>

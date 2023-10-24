@@ -8,4 +8,12 @@ export default class RichText extends Field {
     isSearchable() {
         return this.options?.richText?.searchable ?? false;
     }
+
+    /**
+     * @description Gets the language of the field
+     * @return {string}
+     */
+    getLanguage() {
+        return this.options?.richText?.language;
+    }
 }

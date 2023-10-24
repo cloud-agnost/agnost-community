@@ -106,7 +106,7 @@ export default function Models() {
 			<EditOrCreateModelDrawer
 				open={isOpenEditModelDialog}
 				onOpenChange={setIsOpenEditModelDialog}
-				editMode
+				editMode={true}
 			/>
 		</>
 	);

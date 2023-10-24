@@ -102,7 +102,7 @@ export const textRules = (type) => {
 					.bail()
 					.custom((value, { req }) => {
 						if (!req.body.text?.searchable) return true;
-						if (!ftsIndexLanguages[req.db.type].includes(value)) {
+						if (!ftsIndexLanguages[req.db.type].some((item) => item.value.toString() === value)) {
 							throw new AgnostError(
 								t(
 									"Language/collation '%s' is not supported in '%s' databases",

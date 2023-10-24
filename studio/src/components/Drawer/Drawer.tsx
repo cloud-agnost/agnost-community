@@ -7,7 +7,21 @@ import { X } from '@phosphor-icons/react';
 import { cn } from '@/utils';
 import './drawer.scss';
 
-const Drawer = SheetPrimitive.Root;
+const Drawer = ({ children, onOpenChange, ...props }: SheetPrimitive.DialogProps) => (
+	<SheetPrimitive.Root
+		onOpenChange={(status) => {
+			onOpenChange?.(status);
+			if (!status) {
+				setTimeout(() => {
+					document.body.style.pointerEvents = '';
+				}, 50);
+			}
+		}}
+		{...props}
+	>
+		{children}
+	</SheetPrimitive.Root>
+);
 
 const DrawerTrigger = SheetPrimitive.Trigger;
 

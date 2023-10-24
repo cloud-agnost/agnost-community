@@ -240,8 +240,10 @@ END;
 
     addFullTextIndex(model, field, returnQuery = false) {
         const indexName = SQLBaseManager.getFullTextIndexName(field.iid);
+        const fieldClass = new (fieldMap.get(field.type))(field, this.getDbType());
+        const addCollateQuery = fieldClass.toAddCollateQuery(model, field);
 
-        const schema = "CREATE FULLTEXT INDEX `{INDEX_NAME}` ON {TABLE_NAME}({FIELD_NAME});";
+        const schema = addCollateQuery + "\n" + "CREATE FULLTEXT INDEX `{INDEX_NAME}` ON {TABLE_NAME}({FIELD_NAME});";
 
         const SQL = this.ifWrapper(
             MySQLDBManager.checkIndexConditionSchema
