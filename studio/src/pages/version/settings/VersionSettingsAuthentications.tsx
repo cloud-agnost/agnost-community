@@ -23,15 +23,15 @@ export default function VersionSettingsAuthentications() {
 	const AUTH_MENU_ITEMS = [
 		{
 			name: t('version.settings.general'),
-			href: '?a=general',
+			href: 'general',
 		},
 		{
 			name: t('version.authentication.providers'),
-			href: '?a=providers',
+			href: 'providers',
 		},
 		{
 			name: t('version.authentication.message_templates'),
-			href: '?a=templates',
+			href: 'templates',
 		},
 	];
 

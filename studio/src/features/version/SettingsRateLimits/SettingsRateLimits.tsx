@@ -8,6 +8,7 @@ import { EmptyState } from 'components/EmptyState';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import './SettingsRateLimits.scss';
+import useSettingsStore from '@/store/version/settingsStore';
 
 interface SettingsNPMPackagesProps {
 	selectedRows: Row<RateLimit>[] | undefined;
@@ -21,7 +22,7 @@ export default function SettingsRateLimits({
 }: SettingsNPMPackagesProps) {
 	const { t } = useTranslation();
 	const limits = useVersionStore((state) => state.version?.limits ?? []);
-	const { editRateLimitDrawerIsOpen, setEditRateLimitDrawerIsOpen } = useVersionStore();
+	const { editRateLimitDrawerIsOpen, setEditRateLimitDrawerIsOpen } = useSettingsStore();
 
 	return (
 		<>

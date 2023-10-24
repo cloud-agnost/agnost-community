@@ -19,6 +19,8 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import './CreateCopyVersionDrawer.scss';
+import { useToast } from '@/hooks';
+import { useNavigate } from 'react-router-dom';
 const CreateCopyVersionForm = z.object({
 	name: z
 		.string({
@@ -41,11 +43,14 @@ const CreateCopyVersionForm = z.object({
 
 export default function CreateCopyVersionDrawer() {
 	const { t } = useTranslation();
+	const { notify } = useToast();
+	const navigate = useNavigate();
 	const {
 		createCopyVersionDrawerIsOpen,
 		createCopyOfVersion,
 		setCreateCopyVersionDrawerIsOpen,
 		version,
+		getVersionDashboardPath,
 	} = useVersionStore();
 	const [loading, setLoading] = useState(false);
 
@@ -64,24 +69,34 @@ export default function CreateCopyVersionDrawer() {
 
 	async function onSubmit(data: z.infer<typeof CreateCopyVersionForm>) {
 		setLoading(true);
-		try {
-			if (!version) return;
-			await createCopyOfVersion(
-				{
-					orgId: version.orgId,
-					appId: version.appId,
-					parentVersionId: version._id,
-					name: data.name,
-					private: data.private,
-					readOnly: data.readOnly,
-				},
-				true,
-			);
-			form.reset();
-			setCreateCopyVersionDrawerIsOpen(false);
-		} finally {
-			setLoading(false);
-		}
+
+		createCopyOfVersion({
+			orgId: version.orgId,
+			appId: version.appId,
+			parentVersionId: version._id,
+			name: data.name,
+			private: data.private,
+			readOnly: data.readOnly,
+			onSuccess: () => {
+				notify({
+					type: 'success',
+					title: translate('general.success'),
+					description: translate('version.copied'),
+				});
+				form.reset();
+				setCreateCopyVersionDrawerIsOpen(false);
+				navigate(getVersionDashboardPath());
+			},
+			onError: (error) => {
+				notify({
+					type: 'error',
+					title: error.error,
+					description: error.details,
+				});
+			},
+		});
+
+		setLoading(false);
 	}
 
 	return (

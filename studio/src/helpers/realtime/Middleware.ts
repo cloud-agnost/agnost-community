@@ -14,6 +14,14 @@ export default class Middleware extends RealtimeActions<MiddlewareType> {
 		removeTabByPath(identifiers.versionId as string, identifiers.middlewareId as string);
 	}
 	update({ data }: RealtimeActionParams<MiddlewareType>): void {
+		const { updateTab } = useTabStore.getState();
+		updateTab({
+			versionId: data.versionId as string,
+			tab: {
+				title: data.name,
+			},
+			filter: (tab) => tab.path.includes(data._id as string),
+		});
 		useMiddlewareStore.setState?.({
 			middlewares: useMiddlewareStore.getState?.().middlewares.map((middleware) => {
 				if (middleware._id === data._id) {

@@ -27,7 +27,7 @@ interface OutletContext {
 export default function MainEndpoint() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const { notify } = useToast();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
@@ -72,16 +72,6 @@ export default function MainEndpoint() {
 			},
 		});
 	}
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		setPage(0);
-		setSearchParams({ ...searchParams, q: value });
-	}
 
 	function deleteMultipleEndpointsHandler() {
 		deleteMultipleEndpoints({
@@ -101,6 +91,7 @@ export default function MainEndpoint() {
 
 	useEffect(() => {
 		if (versionId && orgId && appId) {
+			setLoading(true);
 			getEndpoints({
 				orgId,
 				appId,
@@ -108,8 +99,8 @@ export default function MainEndpoint() {
 				page,
 				size: PAGE_SIZE,
 				search: searchParams.get('q') ?? undefined,
-				initialFetch: page === 0,
 			});
+			setLoading(false);
 		}
 	}, [searchParams.get('q'), page]);
 	return (
@@ -123,7 +114,7 @@ export default function MainEndpoint() {
 				setIsCreateModalOpen(true);
 			}}
 			onMultipleDelete={deleteMultipleEndpointsHandler}
-			onSearch={onInput}
+			onSearch={() => setPage(0)}
 			table={table}
 			selectedRowLength={selectedRows.length}
 			disabled={!canCreate}
@@ -136,11 +127,9 @@ export default function MainEndpoint() {
 			<InfiniteScroll
 				scrollableTarget='version-layout'
 				dataLength={endpoints.length}
-				next={() => {
-					setPage(page + 1);
-				}}
+				next={() => setPage(page + 1)}
 				hasMore={lastFetchedCount >= PAGE_SIZE}
-				loader={endpoints.length > 0 && <TableLoading />}
+				loader={loading && <TableLoading />}
 			>
 				<DataTable
 					columns={EndpointColumns}

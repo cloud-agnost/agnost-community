@@ -18,7 +18,7 @@ export function Header() {
 	return (
 		<header className='header-menu'>
 			<div className='header-menu-left'>
-				<Link to='/' className='header-menu-left-logo'>
+				<Link to='/'>
 					<Agnost width='40' height='40' />
 				</Link>
 				<div className='header-menu-divider' />

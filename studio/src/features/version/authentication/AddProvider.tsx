@@ -13,6 +13,7 @@ import { Separator } from '@/components/Separator';
 import { OAUTH_URL_MAP } from '@/constants';
 import { useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { APIError, OAuthProvider, OAuthProviderTypes, VersionOAuthProvider } from '@/types';
 import { capitalize, isEmpty, translate as t } from '@/utils';
@@ -97,7 +98,8 @@ const AddOAuthProviderSchema = z
 export default function AddProvider({ open, onClose, provider, editedProvider }: AddProviderProps) {
 	const { notify } = useToast();
 	const { environment } = useEnvironmentStore();
-	const { version, createOAuthConfig, updateOAuthConfig } = useVersionStore();
+	const { createOAuthConfig, updateOAuthConfig } = useSettingsStore();
+	const { version } = useVersionStore();
 	const form = useForm<z.infer<typeof AddOAuthProviderSchema>>({
 		resolver: zodResolver(AddOAuthProviderSchema),
 		defaultValues: {

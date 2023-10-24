@@ -3,20 +3,17 @@ import useResourceStore from '@/store/resources/resourceStore';
 import { useEffect, useState } from 'react';
 
 export default function useCreateResource() {
-	const { resourceType } = useResourceStore();
+	const { resourceConfig } = useResourceStore();
 	const [createResourceElement, setCreateResourceElement] = useState(CREATE_RESOURCES_ELEMENTS[0]);
 
 	useEffect(() => {
-		if (resourceType.step === 1) {
-			setCreateResourceElement(CREATE_RESOURCES_ELEMENTS[0]);
-		} else {
-			setCreateResourceElement(
-				CREATE_RESOURCES_ELEMENTS.find(
-					(resource) => resource.type === resourceType.type && resource.name === resourceType.name,
-				) || CREATE_RESOURCES_ELEMENTS[0],
-			);
-		}
-	}, [resourceType.step]);
+		setCreateResourceElement(
+			CREATE_RESOURCES_ELEMENTS.find(
+				(r) =>
+					r.resourceType === resourceConfig.resourceType && r.instance === resourceConfig.instance,
+			) || CREATE_RESOURCES_ELEMENTS[0],
+		);
+	}, [resourceConfig]);
 
 	return createResourceElement;
 }

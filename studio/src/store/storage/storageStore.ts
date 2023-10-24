@@ -1,3 +1,4 @@
+import { CustomStateStorage } from '@/helpers';
 import StorageService from '@/services/StorageService';
 import {
 	APIError,
@@ -138,7 +139,7 @@ const useStorageStore = create<StorageStore>()(
 				},
 				getStorages: async (params: GetStoragesParams) => {
 					const storages = await StorageService.getStorages(params);
-					if (params.initialFetch) {
+					if (params.page === 0) {
 						set({ storages, lastFetchedCount: storages.length });
 					} else {
 						set((prev) => ({
@@ -372,7 +373,7 @@ const useStorageStore = create<StorageStore>()(
 					}
 				},
 			}),
-			{ name: 'storage-store' },
+			{ name: 'storage-store', storage: CustomStateStorage },
 		),
 	),
 );

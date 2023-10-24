@@ -1,10 +1,10 @@
 import { Button } from '@/components/Button';
 import { VERSION_DROPDOWN_ITEM } from '@/constants';
+import { useToast } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIError } from '@/types';
-import { generateId } from '@/utils';
 import { CaretUpDown, LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ConfirmationModal } from 'components/ConfirmationModal';
 import {
@@ -19,10 +19,10 @@ import { Fragment, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import './versionDropdown.scss';
-
 export default function VersionDropdown() {
 	const [open, setOpen] = useState(false);
-	const { version, getVersionDashboardPath } = useVersionStore();
+	const { notify } = useToast();
+	const { version } = useVersionStore();
 	const { t } = useTranslation();
 	const [error, setError] = useState<null | APIError>(null);
 	const [loading, setLoading] = useState(false);
@@ -32,25 +32,32 @@ export default function VersionDropdown() {
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 	const navigate = useNavigate();
 	const { application, openVersionDrawer } = useApplicationStore();
-	const { addTab } = useTabStore();
+	const { addSettingsTab } = useTabStore();
 
 	async function onConfirm() {
 		setLoading(true);
 		setError(null);
-		try {
-			await deleteVersion({
-				orgId,
-				appId,
-				versionId,
-			});
-			useVersionStore.setState({ deleteVersionDrawerIsOpen: false });
-			navigate(`/organization/${orgId}/apps`);
-			if (application) openVersionDrawer(application);
-		} catch (e) {
-			setError(e as APIError);
-		} finally {
-			setLoading(false);
-		}
+
+		deleteVersion({
+			orgId,
+			appId,
+			versionId,
+			onSuccess: () => {
+				useVersionStore.setState({ deleteVersionDrawerIsOpen: false });
+				navigate(`/organization/${orgId}/apps`);
+				if (application) openVersionDrawer(application);
+			},
+			onError: (error) => {
+				notify({
+					type: 'error',
+					title: error.error,
+					description: error.details,
+				});
+				setError(error as APIError);
+			},
+		});
+
+		setLoading(false);
 	}
 
 	return (
@@ -81,16 +88,7 @@ export default function VersionDropdown() {
 					<Button
 						variant='blank'
 						className='version-dropdown-label'
-						onClick={() => {
-							addTab(version?._id as string, {
-								path: getVersionDashboardPath('/settings'),
-								id: generateId(),
-								title: t('version.settings.default'),
-								isActive: true,
-								isDashboard: false,
-								type: 'Settings',
-							});
-						}}
+						onClick={() => addSettingsTab(version._id)}
 					>
 						<div className='version-label-icon'>
 							{version?.readOnly ? <LockSimple size={20} /> : <LockSimpleOpen size={20} />}

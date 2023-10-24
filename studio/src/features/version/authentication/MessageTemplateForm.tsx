@@ -24,6 +24,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useToast } from '@/hooks';
 import { translate as t } from '@/utils';
+import useSettingsStore from '@/store/version/settingsStore';
 
 const USER_VARIABLES = ['name', 'email', 'phone', 'sigUpAt', 'lastLoginAt'];
 const EMAIL_TOKEN_VARIABLES = [
@@ -85,7 +86,8 @@ const MessageTemplatesSchema = z
 export default function MessageTemplateForm({ template }: { template: VersionMessageTemplate }) {
 	const { notify } = useToast();
 	const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
-	const { setAuthMessageTemplate, version } = useVersionStore();
+	const { setAuthMessageTemplate } = useSettingsStore();
+	const { version } = useVersionStore();
 	const form = useForm<z.infer<typeof MessageTemplatesSchema>>({
 		resolver: zodResolver(MessageTemplatesSchema),
 		defaultValues: template,

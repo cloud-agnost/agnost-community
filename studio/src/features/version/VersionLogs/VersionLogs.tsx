@@ -108,7 +108,6 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 			end: searchParams.get('end') ?? date[0].endDate?.toISOString(),
 			page,
 			size: PAGE_SIZE,
-			initialFetch: page === 0,
 		});
 	}, [searchParams, page]);
 	return (

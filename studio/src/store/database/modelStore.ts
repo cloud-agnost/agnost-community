@@ -1,3 +1,4 @@
+import { CustomStateStorage } from '@/helpers/state';
 import { ModelService } from '@/services';
 import {
 	APIError,
@@ -358,18 +359,21 @@ const useModelStore = create<ModelStore>()(
 					set({ nestedModels: [] });
 				},
 				getModelsTitle: () => {
-					return `${get().model.name}${
-						get().nestedModels.length
-							? '.' +
-							  get()
-									.nestedModels.map((m) => m.name)
-									.join('.')
-							: ''
-					}`;
+					return get().model
+						? `${get().model.name}${
+								get().nestedModels.length
+									? '.' +
+									  get()
+											.nestedModels.map((m) => m.name)
+											.join('.')
+									: ''
+						  }`
+						: '';
 				},
 			}),
 			{
 				name: 'model-storage',
+				storage: CustomStateStorage,
 			},
 		),
 		{

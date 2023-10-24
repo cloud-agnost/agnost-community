@@ -14,6 +14,14 @@ class Storage extends RealtimeActions<StorageType> {
 		removeTabByPath(identifiers.versionId as string, identifiers.storageId as string);
 	}
 	update({ data }: RealtimeActionParams<StorageType>): void {
+		const { updateTab } = useTabStore.getState();
+		updateTab({
+			versionId: data.versionId as string,
+			tab: {
+				title: data.name,
+			},
+			filter: (tab) => tab.path.includes(data._id as string),
+		});
 		useStorageStore.setState?.({
 			storages: useStorageStore.getState?.().storages.map((storage) => {
 				if (storage._id === data._id) {

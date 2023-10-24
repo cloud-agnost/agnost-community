@@ -1,5 +1,5 @@
-import { Tab } from '@/types';
-import { history } from '@/utils';
+import { Tab, TabTypes, UpdateTabParams } from '@/types';
+import { generateId, getUrlWithoutQuery, history, translate } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import useVersionStore from './versionStore';
@@ -11,6 +11,7 @@ interface TabStore {
 	closeDeleteTabModal: () => void;
 	removeAllTabs: (versionId: string) => void;
 	removeAllTabsExcept: (versionId: string) => void;
+	removeAllAtRight: (versionId: string) => void;
 	setCurrentTab: (versionId: string, id: string) => void;
 	removeTab: (versionId: string, id: string) => void;
 	addTab: (versionId: string, tab: Tab) => void;
@@ -19,9 +20,12 @@ interface TabStore {
 	getPreviousTab: (versionId: string, currentTabId: string) => Tab | undefined;
 	getTabsByVersionId: (versionId: string) => Tab[];
 	getCurrentTab: (versionId: string) => Tab;
-	updateCurrentTab: (versionId: string, tab: Tab) => void;
+	updateCurrentTab: (versionId: string, tab: Partial<Tab>) => void;
 	setTabs: (versionId: string, tabs: Tab[]) => void;
+	filterTabs: (versionId: string, filter: (tab: Tab) => boolean) => Tab;
 	removeTabByPath: (versionId: string, path: string) => void;
+	updateTab: (param: UpdateTabParams) => void;
+	addSettingsTab: (versionId: string, path?: string) => void;
 }
 
 const useTabStore = create<TabStore>()(
@@ -67,22 +71,28 @@ const useTabStore = create<TabStore>()(
 					}
 				},
 				addTab: (versionId, tab) => {
-					const existingTab = get().tabs[versionId]?.find((t) => t.path === tab.path);
+					const existingTab = get().tabs[versionId]?.find(
+						(t) => getUrlWithoutQuery(t.path) === tab.path,
+					);
+					const url = useVersionStore.getState().getVersionDashboardPath(tab.path);
 					if (!existingTab) {
 						set((state) => {
 							const tabs = state.tabs[versionId] ?? [];
 							return {
 								tabs: {
 									...state.tabs,
-									[versionId]: [...tabs, tab],
+									[versionId]: [
+										...tabs,
+										{
+											...tab,
+											path: `${url}?tabId=${tab.id}`,
+										},
+									],
 								},
 							};
 						});
 					}
 					get().setCurrentTab(versionId, existingTab?.id ?? tab.id);
-					const url = tab.path.includes('organization')
-						? tab.path
-						: useVersionStore.getState().getVersionDashboardPath(tab.path);
 
 					history.navigate?.(`${url}?tabId=${tab.id}`);
 				},
@@ -122,6 +132,21 @@ const useTabStore = create<TabStore>()(
 						};
 					});
 				},
+				removeAllAtRight: (versionId) => {
+					const currentTab = get().getCurrentTab(versionId);
+					const tabs = get().tabs[versionId] ?? [];
+					const currentTabIndex = tabs.findIndex((tab) => tab.id === currentTab.id);
+					if (currentTabIndex === -1) return;
+					const newTabs = tabs.slice(0, currentTabIndex + 1);
+					set((state) => {
+						return {
+							tabs: {
+								...state.tabs,
+								[versionId]: newTabs,
+							},
+						};
+					});
+				},
 				setCurrentTab: (versionId, id: string) => {
 					set((state) => {
 						const tabs = state.tabs[versionId] ?? [];
@@ -143,9 +168,11 @@ const useTabStore = create<TabStore>()(
 						const tabs = state.tabs[versionId] ?? [];
 						const currentTabIndex = tabs.findIndex((t) => t.isActive);
 						if (currentTabIndex === -1) return state;
-
 						const newTabs = [...tabs];
-						newTabs[currentTabIndex] = tab;
+						newTabs[currentTabIndex] = {
+							...newTabs[currentTabIndex],
+							...tab,
+						};
 
 						return {
 							tabs: {
@@ -169,6 +196,44 @@ const useTabStore = create<TabStore>()(
 					const tab = get().tabs[versionId]?.find((tab) => tab.path.includes(path));
 					if (!tab) return;
 					get().removeTab(versionId, tab.id);
+				},
+				filterTabs: (versionId, filter) => {
+					const tabs = get().tabs[versionId] ?? [];
+					return tabs.find(filter) ?? ({} as Tab);
+				},
+				updateTab: (param) => {
+					const { versionId, tab, filter } = param;
+					if (!tab) return;
+					const toUpdateTab = get().filterTabs(versionId, filter);
+					set((state) => ({
+						tabs: {
+							...state.tabs,
+							[versionId]:
+								state.tabs[versionId]?.map((t) => {
+									if (t.id === toUpdateTab.id) {
+										return { ...t, ...tab };
+									}
+									return t;
+								}) ?? [],
+						},
+					}));
+				},
+				addSettingsTab: (versionId, path = '') => {
+					const tabs = get().tabs[versionId] ?? [];
+					const settingsTab = tabs.find((tab) => tab.type === TabTypes.Settings);
+					if (settingsTab) {
+						get().setCurrentTab(versionId, settingsTab.id);
+						history.navigate?.(settingsTab.path);
+						return;
+					}
+					get().addTab(versionId as string, {
+						path: useVersionStore.getState().getVersionDashboardPath(`settings/${path}`),
+						id: generateId(),
+						title: translate('version.settings.default'),
+						isActive: true,
+						isDashboard: false,
+						type: TabTypes.Settings,
+					});
 				},
 			}),
 			{

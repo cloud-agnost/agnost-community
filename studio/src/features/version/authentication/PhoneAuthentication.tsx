@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/Input';
 import { translate as t } from '@/utils';
 import { PhoneAuthSMSProviders } from '@/types';
+import useSettingsStore from '@/store/version/settingsStore';
 
 const PhoneAuthSchema = z
 	.object({
@@ -129,7 +130,8 @@ const PhoneAuthSchema = z
 
 export default function PhoneAuthentication() {
 	const { notify } = useToast();
-	const { version, savePhoneAuthSettings } = useVersionStore();
+	const { version } = useVersionStore();
+	const { savePhoneAuthSettings } = useSettingsStore();
 	const { phoneAuthSMSProviders } = useTypeStore();
 	const [loading, setLoading] = useState(false);
 	const form = useForm<z.infer<typeof PhoneAuthSchema>>({

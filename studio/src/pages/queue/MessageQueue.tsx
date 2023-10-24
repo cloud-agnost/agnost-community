@@ -38,7 +38,7 @@ export default function MainMessageQueue() {
 	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
 	const canEdit = useAuthorizeVersion('queue.create');
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 
@@ -70,16 +70,6 @@ export default function MainMessageQueue() {
 			},
 		});
 	}
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		setPage(0);
-		setSearchParams({ ...searchParams, q: value });
-	}
 
 	function deleteMultipleQueuesHandler() {
 		deleteMultipleQueues({
@@ -99,6 +89,7 @@ export default function MainMessageQueue() {
 
 	useEffect(() => {
 		if (versionId && orgId && appId) {
+			setLoading(true);
 			getQueues({
 				orgId,
 				appId,
@@ -106,11 +97,10 @@ export default function MainMessageQueue() {
 				page,
 				size: PAGE_SIZE,
 				search: searchParams.get('q') ?? undefined,
-				initialFetch: page === 0,
 			});
+			setLoading(false);
 		}
 	}, [searchParams.get('q'), page]);
-
 	return (
 		<VersionTabLayout<MessageQueue>
 			isEmpty={queues.length === 0}
@@ -121,7 +111,7 @@ export default function MainMessageQueue() {
 			emptyStateTitle={t('queue.empty_text')}
 			table={table}
 			selectedRowLength={selectedRows?.length}
-			onSearch={onInput}
+			onSearch={() => setPage(0)}
 			onMultipleDelete={deleteMultipleQueuesHandler}
 			disabled={!canEdit}
 			handlerButton={
@@ -133,11 +123,9 @@ export default function MainMessageQueue() {
 			<InfiniteScroll
 				scrollableTarget='version-layout'
 				dataLength={queues.length}
-				next={() => {
-					setPage(page + 1);
-				}}
+				next={() => setPage(page + 1)}
 				hasMore={lastFetchedCount >= PAGE_SIZE}
-				loader={queues.length > 0 && <TableLoading />}
+				loader={loading && <TableLoading />}
 			>
 				<DataTable
 					columns={MessageQueueColumns}

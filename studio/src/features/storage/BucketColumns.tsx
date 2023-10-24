@@ -2,7 +2,7 @@ import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useStorageStore from '@/store/storage/storageStore';
-import { Bucket, ColumnDefWithClassName } from '@/types';
+import { Bucket, ColumnDefWithClassName, TabTypes } from '@/types';
 import { notify, translate } from '@/utils';
 import { Prohibit } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
@@ -41,7 +41,7 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 			<TabLink
 				name={original.name}
 				path={`bucket/${original.name}`}
-				type='Storage'
+				type={TabTypes.Bucket}
 				onClick={() => {
 					useStorageStore.setState({ bucket: original });
 				}}

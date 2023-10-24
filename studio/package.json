@@ -44,6 +44,7 @@
 		"cronstrue": "^2.28.0",
 		"framer-motion": "^10.12.16",
 		"i18next": "^22.5.1",
+		"localforage": "^1.10.0",
 		"luxon": "^3.3.0",
 		"monaco-themes": "^0.4.4",
 		"path": "^0.12.7",

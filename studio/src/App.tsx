@@ -14,15 +14,15 @@ function App() {
 	useRenewToken(2);
 	useRealtime();
 
-	const { getAllTypes, isTypesOk } = useTypeStore();
+	const { getAllTypes } = useTypeStore();
 	const { user } = useAuthStore();
 	const { theme } = useThemeStore();
 
 	useEffect(() => {
-		if (!isTypesOk && user) {
+		if (user) {
 			getAllTypes();
 		}
-	}, [isTypesOk, user]);
+	}, [user]);
 
 	useEffect(() => {
 		let systemTheme = theme;

@@ -8,14 +8,15 @@ import { useParams } from 'react-router-dom';
 import { useToast } from '@/hooks';
 import { DotsSixVertical, Trash } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
+import useSettingsStore from '@/store/version/settingsStore';
 
 export default function SortableRealtimeRateLimits() {
 	const realtimeRateLimiters = useVersionStore((state) => state.version?.realtime.rateLimits);
 	const rateLimits = useVersionStore((state) => state.version?.limits);
-	const updateVersionRealtimeProperties = useVersionStore(
+	const updateVersionRealtimeProperties = useSettingsStore(
 		(state) => state.updateVersionRealtimeProperties,
 	);
-	const orderLimits = useVersionStore((state) => state.orderRealtimeRateLimits);
+	const orderLimits = useSettingsStore((state) => state.orderRealtimeRateLimits);
 	const version = useVersionStore((state) => state.version);
 
 	const reorder = (list: string[], startIndex: number, endIndex: number) => {
@@ -80,7 +81,7 @@ function RateLimitItem({ provided, limiter }: RateLimitProps) {
 	const realtimeRateLimitsRateLimits = useVersionStore(
 		(state) => state.version?.realtime.rateLimits,
 	);
-	const updateVersionRealtimeProperties = useVersionStore(
+	const updateVersionRealtimeProperties = useSettingsStore(
 		(state) => state.updateVersionRealtimeProperties,
 	);
 	const { t } = useTranslation();

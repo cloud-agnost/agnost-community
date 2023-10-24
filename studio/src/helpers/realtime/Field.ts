@@ -1,4 +1,6 @@
 import useModelStore from '@/store/database/modelStore';
+import useTabStore from '@/store/version/tabStore';
+import useVersionStore from '@/store/version/versionStore';
 import { Field as FieldType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Field extends RealtimeActions<FieldType> {
@@ -22,6 +24,15 @@ class Field extends RealtimeActions<FieldType> {
 		});
 	}
 	update({ data, identifiers }: RealtimeActionParams<FieldType>): void {
+		const { updateTab } = useTabStore.getState();
+		const { version } = useVersionStore.getState();
+		updateTab({
+			versionId: version._id as string,
+			tab: {
+				title: data.name,
+			},
+			filter: (tab) => tab.path.includes(data._id as string),
+		});
 		useModelStore.setState?.({
 			model: {
 				...useModelStore.getState().model,

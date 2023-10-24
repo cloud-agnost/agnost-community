@@ -26,6 +26,14 @@ class Task extends RealtimeActions<TaskType> {
 		removeTabByPath(identifiers.versionId as string, identifiers.taskId as string);
 	}
 	update({ data }: RealtimeActionParams<TaskType>) {
+		const { updateTab } = useTabStore.getState();
+		updateTab({
+			versionId: data.versionId as string,
+			tab: {
+				title: data.name,
+			},
+			filter: (tab) => tab.path.includes(data._id as string),
+		});
 		useTaskStore.setState?.({
 			tasks: useTaskStore.getState?.().tasks.map((queue) => {
 				if (queue._id === data._id) {

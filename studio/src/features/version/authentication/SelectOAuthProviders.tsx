@@ -18,6 +18,7 @@ import {
 import { useMemo, useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
 import AddProvider from './AddProvider';
+import useSettingsStore from '@/store/version/settingsStore';
 
 interface SelectProvider {
 	provider: OAuthProvider;
@@ -33,7 +34,8 @@ interface DeleteProvider {
 export default function SelectOAuthProviders() {
 	const { t } = useTranslation();
 	const { oAuthProviderTypes } = useTypeStore();
-	const { version, deleteOAuthConfig } = useVersionStore();
+	const { deleteOAuthConfig } = useSettingsStore();
+	const { version } = useVersionStore();
 	const [selectedProvider, setSelectedProvider] = useReducer(
 		(state: SelectProvider, newState: Partial<SelectProvider>) => ({ ...state, ...newState }),
 		{

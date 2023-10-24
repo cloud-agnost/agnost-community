@@ -106,7 +106,7 @@ export default function EmptyState({ type, title, className, children }: EmptySt
 	const { theme } = useThemeStore();
 	const Icon = theme === 'light' ? LIGHT_ICON_MAP[type] : ICON_MAP[type];
 	return (
-		<div className={cn('empty-state', className)}>
+		<div className={cn('empty-state h-[95%]', className)}>
 			{<Icon className='w-44 h-44 text-icon-secondary' />}
 			<h2 className='empty-state-title'>{title}</h2>
 			{children}

@@ -224,19 +224,25 @@ export interface GetVersionRequest extends BaseGetRequest {
 	appId: string;
 }
 
-export type TabTypes =
-	| 'Database'
-	| 'Storage'
-	| 'Cache'
-	| 'Message Queue'
-	| 'Task'
-	| 'Endpoint'
-	| 'Middleware'
-	| 'Settings'
-	| 'Dashboard'
-	| 'Notifications'
-	| 'Queue'
-	| 'Function';
+export enum TabTypes {
+	Database = 'Database',
+	Storage = 'Storage',
+	Cache = 'Cache',
+	MessageQueue = 'Message Queue',
+	Task = 'Task',
+	Endpoint = 'Endpoint',
+	Middleware = 'Middleware',
+	Settings = 'Settings',
+	Dashboard = 'Dashboard',
+	Notifications = 'Notifications',
+	Queue = 'Queue',
+	Function = 'Function',
+	Model = 'Model',
+	Field = 'Field',
+	Bucket = 'Bucket',
+	File = 'File',
+	Navigator = 'Navigator',
+}
 
 export type DesignElementTypes = Lowercase<TabTypes>;
 export interface Tab {
@@ -265,16 +271,17 @@ export interface VersionParams extends BaseParams {
 }
 
 export type GetVersionByIdParams = BaseParams;
-export type DeleteVersionParams = BaseParams;
+export type DeleteVersionParams = BaseParams & BaseRequest;
 export type CreateRateLimitParams = BaseParams & {
 	rate: number;
 	duration: number;
 	name: string;
 	errorMessage: string;
 };
-export type DeleteRateLimitParams = BaseParams & {
-	limitId: string;
-};
+export type DeleteRateLimitParams = BaseParams &
+	BaseRequest & {
+		limitId: string;
+	};
 
 export type DeleteMultipleRateLimitsParams = BaseParams & {
 	limitIds: string[];
@@ -294,7 +301,6 @@ export type VersionRealtimeProperties = {
 	rateLimits: string[];
 };
 
-export type UpdateVersionPropertiesParams = BaseParams & VersionProperties;
 export type UpdateVersionRealtimePropertiesParams = BaseParams & VersionRealtimeProperties;
 
 export type SearchNPMPackagesParams = BaseParams & {
@@ -335,12 +341,13 @@ export type UpdateVersionVariableParams = AddVersionVariableParams & {
 	paramId: string;
 };
 
-export type CreateCopyOfVersionParams = Omit<BaseParams, 'versionId'> & {
-	name: string;
-	private: boolean;
-	readOnly: boolean;
-	parentVersionId: string;
-};
+export type CreateCopyOfVersionParams = Omit<BaseParams, 'versionId'> &
+	BaseRequest & {
+		name: string;
+		private: boolean;
+		readOnly: boolean;
+		parentVersionId: string;
+	};
 
 export type EditRateLimitParams = CreateRateLimitParams & {
 	limitId: string;
@@ -433,4 +440,21 @@ export interface DeleteOAuthConfigParams extends BaseParams, BaseRequest {
 export interface AuthMessageTemplateParams extends BaseParams, BaseRequest {
 	type: string;
 	body: string;
+}
+
+export type UpdateVersionPropertiesParams = BaseParams & Partial<Version> & BaseRequest;
+export type UpdateTabParams = {
+	versionId: string;
+	tab: Partial<Tab>;
+	filter(tab: Tab): boolean;
+};
+export interface Dashboard {
+	database: number;
+	cache: number;
+	storage: number;
+	endpoint: number;
+	middleware: number;
+	function: number;
+	queue: number;
+	task: number;
 }

@@ -2,6 +2,7 @@ import { ActionsCell } from '@/components/ActionsCell';
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, Param } from '@/types';
 import { translate } from '@/utils';
@@ -34,9 +35,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 		cell: ({
@@ -50,9 +49,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	},
 	{
 		id: 'value',
-		header: ({ column }) => (
-			<SortButton text={translate('general.value').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.value')} column={column} />,
 		accessorKey: 'value',
 		sortingFn: 'textCaseSensitive',
 		cell: ({
@@ -68,7 +65,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.created_at').toUpperCase()}
+				text={translate('general.created_at')}
 				column={column}
 			/>
 		),
@@ -91,7 +88,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.updated_at').toUpperCase()}
+				text={translate('general.updated_at')}
 				column={column}
 			/>
 		),
@@ -114,8 +111,8 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 		id: 'actions',
 		className: 'actions',
 		cell: ({ row: { original } }) => {
-			const { version, deleteParam, setParam, setEditParamDrawerIsOpen } =
-				useVersionStore.getState();
+			const { version } = useVersionStore.getState();
+			const { deleteParam, setParam, setEditParamDrawerIsOpen } = useSettingsStore.getState();
 			async function clickHandler() {
 				if (!version) return;
 				await deleteParam({

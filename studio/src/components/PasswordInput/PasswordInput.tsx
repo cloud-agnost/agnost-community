@@ -15,10 +15,16 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
 	({ className, value, placeholder, error, ...props }, ref) => {
 		const [inputValue, setInputValue] = useState(value);
 		const [showPassword, setShowPassword] = useState(false);
+
+		React.useEffect(() => {
+			setInputValue(value);
+		}, [value]);
+
 		return (
 			<div className={cn('password-input-wrapper', className)} {...props}>
 				<Input
 					ref={ref}
+					defaultValue={inputValue}
 					value={inputValue}
 					onChange={(e) => setInputValue(e.target.value)}
 					error={error}

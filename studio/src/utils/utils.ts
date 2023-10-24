@@ -312,7 +312,7 @@ export function handleTabChange(name: string, url: string) {
 	const hasAnotherParams = versionUrl.includes('?');
 	updateCurrentTab(version._id, {
 		...tab,
-		path: hasAnotherParams ? `${url}&tabId=${tab.id}` : `${url}?tabId=${tab.id}`,
+		path: hasAnotherParams ? `${versionUrl}&tabId=${tab.id}` : `${versionUrl}?tabId=${tab.id}`,
 		title: name,
 	});
 }
@@ -400,4 +400,15 @@ export function dataURItoBlob(dataURI: string): Blob {
 	}
 
 	return new Blob([ab], { type: 'application/octet-stream' });
+}
+export function getUrlWithoutQuery(url: string) {
+	const queryIndex = url.indexOf('?');
+	if (queryIndex !== -1) {
+		return url.substring(0, queryIndex);
+	}
+	return url;
+}
+export function getTabIdFromUrl() {
+	const searchParams = new URLSearchParams(window.location.search);
+	return searchParams.get('tabId');
 }

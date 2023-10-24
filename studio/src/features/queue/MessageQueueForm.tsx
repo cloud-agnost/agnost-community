@@ -12,22 +12,20 @@ import { Input } from '@/components/Input';
 import { ResourceSelect } from '@/components/ResourceSelect';
 import { Switch } from '@/components/Switch';
 import useResourceStore from '@/store/resources/resourceStore';
-import { CreateMessageQueueSchema } from '@/types';
+import { CreateMessageQueueSchema, ResourceType } from '@/types';
 import { translate as t } from '@/utils';
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import * as z from 'zod';
 
 export default function MessageQueueForm({ edit }: { edit?: boolean }) {
 	const form = useFormContext<z.infer<typeof CreateMessageQueueSchema>>();
-	const { getResources, resources } = useResourceStore();
+	const { resources } = useResourceStore();
 
-	useEffect(() => {
-		getResources({
-			type: 'queue',
-		});
-	}, []);
-
+	const selectedResource = useMemo(
+		() => resources.find((item) => item._id === form.getValues('resourceId')),
+		[form.getValues('resourceId')],
+	);
 	return (
 		<div className='space-y-6'>
 			<FormField
@@ -52,34 +50,36 @@ export default function MessageQueueForm({ edit }: { edit?: boolean }) {
 					</FormItem>
 				)}
 			/>
-			<FormField
-				control={form.control}
-				name='delay'
-				render={({ field }) => (
-					<FormItem>
-						<FormLabel>{t('queue.create.delay')}</FormLabel>
-						<FormControl>
-							{/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			{selectedResource?.config?.delayedMessages && (
+				<FormField
+					control={form.control}
+					name='delay'
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>{t('queue.create.delay')}</FormLabel>
+							<FormControl>
+								{/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				/* @ts-ignore */}
-							<Input
-								type='number'
-								error={Boolean(form.formState.errors.delay)}
-								placeholder={
-									t('forms.placeholder', {
-										label: t('queue.create.delay'),
-									}) ?? ''
-								}
-								{...field}
-								{...form.register('delay', {
-									setValueAs: (v) => (v === '' ? null : parseInt(v)),
-								})}
-							/>
-						</FormControl>
-						<FormDescription>{t('queue.create.delay_description')}</FormDescription>
-						<FormMessage />
-					</FormItem>
-				)}
-			/>
+								<Input
+									type='number'
+									error={Boolean(form.formState.errors.delay)}
+									placeholder={
+										t('forms.placeholder', {
+											label: t('queue.create.delay'),
+										}) ?? ''
+									}
+									{...field}
+									{...form.register('delay', {
+										setValueAs: (v) => (v === '' ? null : parseInt(v)),
+									})}
+								/>
+							</FormControl>
+							<FormDescription>{t('queue.create.delay_description')}</FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+			)}
 
 			<FormField
 				control={form.control}
@@ -111,7 +111,7 @@ export default function MessageQueueForm({ edit }: { edit?: boolean }) {
 									name={field.name}
 									onValueChange={field.onChange}
 									error={Boolean(form.formState.errors.resourceId)}
-									resources={resources}
+									type={ResourceType.Queue}
 								/>
 							</FormControl>
 							<FormDescription>{t('queue.create.resource.description')}</FormDescription>

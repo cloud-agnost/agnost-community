@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useFieldArray, useForm } from 'react-hook-form';
 import { translate as t } from '@/utils';
 import * as z from 'zod';
+import useSettingsStore from '@/store/version/settingsStore';
 
 const RedirectURLsSchema = z.object({
 	redirectURLs: z
@@ -30,7 +31,8 @@ const RedirectURLsSchema = z.object({
 });
 export default function RedirectURLs() {
 	const { notify } = useToast();
-	const { version, saveRedirectURLs } = useVersionStore();
+	const { saveRedirectURLs } = useSettingsStore();
+	const { version } = useVersionStore();
 	const form = useForm<z.infer<typeof RedirectURLsSchema>>({
 		resolver: zodResolver(RedirectURLsSchema),
 		defaultValues: {

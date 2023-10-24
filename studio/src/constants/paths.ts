@@ -40,13 +40,11 @@ export const PATHS = {
 		endpoint: `${versionPath}/VersionEndpoint.tsx`,
 		storage: `${versionPath}/VersionStorage.tsx`,
 		function: `${versionPath}/VersionFunction.tsx`,
-		middlewareOutlet: `${versionPath}/VersionMiddlewaresOutlet.tsx`,
-		middlewares: `${versionPath}/VersionMiddlewares.tsx`,
-		editMiddleware: `${versionPath}/VersionEditMiddlewares.tsx`,
 		cache: `${versionPath}/VersionCache.tsx`,
 		messageQueue: `${versionPath}/VersionMessageQueue.tsx`,
 		task: `${versionPath}/VersionTask.tsx`,
 		notifications: `${versionPath}/VersionNotifications.tsx`,
+		middlewares: `${versionPath}/VersionMiddlewares.tsx`,
 		settings: {
 			versionSettings: `${versionPath}/settings/VersionSettings.tsx`,
 			general: `${versionPath}/settings/VersionSettingsGeneral.tsx`,
@@ -77,6 +75,10 @@ export const PATHS = {
 	function: {
 		function: `${path}/function/Function.tsx`,
 		editFunction: `${path}/function/EditFunction.tsx`,
+	},
+	middleware: {
+		middlewares: `${path}/middleware/Middleware.tsx`,
+		editMiddleware: `${path}/middleware/EditMiddleware.tsx`,
 	},
 	storage: {
 		storage: `${storagePath}/Storage.tsx`,

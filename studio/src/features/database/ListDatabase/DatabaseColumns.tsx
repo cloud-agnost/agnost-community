@@ -1,7 +1,7 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { DATABASE_ICON_MAP } from '@/constants';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
-import { ColumnDefWithClassName, Database } from '@/types';
+import { ColumnDefWithClassName, Database, TabTypes } from '@/types';
 import { translate } from '@/utils';
 import { Table } from '@phosphor-icons/react';
 import { Badge } from 'components/Badge';
@@ -13,9 +13,7 @@ import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from 'compon
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -25,7 +23,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 				<TabLink
 					name={original.name}
 					path={`${original._id}/models`}
-					type='Database'
+					type={TabTypes.Model}
 					onClick={() => setDatabase(original)}
 				/>
 			);
@@ -33,9 +31,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'type',
-		header: ({ column }) => (
-			<SortButton text={translate('general.type').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.type')} column={column} />,
 		accessorKey: 'type',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -55,9 +51,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'managed',
-		header: ({ column }) => (
-			<SortButton text={translate('general.managed').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.managed')} column={column} />,
 		accessorKey: 'managed',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,

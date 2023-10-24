@@ -37,4 +37,12 @@ export default class ClusterService {
 			})
 		).data;
 	}
+
+	static async getClusterInfo() {
+		return (await axios.get(`${this.url}/info`)).data;
+	}
+
+	static async updateSmtpSettings(data: any) {
+		return (await axios.put(`${this.url}/smtp`, data)).data;
+	}
 }

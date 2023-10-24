@@ -31,7 +31,6 @@ import {
 	MessageQueue,
 	Middleware,
 	MinIo,
-	Model,
 	MongoDb,
 	MySql,
 	Nodejs,
@@ -61,10 +60,6 @@ import {
 	ConnectDatabase,
 	ConnectGCP,
 	ConnectQueue,
-	CreateCache,
-	CreateDatabase,
-	CreateQueue,
-	SelectResourceType,
 } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
 import useTabStore from '@/store/version/tabStore';
@@ -75,10 +70,14 @@ import {
 	HttpMethod,
 	Instance,
 	OAuthProviderTypes,
+	ResourceCreateType,
+	ResourceInstances,
+	ResourceType,
 	SortOption,
 	Tab,
+	TabTypes,
 } from '@/types';
-import { generateId, translate } from '@/utils';
+import { generateId, notify, translate } from '@/utils';
 import {
 	BracketsCurly,
 	Clock,
@@ -97,7 +96,9 @@ import {
 	Phone,
 	Plus,
 	Share,
+	Table,
 	TextAa,
+	Textbox,
 } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { ElementType } from 'react';
@@ -284,63 +285,62 @@ export const INVITATIONS_SORT_OPTIONS: SortOption[] = [
 		sortDir: 'desc',
 	},
 ];
-
 export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 	{
 		title: translate('version.databases'),
 		path: 'database',
 		isActive: false,
 		isDashboard: false,
-		type: 'Database',
+		type: TabTypes.Database,
 	},
 	{
 		title: translate('version.storage'),
-		path: 'storage',
+		path: '/storage',
 		isActive: false,
 		isDashboard: false,
-		type: 'Storage',
+		type: TabTypes.Storage,
 	},
 	{
 		title: translate('version.cache'),
-		path: 'cache',
+		path: '/cache',
 		isActive: false,
 		isDashboard: false,
-		type: 'Cache',
+		type: TabTypes.Cache,
 	},
 	{
 		title: translate('version.endpoints'),
-		path: 'endpoint',
+		path: '/endpoint',
 		isActive: false,
 		isDashboard: false,
-		type: 'Endpoint',
+		type: TabTypes.Endpoint,
 	},
 	{
 		title: translate('version.message_queues'),
-		path: 'queue',
+		path: '/queue',
 		isActive: false,
 		isDashboard: false,
-		type: 'Message Queue',
+		type: TabTypes.MessageQueue,
 	},
 	{
 		title: translate('version.cron_jobs'),
-		path: 'task',
+		path: '/task',
 		isActive: false,
 		isDashboard: false,
-		type: 'Task',
+		type: TabTypes.Task,
 	},
 	{
 		title: translate('version.middleware.default'),
-		path: 'middleware',
+		path: '/middleware',
 		isActive: false,
 		isDashboard: false,
-		type: 'Middleware',
+		type: TabTypes.Middleware,
 	},
 	{
 		title: translate('version.function'),
-		path: 'function',
+		path: '/function',
 		isActive: false,
 		isDashboard: false,
-		type: 'Function',
+		type: TabTypes.Function,
 	},
 ];
 
@@ -355,7 +355,7 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	ADMIN: 'orange',
 	DEVELOPER: 'purple',
 	VIEWER: 'blue',
-	CREATING: 'green',
+	CREATING: 'blue',
 	UPDATING: 'yellow',
 	DELETING: 'red',
 	BINDING: 'blue',
@@ -376,15 +376,15 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 export const EDIT_APPLICATION_MENU_ITEMS = [
 	{
 		name: translate('application.edit.general'),
-		href: '?t=general',
+		href: 'general',
 	},
 	{
 		name: translate('application.edit.members'),
-		href: '?t=members',
+		href: 'members',
 	},
 	{
 		name: translate('application.edit.invitations'),
-		href: '?t=invitations',
+		href: 'invitations',
 	},
 ];
 
@@ -406,25 +406,25 @@ export const AUTH_MENU_ITEMS = [
 export const TEST_ENDPOINTS_MENU_ITEMS = [
 	{
 		name: translate('endpoint.test.params'),
-		href: '?t=params',
+		href: 'params',
 		isPath: false,
 		allowedMethods: ['GET', 'DELETE', 'PUT', 'POST'],
 	},
 	{
 		name: translate('endpoint.test.path_variables'),
-		href: '?t=variables',
+		href: 'variables',
 		isPath: true,
 		allowedMethods: ['GET', 'DELETE', 'PUT', 'POST'],
 	},
 	{
 		name: translate('endpoint.test.headers'),
-		href: '?t=headers',
+		href: 'headers',
 		isPath: false,
 		allowedMethods: ['GET', 'DELETE', 'PUT', 'POST'],
 	},
 	{
 		name: translate('endpoint.test.body'),
-		href: '?t=body',
+		href: 'body',
 		isPath: false,
 		allowedMethods: ['DELETE', 'PUT', 'POST'],
 	},
@@ -506,62 +506,14 @@ export const RESOURCE_TYPES = [
 
 export const DEFAULT_RESOURCE_INSTANCES: Instance[] = [
 	{
-		id: 'create_new',
+		id: ResourceCreateType.New,
 		name: translate('resources.create_new'),
 		icon: Plus,
 	},
 	{
-		id: 'connect_existing',
+		id: ResourceCreateType.Existing,
 		name: translate('resources.connect_existing'),
 		icon: Connect,
-	},
-];
-
-export const STORAGE_TYPES: Instance[] = [
-	{
-		id: 'AWS S3',
-		name: 'AWS S3',
-		icon: Awss3,
-	},
-	{
-		id: 'Azure Blob Storage',
-		name: 'Azure Blob Storage',
-		icon: AzureBlobStorage,
-	},
-	{
-		id: 'GCP Cloud Storage',
-		name: 'GCP Cloud Storage',
-		icon: GcpStorage,
-	},
-];
-
-export const DATABASE_TYPES: Instance[] = [
-	{
-		id: 'MongoDB',
-		name: 'MongoDB',
-		icon: MongoDb,
-	},
-	{
-		id: 'MySQL',
-		name: 'MySQL',
-		icon: MySql,
-	},
-	{
-		id: 'PostgreSQL',
-		name: 'PostgreSQL',
-		icon: PostgreSql,
-	},
-	{
-		id: 'Oracle',
-		name: 'Oracle',
-		icon: Oracle,
-		isConnectOnly: true,
-	},
-	{
-		id: 'SQL Server',
-		name: 'SQL Server',
-		icon: SqlServer,
-		isConnectOnly: true,
 	},
 ];
 
@@ -576,18 +528,6 @@ export const QUEUE_ICON_MAP: Record<string, ElementType> = {
 	RabbitMQ: RabbitMq,
 	Kafka: Kafka,
 };
-export const QUEUE_TYPES: Instance[] = [
-	{
-		id: 'RabbitMQ',
-		name: 'RabbitMQ',
-		icon: RabbitMq,
-	},
-	{
-		id: 'Kafka',
-		name: 'Kafka',
-		icon: Kafka,
-	},
-];
 
 export const STORAGE_ICON_MAP: Record<string, ElementType> = {
 	'AWS S3': Awss3,
@@ -598,67 +538,42 @@ export const STORAGE_ICON_MAP: Record<string, ElementType> = {
 
 export const CREATE_RESOURCES_ELEMENTS = [
 	{
-		step: 1,
-		title: translate('resources.select'),
-		CurrentResourceElement: SelectResourceType,
-	},
-	{
-		step: 2,
 		name: translate('version.databases'),
-		type: translate('resources.create_new'),
-		CurrentResourceElement: CreateDatabase,
-	},
-	{
-		step: 2,
-		name: translate('version.databases'),
-		type: translate('resources.connect_existing'),
+		resourceType: ResourceType.Database,
+		instance: ResourceType.Database,
 		CurrentResourceElement: ConnectDatabase,
 	},
 	{
-		step: 2,
 		name: translate('version.storage'),
-		type: 'AWS S3',
+		resourceType: ResourceType.Storage,
+		instance: ResourceInstances.GCPStorage,
+		CurrentResourceElement: ConnectGCP,
+	},
+	{
+		name: translate('version.storage'),
+		resourceType: ResourceType.Storage,
+		instance: ResourceInstances.AWSS3,
 		CurrentResourceElement: ConnectAWS,
 	},
 	{
-		step: 2,
 		name: translate('version.storage'),
-		type: 'Azure Blob Storage',
+		resourceType: ResourceType.Storage,
+		instance: ResourceInstances.AzureBlob,
 		CurrentResourceElement: ConnectAzure,
 	},
 	{
-		step: 2,
-		name: translate('version.storage'),
-		type: 'GCP Cloud Storage',
-		CurrentResourceElement: ConnectGCP,
-	},
-
-	{
-		step: 2,
 		name: translate('version.cache'),
-		type: translate('resources.create_new'),
-		CurrentResourceElement: CreateCache,
-	},
-	{
-		step: 2,
-		name: translate('version.cache'),
-		type: translate('resources.connect_existing'),
+		resourceType: ResourceType.Cache,
+		instance: ResourceInstances.Redis,
 		CurrentResourceElement: ConnectCache,
 	},
 	{
-		step: 2,
 		name: translate('version.message_queues'),
-		type: translate('resources.create_new'),
-		CurrentResourceElement: CreateQueue,
-	},
-	{
-		step: 2,
-		name: translate('version.message_queues'),
-		type: translate('resources.connect_existing'),
+		resourceType: ResourceType.Queue,
+		instance: ResourceInstances.RabbitMQ,
 		CurrentResourceElement: ConnectQueue,
 	},
 ];
-
 export const VERSION_DROPDOWN_ITEM = [
 	{
 		title: translate('version.open_version'),
@@ -667,7 +582,7 @@ export const VERSION_DROPDOWN_ITEM = [
 			if (!application) return;
 			openVersionDrawer(application);
 		},
-		disabled: useVersionStore.getState().versions.length <= 1,
+		//TODO disabled: useVersionStore.getState().versions.length <= 1,
 	},
 	{
 		title: translate('version.create_a_copy'),
@@ -715,6 +630,13 @@ export const VERSION_DROPDOWN_ITEM = [
 				versionId: version._id,
 				appId: version.appId,
 				readOnly: !version?.readOnly,
+				onError: (error) => {
+					notify({
+						type: 'error',
+						title: translate('general.error'),
+						description: error.details,
+					});
+				},
 			});
 		},
 		disabled: false,
@@ -731,6 +653,13 @@ export const VERSION_DROPDOWN_ITEM = [
 				versionId: version._id,
 				appId: version.appId,
 				private: !version?.private,
+				onError: (error) => {
+					notify({
+						type: 'error',
+						title: translate('general.error'),
+						description: error.details,
+					});
+				},
 			});
 		},
 		disabled: useVersionStore.getState().version?.master,
@@ -746,7 +675,7 @@ export const VERSION_DROPDOWN_ITEM = [
 				path: versionHomePath,
 				isActive: true,
 				isDashboard: false,
-				type: 'Settings',
+				type: TabTypes.Settings,
 			});
 		},
 		disabled: false,
@@ -776,15 +705,15 @@ export const MONGODB_CONNECTION_FORMATS = ['mongodb', 'mongodb+srv'] as const;
 export const ADD_API_KEYS_MENU_ITEMS = [
 	{
 		name: translate('application.edit.general'),
-		href: '?t=general',
+		href: 'general',
 	},
 	{
 		name: translate('version.api_key.allowed_domains'),
-		href: '?t=allowed-domains',
+		href: 'allowed-domains',
 	},
 	{
 		name: translate('version.api_key.allowed_ips'),
-		href: '?t=allowed-ips',
+		href: 'allowed-ips',
 	},
 ];
 
@@ -814,13 +743,14 @@ export const HTTP_METHOD_BADGE_MAP: Record<string, BadgeColors> = {
 	PUT: 'yellow',
 	DELETE: 'red',
 };
-export const INSTANCE_PORT_MAP: Record<string, string> = {
-	PostgreSQL: '5432',
-	MySQL: '3306',
-	'SQL Server': '1433',
-	MongoDB: '27017',
-	Oracle: '1521',
-	Redis: '6379',
+export const INSTANCE_PORT_MAP: Record<string, number> = {
+	PostgreSQL: 5432,
+	MySQL: 3306,
+	'SQL Server': 1433,
+	MongoDB: 27017,
+	Oracle: 1521,
+	Redis: 6379,
+	RabbitMQ: 5672,
 };
 export const ENDPOINT_METHOD_TEXT_COLOR: Record<string, string> = {
 	GET: 'text-elements-blue',
@@ -968,8 +898,9 @@ export const TAB_ICON_MAP: Record<string, ElementType> = {
 	Dashboard: Dashboard,
 	Notifications: BellRing,
 	Function: Function,
-	Field: Model,
-	Model: Model,
+	Field: Textbox,
+	Model: Table,
+	Navigator: Table,
 };
 
 export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {

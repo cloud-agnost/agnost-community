@@ -8,7 +8,10 @@ import { Table } from '@tanstack/react-table';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ReactNode } from 'react';
-
+import useTabStore from '@/store/version/tabStore';
+import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useUpdateEffect } from '@/hooks';
 interface Props<T> {
 	isEmpty: boolean;
 	table?: Table<T>;
@@ -22,10 +25,9 @@ interface Props<T> {
 	className?: string;
 	breadCrumb?: ReactNode;
 	handlerButton?: ReactNode;
-	onSearchInputClear?: () => void;
 	onMultipleDelete?: () => void;
-	onSearch?: (value: string) => void;
 	openCreateModal?: () => void;
+	onSearch?: () => void;
 }
 
 export default function VersionTabLayout<T>({
@@ -42,26 +44,17 @@ export default function VersionTabLayout<T>({
 	className,
 	handlerButton,
 	onMultipleDelete,
-	onSearch,
 	openCreateModal,
-	onSearchInputClear,
+	onSearch,
 }: Props<T>) {
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { versionId } = useParams<{ versionId: string }>();
+	const { pathname, search } = useLocation();
 	const { t } = useTranslation();
-
-	function onSearchHandler(value: string) {
-		setQueryParam(value);
-		onSearch?.(value);
-	}
+	const { updateCurrentTab } = useTabStore();
 
 	function onClearHandler() {
-		setQueryParam();
-		onSearchInputClear?.();
-	}
-
-	function setQueryParam(value?: string) {
-		if (!value || value === '') searchParams.delete('q');
-		else searchParams.set('q', value);
+		searchParams.delete('q');
 		setSearchParams(searchParams);
 	}
 
@@ -93,9 +86,13 @@ export default function VersionTabLayout<T>({
 	} else {
 		content = children;
 	}
-
+	useUpdateEffect(() => {
+		updateCurrentTab(versionId as string, {
+			path: pathname + search,
+		});
+	}, [search]);
 	return (
-		<div className={cn('h-full space-y-4 flex flex-col', className)}>
+		<div className={cn('h-full space-y-4 ', className)}>
 			{breadCrumb}
 			<div className='flex items-center justify-between'>
 				<h1 className='text-default text-2xl text-center'>{title}</h1>
@@ -103,8 +100,7 @@ export default function VersionTabLayout<T>({
 					{onSearch && (
 						<SearchInput
 							value={searchParams.get('q') ?? undefined}
-							onSearch={onSearchHandler}
-							onClear={onClearHandler}
+							onSearch={onSearch}
 							className='sm:w-[450px] flex-1'
 						/>
 					)}

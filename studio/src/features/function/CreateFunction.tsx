@@ -2,7 +2,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
 import useFunctionStore from '@/store/function/functionStore';
-import { CreateFunctionSchema } from '@/types';
+import { CreateFunctionSchema, TabTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -44,7 +44,7 @@ export default function CreateFunction({ open, onClose }: CreateTaskProps) {
 					path: `${pathname}/${helper._id}`,
 					isActive: true,
 					isDashboard: false,
-					type: 'Function',
+					type: TabTypes.Function,
 				});
 				onClose();
 			},

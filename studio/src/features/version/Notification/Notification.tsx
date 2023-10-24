@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import { Notification } from '@/types';
+import { Notification, TabTypes } from '@/types';
 import { cn, generateId, getRelativeTime } from '@/utils';
 import { Bell, GearSix } from '@phosphor-icons/react';
 import {
@@ -28,7 +28,7 @@ export default function MainNotification() {
 			path: versionHomePath,
 			isActive: true,
 			isDashboard: false,
-			type: 'Notifications',
+			type: TabTypes.Notifications,
 		});
 	}
 	return (

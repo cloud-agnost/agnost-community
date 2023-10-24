@@ -40,7 +40,7 @@ export default function MainTask() {
 		closeDeleteTaskModal,
 	} = useTaskStore();
 	const { versionId, orgId, appId } = useParams();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const {
 		setSelectedRows,
 		setTable,
@@ -50,17 +50,6 @@ export default function MainTask() {
 		table,
 		selectedRows,
 	}: OutletContext = useOutletContext();
-
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		setPage(0);
-		setSearchParams({ ...searchParams, q: value });
-	}
 
 	function deleteMultipleTasksHandler() {
 		deleteMultipleTasks({
@@ -98,6 +87,7 @@ export default function MainTask() {
 
 	useEffect(() => {
 		if (versionId && orgId && appId) {
+			setLoading(true);
 			getTasks({
 				orgId,
 				appId,
@@ -105,8 +95,8 @@ export default function MainTask() {
 				page,
 				size: PAGE_SIZE,
 				search: searchParams.get('q') ?? undefined,
-				initialFetch: page === 0,
 			});
+			setLoading(false);
 		}
 	}, [searchParams.get('q'), page]);
 
@@ -121,7 +111,7 @@ export default function MainTask() {
 				setIsCreateModalOpen(true);
 			}}
 			onMultipleDelete={deleteMultipleTasksHandler}
-			onSearch={onInput}
+			onSearch={() => setPage(0)}
 			table={table}
 			selectedRowLength={selectedRows.length}
 			disabled={!canEdit}
@@ -131,7 +121,7 @@ export default function MainTask() {
 				dataLength={tasks.length}
 				next={() => setPage(page + 1)}
 				hasMore={lastFetchedCount >= PAGE_SIZE}
-				loader={tasks.length > 0 && <TableLoading />}
+				loader={loading && <TableLoading />}
 			>
 				<DataTable<Task>
 					data={tasks}

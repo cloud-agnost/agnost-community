@@ -4,7 +4,7 @@ import { TabLink } from '@/features/version/Tabs';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import { ColumnDefWithClassName, MessageQueue } from '@/types';
+import { ColumnDefWithClassName, MessageQueue, TabTypes } from '@/types';
 import { translate } from '@/utils';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
@@ -38,7 +38,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 		sortingFn: 'textCaseSensitive',
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
-			return <TabLink name={name} path={`${_id}`} type='Message Queue' />;
+			return <TabLink name={name} path={`${_id}`} type={TabTypes.MessageQueue} />;
 		},
 	},
 	{

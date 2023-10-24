@@ -8,7 +8,7 @@ import { BADGE_COLOR_MAP, HTTP_METHOD_BADGE_MAP } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { ColumnDefWithClassName, Endpoint } from '@/types';
+import { ColumnDefWithClassName, Endpoint, TabTypes } from '@/types';
 import { translate } from '@/utils';
 import { TabLink } from '../version/Tabs';
 
@@ -45,7 +45,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
 
-			return <TabLink name={name} path={`${_id}`} type='Endpoint' />;
+			return <TabLink name={name} path={`${_id}`} type={TabTypes.Endpoint} />;
 		},
 	},
 	{

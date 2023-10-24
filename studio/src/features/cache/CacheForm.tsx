@@ -12,7 +12,7 @@ import { Input } from '@/components/Input';
 import { ResourceSelect } from '@/components/ResourceSelect';
 import { Switch } from '@/components/Switch';
 import useResourceStore from '@/store/resources/resourceStore';
-import { CreateCacheSchema } from '@/types';
+import { CreateCacheSchema, ResourceType } from '@/types';
 import { translate as t } from '@/utils';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -23,7 +23,7 @@ interface CacheFormProps {
 }
 export default function CacheForm({ edit = false }: CacheFormProps) {
 	const form = useFormContext<z.infer<typeof CreateCacheSchema>>();
-	const { getResources, resources } = useResourceStore();
+	const { getResources } = useResourceStore();
 
 	useEffect(() => {
 		getResources({
@@ -86,7 +86,7 @@ export default function CacheForm({ edit = false }: CacheFormProps) {
 										name={field.name}
 										onValueChange={field.onChange}
 										error={Boolean(form.formState.errors.resourceId)}
-										resources={resources}
+										type={ResourceType.Cache}
 									/>
 								</FormControl>
 								<FormDescription>{t('queue.create.resource.description')}</FormDescription>

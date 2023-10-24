@@ -14,6 +14,7 @@ class Database extends RealtimeActions<DatabaseType> {
 		removeTabByPath(identifiers.versionId as string, identifiers.dbId as string);
 	}
 	update({ data }: RealtimeActionParams<DatabaseType>): void {
+		const { updateTab } = useTabStore.getState();
 		useDatabaseStore.setState?.({
 			databases: useDatabaseStore.getState?.().databases.map((database) => {
 				if (database._id === data._id) {
@@ -22,6 +23,13 @@ class Database extends RealtimeActions<DatabaseType> {
 				return database;
 			}),
 			database: data,
+		});
+		updateTab({
+			versionId: data.versionId as string,
+			tab: {
+				title: data.name,
+			},
+			filter: (tab) => tab.path.includes(data._id as string),
 		});
 	}
 	create({ data }: RealtimeActionParams<DatabaseType>): void {

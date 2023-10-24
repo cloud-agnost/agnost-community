@@ -2,7 +2,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import { CreateMessageQueueSchema } from '@/types';
+import { CreateMessageQueueSchema, TabTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -45,7 +45,7 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 					path: `${pathname}/${queue._id}`,
 					isActive: true,
 					isDashboard: false,
-					type: 'Message Queue',
+					type: TabTypes.MessageQueue,
 				});
 			},
 			onError: ({ error, details }) => {

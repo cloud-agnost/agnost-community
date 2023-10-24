@@ -56,6 +56,8 @@
 		"key": "Key",
 		"value": "Value",
 		"add_query_param": "Add Query Param",
+		"add_form_data": "Add Form Data",
+		"add_header": "Add Header",
 		"deploy": {
 			"warning": "API Server undergoing deployment",
 			"description": "Please wait a few seconds for deployment to complete before testing endpoint"

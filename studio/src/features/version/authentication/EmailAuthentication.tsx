@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import EmailSmtpForm from './EmailSmtpForm';
+import useSettingsStore from '@/store/version/settingsStore';
 export const EmailAuthenticationSchema = z.object({
 	enabled: z.boolean().default(true),
 	confirmEmail: z.boolean().default(false),
@@ -47,7 +48,8 @@ export const EmailAuthenticationSchema = z.object({
 export default function EmailAuthentication() {
 	const { notify } = useToast();
 	const [loading, setLoading] = useState(false);
-	const { version, saveEmailAuthSettings } = useVersionStore();
+	const { saveEmailAuthSettings } = useSettingsStore();
+	const { version } = useVersionStore();
 	const form = useForm<z.infer<typeof EmailAuthenticationSchema>>({
 		resolver: zodResolver(EmailAuthenticationSchema),
 		defaultValues: version?.authentication.email,

@@ -9,7 +9,7 @@ import { HTTP_METHOD_BADGE_MAP, TEST_ENDPOINTS_MENU_ITEMS } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import { TestMethods } from '@/types';
-import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import {
 	arrayToObj,
@@ -182,7 +182,8 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 
 	useEffect(() => {
 		if (!searchParams.get('t') && open) {
-			setSearchParams({ t: 'params' });
+			searchParams.set('t', 'params');
+			setSearchParams(searchParams);
 		}
 	}, [searchParams.get('t'), open]);
 	return (

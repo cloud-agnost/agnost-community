@@ -56,7 +56,7 @@ export default function EndpointHeaders() {
 										<Input
 											placeholder={
 												t('forms.placeholder', {
-													label: t('resources.database.key'),
+													label: t('resources.database.value'),
 												}) ?? ''
 											}
 											error={!!errors.headers?.[index]?.value}
@@ -79,7 +79,7 @@ export default function EndpointHeaders() {
 				<TableCell colSpan={3} className='text-center'>
 					<Button type='button' variant='secondary' onClick={() => append({ key: '', value: '' })}>
 						<Plus size={16} className='text-icon-secondary mr-2' weight='bold' />
-						{t('endpoint.test.add_query_param')}
+						{t('endpoint.test.add_header')}
 					</Button>
 				</TableCell>
 			</TableRow>

@@ -17,7 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
 import { nameSchema } from '@/features/version/Middlewares/formSchema.ts';
-
+import { useToast } from '@/hooks';
 const MiddlewareFormSchema = z.object({
 	name: nameSchema,
 });
@@ -25,6 +25,7 @@ const MiddlewareFormSchema = z.object({
 export default function EditMiddlewareDrawer() {
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
+	const { notify } = useToast();
 	const {
 		middleware,
 		setEditMiddlewareDrawerIsOpen,
@@ -64,9 +65,23 @@ export default function EditMiddlewareDrawer() {
 				versionId: middleware.versionId,
 				mwId: middleware._id,
 			};
-			await updateMiddleware({
+			updateMiddleware({
 				...params,
 				name: data.name,
+				onSuccess: () => {
+					notify({
+						title: t('general.success'),
+						description: t('version.middleware.edit.success'),
+						type: 'success',
+					});
+				},
+				onError: (error) => {
+					notify({
+						title: error.error,
+						description: error.details,
+						type: 'error',
+					});
+				},
 			});
 			setEditMiddlewareDrawerIsOpen(false);
 		} finally {

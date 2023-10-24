@@ -63,7 +63,7 @@ export default function Buckets() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 	const viewData = useAuthorizeVersion('storage.viewData');
@@ -100,17 +100,6 @@ export default function Buckets() {
 		},
 	];
 
-	function onInput(value: string) {
-		value = value.trim();
-		if (!value) {
-			searchParams.delete('q');
-			setSearchParams(searchParams);
-			return;
-		}
-		setBucketPage(1);
-		setSearchParams({ ...searchParams, q: value });
-	}
-
 	function deleteMultipleBucketsHandler() {
 		deleteMultipleBuckets({
 			bucketNames: selectedBuckets.map((row) => row.original.name),
@@ -143,6 +132,7 @@ export default function Buckets() {
 
 	useEffect(() => {
 		if (versionId && orgId && appId) {
+			setLoading(true);
 			getBuckets({
 				storageName: storage?.name,
 				page: bucketPage,
@@ -150,6 +140,7 @@ export default function Buckets() {
 				search: searchParams.get('q') as string,
 				returnCountInfo: true,
 			});
+			setLoading(false);
 		}
 	}, [searchParams.get('q'), bucketPage, versionId, storage?.name]);
 
@@ -169,7 +160,7 @@ export default function Buckets() {
 			emptyStateTitle={t('storage.bucket.empty_text')}
 			table={bucketTable}
 			selectedRowLength={selectedBuckets?.length}
-			onSearch={onInput}
+			onSearch={() => setBucketPage(1)}
 			onMultipleDelete={deleteMultipleBucketsHandler}
 			breadCrumb={<BreadCrumb goBackLink={storageUrl} items={breadcrumbItems} />}
 		>
@@ -180,7 +171,7 @@ export default function Buckets() {
 					setBucketPage(bucketPage + 1);
 				}}
 				hasMore={bucketCountInfo.count >= PAGE_SIZE}
-				loader={buckets.length > 0 && <TableLoading />}
+				loader={loading && <TableLoading />}
 			>
 				<DataTable
 					columns={BucketColumns}

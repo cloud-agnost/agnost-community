@@ -2,6 +2,7 @@ import { ActionsCell } from '@/components/ActionsCell';
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIKey, APIKeyTypes, ColumnDefWithClassName } from '@/types';
 import { translate } from '@/utils';
@@ -37,9 +38,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		enableSorting: true,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
@@ -54,7 +53,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	},
 	{
 		id: 'key',
-		header: translate('general.key').toUpperCase(),
+		header: translate('general.key'),
 		accessorKey: 'key',
 		className: '!max-w-[420px]',
 		enableSorting: false,
@@ -74,9 +73,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	{
 		id: 'allowRealtime',
 		header: () => (
-			<span className='whitespace-nowrap'>
-				{translate('version.api_key.realtime_allowed').toUpperCase()}
-			</span>
+			<span className='whitespace-nowrap'>{translate('version.api_key.realtime_allowed')}</span>
 		),
 		accessorKey: 'allowRealtime',
 		cell: ({
@@ -100,7 +97,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	},
 	{
 		id: 'type',
-		header: translate('general.type').toUpperCase(),
+		header: translate('general.type'),
 		accessorKey: 'type',
 		cell: ({
 			row: {
@@ -113,9 +110,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	{
 		id: 'authorizedDomains',
 		header: () => (
-			<span className='whitespace-nowrap'>
-				{translate('version.api_key.allowed_domains').toUpperCase()}
-			</span>
+			<span className='whitespace-nowrap'>{translate('version.api_key.allowed_domains')}</span>
 		),
 		accessorKey: 'authorizedDomains',
 		className: 'max-w-[300px]',
@@ -140,9 +135,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	{
 		id: 'authorizedIPs',
 		header: () => (
-			<span className='whitespace-nowrap'>
-				{translate('version.api_key.allowed_ips').toUpperCase()}
-			</span>
+			<span className='whitespace-nowrap'>{translate('version.api_key.allowed_ips')}</span>
 		),
 		accessorKey: 'authorizedIPs',
 		className: 'max-w-[300px]',
@@ -169,7 +162,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.expires_at').toUpperCase()}
+				text={translate('general.expires_at')}
 				column={column}
 			/>
 		),
@@ -191,7 +184,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.created_at').toUpperCase()}
+				text={translate('general.created_at')}
 				column={column}
 			/>
 		),
@@ -214,7 +207,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.updated_at').toUpperCase()}
+				text={translate('general.updated_at')}
 				column={column}
 			/>
 		),
@@ -238,7 +231,8 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		className: 'actions',
 		cell: ({ row: { original } }) => {
 			async function clickHandler() {
-				const { deleteAPIKey, version } = useVersionStore.getState();
+				const { version } = useVersionStore.getState();
+				const { deleteAPIKey } = useSettingsStore.getState();
 				if (!version) return;
 				await deleteAPIKey({
 					appId: version.appId,
@@ -249,7 +243,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 			}
 
 			function editHandler() {
-				const { setSelectedAPIKey, setEditAPIKeyDrawerIsOpen } = useVersionStore.getState();
+				const { setSelectedAPIKey, setEditAPIKeyDrawerIsOpen } = useSettingsStore.getState();
 				setSelectedAPIKey(original);
 				setEditAPIKeyDrawerIsOpen(true);
 			}

@@ -1,6 +1,7 @@
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, NPMPackage } from '@/types';
 import { translate } from '@/utils';
@@ -35,23 +36,19 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 	},
 	{
 		id: 'version',
-		header: translate('general.version').toUpperCase(),
+		header: translate('general.version'),
 		accessorKey: 'version',
 		sortingFn: 'textCaseSensitive',
 	},
 	{
 		id: 'created_at',
-		header: ({ column }) => (
-			<SortButton text={translate('general.created_at').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
 		accessorKey: 'created_at',
 		enableSorting: true,
 		sortingFn: 'datetime',
@@ -74,7 +71,8 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 				original: { _id },
 			},
 		}) => {
-			const { version, deleteNPMPackage } = useVersionStore.getState();
+			const { version } = useVersionStore.getState();
+			const { deleteNPMPackage } = useSettingsStore.getState();
 			async function clickHandler() {
 				if (!version) return;
 				await deleteNPMPackage({

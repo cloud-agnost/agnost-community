@@ -5,7 +5,7 @@ import { TabLink } from '@/features/version/Tabs';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useStorageStore from '@/store/storage/storageStore';
-import { ColumnDefWithClassName, Storage } from '@/types';
+import { ColumnDefWithClassName, Storage, TabTypes } from '@/types';
 import { translate } from '@/utils';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
@@ -48,7 +48,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 					onClick={() => {
 						useStorageStore.setState({ storage: original });
 					}}
-					type='Storage'
+					type={TabTypes.Bucket}
 				/>
 			);
 		},

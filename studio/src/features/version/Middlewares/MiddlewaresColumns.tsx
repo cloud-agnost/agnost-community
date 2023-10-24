@@ -3,7 +3,7 @@ import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useMiddlewareStore from '@/store/middleware/middlewareStore';
-import { ColumnDefWithClassName, Middleware } from '@/types';
+import { ColumnDefWithClassName, Middleware, TabTypes } from '@/types';
 import { translate } from '@/utils';
 import { ActionsCell } from 'components/ActionsCell';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
@@ -11,7 +11,7 @@ import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
-
+import { notify } from '@/utils';
 const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
 		id: 'select',
@@ -35,24 +35,20 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		cell: ({
 			row: {
 				original: { _id, name },
 			},
 		}) => {
-			return <TabLink name={name} path={`${_id}`} type='Middleware' />;
+			return <TabLink name={name} path={`${_id}`} type={TabTypes.Middleware} />;
 		},
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 	},
 	{
 		id: 'createdAt',
-		header: ({ column }) => (
-			<SortButton text={translate('general.created_at').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
 		accessorKey: 'createdAt',
 		sortingFn: 'datetime',
 		enableSorting: true,
@@ -70,9 +66,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	},
 	{
 		id: 'updatedAt',
-		header: ({ column }) => (
-			<SortButton text={translate('general.updated_at').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.updated_at')} column={column} />,
 		accessorKey: 'updatedAt',
 		enableSorting: true,
 		sortingFn: 'datetime',
@@ -101,11 +95,25 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 			}
 
 			async function deleteHandler() {
-				await deleteMiddleware({
+				deleteMiddleware({
 					appId: original.appId,
 					orgId: original.orgId,
 					versionId: original.versionId,
 					mwId: original._id,
+					onSuccess: () => {
+						notify({
+							title: translate('general.success'),
+							description: translate('version.middleware.delete.success'),
+							type: 'success',
+						});
+					},
+					onError: (error) => {
+						notify({
+							title: error.error,
+							description: error.details,
+							type: 'error',
+						});
+					},
 				});
 			}
 

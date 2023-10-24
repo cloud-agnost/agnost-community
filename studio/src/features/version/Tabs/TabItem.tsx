@@ -45,6 +45,7 @@ export default function TabItem({
 			{...provided.dragHandleProps}
 			ref={provided.innerRef}
 			title={title}
+			{...(active && { 'data-active': true })}
 		>
 			<Link title={title} className={cn('tab-item-link')} onClick={onClick} to={to}>
 				<div className='flex items-center gap-2'>

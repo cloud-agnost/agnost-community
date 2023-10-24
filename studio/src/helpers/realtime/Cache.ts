@@ -13,6 +13,7 @@ class Cache extends RealtimeActions<CacheType> {
 		removeTabByPath(identifiers.versionId as string, identifiers.cacheId as string);
 	}
 	update({ data }: RealtimeActionParams<CacheType>): void {
+		const { updateTab } = useTabStore.getState();
 		useCacheStore.setState?.({
 			caches: useCacheStore.getState?.().caches.map((cache) => {
 				if (cache._id === data._id) {
@@ -21,6 +22,13 @@ class Cache extends RealtimeActions<CacheType> {
 				return cache;
 			}),
 			cache: data,
+		});
+		updateTab({
+			versionId: data.versionId as string,
+			tab: {
+				title: data.name,
+			},
+			filter: (tab) => tab.path.includes(data._id as string),
 		});
 	}
 	create({ data }: RealtimeActionParams<CacheType>): void {

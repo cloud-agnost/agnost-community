@@ -4,7 +4,7 @@ import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
-import { ColumnDefWithClassName, Model } from '@/types';
+import { ColumnDefWithClassName, Model, TabTypes } from '@/types';
 import { translate } from '@/utils';
 import { Columns } from '@phosphor-icons/react';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
@@ -46,7 +46,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 				original: { _id, name },
 			},
 		}) => {
-			return <TabLink name={name} path={`${_id}/fields`} type='Database' />;
+			return <TabLink name={name} path={`${_id}/fields`} type={TabTypes.Field} />;
 		},
 	},
 	{

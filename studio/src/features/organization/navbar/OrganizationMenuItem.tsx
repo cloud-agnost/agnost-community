@@ -1,7 +1,7 @@
+import { Button } from '@/components/Button';
 import { cn } from '@/utils';
-import { Link } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import './organizationMenu.scss';
-
 interface OrganizationMenuItemProps {
 	onClick?: () => void;
 	active?: boolean;
@@ -10,15 +10,33 @@ interface OrganizationMenuItemProps {
 		href: string;
 		icon?: React.ElementType;
 	};
+	isNavigate?: boolean;
 }
 
-export default function OrganizationMenuItem({ item, active, onClick }: OrganizationMenuItemProps) {
+export default function OrganizationMenuItem({
+	item,
+	active,
+	onClick,
+	isNavigate = false,
+}: OrganizationMenuItemProps) {
+	const [searchParams, setSearchParams] = useSearchParams();
+	const navigate = useNavigate();
+
+	function clickHandler() {
+		onClick?.();
+		if (isNavigate) {
+			navigate(item.href);
+		} else {
+			searchParams.set('t', item.href);
+			setSearchParams(searchParams);
+		}
+	}
 	return (
 		<li className={cn('org-menu-item', active && 'active')}>
-			<Link to={item.href} className='org-menu-link' onClick={onClick}>
+			<Button variant='blank' onClick={clickHandler} className='org-menu-link rounded-none'>
 				{item.icon && <item.icon size={24} className='org-menu-icon' />}
 				<span className='org-menu-item-name'>{item.name}</span>
-			</Link>
+			</Button>
 		</li>
 	);
 }

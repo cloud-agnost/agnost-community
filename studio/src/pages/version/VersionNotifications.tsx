@@ -124,7 +124,6 @@ export default function VersionNotifications() {
 			start: searchParams.get('start') ?? undefined,
 			end: searchParams.get('end') ?? undefined,
 			action: (searchParams.get('a')?.split(',') as NotificationActions[]) ?? undefined,
-			initialFetch: page === 0,
 		});
 	}, [page, searchParams]);
 

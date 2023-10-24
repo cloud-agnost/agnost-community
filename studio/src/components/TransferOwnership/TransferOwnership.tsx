@@ -68,7 +68,6 @@ export default function TransferOwnership({
 				value: member,
 			}));
 	}, [members]);
-	console.log('teamOptions', teamOptions, members);
 	return (
 		<div className='space-y-8'>
 			{error && (

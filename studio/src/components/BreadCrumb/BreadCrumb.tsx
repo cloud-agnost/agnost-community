@@ -4,7 +4,7 @@ import { cn, generateId } from '@/utils';
 import { ArrowLeft, CaretRight } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 import { Fragment } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 export interface BreadCrumbItem {
 	name?: string;
 	url?: string;
@@ -18,9 +18,8 @@ type BreadCrumbProps = {
 
 export default function BreadCrumb({ goBackLink, className, items }: BreadCrumbProps) {
 	const filteredItems = items.filter((item) => Boolean(item.name));
-	const { updateCurrentTab, getCurrentTab } = useTabStore();
+	const { addTab, getCurrentTab } = useTabStore();
 	const versionId = useParams<{ versionId: string }>().versionId as string;
-	const navigate = useNavigate();
 	return (
 		<div className={cn('shrink-0 flex items-center gap-x-6', className)}>
 			<Button to={goBackLink} className='text-lg border-none h-8 w-8 p-0' variant='secondary'>
@@ -39,8 +38,7 @@ export default function BreadCrumb({ goBackLink, className, items }: BreadCrumbP
 									index === filteredItems.length - 1 ? 'text-default' : 'text-subtle',
 								)}
 								onClick={() => {
-									navigate(item.url as string);
-									updateCurrentTab(versionId, {
+									addTab(versionId, {
 										id: generateId(),
 										title: item.name as string,
 										path: item.url as string,

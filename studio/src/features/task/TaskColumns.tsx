@@ -3,7 +3,7 @@ import { Badge } from '@/components/Badge';
 import { BADGE_COLOR_MAP } from '@/constants';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTaskStore from '@/store/task/taskStore';
-import { ColumnDefWithClassName, Task } from '@/types';
+import { ColumnDefWithClassName, TabTypes, Task } from '@/types';
 import { translate } from '@/utils';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
@@ -39,7 +39,7 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		sortingFn: 'textCaseSensitive',
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
-			return <TabLink name={name} path={`${_id}`} type='Task' />;
+			return <TabLink name={name} path={`${_id}`} type={TabTypes.Task} />;
 		},
 	},
 	{

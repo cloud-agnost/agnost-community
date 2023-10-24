@@ -1,5 +1,6 @@
 import { NUMBER_REGEX } from '@/constants';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIError, RateLimit } from '@/types';
 import { translate } from '@/utils';
@@ -22,6 +23,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
+import { useToast } from '@/hooks';
 
 const FormSchema = z.object({
 	name: z
@@ -98,16 +100,13 @@ export default function EditOrAddEndpointRateLimiterDrawer({
 	onCreate,
 }: AddEndpointRateLimiterDrawerProps) {
 	const [loading, setLoading] = useState(false);
+	const { notify } = useToast();
 	const { t } = useTranslation();
 	const [error, setError] = useState<APIError | null>(null);
 	const canEdit = useAuthorizeVersion('version.limit.create');
-	const {
-		createRateLimit,
-		updateVersionProperties,
-		updateVersionRealtimeProperties,
-		rateLimit,
-		editRateLimit,
-	} = useVersionStore();
+	const { createRateLimit, updateVersionRealtimeProperties, rateLimit, editRateLimit } =
+		useSettingsStore();
+	const { updateVersionProperties } = useVersionStore();
 	const defaultEndpointLimits = useVersionStore((state) => state.version?.defaultEndpointLimits);
 	const realtimeEndpoints = useVersionStore((state) => state.version?.realtime?.rateLimits);
 
@@ -178,6 +177,13 @@ export default function EditOrAddEndpointRateLimiterDrawer({
 				versionId,
 				appId,
 				defaultEndpointLimits: [...(defaultEndpointLimits ?? []), rateLimit.iid],
+				onError: (error) => {
+					notify({
+						type: 'error',
+						title: t('general.error'),
+						description: error.details,
+					});
+				},
 			});
 		}
 		if (addToDefault === 'realtime') {

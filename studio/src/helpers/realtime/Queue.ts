@@ -28,6 +28,14 @@ class Queue extends RealtimeActions<MessageQueue> {
 		removeTabByPath(identifiers.versionId as string, identifiers.queueId as string);
 	}
 	update({ data }: RealtimeActionParams<MessageQueue>) {
+		const { updateTab } = useTabStore.getState();
+		updateTab({
+			versionId: data.versionId as string,
+			tab: {
+				title: data.name,
+			},
+			filter: (tab) => tab.path.includes(data._id as string),
+		});
 		useMessageQueueStore.setState?.({
 			queues: useMessageQueueStore.getState?.().queues.map((queue) => {
 				if (queue._id === data._id) {

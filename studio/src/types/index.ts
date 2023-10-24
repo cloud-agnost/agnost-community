@@ -19,9 +19,17 @@ export { CreateMessageQueueSchema, MessageQueueSchema } from './queue.ts';
 export type * from './resource.ts';
 export {
 	AccessDbSchema,
-	ConnectDatabaseSchema,
-	ConnectQueueSchema,
+	AllowedRole,
 	ConnectResourceSchema,
+	CreateResourceSchema,
+	KafkaConnFormat,
+	KafkaSaslMechanism,
+	MongoDBConnFormat,
+	RabbitMQConnFormat,
+	RabbitMQConnScheme,
+	ResourceCreateType,
+	ResourceInstances,
+	ResourceType,
 } from './resource.ts';
 export type * from './storage.ts';
 export { BucketSchema, CreateStorageSchema, StorageSchema } from './storage.ts';
@@ -30,4 +38,4 @@ export { CreateTaskSchema } from './task.ts';
 export type * from './type.ts';
 export { OAuthProviderTypes, PhoneAuthSMSProviders, SMTPSchema } from './type.ts';
 export type * from './version.ts';
-export { TemplateTypes } from './version.ts';
+export { TabTypes, TemplateTypes } from './version.ts';

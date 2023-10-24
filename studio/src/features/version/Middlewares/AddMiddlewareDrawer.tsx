@@ -18,8 +18,9 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { nameSchema } from '@/features/version/Middlewares/formSchema.ts';
-import { Middleware } from '@/types';
+import { Middleware, TabTypes } from '@/types';
 import { useTabNavigate } from '@/hooks';
+import { useToast } from '@/hooks';
 const MiddlewareFormSchema = z.object({
 	name: nameSchema,
 });
@@ -36,6 +37,7 @@ export default function AddMiddlewareDrawer({
 	onCreate,
 }: AddMiddlewareDrawerProps) {
 	const { t } = useTranslation();
+	const { notify } = useToast();
 	const [loading, setLoading] = useState(false);
 	const { createMiddleware } = useMiddlewareStore();
 	const navigate = useTabNavigate();
@@ -56,27 +58,39 @@ export default function AddMiddlewareDrawer({
 	async function onSubmit(data: z.infer<typeof MiddlewareFormSchema>) {
 		if (!orgId || !appId || !versionId) return;
 		setLoading(true);
-		try {
-			const mw = await createMiddleware({
-				orgId,
-				appId,
-				versionId,
-				name: data.name,
-			});
-			onOpenChange(false);
-			if (onCreate) onCreate(mw);
-			else {
-				navigate({
-					title: data.name,
-					path: `${pathname}/${mw._id}`,
-					isActive: true,
-					isDashboard: false,
-					type: 'Middleware',
+		await createMiddleware({
+			orgId,
+			appId,
+			versionId,
+			name: data.name,
+			onSuccess: (mw) => {
+				notify({
+					title: t('general.success'),
+					description: t('version.middleware.add.success'),
+					type: 'success',
 				});
-			}
-		} finally {
-			setLoading(false);
-		}
+				onOpenChange(false);
+				if (onCreate) onCreate(mw);
+				else {
+					navigate({
+						title: data.name,
+						path: `${pathname}/${mw._id}`,
+						isActive: true,
+						isDashboard: false,
+						type: TabTypes.Middleware,
+					});
+				}
+				setLoading(false);
+			},
+			onError: (error) => {
+				notify({
+					type: 'error',
+					title: error.error,
+					description: error.details,
+				});
+				setLoading(false);
+			},
+		});
 	}
 
 	return (

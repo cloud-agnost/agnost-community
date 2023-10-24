@@ -1,12 +1,13 @@
 import { SortableRateLimits } from '@/features/version/SettingsGeneral';
+import { useToast } from '@/hooks';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
+import { RateLimit } from '@/types';
 import { reorder } from '@/utils';
+import { useState } from 'react';
 import { DropResult } from 'react-beautiful-dnd';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { useToast } from '@/hooks';
-import { APIError, RateLimit } from '@/types';
-import { useState } from 'react';
 export default function EndpointRateLimiters() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
@@ -21,7 +22,7 @@ export default function EndpointRateLimiters() {
 	const rateLimitsNotInDefault = rateLimits?.filter(
 		(item) => !defaultRateLimiters?.includes(item.iid),
 	);
-	const orderLimits = useVersionStore((state) => state.orderEndpointRateLimits);
+	const orderLimits = useSettingsStore((state) => state.orderEndpointRateLimits);
 	const { orgId, versionId, appId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -37,58 +38,66 @@ export default function EndpointRateLimiters() {
 			versionId,
 			appId,
 			defaultEndpointLimits: ordered,
+			onError: (error) => {
+				notify({
+					type: 'error',
+					title: t('general.error'),
+					description: error.details,
+				});
+			},
 		});
 	}
 
 	async function addToDefault(limiter: RateLimit) {
 		if (!defaultRateLimiters || !versionId || !appId || !orgId) return;
-		try {
-			await updateVersionProperties({
-				orgId,
-				versionId,
-				appId,
-				defaultEndpointLimits: [...(defaultRateLimiters ?? []), limiter.iid],
-			});
-			notify({
-				type: 'success',
-				title: t('general.success'),
-				description: t('version.limiter_added_to_default'),
-			});
-		} catch (e) {
-			const error = e as APIError;
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
-			});
-		}
+		updateVersionProperties({
+			orgId,
+			versionId,
+			appId,
+			defaultEndpointLimits: [...(defaultRateLimiters ?? []), limiter.iid],
+			onSuccess: () => {
+				notify({
+					type: 'success',
+					title: t('general.success'),
+					description: t('version.limiter_added_to_default'),
+				});
+			},
+			onError: (error) => {
+				notify({
+					type: 'error',
+					title: t('general.error'),
+					description: error.details,
+				});
+			},
+		});
 	}
 
 	async function deleteHandler(limitId?: string) {
 		if (!versionId || !appId || !orgId || deleting || !limitId) return;
-		try {
-			setDeleting(true);
-			await updateVersionProperties({
-				orgId,
-				versionId,
-				appId,
-				defaultEndpointLimits: defaultEndpointLimits?.filter((item) => item !== limitId),
-			});
-			notify({
-				type: 'success',
-				title: t('general.success'),
-				description: t('version.default_limiter_deleted'),
-			});
-		} catch (e) {
-			const error = e as APIError;
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
-			});
-		} finally {
-			setDeleting(false);
-		}
+
+		setDeleting(true);
+		updateVersionProperties({
+			orgId,
+			versionId,
+			appId,
+			defaultEndpointLimits: defaultEndpointLimits?.filter((item) => item !== limitId),
+			onSuccess: () => {
+				notify({
+					type: 'success',
+					title: t('general.success'),
+					description: t('version.limiter_added_to_default'),
+				});
+				setDeleting(false);
+			},
+			onError: (error) => {
+				notify({
+					type: 'error',
+					title: t('general.error'),
+					description: error.details,
+				});
+				setDeleting(false);
+			},
+		});
 	}
 
 	return (

@@ -14,6 +14,14 @@ class Model extends RealtimeActions<ModelType> {
 		removeTabByPath(identifiers.versionId as string, identifiers.modelId as string);
 	}
 	update({ data }: RealtimeActionParams<ModelType>): void {
+		const { updateTab } = useTabStore.getState();
+		updateTab({
+			versionId: data.versionId as string,
+			tab: {
+				title: data.name,
+			},
+			filter: (tab) => tab.path.includes(data._id as string),
+		});
 		useModelStore.setState?.({
 			models: useModelStore.getState?.().models.map((model) => {
 				if (model._id === data._id) {
