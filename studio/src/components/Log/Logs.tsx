@@ -20,22 +20,22 @@ export default function Logs({ logs, className }: LogsProps) {
 	return (
 		<div
 			className={cn(
-				'overflow-auto bg-base whitespace-pre text-default text-sm font-mono',
+				'overflow-auto bg-subtle dark:bg-base whitespace-pre text-default text-sm font-mono',
 				className,
 			)}
 		>
 			{logs?.length ? (
 				logs?.map((log, index) => (
-					<div key={index} className='flex items-start gap-6  px-4 py-2'>
-						<p>{log.timestamp}</p>
+					<div key={index} className='flex items-start gap-4  px-4 py-2'>
+						<small>{log.timestamp}</small>
 						{log.type && (
 							<Badge
-								className='w-14 flex-shrink-0'
+								className='w-10 flex-shrink-0 p-0'
 								variant={BADGE_COLOR_MAP[log.type.toUpperCase()]}
 								text={log.type}
 							/>
 						)}
-						<pre>{parseJSON(log.message)}</pre>
+						<pre className='text-xs'>{parseJSON(log.message)}</pre>
 					</div>
 				))
 			) : (

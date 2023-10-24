@@ -19,7 +19,7 @@
 	@apply text-default font-semibold text-[26px] leading-[36px];
 }
 .tab-list {
-	@apply inline-flex h-9 bg-subtle dark:bg-wrapper-background-light p-1 text-subtle gap-1 rounded-full max-w-full lg:max-w-none overflow-x-auto no-scrollbar;
+	@apply inline-flex h-9 bg-lighter p-1 text-subtle gap-1 rounded-full max-w-full lg:max-w-none overflow-x-auto no-scrollbar;
 }
 
 .tab-trigger {
