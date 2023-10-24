@@ -301,21 +301,17 @@ export class AdapterManager {
 			if (!connSettings) return;
 
 			// Create a pool of connections
-			const client = new pg.Pool({
+			const pool = new pg.Pool({
 				...helper.getAsObject(connSettings.options),
 				host: connSettings.host,
 				port: connSettings.port,
 				user: connSettings.username,
 				password: connSettings.password,
 				database: connSettings.dbName,
-				max: config.poolSize,
+				max: resource.config.poolSize,
 			});
 
-			// We are now using the database pool and we do not need this connect method anymore
-			// await client.connect();
-			client.on("error", (err, errClient) => {
-				this.reconnectToPostgresSQLWithBackoff(errClient, `${resource.iid}.0`);
-			});
+			pool.on("error", (err, errClient) => {});
 
 			const adapterObj = {
 				name,
@@ -323,7 +319,7 @@ export class AdapterManager {
 				instance,
 				iid,
 				readOnly: false,
-				adapter: new PostgreSQL(client),
+				adapter: new PostgreSQL(pool),
 				slaves: [],
 			};
 
@@ -336,24 +332,17 @@ export class AdapterManager {
 
 					try {
 						// Create a pool of connections
-						const slaveClient = new pg.Pool({
+						const slavePool = new pg.Pool({
 							...helper.getAsObject(config.options),
 							host: config.host,
 							port: config.port,
 							user: config.username,
 							password: config.password,
 							database: config.dbName,
-							max: config.poolSize,
+							max: resource.config.poolSize,
 						});
 
-						// We are now using the database pool and we do not need this connect method anymore
-						// await slaveClient.connect();
-						slaveClient.on("error", (err, errClient) => {
-							this.reconnectToPostgresSQLWithBackoff(
-								errClient,
-								`${resource.iid}.${i + 1}`
-							);
-						});
+						slavePool.on("error", (err, errClient) => {});
 
 						adapterObj.slaves.push({
 							name,
@@ -361,35 +350,12 @@ export class AdapterManager {
 							instance,
 							iid,
 							readOnly: true,
-							adapter: new PostgreSQL(slaveClient),
+							adapter: new PostgreSQL(slavePool),
 						});
 					} catch (err) {}
 				}
 			}
 		} catch (err) {}
-	}
-
-	/**
-	 * Retires to connect to the database with exponential backoff
-	 * @param  {Object} client The client connection
-	 * @param  {string} identifer The unique identifier of the connection to manage retry values
-	 */
-	async reconnectToPostgresSQLWithBackoff(client, identifer) {
-		const retries = this.getRetryCount(identifer);
-		const delay = Math.min(
-			2 ** retries * 1000,
-			config.get("general.maxBackoffSeconds") * 1000
-		); // Exponential backoff with a max of 30 seconds
-
-		setTimeout(async () => {
-			try {
-				await client.connect();
-				this.resetRetryCount(identifer);
-			} catch (err) {
-				this.incrementRetryCount(identifer);
-				reconnectToPostgresSQLWithBackoff(client, identifer);
-			}
-		}, delay);
 	}
 
 	/**
@@ -403,24 +369,18 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, accessReadOnly, iid, instance, type, name, config } =
-				resource;
+			const { access, accessReadOnly, iid, instance, type, name } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
-			const client = mysql.createPool({
+			const pool = mysql.createPool({
 				...helper.getAsObject(connSettings.options),
 				host: connSettings.host,
 				port: connSettings.port,
 				user: connSettings.username,
 				password: connSettings.password,
 				database: connSettings.dbName,
-				connectionLimit: config.poolSize,
-			});
-
-			await client.connect();
-			client.on("error", (err) => {
-				this.reconnectToMySQLWithBackoff(client, `${resource.iid}.0`);
+				connectionLimit: resource.config.poolSize,
 			});
 
 			const adapterObj = {
@@ -429,7 +389,7 @@ export class AdapterManager {
 				instance,
 				iid,
 				readOnly: false,
-				adapter: new MySQL(client),
+				adapter: new MySQL(pool),
 				slaves: [],
 			};
 
@@ -441,22 +401,14 @@ export class AdapterManager {
 					let config = accessReadOnly[i];
 
 					try {
-						const slaveClient = mysql.createPool({
+						const slavePool = mysql.createPool({
 							...helper.getAsObject(config.options),
 							host: config.host,
 							port: config.port,
 							user: config.username,
 							password: config.password,
 							database: config.dbName,
-							connectionLimit: config.poolSize,
-						});
-
-						await slaveClient.connect();
-						slaveClient.on("error", (err) => {
-							this.reconnectToMySQLWithBackoff(
-								slaveClient,
-								`${resource.iid}.${i + 1}`
-							);
+							connectionLimit: resource.config.poolSize,
 						});
 
 						adapterObj.slaves.push({
@@ -465,35 +417,12 @@ export class AdapterManager {
 							instance,
 							iid,
 							readOnly: true,
-							adapter: new MySQL(slaveClient),
+							adapter: new MySQL(slavePool),
 						});
 					} catch (err) {}
 				}
 			}
 		} catch (err) {}
-	}
-
-	/**
-	 * Retires to connect to the database with exponential backoff
-	 * @param  {Object} client The client connection
-	 * @param  {string} identifer The unique identifier of the connection to manage retry values
-	 */
-	async reconnectToMySQLWithBackoff(client, identifer) {
-		const retries = this.getRetryCount(identifer);
-		const delay = Math.min(
-			2 ** retries * 1000,
-			config.get("general.maxBackoffSeconds") * 1000
-		); // Exponential backoff with a max of 30 seconds
-
-		setTimeout(async () => {
-			try {
-				await client.connect();
-				this.resetRetryCount(identifer);
-			} catch (err) {
-				this.incrementRetryCount(identifer);
-				reconnectToMySQLWithBackoff(client, identifer);
-			}
-		}, delay);
 	}
 
 	/**
@@ -511,7 +440,7 @@ export class AdapterManager {
 			let connSettings = access;
 			if (!connSettings) return;
 
-			const client = await mssql.connect({
+			const pool = new mssql.ConnectionPool({
 				...helper.getAsObject(connSettings.options),
 				server: connSettings.host,
 				port: connSettings.port,
@@ -519,11 +448,13 @@ export class AdapterManager {
 				password: connSettings.password,
 				database: connSettings.dbName,
 				encrypt: connSettings.encrypt ?? false,
+				pool: {
+					max: resource.config.poolSize,
+				},
 			});
 
-			client.on("error", (err) => {
-				this.reconnectToSQLServerWithBackoff(client, `${resource.iid}.0`);
-			});
+			await pool.connect();
+			pool.on("error", (err) => {});
 
 			const adapterObj = {
 				name,
@@ -531,7 +462,7 @@ export class AdapterManager {
 				instance,
 				iid,
 				readOnly: false,
-				adapter: new SQLServer(client),
+				adapter: new SQLServer(pool),
 				slaves: [],
 			};
 
@@ -543,7 +474,7 @@ export class AdapterManager {
 					let config = accessReadOnly[i];
 
 					try {
-						const slaveClient = await mssql.connect({
+						const slavePool = new mssql.ConnectionPool({
 							...helper.getAsObject(config.options),
 							host: config.host,
 							port: config.port,
@@ -552,12 +483,8 @@ export class AdapterManager {
 							database: config.dbName,
 						});
 
-						slaveClient.on("error", (err) => {
-							this.reconnectToSQLServerWithBackoff(
-								slaveClient,
-								`${resource.iid}.${i + 1}`
-							);
-						});
+						await slavePool.connect();
+						slavePool.on("error", (err) => {});
 
 						adapterObj.slaves.push({
 							name,
@@ -565,35 +492,12 @@ export class AdapterManager {
 							instance,
 							iid,
 							readOnly: true,
-							adapter: new SQLServer(slaveClient),
+							adapter: new SQLServer(slavePool),
 						});
 					} catch (err) {}
 				}
 			}
 		} catch (err) {}
-	}
-
-	/**
-	 * Retires to connect to the database with exponential backoff
-	 * @param  {Object} client The client connection
-	 * @param  {string} identifer The unique identifier of the connection to manage retry values
-	 */
-	async reconnectToSQLServerWithBackoff(client, identifer) {
-		const retries = this.getRetryCount(identifer);
-		const delay = Math.min(
-			2 ** retries * 1000,
-			config.get("general.maxBackoffSeconds") * 1000
-		); // Exponential backoff with a max of 30 seconds
-
-		setTimeout(async () => {
-			try {
-				await client.connect();
-				this.resetRetryCount(identifer);
-			} catch (err) {
-				this.incrementRetryCount(identifer);
-				reconnectToSQLServerWithBackoff(client, identifer);
-			}
-		}, delay);
 	}
 
 	/**
@@ -652,9 +556,7 @@ export class AdapterManager {
 
 			// Connect to the database of the application
 			await client.connect();
-			client.on("error", (err) => {
-				this.reconnectToMongoDBWithBackoff(client, `${resource.iid}.0`);
-			});
+			client.on("error", (err) => {});
 
 			const adapterObj = {
 				name,
@@ -667,29 +569,6 @@ export class AdapterManager {
 
 			this.adapters.set(resource.iid, adapterObj);
 		} catch (err) {}
-	}
-
-	/**
-	 * Retires to connect to the database with exponential backoff
-	 * @param  {Object} client The client connection
-	 * @param  {string} identifer The unique identifier of the connection to manage retry values
-	 */
-	async reconnectToMongoDBWithBackoff(client, identifer) {
-		const retries = this.getRetryCount(identifer);
-		const delay = Math.min(
-			2 ** retries * 1000,
-			config.get("general.maxBackoffSeconds") * 1000
-		); // Exponential backoff with a max of 30 seconds
-
-		setTimeout(async () => {
-			try {
-				await client.connect();
-				this.resetRetryCount(identifer);
-			} catch (err) {
-				this.incrementRetryCount(identifer);
-				reconnectToMongoDBWithBackoff(client, identifer);
-			}
-		}, delay);
 	}
 
 	/**

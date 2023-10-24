@@ -564,10 +564,14 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	async setupResourceConnections() {
 		const resources = this.getResources();
 		for (const resource of resources) {
-			// Check whether this is a PostgreSQL, MySQL or SQL Server database or not
+			// Check whether this is a PostgreSQL, MySQL, SQL Server or MongoDB database or not
 			// We need to connect to the actual database not to the default database
 			// For this reason we connect based on database not based on resource
-			if (["PostgreSQL", "MySQL", "SQL Server"].includes(resource.instance))
+			if (
+				["PostgreSQL", "MySQL", "SQL Server", "MongoDB"].includes(
+					resource.instance
+				)
+			)
 				continue;
 
 			resource.access = helper.decryptSensitiveData(resource.access);
@@ -582,7 +586,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// Get the list of databases and filter the ones that are PostgreSQL, MySQL or SQL Server
 		const dbs = await META.getDatabasesSync().filter((entry) =>
-			["PostgreSQL", "MySQL", "SQL Server"].includes(entry.type)
+			["PostgreSQL", "MySQL", "SQL Server", "MongoDB"].includes(entry.type)
 		);
 
 		for (const db of dbs) {

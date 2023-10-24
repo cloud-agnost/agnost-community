@@ -201,7 +201,7 @@ export const applyRules = (type) => {
 					.isBoolean()
 					.withMessage(t("Not a valid boolean value"))
 					.toBoolean(),
-				query("poolSize")
+				body("poolSize")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
@@ -329,7 +329,7 @@ export const applyRules = (type) => {
 
 						return true;
 					}),
-				query("poolSize")
+				body("poolSize")
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty"))
