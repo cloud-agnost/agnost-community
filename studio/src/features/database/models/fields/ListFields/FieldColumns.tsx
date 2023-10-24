@@ -1,8 +1,7 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { FIELD_ICON_MAP } from '@/constants';
 import { SubFields } from '@/features/database/models/fields/ListFields/index.ts';
-import useAuthorizeApp from '@/hooks/useAuthorizeApp';
-import useApplicationStore from '@/store/app/applicationStore';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
 import { ColumnDefWithClassName, Field } from '@/types';
@@ -256,11 +255,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 ];
 
 function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-	const role = useApplicationStore.getState().role;
-	const hasAppPermission = useAuthorizeApp({
-		key: 'model.delete',
-		role,
-	});
+	const hasAppPermission = useAuthorizeVersion('model.delete');
 	return (
 		<TableConfirmation
 			align='end'

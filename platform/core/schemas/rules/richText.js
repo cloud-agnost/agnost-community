@@ -40,7 +40,7 @@ export const richTextRules = (type) => {
 					.bail()
 					.custom((value, { req }) => {
 						if (!req.body.richText?.searchable) return true;
-						if (!ftsIndexLanguages[req.db.type].includes(value)) {
+						if (!ftsIndexLanguages[req.db.type].some((item) => item.value.toString() === value)) {
 							throw new AgnostError(
 								t(
 									"Language/collation '%s' is not supported in '%s' databases",

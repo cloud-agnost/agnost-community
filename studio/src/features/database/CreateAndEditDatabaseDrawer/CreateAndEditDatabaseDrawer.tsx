@@ -5,7 +5,7 @@ import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useResourceStore from '@/store/resources/resourceStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIError, ResourceType } from '@/types';
-import { translate } from '@/utils';
+import { capitalize, cn, translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from 'components/Button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
@@ -35,6 +35,17 @@ interface CreateDatabaseDrawerProps {
 const CreateSchema = z.object({
 	name: NAME_SCHEMA,
 	assignUniqueName: z.boolean(),
+	poolSize: z
+		.number({
+			invalid_type_error: translate('forms.required', {
+				label: capitalize(translate('database.add.poolSize').toLowerCase()),
+			}),
+			required_error: translate('forms.required', {
+				label: capitalize(translate('database.add.poolSize').toLowerCase()),
+			}),
+		})
+		.min(1)
+		.max(50),
 	resourceId: z
 		.string({
 			required_error: translate('forms.required', {
@@ -67,6 +78,7 @@ export default function CreateAndEditDatabaseDrawer({
 		defaultValues: {
 			managed: true,
 			assignUniqueName: true,
+			poolSize: 1,
 		},
 	});
 
@@ -84,6 +96,7 @@ export default function CreateAndEditDatabaseDrawer({
 		// resource id is not editable, and its value is not changed when editing
 		form.setValue('resourceId', useResourceStore.getState().resources[0]._id);
 		form.setValue('assignUniqueName', toEditDatabase.assignUniqueName);
+		form.setValue('poolSize', toEditDatabase.poolSize);
 	}, [open, editMode, toEditDatabase]);
 
 	async function onSubmit(data: z.infer<typeof CreateSchema>) {
@@ -96,6 +109,7 @@ export default function CreateAndEditDatabaseDrawer({
 					orgId: version.orgId,
 					versionId: version._id,
 					appId: version.appId,
+					poolSize: data.poolSize,
 					name: data.name,
 					dbId: toEditDatabase?._id,
 				});
@@ -105,6 +119,7 @@ export default function CreateAndEditDatabaseDrawer({
 					versionId: version._id,
 					appId: version.appId,
 					managed: data.managed,
+					poolSize: data.poolSize,
 					type: resource.instance,
 					resourceId: data.resourceId,
 					name: data.name,
@@ -195,17 +210,41 @@ export default function CreateAndEditDatabaseDrawer({
 								)}
 							/>
 
-							{!editMode && (
-								<>
-									<Separator />
+							<Separator />
+							<div className={cn('grid', !editMode && 'grid-cols-2 gap-4')}>
+								<FormField
+									control={form.control}
+									name='poolSize'
+									render={({ field, formState: { errors } }) => (
+										<FormItem className='space-y-1'>
+											<FormLabel>{t('database.add.poolSize')}</FormLabel>
+											<FormControl>
+												<Input
+													error={Boolean(errors.name)}
+													type='number'
+													placeholder={
+														t('forms.placeholder', {
+															label: t('database.add.poolSize').toLowerCase(),
+														}) as string
+													}
+													{...field}
+													onChange={undefined}
+													onInput={(e) => field.onChange(e.currentTarget.valueAsNumber)}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								{!editMode && (
 									<FormField
 										control={form.control}
 										name='resourceId'
 										render={({ field }) => (
 											<FormItem className='space-y-1'>
 												<FormLabel>{t('database.add.resource.field')}</FormLabel>
-
 												<ResourceSelect
+													className='w-full'
 													defaultValue={field.value}
 													value={field.value}
 													name={field.name}
@@ -217,8 +256,9 @@ export default function CreateAndEditDatabaseDrawer({
 											</FormItem>
 										)}
 									/>
-								</>
-							)}
+								)}
+							</div>
+
 							<div className='flex justify-end'>
 								<Button
 									size='lg'

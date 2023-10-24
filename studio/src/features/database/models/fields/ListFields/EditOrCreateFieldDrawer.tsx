@@ -24,7 +24,7 @@ import {
 	SQL_SERVER_RESERVED_WORDS,
 	TIMESTAMPS_SCHEMA,
 } from '@/constants';
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { APIError, Database, Field, FieldType, Model, ReferenceAction } from '@/types';
 import { capitalize, cn, toDisplayName } from '@/utils';
 import { useParams } from 'react-router-dom';
@@ -90,6 +90,7 @@ export default function EditOrCreateFieldDrawer({
 	editMode,
 	type,
 }: EditOrCreateModelDrawerProps) {
+	const languages = useTypeStore((state) => state.ftsIndexLanguages);
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 	const databases = useDatabaseStore((state) => state.databases);
@@ -138,6 +139,13 @@ export default function EditOrCreateFieldDrawer({
 		view.indexed = false;
 	}
 
+	const languageOptions = {
+		[DATABASE.MongoDB]: languages.MongoDB,
+		[DATABASE.MySQL]: languages.MySQL,
+		[DATABASE.PostgreSQL]: languages.PostgreSQL,
+		[DATABASE.SQLServer]: languages['SQL Server'],
+	}[database.type];
+
 	const views = Object.entries(view ?? {})
 		.filter(([, value]) => !!value)
 		.map(([key]) => key) as View[];
@@ -157,6 +165,7 @@ export default function EditOrCreateFieldDrawer({
 				immutable: z.boolean(),
 				defaultValue: z.string().optional(),
 				description: z.string().optional(),
+				language: z.string().optional(),
 				maxLength: z
 					.string()
 					.regex(/^\d+$/, {
@@ -385,6 +394,21 @@ export default function EditOrCreateFieldDrawer({
 						path: ['name'],
 					});
 				}
+
+				if (arg.searchable && languageOptions && !arg.language) {
+					const label =
+						database.type === DATABASE.MySQL
+							? t('database.fields.searchable.collation.title')
+							: t('database.fields.searchable.lang.title');
+
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: t('forms.required', {
+							label: capitalize(label.toLowerCase()),
+						}).toString(),
+						path: ['language'],
+					});
+				}
 			}),
 	});
 
@@ -411,6 +435,7 @@ export default function EditOrCreateFieldDrawer({
 
 	const indexWatch = form.watch('general.indexed');
 	const requiredWatch = form.watch('general.required');
+	const searchableWatch = form.watch('general.searchable');
 
 	useEffect(() => {
 		if (database?.type !== DATABASE.MySQL || !isGeoPoint) return;
@@ -502,9 +527,11 @@ export default function EditOrCreateFieldDrawer({
 			text: {
 				searchable: data.general.searchable,
 				maxLength: Number(data.general.maxLength),
+				language: data.general.language,
 			},
 			richText: {
 				searchable: data.general.searchable,
+				language: data.general.language,
 			},
 			encryptedText: {
 				maxLength: Number(data.general.maxLength),
@@ -557,10 +584,12 @@ export default function EditOrCreateFieldDrawer({
 		if (fieldToEdit.text) {
 			form.setValue('general.searchable', fieldToEdit.text.searchable);
 			form.setValue('general.maxLength', fieldToEdit.text.maxLength.toString());
+			form.setValue('general.language', fieldToEdit.text.language);
 		}
 
 		if (fieldToEdit.richText) {
 			form.setValue('general.searchable', fieldToEdit.richText.searchable);
+			form.setValue('general.language', fieldToEdit.richText.language);
 		}
 
 		if (fieldToEdit.encryptedText) {
@@ -855,30 +884,94 @@ export default function EditOrCreateFieldDrawer({
 												!fieldToEdit.required &&
 												database.type === DATABASE.MySQL));
 									return (
-										<FormField
-											key={index}
-											control={form.control}
-											name={`general.${key}`}
-											render={({ field }) => (
-												<FormItem>
-													<SettingsFormItem
-														as='label'
-														className='py-0 space-y-0'
-														contentClassName='flex items-center justify-center'
-														title={t(`general.${key}`)}
-														description={t(`database.fields.form.${key}_desc`)}
-														twoColumns
-													>
-														<Switch
-															disabled={isDisabled}
-															checked={field.value}
-															onCheckedChange={field.onChange}
-														/>
-													</SettingsFormItem>
-													<FormMessage />
-												</FormItem>
+										<Fragment key={index}>
+											<FormField
+												control={form.control}
+												name={`general.${key}`}
+												render={({ field }) => (
+													<FormItem>
+														<SettingsFormItem
+															as='label'
+															className='py-0 space-y-0'
+															contentClassName='flex items-center justify-center'
+															title={t(`general.${key}`)}
+															description={t(`database.fields.form.${key}_desc`)}
+															twoColumns
+														>
+															<Switch
+																disabled={isDisabled}
+																checked={field.value}
+																onCheckedChange={field.onChange}
+															/>
+														</SettingsFormItem>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+											{key === 'searchable' && languageOptions && searchableWatch && (
+												<>
+													<FormField
+														control={form.control}
+														name='general.language'
+														render={({ field }) => (
+															<FormItem className={cn('flex-1 flex flex-col')}>
+																<FormLabel>
+																	{database.type === DATABASE.MySQL
+																		? t('database.fields.searchable.collation.title')
+																		: t('database.fields.searchable.lang.title')}
+																</FormLabel>
+																<FormControl>
+																	<Select
+																		defaultValue={field.value}
+																		value={field.value}
+																		name={field.name}
+																		disabled={
+																			!!fieldToEdit?.text?.language ||
+																			!!fieldToEdit?.richText?.language
+																		}
+																		onValueChange={field.onChange}
+																	>
+																		<FormControl>
+																			<SelectTrigger className={cn('w-full input')}>
+																				<SelectValue
+																					className={cn('text-subtle')}
+																					placeholder={
+																						database.type === DATABASE.MySQL
+																							? t(
+																									'database.fields.searchable.collation.placeholder',
+																							  )
+																							: t('database.fields.searchable.lang.placeholder')
+																					}
+																				/>
+																			</SelectTrigger>
+																		</FormControl>
+																		<SelectContent className='max-h-[400px]'>
+																			{languageOptions.map((item, index) => {
+																				return (
+																					<SelectItem
+																						className='px-3 py-[6px] w-full max-w-full cursor-pointer'
+																						key={index}
+																						value={item.value}
+																					>
+																						<div className='flex items-center gap-2 [&>svg]:text-lg'>
+																							{database.type === DATABASE.MySQL
+																								? item.name
+																								: capitalize(item.name)}
+																						</div>
+																					</SelectItem>
+																				);
+																			})}
+																		</SelectContent>
+																	</Select>
+																</FormControl>
+																<FormMessage />
+															</FormItem>
+														)}
+													/>
+													<Separator />
+												</>
 											)}
-										/>
+										</Fragment>
 									);
 								})}
 								{!['object', 'object-list'].includes(TYPE) && (

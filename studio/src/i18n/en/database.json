@@ -3,6 +3,7 @@
 	"empty_text": "You have not defined any databases for this app version",
 	"add": {
 		"title": "Create Database",
+		"poolSize": "Pool Size",
 		"field": "Database Name",
 		"resource": {
 			"title": "Resource Management",
@@ -99,6 +100,18 @@
 			"immutable_desc": "The value of the field once set cannot be modified later.",
 			"searchable_desc": "Enable text search of string content.",
 			"default_value": "Default Value"
+		},
+		"searchable": {
+			"lang": {
+				"title": "Searchable Language",
+				"field": "Searchable Language",
+				"placeholder": "Select Searchable Language"
+			},
+			"collation": {
+				"title": "Searchable Collation",
+				"field": "Searchable Collation",
+				"placeholder": "Select Searchable Collation"
+			}
 		}
 	}
 }
