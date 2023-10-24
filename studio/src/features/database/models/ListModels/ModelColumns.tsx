@@ -1,6 +1,7 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { TabLink } from '@/features/version/Tabs';
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
@@ -150,11 +151,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 ];
 
 function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-	const role = useApplicationStore.getState().role;
-	const hasAppPermission = useAuthorizeApp({
-		key: 'model.delete',
-		role,
-	});
+	const hasAppPermission = useAuthorizeVersion('model.delete');
 	return (
 		<TableConfirmation
 			align='end'
