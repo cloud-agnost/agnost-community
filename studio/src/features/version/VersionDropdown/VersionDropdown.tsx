@@ -33,7 +33,7 @@ export default function VersionDropdown() {
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 	const navigate = useNavigate();
 	const { application, openVersionDrawer } = useApplicationStore();
-	const { addTab } = useTabStore();
+	const { addSettingsTab } = useTabStore();
 
 	async function onConfirm() {
 		setLoading(true);
@@ -89,16 +89,7 @@ export default function VersionDropdown() {
 					<Button
 						variant='blank'
 						className='version-dropdown-label'
-						onClick={() => {
-							addTab(version?._id as string, {
-								path: getVersionDashboardPath('/settings'),
-								id: generateId(),
-								title: t('version.settings.default'),
-								isActive: true,
-								isDashboard: false,
-								type: TabTypes.Settings,
-							});
-						}}
+						onClick={() => addSettingsTab(version._id)}
 					>
 						<div className='version-label-icon'>
 							{version?.readOnly ? <LockSimple size={20} /> : <LockSimpleOpen size={20} />}

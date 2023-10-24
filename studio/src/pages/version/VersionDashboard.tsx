@@ -10,6 +10,7 @@ import {
 import { CopyInput } from '@/components/CopyInput';
 import { TAB_ICON_MAP } from '@/constants';
 import useEnvironmentStore from '@/store/environment/environmentStore';
+import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { capitalize } from '@/utils';
 import { Key } from '@phosphor-icons/react';
@@ -27,6 +28,7 @@ VersionDashboard.loader = async ({ params }: LoaderFunctionArgs) => {
 export default function VersionDashboard() {
 	const { version, dashboard } = useVersionStore();
 	const { environment } = useEnvironmentStore();
+	const { addSettingsTab } = useTabStore();
 	const { t } = useTranslation();
 	function getIcon(type: string) {
 		const Icon = TAB_ICON_MAP[type];
@@ -37,17 +39,17 @@ export default function VersionDashboard() {
 		{
 			title: 'Product Guides',
 			description: 'Learn how to use our product',
-			link: 'https://docs.appsmith.com/v/v1.2.1/',
+			link: '/_blank',
 		},
 		{
 			title: 'Client API Guide',
 			description: 'Learn how to use our Client API',
-			link: 'https://docs.appsmith.com/v/v1.2.1/',
+			link: '/_blank',
 		},
 		{
 			title: 'API Reference',
 			description: 'Learn how to use our API',
-			link: 'https://docs.appsmith.com/v/v1.2.1/',
+			link: '/_blank',
 		},
 	];
 	return (
@@ -108,7 +110,9 @@ export default function VersionDashboard() {
 					))}
 				</CardContent>
 				<CardFooter className='flex justify-between'>
-					<Button variant='outline'>{t('version.settings.manage_api_keys')}</Button>
+					<Button variant='outline' onClick={() => addSettingsTab(version._id, 'api-keys')}>
+						{t('version.settings.manage_api_keys')}
+					</Button>
 				</CardFooter>
 			</Card>
 
@@ -118,14 +122,20 @@ export default function VersionDashboard() {
 				</CardHeader>
 				<CardContent className='grid grid-cols-3 gap-6'>
 					{GUIDES.map((guide) => (
-						<Link to={guide.link} key={guide.title} className='border border-border'>
-							<div className='flex items-center gap-4 max-w-xl'>
+						<Link
+							to={guide.link}
+							key={guide.title}
+							className='border border-border'
+							target='_blank'
+							rel='noopener noreferrer'
+						>
+							<div className='flex items-center gap-4 max-w-xl p-4'>
 								<div className='p-4 bg-lighter '>
 									<Key className='w-6 h-6 text-default' />
 								</div>
 								<div className='flex-1'>
 									<h1 className='text-default text-lg'>{guide.title}</h1>
-									<h2 className='text-subtle'>{guide.description}</h2>
+									<h2 className='text-subtle text-md'>{guide.description}</h2>
 								</div>
 							</div>
 						</Link>

@@ -312,7 +312,7 @@ export function handleTabChange(name: string, url: string) {
 	const hasAnotherParams = versionUrl.includes('?');
 	updateCurrentTab(version._id, {
 		...tab,
-		path: hasAnotherParams ? `${url}&tabId=${tab.id}` : `${url}?tabId=${tab.id}`,
+		path: hasAnotherParams ? `${versionUrl}&tabId=${tab.id}` : `${versionUrl}?tabId=${tab.id}`,
 		title: name,
 	});
 }

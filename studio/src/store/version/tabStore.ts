@@ -1,5 +1,5 @@
-import { Tab, UpdateTabParams } from '@/types';
-import { getUrlWithoutQuery, history } from '@/utils';
+import { Tab, TabTypes, UpdateTabParams } from '@/types';
+import { generateId, getUrlWithoutQuery, history, translate } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import useVersionStore from './versionStore';
@@ -25,6 +25,7 @@ interface TabStore {
 	filterTabs: (versionId: string, filter: (tab: Tab) => boolean) => Tab;
 	removeTabByPath: (versionId: string, path: string) => void;
 	updateTab: (param: UpdateTabParams) => void;
+	addSettingsTab: (versionId: string, path?: string) => void;
 }
 
 const useTabStore = create<TabStore>()(
@@ -216,6 +217,23 @@ const useTabStore = create<TabStore>()(
 								}) ?? [],
 						},
 					}));
+				},
+				addSettingsTab: (versionId, path = '') => {
+					const tabs = get().tabs[versionId] ?? [];
+					const settingsTab = tabs.find((tab) => tab.type === TabTypes.Settings);
+					if (settingsTab) {
+						get().setCurrentTab(versionId, settingsTab.id);
+						history.navigate?.(settingsTab.path);
+						return;
+					}
+					get().addTab(versionId as string, {
+						path: useVersionStore.getState().getVersionDashboardPath(`settings/${path}`),
+						id: generateId(),
+						title: translate('version.settings.default'),
+						isActive: true,
+						isDashboard: false,
+						type: TabTypes.Settings,
+					});
 				},
 			}),
 			{
