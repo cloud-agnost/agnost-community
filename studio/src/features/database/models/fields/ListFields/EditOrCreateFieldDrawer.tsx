@@ -47,7 +47,6 @@ interface EditOrCreateModelDrawerProps {
 }
 
 const defaultValueDisabledTypes = [
-	'reference',
 	'time',
 	'object',
 	'object-list',
@@ -338,6 +337,16 @@ export default function EditOrCreateFieldDrawer({
 					});
 				}
 
+				if (isReference && database.type !== DATABASE.MongoDB && arg.defaultValue && isNaN(Number(arg.defaultValue))) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: t('forms.number', {
+							label: capitalize(t('general.default_value').toLowerCase()),
+						}).toString(),
+						path: ['defaultValue'],
+					});
+				}
+
 				if (
 					database?.type === DATABASE.PostgreSQL &&
 					POSTGRES_RESERVED_WORDS.includes(arg.name.toLowerCase())
@@ -450,8 +459,11 @@ export default function EditOrCreateFieldDrawer({
 		};
 		const getDefaultValue = () => {
 			if (editMode && hasDefaultValue && !data.general.defaultValue) return '$$unset';
+
+			if (isReference && database.type !== DATABASE.MongoDB || (isDecimal || isInteger)) {
+				return Number(data.general.defaultValue)
+			}
 			if (isBoolean) return parseForBoolean(data.general.defaultValue);
-			if (isDecimal || isInteger) return Number(data.general.defaultValue);
 			return data.general.defaultValue;
 		};
 		const getIndexed = () => {

@@ -21,6 +21,9 @@ export class MsSQLDBManager extends SQLBaseManager {
 
     static CHECK_SCHEMA = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{SCHEMA_NAME}'";
 
+    static CHECK_TABLE_SCHEMA =
+        "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{SCHEMA_NAME}' AND TABLE_NAME = '{TABLE_NAME}'";
+
     constructor(env, dbConfig, prevDbConfig, addLogFn) {
         super(env, dbConfig, prevDbConfig, addLogFn);
     }
@@ -183,26 +186,12 @@ export class MsSQLDBManager extends SQLBaseManager {
             await this.dropFullTextIndexByColumn(model.name, field.name, true),
             await this.dropUniqueConstraint(model, field, true),
             await this.dropIndex(model, field, true),
-            await this.dropForeignKeyConstraint(model.name, field, true),
+            await this.dropForeignKey(model, SQLBaseManager.getForeignKeyName(field.iid), true),
             await this.dropDefaultConstraint(model.name, field, true),
             DROP_FIELD_QUERY,
             await this.dropFullTextIndexIfDisabled(model.name, true),
         ].join("\n");
 
-        if (returnQuery) return SQL;
-        return this.runQuery(SQL);
-    }
-
-    /**
-     * @description Drop the foreign key constraint from the column
-     * @param modelName {string}
-     * @param field {object}
-     * @param returnQuery {boolean}
-     * @return {Promise<Object|[]>|string}
-     */
-    dropForeignKeyConstraint(modelName, field, returnQuery = false) {
-        const FK_NAME = SQLBaseManager.getForeignKeyName(field.iid);
-        const SQL = `ALTER TABLE ${this.getSchemaName()}.${modelName} DROP CONSTRAINT IF EXISTS ${FK_NAME};`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
@@ -376,8 +365,8 @@ export class MsSQLDBManager extends SQLBaseManager {
                 const reference = new Ref(field, this.getDbType());
                 const foreignName = SQLBaseManager.getForeignKeyName(field.iid);
 
-                const onlyConstraint = reference.createConstraint(model.name);
-                const withField = reference.createConstraint(model.name, true);
+                const onlyConstraint = reference.createConstraint(this.getModelNameWithSchema(model.name));
+                const withField = reference.createConstraint(this.getModelNameWithSchema(model.name), true);
 
                 const condition = MsSQLDBManager.CHECK_FIELD_SCHEMA.replace("{TABLE_NAME}", model.name)
                     .replace("{FIELD_NAME}", field.name)
@@ -408,7 +397,7 @@ export class MsSQLDBManager extends SQLBaseManager {
     }
 
     dropForeignKey(model, foreignKeyName, returnQuery = false) {
-        const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} DROP CONSTRAINT IF EXISTS ${foreignKeyName};`;
+        const SQL = `ALTER TABLE ${this.getModelNameWithSchema(model.name)} DROP CONSTRAINT IF EXISTS ${FK_NAME};`;
         if (returnQuery) return SQL;
         return this.runQuery(SQL);
     }
@@ -461,6 +450,35 @@ export class MsSQLDBManager extends SQLBaseManager {
     removeDefaultValues(model, field, returnQuery = false) {
         const constraintName = SQLBaseManager.getDefaultConstraintName(field.iid);
         const SQL = `ALTER TABLE ${this.getSchemaName()}.${model.name} DROP CONSTRAINT IF EXISTS ${constraintName};`;
+
+        if (returnQuery) return SQL;
+        return this.runQuery(SQL);
+    }
+
+    async handleModelsDrop(deletedModels, returnQuery = false) {
+        let SQL = "";
+
+        for (const model of deletedModels) {
+            let ifQuery = "";
+            for (let field of model.fields) {
+                let query = "";
+
+                if (field.type === "reference") {
+                    ifQuery = MsSQLDBManager.CHECK_TABLE_SCHEMA.replace("{SCHEMA_NAME}", this.getSchemaName()).replace(
+                        "{TABLE_NAME}",
+                        model.name
+                    );
+                    query += this.dropForeignKey(model, SQLBaseManager.getForeignKeyName(field.iid), true) + "\n";
+                }
+
+                SQL += (ifQuery ? this.ifWrapper(`EXISTS(${ifQuery})`, query) : query) + "\n";
+            }
+        }
+
+        for (const model of deletedModels) {
+            const query = await this.dropModel(model, returnQuery);
+            SQL += query + "\n";
+        }
 
         if (returnQuery) return SQL;
         return this.runQuery(SQL);

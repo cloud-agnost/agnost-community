@@ -242,8 +242,8 @@ $$;`;
 
                 const foreignName = SQLBaseManager.getForeignKeyName(field.iid);
 
-                const onlyConstraint = reference.createConstraint(model.name);
-                const withField = reference.createConstraint(model.name, true);
+                const onlyConstraint = reference.createConstraint(this.getModelNameWithSchema(model.name));
+                const withField = reference.createConstraint(this.getModelNameWithSchema(model.name), true);
 
                 const fieldCondition = PostgresDBManager.CHECK_FIELD_EXISTS.replace(
                     "{TABLE_NAME}",
