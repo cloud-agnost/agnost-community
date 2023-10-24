@@ -4,6 +4,51 @@ import Model from "../sql-database/Model.js";
 
 export class SQLBaseManager extends DBManager {
     /**
+     * @description Return the foreign key name
+     * @param iid {string} - The field iid
+     * @return {string}
+     */
+    static getForeignKeyName(iid) {
+        return `fk_${iid.replaceAll("-", "_")}`;
+    }
+
+    /**
+     * @description Return the unique index name
+     * @param iid {string} - The field iid
+     * @return {string}
+     */
+    static getUniqueIndexName(iid) {
+        return `uq_${iid.replaceAll("-", "_")}`;
+    }
+
+    /**
+     * @description Return the index name
+     * @param iid {string} - The field iid
+     * @return {string}
+     */
+    static getIndexName(iid) {
+        return `idx_${iid.replaceAll("-", "_")}`;
+    }
+
+    /**
+     * @description Return the full text index name
+     * @param iid {string} - The field iid
+     * @return {string}
+     */
+    static getFullTextIndexName(iid) {
+        return `fti_${iid.replaceAll("-", "_")}`;
+    }
+
+    /**
+     * @description Return the default value constraint name
+     * @param iid {string} - The field iid
+     * @return {string}
+     */
+    static getDefaultConstraintName(iid) {
+        return `dc_${iid.replaceAll("-", "_")}`;
+    }
+
+    /**
      * Type of execution
      * @type {"deploy"| "redeploy"}
      */
@@ -28,6 +73,17 @@ export class SQLBaseManager extends DBManager {
     databaseType;
 
     /**
+     * SQLBaseManager constructor
+     * @param {object} env - environment
+     * @param {object} dbConfig - database configuration
+     * @param {object} prevDbConfig - previous database configuration
+     * @param {function} addLogFn - function to add log
+     */
+    constructor(env, dbConfig, prevDbConfig, addLogFn) {
+        super(env, dbConfig, prevDbConfig, addLogFn);
+    }
+
+    /**
      * Start a transaction
      * @return {void}
      */
@@ -38,17 +94,6 @@ export class SQLBaseManager extends DBManager {
      * @return {void}
      */
     endTransaction() {}
-
-    /**
-     * SQLBaseManager constructor
-     * @param {object} env - environment
-     * @param {object} dbConfig - database configuration
-     * @param {object} prevDbConfig - previous database configuration
-     * @param {function} addLogFn - function to add log
-     */
-    constructor(env, dbConfig, prevDbConfig, addLogFn) {
-        super(env, dbConfig, prevDbConfig, addLogFn);
-    }
 
     /**
      * Use the database
@@ -289,7 +334,9 @@ export class SQLBaseManager extends DBManager {
             const withReferences = curr.fields
                 .filter((field) => field.type === "reference")
                 .map((field) => {
-                    field.reference.modelName = this.getModelNameByIid(field?.reference?.iid);
+                    field.reference.modelName = this.getModelNameWithSchema(
+                        this.getModelNameByIid(field?.reference?.iid)
+                    );
                     return field;
                 });
 
@@ -365,7 +412,7 @@ export class SQLBaseManager extends DBManager {
         modelToCreate.fields = model.fieldChanges.added
             .filter((field) => field.type === "reference")
             .map((field) => {
-                field.reference.modelName = this.getModelNameByIid(field.reference.iid);
+                field.reference.modelName = this.getModelNameWithSchema(this.getModelNameByIid(field?.reference?.iid));
                 return field;
             });
         SQL += this.createForeignKeyQuery([modelToCreate]);
@@ -819,51 +866,6 @@ export class SQLBaseManager extends DBManager {
      */
     dropForeignKey(model, foreignKeyName, returnQuery = false) {}
 
-    /**
-     * @description Return the foreign key name
-     * @param iid {string} - The field iid
-     * @return {string}
-     */
-    static getForeignKeyName(iid) {
-        return `fk_${iid.replaceAll("-", "_")}`;
-    }
-
-    /**
-     * @description Return the unique index name
-     * @param iid {string} - The field iid
-     * @return {string}
-     */
-    static getUniqueIndexName(iid) {
-        return `uq_${iid.replaceAll("-", "_")}`;
-    }
-
-    /**
-     * @description Return the index name
-     * @param iid {string} - The field iid
-     * @return {string}
-     */
-    static getIndexName(iid) {
-        return `idx_${iid.replaceAll("-", "_")}`;
-    }
-
-    /**
-     * @description Return the full text index name
-     * @param iid {string} - The field iid
-     * @return {string}
-     */
-    static getFullTextIndexName(iid) {
-        return `fti_${iid.replaceAll("-", "_")}`;
-    }
-
-    /**
-     * @description Return the default value constraint name
-     * @param iid {string} - The field iid
-     * @return {string}
-     */
-    static getDefaultConstraintName(iid) {
-        return `dc_${iid.replaceAll("-", "_")}`;
-    }
-
     getDatabaseNameToUse() {
         return this.getAssignUniqueName()
             ? `${this.getEnvId()}_${this.getDbId()}`.replaceAll("-", "_").toLowerCase()
@@ -903,4 +905,22 @@ export class SQLBaseManager extends DBManager {
      * @param returnQuery {boolean}
      */
     createField(modelName, fields, returnQuery = false) {}
+
+    /**
+     * @description get the schema name
+     * @return {string}
+     */
+    getSchemaName() {
+        return "";
+    }
+
+    /**
+     * @description get the model name with schema, if schema is not available, it will return the model name
+     * @param modelName {string}
+     * @return {string}
+     */
+    getModelNameWithSchema(modelName) {
+        const schemaName = this.getSchemaName() ? `${this.getSchemaName()}.` : "";
+        return `${schemaName}${modelName}`;
+    }
 }
