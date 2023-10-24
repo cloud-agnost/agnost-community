@@ -11,6 +11,7 @@ import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
 
 const { selectVersion } = useVersionStore.getState();
+const closeVersionDrawer = useApplicationStore.getState().closeVersionDrawer;
 const app = useApplicationStore.getState().application;
 
 export const VersionTableColumns: ColumnDef<Version>[] = [
@@ -73,7 +74,10 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 				<OpenVersion
 					id={_id}
 					app={app as Application}
-					onSelect={() => selectVersion(row.original)}
+					onSelect={() => {
+						selectVersion(row.original);
+						closeVersionDrawer();
+					}}
 				/>
 			);
 		},

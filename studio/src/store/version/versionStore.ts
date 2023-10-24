@@ -23,7 +23,6 @@ import { history } from '@/utils';
 import localforage from 'localforage';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import useApplicationStore from '../app/applicationStore';
 import useAuthStore from '../auth/authStore';
 
 interface VersionStore {
@@ -94,7 +93,6 @@ const useVersionStore = create<VersionStore>()(
 					localforage.clear();
 					set({ version });
 					history.navigate?.(get().getVersionDashboardPath());
-					useApplicationStore.getState().closeVersionDrawer();
 				},
 				setCreateCopyVersionDrawerIsOpen: (isOpen: boolean) => {
 					set({ createCopyVersionDrawerIsOpen: isOpen });
