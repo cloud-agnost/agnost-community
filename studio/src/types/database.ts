@@ -4,6 +4,7 @@ export interface Database {
 	orgId: string;
 	appId: string;
 	assignUniqueName: boolean;
+	poolSize: number;
 	versionId: string;
 	iid: string;
 	name: string;
@@ -22,6 +23,7 @@ export type GetDatabasesOfAppParams = Omit<VersionParams, 'envId'>;
 export type CreateDatabaseParams = GetDatabasesOfAppParams & {
 	name: string;
 	type: string;
+	poolSize: number;
 	managed: boolean;
 	resourceId: string;
 	assignUniqueName: boolean;
@@ -37,4 +39,5 @@ export type DeleteDatabaseParams = GetDatabasesOfAppParams & {
 
 export type UpdateDatabaseNameParams = GetDatabaseOfAppByIdParams & {
 	name: string;
+	poolSize: number;
 };

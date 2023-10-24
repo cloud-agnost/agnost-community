@@ -3,6 +3,10 @@ import { DATABASE } from "../../../config/constants.js";
 import { SQLBaseManager } from "../../managers/SQLBaseManager.js";
 
 export default class Text extends Field {
+    collateMap = {
+        [DATABASE.MySQL]: "ALTER TABLE {TABLE_NAME} MODIFY {NAME} {TYPE}({MAX_LENGTH}) COLLATE {COLLATE};",
+    };
+
     createMap = {
         [DATABASE.PostgreSQL]: "{NAME} {TYPE}({MAX_LENGTH}) {REQUIRED} {DEFAULT_VALUE}",
         [DATABASE.MySQL]: "`{NAME}` {TYPE}({MAX_LENGTH}) {REQUIRED} {DEFAULT_VALUE}",
@@ -37,6 +41,14 @@ export default class Text extends Field {
         return this.options?.text?.maxLength;
     }
 
+    /**
+     * @description Gets the language of the field
+     * @return {string}
+     */
+    getLanguage() {
+        return this.options?.text?.language;
+    }
+
     toDefinitionQuery() {
         let schema = this.createMap[this.getDatabaseType()];
 
@@ -59,5 +71,14 @@ export default class Text extends Field {
             .replace("{NAME}", field.name)
             .replace("{TYPE}", this.getDbType())
             .replace("{MAX_LENGTH}", this.getMaxLength());
+    }
+
+    toAddCollateQuery(model, field) {
+        return this.collateMap[this.getDatabaseType()]
+            .replace("{TABLE_NAME}", model.name)
+            .replace("{NAME}", field.name)
+            .replace("{TYPE}", this.getDbType())
+            .replace("{MAX_LENGTH}", this.getMaxLength())
+            .replace("{COLLATE}", this.getLanguage());
     }
 }

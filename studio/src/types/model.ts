@@ -45,9 +45,11 @@ export interface Field {
 	text?: {
 		searchable: boolean;
 		maxLength: number;
+		language: string;
 	};
 	richText?: {
 		searchable: boolean;
+		language: string;
 	};
 	encryptedText?: {
 		maxLength: number;
@@ -135,9 +137,11 @@ export type AddNewFieldParams = GetModelsOfDatabaseParams & {
 	text?: {
 		searchable: boolean;
 		maxLength: number;
+		language?: string;
 	};
 	richText?: {
 		searchable: boolean;
+		language?: string;
 	};
 	encryptedText?: {
 		maxLength: number;

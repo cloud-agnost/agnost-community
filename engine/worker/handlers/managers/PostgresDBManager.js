@@ -199,9 +199,17 @@ $$;`;
 
     addFullTextIndex(model, field, returnQuery = false) {
         const indexName = SQLBaseManager.getFullTextIndexName(field.iid);
+        let language = "english";
+
+        if (field.type === "text") {
+            language = field?.text?.language ?? "english";
+        } else if (field.type === "rich-text") {
+            language = field?.richText?.language ?? "english";
+        }
+
         const SQL = `CREATE INDEX IF NOT EXISTS ${indexName} ON ${this.getSchemaName()}.${
             model.name
-        } USING GIN(to_tsvector('english', ${field.name}));`;
+        } USING GIN(to_tsvector('${language}', ${field.name}));`;
 
         if (returnQuery) return SQL;
 

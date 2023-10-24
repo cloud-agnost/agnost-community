@@ -6,11 +6,13 @@ import { useTranslation } from 'react-i18next';
 import { FormControl } from '../Form';
 import { useEffect } from 'react';
 import { ResourceType } from '@/types';
+import { cn } from '@/utils';
 interface ResourceSelectProps extends SelectProps {
 	error: boolean;
 	type: ResourceType;
+	className?: string;
 }
-export default function ResourceSelect({ error, type, ...props }: ResourceSelectProps) {
+export default function ResourceSelect({ error, type, className, ...props }: ResourceSelectProps) {
 	const { t } = useTranslation();
 	const { resources, getResources } = useResourceStore();
 	function getIcon(type: string): React.ReactNode {
@@ -27,7 +29,7 @@ export default function ResourceSelect({ error, type, ...props }: ResourceSelect
 	return (
 		<Select {...props}>
 			<FormControl>
-				<SelectTrigger error={error} className='w-1/3'>
+				<SelectTrigger error={error} className={cn('w-1/3', className)}>
 					<SelectValue placeholder={`${t('general.select')} ${t('queue.create.resource.title')}`} />
 				</SelectTrigger>
 			</FormControl>

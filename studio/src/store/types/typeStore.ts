@@ -17,6 +17,24 @@ interface TypesStore {
 	bvlTypes: string[];
 	fieldTypes: FieldType[];
 	databaseTypes: string[];
+	ftsIndexLanguages: {
+		PostgreSQL: {
+			value: string;
+			name: string;
+		}[];
+		MySQL: {
+			value: string;
+			name: string;
+		}[];
+		MongoDB: {
+			value: string;
+			name: string;
+		}[];
+		'SQL Server': {
+			value: string;
+			name: string;
+		}[];
+	};
 	instanceTypes: {
 		engine: string[];
 		database: string[];
@@ -74,6 +92,12 @@ const useTypeStore = create<TypesStore>()(
 					queue: [],
 					scheduler: [],
 					realtime: [],
+				},
+				ftsIndexLanguages: {
+					PostgreSQL: [],
+					MySQL: [],
+					MongoDB: [],
+					'SQL Server': [],
 				},
 				phoneAuthSMSProviders: [
 					{

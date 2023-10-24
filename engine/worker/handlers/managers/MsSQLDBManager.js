@@ -71,7 +71,7 @@ export class MsSQLDBManager extends SQLBaseManager {
             SQL = query;
         }
 
-        const hasSQL = SQL.trim().length > 0;
+        const hasSQL = SQL?.trim().length > 0;
         if (!hasSQL) return;
 
         if (this.getDatabaseName()) {
@@ -271,7 +271,19 @@ export class MsSQLDBManager extends SQLBaseManager {
             `CREATE FULLTEXT CATALOG ${catalogName} AS DEFAULT;`
         );
 
-        const fieldsToIndex = fields.map((field) => field.name).join(", ");
+        const fieldsToIndex = fields
+            .map((field) => {
+                let language = "1033";
+
+                if (field.type === "text") {
+                    language = field?.text?.language ?? "1033";
+                } else if (field.type === "rich-text") {
+                    language = field?.richText?.language ?? "1033";
+                }
+
+                return `${field.name} LANGUAGE ${language}`;
+            })
+            .join(", ");
 
         const dropFullTextIndexIfExists = this.ifWrapper(
             `EXISTS(${MsSQLDBManager.CHECK_FULL_TEXT_INDEX_SCHEMA.replace("{TABLE_NAME}", model.name).replace(
