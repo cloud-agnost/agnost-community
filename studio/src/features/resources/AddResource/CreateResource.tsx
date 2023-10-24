@@ -4,15 +4,16 @@ import { Input } from '@/components/Input';
 import { CreateResourceLayout } from '@/features/resources';
 import { useToast } from '@/hooks';
 import useResourceStore from '@/store/resources/resourceStore';
+import useTypeStore from '@/store/types/typeStore';
 import { CreateResourceSchema, ResourceInstances } from '@/types';
 import { isEmpty } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'components/Select';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-
 export default function CreateResource() {
 	const form = useForm<z.infer<typeof CreateResourceSchema>>({
 		resolver: zodResolver(CreateResourceSchema),
@@ -25,7 +26,7 @@ export default function CreateResource() {
 			: 'instances';
 	const { createNewResource, toggleCreateResourceModal, closeEditResourceModal, resourceToEdit } =
 		useResourceStore();
-
+	const { resourceVersions } = useTypeStore();
 	const [loading, setLoading] = useState(false);
 	const { notify } = useToast();
 
@@ -49,7 +50,6 @@ export default function CreateResource() {
 			},
 		});
 	};
-	console.log('resourceToEdit', form.formState.errors);
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)}>
@@ -70,6 +70,38 @@ export default function CreateResource() {
 								<FormDescription>
 									{t('resources.database.storage_size_description')}
 								</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='config.version'
+						render={({ field }) => (
+							<FormItem className='flex-1'>
+								<FormLabel>{t('resources.version')}</FormLabel>
+								<FormControl>
+									<FormControl>
+										<Select defaultValue={field.value} onValueChange={field.onChange}>
+											<FormControl>
+												<SelectTrigger
+													className='w-full'
+													error={Boolean(form.formState.errors.config?.version)}
+												>
+													<SelectValue placeholder={t('resources.select_version')} />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												{resourceVersions[form.watch('instance')]?.map((version) => (
+													<SelectItem key={version} value={version} className='max-w-full'>
+														{version}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</FormControl>
+								</FormControl>
+
 								<FormMessage />
 							</FormItem>
 						)}

@@ -51,6 +51,9 @@ interface TypesStore {
 	}[];
 	resourceTypes: ResourceType[];
 	isTypesOk: boolean;
+	resourceVersions: {
+		[key: string]: string[];
+	};
 	getAllTypes: () => Promise<Types | APIError>;
 }
 
@@ -105,6 +108,7 @@ const useTypeStore = create<TypesStore>()(
 						type: '',
 					},
 				],
+				resourceVersions: {},
 				isTypesOk: false,
 				resourceTypes: [],
 				getAllTypes: async () => {

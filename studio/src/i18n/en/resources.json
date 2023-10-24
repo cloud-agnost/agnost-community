@@ -105,5 +105,7 @@
 		"certificateAuthority": "Certificate Authority",
 		"publicKey": "Public Key",
 		"certificate": "Certificate"
-	}
+	},
+	"version": "Version",
+	"select_version": "Select Version"
 }

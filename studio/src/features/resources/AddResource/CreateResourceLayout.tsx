@@ -26,13 +26,6 @@ export default function CreateResourceLayout({ children, loading }: Props) {
 	const canCreateResource = useAuthorizeOrg('resource.create');
 	const form = useFormContext();
 
-	const INSTANCE_VERSION_MAP: Record<string, string> = {
-		PostgreSQL: '14',
-		MySQL: '8.0.34',
-		MongoDB: '6.0.4',
-		Redis: '7.2.0',
-		RabbitMQ: '3.12.0',
-	};
 	useEffect(() => {
 		if (form) {
 			form.reset({
@@ -42,9 +35,6 @@ export default function CreateResourceLayout({ children, loading }: Props) {
 				access: {
 					port: INSTANCE_PORT_MAP[resourceConfig.instance],
 					options: [],
-				},
-				config: {
-					version: INSTANCE_VERSION_MAP[resourceConfig.instance],
 				},
 			});
 		}
