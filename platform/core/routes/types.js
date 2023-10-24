@@ -10,6 +10,8 @@ import {
 	phoneAuthSMSProviders,
 	oAuthProviderTypes,
 	authUserDataModel,
+	resourceVersions,
+	ftsIndexLanguages,
 } from "../config/constants.js";
 
 const router = express.Router({ mergeParams: true });
@@ -31,6 +33,8 @@ router.get("/all", authSession, (req, res) => {
 		phoneAuthSMSProviders,
 		oAuthProviderTypes,
 		authUserDataModel,
+		resourceVersions,
+		ftsIndexLanguages,
 	});
 });
 

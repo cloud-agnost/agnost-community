@@ -17,6 +17,21 @@ export class MetaManager {
 	}
 
 	/**
+	 * Resets the cache of META manager
+	 */
+	reset(envObj) {
+		this.envObj = envObj;
+		this.databases = null;
+		this.endpoints = null;
+		this.middlewares = null;
+		this.queues = null;
+		this.tasks = null;
+		this.storages = null;
+		this.functions = null;
+		this.caches = null;
+	}
+
+	/**
 	 * Returns the environment object
 	 */
 	getEnvObj() {

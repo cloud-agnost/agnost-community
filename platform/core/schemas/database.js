@@ -56,6 +56,12 @@ export const DatabaseModel = mongoose.model(
 				immutable: true,
 				default: true,
 			},
+			poolSize: {
+				type: Number,
+				required: true,
+				index: true,
+				default: config.get("general.defaultDBPoolSize"),
+			},
 			schemas: [
 				{
 					iid: {
@@ -195,6 +201,19 @@ export const applyRules = (type) => {
 					.isBoolean()
 					.withMessage(t("Not a valid boolean value"))
 					.toBoolean(),
+				body("poolSize")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.isInt({ min: 1, max: config.get("general.maxDBPoolSize") })
+					.withMessage(
+						t(
+							"Pool size needs to be a positive ingeber between %s-%s",
+							1,
+							config.get("general.maxDBPoolSize")
+						)
+					)
+					.toInt(),
 				body("resourceId")
 					.trim()
 					.notEmpty()
@@ -310,6 +329,19 @@ export const applyRules = (type) => {
 
 						return true;
 					}),
+				body("poolSize")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.isInt({ min: 1, max: config.get("general.maxDBPoolSize") })
+					.withMessage(
+						t(
+							"Pool size needs to be a positive ingeber between %s-%s",
+							1,
+							config.get("general.maxDBPoolSize")
+						)
+					)
+					.toInt(),
 			];
 		default:
 			return [];

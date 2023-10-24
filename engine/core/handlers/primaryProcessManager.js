@@ -50,6 +50,24 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	}
 
 	/**
+	 * Checks to see if there is any resource change in environment configuration
+	 */
+	async hasDBPoolSizeChange() {
+		const oldDbs = await this.loadEntityConfigFile("databases");
+		const newDbs =
+			(await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.databases`)) ?? [];
+
+		// Check to see if there is any change in resource config
+		for (const newDb of newDbs) {
+			const matchingDb = oldDbs.find((entry) => entry.iid === newDb.iid);
+
+			if (matchingDb?.poolSize !== newDb.poolSize) return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Manages the metadata of the api server
 	 */
 	async initializeCore() {
@@ -185,6 +203,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 
 		// Save environment and version info
 		await this.saveEnvConfigFile();
+
 		// Save databases info
 		const databases =
 			(await getKey(`${process.env.AGNOST_ENVIRONMENT_ID}.databases`)) ?? [];

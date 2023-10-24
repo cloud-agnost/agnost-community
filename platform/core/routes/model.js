@@ -755,10 +755,79 @@ router.post(
 				createdBy: user._id,
 			};
 
+			// If field is not searchabled then we should not have a language property
+			if (type === "text" && !req.body.text.searchable) {
+				delete req.body.text.language;
+			} else if (type === "rich-text" && !req.body.richText.searchable) {
+				delete req.body.richText.language;
+			}
+
 			// Assign field specific properties
 			let fieldSpecifcPropName = modelCtrl.getFieldSpecificPropName(type);
 			if (fieldSpecifcPropName) {
 				fieldData[fieldSpecifcPropName] = req.body[fieldSpecifcPropName];
+			}
+
+			// If we are adding a searchable field to MongoDB then we need to add the 'languge' field
+			if (db.type === "MongoDB" && (type === "text" || type === "rich-text")) {
+				let searchable = false;
+				let language = "";
+				if (type === "text") {
+					searchable = req.body.text.searchable;
+					language = req.body.text.language;
+				} else {
+					searchable = req.body.richText.searchable;
+					language = req.body.richText.language;
+				}
+
+				if (searchable) {
+					// Ok the field is searchable, check to see if there is already a system field named language
+					const field = model.fields.find((entry) => entry.name === "language");
+					if (field) {
+						if (field.creator === "user") {
+							modelCtrl.endSession(session);
+							return res.status(422).json({
+								error: t("Not Allowed"),
+								details: t(
+									"Creating a searchable (full-text indexed) field in MongoDB requires a Agnost managed text field named 'language' to be added to the model. There is already a field named 'language' in model '%s' which is not managed by Agnost.",
+									model.name
+								),
+								code: ERROR_CODES.notAllowed,
+							});
+						}
+					} else {
+						// We do not have the language field, lets create it
+						let langFieldData = {
+							_id: helper.generateId(),
+							name: "language",
+							iid: helper.generateSlug("fld"),
+							creator: "system",
+							type: "text",
+							dbType: dbTypeMappings[db.type]["text"],
+							order: modelCtrl.getNewFieldOrderNumber(model),
+							required: true,
+							unique: false,
+							immutable: true,
+							indexed: true,
+							defaultValue: language,
+							text: {
+								searchable: false,
+								maxLength: 32,
+							},
+							createdBy: user._id,
+						};
+
+						await modelCtrl.pushObjectById(
+							model._id,
+							"fields",
+							langFieldData,
+							{
+								updatedBy: req.user._id,
+							},
+							{ cacheKey: model._id, session }
+						);
+					}
+				}
 			}
 
 			// If we are creating a sub-model object or sub-model-list then we need to create the assocaited model also
@@ -930,6 +999,42 @@ router.delete(
 				{ session, cacheKey: model._id }
 			);
 
+			// If do not have any searchable field and have a system manged language field then delete it
+			if (db.type === "MongoDB") {
+				const languageField = updatedModel.fields.find(
+					(entry) => entry.name === "language" && entry.creator === "system"
+				);
+
+				if (languageField) {
+					let hasSearchabledField = false;
+					// Ok we have language field check if it is still needed
+					for (const field of updatedModel.fields) {
+						if (field.type === "text" && field.text?.searchable) {
+							hasSearchabledField = true;
+							break;
+						} else if (
+							field.type === "rich-text" &&
+							field.richText?.searchable
+						) {
+							hasSearchabledField = true;
+							break;
+						}
+					}
+
+					// No more searchable fields, delete the language field
+					if (!hasSearchabledField) {
+						// Delete the field from the models field list
+						updatedModel = await modelCtrl.pullObjectById(
+							model._id,
+							"fields",
+							languageField._id,
+							{ updatedBy: user._id },
+							{ session, cacheKey: model._id }
+						);
+					}
+				}
+			}
+
 			// Commit transaction
 			await modelCtrl.commit(session);
 
@@ -1049,6 +1154,42 @@ router.delete(
 				{ session, cacheKey: model._id }
 			);
 
+			// If do not have any searchable field and have a system manged language field then delete it
+			if (db.type === "MongoDB") {
+				const languageField = updatedModel.fields.find(
+					(entry) => entry.name === "language" && entry.creator === "system"
+				);
+
+				if (languageField) {
+					let hasSearchabledField = false;
+					// Ok we have language field check if it is still needed
+					for (const field of updatedModel.fields) {
+						if (field.type === "text" && field.text?.searchable) {
+							hasSearchabledField = true;
+							break;
+						} else if (
+							field.type === "rich-text" &&
+							field.richText?.searchable
+						) {
+							hasSearchabledField = true;
+							break;
+						}
+					}
+
+					// No more searchable fields, delete the language field
+					if (!hasSearchabledField) {
+						// Delete the field from the models field list
+						updatedModel = await modelCtrl.pullObjectById(
+							model._id,
+							"fields",
+							languageField._id,
+							{ updatedBy: user._id },
+							{ session, cacheKey: model._id }
+						);
+					}
+				}
+			}
+
 			// Commit transaction
 			await modelCtrl.commit(session);
 
@@ -1150,8 +1291,19 @@ router.put(
 					updatedBy: user._id,
 				};
 
-				if (defaultValue && defaultValue !== "$$unset")
+				if (
+					defaultValue !== null &&
+					defaultValue !== undefined &&
+					defaultValue !== "$$unset"
+				)
 					fieldUpdateData["fields.$.defaultValue"] = defaultValue;
+			}
+
+			// If field is not searchabled then we should not have a language property
+			if (field.type === "text" && !req.body.text.searchable) {
+				delete req.body.text.language;
+			} else if (field.type === "rich-text" && !req.body.richText.searchable) {
+				delete req.body.richText.language;
 			}
 
 			// Assign field specific properties, we cannot update field specific properties for object and object-list
@@ -1193,6 +1345,77 @@ router.put(
 						},
 						{},
 						{ session, cacheKey: subModel._id }
+					);
+				}
+			}
+
+			// If do not have any searchable field and have a system manged language field then delete it
+			if (db.type === "MongoDB") {
+				const languageField = updatedModel.fields.find(
+					(entry) => entry.name === "language" && entry.creator === "system"
+				);
+
+				let hasSearchabledField = false;
+				// Ok we have language field check if it is still needed
+				for (const field of updatedModel.fields) {
+					if (field.type === "text" && field.text?.searchable) {
+						hasSearchabledField = true;
+						break;
+					} else if (field.type === "rich-text" && field.richText?.searchable) {
+						hasSearchabledField = true;
+						break;
+					}
+				}
+
+				if (languageField) {
+					// No more searchable fields, delete the language field
+					if (!hasSearchabledField) {
+						// Delete the field from the models field list
+						updatedModel = await modelCtrl.pullObjectById(
+							model._id,
+							"fields",
+							languageField._id,
+							{ updatedBy: user._id },
+							{ session, cacheKey: model._id }
+						);
+					}
+				} else if (
+					hasSearchabledField &&
+					(field.type === "text" || field.type === "rich-text")
+				) {
+					// Ok this seems a field has been marked as searchable
+					// We do not have the language field, lets create it
+					let langFieldData = {
+						_id: helper.generateId(),
+						name: "language",
+						iid: helper.generateSlug("fld"),
+						creator: "system",
+						type: "text",
+						dbType: dbTypeMappings[db.type]["text"],
+						order: modelCtrl.getNewFieldOrderNumber(model),
+						required: true,
+						unique: false,
+						immutable: true,
+						indexed: true,
+						defaultValue:
+							field.type === "text"
+								? field.text.language
+								: field.richText.language,
+						text: {
+							searchable: false,
+							maxLength: 32,
+						},
+						createdBy: user._id,
+					};
+
+					updatedModel = await modelCtrl.pushObjectById(
+						model._id,
+						"fields",
+						langFieldData,
+						{
+							updatedBy: req.user._id,
+						},
+						{ cacheKey: model._id, session }
 					);
 				}
 			}

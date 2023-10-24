@@ -54,6 +54,8 @@
         "minPwdLength": 6,
         "maxPwdLength": 50,
         "defaultTokenExpiryDuration": 3600,
-        "expressSessionSecret": "f7A95f08.62d2*4c4c!b85c%734149347fcf"
+        "expressSessionSecret": "f7A95f08.62d2*4c4c!b85c%734149347fcf",
+        "maxBackoffSeconds": 30,
+        "defaultDBPoolSize": 3
      }
 }

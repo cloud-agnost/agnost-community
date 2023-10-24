@@ -6,8 +6,11 @@ import { SQLDatabase } from "./SQLDatabase.js";
 export class PostgreSQL extends SQLDatabase {
 	constructor(driver) {
 		super();
+		// Driver is the pool of PostgreSQL connections
 		this.driver = driver;
 		this.inTransaction = false;
+		// Individual PostgreSQL connection used for the transaction
+		this.connection = null;
 	}
 
 	async disconnect() {
@@ -20,7 +23,9 @@ export class PostgreSQL extends SQLDatabase {
 	 * Returns the database driver
 	 */
 	getDriver() {
-		return this.driver;
+		// If the adapter is in transaction then return the transaction executing connection otherwise return the driver
+		if (this.inTransaction) return this.connection;
+		else return this.driver;
 	}
 
 	/**
@@ -29,8 +34,10 @@ export class PostgreSQL extends SQLDatabase {
 	async beginTransaction(dbMeta) {
 		if (this.inTransaction) return;
 
+		// Acquire a client from the pool
+		this.connection = await this.driver.connect();
 		// Start the transaction
-		await this.driver.query("BEGIN");
+		await this.connection.query("BEGIN");
 		this.inTransaction = true;
 	}
 
@@ -39,8 +46,9 @@ export class PostgreSQL extends SQLDatabase {
 	 */
 	async commitTransaction(dbMeta) {
 		if (this.inTransaction) {
-			await this.driver.query("COMMIT");
+			await this.connection.query("COMMIT");
 			this.inTransaction = false;
+			this.connection.release();
 		}
 	}
 
@@ -49,8 +57,9 @@ export class PostgreSQL extends SQLDatabase {
 	 */
 	async rollbackTransaction(dbMeta) {
 		if (this.inTransaction) {
-			await this.driver.query("ROLLBACK");
+			await this.connection.query("ROLLBACK");
 			this.inTransaction = false;
+			this.connection.release();
 		}
 	}
 
@@ -134,20 +143,31 @@ export class PostgreSQL extends SQLDatabase {
 						) AS ${joinDef.as}`
 					);
 				} else if (joinDef.joinType === "complex") {
+					// This is a complex lookup
+					const orderBy = this.getOrderByDefinition(joinDef.sort);
+					const limit = joinDef.limit ?? null;
+					const offset = joinDef.skip ?? null;
+
 					selectEntries.push(
 						`COALESCE(
-						(
-							SELECT json_agg(${this.getJsonBuildObjectString(
-								joinDef.as,
-								joinedModelMeta.fields,
-								null,
-								false
-							)})
-							FROM ${this.getTableName(dbMeta, joinedModelMeta)} AS ${joinDef.as}
-							WHERE ${joinDef.where.getQuery("PostgreSQL")}
-						),
-						'[]'::json
-					) AS ${joinDef.as}`
+							(
+								SELECT json_agg(${this.getJsonBuildObjectString(
+									joinDef.as,
+									joinedModelMeta.fields,
+									null,
+									false
+								)})
+								FROM (
+									SELECT ${joinDef.as}.*
+									FROM ${this.getTableName(dbMeta, joinedModelMeta)} AS ${joinDef.as}
+									WHERE ${joinDef.where.getQuery("PostgreSQL")}
+									${orderBy ? `ORDER BY ${orderBy}` : ""}
+									${limit ? `LIMIT ${limit}` : ""}
+									${offset ? `OFFSET ${offset}` : ""}
+								) AS ${joinDef.as}
+							),
+							'[]'::json
+						) AS ${joinDef.as}`
 					);
 				}
 			}
@@ -213,6 +233,11 @@ export class PostgreSQL extends SQLDatabase {
 					) AS ${joinDef.as}`
 				);
 			} else if (joinDef.joinType === "complex") {
+				// This is a complex lookup
+				const orderBy = this.getOrderByDefinition(joinDef.sort);
+				const limit = joinDef.limit ?? null;
+				const offset = joinDef.skip ?? null;
+
 				selectEntries.push(
 					`COALESCE(
 						(
@@ -222,8 +247,14 @@ export class PostgreSQL extends SQLDatabase {
 								list,
 								include
 							)})
-							FROM ${this.getTableName(dbMeta, joinedModelMeta)} AS ${joinDef.as}
-							WHERE ${joinDef.where.getQuery("PostgreSQL")}
+							FROM (
+								SELECT ${joinDef.as}.*
+								FROM ${this.getTableName(dbMeta, joinedModelMeta)} AS ${joinDef.as}
+								WHERE ${joinDef.where.getQuery("PostgreSQL")}
+								${orderBy ? `ORDER BY ${orderBy}` : ""}
+								${limit ? `LIMIT ${limit}` : ""}
+								${offset ? `OFFSET ${offset}` : ""}
+							) AS ${joinDef.as}
 						),
 						'[]'::json
 					) AS ${joinDef.as}`
@@ -402,7 +433,7 @@ export class PostgreSQL extends SQLDatabase {
 		console.log("***values", values);
 
 		// Execute the INSERT query
-		const result = await this.driver.query(insertQuery, values);
+		const result = await this.getDriver().query(insertQuery, values);
 
 		return result.rows && result.rows.length > 0 ? result.rows[0] : null;
 	}
@@ -435,7 +466,7 @@ export class PostgreSQL extends SQLDatabase {
 			console.log("***values", values);
 
 			// Execute the INSERT query
-			const result = await this.driver.query(insertQuery, values);
+			const result = await this.getDriver().query(insertQuery, values);
 			await this.commitTransaction(dbMeta);
 
 			return { count: result.rowCount };
@@ -472,7 +503,7 @@ export class PostgreSQL extends SQLDatabase {
 		console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
-		const result = await this.driver.query(selectQuery);
+		const result = await this.getDriver().query(selectQuery);
 
 		return result.rows && result.rows.length > 0 ? result.rows[0] : null;
 	}
@@ -515,7 +546,7 @@ export class PostgreSQL extends SQLDatabase {
 		console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
-		const result = await this.driver.query(selectQuery);
+		const result = await this.getDriver().query(selectQuery);
 
 		return result.rows && result.rows.length > 0 ? result.rows[0] : null;
 	}
@@ -559,7 +590,7 @@ export class PostgreSQL extends SQLDatabase {
 		console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
-		const result = await this.driver.query(selectQuery);
+		const result = await this.getDriver().query(selectQuery);
 
 		return result.rows && result.rows.length > 0 ? result.rows : [];
 	}
@@ -584,7 +615,7 @@ export class PostgreSQL extends SQLDatabase {
 		console.log("***sql", deleteQuery);
 
 		// Execute the DELETE query
-		const result = await this.driver.query(deleteQuery);
+		const result = await this.getDriver().query(deleteQuery);
 
 		return { count: result.rowCount };
 	}
@@ -619,7 +650,7 @@ export class PostgreSQL extends SQLDatabase {
 		console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
-		const result = await this.driver.query(selectQuery);
+		const result = await this.getDriver().query(selectQuery);
 
 		const id =
 			result.rows && result.rows.length > 0
@@ -661,7 +692,7 @@ export class PostgreSQL extends SQLDatabase {
 		console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
-		const selectResult = await this.driver.query(selectQuery);
+		const selectResult = await this.getDriver().query(selectQuery);
 		const rows =
 			selectResult.rows && selectResult.rows.length > 0
 				? selectResult.rows
@@ -681,7 +712,7 @@ export class PostgreSQL extends SQLDatabase {
 		console.log("***sql", deleteQuery);
 
 		// Execute the DELETE query
-		const result = await this.driver.query(deleteQuery);
+		const result = await this.getDriver().query(deleteQuery);
 
 		return { count: result.rowCount };
 	}
@@ -719,7 +750,7 @@ export class PostgreSQL extends SQLDatabase {
 		console.log("***values", values);
 
 		// Execute the UPDATE query
-		const result = await this.driver.query(updateQuery, values);
+		const result = await this.getDriver().query(updateQuery, values);
 
 		return result.rows && result.rows.length > 0 ? result.rows[0] : null;
 	}
@@ -754,7 +785,7 @@ export class PostgreSQL extends SQLDatabase {
 		console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
-		const result = await this.driver.query(selectQuery);
+		const result = await this.getDriver().query(selectQuery);
 
 		const id =
 			result.rows && result.rows.length > 0
@@ -796,7 +827,7 @@ export class PostgreSQL extends SQLDatabase {
 		console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
-		const selectResult = await this.driver.query(selectQuery);
+		const selectResult = await this.getDriver().query(selectQuery);
 		const rows =
 			selectResult.rows && selectResult.rows.length > 0
 				? selectResult.rows
@@ -822,7 +853,7 @@ export class PostgreSQL extends SQLDatabase {
 		console.log("***values", values);
 
 		// Execute the UPDATE query
-		const result = await this.driver.query(updateQuery, values);
+		const result = await this.getDriver().query(updateQuery, values);
 
 		return { count: result.rowCount };
 	}

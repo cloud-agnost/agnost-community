@@ -48,8 +48,10 @@ export const manageAPIServerHandler = (connection, envId) => {
 						const manager = new PrimaryProcessDeploymentManager(msgObj, envObj);
 						// Check to see if resources have changed or not and whether we are dedeploying the version, if not we can update the child process faster, no need to kill it
 						const hasResourceChange = await manager.hasResourceChange();
+						const hasDBPoolSizeChange = await manager.hasDBPoolSizeChange();
 						if (
 							hasResourceChange ||
+							hasDBPoolSizeChange ||
 							msgObj.subAction === "deploy" ||
 							msgObj.subAction === "redeploy" ||
 							updateCount >= config.get("general.maxUpdatesBeforeRestart")

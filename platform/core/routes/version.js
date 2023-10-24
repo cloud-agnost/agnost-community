@@ -7,8 +7,15 @@ import envCtrl from "../controllers/environment.js";
 import deployCtrl from "../controllers/deployment.js";
 import resourceCtrl from "../controllers/resource.js";
 import auditCtrl from "../controllers/audit.js";
-import epCtrl from "../controllers/endpoint.js";
 import modelCtrl from "../controllers/model.js";
+import dbCtrl from "../controllers/database.js";
+import cacheCtrl from "../controllers/cache.js";
+import storageCtrl from "../controllers/storage.js";
+import epCtrl from "../controllers/endpoint.js";
+import mwCtrl from "../controllers/middleware.js";
+import funcCtrl from "../controllers/function.js";
+import queueCtrl from "../controllers/queue.js";
+import taskCtrl from "../controllers/task.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
@@ -283,6 +290,79 @@ router.get(
 			const { version } = req;
 
 			res.json(version);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/dashboard
+@method     GET
+@desc       Get the app versions summarized dashboard data
+@access     private
+*/
+router.get(
+	"/:versionId/dashboard",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.view"),
+	async (req, res) => {
+		try {
+			const { version } = req;
+
+			const dbs = await dbCtrl.getManyByQuery(
+				{ versionId: version._id },
+				{ projection: { _id: 1 } }
+			);
+
+			const caches = await cacheCtrl.getManyByQuery(
+				{ versionId: version._id },
+				{ projection: { _id: 1 } }
+			);
+
+			const storages = await storageCtrl.getManyByQuery(
+				{ versionId: version._id },
+				{ projection: { _id: 1 } }
+			);
+
+			const eps = await epCtrl.getManyByQuery(
+				{ versionId: version._id },
+				{ projection: { _id: 1 } }
+			);
+
+			const mws = await mwCtrl.getManyByQuery(
+				{ versionId: version._id },
+				{ projection: { _id: 1 } }
+			);
+
+			const funcs = await funcCtrl.getManyByQuery(
+				{ versionId: version._id },
+				{ projection: { _id: 1 } }
+			);
+
+			const queues = await queueCtrl.getManyByQuery(
+				{ versionId: version._id },
+				{ projection: { _id: 1 } }
+			);
+
+			const tasks = await taskCtrl.getManyByQuery(
+				{ versionId: version._id },
+				{ projection: { _id: 1 } }
+			);
+
+			res.json({
+				databases: dbs.length,
+				caches: caches.length,
+				storages: storages.length,
+				endpoints: eps.length,
+				middlewares: mws.length,
+				funcs: funcs.length,
+				queues: queues.length,
+				tasks: tasks.length,
+			});
 		} catch (err) {
 			handleError(req, res, err);
 		}

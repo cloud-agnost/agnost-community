@@ -30,6 +30,25 @@ export class AdapterManager {
 		this.functionAdapter = new FunctionAdapter(this);
 		this.realtimeAdapter = new RealtimeAdapter(this);
 		this.query = null;
+		this.retries = new Map();
+	}
+
+	getRetryCount(identifier) {
+		const retry = this.retries.get(identifier);
+		if (retry === undefined || retry === null) {
+			this.retries.set(identifier, 0);
+			return 0;
+		}
+		return retry;
+	}
+
+	resetRetryCount(identifier) {
+		this.retries.set(identifier, 0);
+	}
+
+	incrementRetryCount(identifier) {
+		const retry = this.getRetryCount(identifier);
+		this.retries.set(++retry);
 	}
 
 	setModuleLoaderQuery(query) {
@@ -276,22 +295,23 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, accessReadOnly, iid, instance, type, name } = resource;
+			const { access, accessReadOnly, iid, instance, type, name, config } =
+				resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
-			const client = new pg.Client({
+			// Create a pool of connections
+			const pool = new pg.Pool({
 				...helper.getAsObject(connSettings.options),
 				host: connSettings.host,
 				port: connSettings.port,
 				user: connSettings.username,
 				password: connSettings.password,
 				database: connSettings.dbName,
+				max: resource.config.poolSize,
 			});
 
-			await client.connect();
-			client.on("error", (err) => {});
-			client.on("end", () => {});
+			pool.on("error", (err, errClient) => {});
 
 			const adapterObj = {
 				name,
@@ -299,7 +319,7 @@ export class AdapterManager {
 				instance,
 				iid,
 				readOnly: false,
-				adapter: new PostgreSQL(client),
+				adapter: new PostgreSQL(pool),
 				slaves: [],
 			};
 
@@ -311,17 +331,18 @@ export class AdapterManager {
 					let config = accessReadOnly[i];
 
 					try {
-						const slaveClient = new pg.Client({
+						// Create a pool of connections
+						const slavePool = new pg.Pool({
 							...helper.getAsObject(config.options),
 							host: config.host,
 							port: config.port,
 							user: config.username,
 							password: config.password,
 							database: config.dbName,
+							max: resource.config.poolSize,
 						});
 
-						await slaveClient.connect();
-						slaveClient.on("error", (err) => {});
+						slavePool.on("error", (err, errClient) => {});
 
 						adapterObj.slaves.push({
 							name,
@@ -329,7 +350,7 @@ export class AdapterManager {
 							instance,
 							iid,
 							readOnly: true,
-							adapter: new PostgreSQL(slaveClient),
+							adapter: new PostgreSQL(slavePool),
 						});
 					} catch (err) {}
 				}
@@ -352,16 +373,15 @@ export class AdapterManager {
 			let connSettings = access;
 			if (!connSettings) return;
 
-			const client = await mysql.createConnection({
+			const pool = mysql.createPool({
 				...helper.getAsObject(connSettings.options),
 				host: connSettings.host,
 				port: connSettings.port,
 				user: connSettings.username,
 				password: connSettings.password,
 				database: connSettings.dbName,
+				connectionLimit: resource.config.poolSize,
 			});
-
-			client.on("error", (err) => {});
 
 			const adapterObj = {
 				name,
@@ -369,7 +389,7 @@ export class AdapterManager {
 				instance,
 				iid,
 				readOnly: false,
-				adapter: new MySQL(client),
+				adapter: new MySQL(pool),
 				slaves: [],
 			};
 
@@ -381,16 +401,15 @@ export class AdapterManager {
 					let config = accessReadOnly[i];
 
 					try {
-						const slaveClient = await mysql.createConnection({
+						const slavePool = mysql.createPool({
 							...helper.getAsObject(config.options),
 							host: config.host,
 							port: config.port,
 							user: config.username,
 							password: config.password,
 							database: config.dbName,
+							connectionLimit: resource.config.poolSize,
 						});
-
-						slaveClient.on("error", (err) => {});
 
 						adapterObj.slaves.push({
 							name,
@@ -398,7 +417,7 @@ export class AdapterManager {
 							instance,
 							iid,
 							readOnly: true,
-							adapter: new MySQL(slaveClient),
+							adapter: new MySQL(slavePool),
 						});
 					} catch (err) {}
 				}
@@ -421,7 +440,7 @@ export class AdapterManager {
 			let connSettings = access;
 			if (!connSettings) return;
 
-			const client = await mssql.connect({
+			const pool = new mssql.ConnectionPool({
 				...helper.getAsObject(connSettings.options),
 				server: connSettings.host,
 				port: connSettings.port,
@@ -429,7 +448,13 @@ export class AdapterManager {
 				password: connSettings.password,
 				database: connSettings.dbName,
 				encrypt: connSettings.encrypt ?? false,
+				pool: {
+					max: resource.config.poolSize,
+				},
 			});
+
+			await pool.connect();
+			pool.on("error", (err) => {});
 
 			const adapterObj = {
 				name,
@@ -437,7 +462,7 @@ export class AdapterManager {
 				instance,
 				iid,
 				readOnly: false,
-				adapter: new SQLServer(client),
+				adapter: new SQLServer(pool),
 				slaves: [],
 			};
 
@@ -449,7 +474,7 @@ export class AdapterManager {
 					let config = accessReadOnly[i];
 
 					try {
-						const slaveClient = await mssql.connect({
+						const slavePool = new mssql.ConnectionPool({
 							...helper.getAsObject(config.options),
 							host: config.host,
 							port: config.port,
@@ -458,13 +483,16 @@ export class AdapterManager {
 							database: config.dbName,
 						});
 
+						await slavePool.connect();
+						slavePool.on("error", (err) => {});
+
 						adapterObj.slaves.push({
 							name,
 							type,
 							instance,
 							iid,
 							readOnly: true,
-							adapter: new SQLServer(slaveClient),
+							adapter: new SQLServer(slavePool),
 						});
 					} catch (err) {}
 				}
@@ -483,7 +511,7 @@ export class AdapterManager {
 		if (adapterObj) return;
 
 		try {
-			const { access, iid, instance, type, name } = resource;
+			const { access, iid, instance, type, name, config } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -509,6 +537,7 @@ export class AdapterManager {
 						username: connSettings.username,
 						password: connSettings.password,
 					},
+					minPoolSize: config.poolSize,
 				});
 			} else {
 				let uri = `mongodb+srv://${connSettings.host}`;
@@ -521,11 +550,13 @@ export class AdapterManager {
 						username: connSettings.username,
 						password: connSettings.password,
 					},
+					minPoolSize: config.poolSize,
 				});
 			}
 
 			// Connect to the database of the application
 			await client.connect();
+			client.on("error", (err) => {});
 
 			const adapterObj = {
 				name,

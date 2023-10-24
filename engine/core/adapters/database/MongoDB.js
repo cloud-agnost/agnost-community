@@ -869,7 +869,7 @@ export class MongoDB extends DatabaseBase {
 			this.createLimitStage(options.limit, pipeline);
 			this.createProjectStage(options.select, options.omit, pipeline);
 
-			console.stdlog("***pipeline", JSON.stringify(pipeline, null, 2));
+			// console.log("***pipeline", JSON.stringify(pipeline, null, 2));
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
@@ -1179,7 +1179,8 @@ export class MongoDB extends DatabaseBase {
 		this.createLimitStage(options.limit, pipeline);
 		this.createProjectStage(options.select, options.omit, pipeline);
 
-		console.stdlog("***pipeline", JSON.stringify(pipeline, null, 2));
+		// console.log("***pipeline", JSON.stringify(pipeline, null, 2));
+
 		const dataCursor = await collection.aggregate(pipeline, {
 			allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
 			raw: false, // Whether to return document results as raw BSON buffers

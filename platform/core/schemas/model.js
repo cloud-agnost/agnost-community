@@ -142,11 +142,17 @@ export const ModelModel = mongoose.model(
 						maxLength: {
 							type: Number,
 						},
+						language: {
+							type: String,
+						},
 					},
 					richText: {
 						//If searchable is true then a text index is created (wip, not implemented yet)
 						searchable: {
 							type: Boolean,
+						},
+						language: {
+							type: String,
 						},
 					},
 					encryptedText: {
