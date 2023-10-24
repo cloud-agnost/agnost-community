@@ -1,10 +1,10 @@
 import { Button } from '@/components/Button';
 import { VERSION_DROPDOWN_ITEM } from '@/constants';
+import { useToast } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { APIError, TabTypes } from '@/types';
-import { generateId } from '@/utils';
+import { APIError } from '@/types';
 import { CaretUpDown, LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ConfirmationModal } from 'components/ConfirmationModal';
 import {
@@ -19,11 +19,10 @@ import { Fragment, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import './versionDropdown.scss';
-import { useToast } from '@/hooks';
 export default function VersionDropdown() {
 	const [open, setOpen] = useState(false);
 	const { notify } = useToast();
-	const { version, getVersionDashboardPath } = useVersionStore();
+	const { version } = useVersionStore();
 	const { t } = useTranslation();
 	const [error, setError] = useState<null | APIError>(null);
 	const [loading, setLoading] = useState(false);

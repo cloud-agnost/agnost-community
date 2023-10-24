@@ -32,14 +32,14 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	},
 	{
 		id: 'name',
-		header: translate('general.name').toUpperCase(),
+		header: translate('general.name'),
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 		size: 300,
 	},
 	{
 		id: 'status',
-		header: translate('general.status').toUpperCase(),
+		header: translate('general.status'),
 		accessorKey: 'status',
 		sortingFn: 'textCaseSensitive',
 		size: 100,
@@ -48,14 +48,12 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 				original: { status },
 			},
 		}) => {
-			return (
-				<Badge variant={BADGE_COLOR_MAP[status.toUpperCase()]} text={capitalize(status)} rounded />
-			);
+			return <Badge variant={BADGE_COLOR_MAP[status]} text={capitalize(status)} rounded />;
 		},
 	},
 	{
 		id: 'duration',
-		header: translate('version.response_time').toUpperCase(),
+		header: translate('version.response_time'),
 		accessorKey: 'duration',
 		sortingFn: 'textCaseSensitive',
 		size: 100,

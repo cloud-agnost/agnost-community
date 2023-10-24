@@ -35,9 +35,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 		cell: ({
@@ -51,9 +49,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	},
 	{
 		id: 'value',
-		header: ({ column }) => (
-			<SortButton text={translate('general.value').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.value')} column={column} />,
 		accessorKey: 'value',
 		sortingFn: 'textCaseSensitive',
 		cell: ({
@@ -69,7 +65,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.created_at').toUpperCase()}
+				text={translate('general.created_at')}
 				column={column}
 			/>
 		),
@@ -92,7 +88,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
-				text={translate('general.updated_at').toUpperCase()}
+				text={translate('general.updated_at')}
 				column={column}
 			/>
 		),

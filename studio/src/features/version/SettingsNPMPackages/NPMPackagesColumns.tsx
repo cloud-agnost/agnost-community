@@ -36,23 +36,19 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 	},
 	{
 		id: 'version',
-		header: translate('general.version').toUpperCase(),
+		header: translate('general.version'),
 		accessorKey: 'version',
 		sortingFn: 'textCaseSensitive',
 	},
 	{
 		id: 'created_at',
-		header: ({ column }) => (
-			<SortButton text={translate('general.created_at').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
 		accessorKey: 'created_at',
 		enableSorting: true,
 		sortingFn: 'datetime',

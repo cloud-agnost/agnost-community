@@ -13,9 +13,7 @@ import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from 'compon
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('general.name').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -33,9 +31,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'type',
-		header: ({ column }) => (
-			<SortButton text={translate('general.type').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.type')} column={column} />,
 		accessorKey: 'type',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -55,9 +51,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'managed',
-		header: ({ column }) => (
-			<SortButton text={translate('general.managed').toUpperCase()} column={column} />
-		),
+		header: ({ column }) => <SortButton text={translate('general.managed')} column={column} />,
 		accessorKey: 'managed',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
