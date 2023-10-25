@@ -47,7 +47,7 @@ export default function ReadReplicas() {
 
 	function removeReplica(index: number) {
 		const filteredReplicas = readReplicas.filter((_, i) => i !== index);
-		reset({ accessReadOnly: filteredReplicas });
+		reset({ ...getValues(), accessReadOnly: filteredReplicas });
 	}
 	function editReplica(index: number) {
 		const replica = readReplicas[index];
