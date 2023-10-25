@@ -132,7 +132,7 @@ export const MENU_ITEMS = [
 	},
 	{
 		title: 'Docs',
-		url: '/docs',
+		url: 'https://agnost.dev/docs/installation/installation-minikube',
 		icon: FileText,
 	},
 ];

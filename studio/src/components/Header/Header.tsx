@@ -42,7 +42,13 @@ export function Header() {
 				<nav className='header-menu-right-nav'>
 					<Feedback />
 					{MENU_ITEMS.map((item, index) => (
-						<Link className='header-menu-right-nav-item' key={index} to={item.url}>
+						<Link
+							className='header-menu-right-nav-item'
+							key={index}
+							to={item.url}
+							target='_blank'
+							rel='noopener noreferrer'
+						>
 							<span className='header-menu-right-nav-item-icon'>
 								<item.icon />
 							</span>
