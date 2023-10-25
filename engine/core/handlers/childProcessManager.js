@@ -589,11 +589,20 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			["PostgreSQL", "MySQL", "SQL Server", "MongoDB"].includes(entry.type)
 		);
 
+		console.log(
+			"***dbs",
+			dbs.map((entry) => entry.name)
+		);
+
 		for (const db of dbs) {
 			// First find the corresponding resource mapping
 			const mapping = this.getResourceMappings().find(
 				(entry) => entry.design.iid === db.iid
 			);
+
+			if (!mapping) continue;
+
+			//console.log("***here", mapping);
 
 			// Get the resource corresponding to this mapping
 			const resource = this.getResources().find(

@@ -54,8 +54,8 @@
 				const n = r(7602),
 					i = r(6120),
 					a = r(6760),
-					o = r(9634),
-					s = r(665),
+					s = r(9634),
+					o = r(665),
 					u = r(9949),
 					l = r(2847),
 					d = r(4079),
@@ -103,7 +103,7 @@
 						const t = this.managers.get(`task-${e}`);
 						if (t) return t;
 						{
-							const t = new o.Task(this.metaManager, this.adapterManager, e);
+							const t = new s.Task(this.metaManager, this.adapterManager, e);
 							return this.managers.set(`task-${e}`, t), t;
 						}
 					}
@@ -114,10 +114,9 @@
 								"Database name needs to be a string value"
 							);
 						const t = this.managers.get(`db-${e}`);
-						if (t) return console.log("*******EXISTING DB ********"), t;
+						if (t) return t;
 						{
-							console.log("*******NEW DB ********");
-							const t = new s.Database(
+							const t = new o.Database(
 								this.metaManager,
 								this.adapterManager,
 								e
@@ -230,8 +229,8 @@
 					(t.FunctionManager = void 0);
 				const i = n(r(5581)),
 					a = n(r(7013)),
-					o = n(r(3188)),
-					s = n(r(9225)),
+					s = n(r(3188)),
+					o = n(r(9225)),
 					u = n(r(9080)),
 					l = n(r(4021)),
 					d = n(r(2998)),
@@ -242,41 +241,41 @@
 					y = n(r(711)),
 					m = n(r(3510)),
 					g = n(r(2327)),
-					v = n(r(9674)),
-					T = n(r(5850)),
-					b = n(r(1946)),
-					E = n(r(3115)),
+					T = n(r(9674)),
+					v = n(r(5850)),
+					E = n(r(1946)),
+					b = n(r(3115)),
 					w = n(r(5616)),
-					_ = n(r(7934)),
-					R = n(r(6489)),
+					R = n(r(7934)),
+					_ = n(r(6489)),
 					M = n(r(2237)),
 					O = n(r(9660)),
-					$ = n(r(3481)),
-					B = n(r(789)),
-					P = n(r(6587)),
-					x = n(r(7267)),
-					j = n(r(6835)),
-					C = n(r(5191)),
-					D = n(r(2115)),
-					A = n(r(6509)),
-					F = n(r(4207)),
-					N = n(r(6032)),
-					I = n(r(2228)),
-					S = n(r(6683)),
-					Q = n(r(587)),
-					L = n(r(5102)),
-					k = n(r(4175)),
-					U = n(r(929)),
-					Y = n(r(1021)),
+					P = n(r(3481)),
+					$ = n(r(789)),
+					B = n(r(6587)),
+					S = n(r(7267)),
+					D = n(r(6835)),
+					A = n(r(5191)),
+					Q = n(r(2115)),
+					C = n(r(6509)),
+					N = n(r(4207)),
+					x = n(r(6032)),
+					j = n(r(2228)),
+					L = n(r(6683)),
+					F = n(r(587)),
+					I = n(r(5102)),
+					Y = n(r(4175)),
+					k = n(r(929)),
+					U = n(r(1021)),
 					V = n(r(1401)),
-					q = n(r(6222)),
-					G = n(r(5331)),
+					G = n(r(6222)),
+					q = n(r(5331)),
 					J = n(r(3236)),
-					K = n(r(2970)),
-					X = n(r(6903)),
+					X = n(r(2970)),
+					K = n(r(6903)),
 					W = n(r(1421)),
-					z = n(r(8354)),
-					H = n(r(9135)),
+					H = n(r(8354)),
+					z = n(r(9135)),
 					Z = n(r(7665)),
 					ee = n(r(3221)),
 					te = n(r(6308)),
@@ -284,8 +283,8 @@
 					ne = n(r(8374)),
 					ie = n(r(6743)),
 					ae = n(r(3725)),
-					oe = n(r(1357)),
-					se = n(r(2415)),
+					se = n(r(1357)),
+					oe = n(r(2415)),
 					ue = n(r(923)),
 					le = n(r(8949)),
 					de = n(r(6336)),
@@ -296,19 +295,20 @@
 					ye = n(r(4232)),
 					me = n(r(4617)),
 					ge = n(r(5160)),
+					Te = n(r(1723)),
 					ve = n(r(3057)),
-					Te = n(r(6923)),
+					Ee = n(r(6923)),
 					be = n(r(8051)),
-					Ee = n(r(4184)),
-					we = n(r(6768)),
+					we = n(r(4184)),
+					Re = n(r(6768)),
 					_e = n(r(6735)),
-					Re = n(r(107)),
-					Me = n(r(4997));
+					Me = n(r(107)),
+					Oe = n(r(4997));
 				t.FunctionManager = {
 					$abs: i.default,
 					$add: a.default,
-					$and: o.default,
-					$ceil: s.default,
+					$and: s.default,
+					$ceil: o.default,
 					$charindex: u.default,
 					$concat: l.default,
 					$divide: d.default,
@@ -319,41 +319,41 @@
 					$gt: y.default,
 					$gte: m.default,
 					$in: g.default,
-					$includes: v.default,
-					$left: T.default,
-					$length: b.default,
-					$lower: E.default,
+					$includes: T.default,
+					$left: v.default,
+					$length: E.default,
+					$lower: b.default,
 					$lt: w.default,
-					$lte: _.default,
-					$ltrim: R.default,
+					$lte: R.default,
+					$ltrim: _.default,
 					$mod: M.default,
 					$multiply: O.default,
-					$neq: $.default,
-					$nin: B.default,
-					$not: P.default,
-					$or: x.default,
-					$right: j.default,
-					$round: C.default,
-					$rtrim: D.default,
-					$sqrt: A.default,
-					$startswith: F.default,
-					$substring: N.default,
-					$subtract: I.default,
-					$trim: S.default,
-					$upper: Q.default,
-					$size: L.default,
-					$exp: k.default,
-					$ln: U.default,
-					$log: Y.default,
+					$neq: P.default,
+					$nin: $.default,
+					$not: B.default,
+					$or: S.default,
+					$right: D.default,
+					$round: A.default,
+					$rtrim: Q.default,
+					$sqrt: C.default,
+					$startswith: N.default,
+					$substring: x.default,
+					$subtract: j.default,
+					$trim: L.default,
+					$upper: F.default,
+					$size: I.default,
+					$exp: Y.default,
+					$ln: k.default,
+					$log: U.default,
 					$log10: V.default,
-					$pow: q.default,
-					$sin: G.default,
+					$pow: G.default,
+					$sin: q.default,
 					$cos: J.default,
-					$tan: K.default,
-					$sinh: X.default,
+					$tan: X.default,
+					$sinh: K.default,
 					$cosh: W.default,
-					$tanh: z.default,
-					$asin: H.default,
+					$tanh: H.default,
+					$asin: z.default,
 					$acos: Z.default,
 					$atan: ee.default,
 					$atan2: te.default,
@@ -361,8 +361,8 @@
 					$acosh: ne.default,
 					$atanh: ie.default,
 					$radians: ae.default,
-					$degrees: oe.default,
-					$dateadd: se.default,
+					$degrees: se.default,
+					$dateadd: oe.default,
 					$datediff: ue.default,
 					$hour: le.default,
 					$minute: de.default,
@@ -373,14 +373,15 @@
 					$dayofweek: ye.default,
 					$dayofyear: me.default,
 					$strtodate: ge.default,
+					$now: Te.default,
 					$todecimal: ve.default,
-					$toboolean: Te.default,
+					$toboolean: Ee.default,
 					$tointeger: be.default,
-					$todate: Ee.default,
-					$tostring: we.default,
+					$todate: we.default,
+					$tostring: Re.default,
 					$toobjectid: _e.default,
-					$distance: Re.default,
-					$point: Me.default,
+					$distance: Me.default,
+					$point: Oe.default,
 				};
 			},
 			5145: (e, t, r) => {
@@ -389,7 +390,7 @@
 				const n = r(6098),
 					i = r(9307),
 					a = r(990);
-				class o extends n.Expression {
+				class s extends n.Expression {
 					constructor(e, t) {
 						super(),
 							(this.name = e),
@@ -422,7 +423,8 @@
 							);
 						if (
 							t !== this.definition.paramCount &&
-							-1 !== this.definition.paramCount
+							-1 !== this.definition.paramCount &&
+							"now" !== this.name
 						)
 							throw new a.ClientError(
 								"invalid_parameter",
@@ -431,15 +433,15 @@
 						for (let t = 0; t < this.parameters.length; t++) {
 							const r = this.parameters[t],
 								n = r.getReturnType(),
-								o = Array.isArray(this.definition.params)
+								s = Array.isArray(this.definition.params)
 									? this.definition.params[t]
 									: this.definition.params;
 							if (
-								o !== i.ReturnType.ANY &&
-								((o !== i.ReturnType.DATE && o !== i.ReturnType.DATETIME) ||
+								s !== i.ReturnType.ANY &&
+								((s !== i.ReturnType.DATE && s !== i.ReturnType.DATETIME) ||
 									(n !== i.ReturnType.DATE && n !== i.ReturnType.DATETIME))
 							) {
-								if (o === i.ReturnType.PRIMITIVE) {
+								if (s === i.ReturnType.PRIMITIVE) {
 									if (
 										[
 											i.ReturnType.OBJECT,
@@ -453,12 +455,12 @@
 											`Function '${
 												this.name
 											}' expects a '${this.getReturnTypeText(
-												o
+												s
 											)}' input for parameter #${
 												t + 1
 											} but received '${this.getReturnTypeText(n)}'.`
 										);
-								} else if (o === i.ReturnType.STATICBOOLEAN) {
+								} else if (s === i.ReturnType.STATICBOOLEAN) {
 									if (
 										n !== i.ReturnType.BOOLEAN &&
 										r.getExpressionType() !== i.ExpressionType.STATIC
@@ -471,13 +473,13 @@
 												t + 1
 											} but received ${this.getReturnTypeText(n)}.`
 										);
-								} else if (o !== n)
+								} else if (s !== n)
 									throw new a.ClientError(
 										"invalid_parameter",
 										`Function '${
 											this.name
 										}' expects a '${this.getReturnTypeText(
-											o
+											s
 										)}' input for parameter #${
 											t + 1
 										} but received '${this.getReturnTypeText(n)}'.`
@@ -514,16 +516,16 @@
 						for (let t = 0; t < this.parameters.length; t++) {
 							const r = this.parameters[t],
 								n = r.getReturnType(),
-								o = Array.isArray(this.definition.params)
+								s = Array.isArray(this.definition.params)
 									? this.definition.params[t]
 									: this.definition.params;
 							if (
 								(0 !== t ||
 									(r.getExpressionType() !== i.ExpressionType.FIELD &&
 										r.getExpressionType() !== i.ExpressionType.ARRAY_FIELD)) &&
-								o !== i.ReturnType.ANY
+								s !== i.ReturnType.ANY
 							) {
-								if (o === i.ReturnType.PRIMITIVE) {
+								if (s === i.ReturnType.PRIMITIVE) {
 									if (
 										[
 											i.ReturnType.OBJECT,
@@ -537,12 +539,12 @@
 											`Function '${
 												this.name
 											}' expects a '${this.getReturnTypeText(
-												o
+												s
 											)}' input for parameter #${
 												t + 1
 											} but received '${this.getReturnTypeText(n)}'.`
 										);
-								} else if (o === i.ReturnType.STATICBOOLEAN) {
+								} else if (s === i.ReturnType.STATICBOOLEAN) {
 									if (
 										n !== i.ReturnType.BOOLEAN &&
 										r.getExpressionType() !== i.ExpressionType.STATIC
@@ -555,13 +557,13 @@
 												t + 1
 											} but received ${this.getReturnTypeText(n)}.`
 										);
-								} else if (o !== n)
+								} else if (s !== n)
 									throw new a.ClientError(
 										"invalid_parameter",
 										`Function '${
 											this.name
 										}' expects a '${this.getReturnTypeText(
-											o
+											s
 										)}' input for parameter #${
 											t + 1
 										} but received '${this.getReturnTypeText(n)}'.`
@@ -582,10 +584,11 @@
 									return { [r]: n };
 								}
 							case i.DBTYPE.POSTGRESQL:
-							case i.DBTYPE.MYSQL:
+							case i.DBTYPE.MYSQL: {
 								const n = [];
 								for (const r of this.parameters) n.push(r.getQuery(e, t));
 								return `${r}(${n.join(", ")})`;
+							}
 							default:
 								return null;
 						}
@@ -609,7 +612,7 @@
 						return !1;
 					}
 				}
-				t.Function = o;
+				t.Function = s;
 			},
 			5581: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
@@ -621,7 +624,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$abs" },
+							mapping: { MongoDB: "$abs", PostgreSQL: "ABS", MySQL: "ABS" },
 						});
 					}
 				}
@@ -637,7 +640,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$acos" },
+							mapping: { MongoDB: "$acos", PostgreSQL: "ACOS", MySQL: "ACOS" },
 						});
 					}
 				}
@@ -653,7 +656,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$acosh" },
+							mapping: { MongoDB: "$acosh", PostgreSQL: "ACOSH", MySQL: "n/a" },
 						});
 					}
 				}
@@ -669,8 +672,21 @@
 							paramCount: -1,
 							returnType: i.ReturnType.NUMBER,
 							params: i.ReturnType.NUMBER,
-							mapping: { MongoDB: "$add" },
+							mapping: { MongoDB: "$add", PostgreSQL: "+", MySQL: "+" },
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								const r = [];
+								for (const n of this.parameters) r.push(n.getQuery(e, t));
+								return `(${r.join(" + ")})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -722,7 +738,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$asin" },
+							mapping: { MongoDB: "$asin", PostgreSQL: "ASIN", MySQL: "ASIN" },
 						});
 					}
 				}
@@ -738,7 +754,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$asinh" },
+							mapping: { MongoDB: "$asinh", PostgreSQL: "ASINH", MySQL: "n/a" },
 						});
 					}
 				}
@@ -754,7 +770,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$atan" },
+							mapping: { MongoDB: "$atan", PostgreSQL: "ATAN", MySQL: "ATAN" },
 						});
 					}
 				}
@@ -770,7 +786,11 @@
 							paramCount: 2,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$atan2" },
+							mapping: {
+								MongoDB: "$atan2",
+								PostgreSQL: "ATAN2",
+								MySQL: "ATAN2",
+							},
 						});
 					}
 				}
@@ -786,7 +806,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$atanh" },
+							mapping: { MongoDB: "$atanh", PostgreSQL: "ATANH", MySQL: "n/a" },
 						});
 					}
 				}
@@ -802,7 +822,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$ceil" },
+							mapping: { MongoDB: "$ceil", PostgreSQL: "CEIL", MySQL: "CEIL" },
 						});
 					}
 				}
@@ -822,26 +842,74 @@
 								i.ReturnType.TEXT,
 								i.ReturnType.NUMBER,
 							],
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "$custom",
+								MySQL: "$custom",
+							},
 						});
 					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? this.parameters[2]
-								? {
-										$indexOfCP: [
-											this.parameters[0].getQuery(e, t),
-											this.parameters[1].getQuery(e, t),
-											this.parameters[2].getQuery(e, t),
-										],
-								  }
-								: {
-										$indexOfCP: [
-											this.parameters[0].getQuery(e, t),
-											this.parameters[1].getQuery(e, t),
-										],
-								  }
-							: null;
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return this.parameters[2]
+									? {
+											$indexOfCP: [
+												this.parameters[0].getQuery(e, t),
+												this.parameters[1].getQuery(e, t),
+												this.parameters[2].getQuery(e, t),
+											],
+									  }
+									: {
+											$indexOfCP: [
+												this.parameters[0].getQuery(e, t),
+												this.parameters[1].getQuery(e, t),
+											],
+									  };
+							case i.DBTYPE.MYSQL:
+								return this.parameters[2]
+									? `CASE \n          WHEN ${this.parameters[0].getQuery(
+											e,
+											t
+									  )} IS NULL OR ${this.parameters[1].getQuery(
+											e,
+											t
+									  )} IS NULL THEN -1\n          ELSE LOCATE(${this.parameters[1].getQuery(
+											e,
+											t
+									  )}, ${this.parameters[0].getQuery(
+											e,
+											t
+									  )}, (${this.parameters[2].getQuery(
+											e,
+											t
+									  )} + 1)) - 1\n      END`
+									: `CASE \n          WHEN ${this.parameters[0].getQuery(
+											e,
+											t
+									  )} IS NULL OR ${this.parameters[1].getQuery(
+											e,
+											t
+									  )} IS NULL THEN -1\n          ELSE LOCATE(${this.parameters[1].getQuery(
+											e,
+											t
+									  )}, ${this.parameters[0].getQuery(e, t)}) - 1\n      END`;
+							case i.DBTYPE.POSTGRESQL:
+								return this.parameters[2]
+									? `POSITION(${this.parameters[1].getQuery(
+											e,
+											t
+									  )} IN SUBSTRING(${this.parameters[0].getQuery(
+											e,
+											t
+									  )} FROM (${this.parameters[2].getQuery(e, t)} + 1))) - 1`
+									: `POSITION(${this.parameters[1].getQuery(
+											e,
+											t
+									  )} IN ${this.parameters[0].getQuery(e, t)}) - 1`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -856,8 +924,25 @@
 							paramCount: -1,
 							returnType: i.ReturnType.TEXT,
 							params: i.ReturnType.PRIMITIVE,
-							mapping: { MongoDB: "$concat" },
+							mapping: {
+								MongoDB: "$concat",
+								PostgreSQL: "||",
+								MySQL: "CONCAT",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+							case i.DBTYPE.MYSQL:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								const r = [];
+								for (const n of this.parameters) r.push(n.getQuery(e, t));
+								return `(${r.join(" || ")})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -872,7 +957,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$cos" },
+							mapping: { MongoDB: "$cos", PostgreSQL: "COS", MySQL: "COS" },
 						});
 					}
 				}
@@ -888,7 +973,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$cosh" },
+							mapping: { MongoDB: "$cosh", PostgreSQL: "COSH", MySQL: "n/a" },
 						});
 					}
 				}
@@ -897,8 +982,9 @@
 			2415: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
 				const n = r(5145),
-					i = r(9307);
-				class a extends n.Function {
+					i = r(9307),
+					a = r(990);
+				class s extends n.Function {
 					constructor() {
 						super("dateAdd", {
 							paramCount: 3,
@@ -908,49 +994,166 @@
 								i.ReturnType.NUMBER,
 								i.ReturnType.TEXT,
 							],
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "$custom",
+								MySQL: "TIMESTAMPADD",
+							},
 						});
 					}
+					validate(e) {
+						super.validate(e);
+						const t = [
+								"year",
+								"quarter",
+								"week",
+								"month",
+								"day",
+								"hour",
+								"minute",
+								"second",
+							],
+							r = this.parameters[2]
+								.getQuery(e)
+								.replaceAll("'", "")
+								.toLowerCase();
+						if (!t.includes(r))
+							throw new a.ClientError(
+								"invalid_parameter",
+								`Function '${
+									this.name
+								}' expects unit of measure parameter either one of the following '${t.join(
+									", "
+								)}'.`
+							);
+					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return {
 									$dateAdd: {
 										startDate: this.parameters[0].getQuery(e, t),
 										amount: this.parameters[1].getQuery(e, t),
 										unit: this.parameters[2].getQuery(e, t),
 									},
-							  }
-							: null;
+								};
+							case i.DBTYPE.POSTGRESQL: {
+								const r = [];
+								for (const n of this.parameters) r.push(n.getQuery(e, t));
+								return `(${r[0]}::TIMESTAMP + (${
+									r[1]
+								} || ' ' || ${r[2].toUpperCase()})::INTERVAL)`;
+							}
+							case i.DBTYPE.MYSQL: {
+								const r = [];
+								for (const n of this.parameters) r.push(n.getQuery(e, t));
+								return `TIMESTAMPADD(${r[2]
+									.replaceAll("'", "")
+									.toUpperCase()}, ${r[1]}, ${r[0]})`;
+							}
+							default:
+								return null;
+						}
 					}
 				}
-				t.default = a;
+				t.default = s;
 			},
 			923: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
 				const n = r(5145),
-					i = r(9307);
-				class a extends n.Function {
+					i = r(9307),
+					a = r(990);
+				class s extends n.Function {
 					constructor() {
 						super("dateDiff", {
 							paramCount: 3,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.DATE, i.ReturnType.DATE, i.ReturnType.TEXT],
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "$custom",
+								MySQL: "TIMESTAMPDIFF",
+							},
 						});
 					}
+					validate(e) {
+						super.validate(e);
+						const t = [
+								"year",
+								"quarter",
+								"week",
+								"month",
+								"day",
+								"hour",
+								"minute",
+								"second",
+							],
+							r = this.parameters[2]
+								.getQuery(e)
+								.replaceAll("'", "")
+								.toLowerCase();
+						if (!t.includes(r))
+							throw new a.ClientError(
+								"invalid_parameter",
+								`Function '${
+									this.name
+								}' expects unit of measure parameter either one of the following '${t.join(
+									", "
+								)}'.`
+							);
+					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return {
 									$dateDiff: {
 										startDate: this.parameters[0].getQuery(e, t),
 										endDate: this.parameters[1].getQuery(e, t),
 										unit: this.parameters[2].getQuery(e, t),
 									},
-							  }
-							: null;
+								};
+							case i.DBTYPE.POSTGRESQL: {
+								const r = [];
+								for (const n of this.parameters) r.push(n.getQuery(e, t));
+								switch (
+									this.parameters[2]
+										.getQuery(e)
+										.replaceAll("'", "")
+										.toLowerCase()
+								) {
+									case "year":
+										return `EXTRACT(YEAR FROM AGE(${r[1]}::TIMESTAMP, ${r[0]}::TIMESTAMP))`;
+									case "quarter":
+										return `FLOOR((EXTRACT(YEAR FROM AGE(${r[1]}::TIMESTAMP, ${r[0]}::TIMESTAMP)) * 12 + EXTRACT(MONTH FROM AGE( ${r[1]}::TIMESTAMP,  ${r[0]}::TIMESTAMP)))/3)`;
+									case "week":
+										return `FLOOR(EXTRACT(EPOCH FROM (${r[1]}::TIMESTAMP - ${r[0]}::TIMESTAMP)) / (60*60*24*7))`;
+									case "month":
+										return `(EXTRACT(YEAR FROM AGE(${r[1]}::TIMESTAMP, ${r[0]}::TIMESTAMP)) * 12 + EXTRACT(MONTH FROM AGE(${r[1]}::TIMESTAMP, ${r[0]}::TIMESTAMP)))`;
+									case "day":
+										return `EXTRACT(DAY FROM (${r[1]}::TIMESTAMP - ${r[0]}::TIMESTAMP))`;
+									case "hour":
+										return `FLOOR(EXTRACT(EPOCH FROM (${r[1]}::TIMESTAMP - ${r[0]}::TIMESTAMP)) / (60*60))`;
+									case "minute":
+										return `FLOOR(EXTRACT(EPOCH FROM (${r[1]}::TIMESTAMP - ${r[0]}::TIMESTAMP)) / 60)`;
+									case "second":
+										return `FLOOR(EXTRACT(EPOCH FROM (${r[1]}::TIMESTAMP - ${r[0]}::TIMESTAMP)))`;
+									default:
+										return null;
+								}
+							}
+							case i.DBTYPE.MYSQL: {
+								const r = [];
+								for (const n of this.parameters) r.push(n.getQuery(e, t));
+								return `TIMESTAMPDIFF(${r[2]
+									.replaceAll("'", "")
+									.toUpperCase()}, ${r[0]}, ${r[1]})`;
+							}
+							default:
+								return null;
+						}
 					}
 				}
-				t.default = a;
+				t.default = s;
 			},
 			7821: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
@@ -962,8 +1165,27 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.DATE],
-							mapping: { MongoDB: "$dayOfMonth" },
+							mapping: {
+								MongoDB: "$dayOfMonth",
+								PostgreSQL: "$custom",
+								MySQL: "$custom",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `EXTRACT(DAY FROM ${this.parameters[0].getQuery(
+									e,
+									t
+								)}::DATE)`;
+							case i.DBTYPE.MYSQL:
+								return `EXTRACT(DAY FROM ${this.parameters[0].getQuery(e, t)})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -978,8 +1200,27 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.DATE],
-							mapping: { MongoDB: "$dayOfWeek" },
+							mapping: {
+								MongoDB: "$dayOfWeek",
+								PostgreSQL: "$custom",
+								MySQL: "DAYOFWEEK",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `(EXTRACT(DOW FROM ${this.parameters[0].getQuery(
+									e,
+									t
+								)}::DATE) + 1)`;
+							case i.DBTYPE.MYSQL:
+								return `DAYOFWEEK(${this.parameters[0].getQuery(e, t)})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -994,8 +1235,27 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.DATE],
-							mapping: { MongoDB: "$dayOfYear" },
+							mapping: {
+								MongoDB: "$dayOfYear",
+								PostgreSQL: "$custom",
+								MySQL: "DAYOFYEAR",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `EXTRACT(DOY FROM ${this.parameters[0].getQuery(
+									e,
+									t
+								)}::DATE)`;
+							case i.DBTYPE.MYSQL:
+								return `DAYOFYEAR(${this.parameters[0].getQuery(e, t)})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -1010,7 +1270,11 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$radiansToDegrees" },
+							mapping: {
+								MongoDB: "$radiansToDegrees",
+								PostgreSQL: "DEGREES",
+								MySQL: "DEGREES",
+							},
 						});
 					}
 				}
@@ -1035,234 +1299,240 @@
 							: e + ".coordinates";
 					}
 					getQuery(e, t) {
-						if (e === i.DBTYPE.MONGODB) {
-							const r = this.parameters[0].getQuery(e, t),
-								n = this.parameters[1].getQuery(e, t);
-							return {
-								$let: {
-									vars: {
-										lon1: { $arrayElemAt: [this.getCoordinates(r), 0] },
-										lat1: { $arrayElemAt: [this.getCoordinates(r), 1] },
-										lon2: { $arrayElemAt: [this.getCoordinates(n), 0] },
-										lat2: { $arrayElemAt: [this.getCoordinates(n), 1] },
-										pi: 3.141592653589793,
-										multiplier: 1e3,
-									},
-									in: {
-										$multiply: [
-											{
-												$multiply: [
-													2,
-													{
-														$atan2: [
-															{
-																$sqrt: {
-																	$add: [
-																		{
-																			$pow: [
-																				{
-																					$sin: {
-																						$divide: [
-																							{
-																								$divide: [
-																									{
-																										$multiply: [
-																											{
-																												$subtract: [
-																													"$$lat2",
-																													"$$lat1",
-																												],
-																											},
-																											"$$pi",
-																										],
-																									},
-																									180,
-																								],
-																							},
-																							2,
-																						],
-																					},
-																				},
-																				2,
-																			],
-																		},
-																		{
-																			$multiply: [
-																				{
-																					$multiply: [
-																						{
-																							$cos: {
-																								$divide: [
-																									{
-																										$multiply: [
-																											"$$lat1",
-																											"$$pi",
-																										],
-																									},
-																									180,
-																								],
-																							},
-																						},
-																						{
-																							$cos: {
-																								$divide: [
-																									{
-																										$multiply: [
-																											"$$lat2",
-																											"$$pi",
-																										],
-																									},
-																									180,
-																								],
-																							},
-																						},
-																					],
-																				},
-																				{
-																					$pow: [
-																						{
-																							$sin: {
-																								$divide: [
-																									{
-																										$divide: [
-																											{
-																												$multiply: [
-																													{
-																														$subtract: [
-																															"$$lon2",
-																															"$$lon1",
-																														],
-																													},
-																													"$$pi",
-																												],
-																											},
-																											180,
-																										],
-																									},
-																									2,
-																								],
-																							},
-																						},
-																						2,
-																					],
-																				},
-																			],
-																		},
-																	],
-																},
-															},
-															{
-																$sqrt: {
-																	$subtract: [
-																		1,
-																		{
-																			$add: [
-																				{
-																					$pow: [
-																						{
-																							$sin: {
-																								$divide: [
-																									{
-																										$divide: [
-																											{
-																												$multiply: [
-																													{
-																														$subtract: [
-																															"$$lat2",
-																															"$$lat1",
-																														],
-																													},
-																													"$$pi",
-																												],
-																											},
-																											180,
-																										],
-																									},
-																									2,
-																								],
-																							},
-																						},
-																						2,
-																					],
-																				},
-																				{
-																					$multiply: [
-																						{
-																							$multiply: [
+						const r = this.parameters[0].getQuery(e, t),
+							n = this.parameters[1].getQuery(e, t);
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return {
+									$let: {
+										vars: {
+											lon1: { $arrayElemAt: [this.getCoordinates(r), 0] },
+											lat1: { $arrayElemAt: [this.getCoordinates(r), 1] },
+											lon2: { $arrayElemAt: [this.getCoordinates(n), 0] },
+											lat2: { $arrayElemAt: [this.getCoordinates(n), 1] },
+											pi: 3.141592653589793,
+											multiplier: 1e3,
+										},
+										in: {
+											$multiply: [
+												{
+													$multiply: [
+														2,
+														{
+															$atan2: [
+																{
+																	$sqrt: {
+																		$add: [
+																			{
+																				$pow: [
+																					{
+																						$sin: {
+																							$divide: [
 																								{
-																									$cos: {
-																										$divide: [
-																											{
-																												$multiply: [
-																													"$$lat1",
-																													"$$pi",
-																												],
-																											},
-																											180,
-																										],
-																									},
-																								},
-																								{
-																									$cos: {
-																										$divide: [
-																											{
-																												$multiply: [
-																													"$$lat2",
-																													"$$pi",
-																												],
-																											},
-																											180,
-																										],
-																									},
-																								},
-																							],
-																						},
-																						{
-																							$pow: [
-																								{
-																									$sin: {
-																										$divide: [
-																											{
-																												$divide: [
-																													{
-																														$multiply: [
-																															{
-																																$subtract: [
-																																	"$$lon2",
-																																	"$$lon1",
-																																],
-																															},
-																															"$$pi",
-																														],
-																													},
-																													180,
-																												],
-																											},
-																											2,
-																										],
-																									},
+																									$divide: [
+																										{
+																											$multiply: [
+																												{
+																													$subtract: [
+																														"$$lat2",
+																														"$$lat1",
+																													],
+																												},
+																												"$$pi",
+																											],
+																										},
+																										180,
+																									],
 																								},
 																								2,
 																							],
 																						},
-																					],
-																				},
-																			],
-																		},
-																	],
+																					},
+																					2,
+																				],
+																			},
+																			{
+																				$multiply: [
+																					{
+																						$multiply: [
+																							{
+																								$cos: {
+																									$divide: [
+																										{
+																											$multiply: [
+																												"$$lat1",
+																												"$$pi",
+																											],
+																										},
+																										180,
+																									],
+																								},
+																							},
+																							{
+																								$cos: {
+																									$divide: [
+																										{
+																											$multiply: [
+																												"$$lat2",
+																												"$$pi",
+																											],
+																										},
+																										180,
+																									],
+																								},
+																							},
+																						],
+																					},
+																					{
+																						$pow: [
+																							{
+																								$sin: {
+																									$divide: [
+																										{
+																											$divide: [
+																												{
+																													$multiply: [
+																														{
+																															$subtract: [
+																																"$$lon2",
+																																"$$lon1",
+																															],
+																														},
+																														"$$pi",
+																													],
+																												},
+																												180,
+																											],
+																										},
+																										2,
+																									],
+																								},
+																							},
+																							2,
+																						],
+																					},
+																				],
+																			},
+																		],
+																	},
 																},
-															},
-														],
-													},
-												],
-											},
-											"$$multiplier",
-										],
+																{
+																	$sqrt: {
+																		$subtract: [
+																			1,
+																			{
+																				$add: [
+																					{
+																						$pow: [
+																							{
+																								$sin: {
+																									$divide: [
+																										{
+																											$divide: [
+																												{
+																													$multiply: [
+																														{
+																															$subtract: [
+																																"$$lat2",
+																																"$$lat1",
+																															],
+																														},
+																														"$$pi",
+																													],
+																												},
+																												180,
+																											],
+																										},
+																										2,
+																									],
+																								},
+																							},
+																							2,
+																						],
+																					},
+																					{
+																						$multiply: [
+																							{
+																								$multiply: [
+																									{
+																										$cos: {
+																											$divide: [
+																												{
+																													$multiply: [
+																														"$$lat1",
+																														"$$pi",
+																													],
+																												},
+																												180,
+																											],
+																										},
+																									},
+																									{
+																										$cos: {
+																											$divide: [
+																												{
+																													$multiply: [
+																														"$$lat2",
+																														"$$pi",
+																													],
+																												},
+																												180,
+																											],
+																										},
+																									},
+																								],
+																							},
+																							{
+																								$pow: [
+																									{
+																										$sin: {
+																											$divide: [
+																												{
+																													$divide: [
+																														{
+																															$multiply: [
+																																{
+																																	$subtract: [
+																																		"$$lon2",
+																																		"$$lon1",
+																																	],
+																																},
+																																"$$pi",
+																															],
+																														},
+																														180,
+																													],
+																												},
+																												2,
+																											],
+																										},
+																									},
+																									2,
+																								],
+																							},
+																						],
+																					},
+																				],
+																			},
+																		],
+																	},
+																},
+															],
+														},
+													],
+												},
+												"$$multiplier",
+											],
+										},
 									},
-								},
-							};
+								};
+							case i.DBTYPE.POSTGRESQL:
+								return `(6371008.8 * 2 * ASIN(\n\t\t\t\t\tSQRT(\n\t\t\t\t\t\tPOW(SIN(RADIANS((${n}::POINT)[1] - (${r}::POINT)[1]) / 2), 2) +\n\t\t\t\t\t\tCOS(RADIANS((${r}::POINT)[1])) * COS(RADIANS((${n}::POINT)[1])) *\n\t\t\t\t\t\tPOW(SIN(RADIANS((${n}::POINT)[0] - (${r}::POINT)[0]) / 2), 2)\n\t\t\t\t\t)\n\t\t\t\t))`;
+							case i.DBTYPE.MYSQL:
+								return `ST_Distance_Sphere(${r}, ${n})`;
+							default:
+								return null;
 						}
-						return null;
 					}
 				}
 				t.default = a;
@@ -1277,8 +1547,21 @@
 							paramCount: 2,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$divide" },
+							mapping: { MongoDB: "$divide", PostgreSQL: "/", MySQL: "/" },
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								const r = [];
+								for (const n of this.parameters) r.push(n.getQuery(e, t));
+								return `(${r[0]} / ${r[1]})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -1293,12 +1576,17 @@
 							paramCount: 2,
 							returnType: i.ReturnType.BOOLEAN,
 							params: [i.ReturnType.TEXT, i.ReturnType.PRIMITIVE],
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "$custom",
+								MySQL: "$custom",
+							},
 						});
 					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return {
 									$cond: {
 										if: {
 											$lt: [
@@ -1339,8 +1627,20 @@
 											],
 										},
 									},
-							  }
-							: null;
+								};
+							case i.DBTYPE.POSTGRESQL:
+								return `${this.parameters[0].getQuery(
+									e,
+									t
+								)} LIKE '%' || ${this.parameters[1].getQuery(e, t)}`;
+							case i.DBTYPE.MYSQL:
+								return `${this.parameters[0].getQuery(
+									e,
+									t
+								)} LIKE CONCAT('%', ${this.parameters[1].getQuery(e, t)})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -1350,7 +1650,7 @@
 				const n = r(5145),
 					i = r(9307),
 					a = r(990);
-				class o extends n.Function {
+				class s extends n.Function {
 					constructor() {
 						super("eq", {
 							paramCount: 2,
@@ -1426,14 +1726,14 @@
 						}
 					}
 				}
-				t.default = o;
+				t.default = s;
 			},
 			2897: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
 				const n = r(5145),
 					i = r(9307),
 					a = r(990);
-				class o extends n.Function {
+				class s extends n.Function {
 					constructor() {
 						super("exists", {
 							paramCount: 1,
@@ -1470,7 +1770,7 @@
 							: { [this.parameters[0].getPullQuery(e, t)]: { $exists: !0 } };
 					}
 				}
-				t.default = o;
+				t.default = s;
 			},
 			4175: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
@@ -1482,7 +1782,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$exp" },
+							mapping: { MongoDB: "$exp", PostgreSQL: "EXP", MySQL: "EXP" },
 						});
 					}
 				}
@@ -1498,7 +1798,11 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$floor" },
+							mapping: {
+								MongoDB: "$floor",
+								PostgreSQL: "FLOOR",
+								MySQL: "FLOOR",
+							},
 						});
 					}
 				}
@@ -1509,7 +1813,7 @@
 				const n = r(5145),
 					i = r(9307),
 					a = r(990);
-				class o extends n.Function {
+				class s extends n.Function {
 					constructor() {
 						super("gt", {
 							paramCount: 2,
@@ -1585,14 +1889,14 @@
 						}
 					}
 				}
-				t.default = o;
+				t.default = s;
 			},
 			3510: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
 				const n = r(5145),
 					i = r(9307),
 					a = r(990);
-				class o extends n.Function {
+				class s extends n.Function {
 					constructor() {
 						super("gte", {
 							paramCount: 2,
@@ -1668,7 +1972,7 @@
 						}
 					}
 				}
-				t.default = o;
+				t.default = s;
 			},
 			8949: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
@@ -1680,8 +1984,30 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.DATE],
-							mapping: { MongoDB: "$hour" },
+							mapping: {
+								MongoDB: "$hour",
+								PostgreSQL: "EXTRACT",
+								MySQL: "EXTRACT",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `EXTRACT(HOUR FROM ${this.parameters[0].getQuery(
+									e,
+									t
+								)}::TIMESTAMP)`;
+							case i.DBTYPE.MYSQL:
+								return `EXTRACT(HOUR FROM ${this.parameters[0].getQuery(
+									e,
+									t
+								)})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -1691,7 +2017,7 @@
 				const n = r(5145),
 					i = r(9307),
 					a = r(990);
-				class o extends n.Function {
+				class s extends n.Function {
 					constructor() {
 						super("in", {
 							paramCount: 2,
@@ -1750,7 +2076,7 @@
 							  };
 					}
 				}
-				t.default = o;
+				t.default = s;
 			},
 			9674: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
@@ -1766,20 +2092,53 @@
 								i.ReturnType.TEXT,
 								i.ReturnType.STATICBOOLEAN,
 							],
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "$custom",
+								MySQL: "$custom",
+							},
 						});
 					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return {
 									$regexMatch: {
 										input: this.parameters[0].getQuery(e, t),
 										regex: this.parameters[1].getQuery(e, t),
 										options:
 											!1 === this.parameters[2].getQuery(e, t) ? "i" : void 0,
 									},
-							  }
-							: null;
+								};
+							case i.DBTYPE.POSTGRESQL:
+								return !1 === this.parameters[2].getQuery(e, t)
+									? `${this.parameters[0].getQuery(
+											e,
+											t
+									  )} ILIKE '%' || ${this.parameters[1].getQuery(e, t)} || '%'`
+									: `${this.parameters[0].getQuery(
+											e,
+											t
+									  )} LIKE '%' || ${this.parameters[1].getQuery(e, t)} || '%'`;
+							case i.DBTYPE.MYSQL:
+								return !1 === this.parameters[2].getQuery(e, t)
+									? `LOWER(${this.parameters[0].getQuery(
+											e,
+											t
+									  )}) LIKE LOWER(CONCAT('%', ${this.parameters[1].getQuery(
+											e,
+											t
+									  )}, '%'))`
+									: `${this.parameters[0].getQuery(
+											e,
+											t
+									  )} LIKE CONCAT('%', ${this.parameters[1].getQuery(
+											e,
+											t
+									  )}, '%')`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -1794,19 +2153,29 @@
 							paramCount: 2,
 							returnType: i.ReturnType.TEXT,
 							params: [i.ReturnType.TEXT, i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "LEFT",
+								MySQL: "LEFT",
+							},
 						});
 					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return {
 									$substrCP: [
 										this.parameters[0].getQuery(e, t),
 										0,
 										this.parameters[1].getQuery(e, t),
 									],
-							  }
-							: null;
+								};
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return super.getQuery(e, t);
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -1821,7 +2190,11 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.TEXT],
-							mapping: { MongoDB: "$strLenCP" },
+							mapping: {
+								MongoDB: "$strLenCP",
+								PostgreSQL: "CHAR_LENGTH",
+								MySQL: "CHAR_LENGTH",
+							},
 						});
 					}
 				}
@@ -1837,7 +2210,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$ln" },
+							mapping: { MongoDB: "$ln", PostgreSQL: "LN", MySQL: "LN" },
 						});
 					}
 				}
@@ -1853,8 +2226,20 @@
 							paramCount: 2,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$log" },
+							mapping: { MongoDB: "$log", PostgreSQL: "LOG", MySQL: "n/a" },
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								const r = [];
+								for (const n of this.parameters) r.push(n.getQuery(e, t));
+								return `LOG(${r[1]}, ${r[0]})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -1869,7 +2254,11 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$log10" },
+							mapping: {
+								MongoDB: "$log10",
+								PostgreSQL: "LOG10",
+								MySQL: "LOG10",
+							},
 						});
 					}
 				}
@@ -1885,7 +2274,11 @@
 							paramCount: 1,
 							returnType: i.ReturnType.TEXT,
 							params: [i.ReturnType.TEXT],
-							mapping: { MongoDB: "$toLower" },
+							mapping: {
+								MongoDB: "$toLower",
+								PostgreSQL: "LOWER",
+								MySQL: "LOWER",
+							},
 						});
 					}
 				}
@@ -1896,7 +2289,7 @@
 				const n = r(5145),
 					i = r(9307),
 					a = r(990);
-				class o extends n.Function {
+				class s extends n.Function {
 					constructor() {
 						super("lt", {
 							paramCount: 2,
@@ -1972,14 +2365,14 @@
 						}
 					}
 				}
-				t.default = o;
+				t.default = s;
 			},
 			7934: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
 				const n = r(5145),
 					i = r(9307),
 					a = r(990);
-				class o extends n.Function {
+				class s extends n.Function {
 					constructor() {
 						super("lte", {
 							paramCount: 2,
@@ -2055,7 +2448,7 @@
 						}
 					}
 				}
-				t.default = o;
+				t.default = s;
 			},
 			6489: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
@@ -2067,13 +2460,23 @@
 							paramCount: 1,
 							returnType: i.ReturnType.TEXT,
 							params: [i.ReturnType.TEXT],
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "LTRIM",
+								MySQL: "LTRIM",
+							},
 						});
 					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? { $ltrim: { input: this.parameters[0].getQuery(e, t) } }
-							: null;
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return { $ltrim: { input: this.parameters[0].getQuery(e, t) } };
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return super.getQuery(e, t);
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2088,8 +2491,30 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.DATE],
-							mapping: { MongoDB: "$minute" },
+							mapping: {
+								MongoDB: "$minute",
+								PostgreSQL: "$custom",
+								MySQL: "$custom",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `EXTRACT(MINUTE FROM ${this.parameters[0].getQuery(
+									e,
+									t
+								)}::TIMESTAMP)`;
+							case i.DBTYPE.MYSQL:
+								return `EXTRACT(MINUTE FROM ${this.parameters[0].getQuery(
+									e,
+									t
+								)})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2104,7 +2529,7 @@
 							paramCount: 2,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$mod" },
+							mapping: { MongoDB: "$mod", PostgreSQL: "MOD", MySQL: "MOD" },
 						});
 					}
 				}
@@ -2120,8 +2545,30 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.DATE],
-							mapping: { MongoDB: "$month" },
+							mapping: {
+								MongoDB: "$month",
+								PostgreSQL: "$custom",
+								MySQL: "$custom",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `EXTRACT(MONTH FROM ${this.parameters[0].getQuery(
+									e,
+									t
+								)}::DATE)`;
+							case i.DBTYPE.MYSQL:
+								return `EXTRACT(MONTH FROM ${this.parameters[0].getQuery(
+									e,
+									t
+								)})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2136,8 +2583,21 @@
 							paramCount: -1,
 							returnType: i.ReturnType.NUMBER,
 							params: i.ReturnType.NUMBER,
-							mapping: { MongoDB: "$multiply" },
+							mapping: { MongoDB: "$multiply", PostgreSQL: "*", MySQL: "*" },
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								const r = [];
+								for (const n of this.parameters) r.push(n.getQuery(e, t));
+								return `(${r.join(" * ")})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2147,7 +2607,7 @@
 				const n = r(5145),
 					i = r(9307),
 					a = r(990);
-				class o extends n.Function {
+				class s extends n.Function {
 					constructor() {
 						super("neq", {
 							paramCount: 2,
@@ -2223,14 +2683,14 @@
 						}
 					}
 				}
-				t.default = o;
+				t.default = s;
 			},
 			789: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
 				const n = r(5145),
 					i = r(9307),
 					a = r(990);
-				class o extends n.Function {
+				class s extends n.Function {
 					constructor() {
 						super("nin", {
 							paramCount: 2,
@@ -2297,7 +2757,7 @@
 							  };
 					}
 				}
-				t.default = o;
+				t.default = s;
 			},
 			6587: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 });
@@ -2318,7 +2778,38 @@
 								return super.getQuery(e, t);
 							case i.DBTYPE.POSTGRESQL:
 							case i.DBTYPE.MYSQL:
-								return `NOT ${this.parameters[0].getQuery(e, t)}`;
+								return `NOT (${this.parameters[0].getQuery(e, t)})`;
+							default:
+								return null;
+						}
+					}
+				}
+				t.default = a;
+			},
+			1723: (e, t, r) => {
+				Object.defineProperty(t, "__esModule", { value: !0 });
+				const n = r(5145),
+					i = r(9307);
+				class a extends n.Function {
+					constructor() {
+						super("now", {
+							paramCount: 0,
+							returnType: i.ReturnType.DATETIME,
+							params: i.ReturnType.ANY,
+							mapping: {
+								MongoDB: "$currentDate",
+								PostgreSQL: "NOW",
+								MySQL: "NOW",
+							},
+						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return { $currentDate: { format: "iso" } };
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return "NOW()";
 							default:
 								return null;
 						}
@@ -2365,19 +2856,36 @@
 							paramCount: 2,
 							returnType: i.ReturnType.GEOPOINT,
 							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "$custom",
+								MySQL: "$custom",
+							},
 						});
 					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return {
 									type: "Point",
 									coordinates: [
 										this.parameters[0].getQuery(e, t),
 										this.parameters[1].getQuery(e, t),
 									],
-							  }
-							: null;
+								};
+							case i.DBTYPE.POSTGRESQL:
+								return `'${this.parameters[0].getQuery(
+									e,
+									t
+								)},${this.parameters[1].getQuery(e, t)}'::POINT`;
+							case i.DBTYPE.MYSQL:
+								return `POINT(${this.parameters[0].getQuery(
+									e,
+									t
+								)}, ${this.parameters[1].getQuery(e, t)})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2392,7 +2900,7 @@
 							paramCount: 2,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$pow" },
+							mapping: { MongoDB: "$pow", PostgreSQL: "POW", MySQL: "POW" },
 						});
 					}
 				}
@@ -2408,7 +2916,11 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$degreesToRadians" },
+							mapping: {
+								MongoDB: "$degreesToRadians",
+								PostgreSQL: "RADIANS",
+								MySQL: "RADIANS",
+							},
 						});
 					}
 				}
@@ -2424,12 +2936,17 @@
 							paramCount: 2,
 							returnType: i.ReturnType.TEXT,
 							params: [i.ReturnType.TEXT, i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "RIGHT",
+								MySQL: "RIGHT",
+							},
 						});
 					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return {
 									$cond: {
 										if: {
 											$gt: [
@@ -2451,8 +2968,13 @@
 											],
 										},
 									},
-							  }
-							: null;
+								};
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return super.getQuery(e, t);
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2467,7 +2989,11 @@
 							paramCount: 2,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$round" },
+							mapping: {
+								MongoDB: "$round",
+								PostgreSQL: "ROUND",
+								MySQL: "ROUND",
+							},
 						});
 					}
 				}
@@ -2483,13 +3009,23 @@
 							paramCount: 1,
 							returnType: i.ReturnType.TEXT,
 							params: [i.ReturnType.TEXT],
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "RTRIM",
+								MySQL: "RTRIM",
+							},
 						});
 					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? { $rtrim: { input: this.parameters[0].getQuery(e, t) } }
-							: null;
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return { $rtrim: { input: this.parameters[0].getQuery(e, t) } };
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return super.getQuery(e, t);
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2504,8 +3040,30 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.DATE],
-							mapping: { MongoDB: "$second" },
+							mapping: {
+								MongoDB: "$second",
+								PostgreSQL: "$custom",
+								MySQL: "$custom",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `FLOOR(EXTRACT(SECOND FROM ${this.parameters[0].getQuery(
+									e,
+									t
+								)}::TIMESTAMP))`;
+							case i.DBTYPE.MYSQL:
+								return `EXTRACT(SECOND FROM ${this.parameters[0].getQuery(
+									e,
+									t
+								)})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2520,7 +3078,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$sin" },
+							mapping: { MongoDB: "$sin", PostgreSQL: "SIN", MySQL: "SIN" },
 						});
 					}
 				}
@@ -2536,7 +3094,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$sinh" },
+							mapping: { MongoDB: "$sinh", PostgreSQL: "SINH", MySQL: "n/a" },
 						});
 					}
 				}
@@ -2552,7 +3110,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.ARRAY],
-							mapping: { MongoDB: "$custom" },
+							mapping: { MongoDB: "$custom", PostgreSQL: "n/a", MySQL: "n/a" },
 						});
 					}
 					getQuery(e, t) {
@@ -2574,7 +3132,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$sqrt" },
+							mapping: { MongoDB: "$sqrt", PostgreSQL: "SQRT", MySQL: "SQRT" },
 						});
 					}
 				}
@@ -2590,12 +3148,17 @@
 							paramCount: 2,
 							returnType: i.ReturnType.BOOLEAN,
 							params: [i.ReturnType.TEXT, i.ReturnType.PRIMITIVE],
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "$custom",
+								MySQL: "$custom",
+							},
 						});
 					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return {
 									$eq: [
 										{
 											$indexOfCP: [
@@ -2605,8 +3168,20 @@
 										},
 										0,
 									],
-							  }
-							: null;
+								};
+							case i.DBTYPE.POSTGRESQL:
+								return `${this.parameters[0].getQuery(
+									e,
+									t
+								)} LIKE ${this.parameters[1].getQuery(e, t)} || '%'`;
+							case i.DBTYPE.MYSQL:
+								return `${this.parameters[0].getQuery(
+									e,
+									t
+								)} LIKE CONCAT(${this.parameters[1].getQuery(e, t)}, '%')`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2621,18 +3196,35 @@
 							paramCount: 1,
 							returnType: i.ReturnType.DATE,
 							params: i.ReturnType.TEXT,
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "TO_TIMESTAMP",
+								MySQL: "STR_TO_DATE",
+							},
 						});
 					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return {
 									$dateFromString: {
 										dateString: this.parameters[0].getQuery(e, t),
 										format: "%Y-%m-%d %H:%M:%S",
 									},
-							  }
-							: null;
+								};
+							case i.DBTYPE.POSTGRESQL:
+								return `TO_TIMESTAMP(${this.parameters[0].getQuery(
+									e,
+									t
+								)}, 'YYYY-MM-DD HH24:MI:SS')::TIMESTAMP`;
+							case i.DBTYPE.MYSQL:
+								return `STR_TO_DATE(${this.parameters[0].getQuery(
+									e,
+									t
+								)}, '%Y-%m-%d %H:%i:%s')`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2651,8 +3243,32 @@
 								i.ReturnType.NUMBER,
 								i.ReturnType.NUMBER,
 							],
-							mapping: { MongoDB: "$substrCP" },
+							mapping: {
+								MongoDB: "$substrCP",
+								PostgreSQL: "SUBSTRING",
+								MySQL: "SUBSTRING",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `SUBSTRING(${this.parameters[0].getQuery(
+									e,
+									t
+								)} FROM ${this.parameters[1].getQuery(
+									e,
+									t
+								)} + 1 FOR ${this.parameters[2].getQuery(e, t)})`;
+							case i.DBTYPE.MYSQL:
+								this.parameters[0].getQuery(e, t),
+									this.parameters[1].getQuery(e, t),
+									this.parameters[2].getQuery(e, t);
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2667,8 +3283,21 @@
 							paramCount: 2,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER, i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$subtract" },
+							mapping: { MongoDB: "$subtract", PostgreSQL: "-", MySQL: "-" },
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								const r = [];
+								for (const n of this.parameters) r.push(n.getQuery(e, t));
+								return `(${r[0]} - ${r[1]})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2683,7 +3312,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$tan" },
+							mapping: { MongoDB: "$tan", PostgreSQL: "TAN", MySQL: "TAN" },
 						});
 					}
 				}
@@ -2699,7 +3328,7 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.NUMBER],
-							mapping: { MongoDB: "$tanh" },
+							mapping: { MongoDB: "$tanh", PostgreSQL: "TANH", MySQL: "n/a" },
 						});
 					}
 				}
@@ -2715,8 +3344,26 @@
 							paramCount: 1,
 							returnType: i.ReturnType.BOOLEAN,
 							params: [i.ReturnType.ANY],
-							mapping: { MongoDB: "$toBool" },
+							mapping: {
+								MongoDB: "$toBool",
+								PostgreSQL: "$custom",
+								MySQL: "n/a",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `${this.parameters[0].getQuery(e, t)}::BOOLEAN`;
+							case i.DBTYPE.MYSQL: {
+								const r = this.parameters[0].getQuery(e, t);
+								return `(${r} IS NOT NULL AND ${r} <> 0)`;
+							}
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2731,8 +3378,24 @@
 							paramCount: 1,
 							returnType: i.ReturnType.DATE,
 							params: [i.ReturnType.ANY],
-							mapping: { MongoDB: "$toDate" },
+							mapping: {
+								MongoDB: "$toDate",
+								PostgreSQL: "$custom",
+								MySQL: "CAST",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `${this.parameters[0].getQuery(e, t)}::TIMESTAMP`;
+							case i.DBTYPE.MYSQL:
+								return `CAST(${this.parameters[0].getQuery(e, t)} AS DATETIME)`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2747,8 +3410,24 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.ANY],
-							mapping: { MongoDB: "$toDecimal" },
+							mapping: {
+								MongoDB: "$toDecimal",
+								PostgreSQL: "CAST",
+								MySQL: "CAST",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `${this.parameters[0].getQuery(e, t)}::DECIMAL`;
+							case i.DBTYPE.MYSQL:
+								return `CAST(${this.parameters[0].getQuery(e, t)} AS DECIMAL)`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2763,8 +3442,20 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.ANY],
-							mapping: { MongoDB: "$toInt" },
+							mapping: { MongoDB: "$toInt", PostgreSQL: "CAST", MySQL: "CAST" },
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `${this.parameters[0].getQuery(e, t)}::INTEGER`;
+							case i.DBTYPE.MYSQL:
+								return `CAST(${this.parameters[0].getQuery(e, t)} AS SIGNED)`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2779,7 +3470,11 @@
 							paramCount: 1,
 							returnType: i.ReturnType.ID,
 							params: [i.ReturnType.ANY],
-							mapping: { MongoDB: "$toObjectId" },
+							mapping: {
+								MongoDB: "$toObjectId",
+								PostgreSQL: "n/a",
+								MySQL: "n/a",
+							},
 						});
 					}
 				}
@@ -2795,8 +3490,24 @@
 							paramCount: 1,
 							returnType: i.ReturnType.TEXT,
 							params: [i.ReturnType.ANY],
-							mapping: { MongoDB: "$toString" },
+							mapping: {
+								MongoDB: "$toString",
+								PostgreSQL: "CAST",
+								MySQL: "CAST",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `${this.parameters[0].getQuery(e, t)}::TEXT`;
+							case i.DBTYPE.MYSQL:
+								return `CAST(${this.parameters[0].getQuery(e, t)} AS CHAR)`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2811,13 +3522,23 @@
 							paramCount: 1,
 							returnType: i.ReturnType.TEXT,
 							params: [i.ReturnType.TEXT],
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "TRIM",
+								MySQL: "TRIM",
+							},
 						});
 					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? { $trim: { input: this.parameters[0].getQuery(e, t) } }
-							: null;
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return { $trim: { input: this.parameters[0].getQuery(e, t) } };
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								return super.getQuery(e, t);
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2832,7 +3553,11 @@
 							paramCount: 1,
 							returnType: i.ReturnType.TEXT,
 							params: [i.ReturnType.TEXT],
-							mapping: { MongoDB: "$toUpper" },
+							mapping: {
+								MongoDB: "$toUpper",
+								PostgreSQL: "UPPER",
+								MySQL: "UPPER",
+							},
 						});
 					}
 				}
@@ -2848,8 +3573,30 @@
 							paramCount: 1,
 							returnType: i.ReturnType.NUMBER,
 							params: [i.ReturnType.DATE],
-							mapping: { MongoDB: "$year" },
+							mapping: {
+								MongoDB: "$year",
+								PostgreSQL: "$custom",
+								MySQL: "$custom",
+							},
 						});
+					}
+					getQuery(e, t) {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return super.getQuery(e, t);
+							case i.DBTYPE.POSTGRESQL:
+								return `EXTRACT(YEAR FROM ${this.parameters[0].getQuery(
+									e,
+									t
+								)}::DATE)`;
+							case i.DBTYPE.MYSQL:
+								return `EXTRACT(YEAR FROM ${this.parameters[0].getQuery(
+									e,
+									t
+								)})`;
+							default:
+								return null;
+						}
 					}
 				}
 				t.default = a;
@@ -2925,7 +3672,7 @@
 				const n = r(6098),
 					i = r(9307),
 					a = r(990);
-				class o extends n.Expression {
+				class s extends n.Expression {
 					constructor(e, t, r, n) {
 						super(),
 							(this.field = e),
@@ -2991,7 +3738,11 @@
 							case i.DBTYPE.POSTGRESQL:
 							case i.DBTYPE.MYSQL:
 								return "none" === this.joinType
-									? `${this.field.getModel().getName()}.${this.field.getName()}`
+									? "$$dummy" !== this.field.getModel().getName()
+										? `${this.field
+												.getModel()
+												.getName()}.${this.field.getName()}`
+										: this.field.getName()
 									: this.fieldPath;
 							default:
 								return this.fieldPath;
@@ -3017,7 +3768,7 @@
 							);
 					}
 				}
-				t.FieldValue = o;
+				t.FieldValue = s;
 			},
 			7523: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
@@ -3045,11 +3796,20 @@
 							case i.DBTYPE.MONGODB:
 								return this.value;
 							case i.DBTYPE.POSTGRESQL:
+								return null === this.value
+									? "NULL"
+									: "string" == typeof this.value
+									? `'${this.value}'`
+									: this.value;
 							case i.DBTYPE.MYSQL:
 								return null === this.value
 									? "NULL"
 									: "string" == typeof this.value
 									? `'${this.value}'`
+									: "boolean" == typeof this.value
+									? this.value
+										? 1
+										: 0
 									: this.value;
 							default:
 								return this.value;
@@ -3120,18 +3880,18 @@
 						return a.APIBase;
 					},
 				});
-				const o = r(2779);
+				const s = r(2779);
 				Object.defineProperty(t, "AgnostServerSideClient", {
 					enumerable: !0,
 					get: function () {
-						return o.AgnostServerSideClient;
+						return s.AgnostServerSideClient;
 					},
 				});
-				const s = r(6120);
+				const o = r(6120);
 				Object.defineProperty(t, "Storage", {
 					enumerable: !0,
 					get: function () {
-						return s.Storage;
+						return o.Storage;
 					},
 				});
 				const u = r(8414);
@@ -3204,32 +3964,32 @@
 						return g.ModelBase;
 					},
 				});
-				const v = r(1111);
+				const T = r(1111);
 				Object.defineProperty(t, "Field", {
 					enumerable: !0,
 					get: function () {
-						return v.Field;
+						return T.Field;
 					},
 				});
-				const T = r(1687);
+				const v = r(1687);
 				Object.defineProperty(t, "DBAction", {
 					enumerable: !0,
 					get: function () {
-						return T.DBAction;
+						return v.DBAction;
 					},
 				});
-				const b = r(4079);
+				const E = r(4079);
 				Object.defineProperty(t, "Cache", {
 					enumerable: !0,
 					get: function () {
-						return b.Cache;
+						return E.Cache;
 					},
 				});
-				const E = r(9);
+				const b = r(9);
 				Object.defineProperty(t, "CacheBase", {
 					enumerable: !0,
 					get: function () {
-						return E.CacheBase;
+						return b.CacheBase;
 					},
 				});
 				const w = r(6098);
@@ -3239,24 +3999,24 @@
 						return w.Expression;
 					},
 				});
-				const _ = (e, t) => new o.AgnostServerSideClient(e, t);
-				t.createServerSideClient = _;
-				const R = _(global.META, global.ADAPTERS);
-				(t.agnost = R), i(r(9307), t), i(r(2548), t);
+				const R = (e, t) => new s.AgnostServerSideClient(e, t);
+				t.createServerSideClient = R;
+				const _ = R(global.META, global.ADAPTERS);
+				(t.agnost = _), i(r(9307), t), i(r(2548), t);
 			},
 			8414: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -3272,7 +4032,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -3281,15 +4041,15 @@
 					(t.Bucket = void 0);
 				const i = r(2781),
 					a = r(5979),
-					o = r(990),
-					s = r(9419);
+					s = r(990),
+					o = r(9419);
 				t.Bucket = class {
 					constructor(e, t, r) {
 						(this.name = r), (this.meta = e), (this.adapter = t);
 					}
 					file(e) {
-						if (!(0, s.isString)(e))
-							throw new o.ClientError(
+						if (!(0, o.isString)(e))
+							throw new s.ClientError(
 								"invalid_value",
 								"File path needs to be a string value"
 							);
@@ -3302,8 +4062,8 @@
 					}
 					getInfo(e = !1) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, s.isBoolean)(e))
-								throw new o.ClientError(
+							if (!(0, o.isBoolean)(e))
+								throw new s.ClientError(
 									"invalid_value",
 									"Detailed parameter needs to be a boolean value"
 								);
@@ -3317,8 +4077,8 @@
 					}
 					rename(e) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, s.isString)(e))
-								throw new o.ClientError(
+							if (!(0, o.isString)(e))
+								throw new s.ClientError(
 									"invalid_value",
 									"New name needs to be a string value"
 								);
@@ -3337,8 +4097,8 @@
 					}
 					makePublic(e = !1) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, s.isBoolean)(e))
-								throw new o.ClientError(
+							if (!(0, o.isBoolean)(e))
+								throw new s.ClientError(
 									"invalid_value",
 									"Include files parameter needs to be a boolean value"
 								);
@@ -3351,8 +4111,8 @@
 					}
 					makePrivate(e = !1) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, s.isBoolean)(e))
-								throw new o.ClientError(
+							if (!(0, o.isBoolean)(e))
+								throw new s.ClientError(
 									"invalid_value",
 									"Include files parameter needs to be a boolean value"
 								);
@@ -3365,8 +4125,8 @@
 					}
 					setTag(e, t) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, s.isString)(e))
-								throw new o.ClientError(
+							if (!(0, o.isString)(e))
+								throw new s.ClientError(
 									"invalid_value",
 									"Key parameter needs to be a string value"
 								);
@@ -3380,8 +4140,8 @@
 					}
 					removeTag(e) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, s.isString)(e))
-								throw new o.ClientError(
+							if (!(0, o.isString)(e))
+								throw new s.ClientError(
 									"invalid_value",
 									"Key parameter needs to be a string value"
 								);
@@ -3402,23 +4162,23 @@
 					}
 					updateInfo(e, t, r, i = !1) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, s.isString)(e))
-								throw new o.ClientError(
+							if (!(0, o.isString)(e))
+								throw new s.ClientError(
 									"invalid_value",
 									"New name parameter needs to be a string value"
 								);
-							if (!(0, s.isObject)(r))
-								throw new o.ClientError(
+							if (!(0, o.isObject)(r))
+								throw new s.ClientError(
 									"invalid_value",
 									"Tags parameter needs to be a JSON object"
 								);
-							if (!(0, s.isBoolean)(t))
-								throw new o.ClientError(
+							if (!(0, o.isBoolean)(t))
+								throw new s.ClientError(
 									"invalid_value",
 									"isPublic parameter needs to be a boolean value"
 								);
-							if (!(0, s.isBoolean)(i))
-								throw new o.ClientError(
+							if (!(0, o.isBoolean)(i))
+								throw new s.ClientError(
 									"invalid_value",
 									"includeFiles parameter needs to be a boolean value"
 								);
@@ -3434,8 +4194,8 @@
 					}
 					deleteFiles(e) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, s.isArray)(e))
-								throw new o.ClientError(
+							if (!(0, o.isArray)(e))
+								throw new s.ClientError(
 									"invalid_value",
 									"File paths parameter needs to be an array of string values"
 								);
@@ -3445,37 +4205,37 @@
 					listFiles(e) {
 						return n(this, void 0, void 0, function* () {
 							if (e) {
-								if (!(0, s.isObject)(e))
-									throw new o.ClientError(
+								if (!(0, o.isObject)(e))
+									throw new s.ClientError(
 										"invalid_value",
 										"File listing options need to be a JSON object"
 									);
-								if ((0, s.valueExists)(e.search) && !(0, s.isString)(e.search))
-									throw new o.ClientError(
+								if ((0, o.valueExists)(e.search) && !(0, o.isString)(e.search))
+									throw new s.ClientError(
 										"invalid_value",
 										"Search parameter needs to be a string value"
 									);
 								if (
-									(0, s.valueExists)(e.page) &&
-									!(0, s.isPositiveInteger)(e.page)
+									(0, o.valueExists)(e.page) &&
+									!(0, o.isPositiveInteger)(e.page)
 								)
-									throw new o.ClientError(
+									throw new s.ClientError(
 										"invalid_value",
 										"Page number needs to be a positive integer value"
 									);
 								if (
-									(0, s.valueExists)(e.limit) &&
-									!(0, s.isPositiveInteger)(e.limit)
+									(0, o.valueExists)(e.limit) &&
+									!(0, o.isPositiveInteger)(e.limit)
 								)
-									throw new o.ClientError(
+									throw new s.ClientError(
 										"invalid_value",
 										"Page limit (size) needs to be a positive integer value"
 									);
 								if (
-									(0, s.valueExists)(e.returnCountInfo) &&
-									!(0, s.isBoolean)(e.returnCountInfo)
+									(0, o.valueExists)(e.returnCountInfo) &&
+									!(0, o.isBoolean)(e.returnCountInfo)
 								)
-									throw new o.ClientError(
+									throw new s.ClientError(
 										"invalid_value",
 										"Return count info option needs to be a boolean value"
 									);
@@ -3489,62 +4249,62 @@
 					}
 					upload(e, t) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, s.valueExists)(e) || !(0, s.isObject)(e))
-								throw new o.ClientError(
+							if (!(0, o.valueExists)(e) || !(0, o.isObject)(e))
+								throw new s.ClientError(
 									"invalid_value",
 									"File data to upload needs to be provided"
 								);
-							if (!(0, s.isString)(e.path))
-								throw new o.ClientError(
+							if (!(0, o.isString)(e.path))
+								throw new s.ClientError(
 									"invalid_value",
 									"File path needs to be a string value"
 								);
-							if (!(0, s.isString)(e.mimeType))
-								throw new o.ClientError(
+							if (!(0, o.isString)(e.mimeType))
+								throw new s.ClientError(
 									"invalid_value",
 									"File mime-type needs to be a string value"
 								);
-							if (!(0, s.isPositiveInteger)(e.size))
-								throw new o.ClientError(
+							if (!(0, o.isPositiveInteger)(e.size))
+								throw new s.ClientError(
 									"invalid_value",
 									"File size needs to be a positive integer value value"
 								);
 							if ("stream" in e && !(e.stream instanceof i.Readable))
-								throw new o.ClientError(
+								throw new s.ClientError(
 									"invalid_value",
 									"File stream needs to be a Readable stream"
 								);
-							if ("localPath" in e && !(0, s.isString)(e.localPath))
-								throw new o.ClientError(
+							if ("localPath" in e && !(0, o.isString)(e.localPath))
+								throw new s.ClientError(
 									"invalid_value",
 									"File local path needs to be a string value"
 								);
 							if (t) {
-								if (!(0, s.isObject)(t))
-									throw new o.ClientError(
+								if (!(0, o.isObject)(t))
+									throw new s.ClientError(
 										"invalid_value",
 										"File upload options need to be a JSON object"
 									);
 								if (
-									(0, s.valueExists)(t.isPublic) &&
-									!(0, s.isBoolean)(t.isPublic)
+									(0, o.valueExists)(t.isPublic) &&
+									!(0, o.isBoolean)(t.isPublic)
 								)
-									throw new o.ClientError(
+									throw new s.ClientError(
 										"invalid_value",
 										"isPublic parameter needs to be a boolean value"
 									);
-								if ((0, s.valueExists)(t.upsert) && !(0, s.isBoolean)(t.upsert))
-									throw new o.ClientError(
+								if ((0, o.valueExists)(t.upsert) && !(0, o.isBoolean)(t.upsert))
+									throw new s.ClientError(
 										"invalid_value",
 										"Upsert parameter needs to be a boolean value"
 									);
-								if ((0, s.valueExists)(t.tags) && !(0, s.isObject)(t.tags))
-									throw new o.ClientError(
+								if ((0, o.valueExists)(t.tags) && !(0, o.isObject)(t.tags))
+									throw new s.ClientError(
 										"invalid_value",
 										"Tags parameter needs to be a JSON object"
 									);
-								if ((0, s.valueExists)(t.userId) && (0, s.isObject)(t.userId))
-									throw new o.ClientError(
+								if ((0, o.valueExists)(t.userId) && (0, o.isObject)(t.userId))
+									throw new s.ClientError(
 										"invalid_value",
 										"User id can be either a number or a string value"
 									);
@@ -3559,14 +4319,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -3582,7 +4342,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -3639,14 +4399,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -3662,7 +4422,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -3671,8 +4431,8 @@
 					(t.CacheBase = void 0);
 				const i = r(7602),
 					a = r(990),
-					o = r(9419),
-					s = global.helper;
+					s = r(9419),
+					o = global.helper;
 				class u extends i.APIBase {
 					constructor(e, t, r) {
 						if (
@@ -3697,18 +4457,18 @@
 					getAdapterObj(e = !1) {
 						return e && this.adapter.slaves && this.adapter.slaves.length > 0
 							? this.adapter.slaves[
-									s.randomInt(1, this.adapter.slaves.length) - 1
+									o.randomInt(1, this.adapter.slaves.length) - 1
 							  ].adapter
 							: this.adapter.adapter;
 					}
 					getKeyValue(e, t = !1) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, o.isKey)(e))
+							if (!(0, s.isKey)(e))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Key needs to be a string or numeric value"
 								);
-							if (!(0, o.isBoolean)(t))
+							if (!(0, s.isBoolean)(t))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Use read replica needs to be a boolean value"
@@ -3718,12 +4478,12 @@
 					}
 					setKeyValue(e, t, r) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, o.isKey)(e))
+							if (!(0, s.isKey)(e))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Key needs to be a string or numeric value"
 								);
-							if (r && !(0, o.isPositiveInteger)(r))
+							if (r && !(0, s.isPositiveInteger)(r))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Time to live needs to be positive integer"
@@ -3741,7 +4501,7 @@
 							let t = null;
 							t = Array.isArray(e) ? e : [e];
 							for (const e of t)
-								if (!(0, o.isKey)(e))
+								if (!(0, s.isKey)(e))
 									throw new a.ClientError(
 										"invalid_parameter",
 										"Key needs to be a string or numeric value"
@@ -3751,17 +4511,17 @@
 					}
 					incrementKeyValue(e, t = 1, r) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, o.isKey)(e))
+							if (!(0, s.isKey)(e))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Key needs to be a string or numeric value"
 								);
-							if (!(0, o.isInteger)(t))
+							if (!(0, s.isInteger)(t))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Increment needs to be an integer"
 								);
-							if (r && !(0, o.isPositiveInteger)(r))
+							if (r && !(0, s.isPositiveInteger)(r))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Time to live needs to be positive integer"
@@ -3776,17 +4536,17 @@
 					}
 					decrementKeyValue(e, t = 1, r) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, o.isKey)(e))
+							if (!(0, s.isKey)(e))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Key needs to be a string or numeric value"
 								);
-							if (!(0, o.isInteger)(t))
+							if (!(0, s.isInteger)(t))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Increment needs to be an integer"
 								);
-							if (r && !(0, o.isPositiveInteger)(r))
+							if (r && !(0, s.isPositiveInteger)(r))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Time to live needs to be positive integer"
@@ -3801,12 +4561,12 @@
 					}
 					expireKey(e, t) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, o.isKey)(e))
+							if (!(0, s.isKey)(e))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Key needs to be a string or numeric value"
 								);
-							if (t && !(0, o.isPositiveInteger)(t))
+							if (t && !(0, s.isPositiveInteger)(t))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Time to live needs to be positive integer"
@@ -3816,17 +4576,17 @@
 					}
 					listKeys(e, t, r = !1) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, o.isString)(e))
+							if (!(0, s.isString)(e))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Pattern needs to be a string value"
 								);
-							if (!(0, o.isPositiveInteger)(t))
+							if (!(0, s.isPositiveInteger)(t))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Count needs to be a number value"
 								);
-							if (!(0, o.isBoolean)(r))
+							if (!(0, s.isBoolean)(r))
 								throw new a.ClientError(
 									"invalid_parameter",
 									"Use read replica needs to be a boolean value"
@@ -3845,14 +4605,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -3868,7 +4628,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -3913,14 +4673,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -3936,7 +4696,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -3945,8 +4705,8 @@
 					(t.DatabaseBase = void 0);
 				const i = r(7602),
 					a = r(892),
-					o = r(990),
-					s = r(9307),
+					s = r(990),
+					o = r(9307),
 					u = global.helper,
 					l = global.META;
 				class d extends i.APIBase {
@@ -3959,7 +4719,7 @@
 							(this.meta = this.getMetadata("database", r)),
 							!this.meta)
 						)
-							throw new o.ClientError(
+							throw new s.ClientError(
 								"database_not_found",
 								`Cannot find the database object identified by name '${r}'`
 							);
@@ -3967,7 +4727,7 @@
 							((this.adapter = this.getAdapter("database", this.name)),
 							!this.adapter)
 						)
-							throw new o.ClientError(
+							throw new s.ClientError(
 								"adapter_not_found",
 								`Cannot find the adapter of the database named '${r}'`
 							);
@@ -4003,7 +4763,7 @@
 						return this.meta.type;
 					}
 					isSQLDB() {
-						return s.SQLdatabaseTypes.includes(this.meta.type);
+						return o.SQLdatabaseTypes.includes(this.meta.type);
 					}
 					getModelMetaByIId(e) {
 						const { models: t } = this.meta;
@@ -4016,7 +4776,7 @@
 					model(e) {
 						const t = this.models.get(e);
 						if (!t)
-							throw new o.ClientError(
+							throw new s.ClientError(
 								"model_not_found",
 								`Cannot find the model identified by name '${e}' in database '${this.meta.name}'`
 							);
@@ -4059,14 +4819,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -4082,7 +4842,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -4091,7 +4851,7 @@
 					(t.File = void 0);
 				const i = r(2781),
 					a = r(990),
-					o = r(9419);
+					s = r(9419);
 				t.File = class {
 					constructor(e, t, r, n) {
 						(this.path = n),
@@ -4155,7 +4915,7 @@
 					}
 					setTag(e, t) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, o.isString)(e))
+							if (!(0, s.isString)(e))
 								throw new a.ClientError(
 									"invalid_value",
 									"Key parameter needs to be a string value"
@@ -4171,7 +4931,7 @@
 					}
 					removeTag(e) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, o.isString)(e))
+							if (!(0, s.isString)(e))
 								throw new a.ClientError(
 									"invalid_value",
 									"Key parameter needs to be a string value"
@@ -4195,7 +4955,7 @@
 					}
 					copyTo(e) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, o.isString)(e))
+							if (!(0, s.isString)(e))
 								throw new a.ClientError(
 									"invalid_value",
 									"Path parameter needs to be a string value"
@@ -4210,7 +4970,7 @@
 					}
 					moveTo(e) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, o.isString)(e))
+							if (!(0, s.isString)(e))
 								throw new a.ClientError(
 									"invalid_value",
 									"Path parameter needs to be a string value"
@@ -4225,17 +4985,17 @@
 					}
 					replace(e) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, o.valueExists)(e) || !(0, o.isObject)(e))
+							if (!(0, s.valueExists)(e) || !(0, s.isObject)(e))
 								throw new a.ClientError(
 									"invalid_value",
 									"File data to upload needs to be provided"
 								);
-							if (!(0, o.isString)(e.mimeType))
+							if (!(0, s.isString)(e.mimeType))
 								throw new a.ClientError(
 									"invalid_value",
 									"File mime-type needs to be a string value"
 								);
-							if (!(0, o.isPositiveInteger)(e.size))
+							if (!(0, s.isPositiveInteger)(e.size))
 								throw new a.ClientError(
 									"invalid_value",
 									"File size needs to be a positive integer value value"
@@ -4245,7 +5005,7 @@
 									"invalid_value",
 									"File stream needs to be a Readable stream"
 								);
-							if ("localPath" in e && !(0, o.isString)(e.localPath))
+							if ("localPath" in e && !(0, s.isString)(e.localPath))
 								throw new a.ClientError(
 									"invalid_value",
 									"File local path needs to be a string value"
@@ -4260,17 +5020,17 @@
 					}
 					updateInfo(e, t, r) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, o.isString)(e))
+							if (!(0, s.isString)(e))
 								throw new a.ClientError(
 									"invalid_value",
 									"New path parameter needs to be a string value"
 								);
-							if (!(0, o.isObject)(r))
+							if (!(0, s.isObject)(r))
 								throw new a.ClientError(
 									"invalid_value",
 									"Tags parameter needs to be a JSON object"
 								);
-							if (!(0, o.isBoolean)(t))
+							if (!(0, s.isBoolean)(t))
 								throw new a.ClientError(
 									"invalid_value",
 									"isPublic parameter needs to be a boolean value"
@@ -4292,14 +5052,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -4315,7 +5075,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -4324,7 +5084,7 @@
 					(t.Func = void 0);
 				const i = r(7602),
 					a = r(990);
-				class o extends i.APIBase {
+				class s extends i.APIBase {
 					constructor(e, t, r) {
 						if (
 							(super(e, t),
@@ -4351,21 +5111,21 @@
 						});
 					}
 				}
-				t.Func = o;
+				t.Func = s;
 			},
 			6760: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -4381,7 +5141,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -4390,7 +5150,7 @@
 					(t.Queue = void 0);
 				const i = r(7602),
 					a = r(990);
-				class o extends i.APIBase {
+				class s extends i.APIBase {
 					constructor(e, t, r) {
 						if (
 							(super(e, t),
@@ -4429,21 +5189,21 @@
 						});
 					}
 				}
-				t.Queue = o;
+				t.Queue = s;
 			},
 			2847: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -4459,7 +5219,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -4468,8 +5228,8 @@
 					(t.Realtime = void 0);
 				const i = r(7602),
 					a = r(990),
-					o = r(9419);
-				class s extends i.APIBase {
+					s = r(9419);
+				class o extends i.APIBase {
 					constructor(e) {
 						if (
 							(super(null, e),
@@ -4482,7 +5242,7 @@
 							);
 					}
 					broadcast(e, t) {
-						if (!(0, o.checkRequired)(e, !0))
+						if (!(0, s.checkRequired)(e, !0))
 							throw new a.ClientError(
 								"invalid_value",
 								"The 'event name' needs to be a string value"
@@ -4490,12 +5250,12 @@
 						this.adapter.broadcast(e, t);
 					}
 					send(e, t, r) {
-						if (!(0, o.checkRequired)(e, !0))
+						if (!(0, s.checkRequired)(e, !0))
 							throw new a.ClientError(
 								"invalid_value",
 								"The 'channel name' needs to be a string value"
 							);
-						if (!(0, o.checkRequired)(t, !0))
+						if (!(0, s.checkRequired)(t, !0))
 							throw new a.ClientError(
 								"invalid_value",
 								"The 'event name' needs to be a string value"
@@ -4504,7 +5264,7 @@
 					}
 					getMembers(e) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, o.checkRequired)(e, !0))
+							if (!(0, s.checkRequired)(e, !0))
 								throw new a.ClientError(
 									"invalid_value",
 									"The 'channel name' needs to be a string value"
@@ -4513,21 +5273,21 @@
 						});
 					}
 				}
-				t.Realtime = s;
+				t.Realtime = o;
 			},
 			6120: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -4543,7 +5303,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -4552,8 +5312,8 @@
 					(t.Storage = void 0);
 				const i = r(7602),
 					a = r(990),
-					o = r(8414),
-					s = r(9419);
+					s = r(8414),
+					o = r(9419);
 				class u extends i.APIBase {
 					constructor(e, t, r) {
 						if (
@@ -4576,26 +5336,26 @@
 							);
 					}
 					bucket(e) {
-						if (!(0, s.isString)(e))
+						if (!(0, o.isString)(e))
 							throw new a.ClientError(
 								"invalid_value",
 								"Bucket name needs to be a string value"
 							);
-						return new o.Bucket(this.meta, this.adapter, e.trim());
+						return new s.Bucket(this.meta, this.adapter, e.trim());
 					}
 					createBucket(e, t = !0, r, i) {
 						return n(this, void 0, void 0, function* () {
-							if (!(0, s.isString)(e))
+							if (!(0, o.isString)(e))
 								throw new a.ClientError(
 									"invalid_value",
 									"Bucket name needs to be a string value"
 								);
-							if (!(0, s.isBoolean)(t))
+							if (!(0, o.isBoolean)(t))
 								throw new a.ClientError(
 									"invalid_value",
 									"Public flag needs to be a boolean value"
 								);
-							if (r && !(0, s.isObject)(r))
+							if (r && !(0, o.isObject)(r))
 								throw new a.ClientError(
 									"invalid_value",
 									"Bucket tags need to be a JSON object"
@@ -4612,35 +5372,35 @@
 					listBuckets(e) {
 						return n(this, void 0, void 0, function* () {
 							if (e) {
-								if (!(0, s.isObject)(e))
+								if (!(0, o.isObject)(e))
 									throw new a.ClientError(
 										"invalid_value",
 										"Bucket listing options need to be a JSON object"
 									);
-								if ((0, s.valueExists)(e.search) && !(0, s.isString)(e.search))
+								if ((0, o.valueExists)(e.search) && !(0, o.isString)(e.search))
 									throw new a.ClientError(
 										"invalid_value",
 										"Search parameter needs to be a string value"
 									);
 								if (
-									(0, s.valueExists)(e.page) &&
-									!(0, s.isPositiveInteger)(e.page)
+									(0, o.valueExists)(e.page) &&
+									!(0, o.isPositiveInteger)(e.page)
 								)
 									throw new a.ClientError(
 										"invalid_value",
 										"Page number needs to be a positive integer value"
 									);
 								if (
-									(0, s.valueExists)(e.limit) &&
-									!(0, s.isPositiveInteger)(e.limit)
+									(0, o.valueExists)(e.limit) &&
+									!(0, o.isPositiveInteger)(e.limit)
 								)
 									throw new a.ClientError(
 										"invalid_value",
 										"Page limit (size) needs to be a positive integer value"
 									);
 								if (
-									(0, s.valueExists)(e.returnCountInfo) &&
-									!(0, s.isBoolean)(e.returnCountInfo)
+									(0, o.valueExists)(e.returnCountInfo) &&
+									!(0, o.isBoolean)(e.returnCountInfo)
 								)
 									throw new a.ClientError(
 										"invalid_value",
@@ -4653,35 +5413,35 @@
 					listFiles(e) {
 						return n(this, void 0, void 0, function* () {
 							if (e) {
-								if (!(0, s.isObject)(e))
+								if (!(0, o.isObject)(e))
 									throw new a.ClientError(
 										"invalid_value",
 										"File listing options need to be a JSON object"
 									);
-								if ((0, s.valueExists)(e.search) && !(0, s.isString)(e.search))
+								if ((0, o.valueExists)(e.search) && !(0, o.isString)(e.search))
 									throw new a.ClientError(
 										"invalid_value",
 										"Search parameter needs to be a string value"
 									);
 								if (
-									(0, s.valueExists)(e.page) &&
-									!(0, s.isPositiveInteger)(e.page)
+									(0, o.valueExists)(e.page) &&
+									!(0, o.isPositiveInteger)(e.page)
 								)
 									throw new a.ClientError(
 										"invalid_value",
 										"Page number needs to be a positive integer value"
 									);
 								if (
-									(0, s.valueExists)(e.limit) &&
-									!(0, s.isPositiveInteger)(e.limit)
+									(0, o.valueExists)(e.limit) &&
+									!(0, o.isPositiveInteger)(e.limit)
 								)
 									throw new a.ClientError(
 										"invalid_value",
 										"Page limit (size) needs to be a positive integer value"
 									);
 								if (
-									(0, s.valueExists)(e.returnCountInfo) &&
-									!(0, s.isBoolean)(e.returnCountInfo)
+									(0, o.valueExists)(e.returnCountInfo) &&
+									!(0, o.isBoolean)(e.returnCountInfo)
 								)
 									throw new a.ClientError(
 										"invalid_value",
@@ -4704,14 +5464,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -4727,7 +5487,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -4736,7 +5496,7 @@
 					(t.Task = void 0);
 				const i = r(7602),
 					a = r(990);
-				class o extends i.APIBase {
+				class s extends i.APIBase {
 					constructor(e, t, r) {
 						if (
 							(super(e, t),
@@ -4768,21 +5528,21 @@
 						});
 					}
 				}
-				t.Task = o;
+				t.Task = s;
 			},
 			1687: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -4798,7 +5558,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -4807,8 +5567,8 @@
 					(t.DBAction = void 0);
 				const i = r(892),
 					a = r(1779),
-					o = r(8054),
-					s = r(7523),
+					s = r(8054),
+					o = r(7523),
 					u = r(3100),
 					l = r(3819),
 					d = r(4167),
@@ -4837,6 +5597,7 @@
 								groupBy: null,
 								computations: null,
 								having: null,
+								searchField: null,
 								searchText: null,
 							});
 					}
@@ -4859,6 +5620,25 @@
 								`Not a valid record identifier '${e}'`
 							);
 						this.definition.id = e;
+					}
+					setSearchField(e) {
+						if ("object" == typeof e)
+							throw new f.ClientError(
+								"invalid_parameter",
+								"The 'searchText' method expects the search field name as string paramter to query database records"
+							);
+						const t = this.getFieldObject(e, null);
+						if (!t)
+							throw new f.ClientError(
+								"invalid_field",
+								`'${e}' is not a valid field that can be used to perform full-text search.`
+							);
+						if (!t.field.isSearchable())
+							throw new f.ClientError(
+								"invalid_field",
+								`'${e}' is not a valid searchable field that has a full-text index.`
+							);
+						this.definition.searchField = t;
 					}
 					setSearchText(e) {
 						if ("object" == typeof e)
@@ -4961,32 +5741,32 @@
 							let n = this.model,
 								i = "none";
 							for (let a = 0; a < r.length; a++) {
-								const o = r[a],
-									s = n.getField(o);
-								if (s) {
-									const o = s.getType();
+								const s = r[a],
+									o = n.getField(s);
+								if (o) {
+									const s = o.getType();
 									if (a === r.length - 1)
 										return {
 											fieldPath: e,
-											field: s,
+											field: o,
 											joinType: i,
 											joinModel: n,
 										};
-									if ("object" === o || "object-list" === o)
-										n = s.getSubModel();
+									if ("object" === s || "object-list" === s)
+										n = o.getSubModel();
 									else {
 										if (
-											"reference" !== o ||
-											!this.isFieldInJoinDefinition(s.getQueryPath(), t)
+											"reference" !== s ||
+											!this.isFieldInJoinDefinition(o.getQueryPath(), t)
 										)
 											return null;
-										(n = this.model.getDb().getModelByIId(s.getRefModelIId())),
+										(n = this.model.getDb().getModelByIId(o.getRefModelIId())),
 											(i = "complex" === i ? i : "simple");
 									}
 								} else {
 									if (0 !== a) return null;
 									{
-										const e = this.getJoinDefinition(o, t);
+										const e = this.getJoinDefinition(s, t);
 										if (!e) return null;
 										{
 											const t = this.model.getDb().model(e.from);
@@ -5255,10 +6035,10 @@
 							if (i && "join" !== i.field.getType()) {
 								const i = new c.FunctionManager.$eq(),
 									a = this.parseValue(e, r, n),
-									o = this.parseValue(t, r, n);
+									s = this.parseValue(t, r, n);
 								return (
 									i.addParam(a),
-									i.addParam(o),
+									i.addParam(s),
 									n === p.ConditionType.QUERY
 										? i.validate(this.model.getDb().getType())
 										: i.validateForPull(this.model.getDb().getType()),
@@ -5277,15 +6057,15 @@
 							{
 								const i = new c.FunctionManager.$eq(),
 									a = new l.ArrayFilterFieldValue(
-										new o.ArrayFilterField({ name: e }, this.model, e),
+										new s.ArrayFilterField({ name: e }, this.model, e),
 										e,
 										"none",
 										this.model
 									),
-									s = this.parseValue(t, r, n);
+									o = this.parseValue(t, r, n);
 								return (
 									i.addParam(a),
-									i.addParam(s),
+									i.addParam(o),
 									i.validateForPull(this.model.getDb().getType()),
 									i
 								);
@@ -5294,7 +6074,7 @@
 					}
 					parseValue(e, t, r) {
 						if ("boolean" == typeof e || "number" == typeof e || null === e)
-							return new s.StaticValue(e);
+							return new o.StaticValue(e);
 						if ("string" == typeof e) {
 							const n = this.getFieldObject(e, t);
 							return n
@@ -5306,12 +6086,12 @@
 								  )
 								: "string" == typeof e && r === p.ConditionType.ARRAY_FILTER
 								? new l.ArrayFilterFieldValue(
-										new o.ArrayFilterField({ name: e }, this.model, e),
+										new s.ArrayFilterField({ name: e }, this.model, e),
 										e,
 										"none",
 										this.model
 								  )
-								: new s.StaticValue(e);
+								: new o.StaticValue(e);
 						}
 						if ("object" != typeof e || Array.isArray(e)) {
 							if (Array.isArray(e)) {
@@ -5433,14 +6213,14 @@
 									n = [];
 								for (let i = 0; i < e.length; i++) {
 									const a = {},
-										o = e[i];
-									if (!o) continue;
-									const s = yield this.model.prepareFieldValues(o, !0, a);
+										s = e[i];
+									if (!s) continue;
+									const o = yield this.model.prepareFieldValues(s, !0, a);
 									(null === (r = a.errors) || void 0 === r
 										? void 0
 										: r.length) > 0
 										? n.push({ entry: i, errors: a.errors })
-										: t.push(s);
+										: t.push(o);
 								}
 								if (n.length > 0)
 									throw new f.ClientError(
@@ -5509,7 +6289,7 @@
 								}
 							}
 							const a = {},
-								o = yield this.model.prepareFieldValues(n.main, !1, a);
+								s = yield this.model.prepareFieldValues(n.main, !1, a);
 							if (
 								(null === (r = a.errors) || void 0 === r ? void 0 : r.length) >
 								0
@@ -5520,7 +6300,7 @@
 									a.errors
 								);
 							this.definition.updateData = {
-								set: Object.assign(Object.assign({}, o), n.sub),
+								set: Object.assign(Object.assign({}, s), n.sub),
 								others: i,
 							};
 						});
@@ -5552,7 +6332,7 @@
 							if (n.length > 0) {
 								const i = n[0];
 								if (
-									!p.UpdateOperators.includes(i) &&
+									!p.UpdateOperators.includes(i.toLowerCase()) &&
 									("json" === e.field.getType() ||
 										"binary" === e.field.getType())
 								)
@@ -5564,17 +6344,17 @@
 									"Update instruction should be single key-value pair where the value can be the udpate instruction object e.g., { $inc: 4 }"
 								);
 							const a = n[0],
-								o = t[a];
-							if (!p.UpdateOperators.includes(a))
+								s = t[a];
+							if (!p.UpdateOperators.includes(a.toLowerCase()))
 								throw new f.ClientError(
 									"invalid_update_instruction",
 									`Update type '${a}' is not valid. Allowed update operators are '${p.UpdateOperators.join(
 										", "
 									)}'.`
 								);
-							switch (a) {
+							switch (a.toLowerCase()) {
 								case "$set":
-									yield this.processSetInstruction(e, o, r);
+									yield this.processSetInstruction(e, s, r);
 									break;
 								case "$unset":
 									this.processUnsetInstruction(e, i);
@@ -5583,13 +6363,13 @@
 								case "$mul":
 								case "$min":
 								case "$max":
-									this.processNumericInstruction(e, a, o, i);
+									this.processNumericInstruction(e, a, s, i);
 									break;
 								case "$push":
-									yield this.processPushInstruction(e, o, i);
+									yield this.processPushInstruction(e, s, i);
 									break;
 								case "$pull":
-									this.processPullInstruction(e, o, i);
+									this.processPullInstruction(e, s, i);
 									break;
 								case "$pop":
 								case "$shift":
@@ -5662,7 +6442,7 @@
 						n.push({
 							fieldName: e.fieldPath,
 							field: e.field,
-							type: t,
+							type: t.toLowerCase(),
 							value: r,
 						});
 					}
@@ -5879,6 +6659,14 @@
 								"invalid_grouping_entry",
 								`There is already a grouping with the alias '${e}'.`
 							);
+						if (e.includes(".")) {
+							const t = e.split("."),
+								r = t[t.length - 1];
+							throw new f.ClientError(
+								"invalid_grouping_entry",
+								`You are trying to group records by joined model '${e}' using the dot notation (e.g., modelname.fieldname) which is not allowed. Instead try grouping using {as: '${r}' , expression: '${e}'}`
+							);
+						}
 						r.push({
 							as: e,
 							expression: new u.FieldValue(
@@ -5905,17 +6693,25 @@
 								"invalid_grouping_entry",
 								"The 'as' parameter of the group definition cannot include '.'(dot) characters."
 							);
-						if (!(0, h.isObject)(e.expression))
+						if (
+							!(0, h.isObject)(e.expression) &&
+							!(0, h.isString)(e.expression)
+						)
 							throw new f.ClientError(
 								"invalid_grouping_entry",
-								"The 'expression' parameter of the group definition needs to define the grouping expression as a JSON object."
+								"The 'expression' parameter of the group definition needs to define the grouping expression as a JSON object or a field name."
 							);
-						const n = this.processWhereCondition(
-							e.expression,
-							t,
-							p.ConditionType.QUERY
-						);
-						if (!n)
+						let n = null;
+						if (
+							((n = (0, h.isObject)(e.expression)
+								? this.processWhereCondition(
+										e.expression,
+										t,
+										p.ConditionType.QUERY
+								  )
+								: this.parseValue(e.expression, t, p.ConditionType.QUERY)),
+							!n)
+						)
 							throw new f.ClientError(
 								"invalid_grouping_entry",
 								"The 'expression' of the group definition is missing."
@@ -5967,7 +6763,7 @@
 									"invalid_computation_entry",
 									"The 'compute' parameter needs to be in following format: {$computeOperator : <expression>}. The compute operator can be any of the following: $'{ComputeOperators.join(\n\t\t\t\t\t\t\", \"\n\t\t\t\t\t)}'"
 								);
-							const a = n[0];
+							const a = n[0].toLowerCase();
 							if (!p.ComputeOperators.includes(a))
 								throw new f.ClientError(
 									"invalid_computation_operator",
@@ -5975,25 +6771,25 @@
 										", "
 									)}'.`
 								);
-							let o = null;
+							let s = null;
 							if ("$count" !== a) {
-								o = this.parseValue(e.compute[a], t, p.ConditionType.QUERY);
-								const r = o.getReturnType();
+								s = this.parseValue(e.compute[a], t, p.ConditionType.QUERY);
+								const r = s.getReturnType();
 								if (
-									"$countIf" === a &&
+									"$countif" === a &&
 									r !== p.ReturnType.BOOLEAN &&
 									r !== p.ReturnType.STATICBOOLEAN
 								)
 									throw new f.ClientError(
 										"invalid_computation_operator",
-										`Computation type '${a}' expects a boolean computation but received a computation which returns '${o.getReturnTypeText(
+										`Computation type '${a}' expects a boolean computation but received a computation which returns '${s.getReturnTypeText(
 											r
 										)}'.`
 									);
-								if ("$countIf" !== a && r !== p.ReturnType.NUMBER)
+								if ("$countif" !== a && r !== p.ReturnType.NUMBER)
 									throw new f.ClientError(
 										"invalid_computation_operator",
-										`Computation type '${a}' expects a numeric computation but received a computation which returns '${o.getReturnTypeText(
+										`Computation type '${a}' expects a numeric computation but received a computation which returns '${s.getReturnTypeText(
 											r
 										)}'.`
 									);
@@ -6008,7 +6804,7 @@
 									"invalid_computation_entry",
 									`There is already a computation or grouping with the alias '${e.as}'.`
 								);
-							i.push({ as: e.as, operator: a, compute: o });
+							i.push({ as: e.as, operator: a, compute: s });
 						}
 						this.definition.computations = i;
 					}
@@ -6034,7 +6830,7 @@
 							for (const t of this.definition.computations)
 								e.push({ name: t.as, type: "integer" });
 						return new i.ModelBase(
-							{ name: "dummy", type: "model", fields: e },
+							{ name: "$$dummy", type: "model", fields: e },
 							null,
 							this.model.getDb()
 						);
@@ -6173,8 +6969,8 @@
 				const n = r(1264),
 					i = r(7433),
 					a = r(7984),
-					o = r(6199),
-					s = r(7781),
+					s = r(6199),
+					o = r(7781),
 					u = r(1990),
 					l = r(1126),
 					d = r(86),
@@ -6185,20 +6981,20 @@
 					y = r(736),
 					m = r(2382),
 					g = r(3745),
-					v = r(9175),
-					T = r(6666),
-					b = r(335),
-					E = r(1620),
+					T = r(9175),
+					v = r(6666),
+					E = r(335),
+					b = r(1620),
 					w = r(9337),
-					_ = r(8811),
-					R = r(8321),
+					R = r(8811),
+					_ = r(8321),
 					M = r(300);
 				t.createField = function (e, t) {
 					switch (e.type) {
 						case "id":
 							return new f.IdField(e, t);
 						case "text":
-							return new _.TextField(e, t);
+							return new R.TextField(e, t);
 						case "rich-text":
 							return new w.RichTextField(e, t);
 						case "encrypted-text":
@@ -6208,7 +7004,7 @@
 						case "link":
 							return new g.LinkField(e, t);
 						case "phone":
-							return new b.PhoneField(e, t);
+							return new E.PhoneField(e, t);
 						case "boolean":
 							return new a.BooleanField(e, t);
 						case "integer":
@@ -6216,15 +7012,15 @@
 						case "decimal":
 							return new l.DecimalField(e, t);
 						case "createdat":
-							return new o.CreatedAtField(e, t);
+							return new s.CreatedAtField(e, t);
 						case "updatedat":
 							return new M.UpdatedAtField(e, t);
 						case "datetime":
 							return new u.DateTimeField(e, t);
 						case "date":
-							return new s.DateField(e, t);
+							return new o.DateField(e, t);
 						case "time":
-							return new R.TimeField(e, t);
+							return new _.TimeField(e, t);
 						case "enum":
 							return new p.EnumField(e, t);
 						case "geo-point":
@@ -6234,13 +7030,13 @@
 						case "json":
 							return new m.JSONField(e, t);
 						case "reference":
-							return new E.ReferenceField(e, t);
+							return new b.ReferenceField(e, t);
 						case "basic-values-list":
 							return new n.BasicValuesListField(e, t);
 						case "object-list":
-							return new T.ObjectListField(e, t);
+							return new v.ObjectListField(e, t);
 						case "object":
-							return new v.ObjectField(e, t);
+							return new T.ObjectField(e, t);
 					}
 				};
 			},
@@ -6249,14 +7045,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -6272,7 +7068,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -6332,6 +7128,11 @@
 						isSearchable() {
 							return !1;
 						}
+						getLanguage() {
+							return "MySQL" === this.getDBType()
+								? "utf8mb4_unicode_ci"
+								: "english";
+						}
 						getSubModel() {
 							return null;
 						}
@@ -6349,8 +7150,8 @@
 								(a.details.field = this.getQueryPath()),
 								n >= 0 && (a.details.index = n),
 								void 0 !== t && (a.details.value = t);
-							const o = e.errors;
-							o ? o.push(a) : ((e.errors = []), e.errors.push(a));
+							const s = e.errors;
+							s ? s.push(a) : ((e.errors = []), e.errors.push(a));
 						}
 						prepare(e, t, n, i = !0, a = -1) {
 							return r(this, void 0, void 0, function* () {
@@ -6420,14 +7221,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -6443,7 +7244,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -6514,9 +7315,9 @@
 								return yield this.modelBase.aggregate(e);
 							});
 						}
-						searchText(e, t) {
+						searchText(e, t, n) {
 							return r(this, void 0, void 0, function* () {
-								return yield this.modelBase.searchText(e, t);
+								return yield this.modelBase.searchText(e, t, n);
 							});
 						}
 					});
@@ -6526,14 +7327,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -6549,7 +7350,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -6558,8 +7359,8 @@
 					(t.ModelBase = void 0);
 				const i = r(1687),
 					a = r(5866),
-					o = r(9419),
-					s = r(990),
+					s = r(9419),
+					o = r(990),
 					u = r(9307);
 				t.ModelBase = class {
 					constructor(e, t, r) {
@@ -6624,11 +7425,11 @@
 						return n(this, void 0, void 0, function* () {
 							const n = {},
 								a = null != r ? r : {};
-							for (const [r, o] of this.fields)
-								yield o.prepare(e[r], n, a, t, i),
+							for (const [r, s] of this.fields)
+								yield s.prepare(e[r], n, a, t, i),
 									t &&
 										void 0 === n[r] &&
-										"id" !== o.getType() &&
+										"id" !== s.getType() &&
 										this.db.isSQLDB() &&
 										(n[r] = null);
 							return n;
@@ -6637,12 +7438,12 @@
 					createOne(e) {
 						return n(this, void 0, void 0, function* () {
 							if ((this.resetTimestamp(), !e))
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'createOne' method expects an input object to insert into the database"
 								);
-							if (!(0, o.isObject)(e))
-								throw new s.ClientError(
+							if (!(0, s.isObject)(e))
+								throw new o.ClientError(
 									"invalid_value",
 									"The 'data' to create in the database table/collection needs to be a JSON object"
 								);
@@ -6657,12 +7458,12 @@
 					createMany(e) {
 						return n(this, void 0, void 0, function* () {
 							if ((this.resetTimestamp(), !e))
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'createOne' method expects an array of input objects to insert into the database"
 								);
-							if (!(0, o.isArray)(e))
-								throw new s.ClientError(
+							if (!(0, s.isArray)(e))
+								throw new o.ClientError(
 									"invalid_value",
 									"The 'data' to create in the database table/collection needs to be an array of JSON objects"
 								);
@@ -6677,7 +7478,7 @@
 					findById(e, t) {
 						return n(this, void 0, void 0, function* () {
 							if (!e)
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'findById' method expects id of the record to fetch as input"
 								);
@@ -6697,7 +7498,7 @@
 					findOne(e, t) {
 						return n(this, void 0, void 0, function* () {
 							if (!e)
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'findOne' method expects the where condition to query database records"
 								);
@@ -6725,7 +7526,7 @@
 					findMany(e, t) {
 						return n(this, void 0, void 0, function* () {
 							if (!e)
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'findMany' method expects the where condition to query database records"
 								);
@@ -6754,7 +7555,7 @@
 					deleteById(e) {
 						return n(this, void 0, void 0, function* () {
 							if (!e)
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'deleteById' method expects id of the record to delete as input"
 								);
@@ -6765,7 +7566,7 @@
 					deleteOne(e, t) {
 						return n(this, void 0, void 0, function* () {
 							if (!e)
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'delete' method expects the where condition to query database records"
 								);
@@ -6785,7 +7586,7 @@
 					deleteMany(e, t) {
 						return n(this, void 0, void 0, function* () {
 							if (!e)
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'delete' method expects the where condition to query database records"
 								);
@@ -6805,17 +7606,17 @@
 					updateById(e, t, r) {
 						return n(this, void 0, void 0, function* () {
 							if (!e)
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'updateById' method expects id of the record to update as input"
 								);
 							if (!t)
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'updateById' method expects the update definitions as input parameter"
 								);
-							if (!(0, o.isObject)(t))
-								throw new s.ClientError(
+							if (!(0, s.isObject)(t))
+								throw new o.ClientError(
 									"invalid_value",
 									"The 'updateById' method expects the update definitions as an object of key-value pairs"
 								);
@@ -6836,17 +7637,17 @@
 					updateOne(e, t, r) {
 						return n(this, void 0, void 0, function* () {
 							if (!e)
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'update' method expects the where condition to query database records"
 								);
 							if (!t)
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'update' method expects the update definitions as input parameter"
 								);
-							if (!(0, o.isObject)(t))
-								throw new s.ClientError(
+							if (!(0, s.isObject)(t))
+								throw new o.ClientError(
 									"invalid_value",
 									"The 'update' method expects the update definitions as an object of key-value pairs"
 								);
@@ -6872,17 +7673,17 @@
 					updateMany(e, t, r) {
 						return n(this, void 0, void 0, function* () {
 							if (!e)
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'update' method expects the where condition to query database records"
 								);
 							if (!t)
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'update' method expects the update definitions as input parameter"
 								);
-							if (!(0, o.isObject)(t))
-								throw new s.ClientError(
+							if (!(0, s.isObject)(t))
+								throw new o.ClientError(
 									"invalid_value",
 									"The 'update' method expects the update definitions as an object of key-value pairs"
 								);
@@ -6904,7 +7705,7 @@
 					aggregate(e) {
 						return n(this, void 0, void 0, function* () {
 							if (!e || !e.computations)
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'aggregate' method expects at least one computation to aggregate database records"
 								);
@@ -6923,37 +7724,43 @@
 							);
 						});
 					}
-					searchText(e, t) {
+					searchText(e, t, r) {
 						return n(this, void 0, void 0, function* () {
 							if (!e)
-								throw new s.ClientError(
+								throw new o.ClientError(
+									"missing_input_parameter",
+									"The 'searchText' method expects the full-text indexed (searchable) field name to query database records"
+								);
+							if (!t)
+								throw new o.ClientError(
 									"missing_input_parameter",
 									"The 'searchText' method expects the search string to query database records"
 								);
 							if (!this.hasSearchIndex())
-								throw new s.ClientError(
+								throw new o.ClientError(
 									"not_searchable_model",
 									"To run text search on a model records you need to have at least one 'searchable' text or rich-text field."
 								);
-							const r = new i.DBAction(this);
+							const n = new i.DBAction(this);
 							return (
-								r.setMethod("searchText"),
-								r.setSearchText(e),
-								t &&
-									(r.setWhere(
-										null == t ? void 0 : t.where,
-										null == t ? void 0 : t.join,
+								n.setMethod("searchText"),
+								n.setSearchField(e),
+								n.setSearchText(t),
+								r &&
+									(n.setWhere(
+										null == r ? void 0 : r.where,
+										null == r ? void 0 : r.join,
 										u.ConditionType.QUERY
 									),
-									r.setReadReplica(t.useReadReplica),
-									r.setSelect(t.select, this.mergeArrays(t.join, t.lookup)),
-									r.setOmit(t.omit, this.mergeArrays(t.join, t.lookup)),
-									r.setLookup(t.lookup),
-									r.setJoin(t.join),
-									r.setSort(t.sort, t.join),
-									r.setSkip(t.skip),
-									r.setLimit(t.limit)),
-								yield r.execute()
+									n.setReadReplica(r.useReadReplica),
+									n.setSelect(r.select, this.mergeArrays(r.join, r.lookup)),
+									n.setOmit(r.omit, this.mergeArrays(r.join, r.lookup)),
+									n.setLookup(r.lookup),
+									n.setJoin(r.join),
+									n.setSort(r.sort, r.join),
+									n.setSkip(r.skip),
+									n.setLimit(r.limit)),
+								yield n.execute()
 							);
 						});
 					}
@@ -6984,14 +7791,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7007,7 +7814,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7060,14 +7867,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7083,7 +7890,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7114,14 +7921,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7137,7 +7944,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7168,14 +7975,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7191,7 +7998,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7216,14 +8023,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7239,7 +8046,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7248,11 +8055,11 @@
 					(t.DateField = void 0);
 				const i = r(1111),
 					a = global.helper;
-				class o extends i.Field {
+				class s extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, r, i = !0, o = -1) {
+					setValue(e, t, r, i = !0, s = -1) {
 						return n(this, void 0, void 0, function* () {
 							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
@@ -7261,26 +8068,26 @@
 								return void (t[this.getName()] = this.model.getTimestamp());
 							const n = a.getDtmFromString(e.toString());
 							if (!n || !n.isValid)
-								return this.addValidationError(r, e, "not_date_value", o);
+								return this.addValidationError(r, e, "not_date_value", s);
 							t[this.getName()] = n.toJSDate();
 						});
 					}
 				}
-				t.DateField = o;
+				t.DateField = s;
 			},
 			1990: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7296,7 +8103,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7305,11 +8112,11 @@
 					(t.DateTimeField = void 0);
 				const i = r(1111),
 					a = global.helper;
-				class o extends i.Field {
+				class s extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, r, i = !0, o = -1) {
+					setValue(e, t, r, i = !0, s = -1) {
 						return n(this, void 0, void 0, function* () {
 							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
@@ -7318,26 +8125,26 @@
 								return void (t[this.getName()] = this.model.getTimestamp());
 							const n = a.getDtmFromString(e.toString());
 							if (!n || !n.isValid)
-								return this.addValidationError(r, e, "not_datetime_value", o);
+								return this.addValidationError(r, e, "not_datetime_value", s);
 							t[this.getName()] = n.toJSDate();
 						});
 					}
 				}
-				t.DateTimeField = o;
+				t.DateTimeField = s;
 			},
 			1126: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7353,7 +8160,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7362,41 +8169,41 @@
 					(t.DecimalField = void 0);
 				const i = r(1111),
 					a = global.helper;
-				class o extends i.Field {
+				class s extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, r, i = !0, o = -1) {
+					setValue(e, t, r, i = !0, s = -1) {
 						return n(this, void 0, void 0, function* () {
 							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if ("number" != typeof e || !isFinite(e))
-								return this.addValidationError(r, e, "not_decimal_value", o);
+								return this.addValidationError(r, e, "not_decimal_value", s);
 							const n = this.meta.decimal,
-								s = a
+								o = a
 									.createDecimal(e)
 									.toDecimalPlaces(n.decimalDigits, 4)
 									.toNumber();
-							t[this.getName()] = s;
+							t[this.getName()] = o;
 						});
 					}
 				}
-				t.DecimalField = o;
+				t.DecimalField = s;
 			},
 			86: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7412,7 +8219,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7421,11 +8228,11 @@
 					(t.EmailField = void 0);
 				const i = r(1111),
 					a = global.helper;
-				class o extends i.Field {
+				class s extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, r, i = !0, o = -1) {
+					setValue(e, t, r, i = !0, s = -1) {
 						return n(this, void 0, void 0, function* () {
 							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
@@ -7434,43 +8241,43 @@
 								("object" == typeof e && !1 === Array.isArray(e)) ||
 								Array.isArray(e)
 							)
-								return this.addValidationError(r, e, "not_text_value", o);
+								return this.addValidationError(r, e, "not_text_value", s);
 							const n = e.toString().trim();
 							return "" === n && this.isRequired()
 								? this.addValidationError(
 										r,
 										n,
 										"invalid_required_field_value",
-										o
+										s
 								  )
 								: n.length > 320
 								? this.addValidationError(
 										r,
 										n,
 										"max_length_threshold_exceeded",
-										o
+										s
 								  )
 								: !1 === a.isEmail(n)
-								? this.addValidationError(r, n, "invalid_email_address", o)
+								? this.addValidationError(r, n, "invalid_email_address", s)
 								: void (t[this.getName()] = n);
 						});
 					}
 				}
-				t.EmailField = o;
+				t.EmailField = s;
 			},
 			5206: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7486,7 +8293,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7495,11 +8302,11 @@
 					(t.EncryptedTextField = void 0);
 				const i = r(1111),
 					a = global.helper;
-				class o extends i.Field {
+				class s extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, r, i = !0, o = -1) {
+					setValue(e, t, r, i = !0, s = -1) {
 						return n(this, void 0, void 0, function* () {
 							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
@@ -7508,22 +8315,22 @@
 								("object" == typeof e && !1 === Array.isArray(e)) ||
 								Array.isArray(e)
 							)
-								return this.addValidationError(r, e, "not_text_value", o);
+								return this.addValidationError(r, e, "not_text_value", s);
 							let n = e.toString();
 							if ("" === n && this.isRequired())
 								return this.addValidationError(
 									r,
 									n,
 									"invalid_required_field_value",
-									o
+									s
 								);
-							const s = this.meta.encryptedText;
-							if (n.length > s.maxLength)
+							const o = this.meta.encryptedText;
+							if (n.length > o.maxLength)
 								return this.addValidationError(
 									r,
 									n,
 									"max_length_threshold_exceeded",
-									o
+									s
 								);
 							null != n &&
 								"" !== n &&
@@ -7531,21 +8338,21 @@
 						});
 					}
 				}
-				t.EncryptedTextField = o;
+				t.EncryptedTextField = s;
 			},
 			6081: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7561,7 +8368,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7579,7 +8386,7 @@
 						return !1;
 					}
 					setValue(e, t, r, i = !0, a = -1) {
-						var o, s;
+						var s, o;
 						return n(this, void 0, void 0, function* () {
 							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
@@ -7604,11 +8411,11 @@
 								);
 							const u =
 								null !==
-									(s =
-										null === (o = this.meta.enum) || void 0 === o
+									(o =
+										null === (s = this.meta.enum) || void 0 === s
 											? void 0
-											: o.selectList) && void 0 !== s
-									? s
+											: s.selectList) && void 0 !== o
+									? o
 									: [];
 							if (!this.isValueFromList(u, n))
 								return this.addValidationError(
@@ -7628,14 +8435,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7651,7 +8458,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7660,83 +8467,83 @@
 					(t.GeoPointField = void 0);
 				const i = r(1111),
 					a = r(9307);
-				class o extends i.Field {
+				class s extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, r, i = !0, o = -1) {
+					setValue(e, t, r, i = !0, s = -1) {
 						return n(this, void 0, void 0, function* () {
 							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if (!Array.isArray(e) || 2 !== e.length)
-								return this.addValidationError(r, e, "not_geopoint_value"), o;
+								return this.addValidationError(r, e, "not_geopoint_value"), s;
 							if ("number" != typeof e[0] || !isFinite(e[0]))
 								return this.addValidationError(
 									r,
 									e,
 									"invalid_longitude_value",
-									o
+									s
 								);
 							if ("number" != typeof e[1] || !isFinite(e[1]))
 								return this.addValidationError(
 									r,
 									e,
 									"invalid_latitude_value",
-									o
+									s
 								);
 							const n = e[0],
-								s = e[1];
+								o = e[1];
 							if (n < -180 || n > 180)
 								return this.addValidationError(
 									r,
 									e,
 									"invalid_longitude_value",
-									o
+									s
 								);
-							if (s < -90 || s > 90)
+							if (o < -90 || o > 90)
 								return this.addValidationError(
 									r,
 									e,
 									"invalid_latitude_value",
-									o
+									s
 								);
 							switch (this.getDBType()) {
 								case a.DBTYPE.MONGODB:
 									t[this.getName()] = { type: "Point", coordinates: e };
 									break;
 								case a.DBTYPE.POSTGRESQL:
-									t[this.getName()] = `${n},${s}`;
+									t[this.getName()] = `${n},${o}`;
 									break;
 								case a.DBTYPE.MYSQL:
-									t[this.getName()] = `POINT(${n}, ${s})`;
+									t[this.getName()] = `POINT(${n}, ${o})`;
 									break;
 								case a.DBTYPE.SQLSERVER:
-									t[this.getName()] = `geography::Point(${n}, ${s}, 4326)`;
+									t[this.getName()] = `geography::Point(${n}, ${o}, 4326)`;
 									break;
 								case a.DBTYPE.ORACLE:
 									t[
 										this.getName()
-									] = `SDO_GEOMETRY(\n\t\t\t\t\t2001,            \n\t\t\t\t\tNULL,           \n\t\t\t\t\tSDO_POINT_TYPE(${n}, ${s}, NULL), \n\t\t\t\t\tNULL,            \n\t\t\t\t\tNULL             \n\t\t\t\t)`;
+									] = `SDO_GEOMETRY(\n\t\t\t\t\t2001,            \n\t\t\t\t\tNULL,           \n\t\t\t\t\tSDO_POINT_TYPE(${n}, ${o}, NULL), \n\t\t\t\t\tNULL,            \n\t\t\t\t\tNULL             \n\t\t\t\t)`;
 							}
 						});
 					}
 				}
-				t.GeoPointField = o;
+				t.GeoPointField = s;
 			},
 			9677: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7752,7 +8559,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7776,14 +8583,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7799,7 +8606,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7808,23 +8615,23 @@
 					(t.IntegerField = void 0);
 				const i = r(1111),
 					a = global.helper;
-				class o extends i.Field {
+				class s extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, r, i = !0, o = -1) {
+					setValue(e, t, r, i = !0, s = -1) {
 						return n(this, void 0, void 0, function* () {
 							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							if ("number" != typeof e || !isFinite(e))
-								return this.addValidationError(r, e, "not_integer_value", o);
+								return this.addValidationError(r, e, "not_integer_value", s);
 							const n = a.createDecimal(e).toDecimalPlaces(0).toNumber();
 							t[this.getName()] = n;
 						});
 					}
 				}
-				t.IntegerField = o;
+				t.IntegerField = s;
 			},
 			1779: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
@@ -7848,14 +8655,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7871,7 +8678,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7880,16 +8687,16 @@
 					(t.JSONField = void 0);
 				const i = r(1111),
 					a = r(9307);
-				class o extends i.Field {
+				class s extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, r, i = !0, o = -1) {
+					setValue(e, t, r, i = !0, s = -1) {
 						return n(this, void 0, void 0, function* () {
 							if (i || !this.isReadOnly())
 								if (null !== e || !1 !== this.isRequired()) {
 									if ("object" != typeof e)
-										return this.addValidationError(r, e, "not_json_value", o);
+										return this.addValidationError(r, e, "not_json_value", s);
 									switch (this.getDBType()) {
 										case a.DBTYPE.MONGODB:
 											t[this.getName()] = e;
@@ -7904,21 +8711,21 @@
 						});
 					}
 				}
-				t.JSONField = o;
+				t.JSONField = s;
 			},
 			3745: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -7934,7 +8741,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -7943,11 +8750,11 @@
 					(t.LinkField = void 0);
 				const i = r(1111),
 					a = global.helper;
-				class o extends i.Field {
+				class s extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, r, i = !0, o = -1) {
+					setValue(e, t, r, i = !0, s = -1) {
 						return n(this, void 0, void 0, function* () {
 							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
@@ -7956,43 +8763,43 @@
 								("object" == typeof e && !1 === Array.isArray(e)) ||
 								Array.isArray(e)
 							)
-								return this.addValidationError(r, e, "not_text_value", o);
+								return this.addValidationError(r, e, "not_text_value", s);
 							const n = e.toString().trim();
 							return "" === n && this.isRequired()
 								? this.addValidationError(
 										r,
 										n,
 										"invalid_required_field_value",
-										o
+										s
 								  )
 								: n.length > 2048
 								? this.addValidationError(
 										r,
 										n,
 										"max_length_threshold_exceeded",
-										o
+										s
 								  )
 								: !1 === a.isLink(n)
-								? this.addValidationError(r, n, "invalid_URL", o)
+								? this.addValidationError(r, n, "invalid_URL", s)
 								: void (t[this.getName()] = n);
 						});
 					}
 				}
-				t.LinkField = o;
+				t.LinkField = s;
 			},
 			9175: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -8008,7 +8815,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -8017,13 +8824,13 @@
 					(t.ObjectField = void 0);
 				const i = r(892),
 					a = r(1111),
-					o = r(990);
-				class s extends a.Field {
+					s = r(990);
+				class o extends a.Field {
 					constructor(e, t) {
 						super(e, t);
 						const r = t.getDb().getModelMetaByIId(e.object.iid);
 						if (!r)
-							throw new o.ClientError(
+							throw new s.ClientError(
 								"submodel_not_found",
 								`Cannot find the sub-model of the field '${
 									e.name
@@ -8081,11 +8888,11 @@
 						});
 					}
 					prepare(e, t, r, i = !0, a = -1) {
-						const o = Object.create(null, {
+						const s = Object.create(null, {
 							prepare: { get: () => super.prepare },
 						});
 						return n(this, void 0, void 0, function* () {
-							if ((yield o.prepare.call(this, e, t, r, i), i)) {
+							if ((yield s.prepare.call(this, e, t, r, i), i)) {
 								const n = yield this.subModel.prepareFieldValues(
 									e || {},
 									i,
@@ -8097,21 +8904,21 @@
 						});
 					}
 				}
-				t.ObjectField = s;
+				t.ObjectField = o;
 			},
 			6666: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -8127,7 +8934,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -8136,13 +8943,13 @@
 					(t.ObjectListField = void 0);
 				const i = r(892),
 					a = r(1111),
-					o = r(990);
-				class s extends a.Field {
+					s = r(990);
+				class o extends a.Field {
 					constructor(e, t) {
 						super(e, t);
 						const r = t.getDb().getModelMetaByIId(e.objectList.iid);
 						if (!r)
-							throw new o.ClientError(
+							throw new s.ClientError(
 								"submodel_not_found",
 								`Cannot find the sub-model of the field '${
 									e.name
@@ -8189,36 +8996,36 @@
 						});
 					}
 					prepare(e, t, r, i = !0, a = -1) {
-						const o = Object.create(null, {
+						const s = Object.create(null, {
 							prepare: { get: () => super.prepare },
 						});
 						return n(this, void 0, void 0, function* () {
-							if ((yield o.prepare.call(this, e, t, r, i, a), i)) {
+							if ((yield s.prepare.call(this, e, t, r, i, a), i)) {
 								e = e || [];
 								for (let n = 0; n < e.length; n++) {
 									const a = e[n],
-										o = yield this.subModel.prepareFieldValues(a, i, r, n);
-									t[this.getName()].push(o);
+										s = yield this.subModel.prepareFieldValues(a, i, r, n);
+									t[this.getName()].push(s);
 								}
 							}
 						});
 					}
 				}
-				t.ObjectListField = s;
+				t.ObjectListField = o;
 			},
 			335: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -8234,7 +9041,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -8243,90 +9050,9 @@
 					(t.PhoneField = void 0);
 				const i = r(1111),
 					a = global.helper;
-				class o extends i.Field {
-					constructor(e, t) {
-						super(e, t);
-					}
-					setValue(e, t, r, i = !0, o = -1) {
-						return n(this, void 0, void 0, function* () {
-							if (!i && this.isReadOnly()) return;
-							if (null === e && !1 === this.isRequired())
-								return void (t[this.getName()] = null);
-							if (
-								("object" == typeof e && !1 === Array.isArray(e)) ||
-								Array.isArray(e)
-							)
-								return this.addValidationError(r, e, "not_text_value", o);
-							const n = e.toString().trim();
-							return "" === n && this.isRequired()
-								? this.addValidationError(
-										r,
-										n,
-										"invalid_required_field_value",
-										o
-								  )
-								: n.length > 16
-								? this.addValidationError(
-										r,
-										n,
-										"max_length_threshold_exceeded",
-										o
-								  )
-								: !1 === a.isMobilePhone(n)
-								? this.addValidationError(r, n, "invalid_phone_number", o)
-								: void (t[this.getName()] = n);
-						});
-					}
-				}
-				t.PhoneField = o;
-			},
-			1620: function (e, t, r) {
-				var n =
-					(this && this.__awaiter) ||
-					function (e, t, r, n) {
-						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
-								try {
-									u(n.next(e));
-								} catch (e) {
-									a(e);
-								}
-							}
-							function s(e) {
-								try {
-									u(n.throw(e));
-								} catch (e) {
-									a(e);
-								}
-							}
-							function u(e) {
-								var t;
-								e.done
-									? i(e.value)
-									: ((t = e.value),
-									  t instanceof r
-											? t
-											: new r(function (e) {
-													e(t);
-											  })).then(o, s);
-							}
-							u((n = n.apply(e, t || [])).next());
-						});
-					};
-				Object.defineProperty(t, "__esModule", { value: !0 }),
-					(t.ReferenceField = void 0);
-				const i = r(1111),
-					a = r(9307),
-					o = global.helper;
 				class s extends i.Field {
 					constructor(e, t) {
 						super(e, t);
-					}
-					getRefModelIId() {
-						var e;
-						return null === (e = this.meta.reference) || void 0 === e
-							? void 0
-							: e.iid;
 					}
 					setValue(e, t, r, i = !0, s = -1) {
 						return n(this, void 0, void 0, function* () {
@@ -8337,50 +9063,43 @@
 								("object" == typeof e && !1 === Array.isArray(e)) ||
 								Array.isArray(e)
 							)
-								return this.addValidationError(r, e, "not_reference_value", s);
+								return this.addValidationError(r, e, "not_text_value", s);
 							const n = e.toString().trim();
-							if (!n && this.isRequired())
-								return this.addValidationError(
-									r,
-									n,
-									"invalid_required_field_value",
-									s
-								);
-							switch (this.getDBType()) {
-								case a.DBTYPE.MONGODB:
-									if (!o.isValidId(n))
-										return this.addValidationError(
-											r,
-											n,
-											"invalid_mongodb_id",
-											s
-										);
-									t[this.getName()] = o.objectId(n);
-									break;
-								case a.DBTYPE.POSTGRESQL:
-								case a.DBTYPE.MYSQL:
-								case a.DBTYPE.SQLSERVER:
-								case a.DBTYPE.ORACLE:
-									t[this.getName()] = e;
-							}
+							return "" === n && this.isRequired()
+								? this.addValidationError(
+										r,
+										n,
+										"invalid_required_field_value",
+										s
+								  )
+								: n.length > 16
+								? this.addValidationError(
+										r,
+										n,
+										"max_length_threshold_exceeded",
+										s
+								  )
+								: !1 === a.isMobilePhone(n)
+								? this.addValidationError(r, n, "invalid_phone_number", s)
+								: void (t[this.getName()] = n);
 						});
 					}
 				}
-				t.ReferenceField = s;
+				t.PhoneField = s;
 			},
-			9337: function (e, t, r) {
+			1620: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -8396,7 +9115,95 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
+							}
+							u((n = n.apply(e, t || [])).next());
+						});
+					};
+				Object.defineProperty(t, "__esModule", { value: !0 }),
+					(t.ReferenceField = void 0);
+				const i = r(1111),
+					a = r(9307),
+					s = global.helper;
+				class o extends i.Field {
+					constructor(e, t) {
+						super(e, t);
+					}
+					getRefModelIId() {
+						var e;
+						return null === (e = this.meta.reference) || void 0 === e
+							? void 0
+							: e.iid;
+					}
+					setValue(e, t, r, i = !0, o = -1) {
+						return n(this, void 0, void 0, function* () {
+							if (!i && this.isReadOnly()) return;
+							if (null === e && !1 === this.isRequired())
+								return void (t[this.getName()] = null);
+							if (
+								("object" == typeof e && !1 === Array.isArray(e)) ||
+								Array.isArray(e)
+							)
+								return this.addValidationError(r, e, "not_reference_value", o);
+							const n = e.toString().trim();
+							if (!n && this.isRequired())
+								return this.addValidationError(
+									r,
+									n,
+									"invalid_required_field_value",
+									o
+								);
+							switch (this.getDBType()) {
+								case a.DBTYPE.MONGODB:
+									if (!s.isValidId(n))
+										return this.addValidationError(
+											r,
+											n,
+											"invalid_mongodb_id",
+											o
+										);
+									t[this.getName()] = s.objectId(n);
+									break;
+								case a.DBTYPE.POSTGRESQL:
+								case a.DBTYPE.MYSQL:
+								case a.DBTYPE.SQLSERVER:
+								case a.DBTYPE.ORACLE:
+									t[this.getName()] = e;
+							}
+						});
+					}
+				}
+				t.ReferenceField = o;
+			},
+			9337: function (e, t, r) {
+				var n =
+					(this && this.__awaiter) ||
+					function (e, t, r, n) {
+						return new (r || (r = Promise))(function (i, a) {
+							function s(e) {
+								try {
+									u(n.next(e));
+								} catch (e) {
+									a(e);
+								}
+							}
+							function o(e) {
+								try {
+									u(n.throw(e));
+								} catch (e) {
+									a(e);
+								}
+							}
+							function u(e) {
+								var t;
+								e.done
+									? i(e.value)
+									: ((t = e.value),
+									  t instanceof r
+											? t
+											: new r(function (e) {
+													e(t);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -8413,6 +9220,12 @@
 						return null === (e = this.meta.richText) || void 0 === e
 							? void 0
 							: e.searchable;
+					}
+					getLanguage() {
+						var e;
+						return null === (e = this.meta.richText) || void 0 === e
+							? void 0
+							: e.language;
 					}
 					setValue(e, t, r, i = !0, a = -1) {
 						return n(this, void 0, void 0, function* () {
@@ -8443,14 +9256,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -8466,7 +9279,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -8483,6 +9296,12 @@
 						return null === (e = this.meta.text) || void 0 === e
 							? void 0
 							: e.searchable;
+					}
+					getLanguage() {
+						var e;
+						return null === (e = this.meta.text) || void 0 === e
+							? void 0
+							: e.language;
 					}
 					setValue(e, t, r, i = !0, a = -1) {
 						return n(this, void 0, void 0, function* () {
@@ -8502,8 +9321,8 @@
 									"invalid_required_field_value",
 									a
 								);
-							const o = this.meta.text;
-							if (n.length > o.maxLength)
+							const s = this.meta.text;
+							if (n.length > s.maxLength)
 								return this.addValidationError(
 									r,
 									n,
@@ -8521,14 +9340,14 @@
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -8544,7 +9363,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});
@@ -8553,36 +9372,36 @@
 					(t.TimeField = void 0);
 				const i = r(1111),
 					a = global.helper;
-				class o extends i.Field {
+				class s extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, r, i = !0, o = -1) {
+					setValue(e, t, r, i = !0, s = -1) {
 						return n(this, void 0, void 0, function* () {
 							if (!i && this.isReadOnly()) return;
 							if (null === e && !1 === this.isRequired())
 								return void (t[this.getName()] = null);
 							const n = a.getTimeFromString(e.toString());
-							if (!n) return this.addValidationError(r, e, "not_time_value", o);
+							if (!n) return this.addValidationError(r, e, "not_time_value", s);
 							t[this.getName()] = n;
 						});
 					}
 				}
-				t.TimeField = o;
+				t.TimeField = s;
 			},
 			300: function (e, t, r) {
 				var n =
 					(this && this.__awaiter) ||
 					function (e, t, r, n) {
 						return new (r || (r = Promise))(function (i, a) {
-							function o(e) {
+							function s(e) {
 								try {
 									u(n.next(e));
 								} catch (e) {
 									a(e);
 								}
 							}
-							function s(e) {
+							function o(e) {
 								try {
 									u(n.throw(e));
 								} catch (e) {
@@ -8598,7 +9417,7 @@
 											? t
 											: new r(function (e) {
 													e(t);
-											  })).then(o, s);
+											  })).then(s, o);
 							}
 							u((n = n.apply(e, t || [])).next());
 						});

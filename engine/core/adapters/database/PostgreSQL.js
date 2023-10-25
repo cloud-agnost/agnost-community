@@ -64,6 +64,28 @@ export class PostgreSQL extends SQLDatabase {
 	}
 
 	/**
+	 * Returns the comma seperated list of value placeholders for the input JSON object
+	 * @param  {Object} data The JSON object
+	 */
+	getValuePlaceholders(data) {
+		if (Array.isArray(data)) {
+			const keyCount = Object.keys(data[0]).length;
+			return data
+				.map(
+					(entry, i1) =>
+						`(${Object.keys(entry)
+							.map((entry, i2) => `$${i1 * keyCount + i2 + 1}`)
+							.join(", ")})`
+				)
+				.join(",\n");
+		} else {
+			return `(${Object.keys(data)
+				.map((entry, index) => `$${index + 1}`)
+				.join(", ")})`;
+		}
+	}
+
+	/**
 	 * Prepares the select part of the query namely the fields that will be returned.
 	 * @param  {Object} dbMeta The database metadata
 	 * @param  {Object} modelMeta The model metadata
@@ -386,11 +408,139 @@ export class PostgreSQL extends SQLDatabase {
 
 	/**
 	 * Prepares the 'group by' part of the query
-	 * @param  {Object} modelMeta The model metadata
-	 * @param  {Array} joins The list of join definitions
+	 * @param  {Array} groupBys The group by definitions
+	 * @param  {Array} computations The computation definitions
+	 * @returns  The SELECT query string for aggregation operation
+	 */
+	getAggregationSelectDefinitions(groupBys, computations) {
+		// First add the groupBy entries
+		const selectEntries = [];
+		if (groupBys) {
+			for (const groupBy of groupBys) {
+				selectEntries.push(
+					`${groupBy.expression.getQuery("PostgreSQL")} AS ${groupBy.as}`
+				);
+			}
+		}
+
+		for (const comp of computations) {
+			switch (comp.operator) {
+				case "$count":
+					selectEntries.push(`COUNT(*) AS ${comp.as}`);
+					break;
+				case "$countIf":
+					selectEntries.push(
+						`COUNT(*) FILTER (WHERE ${comp.compute.getQuery(
+							"PostgreSQL"
+						)}) AS ${comp.as}`
+					);
+					break;
+				case "$sum":
+					selectEntries.push(
+						`SUM(${comp.compute.getQuery("PostgreSQL")}) AS ${comp.as}`
+					);
+					break;
+				case "$avg":
+					selectEntries.push(
+						`AVG(${comp.compute.getQuery("PostgreSQL")}) AS ${comp.as}`
+					);
+					break;
+				case "$min":
+					selectEntries.push(
+						`MIN(${comp.compute.getQuery("PostgreSQL")}) AS ${comp.as}`
+					);
+					break;
+				case "$max":
+					selectEntries.push(
+						`MAX(${comp.compute.getQuery("PostgreSQL")}) AS ${comp.as}`
+					);
+					break;
+				default:
+					break;
+			}
+		}
+
+		return selectEntries.join(",\n");
+	}
+
+	/**
+	 * Prepares the 'group by' part of the query
+	 * @param  {Array} groupBys The group by definitions
 	 * @returns  The GROUP BY query string
 	 */
-	getGroupByDefinition(modelMeta, joins) {}
+	getGroupByDefinition(groupBys) {
+		if (!groupBys || groupBys.length === 0) return null;
+
+		return groupBys
+			.map((entry) => `${entry.expression.getQuery("PostgreSQL")}`)
+			.join(",\n");
+	}
+
+	/**
+	 * Prepares the 'group by' part of the query
+	 * @param  {Array} groupBys The group by definitions
+	 * @param  {Array} computations The computation definitions
+	 * @returns  The SELECT query string for aggregation operation
+	 */
+	getHavingDefinition(having, computations) {
+		if (!having) return null;
+		// First add the groupBy entries
+		let havingQuery = `${having.getQuery("PostgreSQL")}`;
+
+		// This is need to remove overlapping cases, so that replaceAll does not mess up
+		computations
+			.sort((a, b) => {
+				return b.as.length - a.as.length;
+			})
+			.sort((a, b) => {
+				if (a.as > b.as) return -1;
+				if (a.as < b.as) return 1;
+				return 0;
+			});
+
+		// In SQL we need to replace the field values used in having with their counterpart computation expressions
+		for (const comp of computations) {
+			switch (comp.operator) {
+				case "$count":
+					havingQuery = havingQuery.replaceAll(comp.as, "COUNT(*)");
+					break;
+				case "$countif":
+					havingQuery = havingQuery.replaceAll(
+						comp.as,
+						`(COUNT(*) FILTER (WHERE ${comp.compute.getQuery("PostgreSQL")}))`
+					);
+					break;
+				case "$sum":
+					havingQuery = havingQuery.replaceAll(
+						comp.as,
+						`SUM(${comp.compute.getQuery("PostgreSQL")})`
+					);
+					break;
+				case "$avg":
+					havingQuery = havingQuery.replaceAll(
+						comp.as,
+						`AVG(${comp.compute.getQuery("PostgreSQL")})`
+					);
+					break;
+				case "$min":
+					havingQuery = havingQuery.replaceAll(
+						comp.as,
+						`MIN(${comp.compute.getQuery("PostgreSQL")})`
+					);
+					break;
+				case "$max":
+					havingQuery = havingQuery.replaceAll(
+						comp.as,
+						`MAX(${comp.compute.getQuery("PostgreSQL")})`
+					);
+					break;
+				default:
+					break;
+			}
+		}
+
+		return havingQuery;
+	}
 
 	/**
 	 * Prepares the 'order by' part of the query
@@ -402,14 +552,33 @@ export class PostgreSQL extends SQLDatabase {
 
 		const sortList = [];
 		for (const entry of sort) {
-			if (entry.joinType === "none")
-				sortList.push(
-					`${entry.joinModel.getName()}.${entry.field.getName()} ${entry.order.toUpperCase()}`
-				);
-			else sortList.push(`${entry.fieldPath} ${entry.order.toUpperCase()}`);
+			if (entry.joinType === "none") {
+				const modelName = entry.field.getModel().getName();
+				if (modelName !== "$$dummy")
+					sortList.push(
+						`${entry.joinModel.getName()}.${entry.field.getName()} ${entry.order.toUpperCase()}`
+					);
+				else
+					sortList.push(
+						`${entry.field.getName()} ${entry.order.toUpperCase()}`
+					);
+			} else sortList.push(`${entry.fieldPath} ${entry.order.toUpperCase()}`);
 		}
 
 		return sortList.join(", ");
+	}
+
+	/**
+	 * Prepares the full-text search part of the query
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} searchField The search field
+	 * @param  {string} searchText The search text
+	 * @returns  The full-text search query string
+	 */
+	getTextSearchDefinition(modelMeta, searchField, searchText) {
+		const language = searchField.field.getLanguage();
+		const fieldName = `${modelMeta.name}.${searchField.field.getName()}`;
+		return `to_tsvector('${language}', ${fieldName}) @@ to_tsquery('${language}', '${searchText}')`;
 	}
 
 	/**
@@ -570,7 +739,6 @@ export class PostgreSQL extends SQLDatabase {
 
 		const joins = this.getJoinDefinitions(modelMeta, options.join);
 		const where = this.getWhereDefinition(options.where);
-		//const groupBy = this.getGroupByDefinition(modelMeta, options.join);
 		const orderBy = this.getOrderByDefinition(options.sort);
 		const limit = options.limit ?? null;
 		const offset = options.skip ?? null;
@@ -856,5 +1024,100 @@ export class PostgreSQL extends SQLDatabase {
 		const result = await this.getDriver().query(updateQuery, values);
 
 		return { count: result.rowCount };
+	}
+
+	/**
+	 * Returns the records matching the search query
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The searchText, where, select, omit, join, sort, skip, limit and useReadReplica options
+	 * @returns  The fetched records otherwise an empty array [] if no records can be found
+	 */
+	async searchText(dbMeta, modelMeta, options) {
+		const from = this.getTableName(dbMeta, modelMeta);
+		const select = this.getJoinLookupSelectDefinition(
+			dbMeta,
+			modelMeta,
+			options.select,
+			options.omit,
+			this.mergeArrays(options.lookup, options.join)
+		);
+		const textSearch = this.getTextSearchDefinition(
+			modelMeta,
+			options.searchField,
+			options.searchText
+		);
+		const joins = this.getJoinDefinitions(modelMeta, options.join);
+		const where = this.getWhereDefinition(options.where);
+		const orderBy = this.getOrderByDefinition(options.sort);
+		const limit = options.limit ?? null;
+		const offset = options.skip ?? null;
+
+		// SQL query to select a record from the database
+		let selectQuery = "";
+		selectQuery = `SELECT ${select}`;
+		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+
+		if (joins) selectQuery = `${selectQuery}\n${joins}`;
+		if (where) selectQuery = `${selectQuery}\nWHERE ${textSearch} AND ${where}`;
+		else selectQuery = `${selectQuery}\nWHERE ${textSearch}`;
+
+		if (orderBy) selectQuery = `${selectQuery}\nORDER BY ${orderBy}`;
+		if (limit) selectQuery = `${selectQuery}\nLIMIT ${limit}`;
+		if (offset) selectQuery = `${selectQuery}\nOFFSET ${offset};`;
+
+		console.log("***sql", selectQuery);
+
+		// Execute the SELECT query
+		const result = await this.getDriver().query(selectQuery);
+
+		return result.rows && result.rows.length > 0 ? result.rows : [];
+	}
+
+	/**
+	 * Groups the records and performs computations on these groups
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The `where`, `join`, `groupBy`, `computations`, `having`, `sort`, `limit` and `skip`  instructions
+	 * @returns  Group computation results
+	 */
+	async aggregate(dbMeta, modelMeta, options) {
+		const from = this.getTableName(dbMeta, modelMeta);
+		const select = this.getAggregationSelectDefinitions(
+			options.groupBy,
+			options.computations
+		);
+
+		const joins = this.getJoinDefinitions(modelMeta, options.join);
+		const where = this.getWhereDefinition(options.where);
+		const groupBy = this.getGroupByDefinition(options.groupBy);
+		const having = this.getHavingDefinition(
+			options.having,
+			options.computations
+		);
+
+		const orderBy = this.getOrderByDefinition(options.sort);
+		const limit = options.limit ?? null;
+		const offset = options.skip ?? null;
+
+		// SQL query to run aggregations
+		let aggregateQuery = "";
+		aggregateQuery = `SELECT ${select}`;
+		aggregateQuery = `${aggregateQuery}\nFROM ${from} AS ${modelMeta.name}`;
+
+		if (joins) aggregateQuery = `${aggregateQuery}\n${joins}`;
+		if (where) aggregateQuery = `${aggregateQuery}\nWHERE ${where}`;
+		if (groupBy) aggregateQuery = `${aggregateQuery}\nGROUP By ${groupBy}`;
+		if (having) aggregateQuery = `${aggregateQuery}\nHAVING ${having}`;
+		if (orderBy) aggregateQuery = `${aggregateQuery}\nORDER BY ${orderBy}`;
+		if (limit) aggregateQuery = `${aggregateQuery}\nLIMIT ${limit}`;
+		if (offset) aggregateQuery = `${aggregateQuery}\nOFFSET ${offset};`;
+
+		console.log("***sql", aggregateQuery);
+
+		// Execute the SELECT query
+		const result = await this.getDriver().query(aggregateQuery);
+
+		return result.rows && result.rows.length > 0 ? result.rows : [];
 	}
 }

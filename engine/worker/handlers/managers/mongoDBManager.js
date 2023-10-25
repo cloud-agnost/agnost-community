@@ -292,7 +292,12 @@ export class MongoDBManager extends DBManager {
             }
 
             //Create all required indices
-            await collection.createIndexes(requiredIndices);
+            if (result.textIndexDef?.key) {
+                await collection.createIndexes(requiredIndices, {
+                    default_language: "none",
+                    language_override: "language",
+                });
+            } else await collection.createIndexes(requiredIndices);
             this.addLog(t("Completed processing collection index defitions for model '%s'", model.name));
         }
     }

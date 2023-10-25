@@ -56,28 +56,6 @@ export class SQLDatabase extends DatabaseBase {
 	}
 
 	/**
-	 * Returns the comma seperated list of value placeholders for the input JSON object
-	 * @param  {Object} data The JSON object
-	 */
-	getValuePlaceholders(data) {
-		if (Array.isArray(data)) {
-			const keyCount = Object.keys(data[0]).length;
-			return data
-				.map(
-					(entry, i1) =>
-						`(${Object.keys(entry)
-							.map((entry, i2) => `$${i1 * keyCount + i2 + 1}`)
-							.join(", ")})`
-				)
-				.join(",\n");
-		} else {
-			return `(${Object.keys(data)
-				.map((entry, index) => `$${index + 1}`)
-				.join(", ")})`;
-		}
-	}
-
-	/**
 	 * Returns the SQL represenation of id value
 	 * @param  {Object} id The id value
 	 */

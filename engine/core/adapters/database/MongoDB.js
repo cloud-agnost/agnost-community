@@ -388,7 +388,7 @@ export class MongoDB extends DatabaseBase {
 				case "$count":
 					comps[comp.as] = { $sum: 1 };
 					break;
-				case "$countIf":
+				case "$countif":
 					comps[comp.as] = {
 						$sum: {
 							$cond: { if: comp.compute.getQuery("MongoDB"), then: 1, else: 0 },
@@ -435,7 +435,7 @@ export class MongoDB extends DatabaseBase {
 		pipeline.push({
 			$match: {
 				$text: {
-					$search: searchText,
+					$search: searchText.normalize("NFD"),
 					$caseSensitive: false,
 					$diacriticSensitive: false,
 				},
@@ -1178,8 +1178,6 @@ export class MongoDB extends DatabaseBase {
 		this.createSkipStage(options.skip, pipeline);
 		this.createLimitStage(options.limit, pipeline);
 		this.createProjectStage(options.select, options.omit, pipeline);
-
-		// console.log("***pipeline", JSON.stringify(pipeline, null, 2));
 
 		const dataCursor = await collection.aggregate(pipeline, {
 			allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
