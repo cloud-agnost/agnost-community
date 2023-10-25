@@ -4,8 +4,8 @@ import { DATABASE } from "../../../config/constants.js";
 export default class Id extends Field {
     createMap = {
         [DATABASE.PostgreSQL]: "{NAME} {TYPE} PRIMARY KEY",
-        [DATABASE.MySQL]: "`{NAME}` {TYPE} PRIMARY KEY",
-        [DATABASE.SQLServer]: "{NAME} {TYPE} PRIMARY KEY",
+        [DATABASE.MySQL]: "`{NAME}` {TYPE} AUTO_INCREMENT PRIMARY KEY",
+        [DATABASE.SQLServer]: "{NAME} {TYPE} IDENTITY(1,1) PRIMARY KEY",
     };
 
     isIndexed() {
