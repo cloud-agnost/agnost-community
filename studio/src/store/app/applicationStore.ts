@@ -22,14 +22,14 @@ import {
 } from '@/types';
 
 import { PAGE_SIZE } from '@/constants';
+import { CustomStateStorage, create } from '@/helpers';
+import useAuthStore from '@/store/auth/authStore';
+import useVersionStore from '@/store/version/versionStore';
 import { joinChannel, leaveChannel, translate } from '@/utils';
 import OrganizationService from 'services/OrganizationService.ts';
-import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
-import useAuthStore from '../auth/authStore';
-import useVersionStore from '../version/versionStore';
 
-interface ApplicationStore {
+interface ApplicationState {
 	application: Application | null;
 	applications: Application[];
 	toDeleteApp: Application | null;
@@ -51,6 +51,9 @@ interface ApplicationStore {
 	isDeleteModalOpen: boolean;
 	isLeaveModalOpen: boolean;
 	role: AppRoles;
+}
+
+type Actions = {
 	selectApplication: (application: Application) => void;
 	changeAppName: (req: ChangeAppNameRequest) => Promise<Application>;
 	setAppAvatar: (req: SetAppAvatarRequest) => Promise<Application>;
@@ -83,38 +86,44 @@ interface ApplicationStore {
 	closeDeleteModal: () => void;
 	openLeaveModal: (application: Application) => void;
 	closeLeaveModal: () => void;
-}
+	reset: () => void;
+};
 
-const useApplicationStore = create<ApplicationStore>()(
+// define the initial state
+const initialState: ApplicationState = {
+	application: null,
+	applications: [],
+	temp: [],
+	applicationTeam: [],
+	tempTeam: [],
+	isVersionOpen: false,
+	isEditAppOpen: false,
+	isInviteMemberOpen: false,
+	loading: false,
+	error: null,
+	teamOptions: [],
+	invitations: [],
+	invitationPage: 0,
+	invitationSort: {
+		name: translate('general.sortOptions.default'),
+		value: '',
+		sortDir: '',
+	},
+	invitationSearch: '',
+	invitationRoleFilter: [],
+	appAuthorization: {} as AppPermissions,
+	isDeleteModalOpen: false,
+	isLeaveModalOpen: false,
+	toDeleteApp: null,
+	role: '' as AppRoles,
+};
+
+const useApplicationStore = create<ApplicationState & Actions>()(
 	subscribeWithSelector(
 		devtools(
 			persist(
 				(set, get) => ({
-					application: null,
-					applications: [],
-					temp: [],
-					applicationTeam: [],
-					tempTeam: [],
-					isVersionOpen: false,
-					isEditAppOpen: false,
-					isInviteMemberOpen: false,
-					loading: false,
-					error: null,
-					teamOptions: [],
-					invitations: [],
-					invitationPage: 0,
-					invitationSort: {
-						name: translate('general.sortOptions.default'),
-						value: '',
-						sortDir: '',
-					},
-					invitationSearch: '',
-					invitationRoleFilter: [],
-					appAuthorization: {} as AppPermissions,
-					isDeleteModalOpen: false,
-					isLeaveModalOpen: false,
-					toDeleteApp: null,
-					role: '' as AppRoles,
+					...initialState,
 					openDeleteModal: (application: Application) => {
 						set({
 							isDeleteModalOpen: true,
@@ -507,9 +516,11 @@ const useApplicationStore = create<ApplicationStore>()(
 							throw error as APIError;
 						}
 					},
+					reset: () => set(initialState),
 				}),
 				{
 					name: 'application-storage',
+					storage: CustomStateStorage,
 				},
 			),
 		),

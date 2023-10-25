@@ -1,25 +1,29 @@
+import { create } from '@/helpers';
 import { AuthService, UserService } from '@/services';
 import type {
 	APIError,
 	CompleteAccountSetupRequest,
 	FinalizeAccountSetupRequest,
+	LoginParams,
+	LogoutParams,
 	User,
-} from '@/types/type.ts';
+} from '@/types';
 import { joinChannel, leaveChannel } from '@/utils';
-import localforage from 'localforage';
-import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 
-interface AuthStore {
+interface AuthState {
 	accessToken: string | null | undefined;
 	refreshToken: string | null | undefined;
 	loading: boolean;
-	error: APIError | null;
-	user: User | null;
-	email: string | null;
-	setUser: (user: User | null) => void;
-	login: (email: string, password: string) => Promise<User>;
-	logout: () => Promise<void>;
+	error: APIError;
+	user: User;
+	email: string;
+}
+
+type Actions = {
+	setUser: (user: User) => void;
+	login: (req: LoginParams) => Promise<User>;
+	logout: (req: LogoutParams) => Promise<void>;
 	setToken: (accessToken: string | null | undefined) => void;
 	setRefreshToken: (refreshToken: string | null | undefined) => void;
 	isAuthenticated: () => boolean;
@@ -48,38 +52,52 @@ interface AuthStore {
 	confirmChangeLoginEmail: (token: string) => Promise<void>;
 	getUser: () => Promise<User>;
 	getUserPicture: () => string;
-}
+	reset: () => void;
+};
 
-const useAuthStore = create<AuthStore>()(
+const initialState: AuthState = {
+	accessToken: '',
+	refreshToken: '',
+	loading: false,
+	error: {} as APIError,
+	user: {} as User,
+	email: '',
+};
+
+const useAuthStore = create<AuthState & Actions>()(
 	subscribeWithSelector(
 		devtools(
 			persist(
 				(set, get) => ({
-					accessToken: '',
-					refreshToken: '',
-					loading: false,
-					error: null,
-					user: null,
-					email: null,
+					...initialState,
 					setUser: (user) => {
 						set({ user });
 						if (user) joinChannel(user._id);
 						if (user?.at) get().setToken(user.at);
 						if (user?.rt) get().setRefreshToken(user.rt);
 					},
-					login: async (email, password) => {
-						const res = await AuthService.login(email, password);
-						get().setUser(res);
-						return res;
+					login: async (req: LoginParams) => {
+						try {
+							const user = await AuthService.login(req.email, req.password);
+							get().setUser(user);
+							if (req.onSuccess) req.onSuccess(user);
+							return user;
+						} catch (error) {
+							if (req.onError) req.onError(error as APIError);
+							set({ error: error as APIError });
+							throw error;
+						}
 					},
-					logout: async () => {
-						const user = get().user;
-						if (user) leaveChannel(user?._id);
-						await AuthService.logout();
-						get().setUser(null);
-						localStorage.clear();
-						localforage.clear();
-						location.href = '/login';
+					logout: async (req: LogoutParams) => {
+						try {
+							const user = get().user;
+							if (user) leaveChannel(user?._id);
+							AuthService.logout();
+							set(initialState);
+							req.onSuccess?.();
+						} catch (error) {
+							req.onError?.(error as APIError);
+						}
 					},
 					setToken: (accessToken) => set({ accessToken }),
 					setRefreshToken: (refreshToken) => set({ refreshToken }),
@@ -204,6 +222,9 @@ const useAuthStore = create<AuthStore>()(
 					},
 					getUserPicture() {
 						return location.origin.replace(':4000', '') + '/api' + get().user?.pictureUrl;
+					},
+					reset() {
+						set(initialState);
 					},
 				}),
 				{

@@ -1,3 +1,4 @@
+import { create } from '@/helpers';
 import { ResourceService } from '@/services';
 import {
 	APIError,
@@ -11,7 +12,6 @@ import {
 	UpdateResourceAllowedRolesRequest,
 } from '@/types';
 import { joinChannel, leaveChannel } from '@/utils';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 export interface ResourceStore {
 	resources: Resource[];
@@ -26,6 +26,9 @@ export interface ResourceStore {
 	deletedResource: Resource | null;
 	isEditResourceModalOpen: boolean;
 	resourceToEdit: Resource;
+}
+
+type Actions = {
 	getResources: (req: GetResourcesRequest) => Promise<Resource[]>;
 	testExistingResourceConnection: (req: AddExistingResourceRequest) => Promise<void>;
 	addExistingResource: (req: AddExistingResourceRequest) => Promise<Resource>;
@@ -43,26 +46,28 @@ export interface ResourceStore {
 	openEditResourceModal: (resource: Resource, type: string) => void;
 	closeEditResourceModal: () => void;
 	getOrgResources: (req: GetResourcesRequest) => Promise<Resource[]>;
-}
+	reset: () => void;
+};
+const initialState: ResourceStore = {
+	resources: [],
+	isCreateResourceModalOpen: false,
+	resourceConfig: {
+		type: '',
+		instance: '',
+		resourceType: '' as ResourceType,
+	},
+	openCreateReplicaModal: false,
+	isDeletedResourceModalOpen: false,
+	deletedResource: null,
+	isEditResourceModalOpen: false,
+	resourceToEdit: {} as Resource,
+};
 
-const useResourceStore = create<ResourceStore>()(
+const useResourceStore = create<ResourceStore & Actions>()(
 	devtools(
 		persist(
 			(set) => ({
-				resources: [],
-				isCreateResourceModalOpen: false,
-				resourceConfig: {
-					type: '',
-					instance: '',
-					resourceType: '' as ResourceType,
-				},
-				openCreateReplicaModal: false,
-				isDeletedResourceModalOpen: false,
-				deletedResource: null,
-				lastFetchedCount: 0,
-				isEditResourceModalOpen: false,
-				resourceToEdit: {} as Resource,
-				orgResources: [],
+				...initialState,
 				getResources: async (req: GetResourcesRequest) => {
 					try {
 						const resources = await ResourceService.getResources(req);
@@ -237,6 +242,7 @@ const useResourceStore = create<ResourceStore>()(
 						throw error as APIError;
 					}
 				},
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'resources-store',

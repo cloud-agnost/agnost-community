@@ -1,3 +1,4 @@
+import { create } from '@/helpers';
 import { CustomStateStorage } from '@/helpers/state';
 import { MiddlewareService } from '@/services';
 import {
@@ -11,14 +12,16 @@ import {
 	SaveMiddlewareCodeParams,
 	UpdateMiddlewareParams,
 } from '@/types';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 interface MiddlewareStore {
 	middlewares: Middleware[];
-	middleware: Middleware | null;
+	middleware: Middleware;
 	editMiddlewareDrawerIsOpen: boolean;
 	lastFetchedCount: number;
+}
+
+type Actions = {
 	getMiddlewaresOfAppVersion: (params: GetMiddlewaresOfAppVersionParams) => Promise<Middleware[]>;
 	getMiddlewareById: (params: GetMiddlewareByIdParams) => Promise<Middleware>;
 	deleteMiddleware: (params: DeleteMiddlewareParams) => Promise<void>;
@@ -27,17 +30,22 @@ interface MiddlewareStore {
 	updateMiddleware: (params: UpdateMiddlewareParams) => Promise<Middleware>;
 	saveMiddlewareCode: (params: SaveMiddlewareCodeParams) => Promise<Middleware>;
 	setEditMiddlewareDrawerIsOpen: (open: boolean) => void;
-	setMiddleware: (middleware: Middleware | null) => void;
-}
+	setMiddleware: (middleware: Middleware) => void;
+	reset: () => void;
+};
 
-const useMiddlewareStore = create<MiddlewareStore>()(
+const initialState: MiddlewareStore = {
+	middlewares: [],
+	middleware: {} as Middleware,
+	lastFetchedCount: 0,
+	editMiddlewareDrawerIsOpen: false,
+};
+
+const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 	devtools(
 		persist(
 			(set) => ({
-				middlewares: [],
-				middleware: null,
-				lastFetchedCount: 0,
-				editMiddlewareDrawerIsOpen: false,
+				...initialState,
 				createMiddleware: async (params: CreateMiddlewareParams) => {
 					try {
 						const middleware = await MiddlewareService.createMiddleware(params);
@@ -117,21 +125,15 @@ const useMiddlewareStore = create<MiddlewareStore>()(
 					}));
 					return middleware;
 				},
-				setEditMiddlewareDrawerIsOpen: (open: boolean) => {
-					set({ editMiddlewareDrawerIsOpen: open });
-				},
-				setMiddleware: (middleware) => {
-					set({ middleware });
-				},
+				setEditMiddlewareDrawerIsOpen: (open: boolean) => set({ editMiddlewareDrawerIsOpen: open }),
+				setMiddleware: (middleware) => set({ middleware }),
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'middleware-storage',
 				storage: CustomStateStorage,
 			},
 		),
-		{
-			name: 'middleware',
-		},
 	),
 );
 

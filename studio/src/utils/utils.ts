@@ -1,4 +1,5 @@
-import { PARAM_REGEX } from '@/constants';
+import { ORG_CHANGE_EXCEPTIONS, PARAM_REGEX, VERSION_CHANGE_EXCEPTIONS } from '@/constants';
+import { STATE_LIST } from '@/constants/stateList';
 import { socket } from '@/helpers';
 import { useToast as toast } from '@/hooks';
 import { t } from '@/i18n/config.ts';
@@ -15,6 +16,7 @@ import jsParser from 'prettier/plugins/babel';
 import esTreePlugin from 'prettier/plugins/estree';
 import { HTMLInputTypeAttribute } from 'react';
 import { twMerge } from 'tailwind-merge';
+
 type EmptyableArray = readonly [] | [];
 type EmptyableString = '' | string;
 type EmptyableObject<T extends object> = T & Record<keyof T, never>;
@@ -411,4 +413,20 @@ export function getUrlWithoutQuery(url: string) {
 export function getTabIdFromUrl() {
 	const searchParams = new URLSearchParams(window.location.search);
 	return searchParams.get('tabId');
+}
+
+export function resetAfterVersionChange() {
+	Object.entries(STATE_LIST).forEach(([name, store]) => {
+		if (!VERSION_CHANGE_EXCEPTIONS.includes(name)) {
+			store.getState()?.reset();
+		}
+	});
+}
+
+export function resetAfterOrgChange() {
+	Object.entries(STATE_LIST).forEach(([name, store]) => {
+		if (!ORG_CHANGE_EXCEPTIONS.includes(name)) {
+			store.getState()?.reset();
+		}
+	});
 }

@@ -12,13 +12,13 @@ import {
 } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { PasswordInput } from '@/components/PasswordInput';
+import { resetAllStores } from '@/helpers';
 import { GuestOnly } from '@/router';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 import { APIError } from '@/types';
 import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import localforage from 'localforage';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -60,8 +60,7 @@ const FormSchema = z.object({
 });
 
 AccountInformation.loader = async () => {
-	localStorage.clear();
-	localforage.clear();
+	resetAllStores();
 	return {};
 };
 

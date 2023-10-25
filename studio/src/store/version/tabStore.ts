@@ -1,12 +1,14 @@
+import { create } from '@/helpers';
 import { Tab, TabTypes, UpdateTabParams } from '@/types';
 import { generateId, getUrlWithoutQuery, history, translate } from '@/utils';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import useVersionStore from './versionStore';
 interface TabStore {
 	tabs: Record<string, Tab[]>;
 	toDeleteTab: Tab;
 	isDeleteTabModalOpen: boolean;
+}
+type Actions = {
 	openDeleteTabModal: (tab: Tab) => void;
 	closeDeleteTabModal: () => void;
 	removeAllTabs: (versionId: string) => void;
@@ -26,15 +28,19 @@ interface TabStore {
 	removeTabByPath: (versionId: string, path: string) => void;
 	updateTab: (param: UpdateTabParams) => void;
 	addSettingsTab: (versionId: string, path?: string) => void;
-}
+	reset: () => void;
+};
 
-const useTabStore = create<TabStore>()(
+const initialState: TabStore = {
+	tabs: {},
+	toDeleteTab: {} as Tab,
+	isDeleteTabModalOpen: false,
+};
+const useTabStore = create<TabStore & Actions>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				tabs: {},
-				toDeleteTab: {} as Tab,
-				isDeleteTabModalOpen: false,
+				...initialState,
 				openDeleteTabModal: (tab) => {
 					set({ toDeleteTab: tab, isDeleteTabModalOpen: true });
 				},
@@ -235,6 +241,7 @@ const useTabStore = create<TabStore>()(
 						type: TabTypes.Settings,
 					});
 				},
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'tab-storage',

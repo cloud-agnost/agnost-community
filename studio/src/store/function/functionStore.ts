@@ -1,7 +1,6 @@
-import { CustomStateStorage } from '@/helpers';
+import { CustomStateStorage, create } from '@/helpers';
 import { FunctionService } from '@/services';
 import * as funcTypes from '@/types';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 interface FunctionStore {
 	functions: funcTypes.HelperFunction[];
@@ -11,6 +10,8 @@ interface FunctionStore {
 	toDeleteFunction: funcTypes.HelperFunction;
 	isDeleteFunctionModalOpen: boolean;
 	editedLogic: string;
+}
+type Actions = {
 	getFunctionsOfAppVersion: (
 		params: funcTypes.GetFunctionsOfAppVersion,
 	) => Promise<funcTypes.HelperFunction[]>;
@@ -25,19 +26,24 @@ interface FunctionStore {
 	openDeleteFunctionModal: (func: funcTypes.HelperFunction) => void;
 	closeDeleteFunctionModal: () => void;
 	setEditedLogic: (logic: string) => void;
-}
+	reset: () => void;
+};
 
-const useFunctionStore = create<FunctionStore>()(
+const initialState: FunctionStore = {
+	functions: [],
+	function: {} as funcTypes.HelperFunction,
+	lastFetchedCount: 0,
+	editedLogic: '',
+	isEditFunctionDrawerOpen: false,
+	toDeleteFunction: {} as funcTypes.HelperFunction,
+	isDeleteFunctionModalOpen: false,
+};
+
+const useFunctionStore = create<FunctionStore & Actions>()(
 	devtools(
 		persist(
 			(set) => ({
-				functions: [],
-				function: {} as funcTypes.HelperFunction,
-				lastFetchedCount: 0,
-				editedLogic: '',
-				isEditFunctionDrawerOpen: false,
-				toDeleteFunction: {} as funcTypes.HelperFunction,
-				isDeleteFunctionModalOpen: false,
+				...initialState,
 				getFunctionsOfAppVersion: async (params) => {
 					const functions = await FunctionService.getFunctionsOfAppVersion(params);
 					if (params.page === 0) {
@@ -127,6 +133,7 @@ const useFunctionStore = create<FunctionStore>()(
 				setEditedLogic: (logic) => {
 					set({ editedLogic: logic });
 				},
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'function-store',

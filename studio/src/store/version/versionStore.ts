@@ -1,4 +1,4 @@
-import { CustomStateStorage } from '@/helpers';
+import { CustomStateStorage, create } from '@/helpers';
 import { VersionService } from '@/services';
 import {
 	APIError,
@@ -19,9 +19,7 @@ import {
 	VersionLog,
 	VersionLogBucket,
 } from '@/types';
-import { history } from '@/utils';
-import localforage from 'localforage';
-import { create } from 'zustand';
+import { history, resetAfterVersionChange } from '@/utils';
 import { devtools, persist } from 'zustand/middleware';
 import useAuthStore from '../auth/authStore';
 
@@ -44,6 +42,9 @@ interface VersionStore {
 	notificationLastFetchedCount: number;
 	designElements: DesignElement[];
 	dashboard: Dashboard;
+}
+
+type Actions = {
 	selectVersion: (version: Version) => void;
 	getVersionById: (req: GetVersionByIdParams) => Promise<Version>;
 	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<Version[]>;
@@ -65,32 +66,38 @@ interface VersionStore {
 	searchDesignElements: (params: SearchDesignElementParams) => Promise<DesignElement[]>;
 	resetDesignElements: () => void;
 	getVersionDashboardInfo: (params: BaseParams) => Promise<void>;
-}
+	reset: () => void;
+};
 
-const useVersionStore = create<VersionStore>()(
+const initialState: VersionStore = {
+	notificationLastFetchedCount: 0,
+	loading: false,
+	error: {} as APIError,
+	deleteVersionDrawerIsOpen: false,
+	version: {} as Version,
+	versions: [],
+	versionPage: 0,
+	createCopyVersionDrawerIsOpen: false,
+	logBuckets: {} as VersionLogBucket,
+	logs: [],
+	notifications: [],
+	notificationsPreview: [],
+	log: {} as VersionLog,
+	lastFetchedLogCount: 0,
+	showLogDetails: false,
+	notificationLastSeen: new Date(),
+	designElements: [],
+	dashboard: {} as Dashboard,
+};
+
+const useVersionStore = create<VersionStore & Actions>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				notificationLastFetchedCount: 0,
-				loading: false,
-				error: {} as APIError,
-				deleteVersionDrawerIsOpen: false,
-				version: {} as Version,
-				versions: [],
-				versionPage: 0,
-				createCopyVersionDrawerIsOpen: false,
-				logBuckets: {} as VersionLogBucket,
-				logs: [],
-				notifications: [],
-				notificationsPreview: [],
-				log: {} as VersionLog,
-				lastFetchedLogCount: 0,
-				showLogDetails: false,
-				notificationLastSeen: new Date(),
-				designElements: [],
-				dashboard: {} as Dashboard,
+				...initialState,
 				selectVersion: (version: Version) => {
-					localforage.clear();
+					if (version._id === get().version._id) return;
+					resetAfterVersionChange();
 					set({ version });
 					history.navigate?.(get().getVersionDashboardPath());
 				},
@@ -259,12 +266,16 @@ const useVersionStore = create<VersionStore>()(
 						throw error as APIError;
 					}
 				},
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'version-storage',
 				storage: CustomStateStorage,
 			},
 		),
+		{
+			name: 'version-store',
+		},
 	),
 );
 

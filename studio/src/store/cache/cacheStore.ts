@@ -1,4 +1,5 @@
 import { CustomStateStorage } from '@/helpers';
+import { create } from '@/helpers/store';
 import { CacheService } from '@/services';
 import {
 	APIError,
@@ -10,7 +11,6 @@ import {
 	GetCachesOfAppVersionParams,
 	UpdateCacheParams,
 } from '@/types';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 interface CacheStore {
@@ -22,6 +22,9 @@ interface CacheStore {
 	toDeleteCache: Cache;
 	isDeleteCacheModalOpen: boolean;
 	lastFetchedCount: number;
+}
+
+type Actions = {
 	getCaches: (params: GetCachesOfAppVersionParams) => Promise<void>;
 	getCacheById: (params: GetCacheByIdParams) => Promise<void>;
 	createCache: (params: CreateCacheParams) => Promise<void>;
@@ -32,20 +35,25 @@ interface CacheStore {
 	closeEditCacheModal: () => void;
 	openDeleteCacheModal: (cache: Cache) => void;
 	closeDeleteCacheModal: () => void;
-}
+	reset: () => void;
+};
 
-const useCacheStore = create<CacheStore>()(
+const initialState: CacheStore = {
+	caches: [],
+	cache: {} as Cache,
+	loading: false,
+	error: null,
+	isEditCacheModalOpen: false,
+	toDeleteCache: {} as Cache,
+	isDeleteCacheModalOpen: false,
+	lastFetchedCount: 0,
+};
+
+const useCacheStore = create<CacheStore & Actions>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				caches: [],
-				cache: {} as Cache,
-				loading: false,
-				error: null,
-				isEditCacheModalOpen: false,
-				toDeleteCache: {} as Cache,
-				isDeleteCacheModalOpen: false,
-				lastFetchedCount: 0,
+				...initialState,
 				getCaches: async (params: GetCachesOfAppVersionParams) => {
 					try {
 						const caches = await CacheService.getCaches(params);
@@ -126,12 +134,16 @@ const useCacheStore = create<CacheStore>()(
 				closeDeleteCacheModal: () => {
 					set({ isDeleteCacheModalOpen: false, toDeleteCache: {} as Cache });
 				},
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'cache-store',
 				storage: CustomStateStorage,
 			},
 		),
+		{
+			name: 'cache',
+		},
 	),
 );
 export default useCacheStore;

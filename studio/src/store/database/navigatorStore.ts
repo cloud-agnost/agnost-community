@@ -1,3 +1,4 @@
+import { create } from '@/helpers';
 import { NavigatorService } from '@/services';
 import {
 	APIError,
@@ -5,28 +6,35 @@ import {
 	DeleteMultipleDataFromModelParams,
 	GetDataFromModelParams,
 } from '@/types';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 interface NavigatorStore {
 	editedField: string;
 	data: Record<string, any>[];
 	subModelData: Record<string, any>[];
 	selectedSubModelId: string;
+}
+
+type Actions = {
 	setEditedField: (field: string) => void;
 	getDataFromModel: (param: GetDataFromModelParams) => Promise<void>;
 	deleteDataFromModel: (param: DeleteDataFromModelParams) => Promise<void>;
 	deleteMultipleDataFromModel: (param: DeleteMultipleDataFromModelParams) => Promise<void>;
 	updateDataFromModel: (param: any) => Promise<void>;
-}
+	reset: () => void;
+};
 
-const useNavigatorStore = create<NavigatorStore>()(
+const initialState: NavigatorStore = {
+	editedField: '',
+	data: [],
+	subModelData: [],
+	selectedSubModelId: '',
+};
+
+const useNavigatorStore = create<NavigatorStore & Actions>()(
 	devtools(
 		persist(
 			(set) => ({
-				editedField: '',
-				data: [],
-				subModelData: [],
-				selectedSubModelId: '',
+				...initialState,
 				setEditedField: (field) => set({ editedField: field }),
 				getDataFromModel: async (param) => {
 					const data = await NavigatorService.getDataFromModel(param);
@@ -73,6 +81,7 @@ const useNavigatorStore = create<NavigatorStore>()(
 						throw error;
 					}
 				},
+				reset: () => set(initialState),
 			}),
 
 			{
