@@ -20,11 +20,13 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import './AuthUserDropdown.scss';
-
+import { useNavigate } from 'react-router-dom';
+import { resetAllStores } from '@/helpers';
 export default function AuthUserDropdown() {
 	const { user, logout } = useAuthStore();
 	const { t } = useTranslation();
 	const { setTheme, theme } = useThemeStore();
+	const navigate = useNavigate();
 	const THEMES = [
 		{
 			id: 'light',
@@ -43,6 +45,14 @@ export default function AuthUserDropdown() {
 		},
 	];
 
+	function logoutHandler() {
+		logout({
+			onSuccess: () => {
+				navigate('/login');
+				resetAllStores();
+			},
+		});
+	}
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger>
@@ -110,7 +120,7 @@ export default function AuthUserDropdown() {
 				<DropdownMenuSeparator />
 				<DropdownMenuItem
 					className='flex text-sm text-default leading-6 font-normal items-center gap-2'
-					onClick={logout}
+					onClick={logoutHandler}
 				>
 					<span className='w-6 h-6 flex items-center justify-center'>
 						<SignOut className='text-icon-base text-lg' />
