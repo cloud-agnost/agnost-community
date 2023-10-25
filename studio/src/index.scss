@@ -181,9 +181,9 @@
 		--green-800: 9, 94, 53;
 		--green-900: 6, 62, 35;
 
-		--wrapper-background-base: 255, 255, 255;
+		--wrapper-background-base: 249, 249, 251;
 		--wrapper-background-hover: 237, 238, 243;
-		--wrapper-background-light: 255, 255, 255;
+		--wrapper-background-light: 247, 248, 250;
 
 		--radius: 0.5rem;
 
@@ -542,4 +542,5 @@ html .light ::-webkit-scrollbar-track {
 }
 .infinite-scroll-component__outerdiv {
 	height: 100%;
+	background: rgb(247, 248, 250);
 }
