@@ -39,7 +39,8 @@
 	},
 	"decimal": {
 		"error": "Please enter a valid decimal number",
-		"decimal_digits": "Please enter a valid decimal number with up to {{decimal_digits}} decimal places"
+		"decimal_digits": "Please enter a valid decimal number with up to {{decimal_digits}} decimal places",
+		"decimal_digits_range": "Please enter a valid digit number with {{min_decimal_digits}} to {{max_decimal_digits}} decimal places"
 	},
 	"fieldMaxLength": {
 		"error": "Max length cannot be less than the current max length"
