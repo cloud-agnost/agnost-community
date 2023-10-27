@@ -244,11 +244,11 @@
 					T = n(r(9674)),
 					v = n(r(5850)),
 					E = n(r(1946)),
-					b = n(r(3115)),
-					w = n(r(5616)),
-					R = n(r(7934)),
-					_ = n(r(6489)),
-					M = n(r(2237)),
+					R = n(r(3115)),
+					b = n(r(5616)),
+					w = n(r(7934)),
+					M = n(r(6489)),
+					_ = n(r(2237)),
 					O = n(r(9660)),
 					P = n(r(3481)),
 					$ = n(r(789)),
@@ -298,11 +298,11 @@
 					Te = n(r(1723)),
 					ve = n(r(3057)),
 					Ee = n(r(6923)),
-					be = n(r(8051)),
-					we = n(r(4184)),
-					Re = n(r(6768)),
-					_e = n(r(6735)),
-					Me = n(r(107)),
+					Re = n(r(8051)),
+					be = n(r(4184)),
+					we = n(r(6768)),
+					Me = n(r(6735)),
+					_e = n(r(107)),
 					Oe = n(r(4997));
 				t.FunctionManager = {
 					$abs: i.default,
@@ -322,11 +322,11 @@
 					$includes: T.default,
 					$left: v.default,
 					$length: E.default,
-					$lower: b.default,
-					$lt: w.default,
-					$lte: R.default,
-					$ltrim: _.default,
-					$mod: M.default,
+					$lower: R.default,
+					$lt: b.default,
+					$lte: w.default,
+					$ltrim: M.default,
+					$mod: _.default,
 					$multiply: O.default,
 					$neq: P.default,
 					$nin: $.default,
@@ -376,11 +376,11 @@
 					$now: Te.default,
 					$todecimal: ve.default,
 					$toboolean: Ee.default,
-					$tointeger: be.default,
-					$todate: we.default,
-					$tostring: Re.default,
-					$toobjectid: _e.default,
-					$distance: Me.default,
+					$tointeger: Re.default,
+					$todate: be.default,
+					$tostring: we.default,
+					$toobjectid: Me.default,
+					$distance: _e.default,
 					$point: Oe.default,
 				};
 			},
@@ -1674,6 +1674,10 @@
 								(r.getReturnType() === i.ReturnType.ID &&
 									t.getReturnType() === i.ReturnType.TEXT)
 							) &&
+							((t.getReturnType() !== i.ReturnType.DATE &&
+								t.getReturnType() !== i.ReturnType.DATETIME) ||
+								(r.getReturnType() !== i.ReturnType.DATE &&
+									r.getReturnType() !== i.ReturnType.DATETIME)) &&
 							t.getReturnType() !== r.getReturnType()
 						)
 							throw new a.ClientError(
@@ -1739,18 +1743,31 @@
 							paramCount: 1,
 							returnType: i.ReturnType.BOOLEAN,
 							params: i.ReturnType.ANY,
-							mapping: { MongoDB: "$custom" },
+							mapping: {
+								MongoDB: "$custom",
+								PostgreSQL: "EXISTS",
+								MySQL: "EXISTS",
+							},
 						});
 					}
 					getQuery(e, t) {
-						return e === i.DBTYPE.MONGODB
-							? {
+						switch (e) {
+							case i.DBTYPE.MONGODB:
+								return {
 									$ne: [
 										{ $type: this.parameters[0].getQuery(e, t) },
 										"missing",
 									],
-							  }
-							: null;
+								};
+							case i.DBTYPE.POSTGRESQL:
+							case i.DBTYPE.MYSQL:
+								let r = this.parameters[0].getQuery(e, t);
+								return r.startsWith("'") && r.endsWith("'")
+									? `EXISTS(${r.slice(1, -1)})`
+									: `EXISTS(${r})`;
+							default:
+								return null;
+						}
 					}
 					validateForPull(e) {
 						super.validateForPull(e);
@@ -1837,6 +1854,10 @@
 								(r.getReturnType() === i.ReturnType.ID &&
 									t.getReturnType() === i.ReturnType.TEXT)
 							) &&
+							((t.getReturnType() !== i.ReturnType.DATE &&
+								t.getReturnType() !== i.ReturnType.DATETIME) ||
+								(r.getReturnType() !== i.ReturnType.DATE &&
+									r.getReturnType() !== i.ReturnType.DATETIME)) &&
 							t.getReturnType() !== r.getReturnType()
 						)
 							throw new a.ClientError(
@@ -1920,6 +1941,10 @@
 								(r.getReturnType() === i.ReturnType.ID &&
 									t.getReturnType() === i.ReturnType.TEXT)
 							) &&
+							((t.getReturnType() !== i.ReturnType.DATE &&
+								t.getReturnType() !== i.ReturnType.DATETIME) ||
+								(r.getReturnType() !== i.ReturnType.DATE &&
+									r.getReturnType() !== i.ReturnType.DATETIME)) &&
 							t.getReturnType() !== r.getReturnType()
 						)
 							throw new a.ClientError(
@@ -2121,7 +2146,7 @@
 											t
 									  )} LIKE '%' || ${this.parameters[1].getQuery(e, t)} || '%'`;
 							case i.DBTYPE.MYSQL:
-								return !1 === this.parameters[2].getQuery(e, t)
+								return 0 === this.parameters[2].getQuery(e, t)
 									? `LOWER(${this.parameters[0].getQuery(
 											e,
 											t
@@ -2313,6 +2338,10 @@
 								(r.getReturnType() === i.ReturnType.ID &&
 									t.getReturnType() === i.ReturnType.TEXT)
 							) &&
+							((t.getReturnType() !== i.ReturnType.DATE &&
+								t.getReturnType() !== i.ReturnType.DATETIME) ||
+								(r.getReturnType() !== i.ReturnType.DATE &&
+									r.getReturnType() !== i.ReturnType.DATETIME)) &&
 							t.getReturnType() !== r.getReturnType()
 						)
 							throw new a.ClientError(
@@ -2396,6 +2425,10 @@
 								(r.getReturnType() === i.ReturnType.ID &&
 									t.getReturnType() === i.ReturnType.TEXT)
 							) &&
+							((t.getReturnType() !== i.ReturnType.DATE &&
+								t.getReturnType() !== i.ReturnType.DATETIME) ||
+								(r.getReturnType() !== i.ReturnType.DATE &&
+									r.getReturnType() !== i.ReturnType.DATETIME)) &&
 							t.getReturnType() !== r.getReturnType()
 						)
 							throw new a.ClientError(
@@ -2631,6 +2664,10 @@
 								(r.getReturnType() === i.ReturnType.ID &&
 									t.getReturnType() === i.ReturnType.TEXT)
 							) &&
+							((t.getReturnType() !== i.ReturnType.DATE &&
+								t.getReturnType() !== i.ReturnType.DATETIME) ||
+								(r.getReturnType() !== i.ReturnType.DATE &&
+									r.getReturnType() !== i.ReturnType.DATETIME)) &&
 							t.getReturnType() !== r.getReturnType()
 						)
 							throw new a.ClientError(
@@ -2882,7 +2919,7 @@
 								return `POINT(${this.parameters[0].getQuery(
 									e,
 									t
-								)}, ${this.parameters[1].getQuery(e, t)})`;
+								)} ${this.parameters[1].getQuery(e, t)})`;
 							default:
 								return null;
 						}
@@ -3263,9 +3300,13 @@
 									t
 								)} + 1 FOR ${this.parameters[2].getQuery(e, t)})`;
 							case i.DBTYPE.MYSQL:
-								this.parameters[0].getQuery(e, t),
-									this.parameters[1].getQuery(e, t),
-									this.parameters[2].getQuery(e, t);
+								return `SUBSTRING(${this.parameters[0].getQuery(
+									e,
+									t
+								)}, ${this.parameters[1].getQuery(
+									e,
+									t
+								)} + 1, ${this.parameters[2].getQuery(e, t)})`;
 							default:
 								return null;
 						}
@@ -3985,24 +4026,24 @@
 						return E.Cache;
 					},
 				});
-				const b = r(9);
+				const R = r(9);
 				Object.defineProperty(t, "CacheBase", {
 					enumerable: !0,
 					get: function () {
-						return b.CacheBase;
+						return R.CacheBase;
 					},
 				});
-				const w = r(6098);
+				const b = r(6098);
 				Object.defineProperty(t, "Expression", {
 					enumerable: !0,
 					get: function () {
-						return w.Expression;
+						return b.Expression;
 					},
 				});
-				const R = (e, t) => new s.AgnostServerSideClient(e, t);
-				t.createServerSideClient = R;
-				const _ = R(global.META, global.ADAPTERS);
-				(t.agnost = _), i(r(9307), t), i(r(2548), t);
+				const w = (e, t) => new s.AgnostServerSideClient(e, t);
+				t.createServerSideClient = w;
+				const M = w(global.META, global.ADAPTERS);
+				(t.agnost = M), i(r(9307), t), i(r(2548), t);
 			},
 			8414: function (e, t, r) {
 				var n =
@@ -6956,6 +6997,15 @@
 											this.model.getMetaObj(),
 											this.definition
 										);
+									break;
+								case "getSQLQuery":
+									e = yield t
+										.getAdapterObj(!1)
+										.getSQLQuery(
+											t.getMetaObj(),
+											this.model.getMetaObj(),
+											this.definition
+										);
 							}
 							return e;
 						});
@@ -6984,19 +7034,19 @@
 					T = r(9175),
 					v = r(6666),
 					E = r(335),
-					b = r(1620),
-					w = r(9337),
-					R = r(8811),
-					_ = r(8321),
-					M = r(300);
+					R = r(1620),
+					b = r(9337),
+					w = r(8811),
+					M = r(8321),
+					_ = r(300);
 				t.createField = function (e, t) {
 					switch (e.type) {
 						case "id":
 							return new f.IdField(e, t);
 						case "text":
-							return new R.TextField(e, t);
+							return new w.TextField(e, t);
 						case "rich-text":
-							return new w.RichTextField(e, t);
+							return new b.RichTextField(e, t);
 						case "encrypted-text":
 							return new c.EncryptedTextField(e, t);
 						case "email":
@@ -7014,13 +7064,13 @@
 						case "createdat":
 							return new s.CreatedAtField(e, t);
 						case "updatedat":
-							return new M.UpdatedAtField(e, t);
+							return new _.UpdatedAtField(e, t);
 						case "datetime":
 							return new u.DateTimeField(e, t);
 						case "date":
 							return new o.DateField(e, t);
 						case "time":
-							return new _.TimeField(e, t);
+							return new M.TimeField(e, t);
 						case "enum":
 							return new p.EnumField(e, t);
 						case "geo-point":
@@ -7030,7 +7080,7 @@
 						case "json":
 							return new m.JSONField(e, t);
 						case "reference":
-							return new b.ReferenceField(e, t);
+							return new R.ReferenceField(e, t);
 						case "basic-values-list":
 							return new n.BasicValuesListField(e, t);
 						case "object-list":
@@ -7318,6 +7368,11 @@
 						searchText(e, t, n) {
 							return r(this, void 0, void 0, function* () {
 								return yield this.modelBase.searchText(e, t, n);
+							});
+						}
+						getSQLQuery(e) {
+							return r(this, void 0, void 0, function* () {
+								return yield this.modelBase.getSQLQuery(e);
 							});
 						}
 					});
@@ -7761,6 +7816,38 @@
 									n.setSkip(r.skip),
 									n.setLimit(r.limit)),
 								yield n.execute()
+							);
+						});
+					}
+					getSQLQuery(e) {
+						return n(this, void 0, void 0, function* () {
+							if (this.getDb().getType() === u.DBTYPE.MONGODB)
+								throw new o.ClientError(
+									"not_allowed",
+									`Getting the SQL query string is not available for '${this.getDb().getType()}' databases.`
+								);
+							if (!e || !(0, s.isObject)(e))
+								throw new o.ClientError(
+									"missing_input_parameter",
+									"The 'getSQLQuery' method expects the input parameters as a JSON object."
+								);
+							const t = new i.DBAction(this);
+							return (
+								t.setMethod("getSQLQuery"),
+								t.setWhere(
+									null == e ? void 0 : e.where,
+									null == e ? void 0 : e.join,
+									u.ConditionType.QUERY
+								),
+								t.setSelect(e.select, this.mergeArrays(e.join, e.lookup)),
+								t.setOmit(e.omit, this.mergeArrays(e.join, e.lookup)),
+								t.setLookup(e.lookup),
+								t.setJoin(e.join),
+								t.setSort(e.sort, e.join),
+								t.setSkip(e.skip),
+								t.setLimit(e.limit),
+								t.checkJoinAndLookupDuplicates(),
+								yield t.execute()
 							);
 						});
 					}

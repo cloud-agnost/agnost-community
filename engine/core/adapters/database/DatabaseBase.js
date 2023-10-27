@@ -161,6 +161,17 @@ export class DatabaseBase {
 	async searchText(dbMeta, modelMeta, options) {}
 
 	/**
+	 * Returns the SQL query string of the query definition
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The where, select, omit, join, lookup, sort, skip and limit options
+	 * @returns  The fetched records otherwise an empty array [] if no records can be found
+	 */
+	async getSQLQuery(dbMeta, modelMeta, options) {
+		return "";
+	}
+
+	/**
 	 * Returns the database name
 	 * @param  {Object} dbMeta The database metadata
 	 */
