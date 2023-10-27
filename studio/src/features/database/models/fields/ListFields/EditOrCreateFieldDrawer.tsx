@@ -30,12 +30,13 @@ import { capitalize, cn, toDisplayName } from '@/utils';
 import { useParams } from 'react-router-dom';
 import { Switch } from 'components/Switch';
 import { SettingsFormItem } from 'components/SettingsFormItem';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'components/Select';
+
 import { Separator } from 'components/Separator';
 import useModelStore from '@/store/database/modelStore.ts';
 import useTypeStore from '@/store/types/typeStore.ts';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/Select';
 
 type View = keyof FieldType['view'];
 
@@ -175,16 +176,23 @@ export default function EditOrCreateFieldDrawer({
 					})
 					.optional(),
 				decimalDigits: z
-					.string()
-					.regex(/^\d+$/, {
-						message: t('forms.number', {
+					.number({
+						invalid_type_error: t('forms.number', {
 							label: capitalize(t('general.decimal_digits').toLowerCase()),
 						}).toString(),
 					})
-					.refine((value) => Number(value) > 0 && Number(value) <= (MAX_LENGTH as number), {
-						message: t('forms.maxLength.error', {
+					.min(1, {
+						message: t('forms.decimal.decimal_digits_range', {
 							length: MAX_LENGTH,
-							label: capitalize(t('general.decimal_digits').toLowerCase()),
+							min_decimal_digits: 1,
+							max_decimal_digits: MAX_LENGTH,
+						}).toString(),
+					})
+					.max(MAX_LENGTH as number, {
+						message: t('forms.decimal.decimal_digits_range', {
+							length: MAX_LENGTH,
+							min_decimal_digits: 1,
+							max_decimal_digits: MAX_LENGTH,
 						}).toString(),
 					})
 					.optional(),
@@ -346,7 +354,27 @@ export default function EditOrCreateFieldDrawer({
 					});
 				}
 
-				if (isReference && database.type !== DATABASE.MongoDB && arg.defaultValue && isNaN(Number(arg.defaultValue))) {
+				if (
+					isReference &&
+					database.type !== DATABASE.MongoDB &&
+					arg.defaultValue &&
+					isNaN(Number(arg.defaultValue))
+				) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: t('forms.number', {
+							label: capitalize(t('general.default_value').toLowerCase()),
+						}).toString(),
+						path: ['defaultValue'],
+					});
+				}
+
+				if (
+					isReference &&
+					database.type !== DATABASE.MongoDB &&
+					arg.defaultValue &&
+					isNaN(Number(arg.defaultValue))
+				) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: t('forms.number', {
@@ -392,6 +420,16 @@ export default function EditOrCreateFieldDrawer({
 							label: arg.name,
 						}).toString(),
 						path: ['name'],
+					});
+				}
+
+				if (isDecimal && !arg.decimalDigits) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: t('forms.required', {
+							label: capitalize(t('general.decimal_digits').toLowerCase()),
+						}).toString(),
+						path: ['decimalDigits'],
 					});
 				}
 
@@ -485,8 +523,8 @@ export default function EditOrCreateFieldDrawer({
 		const getDefaultValue = () => {
 			if (editMode && hasDefaultValue && !data.general.defaultValue) return '$$unset';
 
-			if (isReference && database.type !== DATABASE.MongoDB || (isDecimal || isInteger)) {
-				return Number(data.general.defaultValue)
+			if ((isReference && database.type !== DATABASE.MongoDB) || isDecimal || isInteger) {
+				return Number(data.general.defaultValue);
 			}
 			if (isBoolean) return parseForBoolean(data.general.defaultValue);
 			return data.general.defaultValue;
@@ -578,8 +616,11 @@ export default function EditOrCreateFieldDrawer({
 		form.setValue('general.unique', fieldToEdit.unique);
 		form.setValue('general.immutable', fieldToEdit.immutable);
 		form.setValue('general.indexed', fieldToEdit.indexed);
-		form.setValue('general.defaultValue', fieldToEdit.defaultValue);
 		form.setValue('general.description', fieldToEdit.description);
+
+		if (fieldToEdit.defaultValue) {
+			form.setValue('general.defaultValue', fieldToEdit.defaultValue);
+		}
 
 		if (fieldToEdit.text) {
 			form.setValue('general.searchable', fieldToEdit.text.searchable);
@@ -597,7 +638,7 @@ export default function EditOrCreateFieldDrawer({
 		}
 
 		if (fieldToEdit.decimal) {
-			form.setValue('general.decimalDigits', fieldToEdit.decimal.decimalDigits.toString());
+			form.setValue('general.decimalDigits', fieldToEdit.decimal.decimalDigits);
 		}
 
 		if (fieldToEdit.enum) {
@@ -734,6 +775,8 @@ export default function EditOrCreateFieldDrawer({
 															}) as string
 														}
 														{...field}
+														onChange={undefined}
+														onInput={(e) => field.onChange(e.currentTarget.valueAsNumber)}
 													/>
 												</FormControl>
 												<FormMessage />

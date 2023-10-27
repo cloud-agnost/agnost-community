@@ -34,7 +34,7 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 	};
 	return (
 		<>
-			<DropdownMenu open={open}>
+			<DropdownMenu open={open} onOpenChange={() => setOpen(false)}>
 				<DropdownMenuTrigger asChild>
 					<Button
 						variant='text'
