@@ -36,6 +36,7 @@ import useModelStore from '@/store/database/modelStore.ts';
 import useTypeStore from '@/store/types/typeStore.ts';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/Select';
 
 type View = keyof FieldType['view'];
 

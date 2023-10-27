@@ -12,6 +12,7 @@ import {
 } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { PasswordInput } from '@/components/PasswordInput';
+import { resetAllStores } from '@/helpers';
 import { GuestOnly } from '@/router';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
