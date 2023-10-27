@@ -595,6 +595,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 				(entry) => entry.design.iid === db.iid
 			);
 
+			if (!mapping) continue;
+
 			// Get the resource corresponding to this mapping
 			const resource = this.getResources().find(
 				(entry) => entry.iid === mapping.resource.iid

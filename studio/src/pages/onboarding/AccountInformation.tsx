@@ -60,8 +60,7 @@ const FormSchema = z.object({
 });
 
 AccountInformation.loader = async () => {
-	localStorage.clear();
-	localforage.clear();
+	resetAllStores();
 	return {};
 };
 

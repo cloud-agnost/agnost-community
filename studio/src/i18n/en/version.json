@@ -345,5 +345,12 @@
 	"memoryLimit": "Memory Limit",
 	"scaleDownDelay": "Scale Down Delay",
 	"scaleToZeroPodRetentionPeriod": "Scale To Zero Pod Retention Period",
-	"request_Desc": "Limits and requests for CPU resources are measured in cpu units. In Kubernetes, 1 CPU unit is equivalent to 1 physical CPU core, or 1 virtual core, depending on whether the node is a physical host or a virtual machine running inside a physical machine. Fractional requests are allowed. For CPU resource units, the quantity expression 0.1 is equivalent to the expression 100m, which can be read as 'one hundred millicpu'"
+	"request_Desc": "Limits and requests for CPU resources are measured in cpu units. In Kubernetes, 1 CPU unit is equivalent to 1 physical CPU core, or 1 virtual core, depending on whether the node is a physical host or a virtual machine running inside a physical machine. Fractional requests are allowed. For CPU resource units, the quantity expression 0.1 is equivalent to the expression 100m, which can be read as 'one hundred millicpu'",
+	"product_guide": "Product Guide",
+	"product_guide_desc": "Learn how to use Agnost to build your next app.",
+	"client_api": "Client API Guide",
+	"client_api_desc": "Learn how to use Agnost's client library to build your next app.",
+	"server_api": "Server API Guide",
+	"server_api_desc": "Learn how to use Agnost's server API to build your next app.",
+	"documentation": "Documentation"
 }

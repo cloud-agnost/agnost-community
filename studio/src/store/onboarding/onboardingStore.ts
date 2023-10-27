@@ -1,12 +1,15 @@
+import { create } from '@/helpers';
 import { Step } from '@/types';
 import { OnboardingData } from '@/types/type.ts';
 import { removeLastSlash, translate } from '@/utils/utils.ts';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 interface OnboardingStore {
 	steps: Step[];
 	currentStepIndex: number;
 	data: OnboardingData;
+}
+
+type Actions = {
 	setStepByPath: (path: string, step: Partial<Step>) => void;
 	setStepByIndex: (index: number, step: Partial<Step>) => void;
 	setDataPartially: (data: Partial<OnboardingStore['data']>) => void;
@@ -16,63 +19,52 @@ interface OnboardingStore {
 	getCurrentStep: () => Step;
 	goToNextStep: (isDone: boolean) => void;
 	goToPrevStep: () => void;
-}
-
-const useOnboardingStore = create<OnboardingStore>()(
+	reset: () => void;
+};
+const initialState: OnboardingStore = {
+	currentStepIndex: 0,
+	steps: [
+		{
+			text: translate('onboarding.account_info'),
+			path: '/onboarding',
+			isDone: false,
+			nextPath: '/onboarding/create-organization',
+		},
+		{
+			text: translate('onboarding.org.title'),
+			path: '/onboarding/create-organization',
+			isDone: false,
+			prevPath: '/onboarding',
+			nextPath: '/onboarding/create-app',
+		},
+		{
+			text: translate('onboarding.app.title'),
+			path: '/onboarding/create-app',
+			isDone: false,
+			prevPath: '/onboarding/create-organization',
+			nextPath: '/onboarding/smtp-configuration',
+		},
+		{
+			text: translate('onboarding.smtp.title'),
+			path: '/onboarding/smtp-configuration',
+			isDone: false,
+			prevPath: '/onboarding/create-app',
+			nextPath: '/onboarding/invite-team-members',
+		},
+		{
+			text: translate('onboarding.invite.stepper_title'),
+			path: '/onboarding/invite-team-members',
+			isDone: false,
+			prevPath: '/onboarding/smtp-configuration',
+		},
+	],
+	data: {} as OnboardingData,
+};
+const useOnboardingStore = create<OnboardingStore & Actions>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				currentStepIndex: 0,
-				steps: [
-					{
-						text: translate('onboarding.account_info'),
-						path: '/onboarding',
-						isDone: false,
-						nextPath: '/onboarding/create-organization',
-					},
-					{
-						text: translate('onboarding.org.title'),
-						path: '/onboarding/create-organization',
-						isDone: false,
-						prevPath: '/onboarding',
-						nextPath: '/onboarding/create-app',
-					},
-					{
-						text: translate('onboarding.app.title'),
-						path: '/onboarding/create-app',
-						isDone: false,
-						prevPath: '/onboarding/create-organization',
-						nextPath: '/onboarding/smtp-configuration',
-					},
-					{
-						text: translate('onboarding.smtp.title'),
-						path: '/onboarding/smtp-configuration',
-						isDone: false,
-						prevPath: '/onboarding/create-app',
-						nextPath: '/onboarding/invite-team-members',
-					},
-					{
-						text: translate('onboarding.invite.stepper_title'),
-						path: '/onboarding/invite-team-members',
-						isDone: false,
-						prevPath: '/onboarding/smtp-configuration',
-					},
-				],
-				data: {
-					orgName: '',
-					appName: '',
-					uiBaseURL: window.location.origin,
-					smtp: {
-						host: 'smtp.mandrillapp.com',
-						port: 587,
-						useTLS: false,
-						user: 'Altogic',
-						password: 'iS-pNHmBJIXIpjOUXgYmZQ',
-						fromName: 'Altogic',
-						fromEmail: 'enesmozer@gmail.com',
-					},
-					appMembers: [],
-				},
+				...initialState,
 				setDataPartially: (data) => {
 					set((state) => ({
 						data: {
@@ -125,14 +117,12 @@ const useOnboardingStore = create<OnboardingStore>()(
 					return get().steps[get().currentStepIndex];
 				},
 				set: set,
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'onboarding-storage',
 			},
 		),
-		{
-			name: 'onboarding',
-		},
 	),
 );
 

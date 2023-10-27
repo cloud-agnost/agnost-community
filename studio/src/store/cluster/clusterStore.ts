@@ -1,3 +1,4 @@
+import { create } from '@/helpers';
 import { AuthService, ClusterService } from '@/services';
 import {
 	APIError,
@@ -8,7 +9,6 @@ import {
 	UpdateClusterComponentParams,
 } from '@/types';
 import { BaseRequest, User, UserDataToRegister } from '@/types/type.ts';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import useAuthStore from '../auth/authStore';
 
@@ -21,6 +21,9 @@ interface ClusterStore {
 	isEditClusterComponentOpen: boolean;
 	clusterComponent: ClusterComponent;
 	clusterInfo: any;
+}
+
+type Actions = {
 	checkClusterSetup: (req?: BaseRequest) => Promise<boolean>;
 	checkClusterSmtpStatus: () => Promise<boolean>;
 	initializeClusterSetup: (data: UserDataToRegister) => Promise<User>;
@@ -32,20 +35,25 @@ interface ClusterStore {
 	transferClusterOwnership: (params: TransferClusterOwnershipParams) => Promise<void>;
 	getClusterInfo: () => Promise<any>;
 	updateSmtpSettings: (data: any) => Promise<any>;
-}
+	reset: () => void;
+};
 
-const useClusterStore = create<ClusterStore>()(
+const initialState: ClusterStore = {
+	loading: false,
+	isCompleted: false,
+	canClusterSendEmail: false,
+	error: null,
+	clusterComponents: [],
+	clusterComponent: {} as ClusterComponent,
+	isEditClusterComponentOpen: false,
+	clusterInfo: {},
+};
+
+const useClusterStore = create<ClusterStore & Actions>()(
 	devtools(
 		persist(
 			(set) => ({
-				loading: false,
-				isCompleted: false,
-				canClusterSendEmail: false,
-				error: null,
-				clusterComponents: [],
-				clusterComponent: {} as ClusterComponent,
-				isEditClusterComponentOpen: false,
-				clusterInfo: {},
+				...initialState,
 				checkClusterSetup: async (req) => {
 					try {
 						const { status } = await ClusterService.checkCompleted();
@@ -145,6 +153,7 @@ const useClusterStore = create<ClusterStore>()(
 						throw error;
 					}
 				},
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'cluster-storage',

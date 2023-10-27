@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { ConfirmationModal } from 'components/ConfirmationModal';
 import { useNavigate } from 'react-router-dom';
 import { APIError } from '@/types';
+import { resetAllStores } from '@/helpers';
 
 export default function DeleteAccount() {
 	const { t } = useTranslation();
@@ -27,17 +28,20 @@ export default function DeleteAccount() {
 	}
 
 	async function onConfirm() {
-		try {
-			setLoading(true);
-			setError(null);
-			await deleteAccount();
-			await logout();
-			navigate('/login');
-		} catch (error) {
-			setError(error as APIError);
-		} finally {
-			setLoading(false);
-		}
+		setLoading(true);
+		setError(null);
+		await deleteAccount();
+		logout({
+			onSuccess: () => {
+				navigate('/login');
+				resetAllStores();
+				setLoading(false);
+			},
+			onError(error) {
+				setError(error as APIError);
+				setLoading(false);
+			},
+		});
 	}
 
 	return (

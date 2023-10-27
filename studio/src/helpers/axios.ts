@@ -1,4 +1,3 @@
-import { ERROR_CODES_TO_REDIRECT_LOGIN_PAGE } from '@/constants';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { APIError } from '@/types';
 import axios from 'axios';
@@ -39,11 +38,13 @@ instance.interceptors.response.use(
 			...err,
 			details: err.fields?.[0]?.msg ?? err.details,
 		};
-		if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
-			localStorage.clear();
-			localforage.clear();
-			useAuthStore.getState().logout();
-		}
+		// if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
+		// 	useAuthStore.getState().logout({
+		// 		onSuccess: () => {
+		// 			resetAllStores();
+		// 		},
+		// 	});
+		// }
 		// if (error.response.status === 401) {
 		// 	window.location.href = '/401';
 		// }

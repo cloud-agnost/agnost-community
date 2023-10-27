@@ -38,7 +38,7 @@ export default function Login() {
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
-	const { login, setUser } = useAuthStore();
+	const { login } = useAuthStore();
 	const { canClusterSendEmail } = useClusterStore();
 	const navigate = useNavigate();
 	const { state } = useLocation();
@@ -50,17 +50,19 @@ export default function Login() {
 	});
 
 	async function onSubmit({ email, password }: z.infer<typeof FormSchema>) {
-		try {
-			setError(null);
-			setLoading(true);
-			const user = await login(email, password);
-			setUser(user);
-			navigate(REDIRECT_URL);
-		} catch (error) {
-			setError(error as APIError);
-		} finally {
-			setLoading(false);
-		}
+		setLoading(true);
+		login({
+			email,
+			password,
+			onSuccess: () => {
+				navigate(REDIRECT_URL);
+				setLoading(false);
+			},
+			onError: (error) => {
+				setError(error as APIError);
+				setLoading(false);
+			},
+		});
 	}
 
 	if (error?.code === 'pending_email_confirmation') {

@@ -1,4 +1,4 @@
-import { CustomStateStorage } from '@/helpers';
+import { CustomStateStorage, create } from '@/helpers';
 import StorageService from '@/services/StorageService';
 import {
 	APIError,
@@ -24,7 +24,6 @@ import {
 	UpdateStorageParams,
 	UploadFileToBucketParams,
 } from '@/types';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 export interface StorageStore {
 	storages: Storage[];
@@ -46,6 +45,9 @@ export interface StorageStore {
 	toDeleteBucket: Bucket | null;
 	bucketCountInfo: BucketCountInfo;
 	uploadProgress: number;
+}
+
+type Actions = {
 	openDeleteStorageDialog: (storage: Storage) => void;
 	closeStorageDeleteDialog: () => void;
 	openDeleteBucketDialog: (bucket: Bucket) => void;
@@ -78,31 +80,36 @@ export interface StorageStore {
 	replaceFileInBucket: (req: ReplaceFileInBucket) => Promise<BucketFile>;
 	copyFileInBucket: (req: DeleteFileFromBucketParams) => Promise<BucketFile>;
 	updateFileInBucket: (req: UpdateFileInBucketParams) => Promise<BucketFile>;
-}
+	reset: () => void;
+};
 
-const useStorageStore = create<StorageStore>()(
+const initialState: StorageStore = {
+	storages: [],
+	storage: {} as Storage,
+	bucket: {} as Bucket,
+	buckets: [],
+	bucketCountInfo: {} as BucketCountInfo,
+	lastFetchedCount: 0,
+	toDeleteStorage: null,
+	isStorageDeleteDialogOpen: false,
+	isEditStorageDialogOpen: false,
+	isEditBucketDialogOpen: false,
+	isBucketDeleteDialogOpen: false,
+	isFileDeleteDialogOpen: false,
+	isEditFileDialogOpen: false,
+	toDeleteBucket: null,
+	files: [],
+	file: {} as BucketFile,
+	fileCountInfo: {} as BucketCountInfo,
+	toDeleteFile: null,
+	uploadProgress: 0,
+};
+
+const useStorageStore = create<StorageStore & Actions>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				storages: [],
-				storage: {} as Storage,
-				bucket: {} as Bucket,
-				buckets: [],
-				bucketCountInfo: {} as BucketCountInfo,
-				lastFetchedCount: 0,
-				toDeleteStorage: null,
-				isStorageDeleteDialogOpen: false,
-				isEditStorageDialogOpen: false,
-				isEditBucketDialogOpen: false,
-				isBucketDeleteDialogOpen: false,
-				isFileDeleteDialogOpen: false,
-				isEditFileDialogOpen: false,
-				toDeleteBucket: null,
-				files: [],
-				file: {} as BucketFile,
-				fileCountInfo: {} as BucketCountInfo,
-				toDeleteFile: null,
-				uploadProgress: 0,
+				...initialState,
 				openDeleteStorageDialog: (storage: Storage) => {
 					set({ toDeleteStorage: storage, isStorageDeleteDialogOpen: true });
 				},
@@ -372,6 +379,7 @@ const useStorageStore = create<StorageStore>()(
 						throw error as APIError;
 					}
 				},
+				reset: () => set(initialState),
 			}),
 			{ name: 'storage-store', storage: CustomStateStorage },
 		),

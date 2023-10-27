@@ -1,4 +1,9 @@
-import { useTranslation } from 'react-i18next';
+import { nameSchema } from '@/features/version/Middlewares/formSchema.ts';
+import { useToast } from '@/hooks';
+import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
+import { Middleware } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from 'components/Button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import {
 	Form,
@@ -10,14 +15,10 @@ import {
 	FormMessage,
 } from 'components/Form';
 import { Input } from 'components/Input';
-import { Button } from 'components/Button';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
-import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
-import { nameSchema } from '@/features/version/Middlewares/formSchema.ts';
-import { useToast } from '@/hooks';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import * as z from 'zod';
 const MiddlewareFormSchema = z.object({
 	name: nameSchema,
 });
@@ -90,7 +91,7 @@ export default function EditMiddlewareDrawer() {
 	}
 
 	function onOpenChange(status: boolean) {
-		setMiddleware(null);
+		setMiddleware({} as Middleware);
 		setEditMiddlewareDrawerIsOpen(status);
 	}
 

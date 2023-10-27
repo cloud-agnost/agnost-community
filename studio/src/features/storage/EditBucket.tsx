@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import BucketForm from './BucketForm';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface EditStorageProps {
 	open: boolean;
@@ -19,6 +19,7 @@ interface EditStorageProps {
 export default function EditBucket({ open, onClose }: EditStorageProps) {
 	const { t } = useTranslation();
 	const { updateBucket, bucket, storage } = useStorageStore();
+	const [loading, setLoading] = useState(false);
 	const { notify } = useToast();
 	const form = useForm<z.infer<typeof BucketSchema>>({
 		resolver: zodResolver(BucketSchema),
@@ -44,6 +45,7 @@ export default function EditBucket({ open, onClose }: EditStorageProps) {
 	}, [bucket]);
 
 	function onSubmit(data: z.infer<typeof BucketSchema>) {
+		setLoading(true);
 		updateBucket({
 			storageName: storage.name as string,
 			bucketName: bucket.name as string,
@@ -51,8 +53,10 @@ export default function EditBucket({ open, onClose }: EditStorageProps) {
 			tags: arrayToObj(data.tags?.filter((tag) => tag.key && tag.value) as any),
 			onSuccess: () => {
 				resetForm();
+				setLoading(false);
 			},
 			onError: ({ error, details }) => {
+				setLoading(false);
 				notify({ type: 'error', description: details, title: error });
 			},
 		});
@@ -69,7 +73,7 @@ export default function EditBucket({ open, onClose }: EditStorageProps) {
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<BucketForm />
+						<BucketForm loading={loading} />
 					</form>
 				</Form>
 			</DrawerContent>

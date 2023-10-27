@@ -1,3 +1,4 @@
+import { create } from '@/helpers';
 import { t } from '@/i18n/config.ts';
 import OrganizationService from '@/services/OrganizationService';
 import {
@@ -20,8 +21,7 @@ import {
 	UpdateRoleRequest,
 } from '@/types';
 import { BaseRequest } from '@/types/type';
-import { joinChannel, leaveChannel, translate } from '@/utils';
-import { create } from 'zustand';
+import { joinChannel, leaveChannel, resetAfterOrgChange, translate } from '@/utils';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 interface OrganizationStore {
 	loading: boolean;
@@ -35,6 +35,9 @@ interface OrganizationStore {
 	selectedTab: 'member' | 'invitation';
 	orgAuthorization: OrgPermissions;
 	memberPage: number;
+}
+
+type Actions = {
 	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
 	createOrganization: (req: CreateOrganizationRequest) => Promise<Organization | APIError>;
 	selectOrganization: (organization: Organization) => void;
@@ -62,38 +65,33 @@ interface OrganizationStore {
 	clearFilter: () => void;
 	getOrgPermissions: () => Promise<OrgPermissions>;
 	setMemberPage: (page: number) => void;
-}
+	reset: () => void;
+};
 
-const useOrganizationStore = create<OrganizationStore>()(
+const initialState: OrganizationStore = {
+	loading: false,
+	organization: {} as Organization,
+	organizations: [],
+	members: [],
+	invitations: [],
+	memberSearch: '',
+	memberRoleFilter: [],
+	memberSort: {
+		name: t('general.sortOptions.default'),
+		value: '',
+		sortDir: '',
+	},
+	memberPage: 0,
+	selectedTab: 'member',
+	orgAuthorization: {} as OrgPermissions,
+};
+
+const useOrganizationStore = create<OrganizationStore & Actions>()(
 	subscribeWithSelector(
 		devtools(
 			persist(
 				(set, get) => ({
-					loading: false,
-					organization: {} as Organization,
-					organizations: [],
-					applications: [],
-					temp: [],
-					members: [],
-					invitations: [],
-					memberSearch: '',
-					memberRoleFilter: [],
-					memberSort: {
-						name: t('general.sortOptions.default'),
-						value: '',
-						sortDir: '',
-					},
-					memberPage: 0,
-					invitationsPage: 1,
-					invitationsSearch: '',
-					invitationsSort: {
-						name: t('general.sortOptions.default'),
-						value: '',
-						sortDir: '',
-					},
-					invitationsFilter: [],
-					selectedTab: 'member',
-					orgAuthorization: {} as OrgPermissions,
+					...initialState,
 					getAllOrganizationByUser: async () => {
 						try {
 							set({ loading: true });
@@ -129,7 +127,10 @@ const useOrganizationStore = create<OrganizationStore>()(
 					},
 					selectOrganization: (organization: Organization) => {
 						const oldOrganization = get().organization;
-						if (oldOrganization) leaveChannel(oldOrganization._id);
+						if (organization._id !== oldOrganization?._id) {
+							leaveChannel(oldOrganization._id);
+							resetAfterOrgChange();
+						}
 						set({ organization });
 						joinChannel(organization._id);
 					},
@@ -414,6 +415,7 @@ const useOrganizationStore = create<OrganizationStore>()(
 						set({ orgAuthorization });
 						return orgAuthorization;
 					},
+					reset: () => set(initialState),
 				}),
 				{
 					name: 'organization-storage',

@@ -38,14 +38,16 @@ export default function BreadCrumb({ goBackLink, className, items }: BreadCrumbP
 									index === filteredItems.length - 1 ? 'text-default' : 'text-subtle',
 								)}
 								onClick={() => {
-									addTab(versionId, {
-										id: generateId(),
-										title: item.name as string,
-										path: item.url as string,
-										isActive: true,
-										isDashboard: false,
-										type: getCurrentTab(versionId)?.type as TabTypes,
-									});
+									if (item.url) {
+										addTab(versionId, {
+											id: generateId(),
+											title: item.name as string,
+											path: item.url as string,
+											isActive: true,
+											isDashboard: false,
+											type: getCurrentTab(versionId)?.type as TabTypes,
+										});
+									}
 								}}
 							>
 								{item.name}

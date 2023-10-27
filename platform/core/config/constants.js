@@ -448,7 +448,7 @@ export const dbTypeMappings = {
     object: "object",
   },
   PostgreSQL: {
-    id: "bigserial",
+    id: "serial",
     text: "varchar",
     "rich-text": "text",
     "encrypted-text": "varchar",
@@ -467,13 +467,13 @@ export const dbTypeMappings = {
     "geo-point": "point",
     binary: "bytea",
     json: "jsonb",
-    reference: "bigint",
+    reference: "serial",
     "basic-values-list": "undefined",
     "object-list": "undefined",
     object: "undefined",
   },
   MySQL: {
-    id: "bigint",
+    id: "int",
     text: "varchar",
     "rich-text": "longtext",
     "encrypted-text": "varchar",
@@ -492,13 +492,13 @@ export const dbTypeMappings = {
     "geo-point": "point",
     binary: "blob",
     json: "json",
-    reference: "bigint",
+    reference: "int",
     "basic-values-list": "undefined",
     "object-list": "undefined",
     object: "undefined",
   },
   "SQL Server": {
-    id: "bigint",
+    id: "int",
     text: "nvarchar",
     "rich-text": "nvarchar(max)",
     "encrypted-text": "nvarchar",
@@ -517,7 +517,7 @@ export const dbTypeMappings = {
     "geo-point": "geography",
     binary: "binary",
     json: "nvarchar",
-    reference: "bigint",
+    reference: "int",
     "basic-values-list": "undefined",
     "object-list": "undefined",
     object: "undefined",
@@ -999,11 +999,11 @@ export const clusterComponents = [
 ];
 
 export const resourceVersions = {
-	MongoDB: ["7.0.1", "6.0.11", "5.0.21", "4.4.25"],
-	PostgreSQL: ["15", "14", "13", "12"],
-	MySQL: ["8.1.0", "8.0.34"],
-	RabbitMQ: ["3.12.6", "3.11.23"],
-	Redis: ["7.2.1", "7.0.13", "6.2.13"],
+  MongoDB: ["7.0.1", "6.0.11", "5.0.21", "4.4.25"],
+  PostgreSQL: ["15", "14", "13", "12"],
+  MySQL: ["8.1.0", "8.0.34"],
+  RabbitMQ: ["3.12.6", "3.11.23"],
+  Redis: ["7.2.1", "7.0.13", "6.2.13"],
 };
 
 export const ftsIndexLanguages = {
@@ -1023,7 +1023,7 @@ export const ftsIndexLanguages = {
     { value: "spanish", name: "spanish" },
     { value: "swedish", name: "swedish" },
     { value: "turkish", name: "turkish" },
-    ],
+  ],
   PostgreSQL: [
     { value: "arabic", name: "arabic" },
     { value: "armenian", name: "armenian" },
@@ -1054,7 +1054,7 @@ export const ftsIndexLanguages = {
     { value: "tamil", name: "tamil" },
     { value: "turkish", name: "turkish" },
     { value: "yiddish", name: "yiddish" },
-    ],
+  ],
   MySQL: [
     { value: "utf8mb4_bin", name: "utf8mb4_bin" },
     { value: "utf8mb4_croatian_ci", name: "utf8mb4_croatian_ci" },
@@ -1082,7 +1082,7 @@ export const ftsIndexLanguages = {
     { value: "utf8mb4_unicode_520_ci", name: "utf8mb4_unicode_520_ci" },
     { value: "utf8mb4_unicode_ci", name: "utf8mb4_unicode_ci" },
     { value: "utf8mb4_vietnamese_ci", name: "utf8mb4_vietnamese_ci" },
-    ],
+  ],
   "SQL Server": [
     { value: "5124", name: "Chinese (Macao SAR)" },
     { value: "4100", name: "Chinese (Singapore)" },
@@ -1137,6 +1137,5 @@ export const ftsIndexLanguages = {
     { value: "1026", name: "Bulgarian" },
     { value: "1025", name: "Arabic" },
     { value: "0", name: "Neutral" },
-    ],
+  ],
 };
-

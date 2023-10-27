@@ -5,7 +5,6 @@ import { TableLoading } from '@/components/Table/Table';
 import { PAGE_SIZE } from '@/constants';
 import { BucketColumns } from '@/features/storage';
 import { useToast } from '@/hooks';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useApplicationStore from '@/store/app/applicationStore';
 import useStorageStore from '@/store/storage/storageStore';
@@ -23,7 +22,7 @@ import {
 	useSearchParams,
 } from 'react-router-dom';
 Buckets.loader = async ({ params }: LoaderFunctionArgs) => {
-	const role = useApplicationStore.getState().role;
+	const role = useApplicationStore.getState().application?.role;
 
 	const { storageId, appId, orgId, versionId } = params;
 	const { storage, storages } = useStorageStore.getState();
@@ -41,7 +40,8 @@ Buckets.loader = async ({ params }: LoaderFunctionArgs) => {
 		useStorageStore.setState({ storage: selectedStorage });
 	}
 
-	const permission = getAppPermission(role as AppRoles, 'app.storage.view');
+	const permission = getAppPermission(role as AppRoles, 'app.storage.viewData');
+
 	if (!permission) {
 		return redirect('/404');
 	}
@@ -66,8 +66,6 @@ export default function Buckets() {
 	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
-	const viewData = useAuthorizeVersion('storage.viewData');
-
 	const {
 		getBuckets,
 		closeBucketDeleteDialog,
@@ -143,12 +141,6 @@ export default function Buckets() {
 			setLoading(false);
 		}
 	}, [searchParams.get('q'), bucketPage, versionId, storage?.name]);
-
-	useEffect(() => {
-		if (!viewData) {
-			// navigate('/404');
-		}
-	}, [viewData]);
 
 	return (
 		<VersionTabLayout

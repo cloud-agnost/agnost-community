@@ -1,4 +1,4 @@
-import { CustomStateStorage } from '@/helpers';
+import { CustomStateStorage, create } from '@/helpers';
 import QueueService from '@/services/QueueService';
 import {
 	APIError,
@@ -14,7 +14,6 @@ import {
 	UpdateQueueLogicParams,
 	UpdateQueueParams,
 } from '@/types';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 interface MessageQueueStore {
@@ -26,6 +25,9 @@ interface MessageQueueStore {
 	lastFetchedCount: number;
 	testQueueLogs: TestQueueLogs;
 	isEditModalOpen: boolean;
+}
+
+type Actions = {
 	getQueues: (params: GetMessageQueuesParams) => Promise<MessageQueue[]>;
 	getQueueById: (params: GetMessageQueueByIdParams) => Promise<MessageQueue>;
 	deleteQueue: (params: DeleteMessageQueueParams) => Promise<void>;
@@ -40,21 +42,25 @@ interface MessageQueueStore {
 	openEditModal: (queue: MessageQueue) => void;
 	closeEditModal: () => void;
 	setEditedLogic: (logic: string) => void;
-}
+	reset: () => void;
+};
 
-const useMessageQueueStore = create<MessageQueueStore>()(
+const initialState: MessageQueueStore = {
+	queues: [],
+	queue: {} as MessageQueue,
+	toDeleteQueue: {} as MessageQueue,
+	isDeleteModalOpen: false,
+	lastFetchedCount: 0,
+	testQueueLogs: {} as TestQueueLogs,
+	isEditModalOpen: false,
+	editedLogic: '',
+};
+
+const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 	devtools(
 		persist(
 			(set) => ({
-				queues: [],
-				queue: {} as MessageQueue,
-				toDeleteQueue: {} as MessageQueue,
-				isDeleteModalOpen: false,
-				lastFetchedCount: 0,
-				createQueueModalOpen: false,
-				testQueueLogs: {} as TestQueueLogs,
-				isEditModalOpen: false,
-				editedLogic: '',
+				...initialState,
 				openEditModal: (queue: MessageQueue) => {
 					set({ queue, isEditModalOpen: true });
 				},
@@ -177,9 +183,8 @@ const useMessageQueueStore = create<MessageQueueStore>()(
 						},
 					}));
 				},
-				setEditedLogic: (logic: string) => {
-					set({ editedLogic: logic });
-				},
+				setEditedLogic: (logic: string) => set({ editedLogic: logic }),
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'message-queue-store',

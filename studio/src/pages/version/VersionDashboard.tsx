@@ -12,7 +12,8 @@ import { TAB_ICON_MAP } from '@/constants';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import { capitalize } from '@/utils';
+import { TabTypes } from '@/types';
+import { capitalize, generateId } from '@/utils';
 import { Key } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
 import { Link, LoaderFunctionArgs } from 'react-router-dom';
@@ -26,9 +27,9 @@ VersionDashboard.loader = async ({ params }: LoaderFunctionArgs) => {
 	return { props: {} };
 };
 export default function VersionDashboard() {
-	const { version, dashboard } = useVersionStore();
+	const { version, dashboard, getVersionDashboardPath } = useVersionStore();
 	const { environment } = useEnvironmentStore();
-	const { addSettingsTab } = useTabStore();
+	const { addSettingsTab, addTab } = useTabStore();
 	const { t } = useTranslation();
 	function getIcon(type: string) {
 		const Icon = TAB_ICON_MAP[type];
@@ -37,33 +38,46 @@ export default function VersionDashboard() {
 
 	const GUIDES = [
 		{
-			title: 'Product Guides',
-			description: 'Learn how to use our product',
-			link: '/_blank',
+			title: t('version.product_guide'),
+			description: t('version.product_guide_desc'),
+			link: 'https://agnost.dev/docs/intro',
 		},
 		{
-			title: 'Client API Guide',
-			description: 'Learn how to use our Client API',
-			link: '/_blank',
+			title: t('version.client_api'),
+			description: t('version.client_api_desc'),
+			link: 'https://agnost.dev/client',
 		},
 		{
-			title: 'API Reference',
-			description: 'Learn how to use our API',
-			link: '/_blank',
+			title: t('version.server_api'),
+			description: t('version.server_api_desc'),
+			link: 'https://agnost.dev/server',
 		},
 	];
+
+	function clickDashboardItem(type: string) {
+		addTab(version._id, {
+			id: generateId(),
+			title: type,
+			path: getVersionDashboardPath(type.toLowerCase()),
+			type: type as TabTypes,
+			isDashboard: false,
+			isActive: true,
+		});
+	}
 	return (
 		<div className='space-y-8 max-w-7xl'>
 			<h1 className='text-default text-2xl'>{t('version.dashboard')}</h1>
 			<div className='grid grid-cols-4 gap-6 mt-10 '>
 				{Object.entries(dashboard).map(([key, value]) => (
-					<div
+					<Button
+						variant='blank'
 						key={key}
-						className='bg-wrapper-background-base hover:bg-wrapper-background-hover p-6 rounded-md'
+						className='bg-wrapper-background-base p-6 rounded-md shadow-sm h-auto block text-left font-normal'
+						onClick={() => clickDashboardItem(capitalize(key))}
 					>
 						<div className='flex items-center gap-4'>
 							<div className='p-3 rounded-lg bg-lighter'>{getIcon(capitalize(key))}</div>
-							<div className=''>
+							<div>
 								<h1 className='text-default text-2xl'>{value}</h1>
 								<h2 className='text-subtle'>
 									{capitalize(key)}
@@ -71,7 +85,7 @@ export default function VersionDashboard() {
 								</h2>
 							</div>
 						</div>
-					</div>
+					</Button>
 				))}
 			</div>
 			<Card className='w-full'>
@@ -118,7 +132,7 @@ export default function VersionDashboard() {
 
 			<Card className='w-full'>
 				<CardHeader>
-					<CardTitle>{t('version.resources')}</CardTitle>
+					<CardTitle>{t('version.documentation')}</CardTitle>
 				</CardHeader>
 				<CardContent className='grid grid-cols-3 gap-6'>
 					{GUIDES.map((guide) => (

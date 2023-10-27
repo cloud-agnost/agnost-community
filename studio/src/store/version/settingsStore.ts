@@ -1,4 +1,4 @@
-import { CustomStateStorage } from '@/helpers';
+import { CustomStateStorage, create } from '@/helpers';
 import { VersionService } from '@/services';
 import {
 	APIError,
@@ -35,7 +35,6 @@ import {
 	VersionRealtimeProperties,
 } from '@/types';
 import { notify, translate } from '@/utils';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import useVersionStore from './versionStore';
 
@@ -46,6 +45,9 @@ interface SettingsStore {
 	editRateLimitDrawerIsOpen: boolean;
 	editAPIKeyDrawerIsOpen: boolean;
 	selectedAPIKey: APIKey;
+}
+
+type Actions = {
 	searchNPMPackages: (params: SearchNPMPackagesParams) => Promise<SearchNPMPackages[]>;
 	addNPMPackage: (params: AddNPMPackageParams) => Promise<Version>;
 	deleteNPMPackage: (params: DeleteNPMPackageParams) => Promise<Version>;
@@ -82,18 +84,23 @@ interface SettingsStore {
 	deleteRateLimit: (params: DeleteRateLimitParams) => Promise<Version>;
 	orderEndpointRateLimits: (limits: string[]) => void;
 	orderRealtimeRateLimits: (limits: string[]) => void;
-}
+	reset: () => void;
+};
 
-const useSettingsStore = create<SettingsStore>()(
+const initialState: SettingsStore = {
+	param: {} as Param,
+	rateLimit: {} as RateLimit,
+	editParamDrawerIsOpen: false,
+	editRateLimitDrawerIsOpen: false,
+	editAPIKeyDrawerIsOpen: false,
+	selectedAPIKey: {} as APIKey,
+};
+
+const useSettingsStore = create<SettingsStore & Actions>()(
 	devtools(
 		persist(
 			(set) => ({
-				param: {} as Param,
-				rateLimit: {} as RateLimit,
-				editParamDrawerIsOpen: false,
-				editRateLimitDrawerIsOpen: false,
-				editAPIKeyDrawerIsOpen: false,
-				selectedAPIKey: {} as APIKey,
+				...initialState,
 				searchNPMPackages: async (params: SearchNPMPackagesParams) => {
 					try {
 						return VersionService.searchNPMPackages(params);
@@ -602,6 +609,7 @@ const useSettingsStore = create<SettingsStore>()(
 						};
 					});
 				},
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'settings-store',

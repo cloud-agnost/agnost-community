@@ -87,6 +87,7 @@ export default function OrganizationApps() {
 	useEffect(() => {
 		getAppsByOrgId(organization?._id as string);
 	}, [organization?._id]);
+
 	return (
 		<div className={cn('scroll p-8', !temp.length && 'flex items-center justify-center')}>
 			{temp.length > 0 ? (
@@ -146,6 +147,7 @@ export default function OrganizationApps() {
 					<CreateApplicationButton disabled={!canAppCreate} />
 				</EmptyState>
 			)}
+
 			<AppInviteMember />
 			<ConfirmationModal
 				loading={loading}

@@ -132,7 +132,7 @@ export const MENU_ITEMS = [
 	},
 	{
 		title: 'Docs',
-		url: '/docs',
+		url: 'https://agnost.dev/docs/installation/installation-minikube',
 		icon: FileText,
 	},
 ];
@@ -901,6 +901,7 @@ export const TAB_ICON_MAP: Record<string, ElementType> = {
 	Field: Textbox,
 	Model: Table,
 	Navigator: Table,
+	Bucket: Storage,
 };
 
 export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
@@ -950,3 +951,22 @@ export const RESOURCE_ICON_MAP: Record<string, ElementType> = {
 	'Node.js': Nodejs,
 	React,
 };
+
+export const VERSION_CHANGE_EXCEPTIONS = [
+	'organization',
+	'app',
+	'theme',
+	'types',
+	'tab',
+	'cluster',
+	'auth',
+	'onBoarding',
+];
+export const ORG_CHANGE_EXCEPTIONS = [
+	'organization',
+	'theme',
+	'types',
+	'cluster',
+	'auth',
+	'onBoarding',
+];

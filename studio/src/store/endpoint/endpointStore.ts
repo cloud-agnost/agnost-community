@@ -1,4 +1,4 @@
-import { CustomStateStorage } from '@/helpers';
+import { CustomStateStorage, create } from '@/helpers';
 import { EndpointService } from '@/services';
 import {
 	APIError,
@@ -18,7 +18,6 @@ import {
 } from '@/types';
 import { formatTime } from '@/utils';
 import { AxiosResponse } from 'axios';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 interface EndpointStore {
@@ -30,9 +29,12 @@ interface EndpointStore {
 	lastFetchedCount: number;
 	endpointRequest: EndpointRequest;
 	endpointResponse: EndpointResponse;
-	toDeleteEndpoint: Endpoint | null;
+	toDeleteEndpoint: Endpoint;
 	isEndpointDeleteDialogOpen: boolean;
 	isEditEndpointDialogOpen: boolean;
+}
+
+type Actions = {
 	openDeleteEndpointDialog: (endpoint: Endpoint) => void;
 	setSelectEndpointDialogOpen: (open: boolean) => void;
 	setSelectedEndpointIds: (ids: string[]) => void;
@@ -51,23 +53,28 @@ interface EndpointStore {
 	openEditEndpointDialog: (endpoint: Endpoint) => void;
 	closeEditEndpointDialog: () => void;
 	setEditedLogic: (logic: string) => void;
-}
+	reset: () => void;
+};
 
-const useEndpointStore = create<EndpointStore>()(
+const initialState: EndpointStore = {
+	selectEndpointDialogOpen: false,
+	endpoints: [],
+	endpoint: {} as Endpoint,
+	selectedEndpointIds: [],
+	endpointRequest: {} as EndpointRequest,
+	endpointResponse: {} as EndpointResponse,
+	lastFetchedCount: 0,
+	toDeleteEndpoint: {} as Endpoint,
+	isEndpointDeleteDialogOpen: false,
+	isEditEndpointDialogOpen: false,
+	editedLogic: '',
+};
+
+const useEndpointStore = create<EndpointStore & Actions>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				selectEndpointDialogOpen: false,
-				endpoints: [],
-				endpoint: {} as Endpoint,
-				selectedEndpointIds: [],
-				endpointRequest: {} as EndpointRequest,
-				endpointResponse: {} as EndpointResponse,
-				lastFetchedCount: 0,
-				toDeleteEndpoint: null,
-				isEndpointDeleteDialogOpen: false,
-				isEditEndpointDialogOpen: false,
-				editedLogic: '',
+				...initialState,
 				openEditEndpointDialog: (endpoint) => set({ endpoint, isEditEndpointDialogOpen: true }),
 				closeEditEndpointDialog: () => set({ isEditEndpointDialogOpen: false }),
 				setSelectedEndpointIds: (ids) => set({ selectedEndpointIds: ids }),
@@ -237,7 +244,7 @@ const useEndpointStore = create<EndpointStore>()(
 				openDeleteEndpointDialog: (endpoint) =>
 					set({ toDeleteEndpoint: endpoint, isEndpointDeleteDialogOpen: true }),
 				closeEndpointDeleteDialog: () =>
-					set({ toDeleteEndpoint: null, isEndpointDeleteDialogOpen: false }),
+					set({ toDeleteEndpoint: {} as Endpoint, isEndpointDeleteDialogOpen: false }),
 				setEndpointLog(epId, log) {
 					set((prev) => ({
 						endpointResponse: {
@@ -250,6 +257,7 @@ const useEndpointStore = create<EndpointStore>()(
 					}));
 				},
 				setEditedLogic: (logic) => set({ editedLogic: logic }),
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'endpoint-storage',

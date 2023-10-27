@@ -1,3 +1,4 @@
+import { create } from '@/helpers';
 import { CustomStateStorage } from '@/helpers/state';
 import TaskService from '@/services/TaskService';
 import {
@@ -14,7 +15,6 @@ import {
 	TestTaskParams,
 	UpdateTaskParams,
 } from '@/types';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 export interface TaskStore {
 	task: Task;
@@ -25,6 +25,9 @@ export interface TaskStore {
 	taskLogs: TestTaskLogs;
 	isEditTaskModalOpen: boolean;
 	editedLogic: string;
+}
+
+type Actions = {
 	openEditTaskModal: (task: Task) => void;
 	closeEditTaskModal: () => void;
 	getTask: (params: GetTaskParams) => Promise<Task>;
@@ -39,20 +42,25 @@ export interface TaskStore {
 	closeDeleteTaskModal: () => void;
 	setTaskLog: (taskId: string, log: Log) => void;
 	setEditedLogic: (logic: string) => void;
-}
+	reset: () => void;
+};
 
-const useTaskStore = create<TaskStore>()(
+const initialState: TaskStore = {
+	task: {} as Task,
+	tasks: [],
+	toDeleteTask: {} as Task,
+	isDeleteTaskModalOpen: false,
+	lastFetchedCount: 0,
+	taskLogs: {} as TestTaskLogs,
+	isEditTaskModalOpen: false,
+	editedLogic: '',
+};
+
+const useTaskStore = create<TaskStore & Actions>()(
 	devtools(
 		persist(
 			(set) => ({
-				task: {} as Task,
-				tasks: [],
-				toDeleteTask: {} as Task,
-				isDeleteTaskModalOpen: false,
-				lastFetchedCount: 0,
-				taskLogs: {} as TestTaskLogs,
-				isEditTaskModalOpen: false,
-				editedLogic: '',
+				...initialState,
 				openEditTaskModal: (task: Task) => {
 					set({ task, isEditTaskModalOpen: true });
 				},
@@ -174,15 +182,13 @@ const useTaskStore = create<TaskStore>()(
 				setEditedLogic: (logic: string) => {
 					set({ editedLogic: logic });
 				},
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'task-storage',
 				storage: CustomStateStorage,
 			},
 		),
-		{
-			name: 'task',
-		},
 	),
 );
 

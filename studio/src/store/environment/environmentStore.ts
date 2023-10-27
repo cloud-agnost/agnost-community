@@ -1,4 +1,5 @@
 import { CustomStateStorage } from '@/helpers/state';
+import { create } from '@/helpers/store';
 import {
 	APIError,
 	EnvLog,
@@ -16,7 +17,6 @@ import {
 } from '@/types';
 import { notify, translate } from '@/utils';
 import EnvironmentService from 'services/EnvironmentService.ts';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 interface EnvironmentStore {
@@ -27,6 +27,9 @@ interface EnvironmentStore {
 	envLogs: EnvLog[];
 	selectedLog: SelectedEnvLog;
 	isLogDetailsOpen: boolean;
+}
+
+type Actions = {
 	openLogDetails: (log: SelectedEnvLog) => void;
 	closeLogDetails: () => void;
 	getAppVersionEnvironment: (params: getAppVersionEnvironmentParams) => Promise<Environment>;
@@ -39,19 +42,24 @@ interface EnvironmentStore {
 	getEnvironmentResources: (params: GetEnvironmentResourcesParams) => Promise<Resource[]>;
 	setEnvStatus: (env: Environment) => EnvironmentStatus;
 	updateApiServerConf: (params: UpdateAPIServerConfParams) => Promise<void>;
-}
+	reset: () => void;
+};
 
-const useEnvironmentStore = create<EnvironmentStore>()(
+const initialState: EnvironmentStore = {
+	environments: [],
+	environment: {} as Environment,
+	resources: [],
+	envStatus: '' as EnvironmentStatus,
+	envLogs: [],
+	selectedLog: {} as SelectedEnvLog,
+	isLogDetailsOpen: false,
+};
+
+const useEnvironmentStore = create<EnvironmentStore & Actions>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				environments: [],
-				environment: {} as Environment,
-				resources: [],
-				envStatus: '' as EnvironmentStatus,
-				envLogs: [],
-				selectedLog: {} as SelectedEnvLog,
-				isLogDetailsOpen: false,
+				...initialState,
 				getAppVersionEnvironment: async (params: getAppVersionEnvironmentParams) => {
 					const environment = await EnvironmentService.getAppVersionEnvironment(params);
 					set({ environment, envStatus: get().setEnvStatus(environment) });
@@ -192,6 +200,7 @@ const useEnvironmentStore = create<EnvironmentStore>()(
 						throw e;
 					}
 				},
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'environment-storage',

@@ -30,7 +30,7 @@ import { capitalize, cn, toDisplayName } from '@/utils';
 import { useParams } from 'react-router-dom';
 import { Switch } from 'components/Switch';
 import { SettingsFormItem } from 'components/SettingsFormItem';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'components/Select';
+
 import { Separator } from 'components/Separator';
 import useModelStore from '@/store/database/modelStore.ts';
 import useTypeStore from '@/store/types/typeStore.ts';
@@ -350,6 +350,21 @@ export default function EditOrCreateFieldDrawer({
 							label: capitalize(t('database.fields.reference_action').toLowerCase()),
 						}).toString(),
 						path: ['referenceAction'],
+					});
+				}
+
+				if (
+					isReference &&
+					database.type !== DATABASE.MongoDB &&
+					arg.defaultValue &&
+					isNaN(Number(arg.defaultValue))
+				) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: t('forms.number', {
+							label: capitalize(t('general.default_value').toLowerCase()),
+						}).toString(),
+						path: ['defaultValue'],
 					});
 				}
 

@@ -16,14 +16,13 @@ import { Plus, Trash } from '@phosphor-icons/react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-export default function BucketForm() {
+export default function BucketForm({ loading }: { loading: boolean }) {
 	const form = useFormContext<z.infer<typeof BucketSchema>>();
 	const { t } = useTranslation();
 	const { fields, append, remove } = useFieldArray({
 		control: form.control,
 		name: 'tags',
 	});
-
 	return (
 		<div className='space-y-6'>
 			<FormField
@@ -59,9 +58,7 @@ export default function BucketForm() {
 							name={`tags.${index}.key`}
 							render={({ field }) => (
 								<FormItem className='flex-1'>
-									{index === 0 && (
-										<FormLabel>{t('resources.database.key')}</FormLabel>
-									)}
+									{index === 0 && <FormLabel>{t('resources.database.key')}</FormLabel>}
 									<FormControl>
 										<Input
 											placeholder={
@@ -82,9 +79,7 @@ export default function BucketForm() {
 							name={`tags.${index}.value`}
 							render={({ field }) => (
 								<FormItem className='flex-1'>
-									{index === 0 && (
-										<FormLabel>{t('resources.database.value')}</FormLabel>
-									)}
+									{index === 0 && <FormLabel>{t('resources.database.value')}</FormLabel>}
 
 									<Input
 										placeholder={
@@ -130,9 +125,7 @@ export default function BucketForm() {
 							}}
 						>
 							<Plus size={16} className='text-brand-primary' />
-							<span className='text-brand-primary ml-2'>
-								{t('general.add_another_one')}
-							</span>
+							<span className='text-brand-primary ml-2'>{t('general.add_another_one')}</span>
 						</Button>
 					)}
 				</div>
@@ -161,7 +154,7 @@ export default function BucketForm() {
 							{t('general.cancel')}
 						</Button>
 					</DrawerClose>
-					<Button className='ml-2' type='submit' size='lg'>
+					<Button className='ml-2' type='submit' size='lg' loading={loading}>
 						{t('general.save')}
 					</Button>
 				</div>

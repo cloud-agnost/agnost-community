@@ -1,3 +1,5 @@
+import { create } from '@/helpers';
+
 import { CustomStateStorage } from '@/helpers/state';
 import { DatabaseService } from '@/services';
 import {
@@ -10,7 +12,6 @@ import {
 	UpdateDatabaseNameParams,
 } from '@/types';
 import { notify } from '@/utils';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 interface DatabaseStore {
@@ -23,6 +24,9 @@ interface DatabaseStore {
 	apps: object[];
 	appLogs: object[];
 	editDatabaseDialogOpen: boolean;
+}
+
+type Actions = {
 	setToDeleteDatabase: (database: Database) => void;
 	setToEditDatabase: (database: Database) => void;
 	setEditDatabaseDialogOpen: (open: boolean) => void;
@@ -36,21 +40,26 @@ interface DatabaseStore {
 	deleteDatabase: (params: DeleteDatabaseParams) => Promise<void>;
 	searchDatabases: (search: string) => void;
 	setDatabase: (database: Database) => void;
-}
+	reset: () => void;
+};
 
-const useDatabaseStore = create<DatabaseStore>()(
+const initialState: DatabaseStore = {
+	databases: [],
+	databasesForSearch: [],
+	database: {} as Database,
+	editDatabaseDialogOpen: false,
+	apps: [],
+	isOpenDeleteDatabaseDialog: false,
+	appLogs: [],
+	toEditDatabase: null,
+	toDeleteDatabase: null,
+};
+
+const useDatabaseStore = create<DatabaseStore & Actions>()(
 	devtools(
 		persist(
 			(set) => ({
-				databases: [],
-				databasesForSearch: [],
-				database: {} as Database,
-				editDatabaseDialogOpen: false,
-				apps: [],
-				isOpenDeleteDatabaseDialog: false,
-				appLogs: [],
-				toEditDatabase: null,
-				toDeleteDatabase: null,
+				...initialState,
 				setToDeleteDatabase: (database: Database) => set({ toDeleteDatabase: database }),
 				setIsOpenDeleteDatabaseDialog: (open: boolean) => set({ isOpenDeleteDatabaseDialog: open }),
 				setToEditDatabase: (database: Database) => set({ toEditDatabase: database }),
@@ -131,6 +140,7 @@ const useDatabaseStore = create<DatabaseStore>()(
 					}
 				},
 				setDatabase: (database: Database) => set({ database }),
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'database-storage',

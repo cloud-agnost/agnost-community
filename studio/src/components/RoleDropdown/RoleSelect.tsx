@@ -12,7 +12,7 @@ function RoleSelect({ role, type, disabled, onSelect }: RoleSelectProps) {
 	const roles = type === 'app' ? appRoles : orgRoles;
 	return (
 		<Select defaultValue={role} onValueChange={onSelect} disabled={disabled}>
-			<SelectTrigger className='w-[120px]'>
+			<SelectTrigger className='w-[170px]'>
 				<SelectValue>{role}</SelectValue>
 			</SelectTrigger>
 

@@ -1,3 +1,4 @@
+import { create } from '@/helpers';
 import { CustomStateStorage } from '@/helpers/state';
 import { ModelService } from '@/services';
 import {
@@ -19,7 +20,6 @@ import {
 	UpdateNameAndDescriptionParams,
 } from '@/types';
 import { notify } from '@/utils';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 interface ModelStore {
@@ -34,9 +34,12 @@ interface ModelStore {
 	fieldToEdit: Field | null;
 	isOpenEditModelDialog: boolean;
 	isOpenEditFieldDialog: boolean;
-	setFieldToEdit: (field: Field | null) => void;
+}
+
+type Actions = {
+	setFieldToEdit: (field: Field) => void;
 	setIsOpenEditFieldDialog: (isOpen: boolean) => void;
-	setModelToEdit: (model: Model | null) => void;
+	setModelToEdit: (model: Model) => void;
 	setIsOpenEditModelDialog: (isOpen: boolean) => void;
 	getModelsOfDatabase: (params: GetModelsOfDatabaseParams) => Promise<Model[]>;
 	getSpecificModelByIidOfDatabase: (params: GetSpecificModelByIidOfDatabase) => Promise<Model>;
@@ -56,21 +59,26 @@ interface ModelStore {
 	setNestedModels: (modelName: string, index: number) => void;
 	resetNestedModels: () => void;
 	getModelsTitle: () => string;
-}
+	reset: () => void;
+};
 
-const useModelStore = create<ModelStore>()(
+const initialState: ModelStore = {
+	models: [],
+	model: {} as Model,
+	subModel: {} as Model,
+	nestedModels: [],
+	modelToEdit: {} as Model,
+	fieldToEdit: {} as Field,
+	isOpenEditModelDialog: false,
+	isOpenEditFieldDialog: false,
+};
+
+const useModelStore = create<ModelStore & Actions>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				models: [],
-				subModel: {} as Model,
-				modelToEdit: null,
-				fieldToEdit: null,
-				isOpenEditModelDialog: false,
-				isOpenEditFieldDialog: false,
-				model: {} as Model,
-				nestedModels: [],
-				setFieldToEdit: (field: Field | null) => {
+				...initialState,
+				setFieldToEdit: (field: Field) => {
 					set({ fieldToEdit: field });
 				},
 				setIsOpenEditFieldDialog: (isOpen: boolean) => {
@@ -79,7 +87,7 @@ const useModelStore = create<ModelStore>()(
 					}
 					set({ isOpenEditFieldDialog: isOpen });
 				},
-				setModelToEdit: (model: Model | null) => {
+				setModelToEdit: (model: Model) => {
 					set({ modelToEdit: model });
 				},
 				setIsOpenEditModelDialog: (isOpen: boolean) => {
@@ -370,6 +378,7 @@ const useModelStore = create<ModelStore>()(
 						  }`
 						: '';
 				},
+				reset: () => set(initialState),
 			}),
 			{
 				name: 'model-storage',
