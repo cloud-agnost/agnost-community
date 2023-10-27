@@ -64,23 +64,129 @@ export class MySQL extends SQLDatabase {
 	}
 
 	/**
-	 * Returns the comma seperated list of value placeholders for the input JSON object
+	 * Prepares the select part of the query namely the fields that will be returned.
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Array} select The included fields
+	 * @param  {Array} omit The exdluded fields
+	 * @returns  The select for SQL or projection for no-SQL definiton
+	 */
+	getSelectDefinition(modelMeta, select, omit) {
+		// If not select or omit definition the return all fields
+		if (!select && !omit) return "*";
+
+		const include = select ? true : false;
+		const list = select ?? omit;
+
+		if (include) {
+			return list.map((entry) => "`" + entry.fieldName + "`").join(", ");
+		} else {
+			const omits = list.map((entry) => entry.fieldName);
+
+			return modelMeta.fields
+				.filter((entry) => !omits.includes(entry.name))
+				.map((entry) => "`" + entry.name + "`")
+				.join(", ");
+		}
+	}
+
+	/**
+	 * Prepares the update part of the query. The update instructions has the following structure
+	 * {"set":{"updated_at":"2023-10-17T12:37:40.888Z","name":"michael"},"others":[{fieldName: "age", type: "$inc", "value": 1}, ....]}
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {object} updateInstructions The update instructions
+	 * @returns  The update definition
+	 */
+	getUpdateDefinition(modelMeta, updateInstructions) {
+		const updates = [];
+		const values = [];
+
+		// Process set part
+		for (const [key, value] of Object.entries(updateInstructions.set)) {
+			const field = modelMeta.fields.find((entry) => entry.name === key);
+			if (!field) continue;
+
+			updates.push(`${key} = ?`);
+			values.push(value);
+		}
+
+		for (const entry of updateInstructions.others) {
+			switch (entry.type) {
+				case "$set":
+					updates.push(`${entry.fieldName} = ?`);
+					values.push(entry.value);
+					break;
+				case "$inc":
+					updates.push(
+						`${entry.fieldName} = ${entry.fieldName} + ${entry.value}`
+					);
+					break;
+				case "$mul":
+					updates.push(
+						`${entry.fieldName} = ${entry.fieldName} * ${entry.value}`
+					);
+					break;
+				case "$max":
+					updates.push(
+						`${entry.fieldName} = GREATEST(${entry.fieldName}, ${entry.value})`
+					);
+					break;
+				case "$min":
+					updates.push(
+						`${entry.fieldName} = LEAST(${entry.fieldName}, ${entry.value})`
+					);
+					break;
+				default:
+					break;
+			}
+		}
+
+		return { updates: updates.join(", \n\t"), values };
+	}
+
+	/**
+	 * Returns the comma seperated list of JSON object keys
 	 * @param  {Object} data The JSON object
 	 */
-	getValuePlaceholders(data) {
+	getColumnNames(data) {
+		if (Array.isArray(data))
+			return `(${Object.keys(data[0])
+				.map((entry) => "`" + entry + "`")
+				.join(", ")})`;
+		else
+			return `(${Object.keys(data)
+				.map((entry) => "`" + entry + "`")
+				.join(", ")})`;
+	}
+
+	/**
+	 * Returns the comma seperated list of value placeholders for the input JSON object
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} data The JSON object
+	 */
+	getValuePlaceholders(dbMeta, data) {
 		if (Array.isArray(data)) {
 			const keyCount = Object.keys(data[0]).length;
 			return data
 				.map(
 					(entry, i1) =>
 						`(${Object.keys(entry)
-							.map((entry, i2) => "?")
+							.map((entry, i2) => {
+								const field = dbMeta.fields.find(
+									(entry2) => entry2.name === entry
+								);
+								if (field.type === "geo-point") return "ST_GeomFromText(?)";
+								return "?";
+							})
 							.join(", ")})`
 				)
 				.join(",\n");
 		} else {
 			return `(${Object.keys(data)
-				.map((entry, index) => "?")
+				.map((entry, index) => {
+					const field = dbMeta.fields.find((entry2) => entry2.name === entry);
+					if (field.type === "geo-point") return "ST_GeomFromText(?)";
+					return "?";
+				})
 				.join(", ")})`;
 		}
 	}
@@ -173,7 +279,7 @@ export class MySQL extends SQLDatabase {
 					selectEntries.push(
 						`COALESCE(
 							(
-								SELECT json_agg(${this.getJsonBuildObjectString(
+								SELECT JSON_ARRAYAGG(${this.getJsonBuildObjectString(
 									joinDef.as,
 									joinedModelMeta.fields,
 									null,
@@ -188,7 +294,7 @@ export class MySQL extends SQLDatabase {
 									${offset ? `OFFSET ${offset}` : ""}
 								) AS ${joinDef.as}
 							),
-							'[]'::json
+							JSON_ARRAY()
 						) AS ${joinDef.as}`
 					);
 				}
@@ -263,7 +369,7 @@ export class MySQL extends SQLDatabase {
 				selectEntries.push(
 					`COALESCE(
 						(
-							SELECT json_agg(${this.getJsonBuildObjectString(
+							SELECT JSON_ARRAYAGG(${this.getJsonBuildObjectString(
 								joinDef.as,
 								joinedModelMeta.fields,
 								list,
@@ -278,7 +384,7 @@ export class MySQL extends SQLDatabase {
 								${offset ? `OFFSET ${offset}` : ""}
 							) AS ${joinDef.as}
 						),
-						'[]'::json
+						JSON_ARRAY()
 					) AS ${joinDef.as}`
 				);
 			}
@@ -334,7 +440,7 @@ export class MySQL extends SQLDatabase {
 	}
 
 	// Returns the json object in following format
-	// json_build_object('id', myprofile.id, 'gender', myprofile.gender, 'hobby', myprofile.hobby)
+	// JSON_OBJECT(`id`, myprofile.id, `gender`, myprofile.gender, `hobby`, myprofile.hobby)
 	getJsonBuildObjectString(prefix, fields, list, include) {
 		let filteredFields = fields;
 
@@ -358,7 +464,7 @@ export class MySQL extends SQLDatabase {
 			finalList.push(`${prefix}.${field.name}`);
 		}
 
-		return `json_build_object(${finalList.join(", ")})`;
+		return `JSON_OBJECT(${finalList.join(", ")})`;
 	}
 
 	/**
@@ -428,11 +534,9 @@ export class MySQL extends SQLDatabase {
 				case "$count":
 					selectEntries.push(`COUNT(*) AS ${comp.as}`);
 					break;
-				case "$countIf":
+				case "$countif":
 					selectEntries.push(
-						`COUNT(*) FILTER (WHERE ${comp.compute.getQuery("MySQL")}) AS ${
-							comp.as
-						}`
+						`SUM(${comp.compute.getQuery("MySQL")}) AS ${comp.as}`
 					);
 					break;
 				case "$sum":
@@ -507,7 +611,7 @@ export class MySQL extends SQLDatabase {
 				case "$countif":
 					havingQuery = havingQuery.replaceAll(
 						comp.as,
-						`(COUNT(*) FILTER (WHERE ${comp.compute.getQuery("MySQL")}))`
+						`SUM(${comp.compute.getQuery("MySQL")})`
 					);
 					break;
 				case "$sum":
@@ -576,9 +680,8 @@ export class MySQL extends SQLDatabase {
 	 * @returns  The full-text search query string
 	 */
 	getTextSearchDefinition(modelMeta, searchField, searchText) {
-		const language = searchField.field.getLanguage();
 		const fieldName = `${modelMeta.name}.${searchField.field.getName()}`;
-		return `to_tsvector('${language}', ${fieldName}) @@ to_tsquery('${language}', '${searchText}')`;
+		return `MATCH(${fieldName}) AGAINST('${searchText}' IN BOOLEAN MODE)`;
 	}
 
 	/**
@@ -592,7 +695,7 @@ export class MySQL extends SQLDatabase {
 		// SQL query to insert a new user record
 		const insertQuery = `
 			INSERT INTO ${this.getTableName(dbMeta, modelMeta)} ${this.getColumnNames(data)}
-			VALUES ${this.getValuePlaceholders(data)};
+			VALUES ${this.getValuePlaceholders(modelMeta, data)};
 		  `;
 
 		const values = Object.values(data);
@@ -602,10 +705,16 @@ export class MySQL extends SQLDatabase {
 
 		// Execute the INSERT query
 		const [insertResult] = await this.getDriver().query(insertQuery, values);
+		// MySQL does not return the inserted record data, for this reason we need to run a select statement
+		const idField = this.getIdField(modelMeta);
+		const [rows] = await this.getDriver().query(
+			`SELECT * FROM ${this.getTableName(dbMeta, modelMeta)} WHERE ${
+				idField.name
+			} = ?`,
+			[insertResult.insertId]
+		);
 
-		return insertResult;
-
-		return result.rows && result.rows.length > 0 ? result.rows[0] : null;
+		return rows && rows.length > 0 ? rows[0] : null;
 	}
 
 	/**
@@ -626,8 +735,7 @@ export class MySQL extends SQLDatabase {
 			// SQL query to insert a new user record
 			const insertQuery = `
 					INSERT INTO ${this.getTableName(dbMeta, modelMeta)} ${this.getColumnNames(data)}
-					VALUES ${this.getValuePlaceholders(data)}
-					RETURNING ${this.getIdField(modelMeta).name};
+					VALUES ${this.getValuePlaceholders(modelMeta, data)};
 				  `;
 
 			const values = data.flatMap((entry) => Object.values(entry));
@@ -636,10 +744,10 @@ export class MySQL extends SQLDatabase {
 			console.log("***values", values);
 
 			// Execute the INSERT query
-			const result = await this.getDriver().query(insertQuery, values);
+			const [insertResult] = await this.getDriver().query(insertQuery, values);
 			await this.commitTransaction(dbMeta);
 
-			return { count: result.rowCount };
+			return { count: insertResult.affectedRows };
 		} catch (err) {
 			await this.rollbackTransaction(dbMeta);
 			throw err;
@@ -666,16 +774,17 @@ export class MySQL extends SQLDatabase {
 
 		// SQL query to select a record from the database
 		const selectQuery = `
-					SELECT ${select} FROM ${from}
-					WHERE ${idField.name} = ${this.getIdSQLValue(options.id)};
+					SELECT ${select} 
+					FROM ${from} AS ${modelMeta.name}
+					WHERE ${modelMeta.name}.${idField.name} = ${this.getIdSQLValue(options.id)};
 				  `;
 
 		console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
-		const result = await this.getDriver().query(selectQuery);
+		const [rows] = await this.getDriver().query(selectQuery);
 
-		return result.rows && result.rows.length > 0 ? result.rows[0] : null;
+		return rows && rows.length > 0 ? rows[0] : null;
 	}
 
 	/**
@@ -716,9 +825,9 @@ export class MySQL extends SQLDatabase {
 		console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
-		const result = await this.getDriver().query(selectQuery);
+		const [rows] = await this.getDriver().query(selectQuery);
 
-		return result.rows && result.rows.length > 0 ? result.rows[0] : null;
+		return rows && rows.length > 0 ? rows[0] : null;
 	}
 
 	/**
@@ -759,9 +868,9 @@ export class MySQL extends SQLDatabase {
 		console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
-		const result = await this.getDriver().query(selectQuery);
+		const [rows] = await this.getDriver().query(selectQuery);
 
-		return result.rows && result.rows.length > 0 ? result.rows : [];
+		return rows && rows.length > 0 ? rows : [];
 	}
 
 	/**
@@ -784,9 +893,9 @@ export class MySQL extends SQLDatabase {
 		console.log("***sql", deleteQuery);
 
 		// Execute the DELETE query
-		const result = await this.getDriver().query(deleteQuery);
+		const [deleteResult] = await this.getDriver().query(deleteQuery);
 
-		return { count: result.rowCount };
+		return { count: deleteResult.affectedRows };
 	}
 
 	/**
@@ -806,31 +915,41 @@ export class MySQL extends SQLDatabase {
 		const limit = 1;
 		const offset = 0;
 
-		// SQL query to select a record from the database
-		let selectQuery = "";
-		selectQuery = `SELECT ${select}`;
-		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+		if (joins && where) {
+			// SQL query to select a record from the database
+			let selectQuery = "";
+			selectQuery = `SELECT ${select}`;
+			selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+			selectQuery = `${selectQuery}\n${joins}`;
+			selectQuery = `${selectQuery}\nWHERE ${where}`;
+			selectQuery = `${selectQuery}\nLIMIT ${limit}`;
+			selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-		if (joins) selectQuery = `${selectQuery}\n${joins}`;
-		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
-		selectQuery = `${selectQuery}\nLIMIT ${limit}`;
-		selectQuery = `${selectQuery}\nOFFSET ${offset};`;
+			console.log("***sql", selectQuery);
 
-		console.log("***sql", selectQuery);
+			// Execute the SELECT query
+			const [rows] = await this.getDriver().query(selectQuery);
 
-		// Execute the SELECT query
-		const result = await this.getDriver().query(selectQuery);
+			const id = rows && rows.length > 0 ? rows[0][idField.name] : null;
+			if (id === null) return { count: 0 };
 
-		const id =
-			result.rows && result.rows.length > 0
-				? result.rows[0][idField.name]
-				: null;
+			// Set options id value and perform the updates
+			options.id = id;
+			return await this.deleteById(dbMeta, modelMeta, options);
+		} else {
+			// If there are no joins we can directly update the records
+			// SQL query to delete the record
+			let deleteQuery = `DELETE FROM ${from} AS ${modelMeta.name}`;
+			if (where) deleteQuery = `${deleteQuery}\nWHERE ${where}`;
+			deleteQuery = `${deleteQuery}\nLIMIT 1;`;
 
-		if (id === null) return { count: 0 };
+			console.log("***sql", deleteQuery);
 
-		// Set options id value and perform the updates
-		options.id = id;
-		return await this.deleteById(dbMeta, modelMeta, options);
+			// Execute the UPDATE query
+			const [deleteResult] = await this.getDriver().query(deleteQuery);
+
+			return { count: deleteResult.affectedRows };
+		}
 	}
 
 	/**
@@ -849,41 +968,50 @@ export class MySQL extends SQLDatabase {
 		const joins = this.getJoinDefinitions(modelMeta, options.join);
 		const where = this.getWhereDefinition(options.where);
 
-		// SQL query to select a record from the database
-		let selectQuery = "";
-		selectQuery = `SELECT ${select}`;
-		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+		if (joins && where) {
+			// SQL query to select a record from the database
+			let selectQuery = "";
+			selectQuery = `SELECT ${select}`;
+			selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+			selectQuery = `${selectQuery}\n${joins}`;
+			selectQuery = `${selectQuery}\nWHERE ${where}`;
+			selectQuery = `${selectQuery}\nGROUP BY ${select}`;
 
-		if (joins) selectQuery = `${selectQuery}\n${joins}`;
-		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
-		selectQuery = `${selectQuery}\nGROUP BY ${select}`;
+			console.log("***sql", selectQuery);
 
-		console.log("***sql", selectQuery);
+			// Execute the SELECT query
+			const [entries] = await this.getDriver().query(selectQuery);
+			const rows = entries && entries.length > 0 ? entries : null;
+			if (rows === null) return { count: 0 };
 
-		// Execute the SELECT query
-		const selectResult = await this.getDriver().query(selectQuery);
-		const rows =
-			selectResult.rows && selectResult.rows.length > 0
-				? selectResult.rows
-				: null;
+			// Get the list of id values
+			const ids = rows.map((entry) => entry[idField.name]);
 
-		if (rows === null) return { count: 0 };
-
-		// Get the list of id values
-		const ids = rows.map((entry) => entry[idField.name]);
-
-		// SQL query to delete records from the database
-		const deleteQuery = `
+			// SQL query to delete records from the database
+			const deleteQuery = `
 						DELETE FROM ${from}
 						WHERE ${idField.name} IN (${ids.join(", ")});
 					`;
 
-		console.log("***sql", deleteQuery);
+			console.log("***sql", deleteQuery);
 
-		// Execute the DELETE query
-		const result = await this.getDriver().query(deleteQuery);
+			// Execute the DELETE query
+			const [deleteResult] = await this.getDriver().query(deleteQuery);
 
-		return { count: result.rowCount };
+			return { count: deleteResult.affectedRows };
+		} else {
+			// If there are no joins we can directly update the records
+			// SQL query to delete the record
+			let deleteQuery = `DELETE FROM ${from} AS ${modelMeta.name}`;
+			if (where) deleteQuery = `${deleteQuery}\nWHERE ${where};`;
+
+			console.log("***sql", deleteQuery);
+
+			// Execute the UPDATE query
+			const [deleteResult] = await this.getDriver().query(deleteQuery);
+
+			return { count: deleteResult.affectedRows };
+		}
 	}
 
 	/**
@@ -911,17 +1039,25 @@ export class MySQL extends SQLDatabase {
 		const updateQuery = `
 						UPDATE ${from}
 						SET ${updates}
-						WHERE ${idField.name} = ${this.getIdSQLValue(options.id)}
-						RETURNING ${select};
-					`;
+						WHERE ${idField.name} = ${this.getIdSQLValue(options.id)};`;
 
 		console.log("***sql", updateQuery);
 		console.log("***values", values);
 
 		// Execute the UPDATE query
-		const result = await this.getDriver().query(updateQuery, values);
+		const [updateResult] = await this.getDriver().query(updateQuery, values);
 
-		return result.rows && result.rows.length > 0 ? result.rows[0] : null;
+		if (updateResult.affectedRows === 0) return null;
+
+		// MySQL does not return the inserted record data, for this reason we need to run a select statement
+		const [rows] = await this.getDriver().query(
+			`SELECT ${select} 
+			FROM ${this.getTableName(dbMeta, modelMeta)} 
+			WHERE ${idField.name} = ?`,
+			[options.id]
+		);
+
+		return rows && rows.length > 0 ? rows[0] : null;
 	}
 
 	/**
@@ -935,7 +1071,6 @@ export class MySQL extends SQLDatabase {
 		// We first identify the id of the record to update
 		const idField = this.getIdField(modelMeta);
 		const from = this.getTableName(dbMeta, modelMeta);
-		const select = `${modelMeta.name}.${idField.name}`;
 		const joins = this.getJoinDefinitions(modelMeta, options.join);
 		const where = this.getWhereDefinition(options.where);
 		const limit = 1;
@@ -943,7 +1078,7 @@ export class MySQL extends SQLDatabase {
 
 		// SQL query to select a record from the database
 		let selectQuery = "";
-		selectQuery = `SELECT ${select}`;
+		selectQuery = `SELECT ${modelMeta.name}.${idField.name}`;
 		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
 
 		if (joins) selectQuery = `${selectQuery}\n${joins}`;
@@ -954,12 +1089,8 @@ export class MySQL extends SQLDatabase {
 		console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
-		const result = await this.getDriver().query(selectQuery);
-
-		const id =
-			result.rows && result.rows.length > 0
-				? result.rows[0][idField.name]
-				: null;
+		const [rows] = await this.getDriver().query(selectQuery);
+		const id = rows && rows.length > 0 ? rows[0][idField.name] : null;
 
 		if (id === null) return null;
 
@@ -983,48 +1114,62 @@ export class MySQL extends SQLDatabase {
 		const select = `${modelMeta.name}.${idField.name}`;
 		const joins = this.getJoinDefinitions(modelMeta, options.join);
 		const where = this.getWhereDefinition(options.where);
-
-		// SQL query to select a record from the database
-		let selectQuery = "";
-		selectQuery = `SELECT ${select}`;
-		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
-
-		if (joins) selectQuery = `${selectQuery}\n${joins}`;
-		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
-		selectQuery = `${selectQuery}\nGROUP BY ${select}`;
-
-		console.log("***sql", selectQuery);
-
-		// Execute the SELECT query
-		const selectResult = await this.getDriver().query(selectQuery);
-		const rows =
-			selectResult.rows && selectResult.rows.length > 0
-				? selectResult.rows
-				: null;
-
-		if (rows === null) return { count: 0 };
-
-		// Get the list of id values
-		const ids = rows.map((entry) => entry[idField.name]);
 		const { updates, values } = this.getUpdateDefinition(
 			modelMeta,
 			options.updateData
 		);
 
-		// SQL query to update records
-		const updateQuery = `
+		if (joins && where) {
+			// SQL query to select a record from the database
+			let selectQuery = "";
+			selectQuery = `SELECT ${select}`;
+			selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+			selectQuery = `${selectQuery}\n${joins}`;
+			selectQuery = `${selectQuery}\nWHERE ${where}`;
+			selectQuery = `${selectQuery}\nGROUP BY ${select}`;
+
+			console.log("***sql", selectQuery);
+
+			// Execute the SELECT query
+			const [selectRows] = await this.getDriver().query(selectQuery);
+			const rows = selectRows && selectRows.length > 0 ? selectRows : null;
+
+			if (rows === null) return { count: 0 };
+
+			// Get the list of id values
+			const ids = rows.map((entry) => entry[idField.name]);
+
+			// SQL query to update records
+			const updateQuery = `
 						UPDATE ${from}
 						SET ${updates}
 						WHERE ${idField.name} IN (${ids.join(", ")});
 					`;
 
-		console.log("***sql", updateQuery);
-		console.log("***values", values);
+			console.log("***sql", updateQuery);
+			console.log("***values", values);
 
-		// Execute the UPDATE query
-		const result = await this.getDriver().query(updateQuery, values);
+			// Execute the UPDATE query
+			const [updateResult] = await this.getDriver().query(updateQuery, values);
 
-		return { count: result.rowCount };
+			return { count: updateResult.affectedRows };
+		} else {
+			// If there are no joins we can directly update the records
+			// SQL query to update records
+			let updateQuery = `
+						UPDATE ${from}
+						SET ${updates}
+					`;
+			if (where) updateQuery = `${updateQuery}\nWHERE ${where};`;
+
+			console.log("***sql", updateQuery);
+			console.log("***values", values);
+
+			// Execute the UPDATE query
+			const [updateResult] = await this.getDriver().query(updateQuery, values);
+
+			return { count: updateResult.affectedRows };
+		}
 	}
 
 	/**
@@ -1070,9 +1215,9 @@ export class MySQL extends SQLDatabase {
 		console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
-		const result = await this.getDriver().query(selectQuery);
+		const [rows] = await this.getDriver().query(selectQuery);
 
-		return result.rows && result.rows.length > 0 ? result.rows : [];
+		return rows && rows.length > 0 ? rows : [];
 	}
 
 	/**
@@ -1117,8 +1262,8 @@ export class MySQL extends SQLDatabase {
 		console.log("***sql", aggregateQuery);
 
 		// Execute the SELECT query
-		const result = await this.getDriver().query(aggregateQuery);
+		const [rows] = await this.getDriver().query(aggregateQuery);
 
-		return result.rows && result.rows.length > 0 ? result.rows : [];
+		return rows && rows.length > 0 ? rows : [];
 	}
 }

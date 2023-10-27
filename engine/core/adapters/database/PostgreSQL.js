@@ -64,6 +64,96 @@ export class PostgreSQL extends SQLDatabase {
 	}
 
 	/**
+	 * Prepares the select part of the query namely the fields that will be returned.
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Array} select The included fields
+	 * @param  {Array} omit The exdluded fields
+	 * @returns  The select for SQL or projection for no-SQL definiton
+	 */
+	getSelectDefinition(modelMeta, select, omit) {
+		// If not select or omit definition the return all fields
+		if (!select && !omit) return "*";
+
+		const include = select ? true : false;
+		const list = select ?? omit;
+
+		if (include) {
+			return list.map((entry) => entry.fieldName).join(", ");
+		} else {
+			const omits = list.map((entry) => entry.fieldName);
+
+			return modelMeta.fields
+				.filter((entry) => !omits.includes(entry.name))
+				.map((entry) => entry.name)
+				.join(", ");
+		}
+	}
+
+	/**
+	 * Prepares the update part of the query. The update instructions has the following structure
+	 * {"set":{"updated_at":"2023-10-17T12:37:40.888Z","name":"michael"},"others":[{fieldName: "age", type: "$inc", "value": 1}, ....]}
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {object} updateInstructions The update instructions
+	 * @returns  The update definition
+	 */
+	getUpdateDefinition(modelMeta, updateInstructions) {
+		let counter = 1;
+		const updates = [];
+		const values = [];
+
+		// Process set part
+		for (const [key, value] of Object.entries(updateInstructions.set)) {
+			const field = modelMeta.fields.find((entry) => entry.name === key);
+			if (!field) continue;
+
+			updates.push(`${key} = $${counter++}`);
+			values.push(value);
+		}
+
+		for (const entry of updateInstructions.others) {
+			switch (entry.type) {
+				case "$set":
+					updates.push(`${entry.fieldName} = $${counter++}`);
+					values.push(entry.value);
+					break;
+				case "$inc":
+					updates.push(
+						`${entry.fieldName} = ${entry.fieldName} + ${entry.value}`
+					);
+					break;
+				case "$mul":
+					updates.push(
+						`${entry.fieldName} = ${entry.fieldName} * ${entry.value}`
+					);
+					break;
+				case "$max":
+					updates.push(
+						`${entry.fieldName} = GREATEST(${entry.fieldName}, ${entry.value})`
+					);
+					break;
+				case "$min":
+					updates.push(
+						`${entry.fieldName} = LEAST(${entry.fieldName}, ${entry.value})`
+					);
+					break;
+				default:
+					break;
+			}
+		}
+
+		return { updates: updates.join(", \n\t"), values };
+	}
+
+	/**
+	 * Returns the comma seperated list of JSON object keys
+	 * @param  {Object} data The JSON object
+	 */
+	getColumnNames(data) {
+		if (Array.isArray(data)) return `(${Object.keys(data[0]).join(", ")})`;
+		else return `(${Object.keys(data).join(", ")})`;
+	}
+
+	/**
 	 * Returns the comma seperated list of value placeholders for the input JSON object
 	 * @param  {Object} data The JSON object
 	 */
@@ -428,7 +518,7 @@ export class PostgreSQL extends SQLDatabase {
 				case "$count":
 					selectEntries.push(`COUNT(*) AS ${comp.as}`);
 					break;
-				case "$countIf":
+				case "$countif":
 					selectEntries.push(
 						`COUNT(*) FILTER (WHERE ${comp.compute.getQuery(
 							"PostgreSQL"
@@ -665,8 +755,9 @@ export class PostgreSQL extends SQLDatabase {
 
 		// SQL query to select a record from the database
 		const selectQuery = `
-					SELECT ${select} FROM ${from}
-					WHERE ${idField.name} = ${this.getIdSQLValue(options.id)};
+					SELECT ${select} 
+					FROM ${from} AS ${modelMeta.name}
+					WHERE ${modelMeta.name}.${idField.name} = ${this.getIdSQLValue(options.id)};
 				  `;
 
 		console.log("***sql", selectQuery);
@@ -805,31 +896,45 @@ export class PostgreSQL extends SQLDatabase {
 		const limit = 1;
 		const offset = 0;
 
-		// SQL query to select a record from the database
-		let selectQuery = "";
-		selectQuery = `SELECT ${select}`;
-		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+		if (joins && where) {
+			// SQL query to select a record from the database
+			let selectQuery = "";
+			selectQuery = `SELECT ${select}`;
+			selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+			selectQuery = `${selectQuery}\n${joins}`;
+			selectQuery = `${selectQuery}\nWHERE ${where}`;
+			selectQuery = `${selectQuery}\nLIMIT ${limit}`;
+			selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-		if (joins) selectQuery = `${selectQuery}\n${joins}`;
-		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
-		selectQuery = `${selectQuery}\nLIMIT ${limit}`;
-		selectQuery = `${selectQuery}\nOFFSET ${offset};`;
+			console.log("***sql", selectQuery);
 
-		console.log("***sql", selectQuery);
+			// Execute the SELECT query
+			const result = await this.getDriver().query(selectQuery);
 
-		// Execute the SELECT query
-		const result = await this.getDriver().query(selectQuery);
+			const id =
+				result.rows && result.rows.length > 0
+					? result.rows[0][idField.name]
+					: null;
 
-		const id =
-			result.rows && result.rows.length > 0
-				? result.rows[0][idField.name]
-				: null;
+			if (id === null) return { count: 0 };
 
-		if (id === null) return { count: 0 };
+			// Set options id value and perform the updates
+			options.id = id;
+			return await this.deleteById(dbMeta, modelMeta, options);
+		} else {
+			// If there are no joins we can directly update the records
+			// SQL query to delete the record
+			const deleteQuery = `DELETE FROM ${from}
+			USING (SELECT ${idField.name} FROM ${from} AS ${modelMeta.name} WHERE ${where} LIMIT 1) AS subquery
+			WHERE ${from}.${idField.name} = subquery.${idField.name} ;`;
 
-		// Set options id value and perform the updates
-		options.id = id;
-		return await this.deleteById(dbMeta, modelMeta, options);
+			console.log("***sql", deleteQuery);
+
+			// Execute the DELETE query
+			const result = await this.getDriver().query(deleteQuery);
+
+			return { count: result.rowCount };
+		}
 	}
 
 	/**
@@ -848,41 +953,54 @@ export class PostgreSQL extends SQLDatabase {
 		const joins = this.getJoinDefinitions(modelMeta, options.join);
 		const where = this.getWhereDefinition(options.where);
 
-		// SQL query to select a record from the database
-		let selectQuery = "";
-		selectQuery = `SELECT ${select}`;
-		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+		if (joins && where) {
+			// SQL query to select a record from the database
+			let selectQuery = "";
+			selectQuery = `SELECT ${select}`;
+			selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+			selectQuery = `${selectQuery}\n${joins}`;
+			selectQuery = `${selectQuery}\nWHERE ${where}`;
+			selectQuery = `${selectQuery}\nGROUP BY ${select}`;
 
-		if (joins) selectQuery = `${selectQuery}\n${joins}`;
-		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
-		selectQuery = `${selectQuery}\nGROUP BY ${select}`;
+			console.log("***sql", selectQuery);
 
-		console.log("***sql", selectQuery);
+			// Execute the SELECT query
+			const selectResult = await this.getDriver().query(selectQuery);
+			const rows =
+				selectResult.rows && selectResult.rows.length > 0
+					? selectResult.rows
+					: null;
 
-		// Execute the SELECT query
-		const selectResult = await this.getDriver().query(selectQuery);
-		const rows =
-			selectResult.rows && selectResult.rows.length > 0
-				? selectResult.rows
-				: null;
+			if (rows === null) return { count: 0 };
 
-		if (rows === null) return { count: 0 };
+			// Get the list of id values
+			const ids = rows.map((entry) => entry[idField.name]);
 
-		// Get the list of id values
-		const ids = rows.map((entry) => entry[idField.name]);
-
-		// SQL query to delete records from the database
-		const deleteQuery = `
+			// SQL query to delete records from the database
+			const deleteQuery = `
 						DELETE FROM ${from}
 						WHERE ${idField.name} IN (${ids.join(", ")});
 					`;
 
-		console.log("***sql", deleteQuery);
+			console.log("***sql", deleteQuery);
 
-		// Execute the DELETE query
-		const result = await this.getDriver().query(deleteQuery);
+			// Execute the DELETE query
+			const result = await this.getDriver().query(deleteQuery);
 
-		return { count: result.rowCount };
+			return { count: result.rowCount };
+		} else {
+			// If there are no joins we can directly update the records
+			// SQL query to delete the record
+			let deleteQuery = `DELETE FROM ${from} AS ${modelMeta.name}`;
+			if (where) deleteQuery = `${deleteQuery}\nWHERE ${where};`;
+
+			console.log("***sql", deleteQuery);
+
+			// Execute the DELETE query
+			const result = await this.getDriver().query(deleteQuery);
+
+			return { count: result.rowCount };
+		}
 	}
 
 	/**
@@ -934,7 +1052,6 @@ export class PostgreSQL extends SQLDatabase {
 		// We first identify the id of the record to update
 		const idField = this.getIdField(modelMeta);
 		const from = this.getTableName(dbMeta, modelMeta);
-		const select = `${modelMeta.name}.${idField.name}`;
 		const joins = this.getJoinDefinitions(modelMeta, options.join);
 		const where = this.getWhereDefinition(options.where);
 		const limit = 1;
@@ -942,7 +1059,7 @@ export class PostgreSQL extends SQLDatabase {
 
 		// SQL query to select a record from the database
 		let selectQuery = "";
-		selectQuery = `SELECT ${select}`;
+		selectQuery = `SELECT ${modelMeta.name}.${idField.name}`;
 		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
 
 		if (joins) selectQuery = `${selectQuery}\n${joins}`;
@@ -982,48 +1099,64 @@ export class PostgreSQL extends SQLDatabase {
 		const select = `${modelMeta.name}.${idField.name}`;
 		const joins = this.getJoinDefinitions(modelMeta, options.join);
 		const where = this.getWhereDefinition(options.where);
-
-		// SQL query to select a record from the database
-		let selectQuery = "";
-		selectQuery = `SELECT ${select}`;
-		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
-
-		if (joins) selectQuery = `${selectQuery}\n${joins}`;
-		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
-		selectQuery = `${selectQuery}\nGROUP BY ${select}`;
-
-		console.log("***sql", selectQuery);
-
-		// Execute the SELECT query
-		const selectResult = await this.getDriver().query(selectQuery);
-		const rows =
-			selectResult.rows && selectResult.rows.length > 0
-				? selectResult.rows
-				: null;
-
-		if (rows === null) return { count: 0 };
-
-		// Get the list of id values
-		const ids = rows.map((entry) => entry[idField.name]);
 		const { updates, values } = this.getUpdateDefinition(
 			modelMeta,
 			options.updateData
 		);
 
-		// SQL query to update records
-		const updateQuery = `
+		if (joins && where) {
+			// SQL query to select a record from the database
+			let selectQuery = "";
+			selectQuery = `SELECT ${select}`;
+			selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+			selectQuery = `${selectQuery}\n${joins}`;
+			selectQuery = `${selectQuery}\nWHERE ${where}`;
+			selectQuery = `${selectQuery}\nGROUP BY ${select}`;
+
+			console.log("***sql", selectQuery);
+
+			// Execute the SELECT query
+			const selectResult = await this.getDriver().query(selectQuery);
+			const rows =
+				selectResult.rows && selectResult.rows.length > 0
+					? selectResult.rows
+					: null;
+
+			if (rows === null) return { count: 0 };
+			// Get the list of id values
+			const ids = rows.map((entry) => entry[idField.name]);
+
+			// SQL query to update records
+			const updateQuery = `
 						UPDATE ${from}
 						SET ${updates}
 						WHERE ${idField.name} IN (${ids.join(", ")});
 					`;
 
-		console.log("***sql", updateQuery);
-		console.log("***values", values);
+			console.log("***sql", updateQuery);
+			console.log("***values", values);
 
-		// Execute the UPDATE query
-		const result = await this.getDriver().query(updateQuery, values);
+			// Execute the UPDATE query
+			const result = await this.getDriver().query(updateQuery, values);
 
-		return { count: result.rowCount };
+			return { count: result.rowCount };
+		} else {
+			// If there are no joins we can directly update the records
+			// SQL query to update records
+			let updateQuery = `
+						UPDATE ${from}
+						SET ${updates}
+					`;
+			if (where) updateQuery = `${updateQuery}\nWHERE ${where};`;
+
+			console.log("***sql", updateQuery);
+			console.log("***values", values);
+
+			// Execute the UPDATE query
+			const result = await this.getDriver().query(updateQuery, values);
+
+			return { count: result.rowCount };
+		}
 	}
 
 	/**
