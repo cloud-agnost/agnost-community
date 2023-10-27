@@ -1253,4 +1253,42 @@ export class PostgreSQL extends SQLDatabase {
 
 		return result.rows && result.rows.length > 0 ? result.rows : [];
 	}
+
+	/**
+	 * Returns the SQL query string of the query definition
+	 * @param  {Object} dbMeta The database metadata
+	 * @param  {Object} modelMeta The model metadata
+	 * @param  {Object} options The where, select, omit, join, lookup, sort, skip and limit options
+	 * @returns  The fetched records otherwise an empty array [] if no records can be found
+	 */
+	async getSQLQuery(dbMeta, modelMeta, options) {
+		const from = this.getTableName(dbMeta, modelMeta);
+		const select = this.getJoinLookupSelectDefinition(
+			dbMeta,
+			modelMeta,
+			options.select,
+			options.omit,
+			this.mergeArrays(options.lookup, options.join)
+		);
+
+		const joins = this.getJoinDefinitions(modelMeta, options.join);
+		const where = this.getWhereDefinition(options.where);
+		const orderBy = this.getOrderByDefinition(options.sort);
+		const limit = options.limit ?? null;
+		const offset = options.skip ?? null;
+
+		// SQL query to select a record from the database
+		let selectQuery = "";
+		selectQuery = `SELECT ${select}`;
+		selectQuery = `${selectQuery}\nFROM ${from} AS ${modelMeta.name}`;
+
+		if (joins) selectQuery = `${selectQuery}\n${joins}`;
+		if (where) selectQuery = `${selectQuery}\nWHERE ${where}`;
+		if (orderBy) selectQuery = `${selectQuery}\nORDER BY ${orderBy}`;
+
+		if (limit) selectQuery = `${selectQuery}\nLIMIT ${limit}`;
+		if (offset) selectQuery = `${selectQuery}\nOFFSET ${offset};`;
+
+		return selectQuery;
+	}
 }
