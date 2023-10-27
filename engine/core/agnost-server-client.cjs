@@ -6773,7 +6773,7 @@
 								);
 							let s = null;
 							if ("$count" !== a) {
-								s = this.parseValue(e.compute[a], t, p.ConditionType.QUERY);
+								s = this.parseValue(e.compute[n[0]], t, p.ConditionType.QUERY);
 								const r = s.getReturnType();
 								if (
 									"$countif" === a &&
@@ -8516,7 +8516,7 @@
 									t[this.getName()] = `${n},${o}`;
 									break;
 								case a.DBTYPE.MYSQL:
-									t[this.getName()] = `POINT(${n}, ${o})`;
+									t[this.getName()] = `POINT(${n} ${o})`;
 									break;
 								case a.DBTYPE.SQLSERVER:
 									t[this.getName()] = `geography::Point(${n}, ${o}, 4326)`;
@@ -9602,7 +9602,7 @@
 					(t.NumericUpdateOperators = ["$inc", "$mul", "$min", "$max"]),
 					(t.ComputeOperators = [
 						"$count",
-						"$countIf",
+						"$countif",
 						"$sum",
 						"$avg",
 						"$min",

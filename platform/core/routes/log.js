@@ -64,6 +64,7 @@ router.get(
 				sort,
 				skip: size * page,
 				limit: size,
+				projection: { data: 0 },
 			});
 
 			res.json(logs);
