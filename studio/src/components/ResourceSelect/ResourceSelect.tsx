@@ -52,6 +52,11 @@ export default function ResourceSelect({ error, type, className, ...props }: Res
 						</div>
 					</SelectItem>
 				))}
+				{(resources.length === 0 || !resources) && (
+					<SelectItem value='' disabled>
+						{t('resources.database.no_resource')}
+					</SelectItem>
+				)}
 			</SelectContent>
 		</Select>
 	);

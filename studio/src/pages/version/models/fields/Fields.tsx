@@ -28,15 +28,8 @@ export default function Fields() {
 	const canMultiDelete = useAuthorizeVersion('model.delete');
 	const [searchParams] = useSearchParams();
 
-	const model = useMemo(
-		() => models.find((model) => model._id === modelId) as Model,
-		[models, modelId],
-	);
-
-	const parentModel = useMemo(
-		() => models.find((model) => model.iid === parentModelIid),
-		[models, parentModelIid],
-	);
+	const model = models.find((model) => model._id === modelId) as Model;
+	const parentModel = models.find((model) => model.iid === parentModelIid);
 
 	useEffect(() => {
 		findModel();
@@ -55,10 +48,10 @@ export default function Fields() {
 
 	const filteredFields = useMemo(() => {
 		const search = searchParams.get('q') ?? '';
-		if (!search) return model.fields;
+		if (!search) return model?.fields;
 
-		return model.fields
-			.filter((f) => {
+		return model?.fields
+			?.filter((f) => {
 				return f.name.toLowerCase().includes(search.toLowerCase());
 			})
 			.sort((a, b) => b.order - a.order);
@@ -93,7 +86,7 @@ export default function Fields() {
 	}
 
 	const databasesUrl = `/organization/${database?.orgId}/apps/${database?.appId}/version/${database?.versionId}/database`;
-	const databaseUrl = `${databasesUrl}/${model.dbId}/models`;
+	const databaseUrl = `${databasesUrl}/${model?.dbId}/models`;
 	const goParentModelUrl = `${databaseUrl}/${parentModel?._id}/fields`;
 
 	const breadcrumbItems: BreadCrumbItem[] = [

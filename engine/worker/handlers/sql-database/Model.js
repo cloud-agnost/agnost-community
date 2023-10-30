@@ -1,3 +1,7 @@
+import { DATABASE } from "../../config/constants.js";
+
+const MYSQL_COLLATE = "utf8mb4_0900_as_cs";
+
 /**
  * @description The model class for create a table
  * @class Model
@@ -9,6 +13,12 @@ export default class Model {
      * @type {Field[]}
      */
     fields = [];
+
+    /**
+     * @description The database type
+     * @type {string}
+     */
+    dbType;
 
     /**
      * @description The name of the model
@@ -23,15 +33,18 @@ export default class Model {
     schema;
 
     /**
-     * @description Create a new model
-     * @param {string} name - The name of the model
-     * @param {undefined|[]} fields - The fields of the model
-     * @param {undefined|string} schema - The schema of the model
+     *
+     * @param options
+     * @param options.name {string}
+     * @param options.fields {[]|undefined}
+     * @param options.schema {string|undefined}
+     * @param options.dbType {string|undefined}
      */
-    constructor(name, fields = undefined, schema = undefined) {
+    constructor({ name, fields = undefined, schema = undefined, dbType }) {
         this.name = name;
         this.schema = schema;
         if (fields) this.fields = fields;
+        this.dbType = dbType;
     }
 
     /**
@@ -48,10 +61,18 @@ export default class Model {
      * @return {string}
      */
     toString() {
-        const SQL = `
+        const isMySQL = this.dbType === DATABASE.MySQL;
+
+        let SQL = `
 CREATE TABLE {SCHEMA_NAME}{TABLE_NAME} (
 {TABLE_FIELDS}
 ); \n`;
+
+        if (isMySQL)
+            SQL = `
+CREATE TABLE {SCHEMA_NAME}{TABLE_NAME} (
+{TABLE_FIELDS}
+) COLLATE ${MYSQL_COLLATE}; \n`;
 
         const fields = this.fields.map((field) => "\t" + field.toDefinitionQuery()).join(", \n");
 

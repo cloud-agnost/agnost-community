@@ -616,7 +616,7 @@ export class SQLBaseManager extends DBManager {
      * @return {string}
      */
     createModel({ fields, name }) {
-        const model = new Model(name, undefined, this.getSchemaName());
+        const model = new Model({ name, schema: this.getSchemaName(), dbType: this.getDbType() });
 
         for (const field of fields) {
             const FieldClass = fieldMap.get(field.type);

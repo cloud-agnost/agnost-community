@@ -30,7 +30,7 @@ export default function VersionDatabase() {
 	const [createDrawerIsOpen, setCreateDrawerIsOpen] = useState(false);
 	const [table, setTable] = useState<Table<Database>>();
 	const [searchParams] = useSearchParams();
-	const [loading, setLoading] = useState(false);
+	const [_, setLoading] = useState(false);
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -60,62 +60,56 @@ export default function VersionDatabase() {
 		// size: PAGE_SIZE,
 		setLoading(false);
 	}, [page, searchParams.get('q')]);
-	console.log(loading);
+
 	return (
-		<VersionTabLayout<Database>
-			className='p-0'
-			isEmpty={databases.length === 0}
-			title={t('database.page_title')}
-			type='database'
-			openCreateModal={() => setCreateDrawerIsOpen(true)}
-			createButtonTitle={t('database.add.title')}
-			emptyStateTitle={t('database.empty_text')}
-			table={table}
-			selectedRowLength={selectedRows?.length}
-			onSearch={() => setPage(0)}
-			disabled={!canEdit}
-		>
-			{/* <InfiniteScroll
-				scrollableTarget='version-layout'
-				dataLength={databases.length}
-				next={() => setPage(page + 1)}
-				hasMore={lastFetchedCount >= PAGE_SIZE}
-				loader={loading && <TableLoading />}
-			>
-			</InfiniteScroll> */}
-			<DataTable<Database>
-				columns={DatabaseColumns}
-				setTable={setTable}
-				data={databases}
-				noDataMessage={<p className='text-xl'>{t('database.empty_text')}</p>}
-				setSelectedRows={setSelectedRows}
-			/>
+		<>
 			<CreateAndEditDatabaseDrawer
 				open={editDatabaseDialogOpen}
 				onOpenChange={setEditDatabaseDialogOpen}
 				editMode
 			/>
 			<CreateAndEditDatabaseDrawer open={createDrawerIsOpen} onOpenChange={setCreateDrawerIsOpen} />
-			{toDeleteDatabase && (
-				<ConfirmationModal
-					alertTitle={t('database.delete.confirm_title')}
-					alertDescription={t('database.delete.confirm_description')}
-					title={t('database.delete.title')}
-					confirmCode={toDeleteDatabase.name}
-					description={
-						<Trans
-							i18nKey='database.delete.confirm'
-							values={{ confirmCode: toDeleteDatabase.name }}
-							components={{
-								confirmCode: <span className='font-bold text-default' />,
-							}}
-						/>
-					}
-					onConfirm={deleteHandler}
-					isOpen={isOpenDeleteDatabaseDialog}
-					closeModal={() => setIsOpenDeleteDatabaseDialog(false)}
+			<VersionTabLayout<Database>
+				className='p-0'
+				isEmpty={databases.length === 0}
+				title={t('database.page_title')}
+				type='database'
+				openCreateModal={() => setCreateDrawerIsOpen(true)}
+				createButtonTitle={t('database.add.title')}
+				emptyStateTitle={t('database.empty_text')}
+				table={table}
+				selectedRowLength={selectedRows?.length}
+				onSearch={() => setPage(0)}
+				disabled={!canEdit}
+			>
+				<DataTable<Database>
+					columns={DatabaseColumns}
+					setTable={setTable}
+					data={databases}
+					noDataMessage={<p className='text-xl'>{t('database.empty_text')}</p>}
+					setSelectedRows={setSelectedRows}
 				/>
-			)}
-		</VersionTabLayout>
+				{toDeleteDatabase && (
+					<ConfirmationModal
+						alertTitle={t('database.delete.confirm_title')}
+						alertDescription={t('database.delete.confirm_description')}
+						title={t('database.delete.title')}
+						confirmCode={toDeleteDatabase.name}
+						description={
+							<Trans
+								i18nKey='database.delete.confirm'
+								values={{ confirmCode: toDeleteDatabase.name }}
+								components={{
+									confirmCode: <span className='font-bold text-default' />,
+								}}
+							/>
+						}
+						onConfirm={deleteHandler}
+						isOpen={isOpenDeleteDatabaseDialog}
+						closeModal={() => setIsOpenDeleteDatabaseDialog(false)}
+					/>
+				)}
+			</VersionTabLayout>
+		</>
 	);
 }

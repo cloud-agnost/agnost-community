@@ -2,6 +2,7 @@ import { SQLBaseManager } from "./SQLBaseManager.js";
 import fieldMap from "../sql-database/fieldMap.js";
 import { customAlphabet } from "nanoid";
 import Model from "../sql-database/Model.js";
+import { DATABASE } from "../../config/constants.js";
 
 export class MySQLDBManager extends SQLBaseManager {
     static dropForeignKeySchema = "ALTER TABLE `{TABLE_NAME}` DROP FOREIGN KEY `{CONSTRAINT_NAME}`;";
@@ -286,7 +287,7 @@ END;
     }
 
     createModel({ fields, name }) {
-        const model = new Model(name);
+        const model = new Model({ name, dbType: DATABASE.MySQL });
 
         for (const field of fields) {
             const FieldClass = fieldMap.get(field.type);

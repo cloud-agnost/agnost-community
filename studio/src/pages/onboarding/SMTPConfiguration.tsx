@@ -78,6 +78,7 @@ export default function SMTPConfiguration() {
 		setFinalizing(true);
 		finalizeClusterSetup({
 			...onboardingData,
+			uiBaseURL: window.location.origin,
 			onSuccess: (res: ClusterSetupResponse) => {
 				setStepByPath('/onboarding/smtp-configuration', {
 					isDone: true,
