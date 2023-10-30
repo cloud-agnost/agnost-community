@@ -67,7 +67,7 @@ const initialState: ModelStore = {
 	model: {} as Model,
 	subModel: {} as Model,
 	nestedModels: [],
-	modelToEdit: {} as Model,
+	modelToEdit: null,
 	fieldToEdit: {} as Field,
 	isOpenEditModelDialog: false,
 	isOpenEditFieldDialog: false,
