@@ -37,6 +37,7 @@ import {
 	authUserDataModel,
 	apiServerDefaultPckages,
 } from "../config/constants.js";
+import { getVersionTypings } from "../util/typings.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
@@ -1699,6 +1700,32 @@ router.get(
 			}
 
 			res.json(packages);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/typings
+@method     GET
+@desc       Prepares Typescript Type definitions specific to the app version
+@access     private
+*/
+router.get(
+	"/:versionId/typings",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.view"),
+	async (req, res) => {
+		try {
+			const { version } = req;
+			const typings = await getVersionTypings(version);
+
+			res.json(typings);
 		} catch (err) {
 			handleError(req, res, err);
 		}

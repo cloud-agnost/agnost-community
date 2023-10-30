@@ -14,6 +14,7 @@ import { authorizeAppAction } from "../middlewares/authorizeAppAction.js";
 import { applyRules } from "../schemas/database.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
+import { refreshTypings } from "../util/typings.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -144,6 +145,8 @@ router.post(
 					envId: env._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await dbCtrl.rollback(session);
 			handleError(req, res, err);
@@ -249,6 +252,8 @@ router.put(
 				updatedDb,
 				{ orgId: org._id, appId: app._id, versionId: version._id, dbId: db._id }
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await dbCtrl.rollback(session);
 			handleError(req, res, err);
@@ -315,6 +320,8 @@ router.delete(
 				{},
 				{ orgId: org._id, appId: app._id, versionId: version._id, dbId: db._id }
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await dbCtrl.rollback(session);
 			handleError(req, res, err);
