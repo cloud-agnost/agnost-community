@@ -53,7 +53,8 @@
 		"password": "Password",
 		"mongodb": "Standart",
 		"mongodb+srv": "DNS Seed List (MongoDb + SRV)",
-		"selectConnFormat": "Connection Format"
+		"selectConnFormat": "Connection Format",
+		"no_resource": "No resource found"
 	},
 	"storage": {
 		"aws": {
