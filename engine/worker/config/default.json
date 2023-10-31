@@ -17,6 +17,7 @@
         "jsonMaxLength": 4000,
         "linkMaxLength": 2048,
         "phoneMaxLength": 16,
+        "encryptedTextFieldSQLMaxLength": 64,
         "monetaryDecimalDigits": 4,
         "enumMaxLength": 2048,
         "timeout": 60000
@@ -46,7 +47,6 @@
         "maxPoolSize": 3,
         "defaultClusterIPPort": 4000,
         "defaultKnativeIngressPort": 80,
-        "encryptedTextFieldSQLMaxLength": 50,
         "livenessProbe": {
             "timeoutSeconds": 10,
             "periodSeconds": 30,
