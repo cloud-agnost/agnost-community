@@ -47,6 +47,16 @@ export class DeploymentManager {
     /**
      * Returns the redis command pipeline if exists otherwise creates and returns a new one
      */
+    clearPipeline() {
+        if (this.pipeline) {
+            transaction.discard((err) => {});
+            this.pipeline = null;
+        }
+    }
+
+    /**
+     * Returns the redis command pipeline if exists otherwise creates and returns a new one
+     */
     getPipeline() {
         if (this.pipeline) return this.pipeline;
         // Send multiple commands at once to redis and get back all the replies in array form in a single step
@@ -1673,16 +1683,16 @@ export class DeploymentManager {
             await this.loadDatabases();
             // Cache application configuration data
             await this.cacheMetadata();
-            // Execute all redis commands altogether
-            await this.commitPipeline();
-            // After we load all configuration data to the cache we can notify engine API servers to update themselves
-            this.notifyAPIServers();
             // Create application specific configuration and log collections
             await this.createInternalCollections();
             // Create database structure for databases and models (e.g.,tables, collections, indices)
             await this.prepareDatabases("deploy");
             // Save updated deployment to database
             await this.saveDeploymentConfig();
+            // Execute all redis commands altogether
+            await this.commitPipeline();
+            // After we load all configuration data to the cache we can notify engine API servers to update themselves
+            this.notifyAPIServers();
 
             // Update status of environment in engine cluster
             this.addLog(t("Completed deployment successfully"));
@@ -1692,6 +1702,8 @@ export class DeploymentManager {
             await this.setStatus("OK");
             return { success: true };
         } catch (error) {
+            // Clear pipeline
+            this.clearPipeline();
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
@@ -1720,16 +1732,16 @@ export class DeploymentManager {
             await this.loadDatabases();
             // Cache application configuration data
             await this.cacheMetadata();
-            // Execute all redis commands altogether
-            await this.commitPipeline();
-            // After we load all configuration data to the cache we can notify engine API servers to update themselves
-            this.notifyAPIServers();
             // Create application specific configuration and log collections
             await this.createInternalCollections();
             // Create database structure for databases and models (e.g.,tables, collections, indices)
             await this.prepareDatabases("redeploy");
             // Save updated deployment to database
             await this.saveDeploymentConfig();
+            // Execute all redis commands altogether
+            await this.commitPipeline();
+            // After we load all configuration data to the cache we can notify engine API servers to update themselves
+            this.notifyAPIServers();
 
             // Update status of environment in engine cluster
             this.addLog(t("Completed redeployment successfully"));
@@ -1780,6 +1792,8 @@ export class DeploymentManager {
             await this.setStatus("OK");
             return { success: true };
         } catch (error) {
+            // Clear pipeline
+            this.clearPipeline();
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
@@ -1815,6 +1829,8 @@ export class DeploymentManager {
             await this.setStatus("OK");
             return { success: true };
         } catch (error) {
+            // Clear pipeline
+            this.clearPipeline();
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
@@ -1849,12 +1865,6 @@ export class DeploymentManager {
             // Cache updated database configurations (subaction can be add, delete or update)
             const databases = await this.cacheDatabases(this.getDatabases(), subAction);
 
-            // Execute all redis commands altogether
-            await this.commitPipeline();
-            // We first cache all data and then notify api servers
-            // After we load all configuration data to the cache we can notify engine API servers to update themselves
-            this.notifyAPIServers();
-
             if (subAction === "delete") {
                 // Delete the databases
                 await this.deleteManagedDatabases(this.getDatabases());
@@ -1867,6 +1877,11 @@ export class DeploymentManager {
             await this.saveDatabaseDeploymentConfigs(databases);
             // Save updated deployment to database
             await this.saveEnvironmentDeploymentConfig();
+            // Execute all redis commands altogether
+            await this.commitPipeline();
+            // We first cache all data and then notify api servers
+            // After we load all configuration data to the cache we can notify engine API servers to update themselves
+            this.notifyAPIServers();
 
             // Update status of environment in engine cluster
             this.addLog(t("Completed database updates successfully"));
@@ -1876,6 +1891,8 @@ export class DeploymentManager {
             await this.setStatus("OK");
             return { success: true };
         } catch (error) {
+            // Clear pipeline
+            this.clearPipeline();
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
@@ -1924,6 +1941,8 @@ export class DeploymentManager {
             await this.setStatus("OK");
             return { success: true };
         } catch (error) {
+            // Clear pipeline
+            this.clearPipeline();
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
@@ -1969,6 +1988,8 @@ export class DeploymentManager {
             await this.setStatus("OK");
             return { success: true };
         } catch (error) {
+            // Clear pipeline
+            this.clearPipeline();
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
@@ -2014,6 +2035,8 @@ export class DeploymentManager {
             await this.setStatus("OK");
             return { success: true };
         } catch (error) {
+            // Clear pipeline
+            this.clearPipeline();
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
@@ -2059,6 +2082,8 @@ export class DeploymentManager {
             await this.setStatus("OK");
             return { success: true };
         } catch (error) {
+            // Clear pipeline
+            this.clearPipeline();
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
@@ -2107,6 +2132,8 @@ export class DeploymentManager {
             await this.setStatus("OK");
             return { success: true };
         } catch (error) {
+            // Clear pipeline
+            this.clearPipeline();
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
@@ -2155,6 +2182,8 @@ export class DeploymentManager {
             await this.setStatus("OK");
             return { success: true };
         } catch (error) {
+            // Clear pipeline
+            this.clearPipeline();
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
@@ -2200,6 +2229,8 @@ export class DeploymentManager {
             await this.setStatus("OK");
             return { success: true };
         } catch (error) {
+            // Clear pipeline
+            this.clearPipeline();
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform
@@ -2258,6 +2289,8 @@ export class DeploymentManager {
             await this.setStatus("OK");
             return { success: true };
         } catch (error) {
+            // Clear pipeline
+            this.clearPipeline();
             // Update status of environment in engine cluster
             await this.setStatus("Error");
             // Send the deployment telemetry information to the platform

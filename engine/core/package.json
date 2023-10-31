@@ -47,7 +47,7 @@
       "passport-apple": "2.0.2",
       "pg": "8.10.0",
       "rate-limiter-flexible": "3.0.0",
-      "redis": "4.6.9",
+      "redis": "4.6.10",
       "response-time": "2.3.2",
       "socket.io-client": "4.6.1",
       "ua-parser-js": "1.0.36",

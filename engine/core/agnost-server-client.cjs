@@ -1761,7 +1761,7 @@
 								};
 							case i.DBTYPE.POSTGRESQL:
 							case i.DBTYPE.MYSQL:
-								let r = this.parameters[0].getQuery(e, t);
+								const r = this.parameters[0].getQuery(e, t);
 								return r.startsWith("'") && r.endsWith("'")
 									? `EXISTS(${r.slice(1, -1)})`
 									: `EXISTS(${r})`;
