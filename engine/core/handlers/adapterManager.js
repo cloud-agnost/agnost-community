@@ -73,7 +73,9 @@ export class AdapterManager {
 		);
 
 		if (mapping) {
-			let adapterObj = this.adapters.get(mapping.resource.iid);
+			let adapterObj = this.adapters.get(
+				type === "database" ? mapping.design.iid : mapping.resource.iid
+			);
 
 			if (readOnly) {
 				// If the readonly connection is not there then return the read-write connection
@@ -88,10 +90,10 @@ export class AdapterManager {
 
 	/**
 	 * Returns the connection object matching the resource iid
-	 * @param  {string} resourceiid The resource identifier
+	 * @param  {string} resourceiid The resource identifier or database identifier for database resources
 	 */
-	getAdapterObject2(resourceiid) {
-		let adapterObj = this.adapters.get(resourceiid);
+	getAdapterObject2(iid) {
+		let adapterObj = this.adapters.get(iid);
 		if (adapterObj) return adapterObj;
 		else return null;
 	}
@@ -110,7 +112,9 @@ export class AdapterManager {
 		);
 
 		if (mapping) {
-			const adapterObj = this.adapters.get(mapping.resource.iid);
+			const adapterObj = this.adapters.get(
+				type === "database" ? mapping.design.iid : mapping.resource.iid
+			);
 			if (adapterObj) return adapterObj;
 			else return null;
 		} else return null;
@@ -130,7 +134,9 @@ export class AdapterManager {
 		);
 
 		if (mapping) {
-			let adapterObj = this.adapters.get(mapping.resource.iid);
+			let adapterObj = this.adapters.get(
+				type === "database" ? mapping.design.iid : mapping.resource.iid
+			);
 
 			if (readOnly) {
 				// If the readonly connection is not there then return the read-write connection
@@ -193,7 +199,7 @@ export class AdapterManager {
 	}
 
 	/**
-	 * Returns the storage connection object matching the name
+	 * Returns the storage connection object matching the design iid
 	 * @param  {string} id The design iid of the resource
 	 */
 	getStorageAdapterById(id) {
@@ -291,11 +297,11 @@ export class AdapterManager {
 	 */
 	async connectToPostgresSQL(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid);
+		const adapterObj = this.getAdapterObject2(resource.designiid);
 		if (adapterObj) return;
 
 		try {
-			const { access, accessReadOnly, iid, instance, type, name, config } =
+			const { access, accessReadOnly, iid, instance, type, name, designiid } =
 				resource;
 			let connSettings = access;
 			if (!connSettings) return;
@@ -323,7 +329,7 @@ export class AdapterManager {
 				slaves: [],
 			};
 
-			this.adapters.set(resource.iid, adapterObj);
+			this.adapters.set(designiid, adapterObj);
 
 			// Add readonly connections as slave
 			if (accessReadOnly) {
@@ -365,11 +371,12 @@ export class AdapterManager {
 	 */
 	async connectToMySQL(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid);
+		const adapterObj = this.getAdapterObject2(resource.designiid);
 		if (adapterObj) return;
 
 		try {
-			const { access, accessReadOnly, iid, instance, type, name } = resource;
+			const { access, accessReadOnly, iid, instance, type, name, designiid } =
+				resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -393,7 +400,7 @@ export class AdapterManager {
 				slaves: [],
 			};
 
-			this.adapters.set(resource.iid, adapterObj);
+			this.adapters.set(designiid, adapterObj);
 
 			// Add readonly connections as slave
 			if (accessReadOnly) {
@@ -432,11 +439,12 @@ export class AdapterManager {
 	 */
 	async connectToSQLServer(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid);
+		const adapterObj = this.getAdapterObject2(resource.designiid);
 		if (adapterObj) return;
 
 		try {
-			const { access, accessReadOnly, iid, instance, type, name } = resource;
+			const { access, accessReadOnly, iid, instance, type, name, designiid } =
+				resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -466,7 +474,7 @@ export class AdapterManager {
 				slaves: [],
 			};
 
-			this.adapters.set(resource.iid, adapterObj);
+			this.adapters.set(designiid, adapterObj);
 
 			// Add readonly connections as slave
 			if (accessReadOnly) {
@@ -507,11 +515,11 @@ export class AdapterManager {
 	 */
 	async connectToMongoDB(resource) {
 		// First check whether the resource has already been registered or not
-		const adapterObj = this.getAdapterObject2(resource.iid);
+		const adapterObj = this.getAdapterObject2(resource.designiid);
 		if (adapterObj) return;
 
 		try {
-			const { access, iid, instance, type, name, config } = resource;
+			const { access, iid, instance, type, name, config, designiid } = resource;
 			let connSettings = access;
 			if (!connSettings) return;
 
@@ -567,7 +575,7 @@ export class AdapterManager {
 				adapter: new MongoDB(client),
 			};
 
-			this.adapters.set(resource.iid, adapterObj);
+			this.adapters.set(designiid, adapterObj);
 		} catch (err) {}
 	}
 
@@ -584,7 +592,6 @@ export class AdapterManager {
 		try {
 			const { access, accessReadOnly, iid, instance, type, name } = resource;
 			let client = await this.createRedisClient(access, false);
-
 			if (!client) return;
 
 			const adapterObj = {
@@ -628,31 +635,38 @@ export class AdapterManager {
 	 * @param  {boolean} readOnly Connect in READONLY mode
 	 */
 	async createRedisClient(connSettings, readOnly) {
-		try {
-			let redisClient = await redis
-				.createClient({
+		return new Promise(async (resolve, reject) => {
+			try {
+				redis.debug_mode = true;
+				let redisClient = redis.createClient({
 					...helper.getAsObject(connSettings.options),
 					socket: {
 						host: connSettings.host,
 						port: connSettings.port,
 						tls: connSettings.tls ?? false,
 					},
+					// username: connSettings.username ?? undefined,
 					password:
 						connSettings.password && connSettings.password !== "null"
 							? connSettings.password
 							: undefined,
 					database: connSettings.databaseNumber ?? 0,
 					readonly: readOnly,
-				})
-				.on("error", (err) => {
-					redisClient = null;
-				})
-				.connect();
+				});
 
-			return redisClient;
-		} catch (err) {
-			return null;
-		}
+				redisClient.on("connect", function () {
+					resolve(redisClient);
+				});
+
+				redisClient.on("error", (err) => {
+					reject(null);
+				});
+
+				await redisClient.connect();
+			} catch (err) {
+				reject(t("Cannot connect to the Redis cache. %s", err.message));
+			}
+		});
 	}
 
 	/**

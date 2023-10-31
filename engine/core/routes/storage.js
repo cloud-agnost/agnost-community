@@ -662,6 +662,7 @@ router.post(
 			const { storageName, bucketName } = req.params;
 
 			let isPublic = req.bucket.isPublic;
+			let upsert = false;
 			let tags = [];
 			if (req.query?.options) {
 				try {
@@ -670,6 +671,7 @@ router.post(
 					isPublic = isPublic ? true : false;
 
 					tags = req.query.options.tags;
+					upsert = req.query.options.upsert;
 				} catch (err) {}
 			}
 
@@ -698,7 +700,7 @@ router.post(
 						mimeType: file.mimetype,
 						localPath: file.path,
 					},
-					{ isPublic: isPublic, tags: tags }
+					{ isPublic: isPublic, tags: tags, upsert: upsert }
 				);
 
 			res.status(200).json(fileMetadata);

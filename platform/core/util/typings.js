@@ -37,8 +37,6 @@ export async function getVersionTypings(version) {
 	typings = `${typings}\n${await getFunctionTypings(version)}`;
 	typings = `${typings}\n${await getDatabaseTypings(version)}`;
 
-	console.log("***here", typings);
-
 	return { "node_modules/@agnost/server/dist/utils/specifics.d.ts": typings };
 }
 
@@ -164,7 +162,7 @@ async function getDatabaseTypings(version) {
 	let flatModelTypings = `export type ModelType<
 	D extends DatabaseName,
 	T extends ModelList<D>,
-> = ${flat.join("\n")} never;`;
+> = ${flat.join("\n")} {};`;
 
 	// Create typings for hierarchical models
 	const hierarchy = [];
@@ -175,7 +173,7 @@ async function getDatabaseTypings(version) {
 	let hierarchyModelTypings = `export type ModelTypeHierarchy<
 	D extends DatabaseName,
 	T extends ModelList<D>,
-> = ${hierarchy.join("\n")} never;`;
+> = ${hierarchy.join("\n")} {};`;
 
 	// Create typings for full text search fields
 	const fts = [];

@@ -602,7 +602,11 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 				(entry) => entry.iid === mapping.resource.iid
 			);
 
-			resource.access = helper.decryptSensitiveData(resource.access);
+			// A database server can be used by multiple databases, for this reason we should not decrypt access data which is already decrypted
+			if (!resource.isDecrypted) {
+				resource.isDecrypted = true;
+				resource.access = helper.decryptSensitiveData(resource.access);
+			}
 			// Assign the database pool size value to the resource config
 			if (resource.config)
 				resource.config.poolSize =
@@ -612,8 +616,11 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 					poolSize: db.poolSize ?? config.get("general.defaultDBPoolSize"),
 				};
 			}
+
 			// Add the database name info to the access settings
 			resource.access.dbName = this.getAppliedDbName(db);
+			// We will use the design iid when registering databse connections in adapter manager not the resource.iid
+			resource.designiid = db.iid;
 
 			if (resource.accessReadOnly) {
 				resource.accessReadOnly = helper.decryptSensitiveData(
@@ -642,7 +649,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	}
 
 	/**
-	 * Sets up the storage resources for the api server
+	 * Sets up the database resources for the api server
 	 * @param  {Object} endpoint The endpoint JSON object
 	 * @param  {Array} handlers The array where the route handler will be will be added
 	 */
@@ -677,7 +684,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	}
 
 	/**
-	 * Sets up the storage resources for the api server
+	 * Sets up the cache resources for the api server
 	 * @param  {Object} endpoint The endpoint JSON object
 	 * @param  {Array} handlers The array where the route handler will be will be added
 	 */
