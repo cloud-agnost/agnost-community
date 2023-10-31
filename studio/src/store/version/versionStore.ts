@@ -96,9 +96,10 @@ const useVersionStore = create<VersionStore & Actions>()(
 			(set, get) => ({
 				...initialState,
 				selectVersion: (version: Version) => {
-					if (version._id === get().version._id) return;
-					resetAfterVersionChange();
-					set({ version });
+					if (version._id !== get().version._id) {
+						resetAfterVersionChange();
+						set({ version });
+					}
 					history.navigate?.(get().getVersionDashboardPath());
 				},
 				setCreateCopyVersionDrawerIsOpen: (isOpen: boolean) => {

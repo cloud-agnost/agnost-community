@@ -15,6 +15,7 @@ import { applyRules } from "../schemas/queue.js";
 import { validate } from "../middlewares/validate.js";
 import { defaultQueueCode } from "../config/constants.js";
 import { handleError } from "../schemas/platformError.js";
+import { refreshTypings } from "../util/typings.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -199,6 +200,8 @@ router.post(
 					envId: env._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await queueCtrl.rollback(session);
 			handleError(req, res, err);
@@ -296,6 +299,8 @@ router.put(
 					queueId: queue._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await queueCtrl.rollback(session);
 			handleError(req, res, err);
@@ -490,6 +495,8 @@ router.delete(
 					}
 				);
 			});
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await queueCtrl.rollback(session);
 			handleError(req, res, err);
@@ -559,6 +566,8 @@ router.delete(
 					queueId: queue._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await queueCtrl.rollback(session);
 			handleError(req, res, err);

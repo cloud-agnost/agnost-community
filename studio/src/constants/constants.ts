@@ -391,15 +391,15 @@ export const EDIT_APPLICATION_MENU_ITEMS = [
 export const AUTH_MENU_ITEMS = [
 	{
 		name: translate('version.settings.general'),
-		href: '?a=general',
+		href: 'general',
 	},
 	{
 		name: translate('version.authentication.providers'),
-		href: '?a=providers',
+		href: 'providers',
 	},
 	{
 		name: translate('version.authentication.message_templates'),
-		href: '?a=templates',
+		href: 'templates',
 	},
 ];
 
@@ -464,7 +464,7 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 	{
 		id: 7,
 		title: translate('version.settings.authentications'),
-		path: 'authentications?a=general',
+		path: 'authentications?t=general',
 		icon: Authentication,
 	},
 	{

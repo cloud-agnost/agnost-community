@@ -13,6 +13,7 @@ import { authorizeAppAction } from "../middlewares/authorizeAppAction.js";
 import { applyRules } from "../schemas/appStorage.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
+import { refreshTypings } from "../util/typings.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -189,6 +190,8 @@ router.post(
 					envId: env._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await storageCtrl.rollback(session);
 			handleError(req, res, err);
@@ -279,6 +282,8 @@ router.put(
 					storageId: storage._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await storageCtrl.rollback(session);
 			handleError(req, res, err);
@@ -363,6 +368,8 @@ router.delete(
 					}
 				);
 			});
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await storageCtrl.rollback(session);
 			handleError(req, res, err);
@@ -432,6 +439,8 @@ router.delete(
 					storageId: storage._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await storageCtrl.rollback(session);
 			handleError(req, res, err);

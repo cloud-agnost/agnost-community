@@ -57,7 +57,7 @@ export default function VersionSettingsAuthentications() {
 					))}
 				</nav>
 				<div className='scroll space-y-8 p-6'>
-					{searchParams.get('a') === AUTH_TABS.GENERAL && (
+					{searchParams.get('t') === AUTH_TABS.GENERAL && (
 						<>
 							<SelectUserDataModel />
 							<RedirectURLs />
@@ -65,8 +65,8 @@ export default function VersionSettingsAuthentications() {
 							<PhoneAuthentication />
 						</>
 					)}
-					{searchParams.get('a') === AUTH_TABS.PROVIDERS && <SelectOAuthProviders />}
-					{searchParams.get('a') === AUTH_TABS.TEMPLATES && <MessageTemplates />}
+					{searchParams.get('t') === AUTH_TABS.PROVIDERS && <SelectOAuthProviders />}
+					{searchParams.get('t') === AUTH_TABS.TEMPLATES && <MessageTemplates />}
 				</div>
 			</div>
 		</SettingsContainer>

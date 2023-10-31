@@ -16,6 +16,7 @@ import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
 import { dbTypeMappings } from "../config/constants.js";
 import ERROR_CODES from "../config/errorCodes.js";
+import { refreshTypings } from "../util/typings.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -109,6 +110,8 @@ router.post(
 				model,
 				{ orgId: org._id, appId: app._id, versionId: version._id, dbId: db._id }
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -335,6 +338,8 @@ router.delete(
 					}
 				);
 			});
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await modelCtrl.rollback(session);
 			handleError(req, res, err);
@@ -444,6 +449,8 @@ router.delete(
 					modelId: model._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await modelCtrl.rollback(session);
 			handleError(req, res, err);
@@ -509,6 +516,8 @@ router.put(
 					modelId: model._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -611,6 +620,8 @@ router.put(
 					modelId: model._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -688,6 +699,8 @@ router.put(
 					modelId: model._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -906,6 +919,8 @@ router.post(
 					fieldId: fieldId,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (error) {
 			await modelCtrl.rollback(session);
 			handleError(req, res, error);
@@ -1067,6 +1082,8 @@ router.delete(
 					}
 				);
 			});
+
+			refreshTypings(user, version);
 		} catch (error) {
 			await modelCtrl.rollback(session);
 			handleError(req, res, error);
@@ -1220,6 +1237,8 @@ router.delete(
 					fieldId: field._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (error) {
 			await modelCtrl.rollback(session);
 			handleError(req, res, error);
@@ -1450,6 +1469,8 @@ router.put(
 					fieldId: field._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (error) {
 			await modelCtrl.rollback(session);
 			handleError(req, res, error);

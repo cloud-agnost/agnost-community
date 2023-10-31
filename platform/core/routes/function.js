@@ -13,6 +13,7 @@ import { applyRules } from "../schemas/function.js";
 import { validate } from "../middlewares/validate.js";
 import { defaultFunctionCode } from "../config/constants.js";
 import { handleError } from "../schemas/platformError.js";
+import { refreshTypings } from "../util/typings.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -147,6 +148,8 @@ router.post(
 					functionId: func._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -211,6 +214,8 @@ router.put(
 					functionId: func._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -339,6 +344,8 @@ router.delete(
 					}
 				);
 			});
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await funcCtrl.rollback(session);
 			handleError(req, res, err);
@@ -389,6 +396,8 @@ router.delete(
 					functionId: func._id,
 				}
 			);
+
+			refreshTypings(user, version);
 		} catch (err) {
 			await funcCtrl.rollback(session);
 			handleError(req, res, err);
