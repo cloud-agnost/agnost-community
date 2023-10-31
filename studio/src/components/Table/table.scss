@@ -1,13 +1,13 @@
 .table {
 	@apply w-full caption-bottom text-sm bg-base;
 	&-container {
-		@apply w-full rounded-lg border border-border;
+		@apply w-full rounded-lg border border-border overflow-x-auto;
 	}
 	&-header {
 		@apply [&_tr]:border-b;
 	}
 	&-body {
-		@apply [&_tr:last-child]:border-0;
+		@apply [&_tr:last-child]:border-none;
 	}
 	&-footer {
 		@apply bg-subtle font-medium text-subtle;
