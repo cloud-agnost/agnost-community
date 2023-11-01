@@ -4,7 +4,7 @@ import useThemeStore from '@/store/theme/themeStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab } from '@/types';
-import { addLibsToEditor, cn, getTabIdFromUrl, isEmpty } from '@/utils';
+import { addLibsToEditor, cn, filterMatchingKeys, getTabIdFromUrl, isEmpty } from '@/utils';
 import MonacoEditor, { EditorProps } from '@monaco-editor/react';
 import _ from 'lodash';
 import { useEffect } from 'react';
@@ -62,16 +62,17 @@ export default function CodeEditor({
 		const installedPackages =
 			globalThis.monaco?.languages.typescript.javascriptDefaults.getExtraLibs() ?? {};
 
-		const intersection = _.omitBy(packages, (value, key) =>
-			_.isEqual(value, installedPackages[key]),
-		);
-		typeWorker.postMessage(intersection);
-		typeWorker.onmessage = function (e) {
-			addLibsToEditor({
-				...e.data,
-				...typings,
-			});
-		};
+		const intersection = filterMatchingKeys(installedPackages, packages);
+
+		if (!_.isEmpty(intersection)) {
+			typeWorker.postMessage(intersection);
+			typeWorker.onmessage = function (e) {
+				addLibsToEditor({
+					...e.data,
+					...typings,
+				});
+			};
+		}
 	}
 
 	useEffect(() => {
@@ -80,13 +81,6 @@ export default function CodeEditor({
 		}
 	}, [globalThis.monaco, packages]);
 
-	useEffect(() => {
-		getTypings({
-			orgId: version?.orgId as string,
-			appId: version?.appId as string,
-			versionId: version?._id as string,
-		});
-	}, []);
 	return (
 		<div className={cn(containerClassName)}>
 			<MonacoEditor

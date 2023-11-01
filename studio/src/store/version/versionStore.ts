@@ -104,6 +104,11 @@ const useVersionStore = create<VersionStore & Actions>()(
 				selectVersion: (version: Version) => {
 					if (version._id !== get().version._id) {
 						resetAfterVersionChange();
+						get().getTypings({
+							orgId: version.orgId,
+							appId: version.appId,
+							versionId: version._id,
+						});
 						set({ version });
 					}
 

@@ -400,3 +400,16 @@ export function addLibsToEditor(libs: Record<string, string>) {
 		);
 	});
 }
+
+export function filterMatchingKeys(object1: any, object2: any) {
+	for (const key2 in object2) {
+		for (const key1 in object1) {
+			if (key1.includes(key2)) {
+				delete object2[key2];
+				break;
+			}
+		}
+	}
+
+	return object2;
+}
