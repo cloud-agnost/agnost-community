@@ -9,6 +9,7 @@ applications = ['engine/core', 'engine/monitor', 'engine/realtime', 'engine/sche
                 'platform/core', 'platform/sync', 'platform/worker', 'studio']
 
 new_release_dict = {}
+modules_dict = {}
 
 for app in applications:
   package_file = os.path.join(app, 'package.json')
@@ -16,7 +17,10 @@ for app in applications:
         package_info = json.load(fp)
   version = package_info['version']
   app_name = app.replace('/', '-')
-  new_release_dict[app_name] = version
+  modules_dict[app_name] = version
+
+new_release_dict["release"] = release_number
+new_release_dict["modules"] = modules_dict
 
 with open(release_file, 'w') as fp:
   fp.write(json.dumps(new_release_dict, indent=3))

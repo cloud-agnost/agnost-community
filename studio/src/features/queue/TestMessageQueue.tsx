@@ -79,6 +79,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 						onChange={(value) => setPayload(JSON.parse(value as string))}
 						defaultLanguage='json'
 						className='h-96'
+						name='testQueuePayload'
 					/>
 					<Separator className='my-6' />
 					<p className='text-sm text-default font-sfCompact mb-4'>{t('task.console')}</p>

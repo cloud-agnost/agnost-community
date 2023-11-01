@@ -301,6 +301,7 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 												value={field.value}
 												onChange={field.onChange}
 												onMount={setEditor}
+												name='messageTemplate'
 											/>
 										</FormControl>
 										<FormMessage />

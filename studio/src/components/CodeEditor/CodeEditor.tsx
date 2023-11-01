@@ -14,20 +14,20 @@ interface CodeEditorProps extends Omit<EditorProps, 'defaultLanguage'> {
 	defaultLanguage?: 'javascript' | 'json' | 'html';
 	readonly?: boolean;
 	onSave?: (logic: string) => void;
+	name: string;
 }
 export default function CodeEditor({
 	containerClassName,
-	defaultValue,
 	value,
 	className,
 	readonly,
 	defaultLanguage = 'javascript',
+	name,
 	onSave,
 }: CodeEditorProps) {
 	const { updateCurrentTab, getTabById } = useTabStore();
 	const { version, packages, typings, getTypings } = useVersionStore();
 	const theme = useThemeStore((state) => state.theme);
-
 	const typeWorker: Worker = new Worker(
 		new URL('../../workers/fetchTypings.worker.ts', import.meta.url),
 		{
@@ -63,10 +63,8 @@ export default function CodeEditor({
 		const intersection = _.omitBy(packages, (value, key) =>
 			_.isEqual(value, installedPackages[key]),
 		);
-
 		typeWorker.postMessage(intersection);
 		typeWorker.onmessage = function (e) {
-			console.log('Message received from worker', e);
 			addLibsToEditor({
 				...e.data,
 				...typings,
@@ -75,7 +73,7 @@ export default function CodeEditor({
 	}
 
 	useEffect(() => {
-		if (!isEmpty(globalThis.monaco)) {
+		if (!isEmpty(globalThis.monaco) && defaultLanguage === 'javascript') {
 			setupLibs();
 		}
 	}, [globalThis.monaco, packages]);
@@ -87,7 +85,6 @@ export default function CodeEditor({
 			versionId: version?._id as string,
 		});
 	}, []);
-
 	return (
 		<div className={cn(containerClassName)}>
 			<MonacoEditor
@@ -95,13 +92,14 @@ export default function CodeEditor({
 				beforeMount={onBeforeMount}
 				className={cn('editor', className)}
 				onChange={onCodeEditorChange}
-				defaultValue={defaultValue}
+				defaultValue={value}
 				value={value}
 				onMount={onCodeEditorMount}
 				defaultLanguage={defaultLanguage}
-				language='javascript'
-				path='file:///src/index.js'
+				language={defaultLanguage}
+				path={`file:///src/${name}.js`}
 				options={{
+					value,
 					readOnly: readonly,
 					...EDITOR_OPTIONS,
 				}}
