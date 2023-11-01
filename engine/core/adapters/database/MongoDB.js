@@ -533,17 +533,27 @@ export class MongoDB extends DatabaseBase {
 		// If nothing to insert return zero
 		if (data.length === 0) return { count: 0 };
 
-		const dbName = this.getAppliedDbName(dbMeta);
-		const modelName = this.getModelName(modelMeta);
+		try {
+			// Begin the transaction
+			await this.beginTransaction(dbMeta);
 
-		const db = this.driver.db(dbName);
-		const collection = db.collection(modelName);
+			const dbName = this.getAppliedDbName(dbMeta);
+			const modelName = this.getModelName(modelMeta);
 
-		const insertResult = await collection.insertMany(data, {
-			session: this.session,
-		});
+			const db = this.driver.db(dbName);
+			const collection = db.collection(modelName);
 
-		return { count: insertResult.insertedCount };
+			const insertResult = await collection.insertMany(data, {
+				session: this.session,
+			});
+
+			await this.commitTransaction(dbMeta);
+
+			return { count: insertResult.insertedCount };
+		} catch (err) {
+			await this.rollbackTransaction(dbMeta);
+			throw err;
+		}
 	}
 
 	/**
