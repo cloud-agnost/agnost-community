@@ -5558,7 +5558,7 @@
 								`Cannot find the adapter of the cron job named '${r}'`
 							);
 					}
-					runOnce() {
+					run() {
 						return n(this, void 0, void 0, function* () {
 							return yield this.adapter.triggerCronJob(this.meta);
 						});
@@ -8653,17 +8653,30 @@
 					};
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.IdField = void 0);
-				const i = r(1111);
-				global.helper;
-				class a extends i.Field {
+				const i = r(1111),
+					a = r(9307),
+					s = r(9419);
+				class o extends i.Field {
 					constructor(e, t) {
 						super(e, t);
 					}
-					setValue(e, t, r, i = !0, a = -1) {
-						return n(this, void 0, void 0, function* () {});
+					setValue(e, t, r, i = !0, o = -1) {
+						return n(this, void 0, void 0, function* () {
+							if (e && i)
+								if (this.getDBType() === a.DBTYPE.MONGODB) {
+									const n = e.toString().trim();
+									if (!(0, s.isValidId)(n, a.DBTYPE.MONGODB))
+										return this.addValidationError(r, e, "invalid_id_value", o);
+									t[this.getName()] = (0, s.objectId)(n);
+								} else {
+									if (!(0, s.isString)(e) && !(0, s.isInteger)(e))
+										return this.addValidationError(r, e, "invalid_id_value", o);
+									t[this.getName()] = e;
+								}
+						});
 					}
 				}
-				t.IdField = a;
+				t.IdField = o;
 			},
 			736: function (e, t, r) {
 				var n =
@@ -9541,6 +9554,7 @@
 			9419: (e, t, r) => {
 				Object.defineProperty(t, "__esModule", { value: !0 }),
 					(t.checkRequired =
+						t.objectId =
 						t.isValidId =
 						t.isArray =
 						t.isInteger =
@@ -9593,6 +9607,9 @@
 							default:
 								return !1;
 						}
+					}),
+					(t.objectId = function (e) {
+						return i.objectId(e);
 					}),
 					(t.checkRequired = function (e, t = !0) {
 						return (

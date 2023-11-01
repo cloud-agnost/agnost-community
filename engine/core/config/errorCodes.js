@@ -43,6 +43,7 @@ const ERROR_CODES = {
 	modelNotFound: "model_not_found",
 	submodelNotFound: "submodel_not_found",
 	invalidValue: "invalid_value",
+	invalidIdValue: "invalid_id_value",
 	missingFileIdentifier: "missing_file_identifier",
 	invalidFileIdentifier: "invalid_file_identifier",
 	invalidFilePath: "invalid_file_path",

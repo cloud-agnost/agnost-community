@@ -49,7 +49,9 @@ export class DeploymentManager {
      */
     clearPipeline() {
         if (this.pipeline) {
-            transaction.discard((err) => {});
+            try {
+                this.pipeline.discard((err) => {});
+            } catch (err) {}
             this.pipeline = null;
         }
     }
