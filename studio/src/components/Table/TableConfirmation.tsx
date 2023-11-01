@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback } from '../Avatar';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 interface TableConfirmationProps {
 	onConfirm: () => void;
 	disabled?: boolean;
@@ -16,17 +17,18 @@ interface TableConfirmationProps {
 	align?: Align;
 	contentClassName?: string;
 	closeOnConfirm?: boolean;
+	permissionKey: string;
 }
 
 export function TableConfirmation({
 	onConfirm,
-	disabled,
 	showAvatar = true,
 	title,
 	description,
 	contentClassName,
 	closeOnConfirm,
 	align = 'center',
+	permissionKey,
 }: TableConfirmationProps) {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
@@ -34,7 +36,7 @@ export function TableConfirmation({
 		onConfirm();
 		if (closeOnConfirm) setOpen(false);
 	}
-
+	const hasPermission = useAuthorizeVersion(permissionKey);
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<TooltipProvider>
@@ -44,7 +46,7 @@ export function TableConfirmation({
 							<Button
 								variant='blank'
 								rounded
-								disabled={disabled}
+								disabled={!hasPermission}
 								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
 								iconOnly
 								onClick={(e) => {

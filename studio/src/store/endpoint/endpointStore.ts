@@ -30,13 +30,10 @@ interface EndpointStore {
 	lastFetchedPage: number;
 	endpointRequest: EndpointRequest;
 	endpointResponse: EndpointResponse;
-	toDeleteEndpoint: Endpoint;
-	isEndpointDeleteDialogOpen: boolean;
 	isEditEndpointDialogOpen: boolean;
 }
 
 type Actions = {
-	openDeleteEndpointDialog: (endpoint: Endpoint) => void;
 	setSelectEndpointDialogOpen: (open: boolean) => void;
 	setSelectedEndpointIds: (ids: string[]) => void;
 	setEndpoints: (endpoints: Endpoint[]) => void;
@@ -49,7 +46,6 @@ type Actions = {
 	saveEndpointLogic: (endpoint: SaveEndpointLogicParams) => Promise<Endpoint>;
 	getEndpointsByIid: (endpoint: GetEndpointsByIidParams) => Promise<Endpoint[]>;
 	testEndpoint: (endpoint: TestEndpointParams) => Promise<AxiosResponse>;
-	closeEndpointDeleteDialog: () => void;
 	setEndpointLog: (epId: string, log: Log) => void;
 	openEditEndpointDialog: (endpoint: Endpoint) => void;
 	closeEditEndpointDialog: () => void;
@@ -66,8 +62,6 @@ const initialState: EndpointStore = {
 	endpointResponse: {} as EndpointResponse,
 	lastFetchedCount: 0,
 	lastFetchedPage: 0,
-	toDeleteEndpoint: {} as Endpoint,
-	isEndpointDeleteDialogOpen: false,
 	isEditEndpointDialogOpen: false,
 	editedLogic: '',
 };
@@ -244,10 +238,6 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 					if (params.onSuccess) params.onSuccess();
 					return response;
 				},
-				openDeleteEndpointDialog: (endpoint) =>
-					set({ toDeleteEndpoint: endpoint, isEndpointDeleteDialogOpen: true }),
-				closeEndpointDeleteDialog: () =>
-					set({ toDeleteEndpoint: {} as Endpoint, isEndpointDeleteDialogOpen: false }),
 				setEndpointLog(epId, log) {
 					set((prev) => ({
 						endpointResponse: {

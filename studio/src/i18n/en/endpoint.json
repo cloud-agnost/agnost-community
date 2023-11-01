@@ -70,8 +70,6 @@
 	"bodyType": "Body Type",
 	"delete": {
 		"title": "Delete Endpoint",
-		"message": "Are you sure you want to delete endpoint ?",
-		"description": "This action is not reversible — please continue with caution.",
-		"confirmCode": "Confirm endpoint delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
+		"message": "Are you sure you want to delete endpoint ? This action is not reversible — please continue with caution."
 	}
 }

@@ -1,5 +1,4 @@
 import { Button } from '@/components/Button';
-import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
 import { MODULE_PAGE_SIZE } from '@/constants';
@@ -8,10 +7,10 @@ import { useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
-import { APIError, Endpoint } from '@/types';
+import { Endpoint } from '@/types';
 import { Row, Table } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useOutletContext, useParams, useSearchParams } from 'react-router-dom';
 interface OutletContext {
@@ -24,46 +23,17 @@ interface OutletContext {
 
 export default function MainEndpoint() {
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<APIError>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { notify } = useToast();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 
 	const canCreate = useAuthorizeVersion('endpoint.create');
-	const {
-		endpoints,
-		lastFetchedCount,
-		isEndpointDeleteDialogOpen,
-		toDeleteEndpoint,
-		lastFetchedPage,
-		deleteEndpoint,
-		getEndpoints,
-		closeEndpointDeleteDialog,
-		deleteMultipleEndpoints,
-	} = useEndpointStore();
+	const { endpoints, lastFetchedCount, lastFetchedPage, getEndpoints, deleteMultipleEndpoints } =
+		useEndpointStore();
 
 	const { setSelectedRows, setTable, setIsCreateModalOpen, table, selectedRows }: OutletContext =
 		useOutletContext();
-
-	function deleteEndpointHandler() {
-		setLoading(true);
-		deleteEndpoint({
-			epId: toDeleteEndpoint?._id as string,
-			orgId: orgId as string,
-			appId: appId as string,
-			versionId: versionId as string,
-			onSuccess: () => {
-				setLoading(false);
-				closeEndpointDeleteDialog();
-			},
-			onError: (error) => {
-				setError(error);
-				setLoading(false);
-				closeEndpointDeleteDialog();
-			},
-		});
-	}
 
 	function deleteMultipleEndpointsHandler() {
 		deleteMultipleEndpoints({
@@ -134,27 +104,6 @@ export default function MainEndpoint() {
 					setTable={setTable}
 				/>
 			</InfiniteScroll>
-			<ConfirmationModal
-				loading={loading}
-				error={error}
-				title={t('endpoint.delete.title')}
-				alertTitle={t('endpoint.delete.message')}
-				alertDescription={t('endpoint.delete.description')}
-				description={
-					<Trans
-						i18nKey='endpoint.delete.confirmCode'
-						values={{ confirmCode: toDeleteEndpoint?.iid }}
-						components={{
-							confirmCode: <span className='font-bold text-default' />,
-						}}
-					/>
-				}
-				confirmCode={toDeleteEndpoint?.iid as string}
-				onConfirm={deleteEndpointHandler}
-				isOpen={isEndpointDeleteDialogOpen}
-				closeModal={closeEndpointDeleteDialog}
-				closable
-			/>
 		</VersionTabLayout>
 	);
 }
