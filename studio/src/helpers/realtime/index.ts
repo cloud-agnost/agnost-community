@@ -13,6 +13,7 @@ import Storage from './Storage';
 import Task from './Task';
 import User from './User';
 import Version from './Version';
+import Typings from './Typings';
 export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 	const keys = {
 		user: User,
@@ -39,6 +40,7 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		'org.app.version.cache': Cache,
 		'org.app.version.function': Function,
 		// TODO: "org.resource.log"
+		'org.app.version.typings': Typings,
 	};
 	return new keys[type]();
 }

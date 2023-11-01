@@ -9,6 +9,7 @@ import {
 	CreateCopyOfVersionParams,
 	CreateOAuthConfigParams,
 	CreateRateLimitParams,
+	Dashboard,
 	DeleteAPIKeyParams,
 	DeleteMultipleAPIKeys,
 	DeleteMultipleNPMPackagesParams,
@@ -46,7 +47,6 @@ import {
 	Version,
 	VersionLog,
 	VersionLogBucket,
-	Dashboard,
 } from '@/types';
 
 export default class VersionService {
@@ -482,5 +482,21 @@ export default class VersionService {
 	}: BaseParams): Promise<Dashboard> {
 		return (await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/dashboard`))
 			.data;
+	}
+	static async getNpmPackages({
+		orgId,
+		appId,
+		versionId,
+	}: BaseParams): Promise<Record<string, string>> {
+		return (await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/packages`))
+			.data;
+	}
+
+	static async getVersionTypings({
+		orgId,
+		appId,
+		versionId,
+	}: BaseParams): Promise<Record<string, string>> {
+		return (await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/typings`)).data;
 	}
 }

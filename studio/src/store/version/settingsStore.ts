@@ -20,6 +20,7 @@ import {
 	DeleteRateLimitParams,
 	DeleteVersionVariableParams,
 	EditRateLimitParams,
+	NPMPackage,
 	Param,
 	RateLimit,
 	SaveEmailAuthParams,
@@ -117,7 +118,13 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				addNPMPackage: async (params: AddNPMPackageParams) => {
 					try {
 						const version = await VersionService.addNPMPackage(params);
-						useVersionStore.setState({ version });
+						useVersionStore.setState((prev) => ({
+							version,
+							packages: {
+								...prev.packages,
+								[params.name]: params.version,
+							},
+						}));
 
 						notify({
 							type: 'success',
@@ -141,8 +148,17 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				},
 				deleteNPMPackage: async (params: DeleteNPMPackageParams) => {
 					try {
+						const deletedPackage = useVersionStore
+							.getState()
+							.version.npmPackages.find((p) => p._id === params.packageId) as NPMPackage;
 						const version = await VersionService.deleteNPMPackage(params);
-						useVersionStore.setState({ version });
+						const versionPackage = useVersionStore.getState().packages;
+						delete versionPackage[deletedPackage.name];
+
+						useVersionStore.setState({
+							version,
+							packages: versionPackage,
+						});
 
 						notify({
 							type: 'success',
@@ -163,9 +179,15 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				},
 				deleteMultipleNPMPackages: async (params: DeleteMultipleNPMPackagesParams) => {
 					try {
+						const packages = useVersionStore
+							.getState()
+							.version.npmPackages.filter((p) => params.packageIds.includes(p._id));
 						const version = await VersionService.deleteMultipleNPMPackages(params);
-						useVersionStore.setState({ version });
-
+						const versionPackages = useVersionStore.getState().packages;
+						for (const p of packages) {
+							delete versionPackages[p.name];
+						}
+						useVersionStore.setState({ version, packages: versionPackages });
 						notify({
 							type: 'success',
 							title: translate('general.success'),

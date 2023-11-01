@@ -1,13 +1,14 @@
-import { useDebounceFn } from '@/hooks';
+import { useDebounceFn, useEditor } from '@/hooks';
+import { EDITOR_OPTIONS } from '@/hooks/useEditor';
 import useThemeStore from '@/store/theme/themeStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab } from '@/types';
-import { cn, getTabIdFromUrl, saveEditorContent } from '@/utils';
+import { addLibsToEditor, cn, getTabIdFromUrl, isEmpty } from '@/utils';
 import MonacoEditor, { EditorProps } from '@monaco-editor/react';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
-import nightOwl from 'monaco-themes/themes/Night Owl.json';
-import { useRef } from 'react';
+import _ from 'lodash';
+import { useEffect } from 'react';
+
 interface CodeEditorProps extends Omit<EditorProps, 'defaultLanguage'> {
 	containerClassName?: string;
 	defaultLanguage?: 'javascript' | 'json' | 'html';
@@ -18,82 +19,91 @@ export default function CodeEditor({
 	containerClassName,
 	defaultValue,
 	value,
-	onChange,
-	onValidate,
-	loading,
 	className,
-	onSave,
 	readonly,
 	defaultLanguage = 'javascript',
-	onMount,
+	onSave,
 }: CodeEditorProps) {
 	const { updateCurrentTab, getTabById } = useTabStore();
-	const { theme } = useThemeStore();
-	const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
-	const { version } = useVersionStore();
+	const { version, packages, typings, getTypings } = useVersionStore();
+	const theme = useThemeStore((state) => state.theme);
+
+	const typeWorker: Worker = new Worker(
+		new URL('../../workers/fetchTypings.worker.ts', import.meta.url),
+		{
+			type: 'module',
+		},
+	);
+
 	const setTabState = useDebounceFn((isDirty) => {
 		const tabId = getTabIdFromUrl();
-		const tab = getTabById(version?._id as string, tabId as string) as Tab;
+		const tab = getTabById(version?._id, tabId as string) as Tab;
 		if (tab?.type.toLowerCase() === tab?.path) return;
-		updateCurrentTab(version?._id as string, {
+		updateCurrentTab(version?._id, {
 			...tab,
 			isDirty,
 		});
 	}, 500);
-	function handleEditorChange(
-		value: string | undefined,
-		ev: monaco.editor.IModelContentChangedEvent,
-	) {
-		onChange?.(value, ev);
+
+	function handleOnChange(value: string | undefined, ev: any) {
 		if (defaultLanguage === 'javascript' && !readonly) {
 			setTabState(value !== ev.changes[0].text);
 		}
 	}
-	const handleEditorDidMount = (
-		editor: monaco.editor.IStandaloneCodeEditor,
-		_monaco: typeof monaco,
-	) => {
-		editorRef.current = editor;
-		onMount?.(editor, _monaco);
-		editor.addAction({
-			id: 'save-action',
-			label: 'Save',
-			keybindings: [_monaco.KeyMod.CtrlCmd | _monaco.KeyCode.KeyS],
-			contextMenuGroupId: 'navigation',
-			contextMenuOrder: 1.5,
-			run: async () => {
-				saveEditorContent(editor, defaultLanguage, onSave);
-			},
-		});
-	};
-	function setEditorTheme(monaco: any) {
-		monaco.editor.defineTheme('nightOwl', nightOwl);
+	const { onBeforeMount, onCodeEditorMount, onCodeEditorChange } = useEditor({
+		onChange: handleOnChange,
+		onSave,
+		packages,
+	});
+
+	function setupLibs() {
+		const installedPackages =
+			globalThis.monaco?.languages.typescript.javascriptDefaults.getExtraLibs() ?? {};
+
+		const intersection = _.omitBy(packages, (value, key) =>
+			_.isEqual(value, installedPackages[key]),
+		);
+
+		typeWorker.postMessage(intersection);
+		typeWorker.onmessage = function (e) {
+			console.log('Message received from worker', e);
+			addLibsToEditor({
+				...e.data,
+				...typings,
+			});
+		};
 	}
+
+	useEffect(() => {
+		if (!isEmpty(globalThis.monaco)) {
+			setupLibs();
+		}
+	}, [globalThis.monaco, packages]);
+
+	useEffect(() => {
+		getTypings({
+			orgId: version?.orgId as string,
+			appId: version?.appId as string,
+			versionId: version?._id as string,
+		});
+	}, []);
 
 	return (
 		<div className={cn(containerClassName)}>
 			<MonacoEditor
-				theme={theme === 'dark' ? 'nightOwl' : 'vs'}
-				beforeMount={setEditorTheme}
+				theme={theme === 'dark' ? 'nightOwl' : 'vs-light'}
+				beforeMount={onBeforeMount}
 				className={cn('editor', className)}
-				onChange={handleEditorChange}
-				onValidate={onValidate}
+				onChange={onCodeEditorChange}
 				defaultValue={defaultValue}
 				value={value}
-				loading={loading}
-				onMount={handleEditorDidMount}
+				onMount={onCodeEditorMount}
 				defaultLanguage={defaultLanguage}
+				language='javascript'
+				path='file:///src/index.js'
 				options={{
 					readOnly: readonly,
-					minimap: {
-						enabled: false,
-					},
-					autoClosingBrackets: 'always',
-					autoDetectHighContrast: true,
-					fontLigatures: true,
-					fontSize: 16,
-					formatOnPaste: true,
-					formatOnType: true,
+					...EDITOR_OPTIONS,
 				}}
 			/>
 		</div>
