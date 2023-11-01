@@ -388,3 +388,10 @@ export const SMTPSchema = z.object({
 });
 
 export type SetupCluster = OnboardingData & BaseRequest;
+
+declare global {
+	// eslint-disable-next-line no-var
+	var monaco: typeof import('monaco-editor');
+	// eslint-disable-next-line no-var
+	var ts: typeof import('typescript');
+}

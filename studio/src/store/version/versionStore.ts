@@ -42,6 +42,8 @@ interface VersionStore {
 	notificationLastFetchedCount: number;
 	designElements: DesignElement[];
 	dashboard: Dashboard;
+	packages: Record<string, string>;
+	typings: Record<string, string>;
 }
 
 type Actions = {
@@ -66,6 +68,8 @@ type Actions = {
 	searchDesignElements: (params: SearchDesignElementParams) => Promise<DesignElement[]>;
 	resetDesignElements: () => void;
 	getVersionDashboardInfo: (params: BaseParams) => Promise<void>;
+	getNpmPackages: (params: BaseParams) => Promise<void>;
+	getTypings: (params: BaseParams) => Promise<Record<string, string>>;
 	reset: () => void;
 };
 
@@ -88,6 +92,8 @@ const initialState: VersionStore = {
 	notificationLastSeen: new Date(),
 	designElements: [],
 	dashboard: {} as Dashboard,
+	packages: {},
+	typings: {},
 };
 
 const useVersionStore = create<VersionStore & Actions>()(
@@ -100,6 +106,7 @@ const useVersionStore = create<VersionStore & Actions>()(
 						resetAfterVersionChange();
 						set({ version });
 					}
+
 					history.navigate?.(get().getVersionDashboardPath());
 				},
 				setCreateCopyVersionDrawerIsOpen: (isOpen: boolean) => {
@@ -263,6 +270,23 @@ const useVersionStore = create<VersionStore & Actions>()(
 					try {
 						const dashboard = await VersionService.getVersionsDashboardInfo(params);
 						set({ dashboard });
+					} catch (error) {
+						throw error as APIError;
+					}
+				},
+				getNpmPackages: async (params) => {
+					try {
+						const packages = await VersionService.getNpmPackages(params);
+						set({ packages });
+					} catch (error) {
+						throw error as APIError;
+					}
+				},
+				getTypings: async (params) => {
+					try {
+						const typings = await VersionService.getVersionTypings(params);
+						set({ typings });
+						return typings;
 					} catch (error) {
 						throw error as APIError;
 					}

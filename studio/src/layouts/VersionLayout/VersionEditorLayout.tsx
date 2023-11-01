@@ -3,11 +3,11 @@ import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { InfoModal } from '@/components/InfoModal';
 import { Pencil, Warning } from '@/components/icons';
+import { useEditor } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
-import { cn, saveEditorContent } from '@/utils';
+import { cn } from '@/utils';
 import { FloppyDisk, TestTube } from '@phosphor-icons/react';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeepAlive } from 'react-keep-alive';
 import { useLocation, useParams } from 'react-router-dom';
@@ -56,10 +56,9 @@ export default function VersionEditorLayout({
 	const { removeTab, toDeleteTab, isDeleteTabModalOpen, closeDeleteTabModal, getCurrentTab } =
 		useTabStore();
 	const tab = getCurrentTab(versionId as string);
-	const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
-
+	const { saveEditorContent } = useEditor({});
 	async function handleSaveLogic() {
-		saveEditorContent(editor as monaco.editor.IStandaloneCodeEditor, 'javascript', (val) => {
+		saveEditorContent('javascript', (val: string) => {
 			setLogic(val);
 			onSaveLogic(val);
 		});
@@ -110,10 +109,7 @@ export default function VersionEditorLayout({
 					containerClassName='h-[88%]'
 					value={logic}
 					onChange={setLogic}
-					onSave={(logic) => onSaveLogic(logic)}
-					onMount={(editor) => {
-						setEditor(editor);
-					}}
+					onSave={onSaveLogic}
 				/>
 			</KeepAlive>
 			<InfoModal

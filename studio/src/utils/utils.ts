@@ -10,10 +10,6 @@ import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { AppRoles, OrgRoles, RealtimeData, ToastType } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'; // Import the Monaco API
-import * as prettier from 'prettier';
-import jsParser from 'prettier/plugins/babel';
-import esTreePlugin from 'prettier/plugins/estree';
 import { HTMLInputTypeAttribute } from 'react';
 import { twMerge } from 'tailwind-merge';
 
@@ -262,41 +258,6 @@ export function checkNumber(number: number | undefined): number | undefined {
 	return number === 0 || number === undefined ? undefined : Number(number);
 }
 
-export async function formatCode(code: string) {
-	try {
-		return await prettier.format(code, {
-			parser: 'babel',
-			plugins: [jsParser, esTreePlugin],
-		});
-	} catch (error) {
-		return code;
-	}
-}
-export async function saveEditorContent(
-	ed: monaco.editor.IStandaloneCodeEditor,
-	language: 'javascript' | 'json' | 'html',
-	cb?: (value: string) => void,
-) {
-	if (language === 'json') {
-		ed.trigger('', 'editor.action.formatDocument', null);
-	}
-	if (language === 'javascript') {
-		const formatted = await formatCode(ed?.getValue());
-		// Select all text
-		const fullRange = ed.getModel()?.getFullModelRange();
-
-		// Apply the text over the range
-		ed.executeEdits(null, [
-			{
-				text: formatted,
-				range: fullRange as monaco.Range,
-			},
-		]);
-
-		ed.pushUndoStop();
-	}
-	cb?.(ed.getValue());
-}
 export function removeEmptyFields(data: Record<string, any>) {
 	Object.keys(data).forEach((key) => {
 		if (data[key] === '' || data[key] == null) {
@@ -428,5 +389,14 @@ export function resetAfterOrgChange() {
 		if (!ORG_CHANGE_EXCEPTIONS.includes(name)) {
 			store.getState()?.reset();
 		}
+	});
+}
+
+export function addLibsToEditor(libs: Record<string, string>) {
+	Object.entries(libs).forEach(([key, value]) => {
+		globalThis.monaco?.languages.typescript.javascriptDefaults.addExtraLib(
+			value as string,
+			`file:///${key}`,
+		);
 	});
 }
