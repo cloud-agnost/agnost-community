@@ -23,6 +23,7 @@ export default function CodeEditor({
 	readonly,
 	defaultLanguage = 'javascript',
 	name,
+	onChange,
 	onSave,
 }: CodeEditorProps) {
 	const { updateCurrentTab, getTabById } = useTabStore();
@@ -49,6 +50,7 @@ export default function CodeEditor({
 		if (defaultLanguage === 'javascript' && !readonly) {
 			setTabState(value !== ev.changes[0].text);
 		}
+		onChange?.(value, ev);
 	}
 	const { onBeforeMount, onCodeEditorMount, onCodeEditorChange } = useEditor({
 		onChange: handleOnChange,
