@@ -56,6 +56,7 @@ export default function EndpointBody() {
 										value={field.value}
 										onChange={field.onChange}
 										defaultLanguage='json'
+										name='endpointBody'
 									/>
 								</FormControl>
 								<FormMessage />

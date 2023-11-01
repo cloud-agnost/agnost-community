@@ -23,6 +23,7 @@ export default function VersionLogDetails({ open, onClose }: VersionLogDetailsPr
 							defaultLanguage='json'
 							containerClassName='h-[90%]'
 							readonly
+							name='versionLogDetails'
 						/>
 					</div>
 					<div className='space-y-4 h-1/3'>
@@ -32,6 +33,7 @@ export default function VersionLogDetails({ open, onClose }: VersionLogDetailsPr
 							defaultLanguage='json'
 							containerClassName='h-[90%]'
 							readonly
+							name='versionLogErrors'
 						/>
 					</div>
 				</div>

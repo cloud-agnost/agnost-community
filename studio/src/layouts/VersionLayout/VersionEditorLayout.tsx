@@ -110,6 +110,7 @@ export default function VersionEditorLayout({
 					value={logic}
 					onChange={setLogic}
 					onSave={onSaveLogic}
+					name={name}
 				/>
 			</KeepAlive>
 			<InfoModal
