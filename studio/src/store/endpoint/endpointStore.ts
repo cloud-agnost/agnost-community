@@ -27,6 +27,7 @@ interface EndpointStore {
 	editedLogic: string;
 	selectedEndpointIds: string[];
 	lastFetchedCount: number;
+	lastFetchedPage: number;
 	endpointRequest: EndpointRequest;
 	endpointResponse: EndpointResponse;
 	toDeleteEndpoint: Endpoint;
@@ -64,6 +65,7 @@ const initialState: EndpointStore = {
 	endpointRequest: {} as EndpointRequest,
 	endpointResponse: {} as EndpointResponse,
 	lastFetchedCount: 0,
+	lastFetchedPage: 0,
 	toDeleteEndpoint: {} as Endpoint,
 	isEndpointDeleteDialogOpen: false,
 	isEditEndpointDialogOpen: false,
@@ -106,6 +108,7 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 							set((prev) => ({
 								endpoints: [...prev.endpoints, ...endpoints],
 								lastFetchedCount: endpoints.length,
+								lastFetchedPage: params.page,
 							}));
 						}
 						return endpoints;

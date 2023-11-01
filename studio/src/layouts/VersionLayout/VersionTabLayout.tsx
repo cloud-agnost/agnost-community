@@ -27,7 +27,6 @@ interface Props<T> {
 	handlerButton?: ReactNode;
 	onMultipleDelete?: () => void;
 	openCreateModal?: () => void;
-	onSearch?: () => void;
 }
 
 export default function VersionTabLayout<T>({
@@ -45,7 +44,6 @@ export default function VersionTabLayout<T>({
 	handlerButton,
 	onMultipleDelete,
 	openCreateModal,
-	onSearch,
 }: Props<T>) {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { versionId } = useParams<{ versionId: string }>();
@@ -97,13 +95,7 @@ export default function VersionTabLayout<T>({
 			<div className='flex items-center justify-between'>
 				<h1 className='text-default text-2xl text-center'>{title}</h1>
 				<div className='flex items-center justify-center gap-4'>
-					{onSearch && (
-						<SearchInput
-							value={searchParams.get('q') ?? undefined}
-							onSearch={onSearch}
-							className='sm:w-[450px] flex-1'
-						/>
-					)}
+					<SearchInput value={searchParams.get('q') ?? undefined} className='sm:w-[450px] flex-1' />
 					{selectedRowLength ? (
 						<SelectedRowButton
 							selectedRowLength={selectedRowLength}

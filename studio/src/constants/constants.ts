@@ -105,6 +105,7 @@ import { ElementType } from 'react';
 import * as z from 'zod';
 
 export const PAGE_SIZE = 10;
+export const MODULE_PAGE_SIZE = 10;
 export const UI_BASE_URL = window.location.origin;
 export const MIN_DB_SIZE = 1;
 export const MAX_DB_SIZE = 50;

@@ -41,6 +41,7 @@ export default function SearchInput({
 			return;
 		}
 		searchParams.set('q', value);
+		searchParams.delete('p');
 		setSearchParams(searchParams);
 		onSearch?.(value);
 	}
