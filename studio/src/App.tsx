@@ -9,20 +9,21 @@ import { RouterProvider } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import useThemeStore from './store/theme/themeStore';
+import _ from 'lodash';
 
 function App() {
 	useRenewToken(2);
 	useRealtime();
 
 	const { getAllTypes } = useTypeStore();
-	const { user } = useAuthStore();
+	const { accessToken } = useAuthStore();
 	const { theme } = useThemeStore();
 
 	useEffect(() => {
-		if (user) {
+		if (!_.isEmpty(accessToken)) {
 			getAllTypes();
 		}
-	}, [user]);
+	}, [accessToken]);
 
 	useEffect(() => {
 		let systemTheme = theme;
