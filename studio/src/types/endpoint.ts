@@ -191,12 +191,12 @@ export interface TestEndpointParams extends BaseRequest {
 	envId: string;
 	consoleLogId: string;
 	params: {
-		queryParams?: Record<string, string>;
-		pathParams?: Record<string, string>;
+		queryParams?: Record<string, string>[];
+		pathParams?: Record<string, string>[];
 	};
 	body?: string;
 	bodyType?: 'json' | 'form-data';
-	headers?: Record<string, string>;
+	headers?: Record<string, string>[];
 	method: 'get' | 'post' | 'put' | 'delete';
 	formData?: {
 		key: string;
