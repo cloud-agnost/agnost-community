@@ -384,7 +384,7 @@ export const SMTPSchema = z.object({
 		.trim()
 		.refine((value) => value.trim().length > 0, 'Username is required'),
 	password: z.string({ required_error: 'Password is required' }),
-	useTLS: z.boolean(),
+	useTLS: z.boolean().default(false),
 });
 
 export type SetupCluster = OnboardingData & BaseRequest;
