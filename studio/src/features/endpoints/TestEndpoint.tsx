@@ -12,13 +12,11 @@ import { TestMethods } from '@/types';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import {
-	arrayToObj,
 	cn,
 	generateId,
 	getEndpointPath,
 	getPathParams,
 	joinChannel,
-	objToArray,
 	serializedStringToFile,
 } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -103,8 +101,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	});
 	async function onSubmit(data: z.infer<typeof TestEndpointSchema>) {
 		setLoading(true);
-		const pathVariables = arrayToObj(data.params.pathVariables ?? []);
-		const testPath = getEndpointPath(endpoint?.path, pathVariables);
+		const testPath = getEndpointPath(endpoint?.path, data.params.pathVariables ?? []);
 		const consoleLogId = generateId();
 		joinChannel(consoleLogId);
 		await testEndpoint({
@@ -113,13 +110,8 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			path: testPath,
 			consoleLogId,
 			method: endpoint?.method.toLowerCase() as TestMethods,
-			params: {
-				queryParams: arrayToObj(data.params.queryParams),
-				pathParams: pathVariables,
-			},
-			headers: {
-				...arrayToObj(data.headers?.filter((h) => h.key && h.value) as any),
-			},
+			params: data.params,
+			headers: data.headers?.filter((h) => h.key && h.value),
 			body: data.body ?? {},
 			formData: data.formData,
 			bodyType: data.bodyType,
@@ -146,10 +138,10 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 		if (req) {
 			form.reset({
 				params: {
-					queryParams: objToArray(req.params.queryParams),
-					pathVariables: objToArray(req.params.pathParams),
+					queryParams: req.params.queryParams,
+					pathVariables: req.params.pathParams,
 				},
-				headers: objToArray(req.headers),
+				headers: req.headers,
 				body: req.body,
 				formData: req?.formData?.map((f) => ({
 					...f,
@@ -186,6 +178,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			setSearchParams(searchParams);
 		}
 	}, [searchParams.get('t'), open]);
+
 	return (
 		<Drawer open={open} onOpenChange={onClose}>
 			<DrawerContent
