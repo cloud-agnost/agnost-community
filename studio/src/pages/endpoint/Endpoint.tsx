@@ -56,7 +56,7 @@ export default function MainEndpoint() {
 	}
 
 	useEffect(() => {
-		if (versionId && orgId && appId && lastFetchedPage !== parseInt(searchParams.get('p') ?? '0')) {
+		if (versionId && orgId && appId) {
 			setLoading(true);
 			getEndpoints({
 				orgId,
