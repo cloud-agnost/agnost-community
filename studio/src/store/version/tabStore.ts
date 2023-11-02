@@ -70,10 +70,8 @@ const useTabStore = create<TabStore & Actions>()(
 					});
 					if (tab.isActive && prevTab) {
 						get().setCurrentTab(versionId, prevTab?.id);
-						const url = prevTab.path.includes('organization')
-							? prevTab.path
-							: useVersionStore.getState().getVersionDashboardPath(prevTab.path);
-						history.navigate?.(`${url}?tabId=${prevTab.id}`);
+						const url = useVersionStore.getState().getVersionDashboardPath(prevTab.path);
+						history.navigate?.(url);
 					}
 				},
 				addTab: (versionId, tab) => {
