@@ -9,6 +9,8 @@ import { Button } from 'components/Button';
 import { SortButton } from 'components/DataTable';
 import { TabLink } from '@/features/version/Tabs';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from 'components/Tooltip';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { DateText } from '@/components/DateText';
 
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
@@ -17,6 +19,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
+		size: 200,
 		cell: ({ row: { original } }) => {
 			const { setDatabase } = useDatabaseStore.getState();
 			return (
@@ -35,6 +38,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		accessorKey: 'type',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
+		size: 200,
 		cell: ({
 			row: {
 				original: { type },
@@ -55,6 +59,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		accessorKey: 'managed',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
+		size: 200,
 		cell: ({
 			row: {
 				original: { managed },
@@ -71,8 +76,39 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		},
 	},
 	{
+		id: 'created_at',
+		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
+		enableSorting: true,
+		sortingFn: 'datetime',
+		accessorKey: 'createdAt',
+		size: 200,
+		cell: ({ row }) => {
+			const { createdAt, createdBy } = row.original;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === createdBy);
+
+			return <DateText date={createdAt} user={user} />;
+		},
+	},
+
+	{
+		id: 'updated_at',
+		header: ({ column }) => <SortButton text={translate('general.updated_at')} column={column} />,
+		accessorKey: 'updatedAt',
+		size: 200,
+		cell: ({ row }) => {
+			const { updatedAt, updatedBy } = row.original;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === updatedBy);
+			return updatedBy && <DateText date={updatedAt} user={user} />;
+		},
+	},
+	{
 		id: 'actions',
-		className: 'actions !w-[50px]',
+		className: 'actions',
+		size: 50,
 		cell: ({ row: { original } }) => {
 			const {
 				setToEditDatabase,
