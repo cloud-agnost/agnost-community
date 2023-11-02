@@ -103,8 +103,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	});
 	async function onSubmit(data: z.infer<typeof TestEndpointSchema>) {
 		setLoading(true);
-		const pathVariables = arrayToObj(data.params.pathVariables ?? []);
-		const testPath = getEndpointPath(endpoint?.path, pathVariables);
+		const testPath = getEndpointPath(endpoint?.path, data.params.pathVariables ?? []);
 		const consoleLogId = generateId();
 		joinChannel(consoleLogId);
 		await testEndpoint({
@@ -115,7 +114,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			method: endpoint?.method.toLowerCase() as TestMethods,
 			params: {
 				queryParams: arrayToObj(data.params.queryParams),
-				pathParams: pathVariables,
+				pathParams: arrayToObj(data.params.pathVariables ?? []),
 			},
 			headers: {
 				...arrayToObj(data.headers?.filter((h) => h.key && h.value) as any),
