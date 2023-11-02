@@ -133,11 +133,6 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 ];
 
 function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-	const role = useApplicationStore.getState().role;
-	const hasAppPermission = useAuthorizeApp({
-		key: 'middleware.delete',
-		role,
-	});
 	return (
 		<TableConfirmation
 			align='end'
@@ -147,7 +142,7 @@ function ConfirmTable({ onDelete }: { onDelete: () => void }) {
 			description={translate('version.middleware.delete.message')}
 			onConfirm={onDelete}
 			contentClassName='m-0'
-			disabled={!hasAppPermission}
+			permissionKey='middleware.delete'
 		/>
 	);
 }

@@ -93,11 +93,6 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 ];
 
 function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-	const role = useApplicationStore.getState().role;
-	const hasAppPermission = useAuthorizeApp({
-		key: 'version.package.delete',
-		role,
-	});
 	return (
 		<TableConfirmation
 			align='end'
@@ -107,7 +102,7 @@ function ConfirmTable({ onDelete }: { onDelete: () => void }) {
 			description={translate('version.npm.delete_modal_desc')}
 			onConfirm={onDelete}
 			contentClassName='m-0'
-			disabled={!hasAppPermission}
+			permissionKey='version.package.delete'
 		/>
 	);
 }
