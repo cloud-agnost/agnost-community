@@ -38,7 +38,6 @@ export const EDITOR_OPTIONS: EditorProps['options'] = {
 export type CodeEditorProps = {
 	onChange?: (value: string | undefined, ev: monaco.editor.IModelContentChangedEvent) => void;
 	onSave?: (logic: string) => void;
-	packages?: any;
 };
 
 export default function useEditor({ onChange, onSave }: CodeEditorProps) {

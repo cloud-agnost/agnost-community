@@ -11,8 +11,21 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, Endpoint, TabTypes } from '@/types';
 import { translate } from '@/utils';
 import { TabLink } from '../version/Tabs';
+import { TableConfirmation } from '@/components/Table';
+import useApplicationStore from '@/store/app/applicationStore';
+import useAuthorizeApp from '@/hooks/useAuthorizeApp';
+import useVersionStore from '@/store/version/versionStore';
 
-const { openDeleteEndpointDialog, openEditEndpointDialog } = useEndpointStore.getState();
+const { openEditEndpointDialog, deleteEndpoint } = useEndpointStore.getState();
+const { version } = useVersionStore.getState();
+function deleteEndpointHandler(toDeleteEndpoint: Endpoint) {
+	deleteEndpoint({
+		epId: toDeleteEndpoint?._id as string,
+		orgId: version?.orgId as string,
+		appId: version?.appId as string,
+		versionId: version?._id as string,
+	});
+}
 
 const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	{
@@ -155,16 +168,27 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		id: 'actions',
 		className: 'actions',
 		size: 45,
-		cell: ({ row }) => (
-			<ActionsCell<Endpoint>
-				original={row.original}
-				onDelete={() => openDeleteEndpointDialog(row.original)}
-				onEdit={() => openEditEndpointDialog(row.original)}
-				canDeleteKey='endpoint.delete'
-				canEditKey='endpoint.update'
-				type='version'
-			/>
-		),
+		cell: ({ row }) => {
+			return (
+				<ActionsCell<Endpoint>
+					original={row.original}
+					canEditKey='endpoint.update'
+					onEdit={() => openEditEndpointDialog(row.original)}
+					type='version'
+				>
+					<TableConfirmation
+						align='end'
+						closeOnConfirm
+						showAvatar={false}
+						title={translate('endpoint.delete.title')}
+						description={translate('endpoint.delete.message')}
+						onConfirm={() => deleteEndpointHandler(row.original)}
+						contentClassName='m-0'
+						permissionKey='endpoint.delete'
+					/>
+				</ActionsCell>
+			);
+		},
 	},
 ];
 

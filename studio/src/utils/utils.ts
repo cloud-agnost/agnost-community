@@ -163,17 +163,18 @@ export function getPathParams(path: string) {
 	return params;
 }
 
-export function getEndpointPath(path: string, params: Record<string, string>) {
+export function getEndpointPath(path: string, params: Record<string, string>[]) {
 	const pathParams = getPathParams(path);
+	const paramsObj = arrayToObj(params);
 
 	for (const param of pathParams) {
-		path = path.replace(`:${param}`, params[param]);
+		path = path.replace(`:${param}`, paramsObj[param]);
 	}
 
 	return path;
 }
 
-export function arrayToObj(arr: { key: string; value: string }[]): Record<string, string> {
+export function arrayToObj(arr: Record<string, string>[]): Record<string, string> {
 	return arr.reduce(
 		(acc, curr) => {
 			acc[curr.key] = curr.value;
@@ -412,4 +413,10 @@ export function filterMatchingKeys(object1: any, object2: any) {
 	}
 
 	return object2;
+}
+
+export function getTypeWorker() {
+	return new Worker(new URL('../workers/fetchTypings.worker.ts', import.meta.url), {
+		type: 'module',
+	});
 }

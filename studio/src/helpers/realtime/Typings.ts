@@ -1,13 +1,17 @@
+import useVersionStore from '@/store/version/versionStore';
 import { RealtimeActionParams } from '@/types';
+import { addLibsToEditor } from '@/utils';
 
 class Typings {
 	update({ data }: RealtimeActionParams<Record<string, string>>) {
-		Object.entries(data).forEach(([key, value]) => {
-			window.monaco?.languages.typescript.javascriptDefaults.addExtraLib(
-				value as string,
-				`file:///${key}`,
-			);
-		});
+		addLibsToEditor(data);
+		useVersionStore.setState((prev) => ({
+			...prev,
+			typings: {
+				...prev.typings,
+				...data,
+			},
+		}));
 	}
 }
 
