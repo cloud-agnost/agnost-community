@@ -38,7 +38,7 @@ function ActionsCell<T>({
 	};
 
 	return (
-		<div className='flex items-center'>
+		<div className='flex items-center justify-end'>
 			<TooltipProvider>
 				<Tooltip>
 					<TooltipTrigger asChild>
