@@ -197,9 +197,11 @@ const useTabStore = create<TabStore & Actions>()(
 					});
 				},
 				removeTabByPath: (versionId, path) => {
-					const tab = get().tabs[versionId]?.find((tab) => tab.path.includes(path));
+					const tab = get().tabs[versionId]?.filter((tab) => tab.path.includes(path));
 					if (!tab) return;
-					get().removeTab(versionId, tab.id);
+					tab.forEach((t) => {
+						get().removeTab(versionId, t.id);
+					});
 				},
 				filterTabs: (versionId, filter) => {
 					const tabs = get().tabs[versionId] ?? [];
