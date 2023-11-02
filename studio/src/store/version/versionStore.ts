@@ -19,10 +19,10 @@ import {
 	VersionLog,
 	VersionLogBucket,
 } from '@/types';
-import { history, resetAfterVersionChange } from '@/utils';
+import { filterMatchingKeys, getTypeWorker, history, resetAfterVersionChange } from '@/utils';
+import _ from 'lodash';
 import { devtools, persist } from 'zustand/middleware';
 import useAuthStore from '../auth/authStore';
-
 interface VersionStore {
 	loading: boolean;
 	error: APIError;
@@ -70,6 +70,7 @@ type Actions = {
 	getVersionDashboardInfo: (params: BaseParams) => Promise<void>;
 	getNpmPackages: (params: BaseParams) => Promise<void>;
 	getTypings: (params: BaseParams) => Promise<Record<string, string>>;
+	fetchTypes: (packages: Record<string, string>) => Promise<void>;
 	reset: () => void;
 };
 
@@ -104,12 +105,14 @@ const useVersionStore = create<VersionStore & Actions>()(
 				selectVersion: (version: Version) => {
 					if (version._id !== get().version._id) {
 						resetAfterVersionChange();
-						get().getTypings({
-							orgId: version.orgId,
-							appId: version.appId,
-							versionId: version._id,
-						});
 						set({ version });
+						if (_.isEmpty(get().typings)) {
+							get().getNpmPackages({
+								orgId: version.orgId,
+								appId: version.appId,
+								versionId: version._id,
+							});
+						}
 					}
 
 					history.navigate?.(get().getVersionDashboardPath());
@@ -283,6 +286,23 @@ const useVersionStore = create<VersionStore & Actions>()(
 					try {
 						const packages = await VersionService.getNpmPackages(params);
 						set({ packages });
+						const typeWorker = getTypeWorker();
+						const intersection = filterMatchingKeys(get().typings, packages);
+						typeWorker.postMessage(intersection);
+						typeWorker.onmessage = async function (e) {
+							const typings = e.data;
+							const specifics = await get().getTypings({
+								orgId: get().version.orgId,
+								appId: get().version.appId,
+								versionId: get().version._id,
+							});
+							set({
+								typings: {
+									...typings,
+									...specifics,
+								},
+							});
+						};
 					} catch (error) {
 						throw error as APIError;
 					}
@@ -290,14 +310,25 @@ const useVersionStore = create<VersionStore & Actions>()(
 				getTypings: async (params) => {
 					try {
 						const typings = await VersionService.getVersionTypings(params);
-						set({ typings });
+						set((prev) => ({ typings: { ...prev.typings, ...typings } }));
 						return typings;
 					} catch (error) {
 						throw error as APIError;
 					}
 				},
+				fetchTypes: async (packages) => {
+					const typeWorker = getTypeWorker();
+					const intersection = filterMatchingKeys(get().typings, packages);
+					if (_.isEmpty(intersection)) return;
+					typeWorker.postMessage(intersection);
+					typeWorker.onmessage = async function (e) {
+						const typings = e.data;
+						set((prev) => ({ typings: { ...prev.typings, ...typings } }));
+					};
+				},
 				reset: () => set(initialState),
 			}),
+
 			{
 				name: 'version-storage',
 				storage: CustomStateStorage,

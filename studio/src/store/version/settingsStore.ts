@@ -117,6 +117,9 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				addNPMPackage: async (params: AddNPMPackageParams) => {
 					try {
 						const version = await VersionService.addNPMPackage(params);
+						useVersionStore.getState().fetchTypes({
+							[params.name]: params.version,
+						});
 						useVersionStore.setState((prev) => ({
 							version,
 							packages: {

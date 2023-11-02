@@ -20,7 +20,7 @@ export default function Logs({ logs, className }: LogsProps) {
 	return (
 		<div
 			className={cn(
-				'overflow-auto bg-subtle dark:bg-base whitespace-pre text-default text-sm font-mono',
+				'overflow-auto max-h-full bg-subtle dark:bg-base whitespace-pre text-default text-sm font-mono',
 				className,
 			)}
 		>
