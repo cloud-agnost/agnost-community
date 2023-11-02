@@ -90,7 +90,7 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 					</TestEndpointTable>
 				</div>
 			</TabsContent>
-			<TabsContent value='console' className='overflow-y-auto  h-[calc(100%-4rem)]'>
+			<TabsContent value='console' className='h-[calc(100%-4rem)]'>
 				<Logs logs={response?.logs as Log[]} />
 			</TabsContent>
 		</Tabs>
