@@ -14,7 +14,7 @@ import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { TabTypes } from '@/types';
 import { capitalize, generateId } from '@/utils';
-import { Key } from '@phosphor-icons/react';
+import { BookBookmark, FileJs, Code, HardDrives, Key } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
 import { Link, LoaderFunctionArgs } from 'react-router-dom';
 VersionDashboard.loader = async ({ params }: LoaderFunctionArgs) => {
@@ -41,16 +41,19 @@ export default function VersionDashboard() {
 			title: t('version.product_guide'),
 			description: t('version.product_guide_desc'),
 			link: 'https://agnost.dev/docs/intro',
+			icon: BookBookmark,
 		},
 		{
 			title: t('version.client_api'),
 			description: t('version.client_api_desc'),
 			link: 'https://agnost.dev/client',
+			icon: FileJs,
 		},
 		{
 			title: t('version.server_api'),
 			description: t('version.server_api_desc'),
 			link: 'https://agnost.dev/server',
+			icon: Code,
 		},
 	];
 
@@ -94,7 +97,7 @@ export default function VersionDashboard() {
 					<CardDescription>{t('version.settings.version_id_desc')}</CardDescription>
 				</CardHeader>
 				<CardContent className='space-y-6'>
-					<div className='flex items-center gap-4 max-w-lg'>
+					<div className='flex items-center gap-4 max-w-4xl'>
 						<div className='flex items-center gap-2 '>
 							<Key className='w-4 h-4 text-default' />
 							<h1 className='text-sm'>{environment.name}</h1>
@@ -114,7 +117,7 @@ export default function VersionDashboard() {
 				</CardHeader>
 				<CardContent className='space-y-6'>
 					{version.apiKeys.map((key) => (
-						<div key={key._id} className='flex items-center gap-4 max-w-xl'>
+						<div key={key._id} className='flex items-center gap-4 max-w-4xl'>
 							<div className='flex items-center gap-2 flex-[0.2]'>
 								<Key className='w-4 h-4 text-default' />
 								<h1 className='text-sm'>{key.name}</h1>
@@ -145,11 +148,11 @@ export default function VersionDashboard() {
 						>
 							<div className='flex items-center gap-4 max-w-xl p-4'>
 								<div className='p-4 bg-lighter '>
-									<Key className='w-6 h-6 text-default' />
+									<guide.icon className='w-6 h-6 text-default' />
 								</div>
 								<div className='flex-1'>
-									<h1 className='text-default text-lg'>{guide.title}</h1>
-									<h2 className='text-subtle text-md'>{guide.description}</h2>
+									<h1 className='text-default'>{guide.title}</h1>
+									<h2 className='text-subtle text-sm'>{guide.description}</h2>
 								</div>
 							</div>
 						</Link>
