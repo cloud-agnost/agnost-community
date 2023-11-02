@@ -4,9 +4,8 @@ import useThemeStore from '@/store/theme/themeStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab } from '@/types';
-import { addLibsToEditor, cn, filterMatchingKeys, getTabIdFromUrl, isEmpty } from '@/utils';
+import { addLibsToEditor, cn, getTabIdFromUrl, isEmpty } from '@/utils';
 import MonacoEditor, { EditorProps } from '@monaco-editor/react';
-import _ from 'lodash';
 import { useEffect } from 'react';
 
 interface CodeEditorProps extends Omit<EditorProps, 'defaultLanguage'> {
@@ -27,14 +26,8 @@ export default function CodeEditor({
 	onSave,
 }: CodeEditorProps) {
 	const { updateCurrentTab, getTabById } = useTabStore();
-	const { version, packages, typings, getTypings } = useVersionStore();
+	const { version, typings } = useVersionStore();
 	const theme = useThemeStore((state) => state.theme);
-	const typeWorker: Worker = new Worker(
-		new URL('../../workers/fetchTypings.worker.ts', import.meta.url),
-		{
-			type: 'module',
-		},
-	);
 
 	const setTabState = useDebounceFn((isDirty) => {
 		const tabId = getTabIdFromUrl();
@@ -55,31 +48,14 @@ export default function CodeEditor({
 	const { onBeforeMount, onCodeEditorMount, onCodeEditorChange } = useEditor({
 		onChange: handleOnChange,
 		onSave,
-		packages,
 	});
-
-	function setupLibs() {
-		const installedPackages =
-			globalThis.monaco?.languages.typescript.javascriptDefaults.getExtraLibs() ?? {};
-
-		const intersection = filterMatchingKeys(installedPackages, packages);
-
-		if (!_.isEmpty(intersection)) {
-			typeWorker.postMessage(intersection);
-			typeWorker.onmessage = function (e) {
-				addLibsToEditor({
-					...e.data,
-					...typings,
-				});
-			};
-		}
-	}
 
 	useEffect(() => {
 		if (!isEmpty(globalThis.monaco) && defaultLanguage === 'javascript') {
-			setupLibs();
+			console.log('adding libs');
+			addLibsToEditor(typings);
 		}
-	}, [globalThis.monaco, packages]);
+	}, [globalThis.monaco, typings]);
 
 	return (
 		<div className={cn(containerClassName)}>
