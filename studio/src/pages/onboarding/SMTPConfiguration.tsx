@@ -58,7 +58,13 @@ export default function SMTPConfiguration() {
 		try {
 			setIsTesting(true);
 			setError(null);
-			await PlatformService.testSMTPSettings(data);
+			await PlatformService.testSMTPSettings({
+				host: data.host,
+				port: data.port,
+				user: data.user,
+				password: data.password,
+				useTLS: data.useTLS,
+			});
 			const { nextPath } = getCurrentStep();
 			setDataPartially({
 				smtp: data,

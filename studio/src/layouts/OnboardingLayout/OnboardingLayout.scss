@@ -6,7 +6,7 @@
 	}
 
 	.onboarding-layout-right {
-		@apply p-8 md:p-16 bg-subtle;
+		@apply p-8 md:p-16 bg-subtle max-h-screen overflow-y-auto;
 	}
 
 	.onboarding-layout-app-logo {
