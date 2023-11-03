@@ -1,27 +1,14 @@
-import { nameSchema } from '@/features/version/Middlewares/formSchema.ts';
 import { useToast } from '@/hooks';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
-import { Middleware } from '@/types';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from 'components/Button';
+import { Middleware, MiddlewareSchema } from '@/types';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from 'components/Form';
-import { Input } from 'components/Input';
+import { Form } from 'components/Form';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-const MiddlewareFormSchema = z.object({
-	name: nameSchema,
-});
+import MiddlewareForm from './MiddlewareForm';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 export default function EditMiddlewareDrawer() {
 	const { t } = useTranslation();
@@ -35,13 +22,15 @@ export default function EditMiddlewareDrawer() {
 		updateMiddleware,
 	} = useMiddlewareStore();
 
-	const form = useForm<z.infer<typeof MiddlewareFormSchema>>({
-		resolver: zodResolver(MiddlewareFormSchema),
+	const form = useForm<z.infer<typeof MiddlewareSchema>>({
+		resolver: zodResolver(MiddlewareSchema),
+		defaultValues: {
+			name: middleware?.name,
+		},
 	});
 
-	async function init() {
-		if (!middleware) return;
-		if (editMiddlewareDrawerIsOpen) {
+	useEffect(() => {
+		if (editMiddlewareDrawerIsOpen && middleware) {
 			form.reset({
 				name: middleware.name,
 			});
@@ -50,49 +39,43 @@ export default function EditMiddlewareDrawer() {
 				name: '',
 			});
 		}
-	}
-
-	useEffect(() => {
-		init();
 	}, [editMiddlewareDrawerIsOpen]);
 
-	async function onSubmit(data: z.infer<typeof MiddlewareFormSchema>) {
+	async function onSubmit(data: z.infer<typeof MiddlewareSchema>) {
 		if (!middleware) return;
 		setLoading(true);
-		try {
-			const params = {
-				orgId: middleware.orgId,
-				appId: middleware.appId,
-				versionId: middleware.versionId,
-				mwId: middleware._id,
-			};
-			updateMiddleware({
-				...params,
-				name: data.name,
-				onSuccess: () => {
-					notify({
-						title: t('general.success'),
-						description: t('version.middleware.edit.success'),
-						type: 'success',
-					});
-				},
-				onError: (error) => {
-					notify({
-						title: error.error,
-						description: error.details,
-						type: 'error',
-					});
-				},
-			});
-			setEditMiddlewareDrawerIsOpen(false);
-		} finally {
-			setLoading(false);
-		}
+		updateMiddleware({
+			orgId: middleware.orgId,
+			appId: middleware.appId,
+			versionId: middleware.versionId,
+			mwId: middleware._id,
+			name: data.name,
+			onSuccess: () => {
+				setLoading(false);
+				setEditMiddlewareDrawerIsOpen(false);
+				notify({
+					title: t('general.success'),
+					description: t('version.middleware.edit.success'),
+					type: 'success',
+				});
+			},
+			onError: (error) => {
+				setLoading(false);
+				notify({
+					title: error.error,
+					description: error.details,
+					type: 'error',
+				});
+			},
+		});
 	}
 
 	function onOpenChange(status: boolean) {
 		setMiddleware({} as Middleware);
 		setEditMiddlewareDrawerIsOpen(status);
+		form.reset({
+			name: '',
+		});
 	}
 
 	return (
@@ -103,33 +86,7 @@ export default function EditMiddlewareDrawer() {
 				</DrawerHeader>
 				<Form {...form}>
 					<form className='p-6 flex flex-col gap-3 flex-1' onSubmit={form.handleSubmit(onSubmit)}>
-						<FormField
-							control={form.control}
-							name='name'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{t('version.middleware.name')}</FormLabel>
-									<FormControl>
-										<Input
-											error={Boolean(form.formState.errors.name)}
-											placeholder={
-												t('forms.placeholder', {
-													label: t('general.name'),
-												}) ?? ''
-											}
-											{...field}
-										/>
-									</FormControl>
-									<FormDescription>{t('forms.max64.description')}</FormDescription>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<div className='flex justify-end mt-4'>
-							<Button loading={loading} size='lg'>
-								{t('general.save')}
-							</Button>
-						</div>
+						<MiddlewareForm loading={loading} />
 					</form>
 				</Form>
 			</DrawerContent>

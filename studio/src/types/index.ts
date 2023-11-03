@@ -11,6 +11,7 @@ export type * from './environment.ts';
 export type * from './function.ts';
 export { CreateFunctionSchema } from './function.ts';
 export type * from './middleware.ts';
+export { MiddlewareSchema } from './middleware.ts';
 export type * from './model.ts';
 export type * from './navigator.ts';
 export type * from './organization.ts';
@@ -32,6 +33,7 @@ export {
 	ResourceInstances,
 	ResourceType,
 } from './resource.ts';
+export { nameSchema } from './schema.ts';
 export type * from './storage.ts';
 export { BucketSchema, CreateStorageSchema, StorageSchema } from './storage.ts';
 export type * from './task.ts';

@@ -1,5 +1,6 @@
 import { BaseGetRequest, BaseParams, BaseRequest, Middleware } from '@/types';
-
+import { z } from 'zod';
+import { nameSchema } from './schema';
 export type GetMiddlewaresOfAppVersionParams = BaseParams & BaseGetRequest;
 
 export type GetMiddlewareByIdParams = BaseParams & {
@@ -22,3 +23,7 @@ export type SaveMiddlewareCodeParams = GetMiddlewareByIdParams &
 	BaseRequest & {
 		logic: string;
 	};
+
+export const MiddlewareSchema = z.object({
+	name: nameSchema,
+});
