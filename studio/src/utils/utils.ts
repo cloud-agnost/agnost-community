@@ -8,8 +8,9 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import useTypeStore from '@/store/types/typeStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import { AppRoles, OrgRoles, RealtimeData, ToastType } from '@/types';
+import { RealtimeData, ToastType } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
+import _ from 'lodash';
 import { HTMLInputTypeAttribute } from 'react';
 import { twMerge } from 'tailwind-merge';
 
@@ -211,39 +212,13 @@ export default function groupBy<T>(list: T[], keyGetter: (item: T) => string) {
 
 	return map;
 }
-export const getPermission = (permissions: any, pathParts: string[]): boolean | undefined => {
-	let entity = permissions;
-	for (let i = 0; i < pathParts.length - 1; i++) {
-		entity = entity[pathParts[i]];
-		if (!entity) break;
-	}
 
-	if (entity && entity[pathParts[pathParts.length - 1]])
-		return entity[pathParts[pathParts.length - 1]];
-};
-
-export const getAppPermission = (userRole: AppRoles, path: string) => {
-	const pathParts = path.split('.');
-	const userPermissions = useApplicationStore.getState().appAuthorization;
-	if (userPermissions[userRole]) {
-		const currentPermissions = userPermissions[userRole];
-		const permission = getPermission(currentPermissions, pathParts);
-		return permission;
-	}
-	return undefined;
+export const getAppPermission = (path: string) => {
+	return _.get(useApplicationStore.getState().appAuthorization, path);
 };
 
 export const getOrgPermission = (path: string) => {
-	const pathParts = path.split('.');
-	const userPermissions = useOrganizationStore.getState().orgAuthorization;
-	const role = useOrganizationStore.getState().organization?.role as OrgRoles;
-	if (userPermissions[role]) {
-		const currentPermissions = userPermissions[role];
-		const permission = getPermission(currentPermissions, pathParts);
-
-		return permission;
-	}
-	return undefined;
+	return _.get(useOrganizationStore.getState().orgAuthorization, path);
 };
 export function formatFileSize(bytes: number): string {
 	if (bytes === 0) return '0 Bytes';
