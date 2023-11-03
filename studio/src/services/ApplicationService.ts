@@ -74,7 +74,7 @@ export default class ApplicationService {
 		).data;
 	}
 	static async inviteUsersToApp(req: AppInviteRequest): Promise<Invitation[]> {
-		return (await axios.post(`${this.getUrl()}/invite?uiBaseURL=${req.uiBaseUrl}`, req.members))
+		return (await axios.post(`${this.getUrl()}/invite?uiBaseURL=${req.uiBaseURL}`, req.members))
 			.data;
 	}
 	static async getAppInvitations(req: GetInvitationRequest): Promise<Invitation[]> {

@@ -6,8 +6,10 @@ import useTypeStore from '@/store/types/typeStore';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/Alert';
-import { APIError } from '@/types';
+import { APIError, AppMemberRequest } from '@/types';
 import { useToast } from '@/hooks';
+import useClusterStore from '@/store/cluster/clusterStore';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 
 export default function AppInviteMember() {
 	const { t } = useTranslation();
@@ -16,6 +18,30 @@ export default function AppInviteMember() {
 	const { isInviteMemberOpen, closeInviteMemberDrawer, inviteUsersToApp } = useApplicationStore();
 	const { appRoles } = useTypeStore();
 	const { notify } = useToast();
+	const { canClusterSendEmail } = useClusterStore();
+	const canInvite = useAuthorizeOrg('invite.create');
+	function onSubmit(members: AppMemberRequest[], setError: (error: APIError) => void) {
+		inviteUsersToApp({
+			members: members.map((member) => ({
+				...member,
+				uiBaseURL: window.location.origin,
+			})),
+			uiBaseURL: window.location.origin,
+			onSuccess: () => {
+				setLoading(false);
+				closeInviteMemberDrawer();
+				notify({
+					title: t('general.success'),
+					description: t('general.invitation.success'),
+					type: 'success',
+				});
+			},
+			onError: (err) => {
+				setLoading(false);
+				setError(err);
+			},
+		});
+	}
 	return (
 		<Drawer open={isInviteMemberOpen} onOpenChange={closeInviteMemberDrawer}>
 			<DrawerContent position='right' size='lg'>
@@ -29,46 +55,32 @@ export default function AppInviteMember() {
 							<AlertDescription>{error.details}</AlertDescription>
 						</Alert>
 					)}
-					<div>
-						<h2 className='text-default text-sm font-semibold font-sfCompact'>
-							{t('application.invite_member.subTitle')}
-						</h2>
-						<p className='text-sm text-subtle font-sfCompact'>
-							{t('application.invite_member.description')}
-						</p>
-					</div>
-					<InviteMemberForm
+
+					{/* <InviteMemberForm
 						roles={appRoles}
-						submitForm={(val) => {
-							if (val.length) {
-								inviteUsersToApp({
-									members: val.map((m: { email: string; role: string }[]) => ({
-										...m,
-										uiBaseURL: window.location.origin,
-									})),
-									uiBaseUrl: window.location.origin,
-									onSuccess: () => {
-										setLoading(false);
-										closeInviteMemberDrawer();
-										notify({
-											title: t('general.success'),
-											description: t('general.invitation.success'),
-											type: 'success',
-										});
-									},
-									onError: (err) => {
-										setLoading(false);
-										setError(err);
-									},
-								});
-							}
-						}}
+						title={t('application.invite_member.subTitle') as string}
+						description={t('application.invite_member.description') as string}
+						submitForm={onSubmit}
 						actions={
 							<Button variant='primary' loading={loading}>
 								{t('application.edit.invite')}
 							</Button>
 						}
-					/>
+					/> */}
+					{canClusterSendEmail && (
+						<InviteMemberForm
+							submitForm={onSubmit}
+							roles={appRoles}
+							title={t('application.invite_member.subTitle') as string}
+							description={t('application.invite_member.description') as string}
+							actions={
+								<Button variant='primary' loading={loading}>
+									{t('application.edit.invite')}
+								</Button>
+							}
+							disabled={!canInvite}
+						/>
+					)}
 				</div>
 			</DrawerContent>
 		</Drawer>
