@@ -1,17 +1,13 @@
 import { TabLink } from '@/features/version/Tabs';
-import useAuthorizeApp from '@/hooks/useAuthorizeApp';
-import useApplicationStore from '@/store/app/applicationStore';
-import useAuthStore from '@/store/auth/authStore.ts';
 import useMiddlewareStore from '@/store/middleware/middlewareStore';
+import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, Middleware, TabTypes } from '@/types';
-import { translate } from '@/utils';
+import { notify, translate } from '@/utils';
 import { ActionsCell } from 'components/ActionsCell';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
-import { notify } from '@/utils';
 const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
 		id: 'select',
@@ -58,10 +54,11 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 				original: { createdAt, createdBy },
 			},
 		}) => {
-			const isMe = useAuthStore.getState().user?._id === createdBy;
-			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === createdBy);
 
-			return <DateText date={createdAt}>{avatar}</DateText>;
+			return <DateText date={createdAt} user={user} />;
 		},
 	},
 	{
@@ -77,9 +74,11 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 			},
 		}) => {
 			if (!updatedBy) return null;
-			const isMe = useAuthStore.getState().user?._id === updatedBy;
-			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
-			return <DateText date={updatedAt}>{avatar}</DateText>;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === updatedBy);
+
+			return <DateText date={updatedAt} user={user} />;
 		},
 	},
 	{
@@ -120,10 +119,9 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 			return (
 				<ActionsCell<Middleware>
 					original={original}
-					canDeleteKey='middleware.delete'
 					canEditKey='middleware.update'
 					onEdit={handleEdit}
-					type='version'
+					type='app'
 				>
 					<ConfirmTable onDelete={deleteHandler} />
 				</ActionsCell>
