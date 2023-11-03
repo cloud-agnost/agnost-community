@@ -14,6 +14,7 @@ import Task from './Task';
 import User from './User';
 import Version from './Version';
 import Typings from './Typings';
+import Middleware from './Middleware';
 export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 	const keys = {
 		user: User,
@@ -41,6 +42,7 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		'org.app.version.function': Function,
 		// TODO: "org.resource.log"
 		'org.app.version.typings': Typings,
+		'org.app.version.middleware': Middleware,
 	};
 	return new keys[type]();
 }
