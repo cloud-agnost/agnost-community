@@ -19,6 +19,7 @@ interface MiddlewareStore {
 	middleware: Middleware;
 	editMiddlewareDrawerIsOpen: boolean;
 	lastFetchedCount: number;
+	lastFetchedPage: number;
 }
 
 type Actions = {
@@ -38,6 +39,7 @@ const initialState: MiddlewareStore = {
 	middlewares: [],
 	middleware: {} as Middleware,
 	lastFetchedCount: 0,
+	lastFetchedPage: 0,
 	editMiddlewareDrawerIsOpen: false,
 };
 
@@ -70,7 +72,7 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 							lastFetchedCount: middlewares.length,
 						}));
 					}
-					set({ lastFetchedCount: middlewares.length });
+					set({ lastFetchedCount: middlewares.length, lastFetchedPage: params.page });
 					return middlewares;
 				},
 				getMiddlewareById: async (params: GetMiddlewareByIdParams) => {
@@ -119,11 +121,17 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 					}
 				},
 				saveMiddlewareCode: async (params: SaveMiddlewareCodeParams) => {
-					const middleware = await MiddlewareService.saveMiddlewareCode(params);
-					set((prev) => ({
-						middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
-					}));
-					return middleware;
+					try {
+						const middleware = await MiddlewareService.saveMiddlewareCode(params);
+						set((prev) => ({
+							middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
+						}));
+						if (params.onSuccess) params.onSuccess(middleware);
+						return middleware;
+					} catch (error) {
+						if (params.onError) params.onError(error as APIError);
+						throw error;
+					}
 				},
 				setEditMiddlewareDrawerIsOpen: (open: boolean) => set({ editMiddlewareDrawerIsOpen: open }),
 				setMiddleware: (middleware) => set({ middleware }),
