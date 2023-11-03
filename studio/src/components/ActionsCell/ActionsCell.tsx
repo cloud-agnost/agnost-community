@@ -4,15 +4,15 @@ import { Pencil } from '@/components/icons';
 import { Trash } from '@phosphor-icons/react';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '../Tooltip';
 import { useTranslation } from 'react-i18next';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 interface ActionCellProps<T> {
 	original: T;
-	type: 'org' | 'app' | 'version';
+	type: 'org' | 'app';
 	onEdit?: (item: T) => void;
 	onDelete?: (item: T) => void;
 	canEditKey: string;
 	canDeleteKey?: string;
 	children?: React.ReactNode;
-	disabled?: boolean;
 }
 
 function ActionsCell<T>({
@@ -23,18 +23,15 @@ function ActionsCell<T>({
 	canDeleteKey,
 	children,
 	type,
-	disabled,
 }: ActionCellProps<T>) {
 	const { t } = useTranslation();
 	const HAS_EDIT_PERMISSION: Record<string, boolean> = {
-		org: useAuthorizeVersion(canEditKey),
+		org: useAuthorizeOrg(canEditKey),
 		app: useAuthorizeVersion(canEditKey),
-		version: useAuthorizeVersion(canEditKey),
 	};
 	const HAS_DELETE_PERMISSION: Record<string, boolean> = {
-		org: useAuthorizeVersion(canDeleteKey as string),
+		org: useAuthorizeOrg(canDeleteKey as string),
 		app: useAuthorizeVersion(canDeleteKey as string),
-		version: useAuthorizeVersion(canDeleteKey as string),
 	};
 
 	return (
@@ -48,7 +45,7 @@ function ActionsCell<T>({
 							rounded
 							className='text-xl hover:bg-wrapper-background-hover text-icon-base'
 							onClick={() => onEdit?.(original)}
-							disabled={disabled && !HAS_EDIT_PERMISSION[type]}
+							disabled={!HAS_EDIT_PERMISSION[type]}
 						>
 							<Pencil />
 						</Button>
@@ -57,9 +54,7 @@ function ActionsCell<T>({
 				</Tooltip>
 			</TooltipProvider>
 
-			{children ? (
-				children
-			) : (
+			{children ?? (
 				<TooltipProvider>
 					<Tooltip>
 						<TooltipTrigger asChild>
@@ -69,7 +64,7 @@ function ActionsCell<T>({
 								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
 								iconOnly
 								onClick={() => onDelete?.(original)}
-								disabled={disabled && !HAS_DELETE_PERMISSION[type]}
+								disabled={!HAS_DELETE_PERMISSION[type]}
 							>
 								<Trash size={20} />
 							</Button>
