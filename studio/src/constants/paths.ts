@@ -99,7 +99,7 @@ export const PATHS = {
 		inviteTeamMembers: `${onboardingPath}/InviteTeamMembers.tsx`,
 		smtpConfiguration: `${onboardingPath}/SMTPConfiguration.tsx`,
 	},
-	redirectHandle: `${path}/RedirectHandle.tsx`,
+	redirectHandle: `${path}/redirect-handle/RedirectHandle.tsx`,
 	notFound: `${path}/errors/404.tsx`,
 	unauthorized: `${path}/errors/401.tsx`,
 };
