@@ -1,6 +1,7 @@
 import { MODULE_PAGE_SIZE, PAGE_SIZE } from '@/constants';
 import { AddMiddlewareDrawer } from '@/features/version/Middlewares';
 import MiddlewaresColumns from '@/features/version/Middlewares/MiddlewaresColumns.tsx';
+import { usePage, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
@@ -12,8 +13,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { usePage, useToast } from '@/hooks';
-import localforage from 'localforage';
 export default function MainMiddleware() {
 	const { notify } = useToast();
 	const [selectedRows, setSelectedRows] = useState<Row<Middleware>[]>();

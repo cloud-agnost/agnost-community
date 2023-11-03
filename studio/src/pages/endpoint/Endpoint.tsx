@@ -3,7 +3,7 @@ import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
 import { MODULE_PAGE_SIZE } from '@/constants';
 import { EndpointColumns } from '@/features/endpoints';
-import { useToast } from '@/hooks';
+import { usePage, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
@@ -23,11 +23,11 @@ interface OutletContext {
 
 export default function MainEndpoint() {
 	const [loading, setLoading] = useState(false);
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
+	const { page, incrementPage } = usePage();
 	const { notify } = useToast();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
-
 	const canCreate = useAuthorizeVersion('endpoint.create');
 	const { endpoints, lastFetchedCount, lastFetchedPage, getEndpoints, deleteMultipleEndpoints } =
 		useEndpointStore();
@@ -50,25 +50,20 @@ export default function MainEndpoint() {
 		});
 	}
 
-	function setPage(page: number) {
-		searchParams.set('p', page.toString());
-		setSearchParams(searchParams);
-	}
-
 	useEffect(() => {
-		if (versionId && orgId && appId && lastFetchedPage !== parseInt(searchParams.get('p') ?? '0')) {
+		if (versionId && orgId && appId) {
 			setLoading(true);
 			getEndpoints({
 				orgId,
 				appId,
 				versionId,
-				page: parseInt(searchParams.get('p') ?? '0'),
+				page,
 				size: MODULE_PAGE_SIZE,
 				search: searchParams.get('q') ?? undefined,
 			});
 			setLoading(false);
 		}
-	}, [searchParams.get('q'), searchParams.get('p')]);
+	}, [searchParams.get('q'), page]);
 
 	return (
 		<VersionTabLayout<Endpoint>
@@ -77,9 +72,7 @@ export default function MainEndpoint() {
 			createButtonTitle={t('endpoint.add')}
 			emptyStateTitle={t('endpoint.empty')}
 			isEmpty={!endpoints.length}
-			openCreateModal={() => {
-				setIsCreateModalOpen(true);
-			}}
+			openCreateModal={() => setIsCreateModalOpen(true)}
 			onMultipleDelete={deleteMultipleEndpointsHandler}
 			table={table}
 			selectedRowLength={selectedRows.length}
@@ -93,7 +86,7 @@ export default function MainEndpoint() {
 			<InfiniteScroll
 				scrollableTarget='version-layout'
 				dataLength={endpoints.length}
-				next={() => setPage(parseInt(searchParams.get('p') ?? '0') + 1)}
+				next={incrementPage}
 				hasMore={lastFetchedCount >= MODULE_PAGE_SIZE}
 				loader={loading && <TableLoading />}
 			>

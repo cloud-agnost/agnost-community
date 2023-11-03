@@ -2,6 +2,7 @@ export { default as useDebounce } from './useDebounce.tsx';
 export { default as useDebounceFn } from './useDebounceFn.tsx';
 export { default as useEditor } from './useEditor.tsx';
 export { default as useNavigatorColumns } from './useNavigatorColumns.tsx';
+export { default as usePage } from './usePage.tsx';
 export { default as useRealtime } from './useRealtime.tsx';
 export { default as useRenewToken } from './useRenewToken.tsx';
 export { default as useTabNavigate } from './useTabNavigate.tsx';
