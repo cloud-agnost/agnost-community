@@ -1,7 +1,6 @@
 import { Checkbox } from '@/components/Checkbox';
 import { ResendButton } from '@/components/ResendButton';
 import { TableConfirmation } from '@/components/Table';
-import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Invitation } from '@/types';
 import { formatDate, notify, translate } from '@/utils';
@@ -113,20 +112,14 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 							});
 						}}
 					/>
-					<ConfirmTable onDelete={onDelete} />
+					<TableConfirmation
+						title={translate('organization.settings.members.invite.delete')}
+						description={translate('organization.settings.members.invite.deleteDesc')}
+						onConfirm={onDelete}
+						permissionKey='invite.delete'
+					/>
 				</div>
 			);
 		},
 	},
 ];
-function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-	const hasAppPermission = useAuthorizeOrg('invite.delete');
-	return (
-		<TableConfirmation
-			title={translate('organization.settings.members.invite.delete')}
-			description={translate('organization.settings.members.invite.deleteDesc')}
-			onConfirm={onDelete}
-			disabled={!hasAppPermission}
-		/>
-	);
-}

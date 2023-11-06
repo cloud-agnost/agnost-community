@@ -122,7 +122,12 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 			return (
 				<div className='flex items-center justify-end'>
 					<Resend token={token} email={email} />
-					<TableConfirm token={token} />
+					<TableConfirmation
+						title={translate('organization.settings.members.invite.delete')}
+						description={translate('organization.settings.members.invite.deleteDesc')}
+						onConfirm={() => deleteInvitation(token)}
+						permissionKey='invite.delete'
+					/>
 				</div>
 			);
 		},
@@ -154,20 +159,5 @@ function Resend({ token, email }: { token: string; email: string }) {
 	});
 	return (
 		<ResendButton disabled={!hasAppPermission} onResend={() => resendInvitation(token, email)} />
-	);
-}
-
-function TableConfirm({ token }: { token: string }) {
-	const hasAppPermission = useAuthorizeApp({
-		key: 'invite.delete',
-		role,
-	});
-	return (
-		<TableConfirmation
-			title={translate('organization.settings.members.invite.delete')}
-			description={translate('organization.settings.members.invite.deleteDesc')}
-			onConfirm={() => deleteInvitation(token)}
-			disabled={!hasAppPermission}
-		/>
 	);
 }
