@@ -338,10 +338,8 @@ const useOrganizationStore = create<OrganizationStore & Actions>()(
 							const invitations = await OrganizationService.getOrganizationInvitations(req);
 							if (get().memberPage === 0) set({ invitations });
 							else set({ invitations: [...get().invitations, ...invitations] });
-							if (req.onSuccess) req.onSuccess();
 							return invitations;
 						} catch (error) {
-							if (req.onError) req.onError(error as APIError);
 							throw error as APIError;
 						}
 					},

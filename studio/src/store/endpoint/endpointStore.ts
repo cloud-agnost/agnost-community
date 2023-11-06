@@ -90,7 +90,6 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 				getEndpointById: async (params) => {
 					const endpoint = await EndpointService.getEndpointById(params);
 					set({ endpoint, editedLogic: endpoint.logic });
-
 					return endpoint;
 				},
 				getEndpoints: async (params) => {
