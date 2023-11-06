@@ -127,7 +127,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 					onEdit={() => openEditModal(original)}
 					canDeleteKey='queue.delete'
 					canEditKey='queue.edit'
-					type='version'
+					type='app'
 				/>
 			);
 		},

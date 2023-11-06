@@ -1,6 +1,5 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { TabLink } from '@/features/version/Tabs';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
 import { ColumnDefWithClassName, Model, TabTypes } from '@/types';
@@ -138,30 +137,23 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 						original={original}
 						onEdit={openEditDrawer}
 						canEditKey='model.update'
-						type='version'
+						type='app'
 					>
-						<ConfirmTable onDelete={deleteHandler} />
+						<TableConfirmation
+							align='end'
+							closeOnConfirm
+							showAvatar={false}
+							title={translate('database.models.delete.title')}
+							description={translate('database.models.delete.description')}
+							onConfirm={deleteHandler}
+							contentClassName='m-0'
+							permissionKey='model.delete'
+						/>
 					</ActionsCell>
 				</div>
 			);
 		},
 	},
 ];
-
-function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-	const hasAppPermission = useAuthorizeVersion('model.delete');
-	return (
-		<TableConfirmation
-			align='end'
-			closeOnConfirm
-			showAvatar={false}
-			title={translate('database.models.delete.title')}
-			description={translate('database.models.delete.description')}
-			onConfirm={onDelete}
-			contentClassName='m-0'
-			disabled={!hasAppPermission}
-		/>
-	);
-}
 
 export default ModelColumns;

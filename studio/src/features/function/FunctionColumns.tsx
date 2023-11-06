@@ -102,7 +102,7 @@ const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
 					original={original}
 					canDeleteKey='function.delete'
 					canEditKey='function.edit'
-					type='version'
+					type='app'
 				/>
 			);
 		},

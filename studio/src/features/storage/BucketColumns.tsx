@@ -125,7 +125,7 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
 						onClick={() =>
 							emptyBucket({
-								storageName: storage?.name as string,
+								storageName: storage?.name,
 								bucketName: original.name,
 								onSuccess: () => {
 									notify({
@@ -152,7 +152,7 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 						onEdit={() => openEditBucketDialog(original)}
 						canEditKey='storage.update'
 						canDeleteKey='storage.delete'
-						type='version'
+						type='app'
 					/>
 				</div>
 			);

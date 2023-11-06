@@ -1,7 +1,6 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { FIELD_ICON_MAP } from '@/constants';
 import { SubFields } from '@/features/database/models/fields/ListFields/index.ts';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
 import { ColumnDefWithClassName, Field } from '@/types';
@@ -245,29 +244,22 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 					canEditKey='model.update'
 					canDeleteKey='model.delete'
 					onEdit={openEditDrawer}
-					type='version'
+					type='app'
 				>
-					<ConfirmTable onDelete={deleteHandler} />
+					<TableConfirmation
+						align='end'
+						closeOnConfirm
+						showAvatar={false}
+						title={translate('database.fields.delete.title')}
+						description={translate('database.fields.delete.description')}
+						onConfirm={deleteHandler}
+						contentClassName='m-0'
+						permissionKey='model.delete'
+					/>
 				</ActionsCell>
 			);
 		},
 	},
 ];
-
-function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-	const hasAppPermission = useAuthorizeVersion('model.delete');
-	return (
-		<TableConfirmation
-			align='end'
-			closeOnConfirm
-			showAvatar={false}
-			title={translate('database.fields.delete.title')}
-			description={translate('database.fields.delete.description')}
-			onConfirm={onDelete}
-			contentClassName='m-0'
-			disabled={!hasAppPermission}
-		/>
-	);
-}
 
 export default FieldColumns;

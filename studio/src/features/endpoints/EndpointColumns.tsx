@@ -4,26 +4,24 @@ import { Checkbox } from '@/components/Checkbox';
 import { CopyButton } from '@/components/CopyButton';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
+import { TableConfirmation } from '@/components/Table';
 import { BADGE_COLOR_MAP, HTTP_METHOD_BADGE_MAP } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
+import useVersionStore from '@/store/version/versionStore';
 import { ColumnDefWithClassName, Endpoint, TabTypes } from '@/types';
 import { translate } from '@/utils';
 import { TabLink } from '../version/Tabs';
-import { TableConfirmation } from '@/components/Table';
-import useApplicationStore from '@/store/app/applicationStore';
-import useAuthorizeApp from '@/hooks/useAuthorizeApp';
-import useVersionStore from '@/store/version/versionStore';
 
 const { openEditEndpointDialog, deleteEndpoint } = useEndpointStore.getState();
 const { version } = useVersionStore.getState();
 function deleteEndpointHandler(toDeleteEndpoint: Endpoint) {
 	deleteEndpoint({
-		epId: toDeleteEndpoint?._id as string,
-		orgId: version?.orgId as string,
-		appId: version?.appId as string,
-		versionId: version?._id as string,
+		epId: toDeleteEndpoint?._id,
+		orgId: version?.orgId,
+		appId: version?.appId,
+		versionId: version?._id,
 	});
 }
 
@@ -57,7 +55,6 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { name, _id } = row.original;
-
 			return <TabLink name={name} path={`${_id}`} type={TabTypes.Endpoint} />;
 		},
 	},
@@ -174,7 +171,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 					original={row.original}
 					canEditKey='endpoint.update'
 					onEdit={() => openEditEndpointDialog(row.original)}
-					type='version'
+					type='app'
 				>
 					<TableConfirmation
 						align='end'

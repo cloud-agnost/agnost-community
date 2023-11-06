@@ -145,7 +145,7 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 					original={original}
 					canDeleteKey='task.delete'
 					canEditKey='task.edit'
-					type='version'
+					type='app'
 				/>
 			);
 		},

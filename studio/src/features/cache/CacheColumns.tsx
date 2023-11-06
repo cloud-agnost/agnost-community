@@ -150,7 +150,7 @@ const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 					onDelete={() => openDeleteCacheModal(original)}
 					canEditKey='cache.update'
 					canDeleteKey='cache.delete'
-					type='version'
+					type='app'
 				/>
 			);
 		},

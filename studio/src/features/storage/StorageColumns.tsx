@@ -131,7 +131,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 					onDelete={() => openDeleteStorageDialog(original)}
 					canEditKey='storage.update'
 					canDeleteKey='storage.delete'
-					type='version'
+					type='app'
 				/>
 			);
 		},

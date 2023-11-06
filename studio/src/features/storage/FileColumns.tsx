@@ -235,7 +235,7 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 						onEdit={() => openFileEditDialog(original)}
 						canEditKey='storage.update'
 						canDeleteKey='storage.delete'
-						type='version'
+						type='app'
 					/>
 				</div>
 			);

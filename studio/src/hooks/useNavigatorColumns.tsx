@@ -6,20 +6,18 @@ import {
 	BasicValueList,
 	BooleanField,
 	DateTime,
+	Enum,
 	GeoPoint,
 	Link,
 	Number,
 	Reference,
 	SubObject,
 	Text,
-	Enum,
 } from '@/features/database/models/Navigator';
 import Json from '@/features/database/models/Navigator/Json';
-import useApplicationStore from '@/store/app/applicationStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { ColumnDefWithClassName, Field } from '@/types';
 import { capitalize, cn, translate } from '@/utils';
-import useAuthorizeApp from './useAuthorizeApp';
 import { ElementType } from 'react';
 
 export default function useNavigatorColumns(fields: Field[]) {
@@ -91,9 +89,18 @@ export default function useNavigatorColumns(fields: Field[]) {
 						canDeleteKey='middleware.delete'
 						canEditKey='middleware.update'
 						onEdit={handleEdit}
-						type='version'
+						type='app'
 					>
-						<ConfirmTable onDelete={deleteHandler} />
+						<TableConfirmation
+							align='end'
+							closeOnConfirm
+							showAvatar={false}
+							title={translate('version.middleware.delete.title')}
+							description={translate('version.middleware.delete.message')}
+							onConfirm={deleteHandler}
+							contentClassName='m-0'
+							permissionKey='middleware.delete'
+						/>
 					</ActionsCell>
 				);
 			},
@@ -123,26 +130,6 @@ export default function useNavigatorColumns(fields: Field[]) {
 			},
 		});
 	});
-
-	function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-		const role = useApplicationStore.getState().role;
-		const hasAppPermission = useAuthorizeApp({
-			key: 'middleware.delete',
-			role,
-		});
-		return (
-			<TableConfirmation
-				align='end'
-				closeOnConfirm
-				showAvatar={false}
-				title={translate('version.middleware.delete.title')}
-				description={translate('version.middleware.delete.message')}
-				onConfirm={onDelete}
-				contentClassName='m-0'
-				disabled={!hasAppPermission}
-			/>
-		);
-	}
 
 	return NavigatorColumns;
 }

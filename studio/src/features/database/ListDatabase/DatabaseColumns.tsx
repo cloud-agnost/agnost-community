@@ -152,7 +152,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 						onEdit={openEditDrawer}
 						canDeleteKey='db.delete'
 						canEditKey='db.update'
-						type='version'
+						type='app'
 						disabled={!original.managed}
 					/>
 				</div>
