@@ -16,7 +16,7 @@ export type CreateMiddlewareParams = BaseParams &
 		name: string;
 	};
 
-export type UpdateMiddlewareParams = GetMiddlewareByIdParams & Partial<Middleware> & BaseRequest;
+export type UpdateMiddlewareParams = GetMiddlewareByIdParams & Partial<Middleware>;
 export type SaveMiddlewareCodeParams = GetMiddlewareByIdParams &
 	BaseRequest & {
 		logic: string;

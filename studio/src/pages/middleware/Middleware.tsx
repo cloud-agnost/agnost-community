@@ -1,18 +1,19 @@
 import { AddMiddlewareDrawer } from '@/features/version/Middlewares';
 import MiddlewaresColumns from '@/features/version/Middlewares/MiddlewaresColumns.tsx';
-import { useToast, useInfiniteScroll } from '@/hooks';
+import { useInfiniteScroll, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
 import { APIError, Middleware } from '@/types';
+import { useMutation } from '@tanstack/react-query';
 import { Row, Table } from '@tanstack/react-table';
 import { DataTable } from 'components/DataTable';
 import { TableLoading } from 'components/Table/Table.tsx';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+
 export default function MainMiddleware() {
 	const { notify } = useToast();
 	const [selectedRows, setSelectedRows] = useState<Row<Middleware>[]>();
@@ -25,7 +26,7 @@ export default function MainMiddleware() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 
-	const { fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteScroll({
+	const { fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteScroll({
 		queryFn: getMiddlewaresOfAppVersion,
 		lastFetchedPage,
 		dataLength: middlewares.length,
@@ -34,6 +35,7 @@ export default function MainMiddleware() {
 	const { mutateAsync: deleteMiddleware } = useMutation({
 		mutationFn: deleteMultipleMiddlewares,
 		onSuccess: () => {
+			if (!middlewares.length) refetch();
 			table?.toggleAllRowsSelected(false);
 		},
 		onError: (error: APIError) => {
@@ -54,9 +56,8 @@ export default function MainMiddleware() {
 			middlewareIds: rows?.map((row) => row._id) as string[],
 		});
 	}
-
 	return (
-		<>
+		<Fragment>
 			<VersionTabLayout<Middleware>
 				className='p-0'
 				type='middleware'
@@ -86,6 +87,6 @@ export default function MainMiddleware() {
 				</InfiniteScroll>
 			</VersionTabLayout>
 			<AddMiddlewareDrawer open={open} onOpenChange={setOpen} />
-		</>
+		</Fragment>
 	);
 }

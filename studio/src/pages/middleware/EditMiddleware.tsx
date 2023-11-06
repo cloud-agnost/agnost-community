@@ -14,8 +14,8 @@ EditMiddleware.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { getCurrentTab, updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
 	const { middleware, editedLogic } = useMiddlewareStore.getState();
 	if (middleware?._id === middlewareId) {
-		updateCurrentTab(versionId as string, {
-			...getCurrentTab(versionId as string),
+		updateCurrentTab(versionId, {
+			...getCurrentTab(versionId),
 			isDirty: middleware.logic !== editedLogic,
 		});
 		closeDeleteTabModal();
@@ -34,13 +34,8 @@ export default function EditMiddleware() {
 	const { notify } = useToast();
 	const { middlewareId, orgId, appId, versionId } = useParams() as Record<string, string>;
 	const canEdit = useAuthorizeVersion('middleware.update');
-	const {
-		saveMiddlewareCode,
-		setEditMiddlewareDrawerIsOpen,
-		middleware,
-		editedLogic,
-		setEditedLogic,
-	} = useMiddlewareStore();
+	const { saveMiddlewareCode, openEditMiddlewareDrawer, middleware, editedLogic, setEditedLogic } =
+		useMiddlewareStore();
 	const { t } = useTranslation();
 
 	const { mutate, isPending } = useMutation({
@@ -74,7 +69,7 @@ export default function EditMiddleware() {
 		mutate(logic);
 	}
 	function openEditDrawer() {
-		setEditMiddlewareDrawerIsOpen(true);
+		openEditMiddlewareDrawer(middleware);
 	}
 
 	const url = `/organization/${orgId}/apps/${appId}/version/${versionId}/middleware`;

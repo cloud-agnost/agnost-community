@@ -16,7 +16,7 @@ import { devtools } from 'zustand/middleware';
 interface MiddlewareStore {
 	middlewares: Middleware[];
 	middleware: Middleware;
-	editMiddlewareDrawerIsOpen: boolean;
+	isEditMiddlewareDrawerOpen: boolean;
 	lastFetchedCount: number;
 	lastFetchedPage: number;
 	editedLogic: string;
@@ -30,7 +30,8 @@ type Actions = {
 	createMiddleware: (params: CreateMiddlewareParams) => Promise<Middleware>;
 	updateMiddleware: (params: UpdateMiddlewareParams) => Promise<Middleware>;
 	saveMiddlewareCode: (params: SaveMiddlewareCodeParams) => Promise<Middleware>;
-	setEditMiddlewareDrawerIsOpen: (open: boolean) => void;
+	openEditMiddlewareDrawer: (middleware: Middleware) => void;
+	closeEditMiddlewareDrawer: () => void;
 	setEditedLogic: (logic: string) => void;
 	reset: () => void;
 };
@@ -40,7 +41,7 @@ const initialState: MiddlewareStore = {
 	middleware: {} as Middleware,
 	lastFetchedCount: 0,
 	lastFetchedPage: 1,
-	editMiddlewareDrawerIsOpen: false,
+	isEditMiddlewareDrawerOpen: false,
 	editedLogic: '',
 };
 
@@ -100,18 +101,11 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 			}));
 		},
 		updateMiddleware: async (params: UpdateMiddlewareParams) => {
-			try {
-				const middleware = await MiddlewareService.updateMiddleware(params);
-				set((prev) => ({
-					middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
-				}));
-				if (params.onSuccess) params.onSuccess(middleware);
-				return middleware;
-			} catch (e) {
-				const error = e as APIError;
-				if (params.onError) params.onError(error);
-				throw e;
-			}
+			const middleware = await MiddlewareService.updateMiddleware(params);
+			set((prev) => ({
+				middlewares: prev.middlewares.map((mw) => (mw._id === params.mwId ? middleware : mw)),
+			}));
+			return middleware;
 		},
 		saveMiddlewareCode: async (params: SaveMiddlewareCodeParams) => {
 			try {
@@ -128,9 +122,14 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 				throw error;
 			}
 		},
-		setEditMiddlewareDrawerIsOpen: (open: boolean) => set({ editMiddlewareDrawerIsOpen: open }),
 		setEditedLogic: (logic) => {
 			set({ editedLogic: logic });
+		},
+		openEditMiddlewareDrawer: (middleware) => {
+			set({ isEditMiddlewareDrawerOpen: true, middleware });
+		},
+		closeEditMiddlewareDrawer: () => {
+			set({ isEditMiddlewareDrawerOpen: false });
 		},
 		reset: () => set(initialState),
 	})),

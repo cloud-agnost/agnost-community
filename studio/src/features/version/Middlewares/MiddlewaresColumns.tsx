@@ -1,13 +1,45 @@
 import { TabLink } from '@/features/version/Tabs';
 import useMiddlewareStore from '@/store/middleware/middlewareStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { ColumnDefWithClassName, Middleware, TabTypes } from '@/types';
+import { APIError, ColumnDefWithClassName, Middleware, TabTypes } from '@/types';
 import { notify, translate } from '@/utils';
+import { QueryClient, useMutation } from '@tanstack/react-query';
 import { ActionsCell } from 'components/ActionsCell';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
+
+const { openEditMiddlewareDrawer, deleteMiddleware } = useMiddlewareStore.getState();
+const queryClient = new QueryClient();
+
+async function deleteHandler(mw: Middleware) {
+	queryClient
+		.getMutationCache()
+		.build(queryClient, {
+			mutationFn: deleteMiddleware,
+			onSuccess: () => {
+				notify({
+					title: translate('general.success'),
+					description: translate('version.middleware.delete.success'),
+					type: 'success',
+				});
+			},
+			onError: (error: APIError) => {
+				notify({
+					title: error.error,
+					description: error.details,
+					type: 'error',
+				});
+			},
+		})
+		.execute({
+			appId: mw.appId,
+			orgId: mw.orgId,
+			versionId: mw.versionId,
+			mwId: mw._id,
+		});
+}
 const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
 		id: 'select',
@@ -86,63 +118,27 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 		className: 'actions',
 		size: 45,
 		cell: ({ row: { original } }) => {
-			const { setMiddleware, setEditMiddlewareDrawerIsOpen, deleteMiddleware } =
-				useMiddlewareStore.getState();
-			function handleEdit() {
-				setMiddleware(original);
-				setEditMiddlewareDrawerIsOpen(true);
-			}
-
-			async function deleteHandler() {
-				deleteMiddleware({
-					appId: original.appId,
-					orgId: original.orgId,
-					versionId: original.versionId,
-					mwId: original._id,
-					onSuccess: () => {
-						notify({
-							title: translate('general.success'),
-							description: translate('version.middleware.delete.success'),
-							type: 'success',
-						});
-					},
-					onError: (error) => {
-						notify({
-							title: error.error,
-							description: error.details,
-							type: 'error',
-						});
-					},
-				});
-			}
-
 			return (
 				<ActionsCell<Middleware>
 					original={original}
 					canEditKey='middleware.update'
-					onEdit={handleEdit}
+					onEdit={() => openEditMiddlewareDrawer(original)}
 					type='app'
 				>
-					<ConfirmTable onDelete={deleteHandler} />
+					<TableConfirmation
+						align='end'
+						closeOnConfirm
+						showAvatar={false}
+						title={translate('version.middleware.delete.title')}
+						description={translate('version.middleware.delete.message')}
+						onConfirm={() => deleteHandler(original)}
+						contentClassName='m-0'
+						permissionKey='middleware.delete'
+					/>
 				</ActionsCell>
 			);
 		},
 	},
 ];
-
-function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-	return (
-		<TableConfirmation
-			align='end'
-			closeOnConfirm
-			showAvatar={false}
-			title={translate('version.middleware.delete.title')}
-			description={translate('version.middleware.delete.message')}
-			onConfirm={onDelete}
-			contentClassName='m-0'
-			permissionKey='middleware.delete'
-		/>
-	);
-}
 
 export default MiddlewaresColumns;
