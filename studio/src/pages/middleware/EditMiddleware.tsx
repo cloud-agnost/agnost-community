@@ -1,75 +1,82 @@
-import { useMemo, useState } from 'react';
-import { Middleware } from '@/types';
-import { LoaderFunctionArgs, useLoaderData, useParams } from 'react-router-dom';
-import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
+import { useToast } from '@/hooks';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
+import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
+import useTabStore from '@/store/version/tabStore';
+import { APIError } from '@/types';
+import { useMutation } from '@tanstack/react-query';
 import { BreadCrumbItem } from 'components/BreadCrumb';
 import { useTranslation } from 'react-i18next';
-import { useToast } from '@/hooks';
+import { LoaderFunctionArgs, useParams } from 'react-router-dom';
+
 EditMiddleware.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { middlewareId, orgId, appId, versionId } = params as Record<string, string>;
-	const res = await useMiddlewareStore.getState().getMiddlewareById({
+	const { getCurrentTab, updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
+	const { middleware, editedLogic } = useMiddlewareStore.getState();
+	if (middleware?._id === middlewareId) {
+		updateCurrentTab(versionId as string, {
+			...getCurrentTab(versionId as string),
+			isDirty: middleware.logic !== editedLogic,
+		});
+		closeDeleteTabModal();
+		return { middleware };
+	}
+	await useMiddlewareStore.getState().getMiddlewareById({
 		orgId,
 		appId,
 		versionId,
 		mwId: middlewareId,
 	});
-	return { middlewareFromApi: res };
+	return { props: {} };
 };
 
 export default function EditMiddleware() {
 	const { notify } = useToast();
-	const { middlewareFromApi } = useLoaderData() as { middlewareFromApi: Middleware };
 	const { middlewareId, orgId, appId, versionId } = useParams() as Record<string, string>;
-	const { saveMiddlewareCode, setEditMiddlewareDrawerIsOpen, middlewares } = useMiddlewareStore();
-	const [loading, setLoading] = useState(false);
-	const [middleware, setMiddleware] = useState<Middleware>(middlewareFromApi);
+	const canEdit = useAuthorizeVersion('middleware.update');
+	const {
+		saveMiddlewareCode,
+		setEditMiddlewareDrawerIsOpen,
+		middleware,
+		editedLogic,
+		setEditedLogic,
+	} = useMiddlewareStore();
 	const { t } = useTranslation();
-	const name = useMemo(() => {
-		return middlewares.find((mw) => mw._id === middlewareId)?.name;
-	}, [middlewares, middlewareId]);
 
-	async function saveLogic() {
-		if (!middleware?.logic) return;
-		try {
-			setLoading(true);
-			saveMiddlewareCode({
+	const { mutate, isPending } = useMutation({
+		mutationKey: ['saveMiddlewareCode'],
+		mutationFn: (logic: string) => {
+			return saveMiddlewareCode({
 				orgId,
 				appId,
 				versionId,
 				mwId: middlewareId,
-				logic: middleware?.logic,
-				onSuccess: () => {
-					notify({
-						title: t('general.success'),
-						description: t('version.middleware.edit.success'),
-						type: 'success',
-					});
-				},
-				onError: (error) => {
-					notify({
-						title: t('general.error'),
-						description: error.details,
-						type: 'error',
-					});
-				},
+				logic: logic ?? editedLogic,
 			});
-		} finally {
-			setLoading(false);
-		}
+		},
+		onSuccess: () => {
+			notify({
+				title: t('general.success'),
+				description: t('version.middleware.edit.success'),
+				type: 'success',
+			});
+		},
+		onError(error: APIError) {
+			notify({
+				title: t('general.error'),
+				description: error.details,
+				type: 'error',
+			});
+		},
+	});
+	async function saveLogic(logic: string) {
+		if (!editedLogic || !canEdit) return;
+		mutate(logic);
 	}
 	function openEditDrawer() {
 		setEditMiddlewareDrawerIsOpen(true);
-		setMiddleware(middleware);
 	}
 
-	function setLogic(logic?: string) {
-		if (!logic) return;
-		setMiddleware((prev) => {
-			if (!prev) return prev;
-			return { ...prev, logic };
-		});
-	}
 	const url = `/organization/${orgId}/apps/${appId}/version/${versionId}/middleware`;
 	const breadcrumbItems: BreadCrumbItem[] = [
 		{
@@ -77,21 +84,23 @@ export default function EditMiddleware() {
 			url,
 		},
 		{
-			name,
+			name: middleware.name,
 		},
 	];
+
 	return (
 		<VersionEditorLayout
 			className='p-0'
 			breadCrumbItems={breadcrumbItems}
 			onEditModalOpen={openEditDrawer}
 			onSaveLogic={saveLogic}
-			loading={loading}
-			logic={middleware?.logic}
-			setLogic={setLogic}
+			loading={isPending}
+			logic={editedLogic}
+			setLogic={setEditedLogic}
 			name={middlewareId}
+			canEdit={canEdit}
 		>
-			<span className='text-default text-xl'>{name}</span>
+			<span className='text-default text-xl'>{middleware.name}</span>
 		</VersionEditorLayout>
 	);
 }

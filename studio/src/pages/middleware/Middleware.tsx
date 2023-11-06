@@ -1,72 +1,60 @@
-import { MODULE_PAGE_SIZE, PAGE_SIZE } from '@/constants';
 import { AddMiddlewareDrawer } from '@/features/version/Middlewares';
 import MiddlewaresColumns from '@/features/version/Middlewares/MiddlewaresColumns.tsx';
-import { usePage, useToast } from '@/hooks';
+import { useToast, useInfiniteScroll } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
-import { Middleware } from '@/types';
+import { APIError, Middleware } from '@/types';
 import { Row, Table } from '@tanstack/react-table';
 import { DataTable } from 'components/DataTable';
 import { TableLoading } from 'components/Table/Table.tsx';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 export default function MainMiddleware() {
 	const { notify } = useToast();
 	const [selectedRows, setSelectedRows] = useState<Row<Middleware>[]>();
-	const {
-		getMiddlewaresOfAppVersion,
-		deleteMultipleMiddlewares,
-		middlewares,
-		lastFetchedCount,
-		lastFetchedPage,
-	} = useMiddlewareStore();
-	const { page, incrementPage } = usePage();
-	const [loading, setLoading] = useState(false);
+	const { getMiddlewaresOfAppVersion, deleteMultipleMiddlewares, lastFetchedPage, middlewares } =
+		useMiddlewareStore();
+
 	const [table, setTable] = useState<Table<Middleware>>();
 	const { orgId, appId, versionId } = useParams();
 	const canCreate = useAuthorizeVersion('middleware.create');
-
-	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 
+	const { fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteScroll({
+		queryFn: getMiddlewaresOfAppVersion,
+		lastFetchedPage,
+		dataLength: middlewares.length,
+	});
+
+	const { mutateAsync: deleteMiddleware } = useMutation({
+		mutationFn: deleteMultipleMiddlewares,
+		onSuccess: () => {
+			table?.toggleAllRowsSelected(false);
+		},
+		onError: (error: APIError) => {
+			notify({
+				title: error.error,
+				description: error.details,
+				type: 'error',
+			});
+		},
+	});
+
 	function deleteMultipleMiddlewaresHandler() {
 		const rows = selectedRows?.map((row) => row.original);
-		deleteMultipleMiddlewares({
+		deleteMiddleware({
 			orgId: orgId as string,
 			versionId: versionId as string,
 			appId: appId as string,
 			middlewareIds: rows?.map((row) => row._id) as string[],
-			onSuccess: () => {
-				table?.toggleAllRowsSelected(false);
-			},
-			onError: (error) => {
-				notify({
-					title: error.error,
-					description: error.details,
-					type: 'error',
-				});
-			},
 		});
 	}
 
-	useEffect(() => {
-		if (page === 0 || page > lastFetchedPage) {
-			setLoading(true);
-			getMiddlewaresOfAppVersion({
-				orgId: orgId as string,
-				versionId: versionId as string,
-				appId: appId as string,
-				page,
-				size: MODULE_PAGE_SIZE,
-				search: searchParams.get('q') as string,
-			});
-			setLoading(false);
-		}
-	}, [page, searchParams.get('q')]);
 	return (
 		<>
 			<VersionTabLayout<Middleware>
@@ -85,9 +73,9 @@ export default function MainMiddleware() {
 				<InfiniteScroll
 					scrollableTarget='version-layout'
 					dataLength={middlewares.length}
-					next={incrementPage}
-					hasMore={lastFetchedCount >= PAGE_SIZE}
-					loader={loading && <TableLoading />}
+					next={fetchNextPage}
+					hasMore={hasNextPage}
+					loader={isFetchingNextPage && <TableLoading />}
 				>
 					<DataTable<Middleware>
 						columns={MiddlewaresColumns}
