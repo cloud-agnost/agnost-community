@@ -1,7 +1,6 @@
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import useVersionStore from '@/store/version/versionStore';
-import { AppRoles } from '@/types';
 import { getAppPermission } from '@/utils';
 import { useMemo } from 'react';
 
