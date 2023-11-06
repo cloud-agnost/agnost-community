@@ -30,6 +30,7 @@ export default class Middleware extends RealtimeActions<MiddlewareType> {
 				return middleware;
 			}),
 			middleware: data,
+			editedLogic: data.logic,
 		});
 	}
 	create({ data }: RealtimeActionParams<MiddlewareType>): void {
