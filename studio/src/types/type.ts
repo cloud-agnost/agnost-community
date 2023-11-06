@@ -30,7 +30,7 @@ export const UserSchema = z.object({
 	rt: z.string(),
 });
 
-export type APIError = {
+export interface APIError {
 	error: string;
 	details: string;
 	code: string;
@@ -55,7 +55,7 @@ export type APIError = {
 			| 'phoneVerified';
 		type: 'text' | 'boolean' | 'datetime' | 'link' | 'encrypted-text' | 'array' | 'phone' | 'email';
 	}[];
-};
+}
 export type User = z.infer<typeof UserSchema>;
 
 export interface UserDataToRegister extends BaseRequest {
@@ -186,7 +186,7 @@ export interface Types {
 		type: string;
 	}[];
 }
-export interface BaseGetRequest extends BaseRequest {
+export interface BaseGetRequest {
 	page: number;
 	size: number;
 	sortBy?: string;
@@ -194,8 +194,8 @@ export interface BaseGetRequest extends BaseRequest {
 	start?: string;
 	end?: string;
 	search?: string;
-	initialFetch?: boolean;
 }
+export type GetModulesRequest = BaseGetRequest & BaseParams;
 
 export interface SortOption {
 	name: string;

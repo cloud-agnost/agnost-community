@@ -40,7 +40,6 @@ async function loader(params: LoaderFunctionArgs) {
 		if (token && !isAccepted) res = await useAuthStore.getState().acceptInvite(token as string);
 		return { token, isVerified, user: res?.user };
 	} catch (error) {
-		console.log('error', error);
 		if ((error as APIError).code === 'not_allowed') return redirect('/login');
 		else return { error, token, isVerified };
 	}
@@ -134,7 +133,6 @@ export default function CompleteAccountSetupVerifyEmail() {
 					password: data.password,
 				});
 			} else {
-				console.log('here', user);
 				await completeAccountSetup({
 					email: user?.loginProfiles[0].email,
 					token,

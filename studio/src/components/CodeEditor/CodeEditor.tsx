@@ -52,7 +52,6 @@ export default function CodeEditor({
 
 	useEffect(() => {
 		if (!isEmpty(globalThis.monaco) && defaultLanguage === 'javascript') {
-			console.log('adding libs');
 			addLibsToEditor(typings);
 		}
 	}, [globalThis.monaco, typings]);

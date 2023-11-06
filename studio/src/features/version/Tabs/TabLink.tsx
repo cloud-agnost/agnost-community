@@ -17,7 +17,6 @@ export default function TabLink({ className, name, path, onClick, type, ...props
 
 	function handleClickTabLink() {
 		onClick?.();
-		onClick?.();
 		navigate({
 			title: name,
 			path: `${pathname}/${path}`,
