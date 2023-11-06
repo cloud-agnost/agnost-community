@@ -1,9 +1,10 @@
 import { Button } from '@/components/Button';
 import { InfoModal } from '@/components/InfoModal';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
-import { Pencil, Warning } from '@/components/icons';
+import { Pencil } from '@/components/icons';
 import { OAUTH_ICON_MAP } from '@/constants';
 import useTypeStore from '@/store/types/typeStore';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { OAuthProvider, OAuthProviderTypes, VersionOAuthProvider } from '@/types';
 import { capitalize } from '@/utils';
@@ -18,7 +19,6 @@ import {
 import { useMemo, useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
 import AddProvider from './AddProvider';
-import useSettingsStore from '@/store/version/settingsStore';
 
 interface SelectProvider {
 	provider: OAuthProvider;
@@ -179,34 +179,7 @@ export default function SelectOAuthProviders() {
 				}
 				title={t('general.singleDelete')}
 				description={t('general.deleteDescription')}
-				icon={<Warning className='text-icon-danger w-20 h-20' />}
-				action={
-					<div className='flex  items-center justify-center gap-4'>
-						<Button
-							variant='text'
-							size='lg'
-							onClick={(e) => {
-								e.stopPropagation();
-								setOpenDeleteModal({
-									open: false,
-									toDeleteProvider: {} as VersionOAuthProvider,
-								});
-							}}
-						>
-							{t('general.cancel')}
-						</Button>
-						<Button
-							size='lg'
-							variant='primary'
-							onClick={(e) => {
-								e.stopPropagation();
-								handleDeleteOAuthConfig(openDeleteModal.toDeleteProvider);
-							}}
-						>
-							{t('general.ok')}
-						</Button>
-					</div>
-				}
+				onConfirm={() => handleDeleteOAuthConfig(openDeleteModal.toDeleteProvider)}
 			/>
 		</SettingsFormItem>
 	);

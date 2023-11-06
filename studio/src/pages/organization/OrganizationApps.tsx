@@ -175,35 +175,8 @@ export default function OrganizationApps() {
 				closeModal={closeLeaveModal}
 				title={t('application.leave.title')}
 				description={t('application.leave.description')}
-				icon={
-					<div className='bg-lighter p-7 rounded-full text-center'>
-						<Leave className='w-12 h-12 text-icon-base' />
-					</div>
-				}
-				action={
-					<div className='flex  items-center justify-center gap-4'>
-						<Button
-							variant='text'
-							size='lg'
-							onClick={(e) => {
-								e.stopPropagation();
-								closeLeaveModal();
-							}}
-						>
-							{t('general.cancel')}
-						</Button>
-						<Button
-							size='lg'
-							variant='primary'
-							onClick={(e) => {
-								e.stopPropagation();
-								leaveAppHandler();
-							}}
-						>
-							{t('general.ok')}
-						</Button>
-					</div>
-				}
+				onConfirm={leaveAppHandler}
+				icon={Leave}
 			/>
 		</div>
 	);

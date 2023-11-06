@@ -34,7 +34,7 @@ export function OrganizationDropdown() {
 	const { notify } = useToast();
 	function handleLeave() {
 		leaveOrganization({
-			organizationId: organization?._id as string,
+			organizationId: organization?._id,
 			onSuccess: () => {
 				notify({
 					title: t('organization.leave.success.title', {
@@ -146,21 +146,7 @@ export function OrganizationDropdown() {
 			<InfoModal
 				isOpen={openModal}
 				closeModal={() => setOpenModal(false)}
-				icon={
-					<Avatar size='3xl'>
-						<AvatarFallback color='#9B7B0866' />
-					</Avatar>
-				}
-				action={
-					<div className='flex  items-center justify-center gap-4'>
-						<Button variant='text' size='lg' onClick={() => setOpenModal(false)}>
-							{t('general.cancel')}
-						</Button>
-						<Button size='lg' variant='primary' onClick={handleLeave}>
-							{t('general.ok')}
-						</Button>
-					</div>
-				}
+				onConfirm={handleLeave}
 				title={t('organization.leave.main')}
 				description={t('organization.leave.description', {
 					name: organization?.name,
