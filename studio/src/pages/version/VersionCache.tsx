@@ -100,7 +100,6 @@ export default function VersionCache() {
 				emptyStateTitle={t('cache.empty_text')}
 				table={table}
 				selectedRowLength={selectedRows?.length}
-				onSearch={() => setPage(0)}
 				onMultipleDelete={deleteMultipleCachesHandler}
 				disabled={!canCreateCache}
 			>

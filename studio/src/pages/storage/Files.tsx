@@ -159,7 +159,6 @@ export default function Files() {
 			emptyStateTitle={t('storage.file.empty_text')}
 			table={table as Table<BucketFile>}
 			selectedRowLength={selectedRows?.length}
-			onSearch={() => setPage(1)}
 			onMultipleDelete={deleteMultipleFilesHandler}
 		>
 			{loading && (uploadProgress > 0 || uploadProgress < 100) && (

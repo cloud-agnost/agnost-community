@@ -107,7 +107,6 @@ export default function MainStorage() {
 			emptyStateTitle={t('storage.empty_text')}
 			table={table}
 			selectedRowLength={selectedRows?.length}
-			onSearch={() => setPage(0)}
 			onMultipleDelete={deleteMultipleStoragesHandler}
 			disabled={!canCreateStorages}
 		>

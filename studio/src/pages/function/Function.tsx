@@ -100,7 +100,6 @@ export default function MainFunction() {
 				setIsCreateModalOpen(true);
 			}}
 			onMultipleDelete={deleteMultipleFunctionsHandler}
-			onSearch={() => setPage(0)}
 			table={table}
 			selectedRowLength={selectedRows.length}
 			disabled={!canCreate}

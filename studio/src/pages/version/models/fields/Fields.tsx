@@ -123,7 +123,6 @@ export default function Fields() {
 					emptyStateTitle={t('database.fields.no_fields')}
 					table={table}
 					selectedRowLength={selectedRows?.length}
-					onSearch={() => {}}
 					disabled={!canMultiDelete}
 					onMultipleDelete={deleteHandler}
 				>

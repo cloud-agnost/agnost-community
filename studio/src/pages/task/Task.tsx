@@ -111,7 +111,6 @@ export default function MainTask() {
 				setIsCreateModalOpen(true);
 			}}
 			onMultipleDelete={deleteMultipleTasksHandler}
-			onSearch={() => setPage(0)}
 			table={table}
 			selectedRowLength={selectedRows.length}
 			disabled={!canEdit}

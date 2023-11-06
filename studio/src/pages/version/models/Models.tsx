@@ -75,7 +75,6 @@ export default function Models() {
 				emptyStateTitle={t('database.models.no_models')}
 				table={table}
 				selectedRowLength={selectedRows?.length}
-				onSearch={() => {}}
 				disabled={!canCreateModel}
 				onMultipleDelete={deleteAll}
 				handlerButton={
