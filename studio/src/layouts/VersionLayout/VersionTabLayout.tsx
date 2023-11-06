@@ -96,7 +96,6 @@ export default function VersionTabLayout<T>({
 					<SearchInput value={searchParams.get('q') ?? undefined} className='sm:w-[450px] flex-1' />
 					{selectedRowLength ? (
 						<SelectedRowButton
-							selectedRowLength={selectedRowLength}
 							table={table}
 							onDelete={() => onMultipleDelete?.()}
 							disabled={disabled}
