@@ -2,7 +2,7 @@ import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { InfoModal } from '@/components/InfoModal';
-import { Pencil, Warning } from '@/components/icons';
+import { Pencil } from '@/components/icons';
 import { useEditor } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
 import { cn } from '@/utils';
