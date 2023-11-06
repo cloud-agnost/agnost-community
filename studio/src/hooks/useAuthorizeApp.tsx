@@ -10,10 +10,7 @@ interface Props {
 
 export default function useAuthorizeApp({ role, key }: Props) {
 	const apps = useApplicationStore((state) => state.applications);
-	const hasPermission = React.useMemo(
-		() => getAppPermission(role as AppRoles, `app.${key}`),
-		[role, apps],
-	);
+	const hasPermission = React.useMemo(() => getAppPermission(`${role}.app.${key}`), [role, apps]);
 
 	return hasPermission as boolean;
 }
