@@ -14,7 +14,7 @@ import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { TabTypes } from '@/types';
 import { capitalize, generateId } from '@/utils';
-import { BookBookmark, FileJs, Code, HardDrives, Key } from '@phosphor-icons/react';
+import { BookBookmark, Code, FileJs, Key } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
 import { Link, LoaderFunctionArgs } from 'react-router-dom';
 VersionDashboard.loader = async ({ params }: LoaderFunctionArgs) => {
