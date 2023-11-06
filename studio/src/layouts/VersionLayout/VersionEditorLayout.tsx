@@ -9,7 +9,6 @@ import { cn } from '@/utils';
 import { FloppyDisk, TestTube } from '@phosphor-icons/react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeepAlive } from 'react-keep-alive';
 import { useLocation, useParams } from 'react-router-dom';
 interface VersionEditorLayoutProps {
 	children: React.ReactNode;
@@ -18,10 +17,11 @@ interface VersionEditorLayoutProps {
 	logic?: string;
 	breadCrumbItems?: BreadCrumbItem[];
 	name: string;
-	onSaveLogic: (logic?: string) => void;
+	canEdit: boolean;
+	onSaveLogic: (logic: string) => void;
 	onTestModalOpen?: () => void;
 	onEditModalOpen: () => void;
-	setLogic: (logic: string | undefined) => void;
+	setLogic: (logic: string) => void;
 }
 
 const initBeforeUnLoad = (showExitPrompt: boolean) => {
@@ -49,6 +49,7 @@ export default function VersionEditorLayout({
 	setLogic,
 	className,
 	name,
+	canEdit,
 }: VersionEditorLayoutProps) {
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
@@ -71,6 +72,7 @@ export default function VersionEditorLayout({
 	useEffect(() => {
 		initBeforeUnLoad(tab.isDirty as boolean);
 	}, [tab.isDirty]);
+
 	return (
 		<div className={cn('space-y-6 h-full', className)}>
 			<div className='flex items-center gap-4'>
@@ -84,7 +86,7 @@ export default function VersionEditorLayout({
 			<div className='flex items-center justify-between'>
 				{children}
 				<div className='flex items-center gap-4'>
-					<Button variant='secondary' onClick={onEditModalOpen}>
+					<Button variant='secondary' onClick={onEditModalOpen} disabled={!canEdit}>
 						<Pencil className='text-icon-default w-5 h-5 mr-2' />
 						{t('general.edit')}
 					</Button>
@@ -95,51 +97,41 @@ export default function VersionEditorLayout({
 							{t('endpoint.test.test')}
 						</Button>
 					)}
-					<Button variant='primary' onClick={() => handleSaveLogic()} loading={loading}>
+					<Button
+						variant='primary'
+						onClick={() => handleSaveLogic()}
+						loading={loading}
+						disabled={!canEdit}
+					>
 						<FloppyDisk size={20} className='text-icon-default mr-2' />
 						{t('general.save')}
 					</Button>
 				</div>
 			</div>
-			{/*  //eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore */}
-			<KeepAlive name={name} key={name}>
-				<CodeEditor
-					className='h-full'
-					containerClassName='h-[88%]'
-					value={logic}
-					onChange={setLogic}
-					onSave={onSaveLogic}
-					name={name}
-				/>
-			</KeepAlive>
+
+			<CodeEditor
+				className='h-full'
+				containerClassName='h-[88%]'
+				value={logic}
+				onChange={(val) => setLogic(val as string)}
+				onSave={(val) => onSaveLogic(val as string)}
+				name={name}
+			/>
 			<InfoModal
 				isOpen={isDeleteTabModalOpen}
 				closeModal={closeDeleteTabModal}
-				icon={<Warning className='text-icon-danger w-20 h-20' />}
+				onConfirm={() => removeTab(versionId as string, toDeleteTab.id)}
 				action={
-					<div className='flex items-center justify-center gap-4'>
-						<Button variant='text' size='lg' onClick={closeDeleteTabModal}>
-							{t('general.cancel')}
-						</Button>
-						<Button
-							variant='secondary'
-							size='lg'
-							onClick={() => {
-								removeTab(versionId as string, toDeleteTab.id);
-								handleSaveLogic();
-							}}
-						>
-							{t('general.save_and_close')}
-						</Button>
-						<Button
-							size='lg'
-							variant='primary'
-							onClick={() => removeTab(versionId as string, toDeleteTab.id)}
-						>
-							{t('general.ok')}
-						</Button>
-					</div>
+					<Button
+						variant='secondary'
+						size='lg'
+						onClick={() => {
+							removeTab(versionId as string, toDeleteTab.id);
+							handleSaveLogic();
+						}}
+					>
+						{t('general.save_and_close')}
+					</Button>
 				}
 				title={t('general.tab_close_title')}
 				description={t('general.tab_close_description')}
