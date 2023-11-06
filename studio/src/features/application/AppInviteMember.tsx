@@ -14,7 +14,7 @@ import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 export default function AppInviteMember() {
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<APIError>();
+	const [error] = useState<APIError>();
 	const { isInviteMemberOpen, closeInviteMemberDrawer, inviteUsersToApp } = useApplicationStore();
 	const { appRoles } = useTypeStore();
 	const { notify } = useToast();
@@ -56,17 +56,6 @@ export default function AppInviteMember() {
 						</Alert>
 					)}
 
-					{/* <InviteMemberForm
-						roles={appRoles}
-						title={t('application.invite_member.subTitle') as string}
-						description={t('application.invite_member.description') as string}
-						submitForm={onSubmit}
-						actions={
-							<Button variant='primary' loading={loading}>
-								{t('application.edit.invite')}
-							</Button>
-						}
-					/> */}
 					{canClusterSendEmail && (
 						<InviteMemberForm
 							submitForm={onSubmit}
