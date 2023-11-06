@@ -8,11 +8,12 @@ import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 interface ActionCellProps<T> {
 	original: T;
 	type: 'org' | 'app';
-	onEdit?: (item: T) => void;
-	onDelete?: (item: T) => void;
 	canEditKey: string;
 	canDeleteKey?: string;
 	children?: React.ReactNode;
+	disabled?: boolean;
+	onEdit?: (item: T) => void;
+	onDelete?: (item: T) => void;
 }
 
 function ActionsCell<T>({
@@ -23,6 +24,7 @@ function ActionsCell<T>({
 	canDeleteKey,
 	children,
 	type,
+	disabled,
 }: ActionCellProps<T>) {
 	const { t } = useTranslation();
 	const HAS_EDIT_PERMISSION: Record<string, boolean> = {
@@ -45,7 +47,7 @@ function ActionsCell<T>({
 							rounded
 							className='text-xl hover:bg-wrapper-background-hover text-icon-base'
 							onClick={() => onEdit?.(original)}
-							disabled={!HAS_EDIT_PERMISSION[type]}
+							disabled={disabled ?? !HAS_EDIT_PERMISSION[type]}
 						>
 							<Pencil />
 						</Button>
@@ -64,7 +66,7 @@ function ActionsCell<T>({
 								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
 								iconOnly
 								onClick={() => onDelete?.(original)}
-								disabled={!HAS_DELETE_PERMISSION[type]}
+								disabled={disabled ?? !HAS_DELETE_PERMISSION[type]}
 							>
 								<Trash size={20} />
 							</Button>
