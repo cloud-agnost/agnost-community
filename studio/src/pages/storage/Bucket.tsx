@@ -8,7 +8,7 @@ import { useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useApplicationStore from '@/store/app/applicationStore';
 import useStorageStore from '@/store/storage/storageStore';
-import { APIError, AppRoles, Bucket } from '@/types';
+import { APIError, Bucket } from '@/types';
 import { getAppPermission } from '@/utils';
 import { Row, Table } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
@@ -40,7 +40,7 @@ Buckets.loader = async ({ params }: LoaderFunctionArgs) => {
 		useStorageStore.setState({ storage: selectedStorage });
 	}
 
-	const permission = getAppPermission(role as AppRoles, 'app.storage.viewData');
+	const permission = getAppPermission(`${role}.app.storage.viewData`);
 
 	if (!permission) {
 		return redirect('/404');
@@ -152,7 +152,6 @@ export default function Buckets() {
 			emptyStateTitle={t('storage.bucket.empty_text')}
 			table={bucketTable}
 			selectedRowLength={selectedBuckets?.length}
-			onSearch={() => setBucketPage(1)}
 			onMultipleDelete={deleteMultipleBucketsHandler}
 			breadCrumb={<BreadCrumb goBackLink={storageUrl} items={breadcrumbItems} />}
 		>
