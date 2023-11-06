@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useParams, useSearchParams } from 'react-router-dom';
 
 import useTabStore from '@/store/version/tabStore';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { endpointId, orgId, versionId, appId } = params;
 	if (!endpointId) return null;
@@ -31,7 +32,7 @@ EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 		orgId: orgId as string,
 		appId: appId as string,
 		versionId: versionId as string,
-		epId: endpointId as string,
+		epId: endpointId,
 	});
 	return { endpoint: ep };
 };
@@ -39,6 +40,7 @@ EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 export default function EditEndpoint() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
+	const canEdit = useAuthorizeVersion('endpoint.update');
 	const { saveEndpointLogic, openEditEndpointDialog, endpoint, editedLogic, setEditedLogic } =
 		useEndpointStore();
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -81,11 +83,12 @@ export default function EditEndpoint() {
 		<VersionEditorLayout
 			onEditModalOpen={() => openEditEndpointDialog(endpoint)}
 			onTestModalOpen={() => setIsTestEndpointOpen(true)}
-			onSaveLogic={(value) => saveLogic(value as string)}
-			setLogic={(value) => setEditedLogic(value as string)}
+			onSaveLogic={saveLogic}
+			setLogic={setEditedLogic}
 			loading={loading}
 			logic={editedLogic}
 			name={endpoint?._id}
+			canEdit={canEdit}
 			breadCrumbItems={[
 				{
 					name: t('endpoint.title').toString(),

@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useParams } from 'react-router-dom';
 import useTabStore from '@/store/version/tabStore';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 EditTask.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { taskId, orgId, versionId, appId } = params;
 	if (!taskId) return null;
@@ -29,7 +30,7 @@ EditTask.loader = async ({ params }: LoaderFunctionArgs) => {
 		orgId: orgId as string,
 		appId: appId as string,
 		versionId: versionId as string,
-		taskId: taskId as string,
+		taskId,
 	});
 
 	return { props: {} };
@@ -38,6 +39,7 @@ EditTask.loader = async ({ params }: LoaderFunctionArgs) => {
 export default function EditTask() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
+	const canEdit = useAuthorizeVersion('task.update');
 	const { task, saveTaskLogic, openEditTaskModal, editedLogic, setEditedLogic } = useTaskStore();
 	const [loading, setLoading] = useState(false);
 	const [isTestTaskOpen, setIsTestTaskOpen] = useState(false);
@@ -79,11 +81,12 @@ export default function EditTask() {
 		<VersionEditorLayout
 			onEditModalOpen={() => openEditTaskModal(task)}
 			onTestModalOpen={() => setIsTestTaskOpen(true)}
-			onSaveLogic={(value) => saveLogic(value as string)}
+			onSaveLogic={saveLogic}
 			loading={loading}
 			logic={editedLogic}
-			setLogic={(value) => setEditedLogic(value as string)}
+			setLogic={setEditedLogic}
 			name={task._id}
+			canEdit={canEdit}
 			breadCrumbItems={[
 				{
 					name: t('task.title').toString(),
