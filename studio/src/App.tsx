@@ -3,14 +3,15 @@ import '@/i18n/config';
 import { router } from '@/router';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useTypeStore from '@/store/types/typeStore.ts';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import _ from 'lodash';
 import { useEffect } from 'react';
-import { Provider } from 'react-keep-alive';
 import { RouterProvider } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import useThemeStore from './store/theme/themeStore';
-import _ from 'lodash';
 
+const queryClient = new QueryClient();
 function App() {
 	useRenewToken(2);
 	useRealtime();
@@ -34,8 +35,9 @@ function App() {
 		document.body.dataset.mode = systemTheme;
 		document.body.classList.add(systemTheme);
 	}, [theme]);
+
 	return (
-		<Provider>
+		<QueryClientProvider client={queryClient}>
 			<RouterProvider router={router} />
 			<ToastContainer
 				transition={Slide}
@@ -50,7 +52,7 @@ function App() {
 				pauseOnHover
 				theme='dark'
 			/>
-		</Provider>
+		</QueryClientProvider>
 	);
 }
 
