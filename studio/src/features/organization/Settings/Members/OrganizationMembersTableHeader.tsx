@@ -130,7 +130,6 @@ export default function OrganizationMembersTableHeader() {
 			{selectedRows?.length && (
 				<SelectedRowButton<OrganizationMember>
 					onDelete={deleteMulti}
-					selectedRowLength={selectedRows?.length}
 					disabled={!canMultipleDelete}
 				/>
 			)}

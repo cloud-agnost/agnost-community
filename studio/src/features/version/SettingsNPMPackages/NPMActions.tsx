@@ -31,12 +31,7 @@ export default function NPMActions({ selectedRows, table, setSelectedRows }: NPM
 	return (
 		<div className='flex gap-4'>
 			{!!selectedRows?.length && (
-				<SelectedRowButton
-					table={table}
-					onDelete={deleteHandler}
-					selectedRowLength={selectedRows?.length}
-					disabled={!canDeleteMultiple}
-				/>
+				<SelectedRowButton table={table} onDelete={deleteHandler} disabled={!canDeleteMultiple} />
 			)}
 			<AddNPMPackagesButton />
 		</div>

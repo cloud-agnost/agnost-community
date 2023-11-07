@@ -127,7 +127,6 @@ function AppInvitationFilter({ selectedRows, table }: Props) {
 			{!!selectedRows?.length && (
 				<SelectedRowButton<Invitation>
 					onDelete={deleteInvitations}
-					selectedRowLength={selectedRows?.length}
 					table={table}
 					disabled={!canMultiDeleteInvite}
 				/>

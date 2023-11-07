@@ -38,7 +38,6 @@ export default function RateLimitsActions({
 				<SelectedRowButton<RateLimit>
 					table={table}
 					onDelete={deleteHandler}
-					selectedRowLength={selectedRows?.length}
 					disabled={!canDeleteMultiple}
 				/>
 			)}

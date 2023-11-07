@@ -55,7 +55,6 @@ export default function MainAppMembers() {
 					{!!selectedRows?.length && (
 						<SelectedRowButton<ApplicationMember>
 							onDelete={removeMultipleMembers}
-							selectedRowLength={selectedRows?.length}
 							table={table as Table<ApplicationMember>}
 							disabled={!canMultiDelete}
 						/>

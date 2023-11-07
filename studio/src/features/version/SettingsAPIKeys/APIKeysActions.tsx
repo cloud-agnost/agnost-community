@@ -39,7 +39,6 @@ export default function APIKeysActions({
 				<SelectedRowButton<APIKey>
 					table={table}
 					onDelete={onDelete}
-					selectedRowLength={selectedRows?.length}
 					disabled={!canDeleteMultiple}
 				/>
 			)}

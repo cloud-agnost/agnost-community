@@ -38,7 +38,6 @@ export default function VariableActions({
 				<SelectedRowButton<Param>
 					table={table}
 					onDelete={onDelete}
-					selectedRowLength={selectedRows?.length}
 					disabled={!canDeleteMultiple}
 				/>
 			)}
