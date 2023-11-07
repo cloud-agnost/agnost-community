@@ -18,7 +18,6 @@ interface Props<T> {
 	emptyStateTitle: string;
 	createButtonTitle?: string | null;
 	children: ReactNode;
-	selectedRowLength?: number;
 	disabled?: boolean;
 	className?: string;
 	breadCrumb?: ReactNode;
@@ -33,7 +32,6 @@ export default function VersionTabLayout<T>({
 	type,
 	breadCrumb,
 	table,
-	selectedRowLength,
 	title,
 	emptyStateTitle,
 	createButtonTitle,
@@ -94,7 +92,7 @@ export default function VersionTabLayout<T>({
 				<h1 className='text-default text-2xl text-center'>{title}</h1>
 				<div className='flex items-center justify-center gap-4'>
 					<SearchInput value={searchParams.get('q') ?? undefined} className='sm:w-[450px] flex-1' />
-					{selectedRowLength ? (
+					{table?.getSelectedRowModel().rows.length ? (
 						<SelectedRowButton
 							table={table}
 							onDelete={() => onMultipleDelete?.()}

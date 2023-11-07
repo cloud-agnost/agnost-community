@@ -64,7 +64,6 @@ export default function MainFunction() {
 				openCreateModal={() => setIsCreateModalOpen(true)}
 				onMultipleDelete={deleteMultipleFunctionsHandler}
 				table={table}
-				selectedRowLength={selectedRows.length}
 				disabled={!canCreate}
 			>
 				<InfiniteScroll

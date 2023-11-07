@@ -68,7 +68,6 @@ export default function MainMiddleware() {
 				openCreateModal={() => setOpen(true)}
 				onMultipleDelete={deleteMultipleMiddlewaresHandler}
 				table={table}
-				selectedRowLength={selectedRows?.length}
 				disabled={!canCreate}
 			>
 				<InfiniteScroll

@@ -110,7 +110,6 @@ export default function MainMessageQueue() {
 			createButtonTitle={t('queue.create.title')}
 			emptyStateTitle={t('queue.empty_text')}
 			table={table}
-			selectedRowLength={selectedRows?.length}
 			onMultipleDelete={deleteMultipleQueuesHandler}
 			disabled={!canEdit}
 			handlerButton={

@@ -111,7 +111,6 @@ export default function Navigator() {
 			type='field'
 			emptyStateTitle={t('database.fields.no_fields')}
 			table={table}
-			selectedRowLength={selectedRows?.length}
 			disabled={!canMultiDelete}
 			onMultipleDelete={deleteHandler}
 			breadCrumb={<BreadCrumb goBackLink={dbUrl} items={breadcrumbItems} />}

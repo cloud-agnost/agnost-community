@@ -158,7 +158,6 @@ export default function Files() {
 			createButtonTitle={t('storage.file.upload')}
 			emptyStateTitle={t('storage.file.empty_text')}
 			table={table as Table<BucketFile>}
-			selectedRowLength={selectedRows?.length}
 			onMultipleDelete={deleteMultipleFilesHandler}
 		>
 			{loading && (uploadProgress > 0 || uploadProgress < 100) && (

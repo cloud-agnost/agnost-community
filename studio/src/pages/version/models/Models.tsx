@@ -74,7 +74,6 @@ export default function Models() {
 				createButtonTitle={t('database.models.create')}
 				emptyStateTitle={t('database.models.no_models')}
 				table={table}
-				selectedRowLength={selectedRows?.length}
 				disabled={!canCreateModel}
 				onMultipleDelete={deleteAll}
 				handlerButton={

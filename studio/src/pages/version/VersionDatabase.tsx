@@ -78,8 +78,6 @@ export default function VersionDatabase() {
 				createButtonTitle={t('database.add.title')}
 				emptyStateTitle={t('database.empty_text')}
 				table={table}
-				selectedRowLength={selectedRows?.length}
-				onSearch={() => setPage(0)}
 				disabled={!canEdit}
 			>
 				<DataTable<Database>

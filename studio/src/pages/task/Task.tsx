@@ -112,7 +112,6 @@ export default function MainTask() {
 			}}
 			onMultipleDelete={deleteMultipleTasksHandler}
 			table={table}
-			selectedRowLength={selectedRows.length}
 			disabled={!canEdit}
 		>
 			<InfiniteScroll

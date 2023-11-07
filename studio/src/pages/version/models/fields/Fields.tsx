@@ -122,7 +122,6 @@ export default function Fields() {
 					handlerButton={<CreateFieldButton />}
 					emptyStateTitle={t('database.fields.no_fields')}
 					table={table}
-					selectedRowLength={selectedRows?.length}
 					disabled={!canMultiDelete}
 					onMultipleDelete={deleteHandler}
 				>

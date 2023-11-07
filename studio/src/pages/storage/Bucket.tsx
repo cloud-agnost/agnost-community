@@ -151,7 +151,6 @@ export default function Buckets() {
 			createButtonTitle={t('storage.bucket.create')}
 			emptyStateTitle={t('storage.bucket.empty_text')}
 			table={bucketTable}
-			selectedRowLength={selectedBuckets?.length}
 			onMultipleDelete={deleteMultipleBucketsHandler}
 			breadCrumb={<BreadCrumb goBackLink={storageUrl} items={breadcrumbItems} />}
 		>

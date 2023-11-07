@@ -106,7 +106,6 @@ export default function MainStorage() {
 			createButtonTitle={t('storage.create')}
 			emptyStateTitle={t('storage.empty_text')}
 			table={table}
-			selectedRowLength={selectedRows?.length}
 			onMultipleDelete={deleteMultipleStoragesHandler}
 			disabled={!canCreateStorages}
 		>

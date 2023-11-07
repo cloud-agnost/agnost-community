@@ -99,7 +99,6 @@ export default function VersionCache() {
 				createButtonTitle={t('cache.create')}
 				emptyStateTitle={t('cache.empty_text')}
 				table={table}
-				selectedRowLength={selectedRows?.length}
 				onMultipleDelete={deleteMultipleCachesHandler}
 				disabled={!canCreateCache}
 			>
