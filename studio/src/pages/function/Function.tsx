@@ -52,6 +52,7 @@ export default function MainFunction() {
 		queryFn: getFunctionsOfAppVersion,
 		dataLength: functions.length,
 		lastFetchedPage,
+		queryKey: 'functions',
 	});
 
 	return (

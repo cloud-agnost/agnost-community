@@ -30,6 +30,7 @@ export default function MainMiddleware() {
 		queryFn: getMiddlewaresOfAppVersion,
 		lastFetchedPage,
 		dataLength: middlewares.length,
+		queryKey: 'middlewares',
 	});
 
 	const { mutateAsync: deleteMiddleware } = useMutation({

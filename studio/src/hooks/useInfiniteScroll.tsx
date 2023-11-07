@@ -8,17 +8,19 @@ interface UseFetchDataProps {
 	queryFn: (params: BaseGetRequest & BaseParams) => Promise<any>;
 	lastFetchedPage: number;
 	dataLength: number;
+	queryKey: string;
 }
 export default function useInfiniteScroll({
 	queryFn,
 	lastFetchedPage,
 	dataLength,
+	queryKey,
 }: UseFetchDataProps) {
 	const [searchParams] = useSearchParams();
 	const { orgId, appId, versionId } = useParams();
 
 	const result = useInfiniteQuery({
-		queryKey: ['middlewares'],
+		queryKey: [queryKey],
 		initialPageParam: 0,
 		queryFn: ({ pageParam }) =>
 			queryFn({
