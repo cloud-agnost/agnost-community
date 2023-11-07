@@ -3,7 +3,7 @@ import useMiddlewareStore from '@/store/middleware/middlewareStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError, ColumnDefWithClassName, Middleware, TabTypes } from '@/types';
 import { notify, translate } from '@/utils';
-import { QueryClient, useMutation } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
 import { ActionsCell } from 'components/ActionsCell';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
@@ -18,13 +18,6 @@ async function deleteHandler(mw: Middleware) {
 		.getMutationCache()
 		.build(queryClient, {
 			mutationFn: deleteMiddleware,
-			onSuccess: () => {
-				notify({
-					title: translate('general.success'),
-					description: translate('version.middleware.delete.success'),
-					type: 'success',
-				});
-			},
 			onError: (error: APIError) => {
 				notify({
 					title: error.error,
