@@ -87,7 +87,7 @@ router.post(
 			sendMessage(resource._id, {
 				actor: null,
 				action: "telemetry",
-				object: "resource",
+				object: "org.resource",
 				description: t("Resource status updated to '%s'", status.status),
 				timestamp: Date.now(),
 				data: updatedResource,
