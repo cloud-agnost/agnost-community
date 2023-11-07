@@ -1,20 +1,21 @@
 import { RealtimeObjectTypes } from '@/types';
 import Application from './Application';
+import Cache from './Cache';
 import Database from './Database';
 import Endpoint from './Endpoint';
 import Environment from './Environment';
 import Field from './Field';
 import Function from './Function';
+import Middleware from './Middleware';
 import Model from './Model';
 import Organization from './Organization';
 import Queue from './Queue';
 import Resource from './Resources';
 import Storage from './Storage';
 import Task from './Task';
+import Typings from './Typings';
 import User from './User';
 import Version from './Version';
-import Typings from './Typings';
-import Middleware from './Middleware';
 export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 	const keys = {
 		user: User,
