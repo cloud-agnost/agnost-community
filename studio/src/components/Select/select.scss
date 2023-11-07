@@ -1,12 +1,11 @@
 .select {
 	@apply flex h-9 items-center justify-between text-default;
-	@apply rounded-md border border-input-border bg-transparent;
+	@apply rounded appearance-none border border-input-border hover:border-input-hover;
 	@apply px-3 py-2 text-sm ring-offset-button-primary;
-	@apply placeholder:text-subtle focus:outline-none;
-	@apply focus:border-button-primary;
+	@apply placeholder:text-subtle placeholder:text-sm focus:outline-none;
+	@apply focus:border-input-focus focus:outline-none focus:ring-0;
 	@apply truncate max-w-[calc(100%)];
-	@apply border-input-disabled-border disabled:text-subtle;
-	@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border disabled:cursor-not-allowed;
+	@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border disabled:cursor-not-allowed disabled:opacity-50;
 	&[data-placeholder] span {
 		@apply text-subtle focus:outline-none;
 	}
