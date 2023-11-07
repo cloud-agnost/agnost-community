@@ -7,21 +7,15 @@ import { useTranslation } from 'react-i18next';
 import { InfoModal } from '../InfoModal';
 interface Props<T> {
 	onDelete: () => void;
-	table?: Table<T>;
+	table: Table<T>;
 	className?: string;
 	disabled?: boolean;
 }
-function SelectedRowButton<T>({
-	onDelete,
-
-	table,
-	className,
-	disabled,
-}: Props<T>) {
+function SelectedRowButton<T>({ onDelete, table, className, disabled }: Props<T>) {
 	const { t } = useTranslation();
 	const [openInfoModal, setOpenInfoModal] = useState(false);
 
-	return table && table.getSelectedRowModel().rows.length > 0 ? (
+	return (
 		<>
 			<div className={cn('flex items-center rounded-md bg-lighter', className)}>
 				<div className='flex items-center gap-2 border-r border-button-border p-1.5'>
@@ -55,7 +49,7 @@ function SelectedRowButton<T>({
 				onConfirm={onDelete}
 			/>
 		</>
-	) : null;
+	);
 }
 
 export default SelectedRowButton;
