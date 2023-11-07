@@ -1,31 +1,31 @@
 import { DataTable } from '@/components/DataTable';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { OrganizationInvitationsColumns } from '@/features/organization';
+import {
+	OrganizationInvitationsColumns,
+	OrganizationMembersTableHeader,
+} from '@/features/organization';
+import useTable from '@/hooks/useTable';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Invitation } from '@/types';
-import { Row } from '@tanstack/react-table';
-import { useOutletContext } from 'react-router-dom';
-import { SetStateAction, Dispatch } from 'react';
-interface OutletContextTypes {
-	setSelectedRows: Dispatch<SetStateAction<Row<Invitation>[]>>;
-}
+import InfiniteScroll from 'react-infinite-scroll-component';
+
 export default function OrganizationInvitationTable() {
 	const { invitations, setMemberPage, memberPage } = useOrganizationStore();
-	const { setSelectedRows } = useOutletContext() as OutletContextTypes;
-
+	const table = useTable({
+		data: invitations,
+		columns: OrganizationInvitationsColumns,
+	});
 	return (
-		<InfiniteScroll
-			scrollableTarget='settings-scroll'
-			next={() => setMemberPage(memberPage + 1)}
-			hasMore
-			dataLength={invitations.length}
-			loader={<div />}
-		>
-			<DataTable<Invitation>
-				columns={OrganizationInvitationsColumns}
-				data={invitations}
-				setSelectedRows={setSelectedRows}
-			/>
-		</InfiniteScroll>
+		<div className='space-y-4'>
+			<OrganizationMembersTableHeader table={table} />
+			<InfiniteScroll
+				scrollableTarget='settings-scroll'
+				next={() => setMemberPage(memberPage + 1)}
+				hasMore
+				dataLength={invitations.length}
+				loader={<div />}
+			>
+				<DataTable<Invitation> table={table} />
+			</InfiniteScroll>
+		</div>
 	);
 }

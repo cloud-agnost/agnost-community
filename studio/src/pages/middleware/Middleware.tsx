@@ -1,12 +1,11 @@
 import { AddMiddlewareDrawer } from '@/features/version/Middlewares';
 import MiddlewaresColumns from '@/features/version/Middlewares/MiddlewaresColumns.tsx';
-import { useInfiniteScroll, useToast } from '@/hooks';
+import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
 import { APIError, Middleware } from '@/types';
 import { useMutation } from '@tanstack/react-query';
-import { Row, Table } from '@tanstack/react-table';
 import { DataTable } from 'components/DataTable';
 import { TableLoading } from 'components/Table/Table.tsx';
 import { Fragment, useState } from 'react';
@@ -16,11 +15,12 @@ import { useParams } from 'react-router-dom';
 
 export default function MainMiddleware() {
 	const { notify } = useToast();
-	const [selectedRows, setSelectedRows] = useState<Row<Middleware>[]>();
 	const { getMiddlewaresOfAppVersion, deleteMultipleMiddlewares, lastFetchedPage, middlewares } =
 		useMiddlewareStore();
-
-	const [table, setTable] = useState<Table<Middleware>>();
+	const table = useTable({
+		data: middlewares,
+		columns: MiddlewaresColumns,
+	});
 	const { orgId, appId, versionId } = useParams();
 	const canCreate = useAuthorizeVersion('middleware.create');
 	const { t } = useTranslation();
@@ -48,12 +48,12 @@ export default function MainMiddleware() {
 	});
 
 	function deleteMultipleMiddlewaresHandler() {
-		const rows = selectedRows?.map((row) => row.original);
+		const middlewareIds = table.getSelectedRowModel().rows.map((row) => row.original._id);
 		deleteMiddleware({
 			orgId: orgId as string,
 			versionId: versionId as string,
 			appId: appId as string,
-			middlewareIds: rows?.map((row) => row._id) as string[],
+			middlewareIds,
 		});
 	}
 	return (
@@ -77,12 +77,7 @@ export default function MainMiddleware() {
 					hasMore={hasNextPage}
 					loader={isFetchingNextPage && <TableLoading />}
 				>
-					<DataTable<Middleware>
-						columns={MiddlewaresColumns}
-						data={middlewares}
-						setTable={setTable}
-						setSelectedRows={setSelectedRows}
-					/>
+					<DataTable<Middleware> table={table} />
 				</InfiniteScroll>
 			</VersionTabLayout>
 			<AddMiddlewareDrawer open={open} onOpenChange={setOpen} />

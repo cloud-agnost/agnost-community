@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import DeploymentLogColumns from './DeploymentLogColumns';
+import { useTable } from '@/hooks';
 interface DeploymentLogsDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -23,12 +24,6 @@ interface DeploymentLogsDrawerProps {
 export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentLogsDrawerProps) {
 	const { t } = useTranslation();
 	const [selectedTab, setSelectedTab] = useState<string>('db');
-	const { versionId, appId, orgId } = useParams<{
-		versionId: string;
-		appId: string;
-		orgId: string;
-	}>();
-
 	const {
 		getEnvironmentLogs,
 		environment,
@@ -37,6 +32,15 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 		closeLogDetails,
 		selectedLog,
 	} = useEnvironmentStore();
+	const table = useTable({
+		data: envLogs,
+		columns: DeploymentLogColumns,
+	});
+	const { versionId, appId, orgId } = useParams<{
+		versionId: string;
+		appId: string;
+		orgId: string;
+	}>();
 
 	useEffect(() => {
 		if (open) {
@@ -59,7 +63,7 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 						<DrawerTitle>{t('version.logs')}</DrawerTitle>
 					</DrawerHeader>
 					<div className='p-6 scroll'>
-						<DataTable columns={DeploymentLogColumns} data={envLogs} />
+						<DataTable table={table} />
 					</div>
 					<DrawerFooter>
 						<DrawerClose asChild></DrawerClose>

@@ -85,6 +85,7 @@ export default function VersionTabLayout<T>({
 			path: pathname + search,
 		});
 	}, [search]);
+
 	return (
 		<div className={cn('h-full space-y-4 ', className)}>
 			{breadCrumb}

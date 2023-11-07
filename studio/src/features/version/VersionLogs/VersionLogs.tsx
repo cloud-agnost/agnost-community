@@ -3,6 +3,7 @@ import { DateRangePicker } from '@/components/DateRangePicker';
 import { TableLoading } from '@/components/Table/Table';
 import { PAGE_SIZE } from '@/constants';
 import { VersionLogColumns, VersionLogDetails } from '@/features/version/VersionLogs';
+import { useTable } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
 import { calculateRecommendedBuckets, convertDateToMilliseconds, formatDate } from '@/utils';
 import { DateTime } from 'luxon';
@@ -33,6 +34,11 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 		orgId: string;
 		versionId: string;
 	}>();
+
+	const table = useTable({
+		data: logs,
+		columns: VersionLogColumns,
+	});
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [date, setDate] = useState<Range[]>([
 		{
@@ -179,7 +185,7 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 				hasMore={lastFetchedLogCount >= PAGE_SIZE}
 				loader={<TableLoading />}
 			>
-				<DataTable columns={VersionLogColumns} data={logs} />
+				<DataTable table={table} />
 			</InfiniteScroll>
 			<VersionLogDetails open={showLogDetails} onClose={closeVersionLogDetails} />
 		</div>

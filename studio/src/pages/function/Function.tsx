@@ -1,13 +1,12 @@
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
 import { CreateFunction, FunctionColumns } from '@/features/function';
-import { useInfiniteScroll, useToast } from '@/hooks';
+import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useFunctionStore from '@/store/function/functionStore';
 import { APIError, HelperFunction } from '@/types';
 import { useMutation } from '@tanstack/react-query';
-import { Row, Table } from '@tanstack/react-table';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -17,11 +16,13 @@ export default function MainFunction() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
 	const canCreate = useAuthorizeVersion('function.create');
-	const [selectedRows, setSelectedRows] = useState<Row<HelperFunction>[]>([]);
-	const [table, setTable] = useState<Table<HelperFunction>>();
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const { functions, lastFetchedPage, getFunctionsOfAppVersion, deleteMultipleFunctions } =
 		useFunctionStore();
+	const table = useTable({
+		data: functions,
+		columns: FunctionColumns,
+	});
 	const { versionId, orgId, appId } = useParams();
 
 	const { mutateAsync: deleteFunction } = useMutation({
@@ -41,7 +42,7 @@ export default function MainFunction() {
 
 	function deleteMultipleFunctionsHandler() {
 		deleteFunction({
-			functionIds: selectedRows.map((row) => row.original._id),
+			functionIds: table.getSelectedRowModel().rows.map((row) => row.original._id),
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
@@ -73,12 +74,7 @@ export default function MainFunction() {
 					hasMore={hasNextPage}
 					loader={isFetchingNextPage && <TableLoading />}
 				>
-					<DataTable<HelperFunction>
-						data={functions}
-						columns={FunctionColumns}
-						setSelectedRows={setSelectedRows}
-						setTable={setTable}
-					/>
+					<DataTable<HelperFunction> table={table} />
 				</InfiniteScroll>
 			</VersionTabLayout>
 			<CreateFunction open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />

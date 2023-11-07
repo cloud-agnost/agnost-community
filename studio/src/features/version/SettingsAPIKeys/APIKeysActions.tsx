@@ -1,41 +1,34 @@
-import { SelectedRowButton } from 'components/Table';
-import { Row, Table } from '@tanstack/react-table';
-import { APIKey } from '@/types';
 import { AddAPIKeyButton } from '@/features/version/SettingsAPIKeys';
-import useVersionStore from '@/store/version/versionStore.ts';
-import { Dispatch, SetStateAction } from 'react';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useSettingsStore from '@/store/version/settingsStore';
+import useVersionStore from '@/store/version/versionStore.ts';
+import { APIKey } from '@/types';
+import { Table } from '@tanstack/react-table';
+import { SelectedRowButton } from 'components/Table';
 
 interface APIKeysActionsProps {
-	selectedRows: Row<APIKey>[] | undefined;
-	table: Table<APIKey> | undefined;
-	setSelectedRows: Dispatch<SetStateAction<Row<APIKey>[] | undefined>>;
+	table: Table<APIKey>;
 }
-export default function APIKeysActions({
-	selectedRows,
-	table,
-	setSelectedRows,
-}: APIKeysActionsProps) {
+export default function APIKeysActions({ table }: APIKeysActionsProps) {
 	const { version } = useVersionStore();
 	const { deleteMultipleAPIKeys } = useSettingsStore();
 	const canDeleteMultiple = useAuthorizeVersion('version.key.delete');
 	async function onDelete() {
-		if (!version || !selectedRows || selectedRows?.length === 0) return;
+		if (!version || table?.getSelectedRowModel().rows?.length === 0) return;
 
 		await deleteMultipleAPIKeys({
 			appId: version.appId,
-			keyIds: selectedRows.map((row) => row.original._id),
+			keyIds: table?.getSelectedRowModel().rows.map((row) => row.original._id),
 			versionId: version._id,
 			orgId: version.orgId,
 		});
-		setSelectedRows([]);
+
 		table?.resetRowSelection();
 	}
 
 	return (
 		<div className='flex gap-4'>
-			{!!selectedRows?.length && (
+			{!!table?.getSelectedRowModel().rows?.length && (
 				<SelectedRowButton<APIKey>
 					table={table}
 					onDelete={onDelete}

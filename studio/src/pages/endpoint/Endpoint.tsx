@@ -3,41 +3,37 @@ import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
 import { MODULE_PAGE_SIZE } from '@/constants';
 import { EndpointColumns } from '@/features/endpoints';
-import { usePage, useToast } from '@/hooks';
+import { useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import { Endpoint } from '@/types';
-import { Row, Table } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useOutletContext, useParams, useSearchParams } from 'react-router-dom';
 interface OutletContext {
 	setIsCreateModalOpen: (isOpen: boolean) => void;
-	setSelectedRows: (rows: Row<Endpoint>[]) => void;
-	setTable: (table: Table<Endpoint>) => void;
-	table: Table<Endpoint>;
-	selectedRows: Row<Endpoint>[];
 }
 
 export default function MainEndpoint() {
 	const [loading, setLoading] = useState(false);
 	const [searchParams] = useSearchParams();
-	const { page, incrementPage } = usePage();
 	const { notify } = useToast();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 	const canCreate = useAuthorizeVersion('endpoint.create');
-	const { endpoints, lastFetchedCount, lastFetchedPage, getEndpoints, deleteMultipleEndpoints } =
-		useEndpointStore();
+	const { endpoints, lastFetchedCount, getEndpoints, deleteMultipleEndpoints } = useEndpointStore();
+	const table = useTable({
+		data: endpoints,
+		columns: EndpointColumns,
+	});
 
-	const { setSelectedRows, setTable, setIsCreateModalOpen, table, selectedRows }: OutletContext =
-		useOutletContext();
+	const { setIsCreateModalOpen }: OutletContext = useOutletContext();
 
 	function deleteMultipleEndpointsHandler() {
 		deleteMultipleEndpoints({
-			endpointIds: selectedRows.map((row) => row.original._id),
+			endpointIds: table.getSelectedRowModel().rows.map((row) => row.original._id),
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
@@ -57,13 +53,13 @@ export default function MainEndpoint() {
 				orgId,
 				appId,
 				versionId,
-				page,
+				page: 0,
 				size: MODULE_PAGE_SIZE,
 				search: searchParams.get('q') ?? undefined,
 			});
 			setLoading(false);
 		}
-	}, [searchParams.get('q'), page]);
+	}, [searchParams.get('q')]);
 
 	return (
 		<VersionTabLayout<Endpoint>
@@ -75,7 +71,6 @@ export default function MainEndpoint() {
 			openCreateModal={() => setIsCreateModalOpen(true)}
 			onMultipleDelete={deleteMultipleEndpointsHandler}
 			table={table}
-			selectedRowLength={selectedRows.length}
 			disabled={!canCreate}
 			handlerButton={
 				<Button variant='secondary' to='logs'>
@@ -86,16 +81,11 @@ export default function MainEndpoint() {
 			<InfiniteScroll
 				scrollableTarget='version-layout'
 				dataLength={endpoints.length}
-				next={incrementPage}
+				next={() => {}}
 				hasMore={lastFetchedCount >= MODULE_PAGE_SIZE}
 				loader={loading && <TableLoading />}
 			>
-				<DataTable
-					columns={EndpointColumns}
-					data={endpoints}
-					setSelectedRows={setSelectedRows}
-					setTable={setTable}
-				/>
+				<DataTable table={table} />
 			</InfiniteScroll>
 		</VersionTabLayout>
 	);

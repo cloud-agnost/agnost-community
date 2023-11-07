@@ -8,28 +8,18 @@ import {
 import { SearchInput } from '@/components/SearchInput';
 import { INVITATIONS_SORT_OPTIONS, ORG_MEMBERS_SORT_OPTIONS } from '@/constants';
 import { useToast } from '@/hooks';
-import useOrganizationStore from '@/store/organization/organizationStore';
-import { Invitation, OrganizationMember, SortOption } from '@/types';
-import { FunnelSimple } from '@phosphor-icons/react';
-import { Row } from '@tanstack/react-table';
-import { RoleDropdown } from 'components/RoleDropdown';
-import { Dispatch, SetStateAction } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useOutletContext } from 'react-router-dom';
-import '../../organization.scss';
-import { SelectedRowButton } from 'components/Table';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { OrganizationMember, SortOption } from '@/types';
+import { FunnelSimple } from '@phosphor-icons/react';
+import { Table } from '@tanstack/react-table';
+import { RoleDropdown } from 'components/RoleDropdown';
+import { SelectedRowButton } from 'components/Table';
+import { useTranslation } from 'react-i18next';
+import '../../organization.scss';
 
-interface RowTypes extends Omit<Invitation, 'role'>, OrganizationMember {}
-
-interface OutletContextTypes {
-	selectedRows: Row<RowTypes>[];
-	setSelectedRows: Dispatch<SetStateAction<Row<RowTypes>[]>>;
-}
-
-export default function OrganizationMembersTableHeader() {
+export default function OrganizationMembersTableHeader({ table }: { table: Table<any> }) {
 	const { t } = useTranslation();
-	const { selectedRows, setSelectedRows } = useOutletContext() as OutletContextTypes;
 	const { notify } = useToast();
 	const canMultipleDelete = useAuthorizeOrg('team.delete');
 	const {
@@ -49,7 +39,7 @@ export default function OrganizationMembersTableHeader() {
 	function deleteMulti() {
 		if (selectedTab === 'member') {
 			removeMultipleMembersFromOrganization({
-				userIds: selectedRows?.map((row) => row.original.member._id) ?? [],
+				userIds: table.getSelectedRowModel().rows?.map((row) => row.original.member._id) ?? [],
 				onSuccess: () => {
 					notify({
 						title: t('general.success'),
@@ -67,7 +57,7 @@ export default function OrganizationMembersTableHeader() {
 			});
 		} else {
 			deleteMultipleInvitations({
-				tokens: selectedRows?.map((row) => row.original.token) ?? [],
+				tokens: table.getSelectedRowModel().rows?.map((row) => row.original.token) ?? [],
 				onSuccess: () => {
 					notify({
 						title: t('general.success'),
@@ -84,7 +74,6 @@ export default function OrganizationMembersTableHeader() {
 				},
 			});
 		}
-		setSelectedRows([]);
 	}
 	return (
 		<div className='members-filter'>
@@ -127,8 +116,9 @@ export default function OrganizationMembersTableHeader() {
 					))}
 				</DropdownMenuContent>
 			</DropdownMenu>
-			{selectedRows?.length && (
+			{!!table.getSelectedRowModel().rows?.length && (
 				<SelectedRowButton<OrganizationMember>
+					table={table}
 					onDelete={deleteMulti}
 					disabled={!canMultipleDelete}
 				/>

@@ -1,18 +1,15 @@
-import { SelectedRowButton } from 'components/Table';
-import { Row, Table } from '@tanstack/react-table';
 import { AddNPMPackagesButton } from '@/features/version/SettingsNPMPackages';
-import useVersionStore from '@/store/version/versionStore.ts';
-import { NPMPackage } from '@/types';
-import { Dispatch, SetStateAction } from 'react';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useSettingsStore from '@/store/version/settingsStore';
+import useVersionStore from '@/store/version/versionStore.ts';
+import { NPMPackage } from '@/types';
+import { Table } from '@tanstack/react-table';
+import { SelectedRowButton } from 'components/Table';
 
 interface NPMActionsProps {
-	selectedRows: Row<NPMPackage>[] | undefined;
-	table: Table<NPMPackage> | undefined;
-	setSelectedRows: Dispatch<SetStateAction<Row<NPMPackage>[] | undefined>>;
+	table: Table<NPMPackage>;
 }
-export default function NPMActions({ selectedRows, table, setSelectedRows }: NPMActionsProps) {
+export default function NPMActions({ table }: NPMActionsProps) {
 	const { version } = useVersionStore();
 	const { deleteMultipleNPMPackages } = useSettingsStore();
 	const canDeleteMultiple = useAuthorizeVersion('version.package.delete');
@@ -22,15 +19,14 @@ export default function NPMActions({ selectedRows, table, setSelectedRows }: NPM
 			orgId: version.orgId,
 			versionId: version._id,
 			appId: version.appId,
-			packageIds: selectedRows?.map((row) => row.original._id) as string[],
+			packageIds: table.getSelectedRowModel().rows.map((row) => row.original._id) as string[],
 		});
 		table?.resetRowSelection();
-		setSelectedRows?.([]);
 	}
 
 	return (
 		<div className='flex gap-4'>
-			{!!selectedRows?.length && (
+			{!!table.getSelectedRowModel().rows.length && (
 				<SelectedRowButton table={table} onDelete={deleteHandler} disabled={!canDeleteMultiple} />
 			)}
 			<AddNPMPackagesButton />

@@ -2,11 +2,7 @@ import { Button } from '@/components/Button';
 import { InviteMemberForm } from '@/components/InviteMemberForm';
 import { Separator } from '@/components/Separator';
 import { PAGE_SIZE } from '@/constants';
-import {
-	OrganizationInvitationTable,
-	OrganizationMembersTable,
-	OrganizationMembersTableHeader,
-} from '@/features/organization';
+import { OrganizationInvitationTable, OrganizationMembersTable } from '@/features/organization';
 import { useUpdateEffect } from '@/hooks';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout';
@@ -18,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/Tabs';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../organization.scss';
+
 export default function OrganizationSettingsMembers() {
 	const { t } = useTranslation();
 	const { canClusterSendEmail } = useClusterStore();
@@ -102,16 +99,15 @@ export default function OrganizationSettingsMembers() {
 						useOrganizationStore.setState?.({ selectedTab: value as 'member' | 'invitation' });
 						clearFilter();
 					}}
+					className='relative'
 				>
-					<div className='members-header'>
-						<TabsList>
-							<TabsTrigger value='member'>{t('organization.settings.members.title')}</TabsTrigger>
-							<TabsTrigger value='invitation'>
-								{t('organization.settings.pending-invitation')}
-							</TabsTrigger>
-						</TabsList>
-						<OrganizationMembersTableHeader />
-					</div>
+					<TabsList containerClassName='absolute -top-6 xs:relative'>
+						<TabsTrigger value='member'>{t('organization.settings.members.title')}</TabsTrigger>
+						<TabsTrigger value='invitation'>
+							{t('organization.settings.pending-invitation')}
+						</TabsTrigger>
+					</TabsList>
+
 					<TabsContent value='member'>
 						<OrganizationMembersTable />
 					</TabsContent>

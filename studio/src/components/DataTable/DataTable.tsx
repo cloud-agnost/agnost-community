@@ -1,38 +1,21 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/Table';
-import { cn, translate } from '@/utils';
-import {
-	SortingState,
-	flexRender,
-	getCoreRowModel,
-	getSortedRowModel,
-	useReactTable,
-	Row,
-	ColumnFiltersState,
-	getFilteredRowModel,
-	Table as TableType,
-	Cell,
-} from '@tanstack/react-table';
-import { ReactNode, useEffect, useState } from 'react';
 import { ColumnDefWithClassName } from '@/types';
+import { cn, translate } from '@/utils';
+import { Cell, Table as TableType, flexRender } from '@tanstack/react-table';
+import { ReactNode } from 'react';
 import './sortButton.scss';
 interface DataTableProps<TData> {
-	columns: ColumnDefWithClassName<TData>[];
-	data: TData[];
+	table: TableType<TData>;
 	className?: string;
 	containerClassName?: string;
 	onRowClick?: (row: TData) => void;
 	onCellClick?: (cell: Cell<TData, any>) => void;
-	setSelectedRows?: (table: Row<TData>[]) => void;
-	setTable?: (table: TableType<TData>) => void;
 	noDataMessage?: string | ReactNode;
 	headerClassName?: string;
 }
 
 export function DataTable<TData>({
-	columns,
-	data,
-	setSelectedRows,
-	setTable,
+	table,
 	onRowClick,
 	onCellClick,
 	noDataMessage = translate('general.no_results'),
@@ -40,58 +23,7 @@ export function DataTable<TData>({
 	containerClassName,
 	headerClassName,
 }: DataTableProps<TData>) {
-	const [sorting, setSorting] = useState<SortingState>([]);
-	const [rowSelection, setRowSelection] = useState({});
-	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-	const table = useReactTable({
-		data,
-		columns,
-		columnResizeMode: 'onChange',
-		getCoreRowModel: getCoreRowModel(),
-		onSortingChange: setSorting,
-		getSortedRowModel: getSortedRowModel(),
-		onRowSelectionChange: setRowSelection,
-		onColumnFiltersChange: setColumnFilters,
-		getFilteredRowModel: getFilteredRowModel(),
-		enableRowSelection(row) {
-			const cell = row.getAllCells().find((item) => item.column.id === 'select');
-			if (!cell) return false;
-
-			const meta = cell.column.columnDef?.meta;
-			if (!meta) return true;
-
-			const { disabled } = cell.column.columnDef.meta as {
-				disabled: {
-					key: string;
-					value: string;
-				};
-			};
-
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			return row.original[disabled?.key] !== disabled?.value;
-		},
-		state: {
-			sorting,
-			rowSelection,
-			columnFilters,
-		},
-	});
-
-	useEffect(() => {
-		if (table.getSelectedRowModel().rows.length > 0) {
-			setSelectedRows?.(table.getSelectedRowModel().rows);
-		} else {
-			setSelectedRows?.([]);
-		}
-	}, [table.getSelectedRowModel().rows]);
-
-	useEffect(() => {
-		if (table) {
-			setTable?.(table);
-		}
-	}, [table]);
-
+	const columns = table._getColumnDefs() as ColumnDefWithClassName<TData>[];
 	return (
 		<Table className={className} containerClassName={containerClassName}>
 			{columns.map((column) => column.header).filter(Boolean).length > 0 && (
