@@ -1,4 +1,4 @@
-import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants';
+import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants/regex';
 import { translate as t } from '@/utils';
 import * as z from 'zod';
 
