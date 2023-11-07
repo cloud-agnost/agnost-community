@@ -1,3 +1,4 @@
+import { UseBaseMutationResult } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import { z } from 'zod';
 import { EnvironmentStatus } from '.';
@@ -394,4 +395,10 @@ declare global {
 	var monaco: typeof import('monaco-editor');
 	// eslint-disable-next-line no-var
 	var ts: typeof import('typescript');
+}
+
+declare module '@tanstack/react-query' {
+	export interface UseBaseMutationResult<D, APIError, V, C> {
+		error: APIError | null;
+	}
 }
