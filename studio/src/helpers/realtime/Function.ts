@@ -16,11 +16,11 @@ export default class Function extends RealtimeActions<HelperFunction> {
 	update({ data }: RealtimeActionParams<HelperFunction>): void {
 		const { updateTab } = useTabStore.getState();
 		updateTab({
-			versionId: data.versionId as string,
+			versionId: data.versionId,
 			tab: {
 				title: data.name,
 			},
-			filter: (tab) => tab.path.includes(data._id as string),
+			filter: (tab) => tab.path.includes(data._id),
 		});
 		useFunctionStore.setState?.({
 			functions: useFunctionStore.getState?.().functions.map((ep) => {
@@ -30,6 +30,7 @@ export default class Function extends RealtimeActions<HelperFunction> {
 				return ep;
 			}),
 			function: data,
+			editedLogic: data.logic,
 		});
 	}
 	create({ data }: RealtimeActionParams<HelperFunction>): void {

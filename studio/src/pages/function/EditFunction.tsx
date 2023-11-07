@@ -3,32 +3,32 @@ import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useFunctionStore from '@/store/function/functionStore';
 import useTabStore from '@/store/version/tabStore';
+import { APIError } from '@/types';
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useParams } from 'react-router-dom';
 
 EditFunction.loader = async ({ params }: LoaderFunctionArgs) => {
-	const { funcId, orgId, versionId, appId } = params;
+	const { funcId, orgId, versionId, appId } = params as Record<string, string>;
 	if (!funcId) return null;
+	const { editedLogic, getFunctionById } = useFunctionStore.getState();
 	const { getCurrentTab, updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
 	const { function: helper } = useFunctionStore.getState();
-	if (helper?._id === funcId && history.state?.type !== 'tabChanged') {
-		useFunctionStore.setState({
-			editedLogic: helper.logic,
-		});
-		updateCurrentTab(versionId as string, {
-			...getCurrentTab(versionId as string),
-			isDirty: false,
+	if (helper?._id === funcId) {
+		updateCurrentTab(versionId, {
+			...getCurrentTab(versionId),
+			isDirty: helper.logic !== editedLogic,
 		});
 		closeDeleteTabModal();
 		return { helper };
 	}
 
-	await useFunctionStore.getState().getFunctionById({
-		orgId: orgId as string,
-		appId: appId as string,
-		versionId: versionId as string,
-		funcId: funcId as string,
+	await getFunctionById({
+		orgId: orgId,
+		appId: appId,
+		versionId: versionId,
+		funcId: funcId,
 	});
 
 	return { props: {} };
@@ -45,7 +45,6 @@ export default function EditFunction() {
 		editedLogic,
 		setEditedLogic,
 	} = useFunctionStore();
-	const [loading, setLoading] = useState(false);
 
 	const { versionId, appId, orgId, funcId } = useParams<{
 		versionId: string;
@@ -53,40 +52,40 @@ export default function EditFunction() {
 		orgId: string;
 		funcId: string;
 	}>();
+	const { mutate: saveFunctionCodeMutation, isPending } = useMutation({
+		mutationFn: saveFunctionCode,
+		onSuccess: () => {
+			notify({
+				title: t('general.success'),
+				description: t('endpoint.editLogicSuccess'),
+				type: 'success',
+			});
+		},
+		onError: (error: APIError) => {
+			notify({
+				title: error.error,
+				description: error.details,
+				type: 'error',
+			});
+		},
+	});
 
 	function saveLogic(logic: string) {
-		setLoading(true);
-		saveFunctionCode({
+		saveFunctionCodeMutation({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			funcId: funcId as string,
 			logic: logic ?? editedLogic,
-			onSuccess: () => {
-				setLoading(false);
-				notify({
-					title: t('general.success'),
-					description: t('endpoint.editLogicSuccess'),
-					type: 'success',
-				});
-			},
-			onError: ({ error, details }) => {
-				setLoading(false);
-				notify({
-					title: error,
-					description: details,
-					type: 'error',
-				});
-			},
 		});
 	}
 	return (
 		<VersionEditorLayout
 			onEditModalOpen={() => openEditFunctionDrawer(helper)}
-			onSaveLogic={(value) => saveLogic(value as string)}
-			loading={loading}
+			onSaveLogic={saveLogic}
+			loading={isPending}
 			logic={editedLogic}
-			setLogic={(value) => setEditedLogic(value as string)}
+			setLogic={setEditedLogic}
 			name={helper._id}
 			breadCrumbItems={[
 				{

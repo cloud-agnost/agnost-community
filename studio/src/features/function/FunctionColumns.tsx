@@ -1,12 +1,38 @@
 import { ActionsCell } from '@/components/ActionsCell';
+import { TableConfirmation } from '@/components/Table';
 import useFunctionStore from '@/store/function/functionStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { ColumnDefWithClassName, HelperFunction, TabTypes } from '@/types';
-import { translate } from '@/utils';
+import { APIError, ColumnDefWithClassName, HelperFunction, TabTypes } from '@/types';
+import { notify, translate } from '@/utils';
+import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TabLink } from '../version/Tabs';
+
+const { openEditFunctionDrawer, deleteFunction } = useFunctionStore.getState();
+const queryClient = new QueryClient();
+
+function deleteHandler(fn: HelperFunction) {
+	queryClient
+		.getMutationCache()
+		.build(queryClient, {
+			mutationFn: deleteFunction,
+			onError: (error: APIError) => {
+				notify({
+					title: error.error,
+					description: error.details,
+					type: 'error',
+				});
+			},
+		})
+		.execute({
+			appId: fn.appId,
+			orgId: fn.orgId,
+			versionId: fn.versionId,
+			funcId: fn._id,
+		});
+}
 const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
 	{
 		id: 'select',
@@ -94,16 +120,25 @@ const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { openDeleteFunctionModal, openEditFunctionDrawer } = useFunctionStore.getState();
 			return (
 				<ActionsCell<HelperFunction>
-					onDelete={() => openDeleteFunctionModal(original)}
 					onEdit={() => openEditFunctionDrawer(original)}
 					original={original}
 					canDeleteKey='function.delete'
-					canEditKey='function.edit'
+					canEditKey='function.update'
 					type='app'
-				/>
+				>
+					<TableConfirmation
+						align='end'
+						closeOnConfirm
+						showAvatar={false}
+						title={translate('function.delete.title')}
+						description={translate('function.delete.message')}
+						onConfirm={() => deleteHandler(original)}
+						contentClassName='m-0'
+						permissionKey='middleware.delete'
+					/>
+				</ActionsCell>
 			);
 		},
 	},
