@@ -30,7 +30,9 @@ export default function useInfiniteScroll({
 				search: searchParams.get('q') as string,
 			}),
 		refetchOnWindowFocus: false,
-		enabled: lastFetchedPage === 0 || Math.ceil(dataLength / MODULE_PAGE_SIZE) < lastFetchedPage,
+		enabled:
+			(lastFetchedPage === 0 && !dataLength) ||
+			Math.ceil(dataLength / MODULE_PAGE_SIZE) < lastFetchedPage,
 		getNextPageParam: (lastPage) => {
 			const nextPage = lastPage.length === MODULE_PAGE_SIZE ? lastFetchedPage + 1 : undefined;
 			return nextPage;
