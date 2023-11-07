@@ -1,4 +1,3 @@
-import { UseBaseMutationResult } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import { z } from 'zod';
 import { EnvironmentStatus } from '.';
