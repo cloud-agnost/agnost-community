@@ -47,3 +47,34 @@ export const NameSchema = z
 			}),
 		}),
 	);
+
+export const FieldSchema = z
+	.string()
+	.min(2, t('forms.min2.error', { label: t('general.field') }))
+	.max(64, t('forms.max64.error', { label: t('general.field') }))
+	.regex(/^[a-zA-Z0-9_]*$/, {
+		message: t('forms.alphanumeric', { label: t('general.field') }),
+	})
+	.or(z.literal(''));
+
+export const TimestampsSchema = z
+	.object({
+		enabled: z.boolean(),
+		createdAt: FieldSchema,
+		updatedAt: FieldSchema,
+	})
+	.superRefine((arg, ctx) => {
+		if (arg.enabled) {
+			Object.entries(arg).forEach(([key, value]) => {
+				if (key !== 'enabled' && typeof value === 'string' && value.length === 0) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: t('forms.required', {
+							label: t('general.field'),
+						}),
+						path: [key],
+					});
+				}
+			});
+		}
+	});

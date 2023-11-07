@@ -1,10 +1,9 @@
 import { ResourceSelect } from '@/components/ResourceSelect';
-import { NAME_SCHEMA } from '@/constants';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useResourceStore from '@/store/resources/resourceStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { APIError, ResourceType } from '@/types';
+import { APIError, NameSchema, ResourceType } from '@/types';
 import { capitalize, cn, translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from 'components/Button';
@@ -33,7 +32,7 @@ interface CreateDatabaseDrawerProps {
 }
 
 const CreateSchema = z.object({
-	name: NAME_SCHEMA,
+	name: NameSchema,
 	assignUniqueName: z.boolean(),
 	poolSize: z
 		.number({

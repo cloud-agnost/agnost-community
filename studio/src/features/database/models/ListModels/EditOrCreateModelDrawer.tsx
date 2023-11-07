@@ -14,9 +14,8 @@ import {
 } from 'components/Form';
 import { Input, Textarea } from 'components/Input';
 import { Button } from 'components/Button';
-import { NAME_SCHEMA, TIMESTAMPS_SCHEMA } from '@/constants';
 import { ReactNode, useEffect } from 'react';
-import { APIError } from '@/types';
+import { APIError, NameSchema, TimestampsSchema } from '@/types';
 import { Separator } from 'components/Separator';
 import { SettingsFormItem } from 'components/SettingsFormItem';
 import { Switch } from 'components/Switch';
@@ -26,17 +25,13 @@ import useVersionStore from '@/store/version/versionStore.ts';
 import { useParams } from 'react-router-dom';
 
 const Schema = z.object({
-	name: NAME_SCHEMA.refine((value) => /^(?![0-9])/.test(value), {
-		message: translate('forms.notStartWithNumber', {
-			label: translate('general.name'),
-		}).toString(),
-	}),
+	name: NameSchema,
 	description: z
 		.string({
 			required_error: translate('forms.required', { label: translate('general.description') }),
 		})
 		.optional(),
-	timestamps: TIMESTAMPS_SCHEMA,
+	timestamps: TimestampsSchema,
 });
 
 interface EditOrCreateModelDrawerProps {

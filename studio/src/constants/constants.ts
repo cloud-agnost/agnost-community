@@ -102,7 +102,6 @@ import {
 } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { ElementType } from 'react';
-import * as z from 'zod';
 
 export const PAGE_SIZE = 10;
 export const MODULE_PAGE_SIZE = 25;
@@ -784,56 +783,6 @@ export const ENDPOINT_RESPONSE_TABS = [
 		name: translate('endpoint.test.console_logs'),
 	},
 ];
-
-export const NAME_SCHEMA = z
-	.string({
-		required_error: translate('forms.required', {
-			label: translate('general.name'),
-		}),
-	})
-	.min(2, translate('forms.min2.error', { label: translate('general.name') }))
-	.max(64, translate('forms.max64.error', { label: translate('general.name') }))
-	.regex(/^[a-zA-Z0-9_]*$/, {
-		message: translate('forms.alphanumeric', { label: translate('general.name') }),
-	})
-	.trim()
-	.refine(
-		(value) => value.trim().length > 0,
-		translate('forms.required', {
-			label: translate('general.name'),
-		}),
-	);
-
-export const fieldSchema = z
-	.string()
-	.min(2, translate('forms.min2.error', { label: translate('general.field') }))
-	.max(64, translate('forms.max64.error', { label: translate('general.field') }))
-	.regex(/^[a-zA-Z0-9_]*$/, {
-		message: translate('forms.alphanumeric', { label: translate('general.field') }),
-	})
-	.or(z.literal(''));
-
-export const TIMESTAMPS_SCHEMA = z
-	.object({
-		enabled: z.boolean(),
-		createdAt: fieldSchema,
-		updatedAt: fieldSchema,
-	})
-	.superRefine((arg, ctx) => {
-		if (arg.enabled) {
-			Object.entries(arg).forEach(([key, value]) => {
-				if (key !== 'enabled' && typeof value === 'string' && value.length === 0) {
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: translate('forms.required', {
-							label: translate('general.field'),
-						}),
-						path: [key],
-					});
-				}
-			});
-		}
-	});
 
 export const FIELD_ICON_MAP: Record<string, ElementType> = {
 	text: TextAa,
