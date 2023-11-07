@@ -2,7 +2,7 @@ import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants';
 import { translate as t } from '@/utils';
 import * as z from 'zod';
 
-export const nameSchema = z
+export const NameSchema = z
 	.string({
 		required_error: t('forms.required', {
 			label: t('general.name'),

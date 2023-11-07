@@ -33,7 +33,7 @@ export {
 	ResourceInstances,
 	ResourceType,
 } from './resource.ts';
-export { nameSchema } from './schema.ts';
+export { NameSchema } from './schema.ts';
 export type * from './storage.ts';
 export { BucketSchema, CreateStorageSchema, StorageSchema } from './storage.ts';
 export type * from './task.ts';
