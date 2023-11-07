@@ -1,30 +1,23 @@
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { PAGE_SIZE } from '@/constants';
 import { CacheColumns, CreateCache, EditCache } from '@/features/cache';
-import { useToast } from '@/hooks';
+import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useCacheStore from '@/store/cache/cacheStore';
 import { APIError, Cache } from '@/types';
-import { Row, Table } from '@tanstack/react-table';
-import { useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { Row } from '@tanstack/react-table';
+import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export default function VersionCache() {
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-	const [selectedRows, setSelectedRows] = useState<Row<Cache>[]>([]);
-	const [table, setTable] = useState<Table<Cache>>();
-	const [page, setPage] = useState(0);
-
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<APIError>();
-	const { notify } = useToast();
 	const canCreateCache = useAuthorizeVersion('cache.create');
-	const [searchParams] = useSearchParams();
+	const { notify } = useToast();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 	const {
@@ -32,62 +25,64 @@ export default function VersionCache() {
 		closeDeleteCacheModal,
 		deleteCache,
 		deleteMultipleCache,
-		lastFetchedCount,
+		closeEditCacheModal,
+		lastFetchedPage,
 		toDeleteCache,
 		caches,
 		isDeleteCacheModalOpen,
 		isEditCacheModalOpen,
-		closeEditCacheModal,
 	} = useCacheStore();
+	const table = useTable({
+		data: caches,
+		columns: CacheColumns,
+	});
+
+	const { fetchNextPage, hasNextPage, isPending, refetch } = useInfiniteScroll({
+		queryFn: getCaches,
+		lastFetchedPage,
+		dataLength: caches.length,
+		queryKey: 'caches',
+	});
+
+	const {
+		mutateAsync: deleteCacheMutation,
+		error,
+		isPending: isDeleting,
+	} = useMutation({
+		mutationFn: deleteCache,
+		onSettled: () => closeDeleteCacheModal(),
+	});
+
+	const { mutateAsync: deleteMultipleCacheMutation } = useMutation({
+		mutationFn: deleteMultipleCache,
+		onSuccess: () => {
+			if (!caches.length) refetch();
+			table?.resetRowSelection();
+		},
+		onError: ({ error, details }: APIError) => {
+			notify({ type: 'error', description: details, title: error });
+		},
+	});
 
 	function deleteCacheHandler() {
-		setLoading(true);
-		deleteCache({
+		deleteCacheMutation({
 			cacheId: toDeleteCache?._id,
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			onSuccess: () => {
-				setLoading(false);
-				closeDeleteCacheModal();
-			},
-			onError: (error) => {
-				setError(error);
-				setLoading(false);
-				closeDeleteCacheModal();
-			},
 		});
 	}
 
 	function deleteMultipleCachesHandler() {
-		deleteMultipleCache({
-			cacheIds: selectedRows.map((row) => row.original._id),
+		deleteMultipleCacheMutation({
+			cacheIds: table
+				?.getSelectedRowModel()
+				.rows.map((row: Row<Cache>) => row.original._id) as string[],
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			onSuccess: () => {
-				table?.toggleAllRowsSelected(false);
-				setPage(0);
-			},
-			onError: ({ error, details }) => {
-				notify({ type: 'error', description: details, title: error });
-			},
 		});
 	}
-	useEffect(() => {
-		if (versionId && orgId && appId) {
-			setLoading(true);
-			getCaches({
-				orgId,
-				appId,
-				versionId,
-				page,
-				size: PAGE_SIZE,
-				search: searchParams.get('q') ?? undefined,
-			});
-			setLoading(false);
-		}
-	}, [searchParams.get('q'), page]);
 
 	return (
 		<>
@@ -105,21 +100,14 @@ export default function VersionCache() {
 				<InfiniteScroll
 					scrollableTarget='version-layout'
 					dataLength={caches.length}
-					next={() => {
-						setPage(page + 1);
-					}}
-					hasMore={lastFetchedCount >= PAGE_SIZE}
-					loader={loading && <TableLoading />}
+					next={fetchNextPage}
+					hasMore={hasNextPage}
+					loader={isPending && <TableLoading />}
 				>
-					<DataTable
-						columns={CacheColumns}
-						data={caches}
-						setSelectedRows={setSelectedRows}
-						setTable={setTable}
-					/>
+					<DataTable<Cache> table={table} />
 				</InfiniteScroll>
 				<ConfirmationModal
-					loading={loading}
+					loading={isDeleting}
 					error={error}
 					title={t('cache.delete.title')}
 					alertTitle={t('cache.delete.message')}
