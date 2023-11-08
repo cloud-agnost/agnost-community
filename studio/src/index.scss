@@ -437,6 +437,13 @@
 .rdrDayNumber span {
 	color: rgb(var(--text-base)) !important;
 }
+.rdrDay:not(.rdrDayPassive) .rdrInRange ~ .rdrDayNumber span,
+.rdrDay:not(.rdrDayPassive) .rdrStartEdge ~ .rdrDayNumber span,
+.rdrDay:not(.rdrDayPassive) .rdrEndEdge ~ .rdrDayNumber span,
+.rdrDay:not(.rdrDayPassive) .rdrSelected ~ .rdrDayNumber span {
+	color: white !important;
+}
+
 .rdrDayPassive .rdrDayNumber span,
 .rdrMonthName,
 .rdrWeekDay {
@@ -444,7 +451,6 @@
 }
 .rdrStartEdge,
 .rdrEndEdge {
-	border-radius: var(--radius) !important;
 	background: rgb(var(--button-background-base-primary)) !important;
 }
 .rdrInRange {
