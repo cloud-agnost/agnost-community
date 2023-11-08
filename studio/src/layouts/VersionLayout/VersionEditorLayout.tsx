@@ -4,6 +4,7 @@ import { CodeEditor } from '@/components/CodeEditor';
 import { InfoModal } from '@/components/InfoModal';
 import { Pencil } from '@/components/icons';
 import { useEditor } from '@/hooks';
+import useApplicationStore from '@/store/app/applicationStore';
 import useTabStore from '@/store/version/tabStore';
 import { cn } from '@/utils';
 import { FloppyDisk, TestTube } from '@phosphor-icons/react';
@@ -116,6 +117,7 @@ export default function VersionEditorLayout({
 				onChange={(val) => setLogic(val as string)}
 				onSave={(val) => onSaveLogic(val as string)}
 				name={name}
+				readonly={!canEdit}
 			/>
 			<InfoModal
 				isOpen={isDeleteTabModalOpen}
