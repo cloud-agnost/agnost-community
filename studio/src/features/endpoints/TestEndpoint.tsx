@@ -6,23 +6,25 @@ import { Form } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { Separator } from '@/components/Separator';
 import { HTTP_METHOD_BADGE_MAP, TEST_ENDPOINTS_MENU_ITEMS } from '@/constants';
+import { useToast } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
-import { TestMethods } from '@/types';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-
+import { APIError, TestMethods } from '@/types';
 import {
 	cn,
 	generateId,
 	getEndpointPath,
 	getPathParams,
 	joinChannel,
+	leaveChannel,
 	serializedStringToFile,
 } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useRef, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { useSearchParams } from 'react-router-dom';
 import * as z from 'zod';
 import { OrganizationMenuItem } from '../organization';
@@ -77,11 +79,12 @@ export const TestEndpointSchema = z.object({
 
 export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { t } = useTranslation();
+	const { notify } = useToast();
 	const { environment } = useEnvironmentStore();
 	const { endpoint, testEndpoint, endpointRequest } = useEndpointStore();
-	const [loading, setLoading] = useState(false);
 	const resizerRef = useRef<HTMLDivElement>(null);
 	const [searchParams, setSearchParams] = useSearchParams();
+	const consoleLogId = generateId();
 	const form = useForm<z.infer<typeof TestEndpointSchema>>({
 		resolver: zodResolver(TestEndpointSchema),
 		defaultValues: {
@@ -99,12 +102,23 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			body: '{}',
 		},
 	});
+	const { mutateAsync: testEndpointMutate, isPending } = useMutation({
+		mutationFn: testEndpoint,
+		onError: ({ error, details }: APIError) => {
+			notify({
+				title: error,
+				description: details,
+				type: 'error',
+			});
+		},
+		onSettled: () => {
+			leaveChannel(consoleLogId);
+		},
+	});
 	async function onSubmit(data: z.infer<typeof TestEndpointSchema>) {
-		setLoading(true);
 		const testPath = getEndpointPath(endpoint?.path, data.params.pathVariables ?? []);
-		const consoleLogId = generateId();
 		joinChannel(consoleLogId);
-		await testEndpoint({
+		testEndpointMutate({
 			epId: endpoint?._id,
 			envId: environment?.iid,
 			path: testPath,
@@ -115,12 +129,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			body: data.body ?? {},
 			formData: data.formData,
 			bodyType: data.bodyType,
-			onSuccess: () => {
-				setLoading(false);
-			},
-			onError: () => {
-				setLoading(false);
-			},
 		});
 	}
 	useEffect(() => {
@@ -212,8 +220,8 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 							size='lg'
 							variant='primary'
 							onClick={() => form.handleSubmit(onSubmit)()}
-							loading={loading}
-							disabled={loading || environment?.serverStatus !== 'OK'}
+							loading={isPending}
+							disabled={isPending || environment?.serverStatus !== 'OK'}
 						>
 							{t('endpoint.test.send')}
 						</Button>

@@ -23,10 +23,11 @@ import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { SortableRateLimits } from '../version/SettingsGeneral';
 import EndpointMiddlewares from './EndpointMiddlewares';
-export default function EndpointForm() {
+export default function EndpointForm({ loading }: { loading: boolean }) {
 	const { t } = useTranslation();
 	const form = useFormContext<z.infer<typeof CreateEndpointSchema>>();
 	const rateLimits = useVersionStore((state) => state.version?.limits);
+
 	return (
 		<>
 			<FormField
@@ -99,7 +100,7 @@ export default function EndpointForm() {
 									<FormControl>
 										<SelectTrigger
 											className={cn(
-												'w-[100px] bg-input-background rounded-none rounded-l ',
+												'w-[100px] rounded-none rounded-l ',
 												ENDPOINT_METHOD_BG_COLOR[field.value],
 											)}
 											error={Boolean(form.formState.errors.method)}
@@ -247,7 +248,7 @@ export default function EndpointForm() {
 							{t('general.cancel')}
 						</Button>
 					</DrawerClose>
-					<Button className='ml-2' type='submit' size='lg'>
+					<Button className='ml-2' type='submit' size='lg' loading={loading}>
 						{t('general.save')}
 					</Button>
 				</div>
