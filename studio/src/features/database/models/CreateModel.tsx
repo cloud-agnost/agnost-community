@@ -1,0 +1,73 @@
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
+import { APIError, ModelSchema } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { Form } from '@/components/Form';
+import { z } from 'zod';
+import ModelForm from './ModelForm';
+import useModelStore from '@/store/database/modelStore';
+import { useMutation } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
+import { useToast } from '@/hooks';
+export default function CreateModel({
+	open,
+	onOpenChange,
+}: {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+}) {
+	const { t } = useTranslation();
+	const { notify } = useToast();
+	const form = useForm<z.infer<typeof ModelSchema>>({
+		resolver: zodResolver(ModelSchema),
+	});
+	const { versionId, appId, orgId, dbId } = useParams() as {
+		versionId: string;
+		appId: string;
+		orgId: string;
+		dbId: string;
+	};
+	const { createModel } = useModelStore();
+
+	const { mutateAsync: createModelMutation, isPending } = useMutation({
+		mutationFn: createModel,
+		mutationKey: ['createModel'],
+		onError: (error: APIError) => {
+			notify({
+				title: error.error,
+				description: error.details,
+				type: 'error',
+			});
+		},
+		onSettled: () => {
+			form.reset();
+			onOpenChange(false);
+		},
+	});
+	async function onSubmit(data: z.infer<typeof ModelSchema>) {
+		createModelMutation({
+			versionId,
+			appId,
+			orgId,
+			dbId,
+			...data,
+		});
+	}
+	return (
+		<Drawer open={open} onOpenChange={onOpenChange}>
+			<DrawerContent className='overflow-x-hidden'>
+				<DrawerHeader className='relative'>
+					<DrawerTitle>{t('database.models.create')}</DrawerTitle>
+				</DrawerHeader>
+				<div className='p-6 space-y-6'>
+					<Form {...form}>
+						<form className='space-y-6' onSubmit={form.handleSubmit(onSubmit)}>
+							<ModelForm loading={isPending} />
+						</form>
+					</Form>
+				</div>
+			</DrawerContent>
+		</Drawer>
+	);
+}

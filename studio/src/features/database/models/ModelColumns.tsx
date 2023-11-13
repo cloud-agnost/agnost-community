@@ -1,17 +1,39 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { TabLink } from '@/features/version/Tabs';
-import useAuthStore from '@/store/auth/authStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
-import { ColumnDefWithClassName, Model, TabTypes } from '@/types';
-import { translate } from '@/utils';
-import { Columns } from '@phosphor-icons/react';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
-import { Button } from 'components/Button';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { APIError, ColumnDefWithClassName, Model, TabTypes } from '@/types';
+import { getVersionPermission, notify, translate } from '@/utils';
+import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'components/Tooltip';
+const canEditModel = getVersionPermission('model.update');
+const canDeleteModel = getVersionPermission('model.delete');
+const { openEditModelDialog, deleteModel } = useModelStore.getState();
+const queryClient = new QueryClient();
+function deleteHandler(model: Model) {
+	queryClient
+		.getMutationCache()
+		.build(queryClient, {
+			mutationFn: deleteModel,
+			onError: (error: APIError) => {
+				notify({
+					title: error.error,
+					description: error.details,
+					type: 'error',
+				});
+			},
+		})
+		.execute({
+			orgId: model.orgId,
+			modelId: model._id,
+			appId: model.appId,
+			dbId: model.dbId,
+			versionId: model.versionId,
+		});
+}
 const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	{
 		id: 'select',
@@ -48,7 +70,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 		},
 	},
 	{
-		id: 'createdAt',
+		id: 'created_at',
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
@@ -56,7 +78,7 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 				column={column}
 			/>
 		),
-		accessorKey: 'createdAt',
+		accessorKey: 'created_at',
 		enableSorting: true,
 		sortingFn: 'datetime',
 		size: 200,
@@ -65,11 +87,14 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 				original: { createdAt, createdBy },
 			},
 		}) => {
-			const isMe = useAuthStore.getState().user?._id === createdBy;
-			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
-			return <DateText date={createdAt}>{avatar}</DateText>;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === createdBy);
+
+			return <DateText date={createdAt} user={user} />;
 		},
 	},
+
 	{
 		id: 'updatedAt',
 		header: ({ column }) => (
@@ -89,65 +114,29 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 			},
 		}) => {
 			if (!updatedBy) return null;
-			const isMe = useAuthStore.getState().user?._id === updatedBy;
-			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
-			return <DateText date={updatedAt}>{avatar}</DateText>;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === updatedBy);
+			return updatedBy && <DateText date={updatedAt} user={user} />;
 		},
 	},
+
 	{
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { setModelToEdit, setIsOpenEditModelDialog, deleteModel } = useModelStore.getState();
-			function openEditDrawer() {
-				setModelToEdit(original);
-				setIsOpenEditModelDialog(true);
-			}
-
-			async function deleteHandler() {
-				await deleteModel({
-					orgId: original.orgId,
-					modelId: original._id,
-					appId: original.appId,
-					dbId: original.dbId,
-					versionId: original.versionId,
-				});
-			}
-			//TODO: add column permissions
 			return (
 				<div className='flex items-center justify-end'>
-					<TooltipProvider>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<Button
-									to={`${original._id}/fields`}
-									iconOnly
-									variant='blank'
-									rounded
-									className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-								>
-									<Columns />
-								</Button>
-							</TooltipTrigger>
-							<TooltipContent>{translate('database.fields.title')}</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
-
-					<ActionsCell
-						original={original}
-						onEdit={openEditDrawer}
-						canEditKey='model.update'
-						type='app'
-					>
+					<ActionsCell original={original} onEdit={openEditModelDialog} canEdit={canEditModel}>
 						<TableConfirmation
 							align='end'
 							closeOnConfirm
 							showAvatar={false}
 							title={translate('database.models.delete.title')}
 							description={translate('database.models.delete.description')}
-							onConfirm={deleteHandler}
+							onConfirm={() => deleteHandler(original)}
 							contentClassName='m-0'
-							permissionKey='model.delete'
+							hasPermission={canDeleteModel}
 						/>
 					</ActionsCell>
 				</div>
