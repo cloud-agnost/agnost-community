@@ -1,4 +1,4 @@
-import { CustomStateStorage, create } from '@/helpers';
+import { create } from '@/helpers';
 import QueueService from '@/services/QueueService';
 import {
 	APIError,
@@ -14,17 +14,16 @@ import {
 	UpdateQueueLogicParams,
 	UpdateQueueParams,
 } from '@/types';
+import { isEmpty } from '@/utils';
 import { devtools, persist } from 'zustand/middleware';
 
 interface MessageQueueStore {
 	queues: MessageQueue[];
 	queue: MessageQueue;
-	editedLogic: string;
-	toDeleteQueue: MessageQueue;
-	isDeleteModalOpen: boolean;
-	lastFetchedCount: number;
+	lastFetchedPage: number;
 	testQueueLogs: TestQueueLogs;
 	isEditModalOpen: boolean;
+	logics: Record<string, string>;
 }
 
 type Actions = {
@@ -36,30 +35,27 @@ type Actions = {
 	updateQueue: (params: UpdateQueueParams) => Promise<MessageQueue>;
 	updateQueueLogic: (params: UpdateQueueLogicParams) => Promise<MessageQueue>;
 	testQueue: (params: TestQueueParams) => Promise<void>;
-	openDeleteModal: (queue: MessageQueue) => void;
-	closeDeleteModal: () => void;
 	setQueueLogs: (queueId: string, log: Log) => void;
 	openEditModal: (queue: MessageQueue) => void;
 	closeEditModal: () => void;
-	setEditedLogic: (logic: string) => void;
+	setLogics: (id: string, logic: string) => void;
+	deleteLogic: (id: string) => void;
 	reset: () => void;
 };
 
 const initialState: MessageQueueStore = {
 	queues: [],
 	queue: {} as MessageQueue,
-	toDeleteQueue: {} as MessageQueue,
-	isDeleteModalOpen: false,
-	lastFetchedCount: 0,
+	lastFetchedPage: 0,
 	testQueueLogs: {} as TestQueueLogs,
 	isEditModalOpen: false,
-	editedLogic: '',
+	logics: {},
 };
 
 const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 	devtools(
 		persist(
-			(set) => ({
+			(set, get) => ({
 				...initialState,
 				openEditModal: (queue: MessageQueue) => {
 					set({ queue, isEditModalOpen: true });
@@ -70,18 +66,21 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				getQueues: async (params: GetMessageQueuesParams) => {
 					const queues = await QueueService.getQueues(params);
 					if (params.page === 0) {
-						set({ queues, lastFetchedCount: queues.length });
+						set({ queues });
 					} else {
 						set((prev) => ({
 							queues: [...prev.queues, ...queues],
-							lastFetchedCount: queues.length,
+							lastFetchedPage: params.page,
 						}));
 					}
 					return queues;
 				},
 				getQueueById: async (params: GetMessageQueueByIdParams) => {
 					const queue = await QueueService.getQueueById(params);
-					set({ queue, editedLogic: queue.logic });
+					set({ queue });
+					if (isEmpty(get().logics[queue._id])) {
+						get().setLogics(queue._id, queue.logic);
+					}
 					return queue;
 				},
 				deleteQueue: async (params: DeleteMessageQueueParams) => {
@@ -166,12 +165,7 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 						throw error as APIError;
 					}
 				},
-				openDeleteModal: (queue: MessageQueue) => {
-					set({ toDeleteQueue: queue, isDeleteModalOpen: true });
-				},
-				closeDeleteModal: () => {
-					set({ isDeleteModalOpen: false, toDeleteQueue: {} as MessageQueue });
-				},
+
 				setQueueLogs: (queueId: string, log: Log) => {
 					set((prev) => ({
 						testQueueLogs: {
@@ -183,12 +177,19 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 						},
 					}));
 				},
-				setEditedLogic: (logic: string) => set({ editedLogic: logic }),
+				setLogics: (id, logic) => set((prev) => ({ logics: { ...prev.logics, [id]: logic } })),
+				deleteLogic: (id) => {
+					const { [id]: _, ...rest } = get().logics;
+					set({ logics: rest });
+				},
 				reset: () => set(initialState),
 			}),
 			{
-				name: 'message-queue-store',
-				storage: CustomStateStorage,
+				name: 'Message Queue Store',
+				partialize: (state) =>
+					Object.fromEntries(
+						Object.entries(state).filter(([key]) => ['testQueueLogs'].includes(key)),
+					),
 			},
 		),
 	),

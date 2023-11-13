@@ -1,158 +1,101 @@
 import { Button } from '@/components/Button';
-import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { PAGE_SIZE } from '@/constants';
-import { MessageQueueColumns } from '@/features/queue';
-import { useToast } from '@/hooks';
+import { CreateMessageQueue, MessageQueueColumns } from '@/features/queue';
+import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import { APIError, MessageQueue } from '@/types';
-import { Row, Table } from '@tanstack/react-table';
-import { useEffect, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import useTabStore from '@/store/version/tabStore';
+import useVersionStore from '@/store/version/versionStore';
+import { APIError, MessageQueue, TabTypes } from '@/types';
+import { generateId } from '@/utils';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useOutletContext, useParams, useSearchParams } from 'react-router-dom';
-interface OutletContext {
-	setIsCreateModalOpen: (isOpen: boolean) => void;
-	selectedRows: Row<MessageQueue>[];
-	setSelectedRows: (rows: Row<MessageQueue>[]) => void;
-	table: Table<MessageQueue>;
-	setTable: (table: Table<MessageQueue>) => void;
-	page: number;
-	setPage: (page: number) => void;
-}
+import { useParams } from 'react-router-dom';
+
 export default function MainMessageQueue() {
-	const {
-		getQueues,
-		queues,
-		isDeleteModalOpen,
-		closeDeleteModal,
-		lastFetchedCount,
-		toDeleteQueue,
-		deleteQueue,
-		deleteMultipleQueues,
-	} = useMessageQueueStore();
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<APIError>();
+	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+	const { addTab } = useTabStore();
+	const { getVersionDashboardPath } = useVersionStore();
+	const { getQueues, queues, lastFetchedPage, deleteMultipleQueues } = useMessageQueueStore();
 	const { notify } = useToast();
 	const canEdit = useAuthorizeVersion('queue.create');
-	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
+	const table = useTable({
+		columns: MessageQueueColumns,
+		data: queues,
+	});
 
-	const {
-		setSelectedRows,
-		setTable,
-		page,
-		setPage,
-		setIsCreateModalOpen,
-		table,
-		selectedRows,
-	}: OutletContext = useOutletContext();
-
-	function deleteQueueHandler() {
-		setLoading(true);
-		deleteQueue({
-			queueId: toDeleteQueue?._id,
-			orgId: orgId as string,
-			appId: appId as string,
-			versionId: versionId as string,
-			onSuccess: () => {
-				setLoading(false);
-				closeDeleteModal();
-			},
-			onError: (error) => {
-				setError(error);
-				setLoading(false);
-				closeDeleteModal();
-			},
-		});
-	}
+	const { mutateAsync: deleteMultipleQueueMutation } = useMutation({
+		mutationFn: deleteMultipleQueues,
+		onSuccess: () => {
+			table?.resetRowSelection();
+		},
+		onError: ({ error, details }: APIError) => {
+			notify({ type: 'error', description: details, title: error });
+		},
+	});
 
 	function deleteMultipleQueuesHandler() {
-		deleteMultipleQueues({
-			queueIds: selectedRows.map((row) => row.original._id),
+		deleteMultipleQueueMutation({
+			queueIds: table.getSelectedRowModel().rows.map((row) => row.original._id),
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			onSuccess: () => {
-				table.toggleAllRowsSelected(false);
-				setPage(0);
-			},
-			onError: ({ error, details }) => {
-				notify({ type: 'error', description: details, title: error });
-			},
 		});
 	}
 
-	useEffect(() => {
-		if (versionId && orgId && appId) {
-			setLoading(true);
-			getQueues({
-				orgId,
-				appId,
-				versionId,
-				page,
-				size: PAGE_SIZE,
-				search: searchParams.get('q') ?? undefined,
-			});
-			setLoading(false);
-		}
-	}, [searchParams.get('q'), page]);
+	const { fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } = useInfiniteScroll({
+		queryFn: getQueues,
+		lastFetchedPage,
+		queryKey: 'queues',
+		dataLength: queues.length,
+	});
+
+	function openLogTab() {
+		addTab(versionId as string, {
+			id: generateId(),
+			title: t('queue.logs'),
+			path: getVersionDashboardPath('queue/logs'),
+			isActive: true,
+			isDashboard: false,
+			type: TabTypes.MessageQueue,
+		});
+	}
 	return (
-		<VersionTabLayout<MessageQueue>
-			isEmpty={queues.length === 0}
-			title={t('queue.title')}
-			type='queue'
-			openCreateModal={() => setIsCreateModalOpen(true)}
-			createButtonTitle={t('queue.create.title')}
-			emptyStateTitle={t('queue.empty_text')}
-			table={table}
-			onMultipleDelete={deleteMultipleQueuesHandler}
-			disabled={!canEdit}
-			handlerButton={
-				<Button variant='secondary' to='logs'>
-					{t('queue.view_logs')}
-				</Button>
-			}
-		>
-			<InfiniteScroll
-				scrollableTarget='version-layout'
-				dataLength={queues.length}
-				next={() => setPage(page + 1)}
-				hasMore={lastFetchedCount >= PAGE_SIZE}
-				loader={loading && <TableLoading />}
-			>
-				<DataTable
-					columns={MessageQueueColumns}
-					data={queues}
-					setSelectedRows={setSelectedRows}
-					setTable={setTable}
-				/>
-			</InfiniteScroll>
-			<ConfirmationModal
-				loading={loading}
-				error={error}
-				title={t('queue.delete.title')}
-				alertTitle={t('queue.delete.message')}
-				alertDescription={t('queue.delete.description')}
-				description={
-					<Trans
-						i18nKey='queue.delete.confirmCode'
-						values={{ confirmCode: toDeleteQueue?.iid }}
-						components={{
-							confirmCode: <span className='font-bold text-default' />,
-						}}
-					/>
+		<>
+			<VersionTabLayout<MessageQueue>
+				isEmpty={queues.length === 0}
+				title={t('queue.title')}
+				type='queue'
+				openCreateModal={() => setIsCreateModalOpen(true)}
+				createButtonTitle={t('queue.create.title')}
+				emptyStateTitle={t('queue.empty_text')}
+				table={table}
+				onMultipleDelete={deleteMultipleQueuesHandler}
+				disabled={!canEdit}
+				loading={isFetching && !queues.length}
+				handlerButton={
+					<Button variant='secondary' onClick={openLogTab}>
+						{t('queue.view_logs')}
+					</Button>
 				}
-				confirmCode={toDeleteQueue?.iid}
-				onConfirm={deleteQueueHandler}
-				isOpen={isDeleteModalOpen}
-				closeModal={closeDeleteModal}
-				closable
-			/>
-		</VersionTabLayout>
+			>
+				<InfiniteScroll
+					scrollableTarget='version-layout'
+					dataLength={queues.length}
+					next={fetchNextPage}
+					hasMore={hasNextPage}
+					loader={isFetchingNextPage && <TableLoading />}
+				>
+					<DataTable table={table} />
+				</InfiniteScroll>
+			</VersionTabLayout>
+			<CreateMessageQueue open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+		</>
 	);
 }
