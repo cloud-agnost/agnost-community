@@ -6,24 +6,24 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useParams } from 'react-router-dom';
 import useTabStore from '@/store/version/tabStore';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import { useMutation } from '@tanstack/react-query';
+import { APIError } from '@/types';
 EditMessageQueue.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { queueId, orgId, versionId, appId } = params;
 	if (!queueId) return null;
-	const { getCurrentTab, updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
-	const { queue } = useMessageQueueStore.getState();
-	if (queue?._id === queueId && history.state?.type !== 'tabChanged') {
-		useMessageQueueStore.setState({
-			editedLogic: queue.logic,
-		});
+	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
+	const { queue, setLogics, getQueueById, logics } = useMessageQueueStore.getState();
+	if (queue?._id === queueId) {
 		updateCurrentTab(versionId as string, {
-			...getCurrentTab(versionId as string),
-			isDirty: false,
+			isDirty: logics[queueId] ? queue.logic !== logics[queueId] : false,
 		});
+		setLogics(queueId, logics[queueId] ?? queue.logic);
 		closeDeleteTabModal();
 		return { queue };
 	}
 
-	await useMessageQueueStore.getState().getQueueById({
+	await getQueueById({
 		orgId: orgId as string,
 		appId: appId as string,
 		versionId: versionId as string,
@@ -36,9 +36,9 @@ EditMessageQueue.loader = async ({ params }: LoaderFunctionArgs) => {
 export default function EditMessageQueue() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const { updateQueueLogic, queue, openEditModal, editedLogic, setEditedLogic } =
+	const canEdit = useAuthorizeVersion('queue.update');
+	const { updateQueueLogic, queue, openEditModal, setLogics, deleteLogic, logics } =
 		useMessageQueueStore();
-	const [loading, setLoading] = useState(false);
 	const [isTestQueueOpen, setIsTestQueueOpen] = useState(false);
 
 	const { versionId, appId, orgId, queueId } = useParams<{
@@ -48,41 +48,45 @@ export default function EditMessageQueue() {
 		queueId: string;
 	}>();
 
+	const { mutateAsync: updateQueueCode, isPending } = useMutation({
+		mutationFn: updateQueueLogic,
+		mutationKey: ['updateQueueLogic'],
+		onSuccess: () => {
+			notify({
+				title: t('general.success'),
+				description: t('queue.editLogicSuccess'),
+				type: 'success',
+			});
+		},
+		onError: ({ error, details }: APIError) => {
+			notify({
+				title: error,
+				description: details,
+				type: 'error',
+			});
+		},
+	});
+
 	function saveLogic(logic: string) {
-		setLoading(true);
-		updateQueueLogic({
+		updateQueueCode({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			queueId: queueId as string,
-			logic: logic ?? editedLogic,
-			onSuccess: () => {
-				setLoading(false);
-				notify({
-					title: t('general.success'),
-					description: t('queue.editLogicSuccess'),
-					type: 'success',
-				});
-			},
-			onError: ({ error, details }) => {
-				setLoading(false);
-				notify({
-					title: error,
-					description: details,
-					type: 'error',
-				});
-			},
+			logic: logic,
 		});
 	}
 	return (
 		<VersionEditorLayout
 			onEditModalOpen={() => openEditModal(queue)}
 			onTestModalOpen={() => setIsTestQueueOpen(true)}
-			onSaveLogic={(value) => saveLogic(value as string)}
-			loading={loading}
-			logic={editedLogic}
-			setLogic={(value) => setEditedLogic(value as string)}
+			onSaveLogic={saveLogic}
+			loading={isPending}
 			name={queue._id}
+			canEdit={canEdit}
+			logic={logics[queue._id]}
+			setLogic={(val) => setLogics(queue._id, val)}
+			deleteLogic={() => deleteLogic(queue._id)}
 			breadCrumbItems={[
 				{
 					name: t('queue.title').toString(),

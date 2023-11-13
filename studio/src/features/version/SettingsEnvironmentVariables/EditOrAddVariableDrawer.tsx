@@ -1,7 +1,6 @@
-import { NAME_SCHEMA } from '@/constants';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useSettingsStore from '@/store/version/settingsStore';
-import { APIError } from '@/types';
+import { APIError, NameSchema } from '@/types';
 import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
@@ -15,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 const MiddlewareFormSchema = z.object({
-	name: NAME_SCHEMA,
+	name: NameSchema,
 	value: z
 		.string({
 			required_error: translate('forms.required', {

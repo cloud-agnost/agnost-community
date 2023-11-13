@@ -4,7 +4,10 @@ import { SortButton } from '@/components/DataTable';
 import { BADGE_COLOR_MAP } from '@/constants';
 import useResourceStore from '@/store/resources/resourceStore';
 import { ColumnDefWithClassName, Resource } from '@/types';
-import { translate } from '@/utils';
+import { getOrgPermission, translate } from '@/utils';
+
+const canEditResource = getOrgPermission('resource.update');
+const canDeleteResource = getOrgPermission('resource.delete');
 export const EnvironmentResourcesColumn: ColumnDefWithClassName<Resource>[] = [
 	{
 		id: 'name',
@@ -62,9 +65,8 @@ export const EnvironmentResourcesColumn: ColumnDefWithClassName<Resource>[] = [
 							isDeletedResourceModalOpen: true,
 						})
 					}
-					canEditKey='resource.update'
-					canDeleteKey='resource.delete'
-					type='org'
+					canEdit={canEditResource}
+					canDelete={canDeleteResource}
 				/>
 			);
 		},

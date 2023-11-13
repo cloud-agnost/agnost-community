@@ -44,6 +44,7 @@ interface VersionStore {
 	dashboard: Dashboard;
 	packages: Record<string, string>;
 	typings: Record<string, string>;
+	lastFetchedLogPage: number;
 }
 
 type Actions = {
@@ -58,8 +59,8 @@ type Actions = {
 	) => Promise<Version | void>;
 	getVersionDashboardPath: (appendPath?: string, version?: Version) => string;
 	setCreateCopyVersionDrawerIsOpen: (isOpen: boolean) => void;
-	getVersionLogs: (params: GetVersionLogsParams) => Promise<void>;
-	getVersionLogBuckets: (params: GetVersionLogBucketsParams) => Promise<void>;
+	getVersionLogs: (params: GetVersionLogsParams) => Promise<VersionLog[]>;
+	getVersionLogBuckets: (params: GetVersionLogBucketsParams) => Promise<VersionLogBucket>;
 	openVersionLogDetails: (log: VersionLog) => void;
 	closeVersionLogDetails: () => void;
 	deleteVersion: (params: DeleteVersionParams) => Promise<void>;
@@ -95,6 +96,7 @@ const initialState: VersionStore = {
 	dashboard: {} as Dashboard,
 	packages: {},
 	typings: {},
+	lastFetchedLogPage: 0,
 };
 
 const useVersionStore = create<VersionStore & Actions>()(
@@ -193,6 +195,7 @@ const useVersionStore = create<VersionStore & Actions>()(
 					try {
 						const logBuckets = await VersionService.getVersionLogBuckets(params);
 						set({ logBuckets });
+						return logBuckets;
 					} catch (error) {
 						throw error as APIError;
 					}
@@ -204,8 +207,9 @@ const useVersionStore = create<VersionStore & Actions>()(
 						if (params.page === 0) {
 							set({ logs: logs });
 						} else {
-							set({ logs: [...get().logs, ...logs] });
+							set({ logs: [...get().logs, ...logs], lastFetchedLogPage: params.page });
 						}
+						return logs;
 					} catch (error) {
 						throw error as APIError;
 					}

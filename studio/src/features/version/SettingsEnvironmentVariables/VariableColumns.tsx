@@ -1,16 +1,17 @@
 import { ActionsCell } from '@/components/ActionsCell';
-import useAuthorizeApp from '@/hooks/useAuthorizeApp';
-import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, Param } from '@/types';
-import { translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
+
+const canEditParam = getVersionPermission('version.param.update');
+const canDeleteParam = getVersionPermission('version.param.delete');
 
 const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	{
@@ -113,7 +114,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 		cell: ({ row: { original } }) => {
 			const { version } = useVersionStore.getState();
 			const { deleteParam, setParam, setEditParamDrawerIsOpen } = useSettingsStore.getState();
-			async function clickHandler() {
+			async function onDelete() {
 				if (!version) return;
 				await deleteParam({
 					versionId: version?._id,
@@ -128,37 +129,21 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 				setEditParamDrawerIsOpen(true);
 			}
 			return (
-				<ActionsCell
-					original={original}
-					canEditKey='version.key.update'
-					onEdit={editHandler}
-					type='version'
-				>
-					<ConfirmTable onDelete={clickHandler} />
+				<ActionsCell original={original} onEdit={editHandler} canEdit={canEditParam}>
+					<TableConfirmation
+						align='end'
+						closeOnConfirm
+						showAvatar={false}
+						title={translate('version.variable.delete_modal_title')}
+						description={translate('version.variable.delete_modal_desc')}
+						onConfirm={onDelete}
+						contentClassName='m-0'
+						hasPermission={canDeleteParam}
+					/>
 				</ActionsCell>
 			);
 		},
 	},
 ];
-
-function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-	const role = useApplicationStore.getState().role;
-	const hasAppPermission = useAuthorizeApp({
-		key: 'version.key.delete',
-		role,
-	});
-	return (
-		<TableConfirmation
-			align='end'
-			closeOnConfirm
-			showAvatar={false}
-			title={translate('version.variable.delete_modal_title')}
-			description={translate('version.variable.delete_modal_desc')}
-			onConfirm={onDelete}
-			contentClassName='m-0'
-			disabled={!hasAppPermission}
-		/>
-	);
-}
 
 export default VariableColumns;

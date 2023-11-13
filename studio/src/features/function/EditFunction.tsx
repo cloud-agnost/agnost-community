@@ -2,7 +2,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import useFunctionStore from '@/store/function/functionStore';
-import { CreateTaskSchema } from '@/types';
+import { APIError, CreateFunctionSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import FunctionForm from './FunctionForm';
+import { useMutation } from '@tanstack/react-query';
 interface EditTaskProps {
 	open: boolean;
 	onClose: () => void;
@@ -19,30 +20,42 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 	const { t } = useTranslation();
 	const { updateFunction, function: helper } = useFunctionStore();
 	const { notify } = useToast();
-	const { versionId, appId, orgId, funcId } = useParams<{
+	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
 		orgId: string;
-		funcId: string;
 	}>();
 
-	const form = useForm<z.infer<typeof CreateTaskSchema>>({
-		resolver: zodResolver(CreateTaskSchema),
+	const form = useForm<z.infer<typeof CreateFunctionSchema>>({
+		resolver: zodResolver(CreateFunctionSchema),
 	});
 
-	function onSubmit(data: z.infer<typeof CreateTaskSchema>) {
-		updateFunction({
+	const { mutate: updateFunctionMutation } = useMutation({
+		mutationFn: updateFunction,
+		onSuccess: () => {
+			onClose();
+			notify({
+				title: t('general.success'),
+				description: t('endpoint.editLogicSuccess'),
+				type: 'success',
+			});
+		},
+		onError: (error: APIError) => {
+			notify({
+				title: error.error,
+				description: error.details,
+				type: 'error',
+			});
+		},
+	});
+
+	function onSubmit(data: z.infer<typeof CreateFunctionSchema>) {
+		updateFunctionMutation({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			funcId: funcId as string,
+			funcId: helper._id,
 			...data,
-			onSuccess: () => {
-				onClose();
-			},
-			onError: ({ error, details }) => {
-				notify({ type: 'error', description: details, title: error });
-			},
 		});
 	}
 
@@ -52,12 +65,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 		}
 	}, [helper]);
 	return (
-		<Drawer
-			open={open}
-			onOpenChange={() => {
-				onClose();
-			}}
-		>
+		<Drawer open={open} onOpenChange={onClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>

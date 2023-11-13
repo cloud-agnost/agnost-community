@@ -264,7 +264,7 @@ export const AccessDbSchema = z
 			resourceConfig.resourceType !== ResourceType.Storage &&
 			resourceConfig.type !== ResourceType.Queue
 		) {
-			return ctx.addIssue({
+			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: translate('forms.required', {
 					label: translate('resources.database.host'),
@@ -277,7 +277,7 @@ export const AccessDbSchema = z
 			resourceConfig.resourceType !== ResourceType.Storage &&
 			resourceConfig.type !== ResourceType.Queue
 		) {
-			return ctx.addIssue({
+			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: translate('forms.required', {
 					label: translate('resources.database.port'),
@@ -287,7 +287,7 @@ export const AccessDbSchema = z
 		}
 
 		if (!val.username && resourceConfig.resourceType === ResourceType.Database) {
-			return ctx.addIssue({
+			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: translate('forms.required', {
 					label: translate('resources.database.username'),
@@ -296,7 +296,7 @@ export const AccessDbSchema = z
 			});
 		}
 		if (!val.password && resourceConfig.resourceType === ResourceType.Database) {
-			return ctx.addIssue({
+			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: translate('forms.required', {
 					label: translate('resources.database.password'),
@@ -306,7 +306,7 @@ export const AccessDbSchema = z
 		}
 
 		if (!val.format && resourceConfig.resourceType === ResourceType.Queue) {
-			return ctx.addIssue({
+			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: translate('forms.required', {
 					label: translate('resources.database.selectConnFormat'),
@@ -316,7 +316,7 @@ export const AccessDbSchema = z
 		}
 		if (val.format === 'object' && resourceConfig.instance === ResourceInstances.RabbitMQ) {
 			if (!val.scheme) {
-				return ctx.addIssue({
+				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					message: translate('forms.required', {
 						label: translate('resources.queue.scheme'),
@@ -325,7 +325,7 @@ export const AccessDbSchema = z
 				});
 			}
 			if (!val.host) {
-				return ctx.addIssue({
+				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					message: translate('forms.required', {
 						label: translate('resources.database.host'),
@@ -334,7 +334,7 @@ export const AccessDbSchema = z
 				});
 			}
 			if (!val.port) {
-				return ctx.addIssue({
+				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					message: translate('forms.required', {
 						label: translate('resources.database.port'),
@@ -344,7 +344,7 @@ export const AccessDbSchema = z
 			}
 
 			if (!val.username) {
-				return ctx.addIssue({
+				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					message: translate('forms.required', {
 						label: translate('resources.database.username'),
@@ -353,7 +353,7 @@ export const AccessDbSchema = z
 				});
 			}
 			if (!val.password) {
-				return ctx.addIssue({
+				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					message: translate('forms.required', {
 						label: translate('resources.database.password'),
@@ -367,7 +367,7 @@ export const AccessDbSchema = z
 			resourceConfig.instance === ResourceInstances.RabbitMQ &&
 			val.format === 'url'
 		) {
-			return ctx.addIssue({
+			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: translate('forms.required', {
 					label: translate('resources.queue.url'),
@@ -378,7 +378,7 @@ export const AccessDbSchema = z
 
 		if (resourceConfig.instance === ResourceInstances.Kafka && val.format === 'ssl') {
 			if (!val.ssl?.key) {
-				return ctx.addIssue({
+				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					message: translate('forms.required', {
 						label: translate('resources.queue.publicKey'),
@@ -387,7 +387,7 @@ export const AccessDbSchema = z
 				});
 			}
 			if (!val.ssl?.cert) {
-				return ctx.addIssue({
+				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					message: translate('forms.required', {
 						label: translate('resources.queue.certificate'),
@@ -396,7 +396,7 @@ export const AccessDbSchema = z
 				});
 			}
 			if (!val.ssl?.ca) {
-				return ctx.addIssue({
+				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					message: translate('forms.required', {
 						label: translate('resources.queue.ca'),
@@ -407,7 +407,7 @@ export const AccessDbSchema = z
 		}
 		if (val.format === 'sasl' && resourceConfig.instance === ResourceInstances.Kafka) {
 			if (!val.sasl?.mechanism) {
-				return ctx.addIssue({
+				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					message: translate('forms.required', {
 						label: translate('resources.queue.mechanism'),
@@ -416,7 +416,7 @@ export const AccessDbSchema = z
 				});
 			}
 			if (!val.sasl?.username) {
-				return ctx.addIssue({
+				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					message: translate('forms.required', {
 						label: translate('resources.database.username'),
@@ -425,7 +425,7 @@ export const AccessDbSchema = z
 				});
 			}
 			if (!val.sasl?.password) {
-				return ctx.addIssue({
+				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					message: translate('forms.required', {
 						label: translate('resources.database.password'),
@@ -437,7 +437,7 @@ export const AccessDbSchema = z
 		if (resourceConfig.type === ResourceType.Storage) {
 			if (resourceConfig.instance === ResourceInstances.AWSS3) {
 				if (!val.accessKeyId) {
-					return ctx.addIssue({
+					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: translate('forms.required', {
 							label: translate('resources.storage.aws.accessKeyId'),
@@ -447,7 +447,7 @@ export const AccessDbSchema = z
 				}
 
 				if (!val.secretAccessKey) {
-					return ctx.addIssue({
+					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: translate('forms.required', {
 							label: translate('resources.storage.aws.secretAccessKey'),
@@ -456,7 +456,7 @@ export const AccessDbSchema = z
 					});
 				}
 				if (!val.region) {
-					return ctx.addIssue({
+					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: translate('forms.required', {
 							label: translate('resources.storage.aws.region'),
@@ -467,7 +467,7 @@ export const AccessDbSchema = z
 			}
 			if (resourceConfig.instance === ResourceInstances.AzureBlob) {
 				if (!val.connectionString) {
-					return ctx.addIssue({
+					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: translate('forms.required', {
 							label: translate('resources.storage.azure.connectionString'),
@@ -479,7 +479,7 @@ export const AccessDbSchema = z
 
 			if (resourceConfig.instance === ResourceInstances.GCPStorage) {
 				if (!val.projectId) {
-					return ctx.addIssue({
+					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: translate('forms.required', {
 							label: translate('resources.storage.gcp.projectId'),
@@ -488,7 +488,7 @@ export const AccessDbSchema = z
 					});
 				}
 				if (!val.keyFileContents) {
-					return ctx.addIssue({
+					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: translate('forms.required', {
 							label: translate('resources.storage.gcp.keyFileContents'),

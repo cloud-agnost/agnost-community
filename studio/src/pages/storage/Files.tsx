@@ -3,17 +3,16 @@ import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { Progress } from '@/components/Progress';
 import { TableLoading } from '@/components/Table/Table';
-import { PAGE_SIZE } from '@/constants';
 import { EditFile, FileColumns } from '@/features/storage';
-import { useToast } from '@/hooks';
+import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useStorageStore from '@/store/storage/storageStore';
-import { APIError, BucketFile } from '@/types';
-import { Row, Table } from '@tanstack/react-table';
-import { useEffect, useState } from 'react';
+import useVersionStore from '@/store/version/versionStore';
+import { APIError } from '@/types';
+import { useMutation } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { LoaderFunctionArgs, useSearchParams } from 'react-router-dom';
+import { LoaderFunctionArgs } from 'react-router-dom';
 
 Files.Loader = async ({ params }: LoaderFunctionArgs) => {
 	const { bucketName } = params;
@@ -32,15 +31,9 @@ Files.Loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export default function Files() {
-	const [selectedRows, setSelectedRows] = useState<Row<BucketFile>[]>([]);
-	const [table, setTable] = useState<Table<BucketFile>>();
-	const [page, setPage] = useState(1);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
-	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
-
+	const { getVersionDashboardPath } = useVersionStore();
 	const {
 		getFilesOfBucket,
 		bucket,
@@ -58,7 +51,7 @@ export default function Files() {
 		uploadProgress,
 	} = useStorageStore();
 
-	const storageUrl = `/organization/${storage?.orgId}/apps/${storage?.appId}/version/${storage?.versionId}/storage`;
+	const storageUrl = getVersionDashboardPath(`/${storage?.versionId}/storage`);
 	const bucketUrl = `${storageUrl}/${storage._id}`;
 	const breadcrumbItems: BreadCrumbItem[] = [
 		{
@@ -73,35 +66,63 @@ export default function Files() {
 			name: bucket?.name as string,
 		},
 	];
+
+	const { isPending, hasNextPage, fetchNextPage } = useInfiniteScroll({
+		queryFn: getFilesOfBucket,
+		queryKey: 'files',
+		lastFetchedPage: fileCountInfo.currentPage,
+		dataLength: files.length,
+	});
+
+	const table = useTable({
+		data: files,
+		columns: FileColumns,
+	});
+
+	const { mutateAsync: deleteMultipleFileMutation } = useMutation({
+		mutationFn: deleteMultipleFileFromBucket,
+		mutationKey: ['deleteMultipleFileFromBucket'],
+		onSuccess: () => {
+			table?.resetRowSelection();
+		},
+		onError: ({ error, details }: APIError) => {
+			notify({ type: 'error', description: details, title: error });
+		},
+	});
+
+	const {
+		mutateAsync: deleteFileMutation,
+		isPending: deleteLoading,
+		error: deleteError,
+	} = useMutation({
+		mutationFn: deleteFileFromBucket,
+		mutationKey: ['deleteFileFromBucket'],
+		onSettled: closeDeleteFileDialog,
+	});
+
+	const { mutateAsync: updateFileMutation, isPending: uploadLoading } = useMutation({
+		mutationFn: uploadFileToBucket,
+		mutationKey: ['uploadFileToBucket'],
+		onSuccess: () => {
+			useStorageStore.setState({ uploadProgress: 0 });
+		},
+		onError: (error: APIError) => {
+			notify({ type: 'error', description: error.details, title: error.error });
+		},
+	});
+
 	function deleteMultipleFilesHandler() {
-		deleteMultipleFileFromBucket({
-			filePaths: selectedRows.map((row) => row.original.path),
+		deleteMultipleFileMutation({
+			filePaths: table.getSelectedRowModel().rows.map((row) => row.original.path),
 			storageName: storage?.name as string,
 			bucketName: bucket?.name as string,
-			onSuccess: () => {
-				table?.toggleAllRowsSelected(false);
-				setPage(1);
-			},
-			onError: ({ error, details }) => {
-				notify({ type: 'error', description: details, title: error });
-			},
 		});
 	}
 	function deleteFileHandler() {
-		setLoading(true);
-		deleteFileFromBucket({
+		deleteFileMutation({
 			storageName: storage?.name as string,
 			bucketName: bucket?.name as string,
 			filePath: toDeleteFile?.path as string,
-			onSuccess: () => {
-				setLoading(false);
-				closeDeleteFileDialog();
-			},
-			onError: (error) => {
-				setError(error);
-				setLoading(false);
-				closeDeleteFileDialog();
-			},
 		});
 	}
 
@@ -110,44 +131,19 @@ export default function Files() {
 		fileInput.type = 'file';
 		fileInput.multiple = true;
 		fileInput.onchange = (e) => {
-			setLoading(true);
 			const files = (e.target as HTMLInputElement).files;
 			if (!files) return;
-			uploadFileToBucket({
+			updateFileMutation({
 				storageName: storage?.name,
 				bucketName: bucket?.name,
 				isPublic: true,
 				upsert: true,
 				files,
-				onSuccess: () => {
-					setPage(1);
-					setLoading(false);
-					useStorageStore.setState({ uploadProgress: 0 });
-				},
-				onError: (error) => {
-					setLoading(false);
-					setError(error);
-					notify({ type: 'error', description: error.details, title: error.error });
-				},
 			});
 		};
 		fileInput.click();
 	}
 
-	useEffect(() => {
-		if (storage?.name && bucket?.name && page) {
-			setLoading(true);
-			getFilesOfBucket({
-				storageName: storage?.name,
-				bucketName: bucket?.name,
-				page,
-				limit: PAGE_SIZE,
-				search: searchParams.get('q') as string,
-				returnCountInfo: true,
-			});
-			setLoading(false);
-		}
-	}, [searchParams.get('q'), page, bucket?.name]);
 	return (
 		<VersionTabLayout
 			breadCrumb={<BreadCrumb goBackLink={bucketUrl} items={breadcrumbItems} />}
@@ -157,32 +153,23 @@ export default function Files() {
 			openCreateModal={uploadFileHandler}
 			createButtonTitle={t('storage.file.upload')}
 			emptyStateTitle={t('storage.file.empty_text')}
-			table={table as Table<BucketFile>}
-			selectedRowLength={selectedRows?.length}
-			onSearch={() => setPage(1)}
 			onMultipleDelete={deleteMultipleFilesHandler}
+			loading={isPending && !files.length}
 		>
-			{loading && (uploadProgress > 0 || uploadProgress < 100) && (
+			{uploadLoading && (uploadProgress > 0 || uploadProgress < 100) && (
 				<Progress value={uploadProgress} />
 			)}
 			<InfiniteScroll
 				scrollableTarget='version-layout'
 				dataLength={files.length}
-				next={() => {
-					setPage(page + 1);
-				}}
-				hasMore={fileCountInfo.count >= PAGE_SIZE}
-				loader={loading && <TableLoading />}
+				next={fetchNextPage}
+				hasMore={hasNextPage}
+				loader={isPending && <TableLoading />}
 			>
-				<DataTable
-					columns={FileColumns}
-					data={files}
-					setSelectedRows={setSelectedRows}
-					setTable={setTable}
-				/>
+				<DataTable table={table} />
 				<ConfirmationModal
-					loading={loading}
-					error={error}
+					loading={deleteLoading}
+					error={deleteError}
 					title={t('storage.file.delete.title')}
 					alertTitle={t('storage.file.delete.message')}
 					alertDescription={t('storage.file.delete.description')}

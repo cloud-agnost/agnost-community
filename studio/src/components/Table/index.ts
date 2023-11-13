@@ -1,14 +1,13 @@
 export {
 	Table,
-	TableHeader,
 	TableBody,
+	TableCaption,
+	TableCell,
 	TableFooter,
 	TableHead,
+	TableHeader,
 	TableRow,
-	TableCell,
-	TableCaption,
 } from './Table';
 
-export { TableConfirmation } from './TableConfirmation';
 export { default as SelectedRowButton } from './SelectedRowButton';
-export { default as TableActions } from './TableActions';
+export { TableConfirmation } from './TableConfirmation';

@@ -11,6 +11,7 @@ module.exports = {
 		'plugin:react/recommended',
 		'plugin:jsx-a11y/recommended',
 		'prettier',
+		'@tanstack/query',
 	],
 	parser: '@typescript-eslint/parser',
 	parserOptions: {
@@ -23,5 +24,7 @@ module.exports = {
 		'react/react-in-jsx-scope': 'off',
 		'react/prop-types': 'off',
 		'react-hooks/exhaustive-deps': 'off',
+		'@tanstack/query/exhaustive-deps': 'error',
+		'@tanstack/query/stable-query-client': 'error',
 	},
 };

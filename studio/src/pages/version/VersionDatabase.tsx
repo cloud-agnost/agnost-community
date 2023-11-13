@@ -1,74 +1,90 @@
-import { CreateAndEditDatabaseDrawer } from '@/features/database/CreateAndEditDatabaseDrawer';
-import { DatabaseColumns } from '@/features/database/ListDatabase/index.ts';
+import { CreateDatabase, EditDatabase } from '@/features/database';
+import { DatabaseColumns } from '@/features/database';
+import { useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
-import { Database } from '@/types';
-import { Row, Table } from '@tanstack/react-table';
+import { APIError, Database } from '@/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { ConfirmationModal } from 'components/ConfirmationModal';
 import { DataTable } from 'components/DataTable';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useParams, useSearchParams } from 'react-router-dom';
-
+import { useParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 export default function VersionDatabase() {
 	const {
 		databases,
 		toDeleteDatabase,
-		isOpenDeleteDatabaseDialog,
-		setIsOpenDeleteDatabaseDialog,
-		setEditDatabaseDialogOpen,
+		isDeleteDatabaseDialogOpen,
+		isEditDatabaseDialogOpen,
+		closeEditDatabaseDialog,
+		closeDeleteDatabaseDialog,
 		deleteDatabase,
 		getDatabasesOfApp,
-		editDatabaseDialogOpen,
-		// lastFetchedCount,
 	} = useDatabaseStore();
-	const [page, setPage] = useState(0);
 	const { t } = useTranslation();
-	const [selectedRows, setSelectedRows] = useState<Row<Database>[]>();
+	const { notify } = useToast();
 	const canEdit = useAuthorizeVersion('db.create');
 	const [createDrawerIsOpen, setCreateDrawerIsOpen] = useState(false);
-	const [table, setTable] = useState<Table<Database>>();
 	const [searchParams] = useSearchParams();
-	const [_, setLoading] = useState(false);
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
 		orgId: string;
 	}>();
+
+	const filteredDatabase = useMemo(() => {
+		if (searchParams.get('q')) {
+			const query = new RegExp(searchParams.get('q') as string, 'i');
+			return databases.filter((database) => database.name.match(query));
+		}
+		return databases;
+	}, [searchParams.get('q'), databases]);
+
+	const { isFetching } = useQuery({
+		queryKey: ['getDatabases'],
+		queryFn: () => {
+			getDatabasesOfApp({
+				orgId: orgId as string,
+				versionId: versionId as string,
+				appId: appId as string,
+			});
+		},
+	});
+
+	const table = useTable({
+		data: filteredDatabase,
+		columns: DatabaseColumns,
+	});
+
+	const { mutateAsync: deleteDatabaseMutation } = useMutation({
+		mutationFn: deleteDatabase,
+		onError: (error: APIError) => {
+			notify({
+				title: error.error,
+				description: error.details,
+				type: 'error',
+			});
+		},
+		onSettled: () => {
+			closeDeleteDatabaseDialog();
+		},
+	});
 	async function deleteHandler() {
 		if (!toDeleteDatabase) return;
-		await deleteDatabase({
+		deleteDatabaseMutation({
 			orgId: toDeleteDatabase.orgId,
 			appId: toDeleteDatabase.appId,
 			dbId: toDeleteDatabase._id,
 			versionId: toDeleteDatabase.versionId,
 		});
-		setIsOpenDeleteDatabaseDialog(false);
 	}
-
-	useEffect(() => {
-		if (!versionId || !appId || !orgId) return;
-		setLoading(true);
-		getDatabasesOfApp({
-			orgId: orgId as string,
-			versionId: versionId as string,
-			appId: appId as string,
-		});
-		// search: searchParams.get('q') ?? '',
-		// page,
-		// size: PAGE_SIZE,
-		setLoading(false);
-	}, [page, searchParams.get('q')]);
 
 	return (
 		<>
-			<CreateAndEditDatabaseDrawer
-				open={editDatabaseDialogOpen}
-				onOpenChange={setEditDatabaseDialogOpen}
-				editMode
-			/>
-			<CreateAndEditDatabaseDrawer open={createDrawerIsOpen} onOpenChange={setCreateDrawerIsOpen} />
+			<CreateDatabase open={createDrawerIsOpen} onOpenChange={setCreateDrawerIsOpen} />
+			<EditDatabase open={isEditDatabaseDialogOpen} onOpenChange={closeEditDatabaseDialog} />
 			<VersionTabLayout<Database>
 				className='p-0'
 				isEmpty={databases.length === 0}
@@ -78,17 +94,10 @@ export default function VersionDatabase() {
 				createButtonTitle={t('database.add.title')}
 				emptyStateTitle={t('database.empty_text')}
 				table={table}
-				selectedRowLength={selectedRows?.length}
-				onSearch={() => setPage(0)}
 				disabled={!canEdit}
+				loading={isFetching && !databases.length}
 			>
-				<DataTable<Database>
-					columns={DatabaseColumns}
-					setTable={setTable}
-					data={databases}
-					noDataMessage={<p className='text-xl'>{t('database.empty_text')}</p>}
-					setSelectedRows={setSelectedRows}
-				/>
+				<DataTable<Database> table={table} />
 				{toDeleteDatabase && (
 					<ConfirmationModal
 						alertTitle={t('database.delete.confirm_title')}
@@ -105,8 +114,8 @@ export default function VersionDatabase() {
 							/>
 						}
 						onConfirm={deleteHandler}
-						isOpen={isOpenDeleteDatabaseDialog}
-						closeModal={() => setIsOpenDeleteDatabaseDialog(false)}
+						isOpen={isDeleteDatabaseDialogOpen}
+						closeModal={closeDeleteDatabaseDialog}
 					/>
 				)}
 			</VersionTabLayout>

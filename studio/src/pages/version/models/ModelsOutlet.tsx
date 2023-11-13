@@ -1,6 +1,6 @@
-import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
-import useModelStore from '@/store/database/modelStore.ts';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useDatabaseStore from '@/store/database/databaseStore';
+import { LoaderFunctionArgs, Outlet } from 'react-router-dom';
 
 export default function ModelsOutlet() {
 	return <Outlet />;
@@ -15,8 +15,8 @@ ModelsOutlet.loader = async function ({ params }: LoaderFunctionArgs) {
 		versionId: string;
 		dbId: string;
 	};
+	const { database, getDatabaseOfAppById } = useDatabaseStore.getState();
+	if (database._id !== apiParams.dbId) getDatabaseOfAppById(apiParams);
 
-	const { getModelsOfDatabase } = useModelStore.getState();
-	await getModelsOfDatabase(apiParams);
 	return null;
 };

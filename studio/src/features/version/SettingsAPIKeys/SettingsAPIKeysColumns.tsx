@@ -1,11 +1,9 @@
 import { ActionsCell } from '@/components/ActionsCell';
-import useAuthorizeApp from '@/hooks/useAuthorizeApp';
-import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIKey, APIKeyTypes, ColumnDefWithClassName } from '@/types';
-import { translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Badge } from 'components/Badge';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
@@ -14,6 +12,9 @@ import { CopyButton } from 'components/CopyButton';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
+
+const canEdit = getVersionPermission('version.key.update');
+const canDelete = getVersionPermission('version.key.delete');
 
 const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	{
@@ -230,7 +231,7 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		id: 'actions',
 		className: 'actions',
 		cell: ({ row: { original } }) => {
-			async function clickHandler() {
+			async function onDelete() {
 				const { version } = useVersionStore.getState();
 				const { deleteAPIKey } = useSettingsStore.getState();
 				if (!version) return;
@@ -250,38 +251,23 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 
 			return (
 				<div className='flex items-center justify-end gap-0.5'>
-					<ActionsCell
-						onEdit={editHandler}
-						canEditKey='version.key.edit'
-						original={original}
-						type='version'
-					>
-						<ConfirmTable onDelete={clickHandler} />
+					<ActionsCell onEdit={editHandler} canEdit={canEdit} original={original}>
+						<TableConfirmation
+							align='end'
+							closeOnConfirm
+							showAvatar={false}
+							title={translate('version.api_key.delete_modal_title')}
+							description={translate('version.api_key.delete_modal_desc')}
+							onConfirm={onDelete}
+							contentClassName='m-0'
+							hasPermission={canDelete}
+						/>
 					</ActionsCell>
 				</div>
 			);
 		},
 	},
 ];
-function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-	const role = useApplicationStore.getState().role;
-	const hasAppPermission = useAuthorizeApp({
-		key: 'key.delete',
-		role,
-	});
-	return (
-		<TableConfirmation
-			align='end'
-			closeOnConfirm
-			showAvatar={false}
-			title={translate('version.api_key.delete_modal_title')}
-			description={translate('version.api_key.delete_modal_desc')}
-			onConfirm={onDelete}
-			contentClassName='m-0'
-			disabled={!hasAppPermission}
-		/>
-	);
-}
 
 const mapping: Record<APIKeyTypes, BadgeColors> = {
 	'full-access': 'green',

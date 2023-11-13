@@ -1,6 +1,7 @@
 import { BeforeMount, EditorProps, OnChange } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-import github from 'monaco-themes/themes/Github.json';
+import slush from 'monaco-themes/themes/Slush and Poppies.json';
+import iPlastic from 'monaco-themes/themes/iPlastic.json';
 import nightOwl from 'monaco-themes/themes/Night Owl.json';
 import * as prettier from 'prettier';
 import jsParser from 'prettier/plugins/babel';
@@ -33,6 +34,7 @@ export const EDITOR_OPTIONS: EditorProps['options'] = {
 	scrollbar: {},
 	renderLineHighlight: 'none', //Enable rendering of current line highlight
 	folding: false, //Enable code folding
+	codeLens: true,
 };
 
 export type CodeEditorProps = {
@@ -72,8 +74,8 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 			]);
 
 			ed?.pushUndoStop();
+			cb?.(formatted);
 		}
-		cb?.(val);
 	}
 
 	function configureEditor(editor: monaco.editor.IStandaloneCodeEditor, monaco: any) {
@@ -99,7 +101,8 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 	const onBeforeMount: BeforeMount = (monaco) => {
 		setMonacoRef(monaco);
 		monaco.editor.defineTheme('nightOwl', nightOwl as monaco.editor.IStandaloneThemeData);
-		monaco.editor.defineTheme('github', github as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('slush', slush as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('iPlastic', iPlastic as monaco.editor.IStandaloneThemeData);
 		monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
 			target: monaco.languages.typescript.ScriptTarget.Latest,
 			allowNonTsExtensions: true,

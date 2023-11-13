@@ -1,7 +1,7 @@
 import useTaskStore from '@/store/task/taskStore';
+import useTabStore from '@/store/version/tabStore';
 import { LogTypes, RealtimeActionParams, Task as TaskType } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
-import useTabStore from '@/store/version/tabStore';
 class Task extends RealtimeActions<TaskType> {
 	redeploy(): void {
 		throw new Error('Method not implemented.');
@@ -31,6 +31,7 @@ class Task extends RealtimeActions<TaskType> {
 			versionId: data.versionId as string,
 			tab: {
 				title: data.name,
+				...(data.logic && { logic: data.logic }),
 			},
 			filter: (tab) => tab.path.includes(data._id as string),
 		});
@@ -43,6 +44,9 @@ class Task extends RealtimeActions<TaskType> {
 			}),
 			task: data,
 		});
+		if (data.logic) {
+			useTaskStore.getState?.().setLogics(data._id, data.logic);
+		}
 	}
 	create({ data }: RealtimeActionParams<TaskType>) {
 		useTaskStore.setState?.({

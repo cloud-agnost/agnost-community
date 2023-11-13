@@ -1,7 +1,6 @@
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import useVersionStore from '@/store/version/versionStore';
-import { AppRoles } from '@/types';
 import { getAppPermission } from '@/utils';
 import { useMemo } from 'react';
 
@@ -10,14 +9,12 @@ export default function useAuthorizeVersion(type: string) {
 	const role = useApplicationStore((state) => state.application?.role);
 	const user = useAuthStore((state) => state.user);
 	const isPrivateForUser = version?.private ? user?._id === version.createdBy : true;
-
 	const canEdit = useMemo(
 		() =>
 			(version?.readOnly
 				? user?._id === version.createdBy || role === 'Admin'
-				: isPrivateForUser && getAppPermission(role as AppRoles, `app.${type}`)) as boolean,
+				: isPrivateForUser && getAppPermission(`${role}.app.${type}`)) as boolean,
 		[version, role],
 	);
-
 	return canEdit;
 }

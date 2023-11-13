@@ -10,19 +10,7 @@ export function getRelativeTime(date: string) {
 }
 
 export function convertDateToMilliseconds(dateString: string): number {
-	const [datePart, timePart] = dateString.split(' ');
-	const [day, month, year] = datePart.split('.');
-	const [hours, minutes] = timePart.split(':');
-
-	const dateTime = DateTime.utc(
-		Number(year),
-		Number(month),
-		Number(day),
-		Number(hours),
-		Number(minutes),
-	);
-	const milliseconds = dateTime.toMillis();
-	return milliseconds;
+	return new Date(dateString).getTime();
 }
 export function calculateRecommendedBuckets(start: Date, end: Date): number {
 	const startDate = DateTime.fromJSDate(start);

@@ -52,7 +52,6 @@ export default function CodeEditor({
 
 	useEffect(() => {
 		if (!isEmpty(globalThis.monaco) && defaultLanguage === 'javascript') {
-			console.log('adding libs');
 			addLibsToEditor(typings);
 		}
 	}, [globalThis.monaco, typings]);
@@ -60,7 +59,7 @@ export default function CodeEditor({
 	return (
 		<div className={cn(containerClassName)}>
 			<MonacoEditor
-				theme={theme === 'dark' ? 'nightOwl' : 'vs-light'}
+				theme={theme === 'dark' ? 'nightOwl' : 'slush'}
 				beforeMount={onBeforeMount}
 				className={cn('editor', className)}
 				onChange={onCodeEditorChange}

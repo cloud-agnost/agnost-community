@@ -6,11 +6,13 @@ import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useStorageStore from '@/store/storage/storageStore';
 import { ColumnDefWithClassName, Storage, TabTypes } from '@/types';
-import { translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
-
+const { openDeleteStorageDialog, openEditStorageDialog } = useStorageStore.getState();
+const canEditBucket = getVersionPermission('storage.update');
+const canDeleteBucket = getVersionPermission('storage.delete');
 const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 	{
 		id: 'select',
@@ -123,15 +125,13 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { openDeleteStorageDialog, openEditStorageDialog } = useStorageStore.getState();
 			return (
 				<ActionsCell<Storage>
 					original={original}
 					onEdit={() => openEditStorageDialog(original)}
 					onDelete={() => openDeleteStorageDialog(original)}
-					canEditKey='storage.update'
-					canDeleteKey='storage.delete'
-					type='version'
+					canEdit={canEditBucket}
+					canDelete={canDeleteBucket}
 				/>
 			);
 		},

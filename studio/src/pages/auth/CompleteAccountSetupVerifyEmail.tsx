@@ -35,8 +35,9 @@ async function loader(params: LoaderFunctionArgs) {
 	const token = url.searchParams.get('token');
 	const isVerified = url.searchParams.has('isVerified');
 	try {
+		const isAccepted = useAuthStore.getState().isAccepted;
 		let res;
-		if (token) res = await useAuthStore.getState().acceptInvite(token as string);
+		if (token && !isAccepted) res = await useAuthStore.getState().acceptInvite(token as string);
 		return { token, isVerified, user: res?.user };
 	} catch (error) {
 		if ((error as APIError).code === 'not_allowed') return redirect('/login');
@@ -108,12 +109,12 @@ export default function CompleteAccountSetupVerifyEmail() {
 	const {
 		token,
 		isVerified,
-		user,
+
 		error: loaderError,
 	} = useLoaderData() as CompleteAccountSetupVerifyEmailLoaderData;
 	const [error, setError] = useState<APIError | null>(loaderError);
 	const [loading, setLoading] = useState(false);
-	const { completeAccountSetup, finalizeAccountSetup, email } = useAuthStore();
+	const { completeAccountSetup, finalizeAccountSetup, email, user } = useAuthStore();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
@@ -155,6 +156,11 @@ export default function CompleteAccountSetupVerifyEmail() {
 		}
 	}, [error]);
 
+	useEffect(() => {
+		return () => {
+			useAuthStore.setState({ isAccepted: false });
+		};
+	}, []);
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
@@ -198,12 +204,12 @@ export default function CompleteAccountSetupVerifyEmail() {
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>{t('login.password')}</FormLabel>
-									<FormDescription>{t('forms.password_desc')}</FormDescription>
+									<FormDescription>{t('login.password_desc')}</FormDescription>
 									<FormControl>
 										<PasswordInput
 											error={Boolean(form.formState.errors.password)}
 											type='password'
-											placeholder={t('forms.password') as string}
+											placeholder={t('login.password') as string}
 											{...field}
 										/>
 									</FormControl>
@@ -232,7 +238,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 							)}
 						/>
 						<div className='flex justify-end'>
-							<Button loading={loading} size='lg' disabled={!!error}>
+							<Button loading={loading} size='lg'>
 								{t('login.complete_setup')}
 							</Button>
 						</div>

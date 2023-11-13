@@ -25,6 +25,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 		versionId: string;
 		appId: string;
 		orgId: string;
+		taskId: string;
 	}>();
 
 	const form = useForm<z.infer<typeof CreateTaskSchema>>({

@@ -1,5 +1,4 @@
 import { create } from '@/helpers';
-import { CustomStateStorage } from '@/helpers/state';
 import TaskService from '@/services/TaskService';
 import {
 	APIError,
@@ -15,16 +14,15 @@ import {
 	TestTaskParams,
 	UpdateTaskParams,
 } from '@/types';
+import { isEmpty } from '@/utils';
 import { devtools, persist } from 'zustand/middleware';
 export interface TaskStore {
 	task: Task;
 	tasks: Task[];
-	toDeleteTask: Task;
-	isDeleteTaskModalOpen: boolean;
-	lastFetchedCount: number;
+	lastFetchedPage: number;
 	taskLogs: TestTaskLogs;
 	isEditTaskModalOpen: boolean;
-	editedLogic: string;
+	logics: Record<string, string>;
 }
 
 type Actions = {
@@ -38,28 +36,25 @@ type Actions = {
 	deleteMultipleTasks: (params: DeleteMultipleTasksParams) => Promise<Task[]>;
 	saveTaskLogic: (params: SaveTaskLogicParams) => Promise<Task>;
 	testTask: (params: TestTaskParams) => Promise<void>;
-	openDeleteTaskModal: (task: Task) => void;
-	closeDeleteTaskModal: () => void;
 	setTaskLog: (taskId: string, log: Log) => void;
-	setEditedLogic: (logic: string) => void;
+	setLogics: (id: string, logic: string) => void;
+	deleteLogic: (id: string) => void;
 	reset: () => void;
 };
 
 const initialState: TaskStore = {
 	task: {} as Task,
 	tasks: [],
-	toDeleteTask: {} as Task,
-	isDeleteTaskModalOpen: false,
-	lastFetchedCount: 0,
+	lastFetchedPage: 0,
 	taskLogs: {} as TestTaskLogs,
 	isEditTaskModalOpen: false,
-	editedLogic: '',
+	logics: {},
 };
 
 const useTaskStore = create<TaskStore & Actions>()(
 	devtools(
 		persist(
-			(set) => ({
+			(set, get) => ({
 				...initialState,
 				openEditTaskModal: (task: Task) => {
 					set({ task, isEditTaskModalOpen: true });
@@ -69,15 +64,18 @@ const useTaskStore = create<TaskStore & Actions>()(
 				},
 				getTask: async (params: GetTaskParams) => {
 					const task = await TaskService.getTask(params);
-					set({ task, editedLogic: task.logic });
+					set({ task });
+					if (isEmpty(get().logics[task._id])) {
+						get().setLogics(task._id, task.logic);
+					}
 					return task;
 				},
 				getTasks: async (params: GetTasksParams) => {
 					const tasks = await TaskService.getTasks(params);
 					if (params.page === 0) {
-						set({ tasks, lastFetchedCount: tasks.length });
+						set({ tasks });
 					} else {
-						set({ tasks: [...tasks, ...tasks], lastFetchedCount: tasks.length });
+						set({ tasks: [...tasks, ...tasks], lastFetchedPage: params.page });
 					}
 
 					return tasks;
@@ -100,6 +98,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 							tasks: prev.tasks.map((t) => (t._id === task._id ? task : t)),
 							task,
 						}));
+
 						if (params.onSuccess) params.onSuccess();
 						return task;
 					} catch (error) {
@@ -113,12 +112,9 @@ const useTaskStore = create<TaskStore & Actions>()(
 						set((prev) => ({
 							tasks: prev.tasks.map((t) => (t._id === task._id ? task : t)),
 							task,
-							editedLogic: task.logic,
 						}));
-						if (params.onSuccess) params.onSuccess();
 						return task;
 					} catch (error) {
-						if (params.onError) params.onError(error as APIError);
 						throw error as APIError;
 					}
 				},
@@ -163,12 +159,6 @@ const useTaskStore = create<TaskStore & Actions>()(
 						throw error as APIError;
 					}
 				},
-				openDeleteTaskModal: (task: Task) => {
-					set({ toDeleteTask: task, isDeleteTaskModalOpen: true });
-				},
-				closeDeleteTaskModal: () => {
-					set({ toDeleteTask: {} as Task, isDeleteTaskModalOpen: false });
-				},
 				setTaskLog: (taskId: string, log: Log) => {
 					set((prev) => {
 						return {
@@ -179,14 +169,17 @@ const useTaskStore = create<TaskStore & Actions>()(
 						};
 					});
 				},
-				setEditedLogic: (logic: string) => {
-					set({ editedLogic: logic });
+				setLogics: (id, logic) => set((prev) => ({ logics: { ...prev.logics, [id]: logic } })),
+				deleteLogic: (id) => {
+					const { [id]: _, ...rest } = get().logics;
+					set({ logics: rest });
 				},
 				reset: () => set(initialState),
 			}),
 			{
 				name: 'task-storage',
-				storage: CustomStateStorage,
+				partialize: (state) =>
+					Object.fromEntries(Object.entries(state).filter(([key]) => ['taskLogs'].includes(key))),
 			},
 		),
 	),

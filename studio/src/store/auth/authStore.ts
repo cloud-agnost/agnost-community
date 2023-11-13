@@ -18,6 +18,7 @@ interface AuthState {
 	error: APIError;
 	user: User;
 	email: string;
+	isAccepted: boolean;
 }
 
 type Actions = {
@@ -62,6 +63,7 @@ const initialState: AuthState = {
 	error: {} as APIError,
 	user: {} as User,
 	email: '',
+	isAccepted: false,
 };
 
 const useAuthStore = create<AuthState & Actions>()(
@@ -165,9 +167,12 @@ const useAuthStore = create<AuthState & Actions>()(
 					},
 					async acceptInvite(token: string) {
 						try {
-							return UserService.acceptInvite(token);
+							const res = await UserService.acceptInvite(token);
+							set({ isAccepted: true, user: res.user });
+							return res;
 						} catch (err) {
 							set({ error: err as APIError });
+							throw err;
 						}
 					},
 					async changeName(name: string) {

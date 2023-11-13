@@ -2,68 +2,47 @@ import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { PAGE_SIZE } from '@/constants';
-import { BucketColumns } from '@/features/storage';
-import { useToast } from '@/hooks';
+import { BucketColumns, CreateBucket } from '@/features/storage';
+import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useApplicationStore from '@/store/app/applicationStore';
 import useStorageStore from '@/store/storage/storageStore';
-import { APIError, AppRoles, Bucket } from '@/types';
+import { APIError } from '@/types';
 import { getAppPermission } from '@/utils';
-import { Row, Table } from '@tanstack/react-table';
-import { useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import {
-	LoaderFunctionArgs,
-	redirect,
-	useOutletContext,
-	useParams,
-	useSearchParams,
-} from 'react-router-dom';
+import { LoaderFunctionArgs, redirect, useParams } from 'react-router-dom';
 Buckets.loader = async ({ params }: LoaderFunctionArgs) => {
 	const role = useApplicationStore.getState().application?.role;
 
 	const { storageId, appId, orgId, versionId } = params;
-	const { storage, storages } = useStorageStore.getState();
+	const { storages } = useStorageStore.getState();
 
-	if (storageId !== storage?._id) {
-		let selectedStorage = storages.find((storage) => storage._id === storageId);
-		if (!selectedStorage) {
-			selectedStorage = await useStorageStore.getState().getStorageById({
-				storageId: storageId as string,
-				appId: appId as string,
-				orgId: orgId as string,
-				versionId: versionId as string,
-			});
-		}
-		useStorageStore.setState({ storage: selectedStorage });
+	let selectedStorage = storages.find((storage) => storage._id === storageId);
+	if (!selectedStorage) {
+		selectedStorage = await useStorageStore.getState().getStorageById({
+			storageId: storageId as string,
+			appId: appId as string,
+			orgId: orgId as string,
+			versionId: versionId as string,
+		});
 	}
+	useStorageStore.setState({ storage: selectedStorage });
 
-	const permission = getAppPermission(role as AppRoles, 'app.storage.viewData');
+	const permission = getAppPermission(`${role}.app.storage.viewData`);
 
 	if (!permission) {
-		return redirect('/404');
+		return redirect('/401');
 	}
 
 	return { props: {} };
 };
 
-interface OutletContext {
-	setIsBucketCreateOpen: (isOpen: boolean) => void;
-	selectedBuckets: Row<Bucket>[];
-	setSelectedBuckets: (rows: Row<Bucket>[]) => void;
-	bucketTable: Table<Bucket>;
-	setBucketTable: (table: Table<Bucket>) => void;
-	bucketPage: number;
-	setBucketPage: (page: number) => void;
-}
-
 export default function Buckets() {
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<APIError>();
+	const [isBucketCreateOpen, setIsBucketCreateOpen] = useState(false);
 	const { notify } = useToast();
-	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 	const {
@@ -78,15 +57,6 @@ export default function Buckets() {
 		storage,
 	} = useStorageStore();
 
-	const {
-		setIsBucketCreateOpen,
-		selectedBuckets,
-		setSelectedBuckets,
-		bucketTable,
-		setBucketTable,
-		bucketPage,
-		setBucketPage,
-	}: OutletContext = useOutletContext();
 	const storageUrl = `/organization/${orgId}/apps/${appId}/version/${versionId}/storage`;
 	const breadcrumbItems: BreadCrumbItem[] = [
 		{
@@ -98,101 +68,99 @@ export default function Buckets() {
 		},
 	];
 
-	function deleteMultipleBucketsHandler() {
-		deleteMultipleBuckets({
-			bucketNames: selectedBuckets.map((row) => row.original.name),
+	const table = useTable({
+		data: buckets,
+		columns: BucketColumns,
+	});
+	const { hasNextPage, isPending, fetchNextPage } = useInfiniteScroll({
+		queryFn: getBuckets,
+		queryKey: 'getBuckets',
+		dataLength: buckets.length,
+		lastFetchedPage: bucketCountInfo.currentPage ?? 0,
+		params: {
 			storageName: storage?.name,
-			onSuccess: () => {
-				bucketTable.toggleAllRowsSelected(false);
-				setBucketPage(1);
-			},
-			onError: ({ error, details }) => {
-				notify({ type: 'error', description: details, title: error });
-			},
+			returnCountInfo: true,
+		},
+	});
+
+	const {
+		mutationAsync: deleteBucketMutation,
+		isPending: deleteLoading,
+		error: deleteError,
+	} = useMutation({
+		mutationFn: deleteBucket,
+		onSettled: () => {
+			closeBucketDeleteDialog();
+		},
+	});
+	const { mutationAsync: deleteMultipleBucketsMutation } = useMutation({
+		mutationFn: deleteMultipleBuckets,
+		onSuccess: () => {
+			table?.resetRowSelection();
+		},
+		onError: ({ error, details }: APIError) => {
+			notify({ type: 'error', description: details, title: error });
+		},
+	});
+
+	function deleteMultipleBucketsHandler() {
+		deleteMultipleBucketsMutation({
+			bucketNames: table.getSelectedRowModel().rows.map((bucket) => bucket.original.name),
+			storageName: storage?.name,
 		});
 	}
 	function deleteBucketHandler() {
-		setLoading(true);
-		deleteBucket({
+		deleteBucketMutation({
 			storageName: storage?.name,
 			bucketName: toDeleteBucket?.name as string,
-			onSuccess: () => {
-				setLoading(false);
-				closeBucketDeleteDialog();
-			},
-			onError: (error) => {
-				setError(error);
-				setLoading(false);
-				closeBucketDeleteDialog();
-			},
 		});
 	}
 
-	useEffect(() => {
-		if (versionId && orgId && appId) {
-			setLoading(true);
-			getBuckets({
-				storageName: storage?.name,
-				page: bucketPage,
-				limit: PAGE_SIZE,
-				search: searchParams.get('q') as string,
-				returnCountInfo: true,
-			});
-			setLoading(false);
-		}
-	}, [searchParams.get('q'), bucketPage, versionId, storage?.name]);
-
 	return (
-		<VersionTabLayout
-			isEmpty={buckets.length === 0}
-			title={t('storage.buckets')}
-			type='bucket'
-			openCreateModal={() => setIsBucketCreateOpen(true)}
-			createButtonTitle={t('storage.bucket.create')}
-			emptyStateTitle={t('storage.bucket.empty_text')}
-			table={bucketTable}
-			selectedRowLength={selectedBuckets?.length}
-			onSearch={() => setBucketPage(1)}
-			onMultipleDelete={deleteMultipleBucketsHandler}
-			breadCrumb={<BreadCrumb goBackLink={storageUrl} items={breadcrumbItems} />}
-		>
-			<InfiniteScroll
-				scrollableTarget='version-layout'
-				dataLength={buckets.length}
-				next={() => {
-					setBucketPage(bucketPage + 1);
-				}}
-				hasMore={bucketCountInfo.count >= PAGE_SIZE}
-				loader={loading && <TableLoading />}
+		<>
+			<VersionTabLayout
+				isEmpty={buckets.length === 0}
+				title={t('storage.buckets')}
+				type='bucket'
+				openCreateModal={() => setIsBucketCreateOpen(true)}
+				createButtonTitle={t('storage.bucket.create')}
+				emptyStateTitle={t('storage.bucket.empty_text')}
+				onMultipleDelete={deleteMultipleBucketsHandler}
+				loading={isPending && !buckets.length}
+				breadCrumb={<BreadCrumb goBackLink={storageUrl} items={breadcrumbItems} />}
 			>
-				<DataTable
-					columns={BucketColumns}
-					data={buckets}
-					setSelectedRows={setSelectedBuckets}
-					setTable={setBucketTable}
-				/>
-				<ConfirmationModal
-					loading={loading}
-					error={error}
-					title={t('storage.bucket.delete.title')}
-					alertTitle={t('storage.bucket.delete.message')}
-					alertDescription={t('storage.bucket.delete.description')}
-					description={
-						<Trans
-							i18nKey='storage.bucket.delete.confirmCode'
-							values={{ confirmCode: toDeleteBucket?.id }}
-							components={{
-								confirmCode: <span className='font-bold text-default' />,
-							}}
-						/>
-					}
-					confirmCode={toDeleteBucket?.id as string}
-					onConfirm={deleteBucketHandler}
-					isOpen={isBucketDeleteDialogOpen}
-					closeModal={closeBucketDeleteDialog}
-					closable
-				/>
-			</InfiniteScroll>
-		</VersionTabLayout>
+				<InfiniteScroll
+					scrollableTarget='version-layout'
+					dataLength={buckets.length}
+					next={fetchNextPage}
+					hasMore={hasNextPage}
+					loader={isPending && <TableLoading />}
+				>
+					<DataTable table={table} />
+					<ConfirmationModal
+						loading={deleteLoading}
+						error={deleteError}
+						title={t('storage.bucket.delete.title')}
+						alertTitle={t('storage.bucket.delete.message')}
+						alertDescription={t('storage.bucket.delete.description')}
+						description={
+							<Trans
+								i18nKey='storage.bucket.delete.confirmCode'
+								values={{ confirmCode: toDeleteBucket?.id }}
+								components={{
+									confirmCode: <span className='font-bold text-default' />,
+								}}
+							/>
+						}
+						confirmCode={toDeleteBucket?.id as string}
+						onConfirm={deleteBucketHandler}
+						isOpen={isBucketDeleteDialogOpen}
+						closeModal={closeBucketDeleteDialog}
+						closable
+					/>
+				</InfiniteScroll>
+			</VersionTabLayout>
+			<CreateBucket open={isBucketCreateOpen} onClose={() => setIsBucketCreateOpen(false)} />
+		</>
 	);
 }

@@ -1,30 +1,16 @@
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from 'components/Form';
-import { Input } from 'components/Input';
-import { Button } from 'components/Button';
-import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { useTabNavigate, useToast } from '@/hooks';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
-import { useLocation, useParams } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { nameSchema } from '@/features/version/Middlewares/formSchema.ts';
 import { Middleware, TabTypes } from '@/types';
-import { useTabNavigate } from '@/hooks';
-import { useToast } from '@/hooks';
-const MiddlewareFormSchema = z.object({
-	name: nameSchema,
-});
-
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
+import { Form } from 'components/Form';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useParams } from 'react-router-dom';
+import * as z from 'zod';
+import MiddlewareForm from './MiddlewareForm';
+import { MiddlewareSchema } from '@/types';
 interface AddMiddlewareDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -48,14 +34,13 @@ export default function AddMiddlewareDrawer({
 		if (!open) form.reset();
 	}, [open]);
 
-	const form = useForm<z.infer<typeof MiddlewareFormSchema>>({
-		resolver: zodResolver(MiddlewareFormSchema),
+	const form = useForm<z.infer<typeof MiddlewareSchema>>({
+		resolver: zodResolver(MiddlewareSchema),
 		defaultValues: {
 			name: '',
 		},
 	});
-
-	async function onSubmit(data: z.infer<typeof MiddlewareFormSchema>) {
+	async function onSubmit(data: z.infer<typeof MiddlewareSchema>) {
 		if (!orgId || !appId || !versionId) return;
 		setLoading(true);
 		await createMiddleware({
@@ -92,7 +77,6 @@ export default function AddMiddlewareDrawer({
 			},
 		});
 	}
-
 	return (
 		<Drawer open={open} onOpenChange={onOpenChange}>
 			<DrawerContent position='right'>
@@ -100,45 +84,8 @@ export default function AddMiddlewareDrawer({
 					<DrawerTitle>{t('version.middleware.add_middleware')}</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
-					<form className='p-6' onSubmit={(e) => e.preventDefault()}>
-						<FormField
-							control={form.control}
-							name='name'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{t('version.middleware.name')}</FormLabel>
-									<FormControl>
-										<Input
-											onKeyDown={(e) => {
-												if (e.code === 'Enter') form.handleSubmit(onSubmit)();
-											}}
-											value={field.value}
-											onChange={field.onChange}
-											error={Boolean(form.formState.errors.name)}
-											placeholder={
-												t('forms.placeholder', {
-													label: t('general.name'),
-												}) ?? ''
-											}
-										/>
-									</FormControl>
-									<FormDescription>{t('forms.max64.description')}</FormDescription>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<div className='flex justify-end mt-4'>
-							<Button
-								loading={loading}
-								size='lg'
-								type='button'
-								onClick={() => {
-									form.handleSubmit(onSubmit)();
-								}}
-							>
-								{t('general.save')}
-							</Button>
-						</div>
+					<form className='p-6' onSubmit={form.handleSubmit(onSubmit)}>
+						<MiddlewareForm loading={loading} />
 					</form>
 				</Form>
 			</DrawerContent>

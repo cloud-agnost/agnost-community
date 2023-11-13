@@ -1,4 +1,4 @@
-import { CustomStateStorage, create } from '@/helpers';
+import { create } from '@/helpers';
 import { EndpointService } from '@/services';
 import {
 	APIError,
@@ -16,7 +16,7 @@ import {
 	TestEndpointParams,
 	UpdateEndpointParams,
 } from '@/types';
-import { formatTime } from '@/utils';
+import { formatTime, isEmpty } from '@/utils';
 import { AxiosResponse } from 'axios';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -24,13 +24,12 @@ interface EndpointStore {
 	selectEndpointDialogOpen: boolean;
 	endpoints: Endpoint[];
 	endpoint: Endpoint;
-	editedLogic: string;
 	selectedEndpointIds: string[];
-	lastFetchedCount: number;
 	lastFetchedPage: number;
 	endpointRequest: EndpointRequest;
 	endpointResponse: EndpointResponse;
 	isEditEndpointDialogOpen: boolean;
+	logics: Record<string, string>;
 }
 
 type Actions = {
@@ -49,7 +48,8 @@ type Actions = {
 	setEndpointLog: (epId: string, log: Log) => void;
 	openEditEndpointDialog: (endpoint: Endpoint) => void;
 	closeEditEndpointDialog: () => void;
-	setEditedLogic: (logic: string) => void;
+	setLogics: (id: string, logic: string) => void;
+	deleteLogic: (id: string) => void;
 	reset: () => void;
 };
 
@@ -60,10 +60,9 @@ const initialState: EndpointStore = {
 	selectedEndpointIds: [],
 	endpointRequest: {} as EndpointRequest,
 	endpointResponse: {} as EndpointResponse,
-	lastFetchedCount: 0,
 	lastFetchedPage: 0,
 	isEditEndpointDialogOpen: false,
-	editedLogic: '',
+	logics: {},
 };
 
 const useEndpointStore = create<EndpointStore & Actions>()(
@@ -89,19 +88,20 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 				},
 				getEndpointById: async (params) => {
 					const endpoint = await EndpointService.getEndpointById(params);
-					set({ endpoint, editedLogic: endpoint.logic });
-
+					set({ endpoint });
+					if (isEmpty(get().logics[endpoint._id])) {
+						get().setLogics(endpoint._id, endpoint.logic);
+					}
 					return endpoint;
 				},
 				getEndpoints: async (params) => {
 					try {
 						const endpoints = await EndpointService.getEndpoints(params);
 						if (params.page === 0) {
-							set({ endpoints, lastFetchedCount: endpoints.length });
+							set({ endpoints });
 						} else {
 							set((prev) => ({
 								endpoints: [...prev.endpoints, ...endpoints],
-								lastFetchedCount: endpoints.length,
 								lastFetchedPage: params.page,
 							}));
 						}
@@ -154,7 +154,6 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 						set((prev) => ({
 							endpoints: prev.endpoints.map((e) => (e._id === endpoint._id ? endpoint : e)),
 							endpoint,
-							editedLogic: endpoint.logic,
 						}));
 						if (params.onSuccess) params.onSuccess();
 						return endpoint;
@@ -249,12 +248,24 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 						},
 					}));
 				},
-				setEditedLogic: (logic) => set({ editedLogic: logic }),
+				setLogics: (id, logic) => {
+					set((prev) => ({ logics: { ...prev.logics, [id]: logic } }));
+					console.warn('geldi');
+				},
+				deleteLogic: (id) => {
+					const { [id]: _, ...rest } = get().logics;
+					set({ logics: rest });
+				},
 				reset: () => set(initialState),
 			}),
 			{
 				name: 'endpoint-storage',
-				storage: CustomStateStorage,
+				partialize: (state) =>
+					Object.fromEntries(
+						Object.entries(state).filter(([key]) =>
+							['endpointRequest', 'endpointResponse'].includes(key),
+						),
+					),
 			},
 		),
 		{

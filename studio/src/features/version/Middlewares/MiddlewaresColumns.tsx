@@ -1,17 +1,40 @@
 import { TabLink } from '@/features/version/Tabs';
-import useAuthorizeApp from '@/hooks/useAuthorizeApp';
-import useApplicationStore from '@/store/app/applicationStore';
-import useAuthStore from '@/store/auth/authStore.ts';
 import useMiddlewareStore from '@/store/middleware/middlewareStore';
-import { ColumnDefWithClassName, Middleware, TabTypes } from '@/types';
-import { translate } from '@/utils';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { APIError, ColumnDefWithClassName, Middleware, TabTypes } from '@/types';
+import { getVersionPermission, notify, translate } from '@/utils';
+import { QueryClient } from '@tanstack/react-query';
 import { ActionsCell } from 'components/ActionsCell';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
-import { notify } from '@/utils';
+
+const { openEditMiddlewareDrawer, deleteMiddleware } = useMiddlewareStore.getState();
+const queryClient = new QueryClient();
+const canEditMiddleware = getVersionPermission('middleware.update');
+const canDeleteMiddleware = getVersionPermission('middleware.delete');
+
+async function deleteHandler(mw: Middleware) {
+	queryClient
+		.getMutationCache()
+		.build(queryClient, {
+			mutationFn: deleteMiddleware,
+			onError: (error: APIError) => {
+				notify({
+					title: error.error,
+					description: error.details,
+					type: 'error',
+				});
+			},
+		})
+		.execute({
+			appId: mw.appId,
+			orgId: mw.orgId,
+			versionId: mw.versionId,
+			mwId: mw._id,
+		});
+}
 const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
 		id: 'select',
@@ -58,10 +81,11 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 				original: { createdAt, createdBy },
 			},
 		}) => {
-			const isMe = useAuthStore.getState().user?._id === createdBy;
-			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === createdBy);
 
-			return <DateText date={createdAt}>{avatar}</DateText>;
+			return <DateText date={createdAt} user={user} />;
 		},
 	},
 	{
@@ -77,9 +101,11 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 			},
 		}) => {
 			if (!updatedBy) return null;
-			const isMe = useAuthStore.getState().user?._id === updatedBy;
-			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
-			return <DateText date={updatedAt}>{avatar}</DateText>;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === updatedBy);
+
+			return <DateText date={updatedAt} user={user} />;
 		},
 	},
 	{
@@ -87,69 +113,26 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 		className: 'actions',
 		size: 45,
 		cell: ({ row: { original } }) => {
-			const { setMiddleware, setEditMiddlewareDrawerIsOpen, deleteMiddleware } =
-				useMiddlewareStore.getState();
-			function handleEdit() {
-				setMiddleware(original);
-				setEditMiddlewareDrawerIsOpen(true);
-			}
-
-			async function deleteHandler() {
-				deleteMiddleware({
-					appId: original.appId,
-					orgId: original.orgId,
-					versionId: original.versionId,
-					mwId: original._id,
-					onSuccess: () => {
-						notify({
-							title: translate('general.success'),
-							description: translate('version.middleware.delete.success'),
-							type: 'success',
-						});
-					},
-					onError: (error) => {
-						notify({
-							title: error.error,
-							description: error.details,
-							type: 'error',
-						});
-					},
-				});
-			}
-
 			return (
 				<ActionsCell<Middleware>
 					original={original}
-					canDeleteKey='middleware.delete'
-					canEditKey='middleware.update'
-					onEdit={handleEdit}
-					type='version'
+					canEdit={canEditMiddleware}
+					onEdit={() => openEditMiddlewareDrawer(original)}
 				>
-					<ConfirmTable onDelete={deleteHandler} />
+					<TableConfirmation
+						align='end'
+						closeOnConfirm
+						showAvatar={false}
+						title={translate('version.middleware.delete.title')}
+						description={translate('version.middleware.delete.message')}
+						onConfirm={() => deleteHandler(original)}
+						contentClassName='m-0'
+						hasPermission={canDeleteMiddleware}
+					/>
 				</ActionsCell>
 			);
 		},
 	},
 ];
-
-function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-	const role = useApplicationStore.getState().role;
-	const hasAppPermission = useAuthorizeApp({
-		key: 'middleware.delete',
-		role,
-	});
-	return (
-		<TableConfirmation
-			align='end'
-			closeOnConfirm
-			showAvatar={false}
-			title={translate('version.middleware.delete.title')}
-			description={translate('version.middleware.delete.message')}
-			onConfirm={onDelete}
-			contentClassName='m-0'
-			disabled={!hasAppPermission}
-		/>
-	);
-}
 
 export default MiddlewaresColumns;

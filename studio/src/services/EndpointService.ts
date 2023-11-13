@@ -12,7 +12,7 @@ import {
 	TestEndpointParams,
 	UpdateEndpointParams,
 } from '@/types';
-import { isEmpty } from '@/utils';
+import { arrayToObj, isEmpty } from '@/utils';
 
 export default class EndpointService {
 	static url = '/v1/org';
@@ -133,12 +133,12 @@ export default class EndpointService {
 		}
 		const options = {
 			headers: {
-				...headers,
+				...arrayToObj(headers ?? []),
 				'Content-Type': !isEmpty(formData) ? 'multipart/form-data' : 'application/json',
 				'Agnost-Session': consoleLogId,
 			},
 			params: {
-				...params.queryParams,
+				...arrayToObj(params.queryParams ?? []),
 			},
 			data: body,
 		};

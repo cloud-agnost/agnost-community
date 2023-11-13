@@ -4,12 +4,41 @@ import { TabLink } from '@/features/version/Tabs';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import { ColumnDefWithClassName, MessageQueue, TabTypes } from '@/types';
-import { translate } from '@/utils';
+import { APIError, ColumnDefWithClassName, MessageQueue, TabTypes } from '@/types';
+import { getVersionPermission, translate } from '@/utils';
+import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { InstanceType } from 'components/InstanceType';
+import { notify } from '@/utils';
+import { TableConfirmation } from '@/components/Table';
+
+const { openEditModal, deleteQueue } = useMessageQueueStore.getState();
+const queryClient = new QueryClient();
+const canEditQueue = getVersionPermission('middleware.update');
+const canDeleteQueue = getVersionPermission('middleware.delete');
+
+async function deleteHandler(mq: MessageQueue) {
+	queryClient
+		.getMutationCache()
+		.build(queryClient, {
+			mutationFn: deleteQueue,
+			onError: (error: APIError) => {
+				notify({
+					title: error.error,
+					description: error.details,
+					type: 'error',
+				});
+			},
+		})
+		.execute({
+			appId: mq.appId,
+			orgId: mq.orgId,
+			versionId: mq.versionId,
+			queueId: mq._id,
+		});
+}
 const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 	{
 		id: 'select',
@@ -119,16 +148,23 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { openDeleteModal, openEditModal } = useMessageQueueStore.getState();
 			return (
-				<ActionsCell
+				<ActionsCell<MessageQueue>
 					original={original}
-					onDelete={() => openDeleteModal(original)}
+					canEdit={canEditQueue}
 					onEdit={() => openEditModal(original)}
-					canDeleteKey='queue.delete'
-					canEditKey='queue.edit'
-					type='version'
-				/>
+				>
+					<TableConfirmation
+						align='end'
+						closeOnConfirm
+						showAvatar={false}
+						title={translate('queue.delete.title')}
+						description={translate('queue.delete.message')}
+						onConfirm={() => deleteHandler(original)}
+						contentClassName='m-0'
+						hasPermission={canDeleteQueue}
+					/>
+				</ActionsCell>
 			);
 		},
 	},

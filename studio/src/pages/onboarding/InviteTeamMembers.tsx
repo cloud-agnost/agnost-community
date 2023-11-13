@@ -34,6 +34,7 @@ export default function InviteTeamMembers() {
 
 		finalizeClusterSetup({
 			...onboardingReq,
+			uiBaseURL: window.location.origin,
 			appMembers,
 			onSuccess: (res: ClusterSetupResponse) => {
 				setStepByPath('/onboarding/invite-team-members', {

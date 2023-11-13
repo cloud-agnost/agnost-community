@@ -4,7 +4,7 @@ import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import { Invitation } from '@/types';
 import { FunnelSimple } from '@phosphor-icons/react';
-import { Row, Table } from '@tanstack/react-table';
+import { Table } from '@tanstack/react-table';
 import { Button } from 'components/Button';
 import {
 	DropdownMenu,
@@ -19,10 +19,9 @@ import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 interface Props {
-	selectedRows: Row<Invitation>[] | undefined;
 	table: Table<Invitation>;
 }
-function AppInvitationFilter({ selectedRows, table }: Props) {
+function AppInvitationFilter({ table }: Props) {
 	const { notify } = useToast();
 	const { t } = useTranslation();
 	const [searchParams] = useSearchParams();
@@ -41,6 +40,7 @@ function AppInvitationFilter({ selectedRows, table }: Props) {
 	} = useApplicationStore();
 
 	function deleteInvitations() {
+		const selectedRows = table.getSelectedRowModel().rows;
 		if (selectedRows) {
 			deleteMultipleInvitations({
 				tokens: selectedRows.map((row) => row.original.token),
@@ -124,10 +124,9 @@ function AppInvitationFilter({ selectedRows, table }: Props) {
 					))}
 				</DropdownMenuContent>
 			</DropdownMenu>
-			{!!selectedRows?.length && (
+			{!!table.getSelectedRowModel().rows?.length && (
 				<SelectedRowButton<Invitation>
 					onDelete={deleteInvitations}
-					selectedRowLength={selectedRows?.length}
 					table={table}
 					disabled={!canMultiDeleteInvite}
 				/>

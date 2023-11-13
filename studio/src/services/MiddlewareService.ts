@@ -4,7 +4,7 @@ import {
 	DeleteMiddlewareParams,
 	DeleteMultipleMiddlewares,
 	GetMiddlewareByIdParams,
-	GetMiddlewaresOfAppVersionParams,
+	GetModulesRequest,
 	Middleware,
 	SaveMiddlewareCodeParams,
 	UpdateMiddlewareParams,
@@ -18,7 +18,7 @@ export default class MiddlewareService {
 		appId,
 		versionId,
 		...params
-	}: GetMiddlewaresOfAppVersionParams): Promise<Middleware[]> {
+	}: GetModulesRequest): Promise<Middleware[]> {
 		return (
 			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/mw`, {
 				params,

@@ -18,14 +18,21 @@ import {
 	DATABASE,
 	MAX_LENGTHS,
 	MYSQL_RESERVED_WORDS,
-	NAME_SCHEMA,
 	POSTGRES_RESERVED_WORDS,
 	REFERENCE_FIELD_ACTION,
 	SQL_SERVER_RESERVED_WORDS,
-	TIMESTAMPS_SCHEMA,
 } from '@/constants';
 import { Fragment, useEffect, useMemo, useState } from 'react';
-import { APIError, Database, Field, FieldType, Model, ReferenceAction } from '@/types';
+import {
+	APIError,
+	Database,
+	Field,
+	FieldType,
+	Model,
+	NameSchema,
+	ReferenceAction,
+	TimestampsSchema,
+} from '@/types';
 import { capitalize, cn, toDisplayName } from '@/utils';
 import { useParams } from 'react-router-dom';
 import { Switch } from 'components/Switch';
@@ -96,7 +103,7 @@ export default function EditOrCreateFieldDrawer({
 	const [loading, setLoading] = useState(false);
 	const databases = useDatabaseStore((state) => state.databases);
 	const fieldTypes = useTypeStore((state) => state.fieldTypes);
-	const fieldToEdit = useModelStore((state) => state.fieldToEdit) as Field;
+	const fieldToEdit = useModelStore((state) => state.field) as Field;
 	const addNewField = useModelStore((state) => state.addNewField);
 	const updateField = useModelStore((state) => state.updateField);
 	const getReferenceModels = useModelStore((state) => state.getReferenceModels);
@@ -154,11 +161,7 @@ export default function EditOrCreateFieldDrawer({
 	const Schema = z.object({
 		general: z
 			.object({
-				name: NAME_SCHEMA.refine((value) => /^(?![0-9])/.test(value), {
-					message: t('forms.notStartWithNumber', {
-						label: t('general.name'),
-					}).toString(),
-				}),
+				name: NameSchema,
 				required: z.boolean(),
 				unique: z.boolean(),
 				indexed: z.boolean(),
@@ -206,7 +209,7 @@ export default function EditOrCreateFieldDrawer({
 					.optional(),
 				referenceAction: z.enum(REFERENCE_FIELD_ACTION).optional(),
 				enumSelectList: z.string().optional(),
-				timeStamps: TIMESTAMPS_SCHEMA,
+				timeStamps: TimestampsSchema,
 			})
 			.superRefine((arg, ctx) => {
 				if (isInteger && arg?.defaultValue && !Number.isInteger(Number(arg.defaultValue))) {

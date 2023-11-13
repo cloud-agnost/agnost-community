@@ -1,16 +1,17 @@
 import { ActionsCell } from '@/components/ActionsCell';
-import useAuthorizeApp from '@/hooks/useAuthorizeApp';
-import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, RateLimit } from '@/types';
-import { translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
+
+const canEditRateLimit = getVersionPermission('version.limit.update');
+const canDeleteRateLimit = getVersionPermission('version.limit.delete');
 
 const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 	{
@@ -122,7 +123,7 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 			const { version } = useVersionStore.getState();
 			const { setEditRateLimitDrawerIsOpen, setRateLimit, deleteRateLimit } =
 				useSettingsStore.getState();
-			async function clickHandler() {
+			async function onDelete() {
 				if (!version) return;
 				await deleteRateLimit({
 					appId: version.appId,
@@ -137,37 +138,21 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 			}
 
 			return (
-				<ActionsCell
-					original={original}
-					onEdit={editHandler}
-					canEditKey='version.limit.update'
-					type='version'
-				>
-					<ConfirmTable onDelete={clickHandler} />
+				<ActionsCell original={original} onEdit={editHandler} canEdit={canEditRateLimit}>
+					<TableConfirmation
+						align='end'
+						closeOnConfirm
+						showAvatar={false}
+						title={translate('version.npm.delete_modal_title')}
+						description={translate('version.npm.delete_modal_desc')}
+						onConfirm={onDelete}
+						contentClassName='m-0'
+						hasPermission={canDeleteRateLimit}
+					/>
 				</ActionsCell>
 			);
 		},
 	},
 ];
-
-function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-	const role = useApplicationStore.getState().role;
-	const hasAppPermission = useAuthorizeApp({
-		key: 'version.limit.delete',
-		role,
-	});
-	return (
-		<TableConfirmation
-			align='end'
-			closeOnConfirm
-			showAvatar={false}
-			title={translate('version.npm.delete_modal_title')}
-			description={translate('version.npm.delete_modal_desc')}
-			onConfirm={onDelete}
-			contentClassName='m-0'
-			disabled={!hasAppPermission}
-		/>
-	);
-}
 
 export default RateLimitsColumns;

@@ -2,16 +2,15 @@ import { Button } from '@/components/Button';
 import { EmptyState, Modules } from '@/components/EmptyState';
 import { SearchInput } from '@/components/SearchInput';
 import { SelectedRowButton } from '@/components/Table';
+import { useUpdateEffect } from '@/hooks';
+import useTabStore from '@/store/version/tabStore';
 import { cn } from '@/utils';
 import { Plus } from '@phosphor-icons/react';
 import { Table } from '@tanstack/react-table';
-import { useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { ReactNode } from 'react';
-import useTabStore from '@/store/version/tabStore';
-import { useParams } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
-import { useUpdateEffect } from '@/hooks';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useParams, useSearchParams } from 'react-router-dom';
+import BeatLoader from 'react-spinners/BeatLoader';
 interface Props<T> {
 	isEmpty: boolean;
 	table?: Table<T>;
@@ -20,11 +19,11 @@ interface Props<T> {
 	emptyStateTitle: string;
 	createButtonTitle?: string | null;
 	children: ReactNode;
-	selectedRowLength?: number;
 	disabled?: boolean;
 	className?: string;
 	breadCrumb?: ReactNode;
 	handlerButton?: ReactNode;
+	loading: boolean;
 	onMultipleDelete?: () => void;
 	openCreateModal?: () => void;
 }
@@ -35,13 +34,13 @@ export default function VersionTabLayout<T>({
 	type,
 	breadCrumb,
 	table,
-	selectedRowLength,
 	title,
 	emptyStateTitle,
 	createButtonTitle,
 	disabled,
 	className,
 	handlerButton,
+	loading,
 	onMultipleDelete,
 	openCreateModal,
 }: Props<T>) {
@@ -90,15 +89,14 @@ export default function VersionTabLayout<T>({
 		});
 	}, [search]);
 	return (
-		<div className={cn('h-full space-y-4 ', className)}>
+		<div className={cn('h-full space-y-4 relative ', className)}>
 			{breadCrumb}
 			<div className='flex items-center justify-between'>
 				<h1 className='text-default text-2xl text-center'>{title}</h1>
 				<div className='flex items-center justify-center gap-4'>
 					<SearchInput value={searchParams.get('q') ?? undefined} className='sm:w-[450px] flex-1' />
-					{selectedRowLength ? (
+					{table?.getSelectedRowModel().rows.length ? (
 						<SelectedRowButton
-							selectedRowLength={selectedRowLength}
 							table={table}
 							onDelete={() => onMultipleDelete?.()}
 							disabled={disabled}
@@ -113,7 +111,14 @@ export default function VersionTabLayout<T>({
 					)}
 				</div>
 			</div>
-			{content}
+			{!loading && content}
+			<BeatLoader
+				color='#6884FD'
+				className='fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
+				size={24}
+				loading={loading}
+				margin={18}
+			/>
 		</div>
 	);
 }

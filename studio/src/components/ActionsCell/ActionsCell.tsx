@@ -1,41 +1,28 @@
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { Button } from '@/components/Button';
 import { Pencil } from '@/components/icons';
 import { Trash } from '@phosphor-icons/react';
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '../Tooltip';
 import { useTranslation } from 'react-i18next';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
 interface ActionCellProps<T> {
 	original: T;
-	type: 'org' | 'app' | 'version';
-	onEdit?: (item: T) => void;
-	onDelete?: (item: T) => void;
-	canEditKey: string;
-	canDeleteKey?: string;
+	canEdit: boolean;
+	canDelete?: boolean;
 	children?: React.ReactNode;
 	disabled?: boolean;
+	onEdit?: (item: T) => void;
+	onDelete?: (item: T) => void;
 }
 
 function ActionsCell<T>({
 	original,
 	onEdit,
 	onDelete,
-	canEditKey,
-	canDeleteKey,
+	canEdit,
+	canDelete,
 	children,
-	type,
 	disabled,
 }: ActionCellProps<T>) {
 	const { t } = useTranslation();
-	const HAS_EDIT_PERMISSION: Record<string, boolean> = {
-		org: useAuthorizeVersion(canEditKey),
-		app: useAuthorizeVersion(canEditKey),
-		version: useAuthorizeVersion(canEditKey),
-	};
-	const HAS_DELETE_PERMISSION: Record<string, boolean> = {
-		org: useAuthorizeVersion(canDeleteKey as string),
-		app: useAuthorizeVersion(canDeleteKey as string),
-		version: useAuthorizeVersion(canDeleteKey as string),
-	};
 
 	return (
 		<div className='flex items-center justify-end'>
@@ -46,9 +33,9 @@ function ActionsCell<T>({
 							iconOnly
 							variant='blank'
 							rounded
-							className='text-xl hover:bg-wrapper-background-hover text-icon-base'
+							className='text-xl hover:bg-wrapper-background-hover text-icon-base hover:text-default aspect-square'
 							onClick={() => onEdit?.(original)}
-							disabled={disabled && !HAS_EDIT_PERMISSION[type]}
+							disabled={disabled || !canEdit}
 						>
 							<Pencil />
 						</Button>
@@ -57,19 +44,17 @@ function ActionsCell<T>({
 				</Tooltip>
 			</TooltipProvider>
 
-			{children ? (
-				children
-			) : (
+			{children ?? (
 				<TooltipProvider>
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Button
 								variant='blank'
 								rounded
-								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
+								className='hover:bg-wrapper-background-hover text-icon-base hover:text-default aspect-square'
 								iconOnly
 								onClick={() => onDelete?.(original)}
-								disabled={disabled && !HAS_DELETE_PERMISSION[type]}
+								disabled={disabled || !canDelete}
 							>
 								<Trash size={20} />
 							</Button>

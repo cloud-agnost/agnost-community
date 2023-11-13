@@ -1,10 +1,5 @@
-import {
-	NAME_REGEX,
-	NOT_START_WITH_NUMBER_REGEX,
-	PARAM_NAME_REGEX,
-	ROUTE_NAME_REGEX,
-} from '@/constants/regex';
-import { BaseGetRequest, BaseParams, BaseRequest, Log } from '@/types';
+import { PARAM_NAME_REGEX, ROUTE_NAME_REGEX } from '@/constants/regex';
+import { BaseGetRequest, BaseParams, BaseRequest, Log, NameSchema } from '@/types';
 import { getPathParams, translate as t } from '@/utils';
 import { AxiosError, AxiosResponse } from 'axios';
 import * as z from 'zod';
@@ -14,58 +9,11 @@ const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const;
 export type HttpMethod = 'POST' | 'GET' | 'PUT' | 'DELETE';
 
 export const CreateEndpointSchema = z.object({
-	name: z
-		.string({
-			required_error: t('forms.required', {
-				label: t('general.name'),
-			}),
-		})
-		.regex(NAME_REGEX, {
-			message: t('forms.invalid', {
-				label: t('general.name'),
-			}),
-		})
-		.regex(NOT_START_WITH_NUMBER_REGEX, {
-			message: t('forms.notStartWithNumber', {
-				label: t('general.name'),
-			}),
-		})
-		.min(2, {
-			message: t('forms.min2.error', {
-				label: t('general.name'),
-			}),
-		})
-		.max(64, {
-			message: t('forms.max64.error', {
-				label: t('general.name'),
-			}),
-		})
-		.trim()
-		.refine(
-			(value) => value.trim().length > 0,
-			t('forms.required', {
-				label: t('general.name'),
-			}),
-		)
-		.refine((value) => !value.startsWith('_'), {
-			message: t('forms.notStartWithUnderscore', {
-				label: t('general.name'),
-			}),
-		})
-		.refine(
-			(value) => value !== 'this',
-			(value) => ({
-				message: t('forms.reservedKeyword', {
-					keyword: value,
-					label: t('general.name'),
-				}),
-			}),
-		),
-
+	name: NameSchema,
 	method: z
 		.enum(HTTP_METHODS, {
 			required_error: t('forms.required', {
-				label: t('endpoint.create.path'),
+				label: t('endpoint.errors.invalidMethod'),
 			}),
 		})
 		.default('GET'),
@@ -77,11 +25,6 @@ export const CreateEndpointSchema = z.object({
 		})
 		.regex(ROUTE_NAME_REGEX, {
 			message: t('endpoint.errors.notValidRoute'),
-		})
-		.startsWith('/', {
-			message: t('forms.invalid', {
-				label: t('endpoint.create.path'),
-			}),
 		})
 		.superRefine((value, ctx) => {
 			const parameterNames = getPathParams(value);
@@ -191,12 +134,12 @@ export interface TestEndpointParams extends BaseRequest {
 	envId: string;
 	consoleLogId: string;
 	params: {
-		queryParams?: Record<string, string>;
-		pathParams?: Record<string, string>;
+		queryParams?: Record<string, string>[];
+		pathParams?: Record<string, string>[];
 	};
 	body?: string;
 	bodyType?: 'json' | 'form-data';
-	headers?: Record<string, string>;
+	headers?: Record<string, string>[];
 	method: 'get' | 'post' | 'put' | 'delete';
 	formData?: {
 		key: string;

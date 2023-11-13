@@ -7,9 +7,7 @@
 	"editLogicSuccess": "Message Queue logic updated successfully",
 	"delete": {
 		"title": "Delete Queue",
-		"message": "Are you sure you want to delete this queue?",
-		"description": "All organization apps and managed resource and associated data will be deleted. This action is not reversible — please continue with caution.",
-		"confirmCode": "Confirm resource delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
+		"message": "Are you sure you want to delete this function ? This action is not reversible — please continue with caution."
 	},
 	"create": {
 		"title": "Create Message Queue",
@@ -29,5 +27,6 @@
 		"payload": "Message Payload",
 		"console": "Console",
 		"editLogicSuccess": "MEssage Queue logic updated successfully"
-	}
+	},
+	"logs": "Message Queue Logs"
 }

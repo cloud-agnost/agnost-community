@@ -166,7 +166,7 @@ export default function SelectUserDataModel() {
 										>
 											<FormControl>
 												<SelectTrigger
-													className={cn('w-full input', errors.databaseId && 'input-error')}
+													className={cn('w-full flex-1', errors.databaseId && 'input-error')}
 												>
 													<SelectValue
 														className={cn('text-subtle')}

@@ -2,25 +2,26 @@ import { APIError } from '@/types';
 import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
 import { Button } from 'components/Button';
 import { Input } from 'components/Input';
-import { ModalProps } from 'components/Modal';
 import { KeyboardEvent, ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../Dialog';
 import './confirmationModal.scss';
 
-interface ConfirmationModalProps extends ModalProps {
+interface ConfirmationModalProps {
 	error?: APIError | null;
 	title: string;
 	alertTitle?: string | null;
 	alertDescription?: string | null;
 	description: string | ReactNode;
-	action?: ReactNode;
 	closable?: boolean;
 	closeButtonText?: string;
 	confirmCode: string;
 	onConfirm: () => void;
 	loading?: boolean;
 	confirmButtonText?: string | null;
+	isOpen: boolean;
+	closeModal: () => void;
+	className?: string;
 }
 export default function ConfirmationModal({
 	loading,
@@ -40,7 +41,7 @@ export default function ConfirmationModal({
 }: ConfirmationModalProps) {
 	const { t } = useTranslation();
 	const [code, setCode] = useState<string>('');
-	const showAlert = alertTitle || alertDescription;
+	const showAlert = alertTitle ?? alertDescription;
 
 	useEffect(() => {
 		if (!isOpen) setCode('');

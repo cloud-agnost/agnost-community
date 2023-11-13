@@ -16,11 +16,11 @@ export default class Middleware extends RealtimeActions<MiddlewareType> {
 	update({ data }: RealtimeActionParams<MiddlewareType>): void {
 		const { updateTab } = useTabStore.getState();
 		updateTab({
-			versionId: data.versionId as string,
+			versionId: data.versionId,
 			tab: {
 				title: data.name,
 			},
-			filter: (tab) => tab.path.includes(data._id as string),
+			filter: (tab) => tab.path.includes(data._id),
 		});
 		useMiddlewareStore.setState?.({
 			middlewares: useMiddlewareStore.getState?.().middlewares.map((middleware) => {
@@ -31,10 +31,13 @@ export default class Middleware extends RealtimeActions<MiddlewareType> {
 			}),
 			middleware: data,
 		});
+		if (data.logic) {
+			useMiddlewareStore.getState?.().setLogics(data._id, data.logic);
+		}
 	}
 	create({ data }: RealtimeActionParams<MiddlewareType>): void {
 		useMiddlewareStore.setState?.({
-			middlewares: [...useMiddlewareStore.getState().middlewares, data],
+			middlewares: [data, ...useMiddlewareStore.getState().middlewares],
 		});
 	}
 	telemetry(param: RealtimeActionParams<MiddlewareType>): void {

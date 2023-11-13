@@ -6,24 +6,25 @@ import {
 	BasicValueList,
 	BooleanField,
 	DateTime,
+	Enum,
 	GeoPoint,
 	Link,
 	Number,
 	Reference,
 	SubObject,
 	Text,
-	Enum,
 } from '@/features/database/models/Navigator';
 import Json from '@/features/database/models/Navigator/Json';
-import useApplicationStore from '@/store/app/applicationStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { ColumnDefWithClassName, Field } from '@/types';
 import { capitalize, cn, translate } from '@/utils';
-import useAuthorizeApp from './useAuthorizeApp';
 import { ElementType } from 'react';
+import { useAuthorizeVersion } from '.';
 
 export default function useNavigatorColumns(fields: Field[]) {
-	const { editedField, deleteDataFromModel } = useNavigatorStore.getState();
+	const { editedField, deleteDataFromModel } = useNavigatorStore();
+	const canEditModel = useAuthorizeVersion('model.update');
+	const canDeleteModel = useAuthorizeVersion('model.delete');
 	const NavigatorComponentMap: Record<string, ElementType> = {
 		text: Text,
 		enum: Enum,
@@ -86,14 +87,17 @@ export default function useNavigatorColumns(fields: Field[]) {
 				}
 
 				return (
-					<ActionsCell<any>
-						original={original}
-						canDeleteKey='middleware.delete'
-						canEditKey='middleware.update'
-						onEdit={handleEdit}
-						type='version'
-					>
-						<ConfirmTable onDelete={deleteHandler} />
+					<ActionsCell<any> original={original} canEdit={canEditModel} onEdit={handleEdit}>
+						<TableConfirmation
+							align='end'
+							closeOnConfirm
+							showAvatar={false}
+							title={translate('version.middleware.delete.title')}
+							description={translate('version.middleware.delete.message')}
+							onConfirm={deleteHandler}
+							contentClassName='m-0'
+							hasPermission={canDeleteModel}
+						/>
 					</ActionsCell>
 				);
 			},
@@ -123,26 +127,6 @@ export default function useNavigatorColumns(fields: Field[]) {
 			},
 		});
 	});
-
-	function ConfirmTable({ onDelete }: { onDelete: () => void }) {
-		const role = useApplicationStore.getState().role;
-		const hasAppPermission = useAuthorizeApp({
-			key: 'middleware.delete',
-			role,
-		});
-		return (
-			<TableConfirmation
-				align='end'
-				closeOnConfirm
-				showAvatar={false}
-				title={translate('version.middleware.delete.title')}
-				description={translate('version.middleware.delete.message')}
-				onConfirm={onDelete}
-				contentClassName='m-0'
-				disabled={!hasAppPermission}
-			/>
-		);
-	}
 
 	return NavigatorColumns;
 }

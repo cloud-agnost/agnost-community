@@ -27,7 +27,7 @@
 		"port": "Port",
 		"fromName": "From Name",
 		"fromEmail": "From Email",
-		"password": "password",
+		"password": "Password",
 		"username": "User",
 		"enter_username": "Enter username",
 		"enter_host": "Enter hostname",

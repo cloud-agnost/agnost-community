@@ -25,22 +25,21 @@ import { devtools, persist } from 'zustand/middleware';
 interface ModelStore {
 	models: Model[];
 	model: Model;
+	field: Field;
 	subModel: Model;
 	nestedModels: {
 		name: string;
 		index: number;
 	}[];
-	modelToEdit: Model | null;
-	fieldToEdit: Field | null;
-	isOpenEditModelDialog: boolean;
-	isOpenEditFieldDialog: boolean;
+	isEditModelDialogOpen: boolean;
+	isEditFieldDialogOpen: boolean;
 }
 
 type Actions = {
-	setFieldToEdit: (field: Field) => void;
-	setIsOpenEditFieldDialog: (isOpen: boolean) => void;
-	setModelToEdit: (model: Model) => void;
-	setIsOpenEditModelDialog: (isOpen: boolean) => void;
+	openEditModelDialog: (model: Model) => void;
+	closeEditModelDialog: () => void;
+	openEditFieldDialog: (field: Field) => void;
+	closeEditFieldDialog: () => void;
 	getModelsOfDatabase: (params: GetModelsOfDatabaseParams) => Promise<Model[]>;
 	getSpecificModelByIidOfDatabase: (params: GetSpecificModelByIidOfDatabase) => Promise<Model>;
 	getSpecificModelOfDatabase: (params: GetSpecificModelOfDatabase) => Promise<Model>;
@@ -66,11 +65,10 @@ const initialState: ModelStore = {
 	models: [],
 	model: {} as Model,
 	subModel: {} as Model,
+	field: {} as Field,
 	nestedModels: [],
-	modelToEdit: null,
-	fieldToEdit: {} as Field,
-	isOpenEditModelDialog: false,
-	isOpenEditFieldDialog: false,
+	isEditModelDialogOpen: false,
+	isEditFieldDialogOpen: false,
 };
 
 const useModelStore = create<ModelStore & Actions>()(
@@ -78,24 +76,27 @@ const useModelStore = create<ModelStore & Actions>()(
 		persist(
 			(set, get) => ({
 				...initialState,
-				setFieldToEdit: (field: Field) => {
-					set({ fieldToEdit: field });
-				},
-				setIsOpenEditFieldDialog: (isOpen: boolean) => {
-					if (!isOpen) {
-						set({ fieldToEdit: null });
-					}
-					set({ isOpenEditFieldDialog: isOpen });
-				},
-				setModelToEdit: (model: Model) => {
-					set({ modelToEdit: model });
-				},
-				setIsOpenEditModelDialog: (isOpen: boolean) => {
-					if (!isOpen) {
-						set({ modelToEdit: null });
-					}
-					set({ isOpenEditModelDialog: isOpen });
-				},
+				openEditModelDialog: (model: Model) =>
+					set({
+						isEditModelDialogOpen: true,
+						model,
+					}),
+				closeEditModelDialog: () =>
+					set({
+						isEditModelDialogOpen: false,
+						model: {} as Model,
+					}),
+				openEditFieldDialog: (field: Field) =>
+					set({
+						isEditFieldDialogOpen: true,
+						field,
+					}),
+				closeEditFieldDialog: () =>
+					set({
+						isEditFieldDialogOpen: false,
+						field: {} as Field,
+					}),
+
 				getModelsOfDatabase: async (params: GetModelsOfDatabaseParams): Promise<Model[]> => {
 					const models = await ModelService.getModelsOfDatabase(params);
 					set({ models, model: models[0] });

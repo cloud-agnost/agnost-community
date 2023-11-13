@@ -1,135 +1,78 @@
-import { nameSchema } from '@/features/version/Middlewares/formSchema.ts';
 import { useToast } from '@/hooks';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
-import { Middleware } from '@/types';
+import { APIError, MiddlewareSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from 'components/Button';
+import { useMutation } from '@tanstack/react-query';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from 'components/Form';
-import { Input } from 'components/Input';
-import { useEffect, useState } from 'react';
+import { Form } from 'components/Form';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-const MiddlewareFormSchema = z.object({
-	name: nameSchema,
-});
+import MiddlewareForm from './MiddlewareForm';
 
 export default function EditMiddlewareDrawer() {
 	const { t } = useTranslation();
-	const [loading, setLoading] = useState(false);
 	const { notify } = useToast();
-	const {
-		middleware,
-		setEditMiddlewareDrawerIsOpen,
-		editMiddlewareDrawerIsOpen,
-		setMiddleware,
-		updateMiddleware,
-	} = useMiddlewareStore();
+	const { middleware, closeEditMiddlewareDrawer, isEditMiddlewareDrawerOpen, updateMiddleware } =
+		useMiddlewareStore();
 
-	const form = useForm<z.infer<typeof MiddlewareFormSchema>>({
-		resolver: zodResolver(MiddlewareFormSchema),
+	const form = useForm<z.infer<typeof MiddlewareSchema>>({
+		resolver: zodResolver(MiddlewareSchema),
+		defaultValues: {
+			name: middleware?.name,
+		},
 	});
 
-	async function init() {
-		if (!middleware) return;
-		if (editMiddlewareDrawerIsOpen) {
+	useEffect(() => {
+		if (isEditMiddlewareDrawerOpen && middleware) {
 			form.reset({
 				name: middleware.name,
 			});
-		} else {
-			form.reset({
-				name: '',
-			});
 		}
-	}
+	}, [isEditMiddlewareDrawerOpen]);
 
-	useEffect(() => {
-		init();
-	}, [editMiddlewareDrawerIsOpen]);
+	const { mutate: updateMiddlewareMutation, isPending } = useMutation({
+		mutationFn: updateMiddleware,
+		onSuccess: () => {
+			onOpenChange();
+		},
+		onError: (error: APIError) => {
+			notify({
+				title: error.error,
+				description: error.details,
+				type: 'error',
+			});
+		},
+	});
 
-	async function onSubmit(data: z.infer<typeof MiddlewareFormSchema>) {
+	async function onSubmit(data: z.infer<typeof MiddlewareSchema>) {
 		if (!middleware) return;
-		setLoading(true);
-		try {
-			const params = {
-				orgId: middleware.orgId,
-				appId: middleware.appId,
-				versionId: middleware.versionId,
-				mwId: middleware._id,
-			};
-			updateMiddleware({
-				...params,
-				name: data.name,
-				onSuccess: () => {
-					notify({
-						title: t('general.success'),
-						description: t('version.middleware.edit.success'),
-						type: 'success',
-					});
-				},
-				onError: (error) => {
-					notify({
-						title: error.error,
-						description: error.details,
-						type: 'error',
-					});
-				},
-			});
-			setEditMiddlewareDrawerIsOpen(false);
-		} finally {
-			setLoading(false);
-		}
+		updateMiddlewareMutation({
+			orgId: middleware.orgId,
+			appId: middleware.appId,
+			versionId: middleware.versionId,
+			mwId: middleware._id,
+			name: data.name,
+		});
 	}
 
-	function onOpenChange(status: boolean) {
-		setMiddleware({} as Middleware);
-		setEditMiddlewareDrawerIsOpen(status);
+	function onOpenChange() {
+		closeEditMiddlewareDrawer();
+		form.reset({
+			name: '',
+		});
 	}
 
 	return (
-		<Drawer open={editMiddlewareDrawerIsOpen} onOpenChange={onOpenChange}>
+		<Drawer open={isEditMiddlewareDrawerOpen} onOpenChange={onOpenChange}>
 			<DrawerContent className='flex gap-0 flex-col' position='right'>
 				<DrawerHeader>
 					<DrawerTitle>{t('version.middleware.edit.default')}</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
 					<form className='p-6 flex flex-col gap-3 flex-1' onSubmit={form.handleSubmit(onSubmit)}>
-						<FormField
-							control={form.control}
-							name='name'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{t('version.middleware.name')}</FormLabel>
-									<FormControl>
-										<Input
-											error={Boolean(form.formState.errors.name)}
-											placeholder={
-												t('forms.placeholder', {
-													label: t('general.name'),
-												}) ?? ''
-											}
-											{...field}
-										/>
-									</FormControl>
-									<FormDescription>{t('forms.max64.description')}</FormDescription>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<div className='flex justify-end mt-4'>
-							<Button loading={loading} size='lg'>
-								{t('general.save')}
-							</Button>
-						</div>
+						<MiddlewareForm loading={isPending} />
 					</form>
 				</Form>
 			</DrawerContent>

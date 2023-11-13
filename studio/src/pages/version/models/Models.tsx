@@ -1,55 +1,81 @@
 import { Button } from '@/components/Button';
-import { EditOrCreateModelDrawer } from '@/features/database/models/ListModels';
-import { ModelColumns } from '@/features/database/models/ListModels/index.ts';
-import { useTabNavigate } from '@/hooks';
+import { CreateModel, EditModel, ModelColumns } from '@/features/database/models';
+import { useTabNavigate, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
-import { Database, Model, TabTypes } from '@/types';
-import { Row, Table } from '@tanstack/react-table';
+import { APIError, Model, TabTypes } from '@/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 import { DataTable } from 'components/DataTable';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
-
 export default function Models() {
-	const { models, deleteMultipleModel, isOpenEditModelDialog, setIsOpenEditModelDialog } =
-		useModelStore();
-	const [selectedRows, setSelectedRows] = useState<Row<Model>[]>();
+	const {
+		models,
+		deleteMultipleModel,
+		isEditModelDialogOpen,
+		closeEditModelDialog,
+		getModelsOfDatabase,
+	} = useModelStore();
+	const [isCreateModelOpen, setIsCreateModelOpen] = useState(false);
 	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
-	const [table, setTable] = useState<Table<Model>>();
+	const { notify } = useToast();
+
 	const canCreateModel = useAuthorizeVersion('model.create');
-	const { dbId } = useParams();
-	const { databases } = useDatabaseStore();
+	const { dbId, orgId, appId, versionId } = useParams() as {
+		dbId: string;
+		orgId: string;
+		appId: string;
+		versionId: string;
+	};
+	const { database } = useDatabaseStore();
 	const navigate = useTabNavigate();
 
 	const filteredModels = useMemo(() => {
-		const search = searchParams.get('q') ?? '';
-		if (!search) return models;
-
-		return models.filter((model) => {
-			return model.name.toLowerCase().includes(search.toLowerCase());
-		});
+		if (searchParams.get('q')) {
+			const query = new RegExp(searchParams.get('q') as string, 'i');
+			return models.filter((model) => model.name.match(query));
+		}
+		return models;
 	}, [searchParams.get('q'), models]);
 
-	const database = useMemo(() => {
-		return databases.find((database) => database._id === dbId) as Database;
-	}, [databases, dbId]);
+	const table = useTable<Model>({
+		data: filteredModels,
+		columns: ModelColumns,
+	});
 
-	async function deleteAll() {
-		if (!database) return;
-		await deleteMultipleModel({
+	const { isPending } = useQuery({
+		queryFn: () => getModelsOfDatabase({ dbId, orgId, appId, versionId }),
+		queryKey: ['getModelsOfDatabase'],
+	});
+
+	const { mutateAsync: deleteMultipleModelMutation } = useMutation({
+		mutationFn: deleteMultipleModel,
+		mutationKey: ['deleteMultipleModel'],
+		onSuccess: () => {
+			table?.resetRowSelection();
+		},
+		onError: (error: APIError) => {
+			notify({
+				title: error.error,
+				description: error.details,
+				type: 'error',
+			});
+		},
+	});
+
+	async function deleteMultipleModelHandler() {
+		deleteMultipleModelMutation({
 			dbId: database._id,
 			versionId: database.versionId,
 			appId: database.appId,
 			orgId: database.orgId,
-			modelIds: selectedRows?.map((row) => row.original._id) as string[],
+			modelIds: table.getSelectedRowModel().rows.map((row) => row.original._id),
 		});
-		setSelectedRows(undefined);
-		table?.resetRowSelection();
 	}
 
 	const databasesUrl = `/organization/${database?.orgId}/apps/${database?.appId}/version/${database?.versionId}/database`;
@@ -63,51 +89,40 @@ export default function Models() {
 			name: database?.name,
 		},
 	];
+
+	function handleViewDataClick() {
+		navigate({
+			title: 'Navigator',
+			path: `${databasesUrl}/${database._id}/navigator`,
+			isActive: true,
+			isDashboard: false,
+			type: TabTypes.Navigator,
+		});
+	}
 	return (
 		<>
 			<VersionTabLayout<Model>
 				breadCrumb={<BreadCrumb goBackLink={databasesUrl} items={breadcrumbItems} />}
-				isEmpty={filteredModels.length === 0}
+				isEmpty={!filteredModels.length}
 				title={t('database.models.title')}
 				type='model'
-				openCreateModal={() => setIsOpenEditModelDialog(true)}
+				openCreateModal={() => setIsCreateModelOpen(true)}
 				createButtonTitle={t('database.models.create')}
 				emptyStateTitle={t('database.models.no_models')}
 				table={table}
-				selectedRowLength={selectedRows?.length}
-				onSearch={() => {}}
 				disabled={!canCreateModel}
-				onMultipleDelete={deleteAll}
+				onMultipleDelete={deleteMultipleModelHandler}
+				loading={isPending}
 				handlerButton={
-					<Button
-						variant='secondary'
-						onClick={() => {
-							navigate({
-								title: 'Navigator',
-								path: `${databasesUrl}/${database._id}/navigator`,
-								isActive: true,
-								isDashboard: false,
-								type: TabTypes.Navigator,
-							});
-						}}
-					>
+					<Button variant='secondary' onClick={handleViewDataClick}>
 						View Data
 					</Button>
 				}
 			>
-				<DataTable<Model>
-					columns={ModelColumns}
-					data={filteredModels.filter((model) => model.type === 'model')}
-					setTable={setTable}
-					noDataMessage={<p className='text-xl'>{t('database.models.no_models')}</p>}
-					setSelectedRows={setSelectedRows}
-				/>
+				<DataTable<Model> table={table} />
 			</VersionTabLayout>
-			<EditOrCreateModelDrawer
-				open={isOpenEditModelDialog}
-				onOpenChange={setIsOpenEditModelDialog}
-				editMode={true}
-			/>
+			<EditModel open={isEditModelDialogOpen} onOpenChange={closeEditModelDialog} />
+			<CreateModel open={isCreateModelOpen} onOpenChange={setIsCreateModelOpen} />
 		</>
 	);
 }

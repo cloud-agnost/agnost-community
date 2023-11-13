@@ -95,13 +95,14 @@ export interface TeamOption {
 	readonly value: ApplicationMember;
 	readonly label: string;
 }
-interface AppMemberRequest {
+export interface AppMemberRequest {
 	email: string;
 	role: AppRoles | '';
+	uiBaseURL: string;
 }
 export interface AppInviteRequest extends BaseRequest {
 	members: AppMemberRequest[];
-	uiBaseUrl: string;
+	uiBaseURL: string;
 }
 
 interface AuthPermissions {

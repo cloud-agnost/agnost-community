@@ -5,7 +5,7 @@ import {
 	DeleteDatabaseParams,
 	GetDatabaseOfAppByIdParams,
 	GetDatabasesOfAppParams,
-	UpdateDatabaseNameParams,
+	UpdateDatabaseParams,
 } from '@/types';
 
 export default class DatabaseService {
@@ -45,7 +45,7 @@ export default class DatabaseService {
 		versionId,
 		dbId,
 		...data
-	}: UpdateDatabaseNameParams): Promise<Database> {
+	}: UpdateDatabaseParams): Promise<Database> {
 		return (
 			await axios.put(`${this.url}/${orgId}/app/${appId}/version/${versionId}/db/${dbId}`, data)
 		).data;

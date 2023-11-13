@@ -30,7 +30,7 @@ export const UserSchema = z.object({
 	rt: z.string(),
 });
 
-export type APIError = {
+export interface APIError {
 	error: string;
 	details: string;
 	code: string;
@@ -55,7 +55,7 @@ export type APIError = {
 			| 'phoneVerified';
 		type: 'text' | 'boolean' | 'datetime' | 'link' | 'encrypted-text' | 'array' | 'phone' | 'email';
 	}[];
-};
+}
 export type User = z.infer<typeof UserSchema>;
 
 export interface UserDataToRegister extends BaseRequest {
@@ -186,7 +186,7 @@ export interface Types {
 		type: string;
 	}[];
 }
-export interface BaseGetRequest extends BaseRequest {
+export interface BaseGetRequest {
 	page: number;
 	size: number;
 	sortBy?: string;
@@ -194,8 +194,8 @@ export interface BaseGetRequest extends BaseRequest {
 	start?: string;
 	end?: string;
 	search?: string;
-	initialFetch?: boolean;
 }
+export type GetModulesRequest = BaseGetRequest & BaseParams;
 
 export interface SortOption {
 	name: string;
@@ -384,7 +384,7 @@ export const SMTPSchema = z.object({
 		.trim()
 		.refine((value) => value.trim().length > 0, 'Username is required'),
 	password: z.string({ required_error: 'Password is required' }),
-	useTLS: z.boolean(),
+	useTLS: z.boolean().default(false),
 });
 
 export type SetupCluster = OnboardingData & BaseRequest;
@@ -394,4 +394,10 @@ declare global {
 	var monaco: typeof import('monaco-editor');
 	// eslint-disable-next-line no-var
 	var ts: typeof import('typescript');
+}
+
+declare module '@tanstack/react-query' {
+	export interface UseBaseMutationResult<D, APIError, V, C> {
+		error: APIError | null;
+	}
 }

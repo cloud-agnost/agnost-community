@@ -24,7 +24,7 @@ const SelectTrigger = React.forwardRef<
 >(({ className, children, error, ...props }, ref) => (
 	<SelectPrimitive.Trigger
 		ref={ref}
-		className={cn('select', error && 'border-error-default', className)}
+		className={cn('select !bg-input-background', error && 'border-error-default', className)}
 		{...props}
 	>
 		{children}

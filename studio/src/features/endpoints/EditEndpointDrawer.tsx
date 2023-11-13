@@ -1,6 +1,6 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import useEndpointStore from '@/store/endpoint/endpointStore';
-import { CreateEndpointSchema } from '@/types';
+import { APIError, CreateEndpointSchema } from '@/types';
 import { translate as t, removeEmptyFields } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -10,6 +10,7 @@ import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
 interface CreateEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -25,31 +26,28 @@ export default function EditEndpointDrawer({ open, onClose }: CreateEndpointProp
 	const form = useForm<z.infer<typeof CreateEndpointSchema>>({
 		resolver: zodResolver(CreateEndpointSchema),
 	});
-
+	const { mutateAsync: updateEndpointMutation, isPending } = useMutation({
+		mutationFn: updateEndpoint,
+		onSuccess: () => {
+			onClose();
+			form.reset();
+		},
+		onError: ({ error, details }: APIError) => {
+			notify({
+				title: error,
+				description: details,
+				type: 'error',
+			});
+		},
+	});
 	function onSubmit(data: z.infer<typeof CreateEndpointSchema>) {
 		const params = removeEmptyFields(data) as z.infer<typeof CreateEndpointSchema>;
-		updateEndpoint({
+		updateEndpointMutation({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			epId: endpoint?._id as string,
 			...params,
-			onSuccess: () => {
-				notify({
-					title: t('general.success'),
-					description: t('endpoint.editSuccess'),
-					type: 'success',
-				});
-				onClose();
-				form.reset();
-			},
-			onError: ({ error, details }) => {
-				notify({
-					title: error,
-					description: details,
-					type: 'error',
-				});
-			},
 		});
 	}
 
@@ -81,7 +79,7 @@ export default function EditEndpointDrawer({ open, onClose }: CreateEndpointProp
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<EndpointForm />
+						<EndpointForm loading={isPending} />
 					</form>
 				</Form>
 			</DrawerContent>
