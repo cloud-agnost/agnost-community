@@ -26,7 +26,7 @@ function SelectedRowButton<T>({ onDelete, table, className, disabled }: Props<T>
 							className='bg-button-primary h-1/2 p-1'
 							onClick={() => table?.resetRowSelection()}
 						>
-							<Minus size={16} weight='bold' className='text-icon-secondary' />
+							<Minus size={16} weight='bold' className='text-icon-default' />
 						</Button>
 					)}
 
