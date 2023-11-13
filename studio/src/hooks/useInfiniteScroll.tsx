@@ -4,17 +4,19 @@ import { useUpdateEffect } from '.';
 import { useSearchParams, useParams } from 'react-router-dom';
 import { BaseParams, BaseGetRequest } from '@/types';
 
-interface UseFetchDataProps {
-	queryFn: (params: BaseGetRequest & BaseParams) => Promise<any>;
+interface UseFetchDataProps<T = any> {
+	queryFn: (params: BaseGetRequest & BaseParams & T) => Promise<any>;
 	lastFetchedPage: number;
 	dataLength: number;
 	queryKey: string;
+	params?: T;
 }
 export default function useInfiniteScroll({
 	queryFn,
 	lastFetchedPage,
 	dataLength,
 	queryKey,
+	params,
 }: UseFetchDataProps) {
 	const [searchParams] = useSearchParams();
 	const { orgId, appId, versionId } = useParams();
@@ -30,6 +32,7 @@ export default function useInfiniteScroll({
 				page: pageParam,
 				size: MODULE_PAGE_SIZE,
 				search: searchParams.get('q') as string,
+				...params,
 			}),
 		refetchOnWindowFocus: false,
 		enabled:
@@ -43,7 +46,7 @@ export default function useInfiniteScroll({
 
 	useUpdateEffect(() => {
 		result.refetch();
-	}, [searchParams.get('q')]);
+	}, [searchParams]);
 
 	return result;
 }

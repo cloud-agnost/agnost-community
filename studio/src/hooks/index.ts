@@ -10,3 +10,4 @@ export { default as useTable } from './useTable.tsx';
 export { default as useToast } from './useToast.tsx';
 export { default as useUpdateData } from './useUpdateData.tsx';
 export { default as useUpdateEffect } from './useUpdateEffect.tsx';
+export { default as useAuthorizeVersion } from './useAuthorizeVersion.tsx';

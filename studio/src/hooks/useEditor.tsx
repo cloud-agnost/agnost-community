@@ -34,6 +34,7 @@ export const EDITOR_OPTIONS: EditorProps['options'] = {
 	scrollbar: {},
 	renderLineHighlight: 'none', //Enable rendering of current line highlight
 	folding: false, //Enable code folding
+	codeLens: true,
 };
 
 export type CodeEditorProps = {
@@ -73,8 +74,8 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 			]);
 
 			ed?.pushUndoStop();
+			cb?.(formatted);
 		}
-		cb?.(val);
 	}
 
 	function configureEditor(editor: monaco.editor.IStandaloneCodeEditor, monaco: any) {
