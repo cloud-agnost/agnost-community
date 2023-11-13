@@ -4,6 +4,7 @@ import { socket } from '@/helpers';
 import { useToast as toast } from '@/hooks';
 import { t } from '@/i18n/config.ts';
 import useApplicationStore from '@/store/app/applicationStore';
+import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTypeStore from '@/store/types/typeStore';
 import useTabStore from '@/store/version/tabStore';
@@ -394,4 +395,17 @@ export function getTypeWorker() {
 	return new Worker(new URL('../workers/fetchTypings.worker.ts', import.meta.url), {
 		type: 'module',
 	});
+}
+
+export function getVersionPermission(type: string): boolean {
+	const version = useVersionStore.getState().version;
+	const role = useApplicationStore.getState().application?.role;
+	const user = useAuthStore.getState().user;
+
+	const isPrivateForUser = version?.private ? user?._id === version.createdBy : true;
+
+	const isVersionEditable = version?.readOnly
+		? user?._id === version.createdBy || role === 'Admin'
+		: isPrivateForUser && getAppPermission(`${role}.app.${type}`);
+	return isVersionEditable as boolean;
 }
