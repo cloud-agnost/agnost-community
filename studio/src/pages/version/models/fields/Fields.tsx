@@ -3,91 +3,76 @@ import {
 	EditOrCreateFieldDrawer,
 	FieldColumns,
 } from '@/features/database/models/fields/ListFields';
+import { useTable } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
+import useAuthStore from '@/store/auth/authStore';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
-import { Database, Field, Model } from '@/types';
-import { Row, Table } from '@tanstack/react-table';
+import { Field } from '@/types';
 import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 import { DataTable } from 'components/DataTable';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { LoaderFunctionArgs, useParams, useSearchParams } from 'react-router-dom';
+
+Fields.loader = async function ({ params }: LoaderFunctionArgs) {
+	if (!useAuthStore.getState().isAuthenticated()) return null;
+
+	const apiParams = params as {
+		orgId: string;
+		appId: string;
+		versionId: string;
+		dbId: string;
+		modelId: string;
+	};
+
+	const { getSpecificModelOfDatabase, model } = useModelStore.getState();
+	if (apiParams.modelId !== model._id && apiParams.modelId)
+		await getSpecificModelOfDatabase(apiParams);
+
+	return null;
+};
 
 export default function Fields() {
 	const { modelId, versionId, dbId, appId, orgId } = useParams() as Record<string, string>;
-	const [parentModelIid, setParentModelIid] = useState<string>();
-	const { isOpenEditFieldDialog, setIsOpenEditFieldDialog, models, getSpecificModelOfDatabase } =
-		useModelStore();
-	const [selectedRows, setSelectedRows] = useState<Row<Field>[]>();
+
 	const { t } = useTranslation();
-	const [table, setTable] = useState<Table<Field>>();
-	const { databases } = useDatabaseStore();
-	const { deleteMultipleField } = useModelStore();
+	const { database } = useDatabaseStore();
+	const { deleteMultipleField, model, closeEditFieldDialog, isEditFieldDialogOpen } =
+		useModelStore();
 	const canMultiDelete = useAuthorizeVersion('model.delete');
 	const [searchParams] = useSearchParams();
 
-	const model = models.find((model) => model._id === modelId) as Model;
-	const parentModel = models.find((model) => model.iid === parentModelIid);
-
-	useEffect(() => {
-		findModel();
-	}, [modelId]);
-
-	async function findModel() {
-		const model = await getSpecificModelOfDatabase({
-			appId,
-			versionId,
-			orgId,
-			dbId,
-			modelId,
-		});
-		setParentModelIid(model.parentiid);
-	}
-
 	const filteredFields = useMemo(() => {
-		const search = searchParams.get('q') ?? '';
-		if (!search) return model?.fields;
-
-		return model?.fields
-			?.filter((f) => {
-				return f.name.toLowerCase().includes(search.toLowerCase());
-			})
-			.sort((a, b) => b.order - a.order);
+		if (searchParams.get('q')) {
+			const query = new RegExp(searchParams.get('q') as string, 'i');
+			return model.fields.filter((f) => f.name.match(query)).sort((a, b) => b.order - a.order);
+		}
+		return model.fields;
 	}, [searchParams.get('q'), model]);
 
-	useEffect(() => {
-		setSelectedRows((selectedRows) => {
-			return selectedRows?.filter((row) => row.original.creator !== 'system');
-		});
-		if (table) {
-			table?.setRowSelection((updater) => {
-				return updater;
-			});
-		}
-	}, []);
-
-	const database = useMemo(() => {
-		return databases.find((database) => database._id === dbId) as Database;
-	}, [databases, dbId]);
+	const table = useTable<Field>({
+		data: filteredFields,
+		columns: FieldColumns,
+	});
 
 	async function deleteHandler() {
 		await deleteMultipleField({
-			dbId: model.dbId,
-			modelId: model._id,
-			appId: database.appId,
-			orgId: database.orgId,
-			versionId: database.versionId,
-			fieldIds: selectedRows?.map((row) => row.original._id) as string[],
+			modelId,
+			versionId,
+			dbId,
+			appId,
+			orgId,
+			fieldIds: table.getSelectedRowModel().rows.map((row) => row.original._id),
 		});
-		setSelectedRows(undefined);
+
 		table?.resetRowSelection?.();
 	}
 
 	const databasesUrl = `/organization/${database?.orgId}/apps/${database?.appId}/version/${database?.versionId}/database`;
 	const databaseUrl = `${databasesUrl}/${model?.dbId}/models`;
-	const goParentModelUrl = `${databaseUrl}/${parentModel?._id}/fields`;
+	const goParentModelUrl = `${databaseUrl}/${model?._id}/fields`;
 
 	const breadcrumbItems: BreadCrumbItem[] = [
 		{
@@ -99,7 +84,7 @@ export default function Fields() {
 			url: databaseUrl,
 		},
 		{
-			name: parentModel?.name,
+			name: model?.name,
 			url: goParentModelUrl,
 		},
 		{
@@ -108,36 +93,25 @@ export default function Fields() {
 	];
 	return (
 		<>
-			{model && (
-				<VersionTabLayout<Field>
-					breadCrumb={
-						<BreadCrumb
-							goBackLink={parentModel ? goParentModelUrl : databaseUrl}
-							items={breadcrumbItems}
-						/>
-					}
-					isEmpty={!filteredFields.length}
-					title={t('database.fields.title')}
-					type='field'
-					handlerButton={<CreateFieldButton />}
-					emptyStateTitle={t('database.fields.no_fields')}
-					table={table}
-					disabled={!canMultiDelete}
-					onMultipleDelete={deleteHandler}
-				>
-					<DataTable<Field>
-						setTable={setTable}
-						columns={FieldColumns}
-						data={filteredFields}
-						noDataMessage={<p className='text-xl'>{t('database.fields.no_fields')}</p>}
-						setSelectedRows={setSelectedRows}
-					/>
-				</VersionTabLayout>
-			)}
+			<VersionTabLayout<Field>
+				breadCrumb={<BreadCrumb goBackLink={goParentModelUrl} items={breadcrumbItems} />}
+				isEmpty={!filteredFields.length}
+				title={t('database.fields.title')}
+				type='field'
+				handlerButton={<CreateFieldButton />}
+				emptyStateTitle={t('database.fields.no_fields')}
+				table={table}
+				disabled={!canMultiDelete}
+				onMultipleDelete={deleteHandler}
+				loading={!model}
+			>
+				<DataTable<Field> table={table} />
+			</VersionTabLayout>
+
 			<EditOrCreateFieldDrawer
-				key={isOpenEditFieldDialog.toString()}
-				open={isOpenEditFieldDialog}
-				onOpenChange={setIsOpenEditFieldDialog}
+				key={isEditFieldDialogOpen.toString()}
+				open={isEditFieldDialogOpen}
+				onOpenChange={closeEditFieldDialog}
 				editMode
 			/>
 		</>

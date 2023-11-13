@@ -24,11 +24,36 @@ export interface Model {
 	updatedAt: string;
 	__v: number;
 }
+export enum FieldTypes {
+	ID = 'id',
+	TEXT = 'text',
+	RICH_TEXT = 'rich-text',
+	ENCRYPTED_TEXT = 'encrypted-text',
+	EMAIL = 'email',
+	LINK = 'link',
+	PHONE = 'phone',
+	BOOLEAN = 'boolean',
+	INTEGER = 'integer',
+	DECIMAL = 'decimal',
+	CREATED_AT = 'createdat',
+	UPDATED_AT = 'updatedat',
+	DATETIME = 'datetime',
+	DATE = 'date',
+	TIME = 'time',
+	ENUM = 'enum',
+	GEO_POINT = 'geo-point',
+	BINARY = 'binary',
+	JSON = 'json',
+	REFERENCE = 'reference',
+	BASIC_VALUES_LIST = 'basic-values-list',
+	OBJECT = 'object',
+	OBJECT_LIST = 'object-list',
+}
 export interface Field {
 	name: string;
 	iid: string;
 	creator: 'system' | 'user';
-	type: string;
+	type: FieldTypes;
 	description: string;
 	defaultValue: string;
 	dbType: string;

@@ -1,58 +1,43 @@
 import { create } from '@/helpers';
-
-import { CustomStateStorage } from '@/helpers/state';
 import { DatabaseService } from '@/services';
 import {
-	APIError,
 	CreateDatabaseParams,
 	Database,
 	DeleteDatabaseParams,
 	GetDatabaseOfAppByIdParams,
 	GetDatabasesOfAppParams,
-	UpdateDatabaseNameParams,
+	UpdateDatabaseParams,
 } from '@/types';
-import { notify } from '@/utils';
 import { devtools, persist } from 'zustand/middleware';
 
 interface DatabaseStore {
 	databases: Database[];
-	databasesForSearch: Database[];
 	database: Database;
-	toEditDatabase: Database | null;
-	toDeleteDatabase: Database | null;
-	isOpenDeleteDatabaseDialog: boolean;
-	apps: object[];
-	appLogs: object[];
-	editDatabaseDialogOpen: boolean;
+	toDeleteDatabase: Database;
+	isDeleteDatabaseDialogOpen: boolean;
+	isEditDatabaseDialogOpen: boolean;
 }
 
 type Actions = {
-	setToDeleteDatabase: (database: Database) => void;
-	setToEditDatabase: (database: Database) => void;
-	setEditDatabaseDialogOpen: (open: boolean) => void;
-	setApps: (apps: object[]) => void;
-	setAppLogs: (appLogs: object[]) => void;
-	setIsOpenDeleteDatabaseDialog: (open: boolean) => void;
 	getDatabasesOfApp: (params: GetDatabasesOfAppParams) => Promise<Database[]>;
 	getDatabaseOfAppById: (params: GetDatabaseOfAppByIdParams) => Promise<Database>;
 	createDatabase: (params: CreateDatabaseParams) => Promise<Database>;
-	updateDatabaseName: (params: UpdateDatabaseNameParams) => Promise<Database>;
+	updateDatabase: (params: UpdateDatabaseParams) => Promise<Database>;
 	deleteDatabase: (params: DeleteDatabaseParams) => Promise<void>;
-	searchDatabases: (search: string) => void;
 	setDatabase: (database: Database) => void;
+	openDeleteDatabaseDialog: (db: Database) => void;
+	closeDeleteDatabaseDialog: () => void;
+	openEditDatabaseDialog: (db: Database) => void;
+	closeEditDatabaseDialog: () => void;
 	reset: () => void;
 };
 
 const initialState: DatabaseStore = {
 	databases: [],
-	databasesForSearch: [],
 	database: {} as Database,
-	editDatabaseDialogOpen: false,
-	apps: [],
-	isOpenDeleteDatabaseDialog: false,
-	appLogs: [],
-	toEditDatabase: null,
-	toDeleteDatabase: null,
+	toDeleteDatabase: {} as Database,
+	isDeleteDatabaseDialogOpen: false,
+	isEditDatabaseDialogOpen: false,
 };
 
 const useDatabaseStore = create<DatabaseStore & Actions>()(
@@ -60,20 +45,29 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 		persist(
 			(set) => ({
 				...initialState,
-				setToDeleteDatabase: (database: Database) => set({ toDeleteDatabase: database }),
-				setIsOpenDeleteDatabaseDialog: (open: boolean) => set({ isOpenDeleteDatabaseDialog: open }),
-				setToEditDatabase: (database: Database) => set({ toEditDatabase: database }),
-				setEditDatabaseDialogOpen: (open: boolean) => {
-					if (!open) {
-						set({ toEditDatabase: null });
-					}
-					set({ editDatabaseDialogOpen: open });
-				},
-				setApps: (apps: object[]) => set({ apps }),
-				setAppLogs: (appLogs: object[]) => set({ appLogs }),
+				openDeleteDatabaseDialog: (db: Database) =>
+					set({
+						isDeleteDatabaseDialogOpen: true,
+						toDeleteDatabase: db,
+					}),
+				closeDeleteDatabaseDialog: () =>
+					set({
+						isDeleteDatabaseDialogOpen: false,
+						toDeleteDatabase: {} as Database,
+					}),
+				openEditDatabaseDialog: (db: Database) =>
+					set({
+						isEditDatabaseDialogOpen: true,
+						database: db,
+					}),
+				closeEditDatabaseDialog: () =>
+					set({
+						isEditDatabaseDialogOpen: false,
+						database: {} as Database,
+					}),
 				getDatabasesOfApp: async (params: GetDatabasesOfAppParams): Promise<Database[]> => {
 					const databases = await DatabaseService.getDatabasesOfApp(params);
-					set({ databases, databasesForSearch: databases });
+					set({ databases });
 					return databases;
 				},
 				getDatabaseOfAppById: async (params: GetDatabaseOfAppByIdParams): Promise<Database> => {
@@ -85,27 +79,17 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 					try {
 						const database = await DatabaseService.createDatabase(params);
 						set((prev) => ({
-							databases: [...prev.databases, database],
-							databasesForSearch: [...prev.databases, database],
+							databases: [database, ...prev.databases],
 						}));
 						return database;
 					} catch (e) {
-						const error = e as APIError;
-						notify({
-							type: 'error',
-							title: error.error,
-							description: error.details,
-						});
 						throw e;
 					}
 				},
-				updateDatabaseName: async (params: UpdateDatabaseNameParams): Promise<Database> => {
+				updateDatabase: async (params: UpdateDatabaseParams): Promise<Database> => {
 					const database = await DatabaseService.updateDatabaseName(params);
 					set((prev) => ({
 						databases: prev.databases.map((db) => (db._id === database._id ? database : db)),
-						databasesForSearch: prev.databases.map((db) =>
-							db._id === database._id ? database : db,
-						),
 					}));
 					return database;
 				},
@@ -114,29 +98,9 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 						await DatabaseService.deleteDatabase(params);
 						set((prev) => ({
 							databases: prev.databases.filter((db) => db._id !== params.dbId),
-							databasesForSearch: prev.databases.filter((db) => db._id !== params.dbId),
 						}));
 					} catch (e) {
-						const error = e as APIError;
-						notify({
-							type: 'error',
-							title: error.error,
-							description: error.details,
-						});
 						throw e;
-					}
-				},
-				searchDatabases: (search: string) => {
-					if (!search) {
-						set((prev) => ({
-							databasesForSearch: prev.databases,
-						}));
-					} else {
-						set((prev) => ({
-							databasesForSearch: prev.databases.filter((db) =>
-								db.name.toLowerCase().includes(search.toLowerCase()),
-							),
-						}));
 					}
 				},
 				setDatabase: (database: Database) => set({ database }),
@@ -144,7 +108,6 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 			}),
 			{
 				name: 'database-storage',
-				storage: CustomStateStorage,
 			},
 		),
 		{

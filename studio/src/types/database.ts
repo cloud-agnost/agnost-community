@@ -37,7 +37,7 @@ export type DeleteDatabaseParams = GetDatabasesOfAppParams & {
 	dbId: string;
 };
 
-export type UpdateDatabaseNameParams = GetDatabaseOfAppByIdParams & {
+export type UpdateDatabaseParams = GetDatabaseOfAppByIdParams & {
 	name: string;
 	poolSize: number;
 };

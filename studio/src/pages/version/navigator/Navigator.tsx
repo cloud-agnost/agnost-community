@@ -1,14 +1,12 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
-import { useNavigatorColumns, useToast } from '@/hooks';
+import { useNavigatorColumns, useTable, useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useAuthStore from '@/store/auth/authStore';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
-import { Field } from '@/types';
 import { cn, isEmpty } from '@/utils';
 import { Table as TableIcon } from '@phosphor-icons/react';
-import { Row, Table } from '@tanstack/react-table';
 import { DataTable } from 'components/DataTable';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,9 +31,7 @@ Navigator.loader = async function ({ params }: LoaderFunctionArgs) {
 export default function Navigator() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const [selectedRows, setSelectedRows] = useState<Row<Record<string, any>>[]>();
 	const [page, setPage] = useState(0);
-	const [table, setTable] = useState<Table<Field>>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const {
 		setEditedField,
@@ -57,9 +53,15 @@ export default function Navigator() {
 		versionId: string;
 	}>();
 
+	const table = useTable({
+		columns,
+		data: hasSubModel ? subModelData : data,
+	});
+
 	const dbUrl = `/organization/${orgId}/apps/${appId}/version/${versionId}/database`;
 
 	async function deleteHandler() {
+		const selectedRows = table?.getSelectedRowModel().rows;
 		if (!selectedRows) return;
 		const ids = selectedRows.map((row) => row.original.id);
 		await deleteMultipleDataFromModel({
@@ -113,6 +115,7 @@ export default function Navigator() {
 			table={table}
 			disabled={!canMultiDelete}
 			onMultipleDelete={deleteHandler}
+			loading={false}
 			breadCrumb={<BreadCrumb goBackLink={dbUrl} items={breadcrumbItems} />}
 		>
 			<div className='flex gap-4 justify-center h-[88%]'>
@@ -147,14 +150,11 @@ export default function Navigator() {
 					</div>
 				</div>
 				<DataTable<any>
+					table={table}
 					className='table-fixed w-full relative'
 					containerClassName='max-h-full overflow-auto'
 					headerClassName='sticky top-0 z-50'
-					setTable={setTable}
-					columns={columns}
-					data={hasSubModel ? subModelData : data}
 					noDataMessage={<p className='text-xl'>{t('database.fields.no_fields')}</p>}
-					setSelectedRows={setSelectedRows}
 					onCellClick={(cell) => {
 						if (editedField !== cell.id) setEditedField(cell.id);
 					}}
