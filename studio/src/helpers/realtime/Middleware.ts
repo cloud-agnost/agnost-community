@@ -30,8 +30,10 @@ export default class Middleware extends RealtimeActions<MiddlewareType> {
 				return middleware;
 			}),
 			middleware: data,
-			editedLogic: data.logic,
 		});
+		if (data.logic) {
+			useMiddlewareStore.getState?.().setLogics(data._id, data.logic);
+		}
 	}
 	create({ data }: RealtimeActionParams<MiddlewareType>): void {
 		useMiddlewareStore.setState?.({

@@ -11,15 +11,15 @@ import {
 	SaveMiddlewareCodeParams,
 	UpdateMiddlewareParams,
 } from '@/types';
+import { isEmpty } from '@/utils';
 import { devtools } from 'zustand/middleware';
 
 interface MiddlewareStore {
 	middlewares: Middleware[];
 	middleware: Middleware;
 	isEditMiddlewareDrawerOpen: boolean;
-	lastFetchedCount: number;
 	lastFetchedPage: number;
-	editedLogic: string;
+	logics: Record<string, string>;
 }
 
 type Actions = {
@@ -32,21 +32,21 @@ type Actions = {
 	saveMiddlewareCode: (params: SaveMiddlewareCodeParams) => Promise<Middleware>;
 	openEditMiddlewareDrawer: (middleware: Middleware) => void;
 	closeEditMiddlewareDrawer: () => void;
-	setEditedLogic: (logic: string) => void;
+	setLogics: (id: string, logic: string) => void;
+	deleteLogic: (id: string) => void;
 	reset: () => void;
 };
 
 const initialState: MiddlewareStore = {
 	middlewares: [],
 	middleware: {} as Middleware,
-	lastFetchedCount: 0,
-	lastFetchedPage: 1,
+	lastFetchedPage: 0,
 	isEditMiddlewareDrawerOpen: false,
-	editedLogic: '',
+	logics: {},
 };
 
 const useMiddlewareStore = create<MiddlewareStore & Actions>()(
-	devtools((set) => ({
+	devtools((set, get) => ({
 		...initialState,
 		createMiddleware: async (params: CreateMiddlewareParams) => {
 			try {
@@ -66,19 +66,22 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 			const middlewares = await MiddlewareService.getMiddlewaresOfAppVersion(params);
 
 			if (params.page === 0) {
-				set({ middlewares, lastFetchedCount: middlewares.length });
+				set({ middlewares });
 			} else {
 				set((prev) => ({
 					middlewares: [...prev.middlewares, ...middlewares],
-					lastFetchedCount: middlewares.length,
+					lastFetchedPage: params.page,
 				}));
 			}
-			set({ lastFetchedCount: middlewares.length, lastFetchedPage: params.page });
+
 			return middlewares;
 		},
 		getMiddlewareById: async (params: GetMiddlewareByIdParams) => {
 			const middleware = await MiddlewareService.getMiddlewareById(params);
-			set({ middleware, editedLogic: middleware.logic });
+			set({ middleware });
+			if (isEmpty(get().logics[middleware._id])) {
+				get().setLogics(middleware._id, middleware.logic);
+			}
 			return middleware;
 		},
 		deleteMiddleware: async (params: DeleteMiddlewareParams) => {
@@ -122,14 +125,16 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 				throw error;
 			}
 		},
-		setEditedLogic: (logic) => {
-			set({ editedLogic: logic });
-		},
 		openEditMiddlewareDrawer: (middleware) => {
 			set({ isEditMiddlewareDrawerOpen: true, middleware });
 		},
 		closeEditMiddlewareDrawer: () => {
 			set({ isEditMiddlewareDrawerOpen: false });
+		},
+		setLogics: (id, logic) => set((prev) => ({ logics: { ...prev.logics, [id]: logic } })),
+		deleteLogic: (id) => {
+			const { [id]: _, ...rest } = get().logics;
+			set({ logics: rest });
 		},
 		reset: () => set(initialState),
 	})),

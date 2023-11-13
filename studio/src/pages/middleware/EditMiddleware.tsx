@@ -11,13 +11,13 @@ import { LoaderFunctionArgs, useParams } from 'react-router-dom';
 
 EditMiddleware.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { middlewareId, orgId, appId, versionId } = params as Record<string, string>;
-	const { getCurrentTab, updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
-	const { middleware, editedLogic } = useMiddlewareStore.getState();
+	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
+	const { middleware, logics, setLogics } = useMiddlewareStore.getState();
 	if (middleware?._id === middlewareId) {
-		updateCurrentTab(versionId, {
-			...getCurrentTab(versionId),
-			isDirty: middleware.logic !== editedLogic,
+		updateCurrentTab(versionId as string, {
+			isDirty: logics[middlewareId] ? middleware.logic !== logics[middlewareId] : false,
 		});
+		setLogics(middlewareId, logics[middlewareId] ?? middleware.logic);
 		closeDeleteTabModal();
 		return { middleware };
 	}
@@ -34,8 +34,14 @@ export default function EditMiddleware() {
 	const { notify } = useToast();
 	const { middlewareId, orgId, appId, versionId } = useParams() as Record<string, string>;
 	const canEdit = useAuthorizeVersion('middleware.update');
-	const { saveMiddlewareCode, openEditMiddlewareDrawer, middleware, editedLogic, setEditedLogic } =
-		useMiddlewareStore();
+	const {
+		saveMiddlewareCode,
+		openEditMiddlewareDrawer,
+		middleware,
+		logics,
+		setLogics,
+		deleteLogic,
+	} = useMiddlewareStore();
 	const { t } = useTranslation();
 
 	const { mutate, isPending } = useMutation({
@@ -46,7 +52,7 @@ export default function EditMiddleware() {
 				appId,
 				versionId,
 				mwId: middlewareId,
-				logic: logic ?? editedLogic,
+				logic: logic,
 			});
 		},
 		onSuccess: () => {
@@ -65,7 +71,7 @@ export default function EditMiddleware() {
 		},
 	});
 	async function saveLogic(logic: string) {
-		if (!editedLogic || !canEdit) return;
+		if (!logics[middlewareId] || !canEdit) return;
 		mutate(logic);
 	}
 	function openEditDrawer() {
@@ -90,10 +96,11 @@ export default function EditMiddleware() {
 			onEditModalOpen={openEditDrawer}
 			onSaveLogic={saveLogic}
 			loading={isPending}
-			logic={editedLogic}
-			setLogic={setEditedLogic}
 			name={middlewareId}
 			canEdit={canEdit}
+			logic={logics[middlewareId]}
+			setLogic={(val) => setLogics(middlewareId, val)}
+			deleteLogic={() => deleteLogic(middlewareId)}
 		>
 			<span className='text-default text-xl'>{middleware.name}</span>
 		</VersionEditorLayout>

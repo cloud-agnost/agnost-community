@@ -26,7 +26,7 @@ export default function MainMiddleware() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 
-	const { fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteScroll({
+	const { fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } = useInfiniteScroll({
 		queryFn: getMiddlewaresOfAppVersion,
 		lastFetchedPage,
 		dataLength: middlewares.length,
@@ -36,7 +36,6 @@ export default function MainMiddleware() {
 	const { mutateAsync: deleteMiddleware } = useMutation({
 		mutationFn: deleteMultipleMiddlewares,
 		onSuccess: () => {
-			if (!middlewares.length) refetch();
 			table?.toggleAllRowsSelected(false);
 		},
 		onError: (error: APIError) => {
@@ -70,6 +69,7 @@ export default function MainMiddleware() {
 				onMultipleDelete={deleteMultipleMiddlewaresHandler}
 				table={table}
 				disabled={!canCreate}
+				loading={isFetching && !middlewares.length}
 			>
 				<InfiniteScroll
 					scrollableTarget='version-layout'
