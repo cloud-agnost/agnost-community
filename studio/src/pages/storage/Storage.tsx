@@ -1,33 +1,22 @@
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { PAGE_SIZE } from '@/constants';
-import { StorageColumns } from '@/features/storage';
-import { useToast } from '@/hooks';
+import { CreateStorage, StorageColumns } from '@/features/storage';
+import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useStorageStore from '@/store/storage/storageStore';
-import { APIError, Storage } from '@/types';
-import { Row, Table } from '@tanstack/react-table';
-import { useEffect, useState } from 'react';
+import { APIError } from '@/types';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useOutletContext, useParams, useSearchParams } from 'react-router-dom';
-interface OutletContext {
-	setIsCreateModalOpen: (isOpen: boolean) => void;
-	selectedRows: Row<Storage>[];
-	setSelectedRows: (rows: Row<Storage>[]) => void;
-	table: Table<Storage>;
-	setTable: (table: Table<Storage>) => void;
-	page: number;
-	setPage: (page: number) => void;
-}
+import { useParams } from 'react-router-dom';
+
 export default function MainStorage() {
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<APIError>();
+	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const { notify } = useToast();
 	const canCreateStorages = useAuthorizeVersion('storage.create');
-	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 
@@ -36,116 +25,101 @@ export default function MainStorage() {
 		closeStorageDeleteDialog,
 		deleteStorage,
 		deleteMultipleStorages,
-		lastFetchedCount,
+		lastFetchedPage,
 		toDeleteStorage,
 		storages,
 		isStorageDeleteDialogOpen,
 	} = useStorageStore();
-
+	const table = useTable({
+		data: storages,
+		columns: StorageColumns,
+	});
+	const { isFetching, hasNextPage, fetchNextPage } = useInfiniteScroll({
+		queryFn: getStorages,
+		queryKey: 'getStorages',
+		dataLength: storages.length,
+		lastFetchedPage,
+	});
+	const { mutateAsync: deleteStorageMutation } = useMutation({
+		mutationFn: deleteStorage,
+		onSettled: closeStorageDeleteDialog,
+	});
 	const {
-		setSelectedRows,
-		setTable,
-		page,
-		setPage,
-		setIsCreateModalOpen,
-		table,
-		selectedRows,
-	}: OutletContext = useOutletContext();
-
+		mutateAsync: deleteMultipleStoragesMutation,
+		isPending: deleteLoading,
+		error: deleteError,
+	} = useMutation({
+		mutationFn: deleteMultipleStorages,
+		onSuccess: () => {
+			table?.resetRowSelection();
+		},
+		onError: ({ error, details }: APIError) => {
+			notify({ type: 'error', description: details, title: error });
+		},
+	});
 	function deleteStorageHandler() {
-		setLoading(true);
-		deleteStorage({
+		deleteStorageMutation({
 			storageId: toDeleteStorage?._id as string,
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			onSuccess: () => {
-				setLoading(false);
-				closeStorageDeleteDialog();
-			},
-			onError: (error) => {
-				setError(error);
-				setLoading(false);
-				closeStorageDeleteDialog();
-			},
 		});
 	}
 	function deleteMultipleStoragesHandler() {
-		deleteMultipleStorages({
-			storageIds: selectedRows.map((row) => row.original._id),
+		deleteMultipleStoragesMutation({
+			storageIds: table.getSelectedRowModel().rows.map((row) => row.original._id),
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			onSuccess: () => {
-				table.toggleAllRowsSelected(false);
-				setPage(0);
-			},
-			onError: ({ error, details }) => {
-				notify({ type: 'error', description: details, title: error });
-			},
 		});
 	}
-	useEffect(() => {
-		if (versionId && orgId && appId) {
-			getStorages({
-				orgId,
-				appId,
-				versionId,
-				page,
-				size: PAGE_SIZE,
-				search: searchParams.get('q') ?? undefined,
-			});
-		}
-	}, [searchParams.get('q'), page]);
+
 	return (
-		<VersionTabLayout
-			isEmpty={storages.length === 0}
-			title={t('storage.title')}
-			type='storage'
-			openCreateModal={() => setIsCreateModalOpen(true)}
-			createButtonTitle={t('storage.create')}
-			emptyStateTitle={t('storage.empty_text')}
-			table={table}
-			onMultipleDelete={deleteMultipleStoragesHandler}
-			disabled={!canCreateStorages}
-		>
-			<InfiniteScroll
-				scrollableTarget='version-layout'
-				dataLength={storages.length}
-				next={() => {
-					setPage(page + 1);
-				}}
-				hasMore={lastFetchedCount >= PAGE_SIZE}
-				loader={storages.length > 0 && <TableLoading />}
+		<>
+			<VersionTabLayout
+				isEmpty={!storages.length}
+				title={t('storage.title')}
+				type='storage'
+				openCreateModal={() => setIsCreateModalOpen(true)}
+				createButtonTitle={t('storage.create')}
+				emptyStateTitle={t('storage.empty_text')}
+				onMultipleDelete={deleteMultipleStoragesHandler}
+				disabled={!canCreateStorages}
+				loading={isFetching && lastFetchedPage === 0}
+				table={table}
 			>
-				<DataTable
-					columns={StorageColumns}
-					data={storages}
-					setSelectedRows={setSelectedRows}
-					setTable={setTable}
+				<InfiniteScroll
+					scrollableTarget='version-layout'
+					dataLength={storages.length}
+					next={fetchNextPage}
+					hasMore={hasNextPage}
+					loader={isFetching && <TableLoading />}
+				>
+					<DataTable table={table} />
+				</InfiniteScroll>
+				<ConfirmationModal
+					loading={deleteLoading}
+					error={deleteError}
+					title={t('storage.delete.title')}
+					alertTitle={t('storage.delete.message')}
+					alertDescription={t('storage.delete.description')}
+					description={
+						<Trans
+							i18nKey='storage.delete.confirmCode'
+							values={{ confirmCode: toDeleteStorage?.iid }}
+							components={{
+								confirmCode: <span className='font-bold text-default' />,
+							}}
+						/>
+					}
+					confirmCode={toDeleteStorage?.iid as string}
+					onConfirm={deleteStorageHandler}
+					isOpen={isStorageDeleteDialogOpen}
+					closeModal={closeStorageDeleteDialog}
+					closable
 				/>
-			</InfiniteScroll>
-			<ConfirmationModal
-				loading={loading}
-				error={error}
-				title={t('storage.delete.title')}
-				alertTitle={t('storage.delete.message')}
-				alertDescription={t('storage.delete.description')}
-				description={
-					<Trans
-						i18nKey='storage.delete.confirmCode'
-						values={{ confirmCode: toDeleteStorage?.iid }}
-						components={{
-							confirmCode: <span className='font-bold text-default' />,
-						}}
-					/>
-				}
-				confirmCode={toDeleteStorage?.iid as string}
-				onConfirm={deleteStorageHandler}
-				isOpen={isStorageDeleteDialogOpen}
-				closeModal={closeStorageDeleteDialog}
-				closable
-			/>
-		</VersionTabLayout>
+			</VersionTabLayout>
+			<CreateStorage open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+		</>
 	);
 }

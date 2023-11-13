@@ -2,8 +2,8 @@ import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useStorageStore from '@/store/storage/storageStore';
-import { BucketFile, ColumnDefWithClassName } from '@/types';
-import { notify, translate, formatFileSize } from '@/utils';
+import { APIError, BucketFile, ColumnDefWithClassName } from '@/types';
+import { notify, translate, formatFileSize, getVersionPermission } from '@/utils';
 import { Copy, Swap } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 import { Checkbox } from 'components/Checkbox';
@@ -11,6 +11,81 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { Link } from 'react-router-dom';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from 'components/Tooltip';
+import { QueryClient } from '@tanstack/react-query';
+const {
+	copyFileInBucket,
+	replaceFileInBucket,
+	openDeleteFileDialog,
+	openFileEditDialog,
+	storage,
+	bucket,
+} = useStorageStore.getState();
+
+const canEditBucket = getVersionPermission('storage.update');
+const canDeleteBucket = getVersionPermission('storage.delete');
+
+const queryClient = new QueryClient();
+
+function replaceFile(filePath: string) {
+	const input = document.createElement('input');
+	input.type = 'file';
+	input.onchange = (e) => {
+		const file = (e.target as HTMLInputElement).files?.[0];
+		if (!file) return;
+		queryClient
+			.getMutationCache()
+			.build(queryClient, {
+				mutationFn: replaceFileInBucket,
+				onSuccess: () => {
+					notify({
+						title: translate('general.success'),
+						description: translate('storage.bucket.empty'),
+						type: 'success',
+					});
+				},
+				onError: ({ error, details }: APIError) => {
+					notify({
+						title: error,
+						description: details,
+						type: 'error',
+					});
+				},
+			})
+			.execute({
+				storageName: storage?.name,
+				bucketName: bucket.name,
+				filePath,
+				file,
+			});
+	};
+	input.click();
+}
+function copyFile(filePath: string) {
+	queryClient
+		.getMutationCache()
+		.build(queryClient, {
+			mutationFn: copyFileInBucket,
+			onSuccess: () => {
+				notify({
+					title: translate('general.success'),
+					description: translate('storage.bucket.empty'),
+					type: 'success',
+				});
+			},
+			onError: ({ error, details }: APIError) => {
+				notify({
+					title: error,
+					description: details,
+					type: 'error',
+				});
+			},
+		})
+		.execute({
+			storageName: storage?.name,
+			bucketName: bucket.name,
+			filePath,
+		});
+}
 const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 	{
 		id: 'select',
@@ -135,65 +210,6 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 		className: 'actions w-[50px]',
 		size: 50,
 		cell: ({ row: { original } }) => {
-			const {
-				copyFileInBucket,
-				replaceFileInBucket,
-				openDeleteFileDialog,
-				openFileEditDialog,
-				storage,
-				bucket,
-			} = useStorageStore.getState();
-
-			function replaceFile() {
-				const input = document.createElement('input');
-				input.type = 'file';
-				input.onchange = (e) => {
-					const file = (e.target as HTMLInputElement).files?.[0];
-					if (!file) return;
-					replaceFileInBucket({
-						storageName: storage?.name,
-						bucketName: bucket.name,
-						filePath: original.path,
-						file,
-						onSuccess: () => {
-							notify({
-								title: translate('general.success'),
-								description: translate('storage.bucket.empty'),
-								type: 'success',
-							});
-						},
-						onError: ({ error, details }) => {
-							notify({
-								title: error,
-								description: details,
-								type: 'error',
-							});
-						},
-					});
-				};
-				input.click();
-			}
-			function copyFile() {
-				copyFileInBucket({
-					storageName: storage?.name,
-					bucketName: bucket.name,
-					filePath: original.path,
-					onSuccess: () => {
-						notify({
-							title: translate('general.success'),
-							description: translate('storage.bucket.empty'),
-							type: 'success',
-						});
-					},
-					onError: ({ error, details }) => {
-						notify({
-							title: error,
-							description: details,
-							type: 'error',
-						});
-					},
-				});
-			}
 			return (
 				<div className='flex items-center justify-end'>
 					<TooltipProvider>
@@ -204,7 +220,7 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 									variant='blank'
 									rounded
 									className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-									onClick={copyFile}
+									onClick={() => copyFile(original.path)}
 								>
 									<Copy />
 								</Button>
@@ -220,7 +236,7 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 									variant='blank'
 									rounded
 									className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-									onClick={replaceFile}
+									onClick={() => replaceFile(original.path)}
 								>
 									<Swap />
 								</Button>
@@ -233,9 +249,8 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 						original={original}
 						onDelete={() => openDeleteFileDialog(original)}
 						onEdit={() => openFileEditDialog(original)}
-						canEditKey='storage.update'
-						canDeleteKey='storage.delete'
-						type='app'
+						canEdit={canEditBucket}
+						canDelete={canDeleteBucket}
 					/>
 				</div>
 			);
