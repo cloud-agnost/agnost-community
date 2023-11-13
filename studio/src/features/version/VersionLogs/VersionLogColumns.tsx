@@ -6,6 +6,7 @@ import useVersionStore from '@/store/version/versionStore';
 import { ColumnDefWithClassName, VersionLog } from '@/types';
 import { capitalize, translate } from '@/utils';
 import { DateTime } from 'luxon';
+const { openVersionLogDetails } = useVersionStore.getState();
 export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	{
 		id: 'timestamp',
@@ -48,7 +49,9 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 				original: { status },
 			},
 		}) => {
-			return <Badge variant={BADGE_COLOR_MAP[status]} text={capitalize(status)} rounded />;
+			return (
+				<Badge variant={BADGE_COLOR_MAP[status.toUpperCase()]} text={capitalize(status)} rounded />
+			);
 		},
 	},
 	{
@@ -74,8 +77,6 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 		id: 'action',
 		size: 100,
 		cell: ({ row: { original } }) => {
-			const { openVersionLogDetails } = useVersionStore.getState();
-
 			return (
 				<Button variant='secondary' onClick={() => openVersionLogDetails(original)}>
 					<Files className='mr-2' />

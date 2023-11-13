@@ -3,12 +3,15 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, Param } from '@/types';
-import { translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
+
+const canEditParam = getVersionPermission('version.param.update');
+const canDeleteParam = getVersionPermission('version.param.delete');
 
 const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	{
@@ -126,12 +129,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 				setEditParamDrawerIsOpen(true);
 			}
 			return (
-				<ActionsCell
-					original={original}
-					canEditKey='version.key.update'
-					onEdit={editHandler}
-					type='app'
-				>
+				<ActionsCell original={original} onEdit={editHandler} canEdit={canEditParam}>
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
@@ -140,7 +138,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 						description={translate('version.variable.delete_modal_desc')}
 						onConfirm={onDelete}
 						contentClassName='m-0'
-						permissionKey='key.delete'
+						hasPermission={canDeleteParam}
 					/>
 				</ActionsCell>
 			);

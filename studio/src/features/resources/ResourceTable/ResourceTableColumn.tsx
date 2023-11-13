@@ -5,9 +5,11 @@ import { DateText } from '@/components/DateText';
 import { BADGE_COLOR_MAP, RESOURCE_ICON_MAP } from '@/constants';
 import useResourceStore from '@/store/resources/resourceStore';
 import { ColumnDefWithClassName, Resource, ResourceCreateType } from '@/types';
-import { translate } from '@/utils';
+import { getOrgPermission, translate } from '@/utils';
 
 const { openEditResourceModal } = useResourceStore.getState();
+const canEditResource = getOrgPermission('resource.update');
+const canDeleteResource = getOrgPermission('resource.delete');
 export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 	{
 		id: 'name',
@@ -96,9 +98,8 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 							})
 						}
 						onEdit={() => openEditResourceModal(row.original, resourceCreateType)}
-						canEditKey='resource.update'
-						canDeleteKey='resource.delete'
-						type='org'
+						canEdit={canEditResource}
+						canDelete={canDeleteResource}
 					/>
 				)
 			);

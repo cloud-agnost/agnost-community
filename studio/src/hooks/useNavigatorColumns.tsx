@@ -19,9 +19,12 @@ import useNavigatorStore from '@/store/database/navigatorStore';
 import { ColumnDefWithClassName, Field } from '@/types';
 import { capitalize, cn, translate } from '@/utils';
 import { ElementType } from 'react';
+import { useAuthorizeVersion } from '.';
 
 export default function useNavigatorColumns(fields: Field[]) {
-	const { editedField, deleteDataFromModel } = useNavigatorStore.getState();
+	const { editedField, deleteDataFromModel } = useNavigatorStore();
+	const canEditModel = useAuthorizeVersion('model.update');
+	const canDeleteModel = useAuthorizeVersion('model.delete');
 	const NavigatorComponentMap: Record<string, ElementType> = {
 		text: Text,
 		enum: Enum,
@@ -84,13 +87,7 @@ export default function useNavigatorColumns(fields: Field[]) {
 				}
 
 				return (
-					<ActionsCell<any>
-						original={original}
-						canDeleteKey='middleware.delete'
-						canEditKey='middleware.update'
-						onEdit={handleEdit}
-						type='app'
-					>
+					<ActionsCell<any> original={original} canEdit={canEditModel} onEdit={handleEdit}>
 						<TableConfirmation
 							align='end'
 							closeOnConfirm
@@ -99,7 +96,7 @@ export default function useNavigatorColumns(fields: Field[]) {
 							description={translate('version.middleware.delete.message')}
 							onConfirm={deleteHandler}
 							contentClassName='m-0'
-							permissionKey='middleware.delete'
+							hasPermission={canDeleteModel}
 						/>
 					</ActionsCell>
 				);

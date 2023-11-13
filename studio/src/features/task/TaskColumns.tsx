@@ -1,16 +1,44 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
+import { TableConfirmation } from '@/components/Table';
 import { BADGE_COLOR_MAP } from '@/constants';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTaskStore from '@/store/task/taskStore';
-import { ColumnDefWithClassName, TabTypes, Task } from '@/types';
-import { translate } from '@/utils';
+import { APIError, ColumnDefWithClassName, TabTypes, Task } from '@/types';
+import { getVersionPermission, notify, translate } from '@/utils';
+import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { Calendar } from 'components/icons';
 import cronstrue from 'cronstrue';
 import { TabLink } from '../version/Tabs';
+
+const canEditTask = getVersionPermission('task.update');
+const canDeleteTask = getVersionPermission('task.delete');
+
+const queryClient = new QueryClient();
+const { openEditTaskModal, deleteTask } = useTaskStore.getState();
+function deleteHandler(task: Task) {
+	queryClient
+		.getMutationCache()
+		.build(queryClient, {
+			mutationFn: deleteTask,
+			onError: (error: APIError) => {
+				notify({
+					title: error.error,
+					description: error.details,
+					type: 'error',
+				});
+			},
+		})
+		.execute({
+			appId: task.appId,
+			orgId: task.orgId,
+			versionId: task.versionId,
+			taskId: task._id,
+		});
+}
 const TaskColumns: ColumnDefWithClassName<Task>[] = [
 	{
 		id: 'select',
@@ -137,16 +165,23 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { openDeleteTaskModal, openEditTaskModal } = useTaskStore.getState();
 			return (
 				<ActionsCell<Task>
-					onDelete={() => openDeleteTaskModal(original)}
 					onEdit={() => openEditTaskModal(original)}
 					original={original}
-					canDeleteKey='task.delete'
-					canEditKey='task.edit'
-					type='app'
-				/>
+					canEdit={canEditTask}
+				>
+					<TableConfirmation
+						align='end'
+						closeOnConfirm
+						showAvatar={false}
+						title={translate('task.delete.title')}
+						description={translate('task.delete.message')}
+						onConfirm={() => deleteHandler(original)}
+						contentClassName='m-0'
+						hasPermission={canDeleteTask}
+					/>
+				</ActionsCell>
 			);
 		},
 	},

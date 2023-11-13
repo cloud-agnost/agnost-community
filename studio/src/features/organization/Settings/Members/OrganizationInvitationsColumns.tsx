@@ -3,9 +3,11 @@ import { ResendButton } from '@/components/ResendButton';
 import { TableConfirmation } from '@/components/Table';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Invitation } from '@/types';
-import { formatDate, notify, translate } from '@/utils';
+import { formatDate, getOrgPermission, notify, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
+
+const canDelete = getOrgPermission('invite.delete');
 
 export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 	{
@@ -116,7 +118,7 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 						title={translate('organization.settings.members.invite.delete')}
 						description={translate('organization.settings.members.invite.deleteDesc')}
 						onConfirm={onDelete}
-						permissionKey='invite.delete'
+						hasPermission={canDelete}
 					/>
 				</div>
 			);

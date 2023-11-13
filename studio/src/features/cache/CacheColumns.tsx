@@ -6,10 +6,13 @@ import { BADGE_COLOR_MAP } from '@/constants';
 import useCacheStore from '@/store/cache/cacheStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Cache, ColumnDefWithClassName } from '@/types';
-import { translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
+
+const canDelete = getVersionPermission('cache.delete');
+const canUpdate = getVersionPermission('cache.update');
 
 const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 	{
@@ -148,9 +151,8 @@ const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 					original={original}
 					onEdit={() => openEditCacheModal(original)}
 					onDelete={() => openDeleteCacheModal(original)}
-					canEditKey='cache.update'
-					canDeleteKey='cache.delete'
-					type='app'
+					canDelete={canDelete}
+					canEdit={canUpdate}
 				/>
 			);
 		},

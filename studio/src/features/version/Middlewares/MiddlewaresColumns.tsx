@@ -2,7 +2,7 @@ import { TabLink } from '@/features/version/Tabs';
 import useMiddlewareStore from '@/store/middleware/middlewareStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError, ColumnDefWithClassName, Middleware, TabTypes } from '@/types';
-import { notify, translate } from '@/utils';
+import { getVersionPermission, notify, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
 import { ActionsCell } from 'components/ActionsCell';
 import { Checkbox } from 'components/Checkbox';
@@ -12,6 +12,8 @@ import { TableConfirmation } from 'components/Table';
 
 const { openEditMiddlewareDrawer, deleteMiddleware } = useMiddlewareStore.getState();
 const queryClient = new QueryClient();
+const canEditMiddleware = getVersionPermission('middleware.update');
+const canDeleteMiddleware = getVersionPermission('middleware.delete');
 
 async function deleteHandler(mw: Middleware) {
 	queryClient
@@ -114,9 +116,8 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 			return (
 				<ActionsCell<Middleware>
 					original={original}
-					canEditKey='middleware.update'
+					canEdit={canEditMiddleware}
 					onEdit={() => openEditMiddlewareDrawer(original)}
-					type='app'
 				>
 					<TableConfirmation
 						align='end'
@@ -126,7 +127,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 						description={translate('version.middleware.delete.message')}
 						onConfirm={() => deleteHandler(original)}
 						contentClassName='m-0'
-						permissionKey='middleware.delete'
+						hasPermission={canDeleteMiddleware}
 					/>
 				</ActionsCell>
 			);

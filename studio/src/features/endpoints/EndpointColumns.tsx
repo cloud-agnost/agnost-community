@@ -9,24 +9,34 @@ import { BADGE_COLOR_MAP, HTTP_METHOD_BADGE_MAP } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import useVersionStore from '@/store/version/versionStore';
-import { ColumnDefWithClassName, Endpoint, TabTypes } from '@/types';
-import { translate } from '@/utils';
+import { APIError, ColumnDefWithClassName, Endpoint, TabTypes } from '@/types';
+import { getVersionPermission, notify, translate } from '@/utils';
+import { QueryClient } from '@tanstack/react-query';
 import { TabLink } from '../version/Tabs';
-import { TableConfirmation } from '@/components/Table';
-import useApplicationStore from '@/store/app/applicationStore';
-import useAuthorizeApp from '@/hooks/useAuthorizeApp';
-import useVersionStore from '@/store/version/versionStore';
 
+const queryClient = new QueryClient();
+const canEditEndpoint = getVersionPermission('endpoint.update');
+const canDeleteEndpoint = getVersionPermission('endpoint.delete');
 const { openEditEndpointDialog, deleteEndpoint } = useEndpointStore.getState();
-const { version } = useVersionStore.getState();
 function deleteEndpointHandler(toDeleteEndpoint: Endpoint) {
-	deleteEndpoint({
-		epId: toDeleteEndpoint?._id,
-		orgId: version?.orgId,
-		appId: version?.appId,
-		versionId: version?._id,
-	});
+	queryClient
+		.getMutationCache()
+		.build(queryClient, {
+			mutationFn: deleteEndpoint,
+			onError: (error: APIError) => {
+				notify({
+					title: error.error,
+					description: error.details,
+					type: 'error',
+				});
+			},
+		})
+		.execute({
+			appId: toDeleteEndpoint.appId,
+			orgId: toDeleteEndpoint.orgId,
+			versionId: toDeleteEndpoint.versionId,
+			epId: toDeleteEndpoint._id,
+		});
 }
 
 const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
@@ -173,9 +183,8 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 			return (
 				<ActionsCell<Endpoint>
 					original={row.original}
-					canEditKey='endpoint.update'
+					canEdit={canEditEndpoint}
 					onEdit={() => openEditEndpointDialog(row.original)}
-					type='app'
 				>
 					<TableConfirmation
 						align='end'
@@ -185,7 +194,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 						description={translate('endpoint.delete.message')}
 						onConfirm={() => deleteEndpointHandler(row.original)}
 						contentClassName='m-0'
-						permissionKey='endpoint.delete'
+						hasPermission={canDeleteEndpoint}
 					/>
 				</ActionsCell>
 			);

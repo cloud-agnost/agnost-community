@@ -3,12 +3,15 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, RateLimit } from '@/types';
-import { translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
+
+const canEditRateLimit = getVersionPermission('version.limit.update');
+const canDeleteRateLimit = getVersionPermission('version.limit.delete');
 
 const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 	{
@@ -135,12 +138,7 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 			}
 
 			return (
-				<ActionsCell
-					original={original}
-					onEdit={editHandler}
-					canEditKey='version.limit.update'
-					type='app'
-				>
+				<ActionsCell original={original} onEdit={editHandler} canEdit={canEditRateLimit}>
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
@@ -149,7 +147,7 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 						description={translate('version.npm.delete_modal_desc')}
 						onConfirm={onDelete}
 						contentClassName='m-0'
-						permissionKey='version.limit.delete'
+						hasPermission={canDeleteRateLimit}
 					/>
 				</ActionsCell>
 			);

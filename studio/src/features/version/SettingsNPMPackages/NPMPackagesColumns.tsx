@@ -2,12 +2,14 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, NPMPackage } from '@/types';
-import { translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
+
+const canDeletePackage = getVersionPermission('version.param.delete');
 
 const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	{
@@ -91,7 +93,7 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 						description={translate('version.npm.delete_modal_desc')}
 						onConfirm={onDelete}
 						contentClassName='m-0'
-						permissionKey='version.package.delete'
+						hasPermission={canDeletePackage}
 					/>
 				</div>
 			);

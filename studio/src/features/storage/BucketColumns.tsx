@@ -3,13 +3,16 @@ import { Badge } from '@/components/Badge';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useStorageStore from '@/store/storage/storageStore';
 import { Bucket, ColumnDefWithClassName, TabTypes } from '@/types';
-import { notify, translate } from '@/utils';
+import { getVersionPermission, notify, translate } from '@/utils';
 import { Prohibit } from '@phosphor-icons/react';
 import { Button } from 'components/Button';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TabLink } from '@/features/version/Tabs';
+
+const canEditBucket = getVersionPermission('storage.update');
+const canDeleteBucket = getVersionPermission('storage.delete');
 
 const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 	{
@@ -150,9 +153,8 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 						original={original}
 						onDelete={() => openDeleteBucketDialog(original)}
 						onEdit={() => openEditBucketDialog(original)}
-						canEditKey='storage.update'
-						canDeleteKey='storage.delete'
-						type='app'
+						canEdit={canEditBucket}
+						canDelete={canDeleteBucket}
 					/>
 				</div>
 			);

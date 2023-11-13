@@ -3,12 +3,15 @@ import { TableConfirmation } from '@/components/Table';
 import useFunctionStore from '@/store/function/functionStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError, ColumnDefWithClassName, HelperFunction, TabTypes } from '@/types';
-import { notify, translate } from '@/utils';
+import { getVersionPermission, notify, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TabLink } from '../version/Tabs';
+
+const canEditFunction = getVersionPermission('function.update');
+const canDeleteFunction = getVersionPermission('function.delete');
 
 const { openEditFunctionDrawer, deleteFunction } = useFunctionStore.getState();
 const queryClient = new QueryClient();
@@ -124,9 +127,7 @@ const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
 				<ActionsCell<HelperFunction>
 					onEdit={() => openEditFunctionDrawer(original)}
 					original={original}
-					canDeleteKey='function.delete'
-					canEditKey='function.update'
-					type='app'
+					canEdit={canEditFunction}
 				>
 					<TableConfirmation
 						align='end'
@@ -136,7 +137,7 @@ const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
 						description={translate('function.delete.message')}
 						onConfirm={() => deleteHandler(original)}
 						contentClassName='m-0'
-						permissionKey='middleware.delete'
+						hasPermission={canDeleteFunction}
 					/>
 				</ActionsCell>
 			);
