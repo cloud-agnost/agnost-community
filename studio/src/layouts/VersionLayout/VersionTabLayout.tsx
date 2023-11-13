@@ -10,6 +10,7 @@ import { Table } from '@tanstack/react-table';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams, useSearchParams } from 'react-router-dom';
+import BeatLoader from 'react-spinners/BeatLoader';
 interface Props<T> {
 	isEmpty: boolean;
 	table?: Table<T>;
@@ -22,6 +23,7 @@ interface Props<T> {
 	className?: string;
 	breadCrumb?: ReactNode;
 	handlerButton?: ReactNode;
+	loading: boolean;
 	onMultipleDelete?: () => void;
 	openCreateModal?: () => void;
 }
@@ -38,6 +40,7 @@ export default function VersionTabLayout<T>({
 	disabled,
 	className,
 	handlerButton,
+	loading,
 	onMultipleDelete,
 	openCreateModal,
 }: Props<T>) {
@@ -85,9 +88,8 @@ export default function VersionTabLayout<T>({
 			path: pathname + search,
 		});
 	}, [search]);
-
 	return (
-		<div className={cn('h-full space-y-4 ', className)}>
+		<div className={cn('h-full space-y-4 relative ', className)}>
 			{breadCrumb}
 			<div className='flex items-center justify-between'>
 				<h1 className='text-default text-2xl text-center'>{title}</h1>
@@ -109,7 +111,14 @@ export default function VersionTabLayout<T>({
 					)}
 				</div>
 			</div>
-			{content}
+			{!loading && content}
+			<BeatLoader
+				color='#6884FD'
+				className='fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
+				size={24}
+				loading={loading}
+				margin={18}
+			/>
 		</div>
 	);
 }

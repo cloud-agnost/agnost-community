@@ -17,8 +17,13 @@
 			"placeholder": "Select Database Type"
 		},
 		"unique": {
+			"name": "Assign Unique Name",
 			"title": "Assign a unique name to this database in different versions of the application.",
 			"desc": "This option ensures that developers working on different versions of the app utilizing this database server will each have a dedicated database in the database server minimizing conflicts in database schema changes."
+		},
+		"managed": {
+			"title": "Allow Agnost to manage database schema.",
+			"desc": "Agnost can manage the database schema for you, meaning creating and updating tables, fields and indexes."
 		}
 	},
 	"edit": {

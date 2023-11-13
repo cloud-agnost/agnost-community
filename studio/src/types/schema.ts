@@ -1,5 +1,6 @@
 import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants/regex';
-import { translate as t } from '@/utils';
+import useResourceStore from '@/store/resources/resourceStore';
+import { capitalize, translate as t } from '@/utils';
 import * as z from 'zod';
 
 export const NameSchema = z
@@ -78,3 +79,54 @@ export const TimestampsSchema = z
 			});
 		}
 	});
+export const CreateDatabaseSchema = z.object({
+	name: NameSchema,
+	assignUniqueName: z.boolean().default(false),
+
+	poolSize: z
+		.number({
+			invalid_type_error: t('forms.required', {
+				label: capitalize(t('database.add.poolSize').toLowerCase()),
+			}),
+			required_error: t('forms.required', {
+				label: capitalize(t('database.add.poolSize').toLowerCase()),
+			}),
+		})
+		.min(1)
+		.max(50),
+	resourceId: z
+		.string({
+			required_error: t('forms.required', {
+				label: t('database.add.resource.field'),
+			}),
+		})
+		.refine((value) => useResourceStore.getState().resources.some((item) => item._id === value), {
+			message: t('forms.invalid', {
+				label: t('database.add.resource.field'),
+			}),
+		}),
+	managed: z.boolean().default(true),
+});
+export const UpdateDatabaseSchema = z.object({
+	name: NameSchema,
+	poolSize: z
+		.number({
+			invalid_type_error: t('forms.required', {
+				label: capitalize(t('database.add.poolSize').toLowerCase()),
+			}),
+			required_error: t('forms.required', {
+				label: capitalize(t('database.add.poolSize').toLowerCase()),
+			}),
+		})
+		.min(1)
+		.max(50),
+});
+export const ModelSchema = z.object({
+	name: NameSchema,
+	description: z
+		.string({
+			required_error: t('forms.required', { label: t('general.description') }),
+		})
+		.optional(),
+	timestamps: TimestampsSchema,
+});

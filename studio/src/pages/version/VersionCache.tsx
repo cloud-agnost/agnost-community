@@ -37,7 +37,7 @@ export default function VersionCache() {
 		columns: CacheColumns,
 	});
 
-	const { fetchNextPage, hasNextPage, isPending, refetch } = useInfiniteScroll({
+	const { fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } = useInfiniteScroll({
 		queryFn: getCaches,
 		lastFetchedPage,
 		dataLength: caches.length,
@@ -56,7 +56,6 @@ export default function VersionCache() {
 	const { mutateAsync: deleteMultipleCacheMutation } = useMutation({
 		mutationFn: deleteMultipleCache,
 		onSuccess: () => {
-			if (!caches.length) refetch();
 			table?.resetRowSelection();
 		},
 		onError: ({ error, details }: APIError) => {
@@ -96,13 +95,14 @@ export default function VersionCache() {
 				table={table}
 				onMultipleDelete={deleteMultipleCachesHandler}
 				disabled={!canCreateCache}
+				loading={isFetching && !caches.length}
 			>
 				<InfiniteScroll
 					scrollableTarget='version-layout'
 					dataLength={caches.length}
 					next={fetchNextPage}
 					hasMore={hasNextPage}
-					loader={isPending && <TableLoading />}
+					loader={isFetchingNextPage && <TableLoading />}
 				>
 					<DataTable<Cache> table={table} />
 				</InfiniteScroll>
