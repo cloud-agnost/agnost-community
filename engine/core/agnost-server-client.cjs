@@ -1721,10 +1721,20 @@
 								return super.getQuery(e, t);
 							case i.DBTYPE.POSTGRESQL:
 							case i.DBTYPE.MYSQL:
-								return `${this.parameters[0].getQuery(
-									e,
-									t
-								)} = ${this.parameters[1].getQuery(e, t)}`;
+								return (
+									console.log(
+										"****getQuery",
+										this.parameters[0].getQuery(e, t)
+									),
+									console.log(
+										"****getQuery",
+										this.parameters[1].getQuery(e, t)
+									),
+									`${this.parameters[0].getQuery(
+										e,
+										t
+									)} = ${this.parameters[1].getQuery(e, t)}`
+								);
 							default:
 								return null;
 						}
