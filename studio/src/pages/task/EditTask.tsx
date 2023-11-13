@@ -1,32 +1,31 @@
 import { Separator } from '@/components/Separator';
 import { TestTask } from '@/features/task';
 import { useToast } from '@/hooks';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useTaskStore from '@/store/task/taskStore';
+import useTabStore from '@/store/version/tabStore';
+import { APIError } from '@/types';
+import { useMutation } from '@tanstack/react-query';
 import cronstrue from 'cronstrue';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useParams } from 'react-router-dom';
-import useTabStore from '@/store/version/tabStore';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 EditTask.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { taskId, orgId, versionId, appId } = params;
 	if (!taskId) return null;
-	const { getCurrentTab, updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
-	const { task } = useTaskStore.getState();
-	if (task?._id === taskId && history.state?.type !== 'tabChanged') {
-		useTaskStore.setState({
-			editedLogic: task.logic,
-		});
+	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
+	const { task, getTask, logics, setLogics } = useTaskStore.getState();
+	if (task?._id === taskId) {
 		updateCurrentTab(versionId as string, {
-			...getCurrentTab(versionId as string),
-			isDirty: false,
+			isDirty: logics[taskId] ? task.logic !== logics[taskId] : false,
 		});
+		setLogics(taskId, logics[taskId] ?? task.logic);
 		closeDeleteTabModal();
 		return { task };
 	}
 
-	await useTaskStore.getState().getTask({
+	await getTask({
 		orgId: orgId as string,
 		appId: appId as string,
 		versionId: versionId as string,
@@ -40,53 +39,55 @@ export default function EditTask() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
 	const canEdit = useAuthorizeVersion('task.update');
-	const { task, saveTaskLogic, openEditTaskModal, editedLogic, setEditedLogic } = useTaskStore();
-	const [loading, setLoading] = useState(false);
+	const { task, saveTaskLogic, openEditTaskModal, logics, setLogics, deleteLogic } = useTaskStore();
 	const [isTestTaskOpen, setIsTestTaskOpen] = useState(false);
-
-	const { versionId, appId, orgId, taskId } = useParams<{
+	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
 		orgId: string;
 		taskId: string;
 	}>();
 
+	const { mutateAsync: saveTaskCode, isPending } = useMutation({
+		mutationFn: saveTaskLogic,
+		mutationKey: ['saveLogic'],
+		onSuccess: () => {
+			notify({
+				title: t('general.success'),
+				description: t('endpoint.editLogicSuccess'),
+				type: 'success',
+			});
+		},
+		onError: ({ error, details }: APIError) => {
+			notify({
+				title: error,
+				description: details,
+				type: 'error',
+			});
+		},
+	});
+
 	function saveLogic(logic: string) {
-		setLoading(true);
-		saveTaskLogic({
+		saveTaskCode({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			taskId: taskId as string,
-			logic: logic ?? editedLogic,
-			onSuccess: () => {
-				setLoading(false);
-				notify({
-					title: t('general.success'),
-					description: t('endpoint.editLogicSuccess'),
-					type: 'success',
-				});
-			},
-			onError: ({ error, details }) => {
-				setLoading(false);
-				notify({
-					title: error,
-					description: details,
-					type: 'error',
-				});
-			},
+			taskId: useTaskStore.getState().task._id,
+			logic: logic,
 		});
 	}
+
 	return (
 		<VersionEditorLayout
 			onEditModalOpen={() => openEditTaskModal(task)}
 			onTestModalOpen={() => setIsTestTaskOpen(true)}
 			onSaveLogic={saveLogic}
-			loading={loading}
-			logic={editedLogic}
-			setLogic={setEditedLogic}
+			loading={isPending}
 			name={task._id}
 			canEdit={canEdit}
+			logic={logics[task._id]}
+			setLogic={(val) => setLogics(task._id, val)}
+			deleteLogic={() => deleteLogic(task._id)}
 			breadCrumbItems={[
 				{
 					name: t('task.title').toString(),
