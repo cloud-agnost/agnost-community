@@ -120,7 +120,7 @@ async function getDatabaseTypings(version) {
 	}
 
 	if (dbs.length === 0) {
-		let result = `${result}\nexport type DatabaseName = string;`;
+		let result = `\nexport type DatabaseName = string;`;
 		result = `${result}\nexport type ModelType<
 		D extends DatabaseName,
 		T extends ModelList<D>,

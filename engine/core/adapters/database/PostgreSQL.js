@@ -819,6 +819,7 @@ export class PostgreSQL extends SQLDatabase {
 	 * @returns  The fetched records otherwise an empty array [] if no records can be found
 	 */
 	async findMany(dbMeta, modelMeta, options) {
+		console.log("***here1");
 		const from = this.getTableName(dbMeta, modelMeta);
 		const select = this.getJoinLookupSelectDefinition(
 			dbMeta,
@@ -830,6 +831,7 @@ export class PostgreSQL extends SQLDatabase {
 
 		const joins = this.getJoinDefinitions(modelMeta, options.join);
 		const where = this.getWhereDefinition(options.where);
+
 		const orderBy = this.getOrderByDefinition(options.sort);
 		const limit = options.limit ?? null;
 		const offset = options.skip ?? null;

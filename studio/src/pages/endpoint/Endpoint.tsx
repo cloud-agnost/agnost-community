@@ -46,6 +46,11 @@ export default function MainEndpoint() {
 		});
 	}
 
+	function setPage(page: number) {
+		searchParams.set('p', page.toString());
+		setSearchParams(searchParams);
+	}
+
 	useEffect(() => {
 		if (versionId && orgId && appId) {
 			setLoading(true);

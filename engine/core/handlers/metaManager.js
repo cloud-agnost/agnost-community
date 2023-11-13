@@ -49,7 +49,7 @@ export class MetaManager {
 	 * Returns the app team members
 	 */
 	getAppTeam() {
-		return this.envObj.app?.tean;
+		return this.envObj.app?.team;
 	}
 
 	/**

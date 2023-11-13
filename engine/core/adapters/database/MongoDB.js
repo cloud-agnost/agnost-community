@@ -935,7 +935,7 @@ export class MongoDB extends DatabaseBase {
 			}
 		);
 
-		return updateResult.value;
+		return updateResult;
 	}
 
 	/**
@@ -998,7 +998,7 @@ export class MongoDB extends DatabaseBase {
 					}
 				);
 
-				return updateResult.value;
+				return updateResult;
 			}
 
 			return null;
@@ -1017,7 +1017,7 @@ export class MongoDB extends DatabaseBase {
 				}
 			);
 
-			return updateResult.value;
+			return updateResult;
 		}
 	}
 

@@ -13,6 +13,10 @@ import useVersionStore from '@/store/version/versionStore';
 import { ColumnDefWithClassName, Endpoint, TabTypes } from '@/types';
 import { translate } from '@/utils';
 import { TabLink } from '../version/Tabs';
+import { TableConfirmation } from '@/components/Table';
+import useApplicationStore from '@/store/app/applicationStore';
+import useAuthorizeApp from '@/hooks/useAuthorizeApp';
+import useVersionStore from '@/store/version/versionStore';
 
 const { openEditEndpointDialog, deleteEndpoint } = useEndpointStore.getState();
 const { version } = useVersionStore.getState();
