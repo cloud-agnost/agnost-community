@@ -8,6 +8,7 @@ import { ColumnDefWithClassName, Resource, ResourceCreateType } from '@/types';
 import { getOrgPermission, translate } from '@/utils';
 
 const { openEditResourceModal } = useResourceStore.getState();
+
 const canEditResource = getOrgPermission('resource.update');
 const canDeleteResource = getOrgPermission('resource.delete');
 export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
