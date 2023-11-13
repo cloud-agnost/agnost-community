@@ -45,6 +45,9 @@ class Queue extends RealtimeActions<MessageQueue> {
 			}),
 			queue: data,
 		});
+		if (data.logic) {
+			useMessageQueueStore.getState?.().setLogics(data._id, data.logic);
+		}
 	}
 	create({ data }: RealtimeActionParams<MessageQueue>) {
 		useMessageQueueStore.setState?.({

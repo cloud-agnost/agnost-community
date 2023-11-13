@@ -30,9 +30,10 @@
 		}
 	},
 	"errors": {
-		"notValidRoute": "Not a valid endpoint route",
+		"notValidRoute": "Path should start with a forward slash, followed by alphanumeric characters, hyphens, and underscores",
 		"invalidParams": "Invalid route parameter name {{param}}",
-		"duplicateParam": "Duplicate parameter names in route"
+		"duplicateParam": "Duplicate parameter names in route",
+		"invalidMethod": "Unsupported method type"
 	},
 
 	"edit": "Edit {{name}}",

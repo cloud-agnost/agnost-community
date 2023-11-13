@@ -1,7 +1,6 @@
-import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants/regex';
 import { translate } from '@/utils';
 import * as z from 'zod';
-import { BaseGetRequest, BaseParams, BaseRequest, Log } from '.';
+import { BaseGetRequest, BaseParams, BaseRequest, Log, NameSchema } from '.';
 
 export interface MessageQueue {
 	orgId: string;
@@ -30,60 +29,11 @@ export interface DeleteMultipleQueuesParams extends BaseParams, BaseRequest {
 	queueIds: string[];
 }
 export const MessageQueueSchema = z.object({
-	name: z
-		.string({
-			required_error: translate('forms.required', {
-				label: translate('general.name'),
-			}),
-		})
-
-		.regex(NAME_REGEX, {
-			message: translate('forms.invalid', {
-				label: translate('general.name'),
-			}),
-		})
-		.min(2, {
-			message: translate('forms.min2.error', {
-				label: translate('general.name'),
-			}),
-		})
-		.max(64, {
-			message: translate('forms.max64.error', {
-				label: translate('general.name'),
-			}),
-		})
-		.trim()
-		.regex(NOT_START_WITH_NUMBER_REGEX, {
-			message: translate('forms.notStartWithNumber', {
-				label: translate('general.name'),
-			}),
-		})
-		.refine(
-			(value) => value.trim().length > 0,
-			translate('forms.required', {
-				label: translate('general.name'),
-			}),
-		)
-		.refine((value) => !value.startsWith('_'), {
-			message: translate('forms.notStartWithUnderscore', {
-				label: translate('general.name'),
-			}),
-		})
-		.refine(
-			(value) => value !== 'this',
-			(value) => ({
-				message: translate('forms.reservedKeyword', {
-					keyword: value,
-					label: translate('general.name'),
-				}),
-			}),
-		),
-
+	name: NameSchema,
 	delay: z.coerce.number().int().positive().optional().nullish(),
 	logExecution: z.boolean().default(false),
 });
-export const CreateMessageQueueSchema = z.object({
-	...MessageQueueSchema.shape,
+export const CreateMessageQueueSchema = MessageQueueSchema.extend({
 	resourceId: z.string({
 		required_error: translate('forms.required', {
 			label: translate('queue.create.resource.title'),
@@ -107,12 +57,12 @@ export interface UpdateQueueLogicParams extends BaseRequest, BaseParams {
 export interface TestQueueParams extends BaseRequest, BaseParams {
 	queueId: string;
 	debugChannel: string;
-	payload: Record<string, string>;
+	payload: string;
 }
 
 export interface TestQueueLogs {
 	[key: string]: {
-		payload: Record<string, string>;
+		payload: string;
 		logs?: Log[];
 	};
 }

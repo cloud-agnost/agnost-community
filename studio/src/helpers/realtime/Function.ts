@@ -30,8 +30,10 @@ export default class Function extends RealtimeActions<HelperFunction> {
 				return ep;
 			}),
 			function: data,
-			editedLogic: data.logic,
 		});
+		if (data.logic) {
+			useFunctionStore.getState?.().setLogics(data._id, data.logic);
+		}
 	}
 	create({ data }: RealtimeActionParams<HelperFunction>): void {
 		useFunctionStore.setState?.({

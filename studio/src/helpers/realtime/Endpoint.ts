@@ -30,6 +30,7 @@ class Endpoint extends RealtimeActions<EndpointType> {
 	}
 	update({ data }: RealtimeActionParams<EndpointType>) {
 		const { updateTab } = useTabStore.getState();
+
 		updateTab({
 			versionId: data.versionId as string,
 			tab: {
@@ -46,6 +47,9 @@ class Endpoint extends RealtimeActions<EndpointType> {
 			}),
 			endpoint: data,
 		});
+		if (data.logic) {
+			useEndpointStore.getState?.().setLogics(data._id, data.logic);
+		}
 	}
 	create({ data }: RealtimeActionParams<EndpointType>) {
 		useEndpointStore.setState?.({
