@@ -3,79 +3,80 @@ import { Input } from '@/components/Input';
 import { HTTP_METHOD_BADGE_MAP } from '@/constants';
 import TestEndpoint from '@/features/endpoints/TestEndpoint';
 import { useToast } from '@/hooks';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
+import useTabStore from '@/store/version/tabStore';
+import { APIError } from '@/types';
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useParams, useSearchParams } from 'react-router-dom';
-
-import useTabStore from '@/store/version/tabStore';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { endpointId, orgId, versionId, appId } = params;
 	if (!endpointId) return null;
-	const { getCurrentTab, updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
-	const { endpoint } = useEndpointStore.getState();
-	if (endpoint?._id === endpointId && history.state?.type !== 'tabChanged') {
-		useEndpointStore.setState({
-			editedLogic: endpoint.logic,
-		});
+	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
+	const { endpoint, getEndpointById, logics, setLogics } = useEndpointStore.getState();
+	if (endpoint?._id === endpointId) {
 		updateCurrentTab(versionId as string, {
-			...getCurrentTab(versionId as string),
-			isDirty: false,
+			isDirty: logics[endpointId] ? endpoint.logic !== logics[endpointId] : false,
 		});
+		setLogics(endpointId, logics[endpointId] ?? endpoint.logic);
 		closeDeleteTabModal();
 		return { endpoint };
 	}
 
-	const ep = await useEndpointStore.getState().getEndpointById({
+	getEndpointById({
 		orgId: orgId as string,
 		appId: appId as string,
 		versionId: versionId as string,
 		epId: endpointId,
 	});
-	return { endpoint: ep };
+
+	return { props: { endpoint } };
 };
 
 export default function EditEndpoint() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
 	const canEdit = useAuthorizeVersion('endpoint.update');
-	const { saveEndpointLogic, openEditEndpointDialog, endpoint, editedLogic, setEditedLogic } =
+	const { saveEndpointLogic, openEditEndpointDialog, endpoint, logics, setLogics, deleteLogic } =
 		useEndpointStore();
+
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [isTestEndpointOpen, setIsTestEndpointOpen] = useState(false);
-	const [loading, setLoading] = useState(false);
-	const { versionId, appId, orgId } = useParams<{
+	const { versionId, appId, orgId, endpointId } = useParams<{
 		versionId: string;
 		appId: string;
 		orgId: string;
+		endpointId: string;
 	}>();
 
+	const { mutateAsync: saveEpMutation, isPending } = useMutation({
+		mutationFn: saveEndpointLogic,
+		onSuccess: () => {
+			notify({
+				title: t('general.success'),
+				description: t('endpoint.editLogicSuccess'),
+				type: 'success',
+			});
+		},
+		onError: ({ error, details }: APIError) => {
+			notify({
+				title: error,
+				description: details,
+				type: 'error',
+			});
+		},
+	});
+
 	function saveLogic(logic: string) {
-		setLoading(true);
-		saveEndpointLogic({
-			orgId: orgId as string,
-			appId: appId as string,
-			versionId: versionId as string,
-			epId: endpoint._id,
-			logic: logic ?? editedLogic,
-			onSuccess: () => {
-				setLoading(false);
-				notify({
-					title: t('general.success'),
-					description: t('endpoint.editLogicSuccess'),
-					type: 'success',
-				});
-			},
-			onError: ({ error, details }) => {
-				setLoading(false);
-				notify({
-					title: error,
-					description: details,
-					type: 'error',
-				});
-			},
+		saveEpMutation({
+			orgId: orgId,
+			appId: appId,
+			versionId: versionId,
+			epId: endpointId,
+			logic: logic,
 		});
 	}
 
@@ -84,11 +85,12 @@ export default function EditEndpoint() {
 			onEditModalOpen={() => openEditEndpointDialog(endpoint)}
 			onTestModalOpen={() => setIsTestEndpointOpen(true)}
 			onSaveLogic={saveLogic}
-			setLogic={setEditedLogic}
-			loading={loading}
-			logic={editedLogic}
+			loading={isPending}
 			name={endpoint?._id}
 			canEdit={canEdit}
+			logic={logics[endpoint._id]}
+			setLogic={(val) => setLogics(endpoint._id, val)}
+			deleteLogic={() => deleteLogic(endpoint._id)}
 			breadCrumbItems={[
 				{
 					name: t('endpoint.title').toString(),
