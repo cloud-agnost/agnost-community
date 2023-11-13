@@ -1,16 +1,29 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { FIELD_ICON_MAP } from '@/constants';
 import { SubFields } from '@/features/database/models/fields/ListFields/index.ts';
-import useAuthStore from '@/store/auth/authStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
+import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, Field } from '@/types';
-import { toDisplayName, translate } from '@/utils';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
+import { getVersionPermission, toDisplayName, translate } from '@/utils';
 import { Badge } from 'components/Badge';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
+
+const { openEditFieldDialog, deleteField, model } = useModelStore.getState();
+const canDelete = getVersionPermission('model.delete');
+const canEdit = getVersionPermission('model.update');
+async function deleteHandler(field: Field) {
+	await deleteField({
+		dbId: model.dbId,
+		appId: model.appId,
+		orgId: model.orgId,
+		modelId: model._id,
+		fieldId: field._id,
+		versionId: model.versionId,
+	});
+}
 const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'select',
@@ -162,7 +175,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		},
 	},
 	{
-		id: 'createdAt',
+		id: 'created_at',
 		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
@@ -170,7 +183,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 				column={column}
 			/>
 		),
-		accessorKey: 'createdAt',
+		accessorKey: 'created_at',
 		enableSorting: true,
 		sortingFn: 'datetime',
 		size: 200,
@@ -179,11 +192,14 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 				original: { createdAt, createdBy },
 			},
 		}) => {
-			const isMe = useAuthStore.getState().user?._id === createdBy;
-			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
-			return <DateText date={createdAt}>{avatar}</DateText>;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === createdBy);
+
+			return <DateText date={createdAt} user={user} />;
 		},
 	},
+
 	{
 		id: 'updatedAt',
 		header: ({ column }) => (
@@ -203,48 +219,24 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 			},
 		}) => {
 			if (!updatedBy) return null;
-			const isMe = useAuthStore.getState().user?._id === updatedBy;
-			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
-			return <DateText date={updatedAt}>{avatar}</DateText>;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === updatedBy);
+			return updatedBy && <DateText date={updatedAt} user={user} />;
 		},
 	},
+
 	{
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { setFieldToEdit, setIsOpenEditFieldDialog, deleteField, models } =
-				useModelStore.getState();
-
-			function openEditDrawer() {
-				setFieldToEdit(original);
-				setIsOpenEditFieldDialog(true);
-			}
-
-			async function deleteHandler() {
-				const model = models.find((model) =>
-					model.fields.find((field) => field._id === original._id),
-				);
-				if (!model) return;
-
-				await deleteField({
-					dbId: model.dbId,
-					appId: model.appId,
-					orgId: model.orgId,
-					modelId: model._id,
-					fieldId: original._id,
-					versionId: model.versionId,
-				});
-			}
-
 			if (original.creator === 'system') return null;
 
 			return (
 				<ActionsCell
 					original={original}
-					canEditKey='model.update'
-					canDeleteKey='model.delete'
-					onEdit={openEditDrawer}
-					type='app'
+					canEdit={canEdit}
+					onEdit={() => openEditFieldDialog(original)}
 				>
 					<TableConfirmation
 						align='end'
@@ -252,9 +244,9 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 						showAvatar={false}
 						title={translate('database.fields.delete.title')}
 						description={translate('database.fields.delete.description')}
-						onConfirm={deleteHandler}
+						onConfirm={() => deleteHandler(original)}
 						contentClassName='m-0'
-						permissionKey='model.delete'
+						hasPermission={canDelete}
 					/>
 				</ActionsCell>
 			);

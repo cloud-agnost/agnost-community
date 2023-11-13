@@ -103,7 +103,7 @@ export default function EditOrCreateFieldDrawer({
 	const [loading, setLoading] = useState(false);
 	const databases = useDatabaseStore((state) => state.databases);
 	const fieldTypes = useTypeStore((state) => state.fieldTypes);
-	const fieldToEdit = useModelStore((state) => state.fieldToEdit) as Field;
+	const fieldToEdit = useModelStore((state) => state.field) as Field;
 	const addNewField = useModelStore((state) => state.addNewField);
 	const updateField = useModelStore((state) => state.updateField);
 	const getReferenceModels = useModelStore((state) => state.getReferenceModels);
