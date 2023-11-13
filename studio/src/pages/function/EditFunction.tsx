@@ -11,14 +11,14 @@ import { LoaderFunctionArgs, useParams } from 'react-router-dom';
 EditFunction.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { funcId, orgId, versionId, appId } = params as Record<string, string>;
 	if (!funcId) return null;
-	const { editedLogic, getFunctionById } = useFunctionStore.getState();
-	const { getCurrentTab, updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
+	const { getFunctionById, logics, setLogics } = useFunctionStore.getState();
+	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
 	const { function: helper } = useFunctionStore.getState();
 	if (helper?._id === funcId) {
-		updateCurrentTab(versionId, {
-			...getCurrentTab(versionId),
-			isDirty: helper.logic !== editedLogic,
+		updateCurrentTab(versionId as string, {
+			isDirty: logics[funcId] ? helper.logic !== logics[funcId] : false,
 		});
+		setLogics(funcId, logics[funcId] ?? helper.logic);
 		closeDeleteTabModal();
 		return { helper };
 	}
@@ -41,8 +41,9 @@ export default function EditFunction() {
 		function: helper,
 		saveFunctionCode,
 		openEditFunctionDrawer,
-		editedLogic,
-		setEditedLogic,
+		logics,
+		setLogics,
+		deleteLogic,
 	} = useFunctionStore();
 
 	const { versionId, appId, orgId, funcId } = useParams<{
@@ -75,7 +76,7 @@ export default function EditFunction() {
 			appId: appId as string,
 			versionId: versionId as string,
 			funcId: funcId as string,
-			logic: logic ?? editedLogic,
+			logic: logic,
 		});
 	}
 	return (
@@ -83,9 +84,10 @@ export default function EditFunction() {
 			onEditModalOpen={() => openEditFunctionDrawer(helper)}
 			onSaveLogic={saveLogic}
 			loading={isPending}
-			logic={editedLogic}
-			setLogic={setEditedLogic}
 			name={helper._id}
+			logic={logics[helper._id]}
+			setLogic={(val) => setLogics(helper._id, val)}
+			deleteLogic={() => deleteLogic(helper._id)}
 			breadCrumbItems={[
 				{
 					name: t('function.title').toString(),

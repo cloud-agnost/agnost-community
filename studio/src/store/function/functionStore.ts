@@ -1,13 +1,14 @@
 import { CustomStateStorage, create } from '@/helpers';
 import { FunctionService } from '@/services';
 import * as funcTypes from '@/types';
+import { isEmpty } from '@/utils';
 import { devtools } from 'zustand/middleware';
 interface FunctionStore {
 	functions: funcTypes.HelperFunction[];
 	function: funcTypes.HelperFunction;
 	isEditFunctionDrawerOpen: boolean;
-	editedLogic: string;
 	lastFetchedPage: number;
+	logics: Record<string, string>;
 }
 type Actions = {
 	getFunctionsOfAppVersion: (
@@ -21,21 +22,22 @@ type Actions = {
 	saveFunctionCode: (params: funcTypes.SaveFunctionCodeParams) => Promise<funcTypes.HelperFunction>;
 	closeEditFunctionDrawer: () => void;
 	openEditFunctionDrawer: (func: funcTypes.HelperFunction) => void;
-	setEditedLogic: (logic: string) => void;
+	setLogics: (id: string, logic: string) => void;
+	deleteLogic: (id: string) => void;
 	reset: () => void;
 };
 
 const initialState: FunctionStore = {
 	functions: [],
 	function: {} as funcTypes.HelperFunction,
-	editedLogic: '',
 	isEditFunctionDrawerOpen: false,
 	lastFetchedPage: 0,
+	logics: {},
 };
 
 const useFunctionStore = create<FunctionStore & Actions>()(
 	devtools(
-		(set) => ({
+		(set, get) => ({
 			...initialState,
 			getFunctionsOfAppVersion: async (params) => {
 				const functions = await FunctionService.getFunctionsOfAppVersion(params);
@@ -49,7 +51,10 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 			},
 			getFunctionById: async (params) => {
 				const func = await FunctionService.getFunctionById(params);
-				set({ function: func, editedLogic: func.logic });
+				set({ function: func });
+				if (isEmpty(get().logics[func._id])) {
+					get().setLogics(func._id, func.logic);
+				}
 				return func;
 			},
 			deleteFunction: async (params) => {
@@ -119,8 +124,11 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 			openEditFunctionDrawer: (func) => {
 				set({ function: func, isEditFunctionDrawerOpen: true });
 			},
-			setEditedLogic: (logic) => {
-				set({ editedLogic: logic });
+
+			setLogics: (id, logic) => set((prev) => ({ logics: { ...prev.logics, [id]: logic } })),
+			deleteLogic: (id) => {
+				const { [id]: _, ...rest } = get().logics;
+				set({ logics: rest });
 			},
 			reset: () => set(initialState),
 		}),

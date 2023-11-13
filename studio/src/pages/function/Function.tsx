@@ -28,7 +28,6 @@ export default function MainFunction() {
 	const { mutateAsync: deleteFunction } = useMutation({
 		mutationFn: deleteMultipleFunctions,
 		onSuccess: () => {
-			if (!functions.length) refetch();
 			table?.toggleAllRowsSelected(false);
 		},
 		onError: (error: APIError) => {
@@ -48,7 +47,7 @@ export default function MainFunction() {
 			versionId: versionId as string,
 		});
 	}
-	const { fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteScroll({
+	const { fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } = useInfiniteScroll({
 		queryFn: getFunctionsOfAppVersion,
 		dataLength: functions.length,
 		lastFetchedPage,
@@ -67,6 +66,7 @@ export default function MainFunction() {
 				onMultipleDelete={deleteMultipleFunctionsHandler}
 				table={table}
 				disabled={!canCreate}
+				loading={isFetching && !functions.length}
 			>
 				<InfiniteScroll
 					scrollableTarget='version-layout'
