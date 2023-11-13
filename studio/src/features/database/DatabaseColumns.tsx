@@ -1,16 +1,18 @@
 import { ActionsCell } from '@/components/ActionsCell';
-import { DATABASE_ICON_MAP } from '@/constants';
-import useDatabaseStore from '@/store/database/databaseStore.ts';
-import { ColumnDefWithClassName, Database, TabTypes } from '@/types';
-import { translate } from '@/utils';
-import { Table } from '@phosphor-icons/react';
-import { Badge } from 'components/Badge';
-import { Button } from 'components/Button';
-import { SortButton } from 'components/DataTable';
-import { TabLink } from '@/features/version/Tabs';
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from 'components/Tooltip';
-import useOrganizationStore from '@/store/organization/organizationStore';
 import { DateText } from '@/components/DateText';
+import { DATABASE_ICON_MAP } from '@/constants';
+import { TabLink } from '@/features/version/Tabs';
+import useDatabaseStore from '@/store/database/databaseStore.ts';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { ColumnDefWithClassName, Database, TabTypes } from '@/types';
+import { getVersionPermission, translate } from '@/utils';
+import { Badge } from 'components/Badge';
+import { SortButton } from 'components/DataTable';
+
+const { openDeleteDatabaseDialog, openEditDatabaseDialog } = useDatabaseStore.getState();
+
+const canEditDatabase = getVersionPermission('db.update');
+const canDeleteDatabase = getVersionPermission('db.delete');
 
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
@@ -54,6 +56,30 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		},
 	},
 	{
+		id: 'assignUniqueName',
+		header: ({ column }) => (
+			<SortButton text={translate('database.add.unique.name')} column={column} />
+		),
+		accessorKey: 'assignUniqueName',
+		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
+		size: 200,
+		cell: ({
+			row: {
+				original: { assignUniqueName },
+			},
+		}) => {
+			return (
+				<Badge
+					rounded
+					variant={assignUniqueName ? 'green' : 'red'}
+					text={assignUniqueName ? translate('general.yes') : translate('general.no')}
+					className='whitespace-nowrap'
+				/>
+			);
+		},
+	},
+	{
 		id: 'managed',
 		header: ({ column }) => <SortButton text={translate('general.managed')} column={column} />,
 		accessorKey: 'managed',
@@ -77,13 +103,22 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'created_at',
-		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
+		header: ({ column }) => (
+			<SortButton
+				className='whitespace-nowrap'
+				text={translate('general.created_at')}
+				column={column}
+			/>
+		),
+		accessorKey: 'created_at',
 		enableSorting: true,
 		sortingFn: 'datetime',
-		accessorKey: 'createdAt',
 		size: 200,
-		cell: ({ row }) => {
-			const { createdAt, createdBy } = row.original;
+		cell: ({
+			row: {
+				original: { createdAt, createdBy },
+			},
+		}) => {
 			const user = useOrganizationStore
 				.getState()
 				.members.find((member) => member.member._id === createdBy);
@@ -93,69 +128,45 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 
 	{
-		id: 'updated_at',
-		header: ({ column }) => <SortButton text={translate('general.updated_at')} column={column} />,
+		id: 'updatedAt',
+		header: ({ column }) => (
+			<SortButton
+				className='whitespace-nowrap'
+				text={translate('general.updated_at')}
+				column={column}
+			/>
+		),
 		accessorKey: 'updatedAt',
+		enableSorting: true,
+		sortingFn: 'datetime',
 		size: 200,
-		cell: ({ row }) => {
-			const { updatedAt, updatedBy } = row.original;
+		cell: ({
+			row: {
+				original: { updatedAt, updatedBy },
+			},
+		}) => {
+			if (!updatedBy) return null;
 			const user = useOrganizationStore
 				.getState()
 				.members.find((member) => member.member._id === updatedBy);
 			return updatedBy && <DateText date={updatedAt} user={user} />;
 		},
 	},
+
 	{
 		id: 'actions',
 		className: 'actions',
 		size: 50,
 		cell: ({ row: { original } }) => {
-			const {
-				setToEditDatabase,
-				setEditDatabaseDialogOpen,
-				setIsOpenDeleteDatabaseDialog,
-				setToDeleteDatabase,
-			} = useDatabaseStore.getState();
-
-			function openEditDrawer() {
-				setToEditDatabase(original);
-				setEditDatabaseDialogOpen(true);
-			}
-
-			function deleteHandler() {
-				setToDeleteDatabase(original);
-				setIsOpenDeleteDatabaseDialog(true);
-			}
-
-			//Todo: Table permissions
 			return (
-				<div className='flex items-center gap-0.5 justify-end'>
-					<TooltipProvider>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<Button
-									iconOnly
-									variant='blank'
-									rounded
-									to={`${original._id}/models`}
-									className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default text-xl'
-								>
-									<Table />
-								</Button>
-							</TooltipTrigger>
-							<TooltipContent>{translate('database.models.title')}</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
-					<ActionsCell
-						original={original}
-						onDelete={deleteHandler}
-						onEdit={openEditDrawer}
-						canDeleteKey='db.delete'
-						canEditKey='db.update'
-						type='app'
-						disabled={!original.managed}
-					/>
-				</div>
+				<ActionsCell
+					original={original}
+					onDelete={() => openDeleteDatabaseDialog(original)}
+					onEdit={() => openEditDatabaseDialog(original)}
+					canEdit={canEditDatabase}
+					canDelete={canDeleteDatabase}
+					disabled={!original.managed}
+				/>
 			);
 		},
 	},
