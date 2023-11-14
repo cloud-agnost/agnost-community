@@ -128,10 +128,12 @@ const useModelStore = create<ModelStore & Actions>()(
 							if (state.models.some((m) => m._id === model._id)) {
 								return {
 									models: state.models.map((m) => (m._id === model._id ? model : m)),
+									model,
 								};
 							}
 							return {
 								models: [model, ...state.models],
+								model,
 							};
 						});
 						return model;
