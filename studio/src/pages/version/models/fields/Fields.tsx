@@ -85,10 +85,6 @@ export default function Fields() {
 		},
 		{
 			name: model?.name,
-			url: goParentModelUrl,
-		},
-		{
-			name: model?.name,
 		},
 	];
 	return (

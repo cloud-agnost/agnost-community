@@ -218,8 +218,9 @@ export const getAppPermission = (path: string) => {
 	return _.get(useApplicationStore.getState().appAuthorization, path);
 };
 
-export const getOrgPermission = (path: string) => {
-	return _.get(useOrganizationStore.getState().orgAuthorization, path);
+export const getOrgPermission = (path: string): boolean => {
+	const role = useOrganizationStore.getState().organization.role;
+	return _.get(useOrganizationStore.getState().orgAuthorization[role].org, path);
 };
 export function formatFileSize(bytes: number): string {
 	if (bytes === 0) return '0 Bytes';
