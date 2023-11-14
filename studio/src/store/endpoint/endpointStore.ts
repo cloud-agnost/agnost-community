@@ -250,7 +250,6 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 				},
 				setLogics: (id, logic) => {
 					set((prev) => ({ logics: { ...prev.logics, [id]: logic } }));
-					console.warn('geldi');
 				},
 				deleteLogic: (id) => {
 					const { [id]: _, ...rest } = get().logics;
