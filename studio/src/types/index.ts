@@ -5,6 +5,7 @@ export type * from './cache.ts';
 export { CacheSchema, CreateCacheSchema } from './cache.ts';
 export type * from './cluster.ts';
 export type * from './database.ts';
+export { DatabaseTypes } from './database.ts';
 export type * from './endpoint.ts';
 export { CreateEndpointSchema } from './endpoint.ts';
 export type * from './environment.ts';

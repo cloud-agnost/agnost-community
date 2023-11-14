@@ -41,3 +41,11 @@ export type UpdateDatabaseParams = GetDatabaseOfAppByIdParams & {
 	name: string;
 	poolSize: number;
 };
+
+export enum DatabaseTypes {
+	MySQL = 'MySQL',
+	SQLServer = 'SQL Server',
+	PostgreSQL = 'PostgreSQL',
+	Oracle = 'Oracle',
+	MongoDB = 'MongoDB',
+}

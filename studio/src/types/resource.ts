@@ -38,8 +38,6 @@ export enum MongoDBConnFormat {
 	MongoDBSRV = 'mongodb+srv',
 }
 
-export type DatabaseTypes = 'MySQL' | 'PostgreSQL' | 'MongoDB';
-
 export interface ResourceAccessReadOnly {
 	host?: string;
 	port?: number;

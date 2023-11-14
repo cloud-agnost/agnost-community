@@ -1,6 +1,6 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { FIELD_ICON_MAP } from '@/constants';
-import { SubFields } from '@/features/database/models/fields/ListFields/index.ts';
+import { SubFields } from '@/features/database/models/fields';
 import useModelStore from '@/store/database/modelStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, Field } from '@/types';

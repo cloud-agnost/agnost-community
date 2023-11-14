@@ -1,6 +1,8 @@
+export { default as useAuthorizeVersion } from './useAuthorizeVersion.tsx';
 export { default as useDebounce } from './useDebounce.tsx';
 export { default as useDebounceFn } from './useDebounceFn.tsx';
 export { default as useEditor } from './useEditor.tsx';
+export { default as useFieldSchema } from './useFieldSchema.tsx';
 export { default as useInfiniteScroll } from './useInfiniteScroll.tsx';
 export { default as useNavigatorColumns } from './useNavigatorColumns.tsx';
 export { default as useRealtime } from './useRealtime.tsx';
@@ -10,4 +12,3 @@ export { default as useTable } from './useTable.tsx';
 export { default as useToast } from './useToast.tsx';
 export { default as useUpdateData } from './useUpdateData.tsx';
 export { default as useUpdateEffect } from './useUpdateEffect.tsx';
-export { default as useAuthorizeVersion } from './useAuthorizeVersion.tsx';

@@ -669,7 +669,7 @@ export const VERSION_DROPDOWN_ITEM = [
 		action: () => {
 			const { getVersionDashboardPath, version } = useVersionStore.getState();
 			const versionHomePath = getVersionDashboardPath('/settings');
-			useTabStore.getState().addTab(version?._id as string, {
+			useTabStore.getState().addTab(version?._id, {
 				id: generateId(),
 				title: translate('version.settings.default'),
 				path: versionHomePath,
@@ -814,17 +814,18 @@ export const FIELD_ICON_MAP: Record<string, ElementType> = {
  */
 export const REFERENCE_FIELD_ACTION = ['CASCADE', 'NO ACTION', 'SET NULL', 'SET DEFAULT'] as const;
 
-export const MAX_LENGTHS: Record<string, number | Record<string, number>> = {
+export const MAX_LENGTHS: Record<string, number> = {
 	'encrypted-text': 50,
 	decimal: 10,
 	enum: 1000,
-	text: {
-		MySQL: 16_382,
-		'SQL Server': 4_000,
-		PostgreSQL: 10_485_760,
-		Oracle: 4_000,
-		MongoDB: Number.MAX_SAFE_INTEGER,
-	},
+};
+
+export const DATABASE_TEXT_CAPACITIES: Record<string, number> = {
+	MySQL: 16_382,
+	'SQL Server': 4_000,
+	PostgreSQL: 10_485_760,
+	Oracle: 4_000,
+	MongoDB: Number.MAX_SAFE_INTEGER,
 };
 
 export const DATABASE = {
@@ -919,4 +920,42 @@ export const ORG_CHANGE_EXCEPTIONS = [
 	'cluster',
 	'auth',
 	'onBoarding',
+];
+
+export const DEFAULT_VALUE_DISABLED_TYPES = [
+	'time',
+	'object',
+	'object-list',
+	'encrypted-text',
+	'basic-values-list',
+	'geo-point',
+	'rich-text',
+	'binary',
+	'json',
+];
+
+export const BOOLEAN_DEFAULTS = [
+	{
+		label: 'Not set',
+		value: '',
+	},
+	{
+		label: 'True',
+		value: 'true',
+	},
+	{
+		label: 'False',
+		value: 'false',
+	},
+];
+
+export const DATETIME_DEFAULTS = [
+	{
+		label: 'Not set',
+		value: '',
+	},
+	{
+		label: 'Current date',
+		value: '$$NOW',
+	},
 ];
