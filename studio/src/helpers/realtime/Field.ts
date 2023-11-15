@@ -1,82 +1,44 @@
 import useModelStore from '@/store/database/modelStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import { Field as FieldType, RealtimeActionParams } from '@/types';
+import { Model, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
-class Field extends RealtimeActions<FieldType> {
-	delete({ identifiers }: RealtimeActionParams<FieldType>): void {
+class Field extends RealtimeActions<Model> {
+	delete({ identifiers, data }: RealtimeActionParams<Model>): void {
 		useModelStore.setState?.({
-			model: {
-				...useModelStore.getState().model,
-				fields: useModelStore
-					.getState?.()
-					.model.fields.filter((field) => field._id !== identifiers.fieldId),
-			},
-			models: useModelStore.getState().models.map((model) => {
-				if (model._id === identifiers.modelId) {
-					return {
-						...model,
-						fields: model.fields.filter((field) => field._id !== identifiers.fieldId),
-					};
-				}
-				return model;
-			}),
+			model: data,
+			models: useModelStore
+				.getState()
+				.models.map((model) => (model._id === identifiers.modelId ? data : model)),
 		});
 	}
-	update({ data, identifiers }: RealtimeActionParams<FieldType>): void {
+	update({ data, identifiers }: RealtimeActionParams<Model>): void {
 		const { updateTab } = useTabStore.getState();
 		const { version } = useVersionStore.getState();
 		updateTab({
-			versionId: version._id as string,
+			versionId: version._id,
 			tab: {
 				title: data.name,
 			},
-			filter: (tab) => tab.path.includes(data._id as string),
+			filter: (tab) => tab.path.includes(data._id),
 		});
 		useModelStore.setState?.({
-			model: {
-				...useModelStore.getState().model,
-				fields: useModelStore.getState().model.fields.map((field) => {
-					if (field._id === data._id) {
-						return data;
-					}
-					return field;
-				}),
-			},
-			models: useModelStore.getState().models.map((model) => {
-				if (model._id === identifiers.modelId) {
-					return {
-						...model,
-						fields: model.fields.map((field) => {
-							if (field._id === data._id) {
-								return data;
-							}
-							return field;
-						}),
-					};
-				}
-				return model;
-			}),
+			model: data,
+			models: useModelStore
+				.getState()
+				.models.map((model) => (model._id === identifiers.modelId ? data : model)),
 		});
 	}
-	create({ data, identifiers }: RealtimeActionParams<FieldType>): void {
+	create({ data, identifiers }: RealtimeActionParams<Model>): void {
+		console.log(data);
 		useModelStore.setState?.({
-			model: {
-				...useModelStore.getState().model,
-				fields: [...useModelStore.getState().model.fields, data],
-			},
-			models: useModelStore.getState().models.map((model) => {
-				if (model._id === identifiers.modelId) {
-					return {
-						...model,
-						fields: [...model.fields, data],
-					};
-				}
-				return model;
-			}),
+			model: data,
+			models: useModelStore
+				.getState()
+				.models.map((model) => (model._id === identifiers.modelId ? data : model)),
 		});
 	}
-	telemetry(param: RealtimeActionParams<FieldType>): void {
+	telemetry(param: RealtimeActionParams<Model>): void {
 		this.update(param);
 	}
 	log(): void {
