@@ -81,6 +81,51 @@ router.get("/info", authSession, async (req, res) => {
 });
 
 /*
+@route      /v1/cluster/release-info
+@method     GET
+@desc       Returns information about the current release of the cluster and the latest Agnost release
+@access     public
+*/
+router.get("/release-info", authSession, async (req, res) => {
+	try {
+		// Get cluster configuration
+		const { release } = await clsCtrl.getOneByQuery({
+			clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+		});
+
+		if (!release) {
+			return res.status(404).json({
+				error: t("Not Found"),
+				details: t("Release information not found."),
+				code: ERROR_CODES.notFound,
+			});
+		}
+
+		const latest = await axios.get(
+			"https://raw.githubusercontent.com/cloud-agnost/agnost-community/master/releases/latest.json",
+			{
+				headers: {
+					Accept: "application/vnd.github.v3+json",
+				},
+			}
+		);
+
+		const current = await axios.get(
+			`https://raw.githubusercontent.com/cloud-agnost/agnost-community/master/releases/${release}.json`,
+			{
+				headers: {
+					Accept: "application/vnd.github.v3+json",
+				},
+			}
+		);
+
+		res.json({ current: current.data, latest: latest.data });
+	} catch (error) {
+		handleError(req, res, error);
+	}
+});
+
+/*
 @route      /v1/cluster/smtp
 @method     GET
 @desc       Returns the smtp configuration of the cluster object

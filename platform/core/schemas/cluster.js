@@ -25,6 +25,11 @@ export const ClusterModel = mongoose.model(
 				required: true,
 				index: true,
 			},
+			release: {
+				type: String,
+				required: true,
+				index: true,
+			},
 			smtp: {
 				fromEmail: {
 					type: String,

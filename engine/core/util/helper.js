@@ -413,14 +413,6 @@ function getDtmFromString(str) {
 		}
 	}
 
-	if (!date || !date.isValid) {
-		try {
-			date = DateTime.fromMillis(parseInt(str, 10));
-		} catch (err) {
-			date = null;
-		}
-	}
-
 	if (!date || !date.isValid) return null;
 	else return date;
 }

@@ -93,6 +93,7 @@ router.post(
 						clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
 						masterToken: process.env.MASTER_TOKEN,
 						accessToken: process.env.ACCESS_TOKEN,
+						release: process.env.RELEASE_NUMBER,
 						createdBy: userId,
 					},
 					{ session }
@@ -105,6 +106,7 @@ router.post(
 						clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
 						masterToken: process.env.MASTER_TOKEN,
 						accessToken: process.env.ACCESS_TOKEN,
+						release: process.env.RELEASE_NUMBER,
 						createdBy: userId,
 					},
 					{},

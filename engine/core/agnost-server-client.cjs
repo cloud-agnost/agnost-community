@@ -244,8 +244,8 @@
 					T = n(r(9674)),
 					v = n(r(5850)),
 					E = n(r(1946)),
-					R = n(r(3115)),
-					b = n(r(5616)),
+					b = n(r(3115)),
+					R = n(r(5616)),
 					w = n(r(7934)),
 					M = n(r(6489)),
 					_ = n(r(2237)),
@@ -298,8 +298,8 @@
 					Te = n(r(1723)),
 					ve = n(r(3057)),
 					Ee = n(r(6923)),
-					Re = n(r(8051)),
-					be = n(r(4184)),
+					be = n(r(8051)),
+					Re = n(r(4184)),
 					we = n(r(6768)),
 					Me = n(r(6735)),
 					_e = n(r(107)),
@@ -322,8 +322,8 @@
 					$includes: T.default,
 					$left: v.default,
 					$length: E.default,
-					$lower: R.default,
-					$lt: b.default,
+					$lower: b.default,
+					$lt: R.default,
 					$lte: w.default,
 					$ltrim: M.default,
 					$mod: _.default,
@@ -376,8 +376,8 @@
 					$now: Te.default,
 					$todecimal: ve.default,
 					$toboolean: Ee.default,
-					$tointeger: Re.default,
-					$todate: be.default,
+					$tointeger: be.default,
+					$todate: Re.default,
 					$tostring: we.default,
 					$toobjectid: Me.default,
 					$distance: _e.default,
@@ -1721,20 +1721,10 @@
 								return super.getQuery(e, t);
 							case i.DBTYPE.POSTGRESQL:
 							case i.DBTYPE.MYSQL:
-								return (
-									console.log(
-										"****getQuery",
-										this.parameters[0].getQuery(e, t)
-									),
-									console.log(
-										"****getQuery",
-										this.parameters[1].getQuery(e, t)
-									),
-									`${this.parameters[0].getQuery(
-										e,
-										t
-									)} = ${this.parameters[1].getQuery(e, t)}`
-								);
+								return `${this.parameters[0].getQuery(
+									e,
+									t
+								)} = ${this.parameters[1].getQuery(e, t)}`;
 							default:
 								return null;
 						}
@@ -3850,13 +3840,17 @@
 								return null === this.value
 									? "NULL"
 									: "string" == typeof this.value
-									? `'${this.value}'`
+									? t
+										? t(this.value)
+										: `'${this.value}'`
 									: this.value;
 							case i.DBTYPE.MYSQL:
 								return null === this.value
 									? "NULL"
 									: "string" == typeof this.value
-									? `'${this.value}'`
+									? t
+										? t(this.value)
+										: `'${this.value}'`
 									: "boolean" == typeof this.value
 									? this.value
 										? 1
@@ -4036,18 +4030,18 @@
 						return E.Cache;
 					},
 				});
-				const R = r(9);
+				const b = r(9);
 				Object.defineProperty(t, "CacheBase", {
 					enumerable: !0,
 					get: function () {
-						return R.CacheBase;
+						return b.CacheBase;
 					},
 				});
-				const b = r(6098);
+				const R = r(6098);
 				Object.defineProperty(t, "Expression", {
 					enumerable: !0,
 					get: function () {
-						return b.Expression;
+						return R.Expression;
 					},
 				});
 				const w = (e, t) => new s.AgnostServerSideClient(e, t);
@@ -5650,6 +5644,7 @@
 								having: null,
 								searchField: null,
 								searchText: null,
+								baseModel: null,
 							});
 					}
 					getCreateData() {
@@ -5660,6 +5655,21 @@
 					}
 					getSort() {
 						return this.definition.sort;
+					}
+					setBaseModel(e) {
+						if (!e || "string" != typeof e)
+							throw new f.ClientError(
+								"invalid_parameter",
+								"The 'baseModel' is a required field which needs to be the name of the main model where the subquery will be used."
+							);
+						if (!this.model.getDb().model(e))
+							throw new f.ClientError(
+								"model_not_found",
+								`The 'baseModel' parameter should match to a model in the database. There is no model named '${e}' in datababase '${this.model
+									.getDb()
+									.getName()}'`
+							);
+						this.definition.baseModel = e;
 					}
 					setMethod(e) {
 						this.definition.method = e;
@@ -5973,9 +5983,9 @@
 						if (!this.model.getDb().model(e.from))
 							throw new f.ClientError(
 								"invalid_join_or_lookup",
-								`The 'from' parameter should match to the model to join/lookup. There no model named '${this.model.getName()}' in datababase '${this.model
-									.getDb()
-									.getName()}'`
+								`The 'from' parameter should match to the model to join/lookup. There is no model named '${
+									e.from
+								}' in datababase '${this.model.getDb().getName()}'`
 							);
 						if (!(0, h.isObject)(e.where))
 							throw new f.ClientError(
@@ -7044,8 +7054,8 @@
 					T = r(9175),
 					v = r(6666),
 					E = r(335),
-					R = r(1620),
-					b = r(9337),
+					b = r(1620),
+					R = r(9337),
 					w = r(8811),
 					M = r(8321),
 					_ = r(300);
@@ -7056,7 +7066,7 @@
 						case "text":
 							return new w.TextField(e, t);
 						case "rich-text":
-							return new b.RichTextField(e, t);
+							return new R.RichTextField(e, t);
 						case "encrypted-text":
 							return new c.EncryptedTextField(e, t);
 						case "email":
@@ -7090,7 +7100,7 @@
 						case "json":
 							return new m.JSONField(e, t);
 						case "reference":
-							return new R.ReferenceField(e, t);
+							return new b.ReferenceField(e, t);
 						case "basic-values-list":
 							return new n.BasicValuesListField(e, t);
 						case "object-list":
@@ -7380,9 +7390,9 @@
 								return yield this.modelBase.searchText(e, t, n);
 							});
 						}
-						getSQLQuery(e) {
+						getSQLSubQuery(e) {
 							return r(this, void 0, void 0, function* () {
-								return yield this.modelBase.getSQLQuery(e);
+								return yield this.modelBase.getSQLSubQuery(e);
 							});
 						}
 					});
@@ -7829,7 +7839,7 @@
 							);
 						});
 					}
-					getSQLQuery(e) {
+					getSQLSubQuery(e) {
 						return n(this, void 0, void 0, function* () {
 							if (this.getDb().getType() === u.DBTYPE.MONGODB)
 								throw new o.ClientError(
@@ -7856,6 +7866,7 @@
 								t.setSort(e.sort, e.join),
 								t.setSkip(e.skip),
 								t.setLimit(e.limit),
+								t.setBaseModel(e.baseModel),
 								t.checkJoinAndLookupDuplicates(),
 								yield t.execute()
 							);

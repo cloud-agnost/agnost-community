@@ -490,10 +490,10 @@ export class PostgreSQL extends SQLDatabase {
 	 * @param  {object} where The where expression
 	 * @returns  The WHERE query string
 	 */
-	getWhereDefinition(where) {
+	getWhereDefinition(where, paretModelFieldFiller = null) {
 		if (!where) return null;
 
-		return where.getQuery("PostgreSQL");
+		return where.getQuery("PostgreSQL", paretModelFieldFiller);
 	}
 
 	/**
@@ -819,7 +819,6 @@ export class PostgreSQL extends SQLDatabase {
 	 * @returns  The fetched records otherwise an empty array [] if no records can be found
 	 */
 	async findMany(dbMeta, modelMeta, options) {
-		console.log("***here1");
 		const from = this.getTableName(dbMeta, modelMeta);
 		const select = this.getJoinLookupSelectDefinition(
 			dbMeta,
@@ -1273,8 +1272,15 @@ export class PostgreSQL extends SQLDatabase {
 			this.mergeArrays(options.lookup, options.join)
 		);
 
+		// When we use the #exists function to check subqueries we need to make sure any field that starts with the parent model is not returned in quotes
+		const paretModelFieldFiller = (text) => {
+			console.log("***here", text);
+			if (text.startsWith(`${options.baseModel}.`)) return text;
+			else return `'${text}'`;
+		};
+
 		const joins = this.getJoinDefinitions(modelMeta, options.join);
-		const where = this.getWhereDefinition(options.where);
+		const where = this.getWhereDefinition(options.where, paretModelFieldFiller);
 		const orderBy = this.getOrderByDefinition(options.sort);
 		const limit = options.limit ?? null;
 		const offset = options.skip ?? null;
