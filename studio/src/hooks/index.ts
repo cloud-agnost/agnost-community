@@ -11,3 +11,4 @@ export { default as useToast } from './useToast.tsx';
 export { default as useUpdateData } from './useUpdateData.tsx';
 export { default as useUpdateEffect } from './useUpdateEffect.tsx';
 export { default as useAuthorizeVersion } from './useAuthorizeVersion.tsx';
+export { default as useSearch } from './useSearch.tsx';
