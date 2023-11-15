@@ -1,4 +1,6 @@
+import { DATABASE, MYSQL_RESERVED_WORDS, POSTGRES_RESERVED_WORDS } from '@/constants';
 import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants/regex';
+import useDatabaseStore from '@/store/database/databaseStore';
 import useResourceStore from '@/store/resources/resourceStore';
 import { capitalize, translate as t } from '@/utils';
 import * as z from 'zod';
@@ -60,9 +62,9 @@ export const FieldSchema = z
 
 export const TimestampsSchema = z
 	.object({
-		enabled: z.boolean(),
-		createdAt: FieldSchema,
-		updatedAt: FieldSchema,
+		enabled: z.boolean().default(false),
+		createdAt: FieldSchema.default('createdAt'),
+		updatedAt: FieldSchema.default('updatedAt'),
 	})
 	.superRefine((arg, ctx) => {
 		if (arg.enabled) {
@@ -107,6 +109,7 @@ export const CreateDatabaseSchema = z.object({
 		}),
 	managed: z.boolean().default(true),
 });
+
 export const UpdateDatabaseSchema = z.object({
 	name: NameSchema,
 	poolSize: z
@@ -121,12 +124,41 @@ export const UpdateDatabaseSchema = z.object({
 		.min(1)
 		.max(50),
 });
-export const ModelSchema = z.object({
-	name: NameSchema,
-	description: z
-		.string({
-			required_error: t('forms.required', { label: t('general.description') }),
-		})
-		.optional(),
-	timestamps: TimestampsSchema,
-});
+export const ModelSchema = z
+	.object({
+		name: NameSchema,
+		description: z
+			.string({
+				required_error: t('forms.required', { label: t('general.description') }),
+			})
+			.optional(),
+		timestamps: TimestampsSchema,
+	})
+	.superRefine((arg, ctx) => {
+		const database = useDatabaseStore.getState().database;
+		if (
+			database?.type === DATABASE.PostgreSQL &&
+			POSTGRES_RESERVED_WORDS.includes(arg.name.toLowerCase())
+		) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: t('forms.reservedWord', {
+					label: arg.name,
+				}).toString(),
+				path: ['name'],
+			});
+		}
+
+		if (
+			database?.type === DATABASE.MySQL &&
+			MYSQL_RESERVED_WORDS.includes(arg.name.toLowerCase())
+		) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: t('forms.reservedWord', {
+					label: arg.name,
+				}).toString(),
+				path: ['name'],
+			});
+		}
+	});
