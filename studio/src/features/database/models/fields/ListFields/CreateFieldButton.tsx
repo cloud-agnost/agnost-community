@@ -56,7 +56,7 @@ export default function CreateFieldButton() {
 	}
 
 	function findTopModel(model: Model): Model {
-		if (!model.parentiid) return model;
+		if (!model?.parentiid) return model;
 
 		const parentModel = getModelById(model.parentiid);
 		if (!parentModel?.parentiid) return model;
@@ -66,7 +66,7 @@ export default function CreateFieldButton() {
 
 	const hideReferenceFields = useMemo(() => {
 		const parent = findTopModel(model);
-		return parent.type === 'sub-model-list';
+		return parent?.type === 'sub-model-list';
 	}, []);
 
 	return (
