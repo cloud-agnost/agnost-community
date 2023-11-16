@@ -94,6 +94,7 @@ router.post(
 						masterToken: process.env.MASTER_TOKEN,
 						accessToken: process.env.ACCESS_TOKEN,
 						release: process.env.RELEASE_NUMBER,
+						releaseHistory: [],
 						createdBy: userId,
 					},
 					{ session }
