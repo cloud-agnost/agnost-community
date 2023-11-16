@@ -10,7 +10,14 @@ const router = express.Router({ mergeParams: true });
 @access     public
 */
 router.get("/health", (req, res) => {
-	res.status(200).send(new Date().toISOString() + " - Healthy realtime server");
+	res
+		.status(200)
+		.send(
+			new Date().toISOString() +
+				" - Healthy realtime server" +
+				" - " +
+				process.env.RELEASE_NUMBER
+		);
 });
 
 /*

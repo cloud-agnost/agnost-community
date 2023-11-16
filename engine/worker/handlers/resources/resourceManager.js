@@ -428,6 +428,10 @@ export class ResourceManager {
                                         name: "JWT_SECRET",
                                         value: process.env.JWT_SECRET,
                                     },
+                                    {
+                                        name: "RELEASE_NUMBER",
+                                        value: process.env.RELEASE_NUMBER,
+                                    },
                                 ],
                                 resources: {
                                     requests: {
@@ -479,7 +483,7 @@ export class ResourceManager {
     }
 
     /**
-     * Updates an engine deployment (API server)
+     * Updates an engine deployment (API server) min, max replicas and scale down parameters
      * @param  {string} deploymentName The deployment name prefix (resource iid)
      * @param  {object} deploymentConfig The deployment configuration
      */
@@ -535,6 +539,55 @@ export class ResourceManager {
             );
         } catch (err) {
             throw new AgnostError(err.body?.message);
+        }
+    }
+
+    /**
+     * Updates an engine deployment (API server) image - changes the version of the api server image
+     * @param  {string} deploymentName The deployment name prefix (resource iid)
+     * @param  {string} imageName The new image name
+     */
+    async updateKnativeServiceImage(deploymentName, imageName) {
+        // Create a Kubernetes core API client
+        const kubeconfig = new k8s.KubeConfig();
+        kubeconfig.loadFromDefault();
+        const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
+
+        try {
+            const existingService = await k8sApi.getNamespacedCustomObjectStatus(
+                "serving.knative.dev",
+                "v1",
+                process.env.NAMESPACE,
+                "services",
+                deploymentName
+            );
+
+            // Update image and environment variable
+            const container = existingService.body.spec.template.spec.containers[0];
+            container.image = imageName;
+
+            let releaseUpdated = false;
+            container.env = container.env.map((entry) => {
+                if (entry.name === "RELEASE_NUMBER") {
+                    releaseUpdated = true;
+                    return { ...entry, value: imageName.split(":")[1] };
+                } else return entry;
+            });
+
+            if (!releaseUpdated) container.env.push({ name: "RELEASE_NUMBER", value: imageName.split(":")[1] });
+
+            // Apply updated Knative Service
+            await k8sApi.replaceNamespacedCustomObject(
+                "serving.knative.dev",
+                "v1",
+                process.env.NAMESPACE,
+                "services",
+                deploymentName,
+                existingService.body
+            );
+        } catch (err) {
+            console.log("***err", err);
+            logger.error(`Cannot update API server '${deploymentName}' version`, { details: err });
         }
     }
 
@@ -687,6 +740,7 @@ export class ResourceManager {
         if (hpa) {
             info.minReplicas = hpa.spec.minReplicas;
             info.maxReplicas = hpa.spec.maxReplicas;
+            info.hpaCurrentReplicas = hpa.status.currentReplicas;
         }
 
         const comp = { ...component, info };
@@ -728,7 +782,18 @@ export class ResourceManager {
             if (replicas) response.body.spec.replicas = replicas;
             if (imageName) {
                 let container = response.body.spec.template.spec.containers[0];
+                container.imagePullPolicy = "IfNotPresent";
                 container.image = imageName;
+
+                let releaseUpdated = false;
+                container.env = container.env.map((entry) => {
+                    if (entry.name === "RELEASE_NUMBER") {
+                        releaseUpdated = true;
+                        return { ...entry, value: imageName.split(":")[1] };
+                    } else return entry;
+                });
+
+                if (!releaseUpdated) container.env.push({ name: "RELEASE_NUMBER", value: imageName.split(":")[1] });
             }
 
             // Update the deployment

@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import { body } from "express-validator";
-import { clusterComponents } from "../config/constants.js";
+import {
+	clusterComponents,
+	clusterComponentsAll,
+	clusterComponentStatus,
+} from "../config/constants.js";
 /**
  * Account is the top level model which will hold the list of organizations, under organization there will be users and apps etc.
  * Whenever a new users signs up a personal account with 'Admin' role will be creted. When a user joins to an organization, a new account entry
@@ -31,10 +35,30 @@ export const ClusterModel = mongoose.model(
 				index: true,
 			},
 			// Keeps the release number of the previous releases, whenever the current release is updated, the previous release number is added to this array
-			releaseHistory: {
-				type: [String],
-				index: true,
-			},
+			releaseHistory: [
+				{
+					release: {
+						type: String,
+						required: true,
+					},
+					timestamp: { type: Date, default: Date.now, immutable: true },
+				},
+			],
+			clusterResourceStatus: [
+				{
+					name: {
+						type: String,
+						required: true,
+						enum: clusterComponentsAll.map((entry) => entry.deploymentName),
+					},
+					status: {
+						type: String,
+						required: true,
+						enum: clusterComponentStatus,
+					},
+					lastUpdateAt: { type: Date, default: Date.now },
+				},
+			],
 			smtp: {
 				fromEmail: {
 					type: String,
@@ -179,6 +203,13 @@ export const applyRules = (type) => {
 
 						return true;
 					}),
+			];
+		case "update-version":
+			return [
+				body("release")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
 			];
 		default:
 			return [];

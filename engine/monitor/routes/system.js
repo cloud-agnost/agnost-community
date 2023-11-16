@@ -12,7 +12,12 @@ const router = express.Router({ mergeParams: true });
 router.get("/health", (req, res) => {
 	res
 		.status(200)
-		.send(new Date().toISOString() + " - Healthy engine worker server");
+		.send(
+			new Date().toISOString() +
+				" - Healthy engine worker server" +
+				" - " +
+				process.env.RELEASE_NUMBER
+		);
 });
 
 /*
