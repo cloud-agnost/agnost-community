@@ -63,6 +63,28 @@ router.post("/cluster-info", checkContentType, authAccessToken, async (req, res)
 });
 
 /*
+@route      /resource/cluster-versions
+@method     POST
+@desc       Updates the version of cluster's default deployments and if specified the API server versions
+@access     public
+*/
+router.post("/cluster-versions", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        console.log("***here", req.body);
+        res.json();
+
+        const updates = req.body;
+        let manager = new ResourceManager(null);
+        for (const update of updates) {
+            if (!update.apiServer) await manager.updateDeployment(update.deploymentName, null, update.image);
+            else await manager.updateKnativeServiceImage(update.deploymentName, update.image);
+        }
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
 @route      /resource/apiserver/:envId
 @method     GET
 @desc       Get information about the version's API server

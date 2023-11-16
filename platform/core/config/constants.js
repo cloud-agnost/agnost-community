@@ -981,6 +981,7 @@ export const defaultMessages = (userId) => {
 	];
 };
 
+// List of resources that can be customized in terms of min and max replicas
 export const clusterComponents = [
 	{
 		deploymentName: "engine-worker-deployment",
@@ -989,6 +990,42 @@ export const clusterComponents = [
 	{
 		deploymentName: "engine-realtime-deployment",
 		hpaName: "engine-realtime-hpa",
+	},
+	{
+		deploymentName: "platform-core-deployment",
+		hpaName: "platform-core-hpa",
+	},
+	{
+		deploymentName: "platform-sync-deployment",
+		hpaName: "platform-sync-hpa",
+	},
+	{
+		deploymentName: "platform-worker-deployment",
+		hpaName: "platform-worker-hpa",
+	},
+	{
+		deploymentName: "studio-deployment",
+		hpaName: "studio-hpa",
+	},
+];
+
+export const clusterComponentStatus = ["OK", "Error", "Updating"];
+
+// List of all cluster resources
+export const clusterComponentsAll = [
+	{
+		deploymentName: "engine-worker-deployment",
+		hpaName: "engine-worker-hpa",
+	},
+	{
+		deploymentName: "engine-realtime-deployment",
+		hpaName: "engine-realtime-hpa",
+	},
+	{
+		deploymentName: "engine-monitor-deployment",
+	},
+	{
+		deploymentName: "engine-scheduler-deployment",
 	},
 	{
 		deploymentName: "platform-core-deployment",

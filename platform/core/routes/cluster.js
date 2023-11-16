@@ -3,6 +3,7 @@ import express from "express";
 import nodemailer from "nodemailer";
 import userCtrl from "../controllers/user.js";
 import clsCtrl from "../controllers/cluster.js";
+import resourceCtrl from "../controllers/resource.js";
 import { authMasterToken } from "../middlewares/authMasterToken.js";
 import { authSession } from "../middlewares/authSession.js";
 import { handleError } from "../schemas/platformError.js";
@@ -10,6 +11,7 @@ import { applyRules } from "../schemas/cluster.js";
 import { validate } from "../middlewares/validate.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { clusterComponents } from "../config/constants.js";
+import { sendMessage } from "../init/sync.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
@@ -81,6 +83,25 @@ router.get("/info", authSession, async (req, res) => {
 });
 
 /*
+@route      /v1/cluster/status
+@method     GET
+@desc       Returns information about the cluster deployments status information
+@access     public
+*/
+router.get("/status", authSession, async (req, res) => {
+	try {
+		// Get cluster configuration
+		let cluster = await clsCtrl.getOneByQuery({
+			clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+		});
+
+		res.json(cluster.clusterResourceStatus);
+	} catch (error) {
+		handleError(req, res, error);
+	}
+});
+
+/*
 @route      /v1/cluster/release-info
 @method     GET
 @desc       Returns information about the current release of the cluster and the latest Agnost release
@@ -89,11 +110,11 @@ router.get("/info", authSession, async (req, res) => {
 router.get("/release-info", authSession, async (req, res) => {
 	try {
 		// Get cluster configuration
-		const { release } = await clsCtrl.getOneByQuery({
+		const cluster = await clsCtrl.getOneByQuery({
 			clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
 		});
 
-		if (!release) {
+		if (!cluster.release) {
 			return res.status(404).json({
 				error: t("Not Found"),
 				details: t("Release information not found."),
@@ -111,7 +132,7 @@ router.get("/release-info", authSession, async (req, res) => {
 		);
 
 		const current = await axios.get(
-			`https://raw.githubusercontent.com/cloud-agnost/agnost-community/master/releases/${release}.json`,
+			`https://raw.githubusercontent.com/cloud-agnost/agnost-community/master/releases/${cluster.release}.json`,
 			{
 				headers: {
 					Accept: "application/vnd.github.v3+json",
@@ -119,7 +140,11 @@ router.get("/release-info", authSession, async (req, res) => {
 			}
 		);
 
-		res.json({ current: current.data, latest: latest.data });
+		res.json({
+			current: current.data,
+			latest: latest.data,
+			cluster: cluster,
+		});
 	} catch (error) {
 		handleError(req, res, error);
 	}
@@ -301,6 +326,187 @@ router.put(
 			} catch (err) {}
 
 			res.json();
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/cluster/update-release
+@method     PUT
+@desc       Updates the version of cluster's default deployments to the versions' specified in the release
+@access     public
+*/
+router.put(
+	"/update-release",
+	checkContentType,
+	authSession,
+	applyRules("update-version"),
+	validate,
+	async (req, res) => {
+		try {
+			const { user } = req;
+			if (!user.isClusterOwner) {
+				return res.status(401).json({
+					error: t("Not Authorized"),
+					details: t(
+						"You are not authorized to update cluster release number. Only the cluster owner can manage cluster core components."
+					),
+					code: ERROR_CODES.unauthorized,
+				});
+			}
+
+			// Get cluster configuration
+			const cluster = await clsCtrl.getOneByQuery({
+				clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+			});
+
+			const { release } = req.body;
+
+			// If existing and new release are the same do nothing
+			if (cluster.release === release) return res.json(cluster);
+
+			let oldReleaseInfo = null;
+			let newReleaseInfo = null;
+
+			try {
+				oldReleaseInfo = await axios.get(
+					`https://raw.githubusercontent.com/cloud-agnost/agnost-community/master/releases/${cluster.release}.json`,
+					{
+						headers: {
+							Accept: "application/vnd.github.v3+json",
+						},
+					}
+				);
+			} catch (err) {
+				return res.status(404).json({
+					error: t("Not Found"),
+					details: t("There is no such Agnost release '%s'.", cluster.release),
+					code: ERROR_CODES.notFound,
+				});
+			}
+
+			try {
+				newReleaseInfo = await axios.get(
+					`https://raw.githubusercontent.com/cloud-agnost/agnost-community/master/releases/${release}.json`,
+					{
+						headers: {
+							Accept: "application/vnd.github.v3+json",
+						},
+					}
+				);
+			} catch (err) {
+				return res.status(404).json({
+					error: t("Not Found"),
+					details: t("There is no such Agnost release '%s'.", release),
+					code: ERROR_CODES.notFound,
+				});
+			}
+
+			// Indetify the deployments whose release number has changed
+			let apiServersNeedUpdate = false;
+			const requiredUpdates = [];
+			for (const [key, value] of Object.entries(oldReleaseInfo.data.modules)) {
+				if (value !== newReleaseInfo.data.modules[key]) {
+					const entry = {
+						deploymentName: `${key}-deployment`,
+						tag: newReleaseInfo.data.modules[key],
+						image: `gcr.io/agnost-community/${key.replace("-", "/")}:${
+							newReleaseInfo.data.modules[key]
+						}`,
+						apiServer: false,
+					};
+
+					if (key === "engine-core") {
+						apiServersNeedUpdate = true;
+						continue;
+					}
+
+					requiredUpdates.push(entry);
+				}
+			}
+
+			// If api servers need update then fetch all api servers from the database
+			if (apiServersNeedUpdate) {
+				const newVersion = newReleaseInfo.data.modules["engine-core"];
+				const apiServers = await resourceCtrl.getManyByQuery({
+					instance: "API Server",
+				});
+
+				for (const apiServer of apiServers) {
+					requiredUpdates.push({
+						deploymentName: apiServer.iid,
+						tag: newVersion,
+						image: `gcr.io/agnost-community/engine/core:${newVersion}`,
+						apiServer: true,
+					});
+				}
+			}
+
+			// If no updates do nothing
+			if (requiredUpdates.length === 0) return res.json(cluster);
+
+			// Update cluster default deployment image tags - version change
+			await axios.post(
+				config.get("general.workerUrl") + "/v1/resource/cluster-versions",
+				requiredUpdates,
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			// Update cluster release information
+			let updatedCluster = await clsCtrl.updateOneByQuery(
+				{
+					clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+				},
+				{
+					release: release,
+					releaseHistory: [...cluster.releaseHistory, { release: release }],
+				}
+			);
+
+			res.json(updatedCluster);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/cluster/update-status
+@method     POST
+@desc       Updates the status of cluster's default deployments
+@access     public
+*/
+router.post(
+	"/update-status",
+	checkContentType,
+	authMasterToken,
+	async (req, res) => {
+		try {
+			// Update cluster configuration
+			await clsCtrl.updateOneByQuery(
+				{
+					clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+				},
+				{ clusterResourceStatus: req.body }
+			);
+
+			res.json();
+
+			// Send realtime notification message that cluster deployment status has changed
+			sendMessage("cluster", {
+				action: "status-update",
+				object: "cluster",
+				description: t("Status of cluster defaul deployments has changed"),
+				timestamp: Date.now(),
+				data: req.body,
+			});
 		} catch (error) {
 			handleError(req, res, error);
 		}

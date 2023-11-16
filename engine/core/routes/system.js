@@ -16,7 +16,7 @@ router.get("/health", responseTime(logRequestToConsole), (req, res) => {
 		.send(
 			`${new Date().toISOString()} - Healthy API server ${
 				process.env.AGNOST_ENVIRONMENT_ID
-			}`
+			}:${process.env.RELEASE_NUMBER}`
 		);
 });
 

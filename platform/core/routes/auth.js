@@ -94,7 +94,9 @@ router.post(
 						masterToken: process.env.MASTER_TOKEN,
 						accessToken: process.env.ACCESS_TOKEN,
 						release: process.env.RELEASE_NUMBER,
-						releaseHistory: [],
+						releaseHistory: [
+							{ release: process.env.RELEASE_NUMBER, timestamp: Date.now() },
+						],
 						createdBy: userId,
 					},
 					{ session }
@@ -108,6 +110,9 @@ router.post(
 						masterToken: process.env.MASTER_TOKEN,
 						accessToken: process.env.ACCESS_TOKEN,
 						release: process.env.RELEASE_NUMBER,
+						releaseHistory: [
+							{ release: process.env.RELEASE_NUMBER, timestamp: Date.now() },
+						],
 						createdBy: userId,
 					},
 					{},
