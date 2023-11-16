@@ -30,6 +30,11 @@ export const ClusterModel = mongoose.model(
 				required: true,
 				index: true,
 			},
+			// Keeps the release number of the previous releases, whenever the current release is updated, the previous release number is added to this array
+			releaseHistory: {
+				type: [String],
+				index: true,
+			},
 			smtp: {
 				fromEmail: {
 					type: String,
