@@ -21,7 +21,7 @@ for app in applications:
         values_data[app_type][app_name]['tag'] = app['version']
     else:
         app_name = app['application']
-        values_data[app_name] = app['version']
+        values_data[app_name]['tag'] = app['version']
 
 with open(values_yaml, 'w') as outfile:
     yaml.dump(values_data, outfile)
