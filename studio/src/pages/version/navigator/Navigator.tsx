@@ -21,7 +21,6 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { LoaderFunctionArgs, useParams, useSearchParams } from 'react-router-dom';
-import { NavigatorColumns } from '../../../features/database/models/Navigator/NavigatorColumns';
 Navigator.loader = async function ({ params }: LoaderFunctionArgs) {
 	if (!useAuthStore.getState().isAuthenticated()) return null;
 	const { models } = useModelStore.getState();

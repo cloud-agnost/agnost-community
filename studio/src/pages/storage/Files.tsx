@@ -1,5 +1,4 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
-import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { Progress } from '@/components/Progress';
 import { TableLoading } from '@/components/Table/Table';
@@ -10,7 +9,7 @@ import useStorageStore from '@/store/storage/storageStore';
 import useVersionStore from '@/store/version/versionStore';
 import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { LoaderFunctionArgs } from 'react-router-dom';
 
@@ -39,7 +38,6 @@ export default function Files() {
 		getFilesOfBucket,
 		bucket,
 		files,
-		deleteFileFromBucket,
 		deleteMultipleFileFromBucket,
 		fileCountInfo,
 		storage,
