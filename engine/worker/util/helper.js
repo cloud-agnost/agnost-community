@@ -73,14 +73,19 @@ function handleError(req, res, error) {
         stack: error.stack,
     };
 
-    if (error.name == "CastError") {
-        entry.error = t("Not Found");
-        entry.details = t("The object identifier is not recognized.");
-        res.status(400).json(entry);
-    } else {
-        entry.error = t("Internal Server Error");
-        entry.details = t("The server has encountered a situation it does not know how to handle.");
-        res.status(500).json(entry);
+    if (!res.headersSent) {
+        if (error.name == "CastError") {
+            entry.error = t("Not Found");
+            entry.details = t("The object identifier is not recognized.");
+            res.status(400).json(entry);
+        } else {
+            entry.error = t("Internal Server Error");
+            entry.details = t(
+                "The server has encountered a situation it does not know how to handle. %s",
+                error.message
+            );
+            res.status(500).json(entry);
+        }
     }
 
     // Log also the error message in console
@@ -225,6 +230,18 @@ function decryptSensitiveData(access) {
     return decrypted;
 }
 
+/**
+ * Generates a secret name for a certificate.
+ * @param {number} [length=12] - The length of the secret name. Default is 12.
+ * @returns {string} - The generated secret name.
+ */
+function getCertSecretName(length = 12) {
+    // Kubernetes resource names need to be alphanumeric and in lowercase letters
+    const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
+    const nanoid = customAlphabet(alphabet, length);
+    return `cert-secret-${nanoid()}`;
+}
+
 export default {
     constants,
     generateSlug,
@@ -237,4 +254,5 @@ export default {
     getAsObject,
     decryptSensitiveData,
     encyrptSensitiveData,
+    getCertSecretName,
 };

@@ -95,6 +95,16 @@ export const ClusterModel = mongoose.model(
 				type: Number,
 				select: false,
 			},
+			// Custom domains associted with the cluster
+			domains: {
+				type: [String],
+				index: true,
+			},
+			// The ip addresses or hostnames of the cluster
+			ips: {
+				type: [String],
+				index: true,
+			},
 		},
 		{ timestamps: true }
 	)
@@ -210,6 +220,57 @@ export const applyRules = (type) => {
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty")),
+			];
+		case "add-domain":
+			return [
+				body("domain")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.toLowerCase() // convert the value to lowercase
+					.custom((value, { req }) => {
+						const dnameRegex = /^(?:\*\.)?(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+						// Validate domain name (can be at mulitple levels and allows for wildcard subdomains)
+						if (!dnameRegex.test(value)) {
+							throw new AgnostError(t("Not a valid domain name '%s'", value));
+						}
+
+						// Check to see if this domain is already included in the list
+						const { domains } = req.cluster;
+						if (domains && domains.find((entry) => entry === value)) {
+							throw new AgnostError(
+								t(
+									"The specified domain '%s' already exists in cluster domain list",
+									value
+								)
+							);
+						}
+						return true;
+					}),
+			];
+		case "delete-domain":
+			return [
+				body("domain")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.toLowerCase() // convert the value to lowercase
+					.custom((value, { req }) => {
+						// Check to see if this domain is already included in the list
+						const { domains } = req.cluster;
+						if (domains && domains.find((entry) => entry === value)) {
+							return true;
+						} else {
+							throw new AgnostError(
+								t(
+									"The specified domain '%s' does not exist in cluster domain list",
+									value
+								)
+							);
+						}
+					}),
 			];
 		default:
 			return [];

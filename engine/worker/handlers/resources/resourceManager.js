@@ -586,7 +586,6 @@ export class ResourceManager {
                 existingService.body
             );
         } catch (err) {
-            console.log("***err", err);
             logger.error(`Cannot update API server '${deploymentName}' version`, { details: err });
         }
     }
@@ -635,23 +634,23 @@ export class ResourceManager {
                 metadata: {
                     name: `${ingressName}-ingress`,
                     annotations: {
-                        "kubernetes.io/ingress.class": "nginx",
                         "nginx.ingress.kubernetes.io/proxy-body-size": "500m",
                         "nginx.ingress.kubernetes.io/proxy-connect-timeout": "6000",
                         "nginx.ingress.kubernetes.io/proxy-send-timeout": "6000",
                         "nginx.ingress.kubernetes.io/proxy-read-timeout": "6000",
                         "nginx.ingress.kubernetes.io/proxy-next-upstream-timeout": "6000",
-                        "nginx.ingress.kubernetes.io/rewrite-target": "/$1",
+                        "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
                         "nginx.ingress.kubernetes.io/upstream-vhost": `${ingressName}.${process.env.NAMESPACE}.svc.cluster.local`,
                     },
                 },
                 spec: {
+                    ingressClassName: "nginx",
                     rules: [
                         {
                             http: {
                                 paths: [
                                     {
-                                        path: `/${pathName}/(.*)`,
+                                        path: `/${pathName}(/|$)(.*)`,
                                         pathType: "Prefix",
                                         backend: {
                                             service: {
@@ -1146,5 +1145,182 @@ export class ResourceManager {
 
         // Update resource access settings
         await this.updateResourceAccessSettings(access, accessReadOnly);
+    }
+
+    /**
+     * Retrieves the IP addresses of the cluster's load balancer ingress.
+     * @returns {Promise<string[]>} An array of IP addresses.
+     * @throws {AgnostError} If there is an error retrieving the IP addresses.
+     */
+    async getClusterIPAddresses() {
+        try {
+            // Create a Kubernetes core API client
+            const kubeconfig = new k8s.KubeConfig();
+            kubeconfig.loadFromDefault();
+            const k8sApi = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+
+            const result = await k8sApi.readNamespacedIngress("platform-core-ingress", process.env.NAMESPACE);
+            const ingress = result.body;
+            return ingress.status.loadBalancer.ingress.map((ing) => ing.ip || ing.hostname);
+        } catch (err) {
+            throw new AgnostError(err.body?.message);
+        }
+    }
+
+    /**
+     * Initializes the certificate issuer.
+     * This function checks if the certificate issuer already exists, and if not, creates it.
+     * @returns {Promise<void>} A promise that resolves when the initialization is complete.
+     */
+    async initializeCertificateIssuer() {
+        // Create a Kubernetes core API client
+        const kubeconfig = new k8s.KubeConfig();
+        kubeconfig.loadFromDefault();
+        const customApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
+
+        try {
+            // Check to see if we have the certificate issuer already
+            await customApi.getNamespacedCustomObject(
+                "cert-manager.io",
+                "v1",
+                process.env.NAMESPACE,
+                "issuers",
+                "letsencrypt-issuer-cluster"
+            );
+
+            return;
+        } catch (err) {
+            // If we get a 404, we need to create the issuer
+            if (err.statusCode === 404) {
+                const issuer = {
+                    apiVersion: "cert-manager.io/v1",
+                    kind: "Issuer",
+                    metadata: {
+                        name: "letsencrypt-issuer-cluster",
+                        namespace: process.env.NAMESPACE,
+                    },
+                    spec: {
+                        acme: {
+                            privateKeySecretRef: {
+                                name: "letsencrypt-issuer-key",
+                            },
+                            server: "https://acme-v02.api.letsencrypt.org/directory",
+                            solvers: [
+                                {
+                                    http01: {
+                                        ingress: {
+                                            ingressClassName: "nginx",
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                };
+
+                await customApi.createNamespacedCustomObject(
+                    "cert-manager.io",
+                    "v1",
+                    process.env.NAMESPACE,
+                    "issuers",
+                    issuer
+                );
+            }
+        }
+    }
+
+    /**
+     * Adds a custom domain to a cluster ingress.
+     * @param {string} ingressName - The name of the ingress.
+     * @param {string} domainName - The domain name to be added.
+     * @returns {Promise<void>} - A promise that resolves when the custom domain is added successfully.
+     */
+    async addClusterCustomDomain(ingressName, domainName) {
+        try {
+            const kc = new k8s.KubeConfig();
+            kc.loadFromDefault();
+            const k8sExtensionsApi = kc.makeApiClient(k8s.NetworkingV1Api);
+
+            const ingress = await k8sExtensionsApi.readNamespacedIngress(ingressName, process.env.NAMESPACE);
+
+            ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
+            ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "true";
+            ingress.body.metadata.annotations["cert-manager.io/issuer"] = "letsencrypt-issuer-cluster";
+            if (ingress.body.spec.tls) {
+                ingress.body.spec.tls.push({
+                    hosts: [domainName],
+                    secretName: helper.getCertSecretName(),
+                });
+            } else {
+                ingress.body.spec.tls = [
+                    {
+                        hosts: [domainName],
+                        secretName: helper.getCertSecretName(),
+                    },
+                ];
+            }
+
+            const ruleCopy = JSON.parse(JSON.stringify(ingress.body.spec.rules[0]));
+            ruleCopy.host = domainName;
+            ingress.body.spec.rules.push(ruleCopy);
+
+            const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
+            await k8sExtensionsApi.patchNamespacedIngress(
+                ingressName,
+                process.env.NAMESPACE,
+                ingress.body,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                requestOptions
+            );
+        } catch (err) {
+            logger.error(`Cannot add custom domain '${domainName}' to ingress '${ingressName}'`, { details: err });
+        }
+    }
+
+    /**
+     * Deletes a custom domain from the cluster's ingress.
+     * @param {string} ingressName - The name of the ingress.
+     * @param {string} domainName - The domain name to be deleted.
+     * @returns {Promise<void>} - A promise that resolves when the custom domain is successfully deleted.
+     */
+    async deleteClusterCustomDomain(ingressName, domainName) {
+        try {
+            const kc = new k8s.KubeConfig();
+            kc.loadFromDefault();
+            const k8sExtensionsApi = kc.makeApiClient(k8s.NetworkingV1Api);
+            const ingress = await k8sExtensionsApi.readNamespacedIngress(ingressName, process.env.NAMESPACE);
+
+            // Remove tls entry
+            ingress.body.spec.tls = ingress.body.spec.tls.filter((tls) => tls.hosts[0] !== domainName);
+            // If we do not have any tls entry left then delete ssl related annotations
+            if (ingress.body.spec.tls.length === 0) {
+                delete ingress.body.spec.tls;
+                delete ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"];
+                delete ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"];
+                delete ingress.body.metadata.annotations["cert-manager.io/issuer"];
+            }
+
+            // Update rules
+            ingress.body.spec.rules = ingress.body.spec.rules.filter((rule) => rule.host !== domainName);
+
+            const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
+            await k8sExtensionsApi.replaceNamespacedIngress(
+                ingressName,
+                process.env.NAMESPACE,
+                ingress.body,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                requestOptions
+            );
+        } catch (err) {
+            logger.error(`Cannot remove custom domain '${domainName}' to ingress '${ingressName}'`, { details: err });
+        }
     }
 }

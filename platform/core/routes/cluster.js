@@ -9,6 +9,7 @@ import { authSession } from "../middlewares/authSession.js";
 import { handleError } from "../schemas/platformError.js";
 import { applyRules } from "../schemas/cluster.js";
 import { validate } from "../middlewares/validate.js";
+import { validateCluster } from "../middlewares/validateCluster.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { clusterComponents } from "../config/constants.js";
 import { sendMessage } from "../init/sync.js";
@@ -507,6 +508,154 @@ router.post(
 				timestamp: Date.now(),
 				data: req.body,
 			});
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/cluster/domains
+@method     POST
+@desc       Adds a custom domain to the cluster
+@access     public
+*/
+router.post(
+	"/domains",
+	checkContentType,
+	authSession,
+	validateCluster,
+	applyRules("add-domain"),
+	validate,
+	async (req, res) => {
+		try {
+			const { user, cluster } = req;
+			if (!user.isClusterOwner) {
+				return res.status(401).json({
+					error: t("Not Authorized"),
+					details: t(
+						"You are not authorized to add custom domain to the cluster. Only the cluster owner can manage cluster custom domains."
+					),
+					code: ERROR_CODES.unauthorized,
+				});
+			}
+
+			const domains = cluster.domains ?? [];
+			const { domain } = req.body;
+
+			if (domains.length >= config.get("general.maxClusterCustomDomains")) {
+				return res.status(401).json({
+					error: t("Not Allowed"),
+					details: t(
+						"You can add maximum '%s' custom domains to a cluster.",
+						config.get("general.maxClusterCustomDomains")
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// Get all ingresses that will be impacted
+			const apiServers = await resourceCtrl.getManyByQuery({
+				instance: "API Server",
+			});
+
+			const ingresses = [
+				"engine-realtime-ingress",
+				"platform-core-ingress",
+				"platform-sync-ingress",
+				"studio-ingress",
+				...apiServers.map((entry) => `${entry.iid}-ingress`),
+			];
+
+			// Update ingresses
+			await axios.post(
+				config.get("general.workerUrl") + "/v1/resource/cluster-domains-add",
+				{ domain, ingresses },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			// Update cluster domains information
+			let updatedCluster = await clsCtrl.updateOneById(cluster._id, {
+				domains: [...domains, domain],
+			});
+
+			res.json(updatedCluster);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/cluster/domains
+@method     DELETE
+@desc       Removes a custom domain from the cluster
+@access     public
+*/
+router.delete(
+	"/domains",
+	checkContentType,
+	authSession,
+	validateCluster,
+	applyRules("delete-domain"),
+	validate,
+	async (req, res) => {
+		try {
+			const { user, cluster } = req;
+			if (!user.isClusterOwner) {
+				return res.status(401).json({
+					error: t("Not Authorized"),
+					details: t(
+						"You are not authorized to manage custom domains of the cluster. Only the cluster owner can manage cluster custom domains."
+					),
+					code: ERROR_CODES.unauthorized,
+				});
+			}
+
+			const domains = cluster.domains ?? [];
+			const { domain } = req.body;
+
+			// Get all ingresses that will be impacted
+			const apiServers = await resourceCtrl.getManyByQuery({
+				instance: "API Server",
+			});
+
+			const ingresses = [
+				"engine-realtime-ingress",
+				"platform-core-ingress",
+				"platform-sync-ingress",
+				"studio-ingress",
+				...apiServers.map((entry) => `${entry.iid}-ingress`),
+			];
+
+			// Update ingresses
+			await axios.post(
+				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
+				{ domain, ingresses },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			// Update cluster domains information
+			let updatedCluster = await clsCtrl.updateOneByQuery(
+				{
+					clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+				},
+				{
+					domains: domains.filter((entry) => entry !== domain),
+				}
+			);
+
+			res.json(updatedCluster);
 		} catch (error) {
 			handleError(req, res, error);
 		}

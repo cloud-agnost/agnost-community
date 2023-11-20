@@ -71,16 +71,19 @@ export const handleError = (req, res, error) => {
 		stack: error.stack,
 	};
 
-	if (error.name === "CastError") {
-		entry.error = t("Not Found");
-		entry.details = t("The object identifier is not recognized.");
-		res.status(400).json(entry);
-	} else {
-		entry.error = t("Internal Server Error");
-		entry.details = t(
-			"The server has encountered a situation it does not know how to handle."
-		);
-		res.status(500).json(entry);
+	if (!res.headersSent) {
+		if (error.name === "CastError") {
+			entry.error = t("Not Found");
+			entry.details = t("The object identifier is not recognized.");
+			res.status(400).json(entry);
+		} else {
+			entry.error = t("Internal Server Error");
+			entry.details = t(
+				"The server has encountered a situation it does not know how to handle. %s",
+				error.message
+			);
+			res.status(500).json(entry);
+		}
 	}
 
 	// Log also the error message in console

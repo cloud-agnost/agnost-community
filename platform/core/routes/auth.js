@@ -97,6 +97,7 @@ router.post(
 						releaseHistory: [
 							{ release: process.env.RELEASE_NUMBER, timestamp: Date.now() },
 						],
+						ips: await helper.getClusterIPs(),
 						createdBy: userId,
 					},
 					{ session }
@@ -113,6 +114,7 @@ router.post(
 						releaseHistory: [
 							{ release: process.env.RELEASE_NUMBER, timestamp: Date.now() },
 						],
+						ips: await helper.getClusterIPs(),
 						createdBy: userId,
 					},
 					{},

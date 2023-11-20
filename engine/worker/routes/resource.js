@@ -70,7 +70,6 @@ router.post("/cluster-info", checkContentType, authAccessToken, async (req, res)
 */
 router.post("/cluster-versions", checkContentType, authAccessToken, async (req, res) => {
     try {
-        console.log("***here", req.body);
         res.json();
 
         const updates = req.body;
@@ -97,6 +96,66 @@ router.get("/apiserver/:envId", authAccessToken, async (req, res) => {
         const apiServerInfo = await manager.getAPIServerInfo(envId);
 
         res.json(apiServerInfo);
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
+@route      /resource/cluster-ip
+@method     GET
+@desc       Returns the cluster IP addresses
+@access     public
+*/
+router.get("/cluster-ip", authAccessToken, async (req, res) => {
+    try {
+        let manager = new ResourceManager(null);
+        const ips = await manager.getClusterIPAddresses();
+
+        res.json(ips);
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
+@route      /resource/cluster-domains
+@method     POST
+@desc       Adds a new cluster custom domain
+@access     public
+*/
+router.post("/cluster-domains-add", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        console.log(req.body);
+        res.json();
+
+        const { domain, ingresses } = req.body;
+        let manager = new ResourceManager(null);
+        await manager.initializeCertificateIssuer();
+        for (const ingress of ingresses) {
+            await manager.addClusterCustomDomain(ingress, domain);
+        }
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
+@route      /resource/cluster-domains
+@method     POST
+@desc       Deletes a cluster custom domain
+@access     public
+*/
+router.post("/cluster-domains-delete", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        console.log(req.body);
+        res.json();
+
+        const { domain, ingresses } = req.body;
+        let manager = new ResourceManager(null);
+        for (const ingress of ingresses) {
+            await manager.deleteClusterCustomDomain(ingress, domain);
+        }
     } catch (error) {
         helper.handleError(req, res, error);
     }

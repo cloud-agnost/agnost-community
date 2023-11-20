@@ -1048,11 +1048,6 @@ function getDeploymentInfo(component, deployments) {
 
 	if (deployment) {
 		const { status } = deployment;
-		console.log("***monitor", component.deploymentName);
-		console.log("***updatedReplicas", status.updatedReplicas);
-		console.log("***replicas", status.replicas);
-		console.log("***availableReplicas", status.availableReplicas);
-		console.log("***readyReplicas", status.readyReplicas);
 
 		return {
 			name: component.deploymentName,
