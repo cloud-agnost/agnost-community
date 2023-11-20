@@ -1,7 +1,6 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
 import { InstanceType } from '@/components/InstanceType';
-import { Redis } from '@/components/icons';
 import { BADGE_COLOR_MAP } from '@/constants';
 import useCacheStore from '@/store/cache/cacheStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
@@ -64,7 +63,7 @@ const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 				original: { iid },
 			},
 		}) => {
-			return <InstanceType iid={iid} Icon={Redis} />;
+			return <InstanceType iid={iid} />;
 		},
 	},
 	{

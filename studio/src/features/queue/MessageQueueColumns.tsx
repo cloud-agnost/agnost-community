@@ -86,11 +86,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 				original: { iid },
 			},
 		}) => {
-			const environment = useEnvironmentStore.getState().environment;
-			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)?.resource
-				.instance;
-			const Icon = QUEUE_ICON_MAP[instance as string];
-			return <InstanceType iid={iid} Icon={Icon} />;
+			return <InstanceType iid={iid} />;
 		},
 	},
 	{
