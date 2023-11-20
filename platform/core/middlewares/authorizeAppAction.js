@@ -49,6 +49,11 @@ export const appAuthorization = {
 				auth: {
 					update: true,
 				},
+				domain: {
+					view: true,
+					create: true,
+					delete: true,
+				},
 			},
 			db: {
 				view: true,
@@ -170,6 +175,11 @@ export const appAuthorization = {
 				auth: {
 					update: true,
 				},
+				domain: {
+					view: true,
+					create: true,
+					delete: true,
+				},
 			},
 			db: {
 				view: true,
@@ -290,6 +300,11 @@ export const appAuthorization = {
 				},
 				auth: {
 					update: false,
+				},
+				domain: {
+					view: true,
+					create: false,
+					delete: false,
 				},
 			},
 			db: {

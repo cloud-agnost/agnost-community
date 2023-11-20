@@ -169,6 +169,10 @@ async function initExpress(i18n) {
 		"/v1/org/:orgId/app/:appId/version/:versionId/cache",
 		(await import("./routes/cache.js")).default
 	);
+	app.use(
+		"/v1/org/:orgId/app/:appId/version/:versionId/domain",
+		(await import("./routes/domain.js")).default
+	);
 
 	// Middleware to handle undefined paths or posts
 	app.use(handleUndefinedPaths);

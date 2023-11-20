@@ -1282,12 +1282,12 @@ export class ResourceManager {
     }
 
     /**
-     * Deletes a custom domain from the cluster's ingress.
+     * Deletes custom domains from a cluster's ingress.
      * @param {string} ingressName - The name of the ingress.
-     * @param {string} domainName - The domain name to be deleted.
-     * @returns {Promise<void>} - A promise that resolves when the custom domain is successfully deleted.
+     * @param {string[]} domainNames - An array of domain names to be deleted.
+     * @returns {Promise<void>} - A promise that resolves when the custom domains are deleted successfully, or rejects with an error.
      */
-    async deleteClusterCustomDomain(ingressName, domainName) {
+    async deleteClusterCustomDomains(ingressName, domainNames) {
         try {
             const kc = new k8s.KubeConfig();
             kc.loadFromDefault();
@@ -1295,7 +1295,7 @@ export class ResourceManager {
             const ingress = await k8sExtensionsApi.readNamespacedIngress(ingressName, process.env.NAMESPACE);
 
             // Remove tls entry
-            ingress.body.spec.tls = ingress.body.spec.tls.filter((tls) => tls.hosts[0] !== domainName);
+            ingress.body.spec.tls = ingress.body.spec.tls.filter((tls) => !domainNames.includes(tls.hosts[0]));
             // If we do not have any tls entry left then delete ssl related annotations
             if (ingress.body.spec.tls.length === 0) {
                 delete ingress.body.spec.tls;
@@ -1305,7 +1305,7 @@ export class ResourceManager {
             }
 
             // Update rules
-            ingress.body.spec.rules = ingress.body.spec.rules.filter((rule) => rule.host !== domainName);
+            ingress.body.spec.rules = ingress.body.spec.rules.filter((rule) => !domainNames.includes(rule.host));
 
             const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
             await k8sExtensionsApi.replaceNamespacedIngress(
@@ -1320,7 +1320,9 @@ export class ResourceManager {
                 requestOptions
             );
         } catch (err) {
-            logger.error(`Cannot remove custom domain '${domainName}' to ingress '${ingressName}'`, { details: err });
+            logger.error(`Cannot remove custom domain(s) '${domainNames.join(", ")}' to ingress '${ingressName}'`, {
+                details: err,
+            });
         }
     }
 }
