@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: provisioner-role
-  namespace: default
+  namespace: yoda
 rules:
   - apiGroups: [""]
     resources: ["pods", "configmaps", "secrets", "services", "serviceaccounts", "namespaces", "persistentvolumeclaims"]
