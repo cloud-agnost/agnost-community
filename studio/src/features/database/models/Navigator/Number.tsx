@@ -1,15 +1,17 @@
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { useUpdateData } from '@/hooks';
+import { useEditedField, useUpdateData } from '@/hooks';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { NavigatorComponentProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-export default function NumberField({ isEditable, row, field }: NavigatorComponentProps) {
+export default function NumberField({ cell, row, field }: NavigatorComponentProps) {
 	const { setEditedField } = useNavigatorStore();
 	const updateData = useUpdateData(field);
 	const data = row?.original;
+	const isEditable = useEditedField(field, cell);
 	const NumberSchema = z.object({
 		[field.name]: z.coerce.number().optional(),
 	});
@@ -23,6 +25,11 @@ export default function NumberField({ isEditable, row, field }: NavigatorCompone
 	function onSubmit(d: z.infer<typeof NumberSchema>) {
 		updateData(d, data.id, row?.index as number);
 	}
+	useEffect(() => {
+		if (isEditable) {
+			form.setValue(field.name, data[field.name]);
+		}
+	}, [isEditable]);
 	return isEditable ? (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)}>

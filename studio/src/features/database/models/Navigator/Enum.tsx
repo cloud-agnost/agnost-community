@@ -1,16 +1,18 @@
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
-import { useUpdateData } from '@/hooks';
+import { useEditedField, useUpdateData } from '@/hooks';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { NavigatorComponentProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-export default function Enum({ isEditable, row, field: dbField }: NavigatorComponentProps) {
+export default function Enum({ cell, row, field: dbField }: NavigatorComponentProps) {
 	const updateData = useUpdateData(dbField);
 	const { t } = useTranslation();
 	const { setEditedField } = useNavigatorStore();
+	const isEditable = useEditedField(dbField, cell);
 	const data = row?.original;
 	const EnumSchema = z.object({
 		[dbField.name]: z
@@ -36,6 +38,12 @@ export default function Enum({ isEditable, row, field: dbField }: NavigatorCompo
 			row?.index as number,
 		);
 	}
+
+	useEffect(() => {
+		if (isEditable) {
+			form.setValue(dbField.name, data[dbField.name]);
+		}
+	}, [isEditable]);
 	return isEditable ? (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)}>

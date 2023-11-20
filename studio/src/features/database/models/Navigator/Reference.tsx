@@ -7,16 +7,18 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import * as z from 'zod';
 import { Input } from '@/components/Input';
 import { useForm } from 'react-hook-form';
-import { useUpdateData } from '@/hooks';
+import { useEditedField, useUpdateData } from '@/hooks';
 import useNavigatorStore from '@/store/database/navigatorStore';
-export default function Reference({ isEditable, row, field }: NavigatorComponentProps) {
+export default function Reference({ cell, row, field }: NavigatorComponentProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const data = row?.original;
+	const isEditable = useEditedField(field, cell);
 	const { models, setModel } = useModelStore();
 	const { setEditedField } = useNavigatorStore();
 	const updateData = useUpdateData(field);
 	useEffect(() => {
-		if (searchParams.get('ref') === data[field.name]) {
+		if (searchParams.get('ref') && searchParams.get('ref') === data[field.name]) {
+			console.log('here');
 			setModel(models.find((m) => m.iid === field.reference?.iid) as Model);
 		}
 	}, [searchParams]);
@@ -34,7 +36,11 @@ export default function Reference({ isEditable, row, field }: NavigatorComponent
 	function onSubmit(d: z.infer<typeof ReferenceSchema>) {
 		updateData(d, data.id, row?.index as number);
 	}
-
+	useEffect(() => {
+		if (isEditable) {
+			form.setValue(field.name, data[field.name]);
+		}
+	}, [isEditable]);
 	return isEditable ? (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)}>

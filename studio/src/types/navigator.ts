@@ -1,12 +1,7 @@
-import { Row } from '@tanstack/react-table';
-import { BaseRequest, Field } from '.';
+import { Cell, Row } from '@tanstack/react-table';
+import { BaseGetRequest, BaseRequest, Field } from '.';
 
-export type GetDataFromModelParams = {
-	page?: number;
-	limit?: number;
-	sortBy?: string;
-	sortDir?: 'asc' | 'desc';
-	search?: string;
+export type GetDataFromModelParams = BaseGetRequest & {
 	id?: string;
 };
 
@@ -22,8 +17,8 @@ export interface UpdateDataFromModelParams extends BaseRequest {
 	data: any;
 }
 export type NavigatorComponentProps = {
-	isEditable?: boolean;
 	field: Field;
 	parentId?: string;
 	row?: Row<any>;
+	cell: Cell<any, any>;
 };

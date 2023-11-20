@@ -1,7 +1,7 @@
 import { Badge } from '@/components/Badge';
 import { Switch } from '@/components/Switch';
 import { BADGE_COLOR_MAP } from '@/constants';
-import { useUpdateData } from '@/hooks';
+import { useEditedField, useUpdateData } from '@/hooks';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { NavigatorComponentProps } from '@/types';
 import { capitalize } from '@/utils';
@@ -10,11 +10,13 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from 'components/
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useTranslation } from 'react-i18next';
-export default function BooleanField({ isEditable, row, field }: NavigatorComponentProps) {
+import { useEffect } from 'react';
+export default function BooleanField({ cell, row, field }: NavigatorComponentProps) {
 	const name = field.name;
 	const { t } = useTranslation();
 	const data = row?.original;
 	const { setEditedField } = useNavigatorStore();
+	const isEditable = useEditedField(field, cell);
 	const label = data[name] ? t('general.yes') : t('general.no');
 	const updateData = useUpdateData(field);
 	const BooleanSchema = z.object({
@@ -31,6 +33,12 @@ export default function BooleanField({ isEditable, row, field }: NavigatorCompon
 	const onSubmit = async (d: z.infer<typeof BooleanSchema>) => {
 		updateData(d, data.id, row?.index as number);
 	};
+
+	useEffect(() => {
+		if (isEditable) {
+			form.setValue(name, data[name]);
+		}
+	}, [isEditable]);
 	return isEditable ? (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)}>
