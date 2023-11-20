@@ -37,6 +37,7 @@ export interface VersionLog {
 	epId?: string;
 	message: any;
 	errors: any;
+	responseBody: object;
 }
 
 export interface GetVersionLogsParams extends BaseGetRequest, BaseParams {
