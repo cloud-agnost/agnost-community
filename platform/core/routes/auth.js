@@ -93,6 +93,11 @@ router.post(
 						clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
 						masterToken: process.env.MASTER_TOKEN,
 						accessToken: process.env.ACCESS_TOKEN,
+						release: process.env.RELEASE_NUMBER,
+						releaseHistory: [
+							{ release: process.env.RELEASE_NUMBER, timestamp: Date.now() },
+						],
+						ips: await helper.getClusterIPs(),
 						createdBy: userId,
 					},
 					{ session }
@@ -105,6 +110,11 @@ router.post(
 						clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
 						masterToken: process.env.MASTER_TOKEN,
 						accessToken: process.env.ACCESS_TOKEN,
+						release: process.env.RELEASE_NUMBER,
+						releaseHistory: [
+							{ release: process.env.RELEASE_NUMBER, timestamp: Date.now() },
+						],
+						ips: await helper.getClusterIPs(),
 						createdBy: userId,
 					},
 					{},

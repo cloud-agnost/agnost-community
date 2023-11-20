@@ -159,6 +159,7 @@ class ConnectionManager {
 
                     //Connect to the database of the application
                     await client.connect();
+                    client.on("error", (err) => {});
                     this.addConnection(id, client);
 
                     return client;

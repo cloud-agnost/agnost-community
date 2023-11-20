@@ -98,6 +98,8 @@ export default async function monitorResources() {
 			pageNumber++;
 			resources = await getResources(pageNumber, pageSize);
 		}
+
+		await checkClusterResourceStatus();
 	} catch (err) {
 		logger.error(t("Cannot fetch cluster resources"), err);
 	}
@@ -234,7 +236,12 @@ async function checkResourceStatus(resource) {
 				let result = await checkAPIServer(resource.access);
 				if (result === null) return null;
 				return {
-					status: result.availableReplicas > 0 ? "OK" : "Idle",
+					status:
+						result.availableReplicas > 0
+							? result.updating
+								? "Updating"
+								: "OK"
+							: "Idle",
 					availableReplicas: result.availableReplicas,
 					logs: [
 						{
@@ -707,7 +714,31 @@ async function checkAPIServer(connSettings) {
 			totalAvailable += availableReplicas;
 		}
 
-		return { availableReplicas: totalAvailable };
+		const response = await k8sApi.getNamespacedCustomObject(
+			"serving.knative.dev",
+			"v1",
+			process.env.NAMESPACE,
+			"services",
+			connSettings.name
+		);
+
+		const serviceStatus = response.body.status;
+		const latestCreatedRevisionName = serviceStatus.latestCreatedRevisionName;
+		const latestReadyRevisionName = serviceStatus.latestReadyRevisionName;
+
+		// Wheck whether the knative service is in update mode (e.g., image tag update etc. due to version changes)
+		let updating = false;
+		if (
+			latestCreatedRevisionName === latestReadyRevisionName &&
+			serviceStatus.conditions
+		) {
+			const readyCondition = serviceStatus.conditions.find(
+				(c) => c.type === "Ready"
+			);
+			if (readyCondition && readyCondition.status === "True") updating = false;
+		} else updating = true;
+
+		return { availableReplicas: totalAvailable, updating };
 	} catch (err) {
 		return await checkDeployment(connSettings.name);
 	}
@@ -934,5 +965,144 @@ async function checkKafkaConnection(connSettings) {
 		throw new AgnostError(
 			t("Cannot establish connection to Apache Kafka. %s", err.message)
 		);
+	}
+}
+
+// List of all cluster resources
+export const clusterComponentsAll = [
+	{
+		deploymentName: "engine-worker-deployment",
+		hpaName: "engine-worker-hpa",
+	},
+	{
+		deploymentName: "engine-realtime-deployment",
+		hpaName: "engine-realtime-hpa",
+	},
+	{
+		deploymentName: "engine-monitor-deployment",
+	},
+	{
+		deploymentName: "engine-scheduler-deployment",
+	},
+	{
+		deploymentName: "platform-core-deployment",
+		hpaName: "platform-core-hpa",
+	},
+	{
+		deploymentName: "platform-sync-deployment",
+		hpaName: "platform-sync-hpa",
+	},
+	{
+		deploymentName: "platform-worker-deployment",
+		hpaName: "platform-worker-hpa",
+	},
+	{
+		deploymentName: "studio-deployment",
+		hpaName: "studio-hpa",
+	},
+];
+
+/**
+ * Get cluster information
+ */
+async function getClusterInfo() {
+	let dbClient = getDBClient();
+
+	return await dbClient
+		.db("agnost")
+		.collection("clusters")
+		.findOne({ masterToken: process.env.MASTER_TOKEN });
+}
+
+/**
+ * Checks and updates cluster resource status
+ */
+async function checkClusterResourceStatus() {
+	const clusterInfo = [];
+	const clusterComponents = (await import("./clusterComponents.js"))
+		.clusterComponents;
+
+	const k8sApi = kubeconfig.makeApiClient(k8s.AppsV1Api);
+	try {
+		let deployments = await k8sApi.listNamespacedDeployment(
+			process.env.NAMESPACE
+		);
+
+		for (const comp of clusterComponents) {
+			clusterInfo.push(getDeploymentInfo(comp, deployments.body.items));
+		}
+
+		await upadateClusterDeploymentsStatus(clusterInfo);
+	} catch (err) {
+		throw new AgnostError(err.body?.message);
+	}
+}
+
+/**
+ * Returns information about a specific Agnost cluster default deployment
+ */
+function getDeploymentInfo(component, deployments) {
+	const deployment = deployments.find(
+		(entry) => entry.metadata.name === component.deploymentName
+	);
+
+	if (deployment) {
+		const { status } = deployment;
+
+		return {
+			name: component.deploymentName,
+			status:
+				status.availableReplicas === 0
+					? "Error"
+					: status.updatedReplicas === status.replicas &&
+					  status.replicas === status.availableReplicas &&
+					  status.availableReplicas === status.readyReplicas
+					? "OK"
+					: "Updating",
+		};
+	} else {
+		return {
+			name: component.deploymentName,
+			status: "Error",
+		};
+	}
+}
+
+/**
+ * Updates the status of the cluster's default deployment resources
+ * @param  {Array} deploymentsStatusInfo The status info of each default deployment of the cluster
+ */
+async function upadateClusterDeploymentsStatus(deploymentsStatusInfo) {
+	// First get the cluster info
+	const clusterInfo = await getClusterInfo();
+	const existingStatus = clusterInfo.clusterResourceStatus ?? [];
+
+	let statusChanged = false;
+	// Check to see if status of deployments has changed
+	for (const entry of deploymentsStatusInfo) {
+		const existingEntry = existingStatus.find(
+			(entry2) => entry2.name === entry.name
+		);
+		if (!existingEntry || existingEntry.status !== entry.status) {
+			statusChanged = true;
+			break;
+		}
+	}
+
+	// Update status if there is change
+	if (statusChanged) {
+		//Make api call to the platform to log the error message
+		axios
+			.post(
+				config.get("general.platformBaseUrl") + "/v1/cluster/update-status",
+				deploymentsStatusInfo,
+				{
+					headers: {
+						Authorization: process.env.MASTER_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			)
+			.catch((error) => {});
 	}
 }

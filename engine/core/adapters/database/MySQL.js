@@ -700,8 +700,8 @@ export class MySQL extends SQLDatabase {
 
 		const values = Object.values(data);
 
-		console.log("***sql", insertQuery);
-		console.log("***values", values);
+		// console.log("***sql", insertQuery);
+		// console.log("***values", values);
 
 		// Execute the INSERT query
 		const [insertResult] = await this.getDriver().query(insertQuery, values);
@@ -740,8 +740,8 @@ export class MySQL extends SQLDatabase {
 
 			const values = data.flatMap((entry) => Object.values(entry));
 
-			console.log("***sql", insertQuery);
-			console.log("***values", values);
+			// // console.log("***sql", insertQuery);
+			// // console.log("***values", values);
 
 			// Execute the INSERT query
 			const [insertResult] = await this.getDriver().query(insertQuery, values);
@@ -779,7 +779,7 @@ export class MySQL extends SQLDatabase {
 					WHERE ${modelMeta.name}.${idField.name} = ${this.getIdSQLValue(options.id)};
 				  `;
 
-		console.log("***sql", selectQuery);
+		// // console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
 		const [rows] = await this.getDriver().query(selectQuery);
@@ -822,7 +822,7 @@ export class MySQL extends SQLDatabase {
 		selectQuery = `${selectQuery}\nLIMIT ${limit}`;
 		selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-		console.log("***sql", selectQuery);
+		// // console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
 		const [rows] = await this.getDriver().query(selectQuery);
@@ -865,7 +865,7 @@ export class MySQL extends SQLDatabase {
 		if (limit) selectQuery = `${selectQuery}\nLIMIT ${limit}`;
 		if (offset) selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-		console.log("***sql", selectQuery);
+		// // console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
 		const [rows] = await this.getDriver().query(selectQuery);
@@ -890,7 +890,7 @@ export class MySQL extends SQLDatabase {
 					WHERE ${idField.name} = ${this.getIdSQLValue(options.id)};
 				  `;
 
-		console.log("***sql", deleteQuery);
+		// console.log("***sql", deleteQuery);
 
 		// Execute the DELETE query
 		const [deleteResult] = await this.getDriver().query(deleteQuery);
@@ -925,7 +925,7 @@ export class MySQL extends SQLDatabase {
 			selectQuery = `${selectQuery}\nLIMIT ${limit}`;
 			selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-			console.log("***sql", selectQuery);
+			// console.log("***sql", selectQuery);
 
 			// Execute the SELECT query
 			const [rows] = await this.getDriver().query(selectQuery);
@@ -943,7 +943,7 @@ export class MySQL extends SQLDatabase {
 			if (where) deleteQuery = `${deleteQuery}\nWHERE ${where}`;
 			deleteQuery = `${deleteQuery}\nLIMIT 1;`;
 
-			console.log("***sql", deleteQuery);
+			// console.log("***sql", deleteQuery);
 
 			// Execute the UPDATE query
 			const [deleteResult] = await this.getDriver().query(deleteQuery);
@@ -977,7 +977,7 @@ export class MySQL extends SQLDatabase {
 			selectQuery = `${selectQuery}\nWHERE ${where}`;
 			selectQuery = `${selectQuery}\nGROUP BY ${select}`;
 
-			console.log("***sql", selectQuery);
+			// console.log("***sql", selectQuery);
 
 			// Execute the SELECT query
 			const [entries] = await this.getDriver().query(selectQuery);
@@ -993,7 +993,7 @@ export class MySQL extends SQLDatabase {
 						WHERE ${idField.name} IN (${ids.join(", ")});
 					`;
 
-			console.log("***sql", deleteQuery);
+			// console.log("***sql", deleteQuery);
 
 			// Execute the DELETE query
 			const [deleteResult] = await this.getDriver().query(deleteQuery);
@@ -1005,7 +1005,7 @@ export class MySQL extends SQLDatabase {
 			let deleteQuery = `DELETE FROM ${from} AS ${modelMeta.name}`;
 			if (where) deleteQuery = `${deleteQuery}\nWHERE ${where};`;
 
-			console.log("***sql", deleteQuery);
+			// console.log("***sql", deleteQuery);
 
 			// Execute the UPDATE query
 			const [deleteResult] = await this.getDriver().query(deleteQuery);
@@ -1041,8 +1041,8 @@ export class MySQL extends SQLDatabase {
 						SET ${updates}
 						WHERE ${idField.name} = ${this.getIdSQLValue(options.id)};`;
 
-		console.log("***sql", updateQuery);
-		console.log("***values", values);
+		// console.log("***sql", updateQuery);
+		// console.log("***values", values);
 
 		// Execute the UPDATE query
 		const [updateResult] = await this.getDriver().query(updateQuery, values);
@@ -1086,7 +1086,7 @@ export class MySQL extends SQLDatabase {
 		selectQuery = `${selectQuery}\nLIMIT ${limit}`;
 		selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-		console.log("***sql", selectQuery);
+		// console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
 		const [rows] = await this.getDriver().query(selectQuery);
@@ -1128,7 +1128,7 @@ export class MySQL extends SQLDatabase {
 			selectQuery = `${selectQuery}\nWHERE ${where}`;
 			selectQuery = `${selectQuery}\nGROUP BY ${select}`;
 
-			console.log("***sql", selectQuery);
+			// console.log("***sql", selectQuery);
 
 			// Execute the SELECT query
 			const [selectRows] = await this.getDriver().query(selectQuery);
@@ -1146,8 +1146,8 @@ export class MySQL extends SQLDatabase {
 						WHERE ${idField.name} IN (${ids.join(", ")});
 					`;
 
-			console.log("***sql", updateQuery);
-			console.log("***values", values);
+			// console.log("***sql", updateQuery);
+			// console.log("***values", values);
 
 			// Execute the UPDATE query
 			const [updateResult] = await this.getDriver().query(updateQuery, values);
@@ -1162,8 +1162,8 @@ export class MySQL extends SQLDatabase {
 					`;
 			if (where) updateQuery = `${updateQuery}\nWHERE ${where};`;
 
-			console.log("***sql", updateQuery);
-			console.log("***values", values);
+			// console.log("***sql", updateQuery);
+			// console.log("***values", values);
 
 			// Execute the UPDATE query
 			const [updateResult] = await this.getDriver().query(updateQuery, values);
@@ -1212,7 +1212,7 @@ export class MySQL extends SQLDatabase {
 		if (limit) selectQuery = `${selectQuery}\nLIMIT ${limit}`;
 		if (offset) selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-		console.log("***sql", selectQuery);
+		// console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
 		const [rows] = await this.getDriver().query(selectQuery);
@@ -1259,7 +1259,7 @@ export class MySQL extends SQLDatabase {
 		if (limit) aggregateQuery = `${aggregateQuery}\nLIMIT ${limit}`;
 		if (offset) aggregateQuery = `${aggregateQuery}\nOFFSET ${offset};`;
 
-		console.log("***sql", aggregateQuery);
+		// console.log("***sql", aggregateQuery);
 
 		// Execute the SELECT query
 		const [rows] = await this.getDriver().query(aggregateQuery);

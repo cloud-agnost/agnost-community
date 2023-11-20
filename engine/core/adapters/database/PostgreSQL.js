@@ -490,10 +490,10 @@ export class PostgreSQL extends SQLDatabase {
 	 * @param  {object} where The where expression
 	 * @returns  The WHERE query string
 	 */
-	getWhereDefinition(where) {
+	getWhereDefinition(where, paretModelFieldFiller = null) {
 		if (!where) return null;
 
-		return where.getQuery("PostgreSQL");
+		return where.getQuery("PostgreSQL", paretModelFieldFiller);
 	}
 
 	/**
@@ -688,8 +688,8 @@ export class PostgreSQL extends SQLDatabase {
 
 		const values = Object.values(data);
 
-		console.log("***sql", insertQuery);
-		console.log("***values", values);
+		// console.log("***sql", insertQuery);
+		// console.log("***values", values);
 
 		// Execute the INSERT query
 		const result = await this.getDriver().query(insertQuery, values);
@@ -721,8 +721,8 @@ export class PostgreSQL extends SQLDatabase {
 
 			const values = data.flatMap((entry) => Object.values(entry));
 
-			console.log("***sql", insertQuery);
-			console.log("***values", values);
+			// console.log("***sql", insertQuery);
+			// console.log("***values", values);
 
 			// Execute the INSERT query
 			const result = await this.getDriver().query(insertQuery, values);
@@ -760,7 +760,7 @@ export class PostgreSQL extends SQLDatabase {
 					WHERE ${modelMeta.name}.${idField.name} = ${this.getIdSQLValue(options.id)};
 				  `;
 
-		console.log("***sql", selectQuery);
+		// console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
 		const result = await this.getDriver().query(selectQuery);
@@ -803,7 +803,7 @@ export class PostgreSQL extends SQLDatabase {
 		selectQuery = `${selectQuery}\nLIMIT ${limit}`;
 		selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-		console.log("***sql", selectQuery);
+		// console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
 		const result = await this.getDriver().query(selectQuery);
@@ -819,7 +819,6 @@ export class PostgreSQL extends SQLDatabase {
 	 * @returns  The fetched records otherwise an empty array [] if no records can be found
 	 */
 	async findMany(dbMeta, modelMeta, options) {
-		console.log("***here1");
 		const from = this.getTableName(dbMeta, modelMeta);
 		const select = this.getJoinLookupSelectDefinition(
 			dbMeta,
@@ -848,7 +847,7 @@ export class PostgreSQL extends SQLDatabase {
 		if (limit) selectQuery = `${selectQuery}\nLIMIT ${limit}`;
 		if (offset) selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-		console.log("***sql", selectQuery);
+		// console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
 		const result = await this.getDriver().query(selectQuery);
@@ -873,7 +872,7 @@ export class PostgreSQL extends SQLDatabase {
 					WHERE ${idField.name} = ${this.getIdSQLValue(options.id)};
 				  `;
 
-		console.log("***sql", deleteQuery);
+		// console.log("***sql", deleteQuery);
 
 		// Execute the DELETE query
 		const result = await this.getDriver().query(deleteQuery);
@@ -908,7 +907,7 @@ export class PostgreSQL extends SQLDatabase {
 			selectQuery = `${selectQuery}\nLIMIT ${limit}`;
 			selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-			console.log("***sql", selectQuery);
+			// console.log("***sql", selectQuery);
 
 			// Execute the SELECT query
 			const result = await this.getDriver().query(selectQuery);
@@ -930,7 +929,7 @@ export class PostgreSQL extends SQLDatabase {
 			USING (SELECT ${idField.name} FROM ${from} AS ${modelMeta.name} WHERE ${where} LIMIT 1) AS subquery
 			WHERE ${from}.${idField.name} = subquery.${idField.name} ;`;
 
-			console.log("***sql", deleteQuery);
+			// console.log("***sql", deleteQuery);
 
 			// Execute the DELETE query
 			const result = await this.getDriver().query(deleteQuery);
@@ -964,7 +963,7 @@ export class PostgreSQL extends SQLDatabase {
 			selectQuery = `${selectQuery}\nWHERE ${where}`;
 			selectQuery = `${selectQuery}\nGROUP BY ${select}`;
 
-			console.log("***sql", selectQuery);
+			// console.log("***sql", selectQuery);
 
 			// Execute the SELECT query
 			const selectResult = await this.getDriver().query(selectQuery);
@@ -984,7 +983,7 @@ export class PostgreSQL extends SQLDatabase {
 						WHERE ${idField.name} IN (${ids.join(", ")});
 					`;
 
-			console.log("***sql", deleteQuery);
+			// console.log("***sql", deleteQuery);
 
 			// Execute the DELETE query
 			const result = await this.getDriver().query(deleteQuery);
@@ -996,7 +995,7 @@ export class PostgreSQL extends SQLDatabase {
 			let deleteQuery = `DELETE FROM ${from} AS ${modelMeta.name}`;
 			if (where) deleteQuery = `${deleteQuery}\nWHERE ${where};`;
 
-			console.log("***sql", deleteQuery);
+			// console.log("***sql", deleteQuery);
 
 			// Execute the DELETE query
 			const result = await this.getDriver().query(deleteQuery);
@@ -1034,8 +1033,8 @@ export class PostgreSQL extends SQLDatabase {
 						RETURNING ${select};
 					`;
 
-		console.log("***sql", updateQuery);
-		console.log("***values", values);
+		// console.log("***sql", updateQuery);
+		// console.log("***values", values);
 
 		// Execute the UPDATE query
 		const result = await this.getDriver().query(updateQuery, values);
@@ -1069,7 +1068,7 @@ export class PostgreSQL extends SQLDatabase {
 		selectQuery = `${selectQuery}\nLIMIT ${limit}`;
 		selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-		console.log("***sql", selectQuery);
+		// console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
 		const result = await this.getDriver().query(selectQuery);
@@ -1115,7 +1114,7 @@ export class PostgreSQL extends SQLDatabase {
 			selectQuery = `${selectQuery}\nWHERE ${where}`;
 			selectQuery = `${selectQuery}\nGROUP BY ${select}`;
 
-			console.log("***sql", selectQuery);
+			// console.log("***sql", selectQuery);
 
 			// Execute the SELECT query
 			const selectResult = await this.getDriver().query(selectQuery);
@@ -1135,8 +1134,8 @@ export class PostgreSQL extends SQLDatabase {
 						WHERE ${idField.name} IN (${ids.join(", ")});
 					`;
 
-			console.log("***sql", updateQuery);
-			console.log("***values", values);
+			// console.log("***sql", updateQuery);
+			// console.log("***values", values);
 
 			// Execute the UPDATE query
 			const result = await this.getDriver().query(updateQuery, values);
@@ -1151,8 +1150,8 @@ export class PostgreSQL extends SQLDatabase {
 					`;
 			if (where) updateQuery = `${updateQuery}\nWHERE ${where};`;
 
-			console.log("***sql", updateQuery);
-			console.log("***values", values);
+			// console.log("***sql", updateQuery);
+			// console.log("***values", values);
 
 			// Execute the UPDATE query
 			const result = await this.getDriver().query(updateQuery, values);
@@ -1201,7 +1200,7 @@ export class PostgreSQL extends SQLDatabase {
 		if (limit) selectQuery = `${selectQuery}\nLIMIT ${limit}`;
 		if (offset) selectQuery = `${selectQuery}\nOFFSET ${offset};`;
 
-		console.log("***sql", selectQuery);
+		// console.log("***sql", selectQuery);
 
 		// Execute the SELECT query
 		const result = await this.getDriver().query(selectQuery);
@@ -1248,7 +1247,7 @@ export class PostgreSQL extends SQLDatabase {
 		if (limit) aggregateQuery = `${aggregateQuery}\nLIMIT ${limit}`;
 		if (offset) aggregateQuery = `${aggregateQuery}\nOFFSET ${offset};`;
 
-		console.log("***sql", aggregateQuery);
+		// console.log("***sql", aggregateQuery);
 
 		// Execute the SELECT query
 		const result = await this.getDriver().query(aggregateQuery);
@@ -1273,8 +1272,15 @@ export class PostgreSQL extends SQLDatabase {
 			this.mergeArrays(options.lookup, options.join)
 		);
 
+		// When we use the #exists function to check subqueries we need to make sure any field that starts with the parent model is not returned in quotes
+		const paretModelFieldFiller = (text) => {
+			// console.log("***here", text);
+			if (text.startsWith(`${options.baseModel}.`)) return text;
+			else return `'${text}'`;
+		};
+
 		const joins = this.getJoinDefinitions(modelMeta, options.join);
-		const where = this.getWhereDefinition(options.where);
+		const where = this.getWhereDefinition(options.where, paretModelFieldFiller);
 		const orderBy = this.getOrderByDefinition(options.sort);
 		const limit = options.limit ?? null;
 		const offset = options.skip ?? null;

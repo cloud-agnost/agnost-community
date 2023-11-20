@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import { body } from "express-validator";
-import { clusterComponents } from "../config/constants.js";
+import {
+	clusterComponents,
+	clusterComponentsAll,
+	clusterComponentStatus,
+} from "../config/constants.js";
 /**
  * Account is the top level model which will hold the list of organizations, under organization there will be users and apps etc.
  * Whenever a new users signs up a personal account with 'Admin' role will be creted. When a user joins to an organization, a new account entry
@@ -25,6 +29,36 @@ export const ClusterModel = mongoose.model(
 				required: true,
 				index: true,
 			},
+			release: {
+				type: String,
+				required: true,
+				index: true,
+			},
+			// Keeps the release number of the previous releases, whenever the current release is updated, the previous release number is added to this array
+			releaseHistory: [
+				{
+					release: {
+						type: String,
+						required: true,
+					},
+					timestamp: { type: Date, default: Date.now, immutable: true },
+				},
+			],
+			clusterResourceStatus: [
+				{
+					name: {
+						type: String,
+						required: true,
+						enum: clusterComponentsAll.map((entry) => entry.deploymentName),
+					},
+					status: {
+						type: String,
+						required: true,
+						enum: clusterComponentStatus,
+					},
+					lastUpdateAt: { type: Date, default: Date.now },
+				},
+			],
 			smtp: {
 				fromEmail: {
 					type: String,
@@ -60,6 +94,16 @@ export const ClusterModel = mongoose.model(
 			__v: {
 				type: Number,
 				select: false,
+			},
+			// Custom domains associted with the cluster
+			domains: {
+				type: [String],
+				index: true,
+			},
+			// The ip addresses or hostnames of the cluster
+			ips: {
+				type: [String],
+				index: true,
 			},
 		},
 		{ timestamps: true }
@@ -168,6 +212,64 @@ export const applyRules = (type) => {
 							);
 
 						return true;
+					}),
+			];
+		case "update-version":
+			return [
+				body("release")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty")),
+			];
+		case "add-domain":
+			return [
+				body("domain")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.toLowerCase() // convert the value to lowercase
+					.custom((value, { req }) => {
+						const dnameRegex = /^(?:\*\.)?(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+						// Validate domain name (can be at mulitple levels and allows for wildcard subdomains)
+						if (!dnameRegex.test(value)) {
+							throw new AgnostError(t("Not a valid domain name '%s'", value));
+						}
+
+						// Check to see if this domain is already included in the list
+						const { domains } = req.cluster;
+						if (domains && domains.find((entry) => entry === value)) {
+							throw new AgnostError(
+								t(
+									"The specified domain '%s' already exists in cluster domain list",
+									value
+								)
+							);
+						}
+						return true;
+					}),
+			];
+		case "delete-domain":
+			return [
+				body("domain")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.toLowerCase() // convert the value to lowercase
+					.custom((value, { req }) => {
+						// Check to see if this domain is already included in the list
+						const { domains } = req.cluster;
+						if (domains && domains.find((entry) => entry === value)) {
+							return true;
+						} else {
+							throw new AgnostError(
+								t(
+									"The specified domain '%s' does not exist in cluster domain list",
+									value
+								)
+							);
+						}
 					}),
 			];
 		default:

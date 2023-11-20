@@ -357,21 +357,24 @@ function handleError(req, res, error) {
 		specifics: error.specifics,
 	};
 
-	if (error.name === "CastError") {
-		entry.error = t("Not Found");
-		entry.details = t("The object identifier is not recognized.");
-		res.status(400).json({ errors: [entry] });
-	} else {
-		entry.error = error.code ? undefined : t("Internal Server Error");
-		entry.details = error.code
-			? undefined
-			: t(
-					"The server has encountered a situation it does not know how to handle."
-			  );
+	if (!res.headersSent) {
+		if (error.name === "CastError") {
+			entry.error = t("Not Found");
+			entry.details = t("The object identifier is not recognized.");
+			res.status(400).json({ errors: [entry] });
+		} else {
+			entry.error = error.code ? undefined : t("Internal Server Error");
+			entry.details = error.code
+				? undefined
+				: t(
+						"The server has encountered a situation it does not know how to handle. %",
+						error.message
+				  );
 
-		res
-			.status(entry.code !== ERROR_CODES.internalServerError ? 400 : 500)
-			.json({ errors: [entry] });
+			res
+				.status(entry.code !== ERROR_CODES.internalServerError ? 400 : 500)
+				.json({ errors: [entry] });
+		}
 	}
 
 	// Log also the error message in console
@@ -408,14 +411,6 @@ function getDtmFromString(str) {
 			const millis = Date.parse(str);
 			const tempDate = new Date(millis);
 			date = DateTime.fromJSDate(tempDate);
-		} catch (err) {
-			date = null;
-		}
-	}
-
-	if (!date || !date.isValid) {
-		try {
-			date = DateTime.fromMillis(parseInt(str, 10));
 		} catch (err) {
 			date = null;
 		}

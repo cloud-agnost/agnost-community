@@ -121,7 +121,8 @@ export const checkSession = async (socket) => {
 					{
 						error: t("Internal Server Error"),
 						details: t(
-							"The server has encountered a situation it does not know how to handle. Cannot process user session check."
+							"The server has encountered a situation it does not know how to handle. Cannot process user session check. %s",
+							error.message
 						),
 					},
 					ERROR_CODES.internalServerError

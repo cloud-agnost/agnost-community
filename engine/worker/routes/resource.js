@@ -63,6 +63,27 @@ router.post("/cluster-info", checkContentType, authAccessToken, async (req, res)
 });
 
 /*
+@route      /resource/cluster-versions
+@method     POST
+@desc       Updates the version of cluster's default deployments and if specified the API server versions
+@access     public
+*/
+router.post("/cluster-versions", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        res.json();
+
+        const updates = req.body;
+        let manager = new ResourceManager(null);
+        for (const update of updates) {
+            if (!update.apiServer) await manager.updateDeployment(update.deploymentName, null, update.image);
+            else await manager.updateKnativeServiceImage(update.deploymentName, update.image);
+        }
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
 @route      /resource/apiserver/:envId
 @method     GET
 @desc       Get information about the version's API server
@@ -75,6 +96,66 @@ router.get("/apiserver/:envId", authAccessToken, async (req, res) => {
         const apiServerInfo = await manager.getAPIServerInfo(envId);
 
         res.json(apiServerInfo);
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
+@route      /resource/cluster-ip
+@method     GET
+@desc       Returns the cluster IP addresses
+@access     public
+*/
+router.get("/cluster-ip", authAccessToken, async (req, res) => {
+    try {
+        let manager = new ResourceManager(null);
+        const ips = await manager.getClusterIPAddresses();
+
+        res.json(ips);
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
+@route      /resource/cluster-domains
+@method     POST
+@desc       Adds a new cluster custom domain
+@access     public
+*/
+router.post("/cluster-domains-add", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        console.log(req.body);
+        res.json();
+
+        const { domain, ingresses } = req.body;
+        let manager = new ResourceManager(null);
+        await manager.initializeCertificateIssuer();
+        for (const ingress of ingresses) {
+            await manager.addClusterCustomDomain(ingress, domain);
+        }
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
+@route      /resource/cluster-domains
+@method     POST
+@desc       Deletes a cluster custom domain
+@access     public
+*/
+router.post("/cluster-domains-delete", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        console.log(req.body);
+        res.json();
+
+        const { domain, ingresses } = req.body;
+        let manager = new ResourceManager(null);
+        for (const ingress of ingresses) {
+            await manager.deleteClusterCustomDomain(ingress, domain);
+        }
     } catch (error) {
         helper.handleError(req, res, error);
     }

@@ -2,19 +2,20 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
    name: env-l05et1xpq7lw-ingress
+   namespace: default
    annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: 500m
       nginx.ingress.kubernetes.io/proxy-connect-timeout: '6000'
       nginx.ingress.kubernetes.io/proxy-send-timeout: '6000'
       nginx.ingress.kubernetes.io/proxy-read-timeout: '6000'
       nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: '6000'
-      nginx.ingress.kubernetes.io/rewrite-target: /$1
+      nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
    ingressClassName: nginx
    rules:
       - http:
            paths:
-              - path: /env-l05et1xpq7lw/(.*)
+              - path: /env-l05et1xpq7lw(/|$)(.*)
                 pathType: Prefix
                 backend:
                    service:

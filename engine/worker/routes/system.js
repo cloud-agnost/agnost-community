@@ -10,9 +10,9 @@ const router = express.Router({ mergeParams: true });
 @access     public
 */
 router.get("/health", (req, res) => {
-	res
-		.status(200)
-		.send(new Date().toISOString() + " - Healthy engine worker server");
+    res.status(200).send(
+        new Date().toISOString() + " - Healthy engine worker server" + " - " + process.env.RELEASE_NUMBER
+    );
 });
 
 /*
@@ -22,7 +22,7 @@ router.get("/health", (req, res) => {
 @access     public
 */
 router.get("/ping", (req, res) => {
-	res.status(200).send(new Date().toISOString() + " - Pong!");
+    res.status(200).send(new Date().toISOString() + " - Pong!");
 });
 
 /*
@@ -32,7 +32,7 @@ router.get("/ping", (req, res) => {
 @access     public
 */
 router.get("/validate", authAccessToken, (req, res) => {
-	res.status(200).send(new Date().toISOString() + " - Access token validated");
+    res.status(200).send(new Date().toISOString() + " - Access token validated");
 });
 
 export default router;

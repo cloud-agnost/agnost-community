@@ -11,7 +11,6 @@
         "port": 6379
      },
      "queue": {
-        "hostname": "hilarious-lime-fox.rmq4.cloudamqp.com",
         "port": 5672,
         "reconnectInterval": 1000,
         "retryCount": 30
@@ -40,7 +39,7 @@
         "fileStorageFolder": "/tmp/uploads",
         "deleteFilesOlderThanMinues": 30, 
         "expressRequestMaxBodySize": "100mb",
-        "endpointPrefix": "/api",
+        "endpointPrefix": "",
         "gcSeconds": 30,
         "heartbeatIntervalSeconds": 15,
         "heartbeatTimeoutSeconds": 10,
