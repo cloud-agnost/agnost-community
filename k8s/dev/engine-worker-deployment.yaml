@@ -80,4 +80,4 @@ spec:
                          name: cluster-secrets
                          key: jwtSecret
                  - name: NAMESPACE
-                   value: yoda
+                   value: default
