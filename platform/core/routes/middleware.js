@@ -24,44 +24,44 @@ const router = express.Router({ mergeParams: true });
 @access     private
 */
 router.get(
-  "/",
-  authSession,
-  validateOrg,
-  validateApp,
-  validateVersion,
-  authorizeAppAction("app.middleware.view"),
-  applyRules("view"),
-  validate,
-  async (req, res) => {
-    try {
-      const { version } = req;
-      const { page, size, search, sortBy, sortDir, start, end } = req.query;
+	"/",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.middleware.view"),
+	applyRules("view"),
+	validate,
+	async (req, res) => {
+		try {
+			const { version } = req;
+			const { page, size, search, sortBy, sortDir, start, end } = req.query;
 
-      let query = { versionId: version._id };
-      if (search) {
-        query.name = { $regex: search, $options: "i" };
-      }
-      if (start && !end) query.createdAt = { $gte: start };
-      else if (!start && end) query.createdAt = { $lte: end };
-      else if (start && end) query.createdAt = { $gte: start, $lte: end };
+			let query = { versionId: version._id };
+			if (search) {
+				query.name = { $regex: search, $options: "i" };
+			}
+			if (start && !end) query.createdAt = { $gte: start };
+			else if (!start && end) query.createdAt = { $lte: end };
+			else if (start && end) query.createdAt = { $gte: start, $lte: end };
 
-      let sort = {};
-      if (sortBy && sortDir) {
-        sort[sortBy] = sortDir;
-      } else sort = { createdAt: "desc" };
+			let sort = {};
+			if (sortBy && sortDir) {
+				sort[sortBy] = sortDir;
+			} else sort = { createdAt: "desc" };
 
-      let eps = await mwCtrl.getManyByQuery(query, {
-        sort,
-        skip: size * page,
-        limit: size,
-        projection: "-logic",
-      });
+			let eps = await mwCtrl.getManyByQuery(query, {
+				sort,
+				skip: size * page,
+				limit: size,
+				projection: "-logic",
+			});
 
-      res.json(eps);
-    } catch (err) {
-      handleError(req, res, err);
-    }
-  }
+			res.json(eps);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
 );
 
 /*
@@ -71,21 +71,21 @@ router.get(
 @access     private
 */
 router.get(
-  "/:mwId",
-  authSession,
-  validateOrg,
-  validateApp,
-  validateVersion,
-  validateMiddleware,
-  authorizeAppAction("app.middleware.view"),
-  async (req, res) => {
-    try {
-      const { mw } = req;
-      res.json(mw);
-    } catch (err) {
-      handleError(req, res, err);
-    }
-  }
+	"/:mwId",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateMiddleware,
+	authorizeAppAction("app.middleware.view"),
+	async (req, res) => {
+		try {
+			const { mw } = req;
+			res.json(mw);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
 );
 
 /*
@@ -95,63 +95,63 @@ router.get(
 @access     private
 */
 router.post(
-  "/",
-  checkContentType,
-  authSession,
-  validateOrg,
-  validateApp,
-  validateVersion,
-  authorizeAppAction("app.middleware.create"),
-  applyRules("create"),
-  validate,
-  async (req, res) => {
-    try {
-      const { org, user, app, version } = req;
-      const { name } = req.body;
+	"/",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.middleware.create"),
+	applyRules("create"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, user, app, version } = req;
+			const { name } = req.body;
 
-      // Create the middleware
-      let mwId = helper.generateId();
-      let mwiid = helper.generateSlug("mw");
+			// Create the middleware
+			let mwId = helper.generateId();
+			let mwiid = helper.generateSlug("mw");
 
-      let mw = await mwCtrl.create(
-        {
-          _id: mwId,
-          orgId: org._id,
-          appId: app._id,
-          versionId: version._id,
-          iid: mwiid,
-          name,
-          type: "code",
-          logic: defaultMiddlewareCode,
-          createdBy: user._id,
-        },
-        { cacheKey: mwId }
-      );
+			let mw = await mwCtrl.create(
+				{
+					_id: mwId,
+					orgId: org._id,
+					appId: app._id,
+					versionId: version._id,
+					iid: mwiid,
+					name,
+					type: "code",
+					logic: defaultMiddlewareCode,
+					createdBy: user._id,
+				},
+				{ cacheKey: mwId }
+			);
 
-      res.json(mw);
+			res.json(mw);
 
-      // Deploy middleware updates to environments if auto-deployment is enabled
-      await deployCtrl.updateMiddlewares(app, version, user, [mw], "add");
+			// Deploy middleware updates to environments if auto-deployment is enabled
+			await deployCtrl.updateMiddlewares(app, version, user, [mw], "add");
 
-      // Log action
-      auditCtrl.logAndNotify(
-        version._id,
-        user,
-        "org.app.version.middleware",
-        "create",
-        t("Created a new middleware '%s'", name),
-        mw,
-        {
-          orgId: org._id,
-          appId: app._id,
-          versionId: version._id,
-          middlewareId: mw._id,
-        }
-      );
-    } catch (err) {
-      handleError(req, res, err);
-    }
-  }
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.middleware",
+				"create",
+				t("Created a new middleware '%s'", name),
+				mw,
+				{
+					orgId: org._id,
+					appId: app._id,
+					versionId: version._id,
+					middlewareId: mw._id,
+				}
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
 );
 
 /*
@@ -161,62 +161,62 @@ router.post(
 @access     private
 */
 router.put(
-  "/:mwId",
-  checkContentType,
-  authSession,
-  validateOrg,
-  validateApp,
-  validateVersion,
-  validateMiddleware,
-  authorizeAppAction("app.middleware.update"),
-  applyRules("update"),
-  validate,
-  async (req, res) => {
-    try {
-      const { org, user, app, version, mw } = req;
-      const { name } = req.body;
+	"/:mwId",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateMiddleware,
+	authorizeAppAction("app.middleware.update"),
+	applyRules("update"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, user, app, version, mw } = req;
+			const { name } = req.body;
 
-      let updatedMw = await mwCtrl.updateOneById(
-        mw._id,
-        {
-          name,
+			let updatedMw = await mwCtrl.updateOneById(
+				mw._id,
+				{
+					name,
 
-          updatedBy: user._id,
-        },
-        {},
-        { cacheKey: mw._id }
-      );
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: mw._id }
+			);
 
-      res.json(updatedMw);
+			res.json(updatedMw);
 
-      // Deploy middleware updates to environments if auto-deployment is enabled
-      await deployCtrl.updateMiddlewares(
-        app,
-        version,
-        user,
-        [updatedMw],
-        "update"
-      );
+			// Deploy middleware updates to environments if auto-deployment is enabled
+			await deployCtrl.updateMiddlewares(
+				app,
+				version,
+				user,
+				[updatedMw],
+				"update"
+			);
 
-      // Log action
-      auditCtrl.logAndNotify(
-        version._id,
-        user,
-        "org.app.version.middleware",
-        "update",
-        t("Updated the properties of middleware '%s'", updatedMw.name),
-        updatedMw,
-        {
-          orgId: org._id,
-          appId: app._id,
-          versionId: version._id,
-          middlewareId: mw._id,
-        }
-      );
-    } catch (err) {
-      handleError(req, res, err);
-    }
-  }
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.middleware",
+				"update",
+				t("Updated the properties of middleware '%s'", updatedMw.name),
+				updatedMw,
+				{
+					orgId: org._id,
+					appId: app._id,
+					versionId: version._id,
+					middlewareId: mw._id,
+				}
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
 );
 
 /*
@@ -226,59 +226,59 @@ router.put(
 @access     private
 */
 router.put(
-  "/:mwId/logic",
-  checkContentType,
-  authSession,
-  validateOrg,
-  validateApp,
-  validateVersion,
-  validateMiddleware,
-  authorizeAppAction("app.middleware.update"),
-  applyRules("save-logic"),
-  validate,
-  async (req, res) => {
-    try {
-      const { org, user, app, version, mw } = req;
-      const { logic } = req.body;
-      console.log("logic", logic);
-      // Update the endpoing logic/code
-      const updatedMw = await mwCtrl.updateOneById(
-        mw._id,
-        { logic, updatedBy: user._id },
-        {},
-        { cacheKey: mw._id }
-      );
-      console.log("updatedMw", JSON.stringify(updatedMw));
-      res.json(updatedMw);
+	"/:mwId/logic",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateMiddleware,
+	authorizeAppAction("app.middleware.update"),
+	applyRules("save-logic"),
+	validate,
+	async (req, res) => {
+		try {
+			const { org, user, app, version, mw } = req;
+			const { logic } = req.body;
 
-      // Deploy middleware updates to environments if auto-deployment is enabled
-      await deployCtrl.updateMiddlewares(
-        app,
-        version,
-        user,
-        [updatedMw],
-        "update"
-      );
+			// Update the endpoing logic/code
+			const updatedMw = await mwCtrl.updateOneById(
+				mw._id,
+				{ logic, updatedBy: user._id },
+				{},
+				{ cacheKey: mw._id }
+			);
 
-      // Log action
-      auditCtrl.logAndNotify(
-        version._id,
-        user,
-        "org.app.version.middleware",
-        "update",
-        t("Updated the handler of middleware '%s'", updatedMw.name),
-        updatedMw,
-        {
-          orgId: org._id,
-          appId: app._id,
-          versionId: version._id,
-          middlewareId: mw._id,
-        }
-      );
-    } catch (err) {
-      handleError(req, res, err);
-    }
-  }
+			res.json(updatedMw);
+
+			// Deploy middleware updates to environments if auto-deployment is enabled
+			await deployCtrl.updateMiddlewares(
+				app,
+				version,
+				user,
+				[updatedMw],
+				"update"
+			);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.middleware",
+				"update",
+				t("Updated the handler of middleware '%s'", updatedMw.name),
+				updatedMw,
+				{
+					orgId: org._id,
+					appId: app._id,
+					versionId: version._id,
+					middlewareId: mw._id,
+				}
+			);
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
 );
 
 /*
@@ -288,67 +288,67 @@ router.put(
 @access     private
 */
 router.delete(
-  "/delete-multi",
-  checkContentType,
-  authSession,
-  validateOrg,
-  validateApp,
-  validateVersion,
-  authorizeAppAction("app.middleware.delete"),
-  applyRules("delete-multi"),
-  validate,
-  async (req, res) => {
-    const session = await mwCtrl.startSession();
-    try {
-      const { org, user, app, version } = req;
-      const { middlewareIds } = req.body;
+	"/delete-multi",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.middleware.delete"),
+	applyRules("delete-multi"),
+	validate,
+	async (req, res) => {
+		const session = await mwCtrl.startSession();
+		try {
+			const { org, user, app, version } = req;
+			const { middlewareIds } = req.body;
 
-      // Get the list of middlewares that will be deleted
-      let mws = await mwCtrl.getManyByQuery({
-        _id: { $in: middlewareIds },
-        versionId: version._id,
-      });
+			// Get the list of middlewares that will be deleted
+			let mws = await mwCtrl.getManyByQuery({
+				_id: { $in: middlewareIds },
+				versionId: version._id,
+			});
 
-      if (mws.length === 0) return res.json();
+			if (mws.length === 0) return res.json();
 
-      // Delete the middlewares
-      let ids = mws.map((entry) => entry._id);
-      await mwCtrl.deleteManyByQuery(
-        { _id: { $in: ids } },
-        { cacheKey: ids, session }
-      );
+			// Delete the middlewares
+			let ids = mws.map((entry) => entry._id);
+			await mwCtrl.deleteManyByQuery(
+				{ _id: { $in: ids } },
+				{ cacheKey: ids, session }
+			);
 
-      // Update impacted endpoints that are using the deleted middleware
-      await epCtrl.removeMiddlewares(session, version, mws, user);
+			// Update impacted endpoints that are using the deleted middleware
+			await epCtrl.removeMiddlewares(session, version, mws, user);
 
-      await mwCtrl.commit(session);
-      res.json();
+			await mwCtrl.commit(session);
+			res.json();
 
-      // Deploy middleware updates to environments if auto-deployment is enabled
-      await deployCtrl.updateMiddlewares(app, version, user, mws, "delete");
+			// Deploy middleware updates to environments if auto-deployment is enabled
+			await deployCtrl.updateMiddlewares(app, version, user, mws, "delete");
 
-      mws.forEach((mw) => {
-        // Log action
-        auditCtrl.logAndNotify(
-          version._id,
-          user,
-          "org.app.version.middleware",
-          "delete",
-          t("Deleted middleware '%s'", mw.name),
-          {},
-          {
-            orgId: org._id,
-            appId: app._id,
-            versionId: version._id,
-            middlewareId: mw._id,
-          }
-        );
-      });
-    } catch (err) {
-      await mwCtrl.rollback(session);
-      handleError(req, res, err);
-    }
-  }
+			mws.forEach((mw) => {
+				// Log action
+				auditCtrl.logAndNotify(
+					version._id,
+					user,
+					"org.app.version.middleware",
+					"delete",
+					t("Deleted middleware '%s'", mw.name),
+					{},
+					{
+						orgId: org._id,
+						appId: app._id,
+						versionId: version._id,
+						middlewareId: mw._id,
+					}
+				);
+			});
+		} catch (err) {
+			await mwCtrl.rollback(session);
+			handleError(req, res, err);
+		}
+	}
 );
 
 /*
@@ -358,49 +358,49 @@ router.delete(
 @access     private
 */
 router.delete(
-  "/:mwId",
-  authSession,
-  validateOrg,
-  validateApp,
-  validateVersion,
-  validateMiddleware,
-  authorizeAppAction("app.middleware.delete"),
-  async (req, res) => {
-    const session = await mwCtrl.startSession();
-    try {
-      const { org, user, app, version, mw } = req;
+	"/:mwId",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateMiddleware,
+	authorizeAppAction("app.middleware.delete"),
+	async (req, res) => {
+		const session = await mwCtrl.startSession();
+		try {
+			const { org, user, app, version, mw } = req;
 
-      // Delete the middleware
-      await mwCtrl.deleteOneById(mw._id, { cacheKey: mw._id, session });
-      // Update impacted endpoints that are using the deleted middleware
-      await epCtrl.removeMiddlewares(session, version, [mw], user);
+			// Delete the middleware
+			await mwCtrl.deleteOneById(mw._id, { cacheKey: mw._id, session });
+			// Update impacted endpoints that are using the deleted middleware
+			await epCtrl.removeMiddlewares(session, version, [mw], user);
 
-      await mwCtrl.commit(session);
-      res.json();
+			await mwCtrl.commit(session);
+			res.json();
 
-      // Deploy middleware updates to environments if auto-deployment is enabled
-      await deployCtrl.updateMiddlewares(app, version, user, [mw], "delete");
+			// Deploy middleware updates to environments if auto-deployment is enabled
+			await deployCtrl.updateMiddlewares(app, version, user, [mw], "delete");
 
-      // Log action
-      auditCtrl.logAndNotify(
-        version._id,
-        user,
-        "org.app.version.middleware",
-        "delete",
-        t("Deleted middleware '%s'", mw.name),
-        {},
-        {
-          orgId: org._id,
-          appId: app._id,
-          versionId: version._id,
-          middlewareId: mw._id,
-        }
-      );
-    } catch (err) {
-      await mwCtrl.rollback(session);
-      handleError(req, res, err);
-    }
-  }
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version.middleware",
+				"delete",
+				t("Deleted middleware '%s'", mw.name),
+				{},
+				{
+					orgId: org._id,
+					appId: app._id,
+					versionId: version._id,
+					middlewareId: mw._id,
+				}
+			);
+		} catch (err) {
+			await mwCtrl.rollback(session);
+			handleError(req, res, err);
+		}
+	}
 );
 
 export default router;
