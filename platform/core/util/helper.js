@@ -337,6 +337,24 @@ function memoryToBytes(memoryStr) {
 	}
 }
 
+async function getClusterIPs() {
+	try {
+		const result = await axios.get(
+			config.get("general.workerUrl") + "/v1/resource/cluster-ip",
+			{
+				headers: {
+					Authorization: process.env.ACCESS_TOKEN,
+					"Content-Type": "application/json",
+				},
+			}
+		);
+		return res.json(result.data);
+	} catch (err) {
+		logger.error(`Cannot fetch cluster ips`, { details: err });
+		return [];
+	}
+}
+
 export default {
 	constants,
 	isObject,
@@ -360,4 +378,5 @@ export default {
 	getQueryString,
 	getAsObject,
 	memoryToBytes,
+	getClusterIPs,
 };

@@ -37,4 +37,4 @@ spec:
                          name: cluster-secrets
                          key: masterToken
                  - name: NAMESPACE
-                   value: default
+                   value: yoda

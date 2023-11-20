@@ -86,6 +86,7 @@
     "minDatabaseSizeMi": 512,
     "defaultDBPoolSize": 3,
     "maxDBPoolSize": 50,
+    "maxClusterCustomDomains": 3,
     "defaultEngineConfig": {
       "initialScale": 1,
       "minScale": 0,

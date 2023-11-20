@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import { body, query } from "express-validator";
-import { methodTypes, logicTypes } from "../config/constants.js";
+import {
+	methodTypes,
+	logicTypes,
+	forbiddenEpPrefixes,
+} from "../config/constants.js";
 
 /**
  * Node.js express endpoint definition
@@ -247,41 +251,57 @@ export const applyRules = (type) => {
 					.withMessage(t("Required field, cannot be left empty"))
 					.bail()
 					.custom(async (value, { req }) => {
-						const routeNameRegex =
-							/^\/[a-zA-Z0-9_-]+(?:\/:[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)*)*$/;
-						const paramNameRegex = /^[a-zA-Z0-9_-]+$/;
+						// We are allowing root '/' path
+						if (value !== "/") {
+							const routeNameRegex =
+								/^\/[a-zA-Z0-9_-]+(?:\/:[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)*)*$/;
+							const paramNameRegex = /^[a-zA-Z0-9_-]+$/;
 
-						// Validate route name
-						if (!routeNameRegex.test(value)) {
-							throw new AgnostError(t("Not a valid endpoint route"));
-						}
+							// Validate route name
+							if (!routeNameRegex.test(value)) {
+								throw new AgnostError(t("Not a valid endpoint route"));
+							}
 
-						// Extract parameter names from route
-						const paramRegex = /:([^/?]+)/g;
-						const parameterNames = [];
-						let match;
-						while ((match = paramRegex.exec(value)) !== null) {
-							parameterNames.push(match[1]);
-						}
+							// Extract parameter names from route
+							const paramRegex = /:([^/?]+)/g;
+							const parameterNames = [];
+							let match;
+							while ((match = paramRegex.exec(value)) !== null) {
+								parameterNames.push(match[1]);
+							}
 
-						// Validate parameter names
-						for (const paramName of parameterNames) {
-							if (!paramNameRegex.test(paramName)) {
+							// Validate parameter names
+							for (const paramName of parameterNames) {
+								if (!paramNameRegex.test(paramName)) {
+									throw new AgnostError(
+										t("Invalid route parameter name '%s'", paramName)
+									);
+								}
+							}
+
+							// Validate parameter names
+							const uniqueParameterNames = new Set(parameterNames);
+							if (uniqueParameterNames.size !== parameterNames.length) {
+								throw new AgnostError(t("Duplicate parameter names in route"));
+							}
+
+							if (
+								forbiddenEpPrefixes.find((prefix) => value.startsWith(prefix))
+							) {
 								throw new AgnostError(
-									t("Invalid route parameter name '%s'", paramName)
+									t(
+										"Endpoint route cannot start with '%s'",
+										forbiddenEpPrefixes.join("', '")
+									)
 								);
 							}
 						}
 
-						// Validate parameter names
-						const uniqueParameterNames = new Set(parameterNames);
-						if (uniqueParameterNames.size !== parameterNames.length) {
-							throw new AgnostError(t("Duplicate parameter names in route"));
-						}
-
 						const fingerprint = value
 							.split("/")
-							.map((entry) => (entry.startsWith(":") ? ":p" : entry))
+							.map((entry) =>
+								entry.startsWith(":") ? ":p" : entry.toLowerCase()
+							)
 							.join("/");
 
 						// We have the fingerprint, let's check whether we have and endpoint with the same fingerprint and method

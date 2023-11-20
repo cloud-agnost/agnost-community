@@ -57,6 +57,17 @@ export const envStatuses = [
 	"Deleting",
 ];
 
+export const forbiddenEpPrefixes = [
+	"/health",
+	"/ping",
+	"/object",
+	"/test",
+	"/storage",
+	"/auth",
+	"/oauth",
+	"/realtime",
+];
+
 export const logStatuses = ["OK", "Error"];
 
 export const envLogTypes = ["db", "server", "scheduler"];

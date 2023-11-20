@@ -39,7 +39,7 @@
         "fileStorageFolder": "/tmp/uploads",
         "deleteFilesOlderThanMinues": 30, 
         "expressRequestMaxBodySize": "100mb",
-        "endpointPrefix": "/api",
+        "endpointPrefix": "",
         "gcSeconds": 30,
         "heartbeatIntervalSeconds": 15,
         "heartbeatTimeoutSeconds": 10,
