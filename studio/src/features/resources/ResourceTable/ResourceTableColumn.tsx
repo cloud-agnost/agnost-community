@@ -9,8 +9,6 @@ import { getOrgPermission, translate } from '@/utils';
 
 const { openEditResourceModal } = useResourceStore.getState();
 
-const canEditResource = getOrgPermission('resource.update');
-const canDeleteResource = getOrgPermission('resource.delete');
 export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 	{
 		id: 'name',
@@ -88,6 +86,8 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 		cell: ({ row }) => {
 			const resourceCreateType =
 				'access' in row.original ? ResourceCreateType.Existing : ResourceCreateType.New;
+			const canEditResource = getOrgPermission('resource.update');
+			const canDeleteResource = getOrgPermission('resource.delete');
 			return (
 				row.original.deletable && (
 					<ActionsCell
