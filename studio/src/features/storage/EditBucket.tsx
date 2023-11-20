@@ -5,12 +5,12 @@ import useStorageStore from '@/store/storage/storageStore';
 import { APIError, BucketSchema } from '@/types';
 import { arrayToObj, objToArray } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import BucketForm from './BucketForm';
-import { useEffect, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
 
 interface EditStorageProps {
 	open: boolean;
