@@ -169,22 +169,6 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 		),
 	},
 	{
-		id: 'tags',
-		header: translate('storage.bucket.tags'),
-		accessorKey: 'tags',
-		size: 300,
-		cell: ({ row: { original } }) => {
-			const { tags } = original;
-			return (
-				<div className='flex flex-wrap gap-4'>
-					{Object.entries(tags).map(([key, value]) => (
-						<Badge key={key} variant='gray' text={`${key}: ${value}`} rounded />
-					))}
-				</div>
-			);
-		},
-	},
-	{
 		id: 'size',
 		header: ({ column }) => <SortButton text={translate('storage.file.size')} column={column} />,
 		accessorKey: 'size',
@@ -202,6 +186,22 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 		),
 		accessorKey: 'mimeType',
 		sortingFn: 'textCaseSensitive',
+	},
+	{
+		id: 'tags',
+		header: translate('storage.bucket.tags'),
+		accessorKey: 'tags',
+		size: 300,
+		cell: ({ row: { original } }) => {
+			const { tags } = original;
+			return (
+				<div className='flex flex-wrap gap-4'>
+					{Object.entries(tags).map(([key, value]) => (
+						<Badge key={key} variant='gray' text={`${key}: ${value}`} rounded />
+					))}
+				</div>
+			);
+		},
 	},
 	{
 		id: 'created_at',
