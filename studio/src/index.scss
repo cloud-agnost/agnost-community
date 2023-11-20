@@ -546,6 +546,3 @@ html .light ::-webkit-scrollbar-track {
 .select__option--is-focused {
 	@apply bg-wrapper-background-hover #{!important};
 }
-.infinite-scroll-component__outerdiv {
-	height: 100%;
-}

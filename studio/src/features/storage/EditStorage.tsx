@@ -2,7 +2,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import StorageForm from './StorageForm';
-import { StorageSchema } from '@/types';
+import { APIError, StorageSchema } from '@/types';
 import { useTranslation } from 'react-i18next';
 import useStorageStore from '@/store/storage/storageStore';
 import { useParams } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
 
 interface CreateStorageProps {
 	open: boolean;
@@ -28,31 +29,34 @@ export default function EditStorage({ open, onClose }: CreateStorageProps) {
 	const form = useForm<z.infer<typeof StorageSchema>>({
 		resolver: zodResolver(StorageSchema),
 	});
-
+	const { mutateAsync: updateMutation, isPending } = useMutation({
+		mutationFn: updateStorage,
+		onSuccess: () => onCloseHandler(),
+		onError: ({ error, details }: APIError) => {
+			notify({ type: 'error', description: details, title: error });
+		},
+	});
 	function onSubmit(data: z.infer<typeof StorageSchema>) {
-		updateStorage({
+		updateMutation({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			storageId: storage._id,
 			...data,
-			onSuccess: () => {
-				form.reset({
-					name: '',
-				});
-				onClose();
-			},
-			onError: ({ error, details }) => {
-				notify({ type: 'error', description: details, title: error });
-			},
 		});
 	}
 
-	useEffect(() => {
+	function onCloseHandler() {
 		form.reset({
-			name: storage.name,
+			name: undefined,
 		});
+		onClose();
+	}
+
+	useEffect(() => {
+		form.setValue('name', storage.name);
 	}, [storage]);
+
 	return (
 		<Drawer
 			open={open}
@@ -73,7 +77,7 @@ export default function EditStorage({ open, onClose }: CreateStorageProps) {
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<StorageForm edit />
+						<StorageForm edit loading={isPending} />
 					</form>
 				</Form>
 			</DrawerContent>

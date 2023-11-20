@@ -116,7 +116,7 @@ export default class StorageService {
 		bucketNames,
 	}: DeleteMultipleBucketParams): Promise<void> {
 		return (
-			await axios.delete(`${this.getUrl()}/storage/${storageName}/bucket/delete-multi`, {
+			await axios.delete(`${this.getUrl()}/storage/${storageName}/delete-multi-buckets`, {
 				data: { bucketNames },
 			})
 		).data;

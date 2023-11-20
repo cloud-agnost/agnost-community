@@ -76,6 +76,22 @@ export default function EditFile({ open, onClose }: EditFileProps) {
 		}
 	}, [file.tags]);
 
+	useEffect(() => {
+		if (open) {
+			form.reset({
+				path: file.path,
+				isPublic: file.isPublic,
+				tags: objToArray(file.tags),
+			});
+		} else {
+			form.reset({
+				path: '',
+				isPublic: true,
+				tags: [],
+			});
+		}
+	}, [open]);
+
 	return (
 		<Drawer open={open} onOpenChange={() => resetForm()}>
 			<DrawerContent position='right' size='lg' className='h-full'>

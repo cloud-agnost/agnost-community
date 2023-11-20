@@ -351,6 +351,7 @@ const useModelStore = create<ModelStore & Actions>()(
 				}
 			},
 			setModel: (model: Model) => {
+				console.log(model);
 				set({ subModel: {} as Model, model });
 			},
 			setNestedModels: (modelName: string, index: number) => {

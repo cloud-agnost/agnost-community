@@ -19,21 +19,25 @@ export default function DateText({ date, children, className, user, ...props }: 
 					<AvatarFallback isUserAvatar color={user.member?.color} name={user.member?.name} />
 				</Avatar>
 			)}
-			<div>
-				<span className='block text-default text-sm leading-6'>
-					{formatDate(date, {
-						month: 'short',
-						day: 'numeric',
-						year: 'numeric',
-					})}
-				</span>
-				<time className='text-[11px] text-subtle leading-[21px]'>
-					{formatDate(date, {
-						hour: 'numeric',
-						minute: 'numeric',
-					})}
-				</time>
-			</div>
+			{date ? (
+				<div>
+					<span className='block text-default text-sm leading-6'>
+						{formatDate(date, {
+							month: 'short',
+							day: 'numeric',
+							year: 'numeric',
+						})}
+					</span>
+					<time className='text-[11px] text-subtle leading-[21px]'>
+						{formatDate(date, {
+							hour: 'numeric',
+							minute: 'numeric',
+						})}
+					</time>
+				</div>
+			) : (
+				<div className='text-default text-sm leading-6'>-</div>
+			)}
 		</div>
 	);
 }

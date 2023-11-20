@@ -1,5 +1,6 @@
 import { PARAM_NAME_REGEX, ROUTE_NAME_REGEX } from '@/constants/regex';
-import { BaseGetRequest, BaseParams, BaseRequest, Log, NameSchema } from '@/types';
+import { BaseGetRequest, BaseParams, BaseRequest, Log } from '@/types';
+import { NameSchema } from '@/types/schema';
 import { getPathParams, translate as t } from '@/utils';
 import { AxiosError, AxiosResponse } from 'axios';
 import * as z from 'zod';

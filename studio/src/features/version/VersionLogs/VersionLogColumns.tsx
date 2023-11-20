@@ -49,8 +49,16 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 				original: { status },
 			},
 		}) => {
+			let statusText = status;
+			if (typeof status !== 'string') {
+				statusText = status >= 200 && status < 300 ? 'success' : 'error';
+			}
 			return (
-				<Badge variant={BADGE_COLOR_MAP[status.toUpperCase()]} text={capitalize(status)} rounded />
+				<Badge
+					variant={BADGE_COLOR_MAP[statusText.toUpperCase()]}
+					text={capitalize(statusText)}
+					rounded
+				/>
 			);
 		},
 	},

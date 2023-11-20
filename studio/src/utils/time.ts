@@ -1,7 +1,9 @@
 import { DateTime } from 'luxon';
 
 export function formatDate(date: string | Date, option: Intl.DateTimeFormatOptions) {
-	const dt = date instanceof Date ? DateTime.fromJSDate(date) : DateTime.fromISO(date);
+	const dt = DateTime.fromJSDate(new Date(date), {
+		zone: 'utc',
+	});
 	return dt.setLocale('en').toLocaleString(option);
 }
 

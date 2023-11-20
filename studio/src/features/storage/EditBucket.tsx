@@ -2,7 +2,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import useStorageStore from '@/store/storage/storageStore';
-import { BucketSchema } from '@/types';
+import { APIError, BucketSchema } from '@/types';
 import { arrayToObj, objToArray } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import BucketForm from './BucketForm';
 import { useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 
 interface EditStorageProps {
 	open: boolean;
@@ -19,7 +20,6 @@ interface EditStorageProps {
 export default function EditBucket({ open, onClose }: EditStorageProps) {
 	const { t } = useTranslation();
 	const { updateBucket, bucket, storage } = useStorageStore();
-	const [loading, setLoading] = useState(false);
 	const { notify } = useToast();
 	const form = useForm<z.infer<typeof BucketSchema>>({
 		resolver: zodResolver(BucketSchema),
@@ -44,21 +44,22 @@ export default function EditBucket({ open, onClose }: EditStorageProps) {
 		}
 	}, [bucket]);
 
+	const { mutateAsync: updateMutation, isPending } = useMutation({
+		mutationFn: updateBucket,
+		onSuccess: () => {
+			resetForm();
+		},
+		onError: ({ error, details }: APIError) => {
+			notify({ type: 'error', description: details, title: error });
+		},
+	});
+
 	function onSubmit(data: z.infer<typeof BucketSchema>) {
-		setLoading(true);
-		updateBucket({
+		updateMutation({
 			storageName: storage.name as string,
 			bucketName: bucket.name as string,
 			...data,
 			tags: arrayToObj(data.tags?.filter((tag) => tag.key && tag.value) as any),
-			onSuccess: () => {
-				resetForm();
-				setLoading(false);
-			},
-			onError: ({ error, details }) => {
-				setLoading(false);
-				notify({ type: 'error', description: details, title: error });
-			},
 		});
 	}
 	return (
@@ -73,7 +74,7 @@ export default function EditBucket({ open, onClose }: EditStorageProps) {
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<BucketForm loading={loading} />
+						<BucketForm loading={isPending} />
 					</form>
 				</Form>
 			</DrawerContent>

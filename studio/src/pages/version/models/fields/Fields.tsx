@@ -83,6 +83,7 @@ export default function Fields() {
 	return (
 		<>
 			<VersionTabLayout<Field>
+				searchable
 				breadCrumb={<BreadCrumb goBackLink={goParentModelUrl} items={breadcrumbItems} />}
 				isEmpty={!filteredFields.length}
 				title={t('database.fields.title')}

@@ -1,18 +1,56 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
+import { TableConfirmation } from '@/components/Table';
+import { TabLink } from '@/features/version/Tabs';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useStorageStore from '@/store/storage/storageStore';
-import { Bucket, ColumnDefWithClassName, TabTypes } from '@/types';
+import { APIError, Bucket, ColumnDefWithClassName, TabTypes } from '@/types';
 import { getVersionPermission, notify, translate } from '@/utils';
 import { Prohibit } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
+import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
-import { TabLink } from '@/features/version/Tabs';
 
 const canEditBucket = getVersionPermission('storage.update');
 const canDeleteBucket = getVersionPermission('storage.delete');
+
+const { emptyBucket, openDeleteBucketDialog, openEditBucketDialog, storage } =
+	useStorageStore.getState();
+
+const queryClient = new QueryClient();
+function clearBucket(bucketName: string) {
+	queryClient
+		.getMutationCache()
+		.build(queryClient, {
+			mutationFn: emptyBucket,
+			onError: (error: APIError) => {
+				notify({
+					title: error.error,
+					description: error.details,
+					type: 'error',
+				});
+			},
+		})
+		.execute({
+			storageName: storage?.name,
+			bucketName,
+			onSuccess: () => {
+				notify({
+					title: translate('general.success'),
+					description: translate('storage.bucket.empty'),
+					type: 'success',
+				});
+			},
+			onError: ({ error, details }) => {
+				notify({
+					title: error,
+					description: details,
+					type: 'error',
+				});
+			},
+		});
+}
 
 const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 	{
@@ -54,7 +92,9 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 
 	{
 		id: 'visibility',
-		header: translate('storage.bucket.visibility.title'),
+		header: ({ column }) => (
+			<SortButton text={translate('storage.bucket.visibility.title')} column={column} />
+		),
 		cell: ({
 			row: {
 				original: { isPublic },
@@ -73,7 +113,7 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 	},
 	{
 		id: 'tags',
-		header: translate('storage.bucket.tags'),
+		header: ({ column }) => <SortButton text={translate('storage.bucket.tags')} column={column} />,
 		accessorKey: 'tags',
 		cell: ({ row: { original } }) => {
 			const { tags } = original;
@@ -111,44 +151,50 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 			return user && <DateText date={createdAt} user={user} />;
 		},
 	},
+	{
+		id: 'updated_at',
+		header: ({ column }) => (
+			<SortButton
+				className='whitespace-nowrap'
+				text={translate('general.updated_at')}
+				column={column}
+			/>
+		),
+		accessorKey: 'updated_at',
+		enableSorting: true,
+		sortingFn: 'datetime',
+		size: 200,
+		cell: ({
+			row: {
+				original: { updatedAt, userId },
+			},
+		}) => {
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === userId);
+
+			return user && <DateText date={updatedAt} user={user} />;
+		},
+	},
 
 	{
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { emptyBucket, openDeleteBucketDialog, openEditBucketDialog, storage } =
-				useStorageStore.getState();
-
 			return (
 				<div className='flex items-center justify-end'>
-					<Button
-						iconOnly
-						variant='blank'
-						rounded
-						className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-						onClick={() =>
-							emptyBucket({
-								storageName: storage?.name,
-								bucketName: original.name,
-								onSuccess: () => {
-									notify({
-										title: translate('general.success'),
-										description: translate('storage.bucket.empty'),
-										type: 'success',
-									});
-								},
-								onError: ({ error, details }) => {
-									notify({
-										title: error,
-										description: details,
-										type: 'error',
-									});
-								},
-							})
-						}
-					>
-						<Prohibit />
-					</Button>
+					<TableConfirmation
+						align='end'
+						closeOnConfirm
+						title={translate('storage.clear.title')}
+						description={translate('storage.clear.message')}
+						onConfirm={() => clearBucket(original.name)}
+						contentClassName='m-0'
+						hasPermission={canDeleteBucket}
+						tooltip='Clear bucket'
+						icon={<Prohibit size={20} />}
+					/>
+
 					<ActionsCell
 						original={original}
 						onDelete={() => openDeleteBucketDialog(original)}

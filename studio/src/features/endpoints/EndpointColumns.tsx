@@ -189,7 +189,6 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
-						showAvatar={false}
 						title={translate('endpoint.delete.title')}
 						description={translate('endpoint.delete.message')}
 						onConfirm={() => deleteEndpointHandler(row.original)}

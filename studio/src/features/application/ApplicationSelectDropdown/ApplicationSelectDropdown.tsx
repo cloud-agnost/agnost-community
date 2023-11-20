@@ -28,7 +28,6 @@ export default function ApplicationSelectDropdown() {
 		useApplicationStore();
 	const navigate = useNavigate();
 	const { orgId } = useParams();
-
 	function onSelect(app: Application) {
 		selectApplication(app);
 		setOpen(false);

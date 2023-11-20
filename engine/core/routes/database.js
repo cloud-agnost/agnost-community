@@ -34,8 +34,8 @@ router.get(
   async (req, res) => {
     try {
       const { dbName, modelName } = req.params;
-      const { page, limit, sortBy, sortDir, id } = req.query;
-
+      const { page, size, sortBy, sortDir, id } = req.query;
+      console.log("req.query", req.params);
       const data = await agnost
         .db(dbName)
         .model(modelName)
@@ -51,9 +51,9 @@ router.get(
             }),
           },
           {
-            ...(limit && { limit: Number(limit) }),
+            ...(size && { limit: Number(size) }),
             ...(sortBy && sortDir && { sort: { [sortBy]: sortDir } }),
-            ...(limit && page && { skip: Number(page) * Number(limit) }),
+            ...(size && page && { skip: Number(page) * Number(size) }),
           }
         );
 
@@ -161,22 +161,10 @@ router.delete(
     try {
       const { dbName, modelName } = req.params;
       const { ids } = req.body;
-
-      const data = await agnost
-        .db(dbName)
-        .model(modelName)
-        .deleteMany({
-          $in: [
-            "_id",
-            ids.map((id) => {
-              return {
-                $toObjectId: id,
-              };
-            }),
-          ],
-        });
-
-      res.json(data);
+      ids.forEach(async (id) => {
+        await agnost.db(dbName).model(modelName).deleteById(id);
+      });
+      res.json();
     } catch (error) {
       helper.handleError(req, res, error);
     }
