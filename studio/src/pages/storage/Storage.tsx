@@ -34,7 +34,7 @@ export default function MainStorage() {
 		data: storages,
 		columns: StorageColumns,
 	});
-	const { isFetching, hasNextPage, fetchNextPage } = useInfiniteScroll({
+	const { isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteScroll({
 		queryFn: getStorages,
 		queryKey: 'getStorages',
 		dataLength: storages.length,
@@ -77,6 +77,7 @@ export default function MainStorage() {
 	return (
 		<>
 			<VersionTabLayout
+				searchable
 				isEmpty={!storages.length}
 				title={t('storage.title')}
 				type='storage'
@@ -85,7 +86,7 @@ export default function MainStorage() {
 				emptyStateTitle={t('storage.empty_text')}
 				onMultipleDelete={deleteMultipleStoragesHandler}
 				disabled={!canCreateStorages}
-				loading={isFetching && lastFetchedPage === 0}
+				loading={isFetching && !storages.length}
 				table={table}
 			>
 				<InfiniteScroll
@@ -93,7 +94,7 @@ export default function MainStorage() {
 					dataLength={storages.length}
 					next={fetchNextPage}
 					hasMore={hasNextPage}
-					loader={isFetching && <TableLoading />}
+					loader={isFetchingNextPage && <TableLoading />}
 				>
 					<DataTable table={table} />
 				</InfiniteScroll>

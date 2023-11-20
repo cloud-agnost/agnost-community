@@ -7,6 +7,7 @@ import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useApplicationStore from '@/store/app/applicationStore';
 import useStorageStore from '@/store/storage/storageStore';
+import useTabStore from '@/store/version/tabStore';
 import { APIError } from '@/types';
 import { getAppPermission } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
@@ -16,10 +17,9 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { LoaderFunctionArgs, redirect, useParams } from 'react-router-dom';
 Buckets.loader = async ({ params }: LoaderFunctionArgs) => {
 	const role = useApplicationStore.getState().application?.role;
-
+	const { removeTab, getCurrentTab } = useTabStore.getState();
 	const { storageId, appId, orgId, versionId } = params;
 	const { storages } = useStorageStore.getState();
-
 	let selectedStorage = storages.find((storage) => storage._id === storageId);
 	if (!selectedStorage) {
 		selectedStorage = await useStorageStore.getState().getStorageById({
@@ -34,6 +34,7 @@ Buckets.loader = async ({ params }: LoaderFunctionArgs) => {
 	const permission = getAppPermission(`${role}.app.storage.viewData`);
 
 	if (!permission) {
+		removeTab(versionId as string, getCurrentTab(versionId as string).id);
 		return redirect('/401');
 	}
 
@@ -64,7 +65,7 @@ export default function Buckets() {
 			url: storageUrl,
 		},
 		{
-			name: t('storage.buckets') as string,
+			name: storage?.name as string,
 		},
 	];
 
@@ -72,11 +73,11 @@ export default function Buckets() {
 		data: buckets,
 		columns: BucketColumns,
 	});
-	const { hasNextPage, isPending, fetchNextPage } = useInfiniteScroll({
+	const { hasNextPage, isFetching, fetchNextPage, isFetchingNextPage } = useInfiniteScroll({
 		queryFn: getBuckets,
 		queryKey: 'getBuckets',
 		dataLength: buckets.length,
-		lastFetchedPage: bucketCountInfo.currentPage ?? 0,
+		lastFetchedPage: bucketCountInfo.currentPage ? bucketCountInfo.currentPage - 1 : 0,
 		params: {
 			storageName: storage?.name,
 			returnCountInfo: true,
@@ -84,7 +85,7 @@ export default function Buckets() {
 	});
 
 	const {
-		mutationAsync: deleteBucketMutation,
+		mutateAsync: deleteBucketMutation,
 		isPending: deleteLoading,
 		error: deleteError,
 	} = useMutation({
@@ -93,7 +94,7 @@ export default function Buckets() {
 			closeBucketDeleteDialog();
 		},
 	});
-	const { mutationAsync: deleteMultipleBucketsMutation } = useMutation({
+	const { mutateAsync: deleteMultipleBucketsMutation } = useMutation({
 		mutationFn: deleteMultipleBuckets,
 		onSuccess: () => {
 			table?.resetRowSelection();
@@ -110,15 +111,16 @@ export default function Buckets() {
 		});
 	}
 	function deleteBucketHandler() {
+		console.log(toDeleteBucket);
 		deleteBucketMutation({
 			storageName: storage?.name,
 			bucketName: toDeleteBucket?.name as string,
 		});
 	}
-
 	return (
 		<>
 			<VersionTabLayout
+				searchable
 				isEmpty={buckets.length === 0}
 				title={t('storage.buckets')}
 				type='bucket'
@@ -126,15 +128,16 @@ export default function Buckets() {
 				createButtonTitle={t('storage.bucket.create')}
 				emptyStateTitle={t('storage.bucket.empty_text')}
 				onMultipleDelete={deleteMultipleBucketsHandler}
-				loading={isPending && !buckets.length}
+				loading={isFetching && !buckets.length}
 				breadCrumb={<BreadCrumb goBackLink={storageUrl} items={breadcrumbItems} />}
+				table={table}
 			>
 				<InfiniteScroll
 					scrollableTarget='version-layout'
 					dataLength={buckets.length}
 					next={fetchNextPage}
 					hasMore={hasNextPage}
-					loader={isPending && <TableLoading />}
+					loader={isFetchingNextPage && <TableLoading />}
 				>
 					<DataTable table={table} />
 					<ConfirmationModal

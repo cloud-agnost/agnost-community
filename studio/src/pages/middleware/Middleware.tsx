@@ -59,6 +59,7 @@ export default function MainMiddleware() {
 	return (
 		<Fragment>
 			<VersionTabLayout<Middleware>
+				searchable
 				className='p-0'
 				type='middleware'
 				title={t('version.settings.middlewares')}

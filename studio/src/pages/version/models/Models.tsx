@@ -11,7 +11,7 @@ import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 import { DataTable } from 'components/DataTable';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 export default function Models() {
 	const {
 		models,
@@ -21,7 +21,6 @@ export default function Models() {
 		getModelsOfDatabase,
 	} = useModelStore();
 	const [isCreateModelOpen, setIsCreateModelOpen] = useState(false);
-	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { notify } = useToast();
 
@@ -106,6 +105,7 @@ export default function Models() {
 				disabled={!canCreateModel}
 				onMultipleDelete={deleteMultipleModelHandler}
 				loading={isPending}
+				searchable
 				handlerButton={
 					<Button variant='secondary' onClick={handleViewDataClick}>
 						View Data

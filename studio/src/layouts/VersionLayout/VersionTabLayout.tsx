@@ -24,6 +24,7 @@ interface Props<T> {
 	breadCrumb?: ReactNode;
 	handlerButton?: ReactNode;
 	loading: boolean;
+	searchable?: boolean;
 	onMultipleDelete?: () => void;
 	openCreateModal?: () => void;
 }
@@ -41,6 +42,7 @@ export default function VersionTabLayout<T>({
 	className,
 	handlerButton,
 	loading,
+	searchable,
 	onMultipleDelete,
 	openCreateModal,
 }: Props<T>) {
@@ -94,7 +96,12 @@ export default function VersionTabLayout<T>({
 			<div className='flex items-center justify-between'>
 				<h1 className='text-default text-2xl text-center'>{title}</h1>
 				<div className='flex items-center justify-center gap-4'>
-					<SearchInput value={searchParams.get('q') ?? undefined} className='sm:w-[450px] flex-1' />
+					{searchable && (
+						<SearchInput
+							value={searchParams.get('q') ?? undefined}
+							className='sm:w-[450px] flex-1'
+						/>
+					)}
 					{table?.getSelectedRowModel().rows.length ? (
 						<SelectedRowButton
 							table={table}

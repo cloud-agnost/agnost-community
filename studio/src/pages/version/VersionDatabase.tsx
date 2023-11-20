@@ -76,6 +76,7 @@ export default function VersionDatabase() {
 			<CreateDatabase open={createDrawerIsOpen} onOpenChange={setCreateDrawerIsOpen} />
 			<EditDatabase open={isEditDatabaseDialogOpen} onOpenChange={closeEditDatabaseDialog} />
 			<VersionTabLayout<Database>
+				searchable
 				className='p-0'
 				isEmpty={databases.length === 0}
 				title={t('database.page_title')}

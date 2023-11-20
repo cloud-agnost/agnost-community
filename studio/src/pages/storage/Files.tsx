@@ -14,9 +14,10 @@ import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { LoaderFunctionArgs } from 'react-router-dom';
 
-Files.Loader = async ({ params }: LoaderFunctionArgs) => {
+Files.loader = async ({ params }: LoaderFunctionArgs) => {
 	const { bucketName } = params;
 	const { bucket, buckets, storage, getBucket } = useStorageStore.getState();
+
 	if (bucketName !== bucket?.name) {
 		let selectedBucket = buckets.find((bucket) => bucket.name === bucketName);
 		if (!selectedBucket) {
@@ -38,20 +39,17 @@ export default function Files() {
 		getFilesOfBucket,
 		bucket,
 		files,
-		toDeleteFile,
 		deleteFileFromBucket,
 		deleteMultipleFileFromBucket,
 		fileCountInfo,
 		storage,
-		closeDeleteFileDialog,
-		isFileDeleteDialogOpen,
 		uploadFileToBucket,
 		isEditFileDialogOpen,
 		closeFileEditDialog,
 		uploadProgress,
 	} = useStorageStore();
 
-	const storageUrl = getVersionDashboardPath(`/${storage?.versionId}/storage`);
+	const storageUrl = getVersionDashboardPath('/storage');
 	const bucketUrl = `${storageUrl}/${storage._id}`;
 	const breadcrumbItems: BreadCrumbItem[] = [
 		{
@@ -59,7 +57,7 @@ export default function Files() {
 			url: storageUrl,
 		},
 		{
-			name: t('storage.buckets') as string,
+			name: storage.name,
 			url: bucketUrl,
 		},
 		{
@@ -67,13 +65,17 @@ export default function Files() {
 		},
 	];
 
-	const { isPending, hasNextPage, fetchNextPage } = useInfiniteScroll({
+	const { isFetching, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteScroll({
 		queryFn: getFilesOfBucket,
-		queryKey: 'files',
-		lastFetchedPage: fileCountInfo.currentPage,
+		queryKey: 'getFilesOfBucket',
+		lastFetchedPage: fileCountInfo.currentPage ?? 0,
 		dataLength: files.length,
+		params: {
+			storageName: storage?.name as string,
+			bucketName: bucket?.name as string,
+			returnCountInfo: true,
+		},
 	});
-
 	const table = useTable({
 		data: files,
 		columns: FileColumns,
@@ -88,16 +90,6 @@ export default function Files() {
 		onError: ({ error, details }: APIError) => {
 			notify({ type: 'error', description: details, title: error });
 		},
-	});
-
-	const {
-		mutateAsync: deleteFileMutation,
-		isPending: deleteLoading,
-		error: deleteError,
-	} = useMutation({
-		mutationFn: deleteFileFromBucket,
-		mutationKey: ['deleteFileFromBucket'],
-		onSettled: closeDeleteFileDialog,
 	});
 
 	const { mutateAsync: updateFileMutation, isPending: uploadLoading } = useMutation({
@@ -118,13 +110,6 @@ export default function Files() {
 			bucketName: bucket?.name as string,
 		});
 	}
-	function deleteFileHandler() {
-		deleteFileMutation({
-			storageName: storage?.name as string,
-			bucketName: bucket?.name as string,
-			filePath: toDeleteFile?.path as string,
-		});
-	}
 
 	function uploadFileHandler() {
 		const fileInput = document.createElement('input');
@@ -143,9 +128,9 @@ export default function Files() {
 		};
 		fileInput.click();
 	}
-
 	return (
 		<VersionTabLayout
+			searchable
 			breadCrumb={<BreadCrumb goBackLink={bucketUrl} items={breadcrumbItems} />}
 			isEmpty={files.length === 0}
 			title={bucket?.name}
@@ -154,7 +139,8 @@ export default function Files() {
 			createButtonTitle={t('storage.file.upload')}
 			emptyStateTitle={t('storage.file.empty_text')}
 			onMultipleDelete={deleteMultipleFilesHandler}
-			loading={isPending && !files.length}
+			loading={isFetching && !files.length}
+			table={table}
 		>
 			{uploadLoading && (uploadProgress > 0 || uploadProgress < 100) && (
 				<Progress value={uploadProgress} />
@@ -164,30 +150,9 @@ export default function Files() {
 				dataLength={files.length}
 				next={fetchNextPage}
 				hasMore={hasNextPage}
-				loader={isPending && <TableLoading />}
+				loader={isFetchingNextPage && <TableLoading />}
 			>
 				<DataTable table={table} />
-				<ConfirmationModal
-					loading={deleteLoading}
-					error={deleteError}
-					title={t('storage.file.delete.title')}
-					alertTitle={t('storage.file.delete.message')}
-					alertDescription={t('storage.file.delete.description')}
-					description={
-						<Trans
-							i18nKey='storage.file.delete.confirmCode'
-							values={{ confirmCode: toDeleteFile?.id }}
-							components={{
-								confirmCode: <span className='font-bold text-default' />,
-							}}
-						/>
-					}
-					confirmCode={toDeleteFile?.id as string}
-					onConfirm={deleteFileHandler}
-					isOpen={isFileDeleteDialogOpen}
-					closeModal={closeDeleteFileDialog}
-					closable
-				/>
 			</InfiniteScroll>
 			<EditFile open={isEditFileDialogOpen} onClose={closeFileEditDialog} />
 		</VersionTabLayout>

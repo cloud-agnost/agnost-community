@@ -57,6 +57,7 @@ export default function MainFunction() {
 	return (
 		<>
 			<VersionTabLayout
+				searchable
 				type='function'
 				title={t('function.title')}
 				createButtonTitle={t('function.add')}
