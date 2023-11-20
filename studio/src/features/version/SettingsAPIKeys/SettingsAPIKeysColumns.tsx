@@ -255,7 +255,6 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 						<TableConfirmation
 							align='end'
 							closeOnConfirm
-							showAvatar={false}
 							title={translate('version.api_key.delete_modal_title')}
 							description={translate('version.api_key.delete_modal_desc')}
 							onConfirm={onDelete}

@@ -242,7 +242,6 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
-						showAvatar={false}
 						title={translate('database.fields.delete.title')}
 						description={translate('database.fields.delete.description')}
 						onConfirm={() => deleteHandler(original)}

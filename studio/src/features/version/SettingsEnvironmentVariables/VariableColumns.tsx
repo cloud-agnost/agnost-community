@@ -133,7 +133,6 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
-						showAvatar={false}
 						title={translate('version.variable.delete_modal_title')}
 						description={translate('version.variable.delete_modal_desc')}
 						onConfirm={onDelete}

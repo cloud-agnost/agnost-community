@@ -43,7 +43,6 @@ export const NavigatorColumns: ColumnDefWithClassName<Record<string, any>>[] = [
 				<TableConfirmation
 					align='end'
 					closeOnConfirm
-					showAvatar={false}
 					title={translate('database.navigator.delete.title')}
 					description={translate('database.navigator.delete.message')}
 					onConfirm={() => deleteHandler(original.id)}

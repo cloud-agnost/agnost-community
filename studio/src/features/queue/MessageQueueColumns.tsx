@@ -157,7 +157,6 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
-						showAvatar={false}
 						title={translate('queue.delete.title')}
 						description={translate('queue.delete.message')}
 						onConfirm={() => deleteHandler(original)}

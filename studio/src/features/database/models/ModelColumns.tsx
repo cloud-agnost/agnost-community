@@ -131,7 +131,6 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 						<TableConfirmation
 							align='end'
 							closeOnConfirm
-							showAvatar={false}
 							title={translate('database.models.delete.title')}
 							description={translate('database.models.delete.description')}
 							onConfirm={() => deleteHandler(original)}
