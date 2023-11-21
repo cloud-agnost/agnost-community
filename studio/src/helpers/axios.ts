@@ -78,7 +78,7 @@ envInstance.interceptors.response.use(
 	({ response: { data } }) => {
 		const err: APIError = {
 			code: data.code ?? data.errors[0].code,
-			error: data.error ?? data.errors[0].specifics[0].code,
+			error: data.error ?? data.errors[0].error ?? data.errors[0].specifics[0].code,
 			details: data.message ?? data.errors[0].message ?? data.errors.fields?.[0]?.msg,
 		};
 		return Promise.reject(err);
