@@ -66,7 +66,7 @@ export default function Files() {
 	const { isFetching, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteScroll({
 		queryFn: getFilesOfBucket,
 		queryKey: 'getFilesOfBucket',
-		lastFetchedPage: fileCountInfo.currentPage ?? 0,
+		lastFetchedPage: fileCountInfo.currentPage ? fileCountInfo.currentPage - 1 : 0,
 		dataLength: files.length,
 		params: {
 			storageName: storage?.name as string,
