@@ -3,17 +3,9 @@ import responseTime from "response-time";
 import { applyDefaultRateLimiters } from "../middlewares/applyDefaultRateLimiters.js";
 import { authManageStorage } from "../middlewares/authManageStorage.js";
 import { checkContentType } from "../middlewares/checkContentType.js";
+import { checkServerStatus } from "../middlewares/checkServerStatus.js";
 import { getResponseBody } from "../middlewares/getResponseBody.js";
 import { logRequestToConsole } from "../middlewares/logRequest.js";
-import { handleFileUploads } from "../middlewares/handleFileUploads.js";
-import { checkServerStatus } from "../middlewares/checkServerStatus.js";
-import { checkAPIKey } from "../middlewares/checkAPIKey.js";
-import {
-  checkStorage,
-  checkBucket,
-} from "../middlewares/checkStorageBucket.js";
-import { applyRules, validate } from "../util/authRules.js";
-import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
 
