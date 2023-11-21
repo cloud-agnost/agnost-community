@@ -1,20 +1,22 @@
 import express from "express";
 import responseTime from "response-time";
+import ERROR_CODES from "../config/errorCodes.js";
 import { applyDefaultRateLimiters } from "../middlewares/applyDefaultRateLimiters.js";
 import { authManageStorage } from "../middlewares/authManageStorage.js";
-import { checkContentType } from "../middlewares/checkContentType.js";
-import { getResponseBody } from "../middlewares/getResponseBody.js";
-import { logRequestToConsole } from "../middlewares/logRequest.js";
-import { handleFileUploads } from "../middlewares/handleFileUploads.js";
-import { checkServerStatus } from "../middlewares/checkServerStatus.js";
+import { authSession } from "../middlewares/authSession.js";
 import { checkAPIKey } from "../middlewares/checkAPIKey.js";
+import { checkContentType } from "../middlewares/checkContentType.js";
+import { checkServerStatus } from "../middlewares/checkServerStatus.js";
 import {
-  checkStorage,
   checkBucket,
+  checkStorage,
 } from "../middlewares/checkStorageBucket.js";
+import { getResponseBody } from "../middlewares/getResponseBody.js";
+import { handleFileUploads } from "../middlewares/handleFileUploads.js";
+import { logRequestToConsole } from "../middlewares/logRequest.js";
 import { applyRules, validate } from "../util/authRules.js";
-import ERROR_CODES from "../config/errorCodes.js";
-
+import { sendMessage } from "../init/sync.js";
+import helper from "../util/helper.js";
 const router = express.Router({ mergeParams: true });
 
 /*
@@ -35,7 +37,6 @@ router.get(
       const { storageName } = req.params;
       const { page, size, sortBy, sortDir, search, returnCountInfo } =
         req.query;
-      console.log("returnCountInfo", returnCountInfo, Number(page) + 1);
       const bucket = await agnost.storage(storageName).listBuckets({
         page: Number(page) + 1,
         limit: Number(size),
@@ -60,75 +61,49 @@ router.get(
 router.post(
   "/:storageName/bucket",
   authManageStorage,
-  getResponseBody,
   responseTime(logRequestToConsole),
   applyDefaultRateLimiters(),
   checkContentType,
   checkServerStatus,
+  authSession,
+  checkStorage,
+
   async (req, res) => {
     try {
       const { storageName } = req.params;
-      const { name, isPublic, tags, userId } = req.body;
+      const { name, isPublic, tags, versionId } = req.body;
+      const { user } = req;
 
       const bucket = await agnost
         .storage(storageName)
-        .createBucket(name, isPublic, tags, userId);
+        .createBucket(
+          name,
+          isPublic,
+          helper.stringifyObjectValues(tags),
+          user._id
+        );
 
-      res.json(bucket);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
-);
-
-/*
-@route      /storage/:storageName/get-stats
-@method     GET
-@desc      Get stats of the storage
-@access     private
-*/
-router.get(
-  "/:storageName/get-stats",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName } = req.params;
-      const stats = await agnost.storage(storageName).getStats();
-      res.json(stats);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
-);
-/*
-@route      /storage/:storageName/files?page=0&limit=10&search=&sortBy=email&sortDir=asc
-@method     GET
-@desc       Get list of files of the storage
-@access     private
-*/
-router.get(
-  "/:storageName/files",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName } = req.params;
-      const { page, size, sortBy, sortDir, search } = req.query;
-      const files = await agnost.storage(storageName).listFiles({
-        page: Number(page) + 1,
-        limit: Number(size),
-        sort: { field: sortBy, order: sortDir },
-        search,
+      sendMessage(versionId, {
+        actor: {
+          userId: user._id,
+          name: user.name,
+          pictureUrl: user.pictureUrl,
+          color: user.color,
+          loginEmail: user.loginProfiles[0].email,
+          contactEmail: user.contactEmail,
+        },
+        action: "create",
+        object: "org.app.version.storage.bucket",
+        description: `Created bucket ${name} in storage ${storageName}`,
+        timestamp: Date.now(),
+        data: bucket,
+        identifiers: {
+          bucketId: bucket.id,
+          bucketName: name,
+          versionId,
+        },
       });
-
-      res.json(files);
+      res.json(bucket);
     } catch (error) {
       helper.handleError(req, res, error);
     }
@@ -149,13 +124,13 @@ router.get(
   responseTime(logRequestToConsole),
   applyDefaultRateLimiters(),
   checkServerStatus,
+  checkStorage,
+  checkBucket,
   async (req, res) => {
     try {
-      const { storageName, bucketName } = req.params;
+      const { bucket } = req;
 
-      await agnost.storage(storageName).bucket(bucketName).getInfo();
-
-      res.json();
+      res.json(bucket);
     } catch (error) {
       helper.handleError(req, res, error);
     }
@@ -175,12 +150,36 @@ router.delete(
   responseTime(logRequestToConsole),
   applyDefaultRateLimiters(),
   checkServerStatus,
+  checkStorage,
+  checkBucket,
+  authSession,
   async (req, res) => {
     try {
       const { storageName, bucketName } = req.params;
-
+      const { versionId } = req.query;
+      const { user, bucket, storage } = req;
       await agnost.storage(storageName).bucket(bucketName).delete();
-
+      sendMessage(versionId, {
+        actor: {
+          userId: user._id,
+          name: user.name,
+          pictureUrl: user.pictureUrl,
+          color: user.color,
+          loginEmail: user.loginProfiles[0].email,
+          contactEmail: user.contactEmail,
+        },
+        action: "delete",
+        object: "org.app.version.storage.bucket",
+        description: `Deleted bucket ${bucket.name} in storage ${storageName}`,
+        timestamp: Date.now(),
+        data: {},
+        identifiers: {
+          bucketName: bucket.name,
+          bucketId: bucket.id,
+          storageId: storage.id,
+          versionId,
+        },
+      });
       res.json();
     } catch (error) {
       helper.handleError(req, res, error);
@@ -203,17 +202,41 @@ router.delete(
   applyDefaultRateLimiters(),
   checkServerStatus,
   checkContentType,
+  checkStorage,
+  authSession,
   async (req, res) => {
     try {
       const { storageName } = req.params;
-      const { bucketNames } = req.body;
-      bucketNames.forEach(async (bucketName) => {
-        await agnost.storage(storageName).bucket(bucketName).delete();
+      const { deletedBuckets, versionId } = req.body;
+      const { user, storage } = req;
+      deletedBuckets.forEach(async (bucket) => {
+        const { name, id } = bucket;
+        await agnost.storage(storageName).bucket(name).delete();
+        sendMessage(versionId, {
+          actor: {
+            userId: user._id,
+            name: user.name,
+            pictureUrl: user.pictureUrl,
+            color: user.color,
+            loginEmail: user.loginProfiles[0].email,
+            contactEmail: user.contactEmail,
+          },
+          action: "delete",
+          object: "org.app.version.storage.bucket",
+          description: `Deleted bucket ${name} in storage ${storageName}`,
+          timestamp: Date.now(),
+          data: {},
+          identifiers: {
+            bucketId: id,
+            storageId: storage.id,
+            bucketName: name,
+            versionId,
+          },
+        });
       });
 
       res.json();
     } catch (error) {
-      console.log("error", error);
       helper.handleError(req, res, error);
     }
   }
@@ -275,99 +298,6 @@ router.delete(
 );
 
 /*
-@route      /storage/:storageName/bucket/:bucketName/tag
-@method     POST
-@desc       Add tags to a bucket
-@access     private
-*/
-
-router.post(
-  "/:storageName/bucket/:bucketName/tag",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkContentType,
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
-      const buckets = [];
-      await Promise.all(
-        Object.entries(req.body).map(async ([key, value]) => {
-          const bucket = await agnost
-            .storage(storageName)
-            .bucket(bucketName)
-            .setTag(key, value);
-          buckets.push(bucket);
-        })
-      );
-      res.json(buckets);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
-);
-
-/*
-@route      /storage/:storageName/bucket/:bucketName/tag/:tagKey
-@method     DELETE
-@desc       Remove tags from a bucket
-@access     private
-*/
-
-router.delete(
-  "/:storageName/bucket/:bucketName/tag/:tagKey",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName, tagKey } = req.params;
-      const bucket = await agnost
-        .storage(storageName)
-        .bucket(bucketName)
-        .removeTag(tagKey);
-
-      res.json(bucket);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
-);
-
-/*
-@route      /storage/:storageName/bucket/:bucketName/tag/delete-multi
-@method     DELETE
-@desc       Remove multiple tags from a bucket
-@access     private
-*/
-
-router.delete(
-  "/:storageName/bucket/:bucketName/tag/delete-multi",
-  authManageStorage,
-  getResponseBody,
-  responseTime(logRequestToConsole),
-  applyDefaultRateLimiters(),
-  checkServerStatus,
-  async (req, res) => {
-    try {
-      const { storageName, bucketName } = req.params;
-
-      const bucket = await agnost
-        .storage(storageName)
-        .bucket(bucketName)
-        .removeTags();
-      res.json(bucket);
-    } catch (error) {
-      helper.handleError(req, res, error);
-    }
-  }
-);
-
-/*
 @route      /storage/:storageName/bucket/:bucketName
 @method     PUT
 @desc       Update a bucket
@@ -381,15 +311,44 @@ router.put(
   applyDefaultRateLimiters(),
   checkContentType,
   checkServerStatus,
+  authSession,
+  checkStorage,
   async (req, res) => {
     try {
       const { storageName, bucketName } = req.params;
-      const { name, isPublic, tags, includeFiles } = req.body;
+      const { name, isPublic, tags, includeFiles, versionId } = req.body;
+      const { user, storage } = req;
       const bucket = await agnost
         .storage(storageName)
         .bucket(bucketName)
-        .updateInfo(name, isPublic, tags, includeFiles);
-      console.log("bucket", bucket);
+        .updateInfo(
+          name,
+          isPublic,
+          helper.stringifyObjectValues(tags),
+          includeFiles
+        );
+
+      sendMessage(versionId, {
+        actor: {
+          userId: user._id,
+          name: user.name,
+          pictureUrl: user.pictureUrl,
+          color: user.color,
+          loginEmail: user.loginProfiles[0].email,
+          contactEmail: user.contactEmail,
+        },
+        action: "update",
+        object: "org.app.version.storage.bucket",
+        description: `Updated bucket ${name} in storage ${storageName}`,
+        timestamp: Date.now(),
+        data: bucket,
+        identifiers: {
+          bucketId: bucket.id,
+          bucketName: name,
+          storageId: storage.id,
+          versionId,
+        },
+      });
       res.json(bucket);
     } catch (error) {
       helper.handleError(req, res, error);
@@ -634,7 +593,7 @@ router.put(
         .storage(storageName)
         .bucket(bucketName)
         .file(filePath)
-        .updateInfo(path, isPublic, tags);
+        .updateInfo(path, isPublic, helper.stringifyObjectValues(tags));
       res.json(result);
     } catch (error) {
       helper.handleError(req, res, error);
