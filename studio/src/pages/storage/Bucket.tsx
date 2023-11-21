@@ -106,8 +106,12 @@ export default function Buckets() {
 
 	function deleteMultipleBucketsHandler() {
 		deleteMultipleBucketsMutation({
-			bucketNames: table.getSelectedRowModel().rows.map((bucket) => bucket.original.name),
+			deletedBuckets: table.getSelectedRowModel().rows.map(({ original: bucket }) => ({
+				id: bucket.id,
+				name: bucket.name,
+			})),
 			storageName: storage?.name,
+			versionId: storage?.versionId,
 		});
 	}
 	function deleteBucketHandler() {
@@ -115,6 +119,7 @@ export default function Buckets() {
 		deleteBucketMutation({
 			storageName: storage?.name,
 			bucketName: toDeleteBucket?.name as string,
+			versionId: storage?.versionId,
 		});
 	}
 	return (

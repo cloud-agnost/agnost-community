@@ -96,8 +96,16 @@ export default class StorageService {
 		return (await http.post(`${this.getUrl()}/storage/${storageName}/bucket`, data)).data;
 	}
 
-	static async deleteBucket({ storageName, bucketName }: DeleteBucketParams): Promise<void> {
-		return (await http.delete(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}`)).data;
+	static async deleteBucket({
+		storageName,
+		bucketName,
+		versionId,
+	}: DeleteBucketParams): Promise<void> {
+		return (
+			await http.delete(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}`, {
+				params: { versionId },
+			})
+		).data;
 	}
 	static async getBucket({ storageName, bucketName }: DeleteBucketParams): Promise<Bucket> {
 		return (await http.get(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}`)).data;
@@ -113,11 +121,12 @@ export default class StorageService {
 
 	static async deleteMultipleBuckets({
 		storageName,
-		bucketNames,
+		deletedBuckets,
+		versionId,
 	}: DeleteMultipleBucketParams): Promise<void> {
 		return (
 			await axios.delete(`${this.getUrl()}/storage/${storageName}/delete-multi-buckets`, {
-				data: { bucketNames },
+				data: { deletedBuckets, versionId },
 			})
 		).data;
 	}
