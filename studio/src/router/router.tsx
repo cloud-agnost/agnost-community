@@ -3,9 +3,26 @@ import ErrorBoundary from '@/pages/errors/ErrorBoundary.tsx';
 import { Root } from '@/pages/root';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
-import { lazyRouteImport } from '@/utils';
 import type { ReactNode } from 'react';
 import { Navigate, createBrowserRouter, useLocation } from 'react-router-dom';
+import loadable from '@loadable/component';
+import { componentLoader } from '@/helpers';
+export function Fallback(): JSX.Element {
+	return <div>Something went wrong</div>;
+}
+async function lazyRouteImport(path: string) {
+	const Component = loadable(() => componentLoader(() => import(path)), {
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	});
+
+	return {
+		Component,
+		// @ts-ignore
+		loader: Component?.loader,
+	};
+}
+
 const router = createBrowserRouter([
 	{
 		path: '/',
