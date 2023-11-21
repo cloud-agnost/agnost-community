@@ -266,7 +266,7 @@
 	.loading {
 		@apply animate-spin mr-2;
 	}
-	.main {
+	.main-layout {
 		height: calc(100vh - 72px);
 	}
 	.editor {
@@ -545,7 +545,4 @@ html .light ::-webkit-scrollbar-track {
 
 .select__option--is-focused {
 	@apply bg-wrapper-background-hover #{!important};
-}
-.infinite-scroll-component__outerdiv {
-	height: 100%;
 }

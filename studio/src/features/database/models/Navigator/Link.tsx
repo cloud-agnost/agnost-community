@@ -1,17 +1,18 @@
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { useUpdateData } from '@/hooks';
+import { useEditedField, useUpdateData } from '@/hooks';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { NavigatorComponentProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import * as z from 'zod';
-export default function LinkField({ isEditable, row, field }: NavigatorComponentProps) {
+export default function LinkField({ cell, row, field }: NavigatorComponentProps) {
 	const { setEditedField } = useNavigatorStore();
 	const data = row?.original;
 	const updateData = useUpdateData(field);
-
+	const isEditable = useEditedField(field, cell);
 	const LinkSchema = z.object({
 		[field.name]: z.string().optional(),
 	});
@@ -31,6 +32,12 @@ export default function LinkField({ isEditable, row, field }: NavigatorComponent
 			row?.index as number,
 		);
 	}
+
+	useEffect(() => {
+		if (isEditable) {
+			form.setValue(field.name, data[field.name]);
+		}
+	}, [isEditable]);
 	return isEditable ? (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)}>

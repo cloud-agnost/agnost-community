@@ -1,4 +1,9 @@
-import { ORG_CHANGE_EXCEPTIONS, PARAM_REGEX, VERSION_CHANGE_EXCEPTIONS } from '@/constants';
+import {
+	ORG_CHANGE_EXCEPTIONS,
+	PARAM_REGEX,
+	PHONE_REGEXES,
+	VERSION_CHANGE_EXCEPTIONS,
+} from '@/constants';
 import { STATE_LIST } from '@/constants/stateList';
 import { socket } from '@/helpers';
 import { useToast as toast } from '@/hooks';
@@ -409,4 +414,28 @@ export function getVersionPermission(type: string): boolean {
 		? user?._id === version.createdBy || role === 'Admin'
 		: isPrivateForUser && getAppPermission(`${role}.app.${type}`);
 	return isVersionEditable as boolean;
+}
+
+export function isMobilePhone(phoneNumber: string): boolean {
+	if (!phoneNumber.startsWith('+')) {
+		return false;
+	}
+	for (const key in PHONE_REGEXES) {
+		if (PHONE_REGEXES.hasOwnProperty(key)) {
+			const phone = PHONE_REGEXES[key as keyof typeof PHONE_REGEXES];
+			if (phone.test(phoneNumber)) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+export function stringifyObjectValues(obj: Record<string, any>): Record<string, string> {
+	const stringifiedObj: Record<string, any> = {};
+
+	for (const key in obj) {
+		stringifiedObj[key] = String(obj[key]);
+	}
+
+	return stringifiedObj;
 }

@@ -1,12 +1,13 @@
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { useUpdateData } from '@/hooks';
+import { useEditedField, useUpdateData } from '@/hooks';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { NavigatorComponentProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-export default function Text({ isEditable, row, field }: NavigatorComponentProps) {
+export default function Text({ cell, row, field }: NavigatorComponentProps) {
 	const { setEditedField } = useNavigatorStore();
 	const updateData = useUpdateData(field);
 	const data = row?.original;
@@ -22,6 +23,14 @@ export default function Text({ isEditable, row, field }: NavigatorComponentProps
 	function onSubmit(d: z.infer<typeof TextSchema>) {
 		updateData(d, data.id, row?.index as number);
 	}
+
+	const isEditable = useEditedField(field, cell);
+
+	useEffect(() => {
+		if (isEditable) {
+			form.setValue(field.name, data[field.name === '_id' ? 'id' : field.name]);
+		}
+	}, [isEditable]);
 
 	return isEditable ? (
 		<Form {...form}>

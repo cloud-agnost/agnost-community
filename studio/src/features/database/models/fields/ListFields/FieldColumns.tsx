@@ -11,11 +11,12 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 
-const { openEditFieldDialog, deleteField, model } = useModelStore.getState();
+const { openEditFieldDialog, deleteField } = useModelStore.getState();
 const canDelete = getVersionPermission('model.delete');
 const canEdit = getVersionPermission('model.update');
 async function deleteHandler(field: Field) {
-	await deleteField({
+	const model = useModelStore.getState().model;
+	deleteField({
 		dbId: model.dbId,
 		appId: model.appId,
 		orgId: model.orgId,
@@ -241,7 +242,6 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
-						showAvatar={false}
 						title={translate('database.fields.delete.title')}
 						description={translate('database.fields.delete.description')}
 						onConfirm={() => deleteHandler(original)}

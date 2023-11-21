@@ -8,7 +8,6 @@ import { ColumnDefWithClassName, Resource, ResourceCreateType } from '@/types';
 import { getOrgPermission, translate } from '@/utils';
 
 const { openEditResourceModal } = useResourceStore.getState();
-
 export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 	{
 		id: 'name',

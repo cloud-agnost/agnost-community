@@ -142,7 +142,6 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
-						showAvatar={false}
 						title={translate('version.npm.delete_modal_title')}
 						description={translate('version.npm.delete_modal_desc')}
 						onConfirm={onDelete}

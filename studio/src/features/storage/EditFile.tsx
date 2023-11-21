@@ -14,7 +14,7 @@ import { Input } from '@/components/Input';
 import { Switch } from '@/components/Switch';
 import useStorageStore from '@/store/storage/storageStore';
 import { FileSchema } from '@/types';
-import { cn, isEmpty, arrayToObj, objToArray } from '@/utils';
+import { cn, isEmpty, arrayToObj, objToArray, stringifyObjectValues } from '@/utils';
 import { Plus, Trash } from '@phosphor-icons/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +33,7 @@ export default function EditFile({ open, onClose }: EditFileProps) {
 		defaultValues: {
 			path: file.path,
 			isPublic: file.isPublic,
-			tags: objToArray(file.tags),
+			tags: objToArray(stringifyObjectValues(file.tags)),
 		},
 	});
 
@@ -75,6 +75,22 @@ export default function EditFile({ open, onClose }: EditFileProps) {
 			});
 		}
 	}, [file.tags]);
+
+	useEffect(() => {
+		if (open) {
+			form.reset({
+				path: file.path,
+				isPublic: file.isPublic,
+				tags: objToArray(file.tags),
+			});
+		} else {
+			form.reset({
+				path: '',
+				isPublic: true,
+				tags: [],
+			});
+		}
+	}, [open]);
 
 	return (
 		<Drawer open={open} onOpenChange={() => resetForm()}>

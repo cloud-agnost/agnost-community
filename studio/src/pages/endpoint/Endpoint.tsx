@@ -54,6 +54,7 @@ export default function MainEndpoint() {
 	return (
 		<>
 			<VersionTabLayout<Endpoint>
+				searchable
 				type='endpoint'
 				title={t('endpoint.title')}
 				createButtonTitle={t('endpoint.add')}

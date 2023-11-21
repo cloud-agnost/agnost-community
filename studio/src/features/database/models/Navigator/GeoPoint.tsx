@@ -1,17 +1,27 @@
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { useUpdateData } from '@/hooks';
+import { useEditedField, useUpdateData } from '@/hooks';
+import useDatabaseStore from '@/store/database/databaseStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { NavigatorComponentProps } from '@/types';
+import { isEmpty } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
-export default function GeoPoint({ isEditable, row, field }: NavigatorComponentProps) {
+export default function GeoPoint({ cell, row, field }: NavigatorComponentProps) {
 	const name = field.name;
 	const data = row?.original;
 	const id = data?.id;
 	const updateData = useUpdateData(field);
+	const isEditable = useEditedField(field, cell);
+	const database = useDatabaseStore((state) => state.database);
+	const coords = {
+		lat: database.type === 'MongoDB' ? data?.[name]?.coordinates?.[0] : data?.[name]?.x,
+		lng: database.type === 'MongoDB' ? data?.[name]?.coordinates?.[1] : data?.[name]?.y,
+	};
+
 	const GeoPointSchema = z.object({
 		[name]: z.object({
 			lat: z.coerce.number().optional(),
@@ -21,10 +31,7 @@ export default function GeoPoint({ isEditable, row, field }: NavigatorComponentP
 	const form = useForm<z.infer<typeof GeoPointSchema>>({
 		resolver: zodResolver(GeoPointSchema),
 		defaultValues: {
-			[name]: {
-				lat: data?.[name]?.coordinates?.[0],
-				lng: data?.[name]?.coordinates?.[1],
-			},
+			[name]: coords,
 		},
 	});
 	const { setEditedField } = useNavigatorStore.getState();
@@ -32,10 +39,15 @@ export default function GeoPoint({ isEditable, row, field }: NavigatorComponentP
 	function onSubmit(data: z.infer<typeof GeoPointSchema>) {
 		updateData({ [name]: [data[name].lat, data[name].lng] }, id, row?.index as number);
 	}
+	useEffect(() => {
+		if (isEditable) {
+			form.setValue(name, coords);
+		}
+	}, [isEditable]);
 
 	return isEditable ? (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)}>
+			<form onSubmit={form.handleSubmit(onSubmit)} className='flex gap-4'>
 				<FormField
 					control={form.control}
 					name={`${name}.lat`}
@@ -80,7 +92,9 @@ export default function GeoPoint({ isEditable, row, field }: NavigatorComponentP
 		</Form>
 	) : (
 		<span>
-			{data?.[name]?.coordinates?.[0]}, {data?.[name]?.coordinates?.[1]}
+			{coords.lat}
+			{!isEmpty(coords.lat) && !isEmpty(coords.lng) && ', '}
+			{coords.lng}
 		</span>
 	);
 }

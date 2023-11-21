@@ -19,8 +19,9 @@ import * as z from 'zod';
 
 interface StorageFormProps {
 	edit?: boolean;
+	loading: boolean;
 }
-export default function StorageForm({ edit = false }: StorageFormProps) {
+export default function StorageForm({ edit = false, loading }: StorageFormProps) {
 	const form = useFormContext<z.infer<typeof CreateStorageSchema>>();
 	const { getResources } = useResourceStore();
 
@@ -85,7 +86,7 @@ export default function StorageForm({ edit = false }: StorageFormProps) {
 							{t('general.cancel')}
 						</Button>
 					</DrawerClose>
-					<Button className='ml-2' type='submit' size='lg'>
+					<Button className='ml-2' type='submit' size='lg' loading={loading}>
 						{t('general.save')}
 					</Button>
 				</div>

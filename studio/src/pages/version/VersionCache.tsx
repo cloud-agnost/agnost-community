@@ -86,6 +86,7 @@ export default function VersionCache() {
 	return (
 		<>
 			<VersionTabLayout
+				searchable
 				isEmpty={caches.length === 0}
 				title={t('cache.title')}
 				type='cache'

@@ -40,10 +40,7 @@ export default function CreateModel({
 				type: 'error',
 			});
 		},
-		onSettled: () => {
-			form.reset();
-			onOpenChange(false);
-		},
+		onSettled: () => onClose(),
 	});
 	async function onSubmit(data: z.infer<typeof ModelSchema>) {
 		createModelMutation({
@@ -54,8 +51,15 @@ export default function CreateModel({
 			...data,
 		});
 	}
+	function onClose() {
+		form.reset({
+			name: '',
+			description: '',
+		});
+		onOpenChange(false);
+	}
 	return (
-		<Drawer open={open} onOpenChange={onOpenChange}>
+		<Drawer open={open} onOpenChange={onClose}>
 			<DrawerContent className='overflow-x-hidden'>
 				<DrawerHeader className='relative'>
 					<DrawerTitle>{t('database.models.create')}</DrawerTitle>

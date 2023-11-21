@@ -94,17 +94,22 @@ export interface GetFilesParams {
 export interface DeleteBucketParams extends BaseRequest {
 	storageName: string;
 	bucketName: string;
+	versionId?: string;
 }
 export interface DeleteMultipleBucketParams extends BaseRequest {
 	storageName: string;
-	bucketNames: string[];
+	deletedBuckets: {
+		id: string;
+		name: string;
+	}[];
+	versionId: string;
 }
 export interface CreateBucketParams extends BaseRequest {
 	storageName: string;
 	name: string;
 	isPublic?: boolean;
 	tags?: Record<string, string>;
-	userId?: string;
+	versionId?: string;
 }
 
 export interface UpdateBucketParams extends BaseRequest, CreateBucketParams {

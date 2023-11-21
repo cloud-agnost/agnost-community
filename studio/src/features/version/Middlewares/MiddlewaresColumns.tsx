@@ -122,7 +122,6 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
-						showAvatar={false}
 						title={translate('version.middleware.delete.title')}
 						description={translate('version.middleware.delete.message')}
 						onConfirm={() => deleteHandler(original)}

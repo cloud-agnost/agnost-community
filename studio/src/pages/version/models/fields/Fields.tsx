@@ -3,7 +3,7 @@ import {
 	EditOrCreateFieldDrawer,
 	FieldColumns,
 } from '@/features/database/models/fields/ListFields';
-import { useTable } from '@/hooks';
+import { useSearch, useTable } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useAuthStore from '@/store/auth/authStore';
@@ -12,9 +12,8 @@ import useModelStore from '@/store/database/modelStore.ts';
 import { Field } from '@/types';
 import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 import { DataTable } from 'components/DataTable';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LoaderFunctionArgs, useParams, useSearchParams } from 'react-router-dom';
+import { LoaderFunctionArgs, useParams } from 'react-router-dom';
 
 Fields.loader = async function ({ params }: LoaderFunctionArgs) {
 	if (!useAuthStore.getState().isAuthenticated()) return null;
@@ -31,7 +30,7 @@ Fields.loader = async function ({ params }: LoaderFunctionArgs) {
 	if (apiParams.modelId !== model._id && apiParams.modelId)
 		await getSpecificModelOfDatabase(apiParams);
 
-	return null;
+	return { props: {} };
 };
 
 export default function Fields() {
@@ -42,15 +41,8 @@ export default function Fields() {
 	const { deleteMultipleField, model, closeEditFieldDialog, isEditFieldDialogOpen } =
 		useModelStore();
 	const canMultiDelete = useAuthorizeVersion('model.delete');
-	const [searchParams] = useSearchParams();
 
-	const filteredFields = useMemo(() => {
-		if (searchParams.get('q')) {
-			const query = new RegExp(searchParams.get('q') as string, 'i');
-			return model.fields.filter((f) => f.name.match(query)).sort((a, b) => b.order - a.order);
-		}
-		return model.fields;
-	}, [searchParams.get('q'), model]);
+	const filteredFields = useSearch(model.fields);
 
 	const table = useTable<Field>({
 		data: filteredFields,
@@ -87,9 +79,11 @@ export default function Fields() {
 			name: model?.name,
 		},
 	];
+
 	return (
 		<>
 			<VersionTabLayout<Field>
+				searchable
 				breadCrumb={<BreadCrumb goBackLink={goParentModelUrl} items={breadcrumbItems} />}
 				isEmpty={!filteredFields.length}
 				title={t('database.fields.title')}

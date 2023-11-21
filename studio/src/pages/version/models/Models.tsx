@@ -1,6 +1,6 @@
 import { Button } from '@/components/Button';
 import { CreateModel, EditModel, ModelColumns } from '@/features/database/models';
-import { useTabNavigate, useTable, useToast } from '@/hooks';
+import { useSearch, useTabNavigate, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
@@ -9,9 +9,9 @@ import { APIError, Model, TabTypes } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 import { DataTable } from 'components/DataTable';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 export default function Models() {
 	const {
 		models,
@@ -21,7 +21,6 @@ export default function Models() {
 		getModelsOfDatabase,
 	} = useModelStore();
 	const [isCreateModelOpen, setIsCreateModelOpen] = useState(false);
-	const [searchParams] = useSearchParams();
 	const { t } = useTranslation();
 	const { notify } = useToast();
 
@@ -35,14 +34,7 @@ export default function Models() {
 	const { database } = useDatabaseStore();
 	const navigate = useTabNavigate();
 
-	const filteredModels = useMemo(() => {
-		if (searchParams.get('q')) {
-			const query = new RegExp(searchParams.get('q') as string, 'i');
-			return models.filter((model) => model.name.match(query));
-		}
-		return models;
-	}, [searchParams.get('q'), models]);
-
+	const filteredModels = useSearch(models);
 	const table = useTable<Model>({
 		data: filteredModels,
 		columns: ModelColumns,
@@ -113,6 +105,7 @@ export default function Models() {
 				disabled={!canCreateModel}
 				onMultipleDelete={deleteMultipleModelHandler}
 				loading={isPending}
+				searchable
 				handlerButton={
 					<Button variant='secondary' onClick={handleViewDataClick}>
 						View Data

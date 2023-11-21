@@ -1,22 +1,23 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
+import { TableConfirmation } from '@/components/Table';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useStorageStore from '@/store/storage/storageStore';
 import { APIError, BucketFile, ColumnDefWithClassName } from '@/types';
-import { notify, translate, formatFileSize, getVersionPermission } from '@/utils';
+import { formatFileSize, getVersionPermission, notify, translate } from '@/utils';
 import { Copy, Swap } from '@phosphor-icons/react';
+import { QueryClient } from '@tanstack/react-query';
 import { Button } from 'components/Button';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'components/Tooltip';
 import { Link } from 'react-router-dom';
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from 'components/Tooltip';
-import { QueryClient } from '@tanstack/react-query';
 const {
 	copyFileInBucket,
 	replaceFileInBucket,
-	openDeleteFileDialog,
 	openFileEditDialog,
+	deleteFileFromBucket,
 	storage,
 	bucket,
 } = useStorageStore.getState();
@@ -25,6 +26,25 @@ const canEditBucket = getVersionPermission('storage.update');
 const canDeleteBucket = getVersionPermission('storage.delete');
 
 const queryClient = new QueryClient();
+function deleteFileHandler(toDeleteFile: BucketFile) {
+	queryClient
+		.getMutationCache()
+		.build(queryClient, {
+			mutationFn: deleteFileFromBucket,
+			onError: (error: APIError) => {
+				notify({
+					title: error.error,
+					description: error.details,
+					type: 'error',
+				});
+			},
+		})
+		.execute({
+			storageName: storage?.name,
+			bucketName: bucket.name,
+			filePath: toDeleteFile.path,
+		});
+}
 
 function replaceFile(filePath: string) {
 	const input = document.createElement('input');
@@ -149,22 +169,6 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 		),
 	},
 	{
-		id: 'tags',
-		header: translate('storage.bucket.tags'),
-		accessorKey: 'tags',
-		size: 300,
-		cell: ({ row: { original } }) => {
-			const { tags } = original;
-			return (
-				<div className='flex flex-wrap gap-4'>
-					{Object.entries(tags).map(([key, value]) => (
-						<Badge key={key} variant='gray' text={`${key}: ${value}`} rounded />
-					))}
-				</div>
-			);
-		},
-	},
-	{
 		id: 'size',
 		header: ({ column }) => <SortButton text={translate('storage.file.size')} column={column} />,
 		accessorKey: 'size',
@@ -182,6 +186,22 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 		),
 		accessorKey: 'mimeType',
 		sortingFn: 'textCaseSensitive',
+	},
+	{
+		id: 'tags',
+		header: translate('storage.bucket.tags'),
+		accessorKey: 'tags',
+		size: 300,
+		cell: ({ row: { original } }) => {
+			const { tags } = original;
+			return (
+				<div className='flex flex-wrap gap-4'>
+					{Object.entries(tags).map(([key, value]) => (
+						<Badge key={key} variant='gray' text={`${key}: ${value}`} rounded />
+					))}
+				</div>
+			);
+		},
 	},
 	{
 		id: 'created_at',
@@ -247,11 +267,20 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 
 					<ActionsCell
 						original={original}
-						onDelete={() => openDeleteFileDialog(original)}
 						onEdit={() => openFileEditDialog(original)}
 						canEdit={canEditBucket}
 						canDelete={canDeleteBucket}
-					/>
+					>
+						<TableConfirmation
+							align='end'
+							closeOnConfirm
+							title={translate('storage.file.delete.title')}
+							description={translate('storage.file.delete.message')}
+							onConfirm={() => deleteFileHandler(original)}
+							contentClassName='m-0'
+							hasPermission={canDeleteBucket}
+						/>
+					</ActionsCell>
 				</div>
 			);
 		},

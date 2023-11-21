@@ -22,7 +22,7 @@ import {
 } from '@/types';
 
 import { PAGE_SIZE } from '@/constants';
-import { CustomStateStorage, create } from '@/helpers';
+import { create } from '@/helpers';
 import useAuthStore from '@/store/auth/authStore';
 import useVersionStore from '@/store/version/versionStore';
 import { joinChannel, leaveChannel, translate } from '@/utils';
@@ -520,7 +520,6 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 				}),
 				{
 					name: 'application-storage',
-					storage: CustomStateStorage,
 				},
 			),
 		),

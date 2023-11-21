@@ -1,18 +1,15 @@
 import { ActionsCell } from '@/components/ActionsCell';
-import { QUEUE_ICON_MAP } from '@/constants';
+import { TableConfirmation } from '@/components/Table';
 import { TabLink } from '@/features/version/Tabs';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { APIError, ColumnDefWithClassName, MessageQueue, TabTypes } from '@/types';
-import { getVersionPermission, translate } from '@/utils';
+import { getVersionPermission, notify, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { InstanceType } from 'components/InstanceType';
-import { notify } from '@/utils';
-import { TableConfirmation } from '@/components/Table';
 
 const { openEditModal, deleteQueue } = useMessageQueueStore.getState();
 const queryClient = new QueryClient();
@@ -86,11 +83,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 				original: { iid },
 			},
 		}) => {
-			const environment = useEnvironmentStore.getState().environment;
-			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)?.resource
-				.instance;
-			const Icon = QUEUE_ICON_MAP[instance as string];
-			return <InstanceType iid={iid} Icon={Icon} />;
+			return <InstanceType iid={iid} />;
 		},
 	},
 	{
@@ -157,7 +150,6 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
-						showAvatar={false}
 						title={translate('queue.delete.title')}
 						description={translate('queue.delete.message')}
 						onConfirm={() => deleteHandler(original)}

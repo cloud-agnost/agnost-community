@@ -70,7 +70,7 @@ export default function DatabaseForm({
 							</FormItem>
 						)}
 					/>
-					<FormField
+					{/* <FormField
 						control={form.control}
 						name='managed'
 						render={({ field }) => (
@@ -84,7 +84,7 @@ export default function DatabaseForm({
 								</FormControl>
 							</FormItem>
 						)}
-					/>
+					/> */}
 				</>
 			)}
 			<Separator />

@@ -817,7 +817,7 @@ export const REFERENCE_FIELD_ACTION = ['CASCADE', 'NO ACTION', 'SET NULL', 'SET 
 export const MAX_LENGTHS: Record<string, number | Record<string, number>> = {
 	'encrypted-text': 50,
 	decimal: 10,
-	enum: 1000,
+	enum: 2048,
 	text: {
 		MySQL: 16_382,
 		'SQL Server': 4_000,

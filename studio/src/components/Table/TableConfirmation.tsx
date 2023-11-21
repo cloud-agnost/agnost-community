@@ -4,30 +4,31 @@ import { Trash, X } from '@phosphor-icons/react';
 import { Align } from '@radix-ui/react-popper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Avatar, AvatarFallback } from '../Avatar';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
 interface TableConfirmationProps {
 	onConfirm: () => void;
 	disabled?: boolean;
 	title: string;
-	showAvatar?: boolean;
 	description: string;
 	align?: Align;
 	contentClassName?: string;
 	closeOnConfirm?: boolean;
 	hasPermission: boolean;
+	icon?: React.ReactNode;
+	tooltip?: string;
 }
 
 export function TableConfirmation({
 	onConfirm,
-	showAvatar = true,
 	title,
 	description,
 	contentClassName,
 	closeOnConfirm,
 	align = 'center',
 	hasPermission,
+	icon,
+	tooltip,
 }: TableConfirmationProps) {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
@@ -51,11 +52,11 @@ export function TableConfirmation({
 									e.stopPropagation();
 								}}
 							>
-								<Trash size={20} />
+								{icon ?? <Trash size={20} />}
 							</Button>
 						</TooltipTrigger>
 					</PopoverTrigger>
-					<TooltipContent>{t('general.delete')}</TooltipContent>
+					<TooltipContent>{tooltip ?? t('general.delete')}</TooltipContent>
 					<PopoverContent align={align} className={cn(contentClassName)}>
 						<div id='popup-modal'>
 							<div className='relative w-full max-w-sm max-h-full'>
@@ -70,11 +71,6 @@ export function TableConfirmation({
 								</Button>
 								<div className='relative rounded p-4'>
 									<div className='flex flex-col justify-center items-center space-y-4 text-center'>
-										{showAvatar && (
-											<Avatar size='3xl'>
-												<AvatarFallback color='#9B7B0866' />
-											</Avatar>
-										)}
 										<h3 className='text-lg font-semibold text-default'>{title}</h3>
 										<p className='text-sm font-normal text-subtle'>{description}</p>
 									</div>

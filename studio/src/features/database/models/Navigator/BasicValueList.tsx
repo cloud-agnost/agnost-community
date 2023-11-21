@@ -1,16 +1,18 @@
 import { Badge } from '@/components/Badge';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { useUpdateData } from '@/hooks';
+import { useEditedField, useUpdateData } from '@/hooks';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { NavigatorComponentProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-export default function BasicValueList({ isEditable, row, field }: NavigatorComponentProps) {
+export default function BasicValueList({ cell, row, field }: NavigatorComponentProps) {
 	const { setEditedField } = useNavigatorStore();
 	const data = row?.original;
 	const updateData = useUpdateData(field);
+	const isEditable = useEditedField(field, cell);
 	const BVLSchema = z.object({
 		[field.name]: z.string().optional(),
 	});
@@ -30,6 +32,11 @@ export default function BasicValueList({ isEditable, row, field }: NavigatorComp
 			row?.index as number,
 		);
 	}
+	useEffect(() => {
+		if (isEditable) {
+			form.setValue(field.name, data[field.name]?.join(','));
+		}
+	}, [isEditable]);
 
 	return isEditable ? (
 		<Form {...form}>

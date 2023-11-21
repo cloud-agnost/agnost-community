@@ -1,7 +1,31 @@
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
+import {
+	DATABASE,
+	EMAIL_REGEX,
+	MAX_LENGTHS,
+	MYSQL_RESERVED_WORDS,
+	POSTGRES_RESERVED_WORDS,
+	REFERENCE_FIELD_ACTION,
+	SQL_SERVER_RESERVED_WORDS,
+	URL_REGEX,
+} from '@/constants';
+import { useToast } from '@/hooks';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
+import useDatabaseStore from '@/store/database/databaseStore.ts';
+import useModelStore from '@/store/database/modelStore.ts';
+import useTypeStore from '@/store/types/typeStore.ts';
+import {
+	APIError,
+	FieldType,
+	FieldTypes,
+	NameSchema,
+	ReferenceAction,
+	TimestampsSchema,
+} from '@/types';
+import { capitalize, cn, isMobilePhone, toDisplayName } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslation } from 'react-i18next';
+import { useMutation } from '@tanstack/react-query';
+import { Button } from 'components/Button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import {
 	Form,
@@ -13,37 +37,14 @@ import {
 	FormMessage,
 } from 'components/Form';
 import { Input, Textarea } from 'components/Input';
-import { Button } from 'components/Button';
-import {
-	DATABASE,
-	MAX_LENGTHS,
-	MYSQL_RESERVED_WORDS,
-	POSTGRES_RESERVED_WORDS,
-	REFERENCE_FIELD_ACTION,
-	SQL_SERVER_RESERVED_WORDS,
-} from '@/constants';
-import { Fragment, useEffect, useMemo, useState } from 'react';
-import {
-	APIError,
-	Database,
-	Field,
-	FieldType,
-	Model,
-	NameSchema,
-	ReferenceAction,
-	TimestampsSchema,
-} from '@/types';
-import { capitalize, cn, toDisplayName } from '@/utils';
-import { useParams } from 'react-router-dom';
-import { Switch } from 'components/Switch';
-import { SettingsFormItem } from 'components/SettingsFormItem';
-
 import { Separator } from 'components/Separator';
-import useModelStore from '@/store/database/modelStore.ts';
-import useTypeStore from '@/store/types/typeStore.ts';
-import useDatabaseStore from '@/store/database/databaseStore.ts';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/Select';
+import { SettingsFormItem } from 'components/SettingsFormItem';
+import { Switch } from 'components/Switch';
+import { Fragment, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import * as z from 'zod';
 
 type View = keyof FieldType['view'];
 
@@ -100,17 +101,18 @@ export default function EditOrCreateFieldDrawer({
 }: EditOrCreateModelDrawerProps) {
 	const languages = useTypeStore((state) => state.ftsIndexLanguages);
 	const { t } = useTranslation();
-	const [loading, setLoading] = useState(false);
-	const databases = useDatabaseStore((state) => state.databases);
 	const fieldTypes = useTypeStore((state) => state.fieldTypes);
-	const fieldToEdit = useModelStore((state) => state.field) as Field;
-	const addNewField = useModelStore((state) => state.addNewField);
-	const updateField = useModelStore((state) => state.updateField);
-	const getReferenceModels = useModelStore((state) => state.getReferenceModels);
-	const [models, setModels] = useState<Model[]>([]);
+	const {
+		field: fieldToEdit,
+		addNewField,
+		updateField,
+		referenceModels,
+		getReferenceModels,
+	} = useModelStore();
+	const database = useDatabaseStore((state) => state.database);
 	const canCreate = useAuthorizeVersion('model.create');
 	const MAX_LENGTH = MAX_LENGTHS[editMode ? fieldToEdit?.type : type?.name ?? ''];
-
+	const { notify } = useToast();
 	const { dbId, modelId, appId, versionId, orgId } = useParams() as {
 		orgId: string;
 		appId: string;
@@ -119,21 +121,19 @@ export default function EditOrCreateFieldDrawer({
 		modelId: string;
 	};
 
-	const database = useMemo(() => {
-		return databases.find((database) => database._id === dbId) as Database;
-	}, [databases, dbId]);
-
 	const TYPE = editMode ? fieldToEdit?.type : type?.name ?? '';
 	const hasMaxLength = ['text', 'encrypted-text'].includes(TYPE);
 	const isDecimal = TYPE === 'decimal';
 	const isBoolean = TYPE === 'boolean';
-	const isMoney = TYPE === 'monetary';
 	const isInteger = TYPE === 'integer';
 	const isEnum = TYPE === 'enum';
 	const isReference = TYPE === 'reference';
 	const isDatetime = TYPE === 'datetime';
 	const isDate = TYPE === 'date';
 	const isGeoPoint = TYPE === 'geo-point';
+	const isPhone = TYPE === 'phone';
+	const isEmail = TYPE === 'email';
+	const isLink = TYPE === 'link';
 
 	const hasDefaultValue = !defaultValueDisabledTypes.includes(TYPE);
 
@@ -162,6 +162,7 @@ export default function EditOrCreateFieldDrawer({
 		general: z
 			.object({
 				name: NameSchema,
+				type: z.nativeEnum(FieldTypes),
 				required: z.boolean(),
 				unique: z.boolean(),
 				indexed: z.boolean(),
@@ -201,7 +202,7 @@ export default function EditOrCreateFieldDrawer({
 					.optional(),
 				referenceModelIid: z
 					.string()
-					.refine((value) => models.some((model) => model.iid === value), {
+					.refine((value) => referenceModels.some((model) => model.iid === value), {
 						message: t('forms.invalid', {
 							label: t('database.fields.reference_model'),
 						}).toString(),
@@ -233,18 +234,28 @@ export default function EditOrCreateFieldDrawer({
 					});
 				}
 
-				if (
-					isEnum &&
-					arg?.defaultValue &&
-					!arg.enumSelectList?.trim().split('\n').includes(arg.defaultValue)
-				) {
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: t('forms.invalid', {
-							label: capitalize(t('general.default_value').toLowerCase()),
-						}).toString(),
-						path: ['defaultValue'],
-					});
+				if (isEnum) {
+					const enumValues = arg.enumSelectList?.trim().split('\n');
+					if (arg?.defaultValue && !enumValues?.includes(arg.defaultValue)) {
+						ctx.addIssue({
+							code: z.ZodIssueCode.custom,
+							message: t('forms.invalid', {
+								label: capitalize(t('general.default_value').toLowerCase()),
+							}).toString(),
+							path: ['defaultValue'],
+						});
+					}
+
+					if (enumValues?.some((value) => value.length > (MAX_LENGTH as number))) {
+						ctx.addIssue({
+							code: z.ZodIssueCode.custom,
+							message: t('forms.maxLength.error', {
+								length: MAX_LENGTH,
+								label: capitalize(t('general.max_length').toLowerCase()),
+							}).toString(),
+							path: ['enumSelectList'],
+						});
+					}
 				}
 
 				if (isDecimal && arg?.defaultValue) {
@@ -273,14 +284,40 @@ export default function EditOrCreateFieldDrawer({
 					}
 				}
 
-				if (isMoney && arg?.defaultValue && isNaN(Number(arg.defaultValue))) {
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: t('forms.invalid', {
-							label: capitalize(t('general.default_value').toLowerCase()),
-						}).toString(),
-						path: ['defaultValue'],
-					});
+				if (isEmail) {
+					if (arg?.defaultValue && !EMAIL_REGEX.test(arg.defaultValue)) {
+						ctx.addIssue({
+							code: z.ZodIssueCode.custom,
+							message: t('forms.invalid', {
+								label: capitalize(t('general.default_value').toLowerCase()),
+							}).toString(),
+							path: ['defaultValue'],
+						});
+					}
+				}
+
+				if (isLink) {
+					if (arg?.defaultValue && !URL_REGEX.test(arg.defaultValue)) {
+						ctx.addIssue({
+							code: z.ZodIssueCode.custom,
+							message: t('forms.invalid', {
+								label: capitalize(t('general.default_value').toLowerCase()),
+							}).toString(),
+							path: ['defaultValue'],
+						});
+					}
+				}
+
+				if (isPhone) {
+					if (arg?.defaultValue && !isMobilePhone(arg.defaultValue)) {
+						ctx.addIssue({
+							code: z.ZodIssueCode.custom,
+							message: t('forms.invalid', {
+								label: capitalize(t('general.default_value').toLowerCase()),
+							}).toString(),
+							path: ['defaultValue'],
+						});
+					}
 				}
 
 				if (hasMaxLength && !arg.maxLength) {
@@ -457,6 +494,7 @@ export default function EditOrCreateFieldDrawer({
 		resolver: zodResolver(Schema),
 		defaultValues: {
 			general: {
+				type: type?.name as FieldTypes,
 				immutable: false,
 				indexed: false,
 				required: false,
@@ -506,64 +544,64 @@ export default function EditOrCreateFieldDrawer({
 	async function getModels() {
 		if (TYPE !== 'reference') return;
 
-		const models = await getReferenceModels({
+		getReferenceModels({
 			orgId: orgId,
 			appId: appId,
 			versionId: versionId,
 			dbId: dbId,
 		});
-
-		setModels(models);
 	}
 
-	async function onSubmit(data: z.infer<typeof Schema>) {
-		if (loading) return;
-		const parseForBoolean = (value?: string) => {
-			if (value === 'true') return true;
-			if (value === 'false') return false;
-			return undefined;
-		};
-		const getDefaultValue = () => {
-			if (editMode && hasDefaultValue && !data.general.defaultValue) return '$$unset';
+	const { mutateAsync, isPending } = useMutation({
+		mutationFn: editMode ? updateField : addNewField,
+		mutationKey: ['createField'],
+		onError: (error: APIError) => {
+			notify({
+				title: error.error,
+				description: error.details,
+				type: 'error',
+			});
+		},
+		onSuccess: () => onClose(),
+	});
 
-			if ((isReference && database.type !== DATABASE.MongoDB) || isDecimal || isInteger) {
-				return Number(data.general.defaultValue);
-			}
-			if (isBoolean) return parseForBoolean(data.general.defaultValue);
-			return data.general.defaultValue;
-		};
-		const getIndexed = () => {
-			if (
+	const getDefaultValue = (defaultValue: string) => {
+		if (editMode && hasDefaultValue && !defaultValue) {
+			return '$$unset';
+		}
+
+		if ((isReference && database.type !== DATABASE.MongoDB) || isDecimal || isInteger) {
+			return Number(defaultValue);
+		}
+
+		if (isBoolean) {
+			return defaultValue ? JSON.parse(defaultValue) : undefined;
+		}
+
+		return defaultValue;
+	};
+	async function onSubmit(data: z.infer<typeof Schema>) {
+		const dataForAPI = {
+			...(editMode && { fieldId: fieldToEdit._id }),
+			type: data.general.type,
+			orgId,
+			appId,
+			versionId,
+			dbId,
+			modelId,
+			name: data.general.name,
+			required: !(editMode && !fieldToEdit.required) ? data.general.required : false,
+			unique: data.general.unique,
+			immutable: data.general.immutable,
+			indexed:
 				editMode &&
 				isGeoPoint &&
 				database.type === DATABASE.MySQL &&
 				!fieldToEdit.indexed &&
 				!fieldToEdit.required
-			) {
-				return false;
-			}
-
-			return data.general.indexed;
-		};
-		const getRequired = () => {
-			if (editMode && !fieldToEdit.required) return false;
-			return data.general.required;
-		};
-
-		const dataForAPI = {
-			fieldId: editMode ? fieldToEdit._id : '',
-			type: editMode ? fieldToEdit.type : type?.name ?? '',
-			orgId: orgId,
-			appId: appId,
-			versionId: versionId,
-			dbId: dbId,
-			modelId,
-			name: data.general.name,
-			required: getRequired(),
-			unique: data.general.unique,
-			immutable: data.general.immutable,
-			indexed: getIndexed(),
-			defaultValue: getDefaultValue(),
+					? false
+					: data.general.indexed,
+			defaultValue: getDefaultValue(data.general.defaultValue as string),
 			description: data.general.description,
 			text: {
 				searchable: data.general.searchable,
@@ -594,27 +632,13 @@ export default function EditOrCreateFieldDrawer({
 				timestamps: data.general.timeStamps,
 			},
 		};
-		try {
-			setLoading(true);
-			editMode ? await updateField(dataForAPI) : await addNewField(dataForAPI);
-			onOpenChange(false);
-			form.reset();
-		} catch (e) {
-			const error = e as APIError;
-			error.fields?.forEach((field) => {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				form.setError(field.param, {
-					message: field.msg,
-				});
-			});
-		} finally {
-			setLoading(false);
-		}
+
+		mutateAsync(dataForAPI);
 	}
 
 	function setDefaultsForEdit() {
 		form.setValue('general.name', fieldToEdit.name);
+		form.setValue('general.type', fieldToEdit.type);
 		form.setValue('general.required', fieldToEdit.required);
 		form.setValue('general.unique', fieldToEdit.unique);
 		form.setValue('general.immutable', fieldToEdit.immutable);
@@ -666,6 +690,11 @@ export default function EditOrCreateFieldDrawer({
 		}
 	}
 
+	function onClose() {
+		form.reset();
+		onOpenChange(false);
+	}
+
 	return (
 		<Drawer open={open} onOpenChange={onOpenChange}>
 			<DrawerContent className='overflow-x-hidden'>
@@ -691,11 +720,9 @@ export default function EditOrCreateFieldDrawer({
 											<Input
 												error={Boolean(errors.general?.name)}
 												type='text'
-												placeholder={
-													t('forms.placeholder', {
-														label: t('database.fields.form.name').toLowerCase(),
-													}) as string
-												}
+												placeholder={t('forms.placeholder', {
+													label: t('database.fields.form.name').toLowerCase(),
+												}).toString()}
 												{...field}
 											/>
 										</FormControl>
@@ -850,11 +877,11 @@ export default function EditOrCreateFieldDrawer({
 																	</SelectTrigger>
 																</FormControl>
 																<SelectContent align='center'>
-																	{REFERENCE_FIELD_ACTION.map((action, index) => {
+																	{REFERENCE_FIELD_ACTION.map((action) => {
 																		return (
 																			<SelectItem
 																				className='px-3 py-[6px] w-full max-w-full cursor-pointer'
-																				key={index}
+																				key={action}
 																				value={action}
 																			>
 																				<div className='flex items-center gap-2'>{action}</div>
@@ -896,11 +923,11 @@ export default function EditOrCreateFieldDrawer({
 																	</SelectTrigger>
 																</FormControl>
 																<SelectContent align='center'>
-																	{models.map((model, index) => {
+																	{referenceModels.map((model) => {
 																		return (
 																			<SelectItem
 																				className='px-3 py-[6px] w-full max-w-full cursor-pointer'
-																				key={index}
+																				key={model._id}
 																				value={model.iid}
 																			>
 																				{model.name}
@@ -920,7 +947,7 @@ export default function EditOrCreateFieldDrawer({
 								</>
 							)}
 							<div className='space-y-4'>
-								{views.map((key, index) => {
+								{views.map((key) => {
 									const isDisabled =
 										editMode &&
 										((key === 'unique' && !fieldToEdit.unique) ||
@@ -930,7 +957,7 @@ export default function EditOrCreateFieldDrawer({
 												!fieldToEdit.required &&
 												database.type === DATABASE.MySQL));
 									return (
-										<Fragment key={index}>
+										<Fragment key={key}>
 											<FormField
 												control={form.control}
 												name={`general.${key}`}
@@ -992,11 +1019,11 @@ export default function EditOrCreateFieldDrawer({
 																			</SelectTrigger>
 																		</FormControl>
 																		<SelectContent className='max-h-[400px]'>
-																			{languageOptions.map((item, index) => {
+																			{languageOptions.map((item) => {
 																				return (
 																					<SelectItem
 																						className='px-3 py-[6px] w-full max-w-full cursor-pointer'
-																						key={index}
+																						key={item.name}
 																						value={item.value}
 																					>
 																						<div className='flex items-center gap-2 [&>svg]:text-lg'>
@@ -1099,11 +1126,9 @@ export default function EditOrCreateFieldDrawer({
 														<FormControl className='flex-1'>
 															<Input
 																error={Boolean(form.formState.errors.general?.defaultValue)}
-																placeholder={
-																	t('forms.placeholder', {
-																		label: t('database.fields.form.default_value').toLowerCase(),
-																	}) as string
-																}
+																placeholder={t('forms.placeholder', {
+																	label: t('database.fields.form.default_value').toLowerCase(),
+																}).toString()}
 																{...field}
 																onInput={field.onChange}
 															/>
@@ -1117,7 +1142,7 @@ export default function EditOrCreateFieldDrawer({
 								</>
 							)}
 							<div className='flex justify-end'>
-								<Button disabled={!canCreate} size='lg'>
+								<Button disabled={!canCreate} size='lg' loading={isPending}>
 									{editMode ? t('general.save') : t('general.add')}
 								</Button>
 							</div>

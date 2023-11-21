@@ -1,7 +1,6 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
-import useAuthStore from '@/store/auth/authStore';
 import useStorageStore from '@/store/storage/storageStore';
 import { BucketSchema } from '@/types';
 import { arrayToObj } from '@/utils';
@@ -20,17 +19,15 @@ export default function CreateBucket({ open, onClose }: CreateStorageProps) {
 	const form = useForm<z.infer<typeof BucketSchema>>({
 		resolver: zodResolver(BucketSchema),
 	});
-	const user = useAuthStore((state) => state.user);
 	const { t } = useTranslation();
 	const { createBucket, storage } = useStorageStore();
 	const [loading, setLoading] = useState(false);
 	const { notify } = useToast();
-
 	function onSubmit(data: z.infer<typeof BucketSchema>) {
 		setLoading(true);
 		createBucket({
 			storageName: storage?.name as string,
-			userId: user?._id,
+			versionId: storage.versionId as string,
 			...data,
 			tags: arrayToObj(data.tags?.filter((tag) => tag.key && tag.value) as any),
 			onSuccess: () => {

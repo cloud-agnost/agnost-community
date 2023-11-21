@@ -1,8 +1,6 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { InstanceType } from '@/components/InstanceType';
-import { STORAGE_ICON_MAP } from '@/constants';
 import { TabLink } from '@/features/version/Tabs';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useStorageStore from '@/store/storage/storageStore';
 import { ColumnDefWithClassName, Storage, TabTypes } from '@/types';
@@ -13,6 +11,7 @@ import { DateText } from 'components/DateText';
 const { openDeleteStorageDialog, openEditStorageDialog } = useStorageStore.getState();
 const canEditBucket = getVersionPermission('storage.update');
 const canDeleteBucket = getVersionPermission('storage.delete');
+
 const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 	{
 		id: 'select',
@@ -63,11 +62,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 				original: { iid },
 			},
 		}) => {
-			const environment = useEnvironmentStore.getState().environment;
-			const instance = environment?.mappings.find((mapping) => mapping.design.iid === iid)?.resource
-				.instance;
-			const Icon = STORAGE_ICON_MAP[instance as string];
-			return <InstanceType iid={iid} Icon={Icon} />;
+			return <InstanceType iid={iid} />;
 		},
 	},
 	{

@@ -174,7 +174,6 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
-						showAvatar={false}
 						title={translate('task.delete.title')}
 						description={translate('task.delete.message')}
 						onConfirm={() => deleteHandler(original)}

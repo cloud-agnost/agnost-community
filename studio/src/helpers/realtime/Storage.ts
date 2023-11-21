@@ -34,7 +34,7 @@ class Storage extends RealtimeActions<StorageType> {
 	}
 	create({ data }: RealtimeActionParams<StorageType>): void {
 		useStorageStore.setState?.({
-			storages: [...useStorageStore.getState().storages, data],
+			storages: [data, ...useStorageStore.getState().storages],
 		});
 	}
 	telemetry(param: RealtimeActionParams<StorageType>): void {

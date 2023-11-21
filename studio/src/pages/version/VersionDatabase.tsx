@@ -1,6 +1,5 @@
-import { CreateDatabase, EditDatabase } from '@/features/database';
-import { DatabaseColumns } from '@/features/database';
-import { useTable, useToast } from '@/hooks';
+import { CreateDatabase, DatabaseColumns, EditDatabase } from '@/features/database';
+import { useSearch, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
@@ -8,10 +7,9 @@ import { APIError, Database } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ConfirmationModal } from 'components/ConfirmationModal';
 import { DataTable } from 'components/DataTable';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { useSearchParams } from 'react-router-dom';
 export default function VersionDatabase() {
 	const {
 		databases,
@@ -27,30 +25,22 @@ export default function VersionDatabase() {
 	const { notify } = useToast();
 	const canEdit = useAuthorizeVersion('db.create');
 	const [createDrawerIsOpen, setCreateDrawerIsOpen] = useState(false);
-	const [searchParams] = useSearchParams();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
 		orgId: string;
 	}>();
 
-	const filteredDatabase = useMemo(() => {
-		if (searchParams.get('q')) {
-			const query = new RegExp(searchParams.get('q') as string, 'i');
-			return databases.filter((database) => database.name.match(query));
-		}
-		return databases;
-	}, [searchParams.get('q'), databases]);
+	const filteredDatabase = useSearch(databases);
 
 	const { isFetching } = useQuery({
 		queryKey: ['getDatabases'],
-		queryFn: () => {
+		queryFn: () =>
 			getDatabasesOfApp({
 				orgId: orgId as string,
 				versionId: versionId as string,
 				appId: appId as string,
-			});
-		},
+			}),
 	});
 
 	const table = useTable({
@@ -86,6 +76,7 @@ export default function VersionDatabase() {
 			<CreateDatabase open={createDrawerIsOpen} onOpenChange={setCreateDrawerIsOpen} />
 			<EditDatabase open={isEditDatabaseDialogOpen} onOpenChange={closeEditDatabaseDialog} />
 			<VersionTabLayout<Database>
+				searchable
 				className='p-0'
 				isEmpty={databases.length === 0}
 				title={t('database.page_title')}

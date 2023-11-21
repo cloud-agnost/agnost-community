@@ -132,7 +132,6 @@ const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
 					<TableConfirmation
 						align='end'
 						closeOnConfirm
-						showAvatar={false}
 						title={translate('function.delete.title')}
 						description={translate('function.delete.message')}
 						onConfirm={() => deleteHandler(original)}

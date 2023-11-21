@@ -69,6 +69,7 @@ export default function MainMessageQueue() {
 	return (
 		<>
 			<VersionTabLayout<MessageQueue>
+				searchable
 				isEmpty={queues.length === 0}
 				title={t('queue.title')}
 				type='queue'

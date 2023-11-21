@@ -285,6 +285,8 @@ export interface RealtimeIdentifiers {
 	cacheId?: string;
 	middlewareId?: string;
 	functionId?: string;
+	bucketId?: string;
+	bucketName?: string;
 }
 export interface RealtimeData<T> {
 	actor: Partial<User> & { userId: string };

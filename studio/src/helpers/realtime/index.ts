@@ -1,5 +1,6 @@
 import { RealtimeObjectTypes } from '@/types';
 import Application from './Application';
+import Bucket from './Bucket';
 import Cache from './Cache';
 import Database from './Database';
 import Endpoint from './Endpoint';
@@ -39,6 +40,7 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		'org.app.version.db.model': Model,
 		'org.app.version.db.model.field': Field,
 		'org.app.version.storage': Storage,
+		'org.app.version.storage.bucket': Bucket,
 		'org.app.version.cache': Cache,
 		'org.app.version.function': Function,
 		// TODO: "org.resource.log"

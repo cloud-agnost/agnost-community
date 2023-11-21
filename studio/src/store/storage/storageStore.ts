@@ -24,7 +24,7 @@ import {
 	UpdateStorageParams,
 	UploadFileToBucketParams,
 } from '@/types';
-import { devtools } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 export interface StorageStore {
 	storages: Storage[];
 	storage: Storage;
@@ -33,11 +33,9 @@ export interface StorageStore {
 	files: BucketFile[];
 	file: BucketFile;
 	fileCountInfo: BucketCountInfo;
-	toDeleteFile: BucketFile | null;
 	lastFetchedPage: number;
 	toDeleteStorage: Storage | null;
 	isStorageDeleteDialogOpen: boolean;
-	isFileDeleteDialogOpen: boolean;
 	isEditFileDialogOpen: boolean;
 	isEditStorageDialogOpen: boolean;
 	isEditBucketDialogOpen: boolean;
@@ -58,8 +56,6 @@ type Actions = {
 	openFileEditDialog: (file: BucketFile) => void;
 	closeFileEditDialog: () => void;
 	closeEditStorageDialog: () => void;
-	openDeleteFileDialog: (file: BucketFile) => void;
-	closeDeleteFileDialog: () => void;
 	createStorage: (storage: CreateStorageParams) => Promise<Storage>;
 	getStorageById: (storage: GetStorageByIdParams) => Promise<Storage>;
 	getStorages: (storage: GetStoragesParams) => Promise<Storage[]>;
@@ -95,63 +91,57 @@ const initialState: StorageStore = {
 	isEditStorageDialogOpen: false,
 	isEditBucketDialogOpen: false,
 	isBucketDeleteDialogOpen: false,
-	isFileDeleteDialogOpen: false,
-	isEditFileDialogOpen: false,
 	toDeleteBucket: null,
 	files: [],
 	file: {} as BucketFile,
 	fileCountInfo: {} as BucketCountInfo,
-	toDeleteFile: null,
 	uploadProgress: 0,
+	isEditFileDialogOpen: false,
 };
 
 const useStorageStore = create<StorageStore & Actions>()(
-	devtools((set, get) => ({
-		...initialState,
-		openDeleteStorageDialog: (storage: Storage) => {
-			set({ toDeleteStorage: storage, isStorageDeleteDialogOpen: true });
-		},
-		closeStorageDeleteDialog: () => {
-			set({ toDeleteStorage: null, isStorageDeleteDialogOpen: false });
-		},
-		openDeleteBucketDialog: (bucket: Bucket) => {
-			set({ toDeleteBucket: bucket, isBucketDeleteDialogOpen: true });
-		},
-		closeBucketDeleteDialog: () => {
-			set({ toDeleteBucket: null, isBucketDeleteDialogOpen: false });
-		},
-		openDeleteFileDialog: (file: BucketFile) => {
-			set({ toDeleteFile: file, isFileDeleteDialogOpen: true });
-		},
-		closeDeleteFileDialog: () => {
-			set({ toDeleteFile: null, isFileDeleteDialogOpen: false });
-		},
-		createStorage: async (params: CreateStorageParams) => {
-			try {
-				const createdStorage = await StorageService.createStorage(params);
-				set({ storages: [...get().storages, createdStorage] });
-				params.onSuccess?.();
-				return createdStorage;
-			} catch (error) {
-				params.onError?.(error as APIError);
-				throw error as APIError;
-			}
-		},
-		getStorageById: async (params: GetStorageByIdParams) => {
-			const storage = await StorageService.getStorage(params);
-			set({ storage });
-			return storage;
-		},
-		getStorages: async (params: GetStoragesParams) => {
-			const storages = await StorageService.getStorages(params);
-			if (params.page === 0) {
-				set({ storages });
-			} else {
-				set((prev) => ({
-					storages: [...prev.storages, ...storages],
-					lastFetchedPage: params.page,
-				}));
-			}
+	devtools(
+		persist(
+			(set, get) => ({
+				...initialState,
+				openDeleteStorageDialog: (storage: Storage) => {
+					set({ toDeleteStorage: storage, isStorageDeleteDialogOpen: true });
+				},
+				closeStorageDeleteDialog: () => {
+					set({ toDeleteStorage: null, isStorageDeleteDialogOpen: false });
+				},
+				openDeleteBucketDialog: (bucket: Bucket) => {
+					set({ toDeleteBucket: bucket, isBucketDeleteDialogOpen: true });
+				},
+				closeBucketDeleteDialog: () => {
+					set({ toDeleteBucket: null, isBucketDeleteDialogOpen: false });
+				},
+				createStorage: async (params: CreateStorageParams) => {
+					try {
+						const createdStorage = await StorageService.createStorage(params);
+						set({ storages: [createdStorage, ...get().storages] });
+						params.onSuccess?.();
+						return createdStorage;
+					} catch (error) {
+						params.onError?.(error as APIError);
+						throw error as APIError;
+					}
+				},
+				getStorageById: async (params: GetStorageByIdParams) => {
+					const storage = await StorageService.getStorage(params);
+					set({ storage });
+					return storage;
+				},
+				getStorages: async (params: GetStoragesParams) => {
+					const storages = await StorageService.getStorages(params);
+					if (params.page === 0) {
+						set({ storages });
+					} else {
+						set((prev) => ({
+							storages: [...prev.storages, ...storages],
+							lastFetchedPage: params.page,
+						}));
+					}
 
 			return storages;
 		},
@@ -215,7 +205,7 @@ const useStorageStore = create<StorageStore & Actions>()(
 		},
 		getBuckets: async (params: GetStorageBuckets) => {
 			const buckets = await StorageService.getStorageBuckets(params);
-			if (buckets.info.currentPage === 1) {
+			if (buckets.info.currentPage === 0) {
 				set({ buckets: buckets.data, bucketCountInfo: buckets.info, files: [] });
 			} else {
 				set((prev) => ({
@@ -266,7 +256,9 @@ const useStorageStore = create<StorageStore & Actions>()(
 			try {
 				await StorageService.deleteMultipleBuckets(params);
 				set({
-					buckets: get().buckets.filter((bucket) => !params.bucketNames.includes(bucket.name)),
+					buckets: get().buckets.filter(
+						(bucket) => !params.deletedBuckets.find((bck) => bck.name === bucket.name),
+					),
 				});
 				params.onSuccess?.();
 			} catch (error) {
@@ -290,7 +282,7 @@ const useStorageStore = create<StorageStore & Actions>()(
 		},
 		getFilesOfBucket: async (params: GetFilesParams) => {
 			const files = await StorageService.getFilesOfBucket(params);
-			if (files.info.currentPage === 1) {
+			if (files.info.currentPage === 0) {
 				set({ files: files.data, fileCountInfo: files.info });
 			} else {
 				set((prev) => ({
@@ -364,19 +356,28 @@ const useStorageStore = create<StorageStore & Actions>()(
 			try {
 				const file = await StorageService.updateFileInBucket(params);
 
-				set({
-					files: get().files.map((f) => (f.id === file.id ? file : f)),
-					file,
-				});
-				params.onSuccess?.();
-				return file;
-			} catch (error) {
-				params.onError?.(error as APIError);
-				throw error as APIError;
-			}
-		},
-		reset: () => set(initialState),
-	})),
+						set({
+							files: get().files.map((f) => (f.id === file.id ? file : f)),
+							file,
+						});
+						params.onSuccess?.();
+						return file;
+					} catch (error) {
+						params.onError?.(error as APIError);
+						throw error as APIError;
+					}
+				},
+				reset: () => set(initialState),
+			}),
+			{
+				name: 'storage',
+				partialize: (state) =>
+					Object.fromEntries(
+						Object.entries(state).filter(([key]) => ['storage', 'bucket'].includes(key)),
+					),
+			},
+		),
+	),
 );
 
 export default useStorageStore;

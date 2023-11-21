@@ -3,17 +3,9 @@ import responseTime from "response-time";
 import { applyDefaultRateLimiters } from "../middlewares/applyDefaultRateLimiters.js";
 import { authManageStorage } from "../middlewares/authManageStorage.js";
 import { checkContentType } from "../middlewares/checkContentType.js";
+import { checkServerStatus } from "../middlewares/checkServerStatus.js";
 import { getResponseBody } from "../middlewares/getResponseBody.js";
 import { logRequestToConsole } from "../middlewares/logRequest.js";
-import { handleFileUploads } from "../middlewares/handleFileUploads.js";
-import { checkServerStatus } from "../middlewares/checkServerStatus.js";
-import { checkAPIKey } from "../middlewares/checkAPIKey.js";
-import {
-  checkStorage,
-  checkBucket,
-} from "../middlewares/checkStorageBucket.js";
-import { applyRules, validate } from "../util/authRules.js";
-import ERROR_CODES from "../config/errorCodes.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -34,8 +26,8 @@ router.get(
   async (req, res) => {
     try {
       const { dbName, modelName } = req.params;
-      const { page, limit, sortBy, sortDir, id } = req.query;
-
+      const { page, size, sortBy, sortDir, id } = req.query;
+      console.log("req.query", req.params);
       const data = await agnost
         .db(dbName)
         .model(modelName)
@@ -51,9 +43,9 @@ router.get(
             }),
           },
           {
-            ...(limit && { limit: Number(limit) }),
+            ...(size && { limit: Number(size) }),
             ...(sortBy && sortDir && { sort: { [sortBy]: sortDir } }),
-            ...(limit && page && { skip: Number(page) * Number(limit) }),
+            ...(size && page && { skip: Number(page) * Number(size) }),
           }
         );
 
@@ -161,22 +153,10 @@ router.delete(
     try {
       const { dbName, modelName } = req.params;
       const { ids } = req.body;
-
-      const data = await agnost
-        .db(dbName)
-        .model(modelName)
-        .deleteMany({
-          $in: [
-            "_id",
-            ids.map((id) => {
-              return {
-                $toObjectId: id,
-              };
-            }),
-          ],
-        });
-
-      res.json(data);
+      ids.forEach(async (id) => {
+        await agnost.db(dbName).model(modelName).deleteById(id);
+      });
+      res.json();
     } catch (error) {
       helper.handleError(req, res, error);
     }

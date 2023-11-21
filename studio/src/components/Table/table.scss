@@ -1,7 +1,7 @@
 .table {
 	@apply w-full caption-bottom text-sm bg-base;
 	&-container {
-		@apply w-full rounded-lg border border-border overflow-x-auto;
+		@apply w-full rounded-lg border border-border;
 	}
 	&-header {
 		@apply [&_tr]:border-b;

@@ -72,7 +72,8 @@
 		"title": "Models",
 		"create": "Create Model",
 		"edit": "Edit Model",
-		"no_models": "You have not defined any for models for this database"
+		"no_models": "You have not defined any for models for this database",
+		"no_data": "You have not defined any data for this model"
 	},
 	"fields": {
 		"select_default_value": "Select Default Value",
@@ -117,6 +118,13 @@
 				"field": "Searchable Collation",
 				"placeholder": "Select Searchable Collation"
 			}
+		}
+	},
+	"navigator": {
+		"title": "Navigator",
+		"delete": {
+			"title": "Delete Data",
+			"message": "Are you sure you want to delete this data? This action is not reversible — please continue with caution."
 		}
 	}
 }

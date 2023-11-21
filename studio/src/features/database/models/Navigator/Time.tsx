@@ -1,53 +1,54 @@
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
+import { FormControl, FormField, FormItem, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { useEditedField, useUpdateData } from '@/hooks';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { NavigatorComponentProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { InputMask } from '@react-input/mask';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-export default function Json({ cell, row, field }: NavigatorComponentProps) {
+import { Form } from '@/components/Form';
+import { z } from 'zod';
+import { useEffect } from 'react';
+
+export default function Time({ cell, row, field }: NavigatorComponentProps) {
 	const { setEditedField } = useNavigatorStore();
-	const updateData = useUpdateData(field);
 	const data = row?.original;
+	const updateData = useUpdateData(field);
 	const isEditable = useEditedField(field, cell);
-	const JSONSchema = z.object({
+	const DateSchema = z.object({
 		[field.name]: z.string().optional(),
 	});
 
-	const form = useForm<z.infer<typeof JSONSchema>>({
-		resolver: zodResolver(JSONSchema),
+	const form = useForm({
+		resolver: zodResolver(DateSchema),
 		defaultValues: {
-			[field.name]: JSON.stringify(data[field.name]),
+			[field.name]: data[field.name],
 		},
 	});
-
-	function onSubmit(d: z.infer<typeof JSONSchema>) {
-		updateData(
-			{
-				[field.name]: JSON.parse(d[field.name]?.toString() ?? ''),
-			},
-			data.id,
-			row?.index as number,
-		);
-	}
+	const onSubmit = async (d: z.infer<typeof DateSchema>) => {
+		updateData(d, data.id, row?.index as number);
+	};
 	useEffect(() => {
 		if (isEditable) {
-			form.setValue(field.name, JSON.stringify(data[field.name]));
+			form.setValue(field.name, data[field.name]);
 		}
 	}, [isEditable]);
+
 	return isEditable ? (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)}>
 				<FormField
 					control={form.control}
 					name={field.name}
-					render={({ field }) => (
+					render={({ field: fd }) => (
 						<FormItem>
 							<FormControl>
-								<Input
-									{...field}
+								<InputMask
+									component={Input}
+									showMask
+									mask='HH:mm:ss'
+									replacement={{ H: /\d/, m: /\d/, s: /\d/ }}
+									{...fd}
 									error={!!form.formState.errors?.[field.name]}
 									onBlur={() => {
 										form.handleSubmit(onSubmit)();
@@ -62,6 +63,6 @@ export default function Json({ cell, row, field }: NavigatorComponentProps) {
 			</form>
 		</Form>
 	) : (
-		<pre>{JSON.stringify(data[field.name])}</pre>
+		<time className='text-sm text-default leading-[21px]'>{data[field.name]}</time>
 	);
 }

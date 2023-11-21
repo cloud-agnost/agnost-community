@@ -2,13 +2,14 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import useStorageStore from '@/store/storage/storageStore';
-import { CreateStorageSchema } from '@/types';
+import { APIError, CreateStorageSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import StorageForm from './StorageForm';
+import { useMutation } from '@tanstack/react-query';
 
 interface CreateStorageProps {
 	open: boolean;
@@ -27,43 +28,39 @@ export default function CreateStorage({ open, onClose }: CreateStorageProps) {
 	const form = useForm<z.infer<typeof CreateStorageSchema>>({
 		resolver: zodResolver(CreateStorageSchema),
 	});
+	const { mutateAsync: createMutation, isPending } = useMutation({
+		mutationFn: createStorage,
+		onSuccess: () => onCloseHandler(),
+		onError: ({ error, details }: APIError) => {
+			notify({ type: 'error', description: details, title: error });
+		},
+	});
 
 	function onSubmit(data: z.infer<typeof CreateStorageSchema>) {
-		createStorage({
+		createMutation({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			...data,
-			onSuccess: () => {
-				form.reset({
-					name: '',
-					resourceId: '',
-				});
-				onClose();
-			},
-			onError: ({ error, details }) => {
-				notify({ type: 'error', description: details, title: error });
-			},
 		});
 	}
+
+	function onCloseHandler() {
+		form.reset({
+			name: undefined,
+			resourceId: undefined,
+		});
+		onClose();
+	}
 	return (
-		<Drawer
-			open={open}
-			onOpenChange={() => {
-				form.reset({
-					name: '',
-					resourceId: '',
-				});
-				onClose();
-			}}
-		>
+		<Drawer open={open} onOpenChange={onCloseHandler}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>{t('storage.create')}</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<StorageForm />
+						<StorageForm loading={isPending} />
 					</form>
 				</Form>
 			</DrawerContent>

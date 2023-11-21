@@ -323,7 +323,7 @@
 	"hits": "Hits",
 	"hit": "Hit",
 	"timestamp": "TIMESTAMP",
-	"response_time": "RESPONSE TIME",
+	"response_time": "Response Time",
 	"success_count": "Success Count",
 	"error_count": "Error Count",
 	"readOnly": "Readonly",
