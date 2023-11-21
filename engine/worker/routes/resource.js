@@ -51,12 +51,12 @@ router.get("/cluster-info", authAccessToken, async (req, res) => {
 */
 router.post("/cluster-info", checkContentType, authAccessToken, async (req, res) => {
     try {
-        res.json();
-
         const { deploymentName, hpaName, replicas, minReplicas, maxReplicas } = req.body;
         let manager = new ResourceManager(null);
         await manager.updateDeployment(deploymentName, replicas);
         await manager.updateHPA(hpaName, minReplicas, maxReplicas);
+
+        res.json();
     } catch (error) {
         helper.handleError(req, res, error);
     }
@@ -70,14 +70,14 @@ router.post("/cluster-info", checkContentType, authAccessToken, async (req, res)
 */
 router.post("/cluster-versions", checkContentType, authAccessToken, async (req, res) => {
     try {
-        res.json();
-
         const updates = req.body;
         let manager = new ResourceManager(null);
         for (const update of updates) {
             if (!update.apiServer) await manager.updateDeployment(update.deploymentName, null, update.image);
             else await manager.updateKnativeServiceImage(update.deploymentName, update.image);
         }
+
+        res.json();
     } catch (error) {
         helper.handleError(req, res, error);
     }
@@ -126,15 +126,14 @@ router.get("/cluster-ip", authAccessToken, async (req, res) => {
 */
 router.post("/cluster-domains-add", checkContentType, authAccessToken, async (req, res) => {
     try {
-        console.log(req.body);
-        res.json();
-
         const { domain, ingresses } = req.body;
         let manager = new ResourceManager(null);
         await manager.initializeCertificateIssuer();
         for (const ingress of ingresses) {
             await manager.addClusterCustomDomain(ingress, domain);
         }
+
+        res.json();
     } catch (error) {
         helper.handleError(req, res, error);
     }
@@ -148,14 +147,15 @@ router.post("/cluster-domains-add", checkContentType, authAccessToken, async (re
 */
 router.post("/cluster-domains-delete", checkContentType, authAccessToken, async (req, res) => {
     try {
-        console.log(req.body);
-        res.json();
-
         const { domain, ingresses } = req.body;
+        const domains = Array.isArray(domain) ? domain : [domain];
+
         let manager = new ResourceManager(null);
         for (const ingress of ingresses) {
-            await manager.deleteClusterCustomDomain(ingress, domain);
+            await manager.deleteClusterCustomDomains(ingress, domains);
         }
+
+        res.json();
     } catch (error) {
         helper.handleError(req, res, error);
     }
