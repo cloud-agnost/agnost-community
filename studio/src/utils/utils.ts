@@ -430,3 +430,12 @@ export function isMobilePhone(phoneNumber: string): boolean {
 	}
 	return false;
 }
+export function stringifyObjectValues(obj: Record<string, any>): Record<string, string> {
+	const stringifiedObj: Record<string, any> = {};
+
+	for (const key in obj) {
+		stringifiedObj[key] = String(obj[key]);
+	}
+
+	return stringifiedObj;
+}

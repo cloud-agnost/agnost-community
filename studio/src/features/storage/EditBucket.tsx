@@ -3,7 +3,7 @@ import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import useStorageStore from '@/store/storage/storageStore';
 import { APIError, BucketSchema } from '@/types';
-import { arrayToObj, objToArray } from '@/utils';
+import { arrayToObj, objToArray, stringifyObjectValues } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
@@ -39,7 +39,7 @@ export default function EditBucket({ open, onClose }: EditStorageProps) {
 			form.reset({
 				name: bucket.name,
 				isPublic: bucket.isPublic,
-				tags: objToArray(bucket.tags),
+				tags: objToArray(stringifyObjectValues(bucket.tags)),
 			});
 		}
 	}, [bucket]);
@@ -58,6 +58,7 @@ export default function EditBucket({ open, onClose }: EditStorageProps) {
 		updateMutation({
 			storageName: storage.name as string,
 			bucketName: bucket.name as string,
+			versionId: storage.versionId as string,
 			...data,
 			tags: arrayToObj(data.tags?.filter((tag) => tag.key && tag.value) as any),
 		});
