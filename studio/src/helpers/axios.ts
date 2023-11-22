@@ -1,7 +1,7 @@
 import useAuthStore from '@/store/auth/authStore.ts';
 import { APIError } from '@/types';
 import axios from 'axios';
-const baseURL = import.meta.env.VITE_API_URL ?? window.location.origin;
+const baseURL = import.meta.env.VITE_API_URL ?? `${window.location.origin}/api`;
 
 const headers = {
 	'Content-Type': 'application/json',
