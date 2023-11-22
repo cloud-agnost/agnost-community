@@ -25,8 +25,13 @@ import VersionDashboard from '../pages/version/VersionDashboard';
 import Fields from '../pages/version/models/fields/Fields';
 import Navigator from '../pages/version/navigator/Navigator';
 import ModelsOutlet from '../pages/version/models/ModelsOutlet';
+import BeatLoader from 'react-spinners/BeatLoader';
 export function Fallback(): JSX.Element {
-	return <div>Something went wrong</div>;
+	return (
+		<div className='flex items-center justify-center h-screen'>
+			<BeatLoader color='#6884FD' size={24} margin={18} />
+		</div>
+	);
 }
 
 const HomeLoadable = loadable(() => componentLoader(() => import('../pages/home/Home')), {
