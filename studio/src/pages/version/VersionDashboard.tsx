@@ -116,7 +116,7 @@ export default function VersionDashboard() {
 					<CardDescription>{t('version.settings.api_keys_desc')}</CardDescription>
 				</CardHeader>
 				<CardContent className='space-y-6'>
-					{version.apiKeys.map((key) => (
+					{version.apiKeys?.map((key) => (
 						<div key={key._id} className='flex items-center gap-4 max-w-4xl'>
 							<div className='flex items-center gap-2 flex-[0.2]'>
 								<Key className='w-4 h-4 text-default' />
