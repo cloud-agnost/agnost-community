@@ -94,7 +94,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		cell: ({ row }) => {
 			const { path } = row.original;
 			const env = useEnvironmentStore.getState().environment;
-			const copyText = `${window.location.origin}/${env?.iid}/api${path}`;
+			const copyText = `${window.location.origin}/${env?.iid}${path}`;
 			return (
 				<div className='flex items-center gap-8 group'>
 					<div className='truncate max-w-[15ch]'>{path}</div>
