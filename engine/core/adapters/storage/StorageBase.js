@@ -967,8 +967,8 @@ export class StorageBase {
 		}
 
 		// Clear mongodb identifier
-		if (updatedMetadata?.value) delete updatedMetadata.value._id;
-		return updatedMetadata.value;
+		if (updatedMetadata) delete updatedMetadata._id;
+		return updatedMetadata;
 	}
 
 	/**
@@ -1043,8 +1043,8 @@ export class StorageBase {
 		}
 
 		// Clear mongodb identifier
-		if (updatedMetadata?.value) delete updatedMetadata.value._id;
-		return updatedMetadata.value;
+		if (updatedMetadata) delete updatedMetadata._id;
+		return updatedMetadata;
 	}
 
 	/**

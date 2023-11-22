@@ -1,18 +1,32 @@
-# Stage 1: Build
-FROM node:18-alpine as builder
+# Build Stage
+# Use a Node.js base image
+FROM node:latest as build-stage
 
+# Set the working directory
 WORKDIR /app
-COPY . /app
 
+# Copy package.json and package-lock.json (or yarn.lock if you use yarn)
+COPY package*.json ./
+
+# Install dependencies
 RUN npm install
 
+# Copy the rest of your app's source code
+COPY . .
+
+# Build your app
 RUN npm run build
 
-# Stage 2: Final image
-FROM nginx:mainline-alpine
+# Run Stage
+# Use an Nginx base image
+FROM nginx:alpine
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy the built app from the build stage to Nginx's serve directory
+COPY --from=build-stage /app/dist /usr/share/nginx/html
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 4000
 EXPOSE 4000
 
+# Start Nginx and keep it running
 CMD ["nginx", "-g", "daemon off;"]
