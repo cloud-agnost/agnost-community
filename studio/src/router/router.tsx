@@ -1,27 +1,534 @@
-import { PATHS } from '@/constants';
+import { componentLoader } from '@/helpers';
+import { CompleteAccountSetupVerifyEmail, ConfirmChangeEmail } from '@/pages/auth';
 import ErrorBoundary from '@/pages/errors/ErrorBoundary.tsx';
 import { Root } from '@/pages/root';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
+import loadable from '@loadable/component';
 import type { ReactNode } from 'react';
 import { Navigate, createBrowserRouter, useLocation } from 'react-router-dom';
-import loadable from '@loadable/component';
-import { componentLoader } from '@/helpers';
+import ChangePasswordWithToken from '../pages/auth/ChangePasswordWithToken';
+import EditEndpoint from '../pages/endpoint/EditEndpoint';
+import EditFunction from '../pages/function/EditFunction';
+import EditMiddleware from '../pages/middleware/EditMiddleware';
+import EditMessageQueue from '../pages/queue/EditMessageQueue';
+import EditTask from '../pages/task/EditTask';
+import Home from '../pages/home/Home';
+import AccountInformation from '../pages/onboarding/AccountInformation';
+import InviteTeamMembers from '../pages/onboarding/InviteTeamMembers';
+import Onboarding from '../pages/onboarding/Onboarding';
+import OrganizationDetails from '../pages/organization/OrganizationDetails';
+import RedirectHandle from '../pages/redirect-handle/RedirectHandle';
+import Buckets from '../pages/storage/Bucket';
+import Files from '../pages/storage/Files';
+import VersionDashboard from '../pages/version/VersionDashboard';
+import Fields from '../pages/version/models/fields/Fields';
+import Navigator from '../pages/version/navigator/Navigator';
+import ModelsOutlet from '../pages/version/models/ModelsOutlet';
 export function Fallback(): JSX.Element {
 	return <div>Something went wrong</div>;
 }
-async function lazyRouteImport(path: string) {
-	const Component = loadable(() => componentLoader(() => import(path)), {
+
+const HomeLoadable = loadable(() => componentLoader(() => import('../pages/home/Home')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const Login = loadable(() => componentLoader(() => import('../pages/auth/Login')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const ForgotPassword = loadable(
+	() => componentLoader(() => import('../pages/auth/ForgotPassword')),
+	{
 		fallback: <Fallback />,
 		resolveComponent: (mod: any) => mod.default,
-	});
+	},
+);
+const ChangePasswordWithTokenLoadable = loadable(
+	() => componentLoader(() => import('../pages/auth/ChangePasswordWithToken')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
 
- 	return {
-		Component,
-		// @ts-ignore
-		loader: Component?.loader,
-	}; 
-}
+const ConfirmChangeEmailLoadable = loadable(
+	() => componentLoader(() => import('../pages/auth/ConfirmChangeEmail')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VerifyEmail = loadable(() => componentLoader(() => import('../pages/auth/VerifyEmail')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const CompleteAccountSetup = loadable(
+	() => componentLoader(() => import('../pages/auth/CompleteAccountSetup')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const CompleteAccountSetupVerifyEmailLoadable = loadable(
+	() => componentLoader(() => import('../pages/auth/CompleteAccountSetupVerifyEmail')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const Organization = loadable(
+	() => componentLoader(() => import('../pages/organization/Organization')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const OrganizationSelect = loadable(
+	() => componentLoader(() => import('../pages/organization/OrganizationSelect')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const OrganizationDetailsLoadable = loadable(
+	() => componentLoader(() => import('../pages/organization/OrganizationDetails')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const OrganizationApps = loadable(
+	() => componentLoader(() => import('../pages/organization/OrganizationApps')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const OrganizationResources = loadable(
+	() => componentLoader(() => import('../pages/organization/OrganizationResources')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const OrganizationSettingsGeneral = loadable(
+	() =>
+		componentLoader(
+			() => import('../pages/organization/OrganizationSettings/OrganizationSettingsGeneral'),
+		),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const OrganizationSettingsMembers = loadable(
+	() =>
+		componentLoader(
+			() => import('../pages/organization/OrganizationSettings/OrganizationSettingsMembers'),
+		),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const Version = loadable(() => componentLoader(() => import('../pages/version/Version')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const Dashboard = loadable(
+	() => componentLoader(() => import('../pages/version/VersionDashboard')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionDatabase = loadable(
+	() => componentLoader(() => import('../pages/version/VersionDatabase')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const NavigatorLoadable = loadable(
+	() => componentLoader(() => import('../pages/version/navigator/Navigator')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const Models = loadable(() => componentLoader(() => import('../pages/version/models/Models')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const ModelsOutletLoadable = loadable(
+	() => componentLoader(() => import('../pages/version/models/ModelsOutlet')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const FieldsLoadable = loadable(
+	() => componentLoader(() => import('../pages/version/models/fields/Fields')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionEndpoint = loadable(
+	() => componentLoader(() => import('../pages/version/VersionEndpoint')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionStorage = loadable(
+	() => componentLoader(() => import('../pages/version/VersionStorage')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionFunction = loadable(
+	() => componentLoader(() => import('../pages/version/VersionFunction')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionCache = loadable(
+	() => componentLoader(() => import('../pages/version/VersionCache')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionMessageQueue = loadable(
+	() => componentLoader(() => import('../pages/version/VersionMessageQueue')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionTask = loadable(() => componentLoader(() => import('../pages/version/VersionTask')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const VersionNotifications = loadable(
+	() => componentLoader(() => import('../pages/version/VersionNotifications')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionMiddlewares = loadable(
+	() => componentLoader(() => import('../pages/version/VersionMiddlewares')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionSettings = loadable(
+	() => componentLoader(() => import('../pages/version/settings/VersionSettings')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionSettingsGeneral = loadable(
+	() => componentLoader(() => import('../pages/version/settings/VersionSettingsGeneral')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionSettingsEnvironment = loadable(
+	() => componentLoader(() => import('../pages/version/settings/VersionSettingsEnvironment')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionSettingsEnvironmentVariables = loadable(
+	() =>
+		componentLoader(() => import('../pages/version/settings/VersionSettingsEnvironmentVariables')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionSettingsAuthentications = loadable(
+	() => componentLoader(() => import('../pages/version/settings/VersionSettingsAuthentications')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionSettingsAPIKeys = loadable(
+	() => componentLoader(() => import('../pages/version/settings/VersionSettingsAPIKeys')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionSettingsRateLimits = loadable(
+	() => componentLoader(() => import('../pages/version/settings/VersionSettingsRateLimits')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionSettingsRealTime = loadable(
+	() => componentLoader(() => import('../pages/version/settings/VersionSettingsRealTime')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const VersionSettingsNPMPackages = loadable(
+	() => componentLoader(() => import('../pages/version/settings/VersionSettingsNPMPackages')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+// endpoint
+const Endpoint = loadable(() => componentLoader(() => import('../pages/endpoint/Endpoint')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const EditEndpointLoadable = loadable(
+	() => componentLoader(() => import('../pages/endpoint/EditEndpoint')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const EndpointLogs = loadable(
+	() => componentLoader(() => import('../pages/endpoint/EndpointLogs')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+// queue
+const MessageQueue = loadable(() => componentLoader(() => import('../pages/queue/MessageQueue')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const EditMessageQueueLoadable = loadable(
+	() => componentLoader(() => import('../pages/queue/EditMessageQueue')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const MessageQueueLogs = loadable(
+	() => componentLoader(() => import('../pages/queue/MessageQueueLogs')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+// task
+const Task = loadable(() => componentLoader(() => import('../pages/task/Task')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const EditTaskLoadable = loadable(() => componentLoader(() => import('../pages/task/EditTask')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const TaskLogs = loadable(() => componentLoader(() => import('../pages/task/TaskLogs')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+// function
+const Function = loadable(() => componentLoader(() => import('../pages/function/Function')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const EditFunctionLoadable = loadable(
+	() => componentLoader(() => import('../pages/function/EditFunction')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+// middleware
+const Middleware = loadable(() => componentLoader(() => import('../pages/middleware/Middleware')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const EditMiddlewareLoadable = loadable(
+	() => componentLoader(() => import('../pages/middleware/EditMiddleware')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+// storage
+const Storage = loadable(() => componentLoader(() => import('../pages/storage/Storage')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const BucketLoadable = loadable(() => componentLoader(() => import('../pages/storage/Bucket')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const FilesLoadable = loadable(() => componentLoader(() => import('../pages/storage/Files')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+// profileSettings
+const ProfileSettings = loadable(
+	() => componentLoader(() => import('../pages/profile/ProfileSettings')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const ProfileSettingsGeneral = loadable(
+	() => componentLoader(() => import('../pages/profile/ProfileSettingsGeneral')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const ProfileSettingsNotifications = loadable(
+	() => componentLoader(() => import('../pages/profile/ProfileSettingsNotifications')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const ClusterManagement = loadable(
+	() => componentLoader(() => import('../pages/profile/ClusterManagement')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+// onboarding
+const OnboardingLoadable = loadable(
+	() => componentLoader(() => import('../pages/onboarding/Onboarding')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const AccountInformationLoadable = loadable(
+	() => componentLoader(() => import('../pages/onboarding/AccountInformation')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const CreateOrganization = loadable(
+	() => componentLoader(() => import('../pages/onboarding/CreateOrganization')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const CreateApp = loadable(() => componentLoader(() => import('../pages/onboarding/CreateApp')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const InviteTeamMembersLoadable = loadable(
+	() => componentLoader(() => import('../pages/onboarding/InviteTeamMembers')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const SMTPConfiguration = loadable(
+	() => componentLoader(() => import('../pages/onboarding/SMTPConfiguration')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+// others
+const RedirectHandleLoadable = loadable(
+	() => componentLoader(() => import('../pages/redirect-handle/RedirectHandle')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+
+const NotFound = loadable(() => componentLoader(() => import('../pages/errors/404')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
+
+const Unauthorized = loadable(() => componentLoader(() => import('../pages/errors/401')), {
+	fallback: <Fallback />,
+	resolveComponent: (mod: any) => mod.default,
+});
 
 const router = createBrowserRouter([
 	{
@@ -30,85 +537,96 @@ const router = createBrowserRouter([
 		children: [
 			{
 				index: true,
-				lazy: () => lazyRouteImport(PATHS.home),
+				element: <HomeLoadable />,
+				loader: Home.loader,
 			},
 			{
 				path: '/login',
-				lazy: () => lazyRouteImport(PATHS.auth.login),
+				element: <Login />,
 			},
 			{
 				path: '/forgot-password',
-				lazy: () => lazyRouteImport(PATHS.auth.forgetPassword),
+				element: <ForgotPassword />,
 			},
 			{
 				path: '/confirm-change-email',
-				lazy: () => lazyRouteImport(PATHS.auth.confirmChangeEmail),
+				element: <ConfirmChangeEmailLoadable />,
+				loader: ConfirmChangeEmail.loader,
 			},
 			{
-				path: '/forgot-password',
-				lazy: () => lazyRouteImport(PATHS.auth.forgetPassword),
+				path: '/change-password',
+				element: <ChangePasswordWithTokenLoadable />,
+				loader: ChangePasswordWithToken.loader,
 			},
 			{
 				path: '/verify-email',
-				lazy: () => lazyRouteImport(PATHS.auth.verifyEmail),
+				element: <VerifyEmail />,
 			},
 			{
 				path: '/complete-account-setup',
-				lazy: () => lazyRouteImport(PATHS.auth.completeAccountSetup),
+				element: <CompleteAccountSetup />,
 			},
 			{
 				path: '/complete-account-setup/verify-email',
-				lazy: () => lazyRouteImport(PATHS.auth.completeAccountSetupVerifyEmail),
+				element: <CompleteAccountSetupVerifyEmailLoadable />,
+				loader: CompleteAccountSetupVerifyEmail.loader,
 			},
 			{
 				path: '/organization',
-				lazy: () => lazyRouteImport(PATHS.organization.organization),
+				element: <Organization />,
 				children: [
 					{
-						lazy: () => lazyRouteImport(PATHS.organization.select),
 						path: '',
+						element: <OrganizationSelect />,
 					},
 					{
 						path: ':orgId',
-						lazy: () => lazyRouteImport(PATHS.organization.details),
+						element: <OrganizationDetailsLoadable />,
+						loader: OrganizationDetails.loader,
 						children: [
 							{
 								path: 'apps',
 								children: [
 									{
 										index: true,
-										lazy: () => lazyRouteImport(PATHS.organization.apps),
+										element: <OrganizationApps />,
 									},
 									{
 										path: ':appId/version/:versionId',
-										lazy: () => lazyRouteImport(PATHS.version.version),
+
+										element: <Version />,
 										children: [
 											{
 												path: '',
-												lazy: () => lazyRouteImport(PATHS.version.dashboard),
+
+												element: <Dashboard />,
+												loader: VersionDashboard.loader,
 											},
 											{
 												path: 'database',
 												children: [
 													{
 														index: true,
-														lazy: () => lazyRouteImport(PATHS.version.database),
+														element: <VersionDatabase />,
 													},
 													{
 														path: ':dbId/navigator',
-														lazy: () => lazyRouteImport(PATHS.version.navigator),
+														element: <NavigatorLoadable />,
+														loader: Navigator.loader,
 													},
 													{
 														path: ':dbId/models',
-														lazy: () => lazyRouteImport(PATHS.version.modelsOutlet),
+														element: <ModelsOutletLoadable />,
+														loader: ModelsOutlet.loader,
 														children: [
 															{
 																index: true,
-																lazy: () => lazyRouteImport(PATHS.version.models),
+																element: <Models />,
 															},
 															{
 																path: ':modelId/fields',
-																lazy: () => lazyRouteImport(PATHS.version.fields),
+																element: <FieldsLoadable />,
+																loader: Fields.loader,
 															},
 														],
 													},
@@ -116,148 +634,154 @@ const router = createBrowserRouter([
 											},
 											{
 												path: 'endpoint',
-												lazy: () => lazyRouteImport(PATHS.version.endpoint),
+												element: <VersionEndpoint />,
 												children: [
 													{
 														index: true,
-														lazy: () => lazyRouteImport(PATHS.endpoint.endpoint),
+														element: <Endpoint />,
 													},
 													{
 														path: ':endpointId',
-														lazy: () => lazyRouteImport(PATHS.endpoint.editEndpoint),
+														element: <EditEndpointLoadable />,
+														loader: EditEndpoint.loader,
 													},
 													{
 														path: 'logs',
-														lazy: () => lazyRouteImport(PATHS.endpoint.endpointLogs),
+														element: <EndpointLogs />,
 													},
 												],
 											},
 											{
 												path: 'function',
-												lazy: () => lazyRouteImport(PATHS.version.function),
+												element: <VersionFunction />,
 												children: [
 													{
 														index: true,
-														lazy: () => lazyRouteImport(PATHS.function.function),
+														element: <Function />,
 													},
 													{
 														path: ':funcId',
-														lazy: () => lazyRouteImport(PATHS.function.editFunction),
+														element: <EditFunctionLoadable />,
+														loader: EditFunction.loader,
 													},
 												],
 											},
 											{
 												path: 'storage',
-												lazy: () => lazyRouteImport(PATHS.version.storage),
+												element: <VersionStorage />,
 												children: [
 													{
 														index: true,
-														lazy: () => lazyRouteImport(PATHS.storage.storage),
+														element: <Storage />,
 													},
 													{
 														path: ':storageId',
-														lazy: () => lazyRouteImport(PATHS.storage.bucket),
+														element: <BucketLoadable />,
+														loader: Buckets.loader,
 													},
 													{
 														path: ':storageId/bucket/:bucketName',
-														lazy: () => lazyRouteImport(PATHS.storage.files),
+														element: <FilesLoadable />,
+														loader: Files.loader,
 													},
 												],
 											},
 											{
 												path: 'middleware',
-												lazy: () => lazyRouteImport(PATHS.version.middlewares),
+												element: <VersionMiddlewares />,
 												children: [
 													{
 														index: true,
-														lazy: () => lazyRouteImport(PATHS.middleware.middlewares),
+														element: <Middleware />,
 													},
 													{
 														path: ':middlewareId',
-														lazy: () => lazyRouteImport(PATHS.middleware.editMiddleware),
+														element: <EditMiddlewareLoadable />,
+														loader: EditMiddleware.loader,
 													},
 												],
 											},
 											{
 												path: 'cache',
-												lazy: () => lazyRouteImport(PATHS.version.cache),
+												element: <VersionCache />,
 											},
 											{
 												path: 'queue',
-												lazy: () => lazyRouteImport(PATHS.version.messageQueue),
+												element: <VersionMessageQueue />,
 												children: [
 													{
 														index: true,
-														lazy: () => lazyRouteImport(PATHS.queue.queue),
+														element: <MessageQueue />,
 													},
 													{
 														path: ':queueId',
-														lazy: () => lazyRouteImport(PATHS.queue.editQueue),
+														element: <EditMessageQueueLoadable />,
+														loader: EditMessageQueue.loader,
 													},
 													{
 														path: 'logs',
-														lazy: () => lazyRouteImport(PATHS.queue.queueLogs),
+														element: <MessageQueueLogs />,
 													},
 												],
 											},
 											{
 												path: 'task',
-												lazy: () => lazyRouteImport(PATHS.version.task),
+												element: <VersionTask />,
 												children: [
 													{
 														index: true,
-														lazy: () => lazyRouteImport(PATHS.task.task),
+														element: <Task />,
 													},
 													{
 														path: ':taskId',
-														lazy: () => lazyRouteImport(PATHS.task.editTask),
+														element: <EditTaskLoadable />,
+														loader: EditTask.loader,
 													},
 													{
 														path: 'logs',
-														lazy: () => lazyRouteImport(PATHS.task.taskLogs),
+														element: <TaskLogs />,
 													},
 												],
 											},
 											{
 												path: 'notifications',
-												lazy: () => lazyRouteImport(PATHS.version.notifications),
+												element: <VersionNotifications />,
 											},
 											{
 												path: 'settings',
-												lazy: () => lazyRouteImport(PATHS.version.settings.versionSettings),
+												element: <VersionSettings />,
 												children: [
 													{
 														index: true,
-														lazy: () => lazyRouteImport(PATHS.version.settings.general),
+														element: <VersionSettingsGeneral />,
 													},
 													{
 														path: 'environment',
-														lazy: () => lazyRouteImport(PATHS.version.settings.environment),
+														element: <VersionSettingsEnvironment />,
 													},
 													{
 														path: 'npm-packages',
-														lazy: () => lazyRouteImport(PATHS.version.settings.npmPackages),
+														element: <VersionSettingsNPMPackages />,
 													},
 													{
 														path: 'environment-variables',
-														lazy: () =>
-															lazyRouteImport(PATHS.version.settings.environmentVariables),
+														element: <VersionSettingsEnvironmentVariables />,
 													},
 													{
 														path: 'rate-limits',
-														lazy: () => lazyRouteImport(PATHS.version.settings.rateLimits),
+														element: <VersionSettingsRateLimits />,
 													},
 													{
 														path: 'authentications',
-														lazy: () => lazyRouteImport(PATHS.version.settings.authentications),
+														element: <VersionSettingsAuthentications />,
 													},
 													{
 														path: 'api-keys',
-														lazy: () => lazyRouteImport(PATHS.version.settings.apiKeys),
+														element: <VersionSettingsAPIKeys />,
 													},
 													{
 														path: 'real-time',
-														lazy: () => lazyRouteImport(PATHS.version.settings.realTime),
+														element: <VersionSettingsRealTime />,
 													},
 												],
 											},
@@ -267,7 +791,7 @@ const router = createBrowserRouter([
 							},
 							{
 								path: 'resources',
-								lazy: () => lazyRouteImport(PATHS.organization.resources),
+								element: <OrganizationResources />,
 							},
 							{
 								path: 'settings',
@@ -275,11 +799,11 @@ const router = createBrowserRouter([
 									{
 										index: true,
 										path: '',
-										lazy: () => lazyRouteImport(PATHS.organization.settings.general),
+										element: <OrganizationSettingsGeneral />,
 									},
 									{
 										path: 'members',
-										lazy: () => lazyRouteImport(PATHS.organization.settings.members),
+										element: <OrganizationSettingsMembers />,
 									},
 								],
 							},
@@ -289,19 +813,19 @@ const router = createBrowserRouter([
 			},
 			{
 				path: '/profile/settings',
-				lazy: () => lazyRouteImport(PATHS.profileSettings.profileSettings),
+				element: <ProfileSettings />,
 				children: [
 					{
 						index: true,
-						lazy: () => lazyRouteImport(PATHS.profileSettings.account),
+						element: <ProfileSettingsGeneral />,
 					},
 					{
 						path: 'notifications',
-						lazy: () => lazyRouteImport(PATHS.profileSettings.notifications),
+						element: <ProfileSettingsNotifications />,
 					},
 					{
 						path: 'cluster-management',
-						lazy: () => lazyRouteImport(PATHS.profileSettings.clusterManagement),
+						element: <ClusterManagement />,
 					},
 				],
 			},
@@ -310,44 +834,48 @@ const router = createBrowserRouter([
 	},
 	{
 		path: '/onboarding',
-		lazy: () => lazyRouteImport(PATHS.onboarding.onboarding),
+		element: <OnboardingLoadable />,
+		loader: Onboarding.loader,
 		errorElement: <ErrorBoundary />,
 		children: [
 			{
 				path: '',
-				lazy: () => lazyRouteImport(PATHS.onboarding.accountInformation),
+				element: <AccountInformationLoadable />,
+				loader: AccountInformation.loader,
 			},
 			{
 				path: 'create-organization',
-				lazy: () => lazyRouteImport(PATHS.onboarding.createOrganization),
+				element: <CreateOrganization />,
 			},
 			{
 				path: 'create-app',
-				lazy: () => lazyRouteImport(PATHS.onboarding.createApp),
+				element: <CreateApp />,
 			},
 			{
 				path: 'smtp-configuration',
-				lazy: () => lazyRouteImport(PATHS.onboarding.smtpConfiguration),
+				element: <SMTPConfiguration />,
 			},
 			{
 				path: 'invite-team-members',
-				lazy: () => lazyRouteImport(PATHS.onboarding.inviteTeamMembers),
+				element: <InviteTeamMembersLoadable />,
+				loader: InviteTeamMembers.loader,
 			},
 		],
 	},
 	{
 		path: '/redirect-handle',
-		lazy: () => lazyRouteImport(PATHS.redirectHandle),
+		element: <RedirectHandleLoadable />,
+		loader: RedirectHandle.loader,
 		errorElement: <ErrorBoundary />,
 	},
 	{
 		path: '/*',
-		lazy: () => lazyRouteImport(PATHS.notFound),
+		element: <NotFound />,
 		errorElement: <ErrorBoundary />,
 	},
 	{
 		path: '/401',
-		lazy: () => lazyRouteImport(PATHS.unauthorized),
+		element: <Unauthorized />,
 		errorElement: <ErrorBoundary />,
 	},
 ]);
