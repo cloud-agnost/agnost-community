@@ -570,7 +570,11 @@ router.post(
 			// Update ingresses
 			await axios.post(
 				config.get("general.workerUrl") + "/v1/resource/cluster-domains-add",
-				{ domain, ingresses },
+				{
+					domain,
+					ingresses,
+					enforceSSLAccess: cluster.enforceSSLAccess ?? false,
+				},
 				{
 					headers: {
 						Authorization: process.env.ACCESS_TOKEN,
@@ -636,7 +640,10 @@ router.delete(
 			// Update ingresses
 			await axios.post(
 				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
-				{ domain, ingresses },
+				{
+					domain,
+					ingresses,
+				},
 				{
 					headers: {
 						Authorization: process.env.ACCESS_TOKEN,
@@ -646,14 +653,95 @@ router.delete(
 			);
 
 			// Update cluster domains information
+			const updatedList = domains.filter((entry) => entry !== domain);
+
+			// Update cluster domains information
 			let updatedCluster = await clsCtrl.updateOneByQuery(
 				{
 					clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
 				},
 				{
-					domains: domains.filter((entry) => entry !== domain),
+					domains: updatedList,
+					// If there are no domains then we need to make sure the cluster is accessible via non-ssl
+					enforceSSLAccess:
+						updatedList.length === 0 ? false : cluster.enforceSSLAccess,
 				}
 			);
+
+			res.json(updatedCluster);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/cluster/domains/enforce-ssl
+@method     PUT
+@desc       Turns on or off enforce ssl access to the cluster
+@access     public
+*/
+router.put(
+	"/domains/enforce-ssl",
+	checkContentType,
+	authSession,
+	validateCluster,
+	applyRules("update-enforce-ssl"),
+	validate,
+	async (req, res) => {
+		try {
+			const { user, cluster } = req;
+			if (!user.isClusterOwner) {
+				return res.status(401).json({
+					error: t("Not Authorized"),
+					details: t(
+						"You are not authorized to manage cluster SSL access settings. Only the cluster owner can manage cluster access settings."
+					),
+					code: ERROR_CODES.unauthorized,
+				});
+			}
+
+			const { enforceSSLAccess } = req.body;
+
+			if (enforceSSLAccess && cluster.domains.length === 0) {
+				return res.status(401).json({
+					error: t("Not Allowed"),
+					details: t(
+						"You can enforce SSL access to your cluster only if you have a least one domain added to the custom domains list."
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
+			// Get all ingresses that will be impacted
+			const apiServers = await resourceCtrl.getManyByQuery({
+				instance: "API Server",
+			});
+
+			const ingresses = [
+				"engine-realtime-ingress",
+				"platform-core-ingress",
+				"platform-sync-ingress",
+				"studio-ingress",
+				...apiServers.map((entry) => `${entry.iid}-ingress`),
+			];
+
+			// Update ingresses
+			await axios.post(
+				config.get("general.workerUrl") + "/v1/resource/cluster-enforce-ssl",
+				{ enforceSSLAccess, ingresses },
+				{
+					headers: {
+						Authorization: process.env.ACCESS_TOKEN,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			// Update cluster SSL access information
+			let updatedCluster = await clsCtrl.updateOneById(cluster._id, {
+				enforceSSLAccess,
+			});
 
 			res.json(updatedCluster);
 		} catch (error) {

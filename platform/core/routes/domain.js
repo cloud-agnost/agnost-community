@@ -4,6 +4,7 @@ import dmnCtrl from "../controllers/domain.js";
 import envCtrl from "../controllers/environment.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
+import { validateCluster } from "../middlewares/validateCluster.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateApp } from "../middlewares/validateApp.js";
 import { validateVersion } from "../middlewares/validateVersion.js";
@@ -71,6 +72,7 @@ router.post(
 	"/",
 	checkContentType,
 	authSession,
+	validateCluster,
 	validateOrg,
 	validateApp,
 	validateVersion,
@@ -79,7 +81,7 @@ router.post(
 	validate,
 	async (req, res) => {
 		try {
-			const { org, user, app, version } = req;
+			const { org, user, app, version, cluster } = req;
 			const { domain } = req.body;
 
 			// Create the domain entry
@@ -91,7 +93,11 @@ router.post(
 			// Update ingresses
 			await axios.post(
 				config.get("general.workerUrl") + "/v1/resource/cluster-domains-add",
-				{ domain, ingresses: [`${env.iid}-ingress`] },
+				{
+					domain,
+					ingresses: [`${env.iid}-ingress`],
+					enforceSSLAccess: cluster.enforceSSLAccess ?? false,
+				},
 				{
 					headers: {
 						Authorization: process.env.ACCESS_TOKEN,

@@ -627,6 +627,9 @@ export class ResourceManager {
         kubeconfig.loadFromDefault();
         const networkingApi = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
 
+        // Get cluster info from the database
+        const cluster = await getClusterRecord();
+
         try {
             const ingress = {
                 apiVersion: "networking.k8s.io/v1",
@@ -665,6 +668,49 @@ export class ResourceManager {
                     ],
                 },
             };
+
+            // If cluster has SSL settings and custom domains then also add these to the API server ingress
+            if (cluster) {
+                if (cluster.enforceSSLAccess) {
+                    ingress.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
+                    ingress.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "true";
+                } else {
+                    ingress.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "false";
+                    ingress.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "false";
+                }
+
+                if (cluster.domains.length > 0) {
+                    await this.initializeCertificateIssuer();
+                    ingress.metadata.annotations["cert-manager.io/issuer"] = "letsencrypt-issuer-cluster";
+
+                    ingress.spec.tls = cluster.domains.map((domainName) => {
+                        return {
+                            hosts: [domainName],
+                            secretName: helper.getCertSecretName(),
+                        };
+                    });
+
+                    for (const domainName of cluster.domains) {
+                        ingress.spec.rules.push({
+                            host: domainName,
+                            http: {
+                                paths: [
+                                    {
+                                        path: `/${pathName}(/|$)(.*)`,
+                                        pathType: "Prefix",
+                                        backend: {
+                                            service: {
+                                                name: `${serviceName}`,
+                                                port: { number: port },
+                                            },
+                                        },
+                                    },
+                                ],
+                            },
+                        });
+                    }
+                }
+            }
 
             // Create the ingress with the provided spec
             await networkingApi.createNamespacedIngress(process.env.NAMESPACE, ingress);
@@ -927,6 +973,21 @@ export class ResourceManager {
         }
 
         return this.platformDB;
+    }
+
+    /**
+     * Retrieves the cluster record from the database.
+     * @returns {Promise<Object>} The cluster record.
+     */
+    async getClusterRecord() {
+        if (!this.conn) {
+            this.conn = getDBClient();
+        }
+
+        // Get cluster configuration
+        return await this.conn.db("agnost").collection("clusters").getOneByQuery({
+            clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+        });
     }
 
     /**
@@ -1233,9 +1294,10 @@ export class ResourceManager {
      * Adds a custom domain to a cluster ingress.
      * @param {string} ingressName - The name of the ingress.
      * @param {string} domainName - The domain name to be added.
+     * @param {boolean} [enforceSSLAccess=false] - Whether to enforce SSL access to the domain.
      * @returns {Promise<void>} - A promise that resolves when the custom domain is added successfully.
      */
-    async addClusterCustomDomain(ingressName, domainName) {
+    async addClusterCustomDomain(ingressName, domainName, enforceSSLAccess = false) {
         try {
             const kc = new k8s.KubeConfig();
             kc.loadFromDefault();
@@ -1243,8 +1305,14 @@ export class ResourceManager {
 
             const ingress = await k8sExtensionsApi.readNamespacedIngress(ingressName, process.env.NAMESPACE);
 
-            ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
-            ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "true";
+            if (enforceSSLAccess) {
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "true";
+            } else {
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "false";
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "false";
+            }
+
             ingress.body.metadata.annotations["cert-manager.io/issuer"] = "letsencrypt-issuer-cluster";
             if (ingress.body.spec.tls) {
                 ingress.body.spec.tls.push({
@@ -1323,6 +1391,47 @@ export class ResourceManager {
             logger.error(`Cannot remove custom domain(s) '${domainNames.join(", ")}' to ingress '${ingressName}'`, {
                 details: err,
             });
+        }
+    }
+
+    /**
+     * Updates the enforceSSLAccess settings for the specified ingress.
+     * @param {string} ingressName - The name of the ingress.
+     * @param {boolean} [enforceSSLAccess=false] - Whether to enforce SSL access. Default is false.
+     * @returns {Promise<void>} - A Promise that resolves when the update is complete.
+     */
+    async updateEnforceSSLAccessSettings(ingressName, enforceSSLAccess = false) {
+        try {
+            const kc = new k8s.KubeConfig();
+            kc.loadFromDefault();
+            const k8sExtensionsApi = kc.makeApiClient(k8s.NetworkingV1Api);
+
+            const ingress = await k8sExtensionsApi.readNamespacedIngress(ingressName, process.env.NAMESPACE);
+
+            if (enforceSSLAccess) {
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "true";
+            } else {
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "false";
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "false";
+            }
+
+            ingress.body.metadata.annotations["cert-manager.io/issuer"] = "letsencrypt-issuer-cluster";
+
+            const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
+            await k8sExtensionsApi.patchNamespacedIngress(
+                ingressName,
+                process.env.NAMESPACE,
+                ingress.body,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                requestOptions
+            );
+        } catch (err) {
+            logger.error(`Cannot update ssl access settings of ingress '${ingressName}'`, { details: err });
         }
     }
 }

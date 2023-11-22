@@ -100,6 +100,11 @@ export const ClusterModel = mongoose.model(
 				type: [String],
 				index: true,
 			},
+			// Enforce SSL access or not
+			enforceSSLAccess: {
+				type: Boolean,
+				default: false,
+			},
 			// The ip addresses or hostnames of the cluster
 			ips: {
 				type: [String],
@@ -271,6 +276,17 @@ export const applyRules = (type) => {
 							);
 						}
 					}),
+			];
+		case "update-enforce-ssl":
+			return [
+				body("enforceSSLAccess")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
 			];
 		default:
 			return [];
