@@ -16,11 +16,11 @@ async function lazyRouteImport(path: string) {
 		resolveComponent: (mod: any) => mod.default,
 	});
 
-	return {
+ 	return {
 		Component,
 		// @ts-ignore
 		loader: Component?.loader,
-	};
+	}; 
 }
 
 const router = createBrowserRouter([

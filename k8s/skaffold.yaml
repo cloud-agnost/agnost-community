@@ -71,6 +71,24 @@ build:
               - '**/*.json'
         docker:
           dockerfile: Dockerfile.dev
+      - image: agnost-community/studio
+        context: ../studio
+        sync:
+           infer:
+              - '**/*.js'
+              - '**/*.ts'
+              - '**/*.tsx'
+              - '**/*.json'
+              - '**/*.html'
+              - '**/*.htm'
+              - '**/*.css'
+              - '**/*.png'
+              - '**/*.jpg'
+              - '**/*.svg'
+              - '**/*.ico'
+              - '**/*.md'
+        docker:
+           dockerfile: Dockerfile
 deploy:
    statusCheckDeadlineSeconds: 300
    kubectl:
@@ -84,3 +102,4 @@ deploy:
          - dev/engine-monitor-deployment.yaml
          - dev/engine-realtime-deployment.yaml
          - dev/engine-scheduler-deployment.yaml
+         - dev/studio-deployment.yaml
