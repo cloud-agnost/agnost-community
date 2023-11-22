@@ -149,7 +149,7 @@ export default class EndpointService {
 			opt = !isEmpty(formData) ? formDataObj : body;
 		}
 		return await test[method](
-			`http://localhost/${useEnvironmentStore.getState().environment?.iid}/api${path}`,
+			`${window.location.origin}/${useEnvironmentStore.getState().environment?.iid}${path}`,
 			opt,
 			options,
 		);
