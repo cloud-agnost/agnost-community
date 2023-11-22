@@ -1,6 +1,6 @@
 # Build Stage
 # Use a Node.js base image
-FROM node:latest as build-stage
+FROM node:18.16.0-alpine3.18 as build-stage
 
 # Set the working directory
 WORKDIR /app
