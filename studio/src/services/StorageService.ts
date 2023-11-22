@@ -28,8 +28,7 @@ export default class StorageService {
 	static url = 'v1/org/';
 
 	static getUrl() {
-		//Todo: change localhost to actual url
-		return `http://localhost/${useEnvironmentStore.getState().environment?.iid}`;
+		return `${window.location.origin}/${useEnvironmentStore.getState().environment?.iid}`;
 	}
 
 	static async getStorages({ orgId, appId, versionId, ...params }: GetStoragesParams) {
