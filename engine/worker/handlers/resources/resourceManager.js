@@ -628,7 +628,7 @@ export class ResourceManager {
         const networkingApi = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
 
         // Get cluster info from the database
-        const cluster = await getClusterRecord();
+        const cluster = await this.getClusterRecord();
 
         try {
             const ingress = {
@@ -985,7 +985,7 @@ export class ResourceManager {
         }
 
         // Get cluster configuration
-        return await this.conn.db("agnost").collection("clusters").getOneByQuery({
+        return await this.conn.db("agnost").collection("clusters").findOne({
             clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
         });
     }

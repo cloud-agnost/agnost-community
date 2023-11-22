@@ -157,5 +157,48 @@ export const applyRules = (type) => {
 						return true;
 					}),
 			];
+		case "delete-sse":
+			return [
+				body("domain")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.toLowerCase() // convert the value to lowercase
+					.custom(async (value, { req }) => {
+						const dnameRegex = /^(?:\*\.)?(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+						// Validate domain name (can be at mulitple levels and allows for wildcard subdomains)
+						if (!dnameRegex.test(value)) {
+							throw new AgnostError(t("Not a valid domain name '%s'", value));
+						}
+
+						// Check to see if this domain is already in the domain list
+						const domain = await DomainModel.findOne({
+							domain: value,
+						});
+
+						if (!domain) {
+							throw new AgnostError(
+								t(
+									"The specified domain '%s' does not exists in domains list",
+									value
+								)
+							);
+						} else if (
+							domain.vesionId.toString() !== req.version._id.toString()
+						) {
+							throw new AgnostError(
+								t(
+									"Version '%s' does not have such a domain '%s'",
+									req.version.name,
+									value
+								)
+							);
+						}
+
+						req.domain = domain;
+						return true;
+					}),
+			];
 	}
 };
