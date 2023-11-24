@@ -1,5 +1,6 @@
 import axios from "axios";
 import mongoose from "mongoose";
+import net from "net";
 import randomColor from "randomcolor";
 import { customAlphabet } from "nanoid";
 import cyripto from "crypto-js";
