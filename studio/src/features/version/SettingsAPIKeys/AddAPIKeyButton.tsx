@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { AddOrEditAPIKeyDrawer } from '@/features/version/SettingsAPIKeys';
 
 export default function AddAPIKeyButton() {

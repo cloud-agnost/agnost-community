@@ -7,7 +7,7 @@ import { APIError, BucketFile, ColumnDefWithClassName } from '@/types';
 import { formatFileSize, getVersionPermission, notify, translate } from '@/utils';
 import { Copy, Swap } from '@phosphor-icons/react';
 import { QueryClient } from '@tanstack/react-query';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';

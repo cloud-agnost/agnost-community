@@ -1,5 +1,5 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import * as z from 'zod';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

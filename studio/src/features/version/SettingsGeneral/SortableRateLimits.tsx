@@ -3,7 +3,7 @@ import useVersionStore from '@/store/version/versionStore.ts';
 import { RateLimit } from '@/types';
 import { Draggable, DropResult } from 'react-beautiful-dnd';
 import { useTranslation } from 'react-i18next';
-import { AddRateLimiterDropdown } from '.';
+import AddRateLimiterDropdown from './AddRateLimiterDropdown';
 interface SortableRateLimitsProps {
 	onDragEnd: (result: DropResult) => void;
 	onSelect: (limiter: RateLimit) => void;

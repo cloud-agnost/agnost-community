@@ -9,7 +9,7 @@ import useEnvironmentStore from '@/store/environment/environmentStore';
 import { cn } from '@/utils';
 import { Cloud, GearSix } from '@phosphor-icons/react';
 
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,

@@ -1,6 +1,6 @@
 import { APIError } from '@/types';
 import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { Input } from 'components/Input';
 import { KeyboardEvent, ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

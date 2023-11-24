@@ -3,7 +3,7 @@ import useMiddlewareStore from '@/store/middleware/middlewareStore';
 import { Middleware } from '@/types';
 import { reorder } from '@/utils';
 import { CaretDown, CaretUp, Plus } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,

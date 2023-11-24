@@ -1,7 +1,7 @@
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useEnvironmentStore from '@/store/environment/environmentStore.ts';
 import { cn } from '@/utils';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { CopyInput } from 'components/CopyInput';
 import { SettingsFormItem } from 'components/SettingsFormItem';
 import { Switch } from 'components/Switch';

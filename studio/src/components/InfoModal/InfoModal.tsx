@@ -8,7 +8,7 @@ import {
 	DialogDescription,
 } from '../Dialog';
 
-import { Button, buttonVariants } from 'components/Button';
+import { Button, buttonVariants } from '@/components/Button';
 import { ElementType, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import './infoModal.scss';

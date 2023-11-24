@@ -2,7 +2,7 @@ import { cn } from '@/utils';
 import * as React from 'react';
 import './table.scss';
 import { CircleNotch, Copy } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { useToast } from '@/hooks';
 import { useTranslation } from 'react-i18next';
 

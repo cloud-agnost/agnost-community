@@ -1,6 +1,6 @@
 import { cn, copy } from '@/utils';
 import { Copy } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 
 interface CopyButtonProps {
 	text: string;

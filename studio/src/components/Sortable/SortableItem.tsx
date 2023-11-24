@@ -1,5 +1,5 @@
 import { DotsSixVertical, Trash } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { DraggableProvided } from 'react-beautiful-dnd';
 
 interface RateLimitProps<T> {

@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useToast } from '@/hooks';
 import { DotsSixVertical, Trash } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import useSettingsStore from '@/store/version/settingsStore';
 
 export default function SortableRealtimeRateLimits() {

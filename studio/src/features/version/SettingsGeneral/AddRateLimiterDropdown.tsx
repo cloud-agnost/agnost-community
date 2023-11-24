@@ -1,7 +1,7 @@
 import { EditOrAddEndpointRateLimiterDrawer } from '@/features/version/SettingsGeneral';
 import { RateLimit } from '@/types';
 import { CaretDown, CaretUp, Plus } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,

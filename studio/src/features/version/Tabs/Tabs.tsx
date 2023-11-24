@@ -3,7 +3,7 @@ import useTabStore from '@/store/version/tabStore.ts';
 import { Tab, TabTypes } from '@/types';
 import { generateId, reorder } from '@/utils';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { NEW_TAB_ITEMS } from 'constants/constants.ts';
 import { useEffect, useRef, useState } from 'react';
 import {

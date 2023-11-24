@@ -1,4 +1,4 @@
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { AddNPMPackagesDrawer } from '@/features/version/SettingsNPMPackages';

@@ -1,6 +1,6 @@
 import { cn } from '@/utils';
 import { X } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { ReactNode } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import { Link } from 'react-router-dom';

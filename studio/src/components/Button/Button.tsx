@@ -1,11 +1,11 @@
 import { cn } from '@/utils';
+import { CircleNotch } from '@phosphor-icons/react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
-import './Button.scss';
-import { CircleNotch } from '@phosphor-icons/react';
-import { Link, LinkProps } from 'react-router-dom';
-import { RefAttributes } from 'react';
 import * as React from 'react';
+import { RefAttributes } from 'react';
+import { Link, LinkProps } from 'react-router-dom';
+import './Button.scss';
 
 const buttonVariants = cva('btn', {
 	variants: {
@@ -43,7 +43,7 @@ const buttonVariants = cva('btn', {
 	},
 });
 
-export interface ButtonProps
+interface ButtonProps
 	extends React.ButtonHTMLAttributes<HTMLButtonElement>,
 		VariantProps<typeof buttonVariants> {
 	asChild?: boolean;
@@ -102,8 +102,6 @@ const Button = React.forwardRef<
 );
 Button.displayName = 'Button';
 
-const ButtonGroup = ({ children }: { children: React.ReactNode }) => {
-	return <div className='btn-group'>{children}</div>;
-};
-
-export { Button, buttonVariants, ButtonGroup };
+export default Button;
+export { buttonVariants };
+export type { ButtonProps };

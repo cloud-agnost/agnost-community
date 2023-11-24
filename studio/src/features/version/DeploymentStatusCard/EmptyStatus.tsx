@@ -1,5 +1,5 @@
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { useTranslation } from 'react-i18next';
 
 export default function EmptyStatus() {

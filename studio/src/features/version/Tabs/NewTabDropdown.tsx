@@ -3,7 +3,7 @@ import useVersionStore from '@/store/version/versionStore';
 import { DesignElement, Tab, TabTypes } from '@/types';
 import { capitalize, generateId } from '@/utils';
 import { Plus } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
