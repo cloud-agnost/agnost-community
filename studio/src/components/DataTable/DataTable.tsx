@@ -14,7 +14,7 @@ interface DataTableProps<TData> {
 	headerClassName?: string;
 }
 
-export function DataTable<TData>({
+export default function DataTable<TData>({
 	table,
 	onRowClick,
 	onCellClick,
