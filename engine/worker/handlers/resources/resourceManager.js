@@ -1365,6 +1365,8 @@ export class ResourceManager {
             if (container) ruleCopy.http.paths[0].path = "(/|$)(.*)";
             ingress.body.spec.rules.push(ruleCopy);
 
+            console.log("***ruleCopy", ruleCopy);
+
             const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
             await k8sExtensionsApi.patchNamespacedIngress(
                 ingressName,

@@ -8,14 +8,14 @@ metadata:
       nginx.ingress.kubernetes.io/proxy-send-timeout: '6000'
       nginx.ingress.kubernetes.io/proxy-read-timeout: '6000'
       nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: '6000'
-      nginx.ingress.kubernetes.io/rewrite-target: /$1
+      nginx.ingress.kubernetes.io/rewrite-target: /$2
       nginx.ingress.kubernetes.io/upstream-vhost: env-kc2p9wa3qta4.default.svc.cluster.local
 spec:
    ingressClassName: nginx
    rules:
       - http:
            paths:
-              - path: /env-kc2p9wa3qta4/(.*)
+              - path: (/|$)(.*)
                 pathType: Prefix
                 backend:
                    service:
