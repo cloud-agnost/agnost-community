@@ -2,8 +2,6 @@ import { handleError } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 export const validateClusterIPs = async (req, res, next) => {
-	return next();
-
 	try {
 		const clusterIPs = await helper.getClusterIPs();
 		for (let i = 0; i < clusterIPs.length; i++) {

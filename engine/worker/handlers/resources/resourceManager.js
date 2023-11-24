@@ -640,8 +640,6 @@ export class ResourceManager {
         // Get cluster info from the database
         const cluster = await this.getClusterRecord();
 
-        console.log("***here1", cluster);
-
         try {
             const ingress = {
                 apiVersion: "networking.k8s.io/v1",
@@ -728,12 +726,9 @@ export class ResourceManager {
                 }
             }
 
-            console.log("***here1.1", JSON.stringify(ingress, null, 2));
-
             // Create the ingress with the provided spec
             await networkingApi.createNamespacedIngress(process.env.NAMESPACE, ingress);
         } catch (err) {
-            console.log("***here2", err.body?.message);
             throw new AgnostError(err.body?.message);
         }
     }
@@ -806,7 +801,6 @@ export class ResourceManager {
             // Create the ingress with the provided spec
             await networkingApi.createNamespacedIngress(process.env.NAMESPACE, ingress);
         } catch (err) {
-            console.log("***here3", err);
             throw new AgnostError(err.body?.message);
         }
     }
@@ -1507,8 +1501,6 @@ export class ResourceManager {
                 ingress.body.spec.rules.unshift(ruleCopy);
             }
 
-            console.log("***ingress", JSON.stringify(ingress.body, null, 2));
-
             const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
             await k8sExtensionsApi.patchNamespacedIngress(
                 ingressName,
@@ -1522,7 +1514,6 @@ export class ResourceManager {
                 requestOptions
             );
         } catch (err) {
-            console.log("***addClusterCustomDomain-err", err?.body?.message);
             logger.error(`Cannot add custom domain '${domainName}' to ingress '${ingressName}'`, { details: err });
         }
     }
@@ -1535,8 +1526,6 @@ export class ResourceManager {
      */
     async deleteClusterCustomDomains(ingressName, domainNames) {
         try {
-            console.log("***deleteClusterCustomDomains", ingressName, domainNames);
-
             const kc = new k8s.KubeConfig();
             kc.loadFromDefault();
             const k8sExtensionsApi = kc.makeApiClient(k8s.NetworkingV1Api);

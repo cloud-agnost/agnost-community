@@ -15,6 +15,7 @@ import taskCtrl from "../controllers/task.js";
 import storageCtrl from "../controllers/storage.js";
 import funcCtrl from "../controllers/function.js";
 import cacheCtrl from "../controllers/cache.js";
+import dmnCtrl from "../controllers/domain.js";
 import { AppModel } from "../schemas/app.js";
 
 class AppController extends BaseController {
@@ -126,6 +127,10 @@ class AppController extends BaseController {
 			{ session }
 		);
 		await cacheCtrl.deleteManyByQuery(
+			{ orgId: org._id, appId: app._id },
+			{ session }
+		);
+		await dmnCtrl.deleteManyByQuery(
 			{ orgId: org._id, appId: app._id },
 			{ session }
 		);
