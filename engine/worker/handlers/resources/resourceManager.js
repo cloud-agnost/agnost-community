@@ -1362,7 +1362,7 @@ export class ResourceManager {
             const ruleCopy = JSON.parse(JSON.stringify(ingress.body.spec.rules[0]));
             ruleCopy.host = domainName;
             // If this is an ingress for the container then we do not need /<env_id>(/|$)(.*)
-            if (container) ruleCopy.http.paths[0].path = "(/|$)(.*)";
+            if (container) ruleCopy.http.paths[0].path = "/($)(.*)";
             ingress.body.spec.rules.push(ruleCopy);
 
             console.log("***ruleCopy", JSON.stringify(ingress.body, null, 2));
@@ -1380,7 +1380,7 @@ export class ResourceManager {
                 requestOptions
             );
         } catch (err) {
-            console.log("***addClusterCustomDomain-err", err);
+            console.log("***addClusterCustomDomain-err", err?.body?.message);
             logger.error(`Cannot add custom domain '${domainName}' to ingress '${ingressName}'`, { details: err });
         }
     }
@@ -1393,6 +1393,8 @@ export class ResourceManager {
      */
     async deleteClusterCustomDomains(ingressName, domainNames) {
         try {
+            console.log("***deleteClusterCustomDomains", ingressName, domainNames);
+
             const kc = new k8s.KubeConfig();
             kc.loadFromDefault();
             const k8sExtensionsApi = kc.makeApiClient(k8s.NetworkingV1Api);
