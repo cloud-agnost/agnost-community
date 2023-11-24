@@ -1,4 +1,4 @@
-import { BaseRequest } from '.';
+import { BaseRequest } from './type';
 
 export type LoginParams = BaseRequest & {
 	email: string;

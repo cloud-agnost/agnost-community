@@ -1,5 +1,5 @@
 import { VersionParams } from '@/types/version.ts';
-import { BaseGetRequest, BaseParams, BaseRequest, Log } from '.';
+import { BaseGetRequest, BaseParams, BaseRequest, Log } from './type';
 
 export type EnvironmentStatus =
 	| 'OK'

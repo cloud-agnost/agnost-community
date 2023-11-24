@@ -1,7 +1,8 @@
 import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants/regex';
 import { translate } from '@/utils';
 import * as z from 'zod';
-import { BaseGetRequest, BaseParams, BaseRequest, NameSchema } from '.';
+import { NameSchema } from './schema';
+import { BaseGetRequest, BaseParams, BaseRequest } from './type';
 export interface Storage {
 	_id: string;
 	orgId: string;

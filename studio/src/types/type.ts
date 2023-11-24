@@ -1,6 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { z } from 'zod';
-import { EnvironmentStatus } from '.';
+import { EnvironmentStatus } from './environment';
 
 export const UserSchema = z.object({
 	iid: z.string(),

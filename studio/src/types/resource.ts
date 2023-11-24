@@ -3,7 +3,7 @@ import useResourceStore from '@/store/resources/resourceStore';
 import useTypeStore from '@/store/types/typeStore';
 import { translate } from '@/utils';
 import * as z from 'zod';
-import { BaseRequest } from '.';
+import { BaseRequest } from './type';
 
 export enum AllowedRole {
 	Admin = 'Admin',

@@ -1,4 +1,8 @@
-import { Application, BaseRequest, Environment, Organization, Version } from '.';
+import { Application } from './application';
+import { Environment } from './environment';
+import { Organization } from './organization';
+import { BaseRequest } from './type';
+import { Version } from './version';
 
 export type ClusterComponentsType =
 	| 'Node.js'

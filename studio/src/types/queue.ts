@@ -1,6 +1,7 @@
 import { translate } from '@/utils';
 import * as z from 'zod';
-import { BaseGetRequest, BaseParams, BaseRequest, Log, NameSchema } from '.';
+import { NameSchema } from './schema';
+import { BaseGetRequest, BaseParams, BaseRequest, Log } from './type';
 
 export interface MessageQueue {
 	orgId: string;
