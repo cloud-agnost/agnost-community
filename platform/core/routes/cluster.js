@@ -748,6 +748,7 @@ router.put(
 				"platform-sync-ingress",
 				"studio-ingress",
 				...apiServers.map((entry) => `${entry.iid}-ingress`),
+				...apiServers.map((entry) => `${entry.iid}-container-ingress`),
 			];
 
 			// Update ingresses

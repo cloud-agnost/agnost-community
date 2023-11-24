@@ -99,9 +99,10 @@ router.post(
 				config.get("general.workerUrl") + "/v1/resource/cluster-domains-add",
 				{
 					domain,
-					ingresses: [`${env.iid}-ingress`],
+					ingresses: [`${env.iid}-container-ingress`],
 					enforceSSLAccess: cluster.enforceSSLAccess ?? false,
 					container: true,
+					containeriid: env.iid,
 				},
 				{
 					headers: {
@@ -180,9 +181,10 @@ router.post(
 				config.get("general.workerUrl") + "/v1/resource/cluster-domains-add",
 				{
 					domain,
-					ingresses: [`${env.iid}-ingress`],
+					ingresses: [`${env.iid}-container-ingress`],
 					enforceSSLAccess: cluster.enforceSSLAccess ?? false,
 					container: true,
+					containeriid: env.iid,
 				},
 				{
 					headers: {
@@ -264,8 +266,9 @@ router.delete(
 				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
 				{
 					domain: domains.map((entry) => entry.domain),
-					ingresses: [`${env.iid}-ingress`],
+					ingresses: [`${env.iid}-container-ingress`],
 					container: true,
+					containeriid: env.iid,
 				},
 				{
 					headers: {
@@ -329,8 +332,9 @@ router.delete(
 				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
 				{
 					domain: domain.domain,
-					ingresses: [`${env.iid}-ingress`],
+					ingresses: [`${env.iid}-container-ingress`],
 					container: true,
+					containeriid: env.iid,
 				},
 				{
 					headers: {
@@ -392,8 +396,9 @@ router.delete(
 				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
 				{
 					domain: domain.domain,
-					ingresses: [`${env.iid}-ingress`],
+					ingresses: [`${env.iid}-container-ingress`],
 					container: true,
+					containeriid: env.iid,
 				},
 				{
 					headers: {
@@ -456,8 +461,9 @@ router.post(
 				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
 				{
 					domain: domain.domain,
-					ingresses: [`${env.iid}-ingress`],
+					ingresses: [`${env.iid}-container-ingress`],
 					container: true,
+					containeriid: env.iid,
 				},
 				{
 					headers: {

@@ -131,7 +131,14 @@ router.post("/cluster-domains-add", checkContentType, authAccessToken, async (re
         await manager.initializeCertificateIssuer();
         const secretName = helper.getCertSecretName();
         for (const ingress of ingresses) {
-            await manager.addClusterCustomDomain(ingress, domain, secretName, enforceSSLAccess, container);
+            await manager.addClusterCustomDomain(
+                ingress,
+                domain,
+                secretName,
+                enforceSSLAccess,
+                container,
+                containeriid
+            );
         }
 
         res.json();
