@@ -1362,7 +1362,7 @@ export class ResourceManager {
             const ruleCopy = JSON.parse(JSON.stringify(ingress.body.spec.rules[0]));
             ruleCopy.host = domainName;
             // If this is an ingress for the container then we do not need /<env_id>(/|$)(.*)
-            if (container) ruleCopy.host.paths[0].path = "/";
+            if (container) ruleCopy.http.paths[0].path = "/";
             ingress.body.spec.rules.push(ruleCopy);
 
             const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
@@ -1378,6 +1378,7 @@ export class ResourceManager {
                 requestOptions
             );
         } catch (err) {
+            console.log("***addClusterCustomDomain-err", err);
             logger.error(`Cannot add custom domain '${domainName}' to ingress '${ingressName}'`, { details: err });
         }
     }
