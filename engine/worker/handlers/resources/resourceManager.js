@@ -1359,11 +1359,13 @@ export class ResourceManager {
                 ];
             }
 
-            const ruleCopy = JSON.parse(JSON.stringify(ingress.body.spec.rules[0]));
+            // The default ingress rules is the last one, all new ones are added to the beginning of the rules array
+            const ruleCopy = JSON.parse(JSON.stringify(ingress.body.spec.rules[ingress.body.spec.rules.length - 1]));
             ruleCopy.host = domainName;
             // If this is an ingress for the container then we do not need /<env_id>(/|$)(.*)
             if (container) ruleCopy.http.paths[0].path = "/($)(.*)";
-            ingress.body.spec.rules.push(ruleCopy);
+            // Add it to the beginning of the rules array
+            ingress.body.spec.rules.unshift(ruleCopy);
 
             console.log("***ruleCopy", JSON.stringify(ingress.body, null, 2));
 
