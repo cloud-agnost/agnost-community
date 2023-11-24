@@ -1,22 +1,24 @@
 import useAuthStore from '@/store/auth/authStore.ts';
 import { APIError } from '@/types';
 import axios from 'axios';
-const baseURL = import.meta.env.VITE_API_URL ?? `${window.location.origin}/api`;
+const baseURL = `${window.location.protocol}//${window.location.hostname}`;
 
 const headers = {
 	'Content-Type': 'application/json',
 };
 export const instance = axios.create({
-	baseURL,
+	baseURL: `${baseURL}/api`,
 	headers,
 });
 
 export const envInstance = axios.create({
 	headers,
+	baseURL,
 });
 
 export const testEndpointInstance = axios.create({
 	headers,
+	baseURL,
 });
 
 instance.interceptors.request.use((config) => {
@@ -63,14 +65,6 @@ envInstance.interceptors.request.use((config) => {
 	return config;
 });
 
-testEndpointInstance.interceptors.response.use(
-	(response) => {
-		return response;
-	},
-	(error) => {
-		return error;
-	},
-);
 envInstance.interceptors.response.use(
 	(response) => {
 		return response;
