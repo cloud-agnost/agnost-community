@@ -5,42 +5,13 @@ import { TableLoading } from '@/components/Table/Table';
 import { BucketColumns, CreateBucket } from '@/features/storage';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
-import useApplicationStore from '@/store/app/applicationStore';
 import useStorageStore from '@/store/storage/storageStore';
-import useTabStore from '@/store/version/tabStore';
 import { APIError } from '@/types';
-import { getAppPermission } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { LoaderFunctionArgs, redirect, useParams } from 'react-router-dom';
-Buckets.loader = async ({ params }: LoaderFunctionArgs) => {
-	const role = useApplicationStore.getState().application?.role;
-	const { removeTab, getCurrentTab } = useTabStore.getState();
-	const { storageId, appId, orgId, versionId } = params;
-	const { storages } = useStorageStore.getState();
-	let selectedStorage = storages.find((storage) => storage._id === storageId);
-	if (!selectedStorage) {
-		selectedStorage = await useStorageStore.getState().getStorageById({
-			storageId: storageId as string,
-			appId: appId as string,
-			orgId: orgId as string,
-			versionId: versionId as string,
-		});
-	}
-	useStorageStore.setState({ storage: selectedStorage });
-
-	const permission = getAppPermission(`${role}.app.storage.viewData`);
-
-	if (!permission) {
-		removeTab(versionId as string, getCurrentTab(versionId as string).id);
-		return redirect('/401');
-	}
-
-	return { props: {} };
-};
-
+import { useParams } from 'react-router-dom';
 export default function Buckets() {
 	const [isBucketCreateOpen, setIsBucketCreateOpen] = useState(false);
 	const { notify } = useToast();

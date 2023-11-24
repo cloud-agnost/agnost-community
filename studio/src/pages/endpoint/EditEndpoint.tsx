@@ -6,35 +6,11 @@ import { useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
-import useTabStore from '@/store/version/tabStore';
 import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LoaderFunctionArgs, useParams, useSearchParams } from 'react-router-dom';
-EditEndpoint.loader = async ({ params }: LoaderFunctionArgs) => {
-	const { endpointId, orgId, versionId, appId } = params;
-	if (!endpointId) return null;
-	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
-	const { endpoint, getEndpointById, logics, setLogics } = useEndpointStore.getState();
-	if (endpoint?._id === endpointId) {
-		updateCurrentTab(versionId as string, {
-			isDirty: logics[endpointId] ? endpoint.logic !== logics[endpointId] : false,
-		});
-		setLogics(endpointId, logics[endpointId] ?? endpoint.logic);
-		closeDeleteTabModal();
-		return { endpoint };
-	}
-
-	getEndpointById({
-		orgId: orgId as string,
-		appId: appId as string,
-		versionId: versionId as string,
-		epId: endpointId,
-	});
-
-	return { props: { endpoint } };
-};
+import { useParams, useSearchParams } from 'react-router-dom';
 
 export default function EditEndpoint() {
 	const { t } = useTranslation();

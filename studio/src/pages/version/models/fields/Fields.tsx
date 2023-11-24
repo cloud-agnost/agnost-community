@@ -6,32 +6,13 @@ import {
 import { useSearch, useTable } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
-import useAuthStore from '@/store/auth/authStore';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
 import { Field } from '@/types';
 import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 import { DataTable } from 'components/DataTable';
 import { useTranslation } from 'react-i18next';
-import { LoaderFunctionArgs, useParams } from 'react-router-dom';
-
-Fields.loader = async function ({ params }: LoaderFunctionArgs) {
-	if (!useAuthStore.getState().isAuthenticated()) return null;
-
-	const apiParams = params as {
-		orgId: string;
-		appId: string;
-		versionId: string;
-		dbId: string;
-		modelId: string;
-	};
-
-	const { getSpecificModelOfDatabase, model } = useModelStore.getState();
-	if (apiParams.modelId !== model._id && apiParams.modelId)
-		await getSpecificModelOfDatabase(apiParams);
-
-	return { props: {} };
-};
+import { useParams } from 'react-router-dom';
 
 export default function Fields() {
 	const { modelId, versionId, dbId, appId, orgId } = useParams() as Record<string, string>;

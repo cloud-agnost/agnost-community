@@ -11,24 +11,6 @@ import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { LoaderFunctionArgs } from 'react-router-dom';
-
-Files.loader = async ({ params }: LoaderFunctionArgs) => {
-	const { bucketName } = params;
-	const { bucket, buckets, storage, getBucket } = useStorageStore.getState();
-
-	if (bucketName !== bucket?.name) {
-		let selectedBucket = buckets.find((bucket) => bucket.name === bucketName);
-		if (!selectedBucket) {
-			selectedBucket = await getBucket({
-				storageName: storage?.name as string,
-				bucketName: bucketName as string,
-			});
-		}
-		useStorageStore.setState({ bucket: selectedBucket });
-	}
-	return { props: {} };
-};
 
 export default function Files() {
 	const { notify } = useToast();

@@ -1,37 +1,13 @@
 import TestMessageQueue from '@/features/queue/TestMessageQueue';
 import { useToast } from '@/hooks';
+import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
+import { APIError } from '@/types';
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LoaderFunctionArgs, useParams } from 'react-router-dom';
-import useTabStore from '@/store/version/tabStore';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
-import { useMutation } from '@tanstack/react-query';
-import { APIError } from '@/types';
-EditMessageQueue.loader = async ({ params }: LoaderFunctionArgs) => {
-	const { queueId, orgId, versionId, appId } = params;
-	if (!queueId) return null;
-	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
-	const { queue, setLogics, getQueueById, logics } = useMessageQueueStore.getState();
-	if (queue?._id === queueId) {
-		updateCurrentTab(versionId as string, {
-			isDirty: logics[queueId] ? queue.logic !== logics[queueId] : false,
-		});
-		setLogics(queueId, logics[queueId] ?? queue.logic);
-		closeDeleteTabModal();
-		return { queue };
-	}
-
-	await getQueueById({
-		orgId: orgId as string,
-		appId: appId as string,
-		versionId: versionId as string,
-		queueId: queueId,
-	});
-
-	return { props: {} };
-};
+import { useParams } from 'react-router-dom';
 
 export default function EditMessageQueue() {
 	const { t } = useTranslation();

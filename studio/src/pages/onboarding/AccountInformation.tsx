@@ -12,7 +12,6 @@ import {
 } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { PasswordInput } from '@/components/PasswordInput';
-import { resetAllStores } from '@/helpers';
 import { GuestOnly } from '@/router';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
@@ -58,11 +57,6 @@ const FormSchema = z.object({
 			translate('forms.required', { label: translate('login.name') }),
 		),
 });
-
-AccountInformation.loader = async () => {
-	resetAllStores();
-	return {};
-};
 
 export default function AccountInformation() {
 	const [initiating, setInitiating] = useState(false);
