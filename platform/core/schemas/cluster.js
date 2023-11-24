@@ -235,8 +235,11 @@ export const applyRules = (type) => {
 					.bail()
 					.toLowerCase() // convert the value to lowercase
 					.custom((value, { req }) => {
-						const dnameRegex = /^(?:\*\.)?(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
-						// Validate domain name (can be at mulitple levels and allows for wildcard subdomains)
+						// The below reges allows for wildcard subdomains
+						// const dnameRegex = /^(?:\*\.)?(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+						// Check domain name syntax, we do not currently allow wildcard subdomains
+						const dnameRegex = /^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+						// Validate domain name (can be at mulitple levels)
 						if (!dnameRegex.test(value)) {
 							throw new AgnostError(t("Not a valid domain name '%s'", value));
 						}

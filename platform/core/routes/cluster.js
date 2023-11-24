@@ -10,6 +10,7 @@ import { handleError } from "../schemas/platformError.js";
 import { applyRules } from "../schemas/cluster.js";
 import { validate } from "../middlewares/validate.js";
 import { validateCluster } from "../middlewares/validateCluster.js";
+import { validateClusterIPs } from "../middlewares/validateClusterIPs.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { clusterComponents } from "../config/constants.js";
 import { sendMessage } from "../init/sync.js";
@@ -515,6 +516,26 @@ router.post(
 );
 
 /*
+@route      /v1/cluster/domain-status
+@method     GET
+@desc       Returns information whetehr custom domains can be added to the cluster or not
+@access     public
+*/
+router.get(
+	"/domain-status",
+	authSession,
+	validateCluster,
+	validateClusterIPs,
+	async (req, res) => {
+		try {
+			res.json();
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
 @route      /v1/cluster/domains
 @method     POST
 @desc       Adds a custom domain to the cluster
@@ -525,6 +546,7 @@ router.post(
 	checkContentType,
 	authSession,
 	validateCluster,
+	validateClusterIPs,
 	applyRules("add-domain"),
 	validate,
 	async (req, res) => {
@@ -574,6 +596,7 @@ router.post(
 					domain,
 					ingresses,
 					enforceSSLAccess: cluster.enforceSSLAccess ?? false,
+					container: false,
 				},
 				{
 					headers: {
@@ -643,6 +666,7 @@ router.delete(
 				{
 					domain,
 					ingresses,
+					container: false,
 				},
 				{
 					headers: {

@@ -1,3 +1,4 @@
+import axios from "axios";
 import express from "express";
 import auditCtrl from "../controllers/audit.js";
 import dmnCtrl from "../controllers/domain.js";
@@ -6,6 +7,7 @@ import { authSession } from "../middlewares/authSession.js";
 import { authMasterToken } from "../middlewares/authMasterToken.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateCluster } from "../middlewares/validateCluster.js";
+import { validateClusterIPs } from "../middlewares/validateClusterIPs.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
 import { validateApp } from "../middlewares/validateApp.js";
 import { validateVersion } from "../middlewares/validateVersion.js";
@@ -74,6 +76,7 @@ router.post(
 	checkContentType,
 	authSession,
 	validateCluster,
+	validateClusterIPs,
 	validateOrg,
 	validateApp,
 	validateVersion,
@@ -98,6 +101,7 @@ router.post(
 					domain,
 					ingresses: [`${env.iid}-ingress`],
 					enforceSSLAccess: cluster.enforceSSLAccess ?? false,
+					container: true,
 				},
 				{
 					headers: {
@@ -154,6 +158,7 @@ router.post(
 	checkContentType,
 	authMasterToken,
 	validateCluster,
+	validateClusterIPs,
 	validateOrg,
 	validateApp,
 	validateVersion,
@@ -177,6 +182,7 @@ router.post(
 					domain,
 					ingresses: [`${env.iid}-ingress`],
 					enforceSSLAccess: cluster.enforceSSLAccess ?? false,
+					container: true,
 				},
 				{
 					headers: {
@@ -259,6 +265,7 @@ router.delete(
 				{
 					domain: domains.map((entry) => entry.domain),
 					ingresses: [`${env.iid}-ingress`],
+					container: true,
 				},
 				{
 					headers: {
@@ -320,7 +327,11 @@ router.delete(
 			// Update ingresses
 			await axios.post(
 				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
-				{ domain: domain.domain, ingresses: [`${env.iid}-ingress`] },
+				{
+					domain: domain.domain,
+					ingresses: [`${env.iid}-ingress`],
+					container: true,
+				},
 				{
 					headers: {
 						Authorization: process.env.ACCESS_TOKEN,
@@ -379,7 +390,11 @@ router.delete(
 			// Update ingresses
 			await axios.post(
 				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
-				{ domain: domain.domain, ingresses: [`${env.iid}-ingress`] },
+				{
+					domain: domain.domain,
+					ingresses: [`${env.iid}-ingress`],
+					container: true,
+				},
 				{
 					headers: {
 						Authorization: process.env.ACCESS_TOKEN,
@@ -439,7 +454,11 @@ router.post(
 			// Update ingresses
 			await axios.post(
 				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
-				{ domain: domain.domain, ingresses: [`${env.iid}-ingress`] },
+				{
+					domain: domain.domain,
+					ingresses: [`${env.iid}-ingress`],
+					container: true,
+				},
 				{
 					headers: {
 						Authorization: process.env.ACCESS_TOKEN,

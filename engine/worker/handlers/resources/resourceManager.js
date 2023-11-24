@@ -681,12 +681,16 @@ export class ResourceManager {
 
                 if (cluster.domains.length > 0) {
                     await this.initializeCertificateIssuer();
+                    const secrets = await this.getClusterDomainSecrets();
                     ingress.metadata.annotations["cert-manager.io/issuer"] = "letsencrypt-issuer-cluster";
 
                     ingress.spec.tls = cluster.domains.map((domainName) => {
+                        const tlsEntry = secrets.find((entry) => entry.domainName === domainName);
+                        const secretName = tlsEntry ? tlsEntry.secretName : helper.getCertSecretName();
+
                         return {
                             hosts: [domainName],
-                            secretName: helper.getCertSecretName(),
+                            secretName: secretName,
                         };
                     });
 
@@ -1229,6 +1233,31 @@ export class ResourceManager {
     }
 
     /**
+     * Returns the secret names associated with the cluster custom domains.
+     */
+    async getClusterDomainSecrets() {
+        try {
+            // Create a Kubernetes core API client
+            const kubeconfig = new k8s.KubeConfig();
+            kubeconfig.loadFromDefault();
+            const k8sApi = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+
+            const result = await k8sApi.readNamespacedIngress("platform-core-ingress", process.env.NAMESPACE);
+            const ingress = result.body;
+
+            const secrets = ingress.spec.tls
+                ? ingress.spec.tls.map((entry) => {
+                      return { domainName: entry.hosts[0], secretName: entry.secretName };
+                  })
+                : [];
+
+            return secrets;
+        } catch (err) {
+            throw new AgnostError(err.body?.message);
+        }
+    }
+
+    /**
      * Initializes the certificate issuer.
      * This function checks if the certificate issuer already exists, and if not, creates it.
      * @returns {Promise<void>} A promise that resolves when the initialization is complete.
@@ -1294,10 +1323,12 @@ export class ResourceManager {
      * Adds a custom domain to a cluster ingress.
      * @param {string} ingressName - The name of the ingress.
      * @param {string} domainName - The domain name to be added.
+     * @param {string} secretName - The ssl certificate secret name.
      * @param {boolean} [enforceSSLAccess=false] - Whether to enforce SSL access to the domain.
+     * @param {boolean} [container=false] - Whether this domain is added to the container or to the cluster overall.
      * @returns {Promise<void>} - A promise that resolves when the custom domain is added successfully.
      */
-    async addClusterCustomDomain(ingressName, domainName, enforceSSLAccess = false) {
+    async addClusterCustomDomain(ingressName, domainName, secretName, enforceSSLAccess = false, container = false) {
         try {
             const kc = new k8s.KubeConfig();
             kc.loadFromDefault();
@@ -1317,19 +1348,21 @@ export class ResourceManager {
             if (ingress.body.spec.tls) {
                 ingress.body.spec.tls.push({
                     hosts: [domainName],
-                    secretName: helper.getCertSecretName(),
+                    secretName: secretName,
                 });
             } else {
                 ingress.body.spec.tls = [
                     {
                         hosts: [domainName],
-                        secretName: helper.getCertSecretName(),
+                        secretName: secretName,
                     },
                 ];
             }
 
             const ruleCopy = JSON.parse(JSON.stringify(ingress.body.spec.rules[0]));
             ruleCopy.host = domainName;
+            // If this is an ingress for the container then we do not need /<env_id>(/|$)(.*)
+            if (container) ruleCopy.host.paths[0].path = "/";
             ingress.body.spec.rules.push(ruleCopy);
 
             const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };

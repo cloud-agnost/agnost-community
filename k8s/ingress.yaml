@@ -22,3 +22,14 @@ spec:
                       name: env-l05et1xpq7lw-service
                       port:
                          number: 4000
+      - http:
+           host: agnost.dev
+           paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                   service:
+                      name: env-l05et1xpq7lw-service
+                      port:
+                         number: 4000
+                        

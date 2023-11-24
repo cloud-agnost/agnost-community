@@ -126,11 +126,12 @@ router.get("/cluster-ip", authAccessToken, async (req, res) => {
 */
 router.post("/cluster-domains-add", checkContentType, authAccessToken, async (req, res) => {
     try {
-        const { domain, ingresses, enforceSSLAccess } = req.body;
+        const { domain, ingresses, enforceSSLAccess, container } = req.body;
         let manager = new ResourceManager(null);
         await manager.initializeCertificateIssuer();
+        const secretName = helper.getCertSecretName();
         for (const ingress of ingresses) {
-            await manager.addClusterCustomDomain(ingress, domain, enforceSSLAccess);
+            await manager.addClusterCustomDomain(ingress, domain, secretName, enforceSSLAccess, container);
         }
 
         res.json();

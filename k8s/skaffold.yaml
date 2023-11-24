@@ -88,7 +88,7 @@ build:
               - '**/*.ico'
               - '**/*.md'
         docker:
-           dockerfile: Dockerfile
+           dockerfile: Dockerfile.dev
 deploy:
    statusCheckDeadlineSeconds: 300
    kubectl:
