@@ -336,6 +336,8 @@ const useVersionStore = create<VersionStore & Actions>()(
 			{
 				name: 'version-storage',
 				storage: CustomStateStorage,
+				partialize: (state) =>
+					Object.fromEntries(Object.entries(state).filter(([key]) => ['typings'].includes(key))),
 			},
 		),
 		{
