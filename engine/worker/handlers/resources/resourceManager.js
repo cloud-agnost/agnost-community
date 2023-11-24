@@ -284,7 +284,12 @@ export class ResourceManager {
         );
 
         // Create container ingress for custom domains
-        await this.createContainerIngress(resource.iid, resource.iid);
+        await this.createContainerIngress(
+            resource.iid,
+            resource.iid,
+            resource.iid,
+            config.get("general.defaultKnativeIngressPort")
+        );
     }
 
     /**
@@ -635,6 +640,8 @@ export class ResourceManager {
         // Get cluster info from the database
         const cluster = await this.getClusterRecord();
 
+        console.log("***here1", cluster);
+
         try {
             const ingress = {
                 apiVersion: "networking.k8s.io/v1",
@@ -721,21 +728,24 @@ export class ResourceManager {
                 }
             }
 
+            console.log("***here1.1", JSON.stringify(ingress, null, 2));
+
             // Create the ingress with the provided spec
             await networkingApi.createNamespacedIngress(process.env.NAMESPACE, ingress);
         } catch (err) {
+            console.log("***here2", err.body?.message);
             throw new AgnostError(err.body?.message);
         }
     }
 
     /**
      * Creates a container ingress in Kubernetes. This ingress is mainly used to handle custom domain based ingresses.
-     * @param {string} ingressName - The name of the ingress.
-     * @param {string} serviceName - The name of the service.
-     * @returns {Promise<void>} - A promise that resolves when the ingress is created successfully.
-     * @throws {AgnostError} - If there is an error creating the ingress.
+     * @param  {string} ingressName The ingress name
+     * @param  {string} pathName The ingress path to route external traffic to the resource (resource iid)
+     * @param  {string} serviceName The service name prefix (resource iid)
+     * @param  {number} port The service port
      */
-    async createContainerIngress(ingressName, serviceName) {
+    async createContainerIngress(ingressName, pathName, serviceName, port) {
         // Create a Kubernetes core API client
         const kubeconfig = new k8s.KubeConfig();
         kubeconfig.loadFromDefault();
@@ -761,13 +771,24 @@ export class ResourceManager {
                 },
                 spec: {
                     ingressClassName: "nginx",
-                    // Since we do not have any rules definition, at leaset we should have a defaultBackend definition to create the ingress
-                    defaultBackend: {
-                        service: {
-                            name: `${serviceName}`,
-                            port: { number: config.get("general.defaultKnativeIngressPort") },
+                    rules: [
+                        {
+                            http: {
+                                paths: [
+                                    {
+                                        path: `/${pathName}-temp(/|$)(.*)`,
+                                        pathType: "Prefix",
+                                        backend: {
+                                            service: {
+                                                name: `${serviceName}`,
+                                                port: { number: port },
+                                            },
+                                        },
+                                    },
+                                ],
+                            },
                         },
-                    },
+                    ],
                 },
             };
 
@@ -785,6 +806,7 @@ export class ResourceManager {
             // Create the ingress with the provided spec
             await networkingApi.createNamespacedIngress(process.env.NAMESPACE, ingress);
         } catch (err) {
+            console.log("***here3", err);
             throw new AgnostError(err.body?.message);
         }
     }

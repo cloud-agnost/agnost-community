@@ -85,4 +85,4 @@ spec:
                          name: cluster-secrets
                          key: clusterAcessToken
                  - name: NAMESPACE
-                   value: default
+                   value: yoda

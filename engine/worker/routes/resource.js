@@ -126,7 +126,7 @@ router.get("/cluster-ip", authAccessToken, async (req, res) => {
 */
 router.post("/cluster-domains-add", checkContentType, authAccessToken, async (req, res) => {
     try {
-        const { domain, ingresses, enforceSSLAccess, container } = req.body;
+        const { domain, ingresses, enforceSSLAccess, container, containeriid } = req.body;
         let manager = new ResourceManager(null);
         await manager.initializeCertificateIssuer();
         const secretName = helper.getCertSecretName();
