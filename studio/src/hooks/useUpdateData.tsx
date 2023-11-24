@@ -2,7 +2,7 @@ import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { APIError, Field } from '@/types';
 import { capitalize, getNestedPropertyValue, isEmpty, updateObject } from '@/utils';
-import { useToast } from '.';
+import useToast from './useToast';
 export default function useUpdateData(field: Field) {
 	const { updateDataFromModel, selectedSubModelId, data: modelData } = useNavigatorStore();
 	const { notify } = useToast();

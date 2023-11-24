@@ -1,6 +1,6 @@
 import { MODULE_PAGE_SIZE } from '@/constants';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useUpdateEffect } from '.';
+import useUpdateEffect from './useUpdateEffect';
 import { useSearchParams, useParams } from 'react-router-dom';
 import { BaseParams, BaseGetRequest } from '@/types';
 
@@ -20,7 +20,6 @@ export default function useInfiniteScroll({
 }: UseFetchDataProps) {
 	const [searchParams] = useSearchParams();
 	const { orgId, appId, versionId } = useParams();
-
 	const result = useInfiniteQuery({
 		queryKey: [queryKey],
 		initialPageParam: 0,
