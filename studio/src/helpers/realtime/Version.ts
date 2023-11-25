@@ -16,15 +16,17 @@ class Version extends RealtimeActions<VersionType> {
 		});
 	}
 	update(param: RealtimeActionParams<VersionType>): void {
-		useVersionStore.setState?.({
-			versions: useVersionStore.getState?.().versions.map((env) => {
-				if (env._id === param.data._id) {
+		console.log('updat2e', param.data.name);
+		useVersionStore.setState?.((prev) => ({
+			versions: prev.versions.map((version) => {
+				console.log(version._id, param.data._id);
+				if (version._id === param.data._id) {
 					return param.data;
 				}
-				return env;
+				return version;
 			}),
 			version: param.data,
-		});
+		}));
 	}
 	create(param: RealtimeActionParams<VersionType>): void {
 		useVersionStore.setState?.({

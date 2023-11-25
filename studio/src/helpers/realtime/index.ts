@@ -34,7 +34,7 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		'org.app.version.environment': Environment,
 		'org.app.version.keys': Version,
 		'org.app.version.limits': Version,
-		'org.app.version.version': Version,
+		'org.app.version': Version,
 		version: Version,
 		'org.app.version.db': Database,
 		'org.app.version.db.model': Model,
