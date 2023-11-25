@@ -79,5 +79,10 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: jwtSecret
+                 - name: CLUSTER_ACCESS_TOKEN
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: clusterAcessToken
                  - name: NAMESPACE
-                   value: default
+                   value: yoda

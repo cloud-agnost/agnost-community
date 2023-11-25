@@ -1,4 +1,6 @@
+import axios from "axios";
 import mongoose from "mongoose";
+import net from "net";
 import randomColor from "randomcolor";
 import { customAlphabet } from "nanoid";
 import cyripto from "crypto-js";
@@ -348,11 +350,50 @@ async function getClusterIPs() {
 				},
 			}
 		);
-		return res.json(result.data);
+		return result.data;
 	} catch (err) {
 		logger.error(`Cannot fetch cluster ips`, { details: err });
 		return [];
 	}
+}
+
+/**
+ * Checks if the given IP address is a private IP address which are not routable on the internet.
+ * Private IP addresses include:
+ * - 10.x.x.x
+ * - 172.16.x.x - 172.31.x.x
+ * - 192.168.x.x
+ * - Unique local addresses in IPv6 (fc00::/7)
+ *
+ * @param {string} ip - The IP address to check.
+ * @returns {boolean} Returns true if the IP address is private, otherwise returns false.
+ */
+function isPrivateIP(ip) {
+	const parts = ip.split(".").map((part) => parseInt(part, 10));
+
+	// Check for IPv4 private addresses
+	// 10.x.x.x
+	if (parts[0] === 10) {
+		return true;
+	}
+	// 172.16.x.x - 172.31.x.x
+	if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) {
+		return true;
+	}
+	// 192.168.x.x
+	if (parts[0] === 192 && parts[1] === 168) {
+		return true;
+	}
+
+	// If IPv6, check for unique local addresses (fc00::/7)
+	if (net.isIPv6(ip)) {
+		const firstHex = parseInt(ip.substring(0, 4), 16);
+		if (firstHex >= 0xfc00 && firstHex < 0xfe00) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 export default {
@@ -379,4 +420,5 @@ export default {
 	getAsObject,
 	memoryToBytes,
 	getClusterIPs,
+	isPrivateIP,
 };

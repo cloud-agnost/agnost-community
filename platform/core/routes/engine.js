@@ -14,8 +14,6 @@ const router = express.Router({ mergeParams: true });
 */
 router.post("/error", checkContentType, authMasterToken, async (req, res) => {
 	try {
-		console.log("***/v1/engine/error", req.body);
-
 		handleEngineError(req.body);
 		res
 			.status(200)

@@ -119,18 +119,26 @@ router.get("/cluster-ip", authAccessToken, async (req, res) => {
 });
 
 /*
-@route      /resource/cluster-domains
+@route      /resource/cluster-domains-add
 @method     POST
 @desc       Adds a new cluster custom domain
 @access     public
 */
 router.post("/cluster-domains-add", checkContentType, authAccessToken, async (req, res) => {
     try {
-        const { domain, ingresses } = req.body;
+        const { domain, ingresses, enforceSSLAccess, container, containeriid } = req.body;
         let manager = new ResourceManager(null);
         await manager.initializeCertificateIssuer();
+        const secretName = helper.getCertSecretName();
         for (const ingress of ingresses) {
-            await manager.addClusterCustomDomain(ingress, domain);
+            await manager.addClusterCustomDomain(
+                ingress,
+                domain,
+                secretName,
+                enforceSSLAccess,
+                container,
+                containeriid
+            );
         }
 
         res.json();
@@ -140,7 +148,7 @@ router.post("/cluster-domains-add", checkContentType, authAccessToken, async (re
 });
 
 /*
-@route      /resource/cluster-domains
+@route      /resource/cluster-domains-delete
 @method     POST
 @desc       Deletes a cluster custom domain
 @access     public
@@ -153,6 +161,27 @@ router.post("/cluster-domains-delete", checkContentType, authAccessToken, async 
         let manager = new ResourceManager(null);
         for (const ingress of ingresses) {
             await manager.deleteClusterCustomDomains(ingress, domains);
+        }
+
+        res.json();
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
+/*
+@route      /resource/cluster-enforce-ssl
+@method     POST
+@desc       Turns on or off enforce-ssl access to the cluster
+@access     public
+*/
+router.post("/cluster-enforce-ssl", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        const { enforceSSLAccess, ingresses } = req.body;
+        let manager = new ResourceManager(null);
+        await manager.initializeCertificateIssuer();
+        for (const ingress of ingresses) {
+            await manager.updateEnforceSSLAccessSettings(ingress, enforceSSLAccess);
         }
 
         res.json();

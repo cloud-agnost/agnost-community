@@ -282,6 +282,14 @@ export class ResourceManager {
             resource.iid,
             config.get("general.defaultKnativeIngressPort")
         );
+
+        // Create container ingress for custom domains
+        await this.createContainerIngress(
+            resource.iid,
+            resource.iid,
+            resource.iid,
+            config.get("general.defaultKnativeIngressPort")
+        );
     }
 
     /**
@@ -306,6 +314,8 @@ export class ResourceManager {
 
         // Delete the Ingress of the engine service
         await this.deleteIngress(resource.iid);
+        // Delete the Ingress of the engine service
+        await this.deleteContainerIngress(resource.iid);
     }
 
     /**
@@ -627,6 +637,9 @@ export class ResourceManager {
         kubeconfig.loadFromDefault();
         const networkingApi = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
 
+        // Get cluster info from the database
+        const cluster = await this.getClusterRecord();
+
         try {
             const ingress = {
                 apiVersion: "networking.k8s.io/v1",
@@ -666,6 +679,125 @@ export class ResourceManager {
                 },
             };
 
+            // If cluster has SSL settings and custom domains then also add these to the API server ingress
+            if (cluster) {
+                if (cluster.enforceSSLAccess) {
+                    ingress.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
+                    ingress.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "true";
+                } else {
+                    ingress.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "false";
+                    ingress.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "false";
+                }
+
+                if (cluster.domains.length > 0) {
+                    await this.initializeCertificateIssuer();
+                    const secrets = await this.getClusterDomainSecrets();
+                    ingress.metadata.annotations["cert-manager.io/issuer"] = "letsencrypt-issuer-cluster";
+
+                    ingress.spec.tls = cluster.domains.map((domainName) => {
+                        const tlsEntry = secrets.find((entry) => entry.domainName === domainName);
+                        const secretName = tlsEntry ? tlsEntry.secretName : helper.getCertSecretName();
+
+                        return {
+                            hosts: [domainName],
+                            secretName: secretName,
+                        };
+                    });
+
+                    for (const domainName of cluster.domains) {
+                        ingress.spec.rules.push({
+                            host: domainName,
+                            http: {
+                                paths: [
+                                    {
+                                        path: `/${pathName}(/|$)(.*)`,
+                                        pathType: "Prefix",
+                                        backend: {
+                                            service: {
+                                                name: `${serviceName}`,
+                                                port: { number: port },
+                                            },
+                                        },
+                                    },
+                                ],
+                            },
+                        });
+                    }
+                }
+            }
+
+            // Create the ingress with the provided spec
+            await networkingApi.createNamespacedIngress(process.env.NAMESPACE, ingress);
+        } catch (err) {
+            throw new AgnostError(err.body?.message);
+        }
+    }
+
+    /**
+     * Creates a container ingress in Kubernetes. This ingress is mainly used to handle custom domain based ingresses.
+     * @param  {string} ingressName The ingress name
+     * @param  {string} pathName The ingress path to route external traffic to the resource (resource iid)
+     * @param  {string} serviceName The service name prefix (resource iid)
+     * @param  {number} port The service port
+     */
+    async createContainerIngress(ingressName, pathName, serviceName, port) {
+        // Create a Kubernetes core API client
+        const kubeconfig = new k8s.KubeConfig();
+        kubeconfig.loadFromDefault();
+        const networkingApi = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+
+        // Get cluster info from the database
+        const cluster = await this.getClusterRecord();
+
+        try {
+            const ingress = {
+                apiVersion: "networking.k8s.io/v1",
+                kind: "Ingress",
+                metadata: {
+                    name: `${ingressName}-container-ingress`,
+                    annotations: {
+                        "nginx.ingress.kubernetes.io/proxy-body-size": "500m",
+                        "nginx.ingress.kubernetes.io/proxy-connect-timeout": "6000",
+                        "nginx.ingress.kubernetes.io/proxy-send-timeout": "6000",
+                        "nginx.ingress.kubernetes.io/proxy-read-timeout": "6000",
+                        "nginx.ingress.kubernetes.io/proxy-next-upstream-timeout": "6000",
+                        "nginx.ingress.kubernetes.io/upstream-vhost": `${ingressName}.${process.env.NAMESPACE}.svc.cluster.local`,
+                    },
+                },
+                spec: {
+                    ingressClassName: "nginx",
+                    rules: [
+                        {
+                            http: {
+                                paths: [
+                                    {
+                                        path: `/${pathName}-temp(/|$)(.*)`,
+                                        pathType: "Prefix",
+                                        backend: {
+                                            service: {
+                                                name: `${serviceName}`,
+                                                port: { number: port },
+                                            },
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    ],
+                },
+            };
+
+            // If cluster has SSL settings and custom domains then also add these to the API server ingress
+            if (cluster) {
+                if (cluster.enforceSSLAccess) {
+                    ingress.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
+                    ingress.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "true";
+                } else {
+                    ingress.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "false";
+                    ingress.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "false";
+                }
+            }
+
             // Create the ingress with the provided spec
             await networkingApi.createNamespacedIngress(process.env.NAMESPACE, ingress);
         } catch (err) {
@@ -686,6 +818,24 @@ export class ResourceManager {
         try {
             // Delete the ingress resource
             await networkingApi.deleteNamespacedIngress(`${ingressName}-ingress`, process.env.NAMESPACE);
+        } catch (err) {
+            throw new AgnostError(err.body?.message);
+        }
+    }
+
+    /**
+     * Deletes the ingress of the API server, this ingress is mainly used to handle custom domain based ingresses
+     * @param  {string} ingressName The ingress name
+     */
+    async deleteContainerIngress(ingressName) {
+        // Create a Kubernetes core API client
+        const kubeconfig = new k8s.KubeConfig();
+        kubeconfig.loadFromDefault();
+        const networkingApi = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+
+        try {
+            // Delete the ingress resource
+            await networkingApi.deleteNamespacedIngress(`${ingressName}-container-ingress`, process.env.NAMESPACE);
         } catch (err) {
             throw new AgnostError(err.body?.message);
         }
@@ -930,6 +1080,21 @@ export class ResourceManager {
     }
 
     /**
+     * Retrieves the cluster record from the database.
+     * @returns {Promise<Object>} The cluster record.
+     */
+    async getClusterRecord() {
+        if (!this.conn) {
+            this.conn = getDBClient();
+        }
+
+        // Get cluster configuration
+        return await this.conn.db("agnost").collection("clusters").findOne({
+            clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+        });
+    }
+
+    /**
      * Updates the access settings of the resource
      */
     async updateResourceAccessSettings(access, accessReadOnly) {
@@ -1168,6 +1333,31 @@ export class ResourceManager {
     }
 
     /**
+     * Returns the secret names associated with the cluster custom domains.
+     */
+    async getClusterDomainSecrets() {
+        try {
+            // Create a Kubernetes core API client
+            const kubeconfig = new k8s.KubeConfig();
+            kubeconfig.loadFromDefault();
+            const k8sApi = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+
+            const result = await k8sApi.readNamespacedIngress("platform-core-ingress", process.env.NAMESPACE);
+            const ingress = result.body;
+
+            const secrets = ingress.spec.tls
+                ? ingress.spec.tls.map((entry) => {
+                      return { domainName: entry.hosts[0], secretName: entry.secretName };
+                  })
+                : [];
+
+            return secrets;
+        } catch (err) {
+            throw new AgnostError(err.body?.message);
+        }
+    }
+
+    /**
      * Initializes the certificate issuer.
      * This function checks if the certificate issuer already exists, and if not, creates it.
      * @returns {Promise<void>} A promise that resolves when the initialization is complete.
@@ -1233,9 +1423,20 @@ export class ResourceManager {
      * Adds a custom domain to a cluster ingress.
      * @param {string} ingressName - The name of the ingress.
      * @param {string} domainName - The domain name to be added.
+     * @param {string} secretName - The ssl certificate secret name.
+     * @param {boolean} [enforceSSLAccess=false] - Whether to enforce SSL access to the domain.
+     * @param {boolean} [container=false] - Whether this domain is added to the container or to the cluster overall.
+     * @param {string} [containeriid=null] - If it is a container then this holds the iid of the container.
      * @returns {Promise<void>} - A promise that resolves when the custom domain is added successfully.
      */
-    async addClusterCustomDomain(ingressName, domainName) {
+    async addClusterCustomDomain(
+        ingressName,
+        domainName,
+        secretName,
+        enforceSSLAccess = false,
+        container = false,
+        containeriid = null
+    ) {
         try {
             const kc = new k8s.KubeConfig();
             kc.loadFromDefault();
@@ -1243,26 +1444,62 @@ export class ResourceManager {
 
             const ingress = await k8sExtensionsApi.readNamespacedIngress(ingressName, process.env.NAMESPACE);
 
-            ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
-            ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "true";
+            if (enforceSSLAccess) {
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "true";
+            } else {
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "false";
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "false";
+            }
+
             ingress.body.metadata.annotations["cert-manager.io/issuer"] = "letsencrypt-issuer-cluster";
             if (ingress.body.spec.tls) {
                 ingress.body.spec.tls.push({
                     hosts: [domainName],
-                    secretName: helper.getCertSecretName(),
+                    secretName: secretName,
                 });
             } else {
                 ingress.body.spec.tls = [
                     {
                         hosts: [domainName],
-                        secretName: helper.getCertSecretName(),
+                        secretName: secretName,
                     },
                 ];
             }
 
-            const ruleCopy = JSON.parse(JSON.stringify(ingress.body.spec.rules[0]));
-            ruleCopy.host = domainName;
-            ingress.body.spec.rules.push(ruleCopy);
+            // The default ingress rules is the last one, all new ones are added to the beginning of the rules array
+            let ruleCopy = null;
+            if (container && containeriid) {
+                ruleCopy = {
+                    host: domainName,
+                    http: {
+                        paths: [
+                            {
+                                path: "/",
+                                pathType: "Prefix",
+                                backend: {
+                                    service: {
+                                        name: `${containeriid}`,
+                                        port: { number: config.get("general.defaultKnativeIngressPort") },
+                                    },
+                                },
+                            },
+                        ],
+                    },
+                };
+
+                ingress.body.spec.rules = ingress.body.spec.rules ?? [];
+                // Add it to the end of the rules array
+                ingress.body.spec.rules.push(ruleCopy);
+            } else {
+                // The default ingress rules is the last one, all new ones are added to the beginning of the rules array
+                const ruleCopy = JSON.parse(
+                    JSON.stringify(ingress.body.spec.rules[ingress.body.spec.rules.length - 1])
+                );
+                ruleCopy.host = domainName;
+                // Add it to the beginning of the rules array
+                ingress.body.spec.rules.unshift(ruleCopy);
+            }
 
             const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
             await k8sExtensionsApi.patchNamespacedIngress(
@@ -1323,6 +1560,47 @@ export class ResourceManager {
             logger.error(`Cannot remove custom domain(s) '${domainNames.join(", ")}' to ingress '${ingressName}'`, {
                 details: err,
             });
+        }
+    }
+
+    /**
+     * Updates the enforceSSLAccess settings for the specified ingress.
+     * @param {string} ingressName - The name of the ingress.
+     * @param {boolean} [enforceSSLAccess=false] - Whether to enforce SSL access. Default is false.
+     * @returns {Promise<void>} - A Promise that resolves when the update is complete.
+     */
+    async updateEnforceSSLAccessSettings(ingressName, enforceSSLAccess = false) {
+        try {
+            const kc = new k8s.KubeConfig();
+            kc.loadFromDefault();
+            const k8sExtensionsApi = kc.makeApiClient(k8s.NetworkingV1Api);
+
+            const ingress = await k8sExtensionsApi.readNamespacedIngress(ingressName, process.env.NAMESPACE);
+
+            if (enforceSSLAccess) {
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "true";
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "true";
+            } else {
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/ssl-redirect"] = "false";
+                ingress.body.metadata.annotations["nginx.ingress.kubernetes.io/force-ssl-redirect"] = "false";
+            }
+
+            ingress.body.metadata.annotations["cert-manager.io/issuer"] = "letsencrypt-issuer-cluster";
+
+            const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
+            await k8sExtensionsApi.patchNamespacedIngress(
+                ingressName,
+                process.env.NAMESPACE,
+                ingress.body,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                requestOptions
+            );
+        } catch (err) {
+            logger.error(`Cannot update ssl access settings of ingress '${ingressName}'`, { details: err });
         }
     }
 }

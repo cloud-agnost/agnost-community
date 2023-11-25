@@ -82,8 +82,13 @@ spec:
                       secretKeyRef:
                          name: cluster-secrets
                          key: jwtSecret
+                 - name: CLUSTER_ACCESS_TOKEN
+                   valueFrom:
+                      secretKeyRef:
+                         name: cluster-secrets
+                         key: clusterAcessToken
                  - name: NAMESPACE
-                   value: default
+                   value: yoda
                  - name: AGNOST_ENVIRONMENT_ID
                    value: env-l05et1xpq7lw
                  - name: AGNOST_ENGINE_ID

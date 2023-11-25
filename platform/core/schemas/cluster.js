@@ -100,6 +100,11 @@ export const ClusterModel = mongoose.model(
 				type: [String],
 				index: true,
 			},
+			// Enforce SSL access or not
+			enforceSSLAccess: {
+				type: Boolean,
+				default: false,
+			},
 			// The ip addresses or hostnames of the cluster
 			ips: {
 				type: [String],
@@ -230,8 +235,11 @@ export const applyRules = (type) => {
 					.bail()
 					.toLowerCase() // convert the value to lowercase
 					.custom((value, { req }) => {
-						const dnameRegex = /^(?:\*\.)?(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
-						// Validate domain name (can be at mulitple levels and allows for wildcard subdomains)
+						// The below reges allows for wildcard subdomains
+						// const dnameRegex = /^(?:\*\.)?(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+						// Check domain name syntax, we do not currently allow wildcard subdomains
+						const dnameRegex = /^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+						// Validate domain name (can be at mulitple levels)
 						if (!dnameRegex.test(value)) {
 							throw new AgnostError(t("Not a valid domain name '%s'", value));
 						}
@@ -271,6 +279,17 @@ export const applyRules = (type) => {
 							);
 						}
 					}),
+			];
+		case "update-enforce-ssl":
+			return [
+				body("enforceSSLAccess")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(),
 			];
 		default:
 			return [];
