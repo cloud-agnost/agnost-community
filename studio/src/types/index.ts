@@ -41,6 +41,7 @@ export {
 	NameSchema,
 	TimestampsSchema,
 	UpdateDatabaseSchema,
+	ChangeNameFormSchema,
 } from './schema.ts';
 export type * from './storage.ts';
 export { BucketSchema, CreateStorageSchema, StorageSchema } from './storage.ts';
