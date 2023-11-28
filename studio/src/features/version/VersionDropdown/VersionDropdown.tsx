@@ -1,6 +1,5 @@
 import { Button } from '@/components/Button';
-import { VERSION_DROPDOWN_ITEM } from '@/constants';
-import { useToast } from '@/hooks';
+import { useToast, useVersionDropdownItems } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore.ts';
@@ -19,6 +18,7 @@ import { Fragment, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import './versionDropdown.scss';
+
 export default function VersionDropdown() {
 	const [open, setOpen] = useState(false);
 	const { notify } = useToast();
@@ -33,6 +33,7 @@ export default function VersionDropdown() {
 	const navigate = useNavigate();
 	const { application, openVersionDrawer } = useApplicationStore();
 	const { addSettingsTab } = useTabStore();
+	const versionDropdownItems = useVersionDropdownItems();
 
 	async function onConfirm() {
 		setLoading(true);
@@ -113,7 +114,7 @@ export default function VersionDropdown() {
 
 				<DropdownMenuContent align='end' className='version-dropdown-content'>
 					<DropdownMenuItemContainer>
-						{VERSION_DROPDOWN_ITEM.map((option) => (
+						{versionDropdownItems.map((option) => (
 							<DropdownMenuItem
 								onClick={option.action}
 								key={option.title}
