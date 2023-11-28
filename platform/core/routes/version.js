@@ -36,6 +36,7 @@ import { setKey } from "../init/cache.js";
 import {
 	authUserDataModel,
 	apiServerDefaultPackages,
+	dbTypeMappings,
 } from "../config/constants.js";
 import { getVersionTypings } from "../util/typings.js";
 import ERROR_CODES from "../config/errorCodes.js";
