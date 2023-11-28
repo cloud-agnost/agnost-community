@@ -70,7 +70,6 @@ export default function useNavigatorColumns(fields: Field[]) {
 				},
 			}),
 		);
-		console.log(newNavigatorColumns);
 		setColumns([NavigatorColumns[0], ...newNavigatorColumns, NavigatorColumns[1]]);
 	}, [fields]);
 	return columns;

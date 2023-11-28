@@ -25,7 +25,6 @@ export default function ChangeNameForm({ error, loading, label, disabled }: Chan
 	const { t } = useTranslation();
 
 	const form = useFormContext<z.infer<typeof ChangeNameFormSchema>>();
-	console.log(form.getValues());
 	return (
 		<div className='space-y-4'>
 			{error && (

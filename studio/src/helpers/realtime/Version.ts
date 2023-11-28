@@ -16,10 +16,8 @@ class Version extends RealtimeActions<VersionType> {
 		});
 	}
 	update(param: RealtimeActionParams<VersionType>): void {
-		console.log('updat2e', param.data.name);
 		useVersionStore.setState?.((prev) => ({
 			versions: prev.versions.map((version) => {
-				console.log(version._id, param.data._id);
 				if (version._id === param.data._id) {
 					return param.data;
 				}
