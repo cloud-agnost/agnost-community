@@ -60,4 +60,4 @@ spec:
                          name: cluster-secrets
                          key: accessToken
                  - name: NAMESPACE
-                   value: yoda
+                   value: default
