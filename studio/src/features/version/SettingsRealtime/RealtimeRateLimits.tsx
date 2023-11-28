@@ -1,18 +1,15 @@
-import { useTranslation } from 'react-i18next';
 import { SortableRateLimits } from '@/features/version/SettingsGeneral';
-import useVersionStore from '@/store/version/versionStore';
-import { useParams } from 'react-router-dom';
-import { APIError, RateLimit, Version, VersionRealtimeProperties } from '@/types';
-import { DropResult } from 'react-beautiful-dnd';
-import { reorder } from '@/utils';
-import { useState } from 'react';
 import { useToast } from '@/hooks';
 import useSettingsStore from '@/store/version/settingsStore';
+import useVersionStore from '@/store/version/versionStore';
+import { APIError, RateLimit, Version } from '@/types';
+import { reorder } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
+import { DropResult } from 'react-beautiful-dnd';
+import { useParams } from 'react-router-dom';
 
 export default function RealtimeRateLimits() {
 	const { notify } = useToast();
-	const { t } = useTranslation();
 	const { updateVersionRealtimeProperties } = useSettingsStore();
 	const rateLimits = useVersionStore((state) => state.version?.limits);
 	const realtime = useVersionStore((state) => state.version?.realtime);

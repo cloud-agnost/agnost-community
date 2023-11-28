@@ -3,28 +3,27 @@ import { Checkbox } from '@/components/Checkbox';
 import {
 	Form,
 	FormControl,
+	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
-	FormDescription,
 	FormMessage,
 } from '@/components/Form';
+import { Input } from '@/components/Input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { Separator } from '@/components/Separator';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { Switch } from '@/components/Switch';
+import { useToast, useUpdateEffect } from '@/hooks';
+import useTypeStore from '@/store/types/typeStore';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
+import { APIError, PhoneAuthSMSProviders } from '@/types';
+import { translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { useToast, useUpdateEffect } from '@/hooks';
-import { useState } from 'react';
-import useTypeStore from '@/store/types/typeStore';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
-import { Input } from '@/components/Input';
-import { translate as t } from '@/utils';
-import { APIError, PhoneAuthSMSProviders } from '@/types';
-import useSettingsStore from '@/store/version/settingsStore';
-import { useMutation } from '@tanstack/react-query';
 
 const PhoneAuthSchema = z
 	.object({

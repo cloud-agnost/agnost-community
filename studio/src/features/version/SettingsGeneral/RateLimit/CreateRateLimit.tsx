@@ -1,17 +1,16 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
+import { Form } from '@/components/Form';
+import { useToast } from '@/hooks';
+import useSettingsStore from '@/store/version/settingsStore';
+import useVersionStore from '@/store/version/versionStore';
 import { APIError, CreateRateLimitSchema, RateLimit } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import * as z from 'zod';
-import { Form } from '@/components/Form';
-import RateLimitForm from './RateLimitForm';
-import useSettingsStore from '@/store/version/settingsStore';
-import { useMutation } from '@tanstack/react-query';
-import useVersionStore from '@/store/version/versionStore';
 import { useParams } from 'react-router-dom';
-import { useAuthorizeVersion, useToast } from '@/hooks';
-import { add } from 'lodash';
-import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import RateLimitForm from './RateLimitForm';
 
 interface CreateRateLimitProps {
 	open: boolean;

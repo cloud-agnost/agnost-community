@@ -8,7 +8,6 @@ import { APIError, VersionRealtimeProperties } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { SettingsFormItem } from 'components/SettingsFormItem';
 import { Switch } from 'components/Switch';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function VersionSettingsRealTime() {

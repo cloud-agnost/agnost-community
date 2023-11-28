@@ -1,16 +1,15 @@
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
-import { APIError, CreateRateLimitSchema } from '@/types';
+import useSettingsStore from '@/store/version/settingsStore';
+import { CreateRateLimitSchema } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import RateLimitForm from './RateLimitForm';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
-import useSettingsStore from '@/store/version/settingsStore';
-import { useMutation } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
-import { useToast } from '@/hooks';
 
 interface EditRateLimitProps {
 	open: boolean;
@@ -20,7 +19,6 @@ interface EditRateLimitProps {
 export default function EditRateLimit({ open, onOpenChange }: EditRateLimitProps) {
 	const { t } = useTranslation();
 	const { editRateLimit, rateLimit } = useSettingsStore();
-	const { notify } = useToast();
 	const form = useForm<z.infer<typeof CreateRateLimitSchema>>({
 		resolver: zodResolver(CreateRateLimitSchema),
 		defaultValues: {
