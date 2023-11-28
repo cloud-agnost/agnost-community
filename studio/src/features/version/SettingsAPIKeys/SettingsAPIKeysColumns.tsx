@@ -1,5 +1,6 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useOrganizationStore from '@/store/organization/organizationStore';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIKey, APIKeyTypes, ColumnDefWithClassName } from '@/types';
@@ -182,49 +183,32 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	},
 	{
 		id: 'created_at',
-		header: ({ column }) => (
-			<SortButton
-				className='whitespace-nowrap'
-				text={translate('general.created_at')}
-				column={column}
-			/>
-		),
-		accessorKey: 'created_at',
+		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
 		enableSorting: true,
 		sortingFn: 'datetime',
+		accessorKey: 'createdAt',
 		size: 200,
-		cell: ({
-			row: {
-				original: { createdAt, createdBy },
-			},
-		}) => {
-			const isMe = useAuthStore.getState().user?._id === createdBy;
-			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
-			return <DateText date={createdAt}>{avatar}</DateText>;
+		cell: ({ row }) => {
+			const { createdAt, createdBy } = row.original;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === createdBy);
+
+			return <DateText date={createdAt} user={user} />;
 		},
 	},
+
 	{
-		id: 'updatedAt',
-		header: ({ column }) => (
-			<SortButton
-				className='whitespace-nowrap'
-				text={translate('general.updated_at')}
-				column={column}
-			/>
-		),
+		id: 'updated_at',
+		header: ({ column }) => <SortButton text={translate('general.updated_at')} column={column} />,
 		accessorKey: 'updatedAt',
-		enableSorting: true,
-		sortingFn: 'datetime',
 		size: 200,
-		cell: ({
-			row: {
-				original: { updatedAt, updatedBy },
-			},
-		}) => {
-			if (!updatedBy) return null;
-			const isMe = useAuthStore.getState().user?._id === updatedBy;
-			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
-			return <DateText date={updatedAt}>{avatar}</DateText>;
+		cell: ({ row }) => {
+			const { updatedAt, updatedBy } = row.original;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === updatedBy);
+			return updatedBy && <DateText date={updatedAt} user={user} />;
 		},
 	},
 	{
