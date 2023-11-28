@@ -207,6 +207,8 @@ router.post(
 			const { org, user } = req;
 			let { appId, name, type, instance, allowedRoles, config } = req.body;
 
+			console.log("***here", appId, name, type, instance, allowedRoles, config);
+
 			// We create RabbitMQ clusters with delayed-message-exchange add-on
 			if (instance !== "RabbitMQ") config.delayedMessages = true;
 
@@ -269,6 +271,8 @@ router.post(
 				{ orgId: org._id, appId, resourceId }
 			);
 		} catch (error) {
+			console.log("***err", error);
+
 			await resourceCtrl.rollback(session);
 			handleError(req, res, error);
 		}
