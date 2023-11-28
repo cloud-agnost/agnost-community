@@ -1,6 +1,6 @@
-import * as z from 'zod';
-import { isEmpty, translate } from '@/utils';
 import { AUTHORIZATION_OPTIONS, ENDPOINT_ACCESS_PROPERTIES } from '@/constants';
+import { isEmpty, translate } from '@/utils';
+import * as z from 'zod';
 
 const URL_REGEX =
 	/^(https?:\/\/)?((?:([a-z0-9-]+|\*)\.)?([a-z0-9-]{1,61})\.([a-z0-9]{2,61})|(localhost)):?(\d{1,5})?$/gi;
@@ -95,7 +95,7 @@ const Schema = z.object({
 		}),
 	ip: z
 		.object({
-			type: z.enum(AUTHORIZATION_OPTIONS),
+			type: z.enum(AUTHORIZATION_OPTIONS).default('all'),
 			list: z.array(
 				z.object({
 					ip: z
