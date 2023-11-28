@@ -42,13 +42,13 @@ export default (actionType) => {
 			.if(() => actionType === "update-config")
 			.custom((value, { req }) => {
 				const size = helper.memoryToBytes(value);
-				const currentSize = helper.memoryToBytes(req.resource.config.size);
+				const currentSize = helper.memoryToBytes(req.resource?.config.size);
 				if (size < currentSize)
 					throw new AgnostError(
 						t(
 							"You can only inrease the persistent storage size of a message broker. The new persistent storage size '%s' cannot be smaller than the existing size '%s'.",
 							value,
-							req.resource.config.size
+							req.resource?.config.size
 						)
 					);
 				return true;
@@ -67,20 +67,18 @@ export default (actionType) => {
 			})
 			.withMessage(t("Replica count needs to be a positive integer"))
 			.bail()
+			.toInt()
+			.if(() => actionType === "update-config")
 			.custom((value, { req }) => {
-				if (
-					value < req.resource.config.replicas &&
-					actionType === "update-config"
-				)
+				if (value < req.resource?.config.replicas)
 					throw new AgnostError(
 						t(
 							"RabbitMQ cluster scale down not supported. You cannot decrease the replica count from '%s' to '%s'.",
-							req.resource.config.size,
+							req.resource?.config.size,
 							value
 						)
 					);
 				return true;
-			})
-			.toInt(),
+			}),
 	];
 };
