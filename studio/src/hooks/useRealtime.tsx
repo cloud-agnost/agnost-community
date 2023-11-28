@@ -20,7 +20,7 @@ export default function useRealtime() {
 					identifiers,
 					timestamp: DateTime.fromISO(timestamp).toFormat('yyyy-MM-dd hh:mm:ss'),
 					message: log,
-					id,
+					...(id && { id }),
 					type,
 				});
 				if (NOTIFICATION_ACTIONS.includes(action)) {

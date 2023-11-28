@@ -35,7 +35,7 @@ export const checkAuthUserModel = async function (req, res, next) {
 					ERROR_CODES.clientError,
 					ERROR_CODES.missingAuthUserDataModel,
 					t(
-						"The application version '%s' does not have the configured user data model to to store user authentication data.",
+						"The application version '%s' does not have the configured user data model to store user authentication data.",
 						version.name
 					)
 				)

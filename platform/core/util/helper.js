@@ -396,6 +396,36 @@ function isPrivateIP(ip) {
 	return false;
 }
 
+function decryptVersionData(data) {
+	if (!data) return data;
+	if (Array.isArray(data)) {
+		return data.map((item) => {
+			return decryptVersionData(item);
+		});
+	}
+
+	if (typeof data === "object") {
+		if (data.authentication?.email?.customSMTP?.password) {
+			data.authentication.email.customSMTP.password = decryptText(
+				data.authentication.email.customSMTP.password
+			);
+		}
+
+		if (data.authentication?.phone?.providerConfig)
+			data.authentication.phone.providerConfig = decryptSensitiveData(
+				data.authentication.phone.providerConfig
+			);
+
+		if (data.authentication?.providers) {
+			data.authentication.providers.forEach((entry) => {
+				entry.config = decryptSensitiveData(entry.config);
+			});
+		}
+	}
+
+	return data;
+}
+
 export default {
 	constants,
 	isObject,
@@ -421,4 +451,5 @@ export default {
 	memoryToBytes,
 	getClusterIPs,
 	isPrivateIP,
+	decryptVersionData,
 };

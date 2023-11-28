@@ -30,7 +30,6 @@ class Field extends RealtimeActions<Model> {
 		});
 	}
 	create({ data, identifiers }: RealtimeActionParams<Model>): void {
-		console.log(data);
 		useModelStore.setState?.({
 			model: data,
 			models: useModelStore

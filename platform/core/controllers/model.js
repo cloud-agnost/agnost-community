@@ -286,6 +286,7 @@ class ModelController extends BaseController {
 				iid: helper.generateSlug("fld"),
 				creator: "user",
 				type: newField.type,
+				dbType: newField.dbType,
 				order: (startingOrderNumber += 10000),
 				required: ["provider", "signUpAt"].includes(newField.name)
 					? true

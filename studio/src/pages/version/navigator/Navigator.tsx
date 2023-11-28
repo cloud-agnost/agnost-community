@@ -137,7 +137,6 @@ export default function Navigator() {
 									)}
 									variant='blank'
 									onClick={() => {
-										console.log(md);
 										setModel(md);
 										resetNestedModels();
 										searchParams.delete('ref');

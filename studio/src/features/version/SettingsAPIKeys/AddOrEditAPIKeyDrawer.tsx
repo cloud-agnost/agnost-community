@@ -139,7 +139,6 @@ export default function AddOrEditAPIKeyDrawer({
 		'allowed-domains': 'domain',
 		general: 'general',
 	};
-
 	async function onSubmit(data: z.infer<typeof Schema>) {
 		if (!version) return;
 		const func = editMode ? editAPIKey : createAPIKey;

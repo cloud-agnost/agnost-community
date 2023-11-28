@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
-import { useToast } from '@/hooks';
+import { useToast, useUpdateEffect } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
 import { cn, isEmpty } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,6 +11,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { translate as t } from '@/utils';
 import * as z from 'zod';
 import useSettingsStore from '@/store/version/settingsStore';
+import { useMutation } from '@tanstack/react-query';
 
 const RedirectURLsSchema = z.object({
 	redirectURLs: z
@@ -43,22 +44,33 @@ export default function RedirectURLs() {
 		control: form.control,
 		name: 'redirectURLs',
 	});
-
+	const { mutateAsync, isPending } = useMutation({
+		mutationFn: saveRedirectURLs,
+		mutationKey: ['saveRedirectURLs'],
+		onSuccess: () => {
+			notify({
+				type: 'success',
+				title: t('general.success'),
+				description: t('version.authentication.redirect_url_success'),
+			});
+		},
+	});
 	function onSubmit(data: z.infer<typeof RedirectURLsSchema>) {
-		saveRedirectURLs({
+		mutateAsync({
 			orgId: version?.orgId as string,
 			versionId: version?._id as string,
 			appId: version?.appId as string,
 			redirectURLs: data.redirectURLs.map((r) => r.url),
-			onSuccess: () => {
-				notify({
-					type: 'success',
-					title: t('general.success'),
-					description: t('version.authentication.redirect_url_success'),
-				});
-			},
 		});
 	}
+
+	useUpdateEffect(() => {
+		if (version && !isEmpty(version.authentication.redirectURLs)) {
+			form.reset({
+				redirectURLs: version.authentication.redirectURLs.map((r) => ({ url: r })),
+			});
+		}
+	}, [version]);
 
 	return (
 		<SettingsFormItem
@@ -130,7 +142,13 @@ export default function RedirectURLs() {
 							</Button>
 						</div>
 					))}
-					<Button size='lg' type='submit' variant='primary' className='self-end'>
+					<Button
+						size='lg'
+						type='submit'
+						variant='primary'
+						className='self-end'
+						loading={isPending}
+					>
 						{t('general.save')}
 					</Button>
 				</form>

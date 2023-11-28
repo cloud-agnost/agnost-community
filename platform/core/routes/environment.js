@@ -398,6 +398,8 @@ router.post(
 
 			if (type === "db") {
 				dataSet.dbStatus = status;
+				// If we have errors in database deployment then we need to update the server status to error
+				if (status === "Error") dataSet.serverStatus = status;
 			} else if (type === "server") {
 				dataSet.serverStatus = status;
 			} else {

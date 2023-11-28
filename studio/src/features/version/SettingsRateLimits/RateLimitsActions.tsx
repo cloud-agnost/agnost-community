@@ -23,10 +23,9 @@ export default function RateLimitsActions({ table }: RateLimitsActionsProps) {
 		});
 		table?.resetRowSelection();
 	}
-
 	return (
 		<div className='flex gap-4'>
-			{!!table?.getSortedRowModel().rows.length && (
+			{!!table?.getSelectedRowModel().rows.length && (
 				<SelectedRowButton<RateLimit>
 					table={table}
 					onDelete={deleteHandler}

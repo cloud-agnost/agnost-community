@@ -86,7 +86,6 @@ export default function Buckets() {
 		});
 	}
 	function deleteBucketHandler() {
-		console.log(toDeleteBucket);
 		deleteBucketMutation({
 			storageName: storage?.name,
 			bucketName: toDeleteBucket?.name as string,

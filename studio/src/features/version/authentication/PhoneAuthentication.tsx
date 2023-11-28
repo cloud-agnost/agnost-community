@@ -3,27 +3,27 @@ import { Checkbox } from '@/components/Checkbox';
 import {
 	Form,
 	FormControl,
+	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
-	FormDescription,
 	FormMessage,
 } from '@/components/Form';
+import { Input } from '@/components/Input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { Separator } from '@/components/Separator';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { Switch } from '@/components/Switch';
+import { useToast, useUpdateEffect } from '@/hooks';
+import useTypeStore from '@/store/types/typeStore';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
+import { APIError, PhoneAuthSMSProviders } from '@/types';
+import { translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { useToast } from '@/hooks';
-import { useState } from 'react';
-import useTypeStore from '@/store/types/typeStore';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
-import { Input } from '@/components/Input';
-import { translate as t } from '@/utils';
-import { PhoneAuthSMSProviders } from '@/types';
-import useSettingsStore from '@/store/version/settingsStore';
 
 const PhoneAuthSchema = z
 	.object({
@@ -133,7 +133,6 @@ export default function PhoneAuthentication() {
 	const { version } = useVersionStore();
 	const { savePhoneAuthSettings } = useSettingsStore();
 	const { phoneAuthSMSProviders } = useTypeStore();
-	const [loading, setLoading] = useState(false);
 	const form = useForm<z.infer<typeof PhoneAuthSchema>>({
 		resolver: zodResolver(PhoneAuthSchema),
 		defaultValues: version?.authentication.phone,
@@ -141,31 +140,37 @@ export default function PhoneAuthentication() {
 	const selectedProvider = phoneAuthSMSProviders.find(
 		(p) => p.provider === form.watch('smsProvider'),
 	);
+	const { mutateAsync, isPending } = useMutation({
+		mutationFn: savePhoneAuthSettings,
+		mutationKey: ['savePhoneAuthSettings'],
+		onSuccess: () => {
+			notify({
+				type: 'success',
+				title: t('general.success'),
+				description: t('version.authentication.phone_authentication_success'),
+			});
+		},
+		onError: (error: APIError) => {
+			notify({
+				title: t('general.error'),
+				description: error.details,
+				type: 'error',
+			});
+		},
+	});
 	function onSubmit(data: z.infer<typeof PhoneAuthSchema>) {
-		setLoading(true);
-		savePhoneAuthSettings({
+		mutateAsync({
 			versionId: version._id,
 			orgId: version.orgId,
 			appId: version.appId,
 			...data,
-			onSuccess: () => {
-				setLoading(false);
-				notify({
-					title: t('general.success'),
-					description: t('version.authentication.phone_authentication_success'),
-					type: 'success',
-				});
-			},
-			onError: (error) => {
-				setLoading(false);
-				notify({
-					title: t('general.error'),
-					description: error.details,
-					type: 'error',
-				});
-			},
 		});
 	}
+	useUpdateEffect(() => {
+		if (version) {
+			form.reset(version.authentication.phone);
+		}
+	}, [version]);
 	return (
 		<SettingsFormItem
 			className='py-0'
@@ -330,7 +335,13 @@ export default function PhoneAuthentication() {
 						)}
 					/>
 
-					<Button size='lg' className='self-end' type='submit' variant='primary' loading={loading}>
+					<Button
+						size='lg'
+						className='self-end'
+						type='submit'
+						variant='primary'
+						loading={isPending}
+					>
 						{t('general.save')}
 					</Button>
 				</form>

@@ -20,6 +20,9 @@ export default class ApplicationService {
 		return this.url.replace(':orgId', orgId as string).replace(':appId', appId as string);
 	}
 
+	static async getAppById(orgId: string, appId: string): Promise<Application> {
+		return (await axios.put(`'/v1/org/${orgId}/app/${appId}'`)).data;
+	}
 	static async changeAppName(name: string): Promise<Application> {
 		return (await axios.put(`${this.getUrl()}`, { name })).data;
 	}

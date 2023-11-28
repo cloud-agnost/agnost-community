@@ -6,7 +6,6 @@ import {
 	AddNPMPackageParams,
 	AddVersionVariableParams,
 	AuthMessageTemplateParams,
-	BaseParams,
 	CreateAPIKeyParams,
 	CreateOAuthConfigParams,
 	CreateRateLimitParams,
@@ -30,9 +29,9 @@ import {
 	SearchNPMPackagesParams,
 	UpdateAPIKeyParams,
 	UpdateOAuthConfigParams,
+	UpdateVersionRealtimePropertiesParams,
 	UpdateVersionVariableParams,
 	Version,
-	VersionRealtimeProperties,
 } from '@/types';
 import { notify, translate } from '@/utils';
 import { devtools, persist } from 'zustand/middleware';
@@ -67,7 +66,7 @@ type Actions = {
 	deleteAPIKey: (params: DeleteAPIKeyParams) => Promise<Version>;
 	deleteMultipleAPIKeys: (params: DeleteMultipleAPIKeys) => Promise<Version>;
 	updateVersionRealtimeProperties: (
-		version: BaseParams & Partial<VersionRealtimeProperties>,
+		params: UpdateVersionRealtimePropertiesParams,
 	) => Promise<Version>;
 	saveUserDataModelInfo: (params: SaveUserDataModelInfoParams) => Promise<void>;
 	addMissingUserDataModelFields: (params: SaveUserDataModelInfoParams) => Promise<void>;
@@ -437,39 +436,15 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 						throw e;
 					}
 				},
-				updateVersionRealtimeProperties: async ({ orgId, versionId, appId, ...data }) => {
+				updateVersionRealtimeProperties: async (params) => {
 					try {
 						const version = useVersionStore.getState().version;
-						const updatedVersion = await VersionService.updateVersionRealtimeProperties({
-							orgId,
-							versionId,
-							appId,
-							enabled: version?.realtime?.enabled ?? false,
-							rateLimits: version?.realtime?.rateLimits ?? [],
-							apiKeyRequired: version?.realtime?.apiKeyRequired ?? false,
-							sessionRequired: version?.realtime?.sessionRequired ?? false,
-							...data,
-						});
+						console.log(params);
+						const updatedVersion = await VersionService.updateVersionRealtimeProperties(params);
 						useVersionStore.setState({ version: updatedVersion });
-
-						notify({
-							type: 'success',
-							title: translate('general.success'),
-							description: translate('version.realtime.update_success'),
-						});
-
 						return version;
-					} catch (e) {
-						const error = e as APIError;
-						const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-						for (const field of errorArray) {
-							notify({
-								type: 'error',
-								title: error.error,
-								description: field.msg,
-							});
-						}
-						throw e;
+					} catch (error) {
+						throw error as APIError;
 					}
 				},
 				saveUserDataModelInfo: async (params) => {
@@ -612,13 +587,15 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 					});
 				},
 				orderRealtimeRateLimits: (limits: string[]) => {
-					useVersionStore.setState((prev) => {
-						if (!prev.version) return prev;
-						prev.version.realtime.rateLimits = limits;
-						return {
-							version: prev.version,
-						};
-					});
+					useVersionStore.setState((prev) => ({
+						version: {
+							...prev.version,
+							realtime: {
+								...prev.version.realtime,
+								defaultLimits: limits,
+							},
+						},
+					}));
 				},
 				reset: () => set(initialState),
 			}),

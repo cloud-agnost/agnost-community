@@ -10,7 +10,7 @@ var SMTPconnection = null;
 /**
  * Sets up the SMTP connection
  */
-export function setUpSMTPConnection(connData) {
+export async function setUpSMTPConnection(connData) {
 	// If we already have a connection then first close it
 	if (SMTPconnection) {
 		try {
@@ -21,7 +21,7 @@ export function setUpSMTPConnection(connData) {
 		}
 	}
 
-	if (!connData.host || !connData.port || !connData.user || connData.pass)
+	if (!connData.host || !connData.port || !connData.user || !connData.password)
 		return null;
 
 	// Create the new connection
@@ -38,15 +38,16 @@ export function setUpSMTPConnection(connData) {
 		maxMessages: config.get("general.SMTPserverConnectionMaxMessages"),
 	});
 
+	await SMTPconnection.verify();
 	return SMTPconnection;
 }
 
 /**
  * Returns the SMTP connection
  */
-export function getSMTPconnection(connData) {
+export async function getSMTPconnection(connData) {
 	if (SMTPconnection) return SMTPconnection;
-	else return setUpSMTPConnection(connData);
+	else return await setUpSMTPConnection(connData);
 }
 
 /**

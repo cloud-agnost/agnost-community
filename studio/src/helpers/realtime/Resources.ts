@@ -1,3 +1,4 @@
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useResourceStore from '@/store/resources/resourceStore';
 import { RealtimeActionParams, Resource as ResourceType } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
@@ -18,6 +19,11 @@ class Resource extends RealtimeActions<ResourceType> {
 				.getState?.()
 				.resources.filter((resource) => resource._id !== identifiers.resourceId),
 		});
+
+		useEnvironmentStore.setState?.((prev) => ({
+			...prev,
+			resources: prev.resources.filter((resource) => resource._id !== identifiers.resourceId),
+		}));
 	}
 	update({ data }: RealtimeActionParams<ResourceType>) {
 		useResourceStore.setState?.({
@@ -28,6 +34,15 @@ class Resource extends RealtimeActions<ResourceType> {
 				return resource;
 			}),
 		});
+		useEnvironmentStore.setState?.((prev) => ({
+			...prev,
+			resources: prev.resources.map((resource) => {
+				if (resource._id === data._id) {
+					return data;
+				}
+				return resource;
+			}),
+		}));
 	}
 	create({ data }: RealtimeActionParams<ResourceType>) {
 		useResourceStore.setState?.({

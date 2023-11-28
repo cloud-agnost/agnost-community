@@ -66,7 +66,6 @@ export default function SearchInput({
 			<MagnifyingGlass size={20} className='search-input-icon' />
 			<Input
 				ref={ref}
-				defaultValue={inputValue}
 				value={inputValue}
 				onChange={(e) => setInputValue(e.target.value)}
 				placeholder={placeholder ?? t('general.search').toString()}

@@ -4,11 +4,14 @@ import { CodeEditor } from '@/components/CodeEditor';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { Document } from '@/components/icons';
+import { useToast, useUpdateEffect } from '@/hooks';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
-import { VersionMessageTemplate, TemplateTypes } from '@/types';
-import { capitalize } from '@/utils';
+import { APIError, TemplateTypes, VersionMessageTemplate } from '@/types';
+import { capitalize, translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CaretDown, FloppyDisk } from '@phosphor-icons/react';
+import { useMutation } from '@tanstack/react-query';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -19,12 +22,8 @@ import {
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
 import * as monaco from 'monaco-editor';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { useToast } from '@/hooks';
-import { translate as t } from '@/utils';
-import useSettingsStore from '@/store/version/settingsStore';
 
 const USER_VARIABLES = ['name', 'email', 'phone', 'sigUpAt', 'lastLoginAt'];
 const EMAIL_TOKEN_VARIABLES = [
@@ -85,37 +84,41 @@ const MessageTemplatesSchema = z
 
 export default function MessageTemplateForm({ template }: { template: VersionMessageTemplate }) {
 	const { notify } = useToast();
-	const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
 	const { setAuthMessageTemplate } = useSettingsStore();
 	const { version } = useVersionStore();
 	const form = useForm<z.infer<typeof MessageTemplatesSchema>>({
 		resolver: zodResolver(MessageTemplatesSchema),
 		defaultValues: template,
 	});
+
+	const { mutateAsync, isPending } = useMutation({
+		mutationFn: setAuthMessageTemplate,
+		onSuccess: () => {
+			notify({
+				type: 'success',
+				title: t('general.success'),
+				description: t('version.authentication.messageTemplateUpdated'),
+			});
+		},
+		onError: (error: APIError) => {
+			notify({
+				type: 'error',
+				title: t('general.error'),
+				description: error.details,
+			});
+		},
+	});
 	function onSubmit(data: z.infer<typeof MessageTemplatesSchema>) {
-		setAuthMessageTemplate({
+		mutateAsync({
 			...data,
 			orgId: version?.orgId,
 			versionId: version?._id,
 			appId: version?.appId,
-			onSuccess: () => {
-				notify({
-					type: 'success',
-					title: t('general.success'),
-					description: t('version.authentication.messageTemplateUpdated'),
-				});
-			},
-			onError: (error) => {
-				notify({
-					type: 'error',
-					title: t('general.error'),
-					description: error.details,
-				});
-			},
 		});
 	}
 
 	function insertVariable(variable: string) {
+		const editor = globalThis.editor;
 		const selection = editor?.getSelection();
 		const range = new monaco.Range(
 			selection?.startLineNumber as number,
@@ -126,8 +129,24 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 		const id = { major: 1, minor: 1 };
 		const text = `{{${variable}}}`;
 		const op = { identifier: id, range, text, forceMoveMarkers: true };
-		editor?.executeEdits('my-source', [op]);
+		editor?.executeEdits(template.type, [op]);
 	}
+
+	function handleOnCloseAutoFocus() {
+		const editor = globalThis.editor;
+		const selection = editor?.getSelection();
+		editor?.setPosition({
+			lineNumber: selection?.startLineNumber as number,
+			column: selection?.startColumn as number,
+		});
+		window.requestAnimationFrame(() => {
+			editor?.focus();
+		});
+	}
+
+	useUpdateEffect(() => {
+		form.reset(template);
+	}, [version]);
 
 	return (
 		<Form {...form}>
@@ -144,8 +163,13 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 							</h6>
 						</div>
 						<div className='flex items-center gap-4'>
-							<Button type='submit' variant='primary' onClick={(e) => e.stopPropagation()}>
-								<FloppyDisk className='mr-2' />
+							<Button
+								type='submit'
+								variant='primary'
+								onClick={(e) => e.stopPropagation()}
+								loading={isPending}
+							>
+								{!isPending && <FloppyDisk className='mr-2' />}
 								{t('general.save')}
 							</Button>
 						</div>
@@ -237,24 +261,15 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 									<FormItem className='flex-1'>
 										<div className='flex items-center gap-4'>
 											<FormLabel>{t('version.authentication.body')}</FormLabel>
-											<DropdownMenu>
+											<DropdownMenu modal={false}>
 												<DropdownMenuTrigger asChild>
 													<Button variant='secondary' iconOnly>
 														<Document className='w-4 h-4' />
 													</Button>
 												</DropdownMenuTrigger>
 												<DropdownMenuContent
-													className='w-56'
-													onCloseAutoFocus={() => {
-														const selection = editor?.getSelection();
-														editor?.setPosition({
-															lineNumber: selection?.startLineNumber as number,
-															column: selection?.startColumn as number,
-														});
-														window.requestAnimationFrame(() => {
-															editor?.focus();
-														});
-													}}
+													className='w-56 max-h-96 overflow-auto'
+													onCloseAutoFocus={handleOnCloseAutoFocus}
 												>
 													<DropdownMenuLabel className='text-subtle'>User</DropdownMenuLabel>
 													<DropdownMenuGroup>
@@ -300,7 +315,6 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 												containerClassName='h-[200px] w-full'
 												value={field.value}
 												onChange={field.onChange}
-												onMount={setEditor}
 												name='messageTemplate'
 											/>
 										</FormControl>

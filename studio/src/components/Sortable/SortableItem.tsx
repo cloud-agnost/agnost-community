@@ -7,12 +7,14 @@ interface RateLimitProps<T> {
 	item: T;
 	onDelete: (id: string) => void;
 	loading?: boolean;
+	disabled?: boolean;
 }
 export default function SortableItem<T extends { name: string; iid: string }>({
 	provided,
 	item,
 	onDelete,
 	loading,
+	disabled,
 }: RateLimitProps<T>) {
 	return (
 		<li
@@ -30,6 +32,7 @@ export default function SortableItem<T extends { name: string; iid: string }>({
 				loading={loading}
 				variant='blank'
 				rounded
+				disabled={disabled}
 				className='ml-auto text-lg text-icon-base aspect-square hover:bg-base hover:text-default'
 			>
 				<Trash />
