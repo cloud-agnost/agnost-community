@@ -962,7 +962,7 @@ router.post(
 			}
 
 			// Check if email verification is enabled
-			if (!authentication.email.confirmEmail) {
+			/* 			if (!authentication.email.confirmEmail) {
 				return res
 					.status(401)
 					.json(
@@ -974,7 +974,7 @@ router.post(
 							)
 						)
 					);
-			}
+			} */
 
 			// Check redirect URL parameter
 			if (!isValidRedirectURL(version, req.body.redirectURL)) {
@@ -1110,7 +1110,7 @@ router.post(
 			}
 
 			// Check if email verification is enabled
-			if (!authentication.email.confirmEmail) {
+			/* 			if (!authentication.email.confirmEmail) {
 				return res
 					.status(401)
 					.json(
@@ -1122,7 +1122,7 @@ router.post(
 							)
 						)
 					);
-			}
+			} */
 
 			// Check redirect URL parameter
 			if (!isValidRedirectURL(version, req.body.redirectURL)) {
