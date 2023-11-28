@@ -960,33 +960,33 @@ export const defaultMessages = (userId) => {
 			type: "confirm_email",
 			subject: "Confirm your email",
 			body: `<p>Thank you for signing up. To complete your sign up, we just need to verify your email address.</p>
-		<p>Follow this link to confirm your email:</p>
-		<p><a href="{{token.confirmationURL}}">Confirm your email</a></p>`,
+			<p>Follow this link to confirm your email:</p>
+			<p><a href="{{token.confirmationURL}}">Confirm your email</a></p>`,
 			createdBy: userId,
 		},
 		{
 			type: "reset_password",
 			subject: "Reset your password",
 			body: `<p>We heard that you lost your password. Sorry about that! But don’t worry!</p>
-		<p>You can use the following link to reset your password:</p>
-		<p><a href="{{token.confirmationURL}}">Reset password</a></p>
-		<p>If you did not mean to reset your password, then you can just ignore this email; your password will not change.</p>`,
+			<p>You can use the following link to reset your password:</p>
+			<p><a href="{{token.confirmationURL}}">Reset password</a></p>
+			<p>If you did not mean to reset your password, then you can just ignore this email; your password will not change.</p>`,
 			createdBy: userId,
 		},
 		{
 			type: "magic_link",
 			subject: "Your magic link",
 			body: `<p>Your magic link is ready to use.</p>
-		<p>To access your account simply click the following link:</p>
-		<p><a href="{{token.confirmationURL}}">Log in</a></p>`,
+			<p>To access your account simply click the following link:</p>
+			<p><a href="{{token.confirmationURL}}">Log in</a></p>`,
 			createdBy: userId,
 		},
 		{
 			type: "confirm_email_change",
 			subject: "Confirm your new email",
 			body: `<p>You requested a change to the email address that you use to sign in to your account.</p>
-		<p>Follow this link to confirm the update of your email from {{user.email}} to {{token.email}}:</p>
-		<p><a href="{{token.confirmationURL}}">Confirm your email</a></p>`,
+			<p>Follow this link to confirm the update of your email from {{user.email}} to {{token.email}}:</p>
+			<p><a href="{{token.confirmationURL}}">Confirm your email</a></p>`,
 			createdBy: userId,
 		},
 	];

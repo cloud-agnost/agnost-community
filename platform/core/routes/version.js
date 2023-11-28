@@ -84,7 +84,7 @@ router.get(
 				limit: size,
 			});
 
-			res.json(versions);
+			res.json(helper.decryptVersionData(versions));
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -128,7 +128,7 @@ router.get(
 				limit: size,
 			});
 
-			res.json(versions);
+			res.json(helper.decryptVersionData(versions));
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -169,7 +169,7 @@ router.post(
 			// Commit transaction
 			await versionCtrl.commit(session);
 			res.json({
-				version,
+				version: helper.decryptVersionData(version),
 				resource,
 				resLog,
 				env,
@@ -238,7 +238,7 @@ router.post(
 			// Commit transaction
 			await versionCtrl.commit(session);
 			res.json({
-				version,
+				version: helper.decryptVersionData(version),
 				resource,
 				resLog,
 				env,
@@ -293,7 +293,7 @@ router.get(
 		try {
 			const { version } = req;
 
-			res.json(version);
+			res.json(helper.decryptVersionData(version));
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -419,7 +419,7 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -792,7 +792,7 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -853,7 +853,7 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -906,7 +906,7 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -961,7 +961,7 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1023,7 +1023,7 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1091,7 +1091,7 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1162,7 +1162,7 @@ router.delete(
 
 			// Commit updates
 			await versionCtrl.commit(session);
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1244,7 +1244,7 @@ router.delete(
 
 			// Commit updates
 			await versionCtrl.commit(session);
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1306,7 +1306,7 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1385,7 +1385,7 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(app, updatedVersion, user, "add-key");
@@ -1460,7 +1460,7 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1513,7 +1513,7 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1568,7 +1568,7 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1764,7 +1764,7 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1823,7 +1823,7 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1881,7 +1881,7 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1936,7 +1936,7 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2030,7 +2030,7 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2152,7 +2152,7 @@ router.post(
 			// Commit transaction
 			await versionCtrl.commit(session);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy database updates to environments if auto-deployment is enabled
 			await deployCtrl.updateDatabase(app, version, user, database, "update");
@@ -2230,7 +2230,7 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2318,7 +2318,7 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2380,7 +2380,7 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2439,7 +2439,7 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2505,7 +2505,7 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2558,7 +2558,7 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2642,7 +2642,7 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(updatedVersion);
+			res.json(helper.decryptVersionData(updatedVersion));
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
