@@ -1,14 +1,15 @@
 import { VersionParams } from '@/types/version.ts';
 import { BaseGetRequest, BaseParams, BaseRequest, Log } from './type';
 
-export type EnvironmentStatus =
-	| 'OK'
-	| 'Error'
-	| 'Deploying'
-	| 'Redeploying'
-	| 'Deleting'
-	| 'Suspended'
-	| 'Idle';
+export enum EnvironmentStatus {
+	OK = 'OK',
+	Error = 'Error',
+	Deploying = 'Deploying',
+	Redeploying = 'Redeploying',
+	Deleting = 'Deleting',
+	Suspended = 'Suspended',
+	Idle = 'Idle',
+}
 export interface Environment {
 	orgId: string;
 	appId: string;

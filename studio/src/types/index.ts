@@ -8,6 +8,7 @@ export type * from './database.ts';
 export type * from './endpoint.ts';
 export { CreateEndpointSchema } from './endpoint.ts';
 export type * from './environment.ts';
+export { EnvironmentStatus } from './environment.ts';
 export type * from './function.ts';
 export { CreateFunctionSchema } from './function.ts';
 export type * from './middleware.ts';
