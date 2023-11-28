@@ -7,6 +7,8 @@ import { useParams } from 'react-router-dom';
 import useEnvironmentStore from '@/store/environment/environmentStore.ts';
 import { cn } from '@/utils';
 import { DeployButton } from '@/features/version/DeployButton';
+import { SuspendButton } from '../SuspendButton';
+import { AutoRedeploy } from '../AutoRedeploy';
 
 interface DeploymentSettingsProps {
 	isOpen: boolean;
@@ -16,43 +18,6 @@ interface DeploymentSettingsProps {
 export default function DeploymentSettings({ isOpen, close }: DeploymentSettingsProps) {
 	const { t } = useTranslation();
 	const environment = useEnvironmentStore((state) => state.environment);
-	const { toggleAutoDeploy, activateEnvironment, suspendEnvironment } = useEnvironmentStore();
-	const { orgId, versionId, appId } = useParams<{
-		versionId: string;
-		appId: string;
-		orgId: string;
-	}>();
-
-	function suspendOrActive() {
-		if (!versionId || !appId || !orgId || !environment?._id) return;
-
-		if (environment?.suspended) {
-			activateEnvironment({
-				envId: environment._id,
-				orgId,
-				appId,
-				versionId,
-			});
-		} else {
-			suspendEnvironment({
-				envId: environment._id,
-				orgId,
-				appId,
-				versionId,
-			});
-		}
-	}
-
-	function onAutoDeployStatusChanged(autoDeploy: boolean) {
-		if (!versionId || !appId || !orgId || !environment?._id) return;
-		toggleAutoDeploy({
-			envId: environment._id,
-			orgId,
-			appId,
-			versionId,
-			autoDeploy,
-		});
-	}
 
 	const settings = [
 		{
@@ -62,15 +27,7 @@ export default function DeploymentSettings({ isOpen, close }: DeploymentSettings
 			description: environment?.suspended
 				? t('version.reactivate_services_desc')
 				: t('version.suspend_services_desc'),
-			element: (
-				<Button
-					className={cn(!environment?.suspended && '!text-elements-red')}
-					variant={environment?.suspended ? 'primary' : 'outline'}
-					onClick={suspendOrActive}
-				>
-					{environment?.suspended ? t('version.reactivate') : t('version.suspend')}
-				</Button>
-			),
+			element: <SuspendButton />,
 		},
 		{
 			title: t('version.redeploy'),
@@ -80,9 +37,7 @@ export default function DeploymentSettings({ isOpen, close }: DeploymentSettings
 		{
 			title: t('version.auto_redeploy'),
 			description: t('version.auto_redeploy_desc'),
-			element: (
-				<Switch checked={!!environment?.autoDeploy} onCheckedChange={onAutoDeployStatusChanged} />
-			),
+			element: <AutoRedeploy />,
 		},
 	];
 
