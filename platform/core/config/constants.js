@@ -1198,7 +1198,7 @@ export const ftsIndexLanguages = {
 	],
 };
 
-export const apiServerDefaultPckages = {
+export const apiServerDefaultPackages = {
 	"@agnost/server": "1.4.3",
 	"@azure/storage-blob": "12.14.0",
 	"@google-cloud/storage": "6.10.0",

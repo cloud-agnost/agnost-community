@@ -54,6 +54,7 @@ export const manageAPIServerHandler = (connection, envId) => {
 							hasDBPoolSizeChange ||
 							msgObj.subAction === "deploy" ||
 							msgObj.subAction === "redeploy" ||
+							msgObj.subAction === "save-email-auth" ||
 							updateCount >= config.get("general.maxUpdatesBeforeRestart")
 						) {
 							await manager.initializeCore();
