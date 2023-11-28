@@ -14,3 +14,4 @@ export { default as useToast } from './useToast.tsx';
 export { default as useUpdateData } from './useUpdateData.tsx';
 export { default as useUpdateEffect } from './useUpdateEffect.tsx';
 export { default as useUpdateVersion } from './useUpdateVersion.tsx';
+export { default as useVersionDropdownItems } from './useVersionDropdownItems.tsx';
