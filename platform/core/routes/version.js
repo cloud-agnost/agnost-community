@@ -2266,7 +2266,9 @@ router.post(
 
 			// If we have the password then encrypt it
 			if (req.body.customSMTP?.password) {
-				req.body.customSMTP = helper.encyrptSensitiveData(req.body.customSMTP);
+				req.body.customSMTP.password = helper.encryptText(
+					req.body.customSMTP.password
+				);
 			}
 
 			let updatedVersion = await versionCtrl.updateOneById(
