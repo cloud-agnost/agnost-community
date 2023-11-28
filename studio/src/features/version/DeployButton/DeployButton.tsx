@@ -1,9 +1,9 @@
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { useTranslation } from 'react-i18next';
 import useEnvironmentStore from '@/store/environment/environmentStore.ts';
 import { useParams } from 'react-router-dom';
 import { useState } from 'react';
-import { ButtonProps } from 'components/Button/Button.tsx';
+import { ButtonProps } from '@/components/Button';
 
 export default function DeployButton(props: Omit<ButtonProps, 'loading' | 'onClick'>) {
 	const { t } = useTranslation();

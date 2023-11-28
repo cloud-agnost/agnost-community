@@ -19,7 +19,7 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenuSeparator,
 } from 'components/Dropdown';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { Check, Funnel, FunnelSimple } from '@phosphor-icons/react';
 import { ALL_HTTP_METHODS, ENDPOINT_OPTIONS, HTTP_METHOD_BADGE_MAP } from '@/constants';
 import { useTranslation } from 'react-i18next';

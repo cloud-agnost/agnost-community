@@ -1,7 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { z } from 'zod';
-import { EnvironmentStatus } from '.';
-
+import { EnvironmentStatus } from './environment';
 export const UserSchema = z.object({
 	iid: z.string(),
 	name: z.string(),
@@ -396,6 +395,8 @@ declare global {
 	var monaco: typeof import('monaco-editor');
 	// eslint-disable-next-line no-var
 	var ts: typeof import('typescript');
+	// eslint-disable-next-line no-var
+	var editor: import('monaco-editor').editor.IStandaloneCodeEditor;
 }
 
 declare module '@tanstack/react-query' {

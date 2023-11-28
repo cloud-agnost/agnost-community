@@ -1,7 +1,7 @@
 import { translate } from '@/utils';
 import * as z from 'zod';
-import { BaseGetRequest, BaseParams, BaseRequest } from '.';
 import { NameSchema } from './schema';
+import { BaseGetRequest, BaseParams, BaseRequest } from './type';
 
 export interface Cache {
 	orgId: string;

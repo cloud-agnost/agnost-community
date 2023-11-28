@@ -1,7 +1,7 @@
 import useVersionStore from '@/store/version/versionStore.ts';
 import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import {
 	Form,

@@ -1,5 +1,5 @@
 import { MiddlewareSchema } from '@/types';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import {
 	FormControl,
 	FormDescription,

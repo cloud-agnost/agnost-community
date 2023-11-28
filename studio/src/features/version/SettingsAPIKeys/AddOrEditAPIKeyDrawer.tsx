@@ -15,7 +15,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { APIKey, CreateAPIKeyParams, Endpoint, UpdateAPIKeyParams } from '@/types';
 import useEndpointStore from '@/store/endpoint/endpointStore.ts';
 import useSettingsStore from '@/store/version/settingsStore';
@@ -139,7 +139,6 @@ export default function AddOrEditAPIKeyDrawer({
 		'allowed-domains': 'domain',
 		general: 'general',
 	};
-
 	async function onSubmit(data: z.infer<typeof Schema>) {
 		if (!version) return;
 		const func = editMode ? editAPIKey : createAPIKey;

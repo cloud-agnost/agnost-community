@@ -1,39 +1,41 @@
 import { ChangeNameForm } from '@/components/ChangeNameForm';
+import { Form } from '@/components/Form';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { APIError } from '@/types';
-import { useState } from 'react';
+import { ChangeNameFormSchema } from '@/types';
+import { useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 export default function ChangeOrganizationName() {
-	const [error, setError] = useState<APIError | null>(null);
-	const [loading, setLoading] = useState(false);
 	const { organization, changeOrganizationName } = useOrganizationStore();
 	const canOrgUpdate = useAuthorizeOrg('update');
-	async function onSubmit(data: any) {
-		if (organization?.name === data.name) return;
-		else {
-			setLoading(true);
-			changeOrganizationName({
-				name: data.name,
-				organizationId: organization?._id as string,
-				onSuccess: () => {
-					setLoading(false);
-				},
-				onError: (error) => {
-					setError(error);
-					setLoading(false);
-				},
-			});
-		}
+	const form = useForm<z.infer<typeof ChangeNameFormSchema>>({
+		defaultValues: {
+			name: organization?.name as string,
+		},
+	});
+
+	const {
+		mutateAsync: changeOrgNameMutate,
+		isPending,
+		error,
+	} = useMutation({
+		mutationFn: changeOrganizationName,
+	});
+
+	async function onSubmit(data: z.infer<typeof ChangeNameFormSchema>) {
+		changeOrgNameMutate({
+			name: data.name,
+			organizationId: organization?._id as string,
+		});
 	}
 
 	return (
-		<ChangeNameForm
-			onFormSubmit={onSubmit}
-			loading={loading}
-			error={error}
-			defaultValue={organization?.name as string}
-			disabled={!canOrgUpdate}
-		/>
+		<Form {...form}>
+			<form className='space-y-6' onSubmit={form.handleSubmit(onSubmit)}>
+				<ChangeNameForm loading={isPending} error={error} disabled={!canOrgUpdate} />
+			</form>
+		</Form>
 	);
 }

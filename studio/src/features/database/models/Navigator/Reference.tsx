@@ -18,7 +18,6 @@ export default function Reference({ cell, row, field }: NavigatorComponentProps)
 	const updateData = useUpdateData(field);
 	useEffect(() => {
 		if (searchParams.get('ref') && searchParams.get('ref') === data[field.name]) {
-			console.log('here');
 			setModel(models.find((m) => m.iid === field.reference?.iid) as Model);
 		}
 	}, [searchParams]);

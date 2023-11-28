@@ -1,4 +1,4 @@
-import { axios, test } from '@/helpers';
+import { axios, http } from '@/helpers';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import {
 	CreateEndpointParams,
@@ -38,13 +38,15 @@ export default class EndpointService {
 	}
 
 	static async getEndpoints(params: GetEndpointsParams): Promise<Endpoint[]> {
-		const { orgId, appId, versionId, search, size, page } = params;
+		const { orgId, appId, versionId, search, size, page, sortBy, sortDir } = params;
 		return (
 			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/ep`, {
 				params: {
 					search,
 					size,
 					page,
+					sortBy,
+					sortDir,
 				},
 			})
 		).data;
@@ -148,8 +150,8 @@ export default class EndpointService {
 		} else {
 			opt = !isEmpty(formData) ? formDataObj : body;
 		}
-		return await test[method](
-			`${window.location.origin}/${useEnvironmentStore.getState().environment?.iid}${path}`,
+		return await http[method](
+			`${useEnvironmentStore.getState().environment?.iid}${path}`,
 			opt,
 			options,
 		);

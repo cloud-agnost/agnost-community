@@ -1,7 +1,8 @@
 import { translate } from '@/utils';
 import parser from 'cron-parser';
 import * as z from 'zod';
-import { BaseGetRequest, BaseParams, BaseRequest, Log, NameSchema } from '.';
+import { NameSchema } from './schema';
+import { BaseGetRequest, BaseParams, BaseRequest, Log } from './type';
 export interface Task {
 	orgId: string;
 	appId: string;

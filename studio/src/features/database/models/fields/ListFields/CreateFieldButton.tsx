@@ -1,5 +1,5 @@
 import { Plus } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { useTranslation } from 'react-i18next';
 import { Fragment, useMemo, useState } from 'react';
 import {

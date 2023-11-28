@@ -1,48 +1,8 @@
 import ApplicationCreateModal from '@/features/application/ApplicationCreateModal';
+import { OrganizationMenu } from '@/features/organization';
 import { Layout } from '@/layouts/Layout';
 import { useState } from 'react';
-import { LoaderFunctionArgs, Outlet, useMatch } from 'react-router-dom';
-import { OrganizationMenu } from '@/features/organization';
-import useOrganizationStore from '@/store/organization/organizationStore.ts';
-import useAuthStore from '@/store/auth/authStore.ts';
-import useApplicationStore from '@/store/app/applicationStore.ts';
-import { Organization } from '@/types';
-
-OrganizationDetails.loader = function ({ params }: LoaderFunctionArgs) {
-	const { isAuthenticated } = useAuthStore.getState();
-	const { orgId, appId } = params;
-
-	if (isAuthenticated()) {
-		const unSubscribeOrg = useOrganizationStore.subscribe(
-			(state) => state.organizations,
-			() => {
-				useOrganizationStore.setState((prev) => {
-					const organization = prev.organizations.find((org) => org._id === orgId);
-					if (organization) prev.organization = organization;
-					else prev.organization = {} as Organization;
-
-					unSubscribeOrg();
-					return prev;
-				});
-			},
-		);
-
-		const unSubscribeApp = useApplicationStore.subscribe(
-			(state) => state.applications,
-			() => {
-				useApplicationStore.setState((prev) => {
-					const application = prev.applications.find((app) => app._id === appId);
-					if (application) prev.application = application;
-
-					unSubscribeApp();
-					return prev;
-				});
-			},
-		);
-	}
-
-	return null;
-};
+import { Outlet, useMatch } from 'react-router-dom';
 
 export default function OrganizationDetails() {
 	const [openAppCreateModal, setOpenAppCreateModal] = useState(false);

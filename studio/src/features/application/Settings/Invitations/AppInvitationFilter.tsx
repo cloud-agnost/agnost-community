@@ -5,7 +5,7 @@ import useApplicationStore from '@/store/app/applicationStore';
 import { Invitation } from '@/types';
 import { FunnelSimple } from '@phosphor-icons/react';
 import { Table } from '@tanstack/react-table';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,

@@ -9,14 +9,24 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-	({ className, type, error, value, ...props }, ref) => {
+	({ className, type, error, onChange, ...props }, ref) => {
+		const [value, setValue] = React.useState(props.value || '');
+
+		const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+			setValue(event.target.value);
+			if (onChange) {
+				onChange(event);
+			}
+		};
+
 		return (
 			<input
 				type={type}
 				className={cn('input', error && 'input-error', className)}
 				ref={ref}
 				autoComplete='off'
-				defaultValue={value}
+				value={value}
+				onChange={handleChange}
 				{...props}
 			/>
 		);

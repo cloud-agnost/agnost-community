@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority';
 import { cn } from '@/utils';
 import { X } from '@phosphor-icons/react';
 import './badge.scss';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 const badgeVariants = cva('badge', {
 	variants: {
 		variant: {

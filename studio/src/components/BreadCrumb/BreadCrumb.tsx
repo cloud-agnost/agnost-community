@@ -2,7 +2,7 @@ import useTabStore from '@/store/version/tabStore';
 import { TabTypes } from '@/types';
 import { cn, generateId } from '@/utils';
 import { ArrowLeft, CaretRight } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { Fragment } from 'react';
 import { useParams } from 'react-router-dom';
 export interface BreadCrumbItem {

@@ -1,22 +1,20 @@
 import useAuthStore from '@/store/auth/authStore.ts';
 import { APIError } from '@/types';
+import { toDisplayName } from '@/utils';
 import axios from 'axios';
-const baseURL = import.meta.env.VITE_API_URL ?? `${window.location.origin}/api`;
+const baseURL = `${window.location.protocol}//${window.location.hostname}`;
 
 const headers = {
 	'Content-Type': 'application/json',
 };
 export const instance = axios.create({
-	baseURL,
+	baseURL: `${baseURL}/api`,
 	headers,
 });
 
 export const envInstance = axios.create({
 	headers,
-});
-
-export const testEndpointInstance = axios.create({
-	headers,
+	baseURL,
 });
 
 instance.interceptors.request.use((config) => {
@@ -63,14 +61,6 @@ envInstance.interceptors.request.use((config) => {
 	return config;
 });
 
-testEndpointInstance.interceptors.response.use(
-	(response) => {
-		return response;
-	},
-	(error) => {
-		return error;
-	},
-);
 envInstance.interceptors.response.use(
 	(response) => {
 		return response;
@@ -78,7 +68,11 @@ envInstance.interceptors.response.use(
 	({ response: { data } }) => {
 		const err: APIError = {
 			code: data.code ?? data.errors[0].code,
-			error: data.error ?? data.errors[0].error ?? data.errors[0].specifics[0].code,
+			error:
+				data.error ??
+				data.errors[0].error ??
+				data.errors?.[0]?.specifics?.[0].code ??
+				toDisplayName(data.errors?.[0]?.code),
 			details: data.message ?? data.errors[0].message ?? data.errors.fields?.[0]?.msg,
 		};
 		return Promise.reject(err);

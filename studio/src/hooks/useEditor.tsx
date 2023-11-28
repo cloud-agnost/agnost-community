@@ -1,8 +1,8 @@
 import { BeforeMount, EditorProps, OnChange } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import nightOwl from 'monaco-themes/themes/Night Owl.json';
 import slush from 'monaco-themes/themes/Slush and Poppies.json';
 import iPlastic from 'monaco-themes/themes/iPlastic.json';
-import nightOwl from 'monaco-themes/themes/Night Owl.json';
 import * as prettier from 'prettier';
 import jsParser from 'prettier/plugins/babel';
 import esTreePlugin from 'prettier/plugins/estree';
@@ -45,7 +45,6 @@ export type CodeEditorProps = {
 export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 	const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
 	const [monacoRef, setMonacoRef] = useState<typeof monaco>();
-
 	async function formatCode(code: string) {
 		try {
 			return await prettier.format(code, {
@@ -119,6 +118,7 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 
 	function onCodeEditorMount(editor: monaco.editor.IStandaloneCodeEditor, monaco: any) {
 		editorRef.current = editor;
+		globalThis.editor = editor;
 		configureEditor(editor, monaco);
 	}
 
@@ -128,7 +128,6 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 	) => {
 		onChange?.(content, ev);
 	};
-
 	return {
 		onBeforeMount,
 		onCodeEditorMount,

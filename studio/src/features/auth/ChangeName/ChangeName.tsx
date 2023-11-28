@@ -11,7 +11,7 @@ import {
 	FormMessage,
 } from 'components/Form';
 import { Input } from 'components/Input';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 
 import './changeName.sass';
 import { useTranslation } from 'react-i18next';

@@ -9,13 +9,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useState } from 'react';
 import { ClusterSetupResponse } from '@/types';
-async function loader() {
-	const { isTypesOk, getAllTypes } = useTypeStore.getState();
-	if (!isTypesOk) {
-		getAllTypes();
-	}
-	return null;
-}
 
 export default function InviteTeamMembers() {
 	const { goBack } = useOutletContext() as { goBack: () => void };
@@ -71,5 +64,3 @@ export default function InviteTeamMembers() {
 		</RequireAuth>
 	);
 }
-
-InviteTeamMembers.loader = loader;

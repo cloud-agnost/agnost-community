@@ -4,81 +4,118 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { Separator } from '@/components/Separator';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { Switch } from '@/components/Switch';
-import { useToast } from '@/hooks';
+import { useToast, useUpdateEffect } from '@/hooks';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
+import { APIError } from '@/types';
 import { translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import EmailSmtpForm from './EmailSmtpForm';
-import useSettingsStore from '@/store/version/settingsStore';
-export const EmailAuthenticationSchema = z.object({
-	enabled: z.boolean().default(true),
-	confirmEmail: z.boolean().default(false),
-	expiresIn: z.coerce
-		.number({
-			required_error: t('forms.required', {
-				label: t('version.authentication.link_expiry_duration'),
-			}),
-		})
-		.int()
-		.positive(),
-	customSMTP: z.object({
-		host: z
-			.string({ required_error: 'Host is required' })
-			.trim()
-			.refine((value) => value.trim().length > 0, 'Host is required'),
-		port: z.coerce
+export const EmailAuthenticationSchema = z
+	.object({
+		enabled: z.boolean().default(true),
+		confirmEmail: z.boolean().default(false),
+		expiresIn: z.coerce
 			.number({
-				required_error: 'Port is required',
+				required_error: t('forms.required', {
+					label: t('version.authentication.link_expiry_duration'),
+				}),
 			})
 			.int()
-			.positive()
-			.min(100, 'Port must be at least 3 characters long'),
-		user: z
-			.string({ required_error: 'Username is required' })
-			.trim()
-			.refine((value) => value.trim().length > 0, 'Username is required'),
-		password: z.string({ required_error: 'Password is required' }),
-		useTLS: z.boolean(),
-	}),
-});
+			.positive(),
+		customSMTP: z.object({
+			host: z.string().trim().optional(),
+			port: z.coerce
+				.number()
+				.int()
+				.positive()
+				.min(100, 'Port must be at least 3 characters long')
+				.optional(),
+			user: z.string().trim().optional(),
+			password: z.string({ required_error: 'Password is required' }),
+			useTLS: z.boolean(),
+		}),
+	})
+	.superRefine((data, ctx) => {
+		const { customSMTP, confirmEmail, enabled } = data;
+		const { host, port, user, password } = customSMTP;
+		if (confirmEmail && enabled) {
+			if (!host) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: 'Host is required',
+					path: ['customSMTP', 'host'],
+				});
+			}
+			if (!port) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: 'Port is required',
+					path: ['customSMTP', 'port'],
+				});
+			}
+			if (!user) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: 'Username is required',
+					path: ['customSMTP', 'user'],
+				});
+			}
+			if (!password) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: 'Password is required',
+					path: ['customSMTP', 'password'],
+				});
+			}
+		}
+	});
 
 export default function EmailAuthentication() {
 	const { notify } = useToast();
-	const [loading, setLoading] = useState(false);
 	const { saveEmailAuthSettings } = useSettingsStore();
 	const { version } = useVersionStore();
 	const form = useForm<z.infer<typeof EmailAuthenticationSchema>>({
 		resolver: zodResolver(EmailAuthenticationSchema),
 		defaultValues: version?.authentication.email,
 	});
+
+	const { mutateAsync, isPending } = useMutation({
+		mutationFn: saveEmailAuthSettings,
+		mutationKey: ['saveEmailAuthSettings'],
+		onSuccess: () => {
+			notify({
+				type: 'success',
+				title: t('general.success'),
+				description: t('version.authentication.email_authentication_success'),
+			});
+		},
+		onError: (error: APIError) => {
+			notify({
+				title: t('general.error'),
+				description: error.details,
+				type: 'error',
+			});
+		},
+	});
 	function onSubmit(data: z.infer<typeof EmailAuthenticationSchema>) {
-		setLoading(true);
-		saveEmailAuthSettings({
+		mutateAsync({
 			versionId: version._id,
 			orgId: version.orgId,
 			appId: version.appId,
 			...data,
-			onSuccess: () => {
-				setLoading(false);
-				notify({
-					title: t('general.success'),
-					description: t('version.authentication.email_authentication_success'),
-					type: 'success',
-				});
-			},
-			onError: (error) => {
-				setLoading(false);
-				notify({
-					title: t('general.error'),
-					description: error.details,
-					type: 'error',
-				});
-			},
+			confirmEmail: data.confirmEmail && data.enabled,
 		});
 	}
+
+	useUpdateEffect(() => {
+		if (version) {
+			form.reset(version.authentication.email);
+		}
+	}, [version]);
 	return (
 		<SettingsFormItem
 			className='py-0'
@@ -126,7 +163,13 @@ export default function EmailAuthentication() {
 						)}
 					/>
 
-					<Button className='self-end' type='submit' variant='primary' size='lg' loading={loading}>
+					<Button
+						className='self-end'
+						type='submit'
+						variant='primary'
+						size='lg'
+						loading={isPending}
+					>
 						{t('general.save')}
 					</Button>
 				</form>

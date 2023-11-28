@@ -162,7 +162,9 @@ const useVersionStore = create<VersionStore & Actions>()(
 							name: get().version?.name ?? '',
 							...data,
 						});
-						set({ version });
+						set({
+							version: version,
+						});
 						onSuccess?.();
 						return version;
 					} catch (error) {
@@ -336,6 +338,12 @@ const useVersionStore = create<VersionStore & Actions>()(
 			{
 				name: 'version-storage',
 				storage: CustomStateStorage,
+				partialize: (state) =>
+					Object.fromEntries(
+						Object.entries(state).filter(([key]) =>
+							['typings', 'version', 'versions'].includes(key),
+						),
+					),
 			},
 		),
 		{

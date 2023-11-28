@@ -1,4 +1,4 @@
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 
 import './deleteAccount.scss';
 import { Trans, useTranslation } from 'react-i18next';

@@ -4,36 +4,12 @@ import { useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useTaskStore from '@/store/task/taskStore';
-import useTabStore from '@/store/version/tabStore';
 import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import cronstrue from 'cronstrue';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LoaderFunctionArgs, useParams } from 'react-router-dom';
-EditTask.loader = async ({ params }: LoaderFunctionArgs) => {
-	const { taskId, orgId, versionId, appId } = params;
-	if (!taskId) return null;
-	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
-	const { task, getTask, logics, setLogics } = useTaskStore.getState();
-	if (task?._id === taskId) {
-		updateCurrentTab(versionId as string, {
-			isDirty: logics[taskId] ? task.logic !== logics[taskId] : false,
-		});
-		setLogics(taskId, logics[taskId] ?? task.logic);
-		closeDeleteTabModal();
-		return { task };
-	}
-
-	await getTask({
-		orgId: orgId as string,
-		appId: appId as string,
-		versionId: versionId as string,
-		taskId,
-	});
-
-	return { props: {} };
-};
+import { useParams } from 'react-router-dom';
 
 export default function EditTask() {
 	const { t } = useTranslation();

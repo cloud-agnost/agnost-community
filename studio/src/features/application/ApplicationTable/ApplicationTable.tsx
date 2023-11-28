@@ -1,4 +1,4 @@
-import { DataTable } from '@/components/DataTable/DataTable';
+import { DataTable } from '@/components/DataTable';
 import { Application } from '@/types';
 import { ApplicationColumns } from './ApplicationColumns';
 import { useTable } from '@/hooks';

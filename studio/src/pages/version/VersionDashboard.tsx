@@ -16,16 +16,8 @@ import { TabTypes } from '@/types';
 import { capitalize, generateId } from '@/utils';
 import { BookBookmark, Code, FileJs, Key } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
-import { Link, LoaderFunctionArgs } from 'react-router-dom';
-VersionDashboard.loader = async ({ params }: LoaderFunctionArgs) => {
-	const { getVersionDashboardInfo } = useVersionStore.getState();
-	getVersionDashboardInfo({
-		orgId: params.orgId as string,
-		appId: params.appId as string,
-		versionId: params.versionId as string,
-	});
-	return { props: {} };
-};
+import { Link } from 'react-router-dom';
+
 export default function VersionDashboard() {
 	const { version, dashboard, getVersionDashboardPath } = useVersionStore();
 	const { environment } = useEnvironmentStore();

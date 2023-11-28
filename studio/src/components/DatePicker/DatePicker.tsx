@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/Popover';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { cn } from '@/utils';
 import { Calendar } from 'components/Calendar';
 import { CalendarBlank, X } from '@phosphor-icons/react';

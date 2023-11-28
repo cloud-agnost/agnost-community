@@ -2,21 +2,21 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
-import { DATABASE_ICON_MAP, FIELD_ICON_MAP } from '@/constants';
+import { FIELD_ICON_MAP, RESOURCE_ICON_MAP } from '@/constants';
 import { useToast } from '@/hooks';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
+import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { APIError } from '@/types';
-import { cn, isEmpty } from '@/utils';
+import { cn, isEmpty, translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from '@phosphor-icons/react';
+import { useMutation } from '@tanstack/react-query';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { translate as t } from '@/utils';
-import useSettingsStore from '@/store/version/settingsStore';
 
 const SaveUserModelSchema = z.object({
 	databaseId: z.string({
@@ -32,11 +32,11 @@ const SaveUserModelSchema = z.object({
 });
 
 export default function SelectUserDataModel() {
-	const [error, setError] = useState<APIError>();
 	const { saveUserDataModelInfo, addMissingUserDataModelFields } = useSettingsStore();
 	const { version } = useVersionStore();
 	const { databases, getDatabasesOfApp } = useDatabaseStore();
 	const { models, getModelsOfDatabase } = useModelStore();
+	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
 	const form = useForm<z.infer<typeof SaveUserModelSchema>>({
 		defaultValues: {
@@ -58,17 +58,58 @@ export default function SelectUserDataModel() {
 			});
 		}
 	}, []);
+	useEffect(() => {
+		const dbId = form.watch('databaseId');
+		if (version && dbId) {
+			getModelsOfDatabase({
+				orgId: version.orgId,
+				versionId: version._id,
+				appId: version.appId,
+				dbId,
+			});
+		}
+	}, [form.watch('databaseId')]);
 	function getDatabaseIcon(type: string): React.ReactNode {
-		const Icon = DATABASE_ICON_MAP[type];
+		const Icon = RESOURCE_ICON_MAP[type];
 		return <Icon className='w-4 h-4' />;
 	}
 	function getFieldIcon(type: string): React.ReactNode {
 		const Icon = FIELD_ICON_MAP[type];
 		return <Icon className='w-6 h-6 text-elements-strong-red' />;
 	}
-
+	const { mutateAsync, isPending } = useMutation({
+		mutationFn: saveUserDataModelInfo,
+		mutationKey: ['saveUserDataModelInfo'],
+		onSuccess: () => {
+			notify({
+				title: t('general.success'),
+				description: t('version.authentication.user_data_model_saved'),
+				type: 'success',
+			});
+		},
+		onError: (error: APIError) => setError(error),
+	});
+	const { mutateAsync: addMissingFieldsMutation, isPending: isLoadingAddFields } = useMutation({
+		mutationFn: addMissingUserDataModelFields,
+		mutationKey: ['addMissingUserDataModelFields'],
+		onSuccess: () => {
+			notify({
+				title: t('general.success'),
+				description: t('version.authentication.added_missing_fields'),
+				type: 'success',
+			});
+			setError(undefined);
+		},
+		onError: (error: APIError) => {
+			notify({
+				title: t('general.error'),
+				description: error.details,
+				type: 'error',
+			});
+		},
+	});
 	function onSubmit(data: z.infer<typeof SaveUserModelSchema>) {
-		saveUserDataModelInfo({
+		mutateAsync({
 			orgId: version?.orgId as string,
 			versionId: version?._id as string,
 			appId: version?.appId as string,
@@ -80,26 +121,29 @@ export default function SelectUserDataModel() {
 					type: 'success',
 				});
 			},
-			onError: (error) => setError(error),
 		});
 	}
 	function addMissingFields() {
-		addMissingUserDataModelFields({
+		addMissingFieldsMutation({
 			orgId: version?.orgId as string,
 			versionId: version?._id as string,
 			appId: version?.appId as string,
 			...form.getValues(),
-			onSuccess: () => {
-				notify({
-					title: t('general.success'),
-					description: t('version.authentication.added_missing_fields'),
-					type: 'success',
-				});
-				setError(undefined);
-			},
-			onError: (error) => setError(error),
 		});
 	}
+
+	useEffect(() => {
+		if (version) {
+			form.reset({
+				databaseId: databases?.find(
+					(db) => db.iid === version?.authentication?.userDataModel?.database,
+				)?._id,
+				modelId: models?.find(
+					(model) => model.iid === version?.authentication?.userDataModel?.model,
+				)?._id,
+			});
+		}
+	}, [version]);
 
 	return (
 		<SettingsFormItem
@@ -131,7 +175,7 @@ export default function SelectUserDataModel() {
 								);
 							})}
 						</div>
-						<Button size='xl' onClick={addMissingFields}>
+						<Button size='xl' onClick={addMissingFields} loading={isLoadingAddFields}>
 							<Plus weight='bold' className='mr-2' />
 							{t('version.authentication.add_missing_fields')}
 						</Button>
@@ -153,14 +197,6 @@ export default function SelectUserDataModel() {
 											value={field.value}
 											name={field.name}
 											onValueChange={(value) => {
-												if (version) {
-													getModelsOfDatabase({
-														orgId: version.orgId,
-														versionId: version._id,
-														appId: version.appId,
-														dbId: value,
-													});
-												}
 												field.onChange(value);
 											}}
 										>
@@ -211,7 +247,7 @@ export default function SelectUserDataModel() {
 										>
 											<FormControl>
 												<SelectTrigger
-													className={cn('w-full input', errors.databaseId && 'input-error')}
+													className={cn('w-full input', errors.modelId && 'input-error')}
 												>
 													<SelectValue
 														className={cn('text-subtle')}
@@ -241,7 +277,7 @@ export default function SelectUserDataModel() {
 							)}
 						/>
 					</div>
-					<Button type='submit' className='ml-auto self-end' size='lg'>
+					<Button type='submit' className='ml-auto self-end' size='lg' loading={isPending}>
 						{t('general.save')}
 					</Button>
 				</form>

@@ -25,7 +25,7 @@ import {
 import { capitalize, cn, isMobilePhone, toDisplayName } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import {
 	Form,

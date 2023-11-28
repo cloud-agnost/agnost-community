@@ -54,6 +54,7 @@ interface ApplicationState {
 }
 
 type Actions = {
+	getAppById: (orgId: string, appId: string) => Promise<Application>;
 	selectApplication: (application: Application) => void;
 	changeAppName: (req: ChangeAppNameRequest) => Promise<Application>;
 	setAppAvatar: (req: SetAppAvatarRequest) => Promise<Application>;
@@ -124,6 +125,15 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			persist(
 				(set, get) => ({
 					...initialState,
+					getAppById: async (orgId: string, appId: string) => {
+						try {
+							const application = await ApplicationService.getAppById(orgId, appId);
+							get().selectApplication(application);
+							return application;
+						} catch (error) {
+							throw error as APIError;
+						}
+					},
 					openDeleteModal: (application: Application) => {
 						set({
 							isDeleteModalOpen: true,
@@ -153,6 +163,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 						const role = application?.team.find((t) => t.userId._id === user?._id)
 							?.role as AppRoles;
 						set({ application, role });
+						joinChannel(application._id);
 					},
 					changeAppName: async (req: ChangeAppNameRequest) => {
 						try {

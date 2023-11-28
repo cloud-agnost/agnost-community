@@ -1,6 +1,10 @@
 import { DeployButton } from '@/features/version/DeployButton';
 import { SettingsContainer } from '@/features/version/SettingsContainer';
-import { SettingsEnvironment } from '@/features/version/SettingsEnvironment';
+import { AutoDeploy } from '@/features/version/SettingsEnvironment';
+import EnvironmentId from '@/features/version/SettingsEnvironment/EnvironmentId';
+import EnvironmentStatusToggle from '@/features/version/SettingsEnvironment/EnvironmentStatusToggle';
+import UpdateAPIServer from '@/features/version/SettingsEnvironment/UpdateAPIServer';
+
 import useEnvironmentStore from '@/store/environment/environmentStore.ts';
 import { formatDate } from '@/utils';
 import { DateTime } from 'luxon';
@@ -19,7 +23,12 @@ export default function VersionSettingsEnvironment() {
 			pageTitle={t('version.settings.environment')}
 			action={<DeployButton />}
 		>
-			<SettingsEnvironment />
+			<div className='divide-y'>
+				<AutoDeploy />
+				<EnvironmentId />
+				<UpdateAPIServer />
+				<EnvironmentStatusToggle />
+			</div>
 		</SettingsContainer>
 	);
 }

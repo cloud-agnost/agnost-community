@@ -1,7 +1,7 @@
 import { cn } from '@/utils';
 import { Minus, Trash } from '@phosphor-icons/react';
 import { Table } from '@tanstack/react-table';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InfoModal } from '../InfoModal';

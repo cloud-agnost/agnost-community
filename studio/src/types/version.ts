@@ -1,6 +1,12 @@
-import { BaseRequest, HttpMethod, OAuthProviderTypes, PhoneAuthSMSProviders } from '.';
-import { BaseGetRequest, BaseParams, User } from './type';
-
+import { HttpMethod } from './endpoint';
+import {
+	BaseGetRequest,
+	BaseParams,
+	BaseRequest,
+	OAuthProviderTypes,
+	PhoneAuthSMSProviders,
+	User,
+} from './type';
 export interface APIKey {
 	expiryDate?: string;
 	updatedBy?: string;

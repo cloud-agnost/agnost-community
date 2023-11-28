@@ -17,7 +17,7 @@ import { ListEndpoint, Schema } from '@/features/version/SettingsAPIKeys';
 import { Dispatch, Fragment, SetStateAction } from 'react';
 import { RadioGroup, RadioGroupItem } from 'components/RadioGroup';
 import { DatePicker } from 'components/DatePicker';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { cn } from '@/utils';
 import useEndpointStore from '@/store/endpoint/endpointStore.ts';
 import { EndpointSelectModal } from '@/features/version/EndpointSelectModal';

@@ -1,5 +1,6 @@
 import { Cell, Row } from '@tanstack/react-table';
-import { BaseGetRequest, BaseRequest, Field } from '.';
+import { Field } from './model';
+import { BaseGetRequest, BaseRequest } from './type';
 
 export type GetDataFromModelParams = BaseGetRequest & {
 	id?: string;

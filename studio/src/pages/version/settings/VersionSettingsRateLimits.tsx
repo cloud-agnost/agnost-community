@@ -1,7 +1,7 @@
 import { DataTable } from '@/components/DataTable';
 import { EmptyState } from '@/components/EmptyState';
 import { SettingsContainer } from '@/features/version/SettingsContainer';
-import { EditOrAddEndpointRateLimiterDrawer } from '@/features/version/SettingsGeneral';
+import { EditRateLimit } from '@/features/version/SettingsGeneral';
 import { RateLimitsColumns } from '@/features/version/SettingsRateLimits';
 import RateLimitsActions from '@/features/version/SettingsRateLimits/RateLimitsActions.tsx';
 import { useTable } from '@/hooks';
@@ -32,17 +32,10 @@ export default function VersionSettingsRateLimits() {
 				</div>
 			) : (
 				<div className='data-table-container'>
-					<DataTable<RateLimit>
-						table={table}
-						noDataMessage={<p className='text-xl'>{t('version.no_rate_limiters')}</p>}
-					/>
+					<DataTable<RateLimit> table={table} />
 				</div>
 			)}
-			<EditOrAddEndpointRateLimiterDrawer
-				open={editRateLimitDrawerIsOpen}
-				onOpenChange={setEditRateLimitDrawerIsOpen}
-				editMode
-			/>
+			<EditRateLimit open={editRateLimitDrawerIsOpen} onOpenChange={setEditRateLimitDrawerIsOpen} />
 		</SettingsContainer>
 	);
 }

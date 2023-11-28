@@ -1,7 +1,7 @@
-import { EditOrAddEndpointRateLimiterDrawer } from '@/features/version/SettingsGeneral';
+import { Button } from '@/components/Button';
+import { CreateRateLimit } from '@/features/version/SettingsGeneral';
 import { RateLimit } from '@/types';
 import { CaretDown, CaretUp, Plus } from '@phosphor-icons/react';
-import { Button } from 'components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -17,12 +17,14 @@ interface AddRateLimiterDropdownProps {
 	options: RateLimit[] | undefined;
 	onSelect: (limiter: RateLimit) => void;
 	hasToAddAsDefault?: 'endpoint' | 'realtime';
+	disabled?: boolean;
 }
 
 export default function AddRateLimiterDropdown({
 	options,
 	onSelect,
 	hasToAddAsDefault,
+	disabled,
 }: AddRateLimiterDropdownProps) {
 	const [addRateLimiterDropDownIsOpen, setAddRateLimiterDropDownIsOpen] = useState(false);
 	const [addRateLimitDrawerIsOpen, setAddRateLimitDrawerIsOpen] = useState(false);
@@ -34,7 +36,7 @@ export default function AddRateLimiterDropdown({
 				open={addRateLimiterDropDownIsOpen}
 				onOpenChange={setAddRateLimiterDropDownIsOpen}
 			>
-				<DropdownMenuTrigger asChild>
+				<DropdownMenuTrigger asChild disabled={disabled}>
 					<Button variant='secondary' className='flex items-center gap-[10px]'>
 						<Plus weight='bold' className='text-base' />
 						{t('version.add_rate_limiter')}
@@ -73,8 +75,8 @@ export default function AddRateLimiterDropdown({
 					</DropdownMenuItemContainer>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			<EditOrAddEndpointRateLimiterDrawer
-				addToDefault={hasToAddAsDefault}
+			<CreateRateLimit
+				type={hasToAddAsDefault}
 				onCreate={onSelect}
 				key={addRateLimitDrawerIsOpen.toString()}
 				open={addRateLimitDrawerIsOpen}

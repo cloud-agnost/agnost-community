@@ -47,12 +47,12 @@ export default function VersionSettingsAuthentications() {
 							key={item.name}
 							item={item}
 							active={window.location.search.includes(item.href)}
-							onClick={() =>
+							onClick={() => {
 								handleTabChange(
 									t('version.settings.authentications'),
-									`settings/authentications/${item.href}`,
-								)
-							}
+									`settings/authentications?t=${item.href}`,
+								);
+							}}
 						/>
 					))}
 				</nav>

@@ -2,36 +2,10 @@ import { useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useFunctionStore from '@/store/function/functionStore';
-import useTabStore from '@/store/version/tabStore';
 import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { LoaderFunctionArgs, useParams } from 'react-router-dom';
-
-EditFunction.loader = async ({ params }: LoaderFunctionArgs) => {
-	const { funcId, orgId, versionId, appId } = params as Record<string, string>;
-	if (!funcId) return null;
-	const { getFunctionById, logics, setLogics } = useFunctionStore.getState();
-	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
-	const { function: helper } = useFunctionStore.getState();
-	if (helper?._id === funcId) {
-		updateCurrentTab(versionId as string, {
-			isDirty: logics[funcId] ? helper.logic !== logics[funcId] : false,
-		});
-		setLogics(funcId, logics[funcId] ?? helper.logic);
-		closeDeleteTabModal();
-		return { helper };
-	}
-
-	await getFunctionById({
-		orgId: orgId,
-		appId: appId,
-		versionId: versionId,
-		funcId: funcId,
-	});
-
-	return { props: {} };
-};
+import { useParams } from 'react-router-dom';
 
 export default function EditFunction() {
 	const { t } = useTranslation();

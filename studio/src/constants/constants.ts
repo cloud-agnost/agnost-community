@@ -62,8 +62,6 @@ import {
 	ConnectQueue,
 } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
-import useTabStore from '@/store/version/tabStore';
-import useVersionStore from '@/store/version/versionStore.ts';
 import {
 	Application,
 	EnvironmentStatus,
@@ -77,7 +75,7 @@ import {
 	Tab,
 	TabTypes,
 } from '@/types';
-import { generateId, notify, translate } from '@/utils';
+import { translate } from '@/utils';
 import {
 	BracketsCurly,
 	Clock,
@@ -572,113 +570,6 @@ export const CREATE_RESOURCES_ELEMENTS = [
 		resourceType: ResourceType.Queue,
 		instance: ResourceInstances.RabbitMQ,
 		CurrentResourceElement: ConnectQueue,
-	},
-];
-export const VERSION_DROPDOWN_ITEM = [
-	{
-		title: translate('version.open_version'),
-		action: () => {
-			const { application, openVersionDrawer } = useApplicationStore.getState();
-			if (!application) return;
-			openVersionDrawer(application);
-		},
-		//TODO disabled: useVersionStore.getState().versions.length <= 1,
-	},
-	{
-		title: translate('version.create_a_copy'),
-
-		action: async () => {
-			useVersionStore.getState().setCreateCopyVersionDrawerIsOpen(true);
-		},
-	},
-	// {
-	// 	title: () => translate('version.merge'),
-	// 	active: () => false,
-	// 	action: () => {
-	// 		// TODO: implement
-	// 	},
-	// 	disabled: () => true,
-	// 	after: () => DropdownMenuSeparator,
-	// },
-	// {
-	// 	title: () => translate('version.export'),
-	// 	active: () => false,
-	// 	action: () => {
-	// 		// TODO: implement
-	// 	},
-	// 	disabled: () => true,
-	//
-	// },
-	// {
-	// 	title: () => translate('version.import'),
-	// 	active: () => false,
-	// 	action: () => {
-	// 		// TODO: implement
-	// 	},
-	// 	disabled: () => true,
-	// 	after: () => DropdownMenuSeparator,
-	// },
-	{
-		title: useVersionStore.getState().version?.readOnly
-			? translate('version.mark_read_write')
-			: translate('version.mark_read_only'),
-		action: () => {
-			const { updateVersionProperties, version } = useVersionStore.getState();
-			if (!version) return;
-			updateVersionProperties({
-				orgId: version.orgId,
-				versionId: version._id,
-				appId: version.appId,
-				readOnly: !version?.readOnly,
-				onError: (error) => {
-					notify({
-						type: 'error',
-						title: translate('general.error'),
-						description: error.details,
-					});
-				},
-			});
-		},
-		disabled: false,
-	},
-	{
-		title: useVersionStore.getState().version?.private
-			? translate('version.set_public')
-			: translate('version.set_private'),
-		action: () => {
-			const { updateVersionProperties, version } = useVersionStore.getState();
-			if (!version) return;
-			updateVersionProperties({
-				orgId: version.orgId,
-				versionId: version._id,
-				appId: version.appId,
-				private: !version?.private,
-				onError: (error) => {
-					notify({
-						type: 'error',
-						title: translate('general.error'),
-						description: error.details,
-					});
-				},
-			});
-		},
-		disabled: useVersionStore.getState().version?.master,
-	},
-	{
-		title: translate('version.settings.default'),
-		action: () => {
-			const { getVersionDashboardPath, version } = useVersionStore.getState();
-			const versionHomePath = getVersionDashboardPath('/settings');
-			useTabStore.getState().addTab(version?._id as string, {
-				id: generateId(),
-				title: translate('version.settings.default'),
-				path: versionHomePath,
-				isActive: true,
-				isDashboard: false,
-				type: TabTypes.Settings,
-			});
-		},
-		disabled: false,
 	},
 ];
 

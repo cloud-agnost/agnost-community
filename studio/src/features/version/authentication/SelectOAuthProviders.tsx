@@ -19,6 +19,7 @@ import {
 import { useMemo, useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
 import AddProvider from './AddProvider';
+import { useUpdateEffect } from '@/hooks';
 
 interface SelectProvider {
 	provider: OAuthProvider;
@@ -76,6 +77,20 @@ export default function SelectOAuthProviders() {
 			return !version.authentication.providers.find((p) => p.provider === type.provider);
 		});
 	}, [version.authentication.providers]);
+
+	useUpdateEffect(() => {
+		if (version) {
+			setSelectedProvider({
+				editedProvider: {} as VersionOAuthProvider,
+				provider: {} as OAuthProvider,
+				open: false,
+			});
+			setOpenDeleteModal({
+				open: false,
+				toDeleteProvider: {} as VersionOAuthProvider,
+			});
+		}
+	}, [version]);
 	return (
 		<SettingsFormItem
 			className='py-0'
@@ -139,7 +154,7 @@ export default function SelectOAuthProviders() {
 										});
 									}}
 								>
-									<Pencil className='text-subtle w-6 h-6' />
+									<Pencil className='text-subtle w-5 h-5' />
 								</Button>
 								<Button
 									type='button'
@@ -152,7 +167,7 @@ export default function SelectOAuthProviders() {
 										})
 									}
 								>
-									<Trash size={24} className='text-subtle' />
+									<Trash size={20} className='text-subtle' />
 								</Button>
 							</div>
 						</div>

@@ -5,8 +5,11 @@ import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab } from '@/types';
 import { addLibsToEditor, cn, getTabIdFromUrl, isEmpty } from '@/utils';
-import MonacoEditor, { EditorProps } from '@monaco-editor/react';
+import { EditorProps } from '@monaco-editor/react';
 import { useEffect } from 'react';
+import Loadable from '@loadable/component';
+
+const MonacoEditor = Loadable(() => import('@monaco-editor/react'));
 
 interface CodeEditorProps extends Omit<EditorProps, 'defaultLanguage'> {
 	containerClassName?: string;

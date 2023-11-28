@@ -10,7 +10,6 @@ import {
 	useUpdateEffect,
 } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
-import useAuthStore from '@/store/auth/authStore';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
@@ -20,22 +19,7 @@ import { DataTable } from 'components/DataTable';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { LoaderFunctionArgs, useParams, useSearchParams } from 'react-router-dom';
-Navigator.loader = async function ({ params }: LoaderFunctionArgs) {
-	if (!useAuthStore.getState().isAuthenticated()) return null;
-	const { models } = useModelStore.getState();
-	if (models.length > 0) return null;
-	const apiParams = params as {
-		orgId: string;
-		appId: string;
-		versionId: string;
-		dbId: string;
-	};
-
-	const { getModelsOfDatabase } = useModelStore.getState();
-	await getModelsOfDatabase(apiParams);
-	return null;
-};
+import { useParams, useSearchParams } from 'react-router-dom';
 
 export default function Navigator() {
 	const { t } = useTranslation();
@@ -153,7 +137,6 @@ export default function Navigator() {
 									)}
 									variant='blank'
 									onClick={() => {
-										console.log(md);
 										setModel(md);
 										resetNestedModels();
 										searchParams.delete('ref');

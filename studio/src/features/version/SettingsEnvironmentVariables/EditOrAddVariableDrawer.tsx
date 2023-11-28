@@ -4,7 +4,7 @@ import { APIError, NameSchema } from '@/types';
 import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, AlertDescription, AlertTitle } from 'components/Alert';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
 import { Input } from 'components/Input';

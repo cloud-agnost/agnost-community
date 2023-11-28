@@ -1,7 +1,7 @@
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { SearchNPMPackages } from '@/types';
-import { Button } from 'components/Button';
+import { Button } from '@/components/Button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import { SearchInput } from 'components/SearchInput';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/Table';

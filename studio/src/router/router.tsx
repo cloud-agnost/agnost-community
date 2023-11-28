@@ -1,5 +1,4 @@
 import { componentLoader } from '@/helpers';
-import { CompleteAccountSetupVerifyEmail, ConfirmChangeEmail } from '@/pages/auth';
 import ErrorBoundary from '@/pages/errors/ErrorBoundary.tsx';
 import { Root } from '@/pages/root';
 import useAuthStore from '@/store/auth/authStore.ts';
@@ -7,26 +6,18 @@ import useClusterStore from '@/store/cluster/clusterStore.ts';
 import loadable from '@loadable/component';
 import type { ReactNode } from 'react';
 import { Navigate, createBrowserRouter, useLocation } from 'react-router-dom';
-import ChangePasswordWithToken from '../pages/auth/ChangePasswordWithToken';
-import EditEndpoint from '../pages/endpoint/EditEndpoint';
-import EditFunction from '../pages/function/EditFunction';
-import EditMiddleware from '../pages/middleware/EditMiddleware';
-import EditMessageQueue from '../pages/queue/EditMessageQueue';
-import EditTask from '../pages/task/EditTask';
-import Home from '../pages/home/Home';
-import AccountInformation from '../pages/onboarding/AccountInformation';
-import InviteTeamMembers from '../pages/onboarding/InviteTeamMembers';
-import Onboarding from '../pages/onboarding/Onboarding';
-import OrganizationDetails from '../pages/organization/OrganizationDetails';
-import RedirectHandle from '../pages/redirect-handle/RedirectHandle';
-import Buckets from '../pages/storage/Bucket';
-import Files from '../pages/storage/Files';
-import VersionDashboard from '../pages/version/VersionDashboard';
-import Fields from '../pages/version/models/fields/Fields';
-import Navigator from '../pages/version/navigator/Navigator';
-import ModelsOutlet from '../pages/version/models/ModelsOutlet';
+import BeatLoader from 'react-spinners/BeatLoader';
+import authLoaders from './loader/AuthLoader';
+import homeLoaders from './loader/HomeLoader';
+import onboardingLoaders from './loader/OnboardingLoader';
+import organizationLoaders from './loader/OrganizationLoader';
+import versionLoaders from './loader/VersionLoader';
 export function Fallback(): JSX.Element {
-	return <div>Something went wrong</div>;
+	return (
+		<div className='flex items-center justify-center h-screen'>
+			<BeatLoader color='#6884FD' size={24} margin={18} />
+		</div>
+	);
 }
 
 const HomeLoadable = loadable(() => componentLoader(() => import('../pages/home/Home')), {
@@ -357,7 +348,7 @@ const MessageQueue = loadable(() => componentLoader(() => import('../pages/queue
 });
 
 const EditMessageQueueLoadable = loadable(
-	() => componentLoader(() => import('../pages/queue/EditMessageQueue')),
+	() => componentLoader(() => import('../pages/queue/MessageQueue')),
 	{
 		fallback: <Fallback />,
 		resolveComponent: (mod: any) => mod.default,
@@ -538,7 +529,7 @@ const router = createBrowserRouter([
 			{
 				index: true,
 				element: <HomeLoadable />,
-				loader: Home.loader,
+				loader: homeLoaders.homeLoader,
 			},
 			{
 				path: '/login',
@@ -551,12 +542,12 @@ const router = createBrowserRouter([
 			{
 				path: '/confirm-change-email',
 				element: <ConfirmChangeEmailLoadable />,
-				loader: ConfirmChangeEmail.loader,
+				loader: authLoaders.confirmChangeEmailLoader,
 			},
 			{
 				path: '/change-password',
 				element: <ChangePasswordWithTokenLoadable />,
-				loader: ChangePasswordWithToken.loader,
+				loader: authLoaders.changePasswordWithTokenLoader,
 			},
 			{
 				path: '/verify-email',
@@ -569,7 +560,7 @@ const router = createBrowserRouter([
 			{
 				path: '/complete-account-setup/verify-email',
 				element: <CompleteAccountSetupVerifyEmailLoadable />,
-				loader: CompleteAccountSetupVerifyEmail.loader,
+				loader: authLoaders.completeAccountSetupVerifyEmail,
 			},
 			{
 				path: '/organization',
@@ -582,7 +573,7 @@ const router = createBrowserRouter([
 					{
 						path: ':orgId',
 						element: <OrganizationDetailsLoadable />,
-						loader: OrganizationDetails.loader,
+						loader: organizationLoaders,
 						children: [
 							{
 								path: 'apps',
@@ -598,9 +589,8 @@ const router = createBrowserRouter([
 										children: [
 											{
 												path: '',
-
 												element: <Dashboard />,
-												loader: VersionDashboard.loader,
+												loader: versionLoaders.dashboardLoader,
 											},
 											{
 												path: 'database',
@@ -612,12 +602,12 @@ const router = createBrowserRouter([
 													{
 														path: ':dbId/navigator',
 														element: <NavigatorLoadable />,
-														loader: Navigator.loader,
+														loader: versionLoaders.navigatorLoader,
 													},
 													{
 														path: ':dbId/models',
 														element: <ModelsOutletLoadable />,
-														loader: ModelsOutlet.loader,
+														loader: versionLoaders.modelsOutletLoader,
 														children: [
 															{
 																index: true,
@@ -626,7 +616,7 @@ const router = createBrowserRouter([
 															{
 																path: ':modelId/fields',
 																element: <FieldsLoadable />,
-																loader: Fields.loader,
+																loader: versionLoaders.fieldsLoader,
 															},
 														],
 													},
@@ -643,7 +633,7 @@ const router = createBrowserRouter([
 													{
 														path: ':endpointId',
 														element: <EditEndpointLoadable />,
-														loader: EditEndpoint.loader,
+														loader: versionLoaders.editEndpointLoader,
 													},
 													{
 														path: 'logs',
@@ -662,7 +652,7 @@ const router = createBrowserRouter([
 													{
 														path: ':funcId',
 														element: <EditFunctionLoadable />,
-														loader: EditFunction.loader,
+														loader: versionLoaders.editFunctionLoader,
 													},
 												],
 											},
@@ -677,12 +667,12 @@ const router = createBrowserRouter([
 													{
 														path: ':storageId',
 														element: <BucketLoadable />,
-														loader: Buckets.loader,
+														loader: versionLoaders.bucketLoader,
 													},
 													{
 														path: ':storageId/bucket/:bucketName',
 														element: <FilesLoadable />,
-														loader: Files.loader,
+														loader: versionLoaders.fileLoader,
 													},
 												],
 											},
@@ -697,7 +687,7 @@ const router = createBrowserRouter([
 													{
 														path: ':middlewareId',
 														element: <EditMiddlewareLoadable />,
-														loader: EditMiddleware.loader,
+														loader: versionLoaders.editMiddlewareLoader,
 													},
 												],
 											},
@@ -716,7 +706,7 @@ const router = createBrowserRouter([
 													{
 														path: ':queueId',
 														element: <EditMessageQueueLoadable />,
-														loader: EditMessageQueue.loader,
+														loader: versionLoaders.editMessageQueueLoader,
 													},
 													{
 														path: 'logs',
@@ -735,7 +725,7 @@ const router = createBrowserRouter([
 													{
 														path: ':taskId',
 														element: <EditTaskLoadable />,
-														loader: EditTask.loader,
+														loader: versionLoaders.editTaskLoader,
 													},
 													{
 														path: 'logs',
@@ -835,13 +825,13 @@ const router = createBrowserRouter([
 	{
 		path: '/onboarding',
 		element: <OnboardingLoadable />,
-		loader: Onboarding.loader,
+		loader: onboardingLoaders.onboardingLoader,
 		errorElement: <ErrorBoundary />,
 		children: [
 			{
 				path: '',
 				element: <AccountInformationLoadable />,
-				loader: AccountInformation.loader,
+				loader: onboardingLoaders.accountInformationLoader,
 			},
 			{
 				path: 'create-organization',
@@ -858,14 +848,14 @@ const router = createBrowserRouter([
 			{
 				path: 'invite-team-members',
 				element: <InviteTeamMembersLoadable />,
-				loader: InviteTeamMembers.loader,
+				loader: onboardingLoaders.inviteTeamMembersLoader,
 			},
 		],
 	},
 	{
 		path: '/redirect-handle',
 		element: <RedirectHandleLoadable />,
-		loader: RedirectHandle.loader,
+		loader: homeLoaders.redirectHandleLoader,
 		errorElement: <ErrorBoundary />,
 	},
 	{

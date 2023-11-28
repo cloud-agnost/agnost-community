@@ -1,5 +1,5 @@
 import { GetDatabasesOfAppParams } from '@/types/database.ts';
-import { BaseRequest } from '.';
+import { BaseRequest } from './type';
 
 export interface Model {
 	orgId: string;

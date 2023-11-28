@@ -1,6 +1,6 @@
 import * as z from 'zod';
-import { BaseGetRequest, BaseParams, BaseRequest } from '.';
 import { NameSchema } from './schema';
+import { BaseGetRequest, BaseParams, BaseRequest } from './type';
 
 export interface HelperFunction {
 	orgId: string;

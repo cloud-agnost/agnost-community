@@ -5,7 +5,7 @@ import useAuthStore from '@/store/auth/authStore';
 import { AppRoles, Application } from '@/types';
 import { getRelativeTime } from '@/utils';
 import { useTranslation } from 'react-i18next';
-import { ApplicationTeam } from '.';
+import ApplicationTeam from './ApplicationTeam';
 import ApplicationSettings from './ApplicationSettings';
 import './application.scss';
 import { BADGE_COLOR_MAP } from '@/constants';

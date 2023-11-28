@@ -14,7 +14,7 @@ import { APIError } from '@/types';
 import { translate } from '@/utils';
 import { CaretLeft } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
-import { Link, LoaderFunctionArgs, redirect, useLoaderData } from 'react-router-dom';
+import { Link, useLoaderData } from 'react-router-dom';
 import './auth.scss';
 
 const FormSchema = z.object({
@@ -117,12 +117,3 @@ export default function ChangePasswordWithToken() {
 		</AuthLayout>
 	);
 }
-
-ChangePasswordWithToken.loader = ({ request }: LoaderFunctionArgs) => {
-	const token = new URL(request.url).searchParams.get('token');
-	if (!token) {
-		return redirect('/login');
-	}
-
-	return token;
-};

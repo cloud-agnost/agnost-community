@@ -34,14 +34,7 @@ export {
 	ResourceInstances,
 	ResourceType,
 } from './resource.ts';
-export {
-	CreateDatabaseSchema,
-	FieldSchema,
-	ModelSchema,
-	NameSchema,
-	TimestampsSchema,
-	UpdateDatabaseSchema,
-} from './schema.ts';
+export * from './schema.ts';
 export type * from './storage.ts';
 export { BucketSchema, CreateStorageSchema, StorageSchema } from './storage.ts';
 export type * from './task.ts';
