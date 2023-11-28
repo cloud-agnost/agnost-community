@@ -140,7 +140,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Set the environment variables of the API server
 		this.manageEnvironmentVariables(this.getEnvironmentVariables());
 		// Set up the authentication flow SMTP server connection if specified
-		this.setUpAuthSMTPConnection();
+		await this.setUpAuthSMTPConnection();
 		// Initialize the connection manager
 		await this.setupResourceConnections();
 		// Manage the realtime connection
@@ -243,7 +243,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Set the environment variables of the API server
 		this.manageEnvironmentVariables(this.getEnvironmentVariables());
 		// Set up the authentication flow SMTP server connection if specified
-		this.setUpAuthSMTPConnection();
+		await this.setUpAuthSMTPConnection();
 		// Manage the realtime connection
 		this.manageRealtimeConnection();
 		// Check databases
@@ -742,14 +742,17 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	/**
 	 *  Sets up the authentication flow SMTP server connection if specified
 	 */
-	setUpAuthSMTPConnection() {
+	async setUpAuthSMTPConnection() {
 		const { authentication } = this.getVersion();
 		if (authentication.email.confirmEmail) {
-			authentication.email.customSMTP.password = helper.decryptText(
-				authentication.email.customSMTP.password
-			);
-			setUpSMTPConnection(authentication.email.customSMTP);
-			this.addLog(`Initialized authentication flow SMTP server connection`);
+			try {
+				await setUpSMTPConnection(authentication.email.customSMTP);
+				this.addLog(`Initialized authentication flow SMTP server connection`);
+			} catch (err) {
+				this.addLog(
+					`Cannot initialize authentication flow SMTP server connection`
+				);
+			}
 		}
 	}
 

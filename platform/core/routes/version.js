@@ -35,7 +35,7 @@ import { handleError } from "../schemas/platformError.js";
 import { setKey } from "../init/cache.js";
 import {
 	authUserDataModel,
-	apiServerDefaultPckages,
+	apiServerDefaultPackages,
 } from "../config/constants.js";
 import { getVersionTypings } from "../util/typings.js";
 import ERROR_CODES from "../config/errorCodes.js";
@@ -1690,7 +1690,7 @@ router.get(
 	async (req, res) => {
 		try {
 			const { version } = req;
-			const packages = { ...apiServerDefaultPckages };
+			const packages = { ...apiServerDefaultPackages };
 			const installedPackages = version.npmPackages;
 
 			for (const pkg of installedPackages) {
