@@ -9,6 +9,7 @@ import Field from './Field';
 import Function from './Function';
 import Middleware from './Middleware';
 import Model from './Model';
+import VersionProperties from './VersionProperties';
 import Organization from './Organization';
 import Queue from './Queue';
 import Resource from './Resources';
@@ -32,9 +33,10 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		endpoint: Endpoint,
 		'org.app.version.endpoint': Endpoint,
 		'org.app.version.environment': Environment,
-		'org.app.version.keys': Version,
-		'org.app.version.limits': Version,
+		'org.app.version.keys': VersionProperties,
+		'org.app.version.limits': VersionProperties,
 		'org.app.version': Version,
+		'org.app.version.packages': VersionProperties,
 		version: Version,
 		'org.app.version.db': Database,
 		'org.app.version.db.model': Model,
