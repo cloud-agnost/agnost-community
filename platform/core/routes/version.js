@@ -1154,7 +1154,7 @@ router.delete(
 					defaultEndpointLimits,
 					"realtime.rateLimits": realtimeLimits,
 				},
-				{ cacheKey: version._id }
+				{ cacheKey: version._id, session }
 			);
 
 			// Update also all the endpoints that use the deleted rate limiter object
@@ -1950,7 +1950,7 @@ router.delete(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.keys",
+				"org.app.version.packages",
 				"delete",
 				t("Removed '%s' NPM package(s)", packageIds.length),
 				updatedVersion,
@@ -2044,8 +2044,8 @@ router.post(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.keys",
-				"delete",
+				"org.app.version",
+				"update",
 				t(
 					"Set authentication user data model to '%s.%s'",
 					database.name,
@@ -2077,6 +2077,8 @@ router.post(
 	applyRules("add-fields"),
 	validate,
 	async (req, res) => {
+		// Start new database transaction session
+		const session = await versionCtrl.startSession();
 		try {
 			const { org, app, user, version, database, model } = req;
 
@@ -2100,10 +2102,15 @@ router.post(
 					}
 				}
 
-				if (!fieldExists) missingFields.push(entry);
+				if (!fieldExists)
+					missingFields.push({
+						...entry,
+						dbType: dbTypeMappings[database.type][entry.type],
+					});
 			}
 
 			if (conflictingFields.length > 0) {
+				await versionCtrl.endSession(session);
 				return res.status(422).json({
 					error: t("Invalid User Data Model"),
 					details: t(
@@ -2128,10 +2135,24 @@ router.post(
 				"fields",
 				fieldsToAdd,
 				{ updatedBy: user._id },
-				{ cacheKey: model._id }
+				{ cacheKey: model._id, session }
 			);
 
-			res.json(updatedModel);
+			let updatedVersion = await versionCtrl.updateOneById(
+				version._id,
+				{
+					"authentication.userDataModel.database": database.iid,
+					"authentication.userDataModel.model": model.iid,
+					updatedBy: user._id,
+				},
+				{},
+				{ cacheKey: version._id, session }
+			);
+
+			// Commit transaction
+			await versionCtrl.commit(session);
+
+			res.json(updatedVersion);
 
 			// Deploy database updates to environments if auto-deployment is enabled
 			await deployCtrl.updateDatabase(app, version, user, database, "update");
@@ -2140,8 +2161,8 @@ router.post(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.db.model.fields",
-				"create",
+				"org.app.version.db.model",
+				"update",
 				t(
 					"Added missing fields to authentication user data model '%s.%s'",
 					database.name,
@@ -2156,7 +2177,23 @@ router.post(
 					modelId: model._id,
 				}
 			);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				version._id,
+				user,
+				"org.app.version",
+				"update",
+				t(
+					"Set authentication user data model to '%s.%s'",
+					database.name,
+					model.name
+				),
+				updatedVersion,
+				{ orgId: org._id, appId: app._id, versionId: version._id }
+			);
 		} catch (err) {
+			await versionCtrl.rollback(session);
 			handleError(req, res, err);
 		}
 	}
@@ -2207,8 +2244,8 @@ router.post(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.keys",
-				"delete",
+				"org.app.version",
+				"update",
 				t("Set default redirect URLs to '%s'", redirectURLs.join(", ")),
 				updatedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
@@ -2295,8 +2332,8 @@ router.post(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.keys",
-				"delete",
+				"org.app.version",
+				"update",
 				t("Saved email based authentication settings"),
 				updatedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
@@ -2357,8 +2394,8 @@ router.post(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.keys",
-				"delete",
+				"org.app.version",
+				"update",
 				t("Saved phone based authentication settings"),
 				updatedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
@@ -2416,8 +2453,8 @@ router.post(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.limits",
-				"create",
+				"org.app.version",
+				"update",
 				t("Configured '%s' oAuth settings", req.body.provider),
 				updatedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
@@ -2482,7 +2519,7 @@ router.put(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.limits",
+				"org.app.version",
 				"update",
 				t("Updated '%s' oAuth settings", oauthProvider.provider),
 				updatedVersion,
@@ -2535,8 +2572,8 @@ router.delete(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.limits",
-				"delete",
+				"org.app.version",
+				"update",
 				t("Deleted '%s' oAuth settings", oauthProvider.provider),
 				updatedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
@@ -2619,8 +2656,8 @@ router.post(
 			auditCtrl.logAndNotify(
 				version._id,
 				user,
-				"org.app.version.limits",
-				"create",
+				"org.app.version",
+				"update",
 				t("Updated the authentication message template '%s'", type),
 				updatedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
