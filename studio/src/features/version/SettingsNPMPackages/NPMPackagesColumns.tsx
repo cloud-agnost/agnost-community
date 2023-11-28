@@ -1,9 +1,8 @@
-import useAuthStore from '@/store/auth/authStore.ts';
+import useOrganizationStore from '@/store/organization/organizationStore';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, NPMPackage } from '@/types';
 import { getVersionPermission, translate } from '@/utils';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
@@ -36,12 +35,14 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	},
 	{
 		id: 'name',
+		size: 200,
 		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 	},
 	{
 		id: 'version',
+		size: 200,
 		header: translate('general.version'),
 		accessorKey: 'version',
 		sortingFn: 'textCaseSensitive',
@@ -49,23 +50,23 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	{
 		id: 'created_at',
 		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
-		accessorKey: 'created_at',
 		enableSorting: true,
 		sortingFn: 'datetime',
+		accessorKey: 'createdAt',
 		size: 200,
-		cell: ({
-			row: {
-				original: { createdAt, createdBy },
-			},
-		}) => {
-			const isMe = useAuthStore.getState().user?._id === createdBy;
-			const avatar = isMe ? <AuthUserAvatar className='border' size='sm' /> : null;
-			return <DateText date={createdAt}>{avatar}</DateText>;
+		cell: ({ row }) => {
+			const { createdAt, createdBy } = row.original;
+			const user = useOrganizationStore
+				.getState()
+				.members.find((member) => member.member._id === createdBy);
+
+			return <DateText date={createdAt} user={user} />;
 		},
 	},
+
 	{
 		id: 'actions',
-		className: 'actions max-w-[20px]',
+		className: 'actions max-w-[50px]',
 		cell: ({
 			row: {
 				original: { _id },
