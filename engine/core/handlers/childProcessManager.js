@@ -744,10 +744,12 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 */
 	setUpAuthSMTPConnection() {
 		const { authentication } = this.getVersion();
-		if (authentication.email.confirmEmail)
+		if (authentication.email.confirmEmail) {
 			setUpSMTPConnection(
 				helper.decryptSensitiveData(authentication.email.customSMTP)
 			);
+			this.addLog(`Initialized authentication flow SMTP server connection`);
+		}
 	}
 
 	/**
