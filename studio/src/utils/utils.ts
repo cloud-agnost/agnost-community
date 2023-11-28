@@ -200,7 +200,7 @@ export function generateId() {
 }
 
 export function toDisplayName(name: string) {
-	return name.replace(/-/g, ' ').split(' ').map(capitalize).join(' ');
+	return name.replace(/[-_]/g, ' ').split(' ').map(capitalize).join(' ');
 }
 
 export default function groupBy<T>(list: T[], keyGetter: (item: T) => string) {
