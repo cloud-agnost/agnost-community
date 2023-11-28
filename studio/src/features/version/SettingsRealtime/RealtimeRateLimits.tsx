@@ -2,19 +2,20 @@ import { useTranslation } from 'react-i18next';
 import { SortableRateLimits } from '@/features/version/SettingsGeneral';
 import useVersionStore from '@/store/version/versionStore';
 import { useParams } from 'react-router-dom';
-import { APIError, RateLimit } from '@/types';
+import { APIError, RateLimit, Version, VersionRealtimeProperties } from '@/types';
 import { DropResult } from 'react-beautiful-dnd';
 import { reorder } from '@/utils';
 import { useState } from 'react';
 import { useToast } from '@/hooks';
 import useSettingsStore from '@/store/version/settingsStore';
+import { useMutation } from '@tanstack/react-query';
 
 export default function RealtimeRateLimits() {
-	const [deleting, setDeleting] = useState(false);
 	const { notify } = useToast();
 	const { t } = useTranslation();
 	const { updateVersionRealtimeProperties } = useSettingsStore();
 	const rateLimits = useVersionStore((state) => state.version?.limits);
+	const realtime = useVersionStore((state) => state.version?.realtime);
 	const realtimeEndpoints = useVersionStore((state) => state.version?.realtime?.rateLimits ?? []);
 	const orderLimits = useSettingsStore((state) => state.orderRealtimeRateLimits);
 
@@ -27,54 +28,39 @@ export default function RealtimeRateLimits() {
 	const rateLimitsNotInDefault = rateLimits?.filter(
 		(item) => !realtimeEndpoints?.includes(item.iid),
 	);
-
-	async function onDragEnd(result: DropResult) {
-		if (!result.destination || !realtimeEndpoints || !versionId || !appId || !orgId) return;
-		const ordered = reorder(realtimeEndpoints, result.source.index, result.destination.index);
-		orderLimits(ordered);
-
-		await updateVersionRealtimeProperties({
-			orgId,
-			versionId,
-			appId,
-			rateLimits: ordered,
-		});
-	}
-
-	function addToDefault(limiter: RateLimit) {
-		updateVersionRealtimeProperties({
+	function handleUpdateVersionRealtimeProperties(rateLimits: string[]): Promise<Version> {
+		return updateVersionRealtimeProperties({
 			orgId: orgId as string,
 			versionId: versionId as string,
 			appId: appId as string,
-			rateLimits: [...(realtimeEndpoints ?? []), limiter.iid],
+			...realtime,
+			rateLimits,
 		});
 	}
-
-	async function deleteHandler(limitId?: string) {
-		if (!versionId || !appId || !orgId || deleting || !limitId) return;
-		try {
-			setDeleting(true);
-			await updateVersionRealtimeProperties({
-				orgId,
-				versionId,
-				appId,
-				rateLimits: realtimeEndpoints?.filter((item) => item !== limitId),
-			});
-			notify({
-				type: 'success',
-				title: t('general.success'),
-				description: t('version.default_limiter_deleted'),
-			});
-		} catch (e) {
-			const error = e as APIError;
+	const { mutateAsync: updateVersionMutate, isPending } = useMutation({
+		mutationFn: handleUpdateVersionRealtimeProperties,
+		onError: (error: APIError) => {
 			notify({
 				type: 'error',
 				title: error.error,
 				description: error.details,
 			});
-		} finally {
-			setDeleting(false);
-		}
+		},
+	});
+	async function onDragEnd(result: DropResult) {
+		if (!result.destination || !realtimeEndpoints) return;
+		const ordered = reorder(realtimeEndpoints, result.source.index, result.destination.index);
+		orderLimits(ordered);
+		updateVersionMutate(ordered);
+	}
+
+	function addToDefault(limiter: RateLimit) {
+		updateVersionMutate([...(realtimeEndpoints ?? []), limiter.iid]);
+	}
+
+	async function deleteHandler(limitId?: string) {
+		if (!limitId) return;
+		updateVersionMutate(realtimeEndpoints?.filter((item) => item !== limitId));
 	}
 
 	return (
@@ -84,7 +70,7 @@ export default function RealtimeRateLimits() {
 			onSelect={addToDefault}
 			selectedLimits={realtimeEndpoints}
 			onDeleteItem={(limitId: string) => deleteHandler(limitId)}
-			loading={deleting}
+			loading={isPending}
 			hasToAddAsDefault='realtime'
 		/>
 	);
