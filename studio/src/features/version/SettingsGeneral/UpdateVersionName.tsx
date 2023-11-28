@@ -25,7 +25,6 @@ export default function UpdateVersionName() {
 
 	useUpdateEffect(() => {
 		if (error) return;
-		console.log('resetting form');
 		form.setValue('name', version?.name);
 	}, [version?.name]);
 	return (

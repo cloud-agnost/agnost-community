@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 export default function BaseUrl() {
 	const { t } = useTranslation();
 	const { environment } = useEnvironmentStore();
+	console.log('environment', environment.iid);
 	return (
 		<SettingsFormItem
 			className='space-y-0 py-0 pb-6'
@@ -12,7 +13,7 @@ export default function BaseUrl() {
 			title={t('version.settings.version_id')}
 			description={t('version.settings.version_id_desc')}
 		>
-			<CopyInput readOnly value={`${window.location.origin}/${environment.iid}`} />
+			<CopyInput readOnly value={`${window.location.origin}/${environment?.iid}`} />
 		</SettingsFormItem>
 	);
 }
