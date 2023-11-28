@@ -1,5 +1,6 @@
 import useAuthStore from '@/store/auth/authStore.ts';
 import { APIError } from '@/types';
+import { toDisplayName } from '@/utils';
 import axios from 'axios';
 const baseURL = `${window.location.protocol}//${window.location.hostname}`;
 
@@ -12,11 +13,6 @@ export const instance = axios.create({
 });
 
 export const envInstance = axios.create({
-	headers,
-	baseURL,
-});
-
-export const testEndpointInstance = axios.create({
 	headers,
 	baseURL,
 });
@@ -72,7 +68,11 @@ envInstance.interceptors.response.use(
 	({ response: { data } }) => {
 		const err: APIError = {
 			code: data.code ?? data.errors[0].code,
-			error: data.error ?? data.errors[0].error ?? data.errors[0].specifics[0].code,
+			error:
+				data.error ??
+				data.errors[0].error ??
+				data.errors?.[0]?.specifics?.[0].code ??
+				toDisplayName(data.errors?.[0]?.code),
 			details: data.message ?? data.errors[0].message ?? data.errors.fields?.[0]?.msg,
 		};
 		return Promise.reject(err);
