@@ -399,28 +399,59 @@ function isPrivateIP(ip) {
 function decryptVersionData(data) {
 	if (!data) return data;
 	if (Array.isArray(data)) {
-		return data.map((item) => {
+		const arrayCopy = JSON.parse(JSON.stringify(data));
+		return arrayCopy.map((item) => {
 			return decryptVersionData(item);
 		});
 	}
 
 	if (typeof data === "object") {
-		if (data.authentication?.email?.customSMTP?.password) {
-			data.authentication.email.customSMTP.password = decryptText(
-				data.authentication.email.customSMTP.password
+		const objectCopy = JSON.parse(JSON.stringify(data));
+		if (objectCopy.authentication?.email?.customSMTP?.password) {
+			objectCopy.authentication.email.customSMTP.password = decryptText(
+				objectCopy.authentication.email.customSMTP.password
 			);
 		}
 
-		if (data.authentication?.phone?.providerConfig)
-			data.authentication.phone.providerConfig = decryptSensitiveData(
-				data.authentication.phone.providerConfig
+		if (objectCopy.authentication?.phone?.providerConfig)
+			objectCopy.authentication.phone.providerConfig = decryptSensitiveData(
+				objectCopy.authentication.phone.providerConfig
 			);
 
-		if (data.authentication?.providers) {
-			data.authentication.providers.forEach((entry) => {
+		if (objectCopy.authentication?.providers) {
+			objectCopy.authentication.providers.forEach((entry) => {
 				entry.config = decryptSensitiveData(entry.config);
 			});
 		}
+
+		return objectCopy;
+	}
+
+	return data;
+}
+
+function decryptResourceData(data) {
+	if (!data) return data;
+	if (Array.isArray(data)) {
+		const arrayCopy = JSON.parse(JSON.stringify(data));
+		return arrayCopy.map((item) => {
+			return decryptResourceData(item);
+		});
+	}
+
+	if (typeof data === "object") {
+		const objectCopy = JSON.parse(JSON.stringify(data));
+		if (objectCopy.access) {
+			objectCopy.access = decryptSensitiveData(objectCopy.access);
+		}
+
+		if (objectCopy.accessReadOnly) {
+			objectCopy.accessReadOnly = decryptSensitiveData(
+				objectCopy.accessReadOnly
+			);
+		}
+
+		return objectCopy;
 	}
 
 	return data;
@@ -452,4 +483,5 @@ export default {
 	getClusterIPs,
 	isPrivateIP,
 	decryptVersionData,
+	decryptResourceData,
 };

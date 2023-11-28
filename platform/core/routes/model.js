@@ -2,6 +2,7 @@ import express from "express";
 import modelCtrl from "../controllers/model.js";
 import auditCtrl from "../controllers/audit.js";
 import deployCtrl from "../controllers/deployment.js";
+import versionCtrl from "../controllers/version.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
@@ -241,6 +242,8 @@ router.delete(
 
 			if (models.length === 0) return res.json();
 
+			let versionNeesUpdate = false;
+			let updatedVersion = null;
 			for (let i = 0; i < models.length; i++) {
 				const model = models[i];
 
@@ -262,15 +265,7 @@ router.delete(
 					version.authentication?.userDataModel?.database === db.iid &&
 					version.authentication?.userDataModel?.model === model.iid
 				) {
-					await modelCtrl.endSession(session);
-					return res.status(422).json({
-						error: t("Not Allowed"),
-						details: t(
-							"Model '%s' is used as the authentication model to store user data in version user authentication settings. You cannot delete the user authentication data model.",
-							model.name
-						),
-						code: ERROR_CODES.notAllowed,
-					});
+					versionNeesUpdate = true;
 				}
 			}
 
@@ -314,6 +309,21 @@ router.delete(
 				}
 			);
 
+			if (versionNeesUpdate) {
+				updatedVersion = await versionCtrl.updateOneById(
+					version._id,
+					{},
+					{
+						"authentication.userDataModel.database": "",
+						"authentication.userDataModel.model": "",
+					},
+					{
+						cacheKey: version._id,
+						session,
+					}
+				);
+			}
+
 			await modelCtrl.commit(session);
 			res.json();
 
@@ -338,6 +348,19 @@ router.delete(
 					}
 				);
 			});
+
+			if (versionNeesUpdate) {
+				// Log action
+				auditCtrl.logAndNotify(
+					version._id,
+					user,
+					"org.app.version",
+					"update",
+					t("Unset authentication user data model"),
+					helper.decryptVersionData(updatedVersion),
+					{ orgId: org._id, appId: app._id, versionId: version._id }
+				);
+			}
 
 			refreshTypings(user, version);
 		} catch (err) {
@@ -380,20 +403,14 @@ router.delete(
 				});
 			}
 
+			let versionNeesUpdate = false;
+			let updatedVersion = null;
 			// If the model to be deleted is used as the model to store authenticated user data then return error
 			if (
 				version.authentication?.userDataModel?.database === db.iid &&
 				version.authentication?.userDataModel?.model === model.iid
 			) {
-				await modelCtrl.endSession(session);
-				return res.status(422).json({
-					error: t("Not Allowed"),
-					details: t(
-						"Model '%s' is used as the authentication model to store user data in version user authentication settings. You cannot delete the user authentication data model.",
-						model.name
-					),
-					code: ERROR_CODES.notAllowed,
-				});
+				versionNeesUpdate = true;
 			}
 
 			// Get the list of dependent models to the deleted model
@@ -427,6 +444,21 @@ router.delete(
 				}
 			);
 
+			if (versionNeesUpdate) {
+				updatedVersion = await versionCtrl.updateOneById(
+					version._id,
+					{},
+					{
+						"authentication.userDataModel.database": "",
+						"authentication.userDataModel.model": "",
+					},
+					{
+						cacheKey: version._id,
+						session,
+					}
+				);
+			}
+
 			await modelCtrl.commit(session);
 			res.json();
 
@@ -449,6 +481,19 @@ router.delete(
 					modelId: model._id,
 				}
 			);
+
+			if (versionNeesUpdate) {
+				// Log action
+				auditCtrl.logAndNotify(
+					version._id,
+					user,
+					"org.app.version",
+					"update",
+					t("Unset authentication user data model"),
+					helper.decryptVersionData(updatedVersion),
+					{ orgId: org._id, appId: app._id, versionId: version._id }
+				);
+			}
 
 			refreshTypings(user, version);
 		} catch (err) {
