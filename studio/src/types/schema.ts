@@ -188,3 +188,58 @@ export const ChangeNameFormSchema = z.object({
 			}),
 		),
 });
+
+export const CreateRateLimitSchema = z.object({
+	name: z
+		.string({
+			required_error: t('forms.required', {
+				label: t('version.add.rate_limiter.name.label_lower'),
+			}),
+		})
+		.min(
+			2,
+			t('forms.min2.error', {
+				label: t('version.add.rate_limiter.name.label_lower'),
+			}),
+		)
+		.max(
+			64,
+			t('forms.max64.error', {
+				label: t('version.add.rate_limiter.name.label_lower'),
+			}),
+		)
+		.trim()
+		.refine(
+			(value) => value.trim().length > 0,
+			t('forms.required', {
+				label: t('version.add.rate_limiter.name.label_lower'),
+			}),
+		),
+	rate: z.coerce
+		.number({
+			invalid_type_error: t('forms.required', {
+				label: t('version.add.rate_limiter.rate.label_lower'),
+			}),
+			required_error: t('forms.required', {
+				label: t('version.add.rate_limiter.rate.label_lower'),
+			}),
+		})
+		.int()
+		.positive(),
+	duration: z.coerce
+		.number({
+			invalid_type_error: t('forms.required', {
+				label: t('version.add.rate_limiter.duration.label_lower'),
+			}),
+			required_error: t('forms.required', {
+				label: t('version.add.rate_limiter.duration.label_lower'),
+			}),
+		})
+		.int()
+		.positive(),
+	errorMessage: z.string({
+		required_error: t('forms.required', {
+			label: t('version.add.rate_limiter.error_message.label_lower'),
+		}),
+	}),
+});

@@ -21,13 +21,6 @@ export default function useUpdateVersion(): UpdateVersionReturnType {
 
 	const { mutateAsync, ...result } = useMutation({
 		mutationFn: updateVersionProperties,
-		onSuccess: () => {
-			notify({
-				type: 'success',
-				title: t('general.success'),
-				description: t('version.update_version_success'),
-			});
-		},
 		onError: (error: APIError) => {
 			notify({
 				type: 'error',
