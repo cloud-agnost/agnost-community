@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button';
-import { useTranslation } from 'react-i18next';
+import { CreateRateLimit } from '@/features/version/SettingsGeneral';
 import { useState } from 'react';
-import { EditOrAddEndpointRateLimiterDrawer } from '@/features/version/SettingsGeneral';
+import { useTranslation } from 'react-i18next';
 
 export default function AddRateLimitButton() {
 	const { t } = useTranslation();
@@ -12,7 +12,7 @@ export default function AddRateLimitButton() {
 			<Button type='button' onClick={() => setOpen(true)}>
 				{t('version.add_new_limiter')}
 			</Button>
-			<EditOrAddEndpointRateLimiterDrawer open={open} onOpenChange={setOpen} />
+			<CreateRateLimit open={open} onOpenChange={setOpen} />
 		</>
 	);
 }
