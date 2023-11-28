@@ -1,14 +1,11 @@
-import { ArrowLeft } from '@phosphor-icons/react';
 import { Button } from '@/components/Button';
-import { Switch } from 'components/Switch';
+import { DeployButton } from '@/features/version/DeployButton';
+import useEnvironmentStore from '@/store/environment/environmentStore.ts';
+import { ArrowLeft } from '@phosphor-icons/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import useEnvironmentStore from '@/store/environment/environmentStore.ts';
-import { cn } from '@/utils';
-import { DeployButton } from '@/features/version/DeployButton';
-import { SuspendButton } from '../SuspendButton';
 import { AutoRedeploy } from '../AutoRedeploy';
+import { SuspendButton } from '../SuspendButton';
 
 interface DeploymentSettingsProps {
 	isOpen: boolean;

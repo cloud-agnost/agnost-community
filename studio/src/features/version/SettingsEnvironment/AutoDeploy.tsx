@@ -1,9 +1,5 @@
 import { SettingsFormItem } from '@/components/SettingsFormItem';
-import { useAuthorizeVersion } from '@/hooks';
-import { Switch } from '@/components/Switch';
 import { useTranslation } from 'react-i18next';
-import useEnvironmentStore from '@/store/environment/environmentStore';
-import { useParams } from 'react-router-dom';
 import { AutoRedeploy } from '../AutoRedeploy';
 export default function AutoDeploy() {
 	const { t } = useTranslation();
