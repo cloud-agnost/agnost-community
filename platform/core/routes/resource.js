@@ -60,6 +60,33 @@ router.post(
 );
 
 /*
+@route      /v1/org/:orgId/resource/iid/:iid
+@method     GET
+@desc       Get the resource matching the iid
+@access     private
+*/
+router.get(
+	"/iid/:iid",
+	checkContentType,
+	authSession,
+	validateOrg,
+	authorizeOrgAction("org.resource.view"),
+	async (req, res) => {
+		try {
+			const { org } = req.body;
+			const { iid } = req.params;
+			const resourceObj = await resourceCtrl.getOneByQuery({
+				iid,
+				orgId: org._id,
+			});
+			res.json(helper.decryptResourceData(resourceObj));
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
 @route      /v1/org/:orgId/resource/add
 @method     POST
 @desc       Add an existing resource. These resources are not managed by the cluster but we just get access to them and use them. 
