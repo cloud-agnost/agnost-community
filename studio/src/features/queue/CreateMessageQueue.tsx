@@ -2,7 +2,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import { CreateMessageQueueSchema, TabTypes } from '@/types';
+import { APIError, CreateMessageQueueSchema, TabTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MessageQueueForm from './MessageQueueForm';
 import { removeEmptyFields } from '@/utils';
+import { useMutation } from '@tanstack/react-query';
 interface CreateQueueProps {
 	open: boolean;
 	onClose: () => void;
@@ -30,28 +31,33 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 		resolver: zodResolver(CreateMessageQueueSchema),
 	});
 
+	const { mutateAsync: createQueueMutate, isPending } = useMutation({
+		mutationFn: createQueue,
+		mutationKey: ['updateQueue'],
+		onSuccess: (queue) => {
+			handleClose();
+			navigate({
+				title: queue.name,
+				path: `${pathname}/${queue._id}`,
+				isActive: true,
+				isDashboard: false,
+				type: TabTypes.MessageQueue,
+			});
+		},
+		onError: ({ error, details }: APIError) => {
+			handleClose();
+			notify({ type: 'error', description: details, title: error });
+		},
+	});
+
 	function onSubmit(data: z.infer<typeof CreateMessageQueueSchema>) {
 		const params = removeEmptyFields(data) as z.infer<typeof CreateMessageQueueSchema>;
-		createQueue({
+		createQueueMutate({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			...params,
-			resourceId: data.resourceId as string,
-			onSuccess: (queue) => {
-				handleClose();
-				navigate({
-					title: queue.name,
-					path: `${pathname}/${queue._id}`,
-					isActive: true,
-					isDashboard: false,
-					type: TabTypes.MessageQueue,
-				});
-			},
-			onError: ({ error, details }) => {
-				handleClose();
-				notify({ type: 'error', description: details, title: error });
-			},
+			resourceId: data.resourceId,
 		});
 	}
 
@@ -72,7 +78,7 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<MessageQueueForm />
+						<MessageQueueForm loading={isPending} />
 					</form>
 				</Form>
 			</DrawerContent>
