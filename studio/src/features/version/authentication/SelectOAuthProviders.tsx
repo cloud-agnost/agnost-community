@@ -3,6 +3,7 @@ import { InfoModal } from '@/components/InfoModal';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { Pencil } from '@/components/icons';
 import { OAUTH_ICON_MAP } from '@/constants';
+import { useAuthorizeVersion, useUpdateEffect } from '@/hooks';
 import useTypeStore from '@/store/types/typeStore';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -16,22 +17,10 @@ import {
 	DropdownMenuItemContainer,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import { useMemo, useReducer, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AddProvider from './AddProvider';
-import { useAuthorizeVersion, useUpdateEffect } from '@/hooks';
 import EditProvider from './EditProvider';
-
-interface SelectProvider {
-	provider: OAuthProvider;
-	open: boolean;
-	editedProvider?: VersionOAuthProvider;
-}
-
-interface DeleteProvider {
-	open: boolean;
-	toDeleteProvider: VersionOAuthProvider;
-}
 
 export default function SelectOAuthProviders() {
 	const { t } = useTranslation();

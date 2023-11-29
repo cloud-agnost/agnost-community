@@ -2,7 +2,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import useSettingsStore from '@/store/version/settingsStore';
-import { APIError, OAuthProvider, VersionOAuthProvider } from '@/types';
+import { APIError, OAuthProvider } from '@/types';
 import { capitalize, translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';

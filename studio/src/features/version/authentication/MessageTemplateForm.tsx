@@ -49,7 +49,7 @@ const MessageTemplatesSchema = z
 		fromEmail: z.string().email().optional(),
 	})
 	.superRefine((data, ctx) => {
-		const { type, subject, fromName, fromEmail } = data;
+		const { type, subject, fromEmail } = data;
 
 		if (type !== TemplateTypes.VerifySMSCode) {
 			if (!subject) {

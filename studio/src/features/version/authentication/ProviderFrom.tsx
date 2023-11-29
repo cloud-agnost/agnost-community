@@ -1,26 +1,18 @@
 import { Button } from '@/components/Button';
 import { CopyInput } from '@/components/CopyInput';
 import {
-	Drawer,
-	DrawerContent,
-	DrawerFooter,
-	DrawerHeader,
-	DrawerTitle,
+	DrawerFooter
 } from '@/components/Drawer';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input, Textarea } from '@/components/Input';
 import { Separator } from '@/components/Separator';
 import { OAUTH_URL_MAP } from '@/constants';
-import { useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useTypeStore from '@/store/types/typeStore';
-import useSettingsStore from '@/store/version/settingsStore';
-import useVersionStore from '@/store/version/versionStore';
-import { APIError, OAuthProvider, OAuthProviderTypes, VersionOAuthProvider } from '@/types';
-import { capitalize, isEmpty, translate as t } from '@/utils';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useMemo } from 'react';
-import { useForm, useFormContext } from 'react-hook-form';
+import { OAuthProviderTypes } from '@/types';
+import { capitalize, translate as t } from '@/utils';
+import { useMemo } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import * as z from 'zod';
