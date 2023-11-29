@@ -9,7 +9,7 @@ import { HTTP_METHOD_BADGE_MAP, TEST_ENDPOINTS_MENU_ITEMS } from '@/constants';
 import { useToast } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
-import { APIError, TestMethods } from '@/types';
+import { APIError, EnvironmentStatus, TestMethods } from '@/types';
 import {
 	cn,
 	generateId,
@@ -198,7 +198,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 					<DrawerTitle>{t('endpoint.test.title')}</DrawerTitle>
 				</DrawerHeader>
 				<div>
-					{environment?.serverStatus === 'Deploying' && (
+					{environment?.serverStatus === EnvironmentStatus.Deploying && (
 						<div className='px-5'>
 							<Alert variant='warning'>
 								<AlertTitle>{t('endpoint.test.deploy.warning')}</AlertTitle>

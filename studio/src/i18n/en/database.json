@@ -52,10 +52,12 @@
 					"desc": "Models with timestamps automatically set create and update timestamp fields so that you can track creation and last modification date of model objects."
 				},
 				"createdAt": {
-					"field": "Created At Field"
+					"field": "Created At Field",
+					"name": "createdAt"
 				},
 				"updatedAt": {
-					"field": "Updated At Field"
+					"field": "Updated At Field",
+					"name": "updatedAt"
 				}
 			}
 		},

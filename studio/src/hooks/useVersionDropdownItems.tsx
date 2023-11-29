@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TabTypes } from '@/types';
 import { generateId } from '@/utils';
@@ -6,6 +6,7 @@ import useToast from './useToast';
 import useTabStore from '@/store/version/tabStore';
 import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore';
+import _ from 'lodash';
 export default function useVersionDropdownItems() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
@@ -16,8 +17,20 @@ export default function useVersionDropdownItems() {
 		setCreateCopyVersionDrawerIsOpen,
 		updateVersionProperties,
 		getVersionDashboardPath,
+		getAllVersionsVisibleToUser,
 	} = useVersionStore();
 	const { addTab } = useTabStore();
+
+	useEffect(() => {
+		if (_.isEmpty(versions)) {
+			getAllVersionsVisibleToUser({
+				appId: application?._id as string,
+				page: 0,
+				size: 10,
+			});
+		}
+	}, [version]);
+
 	const versionDropdownItems = useMemo(
 		() => [
 			{
@@ -92,5 +105,6 @@ export default function useVersionDropdownItems() {
 		],
 		[versions, version],
 	);
+
 	return versionDropdownItems;
 }

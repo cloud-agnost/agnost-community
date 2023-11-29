@@ -11,8 +11,8 @@
 	}
 
 	&-content {
-		@apply relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-wrapper-background-light;
-		@apply text-subtle shadow-md;
+		@apply relative z-50 min-w-[8rem]  rounded-md border bg-wrapper-background-light;
+		@apply text-subtle shadow-md max-h-60 overflow-auto;
 	}
 	&-value {
 		@apply flex items-center justify-between;
@@ -32,7 +32,7 @@
 		@apply focus:bg-subtle focus:text-default;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:text-subtle data-[disabled]:bg-subtle;
 		@apply checked:bg-subtle checked:text-default;
-		@apply truncate max-w-xs hover:bg-lighter;
+		@apply truncate max-w-full hover:bg-lighter;
 	}
 	&-seperator {
 		@apply -mx-1 my-1 h-px bg-subtle;

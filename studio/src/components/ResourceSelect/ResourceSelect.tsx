@@ -29,7 +29,7 @@ export default function ResourceSelect({ error, type, className, ...props }: Res
 	return (
 		<Select {...props}>
 			<FormControl>
-				<SelectTrigger error={error} className={cn('w-1/3', className)}>
+				<SelectTrigger error={error} className={cn('w-full', className)}>
 					<SelectValue placeholder={`${t('general.select')} ${t('queue.create.resource.title')}`} />
 				</SelectTrigger>
 			</FormControl>

@@ -348,7 +348,7 @@ const MessageQueue = loadable(() => componentLoader(() => import('../pages/queue
 });
 
 const EditMessageQueueLoadable = loadable(
-	() => componentLoader(() => import('../pages/queue/MessageQueue')),
+	() => componentLoader(() => import('../pages/queue/EditMessageQueue')),
 	{
 		fallback: <Fallback />,
 		resolveComponent: (mod: any) => mod.default,
@@ -885,7 +885,7 @@ export function GuestOnly({ children }: { children: ReactNode }): JSX.Element {
 	const { isAuthenticated } = useAuthStore();
 	const { isCompleted } = useClusterStore();
 	const { pathname } = useLocation();
-
+	console.log(isAuthenticated(), pathname);
 	if (isAuthenticated() && isCompleted) {
 		return <Navigate to='/organization' />;
 	} else if (!isCompleted && pathname !== '/onboarding') {

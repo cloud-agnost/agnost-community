@@ -11,6 +11,7 @@ import {
 import { Input } from '@/components/Input';
 import { ResourceSelect } from '@/components/ResourceSelect';
 import { Switch } from '@/components/Switch';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useResourceStore from '@/store/resources/resourceStore';
 import { CreateMessageQueueSchema, ResourceType } from '@/types';
 import { translate as t } from '@/utils';
@@ -21,11 +22,12 @@ import * as z from 'zod';
 export default function MessageQueueForm({ edit }: { edit?: boolean }) {
 	const form = useFormContext<z.infer<typeof CreateMessageQueueSchema>>();
 	const { resources } = useResourceStore();
-
+	const environment = useEnvironmentStore((state) => state.environment);
 	const selectedResource = useMemo(
 		() => resources.find((item) => item._id === form.getValues('resourceId')),
 		[form.getValues('resourceId')],
 	);
+
 	return (
 		<div className='space-y-6'>
 			<FormField

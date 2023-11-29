@@ -4,7 +4,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { Separator } from '@/components/Separator';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { Switch } from '@/components/Switch';
-import { useToast, useUpdateEffect } from '@/hooks';
+import { useAuthorizeVersion, useToast, useUpdateEffect } from '@/hooks';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { APIError } from '@/types';
@@ -78,6 +78,7 @@ export default function EmailAuthentication() {
 	const { notify } = useToast();
 	const { saveEmailAuthSettings } = useSettingsStore();
 	const { version } = useVersionStore();
+	const canEdit = useAuthorizeVersion('version.auth.update');
 	const form = useForm<z.infer<typeof EmailAuthenticationSchema>>({
 		resolver: zodResolver(EmailAuthenticationSchema),
 		defaultValues: version?.authentication.email,
@@ -124,7 +125,11 @@ export default function EmailAuthentication() {
 			description={t('version.authentication.email_authentication_desc')}
 		>
 			<Form {...form}>
-				<form className='space-y-6 flex flex-col' onSubmit={form.handleSubmit(onSubmit)}>
+				<form
+					className='space-y-6 flex flex-col'
+					onSubmit={form.handleSubmit(onSubmit)}
+					autoComplete='off'
+				>
 					<FormField
 						control={form.control}
 						name='enabled'
@@ -132,36 +137,42 @@ export default function EmailAuthentication() {
 							<FormItem className='flex justify-between gap-4 items-center space-y-0'>
 								<FormLabel>{t('version.authentication.email_authentication_title')}</FormLabel>
 								<FormControl>
-									<Switch checked={field.value} onCheckedChange={field.onChange} />
+									<Switch
+										checked={field.value}
+										onCheckedChange={field.onChange}
+										disabled={!canEdit}
+									/>
 								</FormControl>
 							</FormItem>
 						)}
 					/>
 					<Separator />
-					<FormField
-						control={form.control}
-						name='confirmEmail'
-						render={({ field }) => (
-							<FormItem className='flex space-y-0 space-x-4'>
-								<FormControl className='self-start'>
-									<Checkbox
-										disabled={!form.getValues('enabled')}
-										checked={field.value}
-										onCheckedChange={field.onChange}
-									/>
-								</FormControl>
-								<div className='space-y-2'>
-									<FormLabel className='block'>
-										{t('version.authentication.confirm_email')}
-									</FormLabel>
-									<FormLabel className='block text-subtle'>
-										{t('version.authentication.confirm_email_desc')}
-									</FormLabel>
-									{form.watch('confirmEmail') && <EmailSmtpForm />}
-								</div>
-							</FormItem>
-						)}
-					/>
+					{form.watch('enabled') && (
+						<FormField
+							control={form.control}
+							name='confirmEmail'
+							render={({ field }) => (
+								<FormItem className='flex space-y-0 space-x-4'>
+									<FormControl className='self-start'>
+										<Checkbox
+											disabled={!form.getValues('enabled') || !canEdit}
+											checked={field.value}
+											onCheckedChange={field.onChange}
+										/>
+									</FormControl>
+									<div className='space-y-2'>
+										<FormLabel className='block'>
+											{t('version.authentication.confirm_email')}
+										</FormLabel>
+										<FormLabel className='block text-subtle'>
+											{t('version.authentication.confirm_email_desc')}
+										</FormLabel>
+										{form.watch('confirmEmail') && <EmailSmtpForm />}
+									</div>
+								</FormItem>
+							)}
+						/>
+					)}
 
 					<Button
 						className='self-end'
@@ -169,6 +180,7 @@ export default function EmailAuthentication() {
 						variant='primary'
 						size='lg'
 						loading={isPending}
+						disabled={!canEdit}
 					>
 						{t('general.save')}
 					</Button>

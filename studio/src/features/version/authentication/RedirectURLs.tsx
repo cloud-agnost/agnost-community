@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
-import { useToast, useUpdateEffect } from '@/hooks';
+import { useAuthorizeVersion, useToast, useUpdateEffect } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
 import { cn, isEmpty } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,6 +12,7 @@ import { translate as t } from '@/utils';
 import * as z from 'zod';
 import useSettingsStore from '@/store/version/settingsStore';
 import { useMutation } from '@tanstack/react-query';
+import { APIError } from '@/types';
 
 const RedirectURLsSchema = z.object({
 	redirectURLs: z
@@ -34,6 +35,7 @@ export default function RedirectURLs() {
 	const { notify } = useToast();
 	const { saveRedirectURLs } = useSettingsStore();
 	const { version } = useVersionStore();
+	const canEdit = useAuthorizeVersion('version.auth.update');
 	const form = useForm<z.infer<typeof RedirectURLsSchema>>({
 		resolver: zodResolver(RedirectURLsSchema),
 		defaultValues: {
@@ -52,6 +54,13 @@ export default function RedirectURLs() {
 				type: 'success',
 				title: t('general.success'),
 				description: t('version.authentication.redirect_url_success'),
+			});
+		},
+		onError: (error: APIError) => {
+			notify({
+				type: 'error',
+				title: error.error,
+				description: error.details,
 			});
 		},
 	});
@@ -148,6 +157,7 @@ export default function RedirectURLs() {
 						variant='primary'
 						className='self-end'
 						loading={isPending}
+						disabled={!canEdit}
 					>
 						{t('general.save')}
 					</Button>

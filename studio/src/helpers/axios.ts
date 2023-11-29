@@ -17,6 +17,11 @@ export const envInstance = axios.create({
 	baseURL,
 });
 
+export const testEndpointInstance = axios.create({
+	headers,
+	baseURL,
+});
+
 instance.interceptors.request.use((config) => {
 	const accessToken = useAuthStore.getState().accessToken;
 	if (accessToken) {
@@ -76,5 +81,13 @@ envInstance.interceptors.response.use(
 			details: data.message ?? data.errors[0].message ?? data.errors.fields?.[0]?.msg,
 		};
 		return Promise.reject(err);
+	},
+);
+testEndpointInstance.interceptors.response.use(
+	(response) => {
+		return response;
+	},
+	(error) => {
+		return error;
 	},
 );

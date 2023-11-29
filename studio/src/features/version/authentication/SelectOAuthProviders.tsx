@@ -16,10 +16,11 @@ import {
 	DropdownMenuItemContainer,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import { useMemo, useReducer } from 'react';
+import { useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AddProvider from './AddProvider';
-import { useUpdateEffect } from '@/hooks';
+import { useAuthorizeVersion, useUpdateEffect } from '@/hooks';
+import EditProvider from './EditProvider';
 
 interface SelectProvider {
 	provider: OAuthProvider;
@@ -34,40 +35,26 @@ interface DeleteProvider {
 
 export default function SelectOAuthProviders() {
 	const { t } = useTranslation();
+	const canEdit = useAuthorizeVersion('version.auth.update');
 	const { oAuthProviderTypes } = useTypeStore();
 	const { deleteOAuthConfig } = useSettingsStore();
 	const { version } = useVersionStore();
-	const [selectedProvider, setSelectedProvider] = useReducer(
-		(state: SelectProvider, newState: Partial<SelectProvider>) => ({ ...state, ...newState }),
-		{
-			editedProvider: {} as VersionOAuthProvider,
-			provider: {} as OAuthProvider,
-			open: false,
-		},
-	);
-	const [openDeleteModal, setOpenDeleteModal] = useReducer(
-		(state: DeleteProvider, newState: Partial<DeleteProvider>) => ({ ...state, ...newState }),
-		{
-			open: false,
-			toDeleteProvider: {} as VersionOAuthProvider,
-		},
-	);
+	const [selectedProvider, setSelectedProvider] = useState<OAuthProvider | null>();
+	const [toDeleteProvider, setToDeleteProvider] = useState<VersionOAuthProvider | null>();
+	const [editedProvider, setEditedProvider] = useState<VersionOAuthProvider | null>();
 
 	function getIcon(provider: OAuthProviderTypes): JSX.Element {
 		const Icon = OAUTH_ICON_MAP[provider];
 		return <Icon className='w-6 h-6' />;
 	}
-	function handleDeleteOAuthConfig(provider: VersionOAuthProvider) {
+	function handleDeleteOAuthConfig() {
 		deleteOAuthConfig({
 			versionId: version._id,
-			providerId: provider._id,
+			providerId: toDeleteProvider?._id as string,
 			orgId: version.orgId,
 			appId: version.appId,
 			onSuccess: () => {
-				setOpenDeleteModal({
-					open: false,
-					toDeleteProvider: {} as VersionOAuthProvider,
-				});
+				setToDeleteProvider(null);
 			},
 		});
 	}
@@ -80,15 +67,9 @@ export default function SelectOAuthProviders() {
 
 	useUpdateEffect(() => {
 		if (version) {
-			setSelectedProvider({
-				editedProvider: {} as VersionOAuthProvider,
-				provider: {} as OAuthProvider,
-				open: false,
-			});
-			setOpenDeleteModal({
-				open: false,
-				toDeleteProvider: {} as VersionOAuthProvider,
-			});
+			setSelectedProvider(null);
+			setToDeleteProvider(null);
+			setEditedProvider(null);
 		}
 	}, [version]);
 	return (
@@ -101,7 +82,7 @@ export default function SelectOAuthProviders() {
 			<div className='flex items-center justify-between'>
 				<p className='text-subtle font-sfCompact'>{t('version.authentication.providers')}</p>
 				<DropdownMenu>
-					<DropdownMenuTrigger asChild disabled={!providers.length}>
+					<DropdownMenuTrigger asChild disabled={!providers.length || !canEdit}>
 						<Button variant='secondary'>
 							<Plus className='mr-2' />
 							{t('version.authentication.add_auth_provider')}
@@ -115,10 +96,7 @@ export default function SelectOAuthProviders() {
 									key={p.provider}
 									className='flex items-center gap-4'
 									onClick={() => {
-										setSelectedProvider({
-											provider: p,
-											open: true,
-										});
+										setSelectedProvider(p);
 									}}
 								>
 									{getIcon(p.provider)}
@@ -146,13 +124,8 @@ export default function SelectOAuthProviders() {
 									type='button'
 									variant='blank'
 									iconOnly
-									onClick={() => {
-										setSelectedProvider({
-											provider: oAuthProviderTypes.find((type) => type.provider === p.provider),
-											editedProvider: p,
-											open: true,
-										});
-									}}
+									onClick={() => setEditedProvider(p)}
+									disabled={!canEdit}
 								>
 									<Pencil className='text-subtle w-5 h-5' />
 								</Button>
@@ -160,12 +133,8 @@ export default function SelectOAuthProviders() {
 									type='button'
 									variant='blank'
 									iconOnly
-									onClick={() =>
-										setOpenDeleteModal({
-											open: true,
-											toDeleteProvider: p,
-										})
-									}
+									onClick={() => setToDeleteProvider(p)}
+									disabled={!canEdit}
 								>
 									<Trash size={20} className='text-subtle' />
 								</Button>
@@ -179,22 +148,21 @@ export default function SelectOAuthProviders() {
 				)}
 			</div>
 			<AddProvider
-				open={selectedProvider.open}
-				provider={selectedProvider.provider}
-				editedProvider={selectedProvider.editedProvider as VersionOAuthProvider}
-				onClose={() => setSelectedProvider({ open: false, provider: {} as OAuthProvider })}
+				open={Boolean(selectedProvider)}
+				provider={selectedProvider as OAuthProvider}
+				onClose={() => setSelectedProvider(null)}
+			/>
+			<EditProvider
+				open={Boolean(editedProvider)}
+				editedProvider={editedProvider as VersionOAuthProvider}
+				onClose={() => setEditedProvider(null)}
 			/>
 			<InfoModal
-				isOpen={openDeleteModal.open}
-				closeModal={() =>
-					setOpenDeleteModal({
-						open: false,
-						toDeleteProvider: {} as VersionOAuthProvider,
-					})
-				}
+				isOpen={Boolean(toDeleteProvider)}
+				closeModal={() => setToDeleteProvider(null)}
 				title={t('general.singleDelete')}
 				description={t('general.deleteDescription')}
-				onConfirm={() => handleDeleteOAuthConfig(openDeleteModal.toDeleteProvider)}
+				onConfirm={handleDeleteOAuthConfig}
 			/>
 		</SettingsFormItem>
 	);

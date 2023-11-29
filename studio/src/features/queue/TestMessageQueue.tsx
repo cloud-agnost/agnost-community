@@ -1,3 +1,4 @@
+import { Alert, AlertTitle, AlertDescription } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
@@ -5,8 +6,9 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { Logs } from '@/components/Log';
 import { Separator } from '@/components/Separator';
 import { useToast } from '@/hooks';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import { APIError, Log } from '@/types';
+import { APIError, EnvironmentStatus, Log } from '@/types';
 import { generateId, joinChannel, leaveChannel } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -28,6 +30,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 	const { t } = useTranslation();
 	const { queue, testQueue, testQueueLogs } = useMessageQueueStore();
 	const { notify } = useToast();
+	const { environment } = useEnvironmentStore();
 	const resizerRef = useRef<HTMLDivElement>(null);
 	const { versionId, appId, orgId, queueId } = useParams<{
 		versionId: string;
@@ -77,7 +80,14 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 				<DrawerHeader>
 					<DrawerTitle>{t('queue.test.title')}</DrawerTitle>
 				</DrawerHeader>
-
+				{environment?.serverStatus === EnvironmentStatus.Deploying && (
+					<div className='px-5'>
+						<Alert variant='warning'>
+							<AlertTitle>{t('endpoint.test.deploy.warning')}</AlertTitle>
+							<AlertDescription>{t('endpoint.test.deploy.description')}</AlertDescription>
+						</Alert>
+					</div>
+				)}
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 h-full'>
 						<div className='flex items-center justify-between flex-1'>
@@ -101,7 +111,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 											<FormControl className='h-full'>
 												<CodeEditor
 													className='min-h-[100px] h-full'
-													containerClassName='h-[calc(100%-6rem)]'
+													containerClassName='h-full'
 													value={field.value}
 													onChange={field.onChange}
 													defaultLanguage='json'
@@ -119,7 +129,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 									ref={resizerRef}
 								/>
 							</PanelResizeHandle>
-							<Panel minSize={30}>
+							<Panel minSize={30} className='max-h-full no-scrollbar !overflow-y-auto'>
 								<Logs logs={testQueueLogs[queue?._id]?.logs as Log[]} />
 							</Panel>
 						</PanelGroup>

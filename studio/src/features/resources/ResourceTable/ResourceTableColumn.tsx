@@ -84,7 +84,7 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 		className: 'actions',
 		cell: ({ row }) => {
 			const resourceCreateType =
-				'access' in row.original ? ResourceCreateType.Existing : ResourceCreateType.New;
+				'config' in row.original ? ResourceCreateType.New : ResourceCreateType.Existing;
 			const canEditResource = getOrgPermission('resource.update');
 			const canDeleteResource = getOrgPermission('resource.delete');
 			return (
@@ -97,7 +97,10 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 								isDeletedResourceModalOpen: true,
 							})
 						}
-						onEdit={() => openEditResourceModal(row.original, resourceCreateType)}
+						onEdit={() => {
+							openEditResourceModal(row.original, resourceCreateType);
+							console.log(row.original, resourceCreateType);
+						}}
 						canEdit={canEditResource}
 						canDelete={canDeleteResource}
 					/>

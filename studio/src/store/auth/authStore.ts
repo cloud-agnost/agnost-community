@@ -15,9 +15,9 @@ interface AuthState {
 	accessToken: string | null | undefined;
 	refreshToken: string | null | undefined;
 	loading: boolean;
-	error: APIError;
-	user: User;
-	email: string;
+	error: APIError | undefined;
+	user: User | undefined;
+	email: string | undefined;
 	isAccepted: boolean;
 }
 
@@ -57,12 +57,12 @@ type Actions = {
 };
 
 const initialState: AuthState = {
-	accessToken: '',
-	refreshToken: '',
+	accessToken: undefined,
+	refreshToken: undefined,
 	loading: false,
-	error: {} as APIError,
-	user: {} as User,
-	email: '',
+	error: undefined,
+	user: undefined,
+	email: undefined,
 	isAccepted: false,
 };
 
@@ -94,8 +94,7 @@ const useAuthStore = create<AuthState & Actions>()(
 						try {
 							const user = get().user;
 							if (user) leaveChannel(user?._id);
-							AuthService.logout();
-							set(initialState);
+							await AuthService.logout();
 							req.onSuccess?.();
 						} catch (error) {
 							req.onError?.(error as APIError);

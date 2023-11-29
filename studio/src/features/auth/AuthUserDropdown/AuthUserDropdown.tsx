@@ -48,8 +48,8 @@ export default function AuthUserDropdown() {
 	function logoutHandler() {
 		logout({
 			onSuccess: () => {
-				navigate('/login');
 				resetAllStores();
+				navigate('/login');
 			},
 		});
 	}

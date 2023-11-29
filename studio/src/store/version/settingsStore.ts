@@ -451,18 +451,14 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 					try {
 						const version = await VersionService.saveUserDataModelInfo(params);
 						useVersionStore.setState({ version });
-						if (params.onSuccess) params?.onSuccess();
 					} catch (error) {
-						if (params.onError) params?.onError(error as APIError);
 						throw error as APIError;
 					}
 				},
 				addMissingUserDataModelFields: async (params) => {
 					try {
 						await VersionService.addMissingUserDataModelFields(params);
-						if (params.onSuccess) params?.onSuccess();
 					} catch (error) {
-						if (params.onError) params?.onError(error as APIError);
 						throw error as APIError;
 					}
 				},
@@ -470,9 +466,7 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 					try {
 						const version = await VersionService.saveRedirectURLs(params);
 						useVersionStore.setState({ version });
-						if (params.onSuccess) params?.onSuccess();
 					} catch (error) {
-						if (params.onError) params?.onError(error as APIError);
 						throw error as APIError;
 					}
 				},
@@ -480,9 +474,7 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 					try {
 						const version = await VersionService.saveEmailAuthSettings(params);
 						useVersionStore.setState({ version });
-						if (params.onSuccess) params?.onSuccess();
 					} catch (error) {
-						if (params.onError) params?.onError(error as APIError);
 						throw error as APIError;
 					}
 				},
@@ -490,9 +482,7 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 					try {
 						const version = await VersionService.savePhoneAuthSettings(params);
 						useVersionStore.setState({ version });
-						if (params.onSuccess) params?.onSuccess();
 					} catch (error) {
-						if (params.onError) params?.onError(error as APIError);
 						throw error as APIError;
 					}
 				},
@@ -500,18 +490,14 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 					try {
 						const version = await VersionService.createOAuthConfig(params);
 						useVersionStore.setState({ version });
-						if (params.onSuccess) params?.onSuccess();
 					} catch (error) {
-						if (params.onError) params?.onError(error as APIError);
 						throw error as APIError;
 					}
 				},
 				updateOAuthConfig: async (params) => {
 					try {
 						await VersionService.updateOAuthConfig(params);
-						if (params.onSuccess) params?.onSuccess();
 					} catch (error) {
-						if (params.onError) params?.onError(error as APIError);
 						throw error as APIError;
 					}
 				},
@@ -529,10 +515,7 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 								},
 							},
 						}));
-
-						if (params.onSuccess) params?.onSuccess();
 					} catch (error) {
-						if (params.onError) params?.onError(error as APIError);
 						throw error as APIError;
 					}
 				},
@@ -540,9 +523,7 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 					try {
 						const version = await VersionService.setAuthMessageTemplate(params);
 						useVersionStore.setState({ version });
-						if (params.onSuccess) params?.onSuccess();
 					} catch (error) {
-						if (params.onError) params?.onError(error as APIError);
 						throw error as APIError;
 					}
 				},

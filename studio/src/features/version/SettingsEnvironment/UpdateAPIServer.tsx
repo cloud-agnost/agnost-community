@@ -2,7 +2,7 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { API_SERVER_PARAM_REGEX, CPU_REGEX, MEMORY_REGEX } from '@/constants';
-import { useToast } from '@/hooks';
+import { useAuthorizeVersion, useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import { APIError } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -62,7 +62,7 @@ const APIServerFormSchema = z.object({
 });
 export default function UpdateAPIServer() {
 	const { notify } = useToast();
-
+	const canEdit = useAuthorizeVersion('version.update');
 	const apiServer = useEnvironmentStore((state) =>
 		state.resources.find((r) => r.type === 'engine'),
 	);
@@ -303,6 +303,7 @@ export default function UpdateAPIServer() {
 						size='lg'
 						className=' self-end'
 						loading={isPending}
+						disabled={!canEdit}
 					>
 						{t('general.save')}
 					</Button>

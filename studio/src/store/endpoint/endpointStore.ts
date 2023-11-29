@@ -166,6 +166,7 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 					return EndpointService.getEndpointsByIid(params);
 				},
 				testEndpoint: async (params) => {
+					console.log('here0');
 					const startTime = performance.now();
 					const prevRequest = get().endpointRequest;
 					const prevResponse = get().endpointResponse;
@@ -181,7 +182,7 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 						}));
 					}
 					const response = await EndpointService.testEndpoint(params);
-
+					console.log('here1', response);
 					if (prevRequest[params.epId]) {
 						set({
 							endpointRequest: {
@@ -202,6 +203,7 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 					}
 					const endTime = performance.now();
 					if (prevResponse[params.epId]) {
+						console.log('here2', response);
 						set((prev) => ({
 							endpointResponse: {
 								...prev.endpointResponse,
