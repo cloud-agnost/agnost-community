@@ -1,11 +1,9 @@
 import { ActionsCell } from '@/components/ActionsCell';
-import useAuthStore from '@/store/auth/authStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { ColumnDefWithClassName, Param } from '@/types';
 import { getVersionPermission, translate } from '@/utils';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
