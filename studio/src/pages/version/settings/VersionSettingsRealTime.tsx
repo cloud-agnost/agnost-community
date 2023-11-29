@@ -50,7 +50,11 @@ export default function VersionSettingsRealTime() {
 					title={t('version.realtime.activate_realtime')}
 					description={t('version.realtime.activate_realtime_desc')}
 				>
-					<Switch onCheckedChange={(enabled) => update({ enabled })} checked={realtime?.enabled} />
+					<Switch
+						onCheckedChange={(enabled) => update({ enabled })}
+						checked={realtime?.enabled}
+						disabled={!canEdit}
+					/>
 				</SettingsFormItem>
 				<SettingsFormItem
 					twoColumns

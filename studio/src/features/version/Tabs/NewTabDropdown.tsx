@@ -51,6 +51,7 @@ export default function NewTabDropdown() {
 
 	function onInput(value: string) {
 		value = value.trim();
+		console.log(value, !value);
 		if (!value) {
 			resetDesignElements();
 			return;
@@ -76,9 +77,14 @@ export default function NewTabDropdown() {
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className='tab-dropdown-content'>
 				<DropdownMenuLabel>
-					<SearchInput placeholder='Search' className='tab-search-input' onSearch={onInput} />
+					<SearchInput
+						placeholder='Search'
+						className='tab-search-input'
+						onSearch={onInput}
+						onClear={resetDesignElements}
+					/>
 				</DropdownMenuLabel>
-				<DropdownMenuItemContainer>
+				<DropdownMenuItemContainer className='overflow-auto max-h-96'>
 					{designElements.length > 0
 						? designElements.map((item) => (
 								<DropdownMenuItem asChild key={item._id} onClick={() => handleClickElement(item)}>
@@ -95,7 +101,12 @@ export default function NewTabDropdown() {
 						  ))
 						: NEW_TAB_ITEMS.sort((a, b) => a.title.localeCompare(b.title)).map((item) => (
 								<DropdownMenuItem onClick={() => handleAddTab(item)} asChild key={item.path}>
-									<span>{item.title}</span>
+									<div className='space-x-4'>
+										<div className='bg-lighter p-2 rounded-lg'>
+											{getIcon(capitalize(item.type) as TabTypes)}
+										</div>
+										<span className='text-default font-sfCompact text-base'>{item.title}</span>
+									</div>
 								</DropdownMenuItem>
 						  ))}
 				</DropdownMenuItemContainer>

@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/Separator';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { Switch } from '@/components/Switch';
-import { useToast, useUpdateEffect } from '@/hooks';
+import { useAuthorizeVersion, useToast, useUpdateEffect } from '@/hooks';
 import useTypeStore from '@/store/types/typeStore';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -39,21 +39,25 @@ const PhoneAuthSchema = z
 			.int()
 			.positive(),
 		smsProvider: z.nativeEnum(PhoneAuthSMSProviders).default(PhoneAuthSMSProviders.TWILIO),
-		providerConfig: z.object({
-			accountSID: z.string().optional(),
-			authToken: z.string().optional(),
-			fromNumberOrSID: z.string().optional(),
-			accessKey: z.string().optional(),
-			originator: z.string().optional(),
-			apiKey: z.string().optional(),
-			apiSecret: z.string().optional(),
-			from: z.string().optional(),
-		}),
+		providerConfig: z
+			.object({
+				accountSID: z.string().optional(),
+				authToken: z.string().optional(),
+				fromNumberOrSID: z.string().optional(),
+				accessKey: z.string().optional(),
+				originator: z.string().optional(),
+				apiKey: z.string().optional(),
+				apiSecret: z.string().optional(),
+				from: z.string().optional(),
+			})
+			.optional(),
 	})
 	.superRefine((val, ctx) => {
-		const { smsProvider, providerConfig } = val;
+		const { smsProvider, providerConfig, confirmPhone, enabled, allowCodeSignIn } = val;
 
-		if (smsProvider === PhoneAuthSMSProviders.TWILIO && !providerConfig.accountSID) {
+		if (!confirmPhone || !enabled || !allowCodeSignIn) return;
+
+		if (smsProvider === PhoneAuthSMSProviders.TWILIO && !providerConfig?.accountSID) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: t('forms.required', {
@@ -62,7 +66,7 @@ const PhoneAuthSchema = z
 				path: ['providerConfig', 'accountSID'],
 			});
 		}
-		if (smsProvider === PhoneAuthSMSProviders.TWILIO && !providerConfig.authToken) {
+		if (smsProvider === PhoneAuthSMSProviders.TWILIO && !providerConfig?.authToken) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: t('forms.required', {
@@ -72,7 +76,7 @@ const PhoneAuthSchema = z
 				path: ['providerConfig', 'authToken'],
 			});
 		}
-		if (smsProvider === PhoneAuthSMSProviders.TWILIO && !providerConfig.fromNumberOrSID) {
+		if (smsProvider === PhoneAuthSMSProviders.TWILIO && !providerConfig?.fromNumberOrSID) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: t('forms.required', {
@@ -81,7 +85,7 @@ const PhoneAuthSchema = z
 				path: ['providerConfig', 'fromNumberOrSID'],
 			});
 		}
-		if (smsProvider === PhoneAuthSMSProviders.MESSAGEBIRD && !providerConfig.accessKey) {
+		if (smsProvider === PhoneAuthSMSProviders.MESSAGEBIRD && !providerConfig?.accessKey) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: t('forms.required', {
@@ -90,7 +94,7 @@ const PhoneAuthSchema = z
 				path: ['providerConfig', 'accessKey'],
 			});
 		}
-		if (smsProvider === PhoneAuthSMSProviders.MESSAGEBIRD && !providerConfig.originator) {
+		if (smsProvider === PhoneAuthSMSProviders.MESSAGEBIRD && !providerConfig?.originator) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: t('forms.required', {
@@ -99,7 +103,7 @@ const PhoneAuthSchema = z
 				path: ['providerConfig', 'originator'],
 			});
 		}
-		if (smsProvider === PhoneAuthSMSProviders.VONAGE && !providerConfig.apiKey) {
+		if (smsProvider === PhoneAuthSMSProviders.VONAGE && !providerConfig?.apiKey) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: t('forms.required', {
@@ -108,7 +112,7 @@ const PhoneAuthSchema = z
 				path: ['providerConfig', 'apiKey'],
 			});
 		}
-		if (smsProvider === PhoneAuthSMSProviders.VONAGE && !providerConfig.apiSecret) {
+		if (smsProvider === PhoneAuthSMSProviders.VONAGE && !providerConfig?.apiSecret) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: t('forms.required', {
@@ -117,7 +121,7 @@ const PhoneAuthSchema = z
 				path: ['providerConfig', 'apiSecret'],
 			});
 		}
-		if (smsProvider === PhoneAuthSMSProviders.VONAGE && !providerConfig.from) {
+		if (smsProvider === PhoneAuthSMSProviders.VONAGE && !providerConfig?.from) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: t('forms.required', {
@@ -133,10 +137,13 @@ export default function PhoneAuthentication() {
 	const { version } = useVersionStore();
 	const { savePhoneAuthSettings } = useSettingsStore();
 	const { phoneAuthSMSProviders } = useTypeStore();
+	const canEdit = useAuthorizeVersion('version.auth.update');
+
 	const form = useForm<z.infer<typeof PhoneAuthSchema>>({
 		resolver: zodResolver(PhoneAuthSchema),
 		defaultValues: version?.authentication.phone,
 	});
+	console.log('phoneAuthSMSProviders', form.formState.errors);
 	const selectedProvider = phoneAuthSMSProviders.find(
 		(p) => p.provider === form.watch('smsProvider'),
 	);
@@ -195,145 +202,151 @@ export default function PhoneAuthentication() {
 					/>
 
 					<Separator />
-					<FormField
-						control={form.control}
-						name='confirmPhone'
-						render={({ field }) => (
-							<FormItem className='flex space-y-0 space-x-4'>
-								<FormControl>
-									<Checkbox
-										disabled={!form.getValues('enabled')}
-										checked={field.value}
-										onCheckedChange={field.onChange}
-									/>
-								</FormControl>
-								<div className='space-y-2'>
-									<FormLabel className='block'>
-										{t('version.authentication.confirm_mobile')}
-									</FormLabel>
-									<FormLabel className='block text-subtle'>
-										{t('version.authentication.confirm_mobile_desc')}
-									</FormLabel>
-								</div>
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name='allowCodeSignIn'
-						render={({ field }) => (
-							<FormItem className='flex space-y-0 space-x-4'>
-								<FormControl className='self-start'>
-									<Checkbox
-										disabled={!form.getValues('enabled')}
-										checked={field.value}
-										onCheckedChange={field.onChange}
-									/>
-								</FormControl>
-								<div className='space-y-4'>
-									<FormLabel className='block'>
-										{t('version.authentication.allow_signin_codes')}
-									</FormLabel>
-									<FormLabel className='block text-subtle'>
-										{t('version.authentication.allow_signin_codes_desc')}
-									</FormLabel>
-									{form.watch('allowCodeSignIn') && (
-										<>
-											<FormField
-												control={form.control}
-												name='expiresIn'
-												render={({ field }) => {
-													return (
-														<FormItem>
-															<FormLabel>
-																{t('version.authentication.link_expiry_duration')}
-															</FormLabel>
-															<FormControl>
-																<Input
-																	type='number'
-																	error={!!form.formState.errors.expiresIn}
-																	placeholder={
-																		t('forms.placeholder', {
-																			label: t('version.authentication.link_expiry_duration'),
-																		}) ?? ''
-																	}
-																	{...field}
-																/>
-															</FormControl>
-															<FormDescription>
-																{t('version.authentication.link_expiry_duration_desc')}
-															</FormDescription>
-															<FormMessage />
-														</FormItem>
-													);
-												}}
+					{form.watch('enabled') && (
+						<>
+							<FormField
+								control={form.control}
+								name='confirmPhone'
+								render={({ field }) => (
+									<FormItem className='flex space-y-0 space-x-4'>
+										<FormControl>
+											<Checkbox
+												disabled={!form.getValues('enabled')}
+												checked={field.value}
+												onCheckedChange={field.onChange}
 											/>
-											<FormField
-												control={form.control}
-												name='smsProvider'
-												render={({ field }) => (
-													<FormItem>
-														<FormLabel>
-															{t('version.authentication.select_sms_provider')}{' '}
-														</FormLabel>
-														<Select defaultValue={field.value} onValueChange={field.onChange}>
-															<FormControl>
-																<SelectTrigger className='w-full'>
-																	<SelectValue
-																		placeholder={t('version.authentication.select_provider')}
-																	/>
-																</SelectTrigger>
-															</FormControl>
-															<SelectContent>
-																{phoneAuthSMSProviders.map((p) => (
-																	<SelectItem
-																		key={p.provider}
-																		value={p.provider}
-																		className='max-w-full'
-																	>
-																		{p.provider}
-																	</SelectItem>
-																))}
-															</SelectContent>
-														</Select>
-
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
-											{selectedProvider?.params.map((p) => (
-												<FormField
-													key={p.name}
-													control={form.control}
-													name={`providerConfig.${p.name}`}
-													render={({ field }) => {
-														return (
-															<FormItem>
-																<FormLabel>{p.title}</FormLabel>
-																<FormControl>
-																	<Input
-																		error={!!form.formState.errors?.providerConfig?.[p.name]}
-																		placeholder={
-																			t('forms.placeholder', {
-																				label: p.title,
-																			}) ?? ''
-																		}
-																		{...field}
-																	/>
-																</FormControl>
-																<FormDescription>{p.description}</FormDescription>
-																<FormMessage />
-															</FormItem>
-														);
-													}}
+										</FormControl>
+										<div className='space-y-2'>
+											<FormLabel className='block'>
+												{t('version.authentication.confirm_mobile')}
+											</FormLabel>
+											<FormLabel className='block text-subtle'>
+												{t('version.authentication.confirm_mobile_desc')}
+											</FormLabel>
+										</div>
+									</FormItem>
+								)}
+							/>
+							{form.watch('confirmPhone') && (
+								<FormField
+									control={form.control}
+									name='allowCodeSignIn'
+									render={({ field }) => (
+										<FormItem className='flex space-y-0 space-x-4'>
+											<FormControl className='self-start'>
+												<Checkbox
+													disabled={!form.getValues('enabled')}
+													checked={field.value}
+													onCheckedChange={field.onChange}
 												/>
-											))}
-										</>
+											</FormControl>
+											<div className='space-y-4'>
+												<FormLabel className='block'>
+													{t('version.authentication.allow_signin_codes')}
+												</FormLabel>
+												<FormLabel className='block text-subtle'>
+													{t('version.authentication.allow_signin_codes_desc')}
+												</FormLabel>
+												{form.watch('allowCodeSignIn') && (
+													<>
+														<FormField
+															control={form.control}
+															name='expiresIn'
+															render={({ field }) => {
+																return (
+																	<FormItem>
+																		<FormLabel>
+																			{t('version.authentication.link_expiry_duration')}
+																		</FormLabel>
+																		<FormControl>
+																			<Input
+																				type='number'
+																				error={!!form.formState.errors.expiresIn}
+																				placeholder={
+																					t('forms.placeholder', {
+																						label: t('version.authentication.link_expiry_duration'),
+																					}) ?? ''
+																				}
+																				{...field}
+																			/>
+																		</FormControl>
+																		<FormDescription>
+																			{t('version.authentication.link_expiry_duration_desc')}
+																		</FormDescription>
+																		<FormMessage />
+																	</FormItem>
+																);
+															}}
+														/>
+														<FormField
+															control={form.control}
+															name='smsProvider'
+															render={({ field }) => (
+																<FormItem>
+																	<FormLabel>
+																		{t('version.authentication.select_sms_provider')}{' '}
+																	</FormLabel>
+																	<Select defaultValue={field.value} onValueChange={field.onChange}>
+																		<FormControl>
+																			<SelectTrigger className='w-full'>
+																				<SelectValue
+																					placeholder={t('version.authentication.select_provider')}
+																				/>
+																			</SelectTrigger>
+																		</FormControl>
+																		<SelectContent>
+																			{phoneAuthSMSProviders.map((p) => (
+																				<SelectItem
+																					key={p.provider}
+																					value={p.provider}
+																					className='max-w-full'
+																				>
+																					{p.provider}
+																				</SelectItem>
+																			))}
+																		</SelectContent>
+																	</Select>
+
+																	<FormMessage />
+																</FormItem>
+															)}
+														/>
+														{selectedProvider?.params.map((p) => (
+															<FormField
+																key={p.name}
+																control={form.control}
+																name={`providerConfig.${p.name}`}
+																render={({ field }) => {
+																	return (
+																		<FormItem>
+																			<FormLabel>{p.title}</FormLabel>
+																			<FormControl>
+																				<Input
+																					error={!!form.formState.errors?.providerConfig?.[p.name]}
+																					placeholder={
+																						t('forms.placeholder', {
+																							label: p.title,
+																						}) ?? ''
+																					}
+																					{...field}
+																				/>
+																			</FormControl>
+																			<FormDescription>{p.description}</FormDescription>
+																			<FormMessage />
+																		</FormItem>
+																	);
+																}}
+															/>
+														))}
+													</>
+												)}
+											</div>
+										</FormItem>
 									)}
-								</div>
-							</FormItem>
-						)}
-					/>
+								/>
+							)}
+						</>
+					)}
 
 					<Button
 						size='lg'
@@ -341,6 +354,7 @@ export default function PhoneAuthentication() {
 						type='submit'
 						variant='primary'
 						loading={isPending}
+						disabled={!canEdit}
 					>
 						{t('general.save')}
 					</Button>

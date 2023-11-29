@@ -56,7 +56,7 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 		}
 	}
 	async function saveEditorContent(language: string | undefined, cb?: (value: string) => void) {
-		const ed = editorRef.current;
+		const ed = globalThis.editor;
 		const val = ed?.getValue() as string;
 
 		if (language === 'json') {

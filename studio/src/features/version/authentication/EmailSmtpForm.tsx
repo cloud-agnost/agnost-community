@@ -13,9 +13,11 @@ import { useTranslation } from 'react-i18next';
 import { useFormContext } from 'react-hook-form';
 import * as z from 'zod';
 import { Switch } from '@/components/Switch';
+import { useAuthorizeVersion } from '@/hooks';
 export default function EmailSmtpForm() {
 	const { t } = useTranslation();
 	const form = useFormContext<z.infer<typeof EmailAuthenticationSchema>>();
+	const canEdit = useAuthorizeVersion('version.auth.update');
 	return (
 		<>
 			<FormField
@@ -113,6 +115,7 @@ export default function EmailSmtpForm() {
 								error={Boolean(form.formState.errors.customSMTP?.password)}
 								type='password'
 								placeholder={t('onboarding.smtp.enter_password').toString()}
+								disableShowPassword={!canEdit}
 								{...field}
 							/>
 						</FormControl>

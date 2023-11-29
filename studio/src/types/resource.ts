@@ -147,6 +147,9 @@ export interface GetResourcesRequest {
 	sortDir?: string;
 	search?: string;
 }
+export interface GetResourceRequest {
+	iid: string;
+}
 export interface Instance {
 	id: string;
 	name: string;

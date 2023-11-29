@@ -3,7 +3,7 @@ import { Button } from '@/components/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { FIELD_ICON_MAP, RESOURCE_ICON_MAP } from '@/constants';
-import { useToast } from '@/hooks';
+import { useAuthorizeVersion, useToast } from '@/hooks';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useSettingsStore from '@/store/version/settingsStore';
@@ -38,6 +38,7 @@ export default function SelectUserDataModel() {
 	const { models, getModelsOfDatabase } = useModelStore();
 	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
+	const canEdit = useAuthorizeVersion('version.auth.update');
 	const form = useForm<z.infer<typeof SaveUserModelSchema>>({
 		defaultValues: {
 			databaseId: databases?.find(
@@ -57,9 +58,10 @@ export default function SelectUserDataModel() {
 				appId: version.appId,
 			});
 		}
-	}, []);
+	}, [version]);
 	useEffect(() => {
 		const dbId = form.watch('databaseId');
+		console.log('dbId', dbId);
 		if (version && dbId) {
 			getModelsOfDatabase({
 				orgId: version.orgId,
@@ -69,6 +71,7 @@ export default function SelectUserDataModel() {
 			});
 		}
 	}, [form.watch('databaseId')]);
+
 	function getDatabaseIcon(type: string): React.ReactNode {
 		const Icon = RESOURCE_ICON_MAP[type];
 		return <Icon className='w-4 h-4' />;
@@ -87,7 +90,15 @@ export default function SelectUserDataModel() {
 				type: 'success',
 			});
 		},
-		onError: (error: APIError) => setError(error),
+		onError: (error: APIError) => {
+			setError(error);
+
+			notify({
+				title: t('general.error'),
+				description: error.details,
+				type: 'error',
+			});
+		},
 	});
 	const { mutateAsync: addMissingFieldsMutation, isPending: isLoadingAddFields } = useMutation({
 		mutationFn: addMissingUserDataModelFields,
@@ -133,7 +144,10 @@ export default function SelectUserDataModel() {
 	}
 
 	useEffect(() => {
-		if (version) {
+		const dbId = form.watch('databaseId');
+		const modelId = form.watch('modelId');
+		if (version && (!dbId || !modelId)) {
+			console.log('resetting form');
 			form.reset({
 				databaseId: databases?.find(
 					(db) => db.iid === version?.authentication?.userDataModel?.database,
@@ -143,7 +157,7 @@ export default function SelectUserDataModel() {
 				)?._id,
 			});
 		}
-	}, [version]);
+	}, [version, databases, models]);
 
 	return (
 		<SettingsFormItem
@@ -184,7 +198,7 @@ export default function SelectUserDataModel() {
 			)}
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className='flex-1 flex flex-col gap-6'>
-					<div className='flex items-center gap-4 flex-1'>
+					<div className='flex  gap-4 flex-1'>
 						<FormField
 							control={form.control}
 							name='databaseId'
@@ -198,6 +212,7 @@ export default function SelectUserDataModel() {
 											name={field.name}
 											onValueChange={(value) => {
 												field.onChange(value);
+												form.resetField('modelId');
 											}}
 										>
 											<FormControl>
@@ -277,7 +292,13 @@ export default function SelectUserDataModel() {
 							)}
 						/>
 					</div>
-					<Button type='submit' className='ml-auto self-end' size='lg' loading={isPending}>
+					<Button
+						type='submit'
+						className='ml-auto self-end'
+						size='lg'
+						loading={isPending}
+						disabled={!canEdit}
+					>
 						{t('general.save')}
 					</Button>
 				</form>

@@ -21,6 +21,12 @@ export default function CreateModel({
 	const { notify } = useToast();
 	const form = useForm<z.infer<typeof ModelSchema>>({
 		resolver: zodResolver(ModelSchema),
+		defaultValues: {
+			timestamps: {
+				createdAt: t('database.models.add.timestamps.createdAt.name') as string,
+				updatedAt: t('database.models.add.timestamps.updatedAt.field') as string,
+			},
+		},
 	});
 	const { versionId, appId, orgId, dbId } = useParams() as {
 		versionId: string;

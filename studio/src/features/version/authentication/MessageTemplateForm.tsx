@@ -4,7 +4,7 @@ import { CodeEditor } from '@/components/CodeEditor';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { Document } from '@/components/icons';
-import { useToast, useUpdateEffect } from '@/hooks';
+import { useAuthorizeVersion, useToast, useUpdateEffect } from '@/hooks';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { APIError, TemplateTypes, VersionMessageTemplate } from '@/types';
@@ -49,7 +49,7 @@ const MessageTemplatesSchema = z
 		fromEmail: z.string().email().optional(),
 	})
 	.superRefine((data, ctx) => {
-		const { type, subject, fromName, fromEmail } = data;
+		const { type, subject, fromEmail } = data;
 
 		if (type !== TemplateTypes.VerifySMSCode) {
 			if (!subject) {
@@ -59,15 +59,6 @@ const MessageTemplatesSchema = z
 						label: t('version.authentication.subject'),
 					}),
 					path: ['subject'],
-				});
-			}
-			if (!fromName) {
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					message: t('forms.required', {
-						label: t('version.authentication.fromName'),
-					}),
-					path: ['fromName'],
 				});
 			}
 			if (!fromEmail) {
@@ -86,6 +77,7 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 	const { notify } = useToast();
 	const { setAuthMessageTemplate } = useSettingsStore();
 	const { version } = useVersionStore();
+	const canEdit = useAuthorizeVersion('version.auth.update');
 	const form = useForm<z.infer<typeof MessageTemplatesSchema>>({
 		resolver: zodResolver(MessageTemplatesSchema),
 		defaultValues: template,
@@ -168,6 +160,7 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 								variant='primary'
 								onClick={(e) => e.stopPropagation()}
 								loading={isPending}
+								disabled={!canEdit}
 							>
 								{!isPending && <FloppyDisk className='mr-2' />}
 								{t('general.save')}
@@ -316,6 +309,7 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 												value={field.value}
 												onChange={field.onChange}
 												name='messageTemplate'
+												readonly={!canEdit}
 											/>
 										</FormControl>
 										<FormMessage />

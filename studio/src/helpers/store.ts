@@ -3,9 +3,7 @@ import { StateCreator, create as _create } from 'zustand';
 const storeResetFns = new Set<() => void>();
 
 export const resetAllStores = () => {
-	storeResetFns.forEach((resetFn) => {
-		resetFn();
-	});
+	localStorage.clear();
 };
 
 export const create = (<T>() => {

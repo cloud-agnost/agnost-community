@@ -1,4 +1,4 @@
-import { axios, http } from '@/helpers';
+import { axios, test } from '@/helpers';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import {
 	CreateEndpointParams,
@@ -150,7 +150,7 @@ export default class EndpointService {
 		} else {
 			opt = !isEmpty(formData) ? formDataObj : body;
 		}
-		return await http[method](
+		return await test[method](
 			`${useEnvironmentStore.getState().environment?.iid}${path}`,
 			opt,
 			options,

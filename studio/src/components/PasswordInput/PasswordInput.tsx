@@ -9,10 +9,11 @@ import './password-input.scss';
 export interface PasswordInputProps extends React.ComponentPropsWithoutRef<'input'> {
 	className?: string;
 	error?: boolean;
+	disableShowPassword?: boolean;
 }
 
 const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
-	({ className, value, placeholder, error, ...props }, ref) => {
+	({ className, value, placeholder, error, disableShowPassword = false, ...props }, ref) => {
 		const [inputValue, setInputValue] = useState(value);
 		const [showPassword, setShowPassword] = useState(false);
 
@@ -38,6 +39,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
 					iconOnly
 					variant='blank'
 					type='button'
+					disabled={disableShowPassword}
 				>
 					{showPassword ? <EyeSlash size={20} /> : <Eye size={20} />}
 				</Button>

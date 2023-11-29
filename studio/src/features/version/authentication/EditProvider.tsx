@@ -1,36 +1,37 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
-import { Form } from '@/components/Form';
-import { useToast } from '@/hooks';
 import useSettingsStore from '@/store/version/settingsStore';
-import { APIError, OAuthProvider } from '@/types';
-import { capitalize, translate as t } from '@/utils';
+import { APIError, VersionOAuthProvider } from '@/types';
+import { notify } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
+import { t } from 'i18next';
+import { capitalize } from 'lodash';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
-import * as z from 'zod';
+import { z } from 'zod';
 import ProviderFrom, { AddOAuthProviderSchema } from './ProviderFrom';
+import { Form } from '@/components/Form';
 
-interface AddProviderProps {
+interface EditProviderProps {
 	open: boolean;
 	onClose: () => void;
-	provider: OAuthProvider;
+	editedProvider?: VersionOAuthProvider;
 }
 
-export default function AddProvider({ open, onClose, provider }: AddProviderProps) {
-	const { notify } = useToast();
-	const { createOAuthConfig } = useSettingsStore();
+export default function EditProvider({ open, onClose, editedProvider }: EditProviderProps) {
+	const { updateOAuthConfig } = useSettingsStore();
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 	const form = useForm<z.infer<typeof AddOAuthProviderSchema>>({
 		resolver: zodResolver(AddOAuthProviderSchema),
 		defaultValues: {
-			provider: provider?.provider,
+			provider: editedProvider?.provider,
+			config: editedProvider?.config,
 		},
 	});
-	const { mutateAsync: createOAuthConfigMutate, isPending } = useMutation({
-		mutationKey: ['createOAuthConfig'],
-		mutationFn: createOAuthConfig,
+	const { mutateAsync: updateOAuthConfigMutate, isPending } = useMutation({
+		mutationKey: ['updateOAuthConfig'],
+		mutationFn: updateOAuthConfig,
 		onSuccess: () => handleCloseModel(),
 		onError: (error: APIError) => {
 			notify({
@@ -41,33 +42,32 @@ export default function AddProvider({ open, onClose, provider }: AddProviderProp
 		},
 	});
 
+	function handleCloseModel() {
+		onClose();
+		form.reset();
+	}
 	function onSubmit(data: z.infer<typeof AddOAuthProviderSchema>) {
-		createOAuthConfigMutate({
+		updateOAuthConfigMutate({
 			orgId,
 			versionId,
 			appId,
-			...data,
+			providerId: editedProvider?._id as string,
+			...data.config,
 		});
 	}
 
-	function handleCloseModel() {
-		form.reset();
-		onClose();
-	}
-
 	useEffect(() => {
-		if (open && provider) {
-			form.setValue('provider', provider.provider);
+		if (editedProvider) {
+			form.reset(editedProvider);
 		}
-	}, [provider]);
-
+	}, [editedProvider]);
 	return (
 		<Drawer open={open} onOpenChange={handleCloseModel}>
 			<DrawerContent position='right' size='lg'>
 				<DrawerHeader>
 					<DrawerTitle>
-						{t('version.authentication.add_provider_title', {
-							provider: capitalize(provider?.provider),
+						{t('version.authentication.edit_provider_title', {
+							provider: capitalize(editedProvider?.provider),
 						})}
 					</DrawerTitle>
 				</DrawerHeader>

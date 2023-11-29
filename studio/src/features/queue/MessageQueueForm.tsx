@@ -18,14 +18,15 @@ import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import * as z from 'zod';
 
-export default function MessageQueueForm({ edit }: { edit?: boolean }) {
+export default function MessageQueueForm({ edit, loading }: { edit?: boolean; loading: boolean }) {
 	const form = useFormContext<z.infer<typeof CreateMessageQueueSchema>>();
-	const { resources } = useResourceStore();
+	const { resources, resource } = useResourceStore();
 
 	const selectedResource = useMemo(
-		() => resources.find((item) => item._id === form.getValues('resourceId')),
-		[form.getValues('resourceId')],
+		() => (edit ? resource : resources.find((item) => item._id === form.getValues('resourceId'))),
+		[form.getValues('resourceId'), resources],
 	);
+
 	return (
 		<div className='space-y-6'>
 			<FormField
@@ -128,7 +129,7 @@ export default function MessageQueueForm({ edit }: { edit?: boolean }) {
 							{t('general.cancel')}
 						</Button>
 					</DrawerClose>
-					<Button className='ml-2' type='submit' size='lg'>
+					<Button className='ml-2' type='submit' size='lg' loading={loading}>
 						{t('general.save')}
 					</Button>
 				</div>

@@ -20,7 +20,7 @@ export default function Logs({ logs, className }: LogsProps) {
 	return (
 		<div
 			className={cn(
-				'overflow-auto max-h-[85%] bg-base whitespace-pre text-default text-sm font-mono',
+				'overflow-auto h-[85%] bg-base whitespace-pre text-default text-sm font-mono',
 				className,
 			)}
 		>
@@ -39,7 +39,7 @@ export default function Logs({ logs, className }: LogsProps) {
 					</div>
 				))
 			) : (
-				<div className='flex items-center justify-center h-32'>
+				<div className='flex items-center justify-center h-full w-full'>
 					<p>{t('general.no_logs')}</p>
 				</div>
 			)}
