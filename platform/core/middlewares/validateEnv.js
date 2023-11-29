@@ -35,23 +35,6 @@ export const validateEnv = async (req, res, next) => {
 			});
 		}
 
-		// Typically users can only manage their own environments, if the app member is in Admin role then they can manage all environments
-		// User check is added since if the endpoing is called using a master token we do not have the user information
-		if (
-			req.user &&
-			env.createdBy.toString() !== req.user._id.toString() &&
-			req.appMember.role !== "Admin"
-		) {
-			return res.status(401).json({
-				error: t("Not Authorized"),
-				details: t(
-					"You do not have the authorization to work on an environment with the provided id '%s'",
-					envId
-				),
-				code: ERROR_CODES.unauthorized,
-			});
-		}
-
 		// Assign environment data
 		req.env = env;
 

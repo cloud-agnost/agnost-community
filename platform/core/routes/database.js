@@ -4,6 +4,7 @@ import modelCtrl from "../controllers/model.js";
 import envCtrl from "../controllers/environment.js";
 import auditCtrl from "../controllers/audit.js";
 import deployCtrl from "../controllers/deployment.js";
+import versionCtrl from "../controllers/version.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validateOrg } from "../middlewares/validateOrg.js";
@@ -297,11 +298,45 @@ router.delete(
 				{ cacheKey: env._id, session }
 			);
 
+			let versionNeesUpdate = false;
+			let updatedVersion = null;
+			// Get the list of models associated with the database
+			const models = await modelCtrl.getManyByQuery({
+				dbId: db._id,
+				versionId: version._id,
+			});
+
+			for (let i = 0; i < models.length; i++) {
+				const model = models[i];
+				// If the model to be deleted is used as the model to store authenticated user data then return error
+				if (
+					version.authentication?.userDataModel?.database === db.iid &&
+					version.authentication?.userDataModel?.model === model.iid
+				) {
+					versionNeesUpdate = true;
+				}
+			}
+
 			// Delete the models associated with the database, we do not clear cache since it will eventually expire
 			await modelCtrl.deleteManyByQuery({ dbId: db._id }, { session });
 
 			// Delete the database
 			await dbCtrl.deleteOneById(db._id, { cacheKey: db._id, session });
+
+			if (versionNeesUpdate) {
+				updatedVersion = await versionCtrl.updateOneById(
+					version._id,
+					{},
+					{
+						"authentication.userDataModel.database": "",
+						"authentication.userDataModel.model": "",
+					},
+					{
+						cacheKey: version._id,
+						session,
+					}
+				);
+			}
 
 			// Commit the database transaction
 			await dbCtrl.commit(session);
@@ -320,6 +355,19 @@ router.delete(
 				{},
 				{ orgId: org._id, appId: app._id, versionId: version._id, dbId: db._id }
 			);
+
+			if (versionNeesUpdate) {
+				// Log action
+				auditCtrl.logAndNotify(
+					version._id,
+					user,
+					"org.app.version",
+					"update",
+					t("Unset authentication user data model"),
+					helper.decryptVersionData(updatedVersion),
+					{ orgId: org._id, appId: app._id, versionId: version._id }
+				);
+			}
 
 			refreshTypings(user, version);
 		} catch (err) {

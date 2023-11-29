@@ -169,8 +169,9 @@ router.post(
 
 			// Commit transaction
 			await versionCtrl.commit(session);
+			const decryptedVersion = helper.decryptVersionData(version);
 			res.json({
-				version: helper.decryptVersionData(version),
+				version: decryptedVersion,
 				resource,
 				resLog,
 				env,
@@ -194,7 +195,7 @@ router.post(
 				"org.app.version",
 				"create",
 				t("Created a new blank app version '%s'", name),
-				{ version, resource, env },
+				{ version: decryptedVersion, resource, env },
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (error) {
@@ -238,8 +239,9 @@ router.post(
 
 			// Commit transaction
 			await versionCtrl.commit(session);
+			const decryptedVersion = helper.decryptVersionData(version);
 			res.json({
-				version: helper.decryptVersionData(version),
+				version: decryptedVersion,
 				resource,
 				resLog,
 				env,
@@ -267,7 +269,7 @@ router.post(
 					name,
 					req.parentVersion.name
 				),
-				{ version, resource, env },
+				{ version: decryptedVersion, resource, env },
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (error) {
@@ -420,7 +422,8 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -437,7 +440,7 @@ router.put(
 				"org.app.version",
 				"update",
 				t("Updated app version '%s' properties", name),
-				version,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -793,7 +796,8 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -810,7 +814,7 @@ router.post(
 				"org.app.version.params",
 				"create",
 				t("Added a new parameter '%s'", name, app.name),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -854,7 +858,8 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -871,7 +876,7 @@ router.put(
 				"org.app.version.params",
 				"update",
 				t("Updated parameter '%s'", name),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -907,7 +912,8 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -924,7 +930,7 @@ router.delete(
 				"org.app.version.params",
 				"delete",
 				t("Deleted parameter '%s'", param.name),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -962,7 +968,8 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -979,7 +986,7 @@ router.delete(
 				"org.app.version.params",
 				"delete",
 				t("Deleted '%s' app parameter(s)", paramIds.length),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -1024,7 +1031,8 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1046,7 +1054,7 @@ router.post(
 					rate,
 					duration
 				),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -1092,7 +1100,8 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1109,7 +1118,7 @@ router.put(
 				"org.app.version.limits",
 				"update",
 				t("Updated rate limiter '%s'", name),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -1163,7 +1172,8 @@ router.delete(
 
 			// Commit updates
 			await versionCtrl.commit(session);
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1180,7 +1190,7 @@ router.delete(
 				"org.app.version.limits",
 				"delete",
 				t("Deleted rate limiter '%s'", limit.name),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -1245,7 +1255,8 @@ router.delete(
 
 			// Commit updates
 			await versionCtrl.commit(session);
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1262,7 +1273,7 @@ router.delete(
 				"org.app.version.limits",
 				"delete",
 				t("Deleted '%s' rate limiter(s)", limitIds.length),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -1307,7 +1318,8 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1324,7 +1336,7 @@ router.put(
 				"org.app.version",
 				"update",
 				t("Updated app version '%s' realtime properties", version.name),
-				version,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -1386,7 +1398,8 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(app, updatedVersion, user, "add-key");
@@ -1398,7 +1411,7 @@ router.post(
 				"org.app.version.keys",
 				"create",
 				t("Added a new API key '%s'", name),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -1461,7 +1474,8 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1478,7 +1492,7 @@ router.put(
 				"org.app.version.keys",
 				"update",
 				t("Updated API key '%s'", name),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -1514,7 +1528,8 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1531,7 +1546,7 @@ router.delete(
 				"org.app.version.keys",
 				"delete",
 				t("Deleted API key '%s'", key.name),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -1569,7 +1584,8 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1586,7 +1602,7 @@ router.delete(
 				"org.app.version.keys",
 				"delete",
 				t("Deleted '%s' API key(s)", keyIds.length),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -1765,7 +1781,8 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1782,7 +1799,7 @@ router.post(
 				"org.app.version.packages",
 				"create",
 				t("Added a new NPM package '%s@%s'", name, req.body.version),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -1824,7 +1841,8 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1846,7 +1864,7 @@ router.put(
 					npmPackage.version,
 					req.body.version
 				),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -1882,7 +1900,8 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1899,7 +1918,7 @@ router.delete(
 				"org.app.version.packages",
 				"delete",
 				t("Removed NPM package '%s'", npmPackage.name),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -1937,7 +1956,8 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -1954,7 +1974,7 @@ router.delete(
 				"org.app.version.packages",
 				"delete",
 				t("Removed '%s' NPM package(s)", packageIds.length),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -2031,7 +2051,8 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2052,7 +2073,7 @@ router.post(
 					database.name,
 					model.name
 				),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -2153,7 +2174,8 @@ router.post(
 			// Commit transaction
 			await versionCtrl.commit(session);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy database updates to environments if auto-deployment is enabled
 			await deployCtrl.updateDatabase(app, version, user, database, "update");
@@ -2190,7 +2212,7 @@ router.post(
 					database.name,
 					model.name
 				),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -2231,7 +2253,8 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2248,7 +2271,7 @@ router.post(
 				"org.app.version",
 				"update",
 				t("Set default redirect URLs to '%s'", redirectURLs.join(", ")),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -2319,7 +2342,8 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2336,7 +2360,7 @@ router.post(
 				"org.app.version",
 				"update",
 				t("Saved email based authentication settings"),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -2381,7 +2405,8 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2398,7 +2423,7 @@ router.post(
 				"org.app.version",
 				"update",
 				t("Saved phone based authentication settings"),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -2440,7 +2465,8 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2457,7 +2483,7 @@ router.post(
 				"org.app.version",
 				"update",
 				t("Configured '%s' oAuth settings", req.body.provider),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -2506,7 +2532,8 @@ router.put(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2523,7 +2550,7 @@ router.put(
 				"org.app.version",
 				"update",
 				t("Updated '%s' oAuth settings", oauthProvider.provider),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -2559,7 +2586,8 @@ router.delete(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2576,7 +2604,7 @@ router.delete(
 				"org.app.version",
 				"update",
 				t("Deleted '%s' oAuth settings", oauthProvider.provider),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {
@@ -2643,7 +2671,8 @@ router.post(
 				{ cacheKey: version._id }
 			);
 
-			res.json(helper.decryptVersionData(updatedVersion));
+			const decryptedVersion = helper.decryptVersionData(updatedVersion);
+			res.json(decryptedVersion);
 
 			// Deploy version updates to environments if auto-deployment is enabled
 			await deployCtrl.updateVersionInfo(
@@ -2660,7 +2689,7 @@ router.post(
 				"org.app.version",
 				"update",
 				t("Updated the authentication message template '%s'", type),
-				updatedVersion,
+				decryptedVersion,
 				{ orgId: org._id, appId: app._id, versionId: version._id }
 			);
 		} catch (err) {

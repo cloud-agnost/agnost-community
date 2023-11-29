@@ -163,7 +163,8 @@ router.post(
 			);
 
 			await resourceCtrl.commit(session);
-			res.json(resourceObj);
+			const decryptedResource = helper.decryptResourceData(resourceObj);
+			res.json(decryptedResource);
 
 			// Bind the managed resource
 			await resourceCtrl.manageClusterResources([
@@ -177,7 +178,7 @@ router.post(
 				"org.resource",
 				"add",
 				t("Added new '%s' resource '%s' named '%s'", type, instance, name),
-				resourceObj,
+				decryptedResource,
 				{ orgId: org._id, appId, resourceId }
 			);
 		} catch (error) {
@@ -243,7 +244,8 @@ router.post(
 			);
 
 			await resourceCtrl.commit(session);
-			res.json(resourceObj);
+			const decryptedResource = helper.decryptResourceData(resourceObj);
+			res.json(decryptedResource);
 
 			// For PostgreSQL the password is created by the operator
 			if (instance !== "PostgreSQL")
@@ -265,7 +267,7 @@ router.post(
 				"org.resource",
 				"create",
 				t("Created new '%s' resource '%s' named '%s'", type, instance, name),
-				resourceObj,
+				decryptedResource,
 				{ orgId: org._id, appId, resourceId }
 			);
 		} catch (error) {
@@ -324,7 +326,7 @@ router.get(
 				sort,
 			});
 
-			res.json(resources);
+			res.json(helper.decryptResourceData(resources));
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -363,17 +365,7 @@ router.get(
 				sort,
 			});
 
-			res.json(
-				resources.map((entry) => {
-					if (entry.access)
-						entry.access = helper.decryptSensitiveData(entry.access);
-					if (entry.accessReadOnly)
-						entry.accessReadOnly = helper.decryptSensitiveData(
-							entry.accessReadOnly
-						);
-					return entry;
-				})
-			);
+			res.json(helper.decryptResourceData(resources));
 		} catch (error) {
 			handleError(req, res, error);
 		}
@@ -415,7 +407,8 @@ router.put(
 			);
 
 			await resourceCtrl.commit(session);
-			res.json(updatedResource);
+			const decryptedResource = helper.decryptResourceData(updatedResource);
+			res.json(decryptedResource);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -429,7 +422,7 @@ router.put(
 					resource.instance,
 					resource.name
 				),
-				updatedResource,
+				decryptedResource,
 				{
 					orgId: org._id,
 					appId: updatedResource.appId,
@@ -542,7 +535,9 @@ router.put(
 			);
 
 			await resourceCtrl.commit(session);
-			res.json(updatedResource);
+
+			const decryptedResource = helper.decryptResourceData(updatedResource);
+			res.json(decryptedResource);
 
 			// Get all the impacted environments and associated versions so that we can refresh their deployments and API servers
 			const environments = await envCtrl.getManyByQuery({
@@ -571,7 +566,7 @@ router.put(
 					resource.instance,
 					resource.name
 				),
-				updatedResource,
+				decryptedResource,
 				{
 					orgId: org._id,
 					appId: updatedResource.appId,
@@ -677,7 +672,9 @@ router.put(
 			);
 
 			await resourceCtrl.commit(session);
-			res.json(updatedResource);
+
+			const decryptedResource = helper.decryptResourceData(updatedResource);
+			res.json(decryptedResource);
 
 			// Update the managed resource
 			await resourceCtrl.manageClusterResources([
@@ -695,7 +692,7 @@ router.put(
 					resource.instance,
 					resource.name
 				),
-				updatedResource,
+				decryptedResource,
 				{
 					orgId: org._id,
 					appId: updatedResource.appId,
