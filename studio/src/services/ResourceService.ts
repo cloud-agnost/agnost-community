@@ -3,6 +3,7 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import {
 	AddExistingResourceRequest,
 	CreateResourceRequest,
+	GetResourceRequest,
 	GetResourcesRequest,
 	Resource,
 	UpdateManagedResourceConfigurationRequest,
@@ -30,6 +31,9 @@ export default class ResourceService {
 				},
 			})
 		).data;
+	}
+	static async getResource(req: GetResourceRequest): Promise<Resource> {
+		return (await axios.get(`${this.getUrl()}/iid/${req.iid}`)).data;
 	}
 
 	static async testExistingResourceConnection(req: AddExistingResourceRequest) {

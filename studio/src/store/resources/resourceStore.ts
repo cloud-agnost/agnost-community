@@ -4,6 +4,7 @@ import {
 	APIError,
 	AddExistingResourceRequest,
 	CreateResourceRequest,
+	GetResourceRequest,
 	GetResourcesRequest,
 	Resource,
 	ResourceType,
@@ -15,6 +16,7 @@ import { joinChannel, leaveChannel } from '@/utils';
 import { devtools, persist } from 'zustand/middleware';
 export interface ResourceStore {
 	resources: Resource[];
+	resource: Resource | null;
 	isCreateResourceModalOpen: boolean;
 	resourceConfig: {
 		instance: string;
@@ -30,6 +32,7 @@ export interface ResourceStore {
 
 type Actions = {
 	getResources: (req: GetResourcesRequest) => Promise<Resource[]>;
+	getResource: (req: GetResourceRequest) => Promise<Resource>;
 	testExistingResourceConnection: (req: AddExistingResourceRequest) => Promise<void>;
 	addExistingResource: (req: AddExistingResourceRequest) => Promise<Resource>;
 	toggleCreateResourceModal: () => void;
@@ -50,6 +53,7 @@ type Actions = {
 };
 const initialState: ResourceStore = {
 	resources: [],
+	resource: null,
 	isCreateResourceModalOpen: false,
 	resourceConfig: {
 		type: '',
@@ -78,6 +82,19 @@ const useResourceStore = create<ResourceStore & Actions>()(
 							joinChannel(resource._id);
 						});
 						return resources;
+					} catch (error) {
+						throw error as APIError;
+					}
+				},
+
+				getResource: async (req: GetResourceRequest) => {
+					try {
+						const resource = await ResourceService.getResource(req);
+						set({
+							resource,
+						});
+						joinChannel(resource._id);
+						return resource;
 					} catch (error) {
 						throw error as APIError;
 					}
