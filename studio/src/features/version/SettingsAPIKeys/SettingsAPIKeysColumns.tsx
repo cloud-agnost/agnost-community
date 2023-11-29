@@ -1,11 +1,9 @@
 import { ActionsCell } from '@/components/ActionsCell';
-import useAuthStore from '@/store/auth/authStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIKey, APIKeyTypes, ColumnDefWithClassName } from '@/types';
 import { getVersionPermission, translate } from '@/utils';
-import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import { Badge } from 'components/Badge';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { Checkbox } from 'components/Checkbox';

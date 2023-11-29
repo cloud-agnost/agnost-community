@@ -90,7 +90,7 @@ router.post(
 				object: "org.resource",
 				description: t("Resource status updated to '%s'", status.status),
 				timestamp: Date.now(),
-				data: updatedResource,
+				data: helper.decryptResourceData(updatedResource),
 				identifiers: {
 					orgId: resource.orgId,
 					resourceId: resource._id,
