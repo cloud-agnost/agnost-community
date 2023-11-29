@@ -25,7 +25,6 @@ class Environment extends RealtimeActions<EnvType> {
 				return env;
 			}),
 			environment: param.data,
-			envStatus: useEnvironmentStore.getState?.().setEnvStatus(param.data),
 		});
 	}
 	create(param: RealtimeActionParams<EnvType>): void {

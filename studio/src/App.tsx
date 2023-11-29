@@ -1,4 +1,4 @@
-import { useRealtime, useRenewToken } from '@/hooks';
+import { useRealtime, useRenewToken, useEnvironmentStatus } from '@/hooks';
 import '@/i18n/config';
 import { router } from '@/router';
 import useAuthStore from '@/store/auth/authStore.ts';
@@ -15,6 +15,7 @@ const queryClient = new QueryClient();
 function App() {
 	useRenewToken(2);
 	useRealtime();
+	useEnvironmentStatus();
 
 	const { getAllTypes } = useTypeStore();
 	const { accessToken } = useAuthStore();
