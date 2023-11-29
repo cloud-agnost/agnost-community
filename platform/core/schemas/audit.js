@@ -89,6 +89,11 @@ export const AuditModel = mongoose.model(
 			ref: "function",
 			index: true,
 		},
+		domainId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "domain",
+			index: true,
+		},
 		// Action type e.g., create, update, delete, deploy, merge
 		action: {
 			type: String,
