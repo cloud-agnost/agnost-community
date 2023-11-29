@@ -72,5 +72,6 @@
 	"delete": {
 		"title": "Delete Endpoint",
 		"message": "Are you sure you want to delete endpoint ? This action is not reversible — please continue with caution."
-	}
+	},
+	"logs": "Endpoint Logs"
 }
