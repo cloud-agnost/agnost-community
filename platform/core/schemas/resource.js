@@ -350,9 +350,15 @@ export const applyRules = (type) => {
 						});
 
 						if (
-							["this", "mongodb", "rabbitmq-server", "redis-master"].includes(
-								value.toLowerCase()
-							)
+							[
+								"mongodb",
+								"rabbitmq-server",
+								"redis-master",
+								"redis",
+								"redis-headless",
+								"rabbitmq",
+								"minio",
+							].includes(value.toLowerCase())
 						) {
 							throw new AgnostError(
 								t(
@@ -510,7 +516,6 @@ export const applyRules = (type) => {
 
 						if (
 							[
-								"this",
 								"mongodb",
 								"rabbitmq-server",
 								"redis-master",
