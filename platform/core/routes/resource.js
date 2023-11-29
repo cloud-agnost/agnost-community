@@ -484,6 +484,20 @@ router.put(
 			const { org, user, resource } = req;
 			let { access, accessReadOnly } = req.body;
 
+			if (resource.managed) {
+				await resourceCtrl.endSession(session);
+
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"The %s resource named '%s' is a managed resource. You cannot update access settings of a resource that is managed by the Agnost cluster.",
+						resource.instance,
+						resource.name
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
 			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
 			// unless the previous one is completed
 			if (
@@ -634,7 +648,7 @@ router.put(
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"The %s resource named '%s' is not a managed resource. You need update configuration of a resource that is not managed by the Agnost cluster.",
+						"The %s resource named '%s' is not a managed resource. You cannot update configuration of a resource that is not managed by the Agnost cluster.",
 						resource.instance,
 						resource.name
 					),
