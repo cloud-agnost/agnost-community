@@ -19,7 +19,7 @@ export default function VersionLogDetails({ open, onClose }: VersionLogDetailsPr
 					<div className='space-y-4 h-[80%]'>
 						<p className='text-default font-sfCompact text-sm'>{t('version.details')}</p>
 						<CodeEditor
-							value={JSON.stringify(log?.responseBody ?? log?.errors ?? {}, null, 2)}
+							value={JSON.stringify(log, null, 2)}
 							defaultLanguage='json'
 							containerClassName='h-full'
 							className='h-full'

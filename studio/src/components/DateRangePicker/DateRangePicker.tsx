@@ -1,9 +1,10 @@
 import { Button } from '@/components/Button';
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from '@/components/Popover';
-import { cn } from '@/utils';
+import { DATE_FORMAT, cn, formatDate } from '@/utils';
 import { CalendarBlank } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { DateRangePicker as DateRange, Range, RangeKeyDict } from 'react-date-range';
+
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 
@@ -27,7 +28,8 @@ export function DateRangePicker({ date, onChange }: DateRangePickerProps) {
 					<CalendarBlank size={16} className='mr-2' />
 					{date ? (
 						<span>
-							{date[0]?.startDate?.toLocaleDateString()} - {date[0].endDate?.toLocaleDateString()}
+							{formatDate(date[0].startDate as Date, DATE_FORMAT)} -{' '}
+							{formatDate(date[0].endDate as Date, DATE_FORMAT)}
 						</span>
 					) : (
 						<span>Pick a date</span>

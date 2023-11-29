@@ -1,9 +1,10 @@
 import { Checkbox } from '@/components/Checkbox';
+import { DateText } from '@/components/DateText';
 import { ResendButton } from '@/components/ResendButton';
 import { TableConfirmation } from '@/components/Table';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Invitation } from '@/types';
-import { formatDate, getOrgPermission, notify, translate } from '@/utils';
+import { getOrgPermission, notify, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
@@ -41,8 +42,7 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 		header: 'Invited At',
 		accessorKey: 'createdAt',
 		size: 200,
-		cell: ({ row }) =>
-			formatDate(row.original.createdAt, { month: 'short', day: 'numeric', year: 'numeric' }),
+		cell: ({ row }) => <DateText date={row.original.createdAt} />,
 	},
 	{
 		id: 'role',

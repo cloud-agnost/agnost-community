@@ -4,8 +4,8 @@ import { Clock, Calendar, Files } from '@phosphor-icons/react';
 import { BADGE_COLOR_MAP } from '@/constants';
 import useVersionStore from '@/store/version/versionStore';
 import { ColumnDefWithClassName, VersionLog } from '@/types';
-import { capitalize, translate } from '@/utils';
-import { DateTime } from 'luxon';
+import { DATETIME_MED_WITH_SECONDS, capitalize, translate, formatDate } from '@/utils';
+
 const { openVersionLogDetails } = useVersionStore.getState();
 export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	{
@@ -23,9 +23,7 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 				<div className='flex items-center gap-2'>
 					<Calendar size={16} />
 					<span className='whitespace-nowrap text-default'>
-						{DateTime.fromISO(timestamp)
-							.setLocale('en')
-							.toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS)}
+						{formatDate(timestamp, DATETIME_MED_WITH_SECONDS)}
 					</span>
 				</div>
 			);

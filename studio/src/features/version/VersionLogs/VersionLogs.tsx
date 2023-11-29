@@ -1,16 +1,15 @@
 import { DateRangePicker } from '@/components/DateRangePicker';
 import { VersionLogDetails } from '@/features/version/VersionLogs';
 import useVersionStore from '@/store/version/versionStore';
-import { calculateRecommendedBuckets } from '@/utils';
+import { calculateRecommendedBuckets, toIsoString } from '@/utils';
 import { useQuery } from '@tanstack/react-query';
-import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 import { Range } from 'react-date-range';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import VersionLogCharts from './VersionLogCharts';
 import VersionLogsTable from './VersionLogsTable';
-
+import { startOfDay, endOfDay } from 'date-fns';
 interface VersionLogsProps {
 	type: 'queue' | 'task' | 'endpoint';
 }
@@ -26,16 +25,16 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [date, setDate] = useState<Range[]>([
 		{
-			startDate: new Date(),
-			endDate: DateTime.now().plus({ days: 1 }).toJSDate(),
+			startDate: startOfDay(new Date()),
+			endDate: endOfDay(new Date()),
 			key: 'selection',
 		},
 	]);
 
 	function selectDate(date: Range[]) {
 		setDate(date);
-		searchParams.set('start', date[0].startDate?.toISOString() ?? '');
-		searchParams.set('end', date[0].endDate?.toISOString() ?? '');
+		searchParams.set('start', toIsoString(date[0].startDate as Date) ?? '');
+		searchParams.set('end', toIsoString(date[0].endDate as Date) ?? '');
 		setSearchParams(searchParams);
 	}
 
@@ -47,8 +46,8 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 				orgId: orgId as string,
 				versionId: versionId as string,
 				type,
-				start: searchParams.get('start') ?? date[0].startDate?.toISOString() ?? '',
-				end: searchParams.get('end') ?? date[0].endDate?.toISOString() ?? '',
+				start: searchParams.get('start') ?? toIsoString(date[0].startDate as Date) ?? '',
+				end: searchParams.get('end') ?? toIsoString(date[0].endDate as Date) ?? '',
 				buckets: calculateRecommendedBuckets(date[0].startDate as Date, date[0].endDate as Date),
 			}),
 		refetchOnWindowFocus: false,

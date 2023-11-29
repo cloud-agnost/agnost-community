@@ -8,7 +8,6 @@ import { TableLoading } from '@/components/Table/Table';
 import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore';
 import { ApplicationMember, FormatOptionLabelProps, NotificationActions } from '@/types';
-import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 import { Range } from 'react-date-range';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +15,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { NOTIFICATION_ACTIONS } from '@/constants';
 import { capitalize } from '@/utils';
+import { startOfDay, endOfDay } from 'date-fns';
 
 interface MemberSearch {
 	label: string;
@@ -82,8 +82,8 @@ export default function VersionNotifications() {
 
 	const [date, setDate] = useState<Range[]>([
 		{
-			startDate: new Date(),
-			endDate: DateTime.now().plus({ days: 1 }).toJSDate(),
+			startDate: startOfDay(new Date()),
+			endDate: endOfDay(new Date()),
 			key: 'selection',
 		},
 	]);
@@ -105,7 +105,7 @@ export default function VersionNotifications() {
 				searchParams.set(paramName, updatedValues.join(','));
 			} else {
 				currentParamArray?.push(paramValue);
-				searchParams.set(paramName, currentParamArray?.join(',') as string);
+				searchParams.set(paramName, currentParamArray?.join(','));
 			}
 		}
 
@@ -143,8 +143,8 @@ export default function VersionNotifications() {
 		setSearchParams(searchParams);
 		setDate([
 			{
-				startDate: new Date(),
-				endDate: DateTime.now().plus({ days: 1 }).toJSDate(),
+				startDate: startOfDay(new Date()),
+				endDate: endOfDay(new Date()),
 				key: 'selection',
 			},
 		]);
