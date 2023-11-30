@@ -96,7 +96,7 @@ function UpdateInvitationUserRole({ member, role }: { member: OrganizationMember
 		<RoleSelect
 			disabled={member.member.isOrgOwner || !canUpdate}
 			role={role}
-			type={'app'}
+			type='org'
 			onSelect={(newRole) => updateRole(member.member._id, newRole)}
 		/>
 	);
