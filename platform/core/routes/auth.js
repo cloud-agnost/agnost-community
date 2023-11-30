@@ -32,7 +32,7 @@ const router = express.Router({ mergeParams: true });
 /*
 @route      /v1/auth/init-cluster-setup
 @method     POST
-@desc       Initializes the cluster set-up. Signs up the cluster owner using email/password verification. Sends a verification code to the email address.
+@desc       Initializes the cluster set-up. Signs up the cluster owner using email/password verification.
 			By default also creates a top level new account for the user and assigns the contact email to the login profile email.
 			By default also creates the cluster configuration entry in the database.
 @access     public

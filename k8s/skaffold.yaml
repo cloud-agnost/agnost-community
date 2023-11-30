@@ -92,7 +92,7 @@ build:
 deploy:
    statusCheckDeadlineSeconds: 300
    kubectl:
-      defaultNamespace: default
+      defaultNamespace: yoda
       manifests:
          - dev/platform-core-deployment.yaml
          - dev/platform-worker-deployment.yaml

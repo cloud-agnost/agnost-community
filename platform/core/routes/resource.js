@@ -484,6 +484,20 @@ router.put(
 			const { org, user, resource } = req;
 			let { access, accessReadOnly } = req.body;
 
+			if (resource.managed) {
+				await resourceCtrl.endSession(session);
+
+				return res.status(422).json({
+					error: t("Not Allowed"),
+					details: t(
+						"The %s resource named '%s' is a managed resource. You cannot update access settings of a resource that is managed by the Agnost cluster.",
+						resource.instance,
+						resource.name
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
 			// If the resouce is already under create, update or delete operations, then do not allow the new configuration update
 			// unless the previous one is completed
 			if (
@@ -634,7 +648,7 @@ router.put(
 				return res.status(422).json({
 					error: t("Not Allowed"),
 					details: t(
-						"The %s resource named '%s' is not a managed resource. You need update configuration of a resource that is not managed by the Agnost cluster.",
+						"The %s resource named '%s' is not a managed resource. You cannot update configuration of a resource that is not managed by the Agnost cluster.",
 						resource.instance,
 						resource.name
 					),
@@ -976,6 +990,79 @@ router.post(
 				),
 				updatedLog,
 				{ orgId: org._id, appId: resource.appId, resourceId: resource._id }
+			);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/resource/:resourceId/update-read-access-settings
+@method     POST
+@desc       Updates the access settings for read replicas of the resource. 
+@access     private
+*/
+router.post(
+	"/:resourceId/update-read-access-settings",
+	checkContentType,
+	authMasterToken,
+	validateOrg,
+	validateResource,
+	async (req, res) => {
+		try {
+			const { org, resource } = req;
+
+			// Get user information
+			let user = await userCtrl.getOneById(resource.updatedBy, {
+				cacheKey: resource.updatedBy,
+			});
+
+			const updatedResource = await resourceCtrl.updateOneById(
+				resource._id,
+				{
+					accessReadOnly: req.body,
+				},
+				{},
+				{ cacheKey: resource._id }
+			);
+
+			res.json();
+
+			// Get all the impacted environments and associated versions so that we can refresh their deployments and API servers
+			const environments = await envCtrl.getManyByQuery({
+				orgId: org._id,
+				"mappings.resource.iid": resource.iid,
+			});
+
+			// Refresh the deployment data and respective API servers
+			environments.forEach(async (element) => {
+				deployCtrl.updateResourceAccessSettings(
+					element.appId,
+					element.versionId,
+					updatedResource,
+					user
+				);
+			});
+
+			// Log action
+			const decryptedResource = helper.decryptResourceData(updatedResource);
+			auditCtrl.logAndNotify(
+				org._id,
+				user,
+				"org.resource",
+				"update",
+				t(
+					"Updated read-only replica access settings of '%s' resource named '%s'",
+					resource.instance,
+					resource.name
+				),
+				decryptedResource,
+				{
+					orgId: org._id,
+					appId: updatedResource.appId,
+					resourceId: resource._id,
+				}
 			);
 		} catch (error) {
 			handleError(req, res, error);

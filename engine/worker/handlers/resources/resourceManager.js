@@ -192,20 +192,53 @@ export class ResourceManager {
                             resource.config.size,
                             resource.config.replicas
                         );
-                    else if (this.getResourceInstance() === "PostgreSQL")
+                    else if (this.getResourceInstance() === "PostgreSQL") {
                         await updatePostgresql(
                             this.getResourceName(),
                             resource.config.version,
                             resource.config.size,
                             resource.config.instances
                         );
-                    else if (this.getResourceInstance() === "MySQL")
+
+                        // We have deleted the read-only replicas
+                        if (resource.config.instances === 1 && resource.accessReadOnly.length === 1) {
+                            this.updateResourceReadOnlyAccessSettings([]);
+                        }
+                        // We have added the read-only replicas
+                        else if (resource.config.instances > 1 && resource.accessReadOnly.length === 0) {
+                            this.updateResourceReadOnlyAccessSettings([
+                                {
+                                    host: `${resource.name}-repl.${process.env.NAMESPACE}.svc.cluster.local`,
+                                    port: 5432,
+                                    username: "postgres",
+                                    password: resource.access.password,
+                                },
+                            ]);
+                        }
+                    } else if (this.getResourceInstance() === "MySQL") {
                         await updateMySQLResource(
                             this.getResourceName(),
                             resource.config.version,
                             resource.config.instances,
                             resource.config.size
                         );
+
+                        // We have deleted the read-only replicas
+                        if (resource.config.instances === 1 && resource.accessReadOnly.length === 1) {
+                            this.updateResourceReadOnlyAccessSettings([]);
+                        }
+                        // We have added the read-only replicas
+                        else if (resource.config.instances > 1 && resource.accessReadOnly.length === 0) {
+                            this.updateResourceReadOnlyAccessSettings([
+                                {
+                                    host: `${resource.name}.${process.env.NAMESPACE}.svc.cluster.local`,
+                                    port: 6447, // Readonly port
+                                    username: resource.access.username,
+                                    password: resource.access.password,
+                                },
+                            ]);
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -1115,6 +1148,31 @@ export class ResourceManager {
                 },
             }
         );
+    }
+
+    /**
+     * Updates the read-only replica access settings of the resource
+     */
+    async updateResourceReadOnlyAccessSettings(accessReadOnly) {
+        const resource = this.getResource();
+
+        // Encrypt sensitive access data
+        accessReadOnly = helper.encyrptSensitiveData(accessReadOnly);
+        try {
+            // Update the resource log object
+            await axios.post(
+                `${config.get("general.platformBaseUrl")}/v1/org/${resource.orgId}/resource/${
+                    resource._id
+                }/update-read-access-settings`,
+                accessReadOnly,
+                {
+                    headers: {
+                        Authorization: process.env.MASTER_TOKEN,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+        } catch (err) {}
     }
 
     /**

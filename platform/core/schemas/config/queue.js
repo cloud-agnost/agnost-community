@@ -74,7 +74,7 @@ export default (actionType) => {
 					throw new AgnostError(
 						t(
 							"RabbitMQ cluster scale down not supported. You cannot decrease the replica count from '%s' to '%s'.",
-							req.resource?.config.size,
+							req.resource?.config.replicas,
 							value
 						)
 					);
