@@ -102,9 +102,7 @@ export default async function monitorResources() {
 							await updateLatestResourceLog(resource, result);
 						}
 					}
-				} catch (err) {
-					console.log("***err", err, resource.name);
-				}
+				} catch (err) {}
 			}
 
 			// Interate to the next page

@@ -69,8 +69,7 @@ class ConnectionManager {
                     });
 
                     await client.connect();
-                    client.on("error", (err) => {});
-                    client.on("end", () => {});
+                    client.on("error", (err, errClient) => {});
 
                     this.addConnection(id, client);
 

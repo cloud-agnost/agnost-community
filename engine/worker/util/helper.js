@@ -255,4 +255,5 @@ export default {
     decryptSensitiveData,
     encyrptSensitiveData,
     getCertSecretName,
+    decryptText,
 };
