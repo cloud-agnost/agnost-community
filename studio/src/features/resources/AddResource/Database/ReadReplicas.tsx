@@ -9,24 +9,19 @@ import {
 	DialogTrigger,
 } from '@/components/Dialog';
 import { Form } from '@/components/Form';
-import { Pencil, TestConnection } from '@/components/icons';
+import { Pencil } from '@/components/icons';
+import { INSTANCE_PORT_MAP } from '@/constants';
+import { DatabaseInfo, MongoConnectionFormat, TestConnectionButton } from '@/features/resources';
 import { AccessDbSchema, ConnectResourceSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash } from '@phosphor-icons/react';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-import { DatabaseInfo, MongoConnectionFormat, TestConnectionButton } from '@/features/resources';
-import useResourceStore from '@/store/resources/resourceStore';
-import { useToast } from '@/hooks';
-import { INSTANCE_PORT_MAP } from '@/constants';
 
 export default function ReadReplicas() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
-	const { testExistingResourceConnection } = useResourceStore();
-	const [openModal, setOpenModal] = useState(false);
 	const { setValue, getValues, reset, watch } =
 		useFormContext<z.infer<typeof ConnectResourceSchema>>();
 	const readReplicas = getValues('accessReadOnly') ?? [];
@@ -36,7 +31,6 @@ export default function ReadReplicas() {
 
 	function addNewReplica(data: any) {
 		setValue('accessReadOnly', [...readReplicas, data]);
-		setOpenModal(false);
 		replicasForm.reset();
 	}
 
@@ -55,19 +49,6 @@ export default function ReadReplicas() {
 			port: replica.port,
 			username: replica.username,
 			password: replica.password,
-		});
-		setOpenModal(true);
-	}
-	async function testResourceConnection() {
-		testExistingResourceConnection({
-			access: {
-				...replicasForm.getValues(),
-				options: replicasForm.getValues().options?.filter((option) => option.key && option.value),
-				brokers: replicasForm.getValues().brokers?.map((broker) => broker.key) as string[],
-			},
-			type: getValues('type'),
-			instance: getValues('instance'),
-			allowedRoles: getValues('allowedRoles'),
 		});
 	}
 

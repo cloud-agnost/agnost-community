@@ -18,7 +18,7 @@ import {
 	FormLabel,
 	FormMessage,
 } from 'components/Form';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';

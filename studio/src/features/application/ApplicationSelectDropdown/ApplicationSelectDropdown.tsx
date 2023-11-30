@@ -11,7 +11,6 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
 import ApplicationCreateModal from '@/features/application/ApplicationCreateModal.tsx';
 import useApplicationStore from '@/store/app/applicationStore';
-import useAuthStore from '@/store/auth/authStore.ts';
 import { Application } from '@/types';
 import { cn } from '@/utils';
 import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
@@ -122,8 +121,6 @@ interface ApplicationLabelProps {
 }
 
 const ApplicationLabel = ({ application, onClick }: ApplicationLabelProps) => {
-	const { user } = useAuthStore();
-
 	function openAppSettings(e: MouseEvent<HTMLButtonElement>) {
 		if (onClick) {
 			e.stopPropagation();
