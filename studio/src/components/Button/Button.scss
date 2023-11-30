@@ -18,7 +18,7 @@
 	}
 
 	&-outline {
-		@apply border border-button-border hover:border-button-border-hover text-default #{!important};
+		@apply border border-button-border hover:border-button-border-hover text-default hover:bg-button-secondary-hover #{!important};
 	}
 	&-md {
 		@apply py-2 px-4;
