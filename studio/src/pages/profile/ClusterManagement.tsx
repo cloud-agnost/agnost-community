@@ -42,14 +42,6 @@ export default function ProfileSettingsClusterManagement() {
 					<SettingsFormItem
 						className='space-y-0 py-0 pb-6'
 						contentClassName='pt-6'
-						title={t('cluster.clusterVersion')}
-						description={t('cluster.transferClusterOwnership')}
-					>
-						<span className='text-subtle text-sm font-sfCompact'>{organization?.iid}</span>
-					</SettingsFormItem>
-					<SettingsFormItem
-						className='space-y-0 py-0 pb-6'
-						contentClassName='pt-6'
 						title={t('cluster.transferClusterOwnership')}
 						description={t('cluster.transferClusterOwnershipDescription')}
 					>
