@@ -68,7 +68,7 @@ type Actions = {
 	updateNotificationLastSeen: () => void;
 	searchDesignElements: (params: SearchDesignElementParams) => Promise<DesignElement[]>;
 	resetDesignElements: () => void;
-	getVersionDashboardInfo: (params: BaseParams) => Promise<void>;
+	getVersionDashboardInfo: (params: BaseParams) => Promise<Dashboard>;
 	getNpmPackages: (params: BaseParams) => Promise<void>;
 	getTypings: (params: BaseParams) => Promise<Record<string, string>>;
 	fetchTypes: (packages: Record<string, string>) => Promise<void>;
@@ -284,6 +284,7 @@ const useVersionStore = create<VersionStore & Actions>()(
 					try {
 						const dashboard = await VersionService.getVersionsDashboardInfo(params);
 						set({ dashboard });
+						return dashboard;
 					} catch (error) {
 						throw error as APIError;
 					}
