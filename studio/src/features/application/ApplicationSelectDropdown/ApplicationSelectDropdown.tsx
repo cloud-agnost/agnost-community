@@ -139,9 +139,7 @@ const ApplicationLabel = ({ application, onClick }: ApplicationLabelProps) => {
 			</Avatar>
 			<div className='application-dropdown-label'>
 				<div className='application-dropdown-name'>{application?.name}</div>
-				<div className='application-dropdown-desc'>
-					{application?.team.find((team) => team.userId._id === user?._id)?.role}
-				</div>
+				<div className='application-dropdown-desc'>{application?.role}</div>
 			</div>
 		</Button>
 	);
