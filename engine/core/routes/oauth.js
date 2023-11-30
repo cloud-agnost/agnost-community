@@ -2,6 +2,7 @@ import express from "express";
 import axios from "axios";
 import passport from "passport";
 import responseTime from "response-time";
+import { agnost } from "@agnost/server";
 import { OAuth2Strategy as GoogleStrategy } from "passport-google-oauth";
 import { Strategy as FacebookStrategy } from "passport-facebook";
 import { Strategy as TwitterStrategy } from "passport-twitter";

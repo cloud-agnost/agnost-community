@@ -1,6 +1,7 @@
 import express from "express";
 import responseTime from "response-time";
 import bcrypt from "bcrypt";
+import { agnost } from "@agnost/server";
 import { logRequestToConsole } from "../middlewares/logRequest.js";
 import { checkContentType } from "../middlewares/checkContentType.js";
 import { getResponseBody } from "../middlewares/getResponseBody.js";

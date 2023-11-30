@@ -1,5 +1,6 @@
 import express from "express";
 import responseTime from "response-time";
+import { agnost } from "@agnost/server";
 import { applyDefaultRateLimiters } from "../middlewares/applyDefaultRateLimiters.js";
 import { authManageStorage } from "../middlewares/authManageStorage.js";
 import { checkContentType } from "../middlewares/checkContentType.js";
