@@ -592,7 +592,7 @@ export const RABBITMQ_CONNECTION_TYPES = ['url', 'object'] as const;
 export const RABBITMQ_CONNECTION_SCHEMES = ['amqp', 'amqps'] as const;
 export const KAFKA_CONNECTION_SCHEMES = ['simple', 'ssl', 'sasl'] as const;
 export const KAFKA_SASL_MECHANISM = ['plain', 'scram-sha-256', 'scram-sha-512'] as const;
-export const MONGODB_CONNECTION_FORMATS = ['mongodb', 'mongodb+srv'] as const;
+export const MONGODB_CONNECTION_FORMATS = ['mongodb+srv', 'mongodb'] as const;
 export const ADD_API_KEYS_MENU_ITEMS = [
 	{
 		name: translate('application.edit.general'),
@@ -810,4 +810,15 @@ export const ORG_CHANGE_EXCEPTIONS = [
 	'cluster',
 	'auth',
 	'onBoarding',
+];
+
+export const FORBIDDEN_EP_PREFIXES = [
+	'/health',
+	'/ping',
+	'/object',
+	'/test',
+	'/storage',
+	'/auth',
+	'/oauth',
+	'/realtime',
 ];
