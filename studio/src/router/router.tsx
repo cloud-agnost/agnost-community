@@ -590,7 +590,6 @@ const router = createBrowserRouter([
 											{
 												path: '',
 												element: <Dashboard />,
-												loader: versionLoaders.dashboardLoader,
 											},
 											{
 												path: 'database',
