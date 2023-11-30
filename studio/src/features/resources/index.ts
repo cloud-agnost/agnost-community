@@ -24,4 +24,3 @@ export { default as ConnectAzure } from './AddResource/Storage/ConnectAzure';
 export { default as ConnectGCP } from './AddResource/Storage/ConnectGCP';
 export { default as TestConnectionButton } from './AddResource/TestConnectionButton';
 export { default as OrgResources } from './OrgResources';
-export { default as ResourceTable } from './ResourceTable/ResourceTable';

@@ -51,12 +51,12 @@ export default function UpdateAllowedRoles() {
 
 	return (
 		<Form {...form}>
-			<form className='flex flex-col' onSubmit={form.handleSubmit(onSubmit)}>
+			<form className='flex' onSubmit={form.handleSubmit(onSubmit)}>
 				<FormField
 					control={form.control}
 					name='allowedRoles'
 					render={({ field: { onChange, value } }) => (
-						<div className='space-y-2'>
+						<FormItem className='flex-1'>
 							<FormLabel>{t('resources.table.allowedRoles')}</FormLabel>
 							<div className='flex items-center space-x-6 space-y-0'>
 								{appRoles.map((role) => (
@@ -83,7 +83,7 @@ export default function UpdateAllowedRoles() {
 								))}
 								<FormMessage />
 							</div>
-						</div>
+						</FormItem>
 					)}
 				/>
 				<Button type='submit' variant='primary' className='self-end' size='lg' loading={loading}>
