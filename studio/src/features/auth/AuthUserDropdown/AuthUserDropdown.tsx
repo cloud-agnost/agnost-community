@@ -1,4 +1,5 @@
 import { LineSegments } from '@/components/icons';
+import { resetAllStores } from '@/helpers';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useThemeStore from '@/store/theme/themeStore.ts';
 import { cn } from '@/utils';
@@ -18,10 +19,8 @@ import {
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './AuthUserDropdown.scss';
-import { useNavigate } from 'react-router-dom';
-import { resetAllStores } from '@/helpers';
 export default function AuthUserDropdown() {
 	const { user, logout } = useAuthStore();
 	const { t } = useTranslation();
