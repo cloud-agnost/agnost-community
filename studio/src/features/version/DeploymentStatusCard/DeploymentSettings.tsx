@@ -39,42 +39,40 @@ export default function DeploymentSettings({ isOpen, close }: DeploymentSettings
 	];
 
 	return (
-		<>
-			<AnimatePresence>
-				{isOpen && (
-					<motion.div
-						initial={{
-							x: '100%',
-						}}
-						animate={{
-							x: 0,
-						}}
-						transition={{ type: 'tween' }}
-						exit={{
-							x: '100%',
-						}}
-						className='deployment-settings'
-					>
-						<header className='deployment-settings-header'>
-							<Button onClick={close} rounded variant='blank' iconOnly>
-								<ArrowLeft size={20} />
-							</Button>
-							<h4>{t('version.deployment_settings')}</h4>
-						</header>
-						<div className='deployment-settings-items'>
-							{settings.map(({ title, description, element }, index) => (
-								<div className='deployment-settings-item' key={index}>
-									<div className='deployment-settings-text'>
-										<h5>{title}</h5>
-										<p>{description}</p>
-									</div>
-									<div className='flex items-center'>{element}</div>
+		<AnimatePresence>
+			{isOpen && (
+				<motion.div
+					initial={{
+						x: '100%',
+					}}
+					animate={{
+						x: 0,
+					}}
+					transition={{ type: 'tween' }}
+					exit={{
+						x: '100%',
+					}}
+					className='deployment-settings'
+				>
+					<header className='deployment-settings-header'>
+						<Button onClick={close} rounded variant='blank' iconOnly>
+							<ArrowLeft size={20} />
+						</Button>
+						<h4>{t('version.deployment_settings')}</h4>
+					</header>
+					<div className='deployment-settings-items'>
+						{settings.map(({ title, description, element }, index) => (
+							<div className='deployment-settings-item' key={index}>
+								<div className='deployment-settings-text'>
+									<h5>{title}</h5>
+									<p>{description}</p>
 								</div>
-							))}
-						</div>
-					</motion.div>
-				)}
-			</AnimatePresence>
-		</>
+								<div className='flex items-center'>{element}</div>
+							</div>
+						))}
+					</div>
+				</motion.div>
+			)}
+		</AnimatePresence>
 	);
 }

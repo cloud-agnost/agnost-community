@@ -1,6 +1,8 @@
 {
 	"title": "Resources",
 	"add": "Add Resource",
+	"edit": "Edit Resource",
+	"empty": "You have not defined any resources for this organization",
 	"table": {
 		"name": "Name",
 		"type": "Type",

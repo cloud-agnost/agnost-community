@@ -12,8 +12,9 @@ export default function MongoConnectionFormat() {
 	const form = useFormContext<z.infer<typeof ConnectResourceSchema>>();
 
 	useEffect(() => {
-		form.setValue('access.connFormat', MongoDBConnFormat.MongoDB);
+		form.setValue('access.connFormat', MongoDBConnFormat.MongoDBSRV);
 	}, []);
+
 	return (
 		<>
 			<h6 className=' font-sfCompact text-sm text-subtle '>
@@ -27,7 +28,7 @@ export default function MongoConnectionFormat() {
 						<FormControl>
 							<RadioGroup
 								onValueChange={field.onChange}
-								defaultValue={field.value}
+								defaultValue={MongoDBConnFormat.MongoDBSRV}
 								className='flex items-center gap-6 mb-8'
 							>
 								{MONGODB_CONNECTION_FORMATS.map((type) => (

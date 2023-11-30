@@ -11,7 +11,6 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
 import ApplicationCreateModal from '@/features/application/ApplicationCreateModal.tsx';
 import useApplicationStore from '@/store/app/applicationStore';
-import useAuthStore from '@/store/auth/authStore.ts';
 import { Application } from '@/types';
 import { cn } from '@/utils';
 import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
@@ -122,8 +121,6 @@ interface ApplicationLabelProps {
 }
 
 const ApplicationLabel = ({ application, onClick }: ApplicationLabelProps) => {
-	const { user } = useAuthStore();
-
 	function openAppSettings(e: MouseEvent<HTMLButtonElement>) {
 		if (onClick) {
 			e.stopPropagation();
@@ -139,9 +136,7 @@ const ApplicationLabel = ({ application, onClick }: ApplicationLabelProps) => {
 			</Avatar>
 			<div className='application-dropdown-label'>
 				<div className='application-dropdown-name'>{application?.name}</div>
-				<div className='application-dropdown-desc'>
-					{application?.team.find((team) => team.userId._id === user?._id)?.role}
-				</div>
+				<div className='application-dropdown-desc'>{application?.role}</div>
 			</div>
 		</Button>
 	);

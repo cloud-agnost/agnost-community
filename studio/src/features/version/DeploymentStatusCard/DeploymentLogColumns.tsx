@@ -3,12 +3,12 @@ import { DateText } from '@/components/DateText';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, EnvLog, SelectedEnvLog } from '@/types';
-import { capitalize, translate } from '@/utils';
+import { DATE_FORMAT_MONTH_DAY_YEAR, capitalize, translate, formatDate } from '@/utils';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/Avatar';
 import { Badge } from 'components/Badge';
 import { Document } from 'components/icons';
-import { BADGE_COLOR_MAP } from 'constants/constants.ts';
-import { DateTime } from 'luxon';
+import { BADGE_COLOR_MAP } from '@/constants';
+
 const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 	{
 		id: 'action',
@@ -21,24 +21,22 @@ const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 				.getState()
 				.members.find((member) => member.member._id === createdBy);
 			return (
-				<>
-					<div className='flex items-center gap-4'>
-						<Avatar size='sm'>
-							<AvatarImage src={user?.member.pictureUrl} />
-							<AvatarFallback
-								isUserAvatar
-								color={user?.member?.color as string}
-								name={user?.member?.name}
-							/>
-						</Avatar>
-						<div>
-							<p className='text-sm text-default font-sfCompact'>{user?.member.name}</p>
-							<p className='text-xs text-subtle font-sfCompact'>
-								{capitalize(action)} version to its environment
-							</p>
-						</div>
+				<div className='flex items-center gap-4'>
+					<Avatar size='sm'>
+						<AvatarImage src={user?.member.pictureUrl} />
+						<AvatarFallback
+							isUserAvatar
+							color={user?.member?.color as string}
+							name={user?.member?.name}
+						/>
+					</Avatar>
+					<div>
+						<p className='text-sm text-default font-sfCompact'>{user?.member.name}</p>
+						<p className='text-xs text-subtle font-sfCompact'>
+							{capitalize(action)} version to its environment
+						</p>
 					</div>
-				</>
+				</div>
 			);
 		},
 	},
@@ -98,17 +96,17 @@ const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 					onClick={() => {
 						const logs = {
 							dbLogs: row.original.dbLogs.map((log) => ({
-								timestamp: DateTime.fromISO(log.startedAt).toFormat('yyyy-MM-dd hh:mm:ss'),
+								timestamp: formatDate(log.startedAt, DATE_FORMAT_MONTH_DAY_YEAR),
 								message: log.message,
 								type: log.status,
 							})),
 							serverLogs: row.original.serverLogs.map((log) => ({
-								timestamp: DateTime.fromISO(log.startedAt).toFormat('yyyy-MM-dd hh:mm:ss'),
+								timestamp: formatDate(log.startedAt, DATE_FORMAT_MONTH_DAY_YEAR),
 								message: log.message,
 								type: log.status,
 							})),
 							schedulerLogs: row.original.schedulerLogs.map((log) => ({
-								timestamp: DateTime.fromISO(log.startedAt).toFormat('yyyy-MM-dd hh:mm:ss'),
+								timestamp: formatDate(log.startedAt, DATE_FORMAT_MONTH_DAY_YEAR),
 								message: log.message,
 								type: log.status,
 							})),

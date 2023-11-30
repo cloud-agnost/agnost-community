@@ -439,7 +439,6 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				updateVersionRealtimeProperties: async (params) => {
 					try {
 						const version = useVersionStore.getState().version;
-						console.log(params);
 						const updatedVersion = await VersionService.updateVersionRealtimeProperties(params);
 						useVersionStore.setState({ version: updatedVersion });
 						return version;

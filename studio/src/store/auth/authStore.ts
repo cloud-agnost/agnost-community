@@ -95,6 +95,7 @@ const useAuthStore = create<AuthState & Actions>()(
 							const user = get().user;
 							if (user) leaveChannel(user?._id);
 							await AuthService.logout();
+							set(initialState);
 							req.onSuccess?.();
 						} catch (error) {
 							req.onError?.(error as APIError);

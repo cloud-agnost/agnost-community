@@ -17,5 +17,6 @@
 	},
 	"resource": "Resource",
 	"edit": "Edit {{name}}",
-	"test": "Test {{name}}"
+	"test": "Test {{name}}",
+	"logs": "Cron Job Logs"
 }

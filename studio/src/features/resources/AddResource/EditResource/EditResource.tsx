@@ -2,11 +2,14 @@ import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { Form } from '@/components/Form';
 import { Input } from '@/components/Input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { useToast } from '@/hooks';
 import useResourceStore from '@/store/resources/resourceStore';
-import { CreateResourceSchema, ResourceInstances } from '@/types';
+import useTypeStore from '@/store/types/typeStore';
+import { APIError, CreateResourceSchema, ResourceInstances, ResourceType } from '@/types';
 import { isEmpty } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import {
 	FormControl,
 	FormDescription,
@@ -15,22 +18,12 @@ import {
 	FormLabel,
 	FormMessage,
 } from 'components/Form';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 
-type UpdateType = 'size' | 'others';
-
 export default function EditResource() {
-	const form = useForm<z.infer<typeof CreateResourceSchema>>({
-		resolver: zodResolver(CreateResourceSchema),
-	});
-	const replicationType =
-		form.watch('instance') === ResourceInstances.MongoDB ||
-		form.watch('instance') === ResourceInstances.RabbitMQ
-			? 'replicas'
-			: 'instances';
 	const {
 		toggleCreateResourceModal,
 		updateManagedResourceConfiguration,
@@ -38,9 +31,61 @@ export default function EditResource() {
 		resourceToEdit,
 	} = useResourceStore();
 
-	const [loading, setLoading] = useState(false);
 	const { notify } = useToast();
 	const { t } = useTranslation();
+	const { resourceVersions } = useTypeStore();
+
+	const form = useForm<z.infer<typeof CreateResourceSchema>>({
+		resolver: zodResolver(CreateResourceSchema),
+		defaultValues: {
+			name: resourceToEdit.name,
+			allowedRoles: resourceToEdit.allowedRoles,
+			instance: resourceToEdit.instance,
+			type: resourceToEdit.type,
+			config: resourceToEdit.config,
+		},
+	});
+
+	const sizeForm = useForm<z.infer<typeof CreateResourceSchema>>({
+		resolver: zodResolver(CreateResourceSchema),
+		defaultValues: {
+			name: resourceToEdit.name,
+			allowedRoles: resourceToEdit.allowedRoles,
+			instance: resourceToEdit.instance,
+			type: resourceToEdit.type,
+			config: resourceToEdit.config,
+		},
+	});
+
+	const replicationType =
+		form.watch('instance') === ResourceInstances.MongoDB ||
+		form.watch('instance') === ResourceInstances.RabbitMQ
+			? 'replicas'
+			: 'instances';
+
+	function onSuccess() {
+		form.reset();
+		if (isEmpty(resourceToEdit)) toggleCreateResourceModal();
+		else closeEditResourceModal();
+	}
+	function onError(error: APIError) {
+		notify({
+			title: error?.error,
+			description: error?.details,
+			type: 'error',
+		});
+	}
+
+	const { mutateAsync: updateResourceMutate, isPending: othersLoading } = useMutation({
+		mutationFn: updateManagedResourceConfiguration,
+		onSuccess,
+		onError,
+	});
+	const { mutateAsync: updateSizeMutate, isPending: sizeLoading } = useMutation({
+		mutationFn: updateManagedResourceConfiguration,
+		onSuccess,
+		onError,
+	});
 
 	useEffect(() => {
 		if (!isEmpty(resourceToEdit)) {
@@ -51,67 +96,36 @@ export default function EditResource() {
 				type: resourceToEdit.type,
 				config: resourceToEdit.config,
 			});
+			sizeForm.reset({
+				name: resourceToEdit.name,
+				allowedRoles: resourceToEdit.allowedRoles,
+				instance: resourceToEdit.instance,
+				type: resourceToEdit.type,
+				config: resourceToEdit.config,
+			});
 		}
-	}, [resourceToEdit]);
+	}, [resourceToEdit, replicationType]);
 
-	function handleUpdate(updateType: UpdateType) {
-		form.trigger();
-		if (!form.formState.isValid) return;
-		setLoading(true);
-		updateManagedResourceConfiguration({
-			updateType,
+	function onSubmit(data: z.infer<typeof CreateResourceSchema>) {
+		updateResourceMutate({
+			updateType: 'others',
 			resourceId: resourceToEdit?._id,
-			...form.getValues(),
-			onSuccess: () => {
-				form.reset();
-				if (isEmpty(resourceToEdit)) toggleCreateResourceModal();
-				else closeEditResourceModal();
-				setLoading(false);
-			},
-			onError: (error) => {
-				setLoading(false);
-				notify({
-					title: error?.error,
-					description: error?.details,
-					type: 'error',
-				});
-			},
+			...data,
+		});
+	}
+
+	function sizeSubmit(data: z.infer<typeof CreateResourceSchema>) {
+		updateSizeMutate({
+			updateType: 'size',
+			resourceId: resourceToEdit?._id,
+			...data,
 		});
 	}
 
 	return (
-		<Form {...form}>
-			<form onSubmit={(e) => e.preventDefault()} className='space-y-6'>
-				<FormField
-					control={form.control}
-					name='config.size'
-					render={({ field }) => (
-						<FormItem className='flex-1'>
-							<FormLabel>{t('resources.database.storage_size')}</FormLabel>
-							<FormControl>
-								<div className='flex items-center'>
-									<Input
-										placeholder={t('resources.database.storage_size_placeholder') ?? ''}
-										error={!!form.formState.errors.config?.size}
-										{...field}
-									/>
-									<Button
-										className='ml-2'
-										type='button'
-										onClick={() => handleUpdate('size')}
-										size='lg'
-										loading={loading && field.value !== resourceToEdit?.config.size}
-									>
-										{t('general.save')}
-									</Button>
-								</div>
-							</FormControl>
-							<FormDescription>{t('resources.database.storage_size_description')}</FormDescription>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				{form.watch('type') !== 'cache' ? (
+		<>
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 '>
 					<FormField
 						control={form.control}
 						name={`config.${replicationType}`}
@@ -119,46 +133,112 @@ export default function EditResource() {
 							<FormItem>
 								<FormLabel>{t(`resources.database.${replicationType}`)}</FormLabel>
 								<FormControl className='flex'>
-									<div className='flex items-center'>
-										<Input
-											type='number'
-											placeholder={t('resources.database.instance_placeholder') ?? ''}
-											error={!!form.formState.errors.config?.instances}
-											{...field}
-										/>
-										<Button
-											className='ml-2'
-											type='button'
-											onClick={() => handleUpdate('others')}
-											size='lg'
-											loading={loading && field.value !== resourceToEdit?.config[replicationType]}
-										>
-											{t('general.save')}
-										</Button>
-									</div>
+									<Input
+										type='number'
+										disabled={form.watch('instance') === ResourceInstances.RabbitMQ}
+										placeholder={t('resources.database.instance_placeholder') ?? ''}
+										error={!!form.formState.errors.config?.instances}
+										{...field}
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
-				) : (
 					<FormField
 						control={form.control}
-						name='config.readReplica'
+						name='config.version'
 						render={({ field }) => (
-							<FormItem className='flex space-y-0 space-x-4'>
+							<FormItem className='flex-1'>
+								<FormLabel>{t('resources.version')}</FormLabel>
 								<FormControl>
-									<Checkbox checked={field.value} onCheckedChange={field.onChange} />
+									<FormControl>
+										<Select
+											defaultValue={field.value}
+											value={field.value}
+											name={field.name}
+											onValueChange={field.onChange}
+											disabled={form.watch('instance') === ResourceInstances.RabbitMQ}
+										>
+											<FormControl>
+												<SelectTrigger
+													className='w-full'
+													error={Boolean(form.formState.errors.config?.version)}
+												>
+													<SelectValue placeholder={t('resources.select_version')} />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												{resourceVersions[form.watch('instance')]?.map((version) => (
+													<SelectItem key={version} value={version} className='max-w-full'>
+														{version}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</FormControl>
 								</FormControl>
-								<div className='space-y-1 leading-none'>
-									<FormLabel>{t('resources.cache.createdReadReplica')}</FormLabel>
-								</div>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
-				)}
-			</form>
-		</Form>
+					{form.watch('type') === ResourceType.Cache && (
+						<FormField
+							control={form.control}
+							name='config.readReplica'
+							disabled
+							render={({ field }) => (
+								<FormItem className='flex space-y-0 space-x-4'>
+									<FormControl>
+										<Checkbox checked={field.value} onCheckedChange={field.onChange} disabled />
+									</FormControl>
+									<div className='space-y-1 leading-none'>
+										<FormLabel>{t('resources.cache.createdReadReplica')}</FormLabel>
+									</div>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					)}
+					<div className='flex justify-end'>
+						<Button
+							className='ml-2'
+							size='lg'
+							loading={othersLoading}
+							disabled={form.watch('instance') === ResourceInstances.RabbitMQ}
+						>
+							{t('general.save')}
+						</Button>
+					</div>
+				</form>
+			</Form>
+			<Form {...sizeForm}>
+				<form onSubmit={form.handleSubmit(sizeSubmit)} className='flex items-center justify-center'>
+					<FormField
+						control={form.control}
+						name='config.size'
+						render={({ field }) => (
+							<FormItem className='flex-1'>
+								<FormLabel>{t('resources.database.storage_size')}</FormLabel>
+								<FormControl>
+									<Input
+										placeholder={t('resources.database.storage_size_placeholder') ?? ''}
+										error={!!form.formState.errors.config?.size}
+										{...field}
+									/>
+								</FormControl>
+								<FormDescription>
+									{t('resources.database.storage_size_description')}
+								</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<Button className='ml-2' size='lg' loading={sizeLoading}>
+						{t('general.save')}
+					</Button>
+				</form>
+			</Form>
+		</>
 	);
 }

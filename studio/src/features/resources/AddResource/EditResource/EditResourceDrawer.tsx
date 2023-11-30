@@ -15,7 +15,7 @@ export default function EditResourceDrawer() {
 		<Drawer open={isEditResourceModalOpen} onOpenChange={closeEditResourceModal}>
 			<DrawerContent position='right' size='lg'>
 				<DrawerHeader>
-					<DrawerTitle>{t('resources.add')}</DrawerTitle>
+					<DrawerTitle>{t('resources.edit')}</DrawerTitle>
 				</DrawerHeader>
 				<div className='px-6 py-4 scroll space-y-8'>
 					<div>

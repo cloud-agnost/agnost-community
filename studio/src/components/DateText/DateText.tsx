@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { cn, formatDate } from '@/utils';
+import { DATE_FORMAT_MONTH_DAY_YEAR, TIME_FORMAT, cn, formatDate } from '@/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../Avatar';
 import { OrganizationMember } from '@/types';
 interface DateTextProps {
@@ -22,17 +22,10 @@ export default function DateText({ date, children, className, user, ...props }: 
 			{date ? (
 				<div>
 					<span className='block text-default text-sm leading-6'>
-						{formatDate(date, {
-							month: 'short',
-							day: 'numeric',
-							year: 'numeric',
-						})}
+						{formatDate(date, DATE_FORMAT_MONTH_DAY_YEAR)}
 					</span>
 					<time className='text-[11px] text-subtle leading-[21px]'>
-						{formatDate(date, {
-							hour: 'numeric',
-							minute: 'numeric',
-						})}
+						{formatDate(date, TIME_FORMAT)}
 					</time>
 				</div>
 			) : (

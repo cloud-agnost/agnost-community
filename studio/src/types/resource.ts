@@ -180,7 +180,7 @@ export enum ResourceInstances {
 	GCPStorage = 'GCP Cloud Storage',
 	SQLServer = 'SQL Server',
 }
-const { resourceConfig } = useResourceStore.getState();
+
 export const AccessDbSchema = z
 	.object({
 		host: z.string().optional(),
@@ -262,6 +262,7 @@ export const AccessDbSchema = z
 		dbNumber: z.coerce.number().int().optional(),
 	})
 	.superRefine((val, ctx) => {
+		const { resourceConfig } = useResourceStore.getState();
 		if (
 			!val.host &&
 			resourceConfig.resourceType !== ResourceType.Storage &&
@@ -437,7 +438,8 @@ export const AccessDbSchema = z
 				});
 			}
 		}
-		if (resourceConfig.type === ResourceType.Storage) {
+		console.log(resourceConfig.type, resourceConfig.instance, ResourceInstances.AWSS3);
+		if (resourceConfig.resourceType === ResourceType.Storage) {
 			if (resourceConfig.instance === ResourceInstances.AWSS3) {
 				if (!val.accessKeyId) {
 					ctx.addIssue({

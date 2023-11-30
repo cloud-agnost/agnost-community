@@ -15,14 +15,32 @@ import useVersionStore from '@/store/version/versionStore';
 import { TabTypes } from '@/types';
 import { capitalize, generateId } from '@/utils';
 import { BookBookmark, Code, FileJs, Key } from '@phosphor-icons/react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import BeatLoader from 'react-spinners/BeatLoader';
 
 export default function VersionDashboard() {
-	const { version, dashboard, getVersionDashboardPath } = useVersionStore();
+	const { version, dashboard, getVersionDashboardPath, getVersionDashboardInfo } =
+		useVersionStore();
 	const { environment } = useEnvironmentStore();
 	const { addSettingsTab, addTab } = useTabStore();
 	const { t } = useTranslation();
+
+	const { orgId, appId, versionId } = useParams() as Record<string, string>;
+
+	const { isFetching } = useQuery({
+		queryKey: ['getVersionDashboardInfo'],
+		queryFn: getVersionDashboardInfoHandler,
+	});
+
+	function getVersionDashboardInfoHandler() {
+		return getVersionDashboardInfo({
+			orgId,
+			appId,
+			versionId,
+		});
+	}
 	function getIcon(type: string) {
 		const Icon = TAB_ICON_MAP[type];
 		return <Icon className='w-8 h-8 text-default' />;
@@ -59,7 +77,11 @@ export default function VersionDashboard() {
 			isActive: true,
 		});
 	}
-	return (
+	return isFetching ? (
+		<div className='flex items-center justify-center h-full'>
+			<BeatLoader color='#6884FD' size={24} margin={18} />
+		</div>
+	) : (
 		<div className='space-y-8 max-w-7xl'>
 			<h1 className='text-default text-2xl'>{t('version.dashboard')}</h1>
 			<div className='grid grid-cols-4 gap-6 mt-10 '>
@@ -67,7 +89,7 @@ export default function VersionDashboard() {
 					<Button
 						variant='blank'
 						key={key}
-						className='bg-wrapper-background-base p-6 rounded-md shadow-sm h-auto block text-left font-normal'
+						className='bg-wrapper-background-base p-6 rounded-md shadow-sm h-auto block text-left font-normal hover:bg-button-secondary'
 						onClick={() => clickDashboardItem(capitalize(key))}
 					>
 						<div className='flex items-center gap-4'>
@@ -134,7 +156,7 @@ export default function VersionDashboard() {
 						<Link
 							to={guide.link}
 							key={guide.title}
-							className='border border-border'
+							className='border border-border hover:bg-button-secondary'
 							target='_blank'
 							rel='noopener noreferrer'
 						>

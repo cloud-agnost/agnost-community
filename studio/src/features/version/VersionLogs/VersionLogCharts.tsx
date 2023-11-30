@@ -1,14 +1,14 @@
 import useThemeStore from '@/store/theme/themeStore';
 import useVersionStore from '@/store/version/versionStore';
-import { convertDateToMilliseconds, formatDate } from '@/utils';
+import { DATE_FORMAT, DATE_TIME_FORMAT, toIsoString, formatDate } from '@/utils';
 import { t } from 'i18next';
-import { DateTime } from 'luxon';
 import { Dispatch, SetStateAction, useMemo } from 'react';
+import { Range } from 'react-date-range';
+import { useSearchParams } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart';
 import { CustomTooltip } from './VersionLogs';
-import { Range } from 'react-date-range';
-import { useSearchParams } from 'react-router-dom';
+
 interface VersionLogChartsProps {
 	date: Range[];
 	setDate: Dispatch<SetStateAction<Range[]>>;
@@ -18,30 +18,19 @@ export default function VersionLogCharts({ date, setDate }: VersionLogChartsProp
 	const [searchParams, setSearchParams] = useSearchParams();
 	const handleClickChart = (e: CategoricalChartState) => {
 		if (e?.activeLabel && e?.activeTooltipIndex !== undefined) {
-			const previousData = data[e.activeTooltipIndex - 1];
 			const currentData = data[e.activeTooltipIndex];
-			const nextData = data[e.activeTooltipIndex + 1];
-			const currentDateTime = convertDateToMilliseconds(currentData?.name.split(',')[0]);
-			let timeDiff;
-			if (nextData) {
-				timeDiff = convertDateToMilliseconds(nextData.name.split(',')[0]) - currentDateTime;
-			} else if (previousData) {
-				timeDiff = currentDateTime - convertDateToMilliseconds(previousData.name.split(',')[0]);
-			}
-			if (timeDiff && !!currentData?.success) {
-				const start = currentDateTime;
-				const end = currentDateTime + timeDiff;
+			if (currentData?.success) {
 				setDate([
 					{
-						startDate: new Date(start),
-						endDate: new Date(end),
+						startDate: new Date(currentData.start),
+						endDate: new Date(currentData.end),
 						key: 'selection',
 					},
 				]);
 				setSearchParams({
 					...searchParams,
-					start: new Date(start).toISOString(),
-					end: new Date(end).toISOString(),
+					start: toIsoString(new Date(currentData.start)),
+					end: toIsoString(new Date(currentData.end)),
 				});
 			}
 		}
@@ -52,7 +41,9 @@ export default function VersionLogCharts({ date, setDate }: VersionLogChartsProp
 	const data = useMemo(
 		() =>
 			logBuckets?.buckets?.map?.((item) => ({
-				name: formatDate(item.start, DateTime.DATETIME_SHORT),
+				name: `${formatDate(item.start, DATE_FORMAT)} - ${formatDate(item.end, DATE_FORMAT)}`,
+				start: formatDate(item.start, DATE_FORMAT),
+				end: formatDate(item.end, DATE_FORMAT),
 				success: item.success,
 				error: item?.error,
 			})) ?? [],
@@ -66,8 +57,8 @@ export default function VersionLogCharts({ date, setDate }: VersionLogChartsProp
 					<span>{logBuckets?.totalHits <= 1 ? t('version.hit') : t('version.hits')}</span>
 				</h1>
 				<p className='text-sm text-subtle'>
-					{formatDate(date[0].startDate as Date, DateTime.DATETIME_SHORT_WITH_SECONDS)} to{' '}
-					{formatDate(date[0].endDate as Date, DateTime.DATETIME_SHORT_WITH_SECONDS)}
+					{formatDate(date[0].startDate as Date, DATE_TIME_FORMAT)} to{' '}
+					{formatDate(date[0].endDate as Date, DATE_TIME_FORMAT)}
 				</p>
 			</div>
 			<div className='p-4 w-full max-h-1/2'>

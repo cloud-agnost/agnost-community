@@ -1,23 +1,37 @@
-import { DateTime } from 'luxon';
+import {
+	differenceInDays,
+	differenceInMonths,
+	differenceInYears,
+	format,
+	formatDistance,
+	formatISO,
+} from 'date-fns';
+import { enUS } from 'date-fns/locale';
+export const DATE_FORMAT = 'yyyy/MM/dd';
+export const TIME_FORMAT_WITH_SECONDS = 'hh:mm:ss a';
+export const DATE_TIME_FORMAT = 'yyyy/MM/dd hh:mm:ss a';
+export const DATE_FORMAT_MONTH_DAY_YEAR = 'MMM d, yyyy';
+export const TIME_FORMAT = 'hh:mm a';
+export const DATETIME_MED_WITH_SECONDS = 'MMM d, yyyy, hh:mm:ss a';
+export const DATETIME_MED = 'MMM d, yyyy, hh:mm a';
 
-export function formatDate(date: string | Date, option: Intl.DateTimeFormatOptions) {
-	const dt = DateTime.fromJSDate(new Date(date), {
-		zone: 'utc',
+export function formatDate(date: string | Date, formatString: string) {
+	return format(new Date(date), formatString, {
+		locale: enUS,
 	});
-	return dt.setLocale('en').toLocaleString(option);
 }
 
 export function getRelativeTime(date: string) {
-	return DateTime.fromISO(date).setLocale('en').toRelative();
+	return formatDistance(new Date(date), new Date(), { addSuffix: true });
 }
 
 export function convertDateToMilliseconds(dateString: string): number {
 	return new Date(dateString).getTime();
 }
 export function calculateRecommendedBuckets(start: Date, end: Date): number {
-	const startDate = DateTime.fromJSDate(start);
-	const endDate = DateTime.fromJSDate(end);
-	const { years, months, days } = endDate.diff(startDate, ['years', 'months', 'days']);
+	const years = differenceInYears(end, start);
+	const months = differenceInMonths(end, start);
+	const days = differenceInDays(end, start);
 
 	const totalMonths = years * 12 + months;
 	const totalDays = months * 30 + days;
@@ -54,4 +68,8 @@ export function formatTime(timeInMilliseconds: number) {
 		const seconds = (timeInMilliseconds / 1000).toFixed(1);
 		return `${seconds} s`;
 	}
+}
+
+export function toIsoString(date: Date) {
+	return formatISO(date);
 }

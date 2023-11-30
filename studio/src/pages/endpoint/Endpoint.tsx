@@ -6,7 +6,10 @@ import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
-import { APIError, Endpoint } from '@/types';
+import useTabStore from '@/store/version/tabStore';
+import useVersionStore from '@/store/version/versionStore';
+import { APIError, Endpoint, TabTypes } from '@/types';
+import { generateId } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +22,8 @@ export default function MainEndpoint() {
 	const { versionId, orgId, appId } = useParams();
 	const canCreate = useAuthorizeVersion('endpoint.create');
 	const { endpoints, lastFetchedPage, getEndpoints, deleteMultipleEndpoints } = useEndpointStore();
+	const { addTab } = useTabStore();
+	const { getVersionDashboardPath } = useVersionStore();
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const table = useTable({
 		data: endpoints,
@@ -51,6 +56,17 @@ export default function MainEndpoint() {
 		});
 	}
 
+	function openLogTab() {
+		addTab(versionId as string, {
+			id: generateId(),
+			title: t('endpoint.logs'),
+			path: getVersionDashboardPath('endpoint/logs'),
+			isActive: true,
+			isDashboard: false,
+			type: TabTypes.Endpoint,
+		});
+	}
+
 	return (
 		<>
 			<VersionTabLayout<Endpoint>
@@ -66,7 +82,7 @@ export default function MainEndpoint() {
 				disabled={!canCreate}
 				loading={isFetching && !endpoints.length}
 				handlerButton={
-					<Button variant='secondary' to='logs'>
+					<Button variant='secondary' onClick={openLogTab}>
 						{t('queue.view_logs')}
 					</Button>
 				}

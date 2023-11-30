@@ -3,9 +3,9 @@ import { realtimeObjectMapper } from '@/helpers/realtime';
 import useAuthStore from '@/store/auth/authStore';
 import useVersionStore from '@/store/version/versionStore';
 import { NotificationActions } from '@/types';
-import { generateId, onChannelMessage } from '@/utils';
-import { DateTime } from 'luxon';
+import { DATE_TIME_FORMAT, generateId, onChannelMessage, formatDate } from '@/utils';
 import { useEffect } from 'react';
+
 export default function useRealtime() {
 	const user = useAuthStore((state) => state.user);
 	useEffect(() => {
@@ -18,7 +18,7 @@ export default function useRealtime() {
 					//@ts-ignore
 					data,
 					identifiers,
-					timestamp: DateTime.fromISO(timestamp).toFormat('yyyy-MM-dd hh:mm:ss'),
+					timestamp: formatDate(timestamp, DATE_TIME_FORMAT),
 					message: log,
 					...(id && { id }),
 					type,

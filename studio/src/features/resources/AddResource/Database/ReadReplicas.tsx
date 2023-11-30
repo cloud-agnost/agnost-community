@@ -9,25 +9,19 @@ import {
 	DialogTrigger,
 } from '@/components/Dialog';
 import { Form } from '@/components/Form';
-import { Pencil, TestConnection } from '@/components/icons';
+import { Pencil } from '@/components/icons';
+import { INSTANCE_PORT_MAP } from '@/constants';
+import { DatabaseInfo, MongoConnectionFormat, TestConnectionButton } from '@/features/resources';
 import { AccessDbSchema, ConnectResourceSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash } from '@phosphor-icons/react';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-import { DatabaseInfo, MongoConnectionFormat } from '@/features/resources';
-import useResourceStore from '@/store/resources/resourceStore';
-import { useToast } from '@/hooks';
-import { INSTANCE_PORT_MAP } from '@/constants';
 
 export default function ReadReplicas() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
-	const { testExistingResourceConnection } = useResourceStore();
-	const [loading, setLoading] = useState(false);
-	const [openModal, setOpenModal] = useState(false);
 	const { setValue, getValues, reset, watch } =
 		useFormContext<z.infer<typeof ConnectResourceSchema>>();
 	const readReplicas = getValues('accessReadOnly') ?? [];
@@ -37,7 +31,6 @@ export default function ReadReplicas() {
 
 	function addNewReplica(data: any) {
 		setValue('accessReadOnly', [...readReplicas, data]);
-		setOpenModal(false);
 		replicasForm.reset();
 	}
 
@@ -57,36 +50,10 @@ export default function ReadReplicas() {
 			username: replica.username,
 			password: replica.password,
 		});
-		setOpenModal(true);
 	}
-	function testResourceConnection() {
-		setLoading(true);
-		testExistingResourceConnection({
-			access: {
-				...replicasForm.getValues(),
-				options: replicasForm.getValues().options?.filter((option) => option.key && option.value),
-				brokers: replicasForm.getValues().brokers?.map((broker) => broker.key) as string[],
-			},
-			type: getValues('type'),
-			instance: getValues('instance'),
-			allowedRoles: getValues('allowedRoles'),
-			onSuccess: () => {
-				setLoading(false);
-				notify({
-					title: t('general.success'),
-					description: t('resources.database.test_success'),
-					type: 'success',
-				});
-			},
-			onError: ({ error, details }) => {
-				setLoading(false);
-				notify({
-					title: error,
-					description: details,
-					type: 'error',
-				});
-			},
-		});
+
+	function onClose() {
+		replicasForm.reset();
 	}
 	useEffect(() => {
 		if (watch('instance')) {
@@ -120,7 +87,7 @@ export default function ReadReplicas() {
 					</div>
 				))}
 			</div>
-			<Dialog open={openModal} onOpenChange={setOpenModal}>
+			<Dialog onOpenChange={onClose}>
 				<DialogTrigger asChild>
 					<Button type='button' variant='text'>
 						<Plus size={16} className='text-brand-primary' />
@@ -138,16 +105,7 @@ export default function ReadReplicas() {
 
 							<DialogFooter>
 								<div className='flex justify-end gap-4 mt-8'>
-									<Button
-										variant='outline'
-										loading={loading}
-										onClick={testResourceConnection}
-										type='button'
-										size='lg'
-									>
-										<TestConnection className='w-4 h-4 text-icon-default mr-2' />
-										{t('resources.database.test')}
-									</Button>
+									<TestConnectionButton replica />
 									<DialogClose asChild>
 										<Button size='lg' variant='secondary'>
 											{t('general.cancel')}

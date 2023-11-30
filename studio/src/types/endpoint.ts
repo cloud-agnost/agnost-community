@@ -1,3 +1,4 @@
+import { FORBIDDEN_EP_PREFIXES } from '@/constants';
 import { PARAM_NAME_REGEX, ROUTE_NAME_REGEX } from '@/constants/regex';
 import { BaseGetRequest, BaseParams, BaseRequest, Log } from '@/types';
 import { NameSchema } from '@/types/schema';
@@ -24,29 +25,42 @@ export const CreateEndpointSchema = z.object({
 				label: t('endpoint.create.path'),
 			}),
 		})
-		.regex(ROUTE_NAME_REGEX, {
-			message: t('endpoint.errors.notValidRoute'),
-		})
 		.superRefine((value, ctx) => {
-			const parameterNames = getPathParams(value);
-
-			// Validate parameter names
-			for (const paramName of parameterNames) {
-				if (!PARAM_NAME_REGEX.test(paramName)) {
+			if (value !== '/') {
+				if (!ROUTE_NAME_REGEX.test(value)) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
-						message: t('endpoint.errors.invalidParams', {
-							param: paramName,
-						}),
+						message: t('endpoint.errors.notValidRoute'),
 					});
 				}
-			}
-			const uniqueParameterNames = new Set(parameterNames);
-			if (uniqueParameterNames.size !== parameterNames.length) {
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					message: t('endpoint.errors.duplicateParam'),
-				});
+
+				const parameterNames = getPathParams(value);
+
+				// Validate parameter names
+				for (const paramName of parameterNames) {
+					if (!PARAM_NAME_REGEX.test(paramName)) {
+						ctx.addIssue({
+							code: z.ZodIssueCode.custom,
+							message: t('endpoint.errors.invalidParams', {
+								param: paramName,
+							}),
+						});
+					}
+				}
+				const uniqueParameterNames = new Set(parameterNames);
+				if (uniqueParameterNames.size !== parameterNames.length) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: t('endpoint.errors.duplicateParam'),
+					});
+				}
+
+				if (FORBIDDEN_EP_PREFIXES.find((prefix) => value.startsWith(prefix))) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: t("Endpoint route cannot start with '%s'", FORBIDDEN_EP_PREFIXES.join("', '")),
+					});
+				}
 			}
 		}),
 	timeout: z

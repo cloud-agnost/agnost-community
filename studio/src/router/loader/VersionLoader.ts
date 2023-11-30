@@ -9,7 +9,6 @@ import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import useStorageStore from '@/store/storage/storageStore';
 import useTaskStore from '@/store/task/taskStore';
 import useTabStore from '@/store/version/tabStore';
-import useVersionStore from '@/store/version/versionStore';
 import { getAppPermission } from '@/utils';
 import { LoaderFunctionArgs, redirect } from 'react-router-dom';
 
@@ -169,15 +168,6 @@ async function editTaskLoader({ params }: LoaderFunctionArgs) {
 
 	return { props: {} };
 }
-async function dashboardLoader({ params }: LoaderFunctionArgs) {
-	const { getVersionDashboardInfo } = useVersionStore.getState();
-	getVersionDashboardInfo({
-		orgId: params.orgId as string,
-		appId: params.appId as string,
-		versionId: params.versionId as string,
-	});
-	return { props: {} };
-}
 
 async function modelsOutletLoader({ params }: LoaderFunctionArgs) {
 	if (!useAuthStore.getState().isAuthenticated()) return null;
@@ -191,7 +181,7 @@ async function modelsOutletLoader({ params }: LoaderFunctionArgs) {
 	const { database, getDatabaseOfAppById } = useDatabaseStore.getState();
 	if (database._id !== apiParams.dbId) getDatabaseOfAppById(apiParams);
 
-	return null;
+	return { props: {} };
 }
 
 async function fieldsLoader({ params }: LoaderFunctionArgs) {
@@ -236,7 +226,6 @@ export default {
 	bucketLoader,
 	fileLoader,
 	editTaskLoader,
-	dashboardLoader,
 	modelsOutletLoader,
 	fieldsLoader,
 	navigatorLoader,

@@ -590,7 +590,6 @@ const router = createBrowserRouter([
 											{
 												path: '',
 												element: <Dashboard />,
-												loader: versionLoaders.dashboardLoader,
 											},
 											{
 												path: 'database',
@@ -885,7 +884,6 @@ export function GuestOnly({ children }: { children: ReactNode }): JSX.Element {
 	const { isAuthenticated } = useAuthStore();
 	const { isCompleted } = useClusterStore();
 	const { pathname } = useLocation();
-	console.log(isAuthenticated(), pathname);
 	if (isAuthenticated() && isCompleted) {
 		return <Navigate to='/organization' />;
 	} else if (!isCompleted && pathname !== '/onboarding') {
