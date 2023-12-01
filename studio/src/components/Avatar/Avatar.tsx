@@ -6,6 +6,7 @@ import { cn, getNameForAvatar } from '@/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import './avatar.scss';
+import { BASE_URL_WITH_API } from '@/constants';
 const avatarVariants = cva('avatar', {
 	variants: {
 		size: {
@@ -63,9 +64,16 @@ Avatar.displayName = AvatarPrimitive.Root.displayName;
 const AvatarImage = React.forwardRef<
 	React.ElementRef<typeof AvatarPrimitive.Image>,
 	AvatarImageProps
->(({ className, ...props }, ref) => (
-	<AvatarPrimitive.Image ref={ref} className={cn('avatar-image', className)} {...props} />
-));
+>(({ className, ...props }, ref) => {
+	return (
+		<AvatarPrimitive.Image
+			ref={ref}
+			className={cn('avatar-image', className)}
+			{...props}
+			src={`${BASE_URL_WITH_API}/${props.src}`}
+		/>
+	);
+});
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 
 const AvatarFallback = React.forwardRef<
