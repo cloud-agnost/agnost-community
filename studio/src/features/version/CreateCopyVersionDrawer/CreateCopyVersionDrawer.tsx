@@ -20,6 +20,8 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import './CreateCopyVersionDrawer.scss';
+import { useMutation } from '@tanstack/react-query';
+import { APIError } from '@/types';
 const CreateCopyVersionForm = z.object({
 	name: z
 		.string({
@@ -50,11 +52,10 @@ export default function CreateCopyVersionDrawer() {
 		version,
 		selectVersion,
 	} = useVersionStore();
-	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		if (!open) form.reset();
-	}, [open]);
+		if (!createCopyVersionDrawerIsOpen) form.reset();
+	}, [createCopyVersionDrawerIsOpen]);
 
 	const form = useForm<z.infer<typeof CreateCopyVersionForm>>({
 		resolver: zodResolver(CreateCopyVersionForm),
@@ -65,40 +66,41 @@ export default function CreateCopyVersionDrawer() {
 		},
 	});
 
+	const { mutateAsync: copyMutate, isPending } = useMutation({
+		mutationFn: createCopyOfVersion,
+		mutationKey: ['createCopyOfVersion'],
+		onSuccess: (version) => {
+			notify({
+				type: 'success',
+				title: translate('general.success'),
+				description: translate('version.copied'),
+			});
+			selectVersion(version);
+		},
+		onError: (error: APIError) => {
+			notify({
+				type: 'error',
+				title: error.error,
+				description: error.details,
+			});
+		},
+	});
 	async function onSubmit(data: z.infer<typeof CreateCopyVersionForm>) {
-		setLoading(true);
-
-		createCopyOfVersion({
+		copyMutate({
 			orgId: version.orgId,
 			appId: version.appId,
 			parentVersionId: version._id,
-			name: data.name,
-			private: data.private,
-			readOnly: data.readOnly,
-			onSuccess: (version) => {
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.copied'),
-				});
-				form.reset();
-				setCreateCopyVersionDrawerIsOpen(false);
-				selectVersion(version);
-			},
-			onError: (error) => {
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
-				});
-			},
+			...data,
 		});
+	}
 
-		setLoading(false);
+	function onClose() {
+		form.reset();
+		setCreateCopyVersionDrawerIsOpen(false);
 	}
 
 	return (
-		<Drawer open={createCopyVersionDrawerIsOpen} onOpenChange={setCreateCopyVersionDrawerIsOpen}>
+		<Drawer open={createCopyVersionDrawerIsOpen} onOpenChange={onClose}>
 			<DrawerContent position='right'>
 				<DrawerHeader>
 					<DrawerTitle>{t('version.create_copy_of_version')}</DrawerTitle>
@@ -171,7 +173,7 @@ export default function CreateCopyVersionDrawer() {
 							)}
 						/>
 						<div className='flex justify-end mt-4'>
-							<Button loading={loading} size='lg'>
+							<Button loading={isPending} size='lg'>
 								{t('general.add')}
 							</Button>
 						</div>
