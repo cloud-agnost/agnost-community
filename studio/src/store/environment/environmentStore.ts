@@ -22,7 +22,6 @@ interface EnvironmentStore {
 	environments: Environment[];
 	environment: Environment;
 	resources: Resource[];
-	envStatus: EnvironmentStatus;
 	envLogs: EnvLog[];
 	selectedLog: SelectedEnvLog;
 	isLogDetailsOpen: boolean;
@@ -39,7 +38,6 @@ type Actions = {
 	redeployAppVersionToEnvironment: (params: VersionParams) => Promise<void>;
 	updateEnvironmentTelemetryLogs: (params: UpdateEnvironmentTelemetryLogsParams) => Promise<any>;
 	getEnvironmentResources: (params: GetEnvironmentResourcesParams) => Promise<Resource[]>;
-	setEnvStatus: (envStatus: EnvironmentStatus) => void;
 	updateApiServerConf: (params: UpdateAPIServerConfParams) => Promise<void>;
 	reset: () => void;
 };
@@ -48,7 +46,6 @@ const initialState: EnvironmentStore = {
 	environments: [],
 	environment: {} as Environment,
 	resources: [],
-	envStatus: '' as EnvironmentStatus,
 	envLogs: [],
 	selectedLog: {} as SelectedEnvLog,
 	isLogDetailsOpen: false,
@@ -61,6 +58,7 @@ const useEnvironmentStore = create<EnvironmentStore & Actions>()(
 				...initialState,
 				getAppVersionEnvironment: async (params: getAppVersionEnvironmentParams) => {
 					const environment = await EnvironmentService.getAppVersionEnvironment(params);
+					console.log({ environment });
 					set({ environment });
 					return environment;
 				},
@@ -114,9 +112,6 @@ const useEnvironmentStore = create<EnvironmentStore & Actions>()(
 				},
 				closeLogDetails: () => {
 					set({ selectedLog: {} as SelectedEnvLog, isLogDetailsOpen: false });
-				},
-				setEnvStatus: (envStatus: EnvironmentStatus) => {
-					set({ envStatus });
 				},
 				updateApiServerConf: async (params: UpdateAPIServerConfParams) => {
 					try {
