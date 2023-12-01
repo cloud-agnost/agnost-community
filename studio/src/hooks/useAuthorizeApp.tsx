@@ -1,16 +1,8 @@
-import React from 'react';
-import { AppRoles } from '@/types';
-import { getAppPermission } from '@/utils';
 import useApplicationStore from '@/store/app/applicationStore';
+import { getAppPermission } from '@/utils';
+import React from 'react';
 
-interface Props {
-	role?: AppRoles;
-	key: string;
-}
-
-export default function useAuthorizeApp({ role, key }: Props) {
-	const apps = useApplicationStore((state) => state.applications);
-	const hasPermission = React.useMemo(() => getAppPermission(`${role}.app.${key}`), [role, apps]);
-
-	return hasPermission as boolean;
+export default function useAuthorizeApp(key: string) {
+	const app = useApplicationStore((state) => state.application);
+	return React.useMemo(() => getAppPermission(key), [app]);
 }
