@@ -43,9 +43,7 @@ export default function useVersionDropdownItems() {
 			},
 			{
 				title: t('version.create_a_copy'),
-				action: async () => {
-					setCreateCopyVersionDrawerIsOpen(true);
-				},
+				action: () => setCreateCopyVersionDrawerIsOpen(true),
 			},
 			{
 				title: version?.readOnly ? t('version.mark_read_write') : t('version.mark_read_only'),
