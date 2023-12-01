@@ -107,6 +107,7 @@ export default function VersionDatabase() {
 						onConfirm={deleteHandler}
 						isOpen={isDeleteDatabaseDialogOpen}
 						closeModal={closeDeleteDatabaseDialog}
+						closable
 					/>
 				)}
 			</VersionTabLayout>
