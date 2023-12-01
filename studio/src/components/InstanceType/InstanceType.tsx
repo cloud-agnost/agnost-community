@@ -6,11 +6,11 @@ export default function InstanceType({ iid }: { iid: string }) {
 	const environment = useEnvironmentStore((state) => state.environment);
 	const instance = useMemo(
 		() =>
-			environment?.mappings.find((mapping) => mapping.design.iid === iid)?.resource
+			environment?.mappings?.find((mapping) => mapping.design.iid === iid)?.resource
 				.instance as string,
 		[environment],
 	);
-
+	console.log('instance', environment);
 	const Icon = useMemo(() => RESOURCE_ICON_MAP[instance], [instance]);
 	return instance ? (
 		<div className='flex items-center gap-2'>
