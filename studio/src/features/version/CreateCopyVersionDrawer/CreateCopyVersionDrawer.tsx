@@ -1,7 +1,8 @@
+import { Button } from '@/components/Button';
+import { useToast } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/Button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import {
 	Form,
@@ -17,10 +18,9 @@ import { Switch } from 'components/Switch';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import './CreateCopyVersionDrawer.scss';
-import { useToast } from '@/hooks';
-import { useNavigate } from 'react-router-dom';
 const CreateCopyVersionForm = z.object({
 	name: z
 		.string({
@@ -51,6 +51,7 @@ export default function CreateCopyVersionDrawer() {
 		setCreateCopyVersionDrawerIsOpen,
 		version,
 		getVersionDashboardPath,
+		selectVersion,
 	} = useVersionStore();
 	const [loading, setLoading] = useState(false);
 
@@ -77,7 +78,7 @@ export default function CreateCopyVersionDrawer() {
 			name: data.name,
 			private: data.private,
 			readOnly: data.readOnly,
-			onSuccess: () => {
+			onSuccess: (version) => {
 				notify({
 					type: 'success',
 					title: translate('general.success'),
@@ -85,7 +86,7 @@ export default function CreateCopyVersionDrawer() {
 				});
 				form.reset();
 				setCreateCopyVersionDrawerIsOpen(false);
-				navigate(getVersionDashboardPath());
+				selectVersion(version);
 			},
 			onError: (error) => {
 				notify({
