@@ -1,8 +1,10 @@
 import { Button } from '@/components/Button';
 import { useToast } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore.ts';
+import { APIError } from '@/types';
 import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import {
 	Form,
@@ -15,13 +17,11 @@ import {
 } from 'components/Form';
 import { Input } from 'components/Input';
 import { Switch } from 'components/Switch';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import './CreateCopyVersionDrawer.scss';
-import { useMutation } from '@tanstack/react-query';
-import { APIError } from '@/types';
 const CreateCopyVersionForm = z.object({
 	name: z
 		.string({
