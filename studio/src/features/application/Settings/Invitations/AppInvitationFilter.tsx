@@ -1,3 +1,4 @@
+import { Button } from '@/components/Button';
 import { INVITATIONS_SORT_OPTIONS, PAGE_SIZE } from '@/constants';
 import { useToast } from '@/hooks';
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
@@ -5,7 +6,6 @@ import useApplicationStore from '@/store/app/applicationStore';
 import { Invitation } from '@/types';
 import { FunnelSimple } from '@phosphor-icons/react';
 import { Table } from '@tanstack/react-table';
-import { Button } from '@/components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
@@ -25,11 +25,7 @@ function AppInvitationFilter({ table }: Props) {
 	const { notify } = useToast();
 	const { t } = useTranslation();
 	const [searchParams] = useSearchParams();
-	const role = useApplicationStore((state) => state.application?.role);
-	const canMultiDeleteInvite = useAuthorizeApp({
-		role,
-		key: 'invitation.delete',
-	});
+	const canMultiDeleteInvite = useAuthorizeApp('invitation.delete');
 	const {
 		invitationRoleFilter,
 		invitationSearch,

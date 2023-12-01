@@ -1,13 +1,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
-import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { SortButton } from '@/components/DataTable';
+import { TableConfirmation } from '@/components/Table';
+import useApplicationStore from '@/store/app/applicationStore';
 import { ApplicationMember } from '@/types';
-import { notify, translate } from '@/utils';
-import { Trash } from '@phosphor-icons/react';
+import { getAppPermission, notify, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
-import useApplicationStore from '@/store/app/applicationStore';
+
+const canDelete = getAppPermission('team.delete');
+const canUpdate = getAppPermission('team.update');
 
 function removeMember(userId: string) {
 	useApplicationStore.getState?.().removeAppMember({
@@ -99,7 +101,7 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 					role={role}
 					type={'app'}
 					onSelect={(selectedRole) => updateMemberRole(member._id, selectedRole)}
-					disabled={member.isAppOwner}
+					disabled={member.isAppOwner || !canUpdate}
 				/>
 			);
 		},
@@ -112,11 +114,12 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 			const { member } = row.original;
 			return (
 				!member.isAppOwner && (
-					<div className='flex items-center justify-end'>
-						<Button variant='blank' iconOnly onClick={() => removeMember(member._id)}>
-							<Trash size={20} />
-						</Button>
-					</div>
+					<TableConfirmation
+						title={translate('application.deleteMember.title')}
+						description={translate('application.deleteMember.description')}
+						onConfirm={() => removeMember(member._id)}
+						hasPermission={canDelete}
+					/>
 				)
 			);
 		},
