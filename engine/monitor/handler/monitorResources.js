@@ -1029,6 +1029,10 @@ async function getClusterInfo() {
  * Checks and updates cluster resource status
  */
 async function checkClusterResourceStatus() {
+	// We only check cluster resoruces if the cluster set up is complete
+	const clusterObj = await getClusterInfo();
+	if (!clusterObj) return;
+
 	const clusterInfo = [];
 	const clusterComponents = (await import("./clusterComponents.js"))
 		.clusterComponents;

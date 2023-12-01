@@ -100,4 +100,7 @@ spec:
                          key: rootPassword
                  - name: NAMESPACE
                    value: default
+                 - name: RELEASE_NUMBER
+                   value: "v1.0.0"
+
 

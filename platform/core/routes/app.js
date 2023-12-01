@@ -67,6 +67,12 @@ router.post(
 				await appCtrl.createApp(session, user, org, name);
 
 			await appCtrl.commit(session);
+			// Set app team member information
+			app.team[0].userId = {
+				...user,
+				loignProfiles: undefined,
+				notifications: undefined,
+			};
 			res.json({
 				app,
 				version,
@@ -274,8 +280,9 @@ router.put(
 				});
 			}
 
-			// Resize image if width and height specifiec
-			buffer = await sharp(req.file.buffer).resize(width, height).toBuffer();
+			// Resize image if width and height specified and if the image is not in svg format
+			if (req.file.mimetype !== "image/svg+xml")
+				buffer = await sharp(req.file.buffer).resize(width, height).toBuffer();
 
 			// Specify the directory where you want to store the image
 			const uploadBucket = config.get("general.storageBucket");

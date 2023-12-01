@@ -337,6 +337,7 @@ router.put(
 	async (req, res) => {
 		try {
 			let buffer = req.file?.buffer;
+			console.log("***here", req.file);
 			let { width, height } = req.query;
 			if (!width) width = config.get("general.profileImgSizePx");
 			if (!height) height = config.get("general.profileImgSizePx");
@@ -349,8 +350,9 @@ router.put(
 				});
 			}
 
-			// Resize image if width and height specifiec
-			buffer = await sharp(req.file.buffer).resize(width, height).toBuffer();
+			// Resize image if width and height specified and if the image is not in svg format
+			if (req.file.mimetype !== "image/svg+xml")
+				buffer = await sharp(req.file.buffer).resize(width, height).toBuffer();
 
 			// Specify the directory where you want to store the image
 			const uploadBucket = config.get("general.storageBucket");
