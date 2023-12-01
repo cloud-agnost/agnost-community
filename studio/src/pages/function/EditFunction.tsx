@@ -20,7 +20,7 @@ export default function EditFunction() {
 		deleteLogic,
 	} = useFunctionStore();
 
-	const { versionId, appId, orgId, funcId } = useParams<{
+	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
 		orgId: string;

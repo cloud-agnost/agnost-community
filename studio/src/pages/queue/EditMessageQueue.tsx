@@ -17,7 +17,7 @@ export default function EditMessageQueue() {
 		useMessageQueueStore();
 	const [isTestQueueOpen, setIsTestQueueOpen] = useState(false);
 
-	const { versionId, appId, orgId, queueId } = useParams<{
+	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
 		orgId: string;
