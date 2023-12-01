@@ -19,13 +19,16 @@ import {
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './deploymentStatusCard.scss';
+import { useEnvironmentStatus } from '@/hooks';
+import { EnvironmentStatus } from '@/types';
 
 export default function DeploymentStatusCard() {
 	const { t } = useTranslation();
 	const [settingsIsOpen, setSettingsIsOpen] = useState(false);
 	const [isLogsOpen, setIsLogsOpen] = useState(false);
-	const { envStatus, getEnvironmentResources, environment } = useEnvironmentStore();
-	const classes = ENV_STATUS_CLASS_MAP[envStatus];
+	const { getEnvironmentResources, environment } = useEnvironmentStore();
+	const envStatus = useEnvironmentStatus();
+	const classes = ENV_STATUS_CLASS_MAP[envStatus as EnvironmentStatus];
 
 	function handleOpenChange(open: boolean) {
 		if (!open) {
