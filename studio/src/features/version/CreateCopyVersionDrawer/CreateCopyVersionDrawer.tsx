@@ -18,7 +18,6 @@ import { Switch } from 'components/Switch';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import './CreateCopyVersionDrawer.scss';
 const CreateCopyVersionForm = z.object({
@@ -44,13 +43,11 @@ const CreateCopyVersionForm = z.object({
 export default function CreateCopyVersionDrawer() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const navigate = useNavigate();
 	const {
 		createCopyVersionDrawerIsOpen,
 		createCopyOfVersion,
 		setCreateCopyVersionDrawerIsOpen,
 		version,
-		getVersionDashboardPath,
 		selectVersion,
 	} = useVersionStore();
 	const [loading, setLoading] = useState(false);
