@@ -87,6 +87,7 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 					}
 				},
 				getEndpointById: async (params) => {
+					set({ endpoint: {} as Endpoint });
 					const endpoint = await EndpointService.getEndpointById(params);
 					set({ endpoint });
 					if (isEmpty(get().logics[endpoint._id])) {

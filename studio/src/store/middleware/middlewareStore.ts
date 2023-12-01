@@ -77,6 +77,7 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 			return middlewares;
 		},
 		getMiddlewareById: async (params: GetMiddlewareByIdParams) => {
+			set({ middleware: {} as Middleware });
 			const middleware = await MiddlewareService.getMiddlewareById(params);
 			set({ middleware });
 			if (isEmpty(get().logics[middleware._id])) {

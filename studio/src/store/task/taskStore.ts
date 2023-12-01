@@ -63,6 +63,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 					set({ isEditTaskModalOpen: false });
 				},
 				getTask: async (params: GetTaskParams) => {
+					set({ task: {} as Task });
 					const task = await TaskService.getTask(params);
 					set({ task });
 					if (isEmpty(get().logics[task._id])) {
