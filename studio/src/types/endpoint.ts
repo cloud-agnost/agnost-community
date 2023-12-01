@@ -54,11 +54,13 @@ export const CreateEndpointSchema = z.object({
 						message: t('endpoint.errors.duplicateParam'),
 					});
 				}
-
+				console.log(value);
 				if (FORBIDDEN_EP_PREFIXES.find((prefix) => value.startsWith(prefix))) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
-						message: t("Endpoint route cannot start with '%s'", FORBIDDEN_EP_PREFIXES.join("', '")),
+						message: t('endpoint.errors.reservedKeyword', {
+							keyword: value.split('/')[1],
+						}),
 					});
 				}
 			}
@@ -165,6 +167,7 @@ export interface TestEndpointParams extends BaseRequest {
 }
 
 interface TestResponse extends AxiosResponse {
+	cookies(cookies: any): unknown;
 	epId: string;
 	duration?: string;
 	response?: AxiosError['response'];

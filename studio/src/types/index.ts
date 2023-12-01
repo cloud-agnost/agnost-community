@@ -1,5 +1,5 @@
 export type * from './application.ts';
-export { CreateApplicationSchema } from './application.ts';
+export { AppRoles, CreateApplicationSchema } from './application.ts';
 export type * from './auth.ts';
 export type * from './cache.ts';
 export { CacheSchema, CreateCacheSchema } from './cache.ts';

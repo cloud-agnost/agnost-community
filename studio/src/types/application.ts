@@ -5,7 +5,11 @@ import { ResLog, Resource } from './resource';
 import { BaseRequest } from './type';
 import { Version } from './version';
 
-export type AppRoles = 'Admin' | 'Developer' | 'Viewer';
+export enum AppRoles {
+	Admin = 'Admin',
+	Developer = 'Developer',
+	Viewer = 'Viewer',
+}
 export interface Application {
 	_id: string;
 	orgId: string;
