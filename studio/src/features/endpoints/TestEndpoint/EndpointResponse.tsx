@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import TestEndpointTable from './TestEndpointTable';
 import { CSSProperties } from 'react';
 import { Log } from '@/types';
+import { EmptyState } from '@/components/EmptyState';
 
 interface EndpointResponseProps {
 	className?: string;
@@ -32,32 +33,34 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 						</TabsTrigger>
 					))}
 				</TabsList>
-				<div className='flex items-center gap-4'>
-					<div className='text-sm text-default'>
-						{t('endpoint.status')}
-						<span
-							className={cn(
-								'ml-2',
-								response?.statusText === 'OK' ? 'text-green-500' : 'text-red-500',
-							)}
-						>
-							{response?.status}
-						</span>
-					</div>
-					{response?.duration && (
+				{response && (
+					<div className='flex items-center gap-4'>
 						<div className='text-sm text-default'>
-							{t('endpoint.duration')}
+							{t('endpoint.status')}
 							<span
 								className={cn(
 									'ml-2',
 									response?.statusText === 'OK' ? 'text-green-500' : 'text-red-500',
 								)}
 							>
-								{response?.duration}
+								{response?.status}
 							</span>
 						</div>
-					)}
-				</div>
+						{response?.duration && (
+							<div className='text-sm text-default'>
+								{t('endpoint.duration')}
+								<span
+									className={cn(
+										'ml-2',
+										response?.statusText === 'OK' ? 'text-green-500' : 'text-red-500',
+									)}
+								>
+									{response?.duration}
+								</span>
+							</div>
+						)}
+					</div>
+				)}
 			</div>
 
 			<TabsContent value='body' className='h-full'>
@@ -71,26 +74,36 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 				/>
 			</TabsContent>
 			<TabsContent value='cookies' className='overflow-y-auto h-[calc(100%-4rem)]'>
-				{/* {fields.map((f, index) => (
-						<TableRow key={f.id}>
-							<TableCell></TableCell>
-							<TableCell></TableCell>
-						</TableRow>
-					))} */}
-			</TabsContent>
-			<TabsContent value='headers' className='h-[calc(100%-4rem)]'>
-				<div className='h-full overflow-y-auto no-scrollbar'>
+				{response?.headers ? (
 					<TestEndpointTable containerClassName='h-auto'>
-						{objToArray(response?.headers).map((header) => (
+						{objToArray(response?.cookies).map((header) => (
 							<TableRow key={header.value}>
 								<TableCell>{header.key}</TableCell>
 								<TableCell>{header.value}</TableCell>
 							</TableRow>
 						))}
 					</TestEndpointTable>
+				) : (
+					<EmptyState title={t('endpoint.no_cookies')} type='endpoint' />
+				)}
+			</TabsContent>
+			<TabsContent value='headers' className='h-[calc(100%-4rem)]'>
+				<div className='h-full overflow-y-auto no-scrollbar'>
+					{response?.headers ? (
+						<TestEndpointTable containerClassName='h-auto'>
+							{objToArray(response?.headers).map((header) => (
+								<TableRow key={header.value}>
+									<TableCell>{header.key}</TableCell>
+									<TableCell>{header.value}</TableCell>
+								</TableRow>
+							))}
+						</TestEndpointTable>
+					) : (
+						<EmptyState title={t('endpoint.no_headers')} type='endpoint' />
+					)}
 				</div>
 			</TabsContent>
-			<TabsContent value='console' className='h-[calc(100%-4rem)]'>
+			<TabsContent value='console' className='h-full'>
 				<Logs logs={response?.logs as Log[]} />
 			</TabsContent>
 		</Tabs>
