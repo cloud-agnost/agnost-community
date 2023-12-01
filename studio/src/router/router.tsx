@@ -10,7 +10,6 @@ import BeatLoader from 'react-spinners/BeatLoader';
 import authLoaders from './loader/AuthLoader';
 import homeLoaders from './loader/HomeLoader';
 import onboardingLoaders from './loader/OnboardingLoader';
-import organizationLoaders from './loader/OrganizationLoader';
 import versionLoaders from './loader/VersionLoader';
 export function Fallback(): JSX.Element {
 	return (
@@ -573,7 +572,6 @@ const router = createBrowserRouter([
 					{
 						path: ':orgId',
 						element: <OrganizationDetailsLoadable />,
-						loader: organizationLoaders,
 						children: [
 							{
 								path: 'apps',
