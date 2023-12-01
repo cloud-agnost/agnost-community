@@ -53,10 +53,7 @@ type Actions = {
 	getAllVersionsVisibleToUser: (req: GetVersionRequest) => Promise<Version[]>;
 	setVersionPage: (page: number) => void;
 	updateVersionProperties: (params: UpdateVersionPropertiesParams) => Promise<Version>;
-	createCopyOfVersion: (
-		params: CreateCopyOfVersionParams,
-		returnRedirect?: boolean,
-	) => Promise<Version | void>;
+	createCopyOfVersion: (params: CreateCopyOfVersionParams) => Promise<Version>;
 	getVersionDashboardPath: (appendPath?: string, version?: Version) => string;
 	setCreateCopyVersionDrawerIsOpen: (isOpen: boolean) => void;
 	getVersionLogs: (params: GetVersionLogsParams) => Promise<VersionLog[]>;
@@ -178,6 +175,7 @@ const useVersionStore = create<VersionStore & Actions>()(
 						const { version } = await VersionService.createCopyOfVersion(params);
 						set((prev) => ({ versions: [version, ...prev.versions] }));
 						params.onSuccess?.(version);
+						return version;
 					} catch (e) {
 						params.onError?.(e as APIError);
 						throw e;
