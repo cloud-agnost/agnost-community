@@ -21,7 +21,7 @@ export default function EditEndpoint() {
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [isTestEndpointOpen, setIsTestEndpointOpen] = useState(false);
-	const { versionId, appId, orgId, endpointId } = useParams<{
+	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
 		orgId: string;
@@ -51,7 +51,7 @@ export default function EditEndpoint() {
 			orgId: orgId,
 			appId: appId,
 			versionId: versionId,
-			epId: endpointId,
+			epId: useEndpointStore.getState().endpoint._id,
 			logic: logic,
 		});
 	}

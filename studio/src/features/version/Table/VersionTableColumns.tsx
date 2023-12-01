@@ -1,18 +1,16 @@
 import { Button } from '@/components/Button';
 import { DateText } from '@/components/DateText';
 import { Version as VersionIcon } from '@/components/icons';
-import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useVersionStore from '@/store/version/versionStore';
-import { Application, Version } from '@/types';
-import { cn, translate } from '@/utils';
+import { Version } from '@/types';
+import { cn, getVersionPermission, translate } from '@/utils';
 import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
 
 const { selectVersion } = useVersionStore.getState();
 const closeVersionDrawer = useApplicationStore.getState().closeVersionDrawer;
-const app = useApplicationStore.getState().application;
 
 export const VersionTableColumns: ColumnDef<Version>[] = [
 	{
@@ -69,26 +67,20 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 		header: '',
 		size: 75,
 		cell: ({ row }) => {
-			const { _id } = row.original;
+			const canViewVersion = getVersionPermission('version.view');
 			return (
-				<OpenVersion
-					id={_id}
-					app={app as Application}
-					onSelect={() => {
+				<Button
+					disabled={!canViewVersion}
+					size='sm'
+					variant='secondary'
+					onClick={() => {
 						selectVersion(row.original);
 						closeVersionDrawer();
 					}}
-				/>
+				>
+					{translate('general.open')}
+				</Button>
 			);
 		},
 	},
 ];
-
-function OpenVersion({ onSelect }: { id: string; app: Application; onSelect: () => void }) {
-	const canViewVersion = useAuthorizeVersion('version.view');
-	return (
-		<Button disabled={!canViewVersion} size='sm' variant='secondary' onClick={onSelect}>
-			{translate('general.open')}
-		</Button>
-	);
-}

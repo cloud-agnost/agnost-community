@@ -62,7 +62,11 @@
 	"delete": {
 		"title": "Delete App",
 		"alert": "Are you sure you want to delete this app?",
-		"description": " You are about to delete the app. After deleting the app you will not be able to access it again. Are you sure you would like to delete the this app?",
+		"description": " You are about to delete the app. After deleting the app you will not be able to access it again.",
 		"confirmCode": "Confirm endpoint delete by typing <confirmCode>{{confirmCode}}</confirmCode> below."
+	},
+	"deleteMember": {
+		"title": "Delete Member",
+		"description": "You are about to delete the member from the app. After deleting the member you will not be able to access it again. Are you sure you would like to delete the this member?"
 	}
 }

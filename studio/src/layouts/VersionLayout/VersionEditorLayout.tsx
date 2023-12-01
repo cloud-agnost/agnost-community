@@ -3,13 +3,14 @@ import { Button } from '@/components/Button';
 import { CodeEditor } from '@/components/CodeEditor';
 import { InfoModal } from '@/components/InfoModal';
 import { Pencil } from '@/components/icons';
-import { useEditor, useUpdateEffect } from '@/hooks';
+import { useUpdateEffect } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
-import { cn } from '@/utils';
+import { cn, formatCode } from '@/utils';
 import { FloppyDisk, TestTube } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router-dom';
+
 interface VersionEditorLayoutProps {
 	children: React.ReactNode;
 	className?: string;
@@ -60,12 +61,12 @@ export default function VersionEditorLayout({
 	const { removeTab, toDeleteTab, isDeleteTabModalOpen, closeDeleteTabModal, getCurrentTab } =
 		useTabStore();
 	const tab = getCurrentTab(versionId as string);
-	const { saveEditorContent } = useEditor({});
 	async function handleSaveLogic() {
-		saveEditorContent('javascript', (val: string) => {
-			setLogic(val);
-			onSaveLogic(val);
-		});
+		const model = monaco.editor.getModels()[0];
+		const formattedLogic = await formatCode(model.getValue());
+		setLogic(formattedLogic);
+		model.setValue(formattedLogic);
+		onSaveLogic(formattedLogic);
 	}
 
 	window.onload = function () {

@@ -51,7 +51,6 @@ export default function NewTabDropdown() {
 
 	function onInput(value: string) {
 		value = value.trim();
-		console.log(value, !value);
 		if (!value) {
 			resetDesignElements();
 			return;
@@ -66,7 +65,7 @@ export default function NewTabDropdown() {
 
 	function getIcon(type: TabTypes): JSX.Element {
 		const IconComponent = TAB_ICON_MAP[type];
-		return <IconComponent className='w-8 h-8 text-icon-base' />;
+		return <IconComponent className='w-5 h-5' />;
 	}
 	return (
 		<DropdownMenu onOpenChange={resetDesignElements}>
@@ -92,7 +91,7 @@ export default function NewTabDropdown() {
 										<div className=' bg-lighter p-2 rounded-lg'>
 											{getIcon(capitalize(item.type) as TabTypes)}
 										</div>
-										<div className='space-y-2'>
+										<div>
 											<p className='text-subtle font-sfCompact'>{capitalize(item.type)}</p>
 											<p className='text-default font-sfCompact'>{item.name}</p>
 										</div>
@@ -100,12 +99,17 @@ export default function NewTabDropdown() {
 								</DropdownMenuItem>
 						  ))
 						: NEW_TAB_ITEMS.sort((a, b) => a.title.localeCompare(b.title)).map((item) => (
-								<DropdownMenuItem onClick={() => handleAddTab(item)} asChild key={item.path}>
-									<div className='space-x-4'>
-										<div className='bg-lighter p-2 rounded-lg'>
-											{getIcon(capitalize(item.type) as TabTypes)}
-										</div>
-										<span className='text-default font-sfCompact text-base'>{item.title}</span>
+								<DropdownMenuItem
+									onClick={() => handleAddTab(item)}
+									asChild
+									key={item.path}
+									className='flex items-center gap-4 relative'
+								>
+									<div>
+										{getIcon(capitalize(item.type) as TabTypes)}
+										<h1 title={item.title} className='flex-1 truncate max-w-[15ch]'>
+											{item.title}
+										</h1>
 									</div>
 								</DropdownMenuItem>
 						  ))}

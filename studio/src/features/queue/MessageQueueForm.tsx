@@ -24,9 +24,8 @@ export default function MessageQueueForm({ edit, loading }: { edit?: boolean; lo
 
 	const selectedResource = useMemo(
 		() => (edit ? resource : resources.find((item) => item._id === form.getValues('resourceId'))),
-		[form.getValues('resourceId'), resources],
+		[form.getValues('resourceId'), resources, resource],
 	);
-
 	return (
 		<div className='space-y-6'>
 			<FormField

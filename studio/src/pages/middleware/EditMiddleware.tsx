@@ -29,7 +29,7 @@ export default function EditMiddleware() {
 				orgId,
 				appId,
 				versionId,
-				mwId: middlewareId,
+				mwId: useMiddlewareStore.getState().middleware._id,
 				logic: logic,
 			});
 		},

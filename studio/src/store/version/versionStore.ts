@@ -176,8 +176,8 @@ const useVersionStore = create<VersionStore & Actions>()(
 				createCopyOfVersion: async (params: CreateCopyOfVersionParams) => {
 					try {
 						const { version } = await VersionService.createCopyOfVersion(params);
-						set((prev) => ({ versions: [...prev.versions, version] }));
-						params.onSuccess?.();
+						set((prev) => ({ versions: [version, ...prev.versions] }));
+						params.onSuccess?.(version);
 					} catch (e) {
 						params.onError?.(e as APIError);
 						throw e;

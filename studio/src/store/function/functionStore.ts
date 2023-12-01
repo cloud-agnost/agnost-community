@@ -50,6 +50,7 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				return functions;
 			},
 			getFunctionById: async (params) => {
+				set({ function: {} as funcTypes.HelperFunction });
 				const func = await FunctionService.getFunctionById(params);
 				set({ function: func });
 				if (isEmpty(get().logics[func._id])) {

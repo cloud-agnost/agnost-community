@@ -1,5 +1,4 @@
 import useAuthStore from '@/store/auth/authStore';
-import { APIError } from '@/types';
 import { LoaderFunctionArgs, json, redirect } from 'react-router-dom';
 
 async function changePasswordWithTokenLoader({ request }: LoaderFunctionArgs) {
@@ -21,8 +20,7 @@ async function completeAccountSetupVerifyEmail(params: LoaderFunctionArgs) {
 		if (token && !isAccepted) res = await useAuthStore.getState().acceptInvite(token as string);
 		return { token, isVerified, user: res?.user };
 	} catch (error) {
-		if ((error as APIError).code === 'not_allowed') return redirect('/login');
-		else return { error, token, isVerified };
+		return { error, token, isVerified };
 	}
 }
 

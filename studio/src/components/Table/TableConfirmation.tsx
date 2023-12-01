@@ -25,7 +25,7 @@ export function TableConfirmation({
 	description,
 	contentClassName,
 	closeOnConfirm,
-	align = 'center',
+	align = 'end',
 	hasPermission,
 	icon,
 	tooltip,
@@ -48,9 +48,7 @@ export function TableConfirmation({
 								disabled={!hasPermission}
 								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
 								iconOnly
-								onClick={(e) => {
-									e.stopPropagation();
-								}}
+								onClick={(e) => e.stopPropagation()}
 							>
 								{icon ?? <Trash size={20} />}
 							</Button>

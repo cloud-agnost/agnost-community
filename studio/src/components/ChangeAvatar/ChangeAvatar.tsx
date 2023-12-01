@@ -72,21 +72,33 @@ export default function ChangeAvatar({
 						className={cn('cursor-pointer', disabled && 'cursor-not-allowed opacity-50')}
 					>
 						<Avatar size='3xl' square>
-							<AvatarImage
-								src={location.protocol + '//' + location.hostname + '/api' + item?.pictureUrl}
-							/>
+							<AvatarImage src={item?.pictureUrl} />
 							{item && <AvatarFallback color={item?.color} name={item?.name} />}
 						</Avatar>
 					</label>
 					{loading && <CircleNotch size={48} className='loading avatar-actions-loading' />}
 					<div className='avatar-actions-button'>
 						{item?.pictureUrl && (
-							<Button onClick={onClickHandler} variant='blank' size='sm'>
+							<Button
+								variant='blank'
+								rounded
+								disabled={disabled}
+								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
+								iconOnly
+								onClick={onClickHandler}
+								size='sm'
+							>
 								<Trash className='avatar-actions-icon' />
 							</Button>
 						)}
-						<Button variant='blank' size='sm' disabled={disabled || loading}>
-							<label htmlFor={filePickerId}>
+						<Button
+							variant='blank'
+							rounded
+							size='sm'
+							disabled={disabled || loading}
+							className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
+						>
+							<label htmlFor={filePickerId} className='cursor-pointer'>
 								<Pencil className='avatar-actions-icon' />
 							</label>
 						</Button>

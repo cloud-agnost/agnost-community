@@ -1,4 +1,3 @@
-import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
@@ -9,7 +8,7 @@ import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import useStorageStore from '@/store/storage/storageStore';
 import useTaskStore from '@/store/task/taskStore';
 import useTabStore from '@/store/version/tabStore';
-import { getAppPermission } from '@/utils';
+import { getVersionPermission } from '@/utils';
 import { LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 async function editEndpointLoader({ params }: LoaderFunctionArgs) {
@@ -104,7 +103,6 @@ async function editMessageQueueLoader({ params }: LoaderFunctionArgs) {
 }
 
 async function bucketLoader({ params }: LoaderFunctionArgs) {
-	const role = useApplicationStore.getState().application?.role;
 	const { removeTab, getCurrentTab } = useTabStore.getState();
 	const { storageId, appId, orgId, versionId } = params;
 	const { storages } = useStorageStore.getState();
@@ -119,7 +117,7 @@ async function bucketLoader({ params }: LoaderFunctionArgs) {
 	}
 	useStorageStore.setState({ storage: selectedStorage });
 
-	const permission = getAppPermission(`${role}.app.storage.viewData`);
+	const permission = getVersionPermission('storage.viewData');
 
 	if (!permission) {
 		removeTab(versionId as string, getCurrentTab(versionId as string).id);
@@ -196,7 +194,7 @@ async function fieldsLoader({ params }: LoaderFunctionArgs) {
 	};
 
 	const { getSpecificModelOfDatabase, model } = useModelStore.getState();
-	if (apiParams.modelId !== model._id && apiParams.modelId)
+	if (apiParams.modelId !== model?._id && apiParams.modelId)
 		await getSpecificModelOfDatabase(apiParams);
 
 	return { props: {} };

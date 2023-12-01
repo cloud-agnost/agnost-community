@@ -20,11 +20,7 @@ export default function MainAppMembers() {
 		columns: AppMembersTableColumns,
 	});
 	const { canClusterSendEmail } = useClusterStore();
-	const role = useApplicationStore((state) => state.application?.role);
-	const canMultiDelete = useAuthorizeApp({
-		role,
-		key: 'team.delete',
-	});
+	const canMultiDelete = useAuthorizeApp('team.delete');
 	const { t } = useTranslation();
 
 	function removeMultipleMembers() {

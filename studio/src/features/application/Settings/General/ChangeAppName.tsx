@@ -11,7 +11,7 @@ import { z } from 'zod';
 export default function ChangeAppName() {
 	const { t } = useTranslation();
 	const { application, changeAppName } = useApplicationStore();
-	const canEdit = useAuthorizeApp({ role: application?.role, key: 'update' });
+	const canEdit = useAuthorizeApp('update');
 	const { notify } = useToast();
 	const form = useForm<z.infer<typeof ChangeNameFormSchema>>({
 		defaultValues: {

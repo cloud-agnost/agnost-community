@@ -83,8 +83,7 @@ export const TimestampsSchema = z
 	});
 export const CreateDatabaseSchema = z.object({
 	name: NameSchema,
-	assignUniqueName: z.boolean().default(false),
-
+	assignUniqueName: z.boolean().default(true),
 	poolSize: z
 		.number({
 			invalid_type_error: t('forms.required', {

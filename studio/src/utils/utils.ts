@@ -14,9 +14,12 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import useTypeStore from '@/store/types/typeStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import { RealtimeData, ToastType } from '@/types';
+import { AppRoles, RealtimeData, ToastType } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
 import _ from 'lodash';
+import * as prettier from 'prettier';
+import jsParser from 'prettier/plugins/babel';
+import esTreePlugin from 'prettier/plugins/estree';
 import { HTMLInputTypeAttribute } from 'react';
 import { twMerge } from 'tailwind-merge';
 
@@ -219,8 +222,11 @@ export default function groupBy<T>(list: T[], keyGetter: (item: T) => string) {
 	return map;
 }
 
-export const getAppPermission = (path: string) => {
-	return _.get(useApplicationStore.getState().appAuthorization, path);
+export const getAppPermission = (path: string, role?: AppRoles): boolean => {
+	const { appAuthorization, application } = useApplicationStore.getState();
+	const key = `${application?.role ?? role}.app.${path}`;
+	console.log('key', key, _.get(appAuthorization, key));
+	return _.get(appAuthorization, key);
 };
 
 export const getOrgPermission = (path: string): boolean => {
@@ -412,7 +418,9 @@ export function getVersionPermission(type: string): boolean {
 
 	const isVersionEditable = version?.readOnly
 		? user?._id === version.createdBy || role === 'Admin'
-		: isPrivateForUser && getAppPermission(`${role}.app.${type}`);
+		: isPrivateForUser && getAppPermission(type);
+
+	console.log('isVersionEditable', isVersionEditable, getAppPermission(type));
 	return isVersionEditable as boolean;
 }
 
@@ -438,4 +446,15 @@ export function stringifyObjectValues(obj: Record<string, any>): Record<string, 
 	}
 
 	return stringifiedObj;
+}
+
+export async function formatCode(code: string) {
+	try {
+		return await prettier.format(code, {
+			parser: 'babel',
+			plugins: [jsParser, esTreePlugin],
+		});
+	} catch (error) {
+		return code;
+	}
 }

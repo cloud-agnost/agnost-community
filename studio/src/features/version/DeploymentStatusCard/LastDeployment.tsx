@@ -25,7 +25,7 @@ export default function LastDeployment() {
 		return 'OK';
 	}
 	return (
-		<div className='w-full space-y-2 px-4 py-2'>
+		<div className='w-full space-y-2 pl-4 pr-5 py-2'>
 			<div className='text-subtle text-sm font-sfCompact leading-6 flex justify-between gap-4'>
 				<p>{t('version.last_deployment')}</p>
 				<p>{t('version.status')}</p>

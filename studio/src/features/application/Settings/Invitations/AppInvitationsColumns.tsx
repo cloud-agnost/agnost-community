@@ -4,15 +4,17 @@ import { ResendButton } from '@/components/ResendButton';
 import { TableConfirmation } from '@/components/Table';
 import useApplicationStore from '@/store/app/applicationStore';
 import { Invitation } from '@/types';
-import { getVersionPermission, notify, translate } from '@/utils';
+import { getAppPermission, notify, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
-const canDelete = getVersionPermission('invite.delete');
-const canResend = getVersionPermission('invite.resend');
-const canUpdate = getVersionPermission('invite.update');
-function updateInvitationUserRole(token: string, role: string) {
-	useApplicationStore.getState?.().updateInvitationUserRole({
+const canDelete = getAppPermission('invite.delete');
+const canResend = getAppPermission('invite.resend');
+const canUpdate = getAppPermission('invite.update');
+const { updateInvitationUserRole, resendInvitation, deleteInvitation } =
+	useApplicationStore.getState();
+function updateInvitationUserRoleHandler(token: string, role: string) {
+	updateInvitationUserRole({
 		token,
 		role,
 		onSuccess: () => {
@@ -31,8 +33,8 @@ function updateInvitationUserRole(token: string, role: string) {
 		},
 	});
 }
-function resendInvitation(token: string, email: string) {
-	useApplicationStore.getState?.().resendInvitation({
+function resendInvitationHandler(token: string, email: string) {
+	resendInvitation({
 		token,
 		onSuccess: () => {
 			notify({
@@ -53,8 +55,8 @@ function resendInvitation(token: string, email: string) {
 	});
 }
 
-function deleteInvitation(token: string) {
-	useApplicationStore.getState?.().deleteInvitation({
+function deleteInvitationHandler(token: string) {
+	deleteInvitation({
 		token,
 		onSuccess: () => {
 			notify({
@@ -115,7 +117,7 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 				<RoleSelect
 					role={role}
 					type={'app'}
-					onSelect={(newRole) => updateInvitationUserRole(token, newRole)}
+					onSelect={(newRole) => updateInvitationUserRoleHandler(token, newRole)}
 					disabled={!canUpdate}
 				/>
 			);
@@ -128,11 +130,14 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 			const { token, email } = row.original;
 			return (
 				<div className='flex items-center justify-end'>
-					<ResendButton disabled={!canResend} onResend={() => resendInvitation(token, email)} />
+					<ResendButton
+						disabled={!canResend}
+						onResend={() => resendInvitationHandler(token, email)}
+					/>
 					<TableConfirmation
 						title={translate('organization.settings.members.invite.delete')}
 						description={translate('organization.settings.members.invite.deleteDesc')}
-						onConfirm={() => deleteInvitation(token)}
+						onConfirm={() => deleteInvitationHandler(token)}
 						hasPermission={canDelete}
 					/>
 				</div>

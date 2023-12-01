@@ -63,6 +63,7 @@ import {
 } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
 import {
+	AppRoles,
 	Application,
 	EnvironmentStatus,
 	HttpMethod,
@@ -75,7 +76,7 @@ import {
 	Tab,
 	TabTypes,
 } from '@/types';
-import { translate } from '@/utils';
+import { getAppPermission, translate } from '@/utils';
 import {
 	BracketsCurly,
 	Clock,
@@ -101,6 +102,8 @@ import {
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { ElementType } from 'react';
 
+export const BASE_URL = `${window.location.protocol}//${window.location.hostname}`;
+export const BASE_URL_WITH_API = `${BASE_URL}/api`;
 export const PAGE_SIZE = 10;
 export const MODULE_PAGE_SIZE = 25;
 export const UI_BASE_URL = window.location.origin;
@@ -178,7 +181,7 @@ export const APPLICATION_SETTINGS = [
 		onClick: (application: Application) => {
 			useApplicationStore.getState().openVersionDrawer(application);
 		},
-		permissionKey: 'version.view',
+		isDisabled: (role: AppRoles) => !getAppPermission('version.view', role),
 	},
 	{
 		id: 'update',
@@ -195,7 +198,7 @@ export const APPLICATION_SETTINGS = [
 				);
 			}
 		},
-		permissionKey: 'update',
+		isDisabled: (role: AppRoles) => !getAppPermission('update', role),
 	},
 	{
 		id: 'invite',
@@ -203,7 +206,23 @@ export const APPLICATION_SETTINGS = [
 		onClick: (application: Application) => {
 			useApplicationStore.getState().openInviteMemberDrawer(application);
 		},
-		permissionKey: 'invite.create',
+		isDisabled: (role: AppRoles) => !getAppPermission('invite.create', role),
+	},
+	{
+		id: 'leave-app',
+		name: translate('application.settings.leaveTeam'),
+		onClick: (application: Application) => {
+			useApplicationStore.getState().openLeaveModal(application);
+		},
+		isDisabled: (role: AppRoles) => role === AppRoles.Admin,
+	},
+	{
+		id: 'delete-app',
+		name: translate('general.delete'),
+		onClick: (application: Application) => {
+			useApplicationStore.getState().openDeleteModal(application);
+		},
+		isDisabled: (role: AppRoles) => !getAppPermission('delete', role),
 	},
 ];
 
@@ -229,7 +248,7 @@ export const ALL_NOTIFICATIONS = [
 	'field',
 	'endpoint',
 	'queue',
-	'cronjob',
+	'task',
 	'cache',
 	'storage',
 	'resource',

@@ -76,6 +76,7 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 					return queues;
 				},
 				getQueueById: async (params: GetMessageQueueByIdParams) => {
+					set({ queue: {} as MessageQueue });
 					const queue = await QueueService.getQueueById(params);
 					set({ queue });
 					if (isEmpty(get().logics[queue._id])) {
