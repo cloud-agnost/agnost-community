@@ -9,6 +9,7 @@ import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import { AppRoles, Application, ColumnDefWithClassName } from '@/types';
 import { getRelativeTime, translate } from '@/utils';
+const user = useAuthStore.getState().user;
 export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 	{
 		id: 'name',
@@ -82,7 +83,6 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 		className: 'actions !w-[50px]',
 		cell: ({ row }) => {
 			const { _id, name, team } = row.original;
-			const user = useAuthStore.getState().user;
 			const me = team.find((member) => member.userId._id === user?._id);
 			return (
 				<div className='text-center action'>
