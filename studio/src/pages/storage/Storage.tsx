@@ -40,15 +40,11 @@ export default function MainStorage() {
 		dataLength: storages.length,
 		lastFetchedPage,
 	});
-	const { mutateAsync: deleteStorageMutation } = useMutation({
+	const { mutateAsync: deleteStorageMutation, isPending } = useMutation({
 		mutationFn: deleteStorage,
 		onSettled: closeStorageDeleteDialog,
 	});
-	const {
-		mutateAsync: deleteMultipleStoragesMutation,
-		isPending: deleteLoading,
-		error: deleteError,
-	} = useMutation({
+	const { mutateAsync: deleteMultipleStoragesMutation, error: deleteError } = useMutation({
 		mutationFn: deleteMultipleStorages,
 		onSuccess: () => {
 			table?.resetRowSelection();
@@ -99,7 +95,7 @@ export default function MainStorage() {
 					<DataTable table={table} />
 				</InfiniteScroll>
 				<ConfirmationModal
-					loading={deleteLoading}
+					loading={isPending}
 					error={deleteError}
 					title={t('storage.delete.title')}
 					alertTitle={t('storage.delete.message')}
