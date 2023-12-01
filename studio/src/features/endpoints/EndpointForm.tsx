@@ -133,11 +133,7 @@ export default function EndpointForm({ loading }: { loading: boolean }) {
 								<Input
 									className='rounded-none rounded-r '
 									error={Boolean(form.formState.errors.path)}
-									placeholder={
-										t('forms.placeholder', {
-											label: t('endpoint.create.path'),
-										}) ?? ''
-									}
+									placeholder={`/${t('endpoint.create.path').toLowerCase()}`}
 									{...field}
 								/>
 							</FormControl>
