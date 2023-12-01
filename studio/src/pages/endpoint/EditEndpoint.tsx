@@ -51,7 +51,7 @@ export default function EditEndpoint() {
 			orgId: orgId,
 			appId: appId,
 			versionId: versionId,
-			epId: endpointId,
+			epId: useEndpointStore.getState().endpoint._id,
 			logic: logic,
 		});
 	}

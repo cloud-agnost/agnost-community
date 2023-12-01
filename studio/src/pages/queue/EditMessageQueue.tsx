@@ -48,7 +48,7 @@ export default function EditMessageQueue() {
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			queueId: queueId as string,
+			queueId: useMessageQueueStore.getState().queue._id as string,
 			logic: logic,
 		});
 	}
