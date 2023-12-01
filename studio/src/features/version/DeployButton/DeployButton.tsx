@@ -1,5 +1,5 @@
 import { Button, ButtonProps } from '@/components/Button';
-import { useAuthorizeVersion, useToast } from '@/hooks';
+import { useAuthorizeVersion, useEnvironmentStatus, useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore.ts';
 import { APIError, EnvironmentStatus } from '@/types';
 import { useMutation } from '@tanstack/react-query';
@@ -10,7 +10,8 @@ export default function DeployButton(props: Omit<ButtonProps, 'loading' | 'onCli
 	const { t } = useTranslation();
 	const { notify } = useToast();
 	const canDeploy = useAuthorizeVersion('env.deploy');
-	const { environment, redeployAppVersionToEnvironment, envStatus } = useEnvironmentStore();
+	const { environment, redeployAppVersionToEnvironment } = useEnvironmentStore();
+	const envStatus = useEnvironmentStatus();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
