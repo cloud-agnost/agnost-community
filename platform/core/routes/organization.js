@@ -154,6 +154,7 @@ router.post(
 
 			// Commit transaction
 			await orgCtrl.commit(session);
+
 			// Return the newly created organization object
 			res.json(orgObj);
 
@@ -337,7 +338,6 @@ router.put(
 	async (req, res) => {
 		try {
 			let buffer = req.file?.buffer;
-			console.log("***here", req.file);
 			let { width, height } = req.query;
 			if (!width) width = config.get("general.profileImgSizePx");
 			if (!height) height = config.get("general.profileImgSizePx");

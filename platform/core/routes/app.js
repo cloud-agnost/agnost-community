@@ -183,7 +183,7 @@ router.get(
 	authorizeOrgAction("org.app.viewAll"),
 	async (req, res) => {
 		try {
-			const { org } = req;
+			const { org, user } = req;
 
 			let apps = await appCtrl.getManyByQuery(
 				{
@@ -197,7 +197,14 @@ router.get(
 				}
 			);
 
-			res.json(apps);
+			res.json(
+				apps.map((app) => ({
+					...app,
+					role: app.team.find(
+						(member) => member.userId._id.toString() === user._id.toString()
+					).role,
+				}))
+			);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -225,14 +232,28 @@ router.put(
 			const { name } = req.body;
 
 			// Update app name
-			let updatedApp = await appCtrl.updateOneById(
+			await appCtrl.updateOneById(
 				app._id,
 				{ name, updatedBy: user._id },
 				{},
 				{ cacheKey: app._id }
 			);
 
-			res.json(updatedApp);
+			let appWithTeam = await appCtrl.getOneById(app._id, {
+				lookup: {
+					path: "team.userId",
+					select: "-loginProfiles -notifications",
+				},
+			});
+
+			appWithTeam = {
+				...appWithTeam,
+				role: appWithTeam.team.find(
+					(member) => member.userId._id.toString() === user._id.toString()
+				).role,
+			};
+
+			res.json(appWithTeam);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -241,7 +262,7 @@ router.put(
 				"org.app",
 				"update",
 				t("Updated the name of app from '%s' to '%s' ", app.name, name),
-				updatedApp,
+				appWithTeam,
 				{ orgId: org._id, appId: app._id }
 			);
 		} catch (err) {
@@ -301,7 +322,7 @@ router.put(
 			await storage.saveFile(uploadBucket, filePath, buffer, metaData);
 
 			// Update app with the new profile image url
-			let appObj = await appCtrl.updateOneById(
+			await appCtrl.updateOneById(
 				req.app._id,
 				{
 					pictureUrl: filePath,
@@ -311,7 +332,21 @@ router.put(
 				{ cacheKey: req.app._id }
 			);
 
-			res.json(appObj);
+			let appWithTeam = await appCtrl.getOneById(req.app._id, {
+				lookup: {
+					path: "team.userId",
+					select: "-loginProfiles -notifications",
+				},
+			});
+
+			appWithTeam = {
+				...appWithTeam,
+				role: appWithTeam.team.find(
+					(member) => member.userId._id.toString() === req.user._id.toString()
+				).role,
+			};
+
+			res.json(appWithTeam);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -320,7 +355,7 @@ router.put(
 				"org.app",
 				"update",
 				t("Updated application picture"),
-				appObj,
+				appWithTeam,
 				{ orgId: req.org._id, appId: req.app._id }
 			);
 		} catch (error) {
@@ -348,14 +383,28 @@ router.delete(
 			storage.deleteFile(req.app.pictureUrl);
 
 			// Update user with the new profile image url
-			let appObj = await appCtrl.updateOneById(
+			await appCtrl.updateOneById(
 				req.app._id,
 				{ updatedBy: req.user._id },
 				{ pictureUrl: 1 },
 				{ cacheKey: req.app._id }
 			);
 
-			res.json(appObj);
+			let appWithTeam = await appCtrl.getOneById(req.app._id, {
+				lookup: {
+					path: "team.userId",
+					select: "-loginProfiles -notifications",
+				},
+			});
+
+			appWithTeam = {
+				...appWithTeam,
+				role: appWithTeam.team.find(
+					(member) => member.userId._id.toString() === req.user._id.toString()
+				).role,
+			};
+
+			res.json(appWithTeam);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -364,7 +413,7 @@ router.delete(
 				"org.app",
 				"update",
 				t("Removed application picture"),
-				appObj,
+				appWithTeam,
 				{ orgId: req.org._id, appId: req.app._id }
 			);
 		} catch (error) {
@@ -388,7 +437,22 @@ router.get(
 	async (req, res) => {
 		try {
 			const { app } = req;
-			res.json(app);
+
+			let appWithTeam = await appCtrl.getOneById(app._id, {
+				lookup: {
+					path: "team.userId",
+					select: "-loginProfiles -notifications",
+				},
+			});
+
+			appWithTeam = {
+				...appWithTeam,
+				role: appWithTeam.team.find(
+					(member) => member.userId._id.toString() === req.user._id.toString()
+				).role,
+			};
+
+			res.json(appWithTeam);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -509,14 +573,28 @@ router.post(
 			let transferredUser = await userCtrl.getOneById(req.params.userId);
 
 			// Update app name
-			let updatedApp = await appCtrl.updateOneById(
+			await appCtrl.updateOneById(
 				app._id,
 				{ ownerUserId: req.params.userId, updatedBy: user._id },
 				{},
 				{ cacheKey: app._id }
 			);
 
-			res.json(updatedApp);
+			let appWithTeam = await appCtrl.getOneById(app._id, {
+				lookup: {
+					path: "team.userId",
+					select: "-loginProfiles -notifications",
+				},
+			});
+
+			appWithTeam = {
+				...appWithTeam,
+				role: appWithTeam.team.find(
+					(member) => member.userId._id.toString() === user._id.toString()
+				).role,
+			};
+
+			res.json(appWithTeam);
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -529,7 +607,7 @@ router.post(
 					transferredUser.name,
 					transferredUser.contactEmail
 				),
-				updatedApp,
+				appWithTeam,
 				{ orgId: org._id, appId: app._id }
 			);
 		} catch (error) {
