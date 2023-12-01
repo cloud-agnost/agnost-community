@@ -6,6 +6,7 @@ import { cn, joinChannel } from '@/utils';
 import _ from 'lodash';
 import { useEffect } from 'react';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
+
 export default function Version() {
 	const { pathname } = useLocation();
 	const { getVersionById, version } = useVersionStore();
@@ -47,7 +48,12 @@ export default function Version() {
 	}, [versionId]);
 
 	return (
-		<VersionLayout className={cn(paths.at(-1))}>
+		<VersionLayout
+			className={cn(
+				paths.slice(-1).pop(),
+				paths.some((p) => p === 'settings') && '!overflow-hidden',
+			)}
+		>
 			<Outlet />
 		</VersionLayout>
 	);
