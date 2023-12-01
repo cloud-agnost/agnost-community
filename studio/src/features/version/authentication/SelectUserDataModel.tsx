@@ -61,7 +61,6 @@ export default function SelectUserDataModel() {
 	}, [version]);
 	useEffect(() => {
 		const dbId = form.watch('databaseId');
-		console.log('dbId', dbId);
 		if (version && dbId) {
 			getModelsOfDatabase({
 				orgId: version.orgId,
@@ -217,8 +216,7 @@ export default function SelectUserDataModel() {
 											defaultValue={field.value}
 											onValueChange={(value) => {
 												field.onChange(value);
-												console.log('resetting modelId', value);
-												// form.resetField('modelId');
+												form.resetField('modelId');
 											}}
 										>
 											<FormControl>

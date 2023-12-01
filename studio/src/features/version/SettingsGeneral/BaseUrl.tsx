@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 export default function BaseUrl() {
 	const { t } = useTranslation();
 	const { environment } = useEnvironmentStore();
-	console.log('environment', environment.iid);
 	return (
 		<SettingsFormItem
 			className='space-y-0 py-0 pb-6'

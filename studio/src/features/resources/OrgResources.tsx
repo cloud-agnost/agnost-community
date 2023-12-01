@@ -41,7 +41,6 @@ export default function OrgResources() {
 		mutationFn: deleteResource,
 		mutationKey: ['deleteResource'],
 		onError: (error: APIError) => {
-			console.log(error);
 			notify({
 				title: error.error,
 				description: error.details,

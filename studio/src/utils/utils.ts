@@ -225,7 +225,6 @@ export default function groupBy<T>(list: T[], keyGetter: (item: T) => string) {
 export const getAppPermission = (path: string, role?: AppRoles): boolean => {
 	const { appAuthorization, application } = useApplicationStore.getState();
 	const key = `${application?.role ?? role}.app.${path}`;
-	console.log('key', key, _.get(appAuthorization, key));
 	return _.get(appAuthorization, key);
 };
 
@@ -420,7 +419,6 @@ export function getVersionPermission(type: string): boolean {
 		? user?._id === version.createdBy || role === 'Admin'
 		: isPrivateForUser && getAppPermission(type);
 
-	console.log('isVersionEditable', isVersionEditable, getAppPermission(type));
 	return isVersionEditable as boolean;
 }
 

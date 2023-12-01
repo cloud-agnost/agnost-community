@@ -54,7 +54,6 @@ export const CreateEndpointSchema = z.object({
 						message: t('endpoint.errors.duplicateParam'),
 					});
 				}
-				console.log(value);
 				if (FORBIDDEN_EP_PREFIXES.find((prefix) => value.startsWith(prefix))) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,

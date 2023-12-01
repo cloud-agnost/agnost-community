@@ -8,7 +8,6 @@ import * as z from 'zod';
 export default function ConnectAWS() {
 	const form = useFormContext<z.infer<typeof ConnectResourceSchema>>();
 	const { t } = useTranslation();
-	console.log(form.formState.errors);
 	return (
 		<div className='grid grid-cols-2 grid-rows-2 gap-6'>
 			<FormField

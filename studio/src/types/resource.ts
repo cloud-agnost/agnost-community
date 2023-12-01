@@ -438,7 +438,6 @@ export const AccessDbSchema = z
 				});
 			}
 		}
-		console.log(resourceConfig.type, resourceConfig.instance, ResourceInstances.AWSS3);
 		if (resourceConfig.resourceType === ResourceType.Storage) {
 			if (resourceConfig.instance === ResourceInstances.AWSS3) {
 				if (!val.accessKeyId) {

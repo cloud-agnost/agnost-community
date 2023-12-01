@@ -43,7 +43,6 @@ export const EmailAuthenticationSchema = z
 		const { customSMTP, confirmEmail, enabled } = data;
 		const { host, port, user, password } = customSMTP;
 		if (confirmEmail && enabled) {
-			console.log('confirmEmail', host, port, user, password);
 			if (!host) {
 				ctx.addIssue({
 					code: z.ZodIssueCode.custom,

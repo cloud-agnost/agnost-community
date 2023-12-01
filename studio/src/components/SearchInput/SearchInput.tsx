@@ -23,7 +23,6 @@ export default function SearchInput({
 	urlKey = 'q',
 	...props
 }: SearchInputProps) {
-	console.log(urlKey);
 	const [inputValue, setInputValue] = useState<string>((value as string) ?? '');
 	const [searchParams, setSearchParams] = useSearchParams();
 	const searchTerm = useDebounce(inputValue, 500);
@@ -49,7 +48,6 @@ export default function SearchInput({
 	}
 
 	useUpdateEffect(() => {
-		console.log({ searchTerm });
 		onInput?.(searchTerm);
 	}, [searchTerm]);
 
@@ -61,7 +59,6 @@ export default function SearchInput({
 	}, [inputValue]);
 
 	useUpdateEffect(() => {
-		console.log(searchParams.get(urlKey));
 		setInputValue(searchParams.get(urlKey) ?? '');
 	}, [searchParams.get(urlKey)]);
 	return (
