@@ -8,6 +8,8 @@
 	"required": "Required",
 	"optional": "Optional",
 	"empty": "You have not defined any endpoints for this app version",
+	"no_headers": "This response has no headers",
+	"no_cookies": "This response has no cookies",
 	"create": {
 		"title": "Create New Endpoint",
 		"name": "Name",
@@ -33,7 +35,8 @@
 		"notValidRoute": "Path should start with a forward slash, followed by alphanumeric characters, hyphens, and underscores",
 		"invalidParams": "Invalid route parameter name {{param}}",
 		"duplicateParam": "Duplicate parameter names in route",
-		"invalidMethod": "Unsupported method type"
+		"invalidMethod": "Unsupported method type",
+		"reservedKeyword": "Endpoint route cannot start with {{keyword}}"
 	},
 
 	"edit": "Edit {{name}}",

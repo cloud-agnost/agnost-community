@@ -62,7 +62,7 @@
 	"field_notification": "Model field events",
 	"endpoint_notification": "Endpoint events",
 	"queue_notification": "Message queue events",
-	"cronjob_notification": "Message queue events",
+	"task_notification": "Cron Job events",
 	"cache_notification": "Cache events",
 	"storage_notification": "Storage events",
 	"resource_notification": "Organization resource events",
