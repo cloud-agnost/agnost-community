@@ -10,7 +10,6 @@ export default function InstanceType({ iid }: { iid: string }) {
 				.instance as string,
 		[environment],
 	);
-	console.log('instance', environment);
 	const Icon = useMemo(() => RESOURCE_ICON_MAP[instance], [instance]);
 	return instance ? (
 		<div className='flex items-center gap-2'>
