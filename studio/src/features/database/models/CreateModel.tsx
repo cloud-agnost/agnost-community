@@ -24,7 +24,7 @@ export default function CreateModel({
 		defaultValues: {
 			timestamps: {
 				createdAt: t('database.models.add.timestamps.createdAt.name') as string,
-				updatedAt: t('database.models.add.timestamps.updatedAt.field') as string,
+				updatedAt: t('database.models.add.timestamps.updatedAt.name') as string,
 			},
 		},
 	});
