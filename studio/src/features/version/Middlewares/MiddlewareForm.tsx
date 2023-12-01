@@ -12,6 +12,7 @@ import { Input } from 'components/Input';
 import { useFormContext } from 'react-hook-form';
 import * as z from 'zod';
 import { useTranslation } from 'react-i18next';
+import { DrawerClose, DrawerFooter } from '@/components/Drawer';
 export default function MiddlewareForm({ loading }: { loading: boolean }) {
 	const { t } = useTranslation();
 	const form = useFormContext<z.infer<typeof MiddlewareSchema>>();
@@ -39,11 +40,18 @@ export default function MiddlewareForm({ loading }: { loading: boolean }) {
 					</FormItem>
 				)}
 			/>
-			<div className='flex justify-end mt-4'>
-				<Button loading={loading} size='lg' type='submit'>
-					{t('general.save')}
-				</Button>
-			</div>
+			<DrawerFooter className='mt-8'>
+				<div className='flex justify-end'>
+					<DrawerClose asChild>
+						<Button variant='secondary' size='lg'>
+							{t('general.cancel')}
+						</Button>
+					</DrawerClose>
+					<Button className='ml-2' type='submit' size='lg' loading={loading}>
+						{t('general.save')}
+					</Button>
+				</div>
+			</DrawerFooter>
 		</>
 	);
 }
