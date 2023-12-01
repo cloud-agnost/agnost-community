@@ -59,7 +59,7 @@ export default function DatabaseForm({
 						control={form.control}
 						name='assignUniqueName'
 						render={({ field }) => (
-							<FormItem className='flex justify-between gap-4 items-center space-y-0'>
+							<FormItem className='flex justify-between gap-4  space-y-0'>
 								<FormLabel>
 									<h6>{t('database.add.unique.title')}</h6>
 									<p className='text-subtle'>{t('database.add.unique.desc')}</p>
