@@ -168,7 +168,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					changeAppName: async (req: ChangeAppNameRequest) => {
 						try {
 							const application = await ApplicationService.changeAppName(req.name);
-							set({ application });
+							get().selectApplication(application);
 							if (req.onSuccess) req.onSuccess();
 							return application;
 						} catch (error) {
@@ -179,8 +179,9 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					setAppAvatar: async (req: SetAppAvatarRequest) => {
 						try {
 							const application = await ApplicationService.setAppAvatar(req.picture);
-							set({ application });
+							get().selectApplication(application);
 							if (req.onSuccess) req.onSuccess();
+
 							return application;
 						} catch (error) {
 							if (req.onError) req.onError(error as APIError);
@@ -190,7 +191,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					removeAppAvatar: async (req: BaseRequest) => {
 						try {
 							const application = await ApplicationService.removeAppAvatar();
-							set({ application });
+							get().selectApplication(application);
 							if (req.onSuccess) req.onSuccess();
 							return application;
 						} catch (error) {
@@ -201,7 +202,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					transferAppOwnership: async (req: TransferAppOwnershipRequest) => {
 						try {
 							const application = await ApplicationService.transferAppOwnership(req.userId);
-							set({ application });
+							get().selectApplication(application);
 							if (req.onSuccess) req.onSuccess();
 							return application;
 						} catch (error) {
