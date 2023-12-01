@@ -31,6 +31,8 @@ export default function useInfiniteScroll({
 				page: pageParam,
 				size: MODULE_PAGE_SIZE,
 				search: searchParams.get('q') as string,
+				sortBy: searchParams.get('f') as string,
+				sortDir: searchParams.get('d') as string,
 				...params,
 			}),
 		refetchOnWindowFocus: false,

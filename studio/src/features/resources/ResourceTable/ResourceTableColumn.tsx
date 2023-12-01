@@ -15,16 +15,16 @@ const canDeleteResource = getOrgPermission('resource.delete');
 export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 	{
 		id: 'name',
-		header: ({ column }) => {
-			return <SortButton text={translate('resources.table.name')} column={column} />;
+		header: () => {
+			return <SortButton text={translate('resources.table.name')} field='name' />;
 		},
 		accessorKey: 'name',
 		size: 200,
 	},
 	{
 		id: 'type',
-		header: ({ column }) => {
-			return <SortButton text={translate('resources.table.type')} column={column} />;
+		header: () => {
+			return <SortButton text={translate('resources.table.type')} field='instance' />;
 		},
 		accessorKey: 'instance',
 		size: 200,
@@ -41,8 +41,8 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 	},
 	{
 		id: 'status',
-		header: ({ column }) => {
-			return <SortButton text={translate('resources.table.status')} column={column} />;
+		header: () => {
+			return <SortButton text={translate('resources.table.status')} field='status' />;
 		},
 		accessorKey: 'status',
 		size: 200,
@@ -53,8 +53,8 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 	},
 	{
 		id: 'manage',
-		header: ({ column }) => {
-			return <SortButton text={translate('resources.table.managed')} column={column} />;
+		header: () => {
+			return <SortButton text={translate('resources.table.managed')} field='manage' />;
 		},
 		accessorKey: 'manage',
 		size: 200,
@@ -66,8 +66,8 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 	},
 	{
 		id: 'allowedRoles',
-		header: ({ column }) => {
-			return <SortButton text={translate('resources.table.allowedRoles')} column={column} />;
+		header: () => {
+			return <SortButton text={translate('resources.table.allowedRoles')} field='allowedRoles' />;
 		},
 		accessorKey: 'allowedRoles',
 		size: 200,
@@ -84,8 +84,8 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 	},
 	{
 		id: 'createdAt',
-		header: ({ column }) => {
-			return <SortButton text={translate('resources.table.createdAt')} column={column} />;
+		header: () => {
+			return <SortButton text={translate('resources.table.createdAt')} field='createdAt' />;
 		},
 		accessorKey: 'createdAt',
 		size: 200,

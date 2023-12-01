@@ -50,7 +50,7 @@ export default function useNavigatorColumns(fields: Field[]) {
 		const newNavigatorColumns: ColumnDefWithClassName<Record<string, any>>[] = fields?.map(
 			(field) => ({
 				id: field._id,
-				header: ({ column }) => <SortButton text={capitalize(field.name)} column={column} />,
+				header: () => <SortButton text={capitalize(field.name)} field={field.name} />,
 				accessorKey: field.type === FieldTypes.ID ? 'id' : field.name,
 				size: field.type === FieldTypes.ID ? 50 : 200,
 				className: cn(field.type === FieldTypes.ID && 'sticky left-0 z-10'),

@@ -66,11 +66,8 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('application.table.name')} column={column} />
-		),
+		header: () => <SortButton text={translate('application.table.name')} field='name' />,
 		accessorKey: 'name',
-		sortingFn: 'textCaseSensitive',
 		size: 600,
 		cell: ({ row }) => {
 			const { member } = row.original;

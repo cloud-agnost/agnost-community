@@ -36,20 +36,31 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	{
 		id: 'name',
 		size: 200,
-		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.name')}
+				field='name'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		accessorKey: 'name',
-		sortingFn: 'textCaseSensitive',
+		sortingFn: 'text',
 	},
 	{
 		id: 'version',
 		size: 200,
 		header: translate('general.version'),
 		accessorKey: 'version',
-		sortingFn: 'textCaseSensitive',
 	},
 	{
 		id: 'created_at',
-		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.created_at')}
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				field='createdAt'
+			/>
+		),
 		enableSorting: true,
 		sortingFn: 'datetime',
 		accessorKey: 'createdAt',

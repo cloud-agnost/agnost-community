@@ -58,7 +58,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
+		header: () => <SortButton text={translate('general.name')} field='name' />,
 		cell: ({
 			row: {
 				original: { _id, name },
@@ -71,7 +71,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	},
 	{
 		id: 'createdAt',
-		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
+		header: () => <SortButton text={translate('general.created_at')} field='createdAt' />,
 		accessorKey: 'createdAt',
 		sortingFn: 'datetime',
 		enableSorting: true,
@@ -90,10 +90,8 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	},
 	{
 		id: 'updatedAt',
-		header: ({ column }) => <SortButton text={translate('general.updated_at')} column={column} />,
+		header: () => <SortButton text={translate('general.updated_at')} field='updatedAt' />,
 		accessorKey: 'updatedAt',
-		enableSorting: true,
-		sortingFn: 'datetime',
 		size: 200,
 		cell: ({
 			row: {

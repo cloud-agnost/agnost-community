@@ -38,10 +38,16 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
-		enableSorting: true,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.name')}
+				field='name'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		accessorKey: 'name',
-		sortingFn: 'textCaseSensitive',
+		enableSorting: true,
+		sortingFn: 'text',
 		cell: ({
 			row: {
 				original: { name },
@@ -163,7 +169,8 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.expires_at')}
-				column={column}
+				field='expiryDate'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 			/>
 		),
 		accessorKey: 'expiryDate',
@@ -181,7 +188,13 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	},
 	{
 		id: 'created_at',
-		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.created_at')}
+				field='createdAt'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		enableSorting: true,
 		sortingFn: 'datetime',
 		accessorKey: 'createdAt',
@@ -198,8 +211,16 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 
 	{
 		id: 'updated_at',
-		header: ({ column }) => <SortButton text={translate('general.updated_at')} column={column} />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.updated_at')}
+				field='updatedAt'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		accessorKey: 'updatedAt',
+		sortingFn: 'datetime',
+		enableSorting: true,
 		size: 200,
 		cell: ({ row }) => {
 			const { updatedAt, updatedBy } = row.original;
