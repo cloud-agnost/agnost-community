@@ -3,9 +3,7 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import nightOwl from 'monaco-themes/themes/Night Owl.json';
 import slush from 'monaco-themes/themes/Slush and Poppies.json';
 import iPlastic from 'monaco-themes/themes/iPlastic.json';
-import * as prettier from 'prettier';
-import jsParser from 'prettier/plugins/babel';
-import esTreePlugin from 'prettier/plugins/estree';
+import { formatCode } from '@/utils';
 import { useRef, useState } from 'react';
 
 export const EDITOR_OPTIONS: EditorProps['options'] = {
@@ -45,18 +43,9 @@ export type CodeEditorProps = {
 export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 	const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
 	const [monacoRef, setMonacoRef] = useState<typeof monaco>();
-	async function formatCode(code: string) {
-		try {
-			return await prettier.format(code, {
-				parser: 'babel',
-				plugins: [jsParser, esTreePlugin],
-			});
-		} catch (error) {
-			return code;
-		}
-	}
+
 	async function saveEditorContent(language: string | undefined, cb?: (value: string) => void) {
-		const ed = globalThis.editor;
+		const ed = editorRef.current;
 		const val = ed?.getValue() as string;
 
 		if (language === 'json') {
@@ -76,7 +65,6 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 			cb?.(formatted);
 		}
 	}
-
 	function configureEditor(editor: monaco.editor.IStandaloneCodeEditor, monaco: any) {
 		editor.onDidFocusEditorText(() => {
 			editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
