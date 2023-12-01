@@ -35,7 +35,7 @@ export const EmailAuthenticationSchema = z
 				.min(100, 'Port must be at least 3 characters long')
 				.optional(),
 			user: z.string().trim().optional(),
-			password: z.string({ required_error: 'Password is required' }),
+			password: z.string().trim().optional(),
 			useTLS: z.boolean(),
 		}),
 	})
@@ -43,6 +43,7 @@ export const EmailAuthenticationSchema = z
 		const { customSMTP, confirmEmail, enabled } = data;
 		const { host, port, user, password } = customSMTP;
 		if (confirmEmail && enabled) {
+			console.log('confirmEmail', host, port, user, password);
 			if (!host) {
 				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
