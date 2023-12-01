@@ -1,4 +1,3 @@
-import { HttpMethod } from './endpoint';
 import {
 	BaseGetRequest,
 	BaseParams,
@@ -267,10 +266,8 @@ export interface DesignElement {
 	versionId: string;
 	name: string;
 	type: DesignElementTypes;
-	meta: {
-		method: HttpMethod;
-		path: string;
-	};
+	modelId?: string;
+	meta: any;
 }
 
 export interface VersionParams extends BaseParams {
