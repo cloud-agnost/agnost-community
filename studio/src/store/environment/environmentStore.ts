@@ -4,7 +4,6 @@ import {
 	APIError,
 	EnvLog,
 	Environment,
-	EnvironmentStatus,
 	GetEnvironmentLogsParams,
 	GetEnvironmentResourcesParams,
 	Resource,

@@ -1,4 +1,3 @@
-import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
@@ -104,7 +103,6 @@ async function editMessageQueueLoader({ params }: LoaderFunctionArgs) {
 }
 
 async function bucketLoader({ params }: LoaderFunctionArgs) {
-	const role = useApplicationStore.getState().application?.role;
 	const { removeTab, getCurrentTab } = useTabStore.getState();
 	const { storageId, appId, orgId, versionId } = params;
 	const { storages } = useStorageStore.getState();
