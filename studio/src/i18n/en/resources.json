@@ -14,8 +14,8 @@
 	},
 	"delete": {
 		"title": "Delete Resource",
-		"message": "Are you sure to delete this resource??",
-		"description": "All organization apps and managed resource and associated data will be deleted. This action is not reversible — please continue with caution."
+		"message": "Are you sure to delete this resource?",
+		"description": "This action is not reversible — please continue with caution."
 	},
 	"step": "Step {{currentStep}} of 2",
 	"select": "Select Resource Type",
