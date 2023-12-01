@@ -2,12 +2,15 @@ import { TAB_ICON_MAP } from '@/constants';
 import { cn } from '@/utils';
 import { Key } from '@phosphor-icons/react';
 import React, { ElementType } from 'react';
+import useThemeStore from '@/store/theme/themeStore';
 import {
-	EmptyFilesLight,
+	EmptyInvitation,
 	EmptyInvitationLight,
 	EnvironmentVariable,
 	NpmPackage,
 	RateLimit,
+	EmptyApps,
+	EmptyAppsLight,
 } from '../icons';
 import './emptyState.scss';
 import { capitalize } from 'lodash';
@@ -40,16 +43,16 @@ interface EmptyStateProps {
 	className?: string;
 }
 
-const ICON_MAP: Record<string, ElementType> = {
-	file: EmptyFilesLight,
-	invitation: EmptyInvitationLight,
-	apiKey: Key,
-	variable: EnvironmentVariable,
-	package: NpmPackage,
-	'rate-limit': RateLimit,
-};
-
 export default function EmptyState({ type, title, className, children }: EmptyStateProps) {
+	const { theme } = useThemeStore();
+	const ICON_MAP: Record<string, ElementType> = {
+		apiKey: Key,
+		variable: EnvironmentVariable,
+		package: NpmPackage,
+		'rate-limit': RateLimit,
+		invitation: theme === 'light' ? EmptyInvitationLight : EmptyInvitation,
+		app: theme === 'light' ? EmptyAppsLight : EmptyApps,
+	};
 	const Icon = TAB_ICON_MAP[capitalize(type)] ?? ICON_MAP[type];
 	return (
 		<div className={cn('empty-state h-[95%]', className)}>
