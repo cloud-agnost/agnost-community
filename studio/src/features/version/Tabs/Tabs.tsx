@@ -62,7 +62,7 @@ export default function Tabs() {
 	}, [scrollContainer, tabs]);
 
 	useEffect(() => {
-		const path = pathname?.split('/')?.at(-1);
+		const path = pathname?.split('/')?.slice(-1)[0];
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
 
 		if (!item) {
@@ -74,7 +74,7 @@ export default function Tabs() {
 			return;
 		}
 
-		const openTab = tabs.find((tab) => tab.path?.split('/')?.at(-1) === item.path);
+		const openTab = tabs.find((tab) => tab.path?.split('/')?.slice(-1)[0] === item.path);
 		if (openTab) {
 			setCurrentTab(versionId, openTab.id);
 		} else {
@@ -96,7 +96,7 @@ export default function Tabs() {
 	}, [versionId]);
 
 	function getDashboardPath() {
-		const matched = matches.at(-1);
+		const matched = matches.slice(-1)[0];
 		if (!matched) return '/organization';
 
 		const { appId, orgId, versionId } = matched.params;
