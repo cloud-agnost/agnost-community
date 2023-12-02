@@ -43,6 +43,8 @@ export interface VersionLog {
 	message: any;
 	errors: any;
 	responseBody: object;
+	method: string;
+	path: string;
 }
 
 export interface GetVersionLogsParams extends BaseGetRequest, BaseParams {
