@@ -5,46 +5,50 @@ import { Schema } from '@/features/version/SettingsAPIKeys/index.ts';
 import { useTranslation } from 'react-i18next';
 import { Badge } from 'components/Badge';
 import { ReactNode } from 'react';
+import { HTTP_METHOD_BADGE_MAP } from '@/constants';
 
 interface ListEndpointProps {
 	type: APIKeyTypes;
 	children?: ReactNode;
-	endpoints?: Endpoint[];
+	endpoints: Endpoint[];
+	setEndpoints: (endpoints: any) => void;
 }
 
-export default function ListEndpoint({ type, children, endpoints }: ListEndpointProps) {
+export default function ListEndpoint({
+	type,
+	children,
+	endpoints,
+	setEndpoints,
+}: ListEndpointProps) {
 	const form = useFormContext<z.infer<typeof Schema>>();
 	const { t } = useTranslation();
 	const key = type === 'custom-allowed' ? 'allowedEndpoints' : 'excludedEndpoints';
-	const values = form.getValues(`general.endpoint.${key}`).filter((item) => item.url);
-
 	function clear(index: number) {
-		const newValues = values.filter((_, i) => i !== index);
-		form.setValue(`general.endpoint.${key}`, newValues);
-	}
-
-	function getName(iid: string) {
-		const name = endpoints?.find((item) => item.iid === iid)?.name;
-		if (!name) return iid;
-		return name;
+		const newValues = endpoints.filter((_, i) => i !== index);
+		form.setValue(
+			`general.endpoint.${key}`,
+			newValues.map((item) => ({ url: item.iid })),
+		);
+		setEndpoints?.(newValues);
 	}
 
 	return (
 		<div className='space-y-3'>
-			{values.length > 0 ? (
+			{endpoints.length > 0 ? (
 				<>
 					<span className='text-subtle text-sm leading-6'>
 						{key === 'allowedEndpoints'
 							? t('version.api_key.allowed_endpoints')
 							: t('version.api_key.excluded_endpoints')}
 					</span>
-					<div className='flex items-center gap-2 overflow-auto no-scrollbar'>
-						{values.map((item, index) => (
+					<div className='flex items-center flex-wrap gap-2'>
+						{endpoints.map((item, index) => (
 							<Badge
 								className='whitespace-nowrap'
 								onClear={() => clear(index)}
-								text={getName(item.url)}
+								text={`${item.method} ${item.name}`}
 								key={index}
+								variant={HTTP_METHOD_BADGE_MAP[item.method]}
 							/>
 						))}
 					</div>
