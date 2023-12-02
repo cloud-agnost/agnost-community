@@ -5,7 +5,7 @@ import { CopyButton } from '@/components/CopyButton';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
 import { TableConfirmation } from '@/components/Table';
-import { BADGE_COLOR_MAP, HTTP_METHOD_BADGE_MAP } from '@/constants';
+import { BADGE_COLOR_MAP, BASE_URL, HTTP_METHOD_BADGE_MAP } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
@@ -17,6 +17,7 @@ import { TabLink } from '../version/Tabs';
 const queryClient = new QueryClient();
 const canEditEndpoint = getVersionPermission('endpoint.update');
 const canDeleteEndpoint = getVersionPermission('endpoint.delete');
+const env = useEnvironmentStore.getState().environment;
 const { openEditEndpointDialog, deleteEndpoint } = useEndpointStore.getState();
 function deleteEndpointHandler(toDeleteEndpoint: Endpoint) {
 	queryClient
@@ -89,8 +90,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { path } = row.original;
-			const env = useEnvironmentStore.getState().environment;
-			const copyText = `${window.location.origin}/${env?.iid}${path}`;
+			const copyText = `${BASE_URL}/${env?.iid}${path}`;
 			return (
 				<div className='flex items-center gap-8 group'>
 					<div className='truncate max-w-[15ch] font-mono'>{path}</div>
