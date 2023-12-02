@@ -14,7 +14,7 @@ import { motion } from 'framer-motion';
 import { useFormContext } from 'react-hook-form';
 import * as z from 'zod';
 import { ListEndpoint, Schema } from '@/features/version/SettingsAPIKeys';
-import { Dispatch, Fragment, SetStateAction } from 'react';
+import { Dispatch, Fragment, SetStateAction, useMemo } from 'react';
 import { RadioGroup, RadioGroupItem } from 'components/RadioGroup';
 import { DatePicker } from 'components/DatePicker';
 import { Button } from '@/components/Button';
@@ -22,10 +22,11 @@ import { cn } from '@/utils';
 import useEndpointStore from '@/store/endpoint/endpointStore.ts';
 import { EndpointSelectModal } from '@/features/version/EndpointSelectModal';
 import { Endpoint } from '@/types';
+import { useUpdateEffect } from '@/hooks';
 
 interface AddOrEditAPIKeyGeneralProps {
-	endpoints?: Endpoint[];
-	setEndpoints?: Dispatch<SetStateAction<Endpoint[] | undefined>>;
+	endpoints: Endpoint[];
+	setEndpoints: Dispatch<SetStateAction<Endpoint[]>>;
 }
 
 export default function AddOrEditAPIKeyGeneral({
@@ -41,13 +42,9 @@ export default function AddOrEditAPIKeyGeneral({
 		setSelectEndpointDialogOpen,
 	} = useEndpointStore();
 
-	const endpointError =
-		form.formState.errors.general?.endpoint?.message ||
-		form.formState.errors.general?.endpoint?.allowedEndpoints?.message;
-
 	function openEndpointDialog() {
 		const key =
-			form.getValues('general.endpoint.type') === 'custom-excluded'
+			form.watch('general.endpoint.type') === 'custom-excluded'
 				? 'excludedEndpoints'
 				: 'allowedEndpoints';
 		const data = form.getValues(`general.endpoint.${key}`).map((item) => item.url);
@@ -71,7 +68,11 @@ export default function AddOrEditAPIKeyGeneral({
 			setEndpoints?.((prevState) => [...(prevState ?? []), lastSelected]);
 		}
 	}
+	const endpointError = form.formState.errors.general?.endpoint?.root?.message;
 
+	useUpdateEffect(() => {
+		form.clearErrors('general.endpoint');
+	}, [form.watch('general.endpoint.type')]);
 	return (
 		<>
 			<EndpointSelectModal
@@ -162,10 +163,14 @@ export default function AddOrEditAPIKeyGeneral({
 													</FormLabel>
 												</FormItem>
 												{item === 'custom-allowed' &&
-													form.getValues('general.endpoint.type') === 'custom-allowed' && (
-														<ListEndpoint endpoints={endpoints} type='custom-allowed'>
+													form.watch('general.endpoint.type') === 'custom-allowed' && (
+														<ListEndpoint
+															endpoints={endpoints ?? []}
+															setEndpoints={setEndpoints}
+															type='custom-allowed'
+														>
 															<Button
-																className={cn(endpointError && 'ring-2 ring-error-default')}
+																className={cn(endpointError && 'border border-error-default')}
 																type='button'
 																onClick={openEndpointDialog}
 															>
@@ -175,10 +180,14 @@ export default function AddOrEditAPIKeyGeneral({
 														</ListEndpoint>
 													)}
 												{item === 'custom-excluded' &&
-													form.getValues('general.endpoint.type') === 'custom-excluded' && (
-														<ListEndpoint endpoints={endpoints} type='custom-excluded'>
+													form.watch('general.endpoint.type') === 'custom-excluded' && (
+														<ListEndpoint
+															endpoints={endpoints}
+															setEndpoints={setEndpoints}
+															type='custom-excluded'
+														>
 															<Button
-																className={cn(endpointError && 'ring-2 ring-error-default')}
+																className={cn(endpointError && 'border border-error-default')}
 																type='button'
 																onClick={openEndpointDialog}
 															>
