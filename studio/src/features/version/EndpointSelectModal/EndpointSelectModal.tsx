@@ -186,23 +186,6 @@ export default function EndpointSelectModal({
 					</DropdownMenu>
 				</div>
 				<div className='pt-4'>
-					{endpoints.filter((ep) => selected.includes(ep.iid)).length > 0 && (
-						<div className='p-4 pt-0 space-y-2'>
-							<span className='text-subtle text-sm leading-6'>{t('version.api_key.selected')}</span>
-							<div className='flex items-center gap-2 overflow-auto no-scrollbar overscroll-contain'>
-								{endpoints
-									.filter((ep) => selected.includes(ep.iid))
-									.map((ep) => (
-										<Badge
-											className='pl-2 pr-1'
-											onClear={() => addList(ep, false)}
-											key={ep._id}
-											text={ep.name}
-										/>
-									))}
-							</div>
-						</div>
-					)}
 					<div className='space-y-2'>
 						{filtered.length > 0 && (
 							<span className='px-4 text-subtle text-sm leading-6'>Endpoints</span>
