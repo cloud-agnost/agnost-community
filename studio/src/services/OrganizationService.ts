@@ -21,6 +21,11 @@ export default class OrganizationService {
 		return (await axios.get(`${this.url}`)).data;
 	}
 
+	static async getOrganizationById(organizationId: string): Promise<Organization> {
+		const res = await axios.get(`${this.url}/${organizationId}`);
+		return res.data;
+	}
+
 	static async createOrganization(name: string): Promise<Organization> {
 		return (await axios.post(`${this.url}`, { name })).data;
 	}
@@ -144,9 +149,8 @@ export default class OrganizationService {
 	static async resendInvitation(token: string) {
 		return (
 			await axios.post(
-				`${this.url}/${
-					useOrganizationStore.getState().organization?._id
-				}/invite-resend?token=${token}&uiBaseURL=${window.location.origin}`,
+				`${this.url}/${useOrganizationStore.getState().organization
+					?._id}/invite-resend?token=${token}&uiBaseURL=${window.location.origin}`,
 				{
 					token,
 				},
