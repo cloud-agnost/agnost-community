@@ -1,8 +1,10 @@
 import { Button } from '@/components/Button';
 import { useToast } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore.ts';
+import { APIError } from '@/types';
 import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import {
 	Form,
@@ -15,7 +17,7 @@ import {
 } from 'components/Form';
 import { Input } from 'components/Input';
 import { Switch } from 'components/Switch';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
@@ -50,11 +52,10 @@ export default function CreateCopyVersionDrawer() {
 		version,
 		selectVersion,
 	} = useVersionStore();
-	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		if (!open) form.reset();
-	}, [open]);
+		if (!createCopyVersionDrawerIsOpen) form.reset();
+	}, [createCopyVersionDrawerIsOpen]);
 
 	const form = useForm<z.infer<typeof CreateCopyVersionForm>>({
 		resolver: zodResolver(CreateCopyVersionForm),
@@ -65,40 +66,41 @@ export default function CreateCopyVersionDrawer() {
 		},
 	});
 
+	const { mutateAsync: copyMutate, isPending } = useMutation({
+		mutationFn: createCopyOfVersion,
+		mutationKey: ['createCopyOfVersion'],
+		onSuccess: (version) => {
+			notify({
+				type: 'success',
+				title: translate('general.success'),
+				description: translate('version.copied'),
+			});
+			selectVersion(version);
+		},
+		onError: (error: APIError) => {
+			notify({
+				type: 'error',
+				title: error.error,
+				description: error.details,
+			});
+		},
+	});
 	async function onSubmit(data: z.infer<typeof CreateCopyVersionForm>) {
-		setLoading(true);
-
-		createCopyOfVersion({
+		copyMutate({
 			orgId: version.orgId,
 			appId: version.appId,
 			parentVersionId: version._id,
-			name: data.name,
-			private: data.private,
-			readOnly: data.readOnly,
-			onSuccess: (version) => {
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.copied'),
-				});
-				form.reset();
-				setCreateCopyVersionDrawerIsOpen(false);
-				selectVersion(version);
-			},
-			onError: (error) => {
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
-				});
-			},
+			...data,
 		});
+	}
 
-		setLoading(false);
+	function onClose() {
+		form.reset();
+		setCreateCopyVersionDrawerIsOpen(false);
 	}
 
 	return (
-		<Drawer open={createCopyVersionDrawerIsOpen} onOpenChange={setCreateCopyVersionDrawerIsOpen}>
+		<Drawer open={createCopyVersionDrawerIsOpen} onOpenChange={onClose}>
 			<DrawerContent position='right'>
 				<DrawerHeader>
 					<DrawerTitle>{t('version.create_copy_of_version')}</DrawerTitle>
@@ -171,7 +173,7 @@ export default function CreateCopyVersionDrawer() {
 							)}
 						/>
 						<div className='flex justify-end mt-4'>
-							<Button loading={loading} size='lg'>
+							<Button loading={isPending} size='lg'>
 								{t('general.add')}
 							</Button>
 						</div>

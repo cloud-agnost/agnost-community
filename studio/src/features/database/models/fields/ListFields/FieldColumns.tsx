@@ -60,7 +60,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => <SortButton text={translate('general.field')} column={column} />,
+		header: () => <SortButton text={translate('general.field')} field='name' />,
 		cell({ row: { original } }) {
 			if (['object-list', 'object'].includes(original.type)) {
 				return <SubFields field={original} name={original.name} />;
@@ -74,10 +74,8 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'type',
-		header: ({ column }) => <SortButton text={translate('general.type')} column={column} />,
+		header: () => <SortButton text={translate('general.type')} field='type' />,
 		accessorKey: 'type',
-		sortingFn: 'textCaseSensitive',
-		enableSorting: true,
 		cell: ({
 			row: {
 				original: { type },
@@ -99,8 +97,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'unique',
-		header: ({ column }) => <SortButton text={translate('general.unique')} column={column} />,
-
+		header: () => <SortButton text={translate('general.unique')} field='unique' />,
 		accessorKey: 'unique',
 		enableSorting: true,
 		cell: ({
@@ -119,9 +116,8 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'indexed',
-		header: ({ column }) => <SortButton text={translate('general.indexed')} column={column} />,
+		header: () => <SortButton text={translate('general.indexed')} field='indexed' />,
 		accessorKey: 'indexed',
-		enableSorting: true,
 		cell: ({
 			row: {
 				original: { indexed },
@@ -138,9 +134,8 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'required',
-		header: ({ column }) => <SortButton text={translate('general.required')} column={column} />,
+		header: () => <SortButton text={translate('general.required')} field='required' />,
 		accessorKey: 'required',
-		enableSorting: true,
 		cell: ({
 			row: {
 				original: { required },
@@ -158,9 +153,8 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'immutable',
 		className: 'whitespace-nowrap',
-		header: ({ column }) => <SortButton text={translate('general.read-only')} column={column} />,
+		header: () => <SortButton text={translate('general.read-only')} field='immutable' />,
 		accessorKey: 'immutable',
-		enableSorting: true,
 		cell: ({
 			row: {
 				original: { immutable },
@@ -176,17 +170,15 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		},
 	},
 	{
-		id: 'created_at',
-		header: ({ column }) => (
+		id: 'createdAt',
+		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.created_at')}
-				column={column}
+				field='createdAt'
 			/>
 		),
-		accessorKey: 'created_at',
-		enableSorting: true,
-		sortingFn: 'datetime',
+		accessorKey: 'createdAt',
 		size: 200,
 		cell: ({
 			row: {
@@ -203,16 +195,14 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 
 	{
 		id: 'updatedAt',
-		header: ({ column }) => (
+		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.updated_at')}
-				column={column}
+				field='updatedAt'
 			/>
 		),
 		accessorKey: 'updatedAt',
-		enableSorting: true,
-		sortingFn: 'datetime',
 		size: 200,
 		cell: ({
 			row: {

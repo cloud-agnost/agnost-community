@@ -1,4 +1,3 @@
-import { HttpMethod } from './endpoint';
 import {
 	BaseGetRequest,
 	BaseParams,
@@ -44,6 +43,8 @@ export interface VersionLog {
 	message: any;
 	errors: any;
 	responseBody: object;
+	method: string;
+	path: string;
 }
 
 export interface GetVersionLogsParams extends BaseGetRequest, BaseParams {
@@ -267,10 +268,8 @@ export interface DesignElement {
 	versionId: string;
 	name: string;
 	type: DesignElementTypes;
-	meta: {
-		method: HttpMethod;
-		path: string;
-	};
+	modelId?: string;
+	meta: any;
 }
 
 export interface VersionParams extends BaseParams {

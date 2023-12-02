@@ -35,7 +35,7 @@ export const EmailAuthenticationSchema = z
 				.min(100, 'Port must be at least 3 characters long')
 				.optional(),
 			user: z.string().trim().optional(),
-			password: z.string({ required_error: 'Password is required' }),
+			password: z.string().trim().optional(),
 			useTLS: z.boolean(),
 		}),
 	})

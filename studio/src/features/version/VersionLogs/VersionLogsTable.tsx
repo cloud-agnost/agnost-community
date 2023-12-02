@@ -18,6 +18,12 @@ export default function VersionLogsTable({ date, type }: VersionLogsTableProps) 
 	const table = useTable({
 		data: logs,
 		columns: VersionLogColumns,
+		initialState: {
+			columnVisibility: {
+				path: type === 'endpoint',
+				method: type === 'endpoint',
+			},
+		},
 	});
 	const { hasNextPage, fetchNextPage, isPending } = useInfiniteScroll({
 		lastFetchedPage: lastFetchedLogPage,

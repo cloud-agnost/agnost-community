@@ -13,9 +13,7 @@ const user = useAuthStore.getState().user;
 export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton text={translate('application.table.name')} column={column} />
-		),
+		header: () => <SortButton text={translate('application.table.name')} field='name' />,
 		size: 900,
 		accessorKey: 'name',
 
@@ -42,9 +40,7 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 	},
 	{
 		id: 'role',
-		header: ({ column }) => (
-			<SortButton text={translate('application.table.role')} column={column} />
-		),
+		header: () => <SortButton text={translate('application.table.role')} field='role' />,
 		accessorKey: 'role',
 		cell: ({ row }) => {
 			const { team } = row.original;
@@ -56,9 +52,7 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 
 	{
 		id: 'date',
-		header: ({ column }) => (
-			<SortButton text={translate('application.table.createdAt')} column={column} />
-		),
+		header: () => <SortButton text={translate('application.table.createdAt')} field='createdAt' />,
 		accessorKey: 'createdAt',
 		cell: ({ row }) => {
 			const { createdAt } = row.original;

@@ -124,20 +124,16 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 				aria-label='Select row'
 			/>
 		),
-		enableSorting: false,
-		enableHiding: false,
 	},
 	{
 		id: 'id',
-		header: ({ column }) => <SortButton text={translate('general.id')} column={column} />,
+		header: () => <SortButton text={translate('general.id')} field='id' />,
 		accessorKey: 'id',
-		sortingFn: 'textCaseSensitive',
 	},
 	{
 		id: 'path',
-		header: ({ column }) => <SortButton text={translate('storage.file.path')} column={column} />,
+		header: () => <SortButton text={translate('storage.file.path')} field='path' />,
 		accessorKey: 'path',
-		sortingFn: 'textCaseSensitive',
 		className: '!w-[300px]',
 		cell: ({ row: { original } }) => {
 			const environment = useEnvironmentStore.getState().environment;
@@ -170,7 +166,7 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 	},
 	{
 		id: 'size',
-		header: ({ column }) => <SortButton text={translate('storage.file.size')} column={column} />,
+		header: () => <SortButton text={translate('storage.file.size')} field='size' />,
 		accessorKey: 'size',
 		sortingFn: 'textCaseSensitive',
 		cell: ({
@@ -181,9 +177,7 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 	},
 	{
 		id: 'mimeType',
-		header: ({ column }) => (
-			<SortButton text={translate('storage.file.mimeType')} column={column} />
-		),
+		header: () => <SortButton text={translate('storage.file.mimeType')} field='mimeType' />,
 		accessorKey: 'mimeType',
 		sortingFn: 'textCaseSensitive',
 	},
@@ -204,17 +198,15 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 		},
 	},
 	{
-		id: 'created_at',
-		header: ({ column }) => (
+		id: 'uploadedAt',
+		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.created_at')}
-				column={column}
+				field='uploadedAt'
 			/>
 		),
-		accessorKey: 'created_at',
-		enableSorting: true,
-		sortingFn: 'datetime',
+		accessorKey: 'uploadedAt',
 		size: 200,
 		cell: ({
 			row: {

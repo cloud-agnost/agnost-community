@@ -57,7 +57,6 @@ const useEnvironmentStore = create<EnvironmentStore & Actions>()(
 				...initialState,
 				getAppVersionEnvironment: async (params: getAppVersionEnvironmentParams) => {
 					const environment = await EnvironmentService.getAppVersionEnvironment(params);
-					console.log({ environment });
 					set({ environment });
 					return environment;
 				},

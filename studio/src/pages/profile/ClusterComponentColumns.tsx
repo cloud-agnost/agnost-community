@@ -12,11 +12,11 @@ const { openEditClusterComponent } = useClusterStore.getState();
 const ClusterComponentColumns: ColumnDefWithClassName<ClusterComponent>[] = [
 	{
 		accessorKey: 'title',
-		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
+		header: () => <SortButton text={translate('general.name')} field='title' />,
 	},
 	{
 		accessorKey: 'type',
-		header: ({ column }) => <SortButton text={translate('general.type')} column={column} />,
+		header: () => <SortButton text={translate('general.type')} field='type' />,
 		cell: ({ row }) => {
 			const { type } = row.original;
 			const Icon = RESOURCE_ICON_MAP[type];
@@ -30,7 +30,7 @@ const ClusterComponentColumns: ColumnDefWithClassName<ClusterComponent>[] = [
 	},
 	{
 		accessorKey: 'status',
-		header: ({ column }) => <SortButton text={translate('cluster.k8sType')} column={column} />,
+		header: () => <SortButton text={translate('cluster.k8sType')} field='status' />,
 		cell: ({ row }) => {
 			const { k8sType } = row.original;
 			return <Badge variant={k8sType === 'Deployment' ? 'blue' : 'orange'} text={k8sType} />;
@@ -38,15 +38,15 @@ const ClusterComponentColumns: ColumnDefWithClassName<ClusterComponent>[] = [
 	},
 	{
 		accessorKey: 'info.version',
-		header: ({ column }) => <SortButton text={translate('general.version')} column={column} />,
+		header: () => <SortButton text={translate('general.version')} field='info.version' />,
 		cell: ({ row }) => (
 			<div className='text-sm text-default truncate w-[30ch]'>{row.original.info?.version}</div>
 		),
 	},
 	{
 		accessorKey: 'info.runningReplicas',
-		header: ({ column }) => (
-			<SortButton text={translate('cluster.running_replicas')} column={column} />
+		header: () => (
+			<SortButton text={translate('cluster.running_replicas')} field='info.runningReplicas' />
 		),
 		cell: ({ row }) => (
 			<span className='text-sm text-default'>{row.original.info?.runningReplicas}</span>

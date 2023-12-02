@@ -13,7 +13,7 @@ export default class NavigatorService {
 	static getUrl() {
 		const dbName = useDatabaseStore.getState().database.name;
 		const modelName = useModelStore.getState().model.name;
-		return `${window.location.origin}/${useEnvironmentStore.getState().environment
+		return `${useEnvironmentStore.getState().environment
 			?.iid}/database/${dbName}/model/${modelName}`;
 	}
 

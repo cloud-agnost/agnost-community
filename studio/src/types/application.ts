@@ -26,16 +26,18 @@ export interface Application {
 }
 
 export interface Team {
-	userId: {
-		_id: string;
-		name: string;
-		color: string;
-		pictureUrl: string;
-	};
+	userId: TeamMember;
 	role: string;
 	_id: string;
 	joinDate: string;
 }
+
+type TeamMember = {
+	_id: string;
+	name: string;
+	color: string;
+	pictureUrl: string;
+};
 
 export interface CreateApplicationRequest extends BaseRequest {
 	name: string;

@@ -11,6 +11,7 @@ import './searchInput.scss';
 interface SearchInputProps extends React.ComponentPropsWithoutRef<'input'> {
 	onSearch?: (value: string) => void;
 	onClear?: () => void;
+	urlKey?: string;
 }
 
 export default function SearchInput({
@@ -19,6 +20,7 @@ export default function SearchInput({
 	onClear,
 	onSearch,
 	value,
+	urlKey = 'q',
 	...props
 }: SearchInputProps) {
 	const [inputValue, setInputValue] = useState<string>((value as string) ?? '');
@@ -27,8 +29,8 @@ export default function SearchInput({
 	const { t } = useTranslation();
 	const ref = React.useRef<HTMLInputElement>(null);
 	function clear() {
-		setInputValue('');
-		searchParams.delete('q');
+		setInputValue(urlKey);
+		searchParams.delete(urlKey);
 		setSearchParams(searchParams);
 		onClear?.();
 	}
@@ -36,13 +38,12 @@ export default function SearchInput({
 	function onInput(value: string) {
 		value = value.trim();
 		if (!value) {
-			searchParams.delete('q');
+			searchParams.delete(urlKey);
 			setSearchParams(searchParams);
-			return;
+		} else {
+			searchParams.set(urlKey, value);
+			setSearchParams(searchParams);
 		}
-		searchParams.set('q', value);
-		searchParams.delete('p');
-		setSearchParams(searchParams);
 		onSearch?.(value);
 	}
 
@@ -58,9 +59,8 @@ export default function SearchInput({
 	}, [inputValue]);
 
 	useUpdateEffect(() => {
-		setInputValue(searchParams.get('q') ?? '');
-	}, [searchParams.get('q')]);
-
+		setInputValue(searchParams.get(urlKey) ?? '');
+	}, [searchParams.get(urlKey)]);
 	return (
 		<div className={cn('search-input-wrapper', className)} {...props}>
 			<MagnifyingGlass size={20} className='search-input-icon' />

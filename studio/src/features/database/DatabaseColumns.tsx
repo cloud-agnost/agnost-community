@@ -17,7 +17,7 @@ const canDeleteDatabase = getVersionPermission('db.delete');
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
 		id: 'name',
-		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
+		header: () => <SortButton text={translate('general.name')} field='name' />,
 		accessorKey: 'name',
 		sortingFn: 'textCaseSensitive',
 		enableSorting: true,
@@ -36,10 +36,8 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'type',
-		header: ({ column }) => <SortButton text={translate('general.type')} column={column} />,
+		header: () => <SortButton text={translate('general.type')} field='type' />,
 		accessorKey: 'type',
-		sortingFn: 'textCaseSensitive',
-		enableSorting: true,
 		size: 200,
 		cell: ({
 			row: {
@@ -57,8 +55,8 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'assignUniqueName',
-		header: ({ column }) => (
-			<SortButton text={translate('database.add.unique.name')} column={column} />
+		header: () => (
+			<SortButton text={translate('database.add.unique.name')} field='assignUniqueName' />
 		),
 		accessorKey: 'assignUniqueName',
 		sortingFn: 'textCaseSensitive',
@@ -81,10 +79,8 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'managed',
-		header: ({ column }) => <SortButton text={translate('general.managed')} column={column} />,
+		header: () => <SortButton text={translate('general.managed')} field='managed' />,
 		accessorKey: 'managed',
-		sortingFn: 'textCaseSensitive',
-		enableSorting: true,
 		size: 200,
 		cell: ({
 			row: {
@@ -102,17 +98,15 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		},
 	},
 	{
-		id: 'created_at',
-		header: ({ column }) => (
+		id: 'createdAt',
+		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.created_at')}
-				column={column}
+				field='createdAt'
 			/>
 		),
-		accessorKey: 'created_at',
-		enableSorting: true,
-		sortingFn: 'datetime',
+		accessorKey: 'createdAt',
 		size: 200,
 		cell: ({
 			row: {
@@ -129,16 +123,14 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 
 	{
 		id: 'updatedAt',
-		header: ({ column }) => (
+		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.updated_at')}
-				column={column}
+				field='updatedAt'
 			/>
 		),
 		accessorKey: 'updatedAt',
-		enableSorting: true,
-		sortingFn: 'datetime',
 		size: 200,
 		cell: ({
 			row: {

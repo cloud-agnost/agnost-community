@@ -11,24 +11,24 @@ const canDeleteResource = getOrgPermission('resource.delete');
 export const EnvironmentResourcesColumn: ColumnDefWithClassName<Resource>[] = [
 	{
 		id: 'name',
-		header: ({ column }) => {
-			return <SortButton text={translate('resources.table.name')} column={column} />;
+		header: () => {
+			return <SortButton text={translate('resources.table.name')} field='name' />;
 		},
 		accessorKey: 'name',
 		size: 200,
 	},
 	{
 		id: 'type',
-		header: ({ column }) => {
-			return <SortButton text={translate('resources.table.type')} column={column} />;
+		header: () => {
+			return <SortButton text={translate('resources.table.type')} field='instance' />;
 		},
 		accessorKey: 'instance',
 		size: 200,
 	},
 	{
 		id: 'status',
-		header: ({ column }) => {
-			return <SortButton text={translate('resources.table.status')} column={column} />;
+		header: () => {
+			return <SortButton text={translate('resources.table.status')} field='status' />;
 		},
 		accessorKey: 'status',
 		size: 200,
@@ -39,8 +39,8 @@ export const EnvironmentResourcesColumn: ColumnDefWithClassName<Resource>[] = [
 	},
 	{
 		id: 'managed',
-		header: ({ column }) => {
-			return <SortButton text={translate('resources.table.managed')} column={column} />;
+		header: () => {
+			return <SortButton text={translate('resources.table.managed')} field='managed' />;
 		},
 		accessorKey: 'managed',
 		size: 200,

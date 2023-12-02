@@ -36,9 +36,16 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.name')}
+				field='name'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		accessorKey: 'name',
-		sortingFn: 'textCaseSensitive',
+		sortingFn: 'text',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { name },
@@ -70,7 +77,13 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 	},
 	{
 		id: 'created_at',
-		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.created_at')}
+				field='createdAt'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		enableSorting: true,
 		sortingFn: 'datetime',
 		accessorKey: 'createdAt',
@@ -87,8 +100,15 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 
 	{
 		id: 'updated_at',
-		header: ({ column }) => <SortButton text={translate('general.updated_at')} column={column} />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.updated_at')}
+				field='updatedAt'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		accessorKey: 'updatedAt',
+		enableSorting: true,
 		size: 200,
 		cell: ({ row }) => {
 			const { updatedAt, updatedBy } = row.original;

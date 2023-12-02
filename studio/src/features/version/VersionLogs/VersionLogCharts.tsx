@@ -1,6 +1,6 @@
 import useThemeStore from '@/store/theme/themeStore';
 import useVersionStore from '@/store/version/versionStore';
-import { DATE_FORMAT, DATE_TIME_FORMAT, toIsoString, formatDate } from '@/utils';
+import { DATE_TIME_FORMAT, formatDate, toIsoString } from '@/utils';
 import { t } from 'i18next';
 import { Dispatch, SetStateAction, useMemo } from 'react';
 import { Range } from 'react-date-range';
@@ -41,9 +41,12 @@ export default function VersionLogCharts({ date, setDate }: VersionLogChartsProp
 	const data = useMemo(
 		() =>
 			logBuckets?.buckets?.map?.((item) => ({
-				name: `${formatDate(item.start, DATE_FORMAT)} - ${formatDate(item.end, DATE_FORMAT)}`,
-				start: formatDate(item.start, DATE_FORMAT),
-				end: formatDate(item.end, DATE_FORMAT),
+				name: `${formatDate(item.start, DATE_TIME_FORMAT)} - ${formatDate(
+					item.end,
+					DATE_TIME_FORMAT,
+				)}`,
+				start: formatDate(item.start, DATE_TIME_FORMAT),
+				end: formatDate(item.end, DATE_TIME_FORMAT),
 				success: item.success,
 				error: item?.error,
 			})) ?? [],

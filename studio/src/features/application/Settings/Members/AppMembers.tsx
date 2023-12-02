@@ -46,8 +46,8 @@ export default function MainAppMembers() {
 	}
 	return (
 		<div className='space-y-6 p-6'>
-			<div className='flex items-center justify-between gap-4'>
-				<SearchInput placeholder={t('general.search') as string} />
+			<div className='flex items-center gap-4'>
+				<SearchInput className='flex-1' placeholder={t('general.search') as string} />
 				<div className='flex items-center gap-4'>
 					{!!table.getSelectedRowModel().rows?.length && (
 						<SelectedRowButton<ApplicationMember>

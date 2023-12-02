@@ -15,6 +15,7 @@ import {
 import { SearchInput } from 'components/SearchInput';
 import { NEW_TAB_ITEMS, TAB_ICON_MAP } from 'constants/constants.ts';
 import { useParams } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 export default function NewTabDropdown() {
 	const { addTab } = useTabStore();
 	const { searchDesignElements, designElements, resetDesignElements, getVersionDashboardPath } =
@@ -36,10 +37,16 @@ export default function NewTabDropdown() {
 	}
 
 	function handleClickElement(item: DesignElement) {
-		const path = getVersionDashboardPath(`${item.type}/${item._id}`);
+		let url = `${item.type}/${item._id}`;
+		if (capitalize(item.type) === TabTypes.Model) url = `/database/${item.meta.dbId}/models`;
+		if (capitalize(item.type) === TabTypes.Field)
+			url = `database/${item.meta.dbId}/models/${item.modelId}/fields`;
+
+		const path = getVersionDashboardPath(url);
+
 		const tab: Tab = {
 			id: generateId(),
-			title: item.name,
+			title: capitalize(item.type) === TabTypes.Field ? item.meta.modelName : item.name,
 			path,
 			isActive: true,
 			isDashboard: false,
@@ -81,38 +88,56 @@ export default function NewTabDropdown() {
 						className='tab-search-input'
 						onSearch={onInput}
 						onClear={resetDesignElements}
+						urlKey='s'
 					/>
 				</DropdownMenuLabel>
 				<DropdownMenuItemContainer className='overflow-auto max-h-96'>
-					{designElements.length > 0
-						? designElements.map((item) => (
-								<DropdownMenuItem asChild key={item._id} onClick={() => handleClickElement(item)}>
-									<div className='space-x-3'>
-										<div className=' bg-lighter p-2 rounded-lg'>
-											{getIcon(capitalize(item.type) as TabTypes)}
+					{designElements.length > 0 ? (
+						<AnimatePresence>
+							<motion.div
+								initial={{
+									x: '100%',
+								}}
+								animate={{
+									x: 0,
+								}}
+								transition={{ type: 'tween' }}
+								exit={{
+									x: '100%',
+								}}
+							>
+								{designElements.map((item) => (
+									<DropdownMenuItem asChild key={item._id} onClick={() => handleClickElement(item)}>
+										<div className='space-x-3'>
+											<div className=' bg-lighter p-2 rounded-lg'>
+												{getIcon(capitalize(item.type) as TabTypes)}
+											</div>
+											<div>
+												<p className='text-subtle font-sfCompact'>{capitalize(item.type)}</p>
+												<p className='text-default font-sfCompact'>{item.name}</p>
+											</div>
 										</div>
-										<div>
-											<p className='text-subtle font-sfCompact'>{capitalize(item.type)}</p>
-											<p className='text-default font-sfCompact'>{item.name}</p>
-										</div>
-									</div>
-								</DropdownMenuItem>
-						  ))
-						: NEW_TAB_ITEMS.sort((a, b) => a.title.localeCompare(b.title)).map((item) => (
-								<DropdownMenuItem
-									onClick={() => handleAddTab(item)}
-									asChild
-									key={item.path}
-									className='flex items-center gap-4 relative'
-								>
-									<div>
-										{getIcon(capitalize(item.type) as TabTypes)}
-										<h1 title={item.title} className='flex-1 truncate max-w-[15ch]'>
-											{item.title}
-										</h1>
-									</div>
-								</DropdownMenuItem>
-						  ))}
+									</DropdownMenuItem>
+								))}
+							</motion.div>
+						</AnimatePresence>
+					) : (
+						NEW_TAB_ITEMS.sort((a, b) => a.title.localeCompare(b.title)).map((item) => (
+							<DropdownMenuItem
+								onClick={() => handleAddTab(item)}
+								asChild
+								key={item.path}
+								className='flex items-center gap-4 relative'
+							>
+								<div>
+									{getIcon(capitalize(item.type) as TabTypes)}
+									<h1 title={item.title} className='flex-1 truncate max-w-[15ch]'>
+										{item.title}
+									</h1>
+								</div>
+							</DropdownMenuItem>
+						))
+					)}
 				</DropdownMenuItemContainer>
 			</DropdownMenuContent>
 		</DropdownMenu>

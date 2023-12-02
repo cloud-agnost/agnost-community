@@ -77,7 +77,7 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 						</Button>
 					</div>
 					<Separator />
-					<div className='h-5/6'>
+					<div className='h-[90%]'>
 						<p className='text-sm text-default font-sfCompact mb-4'>{t('task.console')}</p>
 						<Logs logs={taskLogs[taskId as string] as Log[]} />
 					</div>

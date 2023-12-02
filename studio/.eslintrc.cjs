@@ -25,5 +25,6 @@ module.exports = {
 		'react-hooks/exhaustive-deps': 'off',
 		'@tanstack/query/exhaustive-deps': 'error',
 		'@tanstack/query/stable-query-client': 'error',
+		'import/no-unused-modules': [1, { unusedExports: true }],
 	},
 };

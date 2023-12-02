@@ -5,7 +5,7 @@ import { CopyButton } from '@/components/CopyButton';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
 import { TableConfirmation } from '@/components/Table';
-import { BADGE_COLOR_MAP, HTTP_METHOD_BADGE_MAP } from '@/constants';
+import { BADGE_COLOR_MAP, BASE_URL, HTTP_METHOD_BADGE_MAP } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
@@ -17,6 +17,7 @@ import { TabLink } from '../version/Tabs';
 const queryClient = new QueryClient();
 const canEditEndpoint = getVersionPermission('endpoint.update');
 const canDeleteEndpoint = getVersionPermission('endpoint.delete');
+const env = useEnvironmentStore.getState().environment;
 const { openEditEndpointDialog, deleteEndpoint } = useEndpointStore.getState();
 function deleteEndpointHandler(toDeleteEndpoint: Endpoint) {
 	queryClient
@@ -62,7 +63,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
+		header: () => <SortButton text={translate('general.name')} field='name' />,
 		accessorKey: 'name',
 		enableSorting: true,
 		sortingFn: 'textCaseSensitive',
@@ -74,10 +75,8 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	},
 	{
 		id: 'method',
-		header: ({ column }) => <SortButton text={translate('endpoint.method')} column={column} />,
+		header: () => <SortButton text={translate('endpoint.method')} field='method' />,
 		accessorKey: 'method',
-		enableSorting: true,
-		sortingFn: 'textCaseSensitive',
 		size: 100,
 		cell: ({ row }) => {
 			const { method } = row.original;
@@ -86,18 +85,15 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	},
 	{
 		id: 'path',
-		header: ({ column }) => <SortButton text={translate('endpoint.path')} column={column} />,
-		enableSorting: true,
-		sortingFn: 'alphanumericCaseSensitive',
+		header: () => <SortButton text={translate('endpoint.path')} field='path' />,
 		accessorKey: 'path',
 		size: 200,
 		cell: ({ row }) => {
 			const { path } = row.original;
-			const env = useEnvironmentStore.getState().environment;
-			const copyText = `${window.location.origin}/${env?.iid}${path}`;
+			const copyText = `${BASE_URL}/${env?.iid}${path}`;
 			return (
 				<div className='flex items-center gap-8 group'>
-					<div className='truncate max-w-[15ch]'>{path}</div>
+					<div className='truncate max-w-[15ch] font-mono'>{path}</div>
 					<CopyButton text={copyText} className='hidden group-hover:block' />
 				</div>
 			);
@@ -106,9 +102,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	{
 		id: 'API KEY',
 		accessorKey: 'apiKeyRequired',
-		header: ({ column }) => <SortButton text={translate('endpoint.apiKey')} column={column} />,
-		enableSorting: true,
-		sortingFn: 'basic',
+		header: () => <SortButton text={translate('endpoint.apiKey')} field='apiKeyRequired' />,
 		size: 200,
 		cell: ({ row }) => {
 			const { apiKeyRequired } = row.original;
@@ -126,10 +120,8 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	},
 	{
 		id: 'session',
-		header: ({ column }) => <SortButton text={translate('endpoint.session')} column={column} />,
+		header: () => <SortButton text={translate('endpoint.session')} field='sessionRequired' />,
 		enableSorting: true,
-		sortingFn: 'basic',
-		accessorKey: 'sessionRequired',
 		size: 200,
 		cell: ({ row }) => {
 			const { sessionRequired } = row.original;
@@ -146,10 +138,8 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		},
 	},
 	{
-		id: 'created_at',
-		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
-		enableSorting: true,
-		sortingFn: 'datetime',
+		id: 'createdAt',
+		header: () => <SortButton text={translate('general.created_at')} field='createdAt' />,
 		accessorKey: 'createdAt',
 		size: 200,
 		cell: ({ row }) => {
@@ -163,8 +153,8 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	},
 
 	{
-		id: 'updated_at',
-		header: ({ column }) => <SortButton text={translate('general.updated_at')} column={column} />,
+		id: 'updatedAt',
+		header: () => <SortButton text={translate('general.updated_at')} field='updatedAt' />,
 		accessorKey: 'updatedAt',
 		size: 200,
 		cell: ({ row }) => {

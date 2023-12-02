@@ -1,6 +1,8 @@
 {
 	"page_title": "Databases",
 	"empty_text": "You have not defined any databases for this app version",
+	"no_database": "No database found",
+	"no_model": "No model found",
 	"add": {
 		"title": "Create Database",
 		"poolSize": "Pool Size",

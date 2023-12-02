@@ -75,9 +75,8 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
+		header: () => <SortButton text={translate('general.name')} field='name' />,
 		accessorKey: 'name',
-		sortingFn: 'textCaseSensitive',
 		cell: ({ row: { original } }) => (
 			<TabLink
 				name={original.name}
@@ -92,8 +91,8 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 
 	{
 		id: 'visibility',
-		header: ({ column }) => (
-			<SortButton text={translate('storage.bucket.visibility.title')} column={column} />
+		header: () => (
+			<SortButton text={translate('storage.bucket.visibility.title')} field='isPublic' />
 		),
 		cell: ({
 			row: {
@@ -113,7 +112,7 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 	},
 	{
 		id: 'tags',
-		header: ({ column }) => <SortButton text={translate('storage.bucket.tags')} column={column} />,
+		header: () => <SortButton text={translate('storage.bucket.tags')} field='tags' />,
 		accessorKey: 'tags',
 		cell: ({ row: { original } }) => {
 			const { tags } = original;
@@ -127,17 +126,15 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 		},
 	},
 	{
-		id: 'created_at',
-		header: ({ column }) => (
+		id: 'createdAt',
+		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.created_at')}
-				column={column}
+				field='createdAt'
 			/>
 		),
-		accessorKey: 'created_at',
-		enableSorting: true,
-		sortingFn: 'datetime',
+		accessorKey: 'createdAt',
 		size: 200,
 		cell: ({
 			row: {
@@ -152,17 +149,15 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 		},
 	},
 	{
-		id: 'updated_at',
-		header: ({ column }) => (
+		id: 'updatedAt',
+		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.updated_at')}
-				column={column}
+				field='updatedAt'
 			/>
 		),
-		accessorKey: 'updated_at',
-		enableSorting: true,
-		sortingFn: 'datetime',
+		accessorKey: 'updatedAt',
 		size: 200,
 		cell: ({
 			row: {

@@ -61,7 +61,6 @@ export default function SelectUserDataModel() {
 	}, [version]);
 	useEffect(() => {
 		const dbId = form.watch('databaseId');
-		console.log('dbId', dbId);
 		if (version && dbId) {
 			getModelsOfDatabase({
 				orgId: version.orgId,
@@ -147,17 +146,24 @@ export default function SelectUserDataModel() {
 		const dbId = form.watch('databaseId');
 		const modelId = form.watch('modelId');
 		if (version && (!dbId || !modelId)) {
-			console.log('resetting form');
-			form.reset({
-				databaseId: databases?.find(
-					(db) => db.iid === version?.authentication?.userDataModel?.database,
-				)?._id,
-				modelId: models?.find(
-					(model) => model.iid === version?.authentication?.userDataModel?.model,
-				)?._id,
-			});
+			const dId = databases?.find(
+				(db) => db.iid === version?.authentication?.userDataModel?.database,
+			)?._id;
+
+			form.setValue('databaseId', dId as string);
 		}
-	}, [version, databases, models]);
+	}, [version, databases]);
+	useEffect(() => {
+		const dbId = form.watch('databaseId');
+		const modelId = form.watch('modelId');
+		if (version && (!dbId || !modelId)) {
+			const mId = models?.find(
+				(model) => model.iid === version?.authentication?.userDataModel?.model,
+			)?._id;
+
+			form.setValue('modelId', mId as string);
+		}
+	}, [version, models]);
 
 	return (
 		<SettingsFormItem
@@ -208,8 +214,6 @@ export default function SelectUserDataModel() {
 									<FormControl>
 										<Select
 											defaultValue={field.value}
-											value={field.value}
-											name={field.name}
 											onValueChange={(value) => {
 												field.onChange(value);
 												form.resetField('modelId');
@@ -240,6 +244,11 @@ export default function SelectUserDataModel() {
 														</SelectItem>
 													);
 												})}
+												{!databases.length && (
+													<SelectItem value='' disabled>
+														{t('database.no_database')}
+													</SelectItem>
+												)}
 											</SelectContent>
 										</Select>
 									</FormControl>
@@ -284,6 +293,11 @@ export default function SelectUserDataModel() {
 														</SelectItem>
 													);
 												})}
+												{!models.length && (
+													<SelectItem value='' disabled>
+														{t('database.no_model')}
+													</SelectItem>
+												)}
 											</SelectContent>
 										</Select>
 									</FormControl>

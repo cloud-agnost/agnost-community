@@ -53,9 +53,9 @@ const PhoneAuthSchema = z
 			.optional(),
 	})
 	.superRefine((val, ctx) => {
-		const { smsProvider, providerConfig, confirmPhone, enabled, allowCodeSignIn } = val;
+		const { smsProvider, providerConfig, confirmPhone, enabled } = val;
 
-		if (!confirmPhone || !enabled || !allowCodeSignIn) return;
+		if (!confirmPhone || !enabled) return;
 
 		if (smsProvider === PhoneAuthSMSProviders.TWILIO && !providerConfig?.accountSID) {
 			ctx.addIssue({
@@ -247,7 +247,7 @@ export default function PhoneAuthentication() {
 												<FormLabel className='block text-subtle'>
 													{t('version.authentication.allow_signin_codes_desc')}
 												</FormLabel>
-												{form.watch('allowCodeSignIn') && (
+												{form.watch('confirmPhone') && (
 													<>
 														<FormField
 															control={form.control}

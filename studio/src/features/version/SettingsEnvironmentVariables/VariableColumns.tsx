@@ -35,9 +35,16 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => <SortButton text={translate('general.name')} column={column} />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.name')}
+				field='name'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		accessorKey: 'name',
-		sortingFn: 'textCaseSensitive',
+		sortingFn: 'text',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { name },
@@ -49,9 +56,16 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	},
 	{
 		id: 'value',
-		header: ({ column }) => <SortButton text={translate('general.value')} column={column} />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.value')}
+				field='value'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		accessorKey: 'value',
-		sortingFn: 'textCaseSensitive',
+		sortingFn: 'text',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { value },
@@ -62,7 +76,13 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	},
 	{
 		id: 'created_at',
-		header: ({ column }) => <SortButton text={translate('general.created_at')} column={column} />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.created_at')}
+				field='createdAt'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		enableSorting: true,
 		sortingFn: 'datetime',
 		accessorKey: 'createdAt',
@@ -79,8 +99,16 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 
 	{
 		id: 'updated_at',
-		header: ({ column }) => <SortButton text={translate('general.updated_at')} column={column} />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.updated_at')}
+				field='updatedAt'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		accessorKey: 'updatedAt',
+		enableSorting: true,
+		sortingFn: 'datetime',
 		size: 200,
 		cell: ({ row }) => {
 			const { updatedAt, updatedBy } = row.original;
