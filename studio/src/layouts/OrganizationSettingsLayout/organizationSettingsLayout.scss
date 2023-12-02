@@ -8,7 +8,7 @@
 		@apply max-h-[85%] overflow-auto;
 	}
 	&-right {
-		@apply p-4 md:p-[40px];
+		@apply p-4 md:p-[40px] space-y-8;
 
 		&-divider {
 			@apply border-b border-border pb-4 md:pb-8 mb-4 md:mb-8;
