@@ -1,19 +1,21 @@
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { Clock, Calendar, Files } from '@phosphor-icons/react';
-import { BADGE_COLOR_MAP } from '@/constants';
+import { BADGE_COLOR_MAP, BASE_URL, HTTP_METHOD_BADGE_MAP } from '@/constants';
 import useVersionStore from '@/store/version/versionStore';
 import { ColumnDefWithClassName, VersionLog } from '@/types';
 import { DATETIME_MED_WITH_SECONDS, capitalize, translate, formatDate } from '@/utils';
+import { CopyButton } from '@/components/CopyButton';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 
 const { openVersionLogDetails } = useVersionStore.getState();
+const env = useEnvironmentStore.getState().environment;
 export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	{
 		id: 'timestamp',
 		header: translate('version.timestamp'),
 		accessorKey: 'timestamp',
 		sortingFn: 'textCaseSensitive',
-
 		cell: ({
 			row: {
 				original: { timestamp },
@@ -33,8 +35,33 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 		id: 'name',
 		header: translate('general.name'),
 		accessorKey: 'name',
-		sortingFn: 'textCaseSensitive',
+		size: 100,
+	},
+	{
+		id: 'method',
+		header: () => translate('endpoint.method'),
+		accessorKey: 'method',
+		size: 100,
+		cell: ({ row }) => {
+			const { method } = row.original;
+			return <Badge variant={HTTP_METHOD_BADGE_MAP[method]} text={method} />;
+		},
+	},
+	{
+		id: 'path',
+		header: () => translate('endpoint.path'),
+		accessorKey: 'path',
 		size: 300,
+		cell: ({ row }) => {
+			const { path } = row.original;
+			const copyText = `${BASE_URL}/${env?.iid}${path}`;
+			return (
+				<div className='flex items-center gap-8 group'>
+					<div className='truncate max-w-[15ch] font-mono'>{path}</div>
+					<CopyButton text={copyText} className='hidden group-hover:block' />
+				</div>
+			);
+		},
 	},
 	{
 		id: 'status',
@@ -49,7 +76,7 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 		}) => {
 			let statusText = status;
 			if (typeof status !== 'string') {
-				statusText = status >= 200 && status < 300 ? 'success' : 'error';
+				statusText = status >= 200 && status < 400 ? 'success' : 'error';
 			}
 			return (
 				<Badge
