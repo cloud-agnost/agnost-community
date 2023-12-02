@@ -19,6 +19,7 @@ export default function VersionLogCharts({ date, setDate }: VersionLogChartsProp
 	const handleClickChart = (e: CategoricalChartState) => {
 		if (e?.activeLabel && e?.activeTooltipIndex !== undefined) {
 			const currentData = data[e.activeTooltipIndex];
+			console.log(currentData);
 			if (currentData?.success) {
 				setDate([
 					{
@@ -41,9 +42,12 @@ export default function VersionLogCharts({ date, setDate }: VersionLogChartsProp
 	const data = useMemo(
 		() =>
 			logBuckets?.buckets?.map?.((item) => ({
-				name: `${formatDate(item.start, DATE_FORMAT)} - ${formatDate(item.end, DATE_FORMAT)}`,
-				start: formatDate(item.start, DATE_FORMAT),
-				end: formatDate(item.end, DATE_FORMAT),
+				name: `${formatDate(item.start, DATE_TIME_FORMAT)} - ${formatDate(
+					item.end,
+					DATE_TIME_FORMAT,
+				)}`,
+				start: formatDate(item.start, DATE_TIME_FORMAT),
+				end: formatDate(item.end, DATE_TIME_FORMAT),
 				success: item.success,
 				error: item?.error,
 			})) ?? [],
