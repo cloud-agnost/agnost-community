@@ -53,7 +53,7 @@ const PhoneAuthSchema = z
 			.optional(),
 	})
 	.superRefine((val, ctx) => {
-		const { smsProvider, providerConfig, confirmPhone, enabled, allowCodeSignIn } = val;
+		const { smsProvider, providerConfig, confirmPhone, enabled } = val;
 
 		if (!confirmPhone || !enabled) return;
 
