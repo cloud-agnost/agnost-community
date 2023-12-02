@@ -2,6 +2,7 @@ import { ColumnDefWithClassName } from '@/types';
 import {
 	ColumnFiltersState,
 	SortingState,
+	TableOptions,
 	getCoreRowModel,
 	getFilteredRowModel,
 	getSortedRowModel,
@@ -9,13 +10,12 @@ import {
 } from '@tanstack/react-table';
 import { useState } from 'react';
 
-export default function useTable<TData>({
-	data,
-	columns,
-}: {
-	columns: ColumnDefWithClassName<TData>[];
+type UseTableProps<TData> = Omit<TableOptions<TData>, 'data' | 'columns' | 'getCoreRowModel'> & {
 	data: TData[];
-}) {
+	columns: ColumnDefWithClassName<TData>[];
+};
+
+export default function useTable<TData>({ data, columns, ...props }: UseTableProps<TData>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [rowSelection, setRowSelection] = useState({});
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -23,6 +23,7 @@ export default function useTable<TData>({
 		data,
 		columns,
 		columnResizeMode: 'onChange',
+		...props,
 		getCoreRowModel: getCoreRowModel(),
 		onSortingChange: setSorting,
 		getSortedRowModel: getSortedRowModel(),
