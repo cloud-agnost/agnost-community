@@ -19,7 +19,6 @@ export default function VersionLogCharts({ date, setDate }: VersionLogChartsProp
 	const handleClickChart = (e: CategoricalChartState) => {
 		if (e?.activeLabel && e?.activeTooltipIndex !== undefined) {
 			const currentData = data[e.activeTooltipIndex];
-			console.log(currentData);
 			if (currentData?.success) {
 				setDate([
 					{
