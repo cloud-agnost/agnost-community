@@ -13,7 +13,7 @@ export default function useAuthorizeVersion(type: string) {
 		() =>
 			(version?.readOnly
 				? user?._id === version.createdBy || role === 'Admin'
-				: isPrivateForUser && getAppPermission(`${role}.app.${type}`)) as boolean,
+				: isPrivateForUser && getAppPermission(type)) as boolean,
 		[version, role],
 	);
 	return canEdit;
