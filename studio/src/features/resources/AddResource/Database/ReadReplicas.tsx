@@ -6,16 +6,16 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from '@/components/Dialog';
 import { Form } from '@/components/Form';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip';
 import { Pencil } from '@/components/icons';
 import { INSTANCE_PORT_MAP } from '@/constants';
 import { DatabaseInfo, MongoConnectionFormat, TestConnectionButton } from '@/features/resources';
 import { AccessDbSchema, ConnectResourceSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash } from '@phosphor-icons/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
@@ -24,6 +24,8 @@ export default function ReadReplicas() {
 	const { t } = useTranslation();
 	const { setValue, getValues, reset, watch } =
 		useFormContext<z.infer<typeof ConnectResourceSchema>>();
+
+	const [open, setOpen] = useState(false);
 	const readReplicas = getValues('accessReadOnly') ?? [];
 	const replicasForm = useForm<z.infer<typeof AccessDbSchema>>({
 		resolver: zodResolver(AccessDbSchema),
@@ -31,7 +33,7 @@ export default function ReadReplicas() {
 
 	function addNewReplica(data: any) {
 		setValue('accessReadOnly', [...readReplicas, data]);
-		replicasForm.reset();
+		onClose();
 	}
 
 	function onSubmit() {
@@ -50,10 +52,17 @@ export default function ReadReplicas() {
 			username: replica.username,
 			password: replica.password,
 		});
+		setOpen(true);
 	}
 
 	function onClose() {
-		replicasForm.reset();
+		setOpen(false);
+		replicasForm.reset({
+			host: '',
+			port: undefined,
+			username: '',
+			password: '',
+		});
 	}
 	useEffect(() => {
 		if (watch('instance')) {
@@ -61,11 +70,11 @@ export default function ReadReplicas() {
 		}
 	}, [watch('instance')]);
 	return (
-		<div>
+		<div className='space-y-4'>
 			<h6 className=' font-sfCompact text-sm text-subtle '>
 				{t('resources.database.read_replicas')}
 			</h6>
-			<div className='space-y-3'>
+			<div className='space-y-4'>
 				{getValues('accessReadOnly')?.map((replica, index) => (
 					<div
 						key={index}
@@ -77,23 +86,43 @@ export default function ReadReplicas() {
 							</span>
 						</div>
 						<div className=''>
-							<Button variant='blank' iconOnly type='button'>
-								<Pencil className='w-5 h-5 text-icon-base' onClick={() => editReplica(index)} />
-							</Button>
-							<Button variant='blank' iconOnly type='button' onClick={() => removeReplica(index)}>
-								<Trash size={20} className='text-icon-base' />
-							</Button>
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button variant='blank' iconOnly type='button'>
+											<Pencil
+												className='w-5 h-5 text-icon-base'
+												onClick={() => editReplica(index)}
+											/>
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>{t('general.edit')}</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											variant='blank'
+											iconOnly
+											type='button'
+											onClick={() => removeReplica(index)}
+										>
+											<Trash size={20} className='text-icon-base' />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>{t('general.delete')}</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
 						</div>
 					</div>
 				))}
+				<Button type='button' variant='text' onClick={() => setOpen(true)}>
+					<Plus size={16} className='text-brand-primary' />
+					<span className='ml-2 text-brand-primary'>{t('resources.database.add_replica')}</span>
+				</Button>
 			</div>
-			<Dialog onOpenChange={onClose}>
-				<DialogTrigger asChild>
-					<Button type='button' variant='text'>
-						<Plus size={16} className='text-brand-primary' />
-						<span className='ml-2 text-brand-primary'>{t('resources.database.add_replica')}</span>
-					</Button>
-				</DialogTrigger>
+			<Dialog open={open} onOpenChange={onClose}>
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>{t('resources.database.add_replica')}</DialogTitle>
