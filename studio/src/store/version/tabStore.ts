@@ -28,6 +28,7 @@ type Actions = {
 	removeTabByPath: (versionId: string, path: string) => void;
 	updateTab: (param: UpdateTabParams) => void;
 	addSettingsTab: (versionId: string, path?: string) => void;
+	closeCurrentTab: () => void;
 	reset: () => void;
 };
 
@@ -240,6 +241,11 @@ const useTabStore = create<TabStore & Actions>()(
 						isDashboard: false,
 						type: TabTypes.Settings,
 					});
+				},
+				closeCurrentTab: () => {
+					const currentTab = get().getCurrentTab(useVersionStore.getState().version._id);
+					if (!currentTab) return;
+					get().removeTab(useVersionStore.getState().version._id, currentTab.id);
 				},
 				reset: () => set(initialState),
 			}),
