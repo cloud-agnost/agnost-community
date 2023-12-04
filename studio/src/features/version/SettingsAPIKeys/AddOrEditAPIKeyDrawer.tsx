@@ -36,7 +36,7 @@ export default function AddOrEditAPIKeyDrawer({
 	const { createAPIKey, editAPIKey, selectedAPIKey, setSelectedAPIKey } = useSettingsStore();
 	const { version } = useVersionStore();
 	const { getEndpointsByIid } = useEndpointStore();
-	const [endpoints, setEndpoints] = useState<Endpoint[]>();
+	const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
 
 	const form = useForm<z.infer<typeof Schema>>({
 		resolver: zodResolver(Schema),

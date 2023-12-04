@@ -20,7 +20,10 @@ class Organization extends RealtimeActions<OrganizationType> {
 	}
 	update({ data }: RealtimeActionParams<OrganizationType>) {
 		useOrganizationStore.setState?.({
-			organization: data,
+			organization: {
+				...data,
+				role: useOrganizationStore.getState().organization.role,
+			},
 			organizations: useOrganizationStore.getState?.().organizations.map((org) => {
 				if (org._id === data._id) {
 					return data;

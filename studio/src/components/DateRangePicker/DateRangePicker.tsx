@@ -56,7 +56,7 @@ export function DateRangePicker({ date, onChange }: DateRangePickerProps) {
 							Cancel
 						</Button>
 					</PopoverClose>
-					<PopoverClose>
+					<PopoverClose asChild>
 						<Button size='lg' onClick={() => onChange?.(range)}>
 							Apply
 						</Button>

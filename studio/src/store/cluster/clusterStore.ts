@@ -11,6 +11,8 @@ import {
 import { BaseRequest, User, UserDataToRegister } from '@/types/type.ts';
 import { devtools, persist } from 'zustand/middleware';
 import useAuthStore from '../auth/authStore';
+import useEnvironmentStore from '../environment/environmentStore';
+import useOrganizationStore from '../organization/organizationStore';
 
 interface ClusterStore {
 	loading: boolean;
@@ -91,7 +93,15 @@ const useClusterStore = create<ClusterStore & Actions>()(
 					try {
 						const clusterSetupResponse = await AuthService.finalizeClusterSetup(params);
 						set({ isCompleted: true });
+						useOrganizationStore.setState({
+							organization: {
+								...clusterSetupResponse.org,
+								role: 'Admin',
+							},
+						});
+						useEnvironmentStore.setState({ environment: clusterSetupResponse.env });
 						if (params.onSuccess) params.onSuccess(clusterSetupResponse);
+
 						return clusterSetupResponse;
 					} catch (error) {
 						set({ error: error as APIError });

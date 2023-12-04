@@ -11,6 +11,8 @@ import {
 	RateLimit,
 	EmptyApps,
 	EmptyAppsLight,
+	EmptyResource,
+	EmptyResourceLight,
 } from '../icons';
 import './emptyState.scss';
 import { capitalize } from 'lodash';
@@ -52,6 +54,7 @@ export default function EmptyState({ type, title, className, children }: EmptySt
 		'rate-limit': RateLimit,
 		invitation: theme === 'light' ? EmptyInvitationLight : EmptyInvitation,
 		app: theme === 'light' ? EmptyAppsLight : EmptyApps,
+		resource: theme === 'light' ? EmptyResourceLight : EmptyResource,
 	};
 	const Icon = TAB_ICON_MAP[capitalize(type)] ?? ICON_MAP[type];
 	return (

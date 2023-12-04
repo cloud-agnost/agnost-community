@@ -7,15 +7,15 @@ import { ColumnDefWithClassName, VersionLog } from '@/types';
 import { DATETIME_MED_WITH_SECONDS, capitalize, translate, formatDate } from '@/utils';
 import { CopyButton } from '@/components/CopyButton';
 import useEnvironmentStore from '@/store/environment/environmentStore';
+import { SortButton } from '@/components/DataTable';
 
 const { openVersionLogDetails } = useVersionStore.getState();
 const env = useEnvironmentStore.getState().environment;
 export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	{
 		id: 'timestamp',
-		header: translate('version.timestamp'),
+		header: () => <SortButton text={translate('version.timestamp')} field='timestamp' />,
 		accessorKey: 'timestamp',
-		sortingFn: 'textCaseSensitive',
 		cell: ({
 			row: {
 				original: { timestamp },
@@ -33,13 +33,13 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	},
 	{
 		id: 'name',
-		header: translate('general.name'),
+		header: () => <SortButton text={translate('general.name')} field='name' />,
 		accessorKey: 'name',
 		size: 100,
 	},
 	{
 		id: 'method',
-		header: () => translate('endpoint.method'),
+		header: () => <SortButton text={translate('endpoint.method')} field='method' />,
 		accessorKey: 'method',
 		size: 100,
 		cell: ({ row }) => {
@@ -49,7 +49,7 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	},
 	{
 		id: 'path',
-		header: () => translate('endpoint.path'),
+		header: () => <SortButton text={translate('endpoint.path')} field='path' />,
 		accessorKey: 'path',
 		size: 300,
 		cell: ({ row }) => {
@@ -65,9 +65,8 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	},
 	{
 		id: 'status',
-		header: translate('general.status'),
+		header: () => <SortButton text={translate('general.status')} field='status' />,
 		accessorKey: 'status',
-		sortingFn: 'textCaseSensitive',
 		size: 100,
 		cell: ({
 			row: {
@@ -89,9 +88,8 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 	},
 	{
 		id: 'duration',
-		header: translate('version.response_time'),
+		header: () => <SortButton text={translate('version.response_time')} field='duration' />,
 		accessorKey: 'duration',
-		sortingFn: 'textCaseSensitive',
 		size: 100,
 		cell: ({
 			row: {

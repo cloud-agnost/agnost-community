@@ -1,5 +1,5 @@
 import { componentLoader } from '@/helpers';
-import ErrorBoundary from '@/pages/errors/ErrorBoundary.tsx';
+import ErrorBoundary from '@/pages/errors/ErrorBoundary';
 import { Root } from '@/pages/root';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
@@ -142,6 +142,13 @@ const Version = loadable(() => componentLoader(() => import('../pages/version/Ve
 
 const Dashboard = loadable(
 	() => componentLoader(() => import('../pages/version/VersionDashboard')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
+const VersionError = loadable(
+	() => componentLoader(() => import('../pages/version/VersionError')),
 	{
 		fallback: <Fallback />,
 		resolveComponent: (mod: any) => mod.default,
@@ -582,12 +589,15 @@ const router = createBrowserRouter([
 									},
 									{
 										path: ':appId/version/:versionId',
-
 										element: <Version />,
 										children: [
 											{
 												path: '',
 												element: <Dashboard />,
+											},
+											{
+												path: 'error',
+												element: <VersionError />,
 											},
 											{
 												path: 'database',
@@ -773,6 +783,7 @@ const router = createBrowserRouter([
 												],
 											},
 										],
+										errorElement: <VersionError />,
 									},
 								],
 							},

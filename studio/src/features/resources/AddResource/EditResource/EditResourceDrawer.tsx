@@ -1,10 +1,12 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Input } from '@/components/Input';
 import { Label } from '@/components/Label';
+import { UpdateAllowedRoles, UpdateResourceAccessConf } from '@/features/resources';
 import useResourceStore from '@/store/resources/resourceStore';
 import { ResourceCreateType } from '@/types';
 import { useTranslation } from 'react-i18next';
-import { EditResource, UpdateAllowedRoles, UpdateResourceAccessConf } from '@/features/resources';
+import EditSize from './EditSize';
+import EditVersionAndReplica from './EditVersionAndReplica';
 
 export default function EditResourceDrawer() {
 	const { t } = useTranslation();
@@ -24,7 +26,12 @@ export default function EditResourceDrawer() {
 					</div>
 					<UpdateAllowedRoles />
 					{resourceConfig.type === ResourceCreateType.Existing && <UpdateResourceAccessConf />}
-					{resourceConfig.type === ResourceCreateType.New && <EditResource />}
+					{resourceConfig.type === ResourceCreateType.New && (
+						<>
+							<EditSize />
+							<EditVersionAndReplica />
+						</>
+					)}
 				</div>
 			</DrawerContent>
 		</Drawer>

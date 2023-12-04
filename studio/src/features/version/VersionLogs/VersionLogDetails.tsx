@@ -16,7 +16,7 @@ export default function VersionLogDetails({ open, onClose }: VersionLogDetailsPr
 					<DrawerTitle>{t('version.log_details')}</DrawerTitle>
 				</DrawerHeader>
 				<div className='p-6 h-full overflow-auto space-y-6'>
-					<div className='space-y-4 h-[80%]'>
+					<div className='space-y-4 h-[85%]'>
 						<p className='text-default font-sfCompact text-sm'>{t('version.details')}</p>
 						<CodeEditor
 							value={JSON.stringify(log, null, 2)}

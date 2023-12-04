@@ -7,7 +7,7 @@ import { useAuthorizeVersion } from '@/hooks';
 export default function AddAPIKeyButton() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
-	const canCreate = useAuthorizeVersion('version.keys.create');
+	const canCreate = useAuthorizeVersion('version.key.create');
 	return (
 		<>
 			<Button onClick={() => setOpen(true)} disabled={!canCreate}>
