@@ -83,6 +83,16 @@ export const ResourceModel = mongoose.model(
 				required: true,
 				default: false,
 			},
+			// Whether this resource can be accessed outside of the cluster or not
+			allowExternalAccess: {
+				type: Boolean,
+				required: false,
+				default: false,
+			},
+			// The domain name that is used to access this resource from outside of the cluster, this is only valid for clusters that have a valid IP address
+			externalAccessHost: {
+				type: String,
+			},
 			// The list of app roles that can access to this resource and use in environment resource mappings besides the "Admin" role
 			// App "Admin" role will always be added to the allowedRoles list
 			allowedRoles: {

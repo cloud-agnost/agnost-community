@@ -113,10 +113,10 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		if (!envObj) {
 			// Initialize express server
 			await this.initExpressServer(false);
-			// Spin up the express server
-			await this.startExpressServer();
 			// We completed server initialization and can accept incoming requests
 			global.SERVER_STATUS = "running";
+			// Spin up the express server
+			await this.startExpressServer();
 			return;
 		}
 
@@ -134,8 +134,6 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		await this.initExpressServer();
 		// Manage endpoints
 		await this.manageEndpoints();
-		// Spin up the express server
-		await this.startExpressServer();
 
 		// Set the environment variables of the API server
 		this.manageEnvironmentVariables(this.getEnvironmentVariables());
@@ -163,15 +161,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// We completed server initialization and can accept incoming requests
 		global.SERVER_STATUS = "running";
 
-		// Create the agnost server-side client instance
-		// Save agnost server side client to globals for faster access
-		/* 		const pkg = (await import("../agnost-server-client.cjs")).default;
-		const { agnost } = pkg;
-		global.agnost = agnost;
- */
-		/* 		const pkg = (await import("@agnost/server")).default;
-		const { agnost } = pkg;
-		global.agnost = agnost; */
+		// Spin up the express server
+		await this.startExpressServer();
 	}
 
 	/**
@@ -219,10 +210,10 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		if (!envObj) {
 			// Initialize express server
 			await this.initExpressServer(false);
-			// Spin up the express server
-			await this.startExpressServer();
 			// We completed server initialization and can accept incoming requests
 			global.SERVER_STATUS = "running";
+			// Spin up the express server
+			await this.startExpressServer();
 			return;
 		}
 
@@ -237,8 +228,6 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		await this.initExpressServer();
 		// Manage endpoints
 		await this.manageEndpoints();
-		// Spin up the express server
-		await this.startExpressServer();
 
 		// Set the environment variables of the API server
 		this.manageEnvironmentVariables(this.getEnvironmentVariables());
@@ -264,19 +253,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// We completed server initialization and can accept incoming requests
 		global.SERVER_STATUS = "running";
 
-		// Create the agnost server-side client instance
-		// Save agnost server side client to globals for faster access
-		const pkg = (await import(`../agnost-server-client.cjs`)).default;
-		const { agnost } = pkg;
-		// Reset the cache of the client
-		agnost.clearClientCache();
-		global.agnost = agnost;
-
-		/* 		const pkg = (await import("@agnost/server")).default;
-		const { agnost } = pkg;
-		// Rest the cache of the client
-		agnost.clearClientCache();
-		global.agnost = agnost; */
+		// Spin up the express server
+		await this.startExpressServer();
 	}
 
 	/**

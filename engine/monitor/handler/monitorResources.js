@@ -48,16 +48,10 @@ export default async function monitorResources() {
 						if (
 							["Creating", "Updating", "Deleting"].includes(resource.status)
 						) {
-							console.log(
-								"***here",
-								resource.name,
-								result.status,
-								resource.status
-							);
-							if (result.status === "OK") {
+							/* 							if (result.status === "OK") {
 								await upadateResourceStatus(resource, result);
 								continue;
-							}
+							} */
 
 							// Check duration of the operation
 							const now = Date.now();

@@ -11,7 +11,7 @@
         "monitoringInterval": 3000,
         "resourcePaginationSize": 100,
         "initialDelaySeconds": 30,
-        "maxResourceOpWaitMinues": 10,
+        "maxResourceOpWaitMinues": 5,
         "gcSeconds": 30,
         "platformBaseUrl": "http://platform-core-clusterip-service:4000"
     },
