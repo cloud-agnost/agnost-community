@@ -386,6 +386,9 @@
 .Toastify__progress-bar--animated {
 	animation: Toastify__trackProgress linear 1 forwards;
 }
+.Toastify__close-button {
+	@apply text-icon-secondary;
+}
 
 .rdrDefinedRangesWrapper,
 .rdrStaticRange {

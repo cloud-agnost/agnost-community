@@ -143,7 +143,6 @@ export default function PhoneAuthentication() {
 		resolver: zodResolver(PhoneAuthSchema),
 		defaultValues: version?.authentication.phone,
 	});
-	console.log('phoneAuthSMSProviders', form.formState.errors);
 	const selectedProvider = phoneAuthSMSProviders.find(
 		(p) => p.provider === form.watch('smsProvider'),
 	);

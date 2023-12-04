@@ -56,5 +56,6 @@
 	"notStartWithNumber": "{{label}} cannot start with a number",
 	"notStartWithUnderscore": "{{label}} cannot start with underscore (_) character",
 	"reservedWord": "{{label}} is a reserved word and cannot be used",
-	"nameInvalidCharacters": "Name can include only numbers, letters and underscore (_) characters"
+	"nameInvalidCharacters": "Name can include only numbers, letters and underscore (_) characters",
+	"invalidSize": "Storage size should be specified in non-zero Mi or Gi (e.g., 500Mi or 1Gi)"
 }

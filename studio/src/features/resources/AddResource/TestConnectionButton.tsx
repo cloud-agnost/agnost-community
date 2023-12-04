@@ -29,18 +29,21 @@ export default function TestConnectionButton({ replica }: { replica?: boolean })
 			});
 		},
 	});
+
 	async function testResourceConnection() {
-		const isValid = await form.trigger();
+		const data = form.getValues();
+		const options = replica ? data.options : data.access.options;
+		const access = replica ? data : data.access;
+		const isValid = await form.trigger('access');
+
 		if (!isValid) return;
-		const options = replica ? form.getValues().options : form.getValues().access.options;
-		const access = replica ? form.getValues() : form.getValues().access;
 		testMutate({
-			...form.getValues(),
+			...data,
 			access: {
 				...access,
 				options: options?.filter((option: any) => option.key && option.value),
 				...(replica && {
-					brokers: form.getValues().brokers?.map((broker: any) => broker.key) as string[],
+					brokers: data.brokers?.map((broker: any) => broker.key) as string[],
 				}),
 			},
 			type: resourceConfig.resourceType,

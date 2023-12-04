@@ -39,6 +39,7 @@ interface OrganizationStore {
 
 type Actions = {
 	getAllOrganizationByUser: () => Promise<Organization[] | APIError>;
+	getOrganizationById: (organizationId: string) => Promise<Organization | APIError>;
 	createOrganization: (req: CreateOrganizationRequest) => Promise<Organization | APIError>;
 	selectOrganization: (organization: Organization) => void;
 	leaveOrganization: (req: LeaveOrganizationRequest) => Promise<void>;
@@ -100,6 +101,16 @@ const useOrganizationStore = create<OrganizationStore & Actions>()(
 							res.forEach((organization) => {
 								joinChannel(organization._id);
 							});
+							return res;
+						} catch (error) {
+							throw error as APIError;
+						}
+					},
+					getOrganizationById: async (organizationId: string) => {
+						try {
+							const res = await OrganizationService.getOrganizationById(organizationId);
+							set({ organization: res });
+							joinChannel(organizationId);
 							return res;
 						} catch (error) {
 							throw error as APIError;
@@ -167,7 +178,10 @@ const useOrganizationStore = create<OrganizationStore & Actions>()(
 									}
 									return organization;
 								}),
-								organization: res,
+								organization: {
+									...res,
+									role: get()?.organization?.role,
+								},
 							});
 							if (onSuccess) onSuccess();
 							return res;
@@ -180,7 +194,16 @@ const useOrganizationStore = create<OrganizationStore & Actions>()(
 						try {
 							const res = await OrganizationService.changeOrganizationAvatar(req);
 							set({
-								organization: res,
+								organizations: get().organizations.map((organization) => {
+									if (organization._id === res._id) {
+										return res;
+									}
+									return organization;
+								}),
+								organization: {
+									...res,
+									role: get()?.organization?.role,
+								},
 							});
 							if (req.onSuccess) req.onSuccess();
 							return res;
@@ -195,7 +218,16 @@ const useOrganizationStore = create<OrganizationStore & Actions>()(
 								get()?.organization?._id as string,
 							);
 							set({
-								organization: res,
+								organizations: get().organizations.map((organization) => {
+									if (organization._id === res._id) {
+										return res;
+									}
+									return organization;
+								}),
+								organization: {
+									...res,
+									role: get()?.organization?.role,
+								},
 							});
 							if (req.onSuccess) req.onSuccess();
 							return res;

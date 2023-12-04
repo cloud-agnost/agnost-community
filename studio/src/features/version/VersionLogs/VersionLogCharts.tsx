@@ -2,7 +2,7 @@ import useThemeStore from '@/store/theme/themeStore';
 import useVersionStore from '@/store/version/versionStore';
 import { DATE_TIME_FORMAT, formatDate, toIsoString } from '@/utils';
 import { t } from 'i18next';
-import { Dispatch, SetStateAction, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Range } from 'react-date-range';
 import { useSearchParams } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
@@ -11,22 +11,14 @@ import { CustomTooltip } from './VersionLogs';
 
 interface VersionLogChartsProps {
 	date: Range[];
-	setDate: Dispatch<SetStateAction<Range[]>>;
 }
 
-export default function VersionLogCharts({ date, setDate }: VersionLogChartsProps) {
+export default function VersionLogCharts({ date }: VersionLogChartsProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const handleClickChart = (e: CategoricalChartState) => {
 		if (e?.activeLabel && e?.activeTooltipIndex !== undefined) {
 			const currentData = data[e.activeTooltipIndex];
 			if (currentData?.success) {
-				setDate([
-					{
-						startDate: new Date(currentData.start),
-						endDate: new Date(currentData.end),
-						key: 'selection',
-					},
-				]);
 				setSearchParams({
 					...searchParams,
 					start: toIsoString(new Date(currentData.start)),
@@ -41,7 +33,8 @@ export default function VersionLogCharts({ date, setDate }: VersionLogChartsProp
 	const data = useMemo(
 		() =>
 			logBuckets?.buckets?.map?.((item) => ({
-				name: `${formatDate(item.start, DATE_TIME_FORMAT)} - ${formatDate(
+				name: `${formatDate(item.end, DATE_TIME_FORMAT)}`,
+				tooltip: `${formatDate(item.start, DATE_TIME_FORMAT)} - ${formatDate(
 					item.end,
 					DATE_TIME_FORMAT,
 				)}`,

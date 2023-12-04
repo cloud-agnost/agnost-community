@@ -266,7 +266,8 @@ export const AccessDbSchema = z
 		if (
 			!val.host &&
 			resourceConfig.resourceType !== ResourceType.Storage &&
-			resourceConfig.type !== ResourceType.Queue
+			resourceConfig.type !== ResourceType.Queue &&
+			val.format !== RabbitMQConnFormat.URL
 		) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
@@ -279,7 +280,8 @@ export const AccessDbSchema = z
 		if (
 			!val.port &&
 			resourceConfig.resourceType !== ResourceType.Storage &&
-			resourceConfig.type !== ResourceType.Queue
+			resourceConfig.type !== ResourceType.Queue &&
+			val.format !== RabbitMQConnFormat.URL
 		) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
@@ -290,7 +292,11 @@ export const AccessDbSchema = z
 			});
 		}
 
-		if (!val.username && resourceConfig.resourceType === ResourceType.Database) {
+		if (
+			!val.username &&
+			(resourceConfig.resourceType === ResourceType.Database ||
+				val.format === RabbitMQConnFormat.Object)
+		) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: translate('forms.required', {
@@ -299,7 +305,11 @@ export const AccessDbSchema = z
 				path: ['username'],
 			});
 		}
-		if (!val.password && resourceConfig.resourceType === ResourceType.Database) {
+		if (
+			!val.password &&
+			(resourceConfig.resourceType === ResourceType.Database ||
+				val.format === RabbitMQConnFormat.Object)
+		) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: translate('forms.required', {
@@ -539,15 +549,22 @@ export const CreateResourceSchema = ConnectResourceSchema.omit({
 })
 	.extend({
 		config: z.object({
-			size: z.string().regex(MEMORY_REGEX, {
-				message:
-					translate('forms.invalid', {
-						label: translate('version.memoryRequest'),
-					}) ?? '',
-			}),
+			size: z
+				.string({
+					required_error: translate('forms.required', {
+						label: translate('resources.database.storage_size'),
+					}),
+				})
+				.regex(MEMORY_REGEX, {
+					message: translate('forms.invalidSize'),
+				}),
 			instances: z.coerce.number().min(1).optional(),
 			replicas: z.coerce.number().min(1).optional(),
-			version: z.string(),
+			version: z.string({
+				required_error: translate('forms.required', {
+					label: translate('resources.version'),
+				}),
+			}),
 			readReplica: z.boolean().optional().default(false),
 		}),
 	})

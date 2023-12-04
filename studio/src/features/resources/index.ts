@@ -9,7 +9,6 @@ export { default as ConnectOptions } from './AddResource/Database/ConnectOptions
 export { default as DatabaseInfo } from './AddResource/Database/DatabaseInfo';
 export { default as MongoConnectionFormat } from './AddResource/Database/MongoConnectionFormat';
 export { default as ReadReplicas } from './AddResource/Database/ReadReplicas';
-export { default as EditResource } from './AddResource/EditResource/EditResource';
 export { default as EditResourceDrawer } from './AddResource/EditResource/EditResourceDrawer';
 export { default as UpdateAllowedRoles } from './AddResource/EditResource/UpdateAllowedRoles';
 export { default as UpdateResourceAccessConf } from './AddResource/EditResource/UpdateResourceAccessConf';

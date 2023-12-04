@@ -9,6 +9,7 @@ import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
 import useVersionStore from '@/store/version/versionStore';
 import { history } from '@/utils';
+import _ from 'lodash';
 import { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 
@@ -29,16 +30,22 @@ export default function Root() {
 	const navigate = useNavigate();
 	const { orgId, versionId, appId } = useParams();
 	const { checkClusterSmtpStatus, checkClusterSetup } = useClusterStore();
-	const { getOrganizationMembers } = useOrganizationStore();
+	const { getOrganizationMembers, getOrganizationById, members, organization } =
+		useOrganizationStore();
 	const { getUser, isAuthenticated, user } = useAuthStore();
 	const { getAppVersionEnvironment, getEnvironmentResources } = useEnvironmentStore();
 	const { getVersionNotifications } = useVersionStore();
 
 	useEffect(() => {
 		if (orgId) {
-			getOrganizationMembers({
-				organizationId: orgId,
-			});
+			if (_.isEmpty(organization)) {
+				getOrganizationById(orgId);
+			}
+			if (_.isEmpty(members)) {
+				getOrganizationMembers({
+					organizationId: orgId,
+				});
+			}
 		}
 	}, [orgId]);
 

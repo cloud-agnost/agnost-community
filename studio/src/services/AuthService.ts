@@ -1,11 +1,12 @@
 import { axios } from '@/helpers';
 import {
+	ClusterSetupResponse,
 	CompleteAccountSetupRequest,
 	FinalizeAccountSetupRequest,
 	OnboardingData,
 	User,
 	UserDataToRegister,
-} from '@/types/type.ts';
+} from '@/types';
 
 export default class AuthService {
 	static url = '/v1/auth';
@@ -13,7 +14,7 @@ export default class AuthService {
 	static async initializeClusterSetup(data: UserDataToRegister): Promise<User> {
 		return (await axios.post(`${this.url}/init-cluster-setup`, data)).data;
 	}
-	static async finalizeClusterSetup(req: OnboardingData) {
+	static async finalizeClusterSetup(req: OnboardingData): Promise<ClusterSetupResponse> {
 		return (await axios.post(`${this.url}/finalize-cluster-setup`, req)).data;
 	}
 

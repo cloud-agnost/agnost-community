@@ -55,6 +55,17 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 
 	useEffect(() => {
 		refetch();
+		const start = searchParams.get('start');
+		const end = searchParams.get('end');
+		if (start && end) {
+			setDate([
+				{
+					startDate: new Date(start),
+					endDate: new Date(end),
+					key: 'selection',
+				},
+			]);
+		}
 	}, [searchParams]);
 
 	return (
@@ -63,7 +74,7 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 				<h1 className='text-2xl font-semibold text-default'>{t('version.log')}</h1>
 				<DateRangePicker date={date} onChange={selectDate} />
 			</div>
-			<VersionLogCharts date={date} setDate={setDate} />
+			<VersionLogCharts date={date} />
 			<VersionLogsTable date={date} type={type} />
 			<VersionLogDetails open={showLogDetails} onClose={closeVersionLogDetails} />
 		</div>
@@ -72,8 +83,8 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 export const CustomTooltip = ({ payload }: any) => {
 	const { t } = useTranslation();
 	return (
-		<div className='bg-subtle p-2 rounded-lg space-y-4'>
-			<p className='text-subtle text-sm font-sfCompact'>{payload?.[0]?.payload.name}</p>
+		<div className='bg-subtle p-2 rounded-lg space-y-4 max-w-[13rem]'>
+			<p className='text-subtle text-sm font-sfCompact'>{payload?.[0]?.payload.tooltip}</p>
 			<p className='text-default text-sm font-sfCompact flex items-center gap-1'>
 				<span className='bg-[#11BB69] w-3 h-3 rounded inline-block mr-1' />
 				{payload?.[0]?.payload?.success}{' '}
