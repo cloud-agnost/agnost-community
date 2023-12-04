@@ -83,25 +83,27 @@ export default function EditVersionAndReplica() {
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 '>
-				<FormField
-					control={form.control}
-					name={`config.${replicationType}`}
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>{t(`resources.database.${replicationType}`)}</FormLabel>
-							<FormControl className='flex'>
-								<Input
-									type='number'
-									disabled={form.watch('instance') === ResourceInstances.RabbitMQ}
-									placeholder={t('resources.database.instance_placeholder') ?? ''}
-									error={!!form.formState.errors.config?.instances}
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+				{form.watch('type') !== ResourceType.Cache && (
+					<FormField
+						control={form.control}
+						name={`config.${replicationType}`}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>{t(`resources.database.${replicationType}`)}</FormLabel>
+								<FormControl className='flex'>
+									<Input
+										type='number'
+										disabled={form.watch('instance') === ResourceInstances.RabbitMQ}
+										placeholder={t('resources.database.instance_placeholder') ?? ''}
+										error={!!form.formState.errors.config?.instances}
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+				)}
 				<FormField
 					control={form.control}
 					name='config.version'

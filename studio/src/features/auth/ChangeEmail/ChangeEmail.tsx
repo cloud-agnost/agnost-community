@@ -13,7 +13,6 @@ import {
 } from 'components/Form';
 import { Input } from 'components/Input';
 import { Button } from '@/components/Button';
-
 import './changeEmail.scss';
 import { useTranslation } from 'react-i18next';
 import { translate } from '@/utils';
@@ -138,7 +137,7 @@ export default function ChangeEmail() {
 				</Form>
 			) : (
 				<div className='space-y-4'>
-					<Input readOnly value={user?.loginProfiles[0].email} />
+					<Input disabled readOnly value={user?.loginProfiles[0].email} />
 					<Button onClick={open} size='lg'>
 						{t('profileSettings.change_email')}
 					</Button>

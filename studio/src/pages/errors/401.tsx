@@ -24,7 +24,7 @@ export default function UnauthorizedAccess() {
 			) : (
 				<Button className='mt-8' variant='primary' to='/login'>
 					<ArrowLeft className='mr-2' />
-					{t('general.backToLogin')}
+					{t('login.back_to_login')}
 				</Button>
 			)}
 		</div>
