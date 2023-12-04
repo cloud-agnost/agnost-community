@@ -1,8 +1,6 @@
-import { Card } from '@/components/Card';
 import { Error, SuccessCheck } from '@/components/icons';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import useAuthStore from '@/store/auth/authStore';
-import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';

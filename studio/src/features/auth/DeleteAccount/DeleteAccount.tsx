@@ -1,14 +1,13 @@
 import { Button } from '@/components/Button';
 
-import './deleteAccount.scss';
-import { Trans, useTranslation } from 'react-i18next';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { useState } from 'react';
-import { ConfirmationModal } from 'components/ConfirmationModal';
-import { useNavigate } from 'react-router-dom';
-import { APIError } from '@/types';
 import { resetAllStores } from '@/helpers';
+import useAuthStore from '@/store/auth/authStore.ts';
 import { useMutation } from '@tanstack/react-query';
+import { ConfirmationModal } from 'components/ConfirmationModal';
+import { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import './deleteAccount.scss';
 
 export default function DeleteAccount() {
 	const { t } = useTranslation();
