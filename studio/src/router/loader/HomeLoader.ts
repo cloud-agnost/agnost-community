@@ -5,7 +5,7 @@ const REDIRECT_URLS = {
 	'app-invite': '/complete-account-setup/verify-email?token=:token&isVerified=true',
 	'org-invite': '/org-invite?token=:token',
 	'change-email': '/confirm-change-email?token=:token',
-	'reset-pwd': '/forgot-password?token=:token',
+	'reset-pwd': '/change-password?token=:token',
 };
 
 function homeLoader() {

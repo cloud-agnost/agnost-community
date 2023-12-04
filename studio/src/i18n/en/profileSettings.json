@@ -43,6 +43,8 @@
 	"success": "Success",
 	"name_updated_description": "Your name has been updated successfully",
 	"email_updated_description": "We have sent you an email to confirm your new email address",
+	"email_updated_success": "Email changed successfully",
+	"email_updated_success_description": "Your email has been successfully updated. You can now use your new email to sign in.",
 	"password_updated": "Password updated successfully",
 	"avatar_updated": "Avatar updated successfully",
 	"delete_account_success": "Account deleted successfully",

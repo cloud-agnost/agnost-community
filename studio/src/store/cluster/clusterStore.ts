@@ -156,7 +156,6 @@ const useClusterStore = create<ClusterStore & Actions>()(
 				updateSmtpSettings: async (data: any) => {
 					try {
 						const smtpSettings = await ClusterService.updateSmtpSettings(data);
-
 						return smtpSettings;
 					} catch (error) {
 						set({ error: error as APIError });

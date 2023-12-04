@@ -9,16 +9,15 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/Form';
+import { Textarea } from '@/components/Input';
 import { ErrorPage } from '@/components/icons';
 import { notify } from '@/utils';
-import { ArrowLeft } from '@phosphor-icons/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams, useRouteError } from 'react-router-dom';
 import * as z from 'zod';
-import { Textarea } from '@/components/Input';
-import { zodResolver } from '@hookform/resolvers/zod';
 const ErrorScheme = z.object({
 	description: z.string({
 		required_error: 'Description is required',
@@ -34,7 +33,7 @@ export default function Error({ children }: { children: React.ReactNode }) {
 		resolver: zodResolver(ErrorScheme),
 	});
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
-
+	console.error(error);
 	function onSubmit(data: z.infer<typeof ErrorScheme>) {
 		setLoading(true);
 		const myHeaders = new Headers();
