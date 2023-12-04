@@ -14,26 +14,11 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import * as z from 'zod';
-import {
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from '@/components/Form';
-import { Input } from '@/components/Input';
 export default function SMTPConfiguration() {
 	const [error, setError] = useState<APIError | null>(null);
 	const [isTesting, setIsTesting] = useState(false);
 	const [finalizing, setFinalizing] = useState(false);
 	const { t } = useTranslation();
-
-	const Schema = z.object({
-		fromEmail: z.string({ required_error: 'Email is required' }).email(),
-		fromName: z.string().optional(),
-		...SMTPSchema.shape,
-	});
 
 	const {
 		setDataPartially,
@@ -47,14 +32,14 @@ export default function SMTPConfiguration() {
 	const { goBack } = useOutletContext() as { goBack: () => void };
 
 	const navigate = useNavigate();
-	const form = useForm<z.infer<typeof Schema>>({
-		resolver: zodResolver(Schema),
+	const form = useForm<z.infer<typeof SMTPSchema>>({
+		resolver: zodResolver(SMTPSchema),
 		defaultValues: {
 			...onboardingData.smtp,
 		},
 	});
 
-	async function onSubmit(data: z.infer<typeof Schema>) {
+	async function onSubmit(data: z.infer<typeof SMTPSchema>) {
 		try {
 			setIsTesting(true);
 			setError(null);
@@ -113,42 +98,6 @@ export default function SMTPConfiguration() {
 
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-3.5'>
-						<FormField
-							control={form.control}
-							name='fromName'
-							render={({ field }) => (
-								<FormItem className='flex-1'>
-									<FormLabel>{t('onboarding.smtp.fromName')}</FormLabel>
-									<FormControl>
-										<Input
-											error={!!form.formState.errors.host}
-											placeholder={t('onboarding.smtp.enter_fromName').toString()}
-											{...field}
-										/>
-									</FormControl>
-									<FormDescription>{t('onboarding.smtp.fromName_desc')}</FormDescription>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='fromEmail'
-							render={({ field }) => (
-								<FormItem className='flex-1'>
-									<FormLabel>{t('onboarding.smtp.fromEmail')}</FormLabel>
-									<FormControl>
-										<Input
-											error={!!form.formState.errors.host}
-											placeholder={t('onboarding.smtp.enter_fromEmail').toString()}
-											{...field}
-										/>
-									</FormControl>
-									<FormDescription>{t('onboarding.smtp.fromEmail_desc')}</FormDescription>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
 						<SMTPForm />
 						<div className='flex gap-4 justify-end'>
 							<Button onClick={goBack} type='button' variant='text' size='lg'>
