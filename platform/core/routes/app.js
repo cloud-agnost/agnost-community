@@ -136,12 +136,7 @@ router.get(
 						},
 					}
 				);
-				res.json(
-					apps.map((app) => ({
-						...app,
-						role: "Admin",
-					}))
-				);
+				res.json(apps);
 			} else {
 				apps = await appCtrl.getManyByQuery(
 					{
@@ -155,14 +150,7 @@ router.get(
 						},
 					}
 				);
-				res.json(
-					apps.map((app) => ({
-						...app,
-						role: app.team.find(
-							(member) => member.userId._id.toString() === user._id.toString()
-						).role,
-					}))
-				);
+				res.json(apps);
 			}
 		} catch (err) {
 			handleError(req, res, err);
@@ -197,14 +185,7 @@ router.get(
 				}
 			);
 
-			res.json(
-				apps.map((app) => ({
-					...app,
-					role: app.team.find(
-						(member) => member.userId._id.toString() === user._id.toString()
-					).role,
-				}))
-			);
+			res.json(apps);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -245,13 +226,6 @@ router.put(
 					select: "-loginProfiles -notifications",
 				},
 			});
-
-			appWithTeam = {
-				...appWithTeam,
-				role: appWithTeam.team.find(
-					(member) => member.userId._id.toString() === user._id.toString()
-				).role,
-			};
 
 			res.json(appWithTeam);
 
@@ -339,13 +313,6 @@ router.put(
 				},
 			});
 
-			appWithTeam = {
-				...appWithTeam,
-				role: appWithTeam.team.find(
-					(member) => member.userId._id.toString() === req.user._id.toString()
-				).role,
-			};
-
 			res.json(appWithTeam);
 
 			// Log action
@@ -397,13 +364,6 @@ router.delete(
 				},
 			});
 
-			appWithTeam = {
-				...appWithTeam,
-				role: appWithTeam.team.find(
-					(member) => member.userId._id.toString() === req.user._id.toString()
-				).role,
-			};
-
 			res.json(appWithTeam);
 
 			// Log action
@@ -444,13 +404,6 @@ router.get(
 					select: "-loginProfiles -notifications",
 				},
 			});
-
-			appWithTeam = {
-				...appWithTeam,
-				role: appWithTeam.team.find(
-					(member) => member.userId._id.toString() === req.user._id.toString()
-				).role,
-			};
 
 			res.json(appWithTeam);
 		} catch (err) {
@@ -586,13 +539,6 @@ router.post(
 					select: "-loginProfiles -notifications",
 				},
 			});
-
-			appWithTeam = {
-				...appWithTeam,
-				role: appWithTeam.team.find(
-					(member) => member.userId._id.toString() === user._id.toString()
-				).role,
-			};
 
 			res.json(appWithTeam);
 

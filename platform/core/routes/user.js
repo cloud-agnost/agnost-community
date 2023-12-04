@@ -1051,7 +1051,7 @@ router.post(
 			}
 
 			// Add user to the app team
-			let updatedApp = await appCtrl.pushObjectById(
+			await appCtrl.pushObjectById(
 				invite.appId._id,
 				"team",
 				{
@@ -1070,11 +1070,18 @@ router.post(
 				{ session }
 			);
 
+			let appWithTeam = await appCtrl.getOneById(invite.appId._id, {
+				lookup: {
+					path: "team.userId",
+					select: "-loginProfiles -notifications",
+				},
+			});
+
 			// Commit transaction
 			await userCtrl.commit(session);
 
 			// Return the app object the user is added as a mamber
-			res.json({ app: updatedApp, role: invite.role, user });
+			res.json({ app: appWithTeam, role: invite.role, user });
 
 			// Log action
 			auditCtrl.logAndNotify(
@@ -1083,7 +1090,7 @@ router.post(
 				"org.app",
 				"accept",
 				t("Accepted the invitation to join to the app"),
-				updatedApp,
+				appWithTeam,
 				{ orgId: invite.orgId, appId: invite.appId._id }
 			);
 		} catch (error) {

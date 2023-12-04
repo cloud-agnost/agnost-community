@@ -3,9 +3,11 @@ import nodemailer from "nodemailer";
 import config from "config";
 
 var transporter = null;
+var fromEmail = null;
+var fromName = null;
 
 export async function getTransport() {
-	if (transporter) return transporter;
+	if (transporter) return { transporter, fromEmail, fromName };
 
 	// Get the SMTP server configuration. Make api call to the platform to to get the SMTP configuration
 	try {
@@ -27,8 +29,10 @@ export async function getTransport() {
 				user: smtpConfig.data.user,
 				pass: smtpConfig.data.password,
 			},
-			pool: config.get("emailServer.pool"),
+			//pool: config.get("emailServer.pool"),
 		});
+		fromEmail = smtpConfig.data.fromEmail;
+		fromName = smtpConfig.data.fromName;
 
 		return {
 			transporter,
