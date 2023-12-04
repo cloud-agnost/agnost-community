@@ -100,6 +100,7 @@ const DrawerContent = React.forwardRef<
 		<SheetPrimitive.Content
 			ref={ref}
 			className={cn(drawerVariants({ position, size }), className, 'drawer-content')}
+			onInteractOutside={(e) => e.preventDefault()}
 			{...props}
 		>
 			{children}
