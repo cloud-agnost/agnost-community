@@ -266,7 +266,7 @@ router.put(
 			// Ensure file storage folder exists
 			await storage.ensureBucket(uploadBucket);
 			// Delete existing file if it exists
-			await storage.deleteFile(uploadBucket, req.org.pictureUrl);
+			await storage.deleteFile(uploadBucket, req.user.pictureUrl);
 			// Save the new file
 			const filePath = `storage/avatars/${helper.generateSlug("img", 6)}-${
 				req.file.originalname
@@ -517,6 +517,23 @@ router.post(
 				});
 			}
 
+			// Check if the new email address is already in use
+			const existingUser = await userCtrl.getOneByQuery({
+				loginProfiles: { $elemMatch: { email } },
+				_id: { $ne: req.user._id },
+			});
+
+			if (existingUser) {
+				return res.status(400).json({
+					error: t("Not Allowed"),
+					code: ERROR_CODES.notAllowed,
+					details: t(
+						"A user account with the provided email '%s' already exists.",
+						email
+					),
+				});
+			}
+
 			// Check current password
 			const isMatch = await bcrypt.compare(
 				password.toString(),
@@ -602,13 +619,14 @@ router.post(
 				});
 			}
 
-			// All set we can update the email of the user login profile
+			// All set we can update the email of the user login profile and also contact email
 			let userObj = await userCtrl.updateOneByQuery(
 				{
 					"loginProfiles.provider": "agnost",
 					"loginProfiles.email": profile.email,
 				},
 				{
+					contactEmail: info.email,
 					"loginProfiles.$.email": info.email,
 				},
 				{},

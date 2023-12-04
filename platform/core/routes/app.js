@@ -284,7 +284,7 @@ router.put(
 			// Ensure file storage folder exists
 			await storage.ensureBucket(uploadBucket);
 			// Delete existing file if it exists
-			await storage.deleteFile(uploadBucket, req.org.pictureUrl);
+			await storage.deleteFile(uploadBucket, req.app.pictureUrl);
 			// Save the new file
 			const filePath = `storage/avatars/${helper.generateSlug("img", 6)}-${
 				req.file.originalname
