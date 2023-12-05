@@ -29,7 +29,7 @@ export async function getTransport() {
 				user: smtpConfig.data.user,
 				pass: smtpConfig.data.password,
 			},
-			//pool: config.get("emailServer.pool"),
+			pool: config.get("emailServer.pool"),
 		});
 		fromEmail = smtpConfig.data.fromEmail;
 		fromName = smtpConfig.data.fromName;
