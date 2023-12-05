@@ -1396,6 +1396,44 @@ router.delete(
 				},
 				{ orgId: req.org._id }
 			);
+
+			if (apps.length > 0) {
+				// Get all updated applications
+				const appIds = apps.map((entry) => entry._id);
+				const appsWithMembers = await appCtrl.getManyByQuery(
+					{ _id: { $in: appIds } },
+					{
+						lookup: {
+							path: "team.userId",
+							select: "-loginProfiles -notifications",
+						},
+					}
+				);
+
+				// Send realtime notifications for updated apps
+				appsWithMembers.forEach((entry) => {
+					sendNotification(entry._id, {
+						actor: {
+							userId: req.user._id,
+							name: req.user.name,
+							pictureUrl: req.user.pictureUrl,
+							color: req.user.color,
+							contactEmail: req.user.contactEmail,
+							loginEmail: req.user.loginProfiles[0].email,
+						},
+						action: "update",
+						object: "org.app",
+						description: t(
+							"Removed user '%s' (%s) from app team",
+							user.name,
+							user.contactEmail
+						),
+						timestamp: Date.now(),
+						data: entry,
+						identifiers: { orgId: org._id, appId: entry._id },
+					});
+				});
+			}
 		} catch (error) {
 			await orgMemberCtrl.rollback(session);
 			handleError(req, res, error);
@@ -1504,6 +1542,40 @@ router.post(
 				},
 				{ orgId: req.org._id }
 			);
+
+			if (apps.length > 0) {
+				// Get all updated applications
+				const appIds = apps.map((entry) => entry._id);
+				const appsWithMembers = await appCtrl.getManyByQuery(
+					{ _id: { $in: appIds } },
+					{
+						lookup: {
+							path: "team.userId",
+							select: "-loginProfiles -notifications",
+						},
+					}
+				);
+
+				// Send realtime notifications for updated apps
+				appsWithMembers.forEach((entry) => {
+					sendNotification(entry._id, {
+						actor: {
+							userId: req.user._id,
+							name: req.user.name,
+							pictureUrl: req.user.pictureUrl,
+							color: req.user.color,
+							contactEmail: req.user.contactEmail,
+							loginEmail: req.user.loginProfiles[0].email,
+						},
+						action: "update",
+						object: "org.app",
+						description: t("Removed user(s) from app team"),
+						timestamp: Date.now(),
+						data: entry,
+						identifiers: { orgId: org._id, appId: entry._id },
+					});
+				});
+			}
 		} catch (error) {
 			await orgMemberCtrl.rollback(session);
 			handleError(req, res, error);
@@ -1630,6 +1702,44 @@ router.delete(
 				},
 				{ orgId: req.org._id }
 			);
+
+			if (apps.length > 0) {
+				// Get all updated applications
+				const appIds = apps.map((entry) => entry._id);
+				const appsWithMembers = await appCtrl.getManyByQuery(
+					{ _id: { $in: appIds } },
+					{
+						lookup: {
+							path: "team.userId",
+							select: "-loginProfiles -notifications",
+						},
+					}
+				);
+
+				// Send realtime notifications for updated apps
+				appsWithMembers.forEach((entry) => {
+					sendNotification(entry._id, {
+						actor: {
+							userId: req.user._id,
+							name: req.user.name,
+							pictureUrl: req.user.pictureUrl,
+							color: req.user.color,
+							contactEmail: req.user.contactEmail,
+							loginEmail: req.user.loginProfiles[0].email,
+						},
+						action: "update",
+						object: "org.app",
+						description: t(
+							"User '%s' (%s) has left the app team",
+							user.name,
+							user.contactEmail
+						),
+						timestamp: Date.now(),
+						data: entry,
+						identifiers: { orgId: org._id, appId: entry._id },
+					});
+				});
+			}
 		} catch (error) {
 			await orgMemberCtrl.rollback(session);
 			handleError(req, res, error);

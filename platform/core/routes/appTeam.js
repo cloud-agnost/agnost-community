@@ -198,11 +198,18 @@ router.put(
 
 			res.json(result);
 
+			let appWithTeam = await appCtrl.getOneById(app._id, {
+				lookup: {
+					path: "team.userId",
+					select: "-loginProfiles -notifications",
+				},
+			});
+
 			// Log action
 			auditCtrl.logAndNotify(
 				app._id,
 				req.user,
-				"org.app.team",
+				"org.app",
 				"update",
 				t(
 					"Updated app member role of user '%s' (%s) from '%s' to '%s'",
@@ -211,7 +218,7 @@ router.put(
 					member.role,
 					role
 				),
-				result,
+				appWithTeam,
 				{ orgId: org._id, appId: app._id }
 			);
 		} catch (error) {
@@ -293,22 +300,21 @@ router.delete(
 
 			res.json();
 
+			let appWithTeam = await appCtrl.getOneById(app._id, {
+				lookup: {
+					path: "team.userId",
+					select: "-loginProfiles -notifications",
+				},
+			});
+
 			// Log action
 			auditCtrl.logAndNotify(
 				app._id,
 				req.user,
-				"org.app.team",
-				"delete",
+				"org.app",
+				"update",
 				t("Removed user '%s' (%s) from app team", user.name, user.contactEmail),
-				{
-					_id: user._id,
-					iid: user.iid,
-					color: user.color,
-					contactEmail: user.contactEmail,
-					name: user.name,
-					pictureUrl: user.pictureUrl,
-					loginEmail: user.loginProfiles[0].email,
-				},
+				appWithTeam,
 				{ orgId: org._id, appId: app._id }
 			);
 		} catch (error) {
@@ -370,16 +376,21 @@ router.post(
 
 			res.json();
 
+			let appWithTeam = await appCtrl.getOneById(app._id, {
+				lookup: {
+					path: "team.userId",
+					select: "-loginProfiles -notifications",
+				},
+			});
+
 			// Log action
 			auditCtrl.logAndNotify(
 				app._id,
 				req.user,
-				"org.app.team",
-				"delete",
+				"org.app",
+				"update",
 				t("Removed users from app team"),
-				{
-					userIds,
-				},
+				appWithTeam,
 				{ orgId: org._id, appId: app._id }
 			);
 		} catch (error) {
@@ -439,22 +450,21 @@ router.delete(
 
 			res.json();
 
+			let appWithTeam = await appCtrl.getOneById(app._id, {
+				lookup: {
+					path: "team.userId",
+					select: "-loginProfiles -notifications",
+				},
+			});
+
 			// Log action
 			auditCtrl.logAndNotify(
 				app._id,
 				user,
-				"org.app.team",
-				"delete",
+				"org.app",
+				"update",
 				t("User '%s' (%s) has left the app team", user.name, user.contactEmail),
-				{
-					_id: user._id,
-					iid: user.iid,
-					color: user.color,
-					contactEmail: user.contactEmail,
-					name: user.name,
-					pictureUrl: user.pictureUrl,
-					loginEmail: user.loginProfiles[0].email,
-				},
+				appWithTeam,
 				{ orgId: org._id, appId: app._id }
 			);
 		} catch (error) {
