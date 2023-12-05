@@ -1,3 +1,12 @@
+import { Button } from '@/components/Button';
+import { ENDPOINT_ACCESS_PROPERTIES } from '@/constants';
+import { EndpointSelectModal } from '@/features/version/EndpointSelectModal';
+import { ListEndpoint, Schema } from '@/features/version/SettingsAPIKeys';
+import { useUpdateEffect } from '@/hooks';
+import useEndpointStore from '@/store/endpoint/endpointStore.ts';
+import { Endpoint } from '@/types';
+import { cn } from '@/utils';
+import { DatePicker } from 'components/DatePicker';
 import {
 	FormControl,
 	FormDescription,
@@ -7,22 +16,13 @@ import {
 	FormMessage,
 } from 'components/Form';
 import { Input } from 'components/Input';
-import { Switch } from 'components/Switch';
-import { ENDPOINT_ACCESS_PROPERTIES } from '@/constants';
-import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import { useFormContext } from 'react-hook-form';
-import * as z from 'zod';
-import { ListEndpoint, Schema } from '@/features/version/SettingsAPIKeys';
-import { Dispatch, Fragment, SetStateAction, useMemo } from 'react';
 import { RadioGroup, RadioGroupItem } from 'components/RadioGroup';
-import { DatePicker } from 'components/DatePicker';
-import { Button } from '@/components/Button';
-import { cn } from '@/utils';
-import useEndpointStore from '@/store/endpoint/endpointStore.ts';
-import { EndpointSelectModal } from '@/features/version/EndpointSelectModal';
-import { Endpoint } from '@/types';
-import { useUpdateEffect } from '@/hooks';
+import { Switch } from 'components/Switch';
+import { motion } from 'framer-motion';
+import { Dispatch, Fragment, SetStateAction } from 'react';
+import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import * as z from 'zod';
 
 interface AddOrEditAPIKeyGeneralProps {
 	endpoints: Endpoint[];

@@ -1,5 +1,5 @@
 import useAuthStore from '@/store/auth/authStore';
-import { LoaderFunctionArgs, json, redirect } from 'react-router-dom';
+import { LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 async function changePasswordWithTokenLoader({ request }: LoaderFunctionArgs) {
 	const token = new URL(request.url).searchParams.get('token');
@@ -30,12 +30,7 @@ async function confirmChangeEmailLoader({ request }: LoaderFunctionArgs) {
 		return redirect('/login');
 	}
 
-	try {
-		await useAuthStore.getState().confirmChangeLoginEmail(token);
-		return redirect('/profile/settings');
-	} catch (error) {
-		return json({ error });
-	}
+	return { props: {} };
 }
 
 export default {

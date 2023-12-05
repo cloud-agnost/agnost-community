@@ -1,47 +1,37 @@
 import { Button } from '@/components/Button';
 
-import './deleteAccount.scss';
-import { Trans, useTranslation } from 'react-i18next';
-import useAuthStore from '@/store/auth/authStore.ts';
-import { useState } from 'react';
-import { ConfirmationModal } from 'components/ConfirmationModal';
-import { useNavigate } from 'react-router-dom';
-import { APIError } from '@/types';
 import { resetAllStores } from '@/helpers';
+import useAuthStore from '@/store/auth/authStore.ts';
+import { useMutation } from '@tanstack/react-query';
+import { ConfirmationModal } from 'components/ConfirmationModal';
+import { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import './deleteAccount.scss';
 
 export default function DeleteAccount() {
 	const { t } = useTranslation();
-	const [error, setError] = useState<null | APIError>(null);
-	const [loading, setLoading] = useState(false);
 	const [isOpen, setIsOpen] = useState<boolean>(false);
-	const confirmCode = useAuthStore((state) => state.user?.iid) as string;
-	const { deleteAccount, logout } = useAuthStore();
+	const { user } = useAuthStore();
+	const { deleteAccount } = useAuthStore();
 	const navigate = useNavigate();
-
+	const {
+		mutateAsync: deleteAccountMutate,
+		isPending: loading,
+		error,
+	} = useMutation({
+		mutationFn: deleteAccount,
+		onSuccess: () => {
+			navigate('/login');
+			resetAllStores();
+		},
+	});
 	function closeModal() {
 		setIsOpen(false);
-		setError(null);
 	}
 
 	function openModal() {
 		setIsOpen(true);
-	}
-
-	async function onConfirm() {
-		setLoading(true);
-		setError(null);
-		await deleteAccount();
-		logout({
-			onSuccess: () => {
-				navigate('/login');
-				resetAllStores();
-				setLoading(false);
-			},
-			onError(error) {
-				setError(error as APIError);
-				setLoading(false);
-			},
-		});
 	}
 
 	return (
@@ -55,20 +45,25 @@ export default function DeleteAccount() {
 				description={
 					<Trans
 						i18nKey='profileSettings.delete_confirm_description'
-						values={{ confirmCode }}
+						values={{ confirmCode: user?.iid }}
 						components={{
 							confirmCode: <span className='font-bold text-default' />,
 						}}
 					/>
 				}
-				confirmCode={confirmCode}
-				onConfirm={onConfirm}
+				confirmCode={user?.iid ?? ''}
+				onConfirm={deleteAccountMutate}
 				isOpen={isOpen}
 				closeModal={closeModal}
 				closable
 			/>
 			<div>
-				<Button onClick={openModal} className='delete-account-btn' variant='secondary'>
+				<Button
+					onClick={openModal}
+					className='delete-account-btn'
+					variant='secondary'
+					disabled={user?.isClusterOwner}
+				>
 					{t('profileSettings.delete')}
 				</Button>
 			</div>

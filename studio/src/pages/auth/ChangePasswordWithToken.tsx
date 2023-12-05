@@ -1,56 +1,78 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { Description } from '@/components/Description';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from '@/components/Form';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-
 import { PasswordInput } from '@/components/PasswordInput';
 import useAuthStore from '@/store/auth/authStore.ts';
-import { APIError } from '@/types';
 import { translate } from '@/utils';
 import { CaretLeft } from '@phosphor-icons/react';
+import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link, useLoaderData } from 'react-router-dom';
 import './auth.scss';
 
-const FormSchema = z.object({
-	password: z
-		.string({
-			required_error: translate('forms.required', {
-				label: translate('login.password'),
-			}),
-		})
-		.min(8, translate('forms.min8.error', { label: translate('login.password') })),
-});
+const FormSchema = z
+	.object({
+		password: z
+			.string({
+				required_error: translate('forms.required', {
+					label: translate('login.password'),
+				}),
+			})
+			.min(8, translate('forms.min8.error', { label: translate('login.password') })),
+		confirm: z
+			.string({
+				required_error: translate('forms.required', {
+					label: translate('login.password'),
+				}),
+			})
+			.min(8, translate('forms.min8.error', { label: translate('login.password') })),
+	})
+	.refine((data) => data.password === data.confirm, {
+		message: translate('profileSettings.password_dont_match'),
+		path: ['confirm'],
+	});
 
 export default function ChangePasswordWithToken() {
+	const { isAuthenticated } = useAuthStore();
 	const { changePasswordWithToken } = useAuthStore();
 	const token = useLoaderData() as string;
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<APIError | null>(null);
 	const [success, setSuccess] = useState(false);
 	const { t } = useTranslation();
+	const isLogged = isAuthenticated();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
-
-	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		try {
-			setError(null);
-			setLoading(true);
-			setSuccess(false);
-			await changePasswordWithToken(token, data.password);
+	const {
+		mutateAsync: changePassword,
+		isPending,
+		error,
+	} = useMutation({
+		mutationFn: changePasswordWithToken,
+		mutationKey: ['changePasswordWithToken'],
+		onSuccess: () => {
 			setSuccess(true);
 			form.reset();
-		} catch (e) {
-			setError(e as APIError);
-		} finally {
-			setLoading(false);
-		}
+		},
+	});
+	async function onSubmit(data: z.infer<typeof FormSchema>) {
+		changePassword({
+			token,
+			newPassword: data.password,
+		});
 	}
 
 	return (
@@ -73,13 +95,15 @@ export default function ChangePasswordWithToken() {
 							<AlertTitle>{t('login.changed_successfully')}</AlertTitle>
 							<AlertDescription>{t('login.changed_successfully_desc')}</AlertDescription>
 						</Alert>
-						<Link
-							to='/login'
-							className='text-default hover:underline mt-4 flex items-center justify-center'
-						>
-							<CaretLeft className='mr-1 inline-block' />
-							{t('login.back_to_login')}
-						</Link>
+						{!isLogged && (
+							<Link
+								to='/login'
+								className='text-default hover:underline mt-4 flex items-center justify-center'
+							>
+								<CaretLeft className='mr-1 inline-block' />
+								{t('login.back_to_login')}
+							</Link>
+						)}
 					</div>
 				) : (
 					<Form {...form}>
@@ -97,16 +121,37 @@ export default function ChangePasswordWithToken() {
 												{...field}
 											/>
 										</FormControl>
+										<FormDescription>{t('forms.min8.description')}</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='confirm'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>{t('profileSettings.confirm_new_password')}</FormLabel>
+										<FormControl>
+											<PasswordInput
+												error={Boolean(form.formState.errors?.confirm)}
+												placeholder={t('profileSettings.confirm_new_password_placeholder') ?? ''}
+												{...field}
+											/>
+										</FormControl>
+										<FormDescription>{t('forms.min8.description')}</FormDescription>
 										<FormMessage />
 									</FormItem>
 								)}
 							/>
 
 							<div className='flex justify-end gap-4'>
-								<Button to='/login' variant='text' type='button' size='lg'>
-									{t('login.back_to_login')}
-								</Button>
-								<Button loading={loading} size='lg'>
+								{!isLogged && (
+									<Button to='/login' variant='text' type='button' size='lg'>
+										{t('login.back_to_login')}
+									</Button>
+								)}
+								<Button loading={isPending} size='lg'>
 									{t('login.change_password')}
 								</Button>
 							</div>

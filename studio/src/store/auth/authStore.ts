@@ -32,7 +32,13 @@ type Actions = {
 	completeAccountSetup: (data: CompleteAccountSetupRequest) => Promise<User | APIError>;
 	resetPassword: (email: string) => Promise<void>;
 	verifyEmail: (email: string, code: number) => Promise<void>;
-	changePasswordWithToken: (token: string, newPassword: string) => Promise<void>;
+	changePasswordWithToken: ({
+		token,
+		newPassword,
+	}: {
+		token: string;
+		newPassword: string;
+	}) => Promise<null | APIError>;
 	resendEmailVerificationCode: (email: string) => Promise<void>;
 	initiateAccountSetup: (
 		email: string,
@@ -52,7 +58,6 @@ type Actions = {
 	updateNotifications: (notifications: string[]) => Promise<User>;
 	confirmChangeLoginEmail: (token: string) => Promise<void>;
 	getUser: () => Promise<User>;
-	getUserPicture: () => string;
 	reset: () => void;
 };
 
@@ -134,7 +139,7 @@ const useAuthStore = create<AuthState & Actions>()(
 							throw error as APIError;
 						}
 					},
-					changePasswordWithToken(token: string, newPassword: string) {
+					changePasswordWithToken({ token, newPassword }) {
 						return UserService.changePasswordWithToken({
 							token,
 							newPassword,
@@ -217,16 +222,16 @@ const useAuthStore = create<AuthState & Actions>()(
 						return res;
 					},
 					confirmChangeLoginEmail(token: string) {
-						return UserService.confirmChangeLoginEmail(token);
+						try {
+							return UserService.confirmChangeLoginEmail(token);
+						} catch (error) {
+							throw error as APIError;
+						}
 					},
 					async getUser() {
 						const user = await UserService.getUser();
-						if (user) joinChannel(user._id);
-						set({ user });
+						get().setUser(user);
 						return user;
-					},
-					getUserPicture() {
-						return location.origin.replace(':4000', '') + '/api' + get().user?.pictureUrl;
 					},
 					reset() {
 						set(initialState);

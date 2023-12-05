@@ -13,6 +13,8 @@ const canResend = getAppPermission('invite.resend');
 const canUpdate = getAppPermission('invite.update');
 const { updateInvitationUserRole, resendInvitation, deleteInvitation } =
 	useApplicationStore.getState();
+
+console.log('canDelete', canDelete);
 function updateInvitationUserRoleHandler(token: string, role: string) {
 	updateInvitationUserRole({
 		token,

@@ -20,6 +20,42 @@ export default function SMTPForm() {
 		<>
 			<FormField
 				control={form.control}
+				name='fromName'
+				render={({ field }) => (
+					<FormItem className='flex-1'>
+						<FormLabel>{t('onboarding.smtp.fromName')}</FormLabel>
+						<FormControl>
+							<Input
+								error={!!form.formState.errors.host}
+								placeholder={t('onboarding.smtp.enter_fromName').toString()}
+								{...field}
+							/>
+						</FormControl>
+						<FormDescription>{t('onboarding.smtp.fromName_desc')}</FormDescription>
+						<FormMessage />
+					</FormItem>
+				)}
+			/>
+			<FormField
+				control={form.control}
+				name='fromEmail'
+				render={({ field }) => (
+					<FormItem className='flex-1'>
+						<FormLabel>{t('onboarding.smtp.fromEmail')}</FormLabel>
+						<FormControl>
+							<Input
+								error={!!form.formState.errors.host}
+								placeholder={t('onboarding.smtp.enter_fromEmail').toString()}
+								{...field}
+							/>
+						</FormControl>
+						<FormDescription>{t('onboarding.smtp.fromEmail_desc')}</FormDescription>
+						<FormMessage />
+					</FormItem>
+				)}
+			/>
+			<FormField
+				control={form.control}
 				name='host'
 				render={({ field }) => (
 					<FormItem>

@@ -32,7 +32,7 @@ export default function Root() {
 	const { checkClusterSmtpStatus, checkClusterSetup } = useClusterStore();
 	const { getOrganizationMembers, getOrganizationById, members, organization } =
 		useOrganizationStore();
-	const { getUser, isAuthenticated, user } = useAuthStore();
+	const { getUser, isAuthenticated } = useAuthStore();
 	const { getAppVersionEnvironment, getEnvironmentResources } = useEnvironmentStore();
 	const { getVersionNotifications } = useVersionStore();
 
@@ -95,7 +95,7 @@ export default function Root() {
 
 	useEffect(() => {
 		const isAuthPath = authPaths.includes(pathname);
-		if (!isAuthPath && isAuthenticated() && !user?._id) {
+		if (!isAuthPath && isAuthenticated()) {
 			getUser();
 		}
 	}, [pathname]);

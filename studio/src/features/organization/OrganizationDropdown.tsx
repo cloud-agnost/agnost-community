@@ -67,7 +67,6 @@ export function OrganizationDropdown() {
 						</Link>
 						<Button
 							variant='blank'
-							role='combobox'
 							aria-expanded={open}
 							className='organization-dropdown-button'
 							rounded

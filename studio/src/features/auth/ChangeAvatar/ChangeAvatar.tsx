@@ -61,7 +61,7 @@ export default function ChangeAvatar() {
 					/>
 					<label htmlFor={filePickerId}>
 						<Avatar size='2xl'>
-							<AvatarImage src={location.origin + '/api' + user?.pictureUrl ?? ''} />
+							<AvatarImage src={user?.pictureUrl as string} />
 							{user && <AvatarFallback isUserAvatar color={user?.color} name={user?.name} />}
 						</Avatar>
 					</label>

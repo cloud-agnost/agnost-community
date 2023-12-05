@@ -7,11 +7,19 @@ import { useTranslation } from 'react-i18next';
 import ClusterResources from './ClusterComponents';
 import ClusterSmtpForm from './ClusterSmtpForm';
 import TransferClusterOwnership from './TransferClusterOwnership';
+import useClusterStore from '@/store/cluster/clusterStore';
+import { useEffect } from 'react';
 
 export default function ProfileSettingsClusterManagement() {
 	const { t } = useTranslation();
 	const TabItems = ['General', 'Cluster Resources', 'SMTP'];
 	const { organization } = useOrganizationStore();
+	const { getClusterInfo } = useClusterStore();
+
+	useEffect(() => {
+		getClusterInfo();
+	}, []);
+
 	return (
 		<UserSettingsLayout title={t('profileSettings.clusters_title')}>
 			<Tabs defaultValue={TabItems[0]}>

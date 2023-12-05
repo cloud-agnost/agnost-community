@@ -369,6 +369,8 @@ export interface Log {
 }
 
 export const SMTPSchema = z.object({
+	fromEmail: z.string({ required_error: 'Email is required' }).email(),
+	fromName: z.string().optional(),
 	host: z
 		.string({ required_error: 'Host is required' })
 		.trim()
