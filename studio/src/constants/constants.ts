@@ -512,7 +512,7 @@ export const RESOURCE_TYPES = [
 	{
 		id: 'cache',
 		name: translate('version.cache'),
-		icon: Cache,
+		icon: HardDrive,
 	},
 	{
 		id: 'message-queue',
