@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { body, query } from "express-validator";
+import appCtrl from "../controllers/app.js";
 import helper from "../util/helper.js";
 import { appRoles, orgRoles, invitationStatus } from "../config/constants.js";
 
@@ -111,7 +112,27 @@ export const applyRules = (type) => {
 					.isEmail()
 					.withMessage(t("Not a valid email address"))
 					.bail()
-					.normalizeEmail({ gmail_remove_dots: false }),
+					.normalizeEmail({ gmail_remove_dots: false })
+					.custom(async (value, { req }) => {
+						// Check whether the user is already a member of the application
+						let appWithTeam = await appCtrl.getOneById(req.app._id, {
+							lookup: {
+								path: "team.userId",
+							},
+						});
+
+						// Check whether the user is already a member of the app team or not
+						let appMember = appWithTeam.team.find(
+							(entry) => entry.userId.loginProfiles[0].email === value
+						);
+
+						if (appMember)
+							throw new AgnostError(
+								t("User is already a member of the application")
+							);
+
+						return true;
+					}),
 				body("*.role")
 					.trim()
 					.notEmpty()
