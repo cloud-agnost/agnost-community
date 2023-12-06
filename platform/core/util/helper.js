@@ -457,6 +457,29 @@ function decryptResourceData(data) {
 	return data;
 }
 
+function getTypedValue(value) {
+	if (typeof value !== "string") {
+		// If input is not a string, return it as is
+		return value;
+	}
+
+	if (value === "true") {
+		return true;
+	} else if (value === "false") {
+		return false;
+	} else if (value === "null") {
+		return null;
+	}
+
+	const numberValue = Number(value);
+	if (!isNaN(numberValue)) {
+		return numberValue;
+	}
+
+	// If none of the above conditions are met, return the input string
+	return input;
+}
+
 export default {
 	constants,
 	isObject,
@@ -484,4 +507,5 @@ export default {
 	isPrivateIP,
 	decryptVersionData,
 	decryptResourceData,
+	getTypedValue,
 };
