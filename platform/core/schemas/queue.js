@@ -267,9 +267,6 @@ export const applyRules = (type) => {
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty")),
-				body("payload")
-					.notEmpty()
-					.withMessage(t("Required field, cannot be left empty")),
 			];
 		case "delete-multi":
 			return [
