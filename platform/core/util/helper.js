@@ -477,7 +477,7 @@ function getTypedValue(value) {
 	}
 
 	// If none of the above conditions are met, return the input string
-	return input;
+	return value;
 }
 
 export default {
