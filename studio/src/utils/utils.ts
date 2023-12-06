@@ -456,3 +456,13 @@ export async function formatCode(code: string) {
 		return code;
 	}
 }
+export function parseIfString(input: string | null) {
+	if (input === '') {
+		return null;
+	}
+	try {
+		return JSON.parse(input as string);
+	} catch (error) {
+		return input;
+	}
+}
