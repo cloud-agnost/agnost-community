@@ -1,5 +1,4 @@
 import { useRealtime, useRenewToken } from '@/hooks';
-import '@/i18n/config';
 import { router } from '@/router';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useTypeStore from '@/store/types/typeStore.ts';
