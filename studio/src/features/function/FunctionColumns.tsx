@@ -10,9 +10,6 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TabLink } from '../version/Tabs';
 
-const canEditFunction = getVersionPermission('function.update');
-const canDeleteFunction = getVersionPermission('function.delete');
-
 const { openEditFunctionDrawer, deleteFunction } = useFunctionStore.getState();
 const queryClient = new QueryClient();
 
@@ -120,6 +117,8 @@ const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
+			const canEditFunction = getVersionPermission('function.update');
+			const canDeleteFunction = getVersionPermission('function.delete');
 			return (
 				<ActionsCell<HelperFunction>
 					onEdit={() => openEditFunctionDrawer(original)}
@@ -128,7 +127,6 @@ const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
 				>
 					<TableConfirmation
 						align='end'
-						closeOnConfirm
 						title={translate('function.delete.title')}
 						description={translate('function.delete.message')}
 						onConfirm={() => deleteHandler(original)}

@@ -9,8 +9,22 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 
-const canEditParam = getVersionPermission('version.param.update');
-const canDeleteParam = getVersionPermission('version.param.delete');
+const { deleteParam, setParam, setEditParamDrawerIsOpen } = useSettingsStore.getState();
+async function onDelete(paramId: string) {
+	const { version } = useVersionStore.getState();
+	if (!version) return;
+	await deleteParam({
+		versionId: version?._id,
+		orgId: version?.orgId,
+		appId: version?.appId,
+		paramId,
+	});
+}
+
+function editHandler(original: Param) {
+	setParam(original);
+	setEditParamDrawerIsOpen(true);
+}
 
 const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	{
@@ -122,30 +136,15 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 		id: 'actions',
 		className: 'actions',
 		cell: ({ row: { original } }) => {
-			const { version } = useVersionStore.getState();
-			const { deleteParam, setParam, setEditParamDrawerIsOpen } = useSettingsStore.getState();
-			async function onDelete() {
-				if (!version) return;
-				await deleteParam({
-					versionId: version?._id,
-					orgId: version?.orgId,
-					appId: version?.appId,
-					paramId: original._id,
-				});
-			}
-
-			function editHandler() {
-				setParam(original);
-				setEditParamDrawerIsOpen(true);
-			}
+			const canEditParam = getVersionPermission('version.param.update');
+			const canDeleteParam = getVersionPermission('version.param.delete');
 			return (
 				<ActionsCell original={original} onEdit={editHandler} canEdit={canEditParam}>
 					<TableConfirmation
 						align='end'
-						closeOnConfirm
 						title={translate('version.variable.delete_modal_title')}
 						description={translate('version.variable.delete_modal_desc')}
-						onConfirm={onDelete}
+						onConfirm={() => onDelete(original._id)}
 						contentClassName='m-0'
 						hasPermission={canDeleteParam}
 					/>

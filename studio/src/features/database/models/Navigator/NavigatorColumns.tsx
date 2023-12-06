@@ -5,7 +5,7 @@ import { ColumnDefWithClassName } from '@/types';
 import { getVersionPermission, translate } from '@/utils';
 
 const { deleteDataFromModel } = useNavigatorStore.getState();
-const canDeleteModel = getVersionPermission('model.delete');
+
 async function deleteHandler(id: string) {
 	deleteDataFromModel({
 		id,
@@ -39,10 +39,10 @@ export const NavigatorColumns: ColumnDefWithClassName<Record<string, any>>[] = [
 		header: translate('general.actions'),
 		size: 100,
 		cell: ({ row: { original } }) => {
+			const canDeleteModel = getVersionPermission('model.delete');
 			return (
 				<TableConfirmation
 					align='end'
-					closeOnConfirm
 					title={translate('database.navigator.delete.title')}
 					description={translate('database.navigator.delete.message')}
 					onConfirm={() => deleteHandler(original.id)}

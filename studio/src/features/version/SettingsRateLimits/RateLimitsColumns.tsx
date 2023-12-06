@@ -9,9 +9,21 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 
-const canEditRateLimit = getVersionPermission('version.limit.update');
-const canDeleteRateLimit = getVersionPermission('version.limit.delete');
-
+const { version } = useVersionStore.getState();
+const { setEditRateLimitDrawerIsOpen, setRateLimit, deleteRateLimit } = useSettingsStore.getState();
+async function onDelete(limitId: string) {
+	if (!version) return;
+	await deleteRateLimit({
+		appId: version.appId,
+		versionId: version._id,
+		orgId: version.orgId,
+		limitId,
+	});
+}
+function editHandler(original: RateLimit) {
+	setRateLimit(original);
+	setEditRateLimitDrawerIsOpen(true);
+}
 const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 	{
 		id: 'select',
@@ -122,31 +134,16 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
-			const { version } = useVersionStore.getState();
-			const { setEditRateLimitDrawerIsOpen, setRateLimit, deleteRateLimit } =
-				useSettingsStore.getState();
-			async function onDelete() {
-				if (!version) return;
-				await deleteRateLimit({
-					appId: version.appId,
-					versionId: version._id,
-					limitId: original._id,
-					orgId: version.orgId,
-				});
-			}
-			function editHandler() {
-				setRateLimit(original);
-				setEditRateLimitDrawerIsOpen(true);
-			}
+			const canEditRateLimit = getVersionPermission('version.limit.update');
+			const canDeleteRateLimit = getVersionPermission('version.limit.delete');
 
 			return (
 				<ActionsCell original={original} onEdit={editHandler} canEdit={canEditRateLimit}>
 					<TableConfirmation
 						align='end'
-						closeOnConfirm
 						title={translate('version.npm.delete_modal_title')}
 						description={translate('version.npm.delete_modal_desc')}
-						onConfirm={onDelete}
+						onConfirm={() => onDelete(original._id)}
 						contentClassName='m-0'
 						hasPermission={canDeleteRateLimit}
 					/>

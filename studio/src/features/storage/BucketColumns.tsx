@@ -12,8 +12,7 @@ import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 
-const canEditBucket = getVersionPermission('storage.update');
-const canDeleteBucket = getVersionPermission('storage.delete');
+
 
 const { emptyBucket, openDeleteBucketDialog, openEditBucketDialog, storage } =
 	useStorageStore.getState();
@@ -176,11 +175,12 @@ const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
+			const canEditBucket = getVersionPermission('storage.update');
+			const canDeleteBucket = getVersionPermission('storage.delete');
 			return (
 				<div className='flex items-center justify-end'>
 					<TableConfirmation
 						align='end'
-						closeOnConfirm
 						title={translate('storage.clear.title')}
 						description={translate('storage.clear.message')}
 						onConfirm={() => clearBucket(original.name)}

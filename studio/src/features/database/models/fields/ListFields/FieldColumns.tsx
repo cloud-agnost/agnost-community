@@ -12,8 +12,7 @@ import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 
 const { openEditFieldDialog, deleteField } = useModelStore.getState();
-const canDelete = getVersionPermission('model.delete');
-const canEdit = getVersionPermission('model.update');
+
 async function deleteHandler(field: Field) {
 	const model = useModelStore.getState().model;
 	deleteField({
@@ -222,7 +221,8 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
 			if (original.creator === 'system') return null;
-
+			const canDelete = getVersionPermission('model.delete');
+			const canEdit = getVersionPermission('model.update');
 			return (
 				<ActionsCell
 					original={original}
@@ -231,7 +231,6 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 				>
 					<TableConfirmation
 						align='end'
-						closeOnConfirm
 						title={translate('database.fields.delete.title')}
 						description={translate('database.fields.delete.description')}
 						onConfirm={() => deleteHandler(original)}
