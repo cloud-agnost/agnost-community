@@ -7,8 +7,9 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import './organization.scss';
 import { Button } from '@/components/Button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
+import { useEffect } from 'react';
 export default function OrganizationSelect() {
-	const { organizations, selectOrganization } = useOrganizationStore();
+	const { organizations, selectOrganization, getAllOrganizationByUser } = useOrganizationStore();
 	const { user } = useAuthStore();
 	const { openOrgCreateModal } = useOutletContext<{
 		openOrgCreateModal: () => void;
@@ -21,6 +22,12 @@ export default function OrganizationSelect() {
 		selectOrganization(org);
 		navigate(`/organization/${org?._id}`);
 	}
+
+	useEffect(() => {
+		getAllOrganizationByUser();
+	}, []);
+
+	console.log(organizations);
 
 	return (
 		<div className='p-6'>
