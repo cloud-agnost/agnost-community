@@ -12,7 +12,7 @@ import { APIError, EnvironmentStatus, Log } from '@/types';
 import { generateId, joinChannel, leaveChannel, parseIfString } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
@@ -31,6 +31,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 	const { queue, testQueue, testQueueLogs } = useMessageQueueStore();
 	const { notify } = useToast();
 	const { environment } = useEnvironmentStore();
+	const [debugChannel, setDebugChannel] = useState<string>('');
 	const resizerRef = useRef<HTMLDivElement>(null);
 	const { versionId, appId, orgId, queueId } = useParams<{
 		versionId: string;
@@ -56,22 +57,25 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 	});
 
 	function onSubmit(data: z.infer<typeof TestMessageQueueSchema>) {
-		const debugChannel = generateId();
-		joinChannel(debugChannel);
+		if (debugChannel) leaveChannel(debugChannel);
+		const id = generateId();
+		setDebugChannel(id);
+		joinChannel(id);
 		testQueueMutation({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			queueId: queueId as string,
-			debugChannel,
+			debugChannel: id,
 			payload: parseIfString(data.payload),
 		});
-		setTimeout(() => {
-			leaveChannel(debugChannel);
-		}, 1000);
+	}
+	function handleClose() {
+		if (debugChannel) leaveChannel(debugChannel);
+		onClose();
 	}
 	return (
-		<Drawer open={open} onOpenChange={onClose}>
+		<Drawer open={open} onOpenChange={handleClose}>
 			<DrawerContent
 				position='right'
 				size='lg'
@@ -115,6 +119,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 													value={field.value}
 													onChange={field.onChange}
 													name='testQueuePayload'
+													defaultLanguage='json'
 												/>
 											</FormControl>
 											<FormMessage />

@@ -21,7 +21,7 @@ import {
 } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
@@ -84,7 +84,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { endpoint, testEndpoint, endpointRequest } = useEndpointStore();
 	const resizerRef = useRef<HTMLDivElement>(null);
 	const [searchParams, setSearchParams] = useSearchParams();
-	const consoleLogId = generateId();
+	const [debugChannel, setDebugChannel] = useState<string | null>('');
 	const form = useForm<z.infer<typeof TestEndpointSchema>>({
 		resolver: zodResolver(TestEndpointSchema),
 		defaultValues: {
@@ -112,17 +112,21 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			});
 		},
 		onSettled: () => {
-			leaveChannel(consoleLogId);
+			leaveChannel(debugChannel as string);
+			setDebugChannel(null);
 		},
 	});
 	async function onSubmit(data: z.infer<typeof TestEndpointSchema>) {
 		const testPath = getEndpointPath(endpoint?.path, data.params.pathVariables ?? []);
-		joinChannel(consoleLogId);
+		if (debugChannel) leaveChannel(debugChannel);
+		const id = generateId();
+		setDebugChannel(id);
+		joinChannel(id);
 		testEndpointMutate({
 			epId: endpoint?._id,
 			envId: environment?.iid,
 			path: testPath,
-			consoleLogId,
+			consoleLogId: id,
 			method: endpoint?.method.toLowerCase() as TestMethods,
 			params: data.params,
 			headers: data.headers?.filter((h) => h.key && h.value),
@@ -130,6 +134,11 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			formData: data.formData,
 			bodyType: data.bodyType,
 		});
+	}
+
+	function handleClose() {
+		if (debugChannel) leaveChannel(debugChannel);
+		onClose();
 	}
 	useEffect(() => {
 		const header = {
@@ -188,7 +197,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	}, [searchParams.get('t'), open]);
 
 	return (
-		<Drawer open={open} onOpenChange={onClose}>
+		<Drawer open={open} onOpenChange={handleClose}>
 			<DrawerContent
 				position='right'
 				size='lg'
