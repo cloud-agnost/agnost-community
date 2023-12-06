@@ -12,8 +12,6 @@ import { TableConfirmation } from 'components/Table';
 
 const { openEditMiddlewareDrawer, deleteMiddleware } = useMiddlewareStore.getState();
 const queryClient = new QueryClient();
-const canEditMiddleware = getVersionPermission('middleware.update');
-const canDeleteMiddleware = getVersionPermission('middleware.delete');
 
 async function deleteHandler(mw: Middleware) {
 	queryClient
@@ -111,6 +109,8 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 		className: 'actions',
 		size: 45,
 		cell: ({ row: { original } }) => {
+			const canDeleteMiddleware = getVersionPermission('middleware.delete');
+			const canEditMiddleware = getVersionPermission('middleware.update');
 			return (
 				<ActionsCell<Middleware>
 					original={original}
@@ -119,7 +119,6 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 				>
 					<TableConfirmation
 						align='end'
-						closeOnConfirm
 						title={translate('version.middleware.delete.title')}
 						description={translate('version.middleware.delete.message')}
 						onConfirm={() => deleteHandler(original)}

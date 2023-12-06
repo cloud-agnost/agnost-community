@@ -14,9 +14,6 @@ import { Calendar } from 'components/icons';
 import cronstrue from 'cronstrue';
 import { TabLink } from '../version/Tabs';
 
-const canEditTask = getVersionPermission('task.update');
-const canDeleteTask = getVersionPermission('task.delete');
-
 const queryClient = new QueryClient();
 const { openEditTaskModal, deleteTask } = useTaskStore.getState();
 function deleteHandler(task: Task) {
@@ -163,6 +160,8 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
+			const canEditTask = getVersionPermission('task.update');
+			const canDeleteTask = getVersionPermission('task.delete');
 			return (
 				<ActionsCell<Task>
 					onEdit={() => openEditTaskModal(original)}
@@ -171,7 +170,6 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 				>
 					<TableConfirmation
 						align='end'
-						closeOnConfirm
 						title={translate('task.delete.title')}
 						description={translate('task.delete.message')}
 						onConfirm={() => deleteHandler(original)}

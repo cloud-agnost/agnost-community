@@ -12,8 +12,23 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 
-const canEdit = getVersionPermission('version.key.update');
-const canDelete = getVersionPermission('version.key.delete');
+async function onDelete(original: APIKey) {
+	const { version } = useVersionStore.getState();
+	const { deleteAPIKey } = useSettingsStore.getState();
+	if (!version) return;
+	await deleteAPIKey({
+		appId: version.appId,
+		orgId: version.orgId,
+		keyId: original._id,
+		versionId: version._id,
+	});
+}
+
+function editHandler(original: APIKey) {
+	const { setSelectedAPIKey, setEditAPIKeyDrawerIsOpen } = useSettingsStore.getState();
+	setSelectedAPIKey(original);
+	setEditAPIKeyDrawerIsOpen(true);
+}
 
 const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	{
@@ -234,33 +249,17 @@ const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 		id: 'actions',
 		className: 'actions',
 		cell: ({ row: { original } }) => {
-			async function onDelete() {
-				const { version } = useVersionStore.getState();
-				const { deleteAPIKey } = useSettingsStore.getState();
-				if (!version) return;
-				await deleteAPIKey({
-					appId: version.appId,
-					orgId: version.orgId,
-					keyId: original._id,
-					versionId: version._id,
-				});
-			}
-
-			function editHandler() {
-				const { setSelectedAPIKey, setEditAPIKeyDrawerIsOpen } = useSettingsStore.getState();
-				setSelectedAPIKey(original);
-				setEditAPIKeyDrawerIsOpen(true);
-			}
+			const canEdit = getVersionPermission('version.key.update');
+			const canDelete = getVersionPermission('version.key.delete');
 
 			return (
 				<div className='flex items-center justify-end gap-0.5'>
 					<ActionsCell onEdit={editHandler} canEdit={canEdit} original={original}>
 						<TableConfirmation
 							align='end'
-							closeOnConfirm
 							title={translate('version.api_key.delete_modal_title')}
 							description={translate('version.api_key.delete_modal_desc')}
-							onConfirm={onDelete}
+							onConfirm={() => onDelete(original)}
 							contentClassName='m-0'
 							hasPermission={canDelete}
 						/>

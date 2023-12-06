@@ -22,9 +22,6 @@ const {
 	bucket,
 } = useStorageStore.getState();
 
-const canEditBucket = getVersionPermission('storage.update');
-const canDeleteBucket = getVersionPermission('storage.delete');
-
 const queryClient = new QueryClient();
 function deleteFileHandler(toDeleteFile: BucketFile) {
 	queryClient
@@ -222,6 +219,8 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 		className: 'actions w-[50px]',
 		size: 50,
 		cell: ({ row: { original } }) => {
+			const canEditBucket = getVersionPermission('storage.update');
+			const canDeleteBucket = getVersionPermission('storage.delete');
 			return (
 				<div className='flex items-center justify-end'>
 					<TooltipProvider>
@@ -265,7 +264,6 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 					>
 						<TableConfirmation
 							align='end'
-							closeOnConfirm
 							title={translate('storage.file.delete.title')}
 							description={translate('storage.file.delete.message')}
 							onConfirm={() => deleteFileHandler(original)}

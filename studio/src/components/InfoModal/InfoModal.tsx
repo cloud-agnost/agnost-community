@@ -41,7 +41,7 @@ export default function InfoModal({
 		<Dialog open={isOpen} onOpenChange={closeModal}>
 			<DialogContent className={cn('space-y-4', className)}>
 				<DialogHeader className='flex flex-col items-center gap-2'>
-					<Icon className='text-icon-danger w-20 h-20' />
+					<Icon className='text-icon-secondary w-20 h-20' />
 					<DialogTitle>{title}</DialogTitle>
 					<DialogDescription className='text-center'>{description}</DialogDescription>
 				</DialogHeader>
