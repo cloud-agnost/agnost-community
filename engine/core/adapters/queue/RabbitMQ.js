@@ -15,6 +15,7 @@ export class RabbitMQ extends QueueBase {
 
 	async disconnect() {
 		try {
+			await this.closeChannels();
 			await this.driver.close();
 		} catch (err) {}
 	}
