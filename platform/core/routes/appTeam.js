@@ -209,7 +209,7 @@ router.put(
 			auditCtrl.logAndNotify(
 				app._id,
 				req.user,
-				"org.app",
+				"org.app.team",
 				"update",
 				t(
 					"Updated app member role of user '%s' (%s) from '%s' to '%s'",
@@ -311,8 +311,8 @@ router.delete(
 			auditCtrl.logAndNotify(
 				app._id,
 				req.user,
-				"org.app",
-				"update",
+				"org.app.team",
+				"delete",
 				t("Removed user '%s' (%s) from app team", user.name, user.contactEmail),
 				appWithTeam,
 				{ orgId: org._id, appId: app._id }
@@ -387,8 +387,8 @@ router.post(
 			auditCtrl.logAndNotify(
 				app._id,
 				req.user,
-				"org.app",
-				"update",
+				"org.app.team",
+				"delete",
 				t("Removed users from app team"),
 				appWithTeam,
 				{ orgId: org._id, appId: app._id }
@@ -461,8 +461,8 @@ router.delete(
 			auditCtrl.logAndNotify(
 				app._id,
 				user,
-				"org.app",
-				"update",
+				"org.app.team",
+				"delete",
 				t("User '%s' (%s) has left the app team", user.name, user.contactEmail),
 				appWithTeam,
 				{ orgId: org._id, appId: app._id }

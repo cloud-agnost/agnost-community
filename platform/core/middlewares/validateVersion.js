@@ -51,23 +51,6 @@ export const validateVersion = async (req, res, next) => {
 			}
 		}
 
-		// If this is a readonly version then only authorized people can view and update it
-		if (version.readOnly && req.user) {
-			if (
-				version.createdBy.toString() !== req.user._id.toString() &&
-				req.appMember.role !== "Admin"
-			) {
-				return res.status(401).json({
-					error: t("Not Authorized"),
-					details: t(
-						"You do not have the authorization to work on the read-only version '%s'",
-						version.name
-					),
-					code: ERROR_CODES.unauthorized,
-				});
-			}
-		}
-
 		// Assign version data
 		req.version = version;
 

@@ -1093,6 +1093,7 @@ router.post(
 					path: "team.userId",
 					select: "-loginProfiles -notifications",
 				},
+				session,
 			});
 
 			// Commit transaction
