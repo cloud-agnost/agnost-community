@@ -1,4 +1,5 @@
 import useDatabaseStore from '@/store/database/databaseStore';
+import useModelStore from '@/store/database/modelStore';
 import useTabStore from '@/store/version/tabStore';
 import { Database as DatabaseType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
@@ -10,6 +11,9 @@ class Database extends RealtimeActions<DatabaseType> {
 			databases: useDatabaseStore
 				.getState?.()
 				.databases.filter((database) => database._id !== identifiers.dbId),
+		});
+		useModelStore.setState?.({
+			models: useModelStore.getState?.().models.filter((model) => model.dbId !== identifiers.dbId),
 		});
 		removeTabByPath(identifiers.versionId as string, identifiers.dbId as string);
 	}

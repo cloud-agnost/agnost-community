@@ -1,6 +1,6 @@
 import { Button } from '@/components/Button';
 import { CreateModel, EditModel, ModelColumns } from '@/features/database/models';
-import { useSearch, useTabNavigate, useTable, useToast } from '@/hooks';
+import { useSearch, useTabNavigate, useTable, useToast, useUpdateEffect } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
@@ -40,7 +40,7 @@ export default function Models() {
 		columns: ModelColumns,
 	});
 
-	const { isPending } = useQuery({
+	const { isFetching, refetch } = useQuery({
 		queryFn: () => getModelsOfDatabase({ dbId, orgId, appId, versionId }),
 		queryKey: ['getModelsOfDatabase'],
 	});
@@ -91,6 +91,10 @@ export default function Models() {
 			type: TabTypes.Navigator,
 		});
 	}
+
+	useUpdateEffect(() => {
+		refetch();
+	}, [dbId, orgId, appId, versionId]);
 	return (
 		<>
 			<VersionTabLayout<Model>
@@ -104,7 +108,7 @@ export default function Models() {
 				table={table}
 				disabled={!canCreateModel}
 				onMultipleDelete={deleteMultipleModelHandler}
-				loading={isPending}
+				loading={isFetching}
 				searchable
 				handlerButton={
 					<Button variant='secondary' onClick={handleViewDataClick}>
