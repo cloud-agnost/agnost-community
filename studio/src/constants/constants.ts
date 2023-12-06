@@ -60,6 +60,7 @@ import {
 	ConnectQueue,
 } from '@/features/resources';
 import useApplicationStore from '@/store/app/applicationStore';
+import useAuthStore from '@/store/auth/authStore';
 import {
 	AppRoles,
 	Application,
@@ -214,7 +215,9 @@ export const APPLICATION_SETTINGS = [
 		onClick: (application: Application) => {
 			useApplicationStore.getState().openLeaveModal(application);
 		},
-		isDisabled: (role: AppRoles) => role === AppRoles.Admin,
+		isDisabled: (role: AppRoles, application: Application) => {
+			return useAuthStore.getState().user?._id === application.ownerUserId;
+		},
 	},
 	{
 		id: 'delete-app',

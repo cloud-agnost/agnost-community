@@ -12,12 +12,13 @@ import { Input } from '@/components/Input';
 import { useToast } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { CreateApplicationSchema } from '@/types';
+import { APIError, CreateApplicationSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { Button } from '@/components/Button';
+import { useMutation } from '@tanstack/react-query';
 
 interface ApplicationCreateModalProps {
 	closeModal: () => void;
@@ -36,27 +37,30 @@ export default function ApplicationCreateModal({
 	const { t } = useTranslation();
 	const { organization } = useOrganizationStore();
 	const { createApplication } = useApplicationStore();
-	const { loading } = useOrganizationStore();
 
 	function handleCloseModal() {
 		closeModal();
 		form.reset();
 	}
+
+	const { isPending, mutateAsync: createApplicationMutate } = useMutation({
+		mutationFn: createApplication,
+		onSuccess: () => {
+			handleCloseModal();
+		},
+		onError: (error: APIError) => {
+			notify({
+				title: error.error,
+				description: error.details,
+				type: 'error',
+			});
+			handleCloseModal();
+		},
+	});
 	async function onSubmit(data: z.infer<typeof CreateApplicationSchema>) {
-		await createApplication({
+		createApplicationMutate({
 			name: data.name,
 			orgId: organization?._id as string,
-			onSuccess: () => {
-				handleCloseModal();
-			},
-			onError: (error) => {
-				notify({
-					title: error.error,
-					description: error.details,
-					type: 'error',
-				});
-				handleCloseModal();
-			},
 		});
 	}
 
@@ -90,7 +94,7 @@ export default function ApplicationCreateModal({
 							<Button variant='text' type='button' size='lg' onClick={closeModal}>
 								{t('general.cancel')}
 							</Button>
-							<Button variant='primary' size='lg' loading={loading}>
+							<Button variant='primary' size='lg' loading={isPending}>
 								{t('general.ok')}
 							</Button>
 						</div>

@@ -8,9 +8,6 @@ import { getAppPermission, notify, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
-const canDelete = getAppPermission('team.delete');
-const canUpdate = getAppPermission('team.update');
-
 function removeMember(userId: string) {
 	useApplicationStore.getState?.().removeAppMember({
 		userId,
@@ -93,6 +90,7 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 		filterFn: 'arrIncludesSome',
 		cell: ({ row }) => {
 			const { role, member } = row.original;
+			const canUpdate = getAppPermission('team.update');
 			return (
 				<RoleSelect
 					role={role}
@@ -109,6 +107,7 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 		size: 100,
 		cell: ({ row }) => {
 			const { member } = row.original;
+			const canDelete = getAppPermission('team.delete');
 			return (
 				!member.isAppOwner && (
 					<TableConfirmation

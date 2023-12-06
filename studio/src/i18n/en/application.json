@@ -14,7 +14,7 @@
 	},
 	"leave": {
 		"title": "Leave App Team",
-		"description": "You are about the leave the app team. After leaving the team you will not be able to access it again. Are you sure you would like to leave the {{name}} team?"
+		"description": "You are about the leave the app team. After leaving the team you will not be able to access it again. Are you sure you would like to leave the team?"
 	},
 	"version": {
 		"title": "Open Version",

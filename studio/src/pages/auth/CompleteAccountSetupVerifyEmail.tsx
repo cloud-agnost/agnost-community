@@ -15,21 +15,17 @@ import { PasswordInput } from '@/components/PasswordInput';
 import { VerificationCodeInput } from '@/components/VerificationCodeInput';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import useAuthStore from '@/store/auth/authStore';
-import { APIError, User } from '@/types/type.ts';
+import { APIError } from '@/types/type.ts';
 import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useLoaderData } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import * as z from 'zod';
+import { useNavigate } from 'react-router-dom';
 import './auth.scss';
-interface CompleteAccountSetupVerifyEmailLoaderData {
-	token?: string;
-	isVerified?: boolean;
-	user?: User;
-	error: APIError | null;
-}
 
 const FormSchema = z.object({
 	verificationCode: z
@@ -92,45 +88,58 @@ const FormSchema = z.object({
 });
 
 export default function CompleteAccountSetupVerifyEmail() {
+	const [searchParams] = useSearchParams();
+	const [error, setError] = useState<APIError | null>();
+	const isVerified = searchParams.has('isVerified');
+	const token = searchParams.get('token');
 	const {
-		token,
-		isVerified,
-
-		error: loaderError,
-	} = useLoaderData() as CompleteAccountSetupVerifyEmailLoaderData;
-	const [error, setError] = useState<APIError | null>(loaderError);
-	const [loading, setLoading] = useState(false);
-	const { completeAccountSetup, finalizeAccountSetup, email, user } = useAuthStore();
+		completeAccountSetup,
+		finalizeAccountSetup,
+		email,
+		user,
+		isAuthenticated,
+		acceptInvite,
+		orgAcceptInvite,
+	} = useAuthStore();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 	});
 	const { t } = useTranslation();
+	const navigate = useNavigate();
+	const { mutate: acceptInvitation, data } = useMutation({
+		mutationFn: searchParams.get('type') === 'org' ? orgAcceptInvite : acceptInvite,
+		onError: (err: APIError) => setError(err),
+	});
+	const { mutate: finalizeAccountSetupMutate, isPending: finalizeLoading } = useMutation({
+		mutationFn: finalizeAccountSetup,
+		onError: (err: APIError) => setError(err),
+		onSuccess: () => navigate('/organization'),
+	});
+	const { mutate: completeAccountSetupMutate, isPending: completeLoading } = useMutation({
+		mutationFn: completeAccountSetup,
+		onError: (err: APIError) => setError(err),
+		onSuccess: () => navigate('/organization'),
+	});
 
+	const successText = isAuthenticated()
+		? t('general.invitation_accepted')
+		: t('login.complete_account_setup_desc');
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		try {
-			setError(null);
-			setLoading(true);
-
-			if (!token) {
-				await finalizeAccountSetup({
-					email: email as string,
-					verificationCode: data.verificationCode,
-					name: data.name,
-					password: data.password,
-				});
-			} else {
-				await completeAccountSetup({
-					email: user?.loginProfiles[0].email,
-					token,
-					name: data.name,
-					password: data.password,
-					inviteType: 'app',
-				});
-			}
-		} catch (e) {
-			setError(e as APIError);
-		} finally {
-			setLoading(false);
+		if (!token) {
+			finalizeAccountSetupMutate({
+				email: email as string,
+				verificationCode: data.verificationCode,
+				name: data.name,
+				password: data.password,
+			});
+		} else {
+			completeAccountSetupMutate({
+				email: user?.loginProfiles[0].email,
+				token,
+				name: data.name,
+				password: data.password,
+				inviteType: 'app',
+			});
 		}
 	}
 
@@ -143,9 +152,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 	}, [error]);
 
 	useEffect(() => {
-		return () => {
-			useAuthStore.setState({ isAccepted: false });
-		};
+		acceptInvitation(token);
 	}, []);
 	return (
 		<AuthLayout>
@@ -158,78 +165,80 @@ export default function CompleteAccountSetupVerifyEmail() {
 							{isVerified && !error ? t('login.you_have_been_added') : error?.error}
 						</AlertTitle>
 						<AlertDescription>
-							{isVerified && !error ? t('login.complete_account_setup_desc') : error?.details}
+							{isVerified && !error ? successText : error?.details}
 						</AlertDescription>
 					</Alert>
 				)}
 
-				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-						{!isVerified && (
+				{data && data.user?.status !== 'Active' && (
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+							{!isVerified && (
+								<FormField
+									control={form.control}
+									name='verificationCode'
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>{t('login.verification_code')}</FormLabel>
+											<FormControl>
+												<VerificationCodeInput
+													error={Boolean(form.formState.errors.verificationCode)}
+													{...field}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							)}
+
 							<FormField
 								control={form.control}
-								name='verificationCode'
+								name='password'
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>{t('login.verification_code')}</FormLabel>
+										<FormLabel>{t('login.password')}</FormLabel>
+										<FormDescription>{t('login.password_desc')}</FormDescription>
 										<FormControl>
-											<VerificationCodeInput
-												error={Boolean(form.formState.errors.verificationCode)}
+											<PasswordInput
+												error={Boolean(form.formState.errors.password)}
+												type='password'
+												placeholder={t('login.password') as string}
 												{...field}
 											/>
 										</FormControl>
+										<FormDescription>{t('forms.min8.description')}</FormDescription>
 										<FormMessage />
 									</FormItem>
 								)}
 							/>
-						)}
-
-						<FormField
-							control={form.control}
-							name='password'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{t('login.password')}</FormLabel>
-									<FormDescription>{t('login.password_desc')}</FormDescription>
-									<FormControl>
-										<PasswordInput
-											error={Boolean(form.formState.errors.password)}
-											type='password'
-											placeholder={t('login.password') as string}
-											{...field}
-										/>
-									</FormControl>
-									<FormDescription>{t('forms.min8.description')}</FormDescription>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='name'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{t('login.name')}</FormLabel>
-									<FormDescription>{t('login.name_desc')}</FormDescription>
-									<FormControl>
-										<Input
-											error={Boolean(form.formState.errors.name)}
-											placeholder={t('login.enter_name') as string}
-											{...field}
-										/>
-									</FormControl>
-									<FormDescription>{t('forms.max64.description')}</FormDescription>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<div className='flex justify-end'>
-							<Button loading={loading} size='lg'>
-								{t('login.complete_setup')}
-							</Button>
-						</div>
-					</form>
-				</Form>
+							<FormField
+								control={form.control}
+								name='name'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>{t('login.name')}</FormLabel>
+										<FormDescription>{t('login.name_desc')}</FormDescription>
+										<FormControl>
+											<Input
+												error={Boolean(form.formState.errors.name)}
+												placeholder={t('login.enter_name') as string}
+												{...field}
+											/>
+										</FormControl>
+										<FormDescription>{t('forms.max64.description')}</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<div className='flex justify-end'>
+								<Button loading={finalizeLoading || completeLoading} size='lg'>
+									{t('login.complete_setup')}
+								</Button>
+							</div>
+						</form>
+					</Form>
+				)}
 			</div>
 		</AuthLayout>
 	);

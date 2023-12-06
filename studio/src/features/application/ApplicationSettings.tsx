@@ -37,11 +37,13 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 			>
 				<DropdownMenuItemContainer>
 					{APPLICATION_SETTINGS.map((setting, index) => (
-						<>
+						<div key={setting.id}>
 							<DropdownMenuItem
 								id={setting.id}
-								key={setting.name}
-								disabled={setting.isDisabled(role)}
+								disabled={setting.isDisabled(
+									role,
+									applications.find((app) => app._id === appId) as Application,
+								)}
 								className='font-sfCompact px-3'
 								onClick={() =>
 									setting.onClick(applications.find((app) => app._id === appId) as Application)
@@ -52,7 +54,7 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 							{index === APPLICATION_SETTINGS.length - 3 && (
 								<DropdownMenuSeparator key={setting.name} />
 							)}
-						</>
+						</div>
 					))}
 				</DropdownMenuItemContainer>
 			</DropdownMenuContent>

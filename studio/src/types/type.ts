@@ -1,5 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { z } from 'zod';
+import { OrgRoles } from '.';
 import { EnvironmentStatus } from './environment';
 export const UserSchema = z.object({
 	iid: z.string(),
@@ -218,11 +219,13 @@ export interface Invitation {
 	role: string;
 	status: 'Pending' | 'Active';
 	createdAt: string;
+	orgRole?: OrgRoles;
+	appId?: string;
 }
 
 export interface GetInvitationRequest extends BaseGetRequest {
 	email?: string;
-	roles: string[];
+	roles?: string[];
 	status?: string;
 }
 export interface InvitationRequest extends BaseRequest {

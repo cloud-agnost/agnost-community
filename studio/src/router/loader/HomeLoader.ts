@@ -2,8 +2,8 @@ import useAuthStore from '@/store/auth/authStore';
 import { LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 const REDIRECT_URLS = {
-	'app-invite': '/complete-account-setup/verify-email?token=:token&isVerified=true',
-	'org-invite': '/org-invite?token=:token',
+	'app-invite': '/complete-account-setup/verify-email?token=:token&isVerified=true&type=app',
+	'org-invite': '/complete-account-setup/verify-email?token=:token&isVerified=true&type=org',
 	'change-email': '/confirm-change-email?token=:token',
 	'reset-pwd': '/change-password?token=:token',
 };

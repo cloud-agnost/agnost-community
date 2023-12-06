@@ -45,7 +45,7 @@ export default function OrganizationApps() {
 			appId: toDeleteApp?._id as string,
 			orgId: organization?._id as string,
 			onSuccess: () => {
-				closeDeleteModal();
+				closeLeaveModal();
 			},
 			onError: ({ error, details }) => {
 				notify({
@@ -87,7 +87,6 @@ export default function OrganizationApps() {
 	useEffect(() => {
 		getAppsByOrgId(organization?._id as string);
 	}, [organization?._id]);
-
 	return (
 		<div className={cn('scroll p-8', !temp.length && 'flex items-center justify-center')}>
 			{temp.length > 0 ? (
@@ -181,7 +180,6 @@ export default function OrganizationApps() {
 		</div>
 	);
 }
-
 function CreateApplicationButton({ disabled }: { disabled?: boolean }) {
 	const { t } = useTranslation();
 	const { openAppCreateModal } = useOutletContext<{

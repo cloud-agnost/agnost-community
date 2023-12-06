@@ -44,6 +44,7 @@ export default function MainAppMembers() {
 			},
 		});
 	}
+	console.log('MainApp2Members', { applicationTeam });
 	return (
 		<div className='space-y-6 p-6'>
 			<div className='flex items-center gap-4'>

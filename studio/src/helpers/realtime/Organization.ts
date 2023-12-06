@@ -2,6 +2,23 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization as OrganizationType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Organization extends RealtimeActions<OrganizationType> {
+	accept(param: RealtimeActionParams<OrganizationType>): void {
+		console.log(param);
+		useOrganizationStore.setState?.((prev) => ({
+			...prev,
+			members: [
+				...prev.members,
+				{
+					_id: param.data._id,
+					orgId: param.data._id,
+					role: param.data.role,
+					joinDate: new Date().toISOString(),
+					//@ts-ignore,
+					member: param.data.user,
+				},
+			],
+		}));
+	}
 	redeploy(): void {
 		throw new Error('Method not implemented.');
 	}

@@ -25,6 +25,9 @@ export default class UserService {
 	static async acceptInvite(token: string) {
 		return (await axios.post(`${this.url}/app-invite-accept?token=${token}`, { token })).data;
 	}
+	static async orgAcceptInvite(token: string) {
+		return (await axios.post(`${this.url}/org-invite-accept?token=${token}`, { token })).data;
+	}
 
 	static async changeName(name: string): Promise<User> {
 		return (await axios.put(`${this.url}/name`, { name })).data;

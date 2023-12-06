@@ -122,5 +122,6 @@
 	"schedulerStatus": "Scheduler",
 	"dbLogs": "Database Logs",
 	"serverLogs": "Server Logs",
-	"schedulerLogs": "Scheduler Logs"
+	"schedulerLogs": "Scheduler Logs",
+	"invitation_accepted": "Invitation accepted successfully"
 }

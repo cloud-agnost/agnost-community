@@ -15,7 +15,6 @@ import {
 	InvitationRequest,
 	RemoveMemberRequest,
 	SetAppAvatarRequest,
-	SortOption,
 	TeamOption,
 	TransferAppOwnershipRequest,
 	UpdateRoleRequest,
@@ -25,7 +24,7 @@ import { PAGE_SIZE } from '@/constants';
 import { create } from '@/helpers';
 import useAuthStore from '@/store/auth/authStore';
 import useVersionStore from '@/store/version/versionStore';
-import { joinChannel, leaveChannel, translate } from '@/utils';
+import { joinChannel, leaveChannel } from '@/utils';
 import OrganizationService from 'services/OrganizationService.ts';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 
@@ -34,8 +33,6 @@ interface ApplicationState {
 	applications: Application[];
 	toDeleteApp: Application | null;
 	temp: Application[];
-	loading: boolean;
-	error: APIError | null;
 	applicationTeam: ApplicationMember[];
 	tempTeam: ApplicationMember[];
 	teamOptions: TeamOption[];
@@ -43,14 +40,10 @@ interface ApplicationState {
 	isEditAppOpen: boolean;
 	isInviteMemberOpen: boolean;
 	invitations: Invitation[];
-	invitationPage: number;
-	invitationSort: SortOption;
-	invitationSearch: string;
-	invitationRoleFilter: string[] | null;
 	appAuthorization: AppPermissions;
 	isDeleteModalOpen: boolean;
 	isLeaveModalOpen: boolean;
-	role: AppRoles;
+	lastFetchedInvitationsPage: number;
 }
 
 type Actions = {
@@ -100,23 +93,13 @@ const initialState: ApplicationState = {
 	isVersionOpen: false,
 	isEditAppOpen: false,
 	isInviteMemberOpen: false,
-	loading: false,
-	error: null,
 	teamOptions: [],
 	invitations: [],
-	invitationPage: 0,
-	invitationSort: {
-		name: translate('general.sortOptions.default'),
-		value: '',
-		sortDir: '',
-	},
-	invitationSearch: '',
-	invitationRoleFilter: [],
 	appAuthorization: {} as AppPermissions,
 	isDeleteModalOpen: false,
 	isLeaveModalOpen: false,
 	toDeleteApp: null,
-	role: '' as AppRoles,
+	lastFetchedInvitationsPage: 0,
 };
 
 const useApplicationStore = create<ApplicationState & Actions>()(
@@ -165,7 +148,6 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 						...application,
 						role,
 					},
-					role: role as AppRoles,
 				});
 				joinChannel(application._id);
 			},
@@ -302,8 +284,12 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			getAppInvitations: async (req: GetInvitationRequest) => {
 				try {
 					const invitations = await ApplicationService.getAppInvitations(req);
-					if (get().invitationPage === 0) set({ invitations });
-					else set({ invitations: [...get().invitations, ...invitations] });
+					if (req.page === 0) set({ invitations });
+					else
+						set({
+							invitations: [...invitations, ...get().invitations],
+							lastFetchedInvitationsPage: req.page,
+						});
 					return invitations;
 				} catch (error) {
 					throw error as APIError;
@@ -344,6 +330,10 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 				});
 				const searchParams = new URLSearchParams(window.location.search);
 				searchParams.delete('t');
+				searchParams.delete('r');
+				searchParams.delete('e');
+				searchParams.delete('s');
+				searchParams.delete('d');
 				window.history.replaceState({}, '', `${window.location.pathname}`);
 			},
 			openInviteMemberDrawer: (application: Application) => {
@@ -415,7 +405,6 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			},
 			getAppsByOrgId: async (orgId: string) => {
 				try {
-					set({ loading: true });
 					const applications = await OrganizationService.getOrganizationApps(orgId);
 					set({ applications, temp: applications });
 					applications.forEach((app) => {
@@ -424,8 +413,6 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					return applications;
 				} catch (error) {
 					throw error as APIError;
-				} finally {
-					set({ loading: false });
 				}
 			},
 			createApplication: async ({ orgId, name, onSuccess, onError }: CreateApplicationRequest) => {

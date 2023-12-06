@@ -3,16 +3,27 @@ import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { DateText } from '@/components/DateText';
 import { RoleSelect } from '@/components/RoleDropdown';
+import { TableConfirmation } from '@/components/Table';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { OrganizationMember } from '@/types';
 import { Trash } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
-
+import { getOrgPermission, translate } from '@/utils';
 function updateRole(userId: string, role: string) {
 	useOrganizationStore.getState().changeMemberRole({
 		userId,
 		role,
+	});
+}
+
+function deleteHandler(member: OrganizationMember) {
+	const { removeMemberFromOrganization } = useOrganizationStore.getState();
+	removeMemberFromOrganization({
+		userId: member.member._id,
+		onError: ({ error, details }) => {
+			console.error(error, details);
+		},
 	});
 }
 
@@ -78,18 +89,23 @@ export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 	{
 		id: 'actions',
 		size: 25,
-		cell: ({ row: { original } }) => <DeleteCell isOwner={original.member.isOrgOwner} />,
+		cell: ({ row: { original } }) => {
+			const canDelete = getOrgPermission('member.delete');
+			return (
+				<TableConfirmation
+					align='end'
+					title={translate('organization.settings.members.delete')}
+					description={translate('organization.settings.members.deleteDesc')}
+					onConfirm={() => deleteHandler(original)}
+					contentClassName='m-0'
+					hasPermission={canDelete}
+					disabled={original.member.isOrgOwner}
+				/>
+			);
+		},
 	},
 ];
 
-function DeleteCell({ isOwner }: { isOwner: boolean }) {
-	const canDelete = useAuthorizeOrg('member.delete');
-	return (
-		<Button variant='blank' iconOnly disabled={!canDelete || isOwner}>
-			<Trash size={24} className='text-icon-base' />
-		</Button>
-	);
-}
 function UpdateInvitationUserRole({ member, role }: { member: OrganizationMember; role: string }) {
 	const canUpdate = useAuthorizeOrg('member.update');
 	return (
