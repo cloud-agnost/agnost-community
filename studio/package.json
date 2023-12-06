@@ -1,7 +1,7 @@
 {
    "name": "studio",
    "private": true,
-   "version": "v1.0.18",
+   "version": "v1.0.19",
    "type": "module",
    "scripts": {
       "dev": "vite",
