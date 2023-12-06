@@ -13,7 +13,6 @@ interface TableConfirmationProps {
 	description: string;
 	align?: Align;
 	contentClassName?: string;
-	closeOnConfirm?: boolean;
 	hasPermission: boolean;
 	icon?: React.ReactNode;
 	tooltip?: string;
@@ -24,17 +23,17 @@ export function TableConfirmation({
 	title,
 	description,
 	contentClassName,
-	closeOnConfirm,
 	align = 'end',
 	hasPermission,
 	icon,
 	tooltip,
+	disabled,
 }: TableConfirmationProps) {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 	function confirm() {
 		onConfirm();
-		if (closeOnConfirm) setOpen(false);
+		setOpen(false);
 	}
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -45,7 +44,7 @@ export function TableConfirmation({
 							<Button
 								variant='blank'
 								rounded
-								disabled={!hasPermission}
+								disabled={!hasPermission || disabled}
 								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
 								iconOnly
 								onClick={(e) => e.stopPropagation()}
