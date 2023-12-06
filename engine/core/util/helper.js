@@ -196,12 +196,23 @@ function turnOnLogging(debugChannel, id, objectType) {
 
 	const debugLogger = (type, debugChannel, id, objectType) => {
 		return function () {
+			if (console.stdlog) console.stdlog(...Array.from(arguments));
+
 			var args = [];
 			Array.from(arguments).forEach((arg) => {
-				if (arg !== null && (arg instanceof Object || Array.isArray(arg))) {
-					args.push(JSON.stringify(arg));
+				if (
+					arg !== null &&
+					arg !== undefined &&
+					(arg instanceof Object || Array.isArray(arg))
+				) {
+					try {
+						args.push(JSON.stringify(arg));
+					} catch (err) {
+						args.push(arg.toString());
+					}
 				} else {
 					if (arg === null) args.push("null");
+					else if (arg === undefined) args.push("undefined");
 					else args.push(arg);
 				}
 			});
