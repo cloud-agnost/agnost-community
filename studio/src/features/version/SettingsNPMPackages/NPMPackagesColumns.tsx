@@ -8,7 +8,18 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 
-const canDeletePackage = getVersionPermission('version.param.delete');
+const { deleteNPMPackage } = useSettingsStore.getState();
+
+async function onDelete(packageId: string) {
+	const { version } = useVersionStore.getState();
+	if (!version) return;
+	await deleteNPMPackage({
+		versionId: version?._id,
+		orgId: version?.orgId,
+		appId: version?.appId,
+		packageId,
+	});
+}
 
 const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	{
@@ -83,26 +94,14 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 				original: { _id },
 			},
 		}) => {
-			const { version } = useVersionStore.getState();
-			const { deleteNPMPackage } = useSettingsStore.getState();
-			async function onDelete() {
-				if (!version) return;
-				await deleteNPMPackage({
-					versionId: version?._id,
-					orgId: version?.orgId,
-					appId: version?.appId,
-					packageId: _id,
-				});
-			}
-
+			const canDeletePackage = getVersionPermission('version.param.delete');
 			return (
 				<div className='flex items-center'>
 					<TableConfirmation
 						align='end'
-						closeOnConfirm
 						title={translate('version.npm.delete_modal_title')}
 						description={translate('version.npm.delete_modal_desc')}
-						onConfirm={onDelete}
+						onConfirm={() => onDelete(_id)}
 						contentClassName='m-0'
 						hasPermission={canDeletePackage}
 					/>

@@ -10,9 +10,6 @@ import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 
-const canDelete = getVersionPermission('cache.delete');
-const canUpdate = getVersionPermission('cache.update');
-
 const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 	{
 		id: 'select',
@@ -140,6 +137,8 @@ const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
 			const { openEditCacheModal, openDeleteCacheModal } = useCacheStore.getState();
+			const canDelete = getVersionPermission('cache.delete');
+			const canUpdate = getVersionPermission('cache.update');
 			return (
 				<ActionsCell<Cache>
 					original={original}

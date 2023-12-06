@@ -9,8 +9,7 @@ import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
-const canEditModel = getVersionPermission('model.update');
-const canDeleteModel = getVersionPermission('model.delete');
+
 const { openEditModelDialog, deleteModel } = useModelStore.getState();
 const queryClient = new QueryClient();
 function deleteHandler(model: Model) {
@@ -121,12 +120,13 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
+			const canEditModel = getVersionPermission('model.update');
+			const canDeleteModel = getVersionPermission('model.delete');
 			return (
 				<div className='flex items-center justify-end'>
 					<ActionsCell original={original} onEdit={openEditModelDialog} canEdit={canEditModel}>
 						<TableConfirmation
 							align='end'
-							closeOnConfirm
 							title={translate('database.models.delete.title')}
 							description={translate('database.models.delete.description')}
 							onConfirm={() => deleteHandler(original)}

@@ -13,8 +13,7 @@ import { InstanceType } from 'components/InstanceType';
 
 const { openEditModal, deleteQueue } = useMessageQueueStore.getState();
 const queryClient = new QueryClient();
-const canEditQueue = getVersionPermission('middleware.update');
-const canDeleteQueue = getVersionPermission('middleware.delete');
+
 
 async function deleteHandler(mq: MessageQueue) {
 	queryClient
@@ -137,6 +136,8 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
+			const canEditQueue = getVersionPermission('middleware.update');
+			const canDeleteQueue = getVersionPermission('middleware.delete');
 			return (
 				<ActionsCell<MessageQueue>
 					original={original}
@@ -145,7 +146,6 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 				>
 					<TableConfirmation
 						align='end'
-						closeOnConfirm
 						title={translate('queue.delete.title')}
 						description={translate('queue.delete.message')}
 						onConfirm={() => deleteHandler(original)}

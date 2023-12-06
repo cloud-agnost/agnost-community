@@ -15,8 +15,6 @@ import { QueryClient } from '@tanstack/react-query';
 import { TabLink } from '../version/Tabs';
 
 const queryClient = new QueryClient();
-const canEditEndpoint = getVersionPermission('endpoint.update');
-const canDeleteEndpoint = getVersionPermission('endpoint.delete');
 const env = useEnvironmentStore.getState().environment;
 const { openEditEndpointDialog, deleteEndpoint } = useEndpointStore.getState();
 function deleteEndpointHandler(toDeleteEndpoint: Endpoint) {
@@ -170,6 +168,8 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		className: 'actions',
 		size: 45,
 		cell: ({ row }) => {
+			const canEditEndpoint = getVersionPermission('endpoint.update');
+			const canDeleteEndpoint = getVersionPermission('endpoint.delete');
 			return (
 				<ActionsCell<Endpoint>
 					original={row.original}
@@ -178,7 +178,6 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 				>
 					<TableConfirmation
 						align='end'
-						closeOnConfirm
 						title={translate('endpoint.delete.title')}
 						description={translate('endpoint.delete.message')}
 						onConfirm={() => deleteEndpointHandler(row.original)}
