@@ -181,7 +181,7 @@ function isValidId(id) {
 }
 
 /**
- * Bind console ouptput to send realtime messages to the client during debug mode
+ * Bind console ouptput to send realtime messages to the client during debug mode. console.info is reserverd for internal use.
  * @param  {string} debugChannel The debug channel unique id for realtime messages
  * @param  {string} id The id of the object generating this log e.g., the id of the endpoint, queue or cron job object
  * @param  {string} objectType The type of the object generating this log can be either "endpoint", "queue", "task"
@@ -190,13 +190,12 @@ function turnOnLogging(debugChannel, id, objectType) {
 	// Register the original console methods
 	console.stdlog = console.log.bind(console);
 	console.stderror = console.error.bind(console);
-	console.stdinfo = console.info.bind(console);
 	console.stddebug = console.debug.bind(console);
 	console.stdwarn = console.warn.bind(console);
 
 	const debugLogger = (type, debugChannel, id, objectType) => {
 		return function () {
-			if (console.stdlog) console.stdlog(...Array.from(arguments));
+			if (console.stdlog) console.info(...Array.from(arguments));
 
 			var args = [];
 			Array.from(arguments).forEach((arg) => {
@@ -205,10 +204,19 @@ function turnOnLogging(debugChannel, id, objectType) {
 					arg !== undefined &&
 					(arg instanceof Object || Array.isArray(arg))
 				) {
-					try {
-						args.push(JSON.stringify(arg));
-					} catch (err) {
-						args.push(arg.toString());
+					if (arg instanceof Error) {
+						const errorMessage = JSON.stringify({
+							message: arg.message,
+							stack: arg.stack,
+						});
+
+						args.push(errorMessage);
+					} else {
+						try {
+							args.push(JSON.stringify(arg));
+						} catch (err) {
+							args.push(arg.toString());
+						}
 					}
 				} else {
 					if (arg === null) args.push("null");
@@ -230,7 +238,6 @@ function turnOnLogging(debugChannel, id, objectType) {
 
 	// Override the console output methods
 	console.log = debugLogger("log", debugChannel, id, objectType);
-	console.info = debugLogger("info", debugChannel, id, objectType);
 	console.debug = debugLogger("debug", debugChannel, id, objectType);
 	console.error = debugLogger("error", debugChannel, id, objectType);
 	console.warn = debugLogger("warn", debugChannel, id, objectType);
@@ -244,11 +251,9 @@ function turnOffLogging() {
 	console.error = console.stderror;
 	console.debug = console.stddebug;
 	console.warn = console.stdwarn;
-	console.info = console.stdinfo;
 
 	console.stdlog = null;
 	console.stderror = null;
-	console.stdinfo = null;
 	console.stddebug = null;
 	console.stdwarn = null;
 }
