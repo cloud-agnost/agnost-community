@@ -9,7 +9,7 @@ import { useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { APIError, EnvironmentStatus, Log } from '@/types';
-import { generateId, joinChannel, leaveChannel } from '@/utils';
+import { generateId, joinChannel, leaveChannel, parseIfString } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useRef } from 'react';
@@ -24,7 +24,7 @@ interface TestMessageQueueProps {
 	onClose: () => void;
 }
 export const TestMessageQueueSchema = z.object({
-	payload: z.string().optional().default('{}'),
+	payload: z.string().optional().nullable().default(null),
 });
 export default function TestMessageQueue({ open, onClose }: TestMessageQueueProps) {
 	const { t } = useTranslation();
@@ -64,7 +64,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 			versionId: versionId as string,
 			queueId: queueId as string,
 			debugChannel,
-			...data,
+			payload: parseIfString(data.payload),
 		});
 		setTimeout(() => {
 			leaveChannel(debugChannel);
@@ -114,7 +114,6 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 													containerClassName='h-full'
 													value={field.value}
 													onChange={field.onChange}
-													defaultLanguage='json'
 													name='testQueuePayload'
 												/>
 											</FormControl>
