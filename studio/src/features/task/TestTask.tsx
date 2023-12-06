@@ -9,6 +9,7 @@ import useTaskStore from '@/store/task/taskStore';
 import { APIError, Log } from '@/types';
 import { generateId, joinChannel, leaveChannel } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 interface TestTaskProps {
@@ -19,8 +20,8 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 	const { t } = useTranslation();
 	const { task, testTask, taskLogs } = useTaskStore();
 	const { notify } = useToast();
-	const debugChannel = generateId();
 	const { environment } = useEnvironmentStore();
+	const [debugChannel, setDebugChannel] = useState<string>('');
 	const { versionId, appId, orgId, taskId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -36,23 +37,26 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 				type: 'error',
 			});
 		},
-		onSettled: () => {
-			leaveChannel(debugChannel);
-		},
 	});
 	function testTaskHandler() {
-		joinChannel(debugChannel);
+		if (debugChannel) leaveChannel(debugChannel);
+		const id = generateId();
+		setDebugChannel(id);
+		joinChannel(id);
 		testTaskMutation({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			taskId: taskId as string,
-			debugChannel,
+			debugChannel: id,
 		});
 	}
-
+	function handleClose() {
+		if (debugChannel) leaveChannel(debugChannel);
+		onClose();
+	}
 	return (
-		<Drawer open={open} onOpenChange={onClose}>
+		<Drawer open={open} onOpenChange={handleClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>
