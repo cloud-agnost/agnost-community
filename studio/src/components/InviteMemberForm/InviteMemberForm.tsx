@@ -162,13 +162,13 @@ export default function InviteMemberForm({
 							<span className='ml-2'>Add Another One</span>
 						</Button>
 					)}
-
-					<div>
-						{actions}
-						<Button variant='primary' size='lg' loading={loading} disabled={disabled}>
-							{t('application.edit.invite')}
-						</Button>
-					</div>
+				</div>
+				<div></div>
+				<div className='flex items-center justify-end gap-4'>
+					{actions}
+					<Button variant='primary' size='lg' loading={loading} disabled={disabled}>
+						{t('application.edit.invite')}
+					</Button>
 				</div>
 			</div>
 		</div>
