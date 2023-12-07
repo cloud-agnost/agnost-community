@@ -7,7 +7,7 @@ export const connectToDatabase = async () => {
 		await mongoose.connect(process.env.CLUSTER_DB_URI, {
 			user: process.env.CLUSTER_DB_USER,
 			pass: process.env.CLUSTER_DB_PWD,
-			minPoolSize: config.get("database.minPoolSize"),
+			maxPoolSize: config.get("database.maxPoolSize"),
 		});
 
 		await initializeSearchView();

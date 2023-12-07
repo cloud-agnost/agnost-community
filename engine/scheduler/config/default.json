@@ -19,7 +19,7 @@
         "defaultLockLifetime": 600000
     },
     "database": {
-        "minPoolSize": 3
+        "maxPoolSize": 3
      },
      "cache": {
         "port": 6379

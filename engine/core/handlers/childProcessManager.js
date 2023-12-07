@@ -542,27 +542,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 */
 	async setupResourceConnections() {
 		const resources = this.getResources();
-		for (const resource of resources) {
-			// Check whether this is a PostgreSQL, MySQL, SQL Server or MongoDB database or not
-			// We need to connect to the actual database not to the default database
-			// For this reason we connect based on database not based on resource
-			if (
-				["PostgreSQL", "MySQL", "SQL Server", "MongoDB"].includes(
-					resource.instance
-				)
-			)
-				continue;
-
-			resource.access = helper.decryptSensitiveData(resource.access);
-			if (resource.accessReadOnly)
-				resource.accessReadOnly = helper.decryptSensitiveData(
-					resource.accessReadOnly
-				);
-
-			// Set up the connection
-			await adapterManager.setupConnection(resource);
-		}
-
+		// Fist, we need to set up the database connections
 		// Get the list of databases and filter the ones that are PostgreSQL, MySQL or SQL Server
 		const dbs = await META.getDatabasesSync().filter((entry) =>
 			["PostgreSQL", "MySQL", "SQL Server", "MongoDB"].includes(entry.type)
@@ -577,7 +557,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			if (!mapping) continue;
 
 			// Get the resource corresponding to this mapping
-			const resource = this.getResources().find(
+			const resource = resources.find(
 				(entry) => entry.iid === mapping.resource.iid
 			);
 
@@ -602,14 +582,59 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			resource.designiid = db.iid;
 
 			if (resource.accessReadOnly) {
-				resource.accessReadOnly = helper.decryptSensitiveData(
-					resource.accessReadOnly
-				);
+				if (!resource.isReadOnlyDecrypted) {
+					resource.isReadOnlyDecrypted = true;
+					resource.accessReadOnly = helper.decryptSensitiveData(
+						resource.accessReadOnly
+					);
+				}
+
 				// Add the database name info to the access settings
 				for (const readOnly of resource.accessReadOnly) {
 					readOnly.dbName = this.getAppliedDbName(db);
 				}
 			}
+
+			// Set up the connection
+			await adapterManager.setupConnection(resource);
+		}
+
+		// Second, we need to set up the cache connections
+		const caches = resources.filter((entry) => entry.type === "cache");
+		for (const cache of caches) {
+			cache.access = helper.decryptSensitiveData(cache.access);
+			if (cache.accessReadOnly)
+				cache.accessReadOnly = helper.decryptSensitiveData(
+					cache.accessReadOnly
+				);
+
+			// Set up the connection
+			await adapterManager.setupConnection(cache);
+		}
+
+		// Third, we need to set up the storage connections
+		const storages = resources.filter((entry) => entry.type === "storage");
+		for (const storage of storages) {
+			storage.access = helper.decryptSensitiveData(storage.access);
+			if (storage.accessReadOnly)
+				storage.accessReadOnly = helper.decryptSensitiveData(
+					storage.accessReadOnly
+				);
+
+			// Set up the connection
+			await adapterManager.setupConnection(storage);
+		}
+
+		// Finally, set up the remaining resource conections
+		for (const resource of resources) {
+			// We have already processed db, cache and storage resources, skip them
+			if (!["RabbitMQ", "Agenda"].includes(resource.instance)) continue;
+
+			resource.access = helper.decryptSensitiveData(resource.access);
+			if (resource.accessReadOnly)
+				resource.accessReadOnly = helper.decryptSensitiveData(
+					resource.accessReadOnly
+				);
 
 			// Set up the connection
 			await adapterManager.setupConnection(resource);

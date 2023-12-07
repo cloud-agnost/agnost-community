@@ -789,7 +789,7 @@ router.post(
 				"params",
 				{
 					name,
-					value,
+					value: helper.getTypedValue(value),
 					createdBy: user._id,
 				},
 				{ updatedBy: user._id },
@@ -849,7 +849,7 @@ router.put(
 				{ _id: version._id, "params._id": param._id },
 				{
 					"params.$.name": name,
-					"params.$.value": value,
+					"params.$.value": helper.getTypedValue(value),
 					"params.$.updatedAt": Date.now(),
 					"params.$.updatedBy": user._id,
 					updatedBy: user._id,

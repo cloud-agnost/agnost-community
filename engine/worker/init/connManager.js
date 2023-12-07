@@ -149,6 +149,7 @@ class ConnectionManager {
                         if (connSettings.connOptions) uri = `${uri}?${connSettings.connOptions}`;
 
                         client = new mongo.MongoClient(uri, {
+                            maxPoolSize: config.get("database.maxPoolSize"),
                             auth: {
                                 username: connSettings.username,
                                 password: connSettings.password,

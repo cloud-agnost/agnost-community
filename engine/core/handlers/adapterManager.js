@@ -545,7 +545,7 @@ export class AdapterManager {
 						username: connSettings.username,
 						password: connSettings.password,
 					},
-					minPoolSize: config.poolSize,
+					maxPoolSize: config.poolSize,
 				});
 			} else {
 				let uri = `mongodb+srv://${connSettings.host}`;
@@ -558,7 +558,7 @@ export class AdapterManager {
 						username: connSettings.username,
 						password: connSettings.password,
 					},
-					minPoolSize: config.poolSize,
+					maxPoolSize: config.poolSize,
 				});
 			}
 
