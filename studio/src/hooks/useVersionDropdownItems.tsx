@@ -7,10 +7,12 @@ import useTabStore from '@/store/version/tabStore';
 import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore';
 import _ from 'lodash';
+import { useParams } from 'react-router-dom';
 export default function useVersionDropdownItems() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
 	const { application, openVersionDrawer } = useApplicationStore();
+	const { appId, orgId } = useParams() as Record<string, string>;
 	const {
 		versions,
 		version,
@@ -22,9 +24,10 @@ export default function useVersionDropdownItems() {
 	const { addTab } = useTabStore();
 
 	useEffect(() => {
-		if (_.isEmpty(versions)) {
+		if (_.isEmpty(versions) && appId && orgId) {
 			getAllVersionsVisibleToUser({
-				appId: application?._id as string,
+				appId,
+				orgId,
 				page: 0,
 				size: 10,
 			});
@@ -89,7 +92,7 @@ export default function useVersionDropdownItems() {
 				title: t('version.settings.default'),
 				action: () => {
 					const versionHomePath = getVersionDashboardPath('/settings');
-					addTab(version?._id as string, {
+					addTab(version?._id, {
 						id: generateId(),
 						title: t('version.settings.default'),
 						path: versionHomePath,
