@@ -227,19 +227,27 @@ export interface GetInvitationRequest extends BaseGetRequest {
 	email?: string;
 	roles?: string[];
 	status?: string;
+	appId?: string;
+	orgId?: string;
 }
 export interface InvitationRequest extends BaseRequest {
 	token?: string;
 	tokens?: string[];
+	appId?: string;
+	orgId?: string;
 }
 export interface UpdateRoleRequest extends BaseRequest {
 	token?: string;
 	userId?: string;
 	role: string;
+	appId?: string;
+	orgId?: string;
 }
 export interface RemoveMemberRequest extends BaseRequest {
 	userId?: string;
 	userIds?: string[];
+	appId?: string;
+	orgId?: string;
 }
 export type RealtimeActionTypes =
 	| 'update'

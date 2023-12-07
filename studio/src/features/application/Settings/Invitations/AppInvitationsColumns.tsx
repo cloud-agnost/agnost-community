@@ -8,7 +8,6 @@ import { Invitation } from '@/types';
 import { getAppPermission, notify, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
-import { useParams } from 'react-router-dom';
 
 const { updateInvitationUserRole, resendInvitation, deleteInvitation } =
 	useApplicationStore.getState();
