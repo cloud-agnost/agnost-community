@@ -57,7 +57,7 @@ export const VersionLogColumns: ColumnDefWithClassName<VersionLog>[] = [
 			const copyText = `${BASE_URL}/${env?.iid}${path}`;
 			return (
 				<div className='flex items-center gap-8 group'>
-					<div className='truncate max-w-[15ch] font-mono'>{path}</div>
+					<div className='truncate font-mono'>{path}</div>
 					<CopyButton text={copyText} className='hidden group-hover:block' />
 				</div>
 			);

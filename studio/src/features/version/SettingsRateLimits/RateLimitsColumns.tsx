@@ -63,7 +63,7 @@ const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 				original: { name },
 			},
 		}) => {
-			return <div className='truncate max-w-[15ch]'>{name}</div>;
+			return <div className='truncate'>{name}</div>;
 		},
 		size: 100,
 	},

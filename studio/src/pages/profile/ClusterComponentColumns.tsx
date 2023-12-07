@@ -40,7 +40,7 @@ const ClusterComponentColumns: ColumnDefWithClassName<ClusterComponent>[] = [
 		accessorKey: 'info.version',
 		header: () => <SortButton text={translate('general.version')} field='info.version' />,
 		cell: ({ row }) => (
-			<div className='text-sm text-default truncate w-[30ch]'>{row.original.info?.version}</div>
+			<div className='text-sm text-default truncate'>{row.original.info?.version}</div>
 		),
 	},
 	{
