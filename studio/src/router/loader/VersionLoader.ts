@@ -202,17 +202,21 @@ async function fieldsLoader({ params }: LoaderFunctionArgs) {
 
 async function navigatorLoader({ params }: LoaderFunctionArgs) {
 	if (!useAuthStore.getState().isAuthenticated()) return null;
-	const { models } = useModelStore.getState();
-	if (models.length > 0) return null;
+	const { getModelsOfDatabase } = useModelStore.getState();
+	const { database, getDatabaseOfAppById } = useDatabaseStore.getState();
+
 	const apiParams = params as {
 		orgId: string;
 		appId: string;
 		versionId: string;
 		dbId: string;
 	};
+	console.log('apiParams', database._id, apiParams.dbId);
+	if (database._id !== apiParams.dbId) {
+		getDatabaseOfAppById(apiParams);
+		getModelsOfDatabase(apiParams);
+	}
 
-	const { getModelsOfDatabase } = useModelStore.getState();
-	await getModelsOfDatabase(apiParams);
 	return null;
 }
 
