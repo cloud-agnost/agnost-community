@@ -106,7 +106,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * Initializes the API server of the app version
 	 */
 	async initializeCore() {
-		this.addLog(t("********* CHING PROCESS INIT START *********"));
+		this.addLog(t("********* CHILD PROCESS INIT START *********"));
 		// First load the environment and vesion configuration file
 		const envObj = await this.loadEnvConfigFile();
 		// If we do  not have the envObj yet then just spin up the express server to serve system default endpoints
@@ -157,7 +157,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Set up the task listeners
 		await this.manageTasks();
 
-		this.addLog(t("********* CHING PROCESS INIT END *********"));
+		this.addLog(t("********* CHILD PROCESS INIT END *********"));
 		// Send the deployment telemetry information to the platform
 		await this.sendEnvironmentLogs("OK");
 
@@ -170,7 +170,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * can update an API server faster
 	 */
 	async restartCore() {
-		this.addLog(t("********* CHING PROCESS RESTART *********"));
+		this.addLog(t("********* CHILD PROCESS RESTART *********"));
 		global.SERVER_STATUS = "initializing";
 		this.loaderQuery = helper.generateSlug(null, 6);
 		// First clear the logs
@@ -254,7 +254,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// We completed server initialization and can accept incoming requests
 		global.SERVER_STATUS = "running";
-		this.addLog(t("********* CHING PROCESS RESTART END *********"));
+		this.addLog(t("********* CHILD PROCESS RESTART END *********"));
 	}
 
 	/**
