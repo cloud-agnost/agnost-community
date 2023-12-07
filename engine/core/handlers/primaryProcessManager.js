@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs/promises";
-import { execSync } from "child_process";
+import { exec } from "child_process";
 
 import { DeploymentManager } from "./deploymentManager.js";
 import { getKey } from "../init/cache.js";
