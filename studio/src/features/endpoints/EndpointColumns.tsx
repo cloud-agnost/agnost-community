@@ -85,13 +85,13 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		id: 'path',
 		header: () => <SortButton text={translate('endpoint.path')} field='path' />,
 		accessorKey: 'path',
-		size: 200,
+		size: 300,
 		cell: ({ row }) => {
 			const { path } = row.original;
 			const copyText = `${BASE_URL}/${env?.iid}${path}`;
 			return (
 				<div className='flex items-center gap-8 group'>
-					<div className='truncate max-w-[15ch] font-mono'>{path}</div>
+					<div className='truncate font-mono'>{path}</div>
 					<CopyButton text={copyText} className='hidden group-hover:block' />
 				</div>
 			);

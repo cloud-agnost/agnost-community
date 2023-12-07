@@ -14,7 +14,7 @@ interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
 const Table = React.forwardRef<HTMLTableElement, TableProps>(
 	({ className, containerClassName, style, ...props }, ref) => (
 		<div className={cn('table-container', containerClassName)} style={style}>
-			<table ref={ref} className={cn('table', className)} style={style} {...props} />
+			<table ref={ref} className={cn('table table-fixed', className)} style={style} {...props} />
 		</div>
 	),
 );
