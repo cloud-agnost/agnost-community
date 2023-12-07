@@ -10,6 +10,7 @@ interface UseFetchDataProps<T = any> {
 	dataLength: number;
 	queryKey: string;
 	params?: T;
+	disableVersionParams?: boolean;
 }
 export default function useInfiniteScroll({
 	queryFn,
@@ -17,17 +18,20 @@ export default function useInfiniteScroll({
 	dataLength,
 	queryKey,
 	params,
+	disableVersionParams,
 }: UseFetchDataProps) {
 	const [searchParams] = useSearchParams();
-	const { orgId, appId, versionId } = useParams();
+	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 	const result = useInfiniteQuery({
 		queryKey: [queryKey],
 		initialPageParam: 0,
 		queryFn: ({ pageParam }) =>
 			queryFn({
-				orgId: orgId as string,
-				versionId: versionId as string,
-				appId: appId as string,
+				...(!disableVersionParams && {
+					orgId,
+					versionId,
+					appId,
+				}),
 				page: pageParam,
 				size: MODULE_PAGE_SIZE,
 				search: searchParams.get('q') as string,
