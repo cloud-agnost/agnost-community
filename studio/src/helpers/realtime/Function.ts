@@ -3,6 +3,9 @@ import useTabStore from '@/store/version/tabStore';
 import { HelperFunction, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 export default class Function extends RealtimeActions<HelperFunction> {
+	accept(): void {
+		throw new Error('Method not implemented.');
+	}
 	delete({ identifiers }: RealtimeActionParams<HelperFunction>): void {
 		const { removeTabByPath } = useTabStore.getState();
 		useFunctionStore.setState?.({

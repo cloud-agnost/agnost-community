@@ -4,6 +4,9 @@ import { Model as ModelType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
 class Model extends RealtimeActions<ModelType> {
+	accept(): void {
+		throw new Error('Method not implemented.');
+	}
 	delete({ identifiers }: RealtimeActionParams<ModelType>): void {
 		const { removeTabByPath } = useTabStore.getState();
 		useModelStore.setState?.({

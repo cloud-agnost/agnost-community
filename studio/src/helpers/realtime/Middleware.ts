@@ -4,6 +4,9 @@ import { Middleware as MiddlewareType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
 export default class Middleware extends RealtimeActions<MiddlewareType> {
+	accept(): void {
+		throw new Error('Method not implemented.');
+	}
 	delete({ identifiers }: RealtimeActionParams<MiddlewareType>): void {
 		const { removeTabByPath } = useTabStore.getState();
 		useMiddlewareStore.setState?.({

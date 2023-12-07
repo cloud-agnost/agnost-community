@@ -2,6 +2,9 @@ import useAuthStore from '@/store/auth/authStore';
 import { RealtimeActionParams, User as UserType } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class User extends RealtimeActions<UserType> {
+	accept(): void {
+		throw new Error('Method not implemented.');
+	}
 	redeploy(): void {
 		throw new Error('Method not implemented.');
 	}

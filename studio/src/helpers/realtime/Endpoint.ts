@@ -9,6 +9,9 @@ class Endpoint extends RealtimeActions<EndpointType> {
 	deploy(): void {
 		throw new Error('Method not implemented.');
 	}
+	accept(): void {
+		throw new Error('Method not implemented.');
+	}
 	log({ message, timestamp, id, type }: RealtimeActionParams<EndpointType>) {
 		setTimeout(() => {
 			useEndpointStore.getState?.().setEndpointLog(id as string, {

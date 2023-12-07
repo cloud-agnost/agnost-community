@@ -3,6 +3,9 @@ import useTabStore from '@/store/version/tabStore';
 import { LogTypes, RealtimeActionParams, Task as TaskType } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Task extends RealtimeActions<TaskType> {
+	accept(): void {
+		throw new Error('Method not implemented.');
+	}
 	redeploy(): void {
 		throw new Error('Method not implemented.');
 	}

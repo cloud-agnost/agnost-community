@@ -4,6 +4,9 @@ import { RealtimeActionParams, Storage as StorageType } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
 class Storage extends RealtimeActions<StorageType> {
+	accept(): void {
+		throw new Error('Method not implemented.');
+	}
 	delete({ identifiers }: RealtimeActionParams<StorageType>): void {
 		const { removeTabByPath } = useTabStore.getState();
 		useStorageStore.setState?.({
