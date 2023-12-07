@@ -12,7 +12,7 @@
         }
     ],
     "database": {
-        "minPoolSize": 3,
+        "maxPoolSize": 3,
         "mailMaxLength": 320,
         "jsonMaxLength": 4000,
         "linkMaxLength": 2048,

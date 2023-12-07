@@ -30,7 +30,7 @@
     "retryCount": 30
   },
   "database": {
-    "minPoolSize": 3
+    "maxPoolSize": 3
   },
   "sync": {
     "serverURL": "http://platform-sync-clusterip-service:4000",

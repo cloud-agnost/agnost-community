@@ -6,7 +6,7 @@ var client;
 export const connectToDatabase = async () => {
 	try {
 		client = new mongo.MongoClient(process.env.CLUSTER_DB_URI, {
-			minPoolSize: config.get("database.minPoolSize"),
+			maxPoolSize: config.get("database.maxPoolSize"),
 			auth: {
 				username: process.env.CLUSTER_DB_USER,
 				password: process.env.CLUSTER_DB_PWD,

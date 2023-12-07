@@ -16,7 +16,7 @@
         "platformBaseUrl": "http://platform-core-clusterip-service:4000"
     },
     "database": {
-        "minPoolSize": 3
+        "maxPoolSize": 3
      },
      "cache": {
         "port": 6379
