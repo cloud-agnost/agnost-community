@@ -26,7 +26,7 @@ export const TaskScheme = z.object({});
 
 export const CreateTaskSchema = z.object({
 	name: NameSchema,
-	logExecution: z.boolean().default(false),
+	logExecution: z.boolean().default(true),
 	type: z.enum(['code', 'flow']).default('code'),
 	cronExpression: z
 		.string({

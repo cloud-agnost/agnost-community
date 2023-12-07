@@ -30,6 +30,7 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 		resolver: zodResolver(CreateEndpointSchema),
 		defaultValues: {
 			method: 'GET',
+			logExecution: true,
 		},
 	});
 

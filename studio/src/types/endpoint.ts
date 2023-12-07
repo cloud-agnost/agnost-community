@@ -76,7 +76,7 @@ export const CreateEndpointSchema = z.object({
 		.nullish(),
 	apiKeyRequired: z.boolean().default(false),
 	sessionRequired: z.boolean().default(false),
-	logExecution: z.boolean().default(false),
+	logExecution: z.boolean().default(true),
 	rateLimits: z.array(z.string()).optional(),
 	middlewares: z.array(z.string()).optional(),
 });

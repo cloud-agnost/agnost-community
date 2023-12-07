@@ -29,6 +29,9 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 	const { notify } = useToast();
 	const form = useForm<z.infer<typeof CreateMessageQueueSchema>>({
 		resolver: zodResolver(CreateMessageQueueSchema),
+		defaultValues: {
+			logExecution: true,
+		},
 	});
 
 	const { mutateAsync: createQueueMutate, isPending } = useMutation({
