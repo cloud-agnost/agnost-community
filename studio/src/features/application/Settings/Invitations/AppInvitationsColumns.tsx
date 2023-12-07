@@ -3,10 +3,12 @@ import { DateText } from '@/components/DateText';
 import { ResendButton } from '@/components/ResendButton';
 import { TableConfirmation } from '@/components/Table';
 import useApplicationStore from '@/store/app/applicationStore';
+import useOrganizationStore from '@/store/organization/organizationStore';
 import { Invitation } from '@/types';
 import { getAppPermission, notify, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
+import { useParams } from 'react-router-dom';
 
 const canDelete = getAppPermission('invite.delete');
 const canResend = getAppPermission('invite.resend');
@@ -14,9 +16,12 @@ const canUpdate = getAppPermission('invite.update');
 const { updateInvitationUserRole, resendInvitation, deleteInvitation } =
 	useApplicationStore.getState();
 
-console.log('canDelete', canDelete);
 function updateInvitationUserRoleHandler(token: string, role: string) {
+	const orgId = useOrganizationStore.getState().organization._id;
+	const appId = useApplicationStore.getState().application?._id as string;
 	updateInvitationUserRole({
+		orgId,
+		appId,
 		token,
 		role,
 		onSuccess: () => {
@@ -36,8 +41,12 @@ function updateInvitationUserRoleHandler(token: string, role: string) {
 	});
 }
 function resendInvitationHandler(token: string, email: string) {
+	const orgId = useOrganizationStore.getState().organization._id;
+	const appId = useApplicationStore.getState().application?._id as string;
 	resendInvitation({
 		token,
+		appId,
+		orgId,
 		onSuccess: () => {
 			notify({
 				title: translate('general.success'),
@@ -58,8 +67,12 @@ function resendInvitationHandler(token: string, email: string) {
 }
 
 function deleteInvitationHandler(token: string) {
+	const orgId = useOrganizationStore.getState().organization._id;
+	const appId = useApplicationStore.getState().application?._id as string;
 	deleteInvitation({
 		token,
+		appId,
+		orgId,
 		onSuccess: () => {
 			notify({
 				title: translate('general.success'),
@@ -115,6 +128,7 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { token, role } = row.original;
+
 			return (
 				<RoleSelect
 					role={role}

@@ -12,6 +12,7 @@ import { RoleDropdown } from 'components/RoleDropdown';
 import { SelectedRowButton } from 'components/Table';
 import { useTranslation } from 'react-i18next';
 import { AppMembersTableColumns } from './AppMembersTableColumns';
+import { useParams } from 'react-router-dom';
 export default function MainAppMembers() {
 	const { applicationTeam, application, openInviteMemberDrawer, removeMultipleAppMembers } =
 		useApplicationStore();
@@ -22,11 +23,14 @@ export default function MainAppMembers() {
 	const { canClusterSendEmail } = useClusterStore();
 	const canMultiDelete = useAuthorizeApp('team.delete');
 	const { t } = useTranslation();
+	const { orgId } = useParams() as Record<string, string>;
 
 	function removeMultipleMembers() {
 		const userIds = table.getSelectedRowModel().rows?.map((row) => row.original.member._id);
 		removeMultipleAppMembers({
 			userIds,
+			orgId,
+			appId: application?._id as string,
 			onSuccess: () => {
 				notify({
 					title: t('general.success'),

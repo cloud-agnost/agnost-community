@@ -17,7 +17,7 @@ import { SearchInput } from 'components/SearchInput';
 import { SelectedRowButton } from 'components/Table';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 interface Props {
 	table: Table<Invitation>;
 }
@@ -26,6 +26,7 @@ function AppInvitationFilter({ table }: Props) {
 	const { t } = useTranslation();
 	const [searchParams] = useSearchParams();
 	const canMultiDeleteInvite = useAuthorizeApp('invitation.delete');
+	const { orgId } = useParams() as Record<string, string>;
 	const {
 		invitationRoleFilter,
 		invitationSearch,
@@ -33,12 +34,15 @@ function AppInvitationFilter({ table }: Props) {
 		invitationPage,
 		getAppInvitations,
 		deleteMultipleInvitations,
+		application,
 	} = useApplicationStore();
 
 	function deleteInvitations() {
 		const selectedRows = table.getSelectedRowModel().rows;
 		if (selectedRows) {
 			deleteMultipleInvitations({
+				orgId,
+				appId: application?._id as string,
 				tokens: selectedRows.map((row) => row.original.token),
 				onSuccess: () => {
 					notify({
@@ -68,6 +72,8 @@ function AppInvitationFilter({ table }: Props) {
 			sortDir: invitationSort.sortDir,
 			email: invitationSearch,
 			status: 'Pending',
+			orgId,
+			appId: application?._id as string,
 		});
 	}, [invitationRoleFilter, invitationSearch, invitationSort, invitationPage]);
 

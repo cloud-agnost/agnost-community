@@ -7,6 +7,7 @@ import { ConnectResourceSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 export default function ConnectResource() {
 	const { toggleCreateResourceModal, addExistingResource } = useResourceStore();
@@ -16,11 +17,12 @@ export default function ConnectResource() {
 		resolver: zodResolver(ConnectResourceSchema),
 	});
 	const [loading, setLoading] = useState(false);
-
+	const { orgId } = useParams() as Record<string, string>;
 	function onSubmit(data: z.infer<typeof ConnectResourceSchema>) {
 		setLoading(true);
 		addExistingResource({
 			...data,
+			orgId,
 			access: {
 				...data.access,
 				options: data.access?.options?.filter((option) => option.key && option.value),

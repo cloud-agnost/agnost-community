@@ -6,18 +6,20 @@ import {
 	AppRoles,
 	Application,
 	ApplicationMember,
-	BaseRequest,
 	ChangeAppNameRequest,
 	CreateApplicationRequest,
 	DeleteApplicationRequest,
 	GetInvitationRequest,
 	Invitation,
 	InvitationRequest,
+	RemoveAppAvatarRequest,
 	RemoveMemberRequest,
 	SetAppAvatarRequest,
 	SortOption,
 	TeamOption,
 	TransferAppOwnershipRequest,
+	UpdateAppMemberRoleRequest,
+	UpdateAppParams,
 	UpdateRoleRequest,
 } from '@/types';
 
@@ -58,11 +60,11 @@ type Actions = {
 	selectApplication: (application: Application) => void;
 	changeAppName: (req: ChangeAppNameRequest) => Promise<Application>;
 	setAppAvatar: (req: SetAppAvatarRequest) => Promise<Application>;
-	removeAppAvatar: (req: BaseRequest) => Promise<Application>;
+	removeAppAvatar: (req: RemoveAppAvatarRequest) => Promise<Application>;
 	transferAppOwnership: (req: TransferAppOwnershipRequest) => Promise<Application>;
-	getAppTeamMembers: () => Promise<ApplicationMember[]>;
+	getAppTeamMembers: (req: UpdateAppParams) => Promise<ApplicationMember[]>;
 	filterApplicationTeam: (search: string) => ApplicationMember[];
-	changeAppTeamRole: (req: UpdateRoleRequest) => Promise<ApplicationMember>;
+	changeAppTeamRole: (req: UpdateAppMemberRoleRequest) => Promise<ApplicationMember>;
 	removeAppMember: (req: RemoveMemberRequest) => Promise<void>;
 	removeMultipleAppMembers: (req: RemoveMemberRequest) => Promise<void>;
 	inviteUsersToApp: (req: AppInviteRequest) => Promise<Invitation[]>;
@@ -82,7 +84,7 @@ type Actions = {
 	leaveAppTeam: (req: DeleteApplicationRequest) => Promise<void>;
 	deleteApplication: (req: DeleteApplicationRequest) => Promise<void>;
 	searchApplications: (query: string) => void;
-	getAppPermissions: () => Promise<AppPermissions>;
+	getAppPermissions: (orgId: string) => Promise<AppPermissions>;
 	openDeleteModal: (application: Application) => void;
 	closeDeleteModal: () => void;
 	openLeaveModal: (application: Application) => void;
@@ -171,7 +173,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			},
 			changeAppName: async (req: ChangeAppNameRequest) => {
 				try {
-					const application = await ApplicationService.changeAppName(req.name);
+					const application = await ApplicationService.changeAppName(req);
 					get().selectApplication(application);
 					if (req.onSuccess) req.onSuccess();
 					return application;
@@ -182,7 +184,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			},
 			setAppAvatar: async (req: SetAppAvatarRequest) => {
 				try {
-					const application = await ApplicationService.setAppAvatar(req.picture);
+					const application = await ApplicationService.setAppAvatar(req);
 					get().selectApplication(application);
 					if (req.onSuccess) req.onSuccess();
 
@@ -192,9 +194,9 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					throw error as APIError;
 				}
 			},
-			removeAppAvatar: async (req: BaseRequest) => {
+			removeAppAvatar: async (req: RemoveAppAvatarRequest) => {
 				try {
-					const application = await ApplicationService.removeAppAvatar();
+					const application = await ApplicationService.removeAppAvatar(req);
 					get().selectApplication(application);
 					if (req.onSuccess) req.onSuccess();
 					return application;
@@ -205,7 +207,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			},
 			transferAppOwnership: async (req: TransferAppOwnershipRequest) => {
 				try {
-					const application = await ApplicationService.transferAppOwnership(req.userId);
+					const application = await ApplicationService.transferAppOwnership(req);
 					get().selectApplication(application);
 					if (req.onSuccess) req.onSuccess();
 					return application;
@@ -214,9 +216,9 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					throw error as APIError;
 				}
 			},
-			getAppTeamMembers: async () => {
+			getAppTeamMembers: async (req: UpdateAppParams) => {
 				try {
-					const applicationTeam = await ApplicationService.getAppMembers();
+					const applicationTeam = await ApplicationService.getAppMembers(req);
 					const userId = useAuthStore.getState().user?._id;
 					set({
 						applicationTeam,
@@ -246,10 +248,10 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					return filteredTeam;
 				}
 			},
-			changeAppTeamRole: async (req: UpdateRoleRequest) => {
+			changeAppTeamRole: async (req: UpdateAppMemberRoleRequest) => {
 				const { userId, role, onSuccess, onError } = req;
 				try {
-					const member = await ApplicationService.changeMemberRole(userId as string, role);
+					const member = await ApplicationService.changeMemberRole(req);
 					set({
 						applicationTeam: get().applicationTeam.map((team) => {
 							if (team.member._id === userId) {
@@ -267,7 +269,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			},
 			removeAppMember: async (req: RemoveMemberRequest) => {
 				try {
-					await ApplicationService.removeAppMember(req.userId as string);
+					await ApplicationService.removeAppMember(req);
 					set({
 						applicationTeam: get().applicationTeam.filter((team) => team.member._id !== req.userId),
 					});
@@ -279,7 +281,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			},
 			removeMultipleAppMembers: async (req: RemoveMemberRequest) => {
 				try {
-					await ApplicationService.removeMultipleAppMembers(req.userIds as string[]);
+					await ApplicationService.removeMultipleAppMembers(req);
 					set({
 						applicationTeam: get().applicationTeam.filter(
 							(team) => !req.userIds?.includes(team.member._id),
@@ -359,7 +361,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			},
 			resendInvitation: async (req: InvitationRequest) => {
 				try {
-					await ApplicationService.resendInvitation(req.token as string);
+					await ApplicationService.resendInvitation(req);
 					if (req.onSuccess) req.onSuccess();
 				} catch (error) {
 					if (req.onError) req.onError(error as APIError);
@@ -368,7 +370,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			},
 			deleteInvitation: async (req: InvitationRequest) => {
 				try {
-					await ApplicationService.deleteInvitation(req.token as string);
+					await ApplicationService.deleteInvitation(req);
 					set({
 						invitations: get().invitations.filter((invitation) => invitation.token !== req.token),
 					});
@@ -380,7 +382,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			},
 			deleteMultipleInvitations: async (req: InvitationRequest) => {
 				try {
-					await ApplicationService.deleteMultipleInvitations(req.tokens);
+					await ApplicationService.deleteMultipleInvitations(req);
 					set({
 						invitations: get().invitations.filter(
 							(invitation) => !req.tokens?.includes(invitation.token),
@@ -394,10 +396,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			},
 			updateInvitationUserRole: async (req: UpdateRoleRequest) => {
 				try {
-					const invitation = await ApplicationService.updateInvitationUserRole(
-						req.token as string,
-						req.role,
-					);
+					const invitation = await ApplicationService.updateInvitationUserRole(req);
 					set({
 						invitations: get().invitations.map((invitation) => {
 							if (invitation.token === req.token) {
@@ -507,9 +506,9 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					throw error as APIError;
 				}
 			},
-			getAppPermissions: async () => {
+			getAppPermissions: async (orgId: string) => {
 				try {
-					const appAuthorization = await ApplicationService.getAllAppRoleDefinitions();
+					const appAuthorization = await ApplicationService.getAllAppRoleDefinitions(orgId);
 					set({ appAuthorization });
 					return appAuthorization;
 				} catch (error) {

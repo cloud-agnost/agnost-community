@@ -146,9 +146,11 @@ export interface GetResourcesRequest {
 	sortBy?: string;
 	sortDir?: string;
 	search?: string;
+	orgId: string;
 }
 export interface GetResourceRequest {
 	iid: string;
+	orgId: string;
 }
 export interface Instance {
 	id: string;
@@ -603,9 +605,11 @@ export interface AddExistingResourceRequest extends BaseRequest {
 	instance: string;
 	allowedRoles: string[];
 	access: ResourceAccess;
+	orgId: string;
 }
 
 export interface CreateResourceRequest extends BaseRequest {
+	orgId: string;
 	name: string;
 	type: ResourceType;
 	instance: string;
@@ -621,13 +625,21 @@ export interface UpdateResourceAllowedRolesRequest extends BaseRequest {
 	resourceId: string;
 	allowedRoles: AllowedRole[];
 	name: string;
+	orgId: string;
 }
 export interface UpdateResourceAccessSettingsRequest extends BaseRequest {
 	resourceId: string;
 	access: ResourceAccess;
+	orgId: string;
 }
 export interface UpdateManagedResourceConfigurationRequest
 	extends Omit<CreateResourceRequest, 'name' | 'allowedRoles'> {
 	resourceId: string;
 	updateType?: 'size' | 'others';
+	orgId: string;
+}
+
+export interface DeleteResourceRequest {
+	resourceId: string;
+	orgId: string;
 }

@@ -6,7 +6,7 @@ import { useTable } from '@/hooks';
 import useResourcesStore from '@/store/resources/resourceStore';
 import { useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { ResourceTableColumn } from './ResourceTable/ResourceTableColumn';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { EmptyState } from '@/components/EmptyState';
@@ -17,7 +17,7 @@ export default function OrgResources() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
 	const [searchParams] = useSearchParams();
-
+	const { orgId } = useParams() as Record<string, string>;
 	const {
 		resources,
 		isDeletedResourceModalOpen,
@@ -52,6 +52,7 @@ export default function OrgResources() {
 	function getResources() {
 		return getOrgResources({
 			search: searchParams.get('q') as string,
+			orgId,
 		});
 	}
 
@@ -87,7 +88,12 @@ export default function OrgResources() {
 					/>
 				}
 				confirmCode={deletedResource?.iid as string}
-				onConfirm={() => deleteMutate(deletedResource?._id as string)}
+				onConfirm={() =>
+					deleteMutate({
+						resourceId: deletedResource?._id as string,
+						orgId,
+					})
+				}
 				isOpen={isDeletedResourceModalOpen}
 				closeModal={closeDeleteResourceModal}
 				loading={deleteLoading}

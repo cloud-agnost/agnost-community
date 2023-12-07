@@ -10,16 +10,19 @@ import { APIError, AppMemberRequest } from '@/types';
 import { useToast } from '@/hooks';
 import useClusterStore from '@/store/cluster/clusterStore';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
+import { useParams } from 'react-router-dom';
 
 export default function AppInviteMember() {
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 	const [error] = useState<APIError>();
-	const { isInviteMemberOpen, closeInviteMemberDrawer, inviteUsersToApp } = useApplicationStore();
+	const { isInviteMemberOpen, application, closeInviteMemberDrawer, inviteUsersToApp } =
+		useApplicationStore();
 	const { appRoles } = useTypeStore();
 	const { notify } = useToast();
 	const { canClusterSendEmail } = useClusterStore();
 	const canInvite = useAuthorizeOrg('invite.create');
+	const { orgId } = useParams() as Record<string, string>;
 	function onSubmit(members: AppMemberRequest[], setError: (error: APIError) => void) {
 		inviteUsersToApp({
 			members: members.map((member) => ({
@@ -27,6 +30,8 @@ export default function AppInviteMember() {
 				uiBaseURL: window.location.origin,
 			})),
 			uiBaseURL: window.location.origin,
+			orgId,
+			appId: application?._id as string,
 			onSuccess: () => {
 				setLoading(false);
 				closeInviteMemberDrawer();

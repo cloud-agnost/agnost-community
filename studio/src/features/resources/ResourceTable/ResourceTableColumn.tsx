@@ -10,8 +10,7 @@ import { getOrgPermission, translate } from '@/utils';
 import { t } from 'i18next';
 
 const { openEditResourceModal } = useResourceStore.getState();
-const canEditResource = getOrgPermission('resource.update');
-const canDeleteResource = getOrgPermission('resource.delete');
+
 export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 	{
 		id: 'name',
@@ -109,7 +108,8 @@ export const ResourceTableColumn: ColumnDefWithClassName<Resource>[] = [
 		cell: ({ row }) => {
 			const resourceCreateType =
 				'config' in row.original ? ResourceCreateType.New : ResourceCreateType.Existing;
-
+			const canEditResource = getOrgPermission('resource.update');
+			const canDeleteResource = getOrgPermission('resource.delete');
 			return (
 				row.original.deletable && (
 					<ActionsCell
