@@ -7,7 +7,7 @@
 	"add": "Create Endpoint",
 	"required": "Required",
 	"optional": "Optional",
-	"empty": "You have not defined any endpoints for this app version",
+	"empty": "You do not have any endpoints for this app version",
 	"no_headers": "This response has no headers",
 	"no_cookies": "This response has no cookies",
 	"create": {

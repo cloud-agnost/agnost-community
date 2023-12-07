@@ -1,6 +1,6 @@
 {
 	"title": "Message Queue",
-	"empty_text": "You have not defined any message queues for this app version",
+	"empty_text": "You do not have any message queues for this app version",
 	"delay": "Delay",
 	"view_logs": "View Logs",
 	"edit": "Edit Queue",

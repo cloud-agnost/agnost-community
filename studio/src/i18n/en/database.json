@@ -1,6 +1,6 @@
 {
 	"page_title": "Databases",
-	"empty_text": "You have not defined any databases for this app version",
+	"empty_text": "You do not have any databases for this app version",
 	"no_database": "No database found",
 	"no_model": "No model found",
 	"add": {
@@ -76,8 +76,8 @@
 		"title": "Models",
 		"create": "Create Model",
 		"edit": "Edit Model",
-		"no_models": "You have not defined any for models for this database",
-		"no_data": "You have not defined any data for this model"
+		"no_models": "You do not have any for models for this database",
+		"no_data": "You do not have any data for this model"
 	},
 	"fields": {
 		"select_default_value": "Select Default Value",
@@ -86,7 +86,7 @@
 		"add": "Add Field",
 		"add_field": "Add {{field}} Field",
 		"edit": "Edit Field",
-		"no_fields": "You have not defined any fields for this model",
+		"no_fields": "You do not have any fields for this model",
 		"basic_value_list": "Basic Value List",
 		"basic_value_list_type": "Basic Value List Type",
 		"basic_value_list_placeholder": "Select basic value list type",
