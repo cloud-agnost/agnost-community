@@ -8,7 +8,7 @@
         "rateLimitWindowSec": 30,
         "rateLimitMaxHits": 300}],
      "database": {
-        "minPoolSize": 3
+        "maxPoolSize": 3
      },
      "sync": {
       "pingTimeout": 30000,

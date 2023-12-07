@@ -17,7 +17,7 @@
         "retryCount": 30
      },
      "database": {
-        "minPoolSize": 3
+        "maxPoolSize": 3
      },
      "emailServer": {
       "pool": true
