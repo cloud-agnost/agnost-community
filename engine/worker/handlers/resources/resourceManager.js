@@ -555,6 +555,7 @@ export class ResourceManager {
             for (const revision of revList.body.items) {
                 // Reset the min and max replicas of the old revisions to 0
                 revision.metadata.annotations = {
+                    ...revision.metadata.annotations,
                     "autoscaling.knative.dev/minScale": "0",
                     "autoscaling.knative.dev/maxScale": "0",
                 };
