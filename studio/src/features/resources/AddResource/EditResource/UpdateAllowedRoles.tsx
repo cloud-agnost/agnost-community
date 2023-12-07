@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { useToast } from '@/hooks';
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 const UpdateAllowedRolesSchema = z.object({
 	allowedRoles: z.nativeEnum(AllowedRole).array(),
 });
@@ -26,13 +27,14 @@ export default function UpdateAllowedRoles() {
 			allowedRoles: resourceToEdit?.allowedRoles ?? ['Admin'],
 		},
 	});
-
+	const { orgId } = useParams() as Record<string, string>;
 	function onSubmit(data: z.infer<typeof UpdateAllowedRolesSchema>) {
 		setLoading(true);
 		updateResourceAllowedRoles({
 			name: resourceToEdit?.name,
 			allowedRoles: data.allowedRoles,
 			resourceId: resourceToEdit?._id,
+			orgId,
 			onSuccess: () => {
 				setLoading(false);
 				// closeEditResourceModal();

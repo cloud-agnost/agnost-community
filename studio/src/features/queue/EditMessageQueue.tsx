@@ -24,12 +24,7 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 	const { updateQueue, queue } = useMessageQueueStore();
 	const { getResource } = useResourceStore();
 	const environment = useEnvironmentStore((state) => state.environment);
-	const { versionId, appId, orgId } = useParams<{
-		versionId: string;
-		appId: string;
-		orgId: string;
-		queueId: string;
-	}>();
+	const { versionId, appId, orgId } = useParams() as Record<string, string>;
 	const { notify } = useToast();
 	const form = useForm<z.infer<typeof MessageQueueSchema>>({
 		resolver: zodResolver(MessageQueueSchema),
@@ -62,6 +57,7 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 			const iid = environment?.mappings?.find((m) => m.design.iid === queue.iid)?.resource.iid;
 			if (iid) {
 				getResource({
+					orgId,
 					iid,
 				});
 			}

@@ -6,6 +6,7 @@ import useApplicationStore from '@/store/app/applicationStore';
 import { APIError, ApplicationMember, FormatOptionLabelProps } from '@/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import Select from 'react-select';
 
 const formatOptionLabel = ({ label, value }: FormatOptionLabelProps) => {
@@ -44,15 +45,18 @@ const formatOptionLabel = ({ label, value }: FormatOptionLabelProps) => {
 };
 export default function TransferApp() {
 	const { t } = useTranslation();
-	const { teamOptions, transferAppOwnership } = useApplicationStore();
+	const { teamOptions, transferAppOwnership, application } = useApplicationStore();
 	const [user, setUser] = useState<ApplicationMember>();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError>();
 	const { notify } = useToast();
+	const { orgId } = useParams() as Record<string, string>;
 	function transferApp() {
 		setLoading(true);
 		transferAppOwnership({
 			userId: user?.member._id as string,
+			appId: application?._id as string,
+			orgId,
 			onSuccess: () => {
 				setUser(undefined);
 				setLoading(false);

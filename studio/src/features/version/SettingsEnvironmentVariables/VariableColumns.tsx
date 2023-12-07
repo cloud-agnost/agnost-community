@@ -59,14 +59,14 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 		accessorKey: 'name',
 		sortingFn: 'text',
 		enableSorting: true,
+		size: 300,
 		cell: ({
 			row: {
 				original: { name },
 			},
 		}) => {
-			return <div className='truncate max-w-[15ch]'>{name}</div>;
+			return <div className='truncate'>{name}</div>;
 		},
-		size: 100,
 	},
 	{
 		id: 'value',
@@ -80,12 +80,13 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 		accessorKey: 'value',
 		sortingFn: 'text',
 		enableSorting: true,
+		size: 300,
 		cell: ({
 			row: {
 				original: { value },
 			},
 		}) => {
-			return <div className='truncate max-w-[30ch]'>{value}</div>;
+			return <div className='truncate'>{value}</div>;
 		},
 	},
 	{
@@ -100,7 +101,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 		enableSorting: true,
 		sortingFn: 'datetime',
 		accessorKey: 'createdAt',
-		size: 200,
+		size: 100,
 		cell: ({ row }) => {
 			const { createdAt, createdBy } = row.original;
 			const user = useOrganizationStore
@@ -123,7 +124,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 		accessorKey: 'updatedAt',
 		enableSorting: true,
 		sortingFn: 'datetime',
-		size: 200,
+		size: 100,
 		cell: ({ row }) => {
 			const { updatedAt, updatedBy } = row.original;
 			const user = useOrganizationStore
@@ -135,6 +136,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	{
 		id: 'actions',
 		className: 'actions',
+		size: 100,
 		cell: ({ row: { original } }) => {
 			const canEditParam = getVersionPermission('version.param.update');
 			const canDeleteParam = getVersionPermission('version.param.delete');

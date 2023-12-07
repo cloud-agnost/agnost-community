@@ -4,7 +4,7 @@ import OrganizationMenuItem from '@/features/organization/navbar/OrganizationMen
 import useApplicationStore from '@/store/app/applicationStore';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMatch, useSearchParams } from 'react-router-dom';
+import { useMatch, useParams, useSearchParams } from 'react-router-dom';
 import AppGeneralSettings from './Settings/AppGeneralSettings';
 import AppMembers from './Settings/Members/AppMembers';
 import AppInvitations from '@/features/application/Settings/Invitations/AppInvitations';
@@ -12,8 +12,9 @@ import AppInvitations from '@/features/application/Settings/Invitations/AppInvit
 export default function EditApplication() {
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { isEditAppOpen, closeEditAppDrawer, getAppTeamMembers } = useApplicationStore();
-
+	const { isEditAppOpen, closeEditAppDrawer, getAppTeamMembers, application } =
+		useApplicationStore();
+	const { orgId } = useParams() as Record<string, string>;
 	const match = useMatch('/organization/:orgId/apps');
 
 	useEffect(() => {
@@ -25,7 +26,10 @@ export default function EditApplication() {
 
 	useEffect(() => {
 		if (isEditAppOpen) {
-			getAppTeamMembers();
+			getAppTeamMembers({
+				appId: application?._id as string,
+				orgId,
+			});
 		} else {
 			searchParams.delete('t');
 			setSearchParams(searchParams);

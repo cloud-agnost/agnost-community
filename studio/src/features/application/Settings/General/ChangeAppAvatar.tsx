@@ -4,17 +4,20 @@ import { APIError } from '@/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks';
+import { useParams } from 'react-router-dom';
 export default function ChangeAppAvatar() {
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
 	const { application, setAppAvatar, removeAppAvatar } = useApplicationStore();
+	const { orgId } = useParams() as Record<string, string>;
 	const { notify } = useToast();
 	async function onChangeHandler(file: File) {
 		setLoading(true);
 		setAppAvatar({
-			picture: file,
+			orgId,
 			appId: application?._id as string,
+			picture: file,
 			onSuccess: () => {
 				setLoading(false);
 			},
@@ -29,6 +32,8 @@ export default function ChangeAppAvatar() {
 		setError(null);
 		setLoading(true);
 		removeAppAvatar({
+			appId: application?._id as string,
+			orgId,
 			onSuccess: () => {
 				setLoading(false);
 				notify({

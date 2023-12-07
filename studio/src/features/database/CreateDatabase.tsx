@@ -20,6 +20,9 @@ export default function CreateDatabase({
 }) {
 	const form = useForm<z.infer<typeof CreateDatabaseSchema>>({
 		resolver: zodResolver(CreateDatabaseSchema),
+		defaultValues: {
+			assignUniqueName: true,
+		},
 	});
 	const { notify } = useToast();
 	const { versionId, appId, orgId } = useParams() as {
@@ -46,9 +49,15 @@ export default function CreateDatabase({
 		},
 	});
 
+	function onCloseHandler() {
+		onOpenChange(false);
+		form.reset();
+	}
+
 	async function onSubmit(data: z.infer<typeof CreateDatabaseSchema>) {
 		const resource = resources.find((item) => item._id === data.resourceId);
 		if (!versionId || !resource) return;
+		console.log(data);
 		createDatabaseMutation({
 			orgId,
 			versionId,
@@ -58,10 +67,10 @@ export default function CreateDatabase({
 		});
 	}
 	return (
-		<Drawer open={open} onOpenChange={onOpenChange}>
+		<Drawer open={open} onOpenChange={onCloseHandler}>
 			<DrawerContent className='overflow-x-hidden'>
 				<DrawerHeader className='relative'>
-					<DrawerTitle>{t('database.edit.title')}</DrawerTitle>
+					<DrawerTitle>{t('database.add.title')}</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
 					<form className='p-6 space-y-6' onSubmit={form.handleSubmit(onSubmit)}>

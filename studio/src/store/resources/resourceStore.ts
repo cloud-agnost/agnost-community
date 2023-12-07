@@ -4,6 +4,7 @@ import {
 	APIError,
 	AddExistingResourceRequest,
 	CreateResourceRequest,
+	DeleteResourceRequest,
 	GetResourceRequest,
 	GetResourcesRequest,
 	Resource,
@@ -39,7 +40,7 @@ type Actions = {
 	selectResourceType: (instance: string, type: string, resourceType: ResourceType) => void;
 	openDeleteResourceModal: (resource: Resource) => void;
 	closeDeleteResourceModal: () => void;
-	deleteResource: (resourceId: string) => Promise<void>;
+	deleteResource: (req: DeleteResourceRequest) => Promise<void>;
 	createNewResource: (req: CreateResourceRequest) => Promise<Resource>;
 	updateResourceAllowedRoles: (req: UpdateResourceAllowedRolesRequest) => Promise<Resource>;
 	updateResourceAccessSettings: (req: UpdateResourceAccessSettingsRequest) => Promise<Resource>;
@@ -153,15 +154,15 @@ const useResourceStore = create<ResourceStore & Actions>()(
 				deletedResource: null,
 			});
 		},
-		deleteResource: async (resourceId: string) => {
+		deleteResource: async (req: DeleteResourceRequest) => {
 			try {
-				await ResourceService.deleteResource(resourceId);
+				await ResourceService.deleteResource(req);
 				set((state) => ({
-					resources: state.resources.filter((resource) => resource._id !== resourceId),
+					resources: state.resources.filter((resource) => resource._id !== req.resourceId),
 					isDeletedResourceModalOpen: false,
 					deletedResource: null,
 				}));
-				leaveChannel(resourceId);
+				leaveChannel(req.resourceId);
 			} catch (error) {
 				throw error as APIError;
 			}

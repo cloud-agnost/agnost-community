@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { TestConnectionButton } from '@/features/resources';
 import { useToast } from '@/hooks';
+import { useParams } from 'react-router-dom';
 
 export default function UpdateResourceAccessConf() {
 	const { CurrentResourceElement } = useCreateResource();
@@ -21,7 +22,7 @@ export default function UpdateResourceAccessConf() {
 	const [loading, setLoading] = useState(false);
 	const { resourceToEdit, updateResourceAccessSettings, closeEditResourceModal } =
 		useResourceStore();
-
+	const { orgId } = useParams() as Record<string, string>;
 	useEffect(() => {
 		if (!isEmpty(resourceToEdit)) {
 			form.reset({
@@ -42,6 +43,7 @@ export default function UpdateResourceAccessConf() {
 		setLoading(true);
 		updateResourceAccessSettings({
 			...data,
+			orgId,
 			access: {
 				...data.access,
 				options: data.access?.options?.filter((option) => option.key && option.value),
