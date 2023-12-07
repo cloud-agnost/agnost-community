@@ -82,6 +82,7 @@ if (cluster.isPrimary) {
 
 	// Handle gracelfull process exit
 	process.on("SIGINT", async () => {
+		this.addLog(t("********* CHING PROCESS CLEAN START *********"));
 		// Disconnect all connections/adapters
 		await adapterManager.disconnectAll();
 		// Close connection to cache server(s)
@@ -97,6 +98,7 @@ if (cluster.isPrimary) {
 		// Close the http server
 		if (childManager) await childManager.closeHttpServer();
 		// We call process exit so that primary process can fork a new child process
+		this.addLog(t("********* CHING PROCESS CLEAN END *********"));
 		process.exit();
 	});
 }
