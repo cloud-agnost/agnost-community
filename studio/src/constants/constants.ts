@@ -215,7 +215,7 @@ export const APPLICATION_SETTINGS = [
 		onClick: (application: Application) => {
 			useApplicationStore.getState().openLeaveModal(application);
 		},
-		isDisabled: (role: AppRoles, application: Application) => {
+		isDisabled: (_role: AppRoles, application: Application) => {
 			return useAuthStore.getState().user?._id === application.ownerUserId;
 		},
 	},
