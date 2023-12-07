@@ -13,7 +13,7 @@ import {
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
 import { SearchInput } from 'components/SearchInput';
-import { NEW_TAB_ITEMS, TAB_ICON_MAP } from 'constants/constants.ts';
+import { NEW_TAB_ITEMS, TAB_ICON_MAP } from '@/constants';
 import { useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 export default function NewTabDropdown() {
