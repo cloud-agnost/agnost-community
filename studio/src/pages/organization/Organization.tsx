@@ -10,9 +10,8 @@ export default function Organization() {
 	const { orgId } = useParams();
 	const { getOrgPermissions } = useOrganizationStore();
 	const { getAppPermissions } = useApplicationStore();
-
 	useEffect(() => {
-		getAppPermissions();
+		getAppPermissions(orgId as string);
 		getOrgPermissions();
 	}, [orgId]);
 
