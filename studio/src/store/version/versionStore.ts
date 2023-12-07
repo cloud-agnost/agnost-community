@@ -187,7 +187,7 @@ const useVersionStore = create<VersionStore & Actions>()(
 					if (!_version) return '/organization';
 					const { orgId, appId, _id } = _version;
 					const urlPath = path ? `/${path.replace(/^\//, '')}` : '';
-					if (path && path.includes('organization')) return path;
+					if (path?.includes('organization')) return path;
 					return `/organization/${orgId}/apps/${appId}/version/${_id}` + urlPath;
 				},
 
