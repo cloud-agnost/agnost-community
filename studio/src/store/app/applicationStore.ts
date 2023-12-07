@@ -431,12 +431,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 								...app,
 								team: [
 									{
-										userId: {
-											_id: useAuthStore.getState().user?._id as string,
-											name: useAuthStore.getState().user?.name as string,
-											color: useAuthStore.getState().user?.color as string,
-											pictureUrl: useAuthStore.getState().user?.pictureUrl as string,
-										},
+										userId: useAuthStore.getState().user as any,
 										role: role as string,
 										_id: '',
 										joinDate: '',

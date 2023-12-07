@@ -566,7 +566,6 @@ const router = createBrowserRouter([
 			{
 				path: '/complete-account-setup/verify-email',
 				element: <CompleteAccountSetupVerifyEmailLoadable />,
-				loader: authLoaders.completeAccountSetupVerifyEmail,
 			},
 			{
 				path: '/organization',
