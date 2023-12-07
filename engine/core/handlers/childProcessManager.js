@@ -106,7 +106,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * Initializes the API server of the app version
 	 */
 	async initializeCore() {
-		this.addLog(`Started initializing the API server`);
+		this.addLog(t("********* CHING PROCESS INIT START *********"));
 		// First load the environment and vesion configuration file
 		const envObj = await this.loadEnvConfigFile();
 		// If we do  not have the envObj yet then just spin up the express server to serve system default endpoints
@@ -157,7 +157,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Set up the task listeners
 		await this.manageTasks();
 
-		this.addLog(`Completed initializing the API server`);
+		this.addLog(t("********* CHING PROCESS INIT END *********"));
 		// Send the deployment telemetry information to the platform
 		await this.sendEnvironmentLogs("OK");
 
@@ -170,11 +170,11 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * can update an API server faster
 	 */
 	async restartCore() {
+		this.addLog(t("********* CHING PROCESS RESTART *********"));
 		global.SERVER_STATUS = "initializing";
 		this.loaderQuery = helper.generateSlug(null, 6);
 		// First clear the logs
 		this.clearLogs();
-		this.addLog(`Started updating the API server`);
 		await this.closeHttpServer();
 
 		// We haven't refreshed the META manager so that we can access the old values
@@ -249,12 +249,12 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Set up the task listeners
 		await this.manageTasks();
 
-		this.addLog(`Completed updating the API server`);
 		// Send the deployment telemetry information to the platform
 		await this.sendEnvironmentLogs("OK");
 
 		// We completed server initialization and can accept incoming requests
 		global.SERVER_STATUS = "running";
+		this.addLog(t("********* CHING PROCESS RESTART END *********"));
 	}
 
 	/**

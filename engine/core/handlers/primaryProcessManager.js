@@ -71,7 +71,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 	 * Manages the metadata of the api server
 	 */
 	async initializeCore() {
-		this.addLog(t("Started configuring the API server"));
+		this.addLog(t("********* MANAGER PROCESS START *********"));
 
 		if (!this.getEnvObj()) {
 			this.addLog(t("Cannot get the environment object data"));
@@ -103,8 +103,7 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 		await this.saveConfig();
 		// Manage NPM packages
 		await this.manageNPMPackages();
-		this.addLog(t("Completed initializing API server"));
-		this.addLog(t("Initializing child process and HTTP server"));
+		this.addLog(t("********* MANAGER PROCESS END *********"));
 		// Send the deployment telemetry information to the platform
 		// await this.sendEnvironmentLogs("OK");
 	}
