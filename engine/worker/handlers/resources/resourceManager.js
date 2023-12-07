@@ -362,6 +362,7 @@ export class ResourceManager {
         const kubeconfig = new k8s.KubeConfig();
         kubeconfig.loadFromDefault();
         const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
+        const apiServerVersion = await this.getAPIServerVersion();
 
         // Define the Deployment specification
         const serviceSpec = {
@@ -392,7 +393,9 @@ export class ResourceManager {
                         containerConcurrency: deploymentConfig.containerConcurrency,
                         containers: [
                             {
-                                image: "gcr.io/agnost-community/engine/core",
+                                image: apiServerVersion
+                                    ? "gcr.io/agnost-community/engine/core:${apiServerVersion}"
+                                    : "gcr.io/agnost-community/engine/core",
                                 ports: [
                                     {
                                         containerPort: config.get("general.defaultClusterIPPort"),
@@ -537,6 +540,35 @@ export class ResourceManager {
         const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
         try {
+            const revList = await k8sApi.listNamespacedCustomObject(
+                "serving.knative.dev",
+                "v1",
+                process.env.NAMESPACE,
+                "revisions",
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                `app=${deploymentName}`
+            );
+
+            for (const revision of revList.body.items) {
+                // Reset the min and max replicas of the old revisions to 0
+                revision.metadata.annotations = {
+                    "autoscaling.knative.dev/minScale": "0",
+                    "autoscaling.knative.dev/maxScale": "0",
+                };
+
+                await k8sApi.replaceNamespacedCustomObject(
+                    "serving.knative.dev",
+                    "v1",
+                    process.env.NAMESPACE,
+                    "revisions",
+                    revision.metadata.name,
+                    revision
+                );
+            }
+
             const existingService = await k8sApi.getNamespacedCustomObjectStatus(
                 "serving.knative.dev",
                 "v1",
@@ -544,6 +576,8 @@ export class ResourceManager {
                 "services",
                 deploymentName
             );
+
+            //console.log("***here", JSON.stringify(existingService.body, null, 2));
 
             // Update annotations
             existingService.body.spec.template.metadata.annotations = {
@@ -1125,6 +1159,30 @@ export class ResourceManager {
         return await this.conn.db("agnost").collection("clusters").findOne({
             clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
         });
+    }
+
+    /**
+     * Get release info
+     * @returns {Promise<Object>} The cluster record.
+     */
+    async getAPIServerVersion() {
+        if (process.env.NODE_ENV === "development") return null;
+
+        try {
+            const clusterInfo = await this.getClusterRecord();
+            const releaseInfo = await axios.get(
+                `https://raw.githubusercontent.com/cloud-agnost/agnost-community/master/releases/${clusterInfo.release}.json`,
+                {
+                    headers: {
+                        Accept: "application/vnd.github.v3+json",
+                    },
+                }
+            );
+
+            return releaseInfo.data.modules["engine-core"];
+        } catch (err) {
+            return null;
+        }
     }
 
     /**
