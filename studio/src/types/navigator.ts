@@ -1,4 +1,4 @@
-import { Cell, Row } from '@tanstack/react-table';
+import { Cell } from '@tanstack/react-table';
 import { Field } from './model';
 import { BaseGetRequest, BaseRequest } from './type';
 
@@ -20,6 +20,8 @@ export interface UpdateDataFromModelParams extends BaseRequest {
 export type NavigatorComponentProps = {
 	field: Field;
 	parentId?: string;
-	row?: Row<any>;
 	cell: Cell<any, any>;
+	value: any;
+	id: string | number;
+	index: number;
 };

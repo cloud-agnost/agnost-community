@@ -11,14 +11,13 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
-export default function BooleanField({ cell, row, field }: NavigatorComponentProps) {
+export default function BooleanField({ cell, value, id, index, field }: NavigatorComponentProps) {
 	const name = field.name;
 	const { t } = useTranslation();
-	const data = row?.original;
 	const { setEditedField } = useNavigatorStore();
 	const isEditable = useEditedField(field, cell);
-	const label = data[name] ? t('general.yes') : t('general.no');
-	const updateData = useUpdateData(field);
+	const label = value ? t('general.yes') : t('general.no');
+	const updateData = useUpdateData(field.name);
 	const BooleanSchema = z.object({
 		[name]: z.boolean(),
 	});
@@ -26,17 +25,17 @@ export default function BooleanField({ cell, row, field }: NavigatorComponentPro
 	const form = useForm({
 		resolver: zodResolver(BooleanSchema),
 		defaultValues: {
-			[name]: data[name],
+			[name]: value,
 		},
 	});
 
 	const onSubmit = async (d: z.infer<typeof BooleanSchema>) => {
-		updateData(d, data.id, row?.index as number);
+		updateData(d, id, index);
 	};
 
 	useEffect(() => {
 		if (isEditable) {
-			form.setValue(name, data[name]);
+			form.setValue(name, value);
 		}
 	}, [isEditable]);
 	return isEditable ? (

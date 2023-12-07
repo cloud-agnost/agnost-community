@@ -9,15 +9,14 @@ import { Input } from '@/components/Input';
 import { useForm } from 'react-hook-form';
 import { useEditedField, useUpdateData } from '@/hooks';
 import useNavigatorStore from '@/store/database/navigatorStore';
-export default function Reference({ cell, row, field }: NavigatorComponentProps) {
+export default function Reference({ cell, value, id, index, field }: NavigatorComponentProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const data = row?.original;
 	const isEditable = useEditedField(field, cell);
 	const { models, setModel } = useModelStore();
 	const { setEditedField } = useNavigatorStore();
-	const updateData = useUpdateData(field);
+	const updateData = useUpdateData(field.name);
 	useEffect(() => {
-		if (searchParams.get('ref') && searchParams.get('ref') === data[field.name]) {
+		if (searchParams.get('ref') && searchParams.get('ref') === value) {
 			setModel(models.find((m) => m.iid === field.reference?.iid) as Model);
 		}
 	}, [searchParams]);
@@ -28,16 +27,16 @@ export default function Reference({ cell, row, field }: NavigatorComponentProps)
 
 	const form = useForm<z.infer<typeof ReferenceSchema>>({
 		defaultValues: {
-			[field.name]: data[field.name],
+			[field.name]: value,
 		},
 	});
 
 	function onSubmit(d: z.infer<typeof ReferenceSchema>) {
-		updateData(d, data.id, row?.index as number);
+		updateData(d, id, index);
 	}
 	useEffect(() => {
 		if (isEditable) {
-			form.setValue(field.name, data[field.name]);
+			form.setValue(field.name, value);
 		}
 	}, [isEditable]);
 	return isEditable ? (
@@ -69,11 +68,11 @@ export default function Reference({ cell, row, field }: NavigatorComponentProps)
 			variant='blank'
 			className='link'
 			onClick={() => {
-				searchParams.set('ref', data[field.name]);
+				searchParams.set('ref', value);
 				setSearchParams(searchParams);
 			}}
 		>
-			{data[field.name]}
+			{value}
 		</Button>
 	);
 }

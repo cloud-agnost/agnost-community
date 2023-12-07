@@ -21,10 +21,9 @@ const MASK_OPTIONS: Record<string, MaskProps> = {
 		replacement: { d: /\d/, m: /\d/, y: /\d/, H: /\d/, M: /\d/, s: /\d/ },
 	},
 };
-export default function DateTime({ cell, row, field }: NavigatorComponentProps) {
+export default function DateTime({ cell, value, id, index, field }: NavigatorComponentProps) {
 	const { setEditedField } = useNavigatorStore();
-	const data = row?.original;
-	const updateData = useUpdateData(field);
+	const updateData = useUpdateData(field.name);
 	const isEditable = useEditedField(field, cell);
 
 	const DateSchema = z.object({
@@ -34,22 +33,22 @@ export default function DateTime({ cell, row, field }: NavigatorComponentProps) 
 	const form = useForm({
 		resolver: zodResolver(DateSchema),
 		defaultValues: {
-			[field.name]: convertDates(data[field.name.toLowerCase()]),
+			[field.name]: convertDates(value),
 		},
 	});
 	const onSubmit = async (d: z.infer<typeof DateSchema>) => {
-		updateData(d, data.id, row?.index as number);
+		updateData(d, id, index);
 	};
 	function convertDates(date: string) {
 		if (!date) return '';
 
 		if (field.type === FieldTypes.DATETIME) return formatDate(date, DATE_TIME_FORMAT);
 		if (field.type === FieldTypes.DATE) return formatDate(date, DATE_FORMAT);
-		return data[field.name.toLowerCase()];
+		return value;
 	}
 	useEffect(() => {
 		if (isEditable) {
-			form.setValue(field.name, convertDates(data[field.name.toLowerCase()]));
+			form.setValue(field.name, convertDates(value));
 		}
 	}, [isEditable]);
 	return isEditable ? (
@@ -81,6 +80,6 @@ export default function DateTime({ cell, row, field }: NavigatorComponentProps) 
 			</form>
 		</Form>
 	) : (
-		<DateText date={data[field.name.toLowerCase()]} />
+		<DateText date={value} />
 	);
 }

@@ -7,28 +7,27 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-export default function Text({ cell, row, field }: NavigatorComponentProps) {
+export default function Text({ cell, value, id, index, field }: NavigatorComponentProps) {
 	const { setEditedField } = useNavigatorStore();
-	const updateData = useUpdateData(field);
-	const data = row?.original;
+	const updateData = useUpdateData(field.name);
 	const TextSchema = z.object({
 		[field.name]: z.string().optional(),
 	});
 	const form = useForm<z.infer<typeof TextSchema>>({
 		resolver: zodResolver(TextSchema),
 		defaultValues: {
-			[field.name]: data[field.name === '_id' ? 'id' : field.name],
+			[field.name]: value,
 		},
 	});
 	function onSubmit(d: z.infer<typeof TextSchema>) {
-		updateData(d, data.id, row?.index as number);
+		updateData(d, id, index);
 	}
 
 	const isEditable = useEditedField(field, cell);
 
 	useEffect(() => {
 		if (isEditable) {
-			form.setValue(field.name, data[field.name === '_id' ? 'id' : field.name]);
+			form.setValue(field.name, value);
 		}
 	}, [isEditable]);
 
@@ -57,6 +56,6 @@ export default function Text({ cell, row, field }: NavigatorComponentProps) {
 			</form>
 		</Form>
 	) : (
-		<div className='truncate'>{data[field.name === '_id' ? 'id' : field.name]}</div>
+		<div className='truncate'>{value}</div>
 	);
 }
