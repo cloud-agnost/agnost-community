@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
-import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { DateText } from '@/components/DateText';
 import { RoleSelect } from '@/components/RoleDropdown';
@@ -7,9 +6,8 @@ import { TableConfirmation } from '@/components/Table';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { OrganizationMember } from '@/types';
-import { Trash } from '@phosphor-icons/react';
-import { ColumnDef } from '@tanstack/react-table';
 import { getOrgPermission, translate } from '@/utils';
+import { ColumnDef } from '@tanstack/react-table';
 function updateRole(userId: string, role: string) {
 	useOrganizationStore.getState().changeMemberRole({
 		userId,

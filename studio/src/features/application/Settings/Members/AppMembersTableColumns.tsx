@@ -97,7 +97,7 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 		size: 200,
 		filterFn: 'arrIncludesSome',
 		cell: ({ row }) => {
-			const { role, member } = row.original;
+			const { role, member, appId } = row.original;
 			const canUpdate = getAppPermission('team.update');
 			return (
 				<RoleSelect

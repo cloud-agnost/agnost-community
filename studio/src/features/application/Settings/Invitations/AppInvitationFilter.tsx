@@ -26,7 +26,8 @@ function AppInvitationFilter({ table }: Props) {
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const canMultiDeleteInvite = useAuthorizeApp('invite.delete');
-	const { deleteMultipleInvitations } = useApplicationStore();
+	const { deleteMultipleInvitations, application } = useApplicationStore();
+	const { orgId } = useParams() as Record<string, string>;
 
 	function deleteInvitations() {
 		const selectedRows = table.getSelectedRowModel().rows;

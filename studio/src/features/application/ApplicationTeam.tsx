@@ -1,8 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
-import { Team } from '@/types';
+import { AppTeam } from '@/types';
 import './application.scss';
 interface ApplicationTeamProps {
-	team: Team[];
+	team: AppTeam[];
 	table?: boolean;
 }
 export default function ApplicationTeam({ team, table = false }: ApplicationTeamProps) {
