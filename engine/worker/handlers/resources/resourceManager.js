@@ -540,6 +540,7 @@ export class ResourceManager {
         const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
         try {
+            /* Might be needed in the future but for now we let Knative to handle the past revisions             
             const revList = await k8sApi.listNamespacedCustomObject(
                 "serving.knative.dev",
                 "v1",
@@ -569,7 +570,7 @@ export class ResourceManager {
                     revision
                 );
             }
-
+ */
             const existingService = await k8sApi.getNamespacedCustomObjectStatus(
                 "serving.knative.dev",
                 "v1",
