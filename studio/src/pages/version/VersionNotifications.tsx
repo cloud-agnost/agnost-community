@@ -128,7 +128,10 @@ export default function VersionNotifications() {
 	}, [page, searchParams]);
 
 	useEffect(() => {
-		getAppTeamMembers();
+		getAppTeamMembers({
+			appId,
+			orgId,
+		});
 	}, []);
 
 	function resetMemberFilter() {

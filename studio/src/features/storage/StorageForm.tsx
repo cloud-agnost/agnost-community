@@ -15,6 +15,7 @@ import { CreateStorageSchema, ResourceType } from '@/types';
 import { translate as t } from '@/utils';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 
 interface StorageFormProps {
@@ -24,9 +25,10 @@ interface StorageFormProps {
 export default function StorageForm({ edit = false, loading }: StorageFormProps) {
 	const form = useFormContext<z.infer<typeof CreateStorageSchema>>();
 	const { getResources } = useResourceStore();
-
+	const { orgId } = useParams() as Record<string, string>;
 	useEffect(() => {
 		getResources({
+			orgId,
 			type: 'storage',
 		});
 	}, []);

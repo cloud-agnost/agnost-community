@@ -68,18 +68,24 @@ export default class ApplicationService {
 
 	static async removeAppMember(req: RemoveMemberRequest) {
 		return (
-			await axios.delete(`${this.getUrl(req.orgId, req.appId)}/team/${req.userId}`, {
-				data: {},
-			})
+			await axios.delete(
+				`${this.getUrl(req.orgId as string, req.appId as string)}/team/${req.userId}`,
+				{
+					data: {},
+				},
+			)
 		).data;
 	}
 	static async removeMultipleAppMembers(req: RemoveMemberRequest): Promise<void> {
 		return (
-			await axios.delete(`${this.getUrl(req.orgId, req.appId)}/team/delete-multi`, {
-				data: {
-					userIds: req.userIds,
+			await axios.delete(
+				`${this.getUrl(req.orgId as string, req.appId as string)}/team/delete-multi`,
+				{
+					data: {
+						userIds: req.userIds,
+					},
 				},
-			})
+			)
 		).data;
 	}
 	static async inviteUsersToApp(req: AppInviteRequest): Promise<Invitation[]> {
@@ -94,7 +100,7 @@ export default class ApplicationService {
 		const { roles, ...params } = req;
 		const role = arrayToQueryString(roles, 'role');
 		return (
-			await axios.get(`${this.getUrl(req.orgId, req.appId)}/invite?${role}`, {
+			await axios.get(`${this.getUrl(req.orgId as string, req.appId as string)}/invite?${role}`, {
 				params,
 			})
 		).data;
