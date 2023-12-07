@@ -42,6 +42,10 @@ export const TaskModel = mongoose.model(
 				type: Boolean,
 				default: true,
 			},
+			enabled: {
+				type: Boolean,
+				default: true,
+			},
 			type: {
 				type: String,
 				required: true,
@@ -206,6 +210,14 @@ export const applyRules = (type) => {
 					.isBoolean()
 					.withMessage(t("Not a valid boolean value"))
 					.toBoolean(),
+				/* 				body("enabled")
+					.trim()
+					.notEmpty()
+					.withMessage(t("Required field, cannot be left empty"))
+					.bail()
+					.isBoolean()
+					.withMessage(t("Not a valid boolean value"))
+					.toBoolean(), */
 				body("cronExpression")
 					.trim()
 					.notEmpty()
