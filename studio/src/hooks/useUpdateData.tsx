@@ -3,7 +3,7 @@ import useNavigatorStore from '@/store/database/navigatorStore';
 import { APIError, Field } from '@/types';
 import { capitalize, getNestedPropertyValue, isEmpty, updateObject } from '@/utils';
 import useToast from './useToast';
-export default function useUpdateData(field: Field) {
+export default function useUpdateData(name: string) {
 	const { updateDataFromModel, selectedSubModelId, data: modelData } = useNavigatorStore();
 	const { notify } = useToast();
 	const { subModel, nestedModels } = useModelStore();
@@ -18,12 +18,12 @@ export default function useUpdateData(field: Field) {
 		return arr.slice(0, arr.length - 1).join('.');
 	}
 
-	function updateData(data: any, id: string, rowIndex: number) {
+	function updateData(data: any, id: string | number, rowIndex?: number) {
 		let updatedData: any;
 
 		if (hasSubModel) {
 			if (subModel.type === 'sub-model-list') {
-				updatedData = updateSubModelList(data, rowIndex);
+				updatedData = updateSubModelList(data, rowIndex as number);
 			} else if (subModel.type === 'sub-model-object') {
 				updatedData = updateSubModelObject(data);
 			}
@@ -44,8 +44,8 @@ export default function useUpdateData(field: Field) {
 		const firstIndex = modelData.findIndex((m) => m.id === selectedSubModelId);
 		const updatedData = updateObject(
 			structuredClone(modelData[firstIndex]),
-			`${getModelPath()}.${rowIndex}.${field.name}`,
-			() => data[field.name],
+			`${getModelPath()}.${rowIndex}.${name}`,
+			() => data[name],
 		);
 
 		return {
@@ -54,7 +54,7 @@ export default function useUpdateData(field: Field) {
 	}
 
 	function updateSubModelObject(data: any) {
-		return { [`${nestedModels.map((m) => m.name).join('.')}.${field.name}`]: data[field.name] };
+		return { [`${nestedModels.map((m) => m.name).join('.')}.${name}`]: data[name] };
 	}
 
 	function handleSuccess(updatedData: any) {
