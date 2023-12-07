@@ -11,9 +11,6 @@ import { SortButton } from 'components/DataTable';
 
 const { openDeleteDatabaseDialog, openEditDatabaseDialog } = useDatabaseStore.getState();
 
-const canEditDatabase = getVersionPermission('db.update');
-const canDeleteDatabase = getVersionPermission('db.delete');
-
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
 		id: 'name',
@@ -150,6 +147,8 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		className: 'actions',
 		size: 50,
 		cell: ({ row: { original } }) => {
+			const canEditDatabase = getVersionPermission('db.update');
+			const canDeleteDatabase = getVersionPermission('db.delete');
 			return (
 				<ActionsCell
 					original={original}
