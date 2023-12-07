@@ -13,14 +13,24 @@ export class FunctionAdapter {
 	async run(functionName, ...params) {
 		let functionModule = null;
 
-		// Dynamicly import the
-		functionModule = await import(
-			`../../meta/functions/${functionName}.js${
-				this.manager.getModuleLoaderQuery()
-					? "?" + this.manager.getModuleLoaderQuery()
-					: ""
-			}`
-		);
+		try {
+			// Dynamicly import the
+			functionModule = await import(
+				`../../meta/functions/${functionName}.js${
+					this.manager.getModuleLoaderQuery()
+						? "?" + this.manager.getModuleLoaderQuery()
+						: ""
+				}`
+			);
+		} catch (err) {
+			throw new AgnostError(
+				t(
+					"An error occurred while importing the helper function '%s' module. %s",
+					functionName,
+					err.message
+				)
+			);
+		}
 
 		const funcHandler = functionModule.default;
 		// Check the function module has a default exprot or not
