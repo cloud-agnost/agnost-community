@@ -3,14 +3,19 @@ import { Checkbox } from '@/components/Checkbox';
 import { SortButton } from '@/components/DataTable';
 import { TableConfirmation } from '@/components/Table';
 import useApplicationStore from '@/store/app/applicationStore';
+import useOrganizationStore from '@/store/organization/organizationStore';
 import { ApplicationMember } from '@/types';
 import { getAppPermission, notify, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
-function removeMember(userId: string) {
+function removeMember(userId: string, appId: string) {
+	const orgId = useOrganizationStore.getState().organization._id;
+
 	useApplicationStore.getState?.().removeAppMember({
 		userId,
+		orgId,
+		appId,
 		onSuccess: () => {
 			notify({
 				title: translate('general.success'),
@@ -27,10 +32,13 @@ function removeMember(userId: string) {
 		},
 	});
 }
-function updateMemberRole(userId: string, role: string) {
+function updateMemberRole(userId: string, role: string, appId: string) {
+	const orgId = useOrganizationStore.getState().organization._id;
 	useApplicationStore.getState?.().changeAppTeamRole({
 		userId,
 		role,
+		appId,
+		orgId,
 		onError: ({ error, details }) => {
 			notify({
 				title: error,
@@ -95,7 +103,7 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 				<RoleSelect
 					role={role}
 					type={'app'}
-					onSelect={(selectedRole) => updateMemberRole(member._id, selectedRole)}
+					onSelect={(selectedRole) => updateMemberRole(member._id, selectedRole, appId)}
 					disabled={member.isAppOwner || !canUpdate}
 				/>
 			);
@@ -106,14 +114,14 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 		header: '',
 		size: 100,
 		cell: ({ row }) => {
-			const { member } = row.original;
+			const { member, appId } = row.original;
 			const canDelete = getAppPermission('team.delete');
 			return (
 				!member.isAppOwner && (
 					<TableConfirmation
 						title={translate('application.deleteMember.title')}
 						description={translate('application.deleteMember.description')}
-						onConfirm={() => removeMember(member._id)}
+						onConfirm={() => removeMember(member._id, appId)}
 						hasPermission={canDelete}
 					/>
 				)

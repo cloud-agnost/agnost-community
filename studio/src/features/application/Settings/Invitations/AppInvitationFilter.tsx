@@ -17,7 +17,7 @@ import { SearchInput } from 'components/SearchInput';
 import { SelectedRowButton } from 'components/Table';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 interface Props {
 	table: Table<Invitation>;
 }
@@ -32,6 +32,8 @@ function AppInvitationFilter({ table }: Props) {
 		const selectedRows = table.getSelectedRowModel().rows;
 		if (selectedRows) {
 			deleteMultipleInvitations({
+				orgId,
+				appId: application?._id as string,
 				tokens: selectedRows.map((row) => row.original.token),
 				onSuccess: () => {
 					notify({

@@ -2,7 +2,7 @@ import { translate } from '@/utils';
 import { z } from 'zod';
 import { EnvLog, Environment } from './environment';
 import { ResLog, Resource } from './resource';
-import { BaseRequest } from './type';
+import { BaseRequest, UpdateRoleRequest } from './type';
 import { Version } from './version';
 
 export enum AppRoles {
@@ -75,14 +75,14 @@ export interface DeleteApplicationRequest extends BaseRequest {
 	appId: string;
 	orgId: string;
 }
-export interface ChangeAppNameRequest extends BaseRequest {
+export interface ChangeAppNameRequest extends BaseRequest, UpdateAppParams {
 	name: string;
 }
-export interface SetAppAvatarRequest extends BaseRequest {
+export interface SetAppAvatarRequest extends BaseRequest, UpdateAppParams {
 	picture: File;
 	appId: string;
 }
-export interface TransferAppOwnershipRequest extends BaseRequest {
+export interface TransferAppOwnershipRequest extends BaseRequest, UpdateAppParams {
 	userId: string;
 }
 export interface ApplicationMember {
@@ -101,7 +101,7 @@ export interface AppMemberRequest {
 	role: AppRoles | '';
 	uiBaseURL: string;
 }
-export interface AppInviteRequest extends BaseRequest {
+export interface AppInviteRequest extends BaseRequest, UpdateAppParams {
 	members: AppMemberRequest[];
 	uiBaseURL: string;
 }
@@ -227,3 +227,26 @@ export interface AppPermissions {
 	Developer: AppRolePermissions;
 	Viewer: AppRolePermissions;
 }
+
+export interface UpdateAppParams {
+	appId: string;
+	orgId: string;
+}
+
+export type UpdateAppMemberRoleRequest = UpdateAppParams & UpdateRoleRequest;
+export type RemoveAppAvatarRequest = UpdateAppParams & BaseRequest;
+export type removeMultipleAppMembers = UpdateAppParams & {
+	userIds: string[];
+};
+
+export type UpdateInvitationRoleRequest = UpdateAppParams & {
+	token: string;
+	role: string;
+};
+
+export type DeleteInvitationRequest = UpdateAppParams & {
+	token: string;
+};
+export type DeleteMultipleInvitationRequest = UpdateAppParams & {
+	tokens: string[];
+};

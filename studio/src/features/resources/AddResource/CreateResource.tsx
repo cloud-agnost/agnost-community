@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'c
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 export default function CreateResource() {
 	const form = useForm<z.infer<typeof CreateResourceSchema>>({
@@ -29,11 +30,12 @@ export default function CreateResource() {
 	const { resourceVersions } = useTypeStore();
 	const [loading, setLoading] = useState(false);
 	const { notify } = useToast();
-
+	const { orgId } = useParams() as Record<string, string>;
 	const onSubmit = (data: z.infer<typeof CreateResourceSchema>) => {
 		setLoading(true);
 		createNewResource({
 			...data,
+			orgId,
 			onSuccess: () => {
 				form.reset();
 				if (isEmpty(resourceToEdit)) toggleCreateResourceModal();

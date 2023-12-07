@@ -8,11 +8,13 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Form } from '@/components/Form';
 import { z } from 'zod';
+import { useParams } from 'react-router-dom';
 export default function ChangeAppName() {
 	const { t } = useTranslation();
 	const { application, changeAppName } = useApplicationStore();
 	const canEdit = useAuthorizeApp('update');
 	const { notify } = useToast();
+	const { orgId } = useParams() as Record<string, string>;
 	const form = useForm<z.infer<typeof ChangeNameFormSchema>>({
 		defaultValues: {
 			name: application?.name as string,
@@ -37,6 +39,8 @@ export default function ChangeAppName() {
 		if (application?.name === data.name) return;
 		changeNameMutate({
 			name: data.name,
+			appId: application?._id as string,
+			orgId,
 		});
 	}
 

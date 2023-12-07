@@ -1,132 +1,151 @@
 import { UI_BASE_URL } from '@/constants';
 import { axios } from '@/helpers';
 import useApplicationStore from '@/store/app/applicationStore';
-import useOrganizationStore from '@/store/organization/organizationStore';
 import {
+	AppInviteRequest,
 	AppPermissions,
 	Application,
 	ApplicationMember,
+	ChangeAppNameRequest,
 	GetInvitationRequest,
 	Invitation,
+	InvitationRequest,
+	RemoveMemberRequest,
+	SetAppAvatarRequest,
+	TransferAppOwnershipRequest,
+	UpdateAppMemberRoleRequest,
+	UpdateAppParams,
+	UpdateRoleRequest,
 } from '@/types';
-import { AppInviteRequest } from '@/types/application';
+
 import { arrayToQueryString } from '@/utils';
 export default class ApplicationService {
 	static url = '/v1/org/:orgId/app/:appId';
 
-	static getUrl() {
-		const orgId = useOrganizationStore.getState().organization?._id;
-		const appId = useApplicationStore.getState().application?._id;
+	static getUrl(orgId: string, appId: string) {
 		return this.url.replace(':orgId', orgId as string).replace(':appId', appId as string);
 	}
 
 	static async getAppById(orgId: string, appId: string): Promise<Application> {
 		return (await axios.get(`v1/org/${orgId}/app/${appId}`)).data;
 	}
-	static async changeAppName(name: string): Promise<Application> {
-		return (await axios.put(`${this.getUrl()}`, { name })).data;
+	static async changeAppName(req: ChangeAppNameRequest): Promise<Application> {
+		return (await axios.put(`${this.getUrl(req.orgId, req.appId)}`, { name: req.name })).data;
 	}
-	static async setAppAvatar(picture: File): Promise<Application> {
+	static async setAppAvatar(req: SetAppAvatarRequest): Promise<Application> {
 		const formData = new FormData();
-		formData.append('picture', picture, picture.name);
+		formData.append('picture', req.picture, req.picture.name);
 		return (
-			await axios.put(`${this.getUrl()}/picture`, formData, {
+			await axios.put(`${this.getUrl(req.orgId, req.appId)}/picture`, formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
 				},
 			})
 		).data;
 	}
-	static async removeAppAvatar(): Promise<Application> {
-		return (await axios.delete(`${this.getUrl()}/picture`)).data;
+	static async removeAppAvatar(req: UpdateAppParams): Promise<Application> {
+		return (await axios.delete(`${this.getUrl(req.orgId, req.appId)}/picture`)).data;
 	}
-	static async transferAppOwnership(userId: string): Promise<Application> {
+	static async transferAppOwnership(req: TransferAppOwnershipRequest): Promise<Application> {
 		return (
-			await axios.post(`${this.getUrl()}/transfer/${userId}`, {
-				userId,
+			await axios.post(`${this.getUrl(req.orgId, req.appId)}/transfer/${req.userId}`, {
+				userId: req.userId,
 			})
 		).data;
 	}
 
-	static async getAppMembers(): Promise<ApplicationMember[]> {
-		return (await axios.get(`${this.getUrl()}/team`)).data;
+	static async getAppMembers(req: UpdateAppParams): Promise<ApplicationMember[]> {
+		return (await axios.get(`${this.getUrl(req.orgId, req.appId)}/team`)).data;
 	}
 
-	static async changeMemberRole(userId: string, role: string): Promise<ApplicationMember> {
+	static async changeMemberRole(req: UpdateAppMemberRoleRequest): Promise<ApplicationMember> {
 		return (
-			await axios.put(`${this.getUrl()}/team/${userId}`, {
-				role,
+			await axios.put(`${this.getUrl(req.orgId, req.appId)}/team/${req.userId}`, {
+				role: req.role,
 			})
 		).data;
 	}
 
-	static async removeAppMember(userId: string) {
+	static async removeAppMember(req: RemoveMemberRequest) {
 		return (
-			await axios.delete(`${this.getUrl()}/team/${userId}`, {
+			await axios.delete(`${this.getUrl(req.orgId, req.appId)}/team/${req.userId}`, {
 				data: {},
 			})
 		).data;
 	}
-	static async removeMultipleAppMembers(userIds: string[]): Promise<void> {
+	static async removeMultipleAppMembers(req: RemoveMemberRequest): Promise<void> {
 		return (
-			await axios.delete(`${this.getUrl()}/team/delete-multi`, {
+			await axios.delete(`${this.getUrl(req.orgId, req.appId)}/team/delete-multi`, {
 				data: {
-					userIds,
+					userIds: req.userIds,
 				},
 			})
 		).data;
 	}
 	static async inviteUsersToApp(req: AppInviteRequest): Promise<Invitation[]> {
-		return (await axios.post(`${this.getUrl()}/invite?uiBaseURL=${req.uiBaseURL}`, req.members))
-			.data;
+		return (
+			await axios.post(
+				`${this.getUrl(req.orgId, req.appId)}/invite?uiBaseURL=${req.uiBaseURL}`,
+				req.members,
+			)
+		).data;
 	}
 	static async getAppInvitations(req: GetInvitationRequest): Promise<Invitation[]> {
 		const { roles, ...params } = req;
-		const role = arrayToQueryString(roles ?? [], 'role');
+		const role = arrayToQueryString(roles, 'role');
 		return (
-			await axios.get(`${this.getUrl()}/invite?${role}`, {
-				params: params,
+			await axios.get(`${this.getUrl(req.orgId, req.appId)}/invite?${role}`, {
+				params,
 			})
 		).data;
 	}
 
-	static async resendInvitation(token: string): Promise<Invitation> {
+	static async resendInvitation(req: InvitationRequest): Promise<Invitation> {
 		return (
-			await axios.post(`${this.getUrl()}/invite/resend?token=${token}&uiBaseURL=${UI_BASE_URL}`, {
-				token,
-			})
+			await axios.post(
+				`${this.getUrl(req.orgId as string, req.appId as string)}/invite/resend?token=${
+					req.token
+				}&uiBaseURL=${UI_BASE_URL}`,
+				{
+					token: req.token,
+				},
+			)
 		).data;
 	}
 
-	static async updateInvitationUserRole(token: string, role: string): Promise<Invitation> {
+	static async updateInvitationUserRole(req: UpdateRoleRequest): Promise<Invitation> {
 		return (
-			await axios.put(`${this.getUrl()}/invite?token=${token}`, {
-				role,
-			})
+			await axios.put(
+				`${this.getUrl(req.orgId as string, req.appId as string)}/invite?token=${req.token}`,
+				{
+					role: req.role,
+				},
+			)
 		).data;
 	}
-	static async deleteInvitation(token: string): Promise<Invitation> {
+	static async deleteInvitation(req: InvitationRequest): Promise<Invitation> {
 		return (
-			await axios.delete(`${this.getUrl()}/invite?token=${token}`, {
-				data: {},
-			})
+			await axios.delete(
+				`${this.getUrl(req.orgId as string, req.appId as string)}/invite?token=${req.token}`,
+				{
+					data: {},
+				},
+			)
 		).data;
 	}
 
-	static async deleteMultipleInvitations(tokens: string[] | undefined): Promise<Invitation[]> {
+	static async deleteMultipleInvitations(req: InvitationRequest): Promise<Invitation[]> {
 		return (
-			await axios.delete(`${this.getUrl()}/invite/multi`, {
+			await axios.delete(`${this.getUrl(req.orgId as string, req.appId as string)}/invite/multi`, {
 				data: {
-					tokens,
+					tokens: req.tokens,
 				},
 			})
 		).data;
 	}
 
-	static async getAllAppRoleDefinitions(): Promise<AppPermissions> {
-		return (
-			await axios.get(`v1/org/${useOrganizationStore.getState().organization?._id}/app/roles`)
-		).data;
+	static async getAllAppRoleDefinitions(orgId: string): Promise<AppPermissions> {
+		return (await axios.get(`v1/org/${orgId}/app/roles`)).data;
 	}
 
 	static async searchApps(query: string): Promise<Application[]> {

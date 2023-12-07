@@ -7,6 +7,7 @@ import { FormControl } from '../Form';
 import { useEffect } from 'react';
 import { ResourceType } from '@/types';
 import { cn } from '@/utils';
+import { useParams } from 'react-router-dom';
 interface ResourceSelectProps extends SelectProps {
 	error: boolean;
 	type: ResourceType;
@@ -15,6 +16,7 @@ interface ResourceSelectProps extends SelectProps {
 export default function ResourceSelect({ error, type, className, ...props }: ResourceSelectProps) {
 	const { t } = useTranslation();
 	const { resources, getResources } = useResourceStore();
+	const { orgId } = useParams() as Record<string, string>;
 	function getIcon(type: string): React.ReactNode {
 		const Icon = RESOURCE_ICON_MAP[type];
 		return <Icon className='w-6 h-6' />;
@@ -22,6 +24,7 @@ export default function ResourceSelect({ error, type, className, ...props }: Res
 
 	useEffect(() => {
 		getResources({
+			orgId,
 			type,
 		});
 	}, []);
