@@ -22,7 +22,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 const APIServerFormSchema = z.object({
-	minScale: z.coerce.number().positive().int().min(1).default(1),
+	minScale: z.coerce.number().int().min(0).default(1),
 	maxScale: z.coerce.number().positive().int().min(1).default(1),
 	scaleDownDelay: z.string().regex(API_SERVER_PARAM_REGEX, {
 		message:
@@ -120,13 +120,13 @@ export default function UpdateAPIServer() {
 							render={({ field }) => {
 								return (
 									<FormItem className='flex-1'>
-										<FormLabel>{t('version.replicas')}</FormLabel>
+										<FormLabel>{t('version.minReplicas')}</FormLabel>
 										<FormControl>
 											<Input
 												type='number'
 												error={!!form.formState.errors.minScale}
 												placeholder={t('forms.placeholder', {
-													label: t('version.replicas'),
+													label: t('version.minReplicas'),
 												}).toString()}
 												{...field}
 											/>
