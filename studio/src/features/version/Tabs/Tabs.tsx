@@ -41,7 +41,9 @@ export default function Tabs() {
 
 	useEffect(() => {
 		if (!scrollContainer.current) return;
-		scrollContainer.current.querySelector('[data-active]')?.scrollIntoView({ behavior: 'smooth' });
+		scrollContainer.current
+			.querySelector('[data-active]')
+			?.scrollIntoView({ behavior: 'smooth', inline: 'end' });
 	}, [tabs]);
 
 	useEffect(() => {
