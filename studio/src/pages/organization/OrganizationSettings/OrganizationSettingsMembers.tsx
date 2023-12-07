@@ -14,11 +14,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/Tabs';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../organization.scss';
+import { useParams } from 'react-router-dom';
 
 export default function OrganizationSettingsMembers() {
 	const { t } = useTranslation();
 	const { canClusterSendEmail } = useClusterStore();
 	const canInvite = useAuthorizeOrg('invite.create');
+	const { orgId, appId } = useParams() as Record<string, string>;
 	const {
 		inviteUsersToOrganization,
 		getOrganizationInvitations,
@@ -64,6 +66,8 @@ export default function OrganizationSettingsMembers() {
 		} else {
 			getOrganizationInvitations({
 				...getMemberRequest,
+				orgId,
+				appId,
 				status: 'Pending',
 			});
 		}
