@@ -7,7 +7,6 @@ import {
 import { STATE_LIST } from '@/constants/stateList';
 import { socket } from '@/helpers';
 import { useToast as toast } from '@/hooks';
-import { t } from '@/i18n/config.ts';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
@@ -16,6 +15,7 @@ import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { AppRoles, RealtimeData, ToastType } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
+import i18next from 'i18next';
 import _ from 'lodash';
 import * as prettier from 'prettier';
 import jsParser from 'prettier/plugins/babel';
@@ -36,7 +36,7 @@ export function removeLastSlash(str: string) {
 	return str.replace(/\/$/, '');
 }
 export function translate(key: string, options?: any) {
-	return String(t(key, options));
+	return String(i18next.t(key, options));
 }
 
 export function joinChannel(channel: string) {
@@ -115,8 +115,8 @@ export function capitalize(str: string) {
 export function notify(params: ToastType) {
 	return toast().notify(params);
 }
-export function arrayToQueryString(array: string[], key: string) {
-	return array.map((item) => `${key}=${item}`).join('&');
+export function arrayToQueryString(array: string[] | undefined, key: string) {
+	return array?.map((item) => `${key}=${item}`).join('&');
 }
 
 export async function copy(text: string) {

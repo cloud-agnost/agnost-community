@@ -9,12 +9,12 @@ import { getAppPermission, notify, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
-const canDelete = getAppPermission('invite.delete');
-const canResend = getAppPermission('invite.resend');
-const canUpdate = getAppPermission('invite.update');
 const { updateInvitationUserRole, resendInvitation, deleteInvitation } =
 	useApplicationStore.getState();
 
+function getPermission(type: string) {
+	return getAppPermission(`invite.${type}`);
+}
 function updateInvitationUserRoleHandler(token: string, role: string) {
 	const orgId = useOrganizationStore.getState().organization._id;
 	const appId = useApplicationStore.getState().application?._id as string;
@@ -133,7 +133,7 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 					role={role}
 					type={'app'}
 					onSelect={(newRole) => updateInvitationUserRoleHandler(token, newRole)}
-					disabled={!canUpdate}
+					disabled={!getPermission('update')}
 				/>
 			);
 		},
@@ -146,14 +146,14 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 			return (
 				<div className='flex items-center justify-end'>
 					<ResendButton
-						disabled={!canResend}
+						disabled={!getPermission('update')}
 						onResend={() => resendInvitationHandler(token, email)}
 					/>
 					<TableConfirmation
-						title={translate('organization.settings.members.invite.delete')}
-						description={translate('organization.settings.members.invite.deleteDesc')}
+						title={translate('application.invite_member.delete')}
+						description={translate('application.invite_member.deleteDesc')}
 						onConfirm={() => deleteInvitationHandler(token)}
-						hasPermission={canDelete}
+						hasPermission={getPermission('delete')}
 					/>
 				</div>
 			);

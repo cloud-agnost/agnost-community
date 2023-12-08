@@ -8,4 +8,5 @@ export abstract class RealtimeActions<T> {
 	abstract log(param: RealtimeActionParams<T>): void;
 	abstract deploy(param: RealtimeActionParams<T>): void;
 	abstract redeploy(param: RealtimeActionParams<T>): void;
+	abstract accept(param: RealtimeActionParams<T>): void;
 }

@@ -1,4 +1,5 @@
 import { RealtimeObjectTypes } from '@/types';
+import ApplicationTeam from './AppTeam';
 import Application from './Application';
 import Bucket from './Bucket';
 import Cache from './Cache';
@@ -9,7 +10,7 @@ import Field from './Field';
 import Function from './Function';
 import Middleware from './Middleware';
 import Model from './Model';
-import VersionProperties from './VersionProperties';
+import OrgMember from './OrgMember';
 import Organization from './Organization';
 import Queue from './Queue';
 import Resource from './Resources';
@@ -18,11 +19,13 @@ import Task from './Task';
 import Typings from './Typings';
 import User from './User';
 import Version from './Version';
+import VersionProperties from './VersionProperties';
 export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 	const keys = {
 		user: User,
 		org: Organization,
 		'org.app': Application,
+		'org.app.team': ApplicationTeam,
 		'org.resource': Resource,
 		app: Application,
 		resource: Resource,
@@ -48,6 +51,7 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		// TODO: "org.resource.log"
 		'org.app.version.typings': Typings,
 		'org.app.version.middleware': Middleware,
+		'org.member': OrgMember,
 	};
 	return new keys[type]();
 }

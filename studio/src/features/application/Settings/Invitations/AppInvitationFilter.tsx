@@ -1,9 +1,9 @@
 import { Button } from '@/components/Button';
-import { INVITATIONS_SORT_OPTIONS, PAGE_SIZE } from '@/constants';
+import { INVITATIONS_SORT_OPTIONS } from '@/constants';
 import { useToast } from '@/hooks';
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
-import { Invitation } from '@/types';
+import { Invitation, SortOption } from '@/types';
 import { FunnelSimple } from '@phosphor-icons/react';
 import { Table } from '@tanstack/react-table';
 import {
@@ -15,7 +15,7 @@ import {
 import { RoleDropdown } from 'components/RoleDropdown';
 import { SearchInput } from 'components/SearchInput';
 import { SelectedRowButton } from 'components/Table';
-import { useCallback, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 interface Props {
@@ -24,18 +24,10 @@ interface Props {
 function AppInvitationFilter({ table }: Props) {
 	const { notify } = useToast();
 	const { t } = useTranslation();
-	const [searchParams] = useSearchParams();
-	const canMultiDeleteInvite = useAuthorizeApp('invitation.delete');
+	const [searchParams, setSearchParams] = useSearchParams();
+	const canMultiDeleteInvite = useAuthorizeApp('invite.delete');
+	const { deleteMultipleInvitations, application } = useApplicationStore();
 	const { orgId } = useParams() as Record<string, string>;
-	const {
-		invitationRoleFilter,
-		invitationSearch,
-		invitationSort,
-		invitationPage,
-		getAppInvitations,
-		deleteMultipleInvitations,
-		application,
-	} = useApplicationStore();
 
 	function deleteInvitations() {
 		const selectedRows = table.getSelectedRowModel().rows;
@@ -63,62 +55,51 @@ function AppInvitationFilter({ table }: Props) {
 		}
 	}
 
-	const getInvitations = useCallback(() => {
-		getAppInvitations({
-			size: PAGE_SIZE,
-			page: invitationPage,
-			roles: invitationRoleFilter || [],
-			sortBy: invitationSort.value,
-			sortDir: invitationSort.sortDir,
-			email: invitationSearch,
-			status: 'Pending',
-			orgId,
-			appId: application?._id as string,
-		});
-	}, [invitationRoleFilter, invitationSearch, invitationSort, invitationPage]);
+	const selectedSort = useMemo(() => {
+		return (
+			INVITATIONS_SORT_OPTIONS.find((sort) => sort.value === searchParams.get('s')) ??
+			INVITATIONS_SORT_OPTIONS[0]
+		);
+	}, [searchParams]);
 
-	useEffect(() => {
-		if (searchParams.get('t') === 'invitations') {
-			getInvitations();
+	function setMemberRoleFilter(roles: string[]) {
+		searchParams.set('r', roles.join(','));
+		setSearchParams(searchParams);
+	}
+
+	function setMemberSort(sort: SortOption) {
+		if (sort.sortDir && sort.value) {
+			searchParams.set('s', sort.value);
+			searchParams.set('d', sort.sortDir);
+		} else {
+			searchParams.delete('s');
+			searchParams.delete('d');
 		}
-	}, [getInvitations]);
+		setSearchParams(searchParams);
+	}
 
 	return (
 		<div className='flex gap-4'>
-			<SearchInput
-				value={invitationSearch}
-				className='flex-1'
-				onSearch={(val) =>
-					useApplicationStore.setState?.({ invitationSearch: val, invitationPage: 0 })
-				}
-			/>
-			<RoleDropdown
-				value={invitationRoleFilter || []}
-				type='app'
-				onChange={(roles) => useApplicationStore.setState?.({ invitationRoleFilter: roles })}
-			/>
+			<SearchInput className='flex-1' urlKey='e' />
+			<RoleDropdown type='app' onChange={setMemberRoleFilter} />
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button variant='outline'>
 						<FunnelSimple size={16} className='members-filter-icon' />
-						{invitationSort.name}
+						{selectedSort?.name}
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className='w-56'>
 					{INVITATIONS_SORT_OPTIONS.map((sort) => (
 						<DropdownMenuCheckboxItem
 							key={sort.name}
-							checked={invitationSort.name === sort.name}
+							checked={selectedSort?.name === sort.name}
 							onCheckedChange={(checked) => {
-								if (checked) useApplicationStore.setState?.({ invitationSort: sort });
-								else
-									useApplicationStore.setState?.({
-										invitationSort: {
-											name: t('general.sortOptions.default'),
-											value: '',
-											sortDir: '',
-										},
-									});
+								if (checked) {
+									setMemberSort(sort);
+								} else {
+									setMemberSort(INVITATIONS_SORT_OPTIONS[0]);
+								}
 							}}
 						>
 							{sort.name}

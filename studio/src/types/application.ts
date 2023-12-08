@@ -17,7 +17,7 @@ export interface Application {
 	ownerUserId: string;
 	name: string;
 	color: string;
-	team: Team[];
+	team: AppTeam[];
 	createdBy: string;
 	createdAt: string;
 	updatedAt: string;
@@ -25,7 +25,7 @@ export interface Application {
 	role: AppRoles;
 }
 
-export interface Team {
+export interface AppTeam {
 	userId: TeamMember;
 	role: string;
 	_id: string;
@@ -37,6 +37,10 @@ type TeamMember = {
 	name: string;
 	color: string;
 	pictureUrl: string;
+	contactEmail: string;
+	iid: string;
+	isAppOwner: boolean;
+	loginEmail: string;
 };
 
 export interface CreateApplicationRequest extends BaseRequest {
@@ -86,16 +90,7 @@ export interface ApplicationMember {
 	appId: string;
 	role: string;
 	joinDate: string;
-	member: {
-		color: string;
-		contactEmail: string;
-		iid: string;
-		isAppOwner: boolean;
-		loginEmail: string;
-		name: string;
-		_id: string;
-		pictureUrl: string;
-	};
+	member: TeamMember;
 }
 export interface TeamOption {
 	readonly value: ApplicationMember;

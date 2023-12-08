@@ -3,6 +3,9 @@ import useTabStore from '@/store/version/tabStore';
 import { Cache as CacheType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Cache extends RealtimeActions<CacheType> {
+	accept(): void {
+		throw new Error('Method not implemented.');
+	}
 	delete({ identifiers }: RealtimeActionParams<CacheType>): void {
 		const { removeTabByPath } = useTabStore.getState();
 		useCacheStore.setState?.({

@@ -9,6 +9,9 @@ class Environment extends RealtimeActions<EnvType> {
 	deploy(param: RealtimeActionParams<EnvType>): void {
 		this.update(param);
 	}
+	accept(): void {
+		throw new Error('Method not implemented.');
+	}
 	delete(param: RealtimeActionParams<EnvType>): void {
 		useEnvironmentStore.setState?.({
 			environments: useEnvironmentStore

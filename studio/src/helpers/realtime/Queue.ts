@@ -3,6 +3,9 @@ import useTabStore from '@/store/version/tabStore';
 import { LogTypes, MessageQueue, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Queue extends RealtimeActions<MessageQueue> {
+	accept(): void {
+		throw new Error('Method not implemented.');
+	}
 	redeploy(): void {
 		throw new Error('Method not implemented.');
 	}

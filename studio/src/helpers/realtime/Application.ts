@@ -1,11 +1,16 @@
 import useApplicationStore from '@/store/app/applicationStore';
+import useAuthStore from '@/store/auth/authStore';
 import {
+	AppRoles,
 	Application as ApplicationType,
 	CreateApplicationResponse,
 	RealtimeActionParams,
 } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Application extends RealtimeActions<ApplicationType | CreateApplicationResponse> {
+	accept(param: RealtimeActionParams<ApplicationType>): void {
+		this.update(param);
+	}
 	redeploy(): void {
 		throw new Error('Method not implemented.');
 	}
@@ -24,14 +29,28 @@ class Application extends RealtimeActions<ApplicationType | CreateApplicationRes
 	}
 
 	update({ data }: RealtimeActionParams<ApplicationType>) {
+		const user = useAuthStore.getState()?.user;
+		const role = data.team.find((team) => team.userId._id === user?._id)?.role;
 		useApplicationStore.setState?.({
-			application: data,
+			application: {
+				...data,
+				role: role as AppRoles,
+			},
 			applications: useApplicationStore.getState?.().applications.map((app) => {
 				if (app._id === data._id) {
-					return data;
+					return {
+						...data,
+						role: role as AppRoles,
+					};
 				}
 				return app;
 			}),
+
+			applicationTeam: data.team.map((member) => ({
+				...member,
+				appId: data._id,
+				member: member.userId,
+			})),
 		});
 	}
 	create({ data }: RealtimeActionParams<CreateApplicationResponse>) {

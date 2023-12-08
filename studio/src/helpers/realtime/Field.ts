@@ -4,6 +4,9 @@ import useVersionStore from '@/store/version/versionStore';
 import { Model, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Field extends RealtimeActions<Model> {
+	accept(): void {
+		throw new Error('Method not implemented.');
+	}
 	delete({ identifiers, data }: RealtimeActionParams<Model>): void {
 		useModelStore.setState?.({
 			model: data,

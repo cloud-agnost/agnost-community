@@ -8,7 +8,49 @@ import { getOrgPermission, notify, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
-const canDelete = getOrgPermission('invite.delete');
+function onDelete(token: string) {
+	useOrganizationStore.getState().deleteInvitation({
+		token,
+		onSuccess: () => {
+			notify({
+				title: 'Invitation deleted',
+				description: 'Invitation has been deleted.',
+				type: 'success',
+			});
+		},
+		onError: ({ error, details }) => {
+			notify({
+				title: error,
+				description: details,
+				type: 'error',
+			});
+		},
+	});
+}
+
+function onResend(token: string) {
+	useOrganizationStore.getState?.().resendInvitation({
+		token,
+		onSuccess: () => {
+			notify({
+				title: 'Invitation resent',
+				description: 'Invitation has been resent to the user.',
+				type: 'success',
+			});
+		},
+		onError: ({ error, details }) => {
+			notify({
+				title: error,
+				description: details,
+				type: 'error',
+			});
+		},
+	});
+}
+
+function canDelete() {
+	return getOrgPermission('invite.delete');
+}
 
 export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 	{
@@ -72,53 +114,14 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 		size: 45,
 		cell: ({ row }) => {
 			const { token } = row.original;
-			function onDelete() {
-				useOrganizationStore.getState().deleteInvitation({
-					token,
-					onSuccess: () => {
-						notify({
-							title: 'Invitation deleted',
-							description: 'Invitation has been deleted.',
-							type: 'success',
-						});
-					},
-					onError: ({ error, details }) => {
-						notify({
-							title: error,
-							description: details,
-							type: 'error',
-						});
-					},
-				});
-			}
 			return (
 				<div className='flex items-center justify-end'>
-					<ResendButton
-						onResend={() => {
-							useOrganizationStore.getState?.().resendInvitation({
-								token,
-								onSuccess: () => {
-									notify({
-										title: 'Invitation resent',
-										description: 'Invitation has been resent to the user.',
-										type: 'success',
-									});
-								},
-								onError: ({ error, details }) => {
-									notify({
-										title: error,
-										description: details,
-										type: 'error',
-									});
-								},
-							});
-						}}
-					/>
+					<ResendButton onResend={() => onResend(token)} />
 					<TableConfirmation
 						title={translate('organization.settings.members.invite.delete')}
 						description={translate('organization.settings.members.invite.deleteDesc')}
-						onConfirm={onDelete}
-						hasPermission={canDelete}
+						onConfirm={() => onDelete(token)}
+						hasPermission={canDelete()}
 					/>
 				</div>
 			);

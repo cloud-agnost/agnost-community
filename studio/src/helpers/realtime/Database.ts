@@ -5,6 +5,9 @@ import { Database as DatabaseType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
 class Database extends RealtimeActions<DatabaseType> {
+	accept(): void {
+		throw new Error('Method not implemented.');
+	}
 	delete({ identifiers }: RealtimeActionParams<DatabaseType>): void {
 		const { removeTabByPath } = useTabStore.getState();
 		useDatabaseStore.setState?.({

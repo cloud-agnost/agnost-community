@@ -101,22 +101,13 @@ export default class OrganizationService {
 	}
 
 	static async getOrganizationInvitations(req: GetInvitationRequest): Promise<Invitation[]> {
-		const { page, size, status, email, roles, start, end, sortBy, sortDir } = req;
-		const role = arrayToQueryString(roles, 'role');
+		const { roles, ...params } = req;
+		const role = arrayToQueryString(roles ?? [], 'role');
 		return (
 			await axios.get(
 				`${this.url}/${useOrganizationStore.getState().organization?._id}/invite?${role}`,
 				{
-					params: {
-						page,
-						size,
-						sortBy,
-						sortDir,
-						status,
-						email,
-						start,
-						end,
-					},
+					params: params,
 				},
 			)
 		).data;
