@@ -45,13 +45,16 @@ if (cluster.isPrimary) {
 } else if (cluster.isWorker) {
 	logger.info(`Child process ${process.pid} is running`);
 
-	// Listen for heartbeat messages from the parent process
-	process.on("message", (message) => {
-		if (message === "heartbeat") {
-			// Respond back to the parent process to indicate responsiveness
-			process.send("heartbeat");
-		}
-	});
+	// In production environment we do not need to check for heartbeat, kubernetes will restart the process if it is unresponsive
+	if (process.env.NODE_ENV === "development") {
+		// Listen for heartbeat messages from the parent process
+		process.on("message", (message) => {
+			if (message === "heartbeat") {
+				// Respond back to the parent process to indicate responsiveness
+				process.send("heartbeat");
+			}
+		});
+	}
 
 	// Init globally accessible variables
 	initGlobals();
@@ -68,16 +71,12 @@ if (cluster.isPrimary) {
 	await manager.initializeCore();
 	childManager = manager;
 
-	// In production environment we do not need to check for heartbeat, kubernetes will restart the process if it is unresponsive
-	if (process.env.NODE_ENV === "development") {
-		// Listen for child process update messages (not restart but update)
-		process.on("message", (message) => {
-			if (message === "restart") {
-				logger.info(`Child process update started`);
-				childManager.restartCore();
-			}
-		});
-	}
+	// Listen for child process update messages (not restart but update)
+	process.on("message", (message) => {
+		if (message === "restart") {
+			childManager.restartCore();
+		}
+	});
 
 	// Connect to synchronization server
 	initializeSyncClient();
