@@ -15,7 +15,6 @@ export class RabbitMQ extends QueueBase {
 
 	async disconnect() {
 		try {
-			await this.closeChannels();
 			await this.driver.close();
 		} catch (err) {}
 	}
@@ -92,7 +91,6 @@ export class RabbitMQ extends QueueBase {
 			const channel = await this.driver.createChannel();
 			console.log("****sendMessage2");
 
-			this.addChannel(channel);
 			channel.on("error", (err) => {
 				console.error("RabbitMQ channel error to send messages:", queue, err);
 			});
