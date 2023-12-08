@@ -12,9 +12,7 @@ import AppInvitations from '@/features/application/Settings/Invitations/AppInvit
 export default function EditApplication() {
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { isEditAppOpen, closeEditAppDrawer, getAppTeamMembers, application } =
-		useApplicationStore();
-	const { orgId } = useParams() as Record<string, string>;
+	const { isEditAppOpen, closeEditAppDrawer } = useApplicationStore();
 	const match = useMatch('/organization/:orgId/apps');
 
 	useEffect(() => {
@@ -25,12 +23,7 @@ export default function EditApplication() {
 	}, [isEditAppOpen, searchParams]);
 
 	useEffect(() => {
-		if (isEditAppOpen) {
-			getAppTeamMembers({
-				appId: application?._id as string,
-				orgId,
-			});
-		} else {
+		if (!isEditAppOpen) {
 			searchParams.delete('t');
 			setSearchParams(searchParams);
 		}
