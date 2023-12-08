@@ -32,7 +32,7 @@ export interface DeleteMultipleQueuesParams extends BaseParams, BaseRequest {
 export const MessageQueueSchema = z.object({
 	name: NameSchema,
 	delay: z.coerce.number().int().positive().optional().nullish(),
-	logExecution: z.boolean().default(false),
+	logExecution: z.boolean().default(true),
 });
 export const CreateMessageQueueSchema = MessageQueueSchema.extend({
 	resourceId: z.string({

@@ -10,10 +10,9 @@ import { Form } from '@/components/Form';
 import { z } from 'zod';
 import { useEffect } from 'react';
 
-export default function Time({ cell, row, field }: NavigatorComponentProps) {
+export default function Time({ cell, value, id, index, field }: NavigatorComponentProps) {
 	const { setEditedField } = useNavigatorStore();
-	const data = row?.original;
-	const updateData = useUpdateData(field);
+	const updateData = useUpdateData(field.name);
 	const isEditable = useEditedField(field, cell);
 	const DateSchema = z.object({
 		[field.name]: z.string().optional(),
@@ -22,15 +21,15 @@ export default function Time({ cell, row, field }: NavigatorComponentProps) {
 	const form = useForm({
 		resolver: zodResolver(DateSchema),
 		defaultValues: {
-			[field.name]: data[field.name],
+			[field.name]: value,
 		},
 	});
 	const onSubmit = async (d: z.infer<typeof DateSchema>) => {
-		updateData(d, data.id, row?.index as number);
+		updateData(d, id, index);
 	};
 	useEffect(() => {
 		if (isEditable) {
-			form.setValue(field.name, data[field.name]);
+			form.setValue(field.name, value);
 		}
 	}, [isEditable]);
 
@@ -63,6 +62,6 @@ export default function Time({ cell, row, field }: NavigatorComponentProps) {
 			</form>
 		</Form>
 	) : (
-		<time className='text-sm text-default leading-[21px]'>{data[field.name]}</time>
+		<time className='text-sm text-default leading-[21px]'>{value}</time>
 	);
 }

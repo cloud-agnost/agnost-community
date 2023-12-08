@@ -1,5 +1,5 @@
 {
-	"empty_text": "You have not defined any cron jobs for this app version",
+	"empty_text": "You do not have any cron jobs for this app version",
 	"add": "Create Job",
 	"title": "Cron Jobs",
 	"schedule": "Schedule",

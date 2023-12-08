@@ -37,16 +37,21 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
-			taskId: task._id as string,
+			taskId: task._id,
 			resourceId: resources[0]._id,
 			...data,
 			onSuccess: () => {
-				onClose();
+				handleClose();
 			},
 			onError: ({ error, details }) => {
 				notify({ type: 'error', description: details, title: error });
 			},
 		});
+	}
+
+	function handleClose() {
+		onClose();
+		form.reset();
 	}
 
 	useEffect(() => {
@@ -55,12 +60,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 		}
 	}, [task]);
 	return (
-		<Drawer
-			open={open}
-			onOpenChange={() => {
-				onClose();
-			}}
-		>
+		<Drawer open={open} onOpenChange={handleClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>

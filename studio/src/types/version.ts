@@ -230,6 +230,7 @@ export interface GetVersionNotificationParams extends BaseGetRequest {
 export interface GetVersionRequest extends BaseGetRequest {
 	name?: string;
 	appId: string;
+	orgId: string;
 }
 
 export enum TabTypes {

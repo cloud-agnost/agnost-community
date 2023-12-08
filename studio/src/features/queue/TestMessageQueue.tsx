@@ -24,7 +24,7 @@ interface TestMessageQueueProps {
 	onClose: () => void;
 }
 export const TestMessageQueueSchema = z.object({
-	payload: z.string().optional().nullable().default(null),
+	payload: z.any().optional().default(null),
 });
 export default function TestMessageQueue({ open, onClose }: TestMessageQueueProps) {
 	const { t } = useTranslation();
@@ -74,6 +74,11 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 		if (debugChannel) leaveChannel(debugChannel);
 		onClose();
 	}
+
+	function stringifyIfObject(value: any) {
+		if (typeof value === 'object') return JSON.stringify(value, null, 2);
+		return value;
+	}
 	return (
 		<Drawer open={open} onOpenChange={handleClose}>
 			<DrawerContent
@@ -116,7 +121,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 												<CodeEditor
 													className='min-h-[100px] h-full'
 													containerClassName='h-full'
-													value={field.value}
+													value={stringifyIfObject(field.value)}
 													onChange={field.onChange}
 													name='testQueuePayload'
 													defaultLanguage='json'

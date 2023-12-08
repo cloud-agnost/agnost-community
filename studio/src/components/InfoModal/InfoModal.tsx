@@ -24,6 +24,7 @@ interface InfoModalProps {
 	onConfirm: () => void;
 	action?: ReactNode;
 	icon?: any;
+	loading?: boolean;
 }
 export default function InfoModal({
 	closeModal,
@@ -34,6 +35,7 @@ export default function InfoModal({
 	onConfirm,
 	action,
 	icon,
+	loading,
 }: InfoModalProps) {
 	const { t } = useTranslation();
 	const Icon = (icon ?? Warning) as ElementType;
@@ -53,7 +55,7 @@ export default function InfoModal({
 						{t('general.cancel')}
 					</DialogClose>
 					{action}
-					<Button onClick={onConfirm} size='lg'>
+					<Button onClick={onConfirm} size='lg' loading={loading}>
 						{t('general.ok')}
 					</Button>
 				</DialogFooter>

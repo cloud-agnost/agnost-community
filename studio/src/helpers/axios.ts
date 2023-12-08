@@ -1,7 +1,9 @@
+import { ERROR_CODES_TO_REDIRECT_LOGIN_PAGE } from '@/constants';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { APIError } from '@/types';
-import { toDisplayName } from '@/utils';
+import { history, toDisplayName } from '@/utils';
 import axios from 'axios';
+import { resetAllStores } from '.';
 const baseURL = `${window.location.protocol}//${window.location.hostname}`;
 
 const headers = {
@@ -40,19 +42,10 @@ instance.interceptors.response.use(
 			...err,
 			details: err.fields?.[0]?.msg ?? err.details,
 		};
-		// if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
-		// 	useAuthStore.getState().logout({
-		// 		onSuccess: () => {
-		// 			resetAllStores();
-		// 		},
-		// 	});
-		// }
-		// if (error.response.status === 401) {
-		// 	window.location.href = '/401';
-		// }
-		// if (error.response.status === 404) {
-		// 	window.location.href = '/404';
-		// }
+		if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
+			resetAllStores();
+			history.navigate?.('/login');
+		}
 
 		return Promise.reject(apiError);
 	},

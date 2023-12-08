@@ -91,10 +91,10 @@ export default function VersionTabLayout<T>({
 		});
 	}, [search]);
 	return (
-		<div className={cn('h-full space-y-4 relative ', className)}>
+		<div className={cn('h-full space-y-6 relative ', className)}>
 			{breadCrumb}
 			<div className='flex items-center justify-between'>
-				<h1 className='text-default text-2xl text-center'>{title}</h1>
+				<h1 className='text-default text-xl text-center'>{title}</h1>
 				<div className='flex items-center justify-center gap-4'>
 					{searchable && (
 						<SearchInput

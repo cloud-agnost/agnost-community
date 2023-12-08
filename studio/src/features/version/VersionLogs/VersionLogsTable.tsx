@@ -45,7 +45,7 @@ export default function VersionLogsTable({ date, type }: VersionLogsTableProps) 
 			hasMore={hasNextPage}
 			loader={isPending && <TableLoading />}
 		>
-			<DataTable table={table} />
+			<DataTable table={table} className='table-fixed' />
 		</InfiniteScroll>
 	);
 }

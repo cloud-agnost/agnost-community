@@ -8,12 +8,11 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-export default function Enum({ cell, row, field: dbField }: NavigatorComponentProps) {
-	const updateData = useUpdateData(dbField);
+export default function Enum({ cell, value, id, index, field: dbField }: NavigatorComponentProps) {
+	const updateData = useUpdateData(dbField.name);
 	const { t } = useTranslation();
 	const { setEditedField } = useNavigatorStore();
 	const isEditable = useEditedField(dbField, cell);
-	const data = row?.original;
 	const EnumSchema = z.object({
 		[dbField.name]: z
 			.string()
@@ -25,7 +24,7 @@ export default function Enum({ cell, row, field: dbField }: NavigatorComponentPr
 	const form = useForm<z.infer<typeof EnumSchema>>({
 		resolver: zodResolver(EnumSchema),
 		defaultValues: {
-			[dbField.name]: data[dbField.name],
+			[dbField.name]: value,
 		},
 	});
 
@@ -34,14 +33,14 @@ export default function Enum({ cell, row, field: dbField }: NavigatorComponentPr
 			{
 				[dbField.name]: d[dbField.name],
 			},
-			data.id,
-			row?.index as number,
+			id,
+			index,
 		);
 	}
 
 	useEffect(() => {
 		if (isEditable) {
-			form.setValue(dbField.name, data[dbField.name]);
+			form.setValue(dbField.name, value);
 		}
 	}, [isEditable]);
 	return isEditable ? (
@@ -89,6 +88,6 @@ export default function Enum({ cell, row, field: dbField }: NavigatorComponentPr
 			</form>
 		</Form>
 	) : (
-		<div className='truncate'>{data[dbField.name]}</div>
+		<div className='truncate'>{value}</div>
 	);
 }

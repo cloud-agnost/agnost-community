@@ -29,6 +29,7 @@ import useVersionStore from '@/store/version/versionStore';
 import { joinChannel, leaveChannel } from '@/utils';
 import OrganizationService from 'services/OrganizationService.ts';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
+import useOrganizationStore from '../organization/organizationStore';
 
 interface ApplicationState {
 	application: Application | null;
@@ -300,7 +301,9 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			openVersionDrawer: async (application: Application) => {
 				get().selectApplication(application);
 				const { getAllVersionsVisibleToUser, selectVersion } = useVersionStore.getState();
+				const { organization } = useOrganizationStore.getState();
 				const versions = await getAllVersionsVisibleToUser({
+					orgId: organization._id,
 					appId: application._id,
 					page: 0,
 					size: PAGE_SIZE,

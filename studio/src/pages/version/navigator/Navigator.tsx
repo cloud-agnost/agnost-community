@@ -2,6 +2,8 @@ import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
 import { Button } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { TableLoading } from '@/components/Table/Table';
+import { Refresh } from '@/components/icons';
+import { SelectModel } from '@/features/database';
 import {
 	useInfiniteScroll,
 	useNavigatorColumns,
@@ -13,18 +15,20 @@ import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
+import { APIError } from '@/types';
 import { cn, isEmpty } from '@/utils';
-import { Table as TableIcon } from '@phosphor-icons/react';
+import { useMutation } from '@tanstack/react-query';
 import { DataTable } from 'components/DataTable';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams, useSearchParams } from 'react-router-dom';
+import BeatLoader from 'react-spinners/BeatLoader';
 
 export default function Navigator() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const {
 		setEditedField,
 		getDataFromModel,
@@ -35,16 +39,12 @@ export default function Navigator() {
 		lastFetchedPage,
 	} = useNavigatorStore();
 	const database = useDatabaseStore((state) => state.database);
-	const { model, setModel, models, subModel, resetNestedModels, getModelsTitle } = useModelStore();
+	const { model, subModel, getModelsTitle } = useModelStore();
 	const title = getModelsTitle();
 	const canMultiDelete = true;
 	const hasSubModel = !isEmpty(subModel);
 	const columns = useNavigatorColumns(hasSubModel ? subModel.fields : model?.fields);
-	const { orgId, appId, versionId } = useParams<{
-		orgId: string;
-		appId: string;
-		versionId: string;
-	}>();
+	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 
 	const table = useTable({
 		columns,
@@ -53,16 +53,19 @@ export default function Navigator() {
 
 	const dbUrl = `/organization/${orgId}/apps/${appId}/version/${versionId}/database`;
 
+	const { mutateAsync: deleteMultipleMutate } = useMutation({
+		mutationFn: deleteMultipleDataFromModel,
+		mutationKey: ['deleteMultipleDataFromModel'],
+		onSuccess: () => table.resetRowSelection(),
+		onError: ({ error, details }: APIError) => {
+			notify({ type: 'error', description: details, title: error });
+		},
+	});
+
 	async function deleteHandler() {
 		const ids = table?.getSelectedRowModel().rows.map((row) => row.original.id);
-		await deleteMultipleDataFromModel({
+		deleteMultipleMutate({
 			ids,
-			onSuccess: () => {
-				table?.toggleAllRowsSelected(false);
-			},
-			onError: ({ error, details }) => {
-				notify({ type: 'error', description: details, title: error });
-			},
 		});
 	}
 
@@ -89,6 +92,7 @@ export default function Navigator() {
 			queryKey: 'getDataFromModel',
 			lastFetchedPage,
 			dataLength: data.length,
+			disableVersionParams: true,
 			params: {
 				id: searchParams.get('ref') as string,
 			},
@@ -116,41 +120,23 @@ export default function Navigator() {
 			table={table}
 			disabled={!canMultiDelete}
 			onMultipleDelete={deleteHandler}
-			loading={isFetching && !data.length}
+			loading={false}
 			className='!overflow-hidden'
 			breadCrumb={<BreadCrumb goBackLink={`${dbUrl}/models`} items={breadcrumbItems} />}
+			handlerButton={
+				<Button variant='secondary' onClick={() => refetch()} iconOnly>
+					<Refresh className={cn('mr-2')} />
+					{t('general.refresh')}
+				</Button>
+			}
 		>
 			<div className='flex gap-4 justify-center h-[88%]'>
-				<div className=' bg-subtle p-4 rounded-lg w-1/6 space-y-4'>
-					<h2 className='text-default text-2xl font-sfCompact'>
-						{t('database.models.title')}
-						<span className='text-subtle font-sfCompact'> ({models.length})</span>
-					</h2>
-
-					<div>
-						{models.map((md) => (
-							<div key={md._id}>
-								<Button
-									className={cn(
-										'text-default text-base p-2 font-normal',
-										model._id === md._id && 'font-bold bg-wrapper-background-hover',
-									)}
-									variant='blank'
-									onClick={() => {
-										setModel(md);
-										resetNestedModels();
-										searchParams.delete('ref');
-										setSearchParams(searchParams);
-									}}
-								>
-									<TableIcon className='w-6 h-6 inline-block mr-2' />
-									{md.name}
-								</Button>
-							</div>
-						))}
+				<SelectModel />
+				{isFetching ? (
+					<div className='flex-1 flex items-center justify-center'>
+						<BeatLoader color='#6884FD' size={24} margin={18} />
 					</div>
-				</div>
-				{data.length > 0 ? (
+				) : data.length > 0 ? (
 					<div className='w-5/6 h-full table-container overflow-auto' id='scroll'>
 						<InfiniteScroll
 							hasMore={hasNextPage}
@@ -164,6 +150,7 @@ export default function Navigator() {
 								table={table}
 								className='table-fixed w-full relative'
 								headerClassName='sticky top-0 z-50'
+								containerClassName='!border-none'
 								onCellClick={(cell) => {
 									if (editedField !== cell.id) setEditedField(cell.id);
 								}}

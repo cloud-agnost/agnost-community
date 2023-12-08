@@ -8,10 +8,9 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import * as z from 'zod';
-export default function LinkField({ cell, row, field }: NavigatorComponentProps) {
+export default function LinkField({ cell, value, id, index, field }: NavigatorComponentProps) {
 	const { setEditedField } = useNavigatorStore();
-	const data = row?.original;
-	const updateData = useUpdateData(field);
+	const updateData = useUpdateData(field.name);
 	const isEditable = useEditedField(field, cell);
 	const LinkSchema = z.object({
 		[field.name]: z.string().optional(),
@@ -19,7 +18,7 @@ export default function LinkField({ cell, row, field }: NavigatorComponentProps)
 	const form = useForm<z.infer<typeof LinkSchema>>({
 		resolver: zodResolver(LinkSchema),
 		defaultValues: {
-			[field.name]: data[field.name],
+			[field.name]: value,
 		},
 	});
 
@@ -28,14 +27,14 @@ export default function LinkField({ cell, row, field }: NavigatorComponentProps)
 			{
 				[field.name]: d[field.name],
 			},
-			data.id,
-			row?.index as number,
+			id,
+			index,
 		);
 	}
 
 	useEffect(() => {
 		if (isEditable) {
-			form.setValue(field.name, data[field.name]);
+			form.setValue(field.name, value);
 		}
 	}, [isEditable]);
 	return isEditable ? (
@@ -63,13 +62,8 @@ export default function LinkField({ cell, row, field }: NavigatorComponentProps)
 			</form>
 		</Form>
 	) : (
-		<Link
-			to={data[field.name]}
-			className='link truncate block'
-			target='_blank'
-			rel='noopener noreferrer'
-		>
-			{data[field.name]}
+		<Link to={value} className='link truncate block' target='_blank' rel='noopener noreferrer'>
+			{value}
 		</Link>
 	);
 }

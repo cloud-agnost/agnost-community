@@ -8,6 +8,7 @@ import { addLibsToEditor, cn, getTabIdFromUrl, isEmpty } from '@/utils';
 import { EditorProps } from '@monaco-editor/react';
 import { useEffect } from 'react';
 import Loadable from '@loadable/component';
+import BeatLoader from 'react-spinners/BeatLoader';
 
 const MonacoEditor = Loadable(() => import('@monaco-editor/react'));
 
@@ -72,6 +73,7 @@ export default function CodeEditor({
 				defaultLanguage={defaultLanguage}
 				language={defaultLanguage}
 				path={`file:///src/${name}.js`}
+				loading={<BeatLoader color='#6884FD' size={24} margin={18} />}
 				options={{
 					value,
 					readOnly: readonly,

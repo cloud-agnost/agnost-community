@@ -1,5 +1,5 @@
 {
-	"empty_text": "You have not defined any caches for this app version",
+	"empty_text": "You do not have any caches for this app version",
 	"create": "Create Cache",
 	"title": "Caches",
 	"assignUniqueName": "Assign Unique Name",

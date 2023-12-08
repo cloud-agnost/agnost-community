@@ -7,10 +7,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-export default function Json({ cell, row, field }: NavigatorComponentProps) {
+export default function Json({ cell, value, id, index, field }: NavigatorComponentProps) {
 	const { setEditedField } = useNavigatorStore();
-	const updateData = useUpdateData(field);
-	const data = row?.original;
+	const updateData = useUpdateData(field.name);
 	const isEditable = useEditedField(field, cell);
 	const JSONSchema = z.object({
 		[field.name]: z.string().optional(),
@@ -19,7 +18,7 @@ export default function Json({ cell, row, field }: NavigatorComponentProps) {
 	const form = useForm<z.infer<typeof JSONSchema>>({
 		resolver: zodResolver(JSONSchema),
 		defaultValues: {
-			[field.name]: JSON.stringify(data[field.name]),
+			[field.name]: JSON.stringify(value),
 		},
 	});
 
@@ -28,13 +27,13 @@ export default function Json({ cell, row, field }: NavigatorComponentProps) {
 			{
 				[field.name]: JSON.parse(d[field.name]?.toString() ?? ''),
 			},
-			data.id,
-			row?.index as number,
+			id,
+			index,
 		);
 	}
 	useEffect(() => {
 		if (isEditable) {
-			form.setValue(field.name, JSON.stringify(data[field.name]));
+			form.setValue(field.name, JSON.stringify(value));
 		}
 	}, [isEditable]);
 	return isEditable ? (
@@ -62,6 +61,6 @@ export default function Json({ cell, row, field }: NavigatorComponentProps) {
 			</form>
 		</Form>
 	) : (
-		<pre>{JSON.stringify(data[field.name])}</pre>
+		<pre>{JSON.stringify(value)}</pre>
 	);
 }

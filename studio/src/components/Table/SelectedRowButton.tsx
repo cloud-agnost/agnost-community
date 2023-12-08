@@ -1,7 +1,8 @@
+import { Button } from '@/components/Button';
 import { cn } from '@/utils';
 import { Minus, Trash } from '@phosphor-icons/react';
+import { useIsMutating } from '@tanstack/react-query';
 import { Table } from '@tanstack/react-table';
-import { Button } from '@/components/Button';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InfoModal } from '../InfoModal';
@@ -14,6 +15,7 @@ interface Props<T> {
 function SelectedRowButton<T>({ onDelete, table, className, disabled }: Props<T>) {
 	const { t } = useTranslation();
 	const [openInfoModal, setOpenInfoModal] = useState(false);
+	const isMutating = useIsMutating();
 
 	return (
 		<>
@@ -47,6 +49,7 @@ function SelectedRowButton<T>({ onDelete, table, className, disabled }: Props<T>
 				title={t('general.multiDelete')}
 				description={t('general.deleteDescription')}
 				onConfirm={onDelete}
+				loading={!!isMutating}
 			/>
 		</>
 	);

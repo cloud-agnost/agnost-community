@@ -10,16 +10,15 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
-export default function GeoPoint({ cell, row, field }: NavigatorComponentProps) {
+export default function GeoPoint({ cell, value, id, index, field }: NavigatorComponentProps) {
 	const name = field.name;
-	const data = row?.original;
-	const id = data?.id;
-	const updateData = useUpdateData(field);
+
+	const updateData = useUpdateData(field.name);
 	const isEditable = useEditedField(field, cell);
 	const database = useDatabaseStore((state) => state.database);
 	const coords = {
-		lat: database.type === 'MongoDB' ? data?.[name]?.coordinates?.[0] : data?.[name]?.x,
-		lng: database.type === 'MongoDB' ? data?.[name]?.coordinates?.[1] : data?.[name]?.y,
+		lat: database.type === 'MongoDB' ? value?.coordinates?.[0] : value?.x,
+		lng: database.type === 'MongoDB' ? value?.coordinates?.[1] : value?.y,
 	};
 
 	const GeoPointSchema = z.object({
@@ -37,7 +36,7 @@ export default function GeoPoint({ cell, row, field }: NavigatorComponentProps) 
 	const { setEditedField } = useNavigatorStore.getState();
 
 	function onSubmit(data: z.infer<typeof GeoPointSchema>) {
-		updateData({ [name]: [data[name].lat, data[name].lng] }, id, row?.index as number);
+		updateData({ [name]: [data[name].lat, data[name].lng] }, id, index);
 	}
 	useEffect(() => {
 		if (isEditable) {

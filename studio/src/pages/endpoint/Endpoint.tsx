@@ -94,7 +94,7 @@ export default function MainEndpoint() {
 					hasMore={hasNextPage}
 					loader={isFetchingNextPage && <TableLoading />}
 				>
-					<DataTable table={table} />
+					<DataTable table={table} className='table-fixed' />
 				</InfiniteScroll>
 			</VersionTabLayout>
 			<CreateEndpoint open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />

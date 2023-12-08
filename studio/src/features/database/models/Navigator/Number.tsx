@@ -7,10 +7,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-export default function NumberField({ cell, row, field }: NavigatorComponentProps) {
+export default function NumberField({ cell, value, id, index, field }: NavigatorComponentProps) {
 	const { setEditedField } = useNavigatorStore();
-	const updateData = useUpdateData(field);
-	const data = row?.original;
+	const updateData = useUpdateData(field.name);
 	const isEditable = useEditedField(field, cell);
 	const NumberSchema = z.object({
 		[field.name]: z.coerce.number().optional(),
@@ -19,15 +18,15 @@ export default function NumberField({ cell, row, field }: NavigatorComponentProp
 	const form = useForm<z.infer<typeof NumberSchema>>({
 		resolver: zodResolver(NumberSchema),
 		defaultValues: {
-			[field.name]: data[field.name],
+			[field.name]: value,
 		},
 	});
 	function onSubmit(d: z.infer<typeof NumberSchema>) {
-		updateData(d, data.id, row?.index as number);
+		updateData(d, id, index);
 	}
 	useEffect(() => {
 		if (isEditable) {
-			form.setValue(field.name, data[field.name]);
+			form.setValue(field.name, value);
 		}
 	}, [isEditable]);
 	return isEditable ? (
@@ -56,6 +55,6 @@ export default function NumberField({ cell, row, field }: NavigatorComponentProp
 			</form>
 		</Form>
 	) : (
-		<div className='truncate'>{data[field.name]}</div>
+		<div className='truncate'>{value}</div>
 	);
 }

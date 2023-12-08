@@ -8,10 +8,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-export default function BasicValueList({ cell, row, field }: NavigatorComponentProps) {
+export default function BasicValueList({ cell, id, value, index, field }: NavigatorComponentProps) {
 	const { setEditedField } = useNavigatorStore();
-	const data = row?.original;
-	const updateData = useUpdateData(field);
+
+	const updateData = useUpdateData(field.name);
 	const isEditable = useEditedField(field, cell);
 	const BVLSchema = z.object({
 		[field.name]: z.string().optional(),
@@ -19,7 +19,7 @@ export default function BasicValueList({ cell, row, field }: NavigatorComponentP
 	const form = useForm<z.infer<typeof BVLSchema>>({
 		resolver: zodResolver(BVLSchema),
 		defaultValues: {
-			[field.name]: data[field.name]?.join(','),
+			[field.name]: value?.join(','),
 		},
 	});
 
@@ -28,13 +28,13 @@ export default function BasicValueList({ cell, row, field }: NavigatorComponentP
 			{
 				[field.name]: d[field.name]?.split(',').map((val) => val.trim()),
 			},
-			data.id,
-			row?.index as number,
+			id,
+			index as number,
 		);
 	}
 	useEffect(() => {
 		if (isEditable) {
-			form.setValue(field.name, data[field.name]?.join(','));
+			form.setValue(field.name, value?.join(','));
 		}
 	}, [isEditable]);
 
@@ -64,7 +64,7 @@ export default function BasicValueList({ cell, row, field }: NavigatorComponentP
 		</Form>
 	) : (
 		<div className='flex flex-wrap'>
-			{data[field.name]?.map((val: string) => <Badge text={val} className='mr-2 mb-2' key={val} />)}
+			{value?.map((val: string) => <Badge text={val} className='mr-2 mb-2' key={val} />)}
 		</div>
 	);
 }

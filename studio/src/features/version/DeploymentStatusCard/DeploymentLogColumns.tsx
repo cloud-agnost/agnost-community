@@ -3,7 +3,7 @@ import { DateText } from '@/components/DateText';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, EnvLog, SelectedEnvLog } from '@/types';
-import { DATE_FORMAT_MONTH_DAY_YEAR, capitalize, translate, formatDate } from '@/utils';
+import { DATE_TIME_FORMAT, capitalize, translate, formatDate } from '@/utils';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/Avatar';
 import { Badge } from 'components/Badge';
 import { Document } from 'components/icons';
@@ -96,17 +96,17 @@ const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 					onClick={() => {
 						const logs = {
 							dbLogs: row.original.dbLogs.map((log) => ({
-								timestamp: formatDate(log.startedAt, DATE_FORMAT_MONTH_DAY_YEAR),
+								timestamp: formatDate(log.startedAt, DATE_TIME_FORMAT),
 								message: log.message,
 								type: log.status,
 							})),
 							serverLogs: row.original.serverLogs.map((log) => ({
-								timestamp: formatDate(log.startedAt, DATE_FORMAT_MONTH_DAY_YEAR),
+								timestamp: formatDate(log.startedAt, DATE_TIME_FORMAT),
 								message: log.message,
 								type: log.status,
 							})),
 							schedulerLogs: row.original.schedulerLogs.map((log) => ({
-								timestamp: formatDate(log.startedAt, DATE_FORMAT_MONTH_DAY_YEAR),
+								timestamp: formatDate(log.startedAt, DATE_TIME_FORMAT),
 								message: log.message,
 								type: log.status,
 							})),

@@ -9,8 +9,6 @@ import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 const { openDeleteStorageDialog, openEditStorageDialog } = useStorageStore.getState();
-const canEditBucket = getVersionPermission('storage.update');
-const canDeleteBucket = getVersionPermission('storage.delete');
 
 const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 	{
@@ -117,6 +115,8 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 		id: 'actions',
 		className: 'actions !w-[50px]',
 		cell: ({ row: { original } }) => {
+			const canEditBucket = getVersionPermission('storage.update');
+			const canDeleteBucket = getVersionPermission('storage.delete');
 			return (
 				<ActionsCell<Storage>
 					original={original}

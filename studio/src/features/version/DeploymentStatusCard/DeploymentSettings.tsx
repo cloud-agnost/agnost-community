@@ -23,6 +23,11 @@ export default function DeploymentSettings({ isOpen, close }: DeploymentSettings
 			element: <AutoRedeploy />,
 		},
 		{
+			title: t('version.redeploy'),
+			description: t('version.redeploy_desc'),
+			element: <DeployButton />,
+		},
+		{
 			title: environment?.suspended
 				? t('version.reactivate_services')
 				: t('version.suspend_services'),
@@ -30,11 +35,6 @@ export default function DeploymentSettings({ isOpen, close }: DeploymentSettings
 				? t('version.reactivate_services_desc')
 				: t('version.suspend_services_desc'),
 			element: <SuspendButton />,
-		},
-		{
-			title: t('version.redeploy'),
-			description: t('version.redeploy_desc'),
-			element: <DeployButton />,
 		},
 	];
 

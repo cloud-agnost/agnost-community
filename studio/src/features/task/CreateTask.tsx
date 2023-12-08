@@ -24,6 +24,9 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 	const navigate = useTabNavigate();
 	const form = useForm<z.infer<typeof CreateTaskSchema>>({
 		resolver: zodResolver(CreateTaskSchema),
+		defaultValues: {
+			logExecution: true,
+		},
 	});
 	const { pathname } = useLocation();
 	const { versionId, appId, orgId } = useParams<{

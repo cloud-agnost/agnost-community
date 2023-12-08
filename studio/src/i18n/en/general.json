@@ -123,5 +123,6 @@
 	"dbLogs": "Database Logs",
 	"serverLogs": "Server Logs",
 	"schedulerLogs": "Scheduler Logs",
+	"refresh": "Refresh",
 	"invitation_accepted": "Invitation accepted successfully"
 }

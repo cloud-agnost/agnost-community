@@ -32,10 +32,7 @@ export default function VersionSettingsAPIKeys() {
 			{apiKeys.length > 0 ? (
 				<>
 					<div className='data-table-container'>
-						<DataTable<APIKey>
-							table={table}
-							noDataMessage={<p className='text-xl'>{t('version.api_key.no_api_key_found')}</p>}
-						/>
+						<DataTable<APIKey> table={table} className='table-fixed' />
 					</div>
 					<AddOrEditAPIKeyDrawer
 						key={editAPIKeyDrawerIsOpen.toString()}

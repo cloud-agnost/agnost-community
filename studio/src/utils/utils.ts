@@ -466,3 +466,5 @@ export function parseIfString(input: string | null) {
 		return input;
 	}
 }
+export const getValueFromData = (data: Record<string, unknown>, fieldName: string): any =>
+	data[fieldName] ?? data[fieldName.toLowerCase()];
