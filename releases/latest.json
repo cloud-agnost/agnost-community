@@ -1,5 +1,5 @@
 {
-   "release": "v1.0.57",
+   "release": "v1.0.56",
    "modules": {
       "engine-core": "v1.0.25",
       "engine-monitor": "v1.0.10",
