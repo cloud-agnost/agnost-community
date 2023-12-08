@@ -1,4 +1,5 @@
 import { Button } from '@/components/Button';
+import { DrawerClose } from '@/components/Drawer';
 import {
 	FormControl,
 	FormDescription,
@@ -54,24 +55,23 @@ export default function DatabaseForm({
 			/>
 			<Separator />
 
-			{!edit && (
-				<>
-					<FormField
-						control={form.control}
-						name='assignUniqueName'
-						render={({ field }) => (
-							<FormItem className='flex justify-between gap-4  space-y-0'>
-								<FormLabel>
-									<h6>{t('database.add.unique.title')}</h6>
-									<p className='text-subtle'>{t('database.add.unique.desc')}</p>
-								</FormLabel>
-								<FormControl>
-									<Switch checked={field.value} onCheckedChange={field.onChange} />
-								</FormControl>
-							</FormItem>
-						)}
-					/>
-					{/* <FormField
+			<FormField
+				control={form.control}
+				name='assignUniqueName'
+				disabled={edit}
+				render={({ field }) => (
+					<FormItem className='flex justify-between gap-4  space-y-0'>
+						<FormLabel>
+							<h6>{t('database.add.unique.title')}</h6>
+							<p className='text-subtle'>{t('database.add.unique.desc')}</p>
+						</FormLabel>
+						<FormControl>
+							<Switch checked={field.value} onCheckedChange={field.onChange} disabled={edit} />
+						</FormControl>
+					</FormItem>
+				)}
+			/>
+			{/* <FormField
 						control={form.control}
 						name='managed'
 						render={({ field }) => (
@@ -86,8 +86,7 @@ export default function DatabaseForm({
 							</FormItem>
 						)}
 					/> */}
-				</>
-			)}
+
 			<Separator />
 			<FormField
 				control={form.control}
@@ -136,7 +135,12 @@ export default function DatabaseForm({
 				/>
 			)}
 
-			<div className='flex justify-end'>
+			<div className='flex justify-end gap-4'>
+				<DrawerClose asChild>
+					<Button variant='secondary' size='lg'>
+						{t('general.cancel')}
+					</Button>
+				</DrawerClose>
 				<Button size='lg' loading={loading} type='submit'>
 					{edit ? t('general.save') : t('general.create')}
 				</Button>

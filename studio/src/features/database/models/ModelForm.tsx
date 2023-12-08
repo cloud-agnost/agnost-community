@@ -15,6 +15,7 @@ import { Button } from '@/components/Button';
 import { useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 import { ModelSchema } from '@/types';
+import { DrawerClose } from '@/components/Drawer';
 
 export default function ModelForm({ editMode, loading }: { editMode?: boolean; loading: boolean }) {
 	const form = useFormContext<z.infer<typeof ModelSchema>>();
@@ -142,7 +143,12 @@ export default function ModelForm({ editMode, loading }: { editMode?: boolean; l
 				</>
 			)}
 
-			<div className='flex justify-end'>
+			<div className='flex justify-end gap-4'>
+				<DrawerClose asChild>
+					<Button variant='secondary' size='lg'>
+						{t('general.cancel')}
+					</Button>
+				</DrawerClose>
 				<Button size='lg' loading={loading}>
 					{editMode ? t('general.save') : t('general.create')}
 				</Button>

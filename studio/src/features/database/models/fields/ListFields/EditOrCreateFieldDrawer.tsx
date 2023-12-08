@@ -26,7 +26,7 @@ import { capitalize, cn, isMobilePhone, toDisplayName } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/Button';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
+import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import {
 	Form,
 	FormControl,
@@ -1141,7 +1141,12 @@ export default function EditOrCreateFieldDrawer({
 									</div>
 								</>
 							)}
-							<div className='flex justify-end'>
+							<div className='flex gap-4 justify-end'>
+								<DrawerClose asChild>
+									<Button variant='secondary' size='lg'>
+										{t('general.cancel')}
+									</Button>
+								</DrawerClose>
 								<Button disabled={!canCreate} size='lg' loading={isPending}>
 									{editMode ? t('general.save') : t('general.add')}
 								</Button>
