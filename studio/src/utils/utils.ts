@@ -115,8 +115,8 @@ export function capitalize(str: string) {
 export function notify(params: ToastType) {
 	return toast().notify(params);
 }
-export function arrayToQueryString(array: string[], key: string) {
-	return array.map((item) => `${key}=${item}`).join('&');
+export function arrayToQueryString(array: string[] | undefined, key: string) {
+	return array?.map((item) => `${key}=${item}`).join('&');
 }
 
 export async function copy(text: string) {
@@ -225,7 +225,6 @@ export default function groupBy<T>(list: T[], keyGetter: (item: T) => string) {
 export const getAppPermission = (path: string, role?: AppRoles): boolean => {
 	const { appAuthorization, application } = useApplicationStore.getState();
 	const key = `${application?.role ?? role}.app.${path}`;
-	console.log(key);
 	return _.get(appAuthorization, key);
 };
 
