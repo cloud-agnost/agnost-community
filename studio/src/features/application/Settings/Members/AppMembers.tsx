@@ -14,7 +14,6 @@ import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { AppMembersTableColumns } from './AppMembersTableColumns';
-import { useParams } from 'react-router-dom';
 export default function MainAppMembers() {
 	const [searchParams] = useSearchParams();
 	const {

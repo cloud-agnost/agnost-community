@@ -5,7 +5,7 @@ import OrganizationMenuItem from '@/features/organization/navbar/OrganizationMen
 import useApplicationStore from '@/store/app/applicationStore';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMatch, useParams, useSearchParams } from 'react-router-dom';
+import { useMatch, useSearchParams } from 'react-router-dom';
 import AppGeneralSettings from './Settings/AppGeneralSettings';
 import AppMembers from './Settings/Members/AppMembers';
 
