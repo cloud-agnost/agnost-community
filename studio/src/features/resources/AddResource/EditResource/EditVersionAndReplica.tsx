@@ -15,6 +15,7 @@ import * as z from 'zod';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks';
 import useTypeStore from '@/store/types/typeStore';
+import { useParams } from 'react-router-dom';
 
 export default function EditVersionAndReplica() {
 	const {
@@ -26,7 +27,7 @@ export default function EditVersionAndReplica() {
 	const { notify } = useToast();
 	const { t } = useTranslation();
 	const { resourceVersions } = useTypeStore();
-
+	const { orgId } = useParams() as Record<string, string>;
 	const form = useForm<z.infer<typeof CreateResourceSchema>>({
 		resolver: zodResolver(CreateResourceSchema),
 		defaultValues: {
@@ -65,6 +66,7 @@ export default function EditVersionAndReplica() {
 		updateResourceMutate({
 			updateType: 'others',
 			resourceId: resourceToEdit?._id,
+			orgId,
 			...data,
 		});
 	}
