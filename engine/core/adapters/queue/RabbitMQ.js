@@ -72,8 +72,6 @@ export class RabbitMQ extends QueueBase {
 	 * @param  {string} debugChannel The realtime debug unique channel id
 	 */
 	async sendMessage(queue, payload, delayMs = 0, debugChannel = null) {
-		console.log("****sendMessage0");
-
 		// Add a tracking record to track progress of this message
 		const trackingId = helper.generateId();
 		const trackingRecord = await this.createMessageTrackingRecord({
@@ -84,18 +82,12 @@ export class RabbitMQ extends QueueBase {
 			status: "pending",
 			delay: delayMs,
 		});
-		console.log("****trackingRecord", trackingRecord);
 
 		try {
-			console.log("****sendMessage1");
 			const channel = await this.driver.createChannel();
-			console.log("****sendMessage2");
-
 			channel.on("error", (err) => {
 				console.error("RabbitMQ channel error to send messages:", queue, err);
 			});
-
-			console.log("****sendMessage3");
 
 			const envId = META.getEnvId();
 			const message = {
@@ -105,12 +97,8 @@ export class RabbitMQ extends QueueBase {
 				debugChannel,
 			};
 
-			console.log("****sendMessage4", message);
-
 			// Check if this is a delayed message or not
 			if (delayMs && delayMs > 0 && this.config?.delayedMessages) {
-				console.log("****sendMessage5");
-
 				const exchangeNumber = helper.randomInt(
 					1,
 					config.get("general.delayedMessageExchangeCount")
@@ -139,25 +127,16 @@ export class RabbitMQ extends QueueBase {
 					}
 				);
 			} else {
-				console.log(
-					"****sendMessage6",
-					config.get("general.messageProcessQueueCount")
-				);
-
 				const queueNumber = helper.randomInt(
 					1,
 					config.get("general.messageProcessQueueCount")
 				);
 				const queueName = `process-message-${envId}-${queue.name}-${queueNumber}`;
 
-				console.log("****sendMessage7", queueName);
-
 				await channel.assertQueue(queueName, {
 					durable: true,
 					autoDelete: true,
 				});
-
-				console.log("****sendMessage8");
 
 				await channel.sendToQueue(
 					queueName,
@@ -167,22 +146,10 @@ export class RabbitMQ extends QueueBase {
 						timestamp: Date.now(),
 					}
 				);
-
-				console.log("****sendMessage9");
 			}
 
-			console.log("****sendMessage10");
-
-			/* 			try {
-				await channel.close();
-			} catch (err) {
-				console.log("****channel.close()", err);
-
-			} */
-			console.log("****sendMessage11");
+			await channel.close();
 		} catch (error) {
-			console.log("****sendMessage12", error);
-
 			logger.error("Cannot create channel to message queue", {
 				details: error,
 			});
