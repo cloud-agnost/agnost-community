@@ -173,7 +173,11 @@ export class RabbitMQ extends QueueBase {
 
 			console.log("****sendMessage10");
 
-			// await channel.close();
+			try {
+				await channel.close();
+			} catch (err) {
+				console.log("****channel.close()", err);
+			}
 			console.log("****sendMessage11");
 		} catch (error) {
 			console.log("****sendMessage12", error);
