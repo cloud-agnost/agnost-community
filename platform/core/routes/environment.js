@@ -710,4 +710,69 @@ router.put(
 	}
 );
 
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/apiserver-restart
+@method     POST
+@desc       Restarts the API server
+@access     private
+*/
+router.post(
+	"/:envId/apiserver-restart",
+	checkContentType,
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateEnv,
+	async (req, res) => {
+		// Start new database transaction session
+		try {
+			const { version, env, org, app, user } = req;
+
+			// Get the API server resource, the api server has the same iid of the environment
+			const resource = await resourceCtrl.getOneByQuery({
+				iid: env.iid,
+			});
+
+			const log = await resLogCtrl.create({
+				orgId: org._id,
+				appId: app._id,
+				versionId: version._id,
+				resourceId: resource._id,
+				action: "restart",
+				status: "Updating",
+				createdBy: user._id,
+			});
+
+			res.json();
+
+			// Apply changes to the API server
+			await resourceCtrl.manageClusterResources([
+				{ resource: resource, log: log },
+			]);
+
+			// Log action
+			auditCtrl.logAndNotify(
+				org._id,
+				user,
+				"org.resource",
+				"update",
+				t(
+					"Restarting '%s' resource named '%s'",
+					resource.instance,
+					resource.name
+				),
+				resource,
+				{
+					orgId: org._id,
+					appId: resource.appId,
+					resourceId: resource._id,
+				}
+			);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
 export default router;

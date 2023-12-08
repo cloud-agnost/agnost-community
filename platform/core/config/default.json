@@ -94,7 +94,7 @@
       "scaleDownDelay": "5m00s",
       "scaleToZeroPodRetentionPeriod": "10m00s",
       "target": 10,
-      "containerConcurrency": 40,
+      "containerConcurrency": 10,
       "cpu": {
         "request": "125m",
         "limit": "250m"

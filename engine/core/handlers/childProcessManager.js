@@ -106,15 +106,16 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * Initializes the API server of the app version
 	 */
 	async initializeCore() {
-		this.addLog(`Started initializing the API server`);
+		this.addLog(t("********* CHILD PROCESS INIT START *********"));
 		// First load the environment and vesion configuration file
 		const envObj = await this.loadEnvConfigFile();
 		// If we do  not have the envObj yet then just spin up the express server to serve system default endpoints
 		if (!envObj) {
 			// Initialize express server
-			await this.initExpressServer(false);
+			await this.initExpressServer();
 			// We completed server initialization and can accept incoming requests
 			global.SERVER_STATUS = "running";
+
 			// Spin up the express server
 			await this.startExpressServer();
 			return;
@@ -134,6 +135,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		await this.initExpressServer();
 		// Manage endpoints
 		await this.manageEndpoints();
+		// Spin up the express server
+		await this.startExpressServer();
 
 		// Set the environment variables of the API server
 		this.manageEnvironmentVariables(this.getEnvironmentVariables());
@@ -154,15 +157,12 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Set up the task listeners
 		await this.manageTasks();
 
-		this.addLog(`Completed initializing the API server`);
+		this.addLog(t("********* CHILD PROCESS INIT END *********"));
 		// Send the deployment telemetry information to the platform
 		await this.sendEnvironmentLogs("OK");
 
 		// We completed server initialization and can accept incoming requests
 		global.SERVER_STATUS = "running";
-
-		// Spin up the express server
-		await this.startExpressServer();
 	}
 
 	/**
@@ -170,11 +170,11 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * can update an API server faster
 	 */
 	async restartCore() {
+		this.addLog(t("********* CHILD PROCESS RESTART *********"));
 		global.SERVER_STATUS = "initializing";
 		this.loaderQuery = helper.generateSlug(null, 6);
 		// First clear the logs
 		this.clearLogs();
-		this.addLog(`Started updating the API server`);
 		await this.closeHttpServer();
 
 		// We haven't refreshed the META manager so that we can access the old values
@@ -209,9 +209,10 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// If we do  not have the envObj yet then just spin up the express server to serve system default endpoints
 		if (!envObj) {
 			// Initialize express server
-			await this.initExpressServer(false);
+			await this.initExpressServer();
 			// We completed server initialization and can accept incoming requests
 			global.SERVER_STATUS = "running";
+
 			// Spin up the express server
 			await this.startExpressServer();
 			return;
@@ -228,6 +229,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		await this.initExpressServer();
 		// Manage endpoints
 		await this.manageEndpoints();
+		// Spin up the express server
+		await this.startExpressServer();
 
 		// Set the environment variables of the API server
 		this.manageEnvironmentVariables(this.getEnvironmentVariables());
@@ -246,15 +249,12 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Set up the task listeners
 		await this.manageTasks();
 
-		this.addLog(`Completed updating the API server`);
 		// Send the deployment telemetry information to the platform
 		await this.sendEnvironmentLogs("OK");
 
 		// We completed server initialization and can accept incoming requests
 		global.SERVER_STATUS = "running";
-
-		// Spin up the express server
-		await this.startExpressServer();
+		this.addLog(t("********* CHILD PROCESS RESTART END *********"));
 	}
 
 	/**
@@ -273,7 +273,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	/**
 	 * Initializes the express server
 	 */
-	async initExpressServer(fullInit = true) {
+	async initExpressServer() {
 		this.addLog(`Initializing express server`);
 		// Create and set the express application
 		var app = express();
@@ -317,20 +317,21 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		// Add the default system endpoints
 		app.use("/", (await import("../routes/system.js")).default);
+	}
 
-		if (fullInit) {
-			// Add the default storage object endpoints to access stored objects
-			app.use("/object", (await import("../routes/object.js")).default);
-			// Add the test queue and cron job handlers
-			app.use("/test", (await import("../routes/test.js")).default);
-			// Add the default storage object endpoints
-			app.use("/storage", (await import("../routes/storage.js")).default);
-			// Add the default user authentication endpoints
-			app.use("/auth", (await import("../routes/auth.js")).default);
-			app.use("/database", (await import("../routes/database.js")).default);
-			app.use("/oauth", (await import("../routes/oauth.js")).default);
-			app.use("/realtime", (await import("../routes/realtime.js")).default);
-		}
+	async initializeDefaultEndpoints() {
+		const app = this.getExpressApp();
+		// Add the default storage object endpoints to access stored objects
+		app.use("/object", (await import("../routes/object.js")).default);
+		// Add the test queue and cron job handlers
+		app.use("/test", (await import("../routes/test.js")).default);
+		// Add the default storage object endpoints
+		app.use("/storage", (await import("../routes/storage.js")).default);
+		// Add the default user authentication endpoints
+		app.use("/auth", (await import("../routes/auth.js")).default);
+		app.use("/database", (await import("../routes/database.js")).default);
+		app.use("/oauth", (await import("../routes/oauth.js")).default);
+		app.use("/realtime", (await import("../routes/realtime.js")).default);
 	}
 
 	/**
@@ -358,6 +359,9 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * Adds the endpoints and associated middlewares of the API server as routes to the express server app
 	 */
 	async manageEndpoints() {
+		// Add the default system endpoings
+		await this.initializeDefaultEndpoints();
+
 		// First load the endpoints configuration file
 		const endpoints = await META.getEndpoints();
 		// Process each endpoint one by one and add it to the express app as a route

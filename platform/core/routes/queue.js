@@ -389,6 +389,7 @@ router.post(
 	validate,
 	async (req, res) => {
 		try {
+			console.log("test queue1");
 			const { org, app, version, queue } = req;
 			const { payload, debugChannel } = req.body;
 
@@ -398,6 +399,12 @@ router.post(
 				appId: app._id,
 				versionId: version._id,
 			});
+
+			console.log("test queue2", env);
+			console.log(
+				"test queue3",
+				`http://${env.iid}.${process.env.NAMESPACE}.svc.cluster.local/test/queue`
+			);
 
 			// Make api call to environment API server to trigger testing of the message queue
 			await axios.post(
@@ -410,6 +417,8 @@ router.post(
 					},
 				}
 			);
+
+			console.log("test queue4", env);
 
 			res.json();
 		} catch (err) {

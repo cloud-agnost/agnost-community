@@ -109,7 +109,7 @@ router.post(
 		const session = await taskCtrl.startSession();
 		try {
 			const { org, user, app, version, resource } = req;
-			const { name, cronExpression, logExecution } = req.body;
+			const { name, cronExpression, logExecution, enabled } = req.body;
 
 			// Create the task
 			let taskId = helper.generateId();
@@ -125,6 +125,7 @@ router.post(
 					name,
 					cronExpression,
 					logExecution,
+					enabled,
 					type: "code",
 					logic: defaultTaskCode,
 					createdBy: user._id,
@@ -226,7 +227,7 @@ router.put(
 		const session = await taskCtrl.startSession();
 		try {
 			const { org, user, app, version, task } = req;
-			const { name, cronExpression, logExecution } = req.body;
+			const { name, cronExpression, logExecution, enabled } = req.body;
 
 			let updatedTask = await taskCtrl.updateOneById(
 				task._id,
@@ -234,6 +235,7 @@ router.put(
 					name,
 					cronExpression,
 					logExecution,
+					enabled,
 					updatedBy: user._id,
 				},
 				{},

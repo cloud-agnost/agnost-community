@@ -352,6 +352,47 @@ export class ResourceManager {
     }
 
     /**
+     * Restarts the API server
+     */
+    async restartAPIServer() {
+        const resource = this.getResource();
+
+        // Create a Kubernetes core API client
+        const kubeconfig = new k8s.KubeConfig();
+        kubeconfig.loadFromDefault();
+        const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
+
+        try {
+            const existingService = await k8sApi.getNamespacedCustomObjectStatus(
+                "serving.knative.dev",
+                "v1",
+                process.env.NAMESPACE,
+                "services",
+                resource.iid
+            );
+
+            // Modify the deployment (e.g., update an environment variable)
+            // This is an example; modify according to your deployment spec
+            existingService.body.spec.template.spec.containers[0].env.push({
+                name: "RESTART_TIMESTAMP",
+                value: new Date().toISOString(),
+            });
+
+            // Apply updated Knative Service
+            await k8sApi.replaceNamespacedCustomObject(
+                "serving.knative.dev",
+                "v1",
+                process.env.NAMESPACE,
+                "services",
+                deploymentName,
+                existingService.body
+            );
+        } catch (err) {
+            throw new AgnostError(err.body?.message);
+        }
+    }
+
+    /**
      * Creates an engine deployment (API server)
      * @param  {string} deploymentName The deployment name prefix (resource iid)
      * @param  {object} accessConfig The access configuration of the deployment
@@ -362,6 +403,7 @@ export class ResourceManager {
         const kubeconfig = new k8s.KubeConfig();
         kubeconfig.loadFromDefault();
         const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
+        const apiServerVersion = await this.getAPIServerVersion();
 
         // Define the Deployment specification
         const serviceSpec = {
@@ -392,7 +434,9 @@ export class ResourceManager {
                         containerConcurrency: deploymentConfig.containerConcurrency,
                         containers: [
                             {
-                                image: "gcr.io/agnost-community/engine/core",
+                                image: apiServerVersion
+                                    ? `gcr.io/agnost-community/engine/core:${apiServerVersion}`
+                                    : "gcr.io/agnost-community/engine/core",
                                 ports: [
                                     {
                                         containerPort: config.get("general.defaultClusterIPPort"),
@@ -544,6 +588,8 @@ export class ResourceManager {
                 "services",
                 deploymentName
             );
+
+            //console.log("***here", JSON.stringify(existingService.body, null, 2));
 
             // Update annotations
             existingService.body.spec.template.metadata.annotations = {
@@ -1128,6 +1174,30 @@ export class ResourceManager {
     }
 
     /**
+     * Get release info
+     * @returns {Promise<Object>} The cluster record.
+     */
+    async getAPIServerVersion() {
+        if (process.env.NODE_ENV === "development") return null;
+
+        try {
+            const clusterInfo = await this.getClusterRecord();
+            const releaseInfo = await axios.get(
+                `https://raw.githubusercontent.com/cloud-agnost/agnost-community/master/releases/${clusterInfo.release}.json`,
+                {
+                    headers: {
+                        Accept: "application/vnd.github.v3+json",
+                    },
+                }
+            );
+
+            return releaseInfo.data.modules["engine-core"];
+        } catch (err) {
+            return null;
+        }
+    }
+
+    /**
      * Updates the access settings of the resource
      */
     async updateResourceAccessSettings(access, accessReadOnly) {
@@ -1499,6 +1569,7 @@ export class ResourceManager {
             const kc = new k8s.KubeConfig();
             kc.loadFromDefault();
             const k8sExtensionsApi = kc.makeApiClient(k8s.NetworkingV1Api);
+            const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 
             const ingress = await k8sExtensionsApi.readNamespacedIngress(ingressName, process.env.NAMESPACE);
 
@@ -1571,6 +1642,49 @@ export class ResourceManager {
                 undefined,
                 requestOptions
             );
+
+            // Digital Ocean requires certain annotation on the Ingress LoadBalancer service
+            // This code assumes the LB service is running on the ingress-nginx namespace
+            k8sCoreApi
+                .listNamespacedService("ingress-nginx")
+                .then((res) => {
+                    res.body.items.forEach(async (service) => {
+                        const svc = await k8sCoreApi.readNamespacedService(service.metadata.name, "ingress-nginx");
+                        if (
+                            svc.body.metadata.annotations[
+                                "service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol"
+                            ] == "true"
+                        ) {
+                            svc.body.metadata.annotations["service.beta.kubernetes.io/do-loadbalancer-hostname"] =
+                                domainName;
+                            const options = { headers: { "Content-Type": "application/merge-patch+json" } };
+                            await k8sCoreApi
+                                .patchNamespacedService(
+                                    service.metadata.name,
+                                    "ingress-nginx",
+                                    svc.body,
+                                    undefined,
+                                    undefined,
+                                    undefined,
+                                    undefined,
+                                    undefined,
+                                    options
+                                )
+                                .then((response) => {
+                                    console.log(
+                                        "Ingress Service is updated for Digital Ocean:",
+                                        response.body.metadata.name
+                                    );
+                                })
+                                .catch((err) => {
+                                    console.error("Error updating ingress for Digital Ocean:", err);
+                                });
+                        }
+                    });
+                })
+                .catch((err) => {
+                    console.error("Error listing ingress for Digital Ocean:", err);
+                });
         } catch (err) {
             logger.error(`Cannot add custom domain '${domainName}' to ingress '${ingressName}'`, { details: err });
         }
