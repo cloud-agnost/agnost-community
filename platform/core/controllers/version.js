@@ -167,7 +167,7 @@ class VersionController extends BaseController {
 				readOnly: readOnly,
 				master: master,
 				realtime: parentVersion.realtime,
-				params: parentVersion.pararms,
+				params: parentVersion.params,
 				limits: parentVersion.limits,
 				defaultEndpointLimits: parentVersion.defaultEndpointLimits,
 				apiKeys: parentVersion.apiKeys,
