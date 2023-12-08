@@ -35,10 +35,7 @@ export default function VersionSettingsEnvironmentVariables() {
 					</div>
 				) : (
 					<div className='data-table-container'>
-						<DataTable<Param>
-							table={table}
-							noDataMessage={<p className='text-xl'>{t('version.variable.no_variable_found')}</p>}
-						/>
+						<DataTable<Param> table={table} className='table-fixed' />
 					</div>
 				)}
 				<EditOrAddVariableDrawer

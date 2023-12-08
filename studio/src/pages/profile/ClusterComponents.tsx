@@ -18,7 +18,7 @@ export default function ClusterComponents() {
 	});
 	return (
 		<>
-			<DataTable<ClusterComponent> table={table} />
+			<DataTable<ClusterComponent> table={table} className='table-fixed' />
 			<EditClusterComponent />
 		</>
 	);
