@@ -7,7 +7,6 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
-import useVersionStore from '@/store/version/versionStore';
 import { history } from '@/utils';
 import _ from 'lodash';
 import { useEffect } from 'react';

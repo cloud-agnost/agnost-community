@@ -4,40 +4,13 @@ import { DateRangePicker } from '@/components/DateRangePicker';
 import { NOTIFICATION_ACTIONS } from '@/constants';
 import { useUpdateEffect } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
-import { ApplicationMember, FormatOptionLabelProps } from '@/types';
+import { FormatOptionLabelProps } from '@/types';
 import { capitalize } from '@/utils';
-import { MagnifyingGlass } from '@phosphor-icons/react';
 import { endOfDay, startOfDay } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
 import { Range } from 'react-date-range';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Select from 'react-select';
-interface MemberSearch {
-	label: string;
-	value: ApplicationMember;
-}
-
-const filterMembers = (inputValue: string) => {
-	const { tempTeam: members } = useApplicationStore.getState();
-
-	const memberOptions = members.map((res) => ({
-		label: res.member.name,
-		value: res,
-	}));
-	return memberOptions.filter((i) => i.label.toLowerCase().includes(inputValue.toLowerCase()));
-};
-
-const promiseOptions = (inputValue: string) =>
-	new Promise<
-		{
-			label: string;
-			value: ApplicationMember;
-		}[]
-	>((resolve) => {
-		setTimeout(() => {
-			resolve(filterMembers(inputValue));
-		}, 1000);
-	});
 
 const formatOptionLabel = ({ label, value }: FormatOptionLabelProps) => {
 	const name = label?.split(' ');
