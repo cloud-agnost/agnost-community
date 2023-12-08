@@ -20,13 +20,21 @@ router.post(
 	authAccessToken,
 	async (req, res) => {
 		try {
+			console.log("test queue", req.body);
 			const { queueiid, delay, payload, debugChannel } = req.body;
 			const queue = await META.getQueue(queueiid);
+			console.log("test queue2", queue);
 
 			if (queue) {
+				console.log("test queue3");
+
 				const adapterObj = adapterManager.getQueueAdapter(queue.name);
+				console.log("test queue4");
+
 				await adapterObj.sendMessage(queue, payload, delay, debugChannel);
+				console.log("test queue5");
 			}
+			console.log("test queue6");
 
 			res.json();
 		} catch (err) {
