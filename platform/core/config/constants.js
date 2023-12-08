@@ -574,7 +574,14 @@ export const kafkaConnFormat = ["simple", "ssl", "sasl"];
 
 export const kafkaSaslMechanism = ["plain", "scram-sha-256", "scram-sha-512"];
 
-export const resourceActions = ["create", "update", "delete", "bind", "check"];
+export const resourceActions = [
+	"create",
+	"update",
+	"delete",
+	"bind",
+	"check",
+	"restart",
+];
 
 export const resourceStatuses = [
 	"Binding", // Valid for default cluster resources

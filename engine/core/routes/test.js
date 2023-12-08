@@ -19,15 +19,19 @@ router.post(
 	checkContentType,
 	authAccessToken,
 	async (req, res) => {
-		const { queueiid, delay, payload, debugChannel } = req.body;
-		const queue = await META.getQueue(queueiid);
+		try {
+			const { queueiid, delay, payload, debugChannel } = req.body;
+			const queue = await META.getQueue(queueiid);
 
-		if (queue) {
-			const adapterObj = adapterManager.getQueueAdapter(queue.name);
-			await adapterObj.sendMessage(queue, payload, delay, debugChannel);
+			if (queue) {
+				const adapterObj = adapterManager.getQueueAdapter(queue.name);
+				await adapterObj.sendMessage(queue, payload, delay, debugChannel);
+			}
+
+			res.json();
+		} catch (err) {
+			helper.handleError(req, res, err);
 		}
-
-		res.json();
 	}
 );
 
@@ -43,14 +47,18 @@ router.post(
 	checkContentType,
 	authAccessToken,
 	async (req, res) => {
-		const { taskiid, debugChannel } = req.body;
-		const task = await META.getTask(taskiid);
-		if (task) {
-			const adapterObj = adapterManager.getTaskAdapter(task.name);
-			await adapterObj.triggerCronJob(task, debugChannel);
-		}
+		try {
+			const { taskiid, debugChannel } = req.body;
+			const task = await META.getTask(taskiid);
+			if (task) {
+				const adapterObj = adapterManager.getTaskAdapter(task.name);
+				await adapterObj.triggerCronJob(task, debugChannel);
+			}
 
-		res.json();
+			res.json();
+		} catch (err) {
+			helper.handleError(req, res, err);
+		}
 	}
 );
 

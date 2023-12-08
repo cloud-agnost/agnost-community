@@ -45,13 +45,16 @@ if (cluster.isPrimary) {
 } else if (cluster.isWorker) {
 	logger.info(`Child process ${process.pid} is running`);
 
-	// Listen for heartbeat messages from the parent process
-	process.on("message", (message) => {
-		if (message === "heartbeat") {
-			// Respond back to the parent process to indicate responsiveness
-			process.send("heartbeat");
-		}
-	});
+	// In production environment we do not need to check for heartbeat, kubernetes will restart the process if it is unresponsive
+	if (process.env.NODE_ENV === "development") {
+		// Listen for heartbeat messages from the parent process
+		process.on("message", (message) => {
+			if (message === "heartbeat") {
+				// Respond back to the parent process to indicate responsiveness
+				process.send("heartbeat");
+			}
+		});
+	}
 
 	// Init globally accessible variables
 	initGlobals();
@@ -71,10 +74,10 @@ if (cluster.isPrimary) {
 	// Listen for child process update messages (not restart but update)
 	process.on("message", (message) => {
 		if (message === "restart") {
-			logger.info(`Child process update started`);
 			childManager.restartCore();
 		}
 	});
+
 	// Connect to synchronization server
 	initializeSyncClient();
 	// Set up garbage collector
@@ -119,31 +122,34 @@ async function finalizePrimaryProcessStartup() {
 		childProcess = cluster.fork();
 	});
 
-	// Set up heartbeat interval
-	setInterval(() => {
-		// Send heartbeat message to the child process
-		if (childProcess.isConnected()) childProcess.send("heartbeat");
-		else return;
+	// In production environment we do not need to check for heartbeat, kubernetes will restart the process if it is unresponsive
+	if (process.env.NODE_ENV === "development") {
+		// Set up heartbeat interval
+		setInterval(() => {
+			// Send heartbeat message to the child process
+			if (childProcess.isConnected()) childProcess.send("heartbeat");
+			else return;
 
-		// Set a timeout to check if child process responded
-		const heartbeatTimeout = setTimeout(() => {
-			// Child process did not respond within timeout, handle accordingly
-			logger.warn("Child process is unresponsive!");
+			// Set a timeout to check if child process responded
+			const heartbeatTimeout = setTimeout(() => {
+				// Child process did not respond within timeout, handle accordingly
+				logger.warn("Child process is unresponsive!");
 
-			// Kill the child process so that it restarts.
-			// SIGINT does not work if child process is stuck in an ifinite loop, we need to use SIGTERM
-			childProcess.kill("SIGTERM");
-		}, config.get("general.heartbeatTimeoutSeconds") * 1000); // Timeout duration in milliseconds
+				// Kill the child process so that it restarts.
+				// SIGINT does not work if child process is stuck in an ifinite loop, we need to use SIGTERM
+				childProcess.kill("SIGTERM");
+			}, config.get("general.heartbeatTimeoutSeconds") * 1000); // Timeout duration in milliseconds
 
-		// Listen for heartbeat response from the child process
-		childProcess.once("message", (message) => {
-			if (message === "heartbeat") {
-				// logger.info(`Child process is up and running`);
-				// Child process responded, clear the heartbeat timeout
-				clearTimeout(heartbeatTimeout);
-			}
-		});
-	}, config.get("general.heartbeatIntervalSeconds") * 1000); // Heartbeat interval duration in milliseconds
+			// Listen for heartbeat response from the child process
+			childProcess.once("message", (message) => {
+				if (message === "heartbeat") {
+					// logger.info(`Child process is up and running`);
+					// Child process responded, clear the heartbeat timeout
+					clearTimeout(heartbeatTimeout);
+				}
+			});
+		}, config.get("general.heartbeatIntervalSeconds") * 1000); // Heartbeat interval duration in milliseconds
+	}
 }
 
 function initGlobals() {

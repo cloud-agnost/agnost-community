@@ -57,6 +57,7 @@ export default function CreateDatabase({
 	async function onSubmit(data: z.infer<typeof CreateDatabaseSchema>) {
 		const resource = resources.find((item) => item._id === data.resourceId);
 		if (!versionId || !resource) return;
+		console.log(data);
 		createDatabaseMutation({
 			orgId,
 			versionId,
