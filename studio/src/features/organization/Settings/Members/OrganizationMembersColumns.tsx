@@ -3,7 +3,7 @@ import { Checkbox } from '@/components/Checkbox';
 import { DateText } from '@/components/DateText';
 import { RoleSelect } from '@/components/RoleDropdown';
 import { TableConfirmation } from '@/components/Table';
-import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
+import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { OrganizationMember } from '@/types';
 import { getOrgPermission, translate } from '@/utils';
@@ -35,13 +35,18 @@ export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 				aria-label='Select all'
 			/>
 		),
-		cell: ({ row }) => (
-			<Checkbox
-				checked={row.getIsSelected()}
-				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label='Select row'
-			/>
-		),
+		cell: ({ row }) => {
+			const { member } = row.original;
+			const user = useAuthStore.getState().user;
+			return (
+				<Checkbox
+					checked={row.getIsSelected()}
+					onCheckedChange={(value) => row.toggleSelected(!!value)}
+					aria-label='Select row'
+					disabled={member._id === user?._id || member.isOrgOwner}
+				/>
+			);
+		},
 		enableSorting: false,
 		enableHiding: false,
 		size: 45,
@@ -80,8 +85,18 @@ export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 		accessorKey: 'role',
 		size: 200,
 		cell: ({ row }) => {
+			const { member } = row.original;
+			const canUpdate = getOrgPermission('member.update');
 			const { role } = row.original;
-			return <UpdateInvitationUserRole member={row.original} role={role} />;
+			const user = useAuthStore.getState().user;
+			return (
+				<RoleSelect
+					disabled={member.isOrgOwner || !canUpdate || member._id === user?._id}
+					role={role}
+					type='org'
+					onSelect={(newRole) => updateRole(member._id, newRole)}
+				/>
+			);
 		},
 	},
 	{
@@ -89,6 +104,7 @@ export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 		size: 25,
 		cell: ({ row: { original } }) => {
 			const canDelete = getOrgPermission('member.delete');
+			const isMe = original.member._id === useAuthStore.getState().user?._id;
 			return (
 				<TableConfirmation
 					align='end'
@@ -97,21 +113,9 @@ export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 					onConfirm={() => deleteHandler(original)}
 					contentClassName='m-0'
 					hasPermission={canDelete}
-					disabled={original.member.isOrgOwner}
+					disabled={original.member.isOrgOwner || isMe}
 				/>
 			);
 		},
 	},
 ];
-
-function UpdateInvitationUserRole({ member, role }: { member: OrganizationMember; role: string }) {
-	const canUpdate = useAuthorizeOrg('member.update');
-	return (
-		<RoleSelect
-			disabled={member.member.isOrgOwner || !canUpdate}
-			role={role}
-			type='org'
-			onSelect={(newRole) => updateRole(member.member._id, newRole)}
-		/>
-	);
-}
