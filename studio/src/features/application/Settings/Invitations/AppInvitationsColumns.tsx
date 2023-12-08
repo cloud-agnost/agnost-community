@@ -150,8 +150,8 @@ export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 						onResend={() => resendInvitationHandler(token, email)}
 					/>
 					<TableConfirmation
-						title={translate('organization.settings.members.invite.delete')}
-						description={translate('organization.settings.members.invite.deleteDesc')}
+						title={translate('application.invite_member.delete')}
+						description={translate('application.invite_member.deleteDesc')}
 						onConfirm={() => deleteInvitationHandler(token)}
 						hasPermission={getPermission('delete')}
 					/>
