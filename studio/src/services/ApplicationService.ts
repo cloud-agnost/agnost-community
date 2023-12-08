@@ -78,7 +78,7 @@ export default class ApplicationService {
 	}
 	static async removeMultipleAppMembers(req: RemoveMemberRequest): Promise<void> {
 		return (
-			await axios.delete(
+			await axios.post(
 				`${this.getUrl(req.orgId as string, req.appId as string)}/team/delete-multi`,
 				{
 					data: {
