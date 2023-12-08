@@ -581,37 +581,6 @@ export class ResourceManager {
         const k8sApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
         try {
-            /* Might be needed in the future but for now we let Knative to handle the past revisions             
-            const revList = await k8sApi.listNamespacedCustomObject(
-                "serving.knative.dev",
-                "v1",
-                process.env.NAMESPACE,
-                "revisions",
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                `app=${deploymentName}`
-            );
-
-            for (const revision of revList.body.items) {
-                // Reset the min and max replicas of the old revisions to 0
-                revision.metadata.annotations = {
-                    ...revision.metadata.annotations,
-                    "autoscaling.knative.dev/minScale": "0",
-                    "autoscaling.knative.dev/maxScale": "0",
-                };
-
-                await k8sApi.replaceNamespacedCustomObject(
-                    "serving.knative.dev",
-                    "v1",
-                    process.env.NAMESPACE,
-                    "revisions",
-                    revision.metadata.name,
-                    revision
-                );
-            }
- */
             const existingService = await k8sApi.getNamespacedCustomObjectStatus(
                 "serving.knative.dev",
                 "v1",
