@@ -79,7 +79,6 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 		if (typeof value === 'object') return JSON.stringify(value, null, 2);
 		return value;
 	}
-	console.log('TestMessageQueue', form.formState.errors);
 	return (
 		<Drawer open={open} onOpenChange={handleClose}>
 			<DrawerContent

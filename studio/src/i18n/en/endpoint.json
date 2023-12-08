@@ -64,7 +64,7 @@
 		"add_header": "Add Header",
 		"deploy": {
 			"warning": "API Server undergoing deployment",
-			"description": "Please wait a few seconds for deployment to complete before testing endpoint"
+			"description": "Please wait a few seconds for deployment to complete before testing."
 		}
 	},
 	"duration": "Duration",
