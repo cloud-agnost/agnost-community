@@ -16,7 +16,7 @@ import {
 import Json from '@/features/database/models/Navigator/Json';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { ColumnDefWithClassName, Field, FieldTypes } from '@/types';
-import { capitalize, cn, getValueFromData } from '@/utils';
+import { cn, getValueFromData } from '@/utils';
 import { ElementType, useEffect, useState } from 'react';
 
 const NavigatorComponentMap: Record<string, ElementType> = {

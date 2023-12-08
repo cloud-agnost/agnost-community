@@ -1,6 +1,6 @@
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
-import { APIError, Field } from '@/types';
+import { APIError } from '@/types';
 import { capitalize, getNestedPropertyValue, isEmpty, updateObject } from '@/utils';
 import useToast from './useToast';
 export default function useUpdateData(name: string) {
