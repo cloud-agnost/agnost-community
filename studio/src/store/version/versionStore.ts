@@ -62,6 +62,7 @@ type Actions = {
 	closeVersionLogDetails: () => void;
 	deleteVersion: (params: DeleteVersionParams) => Promise<void>;
 	getVersionNotifications: (params: GetVersionNotificationParams) => Promise<void>;
+	getVersionNotificationsPreview: (params: GetVersionNotificationParams) => Promise<void>;
 	updateNotificationLastSeen: () => void;
 	searchDesignElements: (params: SearchDesignElementParams) => Promise<DesignElement[]>;
 	resetDesignElements: () => void;
@@ -236,6 +237,21 @@ const useVersionStore = create<VersionStore & Actions>()(
 				getVersionNotifications: async (params) => {
 					try {
 						const notifications = await VersionService.getVersionNotifications(params);
+						if (params.page === 0) {
+							set({ notifications });
+						} else {
+							set((prev) => ({
+								notifications: [...prev.notifications, ...notifications],
+								notificationLastFetchedCount: notifications.length,
+							}));
+						}
+					} catch (error) {
+						throw error as APIError;
+					}
+				},
+				getVersionNotificationsPreview: async (params) => {
+					try {
+						const notifications = await VersionService.getVersionNotifications(params);
 						const user = useAuthStore.getState().user;
 
 						const allowedNotifications = user?.notifications.map((ntf) => {
@@ -247,18 +263,10 @@ const useVersionStore = create<VersionStore & Actions>()(
 						const filteredNotifications = notifications.filter(
 							(ntf) => allowedNotifications?.includes(ntf.object),
 						);
-						if (params.page === 0) {
-							set({ notifications, notificationsPreview: filteredNotifications });
-						} else {
-							set((prev) => ({
-								notifications: [...prev.notifications, ...notifications],
-								notificationsPreview: [
-									...prev.notificationsPreview,
-									...filteredNotifications,
-								].splice(0, 100),
-								notificationLastFetchedCount: notifications.length,
-							}));
-						}
+
+						set({
+							notificationsPreview: filteredNotifications,
+						});
 					} catch (error) {
 						throw error as APIError;
 					}

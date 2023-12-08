@@ -34,7 +34,6 @@ export default function Root() {
 		useOrganizationStore();
 	const { getUser, isAuthenticated } = useAuthStore();
 	const { getAppVersionEnvironment, getEnvironmentResources } = useEnvironmentStore();
-	const { getVersionNotifications } = useVersionStore();
 
 	useEffect(() => {
 		if (orgId) {
@@ -70,15 +69,6 @@ export default function Root() {
 
 		if (orgId && versionId && appId) {
 			getResources();
-			getVersionNotifications({
-				appId,
-				orgId,
-				versionId,
-				page: 0,
-				size: 50,
-				sortBy: 'createdAt',
-				sortDir: 'desc',
-			});
 		}
 	}, [versionId]);
 

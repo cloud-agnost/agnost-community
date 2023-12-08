@@ -44,7 +44,7 @@ export default function useInfiniteScroll({
 			(lastFetchedPage === 0 && !dataLength) ||
 			Math.ceil(dataLength / MODULE_PAGE_SIZE) < lastFetchedPage,
 		getNextPageParam: (lastPage) => {
-			const nextPage = lastPage.length === MODULE_PAGE_SIZE ? lastFetchedPage + 1 : undefined;
+			const nextPage = lastPage?.length === MODULE_PAGE_SIZE ? lastFetchedPage + 1 : undefined;
 			return nextPage;
 		},
 	});
