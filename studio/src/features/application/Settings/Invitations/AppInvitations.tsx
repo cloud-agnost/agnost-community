@@ -7,15 +7,18 @@ import AppInvitationFilter from './AppInvitationFilter';
 import { AppInvitationsColumns } from './AppInvitationsColumns';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { PAGE_SIZE } from '@/constants';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { TableLoading } from '@/components/Table/Table';
 function AppInvitations() {
-	const { invitations, getAppInvitations, lastFetchedInvitationsPage } = useApplicationStore();
+	const { invitations, getAppInvitations, lastFetchedInvitationsPage, application } =
+		useApplicationStore();
 	const [searchParams] = useSearchParams();
 	const table = useTable({
 		data: invitations,
 		columns: AppInvitationsColumns,
 	});
+
+	const { orgId } = useParams<{ orgId: string }>();
 
 	const { fetchNextPage, isFetchingNextPage, hasNextPage, refetch } = useInfiniteQuery({
 		queryFn: ({ pageParam }) =>
@@ -27,10 +30,12 @@ function AppInvitations() {
 				sortDir: searchParams.get('d') as string,
 				roles: searchParams.get('r')?.split(',') as string[],
 				status: 'Pending',
+				orgId,
+				appId: application?._id,
 			}),
-		queryKey: ['organizationInvitations'],
-		initialPageParam: 0,
+		queryKey: ['applicationInvitations'],
 		enabled: searchParams.get('t') === 'invitations',
+		initialPageParam: 0,
 		getNextPageParam: (lastPage) => {
 			const nextPage = lastPage.length === PAGE_SIZE ? lastFetchedInvitationsPage + 1 : undefined;
 			return nextPage;
