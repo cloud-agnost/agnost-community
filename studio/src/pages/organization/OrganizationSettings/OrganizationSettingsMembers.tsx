@@ -39,7 +39,6 @@ export default function OrganizationSettingsMembers() {
 			form.reset();
 		},
 		onError: (err: APIError) => {
-			console.log(err);
 			err.fields?.forEach((field) => {
 				form.setError(`member.${field.param.replace(/\[|\]/g, '')}` as any, {
 					type: 'custom',
@@ -74,7 +73,6 @@ export default function OrganizationSettingsMembers() {
 	}, [searchParams, searchParams.get('tab')]);
 
 	useEffect(() => {
-		console.log(searchParams.has('tab'));
 		if (!searchParams.has('tab')) {
 			searchParams.set('tab', 'member');
 			setSearchParams(searchParams);

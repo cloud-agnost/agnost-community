@@ -3,7 +3,6 @@ import { Organization as OrganizationType, RealtimeActionParams } from '@/types'
 import { RealtimeActions } from './RealtimeActions';
 class Organization extends RealtimeActions<OrganizationType> {
 	accept(param: RealtimeActionParams<OrganizationType>): void {
-		console.log(param);
 		useOrganizationStore.setState?.((prev) => ({
 			...prev,
 			members: [

@@ -21,10 +21,6 @@ class ApplicationTeam extends RealtimeActions<Application> {
 		const user = useAuthStore.getState()?.user;
 
 		if (!team.some((member) => member.userId._id === user?._id)) {
-			console.log(
-				'here',
-				useApplicationStore.getState?.().applications.filter((app) => app._id !== data._id),
-			);
 			useApplicationStore.setState?.({
 				application: null,
 				applications: useApplicationStore

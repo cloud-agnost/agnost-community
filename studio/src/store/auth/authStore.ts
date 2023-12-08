@@ -180,7 +180,6 @@ const useAuthStore = create<AuthState & Actions>()(
 							const res = await UserService.acceptInvite(token);
 							set({ isAccepted: true, user: res.user });
 							if (get().isAuthenticated()) {
-								console.log('here', res.app);
 								joinChannel(res.app._id);
 								useApplicationStore.setState?.({
 									applications: [...useApplicationStore.getState().applications, res.app],

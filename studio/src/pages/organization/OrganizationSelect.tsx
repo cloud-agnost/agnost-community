@@ -27,8 +27,6 @@ export default function OrganizationSelect() {
 		getAllOrganizationByUser();
 	}, []);
 
-	console.log(organizations);
-
 	return (
 		<div className='p-6'>
 			<div className='select-organization-container'>

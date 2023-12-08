@@ -25,7 +25,6 @@ export default function DatabaseForm({
 	disabled?: boolean;
 }) {
 	const form = useFormContext();
-	console.log(form.getValues());
 	return (
 		<>
 			<FormField

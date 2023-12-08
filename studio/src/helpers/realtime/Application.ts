@@ -31,7 +31,6 @@ class Application extends RealtimeActions<ApplicationType | CreateApplicationRes
 	update({ data }: RealtimeActionParams<ApplicationType>) {
 		const user = useAuthStore.getState()?.user;
 		const role = data.team.find((team) => team.userId._id === user?._id)?.role;
-		console.log(data.team);
 		useApplicationStore.setState?.({
 			application: {
 				...data,
