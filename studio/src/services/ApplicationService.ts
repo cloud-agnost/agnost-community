@@ -78,7 +78,7 @@ export default class ApplicationService {
 	}
 	static async removeMultipleAppMembers(req: RemoveMemberRequest): Promise<void> {
 		return (
-			await axios.delete(
+			await axios.post(
 				`${this.getUrl(req.orgId as string, req.appId as string)}/team/delete-multi`,
 				{
 					data: {
@@ -98,7 +98,7 @@ export default class ApplicationService {
 	}
 	static async getAppInvitations(req: GetInvitationRequest): Promise<Invitation[]> {
 		const { roles, ...params } = req;
-		const role = arrayToQueryString(roles, 'role');
+		const role = arrayToQueryString(roles as string[], 'role');
 		return (
 			await axios.get(`${this.getUrl(req.orgId as string, req.appId as string)}/invite?${role}`, {
 				params,

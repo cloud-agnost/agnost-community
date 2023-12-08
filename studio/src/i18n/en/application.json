@@ -14,7 +14,7 @@
 	},
 	"leave": {
 		"title": "Leave App Team",
-		"description": "You are about the leave the app team. After leaving the team you will not be able to access it again. Are you sure you would like to leave the {{name}} team?"
+		"description": "You are about the leave the app team. After leaving the team you will not be able to access it again. Are you sure you would like to leave the team?"
 	},
 	"version": {
 		"title": "Open Version",
@@ -57,7 +57,9 @@
 		"subTitle": "Invite Application Members",
 		"description": "Each application member can have different role assigned to authorize certain actions within the organization itself. Organization members can also be added to app teams.",
 		"success": "Invitation has been sent successfully",
-		"successDesc": "The invitation has been sent successfully. The invited member will be able to access the app once they accept the invitation."
+		"successDesc": "The invitation has been sent successfully. The invited member will be able to access the app once they accept the invitation.",
+		"delete": "Delete Invitation",
+		"deleteDesc": "Are you sure you want to delete this invitation? This action cannot be undone. The user will not be able to join the application."
 	},
 	"delete": {
 		"title": "Delete App",

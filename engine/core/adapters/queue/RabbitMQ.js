@@ -173,9 +173,11 @@ export class RabbitMQ extends QueueBase {
 
 			console.log("****sendMessage10");
 
-			await channel.close();
+			// await channel.close();
 			console.log("****sendMessage11");
 		} catch (error) {
+			console.log("****sendMessage12", error);
+
 			logger.error("Cannot create channel to message queue", {
 				details: error,
 			});

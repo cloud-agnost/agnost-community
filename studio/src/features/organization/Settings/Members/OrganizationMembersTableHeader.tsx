@@ -16,93 +16,93 @@ import { Table } from '@tanstack/react-table';
 import { RoleDropdown } from 'components/RoleDropdown';
 import { SelectedRowButton } from 'components/Table';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import '../../organization.scss';
+import { useMemo } from 'react';
 
 export default function OrganizationMembersTableHeader({ table }: { table: Table<any> }) {
 	const { t } = useTranslation();
 	const { notify } = useToast();
 	const canMultipleDelete = useAuthorizeOrg('team.delete');
-	const {
-		memberSearch,
-		memberSort,
-		selectedTab,
-		deleteMultipleInvitations,
-		removeMultipleMembersFromOrganization,
-		setMemberSearch,
-		setMemberSort,
-		setMemberRoleFilter,
-	} = useOrganizationStore();
-
+	const [searchParams, setSearchParams] = useSearchParams();
+	const { deleteMultipleInvitations, removeMultipleMembersFromOrganization } =
+		useOrganizationStore();
+	const selectedTab = searchParams.get('tab') as string;
 	const sortOptions: SortOption[] =
 		selectedTab === 'member' ? ORG_MEMBERS_SORT_OPTIONS : INVITATIONS_SORT_OPTIONS;
 
+	const selectedSort = useMemo(() => {
+		return (
+			sortOptions.find((sort) => sort.value === searchParams.get('s')) ??
+			INVITATIONS_SORT_OPTIONS[0]
+		);
+	}, [searchParams]);
+
+	function setMemberRoleFilter(roles: string[]) {
+		searchParams.set('r', roles.join(','));
+		setSearchParams(searchParams);
+	}
+
+	function setMemberSort(sort: SortOption) {
+		if (sort.sortDir && sort.value) {
+			searchParams.set('s', sort.value);
+			searchParams.set('d', sort.sortDir);
+		} else {
+			searchParams.delete('s');
+			searchParams.delete('d');
+		}
+		setSearchParams(searchParams);
+	}
+	function onSuccess() {
+		notify({
+			title: t('general.success'),
+			description:
+				selectedTab === 'member'
+					? t('organization.member.delete')
+					: t('organization.invitation.delete'),
+			type: 'success',
+		});
+	}
+	function onError({ error, details }: { error: string; details: string }) {
+		notify({
+			title: error,
+			description: details,
+			type: 'error',
+		});
+	}
 	function deleteMulti() {
+		const selectedRows = table.getSelectedRowModel().rows;
 		if (selectedTab === 'member') {
 			removeMultipleMembersFromOrganization({
-				userIds: table.getSelectedRowModel().rows?.map((row) => row.original.member._id) ?? [],
-				onSuccess: () => {
-					notify({
-						title: t('general.success'),
-						description: t('general.invitation.delete'),
-						type: 'success',
-					});
-				},
-				onError: ({ error, details }) => {
-					notify({
-						title: error,
-						description: details,
-						type: 'error',
-					});
-				},
+				userIds: selectedRows.map((row) => row.original.member._id) ?? [],
+				onSuccess,
+				onError,
 			});
 		} else {
 			deleteMultipleInvitations({
-				tokens: table.getSelectedRowModel().rows?.map((row) => row.original.token) ?? [],
-				onSuccess: () => {
-					notify({
-						title: t('general.success'),
-						description: t('general.invitation.delete'),
-						type: 'success',
-					});
-				},
-				onError: ({ error, details }) => {
-					notify({
-						title: error,
-						description: details,
-						type: 'error',
-					});
-				},
+				tokens: selectedRows?.map((row) => row.original.token) ?? [],
+				onSuccess,
+				onError,
 			});
 		}
 	}
 	return (
 		<div className='members-filter'>
-			<SearchInput
-				className='w-80'
-				value={memberSearch}
-				onSearch={(searchTerm) => {
-					setMemberSearch(searchTerm);
-				}}
-			/>
+			<SearchInput className='w-80' />
 
 			<DropdownMenu>
-				<RoleDropdown
-					type={'org'}
-					onChange={(roles) => {
-						setMemberRoleFilter(roles);
-					}}
-				/>
+				<RoleDropdown type='org' onChange={setMemberRoleFilter} />
 				<DropdownMenuTrigger asChild>
 					<Button variant='outline'>
 						<FunnelSimple size={16} className='members-filter-icon' />
-						{memberSort.name}
+						{selectedSort?.name}
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className='w-56'>
 					{sortOptions.map((sort) => (
 						<DropdownMenuCheckboxItem
 							key={sort.name}
-							checked={memberSort.name === sort.name}
+							checked={sort.name === selectedSort?.name}
 							onCheckedChange={(checked) => {
 								if (checked) {
 									setMemberSort(sort);

@@ -10,6 +10,8 @@ import type {
 } from '@/types';
 import { joinChannel, leaveChannel } from '@/utils';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
+import useApplicationStore from '../app/applicationStore';
+import useOrganizationStore from '../organization/organizationStore';
 
 interface AuthState {
 	accessToken: string | null | undefined;
@@ -47,6 +49,9 @@ type Actions = {
 	) => Promise<void>;
 	finalizeAccountSetup: (data: FinalizeAccountSetupRequest) => Promise<User | APIError>;
 	acceptInvite: (token: string) => Promise<{
+		user: User;
+	}>;
+	orgAcceptInvite: (token: string) => Promise<{
 		user: User;
 	}>;
 	changeName: (name: string) => Promise<User>;
@@ -174,6 +179,29 @@ const useAuthStore = create<AuthState & Actions>()(
 						try {
 							const res = await UserService.acceptInvite(token);
 							set({ isAccepted: true, user: res.user });
+							if (get().isAuthenticated()) {
+								joinChannel(res.app._id);
+								useApplicationStore.setState?.({
+									applications: [...useApplicationStore.getState().applications, res.app],
+									temp: [...useApplicationStore.getState().applications, res.app],
+								});
+							}
+							return res;
+						} catch (err) {
+							set({ error: err as APIError });
+							throw err;
+						}
+					},
+					async orgAcceptInvite(token: string) {
+						try {
+							const res = await UserService.orgAcceptInvite(token);
+							set({ isAccepted: true, user: res.user });
+							joinChannel(res.org._id);
+							if (get().isAuthenticated()) {
+								useOrganizationStore.setState?.({
+									organizations: [...useOrganizationStore.getState().organizations, res.org],
+								});
+							}
 							return res;
 						} catch (err) {
 							set({ error: err as APIError });

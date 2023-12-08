@@ -1,77 +1,83 @@
-import { Button } from '@/components/Button';
-import { InviteMemberForm } from '@/components/InviteMemberForm';
+import { Form } from '@/components/Form';
+import { InviteMemberForm, InviteMemberSchema } from '@/components/InviteMemberForm';
 import { Separator } from '@/components/Separator';
-import { PAGE_SIZE } from '@/constants';
 import { OrganizationInvitationTable, OrganizationMembersTable } from '@/features/organization';
-import { useUpdateEffect } from '@/hooks';
+import { useToast, useUpdateEffect } from '@/hooks';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout';
 import useClusterStore from '@/store/cluster/clusterStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import useTypeStore from '@/store/types/typeStore';
-import { APIError, OrgMemberRequest } from '@/types';
+import { APIError } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/Tabs';
-import { useMemo } from 'react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
+import { z } from 'zod';
 import '../organization.scss';
-import { useParams } from 'react-router-dom';
-
 export default function OrganizationSettingsMembers() {
 	const { t } = useTranslation();
+	const { notify } = useToast();
 	const { canClusterSendEmail } = useClusterStore();
+	const [searchParams, setSearchParams] = useSearchParams();
 	const canInvite = useAuthorizeOrg('invite.create');
-	const { orgId, appId } = useParams() as Record<string, string>;
-	const {
-		inviteUsersToOrganization,
-		getOrganizationInvitations,
-		getOrganizationMembers,
-		clearFilter,
-		organization,
-		memberPage,
-		memberSearch,
-		memberRoleFilter,
-		memberSort,
-		selectedTab,
-	} = useOrganizationStore();
-
-	function onSubmit(data: OrgMemberRequest[], setError: (error: APIError) => void) {
-		if (data.length) {
-			inviteUsersToOrganization({
-				organizationId: organization?._id as string,
-				members: data,
-				uiBaseURL: window.location.origin,
-				onError: (error) => setError(error),
+	const { inviteUsersToOrganization, getOrganizationMembers, organization } =
+		useOrganizationStore();
+	const form = useForm<z.infer<typeof InviteMemberSchema>>({
+		resolver: zodResolver(InviteMemberSchema),
+	});
+	const { mutateAsync: inviteMutate, isPending } = useMutation({
+		mutationFn: inviteUsersToOrganization,
+		onSuccess: () => {
+			notify({
+				title: t('general.success'),
+				description: t('general.invitation.success'),
+				type: 'success',
 			});
-		}
-	}
-
-	const { orgRoles } = useTypeStore();
-
-	const getMemberRequest = useMemo(
-		() => ({
-			page: memberPage,
-			size: PAGE_SIZE,
+			form.reset();
+		},
+		onError: (err: APIError) => {
+			err.fields?.forEach((field) => {
+				form.setError(`member.${field.param.replace(/\[|\]/g, '')}` as any, {
+					type: 'custom',
+					message: field.msg,
+				});
+			});
+		},
+	});
+	const onSubmit = (data: z.infer<typeof InviteMemberSchema>) => {
+		inviteMutate({
 			organizationId: organization?._id as string,
-			...(selectedTab === 'member' ? { search: memberSearch } : { email: memberSearch }),
-			sortBy: memberSort.value,
-			sortDir: memberSort.sortDir,
-			roles: memberRoleFilter,
-		}),
-		[memberPage, memberSearch, memberSort, memberRoleFilter],
-	);
+			members: data.member.filter((item) => item.email !== '' && item.role !== '') as any,
+			uiBaseURL: window.location.origin,
+		});
+	};
+
+	const { refetch } = useQuery({
+		queryKey: ['organizationMembers'],
+		queryFn: () =>
+			getOrganizationMembers({
+				organizationId: organization?._id as string,
+				search: searchParams.get('q') as string,
+				sortBy: searchParams.get('s') as string,
+				sortDir: searchParams.get('d') as string,
+				roles: searchParams.get('r')?.split(',') as string[],
+			}),
+		enabled: searchParams.get('tab') === 'member',
+	});
 
 	useUpdateEffect(() => {
-		if (selectedTab === 'member') {
-			getOrganizationMembers(getMemberRequest);
-		} else {
-			getOrganizationInvitations({
-				...getMemberRequest,
-				orgId,
-				appId,
-				status: 'Pending',
-			});
+		if (searchParams.get('tab') === 'member') refetch();
+	}, [searchParams, searchParams.get('tab')]);
+
+	useEffect(() => {
+		if (!searchParams.has('tab')) {
+			searchParams.set('tab', 'member');
+			setSearchParams(searchParams);
 		}
-	}, [selectedTab, getMemberRequest]);
+	}, []);
 
 	return (
 		<OrganizationSettingsLayout
@@ -79,29 +85,30 @@ export default function OrganizationSettingsMembers() {
 			description={t('organization.settings.members.description')}
 		>
 			{canClusterSendEmail && (
-				<>
-					<InviteMemberForm
-						submitForm={onSubmit}
-						roles={orgRoles}
-						title={t('organization.settings.members.invite.title') as string}
-						description={t('organization.settings.members.invite.desc') as string}
-						actions={
-							<Button variant='primary' size='lg' disabled={!canInvite}>
-								{t('organization.settings.members.invite.button')}
-							</Button>
-						}
-						disabled={!canInvite}
-					/>
-					<Separator className='my-12' />
-				</>
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(onSubmit)}>
+						<InviteMemberForm
+							loading={isPending}
+							type='org'
+							title={t('organization.settings.members.invite.title') as string}
+							description={t('organization.settings.members.invite.desc') as string}
+							disabled={!canInvite}
+						/>
+						<Separator className='my-12' />
+					</form>
+				</Form>
 			)}
 
 			<div className='members'>
 				<Tabs
-					defaultValue={selectedTab}
+					value={searchParams.get('tab') as string}
 					onValueChange={(value) => {
-						useOrganizationStore.setState?.({ selectedTab: value as 'member' | 'invitation' });
-						clearFilter();
+						searchParams.set('tab', value);
+						searchParams.delete('q');
+						searchParams.delete('s');
+						searchParams.delete('d');
+						searchParams.delete('r');
+						setSearchParams(searchParams);
 					}}
 					className='relative'
 				>

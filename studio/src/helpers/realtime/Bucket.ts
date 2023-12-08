@@ -5,6 +5,9 @@ import { Bucket as BucketType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
 class Bucket extends RealtimeActions<BucketType> {
+	accept(): void {
+		throw new Error('Method not implemented.');
+	}
 	delete({ identifiers }: RealtimeActionParams<BucketType>): void {
 		const { removeTabByPath } = useTabStore.getState();
 		useStorageStore.setState?.((prev) => ({

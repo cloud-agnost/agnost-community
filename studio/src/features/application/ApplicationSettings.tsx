@@ -40,7 +40,10 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 						<div key={setting.id}>
 							<DropdownMenuItem
 								id={setting.id}
-								disabled={setting.isDisabled(role)}
+								disabled={setting.isDisabled(
+									role,
+									applications.find((app) => app._id === appId) as Application,
+								)}
 								className='font-sfCompact px-3'
 								onClick={() =>
 									setting.onClick(applications.find((app) => app._id === appId) as Application)

@@ -348,39 +348,30 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 			packagesToUnInstall.push(`${key}`);
 		}
 
+		let finalCommand = null;
+		let uninstallCommand = null;
+		let installCommand = null;
+
 		if (packagesToUnInstall.length > 0) {
-			this.addLog(t("Uninstalling %s package(s)", packagesToUnInstall.length));
+			this.addLog(t("Uninstalling packages: ", packagesToUnInstall.join(" ")));
+			uninstallCommand = `npm uninstall ${packagesToUnInstall.join(" ")}`;
 		}
-		// If there are packages to uninstall then uninstall them
-		for (let i = 0; i < packagesToUnInstall.length; i++) {
-			const entry = packagesToUnInstall[i];
-			try {
-				execSync(`npm uninstall ${entry}`, {
-					stdio: "ignore",
-				});
-				this.addLog(t("Uninstalled package %s", entry));
-			} catch (err) {
-				this.addLog(t("Failed to uninstall package %s", entry));
-			}
-		}
-
 		if (packagesToInstall.length > 0) {
-			this.addLog(
-				t("Installing/updating %s package(s)", packagesToInstall.length)
-			);
+			this.addLog(t("Installing packages:", packagesToInstall.join(" ")));
+			installCommand = `npm install ${packagesToInstall.join(" ")}`;
 		}
 
-		// If there are packages to install then install them
-		for (let i = 0; i < packagesToInstall.length; i++) {
-			const entry = packagesToInstall[i];
-			try {
-				execSync(`npm install ${entry}`, {
-					stdio: "ignore",
-				});
-				this.addLog(t("Installed/updated package %s", entry));
-			} catch (err) {
-				this.addLog(t("Failed to install package %s", entry));
-			}
+		if (uninstallCommand && installCommand)
+			finalCommand = `${uninstallCommand} && ${installCommand}`;
+		else if (uninstallCommand) finalCommand = uninstallCommand;
+		else finalCommand = installCommand;
+
+		try {
+			execSync(finalCommand, {
+				stdio: "ignore",
+			});
+		} catch (err) {
+			this.addLog(t("Failed to install/uninstall packages %s", err.message));
 		}
 	}
 }

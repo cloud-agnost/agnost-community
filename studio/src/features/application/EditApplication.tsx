@@ -1,20 +1,18 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { EDIT_APPLICATION_MENU_ITEMS } from '@/constants';
+import AppInvitations from '@/features/application/Settings/Invitations/AppInvitations';
 import OrganizationMenuItem from '@/features/organization/navbar/OrganizationMenuItem';
 import useApplicationStore from '@/store/app/applicationStore';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMatch, useParams, useSearchParams } from 'react-router-dom';
+import { useMatch, useSearchParams } from 'react-router-dom';
 import AppGeneralSettings from './Settings/AppGeneralSettings';
 import AppMembers from './Settings/Members/AppMembers';
-import AppInvitations from '@/features/application/Settings/Invitations/AppInvitations';
 
 export default function EditApplication() {
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { isEditAppOpen, closeEditAppDrawer, getAppTeamMembers, application } =
-		useApplicationStore();
-	const { orgId } = useParams() as Record<string, string>;
+	const { isEditAppOpen, closeEditAppDrawer } = useApplicationStore();
 	const match = useMatch('/organization/:orgId/apps');
 
 	useEffect(() => {
@@ -25,12 +23,7 @@ export default function EditApplication() {
 	}, [isEditAppOpen, searchParams]);
 
 	useEffect(() => {
-		if (isEditAppOpen) {
-			getAppTeamMembers({
-				appId: application?._id as string,
-				orgId,
-			});
-		} else {
+		if (!isEditAppOpen) {
 			searchParams.delete('t');
 			setSearchParams(searchParams);
 		}

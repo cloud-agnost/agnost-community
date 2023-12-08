@@ -1,1 +1,1 @@
-export { default as InviteMemberForm } from './InviteMemberForm';
+export { default as InviteMemberForm, InviteMemberSchema } from './InviteMemberForm';

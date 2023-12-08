@@ -3,6 +3,7 @@ import { Checkbox } from '@/components/Checkbox';
 import { SortButton } from '@/components/DataTable';
 import { TableConfirmation } from '@/components/Table';
 import useApplicationStore from '@/store/app/applicationStore';
+import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ApplicationMember } from '@/types';
 import { getAppPermission, notify, translate } from '@/utils';
@@ -58,13 +59,18 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 				aria-label='Select all'
 			/>
 		),
-		cell: ({ row }) => (
-			<Checkbox
-				checked={row.getIsSelected()}
-				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label='Select row'
-			/>
-		),
+		cell: ({ row }) => {
+			const { member } = row.original;
+			const user = useAuthStore.getState().user;
+			return (
+				<Checkbox
+					checked={row.getIsSelected()}
+					onCheckedChange={(value) => row.toggleSelected(!!value)}
+					aria-label='Select row'
+					disabled={member._id === user?._id || member.isAppOwner}
+				/>
+			);
+		},
 		enableSorting: false,
 		enableHiding: false,
 		size: 45,
@@ -97,15 +103,16 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 		size: 200,
 		filterFn: 'arrIncludesSome',
 		cell: ({ row }) => {
-			const canUpdate = getAppPermission('team.update');
-
 			const { role, member, appId } = row.original;
+			const canUpdate = getAppPermission('team.update');
+			const user = useAuthStore.getState().user;
+			const isMe = member._id === user?._id;
 			return (
 				<RoleSelect
 					role={role}
 					type={'app'}
 					onSelect={(selectedRole) => updateMemberRole(member._id, selectedRole, appId)}
-					disabled={member.isAppOwner || !canUpdate}
+					disabled={member.isAppOwner || !canUpdate || isMe}
 				/>
 			);
 		},
@@ -117,6 +124,8 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 		cell: ({ row }) => {
 			const { member, appId } = row.original;
 			const canDelete = getAppPermission('team.delete');
+			const user = useAuthStore.getState().user;
+			const isMe = member._id === user?._id;
 			return (
 				!member.isAppOwner && (
 					<TableConfirmation
@@ -124,6 +133,7 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 						description={translate('application.deleteMember.description')}
 						onConfirm={() => removeMember(member._id, appId)}
 						hasPermission={canDelete}
+						disabled={isMe}
 					/>
 				)
 			);

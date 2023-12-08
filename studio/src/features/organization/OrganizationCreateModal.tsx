@@ -13,6 +13,7 @@ import { Input } from '@/components/Input';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { CreateOrganizationSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
@@ -30,21 +31,20 @@ export default function OrganizationCreateModal({
 	});
 	const { t } = useTranslation();
 	const { createOrganization } = useOrganizationStore();
-	const { loading } = useOrganizationStore();
 
 	function handleCloseModal() {
 		closeModal();
 		form.reset();
 	}
+
+	const { isPending, mutateAsync: createOrganizationMutate } = useMutation({
+		mutationFn: createOrganization,
+		onSettled: handleCloseModal,
+	});
+
 	async function onSubmit(data: z.infer<typeof CreateOrganizationSchema>) {
-		await createOrganization({
+		createOrganizationMutate({
 			name: data.name,
-			onSuccess: () => {
-				handleCloseModal();
-			},
-			onError: () => {
-				handleCloseModal();
-			},
 		});
 	}
 
@@ -78,7 +78,7 @@ export default function OrganizationCreateModal({
 							<Button variant='text' type='button' size='lg' onClick={closeModal}>
 								{t('general.cancel')}
 							</Button>
-							<Button variant='primary' size='lg' loading={loading}>
+							<Button variant='primary' size='lg' loading={isPending}>
 								{t('general.ok')}
 							</Button>
 						</div>
