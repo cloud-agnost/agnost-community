@@ -355,14 +355,22 @@
 }
 .Toastify__close-button {
 	align-self: center;
+	padding: 0.5rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.Toastify__close-button:hover {
+	border-radius: 50%;
+	background-color: rgb(var(--wrapper-background-base));
 }
 .Toastify__close-button--light {
 	color: rgb(var(--icon-base));
 	opacity: 1;
 }
 .Toastify__close-button > svg {
-	width: 1.25rem;
-	height: 1.25rem;
+	width: 1rem;
+	height: 1rem;
 }
 @keyframes Toastify__trackProgress {
 	0% {
