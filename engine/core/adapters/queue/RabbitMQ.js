@@ -25,10 +25,18 @@ export class RabbitMQ extends QueueBase {
 	 */
 	async closeChannels() {
 		try {
-			if (this.consumeChannel) await this.consumeChannel.close();
+			if (this.consumeChannel) {
+				this.consumeChannel.removeAllListeners("error");
+				await this.consumeChannel.close();
+			}
+			if (this.publishChannel) {
+				this.publishChannel.removeAllListeners("error");
+				await this.publishChannel.close();
+			}
 		} catch (err) {}
 
 		this.consumeChannel = null;
+		this.publishChannel = null;
 	}
 
 	/**
@@ -82,11 +90,10 @@ export class RabbitMQ extends QueueBase {
 		try {
 			if (!this.publishChannel) {
 				this.publishChannel = await this.driver.createChannel();
+				this.publishChannel.on("error", (err) => {
+					console.error("RabbitMQ channel error to send messages:", queue, err);
+				});
 			}
-
-			this.publishChannel.on("error", (err) => {
-				console.error("RabbitMQ channel error to send messages:", queue, err);
-			});
 
 			const envId = META.getEnvId();
 			const message = {
@@ -173,16 +180,15 @@ export class RabbitMQ extends QueueBase {
 		try {
 			if (!this.consumeChannel) {
 				this.consumeChannel = await this.driver.createChannel();
+				this.consumeChannel.on("error", (err) => {
+					console.error(
+						"RabbitMQ channel error to process messages:",
+						queue,
+						exchange,
+						err
+					);
+				});
 			}
-
-			this.consumeChannel.on("error", (err) => {
-				console.error(
-					"RabbitMQ channel error to process messages:",
-					queue,
-					exchange,
-					err
-				);
-			});
 
 			// If this is a delayed message then we need to bind the queue to the exchange
 			if (exchange) {
