@@ -1,4 +1,3 @@
-import axios from "axios";
 import { getKey } from "../init/cache.js";
 import { DeploymentManager } from "../handlers/managers/deploymentManager.js";
 
