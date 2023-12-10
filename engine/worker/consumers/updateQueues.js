@@ -28,6 +28,8 @@ export const updateQueuesHandler = (connection, queue) => {
             async function (msg) {
                 let msgObj = JSON.parse(msg.content.toString());
 
+                console.log("msgObj", JSON.stringify(msgObj, null, 2));
+
                 // Check the environment status if it is in a deployment state then do not acknowledge the message unless it is timed out
                 let envStatus = await getKey(`${msgObj.env.iid}.status`);
                 console.log("envStatus", envStatus);
