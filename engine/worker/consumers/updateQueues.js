@@ -37,6 +37,7 @@ export const updateQueuesHandler = (connection, queue) => {
                     const date = new Date(Date.parse(msgObj.timestamp));
                     const millisecondsFromEpoch = date.getTime();
 
+                    console.log("msgObj.timestamp", msgObj.timestamp);
                     console.log("now - millisecondsFromEpoch", now - millisecondsFromEpoch);
                     console.log("wait time", config.get("general.maxMessageWaitMinues") * 60 * 1000);
 
