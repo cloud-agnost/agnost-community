@@ -257,6 +257,7 @@ export class MongoDBManager extends DBManager {
             }
         }
 
+        console.log("fieldDeletes", fieldDeletes);
         // Drop deleted fiels
         let appDB = await this.getAppDB();
         for (let key in fieldDeletes) {
