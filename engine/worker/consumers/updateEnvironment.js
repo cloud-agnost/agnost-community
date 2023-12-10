@@ -33,7 +33,7 @@ export const updateEnvironmentHandler = (connection, queue) => {
                 if (["Deploying", "Redeploying"].includes(envStatus)) {
                     // Check timestamp of the message
                     const now = Date.now();
-                    const date = new Date(Date.parse(msgObj.timestamp));
+                    const date = new Date(Date.parse(msgObj.env.timestamp));
                     const millisecondsFromEpoch = date.getTime();
 
                     // If the message was wating more than the max message wait duration, acknowledge the mesage and set environment status to Error
