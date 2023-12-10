@@ -30,11 +30,15 @@ export const updateQueuesHandler = (connection, queue) => {
 
                 // Check the environment status if it is in a deployment state then do not acknowledge the message unless it is timed out
                 let envStatus = await getKey(`${msgObj.env.iid}.status`);
+                console.log("envStatus", envStatus);
                 if (["Deploying", "Redeploying"].includes(envStatus)) {
                     // Check timestamp of the message
                     const now = Date.now();
                     const date = new Date(Date.parse(msgObj.timestamp));
                     const millisecondsFromEpoch = date.getTime();
+
+                    console.log("now - millisecondsFromEpoch", now - millisecondsFromEpoch);
+                    console.log("wait time", config.get("general.maxMessageWaitMinues") * 60 * 1000);
 
                     // If the message was wating more than the max message wait duration, acknowledge the mesage and set environment status to Error
                     if (now - millisecondsFromEpoch >= config.get("general.maxMessageWaitMinues") * 60 * 1000) {
@@ -77,6 +81,7 @@ export const updateQueuesHandler = (connection, queue) => {
 
                         channel.ack(msg);
                     } else {
+                        console.log("nack");
                         // Message has not timed out yet, it might be still being processed
                         channel.nack(msg);
                     }
