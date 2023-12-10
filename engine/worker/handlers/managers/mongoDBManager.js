@@ -98,6 +98,7 @@ export class MongoDBManager extends DBManager {
      * Iterates over database models creates/drops counterpart collections and associated collection indices
      */
     async manageModels() {
+        console.log("***manage models");
         const models = this.getModels();
         const appDB = await this.getAppDB();
 
@@ -123,6 +124,8 @@ export class MongoDBManager extends DBManager {
             }
         }
 
+        console.log("***create models");
+
         // Drop deleted models
         for (let i = 0; i < collections.length; i++) {
             const collection = collections[i];
@@ -132,12 +135,22 @@ export class MongoDBManager extends DBManager {
             }
         }
 
+        console.log("***drop models");
+
         // Process field name changes
         await this.processFieldNameChanges();
+
+        console.log("***processFieldNameChanges");
+
         // Drop deleted fields from database collections
         await this.dropDeletedFields();
+
+        console.log("***dropDeletedFields");
+
         // Prepare/update indices on collections
         await this.ensureIndices();
+
+        console.log("***ensureIndices");
     }
 
     /**
@@ -287,9 +300,12 @@ export class MongoDBManager extends DBManager {
                 const requiredIndex = this.getRequiredIndex(index, requiredIndices, result.textIndexDef);
 
                 if (!requiredIndex) {
+                    console.log("dropIndex", index.name);
                     await collection.dropIndex(index.name);
                 }
             }
+
+            console.log("createIndexes", requiredIndices);
 
             //Create all required indices
             if (result.textIndexDef?.key) {
