@@ -249,6 +249,12 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Set up the task listeners
 		await this.manageTasks();
 
+		// Clear agnost package cache
+		const pkg = (await import("@agnost/server")).default;
+		const { agnost } = pkg;
+		agnost.clearClientCache();
+		this.addLog(`Cleared server side module '@agnost/server' cache`);
+
 		// Send the deployment telemetry information to the platform
 		await this.sendEnvironmentLogs("OK");
 
