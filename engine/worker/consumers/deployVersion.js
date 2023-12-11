@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getKey, setKey } from "../init/cache.js";
-import { sendMessage } from "../init/sync.js";
 import { DeploymentManager } from "../handlers/managers/deploymentManager.js";
 
 export const deployVersionHandler = (connection, queue) => {
@@ -34,29 +33,13 @@ export const deployVersionHandler = (connection, queue) => {
                 if (["Deploying", "Redeploying"].includes(envStatus)) {
                     // Check timestamp of the message
                     const now = Date.now();
-                    const date = new Date(Date.parse(msgObj.timestamp));
+                    const date = new Date(Date.parse(msgObj.env.timestamp));
                     const millisecondsFromEpoch = date.getTime();
 
                     // If the message was wating more than the max message wait duration, acknowledge the mesage and set environment status to Error
                     if (now - millisecondsFromEpoch >= config.get("general.maxMessageWaitMinues") * 60 * 1000) {
                         // Set environment status
                         await setKey(`${msgObj.env.iid}.status`, "Error");
-
-                        // Send realtime message
-                        sendMessage(msgObj.env._id, {
-                            actor: msgObj.actor,
-                            action: "telemetry",
-                            object: "org.app.version.environment",
-                            description: t("App version deployment timed out due to errors"),
-                            timestamp: Date.now(),
-                            data: msgObj,
-                            identifiers: {
-                                orgId: msgObj.env.orgId,
-                                appId: msgObj.env.appId,
-                                versionId: msgObj.env.versionId,
-                                envId: msgObj.env._id,
-                            },
-                        });
 
                         // Update the environment log object
                         axios
@@ -69,9 +52,12 @@ export const deployVersionHandler = (connection, queue) => {
                                             startedAt: new Date(now).toISOString(),
                                             duration: Date.now() - now,
                                             status: "Error",
-                                            message: "App version deployment timed out due to errors",
+                                            message: t(
+                                                "App version deployment timed out due to waiting too long for the deployment to complete"
+                                            ),
                                         },
                                     ],
+                                    type: "db",
                                 },
                                 {
                                     headers: {

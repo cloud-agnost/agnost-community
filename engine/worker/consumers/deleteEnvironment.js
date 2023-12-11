@@ -1,4 +1,3 @@
-import axios from "axios";
 import { getKey } from "../init/cache.js";
 import { DeploymentManager } from "../handlers/managers/deploymentManager.js";
 
@@ -33,7 +32,7 @@ export const deleteEnvironmentHandler = (connection, queue) => {
                 if (["Deploying", "Redeploying"].includes(envStatus)) {
                     // Check timestamp of the message
                     const now = Date.now();
-                    const date = new Date(Date.parse(msgObj.timestamp));
+                    const date = new Date(Date.parse(msgObj.env.timestamp));
                     const millisecondsFromEpoch = date.getTime();
 
                     // If processing has not timed out do not acknowledge message and return

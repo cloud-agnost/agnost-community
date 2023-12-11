@@ -132,12 +132,14 @@ export class MongoDBManager extends DBManager {
             }
         }
 
-        // Process field name changes
-        await this.processFieldNameChanges();
-        // Drop deleted fields from database collections
-        await this.dropDeletedFields();
         // Prepare/update indices on collections
         await this.ensureIndices();
+
+        // Process field name changes
+        await this.processFieldNameChanges();
+
+        // Drop deleted fields from database collections
+        await this.dropDeletedFields();
     }
 
     /**
@@ -202,8 +204,11 @@ export class MongoDBManager extends DBManager {
                 const rename = {};
                 rename.$rename = {};
                 rename.$rename[item.fieldPath] = item.newName;
-                await appDB.collection(key).updateMany({}, rename);
-                this.addLog(t("Renamed field '%s' to '%s' in model '%s", item.oldName, item.newName, item.modelPath));
+                appDB
+                    .collection(key)
+                    .updateMany({}, rename, { writeConcern: { w: 0 } })
+                    .catch(() => {});
+                this.addLog(t("Renaming field '%s' to '%s' in model '%s", item.oldName, item.newName, item.modelPath));
             }
         }
     }
@@ -253,8 +258,11 @@ export class MongoDBManager extends DBManager {
                 const del = {};
                 del.$unset = {};
                 del.$unset[item.fieldPath] = "";
-                await appDB.collection(key).updateMany({}, del);
-                this.addLog(t("Deleted field '%s' in model '%s", item.fieldName, item.modelPath));
+                appDB
+                    .collection(key)
+                    .updateMany({}, del, { writeConcern: { w: 0 } })
+                    .catch(() => {});
+                this.addLog(t("Deleting field '%s' in model '%s", item.fieldName, item.modelPath));
             }
         }
     }

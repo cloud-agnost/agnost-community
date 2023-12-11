@@ -9,8 +9,9 @@ export class RabbitMQ extends QueueBase {
 		super();
 		this.driver = driver;
 		this.manager = manager;
-		this.channels = [];
 		this.config = config;
+		this.consumeChannel = null;
+		this.publishChannel = null;
 	}
 
 	async disconnect() {
@@ -19,23 +20,23 @@ export class RabbitMQ extends QueueBase {
 		} catch (err) {}
 	}
 
-	addChannel(channelObj) {
-		this.channels.push(channelObj);
-	}
-
 	/**
 	 * In order to correctly and effectively update the child process resources we need to close the old channels
 	 */
 	async closeChannels() {
-		for (const entry of this.channels) {
-			if (entry) {
-				try {
-					await entry.close();
-				} catch (err) {}
+		try {
+			if (this.consumeChannel) {
+				this.consumeChannel.removeAllListeners("error");
+				await this.consumeChannel.close();
 			}
-		}
+			if (this.publishChannel) {
+				this.publishChannel.removeAllListeners("error");
+				await this.publishChannel.close();
+			}
+		} catch (err) {}
 
-		this.channels = [];
+		this.consumeChannel = null;
+		this.publishChannel = null;
 	}
 
 	/**
@@ -49,14 +50,17 @@ export class RabbitMQ extends QueueBase {
 
 		// Listen for messages
 		for (let i = 1; i <= queueCount; i++) {
-			this.processMessage(queue, `process-message-${envId}-${queue.name}-${i}`);
+			await this.processMessage(
+				queue,
+				`process-message-${envId}-${queue.name}-${i}`
+			);
 		}
 
 		// Check if the message broker supports delayed messages or not
 		if (!this.config?.delayedMessages) return;
 		// Listen for delayed messages
 		for (let i = 1; i <= exchangeCount; i++) {
-			this.processMessage(
+			await this.processMessage(
 				queue,
 				`process-delayed-message-${envId}-${queue.name}-${i}`,
 				`process-delayed-message-exchange-${envId}-${queue.name}-${i}`
@@ -72,8 +76,6 @@ export class RabbitMQ extends QueueBase {
 	 * @param  {string} debugChannel The realtime debug unique channel id
 	 */
 	async sendMessage(queue, payload, delayMs = 0, debugChannel = null) {
-		console.log("****sendMessage0");
-
 		// Add a tracking record to track progress of this message
 		const trackingId = helper.generateId();
 		const trackingRecord = await this.createMessageTrackingRecord({
@@ -84,18 +86,14 @@ export class RabbitMQ extends QueueBase {
 			status: "pending",
 			delay: delayMs,
 		});
-		console.log("****trackingRecord", trackingRecord);
 
 		try {
-			console.log("****sendMessage1");
-			const channel = await this.driver.createChannel();
-			console.log("****sendMessage2");
-
-			channel.on("error", (err) => {
-				console.error("RabbitMQ channel error to send messages:", queue, err);
-			});
-
-			console.log("****sendMessage3");
+			if (!this.publishChannel) {
+				this.publishChannel = await this.driver.createChannel();
+				this.publishChannel.on("error", (err) => {
+					console.error("RabbitMQ channel error to send messages:", queue, err);
+				});
+			}
 
 			const envId = META.getEnvId();
 			const message = {
@@ -105,28 +103,28 @@ export class RabbitMQ extends QueueBase {
 				debugChannel,
 			};
 
-			console.log("****sendMessage4", message);
-
 			// Check if this is a delayed message or not
 			if (delayMs && delayMs > 0 && this.config?.delayedMessages) {
-				console.log("****sendMessage5");
-
 				const exchangeNumber = helper.randomInt(
 					1,
 					config.get("general.delayedMessageExchangeCount")
 				);
 				const exchangeName = `process-delayed-message-exchange-${envId}-${queue.name}-${exchangeNumber}`;
 
-				await channel.assertExchange(exchangeName, "x-delayed-message", {
-					durable: true,
-					autoDelete: true,
-					arguments: {
-						"x-delayed-type": "direct",
-					},
-				});
+				await this.publishChannel.assertExchange(
+					exchangeName,
+					"x-delayed-message",
+					{
+						durable: true,
+						autoDelete: true,
+						arguments: {
+							"x-delayed-type": "direct",
+						},
+					}
+				);
 
 				//Since payload is string we do not stringify it
-				await channel.publish(
+				await this.publishChannel.publish(
 					exchangeName,
 					"",
 					Buffer.from(JSON.stringify(message)),
@@ -139,27 +137,22 @@ export class RabbitMQ extends QueueBase {
 					}
 				);
 			} else {
-				console.log(
-					"****sendMessage6",
-					config.get("general.messageProcessQueueCount")
-				);
-
 				const queueNumber = helper.randomInt(
 					1,
 					config.get("general.messageProcessQueueCount")
 				);
 				const queueName = `process-message-${envId}-${queue.name}-${queueNumber}`;
 
-				console.log("****sendMessage7", queueName);
-
-				await channel.assertQueue(queueName, {
+				await this.publishChannel.assertQueue(queueName, {
 					durable: true,
 					autoDelete: true,
+					arguments: {
+						// With lazy queues, the messages go straight to disk, thereby minimizing the RAM usage, though throughput will be lower.
+						"x-queue-mode": "lazy",
+					},
 				});
 
-				console.log("****sendMessage8");
-
-				await channel.sendToQueue(
+				await this.publishChannel.sendToQueue(
 					queueName,
 					Buffer.from(JSON.stringify(message)),
 					{
@@ -167,17 +160,8 @@ export class RabbitMQ extends QueueBase {
 						timestamp: Date.now(),
 					}
 				);
-
-				console.log("****sendMessage9");
 			}
-
-			console.log("****sendMessage10");
-
-			// await channel.close();
-			console.log("****sendMessage11");
 		} catch (error) {
-			console.log("****sendMessage12", error);
-
 			logger.error("Cannot create channel to message queue", {
 				details: error,
 			});
@@ -194,34 +178,43 @@ export class RabbitMQ extends QueueBase {
 	 */
 	async processMessage(queueObj, queue, exchange) {
 		try {
-			const channel = await this.driver.createChannel();
-			this.addChannel(channel);
-			channel.on("error", (err) => {
-				console.error(
-					"RabbitMQ channel error to process messages:",
-					queue,
-					exchange,
-					err
-				);
-			});
+			if (!this.consumeChannel) {
+				this.consumeChannel = await this.driver.createChannel();
+				this.consumeChannel.on("error", (err) => {
+					console.error(
+						"RabbitMQ channel error to process messages:",
+						queue,
+						exchange,
+						err
+					);
+				});
+			}
 
 			// If this is a delayed message then we need to bind the queue to the exchange
 			if (exchange) {
-				await channel.assertExchange(exchange, "x-delayed-message", {
+				await this.consumeChannel.assertExchange(
+					exchange,
+					"x-delayed-message",
+					{
+						durable: true,
+						autoDelete: true,
+						arguments: {
+							"x-delayed-type": "direct",
+						},
+					}
+				);
+
+				await this.consumeChannel.assertQueue(queue, {
 					durable: true,
 					autoDelete: true,
 					arguments: {
-						"x-delayed-type": "direct",
+						// With lazy queues, the messages go straight to disk, thereby minimizing the RAM usage, though throughput will be lower.
+						"x-queue-mode": "lazy",
 					},
 				});
 
-				await channel.assertQueue(queue, {
-					durable: true,
-					autoDelete: true,
-				});
-
 				// Bind exchange to the queue
-				await channel.bindQueue(queue, exchange, "");
+				await this.consumeChannel.bindQueue(queue, exchange, "");
 				logger.info(
 					"Listening delayed messages from <" +
 						exchange +
@@ -230,9 +223,13 @@ export class RabbitMQ extends QueueBase {
 						"> queue"
 				);
 			} else {
-				await channel.assertQueue(queue, {
+				await this.consumeChannel.assertQueue(queue, {
 					durable: true,
 					autoDelete: true,
+					arguments: {
+						// With lazy queues, the messages go straight to disk, thereby minimizing the RAM usage, though throughput will be lower.
+						"x-queue-mode": "lazy",
+					},
 				});
 
 				logger.info("Listening messages from <" + queue + "> queue");
@@ -241,9 +238,9 @@ export class RabbitMQ extends QueueBase {
 			//Tells RabbitMQ not to give more than one message to a worker at a time. Or, in other words,
 			//don't dispatch a new message to a worker until it has processed and acknowledged the previous one.
 			//Instead, it will dispatch it to the next worker that is not still busy
-			channel.prefetch(1);
+			this.consumeChannel.prefetch(1);
 
-			channel.consume(
+			this.consumeChannel.consume(
 				queue,
 				async (messsage) => {
 					//Start timer

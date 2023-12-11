@@ -113,7 +113,7 @@ export class DeploymentManager {
 			duration: duration,
 			status,
 			message,
-			pod: process.env.POD_NAME,
+			pod: process.env.HOSTNAME,
 		});
 
 		logger.info(`${message} (${duration}ms)`);
@@ -136,7 +136,7 @@ export class DeploymentManager {
 					status: status,
 					logs: this.logs,
 					type: "server",
-					pod: process.env.POD_NAME,
+					pod: process.env.HOSTNAME,
 				},
 				{
 					headers: {

@@ -249,6 +249,12 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		// Set up the task listeners
 		await this.manageTasks();
 
+		// Clear agnost package cache
+		const pkg = (await import("@agnost/server")).default;
+		const { agnost } = pkg;
+		agnost.clearClientCache();
+		this.addLog(`Cleared server side module '@agnost/server' cache`);
+
 		// Send the deployment telemetry information to the platform
 		await this.sendEnvironmentLogs("OK");
 
@@ -721,7 +727,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		for (const queue of queueus) {
 			const adapterObj = adapterManager.getQueueAdapter(queue.name);
 			if (adapterObj) {
-				adapterObj.listenMessages(queue);
+				await adapterObj.listenMessages(queue);
 				this.addLog(`Initialized handler of queue '${queue.name}'`);
 			} else this.addLog(`Cannot initialize handler of queue '${queue.name}'`);
 		}
@@ -740,7 +746,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		for (const task of tasks) {
 			const adapterObj = adapterManager.getTaskAdapter(task.name);
 			if (adapterObj) {
-				adapterObj.listenMessages(task);
+				await adapterObj.listenMessages(task);
 				this.addLog(`Initialized handler of task '${task.name}'`);
 			} else this.addLog(`Cannot initialize handler of task '${task.name}'`);
 		}

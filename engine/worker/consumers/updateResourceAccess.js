@@ -1,4 +1,5 @@
-import { getKey } from "../init/cache.js";
+import axios from "axios";
+import { getKey, setKey } from "../init/cache.js";
 import { DeploymentManager } from "../handlers/managers/deploymentManager.js";
 
 export const updateResourceAccessHandler = (connection, queue) => {
@@ -29,7 +30,58 @@ export const updateResourceAccessHandler = (connection, queue) => {
 
                 // Check the environment status if it is in a deployment state then do not acknowledge the message unless it is timed out
                 let envStatus = await getKey(`${msgObj.env.iid}.status`);
-                if (envStatus === "Deleting") {
+                if (["Deploying", "Redeploying"].includes(envStatus)) {
+                    // Check timestamp of the message
+                    const now = Date.now();
+                    const date = new Date(Date.parse(msgObj.env.timestamp));
+                    const millisecondsFromEpoch = date.getTime();
+
+                    // If the message was wating more than the max message wait duration, acknowledge the mesage and set environment status to Error
+                    if (now - millisecondsFromEpoch >= config.get("general.maxMessageWaitMinues") * 60 * 1000) {
+                        // Set environment status
+                        await setKey(`${msgObj.env.iid}.status`, "Error");
+
+                        // Update the environment log object
+                        axios
+                            .post(
+                                msgObj.callback,
+                                {
+                                    status: "Error",
+                                    logs: [
+                                        {
+                                            startedAt: new Date(now).toISOString(),
+                                            duration: Date.now() - now,
+                                            status: "Error",
+                                            message: "Resource access settings update timed out due to errors",
+                                        },
+                                    ],
+                                    type: "db",
+                                },
+                                {
+                                    headers: {
+                                        Authorization: process.env.MASTER_TOKEN,
+                                        "Content-Type": "application/json",
+                                    },
+                                }
+                            )
+                            .catch((error) => {});
+
+                        logger.info(
+                            t(
+                                "Resource access settings update timed out for app '%s' version '%s' to environment '%s'",
+                                msgObj.app.name,
+                                msgObj.env.version.name,
+                                msgObj.env.name
+                            )
+                        );
+
+                        channel.ack(msg);
+                    } else {
+                        // Message has not timed out yet, it might be still being processed
+                        channel.nack(msg);
+                    }
+                    return;
+                } else if (envStatus === "Deleting") {
                     // If the environment is being deleted then do not process deployment messages
                     channel.ack(msg);
                     return;

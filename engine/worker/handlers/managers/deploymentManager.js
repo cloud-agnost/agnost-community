@@ -947,8 +947,8 @@ export class DeploymentManager {
         const databases = await this.getPrevDBDefinitions();
         for (let i = 0; i < databases.length; i++) {
             const db = databases[i];
-            // We only process databases managed by the platform
-            if (!db.managed) continue;
+            // We only process databases managed by the platform and databases that have unique names
+            if (!db.managed || !db.assignUniqueName) continue;
 
             this.addLog(t("Started deleting %s database %s", db.type, db.name));
             let dbManager = this.createDBManager(db, db);

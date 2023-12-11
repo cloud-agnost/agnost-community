@@ -353,18 +353,21 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 		let installCommand = null;
 
 		if (packagesToUnInstall.length > 0) {
-			this.addLog(t("Uninstalling packages: ", packagesToUnInstall.join(" ")));
+			this.addLog(
+				t("Uninstalling packages: %s", packagesToUnInstall.join(", "))
+			);
 			uninstallCommand = `npm uninstall ${packagesToUnInstall.join(" ")}`;
 		}
 		if (packagesToInstall.length > 0) {
-			this.addLog(t("Installing packages:", packagesToInstall.join(" ")));
+			this.addLog(t("Installing packages: %s", packagesToInstall.join(", ")));
 			installCommand = `npm install ${packagesToInstall.join(" ")}`;
 		}
 
 		if (uninstallCommand && installCommand)
 			finalCommand = `${uninstallCommand} && ${installCommand}`;
 		else if (uninstallCommand) finalCommand = uninstallCommand;
-		else finalCommand = installCommand;
+		else if (installCommand) finalCommand = installCommand;
+		else return;
 
 		try {
 			execSync(finalCommand, {

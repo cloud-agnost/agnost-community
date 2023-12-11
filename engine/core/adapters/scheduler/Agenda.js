@@ -9,7 +9,8 @@ export class Agenda extends SchedulerBase {
 		super();
 		this.driver = driver;
 		this.manager = manager;
-		this.channels = [];
+		this.consumeChannel = null;
+		this.publishChannel = null;
 	}
 
 	async disconnect() {
@@ -17,23 +18,17 @@ export class Agenda extends SchedulerBase {
 		await this.closeChannels();
 	}
 
-	addChannel(channelObj) {
-		this.channels.push(channelObj);
-	}
-
 	/**
 	 * In order to correctly and effectively update the child process resources we need to close the old channels
 	 */
 	async closeChannels() {
-		for (const entry of this.channels) {
-			if (entry) {
-				try {
-					await entry.close();
-				} catch (err) {}
-			}
-		}
+		try {
+			if (this.consumeChannel) await this.consumeChannel.close();
+			if (this.publishChannel) await this.publishChannel.close();
+		} catch (err) {}
 
-		this.channels = [];
+		this.consumeChannel = null;
+		this.publishChannel = null;
 	}
 
 	/**
@@ -52,8 +47,10 @@ export class Agenda extends SchedulerBase {
 		});
 
 		try {
-			const channel = await this.driver.createChannel();
-			this.addChannel(channel);
+			if (!this.publishChannel) {
+				this.publishChannel = await this.driver.createChannel();
+			}
+
 			const envId = META.getEnvId();
 			const message = {
 				taskId: task.iid,
@@ -69,12 +66,12 @@ export class Agenda extends SchedulerBase {
 			);
 			const queueName = `process-task-${envId}-${task.name}-${queueNumber}`;
 
-			await channel.assertQueue(queueName, {
+			await this.publishChannel.assertQueue(queueName, {
 				durable: true,
 				autoDelete: true,
 			});
 
-			await channel.sendToQueue(
+			await this.publishChannel.sendToQueue(
 				queueName,
 				Buffer.from(JSON.stringify(message)),
 				{
@@ -82,8 +79,6 @@ export class Agenda extends SchedulerBase {
 					timestamp: Date.now(),
 				}
 			);
-
-			await channel.close();
 		} catch (error) {
 			logger.error(
 				"Cannot create channel to cron job processing message queue",
@@ -106,7 +101,7 @@ export class Agenda extends SchedulerBase {
 
 		// Listen for messages
 		for (let i = 1; i <= queueCount; i++) {
-			this.processTask(task, `process-task-${envId}-${task.name}-${i}`);
+			await this.processTask(task, `process-task-${envId}-${task.name}-${i}`);
 		}
 	}
 
@@ -117,10 +112,11 @@ export class Agenda extends SchedulerBase {
 	 */
 	async processTask(taskObj, queue) {
 		try {
-			const channel = await this.driver.createChannel();
-			this.addChannel(channel);
+			if (!this.consumeChannel) {
+				this.consumeChannel = await this.driver.createChannel();
+			}
 
-			channel.assertQueue(queue, {
+			this.consumeChannel.assertQueue(queue, {
 				durable: true,
 				autoDelete: true,
 			});
@@ -130,9 +126,9 @@ export class Agenda extends SchedulerBase {
 			//Tells RabbitMQ not to give more than one message to a worker at a time. Or, in other words,
 			//don't dispatch a new message to a worker until it has processed and acknowledged the previous one.
 			//Instead, it will dispatch it to the next worker that is not still busy
-			channel.prefetch(1);
+			this.consumeChannel.prefetch(1);
 
-			channel.consume(
+			this.consumeChannel.consume(
 				queue,
 				async (messsage) => {
 					//Start timer
