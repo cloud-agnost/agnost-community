@@ -39,6 +39,9 @@ export const EnvironmentLogModel = mongoose.model(
 			enum: envActions,
 			required: true,
 		},
+		description: {
+			type: String,
+		},
 		dbStatus: {
 			type: String,
 			index: true,

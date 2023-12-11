@@ -41,7 +41,8 @@ class DeploymentController {
 		user,
 		dbStatus,
 		serverStatus,
-		schedulerStatus
+		schedulerStatus,
+		description
 	) {
 		// Update the environment object status
 		const updatedEnv = await envCtrl.updateOneById(
@@ -86,6 +87,7 @@ class DeploymentController {
 			versionId: version._id,
 			envId: env._id,
 			action: "deploy",
+			description: description,
 			dbStatus: dbStatus,
 			serverStatus: serverStatus,
 			schedulerStatus: schedulerStatus,
@@ -364,7 +366,8 @@ class DeploymentController {
 			user,
 			"Deploying",
 			"Deploying",
-			env.schedulerStatus
+			env.schedulerStatus,
+			t("Updating version info")
 		);
 		// First get the list of environment resources
 		const resources = await this.getEnvironmentResources(env);
@@ -428,7 +431,8 @@ class DeploymentController {
 			user,
 			"Deploying",
 			"Deploying",
-			env.schedulerStatus
+			env.schedulerStatus,
+			t("Updating resource access settings")
 		);
 		// First get the list of environment resources
 		const resources = await this.getEnvironmentResources(env);
@@ -489,7 +493,8 @@ class DeploymentController {
 			user,
 			"Deploying",
 			"Deploying",
-			env.schedulerStatus
+			env.schedulerStatus,
+			t("Updating database")
 		);
 
 		// First get the list of environment resources
@@ -557,7 +562,8 @@ class DeploymentController {
 			user,
 			"Deploying",
 			"Deploying",
-			env.schedulerStatus
+			env.schedulerStatus,
+			t("Updating endpoints")
 		);
 
 		// First get the list of environment resources
@@ -619,7 +625,8 @@ class DeploymentController {
 			user,
 			"Deploying",
 			"Deploying",
-			env.schedulerStatus
+			env.schedulerStatus,
+			t("Updating middlewares")
 		);
 
 		// First get the list of environment resources
@@ -681,7 +688,8 @@ class DeploymentController {
 			user,
 			"Deploying",
 			"Deploying",
-			env.schedulerStatus
+			env.schedulerStatus,
+			t("Updating message queues")
 		);
 
 		// First get the list of environment resources
@@ -743,7 +751,8 @@ class DeploymentController {
 			user,
 			"Deploying",
 			"Deploying",
-			"Deploying"
+			"Deploying",
+			t("Updating cron jobs")
 		);
 
 		// First get the list of environment resources
@@ -805,7 +814,8 @@ class DeploymentController {
 			user,
 			"Deploying",
 			"Deploying",
-			env.schedulerStatus
+			env.schedulerStatus,
+			t("Updating document storages")
 		);
 
 		// First get the list of environment resources
@@ -867,7 +877,8 @@ class DeploymentController {
 			user,
 			"Deploying",
 			"Deploying",
-			env.schedulerStatus
+			env.schedulerStatus,
+			t("Updating helper functions")
 		);
 
 		// First get the list of environment resources
@@ -929,7 +940,8 @@ class DeploymentController {
 			user,
 			"Deploying",
 			"Deploying",
-			env.schedulerStatus
+			env.schedulerStatus,
+			t("Updating caches")
 		);
 
 		// First get the list of environment resources
