@@ -26,11 +26,7 @@ export default function EditRateLimit({ open, onOpenChange }: EditRateLimitProps
 		},
 	});
 
-	const {
-		mutateAsync: editRateLimitMutate,
-		isPending,
-		error,
-	} = useMutation({
+	const { mutateAsync: editRateLimitMutate, isPending } = useMutation({
 		mutationFn: editRateLimit,
 		onSuccess: () => {
 			onClose();

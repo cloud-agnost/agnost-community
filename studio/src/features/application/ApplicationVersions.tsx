@@ -14,7 +14,7 @@ import useVersionStore from '@/store/version/versionStore';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useMatch, useParams, useSearchParams } from 'react-router-dom';
+import { useMatch, useSearchParams } from 'react-router-dom';
 import { VersionTable } from '../version/Table';
 export default function ApplicationVersions() {
 	const { t } = useTranslation();
