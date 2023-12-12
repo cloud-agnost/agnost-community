@@ -183,7 +183,6 @@ const useAuthStore = create<AuthState & Actions>()(
 								joinChannel(res.app._id);
 								useApplicationStore.setState?.({
 									applications: [...useApplicationStore.getState().applications, res.app],
-									temp: [...useApplicationStore.getState().applications, res.app],
 								});
 							}
 							return res;

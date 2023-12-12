@@ -40,6 +40,7 @@
 	"reactivate_services": "Reactivate Services",
 	"reactivate_services_desc": "Reactivate access to the execution environment of this version.",
 	"redeploy": "Redeploy",
+	"deploying": "Deploying",
 	"redeploy_desc": "Redeploy latest changes to the environment",
 	"auto_redeploy": "Auto redeploy",
 	"auto_deploy": "Auto Deploy",

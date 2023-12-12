@@ -1,15 +1,17 @@
+import { Button } from '@/components/Button';
+import { Refresh } from '@/components/icons';
 import { ENV_STATUS_CLASS_MAP } from '@/constants';
 import {
 	DeploymentLogsDrawer,
-	DeploymentSettings,
 	LastDeployment,
 	Resources,
 } from '@/features/version/DeploymentStatusCard/index.ts';
+import { useAuthorizeVersion, useEnvironmentStatus, useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
+import { APIError, EnvironmentStatus } from '@/types';
 import { cn } from '@/utils';
-import { Cloud, GearSix } from '@phosphor-icons/react';
-
-import { Button } from '@/components/Button';
+import { Cloud } from '@phosphor-icons/react';
+import { useMutation } from '@tanstack/react-query';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -19,21 +21,25 @@ import {
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './deploymentStatusCard.scss';
-import { useEnvironmentStatus } from '@/hooks';
-import { EnvironmentStatus } from '@/types';
+import { useParams } from 'react-router-dom';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip';
 
 export default function DeploymentStatusCard() {
 	const { t } = useTranslation();
-	const [settingsIsOpen, setSettingsIsOpen] = useState(false);
 	const [isLogsOpen, setIsLogsOpen] = useState(false);
-	const { getEnvironmentResources, environment } = useEnvironmentStore();
+	const canDeploy = useAuthorizeVersion('env.deploy');
+	const { getEnvironmentResources, environment, redeployAppVersionToEnvironment, resources } =
+		useEnvironmentStore();
 	const envStatus = useEnvironmentStatus();
 	const classes = ENV_STATUS_CLASS_MAP[envStatus as EnvironmentStatus];
-
+	const { notify } = useToast();
+	const { versionId, appId, orgId } = useParams<{
+		versionId: string;
+		appId: string;
+		orgId: string;
+	}>();
 	function handleOpenChange(open: boolean) {
-		if (!open) {
-			setSettingsIsOpen(false);
-		} else {
+		if (open && !resources) {
 			getEnvironmentResources({
 				orgId: environment?.orgId,
 				appId: environment?.appId,
@@ -41,6 +47,25 @@ export default function DeploymentStatusCard() {
 				versionId: environment?.versionId,
 			});
 		}
+	}
+	const { mutateAsync: redeployMutate, isPending } = useMutation({
+		mutationFn: redeployAppVersionToEnvironment,
+		onError: (error: APIError) => {
+			notify({
+				type: 'error',
+				title: error.error,
+				description: error.details,
+			});
+		},
+	});
+	async function redeploy() {
+		if (!versionId || !appId || !orgId || !environment) return;
+		redeployMutate({
+			orgId,
+			appId,
+			versionId,
+			envId: environment._id,
+		});
 	}
 	return (
 		<>
@@ -61,28 +86,41 @@ export default function DeploymentStatusCard() {
 						<Cloud size={24} />
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent
-					className={cn('overflow-hidden relative w-[21rem]', settingsIsOpen && 'h-[24rem]')}
-					align='end'
-				>
+				<DropdownMenuContent className='overflow-hidden relative w-[21rem]' align='end'>
 					<DropdownMenuLabel className='relative flex justify-between items-center px-4 py-2'>
 						<span className='truncate text-default'>{t('version.deployment_status')}</span>
-						<Button
-							onClick={() => setSettingsIsOpen((prev) => !prev)}
-							variant='blank'
-							iconOnly
-							rounded
-							className='hover:bg-subtle aspect-square'
-						>
-							<GearSix size={20} />
-						</Button>
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Button
+										onClick={redeploy}
+										variant='blank'
+										iconOnly
+										rounded
+										className='hover:bg-subtle aspect-square'
+										disabled={envStatus === EnvironmentStatus.Deploying || !canDeploy}
+									>
+										<Refresh
+											className={cn(
+												'w-5 h-5 text-icon-secondary',
+												(isPending || envStatus === EnvironmentStatus.Deploying) && 'animate-spin',
+											)}
+										/>
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent>
+									{envStatus === EnvironmentStatus.Deploying
+										? t('version.deploying')
+										: t('version.redeploy')}
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
 					</DropdownMenuLabel>
 					<div className='deployment-status-content'>
 						<LastDeployment />
 						<Resources />
 					</div>
 
-					<DeploymentSettings isOpen={settingsIsOpen} close={() => setSettingsIsOpen(false)} />
 					<footer className='deployment-status-footer p-4'>
 						<Button onClick={() => setIsLogsOpen(true)} variant='link'>
 							{t('version.view_logs')}

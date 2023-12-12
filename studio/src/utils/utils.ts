@@ -15,6 +15,7 @@ import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { AppRoles, RealtimeData, ToastType } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
+import cronstrue from 'cronstrue';
 import i18next from 'i18next';
 import _ from 'lodash';
 import * as prettier from 'prettier';
@@ -468,3 +469,22 @@ export function parseIfString(input: string | null) {
 }
 export const getValueFromData = (data: Record<string, unknown>, fieldName: string): any =>
 	data[fieldName] ?? data[fieldName.toLowerCase()];
+
+export function updateOrPush<T extends { _id: string }>(array: T[], newData: T) {
+	const index = array.findIndex((item) => item._id === newData._id);
+
+	if (index !== -1) {
+		array[index] = { ...array[index], ...newData };
+	} else {
+		array.push(newData);
+	}
+
+	return array;
+}
+export function describeCronExpression(cronExpression: string) {
+	try {
+		return cronstrue.toString(cronExpression);
+	} catch (error) {
+		return 'Invalid cron expression';
+	}
+}

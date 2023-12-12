@@ -69,8 +69,8 @@ export default function Tabs() {
 
 		if (!item) {
 			const currentTab = tabs.find((tab) => tab.isActive);
-			if (currentTab?.path !== pathname) {
-				const targetPath = currentTab?.path || getDashboardPath();
+			if (!currentTab?.path.includes(pathname)) {
+				const targetPath = currentTab?.path ?? getDashboardPath();
 				navigate(targetPath);
 			}
 			return;
@@ -92,7 +92,8 @@ export default function Tabs() {
 	useUpdateEffect(() => {
 		const currentTab = tabs.find((tab) => tab.isActive);
 		if (currentTab?.path !== pathname) {
-			const targetPath = currentTab?.path || getDashboardPath();
+			console.log('navigate');
+			const targetPath = currentTab?.path ?? getDashboardPath();
 			navigate(targetPath);
 		}
 	}, [versionId]);

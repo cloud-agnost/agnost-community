@@ -35,7 +35,6 @@ interface ApplicationState {
 	application: Application | null;
 	applications: Application[];
 	toDeleteApp: Application | null;
-	temp: Application[];
 	applicationTeam: ApplicationMember[];
 	tempTeam: ApplicationMember[];
 	teamOptions: TeamOption[];
@@ -77,7 +76,6 @@ type Actions = {
 	createApplication: (req: CreateApplicationRequest) => Promise<Application | APIError>;
 	leaveAppTeam: (req: DeleteApplicationRequest) => Promise<void>;
 	deleteApplication: (req: DeleteApplicationRequest) => Promise<void>;
-	searchApplications: (query: string) => void;
 	getAppPermissions: (orgId: string) => Promise<AppPermissions>;
 	openDeleteModal: (application: Application) => void;
 	closeDeleteModal: () => void;
@@ -90,7 +88,6 @@ type Actions = {
 const initialState: ApplicationState = {
 	application: null,
 	applications: [],
-	temp: [],
 	applicationTeam: [],
 	tempTeam: [],
 	isVersionOpen: false,
@@ -408,7 +405,7 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			getAppsByOrgId: async (orgId: string) => {
 				try {
 					const applications = await OrganizationService.getOrganizationApps(orgId);
-					set({ applications, temp: applications });
+					set({ applications });
 					applications.forEach((app) => {
 						joinChannel(app._id);
 					});
@@ -442,7 +439,6 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 								],
 							},
 						],
-						temp: [...prev.applications, app],
 					}));
 					joinChannel(app._id);
 					return app;
@@ -456,7 +452,6 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					await OrganizationService.leaveAppTeam(appId, orgId);
 					set((prev) => ({
 						applications: prev.applications.filter((app) => app._id !== appId),
-						temp: prev.applications.filter((app) => app._id !== appId),
 					}));
 					leaveChannel(appId);
 					if (onSuccess) onSuccess();
@@ -470,24 +465,11 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					await OrganizationService.deleteApplication(appId, orgId);
 					set((prev) => ({
 						applications: prev.applications.filter((app) => app._id !== appId),
-						temp: prev.applications.filter((app) => app._id !== appId),
 					}));
 					leaveChannel(appId);
 					if (onSuccess) onSuccess();
 				} catch (error) {
 					if (onError) onError(error as APIError);
-					throw error as APIError;
-				}
-			},
-			searchApplications: async (query: string) => {
-				try {
-					if (!query) {
-						set((prev) => ({ applications: prev.temp }));
-						return get().temp;
-					}
-					const applications = await ApplicationService.searchApps(query);
-					set({ applications });
-				} catch (error) {
 					throw error as APIError;
 				}
 			},

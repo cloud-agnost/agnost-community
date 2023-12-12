@@ -52,14 +52,6 @@ export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropd
 			disabled: pathname.split('?')[0] === getDashboardPath(),
 		},
 		{
-			title: t('version.close_all_tabs_except_current'),
-			action: () => {
-				if (!currentTab) return;
-				removeAllTabsExcept(versionId);
-			},
-			disabled: tabs.filter((tab) => !tab.isDashboard).length < 2,
-		},
-		{
 			title: t('version.close_all_tabs'),
 			action: () => {
 				removeAllTabs(versionId);
@@ -73,6 +65,14 @@ export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropd
 				removeAllAtRight(versionId);
 			},
 			disabled: tabs.indexOf(currentTab) === tabs.length - 1,
+		},
+		{
+			title: t('version.close_all_tabs_except_current'),
+			action: () => {
+				if (!currentTab) return;
+				removeAllTabsExcept(versionId);
+			},
+			disabled: tabs.filter((tab) => !tab.isDashboard).length < 2,
 		},
 	];
 	function getTabIcon(type: string) {

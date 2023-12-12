@@ -21,7 +21,15 @@ interface EndpointResponseProps {
 export default function EndpointResponse(props: EndpointResponseProps) {
 	const { t } = useTranslation();
 	const { endpointResponse, endpoint } = useEndpointStore();
-	const response = endpointResponse[endpoint?._id as string];
+	const response = endpointResponse[endpoint?._id];
+
+	function getStatusClass(status: number) {
+		if (status >= 200 && status < 300) return 'text-green-500';
+		if (status >= 300 && status < 400) return 'text-yellow-500';
+		if (status >= 400 && status < 500) return 'text-red-500';
+		if (status >= 500 && status < 600) return 'text-red-500';
+		return 'text-default';
+	}
 
 	return (
 		<Tabs style={props.style} defaultValue='body' className={cn(props.className)}>
@@ -37,24 +45,14 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 					<div className='flex items-center gap-4'>
 						<div className='text-sm text-default'>
 							{t('endpoint.status')}
-							<span
-								className={cn(
-									'ml-2',
-									response?.statusText === 'OK' ? 'text-green-500' : 'text-red-500',
-								)}
-							>
+							<span className={cn('ml-2', getStatusClass(response?.status))}>
 								{response?.status}
 							</span>
 						</div>
 						{response?.duration && (
 							<div className='text-sm text-default'>
 								{t('endpoint.duration')}
-								<span
-									className={cn(
-										'ml-2',
-										response?.statusText === 'OK' ? 'text-green-500' : 'text-red-500',
-									)}
-								>
+								<span className={cn('ml-2', getStatusClass(response?.status))}>
 									{response?.duration}
 								</span>
 							</div>

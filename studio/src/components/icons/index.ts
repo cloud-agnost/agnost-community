@@ -25,6 +25,8 @@ export { default as EmptyApps } from './EmptyApps';
 export { default as EmptyAppsLight } from './EmptyAppsLight';
 export { default as EmptyInvitation } from './EmptyInvitation';
 export { default as EmptyInvitationLight } from './EmptyInvitationLight';
+export { default as EmptyOrg } from './EmptyOrg';
+export { default as EmptyOrgLight } from './EmptyOrgLight';
 export { default as EmptyResource } from './EmptyResource';
 export { default as EmptyResourceLight } from './EmptyResourceLight';
 export { default as Environment } from './Environment';

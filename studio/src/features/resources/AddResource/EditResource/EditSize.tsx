@@ -18,6 +18,7 @@ import {
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 
 export default function EditSize() {
@@ -29,7 +30,7 @@ export default function EditSize() {
 	} = useResourceStore();
 	const { notify } = useToast();
 	const { t } = useTranslation();
-
+	const { orgId } = useParams() as Record<string, string>;
 	const form = useForm<z.infer<typeof CreateResourceSchema>>({
 		resolver: zodResolver(CreateResourceSchema),
 		defaultValues: {
@@ -62,6 +63,7 @@ export default function EditSize() {
 
 	function onSubmit(data: z.infer<typeof CreateResourceSchema>) {
 		updateResourceMutate({
+			orgId,
 			updateType: 'others',
 			resourceId: resourceToEdit?._id,
 			...data,

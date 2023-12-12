@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import DeploymentLogColumns from './DeploymentLogColumns';
 import { useTable } from '@/hooks';
+import _ from 'lodash';
 interface DeploymentLogsDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -43,7 +44,7 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 	}>();
 
 	useEffect(() => {
-		if (open) {
+		if (open && _.isEmpty(envLogs)) {
 			getEnvironmentLogs({
 				orgId: orgId as string,
 				appId: appId as string,

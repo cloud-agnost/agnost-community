@@ -16,7 +16,7 @@ import {
 	TestEndpointParams,
 	UpdateEndpointParams,
 } from '@/types';
-import { formatTime, isEmpty } from '@/utils';
+import { formatTime, isEmpty, updateOrPush } from '@/utils';
 import { AxiosResponse } from 'axios';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -87,9 +87,11 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 					}
 				},
 				getEndpointById: async (params) => {
-					set({ endpoint: {} as Endpoint });
 					const endpoint = await EndpointService.getEndpointById(params);
-					set({ endpoint });
+					set((prev) => {
+						const endpoints = updateOrPush(prev.endpoints, endpoint);
+						return { endpoint, endpoints };
+					});
 					if (isEmpty(get().logics[endpoint._id])) {
 						get().setLogics(endpoint._id, endpoint.logic);
 					}
@@ -182,58 +184,23 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 						}));
 					}
 					const response = await EndpointService.testEndpoint(params);
-					if (prevRequest[params.epId]) {
-						set({
-							endpointRequest: {
-								...prevRequest,
-								[params.epId]: {
-									...prevRequest[params.epId],
-									...params,
-								},
-							},
-						});
-					} else {
-						set({
-							endpointRequest: {
-								...prevRequest,
-								[params.epId]: params,
-							},
-						});
-					}
+					set({
+						endpointRequest: {
+							...prevRequest,
+							[params.epId]: params,
+						},
+					});
 					const endTime = performance.now();
-					if (prevResponse[params.epId]) {
-						set((prev) => ({
-							endpointResponse: {
-								...prev.endpointResponse,
-								[params.epId]: {
-									...prev.endpointResponse[params.epId],
-									epId: params.epId,
-									duration: formatTime(endTime - startTime),
-									status: response?.response?.status ?? response?.status,
-									statusText: response?.response?.statusText ?? response?.statusText,
-									data: response?.response?.data ?? response?.data,
-									headers: response?.response?.headers ?? response?.headers,
-									config: response?.response?.config ?? response?.config,
-								},
+					set((prev) => ({
+						endpointResponse: {
+							...prev.endpointResponse,
+							[params.epId]: {
+								...response,
+								epId: params.epId,
+								duration: formatTime(endTime - startTime),
 							},
-						}));
-					} else {
-						set((prev) => ({
-							endpointResponse: {
-								...prev.endpointResponse,
-								[params.epId]: {
-									...response,
-									epId: params.epId,
-									duration: formatTime(endTime - startTime),
-									status: response?.response?.status ?? response?.status,
-									statusText: response?.response?.statusText ?? response?.statusText,
-									data: response?.response?.data ?? response?.data,
-									headers: response?.response?.headers ?? response?.headers,
-									config: response?.response?.config ?? response?.config,
-								},
-							},
-						}));
-					}
+						},
+					}));
 					if (params.onSuccess) params.onSuccess();
 					return response;
 				},

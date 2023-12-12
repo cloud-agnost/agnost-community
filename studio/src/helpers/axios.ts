@@ -78,9 +78,10 @@ envInstance.interceptors.response.use(
 );
 testEndpointInstance.interceptors.response.use(
 	(response) => {
+		console.log(response);
 		return response;
 	},
 	(error) => {
-		return error;
+		return error.response;
 	},
 );

@@ -7,7 +7,6 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
-import useVersionStore from '@/store/version/versionStore';
 import { history } from '@/utils';
 import _ from 'lodash';
 import { useEffect } from 'react';
@@ -34,7 +33,6 @@ export default function Root() {
 		useOrganizationStore();
 	const { getUser, isAuthenticated } = useAuthStore();
 	const { getAppVersionEnvironment, getEnvironmentResources } = useEnvironmentStore();
-	const { getVersionNotifications } = useVersionStore();
 
 	useEffect(() => {
 		if (orgId) {
@@ -70,15 +68,6 @@ export default function Root() {
 
 		if (orgId && versionId && appId) {
 			getResources();
-			getVersionNotifications({
-				appId,
-				orgId,
-				versionId,
-				page: 0,
-				size: 50,
-				sortBy: 'createdAt',
-				sortDir: 'desc',
-			});
 		}
 	}, [versionId]);
 

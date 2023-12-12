@@ -30,7 +30,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 		resolver: zodResolver(CreateFunctionSchema),
 	});
 
-	const { mutate: updateFunctionMutation } = useMutation({
+	const { mutate: updateFunctionMutation, isPending } = useMutation({
 		mutationFn: updateFunction,
 		onSuccess: () => {
 			onClose();
@@ -76,7 +76,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<FunctionForm />
+						<FunctionForm loading={isPending} />
 					</form>
 				</Form>
 			</DrawerContent>

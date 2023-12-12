@@ -5,16 +5,16 @@ import { OrganizationDropdown } from '@/features/organization/OrganizationDropdo
 import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
 import { VersionDropdown } from '@/features/version/VersionDropdown';
 import { CaretRight } from '@phosphor-icons/react';
-
 import { AuthUserDropdown } from '@/features/auth/AuthUserDropdown';
-import { Notification } from '@/features/version/Notification';
+import { NotificationDropdown } from '@/features/version/Notification';
 import { Link, useParams } from 'react-router-dom';
 import Feedback from './Feedback';
 import './header.scss';
+import { useAuthorizeVersion } from '@/hooks';
 
 export function Header() {
 	const { versionId, appId } = useParams();
-
+	const canViewNotf = useAuthorizeVersion('viewLogs');
 	return (
 		<header className='header-menu'>
 			<div className='header-menu-left'>
@@ -63,9 +63,11 @@ export function Header() {
 							<div className='header-menu-right-actions-versions'>
 								<DeploymentStatusCard />
 							</div>
-							<div className='header-menu-right-actions-notification'>
-								<Notification />
-							</div>
+							{canViewNotf && (
+								<div className='header-menu-right-actions-notification'>
+									<NotificationDropdown />
+								</div>
+							)}
 						</>
 					)}
 

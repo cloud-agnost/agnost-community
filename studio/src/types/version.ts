@@ -1,3 +1,6 @@
+import { translate } from '@/utils';
+import { z } from 'zod';
+import { NameSchema } from './schema';
 import {
 	BaseGetRequest,
 	BaseParams,
@@ -465,3 +468,12 @@ export interface Dashboard {
 	queue: number;
 	task: number;
 }
+
+export const EnvVariableSchema = z.object({
+	name: NameSchema,
+	value: z.any({
+		required_error: translate('forms.required', {
+			label: translate('general.value'),
+		}),
+	}),
+});

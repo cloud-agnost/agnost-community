@@ -6,8 +6,8 @@
 
 @layer base {
 	:root {
-		--header-menu-height: 72px;
-		--navigation-tab-menu-height: 41px;
+		--header-menu-height: 75px;
+		--navigation-tab-menu-height: 45px;
 
 		--font-sans: 'Rubik', sans-serif;
 		--font-albert: 'Albert Sans', sans-serif;
@@ -355,14 +355,22 @@
 }
 .Toastify__close-button {
 	align-self: center;
+	padding: 0.5rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.Toastify__close-button:hover {
+	border-radius: 50%;
+	background-color: rgb(var(--wrapper-background-base));
 }
 .Toastify__close-button--light {
 	color: rgb(var(--icon-base));
 	opacity: 1;
 }
 .Toastify__close-button > svg {
-	width: 1.25rem;
-	height: 1.25rem;
+	width: 1rem;
+	height: 1rem;
 }
 @keyframes Toastify__trackProgress {
 	0% {
@@ -548,4 +556,59 @@ html .light ::-webkit-scrollbar-track {
 
 .select__option--is-focused {
 	@apply bg-wrapper-background-hover #{!important};
+}
+
+.select {
+	&-container {
+		@apply flex  w-full  text-sm text-default  rounded appearance-none;
+		@apply placeholder:text-subtle placeholder:text-sm;
+		@apply disabled:cursor-not-allowed disabled:opacity-50;
+		@apply focus:border-input-focus focus:outline-none focus:ring-0;
+		@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border;
+	}
+	&__control {
+		@apply max-w-sm w-full h-full  #{!important};
+		@apply bg-input-background border border-input-border hover:border-input-hover #{!important};
+	}
+	&__indicators {
+		@apply hidden #{!important};
+	}
+	&__input-container {
+		@apply px-2 #{!important};
+	}
+	&__input {
+		@apply text-default font-sfCompact #{!important};
+	}
+	&__placeholder {
+		@apply text-subtle text-sm font-sfCompact px-2 #{!important};
+	}
+	&__menu {
+		@apply bg-wrapper-background-light rounded  #{!important};
+	}
+	&__single-value {
+		@apply text-default #{!important};
+	}
+	&__value-container {
+		@apply py-0 gap-2 #{!important};
+	}
+	&__multi-value {
+		@apply bg-wrapper-background-light flex-wrap #{!important};
+	}
+	&__multi-value__remove {
+		@apply text-icon-base #{!important};
+		&:hover {
+			@apply bg-button-secondary-hover #{!important};
+		}
+	}
+
+	&__option {
+		@apply text-default hover:bg-wrapper-background-hover border-b border-border #{!important};
+		&--is-selected {
+			@apply bg-wrapper-background-hover #{!important};
+		}
+
+		&--is-focused {
+			@apply bg-wrapper-background-hover #{!important};
+		}
+	}
 }

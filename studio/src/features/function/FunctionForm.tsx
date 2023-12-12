@@ -14,7 +14,7 @@ import { translate as t } from '@/utils';
 import { useFormContext } from 'react-hook-form';
 import * as z from 'zod';
 
-export default function FunctionForm() {
+export default function FunctionForm({ loading }: { loading: boolean }) {
 	const form = useFormContext<z.infer<typeof CreateFunctionSchema>>();
 
 	return (
@@ -49,7 +49,7 @@ export default function FunctionForm() {
 							{t('general.cancel')}
 						</Button>
 					</DrawerClose>
-					<Button className='ml-2' type='submit' size='lg'>
+					<Button className='ml-2' type='submit' size='lg' loading={loading}>
 						{t('general.save')}
 					</Button>
 				</div>

@@ -1,13 +1,13 @@
 import { Button } from '@/components/Button';
 import { DateText } from '@/components/DateText';
+import { BADGE_COLOR_MAP } from '@/constants';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, EnvLog, SelectedEnvLog } from '@/types';
-import { DATE_TIME_FORMAT, capitalize, translate, formatDate } from '@/utils';
+import { DATE_TIME_FORMAT, formatDate, translate } from '@/utils';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/Avatar';
 import { Badge } from 'components/Badge';
 import { Document } from 'components/icons';
-import { BADGE_COLOR_MAP } from '@/constants';
 
 const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 	{
@@ -16,7 +16,7 @@ const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 		accessorKey: 'action',
 		size: 900,
 		cell: ({ row }) => {
-			const { action, createdBy } = row.original;
+			const { description, createdBy } = row.original;
 			const user = useOrganizationStore
 				.getState()
 				.members.find((member) => member.member._id === createdBy);
@@ -32,9 +32,7 @@ const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 					</Avatar>
 					<div>
 						<p className='text-sm text-default font-sfCompact'>{user?.member.name}</p>
-						<p className='text-xs text-subtle font-sfCompact'>
-							{capitalize(action)} version to its environment
-						</p>
+						<p className='text-xs text-subtle font-sfCompact'>{description}</p>
 					</div>
 				</div>
 			);

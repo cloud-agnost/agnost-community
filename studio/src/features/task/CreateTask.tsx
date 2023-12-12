@@ -3,7 +3,7 @@ import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
 import useResourceStore from '@/store/resources/resourceStore';
 import useTaskStore from '@/store/task/taskStore';
-import { CreateTaskSchema, TabTypes } from '@/types';
+import { APIError, CreateTaskSchema, TabTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router-dom';
 import * as z from 'zod';
 import TaskForm from './TaskForm';
+import { useMutation } from '@tanstack/react-query';
 interface CreateTaskProps {
 	open: boolean;
 	onClose: () => void;
@@ -42,36 +43,40 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 			type: 'scheduler',
 		});
 	}, []);
+
+	const { mutateAsync: createTaskMutate, isPending } = useMutation({
+		mutationFn: createTask,
+		onSuccess: (task) => {
+			form.reset({
+				name: '',
+				cronExpression: '',
+				logExecution: false,
+			});
+			navigate({
+				title: task.name,
+				path: `${pathname}/${task._id}`,
+				isActive: true,
+				isDashboard: false,
+				type: TabTypes.Task,
+			});
+			onClose();
+		},
+		onError: ({ error, details }: APIError) => {
+			form.reset({
+				name: '',
+				cronExpression: '',
+				logExecution: false,
+			});
+			notify({ type: 'error', description: details, title: error });
+		},
+	});
 	function onSubmit(data: z.infer<typeof CreateTaskSchema>) {
-		createTask({
+		createTaskMutate({
 			...data,
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			resourceId: resources[0]._id,
-			onSuccess: (task) => {
-				form.reset({
-					name: '',
-					cronExpression: '',
-					logExecution: false,
-				});
-				navigate({
-					title: task.name,
-					path: `${pathname}/${task._id}`,
-					isActive: true,
-					isDashboard: false,
-					type: TabTypes.Task,
-				});
-				onClose();
-			},
-			onError: ({ error, details }) => {
-				form.reset({
-					name: '',
-					cronExpression: '',
-					logExecution: false,
-				});
-				notify({ type: 'error', description: details, title: error });
-			},
 		});
 	}
 
@@ -93,7 +98,7 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<TaskForm />
+						<TaskForm loading={isPending} />
 					</form>
 				</Form>
 			</DrawerContent>

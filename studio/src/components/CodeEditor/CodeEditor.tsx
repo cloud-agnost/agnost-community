@@ -5,9 +5,9 @@ import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab } from '@/types';
 import { addLibsToEditor, cn, getTabIdFromUrl, isEmpty } from '@/utils';
+import Loadable from '@loadable/component';
 import { EditorProps } from '@monaco-editor/react';
 import { useEffect } from 'react';
-import Loadable from '@loadable/component';
 import BeatLoader from 'react-spinners/BeatLoader';
 
 const MonacoEditor = Loadable(() => import('@monaco-editor/react'));
@@ -43,7 +43,7 @@ export default function CodeEditor({
 		});
 	}, 500);
 
-	function handleOnChange(value: string | undefined, ev: any) {
+	function handleOnChange(ev: any) {
 		if (defaultLanguage === 'javascript' && !readonly) {
 			setTabState(value !== ev.changes[0].text);
 		}
@@ -78,6 +78,8 @@ export default function CodeEditor({
 					value,
 					readOnly: readonly,
 					...EDITOR_OPTIONS,
+					formatOnPaste: defaultLanguage !== 'javascript',
+					formatOnType: defaultLanguage !== 'javascript',
 				}}
 			/>
 		</div>
