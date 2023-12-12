@@ -24,7 +24,6 @@ export default function ApplicationVersions() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const match = useMatch('/organization/:orgId/apps');
 	const getVersions = useCallback(async () => {
-		console.log('getVersions');
 		if (application?._id) {
 			const versions = await getAllVersionsVisibleToUser({
 				orgId: application?.orgId as string,

@@ -16,11 +16,12 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization } from '@/types';
 import { cn } from '@/utils';
 import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import './organization.scss';
 import useAuthStore from '@/store/auth/authStore';
+import _ from 'lodash';
 
 export function OrganizationDropdown() {
 	const { t } = useTranslation();
@@ -28,8 +29,13 @@ export function OrganizationDropdown() {
 	const [open, setOpen] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
 	const [openCreateModal, setOpenCreateModal] = useState(false);
-	const { organizations, organization, selectOrganization, leaveOrganization } =
-		useOrganizationStore();
+	const {
+		organizations,
+		organization,
+		selectOrganization,
+		leaveOrganization,
+		getAllOrganizationByUser,
+	} = useOrganizationStore();
 	const navigate = useNavigate();
 	const { notify } = useToast();
 	function handleLeave() {
@@ -57,6 +63,12 @@ export function OrganizationDropdown() {
 		});
 		setOpenModal(false);
 	}
+
+	useEffect(() => {
+		if (_.isEmpty(organizations)) {
+			getAllOrganizationByUser();
+		}
+	}, []);
 	return (
 		<>
 			<Popover open={open} onOpenChange={setOpen}>
