@@ -60,12 +60,12 @@ export const envStatuses = [
 export const forbiddenEpPrefixes = [
 	"/health",
 	"/ping",
-	"/object",
-	"/test",
-	"/storage",
-	"/auth",
-	"/oauth",
-	"/realtime",
+	"/object/",
+	"/test/",
+	"/storage/",
+	"/auth/",
+	"/oauth/",
+	"/realtime/",
 ];
 
 export const logStatuses = ["OK", "Error"];
