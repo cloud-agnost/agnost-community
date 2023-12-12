@@ -1,6 +1,5 @@
 import { UI_BASE_URL } from '@/constants';
 import { axios } from '@/helpers';
-import useApplicationStore from '@/store/app/applicationStore';
 import {
 	AppInviteRequest,
 	AppPermissions,
@@ -152,11 +151,5 @@ export default class ApplicationService {
 
 	static async getAllAppRoleDefinitions(orgId: string): Promise<AppPermissions> {
 		return (await axios.get(`v1/org/${orgId}/app/roles`)).data;
-	}
-
-	static async searchApps(query: string): Promise<Application[]> {
-		return useApplicationStore
-			.getState()
-			.temp.filter((app) => app.name.toLowerCase().includes(query.toLowerCase()));
 	}
 }
