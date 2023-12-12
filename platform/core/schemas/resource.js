@@ -327,11 +327,11 @@ export const applyRules = (type) => {
 					)
 					.bail()
 					.custom((value) => {
-						let regex = /^[A-Za-z0-9-]+$/;
+						let regex = /^[a-z0-9-]+$/;
 						if (!regex.test(value)) {
 							throw new AgnostError(
 								t(
-									"Resource names can include only numbers, letters and '-' characters"
+									"Resource names can include only numbers, lowercase letters and '-' characters"
 								)
 							);
 						}
@@ -340,6 +340,13 @@ export const applyRules = (type) => {
 						if (regex2.test(value)) {
 							throw new AgnostError(
 								t("Resource names cannot start with a number")
+							);
+						}
+
+						let regex3 = /^-|-$/;
+						if (regex3.test(value)) {
+							throw new AgnostError(
+								t("Resource names cannot start or end with '-' character")
 							);
 						}
 
@@ -492,11 +499,11 @@ export const applyRules = (type) => {
 					)
 					.bail()
 					.custom((value) => {
-						let regex = /^[A-Za-z0-9-]+$/;
+						let regex = /^[a-z0-9-]+$/;
 						if (!regex.test(value)) {
 							throw new AgnostError(
 								t(
-									"Resource names can include only numbers, letters and '-' characters"
+									"Resource names can include only numbers, lowercase letters and '-' characters"
 								)
 							);
 						}
@@ -505,6 +512,13 @@ export const applyRules = (type) => {
 						if (regex2.test(value)) {
 							throw new AgnostError(
 								t("Resource names cannot start with a number")
+							);
+						}
+
+						let regex3 = /^-|-$/;
+						if (regex3.test(value)) {
+							throw new AgnostError(
+								t("Resource names cannot start or end with '-' character")
 							);
 						}
 
