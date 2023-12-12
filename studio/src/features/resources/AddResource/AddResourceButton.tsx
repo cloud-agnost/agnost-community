@@ -4,7 +4,7 @@ import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useResourceStore from '@/store/resources/resourceStore';
 import useTypeStore from '@/store/types/typeStore';
 import { capitalize } from '@/utils';
-import { Plus } from '@phosphor-icons/react';
+import { CaretDown, Plus } from '@phosphor-icons/react';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -46,6 +46,7 @@ export default function AddResourceButton() {
 				<Button className='gap-2 whitespace-nowrap' disabled={!canCreateResource}>
 					<Plus weight='bold' />
 					{t('resources.add')}
+					<CaretDown weight='bold' />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align='end' className='max-h-[650px] overflow-y-auto'>
