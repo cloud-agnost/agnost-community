@@ -119,7 +119,6 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 		onBeforeMount,
 		onCodeEditorMount,
 		onCodeEditorChange,
-		saveEditorContent,
-		monaco: monacoRef,
+		editor: editorRef.current,
 	};
 }

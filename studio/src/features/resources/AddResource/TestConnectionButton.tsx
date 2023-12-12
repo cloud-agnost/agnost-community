@@ -1,17 +1,19 @@
 import { Button } from '@/components/Button';
 import { TestConnection } from '@/components/icons';
 import { useToast } from '@/hooks';
+import useApplicationStore from '@/store/app/applicationStore';
 import useResourceStore from '@/store/resources/resourceStore';
 import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 export default function TestConnectionButton({ replica }: { replica?: boolean }) {
 	const { t } = useTranslation();
 	const form = useFormContext();
 	const { notify } = useToast();
 	const { testExistingResourceConnection, resourceConfig } = useResourceStore();
-
+	const { orgId } = useParams() as Record<string, string>;
 	const { mutateAsync: testMutate, isPending } = useMutation({
 		mutationFn: testExistingResourceConnection,
 		onSuccess: () => {
@@ -38,6 +40,7 @@ export default function TestConnectionButton({ replica }: { replica?: boolean })
 
 		if (!isValid) return;
 		testMutate({
+			orgId,
 			...data,
 			access: {
 				...access,

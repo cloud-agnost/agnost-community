@@ -87,7 +87,7 @@ export default function Root() {
 		if (!isAuthPath && isAuthenticated()) {
 			getUser();
 		}
-	}, [pathname]);
+	}, []);
 
 	return (
 		<>
