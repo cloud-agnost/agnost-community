@@ -1,1 +1,1 @@
-export { default as ChangeAvatar } from './ChangeAvatar.tsx';
+export { default as ChangeUserAvatar } from './ChangeUserAvatar.tsx';
