@@ -16,7 +16,7 @@ const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 		accessorKey: 'action',
 		size: 900,
 		cell: ({ row }) => {
-			const { action, createdBy } = row.original;
+			const { description, createdBy } = row.original;
 			const user = useOrganizationStore
 				.getState()
 				.members.find((member) => member.member._id === createdBy);
@@ -32,9 +32,7 @@ const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 					</Avatar>
 					<div>
 						<p className='text-sm text-default font-sfCompact'>{user?.member.name}</p>
-						<p className='text-xs text-subtle font-sfCompact'>
-							{capitalize(action)} version to its environment
-						</p>
+						<p className='text-xs text-subtle font-sfCompact'>{description}</p>
 					</div>
 				</div>
 			);
