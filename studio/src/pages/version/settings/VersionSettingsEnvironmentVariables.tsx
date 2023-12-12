@@ -2,7 +2,7 @@ import { DataTable } from '@/components/DataTable';
 import { EmptyState } from '@/components/EmptyState';
 import { SettingsContainer } from '@/features/version/SettingsContainer';
 import {
-	EditOrAddVariableDrawer,
+	EditEnvVariable,
 	VariableActions,
 	VariableColumns,
 } from '@/features/version/SettingsEnvironmentVariables';
@@ -38,11 +38,7 @@ export default function VersionSettingsEnvironmentVariables() {
 						<DataTable<Param> table={table} className='table-fixed' />
 					</div>
 				)}
-				<EditOrAddVariableDrawer
-					open={editParamDrawerIsOpen}
-					editMode
-					onOpenChange={setEditParamDrawerIsOpen}
-				/>
+				<EditEnvVariable open={editParamDrawerIsOpen} onOpenChange={setEditParamDrawerIsOpen} />
 			</>
 		</SettingsContainer>
 	);
