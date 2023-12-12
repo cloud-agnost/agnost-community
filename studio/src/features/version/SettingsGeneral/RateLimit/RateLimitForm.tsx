@@ -14,21 +14,15 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { CreateRateLimitSchema } from '@/types';
 import * as z from 'zod';
+import { DrawerClose } from '@/components/Drawer';
 interface RateLimitFormProps {
 	loading: boolean;
-	error: APIError;
 }
-export default function RateLimitForm({ loading, error }: RateLimitFormProps) {
+export default function RateLimitForm({ loading }: RateLimitFormProps) {
 	const { t } = useTranslation();
 	const form = useFormContext<z.infer<typeof CreateRateLimitSchema>>();
 	return (
 		<div className='space-y-6'>
-			{error && (
-				<Alert variant='error'>
-					<AlertTitle>{error.error}</AlertTitle>
-					<AlertDescription>{error.details}</AlertDescription>
-				</Alert>
-			)}
 			<FormField
 				control={form.control}
 				name='name'
@@ -103,7 +97,12 @@ export default function RateLimitForm({ loading, error }: RateLimitFormProps) {
 					</FormItem>
 				)}
 			/>
-			<div className='mt-4 flex justify-end'>
+			<div className='mt-4 flex gap-4 justify-end'>
+				<DrawerClose asChild>
+					<Button variant='secondary' size='lg'>
+						{t('general.cancel')}
+					</Button>
+				</DrawerClose>
 				<Button loading={loading} size='lg'>
 					{t('general.save')}
 				</Button>

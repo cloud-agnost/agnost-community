@@ -5,7 +5,7 @@ import { APIError } from '@/types';
 import { translate } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
+import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import {
 	Form,
 	FormControl,
@@ -172,7 +172,12 @@ export default function CreateCopyVersionDrawer() {
 								</FormItem>
 							)}
 						/>
-						<div className='flex justify-end mt-4'>
+						<div className='flex gap-4 justify-end mt-4'>
+							<DrawerClose asChild>
+								<Button variant='secondary' size='lg'>
+									{t('general.cancel')}
+								</Button>
+							</DrawerClose>
 							<Button loading={isPending} size='lg'>
 								{t('general.add')}
 							</Button>
