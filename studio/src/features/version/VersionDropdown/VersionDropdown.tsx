@@ -38,7 +38,6 @@ export default function VersionDropdown() {
 	async function onConfirm() {
 		setLoading(true);
 		setError(null);
-
 		deleteVersion({
 			orgId,
 			appId,
@@ -47,6 +46,7 @@ export default function VersionDropdown() {
 				useVersionStore.setState({ deleteVersionDrawerIsOpen: false });
 				navigate(`/organization/${orgId}/apps`);
 				if (application) openVersionDrawer(application);
+				setLoading(false);
 			},
 			onError: (error) => {
 				notify({
@@ -55,10 +55,9 @@ export default function VersionDropdown() {
 					description: error.details,
 				});
 				setError(error as APIError);
+				setLoading(false);
 			},
 		});
-
-		setLoading(false);
 	}
 
 	return (
