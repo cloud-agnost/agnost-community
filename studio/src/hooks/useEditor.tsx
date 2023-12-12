@@ -23,8 +23,6 @@ export const EDITOR_OPTIONS: EditorProps['options'] = {
 	fontWeight: '400',
 	autoClosingBrackets: 'always',
 	autoDetectHighContrast: true,
-	formatOnPaste: true,
-	formatOnType: true,
 	wordWrap: 'on',
 	lineNumbers: 'on',
 	lineNumbersMinChars: 3,
@@ -37,7 +35,7 @@ export const EDITOR_OPTIONS: EditorProps['options'] = {
 };
 
 export type CodeEditorProps = {
-	onChange?: (value: string | undefined, ev: monaco.editor.IModelContentChangedEvent) => void;
+	onChange?: (ev: monaco.editor.IModelContentChangedEvent) => void;
 	onSave?: (logic: string) => void;
 };
 
@@ -115,7 +113,7 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 		content: Parameters<OnChange>[0],
 		ev: monaco.editor.IModelContentChangedEvent,
 	) => {
-		onChange?.(content, ev);
+		onChange?.(ev);
 	};
 	return {
 		onBeforeMount,
