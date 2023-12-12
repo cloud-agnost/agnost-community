@@ -55,7 +55,7 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 		if (queue) {
 			form.reset(queue);
 			const iid = environment?.mappings?.find((m) => m.design.iid === queue.iid)?.resource.iid;
-			if (iid) {
+			if (iid && open) {
 				getResource({
 					orgId,
 					iid,
