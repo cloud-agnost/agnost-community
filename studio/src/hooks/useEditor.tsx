@@ -109,10 +109,7 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 		configureEditor(editor, monaco);
 	}
 
-	const onCodeEditorChange = (
-		content: Parameters<OnChange>[0],
-		ev: monaco.editor.IModelContentChangedEvent,
-	) => {
+	const onCodeEditorChange = (ev: monaco.editor.IModelContentChangedEvent) => {
 		onChange?.(ev);
 	};
 	return {
