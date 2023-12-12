@@ -62,10 +62,10 @@ export default function VersionEditorLayout({
 		useTabStore();
 	const tab = getCurrentTab(versionId as string);
 	async function handleSaveLogic() {
-		const model = monaco.editor.getModels()[0];
-		const formattedLogic = await formatCode(model.getValue());
+		const editor = monaco.editor.getEditors()[0];
+		const formattedLogic = await formatCode(editor.getValue());
 		setLogic(formattedLogic);
-		model.setValue(formattedLogic);
+		editor.setValue(formattedLogic);
 		onSaveLogic(formattedLogic);
 	}
 

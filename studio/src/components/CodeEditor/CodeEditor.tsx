@@ -45,14 +45,20 @@ export default function CodeEditor({
 
 	function handleOnChange(ev: any) {
 		if (defaultLanguage === 'javascript' && !readonly) {
-			setTabState(value !== ev.changes[0].text);
+			console.log('setTabState', ev.changes[0]);
+			setTabState(!!ev.changes[0].text);
 		}
 		onChange?.(value, ev);
 	}
 	const { onBeforeMount, onCodeEditorMount, onCodeEditorChange } = useEditor({
 		onChange: handleOnChange,
-		onSave,
+		onSave: handleSaveLogic,
 	});
+
+	function handleSaveLogic(value: string) {
+		onSave?.(value);
+		setTabState(false);
+	}
 
 	useEffect(() => {
 		if (!isEmpty(globalThis.monaco) && defaultLanguage === 'javascript') {
