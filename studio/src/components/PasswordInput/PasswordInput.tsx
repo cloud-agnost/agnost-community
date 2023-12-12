@@ -32,6 +32,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
 					type={showPassword ? 'text' : 'password'}
 					placeholder={placeholder}
 					className='password-input'
+					autoComplete='new-password'
 				/>
 				<Button
 					className='password-input-button p-2'
