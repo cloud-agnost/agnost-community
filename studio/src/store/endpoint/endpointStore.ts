@@ -16,7 +16,7 @@ import {
 	TestEndpointParams,
 	UpdateEndpointParams,
 } from '@/types';
-import { formatTime, isEmpty } from '@/utils';
+import { formatTime, isEmpty, updateOrPush } from '@/utils';
 import { AxiosResponse } from 'axios';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -87,9 +87,11 @@ const useEndpointStore = create<EndpointStore & Actions>()(
 					}
 				},
 				getEndpointById: async (params) => {
-					set({ endpoint: {} as Endpoint });
 					const endpoint = await EndpointService.getEndpointById(params);
-					set({ endpoint });
+					set((prev) => {
+						const endpoints = updateOrPush(prev.endpoints, endpoint);
+						return { endpoint, endpoints };
+					});
 					if (isEmpty(get().logics[endpoint._id])) {
 						get().setLogics(endpoint._id, endpoint.logic);
 					}

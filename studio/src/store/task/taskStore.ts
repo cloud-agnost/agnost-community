@@ -14,7 +14,7 @@ import {
 	TestTaskParams,
 	UpdateTaskParams,
 } from '@/types';
-import { isEmpty } from '@/utils';
+import { isEmpty, updateOrPush } from '@/utils';
 import { devtools, persist } from 'zustand/middleware';
 export interface TaskStore {
 	task: Task;
@@ -63,9 +63,11 @@ const useTaskStore = create<TaskStore & Actions>()(
 					set({ isEditTaskModalOpen: false });
 				},
 				getTask: async (params: GetTaskParams) => {
-					set({ task: {} as Task });
 					const task = await TaskService.getTask(params);
-					set({ task });
+					set((prev) => {
+						const tasks = updateOrPush(prev.tasks, task);
+						return { task, tasks };
+					});
 					if (isEmpty(get().logics[task._id])) {
 						get().setLogics(task._id, task.logic);
 					}

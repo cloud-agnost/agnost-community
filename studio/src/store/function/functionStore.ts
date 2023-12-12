@@ -1,7 +1,7 @@
 import { CustomStateStorage, create } from '@/helpers';
 import { FunctionService } from '@/services';
 import * as funcTypes from '@/types';
-import { isEmpty } from '@/utils';
+import { isEmpty, updateOrPush } from '@/utils';
 import { devtools } from 'zustand/middleware';
 interface FunctionStore {
 	functions: funcTypes.HelperFunction[];
@@ -50,9 +50,11 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				return functions;
 			},
 			getFunctionById: async (params) => {
-				set({ function: {} as funcTypes.HelperFunction });
 				const func = await FunctionService.getFunctionById(params);
-				set({ function: func });
+				set((prev) => {
+					const functions = updateOrPush(prev.functions, func);
+					return { function: func, functions };
+				});
 				if (isEmpty(get().logics[func._id])) {
 					get().setLogics(func._id, func.logic);
 				}

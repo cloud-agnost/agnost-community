@@ -8,7 +8,8 @@ import {
 	GetDatabasesOfAppParams,
 	UpdateDatabaseParams,
 } from '@/types';
-import { devtools, persist } from 'zustand/middleware';
+import { updateOrPush } from '@/utils';
+import { devtools } from 'zustand/middleware';
 
 interface DatabaseStore {
 	databases: Database[];
@@ -42,74 +43,72 @@ const initialState: DatabaseStore = {
 
 const useDatabaseStore = create<DatabaseStore & Actions>()(
 	devtools(
-		persist(
-			(set) => ({
-				...initialState,
-				openDeleteDatabaseDialog: (db: Database) =>
-					set({
-						isDeleteDatabaseDialogOpen: true,
-						toDeleteDatabase: db,
-					}),
-				closeDeleteDatabaseDialog: () =>
-					set({
-						isDeleteDatabaseDialogOpen: false,
-						toDeleteDatabase: {} as Database,
-					}),
-				openEditDatabaseDialog: (db: Database) =>
-					set({
-						isEditDatabaseDialogOpen: true,
-						database: db,
-					}),
-				closeEditDatabaseDialog: () =>
-					set({
-						isEditDatabaseDialogOpen: false,
-						database: {} as Database,
-					}),
-				getDatabasesOfApp: async (params: GetDatabasesOfAppParams): Promise<Database[]> => {
-					const databases = await DatabaseService.getDatabasesOfApp(params);
-					set({ databases });
-					return databases;
-				},
-				getDatabaseOfAppById: async (params: GetDatabaseOfAppByIdParams): Promise<Database> => {
-					const database = await DatabaseService.getDatabaseOfAppById(params);
-					set({ database });
-					return database;
-				},
-				createDatabase: async (params: CreateDatabaseParams): Promise<Database> => {
-					try {
-						const database = await DatabaseService.createDatabase(params);
-						set((prev) => ({
-							databases: [database, ...prev.databases],
-						}));
-						return database;
-					} catch (e) {
-						throw e;
-					}
-				},
-				updateDatabase: async (params: UpdateDatabaseParams): Promise<Database> => {
-					const database = await DatabaseService.updateDatabaseName(params);
+		(set) => ({
+			...initialState,
+			openDeleteDatabaseDialog: (db: Database) =>
+				set({
+					isDeleteDatabaseDialogOpen: true,
+					toDeleteDatabase: db,
+				}),
+			closeDeleteDatabaseDialog: () =>
+				set({
+					isDeleteDatabaseDialogOpen: false,
+					toDeleteDatabase: {} as Database,
+				}),
+			openEditDatabaseDialog: (db: Database) =>
+				set({
+					isEditDatabaseDialogOpen: true,
+					database: db,
+				}),
+			closeEditDatabaseDialog: () =>
+				set({
+					isEditDatabaseDialogOpen: false,
+					database: {} as Database,
+				}),
+			getDatabasesOfApp: async (params: GetDatabasesOfAppParams): Promise<Database[]> => {
+				const databases = await DatabaseService.getDatabasesOfApp(params);
+				set({ databases });
+				return databases;
+			},
+			getDatabaseOfAppById: async (params: GetDatabaseOfAppByIdParams): Promise<Database> => {
+				const database = await DatabaseService.getDatabaseOfAppById(params);
+				set((prev) => {
+					const updatedList = updateOrPush(prev.databases, database);
+					return { database, databases: updatedList };
+				});
+				return database;
+			},
+			createDatabase: async (params: CreateDatabaseParams): Promise<Database> => {
+				try {
+					const database = await DatabaseService.createDatabase(params);
 					set((prev) => ({
-						databases: prev.databases.map((db) => (db._id === database._id ? database : db)),
+						databases: [database, ...prev.databases],
 					}));
 					return database;
-				},
-				deleteDatabase: async (params: DeleteDatabaseParams) => {
-					try {
-						await DatabaseService.deleteDatabase(params);
-						set((prev) => ({
-							databases: prev.databases.filter((db) => db._id !== params.dbId),
-						}));
-					} catch (e) {
-						throw e;
-					}
-				},
-				setDatabase: (database: Database) => set({ database }),
-				reset: () => set(initialState),
-			}),
-			{
-				name: 'database-storage',
+				} catch (e) {
+					throw e;
+				}
 			},
-		),
+			updateDatabase: async (params: UpdateDatabaseParams): Promise<Database> => {
+				const database = await DatabaseService.updateDatabaseName(params);
+				set((prev) => ({
+					databases: prev.databases.map((db) => (db._id === database._id ? database : db)),
+				}));
+				return database;
+			},
+			deleteDatabase: async (params: DeleteDatabaseParams) => {
+				try {
+					await DatabaseService.deleteDatabase(params);
+					set((prev) => ({
+						databases: prev.databases.filter((db) => db._id !== params.dbId),
+					}));
+				} catch (e) {
+					throw e;
+				}
+			},
+			setDatabase: (database: Database) => set({ database }),
+			reset: () => set(initialState),
+		}),
 		{
 			name: 'database',
 		},

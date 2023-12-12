@@ -14,7 +14,8 @@ import {
 	UpdateQueueLogicParams,
 	UpdateQueueParams,
 } from '@/types';
-import { isEmpty } from '@/utils';
+import { isEmpty, updateOrPush } from '@/utils';
+import _ from 'lodash';
 import { devtools, persist } from 'zustand/middleware';
 
 interface MessageQueueStore {
@@ -76,9 +77,11 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 					return queues;
 				},
 				getQueueById: async (params: GetMessageQueueByIdParams) => {
-					set({ queue: {} as MessageQueue });
 					const queue = await QueueService.getQueueById(params);
-					set({ queue });
+					set((prev) => {
+						const updatedList = updateOrPush(prev.queues, queue);
+						return { queue, queues: updatedList };
+					});
 					if (isEmpty(get().logics[queue._id])) {
 						get().setLogics(queue._id, queue.logic);
 					}

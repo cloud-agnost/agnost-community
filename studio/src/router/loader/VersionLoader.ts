@@ -9,13 +9,24 @@ import useStorageStore from '@/store/storage/storageStore';
 import useTaskStore from '@/store/task/taskStore';
 import useTabStore from '@/store/version/tabStore';
 import { getVersionPermission } from '@/utils';
+import _ from 'lodash';
 import { LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 async function editEndpointLoader({ params }: LoaderFunctionArgs) {
 	const { endpointId, orgId, versionId, appId } = params;
 	if (!endpointId) return null;
 	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
-	const { endpoint, getEndpointById, logics, setLogics } = useEndpointStore.getState();
+	const { endpoint, getEndpointById, logics, setLogics, endpoints } = useEndpointStore.getState();
+
+	const listEp = endpoints.find((ep) => ep._id === endpointId);
+	if (!_.isEmpty(listEp) && listEp?.logic) {
+		useEndpointStore.setState({ endpoint: listEp });
+		if (_.isEmpty(logics[listEp._id])) {
+			setLogics(listEp._id, listEp.logic);
+		}
+		return { endpoint: listEp };
+	}
+
 	if (endpoint?._id === endpointId) {
 		updateCurrentTab(versionId as string, {
 			isDirty: logics[endpointId] ? endpoint.logic !== logics[endpointId] : false,
@@ -37,9 +48,24 @@ async function editEndpointLoader({ params }: LoaderFunctionArgs) {
 async function editFunctionLoader({ params }: LoaderFunctionArgs) {
 	const { funcId, orgId, versionId, appId } = params as Record<string, string>;
 	if (!funcId) return null;
-	const { getFunctionById, logics, setLogics } = useFunctionStore.getState();
+	const {
+		getFunctionById,
+		logics,
+		setLogics,
+		function: helper,
+		functions,
+	} = useFunctionStore.getState();
 	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
-	const { function: helper } = useFunctionStore.getState();
+
+	const listFn = functions.find((fn) => fn._id === funcId);
+	if (!_.isEmpty(listFn) && listFn?.logic) {
+		useFunctionStore.setState({ function: listFn });
+		if (_.isEmpty(logics[listFn._id])) {
+			setLogics(listFn._id, listFn.logic);
+		}
+		return { function: listFn };
+	}
+
 	if (helper?._id === funcId) {
 		updateCurrentTab(versionId as string, {
 			isDirty: logics[funcId] ? helper.logic !== logics[funcId] : false,
@@ -61,7 +87,17 @@ async function editFunctionLoader({ params }: LoaderFunctionArgs) {
 async function editMiddlewareLoader({ params }: LoaderFunctionArgs) {
 	const { middlewareId, orgId, appId, versionId } = params as Record<string, string>;
 	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
-	const { middleware, logics, setLogics } = useMiddlewareStore.getState();
+	const { middleware, logics, setLogics, middlewares } = useMiddlewareStore.getState();
+
+	const listMw = middlewares.find((mw) => mw._id === middlewareId);
+	if (!_.isEmpty(listMw) && listMw?.logic) {
+		useMiddlewareStore.setState({ middleware: listMw });
+		if (_.isEmpty(logics[listMw._id])) {
+			setLogics(listMw._id, listMw.logic);
+		}
+		return { middleware: listMw };
+	}
+
 	if (middleware?._id === middlewareId) {
 		updateCurrentTab(versionId as string, {
 			isDirty: logics[middlewareId] ? middleware.logic !== logics[middlewareId] : false,
@@ -82,7 +118,16 @@ async function editMessageQueueLoader({ params }: LoaderFunctionArgs) {
 	const { queueId, orgId, versionId, appId } = params;
 	if (!queueId) return null;
 	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
-	const { queue, setLogics, getQueueById, logics } = useMessageQueueStore.getState();
+	const { queue, setLogics, getQueueById, logics, queues } = useMessageQueueStore.getState();
+	const listQueue = queues.find((queue) => queue._id === queueId);
+	if (!_.isEmpty(listQueue) && listQueue?.logic) {
+		useMessageQueueStore.setState({ queue: listQueue });
+		if (_.isEmpty(logics[listQueue._id])) {
+			setLogics(listQueue._id, listQueue.logic);
+		}
+		return { queue: listQueue };
+	}
+
 	if (queue?._id === queueId) {
 		updateCurrentTab(versionId as string, {
 			isDirty: logics[queueId] ? queue.logic !== logics[queueId] : false,
@@ -147,7 +192,17 @@ async function editTaskLoader({ params }: LoaderFunctionArgs) {
 	const { taskId, orgId, versionId, appId } = params;
 	if (!taskId) return null;
 	const { updateCurrentTab, closeDeleteTabModal } = useTabStore.getState();
-	const { task, getTask, logics, setLogics } = useTaskStore.getState();
+	const { task, getTask, logics, setLogics, tasks } = useTaskStore.getState();
+
+	const listTask = tasks.find((task) => task._id === taskId);
+	if (!_.isEmpty(listTask) && listTask?.logic) {
+		useTaskStore.setState({ task: listTask });
+		if (_.isEmpty(logics[listTask._id])) {
+			setLogics(listTask._id, listTask.logic);
+		}
+		return { task: listTask };
+	}
+
 	if (task?._id === taskId) {
 		updateCurrentTab(versionId as string, {
 			isDirty: logics[taskId] ? task.logic !== logics[taskId] : false,
@@ -176,7 +231,12 @@ async function modelsOutletLoader({ params }: LoaderFunctionArgs) {
 		versionId: string;
 		dbId: string;
 	};
-	const { database, getDatabaseOfAppById } = useDatabaseStore.getState();
+	const { database, getDatabaseOfAppById, databases } = useDatabaseStore.getState();
+	const listDb = databases.find((db) => db._id === apiParams.dbId);
+	if (!_.isEmpty(listDb)) {
+		useDatabaseStore.setState({ database: listDb });
+		return { database: listDb };
+	}
 	if (database._id !== apiParams.dbId) getDatabaseOfAppById(apiParams);
 
 	return { props: {} };
@@ -211,7 +271,6 @@ async function navigatorLoader({ params }: LoaderFunctionArgs) {
 		versionId: string;
 		dbId: string;
 	};
-	console.log('apiParams', database._id, apiParams.dbId);
 	if (database._id !== apiParams.dbId) {
 		getDatabaseOfAppById(apiParams);
 		getModelsOfDatabase(apiParams);

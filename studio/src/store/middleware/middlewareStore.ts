@@ -11,7 +11,7 @@ import {
 	SaveMiddlewareCodeParams,
 	UpdateMiddlewareParams,
 } from '@/types';
-import { isEmpty } from '@/utils';
+import { isEmpty, updateOrPush } from '@/utils';
 import { devtools } from 'zustand/middleware';
 
 interface MiddlewareStore {
@@ -77,9 +77,11 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 			return middlewares;
 		},
 		getMiddlewareById: async (params: GetMiddlewareByIdParams) => {
-			set({ middleware: {} as Middleware });
 			const middleware = await MiddlewareService.getMiddlewareById(params);
-			set({ middleware });
+			set((prev) => {
+				const middlewares = updateOrPush(prev.middlewares, middleware);
+				return { middleware, middlewares };
+			});
 			if (isEmpty(get().logics[middleware._id])) {
 				get().setLogics(middleware._id, middleware.logic);
 			}
