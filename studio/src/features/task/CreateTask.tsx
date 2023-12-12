@@ -47,11 +47,6 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 	const { mutateAsync: createTaskMutate, isPending } = useMutation({
 		mutationFn: createTask,
 		onSuccess: (task) => {
-			form.reset({
-				name: '',
-				cronExpression: '',
-				logExecution: false,
-			});
 			navigate({
 				title: task.name,
 				path: `${pathname}/${task._id}`,
@@ -59,14 +54,9 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 				isDashboard: false,
 				type: TabTypes.Task,
 			});
-			onClose();
+			handleClose();
 		},
 		onError: ({ error, details }: APIError) => {
-			form.reset({
-				name: '',
-				cronExpression: '',
-				logExecution: false,
-			});
 			notify({ type: 'error', description: details, title: error });
 		},
 	});
@@ -80,18 +70,13 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 		});
 	}
 
+	function handleClose() {
+		form.reset();
+		onClose();
+	}
+
 	return (
-		<Drawer
-			open={open}
-			onOpenChange={() => {
-				form.reset({
-					name: '',
-					cronExpression: '',
-					logExecution: false,
-				});
-				onClose();
-			}}
-		>
+		<Drawer open={open} onOpenChange={handleClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>{t('task.add')}</DrawerTitle>
