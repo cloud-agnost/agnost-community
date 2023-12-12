@@ -74,6 +74,7 @@ export interface EnvLog {
 	_id: string;
 	createdAt: string;
 	updatedAt: string;
+	description: string;
 	__v: number;
 }
 

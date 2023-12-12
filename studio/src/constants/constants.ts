@@ -751,7 +751,7 @@ export const DATABASE = {
 	MongoDB: 'MongoDB',
 };
 
-export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
+export const TAB_ICON_MAP: Record<string, ElementType> = {
 	Storage: Storage,
 	Database: DatabaseIcon,
 	Cache: Lightning,
