@@ -1,7 +1,6 @@
 import { Button } from '@/components/Button';
 import { TestConnection } from '@/components/icons';
 import { useToast } from '@/hooks';
-import useApplicationStore from '@/store/app/applicationStore';
 import useResourceStore from '@/store/resources/resourceStore';
 import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';

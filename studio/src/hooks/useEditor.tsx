@@ -4,7 +4,7 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import nightOwl from 'monaco-themes/themes/Night Owl.json';
 import slush from 'monaco-themes/themes/Slush and Poppies.json';
 import iPlastic from 'monaco-themes/themes/iPlastic.json';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
 export const EDITOR_OPTIONS: EditorProps['options'] = {
 	minimap: { enabled: false },
@@ -41,7 +41,6 @@ export type CodeEditorProps = {
 
 export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 	const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
-	const [monacoRef, setMonacoRef] = useState<typeof monaco>();
 
 	async function saveEditorContent(language: string | undefined, cb?: (value: string) => void) {
 		const ed = editorRef.current;
@@ -85,7 +84,6 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 	}
 
 	const onBeforeMount: BeforeMount = (monaco) => {
-		setMonacoRef(monaco);
 		monaco.editor.defineTheme('nightOwl', nightOwl as monaco.editor.IStandaloneThemeData);
 		monaco.editor.defineTheme('slush', slush as monaco.editor.IStandaloneThemeData);
 		monaco.editor.defineTheme('iPlastic', iPlastic as monaco.editor.IStandaloneThemeData);
