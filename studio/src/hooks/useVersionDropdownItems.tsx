@@ -11,7 +11,7 @@ import { useParams } from 'react-router-dom';
 export default function useVersionDropdownItems() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const { application, openVersionDrawer } = useApplicationStore();
+	const { openVersionDrawer } = useApplicationStore();
 	const { appId, orgId } = useParams() as Record<string, string>;
 	const {
 		versions,
@@ -39,6 +39,7 @@ export default function useVersionDropdownItems() {
 			{
 				title: t('version.open_version'),
 				action: () => {
+					const application = useApplicationStore.getState().application;
 					if (!application) return;
 					openVersionDrawer(application);
 				},
