@@ -126,95 +126,93 @@ export default function ChangePassword() {
 	}
 
 	return (
-		<>
-			<div className='space-y-4'>
-				{error && (
-					<Alert variant='error'>
-						<AlertTitle>{error.error}</AlertTitle>
-						<AlertDescription>{error.details}</AlertDescription>
-					</Alert>
-				)}
-				{isChangeMode ? (
-					<Form {...form}>
-						<form className='change-email-form' onSubmit={form.handleSubmit(onSubmit)}>
-							<FormField
-								control={form.control}
-								name='currentPassword'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>{t('profileSettings.current_password')}</FormLabel>
-										<FormControl>
-											<PasswordInput
-												error={Boolean(form.formState.errors.currentPassword)}
-												placeholder={t('profileSettings.current_password_placeholder') ?? ''}
-												{...field}
-											/>
-										</FormControl>
-										<FormDescription>{t('forms.min8.description')}</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='newPassword.password'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>{t('profileSettings.new_password')}</FormLabel>
-										<FormControl>
-											<PasswordInput
-												error={Boolean(form.formState.errors.newPassword?.password)}
-												placeholder={t('profileSettings.new_password_placeholder') ?? ''}
-												{...field}
-											/>
-										</FormControl>
-										<FormDescription>{t('forms.min8.description')}</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='newPassword.confirm'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>{t('profileSettings.confirm_new_password')}</FormLabel>
-										<FormControl>
-											<PasswordInput
-												error={Boolean(form.formState.errors.newPassword?.confirm)}
-												placeholder={t('profileSettings.confirm_new_password_placeholder') ?? ''}
-												{...field}
-											/>
-										</FormControl>
-										<FormDescription>{t('forms.min8.description')}</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<div className='mt-4 flex gap-4 justify-end'>
-								<Button onClick={close} variant='text' size='lg'>
-									{t('profileSettings.cancel')}
-								</Button>
-								<Button loading={loading} size='lg'>
-									{t('profileSettings.update')}
-								</Button>
-							</div>
-						</form>
-					</Form>
-				) : (
-					<div className='space-y-4 flex flex-col items-start'>
-						<Button onClick={open} size='lg'>
-							{t('profileSettings.update_password')}
-						</Button>
-						<div className='space-y-2'>
-							<p className='cant-remember'>{t('profileSettings.cant_remember_password')}</p>
-							<Button loading={sending} onClick={resetPasswordByEmail} variant='secondary'>
-								{t('profileSettings.reset_password_by_email')}
+		<div className='space-y-4'>
+			{error && (
+				<Alert variant='error'>
+					<AlertTitle>{error.error}</AlertTitle>
+					<AlertDescription>{error.details}</AlertDescription>
+				</Alert>
+			)}
+			{isChangeMode ? (
+				<Form {...form}>
+					<form className='change-email-form' onSubmit={form.handleSubmit(onSubmit)}>
+						<FormField
+							control={form.control}
+							name='currentPassword'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>{t('profileSettings.current_password')}</FormLabel>
+									<FormControl>
+										<PasswordInput
+											error={Boolean(form.formState.errors.currentPassword)}
+											placeholder={t('profileSettings.current_password_placeholder') ?? ''}
+											{...field}
+										/>
+									</FormControl>
+									<FormDescription>{t('forms.min8.description')}</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='newPassword.password'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>{t('profileSettings.new_password')}</FormLabel>
+									<FormControl>
+										<PasswordInput
+											error={Boolean(form.formState.errors.newPassword?.password)}
+											placeholder={t('profileSettings.new_password_placeholder') ?? ''}
+											{...field}
+										/>
+									</FormControl>
+									<FormDescription>{t('forms.min8.description')}</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='newPassword.confirm'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>{t('profileSettings.confirm_new_password')}</FormLabel>
+									<FormControl>
+										<PasswordInput
+											error={Boolean(form.formState.errors.newPassword?.confirm)}
+											placeholder={t('profileSettings.confirm_new_password_placeholder') ?? ''}
+											{...field}
+										/>
+									</FormControl>
+									<FormDescription>{t('forms.min8.description')}</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<div className='mt-4 flex gap-4 justify-end'>
+							<Button onClick={close} variant='text' size='lg'>
+								{t('profileSettings.cancel')}
+							</Button>
+							<Button loading={loading} size='lg'>
+								{t('profileSettings.update')}
 							</Button>
 						</div>
+					</form>
+				</Form>
+			) : (
+				<div className='space-y-4 flex flex-col items-start'>
+					<Button onClick={open} size='lg'>
+						{t('profileSettings.update_password')}
+					</Button>
+					<div className='space-y-2'>
+						<p className='cant-remember'>{t('profileSettings.cant_remember_password')}</p>
+						<Button loading={sending} onClick={resetPasswordByEmail} variant='secondary'>
+							{t('profileSettings.reset_password_by_email')}
+						</Button>
 					</div>
-				)}
-			</div>
-		</>
+				</div>
+			)}
+		</div>
 	);
 }
