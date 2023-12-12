@@ -12,7 +12,7 @@ import { APIError, EnvironmentStatus, Log } from '@/types';
 import { generateId, joinChannel, leaveChannel, parseIfString } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
@@ -55,7 +55,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 			});
 		},
 	});
-
+	console.log('testQueueLogs', form.getValues());
 	function onSubmit(data: z.infer<typeof TestMessageQueueSchema>) {
 		if (debugChannel) leaveChannel(debugChannel);
 		const id = generateId();
@@ -73,12 +73,19 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 	function handleClose() {
 		if (debugChannel) leaveChannel(debugChannel);
 		onClose();
+		form.reset();
 	}
 
 	function stringifyIfObject(value: any) {
 		if (typeof value === 'object') return JSON.stringify(value, null, 2);
 		return value;
 	}
+
+	useEffect(() => {
+		if (open) {
+			form.setValue('payload', testQueueLogs[queue?._id]?.payload);
+		}
+	}, [open]);
 	return (
 		<Drawer open={open} onOpenChange={handleClose}>
 			<DrawerContent
