@@ -1,9 +1,10 @@
+import { Button } from '@/components/Button';
+import { NEW_TAB_ITEMS, TAB_ICON_MAP } from '@/constants';
 import useTabStore from '@/store/version/tabStore.ts';
 import useVersionStore from '@/store/version/versionStore';
 import { DesignElement, Tab, TabTypes } from '@/types';
 import { capitalize, generateId } from '@/utils';
 import { Plus } from '@phosphor-icons/react';
-import { Button } from '@/components/Button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -13,9 +14,7 @@ import {
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
 import { SearchInput } from 'components/SearchInput';
-import { NEW_TAB_ITEMS, TAB_ICON_MAP } from '@/constants';
 import { useParams } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
 export default function NewTabDropdown() {
 	const { addTab } = useTabStore();
 	const { searchDesignElements, designElements, resetDesignElements, getVersionDashboardPath } =
@@ -93,34 +92,21 @@ export default function NewTabDropdown() {
 				</DropdownMenuLabel>
 				<DropdownMenuItemContainer className='overflow-auto max-h-96'>
 					{designElements.length > 0 ? (
-						<AnimatePresence>
-							<motion.div
-								initial={{
-									x: '100%',
-								}}
-								animate={{
-									x: 0,
-								}}
-								transition={{ type: 'tween' }}
-								exit={{
-									x: '100%',
-								}}
-							>
-								{designElements.map((item) => (
-									<DropdownMenuItem asChild key={item._id} onClick={() => handleClickElement(item)}>
-										<div className='space-x-3'>
-											<div className=' bg-lighter p-2 rounded-lg'>
-												{getIcon(capitalize(item.type) as TabTypes)}
-											</div>
-											<div>
-												<p className='text-subtle font-sfCompact'>{capitalize(item.type)}</p>
-												<p className='text-default font-sfCompact'>{item.name}</p>
-											</div>
+						<>
+							{designElements.map((item) => (
+								<DropdownMenuItem asChild key={item._id} onClick={() => handleClickElement(item)}>
+									<div className='space-x-3'>
+										<div className=' bg-lighter p-2 rounded-lg'>
+											{getIcon(capitalize(item.type) as TabTypes)}
 										</div>
-									</DropdownMenuItem>
-								))}
-							</motion.div>
-						</AnimatePresence>
+										<div>
+											<p className='text-subtle font-sfCompact'>{capitalize(item.type)}</p>
+											<p className='text-default font-sfCompact'>{item.name}</p>
+										</div>
+									</div>
+								</DropdownMenuItem>
+							))}
+						</>
 					) : (
 						NEW_TAB_ITEMS.sort((a, b) => a.title.localeCompare(b.title)).map((item) => (
 							<DropdownMenuItem
