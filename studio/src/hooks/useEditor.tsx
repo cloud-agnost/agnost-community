@@ -31,7 +31,7 @@ export const EDITOR_OPTIONS: EditorProps['options'] = {
 	renderLineHighlight: 'none', //Enable rendering of current line highlight
 	folding: false, //Enable code folding
 	codeLens: true,
-	tabSize: 2,
+	tabSize: 3,
 };
 
 export type CodeEditorProps = {

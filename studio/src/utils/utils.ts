@@ -452,6 +452,7 @@ export async function formatCode(code: string) {
 		return await prettier.format(code, {
 			parser: 'babel',
 			plugins: [jsParser, esTreePlugin],
+			tabWidth: 3,
 		});
 	} catch (error) {
 		return code;
