@@ -29,7 +29,7 @@ export default function CreateFunction({ open, onClose }: CreateTaskProps) {
 		appId: string;
 		orgId: string;
 	}>();
-	const { mutate: createFunctionMutation } = useMutation({
+	const { mutate: createFunctionMutation, isPending } = useMutation({
 		mutationFn: createFunction,
 		onSuccess: (helper) => {
 			navigate({
@@ -74,7 +74,7 @@ export default function CreateFunction({ open, onClose }: CreateTaskProps) {
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<FunctionForm />
+						<FunctionForm loading={isPending} />
 					</form>
 				</Form>
 			</DrawerContent>
