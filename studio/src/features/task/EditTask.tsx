@@ -2,7 +2,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import useTaskStore from '@/store/task/taskStore';
-import { CreateTaskSchema } from '@/types';
+import { APIError, CreateTaskSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ import * as z from 'zod';
 import TaskForm from './TaskForm';
 import useResourceStore from '@/store/resources/resourceStore';
 import { useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
 interface EditTaskProps {
 	open: boolean;
 	onClose: () => void;
@@ -31,21 +32,25 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 	const form = useForm<z.infer<typeof CreateTaskSchema>>({
 		resolver: zodResolver(CreateTaskSchema),
 	});
-
+	const { mutateAsync: updateTaskMutation, isPending } = useMutation({
+		mutationFn: updateTask,
+		onSuccess: handleClose,
+		onError: ({ error, details }: APIError) => {
+			notify({
+				title: error,
+				description: details,
+				type: 'error',
+			});
+		},
+	});
 	function onSubmit(data: z.infer<typeof CreateTaskSchema>) {
-		updateTask({
+		updateTaskMutation({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			taskId: task._id,
 			resourceId: resources[0]._id,
 			...data,
-			onSuccess: () => {
-				handleClose();
-			},
-			onError: ({ error, details }) => {
-				notify({ type: 'error', description: details, title: error });
-			},
 		});
 	}
 
@@ -71,7 +76,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<TaskForm />
+						<TaskForm loading={isPending} />
 					</form>
 				</Form>
 			</DrawerContent>
