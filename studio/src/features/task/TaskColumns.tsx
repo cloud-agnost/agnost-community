@@ -5,13 +5,12 @@ import { BADGE_COLOR_MAP } from '@/constants';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTaskStore from '@/store/task/taskStore';
 import { APIError, ColumnDefWithClassName, TabTypes, Task } from '@/types';
-import { getVersionPermission, notify, translate } from '@/utils';
+import { describeCronExpression, getVersionPermission, notify, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { Calendar } from 'components/icons';
-import cronstrue from 'cronstrue';
 import { TabLink } from '../version/Tabs';
 
 const queryClient = new QueryClient();
@@ -74,7 +73,7 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		size: 300,
 		cell: ({ row }) => {
 			const { cronExpression } = row.original;
-			const result = cronstrue.toString(cronExpression);
+			const result = describeCronExpression(cronExpression);
 			return (
 				<div className='grid grid-cols-[1fr,10fr] items-center gap-2'>
 					<Calendar className='w-4 h-4' />

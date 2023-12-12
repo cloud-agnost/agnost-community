@@ -5,8 +5,8 @@ import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useTaskStore from '@/store/task/taskStore';
 import { APIError } from '@/types';
+import { describeCronExpression } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
-import cronstrue from 'cronstrue';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -78,7 +78,7 @@ export default function EditTask() {
 				<span className='text-xl text-default'>{task.name}</span>
 				<Separator orientation='vertical' className='h-[24px] w-[1px]' />
 				<span className='text-default font-sfCompact text-sm'>
-					{cronstrue.toString(task.cronExpression)}
+					{describeCronExpression(task.cronExpression)}
 				</span>
 			</div>
 			<TestTask open={isTestTaskOpen} onClose={() => setIsTestTaskOpen(false)} />
