@@ -85,8 +85,10 @@ import {
 	Function,
 	GearSix,
 	HardDrive,
+	HardDrives,
 	IdentificationBadge,
 	Key,
+	Lightning,
 	LinkSimple,
 	ListChecks,
 	ListNumbers,
@@ -99,6 +101,7 @@ import {
 	Table,
 	TextAa,
 	Textbox,
+	Timer,
 } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { ElementType } from 'react';
@@ -748,14 +751,14 @@ export const DATABASE = {
 	MongoDB: 'MongoDB',
 };
 
-export const TAB_ICON_MAP: Record<string, ElementType> = {
+export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
 	Storage: Storage,
 	Database: DatabaseIcon,
-	Cache: HardDrive,
+	Cache: Lightning,
 	Endpoint: ApiKeys,
 	Queue: MessageQueue,
 	'Message Queue': MessageQueue,
-	Task: Calendar,
+	Task: Timer,
 	Middleware: SkipForward,
 	Settings: GearSix,
 	Dashboard: Dashboard,
@@ -764,7 +767,8 @@ export const TAB_ICON_MAP: Record<string, ElementType> = {
 	Field: Textbox,
 	Model: Table,
 	Navigator: Table,
-	Bucket: Storage,
+	Bucket: HardDrives,
+	File: FileText,
 };
 
 export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
