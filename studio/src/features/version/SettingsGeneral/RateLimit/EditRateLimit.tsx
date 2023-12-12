@@ -26,11 +26,7 @@ export default function EditRateLimit({ open, onOpenChange }: EditRateLimitProps
 		},
 	});
 
-	const {
-		mutateAsync: editRateLimitMutate,
-		isPending,
-		error,
-	} = useMutation({
+	const { mutateAsync: editRateLimitMutate, isPending } = useMutation({
 		mutationFn: editRateLimit,
 		onSuccess: () => {
 			onClose();
@@ -76,7 +72,7 @@ export default function EditRateLimit({ open, onOpenChange }: EditRateLimitProps
 				<div className='p-6'>
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)}>
-							<RateLimitForm loading={isPending} error={error} />
+							<RateLimitForm loading={isPending} />
 						</form>
 					</Form>
 				</div>

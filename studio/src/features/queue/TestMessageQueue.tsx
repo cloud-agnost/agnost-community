@@ -55,7 +55,6 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 			});
 		},
 	});
-	console.log('testQueueLogs', form.getValues());
 	function onSubmit(data: z.infer<typeof TestMessageQueueSchema>) {
 		if (debugChannel) leaveChannel(debugChannel);
 		const id = generateId();

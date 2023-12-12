@@ -259,6 +259,8 @@ export const ALL_NOTIFICATIONS = [
 	'storage',
 	'resource',
 	'environment',
+	'middleware',
+	'function',
 ];
 
 export const ERROR_CODES_TO_REDIRECT_LOGIN_PAGE = [

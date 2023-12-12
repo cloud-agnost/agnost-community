@@ -36,7 +36,7 @@ async function editEndpointLoader({ params }: LoaderFunctionArgs) {
 		return { endpoint };
 	}
 
-	getEndpointById({
+	await getEndpointById({
 		orgId: orgId as string,
 		appId: appId as string,
 		versionId: versionId as string,
@@ -137,7 +137,7 @@ async function editMessageQueueLoader({ params }: LoaderFunctionArgs) {
 		return { queue };
 	}
 
-	getQueueById({
+	await getQueueById({
 		orgId: orgId as string,
 		appId: appId as string,
 		versionId: versionId as string,
@@ -272,8 +272,8 @@ async function navigatorLoader({ params }: LoaderFunctionArgs) {
 		dbId: string;
 	};
 	if (database._id !== apiParams.dbId) {
-		getDatabaseOfAppById(apiParams);
-		getModelsOfDatabase(apiParams);
+		await getDatabaseOfAppById(apiParams);
+		await getModelsOfDatabase(apiParams);
 	}
 
 	return null;

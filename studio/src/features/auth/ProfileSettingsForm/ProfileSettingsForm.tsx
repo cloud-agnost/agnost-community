@@ -6,7 +6,7 @@ import { ChangeEmail } from '@/features/auth/ChangeEmail';
 import { ChangePassword } from '@/features/auth/ChangePassword';
 import { ProfileSettingsFormItem } from '@/features/auth/ProfileSettingsForm/index.ts';
 import { DeleteAccount } from '@/features/auth/DeleteAccount';
-import { ChangeAvatar } from '@/features/auth/ChangeAvatar';
+import { ChangeUserAvatar } from '@/features/auth/ChangeAvatar';
 
 export default function ProfileSettingsForm() {
 	const { t } = useTranslation();
@@ -43,7 +43,7 @@ export default function ProfileSettingsForm() {
 				title={t('profileSettings.your_avatar')}
 				description={t('profileSettings.your_avatar_description')}
 			>
-				<ChangeAvatar />
+				<ChangeUserAvatar />
 			</ProfileSettingsFormItem>
 
 			<ProfileSettingsFormItem

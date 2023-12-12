@@ -419,11 +419,8 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					const { app } = await OrganizationService.createApplication({ orgId, name });
 					if (onSuccess) onSuccess();
 					const role = app.team.find(
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						//@ts-ignore
-						(team) => team.userId === useAuthStore.getState().user?._id,
+						(team) => team.userId._id === useAuthStore.getState().user?._id,
 					)?.role;
-
 					set((prev) => ({
 						applications: [
 							...prev.applications,

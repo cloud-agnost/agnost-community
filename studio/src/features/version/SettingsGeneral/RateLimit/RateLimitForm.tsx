@@ -1,4 +1,5 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
+import { Button } from '@/components/Button';
+import { DrawerClose } from '@/components/Drawer';
 import {
 	FormControl,
 	FormDescription,
@@ -8,27 +9,18 @@ import {
 	FormMessage,
 } from '@/components/Form';
 import { Input } from '@/components/Input';
-import { APIError } from '@/types';
-import { Button } from '@/components/Button';
+import { CreateRateLimitSchema } from '@/types';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { CreateRateLimitSchema } from '@/types';
 import * as z from 'zod';
 interface RateLimitFormProps {
 	loading: boolean;
-	error: APIError;
 }
-export default function RateLimitForm({ loading, error }: RateLimitFormProps) {
+export default function RateLimitForm({ loading }: RateLimitFormProps) {
 	const { t } = useTranslation();
 	const form = useFormContext<z.infer<typeof CreateRateLimitSchema>>();
 	return (
 		<div className='space-y-6'>
-			{error && (
-				<Alert variant='error'>
-					<AlertTitle>{error.error}</AlertTitle>
-					<AlertDescription>{error.details}</AlertDescription>
-				</Alert>
-			)}
 			<FormField
 				control={form.control}
 				name='name'
@@ -103,7 +95,12 @@ export default function RateLimitForm({ loading, error }: RateLimitFormProps) {
 					</FormItem>
 				)}
 			/>
-			<div className='mt-4 flex justify-end'>
+			<div className='mt-4 flex gap-4 justify-end'>
+				<DrawerClose asChild>
+					<Button variant='secondary' size='lg'>
+						{t('general.cancel')}
+					</Button>
+				</DrawerClose>
 				<Button loading={loading} size='lg'>
 					{t('general.save')}
 				</Button>

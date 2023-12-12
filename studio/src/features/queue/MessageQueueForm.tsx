@@ -50,36 +50,6 @@ export default function MessageQueueForm({ edit, loading }: { edit?: boolean; lo
 					</FormItem>
 				)}
 			/>
-			{selectedResource?.config?.delayedMessages && (
-				<FormField
-					control={form.control}
-					name='delay'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>{t('queue.create.delay')}</FormLabel>
-							<FormControl>
-								{/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				/* @ts-ignore */}
-								<Input
-									type='number'
-									error={Boolean(form.formState.errors.delay)}
-									placeholder={
-										t('forms.placeholder', {
-											label: t('queue.create.delay'),
-										}) ?? ''
-									}
-									{...field}
-									{...form.register('delay', {
-										setValueAs: (v) => (v === '' ? null : parseInt(v)),
-									})}
-								/>
-							</FormControl>
-							<FormDescription>{t('queue.create.delay_description')}</FormDescription>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-			)}
 
 			<FormField
 				control={form.control}
@@ -115,6 +85,36 @@ export default function MessageQueueForm({ edit, loading }: { edit?: boolean; lo
 								/>
 							</FormControl>
 							<FormDescription>{t('queue.create.resource.description')}</FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+			)}
+			{selectedResource?.config?.delayedMessages && (
+				<FormField
+					control={form.control}
+					name='delay'
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>{t('queue.create.delay')}</FormLabel>
+							<FormControl>
+								{/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				/* @ts-ignore */}
+								<Input
+									type='number'
+									error={Boolean(form.formState.errors.delay)}
+									placeholder={
+										t('forms.placeholder', {
+											label: t('queue.create.delay'),
+										}) ?? ''
+									}
+									{...field}
+									{...form.register('delay', {
+										setValueAs: (v) => (v === '' ? null : parseInt(v)),
+									})}
+								/>
+							</FormControl>
+							<FormDescription>{t('queue.create.delay_description')}</FormDescription>
 							<FormMessage />
 						</FormItem>
 					)}

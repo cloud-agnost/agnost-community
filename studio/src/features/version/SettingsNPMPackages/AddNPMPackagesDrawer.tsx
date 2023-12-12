@@ -2,7 +2,7 @@ import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { SearchNPMPackages } from '@/types';
 import { Button } from '@/components/Button';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
+import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import { SearchInput } from 'components/SearchInput';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/Table';
 import { TableLoading } from 'components/Table/Table.tsx';
@@ -152,7 +152,12 @@ export default function AddNPMPackagesDrawer({ open, onOpenChange }: AddNPMPacka
 							</Table>
 						</InfiniteScroll>
 					)}
-					<div className='flex justify-end'>
+					<div className='flex gap-4 justify-end'>
+						<DrawerClose asChild>
+							<Button variant='secondary' size='lg'>
+								{t('general.cancel')}
+							</Button>
+						</DrawerClose>
 						<Button onClick={() => onOpenChange(false)} size='lg'>
 							{t('general.close')}
 						</Button>

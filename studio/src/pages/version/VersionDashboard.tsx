@@ -16,6 +16,7 @@ import { TabTypes } from '@/types';
 import { capitalize, generateId } from '@/utils';
 import { BookBookmark, Code, FileJs, Key } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
+import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import BeatLoader from 'react-spinners/BeatLoader';
@@ -32,14 +33,17 @@ export default function VersionDashboard() {
 	const { isFetching } = useQuery({
 		queryKey: ['getVersionDashboardInfo'],
 		queryFn: getVersionDashboardInfoHandler,
+		refetchOnWindowFocus: false,
 	});
 
 	function getVersionDashboardInfoHandler() {
-		return getVersionDashboardInfo({
-			orgId,
-			appId,
-			versionId,
-		});
+		if (_.isEmpty(dashboard)) {
+			return getVersionDashboardInfo({
+				orgId,
+				appId,
+				versionId,
+			});
+		}
 	}
 	function getIcon(type: string) {
 		const Icon = TAB_ICON_MAP[type];

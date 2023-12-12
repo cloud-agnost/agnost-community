@@ -42,11 +42,7 @@ export default function CreateRateLimit({
 		appId: string;
 		orgId: string;
 	}>();
-	const {
-		mutateAsync: createRateLimitMutate,
-		isPending,
-		error,
-	} = useMutation({
+	const { mutateAsync: createRateLimitMutate, isPending } = useMutation({
 		mutationFn: createRateLimit,
 		onSuccess: onSuccess,
 		onError: (error: APIError) => {
@@ -115,7 +111,7 @@ export default function CreateRateLimit({
 				<div className='p-6'>
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)}>
-							<RateLimitForm loading={isPending} error={error} />
+							<RateLimitForm loading={isPending} />
 						</form>
 					</Form>
 				</div>

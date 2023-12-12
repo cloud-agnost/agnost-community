@@ -1,19 +1,19 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
+import useResourceStore from '@/store/resources/resourceStore';
 import { APIError, MessageQueueSchema } from '@/types';
+import { removeEmptyFields } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MessageQueueForm from './MessageQueueForm';
-import { useEffect } from 'react';
-import { removeEmptyFields } from '@/utils';
-import useResourceStore from '@/store/resources/resourceStore';
-import useEnvironmentStore from '@/store/environment/environmentStore';
-import { useMutation } from '@tanstack/react-query';
 interface CreateQueueProps {
 	open: boolean;
 	onClose: () => void;
@@ -62,7 +62,7 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 				});
 			}
 		}
-	}, [queue]);
+	}, [queue, environment]);
 
 	return (
 		<Drawer

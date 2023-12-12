@@ -1,5 +1,5 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
-import { EnvVariableSchema } from '@/types';
+import { APIError, EnvVariableSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,7 @@ import { useParams } from 'react-router-dom';
 import useSettingsStore from '@/store/version/settingsStore';
 import { useMutation } from '@tanstack/react-query';
 import { Form } from '@/components/Form';
-
+import { useToast } from '@/hooks';
 interface CreateEnvVariableProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -17,6 +17,7 @@ interface CreateEnvVariableProps {
 
 export default function CreateEnvVariable({ open, onOpenChange }: CreateEnvVariableProps) {
 	const { t } = useTranslation();
+	const { notify } = useToast();
 	const form = useForm<z.infer<typeof EnvVariableSchema>>({
 		resolver: zodResolver(EnvVariableSchema),
 	});
@@ -25,6 +26,14 @@ export default function CreateEnvVariable({ open, onOpenChange }: CreateEnvVaria
 	const { mutateAsync: addParamMutate, isPending } = useMutation({
 		mutationKey: ['addParam'],
 		mutationFn: addParam,
+		onSuccess: onClose,
+		onError: (error: APIError) => {
+			notify({
+				title: error.error,
+				description: error.details,
+				type: 'error',
+			});
+		},
 	});
 
 	function onSubmit(data: z.infer<typeof EnvVariableSchema>) {

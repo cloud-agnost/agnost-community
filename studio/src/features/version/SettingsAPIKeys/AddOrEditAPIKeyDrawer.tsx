@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
+import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import { FormEvent, ReactNode, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ADD_API_KEYS_MENU_ITEMS } from '@/constants';
@@ -227,7 +227,12 @@ export default function AddOrEditAPIKeyDrawer({
 					</ul>
 					<form onSubmit={bindOnSubmit}>
 						<AnimatePresence>{tabs[activeTab]}</AnimatePresence>
-						<div className='flex justify-end border-none p-6 !pt-0'>
+						<div className='flex gap-4 justify-end border-none p-6 !pt-0'>
+							<DrawerClose asChild>
+								<Button variant='secondary' size='lg'>
+									{t('general.cancel')}
+								</Button>
+							</DrawerClose>
 							<Button size='lg'>{t('general.save')}</Button>
 						</div>
 					</form>

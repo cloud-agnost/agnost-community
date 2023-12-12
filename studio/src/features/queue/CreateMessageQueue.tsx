@@ -65,12 +65,7 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 	}
 
 	function handleClose() {
-		form.reset({
-			name: '',
-			delay: undefined,
-			logExecution: false,
-			resourceId: '',
-		});
+		form.reset();
 		onClose();
 	}
 	return (

@@ -5,6 +5,7 @@ import { Button } from '@/components/Button';
 import { useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 import { EnvVariableSchema } from '@/types';
+import { DrawerClose } from '@/components/Drawer';
 
 interface EnvVariableFormProps {
 	loading: boolean;
@@ -57,7 +58,12 @@ export default function EnvVariableForm({ loading }: EnvVariableFormProps) {
 					</FormItem>
 				)}
 			/>
-			<div className='flex justify-end mt-4'>
+			<div className='flex gap-4 justify-end mt-4'>
+				<DrawerClose asChild>
+					<Button variant='secondary' size='lg'>
+						{t('general.cancel')}
+					</Button>
+				</DrawerClose>
 				<Button loading={loading} size='lg'>
 					{t('general.add')}
 				</Button>

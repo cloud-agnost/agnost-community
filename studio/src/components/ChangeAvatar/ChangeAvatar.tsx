@@ -23,6 +23,7 @@ interface ChangeAvatarProps {
 	description?: string;
 	className?: string;
 	disabled?: boolean;
+	userAvatar?: boolean;
 }
 
 export default function ChangeAvatar({
@@ -35,6 +36,7 @@ export default function ChangeAvatar({
 	description,
 	className,
 	disabled,
+	userAvatar,
 }: ChangeAvatarProps) {
 	const fileInput = useRef<HTMLInputElement>(null);
 	const filePickerId = useId();
@@ -71,37 +73,45 @@ export default function ChangeAvatar({
 						htmlFor={filePickerId}
 						className={cn('cursor-pointer', disabled && 'cursor-not-allowed opacity-50')}
 					>
-						<Avatar size='3xl' square>
+						<Avatar size='3xl' square={!userAvatar}>
 							<AvatarImage src={item?.pictureUrl} />
-							{item && <AvatarFallback color={item?.color} name={item?.name} />}
+							<AvatarFallback
+								color={item?.color}
+								name={item?.name}
+								delayMs={1200}
+								isUserAvatar={userAvatar}
+							/>
 						</Avatar>
 					</label>
 					{loading && <CircleNotch size={48} className='loading avatar-actions-loading' />}
 					<div className='avatar-actions-button'>
-						{item?.pictureUrl && (
+						<div>
+							{item?.pictureUrl && (
+								<Button
+									variant='blank'
+									rounded
+									disabled={disabled}
+									className='hover:bg-button-border-hover text-icon-base hover:text-default'
+									iconOnly
+									onClick={onClickHandler}
+									size='sm'
+								>
+									<Trash className='avatar-actions-icon' />
+								</Button>
+							)}
 							<Button
 								variant='blank'
 								rounded
-								disabled={disabled}
-								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
 								iconOnly
-								onClick={onClickHandler}
 								size='sm'
+								disabled={disabled || loading}
+								className='hover:bg-button-border-hover text-icon-base hover:text-default'
 							>
-								<Trash className='avatar-actions-icon' />
+								<label htmlFor={filePickerId} className='cursor-pointer'>
+									<Pencil className='avatar-actions-icon' />
+								</label>
 							</Button>
-						)}
-						<Button
-							variant='blank'
-							rounded
-							size='sm'
-							disabled={disabled || loading}
-							className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-						>
-							<label htmlFor={filePickerId} className='cursor-pointer'>
-								<Pencil className='avatar-actions-icon' />
-							</label>
-						</Button>
+						</div>
 					</div>
 				</div>
 			</div>
