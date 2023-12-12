@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { DateRangePicker } from '@/components/DateRangePicker';
-import { NOTIFICATION_ACTIONS } from '@/constants';
+import { BASE_URL_WITH_API, NOTIFICATION_ACTIONS } from '@/constants';
 import { useUpdateEffect } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
 import { FormatOptionLabelProps } from '@/types';
@@ -15,10 +15,10 @@ import Select from 'react-select';
 const formatOptionLabel = ({ label, value }: FormatOptionLabelProps) => {
 	const name = label?.split(' ');
 	return (
-		<div className='gap-2'>
+		<div className='gap-2 flex items-center'>
 			{value?.member.pictureUrl ? (
 				<img
-					src={value?.member.pictureUrl}
+					src={`${BASE_URL_WITH_API}/${value?.member.pictureUrl}`}
 					alt={label}
 					className='rounded-full object-contain w-6 h-6'
 				/>
@@ -63,11 +63,6 @@ export default function NotificationFilter() {
 	function removeParam(key: string, value: string) {
 		const values = searchParams.get(key)?.split(',') ?? [];
 		const newValues = values.filter((v) => v !== value);
-		console.log({
-			newValues,
-			key,
-			value,
-		});
 		if (newValues.length) {
 			searchParams.set(key, newValues.join(','));
 		} else {
@@ -76,6 +71,7 @@ export default function NotificationFilter() {
 		setSearchParams(searchParams);
 	}
 
+	console.log('reset', date);
 	function resetDateFilter() {
 		searchParams.delete('start');
 		searchParams.delete('end');
@@ -171,31 +167,6 @@ export default function NotificationFilter() {
 						}
 					}}
 				/>
-				{/* <AsyncSelect
-					cacheOptions
-					defaultOptions
-					loadOptions={promiseOptions}
-					onChange={(val) => onChange(val)}
-					className='select-container'
-					classNamePrefix='select'
-					placeholder={placeholder ?? 'Search...'}
-					isMulti={isMulti}
-					{...props}
-				/>
-				<AutoComplete<MemberSearch[]>
-					isMulti
-					loadOptions={promiseOptions}
-					formatOptionLabel={formatOptionLabel}
-					onChange={(value: MemberSearch[]) => {
-						const val = value.map((v) => v.value.member.name).join(',');
-						if (val) {
-							addNewParam('a', val);
-						} else {
-							removeParam('a', val);
-						}
-					}}
-					placeholder='Search team member'
-				/> */}
 			</div>
 
 			<div className='space-y-3'>
