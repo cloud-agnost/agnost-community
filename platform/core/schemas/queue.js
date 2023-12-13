@@ -41,6 +41,10 @@ export const QueueModel = mongoose.model(
 				type: Boolean,
 				default: true,
 			},
+			delayedMessages: {
+				type: Boolean,
+				default: false,
+			},
 			// The delay duration of the queue, in milliseconds
 			delay: {
 				type: Number,
