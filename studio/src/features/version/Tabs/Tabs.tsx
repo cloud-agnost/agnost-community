@@ -66,13 +66,12 @@ export default function Tabs() {
 	useEffect(() => {
 		const path = pathname?.split('/')?.slice(-1)[0];
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
-
+		console.log('item', item);
 		if (!item) {
 			const currentTab = tabs.find((tab) => tab.isActive);
-			if (!currentTab?.path.includes(pathname)) {
-				const targetPath = currentTab?.path ?? getDashboardPath();
-				navigate(targetPath);
-			}
+			const targetPath = currentTab?.path ?? getDashboardPath();
+			navigate(targetPath);
+
 			return;
 		}
 
@@ -92,7 +91,6 @@ export default function Tabs() {
 	useUpdateEffect(() => {
 		const currentTab = tabs.find((tab) => tab.isActive);
 		if (currentTab?.path !== pathname) {
-			console.log('navigate');
 			const targetPath = currentTab?.path ?? getDashboardPath();
 			navigate(targetPath);
 		}
