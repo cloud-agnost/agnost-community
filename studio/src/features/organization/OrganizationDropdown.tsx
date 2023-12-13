@@ -72,11 +72,11 @@ export function OrganizationDropdown() {
 	return (
 		<>
 			<Popover open={open} onOpenChange={setOpen}>
-				<PopoverTrigger asChild>
-					<div className='organization-dropdown'>
-						<Link to={`/organization/${organization?._id}`}>
-							<OrganizationLabel organization={organization} />
-						</Link>
+				<div className='organization-dropdown'>
+					<Link to={`/organization/${organization?._id}`}>
+						<OrganizationLabel organization={organization} />
+					</Link>
+					<PopoverTrigger asChild>
 						<Button
 							variant='blank'
 							aria-expanded={open}
@@ -87,8 +87,8 @@ export function OrganizationDropdown() {
 								<CaretUpDown size={20} />
 							</div>
 						</Button>
-					</div>
-				</PopoverTrigger>
+					</PopoverTrigger>
+				</div>
 				<PopoverContent align='start' className='organization-dropdown-content'>
 					<Command>
 						{organizations.length > 5 && (
