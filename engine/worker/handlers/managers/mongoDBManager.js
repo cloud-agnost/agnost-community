@@ -101,9 +101,24 @@ export class MongoDBManager extends DBManager {
         const models = this.getModels();
         const appDB = await this.getAppDB();
 
+        // First rename models whose name has changed, then we should proceed creation and deletion of collections
+        for (let i = 0; i < models.length; i++) {
+            const model = models[i];
+            //We crete collection only for top level models
+            if (model.type === "model") {
+                const prevModel = this.getPrevModel(model.iid);
+                // Check if the model has been renamed or not
+                if (prevModel && prevModel.name !== model.name) {
+                    await appDB.renameCollection(prevModel.name, model.name);
+                    this.addLog(t("Renamed collection '%s' to '%s'", prevModel.name, model.name));
+                }
+            }
+        }
+
+        // Get all collections of the database
         const collections = await appDB.collections();
 
-        // Create new model collections and rename existing ones (if name has changed)
+        // Create new model collections
         for (let i = 0; i < models.length; i++) {
             const model = models[i];
             //We crete collection only for top level models
@@ -112,13 +127,6 @@ export class MongoDBManager extends DBManager {
                 if (this.modelHasCollection(collections, model) === false) {
                     await appDB.createCollection(model.name);
                     this.addLog(t("Created collection '%s'", model.name));
-                } else {
-                    const prevModel = this.getPrevModel(model.iid);
-                    // Check if the model has been renamed or not
-                    if (prevModel && prevModel.name !== model.name) {
-                        await appDB.renameCollection(prevModel.name, model.name);
-                        this.addLog(t("Renamed collection '%s' to '%s'", prevModel.name, model.name));
-                    }
                 }
             }
         }
