@@ -14,9 +14,15 @@ const { openDeleteDatabaseDialog, openEditDatabaseDialog } = useDatabaseStore.ge
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
 		id: 'name',
-		header: () => <SortButton text={translate('general.name')} field='name' />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.name')}
+				field='name'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		accessorKey: 'name',
-		sortingFn: 'textCaseSensitive',
+		sortingFn: 'text',
 		enableSorting: true,
 		size: 200,
 		cell: ({ row: { original } }) => {
@@ -33,9 +39,17 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'type',
-		header: () => <SortButton text={translate('general.type')} field='type' />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.type')}
+				field='type'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		accessorKey: 'type',
 		size: 200,
+		sortingFn: 'text',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { type },
@@ -52,11 +66,15 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'assignUniqueName',
-		header: () => (
-			<SortButton text={translate('database.add.unique.name')} field='assignUniqueName' />
+		header: ({ column }) => (
+			<SortButton
+				text={translate('database.add.unique.name')}
+				field='assignUniqueName'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
 		),
 		accessorKey: 'assignUniqueName',
-		sortingFn: 'textCaseSensitive',
+		sortingFn: 'basic',
 		enableSorting: true,
 		size: 200,
 		cell: ({
@@ -76,8 +94,16 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'managed',
-		header: () => <SortButton text={translate('general.managed')} field='managed' />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.managed')}
+				field='managed'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		accessorKey: 'managed',
+		sortingFn: 'text',
+		enableSorting: true,
 		size: 200,
 		cell: ({
 			row: {
@@ -96,14 +122,17 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'createdAt',
-		header: () => (
+		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.created_at')}
 				field='createdAt'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 			/>
 		),
 		accessorKey: 'createdAt',
+		sortingFn: 'datetime',
+		enableSorting: true,
 		size: 200,
 		cell: ({
 			row: {
@@ -120,15 +149,18 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 
 	{
 		id: 'updatedAt',
-		header: () => (
+		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.updated_at')}
 				field='updatedAt'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 			/>
 		),
 		accessorKey: 'updatedAt',
 		size: 200,
+		sortingFn: 'datetime',
+		enableSorting: true,
 		cell: ({
 			row: {
 				original: { updatedAt, updatedBy },
