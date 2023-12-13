@@ -1,28 +1,26 @@
-import { useEffect, useMemo, useState } from 'react';
-import { SearchInput } from 'components/SearchInput';
-import { Badge } from 'components/Badge';
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter } from 'components/Drawer';
-import { Endpoint, HttpMethod, SortOption } from '@/types';
+import { Button } from '@/components/Button';
+import { ALL_HTTP_METHODS, ENDPOINT_OPTIONS, HTTP_METHOD_BADGE_MAP } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { TableLoading } from 'components/Table/Table.tsx';
-import { Checkbox } from 'components/Checkbox';
+import { Endpoint, HttpMethod, SortOption } from '@/types';
 import { cn } from '@/utils';
+import { Check, Funnel, FunnelSimple } from '@phosphor-icons/react';
 import { CheckedState } from '@radix-ui/react-checkbox';
-import { EmptyState } from 'components/EmptyState';
+import { Badge } from 'components/Badge';
+import { Checkbox } from 'components/Checkbox';
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter } from 'components/Drawer';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuTrigger,
-	DropdownMenuSeparator,
+	DropdownMenuTrigger
 } from 'components/Dropdown';
-import { Button } from '@/components/Button';
-import { Check, Funnel, FunnelSimple } from '@phosphor-icons/react';
-import { ALL_HTTP_METHODS, ENDPOINT_OPTIONS, HTTP_METHOD_BADGE_MAP } from '@/constants';
+import { EmptyState } from 'components/EmptyState';
+import { SearchInput } from 'components/SearchInput';
+import { TableLoading } from 'components/Table/Table.tsx';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface EndpointSelectModalProps {
 	open: boolean;
