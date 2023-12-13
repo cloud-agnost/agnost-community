@@ -51,17 +51,16 @@ export default function ApplicationSelectDropdown() {
 	return (
 		<>
 			<Popover open={open} onOpenChange={setOpen}>
-				<PopoverTrigger asChild>
-					<div className='application-dropdown'>
-						<ApplicationLabel
-							onClick={() => {
-								if (application) openEditAppDrawer(application);
-							}}
-							application={application}
-						/>
+				<div className='application-dropdown'>
+					<ApplicationLabel
+						onClick={() => {
+							if (application) openEditAppDrawer(application);
+						}}
+						application={application}
+					/>
+					<PopoverTrigger asChild>
 						<Button
 							variant='blank'
-							role='combobox'
 							aria-expanded={open}
 							className='application-dropdown-button'
 							rounded
@@ -70,8 +69,8 @@ export default function ApplicationSelectDropdown() {
 								<CaretUpDown size={20} />
 							</div>
 						</Button>
-					</div>
-				</PopoverTrigger>
+					</PopoverTrigger>
+				</div>
 				<PopoverContent align='start' className='application-dropdown-content'>
 					<Command>
 						{applications.length > 5 && (

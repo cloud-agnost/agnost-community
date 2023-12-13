@@ -45,6 +45,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
+import _ from 'lodash';
 
 type View = keyof FieldType['view'];
 
@@ -566,15 +567,19 @@ export default function EditOrCreateFieldDrawer({
 	});
 
 	const getDefaultValue = (defaultValue: string) => {
+		console.log(defaultValue);
 		if (editMode && hasDefaultValue && !defaultValue) {
+			console.log('here');
 			return '$$unset';
 		}
 
 		if ((isReference && database.type !== DATABASE.MongoDB) || isDecimal || isInteger) {
+			console.log('here2');
 			return Number(defaultValue);
 		}
 
 		if (isBoolean) {
+			console.log('here3');
 			return defaultValue ? JSON.parse(defaultValue) : undefined;
 		}
 
@@ -645,7 +650,7 @@ export default function EditOrCreateFieldDrawer({
 		form.setValue('general.indexed', fieldToEdit.indexed);
 		form.setValue('general.description', fieldToEdit.description);
 
-		if (fieldToEdit.defaultValue) {
+		if (!_.isNil(fieldToEdit.defaultValue)) {
 			form.setValue('general.defaultValue', fieldToEdit.defaultValue);
 		}
 

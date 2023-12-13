@@ -41,6 +41,7 @@ export default function VersionDatabase() {
 				versionId: versionId as string,
 				appId: appId as string,
 			}),
+		enabled: !databases.length,
 	});
 
 	const table = useTable({

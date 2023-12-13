@@ -43,6 +43,7 @@ export default function Models() {
 	const { isFetching, refetch } = useQuery({
 		queryFn: () => getModelsOfDatabase({ dbId, orgId, appId, versionId }),
 		queryKey: ['getModelsOfDatabase'],
+		enabled: !models.length,
 	});
 
 	const { mutateAsync: deleteMultipleModelMutation } = useMutation({
