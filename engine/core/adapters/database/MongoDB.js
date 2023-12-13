@@ -469,7 +469,7 @@ export class MongoDB extends DatabaseBase {
 		}
 
 		const session = await this.driver.startSession();
-		session.startTransaction();
+		await session.startTransaction();
 		this.session = session;
 	}
 
@@ -479,7 +479,7 @@ export class MongoDB extends DatabaseBase {
 	async commitTransaction(dbMeta) {
 		if (this.session) {
 			await this.session.commitTransaction();
-			this.session.endSession();
+			await this.session.endSession();
 			this.session = null;
 		}
 	}
@@ -490,7 +490,7 @@ export class MongoDB extends DatabaseBase {
 	async rollbackTransaction(dbMeta) {
 		if (this.session) {
 			if (this.session.inTransaction()) await this.session.abortTransaction();
-			this.session.endSession();
+			await this.session.endSession();
 			this.session = null;
 		}
 	}
