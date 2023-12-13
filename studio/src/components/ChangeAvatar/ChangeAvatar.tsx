@@ -75,12 +75,9 @@ export default function ChangeAvatar({
 					>
 						<Avatar size='3xl' square={!userAvatar}>
 							<AvatarImage src={item?.pictureUrl} />
-							<AvatarFallback
-								color={item?.color}
-								name={item?.name}
-								delayMs={1200}
-								isUserAvatar={userAvatar}
-							/>
+							{!item?.pictureUrl && (
+								<AvatarFallback color={item?.color} name={item?.name} isUserAvatar={userAvatar} />
+							)}
 						</Avatar>
 					</label>
 					{loading && <CircleNotch size={48} className='loading avatar-actions-loading' />}
