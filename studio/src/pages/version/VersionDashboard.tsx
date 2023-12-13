@@ -34,16 +34,15 @@ export default function VersionDashboard() {
 		queryKey: ['getVersionDashboardInfo'],
 		queryFn: getVersionDashboardInfoHandler,
 		refetchOnWindowFocus: false,
+		enabled: _.isEmpty(dashboard),
 	});
 
 	function getVersionDashboardInfoHandler() {
-		if (_.isEmpty(dashboard)) {
-			return getVersionDashboardInfo({
-				orgId,
-				appId,
-				versionId,
-			});
-		}
+		return getVersionDashboardInfo({
+			orgId,
+			appId,
+			versionId,
+		});
 	}
 	function getIcon(type: string) {
 		const Icon = TAB_ICON_MAP[type];
