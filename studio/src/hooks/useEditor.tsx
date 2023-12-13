@@ -1,5 +1,5 @@
 import { formatCode } from '@/utils';
-import { BeforeMount, EditorProps } from '@monaco-editor/react';
+import { BeforeMount, EditorProps, OnChange } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import nightOwl from 'monaco-themes/themes/Night Owl.json';
 import slush from 'monaco-themes/themes/Slush and Poppies.json';
@@ -35,7 +35,7 @@ export const EDITOR_OPTIONS: EditorProps['options'] = {
 };
 
 export type CodeEditorProps = {
-	onChange?: (ev: monaco.editor.IModelContentChangedEvent) => void;
+	onChange?: (value: string | undefined, ev: monaco.editor.IModelContentChangedEvent) => void;
 	onSave?: (logic: string) => void;
 };
 
@@ -108,10 +108,10 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 	}
 
 	const onCodeEditorChange = (
-		_value: string | undefined,
+		content: Parameters<OnChange>[0],
 		ev: monaco.editor.IModelContentChangedEvent,
 	) => {
-		onChange?.(ev);
+		onChange?.(content, ev);
 	};
 	return {
 		onBeforeMount,
