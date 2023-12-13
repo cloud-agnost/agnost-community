@@ -534,9 +534,6 @@ export class MongoDB extends DatabaseBase {
 		if (data.length === 0) return { count: 0 };
 
 		try {
-			// Begin the transaction
-			await this.beginTransaction(dbMeta);
-
 			const dbName = this.getAppliedDbName(dbMeta);
 			const modelName = this.getModelName(modelMeta);
 
@@ -546,8 +543,6 @@ export class MongoDB extends DatabaseBase {
 			const insertResult = await collection.insertMany(data, {
 				session: this.session,
 			});
-
-			await this.commitTransaction(dbMeta);
 
 			return { count: insertResult.insertedCount };
 		} catch (err) {
