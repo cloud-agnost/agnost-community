@@ -16,6 +16,9 @@
 	&-link {
 		@apply text-button-primary hover:underline hover:text-button-primary-hover #{!important};
 	}
+	&-destructive {
+		@apply bg-elements-strong-red hover:bg-elements-red text-white #{!important};
+	}
 
 	&-outline {
 		@apply border border-button-border hover:border-button-border-hover text-default hover:bg-button-secondary-hover #{!important};
