@@ -134,24 +134,6 @@ export default function EndpointSelectModal({
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align='start' className='w-40'>
-							{methods.length > 0 && (
-								<>
-									<DropdownMenuLabel className='pb-1'>
-										<div className='flex items-center gap-2 overflow-auto no-scrollbar'>
-											{methods.map((method, index) => (
-												<Badge
-													className='pl-2 pr-1'
-													onClear={() => onMethodSelect(method)}
-													text={method}
-													variant={HTTP_METHOD_BADGE_MAP[method]}
-													key={index}
-												/>
-											))}
-										</div>
-									</DropdownMenuLabel>
-									<DropdownMenuSeparator />
-								</>
-							)}
 							{ALL_HTTP_METHODS.map((method, index) => (
 								<DropdownMenuItem
 									onClick={() => onMethodSelect(method)}
