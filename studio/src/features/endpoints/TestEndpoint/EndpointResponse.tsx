@@ -86,7 +86,7 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 				)}
 			</TabsContent>
 			<TabsContent value='headers' className='h-[calc(100%-4rem)]'>
-				<div className='h-full overflow-y-auto no-scrollbar'>
+				<div className='h-full overflow-y-auto'>
 					{response?.headers ? (
 						<TestEndpointTable containerClassName='h-auto'>
 							{objToArray(response?.headers).map((header) => (

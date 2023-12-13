@@ -253,11 +253,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 				</div>
 				<Form {...form}>
 					<PanelGroup className={cn('p-6 pt-0')} direction='vertical' autoSaveId={endpoint._id}>
-						<Panel
-							defaultSize={32}
-							className='max-h-full no-scrollbar !overflow-y-auto'
-							minSize={20}
-						>
+						<Panel defaultSize={32} className='max-h-full !overflow-y-auto' minSize={20}>
 							<div
 								className={cn(
 									'h-full',
