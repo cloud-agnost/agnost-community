@@ -62,15 +62,10 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 				});
 			}
 		}
-	}, [queue, environment]);
+	}, [open, queue, environment]);
 
 	return (
-		<Drawer
-			open={open}
-			onOpenChange={() => {
-				onClose();
-			}}
-		>
+		<Drawer open={open} onOpenChange={onClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>

@@ -63,9 +63,10 @@ export default function AddOrEditAPIKeyGeneral({
 			data,
 		);
 		form.clearErrors('general.endpoint');
-
 		if (lastSelected) {
 			setEndpoints?.((prevState) => [...(prevState ?? []), lastSelected]);
+		} else {
+			setEndpoints?.((prevState) => prevState?.filter((item) => endpoint.includes(item.iid)));
 		}
 	}
 	const endpointError = form.formState.errors.general?.endpoint?.root?.message;

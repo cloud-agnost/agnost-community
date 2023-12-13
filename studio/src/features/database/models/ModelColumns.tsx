@@ -56,7 +56,13 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	},
 	{
 		id: 'name',
-		header: () => <SortButton text={translate('general.name')} field='name' />,
+		header: ({ column }) => (
+			<SortButton
+				text={translate('general.name')}
+				field='name'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			/>
+		),
 		accessorKey: 'name',
 		cell: ({
 			row: {
@@ -68,11 +74,12 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	},
 	{
 		id: 'created_at',
-		header: () => (
+		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.created_at')}
 				field='createdAt'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 			/>
 		),
 		accessorKey: 'createdAt',
@@ -92,11 +99,12 @@ const ModelColumns: ColumnDefWithClassName<Model>[] = [
 
 	{
 		id: 'updatedAt',
-		header: () => (
+		header: ({ column }) => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.updated_at')}
 				field='updatedAt'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 			/>
 		),
 		accessorKey: 'updatedAt',

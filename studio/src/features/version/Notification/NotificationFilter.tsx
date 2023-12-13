@@ -71,7 +71,6 @@ export default function NotificationFilter() {
 		setSearchParams(searchParams);
 	}
 
-	console.log('reset', date);
 	function resetDateFilter() {
 		searchParams.delete('start');
 		searchParams.delete('end');
@@ -160,7 +159,6 @@ export default function NotificationFilter() {
 					onChange={(value, actionMeta) => {
 						const val = value.map((v) => v.value.member._id).join(',');
 						if (val) {
-							console.log('add');
 							addNewParam('u', val);
 						} else {
 							removeParam('u', actionMeta.removedValue?.value.member._id as string);
