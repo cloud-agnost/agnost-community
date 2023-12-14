@@ -61,6 +61,6 @@ export default function Json({ cell, value, id, index, field }: NavigatorCompone
 			</form>
 		</Form>
 	) : (
-		<pre>{JSON.stringify(value)}</pre>
+		<pre className='truncate'>{JSON.stringify(value)}</pre>
 	);
 }
