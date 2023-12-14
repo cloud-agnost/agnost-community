@@ -50,7 +50,6 @@ export default function ApplicationVersions() {
 
 	function handleCloseClick() {
 		closeVersionDrawer();
-		console.log('close', applications.find((app) => app._id === appId) as Application);
 		selectApplication(applications.find((app) => app._id === appId) as Application);
 	}
 	useUpdateEffect(() => {

@@ -31,7 +31,6 @@ export default function ApplicationSelectDropdown() {
 	function onSelect(app: Application) {
 		setOpen(false);
 		if (app._id === application?._id) return;
-		console.log('app', app._id, application?._id);
 		openVersionDrawer(app);
 	}
 
@@ -43,10 +42,6 @@ export default function ApplicationSelectDropdown() {
 
 	const filteredApps = useMemo(() => {
 		if (!search) return applications;
-		console.log(
-			'search',
-			applications.filter((app) => RegExp(new RegExp(search, 'i')).exec(app.name)),
-		);
 		return applications.filter((app) => RegExp(new RegExp(search, 'i')).exec(app.name));
 	}, [applications, search]);
 
