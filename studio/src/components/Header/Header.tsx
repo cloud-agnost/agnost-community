@@ -13,7 +13,7 @@ import './header.scss';
 import { useAuthorizeVersion } from '@/hooks';
 
 export function Header() {
-	const { versionId, appId } = useParams();
+	const { versionId, appId, orgId } = useParams();
 	const canViewNotf = useAuthorizeVersion('viewLogs');
 	return (
 		<header className='header-menu'>
@@ -23,7 +23,7 @@ export function Header() {
 				</Link>
 				<div className='header-menu-divider' />
 				<div className='flex items-center gap-2'>
-					<OrganizationDropdown />
+					{orgId && <OrganizationDropdown />}
 					{appId && (
 						<>
 							<CaretRight size={20} className='text-icon-disabled' />
