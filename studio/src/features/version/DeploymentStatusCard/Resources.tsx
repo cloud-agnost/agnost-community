@@ -36,7 +36,7 @@ export default function Resources() {
 						<div className='flex items-center'>
 							<Badge
 								rounded
-								variant={BADGE_COLOR_MAP[resource.status.toUpperCase()]}
+								variant={BADGE_COLOR_MAP[resource.status?.toUpperCase()]}
 								text={resource.status}
 							/>
 						</div>
