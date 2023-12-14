@@ -2,7 +2,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import CacheForm from './CacheForm';
-import { CacheSchema } from '@/types';
+import { APIError, CacheSchema } from '@/types';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useEffect } from 'react';
 import useCacheStore from '@/store/cache/cacheStore';
+import { useMutation } from '@tanstack/react-query';
 
 interface CreateCacheProps {
 	open: boolean;
@@ -35,19 +36,22 @@ export default function EditCache({ open, onClose }: CreateCacheProps) {
 		});
 		onClose();
 	}
+	const { mutateAsync: updateMutate, isPending } = useMutation({
+		mutationFn: updateCache,
+		onSuccess: () => {
+			resetAndClose();
+		},
+		onError: ({ error, details }: APIError) => {
+			notify({ type: 'error', description: details, title: error });
+		},
+	});
 	function onSubmit(data: z.infer<typeof CacheSchema>) {
-		updateCache({
+		updateMutate({
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
 			cacheId: cache._id,
 			...data,
-			onSuccess: () => {
-				resetAndClose();
-			},
-			onError: ({ error, details }) => {
-				notify({ type: 'error', description: details, title: error });
-			},
 		});
 	}
 
@@ -69,7 +73,7 @@ export default function EditCache({ open, onClose }: CreateCacheProps) {
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll'>
-						<CacheForm edit />
+						<CacheForm edit loading={isPending} />
 					</form>
 				</Form>
 			</DrawerContent>
