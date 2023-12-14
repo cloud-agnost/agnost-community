@@ -122,6 +122,7 @@ export default function ChangePassword() {
 	}
 
 	function close() {
+		form.reset();
 		setIsChangeMode(false);
 	}
 
