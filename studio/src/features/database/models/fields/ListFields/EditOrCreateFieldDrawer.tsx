@@ -647,7 +647,7 @@ export default function EditOrCreateFieldDrawer({
 		form.setValue('general.description', fieldToEdit.description);
 
 		if (!_.isNil(fieldToEdit.defaultValue)) {
-			form.setValue('general.defaultValue', fieldToEdit.defaultValue);
+			form.setValue('general.defaultValue', fieldToEdit.defaultValue.toString());
 		}
 
 		if (fieldToEdit.text) {
