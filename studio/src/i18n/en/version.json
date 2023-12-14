@@ -137,7 +137,7 @@
 		"lastLoginAt": "Stores the last login date & time of the user",
 		"emailVerified": "Stores whether the user’s email address is verified or not",
 		"phoneVerified": "Stores whether the user’s mobile phone number is verified or not",
-		"add_missing_fields": "Add Missing Field to Model",
+		"add_missing_fields": "Add Missing Fields to Model",
 		"user_data_model_saved": "User data model saved successfully",
 		"added_missing_fields": "Added missing fields to user data model",
 		"2fa": "Stores whether the user’s two factor authentication is enabled or not",
