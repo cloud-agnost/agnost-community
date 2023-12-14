@@ -1,7 +1,6 @@
 import { Button } from '@/components/Button';
 import {
 	Drawer,
-	DrawerClose,
 	DrawerContent,
 	DrawerFooter,
 	DrawerHeader,
@@ -11,12 +10,12 @@ import { SearchInput } from '@/components/SearchInput';
 import { useUpdateEffect } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore';
+import { Application } from '@/types';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useMatch, useParams, useSearchParams } from 'react-router-dom';
 import { VersionTable } from '../version/Table';
-import { Application } from '@/types';
 export default function ApplicationVersions() {
 	const { t } = useTranslation();
 	const { isVersionOpen, application, closeVersionDrawer, applications, selectApplication } =
