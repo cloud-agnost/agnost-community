@@ -110,7 +110,7 @@ export const appAuthorization = {
 				update: true,
 				delete: true,
 				viewData: true,
-				manageData: false,
+				manageData: true,
 			},
 			function: {
 				view: true,
