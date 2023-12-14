@@ -66,7 +66,6 @@ export default function Tabs() {
 	useEffect(() => {
 		const path = pathname?.split('/')?.slice(-1)[0];
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
-		console.log('item', item);
 		if (!item) {
 			const currentTab = tabs.find((tab) => tab.isActive);
 			const targetPath = currentTab?.path ?? getDashboardPath();
