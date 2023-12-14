@@ -8,6 +8,7 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from '@tanstack/react-table';
+import _ from 'lodash';
 import { useState } from 'react';
 
 type UseTableProps<TData> = Omit<TableOptions<TData>, 'data' | 'columns' | 'getCoreRowModel'> & {
@@ -33,20 +34,17 @@ export default function useTable<TData>({ data, columns, ...props }: UseTablePro
 		enableRowSelection(row) {
 			const cell = row.getAllCells().find((item) => item.column.id === 'select');
 			if (!cell) return false;
-
 			const meta = cell.column.columnDef?.meta;
 			if (!meta) return true;
 
-			const { disabled } = cell.column.columnDef.meta as {
-				disabled: {
-					key: string;
-					value: string;
-				};
-			};
+			const { disabled } = cell.column.columnDef.meta as Record<
+				string,
+				{ key: string; value: string }[]
+			>;
 
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			return row.original[disabled?.key] !== disabled?.value;
+			if (!disabled) return true;
+
+			return !disabled.some((item) => _.get(row.original, item.key) === item.value);
 		},
 		state: {
 			sorting,
