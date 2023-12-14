@@ -26,7 +26,7 @@ import { PAGE_SIZE } from '@/constants';
 import { create } from '@/helpers';
 import useAuthStore from '@/store/auth/authStore';
 import useVersionStore from '@/store/version/versionStore';
-import { history, joinChannel, leaveChannel } from '@/utils';
+import { joinChannel, leaveChannel } from '@/utils';
 import OrganizationService from 'services/OrganizationService.ts';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import useOrganizationStore from '../organization/organizationStore';
@@ -308,7 +308,6 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 				if (versions.length === 1) {
 					selectVersion(versions[0]);
 				} else {
-					history.navigate?.(`/organization/${application.orgId}`);
 					set({
 						isVersionOpen: true,
 					});
