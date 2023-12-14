@@ -36,7 +36,6 @@ export default function ChangeAppName() {
 		},
 	});
 	async function onSubmit(data: z.infer<typeof ChangeNameFormSchema>) {
-		if (application?.name === data.name) return;
 		changeNameMutate({
 			name: data.name,
 			appId: application?._id as string,
