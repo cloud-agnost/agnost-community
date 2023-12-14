@@ -46,15 +46,19 @@ export default function DataTable<TData>({
 										{header.isPlaceholder
 											? null
 											: flexRender(header.column.columnDef.header, header.getContext())}
-										<div
-											{...{
-												onMouseDown: header.getResizeHandler(),
-												onTouchStart: header.getResizeHandler(),
-												className: `resizer absolute right-0 top-0 h-full w-1 bg-border cursor-col-resize select-none touch-none ${
-													header.column.getIsResizing() ? 'opacity-100 bg-elements-strong-blue' : ''
-												}`,
-											}}
-										/>
+										{header.id !== 'select' && (
+											<div
+												{...{
+													onMouseDown: header.getResizeHandler(),
+													onTouchStart: header.getResizeHandler(),
+													className: `resizer absolute right-0 top-0 h-full w-1 bg-border cursor-col-resize select-none touch-none ${
+														header.column.getIsResizing()
+															? 'opacity-100 bg-elements-strong-blue'
+															: ''
+													}`,
+												}}
+											/>
+										)}
 									</TableHead>
 								);
 							})}
