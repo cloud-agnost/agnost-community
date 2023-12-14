@@ -117,6 +117,7 @@ export const checkAPIKey = (endpoint) => (req, res, next) => {
 
 	// Check if the api key requires authorized domains and if yes check whether the request origin is from a valid domain
 	if (apiKeyObj.domainAuthorization === "specified") {
+		console.info("****headers", req.headers);
 		let origin = req.header("origin");
 		if (!origin) {
 			let host = req.get("host");
