@@ -53,5 +53,9 @@ export default function useInfiniteScroll({
 		result.refetch();
 	}, [searchParams]);
 
+	useUpdateEffect(() => {
+		result.refetch();
+	}, [orgId, appId, versionId]);
+
 	return result;
 }
