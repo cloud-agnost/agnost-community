@@ -3,6 +3,7 @@ import { useSearch, useTable, useToast, useUpdateEffect } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import { APIError, Database } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ConfirmationModal } from 'components/ConfirmationModal';
@@ -49,7 +50,7 @@ export default function VersionDatabase() {
 		data: filteredDatabase,
 		columns: DatabaseColumns,
 	});
-
+	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { mutateAsync: deleteDatabaseMutation } = useMutation({
 		mutationFn: deleteDatabase,
 		onError: (error: APIError) => {
@@ -61,6 +62,14 @@ export default function VersionDatabase() {
 		},
 		onSettled: () => {
 			closeDeleteDatabaseDialog();
+		},
+		onSuccess: () => {
+			getEnvironmentResources({
+				orgId: environment?.orgId,
+				appId: environment?.appId,
+				envId: environment?._id,
+				versionId: environment?.versionId,
+			});
 		},
 	});
 	async function deleteHandler() {
