@@ -97,7 +97,7 @@ export default function DeploymentStatusCard() {
 										variant='blank'
 										iconOnly
 										rounded
-										className='hover:bg-subtle aspect-square'
+										className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
 										disabled={envStatus === EnvironmentStatus.Deploying || !canDeploy}
 									>
 										<Refresh
