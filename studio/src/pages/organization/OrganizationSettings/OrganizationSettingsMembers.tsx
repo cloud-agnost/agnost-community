@@ -14,9 +14,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/Tabs';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import '../organization.scss';
+import { EmptyState } from '@/components/EmptyState';
 export default function OrganizationSettingsMembers() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
@@ -66,6 +67,7 @@ export default function OrganizationSettingsMembers() {
 				roles: searchParams.get('r')?.split(',') as string[],
 			}),
 		enabled: searchParams.get('tab') === 'member',
+		refetchOnWindowFocus: false,
 	});
 
 	useUpdateEffect(() => {
@@ -84,7 +86,7 @@ export default function OrganizationSettingsMembers() {
 			title={t('organization.settings.members.title')}
 			description={t('organization.settings.members.description')}
 		>
-			{canClusterSendEmail && (
+			{canClusterSendEmail ? (
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)}>
 						<InviteMemberForm
@@ -97,6 +99,16 @@ export default function OrganizationSettingsMembers() {
 						<Separator className='my-12' />
 					</form>
 				</Form>
+			) : (
+				<EmptyState title={t('application.invite_member.email_disabled')} type='invitation'>
+					<p className='text-subtle'>{t('application.invite_member.email_disabled')}</p>
+					<Link
+						to={`/organization/${organization?._id}/profile/cluster-management`}
+						className='text-blue-600 hover:underline'
+					>
+						{t('application.invite_member.configure')}
+					</Link>
+				</EmptyState>
 			)}
 
 			<div className='members'>

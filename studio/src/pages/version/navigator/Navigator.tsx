@@ -82,7 +82,7 @@ export default function Navigator() {
 	}, []);
 
 	useUpdateEffect(() => {
-		if (model && isEmpty(subModel)) {
+		if (model && isEmpty(subModel) && !searchParams.size) {
 			refetch();
 		}
 	}, [model, subModel]);
@@ -132,25 +132,25 @@ export default function Navigator() {
 		>
 			<div className='flex gap-4 justify-center h-[88%]'>
 				<SelectModel />
-				{isFetching ? (
+				{isFetching && !searchParams.size ? (
 					<div className='flex-1 flex items-center justify-center'>
 						<BeatLoader color='#6884FD' size={24} margin={18} />
 					</div>
 				) : data.length > 0 ? (
-					<div className='w-5/6 h-full table-container overflow-auto' id='scroll'>
+					<div className='w-5/6 table-container overflow-auto h-[calc(100vh-18rem)]' id='scroll'>
 						<InfiniteScroll
 							hasMore={hasNextPage}
 							next={fetchNextPage}
 							loader={isFetchingNextPage && <TableLoading />}
 							dataLength={data.length}
 							scrollableTarget='scroll'
-							className='!overflow-visible'
+							className='!overflow-visible h-full'
 						>
 							<DataTable<any>
 								table={table}
-								className='table-fixed w-full relative'
+								className='table-fixed w-full h-full relative'
 								headerClassName='sticky top-0 z-50'
-								containerClassName='!border-none'
+								containerClassName='!border-none h-full'
 								onCellClick={(cell) => {
 									if (editedField !== cell.id) setEditedField(cell.id);
 								}}

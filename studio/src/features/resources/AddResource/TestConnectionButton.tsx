@@ -35,7 +35,7 @@ export default function TestConnectionButton({ replica }: { replica?: boolean })
 		const data = form.getValues();
 		const options = replica ? data.options : data.access.options;
 		const access = replica ? data : data.access;
-		const isValid = await form.trigger('access');
+		const isValid = await form.trigger(replica ? undefined : 'access');
 
 		if (!isValid) return;
 		testMutate({

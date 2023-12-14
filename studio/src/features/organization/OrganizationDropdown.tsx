@@ -22,6 +22,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './organization.scss';
 import useAuthStore from '@/store/auth/authStore';
 import _ from 'lodash';
+import useApplicationStore from '@/store/app/applicationStore';
 
 export function OrganizationDropdown() {
 	const { t } = useTranslation();
@@ -37,6 +38,7 @@ export function OrganizationDropdown() {
 		getAllOrganizationByUser,
 	} = useOrganizationStore();
 	const navigate = useNavigate();
+	const { getAppsByOrgId } = useApplicationStore();
 	const { notify } = useToast();
 	function handleLeave() {
 		leaveOrganization({
@@ -62,6 +64,13 @@ export function OrganizationDropdown() {
 			},
 		});
 		setOpenModal(false);
+	}
+
+	function onSelect(org: Organization) {
+		selectOrganization(org);
+		getAppsByOrgId(org._id);
+		navigate(`/organization/${org?._id}`);
+		setOpen(false);
 	}
 
 	useEffect(() => {
@@ -101,11 +110,7 @@ export function OrganizationDropdown() {
 									<CommandItem
 										key={org._id}
 										value={org._id}
-										onSelect={() => {
-											selectOrganization(org);
-											navigate(`/organization/${org?._id}`);
-											setOpen(false);
-										}}
+										onSelect={() => onSelect(org)}
 										className='organization-dropdown-option'
 									>
 										<OrganizationLabel organization={org} />

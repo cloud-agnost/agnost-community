@@ -35,6 +35,8 @@ export default function OrgResources() {
 	const { isPending, refetch } = useQuery({
 		queryKey: ['orgResources'],
 		queryFn: getResources,
+		refetchOnWindowFocus: false,
+		enabled: !resources.length,
 	});
 
 	const { mutateAsync: deleteMutate, isPending: deleteLoading } = useMutation({

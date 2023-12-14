@@ -65,7 +65,7 @@ export default function EnvVariableForm({ loading }: EnvVariableFormProps) {
 					</Button>
 				</DrawerClose>
 				<Button loading={loading} size='lg'>
-					{t('general.add')}
+					{t('general.save')}
 				</Button>
 			</div>
 		</>

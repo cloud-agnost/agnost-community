@@ -567,19 +567,15 @@ export default function EditOrCreateFieldDrawer({
 	});
 
 	const getDefaultValue = (defaultValue: string) => {
-		console.log(defaultValue);
 		if (editMode && hasDefaultValue && !defaultValue) {
-			console.log('here');
 			return '$$unset';
 		}
 
 		if ((isReference && database.type !== DATABASE.MongoDB) || isDecimal || isInteger) {
-			console.log('here2');
 			return Number(defaultValue);
 		}
 
 		if (isBoolean) {
-			console.log('here3');
 			return defaultValue ? JSON.parse(defaultValue) : undefined;
 		}
 
@@ -595,7 +591,7 @@ export default function EditOrCreateFieldDrawer({
 			dbId,
 			modelId,
 			name: data.general.name,
-			required: !(editMode && !fieldToEdit.required) ? data.general.required : false,
+			required: data.general.required,
 			unique: data.general.unique,
 			immutable: data.general.immutable,
 			indexed:

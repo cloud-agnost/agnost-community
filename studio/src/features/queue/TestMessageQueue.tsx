@@ -113,11 +113,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 						</div>
 						<Separator className='my-6' />
 						<PanelGroup direction='vertical' autoSaveId={queue._id}>
-							<Panel
-								defaultSize={32}
-								className='max-h-full no-scrollbar !overflow-y-auto'
-								minSize={20}
-							>
+							<Panel defaultSize={32} className='max-h-full !overflow-y-auto' minSize={20}>
 								<FormField
 									control={form.control}
 									name='payload'

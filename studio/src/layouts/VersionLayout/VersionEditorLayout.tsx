@@ -58,8 +58,14 @@ export default function VersionEditorLayout({
 	const { pathname } = useLocation();
 	const { versionId } = useParams<{ versionId: string }>();
 	const [editedLogic, setEditedLogic] = useState(logic);
-	const { removeTab, toDeleteTab, isDeleteTabModalOpen, closeDeleteTabModal, getCurrentTab } =
-		useTabStore();
+	const {
+		removeTab,
+		toDeleteTab,
+		isDeleteTabModalOpen,
+		closeDeleteTabModal,
+		getCurrentTab,
+		updateCurrentTab,
+	} = useTabStore();
 	const tab = getCurrentTab(versionId as string);
 	async function handleSaveLogic() {
 		const editor = monaco.editor.getEditors()[0];
@@ -67,6 +73,10 @@ export default function VersionEditorLayout({
 		setLogic(formattedLogic);
 		editor.setValue(formattedLogic);
 		onSaveLogic(formattedLogic);
+		updateCurrentTab(versionId as string, {
+			...tab,
+			isDirty: false,
+		});
 	}
 
 	window.onload = function () {

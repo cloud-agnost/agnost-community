@@ -14,11 +14,11 @@ import useApplicationStore from '@/store/app/applicationStore';
 import { Application } from '@/types';
 import { cn } from '@/utils';
 import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
+import _ from 'lodash';
 import { MouseEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import './appSelectDropdown.scss';
-import _ from 'lodash';
 
 export default function ApplicationSelectDropdown() {
 	const { t } = useTranslation();
@@ -32,13 +32,11 @@ export default function ApplicationSelectDropdown() {
 		openEditAppDrawer,
 		getAppsByOrgId,
 	} = useApplicationStore();
-	const navigate = useNavigate();
 	const { orgId } = useParams();
 	function onSelect(app: Application) {
 		selectApplication(app);
 		setOpen(false);
 		if (app._id === application?._id) return;
-		navigate(`/organization/${orgId}`);
 		openVersionDrawer(app);
 	}
 

@@ -45,7 +45,7 @@ export default function CodeEditor({
 
 	function handleOnChange(value: string | undefined, ev: any) {
 		if (defaultLanguage === 'javascript' && !readonly) {
-			setTabState(!!ev.changes[0].text);
+			setTabState(value !== ev.changes[0].text);
 		}
 		onChange?.(value, ev);
 	}
@@ -56,7 +56,6 @@ export default function CodeEditor({
 
 	function handleSaveLogic(value: string) {
 		onSave?.(value);
-		setTabState(false);
 	}
 
 	useEffect(() => {

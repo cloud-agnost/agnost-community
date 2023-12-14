@@ -42,17 +42,19 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 			return (
 				<Checkbox
 					disabled={isSystem}
-					checked={props.row.original.creator !== 'system' && props.row.getIsSelected()}
+					checked={isSystem && props.row.getIsSelected()}
 					onCheckedChange={(value) => props.row.toggleSelected(!!value)}
 					aria-label='Select row'
 				/>
 			);
 		},
 		meta: {
-			disabled: {
-				key: 'creator',
-				value: 'system',
-			},
+			disabled: [
+				{
+					key: 'creator',
+					value: 'system',
+				},
+			],
 		},
 		enableSorting: false,
 		enableHiding: false,

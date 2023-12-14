@@ -38,14 +38,27 @@ export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 		cell: ({ row }) => {
 			const { member } = row.original;
 			const user = useAuthStore.getState().user;
+			const isDisabled = member._id === user?._id || member.isOrgOwner;
 			return (
 				<Checkbox
-					checked={row.getIsSelected()}
+					checked={!isDisabled && row.getIsSelected()}
 					onCheckedChange={(value) => row.toggleSelected(!!value)}
 					aria-label='Select row'
-					disabled={member._id === user?._id || member.isOrgOwner}
+					disabled={isDisabled}
 				/>
 			);
+		},
+		meta: {
+			disabled: [
+				{
+					key: 'member.isOrgOwner',
+					value: true,
+				},
+				{
+					key: 'member._id',
+					value: useAuthStore.getState().user?._id,
+				},
+			],
 		},
 		enableSorting: false,
 		enableHiding: false,

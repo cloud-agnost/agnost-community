@@ -804,25 +804,30 @@ const router = createBrowserRouter([
 									},
 								],
 							},
+							{
+								path: 'profile',
+								element: <ProfileSettings />,
+								children: [
+									{
+										index: true,
+										path: '',
+										element: <ProfileSettingsGeneral />,
+									},
+									{
+										path: 'cluster-management',
+										element: <ClusterManagement />,
+									},
+									{
+										path: 'notifications',
+										element: <ProfileSettingsNotifications />,
+									},
+									{
+										path: 'cluster-management',
+										element: <ClusterManagement />,
+									},
+								],
+							},
 						],
-					},
-				],
-			},
-			{
-				path: '/profile/settings',
-				element: <ProfileSettings />,
-				children: [
-					{
-						index: true,
-						element: <ProfileSettingsGeneral />,
-					},
-					{
-						path: 'notifications',
-						element: <ProfileSettingsNotifications />,
-					},
-					{
-						path: 'cluster-management',
-						element: <ClusterManagement />,
 					},
 				],
 			},

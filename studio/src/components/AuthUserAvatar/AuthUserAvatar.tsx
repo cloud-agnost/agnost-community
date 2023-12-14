@@ -3,12 +3,11 @@ import { Avatar, AvatarFallback, AvatarImage, AvatarProps } from 'components/Ava
 
 export default function AuthUserAvatar(props: AvatarProps) {
 	const { user } = useAuthStore();
-	if (!user) return null;
 
 	return (
 		<Avatar {...props}>
-			<AvatarImage src={user.pictureUrl as string} />
-			<AvatarFallback isUserAvatar color={user.color} name={user.name} />
+			<AvatarImage src={user?.pictureUrl as string} />
+			<AvatarFallback isUserAvatar color={user?.color as string} name={user?.name} />
 		</Avatar>
 	);
 }

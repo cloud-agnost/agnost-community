@@ -10,7 +10,6 @@ import {
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuItemContainer,
-	DropdownMenuLabel,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
 import { SearchInput } from 'components/SearchInput';
@@ -55,17 +54,17 @@ export default function NewTabDropdown() {
 		addTab(versionId, tab);
 	}
 
-	function onInput(value: string) {
-		value = value.trim();
+	async function onInput(value: string) {
+		const keyword = value.trim();
 		if (!value) {
 			resetDesignElements();
 			return;
 		}
-		searchDesignElements({
+		await searchDesignElements({
 			orgId,
 			appId,
 			versionId,
-			keyword: value,
+			keyword,
 		});
 	}
 
@@ -81,15 +80,15 @@ export default function NewTabDropdown() {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className='tab-dropdown-content'>
-				<DropdownMenuLabel>
+				<div className='p-2'>
 					<SearchInput
-						placeholder='Search'
 						className='tab-search-input'
 						onSearch={onInput}
 						onClear={resetDesignElements}
 						urlKey='s'
 					/>
-				</DropdownMenuLabel>
+				</div>
+
 				<DropdownMenuItemContainer className='overflow-auto max-h-96'>
 					{designElements.length > 0 ? (
 						<>

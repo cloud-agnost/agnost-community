@@ -20,9 +20,23 @@ export default function BreadCrumb({ goBackLink, className, items }: BreadCrumbP
 	const filteredItems = items.filter((item) => Boolean(item.name));
 	const { addTab, getCurrentTab } = useTabStore();
 	const versionId = useParams<{ versionId: string }>().versionId as string;
+
 	return (
 		<div className={cn('shrink-0 flex items-center gap-x-6', className)}>
-			<Button to={goBackLink} className='text-lg border-none h-8 w-8 p-0' variant='secondary'>
+			<Button
+				className='text-lg border-none h-8 w-8 p-0'
+				variant='secondary'
+				onClick={() => {
+					addTab(versionId, {
+						id: generateId(),
+						title: getCurrentTab(versionId)?.type,
+						path: goBackLink,
+						isActive: true,
+						isDashboard: false,
+						type: getCurrentTab(versionId)?.type as TabTypes,
+					});
+				}}
+			>
 				<ArrowLeft weight='bold' />
 			</Button>
 			<div className='flex items-center gap-2 text-sm leading-6'>

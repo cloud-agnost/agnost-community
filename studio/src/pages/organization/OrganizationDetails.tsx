@@ -7,6 +7,7 @@ import { Outlet, useMatch } from 'react-router-dom';
 export default function OrganizationDetails() {
 	const [openAppCreateModal, setOpenAppCreateModal] = useState(false);
 	const hideTabMenu = useMatch('/organization/:orgId/apps/:appId/*');
+	const isProfile = useMatch('/organization/:orgId/profile/*');
 	return (
 		<Layout>
 			<ApplicationCreateModal
@@ -14,7 +15,7 @@ export default function OrganizationDetails() {
 				isOpen={openAppCreateModal}
 				closeModal={() => setOpenAppCreateModal(false)}
 			/>
-			{!hideTabMenu && (
+			{!hideTabMenu && !isProfile && (
 				<div className='org-menu-container'>
 					<OrganizationMenu />
 				</div>

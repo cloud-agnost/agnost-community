@@ -1,19 +1,16 @@
 .table {
-	@apply w-full caption-bottom text-sm bg-base;
+	@apply w-full caption-bottom text-sm bg-base rounded-lg  overflow-hidden;
 	&-container {
-		@apply w-full rounded-lg border border-border;
+		@apply w-full border border-border rounded-lg;
 	}
 	&-header {
 		@apply [&_tr]:border-b;
-	}
-	&-body {
-		@apply [&_tr:last-child]:border-none;
 	}
 	&-footer {
 		@apply bg-subtle font-medium text-subtle;
 	}
 	&-row {
-		@apply border-b transition-colors data-[state=selected]:bg-surface-blue #{!important};
+		@apply border-b transition-colors data-[state=selected]:bg-surface-blue  #{!important};
 		&[data-state='selected'] > * {
 			@apply bg-surface-blue;
 		}

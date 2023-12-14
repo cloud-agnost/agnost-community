@@ -1,6 +1,6 @@
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
-import { DrawerFooter } from '@/components/Drawer';
+import { DrawerClose, DrawerFooter } from '@/components/Drawer';
 import { Input } from '@/components/Input';
 import { INSTANCE_PORT_MAP } from '@/constants';
 import { TestConnectionButton } from '@/features/resources';
@@ -8,7 +8,7 @@ import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useResourceStore from '@/store/resources/resourceStore';
 import useTypeStore from '@/store/types/typeStore';
 import { ResourceCreateType } from '@/types';
-import { isEmpty } from '@/utils';
+import { cn, isEmpty } from '@/utils';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -104,11 +104,23 @@ export default function CreateResourceLayout({ children, loading }: Props) {
 			)}
 
 			{children}
-			<DrawerFooter className='gap-4 justify-between'>
+			<DrawerFooter
+				className={cn(
+					'gap-4',
+					resourceConfig.type === ResourceCreateType.Existing && 'justify-between',
+				)}
+			>
 				{resourceConfig.type === ResourceCreateType.Existing && <TestConnectionButton />}
-				<Button size='lg' type='submit' loading={loading} disabled={!canCreateResource}>
-					{t('general.save')}
-				</Button>
+				<div className='space-x-4 self-end'>
+					<DrawerClose asChild>
+						<Button variant='secondary' size='lg'>
+							{t('general.cancel')}
+						</Button>
+					</DrawerClose>
+					<Button size='lg' type='submit' loading={loading} disabled={!canCreateResource}>
+						{t('general.save')}
+					</Button>
+				</div>
 			</DrawerFooter>
 		</div>
 	);
