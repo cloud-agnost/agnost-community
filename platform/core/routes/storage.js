@@ -23,6 +23,8 @@ router.get("/avatars/:file", async (req, res) => {
 		res.set("Content-Type", fileStat.metaData["content-type"]);
 		res.set("Cache-Control", "public, max-age=31536000");
 		res.set("ETag", fileStat.etag); // Replace with actual ETag
+		res.set("Expires", new Date(Date.now() + 31536000000).toUTCString()); // 1 year from now
+		res.set("Pragma", "cache"); // Encourage caching
 		res.set("Last-Modified", fileStat.lastModified); // Replace with actual date
 
 		dataStream.pipe(res);
