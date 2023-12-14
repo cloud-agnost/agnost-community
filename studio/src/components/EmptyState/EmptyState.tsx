@@ -1,23 +1,10 @@
 import { TAB_ICON_MAP } from '@/constants';
 import { cn } from '@/utils';
-import { Key } from '@phosphor-icons/react';
-import React, { ElementType } from 'react';
-import useThemeStore from '@/store/theme/themeStore';
-import {
-	EmptyInvitation,
-	EmptyInvitationLight,
-	EnvironmentVariable,
-	NpmPackage,
-	RateLimit,
-	EmptyApps,
-	EmptyAppsLight,
-	EmptyResource,
-	EmptyResourceLight,
-	EmptyOrg,
-	EmptyOrgLight,
-} from '../icons';
-import './emptyState.scss';
+import { AppWindow, Envelope, Key, Users } from '@phosphor-icons/react';
 import { capitalize } from 'lodash';
+import React, { ElementType } from 'react';
+import { EnvironmentVariable, NpmPackage, RateLimit, Storage } from '../icons';
+import './emptyState.scss';
 
 export type Modules =
 	| 'org'
@@ -49,16 +36,15 @@ interface EmptyStateProps {
 }
 
 export default function EmptyState({ type, title, className, children }: EmptyStateProps) {
-	const { theme } = useThemeStore();
 	const ICON_MAP: Record<string, ElementType> = {
 		apiKey: Key,
 		variable: EnvironmentVariable,
 		package: NpmPackage,
 		'rate-limit': RateLimit,
-		invitation: theme === 'light' ? EmptyInvitationLight : EmptyInvitation,
-		app: theme === 'light' ? EmptyAppsLight : EmptyApps,
-		resource: theme === 'light' ? EmptyResourceLight : EmptyResource,
-		org: theme === 'light' ? EmptyOrgLight : EmptyOrg,
+		invitation: Envelope,
+		app: AppWindow,
+		resource: Storage,
+		org: Users,
 	};
 	const Icon = TAB_ICON_MAP[capitalize(type)] ?? ICON_MAP[type];
 	return (
