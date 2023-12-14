@@ -16,7 +16,7 @@ import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { APIError } from '@/types';
-import { cn, isEmpty } from '@/utils';
+import { isEmpty } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 import { DataTable } from 'components/DataTable';
 import { useEffect } from 'react';
@@ -45,7 +45,7 @@ export default function Navigator() {
 	const hasSubModel = !isEmpty(subModel);
 	const columns = useNavigatorColumns(hasSubModel ? subModel.fields : model?.fields);
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
-
+	const isSorted = searchParams.get('f') && searchParams.get('d');
 	const table = useTable({
 		columns,
 		data: hasSubModel ? subModelData : data,
@@ -82,12 +82,12 @@ export default function Navigator() {
 	}, []);
 
 	useUpdateEffect(() => {
-		if (model && isEmpty(subModel) && !searchParams.size) {
+		if (model && isEmpty(subModel) && !isSorted) {
 			refetch();
 		}
 	}, [model, subModel]);
-	const { hasNextPage, fetchNextPage, isFetching, isFetchingNextPage, refetch } = useInfiniteScroll(
-		{
+	const { hasNextPage, fetchNextPage, isFetching, isFetchingNextPage, refetch, isRefetching } =
+		useInfiniteScroll({
 			queryFn: getDataFromModel,
 			queryKey: 'getDataFromModel',
 			lastFetchedPage,
@@ -96,8 +96,7 @@ export default function Navigator() {
 			params: {
 				id: searchParams.get('ref') as string,
 			},
-		},
-	);
+		});
 	const breadcrumbItems: BreadCrumbItem[] = [
 		{
 			name: database.name,
@@ -111,6 +110,7 @@ export default function Navigator() {
 			name: t('database.navigator.title').toString(),
 		},
 	];
+
 	return (
 		<VersionTabLayout
 			isEmpty={false}
@@ -124,15 +124,15 @@ export default function Navigator() {
 			className='!overflow-hidden'
 			breadCrumb={<BreadCrumb goBackLink={`${dbUrl}/models`} items={breadcrumbItems} />}
 			handlerButton={
-				<Button variant='secondary' onClick={() => refetch()} iconOnly>
-					<Refresh className={cn('mr-2')} />
+				<Button variant='secondary' onClick={() => refetch()} iconOnly loading={isRefetching}>
+					{!isRefetching && <Refresh className='mr-2' />}
 					{t('general.refresh')}
 				</Button>
 			}
 		>
 			<div className='flex gap-4 justify-center h-[88%]'>
 				<SelectModel />
-				{isFetching && !searchParams.size ? (
+				{isFetching && !isSorted && !isFetchingNextPage ? (
 					<div className='flex-1 flex items-center justify-center'>
 						<BeatLoader color='#6884FD' size={24} margin={18} />
 					</div>
