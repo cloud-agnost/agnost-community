@@ -19,10 +19,11 @@ import {
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import './AuthUserDropdown.scss';
 export default function AuthUserDropdown() {
 	const { user, logout } = useAuthStore();
+	const { orgId } = useParams() as { orgId: string };
 	const { t } = useTranslation();
 	const { setTheme, theme } = useThemeStore();
 	const navigate = useNavigate();
@@ -69,7 +70,7 @@ export default function AuthUserDropdown() {
 
 				<DropdownMenuItemContainer className='space-y-2'>
 					<DropdownMenuItem asChild>
-						<Link className={cn('flex items-center gap-2')} to='/profile/settings'>
+						<Link className={cn('flex items-center gap-2')} to={`/organization/${orgId}/profile`}>
 							<GearSix className='text-icon-base text-lg' />
 							{t('general.account_settings')}
 						</Link>
@@ -78,7 +79,7 @@ export default function AuthUserDropdown() {
 						<DropdownMenuItem asChild>
 							<Link
 								className={cn('flex items-center gap-2')}
-								to={'/profile/settings/cluster-management'}
+								to={`/organization/${orgId}/profile/cluster-management`}
 							>
 								<LineSegments className='text-icon-base text-lg' />
 								{t('profileSettings.clusters_title')}
