@@ -26,7 +26,10 @@ export const testEndpointInstance = axios.create({
 
 instance.interceptors.request.use((config) => {
 	const accessToken = useAuthStore.getState().accessToken;
-	if (accessToken) {
+	const refreshToken = useAuthStore.getState().refreshToken;
+	if (config.url === '/v1/auth/renew') {
+		config.headers['Authorization'] = refreshToken;
+	} else if (accessToken) {
 		config.headers['Authorization'] = accessToken;
 	}
 	return config;
