@@ -11,6 +11,7 @@ import {
 import { Input } from '@/components/Input';
 import { ResourceSelect } from '@/components/ResourceSelect';
 import { Switch } from '@/components/Switch';
+import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import useResourceStore from '@/store/resources/resourceStore';
 import { CreateMessageQueueSchema, ResourceType } from '@/types';
 import { translate as t } from '@/utils';
@@ -20,11 +21,11 @@ import * as z from 'zod';
 
 export default function MessageQueueForm({ edit, loading }: { edit?: boolean; loading: boolean }) {
 	const form = useFormContext<z.infer<typeof CreateMessageQueueSchema>>();
-	const { resources, resource } = useResourceStore();
-
+	const { resources } = useResourceStore();
+	const { queue } = useMessageQueueStore();
 	const selectedResource = useMemo(
-		() => (edit ? resource : resources.find((item) => item._id === form.getValues('resourceId'))),
-		[form.getValues('resourceId'), resources, resource],
+		() => resources.find((item) => item._id === form.getValues('resourceId')),
+		[form.watch('resourceId'), resources],
 	);
 	return (
 		<div className='space-y-6'>
@@ -90,7 +91,7 @@ export default function MessageQueueForm({ edit, loading }: { edit?: boolean; lo
 					)}
 				/>
 			)}
-			{selectedResource?.config?.delayedMessages && (
+			{(selectedResource?.config?.delayedMessages || (edit && queue.delayedMessages)) && (
 				<FormField
 					control={form.control}
 					name='delay'

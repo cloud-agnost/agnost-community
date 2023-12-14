@@ -3,7 +3,6 @@ import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import useResourceStore from '@/store/resources/resourceStore';
 import { APIError, MessageQueueSchema } from '@/types';
 import { removeEmptyFields } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
