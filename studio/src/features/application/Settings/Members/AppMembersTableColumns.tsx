@@ -62,14 +62,27 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 		cell: ({ row }) => {
 			const { member } = row.original;
 			const user = useAuthStore.getState().user;
+			const isDisabled = member._id === user?._id || member.isAppOwner;
 			return (
 				<Checkbox
-					checked={row.getIsSelected()}
+					checked={!isDisabled && row.getIsSelected()}
 					onCheckedChange={(value) => row.toggleSelected(!!value)}
 					aria-label='Select row'
-					disabled={member._id === user?._id || member.isAppOwner}
+					disabled={isDisabled}
 				/>
 			);
+		},
+		meta: {
+			disabled: [
+				{
+					key: 'member.isOrgOwner',
+					value: true,
+				},
+				{
+					key: 'member._id',
+					value: useAuthStore.getState().user?._id,
+				},
+			],
 		},
 		enableSorting: false,
 		enableHiding: false,
