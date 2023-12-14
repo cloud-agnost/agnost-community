@@ -25,19 +25,13 @@ export default function ApplicationSelectDropdown() {
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState('');
 	const [openCreateModal, setOpenCreateModal] = useState(false);
-	const {
-		applications,
-		application,
-		selectApplication,
-		openVersionDrawer,
-		openEditAppDrawer,
-		getAppsByOrgId,
-	} = useApplicationStore();
+	const { applications, application, openVersionDrawer, openEditAppDrawer, getAppsByOrgId } =
+		useApplicationStore();
 	const { orgId } = useParams();
 	function onSelect(app: Application) {
-		selectApplication(app);
 		setOpen(false);
 		if (app._id === application?._id) return;
+		console.log('app', app._id, application?._id);
 		openVersionDrawer(app);
 	}
 
