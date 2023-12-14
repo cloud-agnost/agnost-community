@@ -158,19 +158,19 @@ export const applyRules = (type) => {
 					.bail()
 					.custom(async (value, { req }) => {
 						//Check whether model name is unique or not
-						let mws = await FunctionModel.find(
+						let funcs = await FunctionModel.find(
 							{
 								versionId: req.version._id,
 							},
 							"-logic"
 						);
-						mws.forEach((mw) => {
+						funcs.forEach((func) => {
 							if (
-								(mw.name.toLowerCase() === value.toLowerCase() &&
+								(func.name.toLowerCase() === value.toLowerCase() &&
 									type === "create") ||
-								(mw.name.toLowerCase() === value.toLowerCase() &&
+								(func.name.toLowerCase() === value.toLowerCase() &&
 									type === "update" &&
-									req.mw._id.toString() !== mw._id.toString())
+									req.func._id.toString() !== func._id.toString())
 							)
 								throw new AgnostError(
 									t("Function with the provided name already exists")
