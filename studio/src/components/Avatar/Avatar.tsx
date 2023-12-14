@@ -85,7 +85,7 @@ const AvatarFallback = React.forwardRef<
 	return (
 		<AvatarPrimitive.Fallback
 			ref={ref}
-			delayMs={500}
+			delayMs={70}
 			className={cn(
 				'avatar-fallback',
 				isUserAvatar ? 'avatar-fallback-user' : 'avatar-fallback-org',
