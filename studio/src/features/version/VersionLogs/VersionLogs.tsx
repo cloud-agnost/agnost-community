@@ -40,16 +40,19 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 
 	const { refetch } = useQuery({
 		queryKey: ['versionLogBuckets'],
-		queryFn: () =>
-			getVersionLogBuckets({
+		queryFn: () => {
+			const start = new Date(searchParams.get('start') as string) ?? date[0].startDate;
+			const end = new Date(searchParams.get('end') as string) ?? date[0].endDate;
+			return getVersionLogBuckets({
 				appId: appId as string,
 				orgId: orgId as string,
 				versionId: versionId as string,
 				type,
 				start: searchParams.get('start') ?? toIsoString(date[0].startDate as Date) ?? '',
 				end: searchParams.get('end') ?? toIsoString(date[0].endDate as Date) ?? '',
-				buckets: calculateRecommendedBuckets(date[0].startDate as Date, date[0].endDate as Date),
-			}),
+				buckets: calculateRecommendedBuckets(start, end as Date),
+			});
+		},
 		refetchOnWindowFocus: false,
 	});
 
