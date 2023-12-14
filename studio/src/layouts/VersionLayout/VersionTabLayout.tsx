@@ -91,7 +91,7 @@ export default function VersionTabLayout<T>({
 		});
 	}, [search]);
 	return (
-		<div className={cn('h-[90%] space-y-6 relative ', className)}>
+		<div className={cn('h-full space-y-6 relative ', className)}>
 			{breadCrumb}
 			<div className='flex items-center justify-between'>
 				<h1 className='text-default text-xl text-center'>{title}</h1>
