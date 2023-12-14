@@ -51,7 +51,7 @@ export default function useInfiniteScroll({
 
 	useUpdateEffect(() => {
 		result.refetch();
-	}, [searchParams]);
+	}, [searchParams.get('q'), searchParams.get('f'), searchParams.get('d')]);
 
 	useUpdateEffect(() => {
 		result.refetch();
