@@ -15,7 +15,7 @@ import { Application } from '@/types';
 import { cn } from '@/utils';
 import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
 import _ from 'lodash';
-import { MouseEvent, useEffect, useState } from 'react';
+import { MouseEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import './appSelectDropdown.scss';
@@ -23,6 +23,7 @@ import './appSelectDropdown.scss';
 export default function ApplicationSelectDropdown() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
+	const [search, setSearch] = useState('');
 	const [openCreateModal, setOpenCreateModal] = useState(false);
 	const {
 		applications,
@@ -45,6 +46,15 @@ export default function ApplicationSelectDropdown() {
 			getAppsByOrgId(orgId);
 		}
 	}, [orgId]);
+
+	const filteredApps = useMemo(() => {
+		if (!search) return applications;
+		console.log(
+			'search',
+			applications.filter((app) => RegExp(new RegExp(search, 'i')).exec(app.name)),
+		);
+		return applications.filter((app) => RegExp(new RegExp(search, 'i')).exec(app.name));
+	}, [applications, search]);
 
 	return (
 		<>
@@ -70,14 +80,18 @@ export default function ApplicationSelectDropdown() {
 					</PopoverTrigger>
 				</div>
 				<PopoverContent align='start' className='application-dropdown-content'>
-					<Command>
+					<Command shouldFilter={false}>
 						{applications.length > 5 && (
-							<CommandInput placeholder={t('organization.select') as string} />
+							<CommandInput
+								placeholder={t('application.select') as string}
+								value={search}
+								onValueChange={setSearch}
+							/>
 						)}
 						<CommandEmpty>{t('organization.empty')}</CommandEmpty>
 						<CommandGroup className='application-dropdown-container'>
 							<div className='application-dropdown-options'>
-								{applications.map((app) => (
+								{filteredApps.map((app) => (
 									<CommandItem
 										key={app._id}
 										value={app._id}
