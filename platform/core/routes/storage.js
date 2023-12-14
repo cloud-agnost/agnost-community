@@ -16,10 +16,15 @@ router.get("/avatars/:file", async (req, res) => {
 		const bucketName = config.get("general.storageBucket");
 		const fileName = `storage/avatars/${file}`;
 
-		const contentType = await storage.getFileContentType(bucketName, fileName);
+		const fileStat = await storage.getFileStat(bucketName, fileName);
 		const dataStream = await storage.getFileStream(bucketName, fileName);
 
-		res.set("Content-Type", contentType);
+		// Set cache and content-type headers
+		res.set("Content-Type", fileStat.metaData["content-type"]);
+		res.set("Cache-Control", "public, max-age=31536000");
+		res.set("ETag", fileStat.etag); // Replace with actual ETag
+		res.set("Last-Modified", fileStat.lastModified); // Replace with actual date
+
 		dataStream.pipe(res);
 	} catch (error) {
 		handleError(req, res, error);

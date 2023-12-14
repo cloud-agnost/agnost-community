@@ -97,7 +97,8 @@ router.put(
 					user,
 					"Deploying",
 					"Deploying",
-					"Deploying"
+					"Deploying",
+					t("Turing on/off auto-deploy")
 				);
 				// Update environemnt data in engine cluster
 				await deployCtrl.redeploy(envLog, app, version, updatedEnv, user);
@@ -321,6 +322,7 @@ router.post(
 					versionId: version._id,
 					envId: env._id,
 					action: "deploy",
+					description: t("Redeploying app version"),
 					dbStatus: "Deploying",
 					serverStatus: "Deploying",
 					schedulerStatus: "Deploying",

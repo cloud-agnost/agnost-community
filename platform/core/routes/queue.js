@@ -52,14 +52,14 @@ router.get(
 				sort[sortBy] = sortDir;
 			} else sort = { createdAt: "desc" };
 
-			let eps = await queueCtrl.getManyByQuery(query, {
+			let queues = await queueCtrl.getManyByQuery(query, {
 				sort,
 				skip: size * page,
 				limit: size,
 				projection: "-logic",
 			});
 
-			res.json(eps);
+			res.json(queues);
 		} catch (err) {
 			handleError(req, res, err);
 		}
@@ -126,6 +126,10 @@ router.post(
 					name,
 					delay: delay === 0 ? undefined : delay,
 					logExecution,
+					delayedMessages:
+						resource.instance === "RabbitMQ"
+							? resource.config?.delayedMessages ?? false
+							: false,
 					type: "code",
 					logic: defaultQueueCode,
 					createdBy: user._id,
