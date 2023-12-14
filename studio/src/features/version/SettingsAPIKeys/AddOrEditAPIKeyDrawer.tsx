@@ -19,6 +19,7 @@ import { Button } from '@/components/Button';
 import { APIKey, CreateAPIKeyParams, Endpoint, UpdateAPIKeyParams } from '@/types';
 import useEndpointStore from '@/store/endpoint/endpointStore.ts';
 import useSettingsStore from '@/store/version/settingsStore';
+import { useMutation } from '@tanstack/react-query';
 
 interface AddAPIKeyDrawerProps {
 	open: boolean;
@@ -139,9 +140,15 @@ export default function AddOrEditAPIKeyDrawer({
 		'allowed-domains': 'domain',
 		general: 'general',
 	};
+	const { mutateAsync, isPending } = useMutation({
+		mutationFn: editMode ? editAPIKey : createAPIKey,
+		onSuccess: () => {
+			onOpenChange(false);
+			form.reset();
+		},
+	});
 	async function onSubmit(data: z.infer<typeof Schema>) {
 		if (!version) return;
-		const func = editMode ? editAPIKey : createAPIKey;
 		const dataToAPI: UpdateAPIKeyParams & CreateAPIKeyParams = {
 			keyId: '',
 			orgId: version.orgId,
@@ -178,7 +185,7 @@ export default function AddOrEditAPIKeyDrawer({
 			dataToAPI.keyId = selectedAPIKey?._id;
 		}
 
-		await func(dataToAPI);
+		await mutateAsync(dataToAPI);
 		onOpenChange(false);
 		form.reset();
 	}
@@ -233,7 +240,9 @@ export default function AddOrEditAPIKeyDrawer({
 									{t('general.cancel')}
 								</Button>
 							</DrawerClose>
-							<Button size='lg'>{t('general.save')}</Button>
+							<Button size='lg' loading={isPending}>
+								{t('general.save')}
+							</Button>
 						</div>
 					</form>
 				</DrawerContent>
