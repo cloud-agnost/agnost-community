@@ -14,19 +14,22 @@ import useVersionStore from '@/store/version/versionStore';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useMatch, useSearchParams } from 'react-router-dom';
+import { useMatch, useParams, useSearchParams } from 'react-router-dom';
 import { VersionTable } from '../version/Table';
+import { Application } from '@/types';
 export default function ApplicationVersions() {
 	const { t } = useTranslation();
-	const { isVersionOpen, application, closeVersionDrawer } = useApplicationStore();
+	const { isVersionOpen, application, closeVersionDrawer, applications, selectApplication } =
+		useApplicationStore();
 	const { getAllVersionsVisibleToUser, versions, selectVersion } = useVersionStore();
 	const [page, setPage] = useState(0);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const match = useMatch('/organization/:orgId/apps');
+	const { orgId, appId } = useParams() as Record<string, string>;
 	const getVersions = useCallback(async () => {
 		if (application?._id) {
 			const versions = await getAllVersionsVisibleToUser({
-				orgId: application?.orgId as string,
+				orgId,
 				appId: application?._id as string,
 				page,
 				size: 10,
@@ -43,6 +46,12 @@ export default function ApplicationVersions() {
 		searchParams.delete('q');
 		setSearchParams(searchParams);
 		closeVersionDrawer(!!match);
+	}
+
+	function handleCloseClick() {
+		closeVersionDrawer();
+		console.log('close', applications.find((app) => app._id === appId) as Application);
+		selectApplication(applications.find((app) => app._id === appId) as Application);
 	}
 	useUpdateEffect(() => {
 		if (isVersionOpen) {
@@ -69,11 +78,9 @@ export default function ApplicationVersions() {
 							<VersionTable />
 						</InfiniteScroll>
 						<DrawerFooter>
-							<DrawerClose asChild>
-								<Button variant='secondary' size='lg'>
-									{t('general.cancel')}
-								</Button>
-							</DrawerClose>
+							<Button variant='secondary' size='lg' onClick={handleCloseClick}>
+								{t('general.cancel')}
+							</Button>
 						</DrawerFooter>
 					</div>
 				</div>
