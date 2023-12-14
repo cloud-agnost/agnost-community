@@ -13,7 +13,13 @@ const user = useAuthStore.getState().user;
 export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 	{
 		id: 'name',
-		header: () => <SortButton text={translate('application.table.name')} field='name' />,
+		header: ({ column }) => (
+			<SortButton
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				text={translate('application.table.name')}
+				field='name'
+			/>
+		),
 		size: 900,
 		accessorKey: 'name',
 
@@ -40,7 +46,13 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 	},
 	{
 		id: 'role',
-		header: () => <SortButton text={translate('application.table.role')} field='role' />,
+		header: ({ column }) => (
+			<SortButton
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				text={translate('application.table.role')}
+				field='role'
+			/>
+		),
 		accessorKey: 'role',
 		cell: ({ row }) => {
 			const { team } = row.original;
@@ -52,7 +64,13 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 
 	{
 		id: 'date',
-		header: () => <SortButton text={translate('application.table.createdAt')} field='createdAt' />,
+		header: ({ column }) => (
+			<SortButton
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				text={translate('application.table.createdAt')}
+				field='createdAt'
+			/>
+		),
 		accessorKey: 'createdAt',
 		cell: ({ row }) => {
 			const { createdAt } = row.original;

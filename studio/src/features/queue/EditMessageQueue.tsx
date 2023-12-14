@@ -3,7 +3,6 @@ import { Form } from '@/components/Form';
 import { useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
-import useResourceStore from '@/store/resources/resourceStore';
 import { APIError, MessageQueueSchema } from '@/types';
 import { removeEmptyFields } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,7 +21,6 @@ interface CreateQueueProps {
 export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 	const { t } = useTranslation();
 	const { updateQueue, queue } = useMessageQueueStore();
-	const { getResource } = useResourceStore();
 	const environment = useEnvironmentStore((state) => state.environment);
 	const { versionId, appId, orgId } = useParams() as Record<string, string>;
 	const { notify } = useToast();
@@ -54,13 +52,6 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 	useEffect(() => {
 		if (queue) {
 			form.reset(queue);
-			const iid = environment?.mappings?.find((m) => m.design.iid === queue.iid)?.resource.iid;
-			if (iid && open) {
-				getResource({
-					orgId,
-					iid,
-				});
-			}
 		}
 	}, [open, queue, environment]);
 

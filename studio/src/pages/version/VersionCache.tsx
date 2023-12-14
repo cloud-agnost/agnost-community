@@ -6,6 +6,7 @@ import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useCacheStore from '@/store/cache/cacheStore';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import { APIError, Cache } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { Row } from '@tanstack/react-table';
@@ -36,7 +37,7 @@ export default function VersionCache() {
 		data: caches,
 		columns: CacheColumns,
 	});
-
+	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } = useInfiniteScroll({
 		queryFn: getCaches,
 		lastFetchedPage,
@@ -50,12 +51,26 @@ export default function VersionCache() {
 		isPending: isDeleting,
 	} = useMutation({
 		mutationFn: deleteCache,
-		onSettled: () => closeDeleteCacheModal(),
+		onSuccess: () => {
+			getEnvironmentResources({
+				orgId: environment?.orgId,
+				appId: environment?.appId,
+				envId: environment?._id,
+				versionId: environment?.versionId,
+			});
+			closeDeleteCacheModal();
+		},
 	});
 
 	const { mutateAsync: deleteMultipleCacheMutation } = useMutation({
 		mutationFn: deleteMultipleCache,
 		onSuccess: () => {
+			getEnvironmentResources({
+				orgId: environment?.orgId,
+				appId: environment?.appId,
+				envId: environment?._id,
+				versionId: environment?.versionId,
+			});
 			table?.resetRowSelection();
 		},
 		onError: ({ error, details }: APIError) => {

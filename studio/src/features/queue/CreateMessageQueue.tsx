@@ -11,6 +11,7 @@ import * as z from 'zod';
 import MessageQueueForm from './MessageQueueForm';
 import { removeEmptyFields } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 interface CreateQueueProps {
 	open: boolean;
 	onClose: () => void;
@@ -21,6 +22,7 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 	const { createQueue } = useMessageQueueStore();
 	const navigate = useTabNavigate();
 	const { pathname } = useLocation();
+	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -45,6 +47,12 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 				isActive: true,
 				isDashboard: false,
 				type: TabTypes.MessageQueue,
+			});
+			getEnvironmentResources({
+				orgId: environment?.orgId,
+				appId: environment?.appId,
+				envId: environment?._id,
+				versionId: environment?.versionId,
 			});
 		},
 		onError: ({ error, details }: APIError) => {

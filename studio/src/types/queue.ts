@@ -18,7 +18,7 @@ export interface MessageQueue {
 	_id: string;
 	createdAt: string;
 	updatedAt: string;
-	__v: number;
+	delayedMessages: boolean;
 }
 
 export type GetMessageQueuesParams = BaseParams & BaseGetRequest;

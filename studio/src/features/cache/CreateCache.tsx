@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import useCacheStore from '@/store/cache/cacheStore';
 import { useMutation } from '@tanstack/react-query';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 
 interface CreateCacheProps {
 	open: boolean;
@@ -19,6 +20,7 @@ interface CreateCacheProps {
 export default function CreateCache({ open, onClose }: CreateCacheProps) {
 	const { t } = useTranslation();
 	const { createCache } = useCacheStore();
+	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -40,6 +42,12 @@ export default function CreateCache({ open, onClose }: CreateCacheProps) {
 		mutationFn: createCache,
 		onSuccess: () => {
 			resetAndClose();
+			getEnvironmentResources({
+				orgId: environment?.orgId,
+				appId: environment?.appId,
+				envId: environment?._id,
+				versionId: environment?.versionId,
+			});
 		},
 		onError: ({ error, details }: APIError) => {
 			notify({ type: 'error', description: details, title: error });

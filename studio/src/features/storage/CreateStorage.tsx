@@ -10,6 +10,7 @@ import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import StorageForm from './StorageForm';
 import { useMutation } from '@tanstack/react-query';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 
 interface CreateStorageProps {
 	open: boolean;
@@ -28,9 +29,18 @@ export default function CreateStorage({ open, onClose }: CreateStorageProps) {
 	const form = useForm<z.infer<typeof CreateStorageSchema>>({
 		resolver: zodResolver(CreateStorageSchema),
 	});
+	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { mutateAsync: createMutation, isPending } = useMutation({
 		mutationFn: createStorage,
-		onSuccess: () => onCloseHandler(),
+		onSuccess: () => {
+			getEnvironmentResources({
+				orgId: environment?.orgId,
+				appId: environment?.appId,
+				envId: environment?._id,
+				versionId: environment?.versionId,
+			});
+			onCloseHandler();
+		},
 		onError: ({ error, details }: APIError) => {
 			notify({ type: 'error', description: details, title: error });
 		},

@@ -45,6 +45,7 @@ export default function SearchInput({
 			setSearchParams(searchParams);
 		}
 		onSearch?.(value);
+		ref.current?.focus();
 	}
 
 	useUpdateEffect(() => {
@@ -52,15 +53,9 @@ export default function SearchInput({
 	}, [searchTerm]);
 
 	useUpdateEffect(() => {
-		if (ref.current && !inputValue) {
-			ref.current.focus();
-			ref.current.value = '';
-		}
-	}, [inputValue]);
-
-	useUpdateEffect(() => {
 		setInputValue(searchParams.get(urlKey) ?? '');
 	}, [searchParams.get(urlKey)]);
+
 	return (
 		<div className={cn('search-input-wrapper', className)} {...props}>
 			<MagnifyingGlass size={20} className='search-input-icon' />

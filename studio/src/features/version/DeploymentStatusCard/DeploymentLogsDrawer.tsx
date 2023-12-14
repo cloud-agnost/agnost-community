@@ -44,7 +44,7 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 	}>();
 
 	useEffect(() => {
-		if (open && _.isEmpty(envLogs)) {
+		if (open) {
 			getEnvironmentLogs({
 				orgId: orgId as string,
 				appId: appId as string,

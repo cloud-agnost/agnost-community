@@ -16,7 +16,6 @@ import {
 	Database as DatabaseIcon,
 	Decimal,
 	Decision,
-	DeviceMobile,
 	Discord,
 	Environment,
 	EnvironmentVariable,
@@ -77,6 +76,7 @@ import {
 } from '@/types';
 import { getAppPermission, translate } from '@/utils';
 import {
+	AppWindow,
 	BracketsCurly,
 	Clock,
 	CurrencyDollarSimple,
@@ -164,12 +164,12 @@ export const ORGANIZATION_MENU_ITEMS = [
 	{
 		name: translate('organization.menu.apps'),
 		href: 'apps',
-		icon: DeviceMobile,
+		icon: AppWindow,
 	},
 	{
 		name: translate('organization.menu.resources'),
 		href: 'resources',
-		icon: DatabaseIcon,
+		icon: Storage,
 	},
 	{
 		name: translate('organization.menu.settings'),

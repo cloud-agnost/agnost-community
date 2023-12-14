@@ -16,7 +16,7 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization } from '@/types';
 import { cn } from '@/utils';
 import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import './organization.scss';
@@ -30,6 +30,7 @@ export function OrganizationDropdown() {
 	const [open, setOpen] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
 	const [openCreateModal, setOpenCreateModal] = useState(false);
+	const [search, setSearch] = useState('');
 	const {
 		organizations,
 		organization,
@@ -78,6 +79,11 @@ export function OrganizationDropdown() {
 			getAllOrganizationByUser();
 		}
 	}, []);
+
+	const filteredOrgs = useMemo(() => {
+		if (!search) return organizations;
+		return organizations.filter((org) => RegExp(new RegExp(search, 'i')).exec(org.name));
+	}, [organizations, search]);
 	return (
 		<>
 			<Popover open={open} onOpenChange={setOpen}>
@@ -99,14 +105,18 @@ export function OrganizationDropdown() {
 					</PopoverTrigger>
 				</div>
 				<PopoverContent align='start' className='organization-dropdown-content'>
-					<Command>
+					<Command shouldFilter={false}>
 						{organizations.length > 5 && (
-							<CommandInput placeholder={t('organization.select') as string} />
+							<CommandInput
+								placeholder={t('organization.select') as string}
+								value={search}
+								onValueChange={setSearch}
+							/>
 						)}
 						<CommandEmpty>{t('organization.empty')}</CommandEmpty>
 						<CommandGroup className='organization-dropdown-container'>
 							<div className='organization-dropdown-options'>
-								{organizations.map((org) => (
+								{filteredOrgs.map((org) => (
 									<CommandItem
 										key={org._id}
 										value={org._id}

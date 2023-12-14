@@ -7,6 +7,7 @@
 	"enter_name": "Enter app name",
 	"empty": "You have not created any apps yet!",
 	"search_empty": "No applications matching search criteria",
+	"select": "Select your app",
 	"settings": {
 		"openVersion": "Open Version",
 		"editApp": "Edit App",

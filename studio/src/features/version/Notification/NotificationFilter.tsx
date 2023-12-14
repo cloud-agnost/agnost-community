@@ -204,6 +204,7 @@ export default function NotificationFilter() {
 					</Button>
 				</div>
 				<DateRangePicker
+					key={date[0].startDate?.toISOString()}
 					date={date}
 					onChange={(date) => {
 						setSearchParams({

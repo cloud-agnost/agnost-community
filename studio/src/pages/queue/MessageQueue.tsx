@@ -5,6 +5,7 @@ import { CreateMessageQueue, MessageQueueColumns } from '@/features/queue';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -29,10 +30,16 @@ export default function MainMessageQueue() {
 		columns: MessageQueueColumns,
 		data: queues,
 	});
-
+	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { mutateAsync: deleteMultipleQueueMutation } = useMutation({
 		mutationFn: deleteMultipleQueues,
 		onSuccess: () => {
+			getEnvironmentResources({
+				orgId: environment?.orgId,
+				appId: environment?.appId,
+				envId: environment?._id,
+				versionId: environment?.versionId,
+			});
 			table?.resetRowSelection();
 		},
 		onError: ({ error, details }: APIError) => {

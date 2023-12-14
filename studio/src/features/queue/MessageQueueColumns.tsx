@@ -1,6 +1,7 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { TableConfirmation } from '@/components/Table';
 import { TabLink } from '@/features/version/Tabs';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { APIError, ColumnDefWithClassName, MessageQueue, TabTypes } from '@/types';
@@ -12,8 +13,8 @@ import { DateText } from 'components/DateText';
 import { InstanceType } from 'components/InstanceType';
 
 const { openEditModal, deleteQueue } = useMessageQueueStore.getState();
+const { getEnvironmentResources } = useEnvironmentStore.getState();
 const queryClient = new QueryClient();
-
 
 async function deleteHandler(mq: MessageQueue) {
 	queryClient
@@ -25,6 +26,15 @@ async function deleteHandler(mq: MessageQueue) {
 					title: error.error,
 					description: error.details,
 					type: 'error',
+				});
+			},
+			onSuccess: () => {
+				const { environment } = useEnvironmentStore.getState();
+				getEnvironmentResources({
+					orgId: environment?.orgId,
+					appId: environment?.appId,
+					envId: environment?._id,
+					versionId: environment?.versionId,
 				});
 			},
 		})

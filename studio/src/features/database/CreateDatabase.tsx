@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import DatabaseForm from './DatabaseForm';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 export default function CreateDatabase({
 	open,
 	onOpenChange,
@@ -31,6 +32,7 @@ export default function CreateDatabase({
 		orgId: string;
 	};
 	const { createDatabase } = useDatabaseStore();
+	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const resources = useResourceStore((state) =>
 		state.resources.filter((resource) => resource.type === 'database'),
 	);
@@ -39,6 +41,12 @@ export default function CreateDatabase({
 		onSuccess: () => {
 			onOpenChange(false);
 			form.reset();
+			getEnvironmentResources({
+				orgId: environment?.orgId,
+				appId: environment?.appId,
+				envId: environment?._id,
+				versionId: environment?.versionId,
+			});
 		},
 		onError: (error: APIError) => {
 			notify({

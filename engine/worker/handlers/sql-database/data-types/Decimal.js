@@ -32,7 +32,7 @@ export default class Decimal extends Field {
     toDefinitionQuery() {
         let schema = this.createMap[this.getDatabaseType()];
 
-        if (this.getDefaultValue()) {
+        if (this.getDefaultValue() !== undefined || this.getDefaultValue() !== null) {
             schema = schema.replace("{DEFAULT_VALUE}", this.defaultMap[this.getDatabaseType()]);
         }
 
