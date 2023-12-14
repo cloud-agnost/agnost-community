@@ -11,10 +11,12 @@ export default function SelectModel() {
 	const { model, setModel, models, resetNestedModels } = useModelStore();
 
 	function onModelSelect(model: Model) {
-		setModel(model);
 		resetNestedModels();
+		searchParams.delete('f');
+		searchParams.delete('d');
 		searchParams.delete('ref');
 		setSearchParams(searchParams);
+		setModel(model);
 	}
 	return (
 		<div className=' bg-subtle p-4 rounded-lg w-1/6 space-y-4'>
