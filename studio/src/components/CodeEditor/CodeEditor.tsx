@@ -45,7 +45,6 @@ export default function CodeEditor({
 
 	function handleOnChange(value: string | undefined, ev: any) {
 		if (defaultLanguage === 'javascript' && !readonly) {
-			console.log('setTabState', ev.changes);
 			setTabState(value !== ev.changes[0].text);
 		}
 		onChange?.(value, ev);
@@ -66,11 +65,11 @@ export default function CodeEditor({
 	}, [globalThis.monaco, typings]);
 
 	return (
-		<div className={cn(containerClassName)} id='editor-container'>
+		<div className={cn(containerClassName)}>
 			<MonacoEditor
 				theme={theme === 'dark' ? 'nightOwl' : 'slush'}
 				beforeMount={onBeforeMount}
-				className={cn('editor code-editor', className)}
+				className={cn('editor', className)}
 				onChange={onCodeEditorChange}
 				defaultValue={value}
 				value={value}
