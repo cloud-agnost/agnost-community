@@ -1,4 +1,5 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
+import { EmptyState } from '@/components/EmptyState';
 import { Form } from '@/components/Form';
 import { InviteMemberForm, InviteMemberSchema } from '@/components/InviteMemberForm';
 import { useToast } from '@/hooks';
@@ -10,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { z } from 'zod';
 
 export default function AppInviteMember() {
@@ -71,7 +72,7 @@ export default function AppInviteMember() {
 					<DrawerTitle>{t('application.invite_member.title')}</DrawerTitle>
 				</DrawerHeader>
 				<div className='p-6 space-y-6'>
-					{canClusterSendEmail && (
+					{canClusterSendEmail ? (
 						<Form {...form}>
 							<form onSubmit={form.handleSubmit(onSubmit)}>
 								<InviteMemberForm
@@ -83,6 +84,16 @@ export default function AppInviteMember() {
 								/>
 							</form>
 						</Form>
+					) : (
+						<EmptyState title={t('application.invite_member.email_disabled')} type='invitation'>
+							<p className='text-subtle'>{t('application.invite_member.email_disabled')}</p>
+							<Link
+								to={`/organization/${orgId}/profile/cluster-management`}
+								className='text-blue-600 hover:underline'
+							>
+								{t('application.invite_member.configure')}
+							</Link>
+						</EmptyState>
 					)}
 				</div>
 			</DrawerContent>
