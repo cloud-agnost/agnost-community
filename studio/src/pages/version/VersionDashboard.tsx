@@ -9,6 +9,7 @@ import {
 } from '@/components/Card';
 import { CopyInput } from '@/components/CopyInput';
 import { TAB_ICON_MAP } from '@/constants';
+import { useUpdateEffect } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -30,7 +31,7 @@ export default function VersionDashboard() {
 
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 
-	const { isFetching } = useQuery({
+	const { isFetching, refetch } = useQuery({
 		queryKey: ['getVersionDashboardInfo'],
 		queryFn: getVersionDashboardInfoHandler,
 		refetchOnWindowFocus: false,
@@ -44,6 +45,11 @@ export default function VersionDashboard() {
 			versionId,
 		});
 	}
+
+	useUpdateEffect(() => {
+		refetch();
+	}, [orgId, appId, versionId]);
+
 	function getIcon(type: string) {
 		const Icon = TAB_ICON_MAP[type];
 		return <Icon className='w-8 h-8 text-default' />;

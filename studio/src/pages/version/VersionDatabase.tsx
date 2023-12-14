@@ -1,5 +1,5 @@
 import { CreateDatabase, DatabaseColumns, EditDatabase } from '@/features/database';
-import { useSearch, useTable, useToast } from '@/hooks';
+import { useSearch, useTable, useToast, useUpdateEffect } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
@@ -33,7 +33,7 @@ export default function VersionDatabase() {
 
 	const filteredDatabase = useSearch(databases);
 
-	const { isFetching } = useQuery({
+	const { isFetching, refetch } = useQuery({
 		queryKey: ['getDatabases'],
 		queryFn: () =>
 			getDatabasesOfApp({
@@ -42,6 +42,7 @@ export default function VersionDatabase() {
 				appId: appId as string,
 			}),
 		enabled: !databases.length,
+		refetchOnWindowFocus: false,
 	});
 
 	const table = useTable({
@@ -71,7 +72,9 @@ export default function VersionDatabase() {
 			versionId: toDeleteDatabase.versionId,
 		});
 	}
-
+	useUpdateEffect(() => {
+		refetch();
+	}, [orgId, appId, versionId]);
 	return (
 		<>
 			<CreateDatabase open={createDrawerIsOpen} onOpenChange={setCreateDrawerIsOpen} />
