@@ -195,7 +195,7 @@ export default function SelectUserDataModel() {
 								);
 							})}
 						</div>
-						<Button size='xl' onClick={addMissingFields} loading={isLoadingAddFields}>
+						<Button size='2xl' onClick={addMissingFields} loading={isLoadingAddFields}>
 							{!isLoadingAddFields && <Plus weight='bold' className='mr-2' />}
 							{t('version.authentication.add_missing_fields')}
 						</Button>
