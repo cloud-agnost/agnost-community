@@ -14,6 +14,8 @@ import { devtools, persist } from 'zustand/middleware';
 interface TypesStore {
 	orgRoles: string[];
 	appRoles: string[];
+	orgRoleDesc: Record<string, string>;
+	appRoleDesc: Record<string, string>;
 	bvlTypes: string[];
 	fieldTypes: FieldType[];
 	databaseTypes: string[];
@@ -81,6 +83,8 @@ const useTypeStore = create<TypesStore>()(
 			(set) => ({
 				orgRoles: [],
 				appRoles: [],
+				orgRoleDesc: {},
+				appRoleDesc: {},
 				bvlTypes: [],
 				fieldTypes: [],
 				databaseTypes: [],
