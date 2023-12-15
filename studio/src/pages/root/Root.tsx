@@ -1,4 +1,5 @@
 import { ApplicationVersions } from '@/features/application';
+import AppInviteMember from '@/features/application/AppInviteMember';
 import EditApplication from '@/features/application/EditApplication.tsx';
 import { AddResourceDrawer } from '@/features/resources';
 import { CreateCopyVersionDrawer } from '@/features/version/CreateCopyVersionDrawer';
@@ -97,6 +98,7 @@ export default function Root() {
 			<EditMiddlewareDrawer />
 			<CreateCopyVersionDrawer />
 			<AddResourceDrawer />
+			<AppInviteMember />
 		</>
 	);
 }
