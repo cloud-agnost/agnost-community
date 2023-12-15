@@ -138,7 +138,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 				token,
 				name: data.name,
 				password: data.password,
-				inviteType: 'app',
+				inviteType: searchParams.get('type'),
 			});
 		}
 	}
@@ -152,13 +152,12 @@ export default function CompleteAccountSetupVerifyEmail() {
 	}, [error]);
 
 	useEffect(() => {
-		acceptInvitation(token);
+		if (token) acceptInvitation(token);
 	}, []);
+	console.log('data', data);
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
-				<Description title={t('login.complete_account_setup')} />
-
 				{(error || isVerified) && (
 					<Alert className='!max-w-full' variant={isVerified && !error ? 'success' : 'error'}>
 						<AlertTitle>
@@ -169,8 +168,8 @@ export default function CompleteAccountSetupVerifyEmail() {
 						</AlertDescription>
 					</Alert>
 				)}
-
-				{data && data.user?.status !== 'Active' && (
+				{!(error || isVerified) && <Description title={t('login.complete_account_setup')} />}
+				{(!token || (data && data.user?.status !== 'Active')) && (
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
 							{!isVerified && (
