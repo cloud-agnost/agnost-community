@@ -29,10 +29,31 @@ export const userStatus = ["Active", "Pending", "Deleted"];
 // Resource Manager - Can access organization data and view apps that they are a member of.  Can manage organization resources but cannot manage organization members or organization settings.
 // Viewer - Can access organization data and view apps that they are a member of.  Cannot manage organization resources, organization members and organization settings.
 export const orgRoles = ["Admin", "Member", "Resource Manager", "Viewer"];
-
+export const orgRoleDesc = {
+	Admin: t(
+		"Full control over the organization and its resources. Can manage organization team and resources (e.g., create or add new database) and can create new apps."
+	),
+	Member: t(
+		"Can view organization resource and members but cannot update them and cannot create new apps."
+	),
+	"Resource Manager": t(
+		"Can view organization resources and members and can only manage organization resources (e.g., create or add new database)."
+	),
+	Viewer: t(
+		"Can view organization resources and members but cannot update them."
+	),
+};
 // Application team member roles
 export const appRoles = ["Admin", "Developer", "Viewer"];
-
+export const appRoleDesc = {
+	Admin: t(
+		"Full control over the app, its design elements and team members. Can manage all app versions even the ones marked as private and even edit the ones marked as read-only."
+	),
+	Developer: t(
+		"Has read-write access over the design elements of his app version. Can view versions marked as public by other team membes but cannot manage app team."
+	),
+	Viewer: t("Read-only access to public app versions and app properties."),
+};
 // Invitation statuses
 export const invitationStatus = ["Pending", "Accepted", "Rejected"];
 

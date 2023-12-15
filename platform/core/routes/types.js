@@ -2,7 +2,9 @@ import express from "express";
 import { authSession } from "../middlewares/authSession.js";
 import {
 	orgRoles,
+	orgRoleDesc,
 	appRoles,
+	appRoleDesc,
 	fieldTypes,
 	databaseTypes,
 	resourceTypes,
@@ -25,7 +27,9 @@ const router = express.Router({ mergeParams: true });
 router.get("/all", authSession, (req, res) => {
 	res.json({
 		orgRoles,
+		orgRoleDesc,
 		appRoles,
+		appRoleDesc,
 		fieldTypes,
 		databaseTypes,
 		resourceTypes,
