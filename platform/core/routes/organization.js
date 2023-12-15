@@ -10,6 +10,7 @@ import resourceCtrl from "../controllers/resource.js";
 import envCtrl from "../controllers/environment.js";
 import auditCtrl from "../controllers/audit.js";
 import deployCtrl from "../controllers/deployment.js";
+import clsCtrl from "../controllers/cluster.js";
 import { applyRules } from "../schemas/organization.js";
 import { applyRules as invitationApplyRules } from "../schemas/orgInvitation.js";
 import { applyRules as memberApplyRules } from "../schemas/organizationMember.js";
@@ -63,11 +64,9 @@ router.get("/", authSession, async (req, res) => {
 					.map((entry) => {
 						return { ...entry, role: "Admin" };
 					})
-					.sort((a, b) => {
-						if (a.name < b.name) return -1;
-						if (a.name > b.name) return 1;
-						return 0;
-					})
+					.sort((a, b) =>
+						a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+					)
 			);
 		} else {
 			orgs = await orgMemberCtrl.getManyByQuery(
@@ -79,11 +78,9 @@ router.get("/", authSession, async (req, res) => {
 					.map((entry) => {
 						return { ...entry.orgId, role: entry.role };
 					})
-					.sort((a, b) => {
-						if (a.name < b.name) return -1;
-						if (a.name > b.name) return 1;
-						return 0;
-					})
+					.sort((a, b) =>
+						a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+					)
 			);
 		}
 	} catch (error) {
@@ -459,6 +456,23 @@ router.post(
 		try {
 			const { user, org } = req;
 			const { uiBaseURL } = req.query;
+
+			// Get cluster configuration
+			let cluster = await clsCtrl.getOneByQuery({
+				clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+			});
+
+			const canSendEmail = cluster?.smtp ?? false;
+			if (!canSendEmail) {
+				return res.status(404).json({
+					error: t("Not Allowed"),
+					details: t(
+						"You have not defined the SMTP server to send invitation emails in your cluster settings. An SMTP server needs to be defined to send invitation emails."
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
+
 			// Prepare the invitations array to store in the database
 			let invitations = [];
 			req.body.forEach((entry) => {
@@ -654,6 +668,22 @@ router.post(
 		try {
 			const { token, uiBaseURL } = req.query;
 			const { user, org } = req;
+
+			// Get cluster configuration
+			let cluster = await clsCtrl.getOneByQuery({
+				clusterAccesssToken: process.env.CLUSTER_ACCESS_TOKEN,
+			});
+
+			const canSendEmail = cluster?.smtp ?? false;
+			if (!canSendEmail) {
+				return res.status(404).json({
+					error: t("Not Allowed"),
+					details: t(
+						"You have not defined the SMTP server to send invitation emails in your cluster settings. An SMTP server needs to be defined to send invitation emails."
+					),
+					code: ERROR_CODES.notAllowed,
+				});
+			}
 
 			let invite = await orgInvitationCtrl.getOneByQuery({ token });
 			if (!invite) {
@@ -853,7 +883,7 @@ router.get(
 			let sort = {};
 			if (sortBy && sortDir) {
 				sort[sortBy] = sortDir;
-			} else sort = { createdAt: "desc" };
+			} else sort = { createdAt: "asc" };
 
 			let invites = await orgInvitationCtrl.getManyByQuery(query, {
 				sort,

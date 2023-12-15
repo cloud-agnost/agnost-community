@@ -851,7 +851,9 @@ router.post(
 				await userCtrl.endSession(session);
 				return res.status(422).json({
 					error: t("Not Allowed"),
-					details: t("Invitations only in 'pending' status can be accepted."),
+					details: t(
+						"Invitations only in 'pending' status can be accepted. It seems you have already accepted this invitation."
+					),
 					code: ERROR_CODES.notAllowed,
 				});
 			}
@@ -876,7 +878,7 @@ router.post(
 					return res.status(422).json({
 						error: t("Already Member"),
 						details: t(
-							"You are already a member of the organization '%s'.",
+							"You are already a member of the organization '%s' team.",
 							invite.orgId.name
 						),
 						code: ERROR_CODES.notAllowed,
@@ -984,7 +986,9 @@ router.post(
 				await userCtrl.endSession(session);
 				return res.status(422).json({
 					error: t("Not Allowed"),
-					details: t("Invitations only in 'pending' status can be accepted."),
+					details: t(
+						"Invitations only in 'pending' status can be accepted. It seems you have already accepted this invitation."
+					),
 					code: ERROR_CODES.notAllowed,
 				});
 			}
@@ -1005,7 +1009,7 @@ router.post(
 					return res.status(422).json({
 						error: t("Already Member"),
 						details: t(
-							"You are already a member of the app '%s'.",
+							"You are already a member of the app '%s' team.",
 							invite.appId.name
 						),
 						code: ERROR_CODES.notAllowed,

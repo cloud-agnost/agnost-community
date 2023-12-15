@@ -13,7 +13,7 @@
   ],
   "session": {
     "validationCodeExpiry": 600,
-    "accessTokenExpiry": 150,
+    "accessTokenExpiry": 300,
     "refreshTokenExpiry": 31536000
   },
   "storage": {
