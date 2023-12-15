@@ -6,7 +6,6 @@ import {
 	ApplicationFilter,
 	CreateApplicationButton,
 } from '@/features/application';
-import AppInviteMember from '@/features/application/AppInviteMember';
 import ApplicationTable from '@/features/application/ApplicationTable/ApplicationTable';
 import { useSearch, useToast } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore.ts';
@@ -115,7 +114,6 @@ export default function OrganizationApps() {
 				</EmptyState>
 			)}
 
-			<AppInviteMember />
 			<ConfirmationModal
 				loading={deleteLoading}
 				error={deleteError}
