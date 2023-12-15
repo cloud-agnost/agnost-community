@@ -143,8 +143,7 @@ export default function AddOrEditAPIKeyDrawer({
 	const { mutateAsync, isPending } = useMutation({
 		mutationFn: editMode ? editAPIKey : createAPIKey,
 		onSuccess: () => {
-			onOpenChange(false);
-			form.reset();
+			handleOnOpenChange(false);
 		},
 	});
 	async function onSubmit(data: z.infer<typeof Schema>) {
@@ -186,8 +185,6 @@ export default function AddOrEditAPIKeyDrawer({
 		}
 
 		await mutateAsync(dataToAPI);
-		onOpenChange(false);
-		form.reset();
 	}
 
 	function bindOnSubmit(event: FormEvent<HTMLFormElement>) {
@@ -207,6 +204,7 @@ export default function AddOrEditAPIKeyDrawer({
 
 	function handleOnOpenChange(status: boolean) {
 		onOpenChange(status);
+		form.reset();
 		if (!status) {
 			setSelectedAPIKey({} as APIKey);
 		}
