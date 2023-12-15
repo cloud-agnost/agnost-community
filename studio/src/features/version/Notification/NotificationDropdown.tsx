@@ -68,9 +68,11 @@ export default function NotificationDropdown() {
 					))}
 				</div>
 				<footer className='flex items-center justify-between px-4 py-1'>
-					<Link to='/profile/settings/notifications'>
-						<GearSix size={20} className=' text-icon-secondary' />
-					</Link>
+					<div className='p-2 hover:bg-button-border-hover rounded-full'>
+						<Link to={`/organization/${orgId}/profile/notifications`}>
+							<GearSix size={20} className=' text-icon-secondary' />
+						</Link>
+					</div>
 					<Button variant='link' onClick={seeAllNotifications}>
 						{t('version.view_all_notifications')}
 					</Button>
@@ -94,7 +96,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
 				/>
 			</Avatar>
 			<div className='space-y-3 flex-1'>
-				<div className='space-x-2 break-all'>
+				<div className='space-x-2'>
 					<span className='text-default font-sfCompact'>{notification.actor.name}</span>
 					<Description description={notification.description} />
 				</div>
@@ -136,5 +138,5 @@ function Description({ description }: { description: string }) {
 		elements.push(<span className='text-subtle font-sfCompact text-sm'>{textAfter}</span>);
 	}
 
-	return <div className='inline'>{elements}</div>;
+	return <div className='inline break-words'>{elements}</div>;
 }

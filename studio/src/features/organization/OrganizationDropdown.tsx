@@ -68,9 +68,9 @@ export function OrganizationDropdown() {
 	}
 
 	function onSelect(org: Organization) {
-		selectOrganization(org);
 		getAppsByOrgId(org._id);
 		navigate(`/organization/${org?._id}`);
+		selectOrganization(org);
 		setOpen(false);
 	}
 

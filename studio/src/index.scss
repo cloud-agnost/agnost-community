@@ -615,3 +615,7 @@ html .light ::-webkit-scrollbar-track {
 .monaco-editor .parameter-hints-widget {
 	transform: translate(1.25rem, 50%) !important;
 }
+
+.navigator .table-body tr:last-child td {
+	@apply border-b;
+}

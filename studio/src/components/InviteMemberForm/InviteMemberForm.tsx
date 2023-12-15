@@ -65,8 +65,9 @@ export default function InviteMemberForm({
 	disabled,
 	loading,
 }: InviteMemberFormProps) {
-	const { appRoles, orgRoles } = useTypeStore();
+	const { appRoles, orgRoles, appRoleDesc, orgRoleDesc } = useTypeStore();
 	const roles = type === 'app' ? appRoles : orgRoles;
+	const desc = type === 'app' ? appRoleDesc : orgRoleDesc;
 	const form = useFormContext<z.infer<typeof InviteMemberSchema>>();
 	const { t } = useTranslation();
 	const { fields, append, remove } = useFieldArray({
@@ -112,15 +113,20 @@ export default function InviteMemberForm({
 									<Select onValueChange={field.onChange}>
 										<FormControl>
 											<SelectTrigger className='w-[180px]'>
-												<SelectValue placeholder='Select a role' />
+												<SelectValue placeholder='Select a role'>{field.value}</SelectValue>
 											</SelectTrigger>
 										</FormControl>
-										<SelectContent>
-											{roles.map((role) => (
-												<SelectItem key={role} value={role}>
-													{role}
-												</SelectItem>
-											))}
+										<SelectContent className='w-[400px]'>
+											<div className='space-y-2'>
+												{roles.map((role) => (
+													<SelectItem key={role} value={role} className=''>
+														{role}
+														<p className='text-xs text-subtle whitespace-break-spaces'>
+															{desc[role]}
+														</p>
+													</SelectItem>
+												))}
+											</div>
 										</SelectContent>
 									</Select>
 

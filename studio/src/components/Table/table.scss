@@ -9,6 +9,9 @@
 	&-footer {
 		@apply bg-subtle font-medium text-subtle;
 	}
+	&-body {
+		@apply [&_tr:last-child]:border-none;
+	}
 	&-row {
 		@apply border-b transition-colors data-[state=selected]:bg-surface-blue  #{!important};
 		&[data-state='selected'] > * {

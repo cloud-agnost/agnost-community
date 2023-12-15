@@ -26,6 +26,7 @@ const buttonVariants = cva('btn', {
 			sm: 'btn-sm',
 			lg: 'btn-lg',
 			xl: 'btn-xl',
+			'2xl': 'btn-2xl',
 			full: 'btn-full',
 		},
 		loading: {

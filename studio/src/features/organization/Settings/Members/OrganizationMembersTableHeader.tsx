@@ -23,7 +23,7 @@ import { useMemo } from 'react';
 export default function OrganizationMembersTableHeader({ table }: { table: Table<any> }) {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-	const canMultipleDelete = useAuthorizeOrg('team.delete');
+	const canMultipleDelete = useAuthorizeOrg('member.delete');
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { deleteMultipleInvitations, removeMultipleMembersFromOrganization } =
 		useOrganizationStore();
