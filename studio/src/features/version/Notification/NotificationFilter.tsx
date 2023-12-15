@@ -207,11 +207,9 @@ export default function NotificationFilter() {
 					key={date[0].startDate?.toISOString()}
 					date={date}
 					onChange={(date) => {
-						setSearchParams({
-							...searchParams,
-							start: date[0].startDate?.toISOString(),
-							end: date[0].endDate?.toISOString(),
-						});
+						searchParams.set('start', date[0].startDate?.toISOString() as string);
+						searchParams.set('end', date[0].endDate?.toISOString() as string);
+						setSearchParams(searchParams);
 					}}
 				/>
 			</div>
