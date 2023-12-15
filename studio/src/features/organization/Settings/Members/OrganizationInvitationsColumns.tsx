@@ -97,7 +97,7 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 				<>
 					<RoleSelect
 						role={role}
-						type={'app'}
+						type='org'
 						onSelect={(val) => {
 							useOrganizationStore.getState?.().updateInvitationUserRole({
 								token,
