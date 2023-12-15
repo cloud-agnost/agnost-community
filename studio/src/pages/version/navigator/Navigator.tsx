@@ -124,8 +124,13 @@ export default function Navigator() {
 			className='!overflow-hidden'
 			breadCrumb={<BreadCrumb goBackLink={`${dbUrl}/models`} items={breadcrumbItems} />}
 			handlerButton={
-				<Button variant='secondary' onClick={() => refetch()} iconOnly loading={isRefetching}>
-					{!isRefetching && <Refresh className='mr-2' />}
+				<Button
+					variant='secondary'
+					onClick={() => refetch()}
+					iconOnly
+					loading={isRefetching && !isFetching}
+				>
+					{!isRefetching && <Refresh className='mr-2 w-5 h-5' />}
 					{t('general.refresh')}
 				</Button>
 			}
@@ -148,7 +153,7 @@ export default function Navigator() {
 						>
 							<DataTable<any>
 								table={table}
-								className='table-fixed w-full h-full relative'
+								className='navigator table-fixed w-full h-full relative'
 								headerClassName='sticky top-0 z-50'
 								containerClassName='!border-none h-full'
 								onCellClick={(cell) => {
