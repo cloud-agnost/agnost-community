@@ -24,7 +24,7 @@ export default function NewTabDropdown() {
 			...item,
 			path: getVersionDashboardPath(item.path),
 		};
-
+		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 		addTab(versionId, tab);
 	}
 
@@ -46,6 +46,7 @@ export default function NewTabDropdown() {
 			type: capitalize(item.type) as TabTypes,
 		};
 		addTab(versionId, tab);
+		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	}
 
 	function onInput(keyword: string) {
