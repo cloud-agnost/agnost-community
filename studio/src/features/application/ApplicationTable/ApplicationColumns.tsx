@@ -22,7 +22,7 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 		),
 		size: 900,
 		accessorKey: 'name',
-
+		sortingFn: 'text',
 		cell: ({ row }) => {
 			const { pictureUrl, name, color } = row.original;
 			return (
@@ -54,6 +54,7 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 			/>
 		),
 		accessorKey: 'role',
+		sortingFn: 'text',
 		cell: ({ row }) => {
 			const { team } = row.original;
 			const role = team.find((member) => member._id !== useAuthStore.getState().user?._id)
@@ -72,6 +73,7 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 			/>
 		),
 		accessorKey: 'createdAt',
+		sortingFn: 'datetime',
 		cell: ({ row }) => {
 			const { createdAt } = row.original;
 			return (
