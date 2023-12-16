@@ -24,8 +24,7 @@ export default function OrganizationSettingsMembers() {
 	const { canClusterSendEmail } = useClusterStore();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const canInvite = useAuthorizeOrg('invite.create');
-	const { inviteUsersToOrganization, getOrganizationMembers, organization } =
-		useOrganizationStore();
+	const { inviteUsersToOrganization, organization } = useOrganizationStore();
 	const form = useForm<z.infer<typeof InviteMemberSchema>>({
 		resolver: zodResolver(InviteMemberSchema),
 	});

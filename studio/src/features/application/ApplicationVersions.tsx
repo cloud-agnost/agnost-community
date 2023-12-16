@@ -20,7 +20,7 @@ export default function ApplicationVersions() {
 	const { t } = useTranslation();
 	const { isVersionOpen, application, closeVersionDrawer, applications, selectApplication } =
 		useApplicationStore();
-	const { getAllVersionsVisibleToUser, versions, selectVersion } = useVersionStore();
+	const { getAllVersionsVisibleToUser, versions } = useVersionStore();
 	const [page, setPage] = useState(0);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const match = useMatch('/organization/:orgId/apps');

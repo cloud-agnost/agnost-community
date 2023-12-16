@@ -1,7 +1,6 @@
 import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Application } from '@/types';
-import { resetAfterVersionChange } from '@/utils';
 import { useParams } from 'react-router-dom';
 
 export default function useSelectApplication() {

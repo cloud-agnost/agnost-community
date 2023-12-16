@@ -5,7 +5,6 @@ import { SortButton } from '@/components/DataTable';
 import { Refresh } from '@/components/icons';
 import { BADGE_COLOR_MAP } from '@/constants';
 import { ApplicationSettings, ApplicationTeam } from '@/features/application';
-import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import { AppRoles, Application, ColumnDefWithClassName } from '@/types';
 import { getRelativeTime, handleSelectApp, translate } from '@/utils';
