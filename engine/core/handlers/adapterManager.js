@@ -576,7 +576,9 @@ export class AdapterManager {
 			};
 
 			this.adapters.set(designiid, adapterObj);
-		} catch (err) {}
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
 	/**

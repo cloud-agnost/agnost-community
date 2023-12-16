@@ -576,6 +576,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 				resource.isDecrypted = true;
 				resource.access = helper.decryptSensitiveData(resource.access);
 			}
+
 			// Assign the database pool size value to the resource config
 			if (resource.config)
 				resource.config.poolSize =
@@ -586,8 +587,10 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 				};
 			}
 
-			// Add the database name info to the access settings
-			resource.access.dbName = this.getAppliedDbName(db);
+			// Add the database name info to the access settings, for MongoDB databases created within the cluster, we will not pass the databse name as parameter
+			if (db.type !== "MongoDB")
+				resource.access.dbName = this.getAppliedDbName(db);
+
 			// We will use the design iid when registering databse connections in adapter manager not the resource.iid
 			resource.designiid = db.iid;
 
