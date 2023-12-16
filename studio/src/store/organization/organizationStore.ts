@@ -118,7 +118,7 @@ const useOrganizationStore = create<OrganizationStore & Actions>()(
 					leaveChannel(oldOrganization._id);
 					resetAfterOrgChange();
 				}
-				set({ organization });
+				set({ organization, members: [], invitations: [], lastFetchedInvitationsPage: 0 });
 				joinChannel(organization._id);
 			},
 			leaveOrganization: async ({
