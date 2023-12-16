@@ -48,10 +48,6 @@ function onResend(token: string) {
 	});
 }
 
-function canDelete() {
-	return getOrgPermission('invite.delete');
-}
-
 export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 	{
 		id: 'select',
@@ -93,10 +89,12 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 		size: 200,
 		cell: ({ row }) => {
 			const { token, role } = row.original;
+			const canUpdate = getOrgPermission('invite.update');
 			return (
 				<>
 					<RoleSelect
 						role={role}
+						disabled={!canUpdate}
 						type='org'
 						onSelect={(val) => {
 							useOrganizationStore.getState?.().updateInvitationUserRole({
@@ -114,14 +112,16 @@ export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 		size: 45,
 		cell: ({ row }) => {
 			const { token } = row.original;
+			const canDelete = getOrgPermission('invite.delete');
+			const canResend = getOrgPermission('invite.resend');
 			return (
 				<div className='flex items-center justify-end'>
-					<ResendButton onResend={() => onResend(token)} />
+					<ResendButton onResend={() => onResend(token)} disabled={!canResend} />
 					<TableConfirmation
 						title={translate('organization.settings.members.invite.delete')}
 						description={translate('organization.settings.members.invite.deleteDesc')}
 						onConfirm={() => onDelete(token)}
-						hasPermission={canDelete()}
+						hasPermission={canDelete}
 					/>
 				</div>
 			);

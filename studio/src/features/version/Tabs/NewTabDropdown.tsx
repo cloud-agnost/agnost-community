@@ -73,7 +73,7 @@ export default function NewTabDropdown() {
 					<Plus size={15} />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className='tab-dropdown-content'>
+			<PopoverContent className='tab-dropdown-content bg-wrapper-background-base'>
 				<div className='p-2'>
 					<SearchInput
 						className='tab-search-input'
@@ -90,7 +90,7 @@ export default function NewTabDropdown() {
 								key={item._id}
 								onClick={() => handleClickElement(item)}
 								variant='text'
-								className='flex items-center justify-start gap-4 relative p-2 w-full text-left font-normal'
+								className='flex items-center justify-start gap-4 relative p-3 w-full text-left font-normal'
 							>
 								<div className=' bg-lighter p-2 rounded-lg'>
 									{getIcon(capitalize(item.type) as TabTypes)}
@@ -110,7 +110,7 @@ export default function NewTabDropdown() {
 							<Button
 								onClick={() => handleAddTab(item)}
 								key={item.path}
-								className='flex items-center justify-start gap-4 relative p-2 w-full text-left font-normal'
+								className='flex items-center justify-start gap-4 relative p-3 w-full text-left font-normal'
 								variant='text'
 							>
 								{getIcon(capitalize(item.type) as TabTypes)}

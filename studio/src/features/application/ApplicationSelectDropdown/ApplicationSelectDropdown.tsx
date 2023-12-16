@@ -19,19 +19,20 @@ import { MouseEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import './appSelectDropdown.scss';
+import { useSelectApplication } from '@/hooks';
 
 export default function ApplicationSelectDropdown() {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState('');
 	const [openCreateModal, setOpenCreateModal] = useState(false);
-	const { applications, application, openVersionDrawer, openEditAppDrawer, getAppsByOrgId } =
-		useApplicationStore();
+	const { applications, application, openEditAppDrawer, getAppsByOrgId } = useApplicationStore();
+	const handleSelectApp = useSelectApplication();
 	const { orgId } = useParams();
 	function onSelect(app: Application) {
 		setOpen(false);
 		if (app._id === application?._id) return;
-		openVersionDrawer(app);
+		handleSelectApp(app);
 	}
 
 	useEffect(() => {

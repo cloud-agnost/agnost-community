@@ -20,24 +20,20 @@ export default function ApplicationVersions() {
 	const { t } = useTranslation();
 	const { isVersionOpen, application, closeVersionDrawer, applications, selectApplication } =
 		useApplicationStore();
-	const { getAllVersionsVisibleToUser, versions, selectVersion } = useVersionStore();
+	const { getAllVersionsVisibleToUser, versions } = useVersionStore();
 	const [page, setPage] = useState(0);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const match = useMatch('/organization/:orgId/apps');
 	const { orgId, appId } = useParams() as Record<string, string>;
 	const getVersions = useCallback(async () => {
 		if (application?._id) {
-			const versions = await getAllVersionsVisibleToUser({
+			getAllVersionsVisibleToUser({
 				orgId,
 				appId: application?._id as string,
 				page,
 				size: 10,
 				name: searchParams.get('q') || '',
 			});
-
-			if (versions.length === 1) {
-				selectVersion(versions[0]);
-			}
 		}
 	}, [page, searchParams, application?._id]);
 

@@ -24,12 +24,12 @@ export default function useVersionDropdownItems() {
 	const { addTab } = useTabStore();
 
 	useEffect(() => {
-		if (_.isEmpty(versions) && appId && orgId) {
+		if (!_.isEmpty(versions) && appId && orgId) {
 			getAllVersionsVisibleToUser({
 				appId,
 				orgId,
 				page: 0,
-				size: 10,
+				size: 2,
 			});
 		}
 	}, [version]);

@@ -1,22 +1,42 @@
 import { DataTable } from '@/components/DataTable';
+import { TableLoading } from '@/components/Table/Table';
 import {
 	OrganizationMembersColumns,
 	OrganizationMembersTableHeader,
 } from '@/features/organization';
-import { useTable } from '@/hooks';
+import { useTable, useUpdateEffect } from '@/hooks';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { OrganizationMember } from '@/types';
-
+import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 export default function OrganizationMembersTable() {
 	const { members } = useOrganizationStore();
+	const [searchParams] = useSearchParams();
+	const { organization, getOrganizationMembers } = useOrganizationStore();
 	const table = useTable({
 		data: members,
 		columns: OrganizationMembersColumns,
 	});
+	const { refetch, isPending } = useQuery({
+		queryKey: ['organizationMembers'],
+		queryFn: () =>
+			getOrganizationMembers({
+				organizationId: organization?._id as string,
+				search: searchParams.get('q') as string,
+				sortBy: searchParams.get('s') as string,
+				sortDir: searchParams.get('d') as string,
+				roles: searchParams.get('r')?.split(',') as string[],
+			}),
+		refetchOnWindowFocus: false,
+	});
+
+	useUpdateEffect(() => {
+		if (searchParams.get('tab') === 'member') refetch();
+	}, [searchParams, searchParams.get('tab')]);
 	return (
 		<div className='space-y-4'>
 			<OrganizationMembersTableHeader table={table} />
-			<DataTable<OrganizationMember> table={table} />
+			{isPending ? <TableLoading /> : <DataTable<OrganizationMember> table={table} />}
 		</div>
 	);
 }

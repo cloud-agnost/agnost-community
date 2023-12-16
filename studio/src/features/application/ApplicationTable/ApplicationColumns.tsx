@@ -5,10 +5,9 @@ import { SortButton } from '@/components/DataTable';
 import { Refresh } from '@/components/icons';
 import { BADGE_COLOR_MAP } from '@/constants';
 import { ApplicationSettings, ApplicationTeam } from '@/features/application';
-import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import { AppRoles, Application, ColumnDefWithClassName } from '@/types';
-import { getRelativeTime, translate } from '@/utils';
+import { getRelativeTime, handleSelectApp, translate } from '@/utils';
 const user = useAuthStore.getState().user;
 export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 	{
@@ -34,7 +33,7 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 					<Button
 						variant='blank'
 						onClick={() => {
-							useApplicationStore.getState().openVersionDrawer(row.original);
+							handleSelectApp(row.original);
 						}}
 						className='ml-2 link'
 					>
