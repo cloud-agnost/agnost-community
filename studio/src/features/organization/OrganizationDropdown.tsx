@@ -141,8 +141,8 @@ export function OrganizationDropdown() {
 							<CommandItem className='organization-dropdown-leave'>
 								<Button
 									disabled={organization?.ownerUserId === user?._id}
-									variant='blank'
-									className='text-subtle'
+									className='w-full'
+									variant='text'
 									onClick={() => {
 										setOpenModal(true);
 										setOpen(false);
