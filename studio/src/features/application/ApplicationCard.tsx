@@ -9,6 +9,7 @@ import ApplicationTeam from './ApplicationTeam';
 import ApplicationSettings from './ApplicationSettings';
 import './application.scss';
 import { BADGE_COLOR_MAP } from '@/constants';
+import { useSelectApplication } from '@/hooks';
 interface ApplicationCardProps {
 	application: Application;
 }
@@ -16,7 +17,7 @@ interface ApplicationCardProps {
 export default function ApplicationCard({ application }: ApplicationCardProps) {
 	const { user } = useAuthStore();
 	const { t } = useTranslation();
-	const { openVersionDrawer } = useApplicationStore();
+	const handleClickApp = useSelectApplication();
 
 	const role = application.team?.find(({ userId }) => userId._id === user?._id)?.role as string;
 	return (
@@ -25,7 +26,7 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 			onClick={(e) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				//@ts-ignore
-				if (e.target.id === 'open-version' || !e.target.id) openVersionDrawer(application);
+				if (e.target.id === 'open-version' || !e.target.id) handleClickApp(application);
 			}}
 			role='button'
 			tabIndex={0}

@@ -27,17 +27,13 @@ export default function ApplicationVersions() {
 	const { orgId, appId } = useParams() as Record<string, string>;
 	const getVersions = useCallback(async () => {
 		if (application?._id) {
-			const versions = await getAllVersionsVisibleToUser({
+			getAllVersionsVisibleToUser({
 				orgId,
 				appId: application?._id as string,
 				page,
 				size: 10,
 				name: searchParams.get('q') || '',
 			});
-
-			if (versions.length === 1) {
-				selectVersion(versions[0]);
-			}
 		}
 	}, [page, searchParams, application?._id]);
 
