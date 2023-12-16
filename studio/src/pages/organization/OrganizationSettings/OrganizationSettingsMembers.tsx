@@ -1,15 +1,16 @@
+import { EmptyState } from '@/components/EmptyState';
 import { Form } from '@/components/Form';
 import { InviteMemberForm, InviteMemberSchema } from '@/components/InviteMemberForm';
 import { Separator } from '@/components/Separator';
 import { OrganizationInvitationTable, OrganizationMembersTable } from '@/features/organization';
-import { useToast, useUpdateEffect } from '@/hooks';
+import { useToast } from '@/hooks';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout';
 import useClusterStore from '@/store/cluster/clusterStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/Tabs';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -17,7 +18,6 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import '../organization.scss';
-import { EmptyState } from '@/components/EmptyState';
 export default function OrganizationSettingsMembers() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
@@ -37,7 +37,14 @@ export default function OrganizationSettingsMembers() {
 				description: t('general.invitation.success'),
 				type: 'success',
 			});
-			form.reset();
+			form.reset({
+				member: [
+					{
+						email: '',
+						role: '',
+					},
+				],
+			});
 		},
 		onError: (err: APIError) => {
 			err.fields?.forEach((field) => {
@@ -55,24 +62,6 @@ export default function OrganizationSettingsMembers() {
 			uiBaseURL: window.location.origin,
 		});
 	};
-
-	const { refetch } = useQuery({
-		queryKey: ['organizationMembers'],
-		queryFn: () =>
-			getOrganizationMembers({
-				organizationId: organization?._id as string,
-				search: searchParams.get('q') as string,
-				sortBy: searchParams.get('s') as string,
-				sortDir: searchParams.get('d') as string,
-				roles: searchParams.get('r')?.split(',') as string[],
-			}),
-		enabled: searchParams.get('tab') === 'member',
-		refetchOnWindowFocus: false,
-	});
-
-	useUpdateEffect(() => {
-		if (searchParams.get('tab') === 'member') refetch();
-	}, [searchParams, searchParams.get('tab')]);
 
 	useEffect(() => {
 		if (!searchParams.has('tab')) {
