@@ -20,7 +20,7 @@ import {
 } from 'components/Dropdown';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import './AuthUserDropdown.scss';
+
 export default function AuthUserDropdown() {
 	const { user, logout } = useAuthStore();
 	const { orgId } = useParams() as { orgId: string };
