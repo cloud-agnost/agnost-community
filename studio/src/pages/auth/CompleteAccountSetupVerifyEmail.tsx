@@ -22,9 +22,8 @@ import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import * as z from 'zod';
-import { useNavigate } from 'react-router-dom';
 import './auth.scss';
 
 const FormSchema = z.object({
@@ -106,7 +105,11 @@ export default function CompleteAccountSetupVerifyEmail() {
 	});
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-	const { mutate: acceptInvitation, data } = useMutation({
+	const {
+		mutate: acceptInvitation,
+		data,
+		isPending,
+	} = useMutation({
 		mutationFn: searchParams.get('type') === 'org' ? orgAcceptInvite : acceptInvite,
 		onError: (err: APIError) => setError(err),
 	});
@@ -154,14 +157,19 @@ export default function CompleteAccountSetupVerifyEmail() {
 	useEffect(() => {
 		if (token) acceptInvitation(token);
 	}, []);
-	console.log('data', data);
+
 	return (
 		<AuthLayout>
 			<div className='auth-page'>
-				{(error || isVerified) && (
+				{!isPending && (error || isVerified) && (
 					<Alert className='!max-w-full' variant={isVerified && !error ? 'success' : 'error'}>
 						<AlertTitle>
-							{isVerified && !error ? t('login.you_have_been_added') : error?.error}
+							{isVerified && !error
+								? t('login.you_have_been_added', {
+										name: data?.org.name ?? data?.app.name,
+										role: data?.role,
+								  })
+								: error?.error}
 						</AlertTitle>
 						<AlertDescription>
 							{isVerified && !error ? successText : error?.details}
@@ -237,6 +245,17 @@ export default function CompleteAccountSetupVerifyEmail() {
 							</div>
 						</form>
 					</Form>
+				)}
+
+				{((data && data.user?.status === 'Active') || isAuthenticated()) && (
+					<div className='flex justify-end'>
+						<Button
+							size='lg'
+							onClick={() => navigate(isAuthenticated() ? '/organization' : '/login')}
+						>
+							{isAuthenticated() ? t('organization.select') : t('login.back_to_login')}
+						</Button>
+					</div>
 				)}
 			</div>
 		</AuthLayout>
