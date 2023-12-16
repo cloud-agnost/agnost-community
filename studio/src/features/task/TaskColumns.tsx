@@ -12,14 +12,25 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { Calendar } from 'components/icons';
 import { TabLink } from '../version/Tabs';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 
 const queryClient = new QueryClient();
 const { openEditTaskModal, deleteTask } = useTaskStore.getState();
+const { getEnvironmentResources } = useEnvironmentStore.getState();
 function deleteHandler(task: Task) {
+	const environment = useEnvironmentStore.getState().environment;
 	queryClient
 		.getMutationCache()
 		.build(queryClient, {
 			mutationFn: deleteTask,
+			onSuccess: () => {
+				getEnvironmentResources({
+					orgId: environment?.orgId,
+					appId: environment?.appId,
+					envId: environment?._id,
+					versionId: environment?.versionId,
+				});
+			},
 			onError: (error: APIError) => {
 				notify({
 					title: error.error,

@@ -12,6 +12,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import * as z from 'zod';
 import TaskForm from './TaskForm';
 import { useMutation } from '@tanstack/react-query';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 interface CreateTaskProps {
 	open: boolean;
 	onClose: () => void;
@@ -36,13 +37,16 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 		orgId: string;
 	}>();
 	const { getResources } = useResourceStore();
+	const { getEnvironmentResources, environment } = useEnvironmentStore();
 
 	useEffect(() => {
-		getResources({
-			orgId: orgId as string,
-			type: 'scheduler',
-		});
-	}, []);
+		if (open) {
+			getResources({
+				orgId: orgId as string,
+				type: 'scheduler',
+			});
+		}
+	}, [open]);
 
 	const { mutateAsync: createTaskMutate, isPending } = useMutation({
 		mutationFn: createTask,
@@ -53,6 +57,12 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 				isActive: true,
 				isDashboard: false,
 				type: TabTypes.Task,
+			});
+			getEnvironmentResources({
+				orgId: environment?.orgId,
+				appId: environment?.appId,
+				envId: environment?._id,
+				versionId: environment?.versionId,
 			});
 			handleClose();
 		},

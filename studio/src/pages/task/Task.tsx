@@ -5,6 +5,7 @@ import { CreateTask, TaskColumns } from '@/features/task';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useTaskStore from '@/store/task/taskStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -24,6 +25,7 @@ export default function MainTask() {
 	const { addTab } = useTabStore();
 	const { getVersionDashboardPath } = useVersionStore();
 	const { tasks, getTasks, lastFetchedPage, deleteMultipleTasks } = useTaskStore();
+	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { versionId, orgId, appId } = useParams();
 
 	const { hasNextPage, fetchNextPage, isFetching, isFetchingNextPage } = useInfiniteScroll({
@@ -42,6 +44,12 @@ export default function MainTask() {
 		mutationFn: deleteMultipleTasks,
 		onSuccess: () => {
 			table?.resetRowSelection();
+			getEnvironmentResources({
+				orgId: environment?.orgId,
+				appId: environment?.appId,
+				envId: environment?._id,
+				versionId: environment?.versionId,
+			});
 		},
 		onError: ({ error, details }: APIError) => {
 			notify({ type: 'error', description: details, title: error });
