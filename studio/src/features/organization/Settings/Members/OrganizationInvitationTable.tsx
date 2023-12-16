@@ -22,7 +22,7 @@ export default function OrganizationInvitationTable() {
 		columns: OrganizationInvitationsColumns,
 	});
 
-	const { fetchNextPage, isFetchingNextPage, hasNextPage, refetch } = useInfiniteQuery({
+	const { fetchNextPage, isFetchingNextPage, hasNextPage, refetch, isFetching } = useInfiniteQuery({
 		queryFn: ({ pageParam }) =>
 			getOrganizationInvitations({
 				page: pageParam,
@@ -49,15 +49,19 @@ export default function OrganizationInvitationTable() {
 	return (
 		<div className='space-y-4'>
 			<OrganizationMembersTableHeader table={table} />
-			<InfiniteScroll
-				scrollableTarget='settings-scroll'
-				next={fetchNextPage}
-				hasMore={hasNextPage}
-				dataLength={invitations.length}
-				loader={isFetchingNextPage && <TableLoading />}
-			>
-				<DataTable<Invitation> table={table} />
-			</InfiniteScroll>
+			{isFetching ? (
+				<TableLoading />
+			) : (
+				<InfiniteScroll
+					scrollableTarget='settings-scroll'
+					next={fetchNextPage}
+					hasMore={hasNextPage}
+					dataLength={invitations.length}
+					loader={isFetchingNextPage && <TableLoading />}
+				>
+					<DataTable<Invitation> table={table} />
+				</InfiniteScroll>
+			)}
 		</div>
 	);
 }
