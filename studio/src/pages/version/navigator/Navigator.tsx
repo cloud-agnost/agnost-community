@@ -124,12 +124,7 @@ export default function Navigator() {
 			className='!overflow-hidden'
 			breadCrumb={<BreadCrumb goBackLink={`${dbUrl}/models`} items={breadcrumbItems} />}
 			handlerButton={
-				<Button
-					variant='secondary'
-					onClick={() => refetch()}
-					iconOnly
-					loading={isRefetching && !isFetching}
-				>
+				<Button variant='secondary' onClick={() => refetch()} iconOnly loading={isRefetching}>
 					{!isRefetching && <Refresh className='mr-2 w-5 h-5' />}
 					{t('general.refresh')}
 				</Button>
