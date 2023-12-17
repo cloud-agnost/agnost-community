@@ -94,17 +94,13 @@ export class RabbitMQ extends QueueBase {
 			if (!this.publishChannel) {
 				this.publishChannel = await this.driver.createChannel();
 				this.publishChannel.on("error", async (err) => {
-					console.error(
-						"RabbitMQ channel error to process messages:",
-						queue,
-						err
-					);
+					console.error("RabbitMQ channel error:", queue, err);
 
 					await this.closeChannels();
 				});
 
 				this.publishChannel.on("close", async () => {
-					console.error("RabbitMQ channel closed:", queue);
+					console.info("RabbitMQ channel closed:", queue);
 
 					await this.closeChannels();
 				});
@@ -177,6 +173,7 @@ export class RabbitMQ extends QueueBase {
 				);
 			}
 		} catch (error) {
+			console.log("***err", error);
 			logger.error("Cannot create channel to message queue", {
 				details: error,
 			});
@@ -196,18 +193,13 @@ export class RabbitMQ extends QueueBase {
 			if (!this.consumeChannel) {
 				this.consumeChannel = await this.driver.createChannel();
 				this.consumeChannel.on("error", async (err) => {
-					console.error(
-						"RabbitMQ channel error to process messages:",
-						queue,
-						exchange,
-						err
-					);
+					console.error("RabbitMQ channel error:", queue, exchange, err);
 
 					await this.closeChannels();
 				});
 
 				this.consumeChannel.on("close", async () => {
-					console.error("RabbitMQ channel closed:", queue, exchange);
+					console.info("RabbitMQ channel closed:", queue, exchange);
 
 					await this.closeChannels();
 				});
