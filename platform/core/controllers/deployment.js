@@ -238,7 +238,7 @@ class DeploymentController {
 			tasks: await this.getTasks(version._id),
 			storages: await this.getStorages(version._id),
 			functions: await this.getFunctions(version._id),
-			cache: await this.getCaches(version._id),
+			caches: await this.getCaches(version._id),
 		};
 
 		//Make api call to environment worker engine to deploy app version
@@ -293,7 +293,7 @@ class DeploymentController {
 			tasks: await this.getTasks(version._id),
 			storages: await this.getStorages(version._id),
 			functions: await this.getFunctions(version._id),
-			cache: await this.getCaches(version._id),
+			caches: await this.getCaches(version._id),
 		};
 
 		//Make api call to environment worker engine to redeploy app version
