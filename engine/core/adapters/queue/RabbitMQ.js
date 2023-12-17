@@ -29,6 +29,9 @@ export class RabbitMQ extends QueueBase {
 				this.consumeChannel.removeAllListeners("error");
 				await this.consumeChannel.close();
 			}
+		} catch (err) {}
+
+		try {
 			if (this.publishChannel) {
 				this.publishChannel.removeAllListeners("error");
 				await this.publishChannel.close();
@@ -90,8 +93,20 @@ export class RabbitMQ extends QueueBase {
 		try {
 			if (!this.publishChannel) {
 				this.publishChannel = await this.driver.createChannel();
-				this.publishChannel.on("error", (err) => {
-					console.error("RabbitMQ channel error to send messages:", queue, err);
+				this.publishChannel.on("error", async (err) => {
+					console.error(
+						"RabbitMQ channel error to process messages:",
+						queue,
+						err
+					);
+
+					await this.closeChannels();
+				});
+
+				this.publishChannel.on("close", async () => {
+					console.error("RabbitMQ channel closed:", queue);
+
+					await this.closeChannels();
 				});
 			}
 
@@ -180,13 +195,21 @@ export class RabbitMQ extends QueueBase {
 		try {
 			if (!this.consumeChannel) {
 				this.consumeChannel = await this.driver.createChannel();
-				this.consumeChannel.on("error", (err) => {
+				this.consumeChannel.on("error", async (err) => {
 					console.error(
 						"RabbitMQ channel error to process messages:",
 						queue,
 						exchange,
 						err
 					);
+
+					await this.closeChannels();
+				});
+
+				this.consumeChannel.on("close", async () => {
+					console.error("RabbitMQ channel closed:", queue, exchange);
+
+					await this.closeChannels();
 				});
 			}
 
@@ -243,6 +266,8 @@ export class RabbitMQ extends QueueBase {
 			this.consumeChannel.consume(
 				queue,
 				async (messsage) => {
+					// If we receive an empty message then return, we should always have a message object to perform processing
+					if (!messsage) return;
 					//Start timer
 					const start = Date.now();
 					const messageObj = JSON.parse(messsage.content.toString());

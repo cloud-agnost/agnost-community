@@ -23,8 +23,17 @@ export class Agenda extends SchedulerBase {
 	 */
 	async closeChannels() {
 		try {
-			if (this.consumeChannel) await this.consumeChannel.close();
-			if (this.publishChannel) await this.publishChannel.close();
+			if (this.consumeChannel) {
+				this.consumeChannel.removeAllListeners("error");
+				await this.consumeChannel.close();
+			}
+		} catch (err) {}
+
+		try {
+			if (this.publishChannel) {
+				this.publishChannel.removeAllListeners("error");
+				await this.publishChannel.close();
+			}
 		} catch (err) {}
 
 		this.consumeChannel = null;
@@ -49,6 +58,21 @@ export class Agenda extends SchedulerBase {
 		try {
 			if (!this.publishChannel) {
 				this.publishChannel = await this.driver.createChannel();
+				this.publishChannel.on("error", async (err) => {
+					console.error(
+						"RabbitMQ channel error to process messages:",
+						task.name,
+						err
+					);
+
+					await this.closeChannels();
+				});
+
+				this.publishChannel.on("close", async () => {
+					console.error("RabbitMQ channel closed:", task.name);
+
+					await this.closeChannels();
+				});
 			}
 
 			const envId = META.getEnvId();
@@ -114,6 +138,22 @@ export class Agenda extends SchedulerBase {
 		try {
 			if (!this.consumeChannel) {
 				this.consumeChannel = await this.driver.createChannel();
+
+				this.consumeChannel.on("error", async (err) => {
+					console.error(
+						"RabbitMQ channel error to process messages:",
+						queue,
+						err
+					);
+
+					await this.closeChannels();
+				});
+
+				this.consumeChannel.on("close", async () => {
+					console.error("RabbitMQ channel closed:", queue);
+
+					await this.closeChannels();
+				});
 			}
 
 			this.consumeChannel.assertQueue(queue, {
@@ -131,6 +171,8 @@ export class Agenda extends SchedulerBase {
 			this.consumeChannel.consume(
 				queue,
 				async (messsage) => {
+					// If we receive an empty message then return, we should always have a message object to perform processing
+					if (!messsage) return;
 					//Start timer
 					const start = Date.now();
 					const messageObj = JSON.parse(messsage.content.toString());
