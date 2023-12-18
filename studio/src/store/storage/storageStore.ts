@@ -33,7 +33,7 @@ export interface StorageStore {
 	files: BucketFile[];
 	file: BucketFile;
 	fileCountInfo: BucketCountInfo;
-	lastFetchedPage: number;
+	lastFetchedPage: number | undefined;
 	toDeleteStorage: Storage | null;
 	isStorageDeleteDialogOpen: boolean;
 	isEditFileDialogOpen: boolean;
@@ -85,7 +85,7 @@ const initialState: StorageStore = {
 	bucket: {} as Bucket,
 	buckets: [],
 	bucketCountInfo: {} as BucketCountInfo,
-	lastFetchedPage: 0,
+	lastFetchedPage: undefined,
 	toDeleteStorage: null,
 	isStorageDeleteDialogOpen: false,
 	isEditStorageDialogOpen: false,
@@ -133,7 +133,7 @@ const useStorageStore = create<StorageStore & Actions>()(
 		getStorages: async (params: GetStoragesParams) => {
 			const storages = await StorageService.getStorages(params);
 			if (params.page === 0) {
-				set({ storages });
+				set({ storages, lastFetchedPage: params.page });
 			} else {
 				set((prev) => ({
 					storages: [...prev.storages, ...storages],

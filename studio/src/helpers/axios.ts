@@ -1,5 +1,7 @@
 import { ERROR_CODES_TO_REDIRECT_LOGIN_PAGE } from '@/constants';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useTabStore from '@/store/version/tabStore';
+import useVersionStore from '@/store/version/versionStore';
 import { APIError } from '@/types';
 import { history, toDisplayName } from '@/utils';
 import axios from 'axios';
@@ -48,6 +50,15 @@ instance.interceptors.response.use(
 		if (ERROR_CODES_TO_REDIRECT_LOGIN_PAGE.includes(apiError.code)) {
 			resetAllStores();
 			history.navigate?.('/login');
+		}
+
+		if (apiError.code === 'not_found' && error.config.url.includes('version')) {
+			const { getVersionDashboardPath, version } = useVersionStore.getState();
+			const path = getVersionDashboardPath('notFound');
+			useTabStore.getState().updateCurrentTab(version._id, {
+				path,
+			});
+			history.navigate?.(path);
 		}
 
 		return Promise.reject(apiError);

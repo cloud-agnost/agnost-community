@@ -22,7 +22,7 @@ interface EndpointStore {
 	endpoints: Endpoint[];
 	endpoint: Endpoint;
 	selectedEndpointIds: string[];
-	lastFetchedPage: number;
+	lastFetchedPage: number | undefined;
 	isEditEndpointDialogOpen: boolean;
 	logics: Record<string, string>;
 }
@@ -52,7 +52,7 @@ const initialState: EndpointStore = {
 	endpoints: [],
 	endpoint: {} as Endpoint,
 	selectedEndpointIds: [],
-	lastFetchedPage: 0,
+	lastFetchedPage: undefined,
 	isEditEndpointDialogOpen: false,
 	logics: {},
 };
@@ -90,7 +90,7 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 		try {
 			const endpoints = await EndpointService.getEndpoints(params);
 			if (params.page === 0) {
-				set({ endpoints });
+				set({ endpoints, lastFetchedPage: params.page });
 			} else {
 				set((prev) => ({
 					endpoints: [...prev.endpoints, ...endpoints],

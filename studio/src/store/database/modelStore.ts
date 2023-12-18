@@ -34,6 +34,7 @@ interface ModelStore {
 	isEditModelDialogOpen: boolean;
 	isEditFieldDialogOpen: boolean;
 	selectedType: FieldType;
+	isModelsFetched: boolean;
 }
 
 type Actions = {
@@ -73,6 +74,7 @@ const initialState: ModelStore = {
 	isEditModelDialogOpen: false,
 	isEditFieldDialogOpen: false,
 	selectedType: {} as FieldType,
+	isModelsFetched: false,
 };
 
 const useModelStore = create<ModelStore & Actions>()((set, get) => ({
@@ -100,7 +102,7 @@ const useModelStore = create<ModelStore & Actions>()((set, get) => ({
 
 	getModelsOfDatabase: async (params: GetModelsOfDatabaseParams): Promise<Model[]> => {
 		const models = await ModelService.getModelsOfDatabase(params);
-		set({ models, model: models[0] });
+		set({ models, model: models[0], isModelsFetched: true });
 		return models;
 	},
 	getSpecificModelByIidOfDatabase: async (

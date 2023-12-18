@@ -1,4 +1,5 @@
 import {
+	FIELD_MAPPER,
 	ORG_CHANGE_EXCEPTIONS,
 	PARAM_REGEX,
 	PHONE_REGEXES,
@@ -494,8 +495,8 @@ export async function handleSelectApp(app: Application) {
 	const { selectApplication, openVersionDrawer } = useApplicationStore.getState();
 	const { getAllVersionsVisibleToUser, selectVersion } = useVersionStore.getState();
 	const versions = await getAllVersionsVisibleToUser({
-		orgId: app?.orgId as string,
-		appId: app?._id as string,
+		orgId: app?.orgId,
+		appId: app?._id,
 		page: 0,
 		size: 2,
 	});
@@ -509,6 +510,18 @@ export async function handleSelectApp(app: Application) {
 	}
 }
 
-export function sortByField<T>(arr: T[], field: keyof T, direction: 'asc' | 'desc' = 'asc'): T[] {
-	return _.orderBy(arr, [field], [direction]);
+export function sortByField<T extends { updatedBy?: string; updatedAt: string; type: string }>(
+	arr: T[],
+	field: keyof T,
+	direction: 'asc' | 'desc' = 'asc',
+): T[] {
+	return _.orderBy(
+		arr.map((d) => ({
+			...d,
+			updatedAt: d?.updatedBy ? d.updatedAt : undefined,
+			type: FIELD_MAPPER[d?.type] ?? d?.type,
+		})),
+		[field],
+		[direction, 'asc'],
+	);
 }

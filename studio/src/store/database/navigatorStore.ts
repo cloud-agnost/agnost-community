@@ -12,7 +12,7 @@ interface NavigatorStore {
 	data: Record<string, any>[];
 	subModelData: Record<string, any>[];
 	selectedSubModelId: string;
-	lastFetchedPage: number;
+	lastFetchedPage: number | undefined;
 }
 
 type Actions = {
@@ -29,7 +29,7 @@ const initialState: NavigatorStore = {
 	data: [],
 	subModelData: [],
 	selectedSubModelId: '',
-	lastFetchedPage: 0,
+	lastFetchedPage: undefined,
 };
 
 const useNavigatorStore = create<NavigatorStore & Actions>()(
@@ -40,7 +40,7 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 			try {
 				const data = await NavigatorService.getDataFromModel(params);
 				if (params.page === 0) {
-					set({ data });
+					set({ data, lastFetchedPage: params.page });
 				} else {
 					set((prev) => ({
 						data: [...prev.data, ...data],

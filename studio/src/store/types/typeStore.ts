@@ -6,10 +6,11 @@ import {
 	OAuthProviderParams,
 	OAuthProviderTypes,
 	PhoneAuthSMSProviderParams,
-	PhoneAuthSMSProviders,
 	ResourceType,
 	Types,
 } from '@/types';
+import { PhoneAuthSMSProviders } from '@/types/type';
+
 import { devtools, persist } from 'zustand/middleware';
 interface TypesStore {
 	orgRoles: string[];

@@ -7,7 +7,7 @@ interface FunctionStore {
 	functions: funcTypes.HelperFunction[];
 	function: funcTypes.HelperFunction;
 	isEditFunctionDrawerOpen: boolean;
-	lastFetchedPage: number;
+	lastFetchedPage: number | undefined;
 	logics: Record<string, string>;
 }
 type Actions = {
@@ -31,7 +31,7 @@ const initialState: FunctionStore = {
 	functions: [],
 	function: {} as funcTypes.HelperFunction,
 	isEditFunctionDrawerOpen: false,
-	lastFetchedPage: 0,
+	lastFetchedPage: undefined,
 	logics: {},
 };
 
@@ -66,9 +66,9 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 					set((prev) => ({
 						functions: prev.functions.filter((func) => func._id !== params.funcId),
 					}));
-					params.onSuccess && params.onSuccess();
+					params.onSuccess?.();
 				} catch (err) {
-					params.onError && params.onError(err as funcTypes.APIError);
+					params.onError?.(err as funcTypes.APIError);
 					throw err as funcTypes.APIError;
 				}
 			},
@@ -78,9 +78,9 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 					set((prev) => ({
 						functions: prev.functions.filter((func) => !params.functionIds.includes(func._id)),
 					}));
-					params.onSuccess && params.onSuccess();
+					params.onSuccess?.();
 				} catch (err) {
-					params.onError && params.onError(err as funcTypes.APIError);
+					params.onError?.(err as funcTypes.APIError);
 					throw err as funcTypes.APIError;
 				}
 			},
@@ -88,10 +88,10 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				try {
 					const func = await FunctionService.createFunction(params);
 					set((prev) => ({ functions: [func, ...prev.functions] }));
-					params.onSuccess && params.onSuccess(func);
+					params.onSuccess?.(func);
 					return func;
 				} catch (err) {
-					params.onError && params.onError(err as funcTypes.APIError);
+					params.onError?.(err as funcTypes.APIError);
 					throw err as funcTypes.APIError;
 				}
 			},
@@ -101,10 +101,10 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 					set((prev) => ({
 						functions: prev.functions.map((f) => (f._id === func._id ? func : f)),
 					}));
-					params.onSuccess && params.onSuccess();
+					params.onSuccess?.();
 					return func;
 				} catch (err) {
-					params.onError && params.onError(err as funcTypes.APIError);
+					params.onError?.(err as funcTypes.APIError);
 					throw err as funcTypes.APIError;
 				}
 			},
@@ -116,10 +116,10 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 						function: func,
 						editedLogic: func.logic,
 					}));
-					params.onSuccess && params.onSuccess();
+					params.onSuccess?.();
 					return func;
 				} catch (err) {
-					params.onError && params.onError(err as funcTypes.APIError);
+					params.onError?.(err as funcTypes.APIError);
 					throw err as funcTypes.APIError;
 				}
 			},

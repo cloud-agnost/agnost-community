@@ -619,3 +619,6 @@ html .light ::-webkit-scrollbar-track {
 .navigator .table-body tr:last-child td {
 	@apply border-b;
 }
+button:focus-visible {
+	@apply outline-none ring-0;
+}

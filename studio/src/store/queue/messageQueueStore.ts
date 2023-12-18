@@ -19,7 +19,7 @@ import useUtilsStore from '../version/utilsStore';
 interface MessageQueueStore {
 	queues: MessageQueue[];
 	queue: MessageQueue;
-	lastFetchedPage: number;
+	lastFetchedPage: number | undefined;
 	isEditModalOpen: boolean;
 	logics: Record<string, string>;
 }
@@ -43,7 +43,7 @@ type Actions = {
 const initialState: MessageQueueStore = {
 	queues: [],
 	queue: {} as MessageQueue,
-	lastFetchedPage: 0,
+	lastFetchedPage: undefined,
 	isEditModalOpen: false,
 	logics: {},
 };
@@ -60,7 +60,7 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 		getQueues: async (params: GetMessageQueuesParams) => {
 			const queues = await QueueService.getQueues(params);
 			if (params.page === 0) {
-				set({ queues });
+				set({ queues, lastFetchedPage: params.page });
 			} else {
 				set((prev) => ({
 					queues: [...prev.queues, ...queues],

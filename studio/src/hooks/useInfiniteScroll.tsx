@@ -6,7 +6,7 @@ import { BaseParams, BaseGetRequest } from '@/types';
 
 interface UseFetchDataProps<T = any> {
 	queryFn: (params: BaseGetRequest & BaseParams & T) => Promise<any>;
-	lastFetchedPage: number;
+	lastFetchedPage: number | undefined;
 	dataLength: number;
 	queryKey: string;
 	params?: T;
@@ -41,14 +41,14 @@ export default function useInfiniteScroll({
 			}),
 		refetchOnWindowFocus: false,
 		enabled:
-			(lastFetchedPage === 0 && dataLength <= 1) ||
-			Math.ceil(dataLength / MODULE_PAGE_SIZE) < lastFetchedPage,
+			lastFetchedPage === undefined ||
+			Math.ceil(dataLength / MODULE_PAGE_SIZE) < (lastFetchedPage ?? 0),
 		getNextPageParam: (lastPage) => {
-			const nextPage = lastPage?.length === MODULE_PAGE_SIZE ? lastFetchedPage + 1 : undefined;
+			const nextPage =
+				lastPage?.length === MODULE_PAGE_SIZE ? (lastFetchedPage ?? 0) + 1 : undefined;
 			return nextPage;
 		},
 	});
-
 	useUpdateEffect(() => {
 		result.refetch();
 	}, [

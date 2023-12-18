@@ -12,6 +12,7 @@ import { Invitation } from '@/types';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSearchParams } from 'react-router-dom';
+import BeatLoader from 'react-spinners/BeatLoader';
 export default function OrganizationInvitationTable() {
 	const [searchParams] = useSearchParams();
 	const { invitations, lastFetchedInvitationsPage, getOrganizationInvitations } =
@@ -50,7 +51,9 @@ export default function OrganizationInvitationTable() {
 		<div className='space-y-4'>
 			<OrganizationMembersTableHeader table={table} />
 			{isFetching ? (
-				<TableLoading />
+				<div className='flex items-center justify-center h-full w-full'>
+					<BeatLoader color='#6884FD' size={16} margin={12} />
+				</div>
 			) : (
 				<InfiniteScroll
 					scrollableTarget='settings-scroll'

@@ -36,7 +36,7 @@ export default function Buckets() {
 			url: storageUrl,
 		},
 		{
-			name: storage?.name as string,
+			name: storage?.name,
 		},
 	];
 
@@ -48,6 +48,7 @@ export default function Buckets() {
 		queryFn: getBuckets,
 		queryKey: 'getBuckets',
 		dataLength: buckets.length,
+		disableVersionParams: true,
 		lastFetchedPage: bucketCountInfo.currentPage ? bucketCountInfo.currentPage - 1 : 0,
 		params: {
 			storageName: storage?.name,

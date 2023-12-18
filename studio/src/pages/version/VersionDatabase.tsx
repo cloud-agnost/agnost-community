@@ -17,6 +17,7 @@ export default function VersionDatabase() {
 		toDeleteDatabase,
 		isDeleteDatabaseDialogOpen,
 		isEditDatabaseDialogOpen,
+		isDatabaseFetched,
 		closeEditDatabaseDialog,
 		closeDeleteDatabaseDialog,
 		deleteDatabase,
@@ -42,7 +43,7 @@ export default function VersionDatabase() {
 				versionId: versionId as string,
 				appId: appId as string,
 			}),
-		enabled: !databases.length,
+		enabled: !isDatabaseFetched,
 		refetchOnWindowFocus: false,
 	});
 
@@ -51,7 +52,7 @@ export default function VersionDatabase() {
 		columns: DatabaseColumns,
 	});
 	const { getEnvironmentResources, environment } = useEnvironmentStore();
-	const { mutateAsync: deleteDatabaseMutation } = useMutation({
+	const { mutateAsync: deleteDatabaseMutation, isPending: deleteLoading } = useMutation({
 		mutationFn: deleteDatabase,
 		onError: (error: APIError) => {
 			notify({
@@ -121,6 +122,7 @@ export default function VersionDatabase() {
 						isOpen={isDeleteDatabaseDialogOpen}
 						closeModal={closeDeleteDatabaseDialog}
 						closable
+						loading={deleteLoading}
 					/>
 				)}
 			</VersionTabLayout>

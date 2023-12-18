@@ -154,6 +154,13 @@ const VersionError = loadable(
 		resolveComponent: (mod: any) => mod.default,
 	},
 );
+const VersionNotFound = loadable(
+	() => componentLoader(() => import('../pages/version/VersionNotFound')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
 
 const VersionDatabase = loadable(
 	() => componentLoader(() => import('../pages/version/VersionDatabase')),
@@ -597,6 +604,10 @@ const router = createBrowserRouter([
 											{
 												path: 'error',
 												element: <VersionError />,
+											},
+											{
+												path: 'notFound',
+												element: <VersionNotFound />,
 											},
 											{
 												path: 'database',

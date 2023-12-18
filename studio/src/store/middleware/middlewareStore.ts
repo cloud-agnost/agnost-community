@@ -18,7 +18,7 @@ interface MiddlewareStore {
 	middlewares: Middleware[];
 	middleware: Middleware;
 	isEditMiddlewareDrawerOpen: boolean;
-	lastFetchedPage: number;
+	lastFetchedPage: number | undefined;
 	logics: Record<string, string>;
 }
 
@@ -40,7 +40,7 @@ type Actions = {
 const initialState: MiddlewareStore = {
 	middlewares: [],
 	middleware: {} as Middleware,
-	lastFetchedPage: 0,
+	lastFetchedPage: undefined,
 	isEditMiddlewareDrawerOpen: false,
 	logics: {},
 };
@@ -66,7 +66,7 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 			const middlewares = await MiddlewareService.getMiddlewaresOfAppVersion(params);
 
 			if (params.page === 0) {
-				set({ middlewares });
+				set({ middlewares, lastFetchedPage: params.page });
 			} else {
 				set((prev) => ({
 					middlewares: [...prev.middlewares, ...middlewares],
