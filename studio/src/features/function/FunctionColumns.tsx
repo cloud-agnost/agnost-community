@@ -13,7 +13,7 @@ import { TabLink } from '../version/Tabs';
 const { openEditFunctionDrawer, deleteFunction } = useFunctionStore.getState();
 const queryClient = new QueryClient();
 
-function deleteHandler(fn: HelperFunction) {
+async function deleteHandler(fn: HelperFunction) {
 	queryClient
 		.getMutationCache()
 		.build(queryClient, {

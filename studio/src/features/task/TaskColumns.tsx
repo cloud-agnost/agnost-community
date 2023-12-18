@@ -17,7 +17,7 @@ import useEnvironmentStore from '@/store/environment/environmentStore';
 const queryClient = new QueryClient();
 const { openEditTaskModal, deleteTask } = useTaskStore.getState();
 const { getEnvironmentResources } = useEnvironmentStore.getState();
-function deleteHandler(task: Task) {
+async function deleteHandler(task: Task) {
 	const environment = useEnvironmentStore.getState().environment;
 	queryClient
 		.getMutationCache()

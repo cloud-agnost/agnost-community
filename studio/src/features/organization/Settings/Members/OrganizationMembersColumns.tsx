@@ -15,7 +15,7 @@ function updateRole(userId: string, role: string) {
 	});
 }
 
-function deleteHandler(member: OrganizationMember) {
+async function deleteHandler(member: OrganizationMember) {
 	const { removeMemberFromOrganization } = useOrganizationStore.getState();
 	removeMemberFromOrganization({
 		userId: member.member._id,

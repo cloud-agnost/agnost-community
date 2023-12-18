@@ -8,7 +8,7 @@ import { getOrgPermission, notify, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
-function onDelete(token: string) {
+async function onDelete(token: string) {
 	useOrganizationStore.getState().deleteInvitation({
 		token,
 		onSuccess: () => {

@@ -65,7 +65,7 @@ function resendInvitationHandler(token: string, email: string) {
 	});
 }
 
-function deleteInvitationHandler(token: string) {
+async function deleteInvitationHandler(token: string) {
 	const orgId = useOrganizationStore.getState().organization._id;
 	const appId = useApplicationStore.getState().application?._id as string;
 	deleteInvitation({

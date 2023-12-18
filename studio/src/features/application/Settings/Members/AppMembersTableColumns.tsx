@@ -10,7 +10,7 @@ import { getAppPermission, notify, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
-function removeMember(userId: string, appId: string) {
+async function removeMember(userId: string, appId: string) {
 	const orgId = useOrganizationStore.getState().organization._id;
 
 	useApplicationStore.getState?.().removeAppMember({
