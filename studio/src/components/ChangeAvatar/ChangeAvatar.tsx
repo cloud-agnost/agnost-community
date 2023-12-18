@@ -49,6 +49,9 @@ export default function ChangeAvatar({
 
 	async function onClickHandler() {
 		removeAvatar();
+		if (fileInput.current?.value) {
+			fileInput.current.value = '';
+		}
 	}
 	return (
 		<>
