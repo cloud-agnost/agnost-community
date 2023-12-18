@@ -2,7 +2,7 @@ import { Badge } from '@/components/Badge';
 import { Input } from '@/components/Input';
 import { HTTP_METHOD_BADGE_MAP } from '@/constants';
 import TestEndpoint from '@/features/endpoints/TestEndpoint';
-import { useToast } from '@/hooks';
+import { useSaveLogicOnSuccess, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
@@ -27,16 +27,10 @@ export default function EditEndpoint() {
 		orgId: string;
 		endpointId: string;
 	}>();
-
+	const onSuccess = useSaveLogicOnSuccess(t('endpoint.editLogicSuccess'));
 	const { mutateAsync: saveEpMutation, isPending } = useMutation({
 		mutationFn: saveEndpointLogic,
-		onSuccess: () => {
-			notify({
-				title: t('general.success'),
-				description: t('endpoint.editLogicSuccess'),
-				type: 'success',
-			});
-		},
+		onSuccess,
 		onError: ({ error, details }: APIError) => {
 			notify({
 				title: error,
@@ -46,8 +40,8 @@ export default function EditEndpoint() {
 		},
 	});
 
-	function saveLogic(logic: string) {
-		saveEpMutation({
+	async function saveLogic(logic: string) {
+		await saveEpMutation({
 			orgId: orgId,
 			appId: appId,
 			versionId: versionId,
