@@ -86,8 +86,8 @@ export default function Navigator() {
 			refetch();
 		}
 	}, [model, subModel]);
-	const { hasNextPage, fetchNextPage, isFetching, isFetchingNextPage, refetch, isRefetching } =
-		useInfiniteScroll({
+	const { hasNextPage, fetchNextPage, isFetching, isFetchingNextPage, refetch } = useInfiniteScroll(
+		{
 			queryFn: getDataFromModel,
 			queryKey: 'getDataFromModel',
 			lastFetchedPage,
@@ -96,7 +96,8 @@ export default function Navigator() {
 			params: {
 				id: searchParams.get('ref') as string,
 			},
-		});
+		},
+	);
 	const breadcrumbItems: BreadCrumbItem[] = [
 		{
 			name: database.name,
