@@ -1,5 +1,5 @@
 import { ActionsCell } from '@/components/ActionsCell';
-import { FIELD_ICON_MAP } from '@/constants';
+import { FIELD_ICON_MAP, FIELD_MAPPER } from '@/constants';
 import { SubFields } from '@/features/database/models/fields/ListFields/index.ts';
 import useModelStore from '@/store/database/modelStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore';
@@ -12,11 +12,6 @@ import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 
 const { openEditFieldDialog, deleteField } = useModelStore.getState();
-const FIELD_MAPPER: Record<string, string> = {
-	createdat: 'datetime',
-	updatedat: 'datetime',
-	parent: 'reference',
-};
 
 async function deleteHandler(field: Field) {
 	const model = useModelStore.getState().model;
@@ -251,7 +246,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 			const user = useOrganizationStore
 				.getState()
 				.members.find((member) => member.member._id === updatedBy);
-			return <DateText date={updatedAt} user={user} />;
+			return updatedBy && <DateText date={updatedAt} user={user} />;
 		},
 	},
 

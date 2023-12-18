@@ -850,3 +850,9 @@ export const FORBIDDEN_EP_PREFIXES = [
 	'/oauth',
 	'/realtime',
 ];
+
+export const FIELD_MAPPER: Record<string, string> = {
+	createdat: 'datetime',
+	updatedat: 'datetime',
+	parent: 'reference',
+};
