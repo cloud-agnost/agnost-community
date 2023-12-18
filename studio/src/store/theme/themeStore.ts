@@ -2,23 +2,30 @@ import { create } from '@/helpers';
 import { devtools, persist } from 'zustand/middleware';
 
 interface ThemeStore {
-	theme: string;
-	setTheme: (theme: string) => void;
+	theme: Record<string, string>;
+	setTheme: (theme: string, userId: string) => void;
+	getTheme: (userId: string) => string;
 }
 
 const useThemeStore = create<ThemeStore>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				theme: 'dark',
-				setTheme: (theme) => {
-					document.body.classList.remove(get().theme);
+				theme: {},
+				setTheme: (theme, userId) => {
+					document.body.classList.remove(get().theme[userId]);
 					document.body.classList.add(theme);
-					set({ theme });
+					set({
+						theme: {
+							[userId]: theme,
+						},
+					});
 				},
+				getTheme: (userId) => get().theme[userId] ?? 'dark',
 			}),
+
 			{
-				name: 'theme-storage',
+				name: 'theme-store',
 			},
 		),
 	),

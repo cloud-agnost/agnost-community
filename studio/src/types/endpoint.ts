@@ -165,15 +165,18 @@ export interface TestEndpointParams extends BaseRequest {
 	}[];
 }
 
-interface TestResponse extends AxiosResponse {
-	cookies(cookies: any): unknown;
+export interface TestResponse extends AxiosResponse {
+	cookies: any;
 	epId: string;
 	duration?: string;
 	response?: AxiosError['response'];
-	logs?: Log[];
 }
+
 export interface EndpointResponse {
 	[key: string]: TestResponse;
+}
+export interface EndpointLogs {
+	[key: string]: Log[];
 }
 export interface EndpointRequest {
 	[key: string]: TestEndpointParams;

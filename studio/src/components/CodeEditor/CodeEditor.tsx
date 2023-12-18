@@ -1,7 +1,9 @@
 import { useDebounceFn, useEditor } from '@/hooks';
 import { EDITOR_OPTIONS } from '@/hooks/useEditor';
+import useAuthStore from '@/store/auth/authStore';
 import useThemeStore from '@/store/theme/themeStore';
 import useTabStore from '@/store/version/tabStore';
+import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab } from '@/types';
 import { addLibsToEditor, cn, getTabIdFromUrl, isEmpty } from '@/utils';
@@ -30,9 +32,10 @@ export default function CodeEditor({
 	onSave,
 }: CodeEditorProps) {
 	const { updateCurrentTab, getTabById } = useTabStore();
-	const { version, typings } = useVersionStore();
-	const theme = useThemeStore((state) => state.theme);
-
+	const { version } = useVersionStore();
+	const { typings } = useUtilsStore();
+	const { getTheme } = useThemeStore();
+	const userId = useAuthStore((state) => state.user?._id);
 	const setTabState = useDebounceFn((isDirty) => {
 		const tabId = getTabIdFromUrl();
 		const tab = getTabById(version?._id, tabId as string) as Tab;
@@ -60,14 +63,14 @@ export default function CodeEditor({
 
 	useEffect(() => {
 		if (!isEmpty(globalThis.monaco) && defaultLanguage === 'javascript') {
-			addLibsToEditor(typings);
+			addLibsToEditor(typings ?? {});
 		}
 	}, [globalThis.monaco, typings]);
 
 	return (
 		<div className={cn(containerClassName)}>
 			<MonacoEditor
-				theme={theme === 'dark' ? 'nightOwl' : 'slush'}
+				theme={getTheme(userId ?? '') === 'dark' ? 'nightOwl' : 'slush'}
 				beforeMount={onBeforeMount}
 				className={cn('editor', className)}
 				onChange={onCodeEditorChange}

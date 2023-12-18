@@ -33,6 +33,7 @@ import EndpointHeaders from './TestEndpoint/EndpointHeaders';
 import EndpointParams from './TestEndpoint/EndpointParams';
 import EndpointPathVariables from './TestEndpoint/EndpointPathVariables';
 import EndpointResponse from './TestEndpoint/EndpointResponse';
+import useUtilsStore from '@/store/version/utilsStore';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -81,7 +82,8 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { t } = useTranslation();
 	const { notify } = useToast();
 	const { environment } = useEnvironmentStore();
-	const { endpoint, testEndpoint, endpointRequest } = useEndpointStore();
+	const { endpoint, testEndpoint } = useEndpointStore();
+	const { endpointRequest } = useUtilsStore();
 	const resizerRef = useRef<HTMLDivElement>(null);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [debugChannel, setDebugChannel] = useState<string | null>('');
@@ -111,10 +113,6 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 				type: 'error',
 			});
 		},
-		onSettled: () => {
-			leaveChannel(debugChannel as string);
-			setDebugChannel(null);
-		},
 	});
 	async function onSubmit(data: z.infer<typeof TestEndpointSchema>) {
 		const testPath = getEndpointPath(endpoint?.path, data.params.pathVariables ?? []);
@@ -137,7 +135,8 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	}
 
 	function handleClose() {
-		if (debugChannel) leaveChannel(debugChannel);
+		leaveChannel(debugChannel as string);
+		setDebugChannel(null);
 		onClose();
 	}
 	useEffect(() => {
@@ -151,7 +150,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	}, [form.getValues('bodyType')]);
 
 	useEffect(() => {
-		const req = endpointRequest[endpoint?._id];
+		const req = endpointRequest?.[endpoint?._id];
 		if (req) {
 			form.reset({
 				params: {
@@ -187,7 +186,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 				formData: [],
 			});
 		}
-	}, [endpointRequest[endpoint?._id]]);
+	}, [endpointRequest?.[endpoint?._id]]);
 
 	useEffect(() => {
 		if (!searchParams.get('t') && open) {

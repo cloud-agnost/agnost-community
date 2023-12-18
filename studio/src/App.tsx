@@ -16,8 +16,8 @@ function App() {
 	useRealtime();
 
 	const { getAllTypes } = useTypeStore();
-	const { accessToken } = useAuthStore();
-	const { theme } = useThemeStore();
+	const { accessToken, user } = useAuthStore();
+	const { getTheme } = useThemeStore();
 
 	useEffect(() => {
 		if (!_.isEmpty(accessToken)) {
@@ -26,6 +26,7 @@ function App() {
 	}, [accessToken]);
 
 	useEffect(() => {
+		const theme = getTheme(user?._id ?? '');
 		let systemTheme = theme;
 		if (theme === 'system') {
 			systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -33,7 +34,7 @@ function App() {
 		document.body.classList.remove('dark', 'light');
 		document.body.dataset.mode = systemTheme;
 		document.body.classList.add(systemTheme);
-	}, [theme]);
+	}, [getTheme(user?._id ?? '')]);
 
 	return (
 		<QueryClientProvider client={queryClient}>

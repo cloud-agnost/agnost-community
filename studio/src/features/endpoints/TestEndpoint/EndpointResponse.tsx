@@ -11,6 +11,7 @@ import TestEndpointTable from './TestEndpointTable';
 import { CSSProperties } from 'react';
 import { Log } from '@/types';
 import { EmptyState } from '@/components/EmptyState';
+import useUtilsStore from '@/store/version/utilsStore';
 
 interface EndpointResponseProps {
 	className?: string;
@@ -20,9 +21,10 @@ interface EndpointResponseProps {
 
 export default function EndpointResponse(props: EndpointResponseProps) {
 	const { t } = useTranslation();
-	const { endpointResponse, endpoint } = useEndpointStore();
-	const response = endpointResponse[endpoint?._id];
-
+	const { endpoint } = useEndpointStore();
+	const { endpointResponse, endpointLogs } = useUtilsStore();
+	const response = endpointResponse?.[endpoint?._id];
+	const logs = endpointLogs?.[endpoint?._id];
 	function getStatusClass(status: number) {
 		if (status >= 200 && status < 300) return 'text-green-500';
 		if (status >= 300 && status < 400) return 'text-yellow-500';
@@ -102,7 +104,7 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 				</div>
 			</TabsContent>
 			<TabsContent value='console' className='h-full'>
-				<Logs logs={response?.logs as Log[]} />
+				<Logs logs={logs as Log[]} />
 			</TabsContent>
 		</Tabs>
 	);

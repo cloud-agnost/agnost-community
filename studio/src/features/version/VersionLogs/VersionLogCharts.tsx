@@ -8,6 +8,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart';
 import { CustomTooltip } from './VersionLogs';
+import useAuthStore from '@/store/auth/authStore';
 
 interface VersionLogChartsProps {
 	date: Range[];
@@ -15,6 +16,7 @@ interface VersionLogChartsProps {
 
 export default function VersionLogCharts({ date }: VersionLogChartsProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
+	const userId = useAuthStore((state) => state.user?._id);
 	const handleClickChart = (e: CategoricalChartState) => {
 		if (e?.activeLabel && e?.activeTooltipIndex !== undefined) {
 			const currentData = data[e.activeTooltipIndex];
@@ -28,7 +30,7 @@ export default function VersionLogCharts({ date }: VersionLogChartsProps) {
 		}
 	};
 
-	const { theme } = useThemeStore();
+	const { getTheme } = useThemeStore();
 	const { logBuckets } = useVersionStore();
 	const data = useMemo(
 		() =>
@@ -74,7 +76,10 @@ export default function VersionLogCharts({ date }: VersionLogChartsProps) {
 						<Tooltip
 							content={<CustomTooltip payload={data} />}
 							cursor={{
-								fill: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+								fill:
+									getTheme(userId as string) === 'dark'
+										? 'rgba(255,255,255,0.1)'
+										: 'rgba(0,0,0,0.1)',
 								radius: 2,
 							}}
 						/>

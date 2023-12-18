@@ -2,6 +2,7 @@ import useTaskStore from '@/store/task/taskStore';
 import useTabStore from '@/store/version/tabStore';
 import { LogTypes, RealtimeActionParams, Task as TaskType } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
+import useUtilsStore from '@/store/version/utilsStore';
 class Task extends RealtimeActions<TaskType> {
 	accept(): void {
 		throw new Error('Method not implemented.');
@@ -14,7 +15,7 @@ class Task extends RealtimeActions<TaskType> {
 	}
 	log({ message, timestamp, id, type }: RealtimeActionParams<TaskType>) {
 		setTimeout(() => {
-			useTaskStore.getState?.().setTaskLog(id as string, {
+			useUtilsStore.getState?.().setTaskLogs(id as string, {
 				message: message as string,
 				timestamp: timestamp as string,
 				type: type as LogTypes,
