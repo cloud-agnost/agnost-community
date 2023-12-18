@@ -1,6 +1,5 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
-import { Description } from '@/components/Description';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { useToast } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
