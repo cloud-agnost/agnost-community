@@ -17,6 +17,7 @@ interface DatabaseStore {
 	toDeleteDatabase: Database;
 	isDeleteDatabaseDialogOpen: boolean;
 	isEditDatabaseDialogOpen: boolean;
+	isDatabaseFetched: boolean;
 }
 
 type Actions = {
@@ -39,6 +40,7 @@ const initialState: DatabaseStore = {
 	toDeleteDatabase: {} as Database,
 	isDeleteDatabaseDialogOpen: false,
 	isEditDatabaseDialogOpen: false,
+	isDatabaseFetched: false,
 };
 
 const useDatabaseStore = create<DatabaseStore & Actions>()(
@@ -67,7 +69,7 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 				}),
 			getDatabasesOfApp: async (params: GetDatabasesOfAppParams): Promise<Database[]> => {
 				const databases = await DatabaseService.getDatabasesOfApp(params);
-				set({ databases });
+				set({ databases, isDatabaseFetched: true });
 				return databases;
 			},
 			getDatabaseOfAppById: async (params: GetDatabaseOfAppByIdParams): Promise<Database> => {

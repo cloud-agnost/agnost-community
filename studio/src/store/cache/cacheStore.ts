@@ -20,7 +20,7 @@ interface CacheStore {
 	isEditCacheModalOpen: boolean;
 	toDeleteCache: Cache;
 	isDeleteCacheModalOpen: boolean;
-	lastFetchedPage: number;
+	lastFetchedPage: number | undefined;
 }
 
 type Actions = {
@@ -45,7 +45,7 @@ const initialState: CacheStore = {
 	isEditCacheModalOpen: false,
 	toDeleteCache: {} as Cache,
 	isDeleteCacheModalOpen: false,
-	lastFetchedPage: 0,
+	lastFetchedPage: undefined,
 };
 
 const useCacheStore = create<CacheStore & Actions>()(
@@ -56,7 +56,7 @@ const useCacheStore = create<CacheStore & Actions>()(
 				try {
 					const caches = await CacheService.getCaches(params);
 					if (params.page === 0) {
-						set({ caches });
+						set({ caches, lastFetchedPage: params.page });
 					} else {
 						set({ caches: [...get().caches, ...caches], lastFetchedPage: params.page });
 					}

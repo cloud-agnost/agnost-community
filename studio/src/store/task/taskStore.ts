@@ -19,7 +19,7 @@ import useUtilsStore from '../version/utilsStore';
 export interface TaskStore {
 	task: Task;
 	tasks: Task[];
-	lastFetchedPage: number;
+	lastFetchedPage: number | undefined;
 	isEditTaskModalOpen: boolean;
 	logics: Record<string, string>;
 }
@@ -43,7 +43,7 @@ type Actions = {
 const initialState: TaskStore = {
 	task: {} as Task,
 	tasks: [],
-	lastFetchedPage: 0,
+	lastFetchedPage: undefined,
 	isEditTaskModalOpen: false,
 	logics: {},
 };
@@ -71,7 +71,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 		getTasks: async (params: GetTasksParams) => {
 			const tasks = await TaskService.getTasks(params);
 			if (params.page === 0) {
-				set({ tasks });
+				set({ tasks, lastFetchedPage: params.page });
 			} else {
 				set({ tasks: [...tasks, ...tasks], lastFetchedPage: params.page });
 			}
