@@ -3,8 +3,9 @@ import { FIELD_ICON_MAP, FIELD_MAPPER } from '@/constants';
 import { SubFields } from '@/features/database/models/fields/ListFields/index.ts';
 import useModelStore from '@/store/database/modelStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { ColumnDefWithClassName, Field } from '@/types';
-import { getVersionPermission, toDisplayName, translate } from '@/utils';
+import { APIError, ColumnDefWithClassName, Field } from '@/types';
+import { getVersionPermission, notify, toDisplayName, translate } from '@/utils';
+import { QueryClient } from '@tanstack/react-query';
 import { Badge } from 'components/Badge';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
@@ -12,17 +13,30 @@ import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 
 const { openEditFieldDialog, deleteField } = useModelStore.getState();
+const queryClient = new QueryClient();
 
 async function deleteHandler(field: Field) {
 	const model = useModelStore.getState().model;
-	deleteField({
-		dbId: model.dbId,
-		appId: model.appId,
-		orgId: model.orgId,
-		modelId: model._id,
-		fieldId: field._id,
-		versionId: model.versionId,
-	});
+	queryClient
+		.getMutationCache()
+		.build(queryClient, {
+			mutationFn: deleteField,
+			onError: (error: APIError) => {
+				notify({
+					title: error.error,
+					description: error.details,
+					type: 'error',
+				});
+			},
+		})
+		.execute({
+			dbId: model.dbId,
+			appId: model.appId,
+			orgId: model.orgId,
+			modelId: model._id,
+			fieldId: field._id,
+			versionId: model.versionId,
+		});
 }
 const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
