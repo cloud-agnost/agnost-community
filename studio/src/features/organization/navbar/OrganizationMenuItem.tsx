@@ -11,12 +11,14 @@ interface OrganizationMenuItemProps {
 		icon?: React.ElementType;
 	};
 	isNavigate?: boolean;
+	urlKey?: string;
 }
 
 export default function OrganizationMenuItem({
 	item,
 	active,
 	onClick,
+	urlKey,
 	isNavigate = false,
 }: OrganizationMenuItemProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -27,7 +29,7 @@ export default function OrganizationMenuItem({
 		if (isNavigate) {
 			navigate(item.href);
 		} else {
-			searchParams.set('t', item.href);
+			searchParams.set(urlKey ?? 't', item.href);
 			setSearchParams(searchParams);
 		}
 	}
