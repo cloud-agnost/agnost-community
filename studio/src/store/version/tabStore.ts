@@ -69,7 +69,7 @@ const useTabStore = create<TabStore & Actions>()(
 							},
 						};
 					});
-					if (tab.isActive && prevTab) {
+					if (tab.isActive && prevTab && window.location.pathname.includes('version')) {
 						get().setCurrentTab(versionId, prevTab?.id);
 						const url = useVersionStore.getState().getVersionDashboardPath(prevTab.path);
 						history.navigate?.(url);
