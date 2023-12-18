@@ -1,14 +1,14 @@
-import useVersionStore from '@/store/version/versionStore';
+import useUtilsStore from '@/store/version/utilsStore';
 import { RealtimeActionParams } from '@/types';
 import { addLibsToEditor } from '@/utils';
 
 class Typings {
 	update({ data }: RealtimeActionParams<Record<string, string>>) {
 		addLibsToEditor(data);
-		useVersionStore.setState((prev) => ({
+		useUtilsStore.setState((prev) => ({
 			...prev,
 			typings: {
-				...prev.typings,
+				...(prev?.typings as Record<string, string>),
 				...data,
 			},
 		}));

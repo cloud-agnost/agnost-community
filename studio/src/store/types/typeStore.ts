@@ -153,7 +153,7 @@ const useTypeStore = create<TypesStore>()(
 				},
 			}),
 			{
-				name: 'type-storage',
+				name: 'type-store',
 			},
 		),
 	),

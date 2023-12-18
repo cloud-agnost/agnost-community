@@ -6,6 +6,7 @@ import { Separator } from '@/components/Separator';
 import { useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useTaskStore from '@/store/task/taskStore';
+import useUtilsStore from '@/store/version/utilsStore';
 import { APIError, Log } from '@/types';
 import { generateId, joinChannel, leaveChannel } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
@@ -18,7 +19,8 @@ interface TestTaskProps {
 }
 export default function TestTask({ open, onClose }: TestTaskProps) {
 	const { t } = useTranslation();
-	const { task, testTask, taskLogs } = useTaskStore();
+	const { task, testTask } = useTaskStore();
+	const { taskLogs } = useUtilsStore();
 	const { notify } = useToast();
 	const { environment } = useEnvironmentStore();
 	const [debugChannel, setDebugChannel] = useState<string>('');
@@ -83,7 +85,7 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 					<Separator />
 					<div className='h-[90%]'>
 						<p className='text-sm text-default font-sfCompact mb-4'>{t('task.console')}</p>
-						<Logs logs={taskLogs[taskId as string] as Log[]} />
+						<Logs logs={taskLogs?.[taskId as string] as Log[]} />
 					</div>
 				</div>
 			</DrawerContent>

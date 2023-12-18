@@ -25,7 +25,7 @@ export default function AuthUserDropdown() {
 	const { user, logout } = useAuthStore();
 	const { orgId } = useParams() as { orgId: string };
 	const { t } = useTranslation();
-	const { setTheme, theme } = useThemeStore();
+	const { setTheme, getTheme } = useThemeStore();
 	const navigate = useNavigate();
 	const THEMES = [
 		{
@@ -100,11 +100,11 @@ export default function AuthUserDropdown() {
 							>
 								{THEMES.map((t) => (
 									<DropdownMenuItem
-										onClick={() => setTheme(t.id)}
+										onClick={() => setTheme(t.id, user?._id ?? '')}
 										asChild
 										key={t.id}
 										className={cn({
-											' text-brand-primary': t.id === theme,
+											' text-brand-primary': t.id === getTheme(user?._id ?? ''),
 										})}
 									>
 										<span className='flex items-center gap-2'>

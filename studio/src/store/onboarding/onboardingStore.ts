@@ -120,7 +120,7 @@ const useOnboardingStore = create<OnboardingStore & Actions>()(
 				reset: () => set(initialState),
 			}),
 			{
-				name: 'onboarding-storage',
+				name: 'onboarding-store',
 			},
 		),
 	),

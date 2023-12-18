@@ -3,7 +3,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { Form } from '@/components/Form';
 import { InviteMemberForm, InviteMemberSchema } from '@/components/InviteMemberForm';
 import { useToast } from '@/hooks';
-import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
+import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import useClusterStore from '@/store/cluster/clusterStore';
 import { APIError } from '@/types';
@@ -20,7 +20,7 @@ export default function AppInviteMember() {
 		useApplicationStore();
 	const { notify } = useToast();
 	const { canClusterSendEmail } = useClusterStore();
-	const canInvite = useAuthorizeOrg('invite.create');
+	const canInvite = useAuthorizeApp('invite.create');
 	const { orgId } = useParams() as Record<string, string>;
 	const form = useForm<z.infer<typeof InviteMemberSchema>>({
 		resolver: zodResolver(InviteMemberSchema),

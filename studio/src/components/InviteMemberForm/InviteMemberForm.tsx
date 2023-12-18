@@ -116,7 +116,7 @@ export default function InviteMemberForm({
 												<SelectValue placeholder='Select a role'>{field.value}</SelectValue>
 											</SelectTrigger>
 										</FormControl>
-										<SelectContent className='w-[400px]'>
+										<SelectContent className='w-[400px] !max-h-[500px]'>
 											<div className='space-y-2'>
 												{roles.map((role) => (
 													<SelectItem key={role} value={role} className=''>

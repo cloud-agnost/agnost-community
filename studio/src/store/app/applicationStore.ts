@@ -340,9 +340,9 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 				window.history.replaceState({}, '', `${window.location.pathname}`);
 			},
 			openInviteMemberDrawer: (application: Application) => {
+				get().selectApplication(application);
 				set({
 					isInviteMemberOpen: true,
-					application,
 				});
 			},
 			closeInviteMemberDrawer: () => {

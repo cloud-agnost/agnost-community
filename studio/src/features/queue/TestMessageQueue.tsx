@@ -8,6 +8,7 @@ import { Separator } from '@/components/Separator';
 import { useToast } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
+import useUtilsStore from '@/store/version/utilsStore';
 import { APIError, EnvironmentStatus, Log } from '@/types';
 import { generateId, joinChannel, leaveChannel, parseIfString } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,7 +29,8 @@ export const TestMessageQueueSchema = z.object({
 });
 export default function TestMessageQueue({ open, onClose }: TestMessageQueueProps) {
 	const { t } = useTranslation();
-	const { queue, testQueue, testQueueLogs } = useMessageQueueStore();
+	const { queue, testQueue } = useMessageQueueStore();
+	const { testQueueLogs } = useUtilsStore();
 	const { notify } = useToast();
 	const { environment } = useEnvironmentStore();
 	const [debugChannel, setDebugChannel] = useState<string>('');
@@ -42,7 +44,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 	const form = useForm({
 		resolver: zodResolver(TestMessageQueueSchema),
 		defaultValues: {
-			payload: testQueueLogs[queue?._id]?.payload,
+			payload: testQueueLogs?.[queue?._id]?.payload,
 		},
 	});
 	const { mutateAsync: testQueueMutation, isPending } = useMutation({
@@ -82,7 +84,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 
 	useEffect(() => {
 		if (open) {
-			form.setValue('payload', testQueueLogs[queue?._id]?.payload);
+			form.setValue('payload', testQueueLogs?.[queue?._id]?.payload);
 		}
 	}, [open]);
 	return (
@@ -141,7 +143,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 								/>
 							</PanelResizeHandle>
 							<Panel minSize={30} className='max-h-full no-scrollbar !overflow-y-auto'>
-								<Logs logs={testQueueLogs[queue?._id]?.logs as Log[]} />
+								<Logs logs={testQueueLogs?.[queue?._id]?.logs as Log[]} />
 							</Panel>
 						</PanelGroup>
 					</form>

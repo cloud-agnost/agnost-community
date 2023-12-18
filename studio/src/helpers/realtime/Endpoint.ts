@@ -1,5 +1,6 @@
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useTabStore from '@/store/version/tabStore';
+import useUtilsStore from '@/store/version/utilsStore';
 import { Endpoint as EndpointType, LogTypes, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Endpoint extends RealtimeActions<EndpointType> {
@@ -14,7 +15,7 @@ class Endpoint extends RealtimeActions<EndpointType> {
 	}
 	log({ message, timestamp, id, type }: RealtimeActionParams<EndpointType>) {
 		setTimeout(() => {
-			useEndpointStore.getState?.().setEndpointLog(id as string, {
+			useUtilsStore.getState?.().setEndpointLogs(id as string, {
 				message: message as string,
 				timestamp: timestamp as string,
 				type: type as LogTypes,
