@@ -24,10 +24,7 @@ export default function VersionSettingsNPMPackages() {
 			className='table-view'
 		>
 			{npmPackages.length > 0 ? (
-				<DataTable<NPMPackage>
-					table={table}
-					noDataMessage={<p className='text-xl'>{t('version.npm.no_package_found')}</p>}
-				/>
+				<DataTable<NPMPackage> table={table} className='navigator' />
 			) : (
 				<EmptyState type='package' title={t('version.npm.no_package_found')} />
 			)}
