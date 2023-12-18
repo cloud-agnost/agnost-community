@@ -622,3 +622,6 @@ html .light ::-webkit-scrollbar-track {
 button:focus-visible {
 	@apply outline-none ring-0;
 }
+.Toastify__toast-container--top-center {
+	top: 0em !important;
+}
