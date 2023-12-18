@@ -265,7 +265,7 @@ const useAuthStore = create<AuthState & Actions>()(
 					},
 				}),
 				{
-					name: 'auth-storage',
+					name: 'auth-store',
 				},
 			),
 			{

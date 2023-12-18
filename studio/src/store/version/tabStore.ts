@@ -250,7 +250,7 @@ const useTabStore = create<TabStore & Actions>()(
 				reset: () => set(initialState),
 			}),
 			{
-				name: 'tab-storage',
+				name: 'tab-store',
 			},
 		),
 	),

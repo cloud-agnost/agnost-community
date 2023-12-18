@@ -24,7 +24,7 @@ import {
 	UpdateStorageParams,
 	UploadFileToBucketParams,
 } from '@/types';
-import { devtools, persist } from 'zustand/middleware';
+import { devtools } from 'zustand/middleware';
 export interface StorageStore {
 	storages: Storage[];
 	storage: Storage;
@@ -100,48 +100,46 @@ const initialState: StorageStore = {
 };
 
 const useStorageStore = create<StorageStore & Actions>()(
-	devtools(
-		persist(
-			(set, get) => ({
-				...initialState,
-				openDeleteStorageDialog: (storage: Storage) => {
-					set({ toDeleteStorage: storage, isStorageDeleteDialogOpen: true });
-				},
-				closeStorageDeleteDialog: () => {
-					set({ toDeleteStorage: null, isStorageDeleteDialogOpen: false });
-				},
-				openDeleteBucketDialog: (bucket: Bucket) => {
-					set({ toDeleteBucket: bucket, isBucketDeleteDialogOpen: true });
-				},
-				closeBucketDeleteDialog: () => {
-					set({ toDeleteBucket: null, isBucketDeleteDialogOpen: false });
-				},
-				createStorage: async (params: CreateStorageParams) => {
-					try {
-						const createdStorage = await StorageService.createStorage(params);
-						set({ storages: [createdStorage, ...get().storages] });
-						params.onSuccess?.();
-						return createdStorage;
-					} catch (error) {
-						params.onError?.(error as APIError);
-						throw error as APIError;
-					}
-				},
-				getStorageById: async (params: GetStorageByIdParams) => {
-					const storage = await StorageService.getStorage(params);
-					set({ storage });
-					return storage;
-				},
-				getStorages: async (params: GetStoragesParams) => {
-					const storages = await StorageService.getStorages(params);
-					if (params.page === 0) {
-						set({ storages });
-					} else {
-						set((prev) => ({
-							storages: [...prev.storages, ...storages],
-							lastFetchedPage: params.page,
-						}));
-					}
+	devtools((set, get) => ({
+		...initialState,
+		openDeleteStorageDialog: (storage: Storage) => {
+			set({ toDeleteStorage: storage, isStorageDeleteDialogOpen: true });
+		},
+		closeStorageDeleteDialog: () => {
+			set({ toDeleteStorage: null, isStorageDeleteDialogOpen: false });
+		},
+		openDeleteBucketDialog: (bucket: Bucket) => {
+			set({ toDeleteBucket: bucket, isBucketDeleteDialogOpen: true });
+		},
+		closeBucketDeleteDialog: () => {
+			set({ toDeleteBucket: null, isBucketDeleteDialogOpen: false });
+		},
+		createStorage: async (params: CreateStorageParams) => {
+			try {
+				const createdStorage = await StorageService.createStorage(params);
+				set({ storages: [createdStorage, ...get().storages] });
+				params.onSuccess?.();
+				return createdStorage;
+			} catch (error) {
+				params.onError?.(error as APIError);
+				throw error as APIError;
+			}
+		},
+		getStorageById: async (params: GetStorageByIdParams) => {
+			const storage = await StorageService.getStorage(params);
+			set({ storage });
+			return storage;
+		},
+		getStorages: async (params: GetStoragesParams) => {
+			const storages = await StorageService.getStorages(params);
+			if (params.page === 0) {
+				set({ storages });
+			} else {
+				set((prev) => ({
+					storages: [...prev.storages, ...storages],
+					lastFetchedPage: params.page,
+				}));
+			}
 
 			return storages;
 		},
@@ -356,28 +354,19 @@ const useStorageStore = create<StorageStore & Actions>()(
 			try {
 				const file = await StorageService.updateFileInBucket(params);
 
-						set({
-							files: get().files.map((f) => (f.id === file.id ? file : f)),
-							file,
-						});
-						params.onSuccess?.();
-						return file;
-					} catch (error) {
-						params.onError?.(error as APIError);
-						throw error as APIError;
-					}
-				},
-				reset: () => set(initialState),
-			}),
-			{
-				name: 'storage',
-				partialize: (state) =>
-					Object.fromEntries(
-						Object.entries(state).filter(([key]) => ['storage', 'bucket'].includes(key)),
-					),
-			},
-		),
-	),
+				set({
+					files: get().files.map((f) => (f.id === file.id ? file : f)),
+					file,
+				});
+				params.onSuccess?.();
+				return file;
+			} catch (error) {
+				params.onError?.(error as APIError);
+				throw error as APIError;
+			}
+		},
+		reset: () => set(initialState),
+	})),
 );
 
 export default useStorageStore;
