@@ -8,6 +8,7 @@ import { DesignElement, Tab, TabTypes } from '@/types';
 import { capitalize, generateId } from '@/utils';
 import { Plus } from '@phosphor-icons/react';
 import { useParams } from 'react-router-dom';
+import '@/components/Dropdown/dropdown.scss';
 export default function NewTabDropdown() {
 	const { addTab } = useTabStore();
 	const { searchDesignElements, designElements, resetDesignElements, getVersionDashboardPath } =
@@ -83,43 +84,41 @@ export default function NewTabDropdown() {
 					/>
 				</div>
 
-				<div className='overflow-auto max-h-96'>
-					<div className='space-y-4'>
-						{designElements.map((item) => (
-							<Button
-								key={item._id}
-								onClick={() => handleClickElement(item)}
-								variant='text'
-								className='flex items-center justify-start gap-4 relative p-3 w-full text-left font-normal'
-							>
-								<div className=' bg-lighter p-2 rounded-lg'>
-									{getIcon(capitalize(item.type) as TabTypes)}
-								</div>
-								<div>
-									<p className='text-subtle font-sfCompact'>
-										{capitalize(item.type)}
-										{capitalize(item.type) === TabTypes.Field && ` - ${item.meta.modelName}`}
-									</p>
-									<p className='text-default font-sfCompact'>{item.name}</p>
-								</div>
-							</Button>
-						))}
-					</div>
-					{!designElements.length &&
-						NEW_TAB_ITEMS.sort((a, b) => a.title.localeCompare(b.title)).map((item) => (
-							<Button
-								onClick={() => handleAddTab(item)}
-								key={item.path}
-								className='flex items-center justify-start gap-4 relative p-3 w-full text-left font-normal'
-								variant='text'
-							>
+				<div className='overflow-auto max-h-96 dropdown-item-container space-y-2'>
+					{designElements.map((item) => (
+						<Button
+							key={item._id}
+							onClick={() => handleClickElement(item)}
+							variant='text'
+							className='dropdown-item flex items-center justify-start gap-4 relative py-6 px-2 w-full text-left font-normal'
+						>
+							<div className=' bg-lighter p-2 rounded-lg'>
 								{getIcon(capitalize(item.type) as TabTypes)}
-								<h1 title={item.title} className='flex-1 truncate max-w-[15ch]'>
-									{item.title}
-								</h1>
-							</Button>
-						))}
+							</div>
+							<div>
+								<p className='text-subtle font-sfCompact'>
+									{capitalize(item.type)}
+									{capitalize(item.type) === TabTypes.Field && ` - ${item.meta.modelName}`}
+								</p>
+								<p className='text-default font-sfCompact'>{item.name}</p>
+							</div>
+						</Button>
+					))}
 				</div>
+				{!designElements.length &&
+					NEW_TAB_ITEMS.sort((a, b) => a.title.localeCompare(b.title)).map((item) => (
+						<Button
+							onClick={() => handleAddTab(item)}
+							key={item.path}
+							className='dropdown-item flex items-center justify-start gap-4 relative p-3 w-full text-left font-normal'
+							variant='text'
+						>
+							{getIcon(capitalize(item.type) as TabTypes)}
+							<h1 title={item.title} className='flex-1 truncate max-w-[15ch]'>
+								{item.title}
+							</h1>
+						</Button>
+					))}
 			</PopoverContent>
 		</Popover>
 	);
