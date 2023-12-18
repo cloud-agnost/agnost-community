@@ -10,9 +10,9 @@ import ApplicationTable from '@/features/application/ApplicationTable/Applicatio
 import { useSearch, useToast } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore.ts';
 import { APIError, Application } from '@/types';
-import { cn } from '@/utils';
+import { cn, resetAfterVersionChange } from '@/utils';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import BeatLoader from 'react-spinners/BeatLoader';
@@ -41,9 +41,7 @@ export default function OrganizationApps() {
 				appId: toDeleteApp?._id as string,
 				orgId,
 			}),
-		onSuccess: () => {
-			closeLeaveModal();
-		},
+		onSuccess: closeLeaveModal,
 		onError: ({ error, details }: APIError) => {
 			notify({
 				title: error,
@@ -78,6 +76,10 @@ export default function OrganizationApps() {
 		enabled: applications[0]?.orgId !== orgId,
 		refetchOnWindowFocus: false,
 	});
+
+	useEffect(() => {
+		resetAfterVersionChange();
+	}, []);
 
 	return (
 		<div className={cn('scroll p-8', !applications.length && 'flex items-center justify-center')}>
