@@ -19,7 +19,7 @@ import { APIError } from '@/types';
 import { isEmpty } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 import { DataTable } from 'components/DataTable';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams, useSearchParams } from 'react-router-dom';
@@ -52,7 +52,7 @@ export default function Navigator() {
 	});
 
 	const dbUrl = `/organization/${orgId}/apps/${appId}/version/${versionId}/database`;
-
+	const [isRefreshing, setIsRefreshing] = useState(false);
 	const { mutateAsync: deleteMultipleMutate } = useMutation({
 		mutationFn: deleteMultipleDataFromModel,
 		mutationKey: ['deleteMultipleDataFromModel'],
@@ -111,6 +111,12 @@ export default function Navigator() {
 		},
 	];
 
+	async function onRefresh() {
+		setIsRefreshing(true);
+		await refetch();
+		setIsRefreshing(false);
+	}
+
 	return (
 		<VersionTabLayout
 			isEmpty={false}
@@ -124,8 +130,8 @@ export default function Navigator() {
 			className='!overflow-hidden'
 			breadCrumb={<BreadCrumb goBackLink={`${dbUrl}/models`} items={breadcrumbItems} />}
 			handlerButton={
-				<Button variant='secondary' onClick={() => refetch()} iconOnly loading={isRefetching}>
-					{!isRefetching && <Refresh className='mr-2 w-5 h-5' />}
+				<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
+					{!isRefreshing && <Refresh className='mr-2 w-5 h-5' />}
 					{t('general.refresh')}
 				</Button>
 			}
