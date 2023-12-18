@@ -2,12 +2,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
 import { cn } from '@/utils';
 import { Trash, X } from '@phosphor-icons/react';
 import { Align } from '@radix-ui/react-popper';
+import { MutationFunction, useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
 interface TableConfirmationProps {
-	onConfirm: () => void;
+	onConfirm: MutationFunction<unknown, void>;
 	disabled?: boolean;
 	title: string;
 	description: string;
@@ -31,10 +32,13 @@ export function TableConfirmation({
 }: TableConfirmationProps) {
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
-	function confirm() {
-		onConfirm();
-		setOpen(false);
-	}
+
+	const { isPending, mutate } = useMutation({
+		mutationFn: onConfirm,
+		onSuccess: () => {
+			setOpen(false);
+		},
+	});
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<TooltipProvider>
@@ -75,7 +79,7 @@ export function TableConfirmation({
 										<Button variant='text' size='lg' onClick={() => setOpen(false)}>
 											{t('general.cancel')}
 										</Button>
-										<Button variant='primary' size='lg' onClick={confirm}>
+										<Button variant='primary' size='lg' onClick={mutate} loading={isPending}>
 											{t('general.ok')}
 										</Button>
 									</div>
