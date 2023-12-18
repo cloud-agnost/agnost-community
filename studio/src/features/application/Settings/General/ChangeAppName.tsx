@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Form } from '@/components/Form';
 import { z } from 'zod';
 import { useParams } from 'react-router-dom';
+import { SettingsFormItem } from '@/components/SettingsFormItem';
 export default function ChangeAppName() {
 	const { t } = useTranslation();
 	const { application, changeAppName } = useApplicationStore();
@@ -44,15 +45,15 @@ export default function ChangeAppName() {
 	}
 
 	return (
-		<Form {...form}>
-			<form className='space-y-6' onSubmit={form.handleSubmit(onSubmit)}>
-				<ChangeNameForm
-					label={t('application.edit.name.title') as string}
-					loading={isPending}
-					error={error}
-					disabled={!canEdit}
-				/>
-			</form>
-		</Form>
+		<SettingsFormItem
+			title={t('application.edit.name.title')}
+			description={t('organization.settings.name.desc')}
+		>
+			<Form {...form}>
+				<form className='space-y-6' onSubmit={form.handleSubmit(onSubmit)}>
+					<ChangeNameForm loading={isPending} error={error} disabled={!canEdit} />
+				</form>
+			</Form>
+		</SettingsFormItem>
 	);
 }
