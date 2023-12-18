@@ -12,6 +12,11 @@ import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 
 const { openEditFieldDialog, deleteField } = useModelStore.getState();
+const FIELD_MAPPER: Record<string, string> = {
+	createdat: 'datetime',
+	updatedat: 'datetime',
+	parent: 'reference',
+};
 
 async function deleteHandler(field: Field) {
 	const model = useModelStore.getState().model;
@@ -94,16 +99,11 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 				original: { type },
 			},
 		}) => {
-			const mapper: Record<string, string> = {
-				createdat: 'datetime',
-				updatedat: 'datetime',
-				parent: 'reference',
-			};
-			const Icon = FIELD_ICON_MAP[mapper[type] ?? type];
+			const Icon = FIELD_ICON_MAP[FIELD_MAPPER[type] ?? type];
 			return (
 				<span className='whitespace-nowrap flex items-center gap-1'>
 					{Icon && <Icon className='w-5 h-5' />}
-					{toDisplayName(mapper[type] ?? type)}
+					{toDisplayName(FIELD_MAPPER[type] ?? type)}
 				</span>
 			);
 		},
@@ -248,11 +248,10 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 				original: { updatedAt, updatedBy },
 			},
 		}) => {
-			if (!updatedBy) return null;
 			const user = useOrganizationStore
 				.getState()
 				.members.find((member) => member.member._id === updatedBy);
-			return updatedBy && <DateText date={updatedAt} user={user} />;
+			return <DateText date={updatedAt} user={user} />;
 		},
 	},
 
