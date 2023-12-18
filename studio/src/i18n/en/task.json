@@ -18,5 +18,6 @@
 	"resource": "Resource",
 	"edit": "Edit {{name}}",
 	"test": "Test {{name}}",
-	"logs": "Cron Job Logs"
+	"logs": "Cron Job Logs",
+	"editLogicSuccess": "Cron job updated successfully"
 }

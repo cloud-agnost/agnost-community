@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks';
 import { useParams } from 'react-router-dom';
+import { SettingsFormItem } from '@/components/SettingsFormItem';
 export default function ChangeAppAvatar() {
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
@@ -50,20 +51,24 @@ export default function ChangeAppAvatar() {
 	}
 
 	return (
-		<ChangeAvatar
-			item={{
-				name: application?.name as string,
-				color: application?.color as string,
-				pictureUrl: application?.pictureUrl as string,
-				_id: application?._id as string,
-			}}
-			onChange={onChangeHandler}
-			removeAvatar={removeHandler}
-			error={error}
-			loading={loading}
+		<SettingsFormItem
+			twoColumns
 			title={t('application.edit.avatar.title') as string}
 			description={t('application.edit.avatar.description') as string}
-			className='flex items-center gap-32'
-		/>
+		>
+			<ChangeAvatar
+				item={{
+					name: application?.name as string,
+					color: application?.color as string,
+					pictureUrl: application?.pictureUrl as string,
+					_id: application?._id as string,
+				}}
+				onChange={onChangeHandler}
+				removeAvatar={removeHandler}
+				error={error}
+				loading={loading}
+				className='flex items-center gap-32'
+			/>
+		</SettingsFormItem>
 	);
 }

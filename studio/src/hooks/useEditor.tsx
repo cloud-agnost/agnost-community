@@ -51,15 +51,7 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 		}
 		if (language === 'javascript') {
 			const formatted = await formatCode(val);
-			const fullRange = ed?.getModel()?.getFullModelRange();
-			ed?.executeEdits(null, [
-				{
-					text: formatted,
-					range: fullRange as monaco.Range,
-				},
-			]);
 
-			ed?.pushUndoStop();
 			cb?.(formatted);
 		}
 	}

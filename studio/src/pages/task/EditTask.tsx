@@ -1,6 +1,6 @@
 import { Separator } from '@/components/Separator';
 import { TestTask } from '@/features/task';
-import { useToast } from '@/hooks';
+import { useSaveLogicOnSuccess, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useTaskStore from '@/store/task/taskStore';
@@ -23,17 +23,11 @@ export default function EditTask() {
 		orgId: string;
 		taskId: string;
 	}>();
-
+	const onSuccess = useSaveLogicOnSuccess(t('task.editLogicSuccess'));
 	const { mutateAsync: saveTaskCode, isPending } = useMutation({
 		mutationFn: saveTaskLogic,
 		mutationKey: ['saveLogic'],
-		onSuccess: () => {
-			notify({
-				title: t('general.success'),
-				description: t('endpoint.editLogicSuccess'),
-				type: 'success',
-			});
-		},
+		onSuccess,
 		onError: ({ error, details }: APIError) => {
 			notify({
 				title: error,

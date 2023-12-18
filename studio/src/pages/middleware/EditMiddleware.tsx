@@ -1,4 +1,4 @@
-import { useToast } from '@/hooks';
+import { useSaveLogicOnSuccess, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
@@ -21,7 +21,7 @@ export default function EditMiddleware() {
 		deleteLogic,
 	} = useMiddlewareStore();
 	const { t } = useTranslation();
-
+	const onSuccess = useSaveLogicOnSuccess(t('version.middleware.edit.success'));
 	const { mutate, isPending } = useMutation({
 		mutationKey: ['saveMiddlewareCode'],
 		mutationFn: (logic: string) => {
@@ -33,13 +33,7 @@ export default function EditMiddleware() {
 				logic: logic,
 			});
 		},
-		onSuccess: () => {
-			notify({
-				title: t('general.success'),
-				description: t('version.middleware.edit.success'),
-				type: 'success',
-			});
-		},
+		onSuccess,
 		onError(error: APIError) {
 			notify({
 				title: t('general.error'),

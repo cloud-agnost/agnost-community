@@ -508,3 +508,7 @@ export async function handleSelectApp(app: Application) {
 		openVersionDrawer(app);
 	}
 }
+
+export function sortByField<T>(arr: T[], field: keyof T, direction: 'asc' | 'desc' = 'asc'): T[] {
+	return _.orderBy(arr, [field], [direction]);
+}

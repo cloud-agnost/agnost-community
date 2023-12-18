@@ -16,15 +16,15 @@ export default function EditApplication() {
 	const match = useMatch('/organization/:orgId/apps');
 
 	useEffect(() => {
-		if (isEditAppOpen && !searchParams.get('t')) {
-			searchParams.set('t', 'general');
+		if (isEditAppOpen && !searchParams.get('st')) {
+			searchParams.set('st', 'general');
 			setSearchParams(searchParams);
 		}
 	}, [isEditAppOpen, searchParams]);
 
 	useEffect(() => {
 		if (!isEditAppOpen) {
-			searchParams.delete('t');
+			searchParams.delete('st');
 			setSearchParams(searchParams);
 		}
 	}, [isEditAppOpen]);
@@ -41,15 +41,16 @@ export default function EditApplication() {
 							<OrganizationMenuItem
 								key={item.name}
 								item={item}
-								active={window.location.search.includes(item.href)}
+								active={searchParams.get('st') === item.href}
+								urlKey='st'
 							/>
 						);
 					})}
 				</nav>
 				<div className='flex flex-col h-full'>
-					{searchParams.get('t') === 'general' && <AppGeneralSettings />}
-					{searchParams.get('t') === 'members' && <AppMembers />}
-					{searchParams.get('t') === 'invitations' && <AppInvitations />}
+					{searchParams.get('st') === 'general' && <AppGeneralSettings />}
+					{searchParams.get('st') === 'members' && <AppMembers />}
+					{searchParams.get('st') === 'invitations' && <AppInvitations />}
 				</div>
 			</DrawerContent>
 		</Drawer>

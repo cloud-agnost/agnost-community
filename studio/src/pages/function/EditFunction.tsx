@@ -1,4 +1,4 @@
-import { useToast } from '@/hooks';
+import { useSaveLogicOnSuccess, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useFunctionStore from '@/store/function/functionStore';
@@ -26,15 +26,10 @@ export default function EditFunction() {
 		orgId: string;
 		funcId: string;
 	}>();
+	const onSuccess = useSaveLogicOnSuccess(t('function.editLogicSuccess'));
 	const { mutate: saveFunctionCodeMutation, isPending } = useMutation({
 		mutationFn: saveFunctionCode,
-		onSuccess: () => {
-			notify({
-				title: t('general.success'),
-				description: t('endpoint.editLogicSuccess'),
-				type: 'success',
-			});
-		},
+		onSuccess,
 		onError: (error: APIError) => {
 			notify({
 				title: error.error,

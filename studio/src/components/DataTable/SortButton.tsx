@@ -20,7 +20,9 @@ export function SortButton({ text, className, field, onClick }: SortButtonProps)
 			newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
 		}
 		onClick?.();
-		setSearchParams({ f: field, d: newDirection });
+		searchParams.set('f', field);
+		searchParams.set('d', newDirection);
+		setSearchParams(searchParams);
 	};
 	return (
 		<Button variant='blank' onClick={handleSortClick} className={cn('sort-button', className)}>

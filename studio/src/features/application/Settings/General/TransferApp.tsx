@@ -1,6 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
-import { Description } from '@/components/Description';
+import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { useToast } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
 import { APIError, ApplicationMember, FormatOptionLabelProps } from '@/types';
@@ -73,11 +73,14 @@ export default function TransferApp() {
 		});
 	}
 	return (
-		<div className='space-y-3'>
-			<Description title={t('application.edit.transfer.title')}>
-				{t('application.edit.transfer.description')}
-				<span className='block mt-3'>{t('application.edit.transfer.subDesc')}</span>
-			</Description>
+		<SettingsFormItem
+			contentClassName='space-y-3'
+			title={t('application.edit.transfer.title')}
+			description={t('application.edit.transfer.description')}
+		>
+			<span className='text-sm text-subtle font-normal leading-6'>
+				{t('application.edit.transfer.subDesc')}
+			</span>
 			{error && (
 				<Alert variant='error'>
 					<AlertTitle>{error?.error}</AlertTitle>
@@ -101,6 +104,6 @@ export default function TransferApp() {
 			<Button size='lg' variant='primary' onClick={transferApp}>
 				{t('general.transfer')}
 			</Button>
-		</div>
+		</SettingsFormItem>
 	);
 }

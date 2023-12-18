@@ -14,13 +14,7 @@ const { openDeleteDatabaseDialog, openEditDatabaseDialog } = useDatabaseStore.ge
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton
-				text={translate('general.name')}
-				field='name'
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-			/>
-		),
+		header: () => <SortButton text={translate('general.name')} field='name' />,
 		accessorKey: 'name',
 		sortingFn: 'text',
 		enableSorting: true,
@@ -39,13 +33,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'type',
-		header: ({ column }) => (
-			<SortButton
-				text={translate('general.type')}
-				field='type'
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-			/>
-		),
+		header: () => <SortButton text={translate('general.type')} field='type' />,
 		accessorKey: 'type',
 		size: 200,
 		sortingFn: 'text',
@@ -66,12 +54,8 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'assignUniqueName',
-		header: ({ column }) => (
-			<SortButton
-				text={translate('database.add.unique.name')}
-				field='assignUniqueName'
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-			/>
+		header: () => (
+			<SortButton text={translate('database.add.unique.name')} field='assignUniqueName' />
 		),
 		accessorKey: 'assignUniqueName',
 		sortingFn: 'basic',
@@ -94,13 +78,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'managed',
-		header: ({ column }) => (
-			<SortButton
-				text={translate('general.managed')}
-				field='managed'
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-			/>
-		),
+		header: () => <SortButton text={translate('general.managed')} field='managed' />,
 		accessorKey: 'managed',
 		sortingFn: 'text',
 		enableSorting: true,
@@ -122,12 +100,11 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	},
 	{
 		id: 'createdAt',
-		header: ({ column }) => (
+		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.created_at')}
 				field='createdAt'
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 			/>
 		),
 		accessorKey: 'createdAt',
@@ -149,12 +126,11 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 
 	{
 		id: 'updatedAt',
-		header: ({ column }) => (
+		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
 				text={translate('general.updated_at')}
 				field='updatedAt'
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 			/>
 		),
 		accessorKey: 'updatedAt',

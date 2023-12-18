@@ -1,5 +1,5 @@
 import TestMessageQueue from '@/features/queue/TestMessageQueue';
-import { useToast } from '@/hooks';
+import { useSaveLogicOnSuccess, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
@@ -23,17 +23,11 @@ export default function EditMessageQueue() {
 		orgId: string;
 		queueId: string;
 	}>();
-
+	const onSuccess = useSaveLogicOnSuccess(t('queue.editLogicSuccess'));
 	const { mutateAsync: updateQueueCode, isPending } = useMutation({
 		mutationFn: updateQueueLogic,
 		mutationKey: ['updateQueueLogic'],
-		onSuccess: () => {
-			notify({
-				title: t('general.success'),
-				description: t('queue.editLogicSuccess'),
-				type: 'success',
-			});
-		},
+		onSuccess,
 		onError: ({ error, details }: APIError) => {
 			notify({
 				title: error,
