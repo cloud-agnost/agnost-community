@@ -86,7 +86,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
 	const { notificationLastSeen } = useVersionStore();
 	return (
 		<div className='py-3 px-4 relative flex items-center gap-4'>
-			<Avatar size='sm'>
+			<Avatar size='sm' className='self-start'>
 				<AvatarImage src={notification.actor.pictureUrl as string} />
 				<AvatarFallback
 					isUserAvatar
