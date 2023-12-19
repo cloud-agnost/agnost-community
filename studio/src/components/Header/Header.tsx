@@ -1,17 +1,16 @@
 import { Agnost } from '@/components/icons';
 import { MENU_ITEMS } from '@/constants';
 import { ApplicationSelectDropdown } from '@/features/application';
+import { AuthUserDropdown } from '@/features/auth/AuthUserDropdown';
 import { OrganizationDropdown } from '@/features/organization/OrganizationDropdown';
 import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
-import { VersionDropdown } from '@/features/version/VersionDropdown';
-import { CaretRight } from '@phosphor-icons/react';
-import { AuthUserDropdown } from '@/features/auth/AuthUserDropdown';
 import { NotificationDropdown } from '@/features/version/Notification';
+import { VersionDropdown } from '@/features/version/VersionDropdown';
+import { useAuthorizeVersion } from '@/hooks';
 import { Link, useParams } from 'react-router-dom';
+import { Separator } from '../Separator';
 import Feedback from './Feedback';
 import './header.scss';
-import { useAuthorizeVersion } from '@/hooks';
-import { Separator } from '../Separator';
 
 export function Header() {
 	const { versionId, appId, orgId } = useParams();

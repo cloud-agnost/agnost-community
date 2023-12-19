@@ -73,9 +73,7 @@ export default function Tabs() {
 		const path = pathname?.split('/')?.slice(-1)[0];
 		const currentTab = tabs.find((tab) => tab.isActive);
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
-		console.log(path, currentTab?.path, pathname);
 		if (currentTab?.path.includes(pathname)) {
-			console.log(currentTab?.path);
 			navigate(currentTab?.path);
 			return;
 		}
