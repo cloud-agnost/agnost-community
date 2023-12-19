@@ -33,12 +33,19 @@ instance.interceptors.request.use((config) => {
 		config.headers['Authorization'] = refreshToken;
 	} else if (accessToken) {
 		config.headers['Authorization'] = accessToken;
+		config.headers['Refresh-token'] = refreshToken;
 	}
 	return config;
 });
 
 instance.interceptors.response.use(
 	(response) => {
+		const at = response.headers['access-token'];
+		const rt = response.headers['refresh-token'];
+		if (at && rt) {
+			useAuthStore.getState().setRefreshToken(rt);
+			useAuthStore.getState().setToken(at);
+		}
 		return response;
 	},
 	(error) => {
