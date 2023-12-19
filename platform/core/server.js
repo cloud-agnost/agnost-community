@@ -91,7 +91,11 @@ async function initExpress(i18n) {
 	//Secure express app by setting various HTTP headers
 	app.use(helmet());
 	//Enable cross-origin resource sharing
-	app.use(cors());
+	app.use(
+		cors({
+			exposedHeaders: ["Access-Token", "Refresh-Token"],
+		})
+	);
 	//Disable client side caching
 	app.use(nocache());
 	app.set("etag", false);
