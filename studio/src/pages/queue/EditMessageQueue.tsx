@@ -67,9 +67,6 @@ export default function EditMessageQueue() {
 				},
 			]}
 		>
-			<div className='flex items-center flex-1'>
-				<span className='text-xl font-semibold text-default'>{queue.name}</span>
-			</div>
 			<TestMessageQueue open={isTestQueueOpen} onClose={() => setIsTestQueueOpen(false)} />
 		</VersionEditorLayout>
 	);

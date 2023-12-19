@@ -67,7 +67,6 @@ export default function Fields() {
 				searchable
 				breadCrumb={<BreadCrumb goBackLink={goParentModelUrl} items={breadcrumbItems} />}
 				isEmpty={!filteredFields.length}
-				title={t('database.fields.title')}
 				type='field'
 				handlerButton={<CreateFieldButton />}
 				emptyStateTitle={t('database.fields.no_fields')}

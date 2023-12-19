@@ -98,7 +98,6 @@ export default function Buckets() {
 			<VersionTabLayout
 				searchable
 				isEmpty={buckets.length === 0}
-				title={t('storage.buckets')}
 				type='bucket'
 				openCreateModal={() => setIsBucketCreateOpen(true)}
 				createButtonTitle={t('storage.bucket.create')}

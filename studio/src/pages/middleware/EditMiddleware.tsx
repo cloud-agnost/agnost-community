@@ -73,8 +73,6 @@ export default function EditMiddleware() {
 			logic={logics[middlewareId]}
 			setLogic={(val) => setLogics(middlewareId, val)}
 			deleteLogic={() => deleteLogic(middlewareId)}
-		>
-			<span className='text-default text-xl'>{middleware.name}</span>
-		</VersionEditorLayout>
+		/>
 	);
 }

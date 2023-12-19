@@ -62,7 +62,7 @@ export default function MainMiddleware() {
 				searchable
 				className='p-0'
 				type='middleware'
-				title={t('version.settings.middlewares')}
+				title={t('version.settings.middlewares') as string}
 				emptyStateTitle={t('version.middleware.no_middleware_found')}
 				createButtonTitle={t('version.middleware.add_middleware')}
 				isEmpty={!middlewares.length}

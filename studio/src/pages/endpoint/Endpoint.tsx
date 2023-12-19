@@ -72,7 +72,7 @@ export default function MainEndpoint() {
 			<VersionTabLayout<Endpoint>
 				searchable
 				type='endpoint'
-				title={t('endpoint.title')}
+				title={t('endpoint.title') as string}
 				createButtonTitle={t('endpoint.add')}
 				emptyStateTitle={t('endpoint.empty')}
 				isEmpty={!endpoints.length}

@@ -59,7 +59,7 @@ export default function MainFunction() {
 			<VersionTabLayout
 				searchable
 				type='function'
-				title={t('function.title')}
+				title={t('function.title') as string}
 				createButtonTitle={t('function.add')}
 				emptyStateTitle={t('function.empty_text')}
 				isEmpty={!functions.length}
