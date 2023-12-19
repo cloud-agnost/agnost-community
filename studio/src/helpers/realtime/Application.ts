@@ -54,9 +54,9 @@ class Application extends RealtimeActions<ApplicationType | CreateApplicationRes
 		});
 	}
 	create({ data }: RealtimeActionParams<CreateApplicationResponse>) {
-		useApplicationStore.setState?.({
-			applications: [...useApplicationStore.getState().applications, data.app],
-		});
+		useApplicationStore.setState((prev) => ({
+			applications: [...prev.applications, data.app],
+		}));
 	}
 	telemetry(params: RealtimeActionParams<ApplicationType>) {
 		this.update(params);
