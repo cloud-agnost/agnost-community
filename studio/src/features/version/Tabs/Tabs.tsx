@@ -71,19 +71,16 @@ export default function Tabs() {
 
 	useEffect(() => {
 		const path = pathname?.split('/')?.slice(-1)[0];
+		const currentTab = tabs.find((tab) => tab.isActive);
 		const item = NEW_TAB_ITEMS.find((item) => item.path === path);
-		if (!item) {
-			const currentTab = tabs.find((tab) => tab.isActive);
-			const targetPath = currentTab?.path ?? getDashboardPath();
-			navigate(targetPath);
-
+		console.log(path, currentTab?.path, pathname);
+		if (currentTab?.path.includes(pathname)) {
+			console.log(currentTab?.path);
+			navigate(currentTab?.path);
 			return;
 		}
 
-		const openTab = tabs.find((tab) => tab.path?.split('/')?.slice(-1)[0] === item.path);
-		if (openTab) {
-			setCurrentTab(versionId, openTab.id);
-		} else {
+		if (item) {
 			addTab(versionId, {
 				id: generateId(),
 				...item,
