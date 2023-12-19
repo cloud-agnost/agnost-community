@@ -42,8 +42,8 @@ export const loadMiddlewares = async (req, res, next) => {
 	try {
 		// Get the database object
 		let mws = await mwCtrl.getManyByQuery(
-			{ versionId: req.version._id },
-			{ projection: "-logic" }
+			{ versionId: req.version._id }
+			// { projection: "-logic" }
 		);
 
 		// Assign middlewares data

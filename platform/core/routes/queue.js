@@ -56,7 +56,7 @@ router.get(
 				sort,
 				skip: size * page,
 				limit: size,
-				projection: "-logic",
+				// projection: "-logic",
 			});
 
 			res.json(queues);
