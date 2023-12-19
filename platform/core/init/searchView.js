@@ -91,6 +91,36 @@ async function createSearchView() {
 			},
 			{
 				$unionWith: {
+					coll: "caches",
+					pipeline: [
+						{
+							$project: {
+								_id: 1,
+								versionId: "$versionId",
+								name: "$name",
+								type: { $literal: "cache" },
+							},
+						},
+					],
+				},
+			},
+			{
+				$unionWith: {
+					coll: "functions",
+					pipeline: [
+						{
+							$project: {
+								_id: 1,
+								versionId: "$versionId",
+								name: "$name",
+								type: { $literal: "function" },
+							},
+						},
+					],
+				},
+			},
+			{
+				$unionWith: {
 					coll: "queues",
 					pipeline: [
 						{
