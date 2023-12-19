@@ -1,4 +1,4 @@
-import { useRealtime, useRenewToken } from '@/hooks';
+import { useRealtime } from '@/hooks';
 import { router } from '@/router';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useTypeStore from '@/store/types/typeStore.ts';
@@ -12,7 +12,7 @@ import useThemeStore from './store/theme/themeStore';
 
 const queryClient = new QueryClient();
 function App() {
-	useRenewToken(2);
+	// useRenewToken(2);
 	useRealtime();
 
 	const { getAllTypes } = useTypeStore();
@@ -23,7 +23,7 @@ function App() {
 		if (!_.isEmpty(accessToken)) {
 			getAllTypes();
 		}
-	}, [accessToken]);
+	}, []);
 
 	useEffect(() => {
 		const theme = getTheme(user?._id ?? '');
