@@ -99,16 +99,16 @@
 	"instance": "Instance",
 	"status": "Status",
 	"slider": {
-		"rapid": "Accelerate your app development journey and leave the competition in the dust with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.",
-		"database": "Amplify your backend capabilities and seamlessly integrate, manipulate, and leverage the power of multiple databases, including MySQL, MSSQL, and PostgreSQL.",
-		"realtime": "Build real-time apps that deliver a seamless user experience with our real-time database that syncs data across all connected devices in milliseconds."
+		"rapid": "Accelerate your app development journey with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.",
+		"database": "Amplify your backend capabilities and seamlessly leverage the power of multiple databases, including PostgreSQL, MySQL and MongoDB.",
+		"realtime": "Build real-time apps that deliver a seamless user experience with real-time servers that sync data across all connected devices in milliseconds."
 	},
 	"internalServerError": "Internal Server Error",
 	"internalServerErrorDescription": "Our apologies for the inconvenience. Please help us to resolve this issue by providing the steps to replicate it, screenshots, or any other relevant information.",
 	"unauthorizedAccess": "Unauthorized Access",
 	"unauthorizedAccessDescription": "We're sorry, but you do not have the necessary authorization to access this page. Please contact the administrator for assistance or navigate back to the homepage",
 	"pageNotFound": "Page Not Found",
-	"pageNotFoundDescription": "We’re thinking this isn’t the page you want. Please check for spelling mistake or go back to previous page",
+	"pageNotFoundDescription": "Our apologies for the inconvenience. It seems the page or the item that you are looking for cannot be found and most probably it has been deleted.",
 	"backToHome": "Back to Homepage",
 	"back": "Back",
 	"messageUs": "Message Us",
