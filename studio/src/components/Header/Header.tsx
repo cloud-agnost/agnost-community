@@ -11,6 +11,7 @@ import { Link, useParams } from 'react-router-dom';
 import Feedback from './Feedback';
 import './header.scss';
 import { useAuthorizeVersion } from '@/hooks';
+import { Separator } from '../Separator';
 
 export function Header() {
 	const { versionId, appId, orgId } = useParams();
@@ -22,17 +23,17 @@ export function Header() {
 					<Agnost width='40' height='40' />
 				</Link>
 				<div className='header-menu-divider' />
-				<div className='flex items-center gap-2'>
+				<div className='flex items-center gap-4'>
 					{orgId && <OrganizationDropdown />}
 					{appId && (
 						<>
-							<CaretRight size={20} className='text-icon-disabled' />
+							<Separator orientation='vertical' className='h-8 transform rotate-12' />
 							<ApplicationSelectDropdown />
 						</>
 					)}
 					{versionId && (
 						<>
-							<CaretRight size={20} className='text-icon-disabled' />
+							<Separator orientation='vertical' className='h-8 transform rotate-12' />
 							<VersionDropdown />
 						</>
 					)}
