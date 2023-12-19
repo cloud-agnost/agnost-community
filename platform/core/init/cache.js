@@ -22,6 +22,7 @@ export const connectToRedisCache = async () => {
 			client.get = util.promisify(client.get);
 			client.set = util.promisify(client.set);
 			client.del = util.promisify(client.del);
+			client.expire = util.promisify(client.expire);
 
 			logger.info(
 				`Connected to the cache server @${process.env.CACHE_HOSTNAME}:${cacheConfig.port}`
@@ -133,6 +134,16 @@ export const getKey = async (key) => {
 export const deleteKey = async (key) => {
 	if (!key) return;
 	return await client.del(key.toString());
+};
+
+/**
+ * Sets the expiry of the key
+ * @param  {string} key
+ * @param {number} ttl Time to live in seconds
+ */
+export const expireKey = async (key, ttl) => {
+	if (!key || ttl <= 0) return;
+	return await client.expire(key.toString(), ttl);
 };
 
 export const getRedisClient = () => {

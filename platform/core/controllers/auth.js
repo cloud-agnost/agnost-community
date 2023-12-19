@@ -1,5 +1,5 @@
 import parser from "ua-parser-js";
-import { setKey, getKey, deleteKey } from "../init/cache.js";
+import { setKey, getKey, deleteKey, expireKey } from "../init/cache.js";
 
 /**
  * Create a new 6-digit email validation code and stores it in cache
@@ -84,7 +84,9 @@ const createSession = async (userId, ip, userAgent, provider) => {
  */
 const deleteSession = async (session) => {
 	await deleteKey(session.at);
-	await deleteKey(session.rt);
+	// We do not immediately delte the refresh token, since there can be parallel request to this refresh token
+	// Just set its expiry to some seconds later
+	await expireKey(session.rt, config.get("session.refreshTokenDelete"));
 };
 
 /**
