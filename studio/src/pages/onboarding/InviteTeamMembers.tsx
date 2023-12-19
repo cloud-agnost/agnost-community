@@ -4,9 +4,11 @@ import { InviteMemberForm, InviteMemberSchema } from '@/components/InviteMemberF
 import { RequireAuth } from '@/router';
 import useClusterStore from '@/store/cluster/clusterStore';
 import useOnboardingStore from '@/store/onboarding/onboardingStore';
+import useTypeStore from '@/store/types/typeStore';
 import { APIError } from '@/types/type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router-dom';
@@ -18,7 +20,7 @@ export default function InviteTeamMembers() {
 	const { finalizeClusterSetup } = useClusterStore();
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-
+	const { getAllTypes } = useTypeStore();
 	const form = useForm<z.infer<typeof InviteMemberSchema>>({
 		resolver: zodResolver(InviteMemberSchema),
 	});
@@ -54,6 +56,10 @@ export default function InviteTeamMembers() {
 			appMembers,
 		});
 	}
+
+	useEffect(() => {
+		getAllTypes();
+	}, []);
 
 	return (
 		<RequireAuth>
