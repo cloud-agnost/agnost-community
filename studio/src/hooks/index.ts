@@ -7,7 +7,6 @@ export { default as useEnvironmentStatus } from './useEnvironmentStatus.tsx';
 export { default as useInfiniteScroll } from './useInfiniteScroll.tsx';
 export { default as useNavigatorColumns } from './useNavigatorColumns.tsx';
 export { default as useRealtime } from './useRealtime.tsx';
-export { default as useRenewToken } from './useRenewToken.tsx';
 export { default as useSearch } from './useSearch.tsx';
 export { default as useTabNavigate } from './useTabNavigate.tsx';
 export { default as useTable } from './useTable.tsx';

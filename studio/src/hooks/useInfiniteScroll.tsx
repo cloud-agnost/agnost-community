@@ -3,6 +3,8 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import useUpdateEffect from './useUpdateEffect';
 import { useSearchParams, useParams } from 'react-router-dom';
 import { BaseParams, BaseGetRequest } from '@/types';
+import useApplicationStore from '@/store/app/applicationStore';
+import useVersionStore from '@/store/version/versionStore';
 
 interface UseFetchDataProps<T = any> {
 	queryFn: (params: BaseGetRequest & BaseParams & T) => Promise<any>;
@@ -21,7 +23,9 @@ export default function useInfiniteScroll({
 	disableVersionParams,
 }: UseFetchDataProps) {
 	const [searchParams] = useSearchParams();
-	const { orgId, appId, versionId } = useParams() as Record<string, string>;
+	const { orgId, versionId, appId } = useParams() as Record<string, string>;
+	const { application } = useApplicationStore();
+	const { version } = useVersionStore();
 	const result = useInfiniteQuery({
 		queryKey: [queryKey],
 		initialPageParam: 0,
@@ -29,8 +33,8 @@ export default function useInfiniteScroll({
 			queryFn({
 				...(!disableVersionParams && {
 					orgId,
-					versionId,
-					appId,
+					versionId: version?._id ?? versionId,
+					appId: application?._id ?? appId,
 				}),
 				page: pageParam,
 				size: MODULE_PAGE_SIZE,
@@ -63,7 +67,7 @@ export default function useInfiniteScroll({
 
 	useUpdateEffect(() => {
 		result.refetch();
-	}, [orgId, appId, versionId]);
+	}, [orgId, application?._id, version?._id]);
 
 	return result;
 }

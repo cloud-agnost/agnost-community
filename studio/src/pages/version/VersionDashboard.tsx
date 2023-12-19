@@ -10,6 +10,7 @@ import {
 import { CopyInput } from '@/components/CopyInput';
 import { TAB_ICON_MAP } from '@/constants';
 import { useUpdateEffect } from '@/hooks';
+import useApplicationStore from '@/store/app/applicationStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
@@ -30,7 +31,7 @@ export default function VersionDashboard() {
 	const { t } = useTranslation();
 
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
-
+	const { application } = useApplicationStore();
 	const { isFetching, refetch } = useQuery({
 		queryKey: ['getVersionDashboardInfo'],
 		queryFn: getVersionDashboardInfoHandler,
@@ -41,14 +42,14 @@ export default function VersionDashboard() {
 	function getVersionDashboardInfoHandler() {
 		return getVersionDashboardInfo({
 			orgId,
-			appId,
-			versionId,
+			appId: (application?._id as string) ?? appId,
+			versionId: version._id ?? versionId,
 		});
 	}
 
 	useUpdateEffect(() => {
 		refetch();
-	}, [orgId, appId, versionId]);
+	}, [orgId, application?._id, version._id]);
 
 	function getIcon(type: string) {
 		const Icon = TAB_ICON_MAP[type];

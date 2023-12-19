@@ -41,9 +41,15 @@ export default function Tabs() {
 
 	useEffect(() => {
 		if (!scrollContainer.current) return;
-		scrollContainer.current
-			.querySelector('[data-active]')
-			?.scrollIntoView({ behavior: 'smooth', inline: 'end' });
+		setTimeout(() => {
+			const selectedTab = scrollContainer?.current?.querySelector('[data-active=true]');
+			const firstElement = scrollContainer?.current?.querySelector('.tab-item');
+			scrollContainer?.current?.scrollBy({
+				left:
+					selectedTab?.getBoundingClientRect().left! - firstElement?.getBoundingClientRect().width!,
+				behavior: 'smooth',
+			});
+		}, 100);
 	}, [tabs]);
 
 	useEffect(() => {
