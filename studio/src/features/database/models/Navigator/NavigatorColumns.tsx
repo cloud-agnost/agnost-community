@@ -1,15 +1,28 @@
 import { Checkbox } from '@/components/Checkbox';
 import { TableConfirmation } from '@/components/Table';
 import useNavigatorStore from '@/store/database/navigatorStore';
-import { ColumnDefWithClassName } from '@/types';
-import { getVersionPermission, translate } from '@/utils';
+import { APIError, ColumnDefWithClassName } from '@/types';
+import { getVersionPermission, notify, translate } from '@/utils';
+import { QueryClient } from '@tanstack/react-query';
 
 const { deleteDataFromModel } = useNavigatorStore.getState();
-
+const queryClient = new QueryClient();
 async function deleteHandler(id: string) {
-	deleteDataFromModel({
-		id,
-	});
+	queryClient
+		.getMutationCache()
+		.build(queryClient, {
+			mutationFn: deleteDataFromModel,
+			onError: (error: APIError) => {
+				notify({
+					title: error.error,
+					description: error.details,
+					type: 'error',
+				});
+			},
+		})
+		.execute({
+			id,
+		});
 }
 
 export const NavigatorColumns: ColumnDefWithClassName<Record<string, any>>[] = [

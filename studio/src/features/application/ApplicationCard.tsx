@@ -4,11 +4,12 @@ import { BADGE_COLOR_MAP } from '@/constants';
 import { useSelectApplication } from '@/hooks';
 import useAuthStore from '@/store/auth/authStore';
 import { AppRoles, Application } from '@/types';
-import { getRelativeTime } from '@/utils';
+import { cn, getRelativeTime } from '@/utils';
 import { useTranslation } from 'react-i18next';
 import ApplicationSettings from './ApplicationSettings';
 import ApplicationTeam from './ApplicationTeam';
 import './application.scss';
+import BeatLoader from 'react-spinners/BeatLoader';
 interface ApplicationCardProps {
 	application: Application;
 }
@@ -16,21 +17,35 @@ interface ApplicationCardProps {
 export default function ApplicationCard({ application }: ApplicationCardProps) {
 	const { user } = useAuthStore();
 	const { t } = useTranslation();
-	const handleClickApp = useSelectApplication();
+	const { onAppClick, loading } = useSelectApplication();
 
 	const role = application.team?.find(({ userId }) => userId._id === user?._id)?.role as string;
 	return (
 		<div
-			className='application-card'
+			className='application-card relative'
 			onClick={(e) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				//@ts-ignore
-				if (e.target.id === 'open-version' || !e.target.id) handleClickApp(application);
+				if (e.target.id === 'open-version' || !e.target.id) onAppClick(application);
 			}}
 			role='button'
 			tabIndex={0}
 			aria-hidden='true'
 		>
+			{loading && (
+				<>
+					<div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10'>
+						<BeatLoader color='#6884FD' size={16} margin={12} />
+					</div>
+					<div
+						className={cn(
+							'absolute bg-base/50 w-full h-full z-40',
+							loading ? 'transition-all duration-100 fade-in' : 'animate-out fade-out',
+						)}
+					/>
+				</>
+			)}
+
 			<div className='flex items-center gap-4'>
 				<Avatar size='2xl' square>
 					<AvatarImage src={application.pictureUrl} />

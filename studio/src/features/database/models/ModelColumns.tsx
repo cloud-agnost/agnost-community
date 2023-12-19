@@ -12,7 +12,7 @@ import { TableConfirmation } from 'components/Table';
 
 const { openEditModelDialog, deleteModel } = useModelStore.getState();
 const queryClient = new QueryClient();
-function deleteHandler(model: Model) {
+async function deleteHandler(model: Model) {
 	queryClient
 		.getMutationCache()
 		.build(queryClient, {

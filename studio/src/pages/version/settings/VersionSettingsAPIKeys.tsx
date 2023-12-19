@@ -32,7 +32,7 @@ export default function VersionSettingsAPIKeys() {
 			{apiKeys.length > 0 ? (
 				<>
 					<div className='data-table-container'>
-						<DataTable<APIKey> table={table} className='table-fixed' />
+						<DataTable<APIKey> table={table} className='table-fixed navigator' />
 					</div>
 					<AddOrEditAPIKeyDrawer
 						key={editAPIKeyDrawerIsOpen.toString()}

@@ -17,7 +17,7 @@ import { TabLink } from '../version/Tabs';
 const queryClient = new QueryClient();
 const env = useEnvironmentStore.getState().environment;
 const { openEditEndpointDialog, deleteEndpoint } = useEndpointStore.getState();
-function deleteEndpointHandler(toDeleteEndpoint: Endpoint) {
+async function deleteEndpointHandler(toDeleteEndpoint: Endpoint) {
 	queryClient
 		.getMutationCache()
 		.build(queryClient, {

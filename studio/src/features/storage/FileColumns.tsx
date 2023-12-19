@@ -23,7 +23,7 @@ const {
 } = useStorageStore.getState();
 
 const queryClient = new QueryClient();
-function deleteFileHandler(toDeleteFile: BucketFile) {
+async function deleteFileHandler(toDeleteFile: BucketFile) {
 	queryClient
 		.getMutationCache()
 		.build(queryClient, {

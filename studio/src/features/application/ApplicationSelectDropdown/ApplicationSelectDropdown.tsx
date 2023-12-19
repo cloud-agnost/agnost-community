@@ -27,12 +27,12 @@ export default function ApplicationSelectDropdown() {
 	const [search, setSearch] = useState('');
 	const [openCreateModal, setOpenCreateModal] = useState(false);
 	const { applications, application, openEditAppDrawer, getAppsByOrgId } = useApplicationStore();
-	const handleSelectApp = useSelectApplication();
+	const { onAppClick } = useSelectApplication();
 	const { orgId } = useParams();
 	function onSelect(app: Application) {
 		setOpen(false);
 		if (app._id === application?._id) return;
-		handleSelectApp(app);
+		onAppClick(app);
 	}
 
 	useEffect(() => {

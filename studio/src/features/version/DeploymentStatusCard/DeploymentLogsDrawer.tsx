@@ -1,22 +1,16 @@
 import { DataTable } from '@/components/DataTable';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/Dialog';
 import { Logs } from '@/components/Log';
+import { useTable } from '@/hooks';
 import useEnvironmentStore from '@/store/environment/environmentStore';
-import {
-	Drawer,
-	DrawerClose,
-	DrawerContent,
-	DrawerFooter,
-	DrawerHeader,
-	DrawerTitle,
-} from 'components/Drawer';
+import { useQuery } from '@tanstack/react-query';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/Tabs';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import BeatLoader from 'react-spinners/BeatLoader';
 import DeploymentLogColumns from './DeploymentLogColumns';
-import { useTable } from '@/hooks';
-import _ from 'lodash';
 interface DeploymentLogsDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -43,8 +37,8 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 		orgId: string;
 	}>();
 
-	useEffect(() => {
-		if (open) {
+	const { isFetching } = useQuery({
+		queryFn: () =>
 			getEnvironmentLogs({
 				orgId: orgId as string,
 				appId: appId as string,
@@ -52,9 +46,10 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 				envId: environment._id,
 				page: 0,
 				size: 50,
-			});
-		}
-	}, [open]);
+			}),
+		queryKey: ['getEnvironmentLogs'],
+		enabled: open,
+	});
 
 	return (
 		<>
@@ -64,11 +59,14 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 						<DrawerTitle>{t('version.logs')}</DrawerTitle>
 					</DrawerHeader>
 					<div className='p-6 scroll'>
-						<DataTable table={table} />
+						{isFetching ? (
+							<div className='flex justify-center items-center h-[300px]'>
+								<BeatLoader color='#6884FD' size={16} margin={12} />
+							</div>
+						) : (
+							<DataTable table={table} />
+						)}
 					</div>
-					<DrawerFooter>
-						<DrawerClose asChild></DrawerClose>
-					</DrawerFooter>
 				</DrawerContent>
 			</Drawer>
 			<Dialog open={isLogDetailsOpen} onOpenChange={closeLogDetails}>

@@ -1,14 +1,16 @@
 import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Application } from '@/types';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 export default function useSelectApplication() {
 	const { openVersionDrawer, selectApplication } = useApplicationStore();
 	const { orgId } = useParams() as Record<string, string>;
 	const { getAllVersionsVisibleToUser, selectVersion } = useVersionStore();
-
-	return async function (app: Application) {
+	const [loading, setLoading] = useState(false);
+	async function onAppClick(app: Application) {
+		setLoading(true);
 		const versions = await getAllVersionsVisibleToUser({
 			orgId,
 			appId: app?._id as string,
@@ -22,5 +24,8 @@ export default function useSelectApplication() {
 		} else {
 			openVersionDrawer(app);
 		}
-	};
+		setLoading(false);
+	}
+
+	return { loading, onAppClick };
 }

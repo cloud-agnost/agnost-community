@@ -18,7 +18,7 @@ export default function VersionSettingsEnvironmentVariables() {
 	const { setEditParamDrawerIsOpen, editParamDrawerIsOpen } = useSettingsStore();
 
 	const table = useTable({
-		data: variables,
+		data: variables.sort((a, b) => a.name.localeCompare(b.name)),
 		columns: VariableColumns,
 	});
 
@@ -35,7 +35,7 @@ export default function VersionSettingsEnvironmentVariables() {
 					</div>
 				) : (
 					<div className='data-table-container'>
-						<DataTable<Param> table={table} className='table-fixed' />
+						<DataTable<Param> table={table} className='table-fixed navigator' />
 					</div>
 				)}
 				<EditEnvVariable open={editParamDrawerIsOpen} onOpenChange={setEditParamDrawerIsOpen} />
