@@ -518,6 +518,41 @@ router.put(
 );
 
 /*
+@route      /v1/user/editor
+@method     PUT
+@desc       Updates the code editor settings of the user.
+@access     private
+*/
+router.put("/editor", checkContentType, authSession, async (req, res) => {
+	try {
+		let userObj = await userCtrl.updateOneById(
+			req.user._id,
+			{
+				editorSettings: req.body,
+			},
+			{},
+			{ cacheKey: req.user._id }
+		);
+
+		// Remove password field value from returned object
+		delete userObj.loginProfiles[0].password;
+		res.json(userObj);
+
+		// Log action
+		auditCtrl.logAndNotify(
+			userObj._id,
+			userObj,
+			"user",
+			"update",
+			t("Updated code editor settings"),
+			userObj
+		);
+	} catch (error) {
+		handleError(req, res, error);
+	}
+});
+
+/*
 @route      /v1/user/contact-email
 @method     POST
 @desc       Initiates the update for contact email change. A confirmation email is sent to the new email address.
