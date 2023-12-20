@@ -3,6 +3,7 @@ import { AuthService, ClusterService } from '@/services';
 import {
 	APIError,
 	ClusterComponent,
+	ClusterReleaseInfo,
 	ClusterSetupResponse,
 	SetupCluster,
 	TransferClusterOwnershipParams,
@@ -22,6 +23,7 @@ interface ClusterStore {
 	clusterComponents: ClusterComponent[];
 	isEditClusterComponentOpen: boolean;
 	clusterComponent: ClusterComponent;
+	clusterReleaseInfo: ClusterReleaseInfo | undefined;
 	clusterInfo: any;
 }
 
@@ -37,6 +39,8 @@ type Actions = {
 	transferClusterOwnership: (params: TransferClusterOwnershipParams) => Promise<void>;
 	getClusterInfo: () => Promise<any>;
 	updateSmtpSettings: (data: any) => Promise<any>;
+	getClusterAndReleaseInfo: () => Promise<ClusterReleaseInfo>;
+	updateClusterRelease: (param: { release: string }) => Promise<ClusterReleaseInfo>;
 	reset: () => void;
 };
 
@@ -48,7 +52,8 @@ const initialState: ClusterStore = {
 	clusterComponents: [],
 	clusterComponent: {} as ClusterComponent,
 	isEditClusterComponentOpen: false,
-	clusterInfo: {},
+	clusterInfo: undefined,
+	clusterReleaseInfo: {} as ClusterReleaseInfo,
 };
 
 const useClusterStore = create<ClusterStore & Actions>()(
@@ -159,6 +164,21 @@ const useClusterStore = create<ClusterStore & Actions>()(
 				set({ error: error as APIError });
 				throw error;
 			}
+		},
+		getClusterAndReleaseInfo: async () => {
+			const clusterAndReleaseInfo = await ClusterService.getClusterAndReleaseInfo();
+			set({ clusterReleaseInfo: clusterAndReleaseInfo });
+			return clusterAndReleaseInfo;
+		},
+		updateClusterRelease: async (param: { release: string }) => {
+			const cluster = await ClusterService.updateClusterRelease(param);
+			set((prev) => ({
+				clusterReleaseInfo: {
+					...prev.clusterReleaseInfo,
+					...cluster,
+				},
+			}));
+			return cluster;
 		},
 		reset: () => set(initialState),
 	})),
