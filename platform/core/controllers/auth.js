@@ -82,11 +82,15 @@ const createSession = async (userId, ip, userAgent, provider) => {
  * Invalidates (deletes) the session and also associated refresh token
  * @param  {object} session The session object to invalidate
  */
-const deleteSession = async (session) => {
+const deleteSession = async (session, immediateDelete = false) => {
 	await deleteKey(session.at);
 	// We do not immediately delte the refresh token, since there can be parallel request to this refresh token
-	// Just set its expiry to some seconds later
-	await expireKey(session.rt, config.get("session.refreshTokenDelete"));
+	if (immediateDelete) {
+		await deleteKey(session.rt);
+	} else {
+		// Just set its expiry to some seconds later
+		await expireKey(session.rt, config.get("session.refreshTokenDelete"));
+	}
 };
 
 /**
