@@ -10,6 +10,7 @@ import './organization.scss';
 import { EmptyState } from '@/components/EmptyState';
 import { useEffect } from 'react';
 import { AuthUserDropdown } from '@/features/auth/AuthUserDropdown';
+import { ReleaseDropdown } from '@/features/cluster';
 export default function OrganizationSelect() {
 	const { organizations, selectOrganization, getAllOrganizationByUser } = useOrganizationStore();
 	const { user } = useAuthStore();
@@ -31,7 +32,8 @@ export default function OrganizationSelect() {
 
 	return (
 		<div className='p-6 relative'>
-			<div className='absolute right-6'>
+			<div className='absolute right-6 flex items-center gap-4'>
+				<ReleaseDropdown />
 				<AuthUserDropdown />
 			</div>
 			<div className='select-organization-container'>

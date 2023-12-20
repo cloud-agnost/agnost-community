@@ -11,6 +11,7 @@ import { Link, useParams } from 'react-router-dom';
 import Feedback from './Feedback';
 import './header.scss';
 import { useAuthorizeVersion } from '@/hooks';
+import { ReleaseDropdown } from '@/features/cluster';
 
 export function Header() {
 	const { versionId, appId, orgId } = useParams();
@@ -58,6 +59,7 @@ export function Header() {
 				</nav>
 				<div className='header-menu-divider' />
 				<div className='header-menu-right-actions'>
+					<ReleaseDropdown />
 					{versionId && (
 						<>
 							<div className='header-menu-right-actions-versions'>
