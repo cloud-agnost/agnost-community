@@ -4,6 +4,7 @@
 	"notifications_title": "Notifications",
 	"notifications_description": "When an action happens in any of the organizations or apps that you are a member of you will be notified. You can manage your personal notification settings and turn on/off notifications on specific platform entities.",
 	"clusters_title": "Cluster Management",
+	"editor_settings": "Editor Settings",
 	"save": "Save",
 	"name": "Name",
 	"email": "Email",
@@ -71,5 +72,22 @@
 	"environment_notification": "Environment Events",
 	"middleware_notification": "Middleware Events",
 	"function_notification": "Function Events",
-	"all_notification": "All Notifications"
+	"all_notification": "All Notifications",
+	"editor": {
+		"title": "Editor Preferences",
+		"font_family": "Font Family",
+		"font_size": "Font Size",
+		"tab_size": "Tab Size",
+		"tab_size_desc": "The number of spaces a tab is equal to",
+		"word_wrap": "Word Wrap",
+		"word_wrap_desc": "Controls how lines should wrap.",
+		"line_numbers": "Line Numbers",
+		"minimap": "Minimap",
+		"minimap_desc": "Controls if a Minimap is shown.",
+		"font_ligatures": "Font Ligatures",
+		"font_ligatures_desc": "Configures font ligatures or font features.",
+		"editor_theme": "Editor Theme",
+		"font_weight": "Font Weight",
+		"success": "Editor preferences updated successfully"
+	}
 }

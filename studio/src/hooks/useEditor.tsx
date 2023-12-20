@@ -1,14 +1,62 @@
 import { formatCode } from '@/utils';
 import { BeforeMount, EditorProps, OnChange } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-import nightOwl from 'monaco-themes/themes/Night Owl.json';
-import slush from 'monaco-themes/themes/Slush and Poppies.json';
-import iPlastic from 'monaco-themes/themes/iPlastic.json';
+import * as active4d from 'monaco-themes/themes/Active4D.json';
+import * as allHallowsEve from 'monaco-themes/themes/All Hallows Eve.json';
+import * as amy from 'monaco-themes/themes/Amy.json';
+import * as birdsOfParadise from 'monaco-themes/themes/Birds of Paradise.json';
+import * as blackboard from 'monaco-themes/themes/Blackboard.json';
+import * as brillianceBlack from 'monaco-themes/themes/Brilliance Black.json';
+import * as brillianceDull from 'monaco-themes/themes/Brilliance Dull.json';
+import * as chromeDevtools from 'monaco-themes/themes/Chrome DevTools.json';
+import * as cloudsMidnight from 'monaco-themes/themes/Clouds Midnight.json';
+import * as clouds from 'monaco-themes/themes/Clouds.json';
+import * as cobalt from 'monaco-themes/themes/Cobalt.json';
+import * as cobalt2 from 'monaco-themes/themes/Cobalt2.json';
+import * as dawn from 'monaco-themes/themes/Dawn.json';
+import * as dracula from 'monaco-themes/themes/Dracula.json';
+import * as dreamweaver from 'monaco-themes/themes/Dreamweaver.json';
+import * as eiffel from 'monaco-themes/themes/Eiffel.json';
+import * as espressoLibre from 'monaco-themes/themes/Espresso Libre.json';
+import * as githubDark from 'monaco-themes/themes/GitHub Dark.json';
+import * as githubLight from 'monaco-themes/themes/GitHub Light.json';
+import * as github from 'monaco-themes/themes/GitHub.json';
+import * as idle from 'monaco-themes/themes/IDLE.json';
+import * as katzenmilch from 'monaco-themes/themes/Katzenmilch.json';
+import * as kuroirTheme from 'monaco-themes/themes/Kuroir Theme.json';
+import * as lazy from 'monaco-themes/themes/LAZY.json';
+import * as magicWbAmiga from 'monaco-themes/themes/MagicWB (Amiga).json';
+import * as merbivoreSoft from 'monaco-themes/themes/Merbivore Soft.json';
+import * as merbivore from 'monaco-themes/themes/Merbivore.json';
+import * as monokaiBright from 'monaco-themes/themes/Monokai Bright.json';
+import * as monokai from 'monaco-themes/themes/Monokai.json';
+import * as nightOwl from 'monaco-themes/themes/Night Owl.json';
+import * as nord from 'monaco-themes/themes/Nord.json';
+import * as oceanicNext from 'monaco-themes/themes/Oceanic Next.json';
+import * as pastelsOnDark from 'monaco-themes/themes/Pastels on Dark.json';
+import * as slushAndPoppies from 'monaco-themes/themes/Slush and Poppies.json';
+import * as solarizedDark from 'monaco-themes/themes/Solarized-dark.json';
+import * as solarizedLight from 'monaco-themes/themes/Solarized-light.json';
+import * as spacecadet from 'monaco-themes/themes/SpaceCadet.json';
+import * as sunburst from 'monaco-themes/themes/Sunburst.json';
+import * as textmateMacClassic from 'monaco-themes/themes/Textmate (Mac Classic).json';
+import * as tomorrowNightBlue from 'monaco-themes/themes/Tomorrow-Night-Blue.json';
+import * as tomorrowNightBright from 'monaco-themes/themes/Tomorrow-Night-Bright.json';
+import * as tomorrowNightEighties from 'monaco-themes/themes/Tomorrow-Night-Eighties.json';
+import * as tomorrowNight from 'monaco-themes/themes/Tomorrow-Night.json';
+import * as tomorrow from 'monaco-themes/themes/Tomorrow.json';
+import * as twilight from 'monaco-themes/themes/Twilight.json';
+import * as upstreamSunburst from 'monaco-themes/themes/Upstream Sunburst.json';
+import * as vibrantInk from 'monaco-themes/themes/Vibrant Ink.json';
+import * as xcodeDefault from 'monaco-themes/themes/Xcode_default.json';
+import * as zenburnesque from 'monaco-themes/themes/Zenburnesque.json';
+import * as iplastic from 'monaco-themes/themes/iPlastic.json';
+import * as idlefingers from 'monaco-themes/themes/idleFingers.json';
+import * as krtheme from 'monaco-themes/themes/krTheme.json';
+import * as monoindustrial from 'monaco-themes/themes/monoindustrial.json';
 import { useRef } from 'react';
 
 export const EDITOR_OPTIONS: EditorProps['options'] = {
-	minimap: { enabled: false },
-	fontSize: 14,
 	quickSuggestions: {
 		strings: true,
 		other: true,
@@ -18,20 +66,14 @@ export const EDITOR_OPTIONS: EditorProps['options'] = {
 		indentation: false,
 		highlightActiveIndentation: true,
 	},
-	fontLigatures: true,
-	fontFamily: "'Fira Code', 'Fira Mono', 'Menlo', 'Monaco', 'Courier', monospace",
-	fontWeight: '400',
 	autoClosingBrackets: 'always',
 	autoDetectHighContrast: true,
-	wordWrap: 'on',
-	lineNumbers: 'on',
 	lineNumbersMinChars: 3,
 	scrollBeyondLastLine: false,
 	scrollbar: {},
 	renderLineHighlight: 'none', //Enable rendering of current line highlight
-	folding: false, //Enable code folding
+	folding: true, //Enable code folding
 	codeLens: true,
-	tabSize: 3,
 };
 
 export type CodeEditorProps = {
@@ -76,9 +118,120 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 	}
 
 	const onBeforeMount: BeforeMount = (monaco) => {
-		monaco.editor.defineTheme('nightOwl', nightOwl as monaco.editor.IStandaloneThemeData);
-		monaco.editor.defineTheme('slush', slush as monaco.editor.IStandaloneThemeData);
-		monaco.editor.defineTheme('iPlastic', iPlastic as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('active4d', active4d as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme(
+			'all-hallows-eve',
+			allHallowsEve as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme('amy', amy as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme(
+			'birds-of-paradise',
+			birdsOfParadise as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme('blackboard', blackboard as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme(
+			'brilliance-black',
+			brillianceBlack as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme(
+			'brilliance-dull',
+			brillianceDull as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme(
+			'chrome-devtools',
+			chromeDevtools as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme(
+			'clouds-midnight',
+			cloudsMidnight as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme('clouds', clouds as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('cobalt', cobalt as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('cobalt2', cobalt2 as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('dawn', dawn as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('dracula', dracula as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('dreamweaver', dreamweaver as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('eiffel', eiffel as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme(
+			'espresso-libre',
+			espressoLibre as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme('github-dark', githubDark as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('github-light', githubLight as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('github', github as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('idle', idle as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('katzenmilch', katzenmilch as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('kuroir-theme', kuroirTheme as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('lazy', lazy as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme(
+			'magicwb--amiga-',
+			magicWbAmiga as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme(
+			'merbivore-soft',
+			merbivoreSoft as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme('merbivore', merbivore as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme(
+			'monokai-bright',
+			monokaiBright as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme('monokai', monokai as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('night-owl', nightOwl as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('nord', nord as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('oceanic-next', oceanicNext as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme(
+			'pastels-on-dark',
+			pastelsOnDark as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme(
+			'slush-and-poppies',
+			slushAndPoppies as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme('solarizedDark', solarizedDark as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme(
+			'solarized-light',
+			solarizedLight as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme('spacecadet', spacecadet as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('sunburst', sunburst as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme(
+			'textmate--mac-classic-',
+			textmateMacClassic as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme(
+			'tomorrow-night-blue',
+			tomorrowNightBlue as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme(
+			'tomorrow-night-bright',
+			tomorrowNightBright as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme(
+			'tomorrow-night-eighties',
+			tomorrowNightEighties as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme(
+			'tomorrow-night',
+			tomorrowNight as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme('tomorrow', tomorrow as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('twilight', twilight as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme(
+			'upstream-sunburst',
+			upstreamSunburst as monaco.editor.IStandaloneThemeData,
+		);
+		monaco.editor.defineTheme('vibrant-ink', vibrantInk as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('xcode-default', xcodeDefault as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('zenburnesque', zenburnesque as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('iplastic', iplastic as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('idlefingers', idlefingers as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme('krtheme', krtheme as monaco.editor.IStandaloneThemeData);
+		monaco.editor.defineTheme(
+			'monoindustrial',
+			monoindustrial as monaco.editor.IStandaloneThemeData,
+		);
+
 		monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
 			target: monaco.languages.typescript.ScriptTarget.Latest,
 			allowNonTsExtensions: true,
