@@ -91,7 +91,7 @@ export default function MainStorage() {
 			<VersionTabLayout
 				searchable
 				isEmpty={!storages.length}
-				title={t('storage.title')}
+				title={t('storage.title') as string}
 				type='storage'
 				openCreateModal={() => setIsCreateModalOpen(true)}
 				createButtonTitle={t('storage.create')}

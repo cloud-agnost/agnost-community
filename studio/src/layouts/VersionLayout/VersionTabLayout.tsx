@@ -15,7 +15,7 @@ interface Props<T> {
 	isEmpty: boolean;
 	table?: Table<T>;
 	type: Modules;
-	title: string;
+	title?: string;
 	emptyStateTitle: string;
 	createButtonTitle?: string | null;
 	children: ReactNode;
@@ -92,30 +92,32 @@ export default function VersionTabLayout<T>({
 	}, [search]);
 	return (
 		<div className={cn('h-full space-y-6 relative ', className)}>
-			{breadCrumb}
-			<div className='flex items-center justify-between'>
-				<h1 className='text-default text-xl text-center'>{title}</h1>
-				<div className='flex items-center justify-center gap-4'>
-					{searchable && (
-						<SearchInput
-							value={searchParams.get('q') ?? undefined}
-							className='sm:w-[450px] flex-1'
-						/>
-					)}
-					{table?.getSelectedRowModel().rows.length ? (
-						<SelectedRowButton
-							table={table}
-							onDelete={() => onMultipleDelete?.()}
-							disabled={disabled}
-						/>
-					) : null}
-					{handlerButton}
-					{!!createButtonTitle && !!openCreateModal && (
-						<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
-							<Plus size={16} />
-							<span className='ml-2'>{createButtonTitle}</span>
-						</Button>
-					)}
+			<div className={cn(!title && 'flex items-center justify-between')}>
+				{breadCrumb}
+				<div className='flex items-center justify-between'>
+					<h1 className='text-default text-xl text-center'>{title}</h1>
+					<div className='flex items-center justify-center gap-4'>
+						{searchable && (
+							<SearchInput
+								value={searchParams.get('q') ?? undefined}
+								className='sm:w-[450px] flex-1'
+							/>
+						)}
+						{table?.getSelectedRowModel().rows.length ? (
+							<SelectedRowButton
+								table={table}
+								onDelete={() => onMultipleDelete?.()}
+								disabled={disabled}
+							/>
+						) : null}
+						{handlerButton}
+						{!!createButtonTitle && !!openCreateModal && (
+							<Button variant='primary' onClick={openCreateModal} disabled={disabled}>
+								<Plus size={16} />
+								<span className='ml-2'>{createButtonTitle}</span>
+							</Button>
+						)}
+					</div>
 				</div>
 			</div>
 			{!loading && content}

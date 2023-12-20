@@ -93,7 +93,7 @@ export default function VersionDatabase() {
 				searchable
 				className='p-0'
 				isEmpty={databases.length === 0}
-				title={t('database.page_title')}
+				title={t('database.page_title') as string}
 				type='database'
 				openCreateModal={() => setCreateDrawerIsOpen(true)}
 				createButtonTitle={t('database.add.title')}

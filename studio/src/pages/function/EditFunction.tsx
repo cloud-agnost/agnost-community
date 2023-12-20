@@ -67,10 +67,6 @@ export default function EditFunction() {
 				},
 			]}
 			canEdit={canEdit}
-		>
-			<div className='flex items-center flex-1'>
-				<span className='text-xl font-semibold text-default'>{helper.name}</span>
-			</div>
-		</VersionEditorLayout>
+		/>
 	);
 }

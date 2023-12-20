@@ -78,7 +78,7 @@ export default function MainMessageQueue() {
 			<VersionTabLayout<MessageQueue>
 				searchable
 				isEmpty={queues.length === 0}
-				title={t('queue.title')}
+				title={t('queue.title') as string}
 				type='queue'
 				openCreateModal={() => setIsCreateModalOpen(true)}
 				createButtonTitle={t('queue.create.title')}
