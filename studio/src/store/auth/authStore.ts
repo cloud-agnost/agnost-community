@@ -234,11 +234,8 @@ const useAuthStore = create<AuthState & Actions>()(
 					},
 					async removeAvatar() {
 						try {
-							await UserService.removeAvatar();
-							set((prev) => {
-								delete prev.user?.pictureUrl;
-								return prev;
-							});
+							const user = await UserService.removeAvatar();
+							set({ user });
 						} catch (err) {
 							set({ error: err as APIError });
 							throw err;
