@@ -15,5 +15,16 @@
 	"clusterVersion": "Cluster Version",
 	"transferClusterOwnership": "Transfer Cluster Ownership",
 	"transferClusterOwnershipDescription": "Select the organization member that you would like to transfer the ownership of the cluster.",
-	"smtpSettingsUpdatedDescription": "SMTP settings have been updated successfully."
+	"smtpSettingsUpdatedDescription": "SMTP settings have been updated successfully.",
+	"release": "Release",
+	"history": "History",
+	"component": "Component",
+	"status": "Status",
+	"current": "Current",
+	"latest": "Latest",
+	"update": "Update to release {{release}}",
+	"upToDate": "Your cluster is up to date",
+	"view_notes": "View release notes",
+	"deployed_at": "Deployed at",
+	"deploy_success": "Cluster deployed successfully"
 }
