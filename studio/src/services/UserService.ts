@@ -1,6 +1,6 @@
 import { axios } from '@/helpers';
 import { UpdateNotificationData, User } from '@/types/type.ts';
-
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 export default class UserService {
 	static url = '/v1/user';
 
@@ -72,5 +72,11 @@ export default class UserService {
 
 	static async updateNotifications(data: UpdateNotificationData): Promise<User> {
 		return (await axios.put(`${this.url}/notifications`, data)).data;
+	}
+
+	static async updateEditorPreferences(
+		data: Partial<monaco.editor.IStandaloneEditorConstructionOptions>,
+	): Promise<User> {
+		return (await axios.put(`${this.url}/editor`, data)).data;
 	}
 }

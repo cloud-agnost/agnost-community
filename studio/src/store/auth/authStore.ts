@@ -9,6 +9,7 @@ import type {
 	User,
 } from '@/types';
 import { joinChannel, leaveChannel } from '@/utils';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import useApplicationStore from '../app/applicationStore';
 import useOrganizationStore from '../organization/organizationStore';
@@ -21,6 +22,7 @@ interface AuthState {
 	user: User | undefined;
 	email: string | undefined;
 	isAccepted: boolean;
+	isEditorSettingsDrawerOpen: boolean;
 }
 
 type Actions = {
@@ -63,6 +65,10 @@ type Actions = {
 	updateNotifications: (notifications: string[]) => Promise<User>;
 	confirmChangeLoginEmail: (token: string) => Promise<void>;
 	getUser: () => Promise<User>;
+	toggleEditorSettingsDrawer: () => void;
+	updateEditorPreferences: (
+		preferences: Partial<monaco.editor.IStandaloneEditorConstructionOptions>,
+	) => Promise<User>;
 	reset: () => void;
 };
 
@@ -74,6 +80,7 @@ const initialState: AuthState = {
 	user: undefined,
 	email: undefined,
 	isAccepted: false,
+	isEditorSettingsDrawerOpen: false,
 };
 
 const useAuthStore = create<AuthState & Actions>()(
@@ -259,6 +266,18 @@ const useAuthStore = create<AuthState & Actions>()(
 						const user = await UserService.getUser();
 						get().setUser(user);
 						return user;
+					},
+					toggleEditorSettingsDrawer() {
+						set((prev) => ({ isEditorSettingsDrawerOpen: !prev.isEditorSettingsDrawerOpen }));
+					},
+					async updateEditorPreferences(preferences: any) {
+						try {
+							const user = await UserService.updateEditorPreferences(preferences);
+							set({ user });
+							return user;
+						} catch (error) {
+							throw error as APIError;
+						}
 					},
 					reset() {
 						set(initialState);
