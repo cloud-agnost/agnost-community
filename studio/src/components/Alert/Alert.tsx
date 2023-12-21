@@ -12,17 +12,31 @@ const alertVariants = cva('alert', {
 			error: 'alert-error',
 			warning: 'alert-warning',
 		},
+		size: {
+			sm: 'alert-sm',
+			md: 'alert-md',
+			lg: 'alert-lg',
+		},
+		square: {
+			true: 'avatar-square',
+		},
 	},
 	defaultVariants: {
 		variant: 'success',
+		size: 'md',
 	},
 });
 
 const Alert = React.forwardRef<
 	HTMLDivElement,
 	React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, ...props }, ref) => (
-	<div ref={ref} role='alert' className={cn(alertVariants({ variant }), className)} {...props}>
+>(({ className, variant, size, ...props }, ref) => (
+	<div
+		ref={ref}
+		role='alert'
+		className={cn(alertVariants({ variant, size }), className)}
+		{...props}
+	>
 		<div className='alert-icon'>
 			{variant === 'success' && <SuccessCheck />}
 			{variant === 'warning' && <Warning />}

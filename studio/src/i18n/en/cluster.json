@@ -26,7 +26,8 @@
 	"current": "Current",
 	"latest": "Latest",
 	"update": "Update to release {{release}}",
-	"upToDate": "Your cluster is on the latest release",
+	"update_available": "You have updates available for your cluster.",
+	"up_to_date": "Your cluster is on the latest release",
 	"view_notes": "View release notes",
 	"deployed_at": "Deployed at",
 	"deploy_success": "Cluster deployed successfully"

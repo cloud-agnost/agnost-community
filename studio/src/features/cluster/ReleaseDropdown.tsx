@@ -96,13 +96,11 @@ function ReleaseInfo() {
 	});
 
 	return (
-		<div className='h-96 overflow-auto'>
-			<DataTable
-				table={table}
-				containerClassName='!border-none'
-				className='!bg-transparent [&>tbody]:bg-transparent [&_tr]:border-none [&_td]:p-2 [&_th]:p-2'
-			/>
-		</div>
+		<DataTable
+			table={table}
+			containerClassName='!border-none pl-2'
+			className='!bg-transparent [&>tbody]:bg-transparent [&_tr]:border-none [&_td]:p-2 [&_th]:p-2'
+		/>
 	);
 }
 function ReleaseSettings() {
@@ -132,7 +130,11 @@ function ReleaseSettings() {
 	});
 	return (
 		<>
-			<Alert variant={hasUpdate ? 'warning' : 'success'} size='sm' className='!rounded-none !gap-4'>
+			<Alert
+				variant={hasUpdate ? 'warning' : 'success'}
+				size='sm'
+				className='!rounded-none !gap-2 !p-2'
+			>
 				<AlertTitle className='font-normal'>
 					{hasUpdate ? t('cluster.update_available') : t('cluster.up_to_date')}
 				</AlertTitle>
