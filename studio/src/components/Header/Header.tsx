@@ -2,6 +2,7 @@ import { Agnost } from '@/components/icons';
 import { MENU_ITEMS } from '@/constants';
 import { ApplicationSelectDropdown } from '@/features/application';
 import { AuthUserDropdown } from '@/features/auth/AuthUserDropdown';
+import { ReleaseDropdown } from '@/features/cluster';
 import { OrganizationDropdown } from '@/features/organization/OrganizationDropdown';
 import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
 import { NotificationDropdown } from '@/features/version/Notification';
@@ -58,6 +59,7 @@ export function Header() {
 				</nav>
 				<div className='header-menu-divider' />
 				<div className='header-menu-right-actions'>
+					<ReleaseDropdown />
 					{versionId && (
 						<>
 							<div className='header-menu-right-actions-versions'>

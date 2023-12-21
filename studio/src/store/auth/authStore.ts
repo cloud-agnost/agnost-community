@@ -100,6 +100,7 @@ const useAuthStore = create<AuthState & Actions>()(
 							const user = await AuthService.login(req.email, req.password);
 							get().setUser(user);
 							if (req.onSuccess) req.onSuccess(user);
+							joinChannel('cluster');
 							return user;
 						} catch (error) {
 							if (req.onError) req.onError(error as APIError);
@@ -113,6 +114,7 @@ const useAuthStore = create<AuthState & Actions>()(
 							if (user) leaveChannel(user?._id);
 							await AuthService.logout();
 							set(initialState);
+							leaveChannel('cluster');
 							req.onSuccess?.();
 						} catch (error) {
 							req.onError?.(error as APIError);

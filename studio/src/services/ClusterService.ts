@@ -1,6 +1,7 @@
 import { axios } from '@/helpers';
 import {
 	ClusterComponent,
+	ClusterReleaseInfo,
 	TransferClusterOwnershipParams,
 	UpdateClusterComponentParams,
 } from '@/types';
@@ -44,5 +45,12 @@ export default class ClusterService {
 
 	static async updateSmtpSettings(data: any) {
 		return (await axios.put(`${this.url}/smtp`, data)).data;
+	}
+
+	static async getClusterAndReleaseInfo(): Promise<ClusterReleaseInfo> {
+		return (await axios.get(`${this.url}/release-info`)).data;
+	}
+	static async updateClusterRelease(data: { release: string }) {
+		return (await axios.put(`${this.url}/update-release`, data)).data;
 	}
 }

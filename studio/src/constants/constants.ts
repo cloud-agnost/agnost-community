@@ -782,6 +782,12 @@ export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
 	Redeploying: ['bg-elements-subtle-blue', 'bg-elements-blue'],
 	Deleting: ['bg-elements-subtle-red', 'bg-elements-red'],
 };
+export const CLUSTER_RELEASE_CLASS_MAP: Record<string, string[]> = {
+	Error: ['bg-elements-subtle-red', 'bg-elements-red'],
+	OK: ['bg-elements-subtle-green', 'bg-elements-green'],
+	Updating: ['bg-elements-subtle-yellow', 'bg-elements-yellow'],
+	'Has update': ['bg-elements-subtle-orange', 'bg-elements-orange'],
+};
 
 export const NOTIFICATION_ACTIONS = ['create', 'update', 'deploy', 'redeploy', 'delete'];
 export const OAUTH_ICON_MAP: Record<OAuthProviderTypes, ElementType> = {
