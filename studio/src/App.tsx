@@ -1,4 +1,4 @@
-import { useFetchReleaseHistory, useRealtime } from '@/hooks';
+import { useRealtime } from '@/hooks';
 import { router } from '@/router';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useTypeStore from '@/store/types/typeStore.ts';
@@ -12,7 +12,6 @@ import useThemeStore from './store/theme/themeStore';
 
 const queryClient = new QueryClient();
 function App() {
-	useFetchReleaseHistory();
 	useRealtime();
 
 	const { getAllTypes } = useTypeStore();

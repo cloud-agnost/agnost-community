@@ -23,16 +23,21 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import ReleaseColumns from './ReleaseColumns';
+import BeatLoader from 'react-spinners/BeatLoader';
+import { useEffect, useRef, useState } from 'react';
+import _ from 'lodash';
 
 export default function ReleaseDropdown() {
+	const [open, setOpen] = useState(false);
 	const { t } = useTranslation();
 	const { getClusterAndReleaseInfo, clusterReleaseInfo } = useClusterStore();
 	const classes = CLUSTER_RELEASE_CLASS_MAP[getReleaseStatus()];
-
-	useQuery({
+	const ref = useRef<HTMLButtonElement>(null);
+	const { isFetching, refetch } = useQuery({
 		queryFn: getClusterAndReleaseInfo,
 		queryKey: ['getClusterAndReleaseInfo'],
 		refetchOnWindowFocus: false,
+		refetchInterval: 15 * 60 * 1000,
 	});
 
 	function getReleaseStatus(): string {
@@ -48,9 +53,15 @@ export default function ReleaseDropdown() {
 		return 'OK';
 	}
 
+	useEffect(() => {
+		if (open) {
+			refetch();
+		}
+	}, [open]);
+
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
+		<DropdownMenu open={open} onOpenChange={setOpen}>
+			<DropdownMenuTrigger asChild ref={ref}>
 				<Button variant='blank' iconOnly className='relative'>
 					{getReleaseStatus() !== 'OK' && (
 						<div className='absolute top-1 right-0.5'>
@@ -79,7 +90,7 @@ export default function ReleaseDropdown() {
 					</span>
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator />
-				<ReleaseInfo />
+				<ReleaseInfo loading={isFetching} />
 				<Separator />
 				<ReleaseSettings />
 			</DropdownMenuContent>
@@ -87,7 +98,7 @@ export default function ReleaseDropdown() {
 	);
 }
 
-function ReleaseInfo() {
+function ReleaseInfo({ loading = false }: { loading: boolean }) {
 	const { clusterComponentsReleaseInfo } = useClusterStore();
 
 	const table = useTable({
@@ -95,7 +106,11 @@ function ReleaseInfo() {
 		data: clusterComponentsReleaseInfo,
 	});
 
-	return (
+	return loading && _.isEmpty(clusterComponentsReleaseInfo) ? (
+		<div className='h-96 flex items-center justify-center'>
+			<BeatLoader color='#6884FD' size={16} margin={12} />
+		</div>
+	) : (
 		<DataTable
 			table={table}
 			containerClassName='!border-none pl-2'
