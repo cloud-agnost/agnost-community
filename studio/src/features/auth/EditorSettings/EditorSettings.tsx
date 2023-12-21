@@ -100,7 +100,7 @@ export default function EditorSettings() {
 			minimap: false,
 			lineNumbers: 'on',
 			wordWrap: 'on',
-			theme: 'active4d',
+			theme: 'night-owl',
 			fontLigatures: true,
 		},
 		resolver: zodResolver(schema),
@@ -134,7 +134,7 @@ export default function EditorSettings() {
 	};
 
 	useEffect(() => {
-		if (isEditorSettingsDrawerOpen) {
+		if (isEditorSettingsDrawerOpen && user?.editorSettings) {
 			form.reset({
 				...user?.editorSettings,
 				minimap: user?.editorSettings.minimap?.enabled,
