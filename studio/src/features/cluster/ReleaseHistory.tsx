@@ -17,7 +17,7 @@ export default function ReleaseHistory() {
 		<Drawer open={isReleaseHistoryOpen} onOpenChange={toggleReleaseHistory}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
-					<DrawerTitle>{t('endpoint.create.title')}</DrawerTitle>
+					<DrawerTitle>{t('cluster.history')}</DrawerTitle>
 				</DrawerHeader>
 				<div className='p-6'>
 					<DataTable table={table} />
