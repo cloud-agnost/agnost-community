@@ -49,7 +49,6 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 			appId: appId as string,
 			versionId: versionId as string,
 			taskId: task._id,
-			resourceId: resources[0]._id,
 			...data,
 		});
 	}
