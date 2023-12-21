@@ -1,17 +1,17 @@
 import { Agnost } from '@/components/icons';
 import { MENU_ITEMS } from '@/constants';
 import { ApplicationSelectDropdown } from '@/features/application';
+import { AuthUserDropdown } from '@/features/auth/AuthUserDropdown';
+import { ReleaseDropdown } from '@/features/cluster';
 import { OrganizationDropdown } from '@/features/organization/OrganizationDropdown';
 import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
-import { VersionDropdown } from '@/features/version/VersionDropdown';
-import { CaretRight } from '@phosphor-icons/react';
-import { AuthUserDropdown } from '@/features/auth/AuthUserDropdown';
 import { NotificationDropdown } from '@/features/version/Notification';
+import { VersionDropdown } from '@/features/version/VersionDropdown';
+import { useAuthorizeVersion } from '@/hooks';
 import { Link, useParams } from 'react-router-dom';
+import { Separator } from '../Separator';
 import Feedback from './Feedback';
 import './header.scss';
-import { useAuthorizeVersion } from '@/hooks';
-import { ReleaseDropdown } from '@/features/cluster';
 
 export function Header() {
 	const { versionId, appId, orgId } = useParams();
@@ -23,17 +23,17 @@ export function Header() {
 					<Agnost width='40' height='40' />
 				</Link>
 				<div className='header-menu-divider' />
-				<div className='flex items-center gap-2'>
+				<div className='flex items-center gap-4'>
 					{orgId && <OrganizationDropdown />}
 					{appId && (
 						<>
-							<CaretRight size={20} className='text-icon-disabled' />
+							<Separator orientation='vertical' className='h-8 transform rotate-12' />
 							<ApplicationSelectDropdown />
 						</>
 					)}
 					{versionId && (
 						<>
-							<CaretRight size={20} className='text-icon-disabled' />
+							<Separator orientation='vertical' className='h-8 transform rotate-12' />
 							<VersionDropdown />
 						</>
 					)}

@@ -173,7 +173,6 @@ export class RabbitMQ extends QueueBase {
 				);
 			}
 		} catch (error) {
-			console.log("***err", error);
 			logger.error("Cannot create channel to message queue", {
 				details: error,
 			});

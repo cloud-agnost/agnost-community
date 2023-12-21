@@ -104,6 +104,9 @@ export const UserModel = mongoose.model(
 				default: "Pending",
 				enum: userStatus,
 			},
+			editorSettings: {
+				type: mongoose.Schema.Types.Mixed,
+			},
 			__v: {
 				type: Number,
 				select: false,

@@ -94,6 +94,7 @@ const AvatarFallback = React.forwardRef<
 				backgroundColor: color,
 			}}
 			{...props}
+			delayMs={200}
 		>
 			{name}
 		</AvatarPrimitive.Fallback>

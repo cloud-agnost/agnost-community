@@ -516,7 +516,7 @@ router.post(
 router.post("/logout", authSession, async (req, res) => {
 	try {
 		// Delete the session token and also the associated refresh token
-		await authCtrl.deleteSession(req.session);
+		await authCtrl.deleteSession(req.session, true);
 		res.json();
 	} catch (error) {
 		handleError(req, res, error);

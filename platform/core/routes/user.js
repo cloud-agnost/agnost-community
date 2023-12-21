@@ -7,6 +7,7 @@ import orgInvitationCtrl from "../controllers/orgInvitation.js";
 import appInvitationCtrl from "../controllers/appInvitation.js";
 import orgMemberCtrl from "../controllers/organizationMember.js";
 import appCtrl from "../controllers/app.js";
+import authCtrl from "../controllers/auth.js";
 import { applyRules } from "../schemas/user.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
@@ -17,6 +18,8 @@ import { storage } from "../init/storage.js";
 import { handleError } from "../schemas/platformError.js";
 import ERROR_CODES from "../config/errorCodes.js";
 import { notificationTypes } from "../config/constants.js";
+import { sendMessage as sendNotification } from "../init/sync.js";
+import { deleteKey } from "../init/cache.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -42,12 +45,15 @@ router.get("/me", authSession, async (req, res) => {
 /*
 @route      /v1/user
 @method     DELETE
-@desc       Deletes (anonymizes) the user account
+@desc       Deletes (anonymizes) the user account, removes also the user from organization and app memberships
 @access     private
 */
 router.delete("/", authSession, async (req, res) => {
+	// Start new database transaction session
+	const session = await userCtrl.startSession();
 	try {
-		if (req.user.isClusterOwner) {
+		const { user } = req;
+		if (user.isClusterOwner) {
 			return res.status(400).json({
 				error: t("Not Allowed"),
 				code: ERROR_CODES.notAllowed,
@@ -58,7 +64,7 @@ router.delete("/", authSession, async (req, res) => {
 		}
 
 		await userCtrl.updateOneById(
-			req.user._id,
+			user._id,
 			{
 				name: "Anonymous",
 				contactEmail: "Anonymous",
@@ -67,10 +73,129 @@ router.delete("/", authSession, async (req, res) => {
 				"loginProfiles.$[].email": "Anonymous",
 			},
 			{ pictureUrl: 1, "loginProfiles.$[].password": 1, notifications: 1 },
-			{ cacheKey: req.user._id }
+			{ session }
 		);
+
+		// Clear the cache of the user
+		await deleteKey(user._id);
+
+		// Get organization memberships of the user
+		let orgMemberships = await orgMemberCtrl.getManyByQuery(
+			{
+				userId: user._id,
+			},
+			{
+				session,
+			}
+		);
+
+		// Remove user from organization teams
+		for (let i = 0; i < orgMemberships.length; i++) {
+			const orgMembership = orgMemberships[i];
+			// Leave the organization team
+			await orgMemberCtrl.deleteOneByQuery(
+				{ orgId: orgMembership.orgId, userId: user._id },
+				{
+					cacheKey: `${orgMembership.orgId}.${user._id}`,
+					session,
+				}
+			);
+		}
+
+		// Delete organization invitations
+		await orgInvitationCtrl.deleteManyByQuery(
+			{ email: user.contactEmail },
+			{ session }
+		);
+
+		// Check to see if the user has app team memberships.
+		let apps = await appCtrl.getManyByQuery(
+			{
+				"team.userId": user._id,
+			},
+			{ session }
+		);
+
+		// Remove user from app teams
+		for (let i = 0; i < apps.length; i++) {
+			const app = apps[i];
+			await appCtrl.pullObjectByQuery(
+				app._id,
+				"team",
+				{ userId: user._id },
+				{},
+				{ cacheKey: app._id, session }
+			);
+		}
+
+		// Delete app invitations
+		await appInvitationCtrl.deleteManyByQuery(
+			{ email: user.contactEmail },
+			{ session }
+		);
+
+		// Commit transaction
+		await userCtrl.commit(session);
+		// Clear the session of the user
+		await authCtrl.deleteSession(req.session, true);
+
 		res.json();
+
+		if (orgMemberships.length > 0) {
+			orgMemberships.forEach((orgMembership) => {
+				// Send realtime notifications for updated organizations
+				sendNotification(orgMembership.orgId, {
+					actor: {
+						userId: user._id,
+						name: user.name,
+						pictureUrl: user.pictureUrl,
+						color: user.color,
+						contactEmail: user.contactEmail,
+						loginEmail: user.loginProfiles[0].email,
+					},
+					action: "update",
+					object: "org.app",
+					description: t(
+						"User '%s' (%s) has left the organization team",
+						user.name,
+						user.contactEmail
+					),
+					timestamp: Date.now(),
+					data: entry,
+					identifiers: { orgId: orgMembership.orgId },
+				});
+				s;
+			});
+		}
+
+		if (apps.length > 0) {
+			// Send realtime notifications for updated apps
+			apps.forEach((app) => {
+				sendNotification(app._id, {
+					actor: {
+						userId: user._id,
+						name: user.name,
+						pictureUrl: user.pictureUrl,
+						color: user.color,
+						contactEmail: user.contactEmail,
+						loginEmail: user.loginProfiles[0].email,
+					},
+					action: "update",
+					object: "org.app",
+					description: t(
+						"User '%s' (%s) has left the app team",
+						user.name,
+						user.contactEmail
+					),
+					timestamp: Date.now(),
+					data: entry,
+					identifiers: { orgId: app.orgId, appId: app._id },
+				});
+			});
+		}
 	} catch (error) {
+		console.log(error);
+		await userCtrl.rollback(session);
 		handleError(req, res, error);
 	}
 });
@@ -391,6 +516,41 @@ router.put(
 		}
 	}
 );
+
+/*
+@route      /v1/user/editor
+@method     PUT
+@desc       Updates the code editor settings of the user.
+@access     private
+*/
+router.put("/editor", checkContentType, authSession, async (req, res) => {
+	try {
+		let userObj = await userCtrl.updateOneById(
+			req.user._id,
+			{
+				editorSettings: req.body,
+			},
+			{},
+			{ cacheKey: req.user._id }
+		);
+
+		// Remove password field value from returned object
+		delete userObj.loginProfiles[0].password;
+		res.json(userObj);
+
+		// Log action
+		auditCtrl.logAndNotify(
+			userObj._id,
+			userObj,
+			"user",
+			"update",
+			t("Updated code editor settings"),
+			userObj
+		);
+	} catch (error) {
+		handleError(req, res, error);
+	}
+});
 
 /*
 @route      /v1/user/contact-email

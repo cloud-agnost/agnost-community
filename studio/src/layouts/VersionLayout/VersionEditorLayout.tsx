@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router-dom';
 
 interface VersionEditorLayoutProps {
-	children: React.ReactNode;
+	children?: React.ReactNode;
 	className?: string;
 	loading: boolean;
 	logic: string;
@@ -83,15 +83,13 @@ export default function VersionEditorLayout({
 
 	return (
 		<div className={cn('space-y-6 h-full', className)}>
-			<div className='flex items-center gap-4'>
+			<div className='flex items-center justify-between gap-6'>
 				{breadCrumbItems && (
 					<BreadCrumb
 						goBackLink={pathname.split('/').slice(0, -1).join('/')}
 						items={breadCrumbItems}
 					/>
 				)}
-			</div>
-			<div className='flex items-center justify-between'>
 				{children}
 				<div className='flex items-center gap-4'>
 					<Button variant='secondary' onClick={onEditModalOpen} disabled={!canEdit}>
@@ -114,7 +112,7 @@ export default function VersionEditorLayout({
 
 			<CodeEditor
 				className='h-full'
-				containerClassName='h-[88%]'
+				containerClassName='h-[95%]'
 				value={editedLogic}
 				onChange={(val) => setLogic(val as string)}
 				onSave={(val) => onSaveLogic(val as string)}

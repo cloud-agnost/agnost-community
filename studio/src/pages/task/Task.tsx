@@ -79,7 +79,7 @@ export default function MainTask() {
 		<>
 			<VersionTabLayout
 				type='task'
-				title={t('task.title')}
+				title={t('task.title') as string}
 				createButtonTitle={t('task.add')}
 				emptyStateTitle={t('task.empty_text')}
 				isEmpty={!tasks.length}

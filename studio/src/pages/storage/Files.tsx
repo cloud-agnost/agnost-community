@@ -113,7 +113,6 @@ export default function Files() {
 			searchable
 			breadCrumb={<BreadCrumb goBackLink={bucketUrl} items={breadcrumbItems} />}
 			isEmpty={files.length === 0}
-			title={bucket?.name}
 			type='file'
 			openCreateModal={uploadFileHandler}
 			createButtonTitle={t('storage.file.upload')}

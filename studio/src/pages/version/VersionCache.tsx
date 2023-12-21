@@ -103,7 +103,7 @@ export default function VersionCache() {
 			<VersionTabLayout
 				searchable
 				isEmpty={caches.length === 0}
-				title={t('cache.title')}
+				title={t('cache.title') as string}
 				type='cache'
 				openCreateModal={() => setIsCreateModalOpen(true)}
 				createButtonTitle={t('cache.create')}
