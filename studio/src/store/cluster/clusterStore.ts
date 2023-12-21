@@ -3,8 +3,10 @@ import { AuthService, ClusterService } from '@/services';
 import {
 	APIError,
 	ClusterComponent,
+	ClusterComponentReleaseInfo,
 	ClusterReleaseInfo,
 	ClusterSetupResponse,
+	ModuleVersions,
 	SetupCluster,
 	TransferClusterOwnershipParams,
 	UpdateClusterComponentParams,
@@ -24,7 +26,9 @@ interface ClusterStore {
 	isEditClusterComponentOpen: boolean;
 	clusterComponent: ClusterComponent;
 	clusterReleaseInfo: ClusterReleaseInfo | undefined;
+	clusterComponentsReleaseInfo: ClusterComponentReleaseInfo[];
 	clusterInfo: any;
+	isReleaseHistoryOpen: boolean;
 }
 
 type Actions = {
@@ -41,6 +45,7 @@ type Actions = {
 	updateSmtpSettings: (data: any) => Promise<any>;
 	getClusterAndReleaseInfo: () => Promise<ClusterReleaseInfo>;
 	updateClusterRelease: (param: { release: string }) => Promise<ClusterReleaseInfo>;
+	toggleReleaseHistory: () => void;
 	reset: () => void;
 };
 
@@ -54,6 +59,8 @@ const initialState: ClusterStore = {
 	isEditClusterComponentOpen: false,
 	clusterInfo: undefined,
 	clusterReleaseInfo: {} as ClusterReleaseInfo,
+	clusterComponentsReleaseInfo: [],
+	isReleaseHistoryOpen: false,
 };
 
 const useClusterStore = create<ClusterStore & Actions>()(
@@ -166,19 +173,38 @@ const useClusterStore = create<ClusterStore & Actions>()(
 			}
 		},
 		getClusterAndReleaseInfo: async () => {
-			const clusterAndReleaseInfo = await ClusterService.getClusterAndReleaseInfo();
-			set({ clusterReleaseInfo: clusterAndReleaseInfo });
-			return clusterAndReleaseInfo;
+			const clusterReleaseInfo = await ClusterService.getClusterAndReleaseInfo();
+			set({
+				clusterReleaseInfo,
+				clusterComponentsReleaseInfo: Object.entries(clusterReleaseInfo?.current?.modules ?? {})
+					.filter(([module]) => module !== 'engine-core')
+					.map(([module, version]) => ({
+						module,
+						version,
+						status: clusterReleaseInfo?.cluster.clusterResourceStatus.find((item) =>
+							item.name.includes(module),
+						)?.status as string,
+						latest: clusterReleaseInfo?.latest?.modules?.[module as keyof ModuleVersions] ?? '',
+					})),
+			});
+			return clusterReleaseInfo;
 		},
 		updateClusterRelease: async (param: { release: string }) => {
 			const cluster = await ClusterService.updateClusterRelease(param);
 			set((prev) => ({
 				clusterReleaseInfo: {
 					...prev.clusterReleaseInfo,
+					current: {
+						...prev.clusterReleaseInfo?.current,
+						release: param.release,
+					},
 					...cluster,
 				},
 			}));
 			return cluster;
+		},
+		toggleReleaseHistory: () => {
+			set((prev) => ({ isReleaseHistoryOpen: !prev.isReleaseHistoryOpen }));
 		},
 		reset: () => set(initialState),
 	})),
