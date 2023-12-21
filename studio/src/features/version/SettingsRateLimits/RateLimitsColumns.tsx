@@ -27,6 +27,7 @@ function editHandler(original: RateLimit) {
 const RateLimitsColumns: ColumnDefWithClassName<RateLimit>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		className:
 			'!max-w-[40px] !w-[40px] [&_.checkbox-wrapper]:mx-auto [&_.checkbox-wrapper]:w-fit !p-0',
 		header: ({ table }) => (

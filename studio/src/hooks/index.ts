@@ -4,7 +4,6 @@ export { default as useDebounceFn } from './useDebounceFn.tsx';
 export { default as useEditedField } from './useEditedField.tsx';
 export { default as useEditor } from './useEditor.tsx';
 export { default as useEnvironmentStatus } from './useEnvironmentStatus.tsx';
-export { default as useFetchReleaseHistory } from './useFetchReleaseHistory.tsx';
 export { default as useInfiniteScroll } from './useInfiniteScroll.tsx';
 export { default as useNavigatorColumns } from './useNavigatorColumns.tsx';
 export { default as useRealtime } from './useRealtime.tsx';

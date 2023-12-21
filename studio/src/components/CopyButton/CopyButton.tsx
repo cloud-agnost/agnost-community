@@ -15,7 +15,6 @@ export default function CopyButton({ text, className }: CopyButtonProps) {
 				'bg-button-secondary text-base w-7 h-7 p-[6px] hover:bg-button-secondary-hover border border-button-border hover:border-button-border-hover',
 				className,
 			)}
-			type='button'
 			iconOnly
 		>
 			<Copy />

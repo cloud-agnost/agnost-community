@@ -1,7 +1,5 @@
-'use client';
-
 import { cn } from '@/utils/';
-import { Check, CaretDown } from '@phosphor-icons/react';
+import { Check, CaretDown, CaretUp } from '@phosphor-icons/react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import * as React from 'react';
 import './select.scss';
@@ -46,11 +44,13 @@ const SelectContent = React.forwardRef<
 			position={position}
 			{...props}
 		>
+			<SelectScrollUpButton />
 			<SelectPrimitive.Viewport
 				className={cn('select-viewport', position === 'popper' && 'select-viewport-popper')}
 			>
 				{children}
 			</SelectPrimitive.Viewport>
+			<SelectScrollDownButton />
 		</SelectPrimitive.Content>
 	</SelectPrimitive.Portal>
 ));
@@ -90,6 +90,34 @@ const SelectSeparator = React.forwardRef<
 	/>
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
+
+const SelectScrollUpButton = React.forwardRef<
+	React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
+	React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
+>(({ className, ...props }, ref) => (
+	<SelectPrimitive.ScrollUpButton
+		ref={ref}
+		className={cn('flex cursor-default items-center justify-center py-1', className)}
+		{...props}
+	>
+		<CaretUp className='h-4 w-4' />
+	</SelectPrimitive.ScrollUpButton>
+));
+SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
+
+const SelectScrollDownButton = React.forwardRef<
+	React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
+	React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
+>(({ className, ...props }, ref) => (
+	<SelectPrimitive.ScrollDownButton
+		ref={ref}
+		className={cn('flex cursor-default items-center justify-center py-1', className)}
+		{...props}
+	>
+		<CaretDown className='h-4 w-4' />
+	</SelectPrimitive.ScrollDownButton>
+));
+SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName;
 
 export {
 	Select,

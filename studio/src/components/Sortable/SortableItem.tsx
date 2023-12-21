@@ -26,7 +26,6 @@ export default function SortableItem<T extends { name: string; iid: string }>({
 			<DotsSixVertical size={20} className='text-icon-base text-lg cursor-move' />
 			<span>{item?.name}</span>
 			<Button
-				type='button'
 				onClick={() => onDelete(item?.iid)}
 				iconOnly
 				loading={loading}

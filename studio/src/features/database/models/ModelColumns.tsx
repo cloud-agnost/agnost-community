@@ -36,6 +36,7 @@ async function deleteHandler(model: Model) {
 const ModelColumns: ColumnDefWithClassName<Model>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		className: '!max-w-[40px] !w-[40px]',
 		header: ({ table }) => (
 			<Checkbox

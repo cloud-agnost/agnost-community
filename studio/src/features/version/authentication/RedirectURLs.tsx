@@ -131,7 +131,6 @@ export default function RedirectURLs() {
 							/>
 
 							<Button
-								type='button'
 								variant='secondary'
 								disabled={fields.length === 1}
 								iconOnly

@@ -49,6 +49,7 @@ async function deleteHandler(task: Task) {
 const TaskColumns: ColumnDefWithClassName<Task>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		className: '!max-w-[40px] !w-[40px]',
 		header: ({ table }) => (
 			<Checkbox

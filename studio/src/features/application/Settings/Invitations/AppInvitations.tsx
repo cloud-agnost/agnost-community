@@ -34,7 +34,7 @@ function AppInvitations() {
 				appId: application?._id,
 			}),
 		queryKey: ['applicationInvitations'],
-		enabled: searchParams.get('t') === 'invitations',
+		enabled: searchParams.get('st') === 'invitations',
 		initialPageParam: 0,
 		getNextPageParam: (lastPage) => {
 			const nextPage = lastPage.length === PAGE_SIZE ? lastFetchedInvitationsPage + 1 : undefined;

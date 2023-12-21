@@ -13,6 +13,7 @@ import { DateText } from 'components/DateText';
 const CacheColumns: ColumnDefWithClassName<Cache>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		className: '!max-w-[40px] !w-[40px]',
 		header: ({ table }) => (
 			<Checkbox

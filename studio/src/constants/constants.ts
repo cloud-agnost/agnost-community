@@ -132,12 +132,12 @@ export const SLIDER_IMAGES = [
 export const MENU_ITEMS = [
 	{
 		title: 'Change Log',
-		url: '/change-log',
+		url: 'https://github.com/cloud-agnost/agnost-community/releases',
 		icon: ChangeLog,
 	},
 	{
 		title: 'Docs',
-		url: 'https://agnost.dev/docs/installation/installation-minikube',
+		url: 'https://agnost.dev/docs/intro',
 		icon: FileText,
 	},
 ];
@@ -785,8 +785,8 @@ export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
 export const CLUSTER_RELEASE_CLASS_MAP: Record<string, string[]> = {
 	Error: ['bg-elements-subtle-red', 'bg-elements-red'],
 	OK: ['bg-elements-subtle-green', 'bg-elements-green'],
-	Updating: ['bg-elements-subtle-yellow', 'bg-elements-yellow'],
-	'Has update': ['bg-elements-subtle-orange', 'bg-elements-orange'],
+	Updating: ['bg-elements-subtle-orange', 'bg-elements-orange'],
+	'Has update': ['bg-elements-subtle-blue', 'bg-elements-blue'],
 };
 
 export const NOTIFICATION_ACTIONS = ['create', 'update', 'deploy', 'redeploy', 'delete'];

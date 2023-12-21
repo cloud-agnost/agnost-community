@@ -91,6 +91,7 @@ async function deleteInvitationHandler(token: string) {
 export const AppInvitationsColumns: ColumnDef<Invitation>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}

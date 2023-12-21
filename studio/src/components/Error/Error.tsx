@@ -112,7 +112,7 @@ export default function Error({ children }: { children: React.ReactNode }) {
 								)}
 							/>
 							<div className='flex justify-end gap-4 mt-2'>
-								<Button variant='text' type='button' size='lg' onClick={closeModal}>
+								<Button variant='text' size='lg' onClick={closeModal}>
 									{t('general.cancel')}
 								</Button>
 								<Button variant='primary' size='lg' loading={loading}>

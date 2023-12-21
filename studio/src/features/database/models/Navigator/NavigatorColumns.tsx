@@ -28,6 +28,7 @@ async function deleteHandler(id: string) {
 export const NavigatorColumns: ColumnDefWithClassName<Record<string, any>>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		size: 50,
 		header: ({ table }) => (
 			<Checkbox

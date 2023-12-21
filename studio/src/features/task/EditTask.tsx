@@ -4,14 +4,13 @@ import { useToast } from '@/hooks';
 import useTaskStore from '@/store/task/taskStore';
 import { APIError, CreateTaskSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import TaskForm from './TaskForm';
-import useResourceStore from '@/store/resources/resourceStore';
-import { useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
 interface EditTaskProps {
 	open: boolean;
 	onClose: () => void;
@@ -21,7 +20,6 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 	const { t } = useTranslation();
 	const { updateTask, task } = useTaskStore();
 	const { notify } = useToast();
-	const { resources } = useResourceStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -49,7 +47,6 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 			appId: appId as string,
 			versionId: versionId as string,
 			taskId: task._id,
-			resourceId: resources[0]._id,
 			...data,
 		});
 	}

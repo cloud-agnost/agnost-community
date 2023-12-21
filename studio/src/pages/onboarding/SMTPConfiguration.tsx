@@ -100,16 +100,10 @@ export default function SMTPConfiguration() {
 					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-3.5'>
 						<SMTPForm />
 						<div className='flex gap-4 justify-end'>
-							<Button onClick={goBack} type='button' variant='text' size='lg'>
+							<Button onClick={goBack} variant='text' size='lg'>
 								{t('onboarding.previous')}
 							</Button>
-							<Button
-								loading={finalizing}
-								onClick={finishSetup}
-								type='button'
-								variant='secondary'
-								size='lg'
-							>
+							<Button loading={finalizing} onClick={finishSetup} variant='secondary' size='lg'>
 								{t('onboarding.skip_and_finish')}
 							</Button>
 							<Button loading={isTesting} size='lg'>

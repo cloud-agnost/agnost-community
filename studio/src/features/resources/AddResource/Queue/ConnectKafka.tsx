@@ -97,7 +97,6 @@ export default function ConnectKafka() {
 						)}
 					/>
 					<Button
-						type='button'
 						variant='secondary'
 						disabled={fields.length === 1}
 						iconOnly
@@ -120,7 +119,6 @@ export default function ConnectKafka() {
 			<div className='flex justify-between items-center mt-8'>
 				{fields.length < 50 && (
 					<Button
-						type='button'
 						variant='text'
 						onClick={() => {
 							append({ key: '' });

@@ -29,7 +29,6 @@ const CopyInput = React.forwardRef<HTMLInputElement, React.ComponentPropsWithout
 					className='copy-input-button'
 					onClick={() => copy(inputValue)}
 					variant='blank'
-					type='button'
 					iconOnly
 				>
 					<Copy size={20} />

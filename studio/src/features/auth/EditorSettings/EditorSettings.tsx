@@ -39,38 +39,17 @@ const schema = z.object({
 });
 
 const fonts = [
-	{ name: 'Fira Code', value: 'Fira Code' },
-	{
-		name: 'JetBrains Mono',
-		value: 'JetBrains Mono',
-	},
-	{
-		name: 'Roboto Mono',
-		value: 'Roboto Mono',
-	},
-	{
-		name: 'Source Code Pro',
-		value: 'Source Code Pro',
-	},
-	{
-		name: 'Inconsolata',
-		value: 'Inconsolata',
-	},
-	{
-		name: 'Hack',
-		value: 'Hack',
-	},
-	{
-		name: 'Monaco',
-		value: 'Monaco',
-	},
-	{
-		name: 'DejaVu Sans Mono ',
-		value: 'DejaVu Sans Mono',
-	},
-	{ name: 'Menlo', value: 'Menlo' },
 	{ name: 'Courier', value: 'Courier' },
-	{ name: 'monospace', value: 'monospace' },
+	{ name: 'DejaVu Sans Mono ', value: 'DejaVu Sans Mono' },
+	{ name: 'Fira Code', value: 'Fira Code' },
+	{ name: 'Hack', value: 'Hack' },
+	{ name: 'Inconsolata', value: 'Inconsolata' },
+	{ name: 'JetBrains Mono', value: 'JetBrains Mono' },
+	{ name: 'Menlo', value: 'Menlo' },
+	{ name: 'Monaco', value: 'Monaco' },
+	{ name: 'Monospace', value: 'monospace' },
+	{ name: 'Roboto Mono', value: 'Roboto Mono' },
+	{ name: 'Source Code Pro', value: 'Source Code Pro' },
 ];
 const word_wrap = [
 	{ name: 'On', value: 'on' },
@@ -84,6 +63,12 @@ const line_numbers = [
 	{ name: 'Relative', value: 'relative' },
 	{ name: 'Interval', value: 'interval' },
 ];
+
+const themes = {
+	vs: 'VS',
+	'vs-dark': 'VS Dark',
+	...monacoThemes,
+};
 
 export default function EditorSettings() {
 	const { t } = useTranslation();
@@ -151,7 +136,7 @@ export default function EditorSettings() {
 					<DrawerTitle>{t('profileSettings.editor.title')}</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll space-y-8'>
+					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll space-y-6'>
 						<div className='grid grid-cols-3 gap-4'>
 							<FormField
 								control={form.control}
@@ -167,14 +152,11 @@ export default function EditorSettings() {
 												onValueChange={field.onChange}
 											>
 												<FormControl>
-													<SelectTrigger
-														error={Boolean(form.formState.errors.fontFamily)}
-														className='w-full'
-													>
+													<SelectTrigger className='w-full'>
 														<SelectValue placeholder={`${t('general.select')} `} />
 													</SelectTrigger>
 												</FormControl>
-												<SelectContent align='center'>
+												<SelectContent align='center' className='!max-h-[26rem]'>
 													{fonts.map((font) => (
 														<SelectItem key={font.name} value={font.value}>
 															{font.name}
@@ -221,15 +203,12 @@ export default function EditorSettings() {
 												onValueChange={field.onChange}
 											>
 												<FormControl>
-													<SelectTrigger
-														error={Boolean(form.formState.errors.wordWrap)}
-														className='w-full'
-													>
+													<SelectTrigger className='w-full'>
 														<SelectValue placeholder={`${t('general.select')} `} />
 													</SelectTrigger>
 												</FormControl>
-												<SelectContent align='center'>
-													{Object.entries(monacoThemes).map(([key, theme]) => (
+												<SelectContent align='center' className='!max-h-[36rem]'>
+													{Object.entries(themes).map(([key, theme]) => (
 														<SelectItem key={key} value={key}>
 															{theme}
 														</SelectItem>
@@ -279,10 +258,7 @@ export default function EditorSettings() {
 												onValueChange={field.onChange}
 											>
 												<FormControl>
-													<SelectTrigger
-														error={Boolean(form.formState.errors.lineNumbers)}
-														className='w-full'
-													>
+													<SelectTrigger className='w-full'>
 														<SelectValue placeholder={`${t('general.select')} `} />
 													</SelectTrigger>
 												</FormControl>
@@ -314,10 +290,7 @@ export default function EditorSettings() {
 												onValueChange={field.onChange}
 											>
 												<FormControl>
-													<SelectTrigger
-														error={Boolean(form.formState.errors.wordWrap)}
-														className='w-full'
-													>
+													<SelectTrigger className='w-full'>
 														<SelectValue placeholder={`${t('general.select')} `} />
 													</SelectTrigger>
 												</FormControl>
@@ -368,15 +341,27 @@ export default function EditorSettings() {
 
 						<CodeEditor
 							name='editor'
-							className='h-96'
+							containerClassName='h-1/2'
+							className='h-full'
 							value={`
-// First line
-const  hello = () => {
-	alert('Hello world!');
+// This function calculates the sum of two numbers
+const sum(a, b) => {
+  // Return the sum of a and b
+  return a + b;
 }
-// Last line
+
+// Declare two numbers
+let num1 = 5;
+let num2 = 10;
+
+// Calculate the sum of num1 and num2
+let total = sum(num1, num2);
+
+// Log the result to the console
+console.log('total:', total);
 `}
 							options={{
+								readOnly: true,
 								fontSize: form.watch('fontSize'),
 								fontFamily: form.watch('fontFamily'),
 								fontWeight: form.watch('fontWeight'),

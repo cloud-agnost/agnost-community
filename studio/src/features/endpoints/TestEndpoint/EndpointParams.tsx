@@ -74,7 +74,7 @@ export default function EndpointParams() {
 						/>
 					</TableCell>
 					<TableCell>
-						<Button type='button' variant='secondary' onClick={() => removeQueryParamFields(index)}>
+						<Button variant='secondary' onClick={() => removeQueryParamFields(index)}>
 							<Trash size={16} className='text-icon-secondary' />
 						</Button>
 					</TableCell>
@@ -82,11 +82,7 @@ export default function EndpointParams() {
 			))}
 			<TableRow>
 				<TableCell colSpan={3} className='text-center'>
-					<Button
-						type='button'
-						variant='secondary'
-						onClick={() => appendQueryParams({ key: '', value: '' })}
-					>
+					<Button variant='secondary' onClick={() => appendQueryParams({ key: '', value: '' })}>
 						<Plus size={16} className='text-icon-secondary mr-2' weight='bold' />
 						{t('endpoint.test.add_query_param')}
 					</Button>

@@ -52,6 +52,7 @@ async function clearBucket(bucketName: string) {
 const BucketColumns: ColumnDefWithClassName<Bucket>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		className: '!max-w-[40px] !w-[40px]',
 		header: ({ table }) => (
 			<Checkbox

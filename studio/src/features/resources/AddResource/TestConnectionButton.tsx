@@ -58,7 +58,6 @@ export default function TestConnectionButton({ replica }: { replica?: boolean })
 			variant='outline'
 			loading={isPending}
 			onClick={testResourceConnection}
-			type='button'
 			size='lg'
 			className='self-start'
 		>

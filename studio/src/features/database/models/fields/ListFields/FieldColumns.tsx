@@ -41,6 +41,7 @@ async function deleteHandler(field: Field) {
 const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		className: '!max-w-[40px] !w-[40px]',
 		header: (props) => {
 			return (
