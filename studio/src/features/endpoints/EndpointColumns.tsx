@@ -41,6 +41,7 @@ async function deleteEndpointHandler(toDeleteEndpoint: Endpoint) {
 const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}

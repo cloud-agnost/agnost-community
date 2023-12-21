@@ -48,6 +48,7 @@ async function deleteHandler(mq: MessageQueue) {
 const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		className: '!max-w-[40px] !w-[40px]',
 		header: ({ table }) => (
 			<Checkbox

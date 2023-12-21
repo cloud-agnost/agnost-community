@@ -13,6 +13,7 @@ const { openDeleteStorageDialog, openEditStorageDialog } = useStorageStore.getSt
 const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		className: '!max-w-[40px] !w-[40px]',
 		header: ({ table }) => (
 			<Checkbox

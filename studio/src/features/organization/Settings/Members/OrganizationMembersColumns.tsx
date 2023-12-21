@@ -28,6 +28,7 @@ async function deleteHandler(member: OrganizationMember) {
 export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}

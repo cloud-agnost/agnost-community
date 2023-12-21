@@ -36,6 +36,7 @@ async function deleteHandler(mw: Middleware) {
 const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		className: '!max-w-[25px] !w-[25px] !pr-0',
 		header: ({ table }) => (
 			<Checkbox

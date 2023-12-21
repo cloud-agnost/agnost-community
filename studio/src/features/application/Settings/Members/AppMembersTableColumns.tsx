@@ -52,6 +52,7 @@ function updateMemberRole(userId: string, role: string, appId: string) {
 export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}

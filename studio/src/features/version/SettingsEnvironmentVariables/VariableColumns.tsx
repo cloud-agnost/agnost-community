@@ -29,6 +29,7 @@ function editHandler(original: Param) {
 const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}

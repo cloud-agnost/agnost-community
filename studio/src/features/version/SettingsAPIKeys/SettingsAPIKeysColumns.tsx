@@ -33,6 +33,7 @@ function editHandler(original: APIKey) {
 const SettingsAPIKeysColumns: ColumnDefWithClassName<APIKey>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}

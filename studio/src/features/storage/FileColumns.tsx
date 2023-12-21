@@ -106,6 +106,7 @@ function copyFile(filePath: string) {
 const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		className: '!max-w-[40px] !w-[40px]',
 		header: ({ table }) => (
 			<Checkbox

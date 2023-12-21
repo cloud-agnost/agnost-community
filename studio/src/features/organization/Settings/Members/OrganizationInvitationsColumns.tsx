@@ -51,6 +51,7 @@ function onResend(token: string) {
 export const OrganizationInvitationsColumns: ColumnDef<Invitation>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}

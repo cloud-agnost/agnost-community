@@ -24,6 +24,7 @@ async function onDelete(packageId: string) {
 const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	{
 		id: 'select',
+		enableResizing: false,
 		size: undefined,
 		className:
 			'!max-w-[20px] !w-[20px] [&_.checkbox-wrapper]:mx-auto [&_.checkbox-wrapper]:w-fit !p-0',

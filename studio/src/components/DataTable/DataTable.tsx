@@ -46,7 +46,7 @@ export default function DataTable<TData>({
 										{header.isPlaceholder
 											? null
 											: flexRender(header.column.columnDef.header, header.getContext())}
-										{header.id !== 'select' && (
+										{header.column.columnDef.enableResizing !== false && (
 											<div
 												{...{
 													onMouseDown: header.getResizeHandler(),
