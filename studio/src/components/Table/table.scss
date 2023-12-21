@@ -10,7 +10,7 @@
 		@apply bg-subtle font-medium text-subtle;
 	}
 	&-body {
-		@apply [&_tr:last-child]:border-none;
+		@apply [&_tr:last-child]:border-none bg-base;
 	}
 	&-row {
 		@apply border-b transition-colors   #{!important};
@@ -35,7 +35,7 @@
 		}
 	}
 	&-cell {
-		@apply p-4 align-middle [&:has([role=checkbox])]:pr-0 text-default bg-base;
+		@apply p-4 align-middle [&:has([role=checkbox])]:pr-0 text-default;
 
 		&.actions {
 			* {
