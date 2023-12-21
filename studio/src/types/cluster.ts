@@ -49,7 +49,7 @@ export interface ClusterSetupResponse {
 	env: Environment;
 }
 
-interface ModuleVersions {
+export interface ModuleVersions {
 	'engine-core': string;
 	'engine-monitor': string;
 	'engine-realtime': string;
@@ -66,7 +66,7 @@ interface ReleaseInfo {
 	modules: ModuleVersions;
 }
 
-interface ClusterReleaseHistory {
+export interface ClusterReleaseHistory {
 	release: string;
 	timestamp: string;
 	_id: string;
@@ -102,4 +102,10 @@ export interface ClusterReleaseInfo {
 	};
 	latest: ReleaseInfo;
 	cluster: Cluster;
+}
+export interface ClusterComponentReleaseInfo {
+	module: string;
+	version: string;
+	status: string;
+	latest: string;
 }
