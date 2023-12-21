@@ -19,7 +19,7 @@ export default function ReleaseHistory() {
 				<DrawerHeader>
 					<DrawerTitle>{t('cluster.history')}</DrawerTitle>
 				</DrawerHeader>
-				<div className='p-6'>
+				<div className='p-6 scroll'>
 					<DataTable table={table} />
 				</div>
 			</DrawerContent>

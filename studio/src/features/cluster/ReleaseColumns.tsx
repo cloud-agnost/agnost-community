@@ -8,6 +8,7 @@ const ReleaseColumns: ColumnDef<ClusterComponentReleaseInfo>[] = [
 	{
 		id: 'module',
 		accessorKey: 'module',
+		size: 300,
 		header: () => <span>{t('cluster.component')}</span>,
 	},
 	{
@@ -16,17 +17,19 @@ const ReleaseColumns: ColumnDef<ClusterComponentReleaseInfo>[] = [
 		header: () => <span>{t('cluster.status')}</span>,
 		cell: ({ row }) => {
 			const { status } = row.original;
-			return <Badge variant={BADGE_COLOR_MAP[status]} text={status} />;
+			return <Badge variant={BADGE_COLOR_MAP[status.toUpperCase()]} text={status} />;
 		},
 	},
 	{
 		id: 'current',
 		accessorKey: 'version',
+		size: 100,
 		header: () => <span>{t('cluster.current')}</span>,
 	},
 	{
 		id: 'latest',
 		accessorKey: 'latest',
+		size: 100,
 		header: () => <span>{t('cluster.latest')}</span>,
 	},
 ];
