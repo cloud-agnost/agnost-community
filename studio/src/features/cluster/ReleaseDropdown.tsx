@@ -19,11 +19,9 @@ import { APIError, EnvironmentStatus } from '@/types';
 import { cn } from '@/utils';
 import { CircleWavyCheck, ClockCounterClockwise, Package } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import ReleaseColumns from './ReleaseColumns';
-import ReleaseHistory from './ReleaseHistory';
 
 export default function ReleaseDropdown() {
 	const { t } = useTranslation();
