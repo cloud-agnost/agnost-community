@@ -69,7 +69,7 @@ export default function CodeEditor({
 	return (
 		<div className={cn(containerClassName)}>
 			<MonacoEditor
-				theme={user?.editorSettings.theme}
+				theme={user?.editorSettings?.theme ?? 'night-owl'}
 				beforeMount={onBeforeMount}
 				className={cn('editor', className)}
 				onChange={onCodeEditorChange}
