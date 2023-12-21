@@ -103,15 +103,14 @@ export default function AddAPIKeyGeneral() {
 								/>
 
 								<Button
-									type='button'
 									variant='secondary'
 									disabled={fields.length === 1}
 									className={cn(
 										fields.length === 1 && !isEmpty(atLestOneError)
 											? 'self-center mt-2'
 											: index === 0 && !isEmpty(form.formState.errors?.domain?.list?.[index])
-											? 'self-center mt-2'
-											: index === 0 && 'self-end',
+											  ? 'self-center mt-2'
+											  : index === 0 && 'self-end',
 										index !== 0 &&
 											!isEmpty(form.formState.errors.domain?.list?.[index]) &&
 											'self-start',
@@ -130,7 +129,6 @@ export default function AddAPIKeyGeneral() {
 			{form.getValues('domain.type') === 'specified' && (
 				<div>
 					<Button
-						type='button'
 						variant='text'
 						onClick={() => {
 							append({ domain: '' });

@@ -92,7 +92,6 @@ export default function ReadReplicas() {
 										<Button
 											variant='blank'
 											iconOnly
-											type='button'
 											className='hover:bg-button-border-hover rounded-full text-icon-base hover:text-default'
 										>
 											<Pencil
@@ -110,7 +109,6 @@ export default function ReadReplicas() {
 										<Button
 											variant='blank'
 											iconOnly
-											type='button'
 											className='hover:bg-button-border-hover rounded-full text-icon-base hover:text-default'
 											onClick={() => removeReplica(index)}
 										>
@@ -123,7 +121,7 @@ export default function ReadReplicas() {
 						</div>
 					</div>
 				))}
-				<Button type='button' variant='text' onClick={() => setOpen(true)}>
+				<Button variant='text' onClick={() => setOpen(true)}>
 					<Plus size={16} className='text-brand-primary' />
 					<span className='ml-2 text-brand-primary'>{t('resources.database.add_replica')}</span>
 				</Button>
@@ -146,7 +144,7 @@ export default function ReadReplicas() {
 											{t('general.cancel')}
 										</Button>
 									</DialogClose>
-									<Button size='lg' type='button' onClick={onSubmit}>
+									<Button size='lg' onClick={onSubmit}>
 										{t('resources.database.add_replica')}
 									</Button>
 								</div>

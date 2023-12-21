@@ -70,7 +70,6 @@ export default function ConnectOptions() {
 						)}
 					/>
 					<Button
-						type='button'
 						variant='secondary'
 						iconOnly
 						className={cn(
@@ -89,7 +88,6 @@ export default function ConnectOptions() {
 			<div className='flex justify-between items-center mt-8'>
 				{fields.length < 50 && (
 					<Button
-						type='button'
 						variant='text'
 						onClick={() => {
 							append({ key: '', value: '' });

@@ -69,7 +69,7 @@ export default function EndpointHeaders() {
 						/>
 					</TableCell>
 					<TableCell>
-						<Button type='button' variant='secondary' onClick={() => remove(index)}>
+						<Button variant='secondary' onClick={() => remove(index)}>
 							<Trash size={16} className='text-icon-secondary' />
 						</Button>
 					</TableCell>
@@ -77,7 +77,7 @@ export default function EndpointHeaders() {
 			))}
 			<TableRow>
 				<TableCell colSpan={3} className='text-center'>
-					<Button type='button' variant='secondary' onClick={() => append({ key: '', value: '' })}>
+					<Button variant='secondary' onClick={() => append({ key: '', value: '' })}>
 						<Plus size={16} className='text-icon-secondary mr-2' weight='bold' />
 						{t('endpoint.test.add_header')}
 					</Button>

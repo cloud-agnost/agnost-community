@@ -115,7 +115,6 @@ const TableCell = React.forwardRef<
 							variant='blank'
 							rounded
 							className='text-base hover:bg-subtle aspect-square'
-							type='button'
 							iconOnly
 						>
 							<Copy />

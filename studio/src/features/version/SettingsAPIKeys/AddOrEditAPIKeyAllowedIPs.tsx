@@ -102,15 +102,14 @@ export default function AddOrEditAPIKeyAllowedIPs() {
 								/>
 
 								<Button
-									type='button'
 									variant='secondary'
 									disabled={fields.length === 1}
 									className={cn(
 										fields.length === 1 && !isEmpty(atLestOneError)
 											? 'self-center mt-2'
 											: index === 0 && !isEmpty(form.formState.errors.ip?.list?.[index])
-											? 'self-center mt-2'
-											: index === 0 && 'self-end',
+											  ? 'self-center mt-2'
+											  : index === 0 && 'self-end',
 										index !== 0 &&
 											!isEmpty(form.formState.errors.ip?.list?.[index]) &&
 											'self-start',
@@ -128,7 +127,6 @@ export default function AddOrEditAPIKeyAllowedIPs() {
 			{form.getValues('ip.type') === 'specified' && (
 				<div>
 					<Button
-						type='button'
 						variant='text'
 						onClick={() => {
 							append({ ip: '' });

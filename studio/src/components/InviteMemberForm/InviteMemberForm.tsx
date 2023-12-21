@@ -135,7 +135,6 @@ export default function InviteMemberForm({
 							)}
 						/>
 						<Button
-							type='button'
 							variant='secondary'
 							disabled={fields.length === 1}
 							className={cn(
@@ -158,7 +157,6 @@ export default function InviteMemberForm({
 					{fields.length < 50 && (
 						<Button
 							disabled={disabled}
-							type='button'
 							variant='text'
 							onClick={() => {
 								append({ email: '', role: '' });

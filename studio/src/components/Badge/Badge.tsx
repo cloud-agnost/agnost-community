@@ -49,7 +49,6 @@ export default function Badge({ text, variant, rounded, onClear, className }: Ba
 			<span className={cn('badge-text')}>{text}</span>
 			{onClear && (
 				<Button
-					type='button'
 					variant='blank'
 					iconOnly
 					className='badge-clear p-0 h-4 w-4 text-default'

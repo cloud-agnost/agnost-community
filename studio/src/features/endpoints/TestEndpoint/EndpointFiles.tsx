@@ -135,7 +135,7 @@ export default function EndpointFiles() {
 													}}
 												/>
 											) : (
-												<Button type='button' variant='primary' onClick={() => selectFile(index)}>
+												<Button variant='primary' onClick={() => selectFile(index)}>
 													{t('general.select')}
 												</Button>
 											)}
@@ -148,7 +148,7 @@ export default function EndpointFiles() {
 						)}
 					</TableCell>
 					<TableCell>
-						<Button type='button' variant='secondary' onClick={() => remove(index)}>
+						<Button variant='secondary' onClick={() => remove(index)}>
 							<Trash size={16} className='text-icon-secondary' />
 						</Button>
 					</TableCell>
@@ -156,11 +156,7 @@ export default function EndpointFiles() {
 			))}
 			<TableRow>
 				<TableCell colSpan={4} className='text-center'>
-					<Button
-						type='button'
-						variant='secondary'
-						onClick={() => append({ key: '', value: '', type: 'text' })}
-					>
+					<Button variant='secondary' onClick={() => append({ key: '', value: '', type: 'text' })}>
 						<Plus size={16} className='text-icon-secondary mr-2' weight='bold' />
 						{t('endpoint.test.add_form_data')}
 					</Button>

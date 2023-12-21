@@ -110,7 +110,6 @@ export default function SelectOAuthProviders() {
 							</div>
 							<div className='invisible group-hover:visible'>
 								<Button
-									type='button'
 									variant='blank'
 									iconOnly
 									onClick={() => setEditedProvider(p)}
@@ -119,7 +118,6 @@ export default function SelectOAuthProviders() {
 									<Pencil className='text-subtle w-5 h-5' />
 								</Button>
 								<Button
-									type='button'
 									variant='blank'
 									iconOnly
 									onClick={() => setToDeleteProvider(p)}

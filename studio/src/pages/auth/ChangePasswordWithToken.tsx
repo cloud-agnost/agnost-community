@@ -147,7 +147,7 @@ export default function ChangePasswordWithToken() {
 
 							<div className='flex justify-end gap-4'>
 								{!isLogged && (
-									<Button to='/login' variant='text' type='button' size='lg'>
+									<Button to='/login' variant='text' size='lg'>
 										{t('login.back_to_login')}
 									</Button>
 								)}
