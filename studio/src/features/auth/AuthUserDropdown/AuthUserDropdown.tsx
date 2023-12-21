@@ -3,7 +3,7 @@ import { resetAllStores } from '@/helpers';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useThemeStore from '@/store/theme/themeStore.ts';
 import { cn } from '@/utils';
-import { GearSix, Laptop, MoonStars, SignOut, SunDim } from '@phosphor-icons/react';
+import { CodeBlock, GearSix, Laptop, MoonStars, SignOut, SunDim } from '@phosphor-icons/react';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import {
 	DropdownMenu,
@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 export default function AuthUserDropdown() {
-	const { user, logout } = useAuthStore();
+	const { user, logout, toggleEditorSettingsDrawer } = useAuthStore();
 	const { orgId } = useParams() as { orgId: string };
 	const { t } = useTranslation();
 	const { setTheme, getTheme } = useThemeStore();
@@ -116,6 +116,11 @@ export default function AuthUserDropdown() {
 							</DropdownMenuSubContent>
 						</DropdownMenuPortal>
 					</DropdownMenuSub>
+
+					<DropdownMenuItem className='gap-2' onClick={toggleEditorSettingsDrawer}>
+						<CodeBlock className='text-icon-base text-lg' />
+						{t('profileSettings.editor_settings')}
+					</DropdownMenuItem>
 				</DropdownMenuItemContainer>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem

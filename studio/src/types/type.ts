@@ -1,35 +1,8 @@
 import { ColumnDef } from '@tanstack/react-table';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { z } from 'zod';
 import { OrgRoles } from '.';
 import { EnvironmentStatus } from './environment';
-export const UserSchema = z.object({
-	iid: z.string(),
-	name: z.string(),
-	color: z.string(),
-	contactEmail: z.string(),
-	'2fa': z.boolean(),
-	pictureUrl: z.string().nullish(),
-	canCreateOrg: z.boolean(),
-	isClusterOwner: z.boolean(),
-	loginProfiles: z.array(
-		z.object({
-			provider: z.string(),
-			id: z.string(),
-			email: z.string(),
-			emailVerified: z.boolean(),
-			_id: z.string(),
-		}),
-	),
-	notifications: z.array(z.string()),
-	status: z.string(),
-	_id: z.string(),
-	createdAt: z.string(),
-	updatedAt: z.string(),
-	__v: z.number(),
-	at: z.string(),
-	rt: z.string(),
-});
-
 export interface APIError {
 	error: string;
 	details: string;
@@ -56,7 +29,31 @@ export interface APIError {
 		type: 'text' | 'boolean' | 'datetime' | 'link' | 'encrypted-text' | 'array' | 'phone' | 'email';
 	}[];
 }
-export type User = z.infer<typeof UserSchema>;
+export type User = {
+	iid: string;
+	name: string;
+	color: string;
+	contactEmail: string;
+	'2fa': boolean;
+	pictureUrl: string | null;
+	canCreateOrg: boolean;
+	isClusterOwner: boolean;
+	loginProfiles: {
+		provider: string;
+		id: string;
+		email: string;
+		emailVerified: boolean;
+		_id: string;
+	}[];
+	notifications: string[];
+	status: string;
+	_id: string;
+	createdAt: string;
+	updatedAt: string;
+	editorSettings: Partial<monaco.editor.IStandaloneEditorConstructionOptions>;
+	at: string;
+	rt: string;
+};
 
 export interface UserDataToRegister extends BaseRequest {
 	name: string;
