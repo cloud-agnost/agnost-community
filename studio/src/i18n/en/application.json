@@ -72,6 +72,6 @@
 	},
 	"deleteMember": {
 		"title": "Delete Member",
-		"description": "You are about to delete the member from the app. After deleting the member you will not be able to access it again. Are you sure you would like to delete the this member?"
+		"description": "You are about to delete the member from the app. Are you sure you would like to remove the this member from the app team?"
 	}
 }
