@@ -13,7 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
 import { OrganizationCreateModal } from '@/features/organization';
 import { useToast } from '@/hooks';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { Organization } from '@/types';
+import { APIError, Organization } from '@/types';
 import { cn } from '@/utils';
 import { CaretUpDown, Check, Plus } from '@phosphor-icons/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -23,6 +23,7 @@ import './organization.scss';
 import useAuthStore from '@/store/auth/authStore';
 import _ from 'lodash';
 import useApplicationStore from '@/store/app/applicationStore';
+import { useMutation } from '@tanstack/react-query';
 
 export function OrganizationDropdown() {
 	const { t } = useTranslation();
@@ -41,30 +42,36 @@ export function OrganizationDropdown() {
 	const navigate = useNavigate();
 	const { getAppsByOrgId } = useApplicationStore();
 	const { notify } = useToast();
+
+	const { mutate: leaveOrgMutate, isPending } = useMutation({
+		mutationFn: leaveOrganization,
+		onSuccess: () => {
+			notify({
+				title: t('organization.leave.success.title', {
+					name: organization?.name,
+				}),
+				description: t('organization.leave.success.description', {
+					name: organization?.name,
+				}),
+				type: 'success',
+			});
+			navigate('/organization');
+		},
+		onError: ({ error, details }: APIError) => {
+			notify({
+				title: error,
+				description: details,
+				type: 'error',
+			});
+		},
+		onSettled: () => {
+			setOpenModal(false);
+		},
+	});
 	function handleLeave() {
-		leaveOrganization({
+		leaveOrgMutate({
 			organizationId: organization?._id,
-			onSuccess: () => {
-				notify({
-					title: t('organization.leave.success.title', {
-						name: organization?.name,
-					}),
-					description: t('organization.leave.success.description', {
-						name: organization?.name,
-					}),
-					type: 'success',
-				});
-				navigate('/organization');
-			},
-			onError: ({ error, details }) => {
-				notify({
-					title: error,
-					description: details,
-					type: 'error',
-				});
-			},
 		});
-		setOpenModal(false);
 	}
 
 	function onSelect(org: Organization) {
@@ -177,6 +184,7 @@ export function OrganizationDropdown() {
 				description={t('organization.leave.description', {
 					name: organization?.name,
 				})}
+				loading={isPending}
 			/>
 			<OrganizationCreateModal
 				key={openCreateModal.toString()}
