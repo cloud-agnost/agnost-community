@@ -37,6 +37,7 @@ export default function OrganizationInvitationTable() {
 		queryKey: ['organizationInvitations'],
 		initialPageParam: 0,
 		enabled: searchParams.get('tab') === 'invitation',
+		refetchOnWindowFocus: false,
 		getNextPageParam: (lastPage) => {
 			const nextPage = lastPage.length === PAGE_SIZE ? lastFetchedInvitationsPage + 1 : undefined;
 			return nextPage;
