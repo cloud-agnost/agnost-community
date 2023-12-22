@@ -340,8 +340,7 @@ export class Agenda extends SchedulerBase {
 			logger.error("Cannot run cron job", {
 				details: error,
 			});
-
-			return;
+			throw error;
 		}
 	}
 }

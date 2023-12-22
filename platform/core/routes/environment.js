@@ -403,7 +403,9 @@ router.post(
 				// If we have errors in database deployment then we need to update the server status to error
 				if (status === "Error") dataSet.serverStatus = status;
 			} else if (type === "server") {
-				dataSet.serverStatus = status;
+				if (log.serverStatus !== "Error" && log.dbStatus !== "Error")
+					dataSet.serverStatus = status;
+				else dataSet.serverStatus = "Error";
 			} else {
 				dataSet.schedulerStatus = status;
 			}
@@ -430,15 +432,23 @@ router.post(
 					{}
 				);
 			} else if (type === "server") {
-				// Update environment log data
-				await envLogCtrl.updateOneById(
+				let dataIncSet = {};
+				if (status === "OK") {
+					dataIncSet = { serverStatusOK: 1 };
+				} else if (status === "Error") {
+					dataIncSet = { serverStatusError: 1 };
+				}
+				// Update environment log data, append logs to the logs array
+				await envLogCtrl.pushObjectById(
 					log._id,
+					"serverLogs",
+					logs,
 					{
 						serverStatus: dataSet.serverStatus,
-						serverLogs: logs,
 						updatedAt: timestamp,
 					},
-					{}
+					{},
+					dataIncSet
 				);
 			} else {
 				// Update environment log data

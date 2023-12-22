@@ -118,6 +118,14 @@ export const ResourceModel = mongoose.model(
 				index: true,
 				enum: resourceStatuses,
 			},
+			// Only used for API server resources
+			availableReplicas: {
+				type: Number,
+			},
+			// Only used for API server resources
+			unavailableReplicas: {
+				type: Number,
+			},
 			createdBy: {
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "user",

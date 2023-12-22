@@ -436,8 +436,7 @@ export class RabbitMQ extends QueueBase {
 					details: error,
 				}
 			);
-
-			return;
+			throw error;
 		}
 	}
 }

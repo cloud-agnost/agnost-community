@@ -48,11 +48,6 @@ export default async function monitorResources() {
 						if (
 							["Creating", "Updating", "Deleting"].includes(resource.status)
 						) {
-							/* 							if (result.status === "OK") {
-								await upadateResourceStatus(resource, result);
-								continue;
-							} */
-
 							// Check duration of the operation
 							const now = Date.now();
 							const date = new Date(
@@ -83,7 +78,15 @@ export default async function monitorResources() {
 						}
 
 						// If the status of the resource is ok and last telemetry is also OK no need to update resource status or resource logs
-						if (result.status === "OK" && resource.status === "OK") continue;
+						if (result.status === "OK" && resource.status === "OK") {
+							if (
+								resource.instance === "API Server" &&
+								(resource.availableReplicas !== result.availableReplicas ||
+									resource.unavailableReplicas !== result.unavailableReplicas)
+							) {
+								await upadateResourceStatus(resource, result);
+							} else continue;
+						}
 
 						// If the resource status has changed both update the resource status and add a new resource log
 						if (result.status !== resource.status) {
@@ -93,7 +96,13 @@ export default async function monitorResources() {
 
 						// If the resource is in error state then update the latest error resource log
 						if (result.status === "Error" && resource.status === "Error") {
-							await updateLatestResourceLog(resource, result);
+							if (
+								resource.instance === "API Server" &&
+								(resource.availableReplicas !== result.availableReplicas ||
+									resource.unavailableReplicas !== result.unavailableReplicas)
+							) {
+								await upadateResourceStatus(resource, result);
+							} else await updateLatestResourceLog(resource, result);
 						}
 					}
 				} catch (err) {}
@@ -248,6 +257,7 @@ async function checkResourceStatus(resource) {
 								: "OK"
 							: "Idle",
 					availableReplicas: result.availableReplicas,
+					unavailableReplicas: result.unavailableReplicas,
 					logs: [
 						{
 							startedAt: new Date(),
@@ -263,6 +273,7 @@ async function checkResourceStatus(resource) {
 				return {
 					status: "Error",
 					availableReplicas: 0,
+					unavailableReplicas: 0,
 					logs: {
 						startedAt: new Date(),
 						status: "Error",
@@ -710,14 +721,16 @@ async function checkAPIServer(connSettings) {
 		);
 
 		let totalAvailable = 0;
+		let totalUnAvailable = 0;
 		const revisions = revResponse.body.items;
 
 		for (let index = 0; index < revisions.length; index++) {
 			const revision = revisions[index];
-			const { availableReplicas } = await checkDeployment(
+			const { availableReplicas, unavailableReplicas } = await checkDeployment(
 				revision.metadata.name
 			);
 			totalAvailable += availableReplicas;
+			totalUnAvailable += unavailableReplicas;
 		}
 
 		const response = await k8sApi.getNamespacedCustomObject(
@@ -744,7 +757,11 @@ async function checkAPIServer(connSettings) {
 			if (readyCondition && readyCondition.status === "True") updating = false;
 		} else updating = true;
 
-		return { availableReplicas: totalAvailable, updating };
+		return {
+			availableReplicas: totalAvailable,
+			unavailableReplicas: totalUnAvailable,
+			updating,
+		};
 	} catch (err) {
 		return await checkDeployment(connSettings.name);
 	}
@@ -763,13 +780,16 @@ async function checkDeployment(deploymentName) {
 			`${deploymentName}-deployment`,
 			process.env.NAMESPACE
 		);
+
+		return {
+			availableReplicas: result.body?.status?.availableReplicas ?? 0,
+			unavailableReplicas: result.body?.status?.unavailableReplicas ?? 0,
+		};
 	} catch (err) {
 		throw new AgnostError(
 			t("API server does not have any available replicas.")
 		);
 	}
-
-	return { availableReplicas: result.body?.status?.availableReplicas ?? 0 };
 }
 
 /**

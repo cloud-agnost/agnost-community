@@ -41,6 +41,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		this.httpServer = null;
 		this.i18n = i18n;
 		this.loaderQuery = null;
+		this.overallStatus = "OK";
 	}
 
 	/**
@@ -106,6 +107,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * Initializes the API server of the app version
 	 */
 	async initializeCore() {
+		// Reset deployment status
+		this.overallStatus = "OK";
 		this.addLog(t("********* CHILD PROCESS INIT START *********"));
 		// First load the environment and vesion configuration file
 		const envObj = await this.loadEnvConfigFile();
@@ -159,7 +162,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		this.addLog(t("********* CHILD PROCESS INIT END *********"));
 		// Send the deployment telemetry information to the platform
-		await this.sendEnvironmentLogs("OK");
+		await this.sendEnvironmentLogs(this.overallStatus);
 
 		// We completed server initialization and can accept incoming requests
 		global.SERVER_STATUS = "running";
@@ -170,6 +173,8 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 	 * can update an API server faster
 	 */
 	async restartCore() {
+		// Reset deployment status
+		this.overallStatus = "OK";
 		this.addLog(t("********* CHILD PROCESS RESTART *********"));
 		global.SERVER_STATUS = "initializing";
 		this.loaderQuery = helper.generateSlug(null, 6);
@@ -254,13 +259,13 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		const { agnost } = pkg;
 		agnost.clearClientCache();
 		this.addLog(`Cleared server side module '@agnost/server' cache`);
+		this.addLog(t("********* CHILD PROCESS RESTART END *********"));
 
 		// Send the deployment telemetry information to the platform
-		await this.sendEnvironmentLogs("OK");
+		await this.sendEnvironmentLogs(this.overallStatus);
 
 		// We completed server initialization and can accept incoming requests
 		global.SERVER_STATUS = "running";
-		this.addLog(t("********* CHILD PROCESS RESTART END *********"));
 	}
 
 	/**
@@ -608,8 +613,16 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 				}
 			}
 
-			// Set up the connection
-			await adapterManager.setupConnection(resource);
+			try {
+				// Set up the connection
+				await adapterManager.setupConnection(resource);
+			} catch (err) {
+				this.overallStatus = "Error";
+				this.addLog(
+					`Cannot connect to database server '${resource.name}'. ${err.message}`,
+					"Error"
+				);
+			}
 		}
 
 		// Second, we need to set up the cache connections
@@ -621,8 +634,16 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 					cache.accessReadOnly
 				);
 
-			// Set up the connection
-			await adapterManager.setupConnection(cache);
+			try {
+				// Set up the connection
+				await adapterManager.setupConnection(cache);
+			} catch (err) {
+				this.overallStatus = "Error";
+				this.addLog(
+					`Cannot connect to cache server '${cache.name}'. ${err.message}`,
+					"Error"
+				);
+			}
 		}
 
 		// Third, we need to set up the storage connections
@@ -634,8 +655,16 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 					storage.accessReadOnly
 				);
 
-			// Set up the connection
-			await adapterManager.setupConnection(storage);
+			try {
+				// Set up the connection
+				await adapterManager.setupConnection(storage);
+			} catch (err) {
+				this.overallStatus = "Error";
+				this.addLog(
+					`Cannot connect to storage '${storage.name}'. ${err.message}`,
+					"Error"
+				);
+			}
 		}
 
 		// Finally, set up the remaining resource conections
@@ -649,8 +678,16 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 					resource.accessReadOnly
 				);
 
-			// Set up the connection
-			await adapterManager.setupConnection(resource);
+			try {
+				// Set up the connection
+				await adapterManager.setupConnection(resource);
+			} catch (err) {
+				this.overallStatus = "Error";
+				this.addLog(
+					`Cannot connect to resource '${resource.name}'. ${err.message}`,
+					"Error"
+				);
+			}
 		}
 	}
 
@@ -678,7 +715,10 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		for (const db of dbs) {
 			const adapterObj = adapterManager.getDatabaseAdapter(db.name);
 			if (adapterObj) this.addLog(`Initialized database adapter '${db.name}'`);
-			else this.addLog(`Cannot initialize database adapter '${db.name}'`);
+			else {
+				this.addLog(`Cannot initialize database adapter '${db.name}'`, "Error");
+				this.overallStatus = "Error";
+			}
 		}
 	}
 
@@ -696,7 +736,13 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 			const adapterObj = adapterManager.getStorageAdapter(storage.name);
 			if (adapterObj)
 				this.addLog(`Initialized storage adapter '${storage.name}'`);
-			else this.addLog(`Cannot initialize storage adapter '${storage.name}'`);
+			else {
+				this.addLog(
+					`Cannot initialize storage adapter '${storage.name}'`,
+					"Error"
+				);
+				this.overallStatus = "Error";
+			}
 		}
 	}
 
@@ -713,7 +759,13 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		for (const cache of caches) {
 			const adapterObj = adapterManager.getCacheAdapter(cache.name);
 			if (adapterObj) this.addLog(`Initialized cache adapter '${cache.name}'`);
-			else this.addLog(`Cannot initialize cache adapter '${cache.name}'`);
+			else {
+				this.addLog(
+					`Cannot initialize cache adapter '${cache.name}'.`,
+					"Error"
+				);
+				this.overallStatus = "Error";
+			}
 		}
 	}
 
@@ -730,9 +782,23 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		for (const queue of queueus) {
 			const adapterObj = adapterManager.getQueueAdapter(queue.name);
 			if (adapterObj) {
-				await adapterObj.listenMessages(queue);
-				this.addLog(`Initialized handler of queue '${queue.name}'`);
-			} else this.addLog(`Cannot initialize handler of queue '${queue.name}'`);
+				try {
+					await adapterObj.listenMessages(queue);
+					this.addLog(`Initialized handler of queue '${queue.name}'`);
+				} catch (err) {
+					this.addLog(
+						`Cannot initialize handler of queue '${queue.name}'. ${err.message}`,
+						"Error"
+					);
+					this.overallStatus = "Error";
+				}
+			} else {
+				this.addLog(
+					`Cannot initialize handler of queue '${queue.name}'. No adapter found.`,
+					"Error"
+				);
+				this.overallStatus = "Error";
+			}
 		}
 	}
 
@@ -749,9 +815,23 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		for (const task of tasks) {
 			const adapterObj = adapterManager.getTaskAdapter(task.name);
 			if (adapterObj) {
-				await adapterObj.listenMessages(task);
-				this.addLog(`Initialized handler of task '${task.name}'`);
-			} else this.addLog(`Cannot initialize handler of task '${task.name}'`);
+				try {
+					await adapterObj.listenMessages(task);
+					this.addLog(`Initialized handler of task '${task.name}'`);
+				} catch (err) {
+					this.addLog(
+						`Cannot initialize handler of task '${task.name}'. ${err.message}`,
+						"Error"
+					);
+					this.overallStatus = "Error";
+				}
+			} else {
+				this.addLog(
+					`Cannot initialize handler of task '${task.name}'. No adapter found.`,
+					"Error"
+				);
+				this.overallStatus = "Error";
+			}
 		}
 	}
 
@@ -766,8 +846,10 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 				this.addLog(`Initialized authentication flow SMTP server connection`);
 			} catch (err) {
 				this.addLog(
-					`Cannot initialize authentication flow SMTP server connection`
+					`Cannot initialize authentication flow SMTP server connection. ${err.message}`,
+					"Error"
 				);
+				this.overallStatus = "Error";
 			}
 		}
 	}

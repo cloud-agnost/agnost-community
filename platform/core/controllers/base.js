@@ -331,14 +331,23 @@ export default class BaseController {
 	 * @param  {Object} data The sub-object data to add
 	 * @param  {Object} dataSet The field updates on the parent object
 	 * @param  {Object} options The options to pass to the the database driver
+	 * @param  {Object} dataIncSet The field updates on the parent object
 	 */
-	async pushObjectById(parentId, field, data, dataSet = {}, options = {}) {
+	async pushObjectById(
+		parentId,
+		field,
+		data,
+		dataSet = {},
+		options = {},
+		dataIncSet = {}
+	) {
 		let result = await this.model
 			.findByIdAndUpdate(
 				parentId,
 				{
 					$push: { [field]: Array.isArray(data) ? { $each: data } : data },
 					$set: dataSet,
+					$inc: dataIncSet,
 				},
 				{
 					new: true, //return the updated parent object
@@ -362,14 +371,23 @@ export default class BaseController {
 	 * @param  {Object} data The sub-object data to add
 	 * @param  {Object} dataSet The field updates on the parent object
 	 * @param  {Object} options The options to pass to the the database driver
+	 * @param  {Object} dataIncSet The field updates on the parent object
 	 */
-	async pushObjectByQuery(query, field, data, dataSet = {}, options = {}) {
+	async pushObjectByQuery(
+		query,
+		field,
+		data,
+		dataSet = {},
+		options = {},
+		dataIncSet = {}
+	) {
 		let result = await this.model
 			.findOneAndUpdate(
 				query,
 				{
 					$push: { [field]: Array.isArray(data) ? { $each: data } : data },
 					$set: dataSet,
+					$inc: dataIncSet,
 				},
 				{
 					new: true, //return the updated parent object

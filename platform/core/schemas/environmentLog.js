@@ -70,6 +70,7 @@ export const EnvironmentLogModel = mongoose.model(
 				startedAt: { type: Date },
 				status: { type: String, enum: logStatuses },
 				message: { type: String },
+				pod: { type: String },
 			},
 		],
 		schedulerLogs: [
@@ -79,6 +80,16 @@ export const EnvironmentLogModel = mongoose.model(
 				message: { type: String },
 			},
 		],
+		// Keeps the total number of pods in OK status
+		serverStatusOK: {
+			type: Number,
+			default: 0,
+		},
+		// Keeps the total number of pods in Error status
+		serverStatusError: {
+			type: Number,
+			default: 0,
+		},
 		createdAt: {
 			type: Date,
 			default: Date.now,

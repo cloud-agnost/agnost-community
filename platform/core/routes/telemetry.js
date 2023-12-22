@@ -61,6 +61,8 @@ router.post(
 				{
 					status: status.status,
 					updatedAt: timestamp,
+					availableReplicas: status.availableReplicas,
+					unavailableReplicas: status.unavailableReplicas,
 				},
 				{},
 				{ cacheKey: resource._id, session }

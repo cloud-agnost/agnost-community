@@ -361,7 +361,9 @@ export class AdapterManager {
 					} catch (err) {}
 				}
 			}
-		} catch (err) {}
+		} catch (err) {
+			throw err;
+		}
 	}
 
 	/**
@@ -429,7 +431,9 @@ export class AdapterManager {
 					} catch (err) {}
 				}
 			}
-		} catch (err) {}
+		} catch (err) {
+			throw err;
+		}
 	}
 
 	/**
@@ -505,7 +509,9 @@ export class AdapterManager {
 					} catch (err) {}
 				}
 			}
-		} catch (err) {}
+		} catch (err) {
+			throw err;
+		}
 	}
 
 	/**
@@ -577,7 +583,7 @@ export class AdapterManager {
 
 			this.adapters.set(designiid, adapterObj);
 		} catch (err) {
-			console.log(err);
+			throw err;
 		}
 	}
 
@@ -628,7 +634,9 @@ export class AdapterManager {
 					} catch (err) {}
 				}
 			}
-		} catch (err) {}
+		} catch (err) {
+			throw err;
+		}
 	}
 
 	/**
@@ -707,7 +715,9 @@ export class AdapterManager {
 				readOnly: false,
 				adapter: new RabbitMQ(client, this, resource.config),
 			});
-		} catch (err) {}
+		} catch (err) {
+			throw err;
+		}
 	}
 
 	/**
@@ -765,7 +775,9 @@ export class AdapterManager {
 				readOnly: false,
 				adapter: new KafkaAdapter(admin),
 			});
-		} catch (err) {}
+		} catch (err) {
+			throw err;
+		}
 	}
 
 	/**
@@ -799,7 +811,9 @@ export class AdapterManager {
 				readOnly: false,
 				adapter: new MinIOStorage(minioClient),
 			});
-		} catch (err) {}
+		} catch (err) {
+			throw err;
+		}
 	}
 
 	/**
@@ -829,7 +843,9 @@ export class AdapterManager {
 				readOnly: false,
 				adapter: new GCPStorage(storage),
 			});
-		} catch (err) {}
+		} catch (err) {
+			throw err;
+		}
 	}
 
 	/**
@@ -858,7 +874,9 @@ export class AdapterManager {
 				readOnly: false,
 				adapter: new AzureStorage(blobServiceClient),
 			});
-		} catch (err) {}
+		} catch (err) {
+			throw err;
+		}
 	}
 
 	/**
@@ -891,7 +909,9 @@ export class AdapterManager {
 				readOnly: false,
 				adapter: new MinIOStorage(minioClient),
 			});
-		} catch (err) {}
+		} catch (err) {
+			throw err;
+		}
 	}
 
 	/**
