@@ -72,10 +72,12 @@ export default function ChangeEmail() {
 	}
 
 	function open() {
+		form.reset();
 		setIsChangeMode(true);
 	}
 
 	function close() {
+		form.reset();
 		setIsChangeMode(false);
 	}
 
