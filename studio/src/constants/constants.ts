@@ -264,6 +264,7 @@ export const ALL_NOTIFICATIONS = [
 ];
 
 export const ERROR_CODES_TO_REDIRECT_LOGIN_PAGE = [
+	'invalid_user',
 	'invalid_session',
 	'missing_access_token',
 	'invalid_access_token',
