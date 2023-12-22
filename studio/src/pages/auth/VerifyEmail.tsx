@@ -14,6 +14,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
+import { GuestOnly } from '@/router';
 
 const FormSchema = z.object({
 	code: z
@@ -54,49 +55,51 @@ export default function VerifyEmail() {
 
 	return (
 		<AuthLayout>
-			<div className='auth-page'>
-				<Description title={t('login.verify_your_email')}>
-					<Trans
-						i18nKey='login.sent_verification_code'
-						values={{ email: searchParams.get('email') }}
-						components={{
-							email: <span className='text-default' />,
-						}}
-					/>
-				</Description>
-
-				{error && (
-					<Alert className='!max-w-full' variant='error'>
-						<AlertTitle>{error.error}</AlertTitle>
-						<AlertDescription>{error.details}</AlertDescription>
-					</Alert>
-				)}
-
-				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='auth-form'>
-						<FormField
-							control={form.control}
-							name='code'
-							render={({ field }) => (
-								<FormItem className='space-y-1'>
-									<FormControl>
-										<VerificationCodeInput error={!!form.formState.errors.code} {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+			<GuestOnly>
+				<div className='auth-page'>
+					<Description title={t('login.verify_your_email')}>
+						<Trans
+							i18nKey='login.sent_verification_code'
+							values={{ email: searchParams.get('email') }}
+							components={{
+								email: <span className='text-default' />,
+							}}
 						/>
+					</Description>
 
-						<Description>{t('login.verification_page_info')}</Description>
+					{error && (
+						<Alert className='!max-w-full' variant='error'>
+							<AlertTitle>{error.error}</AlertTitle>
+							<AlertDescription>{error.details}</AlertDescription>
+						</Alert>
+					)}
 
-						<div className='flex justify-end gap-4'>
-							<Button loading={loading} size='lg'>
-								{t('login.verify')}
-							</Button>
-						</div>
-					</form>
-				</Form>
-			</div>
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onSubmit)} className='auth-form'>
+							<FormField
+								control={form.control}
+								name='code'
+								render={({ field }) => (
+									<FormItem className='space-y-1'>
+										<FormControl>
+											<VerificationCodeInput error={!!form.formState.errors.code} {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<Description>{t('login.verification_page_info')}</Description>
+
+							<div className='flex justify-end gap-4'>
+								<Button loading={loading} size='lg'>
+									{t('login.verify')}
+								</Button>
+							</div>
+						</form>
+					</Form>
+				</div>
+			</GuestOnly>
 		</AuthLayout>
 	);
 }

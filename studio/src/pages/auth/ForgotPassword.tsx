@@ -80,57 +80,59 @@ export default function ForgotPassword() {
 
 	return (
 		<AuthLayout>
-			<div className='auth-page'>
-				<Description title={t('login.forgot_password_page')}>
-					{t('login.forgot_password_desc')}
-				</Description>
+			<GuestOnly>
+				<div className='auth-page'>
+					<Description title={t('login.forgot_password_page')}>
+						{t('login.forgot_password_desc')}
+					</Description>
 
-				{error && error.code !== 'invalid_credentials' && (
-					<>
-						<Alert className='!max-w-full' variant='error'>
-							<AlertTitle>{error.error}</AlertTitle>
-							<AlertDescription>{error.details}</AlertDescription>
-						</Alert>
-					</>
-				)}
+					{error && error.code !== 'invalid_credentials' && (
+						<>
+							<Alert className='!max-w-full' variant='error'>
+								<AlertTitle>{error.error}</AlertTitle>
+								<AlertDescription>{error.details}</AlertDescription>
+							</Alert>
+						</>
+					)}
 
-				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='auth-form'>
-						<FormField
-							control={form.control}
-							name='email'
-							render={({ field }) => (
-								<FormItem className='space-y-1'>
-									<FormLabel>{t('login.email')}</FormLabel>
-									<FormControl>
-										<Input
-											error={
-												Boolean(form.formState.errors.email) ||
-												error?.code === 'invalid_credentials'
-											}
-											type='email'
-											placeholder={t('login.enter_email') as string}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage>
-										{form.formState.errors.email?.message || error?.details}
-									</FormMessage>
-								</FormItem>
-							)}
-						/>
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onSubmit)} className='auth-form'>
+							<FormField
+								control={form.control}
+								name='email'
+								render={({ field }) => (
+									<FormItem className='space-y-1'>
+										<FormLabel>{t('login.email')}</FormLabel>
+										<FormControl>
+											<Input
+												error={
+													Boolean(form.formState.errors.email) ||
+													error?.code === 'invalid_credentials'
+												}
+												type='email'
+												placeholder={t('login.enter_email') as string}
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage>
+											{form.formState.errors.email?.message || error?.details}
+										</FormMessage>
+									</FormItem>
+								)}
+							/>
 
-						<div className='flex justify-end gap-4'>
-							<Button to='/login' variant='text' size='lg'>
-								{t('login.back_to_login')}
-							</Button>
-							<Button loading={loading} size='lg'>
-								{t('login.get_reset_link')}
-							</Button>
-						</div>
-					</form>
-				</Form>
-			</div>
+							<div className='flex justify-end gap-4'>
+								<Button to='/login' variant='text' size='lg'>
+									{t('login.back_to_login')}
+								</Button>
+								<Button loading={loading} size='lg'>
+									{t('login.get_reset_link')}
+								</Button>
+							</div>
+						</form>
+					</Form>
+				</div>
+			</GuestOnly>
 		</AuthLayout>
 	);
 }

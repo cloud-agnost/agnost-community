@@ -166,7 +166,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 						<AlertTitle>
 							{isVerified && !error
 								? t('login.you_have_been_added', {
-										name: data?.org.name ?? data?.app.name,
+										name: data?.org?.name ?? data?.app?.name,
 										role: data?.role,
 								  })
 								: error?.error}

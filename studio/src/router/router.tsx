@@ -908,12 +908,8 @@ export function GuestOnly({ children }: { children: ReactNode }): JSX.Element {
 	const { isAuthenticated } = useAuthStore();
 	const { isCompleted } = useClusterStore();
 	const { pathname } = useLocation();
-	const exceptions = [
-		'/change-password',
-		'/confirm-change-email',
-		'/complete-account-setup/verify-email',
-	];
-	if (isAuthenticated() && isCompleted && !exceptions.includes(pathname)) {
+
+	if (isAuthenticated() && isCompleted) {
 		return <Navigate to='/organization' />;
 	} else if (!isCompleted && pathname !== '/onboarding') {
 		return <Navigate to='/onboarding' />;
