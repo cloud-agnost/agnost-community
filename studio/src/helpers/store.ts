@@ -3,7 +3,7 @@ import { StateCreator, create as _create } from 'zustand';
 const storeResetFns = new Set<() => void>();
 
 export const resetAllStores = () => {
-	Object.entries(STATE_LIST).forEach(([name, store]) => {
+	Object.entries(STATE_LIST).forEach(([_, store]) => {
 		store.getState()?.reset();
 	});
 };
