@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
+import { GuestOnly } from '@/router';
 
 const FormSchema = z.object({
 	email: z
@@ -52,49 +53,51 @@ export default function CompleteAccountSetup() {
 
 	return (
 		<AuthLayout>
-			<div className='auth-page'>
-				<Description title={t('login.complete_account_setup')}>
-					{t('login.complete_account_setup_info')}
-				</Description>
+			<GuestOnly>
+				<div className='auth-page'>
+					<Description title={t('login.complete_account_setup')}>
+						{t('login.complete_account_setup_info')}
+					</Description>
 
-				{error && (
-					<Alert className='!max-w-full' variant='error'>
-						<AlertTitle>{error.error}</AlertTitle>
-						<AlertDescription>{error.details}</AlertDescription>
-					</Alert>
-				)}
+					{error && (
+						<Alert className='!max-w-full' variant='error'>
+							<AlertTitle>{error.error}</AlertTitle>
+							<AlertDescription>{error.details}</AlertDescription>
+						</Alert>
+					)}
 
-				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='auth-form'>
-						<FormField
-							control={form.control}
-							name='email'
-							render={({ field }) => (
-								<FormItem className='space-y-1'>
-									<FormLabel>{t('login.email')}</FormLabel>
-									<FormControl>
-										<Input
-											error={Boolean(form.formState.errors.email)}
-											placeholder={t('login.enter_email') as string}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onSubmit)} className='auth-form'>
+							<FormField
+								control={form.control}
+								name='email'
+								render={({ field }) => (
+									<FormItem className='space-y-1'>
+										<FormLabel>{t('login.email')}</FormLabel>
+										<FormControl>
+											<Input
+												error={Boolean(form.formState.errors.email)}
+												placeholder={t('login.enter_email') as string}
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
-						<div className='flex justify-end gap-4'>
-							<Button to='/login' variant='text' size='lg'>
-								{t('login.back_to_login')}
-							</Button>
-							<Button size='lg' loading={loading}>
-								{t('login.continue')}
-							</Button>
-						</div>
-					</form>
-				</Form>
-			</div>
+							<div className='flex justify-end gap-4'>
+								<Button to='/login' variant='text' size='lg'>
+									{t('login.back_to_login')}
+								</Button>
+								<Button size='lg' loading={loading}>
+									{t('login.continue')}
+								</Button>
+							</div>
+						</form>
+					</Form>
+				</div>
+			</GuestOnly>
 		</AuthLayout>
 	);
 }
