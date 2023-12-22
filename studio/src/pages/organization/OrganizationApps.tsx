@@ -61,13 +61,6 @@ export default function OrganizationApps() {
 				orgId,
 			}),
 		onSuccess: () => closeDeleteModal(),
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
-			});
-		},
 	});
 
 	const { isFetching } = useQuery({

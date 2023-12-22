@@ -30,5 +30,5 @@
 	"up_to_date": "Your cluster is on the latest release",
 	"view_notes": "View release notes",
 	"deployed_at": "Deployed at",
-	"deploy_success": "Cluster deployed successfully"
+	"deploy_success": "Updating cluster release."
 }

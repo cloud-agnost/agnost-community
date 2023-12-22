@@ -7,12 +7,14 @@ import useApplicationStore from '@/store/app/applicationStore';
 import useClusterStore from '@/store/cluster/clusterStore';
 import { Application, ApplicationMember } from '@/types';
 import { notify } from '@/utils';
+import { useQuery } from '@tanstack/react-query';
 import { Table } from '@tanstack/react-table';
 import { RoleDropdown } from 'components/RoleDropdown';
 import { SelectedRowButton } from 'components/Table';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
+import BeatLoader from 'react-spinners/BeatLoader';
 import { AppMembersTableColumns } from './AppMembersTableColumns';
 export default function MainAppMembers() {
 	const [searchParams] = useSearchParams();
@@ -41,14 +43,15 @@ export default function MainAppMembers() {
 	const { t } = useTranslation();
 	const { orgId } = useParams() as Record<string, string>;
 
-	useEffect(() => {
-		if (isEditAppOpen) {
+	const { isFetching } = useQuery({
+		queryFn: () =>
 			getAppTeamMembers({
 				appId: application?._id as string,
 				orgId,
-			});
-		}
-	}, [isEditAppOpen]);
+			}),
+		queryKey: ['appTeamMembers'],
+		enabled: isEditAppOpen,
+	});
 
 	function removeMultipleMembers() {
 		const userIds = table.getSelectedRowModel().rows?.map((row) => row.original.member._id);
@@ -104,7 +107,13 @@ export default function MainAppMembers() {
 					)}
 				</div>
 			</div>
-			<DataTable<ApplicationMember> table={table} />
+			{isFetching ? (
+				<div className='flex items-center justify-center h-full w-full'>
+					<BeatLoader color='#6884FD' size={16} margin={12} />
+				</div>
+			) : (
+				<DataTable<ApplicationMember> table={table} />
+			)}
 		</div>
 	);
 }

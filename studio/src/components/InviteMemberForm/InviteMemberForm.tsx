@@ -135,6 +135,7 @@ export default function InviteMemberForm({
 							)}
 						/>
 						<Button
+							type='button'
 							variant='secondary'
 							disabled={fields.length === 1}
 							className={cn(
@@ -156,6 +157,7 @@ export default function InviteMemberForm({
 				<div className='flex justify-between items-center mt-8'>
 					{fields.length < 50 && (
 						<Button
+							type='button'
 							disabled={disabled}
 							variant='text'
 							onClick={() => {
@@ -167,7 +169,7 @@ export default function InviteMemberForm({
 						</Button>
 					)}
 				</div>
-				<div></div>
+
 				<div className='flex items-center justify-end gap-4'>
 					{actions}
 					<Button variant='primary' size='lg' loading={loading} disabled={disabled}>

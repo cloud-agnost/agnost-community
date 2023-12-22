@@ -62,14 +62,8 @@ export function Header() {
 					<ReleaseDropdown />
 					{versionId && (
 						<>
-							<div className='header-menu-right-actions-versions'>
-								<DeploymentStatusCard />
-							</div>
-							{canViewNotf && (
-								<div className='header-menu-right-actions-notification'>
-									<NotificationDropdown />
-								</div>
-							)}
+							<DeploymentStatusCard />
+							{canViewNotf && <NotificationDropdown />}
 						</>
 					)}
 

@@ -11,7 +11,7 @@
 	"select": "Select your organization",
 	"empty": "No organizations found.",
 	"leave": {
-		"description": "You are about the leave the organization. After leaving the organization you will not be able to access it again. Are you sure you would like to leave the {{name}} organization",
+		"description": "You are about the leave the organization. After leaving the organization you will not be able to access it again. Are you sure you would like to leave the {{name}} organization?",
 		"main": "Leave Organization",
 		"success": {
 			"title": "You have successfully left the {{name}} organization.",

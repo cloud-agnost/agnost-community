@@ -47,6 +47,8 @@ class ApplicationTeam extends RealtimeActions<Application> {
 				})),
 			}));
 		}
+
+		useApplicationStore.getState().closeVersionDrawer();
 	}
 
 	update({ data }: RealtimeActionParams<Application>) {

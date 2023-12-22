@@ -33,16 +33,14 @@
 		}
 		&-actions {
 			@apply flex gap-2 items-center;
-			&-versions,
-			&-notification {
+
+			.btn {
+				@apply w-[36px] h-[36px] p-0 rounded-full;
 				svg {
 					@apply text-[17px];
 				}
-				.btn {
-					@apply w-[36px] h-[36px] p-0 rounded-full;
-					&:hover {
-						@apply bg-border text-default;
-					}
+				&:hover {
+					@apply bg-border text-default;
 				}
 			}
 

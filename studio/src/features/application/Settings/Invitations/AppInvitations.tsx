@@ -9,6 +9,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { PAGE_SIZE } from '@/constants';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { TableLoading } from '@/components/Table/Table';
+import BeatLoader from 'react-spinners/BeatLoader';
 function AppInvitations() {
 	const { invitations, getAppInvitations, lastFetchedInvitationsPage, application } =
 		useApplicationStore();
@@ -20,7 +21,7 @@ function AppInvitations() {
 
 	const { orgId } = useParams<{ orgId: string }>();
 
-	const { fetchNextPage, isFetchingNextPage, hasNextPage, refetch } = useInfiniteQuery({
+	const { fetchNextPage, isFetchingNextPage, hasNextPage, refetch, isFetching } = useInfiniteQuery({
 		queryFn: ({ pageParam }) =>
 			getAppInvitations({
 				page: pageParam,
@@ -36,6 +37,7 @@ function AppInvitations() {
 		queryKey: ['applicationInvitations'],
 		enabled: searchParams.get('st') === 'invitations',
 		initialPageParam: 0,
+		refetchOnWindowFocus: false,
 		getNextPageParam: (lastPage) => {
 			const nextPage = lastPage.length === PAGE_SIZE ? lastFetchedInvitationsPage + 1 : undefined;
 			return nextPage;
@@ -57,7 +59,13 @@ function AppInvitations() {
 			>
 				<div className='space-y-4'>
 					<AppInvitationFilter table={table} />
-					<DataTable<Invitation> table={table} />
+					{isFetching && !isFetchingNextPage ? (
+						<div className='flex items-center justify-center h-full w-full'>
+							<BeatLoader color='#6884FD' size={16} margin={12} />
+						</div>
+					) : (
+						<DataTable<Invitation> table={table} />
+					)}
 				</div>
 			</InfiniteScroll>
 		</div>

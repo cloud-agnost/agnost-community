@@ -247,7 +247,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 					</Form>
 				)}
 
-				{((data && data.user?.status === 'Active') || isAuthenticated()) && (
+				{data && data.user?.status === 'Active' && (
 					<div className='flex justify-end'>
 						<Button
 							size='lg'
