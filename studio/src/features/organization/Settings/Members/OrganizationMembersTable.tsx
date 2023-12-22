@@ -8,11 +8,12 @@ import { useTable, useUpdateEffect } from '@/hooks';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { OrganizationMember } from '@/types';
 import { useQuery } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 export default function OrganizationMembersTable() {
 	const { members } = useOrganizationStore();
 	const [searchParams] = useSearchParams();
-	const { organization, getOrganizationMembers } = useOrganizationStore();
+	const { getOrganizationMembers, organization } = useOrganizationStore();
+	const { orgId } = useParams() as Record<string, string>;
 	const table = useTable({
 		data: members,
 		columns: OrganizationMembersColumns,
@@ -21,7 +22,7 @@ export default function OrganizationMembersTable() {
 		queryKey: ['organizationMembers'],
 		queryFn: () =>
 			getOrganizationMembers({
-				organizationId: organization?._id as string,
+				organizationId: organization?._id ?? orgId,
 				search: searchParams.get('q') as string,
 				sortBy: searchParams.get('s') as string,
 				sortDir: searchParams.get('d') as string,
