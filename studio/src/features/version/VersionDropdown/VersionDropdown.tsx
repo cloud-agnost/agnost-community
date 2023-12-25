@@ -100,12 +100,14 @@ export default function VersionDropdown() {
 							</div>
 						</div>
 					</Button>
-					<DropdownMenuTrigger asChild className='version-dropdown-button'>
-						<Button variant='blank' aria-expanded={open} rounded>
-							<span className='version-dropdown-icon'>
-								<CaretUpDown size={20} />
-							</span>
-						</Button>
+					<DropdownMenuTrigger asChild>
+						<div className='version-dropdown-button'>
+							<Button variant='blank' role='combobox' aria-expanded={open} rounded>
+								<span className='version-dropdown-icon'>
+									<CaretUpDown size={20} />
+								</span>
+							</Button>
+						</div>
 					</DropdownMenuTrigger>
 				</div>
 
