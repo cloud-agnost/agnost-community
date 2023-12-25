@@ -64,9 +64,6 @@ export default function ApplicationCreateModal({
 			orgId: organization?._id as string,
 		});
 	}
-	function checkPressEnter(event: KeyboardEvent<HTMLInputElement>) {
-		if (event.key === 'Enter') form.handleSubmit(onSubmit)();
-	}
 
 	return (
 		<Dialog open={isOpen} {...props} onOpenChange={closeModal}>
@@ -87,7 +84,6 @@ export default function ApplicationCreateModal({
 												label: t('application.name'),
 											}).toString()}
 											{...field}
-											onKeyDown={checkPressEnter}
 										/>
 									</FormControl>
 									<FormDescription>{t('forms.max64.description')}</FormDescription>
