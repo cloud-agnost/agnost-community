@@ -1,5 +1,4 @@
 import { DataTable } from '@/components/DataTable';
-import { TableLoading } from '@/components/Table/Table';
 import {
 	OrganizationMembersColumns,
 	OrganizationMembersTableHeader,
