@@ -1,14 +1,14 @@
 import { CopyInput } from '@/components/CopyInput';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/Tabs';
-import { UserSettingsLayout } from '@/layouts/UserSettingsLayout';
+import { SettingsContainer } from '@/features/version/SettingsContainer';
+import useClusterStore from '@/store/cluster/clusterStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import ClusterResources from './ClusterComponents';
 import ClusterSmtpForm from './ClusterSmtpForm';
 import TransferClusterOwnership from './TransferClusterOwnership';
-import useClusterStore from '@/store/cluster/clusterStore';
-import { useEffect } from 'react';
 
 export default function ProfileSettingsClusterManagement() {
 	const { t } = useTranslation();
@@ -21,7 +21,7 @@ export default function ProfileSettingsClusterManagement() {
 	}, []);
 
 	return (
-		<UserSettingsLayout title={t('profileSettings.clusters_title')}>
+		<SettingsContainer pageTitle={t('profileSettings.clusters_title')}>
 			<Tabs defaultValue={TabItems[0]}>
 				<div className='flex items-center pb-6 justify-between'>
 					<TabsList
@@ -63,6 +63,6 @@ export default function ProfileSettingsClusterManagement() {
 					<ClusterSmtpForm />
 				</TabsContent>
 			</Tabs>
-		</UserSettingsLayout>
+		</SettingsContainer>
 	);
 }

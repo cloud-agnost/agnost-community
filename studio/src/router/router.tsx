@@ -113,6 +113,13 @@ const OrganizationResources = loadable(
 	},
 );
 
+const OrganizationSettings = loadable(
+	() => componentLoader(() => import('../pages/organization/OrganizationSettings')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
 const OrganizationSettingsGeneral = loadable(
 	() =>
 		componentLoader(
@@ -803,6 +810,7 @@ const router = createBrowserRouter([
 							},
 							{
 								path: 'settings',
+								element: <OrganizationSettings />,
 								children: [
 									{
 										index: true,

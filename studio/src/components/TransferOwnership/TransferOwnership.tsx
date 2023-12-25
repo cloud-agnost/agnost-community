@@ -69,7 +69,7 @@ export default function TransferOwnership({
 			}));
 	}, [members]);
 	return (
-		<div className='space-y-8'>
+		<div className='space-y-4'>
 			{error && (
 				<Alert variant='error'>
 					<AlertTitle>{error?.error}</AlertTitle>
@@ -83,7 +83,7 @@ export default function TransferOwnership({
 				isSearchable
 				name='color'
 				options={teamOptions}
-				className='select-container'
+				className='select-container mt-4'
 				classNamePrefix='select'
 				placeholder={t('application.edit.transfer.placeholder')}
 				onChange={(option) => {

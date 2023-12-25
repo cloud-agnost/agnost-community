@@ -3,9 +3,9 @@ import { Form } from '@/components/Form';
 import { InviteMemberForm, InviteMemberSchema } from '@/components/InviteMemberForm';
 import { Separator } from '@/components/Separator';
 import { OrganizationInvitationTable, OrganizationMembersTable } from '@/features/organization';
+import { SettingsContainer } from '@/features/version/SettingsContainer';
 import { useToast } from '@/hooks';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
-import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout';
 import useClusterStore from '@/store/cluster/clusterStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError } from '@/types';
@@ -70,8 +70,8 @@ export default function OrganizationSettingsMembers() {
 	}, []);
 
 	return (
-		<OrganizationSettingsLayout
-			title={t('organization.settings.members.title')}
+		<SettingsContainer
+			pageTitle={t('organization.settings.members.title')}
 			description={t('organization.settings.members.description')}
 		>
 			{canClusterSendEmail ? (
@@ -127,6 +127,6 @@ export default function OrganizationSettingsMembers() {
 					</TabsContent>
 				</Tabs>
 			</div>
-		</OrganizationSettingsLayout>
+		</SettingsContainer>
 	);
 }
