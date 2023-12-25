@@ -70,7 +70,7 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 				</DrawerContent>
 			</Drawer>
 			<Dialog open={isLogDetailsOpen} onOpenChange={closeLogDetails}>
-				<DialogContent className='max-w-3xl'>
+				<DialogContent className='max-w-5xl'>
 					<DialogHeader>
 						<DialogTitle>{t('version.log_details')}</DialogTitle>
 					</DialogHeader>

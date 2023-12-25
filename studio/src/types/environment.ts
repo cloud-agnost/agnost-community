@@ -56,6 +56,7 @@ export interface EnvLogDetail {
 	startedAt: string;
 	status: EnvironmentStatus;
 	message: string;
+	pod?: string;
 	_id: string;
 }
 export interface EnvLog {

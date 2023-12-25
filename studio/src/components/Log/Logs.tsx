@@ -17,6 +17,7 @@ export default function Logs({ logs, className }: LogsProps) {
 			return str;
 		}
 	}
+
 	return (
 		<div
 			className={cn(
@@ -28,6 +29,7 @@ export default function Logs({ logs, className }: LogsProps) {
 				logs?.map((log, index) => (
 					<div key={index} className='flex items-start gap-4  px-4 py-2'>
 						<small>{log.timestamp}</small>
+						{log.pod && <span className='text-xs text-default'>{log.pod}</span>}
 						{log.type && (
 							<Badge
 								className='w-10 flex-shrink-0 p-0'

@@ -1,11 +1,13 @@
 import { STATE_LIST } from '@/constants/stateList';
+import useApplicationStore from '@/store/app/applicationStore';
 import { StateCreator, create as _create } from 'zustand';
 const storeResetFns = new Set<() => void>();
 
 export const resetAllStores = () => {
-	Object.entries(STATE_LIST).forEach(([_, store]) => {
-		store.getState()?.reset();
+	Object.entries(STATE_LIST).forEach(([, store]) => {
+		store?.getState()?.reset?.();
 	});
+	useApplicationStore.getState().reset();
 };
 
 export const create = (<T>() => {

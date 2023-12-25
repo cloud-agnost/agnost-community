@@ -102,6 +102,7 @@ const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 								timestamp: formatDate(log.startedAt, DATE_TIME_FORMAT),
 								message: log.message,
 								type: log.status,
+								pod: log.pod,
 							})),
 							schedulerLogs: row.original.schedulerLogs.map((log) => ({
 								timestamp: formatDate(log.startedAt, DATE_TIME_FORMAT),
