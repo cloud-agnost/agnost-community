@@ -16,7 +16,6 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError, CreateApplicationSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { KeyboardEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
@@ -64,9 +63,6 @@ export default function ApplicationCreateModal({
 			orgId: organization?._id as string,
 		});
 	}
-	function checkPressEnter(event: KeyboardEvent<HTMLInputElement>) {
-		if (event.key === 'Enter') form.handleSubmit(onSubmit)();
-	}
 
 	return (
 		<Dialog open={isOpen} {...props} onOpenChange={closeModal}>
@@ -87,7 +83,6 @@ export default function ApplicationCreateModal({
 												label: t('application.name'),
 											}).toString()}
 											{...field}
-											onKeyDown={checkPressEnter}
 										/>
 									</FormControl>
 									<FormDescription>{t('forms.max64.description')}</FormDescription>
