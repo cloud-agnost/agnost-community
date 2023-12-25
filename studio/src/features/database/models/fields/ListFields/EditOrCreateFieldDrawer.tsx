@@ -1148,7 +1148,7 @@ export default function EditOrCreateFieldDrawer({
 										{t('general.cancel')}
 									</Button>
 								</DrawerClose>
-								<Button disabled={!canCreate} size='lg' loading={isPending}>
+								<Button disabled={!canCreate} size='lg' loading={isPending} type='submit'>
 									{editMode ? t('general.save') : t('general.add')}
 								</Button>
 							</div>

@@ -78,7 +78,7 @@ export default function OrganizationCreateModal({
 							<Button variant='text' size='lg' onClick={closeModal}>
 								{t('general.cancel')}
 							</Button>
-							<Button variant='primary' size='lg' loading={isPending}>
+							<Button variant='primary' size='lg' loading={isPending} type='submit'>
 								{t('general.ok')}
 							</Button>
 						</div>

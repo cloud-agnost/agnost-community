@@ -67,6 +67,7 @@ const Button = React.forwardRef<
 			loading,
 			rounded,
 			iconOnly,
+			type,
 			asChild = false,
 			...props
 		},
@@ -93,6 +94,7 @@ const Button = React.forwardRef<
 			<Comp
 				className={cn(buttonVariants({ size, variant, loading, rounded, iconOnly, className }))}
 				ref={ref}
+				type={type ?? 'button'}
 				{...props}
 			>
 				{loading && <CircleNotch size={20} className='loading' />}

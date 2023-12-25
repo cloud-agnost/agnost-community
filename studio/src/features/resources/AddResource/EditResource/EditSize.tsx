@@ -102,7 +102,7 @@ export default function EditSize() {
 						</FormItem>
 					)}
 				/>
-				<Button className='ml-2' size='lg' loading={isPending}>
+				<Button className='ml-2' size='lg' loading={isPending} type='submit'>
 					{t('general.save')}
 				</Button>
 			</form>
