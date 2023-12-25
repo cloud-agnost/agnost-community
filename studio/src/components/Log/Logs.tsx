@@ -17,7 +17,7 @@ export default function Logs({ logs, className }: LogsProps) {
 			return str;
 		}
 	}
-	console.log(logs);
+
 	return (
 		<div
 			className={cn(
