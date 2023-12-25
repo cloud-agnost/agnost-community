@@ -5,7 +5,7 @@ import useApplicationStore from '@/store/app/applicationStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Version } from '@/types';
-import { cn, getAppPermission, getVersionPermission, translate } from '@/utils';
+import { cn, getAppPermission, translate } from '@/utils';
 import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
 
