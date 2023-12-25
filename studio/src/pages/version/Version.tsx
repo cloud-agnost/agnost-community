@@ -9,7 +9,7 @@ import { Outlet, useLocation, useParams } from 'react-router-dom';
 
 export default function Version() {
 	const { pathname } = useLocation();
-	const { getVersionById, version } = useVersionStore();
+	const { getVersionById } = useVersionStore();
 	const { getAppById, application } = useApplicationStore();
 	const paths = pathname.split('/').filter((item) => /^[a-zA-Z-_]+$/.test(item));
 	const canView = useAuthorizeVersion('version.view');
@@ -36,15 +36,11 @@ export default function Version() {
 	}, [appId]);
 
 	useEffect(() => {
-		if (_.isEmpty(version)) {
-			getVersionById({
-				appId: appId as string,
-				orgId: orgId as string,
-				versionId: versionId as string,
-			});
-		} else {
-			joinChannel(versionId as string);
-		}
+		getVersionById({
+			appId: appId as string,
+			orgId: orgId as string,
+			versionId: versionId as string,
+		});
 	}, [versionId]);
 
 	return (
