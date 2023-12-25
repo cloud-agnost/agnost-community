@@ -90,6 +90,15 @@ export default class EnvironmentService {
 		).data;
 	}
 
+	static async restartApiServers({ orgId, appId, versionId, envId }: VersionParams): Promise<void> {
+		return (
+			await axios.post(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/apiserver-restart`,
+				{},
+			)
+		).data;
+	}
+
 	static async updateEnvironmentTelemetryLogs({
 		orgId,
 		appId,
