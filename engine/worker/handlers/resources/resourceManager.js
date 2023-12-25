@@ -384,7 +384,7 @@ export class ResourceManager {
                 "v1",
                 process.env.NAMESPACE,
                 "services",
-                deploymentName,
+                resource.iid,
                 existingService.body
             );
             return { success: true };
