@@ -115,7 +115,7 @@ export default function Error({ children }: { children: React.ReactNode }) {
 								<Button variant='text' size='lg' onClick={closeModal}>
 									{t('general.cancel')}
 								</Button>
-								<Button variant='primary' size='lg' loading={loading}>
+								<Button variant='primary' size='lg' loading={loading} type='submit'>
 									{t('general.ok')}
 								</Button>
 							</div>

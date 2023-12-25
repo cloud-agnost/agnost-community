@@ -101,7 +101,7 @@ export default function RateLimitForm({ loading }: RateLimitFormProps) {
 						{t('general.cancel')}
 					</Button>
 				</DrawerClose>
-				<Button loading={loading} size='lg'>
+				<Button loading={loading} size='lg' type='submit'>
 					{t('general.save')}
 				</Button>
 			</div>

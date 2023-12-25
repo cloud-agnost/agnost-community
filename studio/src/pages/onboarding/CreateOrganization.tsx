@@ -90,7 +90,9 @@ export default function CreateOrganization() {
 						/>
 
 						<div className='flex gap-4 justify-end'>
-							<Button size='lg'>{t('onboarding.next')}</Button>
+							<Button size='lg' type='submit'>
+								{t('onboarding.next')}
+							</Button>
 						</div>
 					</form>
 				</Form>

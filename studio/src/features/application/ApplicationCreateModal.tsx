@@ -96,10 +96,10 @@ export default function ApplicationCreateModal({
 							)}
 						/>
 						<div className='flex justify-end gap-4 mt-2'>
-							<Button variant='text' size='lg' onClick={closeModal}>
+							<Button variant='text' size='lg' onClick={closeModal} type='button'>
 								{t('general.cancel')}
 							</Button>
-							<Button variant='primary' size='lg' loading={isPending}>
+							<Button variant='primary' size='lg' loading={isPending} type='submit'>
 								{t('general.ok')}
 							</Button>
 						</div>

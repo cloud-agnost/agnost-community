@@ -275,6 +275,9 @@
 			border-radius: 8px !important;
 		}
 	}
+	[type='button'] {
+		@apply appearance-none;
+	}
 }
 
 @layer utilities {

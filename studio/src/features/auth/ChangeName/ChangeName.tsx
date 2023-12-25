@@ -100,7 +100,7 @@ export default function ChangeName() {
 						)}
 					/>
 					<div className='mt-4'>
-						<Button loading={loading} size='lg'>
+						<Button loading={loading} size='lg' type='submit'>
 							{t('profileSettings.save')}
 						</Button>
 					</div>

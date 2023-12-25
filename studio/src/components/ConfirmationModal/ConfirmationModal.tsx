@@ -87,7 +87,7 @@ export default function ConfirmationModal({
 								{closeButtonText ?? t('general.cancel')}
 							</Button>
 						)}
-						<Button loading={loading} onClick={onConfirm} size='lg' disabled={code !== confirmCode}>
+						<Button loading={loading} onClick={onConfirm} size='lg'>
 							{confirmButtonText ?? t('general.delete')}
 						</Button>
 					</div>

@@ -28,13 +28,6 @@ const DialogContent = React.forwardRef<
 	React.ElementRef<typeof DialogPrimitive.Content>,
 	React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => {
-	React.useEffect(() => {
-		document.addEventListener('keydown', (event) => {
-			if (event.key === 'Enter') {
-				event.preventDefault();
-			}
-		});
-	}, []);
 	return (
 		<DialogPortal>
 			<DialogOverlay />

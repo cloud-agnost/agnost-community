@@ -164,7 +164,7 @@ export default function AccountInformation() {
 						)}
 					/>
 					<div className='flex justify-end'>
-						<Button loading={initiating} size='lg'>
+						<Button loading={initiating} size='lg' type='submit'>
 							{t('onboarding.next')}
 						</Button>
 					</div>
