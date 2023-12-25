@@ -13,7 +13,7 @@ const { deleteNPMPackage } = useSettingsStore.getState();
 async function onDelete(packageId: string) {
 	const { version } = useVersionStore.getState();
 	if (!version) return;
-	await deleteNPMPackage({
+	return deleteNPMPackage({
 		versionId: version?._id,
 		orgId: version?.orgId,
 		appId: version?.appId,

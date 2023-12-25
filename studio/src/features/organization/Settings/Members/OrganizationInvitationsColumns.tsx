@@ -9,7 +9,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
 async function onDelete(token: string) {
-	useOrganizationStore.getState().deleteInvitation({
+	return useOrganizationStore.getState().deleteInvitation({
 		token,
 		onSuccess: () => {
 			notify({

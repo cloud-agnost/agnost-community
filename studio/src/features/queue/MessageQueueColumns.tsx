@@ -17,7 +17,7 @@ const { getEnvironmentResources } = useEnvironmentStore.getState();
 const queryClient = new QueryClient();
 
 async function deleteHandler(mq: MessageQueue) {
-	queryClient
+	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
 			mutationFn: deleteQueue,

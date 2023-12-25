@@ -17,7 +17,7 @@ const queryClient = new QueryClient();
 
 async function deleteHandler(field: Field) {
 	const model = useModelStore.getState().model;
-	queryClient
+	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
 			mutationFn: deleteField,

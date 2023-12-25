@@ -13,7 +13,7 @@ const { version } = useVersionStore.getState();
 const { setEditRateLimitDrawerIsOpen, setRateLimit, deleteRateLimit } = useSettingsStore.getState();
 async function onDelete(limitId: string) {
 	if (!version) return;
-	await deleteRateLimit({
+	return deleteRateLimit({
 		appId: version.appId,
 		versionId: version._id,
 		orgId: version.orgId,

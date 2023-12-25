@@ -16,7 +16,7 @@ async function onDelete(original: APIKey) {
 	const { version } = useVersionStore.getState();
 	const { deleteAPIKey } = useSettingsStore.getState();
 	if (!version) return;
-	await deleteAPIKey({
+	return deleteAPIKey({
 		appId: version.appId,
 		orgId: version.orgId,
 		keyId: original._id,

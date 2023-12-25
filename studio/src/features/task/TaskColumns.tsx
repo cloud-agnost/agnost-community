@@ -19,7 +19,7 @@ const { openEditTaskModal, deleteTask } = useTaskStore.getState();
 const { getEnvironmentResources } = useEnvironmentStore.getState();
 async function deleteHandler(task: Task) {
 	const environment = useEnvironmentStore.getState().environment;
-	queryClient
+	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
 			mutationFn: deleteTask,

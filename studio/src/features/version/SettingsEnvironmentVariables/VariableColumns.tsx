@@ -13,7 +13,7 @@ const { deleteParam, setParam, setEditParamDrawerIsOpen } = useSettingsStore.get
 async function onDelete(paramId: string) {
 	const { version } = useVersionStore.getState();
 	if (!version) return;
-	await deleteParam({
+	return deleteParam({
 		versionId: version?._id,
 		orgId: version?.orgId,
 		appId: version?.appId,
