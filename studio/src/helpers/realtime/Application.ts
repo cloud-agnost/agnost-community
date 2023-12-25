@@ -6,6 +6,7 @@ import {
 	CreateApplicationResponse,
 	RealtimeActionParams,
 } from '@/types';
+import { history } from '@/utils';
 import { RealtimeActions } from './RealtimeActions';
 class Application extends RealtimeActions<ApplicationType | CreateApplicationResponse> {
 	accept(param: RealtimeActionParams<ApplicationType>): void {
@@ -20,12 +21,20 @@ class Application extends RealtimeActions<ApplicationType | CreateApplicationRes
 	log(): void {
 		throw new Error('Method not implemented.');
 	}
-	delete({ identifiers }: RealtimeActionParams<ApplicationType>) {
+	delete({ identifiers, actor }: RealtimeActionParams<ApplicationType>) {
+		const { user } = useAuthStore.getState();
 		useApplicationStore.setState?.({
 			applications: useApplicationStore
 				.getState?.()
 				.applications.filter((app) => app._id !== identifiers.appId),
 		});
+
+		if (
+			user?._id !== actor?._id &&
+			window.location.pathname.includes(identifiers.appId as string)
+		) {
+			history.navigate?.(`/organization/${identifiers.orgId}/apps`);
+		}
 	}
 
 	update({ data }: RealtimeActionParams<ApplicationType>) {

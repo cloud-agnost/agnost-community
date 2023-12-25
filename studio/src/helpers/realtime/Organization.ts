@@ -1,5 +1,7 @@
+import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization as OrganizationType, RealtimeActionParams } from '@/types';
+import { history } from '@/utils';
 import { RealtimeActions } from './RealtimeActions';
 class Organization extends RealtimeActions<OrganizationType> {
 	accept(param: RealtimeActionParams<OrganizationType>): void {
@@ -27,12 +29,19 @@ class Organization extends RealtimeActions<OrganizationType> {
 	log(): void {
 		throw new Error('Method not implemented.');
 	}
-	delete({ identifiers }: RealtimeActionParams<OrganizationType>) {
+	delete({ identifiers, actor }: RealtimeActionParams<OrganizationType>) {
+		const { user } = useAuthStore.getState();
 		useOrganizationStore.setState?.({
 			organizations: useOrganizationStore
 				.getState?.()
 				.organizations.filter((org) => org._id !== identifiers.orgId),
 		});
+		if (
+			user?._id !== actor?._id &&
+			window.location.pathname.includes(identifiers.orgId as string)
+		) {
+			history.navigate?.(`/organization`);
+		}
 	}
 	update({ data }: RealtimeActionParams<OrganizationType>) {
 		useOrganizationStore.setState?.({
