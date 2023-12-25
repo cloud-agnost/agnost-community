@@ -22,6 +22,7 @@ export default function useRealtime() {
 					message: log,
 					...(id && { id }),
 					type,
+					actor: message.actor,
 				});
 				if (NOTIFICATION_ACTIONS.includes(action)) {
 					useVersionStore.setState({

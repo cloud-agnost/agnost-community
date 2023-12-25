@@ -315,6 +315,7 @@ export interface RealtimeActionParams<T> {
 	id?: string;
 	timestamp?: string;
 	type?: string;
+	actor?: Partial<User> & { userId: string };
 }
 
 export interface Middleware {

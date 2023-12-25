@@ -18,7 +18,7 @@ const queryClient = new QueryClient();
 const env = useEnvironmentStore.getState().environment;
 const { openEditEndpointDialog, deleteEndpoint } = useEndpointStore.getState();
 async function deleteEndpointHandler(toDeleteEndpoint: Endpoint) {
-	queryClient
+	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
 			mutationFn: deleteEndpoint,

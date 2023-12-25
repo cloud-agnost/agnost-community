@@ -24,7 +24,7 @@ const {
 
 const queryClient = new QueryClient();
 async function deleteFileHandler(toDeleteFile: BucketFile) {
-	queryClient
+	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
 			mutationFn: deleteFileFromBucket,

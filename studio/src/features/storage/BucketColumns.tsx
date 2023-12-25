@@ -17,7 +17,7 @@ const { emptyBucket, openDeleteBucketDialog, openEditBucketDialog, storage } =
 
 const queryClient = new QueryClient();
 async function clearBucket(bucketName: string) {
-	queryClient
+	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
 			mutationFn: emptyBucket,

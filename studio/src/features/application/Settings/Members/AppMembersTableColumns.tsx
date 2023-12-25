@@ -13,7 +13,7 @@ import { RoleSelect } from 'components/RoleDropdown';
 async function removeMember(userId: string, appId: string) {
 	const orgId = useOrganizationStore.getState().organization._id;
 
-	useApplicationStore.getState?.().removeAppMember({
+	return useApplicationStore.getState?.().removeAppMember({
 		userId,
 		orgId,
 		appId,

@@ -14,7 +14,7 @@ const { openEditMiddlewareDrawer, deleteMiddleware } = useMiddlewareStore.getSta
 const queryClient = new QueryClient();
 
 async function deleteHandler(mw: Middleware) {
-	queryClient
+	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
 			mutationFn: deleteMiddleware,

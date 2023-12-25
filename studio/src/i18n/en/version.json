@@ -45,6 +45,8 @@
 	"auto_redeploy": "Auto redeploy",
 	"auto_deploy": "Auto Deploy",
 	"auto_redeploy_desc": "When version changes then deploy changes automatically.",
+	"restart": "Restart",
+	"restart_desc": "This will shut down your API Server and restart them.",
 	"view_logs": "View Deployment Logs",
 	"logs": "Deployment Logs",
 	"open_version": "Open Version",
@@ -358,5 +360,6 @@
 	"server_api": "Server API Guide",
 	"server_api_desc": "Learn how to use Agnost's server API to build your next app.",
 	"documentation": "Documentation",
-	"close_tab": "Close Tab"
+	"close_tab": "Close Tab",
+	"noNotifications": "Your search did not match any notifications."
 }

@@ -1,5 +1,7 @@
+import useAuthStore from '@/store/auth/authStore';
 import useVersionStore from '@/store/version/versionStore';
 import { RealtimeActionParams, Version as VersionType } from '@/types';
+import { history } from '@/utils';
 import { RealtimeActions } from './RealtimeActions';
 class Version extends RealtimeActions<VersionType> {
 	accept(): void {
@@ -12,11 +14,19 @@ class Version extends RealtimeActions<VersionType> {
 		this.update(param);
 	}
 	delete(param: RealtimeActionParams<VersionType>): void {
+		const { user } = useAuthStore.getState();
 		useVersionStore.setState?.({
 			versions: useVersionStore
 				.getState?.()
 				.versions.filter((env) => env._id !== param.identifiers.environmentId),
 		});
+
+		if (
+			user?._id !== param.actor?._id &&
+			window.location.pathname.includes(param?.identifiers?.versionId as string)
+		) {
+			history.navigate?.(`/organization/${param.identifiers.orgId}/apps`);
+		}
 	}
 	update(param: RealtimeActionParams<VersionType>): void {
 		useVersionStore.setState?.((prev) => ({

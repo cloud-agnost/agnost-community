@@ -27,18 +27,27 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 const DialogContent = React.forwardRef<
 	React.ElementRef<typeof DialogPrimitive.Content>,
 	React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-	<DialogPortal>
-		<DialogOverlay />
-		<DialogPrimitive.Content ref={ref} className={cn('dialog-content', className)} {...props}>
-			{children}
-			<DialogPrimitive.Close className='dialog-close'>
-				<X size={24} />
-				<span className='sr-only'>Close</span>
-			</DialogPrimitive.Close>
-		</DialogPrimitive.Content>
-	</DialogPortal>
-));
+>(({ className, children, ...props }, ref) => {
+	React.useEffect(() => {
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Enter') {
+				event.preventDefault();
+			}
+		});
+	}, []);
+	return (
+		<DialogPortal>
+			<DialogOverlay />
+			<DialogPrimitive.Content ref={ref} className={cn('dialog-content', className)} {...props}>
+				{children}
+				<DialogPrimitive.Close className='dialog-close'>
+					<X size={24} />
+					<span className='sr-only'>Close</span>
+				</DialogPrimitive.Close>
+			</DialogPrimitive.Content>
+		</DialogPortal>
+	);
+});
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (

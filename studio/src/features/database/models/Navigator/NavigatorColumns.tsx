@@ -8,7 +8,7 @@ import { QueryClient } from '@tanstack/react-query';
 const { deleteDataFromModel } = useNavigatorStore.getState();
 const queryClient = new QueryClient();
 async function deleteHandler(id: string) {
-	queryClient
+	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
 			mutationFn: deleteDataFromModel,

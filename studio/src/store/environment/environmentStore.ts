@@ -13,6 +13,7 @@ import {
 	VersionParams,
 	getAppVersionEnvironmentParams,
 } from '@/types';
+import { joinChannel } from '@/utils';
 import EnvironmentService from 'services/EnvironmentService.ts';
 import { devtools } from 'zustand/middleware';
 
@@ -34,6 +35,7 @@ type Actions = {
 	suspendEnvironment: (params: VersionParams) => Promise<void>;
 	activateEnvironment: (params: VersionParams) => Promise<void>;
 	redeployAppVersionToEnvironment: (params: VersionParams) => Promise<void>;
+	restartApiServers: (params: VersionParams) => Promise<void>;
 	updateEnvironmentTelemetryLogs: (params: UpdateEnvironmentTelemetryLogsParams) => Promise<any>;
 	getEnvironmentResources: (params: GetEnvironmentResourcesParams) => Promise<Resource[]>;
 	updateApiServerConf: (params: UpdateAPIServerConfParams) => Promise<void>;
@@ -56,6 +58,7 @@ const useEnvironmentStore = create<EnvironmentStore & Actions>()(
 			getAppVersionEnvironment: async (params: getAppVersionEnvironmentParams) => {
 				const environment = await EnvironmentService.getAppVersionEnvironment(params);
 				set({ environment });
+				joinChannel(environment._id);
 				return environment;
 			},
 			getEnvironmentLogs: async (params: GetEnvironmentLogsParams) => {
@@ -91,6 +94,13 @@ const useEnvironmentStore = create<EnvironmentStore & Actions>()(
 				try {
 					const environment = await EnvironmentService.redeployAppVersionToEnvironment(params);
 					set({ environment });
+				} catch (error) {
+					throw error as APIError;
+				}
+			},
+			restartApiServers: async (params: VersionParams) => {
+				try {
+					return await EnvironmentService.restartApiServers(params);
 				} catch (error) {
 					throw error as APIError;
 				}

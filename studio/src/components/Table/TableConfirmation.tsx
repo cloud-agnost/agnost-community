@@ -7,6 +7,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
+import { APIError } from '@/types';
+import { useToast } from '@/hooks';
 interface TableConfirmationProps {
 	onConfirm: MutationFunction<unknown, void>;
 	disabled?: boolean;
@@ -30,13 +32,18 @@ export function TableConfirmation({
 	tooltip,
 	disabled,
 }: TableConfirmationProps) {
+	const { notify } = useToast();
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
-
-	const { isPending, mutate } = useMutation({
+	const { mutateAsync, isPending } = useMutation({
 		mutationFn: onConfirm,
-		onSuccess: () => {
-			setOpen(false);
+		onSuccess: () => setOpen(false),
+		onError: ({ error, details }: APIError) => {
+			notify({
+				title: error,
+				description: details,
+				type: 'error',
+			});
 		},
 	});
 	return (
@@ -79,7 +86,7 @@ export function TableConfirmation({
 										<Button variant='text' size='lg' onClick={() => setOpen(false)}>
 											{t('general.cancel')}
 										</Button>
-										<Button variant='primary' size='lg' onClick={mutate} loading={isPending}>
+										<Button variant='primary' size='lg' onClick={mutateAsync} loading={isPending}>
 											{t('general.ok')}
 										</Button>
 									</div>

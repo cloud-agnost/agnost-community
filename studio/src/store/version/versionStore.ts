@@ -19,7 +19,7 @@ import {
 	VersionLog,
 	VersionLogBucket,
 } from '@/types';
-import { history, resetAfterVersionChange } from '@/utils';
+import { history, joinChannel, resetAfterVersionChange } from '@/utils';
 import { devtools } from 'zustand/middleware';
 import useAuthStore from '../auth/authStore';
 import useUtilsStore from './utilsStore';
@@ -39,7 +39,7 @@ interface VersionStore {
 	log: VersionLog;
 	showLogDetails: boolean;
 	notificationLastSeen: Date;
-	notificationLastFetchedCount: number;
+	notificationLastFetchedCount: number | undefined;
 	designElements: DesignElement[];
 	dashboard: Dashboard;
 	packages: Record<string, string>;
@@ -72,7 +72,7 @@ type Actions = {
 };
 
 const initialState: VersionStore = {
-	notificationLastFetchedCount: 0,
+	notificationLastFetchedCount: undefined,
 	loading: false,
 	error: {} as APIError,
 	deleteVersionDrawerIsOpen: false,
@@ -116,6 +116,7 @@ const useVersionStore = create<VersionStore & Actions>()(
 		getVersionById: async (params: GetVersionByIdParams) => {
 			const version = await VersionService.getVersionById(params);
 			set({ version });
+			joinChannel(version._id);
 			return version;
 		},
 		getAllVersionsVisibleToUser: async (req: GetVersionRequest) => {
@@ -231,7 +232,7 @@ const useVersionStore = create<VersionStore & Actions>()(
 			try {
 				const notifications = await VersionService.getVersionNotifications(params);
 				if (params.page === 0) {
-					set({ notifications });
+					set({ notifications, notificationLastFetchedCount: notifications.length });
 				} else {
 					set((prev) => ({
 						notifications: [...prev.notifications, ...notifications],

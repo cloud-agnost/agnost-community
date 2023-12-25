@@ -1,8 +1,10 @@
+import { EmptyState } from '@/components/EmptyState';
 import { TableLoading } from '@/components/Table/Table';
 import { Notification, NotificationFilter } from '@/features/version/Notification';
 import { useInfiniteScroll } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
 import { NotificationActions } from '@/types';
+import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSearchParams } from 'react-router-dom';
@@ -29,6 +31,7 @@ export default function VersionNotifications() {
 			action: (searchParams.get('a')?.split(',') as NotificationActions[]) ?? undefined,
 		},
 	});
+
 	return (
 		<div className='flex gap-6 h-full'>
 			<NotificationFilter />
@@ -42,18 +45,22 @@ export default function VersionNotifications() {
 					</div>
 				) : (
 					<div className='scroll p-6 divide-y-2' id='scrollableDiv'>
-						<InfiniteScroll
-							scrollableTarget='scrollableDiv'
-							dataLength={notifications.length}
-							next={fetchNextPage}
-							hasMore={hasNextPage}
-							loader={isFetchingNextPage && <TableLoading />}
-							className='divide-y-2'
-						>
-							{notifications.map((notification) => (
-								<Notification notification={notification} key={notification._id} />
-							))}
-						</InfiniteScroll>
+						{!_.isEmpty(notifications) ? (
+							<InfiniteScroll
+								scrollableTarget='scrollableDiv'
+								dataLength={notifications.length}
+								next={fetchNextPage}
+								hasMore={hasNextPage}
+								loader={isFetchingNextPage && <TableLoading />}
+								className='divide-y-2'
+							>
+								{notifications.map((notification) => (
+									<Notification notification={notification} key={notification._id} />
+								))}
+							</InfiniteScroll>
+						) : (
+							<EmptyState title={t('version.noNotifications')} type='notification' />
+						)}
 					</div>
 				)}
 			</div>

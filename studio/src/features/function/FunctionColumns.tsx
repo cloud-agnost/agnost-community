@@ -14,7 +14,7 @@ const { openEditFunctionDrawer, deleteFunction } = useFunctionStore.getState();
 const queryClient = new QueryClient();
 
 async function deleteHandler(fn: HelperFunction) {
-	queryClient
+	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
 			mutationFn: deleteFunction,

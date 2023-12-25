@@ -6,7 +6,7 @@ export default function AutoDeploy() {
 
 	return (
 		<SettingsFormItem
-			className='space-y-0 pb-6 pt-0'
+			className='space-y-0 py-6'
 			contentClassName='flex items-center justify-end'
 			twoColumns
 			title={t('version.auto_deploy')}
