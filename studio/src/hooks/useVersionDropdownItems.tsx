@@ -24,7 +24,7 @@ export default function useVersionDropdownItems() {
 	const { addTab } = useTabStore();
 
 	useEffect(() => {
-		if (!_.isEmpty(versions) && appId && orgId) {
+		if (appId && orgId) {
 			getAllVersionsVisibleToUser({
 				appId,
 				orgId,
@@ -33,7 +33,6 @@ export default function useVersionDropdownItems() {
 			});
 		}
 	}, [version]);
-
 	const versionDropdownItems = useMemo(
 		() => [
 			{
