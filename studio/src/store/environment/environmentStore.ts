@@ -110,6 +110,9 @@ const useEnvironmentStore = create<EnvironmentStore & Actions>()(
 			},
 			getEnvironmentResources: async (params: GetEnvironmentResourcesParams) => {
 				const resources = await EnvironmentService.getEnvironmentResources(params);
+				resources.forEach((resource) => {
+					joinChannel(resource._id);
+				});
 				set({ resources });
 				return resources;
 			},

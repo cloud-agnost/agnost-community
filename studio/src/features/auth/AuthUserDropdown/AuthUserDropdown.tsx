@@ -33,9 +33,9 @@ export default function AuthUserDropdown() {
 	const { setTheme, getTheme } = useThemeStore();
 	const navigate = useNavigate();
 	const { version } = useVersionStore();
-	const { organization, organizations } = useOrganizationStore();
+	const { organizations } = useOrganizationStore();
 	const { application, applications } = useApplicationStore();
-	const { environment } = useEnvironmentStore();
+	const { environment, resources: envResources } = useEnvironmentStore();
 	const { resources } = useResourceStore();
 	const THEMES = [
 		{
@@ -70,6 +70,9 @@ export default function AuthUserDropdown() {
 				});
 				applications?.forEach((app) => {
 					leaveChannel(app._id);
+				});
+				envResources?.forEach((envResource) => {
+					leaveChannel(envResource._id);
 				});
 				leaveChannel('cluster');
 				leaveChannel(user?._id ?? '');

@@ -27,6 +27,12 @@ export default function Resources() {
 							<div className='flex flex-col'>
 								<p className='text-sm font-sfCompact font-normal leading-6 text-default'>
 									{resource.name}
+									{(resource.availableReplicas ?? 0) + (resource.unavailableReplicas ?? 0) > 1 && (
+										<span className='text-subtle font-normal'>
+											{' '}
+											({resource.availableReplicas}/{resource.unavailableReplicas})
+										</span>
+									)}
 								</p>
 								<time className='font-sfCompact text-[11px] leading-[21px] tracking-[0.22px] text-subtle font-normal'>
 									{formatDate(resource.createdAt, DATE_FORMAT_MONTH_DAY_YEAR)}

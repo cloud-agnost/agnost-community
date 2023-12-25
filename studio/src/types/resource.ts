@@ -125,6 +125,8 @@ export interface Resource {
 	_id: string;
 	createdAt: string;
 	updatedAt: string;
+	availableReplicas?: number;
+	unavailableReplicas?: number;
 	__v: number;
 }
 export interface ResLog {

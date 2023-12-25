@@ -80,7 +80,7 @@ export default function ReleaseDropdown() {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
-				className='relative w-[23rem] bg-wrapper-background-base h-full'
+				className='relative max-w-md bg-wrapper-background-base h-full'
 				align='end'
 			>
 				<DropdownMenuLabel className='text-default flex items-center justify-between p-4'>
