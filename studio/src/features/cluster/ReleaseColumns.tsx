@@ -19,7 +19,7 @@ const ReleaseColumns: ColumnDef<ClusterComponentReleaseInfo>[] = [
 		enableResizing: false,
 		cell: ({ row }) => {
 			const { status } = row.original;
-			return <Badge variant={BADGE_COLOR_MAP[status.toUpperCase()]} text={status} />;
+			return <Badge rounded variant={BADGE_COLOR_MAP[status.toUpperCase()]} text={status} />;
 		},
 	},
 	{
