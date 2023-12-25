@@ -60,6 +60,7 @@ export default function TestConnectionButton({ replica }: { replica?: boolean })
 			onClick={testResourceConnection}
 			size='lg'
 			className='self-start'
+			type='button'
 		>
 			{!isPending && <TestConnection className='w-4 h-4 text-icon-default mr-2' />}
 			{t('resources.database.test')}
