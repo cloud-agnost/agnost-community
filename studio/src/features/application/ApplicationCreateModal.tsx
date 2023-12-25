@@ -16,7 +16,6 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError, CreateApplicationSchema } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { KeyboardEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
