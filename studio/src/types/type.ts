@@ -374,6 +374,7 @@ export type LogTypes = 'info' | 'log' | 'debug' | 'error' | 'warn';
 export interface Log {
 	message: string;
 	timestamp: string;
+	pod: string;
 	type: LogTypes | EnvironmentStatus;
 }
 
