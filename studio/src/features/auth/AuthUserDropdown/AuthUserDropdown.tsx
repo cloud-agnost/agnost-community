@@ -1,8 +1,13 @@
 import { LineSegments } from '@/components/icons';
 import { resetAllStores } from '@/helpers';
+import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore.ts';
+import useEnvironmentStore from '@/store/environment/environmentStore';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import useResourceStore from '@/store/resources/resourceStore';
 import useThemeStore from '@/store/theme/themeStore.ts';
-import { cn } from '@/utils';
+import useVersionStore from '@/store/version/versionStore';
+import { cn, leaveChannel } from '@/utils';
 import { CodeBlock, GearSix, Laptop, MoonStars, SignOut, SunDim } from '@phosphor-icons/react';
 import { AuthUserAvatar } from 'components/AuthUserAvatar';
 import {
@@ -27,6 +32,11 @@ export default function AuthUserDropdown() {
 	const { t } = useTranslation();
 	const { setTheme, getTheme } = useThemeStore();
 	const navigate = useNavigate();
+	const { version } = useVersionStore();
+	const { organization, organizations } = useOrganizationStore();
+	const { application, applications } = useApplicationStore();
+	const { environment } = useEnvironmentStore();
+	const { resources } = useResourceStore();
 	const THEMES = [
 		{
 			id: 'light',
@@ -48,6 +58,21 @@ export default function AuthUserDropdown() {
 	function logoutHandler() {
 		logout({
 			onSuccess: () => {
+				leaveChannel(orgId);
+				leaveChannel(version?._id ?? '');
+				leaveChannel(application?._id ?? '');
+				leaveChannel(environment?._id ?? '');
+				resources?.forEach((resource) => {
+					leaveChannel(resource._id);
+				});
+				organizations?.forEach((org) => {
+					leaveChannel(org._id);
+				});
+				applications?.forEach((app) => {
+					leaveChannel(app._id);
+				});
+				leaveChannel('cluster');
+				leaveChannel(user?._id ?? '');
 				resetAllStores();
 				navigate('/login');
 			},
