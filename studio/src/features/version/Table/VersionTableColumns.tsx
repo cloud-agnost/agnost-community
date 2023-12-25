@@ -5,7 +5,7 @@ import useApplicationStore from '@/store/app/applicationStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Version } from '@/types';
-import { cn, getVersionPermission, translate } from '@/utils';
+import { cn, getAppPermission, getVersionPermission, translate } from '@/utils';
 import { LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -67,7 +67,7 @@ export const VersionTableColumns: ColumnDef<Version>[] = [
 		header: '',
 		size: 75,
 		cell: ({ row }) => {
-			const canViewVersion = getVersionPermission('version.view');
+			const canViewVersion = getAppPermission('version.view');
 			return (
 				<Button
 					disabled={!canViewVersion}
