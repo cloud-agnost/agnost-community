@@ -14,7 +14,7 @@ export default function OrganizationSettings() {
 	return (
 		<SettingsLayout
 			navbar={<SettingsNavbar items={settings} />}
-			className='p-6 full-height-without-header'
+			className='p-6 !full-height-without-header-and-menu'
 		>
 			<RequireAuth>
 				<Outlet />

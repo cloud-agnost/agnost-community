@@ -23,7 +23,7 @@
 		"general": "General",
 		"members": {
 			"title": "Members",
-			"description": "Manage your member",
+			"description": "Manage your organization members",
 			"delete": "Delete Member",
 			"deleteDesc": "Are you sure you want to delete this member? This action cannot be undone. The user will not be able to join the organization.",
 			"invite": {
