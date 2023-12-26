@@ -3,6 +3,7 @@ import {
 	APIError,
 	EnvLog,
 	Environment,
+	GetEnvironmentLogDetailsParams,
 	GetEnvironmentLogsParams,
 	GetEnvironmentResourcesParams,
 	Resource,
@@ -13,7 +14,7 @@ import {
 	VersionParams,
 	getAppVersionEnvironmentParams,
 } from '@/types';
-import { joinChannel } from '@/utils';
+import { DATE_TIME_FORMAT, formatDate, joinChannel } from '@/utils';
 import EnvironmentService from 'services/EnvironmentService.ts';
 import { devtools } from 'zustand/middleware';
 
@@ -24,13 +25,15 @@ interface EnvironmentStore {
 	envLogs: EnvLog[];
 	selectedLog: SelectedEnvLog;
 	isLogDetailsOpen: boolean;
+	log: EnvLog;
 }
 
 type Actions = {
-	openLogDetails: (log: SelectedEnvLog) => void;
+	openLogDetails: (log: EnvLog) => void;
 	closeLogDetails: () => void;
 	getAppVersionEnvironment: (params: getAppVersionEnvironmentParams) => Promise<Environment>;
 	getEnvironmentLogs: (params: GetEnvironmentLogsParams) => Promise<void>;
+	getEnvironmentLogsDetail: (params: GetEnvironmentLogDetailsParams) => Promise<void>;
 	toggleAutoDeploy: (params: ToggleAutoDeployParams) => Promise<Environment>;
 	suspendEnvironment: (params: VersionParams) => Promise<void>;
 	activateEnvironment: (params: VersionParams) => Promise<void>;
@@ -48,6 +51,7 @@ const initialState: EnvironmentStore = {
 	resources: [],
 	envLogs: [],
 	selectedLog: {} as SelectedEnvLog,
+	log: {} as EnvLog,
 	isLogDetailsOpen: false,
 };
 
@@ -64,6 +68,38 @@ const useEnvironmentStore = create<EnvironmentStore & Actions>()(
 			getEnvironmentLogs: async (params: GetEnvironmentLogsParams) => {
 				const logs = await EnvironmentService.getEnvironmentLogs(params);
 				set({ envLogs: logs });
+			},
+			getEnvironmentLogsDetail: async (params: GetEnvironmentLogDetailsParams) => {
+				const log = await EnvironmentService.getEnvironmentLogsDetail(params);
+
+				const selectedLog = {
+					dbLogs: log.dbLogs?.map((log) => ({
+						timestamp: formatDate(log.startedAt, DATE_TIME_FORMAT),
+						message: log.message,
+						type: log.status,
+					})),
+					serverLogs: log.serverLogs?.map((log) => ({
+						timestamp: formatDate(log.startedAt, DATE_TIME_FORMAT),
+						message: log.message,
+						type: log.status,
+						pod: log.pod,
+					})),
+					schedulerLogs: log.schedulerLogs?.map((log) => ({
+						timestamp: formatDate(log.startedAt, DATE_TIME_FORMAT),
+						message: log.message,
+						type: log.status,
+					})),
+				} as SelectedEnvLog;
+
+				set((prev) => ({
+					selectedLog,
+					envLogs: prev.envLogs.map((envLog) => {
+						if (envLog._id === log._id) {
+							return log;
+						}
+						return envLog;
+					}),
+				}));
 			},
 			toggleAutoDeploy: async (params: ToggleAutoDeployParams) => {
 				try {
@@ -116,8 +152,8 @@ const useEnvironmentStore = create<EnvironmentStore & Actions>()(
 				set({ resources });
 				return resources;
 			},
-			openLogDetails: (log: SelectedEnvLog) => {
-				set({ selectedLog: log, isLogDetailsOpen: true });
+			openLogDetails: (log: EnvLog) => {
+				set({ log, isLogDetailsOpen: true });
 			},
 			closeLogDetails: () => {
 				set({ selectedLog: {} as SelectedEnvLog, isLogDetailsOpen: false });

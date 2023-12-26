@@ -4,7 +4,7 @@ import { BADGE_COLOR_MAP } from '@/constants';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ColumnDefWithClassName, EnvLog, SelectedEnvLog } from '@/types';
-import { DATE_TIME_FORMAT, formatDate, translate } from '@/utils';
+import { translate } from '@/utils';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/Avatar';
 import { Badge } from 'components/Badge';
 import { Document } from 'components/icons';
@@ -89,30 +89,7 @@ const DeploymentLogColumns: ColumnDefWithClassName<EnvLog>[] = [
 		cell: ({ row }) => {
 			const { openLogDetails } = useEnvironmentStore.getState();
 			return (
-				<Button
-					variant='blank'
-					onClick={() => {
-						const logs = {
-							dbLogs: row.original.dbLogs.map((log) => ({
-								timestamp: formatDate(log.startedAt, DATE_TIME_FORMAT),
-								message: log.message,
-								type: log.status,
-							})),
-							serverLogs: row.original.serverLogs.map((log) => ({
-								timestamp: formatDate(log.startedAt, DATE_TIME_FORMAT),
-								message: log.message,
-								type: log.status,
-								pod: log.pod,
-							})),
-							schedulerLogs: row.original.schedulerLogs.map((log) => ({
-								timestamp: formatDate(log.startedAt, DATE_TIME_FORMAT),
-								message: log.message,
-								type: log.status,
-							})),
-						} as SelectedEnvLog;
-						openLogDetails(logs);
-					}}
-				>
+				<Button variant='blank' onClick={() => openLogDetails(row.original)}>
 					<Document className='w-6 h-6' />
 				</Button>
 			);

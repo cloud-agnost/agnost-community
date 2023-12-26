@@ -68,15 +68,16 @@ export interface EnvLog {
 	dbStatus: EnvironmentStatus;
 	serverStatus: EnvironmentStatus;
 	schedulerStatus: EnvironmentStatus;
-	dbLogs: EnvLogDetail[];
-	serverLogs: EnvLogDetail[];
-	schedulerLogs: EnvLogDetail[];
+	dbLogs?: EnvLogDetail[];
+	serverLogs?: EnvLogDetail[];
+	schedulerLogs?: EnvLogDetail[];
 	createdBy: string;
 	_id: string;
 	createdAt: string;
 	updatedAt: string;
 	description: string;
-	__v: number;
+	serverStatusOK: number;
+	serverStatusError: number;
 }
 
 export interface SelectedEnvLog {
@@ -96,7 +97,11 @@ export type ToggleAutoDeployParams = VersionParams & {
 export type GetEnvironmentLogsParams = VersionParams & {
 	actor?: string;
 	status?: string;
+	logId?: string;
 } & BaseGetRequest;
+export type GetEnvironmentLogDetailsParams = VersionParams & {
+	logId: string;
+};
 
 export type getAppVersionEnvironmentParams = BaseParams;
 export type GetEnvironmentResourcesParams = VersionParams;

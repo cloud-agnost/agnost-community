@@ -1,6 +1,8 @@
 import { axios } from '@/helpers';
 import {
+	EnvLog,
 	Environment,
+	GetEnvironmentLogDetailsParams,
 	GetEnvironmentLogsParams,
 	GetEnvironmentResourcesParams,
 	Resource,
@@ -33,6 +35,23 @@ export default class EnvironmentService {
 			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/logs`, {
 				params: params,
 			})
+		).data;
+	}
+	static async getEnvironmentLogsDetail({
+		orgId,
+		appId,
+		versionId,
+		envId,
+		logId,
+		...params
+	}: GetEnvironmentLogDetailsParams): Promise<EnvLog> {
+		return (
+			await axios.get(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/env/${envId}/logs/${logId}`,
+				{
+					params: params,
+				},
+			)
 		).data;
 	}
 
