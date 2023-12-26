@@ -120,11 +120,8 @@ export default function EditorSettings() {
 
 	function closeDrawer() {
 		form.reset();
-		toggleEditorSettingsDrawer();
-	}
-
-	function handleCancel() {
 		globalThis.monaco.editor.setTheme(user?.editorSettings?.theme ?? 'night-owl');
+		toggleEditorSettingsDrawer();
 	}
 
 	useEffect(() => {
@@ -388,7 +385,7 @@ console.log('total:', total);
 						<DrawerFooter className='mt-8'>
 							<div className='flex justify-end'>
 								<DrawerClose asChild>
-									<Button variant='secondary' size='lg' onClick={handleCancel}>
+									<Button variant='secondary' size='lg'>
 										{t('general.cancel')}
 									</Button>
 								</DrawerClose>
