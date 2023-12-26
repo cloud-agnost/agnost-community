@@ -238,7 +238,7 @@ export default function AddOrEditAPIKeyDrawer({
 									{t('general.cancel')}
 								</Button>
 							</DrawerClose>
-							<Button size='lg' loading={isPending} type='submit'>
+							<Button size='lg' loading={isPending}>
 								{t('general.save')}
 							</Button>
 						</div>

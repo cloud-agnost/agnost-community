@@ -140,7 +140,7 @@ export default function ChangeEmail() {
 			) : (
 				<div className='space-y-4'>
 					<Input disabled readOnly value={user?.loginProfiles[0].email} />
-					<Button onClick={open} size='lg' type='submit'>
+					<Button onClick={open} size='lg'>
 						{t('profileSettings.change_email')}
 					</Button>
 				</div>

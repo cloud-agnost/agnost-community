@@ -125,7 +125,7 @@ export default function ForgotPassword() {
 								<Button to='/login' variant='text' size='lg'>
 									{t('login.back_to_login')}
 								</Button>
-								<Button loading={loading} size='lg' type='submit'>
+								<Button loading={loading} size='lg'>
 									{t('login.get_reset_link')}
 								</Button>
 							</div>

@@ -161,7 +161,7 @@ export default function EditVersionAndReplica() {
 					/>
 				)}
 				<div className='flex justify-end'>
-					<Button className='ml-2' size='lg' loading={isPending} type='submit'>
+					<Button className='ml-2' size='lg' loading={isPending}>
 						{t('general.save')}
 					</Button>
 				</div>

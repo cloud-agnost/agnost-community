@@ -94,7 +94,7 @@ export default function ApplicationCreateModal({
 							<Button variant='text' size='lg' onClick={closeModal} type='button'>
 								{t('general.cancel')}
 							</Button>
-							<Button variant='primary' size='lg' loading={isPending} type='submit'>
+							<Button variant='primary' size='lg' loading={isPending}>
 								{t('general.ok')}
 							</Button>
 						</div>

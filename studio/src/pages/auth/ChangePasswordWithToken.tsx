@@ -151,7 +151,7 @@ export default function ChangePasswordWithToken() {
 										{t('login.back_to_login')}
 									</Button>
 								)}
-								<Button loading={isPending} size='lg' type='submit'>
+								<Button loading={isPending} size='lg'>
 									{t('login.change_password')}
 								</Button>
 							</div>

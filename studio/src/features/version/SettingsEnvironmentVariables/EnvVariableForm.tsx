@@ -64,7 +64,7 @@ export default function EnvVariableForm({ loading }: EnvVariableFormProps) {
 						{t('general.cancel')}
 					</Button>
 				</DrawerClose>
-				<Button loading={loading} size='lg' type='submit'>
+				<Button loading={loading} size='lg'>
 					{t('general.save')}
 				</Button>
 			</div>

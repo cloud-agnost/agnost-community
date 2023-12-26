@@ -149,7 +149,7 @@ export default function ModelForm({ editMode, loading }: { editMode?: boolean; l
 						{t('general.cancel')}
 					</Button>
 				</DrawerClose>
-				<Button size='lg' loading={loading} type='submit'>
+				<Button size='lg' loading={loading}>
 					{editMode ? t('general.save') : t('general.create')}
 				</Button>
 			</div>

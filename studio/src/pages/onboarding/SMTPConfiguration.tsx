@@ -106,7 +106,7 @@ export default function SMTPConfiguration() {
 							<Button loading={finalizing} onClick={finishSetup} variant='secondary' size='lg'>
 								{t('onboarding.skip_and_finish')}
 							</Button>
-							<Button loading={isTesting} size='lg' type='submit'>
+							<Button loading={isTesting} size='lg'>
 								{t('onboarding.next')}
 							</Button>
 						</div>

@@ -92,7 +92,7 @@ export default function VerifyEmail() {
 							<Description>{t('login.verification_page_info')}</Description>
 
 							<div className='flex justify-end gap-4'>
-								<Button loading={loading} size='lg' type='submit'>
+								<Button loading={loading} size='lg'>
 									{t('login.verify')}
 								</Button>
 							</div>

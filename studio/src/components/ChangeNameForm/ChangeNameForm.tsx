@@ -57,7 +57,7 @@ export default function ChangeNameForm({ error, loading, label, disabled }: Chan
 				)}
 			/>
 			<div className='mt-4'>
-				<Button loading={loading} size='lg' disabled={disabled} type='submit'>
+				<Button loading={loading} size='lg' disabled={disabled}>
 					{t('general.save')}
 				</Button>
 			</div>

@@ -238,7 +238,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 								)}
 							/>
 							<div className='flex justify-end'>
-								<Button loading={finalizeLoading || completeLoading} size='lg' type='submit'>
+								<Button loading={finalizeLoading || completeLoading} size='lg'>
 									{t('login.complete_setup')}
 								</Button>
 							</div>

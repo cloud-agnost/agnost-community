@@ -90,7 +90,7 @@ export default function CompleteAccountSetup() {
 								<Button to='/login' variant='text' size='lg'>
 									{t('login.back_to_login')}
 								</Button>
-								<Button size='lg' loading={loading} type='submit'>
+								<Button size='lg' loading={loading}>
 									{t('login.continue')}
 								</Button>
 							</div>

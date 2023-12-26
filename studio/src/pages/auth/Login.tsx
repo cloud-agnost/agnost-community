@@ -121,7 +121,7 @@ export default function Login() {
 							/>
 
 							<div className='flex justify-end space-y-8'>
-								<Button loading={loading} size='full' type='submit'>
+								<Button loading={loading} size='full'>
 									{t('login.login')}
 								</Button>
 							</div>

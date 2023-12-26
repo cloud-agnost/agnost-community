@@ -178,7 +178,7 @@ export default function CreateCopyVersionDrawer() {
 									{t('general.cancel')}
 								</Button>
 							</DrawerClose>
-							<Button loading={isPending} size='lg' type='submit'>
+							<Button loading={isPending} size='lg'>
 								{t('general.add')}
 							</Button>
 						</div>
