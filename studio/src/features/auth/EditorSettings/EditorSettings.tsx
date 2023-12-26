@@ -118,6 +118,15 @@ export default function EditorSettings() {
 		});
 	};
 
+	function closeDrawer() {
+		form.reset();
+		toggleEditorSettingsDrawer();
+	}
+
+	function handleCancel() {
+		globalThis.monaco.editor.setTheme(user?.editorSettings?.theme ?? 'night-owl');
+	}
+
 	useEffect(() => {
 		if (isEditorSettingsDrawerOpen && user?.editorSettings) {
 			form.reset({
@@ -130,7 +139,7 @@ export default function EditorSettings() {
 	}, [isEditorSettingsDrawerOpen]);
 
 	return (
-		<Drawer open={isEditorSettingsDrawerOpen} onOpenChange={toggleEditorSettingsDrawer}>
+		<Drawer open={isEditorSettingsDrawerOpen} onOpenChange={closeDrawer}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>{t('profileSettings.editor.title')}</DrawerTitle>
@@ -341,7 +350,7 @@ export default function EditorSettings() {
 
 						<CodeEditor
 							name='editor'
-							containerClassName='h-1/2'
+							containerClassName='h-1/2 xl:h-[62%]'
 							className='h-full'
 							value={`
 // This function calculates the sum of two numbers
@@ -379,7 +388,7 @@ console.log('total:', total);
 						<DrawerFooter className='mt-8'>
 							<div className='flex justify-end'>
 								<DrawerClose asChild>
-									<Button variant='secondary' size='lg'>
+									<Button variant='secondary' size='lg' onClick={handleCancel}>
 										{t('general.cancel')}
 									</Button>
 								</DrawerClose>
