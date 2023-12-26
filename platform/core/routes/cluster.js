@@ -503,7 +503,7 @@ router.post(
 
 			// Send realtime notification message that cluster deployment status has changed
 			sendMessage("cluster", {
-				action: "status-update",
+				action: "update",
 				object: "cluster",
 				description: t("Status of cluster defaul deployments has changed"),
 				timestamp: Date.now(),
