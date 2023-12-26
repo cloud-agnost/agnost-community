@@ -1,4 +1,4 @@
-import { create } from '@/helpers';
+import { create } from 'zustand';
 import { Step } from '@/types';
 import { OnboardingData } from '@/types/type.ts';
 import { removeLastSlash } from '@/utils';

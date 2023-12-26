@@ -1,4 +1,3 @@
-import { create } from '@/helpers';
 import TypesService from '@/services/TypesService';
 import {
 	APIError,
@@ -10,6 +9,7 @@ import {
 	Types,
 } from '@/types';
 import { PhoneAuthSMSProviders } from '@/types/type';
+import { create } from 'zustand';
 
 import { devtools, persist } from 'zustand/middleware';
 interface TypesStore {

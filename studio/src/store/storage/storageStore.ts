@@ -1,4 +1,3 @@
-import { create } from '@/helpers';
 import StorageService from '@/services/StorageService';
 import {
 	APIError,
@@ -24,6 +23,7 @@ import {
 	UpdateStorageParams,
 	UploadFileToBucketParams,
 } from '@/types';
+import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 export interface StorageStore {
 	storages: Storage[];

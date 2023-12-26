@@ -22,10 +22,10 @@ import {
 	UpdateRoleRequest,
 } from '@/types';
 
-import { create } from '@/helpers';
 import useAuthStore from '@/store/auth/authStore';
 import { joinChannel, leaveChannel } from '@/utils';
 import OrganizationService from 'services/OrganizationService.ts';
+import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import useOrganizationStore from '../organization/organizationStore';
 import useVersionStore from '../version/versionStore';

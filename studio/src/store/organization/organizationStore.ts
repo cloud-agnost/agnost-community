@@ -1,4 +1,3 @@
-import { create } from '@/helpers';
 import OrganizationService from '@/services/OrganizationService';
 import {
 	APIError,
@@ -20,6 +19,7 @@ import {
 } from '@/types';
 import { BaseRequest } from '@/types/type';
 import { joinChannel, leaveChannel, resetAfterOrgChange } from '@/utils';
+import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 interface OrganizationStore {
 	organization: Organization;

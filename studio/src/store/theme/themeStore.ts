@@ -1,4 +1,4 @@
-import { create } from '@/helpers';
+import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 interface ThemeStore {
