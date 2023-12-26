@@ -20,12 +20,14 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 	const { t } = useTranslation();
 	const [selectedTab, setSelectedTab] = useState<string>('db');
 	const {
+		getEnvironmentLogsDetail,
 		getEnvironmentLogs,
 		environment,
 		envLogs,
 		isLogDetailsOpen,
 		closeLogDetails,
 		selectedLog,
+		log,
 	} = useEnvironmentStore();
 	const table = useTable({
 		data: envLogs,
@@ -49,6 +51,18 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 			}),
 		queryKey: ['getEnvironmentLogs'],
 		enabled: open,
+	});
+	const { isFetching: isDetailsFetching } = useQuery({
+		queryFn: () =>
+			getEnvironmentLogsDetail({
+				orgId: orgId as string,
+				appId: appId as string,
+				versionId: versionId as string,
+				envId: environment._id,
+				logId: log._id,
+			}),
+		queryKey: ['getEnvironmentLogsDetail'],
+		enabled: isLogDetailsOpen && !!log._id,
 	});
 
 	return (
@@ -82,19 +96,32 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 					>
 						<TabsList>
 							<TabsTrigger value='db'>{t('general.dbLogs')}</TabsTrigger>
-							<TabsTrigger value='server'>{t('general.serverLogs')}</TabsTrigger>
+							<TabsTrigger value='server'>
+								{t('general.serverLogs')}
+								<span className='text-subtle font-normal ml-2'>
+									({log.serverStatusOK}/{log.serverStatusError})
+								</span>
+							</TabsTrigger>
 							<TabsTrigger value='scheduler'>{t('general.schedulerLogs')}</TabsTrigger>
 						</TabsList>
 
-						<TabsContent className='h-[300px] w-full' value='db'>
-							<Logs className='h-full' logs={selectedLog.dbLogs} />
-						</TabsContent>
-						<TabsContent className='h-[300px]' value='server'>
-							<Logs className='h-full' logs={selectedLog.serverLogs} />
-						</TabsContent>
-						<TabsContent className='h-[300px]' value='scheduler'>
-							<Logs className='h-full' logs={selectedLog.schedulerLogs} />
-						</TabsContent>
+						{isDetailsFetching ? (
+							<div className='flex justify-center items-center h-[300px]'>
+								<BeatLoader color='#6884FD' size={16} margin={12} />
+							</div>
+						) : (
+							<>
+								<TabsContent className='h-[300px] w-full' value='db'>
+									<Logs className='h-full' logs={selectedLog.dbLogs} />
+								</TabsContent>
+								<TabsContent className='h-[300px]' value='server'>
+									<Logs className='h-full' logs={selectedLog.serverLogs} />
+								</TabsContent>
+								<TabsContent className='h-[300px]' value='scheduler'>
+									<Logs className='h-full' logs={selectedLog.schedulerLogs} />
+								</TabsContent>
+							</>
+						)}
 					</Tabs>
 				</DialogContent>
 			</Dialog>

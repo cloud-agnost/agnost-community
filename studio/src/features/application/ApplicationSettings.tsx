@@ -49,6 +49,7 @@ export default function ApplicationSettings({ appId, role }: ApplicationSettings
 									setting.onClick(applications.find((app) => app._id === appId) as Application)
 								}
 							>
+								<setting.icon className='w-5 h-5 mr-2' />
 								{setting.name}
 							</DropdownMenuItem>
 							{index === APPLICATION_SETTINGS.length - 3 && (

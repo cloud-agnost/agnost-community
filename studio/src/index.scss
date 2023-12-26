@@ -8,6 +8,7 @@
 	:root {
 		--header-menu-height: 75px;
 		--navigation-tab-menu-height: 45px;
+		--org-menu-height: 71px;
 
 		--font-sans: 'Rubik', sans-serif;
 		--font-albert: 'Albert Sans', sans-serif;
@@ -293,6 +294,11 @@
 	.full-max-height-without-header {
 		--height: calc(100vh - (var(--header-menu-height) + var(--navigation-tab-menu-height)));
 		max-height: var(--height);
+	}
+
+	.full-height-without-header-and-menu {
+		--height: calc(100vh - (var(--header-menu-height) + var(--org-menu-height)));
+		height: var(--height);
 	}
 
 	.no-scrollbar {

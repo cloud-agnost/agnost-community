@@ -15,8 +15,9 @@ import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 interface RateLimitFormProps {
 	loading: boolean;
+	onSubmit: (data: z.infer<typeof CreateRateLimitSchema>) => void;
 }
-export default function RateLimitForm({ loading }: RateLimitFormProps) {
+export default function RateLimitForm({ loading, onSubmit }: RateLimitFormProps) {
 	const { t } = useTranslation();
 	const form = useFormContext<z.infer<typeof CreateRateLimitSchema>>();
 	return (
@@ -101,7 +102,12 @@ export default function RateLimitForm({ loading }: RateLimitFormProps) {
 						{t('general.cancel')}
 					</Button>
 				</DrawerClose>
-				<Button loading={loading} size='lg' type='submit'>
+				<Button
+					loading={loading}
+					size='lg'
+					type='button'
+					onClick={() => form.handleSubmit(onSubmit)()}
+				>
 					{t('general.save')}
 				</Button>
 			</div>

@@ -72,7 +72,7 @@ export default function EditRateLimit({ open, onOpenChange }: EditRateLimitProps
 				<div className='p-6'>
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)}>
-							<RateLimitForm loading={isPending} />
+							<RateLimitForm loading={isPending} onSubmit={onSubmit} />
 						</form>
 					</Form>
 				</div>

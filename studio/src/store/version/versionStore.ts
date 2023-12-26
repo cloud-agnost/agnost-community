@@ -43,7 +43,7 @@ interface VersionStore {
 	designElements: DesignElement[];
 	dashboard: Dashboard;
 	packages: Record<string, string>;
-	lastFetchedLogPage: number;
+	lastFetchedLogPage: number | undefined;
 }
 
 type Actions = {
@@ -91,7 +91,7 @@ const initialState: VersionStore = {
 	designElements: [],
 	dashboard: {} as Dashboard,
 	packages: {},
-	lastFetchedLogPage: 0,
+	lastFetchedLogPage: undefined,
 };
 
 const useVersionStore = create<VersionStore & Actions>()(
@@ -200,7 +200,7 @@ const useVersionStore = create<VersionStore & Actions>()(
 				const logs = await VersionService.getVersionLogs(params);
 				set({ lastFetchedLogCount: logs.length });
 				if (params.page === 0) {
-					set({ logs: logs });
+					set({ logs: logs, lastFetchedLogPage: params.page });
 				} else {
 					set({ logs: [...get().logs, ...logs], lastFetchedLogPage: params.page });
 				}

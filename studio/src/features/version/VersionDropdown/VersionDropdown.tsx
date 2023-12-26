@@ -119,6 +119,7 @@ export default function VersionDropdown() {
 								key={option.title}
 								disabled={option.disabled}
 							>
+								<option.icon className='w-5 h-5 mr-2' />
 								{option.title}
 							</DropdownMenuItem>
 						))}
