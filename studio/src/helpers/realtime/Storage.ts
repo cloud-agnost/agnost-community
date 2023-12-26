@@ -3,10 +3,7 @@ import useTabStore from '@/store/version/tabStore';
 import { RealtimeActionParams, Storage as StorageType } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
-class Storage extends RealtimeActions<StorageType> {
-	accept(): void {
-		throw new Error('Method not implemented.');
-	}
+class Storage implements RealtimeActions<StorageType> {
 	delete({ identifiers }: RealtimeActionParams<StorageType>): void {
 		const { removeTabByPath } = useTabStore.getState();
 		useStorageStore.setState?.({
@@ -42,15 +39,6 @@ class Storage extends RealtimeActions<StorageType> {
 	}
 	telemetry(param: RealtimeActionParams<StorageType>): void {
 		this.update(param);
-	}
-	log(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
 	}
 }
 

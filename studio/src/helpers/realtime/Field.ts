@@ -3,10 +3,7 @@ import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Model, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
-class Field extends RealtimeActions<Model> {
-	accept(): void {
-		throw new Error('Method not implemented.');
-	}
+class Field implements RealtimeActions<Model> {
 	delete({ identifiers, data }: RealtimeActionParams<Model>): void {
 		useModelStore.setState?.({
 			model: data,
@@ -42,15 +39,6 @@ class Field extends RealtimeActions<Model> {
 	}
 	telemetry(param: RealtimeActionParams<Model>): void {
 		this.update(param);
-	}
-	log(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
 	}
 }
 

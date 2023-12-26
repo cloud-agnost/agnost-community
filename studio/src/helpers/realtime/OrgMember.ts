@@ -3,7 +3,7 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { OrgRoles, Organization, OrganizationMember, RealtimeActionParams } from '@/types';
 import { history } from '@/utils';
 import { RealtimeActions } from './RealtimeActions';
-class OrgMember extends RealtimeActions<OrganizationMember> {
+class OrgMember implements RealtimeActions<OrganizationMember> {
 	delete(param: RealtimeActionParams<OrganizationMember>): void {
 		useOrganizationStore.setState?.({
 			members: useOrganizationStore
@@ -47,24 +47,6 @@ class OrgMember extends RealtimeActions<OrganizationMember> {
 				}),
 			});
 		}
-	}
-	create(): void {
-		throw new Error('Method not implemented.');
-	}
-	telemetry(): void {
-		throw new Error('Method not implemented.');
-	}
-	log(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	accept(): void {
-		throw new Error('Method not implemented.');
 	}
 }
 export default OrgMember;

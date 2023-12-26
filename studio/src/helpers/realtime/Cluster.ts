@@ -2,11 +2,9 @@ import useClusterStore from '@/store/cluster/clusterStore';
 import { ClusterResourceStatus, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
-class Cluster extends RealtimeActions<ClusterResourceStatus> {
-	delete(): void {
-		throw new Error('Method not implemented.');
-	}
+class Cluster implements RealtimeActions<ClusterResourceStatus> {
 	update(param: RealtimeActionParams<ClusterResourceStatus>): void {
+		console.log('Cluster update', param);
 		useClusterStore.setState?.((prev) => ({
 			...prev,
 			clusterComponentsReleaseInfo: prev.clusterComponentsReleaseInfo.map((component) => ({
@@ -14,24 +12,6 @@ class Cluster extends RealtimeActions<ClusterResourceStatus> {
 				status: param.data.status,
 			})),
 		}));
-	}
-	create(): void {
-		throw new Error('Method not implemented.');
-	}
-	telemetry(): void {
-		throw new Error('Method not implemented.');
-	}
-	log(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	accept(): void {
-		throw new Error('Method not implemented.');
 	}
 }
 

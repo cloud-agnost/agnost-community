@@ -13,9 +13,9 @@ export default function useRealtime() {
 			const { data, object, action, identifiers, timestamp, message: log, id, type } = message;
 			if (message?.actor?.userId !== user?._id || action !== 'create') {
 				const fn = realtimeObjectMapper(object);
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				//@ts-ignore
 				fn[action]({
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					//@ts-ignore
 					data,
 					identifiers,
 					timestamp: formatDate(timestamp, DATE_TIME_FORMAT),

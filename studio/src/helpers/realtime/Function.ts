@@ -2,10 +2,7 @@ import useFunctionStore from '@/store/function/functionStore';
 import useTabStore from '@/store/version/tabStore';
 import { HelperFunction, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
-export default class Function extends RealtimeActions<HelperFunction> {
-	accept(): void {
-		throw new Error('Method not implemented.');
-	}
+export default class Function implements RealtimeActions<HelperFunction> {
 	delete({ identifiers }: RealtimeActionParams<HelperFunction>): void {
 		const { removeTabByPath } = useTabStore.getState();
 		useFunctionStore.setState?.({
@@ -45,14 +42,5 @@ export default class Function extends RealtimeActions<HelperFunction> {
 	}
 	telemetry(param: RealtimeActionParams<HelperFunction>): void {
 		this.update(param);
-	}
-	log(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
 	}
 }

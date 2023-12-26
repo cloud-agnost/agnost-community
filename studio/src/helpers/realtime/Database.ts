@@ -4,10 +4,7 @@ import useTabStore from '@/store/version/tabStore';
 import { Database as DatabaseType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
-class Database extends RealtimeActions<DatabaseType> {
-	accept(): void {
-		throw new Error('Method not implemented.');
-	}
+class Database implements RealtimeActions<DatabaseType> {
 	delete({ identifiers }: RealtimeActionParams<DatabaseType>): void {
 		const { removeTabByPath } = useTabStore.getState();
 		useDatabaseStore.setState?.({
@@ -46,15 +43,6 @@ class Database extends RealtimeActions<DatabaseType> {
 	}
 	telemetry(param: RealtimeActionParams<DatabaseType>): void {
 		this.update(param);
-	}
-	log(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
 	}
 }
 export default Database;

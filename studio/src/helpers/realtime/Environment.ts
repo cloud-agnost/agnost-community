@@ -2,15 +2,12 @@ import useEnvironmentStore from '@/store/environment/environmentStore';
 import { Environment as EnvType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
-class Environment extends RealtimeActions<EnvType> {
+class Environment implements RealtimeActions<EnvType> {
 	redeploy(param: RealtimeActionParams<EnvType>): void {
 		this.update(param);
 	}
 	deploy(param: RealtimeActionParams<EnvType>): void {
 		this.update(param);
-	}
-	accept(): void {
-		throw new Error('Method not implemented.');
 	}
 	delete(param: RealtimeActionParams<EnvType>): void {
 		useEnvironmentStore.setState?.({
