@@ -159,20 +159,20 @@ export default function CompleteAccountSetupVerifyEmail() {
 	}, []);
 
 	return (
-		<AuthLayout>
+		<AuthLayout className='flex flex-col items-center justify-center h-full'>
 			<div className='auth-page'>
 				{!isPending && (error || isVerified) && (
 					<Feedback
 						success={isVerified && !error}
-						title={
+						title={isVerified && !error ? successText : error?.error ?? ''}
+						description={
 							isVerified && !error
 								? t('login.you_have_been_added', {
 										name: 'App2',
 										role: 'Admin',
 								  })
-								: error?.error ?? ''
+								: error?.details ?? ''
 						}
-						description={isVerified && !error ? successText : error?.details ?? ''}
 					/>
 				)}
 				{!(error || isVerified) && <Description title={t('login.complete_account_setup')} />}

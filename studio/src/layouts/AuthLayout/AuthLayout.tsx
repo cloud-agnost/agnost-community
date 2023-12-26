@@ -3,12 +3,14 @@ import { Logo } from '@/components/Logo';
 import { SLIDER_IMAGES } from '@/constants';
 import { ReactNode } from 'react';
 import './AuthLayout.scss';
+import { cn } from '@/utils';
 
 type AuthLayoutProps = {
 	children: ReactNode;
+	className?: string;
 };
 
-export default function AuthLayout({ children }: AuthLayoutProps) {
+export default function AuthLayout({ children, className }: AuthLayoutProps) {
 	return (
 		<div className='auth-layout'>
 			<div className='auth-layout-left'>
@@ -24,7 +26,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 					})}
 				/>
 			</div>
-			<div className='auth-layout-right'>{children}</div>
+			<div className={cn('auth-layout-right', className)}>{children}</div>
 		</div>
 	);
 }

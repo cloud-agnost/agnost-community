@@ -1,4 +1,4 @@
-import { Error, SuccessCheck } from '@/components/icons';
+import { Feedback } from '@/components/Alert';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import useAuthStore from '@/store/auth/authStore';
 import { useMutation } from '@tanstack/react-query';
@@ -18,7 +18,6 @@ export default function ConfirmChangeEmail() {
 		mutationFn: confirmChangeLoginEmail,
 	});
 	const { t } = useTranslation();
-	const Icon = isSuccess ? SuccessCheck : Error;
 	const title = isSuccess ? t('profileSettings.email_updated_success') : error?.error;
 	const description = isSuccess
 		? t('profileSettings.email_updated_success_description')
@@ -33,11 +32,7 @@ export default function ConfirmChangeEmail() {
 				{isPending ? (
 					<BeatLoader color='#6884FD' size={24} margin={18} />
 				) : (
-					<div className='flex flex-col items-center p-8 space-y-4'>
-						<Icon className='h-24 w-24' />
-						<h2 className='text-3xl font-semibold text-default'>{title}</h2>
-						<p className='text-subtle'>{description}</p>
-					</div>
+					<Feedback success={isSuccess} title={title} description={description} />
 				)}
 			</div>
 		</AuthLayout>
