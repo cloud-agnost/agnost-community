@@ -1452,7 +1452,7 @@ router.delete(
 							loginEmail: req.user.loginProfiles[0].email,
 						},
 						action: "update",
-						object: "org.app",
+						object: "org.app.team",
 						description: t(
 							"Removed user '%s' (%s) from app team",
 							user.name,
@@ -1598,7 +1598,7 @@ router.post(
 							loginEmail: req.user.loginProfiles[0].email,
 						},
 						action: "update",
-						object: "org.app",
+						object: "org.app.team",
 						description: t("Removed user(s) from app team"),
 						timestamp: Date.now(),
 						data: entry,
@@ -1758,7 +1758,7 @@ router.delete(
 							loginEmail: req.user.loginProfiles[0].email,
 						},
 						action: "update",
-						object: "org.app",
+						object: "org.app.team",
 						description: t(
 							"User '%s' (%s) has left the app team",
 							user.name,

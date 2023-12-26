@@ -202,7 +202,7 @@ router.post(
 				org._id,
 				user,
 				"org.resource",
-				"add",
+				"create",
 				t("Added new '%s' resource '%s' named '%s'", type, instance, name),
 				decryptedResource,
 				{ orgId: org._id, appId, resourceId }
