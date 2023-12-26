@@ -595,7 +595,11 @@ router.get(
 
 			// Calculate the interval duration for each bucket. Interval duration should be the multiples of 1 second (1000)
 			const bucketDuration = (end + 1 - start) / numBuckets;
+			console.log("***end", end);
+			console.log("***start", start);
+			console.log("***bucketDuration", bucketDuration);
 			const intervalDuration = Math.round(bucketDuration / 1000) * 1000;
+			console.log("***intervalDuration", intervalDuration);
 
 			// Aggregation pipeline stages
 			const pipeline = [
