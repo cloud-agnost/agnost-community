@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
+import { Feedback } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { Description } from '@/components/Description';
 import {
@@ -162,19 +162,18 @@ export default function CompleteAccountSetupVerifyEmail() {
 		<AuthLayout>
 			<div className='auth-page'>
 				{!isPending && (error || isVerified) && (
-					<Alert className='!max-w-full' variant={isVerified && !error ? 'success' : 'error'}>
-						<AlertTitle>
-							{isVerified && !error
+					<Feedback
+						success={isVerified && !error}
+						title={
+							isVerified && !error
 								? t('login.you_have_been_added', {
-										name: data?.org?.name ?? data?.app?.name,
-										role: data?.role,
+										name: 'App2',
+										role: 'Admin',
 								  })
-								: error?.error}
-						</AlertTitle>
-						<AlertDescription>
-							{isVerified && !error ? successText : error?.details}
-						</AlertDescription>
-					</Alert>
+								: error?.error ?? ''
+						}
+						description={isVerified && !error ? successText : error?.details ?? ''}
+					/>
 				)}
 				{!(error || isVerified) && <Description title={t('login.complete_account_setup')} />}
 				{(!token || (data && data.user?.status !== 'Active')) && (
@@ -248,9 +247,9 @@ export default function CompleteAccountSetupVerifyEmail() {
 				)}
 
 				{data && data.user?.status === 'Active' && (
-					<div className='flex justify-end'>
+					<div className='flex justify-center'>
 						<Button
-							size='lg'
+							size='xl'
 							onClick={() => navigate(isAuthenticated() ? '/organization' : '/login')}
 						>
 							{isAuthenticated() ? t('organization.select') : t('login.back_to_login')}

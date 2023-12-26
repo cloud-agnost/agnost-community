@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import './settingsContainer.scss';
 import { cn } from '@/utils';
+import { Description } from '@/components/Description';
 
 interface Props {
 	children: ReactNode;
@@ -8,6 +9,7 @@ interface Props {
 	action?: ReactNode;
 	className?: string;
 	contentClassName?: string;
+	description?: ReactNode;
 }
 export default function SettingsContainer({
 	children,
@@ -15,12 +17,13 @@ export default function SettingsContainer({
 	action,
 	className,
 	contentClassName,
+	description,
 }: Props) {
 	return (
 		<div className={cn('setting-container', className)}>
 			<div className='setting-container-header'>
 				<div className='setting-container-header-info'>
-					<h3 className='setting-container-header-info-title'>{pageTitle}</h3>
+					<Description title={pageTitle}>{description}</Description>
 				</div>
 				{action && <div className='setting-container-header-action'>{action}</div>}
 			</div>

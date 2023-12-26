@@ -121,7 +121,7 @@ export default function DeploymentStatusCard() {
 						<Resources />
 					</div>
 
-					<footer className='deployment-status-footer p-4'>
+					<footer className='deployment-status-footer p-2'>
 						<Button onClick={() => setIsLogsOpen(true)} variant='link'>
 							{t('version.view_logs')}
 						</Button>

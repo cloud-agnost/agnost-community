@@ -6,10 +6,9 @@ import {
 	DeleteOrganization,
 	TransferOrganization,
 } from '@/features/organization';
-import { OrganizationSettingsLayout } from '@/layouts/OrganizationSettingsLayout';
+import { SettingsContainer } from '@/features/version/SettingsContainer';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { useTranslation } from 'react-i18next';
-
 export default function OrganizationSettingsGeneral() {
 	const { t } = useTranslation();
 	const { organization } = useOrganizationStore();
@@ -40,13 +39,22 @@ export default function OrganizationSettingsGeneral() {
 			component: <DeleteOrganization />,
 		},
 	];
+
 	return (
-		<OrganizationSettingsLayout title='General'>
-			{ORGANIZATION_GENERAL_SETTINGS.map((item, index) => (
-				<SettingsFormItem key={index} title={item.title} description={item.description}>
-					{item.component}
-				</SettingsFormItem>
-			))}
-		</OrganizationSettingsLayout>
+		<SettingsContainer pageTitle={t('organization.settings.general')}>
+			<div className='divide-y space-y-4'>
+				{ORGANIZATION_GENERAL_SETTINGS.map((item, index) => (
+					<SettingsFormItem
+						key={index}
+						title={item.title}
+						description={item.description}
+						className='space-y-0 py-6'
+						twoColumns={index === 2}
+					>
+						{item.component}
+					</SettingsFormItem>
+				))}
+			</div>
+		</SettingsContainer>
 	);
 }

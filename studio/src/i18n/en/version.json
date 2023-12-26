@@ -46,7 +46,7 @@
 	"auto_deploy": "Auto Deploy",
 	"auto_redeploy_desc": "When version changes then deploy changes automatically.",
 	"restart": "Restart",
-	"restart_desc": "This will shut down your API Server and restart them.",
+	"restart_desc": "This will shut down your API Servers and restart them.",
 	"view_logs": "View Deployment Logs",
 	"logs": "Deployment Logs",
 	"open_version": "Open Version",

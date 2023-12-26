@@ -5,7 +5,7 @@ import useVersionStore from '@/store/version/versionStore';
 import { X } from '@phosphor-icons/react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 export default function VersionError() {
 	const navigate = useNavigate();
@@ -13,12 +13,15 @@ export default function VersionError() {
 	const { closeCurrentTab, updateCurrentTab } = useTabStore();
 	const { getVersionDashboardPath } = useVersionStore();
 	const { versionId } = useParams() as Record<string, string>;
+	const { pathname } = useLocation();
 	useEffect(() => {
-		const path = getVersionDashboardPath('error');
-		updateCurrentTab(versionId, {
-			path,
-		});
-		navigate(path);
+		if (!pathname.includes('error')) {
+			const path = getVersionDashboardPath('error');
+			updateCurrentTab(versionId, {
+				path,
+			});
+			navigate(path);
+		}
 	}, []);
 	return (
 		<Error>
