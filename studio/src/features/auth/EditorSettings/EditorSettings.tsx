@@ -120,7 +120,7 @@ export default function EditorSettings() {
 
 	function closeDrawer() {
 		form.reset();
-		globalThis.monaco.editor.setTheme(user?.editorSettings?.theme ?? 'night-owl');
+		globalThis?.monaco?.editor.setTheme(user?.editorSettings?.theme ?? 'night-owl');
 		toggleEditorSettingsDrawer();
 	}
 
