@@ -3,7 +3,7 @@ import { DateText } from '@/components/DateText';
 import { BADGE_COLOR_MAP } from '@/constants';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { ColumnDefWithClassName, EnvLog, SelectedEnvLog } from '@/types';
+import { ColumnDefWithClassName, EnvLog } from '@/types';
 import { translate } from '@/utils';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/Avatar';
 import { Badge } from 'components/Badge';
