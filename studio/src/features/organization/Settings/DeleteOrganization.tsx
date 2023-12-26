@@ -41,7 +41,13 @@ export default function DeleteOrganization() {
 					<AlertDescription>{error?.details}</AlertDescription>
 				</Alert>
 			)}
-			<Button variant='destructive' onClick={() => setIsOpen(true)} size='lg' disabled={!canDelete}>
+			<Button
+				variant='destructive'
+				onClick={() => setIsOpen(true)}
+				size='lg'
+				disabled={!canDelete}
+				className='mt-4'
+			>
 				{t('general.delete')}
 			</Button>
 			<ConfirmationModal
