@@ -72,7 +72,7 @@ export default function EditMiddlewareDrawer() {
 				</DrawerHeader>
 				<Form {...form}>
 					<form className='p-6 flex flex-col gap-3 flex-1' onSubmit={form.handleSubmit(onSubmit)}>
-						<MiddlewareForm loading={isPending} />
+						<MiddlewareForm loading={isPending} onSubmit={onSubmit} />
 					</form>
 				</Form>
 			</DrawerContent>

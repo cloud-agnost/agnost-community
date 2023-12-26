@@ -85,7 +85,7 @@ export default function AddMiddlewareDrawer({
 				</DrawerHeader>
 				<Form {...form}>
 					<form className='p-6' onSubmit={form.handleSubmit(onSubmit)}>
-						<MiddlewareForm loading={loading} />
+						<MiddlewareForm loading={loading} onSubmit={onSubmit} />
 					</form>
 				</Form>
 			</DrawerContent>
