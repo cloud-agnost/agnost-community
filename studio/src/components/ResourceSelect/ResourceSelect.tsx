@@ -56,7 +56,7 @@ export default function ResourceSelect({ error, type, className, ...props }: Res
 					</SelectItem>
 				))}
 				{!resources.length && (
-					<SelectItem value='' disabled>
+					<SelectItem value='empty' disabled>
 						{t('resources.database.no_resource')}
 					</SelectItem>
 				)}
