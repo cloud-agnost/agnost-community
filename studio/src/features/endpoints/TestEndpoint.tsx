@@ -229,7 +229,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 							variant='primary'
 							onClick={() => form.handleSubmit(onSubmit)()}
 							loading={isPending}
-							disabled={isPending || environment?.serverStatus !== 'OK'}
+							disabled={environment?.serverStatus !== 'OK'}
 						>
 							{t('endpoint.test.send')}
 						</Button>
