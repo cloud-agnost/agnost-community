@@ -14,7 +14,7 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import useTypeStore from '@/store/types/typeStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import { AppRoles, Application, RealtimeData, ToastType } from '@/types';
+import { AppRoles, RealtimeData, ToastType } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
 import cronstrue from 'cronstrue';
 import i18next from 'i18next';
@@ -488,25 +488,6 @@ export function describeCronExpression(cronExpression: string) {
 		return cronstrue.toString(cronExpression);
 	} catch (error) {
 		return 'Invalid cron expression';
-	}
-}
-
-export async function handleSelectApp(app: Application) {
-	const { selectApplication, openVersionDrawer } = useApplicationStore.getState();
-	const { getAllVersionsVisibleToUser, selectVersion } = useVersionStore.getState();
-	const versions = await getAllVersionsVisibleToUser({
-		orgId: app?.orgId,
-		appId: app?._id,
-		page: 0,
-		size: 2,
-	});
-
-	if (versions.length === 1) {
-		selectApplication(app);
-		resetAfterVersionChange();
-		selectVersion(versions[0]);
-	} else {
-		openVersionDrawer(app);
 	}
 }
 

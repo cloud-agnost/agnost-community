@@ -1,15 +1,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Badge } from '@/components/Badge';
 import { BADGE_COLOR_MAP } from '@/constants';
-import { useSelectApplication } from '@/hooks';
+import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import { AppRoles, Application } from '@/types';
 import { cn, getRelativeTime } from '@/utils';
 import { useTranslation } from 'react-i18next';
+import BeatLoader from 'react-spinners/BeatLoader';
 import ApplicationSettings from './ApplicationSettings';
 import ApplicationTeam from './ApplicationTeam';
 import './application.scss';
-import BeatLoader from 'react-spinners/BeatLoader';
 interface ApplicationCardProps {
 	application: Application;
 }
@@ -17,8 +17,7 @@ interface ApplicationCardProps {
 export default function ApplicationCard({ application }: ApplicationCardProps) {
 	const { user } = useAuthStore();
 	const { t } = useTranslation();
-	const { onAppClick, loading } = useSelectApplication();
-
+	const { onAppClick, loading, application: selectedApp } = useApplicationStore();
 	const role = application.team?.find(({ userId }) => userId._id === user?._id)?.role as string;
 	return (
 		<div
@@ -32,7 +31,7 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 			tabIndex={0}
 			aria-hidden='true'
 		>
-			{loading && (
+			{loading && application._id === selectedApp?._id && (
 				<>
 					<div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10'>
 						<BeatLoader color='#6884FD' size={16} margin={12} />

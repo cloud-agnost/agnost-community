@@ -22,14 +22,13 @@ import {
 	UpdateRoleRequest,
 } from '@/types';
 
-import { PAGE_SIZE } from '@/constants';
 import { create } from '@/helpers';
 import useAuthStore from '@/store/auth/authStore';
-import useVersionStore from '@/store/version/versionStore';
 import { joinChannel, leaveChannel } from '@/utils';
 import OrganizationService from 'services/OrganizationService.ts';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import useOrganizationStore from '../organization/organizationStore';
+import useVersionStore from '../version/versionStore';
 
 interface ApplicationState {
 	application: Application | null;
@@ -46,6 +45,7 @@ interface ApplicationState {
 	isDeleteModalOpen: boolean;
 	isLeaveModalOpen: boolean;
 	lastFetchedInvitationsPage: number;
+	loading: boolean;
 }
 
 type Actions = {
@@ -81,6 +81,7 @@ type Actions = {
 	closeDeleteModal: () => void;
 	openLeaveModal: (application: Application) => void;
 	closeLeaveModal: () => void;
+	onAppClick: (app: Application) => void;
 	reset: () => void;
 };
 
@@ -100,6 +101,7 @@ const initialState: ApplicationState = {
 	isLeaveModalOpen: false,
 	toDeleteApp: null,
 	lastFetchedInvitationsPage: 0,
+	loading: false,
 };
 
 const useApplicationStore = create<ApplicationState & Actions>()(
@@ -295,23 +297,10 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					throw error as APIError;
 				}
 			},
-			openVersionDrawer: async (application: Application) => {
-				get().selectApplication(application);
-				const { getAllVersionsVisibleToUser, selectVersion } = useVersionStore.getState();
-				const { organization } = useOrganizationStore.getState();
-				const versions = await getAllVersionsVisibleToUser({
-					orgId: organization._id,
-					appId: application._id,
-					page: 0,
-					size: PAGE_SIZE,
+			openVersionDrawer: async () => {
+				set({
+					isVersionOpen: true,
 				});
-				if (versions.length === 1) {
-					selectVersion(versions[0]);
-				} else {
-					set({
-						isVersionOpen: true,
-					});
-				}
 			},
 			closeVersionDrawer: (clearApp?: boolean) => {
 				set({
@@ -479,6 +468,26 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 				} catch (error) {
 					throw error as APIError;
 				}
+			},
+			onAppClick: async (app: Application) => {
+				const { selectApplication, openVersionDrawer } = get();
+				selectApplication(app);
+				set({ loading: true });
+				const { getAllVersionsVisibleToUser, selectVersion } = useVersionStore.getState();
+				const orgId = useOrganizationStore.getState().organization?._id as string;
+				const versions = await getAllVersionsVisibleToUser({
+					orgId,
+					appId: app?._id as string,
+					page: 0,
+					size: 2,
+				});
+
+				if (versions.length === 1) {
+					selectVersion(versions[0]);
+				} else {
+					openVersionDrawer(app);
+				}
+				set({ loading: false });
 			},
 			reset: () => set(initialState),
 		})),
