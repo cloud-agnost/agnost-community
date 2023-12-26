@@ -49,7 +49,7 @@ export default function VersionDashboard() {
 
 	useUpdateEffect(() => {
 		refetch();
-	}, [orgId, application?._id, version._id]);
+	}, [orgId, versionId, appId]);
 
 	function getIcon(type: string) {
 		const Icon = TAB_ICON_MAP[type];

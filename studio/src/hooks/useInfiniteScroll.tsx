@@ -67,7 +67,7 @@ export default function useInfiniteScroll({
 
 	useUpdateEffect(() => {
 		result.refetch();
-	}, [orgId, application?._id, version?._id]);
+	}, [orgId, orgId, versionId, appId]);
 
 	return result;
 }
