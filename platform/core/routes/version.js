@@ -595,7 +595,10 @@ router.get(
 
 			// Calculate the interval duration for each bucket. Interval duration should be the multiples of 1 second (1000)
 			const bucketDuration = (end.valueOf() + 1 - start.valueOf()) / numBuckets;
-			const intervalDuration = Math.round(bucketDuration / 1000) * 1000;
+			const intervalDuration =
+				bucketDuration > 1000
+					? Math.round(bucketDuration / 1000) * 1000
+					: Math.round(Math.floor(bucketDuration) / 10) * 10;
 
 			// Aggregation pipeline stages
 			const pipeline = [
@@ -658,8 +661,6 @@ router.get(
 				.collection(collectionName)
 				.aggregate(pipeline)
 				.toArray();
-
-			console.log("***result", JSON.stringify(result, null, 3));
 
 			let totalHits = 0;
 			// Create the entries for each bucket, since the above query does not return all the bucket data
