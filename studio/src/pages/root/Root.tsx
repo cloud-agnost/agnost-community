@@ -10,7 +10,7 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
-import { history } from '@/utils';
+import { history, joinChannel, leaveChannel } from '@/utils';
 import _ from 'lodash';
 import { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -89,7 +89,12 @@ export default function Root() {
 		const isAuthPath = authPaths.includes(pathname);
 		if (!isAuthPath && isAuthenticated()) {
 			getUser();
+			joinChannel('cluster');
 		}
+
+		return () => {
+			leaveChannel('cluster');
+		};
 	}, []);
 
 	return (
