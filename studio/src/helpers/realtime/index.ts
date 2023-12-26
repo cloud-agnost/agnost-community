@@ -3,6 +3,7 @@ import ApplicationTeam from './AppTeam';
 import Application from './Application';
 import Bucket from './Bucket';
 import Cache from './Cache';
+import Cluster from './Cluster';
 import Database from './Database';
 import Endpoint from './Endpoint';
 import Environment from './Environment';
@@ -28,6 +29,7 @@ export function realtimeObjectMapper(type: RealtimeObjectTypes) {
 		'org.app.team': ApplicationTeam,
 		'org.resource': Resource,
 		app: Application,
+		cluster: Cluster,
 		resource: Resource,
 		queue: Queue,
 		'org.app.version.queue': Queue,

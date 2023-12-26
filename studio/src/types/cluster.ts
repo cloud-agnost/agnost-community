@@ -72,14 +72,14 @@ export interface ClusterReleaseHistory {
 	_id: string;
 }
 
-interface ClusterResourceStatus {
+export interface ClusterResourceStatus {
 	name: string;
 	status: string;
 	_id: string;
 	lastUpdateAt: string;
 }
 
-interface Cluster {
+export interface Cluster {
 	_id: string;
 	clusterAccesssToken: string;
 	masterToken: string;
