@@ -8,6 +8,8 @@ import useApplicationStore from '@/store/app/applicationStore';
 import useVersionStore from '@/store/version/versionStore';
 import _ from 'lodash';
 import { useParams } from 'react-router-dom';
+import { Eye, EyeSlash, GearSix, GitBranch, GitFork, LockSimple } from '@phosphor-icons/react';
+import { LockSimpleOpen } from '@phosphor-icons/react/dist/ssr';
 export default function useVersionDropdownItems() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
@@ -43,10 +45,12 @@ export default function useVersionDropdownItems() {
 					openVersionDrawer(application);
 				},
 				disabled: versions.length <= 1,
+				icon: GitBranch,
 			},
 			{
 				title: t('version.create_a_copy'),
 				action: () => setCreateCopyVersionDrawerIsOpen(true),
+				icon: GitFork,
 			},
 			{
 				title: version?.readOnly ? t('version.mark_read_write') : t('version.mark_read_only'),
@@ -67,6 +71,7 @@ export default function useVersionDropdownItems() {
 					});
 				},
 				disabled: false,
+				icon: !version?.readOnly ? LockSimple : LockSimpleOpen,
 			},
 			{
 				title: version?.private ? t('version.set_public') : t('version.set_private'),
@@ -87,6 +92,7 @@ export default function useVersionDropdownItems() {
 					});
 				},
 				disabled: version?.master,
+				icon: !version?.private ? EyeSlash : Eye,
 			},
 			{
 				title: t('version.settings.default'),
@@ -102,6 +108,7 @@ export default function useVersionDropdownItems() {
 					});
 				},
 				disabled: false,
+				icon: GearSix,
 			},
 		],
 		[versions, version],

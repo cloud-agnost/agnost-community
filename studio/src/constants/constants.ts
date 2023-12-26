@@ -25,6 +25,7 @@ import {
 	Google,
 	Integer,
 	Kafka,
+	Leave,
 	LineSegments,
 	MessageQueue,
 	MinIo,
@@ -35,6 +36,7 @@ import {
 	Object as ObjectIcon,
 	ObjectList,
 	Oracle,
+	Pencil,
 	PostgreSql,
 	RabbitMq,
 	RateLimit,
@@ -84,6 +86,7 @@ import {
 	FileText,
 	Function,
 	GearSix,
+	GitBranch,
 	HardDrive,
 	HardDrives,
 	IdentificationBadge,
@@ -102,6 +105,8 @@ import {
 	TextAa,
 	Textbox,
 	Timer,
+	Trash,
+	UserPlus,
 } from '@phosphor-icons/react';
 import { BadgeColors } from 'components/Badge/Badge.tsx';
 import { ElementType } from 'react';
@@ -186,6 +191,7 @@ export const APPLICATION_SETTINGS = [
 			handleSelectApp(application);
 		},
 		isDisabled: (role: AppRoles) => !getAppPermission('version.view', role),
+		icon: GitBranch,
 	},
 	{
 		id: 'update',
@@ -203,6 +209,7 @@ export const APPLICATION_SETTINGS = [
 			}
 		},
 		isDisabled: (role: AppRoles) => !getAppPermission('update', role),
+		icon: Pencil,
 	},
 	{
 		id: 'invite',
@@ -211,6 +218,7 @@ export const APPLICATION_SETTINGS = [
 			useApplicationStore.getState().openInviteMemberDrawer(application);
 		},
 		isDisabled: (role: AppRoles) => !getAppPermission('invite.create', role),
+		icon: UserPlus,
 	},
 	{
 		id: 'leave-app',
@@ -221,6 +229,7 @@ export const APPLICATION_SETTINGS = [
 		isDisabled: (_role: AppRoles, application: Application) => {
 			return useAuthStore.getState().user?._id === application.ownerUserId;
 		},
+		icon: Leave,
 	},
 	{
 		id: 'delete-app',
@@ -229,6 +238,7 @@ export const APPLICATION_SETTINGS = [
 			useApplicationStore.getState().openDeleteModal(application);
 		},
 		isDisabled: (role: AppRoles) => !getAppPermission('delete', role),
+		icon: Trash,
 	},
 ];
 
