@@ -664,7 +664,7 @@ router.get(
 			let totalHits = 0;
 			// Create the entries for each bucket, since the above query does not return all the bucket data
 			const allBuckets = Array.from({ length: numBuckets }, (element, i) => {
-				const resultBucket = result.find((entry) => entry._id === i + 1);
+				const resultBucket = result.find((entry) => entry._id === i);
 				const countInfo = { success: 0, error: 0 };
 				if (resultBucket?.statusCounts) {
 					if (type === "queue" || type === "task") {
