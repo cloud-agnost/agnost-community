@@ -659,6 +659,8 @@ router.get(
 				.aggregate(pipeline)
 				.toArray();
 
+			console.log("***result", JSON.stringify(result, null, 3));
+
 			let totalHits = 0;
 			// Create the entries for each bucket, since the above query does not return all the bucket data
 			const allBuckets = Array.from({ length: numBuckets }, (element, i) => {
