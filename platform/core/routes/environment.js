@@ -551,9 +551,34 @@ router.get(
 				sort,
 				skip: size * page,
 				limit: size,
+				projection: { dbLogs: 0, serverLogs: 0, schedulerLogs: 0 },
 			});
 
 			res.json(logs);
+		} catch (error) {
+			handleError(req, res, error);
+		}
+	}
+);
+
+/*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/env/:envId/logs/:logId
+@method     GET
+@desc       Returns the specific environment log
+@access     private
+*/
+router.get(
+	"/:envId/logs/:logId",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	validateEnv,
+	validateEnvLog,
+	authorizeAppAction("app.env.view"),
+	async (req, res) => {
+		try {
+			res.json(req.log);
 		} catch (error) {
 			handleError(req, res, error);
 		}
