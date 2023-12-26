@@ -93,7 +93,7 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 		}
 		if (language === 'javascript') {
 			const formatted = await formatCode(val);
-
+			ed?.pushUndoStop();
 			cb?.(formatted);
 		}
 	}
