@@ -2,10 +2,7 @@ import useCacheStore from '@/store/cache/cacheStore';
 import useTabStore from '@/store/version/tabStore';
 import { Cache as CacheType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
-class Cache extends RealtimeActions<CacheType> {
-	accept(): void {
-		throw new Error('Method not implemented.');
-	}
+class Cache implements RealtimeActions<CacheType> {
 	delete({ identifiers }: RealtimeActionParams<CacheType>): void {
 		const { removeTabByPath } = useTabStore.getState();
 		useCacheStore.setState?.({
@@ -41,15 +38,6 @@ class Cache extends RealtimeActions<CacheType> {
 	}
 	telemetry(param: RealtimeActionParams<CacheType>): void {
 		this.update(param);
-	}
-	log(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
 	}
 }
 export default Cache;

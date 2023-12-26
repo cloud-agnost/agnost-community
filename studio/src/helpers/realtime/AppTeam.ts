@@ -3,19 +3,7 @@ import useAuthStore from '@/store/auth/authStore';
 import { AppRoles, Application, RealtimeActionParams } from '@/types';
 import { history } from '@/utils';
 import { RealtimeActions } from './RealtimeActions';
-class ApplicationTeam extends RealtimeActions<Application> {
-	accept(): void {
-		throw new Error('Method not implemented.');
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	log(): void {
-		throw new Error('Method not implemented.');
-	}
+class ApplicationTeam implements RealtimeActions<Application> {
 	delete({ data }: RealtimeActionParams<Application>) {
 		const team = data?.team.filter((member) => member.userId._id !== data._id);
 		const user = useAuthStore.getState()?.user;
@@ -74,9 +62,6 @@ class ApplicationTeam extends RealtimeActions<Application> {
 				member: member.userId,
 			})),
 		});
-	}
-	create() {
-		throw new Error('Method not implemented.');
 	}
 	telemetry(params: RealtimeActionParams<Application>) {
 		this.update(params);

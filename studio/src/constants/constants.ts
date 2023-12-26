@@ -76,7 +76,7 @@ import {
 	Tab,
 	TabTypes,
 } from '@/types';
-import { getAppPermission, handleSelectApp, translate } from '@/utils';
+import { getAppPermission, translate } from '@/utils';
 import {
 	AppWindow,
 	BracketsCurly,
@@ -188,7 +188,7 @@ export const APPLICATION_SETTINGS = [
 		id: 'version',
 		name: translate('application.settings.openVersion'),
 		onClick: (application: Application) => {
-			handleSelectApp(application);
+			useApplicationStore.getState().onAppClick(application);
 		},
 		isDisabled: (role: AppRoles) => !getAppPermission('version.view', role),
 		icon: GitBranch,

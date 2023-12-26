@@ -4,10 +4,7 @@ import useVersionStore from '@/store/version/versionStore';
 import { Bucket as BucketType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
-class Bucket extends RealtimeActions<BucketType> {
-	accept(): void {
-		throw new Error('Method not implemented.');
-	}
+class Bucket implements RealtimeActions<BucketType> {
 	delete({ identifiers }: RealtimeActionParams<BucketType>): void {
 		const { removeTabByPath } = useTabStore.getState();
 		useStorageStore.setState?.((prev) => ({
@@ -44,15 +41,6 @@ class Bucket extends RealtimeActions<BucketType> {
 	}
 	telemetry(param: RealtimeActionParams<BucketType>): void {
 		this.update(param);
-	}
-	log(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
 	}
 }
 

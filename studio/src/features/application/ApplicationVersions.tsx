@@ -1,6 +1,7 @@
 import { Button } from '@/components/Button';
 import {
 	Drawer,
+	DrawerClose,
 	DrawerContent,
 	DrawerFooter,
 	DrawerHeader,
@@ -40,13 +41,10 @@ export default function ApplicationVersions() {
 	function closeDrawerHandler() {
 		searchParams.delete('q');
 		setSearchParams(searchParams);
+		if (appId) selectApplication(applications.find((app) => app._id === appId) as Application);
 		closeVersionDrawer(!!match);
 	}
 
-	function handleCloseClick() {
-		closeVersionDrawer();
-		selectApplication(applications.find((app) => app._id === appId) as Application);
-	}
 	useUpdateEffect(() => {
 		if (isVersionOpen) {
 			getVersions();
@@ -72,9 +70,11 @@ export default function ApplicationVersions() {
 							<VersionTable />
 						</InfiniteScroll>
 						<DrawerFooter>
-							<Button variant='secondary' size='lg' onClick={handleCloseClick}>
-								{t('general.cancel')}
-							</Button>
+							<DrawerClose asChild>
+								<Button variant='secondary' size='lg'>
+									{t('general.cancel')}
+								</Button>
+							</DrawerClose>
 						</DrawerFooter>
 					</div>
 				</div>

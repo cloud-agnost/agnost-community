@@ -1,4 +1,5 @@
-import { create } from '@/helpers';
+import { CustomStateStorage } from '@/helpers/state';
+import { create } from '@/helpers/store';
 import {
 	EndpointLogs,
 	EndpointRequest,
@@ -124,7 +125,7 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 					};
 				},
 			}),
-			{ name: 'utils-store' },
+			{ name: 'utils-store', storage: CustomStateStorage },
 		),
 	),
 );

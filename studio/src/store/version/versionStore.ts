@@ -1,4 +1,3 @@
-import { create } from '@/helpers';
 import { VersionService } from '@/services';
 import {
 	APIError,
@@ -20,6 +19,7 @@ import {
 	VersionLogBucket,
 } from '@/types';
 import { history, joinChannel, resetAfterVersionChange } from '@/utils';
+import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import useAuthStore from '../auth/authStore';
 import useUtilsStore from './utilsStore';

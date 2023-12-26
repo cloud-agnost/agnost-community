@@ -8,18 +8,9 @@ import {
 } from '@/types';
 import { history } from '@/utils';
 import { RealtimeActions } from './RealtimeActions';
-class Application extends RealtimeActions<ApplicationType | CreateApplicationResponse> {
+class Application implements RealtimeActions<ApplicationType | CreateApplicationResponse> {
 	accept(param: RealtimeActionParams<ApplicationType>): void {
 		this.update(param);
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	log(): void {
-		throw new Error('Method not implemented.');
 	}
 	delete({ identifiers, actor }: RealtimeActionParams<ApplicationType>) {
 		const { user } = useAuthStore.getState();

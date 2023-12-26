@@ -3,7 +3,7 @@ import useOrganizationStore from '@/store/organization/organizationStore';
 import { Organization as OrganizationType, RealtimeActionParams } from '@/types';
 import { history } from '@/utils';
 import { RealtimeActions } from './RealtimeActions';
-class Organization extends RealtimeActions<OrganizationType> {
+class Organization implements RealtimeActions<OrganizationType> {
 	accept(param: RealtimeActionParams<OrganizationType>): void {
 		useOrganizationStore.setState?.((prev) => ({
 			...prev,
@@ -19,15 +19,6 @@ class Organization extends RealtimeActions<OrganizationType> {
 				},
 			],
 		}));
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	log(): void {
-		throw new Error('Method not implemented.');
 	}
 	delete({ identifiers, actor }: RealtimeActionParams<OrganizationType>) {
 		const { user } = useAuthStore.getState();

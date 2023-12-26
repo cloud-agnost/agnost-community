@@ -1,18 +1,9 @@
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import useTabStore from '@/store/version/tabStore';
+import useUtilsStore from '@/store/version/utilsStore';
 import { LogTypes, MessageQueue, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
-import useUtilsStore from '@/store/version/utilsStore';
-class Queue extends RealtimeActions<MessageQueue> {
-	accept(): void {
-		throw new Error('Method not implemented.');
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
+class Queue implements RealtimeActions<MessageQueue> {
 	log({ message, timestamp, id, type }: RealtimeActionParams<MessageQueue>) {
 		setTimeout(() => {
 			useUtilsStore.getState?.().setQueueLogs(id as string, {

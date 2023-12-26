@@ -3,10 +3,7 @@ import useTabStore from '@/store/version/tabStore';
 import { Middleware as MiddlewareType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
-export default class Middleware extends RealtimeActions<MiddlewareType> {
-	accept(): void {
-		throw new Error('Method not implemented.');
-	}
+export default class Middleware implements RealtimeActions<MiddlewareType> {
 	delete({ identifiers }: RealtimeActionParams<MiddlewareType>): void {
 		const { removeTabByPath } = useTabStore.getState();
 		useMiddlewareStore.setState?.({
@@ -45,14 +42,5 @@ export default class Middleware extends RealtimeActions<MiddlewareType> {
 	}
 	telemetry(param: RealtimeActionParams<MiddlewareType>): void {
 		this.update(param);
-	}
-	log(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
 	}
 }

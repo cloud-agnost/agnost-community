@@ -3,16 +3,7 @@ import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { Endpoint as EndpointType, LogTypes, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
-class Endpoint extends RealtimeActions<EndpointType> {
-	redeploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	accept(): void {
-		throw new Error('Method not implemented.');
-	}
+class Endpoint implements RealtimeActions<EndpointType> {
 	log({ message, timestamp, id, type }: RealtimeActionParams<EndpointType>) {
 		setTimeout(() => {
 			useUtilsStore.getState?.().setEndpointLogs(id as string, {

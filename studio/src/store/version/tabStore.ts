@@ -1,6 +1,6 @@
-import { create } from '@/helpers';
 import { Tab, TabTypes, UpdateTabParams } from '@/types';
 import { generateId, getUrlWithoutQuery, history, translate } from '@/utils';
+import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import useVersionStore from './versionStore';
 interface TabStore {

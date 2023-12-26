@@ -1,4 +1,3 @@
-import { create } from '@/helpers';
 import { ResourceService } from '@/services';
 import {
 	APIError,
@@ -14,6 +13,7 @@ import {
 	UpdateResourceAllowedRolesRequest,
 } from '@/types';
 import { joinChannel, leaveChannel } from '@/utils';
+import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 export interface ResourceStore {
 	resources: Resource[];

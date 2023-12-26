@@ -3,19 +3,7 @@ import useResourceStore from '@/store/resources/resourceStore';
 import { RealtimeActionParams, Resource as ResourceType } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
-class Resource extends RealtimeActions<ResourceType> {
-	accept(): void {
-		throw new Error('Method not implemented.');
-	}
-	redeploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	deploy(): void {
-		throw new Error('Method not implemented.');
-	}
-	log(): void {
-		throw new Error('Method not implemented.');
-	}
+class Resource implements RealtimeActions<ResourceType> {
 	delete({ identifiers }: RealtimeActionParams<ResourceType>) {
 		useResourceStore.setState?.({
 			resources: useResourceStore

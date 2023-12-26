@@ -155,7 +155,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 			form.reset({
 				params: {
 					queryParams: req.params.queryParams,
-					pathVariables: req.params.pathParams,
+					pathVariables: req.params.pathVariables,
 				},
 				headers: req.headers,
 				body: req.body,
@@ -229,7 +229,7 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 							variant='primary'
 							onClick={() => form.handleSubmit(onSubmit)()}
 							loading={isPending}
-							disabled={isPending || environment?.serverStatus !== 'OK'}
+							disabled={environment?.serverStatus !== 'OK'}
 						>
 							{t('endpoint.test.send')}
 						</Button>
