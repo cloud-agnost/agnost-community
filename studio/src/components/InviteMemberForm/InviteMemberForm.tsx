@@ -5,7 +5,7 @@ import { Input } from '@/components/Input';
 import { Label } from '@/components/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import useTypeStore from '@/store/types/typeStore';
-import { cn, isEmpty, uniq } from '@/utils';
+import { cn, isEmpty } from '@/utils';
 import { Plus, Trash } from '@phosphor-icons/react';
 import React, { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
