@@ -39,7 +39,6 @@ export const InviteMemberSchema = z.object({
 				}),
 		)
 		.superRefine((val, ctx) => {
-			console.log(val);
 			const emails = val.map((v) => v.email).filter(Boolean);
 			emails.forEach((item, index) => {
 				const hasDuplicate = emails.filter((email) => email === item).length > 1;
@@ -85,7 +84,6 @@ export default function InviteMemberForm({
 			append({ email: '', role: '' });
 		}
 	}, []);
-	console.log(form.formState.errors);
 	return (
 		<div className='max-w-2xl space-y-12'>
 			{title && <Description title={title}>{description}</Description>}
