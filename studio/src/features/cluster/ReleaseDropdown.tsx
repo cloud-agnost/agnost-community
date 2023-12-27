@@ -20,12 +20,12 @@ import { APIError } from '@/types';
 import { cn } from '@/utils';
 import { ClockCounterClockwise, Package } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import _ from 'lodash';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import ReleaseColumns from './ReleaseColumns';
 import BeatLoader from 'react-spinners/BeatLoader';
-import { useEffect, useRef, useState } from 'react';
-import _ from 'lodash';
+import ReleaseColumns from './ReleaseColumns';
 
 export default function ReleaseDropdown() {
 	const [open, setOpen] = useState(false);
