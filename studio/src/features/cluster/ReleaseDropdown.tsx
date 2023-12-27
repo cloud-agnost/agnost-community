@@ -32,7 +32,7 @@ export default function ReleaseDropdown() {
 	const { t } = useTranslation();
 	const { getClusterAndReleaseInfo, clusterReleaseInfo } = useClusterStore();
 	const classes = CLUSTER_RELEASE_CLASS_MAP[getReleaseStatus()];
-	const ref = useRef<HTMLButtonElement>(null);
+	const hasUpdate = clusterReleaseInfo?.latest?.release !== clusterReleaseInfo?.current?.release;
 	const { isFetching, refetch } = useQuery({
 		queryFn: getClusterAndReleaseInfo,
 		queryKey: ['getClusterAndReleaseInfo'],
@@ -61,7 +61,7 @@ export default function ReleaseDropdown() {
 
 	return (
 		<DropdownMenu open={open} onOpenChange={setOpen}>
-			<DropdownMenuTrigger asChild ref={ref}>
+			<DropdownMenuTrigger asChild>
 				<Button variant='blank' iconOnly className='relative'>
 					{getReleaseStatus() !== 'OK' && (
 						<div className='absolute top-1 right-0.5'>
@@ -83,13 +83,25 @@ export default function ReleaseDropdown() {
 				className='relative max-w-md bg-wrapper-background-base h-full'
 				align='end'
 			>
-				<DropdownMenuLabel className='text-default flex items-center justify-between p-4'>
+				<DropdownMenuLabel className='text-default flex items-center justify-between p-2'>
 					<p>{t('cluster.release_info')}</p>
 					<span className='text-subtle text-sm font-sfCompact inline-block text-right'>
 						{clusterReleaseInfo?.current?.release}
 					</span>
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator />
+				<DropdownMenuLabel className='p-0'>
+					<Alert
+						variant={hasUpdate ? 'warning' : 'success'}
+						size='sm'
+						className='!rounded-none !gap-2 !p-2'
+					>
+						<AlertTitle className='font-normal'>
+							{hasUpdate ? t('cluster.update_available') : t('cluster.up_to_date')}
+						</AlertTitle>
+					</Alert>
+				</DropdownMenuLabel>
+
 				<ReleaseInfo loading={isFetching} />
 				<Separator />
 				<ReleaseSettings />
@@ -145,16 +157,6 @@ function ReleaseSettings() {
 	});
 	return (
 		<>
-			<Alert
-				variant={hasUpdate ? 'warning' : 'success'}
-				size='sm'
-				className='!rounded-none !gap-2 !p-2'
-			>
-				<AlertTitle className='font-normal'>
-					{hasUpdate ? t('cluster.update_available') : t('cluster.up_to_date')}
-				</AlertTitle>
-			</Alert>
-
 			<DropdownMenuSeparator className='!m-0' />
 			<DropdownMenuItemContainer>
 				{hasUpdate && (
