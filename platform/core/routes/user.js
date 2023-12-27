@@ -153,15 +153,23 @@ router.delete("/", authSession, async (req, res) => {
 						contactEmail: user.contactEmail,
 						loginEmail: user.loginProfiles[0].email,
 					},
-					action: "update",
-					object: "org.app",
+					action: "delete",
+					object: "org.member",
 					description: t(
 						"User '%s' (%s) has left the organization team",
 						user.name,
 						user.contactEmail
 					),
 					timestamp: Date.now(),
-					data: entry,
+					data: {
+						_id: user._id,
+						iid: user.iid,
+						color: user.color,
+						contactEmail: user.contactEmail,
+						name: user.name,
+						pictureUrl: user.pictureUrl,
+						loginEmail: user.loginProfiles[0].email,
+					},
 					identifiers: { orgId: orgMembership.orgId },
 				});
 				s;
@@ -169,9 +177,21 @@ router.delete("/", authSession, async (req, res) => {
 		}
 
 		if (apps.length > 0) {
+			// Get all updated applications
+			const appIds = apps.map((entry) => entry._id);
+			const appsWithMembers = await appCtrl.getManyByQuery(
+				{ _id: { $in: appIds } },
+				{
+					lookup: {
+						path: "team.userId",
+						select: "-loginProfiles -notifications",
+					},
+				}
+			);
+
 			// Send realtime notifications for updated apps
-			apps.forEach((app) => {
-				sendNotification(app._id, {
+			appsWithMembers.forEach((entry) => {
+				sendNotification(entry._id, {
 					actor: {
 						userId: user._id,
 						name: user.name,
@@ -180,8 +200,8 @@ router.delete("/", authSession, async (req, res) => {
 						contactEmail: user.contactEmail,
 						loginEmail: user.loginProfiles[0].email,
 					},
-					action: "update",
-					object: "org.app",
+					action: "delete",
+					object: "org.app.team",
 					description: t(
 						"User '%s' (%s) has left the app team",
 						user.name,
@@ -189,7 +209,7 @@ router.delete("/", authSession, async (req, res) => {
 					),
 					timestamp: Date.now(),
 					data: entry,
-					identifiers: { orgId: app.orgId, appId: app._id },
+					identifiers: { orgId: entry.orgId, appId: entry._id },
 				});
 			});
 		}
