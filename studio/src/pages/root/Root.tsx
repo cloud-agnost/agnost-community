@@ -1,8 +1,8 @@
 import { ApplicationVersions } from '@/features/application';
 import AppInviteMember from '@/features/application/AppInviteMember';
 import EditApplication from '@/features/application/EditApplication.tsx';
-import ReleaseHistory from '@/features/cluster/ReleaseHistory';
 import { EditorSettings } from '@/features/auth/EditorSettings';
+import ReleaseHistory from '@/features/cluster/ReleaseHistory';
 import { AddResourceDrawer } from '@/features/resources';
 import { CreateCopyVersionDrawer } from '@/features/version/CreateCopyVersionDrawer';
 import { EditMiddlewareDrawer } from '@/features/version/Middlewares';
@@ -10,7 +10,7 @@ import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore.ts';
-import { history, joinChannel, leaveChannel } from '@/utils';
+import { history, joinChannel } from '@/utils';
 import _ from 'lodash';
 import { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
