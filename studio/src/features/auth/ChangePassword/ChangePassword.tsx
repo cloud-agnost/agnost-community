@@ -195,7 +195,7 @@ export default function ChangePassword() {
 							<Button onClick={close} variant='text' size='lg'>
 								{t('profileSettings.cancel')}
 							</Button>
-							<Button loading={loading} size='lg'>
+							<Button loading={loading} size='lg' type='submit'>
 								{t('profileSettings.update')}
 							</Button>
 						</div>
@@ -209,10 +209,10 @@ export default function ChangePassword() {
 					<div className='space-y-2'>
 						<p className='cant-remember'>{t('profileSettings.cant_remember_password')}</p>
 						<Button
+							type='submit'
 							loading={sending}
 							onClick={resetPasswordByEmail}
 							variant='secondary'
-							type='submit'
 						>
 							{t('profileSettings.reset_password_by_email')}
 						</Button>
