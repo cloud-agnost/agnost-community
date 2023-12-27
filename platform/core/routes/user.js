@@ -172,7 +172,6 @@ router.delete("/", authSession, async (req, res) => {
 					},
 					identifiers: { orgId: orgMembership.orgId },
 				});
-				s;
 			});
 		}
 
