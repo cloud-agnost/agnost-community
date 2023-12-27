@@ -143,25 +143,21 @@ export const applyRules = (type) => {
 					)
 					.bail()
 					.custom((value) => {
-						let regex = /^[A-Za-z0-9_]+$/;
+						let regex = /^[A-Za-z0-9 _-]+$/;
 						if (!regex.test(value)) {
 							throw new AgnostError(
 								t(
-									"Queue names can include only numbers, letters and underscore (_) characters"
+									"Queue names can include only numbers, letters, spaces, dash and underscore characters"
 								)
 							);
 						}
 
-						let regex2 = /^[0-9].*$/;
+						let regex2 = /^[ _-].*$/;
 						if (regex2.test(value)) {
 							throw new AgnostError(
-								t("Queue names cannot start with a number")
-							);
-						}
-
-						if (value.startsWith("_")) {
-							throw new AgnostError(
-								t("Queue names cannot start with underscore (_) character")
+								t(
+									"Queue names cannot start with a dash or underscore character"
+								)
 							);
 						}
 

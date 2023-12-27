@@ -228,7 +228,10 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 			case "add":
 				for (const entry of contents) {
 					const filePath = path.join(
-						`${appPath}/meta/${contentType}/${entry.name}.js`
+						`${appPath}/meta/${contentType}/${entry.name.replaceAll(
+							" ",
+							"_"
+						)}.js`
 					);
 
 					// Write file code
@@ -242,7 +245,10 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 			case "delete":
 				for (const entry of contents) {
 					const filePath = path.join(
-						`${appPath}/meta/${contentType}/${entry.name}.js`
+						`${appPath}/meta/${contentType}/${entry.name.replaceAll(
+							" ",
+							"_"
+						)}.js`
 					);
 
 					// Delete the file if it exists

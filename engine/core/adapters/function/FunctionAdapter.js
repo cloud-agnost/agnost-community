@@ -16,7 +16,7 @@ export class FunctionAdapter {
 		try {
 			// Dynamicly import the
 			functionModule = await import(
-				`../../meta/functions/${functionName}.js${
+				`../../meta/functions/${functionName.replaceAll(" ", "_")}.js${
 					this.manager.getModuleLoaderQuery()
 						? "?" + this.manager.getModuleLoaderQuery()
 						: ""

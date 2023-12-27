@@ -11,7 +11,7 @@ export const applyCustomMiddleware =
 		try {
 			// Dynamicly import the
 			middlewareModule = await import(
-				`../meta/middlewares/${middleware.name}.js${
+				`../meta/middlewares/${middleware.name.replaceAll(" ", "_")}.js${
 					loaderQuery ? "?" + loaderQuery : ""
 				}`
 			);

@@ -103,7 +103,10 @@ export const submitTask = (payload) => {
 		);
 
 		channel.assertQueue(
-			`process-task-${payload.envId}-${payload.taskName}-${randNumber}`,
+			`process-task-${payload.envId}-${payload.taskName.replaceAll(
+				" ",
+				"-"
+			)}-${randNumber}`,
 			{
 				durable: true,
 				autoDelete: true,

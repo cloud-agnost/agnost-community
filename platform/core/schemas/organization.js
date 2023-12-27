@@ -71,7 +71,30 @@ export const applyRules = (type) => {
 							config.get("general.minNameLength"),
 							config.get("general.maxTextLength")
 						)
-					),
+					)
+					.bail()
+					.custom((value) => {
+						let regex = /^[A-Za-z0-9 _-]+$/;
+						if (!regex.test(value)) {
+							throw new AgnostError(
+								t(
+									"Organization names can include only numbers, letters, spaces, dash and underscore characters"
+								)
+							);
+						}
+
+						let regex2 = /^[ _-].*$/;
+						if (regex2.test(value)) {
+							throw new AgnostError(
+								t(
+									"Organization names cannot start with a dash or underscore character"
+								)
+							);
+						}
+
+						//Indicates the success of this synchronous custom validator
+						return true;
+					}),
 			];
 		case "upload-picture":
 			return [
