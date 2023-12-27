@@ -39,13 +39,18 @@ export const InviteMemberSchema = z.object({
 				}),
 		)
 		.superRefine((val, ctx) => {
+			console.log(val);
 			const emails = val.map((v) => v.email).filter(Boolean);
-			if (uniq(emails).length !== emails.length) {
-				return ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					message: 'Emails must be unique',
-				});
-			}
+			emails.forEach((item, index) => {
+				const hasDuplicate = emails.filter((email) => email === item).length > 1;
+				if (hasDuplicate) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: 'Emails must be unique',
+						path: [`${index}.email`],
+					});
+				}
+			});
 		}),
 });
 interface InviteMemberFormProps {
@@ -80,6 +85,7 @@ export default function InviteMemberForm({
 			append({ email: '', role: '' });
 		}
 	}, []);
+	console.log(form.formState.errors);
 	return (
 		<div className='max-w-2xl space-y-12'>
 			{title && <Description title={title}>{description}</Description>}
