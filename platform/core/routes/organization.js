@@ -1514,6 +1514,11 @@ router.post(
 				});
 			}
 
+			// Get the list of users that are removed from the organization
+			let users = await userCtrl.getManyByQuery({
+				_id: { $in: userIds },
+			});
+
 			// Check to see if the deleted users have app team memberships. If they have then we first need to remove them from the app teams.
 			let apps = await appCtrl.getManyByQuery({
 				orgId: req.org._id,
@@ -1560,18 +1565,26 @@ router.post(
 			await orgMemberCtrl.commit(session);
 			res.json();
 
-			// Log action
-			auditCtrl.logAndNotify(
-				req.org._id,
-				req.user,
-				"org.member",
-				"delete",
-				t("Removed users from organization team"),
-				{
-					userIds,
-				},
-				{ orgId: req.org._id }
-			);
+			users.forEach((removedUser) => {
+				// Log action
+				auditCtrl.logAndNotify(
+					req.org._id,
+					req.user,
+					"org.member",
+					"delete",
+					t("Removed user from organization team"),
+					{
+						_id: removedUser._id,
+						iid: removedUser.iid,
+						color: removedUser.color,
+						contactEmail: removedUser.contactEmail,
+						name: removedUser.name,
+						pictureUrl: removedUser.pictureUrl,
+						loginEmail: removedUser.loginProfiles[0].email,
+					},
+					{ orgId: req.org._id }
+				);
+			});
 
 			if (apps.length > 0) {
 				// Get all updated applications
