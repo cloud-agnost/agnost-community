@@ -91,10 +91,6 @@ export default function Root() {
 			getUser();
 			joinChannel('cluster');
 		}
-
-		return () => {
-			leaveChannel('cluster');
-		};
 	}, []);
 
 	return (
