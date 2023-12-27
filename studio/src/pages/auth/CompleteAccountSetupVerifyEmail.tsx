@@ -168,8 +168,8 @@ export default function CompleteAccountSetupVerifyEmail() {
 						description={
 							isVerified && !error
 								? t('login.you_have_been_added', {
-										name: 'App2',
-										role: 'Admin',
+										name: data?.org?.name ?? data?.app?.name,
+										role: data?.role,
 								  })
 								: error?.details ?? ''
 						}

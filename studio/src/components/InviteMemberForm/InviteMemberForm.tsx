@@ -40,12 +40,16 @@ export const InviteMemberSchema = z.object({
 		)
 		.superRefine((val, ctx) => {
 			const emails = val.map((v) => v.email).filter(Boolean);
-			if (uniq(emails).length !== emails.length) {
-				return ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					message: 'Emails must be unique',
-				});
-			}
+			emails.forEach((item, index) => {
+				const hasDuplicate = emails.filter((email) => email === item).length > 1;
+				if (hasDuplicate) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: 'Emails must be unique',
+						path: [`${index}.email`],
+					});
+				}
+			});
 		}),
 });
 interface InviteMemberFormProps {
