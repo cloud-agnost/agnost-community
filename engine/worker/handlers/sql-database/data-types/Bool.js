@@ -26,8 +26,7 @@ export default class Bool extends Field {
 
     toDefinitionQuery() {
         let schema = this.createMap[this.type];
-
-        if (this.getDefaultValue() !== undefined || this.getDefaultValue() !== null) {
+        if (this.getDefaultValue() !== undefined) {
             schema = schema.replace("{DEFAULT_VALUE}", this.defaultMap[this.getDatabaseType()]);
         }
 
