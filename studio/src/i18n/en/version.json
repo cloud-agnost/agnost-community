@@ -361,5 +361,6 @@
 	"server_api_desc": "Learn how to use Agnost's server API to build your next app.",
 	"documentation": "Documentation",
 	"close_tab": "Close Tab",
-	"noNotifications": "Your search did not match any notifications."
+	"noNotifications": "Your search did not match any notifications.",
+	"no_logs": "Your search did not match any logs."
 }

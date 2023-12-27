@@ -10,12 +10,15 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import VersionLogCharts from './VersionLogCharts';
 import VersionLogsTable from './VersionLogsTable';
 import { startOfDay, endOfDay } from 'date-fns';
+import { EmptyState } from '@/components/EmptyState';
+import BeatLoader from 'react-spinners/BeatLoader';
 interface VersionLogsProps {
 	type: 'queue' | 'task' | 'endpoint';
 }
 export default function VersionLogs({ type }: VersionLogsProps) {
 	const { t } = useTranslation();
-	const { getVersionLogBuckets, showLogDetails, closeVersionLogDetails } = useVersionStore();
+	const { getVersionLogBuckets, showLogDetails, closeVersionLogDetails, logBuckets } =
+		useVersionStore();
 	const { appId, orgId, versionId } = useParams<{
 		appId: string;
 		orgId: string;
@@ -38,7 +41,7 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 		setSearchParams(searchParams);
 	}
 
-	const { refetch } = useQuery({
+	const { refetch, isFetching } = useQuery({
 		queryKey: ['versionLogBuckets'],
 		queryFn: () => {
 			const start = new Date(searchParams.get('start') as string) ?? date[0].startDate;
@@ -72,14 +75,26 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 	}, [searchParams]);
 
 	return (
-		<div className='max-h-full space-y-6'>
+		<div className='h-full space-y-6'>
 			<div className='flex items-center justify-between'>
 				<h1 className='text-2xl font-semibold text-default'>{t('version.log')}</h1>
 				<DateRangePicker date={date} onChange={selectDate} />
 			</div>
-			<VersionLogCharts date={date} />
-			<VersionLogsTable date={date} type={type} />
-			<VersionLogDetails open={showLogDetails} onClose={closeVersionLogDetails} />
+			{isFetching ? (
+				<div className='flex items-center justify-center h-full w-full'>
+					<BeatLoader color='#6884FD' size={16} margin={12} />
+				</div>
+			) : logBuckets.totalHits > 0 ? (
+				<>
+					<VersionLogCharts date={date} />
+					<VersionLogsTable date={date} type={type} />
+					<VersionLogDetails open={showLogDetails} onClose={closeVersionLogDetails} />
+				</>
+			) : (
+				<div className='flex flex-col h-full items-center justify-center'>
+					<EmptyState type={type} title={t('version.no_logs')} />
+				</div>
+			)}
 		</div>
 	);
 }
