@@ -73,7 +73,6 @@ const themes = {
 export default function EditorSettings() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
-
 	const { isEditorSettingsDrawerOpen, toggleEditorSettingsDrawer, updateEditorPreferences, user } =
 		useAuthStore();
 	const form = useForm({
@@ -142,213 +141,220 @@ export default function EditorSettings() {
 					<DrawerTitle>{t('profileSettings.editor.title')}</DrawerTitle>
 				</DrawerHeader>
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6 scroll space-y-6'>
-						<div className='grid grid-cols-3 gap-4'>
-							<FormField
-								control={form.control}
-								name='fontFamily'
-								render={({ field }) => (
-									<FormItem className='flex-1'>
-										<FormLabel>{t('profileSettings.editor.font_family')}</FormLabel>
-										<FormControl>
-											<Select
-												defaultValue={field.value}
-												value={field.value}
-												name={field.name}
-												onValueChange={field.onChange}
-											>
-												<FormControl>
-													<SelectTrigger className='w-full'>
-														<SelectValue placeholder={`${t('general.select')} `} />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent align='center' className='!max-h-[26rem]'>
-													{fonts.map((font) => (
-														<SelectItem key={font.name} value={font.value}>
-															{font.name}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='fontSize'
-								render={({ field }) => {
-									return (
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className='p-6 h-[calc(100%-97px)] overflow-auto space-y-4 grid grid-rows-[auto_1fr_auto] gap-4'
+					>
+						<div className='space-y-6'>
+							<div className='grid grid-cols-3 gap-4'>
+								<FormField
+									control={form.control}
+									name='fontFamily'
+									render={({ field }) => (
 										<FormItem className='flex-1'>
-											<FormLabel>{t('profileSettings.editor.font_size')}</FormLabel>
+											<FormLabel>{t('profileSettings.editor.font_family')}</FormLabel>
 											<FormControl>
-												<Input
-													type='number'
-													error={!!form.formState.errors.fontSize}
-													placeholder={t('profileSettings.editor.font_size').toString()}
-													{...field}
-												/>
+												<Select
+													defaultValue={field.value}
+													value={field.value}
+													name={field.name}
+													onValueChange={field.onChange}
+												>
+													<FormControl>
+														<SelectTrigger className='w-full'>
+															<SelectValue placeholder={`${t('general.select')} `} />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent align='center' className='!max-h-[26rem]'>
+														{fonts.map((font) => (
+															<SelectItem key={font.name} value={font.value}>
+																{font.name}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 											</FormControl>
 											<FormMessage />
 										</FormItem>
-									);
-								}}
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name='fontSize'
+									render={({ field }) => {
+										return (
+											<FormItem className='flex-1'>
+												<FormLabel>{t('profileSettings.editor.font_size')}</FormLabel>
+												<FormControl>
+													<Input
+														type='number'
+														error={!!form.formState.errors.fontSize}
+														placeholder={t('profileSettings.editor.font_size').toString()}
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
+								/>
+								<FormField
+									control={form.control}
+									name='theme'
+									render={({ field }) => (
+										<FormItem className='flex-1'>
+											<FormLabel>{t('profileSettings.editor.editor_theme')}</FormLabel>
+											<FormControl>
+												<Select
+													defaultValue={field.value}
+													value={field.value}
+													name={field.name}
+													onValueChange={field.onChange}
+												>
+													<FormControl>
+														<SelectTrigger className='w-full'>
+															<SelectValue placeholder={`${t('general.select')} `} />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent align='center' className='!max-h-[36rem]'>
+														{Object.entries(themes).map(([key, theme]) => (
+															<SelectItem key={key} value={key}>
+																{theme}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+											</FormControl>
+
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
+
+							<div className='grid grid-cols-3 gap-4'>
+								<FormField
+									control={form.control}
+									name='tabSize'
+									render={({ field }) => {
+										return (
+											<FormItem>
+												<FormLabel>{t('profileSettings.editor.tab_size')}</FormLabel>
+												<FormControl>
+													<Input
+														type='number'
+														error={!!form.formState.errors.tabSize}
+														placeholder={t('profileSettings.editor.tab_size').toString()}
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
+								/>
+								<FormField
+									control={form.control}
+									name='lineNumbers'
+									render={({ field }) => (
+										<FormItem className='flex-1'>
+											<FormLabel>{t('profileSettings.editor.line_numbers')}</FormLabel>
+											<FormControl>
+												<Select
+													defaultValue={field.value}
+													value={field.value}
+													name={field.name}
+													onValueChange={field.onChange}
+												>
+													<FormControl>
+														<SelectTrigger className='w-full'>
+															<SelectValue placeholder={`${t('general.select')} `} />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent align='center'>
+														{line_numbers.map((lm) => (
+															<SelectItem key={lm.name} value={lm.value}>
+																{lm.name}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+											</FormControl>
+
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name='wordWrap'
+									render={({ field }) => (
+										<FormItem className='flex-1'>
+											<FormLabel>{t('profileSettings.editor.word_wrap')}</FormLabel>
+											<FormControl>
+												<Select
+													defaultValue={field.value}
+													value={field.value}
+													name={field.name}
+													onValueChange={field.onChange}
+												>
+													<FormControl>
+														<SelectTrigger className='w-full'>
+															<SelectValue placeholder={`${t('general.select')} `} />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent align='center'>
+														{word_wrap.map((wrap) => (
+															<SelectItem key={wrap.name} value={wrap.value}>
+																{wrap.name}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
+							<FormField
+								control={form.control}
+								name='minimap'
+								render={({ field }) => (
+									<FormItem className='flex justify-between gap-4 items-center space-y-0'>
+										<FormLabel>
+											<p>{t('profileSettings.editor.minimap')}</p>
+											<p className='text-subtle'>{t('profileSettings.editor.minimap_desc')}</p>
+										</FormLabel>
+										<FormControl>
+											<Switch checked={field.value} onCheckedChange={field.onChange} />
+										</FormControl>
+									</FormItem>
+								)}
 							/>
 							<FormField
 								control={form.control}
-								name='theme'
+								name='fontLigatures'
 								render={({ field }) => (
-									<FormItem className='flex-1'>
-										<FormLabel>{t('profileSettings.editor.editor_theme')}</FormLabel>
+									<FormItem className='flex justify-between gap-4 items-center space-y-0'>
+										<FormLabel>
+											<p>{t('profileSettings.editor.font_ligatures')}</p>
+											<p className='text-subtle'>
+												{t('profileSettings.editor.font_ligatures_desc')}
+											</p>
+										</FormLabel>
 										<FormControl>
-											<Select
-												defaultValue={field.value}
-												value={field.value}
-												name={field.name}
-												onValueChange={field.onChange}
-											>
-												<FormControl>
-													<SelectTrigger className='w-full'>
-														<SelectValue placeholder={`${t('general.select')} `} />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent align='center' className='!max-h-[36rem]'>
-													{Object.entries(themes).map(([key, theme]) => (
-														<SelectItem key={key} value={key}>
-															{theme}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
+											<Switch checked={field.value} onCheckedChange={field.onChange} />
 										</FormControl>
-
-										<FormMessage />
 									</FormItem>
 								)}
 							/>
 						</div>
-
-						<div className='grid grid-cols-3 gap-4'>
-							<FormField
-								control={form.control}
-								name='tabSize'
-								render={({ field }) => {
-									return (
-										<FormItem>
-											<FormLabel>{t('profileSettings.editor.tab_size')}</FormLabel>
-											<FormControl>
-												<Input
-													type='number'
-													error={!!form.formState.errors.tabSize}
-													placeholder={t('profileSettings.editor.tab_size').toString()}
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									);
-								}}
-							/>
-							<FormField
-								control={form.control}
-								name='lineNumbers'
-								render={({ field }) => (
-									<FormItem className='flex-1'>
-										<FormLabel>{t('profileSettings.editor.line_numbers')}</FormLabel>
-										<FormControl>
-											<Select
-												defaultValue={field.value}
-												value={field.value}
-												name={field.name}
-												onValueChange={field.onChange}
-											>
-												<FormControl>
-													<SelectTrigger className='w-full'>
-														<SelectValue placeholder={`${t('general.select')} `} />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent align='center'>
-													{line_numbers.map((lm) => (
-														<SelectItem key={lm.name} value={lm.value}>
-															{lm.name}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</FormControl>
-
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='wordWrap'
-								render={({ field }) => (
-									<FormItem className='flex-1'>
-										<FormLabel>{t('profileSettings.editor.word_wrap')}</FormLabel>
-										<FormControl>
-											<Select
-												defaultValue={field.value}
-												value={field.value}
-												name={field.name}
-												onValueChange={field.onChange}
-											>
-												<FormControl>
-													<SelectTrigger className='w-full'>
-														<SelectValue placeholder={`${t('general.select')} `} />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent align='center'>
-													{word_wrap.map((wrap) => (
-														<SelectItem key={wrap.name} value={wrap.value}>
-															{wrap.name}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-						<FormField
-							control={form.control}
-							name='minimap'
-							render={({ field }) => (
-								<FormItem className='flex justify-between gap-4 items-center space-y-0'>
-									<FormLabel>
-										<p>{t('profileSettings.editor.minimap')}</p>
-										<p className='text-subtle'>{t('profileSettings.editor.minimap_desc')}</p>
-									</FormLabel>
-									<FormControl>
-										<Switch checked={field.value} onCheckedChange={field.onChange} />
-									</FormControl>
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='fontLigatures'
-							render={({ field }) => (
-								<FormItem className='flex justify-between gap-4 items-center space-y-0'>
-									<FormLabel>
-										<p>{t('profileSettings.editor.font_ligatures')}</p>
-										<p className='text-subtle'>{t('profileSettings.editor.font_ligatures_desc')}</p>
-									</FormLabel>
-									<FormControl>
-										<Switch checked={field.value} onCheckedChange={field.onChange} />
-									</FormControl>
-								</FormItem>
-							)}
-						/>
 
 						<CodeEditor
 							name='editor'
-							containerClassName='h-1/2 xl:h-[62%]'
-							className='h-full'
+							containerClassName='h-full'
+							className='[&_.overflow-guard]:!h-full [&>:first-child]:!h-full'
 							value={`
 // This function calculates the sum of two numbers
 const sum(a, b) => {
@@ -382,17 +388,15 @@ console.log('total:', total);
 							}}
 						/>
 
-						<DrawerFooter className='mt-8'>
-							<div className='flex justify-end'>
-								<DrawerClose asChild>
-									<Button variant='secondary' size='lg'>
-										{t('general.cancel')}
-									</Button>
-								</DrawerClose>
-								<Button className='ml-2' type='submit' size='lg' loading={isPending}>
-									{t('general.save')}
+						<DrawerFooter className='mt-8 flex justify-end'>
+							<DrawerClose asChild>
+								<Button variant='secondary' size='lg'>
+									{t('general.cancel')}
 								</Button>
-							</div>
+							</DrawerClose>
+							<Button className='ml-2' type='submit' size='lg' loading={isPending}>
+								{t('general.save')}
+							</Button>
 						</DrawerFooter>
 					</form>
 				</Form>
