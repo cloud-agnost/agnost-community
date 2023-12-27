@@ -131,7 +131,7 @@ export default function ChangeEmail() {
 							<Button onClick={close} variant='text' size='lg'>
 								{t('profileSettings.cancel')}
 							</Button>
-							<Button loading={loading} size='lg'>
+							<Button loading={loading} size='lg' type='submit'>
 								{t('profileSettings.change_email')}
 							</Button>
 						</div>

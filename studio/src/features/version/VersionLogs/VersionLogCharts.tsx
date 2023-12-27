@@ -48,7 +48,7 @@ export default function VersionLogCharts({ date }: VersionLogChartsProps) {
 		[logBuckets],
 	);
 	return (
-		<div className=' max-h-[400px] border border-border rounded-lg'>
+		<div className='max-h-[400px] border border-border rounded-lg'>
 			<div className=' bg-subtle w-full rounded-t-lg p-4'>
 				<h1 className='font-semibold text-default space-x-2'>
 					<span>{logBuckets?.totalHits}</span>
