@@ -88,7 +88,10 @@ export class Agenda extends SchedulerBase {
 				1,
 				config.get("general.taskProcessQueueCount")
 			);
-			const queueName = `process-task-${envId}-${task.name}-${queueNumber}`;
+			const queueName = `process-task-${envId}-${task.name.replaceAll(
+				" ",
+				"-"
+			)}-${queueNumber}`;
 
 			await this.publishChannel.assertQueue(queueName, {
 				durable: true,
@@ -125,7 +128,10 @@ export class Agenda extends SchedulerBase {
 
 		// Listen for messages
 		for (let i = 1; i <= queueCount; i++) {
-			await this.processTask(task, `process-task-${envId}-${task.name}-${i}`);
+			await this.processTask(
+				task,
+				`process-task-${envId}-${task.name.replaceAll(" ", "-")}-${i}`
+			);
 		}
 	}
 
@@ -209,7 +215,7 @@ export class Agenda extends SchedulerBase {
 					try {
 						// Dynamicly import the
 						const handlerModule = await import(
-							`../../meta/tasks/${taskObj.name}.js${
+							`../../meta/tasks/${taskObj.name.replaceAll(" ", "_")}.js${
 								this.manager.getModuleLoaderQuery()
 									? "?" + this.manager.getModuleLoaderQuery()
 									: ""

@@ -9,7 +9,7 @@ export const runHandler =
 		try {
 			// Dynamicly import the
 			handlerModule = await import(
-				`../meta/endpoints/${endpoint.name}.js${
+				`../meta/endpoints/${endpoint.name.replaceAll(" ", "_")}.js${
 					loaderQuery ? "?" + loaderQuery : ""
 				}`
 			);

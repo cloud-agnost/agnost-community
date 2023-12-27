@@ -55,7 +55,7 @@ export class RabbitMQ extends QueueBase {
 		for (let i = 1; i <= queueCount; i++) {
 			await this.processMessage(
 				queue,
-				`process-message-${envId}-${queue.name}-${i}`
+				`process-message-${envId}-${queue.name.replaceAll(" ", "-")}-${i}`
 			);
 		}
 
@@ -65,8 +65,14 @@ export class RabbitMQ extends QueueBase {
 		for (let i = 1; i <= exchangeCount; i++) {
 			await this.processMessage(
 				queue,
-				`process-delayed-message-${envId}-${queue.name}-${i}`,
-				`process-delayed-message-exchange-${envId}-${queue.name}-${i}`
+				`process-delayed-message-${envId}-${queue.name.replaceAll(
+					" ",
+					"-"
+				)}-${i}`,
+				`process-delayed-message-exchange-${envId}-${queue.name.replaceAll(
+					" ",
+					"-"
+				)}-${i}`
 			);
 		}
 	}
@@ -120,7 +126,10 @@ export class RabbitMQ extends QueueBase {
 					1,
 					config.get("general.delayedMessageExchangeCount")
 				);
-				const exchangeName = `process-delayed-message-exchange-${envId}-${queue.name}-${exchangeNumber}`;
+				const exchangeName = `process-delayed-message-exchange-${envId}-${queue.name.replaceAll(
+					" ",
+					"-"
+				)}-${exchangeNumber}`;
 
 				await this.publishChannel.assertExchange(
 					exchangeName,
@@ -152,7 +161,10 @@ export class RabbitMQ extends QueueBase {
 					1,
 					config.get("general.messageProcessQueueCount")
 				);
-				const queueName = `process-message-${envId}-${queue.name}-${queueNumber}`;
+				const queueName = `process-message-${envId}-${queue.name.replaceAll(
+					" ",
+					"-"
+				)}-${queueNumber}`;
 
 				await this.publishChannel.assertQueue(queueName, {
 					durable: true,
@@ -295,7 +307,7 @@ export class RabbitMQ extends QueueBase {
 					try {
 						// Dynamicly import the
 						const handlerModule = await import(
-							`../../meta/queues/${queueObj.name}.js${
+							`../../meta/queues/${queueObj.name.replaceAll(" ", "_")}.js${
 								this.manager.getModuleLoaderQuery()
 									? "?" + this.manager.getModuleLoaderQuery()
 									: ""
