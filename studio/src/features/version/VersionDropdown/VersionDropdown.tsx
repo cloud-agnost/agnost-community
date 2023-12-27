@@ -18,6 +18,7 @@ import { Fragment, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import './versionDropdown.scss';
+import { resetAfterVersionChange } from '@/utils';
 
 export default function VersionDropdown() {
 	const [open, setOpen] = useState(false);
@@ -43,6 +44,7 @@ export default function VersionDropdown() {
 			appId,
 			versionId,
 			onSuccess: () => {
+				resetAfterVersionChange();
 				useVersionStore.setState({ deleteVersionDrawerIsOpen: false });
 				navigate(`/organization/${orgId}/apps`);
 				if (application) openVersionDrawer(application);
