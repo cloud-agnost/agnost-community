@@ -80,9 +80,7 @@ export default class ApplicationService {
 			await axios.post(
 				`${this.getUrl(req.orgId as string, req.appId as string)}/team/delete-multi`,
 				{
-					data: {
-						userIds: req.userIds,
-					},
+					userIds: req.userIds,
 				},
 			)
 		).data;
