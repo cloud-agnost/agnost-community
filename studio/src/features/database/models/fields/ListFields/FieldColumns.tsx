@@ -43,11 +43,11 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 		id: 'select',
 		enableResizing: false,
 		className: '!max-w-[40px] !w-[40px]',
-		header: (props) => {
+		header: ({ table }) => {
 			return (
 				<Checkbox
-					checked={props.table.getIsAllPageRowsSelected()}
-					onCheckedChange={(value) => props.table.toggleAllPageRowsSelected(!!value)}
+					checked={table.getIsAllPageRowsSelected()}
+					onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
 					aria-label='Select all'
 				/>
 			);
@@ -57,7 +57,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 			return (
 				<Checkbox
 					disabled={isSystem}
-					checked={isSystem && props.row.getIsSelected()}
+					checked={!isSystem && props.row.getIsSelected()}
 					onCheckedChange={(value) => props.row.toggleSelected(!!value)}
 					aria-label='Select row'
 				/>
