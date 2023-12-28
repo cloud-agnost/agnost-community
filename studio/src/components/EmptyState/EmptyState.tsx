@@ -1,6 +1,6 @@
 import { TAB_ICON_MAP } from '@/constants';
 import { cn } from '@/utils';
-import { AppWindow, Bell, Envelope, Key, Users } from '@phosphor-icons/react';
+import { AppWindow, Bell, Envelope, GlobeSimple, Key, Users } from '@phosphor-icons/react';
 import { capitalize } from 'lodash';
 import React, { ElementType } from 'react';
 import { EnvironmentVariable, NpmPackage, RateLimit, Storage } from '../icons';
@@ -27,7 +27,8 @@ export type Modules =
 	| 'rate-limit'
 	| 'function'
 	| 'cache'
-	| 'notification';
+	| 'notification'
+	| 'custom-domain';
 
 interface EmptyStateProps {
 	title: string;
@@ -47,6 +48,7 @@ export default function EmptyState({ type, title, className, children }: EmptySt
 		resource: Storage,
 		org: Users,
 		notification: Bell,
+		'custom-domain': GlobeSimple,
 	};
 	const Icon = TAB_ICON_MAP[capitalize(type)] ?? ICON_MAP[type];
 	return (
