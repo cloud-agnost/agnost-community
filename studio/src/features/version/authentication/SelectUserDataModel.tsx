@@ -164,7 +164,6 @@ export default function SelectUserDataModel() {
 			form.setValue('modelId', mId as string);
 		}
 	}, [version, models]);
-
 	return (
 		<SettingsFormItem
 			className='py-0'
@@ -214,6 +213,8 @@ export default function SelectUserDataModel() {
 									<FormControl>
 										<Select
 											defaultValue={field.value}
+											value={field.value}
+											name={field.name}
 											onValueChange={(value) => {
 												field.onChange(value);
 												form.resetField('modelId');
