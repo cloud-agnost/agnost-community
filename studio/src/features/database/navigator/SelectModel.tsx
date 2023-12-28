@@ -19,7 +19,7 @@ export default function SelectModel() {
 		setModel(model);
 	}
 	return (
-		<div className=' bg-subtle p-4 rounded-lg w-1/6 space-y-4'>
+		<div className=' bg-subtle p-4 rounded-lg w-1/6 space-y-4 overflow-auto'>
 			<h2 className='text-default text-xl font-sfCompact'>
 				{t('database.models.title')}
 				<span className='text-subtle font-sfCompact'> ({models.length})</span>
