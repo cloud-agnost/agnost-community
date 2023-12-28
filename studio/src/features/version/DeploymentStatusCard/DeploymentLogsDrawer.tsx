@@ -39,7 +39,7 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 		orgId: string;
 	}>();
 
-	const { isFetching } = useQuery({
+	const { isPending } = useQuery({
 		queryFn: () =>
 			getEnvironmentLogs({
 				orgId: orgId as string,
@@ -51,8 +51,9 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 			}),
 		queryKey: ['getEnvironmentLogs'],
 		enabled: open,
+		refetchOnWindowFocus: false,
 	});
-	const { isFetching: isDetailsFetching } = useQuery({
+	const { isPending: isDetailsFetching } = useQuery({
 		queryFn: () =>
 			getEnvironmentLogsDetail({
 				orgId: orgId as string,
@@ -73,7 +74,7 @@ export default function DeploymentLogsDrawer({ open, onOpenChange }: DeploymentL
 						<DrawerTitle>{t('version.logs')}</DrawerTitle>
 					</DrawerHeader>
 					<div className='p-6 scroll'>
-						{isFetching ? (
+						{isPending ? (
 							<div className='flex justify-center items-center h-[300px]'>
 								<BeatLoader color='#6884FD' size={16} margin={12} />
 							</div>
