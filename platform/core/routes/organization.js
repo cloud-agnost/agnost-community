@@ -1723,6 +1723,8 @@ router.delete(
 			await orgMemberCtrl.commit(session);
 			res.json();
 
+			console.log("**here0");
+
 			// Log action
 			auditCtrl.logAndNotify(
 				req.org._id,
@@ -1746,6 +1748,8 @@ router.delete(
 				{ orgId: req.org._id }
 			);
 
+			console.log("**here1", apps.length);
+
 			if (apps.length > 0) {
 				// Get all updated applications
 				const appIds = apps.map((entry) => entry._id);
@@ -1758,6 +1762,8 @@ router.delete(
 						},
 					}
 				);
+
+				console.log("**here2", appsWithMembers);
 
 				// Send realtime notifications for updated apps
 				appsWithMembers.forEach((entry) => {
