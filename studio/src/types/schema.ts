@@ -1,5 +1,5 @@
 import { DATABASE, MYSQL_RESERVED_WORDS, POSTGRES_RESERVED_WORDS } from '@/constants';
-import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants/regex';
+import { DNAME_REGEX, NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants/regex';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useResourceStore from '@/store/resources/resourceStore';
 import { capitalize, translate as t } from '@/utils';
@@ -241,4 +241,17 @@ export const CreateRateLimitSchema = z.object({
 			label: t('version.add.rate_limiter.error_message.label_lower'),
 		}),
 	}),
+});
+
+export const CustomDomainSchema = z.object({
+	domain: z
+		.string({
+			required_error: t('forms.required', {
+				label: t('cluster.domain.title'),
+			}),
+		})
+		.regex(DNAME_REGEX, {
+			message: 'Not a valid domain name',
+		})
+		.transform((value) => value.toLowerCase()),
 });
