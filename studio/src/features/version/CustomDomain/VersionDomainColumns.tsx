@@ -5,10 +5,8 @@ import { TableConfirmation } from '@/components/Table';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useSettingsStore from '@/store/version/settingsStore';
 import { APIError, ColumnDefWithClassName, CustomDomain } from '@/types';
-import { getVersionPermission, translate } from '@/utils';
+import { getVersionPermission, notify, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
-import { ColumnDef } from '@tanstack/react-table';
-import { notify } from '@/utils';
 const { deleteCustomDomain } = useSettingsStore.getState();
 const queryClient = new QueryClient();
 async function deleteHandler(domain: CustomDomain) {

@@ -1,3 +1,4 @@
+import { SearchInput } from '@/components/SearchInput';
 import { useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import useSettingsStore from '@/store/version/settingsStore';
@@ -5,11 +6,8 @@ import { CustomDomain } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { Table } from '@tanstack/react-table';
 import { SelectedRowButton } from 'components/Table';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import AddCustomDomainButton from './AddCustomDomainButton';
-import { SearchInput } from '@/components/SearchInput';
-import { useSearchParams } from 'react-router-dom';
-import useClusterStore from '@/store/cluster/clusterStore';
 interface CustomDomainActionsProps {
 	table: Table<CustomDomain>;
 }

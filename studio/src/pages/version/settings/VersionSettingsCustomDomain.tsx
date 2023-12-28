@@ -8,7 +8,7 @@ import {
 	VersionDomainColumns,
 } from '@/features/version/CustomDomain';
 import { SettingsContainer } from '@/features/version/SettingsContainer';
-import { useAuthorizeVersion, useInfiniteScroll, useTable } from '@/hooks';
+import { useInfiniteScroll, useTable } from '@/hooks';
 import useClusterStore from '@/store/cluster/clusterStore';
 import useSettingsStore from '@/store/version/settingsStore';
 import { useQuery } from '@tanstack/react-query';
