@@ -1,7 +1,10 @@
 import { axios } from '@/helpers';
 import {
+	Cluster,
 	ClusterComponent,
 	ClusterReleaseInfo,
+	DomainParams,
+	EnforceSSLAccessParams,
 	TransferClusterOwnershipParams,
 	UpdateClusterComponentParams,
 } from '@/types';
@@ -52,5 +55,17 @@ export default class ClusterService {
 	}
 	static async updateClusterRelease(data: { release: string }) {
 		return (await axios.put(`${this.url}/update-release`, data)).data;
+	}
+	static async addDomain(data: DomainParams): Promise<Cluster> {
+		return (await axios.post(`${this.url}/domains`, data)).data;
+	}
+	static async deleteDomain(data: DomainParams): Promise<Cluster> {
+		return (await axios.delete(`${this.url}/domains`, { data })).data;
+	}
+	static async enforceSSL(data: EnforceSSLAccessParams): Promise<Cluster> {
+		return (await axios.put(`${this.url}/domains/enforce-ssl`, data)).data;
+	}
+	static async checkDomainStatus() {
+		return (await axios.get(`${this.url}/domain-status`)).data;
 	}
 }

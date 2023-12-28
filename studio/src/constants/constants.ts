@@ -87,6 +87,7 @@ import {
 	Function,
 	GearSix,
 	GitBranch,
+	GlobeSimple,
 	HardDrive,
 	HardDrives,
 	IdentificationBadge,
@@ -514,6 +515,12 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 		title: translate('version.settings.real_time'),
 		href: 'real-time',
 		icon: RealTime,
+	},
+	{
+		id: 9,
+		title: translate('cluster.custom_domain'),
+		href: 'custom-domain',
+		icon: GlobeSimple,
 	},
 ];
 

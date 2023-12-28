@@ -477,3 +477,30 @@ export const EnvVariableSchema = z.object({
 		}),
 	}),
 });
+
+export type AddCustomDomainParams = BaseParams & {
+	domain: string;
+};
+
+export type DeleteCustomDomainParams = BaseParams & {
+	domainId: string;
+};
+
+export type DeleteMultipleCustomDomainsParams = BaseParams & {
+	domainIds: string[];
+};
+
+export type GetCustomDomainParams = VersionParams & BaseGetRequest;
+
+export interface CustomDomain {
+	_id: string;
+	orgId: string;
+	appId: string;
+	versionId: string;
+	iid: string;
+	domain: string;
+	createdBy: string;
+	updatedBy: string;
+	createdAt: string;
+	updatedAt: string;
+}
