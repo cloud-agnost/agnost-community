@@ -93,6 +93,15 @@ export interface Cluster {
 	clusterResourceStatus: ClusterResourceStatus[];
 	createdAt: string;
 	updatedAt: string;
+	smtp: {
+		fromEmail: string;
+		fromName: string;
+		host: string;
+		port: number;
+		user: string;
+		password: string;
+		useTLS: boolean;
+	};
 }
 
 export interface ClusterReleaseInfo {
@@ -109,3 +118,11 @@ export interface ClusterComponentReleaseInfo {
 	status: string;
 	latest: string;
 }
+
+export type DomainParams = {
+	domain: string;
+};
+
+export type EnforceSSLAccessParams = {
+	enforceSSLAccess: boolean;
+};
