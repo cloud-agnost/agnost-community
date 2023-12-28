@@ -20,7 +20,7 @@ export default function useEnvironmentStatus() {
 					check: hasStatus([EnvironmentStatus.Deploying, EnvironmentStatus.Redeploying]),
 					value: EnvironmentStatus.Deploying,
 				},
-				{ check: hasStatus(['error']) || hasErrorResources(), value: EnvironmentStatus.Error },
+				{ check: hasStatus(['Error']) || hasErrorResources(), value: EnvironmentStatus.Error },
 				{ check: hasIdleResources(), value: EnvironmentStatus.Idle },
 			];
 
