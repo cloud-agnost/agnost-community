@@ -15,6 +15,8 @@ import { Link } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
 import { GuestOnly } from '@/router';
+import { SuccessCheck } from '@/components/icons';
+import { ArrowLeft } from '@phosphor-icons/react';
 
 const FormSchema = z.object({
 	email: z
@@ -54,7 +56,7 @@ export default function ForgotPassword() {
 		return (
 			<GuestOnly>
 				<div className='flex justify-center items-center flex-col min-h-screen text-center text-subtle px-4'>
-					<div className='w-[172px] h-[172px] rounded-2xl bg-text-subtle mb-12'></div>
+					<SuccessCheck className='w-[172px] h-[172px]  mb-12'></SuccessCheck>
 					<h1 className='text-default font-semibold leading-[44px] text-[26px] mb-2'>
 						{t('login.password_reset_message_sent')}
 					</h1>
@@ -70,7 +72,7 @@ export default function ForgotPassword() {
 						</p>
 						<p>{t('login.if_you_dont_receive_email')}</p>
 					</div>
-					<Link className='text-default text-xs mt-14 hover:underline' to='/login'>
+					<Link className='text-default mt-14 hover:underline flex items-center' to='/login'>
 						{t('login.back_to_login')}
 					</Link>
 				</div>

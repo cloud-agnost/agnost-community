@@ -27,7 +27,7 @@
 	"get_reset_link": "Get Reset Link",
 	"forgot_password_desc": "Don’t worry! Fill in your email address you use to sign in to Agnost and we’ll send you a link to reset your password.",
 	"password_reset_message_sent": "Password reset message sent",
-	"sent_reset_password_email": "Link and instructions for resetting your password have been sent to <email>{{email}}</email>.",
+	"sent_reset_password_email": "Link and instructions for resetting your password have been sent to <email>{{email}}</email>",
 	"if_you_dont_receive_email": "If you don’t receive it right away, please check your spam folder",
 	"complete_setup": "Complete Setup",
 	"you_have_been_added": "You have been successfully added to {{name}} with {{role}} privileges.",
