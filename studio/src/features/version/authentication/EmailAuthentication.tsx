@@ -81,7 +81,7 @@ export default function EmailAuthentication() {
 	const canEdit = useAuthorizeVersion('version.auth.update');
 	const form = useForm<z.infer<typeof EmailAuthenticationSchema>>({
 		resolver: zodResolver(EmailAuthenticationSchema),
-		defaultValues: version?.authentication.email,
+		defaultValues: version?.authentication?.email,
 	});
 
 	const { mutateAsync, isPending } = useMutation({
