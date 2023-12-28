@@ -20,10 +20,9 @@ export default function useVersionDropdownItems() {
 		version,
 		setCreateCopyVersionDrawerIsOpen,
 		updateVersionProperties,
-		getVersionDashboardPath,
 		getAllVersionsVisibleToUser,
 	} = useVersionStore();
-	const { addTab } = useTabStore();
+	const { addSettingsTab } = useTabStore();
 
 	useEffect(() => {
 		if (appId && orgId) {
@@ -96,17 +95,7 @@ export default function useVersionDropdownItems() {
 			},
 			{
 				title: t('version.settings.default'),
-				action: () => {
-					const versionHomePath = getVersionDashboardPath('/settings');
-					addTab(version?._id, {
-						id: generateId(),
-						title: t('version.settings.default'),
-						path: versionHomePath,
-						isActive: true,
-						isDashboard: false,
-						type: TabTypes.Settings,
-					});
-				},
+				action: () => addSettingsTab(version._id),
 				disabled: false,
 				icon: GearSix,
 			},
