@@ -415,4 +415,7 @@ declare module '@tanstack/react-query' {
 	export interface UseBaseMutationResult<D, APIError, V, C> {
 		error: APIError | null;
 	}
+	interface Register {
+		defaultError: APIError;
+	}
 }

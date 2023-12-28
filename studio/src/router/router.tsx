@@ -339,6 +339,13 @@ const VersionSettingsNPMPackages = loadable(
 		resolveComponent: (mod: any) => mod.default,
 	},
 );
+const VersionSettingsCustomDomain = loadable(
+	() => componentLoader(() => import('../pages/version/settings/VersionSettingsCustomDomain')),
+	{
+		fallback: <Fallback />,
+		resolveComponent: (mod: any) => mod.default,
+	},
+);
 // endpoint
 const Endpoint = loadable(() => componentLoader(() => import('../pages/endpoint/Endpoint')), {
 	fallback: <Fallback />,
@@ -796,6 +803,10 @@ const router = createBrowserRouter([
 													{
 														path: 'real-time',
 														element: <VersionSettingsRealTime />,
+													},
+													{
+														path: 'custom-domain',
+														element: <VersionSettingsCustomDomain />,
 													},
 												],
 											},

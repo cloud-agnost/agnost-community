@@ -7,3 +7,4 @@ export { default as VersionSettingsGeneral } from './VersionSettingsGeneral.tsx'
 export { default as VersionSettingsNPMPackages } from './VersionSettingsNPMPackages.tsx';
 export { default as VersionSettingsRateLimits } from './VersionSettingsRateLimits.tsx';
 export { default as VersionSettingsRealTime } from './VersionSettingsRealTime.tsx';
+export { default as VersionSettingsCustomDomain } from './VersionSettingsCustomDomain.tsx';
