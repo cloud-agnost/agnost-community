@@ -4,13 +4,16 @@ import { OrgRoles, Organization, OrganizationMember, RealtimeActionParams } from
 import { history } from '@/utils';
 import { RealtimeActions } from './RealtimeActions';
 class OrgMember implements RealtimeActions<OrganizationMember> {
-	delete(param: RealtimeActionParams<OrganizationMember>): void {
+	delete(param: RealtimeActionParams<OrganizationMember & { userIds: string[] }>): void {
 		useOrganizationStore.setState?.({
 			members: useOrganizationStore
 				.getState?.()
 				.members.filter((member) => member.member._id !== param.data._id),
 		});
-		if (param.data._id === useAuthStore.getState().user?._id) {
+		if (
+			param.data._id === useAuthStore.getState().user?._id ||
+			param.data.userIds.includes(useAuthStore.getState().user?._id as string)
+		) {
 			useOrganizationStore.setState?.({
 				organization: {} as Organization,
 				members: [],
