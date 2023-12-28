@@ -18,6 +18,7 @@ async function inviteTeamMembersLoader() {
 }
 async function onboardingLoader(params: LoaderFunctionArgs) {
 	const status = await useClusterStore.getState().checkClusterSetup();
+	useClusterStore.getState().checkClusterSmtpStatus();
 	const { currentStepIndex, steps } = useOnboardingStore.getState();
 	const isAuthenticated = useAuthStore.getState().isAuthenticated();
 
