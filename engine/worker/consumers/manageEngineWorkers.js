@@ -92,7 +92,8 @@ export const manageEngineWorkersHandler = (connection, exchange) => {
 
                 switch (msgObj.subAction) {
                     case "update-resource-access":
-                        {
+                        await connManager.removeAllConnections();
+                        /*                         {
                             const { env, updatedResource } = msgObj;
                             const mappings = env.mappings.filter((entry) => entry.resource.iid === updatedResource.iid);
                             // For each design element, meaning that they are databases, update the connection pool
@@ -100,7 +101,7 @@ export const manageEngineWorkersHandler = (connection, exchange) => {
                                 const mapping = mappings[i];
                                 await connManager.removeConnection(mapping.design.iid, updatedResource.instance);
                             }
-                        }
+                        } */
                         break;
                     default:
                         break;

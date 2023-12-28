@@ -250,7 +250,7 @@ export const applyRules = (type) => {
 						// We are allowing root '/' path
 						if (value !== "/") {
 							const routeNameRegex =
-								/^\/[a-zA-Z0-9_-]+(?:\/:[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)*)*$/;
+								/^\/[a-zA-Z0-9_-]+(?:\/(?:[a-zA-Z0-9_-]+|:[a-zA-Z0-9_-]+))*$/;
 							const paramNameRegex = /^[a-zA-Z0-9_-]+$/;
 
 							// Validate route name

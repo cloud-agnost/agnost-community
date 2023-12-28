@@ -1,17 +1,20 @@
-import { create } from 'zustand';
 import { AuthService, ClusterService } from '@/services';
 import {
 	APIError,
+	Cluster,
 	ClusterComponent,
 	ClusterComponentReleaseInfo,
 	ClusterReleaseInfo,
 	ClusterSetupResponse,
+	DomainParams,
+	EnforceSSLAccessParams,
 	ModuleVersions,
 	SetupCluster,
 	TransferClusterOwnershipParams,
 	UpdateClusterComponentParams,
 } from '@/types';
 import { BaseRequest, User, UserDataToRegister } from '@/types/type.ts';
+import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import useAuthStore from '../auth/authStore';
 import useEnvironmentStore from '../environment/environmentStore';
@@ -27,8 +30,9 @@ interface ClusterStore {
 	clusterComponent: ClusterComponent;
 	clusterReleaseInfo: ClusterReleaseInfo | undefined;
 	clusterComponentsReleaseInfo: ClusterComponentReleaseInfo[];
-	clusterInfo: any;
+	cluster: Cluster;
 	isReleaseHistoryOpen: boolean;
+	clusterDomainError: APIError | undefined;
 }
 
 type Actions = {
@@ -46,6 +50,10 @@ type Actions = {
 	getClusterAndReleaseInfo: () => Promise<ClusterReleaseInfo>;
 	updateClusterRelease: (param: { release: string }) => Promise<ClusterReleaseInfo>;
 	toggleReleaseHistory: () => void;
+	addDomain: (data: DomainParams) => Promise<Cluster>;
+	deleteDomain: (data: DomainParams) => Promise<Cluster>;
+	enforceSSL: (data: EnforceSSLAccessParams) => Promise<Cluster>;
+	checkDomainStatus: () => Promise<void>;
 	reset: () => void;
 };
 
@@ -57,10 +65,11 @@ const initialState: ClusterStore = {
 	clusterComponents: [],
 	clusterComponent: {} as ClusterComponent,
 	isEditClusterComponentOpen: false,
-	clusterInfo: undefined,
+	cluster: {} as Cluster,
 	clusterReleaseInfo: {} as ClusterReleaseInfo,
 	clusterComponentsReleaseInfo: [],
 	isReleaseHistoryOpen: false,
+	clusterDomainError: undefined,
 };
 
 const useClusterStore = create<ClusterStore & Actions>()(
@@ -155,9 +164,9 @@ const useClusterStore = create<ClusterStore & Actions>()(
 		},
 		getClusterInfo: async () => {
 			try {
-				const clusterInfo = await ClusterService.getClusterInfo();
-				set({ clusterInfo });
-				return clusterInfo;
+				const cluster = await ClusterService.getClusterInfo();
+				set({ cluster });
+				return cluster;
 			} catch (error) {
 				set({ error: error as APIError });
 				throw error;
@@ -206,6 +215,41 @@ const useClusterStore = create<ClusterStore & Actions>()(
 		},
 		toggleReleaseHistory: () => {
 			set((prev) => ({ isReleaseHistoryOpen: !prev.isReleaseHistoryOpen }));
+		},
+		addDomain: async (data: DomainParams) => {
+			try {
+				const cluster = await ClusterService.addDomain(data);
+				set({ cluster });
+				return cluster;
+			} catch (error) {
+				throw error;
+			}
+		},
+		deleteDomain: async (data: DomainParams) => {
+			try {
+				const cluster = await ClusterService.deleteDomain(data);
+				set({ cluster });
+				return cluster;
+			} catch (error) {
+				throw error;
+			}
+		},
+		enforceSSL: async (data: EnforceSSLAccessParams) => {
+			try {
+				const cluster = await ClusterService.enforceSSL(data);
+				set({ cluster });
+				return cluster;
+			} catch (error) {
+				throw error;
+			}
+		},
+		checkDomainStatus: async () => {
+			try {
+				await ClusterService.checkDomainStatus();
+			} catch (error) {
+				set({ clusterDomainError: error as APIError });
+				throw error;
+			}
 		},
 		reset: () => set(initialState),
 	})),

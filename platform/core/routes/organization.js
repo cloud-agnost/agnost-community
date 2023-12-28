@@ -1444,14 +1444,14 @@ router.delete(
 				appsWithMembers.forEach((entry) => {
 					sendNotification(entry._id, {
 						actor: {
-							userId: req.user._id,
-							name: req.user.name,
-							pictureUrl: req.user.pictureUrl,
-							color: req.user.color,
+							userId: user._id,
+							name: user.name,
+							pictureUrl: user.pictureUrl,
+							color: user.color,
 							contactEmail: req.user.contactEmail,
-							loginEmail: req.user.loginProfiles[0].email,
+							loginEmail: user.loginProfiles[0].email,
 						},
-						action: "update",
+						action: "delete",
 						object: "org.app.team",
 						description: t(
 							"Removed user '%s' (%s) from app team",
@@ -1460,7 +1460,7 @@ router.delete(
 						),
 						timestamp: Date.now(),
 						data: entry,
-						identifiers: { orgId: org._id, appId: entry._id },
+						identifiers: { orgId: req.org._id, appId: entry._id },
 					});
 				});
 			}
@@ -1514,6 +1514,11 @@ router.post(
 				});
 			}
 
+			// Get the list of users that are removed from the organization
+			let users = await userCtrl.getManyByQuery({
+				_id: { $in: userIds },
+			});
+
 			// Check to see if the deleted users have app team memberships. If they have then we first need to remove them from the app teams.
 			let apps = await appCtrl.getManyByQuery({
 				orgId: req.org._id,
@@ -1560,18 +1565,26 @@ router.post(
 			await orgMemberCtrl.commit(session);
 			res.json();
 
-			// Log action
-			auditCtrl.logAndNotify(
-				req.org._id,
-				req.user,
-				"org.member",
-				"delete",
-				t("Removed users from organization team"),
-				{
-					userIds,
-				},
-				{ orgId: req.org._id }
-			);
+			users.forEach((removedUser) => {
+				// Log action
+				auditCtrl.logAndNotify(
+					req.org._id,
+					req.user,
+					"org.member",
+					"delete",
+					t("Removed user from organization team"),
+					{
+						_id: removedUser._id,
+						iid: removedUser.iid,
+						color: removedUser.color,
+						contactEmail: removedUser.contactEmail,
+						name: removedUser.name,
+						pictureUrl: removedUser.pictureUrl,
+						loginEmail: removedUser.loginProfiles[0].email,
+					},
+					{ orgId: req.org._id }
+				);
+			});
 
 			if (apps.length > 0) {
 				// Get all updated applications
@@ -1597,12 +1610,12 @@ router.post(
 							contactEmail: req.user.contactEmail,
 							loginEmail: req.user.loginProfiles[0].email,
 						},
-						action: "update",
+						action: "delete",
 						object: "org.app.team",
 						description: t("Removed user(s) from app team"),
 						timestamp: Date.now(),
 						data: entry,
-						identifiers: { orgId: org._id, appId: entry._id },
+						identifiers: { orgId: req.org._id, appId: entry._id },
 					});
 				});
 			}
@@ -1757,7 +1770,7 @@ router.delete(
 							contactEmail: req.user.contactEmail,
 							loginEmail: req.user.loginProfiles[0].email,
 						},
-						action: "update",
+						action: "delete",
 						object: "org.app.team",
 						description: t(
 							"User '%s' (%s) has left the app team",
@@ -1766,7 +1779,7 @@ router.delete(
 						),
 						timestamp: Date.now(),
 						data: entry,
-						identifiers: { orgId: org._id, appId: entry._id },
+						identifiers: { orgId: req.org._id, appId: entry._id },
 					});
 				});
 			}

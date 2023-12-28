@@ -2,14 +2,18 @@ import { VersionService } from '@/services';
 import {
 	APIError,
 	APIKey,
+	AddCustomDomainParams,
 	AddNPMPackageParams,
 	AddVersionVariableParams,
 	AuthMessageTemplateParams,
 	CreateAPIKeyParams,
 	CreateOAuthConfigParams,
 	CreateRateLimitParams,
+	CustomDomain,
 	DeleteAPIKeyParams,
+	DeleteCustomDomainParams,
 	DeleteMultipleAPIKeys,
+	DeleteMultipleCustomDomainsParams,
 	DeleteMultipleNPMPackagesParams,
 	DeleteMultipleRateLimitsParams,
 	DeleteMultipleVersionVariablesParams,
@@ -18,6 +22,7 @@ import {
 	DeleteRateLimitParams,
 	DeleteVersionVariableParams,
 	EditRateLimitParams,
+	GetCustomDomainParams,
 	Param,
 	RateLimit,
 	SaveEmailAuthParams,
@@ -45,6 +50,8 @@ interface SettingsStore {
 	editRateLimitDrawerIsOpen: boolean;
 	editAPIKeyDrawerIsOpen: boolean;
 	selectedAPIKey: APIKey;
+	versionDomains: CustomDomain[];
+	lastFetchedDomainPage: number | undefined;
 }
 
 type Actions = {
@@ -84,6 +91,10 @@ type Actions = {
 	deleteRateLimit: (params: DeleteRateLimitParams) => Promise<Version>;
 	orderEndpointRateLimits: (limits: string[]) => void;
 	orderRealtimeRateLimits: (limits: string[]) => void;
+	getCustomDomainsOfVersion: (params: GetCustomDomainParams) => Promise<CustomDomain[]>;
+	addCustomDomain: (params: AddCustomDomainParams) => Promise<CustomDomain>;
+	deleteCustomDomain: (params: DeleteCustomDomainParams) => Promise<void>;
+	deleteMultipleCustomDomains: (params: DeleteMultipleCustomDomainsParams) => Promise<void>;
 	reset: () => void;
 };
 
@@ -94,6 +105,8 @@ const initialState: SettingsStore = {
 	editRateLimitDrawerIsOpen: false,
 	editAPIKeyDrawerIsOpen: false,
 	selectedAPIKey: {} as APIKey,
+	versionDomains: [],
+	lastFetchedDomainPage: undefined,
 };
 
 const useSettingsStore = create<SettingsStore & Actions>()(
@@ -576,6 +589,54 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				},
 			}));
 		},
+		getCustomDomainsOfVersion: async (params) => {
+			try {
+				const domains = await VersionService.getCustomDomainsOfAppVersion(params);
+				if (params.page === 0) {
+					set({ versionDomains: domains, lastFetchedDomainPage: params.page });
+				} else {
+					set((prev) => ({
+						versionDomains: [...prev.versionDomains, ...domains],
+						lastFetchedDomainPage: params.page,
+					}));
+				}
+				return domains;
+			} catch (error) {
+				throw error as APIError;
+			}
+		},
+		addCustomDomain: async (params) => {
+			try {
+				const domain = await VersionService.addCustomDomain(params);
+				set((prev) => ({ versionDomains: [...prev.versionDomains, domain] }));
+				return domain;
+			} catch (error) {
+				throw error as APIError;
+			}
+		},
+		deleteCustomDomain: async (params) => {
+			try {
+				await VersionService.deleteCustomDomain(params);
+				set((prev) => ({
+					versionDomains: prev.versionDomains.filter((domain) => domain._id !== params.domainId),
+				}));
+			} catch (error) {
+				throw error as APIError;
+			}
+		},
+		deleteMultipleCustomDomains: async (params) => {
+			try {
+				await VersionService.deleteMultipleCustomDomains(params);
+				set((prev) => ({
+					versionDomains: prev.versionDomains.filter(
+						(domain) => !params.domainIds.includes(domain._id),
+					),
+				}));
+			} catch (error) {
+				throw error as APIError;
+			}
+		},
+
 		reset: () => set(initialState),
 	})),
 );

@@ -64,7 +64,7 @@ export class PostgresDBManager extends SQLBaseManager {
 
         // In the case of postgres, we need to create a new connection with the new database name,
         // so we need to set true as the 4th parameter of getConn
-        this.conn = await connManager.getConn(this.getDbId(), this.getDbType(), config, true);
+        this.conn = await connManager.getConn(`${this.getDbId()}_${config.database}`, this.getDbType(), config);
     }
 
     /**

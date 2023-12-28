@@ -11,12 +11,12 @@ import { useMutation } from '@tanstack/react-query';
 import { useToast } from '@/hooks';
 export default function ClusterSmtpForm() {
 	const { t } = useTranslation();
-	const { updateSmtpSettings, clusterInfo } = useClusterStore();
+	const { updateSmtpSettings, cluster } = useClusterStore();
 	const { notify } = useToast();
 	const form = useForm<z.infer<typeof SMTPSchema>>({
 		resolver: zodResolver(SMTPSchema),
 		defaultValues: {
-			...clusterInfo?.smtp,
+			...cluster?.smtp,
 		},
 	});
 	const { mutateAsync: updateSmtp, isPending } = useMutation({

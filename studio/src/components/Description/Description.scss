@@ -1,9 +1,9 @@
 .description {
 	@apply space-y-2;
 	&-title {
-		@apply text-default text-xl	leading-8 font-semibold;
+		@apply text-default text-xl	leading-8 font-semibold font-sfCompact;
 	}
 	&-content {
-		@apply text-sm text-subtle font-normal leading-6;
+		@apply text-sm text-subtle font-normal leading-6 font-sfCompact;
 	}
 }

@@ -1,5 +1,6 @@
 import { axios } from '@/helpers';
 import {
+	AddCustomDomainParams,
 	AddNPMPackageParams,
 	AddVersionVariableParams,
 	AuthMessageTemplateParams,
@@ -8,9 +9,12 @@ import {
 	CreateCopyOfVersionParams,
 	CreateOAuthConfigParams,
 	CreateRateLimitParams,
+	CustomDomain,
 	Dashboard,
 	DeleteAPIKeyParams,
+	DeleteCustomDomainParams,
 	DeleteMultipleAPIKeys,
+	DeleteMultipleCustomDomainsParams,
 	DeleteMultipleNPMPackagesParams,
 	DeleteMultipleRateLimitsParams,
 	DeleteMultipleVersionVariablesParams,
@@ -23,6 +27,7 @@ import {
 	EditRateLimitParams,
 	EnvLog,
 	Environment,
+	GetCustomDomainParams,
 	GetVersionByIdParams,
 	GetVersionLogBucketsParams,
 	GetVersionLogsParams,
@@ -494,5 +499,57 @@ export default class VersionService {
 		versionId,
 	}: BaseParams): Promise<Record<string, string>> {
 		return (await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/typings`)).data;
+	}
+
+	static async getCustomDomainsOfAppVersion({
+		orgId,
+		appId,
+		versionId,
+		...params
+	}: GetCustomDomainParams): Promise<CustomDomain[]> {
+		return (
+			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/domain`, {
+				params,
+			})
+		).data;
+	}
+	static async addCustomDomain({
+		orgId,
+		appId,
+		versionId,
+		...params
+	}: AddCustomDomainParams): Promise<CustomDomain> {
+		return (
+			await axios.post(`${this.url}/${orgId}/app/${appId}/version/${versionId}/domain`, params)
+		).data;
+	}
+
+	static async deleteCustomDomain({
+		orgId,
+		appId,
+		versionId,
+		domainId,
+	}: DeleteCustomDomainParams): Promise<void> {
+		return (
+			await axios.delete(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/domain/${domainId}`,
+			)
+		).data;
+	}
+
+	static async deleteMultipleCustomDomains({
+		orgId,
+		appId,
+		versionId,
+		...data
+	}: DeleteMultipleCustomDomainsParams): Promise<void> {
+		return (
+			await axios.delete(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/domain/delete-multi`,
+				{
+					data,
+				},
+			)
+		).data;
 	}
 }

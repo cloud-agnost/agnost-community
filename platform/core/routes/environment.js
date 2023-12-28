@@ -421,16 +421,30 @@ router.post(
 			);
 
 			if (type === "db") {
-				// Update environment log data
-				await envLogCtrl.updateOneById(
-					log._id,
-					{
-						dbStatus: status,
-						dbLogs: logs,
-						updatedAt: timestamp,
-					},
-					{}
-				);
+				if (status === "Error") {
+					// Update environment log data
+					await envLogCtrl.updateOneById(
+						log._id,
+						{
+							dbStatus: status,
+							serverStatus: status,
+							dbLogs: logs,
+							updatedAt: timestamp,
+						},
+						{}
+					);
+				} else {
+					// Update environment log data
+					await envLogCtrl.updateOneById(
+						log._id,
+						{
+							dbStatus: status,
+							dbLogs: logs,
+							updatedAt: timestamp,
+						},
+						{}
+					);
+				}
 			} else if (type === "server") {
 				let dataIncSet = {};
 				if (status === "OK") {

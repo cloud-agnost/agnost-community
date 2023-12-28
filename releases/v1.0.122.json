@@ -1,14 +1,14 @@
 {
-   "release": "v1.0.130",
+   "release": "v1.0.122",
    "modules": {
-      "engine-core": "v1.0.43",
+      "engine-core": "v1.0.42",
       "engine-monitor": "v1.0.11",
       "engine-realtime": "v1.0.5",
       "engine-scheduler": "v1.0.7",
-      "engine-worker": "v1.0.45",
-      "platform-core": "1.0.64",
+      "engine-worker": "v1.0.43",
+      "platform-core": "1.0.58",
       "platform-sync": "v1.0.6",
       "platform-worker": "v1.0.7",
-      "studio": "v1.0.55"
+      "studio": "v1.0.54"
    }
 }

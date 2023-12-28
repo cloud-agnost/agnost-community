@@ -12,12 +12,11 @@ class ConnectionManager {
         this.connections = new Map();
     }
 
-    async getConn(id, type, connSettings, forceNew = false) {
+    async getConn(id, type, connSettings) {
         let conn = this.getConnection(id);
 
-        if (conn && !forceNew) {
-            return conn;
-        } else return await this.setUpConnection(id, type, connSettings, false);
+        if (conn) return conn;
+        else return await this.setUpConnection(id, type, connSettings);
     }
 
     getConnection(id) {
@@ -26,6 +25,19 @@ class ConnectionManager {
 
     addConnection(id, conn) {
         this.connections.set(id, conn);
+    }
+
+    async removeAllConnections() {
+        for (const conn of this.connections.values()) {
+            try {
+                await conn.end();
+            } catch (err) {}
+            try {
+                await conn.close();
+            } catch (err) {}
+        }
+
+        this.connections.clear();
     }
 
     async removeConnection(id, type) {
@@ -46,6 +58,12 @@ class ConnectionManager {
                         await conn.close();
                         break;
                     default:
+                        try {
+                            await conn.end();
+                        } catch (err) {}
+                        try {
+                            await conn.close();
+                        } catch (err) {}
                         break;
                 }
             } catch (err) {}
