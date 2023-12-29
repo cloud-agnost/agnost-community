@@ -481,7 +481,7 @@ function getTypedValue(value) {
 }
 
 function getSyncUrl() {
-	return `http://platform-sync-clusterip-service.$ process.env.NAMESPACE}.svc.cluster.local:4000`;
+	return `http://platform-sync-clusterip-service.${process.env.NAMESPACE}.svc.cluster.local:4000`;
 }
 
 function getRealtimeUrl() {
