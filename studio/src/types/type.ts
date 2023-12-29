@@ -419,3 +419,9 @@ declare module '@tanstack/react-query' {
 		defaultError: APIError;
 	}
 }
+
+export interface TransferRequest {
+	appId?: string;
+	orgId?: string;
+	userId: string;
+}

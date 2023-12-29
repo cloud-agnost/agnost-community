@@ -11,7 +11,7 @@ import {
 	InvitationRequest,
 	RemoveMemberRequest,
 	SetAppAvatarRequest,
-	TransferAppOwnershipRequest,
+	TransferRequest,
 	UpdateAppMemberRoleRequest,
 	UpdateAppParams,
 	UpdateRoleRequest,
@@ -45,11 +45,14 @@ export default class ApplicationService {
 	static async removeAppAvatar(req: UpdateAppParams): Promise<Application> {
 		return (await axios.delete(`${this.getUrl(req.orgId, req.appId)}/picture`)).data;
 	}
-	static async transferAppOwnership(req: TransferAppOwnershipRequest): Promise<Application> {
+	static async transferAppOwnership(req: TransferRequest): Promise<Application> {
 		return (
-			await axios.post(`${this.getUrl(req.orgId, req.appId)}/transfer/${req.userId}`, {
-				userId: req.userId,
-			})
+			await axios.post(
+				`${this.getUrl(req?.orgId as string, req.appId as string)}/transfer/${req.userId}`,
+				{
+					userId: req.userId,
+				},
+			)
 		).data;
 	}
 

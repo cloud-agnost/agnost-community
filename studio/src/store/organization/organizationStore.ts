@@ -1,6 +1,7 @@
 import OrganizationService from '@/services/OrganizationService';
 import {
 	APIError,
+	BaseRequest,
 	ChangeOrganizationAvatarRequest,
 	ChangeOrganizationNameRequest,
 	CreateOrganizationRequest,
@@ -14,10 +15,9 @@ import {
 	Organization,
 	OrganizationMember,
 	RemoveMemberFromOrganizationRequest,
-	TransferOrganizationRequest,
+	TransferRequest,
 	UpdateRoleRequest,
 } from '@/types';
-import { BaseRequest } from '@/types/type';
 import { joinChannel, leaveChannel, resetAfterOrgChange } from '@/utils';
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
@@ -39,7 +39,7 @@ type Actions = {
 	changeOrganizationName: (req: ChangeOrganizationNameRequest) => Promise<Organization>;
 	changeOrganizationAvatar: (req: ChangeOrganizationAvatarRequest) => Promise<Organization>;
 	removeOrganizationAvatar: (req: BaseRequest) => Promise<Organization>;
-	transferOrganization: (req: TransferOrganizationRequest) => Promise<Organization>;
+	transferOrganization: (req: TransferRequest) => Promise<Organization>;
 	deleteOrganization: (req: BaseRequest) => Promise<void>;
 	inviteUsersToOrganization: (req: InviteOrgRequest) => Promise<void>;
 	deleteInvitation: (req: InvitationRequest) => Promise<void>;
@@ -212,10 +212,10 @@ const useOrganizationStore = create<OrganizationStore & Actions>()(
 					throw error as APIError;
 				}
 			},
-			transferOrganization: async (req: TransferOrganizationRequest) => {
+			transferOrganization: async (req: TransferRequest) => {
 				try {
 					const res = await OrganizationService.transferOrganization(
-						req.organizationId,
+						req.orgId as string,
 						req.userId,
 					);
 					set({
@@ -224,10 +224,8 @@ const useOrganizationStore = create<OrganizationStore & Actions>()(
 						),
 						organization: {} as Organization,
 					});
-					if (req.onSuccess) req.onSuccess();
 					return res;
 				} catch (error) {
-					if (req.onError) req.onError(error as APIError);
 					throw error as APIError;
 				}
 			},

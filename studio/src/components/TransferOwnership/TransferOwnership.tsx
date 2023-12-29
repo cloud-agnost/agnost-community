@@ -1,73 +1,88 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
+import { useToast } from '@/hooks';
 import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
-import useAuthStore from '@/store/auth/authStore';
+import useApplicationStore from '@/store/app/applicationStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
-import { APIError, FormatOptionLabelProps } from '@/types';
-import { useMemo } from 'react';
+import { TransferRequest } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import Select from 'react-select';
-
+import { useParams } from 'react-router-dom';
+import { z } from 'zod';
+import { Avatar, AvatarFallback, AvatarImage } from '../Avatar';
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from '../Form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../Select';
+import useAuthStore from '@/store/auth/authStore';
+import { useMemo } from 'react';
 interface TransferOwnershipProps {
-	transferOwnership: () => void;
-	error: APIError;
-	loading: boolean;
-	userId: string;
-	setUserId: (userId: string) => void;
+	disabled: boolean;
+	transferFn: (data: TransferRequest) => Promise<any>;
+	type: 'org' | 'app' | 'cluster';
 }
 
-const formatOptionLabel = ({ label, value }: FormatOptionLabelProps) => {
-	const name = label?.split(' ');
-	return (
-		<div className='flex items-center gap-2'>
-			{value.member.pictureUrl ? (
-				<img
-					src={value.member.pictureUrl}
-					alt={label}
-					className='rounded-full object-contain w-6 h-6'
-				/>
-			) : (
-				name && (
-					<div
-						className='relative inline-flex items-center justify-center cursor-pointer overflow-hidden w-6 h-6 rounded-full'
-						style={{
-							backgroundColor: value.member.color,
-						}}
-					>
-						<span className='text-default text-xs'>
-							{name[0]?.charAt(0).toUpperCase()}
-							{name[1]?.charAt(0).toUpperCase()}
-						</span>
-					</div>
-				)
-			)}
-			<div className='flex flex-col'>
-				<span className='ml-2 text-default text-xs'>{label}</span>
-				<span className='ml-2 text-[10px] text-subtle'>{value.member.contactEmail}</span>
-			</div>
-		</div>
-	);
-};
+const TransferOwnershipSchema = z.object({
+	userId: z.string().nonempty(),
+});
 
-export default function TransferOwnership({
-	transferOwnership,
-	error,
-	loading,
-	setUserId,
-	userId,
-}: TransferOwnershipProps) {
-	const canUpdate = useAuthorizeOrg('update');
+export default function TransferOwnership({ transferFn, type, disabled }: TransferOwnershipProps) {
+	const user = useAuthStore((state) => state.user);
 	const { t } = useTranslation();
 	const { members } = useOrganizationStore();
-	const { user } = useAuthStore();
-	const teamOptions = useMemo(() => {
-		return members
-			.filter((member) => member.member._id !== user?._id)
-			.map((member) => ({
-				label: member.member.name,
-				value: member,
-			}));
-	}, [members]);
+	const { applicationTeam } = useApplicationStore();
+	const team = type === 'app' ? applicationTeam : members;
+	const { notify } = useToast();
+	const { orgId, appId } = useParams() as Record<string, string>;
+	const form = useForm<z.infer<typeof TransferOwnershipSchema>>({
+		mode: 'onChange',
+		resolver: zodResolver(TransferOwnershipSchema),
+	});
+
+	const {
+		mutateAsync,
+		isLoading: loading,
+		error,
+	} = useMutation({
+		mutationFn: transferFn,
+		onSuccess: () => {
+			form.reset();
+			notify({
+				title: t('general.success'),
+				description: t('organization.transfer-success'),
+				type: 'success',
+			});
+		},
+		onError: (err) => {
+			notify({
+				title: err.error,
+				description: err.details,
+				type: 'error',
+			});
+		},
+	});
+
+	const onSubmit = async (data: z.infer<typeof TransferOwnershipSchema>) => {
+		console.log(data);
+		mutateAsync({
+			...data,
+			...(type === 'org' && { orgId: orgId }),
+			...(type === 'app' && { appId: appId }),
+		});
+	};
+	const selectedMember = useMemo(
+		() => team.find(({ member }) => member._id === form.watch('userId'))?.member,
+		[form.watch('userId')],
+	);
+	console.log(selectedMember);
 	return (
 		<div className='space-y-4'>
 			{error && (
@@ -76,29 +91,70 @@ export default function TransferOwnership({
 					<AlertDescription>{error?.details}</AlertDescription>
 				</Alert>
 			)}
-			<Select
-				formatOptionLabel={formatOptionLabel}
-				isLoading={loading}
-				isClearable
-				isSearchable
-				name='color'
-				options={teamOptions}
-				className='select-container mt-4'
-				classNamePrefix='select'
-				placeholder={t('application.edit.transfer.placeholder')}
-				onChange={(option) => {
-					setUserId(option?.value.member._id as string);
-				}}
-			/>
-			<Button
-				size='lg'
-				className='text-end'
-				onClick={transferOwnership}
-				loading={loading}
-				disabled={!canUpdate || !userId}
-			>
-				{t('organization.transfer')}
-			</Button>
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4 mt-4'>
+					<FormField
+						control={form.control}
+						name='userId'
+						render={({ field }) => (
+							<FormItem className='space-y-1'>
+								<FormControl>
+									<Select defaultValue={field.value} onValueChange={field.onChange}>
+										<FormControl>
+											<SelectTrigger error={error} className='w-full !h-11 [&>span]:!max-w-full'>
+												<SelectValue
+													placeholder={`${t('general.select')} ${t('general.member.title')}`}
+												/>
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent align='center'>
+											{team
+												.filter(({ member }) => member._id !== user?._id)
+												.map(({ member }) => (
+													<SelectItem key={member._id} value={member._id}>
+														<div className='flex items-center gap-2'>
+															<Avatar size='sm'>
+																<AvatarImage src={member.pictureUrl} />
+																<AvatarFallback
+																	isUserAvatar
+																	color={member?.color}
+																	name={member?.name}
+																/>
+															</Avatar>
+															<div className='flex-1'>
+																<p className='block text-default text-sm leading-6'>
+																	{member.name}
+																</p>
+																<p className='text-[11px] text-subtle leading-[21px]'>
+																	{member.loginEmail}
+																</p>
+															</div>
+														</div>
+													</SelectItem>
+												))}
+											{!members.length && (
+												<SelectItem value='empty' disabled>
+													{t('general.no_member_found')}
+												</SelectItem>
+											)}
+										</SelectContent>
+									</Select>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<Button
+						size='lg'
+						className='text-end'
+						type='submit'
+						loading={loading}
+						disabled={disabled || !form.formState.isValid}
+					>
+						{t('organization.transfer')}
+					</Button>
+				</form>
+			</Form>
 		</div>
 	);
 }

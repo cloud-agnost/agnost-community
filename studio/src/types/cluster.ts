@@ -39,9 +39,6 @@ export interface UpdateClusterComponentParams extends BaseRequest {
 	maxReplicas: number;
 }
 
-export interface TransferClusterOwnershipParams extends BaseRequest {
-	userId: string;
-}
 export interface ClusterSetupResponse {
 	org: Organization;
 	app: Application;
