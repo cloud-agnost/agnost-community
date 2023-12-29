@@ -1,8 +1,8 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { useToast } from '@/hooks';
-import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 import useApplicationStore from '@/store/app/applicationStore';
+import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { TransferRequest } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,18 +12,8 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Avatar, AvatarFallback, AvatarImage } from '../Avatar';
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from '../Form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '../Form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../Select';
-import useAuthStore from '@/store/auth/authStore';
-import { useMemo } from 'react';
 interface TransferOwnershipProps {
 	disabled: boolean;
 	transferFn: (data: TransferRequest) => Promise<any>;
@@ -39,7 +29,10 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 	const { t } = useTranslation();
 	const { members } = useOrganizationStore();
 	const { applicationTeam } = useApplicationStore();
-	const team = type === 'app' ? applicationTeam : members;
+	const team =
+		type === 'app'
+			? applicationTeam.filter(({ member }) => member._id !== user?._id)
+			: members.filter(({ member }) => member._id !== user?._id);
 	const { notify } = useToast();
 	const { orgId, appId } = useParams() as Record<string, string>;
 	const form = useForm<z.infer<typeof TransferOwnershipSchema>>({
@@ -78,11 +71,7 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 			...(type === 'app' && { appId: appId }),
 		});
 	};
-	const selectedMember = useMemo(
-		() => team.find(({ member }) => member._id === form.watch('userId'))?.member,
-		[form.watch('userId')],
-	);
-	console.log(selectedMember);
+
 	return (
 		<div className='space-y-4'>
 			{error && (
@@ -108,31 +97,27 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 											</SelectTrigger>
 										</FormControl>
 										<SelectContent align='center'>
-											{team
-												.filter(({ member }) => member._id !== user?._id)
-												.map(({ member }) => (
-													<SelectItem key={member._id} value={member._id}>
-														<div className='flex items-center gap-2'>
-															<Avatar size='sm'>
-																<AvatarImage src={member.pictureUrl} />
-																<AvatarFallback
-																	isUserAvatar
-																	color={member?.color}
-																	name={member?.name}
-																/>
-															</Avatar>
-															<div className='flex-1'>
-																<p className='block text-default text-sm leading-6'>
-																	{member.name}
-																</p>
-																<p className='text-[11px] text-subtle leading-[21px]'>
-																	{member.loginEmail}
-																</p>
-															</div>
+											{team.map(({ member }) => (
+												<SelectItem key={member._id} value={member._id}>
+													<div className='flex items-center gap-2'>
+														<Avatar size='sm'>
+															<AvatarImage src={member.pictureUrl} />
+															<AvatarFallback
+																isUserAvatar
+																color={member?.color}
+																name={member?.name}
+															/>
+														</Avatar>
+														<div className='flex-1'>
+															<p className='block text-default text-sm leading-6'>{member.name}</p>
+															<p className='text-[11px] text-subtle leading-[21px]'>
+																{member.loginEmail}
+															</p>
 														</div>
-													</SelectItem>
-												))}
-											{!members.length && (
+													</div>
+												</SelectItem>
+											))}
+											{!team.length && (
 												<SelectItem value='empty' disabled>
 													{t('general.no_member_found')}
 												</SelectItem>
