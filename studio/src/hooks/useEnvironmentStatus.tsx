@@ -16,11 +16,11 @@ export default function useEnvironmentStatus() {
 
 			const checksAndValues = [
 				{ check: environment.suspended, value: EnvironmentStatus.Suspended },
+				{ check: hasStatus(['Error']) || hasErrorResources(), value: EnvironmentStatus.Error },
 				{
 					check: hasStatus([EnvironmentStatus.Deploying, EnvironmentStatus.Redeploying]),
 					value: EnvironmentStatus.Deploying,
 				},
-				{ check: hasStatus(['Error']) || hasErrorResources(), value: EnvironmentStatus.Error },
 				{ check: hasIdleResources(), value: EnvironmentStatus.Idle },
 			];
 

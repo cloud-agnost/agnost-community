@@ -28,13 +28,10 @@ with open(values_yaml, 'w') as outfile:
 
 ## Update Chart.yaml with a new version
 chart_data = yaml.load(open(chart_yaml).read())
-version = [int(n) for n in chart_data['version'].split('.')]
-version[2] += 1
-new_version = [str(n) for n in version]
-release_number = os.environ['RELEASE_NUMBER']
+command = 'semver next ' + os.environ['RELEASE_TYPE'] + ' ' + chart_data['version']
+chart_data['version']  = os.popen(command).read().strip()
 
-chart_data['version'] = '.'.join(new_version)
-chart_data['appVersion'] = release_number
+chart_data['appVersion'] = os.environ['RELEASE_NUMBER']
 
 with open(chart_yaml, 'w') as outfile:
     yaml.dump(chart_data, outfile)

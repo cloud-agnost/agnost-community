@@ -243,7 +243,7 @@ function getCertSecretName(length = 12) {
 }
 
 function getSyncUrl() {
-    return `http://platform-sync-clusterip-service.$ process.env.NAMESPACE}.svc.cluster.local:4000`;
+    return `http://platform-sync-clusterip-service.${process.env.NAMESPACE}.svc.cluster.local:4000`;
 }
 
 function getPlatformUrl() {

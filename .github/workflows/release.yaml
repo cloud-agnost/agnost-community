@@ -3,58 +3,108 @@ name: Create New Agnost Release
 on:
   workflow_dispatch:
     inputs:
-      release-number:
-        description: 'Release Number'
+      release-type:
+        description: 'Release Type'
         required: true
-        type: string
+        type: choice
+        default: 'patch'
+        options:
+          - 'patch'
+          - 'minor'
+          - 'major'
       engine-core:
-        description: 'Engine Core Release Version'
+        description: 'Engine Core Release'
         required: false
-        default: "not-changed"
-        type: string
+        default: 'no-change'
+        type: choice
+        options:
+          - 'no-change'
+          - 'patch'
+          - 'minor'
+          - 'major'
       engine-monitor:
-        description: 'Engine Monitor Release Version'
+        description: 'Engine Monitor Release'
         required: false
-        default: "not-changed"
-        type: string
+        default: 'no-change'
+        type: choice
+        options:
+          - 'no-change'
+          - 'patch'
+          - 'minor'
+          - 'major'
       engine-realtime:
-        description: 'Engine Realtime Release Version'
+        description: 'Engine Realtime Release'
         required: false
-        default: "not-changed"
-        type: string
+        default: 'no-change'
+        type: choice
+        options:
+          - 'no-change'
+          - 'patch'
+          - 'minor'
+          - 'major'
       engine-scheduler:
-        description: 'Engine Scheduler Release Version'
+        description: 'Engine Scheduler Release'
         required: false
-        default: "not-changed"
-        type: string
+        default: 'no-change'
+        type: choice
+        options:
+          - 'no-change'
+          - 'patch'
+          - 'minor'
+          - 'major'
       engine-worker:
-        description: 'Engine Worker Release Version'
+        description: 'Engine Worker Release'
         required: false
-        default: "not-changed"
-        type: string
+        default: 'no-change'
+        type: choice
+        options:
+          - 'no-change'
+          - 'patch'
+          - 'minor'
+          - 'major'
       platform-core:
-        description: 'Platform Core Release Version'
+        description: 'Platform Core Release'
         required: false
-        default: "not-changed"
-        type: string
+        default: 'no-change'
+        type: choice
+        options:
+          - 'no-change'
+          - 'patch'
+          - 'minor'
+          - 'major'
       platform-sync:
-        description: 'Platform Sync Release Version'
+        description: 'Platform Sync Release'
         required: false
-        default: "not-changed"
-        type: string
+        default: 'no-change'
+        type: choice
+        options:
+          - 'no-change'
+          - 'patch'
+          - 'minor'
+          - 'major'
       platform-worker:
-        description: 'Platform Worker Release Version'
+        description: 'Platform Worker Release'
         required: false
-        default: "not-changed"
-        type: string
+        default: 'no-change'
+        type: choice
+        options:
+          - 'no-change'
+          - 'patch'
+          - 'minor'
+          - 'major'
       studio:
-        description: 'Studio Release Version'
+        description: 'Studio Release'
         required: false
-        default: "not-changed"
-        type: string
+        default: 'no-change'
+        type: choice
+        options:
+          - 'no-change'
+          - 'patch'
+          - 'minor'
+          - 'major'
 
 env:
-  RELEASE_NUMBER: '${{ github.event.inputs.release-number }}'
+  RELEASE_TYPE: '${{ github.event.inputs.release-type }}'
   ENGINE_CORE: '${{ github.event.inputs.engine-core }}'
   ENGINE_MONITOR: '${{ github.event.inputs.engine-monitor }}'
   ENGINE_REALTIME: '${{ github.event.inputs.engine-realtime }}'
@@ -73,6 +123,7 @@ jobs:
     outputs:
       applications: ${{ steps.get-applications.outputs.APPLICATIONS }}
       details: ${{ steps.get-details.outputs.DETAILS }}
+      release_number: ${{ steps.get-release-number.outputs.RELEASE_NUMBER }}
     steps:
       -
         name: Checkout
@@ -83,17 +134,27 @@ jobs:
         with:
           python-version: "3.10"
       -
+        name: Install semver
+        run: |
+          wget https://github.com/ffurrer2/semver/releases/download/v2.2.0/semver_2.2.0_linux_amd64.tar.gz
+          tar zxvf semver_2.2.0_linux_amd64.tar.gz
+          cp semver /usr/local/bin
+      -
         name: get-info
         run: |
-          read -r APPLICATIONS DETAILS <<< $(python .github/scripts/get_released_apps.py)
+          read -r APPLICATIONS DETAILS RELEASE_NUMBER <<< $(python .github/scripts/get_released_apps.py)
           echo APPLICATIONS=$APPLICATIONS >> $GITHUB_ENV
           echo DETAILS=$DETAILS >> $GITHUB_ENV
+          echo RELEASE_NUMBER=$RELEASE_NUMBER >> $GITHUB_ENV
       -
         id: get-applications
         run: echo "APPLICATIONS=${{ env.APPLICATIONS }}" >> $GITHUB_OUTPUT
       -
         id: get-details
         run: echo "DETAILS=${{ env.DETAILS }}" >> $GITHUB_OUTPUT
+      -
+        id: get-release-number
+        run: echo "RELEASE_NUMBER=${{ env.RELEASE_NUMBER }}" >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
@@ -115,7 +176,7 @@ jobs:
       -
         name: 'Authenticate to GCP'
         id: 'auth'
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v2
         with:
           token_format: 'access_token'
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
@@ -157,6 +218,8 @@ jobs:
         run: python -m pip install ruamel.yaml
       -
         name: Update release info
+        env:
+          RELEASE_NUMBER: ${{ needs.get_released_apps.outputs.release_number }}
         run: |
           python .github/scripts/update_package_json.py '${{ needs.get_released_apps.outputs.details }}'
           python .github/scripts/create_release_manifest.py '${{ needs.get_released_apps.outputs.details }}'
@@ -175,6 +238,8 @@ jobs:
   update-helm-chart:
     runs-on: ubuntu-latest
     needs: [get_released_apps, build]
+    env:
+      RELEASE_NUMBER: ${{ needs.get_released_apps.outputs.release_number }}
     steps:
       -
         name: Checkout
@@ -195,6 +260,12 @@ jobs:
         name: Install yaml library
         run: python -m pip install ruamel.yaml
       -
+        name: Install semver
+        run: |
+          wget https://github.com/ffurrer2/semver/releases/download/v2.2.0/semver_2.2.0_linux_amd64.tar.gz
+          tar zxvf semver_2.2.0_linux_amd64.tar.gz
+          cp semver /usr/local/bin
+      -
         name: Update Helm Chart
         run: |
           cd charts
@@ -211,7 +282,9 @@ jobs:
 
   github-release:
     runs-on: ubuntu-latest
-    needs: [update-helm-chart, update-release-info]
+    needs: [get_released_apps, update-helm-chart, update-release-info]
+    env:
+      RELEASE_NUMBER: ${{ needs.get_released_apps.outputs.release_number }}
     steps:
       -
         name: Checkout
