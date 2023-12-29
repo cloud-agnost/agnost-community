@@ -22,7 +22,7 @@ import {
 	orgAuthorization,
 } from "../middlewares/authorizeOrgAction.js";
 import { validate } from "../middlewares/validate.js";
-import { handleFile } from "../middlewares/handleFile.js";
+import { fileUploadMiddleware } from "../middlewares/handleFile.js";
 import { sendMessage } from "../init/queue.js";
 import { sendMessage as sendNotification } from "../init/sync.js";
 import { storage } from "../init/storage.js";
@@ -326,7 +326,7 @@ router.get("/:orgId", authSession, validateOrg, async (req, res) => {
 */
 router.put(
 	"/:orgId/picture",
-	handleFile.single("picture"),
+	fileUploadMiddleware,
 	authSession,
 	validateOrg,
 	authorizeOrgAction("org.update"),

@@ -20,7 +20,7 @@ import { applyRules } from "../schemas/app.js";
 import { validate } from "../middlewares/validate.js";
 import { handleError } from "../schemas/platformError.js";
 import { setKey } from "../init/cache.js";
-import { handleFile } from "../middlewares/handleFile.js";
+import { fileUploadMiddleware } from "../middlewares/handleFile.js";
 import { storage } from "../init/storage.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
@@ -253,7 +253,7 @@ router.put(
 */
 router.put(
 	"/:appId/picture",
-	handleFile.single("picture"),
+	fileUploadMiddleware,
 	authSession,
 	validateOrg,
 	validateApp,

@@ -31,5 +31,7 @@ const ERROR_CODES = {
 	invalidUserDataModel: "invalid_user_data_model",
 	invalidTimeRange: "invalid_time_range",
 	invalidBucketSize: "invalid_bucket_size",
+	fileSizeTooLarge: "file_size_too_large",
+	fileUploadError: "file_upload_error",
 };
 export default ERROR_CODES;

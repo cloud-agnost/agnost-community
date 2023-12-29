@@ -12,7 +12,7 @@ import { applyRules } from "../schemas/user.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
 import { validate } from "../middlewares/validate.js";
-import { handleFile } from "../middlewares/handleFile.js";
+import { fileUploadMiddleware } from "../middlewares/handleFile.js";
 import { sendMessage } from "../init/queue.js";
 import { storage } from "../init/storage.js";
 import { handleError } from "../schemas/platformError.js";
@@ -344,7 +344,7 @@ router.put(
 */
 router.put(
 	"/picture",
-	handleFile.single("picture"),
+	fileUploadMiddleware,
 	authSession,
 	applyRules("upload-picture"),
 	validate,
