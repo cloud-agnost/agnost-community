@@ -174,44 +174,6 @@ router.delete("/", authSession, async (req, res) => {
 				});
 			});
 		}
-
-		if (apps.length > 0) {
-			// Get all updated applications
-			const appIds = apps.map((entry) => entry._id);
-			const appsWithMembers = await appCtrl.getManyByQuery(
-				{ _id: { $in: appIds } },
-				{
-					lookup: {
-						path: "team.userId",
-						select: "-loginProfiles -notifications",
-					},
-				}
-			);
-
-			// Send realtime notifications for updated apps
-			appsWithMembers.forEach((entry) => {
-				sendNotification(entry._id, {
-					actor: {
-						userId: user._id,
-						name: user.name,
-						pictureUrl: user.pictureUrl,
-						color: user.color,
-						contactEmail: user.contactEmail,
-						loginEmail: user.loginProfiles[0].email,
-					},
-					action: "delete",
-					object: "org.app.team",
-					description: t(
-						"User '%s' (%s) has left the app team",
-						user.name,
-						user.contactEmail
-					),
-					timestamp: Date.now(),
-					data: entry,
-					identifiers: { orgId: entry.orgId, appId: entry._id },
-				});
-			});
-		}
 	} catch (error) {
 		console.log(error);
 		await userCtrl.rollback(session);
