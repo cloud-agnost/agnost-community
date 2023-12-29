@@ -53,7 +53,7 @@ export default function useNavigatorColumns(fields: Field[]) {
 				header: () => <SortButton text={field.name} field={field.name} />,
 				accessorKey: field.type === FieldTypes.ID ? 'id' : field.name,
 				size: field.type === FieldTypes.ID ? 50 : 200,
-				className: cn(field.type === FieldTypes.ID && 'sticky left-0 z-10'),
+				className: cn(field.type === FieldTypes.ID && 'sticky left-0 z-40'),
 				meta: {
 					type: field.type,
 				},
