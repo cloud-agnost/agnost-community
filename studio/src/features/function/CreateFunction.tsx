@@ -18,7 +18,7 @@ interface CreateTaskProps {
 export default function CreateFunction({ open, onClose }: CreateTaskProps) {
 	const { t } = useTranslation();
 	const { createFunction } = useFunctionStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const navigate = useTabNavigate();
 	const form = useForm<z.infer<typeof CreateFunctionSchema>>({
 		resolver: zodResolver(CreateFunctionSchema),
@@ -42,10 +42,9 @@ export default function CreateFunction({ open, onClose }: CreateTaskProps) {
 			handleClose();
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

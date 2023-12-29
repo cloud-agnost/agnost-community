@@ -12,7 +12,7 @@ import * as z from 'zod';
 export default function ConnectResource() {
 	const { toggleCreateResourceModal, addExistingResource } = useResourceStore();
 	const { CurrentResourceElement } = useCreateResource();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const form = useForm<z.infer<typeof ConnectResourceSchema>>({
 		resolver: zodResolver(ConnectResourceSchema),
 	});
@@ -32,12 +32,11 @@ export default function ConnectResource() {
 				setLoading(false);
 				toggleCreateResourceModal();
 			},
-			onError: ({ error, details }) => {
+			onError: ({ details }) => {
 				setLoading(false);
-				notify({
-					title: error,
-					description: details,
-					type: 'error',
+				toast({
+					title: details,
+					action: 'error',
 				});
 			},
 		});

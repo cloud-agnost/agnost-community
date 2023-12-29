@@ -10,23 +10,21 @@ import { useParams } from 'react-router-dom';
 export default function TestConnectionButton({ replica }: { replica?: boolean }) {
 	const { t } = useTranslation();
 	const form = useFormContext();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { testExistingResourceConnection, resourceConfig } = useResourceStore();
 	const { orgId } = useParams() as Record<string, string>;
 	const { mutateAsync: testMutate, isPending } = useMutation({
 		mutationFn: testExistingResourceConnection,
 		onSuccess: () => {
-			notify({
-				title: t('general.success'),
-				description: t('resources.database.test_success'),
-				type: 'success',
+			toast({
+				title: t('resources.database.test_success') as string,
+				action: 'success',
 			});
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }: APIError) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

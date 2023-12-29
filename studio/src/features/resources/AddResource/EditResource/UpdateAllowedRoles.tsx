@@ -17,7 +17,7 @@ const UpdateAllowedRolesSchema = z.object({
 
 export default function UpdateAllowedRoles() {
 	const [loading, setLoading] = useState(false);
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 	const { appRoles } = useTypeStore();
 	const { resourceToEdit, updateResourceAllowedRoles } = useResourceStore();
@@ -40,12 +40,11 @@ export default function UpdateAllowedRoles() {
 				// closeEditResourceModal();
 				// form.reset();
 			},
-			onError: ({ error, details }) => {
+			onError: ({ details }) => {
 				setLoading(false);
-				notify({
-					title: error,
-					description: details,
-					type: 'error',
+				toast({
+					title: details,
+					action: 'error',
 				});
 			},
 		});

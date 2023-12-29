@@ -30,7 +30,7 @@ export default function ApplicationCreateModal({
 	isOpen,
 	...props
 }: ApplicationCreateModalProps) {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const form = useForm<z.infer<typeof CreateApplicationSchema>>({
 		resolver: zodResolver(CreateApplicationSchema),
 	});
@@ -49,10 +49,9 @@ export default function ApplicationCreateModal({
 			handleCloseModal();
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 			handleCloseModal();
 		},

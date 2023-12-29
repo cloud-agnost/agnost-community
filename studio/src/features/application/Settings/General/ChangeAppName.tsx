@@ -14,7 +14,7 @@ export default function ChangeAppName() {
 	const { t } = useTranslation();
 	const { application, changeAppName } = useApplicationStore();
 	const canEdit = useAuthorizeApp('update');
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { orgId } = useParams() as Record<string, string>;
 	const form = useForm<z.infer<typeof ChangeNameFormSchema>>({
 		defaultValues: {
@@ -29,10 +29,9 @@ export default function ChangeAppName() {
 	} = useMutation({
 		mutationFn: changeAppName,
 		onSuccess: () => {
-			notify({
-				title: t('application.edit.name.success') as string,
-				description: t('application.edit.name.successDesc') as string,
-				type: 'success',
+			toast({
+				title: t('application.edit.name.successDesc') as string,
+				action: 'success',
 			});
 		},
 	});

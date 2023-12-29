@@ -1,11 +1,12 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { TableConfirmation } from '@/components/Table';
 import { TabLink } from '@/features/version/Tabs';
+import { toast } from '@/hooks/useToast';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import { APIError, ColumnDefWithClassName, MessageQueue, TabTypes } from '@/types';
-import { getVersionPermission, notify, translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
@@ -22,10 +23,9 @@ async function deleteHandler(mq: MessageQueue) {
 		.build(queryClient, {
 			mutationFn: deleteQueue,
 			onError: (error: APIError) => {
-				notify({
-					title: error.error,
-					description: error.details,
-					type: 'error',
+				toast({
+					title: error.details,
+					action: 'error',
 				});
 			},
 			onSuccess: () => {

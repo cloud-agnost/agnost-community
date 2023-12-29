@@ -6,8 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import _ from 'lodash';
 import { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
-import { Slide, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Toaster } from './components/Toast';
 import useThemeStore from './store/theme/themeStore';
 
 const queryClient = new QueryClient();
@@ -38,19 +37,7 @@ function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<RouterProvider router={router} />
-			<ToastContainer
-				transition={Slide}
-				position='top-center'
-				autoClose={2000}
-				hideProgressBar
-				newestOnTop={false}
-				closeOnClick
-				rtl={false}
-				pauseOnFocusLoss
-				draggable
-				pauseOnHover
-				theme='dark'
-			/>
+			<Toaster />
 		</QueryClientProvider>
 	);
 }

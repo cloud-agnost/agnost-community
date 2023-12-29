@@ -4,16 +4,15 @@ import useEnvironmentStore from '@/store/environment/environmentStore';
 import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 export default function AutoRedeploy() {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { toggleAutoDeploy, environment } = useEnvironmentStore();
 	const canDeploy = useAuthorizeVersion('env.deploy');
 	const { mutateAsync: toggleAutoDeployMutate } = useMutation({
 		mutationFn: toggleAutoDeploy,
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

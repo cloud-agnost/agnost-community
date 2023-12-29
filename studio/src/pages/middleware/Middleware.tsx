@@ -14,7 +14,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams } from 'react-router-dom';
 
 export default function MainMiddleware() {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { getMiddlewaresOfAppVersion, deleteMultipleMiddlewares, lastFetchedPage, middlewares } =
 		useMiddlewareStore();
 	const table = useTable({
@@ -39,10 +39,9 @@ export default function MainMiddleware() {
 			table?.toggleAllRowsSelected(false);
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

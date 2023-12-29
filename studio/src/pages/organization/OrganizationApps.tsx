@@ -18,7 +18,7 @@ import { useParams } from 'react-router-dom';
 import BeatLoader from 'react-spinners/BeatLoader';
 export default function OrganizationApps() {
 	const [isCard, setIsCard] = useState(true);
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { orgId } = useParams() as Record<string, string>;
 	const {
 		applications,
@@ -42,11 +42,10 @@ export default function OrganizationApps() {
 				orgId,
 			}),
 		onSuccess: closeLeaveModal,
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }: APIError) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

@@ -23,7 +23,7 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 	const { updateQueue, queue } = useMessageQueueStore();
 	const environment = useEnvironmentStore((state) => state.environment);
 	const { versionId, appId, orgId } = useParams() as Record<string, string>;
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const form = useForm<z.infer<typeof MessageQueueSchema>>({
 		resolver: zodResolver(MessageQueueSchema),
 	});
@@ -34,8 +34,8 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 		onSuccess: () => {
 			onClose();
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 	function onSubmit(data: z.infer<typeof MessageQueueSchema>) {

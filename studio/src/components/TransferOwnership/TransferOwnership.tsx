@@ -33,7 +33,7 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 		type === 'app'
 			? applicationTeam.filter(({ member }) => member._id !== user?._id)
 			: members.filter(({ member }) => member._id !== user?._id);
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { orgId, appId } = useParams() as Record<string, string>;
 	const form = useForm<z.infer<typeof TransferOwnershipSchema>>({
 		mode: 'onChange',
@@ -48,17 +48,15 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 		mutationFn: transferFn,
 		onSuccess: () => {
 			form.reset();
-			notify({
-				title: t('general.success'),
-				description: t('organization.transfer-success'),
-				type: 'success',
+			toast({
+				title: t('organization.transfer-success') as string,
+				action: 'success',
 			});
 		},
 		onError: (err) => {
-			notify({
-				title: err.error,
-				description: err.details,
-				type: 'error',
+			toast({
+				title: err.details,
+				action: 'error',
 			});
 		},
 	});

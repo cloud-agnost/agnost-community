@@ -21,7 +21,7 @@ export default function EditDatabase({
 	const form = useForm<z.infer<typeof UpdateDatabaseSchema>>({
 		resolver: zodResolver(UpdateDatabaseSchema),
 	});
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { updateDatabase, database } = useDatabaseStore();
 	const { isPending, mutateAsync: updateDatabaseMutation } = useMutation({
 		mutationFn: updateDatabase,
@@ -30,10 +30,9 @@ export default function EditDatabase({
 			form.reset();
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

@@ -25,7 +25,7 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 		appId: string;
 		orgId: string;
 	}>();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const form = useForm<z.infer<typeof CreateEndpointSchema>>({
 		resolver: zodResolver(CreateEndpointSchema),
 		defaultValues: {
@@ -47,11 +47,10 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 			});
 			closeDrawer();
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }: APIError) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

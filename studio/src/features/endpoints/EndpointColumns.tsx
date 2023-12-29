@@ -6,11 +6,12 @@ import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
 import { TableConfirmation } from '@/components/Table';
 import { BADGE_COLOR_MAP, BASE_URL, HTTP_METHOD_BADGE_MAP } from '@/constants';
+import { toast } from '@/hooks/useToast';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError, ColumnDefWithClassName, Endpoint, TabTypes } from '@/types';
-import { getVersionPermission, notify, translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
 import { TabLink } from '../version/Tabs';
 
@@ -23,10 +24,9 @@ async function deleteEndpointHandler(toDeleteEndpoint: Endpoint) {
 		.build(queryClient, {
 			mutationFn: deleteEndpoint,
 			onError: (error: APIError) => {
-				notify({
-					title: error.error,
-					description: error.details,
-					type: 'error',
+				toast({
+					title: error.details,
+					action: 'error',
 				});
 			},
 		})

@@ -22,7 +22,7 @@ import { resetAfterVersionChange } from '@/utils';
 
 export default function VersionDropdown() {
 	const [open, setOpen] = useState(false);
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { version } = useVersionStore();
 	const { t } = useTranslation();
 	const [error, setError] = useState<null | APIError>(null);
@@ -51,10 +51,9 @@ export default function VersionDropdown() {
 				setLoading(false);
 			},
 			onError: (error) => {
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
+				toast({
+					action: 'error',
+					title: error.details,
 				});
 				setError(error as APIError);
 				setLoading(false);

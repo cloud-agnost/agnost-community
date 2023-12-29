@@ -21,7 +21,7 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 	const { t } = useTranslation();
 	const { task, testTask } = useTaskStore();
 	const { taskLogs } = useUtilsStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { environment } = useEnvironmentStore();
 	const [debugChannel, setDebugChannel] = useState<string>('');
 	const { versionId, appId, orgId, taskId } = useParams<{
@@ -32,11 +32,10 @@ export default function TestTask({ open, onClose }: TestTaskProps) {
 	}>();
 	const { mutateAsync: testTaskMutation, isPending } = useMutation({
 		mutationFn: testTask,
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }: APIError) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

@@ -16,7 +16,7 @@ import { useParams } from 'react-router-dom';
 
 export default function MainStorage() {
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const canCreateStorages = useAuthorizeVersion('storage.create');
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
@@ -65,8 +65,8 @@ export default function MainStorage() {
 			});
 			table?.resetRowSelection();
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 	function deleteStorageHandler() {

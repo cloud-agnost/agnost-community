@@ -75,7 +75,7 @@ export const EmailAuthenticationSchema = z
 	});
 
 export default function EmailAuthentication() {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { saveEmailAuthSettings } = useSettingsStore();
 	const { version } = useVersionStore();
 	const canEdit = useAuthorizeVersion('version.auth.update');
@@ -88,17 +88,15 @@ export default function EmailAuthentication() {
 		mutationFn: saveEmailAuthSettings,
 		mutationKey: ['saveEmailAuthSettings'],
 		onSuccess: () => {
-			notify({
-				type: 'success',
-				title: t('general.success'),
-				description: t('version.authentication.email_authentication_success'),
+			toast({
+				action: 'success',
+				title: t('version.authentication.email_authentication_success'),
 			});
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: t('general.error'),
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

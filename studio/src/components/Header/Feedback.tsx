@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import { Button } from '../Button';
 import { Textarea } from '../Input';
-import { notify } from '@/utils';
+import { toast } from '@/hooks/useToast';
 const FeedbackScheme = z.object({
 	feedback: z.string({
 		required_error: 'Feedback is required',
@@ -42,10 +42,9 @@ export default function Feedback() {
 		fetch('https://agnost.c1-europe.altogic.com/feedback', requestOptions)
 			.then((response) => response.text())
 			.then(() => {
-				notify({
+				toast({
 					title: 'Feedback sent',
-					description: 'Thank you for your feedback',
-					type: 'success',
+					action: 'success',
 				});
 				form.reset();
 			})

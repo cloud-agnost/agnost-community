@@ -22,7 +22,7 @@ interface Props {
 	table: Table<Invitation>;
 }
 function AppInvitationFilter({ table }: Props) {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const canMultiDeleteInvite = useAuthorizeApp('invite.delete');
@@ -37,18 +37,16 @@ function AppInvitationFilter({ table }: Props) {
 				appId: application?._id as string,
 				tokens: selectedRows.map((row) => row.original.token),
 				onSuccess: () => {
-					notify({
-						title: t('general.success'),
-						description: t('general.invitation.delete'),
-						type: 'success',
+					toast({
+						title: t('general.invitation.delete') as string,
+						action: 'success',
 					});
 					table.toggleAllRowsSelected(false);
 				},
-				onError: ({ error, details }) => {
-					notify({
-						title: error,
-						description: details,
-						type: 'error',
+				onError: ({ details }) => {
+					toast({
+						title: details,
+						action: 'error',
 					});
 				},
 			});

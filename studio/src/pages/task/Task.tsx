@@ -19,7 +19,7 @@ import { useParams } from 'react-router-dom';
 
 export default function MainTask() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('task.create');
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const { addTab } = useTabStore();
@@ -51,8 +51,8 @@ export default function MainTask() {
 				versionId: environment?.versionId,
 			});
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 

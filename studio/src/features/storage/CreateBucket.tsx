@@ -22,7 +22,7 @@ export default function CreateBucket({ open, onClose }: CreateStorageProps) {
 	const { t } = useTranslation();
 	const { createBucket, storage } = useStorageStore();
 	const [loading, setLoading] = useState(false);
-	const { notify } = useToast();
+	const { toast } = useToast();
 	function onSubmit(data: z.infer<typeof BucketSchema>) {
 		setLoading(true);
 		createBucket({
@@ -38,9 +38,9 @@ export default function CreateBucket({ open, onClose }: CreateStorageProps) {
 				onClose();
 				setLoading(false);
 			},
-			onError: ({ error, details }) => {
+			onError: ({ details }) => {
 				setLoading(false);
-				notify({ type: 'error', description: details, title: error });
+				toast({ action: 'error', title: details });
 			},
 		});
 	}

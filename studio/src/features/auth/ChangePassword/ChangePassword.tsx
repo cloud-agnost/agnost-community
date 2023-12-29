@@ -70,7 +70,7 @@ export default function ChangePassword() {
 	const [sending, setSending] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
 	const [isChangeMode, setIsChangeMode] = useState(false);
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { changePassword, user, resetPassword } = useAuthStore();
 
 	const { t } = useTranslation();
@@ -83,10 +83,9 @@ export default function ChangePassword() {
 			setError(null);
 			setLoading(true);
 			await changePassword(data.currentPassword, data.newPassword.password);
-			notify({
-				type: 'success',
-				title: t('profileSettings.success'),
-				description: t('profileSettings.password_updated'),
+			toast({
+				action: 'success',
+				title: t('profileSettings.password_updated') as string,
 			});
 			close();
 		} catch (error) {
@@ -103,12 +102,11 @@ export default function ChangePassword() {
 			setError(null);
 			setSending(true);
 			await resetPassword(loginEmail);
-			notify({
-				type: 'success',
-				title: t('profileSettings.email_sent'),
-				description: t('profileSettings.email_sent_description', {
+			toast({
+				action: 'success',
+				title: t('profileSettings.email_sent_description', {
 					email: loginEmail,
-				}),
+				}) as string,
 			});
 		} catch (e) {
 			setError(e as APIError);

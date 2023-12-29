@@ -61,7 +61,7 @@ const APIServerFormSchema = z.object({
 	}),
 });
 export default function UpdateAPIServer() {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('version.update');
 	const apiServer = useEnvironmentStore((state) =>
 		state.resources.find((r) => r.type === 'engine'),
@@ -74,17 +74,15 @@ export default function UpdateAPIServer() {
 	const { mutateAsync: updateApiServerConfMutate, isPending } = useMutation({
 		mutationFn: updateApiServerConf,
 		onSuccess: () => {
-			notify({
-				title: t('general.success'),
-				description: t('version.apiServer_updated'),
-				type: 'success',
+			toast({
+				title: t('version.apiServer_updated') ?? '',
+				action: 'success',
 			});
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: t('general.error'),
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

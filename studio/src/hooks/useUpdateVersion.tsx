@@ -2,7 +2,6 @@ import { useToast } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
 import { APIError, VersionProperties } from '@/types';
 import { useMutation } from '@tanstack/react-query';
-import { t } from 'i18next';
 import { useParams } from 'react-router-dom';
 
 interface UpdateVersionReturnType {
@@ -17,15 +16,14 @@ export default function useUpdateVersion(): UpdateVersionReturnType {
 		appId: string;
 		orgId: string;
 	}>();
-	const { notify } = useToast();
+	const { toast } = useToast();
 
 	const { mutateAsync, ...result } = useMutation({
 		mutationFn: updateVersionProperties,
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: t('general.error'),
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

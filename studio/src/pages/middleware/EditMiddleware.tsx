@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 export default function EditMiddleware() {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { middlewareId, orgId, appId, versionId } = useParams() as Record<string, string>;
 	const canEdit = useAuthorizeVersion('middleware.update');
 	const {
@@ -35,10 +35,9 @@ export default function EditMiddleware() {
 		},
 		onSuccess,
 		onError(error: APIError) {
-			notify({
-				title: t('general.error'),
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

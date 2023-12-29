@@ -5,23 +5,21 @@ import { useToast } from '@/hooks';
 import useClusterStore from '@/store/cluster/clusterStore';
 import { useTranslation } from 'react-i18next';
 export default function EnforceSSL() {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 	const { cluster, enforceSSL } = useClusterStore();
 	const { mutate: enforceSSLMutation } = useMutation({
 		mutationFn: enforceSSL,
 		onSuccess: () => {
-			notify({
-				type: 'success',
-				title: t('general.success'),
-				description: t('cluster.enforce_https_success'),
+			toast({
+				action: 'success',
+				title: t('cluster.enforce_https_success') as string,
 			});
 		},
 		onError: (error) => {
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

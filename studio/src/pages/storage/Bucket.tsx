@@ -14,7 +14,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams } from 'react-router-dom';
 export default function Buckets() {
 	const [isBucketCreateOpen, setIsBucketCreateOpen] = useState(false);
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 	const {
@@ -71,8 +71,8 @@ export default function Buckets() {
 		onSuccess: () => {
 			table?.resetRowSelection();
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 

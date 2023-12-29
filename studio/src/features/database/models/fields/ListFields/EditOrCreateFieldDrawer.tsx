@@ -113,7 +113,7 @@ export default function EditOrCreateFieldDrawer({
 	const database = useDatabaseStore((state) => state.database);
 	const canCreate = useAuthorizeVersion('model.create');
 	const MAX_LENGTH = MAX_LENGTHS[editMode ? fieldToEdit?.type : type?.name ?? ''];
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { dbId, modelId, appId, versionId, orgId } = useParams() as {
 		orgId: string;
 		appId: string;
@@ -557,10 +557,9 @@ export default function EditOrCreateFieldDrawer({
 		mutationFn: editMode ? updateField : addNewField,
 		mutationKey: ['createField'],
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 		onSuccess: () => onClose(),

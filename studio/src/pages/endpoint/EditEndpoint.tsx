@@ -14,7 +14,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 
 export default function EditEndpoint() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('endpoint.update');
 	const { saveEndpointLogic, openEditEndpointDialog, endpoint, logics, setLogics, deleteLogic } =
 		useEndpointStore();
@@ -31,11 +31,10 @@ export default function EditEndpoint() {
 	const { mutateAsync: saveEpMutation, isPending } = useMutation({
 		mutationFn: saveEndpointLogic,
 		onSuccess,
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }: APIError) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

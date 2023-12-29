@@ -7,14 +7,14 @@ import {
 } from '@/constants';
 import { STATE_LIST } from '@/constants/stateList';
 import { socket } from '@/helpers';
-import { useToast as toast } from '@/hooks';
+import { toast } from '@/hooks/useToast';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTypeStore from '@/store/types/typeStore';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import { AppRoles, RealtimeData, ToastType } from '@/types';
+import { AppRoles, RealtimeData } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
 import cronstrue from 'cronstrue';
 import i18next from 'i18next';
@@ -114,9 +114,6 @@ export function capitalize(str: string) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function notify(params: ToastType) {
-	return toast().notify(params);
-}
 export function arrayToQueryString(array: string[] | undefined, key: string) {
 	return array?.map((item) => `${key}=${item}`).join('&');
 }
@@ -124,16 +121,14 @@ export function arrayToQueryString(array: string[] | undefined, key: string) {
 export async function copy(text: string) {
 	try {
 		await navigator.clipboard.writeText(text);
-		notify({
-			title: translate('general.success'),
-			description: translate('general.copied'),
-			type: 'success',
+		toast({
+			title: translate('general.copied'),
+			action: 'success',
 		});
 	} catch (e) {
-		notify({
-			title: translate('general.error'),
-			description: translate('general.copied_error'),
-			type: 'error',
+		toast({
+			title: translate('general.copied_error'),
+			action: 'error',
 		});
 	}
 }

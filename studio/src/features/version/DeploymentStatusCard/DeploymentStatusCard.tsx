@@ -32,7 +32,7 @@ export default function DeploymentStatusCard() {
 		useEnvironmentStore();
 	const envStatus = useEnvironmentStatus();
 	const classes = ENV_STATUS_CLASS_MAP[envStatus as EnvironmentStatus];
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -51,10 +51,9 @@ export default function DeploymentStatusCard() {
 	const { mutateAsync: redeployMutate, isPending } = useMutation({
 		mutationFn: redeployAppVersionToEnvironment,
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

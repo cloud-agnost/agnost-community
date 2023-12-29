@@ -44,7 +44,7 @@ const CreateCopyVersionForm = z.object({
 
 export default function CreateCopyVersionDrawer() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const {
 		createCopyVersionDrawerIsOpen,
 		createCopyOfVersion,
@@ -70,18 +70,16 @@ export default function CreateCopyVersionDrawer() {
 		mutationFn: createCopyOfVersion,
 		mutationKey: ['createCopyOfVersion'],
 		onSuccess: (version) => {
-			notify({
-				type: 'success',
-				title: translate('general.success'),
-				description: translate('version.copied'),
+			toast({
+				action: 'success',
+				title: translate('version.copied'),
 			});
 			selectVersion(version);
 		},
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

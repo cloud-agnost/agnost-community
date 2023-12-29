@@ -15,7 +15,7 @@ import { APIError } from '@/types';
 import { useToast } from '@/hooks';
 export default function OrgResources() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const [searchParams] = useSearchParams();
 	const { orgId } = useParams() as Record<string, string>;
 	const {
@@ -43,10 +43,9 @@ export default function OrgResources() {
 		mutationFn: deleteResource,
 		mutationKey: ['deleteResource'],
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

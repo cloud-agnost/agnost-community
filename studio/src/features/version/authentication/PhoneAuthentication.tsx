@@ -133,7 +133,7 @@ const PhoneAuthSchema = z
 	});
 
 export default function PhoneAuthentication() {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { version } = useVersionStore();
 	const { savePhoneAuthSettings } = useSettingsStore();
 	const { phoneAuthSMSProviders } = useTypeStore();
@@ -150,17 +150,15 @@ export default function PhoneAuthentication() {
 		mutationFn: savePhoneAuthSettings,
 		mutationKey: ['savePhoneAuthSettings'],
 		onSuccess: () => {
-			notify({
-				type: 'success',
-				title: t('general.success'),
-				description: t('version.authentication.phone_authentication_success'),
+			toast({
+				action: 'success',
+				title: t('version.authentication.phone_authentication_success'),
 			});
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: t('general.error'),
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});
