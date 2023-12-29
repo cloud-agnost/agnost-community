@@ -14,7 +14,7 @@
 	"yourClusterIdDescription": "This is your Agnost Enterprise Cluster id.",
 	"clusterVersion": "Cluster Version",
 	"transferClusterOwnership": "Transfer Cluster Ownership",
-	"transferClusterOwnershipDescription": "Select the organization member that you would like to transfer the ownership of the cluster.",
+	"transferClusterOwnershipDescription": "Select the cluster member that you would like to transfer the ownership of the cluster.",
 	"smtpSettingsUpdatedDescription": "SMTP settings have been updated successfully.",
 	"release_info": "Release Info",
 	"history": "Release History",
