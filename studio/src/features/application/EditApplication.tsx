@@ -5,16 +5,18 @@ import OrganizationMenuItem from '@/features/organization/navbar/OrganizationMen
 import useApplicationStore from '@/store/app/applicationStore';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMatch, useSearchParams } from 'react-router-dom';
+import { useMatch, useParams, useSearchParams } from 'react-router-dom';
 import AppGeneralSettings from './Settings/AppGeneralSettings';
 import AppMembers from './Settings/Members/AppMembers';
+import { useQuery } from '@tanstack/react-query';
 
 export default function EditApplication() {
 	const { t } = useTranslation();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { isEditAppOpen, closeEditAppDrawer } = useApplicationStore();
+	const { isEditAppOpen, application, closeEditAppDrawer, getAppTeamMembers } =
+		useApplicationStore();
 	const match = useMatch('/organization/:orgId/apps');
-
+	const { orgId } = useParams() as Record<string, string>;
 	useEffect(() => {
 		if (isEditAppOpen && !searchParams.get('st')) {
 			searchParams.set('st', 'general');
@@ -28,6 +30,16 @@ export default function EditApplication() {
 			setSearchParams(searchParams);
 		}
 	}, [isEditAppOpen]);
+
+	const { isPending } = useQuery({
+		queryFn: () =>
+			getAppTeamMembers({
+				appId: application?._id as string,
+				orgId,
+			}),
+		queryKey: ['appTeamMembers'],
+		enabled: isEditAppOpen,
+	});
 
 	return (
 		<Drawer open={isEditAppOpen} onOpenChange={() => closeEditAppDrawer(!!match)}>
@@ -49,7 +61,7 @@ export default function EditApplication() {
 				</nav>
 				<div className='flex flex-col h-full'>
 					{searchParams.get('st') === 'general' && <AppGeneralSettings />}
-					{searchParams.get('st') === 'members' && <AppMembers />}
+					{searchParams.get('st') === 'members' && <AppMembers loading={isPending} />}
 					{searchParams.get('st') === 'invitations' && <AppInvitations />}
 				</div>
 			</DrawerContent>
