@@ -1405,7 +1405,7 @@ router.delete(
 			res.json();
 
 			// Log action
-			auditCtrl.logAndNotify(
+			await auditCtrl.logAndNotify(
 				req.org._id,
 				req.user,
 				"org.member",
@@ -1565,9 +1565,9 @@ router.post(
 			await orgMemberCtrl.commit(session);
 			res.json();
 
-			users.forEach((removedUser) => {
+			for (const removedUser of users) {
 				// Log action
-				auditCtrl.logAndNotify(
+				await auditCtrl.logAndNotify(
 					req.org._id,
 					req.user,
 					"org.member",
@@ -1584,7 +1584,7 @@ router.post(
 					},
 					{ orgId: req.org._id }
 				);
-			});
+			}
 
 			if (apps.length > 0) {
 				// Get all updated applications
@@ -1724,7 +1724,7 @@ router.delete(
 			res.json();
 
 			// Log action
-			auditCtrl.logAndNotify(
+			await auditCtrl.logAndNotify(
 				req.org._id,
 				req.user,
 				"org.member",
