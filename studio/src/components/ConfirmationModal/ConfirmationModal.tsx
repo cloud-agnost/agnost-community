@@ -17,7 +17,7 @@ interface ConfirmationModalProps {
 	closeButtonText?: string;
 	confirmCode: string;
 	onConfirm: () => void;
-	loading?: boolean;
+	loading: boolean;
 	confirmButtonText?: string | null;
 	isOpen: boolean;
 	closeModal: () => void;
