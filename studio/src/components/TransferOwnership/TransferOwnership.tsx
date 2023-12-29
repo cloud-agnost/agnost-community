@@ -14,6 +14,9 @@ import { z } from 'zod';
 import { Avatar, AvatarFallback, AvatarImage } from '../Avatar';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../Form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../Select';
+import { Badge } from '../Badge';
+import { BADGE_COLOR_MAP } from '@/constants';
+import { useMemo } from 'react';
 interface TransferOwnershipProps {
 	disabled: boolean;
 	transferFn: (data: TransferRequest) => Promise<any>;
@@ -72,6 +75,9 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 		});
 	};
 
+	const selectedMember = useMemo(() => {
+		return team.find(({ member }) => member._id === form.getValues('userId'))?.member;
+	}, [form.getValues('userId'), team]);
 	return (
 		<div className='space-y-4'>
 			{error && (
@@ -90,30 +96,54 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 								<FormControl>
 									<Select defaultValue={field.value} onValueChange={field.onChange}>
 										<FormControl>
-											<SelectTrigger error={error} className='w-full !h-11 [&>span]:!max-w-full'>
+											<SelectTrigger error={error} className='w-full  [&>span]:!max-w-full'>
 												<SelectValue
 													placeholder={`${t('general.select')} ${t('general.member.title')}`}
-												/>
+												>
+													<div className='flex items-center justify-between w-full'>
+														<div className='flex items-center gap-2'>
+															<Avatar size='xs'>
+																<AvatarImage src={selectedMember?.pictureUrl} />
+																<AvatarFallback
+																	isUserAvatar
+																	color={selectedMember?.color ?? 'gray'}
+																	name={selectedMember?.name}
+																/>
+															</Avatar>
+
+															<p className='text-default text-sm leading-6'>
+																{selectedMember?.name}
+															</p>
+														</div>
+													</div>
+												</SelectValue>
 											</SelectTrigger>
 										</FormControl>
 										<SelectContent align='center'>
-											{team.map(({ member }) => (
-												<SelectItem key={member._id} value={member._id}>
-													<div className='flex items-center gap-2'>
-														<Avatar size='sm'>
-															<AvatarImage src={member.pictureUrl} />
-															<AvatarFallback
-																isUserAvatar
-																color={member?.color}
-																name={member?.name}
-															/>
-														</Avatar>
-														<div className='flex-1'>
-															<p className='block text-default text-sm leading-6'>{member.name}</p>
-															<p className='text-[11px] text-subtle leading-[21px]'>
-																{member.loginEmail}
-															</p>
+											{team.map(({ member, role }) => (
+												<SelectItem key={member._id} value={member._id} className='w-full'>
+													<div className='flex items-center justify-between w-full'>
+														<div className='flex items-center gap-2'>
+															<Avatar size='sm'>
+																<AvatarImage src={member.pictureUrl} />
+																<AvatarFallback
+																	isUserAvatar
+																	color={member?.color}
+																	name={member?.name}
+																/>
+															</Avatar>
+															<div className='flex-1'>
+																<p className='text-default text-sm leading-6'>{member.name}</p>
+																<p className='text-subtle  text-sm leading-6'>
+																	{member.loginEmail}
+																</p>
+															</div>
 														</div>
+														<Badge
+															key={role}
+															text={role}
+															variant={BADGE_COLOR_MAP[role.toUpperCase()]}
+														/>
 													</div>
 												</SelectItem>
 											))}

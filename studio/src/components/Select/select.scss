@@ -27,7 +27,7 @@
 		@apply py-1.5 px-2 text-default text-sm font-semibold;
 	}
 	&-item {
-		@apply flex items-center justify-between w-full cursor-pointer select-none rounded-sm;
+		@apply grid grid-cols-[10fr_1fr] w-full cursor-pointer select-none rounded-sm;
 		@apply py-1.5 px-2 text-sm outline-none text-default;
 		@apply focus:bg-subtle focus:text-default;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:text-subtle data-[disabled]:bg-subtle;
