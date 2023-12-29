@@ -60,7 +60,7 @@ export default function TaskForm({ loading }: { loading?: boolean }) {
 								{...field}
 							/>
 						</FormControl>
-
+						<FormDescription>{t('task.syntax_description')}</FormDescription>
 						<FormMessage />
 					</FormItem>
 				)}

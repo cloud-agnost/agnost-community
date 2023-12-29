@@ -10,7 +10,7 @@ import {
 	EnforceSSLAccessParams,
 	ModuleVersions,
 	SetupCluster,
-	TransferClusterOwnershipParams,
+	TransferRequest,
 	UpdateClusterComponentParams,
 } from '@/types';
 import { BaseRequest, User, UserDataToRegister } from '@/types/type.ts';
@@ -44,7 +44,7 @@ type Actions = {
 	updateClusterComponent: (data: UpdateClusterComponentParams) => Promise<void>;
 	openEditClusterComponent: (editedClusterComponent: ClusterComponent) => void;
 	closeEditClusterComponent: () => void;
-	transferClusterOwnership: (params: TransferClusterOwnershipParams) => Promise<void>;
+	transferClusterOwnership: (params: TransferRequest) => Promise<void>;
 	getClusterInfo: () => Promise<any>;
 	updateSmtpSettings: (data: any) => Promise<any>;
 	getClusterAndReleaseInfo: () => Promise<ClusterReleaseInfo>;
@@ -153,12 +153,10 @@ const useClusterStore = create<ClusterStore & Actions>()(
 		closeEditClusterComponent: () => {
 			set({ isEditClusterComponentOpen: false, clusterComponent: {} as ClusterComponent });
 		},
-		transferClusterOwnership: async (params: TransferClusterOwnershipParams) => {
+		transferClusterOwnership: async (params: TransferRequest) => {
 			try {
 				await ClusterService.transferClusterOwnership(params);
-				if (params.onSuccess) params.onSuccess();
 			} catch (error) {
-				if (params.onError) params.onError(error as APIError);
 				throw error;
 			}
 		},

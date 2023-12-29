@@ -90,7 +90,7 @@ const useTabStore = create<TabStore & Actions>()(
 										...tabs,
 										{
 											...tab,
-											path: `${url}?tabId=${tab.id}`,
+											path: url.includes('?') ? `${url}&tabId=${tab.id}` : `${url}?tabId=${tab.id}`,
 										},
 									],
 								},
@@ -99,7 +99,9 @@ const useTabStore = create<TabStore & Actions>()(
 					}
 					get().setCurrentTab(versionId, existingTab?.id ?? tab.id);
 
-					history.navigate?.(`${url}?tabId=${tab.id}`);
+					history.navigate?.(
+						url.includes('?') ? `${url}&tabId=${tab.id}` : `${url}?tabId=${tab.id}`,
+					);
 				},
 				getTabByPath: (versionId, path) => {
 					const tabs = get().tabs[versionId] ?? [];

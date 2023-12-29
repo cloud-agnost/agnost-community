@@ -39,7 +39,13 @@ function SelectedRowButton<T>({ onDelete, table, className, disabled }: Props<T>
 					</span>
 				</div>
 
-				<Button variant='blank' iconOnly onClick={() => setOpenInfoModal(true)} disabled={disabled}>
+				<Button
+					variant='blank'
+					iconOnly
+					onClick={() => setOpenInfoModal(true)}
+					disabled={disabled}
+					className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
+				>
 					<Trash size={20} className='text-icon-base' />
 				</Button>
 			</div>

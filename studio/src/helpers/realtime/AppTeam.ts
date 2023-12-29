@@ -15,7 +15,7 @@ class ApplicationTeam implements RealtimeActions<Application> {
 					.getState?.()
 					.applications.filter((app) => app._id !== data._id),
 			});
-			history.navigate?.(`/organization/${data._id}/apps`);
+			history.navigate?.(`/organization/${data.orgId}/apps`);
 		} else {
 			useApplicationStore.setState((prev) => ({
 				...prev,

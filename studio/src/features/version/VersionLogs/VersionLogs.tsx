@@ -1,17 +1,16 @@
-import { DateRangePicker } from '@/components/DateRangePicker';
+import { EmptyState } from '@/components/EmptyState';
 import { VersionLogDetails } from '@/features/version/VersionLogs';
 import useVersionStore from '@/store/version/versionStore';
 import { calculateRecommendedBuckets, toIsoString } from '@/utils';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import { Range } from 'react-date-range';
+import { endOfDay, startOfDay } from 'date-fns';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
+import BeatLoader from 'react-spinners/BeatLoader';
 import VersionLogCharts from './VersionLogCharts';
 import VersionLogsTable from './VersionLogsTable';
-import { startOfDay, endOfDay } from 'date-fns';
-import { EmptyState } from '@/components/EmptyState';
-import BeatLoader from 'react-spinners/BeatLoader';
+import _ from 'lodash';
 interface VersionLogsProps {
 	type: 'queue' | 'task' | 'endpoint';
 }
@@ -26,72 +25,54 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 	}>();
 
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [date, setDate] = useState<Range[]>([
-		{
-			startDate: startOfDay(new Date()),
-			endDate: endOfDay(new Date()),
-			key: 'selection',
-		},
-	]);
-
-	function selectDate(date: Range[]) {
-		setDate(date);
-		searchParams.set('start', toIsoString(date[0].startDate as Date) ?? '');
-		searchParams.set('end', toIsoString(date[0].endDate as Date) ?? '');
-		setSearchParams(searchParams);
-	}
 
 	const { refetch, isFetching } = useQuery({
 		queryKey: ['versionLogBuckets'],
 		queryFn: () => {
-			const start = new Date(searchParams.get('start') as string) ?? date[0].startDate;
-			const end = new Date(searchParams.get('end') as string) ?? date[0].endDate;
+			const start = new Date(searchParams.get('start') as string);
+			const end = new Date(searchParams.get('end') as string);
 			return getVersionLogBuckets({
 				appId: appId as string,
 				orgId: orgId as string,
 				versionId: versionId as string,
 				type,
-				start: searchParams.get('start') ?? toIsoString(date[0].startDate as Date) ?? '',
-				end: searchParams.get('end') ?? toIsoString(date[0].endDate as Date) ?? '',
+				start: searchParams.get('start') ?? '',
+				end: searchParams.get('end') ?? '',
 				buckets: calculateRecommendedBuckets(start, end as Date),
 			});
 		},
+		enabled: !_.isNil(searchParams.get('start')) && !_.isNil(searchParams.get('end')),
 		refetchOnWindowFocus: false,
 	});
 
 	useEffect(() => {
-		refetch();
+		if (!_.isNil(searchParams.get('start')) && !_.isNil(searchParams.get('end'))) refetch();
+	}, [searchParams]);
+
+	useEffect(() => {
 		const start = searchParams.get('start');
 		const end = searchParams.get('end');
-		if (start && end) {
-			setDate([
-				{
-					startDate: new Date(start),
-					endDate: new Date(end),
-					key: 'selection',
-				},
-			]);
+		if (!start || !end) {
+			searchParams.set('start', toIsoString(startOfDay(new Date())) ?? '');
+			searchParams.set('end', toIsoString(endOfDay(new Date())) ?? '');
+			setSearchParams(searchParams);
 		}
-	}, [searchParams]);
+	}, []);
 
 	return (
 		<div className='h-full space-y-6'>
-			<div className='flex items-center justify-between'>
-				<h1 className='text-2xl font-semibold text-default'>{t('version.log')}</h1>
-				<DateRangePicker date={date} onChange={selectDate} />
-			</div>
+			<VersionLogCharts />
 			{isFetching ? (
 				<div className='flex items-center justify-center h-full w-full'>
 					<BeatLoader color='#6884FD' size={16} margin={12} />
 				</div>
 			) : logBuckets.totalHits > 0 ? (
 				<>
-					<VersionLogCharts date={date} />
-					<VersionLogsTable date={date} type={type} />
+					<VersionLogsTable type={type} />
 					<VersionLogDetails open={showLogDetails} onClose={closeVersionLogDetails} />
 				</>
 			) : (
-				<div className='flex flex-col h-full items-center justify-center'>
+				<div className='flex flex-col h-1/2 items-center justify-center'>
 					<EmptyState type={type} title={t('version.no_logs')} />
 				</div>
 			)}

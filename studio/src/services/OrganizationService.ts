@@ -162,7 +162,7 @@ export default class OrganizationService {
 	static async removeMultipleMembersFromOrganization(userIds: string[]) {
 		return (
 			await axios.post(
-				`${this.url}/${useOrganizationStore.getState().organization?._id}/delete-multi`,
+				`${this.url}/${useOrganizationStore.getState().organization?._id}/member/delete-multi`,
 				{
 					userIds,
 				},

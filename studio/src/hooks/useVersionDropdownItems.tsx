@@ -1,15 +1,12 @@
-import { useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { TabTypes } from '@/types';
-import { generateId } from '@/utils';
-import useToast from './useToast';
-import useTabStore from '@/store/version/tabStore';
 import useApplicationStore from '@/store/app/applicationStore';
+import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
-import _ from 'lodash';
-import { useParams } from 'react-router-dom';
 import { Eye, EyeSlash, GearSix, GitBranch, GitFork, LockSimple } from '@phosphor-icons/react';
 import { LockSimpleOpen } from '@phosphor-icons/react/dist/ssr';
+import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import useToast from './useToast';
 export default function useVersionDropdownItems() {
 	const { t } = useTranslation();
 	const { notify } = useToast();
@@ -20,10 +17,9 @@ export default function useVersionDropdownItems() {
 		version,
 		setCreateCopyVersionDrawerIsOpen,
 		updateVersionProperties,
-		getVersionDashboardPath,
 		getAllVersionsVisibleToUser,
 	} = useVersionStore();
-	const { addTab } = useTabStore();
+	const { addSettingsTab } = useTabStore();
 
 	useEffect(() => {
 		if (appId && orgId) {
@@ -96,17 +92,7 @@ export default function useVersionDropdownItems() {
 			},
 			{
 				title: t('version.settings.default'),
-				action: () => {
-					const versionHomePath = getVersionDashboardPath('/settings');
-					addTab(version?._id, {
-						id: generateId(),
-						title: t('version.settings.default'),
-						path: versionHomePath,
-						isActive: true,
-						isDashboard: false,
-						type: TabTypes.Settings,
-					});
-				},
+				action: () => addSettingsTab(version._id),
 				disabled: false,
 				icon: GearSix,
 			},

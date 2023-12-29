@@ -875,6 +875,16 @@ export const FORBIDDEN_EP_PREFIXES = [
 	'/realtime',
 ];
 
+export const FORBIDDEN_RESOURCE_NAMES = [
+	'mongodb',
+	'rabbitmq-server',
+	'redis-master',
+	'redis',
+	'redis-headless',
+	'rabbitmq',
+	'minio',
+];
+
 export const FIELD_MAPPER: Record<string, string> = {
 	createdat: 'datetime',
 	updatedat: 'datetime',

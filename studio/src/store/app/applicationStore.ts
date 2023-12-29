@@ -15,8 +15,7 @@ import {
 	RemoveAppAvatarRequest,
 	RemoveMemberRequest,
 	SetAppAvatarRequest,
-	TeamOption,
-	TransferAppOwnershipRequest,
+	TransferRequest,
 	UpdateAppMemberRoleRequest,
 	UpdateAppParams,
 	UpdateRoleRequest,
@@ -36,7 +35,6 @@ interface ApplicationState {
 	toDeleteApp: Application | null;
 	applicationTeam: ApplicationMember[];
 	tempTeam: ApplicationMember[];
-	teamOptions: TeamOption[];
 	isVersionOpen: boolean;
 	isEditAppOpen: boolean;
 	isInviteMemberOpen: boolean;
@@ -54,7 +52,7 @@ type Actions = {
 	changeAppName: (req: ChangeAppNameRequest) => Promise<Application>;
 	setAppAvatar: (req: SetAppAvatarRequest) => Promise<Application>;
 	removeAppAvatar: (req: RemoveAppAvatarRequest) => Promise<Application>;
-	transferAppOwnership: (req: TransferAppOwnershipRequest) => Promise<Application>;
+	transferAppOwnership: (req: TransferRequest) => Promise<Application>;
 	getAppTeamMembers: (req: UpdateAppParams) => Promise<ApplicationMember[]>;
 	filterApplicationTeam: (search: string) => ApplicationMember[];
 	changeAppTeamRole: (req: UpdateAppMemberRoleRequest) => Promise<ApplicationMember>;
@@ -94,7 +92,6 @@ const initialState: ApplicationState = {
 	isVersionOpen: false,
 	isEditAppOpen: false,
 	isInviteMemberOpen: false,
-	teamOptions: [],
 	invitations: [],
 	appAuthorization: {} as AppPermissions,
 	isDeleteModalOpen: false,
@@ -187,30 +184,21 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 					throw error as APIError;
 				}
 			},
-			transferAppOwnership: async (req: TransferAppOwnershipRequest) => {
+			transferAppOwnership: async (req: TransferRequest) => {
 				try {
 					const application = await ApplicationService.transferAppOwnership(req);
 					get().selectApplication(application);
-					if (req.onSuccess) req.onSuccess();
 					return application;
 				} catch (error) {
-					if (req.onError) req.onError(error as APIError);
 					throw error as APIError;
 				}
 			},
 			getAppTeamMembers: async (req: UpdateAppParams) => {
 				try {
 					const applicationTeam = await ApplicationService.getAppMembers(req);
-					const userId = useAuthStore.getState().user?._id;
 					set({
 						applicationTeam,
 						tempTeam: applicationTeam,
-						teamOptions: applicationTeam
-							.filter((team) => team.role === 'Admin' && userId !== team.member._id)
-							.map((team) => ({
-								label: team.member.name,
-								value: team,
-							})),
 					});
 					return applicationTeam;
 				} catch (error) {

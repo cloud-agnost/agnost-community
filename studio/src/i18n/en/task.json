@@ -19,5 +19,6 @@
 	"edit": "Edit {{name}}",
 	"test": "Test {{name}}",
 	"logs": "Cron Job Logs",
-	"editLogicSuccess": "Cron job updated successfully"
+	"editLogicSuccess": "Cron job updated successfully",
+	"syntax_description": "A cron expression is a time-based scheduler using a format like * * * * * where each asterisk represents minutes, hours, day of the month, month, and day of the week."
 }

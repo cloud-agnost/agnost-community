@@ -141,7 +141,7 @@ export default function PhoneAuthentication() {
 
 	const form = useForm<z.infer<typeof PhoneAuthSchema>>({
 		resolver: zodResolver(PhoneAuthSchema),
-		defaultValues: version?.authentication.phone,
+		defaultValues: version?.authentication?.phone,
 	});
 	const selectedProvider = phoneAuthSMSProviders.find(
 		(p) => p.provider === form.watch('smsProvider'),

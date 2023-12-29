@@ -53,6 +53,7 @@
 		"delete": "Invitation deleted successfully"
 	},
 	"member": {
+		"title": "Member",
 		"update": "Member role changed to {{role}}",
 		"delete": "Member deleted successfully"
 	},
@@ -125,5 +126,6 @@
 	"schedulerLogs": "Scheduler Logs",
 	"refresh": "Refresh",
 	"invitation_accepted": "Invitation accepted successfully",
-	"hour": "Hour"
+	"hour": "Hour",
+	"no_member_found": "No member found"
 }

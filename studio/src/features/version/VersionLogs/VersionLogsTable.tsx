@@ -2,17 +2,15 @@ import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
 import { useInfiniteScroll, useTable } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
-import { Range } from 'react-date-range';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSearchParams } from 'react-router-dom';
 import { VersionLogColumns } from './VersionLogColumns';
 
 interface VersionLogsTableProps {
 	type: 'queue' | 'task' | 'endpoint';
-	date: Range[];
 }
 
-export default function VersionLogsTable({ date, type }: VersionLogsTableProps) {
+export default function VersionLogsTable({ type }: VersionLogsTableProps) {
 	const { logs, getVersionLogs, lastFetchedLogPage } = useVersionStore();
 	const [searchParams] = useSearchParams();
 	const table = useTable({
@@ -32,8 +30,8 @@ export default function VersionLogsTable({ date, type }: VersionLogsTableProps) 
 		queryKey: 'versionLogs',
 		params: {
 			type,
-			start: searchParams.get('start') ?? date[0].startDate?.toISOString(),
-			end: searchParams.get('end') ?? date[0].endDate?.toISOString(),
+			start: searchParams.get('start'),
+			end: searchParams.get('end'),
 		},
 	});
 

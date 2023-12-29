@@ -10,6 +10,7 @@ import useModelStore from '@/store/database/modelStore';
 import { useMutation } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { useToast } from '@/hooks';
+import { useEffect } from 'react';
 export default function CreateModel({
 	open,
 	onOpenChange,
@@ -64,6 +65,17 @@ export default function CreateModel({
 		});
 		onOpenChange(false);
 	}
+
+	useEffect(() => {
+		if (open) {
+			form.reset({
+				timestamps: {
+					createdAt: t('database.models.add.timestamps.createdAt.name') as string,
+					updatedAt: t('database.models.add.timestamps.updatedAt.name') as string,
+				},
+			});
+		}
+	}, [open]);
 	return (
 		<Drawer open={open} onOpenChange={onClose}>
 			<DrawerContent className='overflow-x-hidden'>

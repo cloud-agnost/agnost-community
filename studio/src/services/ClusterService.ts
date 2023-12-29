@@ -5,7 +5,7 @@ import {
 	ClusterReleaseInfo,
 	DomainParams,
 	EnforceSSLAccessParams,
-	TransferClusterOwnershipParams,
+	TransferRequest,
 	UpdateClusterComponentParams,
 } from '@/types';
 
@@ -34,7 +34,7 @@ export default class ClusterService {
 		return (await axios.put(`${this.url}/components`, data)).data;
 	}
 
-	static async transferClusterOwnership({ userId }: TransferClusterOwnershipParams) {
+	static async transferClusterOwnership({ userId }: TransferRequest) {
 		return (
 			await axios.post(`/v1/user/transfer/${userId}`, {
 				userId,

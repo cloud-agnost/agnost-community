@@ -110,5 +110,6 @@
 		"certificate": "Certificate"
 	},
 	"version": "Version",
-	"select_version": "Select Version"
+	"select_version": "Select Version",
+	"invalid_name": "Resource names can include only numbers, lowercase letters and '-' characters"
 }
