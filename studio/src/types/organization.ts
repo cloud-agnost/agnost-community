@@ -1,5 +1,5 @@
-import { translate } from '@/utils';
 import { z } from 'zod';
+import { NameSchema } from '.';
 import { BaseRequest } from './type';
 
 export type OrgRoles = 'Admin' | 'Member' | 'Resource Manager' | 'Viewer';
@@ -25,19 +25,7 @@ export interface LeaveOrganizationRequest extends BaseRequest {
 }
 
 export const CreateOrganizationSchema = z.object({
-	name: z
-		.string({
-			required_error: translate('forms.required', { label: translate('organization.name') }),
-		})
-		.min(2, {
-			message: translate('forms.min2.error', { label: translate('organization.name') }),
-		})
-		.max(64, {
-			message: translate('forms.max64.error', { label: translate('organization.name') }),
-		})
-		.regex(/^[a-zA-Z0-9 ]*$/, {
-			message: translate('forms.alphanumeric', { label: translate('organization.name') }),
-		}),
+	name: NameSchema,
 });
 export interface ChangeOrganizationNameRequest extends BaseRequest {
 	name: string;
@@ -60,10 +48,6 @@ export interface GetOrganizationMembersRequest {
 	excludeSelf?: boolean;
 }
 
-export interface TransferOrganizationRequest extends BaseRequest {
-	organizationId: string;
-	userId: string;
-}
 export interface OrganizationMember {
 	_id: string;
 	orgId: string;

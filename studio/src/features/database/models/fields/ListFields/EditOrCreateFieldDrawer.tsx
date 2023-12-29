@@ -18,7 +18,7 @@ import {
 	APIError,
 	FieldType,
 	FieldTypes,
-	NameSchema,
+	StorageNameSchema,
 	ReferenceAction,
 	TimestampsSchema,
 } from '@/types';
@@ -162,7 +162,7 @@ export default function EditOrCreateFieldDrawer({
 	const Schema = z.object({
 		general: z
 			.object({
-				name: NameSchema,
+				name: StorageNameSchema,
 				type: z.nativeEnum(FieldTypes),
 				required: z.boolean(),
 				unique: z.boolean(),

@@ -1,7 +1,7 @@
 import { NAME_REGEX, NOT_START_WITH_NUMBER_REGEX } from '@/constants/regex';
 import { translate } from '@/utils';
 import * as z from 'zod';
-import { NameSchema } from './schema';
+import { StorageNameSchema } from './schema';
 import { BaseGetRequest, BaseParams, BaseRequest } from './type';
 export interface Storage {
 	_id: string;
@@ -151,7 +151,7 @@ export interface DeleteMultipleFilesFromBucketParams extends BaseRequest {
 }
 
 export const StorageSchema = z.object({
-	name: NameSchema,
+	name: StorageNameSchema,
 });
 
 export const CreateStorageSchema = StorageSchema.extend({
@@ -162,7 +162,7 @@ export const CreateStorageSchema = StorageSchema.extend({
 	}),
 });
 export const BucketSchema = z.object({
-	name: NameSchema,
+	name: StorageNameSchema,
 	isPublic: z.boolean().default(true),
 	tags: z
 		.array(

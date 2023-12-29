@@ -1,7 +1,7 @@
-import { translate } from '@/utils';
 import { z } from 'zod';
 import { EnvLog, Environment } from './environment';
 import { ResLog, Resource } from './resource';
+import { NameSchema } from './schema';
 import { BaseRequest, UpdateRoleRequest } from './type';
 import { Version } from './version';
 
@@ -48,19 +48,7 @@ export interface CreateApplicationRequest extends BaseRequest {
 	orgId: string;
 }
 export const CreateApplicationSchema = z.object({
-	name: z
-		.string({
-			required_error: translate('forms.required', { label: translate('application.name') }),
-		})
-		.min(2, {
-			message: translate('forms.min2.error', { label: translate('application.name') }),
-		})
-		.max(64, {
-			message: translate('forms.max64.error', { label: translate('application.name') }),
-		})
-		.regex(/^[a-zA-Z0-9 ]*$/, {
-			message: translate('forms.alphanumeric', { label: translate('application.name') }),
-		}),
+	name: NameSchema,
 });
 
 export interface CreateApplicationResponse {
@@ -82,9 +70,7 @@ export interface SetAppAvatarRequest extends BaseRequest, UpdateAppParams {
 	picture: File;
 	appId: string;
 }
-export interface TransferAppOwnershipRequest extends BaseRequest, UpdateAppParams {
-	userId: string;
-}
+
 export interface ApplicationMember {
 	_id: string;
 	appId: string;

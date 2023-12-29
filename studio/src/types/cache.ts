@@ -1,6 +1,6 @@
 import { translate } from '@/utils';
 import * as z from 'zod';
-import { NameSchema } from './schema';
+import { StorageNameSchema } from './schema';
 import { BaseGetRequest, BaseParams, BaseRequest } from './type';
 
 export interface Cache {
@@ -33,7 +33,7 @@ export interface CreateCacheParams extends BaseParams, BaseRequest {
 export type UpdateCacheParams = GetCacheByIdParams & Partial<Cache> & BaseRequest;
 
 export const CacheSchema = z.object({
-	name: NameSchema,
+	name: StorageNameSchema,
 	assignUniqueName: z.boolean().default(true),
 });
 export const CreateCacheSchema = z.object({

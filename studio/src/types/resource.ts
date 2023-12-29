@@ -3,7 +3,7 @@ import useResourceStore from '@/store/resources/resourceStore';
 import useTypeStore from '@/store/types/typeStore';
 import { translate } from '@/utils';
 import * as z from 'zod';
-import { NameSchema } from '.';
+import { ResourceNameSchema } from '.';
 import { BaseRequest } from './type';
 
 export enum AllowedRole {
@@ -520,7 +520,7 @@ export const AccessDbSchema = z
 	});
 
 export const ConnectResourceSchema = z.object({
-	name: NameSchema,
+	name: ResourceNameSchema,
 	instance: z
 		.string({
 			required_error: translate('forms.required', {
@@ -549,7 +549,6 @@ export const CreateResourceSchema = ConnectResourceSchema.omit({
 	access: true,
 })
 	.extend({
-		name: NameSchema.transform((val) => val.toLowerCase()),
 		config: z.object({
 			size: z
 				.string({
