@@ -18,7 +18,6 @@ import {
 	UpdateFieldParams,
 	UpdateNameAndDescriptionParams,
 } from '@/types';
-import { notify } from '@/utils';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -118,13 +117,7 @@ const useModelStore = create<ModelStore & Actions>()(
 						if (params.onSuccess) params.onSuccess(subModel);
 						return subModel;
 					} catch (e) {
-						const error = e as APIError;
-						if (params.onError) params.onError(error);
-						notify({
-							type: 'error',
-							title: error.error,
-							description: error.details,
-						});
+						if (params.onError) params.onError(e as APIError);
 						throw e;
 					}
 				},
@@ -134,12 +127,6 @@ const useModelStore = create<ModelStore & Actions>()(
 						set({ model });
 						return model;
 					} catch (e) {
-						const error = e as APIError;
-						notify({
-							type: 'error',
-							title: error.error,
-							description: error.details,
-						});
 						throw e;
 					}
 				},
@@ -149,15 +136,6 @@ const useModelStore = create<ModelStore & Actions>()(
 						set((state) => ({ models: [model, ...state.models] }));
 						return model;
 					} catch (e) {
-						const error = e as APIError;
-						const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-						for (const field of errorArray) {
-							notify({
-								type: 'error',
-								title: error.error,
-								description: field.msg,
-							});
-						}
 						throw e;
 					}
 				},
@@ -171,15 +149,6 @@ const useModelStore = create<ModelStore & Actions>()(
 						}));
 						return model;
 					} catch (e) {
-						const error = e as APIError;
-						const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-						for (const field of errorArray) {
-							notify({
-								type: 'error',
-								title: error.error,
-								description: field.msg,
-							});
-						}
 						throw e;
 					}
 				},
@@ -192,15 +161,6 @@ const useModelStore = create<ModelStore & Actions>()(
 						}));
 						return model;
 					} catch (e) {
-						const error = e as APIError;
-						const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-						for (const field of errorArray) {
-							notify({
-								type: 'error',
-								title: error.error,
-								description: field.msg,
-							});
-						}
 						throw e;
 					}
 				},
@@ -213,15 +173,6 @@ const useModelStore = create<ModelStore & Actions>()(
 						}));
 						return model;
 					} catch (e) {
-						const error = e as APIError;
-						const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-						for (const field of errorArray) {
-							notify({
-								type: 'error',
-								title: error.error,
-								description: field.msg,
-							});
-						}
 						throw e;
 					}
 				},
@@ -234,15 +185,6 @@ const useModelStore = create<ModelStore & Actions>()(
 						}));
 						return model;
 					} catch (e) {
-						const error = e as APIError;
-						const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-						for (const field of errorArray) {
-							notify({
-								type: 'error',
-								title: error.error,
-								description: field.msg,
-							});
-						}
 						throw e;
 					}
 				},
@@ -253,15 +195,6 @@ const useModelStore = create<ModelStore & Actions>()(
 							models: state.models.filter((m) => m._id !== params.modelId),
 						}));
 					} catch (e) {
-						const error = e as APIError;
-						const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-						for (const field of errorArray) {
-							notify({
-								type: 'error',
-								title: error.error,
-								description: field.msg,
-							});
-						}
 						throw e;
 					}
 				},
@@ -272,15 +205,6 @@ const useModelStore = create<ModelStore & Actions>()(
 							models: state.models.filter((m) => !params.modelIds.includes(m._id)),
 						}));
 					} catch (e) {
-						const error = e as APIError;
-						const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-						for (const field of errorArray) {
-							notify({
-								type: 'error',
-								title: error.error,
-								description: field.msg,
-							});
-						}
 						throw e;
 					}
 				},
@@ -293,15 +217,6 @@ const useModelStore = create<ModelStore & Actions>()(
 						}));
 						return model;
 					} catch (e) {
-						const error = e as APIError;
-						const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-						for (const field of errorArray) {
-							notify({
-								type: 'error',
-								title: error.error,
-								description: field.msg,
-							});
-						}
 						throw e;
 					}
 				},
@@ -311,12 +226,6 @@ const useModelStore = create<ModelStore & Actions>()(
 						set({ referenceModels });
 						return referenceModels;
 					} catch (e) {
-						const error = e as APIError;
-						notify({
-							type: 'error',
-							title: error.error,
-							description: error.details,
-						});
 						throw e;
 					}
 				},
@@ -328,12 +237,6 @@ const useModelStore = create<ModelStore & Actions>()(
 						}));
 						return model;
 					} catch (e) {
-						const error = e as APIError;
-						notify({
-							type: 'error',
-							title: error.error,
-							description: error.details,
-						});
 						throw e;
 					}
 				},
@@ -345,12 +248,6 @@ const useModelStore = create<ModelStore & Actions>()(
 						}));
 						return model;
 					} catch (e) {
-						const error = e as APIError;
-						notify({
-							type: 'error',
-							title: error.error,
-							description: error.details,
-						});
 						throw e;
 					}
 				},
