@@ -9,14 +9,15 @@ import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
 import { Field } from '@/types';
+import { useMutation } from '@tanstack/react-query';
 import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 import { DataTable } from 'components/DataTable';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-
+import { useToast } from '@/hooks';
 export default function Fields() {
 	const { modelId, versionId, dbId, appId, orgId } = useParams() as Record<string, string>;
-
+	const { notify } = useToast();
 	const { t } = useTranslation();
 	const { database } = useDatabaseStore();
 	const { deleteMultipleField, model, closeEditFieldDialog, isEditFieldDialogOpen } =
@@ -30,18 +31,23 @@ export default function Fields() {
 		columns: FieldColumns,
 	});
 
-	async function deleteHandler() {
-		await deleteMultipleField({
-			modelId,
-			versionId,
-			dbId,
-			appId,
-			orgId,
-			fieldIds: table.getSelectedRowModel().rows.map((row) => row.original._id),
-		});
-
-		table?.resetRowSelection?.();
-	}
+	const { mutate: deleteHandler } = useMutation({
+		mutationFn: () =>
+			deleteMultipleField({
+				modelId,
+				versionId,
+				dbId,
+				appId,
+				orgId,
+				fieldIds: table.getSelectedRowModel().rows.map((row) => row.original._id),
+			}),
+		onSuccess: () => {
+			table?.resetRowSelection?.();
+		},
+		onError: ({ error, details }) => {
+			notify({ type: 'error', description: details, title: error });
+		},
+	});
 
 	const databasesUrl = `/organization/${database?.orgId}/apps/${database?.appId}/version/${database?.versionId}/database`;
 	const databaseUrl = `${databasesUrl}/${model?.dbId}/models`;
