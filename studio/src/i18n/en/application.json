@@ -45,8 +45,8 @@
 			"successDesc": "The app avatar has been updated successfully."
 		},
 		"transfer": {
-			"title": "Transfer Ownership",
-			"description": "The organization owner is the person who has created the organization or the person to whom the organization ownership has been transferred. The Owner has full control over the organization and only organization owners can delete the organization or transfer its ownership to someone else.",
+			"title": "Transfer Application Ownership",
+			"description": "The application owner is the person who has created the application or the person to whom the application ownership has been transferred. The Owner has full control over the application and only application owners can delete the application or transfer its ownership to someone else.",
 			"subDesc": "Select the organization member with Admin role to transfer ownership",
 			"placeholder": "Select a member",
 			"success": "Ownership has been transferred successfully",

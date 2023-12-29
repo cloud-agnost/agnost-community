@@ -3,9 +3,11 @@ import { DataTable } from '@/components/DataTable';
 import { SearchInput } from '@/components/SearchInput';
 import { useTable } from '@/hooks';
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
+import { toast } from '@/hooks/useToast';
 import useApplicationStore from '@/store/app/applicationStore';
 import useClusterStore from '@/store/cluster/clusterStore';
 import { Application, ApplicationMember } from '@/types';
+import { useMutation } from '@tanstack/react-query';
 import { Table } from '@tanstack/react-table';
 import { RoleDropdown } from 'components/RoleDropdown';
 import { SelectedRowButton } from 'components/Table';
@@ -14,7 +16,6 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import BeatLoader from 'react-spinners/BeatLoader';
 import { AppMembersTableColumns } from './AppMembersTableColumns';
-import { toast } from '@/hooks/useToast';
 export default function MainAppMembers({ loading }: { loading: boolean }) {
 	const [searchParams] = useSearchParams();
 	const { applicationTeam, application, openInviteMemberDrawer, removeMultipleAppMembers } =
@@ -35,26 +36,28 @@ export default function MainAppMembers({ loading }: { loading: boolean }) {
 	const canMultiDelete = useAuthorizeApp('team.delete');
 	const { t } = useTranslation();
 	const { orgId } = useParams() as Record<string, string>;
-
+	const { mutate: removeMultipleMembersMutate } = useMutation({
+		mutationFn: removeMultipleAppMembers,
+		onSuccess: () => {
+			toast({
+				title: t('general.member.delete') as string,
+				action: 'success',
+			});
+			table?.toggleAllRowsSelected(false);
+		},
+		onError: ({ details }) => {
+			toast({
+				title: details,
+				action: 'error',
+			});
+		},
+	});
 	function removeMultipleMembers() {
 		const userIds = table.getSelectedRowModel().rows?.map((row) => row.original.member._id);
-		removeMultipleAppMembers({
+		removeMultipleMembersMutate({
 			userIds,
 			orgId,
 			appId: application?._id as string,
-			onSuccess: () => {
-				toast({
-					title: t('general.member.delete') as string,
-					action: 'success',
-				});
-				table?.toggleAllRowsSelected(false);
-			},
-			onError: ({ details }) => {
-				toast({
-					title: details,
-					action: 'error',
-				});
-			},
 		});
 	}
 	return (

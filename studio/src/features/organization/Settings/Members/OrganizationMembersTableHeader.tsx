@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import '../../organization.scss';
 import { useMemo } from 'react';
+import { useMutation } from '@tanstack/react-query';
 
 export default function OrganizationMembersTableHeader({ table }: { table: Table<any> }) {
 	const { t } = useTranslation();
@@ -68,16 +69,27 @@ export default function OrganizationMembersTableHeader({ table }: { table: Table
 			action: 'error',
 		});
 	}
+
+	const { mutate: removeMemberMutate } = useMutation({
+		mutationFn: removeMultipleMembersFromOrganization,
+		onSuccess,
+		onError,
+	});
+	const { mutate: removeInvitationMutate } = useMutation({
+		mutationFn: deleteMultipleInvitations,
+		onSuccess,
+		onError,
+	});
 	function deleteMulti() {
 		const selectedRows = table.getSelectedRowModel().rows;
 		if (selectedTab === 'member') {
-			removeMultipleMembersFromOrganization({
+			removeMemberMutate({
 				userIds: selectedRows.map((row) => row.original.member._id) ?? [],
 				onSuccess,
 				onError,
 			});
 		} else {
-			deleteMultipleInvitations({
+			removeInvitationMutate({
 				tokens: selectedRows?.map((row) => row.original.token) ?? [],
 				onSuccess,
 				onError,

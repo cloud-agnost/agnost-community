@@ -14,7 +14,6 @@ import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 import { DataTable } from 'components/DataTable';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { useToast } from '@/hooks';
 export default function Fields() {
 	const { modelId, versionId, dbId, appId, orgId } = useParams() as Record<string, string>;
 	const { toast } = useToast();
