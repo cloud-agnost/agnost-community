@@ -156,37 +156,34 @@ function ReleaseSettings() {
 		},
 	});
 	return (
-		<>
+		<DropdownMenuItemContainer>
+			{hasUpdate && (
+				<>
+					<DropdownMenuItem onClick={mutateAsync} disabled={!user?.isClusterOwner}>
+						<Refresh className={cn('mr-2', isPending && 'animate-spin')} />
+						{t('cluster.update', {
+							release: clusterReleaseInfo?.latest?.release,
+						})}
+					</DropdownMenuItem>
+					<DropdownMenuSeparator className='!m-0' />
+				</>
+			)}
+			<DropdownMenuItem onClick={toggleReleaseHistory}>
+				<ClockCounterClockwise className='mr-2' />
+				{t('cluster.open_release_history')}
+			</DropdownMenuItem>
 			<DropdownMenuSeparator className='!m-0' />
-			<DropdownMenuItemContainer>
-				{hasUpdate && (
-					<>
-						<DropdownMenuItem onClick={mutateAsync} disabled={!user?.isClusterOwner}>
-							<Refresh className={cn('mr-2', isPending && 'animate-spin')} />
-							{t('cluster.update', {
-								release: clusterReleaseInfo?.latest?.release,
-							})}
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-					</>
-				)}
-				<DropdownMenuItem onClick={toggleReleaseHistory}>
-					<ClockCounterClockwise className='mr-2' />
-					{t('cluster.open_release_history')}
-				</DropdownMenuItem>
-				<DropdownMenuSeparator />
-				<DropdownMenuItem>
-					<Link
-						className='flex items-center gap-1'
-						to={`https://github.com/cloud-agnost/agnost-community/releases/tag/${clusterReleaseInfo?.latest?.release}`}
-						rel='noopener noreferrer'
-						target='_blank'
-					>
-						<Document className='mr-2' />
-						{t('cluster.view_notes')}
-					</Link>
-				</DropdownMenuItem>
-			</DropdownMenuItemContainer>
-		</>
+			<DropdownMenuItem>
+				<Link
+					className='flex items-center gap-1'
+					to={`https://github.com/cloud-agnost/agnost-community/releases/tag/${clusterReleaseInfo?.latest?.release}`}
+					rel='noopener noreferrer'
+					target='_blank'
+				>
+					<Document className='mr-2' />
+					{t('cluster.view_notes')}
+				</Link>
+			</DropdownMenuItem>
+		</DropdownMenuItemContainer>
 	);
 }
