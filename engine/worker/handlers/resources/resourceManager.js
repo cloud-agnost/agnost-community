@@ -1235,7 +1235,7 @@ export class ResourceManager {
         try {
             // Update the resource log object
             await axios.post(
-                `${config.get("general.platformBaseUrl")}/v1/org/${resource.orgId}/resource/${
+                `${helper.getPlatformUrl()}/v1/org/${resource.orgId}/resource/${
                     resource._id
                 }/update-read-access-settings`,
                 accessReadOnly,

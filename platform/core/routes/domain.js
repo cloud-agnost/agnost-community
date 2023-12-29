@@ -96,7 +96,7 @@ router.post(
 			const env = await envCtrl.getOneByQuery({ versionId: version._id });
 			// Update ingresses
 			await axios.post(
-				config.get("general.workerUrl") + "/v1/resource/cluster-domains-add",
+				helper.getWorkerUrl() + "/v1/resource/cluster-domains-add",
 				{
 					domain,
 					ingresses: [`${env.iid}-container-ingress`],
@@ -178,7 +178,7 @@ router.post(
 			const env = await envCtrl.getOneByQuery({ versionId: version._id });
 			// Update ingresses
 			await axios.post(
-				config.get("general.workerUrl") + "/v1/resource/cluster-domains-add",
+				helper.getWorkerUrl() + "/v1/resource/cluster-domains-add",
 				{
 					domain,
 					ingresses: [`${env.iid}-container-ingress`],
@@ -263,7 +263,7 @@ router.delete(
 			const env = await envCtrl.getOneByQuery({ versionId: version._id });
 			// Update ingresses
 			await axios.post(
-				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
+				helper.getWorkerUrl() + "/v1/resource/cluster-domains-delete",
 				{
 					domain: domains.map((entry) => entry.domain),
 					ingresses: [`${env.iid}-container-ingress`],
@@ -329,7 +329,7 @@ router.delete(
 			const env = await envCtrl.getOneByQuery({ versionId: version._id });
 			// Update ingresses
 			await axios.post(
-				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
+				helper.getWorkerUrl() + "/v1/resource/cluster-domains-delete",
 				{
 					domain: domain.domain,
 					ingresses: [`${env.iid}-container-ingress`],
@@ -393,7 +393,7 @@ router.delete(
 			const env = await envCtrl.getOneByQuery({ versionId: version._id });
 			// Update ingresses
 			await axios.post(
-				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
+				helper.getWorkerUrl() + "/v1/resource/cluster-domains-delete",
 				{
 					domain: domain.domain,
 					ingresses: [`${env.iid}-container-ingress`],
@@ -458,7 +458,7 @@ router.post(
 			const env = await envCtrl.getOneByQuery({ versionId: version._id });
 			// Update ingresses
 			await axios.post(
-				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
+				helper.getWorkerUrl() + "/v1/resource/cluster-domains-delete",
 				{
 					domain: domain.domain,
 					ingresses: [`${env.iid}-container-ingress`],

@@ -41,4 +41,8 @@ const generateId = (id = null) => {
 	else return new mongo.ObjectId();
 };
 
-export default { randomInt, generateId, getIP };
+function getPlatformUrl() {
+	return `http://platform-core-clusterip-service.${process.env.NAMESPACE}.svc.cluster.local:4000`;
+}
+
+export default { randomInt, generateId, getIP, getPlatformUrl };

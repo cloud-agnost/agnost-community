@@ -128,7 +128,7 @@ async function updateLatestResourceLog(resource, status) {
 	//Make api call to the platform to log the error message
 	axios
 		.post(
-			config.get("general.platformBaseUrl") + "/v1/telemetry/update-log",
+			helper.getPlatformUrl() + "/v1/telemetry/update-log",
 			{ resource, status },
 			{
 				headers: {
@@ -149,7 +149,7 @@ async function upadateResourceStatus(resource, status) {
 	//Make api call to the platform to log the error message
 	axios
 		.post(
-			config.get("general.platformBaseUrl") + "/v1/telemetry/update-status",
+			helper.getPlatformUrl() + "/v1/telemetry/update-status",
 			{ resource, status },
 			{
 				headers: {
@@ -1124,7 +1124,7 @@ async function upadateClusterDeploymentsStatus(deploymentsStatusInfo) {
 		//Make api call to the platform to log the error message
 		axios
 			.post(
-				config.get("general.platformBaseUrl") + "/v1/cluster/update-status",
+				helper.getPlatformUrl() + "/v1/cluster/update-status",
 				deploymentsStatusInfo,
 				{
 					headers: {

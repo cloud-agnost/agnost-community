@@ -342,7 +342,7 @@ function memoryToBytes(memoryStr) {
 async function getClusterIPs() {
 	try {
 		const result = await axios.get(
-			config.get("general.workerUrl") + "/v1/resource/cluster-ip",
+			helper.getWorkerUrl() + "/v1/resource/cluster-ip",
 			{
 				headers: {
 					Authorization: process.env.ACCESS_TOKEN,
@@ -480,6 +480,22 @@ function getTypedValue(value) {
 	return value;
 }
 
+function getSyncUrl() {
+	return `http://platform-sync-clusterip-service.$ process.env.NAMESPACE}.svc.cluster.local:4000`;
+}
+
+function getRealtimeUrl() {
+	return `http://engine-realtime-clusterip-service.${process.env.NAMESPACE}.svc.cluster.local:4000`;
+}
+
+function getPlatformUrl() {
+	return `http://platform-core-clusterip-service.${process.env.NAMESPACE}.svc.cluster.local:4000`;
+}
+
+function getWorkerUrl() {
+	return `http://engine-worker-clusterip-service.${process.env.NAMESPACE}.svc.cluster.local:4000`;
+}
+
 export default {
 	constants,
 	isObject,
@@ -508,4 +524,8 @@ export default {
 	decryptVersionData,
 	decryptResourceData,
 	getTypedValue,
+	getSyncUrl,
+	getRealtimeUrl,
+	getPlatformUrl,
+	getWorkerUrl,
 };

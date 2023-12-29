@@ -12,8 +12,7 @@
         "resourcePaginationSize": 100,
         "initialDelaySeconds": 30,
         "maxResourceOpWaitMinues": 5,
-        "gcSeconds": 30,
-        "platformBaseUrl": "http://platform-core-clusterip-service:4000"
+        "gcSeconds": 30
     },
     "database": {
         "maxPoolSize": 3

@@ -29,7 +29,7 @@ class EngineErrorTransport extends Transport {
 
 		//Make api call to the platform to log the error message
 		axios
-			.post(config.get("general.platformBaseUrl") + "/v1/engine/error", entry, {
+			.post(helper.getPlatformUrl() + "/v1/engine/error", entry, {
 				headers: {
 					Authorization: process.env.MASTER_TOKEN,
 					"Content-Type": "application/json",

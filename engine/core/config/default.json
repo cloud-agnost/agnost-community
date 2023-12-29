@@ -16,14 +16,12 @@
         "retryCount": 30
      },
      "sync": {
-      "serverURL": "http://platform-sync-clusterip-service:4000",
       "namespace": "",
       "reconnection": true,
       "reconnectionDelay": 500,
       "path": "/sync/"
    },
    "realtime": {
-      "serverURL": "http://engine-realtime-clusterip-service:4000",
       "namespace": "",
       "reconnection": true,
       "reconnectionDelay": 500
@@ -33,7 +31,6 @@
         "taskProcessQueueCount": 1,
         "messageProcessQueueCount": 1,
         "delayedMessageExchangeCount": 1,
-        "platformBaseUrl": "http://platform-core-clusterip-service:4000",
         "maxPoolSize": 3,
         "maxLogPayloadSizeKB": 100,
         "fileStorageFolder": "/tmp/uploads",

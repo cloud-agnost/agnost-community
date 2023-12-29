@@ -63,9 +63,14 @@ function getAsObject(keyValuePairs) {
 	return obj;
 }
 
+function getPlatformUrl() {
+	return `http://platform-core-clusterip-service.${process.env.NAMESPACE}.svc.cluster.local:4000`;
+}
+
 export default {
 	decryptText,
 	getIP,
 	getQueryString,
 	getAsObject,
+	getPlatformUrl,
 };

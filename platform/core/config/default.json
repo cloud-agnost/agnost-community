@@ -34,7 +34,6 @@
     "maxPoolSize": 3
   },
   "sync": {
-    "serverURL": "http://platform-sync-clusterip-service:4000",
     "namespace": "",
     "reconnection": true,
     "reconnectionDelay": 500,
@@ -66,12 +65,9 @@
     "minBucketCount": 1,
     "maxBucketCount": 31,
     "storageBucket": "cluster-storage",
-    "platformBaseUrl": "http://platform-core-clusterip-service:4000",
-    "workerUrl": "http://engine-worker-clusterip-service:4000",
     "defaulPVCSize": "1Gi",
     "defaultSchedulerDeploymentName": "engine-scheduler-deployment",
     "defaultRealtimeDeploymentName": "engine-realtime-deployment",
-    "defaultRealtimeServerURL": "http://engine-realtime-clusterip-service:4000",
     "defaultAuthRedirect": "http://localhost:3000/auth-redirect",
     "emailTokenExpiresInSeconds": 3600,
     "minEmailTokenExpirySeconds": 60,

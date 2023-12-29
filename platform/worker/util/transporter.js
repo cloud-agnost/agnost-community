@@ -12,7 +12,7 @@ export async function getTransport() {
 	// Get the SMTP server configuration. Make api call to the platform to to get the SMTP configuration
 	try {
 		const smtpConfig = await axios.get(
-			config.get("general.platformBaseUrl") + "/v1/cluster/smtp",
+			helper.getPlatformUrl() + "/v1/cluster/smtp",
 			{
 				headers: {
 					Authorization: process.env.MASTER_TOKEN,

@@ -657,7 +657,7 @@ router.get(
 			const { env } = req;
 
 			const apiInfo = await axios.get(
-				config.get("general.workerUrl") + `/v1/resource/apiserver/${env.iid}`,
+				helper.getWorkerUrl() + `/v1/resource/apiserver/${env.iid}`,
 				{
 					headers: {
 						Authorization: process.env.ACCESS_TOKEN,

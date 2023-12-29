@@ -7,7 +7,7 @@ export function initializeRealtimeServer() {
 	if (realtime) return;
 
 	let realtimeConfig = config.get("realtime");
-	realtime = io(realtimeConfig.serverURL, {
+	realtime = io(helper.getRealtimeUrl(), {
 		reconnection: realtimeConfig.reconnection,
 		reconnectionDelay: realtimeConfig.reconnectionDelay,
 		transports: ["websocket", "polling"],
@@ -20,13 +20,13 @@ export function initializeRealtimeServer() {
 
 	realtime.on("connect", () => {
 		logger.info(
-			`Connection established to realtime server @${realtimeConfig.serverURL}`
+			`Connection established to realtime server @${helper.getRealtimeUrl()}`
 		);
 	});
 
 	realtime.io.on("reconnect", () => {
 		logger.info(
-			`Connection re-established to realtime server @${realtimeConfig.serverURL}`
+			`Connection re-established to realtime server @${helper.getRealtimeUrl()}`
 		);
 	});
 }
