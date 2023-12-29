@@ -3,7 +3,9 @@ import { Button } from '@/components/Button';
 import { Description } from '@/components/Description';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
+import { SuccessCheck } from '@/components/icons';
 import { AuthLayout } from '@/layouts/AuthLayout';
+import { GuestOnly } from '@/router';
 import useAuthStore from '@/store/auth/authStore.ts';
 import { APIError } from '@/types';
 import { translate } from '@/utils';
@@ -14,9 +16,6 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import * as z from 'zod';
 import './auth.scss';
-import { GuestOnly } from '@/router';
-import { SuccessCheck } from '@/components/icons';
-import { ArrowLeft } from '@phosphor-icons/react';
 
 const FormSchema = z.object({
 	email: z
