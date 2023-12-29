@@ -9,6 +9,7 @@ import { HTTP_METHOD_BADGE_MAP, TEST_ENDPOINTS_MENU_ITEMS } from '@/constants';
 import { useToast } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
+import useUtilsStore from '@/store/version/utilsStore';
 import { APIError, EnvironmentStatus, TestMethods } from '@/types';
 import {
 	cn,
@@ -33,7 +34,6 @@ import EndpointHeaders from './TestEndpoint/EndpointHeaders';
 import EndpointParams from './TestEndpoint/EndpointParams';
 import EndpointPathVariables from './TestEndpoint/EndpointPathVariables';
 import EndpointResponse from './TestEndpoint/EndpointResponse';
-import useUtilsStore from '@/store/version/utilsStore';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -80,7 +80,7 @@ export const TestEndpointSchema = z.object({
 
 export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { environment } = useEnvironmentStore();
 	const { endpoint, testEndpoint } = useEndpointStore();
 	const { endpointRequest } = useUtilsStore();
@@ -106,11 +106,10 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 	});
 	const { mutateAsync: testEndpointMutate, isPending } = useMutation({
 		mutationFn: testEndpoint,
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }: APIError) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

@@ -444,7 +444,8 @@ export class PostgreSQL extends SQLDatabase {
 
 		const finalList = [];
 		for (const field of filteredFields) {
-			finalList.push(`'${field.name}'`);
+			// Postgresql stores field names in lowercase, so we need to convert them to lowercase
+			finalList.push(`'${field.name.toLowerCase()}'`);
 			finalList.push(`${prefix}.${field.name}`);
 		}
 

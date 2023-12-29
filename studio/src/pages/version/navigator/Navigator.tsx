@@ -27,7 +27,7 @@ import BeatLoader from 'react-spinners/BeatLoader';
 
 export default function Navigator() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const [searchParams] = useSearchParams();
 	const {
 		setEditedField,
@@ -57,8 +57,8 @@ export default function Navigator() {
 		mutationFn: deleteMultipleDataFromModel,
 		mutationKey: ['deleteMultipleDataFromModel'],
 		onSuccess: () => table.resetRowSelection(),
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 

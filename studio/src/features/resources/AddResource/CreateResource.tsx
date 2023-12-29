@@ -29,7 +29,7 @@ export default function CreateResource() {
 		useResourceStore();
 	const { resourceVersions } = useTypeStore();
 	const [loading, setLoading] = useState(false);
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { orgId } = useParams() as Record<string, string>;
 	const onSubmit = (data: z.infer<typeof CreateResourceSchema>) => {
 		setLoading(true);
@@ -44,10 +44,9 @@ export default function CreateResource() {
 			},
 			onError: (error) => {
 				setLoading(false);
-				notify({
-					title: error?.error,
-					description: error?.details,
-					type: 'error',
+				toast({
+					title: error?.details,
+					action: 'error',
 				});
 			},
 		});

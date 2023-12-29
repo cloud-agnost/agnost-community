@@ -134,24 +134,22 @@ function ReleaseSettings() {
 	const { t } = useTranslation();
 	const { clusterReleaseInfo, updateClusterRelease, toggleReleaseHistory } = useClusterStore();
 	const user = useAuthStore((state) => state.user);
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const hasUpdate = clusterReleaseInfo?.latest?.release !== clusterReleaseInfo?.current?.release;
 	const { isPending, mutateAsync } = useMutation({
 		mutationFn: () =>
 			updateClusterRelease({ release: clusterReleaseInfo?.latest?.release as string }),
 		mutationKey: ['updateClusterRelease'],
 		onSuccess: () => {
-			notify({
-				title: t('general.success') as string,
-				description: t('cluster.deploy_success') as string,
-				type: 'success',
+			toast({
+				title: t('cluster.deploy_success') as string,
+				action: 'success',
 			});
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }: APIError) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

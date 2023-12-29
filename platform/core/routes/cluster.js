@@ -255,7 +255,7 @@ router.get("/components", authSession, async (req, res) => {
 
 		// Get cluster configuration
 		const info = await axios.get(
-			config.get("general.workerUrl") + "/v1/resource/cluster-info",
+			helper.getWorkerUrl() + "/v1/resource/cluster-info",
 			{
 				headers: {
 					Authorization: process.env.ACCESS_TOKEN,
@@ -316,7 +316,7 @@ router.put(
 				// Update cluster configuration. We are running this in catch since if engine-worker is upated the called worker can be terminated
 				// resulting in socket hang up kind of errors
 				await axios.post(
-					config.get("general.workerUrl") + "/v1/resource/cluster-info",
+					helper.getWorkerUrl() + "/v1/resource/cluster-info",
 					req.body,
 					{
 						headers: {
@@ -451,7 +451,7 @@ router.put(
 
 			// Update cluster default deployment image tags - version change
 			await axios.post(
-				config.get("general.workerUrl") + "/v1/resource/cluster-versions",
+				helper.getWorkerUrl() + "/v1/resource/cluster-versions",
 				requiredUpdates,
 				{
 					headers: {
@@ -591,7 +591,7 @@ router.post(
 
 			// Update ingresses
 			await axios.post(
-				config.get("general.workerUrl") + "/v1/resource/cluster-domains-add",
+				helper.getWorkerUrl() + "/v1/resource/cluster-domains-add",
 				{
 					domain,
 					ingresses,
@@ -662,7 +662,7 @@ router.delete(
 
 			// Update ingresses
 			await axios.post(
-				config.get("general.workerUrl") + "/v1/resource/cluster-domains-delete",
+				helper.getWorkerUrl() + "/v1/resource/cluster-domains-delete",
 				{
 					domain,
 					ingresses,
@@ -753,7 +753,7 @@ router.put(
 
 			// Update ingresses
 			await axios.post(
-				config.get("general.workerUrl") + "/v1/resource/cluster-enforce-ssl",
+				helper.getWorkerUrl() + "/v1/resource/cluster-enforce-ssl",
 				{ enforceSSLAccess, ingresses },
 				{
 					headers: {

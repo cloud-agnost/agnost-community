@@ -2,9 +2,10 @@ import { Checkbox } from '@/components/Checkbox';
 import { DateText } from '@/components/DateText';
 import { ResendButton } from '@/components/ResendButton';
 import { TableConfirmation } from '@/components/Table';
+import { toast } from '@/hooks/useToast';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Invitation } from '@/types';
-import { getOrgPermission, notify, translate } from '@/utils';
+import { getOrgPermission, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
@@ -12,17 +13,15 @@ async function onDelete(token: string) {
 	return useOrganizationStore.getState().deleteInvitation({
 		token,
 		onSuccess: () => {
-			notify({
+			toast({
 				title: 'Invitation deleted',
-				description: 'Invitation has been deleted.',
-				type: 'success',
+				action: 'success',
 			});
 		},
-		onError: ({ error, details }) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});
@@ -32,17 +31,15 @@ function onResend(token: string) {
 	useOrganizationStore.getState?.().resendInvitation({
 		token,
 		onSuccess: () => {
-			notify({
-				title: 'Invitation resent',
-				description: 'Invitation has been resent to the user.',
-				type: 'success',
+			toast({
+				title: 'Invitation has been resent to the user.',
+				action: 'success',
 			});
 		},
-		onError: ({ error, details }) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

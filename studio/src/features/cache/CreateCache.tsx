@@ -26,7 +26,7 @@ export default function CreateCache({ open, onClose }: CreateCacheProps) {
 		appId: string;
 		orgId: string;
 	}>();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const form = useForm<z.infer<typeof CreateCacheSchema>>({
 		resolver: zodResolver(CreateCacheSchema),
 		defaultValues: {
@@ -49,8 +49,8 @@ export default function CreateCache({ open, onClose }: CreateCacheProps) {
 				versionId: environment?.versionId,
 			});
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 

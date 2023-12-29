@@ -1,37 +1,42 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 import { Button } from '@/components/Button';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
+import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
+import { toast } from '@/hooks/useToast';
 import useOrganizationStore from '@/store/organization/organizationStore';
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { APIError } from '@/types';
-import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
-import useAuthorizeOrg from '@/hooks/useAuthorizeOrg';
 
 export default function DeleteOrganization() {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<APIError | null>();
 	const [isOpen, setIsOpen] = useState(false);
 	const confirmCode = useOrganizationStore((state) => state.organization?.iid) as string;
 	const { deleteOrganization } = useOrganizationStore();
 	const canDelete = useAuthorizeOrg('delete');
-	function onConfirm() {
-		deleteOrganization({
-			onSuccess: () => {
-				closeModal();
-				navigate('/organization');
-			},
-			onError: (error) => {
-				setError(error as APIError);
-			},
-		});
-	}
+
+	const {
+		mutate: onConfirm,
+		error,
+		isPending,
+	} = useMutation({
+		mutationFn: deleteOrganization,
+		onSuccess: () => {
+			closeModal();
+			navigate('/organization');
+		},
+		onError: (error) => {
+			toast({
+				title: error.details,
+				action: 'error',
+			});
+		},
+	});
+
 	function closeModal() {
-		setLoading(false);
 		setIsOpen(false);
-		setError(null);
 	}
 	return (
 		<>
@@ -51,7 +56,7 @@ export default function DeleteOrganization() {
 				{t('general.delete')}
 			</Button>
 			<ConfirmationModal
-				loading={loading}
+				loading={isPending}
 				error={error}
 				title={t('organization.settings.delete.title')}
 				alertTitle={t('organization.settings.delete.confirm.title')}

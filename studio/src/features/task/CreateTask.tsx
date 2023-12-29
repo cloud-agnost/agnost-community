@@ -21,7 +21,7 @@ interface CreateTaskProps {
 export default function CreateTask({ open, onClose }: CreateTaskProps) {
 	const { t } = useTranslation();
 	const { createTask } = useTaskStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { resources } = useResourceStore();
 	const navigate = useTabNavigate();
 	const form = useForm<z.infer<typeof CreateTaskSchema>>({
@@ -66,8 +66,8 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 			});
 			handleClose();
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 	function onSubmit(data: z.infer<typeof CreateTaskSchema>) {

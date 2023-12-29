@@ -93,7 +93,7 @@ function handleError(req, res, error) {
 
     //Make api call to the platform to log the error message
     axios
-        .post(config.get("general.platformBaseUrl") + "/v1/engine/error", entry, {
+        .post(helper.getPlatformUrl() + "/v1/engine/error", entry, {
             headers: {
                 Authorization: process.env.MASTER_TOKEN,
                 "Content-Type": "application/json",
@@ -242,6 +242,14 @@ function getCertSecretName(length = 12) {
     return `cert-secret-${nanoid()}`;
 }
 
+function getSyncUrl() {
+    return `http://platform-sync-clusterip-service.${process.env.NAMESPACE}.svc.cluster.local:4000`;
+}
+
+function getPlatformUrl() {
+    return `http://platform-core-clusterip-service.${process.env.NAMESPACE}.svc.cluster.local:4000`;
+}
+
 export default {
     constants,
     generateSlug,
@@ -256,4 +264,6 @@ export default {
     encyrptSensitiveData,
     getCertSecretName,
     decryptText,
+    getSyncUrl,
+    getPlatformUrl,
 };

@@ -17,7 +17,7 @@ interface AddVersionDomainProps {
 
 export default function AddVersionDomain({ open, onClose }: AddVersionDomainProps) {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { addCustomDomain } = useSettingsStore();
 	const form = useForm<z.infer<typeof CustomDomainSchema>>({
 		resolver: zodResolver(CustomDomainSchema),
@@ -27,10 +27,9 @@ export default function AddVersionDomain({ open, onClose }: AddVersionDomainProp
 		mutationFn: addCustomDomain,
 		onSuccess: handleClose,
 		onError: (error) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

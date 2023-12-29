@@ -72,7 +72,7 @@ const themes = {
 
 export default function EditorSettings() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { isEditorSettingsDrawerOpen, toggleEditorSettingsDrawer, updateEditorPreferences, user } =
 		useAuthStore();
 	const form = useForm({
@@ -94,17 +94,15 @@ export default function EditorSettings() {
 		mutationKey: ['editorPreferences'],
 		onSuccess: () => {
 			toggleEditorSettingsDrawer();
-			notify({
-				title: t('general.success'),
-				description: t('profileSettings.editor.success'),
-				type: 'success',
+			toast({
+				title: t('profileSettings.editor.success') as string,
+				action: 'success',
 			});
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

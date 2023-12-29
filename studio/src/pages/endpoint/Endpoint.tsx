@@ -17,7 +17,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams } from 'react-router-dom';
 
 export default function MainEndpoint() {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 	const canCreate = useAuthorizeVersion('endpoint.create');
@@ -42,8 +42,8 @@ export default function MainEndpoint() {
 		onSuccess: () => {
 			table?.resetRowSelection();
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 

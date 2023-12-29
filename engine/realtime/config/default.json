@@ -26,8 +26,5 @@
     },
     "realtimeCache": {
         "port": 6379
-    },
-    "general": {  
-        "platformBaseUrl": "http://platform-core-clusterip-service:4000"
     }
 }

@@ -21,8 +21,5 @@
      },
      "emailServer": {
       "pool": true
-   },
-   "general": {  
-      "platformBaseUrl": "http://platform-core-clusterip-service:4000"
    }
 }

@@ -17,7 +17,7 @@ interface CreateEnvVariableProps {
 
 export default function CreateEnvVariable({ open, onOpenChange }: CreateEnvVariableProps) {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const form = useForm<z.infer<typeof EnvVariableSchema>>({
 		resolver: zodResolver(EnvVariableSchema),
 	});
@@ -28,10 +28,9 @@ export default function CreateEnvVariable({ open, onOpenChange }: CreateEnvVaria
 		mutationFn: addParam,
 		onSuccess: onClose,
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

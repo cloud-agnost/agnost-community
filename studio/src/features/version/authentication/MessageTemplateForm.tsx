@@ -73,7 +73,7 @@ const MessageTemplatesSchema = z
 	});
 
 export default function MessageTemplateForm({ template }: { template: VersionMessageTemplate }) {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { setAuthMessageTemplate } = useSettingsStore();
 	const { version } = useVersionStore();
 	const canEdit = useAuthorizeVersion('version.auth.update');
@@ -85,17 +85,16 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 	const { mutateAsync, isPending } = useMutation({
 		mutationFn: setAuthMessageTemplate,
 		onSuccess: () => {
-			notify({
-				type: 'success',
-				title: t('general.success'),
-				description: t('version.authentication.messageTemplateUpdated'),
+			toast({
+				action: 'success',
+				title: t('version.authentication.messageTemplateUpdated'),
 			});
 		},
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: t('general.error'),
-				description: error.details,
+			toast({
+				action: 'error',
+
+				title: error.details,
 			});
 		},
 	});

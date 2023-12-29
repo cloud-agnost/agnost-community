@@ -18,7 +18,7 @@ export default function UpdateResourceAccessConf() {
 	const form = useForm<z.infer<typeof ConnectResourceSchema>>({
 		resolver: zodResolver(ConnectResourceSchema),
 	});
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
 	const { resourceToEdit, updateResourceAccessSettings, closeEditResourceModal } =
 		useResourceStore();
@@ -55,12 +55,11 @@ export default function UpdateResourceAccessConf() {
 				form.reset();
 				closeEditResourceModal();
 			},
-			onError: ({ error, details }) => {
+			onError: ({ details }) => {
 				setLoading(false);
-				notify({
-					title: error,
-					description: details,
-					type: 'error',
+				toast({
+					title: details,
+					action: 'error',
 				});
 			},
 		});

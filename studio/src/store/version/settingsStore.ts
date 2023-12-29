@@ -37,7 +37,6 @@ import {
 	UpdateVersionVariableParams,
 	Version,
 } from '@/types';
-import { notify, translate } from '@/utils';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import useUtilsStore from './utilsStore';
@@ -116,12 +115,6 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 			try {
 				return VersionService.searchNPMPackages(params);
 			} catch (e) {
-				const error = e as APIError;
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
-				});
 				throw e;
 			}
 		},
@@ -139,23 +132,8 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 					},
 				}));
 
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.npm.success'),
-				});
-
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-				for (const field of errorArray) {
-					notify({
-						type: 'error',
-						title: error.error,
-						description: field.msg,
-					});
-				}
 				throw e;
 			}
 		},
@@ -167,20 +145,8 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 					version,
 				});
 
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.npm.deleted'),
-				});
-
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
-				});
 				throw e;
 			}
 		},
@@ -188,20 +154,9 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 			try {
 				const version = await VersionService.deleteMultipleNPMPackages(params);
 				useVersionStore.setState({ version });
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.npm.deleted'),
-				});
 
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
-				});
 				throw e;
 			}
 		},
@@ -213,22 +168,8 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				const version = await VersionService.addVersionVariable(params);
 				useVersionStore.setState({ version });
 
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.variable.success'),
-				});
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-				for (const field of errorArray) {
-					notify({
-						type: 'error',
-						title: error.error,
-						description: field.msg,
-					});
-				}
 				throw e;
 			}
 		},
@@ -237,20 +178,8 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				const version = await VersionService.deleteVersionVariable(params);
 				useVersionStore.setState({ version });
 
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.variable.deleted'),
-				});
-
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
-				});
 				throw e;
 			}
 		},
@@ -259,20 +188,8 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				const version = await VersionService.deleteMultipleVersionVariables(params);
 				useVersionStore.setState({ version });
 
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.variable.deleted'),
-				});
-
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
-				});
 				throw e;
 			}
 		},
@@ -281,23 +198,8 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				const version = await VersionService.updateVersionVariable(params);
 				useVersionStore.setState({ version });
 
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.variable.update_success'),
-				});
-
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-				for (const field of errorArray) {
-					notify({
-						type: 'error',
-						title: error.error,
-						description: field.msg,
-					});
-				}
 				throw e;
 			}
 		},
@@ -315,20 +217,8 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				const version = await VersionService.editRateLimit(params);
 				useVersionStore.setState({ version });
 
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.rate_limiter_updated'),
-				});
-
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
-				});
 				throw e;
 			}
 		},
@@ -337,20 +227,8 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				const version = await VersionService.deleteMultipleRateLimits(params);
 				useVersionStore.setState({ version });
 
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.limiter_deleted'),
-				});
-
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
-				});
 				throw e;
 			}
 		},
@@ -359,23 +237,8 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				const version = await VersionService.createAPIKey(params);
 				useVersionStore.setState({ version });
 
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.api_key.success'),
-				});
-
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-				for (const field of errorArray) {
-					notify({
-						type: 'error',
-						title: error.error,
-						description: field.msg,
-					});
-				}
 				throw e;
 			}
 		},
@@ -384,20 +247,8 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				const version = await VersionService.deleteAPIKey(params);
 				useVersionStore.setState({ version });
 
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.api_key.deleted'),
-				});
-
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
-				});
 				throw e;
 			}
 		},
@@ -406,23 +257,8 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				const version = await VersionService.editAPIKey(params);
 				useVersionStore.setState({ version });
 
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.api_key.update_success'),
-				});
-
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				const errorArray = error.fields ? error.fields : [{ msg: error.details }];
-				for (const field of errorArray) {
-					notify({
-						type: 'error',
-						title: error.error,
-						description: field.msg,
-					});
-				}
 				throw e;
 			}
 		},
@@ -431,20 +267,8 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 				const version = await VersionService.deleteMultipleAPIKeys(params);
 				useVersionStore.setState({ version });
 
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.api_key.update_success'),
-				});
-
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
-				});
 				throw e;
 			}
 		},
@@ -553,19 +377,8 @@ const useSettingsStore = create<SettingsStore & Actions>()(
 			try {
 				const version = await VersionService.deleteRateLimit(params);
 				useVersionStore.setState({ version });
-				notify({
-					type: 'success',
-					title: translate('general.success'),
-					description: translate('version.limiter_deleted'),
-				});
 				return version;
 			} catch (e) {
-				const error = e as APIError;
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
-				});
 				throw e;
 			}
 		},

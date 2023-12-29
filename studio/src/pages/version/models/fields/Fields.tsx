@@ -3,7 +3,7 @@ import {
 	EditOrCreateFieldDrawer,
 	FieldColumns,
 } from '@/features/database/models/fields/ListFields';
-import { useSearch, useTable } from '@/hooks';
+import { useSearch, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
@@ -17,7 +17,7 @@ import { useParams } from 'react-router-dom';
 import { useToast } from '@/hooks';
 export default function Fields() {
 	const { modelId, versionId, dbId, appId, orgId } = useParams() as Record<string, string>;
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 	const { database } = useDatabaseStore();
 	const { deleteMultipleField, model, closeEditFieldDialog, isEditFieldDialogOpen } =
@@ -44,8 +44,8 @@ export default function Fields() {
 		onSuccess: () => {
 			table?.resetRowSelection?.();
 		},
-		onError: ({ error, details }) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 

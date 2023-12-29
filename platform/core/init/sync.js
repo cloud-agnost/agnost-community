@@ -4,7 +4,7 @@ var socket = null;
 
 export function initializeSyncClient() {
 	let syncConfig = config.get("sync");
-	socket = io(`${syncConfig.serverURL}/${syncConfig.namespace}`, {
+	socket = io(`${helper.getSyncUrl()}/${syncConfig.namespace}`, {
 		reconnection: syncConfig.reconnection,
 		reconnectionDelay: syncConfig.reconnectionDelay,
 		transports: ["websocket", "polling"],
@@ -13,13 +13,13 @@ export function initializeSyncClient() {
 
 	socket.on("connect", () => {
 		logger.info(
-			`Connection established to synronization server @${syncConfig.serverURL}`
+			`Connection established to synronization server @${helper.getSyncUrl()}`
 		);
 	});
 
 	socket.io.on("reconnect", () => {
 		logger.info(
-			`Connection re-established to synronization server @${syncConfig.serverURL}`
+			`Connection re-established to synronization server @${helper.getSyncUrl()}`
 		);
 	});
 }

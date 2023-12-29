@@ -32,7 +32,6 @@
      "general": {  
         "generalQueueCount": 1,
         "taskProcessQueueCount": 1,
-        "platformBaseUrl": "http://platform-core-clusterip-service:4000",
         "maxPoolSize": 3
      }
 }

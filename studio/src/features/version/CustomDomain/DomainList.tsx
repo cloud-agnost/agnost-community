@@ -5,24 +5,22 @@ import useClusterStore from '@/store/cluster/clusterStore';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 export default function DomainList() {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 	const { cluster, deleteDomain } = useClusterStore();
 	const user = useAuthStore((state) => state.user);
 	const { mutate: deleteDomainMutate } = useMutation({
 		mutationFn: deleteDomain,
 		onSuccess: () => {
-			notify({
-				type: 'success',
-				title: t('general.success'),
-				description: t('cluster.delete_domain_success'),
+			toast({
+				action: 'success',
+				title: t('cluster.delete_domain_success') as string,
 			});
 		},
 		onError: (error) => {
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

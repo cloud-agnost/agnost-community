@@ -515,6 +515,18 @@ function stringifyObjectValues(obj) {
 	return stringifiedObj;
 }
 
+function getSyncUrl() {
+	return `http://platform-sync-clusterip-service.${process.env.NAMESPACE}.svc.cluster.local:4000`;
+}
+
+function getRealtimeUrl() {
+	return `http://engine-realtime-clusterip-service.${process.env.NAMESPACE}.svc.cluster.local:4000`;
+}
+
+function getPlatformUrl() {
+	return `http://platform-core-clusterip-service.${process.env.NAMESPACE}.svc.cluster.local:4000`;
+}
+
 export default {
 	generateSlug,
 	generateFileName,
@@ -543,4 +555,7 @@ export default {
 	encryptText,
 	decryptText,
 	stringifyObjectValues,
+	getSyncUrl,
+	getRealtimeUrl,
+	getPlatformUrl,
 };

@@ -9,15 +9,14 @@ import { useParams } from 'react-router-dom';
 export default function Restart() {
 	const { t } = useTranslation();
 	const { restartApiServers, environment } = useEnvironmentStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { versionId, appId, orgId } = useParams() as Record<string, string>;
 	const { isPending, mutateAsync } = useMutation({
 		mutationFn: () => restartApiServers({ orgId, appId, versionId, envId: environment._id }),
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

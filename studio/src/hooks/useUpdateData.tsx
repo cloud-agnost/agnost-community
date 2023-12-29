@@ -1,11 +1,12 @@
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { APIError } from '@/types';
-import { capitalize, getNestedPropertyValue, isEmpty, updateObject } from '@/utils';
-import useToast from './useToast';
+import { getNestedPropertyValue, isEmpty, updateObject } from '@/utils';
+import { useToast } from './useToast';
+
 export default function useUpdateData(name: string) {
 	const { updateDataFromModel, selectedSubModelId, data: modelData } = useNavigatorStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { subModel, nestedModels } = useModelStore();
 	const hasSubModel = !isEmpty(subModel);
 
@@ -63,11 +64,10 @@ export default function useUpdateData(name: string) {
 		});
 	}
 
-	function handleError(err: APIError) {
-		notify({
-			title: capitalize(err.error).replace(/_/g, ' '),
-			description: err.details,
-			type: 'error',
+	function handleError({ details }: APIError) {
+		toast({
+			title: details,
+			action: 'error',
 		});
 	}
 

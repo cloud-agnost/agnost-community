@@ -4,7 +4,7 @@ import { TableConfirmation } from '@/components/Table';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useStorageStore from '@/store/storage/storageStore';
 import { APIError, BucketFile, ColumnDefWithClassName } from '@/types';
-import { formatFileSize, getVersionPermission, notify, translate } from '@/utils';
+import { formatFileSize, getVersionPermission, translate } from '@/utils';
 import { Copy, Swap } from '@phosphor-icons/react';
 import { QueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/Button';
@@ -13,6 +13,7 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'components/Tooltip';
 import { Link } from 'react-router-dom';
+import { toast } from '@/hooks/useToast';
 const {
 	copyFileInBucket,
 	replaceFileInBucket,
@@ -28,11 +29,10 @@ async function deleteFileHandler(toDeleteFile: BucketFile) {
 		.getMutationCache()
 		.build(queryClient, {
 			mutationFn: deleteFileFromBucket,
-			onError: (error: APIError) => {
-				notify({
-					title: error.error,
-					description: error.details,
-					type: 'error',
+			onError: ({ details }: APIError) => {
+				toast({
+					title: details,
+					action: 'error',
 				});
 			},
 		})
@@ -54,17 +54,15 @@ function replaceFile(filePath: string) {
 			.build(queryClient, {
 				mutationFn: replaceFileInBucket,
 				onSuccess: () => {
-					notify({
-						title: translate('general.success'),
-						description: translate('storage.bucket.empty'),
-						type: 'success',
+					toast({
+						title: translate('storage.bucket.empty'),
+						action: 'success',
 					});
 				},
-				onError: ({ error, details }: APIError) => {
-					notify({
-						title: error,
-						description: details,
-						type: 'error',
+				onError: ({ details }: APIError) => {
+					toast({
+						title: details,
+						action: 'error',
 					});
 				},
 			})
@@ -83,17 +81,15 @@ function copyFile(filePath: string) {
 		.build(queryClient, {
 			mutationFn: copyFileInBucket,
 			onSuccess: () => {
-				notify({
-					title: translate('general.success'),
-					description: translate('storage.bucket.empty'),
-					type: 'success',
+				toast({
+					title: translate('storage.bucket.empty'),
+					action: 'success',
 				});
 			},
-			onError: ({ error, details }: APIError) => {
-				notify({
-					title: error,
-					description: details,
-					type: 'error',
+			onError: ({ details }: APIError) => {
+				toast({
+					title: details,
+					action: 'error',
 				});
 			},
 		})

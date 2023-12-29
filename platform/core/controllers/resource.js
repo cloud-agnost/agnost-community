@@ -186,7 +186,7 @@ class ResourceController extends BaseController {
 				config: {},
 				access: helper.encyrptSensitiveData({
 					name: config.get("general.defaultRealtimeDeploymentName"),
-					serverURL: config.get("general.defaultRealtimeServerURL"),
+					serverURL: helper.getRealtimeUrl(),
 				}),
 				status: "Binding",
 				deletable: false,
@@ -279,23 +279,19 @@ class ResourceController extends BaseController {
 					entry.resource.accessReadOnly
 				),
 				action: entry.log.action,
-				callback: `${config.get("general.platformBaseUrl")}/v1/org/${
+				callback: `${helper.getPlatformUrl()}/v1/org/${
 					entry.resource.orgId
 				}/resource/${entry.resource._id}/log/${entry.log._id}`,
 			};
 		});
 
 		// Make api call to engine worker to manage resources
-		await axios.post(
-			config.get("general.workerUrl") + "/v1/resource/manage",
-			resources,
-			{
-				headers: {
-					Authorization: process.env.ACCESS_TOKEN,
-					"Content-Type": "application/json",
-				},
-			}
-		);
+		await axios.post(helper.getWorkerUrl() + "/v1/resource/manage", resources, {
+			headers: {
+				Authorization: process.env.ACCESS_TOKEN,
+				"Content-Type": "application/json",
+			},
+		});
 	}
 
 	/**
@@ -313,16 +309,12 @@ class ResourceController extends BaseController {
 		});
 
 		// Make api call to engine worker to manage resources
-		await axios.post(
-			config.get("general.workerUrl") + "/v1/resource/manage",
-			resources,
-			{
-				headers: {
-					Authorization: process.env.ACCESS_TOKEN,
-					"Content-Type": "application/json",
-				},
-			}
-		);
+		await axios.post(helper.getWorkerUrl() + "/v1/resource/manage", resources, {
+			headers: {
+				Authorization: process.env.ACCESS_TOKEN,
+				"Content-Type": "application/json",
+			},
+		});
 	}
 }
 

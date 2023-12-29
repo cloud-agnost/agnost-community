@@ -25,7 +25,7 @@ export default function CreateDatabase({
 			assignUniqueName: true,
 		},
 	});
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { versionId, appId, orgId } = useParams() as {
 		versionId: string;
 		appId: string;
@@ -49,10 +49,9 @@ export default function CreateDatabase({
 			});
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

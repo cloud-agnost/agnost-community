@@ -24,16 +24,12 @@ class MongoDBTransport extends Transport {
 
 		//Make api call to the platform to log the error message
 		axios
-			.post(
-				config.get("general.platformBaseUrl") + "/v1/platform/error",
-				entry,
-				{
-					headers: {
-						Authorization: process.env.MASTER_TOKEN,
-						"Content-Type": "application/json",
-					},
-				}
-			)
+			.post(helper.getPlatformUrl() + "/v1/platform/error", entry, {
+				headers: {
+					Authorization: process.env.MASTER_TOKEN,
+					"Content-Type": "application/json",
+				},
+			})
 			.catch((error) => {});
 
 		callback();

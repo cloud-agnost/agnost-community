@@ -1,9 +1,10 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { TabLink } from '@/features/version/Tabs';
+import { toast } from '@/hooks/useToast';
 import useModelStore from '@/store/database/modelStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError, ColumnDefWithClassName, Model, TabTypes } from '@/types';
-import { getVersionPermission, notify, translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
@@ -18,10 +19,9 @@ async function deleteHandler(model: Model) {
 		.build(queryClient, {
 			mutationFn: deleteModel,
 			onError: (error: APIError) => {
-				notify({
-					title: error.error,
-					description: error.details,
-					type: 'error',
+				toast({
+					title: error.details,
+					action: 'error',
 				});
 			},
 		})

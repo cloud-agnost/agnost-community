@@ -12,7 +12,7 @@ import { useToast } from '@/hooks';
 export default function ClusterSmtpForm() {
 	const { t } = useTranslation();
 	const { updateSmtpSettings, cluster } = useClusterStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const form = useForm<z.infer<typeof SMTPSchema>>({
 		resolver: zodResolver(SMTPSchema),
 		defaultValues: {
@@ -22,17 +22,15 @@ export default function ClusterSmtpForm() {
 	const { mutateAsync: updateSmtp, isPending } = useMutation({
 		mutationFn: updateSmtpSettings,
 		onSuccess: () => {
-			notify({
-				title: t('general.success'),
-				description: t('cluster.smtpSettingsUpdatedDescription'),
-				type: 'success',
+			toast({
+				title: t('cluster.smtpSettingsUpdatedDescription') as string,
+				action: 'success',
 			});
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

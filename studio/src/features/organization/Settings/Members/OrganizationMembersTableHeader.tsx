@@ -23,7 +23,7 @@ import { useMutation } from '@tanstack/react-query';
 
 export default function OrganizationMembersTableHeader({ table }: { table: Table<any> }) {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const canMultipleDelete = useAuthorizeOrg('member.delete');
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { deleteMultipleInvitations, removeMultipleMembersFromOrganization } =
@@ -55,20 +55,18 @@ export default function OrganizationMembersTableHeader({ table }: { table: Table
 		setSearchParams(searchParams);
 	}
 	function onSuccess() {
-		notify({
-			title: t('general.success'),
-			description:
+		toast({
+			title:
 				selectedTab === 'member'
-					? t('organization.member.delete')
-					: t('organization.invitation.delete'),
-			type: 'success',
+					? (t('organization.member.delete') as string)
+					: (t('organization.invitation.delete') as string),
+			action: 'success',
 		});
 	}
-	function onError({ error, details }: { error: string; details: string }) {
-		notify({
-			title: error,
-			description: details,
-			type: 'error',
+	function onError({ details }: { error: string; details: string }) {
+		toast({
+			title: details,
+			action: 'error',
 		});
 	}
 

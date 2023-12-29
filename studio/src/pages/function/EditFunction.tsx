@@ -9,7 +9,7 @@ import { useParams } from 'react-router-dom';
 
 export default function EditFunction() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('function.update');
 	const {
 		function: helper,
@@ -31,10 +31,9 @@ export default function EditFunction() {
 		mutationFn: saveFunctionCode,
 		onSuccess,
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

@@ -11,7 +11,7 @@ export { default as useSaveLogicOnSuccess } from './useSaveLogicOnSuccess.tsx';
 export { default as useSearch } from './useSearch.tsx';
 export { default as useTabNavigate } from './useTabNavigate.tsx';
 export { default as useTable } from './useTable.tsx';
-export { default as useToast } from './useToast.tsx';
+export { useToast } from './useToast.tsx';
 export { default as useUpdateData } from './useUpdateData.tsx';
 export { default as useUpdateEffect } from './useUpdateEffect.tsx';
 export { default as useUpdateVersion } from './useUpdateVersion.tsx';

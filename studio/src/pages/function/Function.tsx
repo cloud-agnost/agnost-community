@@ -14,7 +14,7 @@ import { useParams } from 'react-router-dom';
 
 export default function MainFunction() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const canCreate = useAuthorizeVersion('function.create');
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const { functions, lastFetchedPage, getFunctionsOfAppVersion, deleteMultipleFunctions } =
@@ -31,10 +31,9 @@ export default function MainFunction() {
 			table?.toggleAllRowsSelected(false);
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

@@ -211,11 +211,9 @@ class DeploymentController {
 		// First get the list of environment resources
 		let resources = await this.getEnvironmentResources(env);
 
-		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
-			env.orgId
-		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-			envLog._id
-		}`;
+		const callback = `${helper.getPlatformUrl()}/v1/org/${env.orgId}/app/${
+			env.appId
+		}/version/${env.versionId}/env/${env._id}/log/${envLog._id}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "deploy",
@@ -242,16 +240,12 @@ class DeploymentController {
 		};
 
 		//Make api call to environment worker engine to deploy app version
-		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/deploy",
-			payload,
-			{
-				headers: {
-					Authorization: process.env.ACCESS_TOKEN,
-					"Content-Type": "application/json",
-				},
-			}
-		);
+		await axios.post(helper.getWorkerUrl() + "/v1/env/deploy", payload, {
+			headers: {
+				Authorization: process.env.ACCESS_TOKEN,
+				"Content-Type": "application/json",
+			},
+		});
 	}
 
 	/**
@@ -266,11 +260,9 @@ class DeploymentController {
 		// First get the list of environment resources
 		let resources = await this.getEnvironmentResources(env);
 
-		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
-			env.orgId
-		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-			envLog._id
-		}`;
+		const callback = `${helper.getPlatformUrl()}/v1/org/${env.orgId}/app/${
+			env.appId
+		}/version/${env.versionId}/env/${env._id}/log/${envLog._id}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "redeploy",
@@ -297,16 +289,12 @@ class DeploymentController {
 		};
 
 		//Make api call to environment worker engine to redeploy app version
-		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/redeploy",
-			payload,
-			{
-				headers: {
-					Authorization: process.env.ACCESS_TOKEN,
-					"Content-Type": "application/json",
-				},
-			}
-		);
+		await axios.post(helper.getWorkerUrl() + "/v1/env/redeploy", payload, {
+			headers: {
+				Authorization: process.env.ACCESS_TOKEN,
+				"Content-Type": "application/json",
+			},
+		});
 	}
 
 	/**
@@ -336,16 +324,12 @@ class DeploymentController {
 		};
 
 		//Make api call to environment worker engine to delete the environment
-		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/delete",
-			payload,
-			{
-				headers: {
-					Authorization: process.env.ACCESS_TOKEN,
-					"Content-Type": "application/json",
-				},
-			}
-		);
+		await axios.post(helper.getWorkerUrl() + "/v1/env/delete", payload, {
+			headers: {
+				Authorization: process.env.ACCESS_TOKEN,
+				"Content-Type": "application/json",
+			},
+		});
 	}
 
 	/**
@@ -372,11 +356,9 @@ class DeploymentController {
 		// First get the list of environment resources
 		const resources = await this.getEnvironmentResources(env);
 
-		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
-			env.orgId
-		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-			envLog._id
-		}`;
+		const callback = `${helper.getPlatformUrl()}/v1/org/${env.orgId}/app/${
+			env.appId
+		}/version/${env.versionId}/env/${env._id}/log/${envLog._id}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "update-version",
@@ -395,16 +377,12 @@ class DeploymentController {
 		};
 
 		// Make api call to environment worker engine to update environment data
-		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/update",
-			payload,
-			{
-				headers: {
-					Authorization: process.env.ACCESS_TOKEN,
-					"Content-Type": "application/json",
-				},
-			}
-		);
+		await axios.post(helper.getWorkerUrl() + "/v1/env/update", payload, {
+			headers: {
+				Authorization: process.env.ACCESS_TOKEN,
+				"Content-Type": "application/json",
+			},
+		});
 	}
 
 	/**
@@ -437,11 +415,9 @@ class DeploymentController {
 		// First get the list of environment resources
 		const resources = await this.getEnvironmentResources(env);
 
-		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
-			env.orgId
-		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-			envLog._id
-		}`;
+		const callback = `${helper.getPlatformUrl()}/v1/org/${env.orgId}/app/${
+			env.appId
+		}/version/${env.versionId}/env/${env._id}/log/${envLog._id}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "update-resource",
@@ -462,7 +438,7 @@ class DeploymentController {
 
 		// Make api call to environment worker engine to update resource-access settings
 		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/update-resource-access",
+			helper.getWorkerUrl() + "/v1/env/update-resource-access",
 			payload,
 			{
 				headers: {
@@ -506,11 +482,9 @@ class DeploymentController {
 			versionId: version._id,
 		});
 
-		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
-			env.orgId
-		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-			envLog._id
-		}`;
+		const callback = `${helper.getPlatformUrl()}/v1/org/${env.orgId}/app/${
+			env.appId
+		}/version/${env.versionId}/env/${env._id}/log/${envLog._id}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "deploy",
@@ -531,7 +505,7 @@ class DeploymentController {
 
 		// Make api call to environment worker engine to update database
 		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/update-database",
+			helper.getWorkerUrl() + "/v1/env/update-database",
 			payload,
 			{
 				headers: {
@@ -569,11 +543,9 @@ class DeploymentController {
 		// First get the list of environment resources
 		const resources = await this.getEnvironmentResources(env);
 
-		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
-			env.orgId
-		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-			envLog._id
-		}`;
+		const callback = `${helper.getPlatformUrl()}/v1/org/${env.orgId}/app/${
+			env.appId
+		}/version/${env.versionId}/env/${env._id}/log/${envLog._id}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "deploy",
@@ -594,7 +566,7 @@ class DeploymentController {
 
 		// Make api call to environment worker engine to update endpoints
 		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/update-endpoints",
+			helper.getWorkerUrl() + "/v1/env/update-endpoints",
 			payload,
 			{
 				headers: {
@@ -632,11 +604,9 @@ class DeploymentController {
 		// First get the list of environment resources
 		const resources = await this.getEnvironmentResources(env);
 
-		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
-			env.orgId
-		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-			envLog._id
-		}`;
+		const callback = `${helper.getPlatformUrl()}/v1/org/${env.orgId}/app/${
+			env.appId
+		}/version/${env.versionId}/env/${env._id}/log/${envLog._id}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "deploy",
@@ -657,7 +627,7 @@ class DeploymentController {
 
 		// Make api call to environment worker engine to update middlewares
 		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/update-middlewares",
+			helper.getWorkerUrl() + "/v1/env/update-middlewares",
 			payload,
 			{
 				headers: {
@@ -695,11 +665,9 @@ class DeploymentController {
 		// First get the list of environment resources
 		const resources = await this.getEnvironmentResources(env);
 
-		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
-			env.orgId
-		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-			envLog._id
-		}`;
+		const callback = `${helper.getPlatformUrl()}/v1/org/${env.orgId}/app/${
+			env.appId
+		}/version/${env.versionId}/env/${env._id}/log/${envLog._id}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "deploy",
@@ -719,16 +687,12 @@ class DeploymentController {
 		};
 
 		// Make api call to environment worker engine to update queues
-		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/update-queues",
-			payload,
-			{
-				headers: {
-					Authorization: process.env.ACCESS_TOKEN,
-					"Content-Type": "application/json",
-				},
-			}
-		);
+		await axios.post(helper.getWorkerUrl() + "/v1/env/update-queues", payload, {
+			headers: {
+				Authorization: process.env.ACCESS_TOKEN,
+				"Content-Type": "application/json",
+			},
+		});
 	}
 
 	/**
@@ -758,11 +722,9 @@ class DeploymentController {
 		// First get the list of environment resources
 		const resources = await this.getEnvironmentResources(env);
 
-		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
-			env.orgId
-		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-			envLog._id
-		}`;
+		const callback = `${helper.getPlatformUrl()}/v1/org/${env.orgId}/app/${
+			env.appId
+		}/version/${env.versionId}/env/${env._id}/log/${envLog._id}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "deploy",
@@ -782,16 +744,12 @@ class DeploymentController {
 		};
 
 		// Make api call to environment worker engine to update tasks
-		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/update-tasks",
-			payload,
-			{
-				headers: {
-					Authorization: process.env.ACCESS_TOKEN,
-					"Content-Type": "application/json",
-				},
-			}
-		);
+		await axios.post(helper.getWorkerUrl() + "/v1/env/update-tasks", payload, {
+			headers: {
+				Authorization: process.env.ACCESS_TOKEN,
+				"Content-Type": "application/json",
+			},
+		});
 	}
 
 	/**
@@ -821,11 +779,9 @@ class DeploymentController {
 		// First get the list of environment resources
 		const resources = await this.getEnvironmentResources(env);
 
-		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
-			env.orgId
-		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-			envLog._id
-		}`;
+		const callback = `${helper.getPlatformUrl()}/v1/org/${env.orgId}/app/${
+			env.appId
+		}/version/${env.versionId}/env/${env._id}/log/${envLog._id}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "deploy",
@@ -846,7 +802,7 @@ class DeploymentController {
 
 		// Make api call to environment worker engine to update storages
 		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/update-storages",
+			helper.getWorkerUrl() + "/v1/env/update-storages",
 			payload,
 			{
 				headers: {
@@ -884,11 +840,9 @@ class DeploymentController {
 		// First get the list of environment resources
 		const resources = await this.getEnvironmentResources(env);
 
-		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
-			env.orgId
-		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-			envLog._id
-		}`;
+		const callback = `${helper.getPlatformUrl()}/v1/org/${env.orgId}/app/${
+			env.appId
+		}/version/${env.versionId}/env/${env._id}/log/${envLog._id}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "deploy",
@@ -909,7 +863,7 @@ class DeploymentController {
 
 		// Make api call to environment worker engine to update functions
 		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/update-functions",
+			helper.getWorkerUrl() + "/v1/env/update-functions",
 			payload,
 			{
 				headers: {
@@ -947,11 +901,9 @@ class DeploymentController {
 		// First get the list of environment resources
 		const resources = await this.getEnvironmentResources(env);
 
-		const callback = `${config.get("general.platformBaseUrl")}/v1/org/${
-			env.orgId
-		}/app/${env.appId}/version/${env.versionId}/env/${env._id}/log/${
-			envLog._id
-		}`;
+		const callback = `${helper.getPlatformUrl()}/v1/org/${env.orgId}/app/${
+			env.appId
+		}/version/${env.versionId}/env/${env._id}/log/${envLog._id}`;
 		// Start building the deployment instructions that will be sent to the engine cluster worker
 		let payload = {
 			action: "deploy",
@@ -971,16 +923,12 @@ class DeploymentController {
 		};
 
 		// Make api call to environment worker engine to update caches
-		await axios.post(
-			config.get("general.workerUrl") + "/v1/env/update-caches",
-			payload,
-			{
-				headers: {
-					Authorization: process.env.ACCESS_TOKEN,
-					"Content-Type": "application/json",
-				},
-			}
-		);
+		await axios.post(helper.getWorkerUrl() + "/v1/env/update-caches", payload, {
+			headers: {
+				Authorization: process.env.ACCESS_TOKEN,
+				"Content-Type": "application/json",
+			},
+		});
 	}
 }
 

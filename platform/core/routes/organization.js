@@ -22,7 +22,7 @@ import {
 	orgAuthorization,
 } from "../middlewares/authorizeOrgAction.js";
 import { validate } from "../middlewares/validate.js";
-import { handleFile } from "../middlewares/handleFile.js";
+import { fileUploadMiddleware } from "../middlewares/handleFile.js";
 import { sendMessage } from "../init/queue.js";
 import { sendMessage as sendNotification } from "../init/sync.js";
 import { storage } from "../init/storage.js";
@@ -326,7 +326,7 @@ router.get("/:orgId", authSession, validateOrg, async (req, res) => {
 */
 router.put(
 	"/:orgId/picture",
-	handleFile.single("picture"),
+	fileUploadMiddleware,
 	authSession,
 	validateOrg,
 	authorizeOrgAction("org.update"),
@@ -1405,7 +1405,7 @@ router.delete(
 			res.json();
 
 			// Log action
-			auditCtrl.logAndNotify(
+			await auditCtrl.logAndNotify(
 				req.org._id,
 				req.user,
 				"org.member",
@@ -1426,44 +1426,6 @@ router.delete(
 				},
 				{ orgId: req.org._id }
 			);
-
-			if (apps.length > 0) {
-				// Get all updated applications
-				const appIds = apps.map((entry) => entry._id);
-				const appsWithMembers = await appCtrl.getManyByQuery(
-					{ _id: { $in: appIds } },
-					{
-						lookup: {
-							path: "team.userId",
-							select: "-loginProfiles -notifications",
-						},
-					}
-				);
-
-				// Send realtime notifications for updated apps
-				appsWithMembers.forEach((entry) => {
-					sendNotification(entry._id, {
-						actor: {
-							userId: user._id,
-							name: user.name,
-							pictureUrl: user.pictureUrl,
-							color: user.color,
-							contactEmail: req.user.contactEmail,
-							loginEmail: user.loginProfiles[0].email,
-						},
-						action: "delete",
-						object: "org.app.team",
-						description: t(
-							"Removed user '%s' (%s) from app team",
-							user.name,
-							user.contactEmail
-						),
-						timestamp: Date.now(),
-						data: entry,
-						identifiers: { orgId: req.org._id, appId: entry._id },
-					});
-				});
-			}
 		} catch (error) {
 			await orgMemberCtrl.rollback(session);
 			handleError(req, res, error);
@@ -1565,9 +1527,9 @@ router.post(
 			await orgMemberCtrl.commit(session);
 			res.json();
 
-			users.forEach((removedUser) => {
+			for (const removedUser of users) {
 				// Log action
-				auditCtrl.logAndNotify(
+				await auditCtrl.logAndNotify(
 					req.org._id,
 					req.user,
 					"org.member",
@@ -1584,40 +1546,6 @@ router.post(
 					},
 					{ orgId: req.org._id }
 				);
-			});
-
-			if (apps.length > 0) {
-				// Get all updated applications
-				const appIds = apps.map((entry) => entry._id);
-				const appsWithMembers = await appCtrl.getManyByQuery(
-					{ _id: { $in: appIds } },
-					{
-						lookup: {
-							path: "team.userId",
-							select: "-loginProfiles -notifications",
-						},
-					}
-				);
-
-				// Send realtime notifications for updated apps
-				appsWithMembers.forEach((entry) => {
-					sendNotification(entry._id, {
-						actor: {
-							userId: req.user._id,
-							name: req.user.name,
-							pictureUrl: req.user.pictureUrl,
-							color: req.user.color,
-							contactEmail: req.user.contactEmail,
-							loginEmail: req.user.loginProfiles[0].email,
-						},
-						action: "delete",
-						object: "org.app.team",
-						description: t("Removed user(s) from app team"),
-						timestamp: Date.now(),
-						data: entry,
-						identifiers: { orgId: req.org._id, appId: entry._id },
-					});
-				});
 			}
 		} catch (error) {
 			await orgMemberCtrl.rollback(session);
@@ -1724,7 +1652,7 @@ router.delete(
 			res.json();
 
 			// Log action
-			auditCtrl.logAndNotify(
+			await auditCtrl.logAndNotify(
 				req.org._id,
 				req.user,
 				"org.member",
@@ -1745,44 +1673,6 @@ router.delete(
 				},
 				{ orgId: req.org._id }
 			);
-
-			if (apps.length > 0) {
-				// Get all updated applications
-				const appIds = apps.map((entry) => entry._id);
-				const appsWithMembers = await appCtrl.getManyByQuery(
-					{ _id: { $in: appIds } },
-					{
-						lookup: {
-							path: "team.userId",
-							select: "-loginProfiles -notifications",
-						},
-					}
-				);
-
-				// Send realtime notifications for updated apps
-				appsWithMembers.forEach((entry) => {
-					sendNotification(entry._id, {
-						actor: {
-							userId: req.user._id,
-							name: req.user.name,
-							pictureUrl: req.user.pictureUrl,
-							color: req.user.color,
-							contactEmail: req.user.contactEmail,
-							loginEmail: req.user.loginProfiles[0].email,
-						},
-						action: "delete",
-						object: "org.app.team",
-						description: t(
-							"User '%s' (%s) has left the app team",
-							user.name,
-							user.contactEmail
-						),
-						timestamp: Date.now(),
-						data: entry,
-						identifiers: { orgId: req.org._id, appId: entry._id },
-					});
-				});
-			}
 		} catch (error) {
 			await orgMemberCtrl.rollback(session);
 			handleError(req, res, error);

@@ -38,7 +38,7 @@ export default function EditFile({ open, onClose }: EditFileProps) {
 	});
 
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { fields, append, remove } = useFieldArray({
 		control: form.control,
 		name: 'tags',
@@ -62,8 +62,8 @@ export default function EditFile({ open, onClose }: EditFileProps) {
 			onSuccess: () => {
 				resetForm();
 			},
-			onError: ({ error, details }) => {
-				notify({ type: 'error', description: details, title: error });
+			onError: ({ details }) => {
+				toast({ action: 'error', title: details });
 			},
 		});
 	}

@@ -3,10 +3,11 @@ import { DataTable } from '@/components/DataTable';
 import { SearchInput } from '@/components/SearchInput';
 import { useTable } from '@/hooks';
 import useAuthorizeApp from '@/hooks/useAuthorizeApp';
+import { toast } from '@/hooks/useToast';
 import useApplicationStore from '@/store/app/applicationStore';
 import useClusterStore from '@/store/cluster/clusterStore';
 import { Application, ApplicationMember } from '@/types';
-import { notify } from '@/utils';
+import { useMutation } from '@tanstack/react-query';
 import { Table } from '@tanstack/react-table';
 import { RoleDropdown } from 'components/RoleDropdown';
 import { SelectedRowButton } from 'components/Table';
@@ -15,7 +16,6 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import BeatLoader from 'react-spinners/BeatLoader';
 import { AppMembersTableColumns } from './AppMembersTableColumns';
-import { useMutation } from '@tanstack/react-query';
 export default function MainAppMembers({ loading }: { loading: boolean }) {
 	const [searchParams] = useSearchParams();
 	const { applicationTeam, application, openInviteMemberDrawer, removeMultipleAppMembers } =
@@ -39,18 +39,16 @@ export default function MainAppMembers({ loading }: { loading: boolean }) {
 	const { mutate: removeMultipleMembersMutate } = useMutation({
 		mutationFn: removeMultipleAppMembers,
 		onSuccess: () => {
-			notify({
-				title: t('general.success'),
-				description: t('general.member.delete'),
-				type: 'success',
+			toast({
+				title: t('general.member.delete') as string,
+				action: 'success',
 			});
 			table?.toggleAllRowsSelected(false);
 		},
-		onError: ({ error, details }) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

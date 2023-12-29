@@ -1,10 +1,9 @@
-import { cn } from '@/utils';
-import * as React from 'react';
-import './table.scss';
-import { CircleNotch, Copy } from '@phosphor-icons/react';
 import { Button } from '@/components/Button';
 import { useToast } from '@/hooks';
-import { useTranslation } from 'react-i18next';
+import { cn, copy } from '@/utils';
+import { CircleNotch, Copy } from '@phosphor-icons/react';
+import * as React from 'react';
+import './table.scss';
 
 interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
 	containerClassName?: string;
@@ -81,26 +80,11 @@ const TableCell = React.forwardRef<
 		copyableText?: string;
 	}
 >(({ className, children, copyable, copyableText, ...props }, ref) => {
-	const { notify } = useToast();
-	const { t } = useTranslation();
+	const { toast } = useToast();
 
-	async function copy() {
-		if (!copyableText)
-			return notify({ title: 'Error', description: 'No text to copy', type: 'error' });
-		try {
-			await navigator.clipboard.writeText(copyableText);
-			notify({
-				title: t('general.success'),
-				description: t('general.copied'),
-				type: 'success',
-			});
-		} catch (e) {
-			notify({
-				title: t('general.error'),
-				description: t('general.copied_error'),
-				type: 'error',
-			});
-		}
+	async function copyText() {
+		if (!copyableText) return toast({ title: 'No text to copy', action: 'error' });
+		copy(copyableText);
 	}
 	return (
 		<td ref={ref} className={cn('table-cell', className)} {...props}>
@@ -111,7 +95,7 @@ const TableCell = React.forwardRef<
 					{children}
 					{copyable && (
 						<Button
-							onClick={copy}
+							onClick={copyText}
 							variant='blank'
 							rounded
 							className='text-base hover:bg-subtle aspect-square'
@@ -137,12 +121,12 @@ TableCaption.displayName = 'TableCaption';
 
 export {
 	Table,
-	TableLoading,
 	TableBody,
 	TableCaption,
 	TableCell,
 	TableFooter,
 	TableHead,
 	TableHeader,
+	TableLoading,
 	TableRow,
 };

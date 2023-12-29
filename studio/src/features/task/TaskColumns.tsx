@@ -5,7 +5,7 @@ import { BADGE_COLOR_MAP } from '@/constants';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useTaskStore from '@/store/task/taskStore';
 import { APIError, ColumnDefWithClassName, TabTypes, Task } from '@/types';
-import { describeCronExpression, getVersionPermission, notify, translate } from '@/utils';
+import { describeCronExpression, getVersionPermission, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
@@ -13,6 +13,7 @@ import { DateText } from 'components/DateText';
 import { Calendar } from 'components/icons';
 import { TabLink } from '../version/Tabs';
 import useEnvironmentStore from '@/store/environment/environmentStore';
+import { toast } from '@/hooks/useToast';
 
 const queryClient = new QueryClient();
 const { openEditTaskModal, deleteTask } = useTaskStore.getState();
@@ -32,10 +33,9 @@ async function deleteHandler(task: Task) {
 				});
 			},
 			onError: (error: APIError) => {
-				notify({
-					title: error.error,
-					description: error.details,
-					type: 'error',
+				toast({
+					title: error.details,
+					action: 'error',
 				});
 			},
 		})

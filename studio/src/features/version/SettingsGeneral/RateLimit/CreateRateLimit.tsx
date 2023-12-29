@@ -24,7 +24,7 @@ export default function CreateRateLimit({
 	onOpenChange,
 	onCreate,
 }: CreateRateLimitProps) {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 	const form = useForm<z.infer<typeof CreateRateLimitSchema>>({
 		resolver: zodResolver(CreateRateLimitSchema),
@@ -46,10 +46,9 @@ export default function CreateRateLimit({
 		mutationFn: createRateLimit,
 		onSuccess: onSuccess,
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});
@@ -75,10 +74,10 @@ export default function CreateRateLimit({
 				appId,
 				defaultEndpointLimits: [...(defaultEndpointLimits ?? []), rateLimit.iid],
 				onError: (error) => {
-					notify({
-						type: 'error',
-						title: t('general.error'),
-						description: error.details,
+					toast({
+						action: 'error',
+
+						title: error.details,
 					});
 				},
 			});

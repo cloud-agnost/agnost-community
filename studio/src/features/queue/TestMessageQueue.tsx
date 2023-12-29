@@ -31,7 +31,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 	const { t } = useTranslation();
 	const { queue, testQueue } = useMessageQueueStore();
 	const { testQueueLogs } = useUtilsStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { environment } = useEnvironmentStore();
 	const [debugChannel, setDebugChannel] = useState<string>('');
 	const resizerRef = useRef<HTMLDivElement>(null);
@@ -49,11 +49,10 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 	});
 	const { mutateAsync: testQueueMutation, isPending } = useMutation({
 		mutationFn: testQueue,
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }: APIError) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

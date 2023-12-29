@@ -2,10 +2,11 @@ import { ActionsCell } from '@/components/ActionsCell';
 import { Badge } from '@/components/Badge';
 import { TableConfirmation } from '@/components/Table';
 import { TabLink } from '@/features/version/Tabs';
+import { toast } from '@/hooks/useToast';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useStorageStore from '@/store/storage/storageStore';
 import { APIError, Bucket, ColumnDefWithClassName, TabTypes } from '@/types';
-import { getVersionPermission, notify, translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { Prohibit } from '@phosphor-icons/react';
 import { QueryClient } from '@tanstack/react-query';
 import { Checkbox } from 'components/Checkbox';
@@ -22,10 +23,9 @@ async function clearBucket(bucketName: string) {
 		.build(queryClient, {
 			mutationFn: emptyBucket,
 			onError: (error: APIError) => {
-				notify({
-					title: error.error,
-					description: error.details,
-					type: 'error',
+				toast({
+					title: error.details,
+					action: 'error',
 				});
 			},
 		})
@@ -33,17 +33,15 @@ async function clearBucket(bucketName: string) {
 			storageName: storage?.name,
 			bucketName,
 			onSuccess: () => {
-				notify({
-					title: translate('general.success'),
-					description: translate('storage.bucket.empty'),
-					type: 'success',
+				toast({
+					title: translate('storage.bucket.empty'),
+					action: 'success',
 				});
 			},
-			onError: ({ error, details }) => {
-				notify({
-					title: error,
-					description: details,
-					type: 'error',
+			onError: ({ details }) => {
+				toast({
+					title: details,
+					action: 'error',
 				});
 			},
 		});

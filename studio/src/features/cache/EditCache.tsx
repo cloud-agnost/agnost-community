@@ -25,7 +25,7 @@ export default function EditCache({ open, onClose }: CreateCacheProps) {
 		appId: string;
 		orgId: string;
 	}>();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const form = useForm<z.infer<typeof CacheSchema>>({
 		resolver: zodResolver(CacheSchema),
 	});
@@ -41,8 +41,8 @@ export default function EditCache({ open, onClose }: CreateCacheProps) {
 		onSuccess: () => {
 			resetAndClose();
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 	function onSubmit(data: z.infer<typeof CacheSchema>) {

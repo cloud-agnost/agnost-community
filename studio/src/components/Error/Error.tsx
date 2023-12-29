@@ -11,7 +11,7 @@ import {
 } from '@/components/Form';
 import { Textarea } from '@/components/Input';
 import { ErrorPage } from '@/components/icons';
-import { notify } from '@/utils';
+import { toast } from '@/hooks/useToast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -55,10 +55,9 @@ export default function Error({ children }: { children: React.ReactNode }) {
 			.then((response) => response.text())
 			.then(() => {
 				setLoading(false);
-				notify({
+				toast({
 					title: 'Feedback sent',
-					description: 'Thank you for your feedback',
-					type: 'success',
+					action: 'success',
 				});
 				closeModal();
 			})

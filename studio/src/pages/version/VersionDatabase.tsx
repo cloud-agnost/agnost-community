@@ -24,7 +24,7 @@ export default function VersionDatabase() {
 		getDatabasesOfApp,
 	} = useDatabaseStore();
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('db.create');
 	const [createDrawerIsOpen, setCreateDrawerIsOpen] = useState(false);
 	const { versionId, appId, orgId } = useParams<{
@@ -55,10 +55,9 @@ export default function VersionDatabase() {
 	const { mutateAsync: deleteDatabaseMutation, isPending: deleteLoading } = useMutation({
 		mutationFn: deleteDatabase,
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 		onSettled: () => {

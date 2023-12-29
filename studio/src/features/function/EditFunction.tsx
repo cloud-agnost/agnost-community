@@ -19,7 +19,7 @@ interface EditTaskProps {
 export default function EditTask({ open, onClose }: EditTaskProps) {
 	const { t } = useTranslation();
 	const { updateFunction, function: helper } = useFunctionStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -34,17 +34,15 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 		mutationFn: updateFunction,
 		onSuccess: () => {
 			onClose();
-			notify({
-				title: t('general.success'),
-				description: t('endpoint.editLogicSuccess'),
-				type: 'success',
+			toast({
+				title: t('endpoint.editLogicSuccess') as string,
+				action: 'success',
 			});
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

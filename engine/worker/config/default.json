@@ -31,7 +31,6 @@
         "retryCount": 30
     },
     "sync": {
-        "serverURL": "http://platform-sync-clusterip-service:4000",
         "namespace": "",
         "reconnection": true,
         "reconnectionDelay": 500,
@@ -42,7 +41,6 @@
         "maxMessageWaitMinues": 5,
         "maxMongoDBIndexNumberPerCollection": 64,
         "ingressServiceName": "ingress-service",
-        "platformBaseUrl": "http://platform-core-clusterip-service:4000",
         "maxPoolSize": 3,
         "defaultClusterIPPort": 4000,
         "defaultKnativeIngressPort": 80,

@@ -19,7 +19,7 @@ interface EditTaskProps {
 export default function EditTask({ open, onClose }: EditTaskProps) {
 	const { t } = useTranslation();
 	const { updateTask, task } = useTaskStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -33,11 +33,10 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 	const { mutateAsync: updateTaskMutation, isPending } = useMutation({
 		mutationFn: updateTask,
 		onSuccess: handleClose,
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }: APIError) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

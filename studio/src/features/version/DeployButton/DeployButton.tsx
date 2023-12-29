@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 
 export default function DeployButton(props: Omit<ButtonProps, 'loading' | 'onClick'>) {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const canDeploy = useAuthorizeVersion('env.deploy');
 	const { environment, redeployAppVersionToEnvironment } = useEnvironmentStore();
 	const envStatus = useEnvironmentStatus();
@@ -20,10 +20,9 @@ export default function DeployButton(props: Omit<ButtonProps, 'loading' | 'onCli
 	const { mutateAsync: redeployMutate, isPending } = useMutation({
 		mutationFn: redeployAppVersionToEnvironment,
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

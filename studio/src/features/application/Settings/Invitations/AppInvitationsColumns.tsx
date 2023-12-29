@@ -2,10 +2,11 @@ import { Checkbox } from '@/components/Checkbox';
 import { DateText } from '@/components/DateText';
 import { ResendButton } from '@/components/ResendButton';
 import { TableConfirmation } from '@/components/Table';
+import { toast } from '@/hooks/useToast';
 import useApplicationStore from '@/store/app/applicationStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { Invitation } from '@/types';
-import { getAppPermission, notify, translate } from '@/utils';
+import { getAppPermission, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
@@ -24,17 +25,15 @@ function updateInvitationUserRoleHandler(token: string, role: string) {
 		token,
 		role,
 		onSuccess: () => {
-			notify({
-				title: translate('general.success'),
-				description: translate('general.invitation.update', { role }),
-				type: 'success',
+			toast({
+				title: translate('general.invitation.update', { role }) as string,
+				action: 'success',
 			});
 		},
-		onError: ({ error, details }) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});
@@ -47,19 +46,17 @@ function resendInvitationHandler(token: string, email: string) {
 		appId,
 		orgId,
 		onSuccess: () => {
-			notify({
-				title: translate('general.success'),
-				description: translate('general.invitation.resent_success', {
+			toast({
+				title: translate('general.invitation.resent_success', {
 					email,
 				}),
-				type: 'success',
+				action: 'success',
 			});
 		},
-		onError: ({ error, details }) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});
@@ -73,17 +70,15 @@ async function deleteInvitationHandler(token: string) {
 		appId,
 		orgId,
 		onSuccess: () => {
-			notify({
-				title: translate('general.success'),
-				description: translate('general.invitation.delete'),
-				type: 'success',
+			toast({
+				title: translate('general.invitation.delete'),
+				action: 'success',
 			});
 		},
-		onError: ({ error, details }) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

@@ -2,11 +2,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
 import { Checkbox } from '@/components/Checkbox';
 import { SortButton } from '@/components/DataTable';
 import { TableConfirmation } from '@/components/Table';
+import { toast } from '@/hooks/useToast';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { ApplicationMember } from '@/types';
-import { getAppPermission, notify, translate } from '@/utils';
+import { getAppPermission, translate } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { RoleSelect } from 'components/RoleDropdown';
 
@@ -18,17 +19,15 @@ async function removeMember(userId: string, appId: string) {
 		orgId,
 		appId,
 		onSuccess: () => {
-			notify({
-				title: translate('general.success'),
-				description: translate('general.member.delete'),
-				type: 'success',
+			toast({
+				title: translate('general.member.delete'),
+				action: 'success',
 			});
 		},
-		onError: ({ error, details }) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});
@@ -40,11 +39,10 @@ function updateMemberRole(userId: string, role: string, appId: string) {
 		role,
 		appId,
 		orgId,
-		onError: ({ error, details }) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});
