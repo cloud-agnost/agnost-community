@@ -76,7 +76,7 @@ export default function OrganizationMembersTableHeader({ table }: { table: Table
 		onError,
 	});
 	const { mutate: removeInvitationMutate } = useMutation({
-		mutationFn: removeMultipleMembersFromOrganization,
+		mutationFn: deleteMultipleInvitations,
 		onSuccess,
 		onError,
 	});
