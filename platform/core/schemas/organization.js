@@ -74,11 +74,11 @@ export const applyRules = (type) => {
 					)
 					.bail()
 					.custom((value) => {
-						let regex = /^[A-Za-z0-9 _-]+$/;
+						let regex = /^[A-Za-z0-9 _.-]+$/;
 						if (!regex.test(value)) {
 							throw new AgnostError(
 								t(
-									"Organization names can include only numbers, letters, spaces, dash and underscore characters"
+									"Organization names can include only numbers, letters, spaces, dash, dot and underscore characters"
 								)
 							);
 						}
