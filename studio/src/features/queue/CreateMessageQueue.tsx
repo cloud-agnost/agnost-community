@@ -28,7 +28,7 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 		appId: string;
 		orgId: string;
 	}>();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const form = useForm<z.infer<typeof CreateMessageQueueSchema>>({
 		resolver: zodResolver(CreateMessageQueueSchema),
 		defaultValues: {
@@ -55,9 +55,9 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 				versionId: environment?.versionId,
 			});
 		},
-		onError: ({ error, details }: APIError) => {
+		onError: ({ details }: APIError) => {
 			handleClose();
-			notify({ type: 'error', description: details, title: error });
+			toast({ action: 'error', title: details });
 		},
 	});
 

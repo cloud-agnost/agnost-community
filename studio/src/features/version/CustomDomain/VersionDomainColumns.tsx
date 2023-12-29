@@ -2,10 +2,11 @@ import { Checkbox } from '@/components/Checkbox';
 import { SortButton } from '@/components/DataTable';
 import { DateText } from '@/components/DateText';
 import { TableConfirmation } from '@/components/Table';
+import { toast } from '@/hooks/useToast';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useSettingsStore from '@/store/version/settingsStore';
 import { APIError, ColumnDefWithClassName, CustomDomain } from '@/types';
-import { getVersionPermission, notify, translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
 const { deleteCustomDomain } = useSettingsStore.getState();
 const queryClient = new QueryClient();
@@ -15,10 +16,9 @@ async function deleteHandler(domain: CustomDomain) {
 		.build(queryClient, {
 			mutationFn: deleteCustomDomain,
 			onError: (error: APIError) => {
-				notify({
-					title: error.error,
-					description: error.details,
-					type: 'error',
+				toast({
+					title: error.details,
+					action: 'error',
 				});
 			},
 		})

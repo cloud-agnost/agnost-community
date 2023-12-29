@@ -1,11 +1,12 @@
-import { cn, notify } from '@/utils';
 import { Button } from '@/components/Button';
-import { useTranslation } from 'react-i18next';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import { useAuthorizeVersion } from '@/hooks';
-import { useParams } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import { toast } from '@/hooks/useToast';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import { APIError } from '@/types';
+import { cn } from '@/utils';
+import { useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 export default function SuspendButton() {
 	const { t } = useTranslation();
 	const canEdit = useAuthorizeVersion('env.update');
@@ -19,10 +20,9 @@ export default function SuspendButton() {
 	const { mutateAsync: suspendOrActiveMutate, isPending } = useMutation({
 		mutationFn: environment?.suspended ? activateEnvironment : suspendEnvironment,
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

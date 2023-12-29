@@ -15,16 +15,15 @@ export default function VersionSettingsRealTime() {
 	const { version } = useVersionStore();
 	const { updateVersionRealtimeProperties } = useSettingsStore();
 	const canEdit = useAuthorizeVersion('version.update');
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 
 	const { mutateAsync } = useMutation({
 		mutationFn: updateVersionRealtimeProperties,
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

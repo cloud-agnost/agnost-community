@@ -1,10 +1,11 @@
 import { ActionsCell } from '@/components/ActionsCell';
 import { FIELD_ICON_MAP, FIELD_MAPPER } from '@/constants';
 import { SubFields } from '@/features/database/models/fields/ListFields/index.ts';
+import { toast } from '@/hooks/useToast';
 import useModelStore from '@/store/database/modelStore.ts';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError, ColumnDefWithClassName, Field } from '@/types';
-import { getVersionPermission, notify, toDisplayName, translate } from '@/utils';
+import { getVersionPermission, toDisplayName, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
 import { Badge } from 'components/Badge';
 import { Checkbox } from 'components/Checkbox';
@@ -22,10 +23,9 @@ async function deleteHandler(field: Field) {
 		.build(queryClient, {
 			mutationFn: deleteField,
 			onError: (error: APIError) => {
-				notify({
-					title: error.error,
-					description: error.details,
-					type: 'error',
+				toast({
+					title: error.details,
+					action: 'error',
 				});
 			},
 		})

@@ -41,27 +41,23 @@ export function OrganizationDropdown() {
 	} = useOrganizationStore();
 	const navigate = useNavigate();
 	const { getAppsByOrgId } = useApplicationStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 
 	const { mutate: leaveOrgMutate, isPending } = useMutation({
 		mutationFn: leaveOrganization,
 		onSuccess: () => {
-			notify({
+			toast({
 				title: t('organization.leave.success.title', {
 					name: organization?.name,
-				}),
-				description: t('organization.leave.success.description', {
-					name: organization?.name,
-				}),
-				type: 'success',
+				}) as string,
+				action: 'success',
 			});
 			navigate('/organization');
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }: APIError) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 		onSettled: () => {

@@ -32,7 +32,7 @@ const RedirectURLsSchema = z.object({
 		}),
 });
 export default function RedirectURLs() {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { saveRedirectURLs } = useSettingsStore();
 	const { version } = useVersionStore();
 	const canEdit = useAuthorizeVersion('version.auth.update');
@@ -50,17 +50,15 @@ export default function RedirectURLs() {
 		mutationFn: saveRedirectURLs,
 		mutationKey: ['saveRedirectURLs'],
 		onSuccess: () => {
-			notify({
-				type: 'success',
-				title: t('general.success'),
-				description: t('version.authentication.redirect_url_success'),
+			toast({
+				action: 'success',
+				title: t('version.authentication.redirect_url_success'),
 			});
 		},
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

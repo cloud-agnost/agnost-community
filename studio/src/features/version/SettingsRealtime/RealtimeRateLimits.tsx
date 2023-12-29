@@ -9,7 +9,7 @@ import { DropResult } from 'react-beautiful-dnd';
 import { useParams } from 'react-router-dom';
 
 export default function RealtimeRateLimits() {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { updateVersionRealtimeProperties } = useSettingsStore();
 	const rateLimits = useVersionStore((state) => state.version?.limits);
 	const realtime = useVersionStore((state) => state.version?.realtime);
@@ -37,10 +37,9 @@ export default function RealtimeRateLimits() {
 	const { mutateAsync: updateVersionMutate, isPending } = useMutation({
 		mutationFn: handleUpdateVersionRealtimeProperties,
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

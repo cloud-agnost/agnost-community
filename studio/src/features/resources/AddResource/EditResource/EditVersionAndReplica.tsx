@@ -24,7 +24,7 @@ export default function EditVersionAndReplica() {
 		closeEditResourceModal,
 		resourceToEdit,
 	} = useResourceStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 	const { resourceVersions } = useTypeStore();
 	const { orgId } = useParams() as Record<string, string>;
@@ -50,10 +50,9 @@ export default function EditVersionAndReplica() {
 		else closeEditResourceModal();
 	}
 	function onError(error: APIError) {
-		notify({
-			title: error?.error,
-			description: error?.details,
-			type: 'error',
+		toast({
+			title: error?.details,
+			action: 'error',
 		});
 	}
 	const { mutateAsync: updateResourceMutate, isPending } = useMutation({

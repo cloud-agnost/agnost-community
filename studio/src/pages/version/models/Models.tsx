@@ -22,7 +22,7 @@ export default function Models() {
 	} = useModelStore();
 	const [isCreateModelOpen, setIsCreateModelOpen] = useState(false);
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 
 	const canCreateModel = useAuthorizeVersion('model.create');
 	const { dbId, orgId, appId, versionId } = useParams() as {
@@ -54,10 +54,9 @@ export default function Models() {
 			table?.resetRowSelection();
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

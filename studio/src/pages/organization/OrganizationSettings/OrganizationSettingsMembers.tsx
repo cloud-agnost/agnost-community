@@ -20,7 +20,7 @@ import { z } from 'zod';
 import '../organization.scss';
 export default function OrganizationSettingsMembers() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { canClusterSendEmail } = useClusterStore();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const canInvite = useAuthorizeOrg('invite.create');
@@ -31,10 +31,9 @@ export default function OrganizationSettingsMembers() {
 	const { mutateAsync: inviteMutate, isPending } = useMutation({
 		mutationFn: inviteUsersToOrganization,
 		onSuccess: () => {
-			notify({
-				title: t('general.success'),
-				description: t('general.invitation.success'),
-				type: 'success',
+			toast({
+				title: t('general.invitation.success') as string,
+				action: 'success',
 			});
 			form.reset({
 				member: [

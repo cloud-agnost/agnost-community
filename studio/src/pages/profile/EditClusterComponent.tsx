@@ -27,7 +27,7 @@ const Schema = z.object({
 
 export default function EditClusterComponent() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
 
 	const {
@@ -56,7 +56,7 @@ export default function EditClusterComponent() {
 				setLoading(false);
 				closeDrawer();
 			},
-			onError: (error) => notify({ title: error.error, type: 'error', description: error.details }),
+			onError: (error) => toast({ action: 'error', title: error.details }),
 		});
 	}
 

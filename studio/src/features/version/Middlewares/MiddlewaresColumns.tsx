@@ -1,8 +1,9 @@
 import { TabLink } from '@/features/version/Tabs';
+import { toast } from '@/hooks/useToast';
 import useMiddlewareStore from '@/store/middleware/middlewareStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { APIError, ColumnDefWithClassName, Middleware, TabTypes } from '@/types';
-import { getVersionPermission, notify, translate } from '@/utils';
+import { getVersionPermission, translate } from '@/utils';
 import { QueryClient } from '@tanstack/react-query';
 import { ActionsCell } from 'components/ActionsCell';
 import { Checkbox } from 'components/Checkbox';
@@ -19,10 +20,9 @@ async function deleteHandler(mw: Middleware) {
 		.build(queryClient, {
 			mutationFn: deleteMiddleware,
 			onError: (error: APIError) => {
-				notify({
-					title: error.error,
-					description: error.details,
-					type: 'error',
+				toast({
+					title: error.details,
+					action: 'error',
 				});
 			},
 		})

@@ -28,7 +28,7 @@ export default function EditSize() {
 		closeEditResourceModal,
 		resourceToEdit,
 	} = useResourceStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 	const { orgId } = useParams() as Record<string, string>;
 	const form = useForm<z.infer<typeof CreateResourceSchema>>({
@@ -48,10 +48,9 @@ export default function EditSize() {
 		else closeEditResourceModal();
 	}
 	function onError(error: APIError) {
-		notify({
-			title: error?.error,
-			description: error?.details,
-			type: 'error',
+		toast({
+			title: error?.details,
+			action: 'error',
 		});
 	}
 

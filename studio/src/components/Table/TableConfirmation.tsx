@@ -32,17 +32,16 @@ export function TableConfirmation({
 	tooltip,
 	disabled,
 }: TableConfirmationProps) {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 	const { mutateAsync, isPending } = useMutation({
 		mutationFn: onConfirm,
 		onSuccess: () => setOpen(false),
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }: APIError) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

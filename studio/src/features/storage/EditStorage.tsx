@@ -25,15 +25,15 @@ export default function EditStorage({ open, onClose }: CreateStorageProps) {
 		appId: string;
 		orgId: string;
 	}>();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const form = useForm<z.infer<typeof StorageSchema>>({
 		resolver: zodResolver(StorageSchema),
 	});
 	const { mutateAsync: updateMutation, isPending } = useMutation({
 		mutationFn: updateStorage,
 		onSuccess: () => onCloseHandler(),
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 	function onSubmit(data: z.infer<typeof StorageSchema>) {

@@ -19,7 +19,7 @@ export default function CreateModel({
 	onOpenChange: (open: boolean) => void;
 }) {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const form = useForm<z.infer<typeof ModelSchema>>({
 		resolver: zodResolver(ModelSchema),
 		defaultValues: {
@@ -41,10 +41,9 @@ export default function CreateModel({
 		mutationFn: createModel,
 		mutationKey: ['createModel'],
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 		onSettled: () => onClose(),

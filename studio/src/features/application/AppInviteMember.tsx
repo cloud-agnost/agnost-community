@@ -19,7 +19,7 @@ export default function AppInviteMember() {
 	const { t } = useTranslation();
 	const { isInviteMemberOpen, application, closeInviteMemberDrawer, inviteUsersToApp } =
 		useApplicationStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { canClusterSendEmail } = useClusterStore();
 	const canInvite = useAuthorizeApp('invite.create');
 	const { orgId } = useParams() as Record<string, string>;
@@ -32,10 +32,9 @@ export default function AppInviteMember() {
 	const { mutateAsync: inviteMutate, isPending } = useMutation({
 		mutationFn: inviteUsersToApp,
 		onSuccess: () => {
-			notify({
-				title: t('general.success'),
-				description: t('general.invitation.success'),
-				type: 'success',
+			toast({
+				title: t('general.invitation.success') as string,
+				action: 'success',
 			});
 			handleCloseDrawer();
 		},

@@ -3,6 +3,7 @@ import { Checkbox } from '@/components/Checkbox';
 import { DateText } from '@/components/DateText';
 import { RoleSelect } from '@/components/RoleDropdown';
 import { TableConfirmation } from '@/components/Table';
+import { toast } from '@/hooks/useToast';
 import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { OrganizationMember } from '@/types';
@@ -19,8 +20,11 @@ async function deleteHandler(member: OrganizationMember) {
 	const { removeMemberFromOrganization } = useOrganizationStore.getState();
 	return removeMemberFromOrganization({
 		userId: member.member._id,
-		onError: ({ error, details }) => {
-			console.error(error, details);
+		onError: ({ details }) => {
+			toast({
+				title: details,
+				action: 'error',
+			});
 		},
 	});
 }

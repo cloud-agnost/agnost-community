@@ -6,10 +6,10 @@ import { LockSimpleOpen } from '@phosphor-icons/react/dist/ssr';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import useToast from './useToast';
+import { useToast } from './useToast';
 export default function useVersionDropdownItems() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { openVersionDrawer } = useApplicationStore();
 	const { appId, orgId } = useParams() as Record<string, string>;
 	const {
@@ -58,10 +58,9 @@ export default function useVersionDropdownItems() {
 						appId: version.appId,
 						readOnly: !version?.readOnly,
 						onError: (error) => {
-							notify({
-								type: 'error',
-								title: t('general.error'),
-								description: error.details,
+							toast({
+								title: error.details,
+								action: 'error',
 							});
 						},
 					});
@@ -79,10 +78,9 @@ export default function useVersionDropdownItems() {
 						appId: version.appId,
 						private: !version?.private,
 						onError: (error) => {
-							notify({
-								type: 'error',
-								title: t('general.error'),
-								description: error.details,
+							toast({
+								title: error.details,
+								action: 'error',
 							});
 						},
 					});

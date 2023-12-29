@@ -24,7 +24,7 @@ export default function CustomDomains() {
 	const form = useForm<z.infer<typeof CustomDomainSchema>>({
 		resolver: zodResolver(CustomDomainSchema),
 	});
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const user = useAuthStore((state) => state.user);
 	const { addDomain, clusterDomainError } = useClusterStore();
 
@@ -32,17 +32,15 @@ export default function CustomDomains() {
 		mutationFn: addDomain,
 		onSuccess: () => {
 			form.reset();
-			notify({
-				type: 'success',
-				title: t('general.success'),
-				description: t('cluster.domain_added'),
+			toast({
+				action: 'success',
+				title: t('cluster.domain_added') as string,
 			});
 		},
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: error.error,
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

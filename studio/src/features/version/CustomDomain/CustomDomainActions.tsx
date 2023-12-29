@@ -12,7 +12,7 @@ interface CustomDomainActionsProps {
 	table: Table<CustomDomain>;
 }
 export default function CustomDomainActions({ table }: CustomDomainActionsProps) {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const [searchParams] = useSearchParams();
 	const canDeleteMultiple = useAuthorizeVersion('domain.delete');
 	const { deleteMultipleCustomDomains } = useSettingsStore();
@@ -23,10 +23,9 @@ export default function CustomDomainActions({ table }: CustomDomainActionsProps)
 			table?.toggleAllRowsSelected(false);
 		},
 		onError: (error) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

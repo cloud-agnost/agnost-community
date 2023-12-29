@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default function Files() {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 	const { getVersionDashboardPath } = useVersionStore();
 	const {
@@ -67,8 +67,8 @@ export default function Files() {
 		onSuccess: () => {
 			table?.resetRowSelection();
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 
@@ -79,7 +79,7 @@ export default function Files() {
 			useStorageStore.setState({ uploadProgress: 0 });
 		},
 		onError: (error: APIError) => {
-			notify({ type: 'error', description: error.details, title: error.error });
+			toast({ action: 'error', title: error.details });
 		},
 	});
 

@@ -18,7 +18,7 @@ import { useParams } from 'react-router-dom';
 export default function VersionCache() {
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const canCreateCache = useAuthorizeVersion('cache.create');
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 	const {
@@ -73,8 +73,8 @@ export default function VersionCache() {
 			});
 			table?.resetRowSelection();
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 

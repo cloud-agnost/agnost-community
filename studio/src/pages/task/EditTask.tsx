@@ -13,7 +13,7 @@ import { useParams } from 'react-router-dom';
 
 export default function EditTask() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('task.update');
 	const { task, saveTaskLogic, openEditTaskModal, logics, setLogics, deleteLogic } = useTaskStore();
 	const [isTestTaskOpen, setIsTestTaskOpen] = useState(false);
@@ -28,11 +28,10 @@ export default function EditTask() {
 		mutationFn: saveTaskLogic,
 		mutationKey: ['saveLogic'],
 		onSuccess,
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }: APIError) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});

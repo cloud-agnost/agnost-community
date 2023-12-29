@@ -20,7 +20,7 @@ interface EditStorageProps {
 export default function EditBucket({ open, onClose }: EditStorageProps) {
 	const { t } = useTranslation();
 	const { updateBucket, bucket, storage } = useStorageStore();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const form = useForm<z.infer<typeof BucketSchema>>({
 		resolver: zodResolver(BucketSchema),
 	});
@@ -49,8 +49,8 @@ export default function EditBucket({ open, onClose }: EditStorageProps) {
 		onSuccess: () => {
 			resetForm();
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 

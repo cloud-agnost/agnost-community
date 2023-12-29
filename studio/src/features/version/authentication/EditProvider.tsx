@@ -1,7 +1,7 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
+import { Form } from '@/components/Form';
 import useSettingsStore from '@/store/version/settingsStore';
 import { APIError, VersionOAuthProvider } from '@/types';
-import { notify } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { t } from 'i18next';
@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import ProviderFrom, { AddOAuthProviderSchema } from './ProviderFrom';
-import { Form } from '@/components/Form';
+import { toast } from '@/hooks/useToast';
 
 interface EditProviderProps {
 	open: boolean;
@@ -34,10 +34,9 @@ export default function EditProvider({ open, onClose, editedProvider }: EditProv
 		mutationFn: updateOAuthConfig,
 		onSuccess: () => handleCloseModel(),
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: t('general.error'),
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

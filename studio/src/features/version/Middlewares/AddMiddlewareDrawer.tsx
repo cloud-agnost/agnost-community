@@ -23,7 +23,7 @@ export default function AddMiddlewareDrawer({
 	onCreate,
 }: AddMiddlewareDrawerProps) {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
 	const { createMiddleware } = useMiddlewareStore();
 	const navigate = useTabNavigate();
@@ -49,10 +49,9 @@ export default function AddMiddlewareDrawer({
 			versionId,
 			name: data.name,
 			onSuccess: (mw) => {
-				notify({
-					title: t('general.success'),
-					description: t('version.middleware.add.success'),
-					type: 'success',
+				toast({
+					title: t('version.middleware.add.success') as string,
+					action: 'success',
 				});
 				onOpenChange(false);
 				if (onCreate) onCreate(mw);
@@ -68,10 +67,9 @@ export default function AddMiddlewareDrawer({
 				setLoading(false);
 			},
 			onError: (error) => {
-				notify({
-					type: 'error',
-					title: error.error,
-					description: error.details,
+				toast({
+					action: 'error',
+					title: error.details,
 				});
 				setLoading(false);
 			},

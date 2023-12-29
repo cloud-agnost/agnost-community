@@ -101,12 +101,6 @@ export interface BaseRequest {
 	onError?: (err: APIError) => void;
 }
 
-export interface ToastType {
-	title: string;
-	description: string;
-	type: 'success' | 'error';
-}
-
 export interface UpdateNotificationData {
 	notifications: string[];
 }

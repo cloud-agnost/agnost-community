@@ -12,7 +12,7 @@ export default function ChangeAppAvatar() {
 	const [error, setError] = useState<APIError | null>(null);
 	const { application, setAppAvatar, removeAppAvatar } = useApplicationStore();
 	const { orgId } = useParams() as Record<string, string>;
-	const { notify } = useToast();
+	const { toast } = useToast();
 	async function onChangeHandler(file: File) {
 		setLoading(true);
 		setAppAvatar({
@@ -37,10 +37,9 @@ export default function ChangeAppAvatar() {
 			orgId,
 			onSuccess: () => {
 				setLoading(false);
-				notify({
-					title: t('application.edit.avatar.success'),
-					description: t('application.edit.avatar.successDesc'),
-					type: 'success',
+				toast({
+					title: t('application.edit.avatar.successDesc') as string,
+					action: 'success',
 				});
 			},
 			onError: (error: APIError) => {

@@ -13,7 +13,7 @@ import MiddlewareForm from './MiddlewareForm';
 
 export default function EditMiddlewareDrawer() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { middleware, closeEditMiddlewareDrawer, isEditMiddlewareDrawerOpen, updateMiddleware } =
 		useMiddlewareStore();
 
@@ -38,10 +38,9 @@ export default function EditMiddlewareDrawer() {
 			onOpenChange();
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

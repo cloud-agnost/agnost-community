@@ -19,7 +19,7 @@ interface AddProviderProps {
 }
 
 export default function AddProvider({ open, onClose, provider }: AddProviderProps) {
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { createOAuthConfig } = useSettingsStore();
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 	const form = useForm<z.infer<typeof AddOAuthProviderSchema>>({
@@ -33,10 +33,9 @@ export default function AddProvider({ open, onClose, provider }: AddProviderProp
 		mutationFn: createOAuthConfig,
 		onSuccess: () => handleCloseModel(),
 		onError: (error: APIError) => {
-			notify({
-				type: 'error',
-				title: t('general.error'),
-				description: error.details,
+			toast({
+				action: 'error',
+				title: error.details,
 			});
 		},
 	});

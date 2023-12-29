@@ -20,7 +20,7 @@ export default function EditEnvVariable({ open, onOpenChange }: EditEnvVariableP
 	const form = useForm<z.infer<typeof EnvVariableSchema>>({
 		resolver: zodResolver(EnvVariableSchema),
 	});
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { param, updateParam } = useSettingsStore();
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 	const { mutateAsync: updateParamMutate, isPending } = useMutation({
@@ -28,10 +28,9 @@ export default function EditEnvVariable({ open, onOpenChange }: EditEnvVariableP
 		mutationFn: updateParam,
 		onSuccess: onClose,
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});

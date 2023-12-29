@@ -44,7 +44,7 @@ const FormSchema = z.object({
 export default function ChangeEmail() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
-	const { notify } = useToast();
+	const { toast } = useToast();
 
 	const [isChangeMode, setIsChangeMode] = useState(false);
 	const { user, changeEmail } = useAuthStore();
@@ -58,10 +58,9 @@ export default function ChangeEmail() {
 			setError(null);
 			setLoading(true);
 			await changeEmail(data.email, data.password);
-			notify({
-				type: 'success',
-				title: t('profileSettings.success'),
-				description: t('profileSettings.email_updated_description'),
+			toast({
+				action: 'success',
+				title: t('profileSettings.email_updated_description') as string,
 			});
 			close();
 		} catch (e) {

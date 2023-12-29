@@ -25,7 +25,7 @@ export default function CreateStorage({ open, onClose }: CreateStorageProps) {
 		appId: string;
 		orgId: string;
 	}>();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const form = useForm<z.infer<typeof CreateStorageSchema>>({
 		resolver: zodResolver(CreateStorageSchema),
 	});
@@ -41,8 +41,8 @@ export default function CreateStorage({ open, onClose }: CreateStorageProps) {
 			});
 			onCloseHandler();
 		},
-		onError: ({ error, details }: APIError) => {
-			notify({ type: 'error', description: details, title: error });
+		onError: ({ details }: APIError) => {
+			toast({ action: 'error', title: details });
 		},
 	});
 

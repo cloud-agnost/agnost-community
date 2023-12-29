@@ -42,7 +42,7 @@ const FormSchema = z.object({
 export default function ChangeName() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<APIError | null>(null);
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { user, changeName } = useAuthStore();
 	const { t } = useTranslation();
 
@@ -59,10 +59,9 @@ export default function ChangeName() {
 			setLoading(true);
 			setError(null);
 			await changeName(data.name);
-			notify({
-				type: 'success',
-				title: t('profileSettings.success'),
-				description: t('profileSettings.name_updated_description'),
+			toast({
+				action: 'success',
+				title: t('profileSettings.name_updated_description') as string,
 			});
 		} catch (e) {
 			setError(e as APIError);

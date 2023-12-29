@@ -23,7 +23,7 @@ export default function EditModel({
 	const form = useForm<z.infer<typeof ModelSchema>>({
 		resolver: zodResolver(ModelSchema),
 	});
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const { updateNameAndDescription, enableTimestamps, disableTimestamps, model } = useModelStore();
 	const { versionId, appId, orgId, dbId } = useParams() as {
 		versionId: string;
@@ -35,10 +35,9 @@ export default function EditModel({
 		mutationFn: editModelHandler,
 		mutationKey: ['createModel'],
 		onError: (error: APIError) => {
-			notify({
-				title: error.error,
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 		onSettled: () => {

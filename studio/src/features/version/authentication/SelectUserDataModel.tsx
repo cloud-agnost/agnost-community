@@ -37,7 +37,7 @@ export default function SelectUserDataModel() {
 	const { databases, getDatabasesOfApp } = useDatabaseStore();
 	const { models, getModelsOfDatabase } = useModelStore();
 	const [error, setError] = useState<APIError>();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('version.auth.update');
 	const form = useForm<z.infer<typeof SaveUserModelSchema>>({
 		defaultValues: {
@@ -83,19 +83,17 @@ export default function SelectUserDataModel() {
 		mutationFn: saveUserDataModelInfo,
 		mutationKey: ['saveUserDataModelInfo'],
 		onSuccess: () => {
-			notify({
-				title: t('general.success'),
-				description: t('version.authentication.user_data_model_saved'),
-				type: 'success',
+			toast({
+				title: t('version.authentication.user_data_model_saved'),
+				action: 'success',
 			});
 		},
 		onError: (error: APIError) => {
 			setError(error);
 
-			notify({
-				title: t('general.error'),
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});
@@ -103,18 +101,16 @@ export default function SelectUserDataModel() {
 		mutationFn: addMissingUserDataModelFields,
 		mutationKey: ['addMissingUserDataModelFields'],
 		onSuccess: () => {
-			notify({
-				title: t('general.success'),
-				description: t('version.authentication.added_missing_fields'),
-				type: 'success',
+			toast({
+				title: t('version.authentication.added_missing_fields'),
+				action: 'success',
 			});
 			setError(undefined);
 		},
 		onError: (error: APIError) => {
-			notify({
-				title: t('general.error'),
-				description: error.details,
-				type: 'error',
+			toast({
+				title: error.details,
+				action: 'error',
 			});
 		},
 	});
@@ -125,10 +121,9 @@ export default function SelectUserDataModel() {
 			appId: version?.appId as string,
 			...data,
 			onSuccess: () => {
-				notify({
-					title: t('general.success'),
-					description: t('version.authentication.user_data_model_saved'),
-					type: 'success',
+				toast({
+					title: t('version.authentication.user_data_model_saved'),
+					action: 'success',
 				});
 			},
 		});

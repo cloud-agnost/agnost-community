@@ -11,7 +11,7 @@ import { useParams } from 'react-router-dom';
 
 export default function EditMessageQueue() {
 	const { t } = useTranslation();
-	const { notify } = useToast();
+	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('queue.update');
 	const { updateQueueLogic, queue, openEditModal, setLogics, deleteLogic, logics } =
 		useMessageQueueStore();
@@ -28,11 +28,10 @@ export default function EditMessageQueue() {
 		mutationFn: updateQueueLogic,
 		mutationKey: ['updateQueueLogic'],
 		onSuccess,
-		onError: ({ error, details }: APIError) => {
-			notify({
-				title: error,
-				description: details,
-				type: 'error',
+		onError: ({ details }: APIError) => {
+			toast({
+				title: details,
+				action: 'error',
 			});
 		},
 	});
