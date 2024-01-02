@@ -214,7 +214,10 @@ export default function EditorSettings() {
 															<SelectValue placeholder={`${t('general.select')} `} />
 														</SelectTrigger>
 													</FormControl>
-													<SelectContent align='center' className='!max-h-[36rem]'>
+													<SelectContent
+														align='center'
+														className='!max-h-[36rem] [&_.select-viewport]:!overflow-visible'
+													>
 														{Object.entries(themes).map(([key, theme]) => (
 															<SelectItem key={key} value={key}>
 																{theme}
