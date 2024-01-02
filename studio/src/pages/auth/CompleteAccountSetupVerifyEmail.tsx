@@ -197,7 +197,25 @@ export default function CompleteAccountSetupVerifyEmail() {
 									)}
 								/>
 							)}
-
+							<FormField
+								control={form.control}
+								name='name'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>{t('login.name')}</FormLabel>
+										<FormDescription>{t('login.name_desc')}</FormDescription>
+										<FormControl>
+											<Input
+												error={Boolean(form.formState.errors.name)}
+												placeholder={t('login.enter_name') as string}
+												{...field}
+											/>
+										</FormControl>
+										<FormDescription>{t('forms.max64.description')}</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 							<FormField
 								control={form.control}
 								name='password'
@@ -218,25 +236,7 @@ export default function CompleteAccountSetupVerifyEmail() {
 									</FormItem>
 								)}
 							/>
-							<FormField
-								control={form.control}
-								name='name'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>{t('login.name')}</FormLabel>
-										<FormDescription>{t('login.name_desc')}</FormDescription>
-										<FormControl>
-											<Input
-												error={Boolean(form.formState.errors.name)}
-												placeholder={t('login.enter_name') as string}
-												{...field}
-											/>
-										</FormControl>
-										<FormDescription>{t('forms.max64.description')}</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
+
 							<div className='flex justify-end'>
 								<Button loading={finalizeLoading || completeLoading} size='lg' type='submit'>
 									{t('login.complete_setup')}
