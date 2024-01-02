@@ -31,6 +31,10 @@ export default function EditEndpointDrawer({ open, onClose }: CreateEndpointProp
 		onSuccess: () => {
 			onClose();
 			form.reset();
+			toast({
+				title: t('endpoint.editSuccess'),
+				action: 'success',
+			});
 		},
 		onError: ({ details }: APIError) => {
 			toast({
