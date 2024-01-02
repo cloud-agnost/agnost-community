@@ -384,7 +384,7 @@ router.post(
 
 			// Make api call to environment API server to trigger testing of the message queue
 			await axios.post(
-				`http://${env.iid}.${process.env.NAMESPACE}.svc.cluster.local/test/task`,
+				`http://${env.iid}.${process.env.NAMESPACE}.svc.cluster.local/agnost/test/task`,
 				{ taskiid: task.iid, debugChannel },
 				{
 					headers: {

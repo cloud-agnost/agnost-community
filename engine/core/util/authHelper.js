@@ -84,7 +84,7 @@ export function createEmailToken(
 		expiresIn: expireDuration,
 		createdAt: new Date(createdAt),
 		expiresAt: new Date(expiresAt),
-		confirmationURL: `${baseURL}/auth/verify?key=${key}&action=${actionType}&redirect=${encodeURIComponent(
+		confirmationURL: `${baseURL}/agnost/auth/verify?key=${key}&action=${actionType}&redirect=${encodeURIComponent(
 			redirectURL
 		)}`,
 		redirectURL: redirectURL,

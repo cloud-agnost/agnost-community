@@ -28,7 +28,7 @@ function getBaseURL(req) {
 const loginOauthProvider = async (req, res, next) => {
 	let strategy = createStrategy(
 		req.provider,
-		`${getBaseURL(req)}/oauth/${req.provider.name}/callback`,
+		`${getBaseURL(req)}/agnost/oauth/${req.provider.name}/callback`,
 		req
 	);
 

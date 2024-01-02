@@ -534,7 +534,7 @@ export class ResourceManager {
                                 },
                                 livenessProbe: {
                                     httpGet: {
-                                        path: "/health",
+                                        path: "/agnost/health",
                                         port: config.get("general.defaultClusterIPPort"),
                                     },
                                     timeoutSeconds: config.get("general.livenessProbe.timeoutSeconds"),
@@ -543,7 +543,7 @@ export class ResourceManager {
                                 },
                                 readinessProbe: {
                                     httpGet: {
-                                        path: "/health",
+                                        path: "/agnost/health",
                                         port: config.get("general.defaultClusterIPPort"),
                                     },
                                     timeoutSeconds: config.get("general.readinessProbe.timeoutSeconds"),

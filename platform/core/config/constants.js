@@ -78,16 +78,7 @@ export const envStatuses = [
 	"Deleting",
 ];
 
-export const forbiddenEpPrefixes = [
-	"/health",
-	"/ping",
-	"/object/",
-	"/test/",
-	"/storage/",
-	"/auth/",
-	"/oauth/",
-	"/realtime/",
-];
+export const forbiddenEpPrefixes = ["/agnost"];
 
 export const logStatuses = ["OK", "Error"];
 

@@ -327,22 +327,28 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 		app.use(this.i18n.init);
 
 		// Add the default system endpoints
-		app.use("/", (await import("../routes/system.js")).default);
+		app.use("/agnost", (await import("../routes/system.js")).default);
 	}
 
 	async initializeDefaultEndpoints() {
 		const app = this.getExpressApp();
 		// Add the default storage object endpoints to access stored objects
-		app.use("/object", (await import("../routes/object.js")).default);
+		app.use("/agnost/object", (await import("../routes/object.js")).default);
 		// Add the test queue and cron job handlers
-		app.use("/test", (await import("../routes/test.js")).default);
+		app.use("/agnost/test", (await import("../routes/test.js")).default);
 		// Add the default storage object endpoints
-		app.use("/storage", (await import("../routes/storage.js")).default);
+		app.use("/agnost/storage", (await import("../routes/storage.js")).default);
 		// Add the default user authentication endpoints
-		app.use("/auth", (await import("../routes/auth.js")).default);
-		app.use("/database", (await import("../routes/database.js")).default);
-		app.use("/oauth", (await import("../routes/oauth.js")).default);
-		app.use("/realtime", (await import("../routes/realtime.js")).default);
+		app.use("/agnost/auth", (await import("../routes/auth.js")).default);
+		app.use(
+			"/agnost/database",
+			(await import("../routes/database.js")).default
+		);
+		app.use("/agnost/oauth", (await import("../routes/oauth.js")).default);
+		app.use(
+			"/agnost/realtime",
+			(await import("../routes/realtime.js")).default
+		);
 	}
 
 	/**
