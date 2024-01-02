@@ -54,7 +54,7 @@ export default function ChangeAvatar({
 		}
 	}
 	return (
-		<>
+		<div className='space-y-6'>
 			{error && (
 				<Alert variant='error'>
 					<AlertTitle>{error.error}</AlertTitle>
@@ -115,6 +115,6 @@ export default function ChangeAvatar({
 					</div>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }

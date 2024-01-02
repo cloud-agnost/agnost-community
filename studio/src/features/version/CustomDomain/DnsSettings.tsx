@@ -1,3 +1,4 @@
+import { CopyButton } from '@/components/CopyButton';
 import { Description } from '@/components/Description';
 import useClusterStore from '@/store/cluster/clusterStore';
 import { Separator } from '@radix-ui/react-dropdown-menu';
@@ -23,7 +24,10 @@ export default function DnsSettings() {
 					<div className='flex justify-between' key={ip}>
 						<p className='flex-1'>A</p>
 						<p className='flex-1'>@</p>
-						<p className='flex-1'>{ip}</p>
+						<div className='flex items-center gap-3 flex-1 group'>
+							<div className='truncate font-mono'>{ip}</div>
+							<CopyButton text={ip} className='w-6 h-6 invisible group-hover:visible' />
+						</div>
 						<p className='flex-1'>1 {t('general.hour')}</p>
 					</div>
 				))}

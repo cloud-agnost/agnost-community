@@ -28,7 +28,7 @@ export default class StorageService {
 	static url = 'v1/org/';
 
 	static getUrl() {
-		return `${useEnvironmentStore.getState().environment?.iid}`;
+		return `${useEnvironmentStore.getState().environment?.iid}/agnost`;
 	}
 
 	static async getStorages({ orgId, appId, versionId, ...params }: GetStoragesParams) {

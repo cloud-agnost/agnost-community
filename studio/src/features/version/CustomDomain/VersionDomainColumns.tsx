@@ -72,20 +72,6 @@ export const VersionDomainColumns: ColumnDefWithClassName<CustomDomain>[] = [
 			return <DateText date={createdAt} user={user} />;
 		},
 	},
-
-	{
-		id: 'updatedAt',
-		header: () => <SortButton text={translate('general.updated_at')} field='updatedAt' />,
-		accessorKey: 'updatedAt',
-		size: 200,
-		cell: ({ row }) => {
-			const { updatedAt, updatedBy } = row.original;
-			const user = useOrganizationStore
-				.getState()
-				.members.find((member) => member.member._id === updatedBy);
-			return updatedBy && <DateText date={updatedAt} user={user} />;
-		},
-	},
 	{
 		id: 'actions',
 		className: 'actions !w-[50px]',

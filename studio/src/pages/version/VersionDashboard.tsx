@@ -80,7 +80,7 @@ export default function VersionDashboard() {
 	function clickDashboardItem(type: string) {
 		addTab(version._id, {
 			id: generateId(),
-			title: type,
+			title: `${type}s`,
 			path: getVersionDashboardPath(type.toLowerCase()),
 			type: type as TabTypes,
 			isDashboard: false,

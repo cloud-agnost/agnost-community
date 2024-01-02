@@ -68,5 +68,7 @@
 	"transfer-ownership-desc": "The organization owner is the person who has created the organization or the person to whom the organization ownership has been transferred. The Owner has full control over the organization and only organization owners can delete the organization or transfer its ownership to someone else.",
 	"transfer-success": "You have successfully transferred the ownership of the organization.",
 	"empty_organization": "You’re not a Member of any organization!",
-	"empty_organization_desc": "Contact your cluster administrator to request access to organizations."
+	"empty_organization_desc": "Contact your cluster administrator to request access to organizations.",
+	"member_delete_success": "You have successfully deleted the member from the organization.",
+	"invite_delete_success": "You have successfully deleted the invitation."
 }
