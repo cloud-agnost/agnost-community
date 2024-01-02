@@ -1,16 +1,18 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
-import { APIError, ModelSchema } from '@/types';
+import { Form } from '@/components/Form';
+import { useToast } from '@/hooks';
+import useDatabaseStore from '@/store/database/databaseStore';
+import useModelStore from '@/store/database/modelStore';
+import { APIError, ModelSchema, ResourceInstances } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Form } from '@/components/Form';
+import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import ModelForm from './ModelForm';
-import useModelStore from '@/store/database/modelStore';
-import { useMutation } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
-import { useToast } from '@/hooks';
-import { useEffect } from 'react';
+
 export default function CreateModel({
 	open,
 	onOpenChange,
@@ -20,12 +22,13 @@ export default function CreateModel({
 }) {
 	const { t } = useTranslation();
 	const { toast } = useToast();
+	const { database } = useDatabaseStore();
 	const form = useForm<z.infer<typeof ModelSchema>>({
 		resolver: zodResolver(ModelSchema),
 		defaultValues: {
 			timestamps: {
-				createdAt: t('database.models.add.timestamps.createdAt.name') as string,
-				updatedAt: t('database.models.add.timestamps.updatedAt.name') as string,
+				createdAt: database.type === ResourceInstances.MongoDB ? 'createdAt' : 'created_at',
+				updatedAt: database.type === ResourceInstances.MongoDB ? 'updatedAt' : 'updated_at',
 			},
 		},
 	});
@@ -69,12 +72,13 @@ export default function CreateModel({
 		if (open) {
 			form.reset({
 				timestamps: {
-					createdAt: t('database.models.add.timestamps.createdAt.name') as string,
-					updatedAt: t('database.models.add.timestamps.updatedAt.name') as string,
+					createdAt: database.type === ResourceInstances.MongoDB ? 'createdAt' : 'created_at',
+					updatedAt: database.type === ResourceInstances.MongoDB ? 'updatedAt' : 'updated_at',
 				},
 			});
 		}
 	}, [open]);
+
 	return (
 		<Drawer open={open} onOpenChange={onClose}>
 			<DrawerContent className='overflow-x-hidden'>
