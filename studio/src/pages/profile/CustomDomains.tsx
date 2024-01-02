@@ -31,7 +31,9 @@ export default function CustomDomains() {
 	const { mutate: addDomainMutation, isPending } = useMutation({
 		mutationFn: addDomain,
 		onSuccess: () => {
-			form.reset();
+			form.reset({
+				domain: '',
+			});
 			toast({
 				action: 'success',
 				title: t('cluster.domain_added') as string,
@@ -55,7 +57,9 @@ export default function CustomDomains() {
 		<>
 			{_.isNil(clusterDomainError) ? (
 				<div className='space-y-6 max-w-2xl'>
-					<p className='text-subtle text-sm font-sfCompact'>{t('cluster.smtpDescription')}</p>
+					<p className='text-subtle text-sm font-sfCompact'>
+						{t('cluster.custom_domain_description')}
+					</p>
 					<EnforceSSL />
 					<DnsSettings />
 					<div className='space-y-4'>
