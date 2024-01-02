@@ -1,3 +1,4 @@
+import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import { OrgRoles, Organization, OrganizationMember, RealtimeActionParams } from '@/types';
@@ -10,9 +11,10 @@ class OrgMember implements RealtimeActions<OrganizationMember> {
 				.getState?.()
 				.members.filter((member) => member.member._id !== param.data._id),
 		});
+		console.log(param.data._id, useAuthStore.getState().user?._id, param.data);
 		if (
 			param.data._id === useAuthStore.getState().user?._id ||
-			param.data.userIds.includes(useAuthStore.getState().user?._id as string)
+			param.data.userIds?.includes(useAuthStore.getState().user?._id as string)
 		) {
 			useOrganizationStore.setState?.({
 				organization: {} as Organization,
@@ -22,6 +24,15 @@ class OrgMember implements RealtimeActions<OrganizationMember> {
 					.organizations.filter((org) => org._id !== param.identifiers.orgId),
 			});
 			history.navigate?.('/organization');
+		} else {
+			useApplicationStore.setState?.((prev) => ({
+				...prev,
+				applicationTeam: prev.applicationTeam.filter((team) => team.member._id !== param.data._id),
+				applications: prev.applications.map((app) => ({
+					...app,
+					team: app.team.filter((team) => team.userId._id !== param.data._id),
+				})),
+			}));
 		}
 	}
 	update(param: RealtimeActionParams<OrganizationMember>): void {
