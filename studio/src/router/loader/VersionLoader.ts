@@ -1,6 +1,7 @@
 import useAuthStore from '@/store/auth/authStore';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
+import useNavigatorStore from '@/store/database/navigatorStore';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useFunctionStore from '@/store/function/functionStore';
 import useMiddlewareStore from '@/store/middleware/middlewareStore';
@@ -173,14 +174,24 @@ async function bucketLoader({ params }: LoaderFunctionArgs) {
 }
 
 async function fileLoader({ params }: LoaderFunctionArgs) {
-	const { bucketName } = params;
-	const { bucket, buckets, storage, getBucket } = useStorageStore.getState();
+	const { bucketName, storageId, appId, orgId, versionId } = params;
+	const { bucket, buckets, storage, getBucket, storages } = useStorageStore.getState();
+	let selectedStorage = storages.find((storage) => storage._id === storageId);
+	if (!selectedStorage) {
+		selectedStorage = await useStorageStore.getState().getStorageById({
+			storageId: storageId as string,
+			appId: appId as string,
+			orgId: orgId as string,
+			versionId: versionId as string,
+		});
+	}
+	useStorageStore.setState({ storage: selectedStorage });
 
 	if (bucketName !== bucket?.name) {
 		let selectedBucket = buckets.find((bucket) => bucket.name === bucketName);
 		if (!selectedBucket) {
 			selectedBucket = await getBucket({
-				storageName: storage?.name as string,
+				storageName: selectedStorage?.name ?? storage.name,
 				bucketName: bucketName as string,
 			});
 		}
@@ -264,7 +275,7 @@ async function navigatorLoader({ params }: LoaderFunctionArgs) {
 	if (!useAuthStore.getState().isAuthenticated()) return null;
 	const { getModelsOfDatabase } = useModelStore.getState();
 	const { database, getDatabaseOfAppById } = useDatabaseStore.getState();
-
+	useNavigatorStore.setState({ lastFetchedPage: 0 });
 	const apiParams = params as {
 		orgId: string;
 		appId: string;
