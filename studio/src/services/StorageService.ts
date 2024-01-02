@@ -112,7 +112,7 @@ export default class StorageService {
 
 	static async emptyBucket({ storageName, bucketName }: DeleteBucketParams): Promise<void> {
 		return (
-			await axios.delete(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}/empty`, {
+			await http.delete(`${this.getUrl()}/storage/${storageName}/bucket/${bucketName}/empty`, {
 				data: { name: bucketName },
 			})
 		).data;
