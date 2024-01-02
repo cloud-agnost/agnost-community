@@ -15,7 +15,7 @@ export const fileUploadMiddleware = (req, res, next) => {
 			// Handle Multer-specific errors
 			if (err.code === "LIMIT_FILE_SIZE") {
 				return res.status(400).json({
-					error: t("File Too Laerge"),
+					error: t("File Too Large"),
 					code: ERROR_CODES.fileSizeTooLarge,
 					details: t(
 						"File size exceeds the limit of %sMB.",
