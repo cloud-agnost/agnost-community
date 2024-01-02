@@ -1,8 +1,6 @@
 import { Button } from '@/components/Button';
 import { CopyInput } from '@/components/CopyInput';
-import {
-	DrawerFooter
-} from '@/components/Drawer';
+import { DrawerFooter } from '@/components/Drawer';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input, Textarea } from '@/components/Input';
 import { Separator } from '@/components/Separator';
@@ -84,7 +82,7 @@ export default function ProviderFrom({ loading }: { loading: boolean }) {
 	const form = useFormContext<z.infer<typeof AddOAuthProviderSchema>>();
 	const provider = form.watch('provider');
 	const { environment } = useEnvironmentStore();
-	const callbackUrl = `${window.location.origin}/${environment?.iid}/oauth/${provider}/callback`;
+	const callbackUrl = `${window.location.origin}/${environment?.iid}/agnost/oauth/${provider}/callback`;
 	const { oAuthProviderTypes } = useTypeStore();
 
 	const providerParams = useMemo(() => {

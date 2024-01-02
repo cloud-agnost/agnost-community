@@ -866,16 +866,7 @@ export const ORG_CHANGE_EXCEPTIONS = [
 	'onBoarding',
 ];
 
-export const FORBIDDEN_EP_PREFIXES = [
-	'/health',
-	'/ping',
-	'/object',
-	'/test',
-	'/storage',
-	'/auth',
-	'/oauth',
-	'/realtime',
-];
+export const FORBIDDEN_EP_PREFIXES = ['/agnost'];
 
 export const FORBIDDEN_RESOURCE_NAMES = [
 	'mongodb',
