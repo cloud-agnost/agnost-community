@@ -9,6 +9,7 @@ import { MsSQLDBManager } from "./MsSQLDBManager.js";
 import { OracleDBManager } from "./OracleDBManager.js";
 import { DATABASE } from "../../config/constants.js";
 import { manageAPIServers } from "../../init/queue.js";
+import connManager from "../../init/connManager.js";
 
 export class DeploymentManager {
     constructor(msgObj) {
@@ -882,10 +883,17 @@ export class DeploymentManager {
             const newdbConfig = databases.find((entry) => entry.iid === prevdbConfig.iid);
             if (newdbConfig) continue;
             else if (prevdbConfig.managed) {
-                let dbManager = this.createDBManager(prevdbConfig, prevdbConfig);
-                await dbManager.beginSession();
-                await dbManager.dropDatabase();
-                await dbManager.endSession();
+                try {
+                    let dbManager = this.createDBManager(prevdbConfig, prevdbConfig);
+                    await dbManager.beginSession();
+                    await dbManager.dropDatabase();
+                    await dbManager.endSession();
+                } catch (err) {
+                    // If the database server is dropped then we cannot perform database operations for this reason we need to catch the errors
+                } finally {
+                    // We need to reset the connection pool since the database is deleted
+                    await connManager.removeAllConnections();
+                }
             }
         }
     }
