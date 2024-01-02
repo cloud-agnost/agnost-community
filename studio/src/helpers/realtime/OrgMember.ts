@@ -11,7 +11,6 @@ class OrgMember implements RealtimeActions<OrganizationMember> {
 				.getState?.()
 				.members.filter((member) => member.member._id !== param.data._id),
 		});
-		console.log(param.data._id, useAuthStore.getState().user?._id, param.data);
 		if (
 			param.data._id === useAuthStore.getState().user?._id ||
 			param.data.userIds?.includes(useAuthStore.getState().user?._id as string)
