@@ -373,10 +373,31 @@ export class ResourceManager {
 
             // Modify the deployment (e.g., update an environment variable)
             // This is an example; modify according to your deployment spec
-            existingService.body.spec.template.spec.containers[0].env.push({
+            const container = existingService.body.spec.template.spec.containers[0];
+            container.env.push({
                 name: "RESTART_TIMESTAMP",
                 value: new Date().toISOString(),
             });
+
+            container.livenessProbe = {
+                httpGet: {
+                    path: "/agnost/health",
+                    port: config.get("general.defaultClusterIPPort"),
+                },
+                timeoutSeconds: config.get("general.livenessProbe.timeoutSeconds"),
+                periodSeconds: config.get("general.livenessProbe.periodSeconds"),
+                initialDelaySeconds: config.get("general.livenessProbe.initialDelaySeconds"),
+            };
+
+            container.readinessProbe = {
+                httpGet: {
+                    path: "/agnost/health",
+                    port: config.get("general.defaultClusterIPPort"),
+                },
+                timeoutSeconds: config.get("general.readinessProbe.timeoutSeconds"),
+                periodSeconds: config.get("general.readinessProbe.periodSeconds"),
+                initialDelaySeconds: config.get("general.readinessProbe.initialDelaySeconds"),
+            };
 
             // Apply updated Knative Service
             await k8sApi.replaceNamespacedCustomObject(
@@ -619,6 +640,26 @@ export class ResourceManager {
                 },
             };
 
+            container.livenessProbe = {
+                httpGet: {
+                    path: "/agnost/health",
+                    port: config.get("general.defaultClusterIPPort"),
+                },
+                timeoutSeconds: config.get("general.livenessProbe.timeoutSeconds"),
+                periodSeconds: config.get("general.livenessProbe.periodSeconds"),
+                initialDelaySeconds: config.get("general.livenessProbe.initialDelaySeconds"),
+            };
+
+            container.readinessProbe = {
+                httpGet: {
+                    path: "/agnost/health",
+                    port: config.get("general.defaultClusterIPPort"),
+                },
+                timeoutSeconds: config.get("general.readinessProbe.timeoutSeconds"),
+                periodSeconds: config.get("general.readinessProbe.periodSeconds"),
+                initialDelaySeconds: config.get("general.readinessProbe.initialDelaySeconds"),
+            };
+
             // Apply updated Knative Service
             await k8sApi.replaceNamespacedCustomObject(
                 "serving.knative.dev",
@@ -666,6 +707,26 @@ export class ResourceManager {
             });
 
             if (!releaseUpdated) container.env.push({ name: "RELEASE_NUMBER", value: imageName.split(":")[1] });
+
+            container.livenessProbe = {
+                httpGet: {
+                    path: "/agnost/health",
+                    port: config.get("general.defaultClusterIPPort"),
+                },
+                timeoutSeconds: config.get("general.livenessProbe.timeoutSeconds"),
+                periodSeconds: config.get("general.livenessProbe.periodSeconds"),
+                initialDelaySeconds: config.get("general.livenessProbe.initialDelaySeconds"),
+            };
+
+            container.readinessProbe = {
+                httpGet: {
+                    path: "/agnost/health",
+                    port: config.get("general.defaultClusterIPPort"),
+                },
+                timeoutSeconds: config.get("general.readinessProbe.timeoutSeconds"),
+                periodSeconds: config.get("general.readinessProbe.periodSeconds"),
+                initialDelaySeconds: config.get("general.readinessProbe.initialDelaySeconds"),
+            };
 
             // Apply updated Knative Service
             await k8sApi.replaceNamespacedCustomObject(
