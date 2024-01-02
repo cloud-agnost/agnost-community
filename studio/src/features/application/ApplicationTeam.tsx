@@ -16,7 +16,7 @@ export default function ApplicationTeam({ team, table = false }: ApplicationTeam
 			))}
 			{team?.length > 4 && (
 				<Avatar size='xs'>
-					<AvatarFallback name={`${team.length - 5}+`} color='#fff' />
+					<AvatarFallback name={`${team.length - 4}+`} color='#fff' />
 				</Avatar>
 			)}
 		</div>
