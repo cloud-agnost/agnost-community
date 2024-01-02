@@ -62,7 +62,7 @@ export default function TabItem({
 						iconOnly
 						variant='blank'
 						onClick={close}
-						className='invisible group-hover:visible'
+						className='invisible group-hover:visible !h-[unset]'
 					>
 						<X />
 					</Button>
