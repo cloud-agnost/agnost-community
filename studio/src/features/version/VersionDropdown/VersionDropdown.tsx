@@ -4,7 +4,7 @@ import useApplicationStore from '@/store/app/applicationStore.ts';
 import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore.ts';
 import { APIError } from '@/types';
-import { CaretUpDown, LockSimple, LockSimpleOpen } from '@phosphor-icons/react';
+import { CaretUpDown, LockSimple, LockSimpleOpen, Trash } from '@phosphor-icons/react';
 import { ConfirmationModal } from 'components/ConfirmationModal';
 import {
 	DropdownMenu,
@@ -130,6 +130,7 @@ export default function VersionDropdown() {
 								<DropdownMenuItem
 									onClick={() => useVersionStore.setState({ deleteVersionDrawerIsOpen: true })}
 								>
+									<Trash className='w-5 h-5 mr-2' />
 									{t('version.delete')}
 								</DropdownMenuItem>
 							</Fragment>
