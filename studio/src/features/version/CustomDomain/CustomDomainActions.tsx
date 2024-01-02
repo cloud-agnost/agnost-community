@@ -10,8 +10,9 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import AddCustomDomainButton from './AddCustomDomainButton';
 interface CustomDomainActionsProps {
 	table: Table<CustomDomain>;
+	refetch: () => void;
 }
-export default function CustomDomainActions({ table }: CustomDomainActionsProps) {
+export default function CustomDomainActions({ table, refetch }: CustomDomainActionsProps) {
 	const { toast } = useToast();
 	const [searchParams] = useSearchParams();
 	const canDeleteMultiple = useAuthorizeVersion('domain.delete');
@@ -20,6 +21,7 @@ export default function CustomDomainActions({ table }: CustomDomainActionsProps)
 	const { mutateAsync: deleteDomain } = useMutation({
 		mutationFn: deleteMultipleCustomDomains,
 		onSuccess: () => {
+			refetch();
 			table?.toggleAllRowsSelected(false);
 		},
 		onError: (error) => {
