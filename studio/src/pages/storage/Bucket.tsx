@@ -8,6 +8,7 @@ import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useStorageStore from '@/store/storage/storageStore';
 import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';
+import _ from 'lodash';
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -49,13 +50,14 @@ export default function Buckets() {
 		queryKey: 'getBuckets',
 		dataLength: buckets.length,
 		disableVersionParams: true,
-		lastFetchedPage: bucketCountInfo.currentPage ? bucketCountInfo.currentPage - 1 : 0,
+		lastFetchedPage: _.isNil(bucketCountInfo.currentPage)
+			? bucketCountInfo.currentPage
+			: bucketCountInfo.currentPage - 1,
 		params: {
 			storageName: storage?.name,
 			returnCountInfo: true,
 		},
 	});
-
 	const {
 		mutateAsync: deleteBucketMutation,
 		isPending: deleteLoading,
