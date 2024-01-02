@@ -14,7 +14,7 @@ export default class NavigatorService {
 		const dbName = useDatabaseStore.getState().database.name;
 		const modelName = useModelStore.getState().model.name;
 		return `${useEnvironmentStore.getState().environment
-			?.iid}/database/${dbName}/model/${modelName}`;
+			?.iid}/agnost/database/${dbName}/model/${modelName}`;
 	}
 
 	static async getDataFromModel({ ...params }: GetDataFromModelParams) {

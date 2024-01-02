@@ -1,8 +1,6 @@
 import { Button } from '@/components/Button';
 import { CopyInput } from '@/components/CopyInput';
-import {
-	DrawerFooter
-} from '@/components/Drawer';
+import { DrawerFooter } from '@/components/Drawer';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input, Textarea } from '@/components/Input';
 import { Separator } from '@/components/Separator';

@@ -1,21 +1,18 @@
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
+import { EmptyState } from '@/components/EmptyState';
 import { SearchInput } from '@/components/SearchInput';
 import { AddResourceButton, EditResourceDrawer } from '@/features/resources';
 import { useTable } from '@/hooks';
 import useResourcesStore from '@/store/resources/resourceStore';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { ResourceTableColumn } from './ResourceTable/ResourceTableColumn';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { EmptyState } from '@/components/EmptyState';
 import BeatLoader from 'react-spinners/BeatLoader';
-import { APIError } from '@/types';
-import { useToast } from '@/hooks';
+import { ResourceTableColumn } from './ResourceTable/ResourceTableColumn';
 export default function OrgResources() {
 	const { t } = useTranslation();
-	const { toast } = useToast();
 	const [searchParams] = useSearchParams();
 	const { orgId } = useParams() as Record<string, string>;
 	const {
@@ -39,15 +36,13 @@ export default function OrgResources() {
 		enabled: !resources.length,
 	});
 
-	const { mutateAsync: deleteMutate, isPending: deleteLoading } = useMutation({
+	const {
+		mutateAsync: deleteMutate,
+		isPending: deleteLoading,
+		error,
+	} = useMutation({
 		mutationFn: deleteResource,
 		mutationKey: ['deleteResource'],
-		onError: (error: APIError) => {
-			toast({
-				title: error.details,
-				action: 'error',
-			});
-		},
 	});
 
 	function getResources() {
@@ -98,6 +93,7 @@ export default function OrgResources() {
 				isOpen={isDeletedResourceModalOpen}
 				closeModal={closeDeleteResourceModal}
 				loading={deleteLoading}
+				error={error}
 				closable
 			/>
 			<EditResourceDrawer />

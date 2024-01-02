@@ -58,8 +58,8 @@ export default function OrganizationMembersTableHeader({ table }: { table: Table
 		toast({
 			title:
 				selectedTab === 'member'
-					? (t('organization.member.delete') as string)
-					: (t('organization.invitation.delete') as string),
+					? (t('organization.member_delete_success') as string)
+					: (t('organization.invite_delete_success') as string),
 			action: 'success',
 		});
 	}

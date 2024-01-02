@@ -131,7 +131,7 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 		className: '!w-[300px]',
 		cell: ({ row: { original } }) => {
 			const environment = useEnvironmentStore.getState().environment;
-			const publicPath = `${window.location.origin}/${environment?.iid}/object/${original.id}`;
+			const publicPath = `${window.location.origin}/${environment?.iid}/agnost/object/${original.id}`;
 			return (
 				<Link to={publicPath} className='link' target='_blank' rel='noopener noreferrer'>
 					{original.path}

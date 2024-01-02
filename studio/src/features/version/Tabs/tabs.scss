@@ -71,7 +71,7 @@
 				@apply bg-transparent h-full flex items-center justify-center pr-0.5;
 				&:hover {
 					button {
-						@apply bg-subtle;
+						@apply bg-subtle rounded-full;
 					}
 				}
 			}

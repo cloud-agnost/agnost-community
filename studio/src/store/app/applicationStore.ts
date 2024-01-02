@@ -21,6 +21,7 @@ import {
 	UpdateRoleRequest,
 } from '@/types';
 
+import { VersionService } from '@/services';
 import useAuthStore from '@/store/auth/authStore';
 import { joinChannel, leaveChannel } from '@/utils';
 import OrganizationService from 'services/OrganizationService.ts';
@@ -461,9 +462,9 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 				const { selectApplication, openVersionDrawer } = get();
 				selectApplication(app);
 				set({ loading: true });
-				const { getAllVersionsVisibleToUser, selectVersion } = useVersionStore.getState();
+				const { selectVersion } = useVersionStore.getState();
 				const orgId = useOrganizationStore.getState().organization?._id as string;
-				const versions = await getAllVersionsVisibleToUser({
+				const versions = await VersionService.getAllVersionsVisibleToUser({
 					orgId,
 					appId: app?._id as string,
 					page: 0,

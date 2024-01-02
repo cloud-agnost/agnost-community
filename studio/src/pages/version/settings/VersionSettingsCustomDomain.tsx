@@ -28,7 +28,7 @@ export default function VersionSettingsCustomDomain() {
 		columns: VersionDomainColumns,
 	});
 
-	const { fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteScroll({
+	const { fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteScroll({
 		queryFn: getCustomDomainsOfVersion,
 		queryKey: 'getCustomDomainsOfVersion',
 		lastFetchedPage: lastFetchedDomainPage,
@@ -51,7 +51,7 @@ export default function VersionSettingsCustomDomain() {
 	return (
 		<SettingsContainer
 			pageTitle={t('cluster.custom_domain')}
-			action={<CustomDomainActions table={table} />}
+			action={<CustomDomainActions table={table} refetch={refetch} />}
 			className='table-view'
 		>
 			{!_.isNil(clusterDomainError) ? (
@@ -73,7 +73,7 @@ export default function VersionSettingsCustomDomain() {
 					<DataTable table={table} containerClassName='border-none rounded-none' />
 				</InfiniteScroll>
 			) : (
-				<EmptyState type='custom-domain' title={t('version.npm.no_package_found')} />
+				<EmptyState type='custom-domain' title={t('cluster.empty_domain')} />
 			)}
 
 			<AddVersionDomain open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />

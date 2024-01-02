@@ -476,28 +476,10 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 		icon: GearSix,
 	},
 	{
-		id: 2,
-		title: translate('version.settings.environment'),
-		href: 'environment',
-		icon: Environment,
-	},
-	{
-		id: 4,
-		title: translate('version.settings.npm_packages'),
-		href: 'npm-packages',
-		icon: NpmPackage,
-	},
-	{
-		id: 5,
-		title: translate('version.settings.environment_variables'),
-		href: 'environment-variables',
-		icon: EnvironmentVariable,
-	},
-	{
-		id: 6,
-		title: translate('version.settings.rate_limits'),
-		href: 'rate-limits',
-		icon: RateLimit,
+		id: 8,
+		title: translate('version.settings.api_keys'),
+		href: 'api-keys',
+		icon: Key,
 	},
 	{
 		id: 7,
@@ -506,22 +488,41 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 		icon: Authentication,
 	},
 	{
-		id: 8,
-		title: translate('version.settings.api_keys'),
-		href: 'api-keys',
-		icon: Key,
+		id: 9,
+		title: translate('cluster.custom_domain'),
+		href: 'custom-domain',
+		icon: GlobeSimple,
 	},
+	{
+		id: 2,
+		title: translate('version.settings.environment'),
+		href: 'environment',
+		icon: Environment,
+	},
+	{
+		id: 5,
+		title: translate('version.settings.environment_variables'),
+		href: 'environment-variables',
+		icon: EnvironmentVariable,
+	},
+	{
+		id: 4,
+		title: translate('version.settings.npm_packages'),
+		href: 'npm-packages',
+		icon: NpmPackage,
+	},
+	{
+		id: 6,
+		title: translate('version.settings.rate_limits'),
+		href: 'rate-limits',
+		icon: RateLimit,
+	},
+
 	{
 		id: 9,
 		title: translate('version.settings.real_time'),
 		href: 'real-time',
 		icon: RealTime,
-	},
-	{
-		id: 9,
-		title: translate('cluster.custom_domain'),
-		href: 'custom-domain',
-		icon: GlobeSimple,
 	},
 ];
 
@@ -865,16 +866,7 @@ export const ORG_CHANGE_EXCEPTIONS = [
 	'onBoarding',
 ];
 
-export const FORBIDDEN_EP_PREFIXES = [
-	'/health',
-	'/ping',
-	'/object',
-	'/test',
-	'/storage',
-	'/auth',
-	'/oauth',
-	'/realtime',
-];
+export const FORBIDDEN_EP_PREFIXES = ['/agnost'];
 
 export const FORBIDDEN_RESOURCE_NAMES = [
 	'mongodb',
