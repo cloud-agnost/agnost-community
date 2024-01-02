@@ -1,11 +1,13 @@
 import { Badge } from '@/components/Badge';
+import { CopyButton } from '@/components/CopyButton';
 import { Input } from '@/components/Input';
-import { HTTP_METHOD_BADGE_MAP } from '@/constants';
+import { BASE_URL, HTTP_METHOD_BADGE_MAP } from '@/constants';
 import TestEndpoint from '@/features/endpoints/TestEndpoint';
 import { useSaveLogicOnSuccess, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionEditorLayout } from '@/layouts/VersionLayout';
 import useEndpointStore from '@/store/endpoint/endpointStore';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -16,6 +18,7 @@ export default function EditEndpoint() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('endpoint.update');
+	const environment = useEnvironmentStore((state) => state.environment);
 	const { saveEndpointLogic, openEditEndpointDialog, endpoint, logics, setLogics, deleteLogic } =
 		useEndpointStore();
 
@@ -78,7 +81,13 @@ export default function EditEndpoint() {
 						text={endpoint.method}
 					/>
 				</div>
-				<Input className='rounded-none rounded-r max-w-5xl' value={endpoint.path} disabled />
+				<div className='relative flex-[0.8] flex flex-col items-center justify-center'>
+					<Input className='rounded-none rounded-r w-full' value={endpoint.path} disabled />
+					<CopyButton
+						text={`${BASE_URL}/${environment?.iid}${endpoint.path}`}
+						className='absolute right-4'
+					/>
+				</div>
 			</div>
 			<TestEndpoint
 				open={isTestEndpointOpen}
