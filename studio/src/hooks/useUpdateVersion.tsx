@@ -20,6 +20,12 @@ export default function useUpdateVersion(): UpdateVersionReturnType {
 
 	const { mutateAsync, ...result } = useMutation({
 		mutationFn: updateVersionProperties,
+		onSuccess: () => {
+			toast({
+				action: 'success',
+				title: 'Version updated successfully',
+			});
+		},
 		onError: (error: APIError) => {
 			toast({
 				action: 'error',

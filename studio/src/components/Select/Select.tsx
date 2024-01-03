@@ -62,19 +62,28 @@ const SelectLabel = React.forwardRef<
 ));
 SelectLabel.displayName = SelectPrimitive.Label.displayName;
 
-const SelectItem = React.forwardRef<
-	React.ElementRef<typeof SelectPrimitive.Item>,
-	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
->(({ className, children, ...props }, ref) => (
-	<SelectPrimitive.Item ref={ref} className={cn('select-item', className)} {...props}>
-		<SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-		<span className='flex w-full h-full items-center justify-end'>
-			<SelectPrimitive.ItemIndicator>
-				<Check className='h-4 w-4' />
-			</SelectPrimitive.ItemIndicator>
-		</span>
-	</SelectPrimitive.Item>
-));
+type SelectItemProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item> & {
+	hideIndicator?: boolean;
+};
+
+const SelectItem = React.forwardRef<React.ElementRef<typeof SelectPrimitive.Item>, SelectItemProps>(
+	({ className, children, hideIndicator, ...props }, ref) => (
+		<SelectPrimitive.Item
+			ref={ref}
+			className={cn('select-item', hideIndicator && 'no-indicator', className)}
+			{...props}
+		>
+			<SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+			{!hideIndicator && (
+				<span className='flex w-full h-full items-center justify-end'>
+					<SelectPrimitive.ItemIndicator>
+						<Check className='h-4 w-4' />
+					</SelectPrimitive.ItemIndicator>
+				</span>
+			)}
+		</SelectPrimitive.Item>
+	),
+);
 SelectItem.displayName = SelectPrimitive.Item.displayName;
 
 const SelectSeparator = React.forwardRef<

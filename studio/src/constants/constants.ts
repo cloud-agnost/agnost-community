@@ -382,8 +382,8 @@ export const NEW_TAB_ITEMS: Omit<Tab, 'id'>[] = [
 ];
 
 export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
-	SUSPENDED: 'yellow',
-	DEPLOYING: 'blue',
+	SUSPENDED: 'orange',
+	DEPLOYING: 'orange',
 	ERROR: 'red',
 	OK: 'green',
 	GOOD: 'green',
@@ -794,14 +794,14 @@ export const TAB_ICON_MAP: Record<string, ElementType> = {
 };
 
 export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
-	Deploying: ['bg-elements-subtle-blue', 'bg-elements-blue'],
+	Deploying: ['bg-elements-subtle-orange', 'bg-elements-orange'],
 	Error: ['bg-elements-subtle-red', 'bg-elements-red'],
 	Idle: ['bg-elements-subtle-orange', 'bg-elements-orange'],
 	OK: ['bg-elements-subtle-green', 'bg-elements-green'],
-	Suspended: ['bg-elements-subtle-yellow', 'bg-elements-yellow'],
-	Redeploying: ['bg-elements-subtle-blue', 'bg-elements-blue'],
+	Suspended: ['bg-elements-subtle-orange', 'bg-elements-orange'],
+	Redeploying: ['bg-elements-subtle-orange', 'bg-elements-orange'],
 	Deleting: ['bg-elements-subtle-red', 'bg-elements-red'],
-	[EnvironmentStatus.Updating]: ['bg-elements-subtle-yellow', 'bg-elements-yellow'],
+	[EnvironmentStatus.Updating]: ['bg-elements-subtle-orange', 'bg-elements-orange'],
 };
 export const CLUSTER_RELEASE_CLASS_MAP: Record<string, string[]> = {
 	Error: ['bg-elements-subtle-red', 'bg-elements-red'],

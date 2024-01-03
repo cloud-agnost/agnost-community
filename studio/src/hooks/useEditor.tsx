@@ -1,5 +1,6 @@
 import { formatCode } from '@/utils';
 import { BeforeMount, EditorProps, OnChange } from '@monaco-editor/react';
+import { Linter } from 'eslint-linter-browserify';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import * as active4d from 'monaco-themes/themes/Active4D.json';
 import * as allHallowsEve from 'monaco-themes/themes/All Hallows Eve.json';
@@ -55,6 +56,7 @@ import * as idlefingers from 'monaco-themes/themes/idleFingers.json';
 import * as krtheme from 'monaco-themes/themes/krTheme.json';
 import * as monoindustrial from 'monaco-themes/themes/monoindustrial.json';
 import { useRef } from 'react';
+import config from '../helpers/eslint.json';
 
 export const EDITOR_OPTIONS: EditorProps['options'] = {
 	quickSuggestions: {
@@ -83,7 +85,7 @@ export type CodeEditorProps = {
 
 export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 	const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
-
+	const linter = new Linter();
 	async function saveEditorContent(language: string | undefined, cb?: (value: string) => void) {
 		const ed = editorRef.current;
 		const val = ed?.getValue() as string;
@@ -107,11 +109,34 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 	}
 
 	function configureEditor(editor: monaco.editor.IStandaloneCodeEditor, monaco: any) {
+		const validate = (code: string) => {
+			const messages = linter.verify(
+				code,
+				config as Linter.Config<Linter.RulesRecord, Linter.RulesRecord>,
+			);
+			monaco.editor.setModelMarkers(
+				editorRef.current?.getModel(),
+				'eslint',
+				messages.map((message: { line: any; column: any; message: any; severity: number }) => ({
+					startLineNumber: message.line,
+					endLineNumber: message.line,
+					startColumn: message.column,
+					endColumn: message.column,
+					message: message.message,
+					severity:
+						message.severity === 1 ? monaco.MarkerSeverity.Warning : monaco.MarkerSeverity.Error,
+				})),
+			);
+		};
 		editor.onDidFocusEditorText(() => {
 			editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
 				editor.trigger('editor', 'editor.action.formatDocument', undefined);
 				saveEditorContent(editor.getModel()?.getLanguageId(), onSave);
 			});
+		});
+		editor.onDidChangeModelContent(() => {
+			const code = editor.getValue();
+			validate(code);
 		});
 
 		monaco.languages.registerDocumentFormattingEditProvider('typescript', {
@@ -252,6 +277,10 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 			checkJs: true,
 			strict: true,
 			typeRoots: ['node_modules/@types'],
+		});
+		monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+			noSemanticValidation: true,
+			noSyntaxValidation: true,
 		});
 	};
 

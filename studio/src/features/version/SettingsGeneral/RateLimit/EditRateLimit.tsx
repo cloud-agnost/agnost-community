@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import RateLimitForm from './RateLimitForm';
+import { toast } from '@/hooks/useToast';
 
 interface EditRateLimitProps {
 	open: boolean;
@@ -30,6 +31,10 @@ export default function EditRateLimit({ open, onOpenChange }: EditRateLimitProps
 		mutationFn: editRateLimit,
 		onSuccess: () => {
 			onClose();
+			toast({
+				action: 'success',
+				title: t('version.edit_rate_limiter_success').toString(),
+			});
 		},
 	});
 

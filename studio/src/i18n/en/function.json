@@ -8,5 +8,6 @@
 	},
 	"edit": "Edit {{name}}",
 	"test": "Test {{name}}",
-	"editLogicSuccess": "Function logic updated successfully"
+	"editLogicSuccess": "Function logic updated successfully",
+	"edit_success": "Function updated successfully"
 }

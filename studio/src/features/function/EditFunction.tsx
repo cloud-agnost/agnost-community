@@ -35,7 +35,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 		onSuccess: () => {
 			onClose();
 			toast({
-				title: t('endpoint.editLogicSuccess') as string,
+				title: t('function.edit_success') as string,
 				action: 'success',
 			});
 		},

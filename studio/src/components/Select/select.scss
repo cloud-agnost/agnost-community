@@ -33,6 +33,9 @@
 		@apply data-[disabled]:pointer-events-none data-[disabled]:text-subtle data-[disabled]:bg-subtle;
 		@apply checked:bg-subtle checked:text-default;
 		@apply truncate max-w-full hover:bg-lighter focus-visible:bg-lighter;
+		&.no-indicator {
+			@apply block;
+		}
 	}
 	&-seperator {
 		@apply -mx-1 my-1 h-px bg-subtle;

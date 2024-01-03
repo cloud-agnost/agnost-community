@@ -1,5 +1,5 @@
 .table {
-	@apply w-full caption-bottom text-sm bg-base rounded-lg;
+	@apply w-full caption-bottom text-sm bg-base rounded-lg border-border;
 	&-container {
 		@apply w-full border border-border rounded-lg;
 	}
@@ -29,13 +29,13 @@
 	}
 	&-head {
 		@apply h-12 px-4 text-left align-middle font-medium relative bg-subtle;
-		@apply text-subtle [&:has([role=checkbox])]:pr-0 font-sfCompact text-sm;
+		@apply text-subtle [&:has([role=checkbox])]:pr-0 font-sfCompact text-sm first:rounded-tl-lg last:rounded-tr-lg;
 		&.sortable {
 			@apply hover:bg-lighter;
 		}
 	}
 	&-cell {
-		@apply p-4 align-middle [&:has([role=checkbox])]:pr-0 text-default;
+		@apply p-4 align-middle [&:has([role=checkbox])]:pr-0 text-default rounded-lg;
 
 		&.actions {
 			* {

@@ -7,8 +7,9 @@ import { reorder } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 import { DropResult } from 'react-beautiful-dnd';
 import { useParams } from 'react-router-dom';
-
+import { useTranslation } from 'react-i18next';
 export default function RealtimeRateLimits() {
+	const { t } = useTranslation();
 	const { toast } = useToast();
 	const { updateVersionRealtimeProperties } = useSettingsStore();
 	const rateLimits = useVersionStore((state) => state.version?.limits);
@@ -36,6 +37,12 @@ export default function RealtimeRateLimits() {
 	}
 	const { mutateAsync: updateVersionMutate, isPending } = useMutation({
 		mutationFn: handleUpdateVersionRealtimeProperties,
+		onSuccess: () => {
+			toast({
+				action: 'success',
+				title: t('version.realtime.update_success') as string,
+			});
+		},
 		onError: (error: APIError) => {
 			toast({
 				action: 'error',

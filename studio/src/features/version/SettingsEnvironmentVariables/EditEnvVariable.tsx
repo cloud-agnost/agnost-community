@@ -26,7 +26,13 @@ export default function EditEnvVariable({ open, onOpenChange }: EditEnvVariableP
 	const { mutateAsync: updateParamMutate, isPending } = useMutation({
 		mutationKey: ['updateParam'],
 		mutationFn: updateParam,
-		onSuccess: onClose,
+		onSuccess: () => {
+			onClose();
+			toast({
+				title: t('version.variable.update_success') as string,
+				action: 'success',
+			});
+		},
 		onError: (error: APIError) => {
 			toast({
 				title: error.details,

@@ -32,7 +32,7 @@ export interface StorageStore {
 	buckets: Bucket[];
 	files: BucketFile[];
 	file: BucketFile;
-	fileCountInfo: BucketCountInfo;
+	fileCountInfo: BucketCountInfo | undefined;
 	lastFetchedPage: number | undefined;
 	toDeleteStorage: Storage | null;
 	isStorageDeleteDialogOpen: boolean;
@@ -41,7 +41,7 @@ export interface StorageStore {
 	isEditBucketDialogOpen: boolean;
 	isBucketDeleteDialogOpen: boolean;
 	toDeleteBucket: Bucket | null;
-	bucketCountInfo: BucketCountInfo;
+	bucketCountInfo: BucketCountInfo | undefined;
 	uploadProgress: number;
 }
 
@@ -84,7 +84,7 @@ const initialState: StorageStore = {
 	storage: {} as Storage,
 	bucket: {} as Bucket,
 	buckets: [],
-	bucketCountInfo: {} as BucketCountInfo,
+	bucketCountInfo: undefined,
 	lastFetchedPage: undefined,
 	toDeleteStorage: null,
 	isStorageDeleteDialogOpen: false,
@@ -94,7 +94,7 @@ const initialState: StorageStore = {
 	toDeleteBucket: null,
 	files: [],
 	file: {} as BucketFile,
-	fileCountInfo: {} as BucketCountInfo,
+	fileCountInfo: undefined,
 	uploadProgress: 0,
 	isEditFileDialogOpen: false,
 };
@@ -203,7 +203,8 @@ const useStorageStore = create<StorageStore & Actions>()(
 		},
 		getBuckets: async (params: GetStorageBuckets) => {
 			const buckets = await StorageService.getStorageBuckets(params);
-			if (buckets.info.currentPage === 0) {
+			console.log(buckets.info.currentPage);
+			if (buckets.info.currentPage === 1) {
 				set({ buckets: buckets.data, bucketCountInfo: buckets.info, files: [] });
 			} else {
 				set((prev) => ({
@@ -280,7 +281,8 @@ const useStorageStore = create<StorageStore & Actions>()(
 		},
 		getFilesOfBucket: async (params: GetFilesParams) => {
 			const files = await StorageService.getFilesOfBucket(params);
-			if (files.info.currentPage === 0) {
+			if (files.info.currentPage === 1) {
+				console.log('files.info.currentPage', files.info.currentPage);
 				set({ files: files.data, fileCountInfo: files.info });
 			} else {
 				set((prev) => ({

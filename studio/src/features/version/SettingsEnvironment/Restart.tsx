@@ -19,6 +19,12 @@ export default function Restart() {
 				title: error.details,
 			});
 		},
+		onSuccess: () => {
+			toast({
+				action: 'success',
+				title: t('version.restart_success') as string,
+			});
+		},
 	});
 	return (
 		<SettingsFormItem
