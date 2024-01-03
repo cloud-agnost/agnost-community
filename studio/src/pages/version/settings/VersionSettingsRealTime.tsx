@@ -26,6 +26,12 @@ export default function VersionSettingsRealTime() {
 				title: error.details,
 			});
 		},
+		onSuccess: () => {
+			toast({
+				title: t('version.realtime.update_success') as string,
+				action: 'success',
+			});
+		},
 	});
 	async function update(data: Partial<VersionRealtimeProperties>) {
 		mutateAsync({

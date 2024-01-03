@@ -30,9 +30,9 @@
 	"duplicate_tab": "Duplicate selected tab",
 	"suspend_services": "Suspend services",
 	"suspend": "Suspend",
+	"suspend_success": "Services suspended successfully",
 	"create_copy_of_version": "Create a Copy of Version",
-	"suspended_successfully": "Environment suspended successfully",
-	"reactivated_successfully": "Environment activated successfully",
+	"reactivated_successfully": "Services activated successfully",
 	"environment_id": "Environment ID",
 	"environment_id_desc": "This is your environment's id within your Agnost Cluster.",
 	"suspend_services_desc": "Suspend access to the API server of this version.",
@@ -218,6 +218,7 @@
 	"limiter_deleted": "Rate limiter(s) deleted successfully",
 	"limiter_added_to_default": "Rate limiter added to default rate limiters",
 	"edit_rate_limiter": "Edit Rate Limiter",
+	"edit_rate_limiter_success": "Rate limiter updated successfully",
 	"rate_limiters_empty": "No rate limit selected",
 	"handler_code": "Handler Code",
 	"middleware": {
@@ -362,5 +363,6 @@
 	"documentation": "Documentation",
 	"close_tab": "Close Tab",
 	"noNotifications": "Your search did not match any notifications.",
-	"no_logs": "Your search did not match any logs."
+	"no_logs": "Your search did not match any logs.",
+	"restart_success": "API Server restarted successfully"
 }
