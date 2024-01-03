@@ -14,17 +14,12 @@ import { DateText } from 'components/DateText';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'components/Tooltip';
 import { Link } from 'react-router-dom';
 import { toast } from '@/hooks/useToast';
-const {
-	copyFileInBucket,
-	replaceFileInBucket,
-	openFileEditDialog,
-	deleteFileFromBucket,
-	storage,
-	bucket,
-} = useStorageStore.getState();
+const { copyFileInBucket, replaceFileInBucket, openFileEditDialog, deleteFileFromBucket } =
+	useStorageStore.getState();
 
 const queryClient = new QueryClient();
 async function deleteFileHandler(toDeleteFile: BucketFile) {
+	const { bucket, storage } = useStorageStore.getState();
 	return queryClient
 		.getMutationCache()
 		.build(queryClient, {
@@ -44,6 +39,7 @@ async function deleteFileHandler(toDeleteFile: BucketFile) {
 }
 
 function replaceFile(filePath: string) {
+	const { bucket, storage } = useStorageStore.getState();
 	const input = document.createElement('input');
 	input.type = 'file';
 	input.onchange = (e) => {
@@ -76,6 +72,7 @@ function replaceFile(filePath: string) {
 	input.click();
 }
 function copyFile(filePath: string) {
+	const { bucket, storage } = useStorageStore.getState();
 	queryClient
 		.getMutationCache()
 		.build(queryClient, {
