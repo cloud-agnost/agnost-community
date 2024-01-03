@@ -122,134 +122,86 @@ const useModelStore = create<ModelStore & Actions>()(
 					}
 				},
 				getSpecificModelOfDatabase: async (params: GetSpecificModelOfDatabase): Promise<Model> => {
-					try {
-						const model = await ModelService.getSpecificModelOfDatabase(params);
-						set({ model });
-						return model;
-					} catch (e) {
-						throw e;
-					}
+					const model = await ModelService.getSpecificModelOfDatabase(params);
+					set({ model });
+					return model;
 				},
 				createModel: async (params: CreateModelParams): Promise<Model> => {
-					try {
-						const model = await ModelService.createModel(params);
-						set((state) => ({ models: [model, ...state.models] }));
-						return model;
-					} catch (e) {
-						throw e;
-					}
+					const model = await ModelService.createModel(params);
+					set((state) => ({ models: [model, ...state.models] }));
+					return model;
 				},
 				updateNameAndDescription: async (
 					params: UpdateNameAndDescriptionParams,
 				): Promise<Model> => {
-					try {
-						const model = await ModelService.updateNameAndDescription(params);
-						set((state) => ({
-							models: state.models.map((m) => (m._id === model._id ? model : m)),
-						}));
-						return model;
-					} catch (e) {
-						throw e;
-					}
+					const model = await ModelService.updateNameAndDescription(params);
+					set((state) => ({
+						models: state.models.map((m) => (m._id === model._id ? model : m)),
+					}));
+					return model;
 				},
 				addNewField: async (params: AddNewFieldParams): Promise<Model> => {
-					try {
-						const model = await ModelService.addNewField(params);
-						set((state) => ({
-							models: state.models.map((m) => (m._id === model._id ? model : m)),
-							model: model,
-						}));
-						return model;
-					} catch (e) {
-						throw e;
-					}
+					const model = await ModelService.addNewField(params);
+					set((state) => ({
+						models: state.models.map((m) => (m._id === model._id ? model : m)),
+						model: model,
+					}));
+					return model;
 				},
 				deleteField: async (params: DeleteFieldParams): Promise<Model> => {
-					try {
-						const model = await ModelService.deleteField(params);
-						set((state) => ({
-							models: state.models.map((m) => (m._id === model._id ? model : m)),
-							model,
-						}));
-						return model;
-					} catch (e) {
-						throw e;
-					}
+					const model = await ModelService.deleteField(params);
+					set((state) => ({
+						models: state.models.map((m) => (m._id === model._id ? model : m)),
+						model,
+					}));
+					return model;
 				},
 				deleteMultipleField: async (params: DeleteMultipleFieldParams): Promise<Model> => {
-					try {
-						const model = await ModelService.deleteMultipleField(params);
-						set((state) => ({
-							models: state.models.map((m) => (m._id === model._id ? model : m)),
-							model,
-						}));
-						return model;
-					} catch (e) {
-						throw e;
-					}
+					const model = await ModelService.deleteMultipleField(params);
+					set((state) => ({
+						models: state.models.map((m) => (m._id === model._id ? model : m)),
+						model,
+					}));
+					return model;
 				},
 				deleteModel: async (params: DeleteModelParams): Promise<void> => {
-					try {
-						await ModelService.deleteModel(params);
-						set((state) => ({
-							models: state.models.filter((m) => m._id !== params.modelId),
-						}));
-					} catch (e) {
-						throw e;
-					}
+					await ModelService.deleteModel(params);
+					set((state) => ({
+						models: state.models.filter((m) => m._id !== params.modelId),
+					}));
 				},
 				deleteMultipleModel: async (params: DeleteMultipleModelParams): Promise<void> => {
-					try {
-						await ModelService.deleteMultipleModel(params);
-						set((state) => ({
-							models: state.models.filter((m) => !params.modelIds.includes(m._id)),
-						}));
-					} catch (e) {
-						throw e;
-					}
+					await ModelService.deleteMultipleModel(params);
+					set((state) => ({
+						models: state.models.filter((m) => !params.modelIds.includes(m._id)),
+					}));
 				},
 				updateField: async (params: UpdateFieldParams): Promise<Model> => {
-					try {
-						const model = await ModelService.updateField(params);
-						set((state) => ({
-							models: state.models.map((m) => (m._id === model._id ? model : m)),
-							model,
-						}));
-						return model;
-					} catch (e) {
-						throw e;
-					}
+					const model = await ModelService.updateField(params);
+					set((state) => ({
+						models: state.models.map((m) => (m._id === model._id ? model : m)),
+						model,
+					}));
+					return model;
 				},
 				getReferenceModels: async (params: GetModelsOfDatabaseParams): Promise<Model[]> => {
-					try {
-						const referenceModels = await ModelService.getReferenceModels(params);
-						set({ referenceModels });
-						return referenceModels;
-					} catch (e) {
-						throw e;
-					}
+					const referenceModels = await ModelService.getReferenceModels(params);
+					set({ referenceModels });
+					return referenceModels;
 				},
 				enableTimestamps: async (params: EnableTimestampsParams): Promise<Model> => {
-					try {
-						const model = await ModelService.enableTimestamps(params);
-						set((state) => ({
-							models: state.models.map((m) => (m._id === model._id ? model : m)),
-						}));
-						return model;
-					} catch (e) {
-						throw e;
-					}
+					const model = await ModelService.enableTimestamps(params);
+					set((state) => ({
+						models: state.models.map((m) => (m._id === model._id ? model : m)),
+					}));
+					return model;
 				},
 				disableTimestamps: async (params: DisableTimestampsParams): Promise<Model> => {
-					try {
-						const model = await ModelService.disableTimestamps(params);
-						set((state) => ({
-							models: state.models.map((m) => (m._id === model._id ? model : m)),
-						}));
-						return model;
-					} catch (e) {
-						throw e;
-					}
+					const model = await ModelService.disableTimestamps(params);
+					set((state) => ({
+						models: state.models.map((m) => (m._id === model._id ? model : m)),
+					}));
+					return model;
 				},
 				setModel: (model: Model) => {
 					set({ subModel: {} as Model, model });
@@ -269,16 +221,11 @@ const useModelStore = create<ModelStore & Actions>()(
 					set({ nestedModels: [] });
 				},
 				getModelsTitle: () => {
-					return get().model
-						? `${get().model.name}${
-								get().nestedModels.length
-									? '.' +
-									  get()
-											.nestedModels.map((m) => m.name)
-											.join('.')
-									: ''
-						  }`
+					const nestedModels = get().nestedModels;
+					const nestedModelsString = nestedModels.length
+						? '.' + nestedModels.map((m) => m.name).join('.')
 						: '';
+					return get().model ? `${get().model.name}${nestedModelsString}` : '';
 				},
 				setSelectedType: (selectedType: FieldType) => set({ selectedType }),
 				reset: () => set(initialState),
