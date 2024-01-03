@@ -41,7 +41,9 @@
 			"message": "Are you sure you want to delete this file? This action is not reversible — please continue with caution."
 		},
 		"copy": "Duplicate File",
-		"replace": "Replace File"
+		"copy_success": "File has been duplicated",
+		"replace": "Replace File",
+		"replace_success": "File has been replaced"
 	},
 	"clear": {
 		"title": "Clear Bucket",

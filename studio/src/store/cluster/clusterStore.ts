@@ -1,4 +1,4 @@
-import { AuthService, ClusterService } from '@/services';
+import { AuthService, ClusterService, UserService } from '@/services';
 import {
 	APIError,
 	Cluster,
@@ -13,7 +13,7 @@ import {
 	TransferRequest,
 	UpdateClusterComponentParams,
 } from '@/types';
-import { BaseRequest, User, UserDataToRegister } from '@/types/type.ts';
+import { BaseGetRequest, BaseRequest, User, UserDataToRegister } from '@/types/type.ts';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import useAuthStore from '../auth/authStore';
@@ -54,6 +54,7 @@ type Actions = {
 	deleteDomain: (data: DomainParams) => Promise<Cluster>;
 	enforceSSL: (data: EnforceSSLAccessParams) => Promise<Cluster>;
 	checkDomainStatus: () => Promise<void>;
+	getActiveUsers: (params: BaseGetRequest) => Promise<User[]>;
 	reset: () => void;
 };
 
@@ -156,6 +157,12 @@ const useClusterStore = create<ClusterStore & Actions>()(
 		transferClusterOwnership: async (params: TransferRequest) => {
 			try {
 				await ClusterService.transferClusterOwnership(params);
+				useAuthStore.setState((prev) => ({
+					user: {
+						...prev.user,
+						isClusterOwner: false,
+					},
+				}));
 			} catch (error) {
 				throw error;
 			}
@@ -246,6 +253,13 @@ const useClusterStore = create<ClusterStore & Actions>()(
 				await ClusterService.checkDomainStatus();
 			} catch (error) {
 				set({ clusterDomainError: error as APIError });
+				throw error;
+			}
+		},
+		getActiveUsers: async (params) => {
+			try {
+				return await UserService.getActiveUsers(params);
+			} catch (error) {
 				throw error;
 			}
 		},

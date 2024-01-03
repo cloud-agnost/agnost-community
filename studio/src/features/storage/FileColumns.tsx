@@ -55,7 +55,7 @@ function replaceFile(filePath: string) {
 				mutationFn: replaceFileInBucket,
 				onSuccess: () => {
 					toast({
-						title: translate('storage.bucket.empty'),
+						title: translate('storage.file.replace_success'),
 						action: 'success',
 					});
 				},
@@ -82,7 +82,7 @@ function copyFile(filePath: string) {
 			mutationFn: copyFileInBucket,
 			onSuccess: () => {
 				toast({
-					title: translate('storage.bucket.empty'),
+					title: translate('storage.file.copy_success'),
 					action: 'success',
 				});
 			},

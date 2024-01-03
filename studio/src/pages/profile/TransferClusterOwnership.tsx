@@ -1,15 +1,115 @@
-import { TransferOwnership } from '@/components/TransferOwnership';
+import { Button } from '@/components/Button';
+import { BASE_URL_WITH_API } from '@/constants';
+import { useToast } from '@/hooks';
 import useAuthStore from '@/store/auth/authStore';
 import useClusterStore from '@/store/cluster/clusterStore';
+import { FormatOptionLabelProps, User } from '@/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { SingleValue } from 'react-select';
+import AsyncSelect from 'react-select/async';
+const formatOptionLabel = ({ label, value }: FormatOptionLabelProps<User>) => {
+	const name = label?.split(' ');
+	return (
+		<div className='gap-2 flex items-center'>
+			{value?.pictureUrl ? (
+				<img
+					src={`${BASE_URL_WITH_API}/${value?.pictureUrl}`}
+					alt={label}
+					className='rounded-full object-contain w-6 h-6'
+				/>
+			) : (
+				name && (
+					<div
+						className='relative inline-flex items-center justify-center cursor-pointer overflow-hidden w-6 h-6 rounded-full'
+						style={{
+							backgroundColor: value?.color,
+						}}
+					>
+						<span className='text-default text-xs'>
+							{name[0]?.charAt(0).toUpperCase()}
+							{name[1]?.charAt(0).toUpperCase()}
+						</span>
+					</div>
+				)
+			)}
+			<span className='ml-2 text-default text-xs'>{label}</span>
+		</div>
+	);
+};
+
+const loadOptions = async (inputValue: string) => {
+	const { getActiveUsers } = useClusterStore.getState();
+	const users = await getActiveUsers({
+		search: inputValue,
+		page: 0,
+		size: 10,
+	});
+
+	return users.map((user) => ({
+		label: user.name,
+		value: user,
+	}));
+};
 
 export default function TransferClusterOwnership() {
-	const { transferClusterOwnership } = useClusterStore();
-	const user = useAuthStore((state) => state.user);
+	const { user } = useAuthStore();
+	const { transferClusterOwnership, getActiveUsers } = useClusterStore();
+	const [selectedMember, setSelectedMember] =
+		useState<SingleValue<FormatOptionLabelProps<User>>>(null);
+	const { toast } = useToast();
+	const { t } = useTranslation();
+
+	const { mutate, isPending } = useMutation({
+		mutationFn: () =>
+			transferClusterOwnership({
+				userId: selectedMember?.value._id as string,
+			}),
+		onSuccess: () => {
+			toast({
+				title: t('organization.transfer-success') as string,
+				action: 'success',
+			});
+		},
+		onError: (err) => {
+			toast({
+				title: err.details,
+				action: 'error',
+			});
+		},
+	});
+
+	const { data, isPending: loading } = useQuery({
+		queryKey: ['getActiveUsers'],
+		queryFn: () => getActiveUsers({ page: 0, size: 10, search: '' }),
+		select: (data) => data.map((user) => ({ label: user.name, value: user })),
+	});
+
 	return (
-		<TransferOwnership
-			transferFn={transferClusterOwnership}
-			type='cluster'
-			disabled={!user?.isClusterOwner}
-		/>
+		<div className='flex flex-col gap-4'>
+			<AsyncSelect
+				isClearable
+				isDisabled={!user?.isClusterOwner}
+				isLoading={loading}
+				cacheOptions
+				onChange={(newValue) => setSelectedMember(newValue)}
+				loadOptions={loadOptions}
+				defaultOptions={data}
+				className='select-container'
+				classNamePrefix='select'
+				placeholder='Search team member'
+				formatOptionLabel={formatOptionLabel}
+			/>
+			<Button
+				size='lg'
+				className='self-end'
+				onClick={mutate}
+				loading={isPending}
+				disabled={!user?.isClusterOwner}
+			>
+				{t('organization.transfer')}
+			</Button>
+		</div>
 	);
 }

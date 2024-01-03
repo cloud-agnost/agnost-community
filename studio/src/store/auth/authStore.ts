@@ -9,17 +9,17 @@ import type {
 } from '@/types';
 import { joinChannel, leaveChannel } from '@/utils';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import useApplicationStore from '../app/applicationStore';
 import useOrganizationStore from '../organization/organizationStore';
-import { create } from 'zustand';
 
 interface AuthState {
 	accessToken: string | null | undefined;
 	refreshToken: string | null | undefined;
 	loading: boolean;
 	error: APIError | undefined;
-	user: User | undefined;
+	user: User;
 	email: string | undefined;
 	isAccepted: boolean;
 	isEditorSettingsDrawerOpen: boolean;
@@ -77,7 +77,7 @@ const initialState: AuthState = {
 	refreshToken: undefined,
 	loading: false,
 	error: undefined,
-	user: undefined,
+	user: {} as User,
 	email: undefined,
 	isAccepted: false,
 	isEditorSettingsDrawerOpen: false,

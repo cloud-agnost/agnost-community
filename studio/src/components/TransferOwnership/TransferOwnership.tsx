@@ -65,7 +65,6 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 	});
 
 	const onSubmit = async (data: z.infer<typeof TransferOwnershipSchema>) => {
-		console.log(data);
 		mutateAsync({
 			...data,
 			...(type === 'org' && { orgId: orgId }),

@@ -4,7 +4,7 @@ import { DateRangePicker } from '@/components/DateRangePicker';
 import { BASE_URL_WITH_API, NOTIFICATION_ACTIONS } from '@/constants';
 import { useUpdateEffect } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
-import { FormatOptionLabelProps } from '@/types';
+import { ApplicationMember, FormatOptionLabelProps } from '@/types';
 import { capitalize } from '@/utils';
 import { endOfDay, startOfDay } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
@@ -12,7 +12,7 @@ import { Range } from 'react-date-range';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Select from 'react-select';
 
-const formatOptionLabel = ({ label, value }: FormatOptionLabelProps) => {
+const formatOptionLabel = ({ label, value }: FormatOptionLabelProps<ApplicationMember>) => {
 	const name = label?.split(' ');
 	return (
 		<div className='gap-2 flex items-center'>

@@ -8,7 +8,7 @@ import { Tab } from '@/types';
 import { addLibsToEditor, cn, getTabIdFromUrl, isEmpty } from '@/utils';
 import Loadable from '@loadable/component';
 import { EditorProps } from '@monaco-editor/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import BeatLoader from 'react-spinners/BeatLoader';
 
 const MonacoEditor = Loadable(() => import('@monaco-editor/react'));
@@ -34,6 +34,7 @@ export default function CodeEditor({
 	const { updateCurrentTab, getTabById } = useTabStore();
 	const { version } = useVersionStore();
 	const { typings } = useUtilsStore();
+	const [showLoader, setShowLoader] = useState(false);
 	const user = useAuthStore((state) => state.user);
 	const setTabState = useDebounceFn((isDirty) => {
 		const tabId = getTabIdFromUrl();
@@ -66,6 +67,25 @@ export default function CodeEditor({
 		}
 	}, [globalThis.monaco, typings]);
 
+	useEffect(() => {
+		let timer = setTimeout(() => {
+			setShowLoader(true);
+		}, 100);
+
+		// Simulate a loading process
+		const simulateLoading = async () => {
+			await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate a 2 seconds loading process
+			clearTimeout(timer);
+			setShowLoader(false);
+		};
+
+		simulateLoading();
+
+		return () => {
+			clearTimeout(timer);
+		};
+	}, []);
+
 	return (
 		<div className={cn(containerClassName)}>
 			<MonacoEditor
@@ -79,7 +99,7 @@ export default function CodeEditor({
 				defaultLanguage={defaultLanguage}
 				language={defaultLanguage}
 				path={`file:///src/${name}.js`}
-				loading={<BeatLoader color='#6884FD' size={24} margin={18} />}
+				loading={showLoader && <BeatLoader color='#6884FD' size={24} margin={18} />}
 				options={{
 					value,
 					readOnly: readonly,

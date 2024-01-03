@@ -9,6 +9,7 @@ import useStorageStore from '@/store/storage/storageStore';
 import useVersionStore from '@/store/version/versionStore';
 import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';
+import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
@@ -48,7 +49,9 @@ export default function Files() {
 	const { isFetching, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteScroll({
 		queryFn: getFilesOfBucket,
 		queryKey: 'getFilesOfBucket',
-		lastFetchedPage: fileCountInfo.currentPage ? fileCountInfo.currentPage - 1 : 0,
+		lastFetchedPage: _.isNil(fileCountInfo.currentPage)
+			? fileCountInfo.currentPage
+			: fileCountInfo.currentPage - 1,
 		dataLength: files.length,
 		params: {
 			storageName: storage?.name as string,

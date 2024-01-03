@@ -5,7 +5,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { Separator } from '@/components/Separator';
-import { HTTP_METHOD_BADGE_MAP, TEST_ENDPOINTS_MENU_ITEMS } from '@/constants';
+import { BASE_URL, HTTP_METHOD_BADGE_MAP, TEST_ENDPOINTS_MENU_ITEMS } from '@/constants';
 import { useToast } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
@@ -34,6 +34,7 @@ import EndpointHeaders from './TestEndpoint/EndpointHeaders';
 import EndpointParams from './TestEndpoint/EndpointParams';
 import EndpointPathVariables from './TestEndpoint/EndpointPathVariables';
 import EndpointResponse from './TestEndpoint/EndpointResponse';
+import { CopyButton } from '@/components/CopyButton';
 interface TestEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -221,7 +222,13 @@ export default function TestEndpoint({ open, onClose }: TestEndpointProps) {
 								text={endpoint?.method as string}
 							/>
 						</div>
-						<Input className='rounded-none rounded-r' value={endpoint.path} disabled />
+						<div className='relative w-full'>
+							<Input className='rounded-none rounded-r' value={endpoint.path} disabled />
+							<CopyButton
+								text={`${BASE_URL}/${environment?.iid}${endpoint.path}`}
+								className='absolute right-0 top-0 w-8 h-9'
+							/>
+						</div>
 						<Button
 							className='ml-3'
 							size='lg'

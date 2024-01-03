@@ -547,9 +547,7 @@ html .light ::-webkit-scrollbar-track {
 .select__input-container {
 	padding: 0 !important;
 }
-.select__value-container {
-	padding-inline: 12px !important;
-}
+
 .select__control {
 	@apply shadow-none hover:border-input-hover min-h-[34px] h-[42px] bg-input-background border-input-border #{!important};
 }
@@ -557,7 +555,7 @@ html .light ::-webkit-scrollbar-track {
 	@apply bg-wrapper-background-light rounded  #{!important};
 }
 .select__option {
-	@apply text-default hover:bg-wrapper-background-hover border-b border-border #{!important};
+	@apply text-default hover:bg-wrapper-background-hover border-b border-border cursor-pointer #{!important};
 }
 .select__option--is-selected {
 	@apply bg-wrapper-background-hover #{!important};
@@ -576,12 +574,10 @@ html .light ::-webkit-scrollbar-track {
 		@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border;
 	}
 	&__control {
-		@apply max-w-sm w-full h-full  #{!important};
+		@apply w-full h-full  #{!important};
 		@apply bg-input-background border border-input-border hover:border-input-hover #{!important};
 	}
-	&__indicators {
-		@apply hidden #{!important};
-	}
+
 	&__input-container {
 		@apply px-2 #{!important};
 	}
