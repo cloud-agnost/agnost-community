@@ -177,15 +177,17 @@ async function fileLoader({ params }: LoaderFunctionArgs) {
 	const { bucketName, storageId, appId, orgId, versionId } = params;
 	const { bucket, buckets, storage, getBucket, storages } = useStorageStore.getState();
 	let selectedStorage = storages.find((storage) => storage._id === storageId);
-	if (!selectedStorage) {
-		selectedStorage = await useStorageStore.getState().getStorageById({
-			storageId: storageId as string,
-			appId: appId as string,
-			orgId: orgId as string,
-			versionId: versionId as string,
-		});
+	if (_.isEmpty(storage)) {
+		if (!selectedStorage) {
+			selectedStorage = await useStorageStore.getState().getStorageById({
+				storageId: storageId as string,
+				appId: appId as string,
+				orgId: orgId as string,
+				versionId: versionId as string,
+			});
+		}
+		useStorageStore.setState({ storage: selectedStorage });
 	}
-	useStorageStore.setState({ storage: selectedStorage });
 
 	if (bucketName !== bucket?.name) {
 		let selectedBucket = buckets.find((bucket) => bucket.name === bucketName);
@@ -197,6 +199,7 @@ async function fileLoader({ params }: LoaderFunctionArgs) {
 		}
 		useStorageStore.setState({ bucket: selectedBucket });
 	}
+	useStorageStore.setState({ fileCountInfo: undefined });
 	return { props: {} };
 }
 async function editTaskLoader({ params }: LoaderFunctionArgs) {
