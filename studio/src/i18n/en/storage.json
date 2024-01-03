@@ -26,7 +26,8 @@
 			"desc": "Whether the bucket is publicly accessible or not. Public buckets can be accessed by anyone."
 		},
 		"tags": "Tags",
-		"empty": "Bucket's content has been deleted"
+		"empty": "Bucket's content has been deleted",
+		"edit_success": "Bucket updated successfully"
 	},
 	"file": {
 		"upload": "Upload File",
@@ -48,5 +49,6 @@
 	"clear": {
 		"title": "Clear Bucket",
 		"message": "Are you sure you want to clear this bucket?"
-	}
+	},
+	"edit_success": "Storage updated successfully"
 }

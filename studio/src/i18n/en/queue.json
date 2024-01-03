@@ -5,6 +5,7 @@
 	"view_logs": "View Logs",
 	"edit": "Edit Queue",
 	"editLogicSuccess": "Message Queue logic updated successfully",
+	"edit_success": "Message Queue updated successfully",
 	"delete": {
 		"title": "Delete Queue",
 		"message": "Are you sure you want to delete this queue ? This action is not reversible — please continue with caution."
@@ -25,8 +26,7 @@
 		"title": "Test Message Queue",
 		"submit": "Submit Message",
 		"payload": "Message Payload",
-		"console": "Console",
-		"editLogicSuccess": "MEssage Queue logic updated successfully"
+		"console": "Console"
 	},
 	"logs": "Message Queue Logs"
 }

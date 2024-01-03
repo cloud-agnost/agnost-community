@@ -26,6 +26,10 @@ export default function EditDatabase({
 	const { isPending, mutateAsync: updateDatabaseMutation } = useMutation({
 		mutationFn: updateDatabase,
 		onSuccess: () => {
+			toast({
+				title: t('database.edit.success') as string,
+				action: 'success',
+			});
 			onOpenChange(false);
 			form.reset();
 		},

@@ -32,7 +32,13 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 	});
 	const { mutateAsync: updateTaskMutation, isPending } = useMutation({
 		mutationFn: updateTask,
-		onSuccess: handleClose,
+		onSuccess: () => {
+			handleClose();
+			toast({
+				title: t('task.editLogicSuccess') as string,
+				action: 'success',
+			});
+		},
 		onError: ({ details }: APIError) => {
 			toast({
 				title: details,

@@ -48,6 +48,10 @@ export default function EditBucket({ open, onClose }: EditStorageProps) {
 		mutationFn: updateBucket,
 		onSuccess: () => {
 			resetForm();
+			toast({
+				title: t('storage.bucket.edit_success') as string,
+				action: 'success',
+			});
 		},
 		onError: ({ details }: APIError) => {
 			toast({ action: 'error', title: details });

@@ -31,7 +31,13 @@ export default function EditStorage({ open, onClose }: CreateStorageProps) {
 	});
 	const { mutateAsync: updateMutation, isPending } = useMutation({
 		mutationFn: updateStorage,
-		onSuccess: () => onCloseHandler(),
+		onSuccess: () => {
+			onCloseHandler();
+			toast({
+				title: t('storage.edit_success') as string,
+				action: 'success',
+			});
+		},
 		onError: ({ details }: APIError) => {
 			toast({ action: 'error', title: details });
 		},

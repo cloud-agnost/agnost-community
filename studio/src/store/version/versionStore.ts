@@ -110,7 +110,7 @@ const useVersionStore = create<VersionStore & Actions>()(
 						});
 					}
 
-					history.navigate?.(get().getVersionDashboardPath());
+					history.navigate?.(get().getVersionDashboardPath(undefined, version));
 				},
 				setCreateCopyVersionDrawerIsOpen: (isOpen: boolean) => {
 					set({ createCopyVersionDrawerIsOpen: isOpen });

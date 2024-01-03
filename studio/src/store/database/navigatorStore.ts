@@ -1,11 +1,12 @@
-import { create } from 'zustand';
 import { NavigatorService } from '@/services';
 import {
 	APIError,
 	DeleteDataFromModelParams,
 	DeleteMultipleDataFromModelParams,
 	GetDataFromModelParams,
+	UpdateDataFromModelParams,
 } from '@/types';
+import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 interface NavigatorStore {
 	editedField: string;
@@ -20,7 +21,7 @@ type Actions = {
 	getDataFromModel: (params: GetDataFromModelParams) => Promise<void>;
 	deleteDataFromModel: (param: DeleteDataFromModelParams) => Promise<void>;
 	deleteMultipleDataFromModel: (param: DeleteMultipleDataFromModelParams) => Promise<void>;
-	updateDataFromModel: (param: any) => Promise<void>;
+	updateDataFromModel: (param: UpdateDataFromModelParams) => Promise<void>;
 	reset: () => void;
 };
 

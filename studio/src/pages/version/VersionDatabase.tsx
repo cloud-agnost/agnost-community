@@ -2,8 +2,10 @@ import { CreateDatabase, DatabaseColumns, EditDatabase } from '@/features/databa
 import { useSearch, useTable, useToast, useUpdateEffect } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
+import useApplicationStore from '@/store/app/applicationStore';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore';
+import useVersionStore from '@/store/version/versionStore';
 import { APIError, Database } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ConfirmationModal } from 'components/ConfirmationModal';
@@ -12,6 +14,8 @@ import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 export default function VersionDatabase() {
+	const { application } = useApplicationStore();
+	const { version } = useVersionStore();
 	const {
 		databases,
 		toDeleteDatabase,
@@ -40,8 +44,8 @@ export default function VersionDatabase() {
 		queryFn: () =>
 			getDatabasesOfApp({
 				orgId: orgId as string,
-				versionId: versionId as string,
-				appId: appId as string,
+				versionId: version?._id ?? (versionId as string),
+				appId: application?._id ?? (appId as string),
 			}),
 		enabled: !isDatabaseFetched,
 		refetchOnWindowFocus: false,

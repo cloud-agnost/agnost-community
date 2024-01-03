@@ -33,6 +33,10 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 		mutationKey: ['updateQueue'],
 		onSuccess: () => {
 			onClose();
+			toast({
+				title: t('queue.edit_success') as string,
+				action: 'success',
+			});
 		},
 		onError: ({ details }: APIError) => {
 			toast({ action: 'error', title: details });

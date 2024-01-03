@@ -86,6 +86,7 @@ export default function Navigator() {
 			refetch();
 		}
 	}, [model, subModel]);
+
 	const { hasNextPage, fetchNextPage, isFetching, isFetchingNextPage, refetch } = useInfiniteScroll(
 		{
 			queryFn: getDataFromModel,
@@ -117,7 +118,6 @@ export default function Navigator() {
 		await refetch();
 		setIsRefreshing(false);
 	}
-
 	return (
 		<VersionTabLayout
 			isEmpty={false}
@@ -137,14 +137,14 @@ export default function Navigator() {
 				</Button>
 			}
 		>
-			<div className='flex gap-4 justify-center h-[88%]'>
+			<div className='flex gap-4 justify-center h-[87%]'>
 				<SelectModel />
 				{isFetching && !isSorted && !isFetchingNextPage ? (
 					<div className='flex-1 flex items-center justify-center'>
 						<BeatLoader color='#6884FD' size={24} margin={18} />
 					</div>
 				) : data.length > 0 ? (
-					<div className='w-5/6 table-container overflow-auto h-[calc(100vh-18rem)]' id='scroll'>
+					<div className='w-5/6 table-container overflow-auto' id='scroll'>
 						<InfiniteScroll
 							hasMore={hasNextPage}
 							next={fetchNextPage}

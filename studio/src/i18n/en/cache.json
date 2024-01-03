@@ -12,5 +12,6 @@
 	},
 	"resource": "Resource",
 	"edit": "Edit {{name}}",
-	"test": "Test {{name}}"
+	"test": "Test {{name}}",
+	"edit_success": "Cache updated successfully"
 }
