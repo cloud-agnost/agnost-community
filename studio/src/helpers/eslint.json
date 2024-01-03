@@ -1,47 +1,11 @@
 {
-	"parserOptions": {
-		"sourceType": "module"
-	},
 	"env": {
 		"es2020": true
 	},
-	"extends": ["airbnb", "prettier"],
-	"plugins": ["prettier"],
-	"globals": {
-		"__DEV__": false,
-		"__dirname": false,
-		"alert": false,
-		"Blob": false,
-		"cancelAnimationFrame": false,
-		"cancelIdleCallback": false,
-		"clearImmediate": true,
-		"clearInterval": false,
-		"clearTimeout": false,
-		"console": false,
-		"escape": false,
-		"Event": false,
-		"EventTarget": false,
-		"exports": false,
-		"fetch": false,
-		"File": false,
-		"FileReader": false,
-		"FormData": false,
-		"global": false,
-		"Map": true,
-		"module": false,
-		"navigator": false,
-		"process": false,
-		"Promise": true,
-		"requestAnimationFrame": true,
-		"requestIdleCallback": true,
-		"require": false,
-		"Set": true,
-		"setImmediate": true,
-		"setInterval": false,
-		"setTimeout": false,
-		"WebSocket": false,
-		"window": false,
-		"XMLHttpRequest": false
+	"extends": "eslint:recommended",
+	"parserOptions": {
+		"ecmaVersion": 2018,
+		"sourceType": "module"
 	},
 	"rules": {
 		"constructor-super": "error",
@@ -56,7 +20,7 @@
 		"no-dupe-class-members": "error",
 		"no-dupe-keys": "error",
 		"no-duplicate-case": "error",
-		"no-empty": "error",
+		"no-empty": "warn",
 		"no-empty-character-class": "error",
 		"no-empty-pattern": "error",
 		"no-ex-assign": "error",
@@ -83,6 +47,27 @@
 		"no-unused-labels": "error",
 		"require-yield": "error",
 		"use-isnan": "error",
-		"valid-typeof": "error"
+		"valid-typeof": "error",
+		"no-var": "warn"
+	},
+	"globals": {
+		"COUNTER_HTTP_CLIENT_REQUEST": false,
+		"COUNTER_HTTP_CLIENT_RESPONSE": false,
+		"COUNTER_HTTP_SERVER_REQUEST": false,
+		"COUNTER_HTTP_SERVER_RESPONSE": false,
+		"COUNTER_NET_SERVER_CONNECTION": false,
+		"COUNTER_NET_SERVER_CONNECTION_CLOSE": false,
+		"DTRACE_HTTP_CLIENT_REQUEST": false,
+		"DTRACE_HTTP_CLIENT_RESPONSE": false,
+		"DTRACE_HTTP_SERVER_REQUEST": false,
+		"DTRACE_HTTP_SERVER_RESPONSE": false,
+		"DTRACE_NET_SERVER_CONNECTION": false,
+		"DTRACE_NET_STREAM_END": false,
+		"LTTNG_HTTP_CLIENT_REQUEST": false,
+		"LTTNG_HTTP_CLIENT_RESPONSE": false,
+		"LTTNG_HTTP_SERVER_REQUEST": false,
+		"LTTNG_HTTP_SERVER_RESPONSE": false,
+		"LTTNG_NET_SERVER_CONNECTION": false,
+		"LTTNG_NET_STREAM_END": false
 	}
 }
