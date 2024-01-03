@@ -118,7 +118,12 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 										</FormControl>
 										<SelectContent align='center'>
 											{team.map(({ member, role }) => (
-												<SelectItem key={member._id} value={member._id} className='w-full'>
+												<SelectItem
+													key={member._id}
+													value={member._id}
+													className='w-full'
+													hideIndicator
+												>
 													<div className='flex items-center justify-between w-full'>
 														<div className='flex items-center gap-2'>
 															<Avatar size='sm'>
