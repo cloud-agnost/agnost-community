@@ -253,17 +253,21 @@ export default function SelectUserDataModel() {
 							)}
 						/>
 						<FormField
+							disabled={!form.watch('databaseId')}
 							control={form.control}
 							name='modelId'
 							render={({ field, formState: { errors } }) => (
 								<FormItem className='space-y-1 flex-1'>
-									<FormLabel>{t('version.authentication.model')}</FormLabel>
+									<FormLabel className={cn(!form.watch('databaseId') && 'text-disabled')}>
+										{t('version.authentication.model')}
+									</FormLabel>
 									<FormControl>
 										<Select
 											defaultValue={field.value}
 											value={field.value}
 											name={field.name}
 											onValueChange={field.onChange}
+											disabled={!form.watch('databaseId')}
 										>
 											<FormControl>
 												<SelectTrigger
