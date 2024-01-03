@@ -6,20 +6,16 @@ import { LockSimpleOpen } from '@phosphor-icons/react/dist/ssr';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { useToast } from './useToast';
+import { useUpdateVersion } from '.';
 export default function useVersionDropdownItems() {
 	const { t } = useTranslation();
-	const { toast } = useToast();
 	const { openVersionDrawer } = useApplicationStore();
 	const { appId, orgId } = useParams() as Record<string, string>;
-	const {
-		versions,
-		version,
-		setCreateCopyVersionDrawerIsOpen,
-		updateVersionProperties,
-		getAllVersionsVisibleToUser,
-	} = useVersionStore();
+	const { versions, version, setCreateCopyVersionDrawerIsOpen, getAllVersionsVisibleToUser } =
+		useVersionStore();
 	const { addSettingsTab } = useTabStore();
+
+	const { updateVersion } = useUpdateVersion();
 
 	useEffect(() => {
 		if (appId && orgId) {
@@ -52,17 +48,8 @@ export default function useVersionDropdownItems() {
 				title: version?.readOnly ? t('version.mark_read_write') : t('version.mark_read_only'),
 				action: () => {
 					if (!version) return;
-					updateVersionProperties({
-						orgId: version.orgId,
-						versionId: version._id,
-						appId: version.appId,
+					updateVersion({
 						readOnly: !version?.readOnly,
-						onError: (error) => {
-							toast({
-								title: error.details,
-								action: 'error',
-							});
-						},
 					});
 				},
 				disabled: false,
@@ -72,17 +59,8 @@ export default function useVersionDropdownItems() {
 				title: version?.private ? t('version.set_public') : t('version.set_private'),
 				action: () => {
 					if (!version) return;
-					updateVersionProperties({
-						orgId: version.orgId,
-						versionId: version._id,
-						appId: version.appId,
+					updateVersion({
 						private: !version?.private,
-						onError: (error) => {
-							toast({
-								title: error.details,
-								action: 'error',
-							});
-						},
 					});
 				},
 				disabled: version?.master,

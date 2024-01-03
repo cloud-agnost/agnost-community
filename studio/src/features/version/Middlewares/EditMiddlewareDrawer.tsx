@@ -36,6 +36,10 @@ export default function EditMiddlewareDrawer() {
 		mutationFn: updateMiddleware,
 		onSuccess: () => {
 			onOpenChange();
+			toast({
+				title: t('version.middleware.edit.success') as string,
+				action: 'success',
+			});
 		},
 		onError: (error: APIError) => {
 			toast({

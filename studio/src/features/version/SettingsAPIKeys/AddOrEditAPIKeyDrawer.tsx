@@ -20,6 +20,7 @@ import { APIKey, CreateAPIKeyParams, Endpoint, UpdateAPIKeyParams } from '@/type
 import useEndpointStore from '@/store/endpoint/endpointStore.ts';
 import useSettingsStore from '@/store/version/settingsStore';
 import { useMutation } from '@tanstack/react-query';
+import { toast } from '@/hooks/useToast';
 
 interface AddAPIKeyDrawerProps {
 	open: boolean;
@@ -144,6 +145,12 @@ export default function AddOrEditAPIKeyDrawer({
 		mutationFn: editMode ? editAPIKey : createAPIKey,
 		onSuccess: () => {
 			handleOnOpenChange(false);
+			if (editMode) {
+				toast({
+					action: 'success',
+					title: t('version.api_key.update_success') as string,
+				});
+			}
 		},
 	});
 	async function onSubmit(data: z.infer<typeof Schema>) {

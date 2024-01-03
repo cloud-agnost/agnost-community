@@ -19,6 +19,14 @@ export default function SuspendButton() {
 
 	const { mutateAsync: suspendOrActiveMutate, isPending } = useMutation({
 		mutationFn: environment?.suspended ? activateEnvironment : suspendEnvironment,
+		onSuccess: () => {
+			toast({
+				action: 'success',
+				title: environment?.suspended
+					? (t('version.suspend_success') as string)
+					: (t('version.reactivated_successfully') as string),
+			});
+		},
 		onError: (error: APIError) => {
 			toast({
 				action: 'error',
