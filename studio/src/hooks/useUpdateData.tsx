@@ -33,7 +33,7 @@ export default function useUpdateData(name: string) {
 		}
 
 		updateDataFromModel({
-			id: hasSubModel ? selectedSubModelId : id,
+			id: hasSubModel ? selectedSubModelId : (id as string),
 			isSubObjectUpdate: hasSubModel,
 			data: updatedData,
 			onSuccess: handleSuccess,

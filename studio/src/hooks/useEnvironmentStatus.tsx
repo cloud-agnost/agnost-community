@@ -21,6 +21,10 @@ export default function useEnvironmentStatus() {
 					check: hasStatus([EnvironmentStatus.Deploying, EnvironmentStatus.Redeploying]),
 					value: EnvironmentStatus.Deploying,
 				},
+				{
+					check: hasStatus([EnvironmentStatus.Updating]),
+					value: EnvironmentStatus.Updating,
+				},
 				{ check: hasIdleResources(), value: EnvironmentStatus.Idle },
 			];
 

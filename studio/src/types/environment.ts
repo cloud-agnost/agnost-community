@@ -9,6 +9,7 @@ export enum EnvironmentStatus {
 	Deleting = 'Deleting',
 	Suspended = 'Suspended',
 	Idle = 'Idle',
+	Updating = 'Updating',
 }
 export interface Environment {
 	orgId: string;
