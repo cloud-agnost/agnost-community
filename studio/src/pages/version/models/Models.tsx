@@ -3,16 +3,21 @@ import { CreateModel, EditModel, ModelColumns } from '@/features/database/models
 import { useSearch, useTabNavigate, useTable, useToast, useUpdateEffect } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
+import useApplicationStore from '@/store/app/applicationStore';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
+import useVersionStore from '@/store/version/versionStore';
 import { APIError, Model, TabTypes } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 import { DataTable } from 'components/DataTable';
+import _ from 'lodash';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 export default function Models() {
+	const { application } = useApplicationStore();
+	const { version } = useVersionStore();
 	const {
 		models,
 		deleteMultipleModel,
@@ -41,12 +46,17 @@ export default function Models() {
 	});
 
 	const { isFetching, refetch } = useQuery({
-		queryFn: () => getModelsOfDatabase({ dbId, orgId, appId, versionId }),
+		queryFn: () =>
+			getModelsOfDatabase({
+				dbId: database._id,
+				orgId,
+				appId: application?._id ?? appId,
+				versionId: version?._id ?? versionId,
+			}),
 		queryKey: ['getModelsOfDatabase'],
 		refetchOnWindowFocus: false,
-		enabled: models[0]?.dbId !== dbId,
+		enabled: !_.isNil(database) && models[0]?.dbId !== dbId,
 	});
-
 	const { mutateAsync: deleteMultipleModelMutation } = useMutation({
 		mutationFn: deleteMultipleModel,
 		mutationKey: ['deleteMultipleModel'],
@@ -111,9 +121,11 @@ export default function Models() {
 				loading={isFetching}
 				searchable
 				handlerButton={
-					<Button variant='secondary' onClick={handleViewDataClick}>
-						View Data
-					</Button>
+					models.length > 0 && (
+						<Button variant='secondary' onClick={handleViewDataClick}>
+							View Data
+						</Button>
+					)
 				}
 			>
 				<DataTable<Model> table={table} />

@@ -46,6 +46,10 @@ export default function EditSize() {
 		form.reset();
 		if (isEmpty(resourceToEdit)) toggleCreateResourceModal();
 		else closeEditResourceModal();
+		toast({
+			title: t('resources.edit_success') as string,
+			action: 'success',
+		});
 	}
 	function onError(error: APIError) {
 		toast({

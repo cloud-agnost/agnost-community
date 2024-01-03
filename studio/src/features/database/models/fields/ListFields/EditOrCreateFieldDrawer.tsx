@@ -562,7 +562,15 @@ export default function EditOrCreateFieldDrawer({
 				action: 'error',
 			});
 		},
-		onSuccess: () => onClose(),
+		onSuccess: () => {
+			onClose();
+			if (editMode) {
+				toast({
+					title: t('database.fields.edit_success') as string,
+					action: 'success',
+				});
+			}
+		},
 	});
 
 	const getDefaultValue = (defaultValue: string) => {

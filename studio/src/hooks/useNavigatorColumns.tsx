@@ -17,7 +17,7 @@ import Json from '@/features/database/models/Navigator/Json';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { ColumnDefWithClassName, Field, FieldTypes } from '@/types';
 import { cn, getValueFromData } from '@/utils';
-import { ElementType, useEffect, useState } from 'react';
+import { ElementType, useMemo } from 'react';
 
 const NavigatorComponentMap: Record<string, ElementType> = {
 	text: Text,
@@ -45,8 +45,8 @@ const NavigatorComponentMap: Record<string, ElementType> = {
 	binary: Text,
 };
 export default function useNavigatorColumns(fields: Field[]) {
-	const [columns, setColumns] = useState(NavigatorColumns);
-	useEffect(() => {
+	return useMemo(() => {
+		if (!fields) return NavigatorColumns;
 		const newNavigatorColumns: ColumnDefWithClassName<Record<string, any>>[] = fields?.map(
 			(field) => ({
 				id: field._id,
@@ -77,7 +77,6 @@ export default function useNavigatorColumns(fields: Field[]) {
 				},
 			}),
 		);
-		setColumns([NavigatorColumns[0], ...newNavigatorColumns, NavigatorColumns[1]]);
+		return [NavigatorColumns[0], ...newNavigatorColumns, NavigatorColumns[1]];
 	}, [fields]);
-	return columns;
 }

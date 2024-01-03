@@ -39,6 +39,10 @@ export default function EditCache({ open, onClose }: CreateCacheProps) {
 	const { mutateAsync: updateMutate, isPending } = useMutation({
 		mutationFn: updateCache,
 		onSuccess: () => {
+			toast({
+				title: t('cache.edit_success') as string,
+				action: 'success',
+			});
 			resetAndClose();
 		},
 		onError: ({ details }: APIError) => {

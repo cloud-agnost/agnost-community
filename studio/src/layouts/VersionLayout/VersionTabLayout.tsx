@@ -91,8 +91,8 @@ export default function VersionTabLayout<T>({
 		});
 	}, [search]);
 	return (
-		<div className={cn('h-full space-y-6 relative ', className)}>
-			<div className={cn(!title && 'flex items-center justify-between')}>
+		<div className={cn('h-full space-y-4 relative ', className)}>
+			<div className={cn(!title ? 'flex items-center justify-between' : 'space-y-4')}>
 				{breadCrumb}
 				<div className='flex items-center justify-between flex-1'>
 					<h1 className='text-default text-xl text-center'>{title}</h1>

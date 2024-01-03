@@ -248,7 +248,7 @@ async function modelsOutletLoader({ params }: LoaderFunctionArgs) {
 		useDatabaseStore.setState({ database: listDb });
 		return { database: listDb };
 	}
-	if (database._id !== apiParams.dbId) getDatabaseOfAppById(apiParams);
+	if (database._id !== apiParams.dbId) await getDatabaseOfAppById(apiParams);
 
 	return { props: {} };
 }
@@ -273,9 +273,9 @@ async function fieldsLoader({ params }: LoaderFunctionArgs) {
 
 async function navigatorLoader({ params }: LoaderFunctionArgs) {
 	if (!useAuthStore.getState().isAuthenticated()) return null;
-	const { getModelsOfDatabase } = useModelStore.getState();
+	const { getModelsOfDatabase, setModel, models } = useModelStore.getState();
 	const { database, getDatabaseOfAppById } = useDatabaseStore.getState();
-	useNavigatorStore.setState({ lastFetchedPage: 0 });
+
 	const apiParams = params as {
 		orgId: string;
 		appId: string;
@@ -284,9 +284,12 @@ async function navigatorLoader({ params }: LoaderFunctionArgs) {
 	};
 	if (database._id !== apiParams.dbId) {
 		await getDatabaseOfAppById(apiParams);
-		await getModelsOfDatabase(apiParams);
+		const models = await getModelsOfDatabase(apiParams);
+		setModel(models[0]);
+	} else {
+		setModel(models[0]);
 	}
-
+	useNavigatorStore.setState({ lastFetchedPage: undefined });
 	return null;
 }
 

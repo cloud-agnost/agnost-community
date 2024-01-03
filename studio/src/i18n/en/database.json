@@ -29,7 +29,8 @@
 		}
 	},
 	"edit": {
-		"title": "Edit Database"
+		"title": "Edit Database",
+		"success": "Database updated successfully"
 	},
 	"delete": {
 		"title": "Delete Database",
@@ -76,6 +77,7 @@
 		"title": "Models",
 		"create": "Create Model",
 		"edit": "Edit Model",
+		"edit_success": "Model updated successfully",
 		"no_models": "You do not have any for models for this database",
 		"no_data": "You do not have any data for this model"
 	},
@@ -121,7 +123,8 @@
 				"title": "Searchable Collation",
 				"field": "Searchable Collation",
 				"placeholder": "Select Searchable Collation"
-			}
+			},
+			"edit_success": "Field updated successfully"
 		}
 	},
 	"navigator": {

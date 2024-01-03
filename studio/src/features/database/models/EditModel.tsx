@@ -34,15 +34,19 @@ export default function EditModel({
 	const { mutateAsync: editModelMutation, isPending } = useMutation({
 		mutationFn: editModelHandler,
 		mutationKey: ['createModel'],
+		onSuccess: () => {
+			form.reset();
+			onOpenChange(false);
+			toast({
+				title: t('database.models.edit_success') as string,
+				action: 'success',
+			});
+		},
 		onError: (error: APIError) => {
 			toast({
 				title: error.details,
 				action: 'error',
 			});
-		},
-		onSettled: () => {
-			form.reset();
-			onOpenChange(false);
 		},
 	});
 
