@@ -801,6 +801,7 @@ export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
 	Suspended: ['bg-elements-subtle-yellow', 'bg-elements-yellow'],
 	Redeploying: ['bg-elements-subtle-blue', 'bg-elements-blue'],
 	Deleting: ['bg-elements-subtle-red', 'bg-elements-red'],
+	[EnvironmentStatus.Updating]: ['bg-elements-subtle-yellow', 'bg-elements-yellow'],
 };
 export const CLUSTER_RELEASE_CLASS_MAP: Record<string, string[]> = {
 	Error: ['bg-elements-subtle-red', 'bg-elements-red'],
