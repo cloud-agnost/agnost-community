@@ -1,7 +1,9 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
+import { Button } from '@/components/Button';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
+import { Refresh } from '@/components/icons';
 import { BucketColumns, CreateBucket } from '@/features/storage';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
@@ -16,6 +18,7 @@ import { useParams } from 'react-router-dom';
 export default function Buckets() {
 	const [isBucketCreateOpen, setIsBucketCreateOpen] = useState(false);
 	const { toast } = useToast();
+	const [isRefreshing, setIsRefreshing] = useState(false);
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 	const {
@@ -45,19 +48,19 @@ export default function Buckets() {
 		data: buckets,
 		columns: BucketColumns,
 	});
-	const { hasNextPage, isFetching, fetchNextPage, isFetchingNextPage } = useInfiniteScroll({
-		queryFn: getBuckets,
-		queryKey: 'getBuckets',
-		dataLength: buckets.length,
-		disableVersionParams: true,
-		lastFetchedPage: _.isNil(bucketCountInfo.currentPage)
-			? bucketCountInfo.currentPage
-			: bucketCountInfo.currentPage - 1,
-		params: {
-			storageName: storage?.name,
-			returnCountInfo: true,
+	const { hasNextPage, isFetching, fetchNextPage, isFetchingNextPage, refetch } = useInfiniteScroll(
+		{
+			queryFn: getBuckets,
+			queryKey: 'getBuckets',
+			dataLength: buckets.length,
+			disableVersionParams: true,
+			lastFetchedPage: _.isNil(bucketCountInfo) ? undefined : bucketCountInfo.currentPage - 1,
+			params: {
+				storageName: storage?.name,
+				returnCountInfo: true,
+			},
 		},
-	});
+	);
 	const {
 		mutateAsync: deleteBucketMutation,
 		isPending: deleteLoading,
@@ -95,6 +98,12 @@ export default function Buckets() {
 			versionId: storage?.versionId,
 		});
 	}
+
+	async function onRefresh() {
+		setIsRefreshing(true);
+		await refetch();
+		setIsRefreshing(false);
+	}
 	return (
 		<>
 			<VersionTabLayout
@@ -108,6 +117,12 @@ export default function Buckets() {
 				loading={isFetching && !buckets.length}
 				breadCrumb={<BreadCrumb goBackLink={storageUrl} items={breadcrumbItems} />}
 				table={table}
+				handlerButton={
+					<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
+						{!isRefreshing && <Refresh className='mr-2 w-5 h-5' />}
+						{t('general.refresh')}
+					</Button>
+				}
 			>
 				<InfiniteScroll
 					scrollableTarget='version-layout'

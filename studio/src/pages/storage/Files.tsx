@@ -1,7 +1,9 @@
 import { BreadCrumb, BreadCrumbItem } from '@/components/BreadCrumb';
+import { Button } from '@/components/Button';
 import { DataTable } from '@/components/DataTable';
 import { Progress } from '@/components/Progress';
 import { TableLoading } from '@/components/Table/Table';
+import { Refresh } from '@/components/icons';
 import { EditFile, FileColumns } from '@/features/storage';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
@@ -10,10 +12,12 @@ import useVersionStore from '@/store/version/versionStore';
 import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import _ from 'lodash';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default function Files() {
+	const [isRefreshing, setIsRefreshing] = useState(false);
 	const { toast } = useToast();
 	const { t } = useTranslation();
 	const { getVersionDashboardPath } = useVersionStore();
@@ -46,19 +50,19 @@ export default function Files() {
 		},
 	];
 
-	const { isFetching, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteScroll({
-		queryFn: getFilesOfBucket,
-		queryKey: 'getFilesOfBucket',
-		lastFetchedPage: _.isNil(fileCountInfo.currentPage)
-			? fileCountInfo.currentPage
-			: fileCountInfo.currentPage - 1,
-		dataLength: files.length,
-		params: {
-			storageName: storage?.name as string,
-			bucketName: bucket?.name as string,
-			returnCountInfo: true,
+	const { isFetching, isFetchingNextPage, hasNextPage, fetchNextPage, refetch } = useInfiniteScroll(
+		{
+			queryFn: getFilesOfBucket,
+			queryKey: 'getFilesOfBucket',
+			lastFetchedPage: _.isNil(fileCountInfo) ? undefined : fileCountInfo.currentPage - 1,
+			dataLength: files.length,
+			params: {
+				storageName: storage?.name as string,
+				bucketName: bucket?.name as string,
+				returnCountInfo: true,
+			},
 		},
-	});
+	);
 	const table = useTable({
 		data: files,
 		columns: FileColumns,
@@ -111,6 +115,11 @@ export default function Files() {
 		};
 		fileInput.click();
 	}
+	async function onRefresh() {
+		setIsRefreshing(true);
+		await refetch();
+		setIsRefreshing(false);
+	}
 	return (
 		<VersionTabLayout
 			searchable
@@ -123,6 +132,12 @@ export default function Files() {
 			onMultipleDelete={deleteMultipleFilesHandler}
 			loading={isFetching && !files.length}
 			table={table}
+			handlerButton={
+				<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
+					{!isRefreshing && <Refresh className='mr-2 w-5 h-5' />}
+					{t('general.refresh')}
+				</Button>
+			}
 		>
 			{uploadLoading && (uploadProgress > 0 || uploadProgress < 100) && (
 				<Progress value={uploadProgress} />
