@@ -114,17 +114,17 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 				code,
 				config as Linter.Config<Linter.RulesRecord, Linter.RulesRecord>,
 			);
-			console.log('messages', messages);
 			monaco.editor.setModelMarkers(
 				editorRef.current?.getModel(),
 				'eslint',
-				messages.map((message) => ({
+				messages.map((message: { line: any; column: any; message: any; severity: number }) => ({
 					startLineNumber: message.line,
 					endLineNumber: message.line,
 					startColumn: message.column,
 					endColumn: message.column,
 					message: message.message,
-					severity: monaco.MarkerSeverity.Error, // or Warning, Info based on message.severity
+					severity:
+						message.severity === 1 ? monaco.MarkerSeverity.Warning : monaco.MarkerSeverity.Error,
 				})),
 			);
 		};
