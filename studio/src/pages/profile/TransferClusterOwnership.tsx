@@ -12,29 +12,34 @@ import AsyncSelect from 'react-select/async';
 const formatOptionLabel = ({ label, value }: FormatOptionLabelProps<User>) => {
 	const name = label?.split(' ');
 	return (
-		<div className='gap-2 flex items-center'>
-			{value?.pictureUrl ? (
-				<img
-					src={`${BASE_URL_WITH_API}/${value?.pictureUrl}`}
-					alt={label}
-					className='rounded-full object-contain w-6 h-6'
-				/>
-			) : (
-				name && (
-					<div
-						className='relative inline-flex items-center justify-center cursor-pointer overflow-hidden w-6 h-6 rounded-full'
-						style={{
-							backgroundColor: value?.color,
-						}}
-					>
-						<span className='text-default text-xs'>
-							{name[0]?.charAt(0).toUpperCase()}
-							{name[1]?.charAt(0).toUpperCase()}
-						</span>
-					</div>
-				)
-			)}
-			<span className='ml-2 text-default text-xs'>{label}</span>
+		<div className='flex items-center justify-between w-full'>
+			<div className='flex items-center gap-2'>
+				{value?.pictureUrl ? (
+					<img
+						src={`${BASE_URL_WITH_API}/${value?.pictureUrl}`}
+						alt={label}
+						className='rounded-full object-contain w-8 h-8'
+					/>
+				) : (
+					name && (
+						<div
+							className='relative inline-flex items-center justify-center cursor-pointer overflow-hidden w-8 h-8 rounded-full'
+							style={{
+								backgroundColor: value?.color,
+							}}
+						>
+							<span className='text-default text-xs'>
+								{name[0]?.charAt(0).toUpperCase()}
+								{name[1]?.charAt(0).toUpperCase()}
+							</span>
+						</div>
+					)
+				)}
+				<div className='flex-1'>
+					<p className='text-default text-sm leading-6'>{value.name}</p>
+					<p className='text-subtle  text-sm leading-6'>{value.contactEmail}</p>
+				</div>
+			</div>
 		</div>
 	);
 };
