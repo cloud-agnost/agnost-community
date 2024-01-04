@@ -11,6 +11,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart';
 import { CustomTooltip } from './VersionLogs';
+import { differenceInSeconds } from 'date-fns';
 
 export default function VersionLogCharts() {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -32,13 +33,15 @@ export default function VersionLogCharts() {
 	const handleClickChart = (e: CategoricalChartState) => {
 		if (e?.activeLabel && e?.activeTooltipIndex !== undefined) {
 			const currentData = data[e.activeTooltipIndex];
-			if (currentData?.success) {
-				setSearchParams({
-					...searchParams,
-					start: toIsoString(new Date(currentData.start)),
-					end: toIsoString(new Date(currentData.end)),
-				});
-			}
+			const diff = differenceInSeconds(new Date(currentData.end), new Date(currentData.start));
+			if (diff > 10)
+				if (currentData?.success) {
+					setSearchParams({
+						...searchParams,
+						start: toIsoString(new Date(currentData.start)),
+						end: toIsoString(new Date(currentData.end)),
+					});
+				}
 		}
 	};
 

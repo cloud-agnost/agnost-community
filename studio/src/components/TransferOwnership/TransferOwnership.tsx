@@ -73,8 +73,8 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 	};
 
 	const selectedMember = useMemo(() => {
-		return team.find(({ member }) => member._id === form.getValues('userId'))?.member;
-	}, [form.getValues('userId'), team]);
+		return team.find(({ member }) => member._id === form.watch('userId'))?.member;
+	}, [form.watch('userId'), team]);
 	return (
 		<div className='space-y-4'>
 			{error && (

@@ -18,7 +18,11 @@ interface NavigatorStore {
 		[modelId: string]: Record<string, any>[];
 	};
 	selectedSubModelId: string;
-	lastFetchedPage: number | undefined;
+	lastFetchedPage:
+		| {
+				[modelId: string]: number | undefined;
+		  }
+		| undefined;
 }
 
 type Actions = {
@@ -53,15 +57,19 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 							...state.data,
 							[modelId]: data,
 						},
-						lastFetchedPage: params.page,
+						lastFetchedPage: {
+							[modelId]: params.page,
+						},
 					}));
 				} else {
 					set((state) => ({
 						data: {
 							...state.data,
-							[modelId]: [...state.data[modelId], data],
+							[modelId]: [...state.data[modelId], ...data],
 						},
-						lastFetchedPage: params.page,
+						lastFetchedPage: {
+							[modelId]: params.page,
+						},
 					}));
 				}
 				return data;

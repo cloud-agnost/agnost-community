@@ -49,7 +49,7 @@ export default function CreateModel({
 				action: 'error',
 			});
 		},
-		onSettled: () => onClose(),
+		onSuccess: onClose,
 	});
 	async function onSubmit(data: z.infer<typeof ModelSchema>) {
 		createModelMutation({

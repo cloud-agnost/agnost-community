@@ -571,13 +571,16 @@ html .light ::-webkit-scrollbar-track {
 		@apply text-subtle text-sm font-sfCompact px-2 #{!important};
 	}
 	&__menu {
-		@apply bg-wrapper-background-light rounded  #{!important};
+		@apply rounded-md border bg-wrapper-background-light  #{!important};
 		&-list {
 			@apply p-0 #{!important};
 		}
 	}
 	&__single-value {
 		@apply text-default #{!important};
+		& .transfer-email {
+			@apply hidden;
+		}
 	}
 	&__value-container {
 		@apply py-0 gap-2 #{!important};
@@ -591,12 +594,12 @@ html .light ::-webkit-scrollbar-track {
 			@apply bg-button-secondary-hover #{!important};
 		}
 	}
+	&__clear-indicator {
+		@apply cursor-pointer #{!important};
+	}
 
 	&__option {
-		@apply text-default  hover:bg-lighter border-b border-border cursor-pointer bg-wrapper-background-light #{!important};
-		&--is-selected {
-			@apply bg-wrapper-background-hover #{!important};
-		}
+		@apply text-default  hover:bg-lighter cursor-pointer bg-wrapper-background-light #{!important};
 	}
 	&__indicator-separator {
 		@apply hidden #{!important};

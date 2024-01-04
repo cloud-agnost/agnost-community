@@ -124,9 +124,13 @@ export default function CompleteAccountSetupVerifyEmail() {
 		onSuccess: () => navigate('/organization'),
 	});
 
-	const successText = isAuthenticated()
-		? t('general.invitation_accepted')
-		: t('login.complete_account_setup_desc');
+	const successDesc =
+		data?.user?.status === 'Active'
+			? t('login.you_have_been_added', {
+					name: data?.org?.name ?? data?.app?.name,
+					role: data?.role,
+				})
+			: t('login.complete_account_setup_desc');
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		if (!token) {
 			finalizeAccountSetupMutate({
@@ -164,15 +168,8 @@ export default function CompleteAccountSetupVerifyEmail() {
 				{!isPending && (error || isVerified) && (
 					<Feedback
 						success={isVerified && !error}
-						title={isVerified && !error ? successText : error?.error ?? ''}
-						description={
-							isVerified && !error
-								? t('login.you_have_been_added', {
-										name: data?.org?.name ?? data?.app?.name,
-										role: data?.role,
-								  })
-								: error?.details ?? ''
-						}
+						title={isVerified && !error ? t('general.invitation_accepted') : error?.error ?? ''}
+						description={isVerified && !error ? successDesc : error?.details ?? ''}
 					/>
 				)}
 				{!(error || isVerified) && <Description title={t('login.complete_account_setup')} />}

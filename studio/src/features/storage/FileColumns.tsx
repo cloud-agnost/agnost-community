@@ -32,6 +32,7 @@ async function deleteFileHandler(toDeleteFile: BucketFile) {
 			},
 		})
 		.execute({
+			bckId: bucket.id,
 			storageName: storage?.name,
 			bucketName: bucket.name,
 			filePath: toDeleteFile.path,
@@ -63,6 +64,7 @@ function replaceFile(filePath: string) {
 				},
 			})
 			.execute({
+				bckId: bucket.id,
 				storageName: storage?.name,
 				bucketName: bucket.name,
 				filePath,
@@ -91,6 +93,7 @@ function copyFile(filePath: string) {
 			},
 		})
 		.execute({
+			bckId: bucket.id,
 			storageName: storage?.name,
 			bucketName: bucket.name,
 			filePath,

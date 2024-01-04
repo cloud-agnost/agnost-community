@@ -17,6 +17,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
+import { useToast } from '@/hooks';
 interface OrganizationCreateModalProps {
 	closeModal: () => void;
 	isOpen: boolean;
@@ -31,7 +32,7 @@ export default function OrganizationCreateModal({
 	});
 	const { t } = useTranslation();
 	const { createOrganization } = useOrganizationStore();
-
+	const { toast } = useToast();
 	function handleCloseModal() {
 		closeModal();
 		form.reset();
@@ -39,7 +40,13 @@ export default function OrganizationCreateModal({
 
 	const { isPending, mutateAsync: createOrganizationMutate } = useMutation({
 		mutationFn: createOrganization,
-		onSettled: handleCloseModal,
+		onSuccess: handleCloseModal,
+		onError: (error) => {
+			toast({
+				title: error.details,
+				action: 'error',
+			});
+		},
 	});
 
 	async function onSubmit(data: z.infer<typeof CreateOrganizationSchema>) {

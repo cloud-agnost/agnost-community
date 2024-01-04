@@ -54,6 +54,7 @@ export default function EditFile({ open, onClose }: EditFileProps) {
 
 	function onSubmit(data: z.infer<typeof FileSchema>) {
 		updateFileInBucket({
+			bckId: bucket.id,
 			storageName: storage.name,
 			bucketName: bucket.name,
 			...data,

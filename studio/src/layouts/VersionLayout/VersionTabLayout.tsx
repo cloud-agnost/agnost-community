@@ -103,7 +103,7 @@ export default function VersionTabLayout<T>({
 								className='sm:w-[450px] flex-1'
 							/>
 						)}
-						{table?.getSelectedRowModel().rows.length ? (
+						{table?.getSelectedRowModel()?.rows?.length ? (
 							<SelectedRowButton
 								table={table}
 								onDelete={() => onMultipleDelete?.()}

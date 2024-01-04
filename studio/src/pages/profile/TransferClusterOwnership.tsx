@@ -18,12 +18,12 @@ const formatOptionLabel = ({ label, value }: FormatOptionLabelProps<User>) => {
 					<img
 						src={`${BASE_URL_WITH_API}/${value?.pictureUrl}`}
 						alt={label}
-						className='rounded-full object-contain w-8 h-8'
+						className='rounded-full object-contain w-7 h-7'
 					/>
 				) : (
 					name && (
 						<div
-							className='relative inline-flex items-center justify-center cursor-pointer overflow-hidden w-8 h-8 rounded-full'
+							className='relative inline-flex items-center justify-center cursor-pointer overflow-hidden w-7 h-7 rounded-full'
 							style={{
 								backgroundColor: value?.color,
 							}}
@@ -37,7 +37,7 @@ const formatOptionLabel = ({ label, value }: FormatOptionLabelProps<User>) => {
 				)}
 				<div className='flex-1'>
 					<p className='text-default text-sm leading-6'>{value.name}</p>
-					<p className='text-subtle  text-sm leading-6'>{value.contactEmail}</p>
+					<p className='text-subtle  text-sm leading-6 transfer-email'>{value.contactEmail}</p>
 				</div>
 			</div>
 		</div>

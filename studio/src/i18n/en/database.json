@@ -78,7 +78,7 @@
 		"create": "Create Model",
 		"edit": "Edit Model",
 		"edit_success": "Model updated successfully",
-		"no_models": "You do not have any for models for this database",
+		"no_models": "You do not have any models in this database",
 		"no_data": "You do not have any data for this model"
 	},
 	"fields": {

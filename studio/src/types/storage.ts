@@ -85,6 +85,7 @@ export interface GetStorageBuckets {
 }
 
 export interface GetFilesParams {
+	bckId: string;
 	storageName: string;
 	bucketName: string;
 	limit: number;
@@ -118,6 +119,7 @@ export interface UpdateBucketParams extends BaseRequest, CreateBucketParams {
 }
 
 export interface UploadFileToBucketParams extends BaseRequest {
+	bckId: string;
 	storageName: string;
 	bucketName: string;
 	files: FileList;
@@ -126,6 +128,7 @@ export interface UploadFileToBucketParams extends BaseRequest {
 	isPublic?: boolean;
 }
 export interface UpdateFileInBucketParams extends BaseRequest {
+	bckId: string;
 	storageName: string;
 	bucketName: string;
 	tags?: Record<string, string>;
@@ -133,6 +136,7 @@ export interface UpdateFileInBucketParams extends BaseRequest {
 	filePath: string;
 }
 export interface ReplaceFileInBucket extends BaseRequest {
+	bckId: string;
 	storageName: string;
 	bucketName: string;
 	file: File;
@@ -140,11 +144,13 @@ export interface ReplaceFileInBucket extends BaseRequest {
 }
 
 export interface DeleteFileFromBucketParams extends BaseRequest {
+	bckId: string;
 	storageName: string;
 	bucketName: string;
 	filePath: string;
 }
 export interface DeleteMultipleFilesFromBucketParams extends BaseRequest {
+	bckId: string;
 	storageName: string;
 	bucketName: string;
 	filePaths: string[];

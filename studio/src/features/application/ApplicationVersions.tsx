@@ -17,10 +17,12 @@ import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useMatch, useParams, useSearchParams } from 'react-router-dom';
 import { VersionTable } from '../version/Table';
+import useOrganizationStore from '@/store/organization/organizationStore';
 export default function ApplicationVersions() {
 	const { t } = useTranslation();
 	const { isVersionOpen, application, closeVersionDrawer, applications, selectApplication } =
 		useApplicationStore();
+	const { organization } = useOrganizationStore();
 	const { getAllVersionsVisibleToUser, versions } = useVersionStore();
 	const [page, setPage] = useState(0);
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -29,7 +31,7 @@ export default function ApplicationVersions() {
 	const getVersions = useCallback(async () => {
 		if (application?._id) {
 			getAllVersionsVisibleToUser({
-				orgId,
+				orgId: organization._id ?? orgId,
 				appId: application?._id as string,
 				page,
 				size: 10,

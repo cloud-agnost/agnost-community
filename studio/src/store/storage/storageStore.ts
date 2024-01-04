@@ -30,9 +30,15 @@ export interface StorageStore {
 	storage: Storage;
 	bucket: Bucket;
 	buckets: Bucket[];
-	files: BucketFile[];
+	files: {
+		[bckId: string]: BucketFile[];
+	};
 	file: BucketFile;
-	fileCountInfo: BucketCountInfo | undefined;
+	fileCountInfo:
+		| {
+				[bckId: string]: BucketCountInfo | undefined;
+		  }
+		| undefined;
 	lastFetchedPage: number | undefined;
 	toDeleteStorage: Storage | null;
 	isStorageDeleteDialogOpen: boolean;
@@ -92,7 +98,7 @@ const initialState: StorageStore = {
 	isEditBucketDialogOpen: false,
 	isBucketDeleteDialogOpen: false,
 	toDeleteBucket: null,
-	files: [],
+	files: {},
 	file: {} as BucketFile,
 	fileCountInfo: undefined,
 	uploadProgress: 0,
@@ -204,7 +210,7 @@ const useStorageStore = create<StorageStore & Actions>()(
 		getBuckets: async (params: GetStorageBuckets) => {
 			const buckets = await StorageService.getStorageBuckets(params);
 			if (buckets.info.currentPage === 1) {
-				set({ buckets: buckets.data, bucketCountInfo: buckets.info, files: [] });
+				set({ buckets: buckets.data, bucketCountInfo: buckets.info, files: {} });
 			} else {
 				set((prev) => ({
 					buckets: [...prev.buckets, ...buckets.data],
@@ -281,11 +287,17 @@ const useStorageStore = create<StorageStore & Actions>()(
 		getFilesOfBucket: async (params: GetFilesParams) => {
 			const files = await StorageService.getFilesOfBucket(params);
 			if (files.info.currentPage === 1) {
-				set({ files: files.data, fileCountInfo: files.info });
+				set((state) => ({
+					files: { ...state.files, [params.bckId]: files.data },
+					fileCountInfo: { ...state.fileCountInfo, [params.bckId]: files.info },
+				}));
 			} else {
-				set((prev) => ({
-					files: [...prev.files, ...files.data],
-					fileCountInfo: files.info,
+				set((state) => ({
+					files: {
+						...state.files,
+						[params.bckId]: [...state.files[params.bckId], ...files.data],
+					},
+					fileCountInfo: { ...state.fileCountInfo, [params.bckId]: files.info },
 				}));
 			}
 			return files.data;
@@ -293,7 +305,9 @@ const useStorageStore = create<StorageStore & Actions>()(
 		uploadFileToBucket: async (params: UploadFileToBucketParams) => {
 			try {
 				const newFiles = await StorageService.uploadFileToBucket(params);
-				set({ files: [...newFiles, ...get().files] });
+				set((state) => ({
+					files: { ...state.files, [params.bckId]: [...state.files[params.bckId], ...newFiles] },
+				}));
 				params.onSuccess?.();
 				return newFiles;
 			} catch (error) {
@@ -304,9 +318,14 @@ const useStorageStore = create<StorageStore & Actions>()(
 		deleteFileFromBucket: async (params: DeleteFileFromBucketParams) => {
 			try {
 				await StorageService.deleteFileFromBucket(params);
-				set({
-					files: get().files.filter((file) => file.path !== params.filePath),
-				});
+				set((state) => ({
+					files: {
+						...state.files,
+						[params.bckId]: state.files[params.bckId].filter(
+							(file) => file.path !== params.filePath,
+						),
+					},
+				}));
 				params.onSuccess?.();
 			} catch (error) {
 				params.onError?.(error as APIError);
@@ -316,9 +335,14 @@ const useStorageStore = create<StorageStore & Actions>()(
 		deleteMultipleFileFromBucket: async (params: DeleteMultipleFilesFromBucketParams) => {
 			try {
 				await StorageService.deleteMultipleFilesFromBucket(params);
-				set({
-					files: get().files.filter((file) => !params.filePaths.includes(file.path)),
-				});
+				set((state) => ({
+					files: {
+						...state.files,
+						[params.bckId]: state.files[params.bckId].filter(
+							(file) => !params.filePaths.includes(file.path),
+						),
+					},
+				}));
 				params.onSuccess?.();
 			} catch (error) {
 				params.onError?.(error as APIError);
@@ -328,10 +352,13 @@ const useStorageStore = create<StorageStore & Actions>()(
 		replaceFileInBucket: async (params: ReplaceFileInBucket) => {
 			try {
 				const file = await StorageService.replaceFileInBucket(params);
-				set({
-					files: get().files.map((f) => (f.path === file.path ? file : f)),
+				set((state) => ({
+					files: {
+						...state.files,
+						[params.bckId]: state.files[params.bckId].map((f) => (f.path === file.path ? file : f)),
+					},
 					file,
-				});
+				}));
 				params.onSuccess?.();
 				return file;
 			} catch (error) {
@@ -342,7 +369,10 @@ const useStorageStore = create<StorageStore & Actions>()(
 		copyFileInBucket: async (params: DeleteFileFromBucketParams) => {
 			try {
 				const file = await StorageService.copyFileInBucket(params);
-				set({ files: [file, ...get().files] });
+				set((state) => ({
+					files: { ...state.files, [params.bckId]: [file, ...state.files[params.bckId]] },
+					file,
+				}));
 				params.onSuccess?.();
 				return file;
 			} catch (error) {
@@ -353,11 +383,13 @@ const useStorageStore = create<StorageStore & Actions>()(
 		updateFileInBucket: async (params: UpdateFileInBucketParams) => {
 			try {
 				const file = await StorageService.updateFileInBucket(params);
-
-				set({
-					files: get().files.map((f) => (f.id === file.id ? file : f)),
+				set((state) => ({
+					files: {
+						...state.files,
+						[params.bckId]: state.files[params.bckId].map((f) => (f.path === file.path ? file : f)),
+					},
 					file,
-				});
+				}));
 				params.onSuccess?.();
 				return file;
 			} catch (error) {
