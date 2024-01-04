@@ -47,8 +47,8 @@
 		"replace_success": "File has been replaced"
 	},
 	"clear": {
-		"title": "Clear Bucket",
-		"message": "Are you sure you want to clear this bucket?"
+		"title": "Empty Bucket",
+		"message": "Are you sure you want to empty this bucket?"
 	},
 	"edit_success": "Storage updated successfully"
 }
