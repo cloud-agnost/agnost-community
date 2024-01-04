@@ -13,18 +13,19 @@ type AuthLayoutProps = {
 export default function AuthLayout({ children, className }: AuthLayoutProps) {
 	return (
 		<div className='auth-layout'>
-			<div className='auth-layout-left'>
+			<div className='auth-layout-left relative'>
 				<Logo className='auth-layout-app-logo' />
-				<Carousel
-					className='!m-0'
-					showArrows={false}
-					items={SLIDER_IMAGES.map(({ image, text }) => {
-						return {
-							element: <img src={image} alt={text} key={image} />,
-							text,
-						};
-					})}
-				/>
+				<div className='flex flex-col justify-center items-center h-[90%]'>
+					<Carousel
+						showArrows={false}
+						items={SLIDER_IMAGES.map(({ image, text }) => {
+							return {
+								element: <img src={image} alt={text} key={image} />,
+								text,
+							};
+						})}
+					/>
+				</div>
 			</div>
 			<div className={cn('auth-layout-right', className)}>{children}</div>
 		</div>
