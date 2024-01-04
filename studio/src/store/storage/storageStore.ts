@@ -203,7 +203,6 @@ const useStorageStore = create<StorageStore & Actions>()(
 		},
 		getBuckets: async (params: GetStorageBuckets) => {
 			const buckets = await StorageService.getStorageBuckets(params);
-			console.log(buckets.info.currentPage);
 			if (buckets.info.currentPage === 1) {
 				set({ buckets: buckets.data, bucketCountInfo: buckets.info, files: [] });
 			} else {
@@ -282,7 +281,6 @@ const useStorageStore = create<StorageStore & Actions>()(
 		getFilesOfBucket: async (params: GetFilesParams) => {
 			const files = await StorageService.getFilesOfBucket(params);
 			if (files.info.currentPage === 1) {
-				console.log('files.info.currentPage', files.info.currentPage);
 				set({ files: files.data, fileCountInfo: files.info });
 			} else {
 				set((prev) => ({

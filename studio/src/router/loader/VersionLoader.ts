@@ -68,7 +68,7 @@ async function editFunctionLoader({ params }: LoaderFunctionArgs) {
 	}
 
 	if (helper?._id === funcId) {
-		updateCurrentTab(versionId as string, {
+		updateCurrentTab(versionId, {
 			isDirty: logics[funcId] ? helper.logic !== logics[funcId] : false,
 		});
 		setLogics(funcId, logics[funcId] ?? helper.logic);
@@ -100,7 +100,7 @@ async function editMiddlewareLoader({ params }: LoaderFunctionArgs) {
 	}
 
 	if (middleware?._id === middlewareId) {
-		updateCurrentTab(versionId as string, {
+		updateCurrentTab(versionId, {
 			isDirty: logics[middlewareId] ? middleware.logic !== logics[middlewareId] : false,
 		});
 		setLogics(middlewareId, logics[middlewareId] ?? middleware.logic);
@@ -274,9 +274,12 @@ async function fieldsLoader({ params }: LoaderFunctionArgs) {
 	return { props: {} };
 }
 
-async function navigatorLoader({ params }: LoaderFunctionArgs) {
+async function navigatorLoader({ params, request }: LoaderFunctionArgs) {
 	if (!useAuthStore.getState().isAuthenticated()) return null;
-	const { getModelsOfDatabase, setModel, models } = useModelStore.getState();
+	const query = new URLSearchParams(request.url);
+	const modelId = query.get('m');
+
+	const { getModelsOfDatabase, setModel, getModelsOfSelectedDb, model } = useModelStore.getState();
 	const { database, getDatabaseOfAppById } = useDatabaseStore.getState();
 
 	const apiParams = params as {
@@ -287,13 +290,27 @@ async function navigatorLoader({ params }: LoaderFunctionArgs) {
 	};
 	if (database._id !== apiParams.dbId) {
 		await getDatabaseOfAppById(apiParams);
+	}
+
+	const models = getModelsOfSelectedDb(apiParams.dbId);
+	if (_.isEmpty(models)) {
 		const models = await getModelsOfDatabase(apiParams);
 		setModel(models[0]);
-	} else {
-		setModel(models[0]);
 	}
+
+	if (models) {
+		if (modelId && modelId !== model?._id && !_.isEmpty(models)) {
+			const selectedModel = models.find((m) => m._id === modelId);
+			if (selectedModel) setModel(selectedModel);
+		}
+
+		if (modelId && modelId === model?._id) {
+			setModel(model);
+		} else setModel(models[0]);
+	}
+
 	useNavigatorStore.setState({ lastFetchedPage: undefined });
-	return null;
+	return { props: {} };
 }
 
 export default {

@@ -36,7 +36,7 @@ export default function SelectUserDataModel() {
 	const { saveUserDataModelInfo, addMissingUserDataModelFields } = useSettingsStore();
 	const { version } = useVersionStore();
 	const { databases, getDatabasesOfApp } = useDatabaseStore();
-	const { getModelsOfSelectedDb, getModelsOfDatabase, models: dbModels } = useModelStore();
+	const { getModelsOfDatabase, models: dbModels } = useModelStore();
 
 	const [error, setError] = useState<APIError>();
 	const { toast } = useToast();
