@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
+import { Badge } from '@/components/Badge';
 import { Checkbox } from '@/components/Checkbox';
 import { SortButton } from '@/components/DataTable';
 import { TableConfirmation } from '@/components/Table';
@@ -101,8 +102,13 @@ export const AppMembersTableColumns: ColumnDef<ApplicationMember>[] = [
 						<AvatarFallback name={member.name} color={member.color} isUserAvatar />
 					</Avatar>
 					<div className='flex flex-col'>
-						<span className='text-default text-sm font-sfCompact'>{member.name}</span>
-						<span className='text-subtle text-xs font-sfCompact'>{member.contactEmail}</span>
+						<div className='text-default text-sm flex items-center gap-4'>
+							<span className='text-default font-semibold'>{member.name}</span>
+							{member.isAppOwner && (
+								<Badge variant='orange' text='Owner' className='p-0.5 text-sm' />
+							)}
+						</div>
+						<span className='text-subtle text-xs'>{member.contactEmail}</span>
 					</div>
 				</div>
 			);
