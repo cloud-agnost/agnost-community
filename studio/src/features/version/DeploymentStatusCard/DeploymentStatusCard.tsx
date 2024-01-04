@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import './deploymentStatusCard.scss';
 import { useParams } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip';
+import { Alert, AlertTitle } from '@/components/Alert';
 
 export default function DeploymentStatusCard() {
 	const { t } = useTranslation();
@@ -115,6 +116,11 @@ export default function DeploymentStatusCard() {
 							</Tooltip>
 						</TooltipProvider>
 					</DropdownMenuLabel>
+					{environment.suspended && (
+						<Alert variant='warning' size='sm' className='!rounded-none !gap-2 !p-2'>
+							<AlertTitle className='font-normal'>{t('version.suspended_desc')}</AlertTitle>
+						</Alert>
+					)}
 					<div className='deployment-status-content'>
 						<LastDeployment />
 						<Resources />
