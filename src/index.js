@@ -10,6 +10,7 @@ const mariadbRoutes = require('./mariadb');
 const postgresRoutes = require('./postgres');
 const mysqlRoutes = require('./mysql');
 const certificateRoutes = require('./certificates');
+const deploymentRestartRoutes = require('./deploymentRestart')
 
 app.use(bodyParser.json());
 app.use('/', mongodbRoutes);
@@ -20,6 +21,7 @@ app.use('/', mariadbRoutes);
 app.use('/', postgresRoutes);
 app.use('/', mysqlRoutes);
 app.use('/', certificateRoutes);
+app.use('/', deploymentRestartRoutes)
 
 // Start the server
 app.listen(3000, () => console.log('Server started on port 3000.'));
