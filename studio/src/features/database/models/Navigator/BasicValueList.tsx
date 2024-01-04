@@ -19,7 +19,7 @@ export default function BasicValueList({ cell, id, value, index, field }: Naviga
 	const form = useForm<z.infer<typeof BVLSchema>>({
 		resolver: zodResolver(BVLSchema),
 		defaultValues: {
-			[field.name]: value?.join(','),
+			[field.name]: value.join(','),
 		},
 	});
 

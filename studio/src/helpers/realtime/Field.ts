@@ -5,12 +5,15 @@ import { Model, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Field implements RealtimeActions<Model> {
 	delete({ identifiers, data }: RealtimeActionParams<Model>): void {
-		useModelStore.setState?.({
+		useModelStore.setState?.((state) => ({
+			models: {
+				...state.models,
+				[data.dbId]: state.models[data.dbId].map((model) =>
+					model._id === identifiers.modelId ? data : model,
+				),
+			},
 			model: data,
-			models: useModelStore
-				.getState()
-				.models.map((model) => (model._id === identifiers.modelId ? data : model)),
-		});
+		}));
 	}
 	update({ data, identifiers }: RealtimeActionParams<Model>): void {
 		const { updateTab } = useTabStore.getState();
@@ -22,20 +25,26 @@ class Field implements RealtimeActions<Model> {
 			},
 			filter: (tab) => tab.path.includes(data._id),
 		});
-		useModelStore.setState?.({
+		useModelStore.setState?.((state) => ({
+			models: {
+				...state.models,
+				[data.dbId]: state.models[data.dbId].map((model) =>
+					model._id === identifiers.modelId ? data : model,
+				),
+			},
 			model: data,
-			models: useModelStore
-				.getState()
-				.models.map((model) => (model._id === identifiers.modelId ? data : model)),
-		});
+		}));
 	}
 	create({ data, identifiers }: RealtimeActionParams<Model>): void {
-		useModelStore.setState?.({
+		useModelStore.setState?.((state) => ({
+			models: {
+				...state.models,
+				[data.dbId]: state.models[data.dbId].map((model) =>
+					model._id === identifiers.modelId ? data : model,
+				),
+			},
 			model: data,
-			models: useModelStore
-				.getState()
-				.models.map((model) => (model._id === identifiers.modelId ? data : model)),
-		});
+		}));
 	}
 	telemetry(param: RealtimeActionParams<Model>): void {
 		this.update(param);

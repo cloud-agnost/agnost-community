@@ -14,6 +14,7 @@ import {
 	Time,
 } from '@/features/database/models/Navigator';
 import Json from '@/features/database/models/Navigator/Json';
+import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
 import { ColumnDefWithClassName, Field, FieldTypes } from '@/types';
 import { cn, getValueFromData } from '@/utils';
@@ -45,6 +46,9 @@ const NavigatorComponentMap: Record<string, ElementType> = {
 	binary: Text,
 };
 export default function useNavigatorColumns(fields: Field[]) {
+	const model = useModelStore((state) => state.model);
+	const { getDataOfSelectedModel, data: stateData } = useNavigatorStore();
+	const data = useMemo(() => getDataOfSelectedModel(model?._id) ?? [], [model, stateData]);
 	return useMemo(() => {
 		if (!fields) return NavigatorColumns;
 		const newNavigatorColumns: ColumnDefWithClassName<Record<string, any>>[] = fields?.map(
@@ -71,7 +75,7 @@ export default function useNavigatorColumns(fields: Field[]) {
 								row.original,
 								field.type === FieldTypes.ID ? 'id' : field.name,
 							)}
-							parentId={useNavigatorStore.getState().data[cell.row.index].id}
+							parentId={data?.[cell.row.index]?.id}
 						/>
 					);
 				},

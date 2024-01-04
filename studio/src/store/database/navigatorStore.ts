@@ -8,10 +8,15 @@ import {
 } from '@/types';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import useModelStore from './modelStore';
 interface NavigatorStore {
 	editedField: string;
-	data: Record<string, any>[];
-	subModelData: Record<string, any>[];
+	data: {
+		[modelId: string]: Record<string, any>[];
+	};
+	subModelData: {
+		[modelId: string]: Record<string, any>[];
+	};
 	selectedSubModelId: string;
 	lastFetchedPage: number | undefined;
 }
@@ -22,29 +27,40 @@ type Actions = {
 	deleteDataFromModel: (param: DeleteDataFromModelParams) => Promise<void>;
 	deleteMultipleDataFromModel: (param: DeleteMultipleDataFromModelParams) => Promise<void>;
 	updateDataFromModel: (param: UpdateDataFromModelParams) => Promise<void>;
+	getDataOfSelectedModel: (modelId: string) => Record<string, any>[] | undefined;
 	reset: () => void;
 };
 
 const initialState: NavigatorStore = {
 	editedField: '',
-	data: [],
-	subModelData: [],
+	data: {},
+	subModelData: {},
 	selectedSubModelId: '',
 	lastFetchedPage: undefined,
 };
 
 const useNavigatorStore = create<NavigatorStore & Actions>()(
-	devtools((set) => ({
+	devtools((set, get) => ({
 		...initialState,
 		setEditedField: (field) => set({ editedField: field }),
 		getDataFromModel: async (params) => {
 			try {
 				const data = await NavigatorService.getDataFromModel(params);
+				const modelId = useModelStore.getState().model._id;
 				if (params.page === 0) {
-					set({ data, lastFetchedPage: params.page });
+					set((state) => ({
+						data: {
+							...state.data,
+							[modelId]: data,
+						},
+						lastFetchedPage: params.page,
+					}));
 				} else {
-					set((prev) => ({
-						data: [...prev.data, ...data],
+					set((state) => ({
+						data: {
+							...state.data,
+							[modelId]: [...state.data[modelId], data],
+						},
 						lastFetchedPage: params.page,
 					}));
 				}
@@ -56,8 +72,12 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 		deleteDataFromModel: async (param) => {
 			try {
 				await NavigatorService.deleteDataFromModel(param);
+				const modelId = useModelStore.getState().model._id;
 				set((state) => ({
-					data: state.data.filter((item) => item.id !== param.id),
+					data: {
+						...state.data,
+						[modelId]: state.data[modelId].filter((item) => item.id !== param.id),
+					},
 				}));
 				if (param.onSuccess) param.onSuccess();
 			} catch (error) {
@@ -68,8 +88,12 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 		deleteMultipleDataFromModel: async (param) => {
 			try {
 				await NavigatorService.deleteMultipleDataFromModel(param);
+				const modelId = useModelStore.getState().model._id;
 				set((state) => ({
-					data: state.data.filter((item) => !param.ids.includes(item.id)),
+					data: {
+						...state.data,
+						[modelId]: state.data[modelId].filter((item) => !param.ids.includes(item.id as string)),
+					},
 				}));
 				if (param.onSuccess) param.onSuccess();
 			} catch (error) {
@@ -80,19 +104,26 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 		updateDataFromModel: async (param) => {
 			try {
 				const data = await NavigatorService.updateDataFromModel(param);
+				const modelId = useModelStore.getState().model._id;
 				set((state) => ({
-					data: state.data.map((item) => {
-						if (item.id === param.id) {
-							return data;
-						}
-						return item;
-					}),
+					data: {
+						...state.data,
+						[modelId]: state.data[modelId].map((item) => {
+							if (item.id === param.id) {
+								return data;
+							}
+							return item;
+						}),
+					},
 				}));
 				if (param.onSuccess) param.onSuccess(data);
 			} catch (error) {
 				if (param.onError) param.onError(error as APIError);
 				throw error;
 			}
+		},
+		getDataOfSelectedModel: (modelId) => {
+			return get().data[modelId];
 		},
 		reset: () => set(initialState),
 	})),

@@ -7,7 +7,7 @@ import { useToast } from './useToast';
 export default function useUpdateData(name: string) {
 	const { updateDataFromModel, selectedSubModelId, data: modelData } = useNavigatorStore();
 	const { toast } = useToast();
-	const { subModel, nestedModels } = useModelStore();
+	const { subModel, nestedModels, model } = useModelStore();
 	const hasSubModel = !isEmpty(subModel);
 
 	function getModelPath(): string {
@@ -42,7 +42,7 @@ export default function useUpdateData(name: string) {
 	}
 
 	function updateSubModelList(data: any, rowIndex: number) {
-		const firstIndex = modelData.findIndex((m) => m.id === selectedSubModelId);
+		const firstIndex = modelData[model._id].findIndex((m) => m.id === selectedSubModelId);
 		const updatedData = updateObject(
 			structuredClone(modelData[firstIndex]),
 			`${getModelPath()}.${rowIndex}.${name}`,

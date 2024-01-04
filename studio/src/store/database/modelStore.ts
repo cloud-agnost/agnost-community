@@ -22,7 +22,9 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 interface ModelStore {
-	models: Model[];
+	models: {
+		[dbId: string]: Model[];
+	};
 	model: Model;
 	field: Field;
 	subModel: Model;
@@ -61,11 +63,12 @@ type Actions = {
 	resetNestedModels: () => void;
 	getModelsTitle: () => string;
 	setSelectedType: (selectedType: FieldType) => void;
+	getModelsOfSelectedDb: (dbId: string) => Model[] | undefined;
 	reset: () => void;
 };
 
 const initialState: ModelStore = {
-	models: [],
+	models: {},
 	model: {} as Model,
 	subModel: {} as Model,
 	field: {} as Field,
@@ -105,7 +108,13 @@ const useModelStore = create<ModelStore & Actions>()(
 
 				getModelsOfDatabase: async (params: GetModelsOfDatabaseParams): Promise<Model[]> => {
 					const models = await ModelService.getModelsOfDatabase(params);
-					set({ models, isModelsFetched: true });
+					set((state) => ({
+						models: {
+							...state.models,
+							[params.dbId]: models,
+						},
+						isModelsFetched: true,
+					}));
 					return models;
 				},
 				getSpecificModelByIidOfDatabase: async (
@@ -128,30 +137,52 @@ const useModelStore = create<ModelStore & Actions>()(
 				},
 				createModel: async (params: CreateModelParams): Promise<Model> => {
 					const model = await ModelService.createModel(params);
-					set((state) => ({ models: [model, ...state.models] }));
+					set((state) => ({
+						models: {
+							...state.models,
+							[params.dbId]: [...state.models[params.dbId], model],
+						},
+					}));
 					return model;
 				},
 				updateNameAndDescription: async (
 					params: UpdateNameAndDescriptionParams,
 				): Promise<Model> => {
 					const model = await ModelService.updateNameAndDescription(params);
+
 					set((state) => ({
-						models: state.models.map((m) => (m._id === model._id ? model : m)),
+						models: {
+							...state.models,
+							[params.dbId]: state.models[params.dbId].map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
+						model,
 					}));
 					return model;
 				},
 				addNewField: async (params: AddNewFieldParams): Promise<Model> => {
 					const model = await ModelService.addNewField(params);
 					set((state) => ({
-						models: state.models.map((m) => (m._id === model._id ? model : m)),
-						model: model,
+						models: {
+							...state.models,
+							[params.dbId]: state.models[params.dbId].map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
+						model,
 					}));
 					return model;
 				},
 				deleteField: async (params: DeleteFieldParams): Promise<Model> => {
 					const model = await ModelService.deleteField(params);
 					set((state) => ({
-						models: state.models.map((m) => (m._id === model._id ? model : m)),
+						models: {
+							...state.models,
+							[params.dbId]: state.models[params.dbId].map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
 						model,
 					}));
 					return model;
@@ -159,7 +190,12 @@ const useModelStore = create<ModelStore & Actions>()(
 				deleteMultipleField: async (params: DeleteMultipleFieldParams): Promise<Model> => {
 					const model = await ModelService.deleteMultipleField(params);
 					set((state) => ({
-						models: state.models.map((m) => (m._id === model._id ? model : m)),
+						models: {
+							...state.models,
+							[params.dbId]: state.models[params.dbId].map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
 						model,
 					}));
 					return model;
@@ -167,19 +203,32 @@ const useModelStore = create<ModelStore & Actions>()(
 				deleteModel: async (params: DeleteModelParams): Promise<void> => {
 					await ModelService.deleteModel(params);
 					set((state) => ({
-						models: state.models.filter((m) => m._id !== params.modelId),
+						models: {
+							...state.models,
+							[params.dbId]: state.models[params.dbId].filter((m) => m._id !== params.modelId),
+						},
 					}));
 				},
 				deleteMultipleModel: async (params: DeleteMultipleModelParams): Promise<void> => {
 					await ModelService.deleteMultipleModel(params);
 					set((state) => ({
-						models: state.models.filter((m) => !params.modelIds.includes(m._id)),
+						models: {
+							...state.models,
+							[params.dbId]: state.models[params.dbId].filter(
+								(m) => !params.modelIds.includes(m._id),
+							),
+						},
 					}));
 				},
 				updateField: async (params: UpdateFieldParams): Promise<Model> => {
 					const model = await ModelService.updateField(params);
 					set((state) => ({
-						models: state.models.map((m) => (m._id === model._id ? model : m)),
+						models: {
+							...state.models,
+							[params.dbId]: state.models[params.dbId].map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
 						model,
 					}));
 					return model;
@@ -192,14 +241,26 @@ const useModelStore = create<ModelStore & Actions>()(
 				enableTimestamps: async (params: EnableTimestampsParams): Promise<Model> => {
 					const model = await ModelService.enableTimestamps(params);
 					set((state) => ({
-						models: state.models.map((m) => (m._id === model._id ? model : m)),
+						models: {
+							...state.models,
+							[params.dbId]: state.models[params.dbId].map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
+						model,
 					}));
 					return model;
 				},
 				disableTimestamps: async (params: DisableTimestampsParams): Promise<Model> => {
 					const model = await ModelService.disableTimestamps(params);
 					set((state) => ({
-						models: state.models.map((m) => (m._id === model._id ? model : m)),
+						models: {
+							...state.models,
+							[params.dbId]: state.models[params.dbId].map((m) =>
+								m._id === model._id ? model : m,
+							),
+						},
+						model,
 					}));
 					return model;
 				},
@@ -228,6 +289,9 @@ const useModelStore = create<ModelStore & Actions>()(
 					return get().model ? `${get().model.name}${nestedModelsString}` : '';
 				},
 				setSelectedType: (selectedType: FieldType) => set({ selectedType }),
+				getModelsOfSelectedDb: (dbId: string) => {
+					return get().models[dbId];
+				},
 				reset: () => set(initialState),
 			}),
 			{
