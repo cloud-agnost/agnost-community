@@ -19,7 +19,6 @@
 	"endpoints": "Endpoints",
 	"message_queues": "Message Queues",
 	"cron_jobs": "Cron jobs",
-	"dashboard": "Dashboard",
 	"deployment_status_empty": "We do not have such a view anymore",
 	"deploy": "Deploy",
 	"deployment_status": "Deployment Status",
@@ -365,5 +364,16 @@
 	"noNotifications": "Your search did not match any notifications.",
 	"no_logs": "Your search did not match any logs.",
 	"restart_success": "API Server restarted successfully",
-	"suspended_desc": "Your API Server is suspended."
+	"suspended_desc": "Your API Server is suspended.",
+	"dashboard": {
+		"title": "Dashboard",
+		"database": "Database",
+		"cache": "Cache",
+		"storage": "Storage",
+		"endpoint": "Endpoint",
+		"middleware": "Middleware",
+		"function": "Function",
+		"queue": "Message Queue",
+		"task": "Cron Job"
+	}
 }

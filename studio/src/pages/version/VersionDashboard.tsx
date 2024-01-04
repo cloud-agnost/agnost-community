@@ -77,10 +77,10 @@ export default function VersionDashboard() {
 		},
 	];
 
-	function clickDashboardItem(type: string) {
+	function clickDashboardItem(type: string, title: string) {
 		addTab(version._id, {
 			id: generateId(),
-			title: `${type}s`,
+			title: `${title}s`,
 			path: getVersionDashboardPath(type.toLowerCase()),
 			type: type as TabTypes,
 			isDashboard: false,
@@ -93,21 +93,21 @@ export default function VersionDashboard() {
 		</div>
 	) : (
 		<div className='space-y-8 max-w-7xl'>
-			<h1 className='text-default text-2xl'>{t('version.dashboard')}</h1>
+			<h1 className='text-default text-2xl'>{t('version.dashboard.title')}</h1>
 			<div className='grid grid-cols-4 gap-6 mt-10 '>
 				{Object.entries(dashboard).map(([key, value]) => (
 					<Button
 						variant='blank'
 						key={key}
 						className='bg-wrapper-background-base p-6 rounded-md shadow-sm h-auto block text-left font-normal hover:bg-button-secondary'
-						onClick={() => clickDashboardItem(capitalize(key))}
+						onClick={() => clickDashboardItem(capitalize(key), t(`version.dashboard.${key}`))}
 					>
 						<div className='flex items-center gap-4'>
 							<div className='p-3 rounded-lg bg-lighter'>{getIcon(capitalize(key))}</div>
 							<div>
 								<h1 className='text-default text-2xl'>{value}</h1>
 								<h2 className='text-subtle'>
-									{capitalize(key)}
+									{t(`version.dashboard.${key}`)}
 									{value > 1 ? 's' : ''}
 								</h2>
 							</div>
