@@ -8,7 +8,7 @@ export function Toaster() {
 
 	return (
 		<ToastProvider duration={2500}>
-			{toasts.map(function ({ id, title, variant, action, ...props }) {
+			{toasts.map(function ({ id, title, action, ...props }) {
 				return (
 					<Toast key={id} {...props}>
 						<div
@@ -17,8 +17,8 @@ export function Toaster() {
 								'h-6 w-6 rounded-full flex items-center justify-center text-default',
 							)}
 						>
-							{action === 'success' && <Check size={16} weight='bold' />}
-							{action === 'error' && <X size={16} />}
+							{action === 'success' && <Check size={16} weight='bold' color='white' />}
+							{action === 'error' && <X size={16} color='white' />}
 						</div>
 						{title && <ToastTitle className='flex-1'>{title}</ToastTitle>}
 						<ToastClose />
