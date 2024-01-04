@@ -53,7 +53,7 @@ export default function EmptyState({ type, title, className, children }: EmptySt
 	const Icon = TAB_ICON_MAP[capitalize(type)] ?? ICON_MAP[type];
 	return (
 		<div className={cn('empty-state h-[95%]', className)}>
-			{<Icon className='w-44 h-44 text-icon-secondary' />}
+			{<Icon className='w-44 h-44 text-icon-base' />}
 			<h2 className='empty-state-title'>{title}</h2>
 			{children}
 		</div>
