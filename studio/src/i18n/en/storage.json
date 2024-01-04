@@ -50,5 +50,6 @@
 		"title": "Empty Bucket",
 		"message": "Are you sure you want to empty this bucket?"
 	},
-	"edit_success": "Storage updated successfully"
+	"edit_success": "Storage updated successfully",
+	"upload_success": "Files uploaded successfully"
 }

@@ -82,10 +82,19 @@ export default function Files() {
 		},
 	});
 
-	const { mutateAsync: updateFileMutation, isPending: uploadLoading } = useMutation({
-		mutationFn: uploadFileToBucket,
+	const { mutateAsync: uploadFileMutation, isPending: uploadLoading } = useMutation({
+		mutationFn: (files: FileList | null) =>
+			uploadFileToBucket({
+				bckId: bucket?.id as string,
+				storageName: storage?.name,
+				bucketName: bucket?.name,
+				isPublic: true,
+				upsert: true,
+				files: files as FileList,
+			}),
 		mutationKey: ['uploadFileToBucket'],
 		onSuccess: () => {
+			toast({ action: 'success', title: t('storage.upload_success') as string });
 			useStorageStore.setState({ uploadProgress: 0 });
 		},
 		onError: (error: APIError) => {
@@ -108,13 +117,7 @@ export default function Files() {
 		fileInput.onchange = (e) => {
 			const files = (e.target as HTMLInputElement).files;
 			if (!files) return;
-			updateFileMutation({
-				storageName: storage?.name,
-				bucketName: bucket?.name,
-				isPublic: true,
-				upsert: true,
-				files,
-			});
+			uploadFileMutation(files);
 		};
 		fileInput.click();
 	}
