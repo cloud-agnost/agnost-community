@@ -393,6 +393,7 @@ export const BADGE_COLOR_MAP: Record<string, BadgeColors> = {
 	DEVELOPER: 'purple',
 	VIEWER: 'blue',
 	'RESOURCE MANAGER': 'green',
+	MEMBER: 'yellow',
 	CREATING: 'blue',
 	UPDATING: 'yellow',
 	DELETING: 'red',
