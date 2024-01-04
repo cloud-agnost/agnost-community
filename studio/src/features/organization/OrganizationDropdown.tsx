@@ -52,6 +52,7 @@ export function OrganizationDropdown() {
 				}) as string,
 				action: 'success',
 			});
+			setOpenModal(false);
 			navigate('/organization');
 		},
 		onError: ({ details }: APIError) => {
@@ -59,9 +60,6 @@ export function OrganizationDropdown() {
 				title: details,
 				action: 'error',
 			});
-		},
-		onSettled: () => {
-			setOpenModal(false);
 		},
 	});
 	function handleLeave() {
