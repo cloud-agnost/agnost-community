@@ -40,7 +40,7 @@ export default function VersionDatabase() {
 	const filteredDatabase = useSearch(databases);
 
 	const { isFetching, refetch } = useQuery({
-		queryKey: ['getDatabases'],
+		queryKey: ['getDatabases', orgId, version?._id, versionId, application?._id, appId],
 		queryFn: () =>
 			getDatabasesOfApp({
 				orgId: orgId as string,
@@ -64,9 +64,6 @@ export default function VersionDatabase() {
 				action: 'error',
 			});
 		},
-		onSettled: () => {
-			closeDeleteDatabaseDialog();
-		},
 		onSuccess: () => {
 			getEnvironmentResources({
 				orgId: environment?.orgId,
@@ -74,6 +71,7 @@ export default function VersionDatabase() {
 				envId: environment?._id,
 				versionId: environment?.versionId,
 			});
+			closeDeleteDatabaseDialog();
 		},
 	});
 	async function deleteHandler() {
