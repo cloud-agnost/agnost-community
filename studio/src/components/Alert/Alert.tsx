@@ -3,7 +3,8 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/utils';
 
 import './alert.scss';
-import { SuccessCheck, Warning, Error } from '@/components/icons';
+import { SuccessCheck, Error } from '@/components/icons';
+import { CheckCircle, Warning, XCircle } from '@phosphor-icons/react';
 
 const alertVariants = cva('alert', {
 	variants: {
@@ -38,9 +39,9 @@ const Alert = React.forwardRef<
 		{...props}
 	>
 		<div className='alert-icon'>
-			{variant === 'success' && <SuccessCheck />}
-			{variant === 'warning' && <Warning />}
-			{variant === 'error' && <Error />}
+			{variant === 'success' && <CheckCircle className='text-elements-green' />}
+			{variant === 'warning' && <Warning className='text-elements-yellow' />}
+			{variant === 'error' && <XCircle className='text-elements-red' />}
 		</div>
 		<div className='alert-body'>{props.children}</div>
 	</div>
