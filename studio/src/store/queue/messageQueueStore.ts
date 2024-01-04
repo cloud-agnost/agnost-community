@@ -15,6 +15,7 @@ import { isEmpty, updateOrPush } from '@/utils';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import useUtilsStore from '../version/utilsStore';
+import useVersionStore from '../version/versionStore';
 
 interface MessageQueueStore {
 	queues: MessageQueue[];
@@ -109,6 +110,12 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 				const queue = await QueueService.createQueue(params);
 				set((prev) => ({ queues: [queue, ...prev.queues] }));
 				if (params.onSuccess) params.onSuccess(queue);
+				useVersionStore.setState?.((state) => ({
+					dashboard: {
+						...state.dashboard,
+						queue: state.dashboard.queue + 1,
+					},
+				}));
 				return queue;
 			} catch (error) {
 				if (params.onError) params.onError(error as APIError);

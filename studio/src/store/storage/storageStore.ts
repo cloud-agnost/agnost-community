@@ -25,6 +25,7 @@ import {
 } from '@/types';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import useVersionStore from '../version/versionStore';
 export interface StorageStore {
 	storages: Storage[];
 	storage: Storage;
@@ -125,6 +126,12 @@ const useStorageStore = create<StorageStore & Actions>()(
 				const createdStorage = await StorageService.createStorage(params);
 				set({ storages: [createdStorage, ...get().storages] });
 				params.onSuccess?.();
+				useVersionStore.setState?.((state) => ({
+					dashboard: {
+						...state.dashboard,
+						storage: state.dashboard.storage + 1,
+					},
+				}));
 				return createdStorage;
 			} catch (error) {
 				params.onError?.(error as APIError);
@@ -155,6 +162,7 @@ const useStorageStore = create<StorageStore & Actions>()(
 				set({
 					storages: get().storages.filter((storage) => storage._id !== params.storageId),
 				});
+
 				params.onSuccess?.();
 			} catch (error) {
 				params.onError?.(error as APIError);
@@ -167,6 +175,7 @@ const useStorageStore = create<StorageStore & Actions>()(
 				set({
 					storages: get().storages.filter((storage) => !params.storageIds.includes(storage._id)),
 				});
+
 				params.onSuccess?.();
 			} catch (error) {
 				params.onError?.(error as APIError);
@@ -306,7 +315,7 @@ const useStorageStore = create<StorageStore & Actions>()(
 			try {
 				const newFiles = await StorageService.uploadFileToBucket(params);
 				set((state) => ({
-					files: { ...state.files, [params.bckId]: [...state.files[params.bckId], ...newFiles] },
+					files: { ...state.files, [params.bckId]: [...newFiles, ...state.files[params.bckId]] },
 				}));
 				params.onSuccess?.();
 				return newFiles;

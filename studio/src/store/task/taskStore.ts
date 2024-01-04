@@ -16,6 +16,7 @@ import { isEmpty, updateOrPush } from '@/utils';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import useUtilsStore from '../version/utilsStore';
+import useVersionStore from '../version/versionStore';
 export interface TaskStore {
 	task: Task;
 	tasks: Task[];
@@ -83,6 +84,12 @@ const useTaskStore = create<TaskStore & Actions>()(
 				const task = await TaskService.createTask(params);
 				set((prev) => ({ tasks: [task, ...prev.tasks] }));
 				if (params.onSuccess) params.onSuccess(task);
+				useVersionStore.setState?.((state) => ({
+					dashboard: {
+						...state.dashboard,
+						task: state.dashboard.task + 1,
+					},
+				}));
 				return task;
 			} catch (error) {
 				if (params.onError) params.onError(error as APIError);

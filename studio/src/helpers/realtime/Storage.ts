@@ -2,6 +2,7 @@ import useStorageStore from '@/store/storage/storageStore';
 import useTabStore from '@/store/version/tabStore';
 import { RealtimeActionParams, Storage as StorageType } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
+import useVersionStore from '@/store/version/versionStore';
 
 class Storage implements RealtimeActions<StorageType> {
 	delete({ identifiers }: RealtimeActionParams<StorageType>): void {
@@ -12,6 +13,12 @@ class Storage implements RealtimeActions<StorageType> {
 				.storages.filter((storage) => storage._id !== identifiers.storageId),
 		});
 		removeTabByPath(identifiers.versionId as string, identifiers.storageId as string);
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				storage: state.dashboard.storage - 1,
+			},
+		}));
 	}
 	update({ data }: RealtimeActionParams<StorageType>): void {
 		const { updateTab } = useTabStore.getState();
@@ -36,6 +43,12 @@ class Storage implements RealtimeActions<StorageType> {
 		useStorageStore.setState?.({
 			storages: [data, ...useStorageStore.getState().storages],
 		});
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				storage: state.dashboard.storage + 1,
+			},
+		}));
 	}
 	telemetry(param: RealtimeActionParams<StorageType>): void {
 		this.update(param);

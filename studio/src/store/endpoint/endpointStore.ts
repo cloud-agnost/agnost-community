@@ -16,6 +16,7 @@ import { formatTime, isEmpty, updateOrPush } from '@/utils';
 import { AxiosResponse } from 'axios';
 import { create } from 'zustand';
 import useUtilsStore from '../version/utilsStore';
+import useVersionStore from '../version/versionStore';
 
 interface EndpointStore {
 	selectEndpointDialogOpen: boolean;
@@ -69,6 +70,12 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 			const endpoint = await EndpointService.createEndpoint(params);
 			set((prev) => ({ endpoints: [endpoint, ...prev.endpoints] }));
 			if (params.onSuccess) params.onSuccess(endpoint);
+			useVersionStore.setState?.((state) => ({
+				dashboard: {
+					...state.dashboard,
+					endpoint: state.dashboard.endpoint + 1,
+				},
+			}));
 			return endpoint;
 		} catch (error) {
 			if (params.onError) params.onError(error as APIError);
