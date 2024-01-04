@@ -13,6 +13,7 @@ interface UseFetchDataProps<T = any> {
 	queryKey: string;
 	params?: T;
 	disableVersionParams?: boolean;
+	enabled?: boolean;
 }
 export default function useInfiniteScroll({
 	queryFn,
@@ -21,13 +22,23 @@ export default function useInfiniteScroll({
 	queryKey,
 	params,
 	disableVersionParams,
+	enabled = true,
 }: UseFetchDataProps) {
 	const [searchParams] = useSearchParams();
 	const { orgId, versionId, appId } = useParams() as Record<string, string>;
 	const { application } = useApplicationStore();
 	const { version } = useVersionStore();
 	const result = useInfiniteQuery({
-		queryKey: [queryKey],
+		queryKey: [
+			queryKey,
+			disableVersionParams,
+			orgId,
+			version?._id,
+			versionId,
+			application?._id,
+			appId,
+			params,
+		],
 		initialPageParam: 0,
 		queryFn: ({ pageParam }) =>
 			queryFn({
@@ -45,8 +56,10 @@ export default function useInfiniteScroll({
 			}),
 		refetchOnWindowFocus: false,
 		enabled:
-			lastFetchedPage === undefined ||
-			Math.ceil(dataLength / MODULE_PAGE_SIZE) < (lastFetchedPage ?? 0),
+			(lastFetchedPage === undefined ||
+				Math.ceil(dataLength / MODULE_PAGE_SIZE) < (lastFetchedPage ?? 0)) &&
+			enabled,
+
 		getNextPageParam: (lastPage) => {
 			const nextPage =
 				lastPage?.length === MODULE_PAGE_SIZE ? (lastFetchedPage ?? 0) + 1 : undefined;
