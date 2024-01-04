@@ -1,7 +1,6 @@
 import useAuthStore from '@/store/auth/authStore';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
-import useNavigatorStore from '@/store/database/navigatorStore';
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useFunctionStore from '@/store/function/functionStore';
 import useMiddlewareStore from '@/store/middleware/middlewareStore';
@@ -199,7 +198,6 @@ async function fileLoader({ params }: LoaderFunctionArgs) {
 		}
 		useStorageStore.setState({ bucket: selectedBucket });
 	}
-	useStorageStore.setState({ fileCountInfo: undefined });
 	return { props: {} };
 }
 async function editTaskLoader({ params }: LoaderFunctionArgs) {
@@ -309,7 +307,6 @@ async function navigatorLoader({ params, request }: LoaderFunctionArgs) {
 		} else setModel(models[0]);
 	}
 
-	useNavigatorStore.setState({ lastFetchedPage: undefined });
 	return { props: {} };
 }
 

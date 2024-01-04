@@ -1,4 +1,3 @@
-import { create } from 'zustand';
 import { EndpointService } from '@/services';
 import {
 	APIError,
@@ -15,6 +14,7 @@ import {
 } from '@/types';
 import { formatTime, isEmpty, updateOrPush } from '@/utils';
 import { AxiosResponse } from 'axios';
+import { create } from 'zustand';
 import useUtilsStore from '../version/utilsStore';
 
 interface EndpointStore {
