@@ -93,7 +93,7 @@ export default function Navigator() {
 		{
 			queryFn: getDataFromModel,
 			queryKey: 'getDataFromModel',
-			lastFetchedPage,
+			lastFetchedPage: lastFetchedPage?.[model?._id],
 			dataLength: data.length,
 			disableVersionParams: true,
 			params: {
