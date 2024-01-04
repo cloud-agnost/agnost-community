@@ -364,5 +364,6 @@
 	"close_tab": "Close Tab",
 	"noNotifications": "Your search did not match any notifications.",
 	"no_logs": "Your search did not match any logs.",
-	"restart_success": "API Server restarted successfully"
+	"restart_success": "API Server restarted successfully",
+	"suspended_desc": "Your API Server is suspended."
 }
