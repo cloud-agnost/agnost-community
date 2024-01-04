@@ -1,6 +1,7 @@
 import { Badge } from '@/components/Badge';
 import { BADGE_COLOR_MAP } from '@/constants';
 import { ClusterComponentReleaseInfo } from '@/types';
+import { cn } from '@/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { t } from 'i18next';
 
@@ -35,6 +36,10 @@ const ReleaseColumns: ColumnDef<ClusterComponentReleaseInfo>[] = [
 		size: 100,
 		enableResizing: false,
 		header: () => <span>{t('cluster.latest')}</span>,
+		cell: ({ row }) => {
+			const { latest, version } = row.original;
+			return <span className={cn(latest !== version && 'text-elements-orange')}>{latest}</span>;
+		},
 	},
 ];
 
