@@ -65,14 +65,28 @@ export default function Buckets() {
 		mutateAsync: deleteBucketMutation,
 		isPending: deleteLoading,
 		error: deleteError,
+		reset,
 	} = useMutation({
-		mutationFn: deleteBucket,
-		onSettled: () => {
+		mutationFn: () =>
+			deleteBucket({
+				storageName: storage?.name,
+				bucketName: toDeleteBucket?.name as string,
+				versionId: storage?.versionId,
+			}),
+		onSuccess: () => {
 			closeBucketDeleteDialog();
 		},
 	});
 	const { mutateAsync: deleteMultipleBucketsMutation } = useMutation({
-		mutationFn: deleteMultipleBuckets,
+		mutationFn: () =>
+			deleteMultipleBuckets({
+				deletedBuckets: table.getSelectedRowModel().rows.map(({ original: bucket }) => ({
+					id: bucket.id,
+					name: bucket.name,
+				})),
+				storageName: storage?.name,
+				versionId: storage?.versionId,
+			}),
 		onSuccess: () => {
 			table?.resetRowSelection();
 		},
@@ -80,24 +94,6 @@ export default function Buckets() {
 			toast({ action: 'error', title: details });
 		},
 	});
-
-	function deleteMultipleBucketsHandler() {
-		deleteMultipleBucketsMutation({
-			deletedBuckets: table.getSelectedRowModel().rows.map(({ original: bucket }) => ({
-				id: bucket.id,
-				name: bucket.name,
-			})),
-			storageName: storage?.name,
-			versionId: storage?.versionId,
-		});
-	}
-	function deleteBucketHandler() {
-		deleteBucketMutation({
-			storageName: storage?.name,
-			bucketName: toDeleteBucket?.name as string,
-			versionId: storage?.versionId,
-		});
-	}
 
 	async function onRefresh() {
 		setIsRefreshing(true);
@@ -113,7 +109,7 @@ export default function Buckets() {
 				openCreateModal={() => setIsBucketCreateOpen(true)}
 				createButtonTitle={t('storage.bucket.create')}
 				emptyStateTitle={t('storage.bucket.empty_text')}
-				onMultipleDelete={deleteMultipleBucketsHandler}
+				onMultipleDelete={deleteMultipleBucketsMutation}
 				loading={isFetching && !buckets.length}
 				breadCrumb={<BreadCrumb goBackLink={storageUrl} items={breadcrumbItems} />}
 				table={table}
@@ -148,9 +144,12 @@ export default function Buckets() {
 							/>
 						}
 						confirmCode={toDeleteBucket?.id as string}
-						onConfirm={deleteBucketHandler}
+						onConfirm={deleteBucketMutation}
 						isOpen={isBucketDeleteDialogOpen}
-						closeModal={closeBucketDeleteDialog}
+						closeModal={() => {
+							reset();
+							closeBucketDeleteDialog();
+						}}
 						closable
 					/>
 				</InfiniteScroll>

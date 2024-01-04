@@ -12,7 +12,7 @@ import useVersionStore from '@/store/version/versionStore';
 import { APIError } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import _ from 'lodash';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
@@ -22,18 +22,19 @@ export default function Files() {
 	const { t } = useTranslation();
 	const { getVersionDashboardPath } = useVersionStore();
 	const {
+		files: stateFiles,
 		getFilesOfBucket,
 		bucket,
-		files,
 		deleteMultipleFileFromBucket,
-		fileCountInfo,
 		storage,
 		uploadFileToBucket,
 		isEditFileDialogOpen,
 		closeFileEditDialog,
 		uploadProgress,
+		fileCountInfo: stateInfo,
 	} = useStorageStore();
-
+	const files = useMemo(() => stateFiles[bucket.id] ?? [], [bucket.id, stateFiles]);
+	const fileCountInfo = useMemo(() => stateInfo?.[bucket.id], [bucket.id, stateInfo]);
 	const storageUrl = getVersionDashboardPath('/storage');
 	const bucketUrl = `${storageUrl}/${storage._id}`;
 	const breadcrumbItems: BreadCrumbItem[] = [
@@ -54,9 +55,11 @@ export default function Files() {
 		{
 			queryFn: getFilesOfBucket,
 			queryKey: 'getFilesOfBucket',
-			lastFetchedPage: _.isNil(fileCountInfo) ? undefined : fileCountInfo.currentPage - 1,
-			dataLength: files.length,
+			lastFetchedPage: _.isNil(fileCountInfo) ? undefined : fileCountInfo?.currentPage - 1,
+			dataLength: files?.length,
+			disableVersionParams: true,
 			params: {
+				bckId: bucket?.id as string,
 				storageName: storage?.name as string,
 				bucketName: bucket?.name as string,
 				returnCountInfo: true,
@@ -121,37 +124,39 @@ export default function Files() {
 		setIsRefreshing(false);
 	}
 	return (
-		<VersionTabLayout
-			searchable
-			breadCrumb={<BreadCrumb goBackLink={bucketUrl} items={breadcrumbItems} />}
-			isEmpty={files.length === 0}
-			type='file'
-			openCreateModal={uploadFileHandler}
-			createButtonTitle={t('storage.file.upload')}
-			emptyStateTitle={t('storage.file.empty_text')}
-			onMultipleDelete={deleteMultipleFilesHandler}
-			loading={isFetching && !files.length}
-			table={table}
-			handlerButton={
-				<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
-					{!isRefreshing && <Refresh className='mr-2 w-5 h-5' />}
-					{t('general.refresh')}
-				</Button>
-			}
-		>
+		<>
 			{uploadLoading && (uploadProgress > 0 || uploadProgress < 100) && (
-				<Progress value={uploadProgress} />
+				<Progress value={uploadProgress} className='mb-5' />
 			)}
-			<InfiniteScroll
-				scrollableTarget='version-layout'
-				dataLength={files.length}
-				next={fetchNextPage}
-				hasMore={hasNextPage}
-				loader={isFetchingNextPage && <TableLoading />}
+			<VersionTabLayout
+				searchable
+				breadCrumb={<BreadCrumb goBackLink={bucketUrl} items={breadcrumbItems} />}
+				isEmpty={files?.length === 0}
+				type='file'
+				openCreateModal={uploadFileHandler}
+				createButtonTitle={t('storage.file.upload')}
+				emptyStateTitle={t('storage.file.empty_text')}
+				onMultipleDelete={deleteMultipleFilesHandler}
+				loading={isFetching && (!files?.length || files[0].bucketId !== bucket.id)}
+				table={table}
+				handlerButton={
+					<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
+						{!isRefreshing && <Refresh className='mr-2 w-5 h-5' />}
+						{t('general.refresh')}
+					</Button>
+				}
 			>
-				<DataTable table={table} />
-			</InfiniteScroll>
-			<EditFile open={isEditFileDialogOpen} onClose={closeFileEditDialog} />
-		</VersionTabLayout>
+				<InfiniteScroll
+					scrollableTarget='version-layout'
+					dataLength={files?.length}
+					next={fetchNextPage}
+					hasMore={hasNextPage}
+					loader={isFetchingNextPage && <TableLoading />}
+				>
+					<DataTable table={table} />
+				</InfiniteScroll>
+				<EditFile open={isEditFileDialogOpen} onClose={closeFileEditDialog} />
+			</VersionTabLayout>
+		</>
 	);
 }
