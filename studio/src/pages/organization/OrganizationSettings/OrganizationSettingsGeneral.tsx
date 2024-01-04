@@ -42,13 +42,13 @@ export default function OrganizationSettingsGeneral() {
 
 	return (
 		<SettingsContainer pageTitle={t('organization.settings.general')}>
-			<div className='divide-y space-y-4'>
+			<div className='divide-y'>
 				{ORGANIZATION_GENERAL_SETTINGS.map((item, index) => (
 					<SettingsFormItem
 						key={index}
 						title={item.title}
 						description={item.description}
-						className='space-y-0 py-6'
+						className='space-y-4 py-6'
 						twoColumns={index === 2}
 					>
 						{item.component}
