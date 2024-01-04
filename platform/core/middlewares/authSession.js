@@ -1,6 +1,6 @@
 import userCtrl from "../controllers/user.js";
 import authCtrl from "../controllers/auth.js";
-import { deleteKey, getKey } from "../init/cache.js";
+import { getKey } from "../init/cache.js";
 import ERROR_CODES from "../config/errorCodes.js";
 
 export const authSession = async (req, res, next) => {

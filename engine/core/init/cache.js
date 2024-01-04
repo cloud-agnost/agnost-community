@@ -131,6 +131,16 @@ export const deleteKey = async (key) => {
 };
 
 /**
+ * Sets the expiry of the key
+ * @param  {string} key
+ * @param {number} ttl Time to live in seconds
+ */
+export const expireKey = async (key, ttl) => {
+	if (!key || ttl <= 0) return;
+	return await client.expire(key.toString(), ttl);
+};
+
+/**
  * Creates a Redis command pipeline to execute multiple commands at once
  */
 export const createPipeline = () => {

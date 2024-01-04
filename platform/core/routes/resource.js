@@ -323,7 +323,11 @@ router.get(
 
 			let query = { orgId: org._id };
 
-			if (search) query.name = { $regex: search, $options: "i" };
+			if (search)
+				query.name = {
+					$regex: helper.escapeStringRegexp(search),
+					$options: "i",
+				};
 
 			// Type filter
 			if (type) {
@@ -380,7 +384,11 @@ router.get(
 			let query = { orgId: org._id, deletable: true };
 			query.$and = [{ deletable: true }, { instance: { $ne: "API Server" } }];
 
-			if (search) query.name = { $regex: search, $options: "i" };
+			if (search)
+				query.name = {
+					$regex: helper.escapeStringRegexp(search),
+					$options: "i",
+				};
 
 			let sort = {};
 			if (sortBy && sortDir) {

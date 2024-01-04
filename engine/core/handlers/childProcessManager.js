@@ -308,6 +308,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 					callback(null, true);
 				},
 				credentials: true,
+				exposedHeaders: ["Access-Token", "Refresh-Token"],
 			})
 		);
 		// Initialize sesssion storage

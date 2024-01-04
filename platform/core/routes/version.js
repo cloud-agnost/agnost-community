@@ -68,7 +68,8 @@ router.get(
 					{ private: false },
 					{ $and: [{ private: true }, { createdBy: req.user._id }] },
 				];
-			if (name && name !== "null") query.name = { $regex: name, $options: "i" };
+			if (name && name !== "null")
+				query.name = { $regex: helper.escapeStringRegexp(name), $options: "i" };
 
 			if (start && !end) query.createdAt = { $gte: start };
 			else if (!start && end) query.createdAt = { $lte: end };
@@ -112,7 +113,8 @@ router.get(
 			const { page, size, name, sortBy, sortDir, start, end } = req.query;
 
 			let query = { appId: app._id, createdBy: req.user._id };
-			if (name && name !== "null") query.name = { $regex: name, $options: "i" };
+			if (name && name !== "null")
+				query.name = { $regex: helper.escapeStringRegexp(name), $options: "i" };
 
 			if (start && !end) query.createdAt = { $gte: start };
 			else if (!start && end) query.createdAt = { $lte: end };
@@ -1640,7 +1642,7 @@ router.get(
 			const dataCursor = await conn.db.collection("search_view").find(
 				{
 					versionId: helper.objectId(req.version._id),
-					name: { $regex: keyword, $options: "i" },
+					name: { $regex: helper.escapeStringRegexp(keyword), $options: "i" },
 				},
 				{
 					sort: { name: 1 },

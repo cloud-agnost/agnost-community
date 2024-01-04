@@ -455,7 +455,10 @@ router.get(
 
 			let query = { orgId: org._id, appId: app._id };
 			if (email && email !== "null")
-				query.email = { $regex: email, $options: "i" };
+				query.email = {
+					$regex: helper.escapeStringRegexp(email),
+					$options: "i",
+				};
 
 			if (status) {
 				if (Array.isArray(status)) query.status = { $in: status };
@@ -516,9 +519,21 @@ router.get(
 			let query = { _id: { $nin: appTeam }, status: "Active" };
 			if (search && search !== "null") {
 				query.$or = [
-					{ name: { $regex: search, $options: "i" } },
-					{ contactEmail: { $regex: search, $options: "i" } },
-					{ "loginProfiles.email": { $regex: search, $options: "i" } },
+					{
+						name: { $regex: helper.escapeStringRegexp(search), $options: "i" },
+					},
+					{
+						contactEmail: {
+							$regex: helper.escapeStringRegexp(search),
+							$options: "i",
+						},
+					},
+					{
+						"loginProfiles.email": {
+							$regex: helper.escapeStringRegexp(search),
+							$options: "i",
+						},
+					},
 				];
 			}
 

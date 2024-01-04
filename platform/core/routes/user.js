@@ -200,9 +200,21 @@ router.get(
 			let query = { _id: { $ne: user._id }, status: "Active" };
 			if (search && search !== "null") {
 				query.$or = [
-					{ name: { $regex: search, $options: "i" } },
-					{ contactEmail: { $regex: search, $options: "i" } },
-					{ "loginProfiles.email": { $regex: search, $options: "i" } },
+					{
+						name: { $regex: helper.escapeStringRegexp(search), $options: "i" },
+					},
+					{
+						contactEmail: {
+							$regex: helper.escapeStringRegexp(search),
+							$options: "i",
+						},
+					},
+					{
+						"loginProfiles.email": {
+							$regex: helper.escapeStringRegexp(search),
+							$options: "i",
+						},
+					},
 				];
 			}
 
