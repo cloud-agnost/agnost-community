@@ -68,7 +68,7 @@ export default function CodeEditor({
 	}, [globalThis.monaco, typings]);
 
 	useEffect(() => {
-		let timer = setTimeout(() => {
+		const timer = setTimeout(() => {
 			setShowLoader(true);
 		}, 100);
 
@@ -100,6 +100,7 @@ export default function CodeEditor({
 				language={defaultLanguage}
 				path={`file:///src/${name}.js`}
 				loading={showLoader && <BeatLoader color='#6884FD' size={24} margin={18} />}
+				keepCurrentModel
 				options={{
 					value,
 					readOnly: readonly,
