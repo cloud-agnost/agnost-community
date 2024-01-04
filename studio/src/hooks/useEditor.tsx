@@ -1,4 +1,4 @@
-import { formatCode } from '@/utils';
+import { formatCode, getTabIdFromUrl } from '@/utils';
 import { BeforeMount, EditorProps, OnChange } from '@monaco-editor/react';
 import { Linter } from 'eslint-linter-browserify';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
@@ -57,6 +57,10 @@ import * as krtheme from 'monaco-themes/themes/krTheme.json';
 import * as monoindustrial from 'monaco-themes/themes/monoindustrial.json';
 import { useRef } from 'react';
 import config from '../helpers/eslint.json';
+import useTabStore from '@/store/version/tabStore';
+import useVersionStore from '@/store/version/versionStore';
+import { Tab } from '@/types';
+import { useDebounceFn } from '.';
 
 export const EDITOR_OPTIONS: EditorProps['options'] = {
 	quickSuggestions: {
@@ -86,6 +90,22 @@ export type CodeEditorProps = {
 export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 	const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
 	const linter = new Linter();
+	const { updateCurrentTab, getTabById } = useTabStore();
+	const { version } = useVersionStore();
+	const setTabState = useDebounceFn((isDirty) => {
+		if (
+			editor.getModel()?.getLanguageId() === 'javascript' &&
+			!editor.getOption(monaco.editor.EditorOption.readOnly)
+		) {
+			const tabId = getTabIdFromUrl();
+			const tab = getTabById(version?._id, tabId as string) as Tab;
+			if (tab?.type.toLowerCase() === tab?.path) return;
+			updateCurrentTab(version?._id, {
+				...tab,
+				isDirty,
+			});
+		}
+	}, 500);
 	async function saveEditorContent(language: string | undefined, cb?: (value: string) => void) {
 		const ed = editorRef.current;
 		const val = ed?.getValue() as string;
@@ -129,6 +149,7 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 				})),
 			);
 		};
+
 		validate(editor.getValue());
 		editor.onDidFocusEditorText(() => {
 			editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
@@ -136,8 +157,13 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 				saveEditorContent(editor.getModel()?.getLanguageId(), onSave);
 			});
 		});
-		editor.onDidChangeModelContent(() => {
+		editor.onDidChangeModelContent((e) => {
 			validate(editor.getValue());
+			setTabState(editor.getValue() !== e.changes[0].text);
+		});
+
+		editor.onDidPaste(() => {
+			setTabState(true);
 		});
 
 		monaco.languages.registerDocumentFormattingEditProvider('typescript', {
