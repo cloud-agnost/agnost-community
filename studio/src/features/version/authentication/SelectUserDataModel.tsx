@@ -3,7 +3,7 @@ import { Button } from '@/components/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select';
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { FIELD_ICON_MAP, RESOURCE_ICON_MAP } from '@/constants';
-import { useAuthorizeVersion, useToast } from '@/hooks';
+import { useAuthorizeVersion, useToast, useUpdateEffect } from '@/hooks';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useSettingsStore from '@/store/version/settingsStore';
@@ -14,7 +14,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/Form';
-import { useEffect, useState } from 'react';
+import _ from 'lodash';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -35,20 +36,19 @@ export default function SelectUserDataModel() {
 	const { saveUserDataModelInfo, addMissingUserDataModelFields } = useSettingsStore();
 	const { version } = useVersionStore();
 	const { databases, getDatabasesOfApp } = useDatabaseStore();
-	const { models, getModelsOfDatabase } = useModelStore();
+	const { getModelsOfDatabase, models: dbModels } = useModelStore();
+
 	const [error, setError] = useState<APIError>();
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('version.auth.update');
 	const form = useForm<z.infer<typeof SaveUserModelSchema>>({
-		defaultValues: {
-			databaseId: databases?.find(
-				(db) => db.iid === version?.authentication?.userDataModel?.database,
-			)?._id,
-			modelId: models?.find((model) => model.iid === version?.authentication?.userDataModel?.model)
-				?._id,
-		},
 		resolver: zodResolver(SaveUserModelSchema),
 	});
+	const models = useMemo(() => {
+		if (!_.isEmpty(dbModels)) {
+			return dbModels[form.watch('databaseId')] ?? [];
+		}
+	}, [form.watch('databaseId'), dbModels]);
 
 	useEffect(() => {
 		if (version && isEmpty(databases)) {
@@ -116,9 +116,9 @@ export default function SelectUserDataModel() {
 	});
 	function onSubmit(data: z.infer<typeof SaveUserModelSchema>) {
 		mutateAsync({
-			orgId: version?.orgId as string,
-			versionId: version?._id as string,
-			appId: version?.appId as string,
+			orgId: version?.orgId,
+			versionId: version?._id,
+			appId: version?.appId,
 			...data,
 			onSuccess: () => {
 				toast({
@@ -130,9 +130,9 @@ export default function SelectUserDataModel() {
 	}
 	function addMissingFields() {
 		addMissingFieldsMutation({
-			orgId: version?.orgId as string,
-			versionId: version?._id as string,
-			appId: version?.appId as string,
+			orgId: version?.orgId,
+			versionId: version?._id,
+			appId: version?.appId,
 			...form.getValues(),
 		});
 	}
@@ -148,15 +148,21 @@ export default function SelectUserDataModel() {
 			form.setValue('databaseId', dId as string);
 		}
 	}, [version, databases]);
-	useEffect(() => {
-		const dbId = form.watch('databaseId');
-		const modelId = form.watch('modelId');
-		if (version && (!dbId || !modelId)) {
-			const mId = models?.find(
-				(model) => model.iid === version?.authentication?.userDataModel?.model,
-			)?._id;
 
-			form.setValue('modelId', mId as string);
+	useUpdateEffect(() => {
+		if (models?.length) {
+			const dbId = form.watch('databaseId');
+			const modelId = form.watch('modelId');
+			if (version && (!dbId || !modelId)) {
+				const mId = models?.find(
+					(model) => model.iid === version?.authentication?.userDataModel?.model,
+				)?._id;
+
+				form.reset({
+					databaseId: dbId,
+					modelId: mId,
+				});
+			}
 		}
 	}, [version, models]);
 	return (
@@ -282,7 +288,7 @@ export default function SelectUserDataModel() {
 												</SelectTrigger>
 											</FormControl>
 											<SelectContent align='center'>
-												{models.map((model) => {
+												{models?.map((model) => {
 													return (
 														<SelectItem
 															className='px-3 py-[6px] w-full max-w-full cursor-pointer'
@@ -293,7 +299,7 @@ export default function SelectUserDataModel() {
 														</SelectItem>
 													);
 												})}
-												{!models.length && (
+												{!models?.length && (
 													<SelectItem value='' disabled>
 														{t('database.no_model')}
 													</SelectItem>

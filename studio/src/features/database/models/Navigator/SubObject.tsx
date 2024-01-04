@@ -25,7 +25,7 @@ export default function SubObject({ field, parentId, value, index }: NavigatorCo
 					});
 				} else {
 					useNavigatorStore.setState({
-						subModelData: [],
+						subModelData: {},
 						selectedSubModelId: parentId,
 					});
 				}

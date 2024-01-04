@@ -19,7 +19,7 @@ export default function Models() {
 	const { application } = useApplicationStore();
 	const { version } = useVersionStore();
 	const {
-		models,
+		getModelsOfSelectedDb,
 		deleteMultipleModel,
 		isEditModelDialogOpen,
 		closeEditModelDialog,
@@ -28,7 +28,6 @@ export default function Models() {
 	const [isCreateModelOpen, setIsCreateModelOpen] = useState(false);
 	const { t } = useTranslation();
 	const { toast } = useToast();
-
 	const canCreateModel = useAuthorizeVersion('model.create');
 	const { dbId, orgId, appId, versionId } = useParams() as {
 		dbId: string;
@@ -36,10 +35,10 @@ export default function Models() {
 		appId: string;
 		versionId: string;
 	};
+	const models = getModelsOfSelectedDb(dbId);
 	const { database } = useDatabaseStore();
 	const navigate = useTabNavigate();
-
-	const filteredModels = useSearch(models);
+	const filteredModels = useSearch(models ?? []);
 	const table = useTable<Model>({
 		data: filteredModels,
 		columns: ModelColumns,
@@ -53,9 +52,17 @@ export default function Models() {
 				appId: application?._id ?? appId,
 				versionId: version?._id ?? versionId,
 			}),
-		queryKey: ['getModelsOfDatabase'],
+		queryKey: [
+			'getModelsOfDatabase',
+			database._id,
+			orgId,
+			application?._id,
+			appId,
+			version?._id,
+			versionId,
+		],
 		refetchOnWindowFocus: false,
-		enabled: !_.isNil(database) && models[0]?.dbId !== dbId,
+		enabled: !_.isNil(database) && models?.[0]?.dbId !== dbId,
 	});
 	const { mutateAsync: deleteMultipleModelMutation } = useMutation({
 		mutationFn: deleteMultipleModel,
@@ -121,6 +128,7 @@ export default function Models() {
 				loading={isFetching}
 				searchable
 				handlerButton={
+					models &&
 					models.length > 0 && (
 						<Button variant='secondary' onClick={handleViewDataClick}>
 							View Data

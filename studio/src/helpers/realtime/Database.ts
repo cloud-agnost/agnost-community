@@ -2,6 +2,7 @@ import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useTabStore from '@/store/version/tabStore';
 import { Database as DatabaseType, RealtimeActionParams } from '@/types';
+import _ from 'lodash';
 import { RealtimeActions } from './RealtimeActions';
 
 class Database implements RealtimeActions<DatabaseType> {
@@ -12,9 +13,11 @@ class Database implements RealtimeActions<DatabaseType> {
 				.getState?.()
 				.databases.filter((database) => database._id !== identifiers.dbId),
 		});
-		useModelStore.setState?.({
-			models: useModelStore.getState?.().models.filter((model) => model.dbId !== identifiers.dbId),
-		});
+
+		useModelStore.setState?.((state) => ({
+			models: _.omit(state.models, identifiers.dbId as string),
+		}));
+
 		removeTabByPath(identifiers.versionId as string, identifiers.dbId as string);
 	}
 	update({ data }: RealtimeActionParams<DatabaseType>): void {
@@ -29,11 +32,11 @@ class Database implements RealtimeActions<DatabaseType> {
 			database: data,
 		});
 		updateTab({
-			versionId: data.versionId as string,
+			versionId: data.versionId,
 			tab: {
 				title: data.name,
 			},
-			filter: (tab) => tab.path.includes(data._id as string),
+			filter: (tab) => tab.path.includes(data._id),
 		});
 	}
 	create({ data }: RealtimeActionParams<DatabaseType>): void {

@@ -1,32 +1,27 @@
-import useModelStore from '@/store/database/modelStore';
-import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
-import { cn } from '@/utils';
 import { Button } from '@/components/Button';
-import { Table } from '@phosphor-icons/react';
+import useModelStore from '@/store/database/modelStore';
 import { Model } from '@/types';
+import { cn } from '@/utils';
+import { Table } from '@phosphor-icons/react';
+import { useParams, useSearchParams } from 'react-router-dom';
 export default function SelectModel() {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const { t } = useTranslation();
-	const { model, setModel, models, resetNestedModels } = useModelStore();
-
+	const { dbId } = useParams() as { dbId: string };
+	const { model, setModel, getModelsOfSelectedDb, resetNestedModels } = useModelStore();
 	function onModelSelect(model: Model) {
 		resetNestedModels();
 		searchParams.delete('f');
 		searchParams.delete('d');
 		searchParams.delete('ref');
+		searchParams.set('m', model._id);
 		setSearchParams(searchParams);
 		setModel(model);
 	}
+	const models = getModelsOfSelectedDb(dbId);
 	return (
 		<div className=' bg-subtle p-4 rounded-lg w-1/6 space-y-4 overflow-auto'>
-			<h2 className='text-default text-xl font-sfCompact'>
-				{t('database.models.title')}
-				<span className='text-subtle font-sfCompact'> ({models.length})</span>
-			</h2>
-
 			<div className='space-y-4'>
-				{models.map((md) => (
+				{models?.map((md) => (
 					<div key={md._id}>
 						<Button
 							className={cn(

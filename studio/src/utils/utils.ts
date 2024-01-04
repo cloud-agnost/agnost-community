@@ -424,7 +424,7 @@ export function isMobilePhone(phoneNumber: string): boolean {
 		return false;
 	}
 	for (const key in PHONE_REGEXES) {
-		if (PHONE_REGEXES.hasOwnProperty(key)) {
+		if (Object.prototype.hasOwnProperty.call(PHONE_REGEXES, key)) {
 			const phone = PHONE_REGEXES[key as keyof typeof PHONE_REGEXES];
 			if (phone.test(phoneNumber)) {
 				return true;
@@ -487,12 +487,12 @@ export function describeCronExpression(cronExpression: string) {
 }
 
 export function sortByField<T extends { updatedBy?: string; updatedAt: string; type: string }>(
-	arr: T[],
+	arr: T[] | undefined,
 	field: keyof T,
 	direction: 'asc' | 'desc' = 'asc',
 ): T[] {
 	return _.orderBy(
-		arr.map((d) => ({
+		arr?.map((d) => ({
 			...d,
 			updatedAt: d?.updatedBy ? d.updatedAt : undefined,
 			type: FIELD_MAPPER[d?.type] ?? d?.type,

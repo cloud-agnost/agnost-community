@@ -30,7 +30,7 @@ export default function CreateFieldButton() {
 	const fieldTypes = useTypeStore((state) => state.fieldTypes);
 	const { dbId, modelId } = useParams();
 	const canCreateField = useAuthorizeVersion('model.create');
-	const models = useModelStore((state) => state.models);
+	const models = useModelStore((state) => state.models)[dbId as string];
 
 	const databaseType = useMemo(() => {
 		return databases.find((item) => item._id === dbId)?.type as keyof DatabaseType;
@@ -41,8 +41,8 @@ export default function CreateFieldButton() {
 	}, [models, modelId]) as Model;
 
 	function getModelById(_id: string) {
-		if (_id.startsWith('mdl-')) return models.find((item) => item.iid === _id);
-		return models.find((item) => item._id === _id);
+		if (_id.startsWith('mdl-')) return models?.find((item) => item.iid === _id);
+		return models?.find((item) => item._id === _id);
 	}
 
 	const types = useMemo(() => {
@@ -81,7 +81,7 @@ export default function CreateFieldButton() {
 				<DropdownMenuContent align='end' className='w-[330px] max-h-[650px] overflow-y-auto'>
 					<DropdownMenuItemContainer>
 						{Object.entries(types).map(([key, types], index) => (
-							<Fragment key={index}>
+							<Fragment key={key}>
 								{index !== 0 && <DropdownMenuSeparator />}
 								<DropdownMenuGroup className='grid grid-cols-2 gap-y-1 gap-1'>
 									<DropdownMenuLabel className='py-[6px] col-span-2 text-subtle leading-6 text-sm font-medium'>

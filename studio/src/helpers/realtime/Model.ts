@@ -6,36 +6,44 @@ import { RealtimeActions } from './RealtimeActions';
 class Model implements RealtimeActions<ModelType> {
 	delete({ identifiers }: RealtimeActionParams<ModelType>): void {
 		const { removeTabByPath } = useTabStore.getState();
-		useModelStore.setState?.({
-			models: useModelStore
-				.getState?.()
-				.models.filter((model) => model._id !== identifiers.modelId),
-		});
+		useModelStore.setState?.((state) => ({
+			models: {
+				...state.models,
+				[identifiers.dbId as string]: state.models[identifiers.dbId as string].filter(
+					(m) => m._id !== identifiers.modelId,
+				),
+			},
+		}));
+
 		removeTabByPath(identifiers.versionId as string, identifiers.modelId as string);
 	}
 	update({ data }: RealtimeActionParams<ModelType>): void {
 		const { updateTab } = useTabStore.getState();
 		updateTab({
-			versionId: data.versionId as string,
+			versionId: data.versionId,
 			tab: {
 				title: data.name,
 			},
-			filter: (tab) => tab.path.includes(data._id as string),
+			filter: (tab) => tab.path.includes(data._id),
 		});
-		useModelStore.setState?.({
-			models: useModelStore.getState?.().models.map((model) => {
-				if (model._id === data._id) {
-					return data;
-				}
-				return model;
-			}),
+		useModelStore.setState?.((state) => ({
+			models: {
+				...state.models,
+				[data.dbId]: state.models[data.dbId].map((model) =>
+					model._id === data._id ? data : model,
+				),
+			},
 			model: data,
-		});
+		}));
 	}
 	create({ data }: RealtimeActionParams<ModelType>): void {
-		useModelStore.setState?.({
-			models: [...useModelStore.getState().models, data],
-		});
+		useModelStore.setState?.((state) => ({
+			models: {
+				...state.models,
+				[data.dbId]: [data, ...state.models[data.dbId]],
+			},
+			model: data,
+		}));
 	}
 	telemetry(param: RealtimeActionParams<ModelType>): void {
 		this.update(param);
