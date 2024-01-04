@@ -19,7 +19,8 @@ import { APIError } from '@/types';
 import { isEmpty } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 import { DataTable } from 'components/DataTable';
-import { useEffect, useState } from 'react';
+import _ from 'lodash';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams, useSearchParams } from 'react-router-dom';
@@ -33,22 +34,23 @@ export default function Navigator() {
 		setEditedField,
 		getDataFromModel,
 		deleteMultipleDataFromModel,
-		data,
+		getDataOfSelectedModel,
+		data: stateData,
 		editedField,
 		subModelData,
 		lastFetchedPage,
 	} = useNavigatorStore();
 	const database = useDatabaseStore((state) => state.database);
-	const { model, subModel, getModelsTitle } = useModelStore();
-	const title = getModelsTitle();
+	const { model, subModel } = useModelStore();
 	const canMultiDelete = true;
 	const hasSubModel = !isEmpty(subModel);
-	const columns = useNavigatorColumns(hasSubModel ? subModel.fields : model?.fields);
+	const columns = useNavigatorColumns(hasSubModel ? subModel?.fields : model?.fields);
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 	const isSorted = searchParams.get('f') && searchParams.get('d');
+	const data = useMemo(() => getDataOfSelectedModel(model?._id) ?? [], [model, stateData]);
 	const table = useTable({
 		columns,
-		data: hasSubModel ? subModelData : data,
+		data: hasSubModel ? subModelData?.[model?._id] : data,
 	});
 
 	const dbUrl = `/organization/${orgId}/apps/${appId}/version/${versionId}/database`;
@@ -82,7 +84,7 @@ export default function Navigator() {
 	}, []);
 
 	useUpdateEffect(() => {
-		if (model && isEmpty(subModel) && !isSorted) {
+		if (model && isEmpty(subModel) && !isSorted && !Object.keys(stateData).includes(model?._id)) {
 			refetch();
 		}
 	}, [model, subModel]);
@@ -97,6 +99,7 @@ export default function Navigator() {
 			params: {
 				id: searchParams.get('ref') as string,
 			},
+			enabled: !Object.keys(stateData).includes(model?._id) && !isEmpty(model),
 		},
 	);
 	const breadcrumbItems: BreadCrumbItem[] = [
@@ -105,7 +108,7 @@ export default function Navigator() {
 			url: dbUrl,
 		},
 		{
-			name: model.name,
+			name: model?.name,
 			url: `${dbUrl}/${database._id}/models`,
 		},
 		{
@@ -121,7 +124,6 @@ export default function Navigator() {
 	return (
 		<VersionTabLayout
 			isEmpty={false}
-			title={title}
 			type='field'
 			emptyStateTitle={t('database.fields.no_fields')}
 			table={table}
@@ -137,39 +139,45 @@ export default function Navigator() {
 				</Button>
 			}
 		>
-			<div className='flex gap-4 justify-center h-[87%]'>
-				<SelectModel />
-				{isFetching && !isSorted && !isFetchingNextPage ? (
-					<div className='flex-1 flex items-center justify-center'>
-						<BeatLoader color='#6884FD' size={24} margin={18} />
-					</div>
-				) : data.length > 0 ? (
-					<div className='w-5/6 table-container overflow-auto' id='scroll'>
-						<InfiniteScroll
-							hasMore={hasNextPage}
-							next={fetchNextPage}
-							loader={isFetchingNextPage && <TableLoading />}
-							dataLength={data.length}
-							scrollableTarget='scroll'
-							className='!overflow-visible h-full'
-						>
-							<DataTable<any>
-								table={table}
-								className='navigator table-fixed w-full h-full relative'
-								headerClassName='sticky top-0 z-50'
-								containerClassName='!border-none h-full'
-								onCellClick={(cell) => {
-									if (editedField !== cell.id) setEditedField(cell.id);
-								}}
-							/>
-						</InfiniteScroll>
-					</div>
-				) : (
-					<div className='flex-1'>
-						<EmptyState title={t('database.models.no_data')} type='database' />
-					</div>
-				)}
-			</div>
+			{!_.isEmpty(model) ? (
+				<div className='flex gap-4 justify-center h-[calc(100%-50px)]'>
+					<SelectModel />
+					{isFetching && !isSorted && !isFetchingNextPage ? (
+						<div className='flex-1 flex items-center justify-center'>
+							<BeatLoader color='#6884FD' size={24} margin={18} />
+						</div>
+					) : data.length > 0 ? (
+						<div className='w-5/6 table-container overflow-auto' id='scroll'>
+							<InfiniteScroll
+								hasMore={hasNextPage}
+								next={fetchNextPage}
+								loader={isFetchingNextPage && <TableLoading />}
+								dataLength={data.length}
+								scrollableTarget='scroll'
+								className='!overflow-visible h-full'
+							>
+								<DataTable<any>
+									table={table}
+									className='navigator table-fixed w-full h-full relative'
+									headerClassName='sticky top-0 z-50'
+									containerClassName='!border-none h-full'
+									onCellClick={(cell) => {
+										if (editedField !== cell.id) setEditedField(cell.id);
+									}}
+								/>
+							</InfiniteScroll>
+						</div>
+					) : (
+						<div className='flex-1 '>
+							<EmptyState title={t('database.models.no_data')} type='database' />
+						</div>
+					)}
+				</div>
+			) : (
+				<div className='flex-1 flex flex-col justify-center items-center h-full w-full'>
+					<EmptyState title={t('database.models.no_models')} type='model' />
+				</div>
+			)}
 		</VersionTabLayout>
 	);
 }
