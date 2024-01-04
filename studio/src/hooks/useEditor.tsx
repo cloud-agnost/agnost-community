@@ -128,6 +128,7 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 				})),
 			);
 		};
+		validate(editor.getValue());
 		editor.onDidFocusEditorText(() => {
 			editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
 				editor.trigger('editor', 'editor.action.formatDocument', undefined);
@@ -135,8 +136,7 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 			});
 		});
 		editor.onDidChangeModelContent(() => {
-			const code = editor.getValue();
-			validate(code);
+			validate(editor.getValue());
 		});
 
 		monaco.languages.registerDocumentFormattingEditProvider('typescript', {
@@ -277,10 +277,6 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 			checkJs: true,
 			strict: true,
 			typeRoots: ['node_modules/@types'],
-		});
-		monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-			noSemanticValidation: true,
-			noSyntaxValidation: true,
 		});
 	};
 
