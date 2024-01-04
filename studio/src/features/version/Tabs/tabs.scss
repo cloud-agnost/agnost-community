@@ -41,7 +41,7 @@
 			}
 			&::before {
 				content: '';
-				@apply absolute bottom-0 left-0 right-0 h-0.5 bg-button-primary opacity-0 transition z-50;
+				@apply absolute bottom-0 left-0 right-0 h-0.5 bg-button-primary opacity-0 transition z-[9];
 			}
 
 			.tab-item-link {
@@ -58,7 +58,7 @@
 			}
 
 			&:first-child {
-				@apply sticky left-0 z-[51];
+				@apply sticky left-0 z-10;
 			}
 
 			&.icon {
