@@ -76,7 +76,6 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 		return team.find(({ member }) => member._id === form.watch('userId'))?.member;
 	}, [form.watch('userId'), team]);
 
-	console.log('selectedMember', selectedMember);
 	return (
 		<div className='space-y-4'>
 			{error && (

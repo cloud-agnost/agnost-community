@@ -9,7 +9,6 @@ interface VersionLogDetailsProps {
 export default function VersionLogDetails({ open, onClose }: VersionLogDetailsProps) {
 	const { log } = useVersionStore();
 	const { t } = useTranslation();
-	console.log('detail', log);
 	return (
 		<Drawer open={open} onOpenChange={onClose}>
 			<DrawerContent>
