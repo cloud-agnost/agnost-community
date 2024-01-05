@@ -100,9 +100,14 @@
 	"instance": "Instance",
 	"status": "Status",
 	"slider": {
-		"rapid": "Accelerate your app development journey with our cutting-edge platform designed for rapid innovation and unbeatable efficiency.",
-		"database": "Amplify your backend capabilities and seamlessly leverage the power of multiple databases, including PostgreSQL, MySQL and MongoDB.",
-		"realtime": "Build real-time apps that deliver a seamless user experience with real-time servers that sync data across all connected devices in milliseconds."
+		"faster": "Accelerate your app development journey with our cutting-edge <bold>vendor agnostic</bold> and <bold>fully open-source</bold> platform designed for rapid innovatio and unbeatable efficiency.",
+		"tools": "All-in-one backend development. <bold>Database, authentication, app server, realtime, cron jobs, message queues </bold> — it's all here. Agnost gives developers the technologies to build scalable & secure backend apps in minutes.",
+		"database": "<bold>Build complex data models</bold> with relations, rich set of fields and built-in validation rules. Effortlessly manage your <bold>PostgreSQL, MySQL</bold> or <bold>MongoDB</bold> data with a powerful and intuitive user interface.",
+		"serverless": "Write simple, single-purpose functions that are attached to events emitted from your backend application. Your function is triggered when an event being watched is fired and your code is executed in a <bold>fully dedicated environment</bold> with <bold>auto-scaling capabilities</bold>.",
+		"queue": "Offload heavy computations from a parent service to a child one for <bold>asynchronous processing</bold> using <bold>RabbitMQ</bold> so that the parent service can return a response to the client faster and eventually improve response time.",
+		"cron": "<bold>Schedule jobs</bold> to run periodically at fixed times, dates, or intervals. Automate maintenance, administration, and repetitive jobs and make it useful for sending periodic emails, generating documents, performing bulk updates in the database.",
+		"realtime": "Listen to realtime changes with <bold>pub/sub pattern</bold> and <bold>broadcast</bold> the changes to the subscribers through realtime channels. Publish and subscribe to data streams in real-time using a simple and flexible API.",
+		"security": "Apply <bold>security policies</bold> to your backend services and functions. Secure your data and services with authentication, authorization, and encryption. Protect your services from malicious attacks and unauthorized access through <bold>API keys, rate limits, authorized origins</bold> and <bold>IP whitelisting</bold>."
 	},
 	"internalServerError": "Internal Server Error",
 	"internalServerErrorDescription": "Our apologies for the inconvenience. Please help us to resolve this issue by providing the steps to replicate it, screenshots, or any other relevant information.",
