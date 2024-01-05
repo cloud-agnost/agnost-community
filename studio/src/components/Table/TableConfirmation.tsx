@@ -55,7 +55,7 @@ export function TableConfirmation({
 								variant='blank'
 								rounded
 								disabled={!hasPermission || disabled}
-								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
+								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-white'
 								iconOnly
 								onClick={(e) => e.stopPropagation()}
 							>
