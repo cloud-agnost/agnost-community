@@ -8,6 +8,7 @@ import appInvitationCtrl from "../controllers/appInvitation.js";
 import orgMemberCtrl from "../controllers/organizationMember.js";
 import appCtrl from "../controllers/app.js";
 import authCtrl from "../controllers/auth.js";
+import orgCtrl from "../controllers/organization.js";
 import { applyRules } from "../schemas/user.js";
 import { authSession } from "../middlewares/authSession.js";
 import { checkContentType } from "../middlewares/contentType.js";
@@ -1454,12 +1455,84 @@ router.post(
 			await userCtrl.commit(session);
 			res.json();
 
+			// Send realtime notifications
+			for (let i = 0; i < orgMemberships.length; i++) {
+				const orgMembership = orgMemberships[i];
+				// Get organization information
+				const orgInfo = await orgCtrl.getOneById(orgMembership.orgId, {
+					cacheKey: orgMembership.orgId,
+				});
+
+				sendNotification(orgMembership.orgId, {
+					actor: {
+						userId: req.user._id,
+						name: req.user.name,
+						pictureUrl: req.user.pictureUrl,
+						color: req.user.color,
+						contactEmail: req.user.contactEmail,
+						loginEmail: req.user.loginProfiles[0].email,
+					},
+					action: "update",
+					object: "org.member",
+					description: t(
+						"Updated organization member role of user '%s' (%s) to 'Admin'",
+						transferredUser.name,
+						transferredUser.contactEmail
+					),
+					timestamp: Date.now(),
+					data: {
+						...orgMembership,
+						member: {
+							_id: transferredUser._id,
+							iid: transferredUser.iid,
+							color: transferredUser.color,
+							contactEmail: transferredUser.contactEmail,
+							name: transferredUser.name,
+							pictureUrl: transferredUser.pictureUrl,
+							loginEmail: transferredUser.loginProfiles[0].email,
+							isOrgOwner:
+								orgInfo.ownerUserId.toString() ===
+								transferredUser._id.toString(),
+						},
+					},
+					identifiers: { orgId: orgMembership.orgId },
+				});
+			}
+
+			// Send realtime notifications
+			for (let i = 0; i < apps.length; i++) {
+				const app = apps[i];
+				const appInfo = await appCtrl.getOneById(app._id, {
+					cacheKey: app._id,
+				});
+
+				sendNotification(appInfo._id, {
+					actor: {
+						userId: req.user._id,
+						name: req.user.name,
+						pictureUrl: req.user.pictureUrl,
+						color: req.user.color,
+						contactEmail: req.user.contactEmail,
+						loginEmail: req.user.loginProfiles[0].email,
+					},
+					action: "update",
+					object: "org.app.team",
+					description: t(
+						"Updated application member role of user '%s' (%s) to 'Admin'",
+						transferredUser.name,
+						transferredUser.contactEmail
+					),
+					timestamp: Date.now(),
+					data: appInfo,
+					identifiers: { orgId: app.orgId, appId: app._id },
+				});
+			}
 			// Log action
 			auditCtrl.logAndNotify(
 				originalUser._id,
 				originalUser,
 				"user",
-				"transfer",
+				"update",
 				t(
 					"Transferred cluster ownership to user '%s' (%s)",
 					transferredUser.name,
@@ -1473,7 +1546,7 @@ router.post(
 				transferredUser._id,
 				transferredUser,
 				"user",
-				"transfer",
+				"update",
 				t("Became the new cluster owner"),
 				transferredUser
 			);

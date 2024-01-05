@@ -1407,7 +1407,7 @@ router.delete(
 					return res.status(422).json({
 						error: t("Not Allowed"),
 						details: t(
-							"You cannot remove a user who owns an app from the organization. The user first needs to transfer the app '%s' ownership to another app 'Admin' member.",
+							"You cannot remove a user who owns an app from the organization. The user first needs to transfer the app '%s' ownership to another app member with 'Admin' privileges.",
 							app.name
 						),
 						code: ERROR_CODES.notAllowed,
@@ -1651,7 +1651,7 @@ router.delete(
 					return res.status(422).json({
 						error: t("Not Allowed"),
 						details: t(
-							"You cannot leave the organization team, because you are owner of at least one app of the organization. You first need to transfer  app '%s' ownership to another app 'Admin' member.",
+							"You cannot leave the organization team, because you are owner of at least one app of the organization. You first need to transfer  app '%s' ownership to another app member with 'Admin' privileges.",
 							app.name
 						),
 						code: ERROR_CODES.notAllowed,
@@ -1747,7 +1747,7 @@ router.post(
 				req.org._id,
 				req.user,
 				"org",
-				"transfer",
+				"update",
 				t(
 					"Transferred organization ownership to user '%s' (%s)",
 					transferredUser.name,
