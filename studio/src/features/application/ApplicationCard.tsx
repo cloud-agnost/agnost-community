@@ -18,7 +18,9 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
 	const { user } = useAuthStore();
 	const { t } = useTranslation();
 	const { onAppClick, loading, application: selectedApp } = useApplicationStore();
-	const role = application.team?.find(({ userId }) => userId._id === user?._id)?.role as string;
+	const role = user.isClusterOwner
+		? AppRoles.Admin
+		: (application.team?.find(({ userId }) => userId._id === user?._id)?.role as string);
 	return (
 		<div
 			className='application-card relative'

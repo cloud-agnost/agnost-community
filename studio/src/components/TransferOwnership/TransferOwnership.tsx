@@ -31,13 +31,13 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 	const user = useAuthStore((state) => state.user);
 	const { t } = useTranslation();
 	const { members } = useOrganizationStore();
-	const { applicationTeam } = useApplicationStore();
+	const { applicationTeam, application } = useApplicationStore();
 	const team =
 		type === 'app'
 			? applicationTeam.filter(({ member }) => member._id !== user?._id)
 			: members.filter(({ member }) => member._id !== user?._id);
 	const { toast } = useToast();
-	const { orgId, appId } = useParams() as Record<string, string>;
+	const { orgId } = useParams() as Record<string, string>;
 	const form = useForm<z.infer<typeof TransferOwnershipSchema>>({
 		mode: 'onChange',
 		resolver: zodResolver(TransferOwnershipSchema),
@@ -67,14 +67,16 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 	const onSubmit = async (data: z.infer<typeof TransferOwnershipSchema>) => {
 		mutateAsync({
 			...data,
-			...(type === 'org' && { orgId: orgId }),
-			...(type === 'app' && { appId: appId }),
+			...(type !== 'cluster' && { orgId: orgId }),
+			...(type === 'app' && { appId: application?._id }),
 		});
 	};
 
 	const selectedMember = useMemo(() => {
 		return team.find(({ member }) => member._id === form.watch('userId'))?.member;
 	}, [form.watch('userId'), team]);
+
+	console.log('selectedMember', selectedMember);
 	return (
 		<div className='space-y-4'>
 			{error && (
@@ -91,7 +93,11 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 						render={({ field }) => (
 							<FormItem className='space-y-1'>
 								<FormControl>
-									<Select defaultValue={field.value} onValueChange={field.onChange}>
+									<Select
+										defaultValue={field.value}
+										onValueChange={field.onChange}
+										disabled={disabled}
+									>
 										<FormControl>
 											<SelectTrigger error={error} className='w-full  [&>span]:!max-w-full'>
 												<SelectValue
@@ -99,14 +105,16 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 												>
 													<div className='flex items-center justify-between w-full'>
 														<div className='flex items-center gap-2'>
-															<Avatar size='xs'>
-																<AvatarImage src={selectedMember?.pictureUrl} />
-																<AvatarFallback
-																	isUserAvatar
-																	color={selectedMember?.color ?? 'gray'}
-																	name={selectedMember?.name}
-																/>
-															</Avatar>
+															{selectedMember && (
+																<Avatar size='xs'>
+																	<AvatarImage src={selectedMember?.pictureUrl} />
+																	<AvatarFallback
+																		isUserAvatar
+																		color={selectedMember?.color ?? 'gray'}
+																		name={selectedMember?.name}
+																	/>
+																</Avatar>
+															)}
 
 															<p className='text-default text-sm leading-6'>
 																{selectedMember?.name}
