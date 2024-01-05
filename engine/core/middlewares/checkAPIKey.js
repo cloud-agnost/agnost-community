@@ -114,11 +114,6 @@ export const checkAPIKey = (endpoint) => (req, res, next) => {
 				break;
 		}
 	}
-	console.log("origin", req.header("origin"));
-	console.log("x-forwarded-host", req.header("x-forwarded-host"));
-	console.log("x-forwarded-port", req.header("x-forwarded-port"));
-	console.log("host", req.get("host"));
-	console.log("x-forwarded-for", req.headers["x-forwarded-for"]);
 
 	// Check if the api key requires authorized domains and if yes check whether the request origin is from a valid domain
 	if (apiKeyObj.domainAuthorization === "specified") {

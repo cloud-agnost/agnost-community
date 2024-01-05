@@ -198,10 +198,10 @@ router.post("/cluster-enforce-ssl", checkContentType, authAccessToken, async (re
 */
 router.post("/mysql-operator-restart", checkContentType, authAccessToken, async (req, res) => {
     try {
+        res.json();
+
         let manager = new ResourceManager(null);
         await manager.restartMySQLOperator();
-
-        res.json();
     } catch (error) {
         helper.handleError(req, res, error);
     }

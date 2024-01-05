@@ -104,17 +104,19 @@ router.post(
 					{ session }
 				);
 
-				// Due to a bug in mysql operator where we cannot create a mysql database in clusters except minikube, we need to restart the mysql operator
-				await axios.post(
-					helper.getWorkerUrl() + "/v1/resource/mysql-operator-restart",
-					{},
-					{
-						headers: {
-							Authorization: process.env.ACCESS_TOKEN,
-							"Content-Type": "application/json",
-						},
-					}
-				);
+				try {
+					// Due to a bug in mysql operator where we cannot create a mysql database in clusters except minikube, we need to restart the mysql operator
+					await axios.post(
+						helper.getWorkerUrl() + "/v1/resource/mysql-operator-restart",
+						{},
+						{
+							headers: {
+								Authorization: process.env.ACCESS_TOKEN,
+								"Content-Type": "application/json",
+							},
+						}
+					);
+				} catch (err) {}
 			} else {
 				// Update existing configuration
 				await clsCtrl.updateOneById(

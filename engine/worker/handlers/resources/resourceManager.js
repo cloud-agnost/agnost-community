@@ -410,7 +410,6 @@ export class ResourceManager {
             );
             return { success: true };
         } catch (err) {
-            console.log("***err", err);
             return { success: false, err };
         }
     }
@@ -1857,24 +1856,17 @@ export class ResourceManager {
                 process.env.NAMESPACE === "default" ? "operators" : `${process.env.NAMESPACE}-operators`
             );
 
-            // Increment the revision in the deployment template to trigger a rollout
-            currentDeployment.body.spec.template.metadata.annotations = {
-                ...currentDeployment.body.spec.template.metadata.annotations,
-                "kubectl.kubernetes.io/restartedAt": new Date().toISOString(),
-            };
+            const container = currentDeployment.body.spec.template.spec.containers[0];
+            container.env.push({
+                name: "RESTART_TIMESTAMP",
+                value: new Date().toISOString(),
+            });
 
-            // Apply the changes using the patchNamespacedDeployment function
-            const requestOptions = { headers: { "Content-Type": "application/merge-patch+json" } };
-            await k8sApi.patchNamespacedDeployment(
+            // Apply the changes using the replaceNamespacedDeployment function
+            await k8sApi.replaceNamespacedDeployment(
                 "mysql-operator",
                 process.env.NAMESPACE === "default" ? "operators" : `${process.env.NAMESPACE}-operators`,
-                { body: currentDeployment.body },
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                requestOptions
+                currentDeployment.body
             );
         } catch (err) {
             logger.error(`Cannot restart the mysql-operator.${err.message}`, { details: err });
