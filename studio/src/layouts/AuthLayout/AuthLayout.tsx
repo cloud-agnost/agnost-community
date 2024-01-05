@@ -18,10 +18,10 @@ export default function AuthLayout({ children, className }: AuthLayoutProps) {
 				<div className='flex flex-col justify-center items-center h-[90%]'>
 					<Carousel
 						showArrows={false}
-						items={SLIDER_IMAGES.map(({ image, text }) => {
+						items={SLIDER_IMAGES.map(({ image, key }) => {
 							return {
-								element: <img src={image} alt={text} key={image} />,
-								text,
+								element: <img src={image} alt={key} key={image} />,
+								key,
 							};
 						})}
 					/>
