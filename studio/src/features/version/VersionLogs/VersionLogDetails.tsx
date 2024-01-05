@@ -9,6 +9,7 @@ interface VersionLogDetailsProps {
 export default function VersionLogDetails({ open, onClose }: VersionLogDetailsProps) {
 	const { log } = useVersionStore();
 	const { t } = useTranslation();
+	console.log('detail', log);
 	return (
 		<Drawer open={open} onOpenChange={onClose}>
 			<DrawerContent>
@@ -19,6 +20,7 @@ export default function VersionLogDetails({ open, onClose }: VersionLogDetailsPr
 					<div className='space-y-4 h-[85%]'>
 						<p className='text-default font-sfCompact text-sm'>{t('version.details')}</p>
 						<CodeEditor
+							key={log._id}
 							value={JSON.stringify(log, null, 2)}
 							defaultLanguage='json'
 							containerClassName='h-full'
