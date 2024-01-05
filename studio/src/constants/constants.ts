@@ -155,7 +155,7 @@ export const SLIDER_IMAGES = [
 		image: RealtimeCollaboration,
 	},
 	{
-		key: translate('general.slider.security'),
+		key: 'security',
 		image: Security,
 	},
 ];
