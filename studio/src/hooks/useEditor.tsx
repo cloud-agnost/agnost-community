@@ -130,7 +130,7 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 
 	function configureEditor(editor: monaco.editor.IStandaloneCodeEditor, monaco: any) {
 		const validate = (code: string) => {
-			if (editor.getModel()?.getLanguageId() === 'json') return;
+			if (editor.getModel()?.getLanguageId() !== 'javascript') return;
 			const messages = linter.verify(
 				code,
 				config as Linter.Config<Linter.RulesRecord, Linter.RulesRecord>,
