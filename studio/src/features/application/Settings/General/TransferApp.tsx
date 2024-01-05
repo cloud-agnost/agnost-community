@@ -1,6 +1,5 @@
 import { SettingsFormItem } from '@/components/SettingsFormItem';
 import { TransferOwnership } from '@/components/TransferOwnership';
-import useAuthorizeApp from '@/hooks/useAuthorizeApp';
 import useApplicationStore from '@/store/app/applicationStore';
 import useAuthStore from '@/store/auth/authStore';
 import { useTranslation } from 'react-i18next';
