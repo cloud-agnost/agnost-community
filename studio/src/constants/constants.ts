@@ -1,6 +1,11 @@
+import Tools from '@/assets/images/complete_set_of_tools.webp';
+import CronJobs from '@/assets/images/cron_jobs.webp';
 import Database from '@/assets/images/database.png';
-import Rapid from '@/assets/images/rapid.png';
-import Realtime from '@/assets/images/realtime.png';
+import FasterDevelopment from '@/assets/images/faster_development.webp';
+import Queue from '@/assets/images/message_queues.webp';
+import RealtimeCollaboration from '@/assets/images/realtime_collaboration.webp';
+import Security from '@/assets/images/security.webp';
+import Serverless from '@/assets/images/serverless_functions.webp';
 import {
 	ApiKeys,
 	Apple,
@@ -122,16 +127,36 @@ export const MAX_DB_SIZE = 50;
 
 export const SLIDER_IMAGES = [
 	{
-		text: translate('general.slider.rapid'),
-		image: Rapid,
+		key: 'faster',
+		image: FasterDevelopment,
 	},
 	{
-		text: translate('general.slider.database'),
+		key: 'tools',
+		image: Tools,
+	},
+	{
+		key: 'database',
 		image: Database,
 	},
 	{
-		text: translate('general.slider.realtime'),
-		image: Realtime,
+		key: 'serverless',
+		image: Serverless,
+	},
+	{
+		key: 'queue',
+		image: Queue,
+	},
+	{
+		key: 'cron',
+		image: CronJobs,
+	},
+	{
+		key: 'realtime',
+		image: RealtimeCollaboration,
+	},
+	{
+		key: translate('general.slider.security'),
+		image: Security,
 	},
 ];
 
