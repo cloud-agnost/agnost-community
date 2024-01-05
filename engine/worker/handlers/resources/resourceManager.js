@@ -410,7 +410,6 @@ export class ResourceManager {
             );
             return { success: true };
         } catch (err) {
-            console.log("***err", err);
             return { success: false, err };
         }
     }
@@ -1838,6 +1837,39 @@ export class ResourceManager {
             );
         } catch (err) {
             logger.error(`Cannot update ssl access settings of ingress '${ingressName}'`, { details: err });
+        }
+    }
+
+    /**
+     * Restarts the MySQL Operator by triggering a rollout of the deployment.
+     * @returns {Promise<void>} A promise that resolves when the restart is complete.
+     */
+    async restartMySQLOperator() {
+        try {
+            const kc = new k8s.KubeConfig();
+            kc.loadFromDefault();
+            const k8sApi = kc.makeApiClient(k8s.AppsV1Api);
+
+            // Get the current deployment
+            const currentDeployment = await k8sApi.readNamespacedDeployment(
+                "mysql-operator",
+                process.env.NAMESPACE === "default" ? "operators" : `${process.env.NAMESPACE}-operators`
+            );
+
+            const container = currentDeployment.body.spec.template.spec.containers[0];
+            container.env.push({
+                name: "RESTART_TIMESTAMP",
+                value: new Date().toISOString(),
+            });
+
+            // Apply the changes using the replaceNamespacedDeployment function
+            await k8sApi.replaceNamespacedDeployment(
+                "mysql-operator",
+                process.env.NAMESPACE === "default" ? "operators" : `${process.env.NAMESPACE}-operators`,
+                currentDeployment.body
+            );
+        } catch (err) {
+            logger.error(`Cannot restart the mysql-operator.${err.message}`, { details: err });
         }
     }
 }

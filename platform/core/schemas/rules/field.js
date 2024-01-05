@@ -40,14 +40,25 @@ const defaultRules = (type) => {
 						)
 					)
 					.bail()
-					.custom((value) => {
-						let regex = /^[A-Za-z0-9_]+$/;
-						if (!regex.test(value)) {
-							throw new AgnostError(
-								t(
-									"Field names can include only numbers, letters and underscore (_) characters"
-								)
-							);
+					.custom((value, { req }) => {
+						if (req.db.type === "PostgreSQL") {
+							let regex = /^[a-z0-9_$.]+$/;
+							if (!regex.test(value)) {
+								throw new AgnostError(
+									t(
+										"Field names can include only numbers, lowercase letters and underscore (_) characters"
+									)
+								);
+							}
+						} else {
+							let regex = /^[A-Za-z0-9_]+$/;
+							if (!regex.test(value)) {
+								throw new AgnostError(
+									t(
+										"Field names can include only numbers, letters and underscore (_) characters"
+									)
+								);
+							}
 						}
 
 						let regex2 = /^[0-9].*$/;
@@ -175,14 +186,25 @@ const defaultRules = (type) => {
 						)
 					)
 					.bail()
-					.custom((value) => {
-						let regex = /^[A-Za-z0-9_]+$/;
-						if (!regex.test(value)) {
-							throw new AgnostError(
-								t(
-									"Field names can include only numbers, letters and underscore (_) characters"
-								)
-							);
+					.custom((value, { req }) => {
+						if (req.db.type === "PostgreSQL") {
+							let regex = /^[a-z0-9_$.]+$/;
+							if (!regex.test(value)) {
+								throw new AgnostError(
+									t(
+										"Field names can include only numbers, lowercase letters and underscore (_) characters"
+									)
+								);
+							}
+						} else {
+							let regex = /^[A-Za-z0-9_]+$/;
+							if (!regex.test(value)) {
+								throw new AgnostError(
+									t(
+										"Field names can include only numbers, letters and underscore (_) characters"
+									)
+								);
+							}
 						}
 
 						let regex2 = /^[0-9].*$/;

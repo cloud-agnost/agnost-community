@@ -437,7 +437,7 @@ router.delete(
 				return res.status(401).json({
 					error: t("Not Authorized"),
 					details: t(
-						"You are not authorized to delete app '%s'. Only the creator of the app or cluster owner can delete it.",
+						"You are not authorized to delete app '%s'. Only the owner of the app or cluster owner can delete it.",
 						app.name
 					),
 					code: ERROR_CODES.unauthorized,
@@ -546,8 +546,8 @@ router.post(
 			auditCtrl.logAndNotify(
 				app._id,
 				user,
-				"org.app",
-				"transfer",
+				"org.app.team",
+				"update",
 				t(
 					"Transferred app ownership to '%s' (%s)",
 					transferredUser.name,

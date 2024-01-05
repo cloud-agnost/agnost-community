@@ -53,5 +53,10 @@
         "expressSessionSecret": "f7A95f08.62d2*4c4c!b85c%734149347fcf",
         "maxBackoffSeconds": 30,
         "defaultDBPoolSize": 3
-     }
+     },
+     "session": {
+      "accessTokenExpiry": 300,
+      "refreshTokenExpiry": 31536000,
+      "refreshTokenDelete": 5
+    }
 }

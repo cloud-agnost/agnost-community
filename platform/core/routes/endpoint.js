@@ -43,8 +43,12 @@ router.get(
 			let query = { versionId: version._id };
 			if (search) {
 				query.$or = [
-					{ name: { $regex: search, $options: "i" } },
-					{ path: { $regex: search, $options: "i" } },
+					{
+						name: { $regex: helper.escapeStringRegexp(search), $options: "i" },
+					},
+					{
+						path: { $regex: helper.escapeStringRegexp(search), $options: "i" },
+					},
 				];
 			}
 			if (start && !end) query.createdAt = { $gte: start };

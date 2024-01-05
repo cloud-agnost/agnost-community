@@ -496,6 +496,12 @@ function getWorkerUrl() {
 	return `http://engine-worker-clusterip-service.${process.env.NAMESPACE}.svc.cluster.local:4000`;
 }
 
+function escapeStringRegexp(text) {
+	// Escape characters with special meaning either inside or outside character sets.
+	// Use a simple backslash escape when it’s always valid, and a `\xnn` escape when the simpler form would be disallowed by Unicode patterns’ stricter grammar.
+	return text.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
+}
+
 export default {
 	constants,
 	isObject,
@@ -528,4 +534,5 @@ export default {
 	getRealtimeUrl,
 	getPlatformUrl,
 	getWorkerUrl,
+	escapeStringRegexp,
 };

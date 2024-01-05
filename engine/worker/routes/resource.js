@@ -190,4 +190,21 @@ router.post("/cluster-enforce-ssl", checkContentType, authAccessToken, async (re
     }
 });
 
+/*
+@route      /resource/mysql-operator-restart
+@method     POST
+@desc       Restarts the mysql-operator
+@access     public
+*/
+router.post("/mysql-operator-restart", checkContentType, authAccessToken, async (req, res) => {
+    try {
+        res.json();
+
+        let manager = new ResourceManager(null);
+        await manager.restartMySQLOperator();
+    } catch (error) {
+        helper.handleError(req, res, error);
+    }
+});
+
 export default router;
