@@ -116,5 +116,6 @@ function returnError(res, endpoint, errorObj, status = 400) {
 		)
 	);
 
-	return res.status(status).json(errorObj);
+	// Send the error response if the headers are not sent already
+	if (!res.headersSent) return res.status(status).json(errorObj);
 }
