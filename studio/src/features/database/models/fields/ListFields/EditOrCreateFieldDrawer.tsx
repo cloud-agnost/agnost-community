@@ -162,7 +162,10 @@ export default function EditOrCreateFieldDrawer({
 	const Schema = z.object({
 		general: z
 			.object({
-				name: StorageNameSchema,
+				name: StorageNameSchema.transform((value) => {
+					if (database?.type === DATABASE.PostgreSQL) return value.toLowerCase();
+					else return value;
+				}),
 				type: z.nativeEnum(FieldTypes),
 				required: z.boolean(),
 				unique: z.boolean(),
@@ -712,7 +715,7 @@ export default function EditOrCreateFieldDrawer({
 							? t('database.fields.edit')
 							: t('database.fields.add_field', {
 									field: toDisplayName(type ? type?.name : ''),
-							  })}
+								})}
 					</DrawerTitle>
 				</DrawerHeader>
 				<div className='p-6 space-y-6'>
@@ -1020,7 +1023,7 @@ export default function EditOrCreateFieldDrawer({
 																						database.type === DATABASE.MySQL
 																							? t(
 																									'database.fields.searchable.collation.placeholder',
-																							  )
+																								)
 																							: t('database.fields.searchable.lang.placeholder')
 																					}
 																				/>

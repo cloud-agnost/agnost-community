@@ -1,4 +1,3 @@
-import { create } from 'zustand';
 import { MiddlewareService } from '@/services';
 import {
 	APIError,
@@ -12,7 +11,9 @@ import {
 	UpdateMiddlewareParams,
 } from '@/types';
 import { isEmpty, updateOrPush } from '@/utils';
+import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import useVersionStore from '../version/versionStore';
 
 interface MiddlewareStore {
 	middlewares: Middleware[];
@@ -55,6 +56,12 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 				if (params.onSuccess) {
 					params.onSuccess(middleware);
 				}
+				useVersionStore.setState?.((state) => ({
+					dashboard: {
+						...state.dashboard,
+						middleware: state.dashboard.middleware + 1,
+					},
+				}));
 				return middleware;
 			} catch (e) {
 				const error = e as APIError;

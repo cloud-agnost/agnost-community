@@ -10,12 +10,12 @@
 		}
 	}
 	&-label {
-		@apply flex items-center px-1 rounded-none h-full w-full hover:bg-wrapper-background-hover transition font-normal;
+		@apply flex items-center px-1.5 rounded-none h-full w-full hover:bg-wrapper-background-hover transition font-normal;
 	}
 	&-dropdown {
 		@apply w-[210px] h-12 relative border border-border rounded-sm;
 		&-button {
-			@apply absolute z-50 top-1 right-0  p-1.5;
+			@apply absolute z-50 top-1 -right-1  p-1.5;
 			@apply text-icon-base hover:text-icon-secondary;
 		}
 		&-icon {

@@ -11,6 +11,7 @@ import {
 	UpdateCacheParams,
 } from '@/types';
 import { devtools } from 'zustand/middleware';
+import useVersionStore from '../version/versionStore';
 
 interface CacheStore {
 	caches: Cache[];
@@ -77,6 +78,12 @@ const useCacheStore = create<CacheStore & Actions>()(
 				try {
 					const cache = await CacheService.createCache(params);
 					set({ caches: [cache, ...get().caches] });
+					useVersionStore.setState?.((state) => ({
+						dashboard: {
+							...state.dashboard,
+							cache: state.dashboard.cache + 1,
+						},
+					}));
 					if (params.onSuccess) params.onSuccess(cache);
 				} catch (error) {
 					if (params.onError) params.onError(error as APIError);
@@ -114,6 +121,7 @@ const useCacheStore = create<CacheStore & Actions>()(
 					set({
 						caches: get().caches.filter((c) => !params.cacheIds.includes(c._id)),
 					});
+
 					if (params.onSuccess) params.onSuccess();
 				} catch (error) {
 					if (params.onError) params.onError(error as APIError);

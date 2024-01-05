@@ -3,6 +3,7 @@ import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { LogTypes, RealtimeActionParams, Task as TaskType } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
+import useVersionStore from '@/store/version/versionStore';
 class Task implements RealtimeActions<TaskType> {
 	log({ message, timestamp, id, type }: RealtimeActionParams<TaskType>) {
 		setTimeout(() => {
@@ -19,6 +20,12 @@ class Task implements RealtimeActions<TaskType> {
 			tasks: useTaskStore.getState?.().tasks.filter((task) => task._id !== identifiers.taskId),
 		});
 		removeTabByPath(identifiers.versionId as string, identifiers.taskId as string);
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				task: state.dashboard.task - 1,
+			},
+		}));
 	}
 	update({ data }: RealtimeActionParams<TaskType>) {
 		const { updateTab } = useTabStore.getState();
@@ -47,6 +54,12 @@ class Task implements RealtimeActions<TaskType> {
 		useTaskStore.setState?.({
 			tasks: [...useTaskStore.getState().tasks, data],
 		});
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				task: state.dashboard.task + 1,
+			},
+		}));
 	}
 	telemetry(params: RealtimeActionParams<TaskType>) {
 		this.update(params);

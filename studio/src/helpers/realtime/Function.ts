@@ -1,5 +1,6 @@
 import useFunctionStore from '@/store/function/functionStore';
 import useTabStore from '@/store/version/tabStore';
+import useVersionStore from '@/store/version/versionStore';
 import { HelperFunction, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 export default class Function implements RealtimeActions<HelperFunction> {
@@ -12,6 +13,12 @@ export default class Function implements RealtimeActions<HelperFunction> {
 		});
 
 		removeTabByPath(identifiers.versionId as string, identifiers.functionId as string);
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				function: state.dashboard.function - 1,
+			},
+		}));
 	}
 	update({ data }: RealtimeActionParams<HelperFunction>): void {
 		const { updateTab } = useTabStore.getState();
@@ -39,6 +46,12 @@ export default class Function implements RealtimeActions<HelperFunction> {
 		useFunctionStore.setState?.({
 			functions: [...useFunctionStore.getState().functions, data],
 		});
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				function: state.dashboard.function + 1,
+			},
+		}));
 	}
 	telemetry(param: RealtimeActionParams<HelperFunction>): void {
 		this.update(param);

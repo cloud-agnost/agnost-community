@@ -1,11 +1,8 @@
-import { useDebounceFn, useEditor } from '@/hooks';
+import { useEditor } from '@/hooks';
 import { EDITOR_OPTIONS } from '@/hooks/useEditor';
 import useAuthStore from '@/store/auth/authStore';
-import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
-import useVersionStore from '@/store/version/versionStore';
-import { Tab } from '@/types';
-import { addLibsToEditor, cn, getTabIdFromUrl, isEmpty } from '@/utils';
+import { addLibsToEditor, cn, isEmpty } from '@/utils';
 import Loadable from '@loadable/component';
 import { EditorProps } from '@monaco-editor/react';
 import { useEffect, useState } from 'react';
@@ -31,25 +28,11 @@ export default function CodeEditor({
 	onSave,
 	options,
 }: CodeEditorProps) {
-	const { updateCurrentTab, getTabById } = useTabStore();
-	const { version } = useVersionStore();
 	const { typings } = useUtilsStore();
 	const [showLoader, setShowLoader] = useState(false);
 	const user = useAuthStore((state) => state.user);
-	const setTabState = useDebounceFn((isDirty) => {
-		const tabId = getTabIdFromUrl();
-		const tab = getTabById(version?._id, tabId as string) as Tab;
-		if (tab?.type.toLowerCase() === tab?.path) return;
-		updateCurrentTab(version?._id, {
-			...tab,
-			isDirty,
-		});
-	}, 500);
 
 	function handleOnChange(value: string | undefined, ev: any) {
-		if (defaultLanguage === 'javascript' && !readonly) {
-			setTabState(value !== ev.changes[0].text);
-		}
 		onChange?.(value, ev);
 	}
 	const { onBeforeMount, onCodeEditorMount, onCodeEditorChange } = useEditor({

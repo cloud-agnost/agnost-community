@@ -50,7 +50,6 @@ export default function Fields() {
 
 	const databasesUrl = `/organization/${database?.orgId}/apps/${database?.appId}/version/${database?.versionId}/database`;
 	const databaseUrl = `${databasesUrl}/${model?.dbId}/models`;
-	const goParentModelUrl = `${databaseUrl}/${model?._id}/fields`;
 
 	const breadcrumbItems: BreadCrumbItem[] = [
 		{
@@ -70,7 +69,7 @@ export default function Fields() {
 		<>
 			<VersionTabLayout<Field>
 				searchable
-				breadCrumb={<BreadCrumb goBackLink={goParentModelUrl} items={breadcrumbItems} />}
+				breadCrumb={<BreadCrumb goBackLink={databaseUrl} items={breadcrumbItems} />}
 				isEmpty={!filteredFields.length}
 				type='field'
 				handlerButton={<CreateFieldButton />}

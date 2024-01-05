@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/Avatar';
+import { Badge } from '@/components/Badge';
 import { Checkbox } from '@/components/Checkbox';
 import { DateText } from '@/components/DateText';
 import { RoleSelect } from '@/components/RoleDropdown';
@@ -83,7 +84,12 @@ export const OrganizationMembersColumns: ColumnDef<OrganizationMember>[] = [
 						<AvatarFallback name={member.name} color={member.color} isUserAvatar />
 					</Avatar>
 					<div className='flex flex-col'>
-						<span className='text-default text-sm'>{member.name}</span>
+						<div className='text-default text-sm flex items-center gap-4'>
+							<span className='text-default font-semibold'>{member.name}</span>
+							{member.isOrgOwner && (
+								<Badge variant='orange' text='Owner' className='p-0.5 text-sm' />
+							)}
+						</div>
 						<span className='text-subtle text-xs'>{member.contactEmail}</span>
 					</div>
 				</div>

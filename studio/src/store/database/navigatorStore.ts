@@ -58,6 +58,7 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 							[modelId]: data,
 						},
 						lastFetchedPage: {
+							...state.lastFetchedPage,
 							[modelId]: params.page,
 						},
 					}));
@@ -68,6 +69,7 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 							[modelId]: [...state.data[modelId], ...data],
 						},
 						lastFetchedPage: {
+							...state.lastFetchedPage,
 							[modelId]: params.page,
 						},
 					}));

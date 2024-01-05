@@ -105,7 +105,7 @@ export function OrganizationDropdown() {
 						</Button>
 					</PopoverTrigger>
 				</div>
-				<PopoverContent align='start' className='organization-dropdown-content'>
+				<PopoverContent align='end' className='organization-dropdown-content'>
 					<Command shouldFilter={false}>
 						{organizations.length > 5 && (
 							<CommandInput

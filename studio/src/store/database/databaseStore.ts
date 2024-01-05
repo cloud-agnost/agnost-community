@@ -1,4 +1,3 @@
-import { create } from 'zustand';
 import { DatabaseService } from '@/services';
 import {
 	CreateDatabaseParams,
@@ -9,7 +8,9 @@ import {
 	UpdateDatabaseParams,
 } from '@/types';
 import { updateOrPush } from '@/utils';
+import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import useVersionStore from '../version/versionStore';
 
 interface DatabaseStore {
 	databases: Database[];
@@ -81,15 +82,17 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 				return database;
 			},
 			createDatabase: async (params: CreateDatabaseParams): Promise<Database> => {
-				try {
-					const database = await DatabaseService.createDatabase(params);
-					set((prev) => ({
-						databases: [database, ...prev.databases],
-					}));
-					return database;
-				} catch (e) {
-					throw e;
-				}
+				const database = await DatabaseService.createDatabase(params);
+				set((prev) => ({
+					databases: [database, ...prev.databases],
+				}));
+				useVersionStore.setState?.((state) => ({
+					dashboard: {
+						...state.dashboard,
+						database: state.dashboard.database + 1,
+					},
+				}));
+				return database;
 			},
 			updateDatabase: async (params: UpdateDatabaseParams): Promise<Database> => {
 				const database = await DatabaseService.updateDatabaseName(params);
@@ -99,14 +102,10 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 				return database;
 			},
 			deleteDatabase: async (params: DeleteDatabaseParams) => {
-				try {
-					await DatabaseService.deleteDatabase(params);
-					set((prev) => ({
-						databases: prev.databases.filter((db) => db._id !== params.dbId),
-					}));
-				} catch (e) {
-					throw e;
-				}
+				await DatabaseService.deleteDatabase(params);
+				set((prev) => ({
+					databases: prev.databases.filter((db) => db._id !== params.dbId),
+				}));
 			},
 			setDatabase: (database: Database) => set({ database }),
 			reset: () => set(initialState),

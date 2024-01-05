@@ -1,5 +1,6 @@
 import useMiddlewareStore from '@/store/middleware/middlewareStore';
 import useTabStore from '@/store/version/tabStore';
+import useVersionStore from '@/store/version/versionStore';
 import { Middleware as MiddlewareType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 
@@ -12,6 +13,12 @@ export default class Middleware implements RealtimeActions<MiddlewareType> {
 				.middlewares.filter((middleware) => middleware._id !== identifiers.middlewareId),
 		});
 		removeTabByPath(identifiers.versionId as string, identifiers.middlewareId as string);
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				middleware: state.dashboard.middleware - 1,
+			},
+		}));
 	}
 	update({ data }: RealtimeActionParams<MiddlewareType>): void {
 		const { updateTab } = useTabStore.getState();
@@ -39,6 +46,12 @@ export default class Middleware implements RealtimeActions<MiddlewareType> {
 		useMiddlewareStore.setState?.({
 			middlewares: [data, ...useMiddlewareStore.getState().middlewares],
 		});
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				middleware: state.dashboard.middleware + 1,
+			},
+		}));
 	}
 	telemetry(param: RealtimeActionParams<MiddlewareType>): void {
 		this.update(param);

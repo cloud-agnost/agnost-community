@@ -1,6 +1,7 @@
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
+import useVersionStore from '@/store/version/versionStore';
 import { LogTypes, MessageQueue, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Queue implements RealtimeActions<MessageQueue> {
@@ -21,6 +22,12 @@ class Queue implements RealtimeActions<MessageQueue> {
 				.queues.filter((queue) => queue._id !== identifiers.queueId),
 		});
 		removeTabByPath(identifiers.versionId as string, identifiers.queueId as string);
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				queue: state.dashboard.queue - 1,
+			},
+		}));
 	}
 	update({ data }: RealtimeActionParams<MessageQueue>) {
 		const { updateTab } = useTabStore.getState();
@@ -48,6 +55,12 @@ class Queue implements RealtimeActions<MessageQueue> {
 		useMessageQueueStore.setState?.({
 			queues: [...useMessageQueueStore.getState().queues, data],
 		});
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				queue: state.dashboard.queue + 1,
+			},
+		}));
 	}
 	telemetry(params: RealtimeActionParams<MessageQueue>) {
 		this.update(params);

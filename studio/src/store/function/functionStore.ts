@@ -1,8 +1,9 @@
-import { create } from 'zustand';
 import { FunctionService } from '@/services';
 import * as funcTypes from '@/types';
 import { isEmpty, updateOrPush } from '@/utils';
+import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import useVersionStore from '../version/versionStore';
 interface FunctionStore {
 	functions: funcTypes.HelperFunction[];
 	function: funcTypes.HelperFunction;
@@ -88,6 +89,12 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				const func = await FunctionService.createFunction(params);
 				set((prev) => ({ functions: [func, ...prev.functions] }));
 				params.onSuccess?.(func);
+				useVersionStore.setState?.((state) => ({
+					dashboard: {
+						...state.dashboard,
+						function: state.dashboard.function + 1,
+					},
+				}));
 				return func;
 			} catch (err) {
 				params.onError?.(err as funcTypes.APIError);

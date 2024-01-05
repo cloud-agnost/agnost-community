@@ -1,5 +1,6 @@
 import useCacheStore from '@/store/cache/cacheStore';
 import useTabStore from '@/store/version/tabStore';
+import useVersionStore from '@/store/version/versionStore';
 import { Cache as CacheType, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Cache implements RealtimeActions<CacheType> {
@@ -11,6 +12,12 @@ class Cache implements RealtimeActions<CacheType> {
 				.caches.filter((cache) => cache._id !== identifiers.cacheId),
 		});
 		removeTabByPath(identifiers.versionId as string, identifiers.cacheId as string);
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				cache: state.dashboard.cache - 1,
+			},
+		}));
 	}
 	update({ data }: RealtimeActionParams<CacheType>): void {
 		const { updateTab } = useTabStore.getState();
@@ -35,6 +42,12 @@ class Cache implements RealtimeActions<CacheType> {
 		useCacheStore.setState?.({
 			caches: [...useCacheStore.getState().caches, data],
 		});
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				cache: state.dashboard.cache + 1,
+			},
+		}));
 	}
 	telemetry(param: RealtimeActionParams<CacheType>): void {
 		this.update(param);

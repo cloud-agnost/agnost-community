@@ -68,7 +68,7 @@ export default function ApplicationSelectDropdown() {
 						</Button>
 					</PopoverTrigger>
 				</div>
-				<PopoverContent align='start' className='application-dropdown-content'>
+				<PopoverContent align='end' className='application-dropdown-content'>
 					<Command shouldFilter={false}>
 						{applications.length > 5 && (
 							<CommandInput

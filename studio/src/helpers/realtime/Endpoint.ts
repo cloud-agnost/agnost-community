@@ -1,6 +1,7 @@
 import useEndpointStore from '@/store/endpoint/endpointStore';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
+import useVersionStore from '@/store/version/versionStore';
 import { Endpoint as EndpointType, LogTypes, RealtimeActionParams } from '@/types';
 import { RealtimeActions } from './RealtimeActions';
 class Endpoint implements RealtimeActions<EndpointType> {
@@ -22,6 +23,12 @@ class Endpoint implements RealtimeActions<EndpointType> {
 		});
 
 		removeTabByPath(identifiers.versionId as string, identifiers.endpointId as string);
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				endpoint: state.dashboard.endpoint - 1,
+			},
+		}));
 	}
 	update({ data }: RealtimeActionParams<EndpointType>) {
 		const { updateTab } = useTabStore.getState();
@@ -50,6 +57,12 @@ class Endpoint implements RealtimeActions<EndpointType> {
 		useEndpointStore.setState?.({
 			endpoints: [...useEndpointStore.getState().endpoints, data],
 		});
+		useVersionStore.setState?.((state) => ({
+			dashboard: {
+				...state.dashboard,
+				endpoint: state.dashboard.endpoint + 1,
+			},
+		}));
 	}
 	telemetry(params: RealtimeActionParams<EndpointType>) {
 		this.update(params);
