@@ -141,7 +141,9 @@ const useApplicationStore = create<ApplicationState & Actions>()(
 			},
 			selectApplication: (application: Application) => {
 				const user = useAuthStore.getState()?.user;
-				const role = application?.team.find((t) => t.userId._id === user?._id)?.role as AppRoles;
+				const role = user.isClusterOwner
+					? AppRoles.Admin
+					: (application?.team.find((t) => t.userId._id === user?._id)?.role as AppRoles);
 
 				set({
 					application: {

@@ -219,10 +219,16 @@ const useOrganizationStore = create<OrganizationStore & Actions>()(
 						req.userId,
 					);
 					set({
-						organizations: get().organizations.filter(
-							(organization) => organization._id !== get()?.organization?._id,
-						),
-						organization: {} as Organization,
+						organizations: get().organizations.map((organization) => {
+							if (organization._id === res._id) {
+								return res;
+							}
+							return organization;
+						}),
+						organization: {
+							...res,
+							role: get()?.organization?.role,
+						},
 					});
 					return res;
 				} catch (error) {

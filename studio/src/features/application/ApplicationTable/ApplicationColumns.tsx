@@ -56,8 +56,9 @@ export const ApplicationColumns: ColumnDefWithClassName<Application>[] = [
 		sortingFn: 'text',
 		cell: ({ row }) => {
 			const { team } = row.original;
-			const role = team.find((member) => member._id !== useAuthStore.getState().user?._id)
-				?.role as string;
+			const role = user.isClusterOwner
+				? AppRoles.Admin
+				: (team.find((member) => member._id !== useAuthStore.getState().user?._id)?.role as string);
 			return <Badge text={role} variant={BADGE_COLOR_MAP[role.toUpperCase()]} />;
 		},
 	},

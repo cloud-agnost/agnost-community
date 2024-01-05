@@ -56,7 +56,7 @@ export default function Tabs() {
 		if (getTabsByVersionId(versionId).find((tab: Tab) => tab.isDashboard)) return;
 		addTab(versionId, {
 			id: generateId(),
-			title: t('version.dashboard'),
+			title: t('version.dashboard.title'),
 			path: getDashboardPath(),
 			isDashboard: true,
 			isActive: false,
