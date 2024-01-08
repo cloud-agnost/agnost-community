@@ -103,7 +103,7 @@ export default function Models() {
 	function handleViewDataClick() {
 		navigate({
 			title: `${t('database.navigator.title')} - ${database.name} `,
-			path: `${databasesUrl}/${database._id}/navigator/${models?.[0]._id}}`,
+			path: `${databasesUrl}/${database._id}/navigator/${models?.[0]._id}`,
 			isActive: true,
 			isDashboard: false,
 			type: TabTypes.Navigator,
