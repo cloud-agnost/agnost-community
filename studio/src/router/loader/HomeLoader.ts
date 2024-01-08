@@ -1,4 +1,6 @@
 import useAuthStore from '@/store/auth/authStore';
+import useOrganizationStore from '@/store/organization/organizationStore';
+import { resetAfterOrgChange } from '@/utils';
 import { LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 const REDIRECT_URLS = {
@@ -27,7 +29,14 @@ function redirectHandleLoader(params: LoaderFunctionArgs) {
 	return redirect(REDIRECT_URLS[type as keyof typeof REDIRECT_URLS].replace(':token', token));
 }
 
+function organizationSelectLoader() {
+	resetAfterOrgChange();
+	useOrganizationStore.getState().reset();
+	return null;
+}
+
 export default {
 	homeLoader,
 	redirectHandleLoader,
+	organizationSelectLoader,
 };
