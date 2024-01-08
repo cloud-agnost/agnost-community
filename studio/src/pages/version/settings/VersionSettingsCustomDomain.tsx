@@ -70,7 +70,11 @@ export default function VersionSettingsCustomDomain() {
 					hasMore={hasNextPage}
 					loader={isFetchingNextPage && <TableLoading />}
 				>
-					<DataTable table={table} containerClassName='border-none rounded-none' />
+					<DataTable
+						table={table}
+						className='version-settings-table table-fixed'
+						containerClassName='version-settings-table-container border-none rounded-none'
+					/>
 				</InfiniteScroll>
 			) : (
 				<EmptyState type='custom-domain' title={t('cluster.empty_domain')} />

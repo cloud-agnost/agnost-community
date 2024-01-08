@@ -35,7 +35,11 @@ export default function VersionSettingsEnvironmentVariables() {
 					</div>
 				) : (
 					<div className='data-table-container'>
-						<DataTable<Param> table={table} className='table-fixed navigator' />
+						<DataTable<Param>
+							table={table}
+							className='version-settings-table table-fixed'
+							containerClassName='version-settings-table-container'
+						/>
 					</div>
 				)}
 				<EditEnvVariable open={editParamDrawerIsOpen} onOpenChange={setEditParamDrawerIsOpen} />
