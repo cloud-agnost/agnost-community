@@ -93,6 +93,7 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 							<FormItem className='space-y-1'>
 								<FormControl>
 									<Select
+										key={field.value}
 										defaultValue={field.value}
 										onValueChange={field.onChange}
 										disabled={disabled}
