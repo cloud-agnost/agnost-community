@@ -126,7 +126,7 @@ export default function TestMessageQueue({ open, onClose }: TestMessageQueueProp
 													containerClassName='h-full'
 													value={stringifyIfObject(field.value)}
 													onChange={field.onChange}
-													name='testQueuePayload'
+													name={`testQueuePayload-${queue._id}`}
 													defaultLanguage='json'
 												/>
 											</FormControl>

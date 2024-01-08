@@ -25,7 +25,7 @@ export default function VersionLogDetails({ open, onClose }: VersionLogDetailsPr
 							containerClassName='h-full'
 							className='h-full'
 							readonly
-							name='versionLogDetails'
+							name={`versionLogDetails-${log._id}`}
 						/>
 					</div>
 				</div>

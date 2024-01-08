@@ -70,7 +70,7 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 					value={JSON.stringify(response?.data, null, 2)}
 					defaultLanguage='json'
 					readonly
-					name='endpointResponse'
+					name={`endpointResponse-${endpoint?._id}`}
 				/>
 			</TabsContent>
 			<TabsContent value='cookies' className='overflow-y-auto h-[calc(100%-4rem)]'>
