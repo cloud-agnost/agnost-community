@@ -21,6 +21,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from 'components/Dropdown';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -81,7 +82,6 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 		resolver: zodResolver(MessageTemplatesSchema),
 		defaultValues: template,
 	});
-
 	const { mutateAsync, isPending } = useMutation({
 		mutationFn: setAuthMessageTemplate,
 		onSuccess: () => {
@@ -134,10 +134,9 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 		});
 	}
 
-	useUpdateEffect(() => {
-		form.reset(template);
+	useEffect(() => {
+		form.setValue('body', template.body);
 	}, [version]);
-
 	return (
 		<Form {...form}>
 			<form className='space-y-4' onSubmit={form.handleSubmit(onSubmit)}>
@@ -245,6 +244,7 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 							</>
 						)}
 						<FormField
+							key={template.type}
 							control={form.control}
 							name='body'
 							render={({ field }) => {
@@ -302,11 +302,12 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 										</div>
 										<FormControl>
 											<CodeEditor
+												key={template.type}
 												defaultLanguage='html'
 												containerClassName='h-[200px] w-full'
 												value={field.value}
 												onChange={field.onChange}
-												name='messageTemplate'
+												name={template.type}
 												readonly={!canEdit}
 											/>
 										</FormControl>
