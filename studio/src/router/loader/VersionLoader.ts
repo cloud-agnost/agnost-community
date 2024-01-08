@@ -272,7 +272,7 @@ async function fieldsLoader({ params }: LoaderFunctionArgs) {
 	return { props: {} };
 }
 
-async function navigatorLoader({ params, request }: LoaderFunctionArgs) {
+async function navigatorLoader({ params }: LoaderFunctionArgs) {
 	if (!useAuthStore.getState().isAuthenticated()) return null;
 
 	const { getModelsOfDatabase, setModel, getModelsOfSelectedDb, model } = useModelStore.getState();

@@ -4,7 +4,7 @@ import { CodeEditor } from '@/components/CodeEditor';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
 import { Input } from '@/components/Input';
 import { Document } from '@/components/icons';
-import { useAuthorizeVersion, useToast, useUpdateEffect } from '@/hooks';
+import { useAuthorizeVersion, useToast } from '@/hooks';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { APIError, TemplateTypes, VersionMessageTemplate } from '@/types';
