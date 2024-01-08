@@ -92,7 +92,7 @@ export default function Navigator() {
 	const { hasNextPage, fetchNextPage, isFetching, isFetchingNextPage, refetch } = useInfiniteScroll(
 		{
 			queryFn: getDataFromModel,
-			queryKey: 'getDataFromModel',
+			queryKey: model?._id,
 			lastFetchedPage: lastFetchedPage?.[model?._id],
 			dataLength: data.length,
 			disableVersionParams: true,

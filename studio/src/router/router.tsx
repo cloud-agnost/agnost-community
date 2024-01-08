@@ -595,6 +595,7 @@ const router = createBrowserRouter([
 					{
 						path: '',
 						element: <OrganizationSelect />,
+						loader: homeLoaders.organizationSelectLoader,
 					},
 					{
 						path: ':orgId',
@@ -631,7 +632,7 @@ const router = createBrowserRouter([
 														element: <VersionDatabase />,
 													},
 													{
-														path: ':dbId/navigator',
+														path: ':dbId/navigator/:modelId',
 														element: <NavigatorLoadable />,
 														loader: versionLoaders.navigatorLoader,
 													},

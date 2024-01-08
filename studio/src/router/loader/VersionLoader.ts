@@ -274,8 +274,6 @@ async function fieldsLoader({ params }: LoaderFunctionArgs) {
 
 async function navigatorLoader({ params, request }: LoaderFunctionArgs) {
 	if (!useAuthStore.getState().isAuthenticated()) return null;
-	const query = new URLSearchParams(request.url);
-	const modelId = query.get('m');
 
 	const { getModelsOfDatabase, setModel, getModelsOfSelectedDb, model } = useModelStore.getState();
 	const { database, getDatabaseOfAppById } = useDatabaseStore.getState();
@@ -285,6 +283,7 @@ async function navigatorLoader({ params, request }: LoaderFunctionArgs) {
 		appId: string;
 		versionId: string;
 		dbId: string;
+		modelId: string;
 	};
 	if (database._id !== apiParams.dbId) {
 		await getDatabaseOfAppById(apiParams);
@@ -297,12 +296,12 @@ async function navigatorLoader({ params, request }: LoaderFunctionArgs) {
 	}
 
 	if (models) {
-		if (modelId && modelId !== model?._id && !_.isEmpty(models)) {
-			const selectedModel = models.find((m) => m._id === modelId);
+		if (apiParams.modelId && apiParams.modelId !== model?._id && !_.isEmpty(models)) {
+			const selectedModel = models.find((m) => m._id === apiParams.modelId);
 			if (selectedModel) setModel(selectedModel);
 		}
 
-		if (modelId && modelId === model?._id) {
+		if (apiParams.modelId && apiParams.modelId === model?._id) {
 			setModel(model);
 		} else setModel(models[0]);
 	}
