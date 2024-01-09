@@ -5,13 +5,7 @@ import { TableLoading } from '@/components/Table/Table';
 import { Refresh } from '@/components/icons';
 import { MODULE_PAGE_SIZE } from '@/constants';
 import { SelectModel } from '@/features/database';
-import {
-	useInfiniteScroll,
-	useNavigatorColumns,
-	useTable,
-	useToast,
-	useUpdateEffect,
-} from '@/hooks';
+import { useNavigatorColumns, useTable, useToast, useUpdateEffect } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';

@@ -63,6 +63,8 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 							...state.lastFetchedPage,
 							[modelId]:
 								!_.isNil(get().lastFetchedPage?.[modelId]) &&
+								// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+								//@ts-ignore
 								get().lastFetchedPage?.[modelId] >= params.page
 									? get().lastFetchedPage?.[modelId]
 									: params.page,
