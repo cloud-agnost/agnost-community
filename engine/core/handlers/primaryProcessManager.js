@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs/promises";
-import { execSync } from "child_process";
+import { exec } from "child_process";
 
 import { DeploymentManager } from "./deploymentManager.js";
 import { getKey } from "../init/cache.js";
@@ -375,12 +375,11 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 		else if (installCommand) finalCommand = installCommand;
 		else return;
 
-		try {
-			execSync(finalCommand, {
-				stdio: "ignore",
-			});
-		} catch (err) {
-			this.addLog(t("Failed to install/uninstall packages %s", err.message));
-		}
+		// Execute the final command in async mode
+		exec(finalCommand, (error, stdout, stderr) => {
+			if (error) {
+				this.addLog(t("Failed to install/uninstall packages %s", err.message));
+			}
+		});
 	}
 }
