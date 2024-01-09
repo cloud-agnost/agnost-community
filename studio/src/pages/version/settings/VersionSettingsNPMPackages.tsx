@@ -24,7 +24,11 @@ export default function VersionSettingsNPMPackages() {
 			className='table-view'
 		>
 			{npmPackages.length > 0 ? (
-				<DataTable<NPMPackage> table={table} className='navigator' />
+				<DataTable<NPMPackage>
+					table={table}
+					className='version-settings-table'
+					containerClassName='version-settings-table-container'
+				/>
 			) : (
 				<EmptyState type='package' title={t('version.npm.no_package_found')} />
 			)}

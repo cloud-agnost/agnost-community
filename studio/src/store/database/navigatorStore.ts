@@ -6,6 +6,7 @@ import {
 	GetDataFromModelParams,
 	UpdateDataFromModelParams,
 } from '@/types';
+import _ from 'lodash';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import useModelStore from './modelStore';
@@ -27,7 +28,7 @@ interface NavigatorStore {
 
 type Actions = {
 	setEditedField: (field: string) => void;
-	getDataFromModel: (params: GetDataFromModelParams) => Promise<void>;
+	getDataFromModel: (params: GetDataFromModelParams) => Promise<any[]>;
 	deleteDataFromModel: (param: DeleteDataFromModelParams) => Promise<void>;
 	deleteMultipleDataFromModel: (param: DeleteMultipleDataFromModelParams) => Promise<void>;
 	updateDataFromModel: (param: UpdateDataFromModelParams) => Promise<void>;
@@ -51,6 +52,7 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 			try {
 				const data = await NavigatorService.getDataFromModel(params);
 				const modelId = useModelStore.getState().model._id;
+
 				if (params.page === 0) {
 					set((state) => ({
 						data: {
@@ -59,7 +61,11 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 						},
 						lastFetchedPage: {
 							...state.lastFetchedPage,
-							[modelId]: params.page,
+							[modelId]:
+								!_.isNil(get().lastFetchedPage?.[modelId]) &&
+								get().lastFetchedPage?.[modelId] >= params.page
+									? get().lastFetchedPage?.[modelId]
+									: params.page,
 						},
 					}));
 				} else {

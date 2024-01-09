@@ -615,6 +615,18 @@ html .light ::-webkit-scrollbar-track {
 .navigator .table-cell {
 	@apply bg-base;
 }
+.version-settings-table .table-body tr:last-child td {
+	@apply border-b;
+}
+.version-settings-table .table-cell {
+	@apply bg-base rounded-none;
+}
+.version-settings-table .table-head {
+	@apply rounded-none;
+}
+.version-settings-table-container {
+	@apply border-none;
+}
 button:focus-visible {
 	@apply outline-none ring-0;
 }

@@ -375,6 +375,7 @@ export function resetAfterOrgChange() {
 			store.getState()?.reset();
 		}
 	});
+	useApplicationStore.getState().reset();
 }
 
 export function addLibsToEditor(libs: Record<string, string>) {

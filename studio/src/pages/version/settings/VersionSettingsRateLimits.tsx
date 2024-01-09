@@ -32,7 +32,11 @@ export default function VersionSettingsRateLimits() {
 				</div>
 			) : (
 				<div className='data-table-container'>
-					<DataTable<RateLimit> table={table} className='table-fixed navigator' />
+					<DataTable<RateLimit>
+						table={table}
+						className='version-settings-table table-fixed'
+						containerClassName='version-settings-table-container'
+					/>
 				</div>
 			)}
 			<EditRateLimit open={editRateLimitDrawerIsOpen} onOpenChange={setEditRateLimitDrawerIsOpen} />

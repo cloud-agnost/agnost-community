@@ -1,5 +1,5 @@
 .drawer {
-	@apply fixed z-50  gap-4 bg-wrapper-background-base opacity-100 shadow-lg border;
+	@apply fixed z-50  gap-4 bg-wrapper-background-base opacity-100 shadow-lg border outline-none;
 	&-left {
 		@apply animate-in slide-in-from-left h-full duration-300;
 	}

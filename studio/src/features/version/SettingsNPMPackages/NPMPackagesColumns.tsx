@@ -25,6 +25,7 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	{
 		id: 'select',
 		enableResizing: false,
+		size: 40,
 		header: ({ table }) => (
 			<Checkbox
 				checked={table.getIsAllPageRowsSelected()}
@@ -45,7 +46,6 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 	},
 	{
 		id: 'name',
-		size: 200,
 		header: ({ column }) => (
 			<SortButton
 				text={translate('general.name')}
@@ -55,6 +55,7 @@ const NPMPackagesColumns: ColumnDefWithClassName<NPMPackage>[] = [
 		),
 		accessorKey: 'name',
 		sortingFn: 'text',
+		size: 300,
 	},
 	{
 		id: 'version',

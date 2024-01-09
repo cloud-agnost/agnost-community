@@ -3,6 +3,7 @@ import { Button } from '@/components/Button';
 import { EmptyState } from '@/components/EmptyState';
 import { TableLoading } from '@/components/Table/Table';
 import { Refresh } from '@/components/icons';
+import { MODULE_PAGE_SIZE } from '@/constants';
 import { SelectModel } from '@/features/database';
 import {
 	useInfiniteScroll,
@@ -41,16 +42,20 @@ export default function Navigator() {
 		lastFetchedPage,
 	} = useNavigatorStore();
 	const database = useDatabaseStore((state) => state.database);
+	const [isFetching, setIsFetching] = useState(false);
+	const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
+	const [hasNextPage, setHasNextPage] = useState(false);
 	const { model, subModel } = useModelStore();
 	const canMultiDelete = true;
 	const hasSubModel = !isEmpty(subModel);
 	const columns = useNavigatorColumns(hasSubModel ? subModel?.fields : model?.fields);
-	const { orgId, appId, versionId } = useParams() as Record<string, string>;
+	const { orgId, appId, versionId, modelId } = useParams() as Record<string, string>;
 	const isSorted = searchParams.get('f') && searchParams.get('d');
-	const data = useMemo(() => getDataOfSelectedModel(model?._id) ?? [], [model, stateData]);
+
+	const data = useMemo(() => getDataOfSelectedModel(modelId) ?? [], [modelId, stateData]);
 	const table = useTable({
 		columns,
-		data: hasSubModel ? subModelData?.[model?._id] : data,
+		data: hasSubModel ? subModelData?.[modelId] : data,
 	});
 
 	const dbUrl = `/organization/${orgId}/apps/${appId}/version/${versionId}/database`;
@@ -83,25 +88,6 @@ export default function Navigator() {
 		};
 	}, []);
 
-	useUpdateEffect(() => {
-		if (model && isEmpty(subModel) && !isSorted && !Object.keys(stateData).includes(model?._id)) {
-			refetch();
-		}
-	}, [model, subModel]);
-
-	const { hasNextPage, fetchNextPage, isFetching, isFetchingNextPage, refetch } = useInfiniteScroll(
-		{
-			queryFn: getDataFromModel,
-			queryKey: 'getDataFromModel',
-			lastFetchedPage: lastFetchedPage?.[model?._id],
-			dataLength: data.length,
-			disableVersionParams: true,
-			params: {
-				id: searchParams.get('ref') as string,
-			},
-			enabled: !Object.keys(stateData).includes(model?._id) && !isEmpty(model),
-		},
-	);
 	const breadcrumbItems: BreadCrumbItem[] = [
 		{
 			name: database.name,
@@ -118,9 +104,44 @@ export default function Navigator() {
 
 	async function onRefresh() {
 		setIsRefreshing(true);
-		await refetch();
+		await fetchData(0, MODULE_PAGE_SIZE * (lastFetchedPage?.[modelId] ?? 0));
 		setIsRefreshing(false);
 	}
+
+	async function fetchData(page: number, size: number = MODULE_PAGE_SIZE) {
+		setIsFetching(true);
+		const res = await getDataFromModel({
+			page,
+			size,
+			sortBy: searchParams.get('f') as string,
+			sortDir: searchParams.get('d') as string,
+			id: searchParams.get('ref') as string,
+		});
+		setHasNextPage(res.length >= MODULE_PAGE_SIZE);
+		setIsFetching(false);
+	}
+
+	async function fetchNextPage() {
+		setIsFetchingNextPage(true);
+		const page = _.isNil(lastFetchedPage?.[modelId]) ? 0 : (lastFetchedPage[modelId] ?? 0) + 1;
+		await fetchData(page);
+		setIsFetchingNextPage(false);
+	}
+
+	useUpdateEffect(() => {
+		if (searchParams.get('f') || searchParams.get('d') || searchParams.get('ref')) {
+			const page = lastFetchedPage?.[modelId] ?? 0;
+			const size = lastFetchedPage?.[modelId] ? MODULE_PAGE_SIZE * page : MODULE_PAGE_SIZE;
+			console.log('fetching data', data.length);
+			fetchData(0, size);
+		}
+	}, [searchParams.get('f'), searchParams.get('d'), searchParams.get('ref')]);
+
+	useEffect(() => {
+		if (_.isEmpty(data)) {
+			fetchData(0);
+		}
+	}, []);
 	return (
 		<VersionTabLayout
 			isEmpty={false}
@@ -141,7 +162,7 @@ export default function Navigator() {
 		>
 			{!_.isEmpty(model) ? (
 				<div className='flex gap-4 justify-center h-[calc(100%-50px)]'>
-					<SelectModel />
+					<SelectModel fetchData={fetchData} />
 					{isFetching && !isSorted && !isFetchingNextPage ? (
 						<div className='flex-1 flex items-center justify-center'>
 							<BeatLoader color='#6884FD' size={24} margin={18} />

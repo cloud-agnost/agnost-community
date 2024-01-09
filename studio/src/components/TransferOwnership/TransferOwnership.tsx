@@ -45,7 +45,7 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 
 	const {
 		mutateAsync,
-		isLoading: loading,
+		isPending: loading,
 		error,
 	} = useMutation({
 		mutationFn: transferFn,
@@ -93,6 +93,7 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 							<FormItem className='space-y-1'>
 								<FormControl>
 									<Select
+										key={field.value}
 										defaultValue={field.value}
 										onValueChange={field.onChange}
 										disabled={disabled}
@@ -144,7 +145,7 @@ export default function TransferOwnership({ transferFn, type, disabled }: Transf
 															<div className='flex-1'>
 																<p className='text-default text-sm leading-6'>{member.name}</p>
 																<p className='text-subtle  text-sm leading-6'>
-																	{member.loginEmail}
+																	{member.contactEmail}
 																</p>
 															</div>
 														</div>

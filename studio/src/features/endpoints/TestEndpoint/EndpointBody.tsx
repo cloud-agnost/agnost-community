@@ -7,9 +7,11 @@ import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { TestEndpointSchema } from '../TestEndpoint';
 import EndpointFiles from './EndpointFiles';
+import useEndpointStore from '@/store/endpoint/endpointStore';
 export default function EndpointBody() {
 	const { control, watch } = useFormContext<z.infer<typeof TestEndpointSchema>>();
 	const { t } = useTranslation();
+	const endpoint = useEndpointStore((state) => state.endpoint);
 	const bodyType = watch('bodyType');
 
 	return (
@@ -56,7 +58,7 @@ export default function EndpointBody() {
 										value={field.value}
 										onChange={field.onChange}
 										defaultLanguage='json'
-										name='endpointBody'
+										name={`endpointBody-${endpoint._id}`}
 									/>
 								</FormControl>
 								<FormMessage />

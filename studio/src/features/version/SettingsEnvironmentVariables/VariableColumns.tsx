@@ -1,4 +1,5 @@
 import { ActionsCell } from '@/components/ActionsCell';
+import { CopyButton } from '@/components/CopyButton';
 import useOrganizationStore from '@/store/organization/organizationStore';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore.ts';
@@ -66,7 +67,12 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 				original: { name },
 			},
 		}) => {
-			return <div className='truncate'>{name}</div>;
+			return (
+				<div className='flex items-center gap-8 group'>
+					<div className='truncate'>{name}</div>
+					<CopyButton text={name} className='hidden group-hover:block' />
+				</div>
+			);
 		},
 	},
 	{
