@@ -4,7 +4,7 @@ import { SettingsContainer } from '@/features/version/SettingsContainer';
 import { EditRateLimit } from '@/features/version/SettingsGeneral';
 import { RateLimitsColumns } from '@/features/version/SettingsRateLimits';
 import RateLimitsActions from '@/features/version/SettingsRateLimits/RateLimitsActions.tsx';
-import { useTable } from '@/hooks';
+import { useSearch, useTable } from '@/hooks';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { RateLimit } from '@/types';
@@ -14,9 +14,10 @@ export default function VersionSettingsRateLimits() {
 	const { t } = useTranslation();
 	const limits = useVersionStore((state) => state.version?.limits ?? []);
 	const { editRateLimitDrawerIsOpen, setEditRateLimitDrawerIsOpen } = useSettingsStore();
+	const sortedLimits = useSearch(limits);
 
 	const table = useTable({
-		data: limits,
+		data: sortedLimits,
 		columns: RateLimitsColumns,
 	});
 

@@ -3,7 +3,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { SettingsContainer } from '@/features/version/SettingsContainer';
 import { NPMActions } from '@/features/version/SettingsNPMPackages';
 import NPMPackagesColumns from '@/features/version/SettingsNPMPackages/NPMPackagesColumns';
-import { useTable } from '@/hooks';
+import { useSearch, useTable } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
 import { NPMPackage } from '@/types';
 import { useTranslation } from 'react-i18next';
@@ -11,9 +11,9 @@ import { useTranslation } from 'react-i18next';
 export default function VersionSettingsNPMPackages() {
 	const { t } = useTranslation();
 	const npmPackages = useVersionStore((state) => state.version?.npmPackages ?? []);
-
+	const sortedPackages = useSearch(npmPackages);
 	const table = useTable({
-		data: npmPackages,
+		data: sortedPackages,
 		columns: NPMPackagesColumns,
 	});
 
