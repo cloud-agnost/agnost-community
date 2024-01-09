@@ -52,7 +52,7 @@
         "readinessProbe": {
             "timeoutSeconds": 30,
             "periodSeconds": 60,
-            "initialDelaySeconds": 30
+            "initialDelaySeconds": 60
         }
     }
 }
