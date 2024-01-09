@@ -61,6 +61,7 @@ import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab } from '@/types';
 import { useDebounceFn } from '.';
+import { SURROUND_MENU_ITEMS } from '@/constants';
 
 export const EDITOR_OPTIONS: EditorProps['options'] = {
 	quickSuggestions: {
@@ -311,6 +312,31 @@ export default function useEditor({ onChange, onSave }: CodeEditorProps) {
 		editorRef.current = editor;
 		globalThis.editor = editor;
 		configureEditor(editor, monaco);
+		editor.addAction({
+			id: 'open-surround',
+			label: 'Surround',
+			precondition: 'editorHasSelection', // Action will only be shown when there's a selection
+			contextMenuGroupId: 'navigation',
+			contextMenuOrder: 2,
+			keybindings: [
+				monaco.KeyMod.CtrlCmd | monaco.KeyCode.F10,
+				// chord
+				monaco.KeyMod.chord(
+					monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK,
+					monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyM,
+				),
+			],
+			run: function (ed) {
+				ed.focus();
+				ed.trigger('', 'editor.action.quickCommand', '');
+				const input = document.querySelector('.quick-input-box .input') as HTMLInputElement;
+				input.value = '> Surround with';
+				input.dispatchEvent(new Event('input', { bubbles: true }));
+			},
+		});
+		SURROUND_MENU_ITEMS.forEach((item) => {
+			editor.addAction(item);
+		});
 	}
 
 	const onCodeEditorChange = (

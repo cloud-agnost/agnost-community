@@ -6,6 +6,8 @@ import Queue from '@/assets/images/message_queues.webp';
 import RealtimeCollaboration from '@/assets/images/realtime_collaboration.webp';
 import Security from '@/assets/images/security.webp';
 import Serverless from '@/assets/images/serverless_functions.webp';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+
 import {
 	ApiKeys,
 	Apple,
@@ -910,3 +912,461 @@ export const FIELD_MAPPER: Record<string, string> = {
 	updatedat: 'datetime',
 	parent: 'reference',
 };
+export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
+	{
+		id: 'surround-with-try-catch',
+		label: 'Surround with Try-Catch',
+		precondition: 'editorHasSelection', // Action will only be shown when there's a selection
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+
+			const tryCatchBlock =
+				`try {\n` +
+				`  ${selectedText}\n` +
+				`} catch (error) {\n` +
+				`  console.error(error);\n` +
+				`}`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: tryCatchBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-try-catch-finally',
+		label: 'Surround with Try-Catch-Finally',
+		precondition: 'editorHasSelection', // Action will only be shown when there's a selection
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+
+			const tryCatchFinallyBlock =
+				`try {\n` +
+				`  ${selectedText}\n` +
+				`} catch (error) {\n` +
+				`  console.error(error);\n` +
+				`} finally {\n` +
+				`  console.log('finally');\n` +
+				`}`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: tryCatchFinallyBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-if',
+		label: 'Surround with If',
+		precondition: 'editorHasSelection', // Action will only be shown when there's a selection
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+
+			const ifBlock = `if (condition) {\n` + `  ${selectedText}\n` + `}`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: ifBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-if-else',
+		label: 'Surround with If-Else',
+		precondition: 'editorHasSelection', // Action will only be shown when there's a selection
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+
+			const ifElseBlock =
+				`if (condition) {\n` +
+				`  ${selectedText}\n` +
+				`} else {\n` +
+				`  console.error(error);\n` +
+				`}`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: ifElseBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-for-loop',
+		label: 'Surround with For Loop',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+
+			const forLoopBlock =
+				`for (let i = 0; i < array.length; i++) {\n` + `  ${selectedText}\n` + `}`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: forLoopBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-for-in-loop',
+		label: 'Surround with For-In Loop',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+
+			const forInLoopBlock = `for (const key in object) {\n` + `  ${selectedText}\n` + `}`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: forInLoopBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-for-of-loop',
+		label: 'Surround with For-Of Loop',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+
+			const forOfLoopBlock = `for (const element of array) {\n` + `  ${selectedText}\n` + `}`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: forOfLoopBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-foreach-loop',
+		label: 'Surround with Foreach Loop',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+
+			const foreachLoopBlock = `array.forEach((element) => {\n` + `  ${selectedText}\n` + `});`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: foreachLoopBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-async-foreach-loop',
+		label: 'Surround with Async Foreach Loop',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+
+			const foreachLoopBlock =
+				`array.forEach(async (element) => {\n` + `  ${selectedText}\n` + `});`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: foreachLoopBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-while-loop',
+		label: 'Surround with While Loop',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+
+			const whileLoopBlock = `while (condition) {\n` + `  ${selectedText}\n` + `}`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: whileLoopBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surrond-with-comment',
+		label: 'Surround with Comment',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+
+			const commentBlock = `/*\n` + `  ${selectedText}` + `\n*/`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: commentBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-function',
+		label: 'Surround with Function',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+			const functionBlock =
+				`function functionName() {\n` + `  ${selectedText}\n` + `}` + `\n` + `functionName();`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber - 1,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: functionBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-async-function',
+		label: 'Surround with Async Function',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+			const functionBlock =
+				`async function functionName() {\n` +
+				`  ${selectedText}\n` +
+				`}` +
+				`\n` +
+				`functionName();`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber - 1,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: functionBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-arrow-function',
+		label: 'Surround with Arrow Function',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+			const functionBlock = `const functionName = () => {\n` + `  ${selectedText}\n` + `}`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber - 1,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: functionBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-async-arrow-function',
+		label: 'Surround with Async Arrow Function',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+			const functionBlock = `const functionName = async () => {\n` + `  ${selectedText}\n` + `}`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber - 1,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: functionBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-class',
+		label: 'Surround with Class',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+
+			const classBlock =
+				`class ClassName {\n` +
+				`  constructor() {\n` +
+				`    ${selection}\n` +
+				`  }\n` +
+				`  ${selection}\n` +
+				`}`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber - 1,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: classBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-template-literal',
+		label: 'Surround with Template Literal',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+
+			const templateLiteralBlock = `\`${selection}\``;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber - 1,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: templateLiteralBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+	{
+		id: 'surround-with-async-await',
+		label: 'Surround with Async Await',
+		precondition: 'editorHasSelection',
+		run: (ed) => {
+			const selection = ed.getSelection() as monaco.Selection;
+
+			const asyncAwaitBlock = `async () => {\n` + `  ${selection}\n` + `}`;
+
+			ed.executeEdits('', [
+				{
+					range: new monaco.Range(
+						selection.startLineNumber - 1,
+						selection.startColumn,
+						selection.endLineNumber,
+						selection.endColumn,
+					),
+					text: asyncAwaitBlock,
+					forceMoveMarkers: true,
+				},
+			]);
+		},
+	},
+];
