@@ -51,13 +51,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton
-				text={translate('general.name')}
-				field='name'
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-			/>
-		),
+		header: () => <SortButton text={translate('general.name')} field='name' />,
 		accessorKey: 'name',
 		sortingFn: 'text',
 		enableSorting: true,
@@ -77,13 +71,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	},
 	{
 		id: 'value',
-		header: ({ column }) => (
-			<SortButton
-				text={translate('general.value')}
-				field='value'
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-			/>
-		),
+		header: () => <SortButton text={translate('general.value')} field='value' />,
 		accessorKey: 'value',
 		sortingFn: 'text',
 		enableSorting: true,
@@ -98,13 +86,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 	},
 	{
 		id: 'created_at',
-		header: ({ column }) => (
-			<SortButton
-				text={translate('general.created_at')}
-				field='createdAt'
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-			/>
-		),
+		header: () => <SortButton text={translate('general.created_at')} field='createdAt' />,
 		enableSorting: true,
 		sortingFn: 'datetime',
 		accessorKey: 'createdAt',
@@ -121,13 +103,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 
 	{
 		id: 'updated_at',
-		header: ({ column }) => (
-			<SortButton
-				text={translate('general.updated_at')}
-				field='updatedAt'
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-			/>
-		),
+		header: () => <SortButton text={translate('general.updated_at')} field='updatedAt' />,
 		accessorKey: 'updatedAt',
 		enableSorting: true,
 		sortingFn: 'datetime',

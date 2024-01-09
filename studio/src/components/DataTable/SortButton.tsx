@@ -7,9 +7,8 @@ interface SortButtonProps {
 	text: string;
 	className?: string;
 	field: string;
-	onClick?: () => void;
 }
-export function SortButton({ text, className, field, onClick }: SortButtonProps) {
+export function SortButton({ text, className, field }: SortButtonProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const defaultDirection = 'asc';
 	const handleSortClick = () => {
@@ -19,7 +18,6 @@ export function SortButton({ text, className, field, onClick }: SortButtonProps)
 		if (currentField === field) {
 			newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
 		}
-		onClick?.();
 		searchParams.set('f', field);
 		searchParams.set('d', newDirection);
 		setSearchParams(searchParams);

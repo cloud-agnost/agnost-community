@@ -6,7 +6,7 @@ import {
 	SettingsAPIKeysColumns,
 } from '@/features/version/SettingsAPIKeys';
 import { SettingsContainer } from '@/features/version/SettingsContainer';
-import { useTable } from '@/hooks';
+import { useSearch, useTable } from '@/hooks';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { APIKey } from '@/types';
@@ -17,9 +17,9 @@ export default function VersionSettingsAPIKeys() {
 
 	const apiKeys = useVersionStore((state) => state.version?.apiKeys ?? []);
 	const { editAPIKeyDrawerIsOpen, setEditAPIKeyDrawerIsOpen } = useSettingsStore();
-
+	const sortedApiKeys = useSearch(apiKeys);
 	const table = useTable({
-		data: apiKeys,
+		data: sortedApiKeys,
 		columns: SettingsAPIKeysColumns,
 	});
 

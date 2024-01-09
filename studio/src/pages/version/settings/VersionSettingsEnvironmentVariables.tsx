@@ -6,7 +6,7 @@ import {
 	VariableActions,
 	VariableColumns,
 } from '@/features/version/SettingsEnvironmentVariables';
-import { useTable } from '@/hooks';
+import { useSearch, useTable } from '@/hooks';
 import useSettingsStore from '@/store/version/settingsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Param } from '@/types';
@@ -16,9 +16,9 @@ export default function VersionSettingsEnvironmentVariables() {
 	const { t } = useTranslation();
 	const variables = useVersionStore((state) => state.version?.params ?? []);
 	const { setEditParamDrawerIsOpen, editParamDrawerIsOpen } = useSettingsStore();
-
+	const sortedVariables = useSearch(variables);
 	const table = useTable({
-		data: variables.sort((a, b) => a.name.localeCompare(b.name)),
+		data: sortedVariables,
 		columns: VariableColumns,
 	});
 
