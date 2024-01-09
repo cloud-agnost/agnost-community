@@ -98,7 +98,7 @@ export default function Navigator() {
 
 	async function onRefresh() {
 		setIsRefreshing(true);
-		await fetchData(0, MODULE_PAGE_SIZE * (lastFetchedPage?.[modelId] ?? 0));
+		await fetchData(0, MODULE_PAGE_SIZE);
 		setIsRefreshing(false);
 	}
 
