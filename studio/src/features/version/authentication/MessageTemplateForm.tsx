@@ -73,7 +73,13 @@ const MessageTemplatesSchema = z
 		}
 	});
 
-export default function MessageTemplateForm({ template }: { template: VersionMessageTemplate }) {
+export default function MessageTemplateForm({
+	template,
+	showButton,
+}: {
+	template: VersionMessageTemplate;
+	showButton: boolean;
+}) {
 	const { toast } = useToast();
 	const { setAuthMessageTemplate } = useSettingsStore();
 	const { version } = useVersionStore();
@@ -151,18 +157,20 @@ export default function MessageTemplateForm({ template }: { template: VersionMes
 								{capitalize(template.type).replace(/_/g, ' ').toUpperCase()}
 							</h6>
 						</div>
-						<div className='flex items-center gap-4'>
-							<Button
-								type='submit'
-								variant='primary'
-								onClick={(e) => e.stopPropagation()}
-								loading={isPending}
-								disabled={!canEdit}
-							>
-								{!isPending && <FloppyDisk className='mr-2' />}
-								{t('general.save')}
-							</Button>
-						</div>
+						{showButton && (
+							<div className='flex items-center gap-4'>
+								<Button
+									type='submit'
+									variant='primary'
+									onClick={(e) => e.stopPropagation()}
+									loading={isPending}
+									disabled={!canEdit}
+								>
+									{!isPending && <FloppyDisk className='mr-2' />}
+									{t('general.save')}
+								</Button>
+							</div>
+						)}
 					</div>
 				</AccordionTrigger>
 				<AccordionContent className='p-4'>
