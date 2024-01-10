@@ -1,5 +1,6 @@
 import { translate } from '@/utils';
 import { z } from 'zod';
+import { HttpMethod } from '.';
 import { NameSchema } from './schema';
 import {
 	BaseGetRequest,
@@ -273,7 +274,11 @@ export interface DesignElement {
 	name: string;
 	type: DesignElementTypes;
 	modelId?: string;
-	meta: any;
+	meta: {
+		method?: HttpMethod;
+		modelName?: string;
+		dbId?: string;
+	};
 }
 
 export interface VersionParams extends BaseParams {
