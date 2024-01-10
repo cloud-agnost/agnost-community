@@ -89,6 +89,8 @@ const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanE
 };
 CommandShortcut.displayName = 'CommandShortcut';
 
+const CommandLoading = CommandPrimitive.Loading;
+
 export {
 	Command,
 	CommandDialog,
@@ -99,4 +101,5 @@ export {
 	CommandList,
 	CommandSeparator,
 	CommandShortcut,
+	CommandLoading,
 };
