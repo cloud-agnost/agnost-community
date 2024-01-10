@@ -882,6 +882,7 @@ const router = createBrowserRouter([
 			},
 			{
 				path: 'create-app',
+				loader: onboardingLoaders.createAppLoader,
 				element: <CreateApp />,
 			},
 			{

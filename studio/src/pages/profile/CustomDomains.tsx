@@ -53,44 +53,38 @@ export default function CustomDomains() {
 		});
 	}
 
-	return (
-		<>
-			{_.isNil(clusterDomainError) ? (
-				<div className='space-y-6 max-w-2xl'>
-					<p className='text-subtle text-sm font-sfCompact'>
-						{t('cluster.custom_domain_description')}
-					</p>
-					<EnforceSSL />
-					<DnsSettings />
-					<div className='space-y-4'>
-						<Description title={t('cluster.domains')} />
-						<DomainList />
-						<Form {...form}>
-							<form className='space-y-4' onSubmit={form.handleSubmit(onSubmit)}>
-								<CustomDomainForm />
-								<div className='flex justify-end'>
-									<Button
-										type='submit'
-										variant='primary'
-										loading={isPending}
-										disabled={!user?.isClusterOwner}
-									>
-										{t('cluster.add_domain')}
-									</Button>
-								</div>
-							</form>
-						</Form>
-					</div>
-				</div>
-			) : (
-				<div className='h-full flex flex-col items-center justify-center'>
-					<Feedback
-						title={clusterDomainError?.error}
-						description={clusterDomainError?.details}
-						className='max-w-2xl'
-					/>
-				</div>
-			)}
-		</>
+	return _.isNil(clusterDomainError) ? (
+		<div className='space-y-6 max-w-2xl'>
+			<p className='text-subtle text-sm font-sfCompact'>{t('cluster.custom_domain_description')}</p>
+			<EnforceSSL />
+			<DnsSettings />
+			<div className='space-y-4'>
+				<Description title={t('cluster.domains')} />
+				<DomainList />
+				<Form {...form}>
+					<form className='space-y-4' onSubmit={form.handleSubmit(onSubmit)}>
+						<CustomDomainForm />
+						<div className='flex justify-end'>
+							<Button
+								type='submit'
+								variant='primary'
+								loading={isPending}
+								disabled={!user?.isClusterOwner}
+							>
+								{t('cluster.add_domain')}
+							</Button>
+						</div>
+					</form>
+				</Form>
+			</div>
+		</div>
+	) : (
+		<div className='h-full flex flex-col items-center justify-center'>
+			<Feedback
+				title={clusterDomainError?.error}
+				description={clusterDomainError?.details}
+				className='max-w-2xl'
+			/>
+		</div>
 	);
 }
