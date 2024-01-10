@@ -128,7 +128,10 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 						...state.data,
 						[modelId]: state.data[modelId].map((item) => {
 							if (item.id === param.id) {
-								return data;
+								return {
+									id: data.id ?? data._id,
+									...data,
+								};
 							}
 							return item;
 						}),

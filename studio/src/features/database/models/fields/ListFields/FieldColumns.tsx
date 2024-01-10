@@ -76,13 +76,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'name',
-		header: ({ column }) => (
-			<SortButton
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				text={translate('general.field')}
-				field='name'
-			/>
-		),
+		header: () => <SortButton text={translate('general.field')} field='name' />,
 		cell({ row: { original } }) {
 			if (['object-list', 'object'].includes(original.type)) {
 				return <SubFields field={original} name={original.name} />;
@@ -96,13 +90,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'type',
-		header: ({ column }) => (
-			<SortButton
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				text={translate('general.type')}
-				field='type'
-			/>
-		),
+		header: () => <SortButton text={translate('general.type')} field='type' />,
 		accessorKey: 'type',
 		cell: ({
 			row: {
@@ -120,13 +108,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'unique',
-		header: ({ column }) => (
-			<SortButton
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				text={translate('general.unique')}
-				field='unique'
-			/>
-		),
+		header: () => <SortButton text={translate('general.unique')} field='unique' />,
 		accessorKey: 'unique',
 		enableSorting: true,
 		cell: ({
@@ -145,13 +127,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'indexed',
-		header: ({ column }) => (
-			<SortButton
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				text={translate('general.indexed')}
-				field='indexed'
-			/>
-		),
+		header: () => <SortButton text={translate('general.indexed')} field='indexed' />,
 		accessorKey: 'indexed',
 		cell: ({
 			row: {
@@ -169,13 +145,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'required',
-		header: ({ column }) => (
-			<SortButton
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				text={translate('general.required')}
-				field='required'
-			/>
-		),
+		header: () => <SortButton text={translate('general.required')} field='required' />,
 		accessorKey: 'required',
 		cell: ({
 			row: {
@@ -194,13 +164,7 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	{
 		id: 'immutable',
 		className: 'whitespace-nowrap',
-		header: ({ column }) => (
-			<SortButton
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				text={translate('general.read-only')}
-				field='immutable'
-			/>
-		),
+		header: () => <SortButton text={translate('general.read-only')} field='immutable' />,
 		accessorKey: 'immutable',
 		cell: ({
 			row: {
@@ -218,9 +182,8 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 	},
 	{
 		id: 'createdAt',
-		header: ({ column }) => (
+		header: () => (
 			<SortButton
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				className='whitespace-nowrap'
 				text={translate('general.created_at')}
 				field='createdAt'
@@ -243,9 +206,8 @@ const FieldColumns: ColumnDefWithClassName<Field>[] = [
 
 	{
 		id: 'updatedAt',
-		header: ({ column }) => (
+		header: () => (
 			<SortButton
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				className='whitespace-nowrap'
 				text={translate('general.updated_at')}
 				field='updatedAt'
