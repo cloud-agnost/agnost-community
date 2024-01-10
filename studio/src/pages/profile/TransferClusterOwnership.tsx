@@ -7,6 +7,7 @@ import { FormatOptionLabelProps, User } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { SingleValue } from 'react-select';
 import AsyncSelect from 'react-select/async';
 const formatOptionLabel = ({ label, value }: FormatOptionLabelProps<User>) => {
@@ -61,6 +62,7 @@ const loadOptions = async (inputValue: string) => {
 export default function TransferClusterOwnership() {
 	const { user } = useAuthStore();
 	const { transferClusterOwnership, getActiveUsers } = useClusterStore();
+	const navigate = useNavigate();
 	const [selectedMember, setSelectedMember] =
 		useState<SingleValue<FormatOptionLabelProps<User>>>(null);
 	const { toast } = useToast();
@@ -76,6 +78,7 @@ export default function TransferClusterOwnership() {
 				title: t('organization.transfer-success') as string,
 				action: 'success',
 			});
+			navigate('/organization');
 		},
 		onError: (err) => {
 			toast({
