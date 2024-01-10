@@ -15,7 +15,7 @@ import { isEmpty } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 import { DataTable } from 'components/DataTable';
 import _ from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams, useSearchParams } from 'react-router-dom';
@@ -30,6 +30,7 @@ export default function Navigator() {
 		getDataFromModel,
 		deleteMultipleDataFromModel,
 		getDataOfSelectedModel,
+		lastFetchedCount,
 		data: stateData,
 		editedField,
 		subModelData,
@@ -38,14 +39,13 @@ export default function Navigator() {
 	const database = useDatabaseStore((state) => state.database);
 	const [isFetching, setIsFetching] = useState(false);
 	const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
-	const [hasNextPage, setHasNextPage] = useState(false);
 	const { model, subModel } = useModelStore();
 	const canMultiDelete = true;
 	const hasSubModel = !isEmpty(subModel);
 	const columns = useNavigatorColumns(hasSubModel ? subModel?.fields : model?.fields);
 	const { orgId, appId, versionId, modelId } = useParams() as Record<string, string>;
 	const isSorted = searchParams.get('f') && searchParams.get('d');
-
+	const scrollContainer = useRef<HTMLDivElement>(null);
 	const data = useMemo(() => getDataOfSelectedModel(modelId) ?? [], [modelId, stateData]);
 	const table = useTable({
 		columns,
@@ -104,14 +104,13 @@ export default function Navigator() {
 
 	async function fetchData(page: number, size: number = MODULE_PAGE_SIZE) {
 		setIsFetching(true);
-		const res = await getDataFromModel({
+		await getDataFromModel({
 			page,
 			size,
 			sortBy: searchParams.get('f') as string,
 			sortDir: searchParams.get('d') as string,
 			id: searchParams.get('ref') as string,
 		});
-		setHasNextPage(res.length >= MODULE_PAGE_SIZE);
 		setIsFetching(false);
 	}
 
@@ -126,7 +125,6 @@ export default function Navigator() {
 		if (searchParams.get('f') || searchParams.get('d') || searchParams.get('ref')) {
 			const page = lastFetchedPage?.[modelId] ?? 0;
 			const size = lastFetchedPage?.[modelId] ? MODULE_PAGE_SIZE * page : MODULE_PAGE_SIZE;
-			console.log('fetching data', data.length);
 			fetchData(0, size);
 		}
 	}, [searchParams.get('f'), searchParams.get('d'), searchParams.get('ref')]);
@@ -136,6 +134,14 @@ export default function Navigator() {
 			fetchData(0);
 		}
 	}, []);
+
+	useUpdateEffect(() => {
+		if (scrollContainer?.current) {
+			scrollContainer.current.style.overflow =
+				isFetching && !isFetchingNextPage ? 'hidden' : 'auto';
+		}
+	}, [isFetching]);
+
 	return (
 		<VersionTabLayout
 			isEmpty={false}
@@ -162,9 +168,9 @@ export default function Navigator() {
 							<BeatLoader color='#6884FD' size={24} margin={18} />
 						</div>
 					) : data.length > 0 ? (
-						<div className='w-5/6 table-container overflow-auto' id='scroll'>
+						<div className='w-5/6 table-container overflow-auto' id='scroll' ref={scrollContainer}>
 							<InfiniteScroll
-								hasMore={hasNextPage}
+								hasMore={(lastFetchedCount?.[modelId] ?? 0) >= MODULE_PAGE_SIZE}
 								next={fetchNextPage}
 								loader={isFetchingNextPage && <TableLoading />}
 								dataLength={data.length}
