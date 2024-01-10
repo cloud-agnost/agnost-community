@@ -1,4 +1,3 @@
-import { create } from '@/helpers/store';
 import { CacheService } from '@/services';
 import {
 	APIError,
@@ -10,6 +9,7 @@ import {
 	GetCachesOfAppVersionParams,
 	UpdateCacheParams,
 } from '@/types';
+import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import useVersionStore from '../version/versionStore';
 
