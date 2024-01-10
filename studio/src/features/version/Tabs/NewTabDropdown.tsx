@@ -1,18 +1,21 @@
+import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
+import '@/components/Dropdown/dropdown.scss';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/Popover';
 import { SearchInput } from '@/components/SearchInput';
-import { NEW_TAB_ITEMS, TAB_ICON_MAP } from '@/constants';
+import { HTTP_METHOD_BADGE_MAP, NEW_TAB_ITEMS, TAB_ICON_MAP } from '@/constants';
+import { useSearchTabClick } from '@/hooks';
 import useTabStore from '@/store/version/tabStore.ts';
 import useVersionStore from '@/store/version/versionStore';
-import { DesignElement, Tab, TabTypes } from '@/types';
+import { TabTypes } from '@/types';
 import { capitalize, generateId } from '@/utils';
 import { Plus } from '@phosphor-icons/react';
 import { useParams } from 'react-router-dom';
-import '@/components/Dropdown/dropdown.scss';
 export default function NewTabDropdown() {
 	const { addTab } = useTabStore();
 	const { searchDesignElements, designElements, resetDesignElements, getVersionDashboardPath } =
 		useVersionStore();
+	const handleClickElement = useSearchTabClick();
 	const { versionId, appId, orgId } = useParams() as {
 		versionId: string;
 		appId: string;
@@ -27,27 +30,6 @@ export default function NewTabDropdown() {
 		};
 		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 		addTab(versionId, tab);
-	}
-
-	function handleClickElement(item: DesignElement) {
-		let url = `${item.type}/${item._id}`;
-		if (capitalize(item.type) === TabTypes.Model) url = `/database/${item.meta.dbId}/models`;
-		if (capitalize(item.type) === TabTypes.Field)
-			url = `database/${item.meta.dbId}/models/${item.modelId}/fields`;
-
-		const path = getVersionDashboardPath(url);
-
-		const tab: Tab = {
-			id: generateId(),
-			title: capitalize(item.type) === TabTypes.Field ? item.meta.modelName : item.name,
-			path,
-			isActive: true,
-			isDashboard: false,
-			isDirty: false,
-			type: capitalize(item.type) as TabTypes,
-		};
-		addTab(versionId, tab);
-		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	}
 
 	function onInput(keyword: string) {
@@ -102,6 +84,13 @@ export default function NewTabDropdown() {
 								</p>
 								<p className='text-default font-sfCompact'>{item.name}</p>
 							</div>
+							{item.meta?.method && (
+								<Badge
+									variant={HTTP_METHOD_BADGE_MAP[item.meta.method]}
+									text={item.meta.method}
+									className='absolute right-2'
+								/>
+							)}
 						</Button>
 					))}
 				</div>
