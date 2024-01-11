@@ -1,6 +1,8 @@
+import useTabStore from '@/store/version/tabStore';
+import useVersionStore from '@/store/version/versionStore';
 import { cn } from '@/utils';
 import { CaretUp } from '@phosphor-icons/react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { Button } from '../Button';
 import './sortButton.scss';
 interface SortButtonProps {
@@ -10,6 +12,9 @@ interface SortButtonProps {
 }
 export function SortButton({ text, className, field }: SortButtonProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { updateCurrentTab } = useTabStore();
+	const { version } = useVersionStore();
+	const { pathname } = useLocation();
 	const defaultDirection = 'asc';
 	const handleSortClick = () => {
 		const currentField = searchParams.get('f');
@@ -18,10 +23,17 @@ export function SortButton({ text, className, field }: SortButtonProps) {
 		if (currentField === field) {
 			newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
 		}
+
 		searchParams.set('f', field);
 		searchParams.set('d', newDirection);
 		setSearchParams(searchParams);
+		if (version) {
+			updateCurrentTab(version._id, {
+				path: `${pathname}?${searchParams.toString()}`,
+			});
+		}
 	};
+
 	return (
 		<Button variant='blank' onClick={handleSortClick} className={cn('sort-button', className)}>
 			{text}

@@ -36,8 +36,20 @@ async function onboardingLoader(params: LoaderFunctionArgs) {
 	return null;
 }
 
+async function createAppLoader() {
+	const { checkDomainStatus } = useClusterStore.getState();
+	let domainStatus = true;
+	try {
+		await checkDomainStatus();
+	} catch (error) {
+		domainStatus = false;
+	}
+	return { domainStatus };
+}
+
 export default {
 	accountInformationLoader,
 	inviteTeamMembersLoader,
 	onboardingLoader,
+	createAppLoader,
 };

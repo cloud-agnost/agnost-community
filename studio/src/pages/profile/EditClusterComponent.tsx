@@ -19,7 +19,6 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/Button';
 
 const Schema = z.object({
-	hpaName: z.string({ required_error: 'Name is required' }),
 	replicas: z.coerce.number().int().positive(),
 	minReplicas: z.coerce.number().int().positive(),
 	maxReplicas: z.coerce.number().int().positive(),
@@ -40,7 +39,6 @@ export default function EditClusterComponent() {
 	const form = useForm<z.infer<typeof Schema>>({
 		resolver: zodResolver(Schema),
 		defaultValues: {
-			hpaName: clusterComponent?.hpaName,
 			replicas: clusterComponent?.info?.configuredReplicas,
 			minReplicas: clusterComponent?.info?.minReplicas,
 			maxReplicas: clusterComponent?.info?.maxReplicas,
@@ -68,7 +66,6 @@ export default function EditClusterComponent() {
 	useEffect(() => {
 		if (isEditClusterComponentOpen && clusterComponent) {
 			form.reset({
-				hpaName: clusterComponent?.hpaName,
 				replicas: clusterComponent?.info?.configuredReplicas,
 				minReplicas: clusterComponent?.info?.minReplicas,
 				maxReplicas: clusterComponent?.info?.maxReplicas,
@@ -84,25 +81,6 @@ export default function EditClusterComponent() {
 				</DrawerHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='p-6  space-y-8 flex flex-col'>
-						<FormField
-							control={form.control}
-							name='hpaName'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{t('cluster.hpaName')}</FormLabel>
-									<FormControl>
-										<Input
-											error={!!form.formState.errors.hpaName}
-											placeholder={t('forms.placeholder', {
-												label: t('cluster.hpaName'),
-											}).toString()}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
 						<FormField
 							control={form.control}
 							name='replicas'
@@ -133,7 +111,7 @@ export default function EditClusterComponent() {
 										<FormLabel>{t('cluster.minReplicas')}</FormLabel>
 										<FormControl>
 											<Input
-												error={!!form.formState.errors.hpaName}
+												error={!!form.formState.errors.minReplicas}
 												placeholder={t('forms.placeholder', {
 													label: t('cluster.minReplicas'),
 												}).toString()}
@@ -153,7 +131,7 @@ export default function EditClusterComponent() {
 										<FormLabel>{t('cluster.maxReplicas')}</FormLabel>
 										<FormControl>
 											<Input
-												error={!!form.formState.errors.hpaName}
+												error={!!form.formState.errors.maxReplicas}
 												placeholder={t('forms.placeholder', {
 													label: t('cluster.maxReplicas'),
 												}).toString()}

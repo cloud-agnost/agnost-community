@@ -44,13 +44,30 @@ export default function Tabs() {
 		setTimeout(() => {
 			const selectedTab = scrollContainer?.current?.querySelector('[data-active=true]');
 			const firstElement = scrollContainer?.current?.querySelector('.tab-item');
-			scrollContainer?.current?.scrollBy({
-				left:
-					selectedTab?.getBoundingClientRect().left! - firstElement?.getBoundingClientRect().width!,
-				behavior: 'smooth',
-			});
+			if (
+				selectedTab &&
+				!isElementInViewport(selectedTab) &&
+				firstElement?.getBoundingClientRect()
+			) {
+				scrollContainer?.current?.scrollBy({
+					left:
+						selectedTab?.getBoundingClientRect().left -
+						firstElement?.getBoundingClientRect()?.width,
+					behavior: 'smooth',
+				});
+			}
 		}, 100);
 	}, [tabs]);
+
+	function isElementInViewport(el: Element) {
+		const rect = el.getBoundingClientRect();
+		return (
+			rect.top >= 0 &&
+			rect.left >= 0 &&
+			rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+			rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+		);
+	}
 
 	useEffect(() => {
 		if (getTabsByVersionId(versionId).find((tab: Tab) => tab.isDashboard)) return;

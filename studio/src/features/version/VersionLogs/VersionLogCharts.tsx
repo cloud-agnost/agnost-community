@@ -7,15 +7,19 @@ import { endOfDay, startOfDay } from 'date-fns';
 import { t } from 'i18next';
 import { useEffect, useMemo, useState } from 'react';
 import { Range } from 'react-date-range';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart';
 import { CustomTooltip } from './VersionLogs';
 import { differenceInSeconds } from 'date-fns';
+import useTabStore from '@/store/version/tabStore';
 
 export default function VersionLogCharts() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const userId = useAuthStore((state) => state.user?._id);
+	const version = useVersionStore((state) => state.version);
+	const updateCurrentTab = useTabStore((state) => state.updateCurrentTab);
+	const { pathname } = useLocation();
 	const [date, setDate] = useState<Range[]>([
 		{
 			startDate: startOfDay(new Date()),
@@ -29,6 +33,9 @@ export default function VersionLogCharts() {
 		searchParams.set('start', toIsoString(date[0].startDate as Date) ?? '');
 		searchParams.set('end', toIsoString(date[0].endDate as Date) ?? '');
 		setSearchParams(searchParams);
+		updateCurrentTab(version._id, {
+			path: `${pathname}?${searchParams.toString()}`,
+		});
 	}
 	const handleClickChart = (e: CategoricalChartState) => {
 		if (e?.activeLabel && e?.activeTooltipIndex !== undefined) {
@@ -36,11 +43,13 @@ export default function VersionLogCharts() {
 			const diff = differenceInSeconds(new Date(currentData.end), new Date(currentData.start));
 			if (diff > 10)
 				if (currentData?.success) {
-					setSearchParams({
-						...searchParams,
-						start: toIsoString(new Date(currentData.start)),
-						end: toIsoString(new Date(currentData.end)),
-					});
+					selectDate([
+						{
+							startDate: new Date(currentData.start),
+							endDate: new Date(currentData.end),
+							key: 'selection',
+						},
+					]);
 				}
 		}
 	};

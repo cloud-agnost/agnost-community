@@ -24,6 +24,9 @@ interface NavigatorStore {
 				[modelId: string]: number | undefined;
 		  }
 		| undefined;
+	lastFetchedCount: {
+		[modelId: string]: number | undefined;
+	};
 }
 
 type Actions = {
@@ -42,6 +45,7 @@ const initialState: NavigatorStore = {
 	subModelData: {},
 	selectedSubModelId: '',
 	lastFetchedPage: undefined,
+	lastFetchedCount: {},
 };
 
 const useNavigatorStore = create<NavigatorStore & Actions>()(
@@ -65,7 +69,9 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 								!_.isNil(get().lastFetchedPage?.[modelId]) &&
 								// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 								//@ts-ignore
-								get().lastFetchedPage?.[modelId] >= params.page
+								get().lastFetchedPage?.[modelId] >= params.page &&
+								params.sortBy &&
+								params.sortDir
 									? get().lastFetchedPage?.[modelId]
 									: params.page,
 						},
@@ -82,6 +88,14 @@ const useNavigatorStore = create<NavigatorStore & Actions>()(
 						},
 					}));
 				}
+
+				set((state) => ({
+					lastFetchedCount: {
+						...state.lastFetchedCount,
+						[modelId]: data.length,
+					},
+				}));
+
 				return data;
 			} catch (error) {
 				throw error as APIError;
