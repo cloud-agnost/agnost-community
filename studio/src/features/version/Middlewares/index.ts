@@ -1,2 +1,2 @@
-export { default as AddMiddlewareDrawer } from './AddMiddlewareDrawer.tsx';
+export { default as CreateMiddleware } from './CreateMiddleware.tsx';
 export { default as EditMiddlewareDrawer } from './EditMiddlewareDrawer.tsx';

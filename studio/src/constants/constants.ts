@@ -547,7 +547,7 @@ export const VERSION_SETTINGS_MENU_ITEMS = [
 	},
 
 	{
-		id: 9,
+		id: 10,
 		title: translate('version.settings.real_time'),
 		href: 'real-time',
 		icon: RealTime,
@@ -801,24 +801,24 @@ export const DATABASE = {
 	MongoDB: 'MongoDB',
 };
 
-export const TAB_ICON_MAP: Record<string, ElementType> = {
-	Storage: Storage,
-	Database: DatabaseIcon,
-	Cache: Lightning,
-	Endpoint: ApiKeys,
-	Queue: MessageQueue,
-	'Message Queue': MessageQueue,
-	Task: Timer,
-	Middleware: SkipForward,
-	Settings: GearSix,
-	Dashboard: Dashboard,
-	Notifications: BellRing,
-	Function: Function,
-	Field: Textbox,
-	Model: Table,
-	Navigator: Table,
-	Bucket: HardDrives,
-	File: FileText,
+export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
+	[TabTypes.Storage]: Storage,
+	[TabTypes.Database]: DatabaseIcon,
+	[TabTypes.Cache]: Lightning,
+	[TabTypes.Endpoint]: ApiKeys,
+	[TabTypes.MessageQueue]: MessageQueue,
+	[TabTypes.Queue]: MessageQueue,
+	[TabTypes.Task]: Timer,
+	[TabTypes.Middleware]: SkipForward,
+	[TabTypes.Settings]: GearSix,
+	[TabTypes.Dashboard]: Dashboard,
+	[TabTypes.Notifications]: BellRing,
+	[TabTypes.Function]: Function,
+	[TabTypes.Field]: Textbox,
+	[TabTypes.Model]: Table,
+	[TabTypes.Navigator]: Table,
+	[TabTypes.Bucket]: HardDrives,
+	[TabTypes.File]: FileText,
 };
 
 export const ENV_STATUS_CLASS_MAP: Record<EnvironmentStatus, string[]> = {
