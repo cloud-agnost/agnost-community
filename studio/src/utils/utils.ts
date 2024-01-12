@@ -143,14 +143,6 @@ export function reverseArray<T>(arr: T[]) {
 	return reversedArray;
 }
 
-export async function lazyRouteImport(path: string) {
-	const { default: Component } = await import(path);
-
-	return {
-		Component,
-		loader: Component.loader,
-	};
-}
 export const reorder = (list: any[], startIndex: number, endIndex: number) => {
 	const result = Array.from(list);
 	const [removed] = result.splice(startIndex, 1);
@@ -500,5 +492,15 @@ export function sortByField<T extends { updatedBy?: string; updatedAt: string; t
 		})),
 		[field],
 		[direction, 'asc'],
+	);
+}
+
+export function isElementInViewport(el: Element) {
+	const rect = el.getBoundingClientRect();
+	return (
+		rect.top >= 0 &&
+		rect.left >= 0 &&
+		rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+		rect.right <= (window.innerWidth || document.documentElement.clientWidth)
 	);
 }
