@@ -230,7 +230,7 @@ const useTabStore = create<TabStore & Actions>()(
 						},
 					}));
 				},
-				addSettingsTab: (versionId, path = '', title = '') => {
+				addSettingsTab: (versionId, path = '') => {
 					const tabs = get().tabs[versionId] ?? [];
 					const settingsTab = tabs.find((tab) => tab.type === TabTypes.Settings);
 					const tabPath = useVersionStore.getState().getVersionDashboardPath(`settings/${path}`);

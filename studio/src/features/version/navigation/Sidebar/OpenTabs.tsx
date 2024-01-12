@@ -6,22 +6,15 @@ import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { Tab } from '@/types';
 import { cn } from '@/utils';
-import { CaretRight, Trash, X, XSquare } from '@phosphor-icons/react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { CaretRight, X, XSquare } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
 import SideBarButton from './SideBarButton';
-import { useEffect } from 'react';
 export default function OpenTabs() {
 	const { t } = useTranslation();
 	const { versionId } = useParams() as { versionId: string };
-	const {
-		getTabsByVersionId,
-		setCurrentTab,
-		openDeleteTabModal,
-		removeTab,
-		removeAllTabs,
-		getCurrentTab,
-	} = useTabStore();
+	const { getTabsByVersionId, setCurrentTab, openDeleteTabModal, removeTab, removeAllTabs } =
+		useTabStore();
 	const tabs = getTabsByVersionId(versionId);
 	const { toggleOpenEditorTab, sidebar } = useUtilsStore();
 	const getTabIcon = useTabIcon('w-4 h-4');
