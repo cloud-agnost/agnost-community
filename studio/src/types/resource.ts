@@ -245,7 +245,7 @@ export const AccessDbSchema = z
 		clientId: z.string().optional(),
 		ssl: z
 			.object({
-				rejectUnauthorized: z.boolean().default(false),
+				rejectUnauthorized: z.boolean().default(false).optional(),
 				ca: z.string().optional(),
 				key: z.string().optional(),
 				cert: z.string().optional(),
@@ -253,7 +253,7 @@ export const AccessDbSchema = z
 			.optional(),
 		sasl: z
 			.object({
-				mechanism: z.nativeEnum(KafkaSaslMechanism).default(KafkaSaslMechanism.Plain),
+				mechanism: z.nativeEnum(KafkaSaslMechanism).default(KafkaSaslMechanism.Plain).optional(),
 				username: z.string().optional(),
 				password: z.string().optional(),
 			})
