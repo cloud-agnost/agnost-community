@@ -1,6 +1,5 @@
 const express = require('express');
 const k8s = require('@kubernetes/client-node');
-const fs = require('fs');
 
 const router = express.Router();
 

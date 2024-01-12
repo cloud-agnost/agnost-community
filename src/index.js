@@ -12,6 +12,7 @@ const mysqlRoutes = require('./mysql');
 const certificateRoutes = require('./certificates');
 const deploymentRestartRoutes = require('./deploymentRestart');
 const dockerCredenaials = require('./dockerCredentials');
+const resizeMinio = require('./resizeMinio');
 
 app.use(bodyParser.json());
 app.use('/', mongodbRoutes);
@@ -24,6 +25,7 @@ app.use('/', mysqlRoutes);
 app.use('/', certificateRoutes);
 app.use('/', deploymentRestartRoutes);
 app.use('/', dockerCredenaials);
+app.use('/', resizeMinio);
 
 // Start the server
 app.listen(3000, () => console.log('Server started on port 3000.'));
