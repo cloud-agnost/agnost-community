@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 import OpenTabs from './OpenTabs';
 import VersionSettingsExplorer from './VersionSettingsExplorer';
 import Workspace from './Workspace';
+import { isElementInViewport } from '@/utils';
 export default function SideBar() {
 	const { sidebar, toggleSidebar, isSidebarOpen } = useUtilsStore();
 	const { getCurrentTab, tabs } = useTabStore();
@@ -34,7 +35,7 @@ export default function SideBar() {
 					? currentTab.title
 					: window.location.pathname.split('/').slice(-1).pop();
 			const targetElement = document.getElementById(dataId as string);
-			if (targetElement) {
+			if (targetElement && isElementInViewport(targetElement)) {
 				targetElement.scrollIntoView({ behavior: 'smooth' });
 			}
 		};
@@ -50,8 +51,10 @@ export default function SideBar() {
 		};
 	}, [isSidebarOpen, tabs]);
 	return (
-		<div className='h-full w-80 bg-wrapper-background-base shadow-xl'>
-			<h1 className='text-sm font-bold text-white px-8 py-2'>Explorer</h1>
+		<div className='h-full w-96 bg-wrapper-background-base shadow-xl' id='side-navigation'>
+			<h1 className='text-sm font-bold text-white px-8 py-2 border-b border-border mb-1'>
+				Explorer
+			</h1>
 			<PanelGroup
 				direction='vertical'
 				key={String(sidebar[versionId].openEditor)}
