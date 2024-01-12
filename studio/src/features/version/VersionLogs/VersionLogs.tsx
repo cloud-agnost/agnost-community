@@ -4,13 +4,13 @@ import useVersionStore from '@/store/version/versionStore';
 import { calculateRecommendedBuckets, toIsoString } from '@/utils';
 import { useQuery } from '@tanstack/react-query';
 import { endOfDay, startOfDay } from 'date-fns';
+import _ from 'lodash';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import BeatLoader from 'react-spinners/BeatLoader';
 import VersionLogCharts from './VersionLogCharts';
 import VersionLogsTable from './VersionLogsTable';
-import _ from 'lodash';
 interface VersionLogsProps {
 	type: 'queue' | 'task' | 'endpoint';
 }
@@ -73,7 +73,7 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 				</>
 			) : (
 				<div className='flex flex-col h-1/2 items-center justify-center'>
-					<EmptyState type={type} title={t('version.no_logs')} />
+					<EmptyState type={_.capitalize(type) as any} title={t('version.no_logs')} />
 				</div>
 			)}
 		</div>
