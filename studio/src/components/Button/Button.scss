@@ -11,7 +11,7 @@
 		@apply border border-button-border hover:border-button-border-hover #{!important};
 	}
 	&-text {
-		@apply text-default hover:bg-button-secondary-hover #{!important};
+		@apply text-default hover:bg-wrapper-background-hover #{!important};
 	}
 	&-link {
 		@apply text-button-primary hover:underline hover:text-button-primary-hover #{!important};
