@@ -27,7 +27,7 @@ export default function VersionLogs({ type }: VersionLogsProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const { refetch, isFetching } = useQuery({
-		queryKey: ['versionLogBuckets'],
+		queryKey: ['versionLogBuckets', appId, orgId, versionId, type],
 		queryFn: () => {
 			const start = new Date(searchParams.get('start') as string);
 			const end = new Date(searchParams.get('end') as string);

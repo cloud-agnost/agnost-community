@@ -155,17 +155,13 @@ const useClusterStore = create<ClusterStore & Actions>()(
 			set({ isEditClusterComponentOpen: false, clusterComponent: {} as ClusterComponent });
 		},
 		transferClusterOwnership: async (params: TransferRequest) => {
-			try {
-				await ClusterService.transferClusterOwnership(params);
-				useAuthStore.setState((prev) => ({
-					user: {
-						...prev.user,
-						isClusterOwner: false,
-					},
-				}));
-			} catch (error) {
-				throw error;
-			}
+			await ClusterService.transferClusterOwnership(params);
+			useAuthStore.setState((prev) => ({
+				user: {
+					...prev.user,
+					isClusterOwner: false,
+				},
+			}));
 		},
 		getClusterInfo: async () => {
 			try {
@@ -222,31 +218,19 @@ const useClusterStore = create<ClusterStore & Actions>()(
 			set((prev) => ({ isReleaseHistoryOpen: !prev.isReleaseHistoryOpen }));
 		},
 		addDomain: async (data: DomainParams) => {
-			try {
-				const cluster = await ClusterService.addDomain(data);
-				set({ cluster });
-				return cluster;
-			} catch (error) {
-				throw error;
-			}
+			const cluster = await ClusterService.addDomain(data);
+			set({ cluster });
+			return cluster;
 		},
 		deleteDomain: async (data: DomainParams) => {
-			try {
-				const cluster = await ClusterService.deleteDomain(data);
-				set({ cluster });
-				return cluster;
-			} catch (error) {
-				throw error;
-			}
+			const cluster = await ClusterService.deleteDomain(data);
+			set({ cluster });
+			return cluster;
 		},
 		enforceSSL: async (data: EnforceSSLAccessParams) => {
-			try {
-				const cluster = await ClusterService.enforceSSL(data);
-				set({ cluster });
-				return cluster;
-			} catch (error) {
-				throw error;
-			}
+			const cluster = await ClusterService.enforceSSL(data);
+			set({ cluster });
+			return cluster;
 		},
 		checkDomainStatus: async () => {
 			try {
@@ -257,11 +241,7 @@ const useClusterStore = create<ClusterStore & Actions>()(
 			}
 		},
 		getActiveUsers: async (params) => {
-			try {
-				return await UserService.getActiveUsers(params);
-			} catch (error) {
-				throw error;
-			}
+			return await UserService.getActiveUsers(params);
 		},
 		reset: () => set(initialState),
 	})),

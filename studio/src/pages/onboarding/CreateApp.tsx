@@ -13,12 +13,14 @@ import { Input } from '@/components/Input';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useLoaderData, useNavigate, useOutletContext } from 'react-router-dom';
 import useOnboardingStore from '@/store/onboarding/onboardingStore.ts';
 import { translate } from '@/utils';
 import { useTranslation } from 'react-i18next';
 import { RequireAuth } from '@/router';
-
+import useClusterStore from '@/store/cluster/clusterStore';
+import { useMutation } from '@tanstack/react-query';
+import { Alert, AlertDescription, AlertTitle } from '@/components/Alert';
 const FormSchema = z.object({
 	appName: z
 		.string({
@@ -45,8 +47,9 @@ export default function CreateApp() {
 	const navigate = useNavigate();
 	const { goBack } = useOutletContext() as { goBack: () => void };
 	const { setDataPartially, getCurrentStep, goToNextStep, data } = useOnboardingStore();
+	const { finalizeClusterSetup } = useClusterStore();
 	const { t } = useTranslation();
-
+	const { domainStatus } = useLoaderData() as { domainStatus: boolean };
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
@@ -56,18 +59,46 @@ export default function CreateApp() {
 
 	function onSubmit(data: z.infer<typeof FormSchema>) {
 		setDataPartially({ appName: data.appName });
-		const { nextPath } = getCurrentStep();
-		if (nextPath) {
-			navigate(nextPath);
-			goToNextStep(true);
+		if (domainStatus) {
+			const { nextPath } = getCurrentStep();
+			if (nextPath) {
+				navigate(nextPath);
+				goToNextStep(true);
+			}
+		} else {
+			finalizeMutate(data.appName);
 		}
 	}
+
+	const {
+		mutateAsync: finalizeMutate,
+		isLoading: finalizing,
+		error,
+	} = useMutation({
+		mutationFn: (appName: string) =>
+			finalizeClusterSetup({
+				...data,
+				appName,
+				uiBaseURL: window.location.origin,
+			}),
+		onSuccess: (res) => {
+			setDataPartially({
+				appName: data.appName,
+			});
+			navigate(`/organization/${res.org._id}/apps`);
+		},
+	});
 
 	return (
 		<RequireAuth>
 			<>
 				<Description title={t('onboarding.app.title')}>{t('onboarding.app.desc')}</Description>
-
+				{error && (
+					<Alert className='!max-w-full' variant='error'>
+						<AlertTitle>{error.error}</AlertTitle>
+						<AlertDescription>{error.details}</AlertDescription>
+					</Alert>
+				)}
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
 						<FormField
@@ -93,9 +124,15 @@ export default function CreateApp() {
 							<Button onClick={goBack} type='button' variant='text' size='lg'>
 								{t('onboarding.previous')}
 							</Button>
-							<Button size='lg' type='submit'>
-								{t('onboarding.next')}
-							</Button>
+							{domainStatus || !import.meta.env.PROD ? (
+								<Button size='lg' type='submit'>
+									{t('onboarding.next')}
+								</Button>
+							) : (
+								<Button type='submit' loading={finalizing} variant='secondary' size='lg'>
+									{t('onboarding.finish')}
+								</Button>
+							)}
 						</div>
 					</form>
 				</Form>

@@ -62,7 +62,7 @@ const VariableColumns: ColumnDefWithClassName<Param>[] = [
 			},
 		}) => {
 			return (
-				<div className='flex items-center gap-8 group'>
+				<div className='flex items-center gap-4 group'>
 					<div className='truncate'>{name}</div>
 					<CopyButton text={name} className='hidden group-hover:block' />
 				</div>

@@ -921,12 +921,7 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 			const selection = ed.getSelection() as monaco.Selection;
 			const selectedText = ed.getModel()?.getValueInRange(selection);
 
-			const tryCatchBlock =
-				`try {\n` +
-				`  ${selectedText}\n` +
-				`} catch (error) {\n` +
-				`  console.error(error);\n` +
-				`}`;
+			const tryCatchBlock = `try {\n` + `  ${selectedText}\n` + `} catch (error) {\n` + `}`;
 
 			ed.executeEdits('', [
 				{
@@ -999,12 +994,7 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 			const selection = ed.getSelection() as monaco.Selection;
 			const selectedText = ed.getModel()?.getValueInRange(selection);
 
-			const ifElseBlock =
-				`if (condition) {\n` +
-				`  ${selectedText}\n` +
-				`} else {\n` +
-				`  console.error(error);\n` +
-				`}`;
+			const ifElseBlock = `if (condition) {\n` + `  ${selectedText}\n` + `} else {\n` + `}`;
 
 			ed.executeEdits('', [
 				{
@@ -1294,14 +1284,9 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 		precondition: 'editorHasSelection',
 		run: (ed) => {
 			const selection = ed.getSelection() as monaco.Selection;
-
+			const selectedText = ed.getModel()?.getValueInRange(selection);
 			const classBlock =
-				`class ClassName {\n` +
-				`  constructor() {\n` +
-				`    ${selection}\n` +
-				`  }\n` +
-				`  ${selection}\n` +
-				`}`;
+				`class ClassName {\n` + `  constructor() {\n` + `  }\n` + `  ${selectedText}\n` + `}`;
 
 			ed.executeEdits('', [
 				{
@@ -1323,9 +1308,9 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 		precondition: 'editorHasSelection',
 		run: (ed) => {
 			const selection = ed.getSelection() as monaco.Selection;
-
-			const templateLiteralBlock = `\`${selection}\``;
-
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+			const templateLiteralBlock = `\`${selectedText}\``;
+			console.log(templateLiteralBlock);
 			ed.executeEdits('', [
 				{
 					range: new monaco.Range(
@@ -1341,14 +1326,14 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 		},
 	},
 	{
-		id: 'surround-with-async-await',
-		label: 'Surround with Async Await',
+		id: 'surround-with-template-literal-variable',
+		label: 'Surround with Template Literal Variable',
 		precondition: 'editorHasSelection',
 		run: (ed) => {
 			const selection = ed.getSelection() as monaco.Selection;
-
-			const asyncAwaitBlock = `async () => {\n` + `  ${selection}\n` + `}`;
-
+			const selectedText = ed.getModel()?.getValueInRange(selection);
+			const templateLiteralBlock = `\${${selectedText}}`;
+			console.log(templateLiteralBlock);
 			ed.executeEdits('', [
 				{
 					range: new monaco.Range(
@@ -1357,7 +1342,7 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 						selection.endLineNumber,
 						selection.endColumn,
 					),
-					text: asyncAwaitBlock,
+					text: templateLiteralBlock,
 					forceMoveMarkers: true,
 				},
 			]);

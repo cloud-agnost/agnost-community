@@ -9,9 +9,11 @@ import { useTranslation } from 'react-i18next';
 import useClusterStore from '@/store/cluster/clusterStore';
 import { useMutation } from '@tanstack/react-query';
 import { useToast } from '@/hooks';
+import _ from 'lodash';
+import { Feedback } from '@/components/Alert';
 export default function ClusterSmtpForm() {
 	const { t } = useTranslation();
-	const { updateSmtpSettings, cluster } = useClusterStore();
+	const { updateSmtpSettings, cluster, clusterDomainError } = useClusterStore();
 	const { toast } = useToast();
 	const form = useForm<z.infer<typeof SMTPSchema>>({
 		resolver: zodResolver(SMTPSchema),
@@ -37,7 +39,8 @@ export default function ClusterSmtpForm() {
 	function onSubmit(data: z.infer<typeof SMTPSchema>) {
 		updateSmtp(data);
 	}
-	return (
+
+	return _.isNil(clusterDomainError) || !import.meta.env.PROD ? (
 		<Form {...form}>
 			<form className='space-y-6 flex flex-col max-w-2xl' onSubmit={form.handleSubmit(onSubmit)}>
 				<p className='text-subtle text-sm font-sfCompact'>{t('cluster.smtpDescription')}</p>
@@ -47,5 +50,13 @@ export default function ClusterSmtpForm() {
 				</Button>
 			</form>
 		</Form>
+	) : (
+		<div className='h-full flex flex-col items-center justify-center'>
+			<Feedback
+				title={clusterDomainError?.error}
+				description={clusterDomainError?.details}
+				className='max-w-2xl'
+			/>
+		</div>
 	);
 }
