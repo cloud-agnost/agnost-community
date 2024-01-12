@@ -11,17 +11,13 @@ import { useLocation, useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MiddlewareForm from './MiddlewareForm';
 import { MiddlewareSchema } from '@/types';
-interface AddMiddlewareDrawerProps {
+interface CreateMiddlewareProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onCreate?: (middleware: Middleware) => void;
 }
 
-export default function AddMiddlewareDrawer({
-	open,
-	onOpenChange,
-	onCreate,
-}: AddMiddlewareDrawerProps) {
+export default function CreateMiddleware({ open, onOpenChange, onCreate }: CreateMiddlewareProps) {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
