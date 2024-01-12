@@ -5,6 +5,7 @@ import {
 	EndpointRequest,
 	EndpointResponse,
 	Log,
+	TabTypes,
 	TestEndpointParams,
 	TestQueueLogs,
 	TestResponse,
@@ -22,6 +23,14 @@ interface UtilsStore {
 	testQueueLogs: TestQueueLogs;
 	taskLogs: TestTaskLogs;
 	typings: Record<string, string>;
+	sidebar: {
+		[version: string]: {
+			openEditor: boolean | undefined;
+			openedTabs: string[] | undefined;
+		};
+	};
+	isSidebarOpen: boolean;
+	panelScrollPosition: number;
 }
 
 type Actions = {
@@ -33,6 +42,10 @@ type Actions = {
 	setTaskLogs: (taskId: string, log: Log) => void;
 	setEndpointLogs: (epId: string, log: Log) => void;
 	fetchTypes: (packages: Record<string, string>) => Promise<void>;
+	toggleOpenEditorTab: () => void;
+	toggleWorkspaceTab: (tab: TabTypes) => void;
+	toggleSidebar: () => void;
+	setPanelScrollPosition: (position: number) => void;
 };
 
 const initialState: UtilsStore = {
@@ -42,6 +55,9 @@ const initialState: UtilsStore = {
 	taskLogs: {} as TestTaskLogs,
 	typings: {} as Record<string, string>,
 	endpointLogs: {} as EndpointLogs,
+	sidebar: {} as UtilsStore['sidebar'],
+	isSidebarOpen: false,
+	panelScrollPosition: 0,
 };
 
 const useUtilsStore = create<UtilsStore & Actions>()(
@@ -124,6 +140,39 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 						set((prev) => ({ typings: { ...prev.typings, ...typings } }));
 					};
 				},
+				toggleOpenEditorTab: () => {
+					const version = useVersionStore.getState().version;
+					set((prev) => {
+						const isOpen = prev.sidebar?.[version._id]?.openEditor ?? false;
+						return {
+							sidebar: {
+								...prev.sidebar,
+								[version._id]: {
+									...prev.sidebar?.[version._id],
+									openEditor: !isOpen,
+								},
+							},
+						};
+					});
+				},
+				toggleSidebar: () => set((prev) => ({ isSidebarOpen: !prev.isSidebarOpen })),
+				toggleWorkspaceTab: (tab) => {
+					const version = useVersionStore.getState().version;
+					set((prev) => {
+						const openedTabs = prev.sidebar?.[version._id]?.openedTabs ?? [];
+						const isOpen = openedTabs.includes(tab);
+						return {
+							sidebar: {
+								...prev.sidebar,
+								[version._id]: {
+									...prev.sidebar?.[version._id],
+									openedTabs: isOpen ? openedTabs.filter((t) => t !== tab) : [...openedTabs, tab],
+								},
+							},
+						};
+					});
+				},
+				setPanelScrollPosition: (position) => set({ panelScrollPosition: position }),
 			}),
 			{ name: 'utils-store', storage: CustomStateStorage },
 		),

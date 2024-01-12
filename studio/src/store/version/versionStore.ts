@@ -68,6 +68,7 @@ type Actions = {
 	getVersionDashboardInfo: (params: BaseParams) => Promise<Dashboard>;
 	getNpmPackages: (params: BaseParams) => Promise<void>;
 	getTypings: () => Promise<Record<string, string>>;
+
 	reset: () => void;
 };
 
