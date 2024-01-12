@@ -10,6 +10,7 @@ interface FunctionStore {
 	isEditFunctionDrawerOpen: boolean;
 	lastFetchedPage: number | undefined;
 	logics: Record<string, string>;
+	isCreateFunctionDrawerOpen: boolean;
 }
 type Actions = {
 	getFunctionsOfAppVersion: (
@@ -25,6 +26,7 @@ type Actions = {
 	openEditFunctionDrawer: (func: funcTypes.HelperFunction) => void;
 	setLogics: (id: string, logic: string) => void;
 	deleteLogic: (id: string) => void;
+	toggleCreateFunctionDrawer: () => void;
 	reset: () => void;
 };
 
@@ -34,6 +36,7 @@ const initialState: FunctionStore = {
 	isEditFunctionDrawerOpen: false,
 	lastFetchedPage: undefined,
 	logics: {},
+	isCreateFunctionDrawerOpen: false,
 };
 
 const useFunctionStore = create<FunctionStore & Actions>()(
@@ -139,6 +142,8 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 			const { [id]: _, ...rest } = get().logics;
 			set({ logics: rest });
 		},
+		toggleCreateFunctionDrawer: () =>
+			set((prev) => ({ isCreateFunctionDrawerOpen: !prev.isCreateFunctionDrawerOpen })),
 		reset: () => set(initialState),
 	})),
 );

@@ -1,21 +1,19 @@
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { CreateStorage, StorageColumns } from '@/features/storage';
+import { StorageColumns } from '@/features/storage';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useStorageStore from '@/store/storage/storageStore';
-import { APIError } from '@/types';
+import { APIError, TabTypes } from '@/types';
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams } from 'react-router-dom';
 
 export default function MainStorage() {
-	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const { toast } = useToast();
 	const canCreateStorages = useAuthorizeVersion('storage.create');
 	const { t } = useTranslation();
@@ -26,6 +24,7 @@ export default function MainStorage() {
 		closeStorageDeleteDialog,
 		deleteStorage,
 		deleteMultipleStorages,
+		toggleCreateStorageDialog,
 		lastFetchedPage,
 		toDeleteStorage,
 		storages,
@@ -87,52 +86,49 @@ export default function MainStorage() {
 	}
 
 	return (
-		<>
-			<VersionTabLayout
-				searchable
-				isEmpty={!storages.length}
-				title={t('storage.title') as string}
-				type='storage'
-				openCreateModal={() => setIsCreateModalOpen(true)}
-				createButtonTitle={t('storage.create')}
-				emptyStateTitle={t('storage.empty_text')}
-				onMultipleDelete={deleteMultipleStoragesHandler}
-				disabled={!canCreateStorages}
-				loading={isFetching && !storages.length}
-				table={table}
+		<VersionTabLayout
+			searchable
+			isEmpty={!storages.length}
+			title={t('storage.title') as string}
+			type={TabTypes.Storage}
+			openCreateModal={toggleCreateStorageDialog}
+			createButtonTitle={t('storage.create')}
+			emptyStateTitle={t('storage.empty_text')}
+			onMultipleDelete={deleteMultipleStoragesHandler}
+			disabled={!canCreateStorages}
+			loading={isFetching && !storages.length}
+			table={table}
+		>
+			<InfiniteScroll
+				scrollableTarget='version-layout'
+				dataLength={storages.length}
+				next={fetchNextPage}
+				hasMore={hasNextPage}
+				loader={isFetchingNextPage && <TableLoading />}
 			>
-				<InfiniteScroll
-					scrollableTarget='version-layout'
-					dataLength={storages.length}
-					next={fetchNextPage}
-					hasMore={hasNextPage}
-					loader={isFetchingNextPage && <TableLoading />}
-				>
-					<DataTable table={table} />
-				</InfiniteScroll>
-				<ConfirmationModal
-					loading={isPending}
-					error={deleteError}
-					title={t('storage.delete.title')}
-					alertTitle={t('storage.delete.message')}
-					alertDescription={t('storage.delete.description')}
-					description={
-						<Trans
-							i18nKey='storage.delete.confirmCode'
-							values={{ confirmCode: toDeleteStorage?.iid }}
-							components={{
-								confirmCode: <span className='font-bold text-default' />,
-							}}
-						/>
-					}
-					confirmCode={toDeleteStorage?.iid as string}
-					onConfirm={deleteStorageHandler}
-					isOpen={isStorageDeleteDialogOpen}
-					closeModal={closeStorageDeleteDialog}
-					closable
-				/>
-			</VersionTabLayout>
-			<CreateStorage open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
-		</>
+				<DataTable table={table} />
+			</InfiniteScroll>
+			<ConfirmationModal
+				loading={isPending}
+				error={deleteError}
+				title={t('storage.delete.title')}
+				alertTitle={t('storage.delete.message')}
+				alertDescription={t('storage.delete.description')}
+				description={
+					<Trans
+						i18nKey='storage.delete.confirmCode'
+						values={{ confirmCode: toDeleteStorage?.iid }}
+						components={{
+							confirmCode: <span className='font-bold text-default' />,
+						}}
+					/>
+				}
+				confirmCode={toDeleteStorage?.iid as string}
+				onConfirm={deleteStorageHandler}
+				isOpen={isStorageDeleteDialogOpen}
+				closeModal={closeStorageDeleteDialog}
+				closable
+			/>
+		</VersionTabLayout>
 	);
 }

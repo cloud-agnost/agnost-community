@@ -5,29 +5,30 @@ import { capitalize } from 'lodash';
 import React, { ElementType } from 'react';
 import { EnvironmentVariable, NpmPackage, RateLimit, Storage } from '../icons';
 import './emptyState.scss';
+import { TabTypes } from '@/types';
 
 export type Modules =
 	| 'org'
 	| 'app'
-	| 'endpoint'
-	| 'queue'
-	| 'file'
-	| 'database'
-	| 'model'
-	| 'task'
-	| 'field'
+	| TabTypes.Endpoint
+	| TabTypes.MessageQueue
+	| TabTypes.File
+	| TabTypes.Database
+	| TabTypes.Model
+	| TabTypes.Task
+	| TabTypes.Field
+	| TabTypes.Bucket
+	| TabTypes.Storage
+	| TabTypes.Middleware
+	| TabTypes.Function
+	| TabTypes.Cache
+	| TabTypes.Notifications
 	| 'invitation'
-	| 'bucket'
-	| 'storage'
-	| 'middleware'
 	| 'resource'
 	| 'apiKey'
 	| 'variable'
 	| 'package'
 	| 'rate-limit'
-	| 'function'
-	| 'cache'
-	| 'notification'
 	| 'custom-domain';
 
 interface EmptyStateProps {
@@ -50,7 +51,7 @@ export default function EmptyState({ type, title, className, children }: EmptySt
 		notification: Bell,
 		'custom-domain': GlobeSimple,
 	};
-	const Icon = TAB_ICON_MAP[capitalize(type)] ?? ICON_MAP[type];
+	const Icon = TAB_ICON_MAP[capitalize(type) as TabTypes] ?? ICON_MAP[type];
 	return (
 		<div className={cn('empty-state h-[95%]', className)}>
 			{<Icon className='w-44 h-44 text-icon-base' />}

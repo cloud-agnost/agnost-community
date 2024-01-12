@@ -23,6 +23,7 @@ export interface TaskStore {
 	lastFetchedPage: number | undefined;
 	isEditTaskModalOpen: boolean;
 	logics: Record<string, string>;
+	isCreateTaskModalOpen: boolean;
 }
 
 type Actions = {
@@ -38,6 +39,7 @@ type Actions = {
 	testTask: (params: TestTaskParams) => Promise<void>;
 	setLogics: (id: string, logic: string) => void;
 	deleteLogic: (id: string) => void;
+	toggleCreateTaskModal: () => void;
 	reset: () => void;
 };
 
@@ -46,6 +48,7 @@ const initialState: TaskStore = {
 	tasks: [],
 	lastFetchedPage: undefined,
 	isEditTaskModalOpen: false,
+	isCreateTaskModalOpen: false,
 	logics: {},
 };
 
@@ -165,7 +168,9 @@ const useTaskStore = create<TaskStore & Actions>()(
 				throw error as APIError;
 			}
 		},
-
+		toggleCreateTaskModal: () => {
+			set((prev) => ({ isCreateTaskModalOpen: !prev.isCreateTaskModalOpen }));
+		},
 		setLogics: (id, logic) => set((prev) => ({ logics: { ...prev.logics, [id]: logic } })),
 		deleteLogic: (id) => {
 			const { [id]: _, ...rest } = get().logics;

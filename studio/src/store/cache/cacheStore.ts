@@ -18,6 +18,7 @@ interface CacheStore {
 	cache: Cache;
 	loading: boolean;
 	error: APIError | null;
+	isCreateCacheModalOpen: boolean;
 	isEditCacheModalOpen: boolean;
 	toDeleteCache: Cache;
 	isDeleteCacheModalOpen: boolean;
@@ -35,6 +36,7 @@ type Actions = {
 	closeEditCacheModal: () => void;
 	openDeleteCacheModal: (cache: Cache) => void;
 	closeDeleteCacheModal: () => void;
+	toggleCreateCacheModal: () => void;
 	reset: () => void;
 };
 
@@ -47,6 +49,7 @@ const initialState: CacheStore = {
 	toDeleteCache: {} as Cache,
 	isDeleteCacheModalOpen: false,
 	lastFetchedPage: undefined,
+	isCreateCacheModalOpen: false,
 };
 
 const useCacheStore = create<CacheStore & Actions>()(
@@ -140,6 +143,8 @@ const useCacheStore = create<CacheStore & Actions>()(
 			closeDeleteCacheModal: () => {
 				set({ isDeleteCacheModalOpen: false, toDeleteCache: {} as Cache });
 			},
+			toggleCreateCacheModal: () =>
+				set((prev) => ({ isCreateCacheModalOpen: !prev.isCreateCacheModalOpen })),
 			reset: () => set(initialState),
 		}),
 		{

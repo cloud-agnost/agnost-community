@@ -26,6 +26,7 @@ interface EndpointStore {
 	lastFetchedPage: number | undefined;
 	isEditEndpointDialogOpen: boolean;
 	logics: Record<string, string>;
+	isCreateEndpointDialogOpen: boolean;
 }
 
 type Actions = {
@@ -45,6 +46,7 @@ type Actions = {
 	closeEditEndpointDialog: () => void;
 	setLogics: (id: string, logic: string) => void;
 	deleteLogic: (id: string) => void;
+	toggleCreateEndpointDialog: () => void;
 	reset: () => void;
 };
 
@@ -56,6 +58,7 @@ const initialState: EndpointStore = {
 	lastFetchedPage: undefined,
 	isEditEndpointDialogOpen: false,
 	logics: {},
+	isCreateEndpointDialogOpen: false,
 };
 
 const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
@@ -191,6 +194,9 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 	deleteLogic: (id) => {
 		const { [id]: _, ...rest } = get().logics;
 		set({ logics: rest });
+	},
+	toggleCreateEndpointDialog: () => {
+		set((prev) => ({ isCreateEndpointDialogOpen: !prev.isCreateEndpointDialogOpen }));
 	},
 	reset: () => set(initialState),
 }));

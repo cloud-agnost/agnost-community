@@ -9,7 +9,7 @@ import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useStorageStore from '@/store/storage/storageStore';
 import useVersionStore from '@/store/version/versionStore';
-import { APIError } from '@/types';
+import { APIError, TabTypes } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import _ from 'lodash';
 import { useMemo, useState } from 'react';
@@ -135,7 +135,7 @@ export default function Files() {
 				searchable
 				breadCrumb={<BreadCrumb goBackLink={bucketUrl} items={breadcrumbItems} />}
 				isEmpty={files?.length === 0}
-				type='file'
+				type={TabTypes.File}
 				openCreateModal={uploadFileHandler}
 				createButtonTitle={t('storage.file.upload')}
 				emptyStateTitle={t('storage.file.empty_text')}

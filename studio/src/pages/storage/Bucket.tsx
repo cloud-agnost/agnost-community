@@ -8,7 +8,7 @@ import { BucketColumns, CreateBucket } from '@/features/storage';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useStorageStore from '@/store/storage/storageStore';
-import { APIError } from '@/types';
+import { APIError, TabTypes } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import _ from 'lodash';
 import { useState } from 'react';
@@ -105,7 +105,7 @@ export default function Buckets() {
 			<VersionTabLayout
 				searchable
 				isEmpty={buckets.length === 0}
-				type='bucket'
+				type={TabTypes.Bucket}
 				openCreateModal={() => setIsBucketCreateOpen(true)}
 				createButtonTitle={t('storage.bucket.create')}
 				emptyStateTitle={t('storage.bucket.empty_text')}

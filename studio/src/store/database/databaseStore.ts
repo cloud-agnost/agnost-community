@@ -19,6 +19,7 @@ interface DatabaseStore {
 	isDeleteDatabaseDialogOpen: boolean;
 	isEditDatabaseDialogOpen: boolean;
 	isDatabaseFetched: boolean;
+	isCreateDatabaseDialogOpen: boolean;
 }
 
 type Actions = {
@@ -32,6 +33,7 @@ type Actions = {
 	closeDeleteDatabaseDialog: () => void;
 	openEditDatabaseDialog: (db: Database) => void;
 	closeEditDatabaseDialog: () => void;
+	toggleCreateDatabaseDialog: () => void;
 	reset: () => void;
 };
 
@@ -42,6 +44,7 @@ const initialState: DatabaseStore = {
 	isDeleteDatabaseDialogOpen: false,
 	isEditDatabaseDialogOpen: false,
 	isDatabaseFetched: false,
+	isCreateDatabaseDialogOpen: false,
 };
 
 const useDatabaseStore = create<DatabaseStore & Actions>()(
@@ -107,6 +110,10 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 					databases: prev.databases.filter((db) => db._id !== params.dbId),
 				}));
 			},
+			toggleCreateDatabaseDialog: () =>
+				set((prev) => ({
+					isCreateDatabaseDialogOpen: !prev.isCreateDatabaseDialogOpen,
+				})),
 			setDatabase: (database: Database) => set({ database }),
 			reset: () => set(initialState),
 		}),

@@ -50,6 +50,7 @@ export interface StorageStore {
 	toDeleteBucket: Bucket | null;
 	bucketCountInfo: BucketCountInfo | undefined;
 	uploadProgress: number;
+	isCreateStorageDialogOpen: boolean;
 }
 
 type Actions = {
@@ -83,6 +84,7 @@ type Actions = {
 	replaceFileInBucket: (req: ReplaceFileInBucket) => Promise<BucketFile>;
 	copyFileInBucket: (req: DeleteFileFromBucketParams) => Promise<BucketFile>;
 	updateFileInBucket: (req: UpdateFileInBucketParams) => Promise<BucketFile>;
+	toggleCreateStorageDialog: () => void;
 	reset: () => void;
 };
 
@@ -104,6 +106,7 @@ const initialState: StorageStore = {
 	fileCountInfo: undefined,
 	uploadProgress: 0,
 	isEditFileDialogOpen: false,
+	isCreateStorageDialogOpen: false,
 };
 
 const useStorageStore = create<StorageStore & Actions>()(
@@ -405,6 +408,9 @@ const useStorageStore = create<StorageStore & Actions>()(
 				params.onError?.(error as APIError);
 				throw error as APIError;
 			}
+		},
+		toggleCreateStorageDialog: () => {
+			set((prev) => ({ isCreateStorageDialogOpen: !prev.isCreateStorageDialogOpen }));
 		},
 		reset: () => set(initialState),
 	})),

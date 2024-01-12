@@ -1,22 +1,20 @@
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { CacheColumns, CreateCache, EditCache } from '@/features/cache';
+import { CacheColumns, EditCache } from '@/features/cache';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useCacheStore from '@/store/cache/cacheStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
-import { APIError, Cache } from '@/types';
+import { APIError, Cache, TabTypes } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { Row } from '@tanstack/react-table';
-import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams } from 'react-router-dom';
 
 export default function VersionCache() {
-	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const canCreateCache = useAuthorizeVersion('cache.create');
 	const { toast } = useToast();
 	const { t } = useTranslation();
@@ -26,12 +24,11 @@ export default function VersionCache() {
 		closeDeleteCacheModal,
 		deleteCache,
 		deleteMultipleCache,
-		closeEditCacheModal,
+		toggleCreateCacheModal,
 		lastFetchedPage,
 		toDeleteCache,
 		caches,
 		isDeleteCacheModalOpen,
-		isEditCacheModalOpen,
 	} = useCacheStore();
 	const table = useTable({
 		data: caches,
@@ -99,53 +96,49 @@ export default function VersionCache() {
 	}
 
 	return (
-		<>
-			<VersionTabLayout
-				searchable
-				isEmpty={caches.length === 0}
-				title={t('cache.title') as string}
-				type='cache'
-				openCreateModal={() => setIsCreateModalOpen(true)}
-				createButtonTitle={t('cache.create')}
-				emptyStateTitle={t('cache.empty_text')}
-				table={table}
-				onMultipleDelete={deleteMultipleCachesHandler}
-				disabled={!canCreateCache}
-				loading={isFetching && !caches.length}
+		<VersionTabLayout
+			searchable
+			isEmpty={caches.length === 0}
+			title={t('cache.title') as string}
+			type={TabTypes.Cache}
+			openCreateModal={toggleCreateCacheModal}
+			createButtonTitle={t('cache.create')}
+			emptyStateTitle={t('cache.empty_text')}
+			table={table}
+			onMultipleDelete={deleteMultipleCachesHandler}
+			disabled={!canCreateCache}
+			loading={isFetching && !caches.length}
+		>
+			<InfiniteScroll
+				scrollableTarget='version-layout'
+				dataLength={caches.length}
+				next={fetchNextPage}
+				hasMore={hasNextPage}
+				loader={isFetchingNextPage && <TableLoading />}
 			>
-				<InfiniteScroll
-					scrollableTarget='version-layout'
-					dataLength={caches.length}
-					next={fetchNextPage}
-					hasMore={hasNextPage}
-					loader={isFetchingNextPage && <TableLoading />}
-				>
-					<DataTable<Cache> table={table} />
-				</InfiniteScroll>
-				<ConfirmationModal
-					loading={isDeleting}
-					error={error}
-					title={t('cache.delete.title')}
-					alertTitle={t('cache.delete.message')}
-					alertDescription={t('cache.delete.description')}
-					description={
-						<Trans
-							i18nKey='cache.delete.confirmCode'
-							values={{ confirmCode: toDeleteCache?.iid }}
-							components={{
-								confirmCode: <span className='font-bold text-default' />,
-							}}
-						/>
-					}
-					confirmCode={toDeleteCache?.iid}
-					onConfirm={deleteCacheHandler}
-					isOpen={isDeleteCacheModalOpen}
-					closeModal={closeDeleteCacheModal}
-					closable
-				/>
-			</VersionTabLayout>
-			<CreateCache open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
-			<EditCache open={isEditCacheModalOpen} onClose={closeEditCacheModal} />
-		</>
+				<DataTable<Cache> table={table} />
+			</InfiniteScroll>
+			<ConfirmationModal
+				loading={isDeleting}
+				error={error}
+				title={t('cache.delete.title')}
+				alertTitle={t('cache.delete.message')}
+				alertDescription={t('cache.delete.description')}
+				description={
+					<Trans
+						i18nKey='cache.delete.confirmCode'
+						values={{ confirmCode: toDeleteCache?.iid }}
+						components={{
+							confirmCode: <span className='font-bold text-default' />,
+						}}
+					/>
+				}
+				confirmCode={toDeleteCache?.iid}
+				onConfirm={deleteCacheHandler}
+				isOpen={isDeleteCacheModalOpen}
+				closeModal={closeDeleteCacheModal}
+				closable
+			/>
+		</VersionTabLayout>
 	);
 }

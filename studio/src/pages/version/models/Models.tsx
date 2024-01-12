@@ -118,7 +118,7 @@ export default function Models() {
 			<VersionTabLayout<Model>
 				breadCrumb={<BreadCrumb goBackLink={databasesUrl} items={breadcrumbItems} />}
 				isEmpty={!filteredModels.length}
-				type='model'
+				type={TabTypes.Model}
 				openCreateModal={() => setIsCreateModelOpen(true)}
 				createButtonTitle={t('database.models.create')}
 				emptyStateTitle={t('database.models.no_models')}

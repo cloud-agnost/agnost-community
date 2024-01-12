@@ -10,7 +10,7 @@ import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
-import { APIError } from '@/types';
+import { APIError, TabTypes } from '@/types';
 import { isEmpty } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 import { DataTable } from 'components/DataTable';
@@ -139,7 +139,7 @@ export default function Navigator() {
 	return (
 		<VersionTabLayout
 			isEmpty={false}
-			type='field'
+			type={TabTypes.Field}
 			emptyStateTitle={t('database.fields.no_fields')}
 			table={table}
 			disabled={!canMultiDelete}
@@ -184,13 +184,13 @@ export default function Navigator() {
 						</div>
 					) : (
 						<div className='flex-1 '>
-							<EmptyState title={t('database.models.no_data')} type='database' />
+							<EmptyState title={t('database.models.no_data')} type={TabTypes.Database} />
 						</div>
 					)}
 				</div>
 			) : (
 				<div className='flex-1 flex flex-col justify-center items-center h-full w-full'>
-					<EmptyState title={t('database.models.no_models')} type='model' />
+					<EmptyState title={t('database.models.no_models')} type={TabTypes.Model} />
 				</div>
 			)}
 		</VersionTabLayout>

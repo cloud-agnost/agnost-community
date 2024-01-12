@@ -21,6 +21,7 @@ interface MiddlewareStore {
 	isEditMiddlewareDrawerOpen: boolean;
 	lastFetchedPage: number | undefined;
 	logics: Record<string, string>;
+	isCreateMiddlewareDrawerOpen: boolean;
 }
 
 type Actions = {
@@ -35,6 +36,7 @@ type Actions = {
 	closeEditMiddlewareDrawer: () => void;
 	setLogics: (id: string, logic: string) => void;
 	deleteLogic: (id: string) => void;
+	toggleCreateMiddlewareDrawer: () => void;
 	reset: () => void;
 };
 
@@ -44,6 +46,7 @@ const initialState: MiddlewareStore = {
 	lastFetchedPage: undefined,
 	isEditMiddlewareDrawerOpen: false,
 	logics: {},
+	isCreateMiddlewareDrawerOpen: false,
 };
 
 const useMiddlewareStore = create<MiddlewareStore & Actions>()(
@@ -146,6 +149,8 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 			const { [id]: _, ...rest } = get().logics;
 			set({ logics: rest });
 		},
+		toggleCreateMiddlewareDrawer: () =>
+			set((prev) => ({ isCreateMiddlewareDrawerOpen: !prev.isCreateMiddlewareDrawerOpen })),
 		reset: () => set(initialState),
 	})),
 );

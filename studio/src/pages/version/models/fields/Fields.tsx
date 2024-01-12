@@ -8,7 +8,7 @@ import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useModelStore from '@/store/database/modelStore.ts';
-import { Field } from '@/types';
+import { Field, TabTypes } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { BreadCrumb, BreadCrumbItem } from 'components/BreadCrumb';
 import { DataTable } from 'components/DataTable';
@@ -71,7 +71,7 @@ export default function Fields() {
 				searchable
 				breadCrumb={<BreadCrumb goBackLink={databaseUrl} items={breadcrumbItems} />}
 				isEmpty={!filteredFields.length}
-				type='field'
+				type={TabTypes.Field}
 				handlerButton={<CreateFieldButton />}
 				emptyStateTitle={t('database.fields.no_fields')}
 				table={table}
