@@ -3,7 +3,7 @@ import { TableLoading } from '@/components/Table/Table';
 import { Notification, NotificationFilter } from '@/features/version/Notification';
 import { useInfiniteScroll } from '@/hooks';
 import useVersionStore from '@/store/version/versionStore';
-import { NotificationActions } from '@/types';
+import { NotificationActions, TabTypes } from '@/types';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -59,7 +59,7 @@ export default function VersionNotifications() {
 								))}
 							</InfiniteScroll>
 						) : (
-							<EmptyState title={t('version.noNotifications')} type='notification' />
+							<EmptyState title={t('version.noNotifications')} type={TabTypes.Notifications} />
 						)}
 					</div>
 				)}

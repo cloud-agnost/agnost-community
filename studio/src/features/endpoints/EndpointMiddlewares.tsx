@@ -17,7 +17,7 @@ import { Draggable, DropResult } from 'react-beautiful-dnd';
 import { ControllerRenderProps } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-import { AddMiddlewareDrawer } from '../version/Middlewares';
+import { CreateMiddleware } from '../version/Middlewares';
 import { CreateEndpointSchema } from '@/types';
 
 interface EndpointMiddlewaresProps {
@@ -123,7 +123,7 @@ function AddMiddlewareDropdown({ value, onChange }: AddMiddlewareDropdownProps) 
 					</DropdownMenuItemContainer>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			<AddMiddlewareDrawer
+			<CreateMiddleware
 				open={addMiddlewareDrawerIsOpen}
 				onOpenChange={setAddMiddlewareDrawerIsOpen}
 				onCreate={(mw) => {

@@ -126,6 +126,9 @@ const useTabStore = create<TabStore & Actions>()(
 							},
 						};
 					});
+					const dashboardTab = get().tabs[versionId]?.find((tab) => tab.isDashboard);
+					get().setCurrentTab(versionId, dashboardTab?.id as string);
+					history.navigate?.(dashboardTab?.path as string);
 				},
 				removeAllTabsExcept: (versionId) => {
 					set((state) => {
@@ -230,13 +233,14 @@ const useTabStore = create<TabStore & Actions>()(
 				addSettingsTab: (versionId, path = '') => {
 					const tabs = get().tabs[versionId] ?? [];
 					const settingsTab = tabs.find((tab) => tab.type === TabTypes.Settings);
+					const tabPath = useVersionStore.getState().getVersionDashboardPath(`settings/${path}`);
 					if (settingsTab) {
 						get().setCurrentTab(versionId, settingsTab.id);
-						history.navigate?.(settingsTab.path);
+						history.navigate?.(tabPath ?? settingsTab.path);
 						return;
 					}
 					get().addTab(versionId as string, {
-						path: useVersionStore.getState().getVersionDashboardPath(`settings/${path}`),
+						path: tabPath,
 						id: generateId(),
 						title: translate('version.settings.default'),
 						isActive: true,

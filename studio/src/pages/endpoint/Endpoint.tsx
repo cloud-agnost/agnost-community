@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { CreateEndpoint, EndpointColumns } from '@/features/endpoints';
+import { EndpointColumns } from '@/features/endpoints';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
@@ -11,7 +11,6 @@ import useVersionStore from '@/store/version/versionStore';
 import { APIError, Endpoint, TabTypes } from '@/types';
 import { generateId } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams } from 'react-router-dom';
@@ -21,10 +20,15 @@ export default function MainEndpoint() {
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 	const canCreate = useAuthorizeVersion('endpoint.create');
-	const { endpoints, lastFetchedPage, getEndpoints, deleteMultipleEndpoints } = useEndpointStore();
+	const {
+		endpoints,
+		lastFetchedPage,
+		getEndpoints,
+		deleteMultipleEndpoints,
+		toggleCreateEndpointDialog,
+	} = useEndpointStore();
 	const { addTab } = useTabStore();
 	const { getVersionDashboardPath } = useVersionStore();
-	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const table = useTable({
 		data: endpoints,
 		columns: EndpointColumns,
@@ -68,36 +72,33 @@ export default function MainEndpoint() {
 	}
 
 	return (
-		<>
-			<VersionTabLayout<Endpoint>
-				searchable
-				type='endpoint'
-				title={t('endpoint.title') as string}
-				createButtonTitle={t('endpoint.add')}
-				emptyStateTitle={t('endpoint.empty')}
-				isEmpty={!endpoints.length}
-				openCreateModal={() => setIsCreateModalOpen(true)}
-				onMultipleDelete={deleteMultipleEndpointsHandler}
-				table={table}
-				disabled={!canCreate}
-				loading={isFetching && !endpoints.length}
-				handlerButton={
-					<Button variant='secondary' onClick={openLogTab}>
-						{t('queue.view_logs')}
-					</Button>
-				}
+		<VersionTabLayout<Endpoint>
+			searchable
+			type={TabTypes.Endpoint}
+			title={t('endpoint.title') as string}
+			createButtonTitle={t('endpoint.add')}
+			emptyStateTitle={t('endpoint.empty')}
+			isEmpty={!endpoints.length}
+			openCreateModal={toggleCreateEndpointDialog}
+			onMultipleDelete={deleteMultipleEndpointsHandler}
+			table={table}
+			disabled={!canCreate}
+			loading={isFetching && !endpoints.length}
+			handlerButton={
+				<Button variant='secondary' onClick={openLogTab}>
+					{t('queue.view_logs')}
+				</Button>
+			}
+		>
+			<InfiniteScroll
+				scrollableTarget='version-layout'
+				dataLength={endpoints.length}
+				next={fetchNextPage}
+				hasMore={hasNextPage}
+				loader={isFetchingNextPage && <TableLoading />}
 			>
-				<InfiniteScroll
-					scrollableTarget='version-layout'
-					dataLength={endpoints.length}
-					next={fetchNextPage}
-					hasMore={hasNextPage}
-					loader={isFetchingNextPage && <TableLoading />}
-				>
-					<DataTable table={table} className='table-fixed' />
-				</InfiniteScroll>
-			</VersionTabLayout>
-			<CreateEndpoint open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
-		</>
+				<DataTable table={table} className='table-fixed' />
+			</InfiniteScroll>
+		</VersionTabLayout>
 	);
 }

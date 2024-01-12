@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { CreateMessageQueue, MessageQueueColumns } from '@/features/queue';
+import { MessageQueueColumns } from '@/features/queue';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
@@ -12,16 +12,15 @@ import useVersionStore from '@/store/version/versionStore';
 import { APIError, MessageQueue, TabTypes } from '@/types';
 import { generateId } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams } from 'react-router-dom';
 
 export default function MainMessageQueue() {
-	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const { addTab } = useTabStore();
 	const { getVersionDashboardPath } = useVersionStore();
-	const { getQueues, queues, lastFetchedPage, deleteMultipleQueues } = useMessageQueueStore();
+	const { getQueues, queues, lastFetchedPage, deleteMultipleQueues, toggleCreateQueueModal } =
+		useMessageQueueStore();
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('queue.create');
 	const { t } = useTranslation();
@@ -74,36 +73,33 @@ export default function MainMessageQueue() {
 		});
 	}
 	return (
-		<>
-			<VersionTabLayout<MessageQueue>
-				searchable
-				isEmpty={queues.length === 0}
-				title={t('queue.title') as string}
-				type='queue'
-				openCreateModal={() => setIsCreateModalOpen(true)}
-				createButtonTitle={t('queue.create.title')}
-				emptyStateTitle={t('queue.empty_text')}
-				table={table}
-				onMultipleDelete={deleteMultipleQueuesHandler}
-				disabled={!canEdit}
-				loading={isFetching && !queues.length}
-				handlerButton={
-					<Button variant='secondary' onClick={openLogTab}>
-						{t('queue.view_logs')}
-					</Button>
-				}
+		<VersionTabLayout<MessageQueue>
+			searchable
+			isEmpty={queues.length === 0}
+			title={t('queue.title') as string}
+			type={TabTypes.MessageQueue}
+			openCreateModal={toggleCreateQueueModal}
+			createButtonTitle={t('queue.create.title')}
+			emptyStateTitle={t('queue.empty_text')}
+			table={table}
+			onMultipleDelete={deleteMultipleQueuesHandler}
+			disabled={!canEdit}
+			loading={isFetching && !queues.length}
+			handlerButton={
+				<Button variant='secondary' onClick={openLogTab}>
+					{t('queue.view_logs')}
+				</Button>
+			}
+		>
+			<InfiniteScroll
+				scrollableTarget='version-layout'
+				dataLength={queues.length}
+				next={fetchNextPage}
+				hasMore={hasNextPage}
+				loader={isFetchingNextPage && <TableLoading />}
 			>
-				<InfiniteScroll
-					scrollableTarget='version-layout'
-					dataLength={queues.length}
-					next={fetchNextPage}
-					hasMore={hasNextPage}
-					loader={isFetchingNextPage && <TableLoading />}
-				>
-					<DataTable table={table} />
-				</InfiniteScroll>
-			</VersionTabLayout>
-			<CreateMessageQueue open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
-		</>
+				<DataTable table={table} />
+			</InfiniteScroll>
+		</VersionTabLayout>
 	);
 }

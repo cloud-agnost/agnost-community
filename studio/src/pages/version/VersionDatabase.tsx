@@ -1,4 +1,4 @@
-import { CreateDatabase, DatabaseColumns, EditDatabase } from '@/features/database';
+import { DatabaseColumns, EditDatabase } from '@/features/database';
 import { useSearch, useTable, useToast, useUpdateEffect } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
@@ -6,11 +6,10 @@ import useApplicationStore from '@/store/app/applicationStore';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useVersionStore from '@/store/version/versionStore';
-import { APIError, Database } from '@/types';
+import { APIError, Database, TabTypes } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ConfirmationModal } from 'components/ConfirmationModal';
 import { DataTable } from 'components/DataTable';
-import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 export default function VersionDatabase() {
@@ -22,6 +21,7 @@ export default function VersionDatabase() {
 		isDeleteDatabaseDialogOpen,
 		isEditDatabaseDialogOpen,
 		isDatabaseFetched,
+		toggleCreateDatabaseDialog,
 		closeEditDatabaseDialog,
 		closeDeleteDatabaseDialog,
 		deleteDatabase,
@@ -30,7 +30,7 @@ export default function VersionDatabase() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('db.create');
-	const [createDrawerIsOpen, setCreateDrawerIsOpen] = useState(false);
+
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -88,15 +88,14 @@ export default function VersionDatabase() {
 	}, [orgId, appId, versionId]);
 	return (
 		<>
-			<CreateDatabase open={createDrawerIsOpen} onOpenChange={setCreateDrawerIsOpen} />
 			<EditDatabase open={isEditDatabaseDialogOpen} onOpenChange={closeEditDatabaseDialog} />
 			<VersionTabLayout<Database>
 				searchable
 				className='p-0'
 				isEmpty={databases.length === 0}
 				title={t('database.page_title') as string}
-				type='database'
-				openCreateModal={() => setCreateDrawerIsOpen(true)}
+				type={TabTypes.Database}
+				openCreateModal={toggleCreateDatabaseDialog}
 				createButtonTitle={t('database.add.title')}
 				emptyStateTitle={t('database.empty_text')}
 				table={table}

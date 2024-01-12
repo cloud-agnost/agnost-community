@@ -2,7 +2,7 @@ import { Button } from '@/components/Button';
 import { ALL_HTTP_METHODS, ENDPOINT_OPTIONS, HTTP_METHOD_BADGE_MAP } from '@/constants';
 import useEndpointStore from '@/store/endpoint/endpointStore.ts';
 import useVersionStore from '@/store/version/versionStore.ts';
-import { Endpoint, HttpMethod, SortOption } from '@/types';
+import { Endpoint, HttpMethod, SortOption, TabTypes } from '@/types';
 import { cn } from '@/utils';
 import { Check, Funnel, FunnelSimple } from '@phosphor-icons/react';
 import { CheckedState } from '@radix-ui/react-checkbox';
@@ -13,7 +13,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger
+	DropdownMenuTrigger,
 } from 'components/Dropdown';
 import { EmptyState } from 'components/EmptyState';
 import { SearchInput } from 'components/SearchInput';
@@ -178,7 +178,7 @@ export default function EndpointSelectModal({
 							)}
 						>
 							{!loading && filtered.length === 0 ? (
-								<EmptyState title='No endpoints found' type='endpoint' />
+								<EmptyState title='No endpoints found' type={TabTypes.Endpoint} />
 							) : (
 								<InfiniteScroll
 									scrollableTarget='endpoint-list-container'

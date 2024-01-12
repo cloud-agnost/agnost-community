@@ -19,8 +19,9 @@
 	}
 
 	&.table-view {
+		@apply h-full;
 		.setting-container-content {
-			@apply p-0;
+			@apply p-0 h-full;
 		}
 		.table-head:first-child {
 			@apply px-[21px];

@@ -1,9 +1,12 @@
-import { NewTabDropdown, TabItem, TabOptionsDropdown } from '@/features/version/Tabs/index.ts';
-import useTabStore from '@/store/version/tabStore.ts';
-import { Tab, TabTypes } from '@/types';
-import { generateId, reorder } from '@/utils';
-import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { Button } from '@/components/Button';
+import { NewTabDropdown, TabItem, TabOptionsDropdown } from '@/features/version/Tabs/index.ts';
+import { useUpdateEffect } from '@/hooks';
+import useTabStore from '@/store/version/tabStore.ts';
+import useUtilsStore from '@/store/version/utilsStore';
+import useVersionStore from '@/store/version/versionStore';
+import { Tab, TabTypes } from '@/types';
+import { cn, generateId, reorder } from '@/utils';
+import { CaretLeft, CaretRight, Sidebar } from '@phosphor-icons/react';
 import { NEW_TAB_ITEMS } from 'constants/constants.ts';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -15,10 +18,8 @@ import {
 	DroppableProvided,
 } from 'react-beautiful-dnd';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useMatches, useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useMatches, useNavigate, useParams } from 'react-router-dom';
 import './tabs.scss';
-import { useUpdateEffect } from '@/hooks';
-import useVersionStore from '@/store/version/versionStore';
 
 const SCROLL_AMOUNT = 200;
 
@@ -31,6 +32,7 @@ export default function Tabs() {
 	const { openDeleteTabModal, getTabsByVersionId, removeTab, setCurrentTab, addTab, setTabs } =
 		useTabStore();
 	const { getVersionDashboardPath } = useVersionStore();
+	const { toggleSidebar, isSidebarOpen } = useUtilsStore();
 	const { t } = useTranslation();
 	const matches = useMatches();
 	const { pathname } = useLocation();
@@ -116,9 +118,7 @@ export default function Tabs() {
 	function getDashboardPath() {
 		const matched = matches.slice(-1)[0];
 		if (!matched) return '/organization';
-
 		const { appId, orgId, versionId } = matched.params;
-
 		return `/organization/${orgId}/apps/${appId}/version/${versionId}`;
 	}
 
@@ -244,6 +244,17 @@ export default function Tabs() {
 						</Button>
 					</div>
 				)}
+				<div className={'tab-control-item'}>
+					<Button
+						rounded
+						variant='blank'
+						iconOnly
+						onClick={toggleSidebar}
+						className={cn(isSidebarOpen && 'bg-button-primary/50 rounded-full')}
+					>
+						<Sidebar size={15} />
+					</Button>
+				</div>
 				<div className='tab-control-item'>
 					<NewTabDropdown />
 				</div>

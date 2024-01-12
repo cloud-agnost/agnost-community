@@ -9,7 +9,7 @@ import { TabsContent } from '@radix-ui/react-tabs';
 import { useTranslation } from 'react-i18next';
 import TestEndpointTable from './TestEndpointTable';
 import { CSSProperties } from 'react';
-import { Log } from '@/types';
+import { Log, TabTypes } from '@/types';
 import { EmptyState } from '@/components/EmptyState';
 import useUtilsStore from '@/store/version/utilsStore';
 
@@ -84,7 +84,7 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 						))}
 					</TestEndpointTable>
 				) : (
-					<EmptyState title={t('endpoint.no_cookies')} type='endpoint' />
+					<EmptyState title={t('endpoint.no_cookies')} type={TabTypes.Endpoint} />
 				)}
 			</TabsContent>
 			<TabsContent value='headers' className='h-[calc(100%-4rem)]'>
@@ -99,7 +99,7 @@ export default function EndpointResponse(props: EndpointResponseProps) {
 							))}
 						</TestEndpointTable>
 					) : (
-						<EmptyState title={t('endpoint.no_headers')} type='endpoint' />
+						<EmptyState title={t('endpoint.no_headers')} type={TabTypes.Endpoint} />
 					)}
 				</div>
 			</TabsContent>

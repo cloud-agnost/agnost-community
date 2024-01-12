@@ -23,6 +23,7 @@ interface MessageQueueStore {
 	lastFetchedPage: number | undefined;
 	isEditModalOpen: boolean;
 	logics: Record<string, string>;
+	isCreateQueueModalOpen: boolean;
 }
 
 type Actions = {
@@ -38,6 +39,7 @@ type Actions = {
 	closeEditModal: () => void;
 	setLogics: (id: string, logic: string) => void;
 	deleteLogic: (id: string) => void;
+	toggleCreateQueueModal: () => void;
 	reset: () => void;
 };
 
@@ -47,6 +49,7 @@ const initialState: MessageQueueStore = {
 	lastFetchedPage: undefined,
 	isEditModalOpen: false,
 	logics: {},
+	isCreateQueueModalOpen: false,
 };
 
 const useMessageQueueStore = create<MessageQueueStore & Actions>()(
@@ -165,6 +168,9 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 		deleteLogic: (id) => {
 			const { [id]: _, ...rest } = get().logics;
 			set({ logics: rest });
+		},
+		toggleCreateQueueModal: () => {
+			set((prev) => ({ isCreateQueueModalOpen: !prev.isCreateQueueModalOpen }));
 		},
 		reset: () => set(initialState),
 	})),

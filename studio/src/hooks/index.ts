@@ -9,6 +9,8 @@ export { default as useNavigatorColumns } from './useNavigatorColumns.tsx';
 export { default as useRealtime } from './useRealtime.tsx';
 export { default as useSaveLogicOnSuccess } from './useSaveLogicOnSuccess.tsx';
 export { default as useSearch } from './useSearch.tsx';
+export { default as useSearchTabClick } from './useSearchTabClick.tsx';
+export { default as useTabIcon } from './useTabIcon.tsx';
 export { default as useTabNavigate } from './useTabNavigate.tsx';
 export { default as useTable } from './useTable.tsx';
 export { useToast } from './useToast.tsx';

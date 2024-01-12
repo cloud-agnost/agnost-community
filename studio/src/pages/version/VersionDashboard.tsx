@@ -8,8 +8,7 @@ import {
 	CardTitle,
 } from '@/components/Card';
 import { CopyInput } from '@/components/CopyInput';
-import { TAB_ICON_MAP } from '@/constants';
-import { useUpdateEffect } from '@/hooks';
+import { useTabIcon, useUpdateEffect } from '@/hooks';
 import useApplicationStore from '@/store/app/applicationStore';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 import useTabStore from '@/store/version/tabStore';
@@ -29,7 +28,7 @@ export default function VersionDashboard() {
 	const { environment } = useEnvironmentStore();
 	const { addSettingsTab, addTab } = useTabStore();
 	const { t } = useTranslation();
-
+	const getIcon = useTabIcon('w-8 h-8');
 	const { orgId, appId, versionId } = useParams() as Record<string, string>;
 	const { application } = useApplicationStore();
 	const { isFetching, refetch } = useQuery({
@@ -50,11 +49,6 @@ export default function VersionDashboard() {
 	useUpdateEffect(() => {
 		refetch();
 	}, [orgId, versionId, appId]);
-
-	function getIcon(type: string) {
-		const Icon = TAB_ICON_MAP[type];
-		return <Icon className='w-8 h-8 text-default' />;
-	}
 
 	const GUIDES = [
 		{
@@ -103,7 +97,9 @@ export default function VersionDashboard() {
 						onClick={() => clickDashboardItem(capitalize(key), t(`version.dashboard.${key}`))}
 					>
 						<div className='flex items-center gap-4'>
-							<div className='p-3 rounded-lg bg-lighter'>{getIcon(capitalize(key))}</div>
+							<div className='p-3 rounded-lg bg-lighter'>
+								{getIcon(capitalize(key) as TabTypes)}
+							</div>
 							<div>
 								<h1 className='text-default text-2xl'>{value}</h1>
 								<h2 className='text-subtle'>

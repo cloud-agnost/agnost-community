@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
-import { CreateTask, TaskColumns } from '@/features/task';
+import { TaskColumns } from '@/features/task';
 import { useInfiniteScroll, useTable, useToast } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
@@ -12,7 +12,6 @@ import useVersionStore from '@/store/version/versionStore';
 import { APIError, TabTypes, Task } from '@/types';
 import { generateId } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams } from 'react-router-dom';
@@ -21,10 +20,11 @@ export default function MainTask() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('task.create');
-	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
 	const { addTab } = useTabStore();
 	const { getVersionDashboardPath } = useVersionStore();
-	const { tasks, getTasks, lastFetchedPage, deleteMultipleTasks } = useTaskStore();
+	const { tasks, getTasks, lastFetchedPage, deleteMultipleTasks, toggleCreateTaskModal } =
+		useTaskStore();
 	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { versionId, orgId, appId } = useParams();
 
@@ -78,12 +78,12 @@ export default function MainTask() {
 	return (
 		<>
 			<VersionTabLayout
-				type='task'
+				type={TabTypes.Task}
 				title={t('task.title') as string}
 				createButtonTitle={t('task.add')}
 				emptyStateTitle={t('task.empty_text')}
 				isEmpty={!tasks.length}
-				openCreateModal={() => setIsCreateModalOpen(true)}
+				openCreateModal={toggleCreateTaskModal}
 				onMultipleDelete={deleteMultipleTasksHandler}
 				table={table}
 				disabled={!canEdit}
@@ -105,7 +105,6 @@ export default function MainTask() {
 					<DataTable<Task> table={table} />
 				</InfiniteScroll>
 			</VersionTabLayout>
-			<CreateTask open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
 		</>
 	);
 }
