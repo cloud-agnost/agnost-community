@@ -951,13 +951,7 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 			const selectedText = ed.getModel()?.getValueInRange(selection);
 
 			const tryCatchFinallyBlock =
-				`try {\n` +
-				`  ${selectedText}\n` +
-				`} catch (error) {\n` +
-				`  console.error(error);\n` +
-				`} finally {\n` +
-				`  console.log('finally');\n` +
-				`}`;
+				`try {\n` + `  ${selectedText}\n` + `} catch (error) {\n` + `} finally {\n` + `}`;
 
 			ed.executeEdits('', [
 				{

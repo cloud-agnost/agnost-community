@@ -126,7 +126,6 @@ export default function Navigator() {
 		if (searchParams.get('f') || searchParams.get('d') || searchParams.get('ref')) {
 			const page = lastFetchedPage?.[modelId] ?? 0;
 			const size = lastFetchedPage?.[modelId] ? MODULE_PAGE_SIZE * page : MODULE_PAGE_SIZE;
-			console.log('fetching data', data.length);
 			fetchData(0, size);
 		}
 	}, [searchParams.get('f'), searchParams.get('d'), searchParams.get('ref')]);
