@@ -1,25 +1,26 @@
+import { Button } from '@/components/Button';
+import { useTabIcon } from '@/hooks';
+import useTabStore from '@/store/version/tabStore.ts';
+import { cn } from '@/utils';
+import { DotsThreeVertical } from '@phosphor-icons/react';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger,
 	DropdownMenuItemContainer,
 	DropdownMenuSeparator,
+	DropdownMenuTrigger,
 } from 'components/Dropdown';
-import { Button } from '@/components/Button';
-import { DotsThreeVertical } from '@phosphor-icons/react';
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Fragment } from 'react';
-import useTabStore from '@/store/version/tabStore.ts';
-import { TAB_ICON_MAP } from '@/constants';
-import { cn } from '@/utils';
 
 interface TabOptionsDropdownProps {
 	getDashboardPath: () => string;
 }
 export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropdownProps) {
 	const { t } = useTranslation();
+
 	const {
 		removeAllTabs,
 		getCurrentTab,
@@ -33,11 +34,9 @@ export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropd
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
 	const { versionId } = useParams() as { versionId: string };
-
 	const currentTab = getCurrentTab(versionId);
-
 	const tabs = getTabsByVersionId(versionId);
-
+	const getTabIcon = useTabIcon('w-4 h-4');
 	const tabOptions = [
 		{
 			title: t('version.close_selected_tab'),
@@ -75,11 +74,7 @@ export default function TabOptionsDropdown({ getDashboardPath }: TabOptionsDropd
 			disabled: tabs.filter((tab) => !tab.isDashboard).length < 2,
 		},
 	];
-	function getTabIcon(type: string) {
-		const Icon = TAB_ICON_MAP[type];
-		if (!Icon) return <DotsThreeVertical size={15} weight='bold' />;
-		return <Icon className='w-4 h-4' />;
-	}
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
