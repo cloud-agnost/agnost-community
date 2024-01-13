@@ -1142,8 +1142,16 @@ export class MongoDB extends DatabaseBase {
 			readPreference: readPreference,
 		});
 
+		console.info("***dataCursor");
+
 		const findResult = await dataCursor.toArray();
+
+		console.info("***findResult", findResult);
+
 		await dataCursor.close();
+
+		console.info("***dataCursor.close");
+
 		return findResult;
 	}
 
