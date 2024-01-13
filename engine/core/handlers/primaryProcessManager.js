@@ -378,7 +378,9 @@ export class PrimaryProcessDeploymentManager extends DeploymentManager {
 		// Execute the final command in async mode
 		exec(finalCommand, (error, stdout, stderr) => {
 			if (error) {
-				this.addLog(t("Failed to install/uninstall packages %s", err.message));
+				this.addLog(
+					t("Failed to install/uninstall packages %s", error.message)
+				);
 			}
 		});
 	}
