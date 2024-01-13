@@ -616,8 +616,6 @@ export class MongoDB extends DatabaseBase {
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
-				raw: false, // Whether to return document results as raw BSON buffers
-				bypassDocumentValidation: true, // Allow driver to bypass schema validation
 				session: this.session,
 			});
 
@@ -689,8 +687,6 @@ export class MongoDB extends DatabaseBase {
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
-				raw: false, // Whether to return document results as raw BSON buffers
-				bypassDocumentValidation: true, // Allow driver to bypass schema validation
 				session: this.session,
 			});
 
@@ -750,8 +746,6 @@ export class MongoDB extends DatabaseBase {
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
-				raw: false, // Whether to return document results as raw BSON buffers
-				bypassDocumentValidation: true, // Allow driver to bypass schema validation
 				session: this.session,
 				readPreference: readPreference,
 			});
@@ -813,8 +807,6 @@ export class MongoDB extends DatabaseBase {
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
-				raw: false, // Whether to return document results as raw BSON buffers
-				bypassDocumentValidation: true, // Allow driver to bypass schema validation
 				session: this.session,
 				readPreference: readPreference,
 			});
@@ -877,8 +869,6 @@ export class MongoDB extends DatabaseBase {
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
-				raw: false, // Whether to return document results as raw BSON buffers
-				bypassDocumentValidation: true, // Allow driver to bypass schema validation
 				session: this.session,
 				readPreference: readPreference,
 			});
@@ -974,8 +964,6 @@ export class MongoDB extends DatabaseBase {
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
-				raw: false, // Whether to return document results as raw BSON buffers
-				bypassDocumentValidation: true, // Allow driver to bypass schema validation
 				session: this.session,
 			});
 
@@ -1057,8 +1045,6 @@ export class MongoDB extends DatabaseBase {
 
 			const dataCursor = await collection.aggregate(pipeline, {
 				allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
-				raw: false, // Whether to return document results as raw BSON buffers
-				bypassDocumentValidation: true, // Allow driver to bypass schema validation
 				session: this.session,
 			});
 
@@ -1187,8 +1173,6 @@ export class MongoDB extends DatabaseBase {
 
 		const dataCursor = await collection.aggregate(pipeline, {
 			allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
-			raw: false, // Whether to return document results as raw BSON buffers
-			bypassDocumentValidation: true, // Allow driver to bypass schema validation
 			session: this.session,
 			readPreference: readPreference,
 		});
