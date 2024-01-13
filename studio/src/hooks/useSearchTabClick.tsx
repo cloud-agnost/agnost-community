@@ -11,8 +11,7 @@ export default function useSearchTabClick() {
 	const { versionId } = useParams() as Record<string, string>;
 
 	function handleClickElement(item: DesignElement) {
-		let url = `${item.type}/${item._id}`;
-		if (_.capitalize(item.type) === TabTypes.Model) url = `/database/${item.meta.dbId}/models`;
+		let url = `${item.type}/${item._id}/models`;
 		if (_.capitalize(item.type) === TabTypes.Field)
 			url = `database/${item.meta.dbId}/models/${item.modelId}/fields`;
 

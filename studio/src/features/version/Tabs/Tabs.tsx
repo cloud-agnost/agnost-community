@@ -5,7 +5,7 @@ import useTabStore from '@/store/version/tabStore.ts';
 import useUtilsStore from '@/store/version/utilsStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Tab, TabTypes } from '@/types';
-import { cn, generateId, reorder } from '@/utils';
+import { cn, generateId, isElementInViewport, reorder } from '@/utils';
 import { CaretLeft, CaretRight, Sidebar } from '@phosphor-icons/react';
 import { NEW_TAB_ITEMS } from 'constants/constants.ts';
 import { useEffect, useRef, useState } from 'react';
@@ -46,30 +46,23 @@ export default function Tabs() {
 		setTimeout(() => {
 			const selectedTab = scrollContainer?.current?.querySelector('[data-active=true]');
 			const firstElement = scrollContainer?.current?.querySelector('.tab-item');
+			const sidebar = document.getElementById('side-navigation');
 			if (
 				selectedTab &&
 				!isElementInViewport(selectedTab) &&
 				firstElement?.getBoundingClientRect()
 			) {
+				// if sidebar is open, scroll to the left of the selected tab
 				scrollContainer?.current?.scrollBy({
 					left:
 						selectedTab?.getBoundingClientRect().left -
-						firstElement?.getBoundingClientRect()?.width,
+						firstElement?.getBoundingClientRect()?.width -
+						(sidebar?.getBoundingClientRect()?.width ?? 0),
 					behavior: 'smooth',
 				});
 			}
 		}, 100);
 	}, [tabs]);
-
-	function isElementInViewport(el: Element) {
-		const rect = el.getBoundingClientRect();
-		return (
-			rect.top >= 0 &&
-			rect.left >= 0 &&
-			rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-			rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-		);
-	}
 
 	useEffect(() => {
 		if (getTabsByVersionId(versionId).find((tab: Tab) => tab.isDashboard)) return;
@@ -182,10 +175,15 @@ export default function Tabs() {
 				<DragDropContext onDragEnd={onDragEnd}>
 					<Droppable droppableId='TAB' direction='horizontal'>
 						{(dropProvided: DroppableProvided) => (
-							<div {...dropProvided.droppableProps} ref={dropProvided.innerRef}>
+							<div {...dropProvided.droppableProps} ref={dropProvided.innerRef} className='h-full'>
 								<div ref={scrollContainer} className='tab'>
 									{tabs.map((tab: Tab, index: number) => (
-										<Draggable key={tab.id} draggableId={tab.id} index={index}>
+										<Draggable
+											key={tab.id}
+											draggableId={tab.id}
+											index={index}
+											isDragDisabled={tab.isDashboard}
+										>
 											{(dragProvided: DraggableProvided) => (
 												<TabItem
 													active={tab.isActive}
@@ -209,7 +207,7 @@ export default function Tabs() {
 													key={tab.id}
 													type={tab.type}
 												>
-													<p className='tab-item-link-text'>{tab.title} </p>
+													{!tab.isDashboard && <p className='tab-item-link-text'>{tab.title} </p>}
 												</TabItem>
 											)}
 										</Draggable>

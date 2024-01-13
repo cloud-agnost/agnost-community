@@ -116,11 +116,14 @@ export default function Workspace() {
 			openEditCacheModal(data as Cache);
 			return;
 		}
-		const path = type === TabTypes.MessageQueue ? 'queue' : type.toLowerCase();
+		let path = `${type.toLowerCase()}/${data._id}`;
+		if (type === TabTypes.MessageQueue) path = `queue/${data._id}`;
+		if (type === TabTypes.Database) path = `${path}/models`;
+		console.log(path);
 		const tab = {
 			id: generateId(),
 			title: data.name,
-			path: getVersionDashboardPath(`${path}/${data._id}`),
+			path: getVersionDashboardPath(path),
 			isActive: true,
 			isDashboard: false,
 			type,
