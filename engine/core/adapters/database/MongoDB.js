@@ -447,7 +447,6 @@ export class MongoDB extends DatabaseBase {
 	 * Starts a new transaction on the database server. Any database CRUD operation that is executed after a call to `beginTransaction` will be executed within the transaction context. If the transaction is not committed then the changes will not be applied to the database.
 	 */
 	async beginTransaction(dbMeta) {
-		console.log("****beginTransaction");
 		if (this.transactionsSupported === null) {
 			// Check to see if transactions are supported by MongoDB deployment
 			const dbName = this.getAppliedDbName(dbMeta);
@@ -1118,9 +1117,6 @@ export class MongoDB extends DatabaseBase {
 		this.createSortStage(options.sort, pipeline);
 		this.createSkipStage(options.skip, pipeline);
 		this.createLimitStage(options.limit, pipeline);
-
-		console.log("***session", this.session);
-		console.log("***readPreference", readPreference);
 
 		const dataCursor = await collection.aggregate(pipeline, {
 			allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
