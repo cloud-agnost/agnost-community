@@ -51,7 +51,7 @@
     "maxFieldNameLength": 58,
     "profileImgSizePx": 512,
     "minPageSize": 1,
-    "maxPageSize": 100,
+    "maxPageSize": 500,
     "PostgreSQLmaxTextFieldLength": 10485760,
     "MySQLmaxTextFieldLength": 16382,
     "SQLServermaxTextFieldLength": 4000,
