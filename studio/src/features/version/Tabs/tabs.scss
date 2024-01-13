@@ -17,9 +17,9 @@
 	}
 
 	.tab {
-		@apply flex overflow-auto max-w-full select-none no-scrollbar scroll-smooth;
+		@apply flex overflow-auto max-w-full select-none no-scrollbar scroll-smooth h-full;
 		.tab-item {
-			@apply relative flex items-center justify-between bg-subtle border-border min-w-[8.5rem];
+			@apply relative flex items-center justify-between bg-subtle border-border;
 			@apply border-x shrink-0 transition;
 
 			&:hover {

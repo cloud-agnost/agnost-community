@@ -39,7 +39,7 @@ export default function TabItem({
 	const IconComponent = TAB_ICON_MAP[type];
 	return (
 		<div
-			className={cn('tab-item icon', closeable && 'closeable', active && 'active')}
+			className={cn('tab-item icon', closeable && 'closeable  min-w-[8.5rem]', active && 'active')}
 			{...props}
 			{...provided.draggableProps}
 			{...provided.dragHandleProps}

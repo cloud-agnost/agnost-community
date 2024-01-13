@@ -81,12 +81,10 @@ export default function OpenTabs() {
 				{tabs.map((tab) => (
 					<div id={tab.id} key={tab.id} className='relative group'>
 						<SideBarButton active={tab.isActive} onClick={() => handleClickTabLink(tab)}>
-							<div className='flex items-center gap-2'>
-								{getTabIcon(tab.type)}
-								<h1 title={tab.title} className='truncate'>
-									{tab.title}
-								</h1>
-							</div>
+							{getTabIcon(tab.type)}
+							<h1 title={tab.title} className='truncate'>
+								{tab.title}
+							</h1>
 						</SideBarButton>
 						<div className='bg-transparent h-full flex items-center justify-center pr-0.5 absolute top-0 right-0'>
 							{tab.isDirty && (
@@ -99,7 +97,7 @@ export default function OpenTabs() {
 									onClick={() => tabRemoveHandler(tab)}
 									className={cn(
 										'!h-[unset] rounded-full invisible group-hover:visible hover:text-white !p-1',
-										tab.isActive ? 'bg-button-primary' : ' hover:bg-wrapper-background-hover',
+										tab.isActive ? 'hover:bg-button-primary' : ' hover:bg-wrapper-background-hover',
 									)}
 								>
 									<X />
