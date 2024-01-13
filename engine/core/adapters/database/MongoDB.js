@@ -1132,8 +1132,6 @@ export class MongoDB extends DatabaseBase {
 		this.createSkipStage(options.skip, pipeline);
 		this.createLimitStage(options.limit, pipeline);
 
-		console.info("***aggregate", JSON.stringify(pipeline, null, 2));
-
 		const dataCursor = await collection.aggregate(pipeline, {
 			allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
 			raw: false, // Whether to return document results as raw BSON buffers
@@ -1142,15 +1140,8 @@ export class MongoDB extends DatabaseBase {
 			readPreference: readPreference,
 		});
 
-		console.info("***dataCursor");
-
 		const findResult = await dataCursor.toArray();
-
-		console.info("***findResult", findResult);
-
 		await dataCursor.close();
-
-		console.info("***dataCursor.close");
 
 		return findResult;
 	}
