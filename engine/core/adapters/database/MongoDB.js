@@ -480,7 +480,7 @@ export class MongoDB extends DatabaseBase {
 	async commitTransaction(dbMeta) {
 		if (this.session) {
 			await this.session.commitTransaction();
-			await this.session.endSession();
+			this.session.endSession();
 			this.session = null;
 		}
 	}
@@ -491,7 +491,7 @@ export class MongoDB extends DatabaseBase {
 	async rollbackTransaction(dbMeta) {
 		if (this.session) {
 			if (this.session.inTransaction()) await this.session.abortTransaction();
-			await this.session.endSession();
+			this.session.endSession();
 			this.session = null;
 		}
 	}
@@ -1134,10 +1134,10 @@ export class MongoDB extends DatabaseBase {
 		this.createLimitStage(options.limit, pipeline);
 
 		console.log("***session", this.session);
+		console.log("***readPreference", readPreference);
+
 		const dataCursor = await collection.aggregate(pipeline, {
 			allowDiskUse: true, // Lets the server know if it can use disk to store temporary results for the aggregation
-			raw: false, // Whether to return document results as raw BSON buffers
-			bypassDocumentValidation: true, // Allow driver to bypass schema validation
 			session: this.session,
 			readPreference: readPreference,
 		});
