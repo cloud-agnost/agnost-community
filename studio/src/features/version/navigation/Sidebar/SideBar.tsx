@@ -57,11 +57,11 @@ export default function SideBar() {
 			</h1>
 			<PanelGroup
 				direction='vertical'
-				key={String(sidebar[versionId].openEditor)}
+				key={String(sidebar[versionId]?.openEditor)}
 				className='!h-[90%]'
 			>
 				<Panel
-					defaultSize={sidebar[versionId].openEditor ? 30 : 6}
+					defaultSize={sidebar[versionId]?.openEditor ? 30 : 6}
 					minSize={6}
 					className='max-h-full !overflow-y-auto'
 				>
@@ -70,7 +70,7 @@ export default function SideBar() {
 				<PanelResizeHandle className='p-1'>
 					<Separator className='cursor-row-resize h-1 flex items-center justify-center' />
 				</PanelResizeHandle>
-				<Panel defaultSize={sidebar[versionId].openEditor ? 70 : 94}>
+				<Panel defaultSize={sidebar[versionId]?.openEditor ? 70 : 94}>
 					<div className='h-full !overflow-auto' ref={scrollRef}>
 						<Workspace />
 						<VersionSettingsExplorer />
