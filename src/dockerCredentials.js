@@ -1,5 +1,6 @@
 const express = require('express');
 const k8s = require('@kubernetes/client-node');
+const fs = require('fs');
 
 const router = express.Router();
 
@@ -7,10 +8,58 @@ const router = express.Router();
 const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
 const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
+const rbacApi = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
+const batchApi = kc.makeApiClient(k8s.BatchV1Api);
 
 const namespace = process.env.NAMESPACE;
 
-async function createDockerCredetials(repository, username, password, email) {
+async function createAwsResources(awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, regcredSecretName) {
+  const manifest = fs.readFileSync('../manifests/awsEcr.yaml', 'utf8');
+  const resources = k8s.loadAllYaml(manifest);
+
+  for (const resource of resources) {
+    try {
+      const { kind, metadata } = resource;
+
+      switch(kind) {
+        case 'Secret':
+          resource.stringData.AWS_ACCESS_KEY_ID = awsAccessKeyId;
+          resource.stringData.AWS_SECRET_ACCESS_KEY = awsSecretAccessKey;
+          await k8sCoreApi.createNamespacedSecret(namespace, resource);
+          console.log('AWS Secret is created');
+          break;
+        case 'ConfigMap':
+          resource.data.AWS_REGION = awsRegion;
+          resource.data.AWS_ACCOUNT = awsAccount;
+          resource.data.DOCKER_SECRET_NAME = regcredSecretName;
+          await k8sCoreApi.createNamespacedConfigMap(namespace, resource);
+          console.log('AWS ConfigMap is created');
+          break;
+        case 'CronJob':
+          await batchApi.createNamespacedCronJob(namespace, resource);
+          console.log('AWS CronJob is created');
+          break;
+        case('ServiceAccount'):
+          await k8sCoreApi.createNamespacedServiceAccount(namespace, resource);
+          console.log('AWS CronJob Service Account is created');
+          break;
+        case 'Role':
+          await rbacApi.createNamespacedRole(namespace, resource);
+          console.log('AWS CronJob Role is created');
+          break;
+        case 'RoleBinding':
+          await rbacApi.createNamespacedRoleBinding(namespace, resource);
+          console.log('AWS CronJob Role Binding is created');
+          break;
+      }
+    } catch (error) {
+      console.error('Error applying resource:', error.body);
+      throw new Error(JSON.stringify(error.body));
+    }
+  }
+}
+
+async function createDockerCredetials(repository, username, password, email, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount) {
   const secretName = 'regcred-' + repository;
 
   switch(repository) {
@@ -31,12 +80,11 @@ async function createDockerCredetials(repository, username, password, email) {
         dockerServer = "ghcr.io";
         break;
     case "acr":
-      // This also needs registry name! <container-registry-name>.azurecr.io
-      dockerServer = "";
+      dockerServer = azureContainerRegistryName + ".azurecr.io";
       break;
     case "ecr":
-      // must get AWS details -- Another function is required ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
-      dockerServer = "";
+      dockerServer = awsAccount + ".dkr.ecr." + awsRegion + ".amazonaws.com";
+      await createAwsResources(awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, secretName);
       break;
   }
 
@@ -67,10 +115,10 @@ async function createDockerCredetials(repository, username, password, email) {
 
 // Create a Docker Credentials for imagePullSecrets
 router.post('/dockercredentials', async (req, res) => {
-  const { repository, username, password, email } = req.body;
+  const { repository, username, password, email, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount } = req.body;
 
   try {
-    await createDockerCredetials(repository, username, password, email);
+    await createDockerCredetials(repository, username, password, email, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount);
     res.json({ 'secretName': 'regcred' });
   } catch (err) {
     console.error(err);
