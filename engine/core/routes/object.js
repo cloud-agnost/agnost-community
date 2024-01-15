@@ -98,6 +98,10 @@ router.get(
 			);
 
 			res.set("Content-Type", fileInfo.mimeType);
+			res.set("Cross-Origin-Resource-Policy", "cross-origin");
+			res.set("Access-Control-Allow-Origin", "*");
+			res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+
 			if (attachment === true || attachment === "true") {
 				res.setHeader(
 					"Content-Disposition",
@@ -228,6 +232,10 @@ router.get(
 			);
 
 			res.set("Content-Type", fileInfo.mimeType);
+			res.set("Cross-Origin-Resource-Policy", "cross-origin");
+			res.set("Access-Control-Allow-Origin", "*");
+			res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+
 			if (attachment === true || attachment === "true") {
 				res.setHeader(
 					"Content-Disposition",
