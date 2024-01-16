@@ -1677,20 +1677,37 @@ router.get(
 	validate,
 	async (req, res) => {
 		try {
-			const { page, size, sortBy, sortDir, find } = req.query;
+			const { page, size, sortBy, sortDir, find, matchCase, matchWholeWord } =
+				req.query;
 
 			if (!find) return [];
+
+			matchCase = matchCase ?? false;
+			matchWholeWord = matchWholeWord ?? false;
 
 			let sort = {};
 			if (sortBy && sortDir) {
 				sort[sortBy] = sortDir == "asc" ? 1 : -1;
 			} else sort = { name: 1 };
 
+			// Adjust the search term for whole word matching
+			const searchTermRegex = matchWholeWord
+				? `\\b${helper.escapeStringRegexp(find)}\\b`
+				: helper.escapeStringRegexp(find);
+
+			// Perform the text search
+			const searchOptions = matchCase
+				? new RegExp(searchTermRegex)
+				: new RegExp(searchTermRegex, "i");
+
 			const conn = mongoose.connection;
 			const dataCursor = await conn.db.collection("code_search_view").find(
 				{
 					versionId: helper.objectId(req.version._id),
-					code: { $regex: helper.escapeStringRegexp(find), $options: "i" },
+					code: {
+						$regex: helper.escapeStringRegexp(find),
+						$options: matchCase ? undefined : "i",
+					},
 				},
 				{
 					sort,
@@ -1701,24 +1718,26 @@ router.get(
 
 			const findResult = await dataCursor.toArray();
 			// Highlight matching lines
-			const highlightedResults = findResult.map((matchingDoc) => {
-				const lines = matchingDoc.code.split("\n");
-				return {
-					...matchingDoc,
-					code: undefined,
-					matchingLines: lines
-						.map((line, index) => {
-							if (line.includes(find)) {
-								return {
-									lineNumber: index + 1, // Adding 1 because line numbers start from 1
-									lineText: helper.highlight(line, find),
-								};
-							}
-							return null;
-						})
-						.filter((lineInfo) => lineInfo !== null),
-				};
-			});
+			const highlightedResults = findResult
+				.map((matchingDoc) => {
+					const lines = matchingDoc.code.split("\n");
+					return {
+						...matchingDoc,
+						code: undefined,
+						matchingLines: lines
+							.map((line, index) => {
+								if (searchOptions.test(line)) {
+									return {
+										lineNumber: index + 1, // Adding 1 because line numbers start from 1
+										lineText: helper.highlight(line, find, matchCase),
+									};
+								}
+								return null;
+							})
+							.filter((lineInfo) => lineInfo !== null),
+					};
+				})
+				.filter((entry) => entry.matchingLines.length > 0);
 
 			res.json(highlightedResults);
 			await dataCursor.close();

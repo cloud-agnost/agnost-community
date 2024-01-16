@@ -502,8 +502,8 @@ function escapeStringRegexp(text) {
 	return text.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
 }
 
-function highlight(text, term) {
-	const regex = new RegExp(term, "gi");
+function highlight(text, term, matchCase) {
+	const regex = matchCase ? new RegExp(term, "g") : new RegExp(term, "gi");
 	return text.replace(regex, (matched) => `<mark>${matched}</mark>`);
 }
 
