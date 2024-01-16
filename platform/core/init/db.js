@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { initializeSearchView } from "./searchView.js";
+import { initializeCodeSearchView } from "./codeSearchView.js";
 
 export const connectToDatabase = async () => {
 	try {
@@ -11,6 +12,7 @@ export const connectToDatabase = async () => {
 		});
 
 		await initializeSearchView();
+		await initializeCodeSearchView();
 
 		logger.info(`Connected to the database @${process.env.CLUSTER_DB_URI}`);
 	} catch (err) {

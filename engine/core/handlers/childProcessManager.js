@@ -827,7 +827,7 @@ export class ChildProcessDeploymentManager extends DeploymentManager {
 
 		for (const task of tasks) {
 			const adapterObj = adapterManager.getTaskAdapter(task.name);
-			if (adapterObj) {
+			if (adapterObj && (task.enabled || task.enabled === undefined)) {
 				try {
 					await adapterObj.listenMessages(task);
 					this.addLog(`Initialized handler of task '${task.name}'`);

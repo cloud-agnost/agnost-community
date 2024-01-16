@@ -1661,6 +1661,54 @@ router.get(
 );
 
 /*
+@route      /v1/org/:orgId/app/:appId/version/:versionId/search-code?search=text
+@method     GET
+@desc       Searches the code of the version
+@access     private
+*/
+router.get(
+	"/:versionId/search-code",
+	authSession,
+	validateOrg,
+	validateApp,
+	validateVersion,
+	authorizeAppAction("app.version.view"),
+	applyRules("code-search"),
+	validate,
+	async (req, res) => {
+		try {
+			const { page, size, sortBy, sortDir, find } = req.query;
+
+			if (!find) return [];
+
+			let sort = {};
+			if (sortBy && sortDir) {
+				sort[sortBy] = sortDir == "asc" ? 1 : -1;
+			} else sort = { name: 1 };
+
+			const conn = mongoose.connection;
+			const dataCursor = await conn.db.collection("code_search_view").find(
+				{
+					versionId: helper.objectId(req.version._id),
+					$text: { $search: find },
+				},
+				{
+					sort,
+					skip: size * page,
+					limit: size,
+				}
+			);
+
+			const findResult = await dataCursor.toArray();
+			res.json(findResult);
+			await dataCursor.close();
+		} catch (err) {
+			handleError(req, res, err);
+		}
+	}
+);
+
+/*
 @route      /v1/org/:orgId/app/:appId/version/:versionId/npm-search?package=&page=&size=
 @method     GET
 @desc       Searches the NPM packages

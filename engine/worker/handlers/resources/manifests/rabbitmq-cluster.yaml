@@ -20,8 +20,8 @@ spec:
       cpu: 200m
       memory: 500Mi
     limits:
-      cpu: 200m
-      memory: 500Mi
+      cpu: 2000m
+      memory: 1Gi
   persistence:
     storage: 1Gi
   override:

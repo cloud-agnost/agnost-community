@@ -136,22 +136,25 @@ export async function deployTask(env, task) {
 	// Cancel any existing task with the same key
 	await agendaInstance.cancel({ name: `${env.iid}.${task.iid}` });
 
-	// Define the task and its handler function
-	agendaInstance.define(`${env.iid}.${task.iid}`, taskProcessor);
-	// Schedule the task
-	agendaInstance.every(
-		task.cronExpression,
-		`${env.iid}.${task.iid}`,
-		{
-			envId: env.iid,
-			taskId: task.iid,
-			taskName: task.name,
-		},
-		{
-			// Setting this true will skip the immediate run. The first run will occur only in configured interval.
-			skipImmediate: true,
-		}
-	);
+	//We create the task if it is enabled or enabled status undefined for legacy tasks
+	if (task.enabled || task.enabled === undefined) {
+		// Define the task and its handler function
+		agendaInstance.define(`${env.iid}.${task.iid}`, taskProcessor);
+		// Schedule the task
+		agendaInstance.every(
+			task.cronExpression,
+			`${env.iid}.${task.iid}`,
+			{
+				envId: env.iid,
+				taskId: task.iid,
+				taskName: task.name,
+			},
+			{
+				// Setting this true will skip the immediate run. The first run will occur only in configured interval.
+				skipImmediate: true,
+			}
+		);
+	}
 }
 
 export async function undeployTask(envId, taskId) {
