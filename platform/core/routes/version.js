@@ -1700,14 +1700,23 @@ router.get(
 				? new RegExp(searchTermRegex)
 				: new RegExp(searchTermRegex, "i");
 
+			let searchQuery = null;
+			if (matchCase) {
+				searchQuery = {
+					$regex: helper.escapeStringRegexp(find),
+				};
+			} else {
+				searchQuery = {
+					$regex: helper.escapeStringRegexp(find),
+					$options: matchCase ? undefined : "i",
+				};
+			}
+
 			const conn = mongoose.connection;
 			const dataCursor = await conn.db.collection("code_search_view").find(
 				{
 					versionId: helper.objectId(req.version._id),
-					code: {
-						$regex: helper.escapeStringRegexp(find),
-						$options: matchCase ? undefined : "i",
-					},
+					code: searchQuery,
 				},
 				{
 					sort,

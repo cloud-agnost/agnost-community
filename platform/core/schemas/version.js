@@ -1122,13 +1122,13 @@ export const applyRules = (type) => {
 					.trim()
 					.notEmpty()
 					.withMessage(t("Required field, cannot be left empty")),
-				body("matchCase")
+				query("matchCase")
 					.trim()
 					.optional()
 					.isBoolean()
 					.withMessage(t("Not a valid boolean value"))
 					.toBoolean(),
-				body("matchWholeWord")
+				query("matchWholeWord")
 					.trim()
 					.optional()
 					.isBoolean()
