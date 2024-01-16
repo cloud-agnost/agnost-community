@@ -1700,7 +1700,27 @@ router.get(
 			);
 
 			const findResult = await dataCursor.toArray();
-			res.json(findResult);
+			// Highlight matching lines
+			const highlightedResults = findResult.map((matchingDoc) => {
+				const lines = matchingDoc.code.split("\n");
+				return {
+					...matchingDoc,
+					code: undefined,
+					matchingLines: lines
+						.map((line, index) => {
+							if (line.includes(find)) {
+								return {
+									lineNumber: index + 1, // Adding 1 because line numbers start from 1
+									lineText: helper.highlight(line, find),
+								};
+							}
+							return null;
+						})
+						.filter((lineInfo) => lineInfo !== null),
+				};
+			});
+
+			res.json(highlightedResults);
 			await dataCursor.close();
 		} catch (err) {
 			handleError(req, res, err);
