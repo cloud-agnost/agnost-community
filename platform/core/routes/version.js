@@ -1677,7 +1677,7 @@ router.get(
 	validate,
 	async (req, res) => {
 		try {
-			const { page, size, sortBy, sortDir, find, matchCase, matchWholeWord } =
+			let { page, size, sortBy, sortDir, find, matchCase, matchWholeWord } =
 				req.query;
 
 			if (!find) return [];
