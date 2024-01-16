@@ -51,7 +51,7 @@ export default function EmptyState({ type, title, className, children }: EmptySt
 		notification: Bell,
 		'custom-domain': GlobeSimple,
 	};
-	const Icon = TAB_ICON_MAP[capitalize(type) as TabTypes] ?? ICON_MAP[type];
+	const Icon = TAB_ICON_MAP[type as TabTypes] ?? ICON_MAP[type];
 	return (
 		<div className={cn('empty-state h-[95%]', className)}>
 			{<Icon className='w-44 h-44 text-icon-base' />}
