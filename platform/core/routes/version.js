@@ -1661,7 +1661,7 @@ router.get(
 );
 
 /*
-@route      /v1/org/:orgId/app/:appId/version/:versionId/search-code?search=text
+@route      /v1/org/:orgId/app/:appId/version/:versionId/search-code?find=text
 @method     GET
 @desc       Searches the code of the version
 @access     private
@@ -1690,7 +1690,7 @@ router.get(
 			const dataCursor = await conn.db.collection("code_search_view").find(
 				{
 					versionId: helper.objectId(req.version._id),
-					$text: { $search: find },
+					code: { $regex: helper.escapeStringRegexp(find), $options: "i" },
 				},
 				{
 					sort,

@@ -44,7 +44,7 @@ export const MiddlewareModel = mongoose.model(
 			},
 			logic: {
 				type: String,
-				text: true, // Declares a full-text index
+				index: true,
 			},
 			createdBy: {
 				type: mongoose.Schema.Types.ObjectId,

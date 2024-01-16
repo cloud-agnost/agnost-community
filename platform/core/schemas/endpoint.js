@@ -79,7 +79,7 @@ export const EndpointModel = mongoose.model(
 			},
 			logic: {
 				type: String,
-				text: true, // Declares a full-text index
+				index: true,
 			},
 			rateLimits: {
 				type: [String], // Array of rate limit iids
