@@ -1,11 +1,10 @@
 import { TAB_ICON_MAP } from '@/constants';
+import { TabTypes } from '@/types';
 import { cn } from '@/utils';
 import { AppWindow, Bell, Envelope, GlobeSimple, Key, Users } from '@phosphor-icons/react';
-import { capitalize } from 'lodash';
 import React, { ElementType } from 'react';
 import { EnvironmentVariable, NpmPackage, RateLimit, Storage } from '../icons';
 import './emptyState.scss';
-import { TabTypes } from '@/types';
 
 export type Modules =
 	| 'org'
