@@ -25,6 +25,7 @@ export default function CreateTask() {
 		resolver: zodResolver(CreateTaskSchema),
 		defaultValues: {
 			logExecution: true,
+			enabled: true,
 		},
 	});
 	const { getVersionDashboardPath } = useVersionStore();

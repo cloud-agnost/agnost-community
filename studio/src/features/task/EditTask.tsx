@@ -59,7 +59,10 @@ export default function EditTask() {
 
 	useEffect(() => {
 		if (task) {
-			form.reset(task);
+			form.reset({
+				...task,
+				enabled: task.enabled ?? true,
+			});
 		}
 	}, [task]);
 	return (

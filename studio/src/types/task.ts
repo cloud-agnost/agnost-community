@@ -10,6 +10,7 @@ export interface Task {
 	iid: string;
 	name: string;
 	logExecution: boolean;
+	enabled: boolean;
 	resourceId: string;
 	type: 'code' | 'flow';
 	logic: string;
@@ -27,7 +28,9 @@ export const TaskScheme = z.object({});
 export const CreateTaskSchema = z.object({
 	name: NameSchema,
 	logExecution: z.boolean().default(true),
+	enabled: z.boolean().default(true),
 	type: z.enum(['code', 'flow']).default('code'),
+
 	cronExpression: z
 		.string({
 			required_error: translate('forms.required', {
