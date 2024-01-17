@@ -12,6 +12,7 @@ import MessageQueueForm from './MessageQueueForm';
 import { removeEmptyFields } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 import useEnvironmentStore from '@/store/environment/environmentStore';
+import useVersionStore from '@/store/version/versionStore';
 interface CreateQueueProps {
 	open: boolean;
 	onClose: () => void;
@@ -21,7 +22,7 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 	const { t } = useTranslation();
 	const { createQueue } = useMessageQueueStore();
 	const navigate = useTabNavigate();
-	const { pathname } = useLocation();
+	const { getVersionDashboardPath } = useVersionStore();
 	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
@@ -43,7 +44,7 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 			handleClose();
 			navigate({
 				title: queue.name,
-				path: `${pathname}/${queue._id}`,
+				path: getVersionDashboardPath(`queue/${queue._id}`),
 				isActive: true,
 				isDashboard: false,
 				type: TabTypes.MessageQueue,

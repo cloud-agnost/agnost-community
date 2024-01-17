@@ -10,6 +10,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import * as z from 'zod';
 import FunctionForm from './FunctionForm';
 import { useMutation } from '@tanstack/react-query';
+import useVersionStore from '@/store/version/versionStore';
 interface CreateTaskProps {
 	open: boolean;
 	onClose: () => void;
@@ -18,12 +19,13 @@ interface CreateTaskProps {
 export default function CreateFunction({ open, onClose }: CreateTaskProps) {
 	const { t } = useTranslation();
 	const { createFunction } = useFunctionStore();
+	const { getVersionDashboardPath } = useVersionStore();
 	const { toast } = useToast();
 	const navigate = useTabNavigate();
 	const form = useForm<z.infer<typeof CreateFunctionSchema>>({
 		resolver: zodResolver(CreateFunctionSchema),
 	});
-	const { pathname } = useLocation();
+
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -34,11 +36,12 @@ export default function CreateFunction({ open, onClose }: CreateTaskProps) {
 		onSuccess: (helper) => {
 			navigate({
 				title: helper.name,
-				path: `${pathname}/${helper._id}`,
+				path: getVersionDashboardPath(`function/${helper._id}`),
 				isActive: true,
 				isDashboard: false,
 				type: TabTypes.Function,
 			});
+
 			handleClose();
 		},
 		onError: (error: APIError) => {

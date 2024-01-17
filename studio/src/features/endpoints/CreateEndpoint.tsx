@@ -10,6 +10,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import * as z from 'zod';
 import EndpointForm from './EndpointForm';
 import { useMutation } from '@tanstack/react-query';
+import useVersionStore from '@/store/version/versionStore';
 interface CreateEndpointProps {
 	open: boolean;
 	onClose: () => void;
@@ -18,7 +19,7 @@ interface CreateEndpointProps {
 export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 	const { createEndpoint } = useEndpointStore();
 
-	const { pathname } = useLocation();
+	const { getVersionDashboardPath } = useVersionStore();
 	const navigate = useTabNavigate();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
@@ -40,7 +41,7 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 		onSuccess: (endpoint) => {
 			navigate({
 				title: endpoint.name,
-				path: `${pathname}/${endpoint._id}`,
+				path: getVersionDashboardPath(`endpoint/${endpoint._id}`),
 				isActive: true,
 				isDashboard: false,
 				type: TabTypes.Endpoint,

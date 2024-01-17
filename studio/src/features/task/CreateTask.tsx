@@ -13,6 +13,7 @@ import * as z from 'zod';
 import TaskForm from './TaskForm';
 import { useMutation } from '@tanstack/react-query';
 import useEnvironmentStore from '@/store/environment/environmentStore';
+import useVersionStore from '@/store/version/versionStore';
 interface CreateTaskProps {
 	open: boolean;
 	onClose: () => void;
@@ -30,7 +31,7 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 			logExecution: true,
 		},
 	});
-	const { pathname } = useLocation();
+	const { getVersionDashboardPath } = useVersionStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -53,7 +54,7 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 		onSuccess: (task) => {
 			navigate({
 				title: task.name,
-				path: `${pathname}/${task._id}`,
+				path: getVersionDashboardPath(`task/${task._id}`),
 				isActive: true,
 				isDashboard: false,
 				type: TabTypes.Task,

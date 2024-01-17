@@ -11,6 +11,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MiddlewareForm from './MiddlewareForm';
 import { MiddlewareSchema } from '@/types';
+import useVersionStore from '@/store/version/versionStore';
 interface CreateMiddlewareProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -23,7 +24,7 @@ export default function CreateMiddleware({ open, onOpenChange, onCreate }: Creat
 	const [loading, setLoading] = useState(false);
 	const { createMiddleware } = useMiddlewareStore();
 	const navigate = useTabNavigate();
-	const { pathname } = useLocation();
+	const { getVersionDashboardPath } = useVersionStore();
 	const { orgId, appId, versionId } = useParams();
 
 	useEffect(() => {
@@ -54,7 +55,7 @@ export default function CreateMiddleware({ open, onOpenChange, onCreate }: Creat
 				else {
 					navigate({
 						title: data.name,
-						path: `${pathname}/${mw._id}`,
+						path: getVersionDashboardPath(`middleware/${mw._id}`),
 						isActive: true,
 						isDashboard: false,
 						type: TabTypes.Middleware,
@@ -85,4 +86,7 @@ export default function CreateMiddleware({ open, onOpenChange, onCreate }: Creat
 			</DrawerContent>
 		</Drawer>
 	);
+}
+function getVersionDashboardPath(arg0: string): string {
+	throw new Error('Function not implemented.');
 }
