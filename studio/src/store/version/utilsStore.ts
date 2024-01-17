@@ -30,7 +30,6 @@ interface UtilsStore {
 		};
 	};
 	isSidebarOpen: boolean;
-	panelScrollPosition: number;
 }
 
 type Actions = {
@@ -45,7 +44,7 @@ type Actions = {
 	toggleOpenEditorTab: () => void;
 	toggleWorkspaceTab: (tab: TabTypes) => void;
 	toggleSidebar: () => void;
-	setPanelScrollPosition: (position: number) => void;
+	collapseAll: () => void;
 };
 
 const initialState: UtilsStore = {
@@ -57,7 +56,6 @@ const initialState: UtilsStore = {
 	endpointLogs: {} as EndpointLogs,
 	sidebar: {} as UtilsStore['sidebar'],
 	isSidebarOpen: false,
-	panelScrollPosition: 0,
 };
 
 const useUtilsStore = create<UtilsStore & Actions>()(
@@ -172,7 +170,20 @@ const useUtilsStore = create<UtilsStore & Actions>()(
 						};
 					});
 				},
-				setPanelScrollPosition: (position) => set({ panelScrollPosition: position }),
+				collapseAll: () => {
+					const version = useVersionStore.getState().version;
+					set((prev) => {
+						return {
+							sidebar: {
+								...prev.sidebar,
+								[version._id]: {
+									...prev.sidebar?.[version._id],
+									openedTabs: [],
+								},
+							},
+						};
+					});
+				},
 			}),
 			{ name: 'utils-store', storage: CustomStateStorage },
 		),

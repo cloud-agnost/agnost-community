@@ -1,27 +1,24 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useMessageQueueStore from '@/store/queue/messageQueueStore';
+import useVersionStore from '@/store/version/versionStore';
 import { APIError, CreateMessageQueueSchema, TabTypes } from '@/types';
+import { removeEmptyFields } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MessageQueueForm from './MessageQueueForm';
-import { removeEmptyFields } from '@/utils';
-import { useMutation } from '@tanstack/react-query';
-import useEnvironmentStore from '@/store/environment/environmentStore';
-interface CreateQueueProps {
-	open: boolean;
-	onClose: () => void;
-}
 
-export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) {
+export default function CreateMessageQueue() {
 	const { t } = useTranslation();
-	const { createQueue } = useMessageQueueStore();
+	const { createQueue, isCreateQueueModalOpen, toggleCreateModal } = useMessageQueueStore();
 	const navigate = useTabNavigate();
-	const { pathname } = useLocation();
+	const { getVersionDashboardPath } = useVersionStore();
 	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
@@ -43,7 +40,7 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 			handleClose();
 			navigate({
 				title: queue.name,
-				path: `${pathname}/${queue._id}`,
+				path: getVersionDashboardPath(`queue/${queue._id}`),
 				isActive: true,
 				isDashboard: false,
 				type: TabTypes.MessageQueue,
@@ -74,10 +71,10 @@ export default function CreateMessageQueue({ open, onClose }: CreateQueueProps) 
 
 	function handleClose() {
 		form.reset();
-		onClose();
+		toggleCreateModal();
 	}
 	return (
-		<Drawer open={open} onOpenChange={handleClose}>
+		<Drawer open={isCreateQueueModalOpen} onOpenChange={handleClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>{t('queue.create.title')}</DrawerTitle>

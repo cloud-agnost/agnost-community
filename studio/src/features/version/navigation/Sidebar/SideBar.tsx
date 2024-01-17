@@ -1,19 +1,22 @@
-import { Separator } from '@/components/Separator';
+import { Button } from '@/components/Button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { TabTypes } from '@/types';
-import { useEffect, useLayoutEffect, useRef } from 'react';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { isElementInViewport } from '@/utils';
+import { MinusSquare } from '@phosphor-icons/react';
+import { useEffect, useLayoutEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import OpenTabs from './OpenTabs';
 import VersionSettingsExplorer from './VersionSettingsExplorer';
 import Workspace from './Workspace';
-import { isElementInViewport } from '@/utils';
 export default function SideBar() {
-	const { sidebar, toggleSidebar, isSidebarOpen } = useUtilsStore();
+	const { t } = useTranslation();
+	const { toggleSidebar, isSidebarOpen, collapseAll } = useUtilsStore();
 	const { getCurrentTab, tabs } = useTabStore();
 	const { versionId } = useParams() as Record<string, string>;
-	const scrollRef = useRef<HTMLDivElement>(null);
+
 	useEffect(() => {
 		const toggleSidebarShortcut = (e: KeyboardEvent) => {
 			if (e.key === 'b' && (e.metaKey || e.ctrlKey)) {
@@ -35,7 +38,8 @@ export default function SideBar() {
 					? currentTab.title
 					: window.location.pathname.split('/').slice(-1).pop();
 			const targetElement = document.getElementById(dataId as string);
-			if (targetElement && isElementInViewport(targetElement)) {
+
+			if (targetElement && !isElementInViewport(targetElement)) {
 				targetElement.scrollIntoView({ behavior: 'smooth' });
 			}
 		};
@@ -51,32 +55,32 @@ export default function SideBar() {
 		};
 	}, [isSidebarOpen, tabs]);
 	return (
-		<div className='h-full w-96 bg-wrapper-background-base shadow-xl' id='side-navigation'>
-			<h1 className='text-sm font-bold text-white px-8 py-2 border-b border-border mb-1'>
-				Explorer
-			</h1>
-			<PanelGroup
-				direction='vertical'
-				key={String(sidebar[versionId]?.openEditor)}
-				className='!h-[90%]'
-			>
-				<Panel
-					defaultSize={sidebar[versionId]?.openEditor ? 30 : 6}
-					minSize={6}
-					className='max-h-full !overflow-y-auto'
-				>
-					<OpenTabs />
-				</Panel>
-				<PanelResizeHandle className='p-1'>
-					<Separator className='cursor-row-resize h-1 flex items-center justify-center' />
-				</PanelResizeHandle>
-				<Panel defaultSize={sidebar[versionId]?.openEditor ? 70 : 94}>
-					<div className='h-full !overflow-auto' ref={scrollRef}>
-						<Workspace />
-						<VersionSettingsExplorer />
-					</div>
-				</Panel>
-			</PanelGroup>
+		<div className='h-full w-full bg-wrapper-background-base shadow-xl' id='side-navigation'>
+			<div className='pl-6 py-2 border-b border-border mb-1 group flex items-center justify-between'>
+				<h1 className='text-sm font-bold text-white'>{t('version.explorer')}</h1>
+				<TooltipProvider>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant='blank'
+								rounded
+								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6 mr-2 invisible group-hover:visible'
+								iconOnly
+								size='sm'
+								onClick={collapseAll}
+							>
+								<MinusSquare size={16} />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>{t('version.collapse_all')}</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
+			</div>
+			<div className='overflow-y-auto overflow-x-hidden h-[calc(100%-3rem)]'>
+				<OpenTabs />
+				<Workspace />
+				<VersionSettingsExplorer />
+			</div>
 		</div>
 	);
 }

@@ -39,7 +39,7 @@ type Actions = {
 	testTask: (params: TestTaskParams) => Promise<void>;
 	setLogics: (id: string, logic: string) => void;
 	deleteLogic: (id: string) => void;
-	toggleCreateTaskModal: () => void;
+	toggleCreateModal: () => void;
 	reset: () => void;
 };
 
@@ -168,7 +168,7 @@ const useTaskStore = create<TaskStore & Actions>()(
 				throw error as APIError;
 			}
 		},
-		toggleCreateTaskModal: () => {
+		toggleCreateModal: () => {
 			set((prev) => ({ isCreateTaskModalOpen: !prev.isCreateTaskModalOpen }));
 		},
 		setLogics: (id, logic) => set((prev) => ({ logics: { ...prev.logics, [id]: logic } })),

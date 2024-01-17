@@ -13,7 +13,7 @@ import {
 export default class MiddlewareService {
 	static url = '/v1/org';
 
-	static async getMiddlewaresOfAppVersion({
+	static async getMiddlewares({
 		orgId,
 		appId,
 		versionId,
@@ -36,9 +36,12 @@ export default class MiddlewareService {
 			.data;
 	}
 
-	static async deleteMiddleware({ orgId, appId, versionId, mwId }: DeleteMiddlewareParams) {
-		return (await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/mw/${mwId}`))
-			.data;
+	static async deleteMiddleware({ orgId, appId, versionId, middlewareId }: DeleteMiddlewareParams) {
+		return (
+			await axios.delete(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/mw/${middlewareId}`,
+			)
+		).data;
 	}
 
 	static async deleteMultipleMiddlewares({

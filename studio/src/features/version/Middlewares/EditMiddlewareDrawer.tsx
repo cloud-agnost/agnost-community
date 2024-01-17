@@ -14,7 +14,7 @@ import MiddlewareForm from './MiddlewareForm';
 export default function EditMiddlewareDrawer() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
-	const { middleware, closeEditMiddlewareDrawer, isEditMiddlewareDrawerOpen, updateMiddleware } =
+	const { middleware, closeEditMiddlewareModal, isEditMiddlewareModalOpen, updateMiddleware } =
 		useMiddlewareStore();
 
 	const form = useForm<z.infer<typeof MiddlewareSchema>>({
@@ -25,12 +25,12 @@ export default function EditMiddlewareDrawer() {
 	});
 
 	useEffect(() => {
-		if (isEditMiddlewareDrawerOpen && middleware) {
+		if (isEditMiddlewareModalOpen && middleware) {
 			form.reset({
 				name: middleware.name,
 			});
 		}
-	}, [isEditMiddlewareDrawerOpen]);
+	}, [isEditMiddlewareModalOpen]);
 
 	const { mutate: updateMiddlewareMutation, isPending } = useMutation({
 		mutationFn: updateMiddleware,
@@ -61,14 +61,14 @@ export default function EditMiddlewareDrawer() {
 	}
 
 	function onOpenChange() {
-		closeEditMiddlewareDrawer();
+		closeEditMiddlewareModal();
 		form.reset({
 			name: '',
 		});
 	}
 
 	return (
-		<Drawer open={isEditMiddlewareDrawerOpen} onOpenChange={onOpenChange}>
+		<Drawer open={isEditMiddlewareModalOpen} onOpenChange={onOpenChange}>
 			<DrawerContent className='flex gap-0 flex-col' position='right'>
 				<DrawerHeader>
 					<DrawerTitle>{t('version.middleware.edit.default')}</DrawerTitle>

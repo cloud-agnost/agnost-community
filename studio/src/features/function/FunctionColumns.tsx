@@ -11,7 +11,7 @@ import { DateText } from 'components/DateText';
 import { TabLink } from '../version/Tabs';
 import { toast } from '@/hooks/useToast';
 
-const { openEditFunctionDrawer, deleteFunction } = useFunctionStore.getState();
+const { openEditFunctionModal, deleteFunction } = useFunctionStore.getState();
 const queryClient = new QueryClient();
 
 async function deleteHandler(fn: HelperFunction) {
@@ -30,7 +30,7 @@ async function deleteHandler(fn: HelperFunction) {
 			appId: fn.appId,
 			orgId: fn.orgId,
 			versionId: fn.versionId,
-			funcId: fn._id,
+			functionId: fn._id,
 		});
 }
 const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
@@ -122,7 +122,7 @@ const FunctionColumns: ColumnDefWithClassName<HelperFunction>[] = [
 			const canDeleteFunction = getVersionPermission('function.delete');
 			return (
 				<ActionsCell<HelperFunction>
-					onEdit={() => openEditFunctionDrawer(original)}
+					onEdit={() => openEditFunctionModal(original)}
 					original={original}
 					canEdit={canEditFunction}
 				>

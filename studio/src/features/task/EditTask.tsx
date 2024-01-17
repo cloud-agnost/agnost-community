@@ -11,14 +11,10 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import TaskForm from './TaskForm';
-interface EditTaskProps {
-	open: boolean;
-	onClose: () => void;
-}
 
-export default function EditTask({ open, onClose }: EditTaskProps) {
+export default function EditTask() {
 	const { t } = useTranslation();
-	const { updateTask, task } = useTaskStore();
+	const { updateTask, task, isEditTaskModalOpen, closeEditTaskModal } = useTaskStore();
 	const { toast } = useToast();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
@@ -57,7 +53,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 	}
 
 	function handleClose() {
-		onClose();
+		closeEditTaskModal();
 		form.reset();
 	}
 
@@ -67,7 +63,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 		}
 	}, [task]);
 	return (
-		<Drawer open={open} onOpenChange={handleClose}>
+		<Drawer open={isEditTaskModalOpen} onOpenChange={handleClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>

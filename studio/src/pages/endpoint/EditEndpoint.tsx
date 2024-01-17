@@ -19,7 +19,7 @@ export default function EditEndpoint() {
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('endpoint.update');
 	const environment = useEnvironmentStore((state) => state.environment);
-	const { saveEndpointLogic, openEditEndpointDialog, endpoint, logics, setLogics, deleteLogic } =
+	const { saveEndpointLogic, openEditEndpointModal, endpoint, logics, setLogics, deleteLogic } =
 		useEndpointStore();
 
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -54,7 +54,7 @@ export default function EditEndpoint() {
 
 	return (
 		<VersionEditorLayout
-			onEditModalOpen={() => openEditEndpointDialog(endpoint)}
+			onEditModalOpen={() => openEditEndpointModal(endpoint)}
 			onTestModalOpen={() => setIsTestEndpointOpen(true)}
 			onSaveLogic={saveLogic}
 			loading={isPending}
@@ -85,7 +85,7 @@ export default function EditEndpoint() {
 					<Input className='rounded-none rounded-r w-full' value={endpoint.path} disabled />
 					<CopyButton
 						text={`${BASE_URL}/${environment?.iid}${endpoint.path}`}
-						className='absolute right-4'
+						className='absolute right-1'
 					/>
 				</div>
 			</div>

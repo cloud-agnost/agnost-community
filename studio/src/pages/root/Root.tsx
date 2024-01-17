@@ -5,7 +5,6 @@ import { EditorSettings } from '@/features/auth/EditorSettings';
 import ReleaseHistory from '@/features/cluster/ReleaseHistory';
 import { AddResourceDrawer } from '@/features/resources';
 import { CreateCopyVersionDrawer } from '@/features/version/CreateCopyVersionDrawer';
-import { EditMiddlewareDrawer } from '@/features/version/Middlewares';
 import useAuthStore from '@/store/auth/authStore.ts';
 import useClusterStore from '@/store/cluster/clusterStore.ts';
 import useEnvironmentStore from '@/store/environment/environmentStore';
@@ -98,7 +97,6 @@ export default function Root() {
 			<Outlet />
 			<ApplicationVersions />
 			<EditApplication />
-			<EditMiddlewareDrawer />
 			<CreateCopyVersionDrawer />
 			<AddResourceDrawer />
 			<AppInviteMember />

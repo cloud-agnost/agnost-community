@@ -13,14 +13,10 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MessageQueueForm from './MessageQueueForm';
-interface CreateQueueProps {
-	open: boolean;
-	onClose: () => void;
-}
 
-export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
+export default function EditMessageQueue() {
 	const { t } = useTranslation();
-	const { updateQueue, queue } = useMessageQueueStore();
+	const { updateQueue, queue, isEditQueueModalOpen, closeEditQueueModal } = useMessageQueueStore();
 	const environment = useEnvironmentStore((state) => state.environment);
 	const { versionId, appId, orgId } = useParams() as Record<string, string>;
 	const { toast } = useToast();
@@ -32,7 +28,7 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 		mutationFn: updateQueue,
 		mutationKey: ['updateQueue'],
 		onSuccess: () => {
-			onClose();
+			closeEditQueueModal();
 			toast({
 				title: t('queue.edit_success') as string,
 				action: 'success',
@@ -60,7 +56,7 @@ export default function EditMessageQueue({ open, onClose }: CreateQueueProps) {
 	}, [open, queue, environment]);
 
 	return (
-		<Drawer open={open} onOpenChange={onClose}>
+		<Drawer open={isEditQueueModalOpen} onOpenChange={closeEditQueueModal}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>

@@ -11,7 +11,7 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { TableConfirmation } from 'components/Table';
 
-const { openEditMiddlewareDrawer, deleteMiddleware } = useMiddlewareStore.getState();
+const { openEditMiddlewareModal, deleteMiddleware } = useMiddlewareStore.getState();
 const queryClient = new QueryClient();
 
 async function deleteHandler(mw: Middleware) {
@@ -30,7 +30,7 @@ async function deleteHandler(mw: Middleware) {
 			appId: mw.appId,
 			orgId: mw.orgId,
 			versionId: mw.versionId,
-			mwId: mw._id,
+			middlewareId: mw._id,
 		});
 }
 const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
@@ -116,7 +116,7 @@ const MiddlewaresColumns: ColumnDefWithClassName<Middleware>[] = [
 				<ActionsCell<Middleware>
 					original={original}
 					canEdit={canEditMiddleware}
-					onEdit={() => openEditMiddlewareDrawer(original)}
+					onEdit={() => openEditMiddlewareModal(original)}
 				>
 					<TableConfirmation
 						align='end'

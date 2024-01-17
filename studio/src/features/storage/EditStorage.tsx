@@ -12,14 +12,10 @@ import * as z from 'zod';
 import { useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
-interface CreateStorageProps {
-	open: boolean;
-	onClose: () => void;
-}
-
-export default function EditStorage({ open, onClose }: CreateStorageProps) {
+export default function EditStorage() {
 	const { t } = useTranslation();
-	const { updateStorage, storage } = useStorageStore();
+	const { updateStorage, storage, isEditStorageDialogOpen, closeDeleteStorageModal } =
+		useStorageStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -56,7 +52,7 @@ export default function EditStorage({ open, onClose }: CreateStorageProps) {
 		form.reset({
 			name: undefined,
 		});
-		onClose();
+		closeDeleteStorageModal();
 	}
 
 	useEffect(() => {
@@ -65,12 +61,12 @@ export default function EditStorage({ open, onClose }: CreateStorageProps) {
 
 	return (
 		<Drawer
-			open={open}
+			open={isEditStorageDialogOpen}
 			onOpenChange={() => {
 				form.reset({
 					name: '',
 				});
-				onClose();
+				closeDeleteStorageModal();
 			}}
 		>
 			<DrawerContent position='right' size='lg' className='h-full'>

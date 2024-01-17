@@ -65,12 +65,15 @@ export default class EndpointService {
 		orgId,
 		appId,
 		versionId,
-		epId,
+		endpointId,
 	}: DeleteEndpointParams): Promise<void> {
 		return (
-			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/ep/${epId}`, {
-				data: {},
-			})
+			await axios.delete(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/ep/${endpointId}`,
+				{
+					data: {},
+				},
+			)
 		).data;
 	}
 

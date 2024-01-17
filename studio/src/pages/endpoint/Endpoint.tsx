@@ -20,13 +20,8 @@ export default function MainEndpoint() {
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 	const canCreate = useAuthorizeVersion('endpoint.create');
-	const {
-		endpoints,
-		lastFetchedPage,
-		getEndpoints,
-		deleteMultipleEndpoints,
-		toggleCreateEndpointDialog,
-	} = useEndpointStore();
+	const { endpoints, lastFetchedPage, getEndpoints, deleteMultipleEndpoints, toggleCreateModal } =
+		useEndpointStore();
 	const { addTab } = useTabStore();
 	const { getVersionDashboardPath } = useVersionStore();
 	const table = useTable({
@@ -79,7 +74,7 @@ export default function MainEndpoint() {
 			createButtonTitle={t('endpoint.add')}
 			emptyStateTitle={t('endpoint.empty')}
 			isEmpty={!endpoints.length}
-			openCreateModal={toggleCreateEndpointDialog}
+			openCreateModal={toggleCreateModal}
 			onMultipleDelete={deleteMultipleEndpointsHandler}
 			table={table}
 			disabled={!canCreate}

@@ -2,28 +2,26 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
 import useFunctionStore from '@/store/function/functionStore';
+import useVersionStore from '@/store/version/versionStore';
 import { APIError, CreateFunctionSchema, TabTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import FunctionForm from './FunctionForm';
-import { useMutation } from '@tanstack/react-query';
-interface CreateTaskProps {
-	open: boolean;
-	onClose: () => void;
-}
 
-export default function CreateFunction({ open, onClose }: CreateTaskProps) {
+export default function CreateFunction() {
 	const { t } = useTranslation();
-	const { createFunction } = useFunctionStore();
+	const { createFunction, isCreateFunctionDrawerOpen, toggleCreateModal } = useFunctionStore();
+	const { getVersionDashboardPath } = useVersionStore();
 	const { toast } = useToast();
 	const navigate = useTabNavigate();
 	const form = useForm<z.infer<typeof CreateFunctionSchema>>({
 		resolver: zodResolver(CreateFunctionSchema),
 	});
-	const { pathname } = useLocation();
+
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -34,11 +32,12 @@ export default function CreateFunction({ open, onClose }: CreateTaskProps) {
 		onSuccess: (helper) => {
 			navigate({
 				title: helper.name,
-				path: `${pathname}/${helper._id}`,
+				path: getVersionDashboardPath(`function/${helper._id}`),
 				isActive: true,
 				isDashboard: false,
 				type: TabTypes.Function,
 			});
+
 			handleClose();
 		},
 		onError: (error: APIError) => {
@@ -62,11 +61,11 @@ export default function CreateFunction({ open, onClose }: CreateTaskProps) {
 		form.reset({
 			name: '',
 		});
-		onClose();
+		toggleCreateModal();
 	}
 
 	return (
-		<Drawer open={open} onOpenChange={handleClose}>
+		<Drawer open={isCreateFunctionDrawerOpen} onOpenChange={handleClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>{t('function.add')}</DrawerTitle>

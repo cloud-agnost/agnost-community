@@ -6,7 +6,11 @@ export type GetMiddlewareByIdParams = BaseParams & {
 	mwId: string;
 };
 
-export type DeleteMiddlewareParams = GetMiddlewareByIdParams & BaseRequest;
+export type DeleteMiddlewareParams = BaseParams &
+	BaseRequest & {
+		middlewareId: string;
+	};
+
 export type DeleteMultipleMiddlewares = BaseParams & {
 	middlewareIds: string[];
 };

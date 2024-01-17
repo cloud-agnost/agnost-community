@@ -17,14 +17,16 @@ export interface HelperFunction {
 	updatedAt: string;
 	__v: number;
 }
-export type GetFunctionsOfAppVersion = BaseParams & BaseGetRequest;
+export type getFunctions = BaseParams & BaseGetRequest;
 export type GetFunctionByIdParams = BaseParams & {
 	funcId: string;
 };
 export interface DeleteMultipleFunctions extends BaseParams, BaseRequest {
 	functionIds: string[];
 }
-export type DeleteFunctionParams = GetFunctionByIdParams & BaseRequest;
+export type DeleteFunctionParams = BaseParams & {
+	functionId: string;
+} & BaseRequest;
 export interface CreateFunctionParams extends BaseParams, BaseRequest {
 	name: string;
 }

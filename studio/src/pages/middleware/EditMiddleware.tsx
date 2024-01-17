@@ -14,7 +14,7 @@ export default function EditMiddleware() {
 	const canEdit = useAuthorizeVersion('middleware.update');
 	const {
 		saveMiddlewareCode,
-		openEditMiddlewareDrawer,
+		openEditMiddlewareModal,
 		middleware,
 		logics,
 		setLogics,
@@ -46,7 +46,7 @@ export default function EditMiddleware() {
 		mutate(logic);
 	}
 	function openEditDrawer() {
-		openEditMiddlewareDrawer(middleware);
+		openEditMiddlewareModal(middleware);
 	}
 
 	const url = `/organization/${orgId}/apps/${appId}/version/${versionId}/middleware`;

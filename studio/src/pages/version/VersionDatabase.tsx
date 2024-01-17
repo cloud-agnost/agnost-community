@@ -1,34 +1,20 @@
-import { DatabaseColumns, EditDatabase } from '@/features/database';
-import { useSearch, useTable, useToast, useUpdateEffect } from '@/hooks';
+import { DatabaseColumns } from '@/features/database';
+import { useSearch, useTable, useUpdateEffect } from '@/hooks';
 import useAuthorizeVersion from '@/hooks/useAuthorizeVersion.tsx';
 import { VersionTabLayout } from '@/layouts/VersionLayout';
 import useApplicationStore from '@/store/app/applicationStore';
 import useDatabaseStore from '@/store/database/databaseStore.ts';
-import useEnvironmentStore from '@/store/environment/environmentStore';
 import useVersionStore from '@/store/version/versionStore';
-import { APIError, Database, TabTypes } from '@/types';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { ConfirmationModal } from 'components/ConfirmationModal';
+import { Database, TabTypes } from '@/types';
+import { useQuery } from '@tanstack/react-query';
 import { DataTable } from 'components/DataTable';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 export default function VersionDatabase() {
 	const { application } = useApplicationStore();
 	const { version } = useVersionStore();
-	const {
-		databases,
-		toDeleteDatabase,
-		isDeleteDatabaseDialogOpen,
-		isEditDatabaseDialogOpen,
-		isDatabaseFetched,
-		toggleCreateDatabaseDialog,
-		closeEditDatabaseDialog,
-		closeDeleteDatabaseDialog,
-		deleteDatabase,
-		getDatabasesOfApp,
-	} = useDatabaseStore();
+	const { databases, isDatabaseFetched, toggleCreateModal, getDatabases } = useDatabaseStore();
 	const { t } = useTranslation();
-	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('db.create');
 
 	const { versionId, appId, orgId } = useParams<{
@@ -42,7 +28,7 @@ export default function VersionDatabase() {
 	const { isFetching, refetch } = useQuery({
 		queryKey: ['getDatabases', orgId, version?._id, versionId, application?._id, appId],
 		queryFn: () =>
-			getDatabasesOfApp({
+			getDatabases({
 				orgId: orgId as string,
 				versionId: version?._id ?? (versionId as string),
 				appId: application?._id ?? (appId as string),
@@ -55,77 +41,25 @@ export default function VersionDatabase() {
 		data: filteredDatabase,
 		columns: DatabaseColumns,
 	});
-	const { getEnvironmentResources, environment } = useEnvironmentStore();
-	const { mutateAsync: deleteDatabaseMutation, isPending: deleteLoading } = useMutation({
-		mutationFn: deleteDatabase,
-		onError: (error: APIError) => {
-			toast({
-				title: error.details,
-				action: 'error',
-			});
-		},
-		onSuccess: () => {
-			getEnvironmentResources({
-				orgId: environment?.orgId,
-				appId: environment?.appId,
-				envId: environment?._id,
-				versionId: environment?.versionId,
-			});
-			closeDeleteDatabaseDialog();
-		},
-	});
-	async function deleteHandler() {
-		if (!toDeleteDatabase) return;
-		deleteDatabaseMutation({
-			orgId: toDeleteDatabase.orgId,
-			appId: toDeleteDatabase.appId,
-			dbId: toDeleteDatabase._id,
-			versionId: toDeleteDatabase.versionId,
-		});
-	}
+
 	useUpdateEffect(() => {
 		refetch();
 	}, [orgId, appId, versionId]);
 	return (
-		<>
-			<EditDatabase open={isEditDatabaseDialogOpen} onOpenChange={closeEditDatabaseDialog} />
-			<VersionTabLayout<Database>
-				searchable
-				className='p-0'
-				isEmpty={databases.length === 0}
-				title={t('database.page_title') as string}
-				type={TabTypes.Database}
-				openCreateModal={toggleCreateDatabaseDialog}
-				createButtonTitle={t('database.add.title')}
-				emptyStateTitle={t('database.empty_text')}
-				table={table}
-				disabled={!canEdit}
-				loading={isFetching && !databases.length}
-			>
-				<DataTable<Database> table={table} />
-				{toDeleteDatabase && (
-					<ConfirmationModal
-						alertTitle={t('database.delete.confirm_title')}
-						alertDescription={t('database.delete.confirm_description')}
-						title={t('database.delete.title')}
-						confirmCode={toDeleteDatabase.name}
-						description={
-							<Trans
-								i18nKey='database.delete.confirm'
-								values={{ confirmCode: toDeleteDatabase.name }}
-								components={{
-									confirmCode: <span className='font-bold text-default' />,
-								}}
-							/>
-						}
-						onConfirm={deleteHandler}
-						isOpen={isDeleteDatabaseDialogOpen}
-						closeModal={closeDeleteDatabaseDialog}
-						closable
-						loading={deleteLoading}
-					/>
-				)}
-			</VersionTabLayout>
-		</>
+		<VersionTabLayout<Database>
+			searchable
+			className='p-0'
+			isEmpty={databases.length === 0}
+			title={t('database.page_title') as string}
+			type={TabTypes.Database}
+			openCreateModal={toggleCreateModal}
+			createButtonTitle={t('database.add.title')}
+			emptyStateTitle={t('database.empty_text')}
+			table={table}
+			disabled={!canEdit}
+			loading={isFetching && !databases.length}
+		>
+			<DataTable<Database> table={table} />
+		</VersionTabLayout>
 	);
 }

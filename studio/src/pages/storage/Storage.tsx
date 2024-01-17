@@ -1,4 +1,3 @@
-import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { DataTable } from '@/components/DataTable';
 import { TableLoading } from '@/components/Table/Table';
 import { StorageColumns } from '@/features/storage';
@@ -9,7 +8,7 @@ import useEnvironmentStore from '@/store/environment/environmentStore';
 import useStorageStore from '@/store/storage/storageStore';
 import { APIError, TabTypes } from '@/types';
 import { useMutation } from '@tanstack/react-query';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams } from 'react-router-dom';
 
@@ -19,17 +18,8 @@ export default function MainStorage() {
 	const { t } = useTranslation();
 	const { versionId, orgId, appId } = useParams();
 
-	const {
-		getStorages,
-		closeStorageDeleteDialog,
-		deleteStorage,
-		deleteMultipleStorages,
-		toggleCreateStorageDialog,
-		lastFetchedPage,
-		toDeleteStorage,
-		storages,
-		isStorageDeleteDialogOpen,
-	} = useStorageStore();
+	const { getStorages, deleteMultipleStorages, toggleCreateModal, lastFetchedPage, storages } =
+		useStorageStore();
 	const table = useTable({
 		data: storages,
 		columns: StorageColumns,
@@ -41,19 +31,8 @@ export default function MainStorage() {
 		lastFetchedPage,
 	});
 	const { getEnvironmentResources, environment } = useEnvironmentStore();
-	const { mutateAsync: deleteStorageMutation, isPending } = useMutation({
-		mutationFn: deleteStorage,
-		onSuccess: () => {
-			getEnvironmentResources({
-				orgId: environment?.orgId,
-				appId: environment?.appId,
-				envId: environment?._id,
-				versionId: environment?.versionId,
-			});
-			closeStorageDeleteDialog();
-		},
-	});
-	const { mutateAsync: deleteMultipleStoragesMutation, error: deleteError } = useMutation({
+
+	const { mutateAsync: deleteMultipleStoragesMutation } = useMutation({
 		mutationFn: deleteMultipleStorages,
 		onSuccess: () => {
 			getEnvironmentResources({
@@ -68,14 +47,7 @@ export default function MainStorage() {
 			toast({ action: 'error', title: details });
 		},
 	});
-	function deleteStorageHandler() {
-		deleteStorageMutation({
-			storageId: toDeleteStorage?._id as string,
-			orgId: orgId as string,
-			appId: appId as string,
-			versionId: versionId as string,
-		});
-	}
+
 	function deleteMultipleStoragesHandler() {
 		deleteMultipleStoragesMutation({
 			storageIds: table.getSelectedRowModel().rows.map((row) => row.original._id),
@@ -91,7 +63,7 @@ export default function MainStorage() {
 			isEmpty={!storages.length}
 			title={t('storage.title') as string}
 			type={TabTypes.Storage}
-			openCreateModal={toggleCreateStorageDialog}
+			openCreateModal={toggleCreateModal}
 			createButtonTitle={t('storage.create')}
 			emptyStateTitle={t('storage.empty_text')}
 			onMultipleDelete={deleteMultipleStoragesHandler}
@@ -108,27 +80,6 @@ export default function MainStorage() {
 			>
 				<DataTable table={table} />
 			</InfiniteScroll>
-			<ConfirmationModal
-				loading={isPending}
-				error={deleteError}
-				title={t('storage.delete.title')}
-				alertTitle={t('storage.delete.message')}
-				alertDescription={t('storage.delete.description')}
-				description={
-					<Trans
-						i18nKey='storage.delete.confirmCode'
-						values={{ confirmCode: toDeleteStorage?.iid }}
-						components={{
-							confirmCode: <span className='font-bold text-default' />,
-						}}
-					/>
-				}
-				confirmCode={toDeleteStorage?.iid as string}
-				onConfirm={deleteStorageHandler}
-				isOpen={isStorageDeleteDialogOpen}
-				closeModal={closeStorageDeleteDialog}
-				closable
-			/>
 		</VersionTabLayout>
 	);
 }

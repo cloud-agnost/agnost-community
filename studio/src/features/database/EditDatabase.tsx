@@ -11,18 +11,13 @@ import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import DatabaseForm from './DatabaseForm';
 import { useEffect } from 'react';
-export default function EditDatabase({
-	open,
-	onOpenChange,
-}: {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-}) {
+export default function EditDatabase() {
 	const form = useForm<z.infer<typeof UpdateDatabaseSchema>>({
 		resolver: zodResolver(UpdateDatabaseSchema),
 	});
 	const { toast } = useToast();
-	const { updateDatabase, database } = useDatabaseStore();
+	const { updateDatabase, database, isEditDatabaseDialogOpen, closeEditDatabaseModal } =
+		useDatabaseStore();
 	const { isPending, mutateAsync: updateDatabaseMutation } = useMutation({
 		mutationFn: updateDatabase,
 		onSuccess: () => {
@@ -30,7 +25,7 @@ export default function EditDatabase({
 				title: t('database.edit.success') as string,
 				action: 'success',
 			});
-			onOpenChange(false);
+			closeEditDatabaseModal();
 			form.reset();
 		},
 		onError: (error: APIError) => {
@@ -64,7 +59,7 @@ export default function EditDatabase({
 	}, [database]);
 
 	return (
-		<Drawer open={open} onOpenChange={onOpenChange}>
+		<Drawer open={isEditDatabaseDialogOpen} onOpenChange={closeEditDatabaseModal}>
 			<DrawerContent className='overflow-x-hidden'>
 				<DrawerHeader className='relative'>
 					<DrawerTitle>{t('database.edit.title')}</DrawerTitle>

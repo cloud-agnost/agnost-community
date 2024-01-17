@@ -1,23 +1,19 @@
 import { Button } from '@/components/Button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/Collapsible';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip';
-import { useTabIcon } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { Tab } from '@/types';
 import { cn } from '@/utils';
-import { CaretRight, X, XSquare } from '@phosphor-icons/react';
+import { X, XSquare } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ExplorerCollapsible, ExplorerCollapsibleTrigger } from './ExplorerCollapsible';
 import SideBarButton from './SideBarButton';
 export default function OpenTabs() {
-	const { t } = useTranslation();
 	const { versionId } = useParams() as { versionId: string };
-	const { getTabsByVersionId, setCurrentTab, openDeleteTabModal, removeTab, removeAllTabs } =
-		useTabStore();
+	const { getTabsByVersionId, setCurrentTab, openDeleteTabModal, removeTab } = useTabStore();
 	const tabs = getTabsByVersionId(versionId);
 	const { toggleOpenEditorTab, sidebar } = useUtilsStore();
-	const getTabIcon = useTabIcon('w-4 h-4');
 	const navigate = useNavigate();
 
 	function tabRemoveHandler(tab: Tab) {
@@ -34,58 +30,22 @@ export default function OpenTabs() {
 	}
 
 	return (
-		<Collapsible
-			open={sidebar[versionId]?.openEditor}
+		<ExplorerCollapsible
+			open={sidebar[versionId]?.openEditor || false}
 			onOpenChange={toggleOpenEditorTab}
-			className='w-full'
+			trigger={<OpenTabsTrigger />}
 		>
-			<div className='flex items-center hover:bg-wrapper-background-hover group'>
-				<CollapsibleTrigger asChild>
-					<Button variant='blank' size='sm' iconOnly>
-						<CaretRight
-							size={16}
-							className={cn(
-								'transition-transform duration-200',
-								sidebar[versionId]?.openEditor && 'rotate-90',
-							)}
-						/>
-					</Button>
-				</CollapsibleTrigger>
-				<Button
-					variant='blank'
-					size='full'
-					className='justify-start pl-0 w-full text-left font-normal text-sm'
-					onClick={toggleOpenEditorTab}
-				>
-					Open Tabs
-				</Button>
-				<TooltipProvider>
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								variant='blank'
-								rounded
-								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6 mr-2 invisible group-hover:visible'
-								iconOnly
-								size='sm'
-								onClick={() => removeAllTabs(versionId)}
-							>
-								<XSquare size={16} />
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent>{t('version.close_all_tabs')}</TooltipContent>
-					</Tooltip>
-				</TooltipProvider>
-			</div>
-			<CollapsibleContent className='pl-6 px-4 overflow-auto max-h-full'>
+			<div className='max-h-[200px] overflow-auto'>
 				{tabs.map((tab) => (
-					<div id={tab.id} key={tab.id} className='relative group'>
-						<SideBarButton active={tab.isActive} onClick={() => handleClickTabLink(tab)}>
-							{getTabIcon(tab.type)}
-							<h1 title={tab.title} className='truncate'>
-								{tab.title}
-							</h1>
-						</SideBarButton>
+					<div id={tab.id} key={tab.id} className='relative group h-7'>
+						<SideBarButton
+							active={tab.isActive}
+							onClick={() => handleClickTabLink(tab)}
+							title={tab.title}
+							type={tab.type}
+							className='h-full'
+						/>
+
 						<div className='bg-transparent h-full flex items-center justify-center pr-0.5 absolute top-0 right-0'>
 							{tab.isDirty && (
 								<span className='text-default rounded-full bg-base-reverse w-2 h-2 absolute group-hover:invisible' />
@@ -106,7 +66,43 @@ export default function OpenTabs() {
 						</div>
 					</div>
 				))}
-			</CollapsibleContent>
-		</Collapsible>
+			</div>
+		</ExplorerCollapsible>
+	);
+}
+
+function OpenTabsTrigger() {
+	const { t } = useTranslation();
+	const { toggleOpenEditorTab, sidebar } = useUtilsStore();
+	const { removeAllTabs } = useTabStore();
+	const { versionId } = useParams() as { versionId: string };
+	return (
+		<ExplorerCollapsibleTrigger active={sidebar[versionId]?.openEditor || false}>
+			<Button
+				variant='blank'
+				size='full'
+				className='justify-start pl-0 w-full text-left font-normal text-sm'
+				onClick={toggleOpenEditorTab}
+			>
+				Open Tabs
+			</Button>
+			<TooltipProvider>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<Button
+							variant='blank'
+							rounded
+							className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6 mr-2 invisible group-hover:visible'
+							iconOnly
+							size='sm'
+							onClick={() => removeAllTabs(versionId)}
+						>
+							<XSquare size={16} />
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent>{t('version.close_all_tabs')}</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
+		</ExplorerCollapsibleTrigger>
 	);
 }

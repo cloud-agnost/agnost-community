@@ -18,25 +18,25 @@ import useVersionStore from '../version/versionStore';
 interface MiddlewareStore {
 	middlewares: Middleware[];
 	middleware: Middleware;
-	isEditMiddlewareDrawerOpen: boolean;
+	isEditMiddlewareModalOpen: boolean;
 	lastFetchedPage: number | undefined;
 	logics: Record<string, string>;
 	isCreateMiddlewareDrawerOpen: boolean;
 }
 
 type Actions = {
-	getMiddlewaresOfAppVersion: (params: GetModulesRequest) => Promise<Middleware[]>;
+	getMiddlewares: (params: GetModulesRequest) => Promise<Middleware[]>;
 	getMiddlewareById: (params: GetMiddlewareByIdParams) => Promise<Middleware>;
 	deleteMiddleware: (params: DeleteMiddlewareParams) => Promise<void>;
 	deleteMultipleMiddlewares: (params: DeleteMultipleMiddlewares) => Promise<void>;
 	createMiddleware: (params: CreateMiddlewareParams) => Promise<Middleware>;
 	updateMiddleware: (params: UpdateMiddlewareParams) => Promise<Middleware>;
 	saveMiddlewareCode: (params: SaveMiddlewareCodeParams) => Promise<Middleware>;
-	openEditMiddlewareDrawer: (middleware: Middleware) => void;
-	closeEditMiddlewareDrawer: () => void;
+	openEditMiddlewareModal: (middleware: Middleware) => void;
+	closeEditMiddlewareModal: () => void;
 	setLogics: (id: string, logic: string) => void;
 	deleteLogic: (id: string) => void;
-	toggleCreateMiddlewareDrawer: () => void;
+	toggleCreateModal: () => void;
 	reset: () => void;
 };
 
@@ -44,7 +44,7 @@ const initialState: MiddlewareStore = {
 	middlewares: [],
 	middleware: {} as Middleware,
 	lastFetchedPage: undefined,
-	isEditMiddlewareDrawerOpen: false,
+	isEditMiddlewareModalOpen: false,
 	logics: {},
 	isCreateMiddlewareDrawerOpen: false,
 };
@@ -72,8 +72,8 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 				throw e;
 			}
 		},
-		getMiddlewaresOfAppVersion: async (params: GetModulesRequest) => {
-			const middlewares = await MiddlewareService.getMiddlewaresOfAppVersion(params);
+		getMiddlewares: async (params: GetModulesRequest) => {
+			const middlewares = await MiddlewareService.getMiddlewares(params);
 
 			if (params.page === 0) {
 				set({ middlewares, lastFetchedPage: params.page });
@@ -101,7 +101,7 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 			try {
 				await MiddlewareService.deleteMiddleware(params);
 				set((prev) => ({
-					middlewares: prev.middlewares.filter((mw) => mw._id !== params.mwId),
+					middlewares: prev.middlewares.filter((mw) => mw._id !== params.middlewareId),
 				}));
 				if (params.onSuccess) params.onSuccess();
 			} catch (e) {
@@ -138,18 +138,18 @@ const useMiddlewareStore = create<MiddlewareStore & Actions>()(
 				throw error;
 			}
 		},
-		openEditMiddlewareDrawer: (middleware) => {
-			set({ isEditMiddlewareDrawerOpen: true, middleware });
+		openEditMiddlewareModal: (middleware) => {
+			set({ isEditMiddlewareModalOpen: true, middleware });
 		},
-		closeEditMiddlewareDrawer: () => {
-			set({ isEditMiddlewareDrawerOpen: false });
+		closeEditMiddlewareModal: () => {
+			set({ isEditMiddlewareModalOpen: false });
 		},
 		setLogics: (id, logic) => set((prev) => ({ logics: { ...prev.logics, [id]: logic } })),
 		deleteLogic: (id) => {
 			const { [id]: _, ...rest } = get().logics;
 			set({ logics: rest });
 		},
-		toggleCreateMiddlewareDrawer: () =>
+		toggleCreateModal: () =>
 			set((prev) => ({ isCreateMiddlewareDrawerOpen: !prev.isCreateMiddlewareDrawerOpen })),
 		reset: () => set(initialState),
 	})),

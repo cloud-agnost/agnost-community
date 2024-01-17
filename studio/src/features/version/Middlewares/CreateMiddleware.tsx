@@ -1,34 +1,33 @@
 import { useTabNavigate, useToast } from '@/hooks';
 import useMiddlewareStore from '@/store/middleware/middlewareStore.ts';
-import { Middleware, TabTypes } from '@/types';
+import useVersionStore from '@/store/version/versionStore';
+import { Middleware, MiddlewareSchema, TabTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from 'components/Drawer';
 import { Form } from 'components/Form';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import MiddlewareForm from './MiddlewareForm';
-import { MiddlewareSchema } from '@/types';
 interface CreateMiddlewareProps {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
 	onCreate?: (middleware: Middleware) => void;
 }
 
-export default function CreateMiddleware({ open, onOpenChange, onCreate }: CreateMiddlewareProps) {
+export default function CreateMiddleware({ onCreate }: CreateMiddlewareProps) {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
-	const { createMiddleware } = useMiddlewareStore();
+	const { createMiddleware, isCreateMiddlewareDrawerOpen, toggleCreateModal } =
+		useMiddlewareStore();
 	const navigate = useTabNavigate();
-	const { pathname } = useLocation();
+	const { getVersionDashboardPath } = useVersionStore();
 	const { orgId, appId, versionId } = useParams();
 
 	useEffect(() => {
-		if (!open) form.reset();
-	}, [open]);
+		if (!isCreateMiddlewareDrawerOpen) form.reset();
+	}, [isCreateMiddlewareDrawerOpen]);
 
 	const form = useForm<z.infer<typeof MiddlewareSchema>>({
 		resolver: zodResolver(MiddlewareSchema),
@@ -49,12 +48,12 @@ export default function CreateMiddleware({ open, onOpenChange, onCreate }: Creat
 					title: t('version.middleware.add.success') as string,
 					action: 'success',
 				});
-				onOpenChange(false);
+				toggleCreateModal();
 				if (onCreate) onCreate(mw);
 				else {
 					navigate({
 						title: data.name,
-						path: `${pathname}/${mw._id}`,
+						path: getVersionDashboardPath(`middleware/${mw._id}`),
 						isActive: true,
 						isDashboard: false,
 						type: TabTypes.Middleware,
@@ -72,7 +71,7 @@ export default function CreateMiddleware({ open, onOpenChange, onCreate }: Creat
 		});
 	}
 	return (
-		<Drawer open={open} onOpenChange={onOpenChange}>
+		<Drawer open={isCreateMiddlewareDrawerOpen} onOpenChange={toggleCreateModal}>
 			<DrawerContent position='right'>
 				<DrawerHeader>
 					<DrawerTitle>{t('version.middleware.add_middleware')}</DrawerTitle>

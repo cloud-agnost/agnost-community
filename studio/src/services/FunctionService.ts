@@ -1,14 +1,14 @@
-import * as funcTypes from '@/types';
 import { axios } from '@/helpers';
+import * as funcTypes from '@/types';
 export default class FunctionService {
 	static url = '/v1/org';
 
-	static async getFunctionsOfAppVersion({
+	static async getFunctions({
 		orgId,
 		appId,
 		versionId,
 		...params
-	}: funcTypes.GetFunctionsOfAppVersion): Promise<funcTypes.HelperFunction[]> {
+	}: funcTypes.getFunctions): Promise<funcTypes.HelperFunction[]> {
 		return (
 			await axios.get(`${this.url}/${orgId}/app/${appId}/version/${versionId}/func`, {
 				params,
@@ -27,9 +27,16 @@ export default class FunctionService {
 		).data;
 	}
 
-	static async deleteFunction({ orgId, appId, versionId, funcId }: funcTypes.DeleteFunctionParams) {
+	static async deleteFunction({
+		orgId,
+		appId,
+		versionId,
+		functionId,
+	}: funcTypes.DeleteFunctionParams) {
 		return (
-			await axios.delete(`${this.url}/${orgId}/app/${appId}/version/${versionId}/func/${funcId}`)
+			await axios.delete(
+				`${this.url}/${orgId}/app/${appId}/version/${versionId}/func/${functionId}`,
+			)
 		).data;
 	}
 

@@ -50,12 +50,12 @@ export interface StorageStore {
 	toDeleteBucket: Bucket | null;
 	bucketCountInfo: BucketCountInfo | undefined;
 	uploadProgress: number;
-	isCreateStorageDialogOpen: boolean;
+	isCreateStorageModalOpen: boolean;
 }
 
 type Actions = {
-	openDeleteStorageDialog: (storage: Storage) => void;
-	closeStorageDeleteDialog: () => void;
+	openDeleteStorageModal: (storage: Storage) => void;
+	closeDeleteStorageModal: () => void;
 	openDeleteBucketDialog: (bucket: Bucket) => void;
 	closeBucketDeleteDialog: () => void;
 	openEditBucketDialog: (bucket: Bucket) => void;
@@ -84,7 +84,7 @@ type Actions = {
 	replaceFileInBucket: (req: ReplaceFileInBucket) => Promise<BucketFile>;
 	copyFileInBucket: (req: DeleteFileFromBucketParams) => Promise<BucketFile>;
 	updateFileInBucket: (req: UpdateFileInBucketParams) => Promise<BucketFile>;
-	toggleCreateStorageDialog: () => void;
+	toggleCreateModal: () => void;
 	reset: () => void;
 };
 
@@ -106,16 +106,16 @@ const initialState: StorageStore = {
 	fileCountInfo: undefined,
 	uploadProgress: 0,
 	isEditFileDialogOpen: false,
-	isCreateStorageDialogOpen: false,
+	isCreateStorageModalOpen: false,
 };
 
 const useStorageStore = create<StorageStore & Actions>()(
 	devtools((set, get) => ({
 		...initialState,
-		openDeleteStorageDialog: (storage: Storage) => {
+		openDeleteStorageModal: (storage: Storage) => {
 			set({ toDeleteStorage: storage, isStorageDeleteDialogOpen: true });
 		},
-		closeStorageDeleteDialog: () => {
+		closeDeleteStorageModal: () => {
 			set({ toDeleteStorage: null, isStorageDeleteDialogOpen: false });
 		},
 		openDeleteBucketDialog: (bucket: Bucket) => {
@@ -409,8 +409,8 @@ const useStorageStore = create<StorageStore & Actions>()(
 				throw error as APIError;
 			}
 		},
-		toggleCreateStorageDialog: () => {
-			set((prev) => ({ isCreateStorageDialogOpen: !prev.isCreateStorageDialogOpen }));
+		toggleCreateModal: () => {
+			set((prev) => ({ isCreateStorageModalOpen: !prev.isCreateStorageModalOpen }));
 		},
 		reset: () => set(initialState),
 	})),

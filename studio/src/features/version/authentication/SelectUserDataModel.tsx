@@ -35,7 +35,7 @@ const SaveUserModelSchema = z.object({
 export default function SelectUserDataModel() {
 	const { saveUserDataModelInfo, addMissingUserDataModelFields } = useSettingsStore();
 	const { version } = useVersionStore();
-	const { databases, getDatabasesOfApp } = useDatabaseStore();
+	const { databases, getDatabases } = useDatabaseStore();
 	const { getModelsOfDatabase, models: dbModels } = useModelStore();
 
 	const [error, setError] = useState<APIError>();
@@ -52,7 +52,7 @@ export default function SelectUserDataModel() {
 
 	useEffect(() => {
 		if (version && isEmpty(databases)) {
-			getDatabasesOfApp({
+			getDatabases({
 				orgId: version.orgId,
 				versionId: version._id,
 				appId: version.appId,

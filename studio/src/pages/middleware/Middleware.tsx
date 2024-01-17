@@ -14,9 +14,9 @@ import { useParams } from 'react-router-dom';
 export default function MainMiddleware() {
 	const { toast } = useToast();
 	const {
-		getMiddlewaresOfAppVersion,
+		getMiddlewares,
 		deleteMultipleMiddlewares,
-		toggleCreateMiddlewareDrawer,
+		toggleCreateModal,
 		lastFetchedPage,
 		middlewares,
 	} = useMiddlewareStore();
@@ -29,7 +29,7 @@ export default function MainMiddleware() {
 	const { t } = useTranslation();
 
 	const { fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } = useInfiniteScroll({
-		queryFn: getMiddlewaresOfAppVersion,
+		queryFn: getMiddlewares,
 		lastFetchedPage,
 		dataLength: middlewares.length,
 		queryKey: 'middlewares',
@@ -66,7 +66,7 @@ export default function MainMiddleware() {
 			emptyStateTitle={t('version.middleware.no_middleware_found')}
 			createButtonTitle={t('version.middleware.add_middleware')}
 			isEmpty={!middlewares.length}
-			openCreateModal={toggleCreateMiddlewareDrawer}
+			openCreateModal={toggleCreateModal}
 			onMultipleDelete={deleteMultipleMiddlewaresHandler}
 			table={table}
 			disabled={!canCreate}

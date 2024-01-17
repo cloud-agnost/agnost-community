@@ -17,7 +17,7 @@ import { TabLink } from '../version/Tabs';
 
 const queryClient = new QueryClient();
 const env = useEnvironmentStore.getState().environment;
-const { openEditEndpointDialog, deleteEndpoint } = useEndpointStore.getState();
+const { openEditEndpointModal, deleteEndpoint } = useEndpointStore.getState();
 async function deleteEndpointHandler(toDeleteEndpoint: Endpoint) {
 	return queryClient
 		.getMutationCache()
@@ -34,7 +34,7 @@ async function deleteEndpointHandler(toDeleteEndpoint: Endpoint) {
 			appId: toDeleteEndpoint.appId,
 			orgId: toDeleteEndpoint.orgId,
 			versionId: toDeleteEndpoint.versionId,
-			epId: toDeleteEndpoint._id,
+			endpointId: toDeleteEndpoint._id,
 		});
 }
 
@@ -175,7 +175,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 				<ActionsCell<Endpoint>
 					original={row.original}
 					canEdit={canEditEndpoint}
-					onEdit={() => openEditEndpointDialog(row.original)}
+					onEdit={() => openEditEndpointModal(row.original)}
 				>
 					<TableConfirmation
 						align='end'

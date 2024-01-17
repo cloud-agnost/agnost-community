@@ -8,7 +8,7 @@ import { getVersionPermission, translate } from '@/utils';
 import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
-const { openDeleteStorageDialog, openEditStorageDialog } = useStorageStore.getState();
+const { openDeleteStorageModal, openEditStorageDialog } = useStorageStore.getState();
 
 const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 	{
@@ -122,7 +122,7 @@ const StorageColumns: ColumnDefWithClassName<Storage>[] = [
 				<ActionsCell<Storage>
 					original={original}
 					onEdit={() => openEditStorageDialog(original)}
-					onDelete={() => openDeleteStorageDialog(original)}
+					onDelete={() => openDeleteStorageModal(original)}
 					canEdit={canEditBucket}
 					canDelete={canDeleteBucket}
 				/>

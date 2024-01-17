@@ -12,14 +12,9 @@ import useCacheStore from '@/store/cache/cacheStore';
 import { useMutation } from '@tanstack/react-query';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 
-interface CreateCacheProps {
-	open: boolean;
-	onClose: () => void;
-}
-
-export default function CreateCache({ open, onClose }: CreateCacheProps) {
+export default function CreateCache() {
 	const { t } = useTranslation();
-	const { createCache } = useCacheStore();
+	const { createCache, isCreateCacheModalOpen, toggleCreateModal } = useCacheStore();
 	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
@@ -35,7 +30,7 @@ export default function CreateCache({ open, onClose }: CreateCacheProps) {
 	});
 	function resetAndClose() {
 		form.reset();
-		onClose();
+		toggleCreateModal();
 	}
 
 	const { mutateAsync: crateMutate, isPending } = useMutation({
@@ -64,7 +59,7 @@ export default function CreateCache({ open, onClose }: CreateCacheProps) {
 	}
 
 	return (
-		<Drawer open={open} onOpenChange={resetAndClose}>
+		<Drawer open={isCreateCacheModalOpen} onOpenChange={resetAndClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>{t('cache.create')}</DrawerTitle>
