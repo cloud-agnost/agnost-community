@@ -28,6 +28,7 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 		resolver: zodResolver(CreateTaskSchema),
 		defaultValues: {
 			logExecution: true,
+			enabled: true,
 		},
 	});
 	const { pathname } = useLocation();

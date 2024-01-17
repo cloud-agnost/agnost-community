@@ -63,7 +63,10 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 
 	useEffect(() => {
 		if (task) {
-			form.reset(task);
+			form.reset({
+				...task,
+				enabled: task.enabled ?? true,
+			});
 		}
 	}, [task]);
 	return (
