@@ -180,7 +180,7 @@ export default function Workspace() {
 									className={cn(
 										window.location.pathname.includes(data._id)
 											? 'hover:bg-button-primary'
-											: 'hover:bg-wrapper-background-hover',
+											: 'hover:bg-subtle',
 										'aspect-square text-icon-base hover:text-default !p-0 !h-6 mr-2 invisible group-hover:visible rounded-full',
 									)}
 									onClick={() => openEditDialog(data, item.type)}
@@ -194,7 +194,7 @@ export default function Workspace() {
 									className={cn(
 										window.location.pathname.includes(data._id)
 											? 'hover:bg-button-primary'
-											: 'hover:bg-wrapper-background-hover',
+											: 'hover:bg-subtle',
 										'aspect-square text-icon-base hover:text-default !p-0 !h-6 mr-2 invisible group-hover:visible rounded-full',
 									)}
 									iconOnly
