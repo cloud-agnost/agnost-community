@@ -73,8 +73,7 @@ interface AddMiddlewareDropdownProps {
 
 function AddMiddlewareDropdown({ value, onChange }: AddMiddlewareDropdownProps) {
 	const [addMiddlewareDropDownIsOpen, setAddMiddlewareDropDownIsOpen] = useState(false);
-	const [addMiddlewareDrawerIsOpen, setAddMiddlewareDrawerIsOpen] = useState(false);
-	const middlewares = useMiddlewareStore((state) => state.middlewares);
+	const { middlewares, toggleCreateModal } = useMiddlewareStore();
 	const { t } = useTranslation();
 	return (
 		<>
@@ -97,7 +96,7 @@ function AddMiddlewareDropdown({ value, onChange }: AddMiddlewareDropdownProps) 
 				<DropdownMenuContent align='end' className='version-dropdown-content'>
 					<DropdownMenuItemContainer>
 						<DropdownMenuItem
-							onClick={() => setAddMiddlewareDrawerIsOpen(true)}
+							onClick={toggleCreateModal}
 							className='flex gap-[10px] text-default text-sm font-medium'
 						>
 							<Plus weight='bold' />
@@ -124,8 +123,6 @@ function AddMiddlewareDropdown({ value, onChange }: AddMiddlewareDropdownProps) 
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<CreateMiddleware
-				open={addMiddlewareDrawerIsOpen}
-				onOpenChange={setAddMiddlewareDrawerIsOpen}
 				onCreate={(mw) => {
 					if (value) onChange([...value, mw.iid]);
 					else onChange([mw.iid]);
