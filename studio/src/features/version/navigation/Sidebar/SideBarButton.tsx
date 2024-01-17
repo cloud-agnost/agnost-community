@@ -27,10 +27,9 @@ export default function SideBarButton({
 	return (
 		<Button
 			variant='blank'
-			size='full'
 			className={cn(
 				active ? 'bg-button-primary/50' : 'hover:bg-wrapper-background-hover',
-				'justify-start text-left gap-2 text-sm  font-normal cursor-pointer !h-7 !rounded-none',
+				'justify-start text-left gap-2 text-sm  font-normal cursor-pointer !h-7 !rounded-none w-3/4',
 				className,
 			)}
 			{...props}

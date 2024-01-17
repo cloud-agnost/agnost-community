@@ -1,7 +1,5 @@
 import { Button } from '@/components/Button';
-import { CollapsibleContent } from '@/components/Collapsible';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip';
-import { useTabIcon } from '@/hooks';
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { Tab } from '@/types';
@@ -16,7 +14,6 @@ export default function OpenTabs() {
 	const { getTabsByVersionId, setCurrentTab, openDeleteTabModal, removeTab } = useTabStore();
 	const tabs = getTabsByVersionId(versionId);
 	const { toggleOpenEditorTab, sidebar } = useUtilsStore();
-	const getTabIcon = useTabIcon('w-4 h-4');
 	const navigate = useNavigate();
 
 	function tabRemoveHandler(tab: Tab) {

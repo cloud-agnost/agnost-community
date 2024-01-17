@@ -4,7 +4,7 @@ import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { TabTypes } from '@/types';
 import { isElementInViewport } from '@/utils';
-import { MinusSquare, XSquare } from '@phosphor-icons/react';
+import { MinusSquare } from '@phosphor-icons/react';
 import { useEffect, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -76,7 +76,7 @@ export default function SideBar() {
 					</Tooltip>
 				</TooltipProvider>
 			</div>
-			<div className='overflow-auto h-[calc(100%-3rem)]'>
+			<div className='overflow-y-auto overflow-x-hidden h-[calc(100%-3rem)]'>
 				<OpenTabs />
 				<Workspace />
 				<VersionSettingsExplorer />
