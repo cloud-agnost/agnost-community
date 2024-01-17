@@ -13,7 +13,7 @@ export default function EditMessageQueue() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('queue.update');
-	const { updateQueueLogic, queue, openEditModal, setLogics, deleteLogic, logics } =
+	const { updateQueueLogic, queue, openEditQueueModal, setLogics, deleteLogic, logics } =
 		useMessageQueueStore();
 	const [isTestQueueOpen, setIsTestQueueOpen] = useState(false);
 
@@ -47,7 +47,7 @@ export default function EditMessageQueue() {
 	}
 	return (
 		<VersionEditorLayout
-			onEditModalOpen={() => openEditModal(queue)}
+			onEditModalOpen={() => openEditQueueModal(queue)}
 			onTestModalOpen={() => setIsTestQueueOpen(true)}
 			onSaveLogic={saveLogic}
 			loading={isPending}

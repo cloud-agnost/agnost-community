@@ -11,7 +11,7 @@ import {
 export default class DatabaseService {
 	static url = '/v1/org';
 
-	static async getDatabasesOfApp({
+	static async getDatabases({
 		orgId,
 		appId,
 		versionId,

@@ -19,7 +19,7 @@ import { useParams } from 'react-router-dom';
 export default function MainMessageQueue() {
 	const { addTab } = useTabStore();
 	const { getVersionDashboardPath } = useVersionStore();
-	const { getQueues, queues, lastFetchedPage, deleteMultipleQueues, toggleCreateQueueModal } =
+	const { getQueues, queues, lastFetchedPage, deleteMultipleQueues, toggleCreateModal } =
 		useMessageQueueStore();
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('queue.create');
@@ -78,7 +78,7 @@ export default function MainMessageQueue() {
 			isEmpty={queues.length === 0}
 			title={t('queue.title') as string}
 			type={TabTypes.MessageQueue}
-			openCreateModal={toggleCreateQueueModal}
+			openCreateModal={toggleCreateModal}
 			createButtonTitle={t('queue.create.title')}
 			emptyStateTitle={t('queue.empty_text')}
 			table={table}

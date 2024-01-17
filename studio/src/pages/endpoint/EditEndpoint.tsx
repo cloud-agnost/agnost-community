@@ -19,7 +19,7 @@ export default function EditEndpoint() {
 	const { toast } = useToast();
 	const canEdit = useAuthorizeVersion('endpoint.update');
 	const environment = useEnvironmentStore((state) => state.environment);
-	const { saveEndpointLogic, openEditEndpointDialog, endpoint, logics, setLogics, deleteLogic } =
+	const { saveEndpointLogic, openEditEndpointModal, endpoint, logics, setLogics, deleteLogic } =
 		useEndpointStore();
 
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -54,7 +54,7 @@ export default function EditEndpoint() {
 
 	return (
 		<VersionEditorLayout
-			onEditModalOpen={() => openEditEndpointDialog(endpoint)}
+			onEditModalOpen={() => openEditEndpointModal(endpoint)}
 			onTestModalOpen={() => setIsTestEndpointOpen(true)}
 			onSaveLogic={saveLogic}
 			loading={isPending}

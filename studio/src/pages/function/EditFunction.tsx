@@ -14,7 +14,7 @@ export default function EditFunction() {
 	const {
 		function: helper,
 		saveFunctionCode,
-		openEditFunctionDrawer,
+		openEditFunctionModal,
 		logics,
 		setLogics,
 		deleteLogic,
@@ -49,7 +49,7 @@ export default function EditFunction() {
 	}
 	return (
 		<VersionEditorLayout
-			onEditModalOpen={() => openEditFunctionDrawer(helper)}
+			onEditModalOpen={() => openEditFunctionModal(helper)}
 			onSaveLogic={saveLogic}
 			loading={isPending}
 			name={helper._id}

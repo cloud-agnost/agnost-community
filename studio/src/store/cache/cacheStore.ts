@@ -36,7 +36,7 @@ type Actions = {
 	closeEditCacheModal: () => void;
 	openDeleteCacheModal: (cache: Cache) => void;
 	closeDeleteCacheModal: () => void;
-	toggleCreateCacheModal: () => void;
+	toggleCreateModal: () => void;
 	reset: () => void;
 };
 
@@ -143,7 +143,7 @@ const useCacheStore = create<CacheStore & Actions>()(
 			closeDeleteCacheModal: () => {
 				set({ isDeleteCacheModalOpen: false, toDeleteCache: {} as Cache });
 			},
-			toggleCreateCacheModal: () =>
+			toggleCreateModal: () =>
 				set((prev) => ({ isCreateCacheModalOpen: !prev.isCreateCacheModalOpen })),
 			reset: () => set(initialState),
 		}),

@@ -15,13 +15,8 @@ export default function MainFunction() {
 	const { t } = useTranslation();
 	const { toast } = useToast();
 	const canCreate = useAuthorizeVersion('function.create');
-	const {
-		functions,
-		lastFetchedPage,
-		getFunctionsOfAppVersion,
-		deleteMultipleFunctions,
-		toggleCreateFunctionDrawer,
-	} = useFunctionStore();
+	const { functions, lastFetchedPage, getFunctions, deleteMultipleFunctions, toggleCreateModal } =
+		useFunctionStore();
 	const table = useTable({
 		data: functions,
 		columns: FunctionColumns,
@@ -50,7 +45,7 @@ export default function MainFunction() {
 		});
 	}
 	const { fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } = useInfiniteScroll({
-		queryFn: getFunctionsOfAppVersion,
+		queryFn: getFunctions,
 		dataLength: functions.length,
 		lastFetchedPage,
 		queryKey: 'functions',
@@ -64,7 +59,7 @@ export default function MainFunction() {
 			createButtonTitle={t('function.add')}
 			emptyStateTitle={t('function.empty_text')}
 			isEmpty={!functions.length}
-			openCreateModal={toggleCreateFunctionDrawer}
+			openCreateModal={toggleCreateModal}
 			onMultipleDelete={deleteMultipleFunctionsHandler}
 			table={table}
 			disabled={!canCreate}

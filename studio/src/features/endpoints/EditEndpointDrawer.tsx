@@ -11,12 +11,10 @@ import { useToast } from '@/hooks';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
-interface CreateEndpointProps {
-	open: boolean;
-	onClose: () => void;
-}
-export default function EditEndpointDrawer({ open, onClose }: CreateEndpointProps) {
-	const { endpoint, updateEndpoint } = useEndpointStore();
+
+export default function EditEndpointDrawer() {
+	const { endpoint, updateEndpoint, isEditEndpointModalOpen, closeEditEndpointModal } =
+		useEndpointStore();
 	const { toast } = useToast();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
@@ -29,7 +27,7 @@ export default function EditEndpointDrawer({ open, onClose }: CreateEndpointProp
 	const { mutateAsync: updateEndpointMutation, isPending } = useMutation({
 		mutationFn: updateEndpoint,
 		onSuccess: () => {
-			onClose();
+			closeEditEndpointModal();
 			form.reset();
 			toast({
 				title: t('endpoint.editSuccess'),
@@ -55,7 +53,7 @@ export default function EditEndpointDrawer({ open, onClose }: CreateEndpointProp
 	}
 
 	useEffect(() => {
-		if (endpoint && open) {
+		if (endpoint && isEditEndpointModalOpen) {
 			form.reset({
 				name: endpoint.name,
 				method: endpoint.method,
@@ -71,7 +69,7 @@ export default function EditEndpointDrawer({ open, onClose }: CreateEndpointProp
 	}, [endpoint, open]);
 
 	return (
-		<Drawer open={open} onOpenChange={onClose}>
+		<Drawer open={isEditEndpointModalOpen} onOpenChange={closeEditEndpointModal}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>

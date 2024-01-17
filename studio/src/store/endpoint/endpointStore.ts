@@ -24,7 +24,7 @@ interface EndpointStore {
 	endpoint: Endpoint;
 	selectedEndpointIds: string[];
 	lastFetchedPage: number | undefined;
-	isEditEndpointDialogOpen: boolean;
+	isEditEndpointModalOpen: boolean;
 	logics: Record<string, string>;
 	isCreateEndpointDialogOpen: boolean;
 }
@@ -42,11 +42,11 @@ type Actions = {
 	saveEndpointLogic: (endpoint: SaveEndpointLogicParams) => Promise<Endpoint>;
 	getEndpointsByIid: (endpoint: GetEndpointsByIidParams) => Promise<Endpoint[]>;
 	testEndpoint: (endpoint: TestEndpointParams) => Promise<AxiosResponse>;
-	openEditEndpointDialog: (endpoint: Endpoint) => void;
-	closeEditEndpointDialog: () => void;
+	openEditEndpointModal: (endpoint: Endpoint) => void;
+	closeEditEndpointModal: () => void;
 	setLogics: (id: string, logic: string) => void;
 	deleteLogic: (id: string) => void;
-	toggleCreateEndpointDialog: () => void;
+	toggleCreateModal: () => void;
 	reset: () => void;
 };
 
@@ -56,15 +56,15 @@ const initialState: EndpointStore = {
 	endpoint: {} as Endpoint,
 	selectedEndpointIds: [],
 	lastFetchedPage: undefined,
-	isEditEndpointDialogOpen: false,
+	isEditEndpointModalOpen: false,
 	logics: {},
 	isCreateEndpointDialogOpen: false,
 };
 
 const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 	...initialState,
-	openEditEndpointDialog: (endpoint) => set({ endpoint, isEditEndpointDialogOpen: true }),
-	closeEditEndpointDialog: () => set({ isEditEndpointDialogOpen: false }),
+	openEditEndpointModal: (endpoint) => set({ endpoint, isEditEndpointModalOpen: true }),
+	closeEditEndpointModal: () => set({ isEditEndpointModalOpen: false }),
 	setSelectedEndpointIds: (ids) => set({ selectedEndpointIds: ids }),
 	setSelectEndpointDialogOpen: (open) => set({ selectEndpointDialogOpen: open }),
 	setEndpoints: (endpoints) => set({ endpoints }),
@@ -114,9 +114,10 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 	},
 	deleteEndpoint: async (params) => {
 		try {
+			console.log(params);
 			await EndpointService.deleteEndpoint(params);
 			set((prev) => ({
-				endpoints: prev.endpoints.filter((e) => e._id !== params.epId),
+				endpoints: prev.endpoints.filter((e) => e._id !== params.endpointId),
 			}));
 			if (params.onSuccess) params.onSuccess();
 		} catch (error) {
@@ -195,7 +196,7 @@ const useEndpointStore = create<EndpointStore & Actions>()((set, get) => ({
 		const { [id]: _, ...rest } = get().logics;
 		set({ logics: rest });
 	},
-	toggleCreateEndpointDialog: () => {
+	toggleCreateModal: () => {
 		set((prev) => ({ isCreateEndpointDialogOpen: !prev.isCreateEndpointDialogOpen }));
 	},
 	reset: () => set(initialState),

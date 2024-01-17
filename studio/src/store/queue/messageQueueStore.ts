@@ -21,7 +21,7 @@ interface MessageQueueStore {
 	queues: MessageQueue[];
 	queue: MessageQueue;
 	lastFetchedPage: number | undefined;
-	isEditModalOpen: boolean;
+	isEditQueueModalOpen: boolean;
 	logics: Record<string, string>;
 	isCreateQueueModalOpen: boolean;
 }
@@ -35,11 +35,11 @@ type Actions = {
 	updateQueue: (params: UpdateQueueParams) => Promise<MessageQueue>;
 	updateQueueLogic: (params: UpdateQueueLogicParams) => Promise<MessageQueue>;
 	testQueue: (params: TestQueueParams) => Promise<void>;
-	openEditModal: (queue: MessageQueue) => void;
-	closeEditModal: () => void;
+	openEditQueueModal: (queue: MessageQueue) => void;
+	closeEditQueueModal: () => void;
 	setLogics: (id: string, logic: string) => void;
 	deleteLogic: (id: string) => void;
-	toggleCreateQueueModal: () => void;
+	toggleCreateModal: () => void;
 	reset: () => void;
 };
 
@@ -47,7 +47,7 @@ const initialState: MessageQueueStore = {
 	queues: [],
 	queue: {} as MessageQueue,
 	lastFetchedPage: undefined,
-	isEditModalOpen: false,
+	isEditQueueModalOpen: false,
 	logics: {},
 	isCreateQueueModalOpen: false,
 };
@@ -55,11 +55,11 @@ const initialState: MessageQueueStore = {
 const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 	devtools((set, get) => ({
 		...initialState,
-		openEditModal: (queue: MessageQueue) => {
-			set({ queue, isEditModalOpen: true });
+		openEditQueueModal: (queue: MessageQueue) => {
+			set({ queue, isEditQueueModalOpen: true });
 		},
-		closeEditModal: () => {
-			set({ isEditModalOpen: false });
+		closeEditQueueModal: () => {
+			set({ isEditQueueModalOpen: false });
 		},
 		getQueues: async (params: GetMessageQueuesParams) => {
 			const queues = await QueueService.getQueues(params);
@@ -169,7 +169,7 @@ const useMessageQueueStore = create<MessageQueueStore & Actions>()(
 			const { [id]: _, ...rest } = get().logics;
 			set({ logics: rest });
 		},
-		toggleCreateQueueModal: () => {
+		toggleCreateModal: () => {
 			set((prev) => ({ isCreateQueueModalOpen: !prev.isCreateQueueModalOpen }));
 		},
 		reset: () => set(initialState),

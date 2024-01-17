@@ -1,27 +1,23 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useResourceStore from '@/store/resources/resourceStore';
 import useTaskStore from '@/store/task/taskStore';
+import useVersionStore from '@/store/version/versionStore';
 import { APIError, CreateTaskSchema, TabTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import TaskForm from './TaskForm';
-import { useMutation } from '@tanstack/react-query';
-import useEnvironmentStore from '@/store/environment/environmentStore';
-import useVersionStore from '@/store/version/versionStore';
-interface CreateTaskProps {
-	open: boolean;
-	onClose: () => void;
-}
 
-export default function CreateTask({ open, onClose }: CreateTaskProps) {
+export default function CreateTask() {
 	const { t } = useTranslation();
-	const { createTask } = useTaskStore();
+	const { createTask, isCreateTaskModalOpen, toggleCreateModal } = useTaskStore();
 	const { toast } = useToast();
 	const { resources } = useResourceStore();
 	const navigate = useTabNavigate();
@@ -41,13 +37,13 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 	const { getEnvironmentResources, environment } = useEnvironmentStore();
 
 	useEffect(() => {
-		if (open) {
+		if (isCreateTaskModalOpen) {
 			getResources({
 				orgId: orgId as string,
 				type: 'scheduler',
 			});
 		}
-	}, [open]);
+	}, [isCreateTaskModalOpen]);
 
 	const { mutateAsync: createTaskMutate, isPending } = useMutation({
 		mutationFn: createTask,
@@ -83,11 +79,11 @@ export default function CreateTask({ open, onClose }: CreateTaskProps) {
 
 	function handleClose() {
 		form.reset();
-		onClose();
+		toggleCreateModal();
 	}
 
 	return (
-		<Drawer open={open} onOpenChange={handleClose}>
+		<Drawer open={isCreateTaskModalOpen} onOpenChange={handleClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>{t('task.add')}</DrawerTitle>

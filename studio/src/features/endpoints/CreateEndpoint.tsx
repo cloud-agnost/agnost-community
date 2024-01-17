@@ -2,22 +2,18 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/D
 import { Form } from '@/components/Form';
 import { useTabNavigate, useToast } from '@/hooks';
 import useEndpointStore from '@/store/endpoint/endpointStore';
+import useVersionStore from '@/store/version/versionStore';
 import { APIError, CreateEndpointSchema, TabTypes } from '@/types';
 import { removeEmptyFields, translate as t } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import EndpointForm from './EndpointForm';
-import { useMutation } from '@tanstack/react-query';
-import useVersionStore from '@/store/version/versionStore';
-interface CreateEndpointProps {
-	open: boolean;
-	onClose: () => void;
-}
 
-export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
-	const { createEndpoint } = useEndpointStore();
+export default function CreateEndpoint() {
+	const { createEndpoint, isCreateEndpointDialogOpen, toggleCreateModal } = useEndpointStore();
 
 	const { getVersionDashboardPath } = useVersionStore();
 	const navigate = useTabNavigate();
@@ -67,7 +63,7 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 	}
 
 	function closeDrawer() {
-		onClose();
+		toggleCreateModal();
 		form.reset({
 			method: 'GET',
 			path: '',
@@ -82,7 +78,7 @@ export default function CreateEndpoint({ open, onClose }: CreateEndpointProps) {
 	}
 
 	return (
-		<Drawer open={open} onOpenChange={closeDrawer}>
+		<Drawer open={isCreateEndpointDialogOpen} onOpenChange={closeDrawer}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>{t('endpoint.create.title')}</DrawerTitle>

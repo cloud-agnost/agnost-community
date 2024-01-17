@@ -12,13 +12,7 @@ import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import DatabaseForm from './DatabaseForm';
 import useEnvironmentStore from '@/store/environment/environmentStore';
-export default function CreateDatabase({
-	open,
-	onOpenChange,
-}: {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-}) {
+export default function CreateDatabase() {
 	const form = useForm<z.infer<typeof CreateDatabaseSchema>>({
 		resolver: zodResolver(CreateDatabaseSchema),
 		defaultValues: {
@@ -31,7 +25,7 @@ export default function CreateDatabase({
 		appId: string;
 		orgId: string;
 	};
-	const { createDatabase } = useDatabaseStore();
+	const { createDatabase, isCreateDatabaseDialogOpen, toggleCreateModal } = useDatabaseStore();
 	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const resources = useResourceStore((state) =>
 		state.resources.filter((resource) => resource.type === 'database'),
@@ -39,7 +33,7 @@ export default function CreateDatabase({
 	const { mutateAsync: createDatabaseMutation, isPending } = useMutation({
 		mutationFn: createDatabase,
 		onSuccess: () => {
-			onOpenChange(false);
+			toggleCreateModal();
 			form.reset();
 			getEnvironmentResources({
 				orgId: environment?.orgId,
@@ -57,7 +51,7 @@ export default function CreateDatabase({
 	});
 
 	function onCloseHandler() {
-		onOpenChange(false);
+		toggleCreateModal();
 		form.reset();
 	}
 
@@ -73,7 +67,7 @@ export default function CreateDatabase({
 		});
 	}
 	return (
-		<Drawer open={open} onOpenChange={onCloseHandler}>
+		<Drawer open={isCreateDatabaseDialogOpen} onOpenChange={onCloseHandler}>
 			<DrawerContent className='overflow-x-hidden'>
 				<DrawerHeader className='relative'>
 					<DrawerTitle>{t('database.add.title')}</DrawerTitle>

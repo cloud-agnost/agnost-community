@@ -13,20 +13,18 @@ interface FunctionStore {
 	isCreateFunctionDrawerOpen: boolean;
 }
 type Actions = {
-	getFunctionsOfAppVersion: (
-		params: funcTypes.GetFunctionsOfAppVersion,
-	) => Promise<funcTypes.HelperFunction[]>;
+	getFunctions: (params: funcTypes.getFunctions) => Promise<funcTypes.HelperFunction[]>;
 	getFunctionById: (params: funcTypes.GetFunctionByIdParams) => Promise<funcTypes.HelperFunction>;
 	deleteFunction: (params: funcTypes.DeleteFunctionParams) => Promise<void>;
 	deleteMultipleFunctions: (params: funcTypes.DeleteMultipleFunctions) => Promise<void>;
 	createFunction: (params: funcTypes.CreateFunctionParams) => Promise<funcTypes.HelperFunction>;
 	updateFunction: (params: funcTypes.UpdateFunctionParams) => Promise<funcTypes.HelperFunction>;
 	saveFunctionCode: (params: funcTypes.SaveFunctionCodeParams) => Promise<funcTypes.HelperFunction>;
-	closeEditFunctionDrawer: () => void;
-	openEditFunctionDrawer: (func: funcTypes.HelperFunction) => void;
+	closeEditFunctionModal: () => void;
+	openEditFunctionModal: (func: funcTypes.HelperFunction) => void;
 	setLogics: (id: string, logic: string) => void;
 	deleteLogic: (id: string) => void;
-	toggleCreateFunctionDrawer: () => void;
+	toggleCreateModal: () => void;
 	reset: () => void;
 };
 
@@ -42,8 +40,8 @@ const initialState: FunctionStore = {
 const useFunctionStore = create<FunctionStore & Actions>()(
 	devtools((set, get) => ({
 		...initialState,
-		getFunctionsOfAppVersion: async (params) => {
-			const functions = await FunctionService.getFunctionsOfAppVersion(params);
+		getFunctions: async (params) => {
+			const functions = await FunctionService.getFunctions(params);
 			if (params.page === 0) {
 				set({ functions });
 			} else {
@@ -67,7 +65,7 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 			try {
 				await FunctionService.deleteFunction(params);
 				set((prev) => ({
-					functions: prev.functions.filter((func) => func._id !== params.funcId),
+					functions: prev.functions.filter((func) => func._id !== params.functionId),
 				}));
 				params.onSuccess?.();
 			} catch (err) {
@@ -132,8 +130,8 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 				throw err as funcTypes.APIError;
 			}
 		},
-		closeEditFunctionDrawer: () => set({ isEditFunctionDrawerOpen: false }),
-		openEditFunctionDrawer: (func) => {
+		closeEditFunctionModal: () => set({ isEditFunctionDrawerOpen: false }),
+		openEditFunctionModal: (func) => {
 			set({ function: func, isEditFunctionDrawerOpen: true });
 		},
 
@@ -142,7 +140,7 @@ const useFunctionStore = create<FunctionStore & Actions>()(
 			const { [id]: _, ...rest } = get().logics;
 			set({ logics: rest });
 		},
-		toggleCreateFunctionDrawer: () =>
+		toggleCreateModal: () =>
 			set((prev) => ({ isCreateFunctionDrawerOpen: !prev.isCreateFunctionDrawerOpen })),
 		reset: () => set(initialState),
 	})),

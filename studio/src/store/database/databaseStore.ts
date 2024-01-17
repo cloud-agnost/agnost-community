@@ -23,17 +23,17 @@ interface DatabaseStore {
 }
 
 type Actions = {
-	getDatabasesOfApp: (params: GetDatabasesOfAppParams) => Promise<Database[]>;
+	getDatabases: (params: GetDatabasesOfAppParams) => Promise<Database[]>;
 	getDatabaseOfAppById: (params: GetDatabaseOfAppByIdParams) => Promise<Database>;
 	createDatabase: (params: CreateDatabaseParams) => Promise<Database>;
 	updateDatabase: (params: UpdateDatabaseParams) => Promise<Database>;
 	deleteDatabase: (params: DeleteDatabaseParams) => Promise<void>;
 	setDatabase: (database: Database) => void;
-	openDeleteDatabaseDialog: (db: Database) => void;
-	closeDeleteDatabaseDialog: () => void;
-	openEditDatabaseDialog: (db: Database) => void;
-	closeEditDatabaseDialog: () => void;
-	toggleCreateDatabaseDialog: () => void;
+	openDeleteDatabaseModal: (db: Database) => void;
+	closeDeleteDatabaseModal: () => void;
+	openEditDatabaseModal: (db: Database) => void;
+	closeEditDatabaseModal: () => void;
+	toggleCreateModal: () => void;
 	reset: () => void;
 };
 
@@ -51,28 +51,28 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 	devtools(
 		(set) => ({
 			...initialState,
-			openDeleteDatabaseDialog: (db: Database) =>
+			openDeleteDatabaseModal: (db: Database) =>
 				set({
 					isDeleteDatabaseDialogOpen: true,
 					toDeleteDatabase: db,
 				}),
-			closeDeleteDatabaseDialog: () =>
+			closeDeleteDatabaseModal: () =>
 				set({
 					isDeleteDatabaseDialogOpen: false,
 					toDeleteDatabase: {} as Database,
 				}),
-			openEditDatabaseDialog: (db: Database) =>
+			openEditDatabaseModal: (db: Database) =>
 				set({
 					isEditDatabaseDialogOpen: true,
 					database: db,
 				}),
-			closeEditDatabaseDialog: () =>
+			closeEditDatabaseModal: () =>
 				set({
 					isEditDatabaseDialogOpen: false,
 					database: {} as Database,
 				}),
-			getDatabasesOfApp: async (params: GetDatabasesOfAppParams): Promise<Database[]> => {
-				const databases = await DatabaseService.getDatabasesOfApp(params);
+			getDatabases: async (params: GetDatabasesOfAppParams): Promise<Database[]> => {
+				const databases = await DatabaseService.getDatabases(params);
 				set({ databases, isDatabaseFetched: true });
 				return databases;
 			},
@@ -110,7 +110,7 @@ const useDatabaseStore = create<DatabaseStore & Actions>()(
 					databases: prev.databases.filter((db) => db._id !== params.dbId),
 				}));
 			},
-			toggleCreateDatabaseDialog: () =>
+			toggleCreateModal: () =>
 				set((prev) => ({
 					isCreateDatabaseDialogOpen: !prev.isCreateDatabaseDialogOpen,
 				})),

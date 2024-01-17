@@ -11,14 +11,14 @@ import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import FunctionForm from './FunctionForm';
 import { useMutation } from '@tanstack/react-query';
-interface EditTaskProps {
-	open: boolean;
-	onClose: () => void;
-}
-
-export default function EditTask({ open, onClose }: EditTaskProps) {
+export default function EditTask() {
 	const { t } = useTranslation();
-	const { updateFunction, function: helper } = useFunctionStore();
+	const {
+		updateFunction,
+		function: helper,
+		isEditFunctionDrawerOpen,
+		closeEditFunctionModal,
+	} = useFunctionStore();
 	const { toast } = useToast();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
@@ -33,7 +33,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 	const { mutate: updateFunctionMutation, isPending } = useMutation({
 		mutationFn: updateFunction,
 		onSuccess: () => {
-			onClose();
+			closeEditFunctionModal();
 			toast({
 				title: t('function.edit_success') as string,
 				action: 'success',
@@ -63,7 +63,7 @@ export default function EditTask({ open, onClose }: EditTaskProps) {
 		}
 	}, [helper]);
 	return (
-		<Drawer open={open} onOpenChange={onClose}>
+		<Drawer open={isEditFunctionDrawerOpen} onOpenChange={closeEditFunctionModal}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>

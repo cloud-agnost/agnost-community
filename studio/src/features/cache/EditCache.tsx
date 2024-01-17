@@ -12,14 +12,9 @@ import { useEffect } from 'react';
 import useCacheStore from '@/store/cache/cacheStore';
 import { useMutation } from '@tanstack/react-query';
 
-interface CreateCacheProps {
-	open: boolean;
-	onClose: () => void;
-}
-
-export default function EditCache({ open, onClose }: CreateCacheProps) {
+export default function EditCache() {
 	const { t } = useTranslation();
-	const { updateCache, cache } = useCacheStore();
+	const { updateCache, cache, isEditCacheModalOpen, closeEditCacheModal } = useCacheStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -34,7 +29,7 @@ export default function EditCache({ open, onClose }: CreateCacheProps) {
 			name: '',
 			assignUniqueName: false,
 		});
-		onClose();
+		closeEditCacheModal();
 	}
 	const { mutateAsync: updateMutate, isPending } = useMutation({
 		mutationFn: updateCache,
@@ -66,7 +61,7 @@ export default function EditCache({ open, onClose }: CreateCacheProps) {
 		});
 	}, [cache]);
 	return (
-		<Drawer open={open} onOpenChange={resetAndClose}>
+		<Drawer open={isEditCacheModalOpen} onOpenChange={resetAndClose}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>

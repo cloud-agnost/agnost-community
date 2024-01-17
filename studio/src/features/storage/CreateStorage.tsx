@@ -12,14 +12,9 @@ import StorageForm from './StorageForm';
 import { useMutation } from '@tanstack/react-query';
 import useEnvironmentStore from '@/store/environment/environmentStore';
 
-interface CreateStorageProps {
-	open: boolean;
-	onClose: () => void;
-}
-
-export default function CreateStorage({ open, onClose }: CreateStorageProps) {
+export default function CreateStorage() {
 	const { t } = useTranslation();
-	const { createStorage } = useStorageStore();
+	const { createStorage, isCreateStorageModalOpen, toggleCreateModal } = useStorageStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
@@ -60,10 +55,10 @@ export default function CreateStorage({ open, onClose }: CreateStorageProps) {
 			name: undefined,
 			resourceId: undefined,
 		});
-		onClose();
+		toggleCreateModal();
 	}
 	return (
-		<Drawer open={open} onOpenChange={onCloseHandler}>
+		<Drawer open={isCreateStorageModalOpen} onOpenChange={onCloseHandler}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>{t('storage.create')}</DrawerTitle>

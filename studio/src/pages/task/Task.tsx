@@ -23,7 +23,7 @@ export default function MainTask() {
 
 	const { addTab } = useTabStore();
 	const { getVersionDashboardPath } = useVersionStore();
-	const { tasks, getTasks, lastFetchedPage, deleteMultipleTasks, toggleCreateTaskModal } =
+	const { tasks, getTasks, lastFetchedPage, deleteMultipleTasks, toggleCreateModal } =
 		useTaskStore();
 	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { versionId, orgId, appId } = useParams();
@@ -83,7 +83,7 @@ export default function MainTask() {
 				createButtonTitle={t('task.add')}
 				emptyStateTitle={t('task.empty_text')}
 				isEmpty={!tasks.length}
-				openCreateModal={toggleCreateTaskModal}
+				openCreateModal={toggleCreateModal}
 				onMultipleDelete={deleteMultipleTasksHandler}
 				table={table}
 				disabled={!canEdit}
