@@ -9,7 +9,7 @@ import { getVersionPermission, translate } from '@/utils';
 import { Badge } from 'components/Badge';
 import { SortButton } from 'components/DataTable';
 
-const { openDeleteDatabaseDialog, openEditDatabaseDialog } = useDatabaseStore.getState();
+const { openDeleteDatabaseModal, openEditDatabaseModal } = useDatabaseStore.getState();
 
 const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 	{
@@ -160,8 +160,8 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 			return (
 				<ActionsCell
 					original={original}
-					onDelete={() => openDeleteDatabaseDialog(original)}
-					onEdit={() => openEditDatabaseDialog(original)}
+					onDelete={() => openDeleteDatabaseModal(original)}
+					onEdit={() => openEditDatabaseModal(original)}
 					canEdit={canEditDatabase}
 					canDelete={canDeleteDatabase}
 					disabled={!original.managed}

@@ -131,7 +131,7 @@ export interface SaveEndpointLogicParams extends BaseParams, BaseRequest {
 }
 
 export interface DeleteEndpointParams extends BaseParams, BaseRequest {
-	epId: string;
+	endpointId: string;
 }
 
 export interface DeleteMultipleEndpointsParams extends BaseParams, BaseRequest {

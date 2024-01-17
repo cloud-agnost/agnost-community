@@ -13,7 +13,7 @@ import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 import { InstanceType } from 'components/InstanceType';
 
-const { openEditModal, deleteQueue } = useMessageQueueStore.getState();
+const { openEditQueueModal, deleteQueue } = useMessageQueueStore.getState();
 const { getEnvironmentResources } = useEnvironmentStore.getState();
 const queryClient = new QueryClient();
 
@@ -153,7 +153,7 @@ const MessageQueueColumns: ColumnDefWithClassName<MessageQueue>[] = [
 				<ActionsCell<MessageQueue>
 					original={original}
 					canEdit={canEditQueue}
-					onEdit={() => openEditModal(original)}
+					onEdit={() => openEditQueueModal(original)}
 				>
 					<TableConfirmation
 						align='end'
