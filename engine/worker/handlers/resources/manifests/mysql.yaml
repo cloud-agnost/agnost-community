@@ -41,8 +41,8 @@ spec:
           memory: "512Mi"
           cpu: "180m"
         limits:
-          memory: "1024Mi"
-          cpu: "500m"
+          memory: "16Gi"
+          cpu: "4000m"
   mycnf: |
     [mysqld]
     max_connections=200
