@@ -1,5 +1,4 @@
 import { CacheBase } from "./CacheBase.js";
-import util from "util";
 
 /**
  * Manages read and write operations to Redis

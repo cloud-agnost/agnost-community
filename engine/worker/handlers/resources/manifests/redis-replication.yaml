@@ -33,14 +33,14 @@ data:
   master.conf: |-
     dir /data
     # User-supplied master configuration:
-    rename-command FLUSHDB ""
-    rename-command FLUSHALL ""
+    # rename-command FLUSHDB ""
+    # rename-command FLUSHALL ""
     # End of master configuration
   replica.conf: |-
     dir /data
     # User-supplied replica configuration:
-    rename-command FLUSHDB ""
-    rename-command FLUSHALL ""
+    # rename-command FLUSHDB ""
+    # rename-command FLUSHALL ""
     # End of replica configuration
 ---
 apiVersion: v1

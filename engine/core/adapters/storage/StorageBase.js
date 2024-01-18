@@ -393,7 +393,8 @@ export class StorageBase {
 	async emptyBucket(storage, bucketName) {
 		const bucketObj = await this.getBucketInfo(storage, bucketName);
 		if (bucketObj) {
-			await this.emptyBucketUsingDriver(bucketObj.id);
+			// Run this operation using the driver asynchronously, since for large number of objects it might take time
+			this.emptyBucketUsingDriver(bucketObj.id).catch((error) => {});
 			// Delete all files metadata contained in this bucket
 			await this.deleteBucketFilesMetadata(bucketObj.id);
 		} else {
@@ -419,7 +420,9 @@ export class StorageBase {
 					)
 				);
 			}
-			await this.deleteBucketUsingDriver(bucketObj.id);
+
+			// Run this operation using the driver asynchronously, since for large number of objects it might take time
+			await this.deleteBucketUsingDriver(bucketObj.id).catch((error) => {});
 			// Delete all files metadata contained in this bucket
 			await this.deleteBucketFilesMetadata(bucketObj.id);
 			// Delete the bucket metadata
