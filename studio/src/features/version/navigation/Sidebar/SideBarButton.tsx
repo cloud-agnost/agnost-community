@@ -38,8 +38,8 @@ export default function SideBarButton({
 			<div className={cn('flex items-center gap-1 px-5 w-full', !active && '[&>svg]:!text-subtle')}>
 				{!asChild ? (
 					<>
-						{getIcon(type as TabTypes)}
-						<h1 title={title} className='flex-1 truncate'>
+						<div className='flex-1/2'>{getIcon(type as TabTypes)}</div>
+						<h1 title={title} className='truncate'>
 							{title}
 						</h1>
 					</>
