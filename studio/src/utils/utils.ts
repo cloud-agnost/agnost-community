@@ -16,6 +16,7 @@ import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { AppRoles, RealtimeData } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
+import copy from 'copy-to-clipboard';
 import cronstrue from 'cronstrue';
 import i18next from 'i18next';
 import _ from 'lodash';
@@ -118,9 +119,13 @@ export function arrayToQueryString(array: string[] | undefined, key: string) {
 	return array?.map((item) => `${key}=${item}`).join('&');
 }
 
-export async function copy(text: string) {
+export async function copyToClipboard(text: string) {
 	try {
-		await navigator.clipboard.writeText(text);
+		copy(text, {
+			format: 'text/plain',
+			message: 'Press #{key} to copy',
+			debug: true,
+		});
 		toast({
 			title: translate('general.copied'),
 			action: 'success',
