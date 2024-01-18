@@ -1,6 +1,6 @@
 import { Button } from '@/components/Button';
 import { useToast } from '@/hooks';
-import { cn, copy } from '@/utils';
+import { cn, copyToClipboard } from '@/utils';
 import { CircleNotch, Copy } from '@phosphor-icons/react';
 import * as React from 'react';
 import './table.scss';
@@ -75,37 +75,11 @@ TableHead.displayName = 'TableHead';
 
 const TableCell = React.forwardRef<
 	HTMLTableCellElement,
-	React.TdHTMLAttributes<HTMLTableCellElement> & {
-		copyable?: boolean;
-		copyableText?: string;
-	}
->(({ className, children, copyable, copyableText, ...props }, ref) => {
-	const { toast } = useToast();
-
-	async function copyText() {
-		if (!copyableText) return toast({ title: 'No text to copy', action: 'error' });
-		copy(copyableText);
-	}
+	React.TdHTMLAttributes<HTMLTableCellElement>
+>(({ className, children, ...props }, ref) => {
 	return (
 		<td ref={ref} className={cn('table-cell', className)} {...props}>
-			{!copyable ? (
-				children
-			) : (
-				<div className='flex justify-between gap-1 items-center'>
-					{children}
-					{copyable && (
-						<Button
-							onClick={copyText}
-							variant='blank'
-							rounded
-							className='text-base hover:bg-subtle aspect-square'
-							iconOnly
-						>
-							<Copy />
-						</Button>
-					)}
-				</div>
-			)}
+			{children}
 		</td>
 	);
 });
