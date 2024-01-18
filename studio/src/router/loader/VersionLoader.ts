@@ -298,12 +298,10 @@ async function navigatorLoader({ params }: LoaderFunctionArgs) {
 	if (models) {
 		if (apiParams.modelId && apiParams.modelId !== model?._id && !_.isEmpty(models)) {
 			const selectedModel = models.find((m) => m._id === apiParams.modelId);
-			if (selectedModel) setModel(selectedModel);
-		}
 
-		if (apiParams.modelId && apiParams.modelId === model?._id) {
-			setModel(model);
-		} else setModel(models[0]);
+			if (selectedModel) setModel(selectedModel);
+			else setModel(models[0]);
+		}
 	}
 
 	return { props: {} };
