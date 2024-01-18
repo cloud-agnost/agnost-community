@@ -14,7 +14,7 @@ import { useMutation } from '@tanstack/react-query';
 
 export default function EditStorage() {
 	const { t } = useTranslation();
-	const { updateStorage, storage, isEditStorageDialogOpen, closeDeleteStorageModal } =
+	const { updateStorage, storage, isEditStorageDialogOpen, closeEditStorageModal } =
 		useStorageStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
@@ -52,7 +52,7 @@ export default function EditStorage() {
 		form.reset({
 			name: undefined,
 		});
-		closeDeleteStorageModal();
+		closeEditStorageModal();
 	}
 
 	useEffect(() => {
@@ -60,15 +60,7 @@ export default function EditStorage() {
 	}, [storage]);
 
 	return (
-		<Drawer
-			open={isEditStorageDialogOpen}
-			onOpenChange={() => {
-				form.reset({
-					name: '',
-				});
-				closeDeleteStorageModal();
-			}}
-		>
+		<Drawer open={isEditStorageDialogOpen} onOpenChange={onCloseHandler}>
 			<DrawerContent position='right' size='lg' className='h-full'>
 				<DrawerHeader>
 					<DrawerTitle>
