@@ -32,6 +32,7 @@ export interface ClusterComponent {
 }
 
 export interface UpdateClusterComponentParams extends BaseRequest {
+	hpaName: string;
 	deploymentName: string;
 	replicas: number;
 	minReplicas: number;
