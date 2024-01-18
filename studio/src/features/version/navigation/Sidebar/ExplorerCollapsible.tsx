@@ -8,16 +8,23 @@ interface ExplorerCollapsibleProps {
 	onOpenChange: () => void;
 	children: React.ReactNode;
 	trigger?: React.ReactNode;
+	className?: string;
 }
 export function ExplorerCollapsible({
 	open,
 	onOpenChange,
 	children,
 	trigger,
+	className,
 	...props
 }: ExplorerCollapsibleProps) {
 	return (
-		<Collapsible open={open} onOpenChange={onOpenChange} className='w-full' {...props}>
+		<Collapsible
+			open={open}
+			onOpenChange={onOpenChange}
+			className={cn('w-full', className)}
+			{...props}
+		>
 			{trigger}
 			<CollapsibleContent>{children}</CollapsibleContent>
 		</Collapsible>
