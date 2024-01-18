@@ -122,22 +122,6 @@ export default function TaskForm({ loading }: { loading?: boolean }) {
 			/>
 			<FormField
 				control={form.control}
-				name='logExecution'
-				render={({ field }) => (
-					<FormItem className='flex justify-between gap-4 items-center space-y-0'>
-						<FormLabel>
-							<p>{t('task.logExec')}</p>
-							<p className='text-subtle'>{t('task.logExecDesc')}</p>
-						</FormLabel>
-
-						<FormControl>
-							<Switch checked={field.value} onCheckedChange={field.onChange} />
-						</FormControl>
-					</FormItem>
-				)}
-			/>
-			<FormField
-				control={form.control}
 				name='enabled'
 				render={({ field }) => (
 					<FormItem className='flex justify-between gap-4 items-center space-y-0'>
@@ -152,6 +136,23 @@ export default function TaskForm({ loading }: { loading?: boolean }) {
 					</FormItem>
 				)}
 			/>
+			<FormField
+				control={form.control}
+				name='logExecution'
+				render={({ field }) => (
+					<FormItem className='flex justify-between gap-4 items-center space-y-0'>
+						<FormLabel>
+							<p>{t('task.logExec')}</p>
+							<p className='text-subtle'>{t('task.logExecDesc')}</p>
+						</FormLabel>
+
+						<FormControl>
+							<Switch checked={field.value} onCheckedChange={field.onChange} />
+						</FormControl>
+					</FormItem>
+				)}
+			/>
+
 			<DrawerFooter className='mt-8'>
 				<div className='flex justify-end'>
 					<DrawerClose asChild>

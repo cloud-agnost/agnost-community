@@ -152,7 +152,9 @@ export default function Navigator() {
 			onMultipleDelete={deleteHandler}
 			loading={false}
 			className='!overflow-hidden'
-			breadCrumb={<BreadCrumb goBackLink={`${dbUrl}/models`} items={breadcrumbItems} />}
+			breadCrumb={
+				<BreadCrumb goBackLink={`${dbUrl}/${database._id}/models`} items={breadcrumbItems} />
+			}
 			handlerButton={
 				<Button variant='secondary' onClick={onRefresh} iconOnly loading={isRefreshing}>
 					{!isRefreshing && <Refresh className='mr-2 w-5 h-5' />}

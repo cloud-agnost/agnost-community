@@ -70,7 +70,10 @@ export default function CreateMessageQueue() {
 	}
 
 	function handleClose() {
-		form.reset();
+		form.setValue('resourceId', '');
+		form.setValue('name', '');
+		form.setValue('delay', undefined);
+		form.setValue('logExecution', true);
 		toggleCreateModal();
 	}
 	return (

@@ -120,10 +120,11 @@ export default function Workspace() {
 	function handleDeleteMutation() {
 		if (!toDeleteData) return;
 		return STORES[toDeleteData?.type][
-			toDeleteData?.type === TabTypes.Queue ? 'deleteQueue' : `delete${toDeleteData?.type}`
+			toDeleteData?.type === TabTypes.MessageQueue ? 'deleteQueue' : `delete${toDeleteData?.type}`
 		]({
-			[toDeleteData?.type === TabTypes.Queue ? 'queueId' : `${toDeleteData?.type.toLowerCase()}Id`]:
-				toDeleteData?.data._id,
+			[toDeleteData?.type === TabTypes.MessageQueue
+				? 'queueId'
+				: `${toDeleteData?.type.toLowerCase()}Id`]: toDeleteData?.data._id,
 			orgId: orgId as string,
 			appId: appId as string,
 			versionId: versionId as string,
@@ -142,7 +143,23 @@ export default function Workspace() {
 
 	function openEditDialog(data: WorkspaceDataType, type: TabTypes) {
 		const mt = type === TabTypes.MessageQueue ? 'Queue' : type;
+		console.log(data);
 		STORES[type][`openEdit${mt}Modal`](data);
+	}
+
+	function getDeleteTitle(): string {
+		if (!toDeleteData) return '';
+		const key =
+			toDeleteData.type === TabTypes.MessageQueue ? 'queue' : toDeleteData.type.toLowerCase();
+		if (toDeleteData.type === TabTypes.Middleware) return t(`version.${key}.delete.title`);
+		return t(`${key}.delete.title`);
+	}
+	function getDeleteMessage() {
+		if (!toDeleteData) return '';
+		const key =
+			toDeleteData.type === TabTypes.MessageQueue ? 'queue' : toDeleteData.type.toLowerCase();
+		if (toDeleteData.type === TabTypes.Middleware) return t(`version.${key}.delete.message`);
+		return t(`${key}.delete.message`);
 	}
 
 	return (
@@ -210,8 +227,8 @@ export default function Workspace() {
 			<InfoModal
 				isOpen={openInfoModal}
 				closeModal={() => setOpenInfoModal(false)}
-				title={t('general.multiDelete')}
-				description={t('general.deleteDescription')}
+				title={getDeleteTitle()}
+				description={getDeleteMessage()}
 				onConfirm={deleteMutation}
 				loading={isPending}
 			/>

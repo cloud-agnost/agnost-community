@@ -15,16 +15,15 @@ export default function VersionLayout({ children, className }: VersionLayoutProp
 	const { isSidebarOpen } = useUtilsStore();
 	return (
 		<div className='flex h-full'>
-			<PanelGroup direction='horizontal' autoSaveId='sidebar'>
-				{isSidebarOpen && (
-					<Panel defaultSize={15} minSize={12}>
-						<SideNavigation />
-					</Panel>
-				)}
+			<PanelGroup direction='horizontal' autoSaveId='sidebar' key={String(isSidebarOpen)}>
+				<Panel defaultSize={isSidebarOpen ? 15 : 0} minSize={isSidebarOpen ? 12 : 0}>
+					{isSidebarOpen && <SideNavigation />}
+				</Panel>
 				<PanelResizeHandle className=''>
-					<Separator className='cursor-col-resize w-1' orientation='vertical' />
+					{isSidebarOpen && <Separator className='cursor-col-resize w-1' orientation='vertical' />}
 				</PanelResizeHandle>
-				<Panel defaultSize={85}>
+
+				<Panel defaultSize={isSidebarOpen ? 85 : 100}>
 					<div className='w-full'>
 						<Tabs />
 						<div className={cn('version-layout relative', className)} id='version-layout'>

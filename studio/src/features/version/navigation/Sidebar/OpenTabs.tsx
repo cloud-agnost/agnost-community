@@ -34,10 +34,11 @@ export default function OpenTabs() {
 			open={sidebar[versionId]?.openEditor || false}
 			onOpenChange={toggleOpenEditorTab}
 			trigger={<OpenTabsTrigger />}
+			className='border-b border-border'
 		>
 			<div className='max-h-[200px] overflow-auto'>
 				{tabs.map((tab) => (
-					<div id={tab.id} key={tab.id} className='relative group h-7'>
+					<div id={tab.id} key={tab.id} className='relative group h-7 w-full'>
 						<SideBarButton
 							active={tab.isActive}
 							onClick={() => handleClickTabLink(tab)}

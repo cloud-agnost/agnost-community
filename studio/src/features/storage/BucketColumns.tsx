@@ -13,11 +13,11 @@ import { Checkbox } from 'components/Checkbox';
 import { SortButton } from 'components/DataTable';
 import { DateText } from 'components/DateText';
 
-const { emptyBucket, openDeleteBucketDialog, openEditBucketDialog, storage } =
-	useStorageStore.getState();
+const { emptyBucket, openDeleteBucketDialog, openEditBucketDialog } = useStorageStore.getState();
 
 const queryClient = new QueryClient();
 async function clearBucket(bucketName: string) {
+	const storage = useStorageStore.getState().storage;
 	return queryClient
 		.getMutationCache()
 		.build(queryClient, {

@@ -49,12 +49,16 @@ export default function EditClusterComponent() {
 		setLoading(true);
 		updateClusterComponent({
 			deploymentName: clusterComponent?.deploymentName,
+			hpaName: clusterComponent?.hpaName,
 			...data,
 			onSuccess: () => {
 				setLoading(false);
 				closeDrawer();
 			},
-			onError: (error) => toast({ action: 'error', title: error.details }),
+			onError: (error) => {
+				setLoading(false);
+				toast({ action: 'error', title: error.details });
+			},
 		});
 	}
 
