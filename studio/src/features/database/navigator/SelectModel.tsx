@@ -1,22 +1,24 @@
 import { Button } from '@/components/Button';
 import useModelStore from '@/store/database/modelStore';
 import useNavigatorStore from '@/store/database/navigatorStore';
+import useTabStore from '@/store/version/tabStore';
 import useVersionStore from '@/store/version/versionStore';
 import { Model } from '@/types';
 import { cn } from '@/utils';
 import { Table } from '@phosphor-icons/react';
 import _ from 'lodash';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 export default function SelectModel({
 	fetchData,
 }: {
 	fetchData: (page: number, size?: number) => void;
 }) {
+	const { versionId } = useParams() as { versionId: string };
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { dbId } = useParams() as { dbId: string };
 	const { data } = useNavigatorStore();
 	const navigate = useNavigate();
+	const { updateCurrentTab } = useTabStore();
 	const { model, setModel, getModelsOfSelectedDb, resetNestedModels } = useModelStore();
 	const { getVersionDashboardPath } = useVersionStore();
 	function onModelSelect(model: Model) {
@@ -26,9 +28,12 @@ export default function SelectModel({
 		searchParams.delete('ref');
 		setSearchParams(searchParams);
 		setModel(model);
-
+		const path = getVersionDashboardPath(`database/${dbId}/navigator/${model._id}`);
 		if (_.isNil(data?.[model._id])) fetchData(0);
-		navigate(getVersionDashboardPath(`database/${dbId}/navigator/${model._id}`));
+		updateCurrentTab(versionId, {
+			path,
+		});
+		navigate(path);
 	}
 	const models = getModelsOfSelectedDb(dbId);
 	return (
