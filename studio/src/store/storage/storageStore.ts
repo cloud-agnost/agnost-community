@@ -60,10 +60,10 @@ type Actions = {
 	closeBucketDeleteDialog: () => void;
 	openEditBucketDialog: (bucket: Bucket) => void;
 	closeEditBucketDialog: () => void;
-	openEditStorageDialog: (storage: Storage) => void;
+	openEditStorageModal: (storage: Storage) => void;
 	openFileEditDialog: (file: BucketFile) => void;
 	closeFileEditDialog: () => void;
-	closeEditStorageDialog: () => void;
+	closeEditStorageModal: () => void;
 	createStorage: (storage: CreateStorageParams) => Promise<Storage>;
 	getStorageById: (storage: GetStorageByIdParams) => Promise<Storage>;
 	getStorages: (storage: GetStoragesParams) => Promise<Storage[]>;
@@ -201,10 +201,10 @@ const useStorageStore = create<StorageStore & Actions>()(
 				throw error as APIError;
 			}
 		},
-		openEditStorageDialog: (storage: Storage) => {
+		openEditStorageModal: (storage: Storage) => {
 			set({ storage, isEditStorageDialogOpen: true });
 		},
-		closeEditStorageDialog: () => {
+		closeEditStorageModal: () => {
 			set({ storage: {} as Storage, isEditStorageDialogOpen: false });
 		},
 		openEditBucketDialog: (bucket: Bucket) => {
