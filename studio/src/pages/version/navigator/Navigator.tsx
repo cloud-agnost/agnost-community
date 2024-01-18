@@ -163,7 +163,7 @@ export default function Navigator() {
 			}
 		>
 			{!_.isEmpty(model) ? (
-				<div className='flex gap-4 justify-center h-[calc(100%-50px)]'>
+				<div className='flex gap-4 justify-center h-[calc(100%-52px)]'>
 					<SelectModel fetchData={fetchData} />
 					{isFetching && !isSorted && !isFetchingNextPage ? (
 						<div className='flex-1 flex items-center justify-center'>
