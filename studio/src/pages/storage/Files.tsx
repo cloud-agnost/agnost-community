@@ -72,12 +72,19 @@ export default function Files() {
 	});
 
 	const { mutateAsync: deleteMultipleFileMutation } = useMutation({
-		mutationFn: deleteMultipleFileFromBucket,
+		mutationFn: () =>
+			deleteMultipleFileFromBucket({
+				filePaths: table.getSelectedRowModel().rows.map((row) => row.original.path),
+				storageName: storage?.name as string,
+				bucketName: bucket?.name as string,
+				bckId: bucket?.id as string,
+			}),
 		mutationKey: ['deleteMultipleFileFromBucket'],
 		onSuccess: () => {
 			table?.resetRowSelection();
 		},
 		onError: ({ details }: APIError) => {
+			table?.resetRowSelection();
 			toast({ action: 'error', title: details });
 		},
 	});
@@ -101,14 +108,6 @@ export default function Files() {
 			toast({ action: 'error', title: error.details });
 		},
 	});
-
-	function deleteMultipleFilesHandler() {
-		deleteMultipleFileMutation({
-			filePaths: table.getSelectedRowModel().rows.map((row) => row.original.path),
-			storageName: storage?.name as string,
-			bucketName: bucket?.name as string,
-		});
-	}
 
 	function uploadFileHandler() {
 		const fileInput = document.createElement('input');
@@ -139,7 +138,7 @@ export default function Files() {
 				openCreateModal={uploadFileHandler}
 				createButtonTitle={t('storage.file.upload')}
 				emptyStateTitle={t('storage.file.empty_text')}
-				onMultipleDelete={deleteMultipleFilesHandler}
+				onMultipleDelete={deleteMultipleFileMutation}
 				loading={isFetching && (!files?.length || files[0].bucketId !== bucket.id)}
 				table={table}
 				handlerButton={
