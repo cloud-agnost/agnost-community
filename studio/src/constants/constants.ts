@@ -19,7 +19,6 @@ import {
 	Calendar,
 	ChangeLog,
 	Connect,
-	Dashboard,
 	Database as DatabaseIcon,
 	Decimal,
 	Decision,
@@ -107,6 +106,7 @@ import {
 	MapPin,
 	Phone,
 	Plus,
+	PresentationChart,
 	Share,
 	SkipForward,
 	Table,
@@ -811,7 +811,7 @@ export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
 	[TabTypes.Task]: Timer,
 	[TabTypes.Middleware]: SkipForward,
 	[TabTypes.Settings]: GearSix,
-	[TabTypes.Dashboard]: Dashboard,
+	[TabTypes.Dashboard]: PresentationChart,
 	[TabTypes.Notifications]: BellRing,
 	[TabTypes.Function]: Function,
 	[TabTypes.Field]: Textbox,
@@ -1187,13 +1187,12 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 		run: (ed) => {
 			const selection = ed.getSelection() as monaco.Selection;
 			const selectedText = ed.getModel()?.getValueInRange(selection);
-			const functionBlock =
-				`function functionName() {\n` + `  ${selectedText}\n` + `}` + `\n` + `functionName();`;
+			const functionBlock = `function functionName() {\n` + `  ${selectedText}\n` + `}` + `\n`;
 
 			ed.executeEdits('', [
 				{
 					range: new monaco.Range(
-						selection.startLineNumber - 1,
+						selection.startLineNumber,
 						selection.startColumn,
 						selection.endLineNumber,
 						selection.endColumn,
@@ -1211,17 +1210,11 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 		run: (ed) => {
 			const selection = ed.getSelection() as monaco.Selection;
 			const selectedText = ed.getModel()?.getValueInRange(selection);
-			const functionBlock =
-				`async function functionName() {\n` +
-				`  ${selectedText}\n` +
-				`}` +
-				`\n` +
-				`functionName();`;
-
+			const functionBlock = `async function functionName() {\n` + `  ${selectedText}\n` + `}`;
 			ed.executeEdits('', [
 				{
 					range: new monaco.Range(
-						selection.startLineNumber - 1,
+						selection.startLineNumber,
 						selection.startColumn,
 						selection.endLineNumber,
 						selection.endColumn,
@@ -1244,7 +1237,7 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 			ed.executeEdits('', [
 				{
 					range: new monaco.Range(
-						selection.startLineNumber - 1,
+						selection.startLineNumber,
 						selection.startColumn,
 						selection.endLineNumber,
 						selection.endColumn,
@@ -1267,7 +1260,7 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 			ed.executeEdits('', [
 				{
 					range: new monaco.Range(
-						selection.startLineNumber - 1,
+						selection.startLineNumber,
 						selection.startColumn,
 						selection.endLineNumber,
 						selection.endColumn,
@@ -1291,7 +1284,7 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 			ed.executeEdits('', [
 				{
 					range: new monaco.Range(
-						selection.startLineNumber - 1,
+						selection.startLineNumber,
 						selection.startColumn,
 						selection.endLineNumber,
 						selection.endColumn,
@@ -1314,7 +1307,7 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 			ed.executeEdits('', [
 				{
 					range: new monaco.Range(
-						selection.startLineNumber - 1,
+						selection.startLineNumber,
 						selection.startColumn,
 						selection.endLineNumber,
 						selection.endColumn,
@@ -1333,11 +1326,10 @@ export const SURROUND_MENU_ITEMS: monaco.editor.IActionDescriptor[] = [
 			const selection = ed.getSelection() as monaco.Selection;
 			const selectedText = ed.getModel()?.getValueInRange(selection);
 			const templateLiteralBlock = `\${${selectedText}}`;
-			console.log(templateLiteralBlock);
 			ed.executeEdits('', [
 				{
 					range: new monaco.Range(
-						selection.startLineNumber - 1,
+						selection.startLineNumber,
 						selection.startColumn,
 						selection.endLineNumber,
 						selection.endColumn,
