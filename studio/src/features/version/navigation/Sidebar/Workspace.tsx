@@ -171,7 +171,7 @@ export default function Workspace() {
 					key={item.type}
 					trigger={<WorkspaceTrigger item={item} />}
 				>
-					{data[item.type as TabTypes]?.map((data) => (
+					{data[item.type]?.map((data) => (
 						<div
 							id={data._id}
 							key={data._id}
@@ -198,7 +198,7 @@ export default function Workspace() {
 										window.location.pathname.includes(data._id)
 											? 'hover:bg-button-primary'
 											: 'hover:bg-subtle',
-										'aspect-square text-icon-base hover:text-default !p-0 !h-6 mr-2 invisible group-hover:visible rounded-full',
+										'aspect-square text-icon-base hover:text-default  !p-0 !h-6 mr-2 hidden group-hover:inline-flex rounded-full',
 									)}
 									onClick={() => openEditDialog(data, item.type)}
 								>
@@ -212,7 +212,7 @@ export default function Workspace() {
 										window.location.pathname.includes(data._id)
 											? 'hover:bg-button-primary'
 											: 'hover:bg-subtle',
-										'aspect-square text-icon-base hover:text-default !p-0 !h-6 mr-2 invisible group-hover:visible rounded-full',
+										'aspect-square text-icon-base hover:text-default !p-0 !h-6 mr-2 hidden group-hover:inline-flex rounded-full',
 									)}
 									iconOnly
 									onClick={() => deleteHandler(data, item.type)}
