@@ -51,10 +51,8 @@ export default function CreateStorage() {
 	}
 
 	function onCloseHandler() {
-		form.reset({
-			name: undefined,
-			resourceId: undefined,
-		});
+		form.setValue('name', '');
+		form.setValue('resourceId', '');
 		toggleCreateModal();
 	}
 	return (
