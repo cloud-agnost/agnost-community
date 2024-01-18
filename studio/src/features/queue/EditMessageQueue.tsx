@@ -53,7 +53,7 @@ export default function EditMessageQueue() {
 		if (queue) {
 			form.reset(queue);
 		}
-	}, [open, queue, environment]);
+	}, [isEditQueueModalOpen, queue, environment]);
 
 	return (
 		<Drawer open={isEditQueueModalOpen} onOpenChange={closeEditQueueModal}>

@@ -66,7 +66,7 @@ export default function EditEndpointDrawer() {
 				middlewares: endpoint?.middlewares,
 			});
 		}
-	}, [endpoint, open]);
+	}, [endpoint, isEditEndpointModalOpen]);
 
 	return (
 		<Drawer open={isEditEndpointModalOpen} onOpenChange={closeEditEndpointModal}>
