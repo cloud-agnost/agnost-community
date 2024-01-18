@@ -1,7 +1,5 @@
-import { Button } from '@/components/Button';
-import { useToast } from '@/hooks';
-import { cn, copyToClipboard } from '@/utils';
-import { CircleNotch, Copy } from '@phosphor-icons/react';
+import { cn } from '@/utils';
+import { CircleNotch } from '@phosphor-icons/react';
 import * as React from 'react';
 import './table.scss';
 
