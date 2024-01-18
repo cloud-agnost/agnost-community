@@ -1,33 +1,36 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
-import { useToast } from '@/hooks';
+import { useTabNavigate, useToast } from '@/hooks';
+import useEnvironmentStore from '@/store/environment/environmentStore';
 import useStorageStore from '@/store/storage/storageStore';
-import { APIError, CreateStorageSchema } from '@/types';
+import { APIError, CreateStorageSchema, TabTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import StorageForm from './StorageForm';
-import { useMutation } from '@tanstack/react-query';
-import useEnvironmentStore from '@/store/environment/environmentStore';
+import useVersionStore from '@/store/version/versionStore';
 
 export default function CreateStorage() {
 	const { t } = useTranslation();
 	const { createStorage, isCreateStorageModalOpen, toggleCreateModal } = useStorageStore();
+	const { getVersionDashboardPath } = useVersionStore();
 	const { versionId, appId, orgId } = useParams<{
 		versionId: string;
 		appId: string;
 		orgId: string;
 	}>();
 	const { toast } = useToast();
+	const navigate = useTabNavigate();
 	const form = useForm<z.infer<typeof CreateStorageSchema>>({
 		resolver: zodResolver(CreateStorageSchema),
 	});
 	const { getEnvironmentResources, environment } = useEnvironmentStore();
 	const { mutateAsync: createMutation, isPending } = useMutation({
 		mutationFn: createStorage,
-		onSuccess: () => {
+		onSuccess: (storage) => {
 			getEnvironmentResources({
 				orgId: environment?.orgId,
 				appId: environment?.appId,
@@ -35,6 +38,13 @@ export default function CreateStorage() {
 				versionId: environment?.versionId,
 			});
 			onCloseHandler();
+			navigate({
+				title: storage.name,
+				path: getVersionDashboardPath(`storage/${storage._id}`),
+				isActive: true,
+				isDashboard: false,
+				type: TabTypes.Bucket,
+			});
 		},
 		onError: ({ details }: APIError) => {
 			toast({ action: 'error', title: details });
