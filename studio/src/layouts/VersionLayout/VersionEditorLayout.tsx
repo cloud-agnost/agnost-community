@@ -104,7 +104,7 @@ export default function VersionEditorLayout({
 						</Button>
 					)}
 					<Button variant='primary' onClick={handleSaveLogic} loading={loading} disabled={!canEdit}>
-						<FloppyDisk size={20} className='text-icon-default mr-2' />
+						{!loading && <FloppyDisk size={20} className='text-icon-default mr-2' />}
 						{t('general.save')}
 					</Button>
 				</div>
