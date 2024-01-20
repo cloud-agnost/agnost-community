@@ -105,19 +105,9 @@ export default function Workspace() {
 			return;
 		}
 		let path = `${type.toLowerCase()}/${data._id}`;
-		if (type === TabTypes.MessageQueue) path = `queue/${data._id}`;
 		if (type === TabTypes.Database) {
 			path = `${path}/models`;
 		}
-		// const tab = {
-		// 	id: generateId(),
-		// 	title: data.name,
-		// 	path: getVersionDashboardPath(path),
-		// 	isActive: true,
-		// 	isDashboard: false,
-		// 	type,
-		// };
-		// console.log(JSON.stringify(tab, null, 2));
 
 		navigate({
 			title: data.name,
@@ -126,7 +116,6 @@ export default function Workspace() {
 			isDashboard: false,
 			type,
 		});
-		// addTab(versionId, tab);
 	}
 
 	function handleDeleteMutation() {
@@ -154,24 +143,21 @@ export default function Workspace() {
 	}
 
 	function openEditDialog(data: WorkspaceDataType, type: TabTypes) {
-		const mt = type === TabTypes.MessageQueue ? 'Queue' : type;
-		console.log(data);
-		STORES[type][`openEdit${mt}Modal`](data);
+		STORES[type][`openEdit${type}Modal`](data);
 	}
 
 	function getDeleteTitle(): string {
 		if (!toDeleteData) return '';
-		const key =
-			toDeleteData.type === TabTypes.MessageQueue ? 'queue' : toDeleteData.type.toLowerCase();
-		if (toDeleteData.type === TabTypes.Middleware) return t(`version.${key}.delete.title`);
-		return t(`${key}.delete.title`);
+
+		if (toDeleteData.type === TabTypes.Middleware)
+			return t(`version.${toDeleteData.type.toLowerCase()}.delete.title`);
+		return t(`${toDeleteData.type.toLowerCase()}.delete.title`);
 	}
 	function getDeleteMessage() {
 		if (!toDeleteData) return '';
-		const key =
-			toDeleteData.type === TabTypes.MessageQueue ? 'queue' : toDeleteData.type.toLowerCase();
-		if (toDeleteData.type === TabTypes.Middleware) return t(`version.${key}.delete.message`);
-		return t(`${key}.delete.message`);
+		if (toDeleteData.type === TabTypes.Middleware)
+			return t(`version.${toDeleteData.type.toLowerCase()}.delete.message`);
+		return t(`${toDeleteData.type.toLowerCase()}.delete.message`);
 	}
 
 	return (
