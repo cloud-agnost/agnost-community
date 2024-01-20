@@ -38,7 +38,7 @@ export default function Models() {
 	const models = getModelsOfSelectedDb(dbId);
 	const { database } = useDatabaseStore();
 	const navigate = useTabNavigate();
-	const filteredModels = useSearch(models ?? []);
+	const filteredModels = useSearch(models as Model[]);
 	const table = useTable<Model>({
 		data: filteredModels,
 		columns: ModelColumns,
