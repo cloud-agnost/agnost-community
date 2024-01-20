@@ -35,10 +35,9 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
 					autoComplete='new-password'
 				/>
 				<Button
-					className='password-input-button p-2'
+					className='password-input-button'
 					onClick={() => setShowPassword(!showPassword)}
-					iconOnly
-					variant='blank'
+					variant='icon'
 					disabled={disableShowPassword}
 				>
 					{showPassword ? <EyeSlash size={20} /> : <Eye size={20} />}

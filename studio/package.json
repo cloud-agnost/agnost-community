@@ -38,6 +38,7 @@
       "class-variance-authority": "^0.6.0",
       "clsx": "^1.2.1",
       "cmdk": "^0.2.0",
+      "copy-to-clipboard": "^3.3.3",
       "cron-parser": "^4.8.1",
       "cronstrue": "^2.28.0",
       "eslint-linter-browserify": "^8.56.0",

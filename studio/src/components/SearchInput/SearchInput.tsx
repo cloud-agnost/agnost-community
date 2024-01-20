@@ -12,6 +12,7 @@ interface SearchInputProps extends React.ComponentPropsWithoutRef<'input'> {
 	onSearch?: (value: string) => void;
 	onClear?: () => void;
 	urlKey?: string;
+	canAddParam?: boolean;
 }
 
 export default function SearchInput({
@@ -21,6 +22,7 @@ export default function SearchInput({
 	onSearch,
 	value,
 	urlKey = 'q',
+	canAddParam = true,
 	...props
 }: SearchInputProps) {
 	const [inputValue, setInputValue] = useState<string>((value as string) ?? '');
@@ -37,11 +39,12 @@ export default function SearchInput({
 
 	function onInput(value: string) {
 		value = value.trim();
-		if (!value) {
-			searchParams.delete(urlKey);
-			setSearchParams(searchParams);
-		} else {
-			searchParams.set(urlKey, value);
+		if (canAddParam) {
+			if (!value) {
+				searchParams.delete(urlKey);
+			} else {
+				searchParams.set(urlKey, value);
+			}
 			setSearchParams(searchParams);
 		}
 		onSearch?.(value);
@@ -67,7 +70,7 @@ export default function SearchInput({
 				className='search-input'
 			/>
 			{inputValue && (
-				<Button className='search-input-button' onClick={clear} variant='blank' iconOnly>
+				<Button className='search-input-button' onClick={clear} variant='icon'>
 					<X size={20} />
 				</Button>
 			)}

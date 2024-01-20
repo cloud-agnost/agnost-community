@@ -1,10 +1,10 @@
 .form {
 	&-message {
-		@apply text-error-default text-xs;
+		@apply text-error text-xs;
 	}
 
 	&-label-error {
-		@apply text-error-default;
+		@apply text-error;
 	}
 
 	&-description {

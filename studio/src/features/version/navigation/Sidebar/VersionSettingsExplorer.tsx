@@ -37,12 +37,23 @@ export default function VersionSettingsExplorer() {
 					onClick={() => handleAddTab(item)}
 					asChild
 				>
-					<span className='flex items-center justify-center text-xl w-6 h-6'>
+					<div className='flex-1/2'>
 						<item.icon
-							className={cn(tab.title === item.title ? 'text-icon-secondary' : 'text-icon-base')}
+							className={cn(
+								tab.title === item.title
+									? 'text-icon-secondary'
+									: 'text-subtle group-hover:text-default',
+							)}
 						/>
-					</span>
-					{item.title}
+					</div>
+					<p
+						className={cn(
+							'truncate',
+							tab.title === item.title ? 'text-default' : 'text-subtle group-hover:text-default',
+						)}
+					>
+						{item.title}
+					</p>
 				</SideBarButton>
 			))}
 		</ExplorerCollapsible>

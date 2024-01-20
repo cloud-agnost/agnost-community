@@ -88,25 +88,16 @@ export default function ChangeAvatar({
 						<div>
 							{item?.pictureUrl && (
 								<Button
-									variant='blank'
 									rounded
 									disabled={disabled}
-									className='hover:bg-button-border-hover text-icon-base hover:text-default'
-									iconOnly
+									variant='icon'
 									onClick={onClickHandler}
 									size='sm'
 								>
 									<Trash className='avatar-actions-icon' />
 								</Button>
 							)}
-							<Button
-								variant='blank'
-								rounded
-								iconOnly
-								size='sm'
-								disabled={disabled || loading}
-								className='hover:bg-button-border-hover text-icon-base hover:text-default'
-							>
+							<Button rounded variant='icon' size='sm' disabled={disabled || loading}>
 								<label htmlFor={filePickerId} className='cursor-pointer'>
 									<Pencil className='avatar-actions-icon' />
 								</label>

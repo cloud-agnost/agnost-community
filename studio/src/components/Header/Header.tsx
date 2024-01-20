@@ -8,6 +8,7 @@ import { DeploymentStatusCard } from '@/features/version/DeploymentStatusCard';
 import { NotificationDropdown } from '@/features/version/Notification';
 import { VersionDropdown } from '@/features/version/VersionDropdown';
 import { useAuthorizeVersion } from '@/hooks';
+import { MagnifyingGlass } from '@phosphor-icons/react';
 import { Link, useParams } from 'react-router-dom';
 import { Separator } from '../Separator';
 import Feedback from './Feedback';
@@ -59,6 +60,7 @@ export function Header() {
 				</nav>
 				<div className='header-menu-divider' />
 				<div className='header-menu-right-actions'>
+					<MagnifyingGlass />
 					<ReleaseDropdown />
 					{versionId && (
 						<>

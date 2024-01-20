@@ -52,11 +52,9 @@ export function TableConfirmation({
 					<PopoverTrigger asChild>
 						<TooltipTrigger asChild>
 							<Button
-								variant='blank'
 								rounded
 								disabled={!hasPermission || disabled}
-								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-white'
-								iconOnly
+								variant='icon'
 								onClick={(e) => e.stopPropagation()}
 							>
 								{icon ?? <Trash size={20} />}

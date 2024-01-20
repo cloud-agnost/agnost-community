@@ -89,11 +89,7 @@ export default function ReadReplicas() {
 							<TooltipProvider>
 								<Tooltip>
 									<TooltipTrigger asChild>
-										<Button
-											variant='blank'
-											iconOnly
-											className='hover:bg-button-border-hover rounded-full text-icon-base hover:text-default'
-										>
+										<Button variant='icon'>
 											<Pencil
 												className='w-5 h-5 text-icon-base'
 												onClick={() => editReplica(index)}
@@ -106,12 +102,7 @@ export default function ReadReplicas() {
 							<TooltipProvider>
 								<Tooltip>
 									<TooltipTrigger asChild>
-										<Button
-											variant='blank'
-											iconOnly
-											className='hover:bg-button-border-hover rounded-full text-icon-base hover:text-default'
-											onClick={() => removeReplica(index)}
-										>
+										<Button variant='icon' onClick={() => removeReplica(index)}>
 											<Trash size={20} className='text-icon-base' />
 										</Button>
 									</TooltipTrigger>

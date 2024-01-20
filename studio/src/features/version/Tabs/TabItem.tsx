@@ -1,11 +1,11 @@
+import { Button } from '@/components/Button';
+import { useTabIcon } from '@/hooks';
+import { TabTypes } from '@/types';
 import { cn } from '@/utils';
 import { X } from '@phosphor-icons/react';
-import { Button } from '@/components/Button';
 import { ReactNode } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import { Link } from 'react-router-dom';
-import { TAB_ICON_MAP } from '@/constants';
-import { TabTypes } from '@/types';
 interface TabItemProps {
 	to: string;
 	children: ReactNode;
@@ -36,10 +36,10 @@ export default function TabItem({
 	function close() {
 		onClose?.();
 	}
-	const IconComponent = TAB_ICON_MAP[type];
+	const getTabIcon = useTabIcon('w-3.5 h-3.5');
 	return (
 		<div
-			className={cn('tab-item icon', closeable && 'closeable  min-w-[8.5rem]', active && 'active')}
+			className={cn('tab-item icon', closeable && 'closeable', active && 'active')}
 			{...props}
 			{...provided.draggableProps}
 			{...provided.dragHandleProps}
@@ -49,7 +49,7 @@ export default function TabItem({
 		>
 			<Link title={title} className={cn('tab-item-link')} onClick={onClick} to={to}>
 				<div className='flex items-center gap-2'>
-					{IconComponent && <IconComponent className='w-5 h-5' />}
+					{getTabIcon(type)}
 					{children}
 				</div>
 			</Link>
@@ -58,13 +58,8 @@ export default function TabItem({
 					<span className='text-default rounded-full bg-base-reverse w-2 h-2 absolute group-hover:invisible' />
 				)}
 				{closeable && (
-					<Button
-						iconOnly
-						variant='blank'
-						onClick={close}
-						className='invisible group-hover:visible !h-[unset]'
-					>
-						<X />
+					<Button variant='icon' onClick={close} className='!h-[unset]'>
+						<X size={12} />
 					</Button>
 				)}
 			</div>

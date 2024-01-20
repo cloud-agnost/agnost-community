@@ -11,7 +11,7 @@
 	}
 
 	&[data-state='checked'] {
-		@apply bg-success-default;
+		@apply bg-success;
 
 		.switch-thumb {
 			@apply translate-x-6;

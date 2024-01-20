@@ -17,6 +17,7 @@ const buttonVariants = cva('btn', {
 			link: 'btn-link',
 			blank: 'btn-blank',
 			outline: 'btn-outline',
+			icon: 'btn-icon',
 		},
 		iconOnly: {
 			true: 'btn-icon-only',

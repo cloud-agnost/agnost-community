@@ -27,12 +27,11 @@ export default function SortableItem<T extends { name: string; iid: string }>({
 			<span>{item?.name}</span>
 			<Button
 				onClick={() => onDelete(item?.iid)}
-				iconOnly
+				variant='icon'
 				loading={loading}
-				variant='blank'
 				rounded
 				disabled={disabled}
-				className='ml-auto text-lg text-icon-base aspect-square hover:bg-base hover:text-default'
+				className='ml-auto text-lg'
 			>
 				<Trash />
 			</Button>

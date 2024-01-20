@@ -45,6 +45,7 @@ export default function VersionDatabase() {
 	useUpdateEffect(() => {
 		refetch();
 	}, [orgId, appId, versionId]);
+
 	return (
 		<VersionTabLayout<Database>
 			searchable

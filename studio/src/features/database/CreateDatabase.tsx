@@ -1,9 +1,9 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/Drawer';
 import { Form } from '@/components/Form';
-import { useToast } from '@/hooks';
+import { useTabNavigate, useToast } from '@/hooks';
 import useDatabaseStore from '@/store/database/databaseStore';
 import useResourceStore from '@/store/resources/resourceStore';
-import { APIError, CreateDatabaseSchema } from '@/types';
+import { APIError, CreateDatabaseSchema, TabTypes } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { t } from 'i18next';
@@ -12,7 +12,9 @@ import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import DatabaseForm from './DatabaseForm';
 import useEnvironmentStore from '@/store/environment/environmentStore';
+import useVersionStore from '@/store/version/versionStore';
 export default function CreateDatabase() {
+	const navigate = useTabNavigate();
 	const form = useForm<z.infer<typeof CreateDatabaseSchema>>({
 		resolver: zodResolver(CreateDatabaseSchema),
 		defaultValues: {
@@ -27,12 +29,13 @@ export default function CreateDatabase() {
 	};
 	const { createDatabase, isCreateDatabaseDialogOpen, toggleCreateModal } = useDatabaseStore();
 	const { getEnvironmentResources, environment } = useEnvironmentStore();
+	const { getVersionDashboardPath } = useVersionStore();
 	const resources = useResourceStore((state) =>
 		state.resources.filter((resource) => resource.type === 'database'),
 	);
 	const { mutateAsync: createDatabaseMutation, isPending } = useMutation({
 		mutationFn: createDatabase,
-		onSuccess: () => {
+		onSuccess: (database) => {
 			toggleCreateModal();
 			form.reset();
 			getEnvironmentResources({
@@ -40,6 +43,13 @@ export default function CreateDatabase() {
 				appId: environment?.appId,
 				envId: environment?._id,
 				versionId: environment?.versionId,
+			});
+			navigate({
+				title: database.name,
+				path: getVersionDashboardPath(`database/${database._id}/models`),
+				isActive: true,
+				isDashboard: false,
+				type: TabTypes.Model,
 			});
 		},
 		onError: (error: APIError) => {

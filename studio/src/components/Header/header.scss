@@ -1,6 +1,6 @@
 .header-menu {
 	--height: var(--header-menu-height);
-	@apply bg-base flex justify-between items-center h-[var(--height)] py-3 px-6 border-b border-border;
+	@apply bg-base flex justify-between items-center h-[var(--height)] py-1.5 px-3 border-b border-border;
 	@apply sticky top-0 z-50;
 	&-divider {
 		@apply w-[1px] h-[40px] bg-border;
@@ -21,7 +21,7 @@
 			&-item {
 				@apply flex items-center gap-1 p-2 transition rounded;
 				&:hover {
-					@apply bg-border text-default;
+					@apply bg-wrapper-background-hover text-default;
 				}
 				&-icon {
 					@apply w-4 h-4;
@@ -38,9 +38,6 @@
 				@apply w-[36px] h-[36px] p-0 rounded-full;
 				svg {
 					@apply text-[17px];
-				}
-				&:hover {
-					@apply bg-border text-default;
 				}
 			}
 

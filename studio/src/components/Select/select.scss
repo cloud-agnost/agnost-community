@@ -1,6 +1,6 @@
 .select {
 	@apply flex h-9 items-center justify-between text-default;
-	@apply rounded appearance-none border border-input-border hover:border-input-hover;
+	@apply rounded appearance-none;
 	@apply px-3 py-2 text-sm ring-offset-button-primary;
 	@apply placeholder:text-subtle placeholder:text-sm focus:outline-none;
 	@apply focus:border-input-focus focus:outline-none focus:ring-0;
@@ -11,14 +11,13 @@
 	}
 
 	&-content {
-		@apply relative z-50 min-w-[8rem]  rounded-md border bg-wrapper-background-light;
+		@apply relative z-50 min-w-[8rem] rounded-md bg-input-background border border-border;
 		@apply text-subtle shadow-md max-h-60 overflow-auto;
 	}
 	&-value {
 		@apply flex items-center justify-between;
 	}
 	&-viewport {
-		@apply p-1;
 		&-popper {
 			@apply h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)];
 		}
@@ -27,12 +26,12 @@
 		@apply py-1.5 px-2 text-default text-sm font-semibold;
 	}
 	&-item {
-		@apply grid grid-cols-[10fr_1fr] w-full cursor-pointer select-none rounded-sm;
+		@apply grid grid-cols-[10fr_1fr] w-full cursor-pointer select-none;
 		@apply py-1.5 px-2 text-sm outline-none text-default;
 		@apply focus:bg-subtle focus:text-default;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:text-subtle data-[disabled]:bg-subtle;
 		@apply checked:bg-subtle checked:text-default;
-		@apply truncate max-w-full hover:bg-lighter focus-visible:bg-lighter;
+		@apply truncate max-w-full hover:bg-[#343B4D] focus-visible:bg-lighter;
 		&.no-indicator {
 			@apply block;
 		}
@@ -51,7 +50,7 @@
 		@apply focus:border-input-focus focus:outline-none focus:ring-0;
 		@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border;
 		&-error {
-			@apply border-error-default;
+			@apply border-error;
 		}
 	}
 }

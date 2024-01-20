@@ -93,7 +93,7 @@ export default function VersionDashboard() {
 					<Button
 						variant='blank'
 						key={key}
-						className='bg-wrapper-background-base p-6 rounded-md shadow-sm h-auto block text-left font-normal hover:bg-button-secondary'
+						className='bg-subtle p-6 rounded-md shadow-sm h-auto block text-left font-normal border border-border hover:border-border-hover'
 						onClick={() => clickDashboardItem(capitalize(key), t(`version.dashboard.${key}`))}
 					>
 						<div className='flex items-center gap-4'>

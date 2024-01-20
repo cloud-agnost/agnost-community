@@ -109,20 +109,10 @@ export default function SelectOAuthProviders() {
 								<p className='font-sfCompact text-default'>{capitalize(p.provider)}</p>
 							</div>
 							<div className='invisible group-hover:visible'>
-								<Button
-									variant='blank'
-									iconOnly
-									onClick={() => setEditedProvider(p)}
-									disabled={!canEdit}
-								>
+								<Button variant='icon' onClick={() => setEditedProvider(p)} disabled={!canEdit}>
 									<Pencil className='text-subtle w-5 h-5' />
 								</Button>
-								<Button
-									variant='blank'
-									iconOnly
-									onClick={() => setToDeleteProvider(p)}
-									disabled={!canEdit}
-								>
+								<Button variant='icon' onClick={() => setToDeleteProvider(p)} disabled={!canEdit}>
 									<Trash size={20} className='text-subtle' />
 								</Button>
 							</div>

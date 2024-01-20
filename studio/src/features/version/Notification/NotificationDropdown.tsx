@@ -51,7 +51,7 @@ export default function NotificationDropdown() {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button variant='blank' iconOnly className='relative'>
+				<Button variant='icon' className='relative'>
 					<Bell size={24} />
 				</Button>
 			</DropdownMenuTrigger>

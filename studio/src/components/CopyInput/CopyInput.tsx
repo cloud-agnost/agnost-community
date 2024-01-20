@@ -1,5 +1,5 @@
 import { Input } from '@/components/Input';
-import { cn, copy } from '@/utils';
+import { cn, copyToClipboard } from '@/utils';
 import { Copy } from '@phosphor-icons/react';
 import * as React from 'react';
 import { useState } from 'react';
@@ -27,9 +27,8 @@ const CopyInput = React.forwardRef<HTMLInputElement, React.ComponentPropsWithout
 				/>
 				<Button
 					className='copy-input-button'
-					onClick={() => copy(inputValue)}
-					variant='blank'
-					iconOnly
+					onClick={() => copyToClipboard(inputValue)}
+					variant='icon'
 				>
 					<Copy size={20} />
 				</Button>

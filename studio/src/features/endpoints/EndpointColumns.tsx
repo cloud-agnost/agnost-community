@@ -86,7 +86,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 		id: 'path',
 		header: () => <SortButton text={translate('endpoint.path')} field='path' />,
 		accessorKey: 'path',
-		size: 300,
+		size: 200,
 		cell: ({ row }) => {
 			const { path } = row.original;
 			const copyText = `${BASE_URL}/${env?.iid}${path}`;
@@ -167,7 +167,7 @@ const EndpointColumns: ColumnDefWithClassName<Endpoint>[] = [
 	{
 		id: 'actions',
 		className: 'actions',
-		size: 45,
+		size: 145,
 		cell: ({ row }) => {
 			const canEditEndpoint = getVersionPermission('endpoint.update');
 			const canDeleteEndpoint = getVersionPermission('endpoint.delete');

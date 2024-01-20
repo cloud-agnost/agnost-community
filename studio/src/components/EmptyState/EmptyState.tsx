@@ -5,6 +5,7 @@ import { AppWindow, Bell, Envelope, GlobeSimple, Key, Users } from '@phosphor-ic
 import React, { ElementType } from 'react';
 import { EnvironmentVariable, NpmPackage, RateLimit, Storage } from '../icons';
 import './emptyState.scss';
+import { useTabIcon } from '@/hooks';
 
 export type Modules =
 	| 'org'
@@ -50,10 +51,11 @@ export default function EmptyState({ type, title, className, children }: EmptySt
 		notification: Bell,
 		'custom-domain': GlobeSimple,
 	};
-	const Icon = TAB_ICON_MAP[type as TabTypes] ?? ICON_MAP[type];
+	const getTabIcon = useTabIcon('w-44 h-44');
+	const Icon = ICON_MAP[type];
 	return (
 		<div className={cn('empty-state h-[95%]', className)}>
-			{<Icon className='w-44 h-44 text-icon-base' />}
+			{getTabIcon(type as TabTypes) ?? <Icon className='w-44 h-44 text-icon-base' />}
 			<h2 className='empty-state-title'>{title}</h2>
 			{children}
 		</div>

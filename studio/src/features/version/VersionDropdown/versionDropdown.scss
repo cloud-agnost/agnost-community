@@ -1,6 +1,6 @@
 .version {
 	&-dropdown {
-		@apply w-[210px] h-12 relative border border-border rounded-sm overflow-hidden hover:bg-wrapper-background-hover;
+		@apply w-[210px] h-10 relative rounded-sm overflow-hidden hover:bg-wrapper-background-hover;
 		&-button {
 			@apply absolute z-50 top-0 bottom-0 flex items-center -right-2 pr-2;
 			button {

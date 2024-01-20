@@ -171,7 +171,7 @@ export default function AddOrEditAPIKeyGeneral({
 															type='custom-allowed'
 														>
 															<Button
-																className={cn(endpointError && 'border border-error-default')}
+																className={cn(endpointError && 'border border-error')}
 																onClick={openEndpointDialog}
 															>
 																{t('version.api_key.select_allowed_endpoint')}
@@ -187,7 +187,7 @@ export default function AddOrEditAPIKeyGeneral({
 															type='custom-excluded'
 														>
 															<Button
-																className={cn(endpointError && 'border border-error-default')}
+																className={cn(endpointError && 'border border-error')}
 																onClick={openEndpointDialog}
 															>
 																{t('version.api_key.select_excluded_endpoint')}
