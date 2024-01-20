@@ -46,7 +46,7 @@ export default function CreateDatabase() {
 			});
 			navigate({
 				title: database.name,
-				path: getVersionDashboardPath(`database/${database._id}`),
+				path: getVersionDashboardPath(`database/${database._id}/models`),
 				isActive: true,
 				isDashboard: false,
 				type: TabTypes.Model,
