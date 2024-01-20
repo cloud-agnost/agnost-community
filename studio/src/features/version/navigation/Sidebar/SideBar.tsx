@@ -55,17 +55,16 @@ export default function SideBar() {
 		};
 	}, [isSidebarOpen, tabs]);
 	return (
-		<div className='h-full w-full bg-wrapper-background-base shadow-xl' id='side-navigation'>
-			<div className='pl-6 py-2 border-b border-border mb-1 group flex items-center justify-between'>
+		<div className='h-full w-full bg-base shadow-xl' id='side-navigation'>
+			<div className='pl-6 py-2 border-b border-border group flex items-center justify-between'>
 				<h1 className='text-sm font-bold text-white'>{t('version.explorer')}</h1>
 				<TooltipProvider>
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Button
-								variant='blank'
+								variant='icon'
 								rounded
-								className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6 mr-2 invisible group-hover:visible'
-								iconOnly
+								className='!p-0 !h-6 mr-2 invisible group-hover:visible'
 								size='sm'
 								onClick={collapseAll}
 							>
@@ -76,8 +75,8 @@ export default function SideBar() {
 					</Tooltip>
 				</TooltipProvider>
 			</div>
-			<div className='overflow-y-auto overflow-x-hidden h-[calc(100%-3rem)]'>
-				<OpenTabs />
+			<OpenTabs />
+			<div className='overflow-y-auto overflow-x-hidden h-[calc(100%-13rem)]'>
 				<Workspace />
 				<VersionSettingsExplorer />
 			</div>

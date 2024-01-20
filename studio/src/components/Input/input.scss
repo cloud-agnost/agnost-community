@@ -1,6 +1,6 @@
 .input {
 	@apply flex h-9 w-full px-3 py-2 text-sm text-default bg-input-background rounded appearance-none;
-	@apply border border-input-border hover:border-input-hover;
+	// @apply border border-input-border hover:border-input-hover;
 	@apply file:border-0 file:bg-transparent file:text-sm file:font-medium;
 	@apply placeholder:text-subtle placeholder:text-sm;
 	@apply disabled:cursor-not-allowed disabled:opacity-50;

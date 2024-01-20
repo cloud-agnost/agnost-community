@@ -10,16 +10,16 @@
 		}
 	}
 	&-label {
-		@apply flex items-center px-1.5 rounded-none h-full w-full hover:bg-wrapper-background-hover transition font-normal;
+		@apply flex items-center px-1.5 h-full w-full hover:bg-wrapper-background-hover transition font-normal rounded-sm;
 	}
 	&-dropdown {
-		@apply w-[210px] h-12 relative border border-border rounded-sm;
+		@apply w-[210px] h-10 relative;
 		&-button {
-			@apply absolute z-50 top-1 -right-1  p-1.5;
+			@apply absolute z-50 top-0 -right-1  p-1.5;
 			@apply text-icon-base hover:text-icon-secondary;
 		}
 		&-icon {
-			@apply rounded-full hover:bg-wrapper-background-light w-8 h-8;
+			@apply rounded-full hover:bg-wrapper-background-hover w-8 h-8;
 			@apply flex items-center justify-center;
 		}
 		&-container {
@@ -37,10 +37,10 @@
 			@apply justify-center;
 		}
 		&-label {
-			@apply text-left flex-1 font-sfCompact h-full;
+			@apply text-left flex-1 font-sfCompact h-full flex flex-col justify-center;
 		}
 		&-name {
-			@apply text-sm text-default whitespace-nowrap truncate max-w-[12ch];
+			@apply text-sm leading-none text-default whitespace-nowrap truncate max-w-[12ch];
 		}
 		&-desc {
 			@apply text-xs text-subtle;

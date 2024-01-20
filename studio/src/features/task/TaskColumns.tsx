@@ -99,6 +99,25 @@ const TaskColumns: ColumnDefWithClassName<Task>[] = [
 		header: () => (
 			<SortButton
 				className='whitespace-nowrap'
+				text={translate('general.enabled')}
+				field='logExecution'
+			/>
+		),
+		accessorKey: 'enabled',
+		size: 200,
+		cell: ({ row }) => {
+			const { enabled } = row.original;
+			const enabledText = enabled ? translate('general.enabled') : translate('general.disabled');
+			return (
+				<Badge variant={BADGE_COLOR_MAP[enabledText.toUpperCase()]} text={enabledText} rounded />
+			);
+		},
+	},
+	{
+		id: 'logExecution',
+		header: () => (
+			<SortButton
+				className='whitespace-nowrap'
 				text={translate('task.logExec')}
 				field='logExecution'
 			/>

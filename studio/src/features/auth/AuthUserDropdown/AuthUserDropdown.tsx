@@ -86,7 +86,7 @@ export default function AuthUserDropdown() {
 			<DropdownMenuTrigger>
 				<AuthUserAvatar size='sm' />
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className='w-[210px] p-1' align='end'>
+			<DropdownMenuContent className='w-[210px]' align='end'>
 				<DropdownMenuLabel className='p-3 gap-2 flex flex-col items-center justify-center'>
 					<AuthUserAvatar size='md' />
 					<div className='font-normal text-center -space-y-1'>
@@ -96,7 +96,7 @@ export default function AuthUserDropdown() {
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 
-				<DropdownMenuItemContainer className='space-y-2'>
+				<DropdownMenuItemContainer>
 					<DropdownMenuItem asChild>
 						<Link className={cn('flex items-center gap-2')} to={`/organization/${orgId}/profile`}>
 							<GearSix className='text-icon-base text-lg' />

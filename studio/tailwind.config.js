@@ -57,6 +57,7 @@ module.exports = {
 				},
 
 				border: 'rgba(var(--theme-border), <alpha-value>)',
+				'border-hover': 'rgba(var(--theme-border-hover), <alpha-value>)',
 
 				icon: {
 					secondary: 'rgba(var(--icon-secondary), <alpha-value>)',
@@ -98,6 +99,7 @@ module.exports = {
 					'background-base': 'rgba(var(--wrapper-background-base), <alpha-value>)',
 					'background-hover': 'rgba(var(--wrapper-background-hover), <alpha-value>)',
 					'background-light': 'rgba(var(--wrapper-background-light), <alpha-value>)',
+					border: 'rgba(var(--wrapper-menu-border), <alpha-value>)',
 				},
 				text: {
 					default: 'rgba(var(--text-base), <alpha-value>)',

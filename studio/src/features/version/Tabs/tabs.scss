@@ -6,12 +6,9 @@
 		@apply flex items-stretch bg-subtle divide-x border-l;
 
 		.tab-control-item {
-			@apply flex items-center justify-center aspect-square h-10;
-			button {
-				@apply hover:bg-lighter aspect-square h-8;
-			}
-			&.navigation {
-				@apply w-20;
+			@apply flex items-center justify-center  p-1;
+			.btn {
+				@apply h-6 w-6 p-0;
 			}
 		}
 	}
@@ -45,15 +42,15 @@
 			}
 
 			.tab-item-link {
-				@apply p-2 font-sfCompact;
-				@apply text-subtle text-sm leading-6 font-normal w-full;
+				@apply font-sfCompact;
+				@apply text-subtle text-xs leading-6 font-normal w-full;
 
 				svg {
 					@apply shrink-0;
 				}
 
 				.tab-item-link-text {
-					@apply max-w-[15ch] truncate flex-1;
+					@apply max-w-[30ch] truncate flex-1;
 				}
 			}
 
@@ -63,7 +60,7 @@
 
 			&.icon {
 				.tab-item-link {
-					@apply px-4;
+					@apply pl-2 first:pr-2 flex h-full items-center;
 				}
 			}
 
@@ -75,16 +72,6 @@
 					}
 				}
 			}
-		}
-	}
-}
-
-.tab-dropdown-content {
-	@apply w-[272px] mr-6 mt-3;
-
-	.tab-search-input {
-		input {
-			@apply border-input-border bg-wrapper-background-light font-sfCompact font-normal;
 		}
 	}
 }

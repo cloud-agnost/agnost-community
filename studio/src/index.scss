@@ -6,8 +6,8 @@
 
 @layer base {
 	:root {
-		--header-menu-height: 75px;
-		--navigation-tab-menu-height: 45px;
+		--header-menu-height: 48px;
+		--navigation-tab-menu-height: 32px;
 		--org-menu-height: 71px;
 
 		--font-sans: 'Rubik', sans-serif;
@@ -85,8 +85,8 @@
 		--form-input-disabled-background: 249, 249, 251;
 		--form-input-disabled-border: 237, 238, 243;
 
-		--button-background-base-primary: 74, 108, 253;
-		--button-background-hover-primary: 104, 132, 253;
+		--button-background-base-primary: 0, 83, 166;
+		--button-background-hover-primary: 0, 121, 242;
 		--button-background-base-secondary: 237, 238, 243;
 		--button-background-hover-secondary: 219, 221, 230;
 		--button-background-disabled: 249, 249, 251;
@@ -196,14 +196,15 @@
 	}
 
 	.dark {
-		--theme-base-background: 25, 28, 41;
-		--theme-subtle-background: 33, 37, 48;
-		--theme-lighter-background: 50, 56, 73;
+		--theme-base-background: 14, 21, 37;
+		--theme-subtle-background: 28, 35, 51;
+		--theme-lighter-background: 43, 50, 69;
 		--theme-base-reverse-background: 255, 255, 255;
-		--theme-border: 50, 56, 73;
+		--theme-border: 43, 50, 69;
+		--theme-border-hover: 78, 85, 105;
 
-		--text-base: 255, 255, 255;
-		--text-subtle: 146, 154, 181;
+		--text-base: 245, 249, 252;
+		--text-subtle: 157, 162, 166;
 		--text-disabled: 99, 111, 146;
 
 		--icon-secondary: 255, 255, 255;
@@ -241,16 +242,21 @@
 		--button-border-base: 70, 71, 78;
 
 		--wrapper-background-base: 33, 37, 48;
-		--wrapper-background-hover: 50, 56, 73;
+		--wrapper-background-hover: 60, 68, 92;
+		--wrapper-menu-border: 50, 56, 73;
 		--wrapper-background-light: 42, 47, 60;
 
-		--form-input-base-background: 25, 28, 41;
+		--form-input-base-background: 43, 50, 69;
 		--form-input-base-border: 70, 71, 78;
 		--form-input-hover: 99, 111, 146;
 		--form-input-focus: 134, 157, 254;
 		--form-input-disabled-background: 33, 37, 48;
 		--form-input-disabled-border: 50, 56, 73;
 	}
+}
+
+.flex > * {
+	min-width: 0;
 }
 
 @layer base {
@@ -268,7 +274,7 @@
 		@apply animate-spin mr-2;
 	}
 	.main-layout {
-		height: calc(100vh - 72px);
+		height: calc(100vh - var(--header-menu-height));
 	}
 	.editor {
 		.overflow-guard,

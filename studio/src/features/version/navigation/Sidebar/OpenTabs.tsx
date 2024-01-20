@@ -34,38 +34,38 @@ export default function OpenTabs() {
 			open={sidebar[versionId]?.openEditor || false}
 			onOpenChange={toggleOpenEditorTab}
 			trigger={<OpenTabsTrigger />}
-			className='border-b border-border'
+			className='border-b border-border max-h-[205px]'
 		>
-			<div className='max-h-[200px] overflow-auto'>
+			<div className='max-h-[144px] overflow-auto py-0.5'>
 				{tabs.map((tab) => (
-					<div id={tab.id} key={tab.id} className='relative group h-7 w-full'>
-						<SideBarButton
-							active={tab.isActive}
-							onClick={() => handleClickTabLink(tab)}
-							title={tab.title}
-							type={tab.type}
-							className='h-full'
-						/>
-
-						<div className='bg-transparent h-full flex items-center justify-center pr-0.5 absolute top-0 right-0'>
-							{tab.isDirty && (
-								<span className='text-default rounded-full bg-base-reverse w-2 h-2 absolute group-hover:invisible' />
-							)}
-							{!tab.isDashboard && (
-								<Button
-									iconOnly
-									variant='blank'
-									onClick={() => tabRemoveHandler(tab)}
-									className={cn(
-										'!h-[unset] rounded-full invisible group-hover:visible hover:text-white !p-1',
-										tab.isActive ? 'hover:bg-button-primary' : ' hover:bg-wrapper-background-hover',
-									)}
-								>
-									<X />
-								</Button>
-							)}
-						</div>
-					</div>
+					<SideBarButton
+						key={tab.id}
+						id={tab.id}
+						active={tab.isActive}
+						onClick={() => handleClickTabLink(tab)}
+						title={tab.title}
+						type={tab.type}
+						actions={
+							<div className='flex items-center mr-2'>
+								{tab.isDirty && (
+									<span className='text-default rounded-full bg-base-reverse w-2 h-2 absolute group-hover:invisible' />
+								)}
+								{!tab.isDashboard && (
+									<Button
+										variant='icon'
+										rounded
+										className={cn(
+											tab.isActive && 'hover:bg-button-primary',
+											'!p-0 !h-5  hidden group-hover:inline-flex',
+										)}
+										onClick={() => tabRemoveHandler(tab)}
+									>
+										<X size={14} className='text-subtle group-hover:text-default' />
+									</Button>
+								)}
+							</div>
+						}
+					/>
 				))}
 			</div>
 		</ExplorerCollapsible>
@@ -85,20 +85,29 @@ function OpenTabsTrigger() {
 				className='justify-start pl-0 w-full text-left font-normal text-sm'
 				onClick={toggleOpenEditorTab}
 			>
-				Open Tabs
+				<h1
+					title='Open Tabs'
+					className={cn(
+						'truncate max-w-[15ch] text-sm text-default font-sfCompact',
+						sidebar[versionId]?.openEditor
+							? 'text-default'
+							: 'text-subtle group-hover:text-default',
+					)}
+				>
+					Open Tabs
+				</h1>
 			</Button>
 			<TooltipProvider>
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<Button
-							variant='blank'
 							rounded
-							className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default !p-0 !h-6 mr-2 invisible group-hover:visible'
-							iconOnly
+							className='h-full !w-6 p-0.5 mr-2 invisible group-hover:visible'
+							variant='icon'
 							size='sm'
 							onClick={() => removeAllTabs(versionId)}
 						>
-							<XSquare size={16} />
+							<XSquare size={14} />
 						</Button>
 					</TooltipTrigger>
 					<TooltipContent>{t('version.close_all_tabs')}</TooltipContent>

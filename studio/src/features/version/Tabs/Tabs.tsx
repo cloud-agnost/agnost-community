@@ -222,35 +222,24 @@ export default function Tabs() {
 			<div className='tab-control'>
 				{isScrollable && (
 					<div className='tab-control-item navigation'>
-						<Button
-							rounded
-							variant='blank'
-							iconOnly
-							onClick={() => move('prev')}
-							disabled={startOfScroll}
-						>
+						<Button rounded variant='icon' onClick={() => move('prev')} disabled={startOfScroll}>
 							<CaretLeft size={15} />
 						</Button>
-						<Button
-							rounded
-							variant='blank'
-							iconOnly
-							onClick={() => move('next')}
-							disabled={endOfScroll}
-						>
+						<Button rounded variant='icon' onClick={() => move('next')} disabled={endOfScroll}>
 							<CaretRight size={15} />
 						</Button>
 					</div>
 				)}
-				<div className={'tab-control-item'}>
+				<div className='tab-control-item'>
 					<Button
 						rounded
-						variant='blank'
-						iconOnly
+						variant='icon'
 						onClick={toggleSidebar}
-						className={cn(isSidebarOpen && 'bg-button-primary/50 rounded-full')}
+						className={cn(
+							isSidebarOpen && 'bg-button-primary/70 hover:bg-button-primary text-default',
+						)}
 					>
-						<Sidebar size={15} />
+						<Sidebar size={14} />
 					</Button>
 				</div>
 				<div className='tab-control-item'>

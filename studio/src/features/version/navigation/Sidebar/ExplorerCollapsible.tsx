@@ -40,15 +40,27 @@ export function ExplorerCollapsibleTrigger({
 	active: boolean;
 }) {
 	return (
-		<div className='hover:bg-wrapper-background-hover group h-7 flex items-center justify-center'>
+		<div className='hover:bg-subtle group h-6 flex items-center justify-center group'>
 			<div className='flex items-center justify-start gap-1 w-full pl-1'>
 				<CollapsibleTrigger asChild>
 					<Button variant='blank' className='gap-1'>
 						<CaretRight
-							size={16}
-							className={cn('transition-transform duration-200', active && 'rotate-90')}
+							size={14}
+							className={cn(
+								'transition-transform duration-200 text-subtle group-hover:text-default',
+								active && 'rotate-90 text-default',
+							)}
 						/>
-						{title && <h1 className='flex-1 text-left font-normal'>{title}</h1>}
+						{title && (
+							<h1
+								className={cn(
+									'flex-1 text-left font-normal text-sm',
+									active ? 'text-default' : 'text-subtle group-hover:text-default',
+								)}
+							>
+								{title}
+							</h1>
+						)}
 					</Button>
 				</CollapsibleTrigger>
 				<div className='flex-1 flex justify-between items-center'>{children}</div>

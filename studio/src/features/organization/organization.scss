@@ -24,12 +24,12 @@
 		@apply flex items-center px-1 hover:rounded h-full;
 	}
 	&-dropdown {
-		@apply w-[210px] h-12 relative border border-border rounded-sm;
+		@apply w-[210px] h-10 relative;
 		& a {
-			@apply w-full h-full hover:bg-wrapper-background-hover block;
+			@apply w-full h-full hover:bg-wrapper-background-hover block rounded-sm;
 		}
 		&-button {
-			@apply absolute z-50 top-1 right-0  p-1.5;
+			@apply absolute z-50 top-0 right-0  p-1.5;
 			@apply text-icon-base hover:text-icon-secondary;
 		}
 		&-icon {
@@ -52,7 +52,7 @@
 			justify-content: center !important;
 		}
 		&-label {
-			@apply text-left flex-1 font-sfCompact h-full;
+			@apply text-left flex-1 font-sfCompact h-full flex flex-col justify-center;
 		}
 		&-name {
 			@apply text-sm text-default whitespace-nowrap truncate max-w-[12ch];

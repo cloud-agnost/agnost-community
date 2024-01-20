@@ -1,6 +1,6 @@
 .dropdown {
 	&-sub-trigger {
-		@apply flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none;
+		@apply flex cursor-default select-none items-center px-2 py-1.5 text-sm outline-none;
 	}
 
 	&-sub-content {
@@ -8,13 +8,13 @@
 	}
 
 	&-content {
-		@apply bg-wrapper-background-base;
+		@apply bg-subtle;
 		@apply z-50 min-w-[8rem] overflow-hidden rounded-sm border shadow-md animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
 	}
 
 	&-item {
-		@apply relative flex cursor-pointer select-none items-center rounded-sm font-sfCompact;
-		@apply px-3 py-1.5 text-sm text-default outline-none transition-colors;
+		@apply relative flex cursor-pointer select-none items-center font-sfCompact;
+		@apply px-3 py-1 text-sm text-default outline-none transition-colors;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
 		&:hover,
 		&:focus-visible,
@@ -24,7 +24,7 @@
 	}
 
 	&-checkbox-item {
-		@apply relative flex cursor-pointer select-none items-center rounded-sm text-default;
+		@apply relative flex cursor-pointer select-none items-center text-default;
 		@apply font-sfCompact py-1.5 pl-8 pr-2 text-sm outline-none transition-colors;
 		@apply data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
 		> span {
@@ -37,7 +37,7 @@
 	}
 
 	&-radio-item {
-		@apply relative flex cursor-default select-none items-center font-sfCompact rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
+		@apply relative flex cursor-default select-none items-center font-sfCompact py-1.5 pl-8 pr-2 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
 
 		> span {
 			@apply absolute left-2 flex h-3.5 w-3.5 items-center justify-center;
@@ -49,11 +49,11 @@
 	}
 
 	&-item-container {
-		@apply flex flex-col gap-0.5 p-0.5 bg-wrapper-background-base text-default;
+		@apply flex flex-col bg-subtle text-default;
 	}
 
 	&-separator {
-		@apply -mx-1 my-1 h-px bg-wrapper-background-hover;
+		@apply h-px bg-wrapper-border m-0;
 	}
 
 	&-shortcut {
