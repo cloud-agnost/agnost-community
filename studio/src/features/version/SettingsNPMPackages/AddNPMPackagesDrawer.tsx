@@ -94,10 +94,10 @@ export default function AddNPMPackagesDrawer({ open, onOpenChange }: AddNPMPacka
 					<SearchInput
 						onClear={() => setPackages(null)}
 						onSearch={(value) => onSearch(value, true)}
-						className='[&_input]:bg-transparent'
 						placeholder={t('forms.placeholder', {
 							label: t('version.npm.name'),
 						}).toString()}
+						canAddParam={false}
 					/>
 					{packages && (
 						<InfiniteScroll
