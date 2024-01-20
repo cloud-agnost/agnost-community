@@ -20,15 +20,7 @@ const DatabaseColumns: ColumnDefWithClassName<Database>[] = [
 		enableSorting: true,
 		size: 200,
 		cell: ({ row: { original } }) => {
-			const { setDatabase } = useDatabaseStore.getState();
-			return (
-				<TabLink
-					name={original.name}
-					path={`${original._id}/models`}
-					type={TabTypes.Model}
-					onClick={() => setDatabase(original)}
-				/>
-			);
+			return <TabLink name={original.name} path={`${original._id}/models`} type={TabTypes.Model} />;
 		},
 	},
 	{
