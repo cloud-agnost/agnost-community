@@ -1,5 +1,5 @@
 import { Button } from '@/components/Button';
-import { NEW_TAB_ITEMS, TAB_ICON_MAP } from '@/constants';
+import { NEW_TAB_ITEMS } from '@/constants';
 import { useTabIcon } from '@/hooks';
 import useTabStore from '@/store/version/tabStore.ts';
 import useVersionStore from '@/store/version/versionStore';

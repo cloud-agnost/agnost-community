@@ -25,7 +25,10 @@ export default function DomainList() {
 		},
 	});
 	return cluster.domains.map((domain) => (
-		<div className='flex items-center justify-between space-x-2 bg-wrapper-background-base p-3 rounded group'>
+		<div
+			className='flex items-center justify-between space-x-2 bg-wrapper-background-base p-3 rounded group'
+			key={domain}
+		>
 			<p className='text-default font-sfCompact'>{domain}</p>
 			<TableConfirmation
 				align='end'
