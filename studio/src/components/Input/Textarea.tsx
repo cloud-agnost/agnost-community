@@ -16,8 +16,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 					className={cn(
 						'flex min-h-[60px] w-full rounded-md border border-input-border bg-input-background px-3 py-2 text-sm text-default shadow-sm placeholder:text-subtle focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-input-disabled-background disabled:border-input-disabled-border',
 						className,
-						error && 'border-error-default',
-						// count === props.maxLength && ‘border-error-default’,
+						error && 'border-error',
+						// count === props.maxLength && ‘border-error’,
 					)}
 					ref={ref}
 					onInput={(e) => setCount(e.currentTarget.value.length)}

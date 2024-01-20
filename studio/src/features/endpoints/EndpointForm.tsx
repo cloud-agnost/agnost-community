@@ -84,7 +84,7 @@ export default function EndpointForm({ loading }: { loading: boolean }) {
 			<Label
 				className={cn(
 					(Boolean(form.formState.errors.method) || Boolean(form.formState.errors.path)) &&
-						'text-error-default',
+						'text-error',
 				)}
 			>
 				{t('endpoint.create.methodAndPath')}

@@ -7,7 +7,7 @@
 	@apply focus:border-input-focus focus:outline-none focus:ring-0;
 	@apply disabled:bg-input-disabled-background disabled:border-input-disabled-border;
 	&-error {
-		@apply border-error-default;
+		@apply border-error;
 	}
 }
 

@@ -1,6 +1,5 @@
 import { Button } from '@/components/Button';
-import { Pencil } from '@/components/icons';
-import { Trash } from '@phosphor-icons/react';
+import { Trash, Pencil } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
 interface ActionCellProps<T> {

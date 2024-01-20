@@ -15,177 +15,6 @@
 		--font-sf: 'SF Compact Display', sans-serif;
 		--font-mono: 'Space Mono', monospace;
 
-		/* Color styles */
-		--brand-color-primary--darker: 37, 54, 127;
-		--brand-color-primary: 104, 132, 253;
-		--brand-color-subtle--primary: 46, 106, 246;
-
-		--elements-strong--blue: 49, 72, 169;
-		--elements-blue: 104, 132, 253;
-		--elements-subtle-blue: 195, 206, 254;
-
-		--elements-strong-green: 11, 125, 70;
-		--elements-green: 57, 198, 130;
-		--elements-subtle-green: 176, 232, 205;
-
-		--elements-strong-yellow: 155, 123, 8;
-		--elements-yellow: 237, 197, 53;
-		--elements-subtle-yellow: 248, 232, 174;
-
-		--elements-strong-purple: 131, 49, 169;
-		--elements-purple: 206, 104, 253;
-		--elements-subtle-purple: 235, 195, 254;
-
-		--elements-strong-red: 159, 45, 73;
-		--elements-red: 241, 99, 133;
-		--elements-subtle-red: 249, 193, 206;
-
-		--elements-strong-orange: 155, 70, 8;
-		--elements-orange: 237, 130, 53;
-		--elements-subtle-orange: 248, 205, 174;
-
-		--success-default: 14, 156, 88;
-		--success-hover: 57, 198, 130;
-		--success-focus: 9, 94, 53;
-
-		--error-default: 198, 57, 91;
-		--error-hover: 241, 99, 133;
-		--error-focus: 119, 34, 55;
-
-		--theme-base-background: 255, 255, 255;
-		--theme-subtle-background: 249, 249, 251;
-		--theme-lighter-background: 237, 238, 243;
-		--theme-border: 237, 238, 243;
-
-		--theme-base-reverse-background: 25, 28, 41;
-		--theme-subtle-reverse-background: 33, 37, 48;
-		--theme-lighter-reverse-background: 50, 56, 73;
-		--theme-border-reverse: 50, 56, 73;
-
-		--text-base: 25, 28, 41;
-		--text-subtle: 146, 154, 181;
-		--text-disabled: 219, 221, 230;
-
-		--icon-secondary: 33, 37, 48;
-		--icon-base: 146, 154, 181;
-		--icon-disabled: 219, 221, 230;
-
-		--text-base-reverse: 255, 255, 255;
-		--text-subtle-reverse: 146, 154, 181;
-		--text-disabled-reverse: 99, 111, 146;
-
-		--icon-secondary-reverse: 255, 255, 255;
-		--icon-base-reverse: 146, 154, 181;
-		--icon-disabled-reverse: 99, 111, 146;
-
-		--form-input-base-background: 255, 255, 255;
-		--form-input-base-border: 219, 221, 230;
-		--form-input-hover: 146, 154, 181;
-		--form-input-focus: 134, 157, 254;
-		--form-input-disabled-background: 249, 249, 251;
-		--form-input-disabled-border: 237, 238, 243;
-
-		--button-background-base-primary: 0, 83, 166;
-		--button-background-hover-primary: 0, 121, 242;
-		--button-background-base-secondary: 237, 238, 243;
-		--button-background-hover-secondary: 219, 221, 230;
-		--button-background-disabled: 249, 249, 251;
-
-		--button-border-hover: 146, 154, 181;
-		--button-border-disabled: 249, 249, 251;
-		--button-border-base: 219, 221, 230;
-
-		--surface-blue: 219, 226, 255;
-		--surface-dark-blue: 25, 36, 84;
-		--surface-green: 207, 241, 225;
-		--surface-yellow: 251, 241, 206;
-		--surface-purple: 243, 219, 255;
-		--surface-red: 252, 218, 226;
-		--surface-orange: 251, 225, 206;
-
-		--orange-50: 251, 225, 206;
-		--orange-100: 248, 205, 174;
-		--orange-200: 244, 180, 133;
-		--orange-300: 240, 155, 93;
-		--orange-400: 237, 130, 53;
-		--orange-500: 233, 105, 12;
-		--orange-600: 194, 88, 10;
-		--orange-700: 155, 70, 8;
-		--orange-800: 117, 53, 6;
-		--orange-900: 78, 35, 4;
-
-		--neutral-50: 255, 255, 255;
-		--neutral-100: 249, 249, 251;
-		--neutral-200: 237, 238, 243;
-		--neutral-300: 219, 221, 230;
-		--neutral-400: 146, 154, 181;
-		--neutral-500: 99, 111, 146;
-		--neutral-600: 70, 71, 78;
-		--neutral-650: 66, 74, 97;
-		--neutral-700: 50, 56, 73;
-		--neutral-750: 42, 47, 60;
-		--neutral-800: 33, 37, 48;
-		--neutral-900: 25, 28, 41;
-
-		--blue-50: 219, 226, 255;
-		--blue-100: 195, 206, 254;
-		--blue-200: 164, 181, 254;
-		--blue-300: 134, 157, 254;
-		--blue-400: 104, 132, 253;
-		--blue-500: 74, 108, 253;
-		--blue-600: 62, 90, 211;
-		--blue-700: 49, 72, 169;
-		--blue-800: 37, 54, 127;
-		--blue-900: 25, 36, 84;
-
-		--yellow-50: 251, 241, 206;
-		--yellow-100: 248, 232, 174;
-		--yellow-200: 244, 220, 133;
-		--yellow-300: 240, 208, 93;
-		--yellow-400: 237, 197, 53;
-		--yellow-500: 233, 185, 12;
-		--yellow-600: 194, 154, 10;
-		--yellow-700: 155, 123, 8;
-		--yellow-800: 117, 93, 6;
-		--yellow-900: 78, 62, 4;
-
-		--purple-50: 243, 219, 255;
-		--purple-100: 235, 195, 254;
-		--purple-200: 225, 164, 254;
-		--purple-300: 216, 134, 254;
-		--purple-400: 206, 104, 253;
-		--purple-500: 196, 74, 253;
-		--purple-600: 163, 62, 211;
-		--purple-700: 131, 49, 169;
-		--purple-800: 98, 37, 127;
-		--purple-900: 65, 25, 84;
-
-		--red-50: 252, 218, 226;
-		--red-100: 249, 193, 206;
-		--red-200: 246, 161, 182;
-		--red-300: 244, 130, 158;
-		--red-400: 241, 99, 133;
-		--red-500: 238, 68, 109;
-		--red-600: 198, 57, 91;
-		--red-700: 159, 45, 73;
-		--red-800: 119, 34, 55;
-		--red-900: 79, 23, 36;
-
-		--green-50: 207, 241, 225;
-		--green-100: 176, 232, 205;
-		--green-200: 136, 221, 180;
-		--green-300: 96, 210, 155;
-		--green-400: 57, 198, 130;
-		--green-500: 17, 187, 105;
-		--green-600: 14, 156, 88;
-		--green-700: 11, 125, 70;
-		--green-800: 9, 94, 53;
-		--green-900: 6, 62, 35;
-
-		--wrapper-background-base: 249, 249, 251;
-		--wrapper-background-hover: 237, 238, 243;
-		--wrapper-background-light: 247, 248, 250;
-
 		--radius: 0.5rem;
 
 		--font-size-xs: 0.75rem;
@@ -193,65 +22,168 @@
 
 		--font-size-sm: 0.875rem;
 		--font-size-sm-line-height: 1.5rem;
+
+		--brand-color-primary: #6884fd;
+
+		--elements-strong--blue: #3148a9;
+		--elements-blue: #6884fd;
+		--elements-subtle-blue: #c3cefe;
+
+		--elements-strong-green: #0b7d46;
+		--elements-green: #39c682;
+		--elements-subtle-green: #b0e8cd;
+
+		--elements-strong-yellow: #9b7b08;
+		--elements-yellow: #edc535;
+		--elements-subtle-yellow: #f8e8ae;
+
+		--elements-strong-purple: #8331a9;
+		--elements-purple: #ce68fd;
+		--elements-subtle-purple: #ebc3fe;
+
+		--elements-strong-red: #9f2d49;
+		--elements-red: #f16385;
+		--elements-subtle-red: #f9c1ce;
+
+		--elements-strong-orange: #9b4608;
+		--elements-orange: #ed8235;
+		--elements-subtle-orange: #f8cdae;
+
+		--success: #0e9c58;
+		--error: #c6395b;
+
+		--theme-base-background: #ffffff;
+		--theme-subtle-background: #f9f9fb;
+		--theme-lighter-background: #edeef3;
+		--theme-border: #edeef3;
+
+		--theme-base-reverse-background: #191c29;
+		--theme-subtle-reverse-background: #212530;
+		--theme-lighter-reverse-background: #323849;
+		--theme-border-reverse: #323849;
+
+		--text-base: #191c29;
+		--text-subtle: #929ab5;
+		--text-disabled: #dbdde6;
+
+		--icon-secondary: #212530;
+		--icon-base: #929ab5;
+		--icon-disabled: #dbdde6;
+
+		--text-base-reverse: #ffffff;
+		--text-subtle-reverse: #929ab5;
+		--text-disabled-reverse: #63718e;
+
+		--icon-secondary-reverse: #ffffff;
+		--icon-base-reverse: #929ab5;
+		--icon-disabled-reverse: #63718e;
+
+		--form-input-base-background: #ffffff;
+		--form-input-base-border: #dbdde6;
+		--form-input-hover: #929ab5;
+		--form-input-focus: #869dfe;
+		--form-input-disabled-background: #f9f9fb;
+		--form-input-disabled-border: #edeef3;
+
+		--button-background-base-primary: #0053a6;
+		--button-background-hover-primary: #0079f2;
+		--button-background-base-secondary: #edeef3;
+		--button-background-hover-secondary: #dbdde6;
+		--button-background-disabled: #f9f9fb;
+
+		--button-border-hover: #929ab5;
+		--button-border-disabled: #f9f9fb;
+		--button-border-base: #dbdde6;
+
+		--surface-green: #cff1e1;
+		--surface-yellow: #fbf1ce;
+		--surface-red: #fcdae2;
+
+		--wrapper-background-base: #f9f9fb;
+		--wrapper-background-hover: #edeef3;
+		--wrapper-background-light: #f7f8fa;
+
+		--database: #004d0d;
+		--model: #967d00;
+		--field: #d4359f;
+		--cache: #0079f2;
+		--storage: #009118;
+		--bucket: #009380;
+		--file: #5a8700;
+		--endpoint: #0093b0;
+		--middleware: #795eff;
+		--function: #c73ac7;
+		--queue: #ad5700;
+		--task: #e52222;
 	}
 
 	.dark {
-		--theme-base-background: 14, 21, 37;
-		--theme-subtle-background: 28, 35, 51;
-		--theme-lighter-background: 43, 50, 69;
-		--theme-base-reverse-background: 255, 255, 255;
-		--theme-border: 43, 50, 69;
-		--theme-border-hover: 78, 85, 105;
+		--theme-base-background: #0e1525;
+		--theme-subtle-background: #1c2333;
+		--theme-lighter-background: #2b3245;
+		--theme-base-reverse-background: #ffffff;
+		--theme-border: #2b3245;
+		--theme-border-hover: #4e5569;
 
-		--text-base: 245, 249, 252;
-		--text-subtle: 157, 162, 166;
-		--text-disabled: 99, 111, 146;
+		--text-base: #f5f9fc;
+		--text-subtle: #9da2a6;
+		--text-disabled: #636f92;
 
-		--icon-secondary: 255, 255, 255;
-		--icon-base: 146, 154, 181;
-		--icon-disabled: 99, 111, 146;
+		--icon-secondary: #ffffff;
+		--icon-base: #929ab5;
+		--icon-disabled: #63718e;
 
-		--theme-base-reverse-background: 255, 255, 255;
-		--theme-subtle-reverse-background: 249, 249, 251;
-		--theme-lighter-reverse-background: 237, 238, 243;
-		--theme-border-reverse: 237, 238, 243;
+		--theme-base-reverse-background: #ffffff;
+		--theme-subtle-reverse-background: #f9f9fb;
+		--theme-lighter-reverse-background: #edeef3;
+		--theme-border-reverse: #edeef3;
 
-		--text-base-reverse: 25, 28, 41;
-		--text-subtle-reverse: 146, 154, 181;
-		--text-disabled-reverse: 219, 221, 230;
+		--text-base-reverse: #191c29;
+		--text-subtle-reverse: #929ab5;
+		--text-disabled-reverse: #dbdde6;
 
-		--icon-secondary-reverse: 33, 37, 48;
-		--icon-base-reverse: 146, 154, 181;
-		--icon-disabled-reverse: 219, 221, 230;
+		--icon-secondary-reverse: #212530;
+		--icon-base-reverse: #929ab5;
+		--icon-disabled-reverse: #dbdde6;
 
-		--surface-blue: 25, 36, 84;
-		--surface-green: 6, 62, 35;
-		--surface-yellow: 78, 62, 4;
-		--surface-purple: 65, 25, 84;
-		--surface-red: 79, 23, 36;
-		--surface-orange: 78, 35, 4;
+		--surface-green: #063e23;
+		--surface-yellow: #4e3e04;
+		--surface-red: #4f1724;
 
-		--button-background-base-secondary: 50, 56, 73;
-		--button-background-hover-secondary: 66, 74, 97;
-		--button-background-border-secondary: 70, 71, 78;
-		--button-background-border-hover-secondary: 99, 111, 146;
-		--button-background-disabled: 33, 37, 48;
+		--button-background-base-secondary: #323849;
+		--button-background-hover-secondary: #424a61;
+		--button-background-border-secondary: #46474e;
+		--button-background-border-hover-secondary: #636f92;
+		--button-background-disabled: #212530;
 
-		--button-border-hover: 66, 74, 97;
-		--button-border-disabled: 33, 37, 48;
-		--button-border-base: 70, 71, 78;
+		--button-border-hover: #424a61;
+		--button-border-disabled: #212530;
+		--button-border-base: #46474e;
 
-		--wrapper-background-base: 33, 37, 48;
-		--wrapper-background-hover: 60, 68, 92;
-		--wrapper-menu-border: 50, 56, 73;
-		--wrapper-background-light: 42, 47, 60;
+		--wrapper-background-base: #212530;
+		--wrapper-background-hover: #3c445c;
+		--wrapper-menu-border: #323849;
+		--wrapper-background-light: #2a2f3c;
 
-		--form-input-base-background: 43, 50, 69;
-		--form-input-base-border: 70, 71, 78;
-		--form-input-hover: 99, 111, 146;
-		--form-input-focus: 134, 157, 254;
-		--form-input-disabled-background: 33, 37, 48;
-		--form-input-disabled-border: 50, 56, 73;
+		--form-input-base-background: #2b3245;
+		--form-input-base-border: #46474e;
+		--form-input-hover: #636f92;
+		--form-input-focus: #869dfe;
+		--form-input-disabled-background: #212530;
+		--form-input-disabled-border: #323849;
+
+		--database: #7aeb8d;
+		--model: #f2e088;
+		--field: #ffbae8;
+		--cache: #b2d9ff;
+		--storage: #bfffca;
+		--bucket: #69d9f0;
+		--file: #c4e581;
+		--endpoint: #69d9f0;
+		--middleware: #cec4ff;
+		--function: #ffbfff;
+		--queue: #ffbd7a;
+		--task: #ffcfcf;
 	}
 }
 
@@ -547,7 +479,7 @@ html .light ::-webkit-scrollbar-track {
 }
 
 .select-box.error:not(:focus-within) .select__control {
-	@apply border-error-default #{!important};
+	@apply border-error #{!important};
 }
 .select__placeholder,
 .select__input-container {

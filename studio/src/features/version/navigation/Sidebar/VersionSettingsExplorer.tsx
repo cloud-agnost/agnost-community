@@ -37,15 +37,18 @@ export default function VersionSettingsExplorer() {
 					onClick={() => handleAddTab(item)}
 					asChild
 				>
-					<item.icon
-						className={cn(
-							tab.title === item.title
-								? 'text-icon-secondary'
-								: 'text-subtle group-hover:text-default',
-						)}
-					/>
+					<div className='flex-1/2'>
+						<item.icon
+							className={cn(
+								tab.title === item.title
+									? 'text-icon-secondary'
+									: 'text-subtle group-hover:text-default',
+							)}
+						/>
+					</div>
 					<p
 						className={cn(
+							'truncate',
 							tab.title === item.title ? 'text-default' : 'text-subtle group-hover:text-default',
 						)}
 					>

@@ -807,7 +807,6 @@ export const TAB_ICON_MAP: Record<TabTypes, ElementType> = {
 	[TabTypes.Cache]: Lightning,
 	[TabTypes.Endpoint]: ApiKeys,
 	[TabTypes.MessageQueue]: MessageQueue,
-	[TabTypes.Queue]: MessageQueue,
 	[TabTypes.Task]: Timer,
 	[TabTypes.Middleware]: SkipForward,
 	[TabTypes.Settings]: GearSix,

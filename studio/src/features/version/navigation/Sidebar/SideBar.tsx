@@ -3,7 +3,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import useTabStore from '@/store/version/tabStore';
 import useUtilsStore from '@/store/version/utilsStore';
 import { TabTypes } from '@/types';
-import { isElementInViewport } from '@/utils';
+import { cn, isElementInViewport } from '@/utils';
 import { MinusSquare } from '@phosphor-icons/react';
 import { useEffect, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,7 @@ import VersionSettingsExplorer from './VersionSettingsExplorer';
 import Workspace from './Workspace';
 export default function SideBar() {
 	const { t } = useTranslation();
-	const { toggleSidebar, isSidebarOpen, collapseAll } = useUtilsStore();
+	const { toggleSidebar, isSidebarOpen, collapseAll, sidebar } = useUtilsStore();
 	const { getCurrentTab, tabs } = useTabStore();
 	const { versionId } = useParams() as Record<string, string>;
 
@@ -76,7 +76,12 @@ export default function SideBar() {
 				</TooltipProvider>
 			</div>
 			<OpenTabs />
-			<div className='overflow-y-auto overflow-x-hidden h-[calc(100%-13rem)]'>
+			<div
+				className={cn(
+					'overflow-y-auto overflow-x-hidden pb-2',
+					sidebar[versionId].openEditor ? 'h-[calc(100%-13rem)]' : 'h-[calc(100%-4rem)]',
+				)}
+			>
 				<Workspace />
 				<VersionSettingsExplorer />
 			</div>
