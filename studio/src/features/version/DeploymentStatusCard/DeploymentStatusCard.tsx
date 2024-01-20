@@ -71,7 +71,7 @@ export default function DeploymentStatusCard() {
 		<>
 			<DropdownMenu onOpenChange={(open) => handleOpenChange(open)}>
 				<DropdownMenuTrigger asChild>
-					<Button variant='blank' iconOnly className='relative'>
+					<Button variant='icon' className='relative'>
 						<div className='absolute top-1 right-0.5'>
 							<span className='relative flex items-center justify-center h-3 w-3'>
 								<span
@@ -94,10 +94,8 @@ export default function DeploymentStatusCard() {
 								<TooltipTrigger asChild>
 									<Button
 										onClick={redeploy}
-										variant='blank'
-										iconOnly
+										variant='icon'
 										rounded
-										className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
 										disabled={envStatus === EnvironmentStatus.Deploying || !canDeploy}
 									>
 										<Refresh

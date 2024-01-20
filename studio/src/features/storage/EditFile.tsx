@@ -172,9 +172,9 @@ export default function EditFile({ open, onClose }: EditFileProps) {
 											)}
 										/>
 										<Button
+											iconOnly
 											variant='secondary'
 											disabled={fields.length === 1}
-											iconOnly
 											className={cn(
 												!index && 'self-end',
 												!isEmpty(form.formState.errors) && !index && 'self-center mt-2',

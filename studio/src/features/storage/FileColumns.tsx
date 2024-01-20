@@ -223,13 +223,7 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 					<TooltipProvider>
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<Button
-									iconOnly
-									variant='blank'
-									rounded
-									className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-									onClick={() => copyFile(original.path)}
-								>
+								<Button variant='icon' rounded onClick={() => copyFile(original.path)}>
 									<Copy />
 								</Button>
 							</TooltipTrigger>
@@ -239,13 +233,7 @@ const FileColumns: ColumnDefWithClassName<BucketFile>[] = [
 					<TooltipProvider>
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<Button
-									iconOnly
-									variant='blank'
-									rounded
-									className='text-xl hover:bg-wrapper-background-hover text-icon-base'
-									onClick={() => replaceFile(original.path)}
-								>
+								<Button variant='icon' rounded onClick={() => replaceFile(original.path)}>
 									<Swap />
 								</Button>
 							</TooltipTrigger>

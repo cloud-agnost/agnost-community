@@ -129,9 +129,9 @@ export default function RedirectURLs() {
 							/>
 
 							<Button
+								iconOnly
 								variant='secondary'
 								disabled={fields.length === 1}
-								iconOnly
 								className={cn(
 									!index && 'self-end',
 									!isEmpty(form.formState.errors) && !index && 'self-center mt-2',

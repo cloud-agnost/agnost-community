@@ -14,14 +14,7 @@ export default function ResendButton({ onResend, disabled }: Props) {
 		<TooltipProvider>
 			<Tooltip>
 				<TooltipTrigger asChild>
-					<Button
-						variant='blank'
-						rounded
-						disabled={disabled}
-						className='hover:bg-button-border-hover aspect-square text-icon-base hover:text-default'
-						iconOnly
-						onClick={onResend}
-					>
+					<Button variant='icon' rounded disabled={disabled} onClick={onResend}>
 						<EnvelopeSimple size={20} />
 					</Button>
 				</TooltipTrigger>

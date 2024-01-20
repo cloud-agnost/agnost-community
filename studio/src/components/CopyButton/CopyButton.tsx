@@ -10,12 +10,8 @@ export default function CopyButton({ text, className }: CopyButtonProps) {
 	return (
 		<Button
 			onClick={() => copyToClipboard(text)}
-			variant='blank'
-			className={cn(
-				'bg-button-secondary text-base w-7 h-7 p-[6px] hover:bg-button-secondary-hover border border-button-border hover:border-button-border-hover',
-				className,
-			)}
-			iconOnly
+			className={cn('w-7 h-7 p-[6px] ', className)}
+			variant='secondary'
 		>
 			<Copy />
 		</Button>

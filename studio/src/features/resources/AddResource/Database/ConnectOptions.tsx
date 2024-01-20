@@ -70,8 +70,8 @@ export default function ConnectOptions() {
 						)}
 					/>
 					<Button
-						variant='secondary'
 						iconOnly
+						variant='secondary'
 						className={cn(
 							!index && 'self-end',
 							!isEmpty(errors) && !index && 'self-center mt-2',

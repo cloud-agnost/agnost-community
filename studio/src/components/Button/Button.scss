@@ -62,6 +62,9 @@
 	&-icon-only {
 		@apply p-2;
 	}
+	&-icon {
+		@apply p-2 hover:bg-wrapper-background-hover text-icon-base hover:text-default aspect-square;
+	}
 }
 
 .btn:disabled.btn-link,

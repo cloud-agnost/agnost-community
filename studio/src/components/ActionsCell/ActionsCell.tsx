@@ -30,10 +30,9 @@ function ActionsCell<T>({
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<Button
-							iconOnly
-							variant='blank'
+							variant='icon'
 							rounded
-							className='text-xl hover:bg-wrapper-background-hover text-icon-base hover:text-default aspect-square'
+							className='text-xl'
 							onClick={() => onEdit?.(original)}
 							disabled={disabled || !canEdit}
 						>
@@ -49,10 +48,8 @@ function ActionsCell<T>({
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Button
-								variant='blank'
 								rounded
-								className='hover:bg-wrapper-background-hover text-icon-base hover:text-default aspect-square'
-								iconOnly
+								variant='icon'
 								onClick={() => onDelete?.(original)}
 								disabled={disabled || !canDelete}
 							>

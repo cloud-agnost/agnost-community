@@ -55,7 +55,7 @@ export default function DeploymentSettings({ isOpen, close }: DeploymentSettings
 					className='deployment-settings'
 				>
 					<header className='deployment-settings-header'>
-						<Button onClick={close} rounded variant='blank' iconOnly>
+						<Button onClick={close} rounded variant='icon'>
 							<ArrowLeft size={20} />
 						</Button>
 						<h4>{t('version.deployment_settings')}</h4>

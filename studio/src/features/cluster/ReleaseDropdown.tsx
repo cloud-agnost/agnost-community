@@ -62,7 +62,7 @@ export default function ReleaseDropdown() {
 	return (
 		<DropdownMenu open={open} onOpenChange={setOpen}>
 			<DropdownMenuTrigger asChild>
-				<Button variant='blank' iconOnly className='relative'>
+				<Button variant='icon' className='relative'>
 					{getReleaseStatus() !== 'OK' && (
 						<div className='absolute top-1 right-0.5'>
 							<span className='relative flex items-center justify-center h-3 w-3'>
@@ -79,10 +79,7 @@ export default function ReleaseDropdown() {
 					<Package size={24} />
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent
-				className='relative max-w-md bg-wrapper-background-base h-full'
-				align='end'
-			>
+			<DropdownMenuContent className='relative max-w-md bg-subtle h-full' align='end'>
 				<DropdownMenuLabel className='text-default flex items-center justify-between px-4 py-2'>
 					<p>{t('cluster.release_info')}</p>
 					<span className='text-subtle text-sm font-sfCompact inline-block text-right'>
