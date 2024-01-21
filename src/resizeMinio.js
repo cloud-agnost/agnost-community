@@ -11,7 +11,6 @@ const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 const namespace = process.env.NAMESPACE;
 
 async function resizeMinio(newSize) {
-  const pvcName = 'minio';
   const pvcPatch = {
     spec: {
       resources: {
@@ -24,8 +23,11 @@ async function resizeMinio(newSize) {
   const requestOptions = { headers: { 'Content-Type': 'application/merge-patch+json' }, };
 
   try {
-    await k8sCoreApi.patchNamespacedPersistentVolumeClaim(pvcName, namespace, pvcPatch, undefined, undefined, undefined, undefined, undefined, requestOptions);
-    console.log('PersistentVolumeClaim minio was updated...');
+    for (i of ['0', '1', '2', '3']) {
+      const pvcName = 'export-minio-storage-' + i;
+      await k8sCoreApi.patchNamespacedPersistentVolumeClaim(pvcName, namespace, pvcPatch, undefined, undefined, undefined, undefined, undefined, requestOptions);
+      console.log('PersistentVolumeClaim ' + pvcName + ' was updated...');
+    };
   } catch (error){
     console.error('Error updating minio PVC size: ', error.body);
     throw new Error(JSON.stringify(error.body));
