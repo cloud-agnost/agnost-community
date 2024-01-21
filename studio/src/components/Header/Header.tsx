@@ -46,19 +46,19 @@ export function Header() {
 			<div className='header-menu-right'>
 				<nav className='header-menu-right-nav'>
 					<Feedback />
-					{MENU_ITEMS.map((item, index) => (
-						<Link
-							className='header-menu-right-nav-item'
-							key={index}
-							to={item.url}
-							target='_blank'
-							rel='noopener noreferrer'
+					{MENU_ITEMS.map((item) => (
+						<Button
+							key={item.title}
+							variant='blank'
+							className='header-menu-right-nav-item text-subtle'
+							onClick={() => {
+								window.open(item.url, '_blank', 'noreferrer');
+							}}
 						>
-							<span className='header-menu-right-nav-item-icon'>
-								<item.icon />
-							</span>
-							<span className='header-menu-right-nav-item-title'>{item.title}</span>
-						</Link>
+							<item.icon className='header-menu-right-nav-item-icon' />
+
+							<span className='header-menu-right-nav-item-title font-sfCompact'>{item.title}</span>
+						</Button>
 					))}
 				</nav>
 				<div className='header-menu-divider' />
