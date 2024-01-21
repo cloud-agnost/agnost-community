@@ -30,7 +30,7 @@ spec:
           serviceAccountName: sa-regcred-rotate
           containers:
           - name: regcred-rotate
-            image: odaniait/aws-kubectl:latest
+            image: gcr.io/agnost-community/aws-kubectl:2.15.10-1.29.0
             imagePullPolicy: IfNotPresent
             envFrom:
               - secretRef:
@@ -46,7 +46,7 @@ spec:
                 kubectl create secret docker-registry $DOCKER_SECRET_NAME \
                 --docker-server=https://${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com \
                 --docker-username=AWS \
-                --docker-password="${ECR_TOKEN}" \
+                --docker-password="${ECR_TOKEN}"
                 echo "Secret was successfully updated at $(date)"
           restartPolicy: Never
 ---
@@ -62,7 +62,7 @@ metadata:
 rules:
 - apiGroups: [""]
   resources: ["secrets"]
-  resourceNames: ["regcred"]
+  resourceNames: ["regcred-ecr"]
   verbs: ["delete"]
 - apiGroups: [""]
   resources: ["secrets"]

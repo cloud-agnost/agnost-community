@@ -14,7 +14,7 @@ const batchApi = kc.makeApiClient(k8s.BatchV1Api);
 const namespace = process.env.NAMESPACE;
 
 async function createAwsResources(awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, regcredSecretName) {
-  const manifest = fs.readFileSync('../manifests/awsEcr.yaml', 'utf8');
+  const manifest = fs.readFileSync('/manifests/awsEcr.yaml', 'utf8');
   const resources = k8s.loadAllYaml(manifest);
 
   for (const resource of resources) {
@@ -59,37 +59,47 @@ async function createAwsResources(awsAccessKeyId, awsSecretAccessKey, awsRegion,
   }
 }
 
-async function createDockerCredetials(repository, username, password, email, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount) {
+async function createDockerCredetials(repository, username, password, email, gcpRegion, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, serverName) {
   const secretName = 'regcred-' + repository;
 
   switch(repository) {
     case "docker":
       dockerServer = "https://index.docker.io/v1/";
       break;
-    case "gcr":
-      dockerServer = "gcr.io";
-      // json output should be flattened first, then base64 encoded
-      // e.g.: cat private-gcr-user.json | jq -c | base64 -w0
+    case "gcr":    // Google Container Registry -- will shut down on May 15, 2024
+      if (gcpRegion) {
+        dockerServer = gcpRegion + ".gcr.io";
+      } else {
+        dockerServer = "gcr.io";
+      };
       decodedPass = Buffer.from(password, 'base64');
-      password = decodedPass.toString().trim();
+      password = decodedPass.toString().trim().replace(/\n/g, "");
       break;
-    case "quay":
+    case "gar":   // Google Artifact Registry
+      dockerServer = "https://" + gcpRegion + "-docker.pkg.dev";
+      decodedPass = Buffer.from(password, 'base64');
+      password = decodedPass.toString().trim().replace(/\n/g, "");
+      break;
+    case "quay": // Red Hat Quay
       dockerServer = "quay.io";
       break;
-    case "ghcr":
+    case "ghcr":  // GitHub Registry
         dockerServer = "ghcr.io";
         break;
-    case "acr":
+    case "acr":   // Azure Container Registry
       dockerServer = azureContainerRegistryName + ".azurecr.io";
       break;
-    case "ecr":
+    case "ecr":   // AWS Elastic Container Registry
       dockerServer = awsAccount + ".dkr.ecr." + awsRegion + ".amazonaws.com";
       await createAwsResources(awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, secretName);
+      break;
+    case "generic": // For other possible server, serverName needs to be provided
+      dockerServer = serverName;
       break;
   }
 
   auth = Buffer.from(username + ':' + password);
-  const secretData = Buffer.from('{ "auths": { "' + dockerServer + '": { "username": "' + username + '", "password": "' + password.replace(/[\""]/g, '\\"') + '", "email": "' + email + '", "auth": "' + auth.toString("base64") + '" } } }');
+  const secretData = Buffer.from('{"auths":{"' + dockerServer + '":{"username":"' + username + '","password":"' + password.replace(/[\""]/g, '\\"') + '","email":"' + email + '","auth":"' + auth.toString("base64") + '"}}}');
 
   const regcredSecret = {
     "apiVersion": "v1",
@@ -106,6 +116,7 @@ async function createDockerCredetials(repository, username, password, email, azu
 
   try {
     await k8sCoreApi.createNamespacedSecret(namespace, regcredSecret);
+    console.log("Secret " + secretName + " is created");
   } catch (error) {
     console.error('Error creating secret:', error.body);
     throw new Error(JSON.stringify(error.body));
@@ -115,11 +126,11 @@ async function createDockerCredetials(repository, username, password, email, azu
 
 // Create a Docker Credentials for imagePullSecrets
 router.post('/dockercredentials', async (req, res) => {
-  const { repository, username, password, email, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount } = req.body;
+  const { repository, username, password, email, gcpRegion, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, serverName} = req.body;
 
   try {
-    await createDockerCredetials(repository, username, password, email, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount);
-    res.json({ 'secretName': 'regcred' });
+    await createDockerCredetials(repository, username, password, email, gcpRegion, azureContainerRegistryName, awsAccessKeyId, awsSecretAccessKey, awsRegion, awsAccount, serverName);
+    res.json({ 'secretName': 'regcred-' + repository });
   } catch (err) {
     console.error(err);
     res.status(500).json(JSON.parse(err.message));
