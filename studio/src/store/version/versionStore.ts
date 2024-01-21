@@ -44,6 +44,7 @@ interface VersionStore {
 	dashboard: Dashboard;
 	packages: Record<string, string>;
 	lastFetchedLogPage: number | undefined;
+	isSearchCommandMenuOpen: boolean;
 }
 
 type Actions = {
@@ -68,7 +69,7 @@ type Actions = {
 	getVersionDashboardInfo: (params: BaseParams) => Promise<Dashboard>;
 	getNpmPackages: (params: BaseParams) => Promise<void>;
 	getTypings: () => Promise<Record<string, string>>;
-
+	toggleSearchCommandMenu: () => void;
 	reset: () => void;
 };
 
@@ -93,6 +94,7 @@ const initialState: VersionStore = {
 	dashboard: {} as Dashboard,
 	packages: {},
 	lastFetchedLogPage: undefined,
+	isSearchCommandMenuOpen: false,
 };
 
 const useVersionStore = create<VersionStore & Actions>()(
@@ -312,6 +314,9 @@ const useVersionStore = create<VersionStore & Actions>()(
 					} catch (error) {
 						throw error as APIError;
 					}
+				},
+				toggleSearchCommandMenu: () => {
+					set((prev) => ({ isSearchCommandMenuOpen: !prev.isSearchCommandMenuOpen }));
 				},
 				reset: () => set(initialState),
 			}),
